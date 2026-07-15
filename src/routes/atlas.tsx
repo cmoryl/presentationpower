@@ -102,12 +102,27 @@ function Atlas() {
                 <div className="mt-4 border-t border-black/10 pt-3">
                   <div className="text-xs uppercase tracking-widest text-black/50">Variants</div>
                   <ul className="mt-2 space-y-1 text-sm">
-                    {variants.map((v) => (
-                      <li key={v.id} className="flex justify-between">
-                        <span>{v.name}</span>
-                        <span className="font-mono text-xs text-black/50">{v.id}</span>
-                      </li>
-                    ))}
+                    {variants.map((v) => {
+                      const ico = iconographyForVariant(v);
+                      return (
+                        <li key={v.id} className="flex items-center justify-between gap-2">
+                          <span className="truncate">{v.name}</span>
+                          <span className="flex shrink-0 items-center gap-2">
+                            <span
+                              className="rounded-full px-2 py-0.5 font-mono text-[10px]"
+                              style={{
+                                backgroundColor: ico.placement === "none" ? "rgba(0,0,0,0.04)" : "rgba(232,93,44,0.12)",
+                                color: ico.placement === "none" ? "rgba(0,0,0,0.4)" : "#B84512",
+                              }}
+                              title={`${ico.placement} · ${ico.size} · ${ico.treatment} · ${ico.emphasis} — ${ico.rationale}`}
+                            >
+                              {ico.placement === "none" ? "no-icon" : `${ico.placement}·${ico.size}`}
+                            </span>
+                            <span className="font-mono text-xs text-black/50">{v.id}</span>
+                          </span>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               </div>
