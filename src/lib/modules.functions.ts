@@ -27,8 +27,8 @@ export function computeContentHash(variantId: string, brandModeId: string | null
 }
 
 // ── Reviewer role gate ────────────────────────────────────────────────────
-async function assertReviewer(ctx: { supabase: Awaited<ReturnType<typeof requireSupabaseAuth>>; userId: string }) {
-  const s = ctx.supabase as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> };
+async function assertReviewer(ctx: { supabase: unknown; userId: string }) {
+  const s = ctx.supabase as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> };
   const [admin, reviewer] = await Promise.all([
     s.rpc("has_role", { _user_id: ctx.userId, _role: "admin" }),
     s.rpc("has_role", { _user_id: ctx.userId, _role: "brand_reviewer" }),
@@ -37,6 +37,7 @@ async function assertReviewer(ctx: { supabase: Awaited<ReturnType<typeof require
     throw new Error("Forbidden: requires admin or brand_reviewer");
   }
 }
+
 
 // ── Approval queue ────────────────────────────────────────────────────────
 export const listPendingModules = createServerFn({ method: "GET" })
