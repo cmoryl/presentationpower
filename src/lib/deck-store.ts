@@ -83,11 +83,18 @@ function assembleDeck(brief: Brief): Deck {
   const recipe = (arch?.sectionRecipe ?? []).slice(0, Math.max(brief.lengthTarget, 4));
   const profile = BRAND_PROFILES[brief.brandModeId];
   const restricted = new Set(profile?.contentScope.restrictedFamilyIds ?? []);
+  const preferred = new Set(profile?.contentScope.preferredVariantIds ?? []);
   const slides: DeckSlide[] = recipe.map((sfId, i) => {
     const sf = byId(SECTION_FRAMEWORKS, sfId);
-    const options = variantsForSection(sfId).filter((v) => !restricted.has(v.familyId));
-    const fallback = variantsForSection(sfId);
-    const variant = options[0] ?? fallback[0] ?? MODULE_VARIANTS[0];
+    const permitted = variantsForSection(sfId).filter((v) => !restricted.has(v.familyId));
+    const pool = permitted.length > 0 ? permitted : variantsForSection(sfId);
+    // Rank: preferredVariantIds first, then original order.
+    const options = [...pool].sort((a, b) => {
+      const ap = preferred.has(a.id) ? 0 : 1;
+      const bp = preferred.has(b.id) ? 0 : 1;
+      return ap - bp;
+    });
+    const variant = options[0] ?? MODULE_VARIANTS[0];
     const layoutId = variant.permittedLayoutIds[0];
     return {
       id: nanoid(8),

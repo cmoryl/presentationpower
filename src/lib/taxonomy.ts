@@ -20,6 +20,7 @@ export type BrandContentScope = {
   caseStudyTags: string[];     // filters for case study modules
   preferredArchetypes: string[]; // narrative archetype ids that suit this brand
   restrictedFamilyIds?: string[]; // MF ids that are off-limits for this brand
+  preferredVariantIds?: string[]; // MV ids the assembler should reach for first
 };
 
 export type BrandMode = {

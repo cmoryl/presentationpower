@@ -39,13 +39,19 @@ function Library() {
   const { brandModes, moduleFamilies, moduleVariants, layoutFrameworks, sectionFrameworks } = useTaxonomy();
   const [q, setQ] = useState("");
   const [family, setFamily] = useState<string>("all");
+  const [scopeBrandId, setScopeBrandId] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
   const [brandIdx, setBrandIdx] = useState(0);
 
+  const scopeBrand = scopeBrandId === "all" ? undefined : brandModes.find((b) => b.id === scopeBrandId);
+  const restricted = new Set(scopeBrand?.contentScope?.restrictedFamilyIds ?? []);
+  const preferred = new Set(scopeBrand?.contentScope?.preferredVariantIds ?? []);
+
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    return moduleVariants.filter((v) => {
+    const matched = moduleVariants.filter((v) => {
       if (family !== "all" && v.familyId !== family) return false;
+      if (scopeBrand && restricted.has(v.familyId)) return false;
       if (!needle) return true;
       return (
         v.id.toLowerCase().includes(needle) ||
@@ -53,7 +59,14 @@ function Library() {
         v.description.toLowerCase().includes(needle)
       );
     });
-  }, [q, family, moduleVariants]);
+    // Rank preferred variants first when a brand scope is chosen.
+    if (!scopeBrand) return matched;
+    return [...matched].sort((a, b) => {
+      const ap = preferred.has(a.id) ? 0 : 1;
+      const bp = preferred.has(b.id) ? 0 : 1;
+      return ap - bp;
+    });
+  }, [q, family, moduleVariants, scopeBrand, restricted, preferred]);
 
   const active = openId ? moduleVariants.find((v) => v.id === openId) : null;
 
@@ -63,7 +76,7 @@ function Library() {
         <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library</div>
         <h1 className="mt-3 text-4xl font-semibold">Approved module variants.</h1>
         <p className="mt-3 max-w-2xl text-black/60">
-          Search and preview the modules the assembler pulls from. Now loaded live from the Cloud taxonomy.
+          Search and preview the modules the assembler pulls from. Scope by brand to hide off-limits families and float the preferred variants for that identity.
         </p>
       </div>
 
@@ -84,6 +97,22 @@ function Library() {
             <option key={mf.id} value={mf.id}>{mf.id} · {mf.name}</option>
           ))}
         </select>
+        <select
+          value={scopeBrandId}
+          onChange={(e) => setScopeBrandId(e.target.value)}
+          className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+          title="Filter to what's in-scope for a brand"
+        >
+          <option value="all">Any brand scope</option>
+          {brandModes.map((b) => (
+            <option key={b.id} value={b.id}>Scope: {b.name}</option>
+          ))}
+        </select>
+        {scopeBrand && (
+          <span className="rounded-full bg-black/5 px-3 py-1 text-xs text-black/70">
+            {preferred.size} preferred · {restricted.size} family restrictions
+          </span>
+        )}
         <div className="ml-auto text-sm text-black/50">{filtered.length} of {moduleVariants.length}</div>
       </div>
 
@@ -93,8 +122,9 @@ function Library() {
             key={v.id}
             variant={v}
             familyName={byId(moduleFamilies, v.familyId)?.name}
-            brand={brandModes[0]}
+            brand={scopeBrand ?? brandModes[0]}
             sectionId={sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? ""}
+            preferred={preferred.has(v.id)}
             onOpen={() => setOpenId(v.id)}
           />
         ))}
@@ -131,12 +161,14 @@ function VariantCard({
   familyName,
   brand,
   sectionId,
+  preferred,
   onOpen,
 }: {
   variant: ModuleVariant;
   familyName?: string;
   brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
   sectionId: string;
+  preferred?: boolean;
   onOpen: () => void;
 }) {
   const previewSlide = {
@@ -161,6 +193,11 @@ function VariantCard({
         <div className="absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 backdrop-blur transition group-hover:opacity-100">
           View details ↗
         </div>
+        {preferred && (
+          <div className="absolute left-3 top-3 rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white shadow">
+            In scope
+          </div>
+        )}
       </div>
       <div className="border-t border-black/10 p-4">
         <div className="flex items-baseline justify-between">

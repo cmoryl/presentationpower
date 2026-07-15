@@ -22,7 +22,7 @@ function ExportView() {
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
 
-  const qa = useMemo(() => runQa(deck.slides), [deck.slides]);
+  const qa = useMemo(() => runQa(deck.slides, deck.brandModeId), [deck.slides, deck.brandModeId]);
   const blocks = blockingIssues(qa);
   const warns = warningIssues(qa);
   const blocked = blocks.length > 0 && !override;
