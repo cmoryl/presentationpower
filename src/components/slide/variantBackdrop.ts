@@ -48,9 +48,9 @@ export function backdropForVariant(variant: ModuleVariant): SlideBackdrop | null
     return { url: ambient, scrim: "left", scrimStrength: 0.65, tint: "#03002C" };
   }
 
-  // Dividers — abstract/ambient/city with full-frame vignette.
+  // Dividers — abstract/bokeh/ambient/city with full-frame vignette.
   if (/^MV-OP-DIVIDER/.test(id)) {
-    const dividerImages = [abstract, ambient, city];
+    const dividerImages = [abstract, bokeh, ambient, city];
     return {
       url: dividerImages[seed % dividerImages.length],
       scrim: "vignette",
