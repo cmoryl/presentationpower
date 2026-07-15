@@ -1,4 +1,16 @@
 import type { ModuleVariant } from "@/lib/taxonomy";
+import portrait1 from "@/assets/portraits/portrait-1.png";
+import portrait2 from "@/assets/portraits/portrait-2.png";
+import portrait3 from "@/assets/portraits/portrait-3.png";
+import portrait4 from "@/assets/portraits/portrait-4.png";
+
+const PORTRAITS = [portrait1, portrait2, portrait3, portrait4];
+
+function hashStr(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
 
 /**
  * MediaZoneOverlay renders semi-transparent, labelled "media zones" on top of a
@@ -187,14 +199,14 @@ export function MediaZoneOverlay({
       aria-hidden
     >
       {zones.map((z, i) => (
-        <ZoneRect key={i} zone={z} />
+        <ZoneRect key={i} zone={z} seed={hashStr(variant.id) + i} />
       ))}
       <Legend zones={zones} />
     </div>
   );
 }
 
-function ZoneRect({ zone }: { zone: Zone }) {
+function ZoneRect({ zone, seed }: { zone: Zone; seed: number }) {
   const style = KIND_STYLES[zone.kind];
   const isCircle = zone.shape === "circle";
   const isBlob = zone.shape === "blob";
@@ -203,6 +215,8 @@ function ZoneRect({ zone }: { zone: Zone }) {
     zone.kind === "aura" || zone.kind === "overlay"
       ? "none"
       : `3px dashed ${style.ring}`;
+  const isHuman = zone.kind === "human";
+  const portrait = isHuman ? PORTRAITS[seed % PORTRAITS.length] : undefined;
   return (
     <div
       style={{
@@ -211,9 +225,12 @@ function ZoneRect({ zone }: { zone: Zone }) {
         top: zone.y,
         width: zone.w,
         height: zone.h,
-        background: style.fill,
+        background: isHuman
+          ? `linear-gradient(${style.fill}, ${style.fill}), url(${portrait}) center/cover no-repeat`
+          : style.fill,
         border,
         borderRadius: radius,
+        overflow: "hidden",
         transform: zone.rotate ? `rotate(${zone.rotate}deg)` : undefined,
         backdropFilter: zone.kind === "aura" ? "blur(24px)" : undefined,
         mixBlendMode: zone.kind === "overlay" ? "multiply" : undefined,
