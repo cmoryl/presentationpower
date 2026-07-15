@@ -1,8 +1,10 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { useContrastBoost } from "@/hooks/use-contrast-boost";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [boost, setBoost] = useContrastBoost();
   const nav = [
     { to: "/", label: "Dashboard" },
     { to: "/brief/new", label: "New brief" },
@@ -33,6 +35,21 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </Link>
               );
             })}
+            <button
+              type="button"
+              onClick={() => setBoost(!boost)}
+              aria-pressed={boost}
+              aria-label={boost ? "Disable high contrast mode" : "Enable high contrast mode"}
+              title="Auto-adjust text contrast on glass surfaces"
+              className={`ml-2 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition ${
+                boost
+                  ? "border-[#03002C] bg-[#03002C] text-white"
+                  : "border-black/20 bg-white/40 text-black/70 hover:bg-white/70"
+              }`}
+            >
+              <span aria-hidden="true">◐</span>
+              <span>Readable</span>
+            </button>
           </nav>
         </div>
       </header>
@@ -40,4 +57,3 @@ export function AppShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
-
