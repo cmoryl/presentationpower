@@ -1244,3 +1244,26 @@ export const variantsForSection = (sectionId: string): ModuleVariant[] => {
   if (!sf) return [];
   return MODULE_VARIANTS.filter((mv) => sf.permittedFamilyIds.includes(mv.familyId));
 };
+
+// Related-slide graph: given a variant + optional section, return other
+// variants in the same family (and ideally the same section pool), ranked by
+// permitted-layout overlap and section overlap. Excludes the seed variant.
+export function relatedVariants(variantId: string, sectionId?: string, limit = 5): ModuleVariant[] {
+  const seed = byId(MODULE_VARIANTS, variantId);
+  if (!seed) return [];
+  const seedLayouts = new Set(seed.permittedLayoutIds);
+  const sectionPool = sectionId ? new Set(variantsForSection(sectionId).map((v) => v.id)) : null;
+
+  const scored = MODULE_VARIANTS
+    .filter((v) => v.id !== variantId && v.familyId === seed.familyId)
+    .map((v) => {
+      const layoutOverlap = v.permittedLayoutIds.reduce((n, id) => n + (seedLayouts.has(id) ? 1 : 0), 0);
+      const sectionMatch = sectionPool && sectionPool.has(v.id) ? 1 : 0;
+      const fallbackBoost = seed.fallbackVariantId === v.id || v.fallbackVariantId === variantId ? 2 : 0;
+      return { v, score: layoutOverlap + sectionMatch * 2 + fallbackBoost };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  return scored.slice(0, limit).map((s) => s.v);
+}
+

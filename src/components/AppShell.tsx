@@ -8,7 +8,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/brief/new", label: "New brief" },
     { to: "/atlas", label: "Atlas" },
     { to: "/library", label: "Library" },
+    { to: "/admin/approvals", label: "Approvals" },
   ] as const;
+
   return (
     <div className="min-h-screen bg-[#F5F1EA] text-[#0A0F1C]">
       <header className="border-b border-black/10 bg-white">
