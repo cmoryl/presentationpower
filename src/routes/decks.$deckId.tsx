@@ -319,41 +319,8 @@ function Panel({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// QA gates — cheap client-side checks against variant capacity + empty fields
-// ────────────────────────────────────────────────────────────────────────────
-type QaIssue = { slideId: string; message: string };
-
-function runQa(slides: DeckSlide[]): QaIssue[] {
-  const issues: QaIssue[] = [];
-  for (const slide of slides) {
-    const variant = byId(MODULE_VARIANTS, slide.variantId);
-    if (!variant) continue;
-    // Empty editable fields
-    for (const path of variant.editableFields) {
-      for (const cp of expandPath(path, slide.content)) {
-        const v = readPath(slide.content, cp);
-        if (v == null || (typeof v === "string" && v.trim() === "")) {
-          issues.push({ slideId: slide.id, message: `Empty field: ${cp}` });
-        }
-      }
-    }
-    // Capacity: items array bounds
-    checkCapacity(slide, variant, issues);
-  }
-  return issues;
-}
-
-function checkCapacity(slide: DeckSlide, variant: ModuleVariant, issues: QaIssue[]) {
-  const cap = variant.capacity.items;
-  if (!cap) return;
-  const items = slide.content.items;
-  const n = Array.isArray(items) ? items.length : 0;
-  if (n < cap.min) issues.push({ slideId: slide.id, message: `Needs at least ${cap.min} items (has ${n})` });
-  if (n > cap.max) issues.push({ slideId: slide.id, message: `Over capacity: ${n} items, max ${cap.max}` });
-}
-
 // Expand editable field patterns like "items[].title" against the current content.
+
 function FieldEditor({
   path,
   content,
