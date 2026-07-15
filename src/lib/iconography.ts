@@ -279,3 +279,47 @@ export function iconographyForVariant(variant: ModuleVariant): IconSpec & { sour
     rationale: "Fallback: leading soft-tile accent",
   };
 }
+
+// ---------- Module-family icons ----------
+// One representative Lucide glyph per module family, used as a wayfinding
+// mark in /atlas cards, the library filter, and section chips.
+
+import {
+  Compass,
+  AlertTriangle,
+  Lightbulb,
+  Workflow,
+  BarChart3,
+  BookOpen,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
+
+export type ModuleFamilyIcon = {
+  id: string;             // MF-XX
+  Icon: LucideIcon;
+  emphasis: IconEmphasis; // maps to color pair
+  rationale: string;
+};
+
+export const MODULE_FAMILY_ICONS: Record<string, ModuleFamilyIcon> = {
+  "MF-01": { id: "MF-01", Icon: Compass,        emphasis: "accent",  rationale: "Opening & orientation — set the direction" },
+  "MF-02": { id: "MF-02", Icon: AlertTriangle,  emphasis: "warning", rationale: "Context & challenge — surface the problem" },
+  "MF-03": { id: "MF-03", Icon: Lightbulb,      emphasis: "accent",  rationale: "Insight & opportunity — the leverage point" },
+  "MF-04": { id: "MF-04", Icon: Workflow,       emphasis: "primary", rationale: "Solution & process — how it works" },
+  "MF-05": { id: "MF-05", Icon: BarChart3,      emphasis: "success", rationale: "Proof, data & decision — substantiate" },
+  "MF-06": { id: "MF-06", Icon: BookOpen,       emphasis: "primary", rationale: "Case study — the story of a comparable win" },
+  "MF-07": { id: "MF-07", Icon: Users,          emphasis: "primary", rationale: "Team, governance & close — people and next steps" },
+};
+
+export function familyIcon(familyId: string): ModuleFamilyIcon {
+  return (
+    MODULE_FAMILY_ICONS[familyId] ?? {
+      id: familyId,
+      Icon: Compass,
+      emphasis: "muted",
+      rationale: "Fallback",
+    }
+  );
+}
+

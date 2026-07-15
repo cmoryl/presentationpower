@@ -9,10 +9,12 @@ import {
   ICON_EMPHASIS_META,
   resolveEmphasisColors,
   iconographyForVariant,
+  familyIcon,
   type IconTreatment,
   type IconEmphasis,
   type IconSizeToken,
 } from "@/lib/iconography";
+
 import { Sparkles, Target, Workflow, Layers3, Users, Rocket } from "lucide-react";
 import {
   LOGO_POSITIONS_META,
@@ -97,14 +99,37 @@ function Atlas() {
             const variants = MODULE_VARIANTS.filter((mv) => mv.familyId === mf.id);
             return (
               <div key={mf.id} className="rounded-2xl border border-black/10 bg-white p-5">
-                <div className="flex items-baseline justify-between">
-                  <div>
-                    <div className="font-mono text-xs text-black/50">{mf.id}</div>
-                    <div className="mt-1 font-medium">{mf.name}</div>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    {(() => {
+                      const fi = familyIcon(mf.id);
+                      const color =
+                        fi.emphasis === "primary" ? "#0B2A4A"
+                        : fi.emphasis === "accent" ? "#E85D2C"
+                        : fi.emphasis === "success" ? "#1F7A4C"
+                        : fi.emphasis === "warning" ? "#B45309"
+                        : "#7A7A7A";
+                      return (
+                        <span
+                          className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
+                          style={{ backgroundColor: `${color}18`, color }}
+                          aria-hidden
+                          title={fi.rationale}
+                        >
+                          <fi.Icon size={22} strokeWidth={1.75} />
+                        </span>
+                      );
+                    })()}
+
+                    <div>
+                      <div className="font-mono text-xs text-black/50">{mf.id}</div>
+                      <div className="mt-1 font-medium">{mf.name}</div>
+                    </div>
                   </div>
-                  <span className="rounded-full bg-black/5 px-2 py-0.5 text-xs">Review: {mf.reviewLevel}</span>
+                  <span className="shrink-0 rounded-full bg-black/5 px-2 py-0.5 text-xs">Review: {mf.reviewLevel}</span>
                 </div>
-                <div className="mt-2 text-sm text-black/60">{mf.description}</div>
+                <div className="mt-3 text-sm text-black/60">{mf.description}</div>
+
                 <div className="mt-4 border-t border-black/10 pt-3">
                   <div className="text-xs uppercase tracking-widest text-black/50">Variants</div>
                   <ul className="mt-2 space-y-1 text-sm">
