@@ -193,6 +193,11 @@ function VariantCard({
         <div className="absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 backdrop-blur transition group-hover:opacity-100">
           View details ↗
         </div>
+        {preferred && (
+          <div className="absolute left-3 top-3 rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white shadow">
+            In scope
+          </div>
+        )}
       </div>
       <div className="border-t border-black/10 p-4">
         <div className="flex items-baseline justify-between">
