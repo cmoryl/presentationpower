@@ -238,13 +238,8 @@ function renderVariantBody({
     case "MV-OP-COVER-MEDIA":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(135deg, ${brand.tokens.primary} 0%, ${brand.tokens.ink} 100%)`,
-              opacity: 0.85,
-            }}
-          />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} className="absolute inset-0 h-full w-full rounded-none" />
+          <div className="absolute inset-0" style={{ backgroundColor: "rgba(3,0,44,0.62)" }} />
           <div className="relative flex h-full flex-col justify-end text-white">
             <div className="text-2xl uppercase tracking-[0.3em] opacity-80">Prepared for {s(c.clientName)}</div>
             <div className="mt-4 text-[128px] font-semibold leading-[0.95]">{s(c.title)}</div>
@@ -343,7 +338,7 @@ function renderVariantBody({
               <div key={i} className="rounded-2xl border p-8" style={{ borderColor: "rgba(10,15,28,0.1)", backgroundColor: brand.tokens.surface }}>
                 <div
                   className="mb-6 h-32 w-32 rounded-full"
-                  style={{ background: `linear-gradient(135deg, ${brand.tokens.primary}, ${brand.tokens.accent})` }}
+                  style={{ backgroundColor: brand.tokens.accent }}
                 />
                 <div className="text-3xl font-semibold" style={{ color: brand.tokens.primary }}>
                   {s(p.name)}
@@ -509,7 +504,7 @@ function renderVariantBody({
           <div className="mt-12 grid grid-cols-2 gap-8" style={{ gridTemplateRows: "1fr 1fr" }}>
             <div
               className="row-span-2 rounded-2xl p-10 text-white"
-              style={{ background: `linear-gradient(135deg, ${brand.tokens.primary}, ${brand.tokens.accent})` }}
+              style={{ backgroundColor: brand.tokens.primary }}
             >
               <div className="text-xl uppercase tracking-[0.25em] opacity-80">Hero</div>
               <div className="mt-6 text-5xl font-semibold">{s(hero.title)}</div>
@@ -1074,12 +1069,8 @@ function renderVariantBody({
     case "MV-OP-COVER-GRADIENT":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `radial-gradient(circle at 20% 20%, ${brand.tokens.accent}66, transparent 55%), radial-gradient(circle at 80% 70%, ${brand.tokens.primary} 0%, ${brand.tokens.ink} 100%)`,
-            }}
-          />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-image"))} className="absolute inset-0 h-full w-full rounded-none" />
+          <div className="absolute inset-0" style={{ backgroundColor: "rgba(3,0,44,0.58)" }} />
           <div className="relative flex h-full flex-col justify-end text-white">
             <div className="text-2xl uppercase tracking-[0.35em] opacity-85">Prepared for {s(c.clientName)}</div>
             <div className="mt-6 text-[136px] font-semibold leading-[0.95]">{s(c.title)}</div>
@@ -1141,7 +1132,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "hero"))} className="absolute inset-0 h-full w-full rounded-none" />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.65) 100%)" }} />
+          <div className="absolute inset-0" style={{ backgroundColor: "rgba(3,0,44,0.48)" }} />
           <div className="relative flex h-full flex-col justify-end text-white">
             <div className="text-2xl uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>
               {s(c.kicker, "In focus")}
@@ -1232,7 +1223,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote"))} className="absolute inset-0 h-full w-full rounded-none" />
-          <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(0,0,0,0.35), ${brand.tokens.primary}D9)` }} />
+          <div className="absolute inset-0" style={{ backgroundColor: "rgba(3,0,44,0.68)" }} />
           <div className="relative flex h-full flex-col justify-center text-white">
             <div className="text-[200px] leading-none opacity-20" style={{ color: brand.tokens.accent }}>“</div>
             <div className="-mt-12 max-w-6xl text-5xl font-medium leading-[1.2]">{s(c.quote)}</div>
@@ -1372,7 +1363,7 @@ function renderVariantBody({
             </div>
             <div
               className="rounded-3xl p-10 text-center"
-              style={{ background: `linear-gradient(160deg, ${brand.tokens.primary}, ${brand.tokens.accent})`, color: "#fff" }}
+              style={{ backgroundColor: brand.tokens.primary, color: "#fff" }}
             >
               <div className="text-[140px] font-semibold leading-none">
                 {s(c.metric)}<span className="align-top text-6xl opacity-90">{s(c.unit)}</span>
@@ -1459,7 +1450,7 @@ function renderVariantBody({
                     className="flex h-24 items-center justify-between rounded-xl px-10 text-white"
                     style={{
                       width: `${widthPct}%`,
-                      background: `linear-gradient(90deg, ${brand.tokens.primary}, ${brand.tokens.accent})`,
+                      backgroundColor: brand.tokens.primary,
                       opacity: 0.55 + shade * 0.45,
                     }}
                   >
@@ -1525,7 +1516,7 @@ function renderVariantBody({
           <div className="relative mx-auto mt-8 h-[780px] w-[780px]">
             <div
               className="absolute inset-[28%] flex items-center justify-center rounded-full text-center text-white"
-              style={{ background: `linear-gradient(135deg, ${brand.tokens.primary}, ${brand.tokens.accent})` }}
+              style={{ backgroundColor: brand.tokens.primary }}
             >
               <div className="px-6 text-3xl font-semibold leading-tight">{s(c.hub, "Program")}</div>
             </div>
@@ -1573,7 +1564,7 @@ function renderVariantBody({
                     className="flex h-24 items-center justify-center rounded text-white"
                     style={{
                       width: `${widthPct}%`,
-                      background: `linear-gradient(90deg, ${brand.tokens.primary}, ${brand.tokens.accent})`,
+                      backgroundColor: brand.tokens.primary,
                       opacity: shade,
                     }}
                   >
@@ -1824,7 +1815,7 @@ function renderVariantBody({
           <div className="grid h-full grid-cols-[520px_1fr] items-center gap-16">
             <div
               className="overflow-hidden rounded-3xl text-center text-white shadow-2xl"
-              style={{ background: `linear-gradient(160deg, ${brand.tokens.primary}, ${brand.tokens.accent})` }}
+              style={{ backgroundColor: brand.tokens.primary }}
             >
               <div className="border-b border-white/20 py-5 text-xl uppercase tracking-[0.3em] opacity-90">Kickoff</div>
               <div className="px-10 py-14">
@@ -1864,7 +1855,7 @@ function renderVariantBody({
             <div className="flex flex-col justify-center">
               <div className="text-5xl font-semibold leading-tight" style={{ color: brand.tokens.primary }}>{s(c.title)}</div>
               <div className="mt-8 text-2xl leading-snug opacity-85">{s(c.body)}</div>
-              <div className="mt-12 rounded-2xl p-8 text-white" style={{ background: `linear-gradient(135deg, ${brand.tokens.primary}, ${brand.tokens.accent})` }}>
+              <div className="mt-12 rounded-2xl p-8 text-white" style={{ backgroundColor: brand.tokens.primary }}>
                 <div className="text-xs uppercase tracking-[0.3em] opacity-80">Call to action</div>
                 <div className="mt-3 text-4xl font-semibold">{s(c.ctaLabel)}</div>
                 <div className="mt-3 text-xl opacity-90">{s(c.ctaDetail)}</div>
@@ -1949,8 +1940,8 @@ function renderVariantBody({
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// MediaTile — deterministic gradient/pattern placeholder used wherever a
-// module wants imagery. Feels like a photograph without shipping bytes.
+// MediaTile — deterministic image tile used wherever a module wants imagery.
+// Light mode stays plain; dark mode uses real backdrop assets only.
 // ────────────────────────────────────────────────────────────────────────────
 function hash(str: string): number {
   let h = 2166136261;
@@ -1960,16 +1951,6 @@ function hash(str: string): number {
   }
   return h >>> 0;
 }
-
-const MEDIA_PALETTES = [
-  ["#0B2A4A", "#4A90A4", "#F5F1EA"],
-  ["#2B1B17", "#E85A2C", "#F2C48D"],
-  ["#123524", "#3A6B4F", "#D9E2C3"],
-  ["#3D1E4A", "#8E44AD", "#EED9F5"],
-  ["#1A1F36", "#22C1C3", "#EDF6F6"],
-  ["#4A1F1F", "#C0392B", "#F4D8C6"],
-  ["#0F1A2B", "#E4C46B", "#F5EBD0"],
-];
 
 // Real photographic backdrops used inside MediaTile in dark mode.
 import mediaAmbient from "@/assets/backdrops/backdrop-ambient.jpg";
@@ -2000,13 +1981,6 @@ function MediaTile({
 }) {
   const mode = useContext(SlideModeContext);
   const h = hash(seed || brand.id);
-  const palette = MEDIA_PALETTES[h % MEDIA_PALETTES.length];
-  const angle = (h % 12) * 30;
-  const shape = h % 4;
-  const x1 = 15 + ((h >> 3) % 50);
-  const y1 = 20 + ((h >> 6) % 40);
-  const x2 = 45 + ((h >> 9) % 45);
-  const y2 = 30 + ((h >> 12) % 50);
   const grayscale = muted ? "grayscale(60%) brightness(0.9)" : undefined;
 
   // Light mode: render a clean, basic neutral placeholder (no gradient blobs
@@ -2030,10 +2004,8 @@ function MediaTile({
     );
   }
 
-  // Dark mode: use a real photographic backdrop (bokeh/ambient/city/team/
-  // abstract + portraits) with a brand-tinted scrim and a soft-focus accent
-  // blob — same treatment as SlideFrame backdrops, so tiles inside slides
-  // match the outer imagery language instead of showing gradient blobs.
+  // Dark mode: use a real photographic backdrop with a simple scrim and
+  // translucent brand-color washes. No generated radial/dot/pattern layers.
   const tileBackdrops = MEDIA_TILE_BACKDROPS;
   const url = tileBackdrops[h % tileBackdrops.length];
   const accent = brand.tokens.accent;
@@ -2052,27 +2024,30 @@ function MediaTile({
       />
       <div
         aria-hidden
-        className="absolute inset-0 pointer-events-none"
+        className="pointer-events-none absolute -left-[18%] top-[8%] h-[52%] w-[58%] rounded-full"
         style={{
-          backgroundImage: [
-            `radial-gradient(45% 55% at ${x1}% ${y1}%, ${accent}66 0%, ${accent}00 70%)`,
-            `radial-gradient(50% 55% at ${x2}% ${y2}%, ${primary}88 0%, ${primary}00 72%)`,
-          ].join(", "),
-          filter: "blur(30px)",
+          backgroundColor: `${accent}2E`,
+          filter: "blur(34px)",
           mixBlendMode: "screen",
-          opacity: 0.85,
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-[18%] right-[-18%] h-[58%] w-[58%] rounded-full"
+        style={{
+          backgroundColor: `${primary}36`,
+          filter: "blur(38px)",
+          mixBlendMode: "screen",
         }}
       />
       <div
         className="absolute inset-0"
-        style={{
-          background: `linear-gradient(${angle}deg, rgba(3,0,44,0.55) 0%, rgba(3,0,44,0.15) 60%, rgba(3,0,44,0.55) 100%)`,
-        }}
+        style={{ backgroundColor: "rgba(3,0,44,0.42)" }}
       />
       {portrait && (
         <div
           className="absolute left-1/2 top-[58%] h-[70%] w-[45%] -translate-x-1/2 rounded-t-full"
-          style={{ background: `linear-gradient(180deg, ${accent}55, ${primary}33)`, mixBlendMode: "soft-light" }}
+          style={{ backgroundColor: `${accent}33`, mixBlendMode: "soft-light" }}
         />
       )}
     </div>

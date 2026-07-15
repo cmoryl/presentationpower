@@ -87,7 +87,7 @@ export function SlideFrame({
       case "right":  return to("to left");
       case "full":   return `linear-gradient(${hexA(t, a)}, ${hexA(t, a)})`;
       case "vignette":
-        return `radial-gradient(ellipse at center, ${hexA(t, 0)} 30%, ${hexA(t, a)} 100%)`;
+        return `linear-gradient(${hexA(t, a * 0.35)}, ${hexA(t, a)})`;
     }
   })();
 
@@ -102,21 +102,25 @@ export function SlideFrame({
             className="absolute inset-0 h-full w-full object-cover"
             style={{ filter: backdrop.imageDim ? `brightness(${1 - backdrop.imageDim}) saturate(0.95)` : undefined }}
           />
-          {/* Soft-focus accent blobs — tinted from the division's brand tokens.
-              Two large blurred radial gradients (accent + primary) sit above the
-              image but below the scrim, giving each division a color-coded haze. */}
+          {/* Soft-focus accent haze — tinted from the division's brand tokens,
+              but rendered as translucent blurred washes rather than generated
+              dot/gradient backgrounds. */}
           <div
             aria-hidden
-            className="absolute inset-0 pointer-events-none"
+            className="pointer-events-none absolute -left-[12%] top-[4%] h-[48%] w-[54%] rounded-full"
             style={{
-              backgroundImage: [
-                `radial-gradient(38% 42% at 12% 22%, ${hexA(brand.tokens.accent, 0.45)} 0%, ${hexA(brand.tokens.accent, 0)} 70%)`,
-                `radial-gradient(42% 46% at 88% 82%, ${hexA(brand.tokens.primary, 0.55)} 0%, ${hexA(brand.tokens.primary, 0)} 72%)`,
-                `radial-gradient(28% 30% at 70% 18%, ${hexA(brand.tokens.accent, 0.28)} 0%, ${hexA(brand.tokens.accent, 0)} 75%)`,
-              ].join(", "),
-              filter: "blur(40px)",
+              backgroundColor: hexA(brand.tokens.accent, 0.18),
+              filter: "blur(58px)",
               mixBlendMode: "screen",
-              opacity: 0.9,
+            }}
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -bottom-[12%] right-[-10%] h-[56%] w-[56%] rounded-full"
+            style={{
+              backgroundColor: hexA(brand.tokens.primary, 0.22),
+              filter: "blur(64px)",
+              mixBlendMode: "screen",
             }}
           />
           <div className="absolute inset-0" style={{ backgroundImage: scrimGradient }} />
