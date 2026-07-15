@@ -482,6 +482,88 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         ],
       };
 
+    // ── Extended covers ────────────────────────────────────────────────
+    case "MV-OP-COVER-EDITORIAL":
+      return { kicker: `Vol. 01 · ${brief.industry || "Enterprise"}`, title: brief.meetingObjective || `A conversation with ${clientName}`, subtitle: `An editorial briefing for ${clientName}.`, clientName, date: new Date().toLocaleDateString(), mediaSeed: `${clientName}-editorial` };
+    case "MV-OP-COVER-SPLIT":
+      return { title: `${clientName} × TransPerfect`, subtitle: brief.meetingObjective || "A partnership review.", clientName, date: new Date().toLocaleDateString(), mediaSeed: `${clientName}-split` };
+    case "MV-OP-COVER-POSTER":
+      return { kicker: `A briefing for ${clientName}`, title: (brief.meetingObjective || "Signal").split(" ").slice(0, 2).join(" ") || "Signal", meta: `${brief.industry || "Global"} · Confidential` };
+    case "MV-OP-COVER-GRID":
+      return {
+        title: `${clientName}`, subtitle: brief.meetingObjective, date: new Date().toLocaleDateString(),
+        items: [
+          { seed: `${clientName}-a` }, { seed: `${clientName}-b` },
+          { seed: `${clientName}-c` }, { seed: `${clientName}-d` },
+        ],
+      };
+    case "MV-OP-COVER-DOSSIER":
+      return { reference: `TP-${Date.now().toString().slice(-4)}`, title: brief.meetingObjective || `${clientName} engagement dossier`, clientName, prepared: "TransPerfect", date: new Date().toLocaleDateString() };
+    case "MV-OP-COVER-GRADIENT":
+      return { title: brief.meetingObjective || clientName, subtitle: `A strategic conversation with ${clientName}.`, clientName, date: new Date().toLocaleDateString() };
+    case "MV-OP-COVER-MONOGRAM":
+      return { monogram: clientName.slice(0, 2).toUpperCase(), title: brief.meetingObjective || clientName, subtitle: `Prepared for ${clientName}`, date: new Date().toLocaleDateString() };
+    case "MV-OP-COVER-STACKED":
+      return { kicker: `A proposal for ${clientName}`, title: brief.meetingObjective || "The path forward", subtitle: "Prepared by TransPerfect", date: new Date().toLocaleDateString(), mediaSeed: `${clientName}-stacked` };
+
+    // ── Image-forward content ──────────────────────────────────────────
+    case "MV-IMG-FULL-BLEED":
+      return { kicker: "In focus", title: "Content moves at the speed of your program.", body: "Every asset, every market, every review — one connected flow.", mediaSeed: `${clientName}-fullbleed` };
+    case "MV-IMG-SPLIT":
+      return { title: `Built around how ${clientName} works today`, body: "We start with the workflow you already run and add the connective tissue — intake, terminology, and reviewer context — so your team gets time back on day one.", caption: "Fieldwork · 2025", mediaSeed: `${clientName}-workflow` };
+    case "MV-IMG-CAPTION":
+      return { title: "In focus", caption: "The reviewer workbench: source brief, translation, and rules in one view.", credit: "Product · v3.4", mediaSeed: `${clientName}-workbench` };
+    case "MV-IMG-GRID-3":
+      return {
+        title: "In practice",
+        items: [
+          { label: "Intake", caption: "One brief, every downstream step.", seed: "intake" },
+          { label: "Review", caption: "Context follows the file.", seed: "review" },
+          { label: "Publish", caption: "Only approved output routed out.", seed: "publish" },
+        ],
+      };
+    case "MV-IMG-GRID-6":
+      return {
+        title: "Selected work",
+        items: [
+          { caption: "Life sciences · EU launch", seed: "life-1" },
+          { caption: "Banking · reg comms", seed: "bank-1" },
+          { caption: "Consumer tech · 14 languages", seed: "tech-1" },
+          { caption: "Retail · seasonal calendar", seed: "retail-1" },
+          { caption: "Insurance · audit-ready", seed: "ins-1" },
+          { caption: "Automotive · global launch", seed: "auto-1" },
+        ],
+      };
+    case "MV-IMG-PORTRAIT":
+      return {
+        name: "Alex Rivera",
+        role: "Account Director",
+        quote: "Our job is to make the invisible parts of a program feel effortless.",
+        narrative: "12 years running enterprise language programs across regulated industries. Alex owns the relationship end to end and is your single point of accountability across the engagement.",
+        mediaSeed: "alex-portrait",
+      };
+    case "MV-IMG-QUOTE-BG":
+      return { quote: "We were spending more time chasing files than shipping content.", attribution: "Global Marketing Lead", role: "Enterprise client", mediaSeed: "quote-bg" };
+    case "MV-IMG-BEFORE-AFTER":
+      return {
+        title: "What changes on day one",
+        before: { label: "Scattered intake", body: "Requests in email, spreadsheets, and side channels.", seed: "before-scene" },
+        after: { label: "One workflow", body: "Every request carries its brief and rules through review.", seed: "after-scene" },
+      };
+    case "MV-IMG-STAT-CALLOUT":
+      return { stat: "46", unit: "%", label: "faster cycle time", narrative: `${clientName} teams shipped in half the time on the pilot workflow — with the same reviewer headcount.`, mediaSeed: `${clientName}-stat` };
+    case "MV-IMG-STRIP":
+      return {
+        title: "A quick look",
+        items: [
+          { caption: "Intake", seed: "strip-1" },
+          { caption: "Translate", seed: "strip-2" },
+          { caption: "Review", seed: "strip-3" },
+          { caption: "Approve", seed: "strip-4" },
+          { caption: "Publish", seed: "strip-5" },
+        ],
+      };
+
     default:
       return { title: sectionName };
   }
