@@ -41,6 +41,7 @@ function Library() {
   const [family, setFamily] = useState<string>("all");
   const [scopeBrandId, setScopeBrandId] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [mode, setMode] = useState<"light" | "dark">("light");
   const tpMasterIdx = Math.max(0, brandModes.findIndex((b) => b.id === "bm-enterprise"));
   const [brandIdx, setBrandIdx] = useState(tpMasterIdx);
 
