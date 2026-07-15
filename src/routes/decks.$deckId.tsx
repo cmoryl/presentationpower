@@ -13,7 +13,12 @@ import {
   LAYOUT_FRAMEWORKS,
   byId,
   variantsForSection,
+  relatedVariants,
 } from "@/lib/taxonomy";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
+import { getModuleFlags } from "@/lib/modules.functions";
+
 
 
 export const Route = createFileRoute("/decks/$deckId")({
