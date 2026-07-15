@@ -1,7 +1,25 @@
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import { SlideFrame as BaseSlideFrame } from "./SlideChrome";
+import { createContext, useContext } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
+
+// Module-scoped context so helper components (CardGrid, StatGrid, NumberedList,
+// etc.) automatically pick up the current slide's clientName + layoutId when
+// they wrap themselves in <SlideFrame>. VariantRenderer sets the value once
+// per render.
+const SlideFrameCtx = createContext<{ clientName?: string; layoutId?: string }>({});
+
+function SlideFrame(props: ComponentProps<typeof BaseSlideFrame>) {
+  const ctx = useContext(SlideFrameCtx);
+  return (
+    <BaseSlideFrame
+      {...props}
+      clientName={props.clientName ?? ctx.clientName}
+      layoutId={props.layoutId ?? ctx.layoutId}
+    />
+  );
+}
 import {
   ICON_SIZES,
   resolveEmphasisColors,
