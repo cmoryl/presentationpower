@@ -558,3 +558,13 @@ function FieldChips({ fields, tone }: { fields: string[]; tone: "emerald" | "red
   );
 }
 
+
+function LegendChip({ color, icon, label }: { color: string; icon: string; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-2.5 py-1">
+      <span className="inline-block h-3 w-3 rounded" style={{ backgroundColor: color }} />
+      <span>{icon}</span>
+      <span>{label}</span>
+    </span>
+  );
+}
