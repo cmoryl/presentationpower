@@ -28,7 +28,8 @@ const InputSchema = z.object({
 });
 
 export type PersonalizeInput = z.infer<typeof InputSchema>;
-export type PersonalizedSlide = { id: string; content: Record<string, unknown> };
+// Server-fn serializable content bag.
+export type PersonalizedSlide = { id: string; content: Record<string, any> };
 
 export const personalizeSlides = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => InputSchema.parse(raw))
