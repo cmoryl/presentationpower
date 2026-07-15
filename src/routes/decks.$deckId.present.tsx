@@ -13,6 +13,7 @@ export const Route = createFileRoute("/decks/$deckId/present")({
 function PresenterView() {
   const { deckId } = Route.useParams();
   const deck = useDeckStore((s) => s.decks[deckId]);
+  const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const navigate = useNavigate();
   const [i, setI] = useState(0);
 
