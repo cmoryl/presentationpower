@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { MediaZoneOverlay } from "@/components/slide/MediaZoneOverlay";
 import { seedContent, type Brief } from "@/lib/deck-store";
 import { byId, type ModuleVariant } from "@/lib/taxonomy";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
@@ -42,6 +43,7 @@ function Library() {
   const [scopeBrandId, setScopeBrandId] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
   const [mode, setMode] = useState<"light" | "dark">("light");
+  const [showZones, setShowZones] = useState(false);
   const tpMasterIdx = Math.max(0, brandModes.findIndex((b) => b.id === "bm-enterprise"));
   const [brandIdx, setBrandIdx] = useState(tpMasterIdx);
 
@@ -138,9 +140,32 @@ function Library() {
               ☾ Dark
             </button>
           </div>
+          <button
+            type="button"
+            onClick={() => setShowZones((v) => !v)}
+            aria-pressed={showZones}
+            title="Overlay demo imagery zones (human, shape, aura, scrim)"
+            className={`rounded-full border px-3 py-1.5 text-xs ${
+              showZones
+                ? "border-[#03002C] bg-[#03002C] text-white"
+                : "border-black/15 bg-white text-black/70 hover:text-black"
+            }`}
+          >
+            ⌗ Media zones {showZones ? "on" : "off"}
+          </button>
           <span className="text-sm text-black/50">{filtered.length} of {moduleVariants.length}</span>
         </div>
       </div>
+
+      {showZones && (
+        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-black/10 bg-white/60 px-4 py-3 text-xs text-black/70 backdrop-blur-md">
+          <span className="font-medium text-black/80">Legend:</span>
+          <LegendChip color="rgba(0,63,199,0.55)" icon="👤" label="Human imagery — portraits, teams, hero photography" />
+          <LegendChip color="rgba(236,56,138,0.55)" icon="◆" label="Design shape — geometric accents, keylines, blocks" />
+          <LegendChip color="rgba(161,251,249,0.75)" icon="🌫" label="Ambient aura — soft blurred color field" />
+          <LegendChip color="rgba(3,0,44,0.55)" icon="▧" label="Overlay / scrim — transparent layer for legibility" />
+        </div>
+      )}
 
       <div className="mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3">
         {filtered.map((v) => (
@@ -152,6 +177,7 @@ function Library() {
             sectionId={sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? ""}
             preferred={preferred.has(v.id)}
             mode={mode}
+            showZones={showZones}
             onOpen={() => setOpenId(v.id)}
           />
         ))}
@@ -172,6 +198,8 @@ function Library() {
           setBrandIdx={setBrandIdx}
           mode={mode}
           setMode={setMode}
+          showZones={showZones}
+          setShowZones={setShowZones}
           family={byId(moduleFamilies, active.familyId)}
           fallback={active.fallbackVariantId ? byId(moduleVariants, active.fallbackVariantId) : undefined}
           layouts={active.permittedLayoutIds
@@ -192,6 +220,7 @@ function VariantCard({
   sectionId,
   preferred,
   mode = "light",
+  showZones = false,
   onOpen,
 }: {
   variant: ModuleVariant;
@@ -200,6 +229,7 @@ function VariantCard({
   sectionId: string;
   preferred?: boolean;
   mode?: "light" | "dark";
+  showZones?: boolean;
   onOpen: () => void;
 }) {
   const previewSlide = {
@@ -222,7 +252,10 @@ function VariantCard({
     >
       <div className={`relative aspect-[16/9] ${isDark ? "bg-[#03002C]/40" : "bg-white/40"}`}>
         <ScaledSlide>
-          <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
+          <>
+            <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
+            {showZones && <MediaZoneOverlay variant={variant} />}
+          </>
         </ScaledSlide>
         <div className={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest opacity-0 backdrop-blur-md transition group-hover:opacity-100 ${
           isDark ? "bg-white/15 text-white ring-1 ring-white/25" : "bg-black/60 text-white"
@@ -267,6 +300,8 @@ function VariantDetailModal({
   setBrandIdx,
   mode,
   setMode,
+  showZones,
+  setShowZones,
   family,
   fallback,
   layouts,
@@ -280,6 +315,8 @@ function VariantDetailModal({
   setBrandIdx: (i: number) => void;
   mode: "light" | "dark";
   setMode: (m: "light" | "dark") => void;
+  showZones: boolean;
+  setShowZones: (b: boolean) => void;
   family: ReturnType<typeof useTaxonomy>["moduleFamilies"][number] | undefined;
   fallback: ModuleVariant | undefined;
   layouts: ReturnType<typeof useTaxonomy>["layoutFrameworks"];
@@ -364,6 +401,19 @@ function VariantDetailModal({
                     ☾
                   </button>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setShowZones(!showZones)}
+                  aria-pressed={showZones}
+                  className={`rounded-full border px-2.5 py-1 text-[11px] ${
+                    showZones
+                      ? "border-[#03002C] bg-[#03002C] text-white"
+                      : "border-black/15 bg-white text-black/60"
+                  }`}
+                  title="Show media zones"
+                >
+                  ⌗ Zones
+                </button>
                 <select
                   value={brandIdx}
                   onChange={(e) => setBrandIdx(Number(e.target.value))}
@@ -378,7 +428,10 @@ function VariantDetailModal({
             <div className="overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm">
               <div className="aspect-[16/9]">
                 <ScaledSlide>
-                  <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
+                  <>
+                    <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
+                    {showZones && <MediaZoneOverlay variant={variant} />}
+                  </>
                 </ScaledSlide>
               </div>
             </div>
@@ -505,3 +558,13 @@ function FieldChips({ fields, tone }: { fields: string[]; tone: "emerald" | "red
   );
 }
 
+
+function LegendChip({ color, icon, label }: { color: string; icon: string; label: string }) {
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-2.5 py-1">
+      <span className="inline-block h-3 w-3 rounded" style={{ backgroundColor: color }} />
+      <span>{icon}</span>
+      <span>{label}</span>
+    </span>
+  );
+}
