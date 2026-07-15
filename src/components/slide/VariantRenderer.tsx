@@ -199,8 +199,9 @@ export function VariantRenderer(props: Props) {
           <SlideTitle brand={brand} title={s(c.title, "Agenda")} />
           <div className="mt-16 grid grid-cols-2 gap-x-24 gap-y-10">
             {arr(c.items).map((it, i) => (
-              <div key={i} className="flex items-baseline gap-8">
-                <div className="text-6xl font-semibold" style={{ color: brand.tokens.accent }}>
+              <div key={i} className="flex items-center gap-6">
+                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" />
+                <div className="text-5xl font-semibold" style={{ color: brand.tokens.accent }}>
                   {String(i + 1).padStart(2, "0")}
                 </div>
                 <div className="text-4xl">{s(it.label)}</div>
@@ -216,7 +217,8 @@ export function VariantRenderer(props: Props) {
           <SlideTitle brand={brand} title={s(c.title, "Agenda")} />
           <div className="mt-14 space-y-8">
             {arr(c.items).map((it, i) => (
-              <div key={i} className="flex items-baseline gap-10 border-b border-black/10 pb-6">
+              <div key={i} className="flex items-center gap-8 border-b border-black/10 pb-6">
+                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" />
                 <div className="w-24 text-5xl font-semibold" style={{ color: brand.tokens.accent }}>
                   {String(i + 1).padStart(2, "0")}
                 </div>
@@ -431,11 +433,8 @@ export function VariantRenderer(props: Props) {
           <SlideTitle brand={brand} title={s(c.title)} />
           <div className="mt-12 grid grid-cols-2 gap-x-16 gap-y-8">
             {arr(c.items).map((it, i) => (
-              <div key={i} className="flex items-start gap-6">
-                <div
-                  className="mt-3 h-4 w-4 rotate-45"
-                  style={{ backgroundColor: brand.tokens.accent }}
-                />
+              <div key={i} className="flex items-start gap-5">
+                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" />
                 <div className="flex-1">
                   <div className="text-3xl font-semibold" style={{ color: brand.tokens.primary }}>
                     {s(it.label)}
@@ -452,15 +451,14 @@ export function VariantRenderer(props: Props) {
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="relative mt-24">
-            <div className="absolute left-0 right-0 top-10 h-[3px]" style={{ backgroundColor: brand.tokens.accent }} />
+          <div className="relative mt-20">
+            <div className="absolute left-0 right-0 top-7 h-[3px]" style={{ backgroundColor: brand.tokens.accent }} />
             <div className="grid" style={{ gridTemplateColumns: `repeat(${Math.max(arr(c.items).length, 1)}, minmax(0, 1fr))` }}>
               {arr(c.items).map((it, i) => (
                 <div key={i} className="pr-10">
-                  <div
-                    className="mb-8 h-6 w-6 rounded-full"
-                    style={{ backgroundColor: brand.tokens.accent, transform: "translateY(4px)" }}
-                  />
+                  <div className="mb-6 -translate-y-4">
+                    <IconBadge brand={brand} label={s(it.label)} index={i} size="md" />
+                  </div>
                   <div className="text-3xl font-semibold" style={{ color: brand.tokens.primary }}>
                     {s(it.label)}
                   </div>
@@ -681,13 +679,23 @@ export function VariantRenderer(props: Props) {
           <div className="mt-12 space-y-6">
             {arr(c.items).map((it, i) => (
               <div key={i} className="grid grid-cols-2 gap-8 rounded-xl border p-8" style={{ borderColor: "rgba(10,15,28,0.1)" }}>
-                <div>
-                  <div className="text-xl uppercase tracking-[0.2em]" style={{ color: brand.tokens.accent }}>Risk</div>
-                  <div className="mt-3 text-3xl font-semibold">{s(it.risk)}</div>
+                <div className="flex items-start gap-5">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl" style={{ backgroundColor: `${brand.tokens.accent}22`, color: brand.tokens.accent }}>
+                    <AlertTriangle size={28} strokeWidth={2} />
+                  </div>
+                  <div>
+                    <div className="text-xl uppercase tracking-[0.2em]" style={{ color: brand.tokens.accent }}>Risk</div>
+                    <div className="mt-2 text-3xl font-semibold">{s(it.risk)}</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-xl uppercase tracking-[0.2em] opacity-60">Mitigation</div>
-                  <div className="mt-3 text-2xl opacity-90">{s(it.mitigation)}</div>
+                <div className="flex items-start gap-5">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl" style={{ backgroundColor: `${brand.tokens.primary}18`, color: brand.tokens.primary }}>
+                    <ShieldCheck size={28} strokeWidth={2} />
+                  </div>
+                  <div>
+                    <div className="text-xl uppercase tracking-[0.2em] opacity-60">Mitigation</div>
+                    <div className="mt-2 text-2xl opacity-90">{s(it.mitigation)}</div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -1415,8 +1423,8 @@ export function VariantRenderer(props: Props) {
                     backgroundColor: brand.tokens.surface,
                   }}
                 >
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full text-lg font-semibold text-white" style={{ backgroundColor: brand.tokens.accent }}>
-                    {String(i + 1).padStart(2, "0")}
+                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl text-white" style={{ backgroundColor: brand.tokens.accent }}>
+                    {(() => { const Ic = pickIcon(s(it.label), i); return <Ic size={26} strokeWidth={2} />; })()}
                   </div>
                   <div className="mt-4 text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
                   <div className="mt-2 text-lg opacity-75">{s(it.body)}</div>
@@ -1769,13 +1777,14 @@ export function VariantRenderer(props: Props) {
                   <div className="mt-4 text-5xl font-semibold">{s(it.label)}</div>
                   <div className="mt-6 flex-1 text-xl leading-snug opacity-90">{s(it.body)}</div>
                   <div
-                    className="mt-10 rounded-full px-8 py-4 text-center text-xl font-semibold"
+                    className="mt-10 flex items-center justify-center gap-3 rounded-full px-8 py-4 text-center text-xl font-semibold"
                     style={{
                       backgroundColor: highlight ? brand.tokens.accent : brand.tokens.primary,
                       color: "#fff",
                     }}
                   >
-                    {s(it.ctaLabel)}
+                    <span>{s(it.ctaLabel)}</span>
+                    <ArrowRight size={22} strokeWidth={2.5} />
                   </div>
                   <div className="mt-4 text-center text-sm opacity-70">{s(it.note)}</div>
                 </div>
@@ -1789,7 +1798,10 @@ export function VariantRenderer(props: Props) {
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div className="flex h-full flex-col justify-center">
-            <div className="text-xl uppercase tracking-[0.35em]" style={{ color: brand.tokens.accent }}>{s(c.kicker, "Our commitment")}</div>
+            <div className="flex items-center gap-4 text-xl uppercase tracking-[0.35em]" style={{ color: brand.tokens.accent }}>
+              <Trophy size={26} strokeWidth={2} />
+              <span>{s(c.kicker, "Our commitment")}</span>
+            </div>
             <div className="mt-10 flex items-baseline gap-6">
               <div className="text-[320px] font-semibold leading-none" style={{ color: brand.tokens.primary }}>
                 {s(c.metric)}
@@ -2012,17 +2024,21 @@ function NumberedList({ brand, pageNumber, title, items }: { brand: BrandMode; p
     <SlideFrame brand={brand} pageNumber={pageNumber}>
       <SlideTitle brand={brand} title={title} />
       <div className="mt-12 space-y-6">
-        {items.map((it, i) => (
-          <div key={i} className="flex items-start gap-10 rounded-xl border p-8" style={{ borderColor: "rgba(10,15,28,0.08)", backgroundColor: brand.tokens.surface }}>
-            <div className="w-20 text-5xl font-semibold" style={{ color: brand.tokens.accent }}>
-              {String(i + 1).padStart(2, "0")}
+        {items.map((it, i) => {
+          const label = s(it.title ?? it.label);
+          return (
+            <div key={i} className="flex items-start gap-8 rounded-xl border p-8" style={{ borderColor: "rgba(10,15,28,0.08)", backgroundColor: brand.tokens.surface }}>
+              <IconBadge brand={brand} label={label} index={i} size="lg" />
+              <div className="w-20 text-5xl font-semibold" style={{ color: brand.tokens.accent }}>
+                {String(i + 1).padStart(2, "0")}
+              </div>
+              <div className="flex-1">
+                <div className="text-3xl font-semibold" style={{ color: brand.tokens.primary }}>{label}</div>
+                <div className="mt-3 text-2xl opacity-80">{s(it.body)}</div>
+              </div>
             </div>
-            <div className="flex-1">
-              <div className="text-3xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.title ?? it.label)}</div>
-              <div className="mt-3 text-2xl opacity-80">{s(it.body)}</div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </SlideFrame>
   );
@@ -2042,8 +2058,11 @@ function SlideTitle({ brand, title }: { brand: BrandMode; title: string }) {
 function Card({ brand, title, body, index }: { brand: BrandMode; title: string; body: string; index: number }) {
   return (
     <div className="rounded-2xl border p-10" style={{ borderColor: "rgba(10,15,28,0.1)", backgroundColor: brand.tokens.surface }}>
-      <div className="text-2xl font-semibold" style={{ color: brand.tokens.accent }}>
-        {String(index).padStart(2, "0")}
+      <div className="flex items-center gap-5">
+        <IconBadge brand={brand} label={title} index={index - 1} size="md" />
+        <div className="text-2xl font-semibold" style={{ color: brand.tokens.accent }}>
+          {String(index).padStart(2, "0")}
+        </div>
       </div>
       <div className="mt-6 text-4xl font-semibold" style={{ color: brand.tokens.primary }}>
         {title}
