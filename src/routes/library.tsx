@@ -218,6 +218,7 @@ function VariantCard({
   sectionId,
   preferred,
   mode = "light",
+  showZones = false,
   onOpen,
 }: {
   variant: ModuleVariant;
@@ -226,6 +227,7 @@ function VariantCard({
   sectionId: string;
   preferred?: boolean;
   mode?: "light" | "dark";
+  showZones?: boolean;
   onOpen: () => void;
 }) {
   const previewSlide = {
@@ -248,7 +250,10 @@ function VariantCard({
     >
       <div className={`relative aspect-[16/9] ${isDark ? "bg-[#03002C]/40" : "bg-white/40"}`}>
         <ScaledSlide>
-          <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
+          <>
+            <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
+            {showZones && <MediaZoneOverlay variant={variant} />}
+          </>
         </ScaledSlide>
         <div className={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest opacity-0 backdrop-blur-md transition group-hover:opacity-100 ${
           isDark ? "bg-white/15 text-white ring-1 ring-white/25" : "bg-black/60 text-white"
