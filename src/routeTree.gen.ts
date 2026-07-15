@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DecksDeckIdRouteImport } from './routes/decks.$deckId'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
 import { Route as DecksDeckIdPresentRouteImport } from './routes/decks.$deckId.present'
+import { Route as DecksDeckIdExportRouteImport } from './routes/decks.$deckId.export'
 
 const LibraryRoute = LibraryRouteImport.update({
   id: '/library',
@@ -46,6 +47,11 @@ const DecksDeckIdPresentRoute = DecksDeckIdPresentRouteImport.update({
   path: '/present',
   getParentRoute: () => DecksDeckIdRoute,
 } as any)
+const DecksDeckIdExportRoute = DecksDeckIdExportRouteImport.update({
+  id: '/export',
+  path: '/export',
+  getParentRoute: () => DecksDeckIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/library': typeof LibraryRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
+  '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/library': typeof LibraryRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
+  '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
 }
 export interface FileRoutesById {
@@ -70,6 +78,7 @@ export interface FileRoutesById {
   '/library': typeof LibraryRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
+  '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
 }
 export interface FileRouteTypes {
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/brief/new'
     | '/decks/$deckId'
+    | '/decks/$deckId/export'
     | '/decks/$deckId/present'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/brief/new'
     | '/decks/$deckId'
+    | '/decks/$deckId/export'
     | '/decks/$deckId/present'
   id:
     | '__root__'
@@ -96,6 +107,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/brief/new'
     | '/decks/$deckId'
+    | '/decks/$deckId/export'
     | '/decks/$deckId/present'
   fileRoutesById: FileRoutesById
 }
@@ -151,14 +163,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DecksDeckIdPresentRouteImport
       parentRoute: typeof DecksDeckIdRoute
     }
+    '/decks/$deckId/export': {
+      id: '/decks/$deckId/export'
+      path: '/export'
+      fullPath: '/decks/$deckId/export'
+      preLoaderRoute: typeof DecksDeckIdExportRouteImport
+      parentRoute: typeof DecksDeckIdRoute
+    }
   }
 }
 
 interface DecksDeckIdRouteChildren {
+  DecksDeckIdExportRoute: typeof DecksDeckIdExportRoute
   DecksDeckIdPresentRoute: typeof DecksDeckIdPresentRoute
 }
 
 const DecksDeckIdRouteChildren: DecksDeckIdRouteChildren = {
+  DecksDeckIdExportRoute: DecksDeckIdExportRoute,
   DecksDeckIdPresentRoute: DecksDeckIdPresentRoute,
 }
 
