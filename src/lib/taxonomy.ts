@@ -119,12 +119,37 @@ export const BRAND_MODES: BrandMode[] = [
     tokens: { primary: "#111827", accent: "#22C1C3", surface: "#F5F1EA", ink: "#0A0F1C" },
   },
   {
+    id: "bm-tp-media",
+    name: "TransPerfect Media",
+    description: "Media localization: dubbing, subtitling, access services",
+    tokens: { primary: "#141B34", accent: "#F04E45", surface: "#F5F1EA", ink: "#0A0F1C" },
+  },
+  {
+    id: "bm-tp-legal",
+    name: "TransPerfect Legal",
+    description: "Legal solutions: eDiscovery, litigation, IP, legal translation",
+    tokens: { primary: "#1B2A41", accent: "#B8862F", surface: "#F5F1EA", ink: "#0A0F1C" },
+  },
+  {
+    id: "bm-tp-games",
+    name: "TransPerfect Gaming",
+    description: "Game localization, LQA, audio & community services",
+    tokens: { primary: "#0E1626", accent: "#7C3AED", surface: "#F5F1EA", ink: "#0A0F1C" },
+  },
+  {
+    id: "bm-tp-digital",
+    name: "TransPerfect Digital",
+    description: "Digital marketing, web localization & experience",
+    tokens: { primary: "#0B2A4A", accent: "#22C1C3", surface: "#F5F1EA", ink: "#0A0F1C" },
+  },
+  {
     id: "bm-cobrand",
     name: "Co-brand",
     description: "Co-branded with client or partner",
     tokens: { primary: "#0B2A4A", accent: "#8E44AD", surface: "#F5F1EA", ink: "#0A0F1C" },
   },
 ];
+
 
 // ────────────────────────────────────────────────────────────────────────────
 // Section Frameworks (SF-01..SF-16, Atlas Part 02)
