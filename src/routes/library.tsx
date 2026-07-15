@@ -46,6 +46,7 @@ function Library() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [mode, setMode] = useState<"light" | "dark">("light");
   const [showZones, setShowZones] = useState(false);
+  const [showImagery, setShowImagery] = useState(true);
   const tpMasterIdx = Math.max(0, brandModes.findIndex((b) => b.id === "bm-enterprise"));
   const [brandIdx, setBrandIdx] = useState(tpMasterIdx);
 
