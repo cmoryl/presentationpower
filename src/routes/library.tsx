@@ -217,6 +217,8 @@ function Library() {
           setMode={setMode}
           showZones={showZones}
           setShowZones={setShowZones}
+          showImagery={showImagery}
+          setShowImagery={setShowImagery}
           family={byId(moduleFamilies, active.familyId)}
           fallback={active.fallbackVariantId ? byId(moduleVariants, active.fallbackVariantId) : undefined}
           layouts={active.permittedLayoutIds
