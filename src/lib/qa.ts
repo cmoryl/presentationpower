@@ -4,6 +4,7 @@
 
 import type { DeckSlide } from "./deck-store";
 import { MODULE_VARIANTS, byId, type ModuleVariant } from "./taxonomy";
+import { BRAND_PROFILES } from "./brand-profiles";
 
 export type QaSeverity = "block" | "warn";
 export type QaIssue = {
@@ -13,8 +14,13 @@ export type QaIssue = {
   code: string;
 };
 
-export function runQa(slides: DeckSlide[]): QaIssue[] {
+export function runQa(slides: DeckSlide[], brandModeId?: string): QaIssue[] {
   const issues: QaIssue[] = [];
+  const profile = brandModeId ? BRAND_PROFILES[brandModeId] : undefined;
+  const restricted = new Set(profile?.contentScope.restrictedFamilyIds ?? []);
+  const preferred = new Set(profile?.contentScope.preferredVariantIds ?? []);
+  const hasScope = !!profile;
+
   for (const slide of slides) {
     const variant = byId(MODULE_VARIANTS, slide.variantId);
     if (!variant) continue;
@@ -37,10 +43,10 @@ export function runQa(slides: DeckSlide[]): QaIssue[] {
     // Capacity: items array bounds → block
     checkCapacity(slide, variant, issues);
 
-    // Character caps → warn (title/body caps from variant)
+    // Character caps → warn
     checkCharCaps(slide, variant, issues);
 
-    // Sources missing on proof stats → warn (Section 25 QA gate)
+    // Sources missing on proof stats → warn
     if (variant.familyId === "MF-05" && Array.isArray(slide.content.items)) {
       const items = slide.content.items as Array<Record<string, unknown>>;
       const missingSources = items.some(
@@ -52,6 +58,48 @@ export function runQa(slides: DeckSlide[]): QaIssue[] {
           severity: "warn",
           code: "missing-source",
           message: "Proof stats should cite sources",
+        });
+      }
+    }
+
+    // Brand-mode consistency gates (only when a brand profile is in scope)
+    if (hasScope) {
+      // Off-limits family for this brand → block
+      if (restricted.has(variant.familyId)) {
+        issues.push({
+          slideId: slide.id,
+          severity: "block",
+          code: "brand-restricted-family",
+          message: `${variant.familyId} isn't permitted for this brand — swap variant`,
+        });
+      }
+
+      // In-scope but non-preferred variant → soft warn (only if brand declares preferences)
+      if (preferred.size > 0 && !preferred.has(variant.id) && !restricted.has(variant.familyId)) {
+        issues.push({
+          slideId: slide.id,
+          severity: "warn",
+          code: "brand-nonpreferred-variant",
+          message: `Not a preferred variant for this brand — a stronger option may exist`,
+        });
+      }
+
+      // Case study content should reference an in-scope industry — warn if it doesn't.
+      const clientStr = String(slide.content.client ?? "").toLowerCase();
+      const industries = profile?.contentScope.industries ?? [];
+      if (
+        variant.familyId === "MF-06" &&
+        clientStr &&
+        industries.length > 0 &&
+        !industries.some((ind) => clientStr.includes(ind.toLowerCase())) &&
+        // Client-specific cobrand scope has no industry filter to apply.
+        !industries.includes("Client-specific")
+      ) {
+        issues.push({
+          slideId: slide.id,
+          severity: "warn",
+          code: "brand-case-out-of-scope",
+          message: `Case study client doesn't match this brand's industries (${industries.slice(0, 3).join(", ")}…)`,
         });
       }
     }
