@@ -161,12 +161,14 @@ function VariantCard({
   familyName,
   brand,
   sectionId,
+  preferred,
   onOpen,
 }: {
   variant: ModuleVariant;
   familyName?: string;
   brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
   sectionId: string;
+  preferred?: boolean;
   onOpen: () => void;
 }) {
   const previewSlide = {
