@@ -1,4 +1,16 @@
 import type { ModuleVariant } from "@/lib/taxonomy";
+import portrait1 from "@/assets/portraits/portrait-1.png";
+import portrait2 from "@/assets/portraits/portrait-2.png";
+import portrait3 from "@/assets/portraits/portrait-3.png";
+import portrait4 from "@/assets/portraits/portrait-4.png";
+
+const PORTRAITS = [portrait1, portrait2, portrait3, portrait4];
+
+function hashStr(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
 
 /**
  * MediaZoneOverlay renders semi-transparent, labelled "media zones" on top of a
