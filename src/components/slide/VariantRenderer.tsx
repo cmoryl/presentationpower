@@ -1,6 +1,105 @@
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import { SlideFrame } from "./SlideChrome";
 import type { DeckSlide } from "@/lib/deck-store";
+import {
+  Sparkles, Workflow, Layers3, Users, ShieldCheck, Target, Rocket, LineChart,
+  Search, Cog, MessageSquareQuote, Building2, Landmark, Cpu, Factory, Store,
+  HeartPulse, Car, Plane, Coins, Calendar, ArrowRight, CheckCircle2,
+  AlertTriangle, TrendingUp, GitBranch, Globe2, Lightbulb, ClipboardList,
+  FileCheck2, Send, MessagesSquare, Mail, Phone, Timer, Trophy, Puzzle,
+  Handshake, Play, BarChart3, Zap, ArrowUpRight,
+} from "lucide-react";
+
+type IconType = typeof Sparkles;
+
+const ICON_KEYWORDS: Array<[RegExp, IconType]> = [
+  [/intake|brief|request/i, ClipboardList],
+  [/translat|language|linguist|localiz/i, Globe2],
+  [/review|qa\b|quality|check|approve|audit-ready/i, FileCheck2],
+  [/publish|route|deliver|ship|launch/i, Send],
+  [/discover|research|map|understand/i, Search],
+  [/pilot|proto|kickoff/i, Rocket],
+  [/scale|expand|grow|rollout/i, TrendingUp],
+  [/architect|layer|platform|stack/i, Layers3],
+  [/workflow|process|orchestr|operating model/i, Workflow],
+  [/analytic|dashboard|report|insight|sla|kpi/i, LineChart],
+  [/govern|complia|policy|regulat|audit/i, ShieldCheck],
+  [/risk|mitigat|threat|issue/i, AlertTriangle],
+  [/team|people|talent|human|reviewer/i, Users],
+  [/speed|fast|cycle|time-to|time to|weeks|days/i, Timer],
+  [/cost|price|invest|budget|spend|dollar|pricing/i, Coins],
+  [/decision|approve|sign-?off/i, CheckCircle2],
+  [/calendar|schedule|date|when/i, Calendar],
+  [/contact|email|mail|reach out/i, Mail],
+  [/phone|call/i, Phone],
+  [/market|region|country|global|langs?\b|multi/i, Globe2],
+  [/goal|target|outcome|result|objective/i, Target],
+  [/idea|insight|opportunity|so what|big idea/i, Lightbulb],
+  [/integration|connector|api|cms|dam/i, GitBranch],
+  [/tool|config|setup|technolog|ai\b|model/i, Cog],
+  [/testimonial|quote|voice/i, MessageSquareQuote],
+  [/pharma|life[- ]?scien|medic|health|regulator/i, HeartPulse],
+  [/bank|financial|finance/i, Landmark],
+  [/tech|software|product|platform|consumer tech/i, Cpu],
+  [/retail|store|commerce/i, Store],
+  [/insur/i, ShieldCheck],
+  [/auto|vehicle|car/i, Car],
+  [/aero|air|travel/i, Plane],
+  [/manufact|industr|factor/i, Factory],
+  [/enterprise|company|corp|business|client/i, Building2],
+  [/deliver|handoff|hand-off|partner/i, Handshake],
+  [/support|help|service/i, MessagesSquare],
+  [/legal|contract/i, FileCheck2],
+  [/learn|train|educat/i, Lightbulb],
+  [/marketing|campaign|content/i, Sparkles],
+  [/fit|puzzle|module/i, Puzzle],
+  [/next|start|go|begin/i, Play],
+  [/comparison|benchmark|compare/i, BarChart3],
+  [/energy|momentum|impact/i, Zap],
+  [/promise|commit|guarantee/i, Trophy],
+];
+
+const DEFAULT_ICONS: IconType[] = [Target, Layers3, Workflow, LineChart, Users, Rocket];
+
+function pickIcon(label: string, fallbackIndex = 0): IconType {
+  const text = label || "";
+  for (const [rx, Icon] of ICON_KEYWORDS) if (rx.test(text)) return Icon;
+  return DEFAULT_ICONS[Math.abs(fallbackIndex) % DEFAULT_ICONS.length];
+}
+
+function IconBadge({
+  brand,
+  label,
+  index,
+  size = "md",
+  tone = "accent",
+}: {
+  brand: BrandMode;
+  label: string;
+  index: number;
+  size?: "sm" | "md" | "lg";
+  tone?: "accent" | "primary" | "onDark";
+}) {
+  const Icon = pickIcon(label, index);
+  const dim = size === "sm" ? 44 : size === "lg" ? 72 : 56;
+  const px = size === "sm" ? 22 : size === "lg" ? 34 : 28;
+  const bg =
+    tone === "onDark"
+      ? "rgba(255,255,255,0.15)"
+      : tone === "primary"
+        ? `${brand.tokens.primary}18`
+        : `${brand.tokens.accent}22`;
+  const fg = tone === "onDark" ? "#fff" : tone === "primary" ? brand.tokens.primary : brand.tokens.accent;
+  return (
+    <div
+      className="flex shrink-0 items-center justify-center rounded-2xl"
+      style={{ width: dim, height: dim, backgroundColor: bg, color: fg }}
+    >
+      <Icon size={px} strokeWidth={2} />
+    </div>
+  );
+}
+
 
 type Props = {
   slide: DeckSlide;
