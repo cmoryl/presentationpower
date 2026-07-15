@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useDeckStore } from "@/lib/deck-store";
+import { ScaledSlide } from "@/components/slide/ScaledSlide";
+import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_FAMILIES, MODULE_VARIANTS, SECTION_FRAMEWORKS, LAYOUT_FRAMEWORKS, byId } from "@/lib/taxonomy";
 
 export const Route = createFileRoute("/")({
