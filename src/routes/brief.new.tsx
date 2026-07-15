@@ -66,22 +66,47 @@ function BriefWizard() {
           <Field label="Meeting objective">
             <input className={inputCls} value={form.meetingObjective} onChange={(e) => setForm({ ...form, meetingObjective: e.target.value })} />
           </Field>
-          <div className="grid grid-cols-2 gap-6">
-            <Field label="Brand mode">
-              <select className={inputCls} value={form.brandModeId} onChange={(e) => setForm({ ...form, brandModeId: e.target.value })}>
-                {brandModes.map((b) => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
-                ))}
-              </select>
-            </Field>
-            <Field label="Narrative archetype">
-              <select className={inputCls} value={form.archetypeId} onChange={(e) => setForm({ ...form, archetypeId: e.target.value })}>
-                {narrativeArchetypes.map((a) => (
-                  <option key={a.id} value={a.id}>{a.name}</option>
-                ))}
-              </select>
-            </Field>
-          </div>
+          <Field label="Brand mode">
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+              {brandModes.map((b) => {
+                const active = form.brandModeId === b.id;
+                return (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => setForm({ ...form, brandModeId: b.id })}
+                    aria-pressed={active}
+                    className="group flex flex-col rounded-2xl border p-4 text-left transition"
+                    style={{
+                      borderColor: active ? b.tokens.primary : "rgba(0,0,0,0.1)",
+                      backgroundColor: active ? `${b.tokens.primary}08` : "#fff",
+                      boxShadow: active ? `0 0 0 3px ${b.tokens.primary}22` : undefined,
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <BrandLockup brand={b} color={b.tokens.primary} size="sm" clientName={form.prospect} />
+                      <span
+                        className="rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider"
+                        style={{ backgroundColor: `${b.tokens.accent}22`, color: b.tokens.primary }}
+                      >
+                        {b.role ?? "brand"}
+                      </span>
+                    </div>
+                    <div className="mt-3 text-xs text-black/60">{b.description}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </Field>
+          <Field label="Narrative archetype">
+            <select className={inputCls} value={form.archetypeId} onChange={(e) => setForm({ ...form, archetypeId: e.target.value })}>
+              {narrativeArchetypes.map((a) => (
+                <option key={a.id} value={a.id}>{a.name}</option>
+              ))}
+            </select>
+          </Field>
+
+          <BrandRelevancePanel brand={brandModes.find((b) => b.id === form.brandModeId) ?? brandModes[0]} />
           <Field label={`Length target: ${form.lengthTarget} slides`}>
             <input
               type="range"
