@@ -90,24 +90,9 @@ export function BrandLockup({
       )}
       <div className="flex flex-col leading-none">
         {useOfficialWordmark ? (
-          <span
-            aria-hidden
-            style={{
-              display: "inline-block",
-              width: wordmarkWidth,
-              height: wordmarkHeight,
-              backgroundColor: color,
-              WebkitMaskImage: `url(${tpLogoUrl})`,
-              maskImage: `url(${tpLogoUrl})`,
-              WebkitMaskRepeat: "no-repeat",
-              maskRepeat: "no-repeat",
-              WebkitMaskSize: "contain",
-              maskSize: "contain",
-              WebkitMaskPosition: "left center",
-              maskPosition: "left center",
-            }}
-          />
+          <TransPerfectWordmark height={wordmarkHeight} />
         ) : (
+
           <div className="font-semibold tracking-wide" style={{ fontSize: dims.wordPx, letterSpacing: "0.02em" }}>
             {logo.wordmark.toUpperCase()}
           </div>
