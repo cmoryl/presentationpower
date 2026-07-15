@@ -83,9 +83,9 @@ export function backdropForVariant(variant: ModuleVariant): SlideBackdrop | null
     return { url: city, scrim: "full", scrimStrength: 0.65, imageDim: 0.2 };
   }
 
-  // Cards / pillars — ambient with soft bottom scrim.
+  // Cards / pillars — abstract or ambient with soft bottom scrim.
   if (/CARDS-|PILLARS-|PRINCIPLES|VALUE-PROPS/.test(id)) {
-    return { url: ambient, scrim: "bottom", scrimStrength: 0.75, imageDim: 0.15 };
+    return { url: seed % 2 === 0 ? abstract : ambient, scrim: "bottom", scrimStrength: 0.75, imageDim: 0.15 };
   }
 
   // Timeline / roadmap / process — city with bottom scrim.
