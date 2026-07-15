@@ -66,6 +66,54 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
       preferredVariantIds: ["MV-CASE-METRICS", "MV-PROOF-STATS-3", "MV-CTX-STAT-GRID", "MV-INS-BIG-IDEA"],
     },
   },
+  "bm-tp-media": {
+    role: "subcompany",
+    parentId: "bm-enterprise",
+    logo: { mark: "TPM", wordmark: "TransPerfect", divisionLine: "Media" },
+    contentScope: {
+      industries: ["Media & Entertainment", "Streaming", "Broadcast", "Film & TV", "Advertising"],
+      serviceLines: ["Dubbing", "Subtitling", "Audio description", "Access services", "Media localization", "Voice-over"],
+      caseStudyTags: ["streaming", "dubbing", "subtitling", "ott", "access-services", "media"],
+      preferredArchetypes: ["arch-value-story", "arch-market-fit"],
+      preferredVariantIds: ["MV-CASE-STORY", "MV-PROOF-LOGOS", "MV-SOL-PILLARS-3", "MV-INS-BIG-IDEA"],
+    },
+  },
+  "bm-tp-legal": {
+    role: "subcompany",
+    parentId: "bm-enterprise",
+    logo: { mark: "TPL", wordmark: "TransPerfect", divisionLine: "Legal" },
+    contentScope: {
+      industries: ["Legal", "Law Firms", "Corporate Legal", "Financial Services", "Insurance"],
+      serviceLines: ["eDiscovery", "Legal translation", "Litigation support", "IP & patent", "Compliance", "Managed review"],
+      caseStudyTags: ["ediscovery", "litigation", "regulated", "cross-border", "patent", "compliance"],
+      preferredArchetypes: ["arch-decision-drive", "arch-value-story"],
+      preferredVariantIds: ["MV-CASE-STORY", "MV-DEC-CHECKLIST", "MV-PROOF-STATS-3", "MV-CTX-COST"],
+    },
+  },
+  "bm-tp-games": {
+    role: "subcompany",
+    parentId: "bm-enterprise",
+    logo: { mark: "TPG", wordmark: "TransPerfect", divisionLine: "Gaming" },
+    contentScope: {
+      industries: ["Gaming", "Interactive Entertainment", "Mobile Games", "Console", "Esports"],
+      serviceLines: ["Game localization", "LQA", "Audio & voice", "Community management", "Player support", "Cinematics"],
+      caseStudyTags: ["aaa", "mobile-games", "lqa", "live-service", "esports", "voice-over"],
+      preferredArchetypes: ["arch-market-fit", "arch-transformation"],
+      preferredVariantIds: ["MV-CASE-METRICS", "MV-PROOF-LOGOS", "MV-INS-BIG-IDEA", "MV-CTX-STAT-GRID"],
+    },
+  },
+  "bm-tp-digital": {
+    role: "subcompany",
+    parentId: "bm-enterprise",
+    logo: { mark: "TPD", wordmark: "TransPerfect", divisionLine: "Digital" },
+    contentScope: {
+      industries: ["Retail", "E-commerce", "Consumer Brands", "Travel & Hospitality", "Technology"],
+      serviceLines: ["Website localization", "SEO & multilingual search", "Digital marketing", "Creative production", "Personalization", "Analytics"],
+      caseStudyTags: ["ecommerce", "web-localization", "seo", "campaign", "conversion", "digital-experience"],
+      preferredArchetypes: ["arch-market-fit", "arch-transformation"],
+      preferredVariantIds: ["MV-CASE-METRICS", "MV-PROC-BEFORE-AFTER", "MV-CTX-STAT-GRID", "MV-PROOF-LOGOS"],
+    },
+  },
   "bm-cobrand": {
     role: "cobrand",
     parentId: "bm-enterprise",
@@ -79,6 +127,7 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
     },
   },
 };
+
 
 // Merge DB brand rows with the local profile. Missing profile ids fall back to
 // a neutral "corporate" role with a text-mark of the first two letters of the
