@@ -1,8 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { useDeckStore } from "@/lib/deck-store";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
+import { personalizeSlides } from "@/lib/personalize.functions";
+import { byId, SECTION_FRAMEWORKS, NARRATIVE_ARCHETYPES } from "@/lib/taxonomy";
 
 export const Route = createFileRoute("/brief/new")({
   head: () => ({
@@ -22,7 +25,12 @@ export const Route = createFileRoute("/brief/new")({
 function BriefWizard() {
   const navigate = useNavigate();
   const create = useDeckStore((s) => s.createBriefAndAssemble);
+  const applyAi = useDeckStore((s) => s.applyAiContent);
+  const decks = useDeckStore((s) => s.decks);
+  const personalize = useServerFn(personalizeSlides);
   const { brandModes, narrativeArchetypes } = useTaxonomy();
+  const [aiStatus, setAiStatus] = useState<"idle" | "assembling" | "personalizing" | "error">("idle");
+  const [aiError, setAiError] = useState<string | null>(null);
   const [form, setForm] = useState({
     prospect: "Acme Global",
     industry: "Life sciences",
@@ -93,15 +101,70 @@ function BriefWizard() {
           </Field>
         </div>
 
-        <div className="mt-6 flex justify-end">
+        <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
+          {aiStatus !== "idle" && (
+            <span className="text-xs text-black/55">
+              {aiStatus === "assembling" && "Assembling from atlas…"}
+              {aiStatus === "personalizing" && "Personalizing with AI…"}
+              {aiStatus === "error" && `AI fallback: ${aiError ?? "unknown error"}`}
+            </span>
+          )}
           <button
-            className="rounded-full bg-[#0B2A4A] px-6 py-3 text-sm font-medium text-white hover:opacity-90"
+            disabled={aiStatus === "assembling" || aiStatus === "personalizing"}
+            className="rounded-full border border-black/20 px-5 py-2.5 text-sm hover:bg-black/5 disabled:opacity-50"
             onClick={() => {
               const { deckId } = create(form);
               navigate({ to: "/decks/$deckId", params: { deckId } });
             }}
           >
-            Assemble deck →
+            Assemble (no AI)
+          </button>
+          <button
+            disabled={aiStatus === "assembling" || aiStatus === "personalizing"}
+            className="rounded-full bg-[#0B2A4A] px-6 py-3 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+            onClick={async () => {
+              setAiError(null);
+              setAiStatus("assembling");
+              const { deckId } = create(form);
+              const deck = useDeckStore.getState().decks[deckId] ?? decks[deckId];
+              if (!deck) {
+                navigate({ to: "/decks/$deckId", params: { deckId } });
+                return;
+              }
+              setAiStatus("personalizing");
+              try {
+                const result = await personalize({
+                  data: {
+                    brief: {
+                      prospect: form.prospect,
+                      industry: form.industry,
+                      audience: form.audience,
+                      meetingObjective: form.meetingObjective,
+                      clientFacts: form.clientFacts,
+                      archetypeName: byId(NARRATIVE_ARCHETYPES, form.archetypeId)?.name ?? "Deck",
+                    },
+                    slides: deck.slides.map((s) => ({
+                      id: s.id,
+                      variantId: s.variantId,
+                      sectionName: byId(SECTION_FRAMEWORKS, s.sectionId)?.name ?? "",
+                      content: s.content as Record<string, unknown>,
+                    })),
+                  },
+                });
+                if (result.error) {
+                  setAiError(result.error);
+                  setAiStatus("error");
+                } else {
+                  applyAi(deckId, result.slides as Array<{ id: string; content: Record<string, unknown> }>);
+                }
+              } catch (e) {
+                setAiError((e as Error).message);
+                setAiStatus("error");
+              }
+              navigate({ to: "/decks/$deckId", params: { deckId } });
+            }}
+          >
+            Assemble with AI →
           </button>
         </div>
       </div>
