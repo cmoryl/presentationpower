@@ -8,8 +8,10 @@ import portrait4 from "@/assets/portraits/portrait-4.png";
 import ambient from "@/assets/backdrops/backdrop-ambient.jpg";
 import team from "@/assets/backdrops/backdrop-team.jpg";
 import city from "@/assets/backdrops/backdrop-city.jpg";
+import abstractAsset from "@/assets/backdrops/backdrop-abstract.png.asset.json";
 
 const PORTRAITS = [portrait1, portrait2, portrait3, portrait4];
+const abstract = abstractAsset.url;
 
 function hashStr(s: string): number {
   let h = 0;
@@ -44,10 +46,11 @@ export function backdropForVariant(variant: ModuleVariant): SlideBackdrop | null
     return { url: ambient, scrim: "left", scrimStrength: 0.65, tint: "#03002C" };
   }
 
-  // Dividers — ambient/city with full-frame vignette.
+  // Dividers — abstract/ambient/city with full-frame vignette.
   if (/^MV-OP-DIVIDER/.test(id)) {
+    const dividerImages = [abstract, ambient, city];
     return {
-      url: seed % 2 === 0 ? ambient : city,
+      url: dividerImages[seed % dividerImages.length],
       scrim: "vignette",
       scrimStrength: 0.55,
       imageDim: 0.15,
@@ -80,9 +83,9 @@ export function backdropForVariant(variant: ModuleVariant): SlideBackdrop | null
     return { url: city, scrim: "full", scrimStrength: 0.65, imageDim: 0.2 };
   }
 
-  // Cards / pillars — ambient with soft bottom scrim.
+  // Cards / pillars — abstract or ambient with soft bottom scrim.
   if (/CARDS-|PILLARS-|PRINCIPLES|VALUE-PROPS/.test(id)) {
-    return { url: ambient, scrim: "bottom", scrimStrength: 0.75, imageDim: 0.15 };
+    return { url: seed % 2 === 0 ? abstract : ambient, scrim: "bottom", scrimStrength: 0.75, imageDim: 0.15 };
   }
 
   // Timeline / roadmap / process — city with bottom scrim.
@@ -105,6 +108,6 @@ export function backdropForVariant(variant: ModuleVariant): SlideBackdrop | null
     return null;
   }
 
-  // Fallback — ambient with side scrim so content stays readable.
-  return { url: ambient, scrim: "left", scrimStrength: 0.8, imageDim: 0.1 };
+  // Fallback — abstract or ambient with side scrim so content stays readable.
+  return { url: seed % 2 === 0 ? abstract : ambient, scrim: "left", scrimStrength: 0.8, imageDim: 0.1 };
 }
