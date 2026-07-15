@@ -1069,7 +1069,466 @@ export function VariantRenderer(props: Props) {
         </SlideFrame>
       );
 
+    // ── Expanded quote layouts ────────────────────────────────────────
+    case "MV-QUOTE-MULTI":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "What clients tell us")} />
+          <div className="mt-12 space-y-6">
+            {arr(c.items).slice(0, 3).map((it, i) => (
+              <div
+                key={i}
+                className="grid grid-cols-[60px_1fr_260px] items-center gap-8 rounded-2xl border p-8"
+                style={{ borderColor: "rgba(10,15,28,0.1)", backgroundColor: brand.tokens.surface }}
+              >
+                <div className="text-7xl leading-none" style={{ color: brand.tokens.accent }}>“</div>
+                <div className="text-2xl leading-snug">{s(it.quote)}</div>
+                <div className="text-right">
+                  <div className="text-xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.attribution)}</div>
+                  <div className="mt-1 text-lg opacity-70">{s(it.role)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-QUOTE-PORTRAIT":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="grid h-full grid-cols-[420px_1fr] items-stretch gap-14">
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "portrait"))} className="h-full w-full" portrait />
+            <div className="flex flex-col justify-center">
+              <div className="text-[180px] leading-none opacity-15" style={{ color: brand.tokens.accent }}>“</div>
+              <div className="-mt-14 text-5xl font-medium leading-[1.2]">{s(c.quote)}</div>
+              <div className="mt-10">
+                <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(c.attribution)}</div>
+                <div className="mt-2 text-xl opacity-70">{s(c.role)}{s(c.org) && <> <span className="mx-2">·</span> {s(c.org)}</>}</div>
+              </div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-QUOTE-CARD":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="flex h-full items-center justify-center">
+            <div
+              className="relative max-w-5xl rounded-3xl border p-16"
+              style={{ borderColor: "rgba(10,15,28,0.1)", backgroundColor: brand.tokens.surface }}
+            >
+              <div className="absolute -top-2 left-16 h-2 w-40" style={{ backgroundColor: brand.tokens.accent }} />
+              <div className="text-6xl leading-none" style={{ color: brand.tokens.accent }}>“</div>
+              <div className="mt-6 text-4xl font-medium leading-[1.25]">{s(c.quote)}</div>
+              <div className="mt-10 flex items-baseline justify-between">
+                <div>
+                  <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(c.attribution)}</div>
+                  <div className="mt-1 text-xl opacity-70">{s(c.role)}</div>
+                </div>
+                <div className="text-lg opacity-60">{s(c.org)}</div>
+              </div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-QUOTE-METRIC":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="grid h-full grid-cols-[1fr_360px] items-center gap-16">
+            <div>
+              <div className="text-[180px] leading-none opacity-15" style={{ color: brand.tokens.accent }}>“</div>
+              <div className="-mt-14 text-5xl font-medium leading-[1.2]">{s(c.quote)}</div>
+              <div className="mt-8 text-2xl opacity-70">{s(c.attribution)} <span className="mx-2">·</span> {s(c.role)}</div>
+            </div>
+            <div
+              className="rounded-3xl p-10 text-center"
+              style={{ background: `linear-gradient(160deg, ${brand.tokens.primary}, ${brand.tokens.accent})`, color: "#fff" }}
+            >
+              <div className="text-[140px] font-semibold leading-none">
+                {s(c.metric)}<span className="align-top text-6xl opacity-90">{s(c.unit)}</span>
+              </div>
+              <div className="mt-4 text-2xl opacity-90">{s(c.metricLabel)}</div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-QUOTE-POSTER":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <div className="absolute inset-0" style={{ backgroundColor: brand.tokens.primary }} />
+          <div className="relative flex h-full flex-col justify-center text-white">
+            <div className="text-[240px] leading-none opacity-25" style={{ color: brand.tokens.accent }}>“</div>
+            <div className="-mt-20 max-w-6xl text-8xl font-semibold leading-[1.05] tracking-tight">{s(c.quote)}</div>
+            <div className="mt-14 text-2xl uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>
+              {s(c.attribution)}
+            </div>
+            <div className="mt-2 text-xl opacity-70">{s(c.role)}</div>
+          </div>
+        </SlideFrame>
+      );
+
+    // ── Infographic options ───────────────────────────────────────────
+    case "MV-INFO-DONUT": {
+      const items = arr(c.items);
+      const total = items.reduce((sum, it) => sum + (typeof it.value === "number" ? it.value : Number(it.value) || 0), 0) || 1;
+      const palette = [brand.tokens.primary, brand.tokens.accent, "#4A90A4", "#8E44AD", "#22C1C3"];
+      let cum = 0;
+      const segments = items.map((it, i) => {
+        const v = typeof it.value === "number" ? it.value : Number(it.value) || 0;
+        const start = (cum / total) * 360;
+        cum += v;
+        const end = (cum / total) * 360;
+        return `${palette[i % palette.length]} ${start}deg ${end}deg`;
+      }).join(", ");
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "Where the effort goes")} />
+          <div className="mt-10 grid grid-cols-[560px_1fr] items-center gap-16">
+            <div className="relative aspect-square w-[560px]">
+              <div className="absolute inset-0 rounded-full" style={{ background: `conic-gradient(${segments})` }} />
+              <div className="absolute inset-[18%] flex flex-col items-center justify-center rounded-full text-center" style={{ backgroundColor: brand.tokens.surface }}>
+                <div className="text-8xl font-semibold leading-none" style={{ color: brand.tokens.primary }}>
+                  {s(c.centerValue)}<span className="text-4xl" style={{ color: brand.tokens.accent }}>{s(c.centerUnit)}</span>
+                </div>
+                <div className="mt-4 max-w-[80%] text-xl opacity-80">{s(c.centerLabel)}</div>
+              </div>
+            </div>
+            <div className="space-y-5">
+              {items.map((it, i) => (
+                <div key={i} className="flex items-start gap-5">
+                  <div className="mt-3 h-5 w-5 shrink-0 rounded" style={{ backgroundColor: palette[i % palette.length] }} />
+                  <div className="flex-1">
+                    <div className="flex items-baseline justify-between gap-6">
+                      <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
+                      <div className="text-2xl font-semibold" style={{ color: brand.tokens.accent }}>{s(it.value)}%</div>
+                    </div>
+                    <div className="mt-1 text-lg opacity-70">{s(it.note)}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-INFO-FUNNEL": {
+      const items = arr(c.items);
+      const n = Math.max(items.length, 1);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "Funnel")} />
+          <div className="mt-12 space-y-3">
+            {items.map((it, i) => {
+              const widthPct = 100 - (i / n) * 55;
+              const shade = 1 - (i / n) * 0.55;
+              return (
+                <div key={i} className="flex items-center gap-8">
+                  <div
+                    className="flex h-24 items-center justify-between rounded-xl px-10 text-white"
+                    style={{
+                      width: `${widthPct}%`,
+                      background: `linear-gradient(90deg, ${brand.tokens.primary}, ${brand.tokens.accent})`,
+                      opacity: 0.55 + shade * 0.45,
+                    }}
+                  >
+                    <div className="text-2xl font-semibold">{s(it.label)}</div>
+                    <div className="text-3xl font-semibold">{s(it.value)}<span className="ml-2 text-xl opacity-80">{s(it.unit)}</span></div>
+                  </div>
+                  <div className="flex-1 text-xl opacity-70">{s(it.note)}</div>
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-INFO-BAR-COMPARE": {
+      const items = arr(c.items);
+      const values = items.map((it) => (typeof it.value === "number" ? it.value : Number(it.value) || 0));
+      const max = Math.max(1, ...values);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "Comparison")} />
+          <div className="mt-12 space-y-6">
+            {items.map((it, i) => {
+              const v = values[i];
+              const pct = Math.max(6, (v / max) * 100);
+              const highlight = i === items.length - 1;
+              return (
+                <div key={i} className="grid grid-cols-[260px_1fr_120px] items-center gap-6">
+                  <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
+                  <div className="h-14 w-full rounded-lg" style={{ backgroundColor: "rgba(10,15,28,0.06)" }}>
+                    <div
+                      className="flex h-full items-center rounded-lg px-4 text-white"
+                      style={{
+                        width: `${pct}%`,
+                        background: highlight
+                          ? `linear-gradient(90deg, ${brand.tokens.primary}, ${brand.tokens.accent})`
+                          : brand.tokens.primary,
+                        opacity: highlight ? 1 : 0.55,
+                      }}
+                    >
+                      <span className="text-lg opacity-90">{s(it.note)}</span>
+                    </div>
+                  </div>
+                  <div className="text-right text-3xl font-semibold" style={{ color: highlight ? brand.tokens.accent : brand.tokens.primary }}>
+                    {s(it.value)}<span className="ml-1 text-lg opacity-70">{s(c.unit)}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-INFO-CIRCULAR-FLOW": {
+      const items = arr(c.items).slice(0, 6);
+      const n = Math.max(items.length, 1);
+      const R = 300;
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "The cycle")} />
+          <div className="relative mx-auto mt-8 h-[780px] w-[780px]">
+            <div
+              className="absolute inset-[28%] flex items-center justify-center rounded-full text-center text-white"
+              style={{ background: `linear-gradient(135deg, ${brand.tokens.primary}, ${brand.tokens.accent})` }}
+            >
+              <div className="px-6 text-3xl font-semibold leading-tight">{s(c.hub, "Program")}</div>
+            </div>
+            {items.map((it, i) => {
+              const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
+              const x = 50 + (R / 780) * 100 * Math.cos(angle);
+              const y = 50 + (R / 780) * 100 * Math.sin(angle);
+              return (
+                <div
+                  key={i}
+                  className="absolute w-[240px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border p-6 text-center"
+                  style={{
+                    left: `${x}%`,
+                    top: `${y}%`,
+                    borderColor: "rgba(10,15,28,0.1)",
+                    backgroundColor: brand.tokens.surface,
+                  }}
+                >
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full text-lg font-semibold text-white" style={{ backgroundColor: brand.tokens.accent }}>
+                    {String(i + 1).padStart(2, "0")}
+                  </div>
+                  <div className="mt-4 text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
+                  <div className="mt-2 text-lg opacity-75">{s(it.body)}</div>
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-INFO-PYRAMID": {
+      const items = arr(c.items);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "Value pyramid")} />
+          <div className="mt-12 grid grid-cols-[1fr_1fr] items-center gap-16">
+            <div className="flex flex-col items-center gap-2">
+              {items.map((it, i) => {
+                const widthPct = 40 + ((items.length - 1 - i) / Math.max(items.length - 1, 1)) * 55;
+                const shade = 0.5 + (i / Math.max(items.length - 1, 1)) * 0.5;
+                return (
+                  <div
+                    key={i}
+                    className="flex h-24 items-center justify-center rounded text-white"
+                    style={{
+                      width: `${widthPct}%`,
+                      background: `linear-gradient(90deg, ${brand.tokens.primary}, ${brand.tokens.accent})`,
+                      opacity: shade,
+                    }}
+                  >
+                    <div className="text-2xl font-semibold">{s(it.label)}</div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="space-y-6">
+              {items.map((it, i) => (
+                <div key={i} className="border-l-4 pl-6" style={{ borderColor: brand.tokens.accent }}>
+                  <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
+                  <div className="mt-2 text-xl opacity-80">{s(it.body)}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-INFO-VENN": {
+      const items = arr(c.items).slice(0, 3);
+      const colors = [brand.tokens.primary, brand.tokens.accent, "#4A90A4"];
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "Where it lives")} />
+          <div className="mt-6 grid grid-cols-[720px_1fr] items-center gap-12">
+            <div className="relative h-[600px] w-[720px]">
+              {[
+                { left: "20%", top: "18%" },
+                { left: "50%", top: "18%" },
+                { left: "35%", top: "48%" },
+              ].map((pos, i) => (
+                <div
+                  key={i}
+                  className="absolute h-[380px] w-[380px] rounded-full"
+                  style={{ left: pos.left, top: pos.top, backgroundColor: colors[i], opacity: 0.45, mixBlendMode: "multiply" }}
+                />
+              ))}
+              <div className="absolute left-1/2 top-1/2 z-10 max-w-[260px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/95 p-6 text-center shadow-lg">
+                <div className="text-lg uppercase tracking-[0.25em]" style={{ color: brand.tokens.accent }}>Intersection</div>
+                <div className="mt-2 text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(c.intersection)}</div>
+              </div>
+            </div>
+            <div className="space-y-6">
+              {items.map((it, i) => (
+                <div key={i} className="flex items-start gap-5">
+                  <div className="mt-2 h-6 w-6 shrink-0 rounded-full" style={{ backgroundColor: colors[i] }} />
+                  <div>
+                    <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
+                    <div className="mt-2 text-xl opacity-80">{s(it.body)}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    // ── Client & image matrix layouts ─────────────────────────────────
+    case "MV-CLIENT-MATRIX":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "Client outcomes")} />
+          <div className="mt-10 grid grid-cols-3 gap-6">
+            {arr(c.items).slice(0, 6).map((it, i) => (
+              <div
+                key={i}
+                className="flex flex-col rounded-2xl border p-6"
+                style={{ borderColor: "rgba(10,15,28,0.1)", backgroundColor: brand.tokens.surface }}
+              >
+                <div className="flex items-center justify-between">
+                  <div
+                    className="flex h-12 w-24 items-center justify-center rounded text-sm font-semibold text-white"
+                    style={{ backgroundColor: brand.tokens.primary }}
+                  >
+                    {s(it.client).split(" ").map((w) => w[0]).join("").slice(0, 3).toUpperCase()}
+                  </div>
+                  <div className="text-xs uppercase tracking-[0.2em] opacity-60">{s(it.sector)}</div>
+                </div>
+                <div className="mt-5 text-xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.client)}</div>
+                <div className="mt-2 flex-1 text-lg opacity-80">{s(it.result)}</div>
+                <div className="mt-5 border-t pt-4" style={{ borderColor: "rgba(10,15,28,0.08)" }}>
+                  <span className="text-4xl font-semibold" style={{ color: brand.tokens.accent }}>{s(it.metric)}</span>
+                  <span className="ml-2 text-lg opacity-70">{s(it.unit)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-CLIENT-DETAIL-3":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "Client engagements")} />
+          <div className="mt-10 grid grid-cols-3 gap-6">
+            {arr(c.items).slice(0, 3).map((it, i) => (
+              <div key={i} className="overflow-hidden rounded-2xl border" style={{ borderColor: "rgba(10,15,28,0.1)", backgroundColor: brand.tokens.surface }}>
+                <MediaTile brand={brand} seed={s(it.seed, s(it.client, `client-${i}`))} className="aspect-[16/10] w-full rounded-none" />
+                <div className="p-6">
+                  <div className="text-xs uppercase tracking-[0.2em] opacity-60">{s(it.sector)}</div>
+                  <div className="mt-2 text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.client)}</div>
+                  <div className="mt-3 text-lg leading-snug opacity-80">{s(it.story)}</div>
+                  <div className="mt-5 inline-block rounded-full px-4 py-2 text-sm font-semibold" style={{ backgroundColor: brand.tokens.primary, color: "#fff" }}>
+                    {s(it.metric)}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-IMG-MATRIX-4":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "In practice")} />
+          <div className="mt-10 grid grid-cols-2 gap-6">
+            {arr(c.items).slice(0, 4).map((it, i) => (
+              <div key={i} className="grid grid-cols-[240px_1fr] items-center gap-6 overflow-hidden rounded-2xl border" style={{ borderColor: "rgba(10,15,28,0.1)", backgroundColor: brand.tokens.surface }}>
+                <MediaTile brand={brand} seed={s(it.seed, `mx-${i}`)} className="h-full min-h-[200px] w-full rounded-none" />
+                <div className="p-6 pr-8">
+                  <div className="text-xs uppercase tracking-[0.25em]" style={{ color: brand.tokens.accent }}>{String(i + 1).padStart(2, "0")}</div>
+                  <div className="mt-2 text-3xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
+                  <div className="mt-3 text-xl opacity-80">{s(it.body)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-IMG-MATRIX-6":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "Program surface area")} />
+          <div className="mt-8 grid grid-cols-3 gap-5">
+            {arr(c.items).slice(0, 6).map((it, i) => (
+              <div key={i} className="overflow-hidden rounded-2xl border" style={{ borderColor: "rgba(10,15,28,0.1)", backgroundColor: brand.tokens.surface }}>
+                <MediaTile brand={brand} seed={s(it.seed, `mx6-${i}`)} className="aspect-[16/10] w-full rounded-none" />
+                <div className="p-5">
+                  <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
+                  <div className="mt-2 text-lg opacity-75">{s(it.body)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-CLIENT-COMPARE":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "Three engagements")} />
+          <div className="mt-10 grid grid-cols-3 gap-6">
+            {arr(c.items).slice(0, 3).map((it, i) => (
+              <div key={i} className="flex flex-col rounded-2xl border" style={{ borderColor: "rgba(10,15,28,0.1)", backgroundColor: brand.tokens.surface }}>
+                <div className="border-b p-6" style={{ borderColor: "rgba(10,15,28,0.08)" }}>
+                  <div className="text-xs uppercase tracking-[0.25em] opacity-60">Client</div>
+                  <div className="mt-2 text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.client)}</div>
+                </div>
+                <div className="border-b p-6" style={{ borderColor: "rgba(10,15,28,0.08)" }}>
+                  <div className="text-xs uppercase tracking-[0.25em]" style={{ color: brand.tokens.accent }}>Challenge</div>
+                  <div className="mt-2 text-lg opacity-85">{s(it.challenge)}</div>
+                </div>
+                <div className="flex-1 border-b p-6" style={{ borderColor: "rgba(10,15,28,0.08)" }}>
+                  <div className="text-xs uppercase tracking-[0.25em]" style={{ color: brand.tokens.accent }}>Outcome</div>
+                  <div className="mt-2 text-lg opacity-85">{s(it.outcome)}</div>
+                </div>
+                <div className="p-6 text-center" style={{ backgroundColor: brand.tokens.primary, color: "#fff" }}>
+                  <div className="text-2xl font-semibold" style={{ color: brand.tokens.accent }}>{s(it.metric)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </SlideFrame>
+      );
+
     default:
+
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />

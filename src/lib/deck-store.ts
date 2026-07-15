@@ -566,7 +566,170 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         ],
       };
 
+    // ── Expanded quote layouts ─────────────────────────────────────────
+    case "MV-QUOTE-MULTI":
+      return {
+        title: "What clients tell us",
+        items: [
+          { quote: "They cut our launch cycle nearly in half without adding a reviewer.", attribution: "VP, Global Marketing", role: "Life sciences" },
+          { quote: "The first program where reviewers had context on day one.", attribution: "Head of Regulatory", role: "Global bank" },
+          { quote: "One workflow across 14 languages — status finally lives in one place.", attribution: "Director, Content Ops", role: "Consumer tech" },
+        ],
+      };
+    case "MV-QUOTE-PORTRAIT":
+      return {
+        quote: "We were spending more time chasing files than shipping content.",
+        attribution: "Maria Chen",
+        role: "Global Marketing Lead",
+        org: "Fortune 500 life sciences",
+        mediaSeed: `${clientName}-portrait-quote`,
+      };
+    case "MV-QUOTE-CARD":
+      return {
+        quote: "This is the first program where our reviewers see the brief, not just the file.",
+        attribution: "Head of Regulatory Affairs",
+        role: "Global life-sciences leader",
+        org: "Enterprise client, 2025",
+      };
+    case "MV-QUOTE-METRIC":
+      return {
+        quote: "The program cut our launch cycle nearly in half without adding a single reviewer.",
+        attribution: "VP, Global Marketing",
+        role: "Fortune 500 life sciences",
+        metric: "46",
+        unit: "%",
+        metricLabel: "faster cycle time",
+      };
+    case "MV-QUOTE-POSTER":
+      return {
+        quote: "Treat localization as a supply chain, not a service.",
+        attribution: "TransPerfect POV",
+        role: "Enterprise briefing series",
+      };
+
+    // ── Infographic options ────────────────────────────────────────────
+    case "MV-INFO-DONUT":
+      return {
+        title: "Where the effort goes today",
+        centerValue: "62",
+        centerUnit: "%",
+        centerLabel: "of cycle time is review + rework",
+        items: [
+          { label: "Review + rework", value: 62, note: "In-market reviewers, late in cycle" },
+          { label: "Translation", value: 22, note: "Core linguistic work" },
+          { label: "Intake + brief", value: 10, note: "Kickoff and handoffs" },
+          { label: "Publish", value: 6, note: "Approved routing to channels" },
+        ],
+      };
+    case "MV-INFO-FUNNEL":
+      return {
+        title: "From request to published — where volume drops",
+        items: [
+          { label: "Requests filed", value: "12,400", unit: "assets", note: "Across all markets" },
+          { label: "Approved for translation", value: "9,800", unit: "assets", note: "79% conversion" },
+          { label: "Passed QA", value: "8,900", unit: "assets", note: "91% acceptance" },
+          { label: "Published in-market", value: "8,600", unit: "assets", note: "97% of QA-passed" },
+        ],
+      };
+    case "MV-INFO-BAR-COMPARE":
+      return {
+        title: "Cycle time by approach",
+        unit: "weeks",
+        items: [
+          { label: "In-house team", value: 18, note: "Full-time headcount only" },
+          { label: "Freelance stack", value: 10, note: "Per-project vendors" },
+          { label: "Point tools", value: 12, note: "Software without service" },
+          { label: "Managed program", value: 4, note: "TransPerfect" },
+        ],
+      };
+    case "MV-INFO-CIRCULAR-FLOW":
+      return {
+        title: "The program cycle",
+        hub: "Governed workflow",
+        items: [
+          { label: "Intake", body: "One request surface across teams." },
+          { label: "Translate", body: "Subject-matter matched, terminology enforced." },
+          { label: "Review", body: "In-context reviewer workbench." },
+          { label: "Publish", body: "Approved-only routing to channels." },
+        ],
+      };
+    case "MV-INFO-PYRAMID":
+      return {
+        title: "How value stacks up",
+        items: [
+          { label: "Strategic advantage", body: "Speed to market as a durable lever." },
+          { label: "Program outcomes", body: "Cycle time, cost, quality moved together." },
+          { label: "Operational fit", body: "One workflow across teams and tools." },
+          { label: "Language quality", body: "Foundation — accurate, on-brand, on-policy." },
+        ],
+      };
+    case "MV-INFO-VENN":
+      return {
+        title: "Where the program lives",
+        intersection: "Governed acceleration",
+        items: [
+          { label: "Speed", body: "Cycle time in weeks, not quarters." },
+          { label: "Quality", body: "On-brand, on-policy, on-terminology." },
+          { label: "Governance", body: "Audit-ready across every market." },
+        ],
+      };
+
+    // ── Client & image matrix layouts ──────────────────────────────────
+    case "MV-CLIENT-MATRIX":
+      return {
+        title: "Selected client outcomes",
+        items: [
+          { client: "Life sciences leader", sector: "Pharma", result: "Faster regulated launches", metric: "38", unit: "%" },
+          { client: "Global bank", sector: "Financial services", result: "Reg comms across 22 markets", metric: "22", unit: "markets" },
+          { client: "Consumer tech", sector: "Technology", result: "Launch parity across 14 languages", metric: "14", unit: "langs" },
+          { client: "Retail group", sector: "Retail", result: "Lower content cost, same coverage", metric: "24", unit: "% ↓" },
+          { client: "Insurance carrier", sector: "Insurance", result: "Audit-ready in every market", metric: "0", unit: "findings" },
+          { client: "Automotive OEM", sector: "Automotive", result: "Model launches on one timeline", metric: "1", unit: "cadence" },
+        ],
+      };
+    case "MV-CLIENT-DETAIL-3":
+      return {
+        title: "How this has worked for others",
+        items: [
+          { client: "Life-sciences leader", sector: "Pharma · EU + US", story: "Moved from 28 vendors to one program across regulated documents in 28 markets.", metric: "38% ↓ launch time", seed: "life-sci" },
+          { client: "Global bank", sector: "Financial services", story: "Regulator-ready comms rolled out across 22 markets on a single workflow.", metric: "0 audit findings", seed: "bank" },
+          { client: "Consumer tech", sector: "Technology", story: "Product, marketing, and support content shipped in parity across 14 languages.", metric: "14 langs, one release", seed: "tech" },
+        ],
+      };
+    case "MV-IMG-MATRIX-4":
+      return {
+        title: "The program in practice",
+        items: [
+          { label: "Intake", body: "One brief carries every downstream step.", seed: "matrix-intake" },
+          { label: "Translate", body: "Subject-matter matched across 150+ languages.", seed: "matrix-translate" },
+          { label: "Review", body: "Context follows the file into the workbench.", seed: "matrix-review" },
+          { label: "Publish", body: "Approved-only output routed to channels.", seed: "matrix-publish" },
+        ],
+      };
+    case "MV-IMG-MATRIX-6":
+      return {
+        title: "Program surface area",
+        items: [
+          { label: "Marketing", body: "Campaigns across every market.", seed: "matrix-marketing" },
+          { label: "Product", body: "UI, docs, help content.", seed: "matrix-product" },
+          { label: "Regulatory", body: "Audit-ready regulated content.", seed: "matrix-regulatory" },
+          { label: "Support", body: "Localized support at scale.", seed: "matrix-support" },
+          { label: "Learning", body: "Training content, every language.", seed: "matrix-learning" },
+          { label: "Legal", body: "Contracts and disclosures.", seed: "matrix-legal" },
+        ],
+      };
+    case "MV-CLIENT-COMPARE":
+      return {
+        title: "Three engagements, one program",
+        items: [
+          { client: "Life-sciences leader", challenge: "28 vendors, no shared context, launches slipping every quarter.", outcome: "One managed program with AI-assisted QA and single intake.", metric: "38% ↓ launch time" },
+          { client: "Global bank", challenge: "Regulator comms drifting out of parity across 22 markets.", outcome: "Governed workflow with terminology enforcement at the source.", metric: "0 audit findings" },
+          { client: "Consumer tech", challenge: "Product, marketing, and support content out of sync across languages.", outcome: "One release cadence across 14 languages with live SLA dashboards.", metric: "14 langs, one release" },
+        ],
+      };
+
     default:
+
       return { title: sectionName };
   }
 }
