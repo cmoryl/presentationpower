@@ -401,6 +401,19 @@ function VariantDetailModal({
                     ☾
                   </button>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setShowZones(!showZones)}
+                  aria-pressed={showZones}
+                  className={`rounded-full border px-2.5 py-1 text-[11px] ${
+                    showZones
+                      ? "border-[#03002C] bg-[#03002C] text-white"
+                      : "border-black/15 bg-white text-black/60"
+                  }`}
+                  title="Show media zones"
+                >
+                  ⌗ Zones
+                </button>
                 <select
                   value={brandIdx}
                   onChange={(e) => setBrandIdx(Number(e.target.value))}
@@ -415,7 +428,10 @@ function VariantDetailModal({
             <div className="overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm">
               <div className="aspect-[16/9]">
                 <ScaledSlide>
-                  <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
+                  <>
+                    <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
+                    {showZones && <MediaZoneOverlay variant={variant} />}
+                  </>
                 </ScaledSlide>
               </div>
             </div>
