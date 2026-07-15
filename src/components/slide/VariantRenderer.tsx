@@ -733,6 +733,342 @@ export function VariantRenderer(props: Props) {
         </SlideFrame>
       );
 
+    // ── Extended covers ────────────────────────────────────────────────
+    case "MV-OP-COVER-EDITORIAL":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <div className="grid h-full grid-cols-[1.6fr_1fr] gap-12">
+            <div className="flex flex-col justify-between">
+              <div className="text-2xl uppercase tracking-[0.35em]" style={{ color: brand.tokens.accent }}>
+                {s(c.kicker, "Vol. 01")}
+              </div>
+              <div>
+                <div className="text-[128px] font-semibold leading-[0.9]">{s(c.title)}</div>
+                <div className="mt-8 max-w-2xl text-3xl opacity-80">{s(c.subtitle)}</div>
+              </div>
+              <div className="flex gap-16 text-xl opacity-70">
+                <div>Prepared for {s(c.clientName)}</div>
+                <div>{s(c.date)}</div>
+              </div>
+            </div>
+            <div className="flex items-center">
+              <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "editorial"))} className="aspect-[3/4] w-full" />
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-OP-COVER-SPLIT":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <div className="-m-24 grid h-[calc(100%+192px)] grid-cols-2">
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "split"))} className="h-full w-full rounded-none" />
+            <div className="flex flex-col justify-center p-24" style={{ backgroundColor: brand.tokens.primary, color: "#fff" }}>
+              <div className="text-2xl uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>
+                Prepared for {s(c.clientName)}
+              </div>
+              <div className="mt-8 text-[92px] font-semibold leading-[1.02]">{s(c.title)}</div>
+              <div className="mt-8 max-w-xl text-2xl opacity-85">{s(c.subtitle)}</div>
+              <div className="mt-14 text-xl uppercase tracking-[0.3em] opacity-70">{s(c.date)}</div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-OP-COVER-POSTER":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <div className="flex h-full flex-col justify-between">
+            <div className="text-2xl uppercase tracking-[0.4em]" style={{ color: brand.tokens.accent }}>
+              {s(c.kicker, "A briefing")}
+            </div>
+            <div className="text-[220px] font-semibold uppercase leading-[0.88] tracking-tight">
+              {s(c.title, "Signal")}
+            </div>
+            <div className="flex justify-between text-xl uppercase tracking-[0.3em] opacity-70">
+              <span>{s(c.meta, "Confidential")}</span>
+              <span>№ 01</span>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-OP-COVER-GRID": {
+      const items = arr(c.items);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-2 p-2">
+            {(items.length ? items : [{}, {}, {}, {}]).slice(0, 4).map((it, i) => (
+              <MediaTile key={i} brand={brand} seed={s(it.seed, `grid-${i}`)} className="h-full w-full rounded-none" />
+            ))}
+          </div>
+          <div className="absolute inset-0 bg-black/45" />
+          <div className="relative flex h-full flex-col justify-end text-white">
+            <div className="text-2xl uppercase tracking-[0.3em] opacity-90">{s(c.date)}</div>
+            <div className="mt-4 text-[112px] font-semibold leading-[0.95]">{s(c.title)}</div>
+            <div className="mt-6 max-w-4xl text-3xl opacity-90">{s(c.subtitle)}</div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-OP-COVER-DOSSIER":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="flex h-full flex-col justify-between" style={{ color: brand.tokens.ink }}>
+            <div className="flex items-start justify-between">
+              <div className="text-xl uppercase tracking-[0.35em] opacity-70">
+                Dossier · Ref {s(c.reference, "TP-0001")}
+              </div>
+              <div
+                className="rounded-md border-2 px-4 py-2 text-2xl font-semibold uppercase tracking-[0.25em] -rotate-6"
+                style={{ borderColor: brand.tokens.accent, color: brand.tokens.accent }}
+              >
+                Confidential
+              </div>
+            </div>
+            <div>
+              <div className="h-[3px] w-40" style={{ backgroundColor: brand.tokens.accent }} />
+              <div className="mt-8 text-[104px] font-semibold leading-[1.02]" style={{ color: brand.tokens.primary }}>
+                {s(c.title)}
+              </div>
+              <div className="mt-8 max-w-4xl text-3xl opacity-80">Prepared for {s(c.clientName)}</div>
+            </div>
+            <div className="grid grid-cols-3 gap-16 border-t pt-8 text-xl uppercase tracking-[0.3em] opacity-70" style={{ borderColor: "rgba(10,15,28,0.15)" }}>
+              <div>Prepared by · {s(c.prepared, "TransPerfect")}</div>
+              <div>Date · {s(c.date)}</div>
+              <div>Distribution · Internal</div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-OP-COVER-GRADIENT":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `radial-gradient(circle at 20% 20%, ${brand.tokens.accent}66, transparent 55%), radial-gradient(circle at 80% 70%, ${brand.tokens.primary} 0%, ${brand.tokens.ink} 100%)`,
+            }}
+          />
+          <div className="relative flex h-full flex-col justify-end text-white">
+            <div className="text-2xl uppercase tracking-[0.35em] opacity-85">Prepared for {s(c.clientName)}</div>
+            <div className="mt-6 text-[136px] font-semibold leading-[0.95]">{s(c.title)}</div>
+            <div className="mt-8 max-w-4xl text-3xl opacity-90">{s(c.subtitle)}</div>
+            <div className="mt-14 text-xl uppercase tracking-[0.3em] opacity-70">{s(c.date)}</div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-OP-COVER-MONOGRAM":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <div className="grid h-full grid-cols-[1.2fr_1fr] gap-12">
+            <div
+              className="flex items-center justify-center rounded-3xl"
+              style={{ backgroundColor: brand.tokens.primary, color: "#fff" }}
+            >
+              <div
+                className="text-[520px] font-semibold leading-none"
+                style={{ color: brand.tokens.accent }}
+              >
+                {s(c.monogram, "TP").slice(0, 2).toUpperCase()}
+              </div>
+            </div>
+            <div className="flex flex-col justify-center">
+              <div className="h-[3px] w-24" style={{ backgroundColor: brand.tokens.accent }} />
+              <div className="mt-8 text-[76px] font-semibold leading-[1.05]">{s(c.title)}</div>
+              <div className="mt-6 text-2xl opacity-75">{s(c.subtitle)}</div>
+              <div className="mt-12 text-xl uppercase tracking-[0.3em] opacity-60">{s(c.date)}</div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-OP-COVER-STACKED":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <div className="flex h-full flex-col justify-between">
+            <div className="text-2xl uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>
+              {s(c.kicker, "A proposal")}
+            </div>
+            <div className="grid grid-cols-[1fr_1.4fr] items-end gap-12">
+              <MediaTile brand={brand} seed={s(c.mediaSeed, "stacked")} className="aspect-[4/5] w-full" />
+              <div>
+                <div className="text-[96px] font-semibold leading-[0.95]">{s(c.title)}</div>
+                <div className="mt-6 text-3xl opacity-80">{s(c.subtitle)}</div>
+              </div>
+            </div>
+            <div className="flex justify-between text-xl uppercase tracking-[0.3em] opacity-70">
+              <span>Prepared with care</span>
+              <span>{s(c.date)}</span>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    // ── Image-forward content ──────────────────────────────────────────
+    case "MV-IMG-FULL-BLEED":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "hero"))} className="absolute inset-0 h-full w-full rounded-none" />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.65) 100%)" }} />
+          <div className="relative flex h-full flex-col justify-end text-white">
+            <div className="text-2xl uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>
+              {s(c.kicker, "In focus")}
+            </div>
+            <div className="mt-6 max-w-5xl text-[92px] font-semibold leading-[1.02]">{s(c.title)}</div>
+            <div className="mt-6 max-w-4xl text-2xl opacity-90">{s(c.body)}</div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-IMG-SPLIT":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="grid h-full grid-cols-2 gap-14">
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "split"))} className="h-full w-full" />
+            <div className="flex flex-col justify-center">
+              <SlideTitle brand={brand} title={s(c.title)} />
+              <div className="mt-8 text-2xl leading-snug opacity-85">{s(c.body)}</div>
+              {s(c.caption) && <div className="mt-10 text-lg uppercase tracking-[0.25em] opacity-60">{s(c.caption)}</div>}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-IMG-CAPTION":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="flex h-full flex-col items-center justify-center">
+            <div className="text-2xl uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>{s(c.title, "In focus")}</div>
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "framed"))} className="mt-8 aspect-[16/9] w-[80%]" />
+            <div className="mt-8 max-w-4xl text-center text-2xl opacity-85">{s(c.caption)}</div>
+            {s(c.credit) && <div className="mt-3 text-lg uppercase tracking-[0.25em] opacity-50">{s(c.credit)}</div>}
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-IMG-GRID-3":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "In practice")} />
+          <div className="mt-12 grid grid-cols-3 gap-8">
+            {arr(c.items).map((it, i) => (
+              <div key={i}>
+                <MediaTile brand={brand} seed={s(it.seed, `grid3-${i}`)} className="aspect-[4/3] w-full" />
+                <div className="mt-4 text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
+                <div className="mt-2 text-xl opacity-75">{s(it.caption)}</div>
+              </div>
+            ))}
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-IMG-GRID-6":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "Selected work")} />
+          <div className="mt-10 grid grid-cols-3 grid-rows-2 gap-5">
+            {arr(c.items).slice(0, 6).map((it, i) => (
+              <div key={i}>
+                <MediaTile brand={brand} seed={s(it.seed, `grid6-${i}`)} className="aspect-[4/3] w-full" />
+                {s(it.caption) && <div className="mt-2 text-lg opacity-75">{s(it.caption)}</div>}
+              </div>
+            ))}
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-IMG-PORTRAIT":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="grid h-full grid-cols-[1fr_1.3fr] gap-14">
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.name, "portrait"))} className="h-full w-full" portrait />
+            <div className="flex flex-col justify-center">
+              <div className="text-2xl uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>{s(c.role)}</div>
+              <div className="mt-6 text-6xl font-semibold" style={{ color: brand.tokens.primary }}>{s(c.name)}</div>
+              {s(c.quote) && (
+                <div className="mt-10 border-l-4 pl-6 text-3xl italic leading-snug" style={{ borderColor: brand.tokens.accent }}>
+                  “{s(c.quote)}”
+                </div>
+              )}
+              <div className="mt-8 text-2xl leading-snug opacity-80">{s(c.narrative)}</div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-IMG-QUOTE-BG":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote"))} className="absolute inset-0 h-full w-full rounded-none" />
+          <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(0,0,0,0.35), ${brand.tokens.primary}D9)` }} />
+          <div className="relative flex h-full flex-col justify-center text-white">
+            <div className="text-[200px] leading-none opacity-20" style={{ color: brand.tokens.accent }}>“</div>
+            <div className="-mt-12 max-w-6xl text-5xl font-medium leading-[1.2]">{s(c.quote)}</div>
+            <div className="mt-10 text-2xl opacity-85">
+              {s(c.attribution)} <span className="mx-2 opacity-60">·</span> {s(c.role)}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-IMG-BEFORE-AFTER": {
+      const before = obj(c.before);
+      const after = obj(c.after);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "What changes")} />
+          <div className="mt-12 grid grid-cols-2 gap-8">
+            {[{ label: "Before", panel: before }, { label: "After", panel: after }].map((p, i) => (
+              <div key={i} className="overflow-hidden rounded-2xl border" style={{ borderColor: "rgba(10,15,28,0.1)" }}>
+                <MediaTile brand={brand} seed={s(p.panel.seed, `${p.label}-${s(p.panel.label)}`)} className="aspect-[16/9] w-full rounded-none" muted={i === 0} />
+                <div className="p-8">
+                  <div className="text-xl uppercase tracking-[0.25em]" style={{ color: brand.tokens.accent }}>{p.label}</div>
+                  <div className="mt-3 text-3xl font-semibold">{s(p.panel.label)}</div>
+                  <div className="mt-3 text-xl opacity-80">{s(p.panel.body)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-IMG-STAT-CALLOUT":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="grid h-full grid-cols-2 gap-14">
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.label, "stat"))} className="h-full w-full" />
+            <div className="flex flex-col justify-center">
+              <div className="text-[220px] font-semibold leading-none" style={{ color: brand.tokens.accent }}>
+                {s(c.stat)}
+                <span className="align-top text-[110px]">{s(c.unit)}</span>
+              </div>
+              <div className="mt-6 text-3xl">{s(c.label)}</div>
+              <div className="mt-8 max-w-xl text-2xl opacity-80">{s(c.narrative)}</div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-IMG-STRIP":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "A quick look")} />
+          <div className="mt-14 grid grid-cols-5 gap-4">
+            {arr(c.items).slice(0, 5).map((it, i) => (
+              <div key={i}>
+                <MediaTile brand={brand} seed={s(it.seed, `strip-${i}`)} className="aspect-[3/4] w-full" />
+                {s(it.caption) && <div className="mt-3 text-lg opacity-75">{s(it.caption)}</div>}
+              </div>
+            ))}
+          </div>
+        </SlideFrame>
+      );
+
     default:
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
@@ -742,6 +1078,131 @@ export function VariantRenderer(props: Props) {
       );
   }
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// MediaTile — deterministic gradient/pattern placeholder used wherever a
+// module wants imagery. Feels like a photograph without shipping bytes.
+// ────────────────────────────────────────────────────────────────────────────
+function hash(str: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+const MEDIA_PALETTES = [
+  ["#0B2A4A", "#4A90A4", "#F5F1EA"],
+  ["#2B1B17", "#E85A2C", "#F2C48D"],
+  ["#123524", "#3A6B4F", "#D9E2C3"],
+  ["#3D1E4A", "#8E44AD", "#EED9F5"],
+  ["#1A1F36", "#22C1C3", "#EDF6F6"],
+  ["#4A1F1F", "#C0392B", "#F4D8C6"],
+  ["#0F1A2B", "#E4C46B", "#F5EBD0"],
+];
+
+function MediaTile({
+  brand,
+  seed,
+  className,
+  portrait,
+  muted,
+}: {
+  brand: BrandMode;
+  seed: string;
+  className?: string;
+  portrait?: boolean;
+  muted?: boolean;
+}) {
+  const h = hash(seed || brand.id);
+  const palette = MEDIA_PALETTES[h % MEDIA_PALETTES.length];
+  const angle = (h % 12) * 30;
+  const shape = h % 4;
+  const x1 = 15 + ((h >> 3) % 50);
+  const y1 = 20 + ((h >> 6) % 40);
+  const x2 = 45 + ((h >> 9) % 45);
+  const y2 = 30 + ((h >> 12) % 50);
+  const grayscale = muted ? "grayscale(60%) brightness(0.9)" : undefined;
+  return (
+    <div
+      className={`relative overflow-hidden rounded-2xl ${className ?? ""}`}
+      style={{
+        background: `linear-gradient(${angle}deg, ${palette[0]} 0%, ${palette[1]} 65%, ${palette[2]} 100%)`,
+        filter: grayscale,
+      }}
+    >
+      <div
+        className="absolute rounded-full"
+        style={{
+          left: `${x1}%`,
+          top: `${y1}%`,
+          width: portrait ? "70%" : "55%",
+          aspectRatio: "1 / 1",
+          background: `radial-gradient(circle at 30% 30%, ${palette[2]}CC, ${palette[1]}00 70%)`,
+          mixBlendMode: "screen",
+        }}
+      />
+      {shape === 0 && (
+        <div
+          className="absolute rounded-full border"
+          style={{
+            left: `${x2}%`,
+            top: `${y2}%`,
+            width: "40%",
+            aspectRatio: "1 / 1",
+            borderColor: `${palette[2]}55`,
+            borderWidth: 2,
+          }}
+        />
+      )}
+      {shape === 1 && (
+        <div
+          className="absolute"
+          style={{
+            left: `${x2}%`,
+            top: `${y2}%`,
+            width: "50%",
+            height: "6px",
+            background: palette[2],
+            opacity: 0.35,
+            transform: `rotate(${angle}deg)`,
+          }}
+        />
+      )}
+      {shape === 2 && (
+        <div
+          className="absolute"
+          style={{
+            left: `${x2}%`,
+            top: `${y2}%`,
+            width: 0,
+            height: 0,
+            borderLeft: "80px solid transparent",
+            borderRight: "80px solid transparent",
+            borderBottom: `140px solid ${palette[2]}55`,
+            transform: `rotate(${angle}deg)`,
+          }}
+        />
+      )}
+      {shape === 3 && (
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `repeating-linear-gradient(${angle}deg, transparent 0 24px, ${palette[2]}18 24px 28px)`,
+          }}
+        />
+      )}
+      {portrait && (
+        <div
+          className="absolute left-1/2 top-[58%] h-[70%] w-[45%] -translate-x-1/2 rounded-t-full"
+          style={{ background: `linear-gradient(180deg, ${palette[2]}DD, ${palette[1]}66)`, mixBlendMode: "soft-light" }}
+        />
+      )}
+    </div>
+  );
+}
+
 
 // ────────────────────────────────────────────────────────────────────────────
 // Shared building blocks
