@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { getBrandGuide, type ColorSwatch, type TypeStyle } from "@/lib/brand-guides";
+import { getBrandGuide, type BrandGuide, type ColorSwatch, type TypeStyle } from "@/lib/brand-guides";
 import { BRAND_MODES } from "@/lib/taxonomy";
 
 export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
 });
 
 function BrandGuideView() {
-  const { guide } = Route.useLoaderData();
+  const { guide } = Route.useLoaderData() as { guide: BrandGuide };
   const division = BRAND_MODES.find((b) => b.id === guide.divisionId);
   const hero = guide.primaryColors[0]?.hex ?? "#03002C";
   const accent = guide.secondaryColors[0]?.hex ?? "#A1FBF9";
