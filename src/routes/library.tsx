@@ -4,6 +4,8 @@ import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { MediaZoneOverlay } from "@/components/slide/MediaZoneOverlay";
+import { SlideBackdropContext } from "@/components/slide/SlideChrome";
+import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { seedContent, type Brief } from "@/lib/deck-store";
 import { byId, type ModuleVariant } from "@/lib/taxonomy";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
@@ -44,6 +46,7 @@ function Library() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [mode, setMode] = useState<"light" | "dark">("light");
   const [showZones, setShowZones] = useState(false);
+  const [showImagery, setShowImagery] = useState(true);
   const tpMasterIdx = Math.max(0, brandModes.findIndex((b) => b.id === "bm-enterprise"));
   const [brandIdx, setBrandIdx] = useState(tpMasterIdx);
 
@@ -142,6 +145,19 @@ function Library() {
           </div>
           <button
             type="button"
+            onClick={() => setShowImagery((v) => !v)}
+            aria-pressed={showImagery}
+            title="Render each module with a sample background image + alpha gradient scrim"
+            className={`rounded-full border px-3 py-1.5 text-xs ${
+              showImagery
+                ? "border-[#03002C] bg-[#03002C] text-white"
+                : "border-black/15 bg-white text-black/70 hover:text-black"
+            }`}
+          >
+            ▤ Sample imagery {showImagery ? "on" : "off"}
+          </button>
+          <button
+            type="button"
             onClick={() => setShowZones((v) => !v)}
             aria-pressed={showZones}
             title="Overlay demo imagery zones (human, shape, aura, scrim)"
@@ -178,6 +194,7 @@ function Library() {
             preferred={preferred.has(v.id)}
             mode={mode}
             showZones={showZones}
+            showImagery={showImagery}
             onOpen={() => setOpenId(v.id)}
           />
         ))}
@@ -200,6 +217,8 @@ function Library() {
           setMode={setMode}
           showZones={showZones}
           setShowZones={setShowZones}
+          showImagery={showImagery}
+          setShowImagery={setShowImagery}
           family={byId(moduleFamilies, active.familyId)}
           fallback={active.fallbackVariantId ? byId(moduleVariants, active.fallbackVariantId) : undefined}
           layouts={active.permittedLayoutIds
@@ -221,6 +240,7 @@ function VariantCard({
   preferred,
   mode = "light",
   showZones = false,
+  showImagery = false,
   onOpen,
 }: {
   variant: ModuleVariant;
@@ -230,6 +250,7 @@ function VariantCard({
   preferred?: boolean;
   mode?: "light" | "dark";
   showZones?: boolean;
+  showImagery?: boolean;
   onOpen: () => void;
 }) {
   const previewSlide = {
@@ -242,6 +263,7 @@ function VariantCard({
     changes: [],
   };
   const isDark = mode === "dark";
+  const backdrop = showImagery ? backdropForVariant(variant) : null;
   return (
     <button
       type="button"
@@ -252,10 +274,10 @@ function VariantCard({
     >
       <div className={`relative aspect-[16/9] ${isDark ? "bg-[#03002C]/40" : "bg-white/40"}`}>
         <ScaledSlide>
-          <>
+          <SlideBackdropContext.Provider value={backdrop}>
             <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
             {showZones && <MediaZoneOverlay variant={variant} />}
-          </>
+          </SlideBackdropContext.Provider>
         </ScaledSlide>
         <div className={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest opacity-0 backdrop-blur-md transition group-hover:opacity-100 ${
           isDark ? "bg-white/15 text-white ring-1 ring-white/25" : "bg-black/60 text-white"
@@ -302,6 +324,8 @@ function VariantDetailModal({
   setMode,
   showZones,
   setShowZones,
+  showImagery,
+  setShowImagery,
   family,
   fallback,
   layouts,
@@ -317,6 +341,8 @@ function VariantDetailModal({
   setMode: (m: "light" | "dark") => void;
   showZones: boolean;
   setShowZones: (b: boolean) => void;
+  showImagery: boolean;
+  setShowImagery: (b: boolean) => void;
   family: ReturnType<typeof useTaxonomy>["moduleFamilies"][number] | undefined;
   fallback: ModuleVariant | undefined;
   layouts: ReturnType<typeof useTaxonomy>["layoutFrameworks"];
@@ -403,6 +429,19 @@ function VariantDetailModal({
                 </div>
                 <button
                   type="button"
+                  onClick={() => setShowImagery(!showImagery)}
+                  aria-pressed={showImagery}
+                  className={`rounded-full border px-2.5 py-1 text-[11px] ${
+                    showImagery
+                      ? "border-[#03002C] bg-[#03002C] text-white"
+                      : "border-black/15 bg-white text-black/60"
+                  }`}
+                  title="Toggle background imagery + gradient scrim"
+                >
+                  ▤ Imagery
+                </button>
+                <button
+                  type="button"
                   onClick={() => setShowZones(!showZones)}
                   aria-pressed={showZones}
                   className={`rounded-full border px-2.5 py-1 text-[11px] ${
@@ -428,10 +467,10 @@ function VariantDetailModal({
             <div className="overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm">
               <div className="aspect-[16/9]">
                 <ScaledSlide>
-                  <>
+                  <SlideBackdropContext.Provider value={showImagery ? backdropForVariant(variant) : null}>
                     <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
                     {showZones && <MediaZoneOverlay variant={variant} />}
-                  </>
+                  </SlideBackdropContext.Provider>
                 </ScaledSlide>
               </div>
             </div>
