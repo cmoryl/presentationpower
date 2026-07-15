@@ -2061,6 +2061,119 @@ function CardGrid({
   );
 }
 
+// ── Infographic stat tiles ─────────────────────────────────────────────
+// Each tile rotates through a palette (A/B/C testing per position), draws
+// a shape treatment behind the number (ring, bar, block, or split), and
+// scales the number's font size to the character length so short + long
+// values both feel proportionate.
+
+type StatStyle = "block" | "tinted" | "ring" | "bar" | "split";
+
+function statTilePalette(brand: BrandMode, index: number): { bg: string; ink: string; accent: string; muted: string; style: StatStyle } {
+  const styles: StatStyle[] = ["block", "tinted", "ring", "bar", "split"];
+  // A/B/C rotation — first tile leads with the strongest treatment.
+  const rotation = [
+    { bg: brand.tokens.primary, ink: "#ffffff", accent: brand.tokens.accent, muted: "rgba(255,255,255,0.7)" },
+    { bg: `color-mix(in oklab, ${brand.tokens.accent} 14%, ${brand.tokens.surface})`, ink: brand.tokens.ink, accent: brand.tokens.accent, muted: "rgba(10,15,28,0.6)" },
+    { bg: brand.tokens.surface, ink: brand.tokens.ink, accent: brand.tokens.primary, muted: "rgba(10,15,28,0.55)" },
+    { bg: brand.tokens.accent, ink: "#ffffff", accent: "rgba(255,255,255,0.9)", muted: "rgba(255,255,255,0.75)" },
+  ];
+  const palette = rotation[index % rotation.length];
+  return { ...palette, style: styles[index % styles.length] };
+}
+
+function statFontSize(value: string, unit: string): { valuePx: number; unitPx: number } {
+  const len = (value ?? "").length + Math.min((unit ?? "").length, 2);
+  if (len <= 3) return { valuePx: 200, unitPx: 72 };
+  if (len <= 4) return { valuePx: 168, unitPx: 60 };
+  if (len <= 6) return { valuePx: 136, unitPx: 52 };
+  if (len <= 8) return { valuePx: 108, unitPx: 44 };
+  return { valuePx: 88, unitPx: 36 };
+}
+
+function StatTile({ brand, item, index, dense }: { brand: BrandMode; item: Item; index: number; dense: boolean }) {
+  const value = s(item.value);
+  const unit = s(item.unit);
+  const source = s(item.source);
+  // Content-level override wins; otherwise rotation.
+  const rotated = statTilePalette(brand, index);
+  const style = ((item as { style?: string }).style as StatStyle) || rotated.style;
+  const { bg, ink, accent, muted } = rotated;
+  const font = statFontSize(value, unit);
+  const scale = dense ? 0.78 : 1;
+  const valuePx = Math.round(font.valuePx * scale);
+  const unitPx = Math.round(font.unitPx * scale);
+
+  return (
+    <div
+      className="relative flex flex-col overflow-hidden rounded-2xl p-10"
+      style={{ backgroundColor: bg, color: ink }}
+    >
+      {/* Background shape treatment */}
+      {style === "ring" && (
+        <div
+          className="pointer-events-none absolute -right-16 -top-16 rounded-full"
+          style={{
+            width: 340,
+            height: 340,
+            border: `24px solid ${accent}`,
+            opacity: 0.28,
+          }}
+        />
+      )}
+      {style === "bar" && (
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-2"
+          style={{ backgroundColor: accent }}
+        />
+      )}
+      {style === "split" && (
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 w-2"
+          style={{ backgroundColor: accent }}
+        />
+      )}
+      {style === "tinted" && (
+        <div
+          className="pointer-events-none absolute -bottom-24 -left-16 rounded-full"
+          style={{ width: 280, height: 280, backgroundColor: accent, opacity: 0.12 }}
+        />
+      )}
+
+      <div className="relative flex-1">
+        {s(item.title) && (
+          <div className="text-lg uppercase tracking-[0.28em]" style={{ color: muted }}>
+            {s(item.title)}
+          </div>
+        )}
+        <div
+          className="mt-4 font-semibold leading-[0.95] tabular-nums"
+          style={{ fontSize: valuePx, color: ink }}
+        >
+          {value || "—"}
+          {unit && (
+            <span
+              className="ml-2 align-top font-medium"
+              style={{ fontSize: unitPx, color: accent }}
+            >
+              {unit}
+            </span>
+          )}
+        </div>
+        <div className="mt-6 text-2xl leading-snug" style={{ color: ink, opacity: 0.92 }}>
+          {s(item.label)}
+        </div>
+      </div>
+
+      {source && (
+        <div className="relative mt-6 text-sm uppercase tracking-[0.2em]" style={{ color: muted }}>
+          Source · {source}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function StatGrid({
   brand,
   pageNumber,
@@ -2077,24 +2190,22 @@ function StatGrid({
   rows?: number;
 }) {
   const gridClass = cols === 2 ? "grid-cols-2" : "grid-cols-3";
+  const dense = (rows ?? 1) * cols >= 4;
   return (
     <SlideFrame brand={brand} pageNumber={pageNumber}>
       <SlideTitle brand={brand} title={title || "Proof"} />
-      <div className={`mt-16 grid gap-14 ${gridClass}`} style={rows ? { gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` } : undefined}>
+      <div
+        className={`mt-12 grid gap-6 ${gridClass}`}
+        style={rows ? { gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` } : undefined}
+      >
         {items.map((it, i) => (
-          <div key={i}>
-            <div className="text-[140px] font-semibold leading-none" style={{ color: brand.tokens.primary }}>
-              {s(it.value)}
-              <span className="text-5xl" style={{ color: brand.tokens.accent }}>{s(it.unit)}</span>
-            </div>
-            <div className="mt-6 text-2xl">{s(it.label)}</div>
-            {s(it.source) && <div className="mt-4 text-lg opacity-60">Source: {s(it.source)}</div>}
-          </div>
+          <StatTile key={i} brand={brand} item={it} index={i} dense={dense} />
         ))}
       </div>
     </SlideFrame>
   );
 }
+
 
 function NumberedList({ brand, pageNumber, title, items }: { brand: BrandMode; pageNumber: number; title: string; items: Item[] }) {
   return (
