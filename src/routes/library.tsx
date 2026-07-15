@@ -41,7 +41,9 @@ function Library() {
   const [family, setFamily] = useState<string>("all");
   const [scopeBrandId, setScopeBrandId] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
-  const [brandIdx, setBrandIdx] = useState(0);
+  const tpMasterIdx = Math.max(0, brandModes.findIndex((b) => b.id === "bm-enterprise"));
+  const [brandIdx, setBrandIdx] = useState(tpMasterIdx);
+
 
   const scopeBrand = scopeBrandId === "all" ? undefined : brandModes.find((b) => b.id === scopeBrandId);
   // Master TransPerfect brand is the default lockup for library previews.
