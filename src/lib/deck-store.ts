@@ -11,6 +11,8 @@ import {
   byId,
   variantsForSection,
 } from "./taxonomy";
+import { BRAND_PROFILES } from "./brand-profiles";
+import { pickCaseStudy, pickProofLogos } from "./case-studies";
 
 export type BrandModeId = string;
 
