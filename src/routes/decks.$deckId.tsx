@@ -193,24 +193,30 @@ function DeckEditor() {
         <aside className="space-y-4">
           {qa.length > 0 && (
             <Panel label="QA gates">
+              <div className="mb-2 flex gap-3 text-[10px] uppercase tracking-widest">
+                <span className="text-red-700">{blockingIssues(qa).length} blocking</span>
+                <span className="text-amber-700">{warningIssues(qa).length} warnings</span>
+              </div>
               <ul className="space-y-2 text-sm">
                 {qa.map((issue, k) => {
                   const idx = deck.slides.findIndex((sl) => sl.id === issue.slideId);
+                  const isBlock = issue.severity === "block";
                   return (
-                    <li key={k} className="rounded-lg bg-amber-50 px-3 py-2">
+                    <li key={k} className={`rounded-lg px-3 py-2 ${isBlock ? "bg-red-50" : "bg-amber-50"}`}>
                       <button
                         onClick={() => setActiveIdx(idx)}
-                        className="text-xs font-medium uppercase tracking-widest text-amber-900 hover:underline"
+                        className={`text-xs font-medium uppercase tracking-widest hover:underline ${isBlock ? "text-red-900" : "text-amber-900"}`}
                       >
-                        Slide {idx + 1}
+                        {isBlock ? "Block" : "Warn"} · Slide {idx + 1}
                       </button>
-                      <div className="mt-0.5 text-amber-900/80">{issue.message}</div>
+                      <div className={`mt-0.5 ${isBlock ? "text-red-900/80" : "text-amber-900/80"}`}>{issue.message}</div>
                     </li>
                   );
                 })}
               </ul>
             </Panel>
           )}
+
           {sf && (
             <Panel label="Section framework">
               <div className="font-mono text-xs text-black/50">{sf.id}</div>
