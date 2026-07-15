@@ -8,6 +8,7 @@ import {
   ICON_TREATMENTS_META,
   ICON_EMPHASIS_META,
   resolveEmphasisColors,
+  iconographyForVariant,
   type IconTreatment,
   type IconEmphasis,
   type IconSizeToken,
