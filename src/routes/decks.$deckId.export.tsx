@@ -65,19 +65,72 @@ function ExportView() {
         <div className="flex items-center gap-2">
           <button
             onClick={handlePptx}
-            disabled={exporting}
-            className="rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0B2A4A]/90 disabled:opacity-60"
+            disabled={exporting || blocked}
+            title={blocked ? "Resolve blocking QA issues first" : ""}
+            className="rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0B2A4A]/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {exporting ? "Preparing…" : "Download .pptx"}
           </button>
           <button
-            onClick={() => window.print()}
-            className="rounded-full border border-black/15 bg-white px-5 py-2.5 text-sm font-medium text-black hover:border-black/30"
+            onClick={() => !blocked && window.print()}
+            disabled={blocked}
+            className="rounded-full border border-black/15 bg-white px-5 py-2.5 text-sm font-medium text-black hover:border-black/30 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Print / Save PDF
           </button>
         </div>
       </div>
+
+      {(blocks.length > 0 || warns.length > 0) && (
+        <div className="no-print mx-auto mb-8 max-w-[1200px] px-6">
+          {blocks.length > 0 && (
+            <div className="rounded-2xl border border-red-300 bg-red-50 p-5">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-widest text-red-900">
+                    {blocks.length} blocking QA {blocks.length === 1 ? "issue" : "issues"} — export disabled
+                  </div>
+                  <div className="mt-1 text-sm text-red-900/80">
+                    Resolve these in the editor, or override for internal drafts only.
+                  </div>
+                </div>
+                <label className="flex items-center gap-2 text-xs text-red-900">
+                  <input type="checkbox" checked={override} onChange={(e) => setOverride(e.target.checked)} />
+                  Override (internal draft)
+                </label>
+              </div>
+              <ul className="mt-3 space-y-1 text-sm">
+                {blocks.map((issue, k) => {
+                  const idx = deck.slides.findIndex((sl) => sl.id === issue.slideId);
+                  return (
+                    <li key={k} className="text-red-900/90">
+                      <span className="font-mono text-xs text-red-900/60">Slide {idx + 1}</span> · {issue.message}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+          {warns.length > 0 && (
+            <div className="mt-3 rounded-2xl border border-amber-300 bg-amber-50 p-5">
+              <div className="text-xs font-semibold uppercase tracking-widest text-amber-900">
+                {warns.length} {warns.length === 1 ? "warning" : "warnings"} — non-blocking
+              </div>
+              <ul className="mt-2 space-y-1 text-sm">
+                {warns.map((issue, k) => {
+                  const idx = deck.slides.findIndex((sl) => sl.id === issue.slideId);
+                  return (
+                    <li key={k} className="text-amber-900/90">
+                      <span className="font-mono text-xs text-amber-900/60">Slide {idx + 1}</span> · {issue.message}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
 
 
       <div className="mx-auto flex max-w-[1400px] flex-col items-center gap-6 px-6 print:max-w-none print:gap-0 print:p-0">
