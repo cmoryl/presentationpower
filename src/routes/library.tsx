@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { seedContent, type Brief } from "@/lib/deck-store";
 import {
   BRAND_MODES,
   MODULE_FAMILIES,
@@ -11,6 +12,17 @@ import {
   byId,
   type ModuleVariant,
 } from "@/lib/taxonomy";
+
+const SAMPLE_BRIEF: Brief = {
+  prospect: "Acme Corp",
+  industry: "Life sciences",
+  meetingObjective: "Strategic partnership review",
+  audience: "Executive team",
+  brandModeId: "bm-corporate",
+  narrativeArchetypeId: "arch-problem-solution",
+  tone: "confident",
+  notes: "",
+};
 
 export const Route = createFileRoute("/library")({
   head: () => ({
