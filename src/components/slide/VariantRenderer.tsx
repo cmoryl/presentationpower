@@ -171,17 +171,29 @@ const strs = (v: unknown): string[] => (Array.isArray(v) ? (v as unknown[]).map(
 export function VariantRenderer(props: Props) {
   const { slide, variant, brand, pageNumber, clientName } = props;
   const c = slide.content as Record<string, unknown>;
+  const contentClientName = s((slide.content as Record<string, unknown>).clientName);
+  const resolvedClient = clientName ?? contentClientName ?? undefined;
 
-  // Local SlideFrame that injects clientName + layoutId from the current slide,
-  // so every variant automatically gets the co-brand lockup and approved logo
-  // placement without every switch arm passing the same props.
-  const SlideFrame = (frameProps: Omit<ComponentProps<typeof BaseSlideFrame>, "clientName" | "layoutId"> & { children: ReactNode }) => (
-    <BaseSlideFrame
-      {...frameProps}
-      clientName={clientName ?? s((slide.content as Record<string, unknown>).clientName)}
-      layoutId={slide.layoutId}
-    />
+  return (
+    <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId }}>
+      {renderVariantBody({ slide, variant, brand, pageNumber, c })}
+    </SlideFrameCtx.Provider>
   );
+}
+
+function renderVariantBody({
+  slide,
+  variant,
+  brand,
+  pageNumber,
+  c,
+}: {
+  slide: DeckSlide;
+  variant: ModuleVariant;
+  brand: BrandMode;
+  pageNumber: number;
+  c: Record<string, unknown>;
+}): ReactNode {
 
   switch (variant.id) {
     // ── Opening ────────────────────────────────────────────────────────
