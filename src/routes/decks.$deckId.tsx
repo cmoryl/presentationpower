@@ -2,9 +2,10 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { DeckChat } from "@/components/DeckChat";
-import { useDeckStore, type DeckSlide } from "@/lib/deck-store";
+import { useDeckStore } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
 import {
   BRAND_MODES,
   MODULE_VARIANTS,
@@ -12,8 +13,8 @@ import {
   LAYOUT_FRAMEWORKS,
   byId,
   variantsForSection,
-  type ModuleVariant,
 } from "@/lib/taxonomy";
+
 
 export const Route = createFileRoute("/decks/$deckId")({
   head: ({ params }) => ({
@@ -192,24 +193,30 @@ function DeckEditor() {
         <aside className="space-y-4">
           {qa.length > 0 && (
             <Panel label="QA gates">
+              <div className="mb-2 flex gap-3 text-[10px] uppercase tracking-widest">
+                <span className="text-red-700">{blockingIssues(qa).length} blocking</span>
+                <span className="text-amber-700">{warningIssues(qa).length} warnings</span>
+              </div>
               <ul className="space-y-2 text-sm">
                 {qa.map((issue, k) => {
                   const idx = deck.slides.findIndex((sl) => sl.id === issue.slideId);
+                  const isBlock = issue.severity === "block";
                   return (
-                    <li key={k} className="rounded-lg bg-amber-50 px-3 py-2">
+                    <li key={k} className={`rounded-lg px-3 py-2 ${isBlock ? "bg-red-50" : "bg-amber-50"}`}>
                       <button
                         onClick={() => setActiveIdx(idx)}
-                        className="text-xs font-medium uppercase tracking-widest text-amber-900 hover:underline"
+                        className={`text-xs font-medium uppercase tracking-widest hover:underline ${isBlock ? "text-red-900" : "text-amber-900"}`}
                       >
-                        Slide {idx + 1}
+                        {isBlock ? "Block" : "Warn"} · Slide {idx + 1}
                       </button>
-                      <div className="mt-0.5 text-amber-900/80">{issue.message}</div>
+                      <div className={`mt-0.5 ${isBlock ? "text-red-900/80" : "text-amber-900/80"}`}>{issue.message}</div>
                     </li>
                   );
                 })}
               </ul>
             </Panel>
           )}
+
           {sf && (
             <Panel label="Section framework">
               <div className="font-mono text-xs text-black/50">{sf.id}</div>
@@ -312,41 +319,8 @@ function Panel({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// QA gates — cheap client-side checks against variant capacity + empty fields
-// ────────────────────────────────────────────────────────────────────────────
-type QaIssue = { slideId: string; message: string };
-
-function runQa(slides: DeckSlide[]): QaIssue[] {
-  const issues: QaIssue[] = [];
-  for (const slide of slides) {
-    const variant = byId(MODULE_VARIANTS, slide.variantId);
-    if (!variant) continue;
-    // Empty editable fields
-    for (const path of variant.editableFields) {
-      for (const cp of expandPath(path, slide.content)) {
-        const v = readPath(slide.content, cp);
-        if (v == null || (typeof v === "string" && v.trim() === "")) {
-          issues.push({ slideId: slide.id, message: `Empty field: ${cp}` });
-        }
-      }
-    }
-    // Capacity: items array bounds
-    checkCapacity(slide, variant, issues);
-  }
-  return issues;
-}
-
-function checkCapacity(slide: DeckSlide, variant: ModuleVariant, issues: QaIssue[]) {
-  const cap = variant.capacity.items;
-  if (!cap) return;
-  const items = slide.content.items;
-  const n = Array.isArray(items) ? items.length : 0;
-  if (n < cap.min) issues.push({ slideId: slide.id, message: `Needs at least ${cap.min} items (has ${n})` });
-  if (n > cap.max) issues.push({ slideId: slide.id, message: `Over capacity: ${n} items, max ${cap.max}` });
-}
-
 // Expand editable field patterns like "items[].title" against the current content.
+
 function FieldEditor({
   path,
   content,
@@ -384,29 +358,4 @@ function FieldEditor({
       </div>
     </div>
   );
-}
-
-function expandPath(pattern: string, content: Record<string, unknown>): string[] {
-  if (!pattern.includes("[]")) return [pattern];
-  const [head, ...rest] = pattern.split("[]");
-  const arrKey = head.replace(/\.$/, "");
-  const arrVal = readPath(content, arrKey);
-  if (!Array.isArray(arrVal)) return [];
-  const tail = rest.join("[]");
-  return arrVal.map((_, i) => `${arrKey}[${i}]${tail}`);
-}
-
-function readPath(obj: unknown, path: string): unknown {
-  const parts = path.split(".").flatMap((p) => {
-    const m = /^([^\[]+)(\[(\d+)\])?$/.exec(p);
-    if (!m) return [p];
-    return m[3] !== undefined ? [m[1], Number(m[3])] : [m[1]];
-  });
-  let cur: unknown = obj;
-  for (const k of parts) {
-    if (cur == null) return undefined;
-    // @ts-expect-error dynamic
-    cur = cur[k];
-  }
-  return cur;
 }
