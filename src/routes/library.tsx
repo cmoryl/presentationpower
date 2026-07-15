@@ -14,14 +14,16 @@ import {
 } from "@/lib/taxonomy";
 
 const SAMPLE_BRIEF: Brief = {
+  id: "preview",
+  createdAt: new Date().toISOString(),
   prospect: "Acme Corp",
   industry: "Life sciences",
   meetingObjective: "Strategic partnership review",
   audience: "Executive team",
   brandModeId: "bm-corporate",
-  narrativeArchetypeId: "arch-problem-solution",
-  tone: "confident",
-  notes: "",
+  archetypeId: "arch-problem-solution",
+  lengthTarget: 12,
+  clientFacts: "",
 };
 
 export const Route = createFileRoute("/library")({
