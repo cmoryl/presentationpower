@@ -124,7 +124,7 @@ function DeckEditor() {
           <div className="overflow-hidden rounded-2xl border border-black/10 shadow-lg">
             {active && mv && (
               <ScaledSlide>
-                <VariantRenderer slide={active} variant={mv} brand={brand} pageNumber={clamped + 1} />
+                <VariantRenderer slide={active} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} />
               </ScaledSlide>
             )}
           </div>
