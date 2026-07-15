@@ -44,8 +44,11 @@ function Library() {
   const [brandIdx, setBrandIdx] = useState(0);
 
   const scopeBrand = scopeBrandId === "all" ? undefined : brandModes.find((b) => b.id === scopeBrandId);
+  // Master TransPerfect brand is the default lockup for library previews.
+  const tpMaster = brandModes.find((b) => b.id === "bm-enterprise") ?? brandModes[0];
   const restricted = new Set(scopeBrand?.contentScope?.restrictedFamilyIds ?? []);
   const preferred = new Set(scopeBrand?.contentScope?.preferredVariantIds ?? []);
+
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
