@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 // Logo-placement contract for the slide chrome.
 //
 // Every rendered slide places the brand lockup in exactly one of these named
