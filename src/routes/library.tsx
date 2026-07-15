@@ -467,7 +467,7 @@ function VariantDetailModal({
             <div className="overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm">
               <div className="aspect-[16/9]">
                 <ScaledSlide>
-                  <SlideBackdropContext.Provider value={showImagery ? backdropForVariant(variant) : null}>
+                  <SlideBackdropContext.Provider value={showImagery && mode === "dark" ? backdropForVariant(variant) : null}>
                     <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
                     {showZones && <MediaZoneOverlay variant={variant} />}
                   </SlideBackdropContext.Provider>
