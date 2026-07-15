@@ -102,9 +102,27 @@ export function SlideFrame({
             className="absolute inset-0 h-full w-full object-cover"
             style={{ filter: backdrop.imageDim ? `brightness(${1 - backdrop.imageDim}) saturate(0.95)` : undefined }}
           />
+          {/* Soft-focus accent blobs — tinted from the division's brand tokens.
+              Two large blurred radial gradients (accent + primary) sit above the
+              image but below the scrim, giving each division a color-coded haze. */}
+          <div
+            aria-hidden
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage: [
+                `radial-gradient(38% 42% at 12% 22%, ${hexA(brand.tokens.accent, 0.45)} 0%, ${hexA(brand.tokens.accent, 0)} 70%)`,
+                `radial-gradient(42% 46% at 88% 82%, ${hexA(brand.tokens.primary, 0.55)} 0%, ${hexA(brand.tokens.primary, 0)} 72%)`,
+                `radial-gradient(28% 30% at 70% 18%, ${hexA(brand.tokens.accent, 0.28)} 0%, ${hexA(brand.tokens.accent, 0)} 75%)`,
+              ].join(", "),
+              filter: "blur(40px)",
+              mixBlendMode: "screen",
+              opacity: 0.9,
+            }}
+          />
           <div className="absolute inset-0" style={{ backgroundImage: scrimGradient }} />
         </>
       )}
+
       {/* Brand bar (locked) */}
       <div
         className="absolute left-0 top-0 h-2 w-full"
