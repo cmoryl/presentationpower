@@ -44,7 +44,7 @@ function DeckEditor() {
   const mv = active ? byId(MODULE_VARIANTS, active.variantId) : undefined;
   const lf = active ? byId(LAYOUT_FRAMEWORKS, active.layoutId) : undefined;
 
-  const qa = useMemo(() => runQa(deck.slides), [deck.slides]);
+  const qa = useMemo(() => runQa(deck.slides, deck.brandModeId), [deck.slides, deck.brandModeId]);
 
   return (
     <AppShell>
