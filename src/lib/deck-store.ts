@@ -62,6 +62,7 @@ type DeckState = {
   decks: Record<string, Deck>;
   createBriefAndAssemble: (brief: Omit<Brief, "id" | "createdAt">) => { briefId: string; deckId: string };
   applyAiContent: (deckId: string, aiSlides: Array<{ id: string; content: SlideContent }>) => void;
+  revertAiChange: (deckId: string, slideId: string, field: string) => void;
   updateSlideField: (deckId: string, slideId: string, field: string, value: unknown) => void;
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
