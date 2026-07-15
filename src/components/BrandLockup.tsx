@@ -63,7 +63,7 @@ export function BrandLockup({
 
   const useOfficialWordmark = TP_BRANDS.has(logo.wordmark);
   const wordmarkHeight = dims.wordmarkPx;
-  const wordmarkWidth = wordmarkHeight * TP_WORDMARK_ASPECT;
+
 
   return (
     <div
