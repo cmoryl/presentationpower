@@ -43,6 +43,7 @@ function Library() {
   const [scopeBrandId, setScopeBrandId] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
   const [mode, setMode] = useState<"light" | "dark">("light");
+  const [showZones, setShowZones] = useState(false);
   const tpMasterIdx = Math.max(0, brandModes.findIndex((b) => b.id === "bm-enterprise"));
   const [brandIdx, setBrandIdx] = useState(tpMasterIdx);
 
