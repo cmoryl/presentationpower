@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { useDeckStore } from "@/lib/deck-store";
+import { useDeckStore, type DeckSlide } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import {
@@ -11,6 +11,7 @@ import {
   LAYOUT_FRAMEWORKS,
   byId,
   variantsForSection,
+  type ModuleVariant,
 } from "@/lib/taxonomy";
 
 export const Route = createFileRoute("/decks/$deckId")({
@@ -26,24 +27,45 @@ function DeckEditor() {
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const updateField = useDeckStore((s) => s.updateSlideField);
   const swapVariant = useDeckStore((s) => s.swapVariant);
+  const moveSlide = useDeckStore((s) => s.moveSlide);
+  const removeSlide = useDeckStore((s) => s.removeSlide);
+  const addSlide = useDeckStore((s) => s.addSlide);
+  const duplicateSlide = useDeckStore((s) => s.duplicateSlide);
   const [activeIdx, setActiveIdx] = useState(0);
 
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
-  const active = deck.slides[activeIdx];
+  const clamped = Math.min(activeIdx, deck.slides.length - 1);
+  const active = deck.slides[clamped];
   const sf = active ? byId(SECTION_FRAMEWORKS, active.sectionId) : undefined;
   const mv = active ? byId(MODULE_VARIANTS, active.variantId) : undefined;
   const lf = active ? byId(LAYOUT_FRAMEWORKS, active.layoutId) : undefined;
 
+  const qa = useMemo(() => runQa(deck.slides), [deck.slides]);
+
   return (
     <AppShell>
-      <div className="flex items-baseline justify-between">
-        <div>
+      <div className="flex items-baseline justify-between gap-6">
+        <div className="min-w-0">
           <Link to="/" className="text-xs uppercase tracking-widest text-black/50 hover:text-black">← Dashboard</Link>
-          <h1 className="mt-2 text-3xl font-semibold">{deck.title}</h1>
+          <h1 className="mt-2 truncate text-3xl font-semibold">{deck.title}</h1>
           <div className="mt-1 text-sm text-black/60">
-            {deck.slides.length} slides · Brand: {brand.name} · Archetype: {byId(SECTION_FRAMEWORKS, deck.slides[0]?.sectionId ?? "")?.name ?? ""}
+            {deck.slides.length} slides · Brand: {brand.name}
+            {qa.length > 0 && (
+              <span className="ml-3 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-900">
+                {qa.length} QA issue{qa.length === 1 ? "" : "s"}
+              </span>
+            )}
           </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/decks/$deckId/present"
+            params={{ deckId }}
+            className="rounded-full bg-[#0B2A4A] px-4 py-2 text-sm font-medium text-white hover:bg-[#0B2A4A]/90"
+          >
+            Present ▶
+          </Link>
         </div>
       </div>
 
@@ -52,26 +74,39 @@ function DeckEditor() {
         <div className="space-y-3">
           {deck.slides.map((slide, i) => {
             const variant = byId(MODULE_VARIANTS, slide.variantId);
+            const hasIssue = qa.some((q) => q.slideId === slide.id);
             return (
-              <button
-                key={slide.id}
-                onClick={() => setActiveIdx(i)}
-                className={`block w-full overflow-hidden rounded-xl border text-left transition ${
-                  i === activeIdx ? "border-[#0B2A4A] ring-2 ring-[#0B2A4A]/20" : "border-black/10 hover:border-black/30"
-                }`}
-              >
-                <div className="aspect-[16/9] bg-white">
-                  <ScaledSlide>
-                    {variant && <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} />}
-                  </ScaledSlide>
+              <div key={slide.id} className="group relative">
+                <button
+                  onClick={() => setActiveIdx(i)}
+                  className={`block w-full overflow-hidden rounded-xl border text-left transition ${
+                    i === clamped ? "border-[#0B2A4A] ring-2 ring-[#0B2A4A]/20" : "border-black/10 hover:border-black/30"
+                  }`}
+                >
+                  <div className="aspect-[16/9] bg-white">
+                    <ScaledSlide>
+                      {variant && <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} />}
+                    </ScaledSlide>
+                  </div>
+                  <div className="border-t border-black/10 bg-white px-3 py-2 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">{String(i + 1).padStart(2, "0")} · {byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}</span>
+                      {hasIssue && <span className="text-amber-600">●</span>}
+                    </div>
+                    <div className="text-black/50">{variant?.name}</div>
+                  </div>
+                </button>
+                <div className="absolute right-1 top-1 flex gap-1 opacity-0 transition group-hover:opacity-100">
+                  <IconBtn title="Move up" onClick={() => moveSlide(deck.id, slide.id, -1)}>▲</IconBtn>
+                  <IconBtn title="Move down" onClick={() => moveSlide(deck.id, slide.id, 1)}>▼</IconBtn>
+                  <IconBtn title="Duplicate" onClick={() => duplicateSlide(deck.id, slide.id)}>⎘</IconBtn>
+                  <IconBtn title="Remove" onClick={() => { if (confirm("Remove this slide?")) removeSlide(deck.id, slide.id); }}>✕</IconBtn>
                 </div>
-                <div className="border-t border-black/10 bg-white px-3 py-2 text-xs">
-                  <div className="font-medium">{String(i + 1).padStart(2, "0")} · {byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}</div>
-                  <div className="text-black/50">{variant?.name}</div>
-                </div>
-              </button>
+              </div>
             );
           })}
+
+          <AddSlideMenu onAdd={(sectionId) => addSlide(deck.id, sectionId, active?.id)} />
         </div>
 
         {/* Stage */}
@@ -79,7 +114,7 @@ function DeckEditor() {
           <div className="overflow-hidden rounded-2xl border border-black/10 shadow-lg">
             {active && mv && (
               <ScaledSlide>
-                <VariantRenderer slide={active} variant={mv} brand={brand} pageNumber={activeIdx + 1} />
+                <VariantRenderer slide={active} variant={mv} brand={brand} pageNumber={clamped + 1} />
               </ScaledSlide>
             )}
           </div>
@@ -110,6 +145,26 @@ function DeckEditor() {
 
         {/* Inspector */}
         <aside className="space-y-4">
+          {qa.length > 0 && (
+            <Panel label="QA gates">
+              <ul className="space-y-2 text-sm">
+                {qa.map((issue, k) => {
+                  const idx = deck.slides.findIndex((sl) => sl.id === issue.slideId);
+                  return (
+                    <li key={k} className="rounded-lg bg-amber-50 px-3 py-2">
+                      <button
+                        onClick={() => setActiveIdx(idx)}
+                        className="text-xs font-medium uppercase tracking-widest text-amber-900 hover:underline"
+                      >
+                        Slide {idx + 1}
+                      </button>
+                      <div className="mt-0.5 text-amber-900/80">{issue.message}</div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Panel>
+          )}
           {sf && (
             <Panel label="Section framework">
               <div className="font-mono text-xs text-black/50">{sf.id}</div>
@@ -162,6 +217,46 @@ function DeckEditor() {
   );
 }
 
+function IconBtn({ children, title, onClick }: { children: React.ReactNode; title: string; onClick: () => void }) {
+  return (
+    <button
+      title={title}
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
+      className="rounded-md bg-white/95 px-1.5 py-0.5 text-[10px] leading-none text-black/70 shadow ring-1 ring-black/10 hover:bg-white"
+    >
+      {children}
+    </button>
+  );
+}
+
+function AddSlideMenu({ onAdd }: { onAdd: (sectionId: string) => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-xl border border-dashed border-black/20 bg-white/50 p-3">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full text-left text-xs font-medium uppercase tracking-widest text-black/60 hover:text-black"
+      >
+        + Add slide
+      </button>
+      {open && (
+        <div className="mt-2 max-h-64 space-y-1 overflow-auto">
+          {SECTION_FRAMEWORKS.map((sf) => (
+            <button
+              key={sf.id}
+              onClick={() => { onAdd(sf.id); setOpen(false); }}
+              className="block w-full rounded-md px-2 py-1 text-left text-xs hover:bg-black/5"
+            >
+              <span className="font-mono text-black/40">{sf.id}</span>{" "}
+              <span>{sf.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Panel({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-black/10 bg-white p-5">
@@ -169,6 +264,40 @@ function Panel({ label, children }: { label: string; children: React.ReactNode }
       <div className="mt-3">{children}</div>
     </div>
   );
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// QA gates — cheap client-side checks against variant capacity + empty fields
+// ────────────────────────────────────────────────────────────────────────────
+type QaIssue = { slideId: string; message: string };
+
+function runQa(slides: DeckSlide[]): QaIssue[] {
+  const issues: QaIssue[] = [];
+  for (const slide of slides) {
+    const variant = byId(MODULE_VARIANTS, slide.variantId);
+    if (!variant) continue;
+    // Empty editable fields
+    for (const path of variant.editableFields) {
+      for (const cp of expandPath(path, slide.content)) {
+        const v = readPath(slide.content, cp);
+        if (v == null || (typeof v === "string" && v.trim() === "")) {
+          issues.push({ slideId: slide.id, message: `Empty field: ${cp}` });
+        }
+      }
+    }
+    // Capacity: items array bounds
+    checkCapacity(slide, variant, issues);
+  }
+  return issues;
+}
+
+function checkCapacity(slide: DeckSlide, variant: ModuleVariant, issues: QaIssue[]) {
+  const cap = variant.capacity.items;
+  if (!cap) return;
+  const items = slide.content.items;
+  const n = Array.isArray(items) ? items.length : 0;
+  if (n < cap.min) issues.push({ slideId: slide.id, message: `Needs at least ${cap.min} items (has ${n})` });
+  if (n > cap.max) issues.push({ slideId: slide.id, message: `Over capacity: ${n} items, max ${cap.max}` });
 }
 
 // Expand editable field patterns like "items[].title" against the current content.
