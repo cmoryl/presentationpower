@@ -154,6 +154,12 @@ export const LAYOUT_FRAMEWORKS: LayoutFramework[] = [
   { id: "LF-22", name: "Layered architecture", description: "Stacked layers with labels", zones: ["title", "layers"] },
   { id: "LF-23", name: "Pricing tiers", description: "Parallel plan / package columns", zones: ["title", "tiers"] },
   { id: "LF-24", name: "Closing / CTA", description: "Sign-off with next steps", zones: ["message", "cta"] },
+  { id: "LF-25", name: "Editorial spread", description: "Magazine-style asymmetric type + media", zones: ["type", "media", "kicker"] },
+  { id: "LF-26", name: "Media gallery", description: "Grid of captioned media tiles", zones: ["title", "tiles"] },
+  { id: "LF-27", name: "Portrait feature", description: "Full-height portrait with narrative panel", zones: ["portrait", "narrative"] },
+  { id: "LF-28", name: "Poster type", description: "Poster-scale type block on solid field", zones: ["kicker", "type", "meta"] },
+  { id: "LF-29", name: "Framed media", description: "Centered framed media with caption", zones: ["media", "caption"] },
+  { id: "LF-30", name: "Media strip", description: "Horizontal filmstrip of media", zones: ["title", "strip"] },
 ];
 
 // ────────────────────────────────────────────────────────────────────────────
