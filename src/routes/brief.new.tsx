@@ -5,7 +5,8 @@ import { AppShell } from "@/components/AppShell";
 import { useDeckStore } from "@/lib/deck-store";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { personalizeSlides } from "@/lib/personalize.functions";
-import { byId, SECTION_FRAMEWORKS, NARRATIVE_ARCHETYPES } from "@/lib/taxonomy";
+import { byId, SECTION_FRAMEWORKS, NARRATIVE_ARCHETYPES, type BrandMode } from "@/lib/taxonomy";
+import { BrandLockup } from "@/components/BrandLockup";
 
 export const Route = createFileRoute("/brief/new")({
   head: () => ({
@@ -66,22 +67,47 @@ function BriefWizard() {
           <Field label="Meeting objective">
             <input className={inputCls} value={form.meetingObjective} onChange={(e) => setForm({ ...form, meetingObjective: e.target.value })} />
           </Field>
-          <div className="grid grid-cols-2 gap-6">
-            <Field label="Brand mode">
-              <select className={inputCls} value={form.brandModeId} onChange={(e) => setForm({ ...form, brandModeId: e.target.value })}>
-                {brandModes.map((b) => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
-                ))}
-              </select>
-            </Field>
-            <Field label="Narrative archetype">
-              <select className={inputCls} value={form.archetypeId} onChange={(e) => setForm({ ...form, archetypeId: e.target.value })}>
-                {narrativeArchetypes.map((a) => (
-                  <option key={a.id} value={a.id}>{a.name}</option>
-                ))}
-              </select>
-            </Field>
-          </div>
+          <Field label="Brand mode">
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+              {brandModes.map((b) => {
+                const active = form.brandModeId === b.id;
+                return (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => setForm({ ...form, brandModeId: b.id })}
+                    aria-pressed={active}
+                    className="group flex flex-col rounded-2xl border p-4 text-left transition"
+                    style={{
+                      borderColor: active ? b.tokens.primary : "rgba(0,0,0,0.1)",
+                      backgroundColor: active ? `${b.tokens.primary}08` : "#fff",
+                      boxShadow: active ? `0 0 0 3px ${b.tokens.primary}22` : undefined,
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <BrandLockup brand={b} color={b.tokens.primary} size="sm" clientName={form.prospect} />
+                      <span
+                        className="rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider"
+                        style={{ backgroundColor: `${b.tokens.accent}22`, color: b.tokens.primary }}
+                      >
+                        {b.role ?? "brand"}
+                      </span>
+                    </div>
+                    <div className="mt-3 text-xs text-black/60">{b.description}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </Field>
+          <Field label="Narrative archetype">
+            <select className={inputCls} value={form.archetypeId} onChange={(e) => setForm({ ...form, archetypeId: e.target.value })}>
+              {narrativeArchetypes.map((a) => (
+                <option key={a.id} value={a.id}>{a.name}</option>
+              ))}
+            </select>
+          </Field>
+
+          <BrandRelevancePanel brand={brandModes.find((b) => b.id === form.brandModeId) ?? brandModes[0]} />
           <Field label={`Length target: ${form.lengthTarget} slides`}>
             <input
               type="range"
@@ -180,5 +206,48 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <span className="mb-2 block text-xs uppercase tracking-widest text-black/55">{label}</span>
       {children}
     </label>
+  );
+}
+
+function BrandRelevancePanel({ brand }: { brand: BrandMode }) {
+  const scope = brand.contentScope;
+  if (!scope) return null;
+  const chip = (text: string, key: string) => (
+    <span
+      key={key}
+      className="rounded-full px-2.5 py-0.5 text-xs"
+      style={{ backgroundColor: `${brand.tokens.primary}0f`, color: brand.tokens.primary }}
+    >
+      {text}
+    </span>
+  );
+  const Row = ({ label, items }: { label: string; items: string[] }) =>
+    items.length === 0 ? null : (
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[10px] uppercase tracking-widest text-black/50">{label}</span>
+        <div className="flex flex-wrap gap-1.5">{items.map((v, i) => chip(v, `${label}-${i}`))}</div>
+      </div>
+    );
+  return (
+    <div
+      className="rounded-2xl border p-5"
+      style={{ borderColor: `${brand.tokens.primary}22`, backgroundColor: `${brand.tokens.primary}05` }}
+    >
+      <div className="mb-3 flex items-center justify-between">
+        <div className="text-xs uppercase tracking-widest text-black/60">Relevant to this brand</div>
+        <span className="text-[10px] font-mono text-black/40">auto-filtered from brand scope</span>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Row label="Industries" items={scope.industries} />
+        <Row label="Service lines" items={scope.serviceLines} />
+        <Row label="Case study tags" items={scope.caseStudyTags} />
+        <Row label="Preferred narratives" items={scope.preferredArchetypes} />
+      </div>
+      {scope.restrictedFamilyIds && scope.restrictedFamilyIds.length > 0 && (
+        <div className="mt-3 text-xs text-black/50">
+          Off-limits for this brand: {scope.restrictedFamilyIds.join(", ")}
+        </div>
+      )}
+    </div>
   );
 }

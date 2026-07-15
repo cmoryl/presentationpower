@@ -3,11 +3,35 @@
 // This is the source of truth until Lovable Cloud is enabled and these move to
 // database tables. Shape mirrors the planned schema so migration is a copy.
 
+export type BrandRole = "corporate" | "subcompany" | "division" | "product" | "cobrand";
+
+export type BrandLogoLockup = {
+  // Text-based lockup used until real logo assets are uploaded. `mark` is the
+  // short glyph (1–4 chars), `wordmark` is the full name.
+  mark: string;
+  wordmark: string;
+  // Optional secondary line rendered beneath the wordmark (division tagline).
+  divisionLine?: string;
+};
+
+export type BrandContentScope = {
+  industries: string[];        // e.g. "Life Sciences", "Legal", "Financial Services"
+  serviceLines: string[];      // e.g. "Regulatory translation", "eDiscovery"
+  caseStudyTags: string[];     // filters for case study modules
+  preferredArchetypes: string[]; // narrative archetype ids that suit this brand
+  restrictedFamilyIds?: string[]; // MF ids that are off-limits for this brand
+};
+
 export type BrandMode = {
   id: string;
   name: string;
   description: string;
   tokens: { primary: string; accent: string; surface: string; ink: string };
+  // Enrichment layer — resolved from brand-profiles.ts at load time.
+  role?: BrandRole;
+  parentId?: string;
+  logo?: BrandLogoLockup;
+  contentScope?: BrandContentScope;
 };
 
 export type SectionFramework = {
