@@ -359,28 +359,3 @@ function FieldEditor({
     </div>
   );
 }
-
-function expandPath(pattern: string, content: Record<string, unknown>): string[] {
-  if (!pattern.includes("[]")) return [pattern];
-  const [head, ...rest] = pattern.split("[]");
-  const arrKey = head.replace(/\.$/, "");
-  const arrVal = readPath(content, arrKey);
-  if (!Array.isArray(arrVal)) return [];
-  const tail = rest.join("[]");
-  return arrVal.map((_, i) => `${arrKey}[${i}]${tail}`);
-}
-
-function readPath(obj: unknown, path: string): unknown {
-  const parts = path.split(".").flatMap((p) => {
-    const m = /^([^\[]+)(\[(\d+)\])?$/.exec(p);
-    if (!m) return [p];
-    return m[3] !== undefined ? [m[1], Number(m[3])] : [m[1]];
-  });
-  let cur: unknown = obj;
-  for (const k of parts) {
-    if (cur == null) return undefined;
-    // @ts-expect-error dynamic
-    cur = cur[k];
-  }
-  return cur;
-}
