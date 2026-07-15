@@ -2,6 +2,15 @@ import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import { SlideFrame } from "./SlideChrome";
 import type { DeckSlide } from "@/lib/deck-store";
 import {
+  ICON_SIZES,
+  resolveEmphasisColors,
+  withDefaults,
+  type IconPlacement,
+  type IconSizeToken,
+  type IconTreatment,
+  type IconEmphasis,
+} from "@/lib/iconography";
+import {
   Sparkles, Workflow, Layers3, Users, ShieldCheck, Target, Rocket, LineChart,
   Search, Cog, MessageSquareQuote, Building2, Landmark, Cpu, Factory, Store,
   HeartPulse, Car, Plane, Coins, Calendar, ArrowRight, CheckCircle2,
