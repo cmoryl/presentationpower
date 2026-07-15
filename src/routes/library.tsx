@@ -140,9 +140,32 @@ function Library() {
               ☾ Dark
             </button>
           </div>
+          <button
+            type="button"
+            onClick={() => setShowZones((v) => !v)}
+            aria-pressed={showZones}
+            title="Overlay demo imagery zones (human, shape, aura, scrim)"
+            className={`rounded-full border px-3 py-1.5 text-xs ${
+              showZones
+                ? "border-[#03002C] bg-[#03002C] text-white"
+                : "border-black/15 bg-white text-black/70 hover:text-black"
+            }`}
+          >
+            ⌗ Media zones {showZones ? "on" : "off"}
+          </button>
           <span className="text-sm text-black/50">{filtered.length} of {moduleVariants.length}</span>
         </div>
       </div>
+
+      {showZones && (
+        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-black/10 bg-white/60 px-4 py-3 text-xs text-black/70 backdrop-blur-md">
+          <span className="font-medium text-black/80">Legend:</span>
+          <LegendChip color="rgba(0,63,199,0.55)" icon="👤" label="Human imagery — portraits, teams, hero photography" />
+          <LegendChip color="rgba(236,56,138,0.55)" icon="◆" label="Design shape — geometric accents, keylines, blocks" />
+          <LegendChip color="rgba(161,251,249,0.75)" icon="🌫" label="Ambient aura — soft blurred color field" />
+          <LegendChip color="rgba(3,0,44,0.55)" icon="▧" label="Overlay / scrim — transparent layer for legibility" />
+        </div>
+      )}
 
       <div className="mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3">
         {filtered.map((v) => (
