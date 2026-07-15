@@ -194,6 +194,7 @@ function Library() {
             preferred={preferred.has(v.id)}
             mode={mode}
             showZones={showZones}
+            showImagery={showImagery}
             onOpen={() => setOpenId(v.id)}
           />
         ))}
