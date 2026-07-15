@@ -2016,84 +2016,55 @@ function MediaTile({
     );
   }
 
+  // Dark mode: use a real photographic backdrop (bokeh/ambient/city/team/
+  // abstract + portraits) with a brand-tinted scrim and a soft-focus accent
+  // blob — same treatment as SlideFrame backdrops, so tiles inside slides
+  // match the outer imagery language instead of showing gradient blobs.
+  const tileBackdrops = MEDIA_TILE_BACKDROPS;
+  const url = tileBackdrops[h % tileBackdrops.length];
+  const accent = brand.tokens.accent;
+  const primary = brand.tokens.primary;
   return (
     <div
       className={`relative overflow-hidden rounded-2xl ${className ?? ""}`}
-      style={{
-        background: `linear-gradient(${angle}deg, ${palette[0]} 0%, ${palette[1]} 65%, ${palette[2]} 100%)`,
-        filter: grayscale,
-      }}
+      style={{ background: "#03002C", filter: grayscale }}
     >
+      <img
+        src={url}
+        alt=""
+        aria-hidden
+        className="absolute inset-0 h-full w-full object-cover"
+        style={{ filter: "brightness(0.85) saturate(0.95)" }}
+      />
       <div
-        className="absolute rounded-full"
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
         style={{
-          left: `${x1}%`,
-          top: `${y1}%`,
-          width: portrait ? "70%" : "55%",
-          aspectRatio: "1 / 1",
-          background: `radial-gradient(circle at 30% 30%, ${palette[2]}CC, ${palette[1]}00 70%)`,
+          backgroundImage: [
+            `radial-gradient(45% 55% at ${x1}% ${y1}%, ${accent}66 0%, ${accent}00 70%)`,
+            `radial-gradient(50% 55% at ${x2}% ${y2}%, ${primary}88 0%, ${primary}00 72%)`,
+          ].join(", "),
+          filter: "blur(30px)",
           mixBlendMode: "screen",
+          opacity: 0.85,
         }}
       />
-      {shape === 0 && (
-        <div
-          className="absolute rounded-full border"
-          style={{
-            left: `${x2}%`,
-            top: `${y2}%`,
-            width: "40%",
-            aspectRatio: "1 / 1",
-            borderColor: `${palette[2]}55`,
-            borderWidth: 2,
-          }}
-        />
-      )}
-      {shape === 1 && (
-        <div
-          className="absolute"
-          style={{
-            left: `${x2}%`,
-            top: `${y2}%`,
-            width: "50%",
-            height: "6px",
-            background: palette[2],
-            opacity: 0.35,
-            transform: `rotate(${angle}deg)`,
-          }}
-        />
-      )}
-      {shape === 2 && (
-        <div
-          className="absolute"
-          style={{
-            left: `${x2}%`,
-            top: `${y2}%`,
-            width: 0,
-            height: 0,
-            borderLeft: "80px solid transparent",
-            borderRight: "80px solid transparent",
-            borderBottom: `140px solid ${palette[2]}55`,
-            transform: `rotate(${angle}deg)`,
-          }}
-        />
-      )}
-      {shape === 3 && (
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `repeating-linear-gradient(${angle}deg, transparent 0 24px, ${palette[2]}18 24px 28px)`,
-          }}
-        />
-      )}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `linear-gradient(${angle}deg, rgba(3,0,44,0.55) 0%, rgba(3,0,44,0.15) 60%, rgba(3,0,44,0.55) 100%)`,
+        }}
+      />
       {portrait && (
         <div
           className="absolute left-1/2 top-[58%] h-[70%] w-[45%] -translate-x-1/2 rounded-t-full"
-          style={{ background: `linear-gradient(180deg, ${palette[2]}DD, ${palette[1]}66)`, mixBlendMode: "soft-light" }}
+          style={{ background: `linear-gradient(180deg, ${accent}55, ${primary}33)`, mixBlendMode: "soft-light" }}
         />
       )}
     </div>
   );
 }
+
 
 
 
