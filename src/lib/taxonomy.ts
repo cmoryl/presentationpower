@@ -160,6 +160,15 @@ export const LAYOUT_FRAMEWORKS: LayoutFramework[] = [
   { id: "LF-28", name: "Poster type", description: "Poster-scale type block on solid field", zones: ["kicker", "type", "meta"] },
   { id: "LF-29", name: "Framed media", description: "Centered framed media with caption", zones: ["media", "caption"] },
   { id: "LF-30", name: "Media strip", description: "Horizontal filmstrip of media", zones: ["title", "strip"] },
+  { id: "LF-31", name: "Donut infographic", description: "Donut / pie chart with center callout and legend", zones: ["chart", "legend", "callout"] },
+  { id: "LF-32", name: "Funnel infographic", description: "Vertical funnel of stages with conversion", zones: ["title", "stages"] },
+  { id: "LF-33", name: "Bar comparison", description: "Horizontal bar comparison across items", zones: ["title", "bars"] },
+  { id: "LF-34", name: "Circular flow", description: "Circular / cyclical process of 3–6 steps", zones: ["title", "steps", "hub"] },
+  { id: "LF-35", name: "Pyramid", description: "Stacked pyramid tiers from base to peak", zones: ["title", "tiers"] },
+  { id: "LF-36", name: "Venn", description: "Overlapping sets showing intersection", zones: ["title", "sets", "intersection"] },
+  { id: "LF-37", name: "Media matrix", description: "Grid of media tiles paired with copy", zones: ["title", "cells"] },
+  { id: "LF-38", name: "Quote wall", description: "Multiple stacked quotes as a chorus", zones: ["title", "quotes"] },
+  { id: "LF-39", name: "Client matrix", description: "Grid of client outcomes with logo, metric, note", zones: ["title", "cells"] },
 ];
 
 // ────────────────────────────────────────────────────────────────────────────
