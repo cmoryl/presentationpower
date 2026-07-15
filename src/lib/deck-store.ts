@@ -728,7 +728,80 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         ],
       };
 
+    // ── Expanded CTA / close variants ──────────────────────────────────
+    case "MV-CLOSE-TIMELINE":
+      return {
+        title: "What happens after sign-off",
+        items: [
+          { label: "First 30 days", body: "Discovery, intake mapping, and pilot scope locked.", owner: "TransPerfect + Client PM" },
+          { label: "60 days", body: "Pilot live in one market — first measurable results.", owner: "Delivery Lead" },
+          { label: "90 days", body: "Readout, decision on scale, program SOW.", owner: "Account Director" },
+        ],
+      };
+    case "MV-CLOSE-CHECKLIST":
+      return {
+        title: "What happens next",
+        items: [
+          { label: "Sign the pilot SOW", owner: "Client legal", when: "Within 5 business days" },
+          { label: "Kickoff workshop", owner: "TransPerfect + Client PM", when: "Week 1" },
+          { label: "Intake mapping complete", owner: "Solutions Lead", when: "Week 2" },
+          { label: "Pilot live in market", owner: "Delivery Lead", when: "Week 4" },
+        ],
+      };
+    case "MV-CLOSE-DECISION":
+      return {
+        kicker: "The ask",
+        ask: `Approve the pilot with ${clientName} in one priority market.`,
+        rationale: "One quarter, one market, one content type — enough signal to decide on the full program with data, not hypothesis.",
+        decisionBy: "End of month",
+      };
+    case "MV-CLOSE-CALENDAR": {
+      const d = new Date();
+      d.setDate(d.getDate() + 14);
+      return {
+        title: "Kickoff",
+        date: String(d.getDate()),
+        day: d.toLocaleDateString(undefined, { weekday: "long" }),
+        monthYear: d.toLocaleDateString(undefined, { month: "long", year: "numeric" }),
+        body: "Two-hour workshop with your program lead and our delivery team to align on scope, markets, and pilot content.",
+        owner: "TransPerfect account team",
+      };
+    }
+    case "MV-CLOSE-STATEMENT":
+      return {
+        kicker: `For ${clientName}`,
+        statement: "Global Content, Local Precision — on your timeline.",
+        signoff: "TransPerfect",
+      };
+    case "MV-CLOSE-SPLIT":
+      return {
+        title: "Ready when you are.",
+        body: `We've mapped the pilot to ${clientName}'s priority market and content type. Two-week discovery, then live in-market inside a quarter.`,
+        ctaLabel: "Approve the pilot",
+        ctaDetail: "SOW ready to countersign.",
+        owner: "Alex Rivera · Account Director",
+        mediaSeed: `${clientName}-cta`,
+      };
+    case "MV-CLOSE-DUAL-CTA":
+      return {
+        title: "Two ways to start",
+        items: [
+          { label: "Pilot", body: "One market, one content type. Measurable results in a single quarter.", ctaLabel: "Start the pilot", note: "$45k · one quarter" },
+          { label: "Program", body: "Full managed program across the portfolio, with governance and analytics in place.", ctaLabel: "Scope the program", note: "$220k · annualized" },
+        ],
+      };
+    case "MV-CLOSE-METRIC-PROMISE":
+      return {
+        kicker: "Our commitment to you",
+        metric: "40",
+        unit: "%",
+        promise: `Cut ${clientName}'s launch cycle time in the pilot market.`,
+        timeframe: "Within one quarter of go-live.",
+        owner: "TransPerfect account team",
+      };
+
     default:
+
 
       return { title: sectionName };
   }
