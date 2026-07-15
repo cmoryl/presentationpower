@@ -127,38 +127,5 @@ function VariantCard({ variant }: { variant: ModuleVariant }) {
 }
 
 function samplePreviewContent(variantId: string): Record<string, unknown> {
-  switch (variantId) {
-    case "MV-OP-COVER":
-      return { title: "Acme Corp", subtitle: "Strategic partnership review", clientName: "Acme Corp", presenter: "TransPerfect", date: "Preview" };
-    case "MV-OP-AGENDA":
-      return { title: "Agenda", items: [{ label: "Where you are today" }, { label: "What we heard" }, { label: "Our recommendation" }, { label: "Proof" }, { label: "Next steps" }] };
-    case "MV-OP-DIVIDER":
-      return { kicker: "Section", title: "Context" };
-    case "MV-CTX-CARDS-3":
-      return { title: "Where Acme is today", items: [{ title: "Fragmented workflows", body: "Content moves across teams without a single source of truth." }, { title: "Rising volume", body: "Global demand is outpacing review capacity." }, { title: "Compliance drag", body: "Regulated markets add review steps." }] };
-    case "MV-CTX-COST":
-      return { stat: "40", unit: "%", label: "of launch delays trace back to translation bottlenecks", narrative: "Every quarter of delay compounds into lost revenue." };
-    case "MV-INS-CALLOUT":
-      return { insight: "The bottleneck is orchestration, not translation.", narrative: "The linguistic talent exists — the connective tissue is missing." };
-    case "MV-INS-QUOTE":
-      return { quote: "We were spending more time chasing files than shipping content.", attribution: "Global Marketing Lead", role: "Enterprise client" };
-    case "MV-SOL-PILLARS-3":
-      return { title: "Our recommendation", items: [{ title: "Unified intake", body: "One request surface." }, { title: "AI-assisted review", body: "Humans on the exceptions." }, { title: "Governed publish", body: "Approved-only routing." }] };
-    case "MV-SOL-PILLARS-4":
-      return { title: "Capability set", items: [{ title: "Translation", body: "150+ languages." }, { title: "QA", body: "Automated + human." }, { title: "Publish", body: "Native integrations." }, { title: "Analytics", body: "SLA + quality dashboards." }] };
-    case "MV-PROC-TIMELINE":
-      return { title: "How we get there", items: [{ label: "Week 1", body: "Discovery" }, { label: "Week 2–3", body: "Pilot" }, { label: "Week 4", body: "Scale" }] };
-    case "MV-PROOF-STATS-3":
-      return { title: "Proof", items: [{ value: "36", unit: "%", label: "faster time to market", source: "TransPerfect, 2025" }, { value: "22", unit: "%", label: "lower cost", source: "Client, 2024" }, { value: "99.5", unit: "%", label: "QA acceptance", source: "2025" }] };
-    case "MV-DEC-MATRIX":
-      return { title: "Where each option lands", axisX: "Speed", axisY: "Control", q1: "Managed program", q2: "In-house team", q3: "Freelance stack", q4: "Point tools" };
-    case "MV-CASE-SPREAD":
-      return { client: "Global life-sciences leader", challenge: "Localized 4,000+ regulated documents / year.", solution: "Managed program with AI-assisted QA.", result: "38% faster launches, zero reopenings.", metric: "38% ↓ time to market" };
-    case "MV-REC-NEXT":
-      return { recommendation: "We recommend starting with a focused pilot in the highest-volume market.", rationale: "This isolates the workflow change and produces measurable results in one quarter." };
-    case "MV-CLOSE-CTA":
-      return { message: "Ready to scope the pilot.", nextSteps: "Two-week discovery, then a two-month pilot.", owner: "TransPerfect account team", followUp: "Kickoff within 10 business days." };
-    default:
-      return { title: "Preview" };
-  }
+  return seedContent(variantId, SAMPLE_BRIEF, "Preview section") as Record<string, unknown>;
 }
