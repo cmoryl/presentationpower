@@ -1,6 +1,7 @@
+import { useMemo } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { useDeckStore } from "@/lib/deck-store";
+import { useDeckStore, type Deck } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_FAMILIES, MODULE_VARIANTS, SECTION_FRAMEWORKS, LAYOUT_FRAMEWORKS, byId } from "@/lib/taxonomy";
@@ -18,9 +19,13 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const decks = useDeckStore((s) => Object.values(s.decks).sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+  const decksMap = useDeckStore((s) => s.decks);
   const briefs = useDeckStore((s) => s.briefs);
   const deleteDeck = useDeckStore((s) => s.deleteDeck);
+  const decks = useMemo<Deck[]>(
+    () => Object.values(decksMap).sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    [decksMap],
+  );
   return (
     <AppShell>
       <div className="flex items-end justify-between">
