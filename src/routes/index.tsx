@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useDeckStore } from "@/lib/deck-store";
+import { ScaledSlide } from "@/components/slide/ScaledSlide";
+import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_FAMILIES, MODULE_VARIANTS, SECTION_FRAMEWORKS, LAYOUT_FRAMEWORKS, byId } from "@/lib/taxonomy";
 
 export const Route = createFileRoute("/")({
@@ -18,6 +20,7 @@ export const Route = createFileRoute("/")({
 function Dashboard() {
   const decks = useDeckStore((s) => Object.values(s.decks).sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
   const briefs = useDeckStore((s) => s.briefs);
+  const deleteDeck = useDeckStore((s) => s.deleteDeck);
   return (
     <AppShell>
       <div className="flex items-end justify-between">
@@ -57,23 +60,37 @@ function Dashboard() {
           <div className="grid grid-cols-3 gap-6">
             {decks.map((d) => {
               const b = briefs[d.briefId];
-              const brand = byId(BRAND_MODES, d.brandModeId);
+              const brand = byId(BRAND_MODES, d.brandModeId) ?? BRAND_MODES[0];
+              const cover = d.slides[0];
+              const coverVariant = cover ? byId(MODULE_VARIANTS, cover.variantId) : undefined;
               return (
-                <Link
-                  key={d.id}
-                  to="/decks/$deckId"
-                  params={{ deckId: d.id }}
-                  className="group rounded-2xl border border-black/10 bg-white p-6 transition hover:border-black/30"
-                >
-                  <div className="h-2 w-10" style={{ backgroundColor: brand?.tokens.accent ?? "#E85A2C" }} />
-                  <div className="mt-5 text-lg font-semibold">{d.title}</div>
-                  <div className="mt-1 text-sm text-black/60">
-                    {d.slides.length} slides · {b?.industry ?? "—"}
-                  </div>
-                  <div className="mt-8 text-xs uppercase tracking-widest text-black/40">
-                    {new Date(d.createdAt).toLocaleString()}
-                  </div>
-                </Link>
+                <div key={d.id} className="group relative overflow-hidden rounded-2xl border border-black/10 bg-white transition hover:border-black/30">
+                  <Link to="/decks/$deckId" params={{ deckId: d.id }} className="block">
+                    <div className="aspect-[16/9] bg-white">
+                      {cover && coverVariant && (
+                        <ScaledSlide>
+                          <VariantRenderer slide={cover} variant={coverVariant} brand={brand} pageNumber={1} />
+                        </ScaledSlide>
+                      )}
+                    </div>
+                    <div className="border-t border-black/10 p-5">
+                      <div className="h-1.5 w-8 rounded-full" style={{ backgroundColor: brand.tokens.accent }} />
+                      <div className="mt-4 text-lg font-semibold">{d.title}</div>
+                      <div className="mt-1 text-sm text-black/60">
+                        {d.slides.length} slides · {b?.industry ?? "—"}
+                      </div>
+                      <div className="mt-6 text-xs uppercase tracking-widest text-black/40">
+                        {new Date(d.createdAt).toLocaleString()}
+                      </div>
+                    </div>
+                  </Link>
+                  <button
+                    onClick={() => { if (confirm(`Delete "${d.title}"?`)) deleteDeck(d.id); }}
+                    className="absolute right-3 top-3 rounded-full bg-white/95 px-2.5 py-1 text-xs text-black/60 opacity-0 shadow ring-1 ring-black/10 transition hover:text-black group-hover:opacity-100"
+                  >
+                    Delete
+                  </button>
+                </div>
               );
             })}
           </div>
