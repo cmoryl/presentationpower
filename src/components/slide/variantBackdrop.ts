@@ -108,6 +108,6 @@ export function backdropForVariant(variant: ModuleVariant): SlideBackdrop | null
     return null;
   }
 
-  // Fallback — ambient with side scrim so content stays readable.
-  return { url: ambient, scrim: "left", scrimStrength: 0.8, imageDim: 0.1 };
+  // Fallback — abstract or ambient with side scrim so content stays readable.
+  return { url: seed % 2 === 0 ? abstract : ambient, scrim: "left", scrimStrength: 0.8, imageDim: 0.1 };
 }
