@@ -1527,7 +1527,185 @@ export function VariantRenderer(props: Props) {
         </SlideFrame>
       );
 
+    // ── Expanded CTA / close variants ─────────────────────────────────
+    case "MV-CLOSE-TIMELINE":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "What happens next")} />
+          <div className="relative mt-20">
+            <div className="absolute left-0 right-0 top-10 h-[3px]" style={{ backgroundColor: brand.tokens.accent }} />
+            <div className="grid" style={{ gridTemplateColumns: `repeat(${Math.max(arr(c.items).length, 1)}, minmax(0, 1fr))` }}>
+              {arr(c.items).map((it, i) => (
+                <div key={i} className="pr-8">
+                  <div className="mb-8 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold text-white" style={{ backgroundColor: brand.tokens.accent, transform: "translateY(4px)" }}>
+                    {i + 1}
+                  </div>
+                  <div className="text-3xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
+                  <div className="mt-4 text-xl opacity-80">{s(it.body)}</div>
+                  {s(it.owner) && (
+                    <div className="mt-4 text-sm uppercase tracking-[0.2em] opacity-60">Owner · {s(it.owner)}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-CLOSE-CHECKLIST":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "What happens next")} />
+          <div className="mt-12 space-y-4">
+            {arr(c.items).map((it, i) => (
+              <div
+                key={i}
+                className="grid grid-cols-[60px_1fr_260px_180px] items-center gap-6 rounded-xl border p-6"
+                style={{ borderColor: "rgba(10,15,28,0.08)", backgroundColor: brand.tokens.surface }}
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border-2" style={{ borderColor: brand.tokens.accent, color: brand.tokens.accent }}>
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="3"><path d="M5 12l5 5 9-11" /></svg>
+                </div>
+                <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
+                <div className="text-lg opacity-75">{s(it.owner)}</div>
+                <div className="text-right text-lg font-medium" style={{ color: brand.tokens.accent }}>{s(it.when)}</div>
+              </div>
+            ))}
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-CLOSE-DECISION":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <div className="flex h-full flex-col justify-center">
+            <div className="text-2xl uppercase tracking-[0.35em] opacity-70" style={{ color: brand.tokens.accent }}>{s(c.kicker, "The ask")}</div>
+            <div className="mt-10 max-w-5xl text-8xl font-semibold leading-[1.05]" style={{ color: brand.tokens.primary }}>{s(c.ask)}</div>
+            <div className="mt-14 max-w-4xl text-3xl leading-snug opacity-85">{s(c.rationale)}</div>
+            <div className="mt-16 inline-flex items-center gap-6">
+              <div className="rounded-full px-8 py-4 text-xl font-semibold text-white" style={{ backgroundColor: brand.tokens.primary }}>Decision by</div>
+              <div className="text-3xl font-semibold" style={{ color: brand.tokens.accent }}>{s(c.decisionBy)}</div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-CLOSE-CALENDAR":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="grid h-full grid-cols-[520px_1fr] items-center gap-16">
+            <div
+              className="overflow-hidden rounded-3xl text-center text-white shadow-2xl"
+              style={{ background: `linear-gradient(160deg, ${brand.tokens.primary}, ${brand.tokens.accent})` }}
+            >
+              <div className="border-b border-white/20 py-5 text-xl uppercase tracking-[0.3em] opacity-90">Kickoff</div>
+              <div className="px-10 py-14">
+                <div className="text-[220px] font-semibold leading-none">{s(c.date)}</div>
+                <div className="mt-6 text-3xl">{s(c.day)}</div>
+                <div className="mt-2 text-xl opacity-80">{s(c.monthYear)}</div>
+              </div>
+            </div>
+            <div>
+              <div className="text-lg uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>{s(c.title, "Kickoff")}</div>
+              <div className="mt-6 text-4xl font-semibold leading-snug" style={{ color: brand.tokens.primary }}>{s(c.body)}</div>
+              <div className="mt-10 border-t pt-6 text-xl opacity-70" style={{ borderColor: "rgba(10,15,28,0.1)" }}>
+                {s(c.owner)}
+              </div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-CLOSE-STATEMENT":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <div className="absolute inset-0" style={{ backgroundColor: brand.tokens.primary }} />
+          <div className="relative flex h-full flex-col justify-between py-4 text-white">
+            <div className="text-2xl uppercase tracking-[0.35em]" style={{ color: brand.tokens.accent }}>{s(c.kicker)}</div>
+            <div className="max-w-6xl text-9xl font-semibold leading-[0.98] tracking-tight">{s(c.statement)}</div>
+            <div className="text-2xl opacity-80">{s(c.signoff)}</div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-CLOSE-SPLIT":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="grid h-full grid-cols-2 gap-14">
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "cta"))} className="h-full w-full" />
+            <div className="flex flex-col justify-center">
+              <div className="text-5xl font-semibold leading-tight" style={{ color: brand.tokens.primary }}>{s(c.title)}</div>
+              <div className="mt-8 text-2xl leading-snug opacity-85">{s(c.body)}</div>
+              <div className="mt-12 rounded-2xl p-8 text-white" style={{ background: `linear-gradient(135deg, ${brand.tokens.primary}, ${brand.tokens.accent})` }}>
+                <div className="text-xs uppercase tracking-[0.3em] opacity-80">Call to action</div>
+                <div className="mt-3 text-4xl font-semibold">{s(c.ctaLabel)}</div>
+                <div className="mt-3 text-xl opacity-90">{s(c.ctaDetail)}</div>
+              </div>
+              <div className="mt-8 text-lg uppercase tracking-[0.25em] opacity-60">{s(c.owner)}</div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-CLOSE-DUAL-CTA":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, "Two ways to start")} />
+          <div className="mt-14 grid grid-cols-2 gap-10">
+            {arr(c.items).slice(0, 2).map((it, i) => {
+              const highlight = i === 0;
+              return (
+                <div
+                  key={i}
+                  className="flex flex-col rounded-3xl p-12"
+                  style={{
+                    backgroundColor: highlight ? brand.tokens.primary : brand.tokens.surface,
+                    color: highlight ? "#fff" : brand.tokens.ink,
+                    border: highlight ? "none" : "1px solid rgba(10,15,28,0.1)",
+                  }}
+                >
+                  <div className="text-lg uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>
+                    {highlight ? "Recommended" : "Alternative"}
+                  </div>
+                  <div className="mt-4 text-5xl font-semibold">{s(it.label)}</div>
+                  <div className="mt-6 flex-1 text-xl leading-snug opacity-90">{s(it.body)}</div>
+                  <div
+                    className="mt-10 rounded-full px-8 py-4 text-center text-xl font-semibold"
+                    style={{
+                      backgroundColor: highlight ? brand.tokens.accent : brand.tokens.primary,
+                      color: "#fff",
+                    }}
+                  >
+                    {s(it.ctaLabel)}
+                  </div>
+                  <div className="mt-4 text-center text-sm opacity-70">{s(it.note)}</div>
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+
+    case "MV-CLOSE-METRIC-PROMISE":
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <div className="flex h-full flex-col justify-center">
+            <div className="text-xl uppercase tracking-[0.35em]" style={{ color: brand.tokens.accent }}>{s(c.kicker, "Our commitment")}</div>
+            <div className="mt-10 flex items-baseline gap-6">
+              <div className="text-[320px] font-semibold leading-none" style={{ color: brand.tokens.primary }}>
+                {s(c.metric)}
+              </div>
+              <div className="text-8xl font-semibold" style={{ color: brand.tokens.accent }}>{s(c.unit)}</div>
+            </div>
+            <div className="mt-6 max-w-5xl text-5xl font-semibold leading-tight" style={{ color: brand.tokens.primary }}>{s(c.promise)}</div>
+            <div className="mt-10 text-2xl opacity-80">{s(c.timeframe)}</div>
+            <div className="mt-12 text-lg uppercase tracking-[0.3em] opacity-60">{s(c.owner)}</div>
+          </div>
+        </SlideFrame>
+      );
+
     default:
+
 
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
