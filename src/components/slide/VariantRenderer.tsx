@@ -171,8 +171,8 @@ const strs = (v: unknown): string[] => (Array.isArray(v) ? (v as unknown[]).map(
 export function VariantRenderer(props: Props) {
   const { slide, variant, brand, pageNumber, clientName } = props;
   const c = slide.content as Record<string, unknown>;
-  const contentClientName = s((slide.content as Record<string, unknown>).clientName);
-  const resolvedClient = clientName ?? contentClientName ?? undefined;
+  const contentClientName = s((slide.content as Record<string, unknown>).clientName) || undefined;
+  const resolvedClient = clientName || contentClientName;
 
   return (
     <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId }}>
