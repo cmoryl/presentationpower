@@ -154,9 +154,12 @@ function Atlas() {
         </div>
       </Section>
 
+      <TypographySection />
+
       <IconographySection />
 
       <LogoPlacementSection />
+
 
       <div className="mt-14 rounded-2xl border border-dashed border-black/15 bg-white p-6 text-sm text-black/60">
         Want to see the pieces in action?{" "}
