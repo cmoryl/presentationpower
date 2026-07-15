@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useDeckStore } from "@/lib/deck-store";
-import { BRAND_MODES, NARRATIVE_ARCHETYPES } from "@/lib/taxonomy";
+import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 
 export const Route = createFileRoute("/brief/new")({
   head: () => ({
@@ -11,19 +11,25 @@ export const Route = createFileRoute("/brief/new")({
       { name: "description", content: "Guided brief that resolves into an assembled deck." },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(taxonomyQueryOptions),
   component: BriefWizard,
+  errorComponent: ({ error }) => (
+    <div className="p-10 text-sm text-red-600">Brief failed to load: {error.message}</div>
+  ),
+  notFoundComponent: () => <div className="p-10">Not found.</div>,
 });
 
 function BriefWizard() {
   const navigate = useNavigate();
   const create = useDeckStore((s) => s.createBriefAndAssemble);
+  const { brandModes, narrativeArchetypes } = useTaxonomy();
   const [form, setForm] = useState({
     prospect: "Acme Global",
     industry: "Life sciences",
     meetingObjective: "Secure pilot in the highest-volume market",
     audience: "VP Marketing + Head of Localization",
-    brandModeId: BRAND_MODES[0].id,
-    archetypeId: NARRATIVE_ARCHETYPES[0].id,
+    brandModeId: brandModes[0]?.id ?? "bm-enterprise",
+    archetypeId: narrativeArchetypes[0]?.id ?? "arch-problem-solution",
     lengthTarget: 9,
     clientFacts: "Recently expanded into 12 new markets. Under regulatory review pressure.",
   });
@@ -55,14 +61,14 @@ function BriefWizard() {
           <div className="grid grid-cols-2 gap-6">
             <Field label="Brand mode">
               <select className={inputCls} value={form.brandModeId} onChange={(e) => setForm({ ...form, brandModeId: e.target.value })}>
-                {BRAND_MODES.map((b) => (
+                {brandModes.map((b) => (
                   <option key={b.id} value={b.id}>{b.name}</option>
                 ))}
               </select>
             </Field>
             <Field label="Narrative archetype">
               <select className={inputCls} value={form.archetypeId} onChange={(e) => setForm({ ...form, archetypeId: e.target.value })}>
-                {NARRATIVE_ARCHETYPES.map((a) => (
+                {narrativeArchetypes.map((a) => (
                   <option key={a.id} value={a.id}>{a.name}</option>
                 ))}
               </select>

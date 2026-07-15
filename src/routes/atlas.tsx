@@ -1,13 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import {
-  LAYOUT_FRAMEWORKS,
-  MODULE_FAMILIES,
-  MODULE_VARIANTS,
-  SECTION_FRAMEWORKS,
-  NARRATIVE_ARCHETYPES,
-  byId,
-} from "@/lib/taxonomy";
+import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
+import { byId } from "@/lib/taxonomy";
 
 export const Route = createFileRoute("/atlas")({
   head: () => ({
@@ -16,10 +10,23 @@ export const Route = createFileRoute("/atlas")({
       { name: "description", content: "Browse the section frameworks, module families, variants, and layout frameworks." },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(taxonomyQueryOptions),
   component: Atlas,
+  errorComponent: ({ error }) => (
+    <div className="p-10 text-sm text-red-600">Atlas failed to load: {error.message}</div>
+  ),
+  notFoundComponent: () => <div className="p-10">Not found.</div>,
 });
 
 function Atlas() {
+  const {
+    layoutFrameworks: LAYOUT_FRAMEWORKS,
+    moduleFamilies: MODULE_FAMILIES,
+    moduleVariants: MODULE_VARIANTS,
+    sectionFrameworks: SECTION_FRAMEWORKS,
+    narrativeArchetypes: NARRATIVE_ARCHETYPES,
+  } = useTaxonomy();
+
   return (
     <AppShell>
       <div>
@@ -29,6 +36,7 @@ function Atlas() {
           Every deck is assembled from these pieces. Section frameworks decide where you are in the story; module
           families decide what job the slide does; variants decide the shape; layouts decide the geometry.
         </p>
+        <p className="mt-2 text-xs text-black/40">Loaded live from the Cloud taxonomy tables.</p>
       </div>
 
       <Section title="Narrative archetypes" count={NARRATIVE_ARCHETYPES.length}>
