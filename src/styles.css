@@ -261,34 +261,16 @@
   }
 }
 
-/* Ambient color field the glass floats over. Renders as fixed blurred blobs
- * behind everything; without a color field to refract, backdrop-blur reads
- * as flat grey and the "glass" collapses to a plain translucent card. */
+/* Ambient color field utilities retained for older surfaces, but kept flat —
+ * no generated blob/dot backgrounds in the library experience. */
 @utility ambient-field {
   position: relative;
   isolation: isolate;
   &::before,
   &::after {
     content: "";
-    position: fixed;
-    z-index: 0;
-    width: 60vw;
-    height: 60vw;
-    border-radius: 9999px;
-    filter: blur(120px);
-    opacity: 0.55;
+    display: none;
     pointer-events: none;
-  }
-  &::before {
-    top: -20vw;
-    left: -10vw;
-    background: radial-gradient(circle at 30% 30%, #4D88FF, transparent 60%);
-  }
-  &::after {
-    bottom: -25vw;
-    right: -15vw;
-    background: radial-gradient(circle at 60% 40%, #A1FBF9, transparent 55%);
-    opacity: 0.4;
   }
   & > * {
     position: relative;
@@ -302,27 +284,8 @@
   &::before,
   &::after {
     content: "";
-    position: absolute;
-    z-index: 0;
-    border-radius: 9999px;
-    filter: blur(90px);
+    display: none;
     pointer-events: none;
-  }
-  &::before {
-    top: -30%;
-    left: -10%;
-    width: 60%;
-    height: 120%;
-    background: radial-gradient(circle at 40% 40%, #4D88FF, transparent 60%);
-    opacity: 0.55;
-  }
-  &::after {
-    top: 10%;
-    right: -15%;
-    width: 55%;
-    height: 90%;
-    background: radial-gradient(circle at 60% 40%, #EC388A, transparent 55%);
-    opacity: 0.35;
   }
   & > * {
     position: relative;

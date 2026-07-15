@@ -30,8 +30,8 @@ type Zone = {
   w: number;
   h: number;
   label?: string;
-  // Optional shape: rectangle (default), circle, blob (soft radial).
-  shape?: "rect" | "circle" | "blob";
+  // Optional shape: rectangle (default) or circle.
+  shape?: "rect" | "circle";
   rotate?: number;
 };
 
@@ -54,18 +54,16 @@ const KIND_STYLES: Record<
     icon: "◆",
   },
   aura: {
-    label: "Ambient aura",
+    label: "Soft overlay",
     ring: "rgba(161, 251, 249, 0.75)",
-    fill:
-      "radial-gradient(closest-side, rgba(161,251,249,0.55), rgba(194,163,255,0.30) 55%, rgba(255,255,255,0) 80%)",
+    fill: "rgba(161,251,249,0.18)",
     text: "#0B2A4A",
     icon: "🌫",
   },
   overlay: {
     label: "Overlay / scrim",
     ring: "rgba(3, 0, 44, 0.55)",
-    fill:
-      "linear-gradient(135deg, rgba(3,0,44,0.55) 0%, rgba(3,0,44,0.10) 60%, rgba(3,0,44,0.0) 100%)",
+    fill: "rgba(3,0,44,0.32)",
     text: "#FFFFFF",
     icon: "▧",
   },
@@ -78,7 +76,7 @@ function zonesFor(variant: ModuleVariant): Zone[] {
   // Full-bleed cover / hero
   if (/^MV-OP-COVER(-MEDIA)?$/.test(id) || id === "MV-CS-HERO" || id === "MV-CTA-CLOSING-HERO") {
     return [
-      { kind: "aura", x: -160, y: -120, w: 1200, h: 900, shape: "blob", label: "Ambient aura" },
+      { kind: "aura", x: -160, y: -120, w: 1200, h: 900, label: "Soft overlay" },
       { kind: "human", x: 1120, y: 60, w: 740, h: 960, label: "Human imagery" },
       { kind: "overlay", x: 0, y: 540, w: 1920, h: 540, label: "Bottom scrim for text legibility" },
     ];
@@ -87,7 +85,7 @@ function zonesFor(variant: ModuleVariant): Zone[] {
   // Minimal cover — shape + aura only
   if (id === "MV-OP-COVER-MINIMAL") {
     return [
-      { kind: "aura", x: 900, y: -200, w: 1400, h: 1200, shape: "blob" },
+      { kind: "aura", x: 900, y: -200, w: 1400, h: 1200 },
       { kind: "shape", x: 1500, y: 720, w: 320, h: 320, shape: "circle", label: "Accent shape" },
     ];
   }
@@ -95,7 +93,7 @@ function zonesFor(variant: ModuleVariant): Zone[] {
   // Dividers — big ambient aura
   if (/^MV-OP-DIVIDER/.test(id)) {
     return [
-      { kind: "aura", x: -300, y: -300, w: 1600, h: 1600, shape: "blob" },
+      { kind: "aura", x: -300, y: -300, w: 1600, h: 1600 },
       { kind: "shape", x: 1420, y: 640, w: 420, h: 420, shape: "circle", label: "Chapter mark" },
     ];
   }
@@ -103,7 +101,7 @@ function zonesFor(variant: ModuleVariant): Zone[] {
   // Agendas — subtle aura only
   if (/^MV-OP-AGENDA/.test(id)) {
     return [
-      { kind: "aura", x: 1200, y: -160, w: 900, h: 900, shape: "blob", label: "Ambient aura (subtle)" },
+      { kind: "aura", x: 1200, y: -160, w: 900, h: 900, label: "Soft overlay" },
     ];
   }
 
@@ -129,7 +127,7 @@ function zonesFor(variant: ModuleVariant): Zone[] {
   if (/^MV-CS-/.test(id) || /TESTIMONIAL|QUOTE-BIG/.test(id)) {
     return [
       { kind: "human", x: 120, y: 200, w: 720, h: 720, label: "Portrait or team shot" },
-      { kind: "aura", x: 900, y: -100, w: 1200, h: 900, shape: "blob" },
+      { kind: "aura", x: 900, y: -100, w: 1200, h: 900 },
       { kind: "shape", x: 1660, y: 120, w: 180, h: 180, shape: "circle", label: "Accent" },
     ];
   }
@@ -139,7 +137,7 @@ function zonesFor(variant: ModuleVariant): Zone[] {
     return [
       { kind: "shape", x: 1620, y: -80, w: 380, h: 380, shape: "circle", label: "Accent ring" },
       { kind: "shape", x: -80, y: 820, w: 260, h: 260, rotate: 12, label: "Accent block" },
-      { kind: "aura", x: 400, y: 300, w: 900, h: 700, shape: "blob", label: "Subtle aura" },
+      { kind: "aura", x: 400, y: 300, w: 900, h: 700, label: "Soft overlay" },
     ];
   }
 
@@ -147,7 +145,7 @@ function zonesFor(variant: ModuleVariant): Zone[] {
   if (/CARDS-|PILLARS-|PRINCIPLES|VALUE-PROPS/.test(id)) {
     return [
       { kind: "shape", x: 1720, y: 20, w: 180, h: 180, shape: "circle", label: "Corner accent" },
-      { kind: "aura", x: -200, y: 600, w: 900, h: 700, shape: "blob", label: "Subtle aura" },
+      { kind: "aura", x: -200, y: 600, w: 900, h: 700, label: "Soft overlay" },
     ];
   }
 
@@ -157,14 +155,14 @@ function zonesFor(variant: ModuleVariant): Zone[] {
       { kind: "shape", x: 100, y: 780, w: 120, h: 120, shape: "circle" },
       { kind: "shape", x: 900, y: 780, w: 120, h: 120, shape: "circle", label: "Milestone marks" },
       { kind: "shape", x: 1700, y: 780, w: 120, h: 120, shape: "circle" },
-      { kind: "aura", x: 700, y: -100, w: 900, h: 700, shape: "blob" },
+      { kind: "aura", x: 700, y: -100, w: 900, h: 700 },
     ];
   }
 
   // Closing / CTA
   if (/^MV-CTA-|CLOSING|NEXT-STEPS|THANKS/.test(id)) {
     return [
-      { kind: "aura", x: 200, y: -200, w: 1500, h: 1200, shape: "blob", label: "Ambient aura" },
+      { kind: "aura", x: 200, y: -200, w: 1500, h: 1200, label: "Soft overlay" },
       { kind: "overlay", x: 0, y: 0, w: 1920, h: 1080, label: "Full scrim" },
       { kind: "shape", x: 1580, y: 720, w: 300, h: 300, shape: "circle", label: "Accent" },
     ];
@@ -173,13 +171,13 @@ function zonesFor(variant: ModuleVariant): Zone[] {
   // Logos / brand strips — no imagery zones (keep clean)
   if (/LOGO-STRIP|LOGOS/.test(id)) {
     return [
-      { kind: "aura", x: 700, y: -200, w: 900, h: 800, shape: "blob", label: "Subtle aura only" },
+      { kind: "aura", x: 700, y: -200, w: 900, h: 800, label: "Soft overlay only" },
     ];
   }
 
   // Fallback — subtle aura + one accent shape
   return [
-    { kind: "aura", x: 1200, y: -200, w: 1000, h: 1000, shape: "blob", label: "Ambient aura" },
+    { kind: "aura", x: 1200, y: -200, w: 1000, h: 1000, label: "Soft overlay" },
     { kind: "shape", x: 1720, y: 40, w: 160, h: 160, shape: "circle", label: "Design shape" },
   ];
 }
@@ -209,8 +207,7 @@ export function MediaZoneOverlay({
 function ZoneRect({ zone, seed }: { zone: Zone; seed: number }) {
   const style = KIND_STYLES[zone.kind];
   const isCircle = zone.shape === "circle";
-  const isBlob = zone.shape === "blob";
-  const radius = isCircle ? "9999px" : isBlob ? "42% 58% 55% 45% / 50% 45% 55% 50%" : "16px";
+  const radius = isCircle ? "9999px" : "16px";
   const border =
     zone.kind === "aura" || zone.kind === "overlay"
       ? "none"
@@ -232,7 +229,7 @@ function ZoneRect({ zone, seed }: { zone: Zone; seed: number }) {
         borderRadius: radius,
         overflow: "hidden",
         transform: zone.rotate ? `rotate(${zone.rotate}deg)` : undefined,
-        backdropFilter: zone.kind === "aura" ? "blur(24px)" : undefined,
+        backdropFilter: zone.kind === "aura" ? "blur(18px)" : undefined,
         mixBlendMode: zone.kind === "overlay" ? "multiply" : undefined,
       }}
     >

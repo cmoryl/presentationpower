@@ -15,7 +15,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   ] as const;
 
   return (
-    <div className="ambient-field min-h-screen bg-[#F5F1EA] text-[#0A0F1C]">
+    <div className="min-h-screen bg-[#F5F1EA] text-[#0A0F1C]">
       <header className="glass sticky top-0 z-30 !rounded-none border-l-0 border-r-0 border-t-0">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-8 py-5">
           <Link to="/" className="flex items-center gap-3">

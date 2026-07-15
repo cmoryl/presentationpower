@@ -147,7 +147,7 @@ function Library() {
             type="button"
             onClick={() => setShowImagery((v) => !v)}
             aria-pressed={showImagery}
-            title="Render each module with a sample background image + alpha gradient scrim"
+            title="Render each module with sample background imagery"
             className={`rounded-full border px-3 py-1.5 text-xs ${
               showImagery
                 ? "border-[#03002C] bg-[#03002C] text-white"
@@ -178,7 +178,7 @@ function Library() {
           <span className="font-medium text-black/80">Legend:</span>
           <LegendChip color="rgba(0,63,199,0.55)" icon="👤" label="Human imagery — portraits, teams, hero photography" />
           <LegendChip color="rgba(236,56,138,0.55)" icon="◆" label="Design shape — geometric accents, keylines, blocks" />
-          <LegendChip color="rgba(161,251,249,0.75)" icon="🌫" label="Ambient aura — soft blurred color field" />
+          <LegendChip color="rgba(161,251,249,0.75)" icon="🌫" label="Soft overlay — transparent accent wash" />
           <LegendChip color="rgba(3,0,44,0.55)" icon="▧" label="Overlay / scrim — transparent layer for legibility" />
         </div>
       )}
@@ -436,7 +436,7 @@ function VariantDetailModal({
                       ? "border-[#03002C] bg-[#03002C] text-white"
                       : "border-black/15 bg-white text-black/60"
                   }`}
-                  title="Toggle background imagery + gradient scrim"
+                  title="Toggle background imagery"
                 >
                   ▤ Imagery
                 </button>
