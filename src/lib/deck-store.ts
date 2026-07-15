@@ -343,18 +343,17 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
     case "MV-PROOF-LOGOS":
       return {
         title: "Trusted by",
-        items: [
-          { name: "Client A" }, { name: "Client B" }, { name: "Client C" }, { name: "Client D" },
-          { name: "Client E" }, { name: "Client F" }, { name: "Client G" }, { name: "Client H" },
-        ],
+        items: pickProofLogos(brief.brandModeId),
       };
-    case "MV-PROOF-TESTIMONIAL":
+    case "MV-PROOF-TESTIMONIAL": {
+      const cs = pickCaseStudy(brief.brandModeId, brief.industry);
       return {
-        quote: "The program cut our launch cycle nearly in half without adding a single reviewer.",
-        attribution: "VP, Global Marketing",
-        role: "Fortune 500 life sciences",
-        metric: "-46% cycle time",
+        quote: cs.quote,
+        attribution: cs.attribution,
+        role: cs.role,
+        metric: cs.metric,
       };
+    }
 
     case "MV-DEC-MATRIX":
       return { title: "Where each option lands", axisX: "Speed", axisY: "Control", q1: "Managed program", q2: "In-house team", q3: "Freelance stack", q4: "Point tools" };
