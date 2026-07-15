@@ -245,6 +245,54 @@ export type Database = {
           },
         ]
       }
+      knowledge_entries: {
+        Row: {
+          body: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          kind: Database["public"]["Enums"]["knowledge_kind"]
+          owner_division_id: string
+          shared_with_division_ids: string[]
+          sources: string[]
+          tags: string[]
+          title: string
+          updated_at: string
+          visibility: Database["public"]["Enums"]["knowledge_visibility"]
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["knowledge_kind"]
+          owner_division_id: string
+          shared_with_division_ids?: string[]
+          sources?: string[]
+          tags?: string[]
+          title: string
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["knowledge_visibility"]
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["knowledge_kind"]
+          owner_division_id?: string
+          shared_with_division_ids?: string[]
+          sources?: string[]
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["knowledge_visibility"]
+        }
+        Relationships: []
+      }
       layout_frameworks: {
         Row: {
           description: string | null
@@ -515,6 +563,14 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "brand_reviewer" | "content_owner" | "sales"
+      knowledge_kind:
+        | "fact"
+        | "proof_point"
+        | "case_study"
+        | "policy"
+        | "terminology"
+        | "note"
+      knowledge_visibility: "private" | "shared" | "global"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -643,6 +699,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "brand_reviewer", "content_owner", "sales"],
+      knowledge_kind: [
+        "fact",
+        "proof_point",
+        "case_study",
+        "policy",
+        "terminology",
+        "note",
+      ],
+      knowledge_visibility: ["private", "shared", "global"],
     },
   },
 } as const
