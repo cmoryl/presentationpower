@@ -103,11 +103,16 @@ function Atlas() {
                   <div className="flex items-start gap-3">
                     {(() => {
                       const fi = familyIcon(mf.id);
-                      const colors = resolveEmphasisColors(fi.emphasis);
+                      const color =
+                        fi.emphasis === "primary" ? "#0B2A4A"
+                        : fi.emphasis === "accent" ? "#E85D2C"
+                        : fi.emphasis === "success" ? "#1F7A4C"
+                        : fi.emphasis === "warning" ? "#B45309"
+                        : "#7A7A7A";
                       return (
                         <span
                           className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
-                          style={{ backgroundColor: colors.soft, color: colors.fg }}
+                          style={{ backgroundColor: `${color}18`, color }}
                           aria-hidden
                           title={fi.rationale}
                         >
@@ -115,6 +120,7 @@ function Atlas() {
                         </span>
                       );
                     })()}
+
                     <div>
                       <div className="font-mono text-xs text-black/50">{mf.id}</div>
                       <div className="mt-1 font-medium">{mf.name}</div>
