@@ -308,13 +308,14 @@ function VariantDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-6 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#03002C]/70 p-6 backdrop-blur-md"
       onClick={onClose}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="my-6 w-full max-w-6xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="glass glass-sheen my-6 w-full max-w-6xl overflow-hidden rounded-2xl"
       >
+
         {/* Header */}
         <div className="flex items-center justify-between gap-4 border-b border-black/10 px-6 py-4">
           <div className="min-w-0">
