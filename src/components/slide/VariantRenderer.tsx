@@ -238,13 +238,8 @@ function renderVariantBody({
     case "MV-OP-COVER-MEDIA":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `linear-gradient(135deg, ${brand.tokens.primary} 0%, ${brand.tokens.ink} 100%)`,
-              opacity: 0.85,
-            }}
-          />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} className="absolute inset-0 h-full w-full rounded-none" />
+          <div className="absolute inset-0" style={{ backgroundColor: "rgba(3,0,44,0.62)" }} />
           <div className="relative flex h-full flex-col justify-end text-white">
             <div className="text-2xl uppercase tracking-[0.3em] opacity-80">Prepared for {s(c.clientName)}</div>
             <div className="mt-4 text-[128px] font-semibold leading-[0.95]">{s(c.title)}</div>
@@ -1074,12 +1069,8 @@ function renderVariantBody({
     case "MV-OP-COVER-GRADIENT":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `radial-gradient(circle at 20% 20%, ${brand.tokens.accent}66, transparent 55%), radial-gradient(circle at 80% 70%, ${brand.tokens.primary} 0%, ${brand.tokens.ink} 100%)`,
-            }}
-          />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-image"))} className="absolute inset-0 h-full w-full rounded-none" />
+          <div className="absolute inset-0" style={{ backgroundColor: "rgba(3,0,44,0.58)" }} />
           <div className="relative flex h-full flex-col justify-end text-white">
             <div className="text-2xl uppercase tracking-[0.35em] opacity-85">Prepared for {s(c.clientName)}</div>
             <div className="mt-6 text-[136px] font-semibold leading-[0.95]">{s(c.title)}</div>
@@ -1141,7 +1132,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "hero"))} className="absolute inset-0 h-full w-full rounded-none" />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.65) 100%)" }} />
+          <div className="absolute inset-0" style={{ backgroundColor: "rgba(3,0,44,0.48)" }} />
           <div className="relative flex h-full flex-col justify-end text-white">
             <div className="text-2xl uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>
               {s(c.kicker, "In focus")}
@@ -1232,7 +1223,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote"))} className="absolute inset-0 h-full w-full rounded-none" />
-          <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, rgba(0,0,0,0.35), ${brand.tokens.primary}D9)` }} />
+          <div className="absolute inset-0" style={{ backgroundColor: "rgba(3,0,44,0.68)" }} />
           <div className="relative flex h-full flex-col justify-center text-white">
             <div className="text-[200px] leading-none opacity-20" style={{ color: brand.tokens.accent }}>“</div>
             <div className="-mt-12 max-w-6xl text-5xl font-medium leading-[1.2]">{s(c.quote)}</div>
@@ -1990,7 +1981,6 @@ function MediaTile({
 }) {
   const mode = useContext(SlideModeContext);
   const h = hash(seed || brand.id);
-  const angle = (h % 12) * 30;
   const grayscale = muted ? "grayscale(60%) brightness(0.9)" : undefined;
 
   // Light mode: render a clean, basic neutral placeholder (no gradient blobs
@@ -2052,14 +2042,12 @@ function MediaTile({
       />
       <div
         className="absolute inset-0"
-        style={{
-          background: `linear-gradient(${angle}deg, rgba(3,0,44,0.55) 0%, rgba(3,0,44,0.15) 60%, rgba(3,0,44,0.55) 100%)`,
-        }}
+        style={{ backgroundColor: "rgba(3,0,44,0.42)" }}
       />
       {portrait && (
         <div
           className="absolute left-1/2 top-[58%] h-[70%] w-[45%] -translate-x-1/2 rounded-t-full"
-          style={{ background: `linear-gradient(180deg, ${accent}55, ${primary}33)`, mixBlendMode: "soft-light" }}
+          style={{ backgroundColor: `${accent}33`, mixBlendMode: "soft-light" }}
         />
       )}
     </div>
