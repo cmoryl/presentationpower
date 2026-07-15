@@ -1,5 +1,6 @@
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
-import { SlideFrame } from "./SlideChrome";
+import { SlideFrame as BaseSlideFrame } from "./SlideChrome";
+import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
 import {
   ICON_SIZES,
