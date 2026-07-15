@@ -228,8 +228,59 @@ function BrandGuideView() {
         </Section>
       )}
 
-      <div className="my-16 border-t border-black/10 pt-6 text-xs text-black/50">
-        {guide.title} · Brand Guidelines v{guide.version} · Last updated {guide.updatedAt}
+      {/* Iconography */}
+      {guide.iconography && (
+        <Section title="Iconography" eyebrow="07">
+          <div className="rounded-2xl border border-black/10 bg-white p-6">
+            <div className="text-lg font-semibold">{guide.iconography.headline}</div>
+            <p className="mt-2 max-w-3xl text-sm text-black/70">{guide.iconography.body}</p>
+            {guide.iconography.sourceUrl && (
+              <a
+                href={guide.iconography.sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-4 inline-flex items-center gap-1 text-xs uppercase tracking-[0.25em] hover:underline"
+                style={{ color: hero }}
+              >
+                Icon library ↗
+              </a>
+            )}
+          </div>
+        </Section>
+      )}
+
+      {/* Social media */}
+      {guide.socialMedia && guide.socialMedia.length > 0 && (
+        <Section title="Social image watermarks" eyebrow="08">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {guide.socialMedia.map((platform) => (
+              <div key={platform.platform} className="rounded-2xl border border-black/10 bg-white p-6">
+                <div className="text-xs uppercase tracking-[0.25em]" style={{ color: hero }}>
+                  {platform.platform}
+                </div>
+                <ul className="mt-3 space-y-2 text-sm text-black/80">
+                  {platform.rules.map((r) => (
+                    <li key={r} className="flex gap-2">
+                      <span className="mt-2 h-1 w-1 shrink-0 rounded-full" style={{ background: hero }} />
+                      <span>{r}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      <div className="my-16 flex flex-wrap items-center justify-between gap-3 border-t border-black/10 pt-6 text-xs text-black/50">
+        <div>
+          {guide.title} · Brand Guidelines v{guide.version} · Last updated {guide.updatedAt}
+        </div>
+        {guide.sourceUrl && (
+          <a href={guide.sourceUrl} target="_blank" rel="noreferrer" className="hover:underline">
+            View source deck ↗
+          </a>
+        )}
       </div>
     </AppShell>
   );
