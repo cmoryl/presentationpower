@@ -49,10 +49,22 @@ export const personalizeSlides = createServerFn({ method: "POST" })
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) return { slides: data.slides.map((s) => ({ id: s.id, content: s.content })), error: "LOVABLE_API_KEY missing" };
 
+    const scope = data.brief.brandScope;
+    const scopeLines = scope
+      ? [
+          `The active brand is ${scope.brandName ?? "TransPerfect"}${scope.role ? ` (${scope.role})` : ""}.`,
+          scope.industries.length ? `Stay within these industries: ${scope.industries.join(", ")}.` : "",
+          scope.serviceLines.length ? `Only reach for these service lines: ${scope.serviceLines.join(", ")}.` : "",
+          scope.caseStudyTags.length ? `Case-study language should align with these themes: ${scope.caseStudyTags.join(", ")}.` : "",
+          "Do not introduce industries, products, or services outside this brand's scope, even if the source copy hints at them.",
+        ].filter(Boolean)
+      : [];
+
     const system = [
       "You are a senior enterprise deck writer at TransPerfect.",
       "You will receive a sales brief and a set of slide content objects.",
       "Rewrite ONLY the string values inside each slide's `content` object so the copy speaks directly to the named prospect, their industry, audience, and objective.",
+      ...scopeLines,
       "Rules:",
       "- Preserve the EXACT JSON shape and keys of every slide.content. Do not add, remove, rename, or reorder keys or array items.",
       "- Never change numeric values, stat units, or source citations.",
