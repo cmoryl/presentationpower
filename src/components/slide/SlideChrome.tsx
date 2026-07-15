@@ -18,6 +18,23 @@ export function useSlideMode(): SlideMode {
   return useContext(SlideModeContext);
 }
 
+// Optional imagery layer rendered BEHIND the slide content. When set, the
+// SlideFrame replaces its opaque token background with the image + a gradient
+// scrim so content stays legible with real alpha-blended photography.
+export type SlideBackdrop = {
+  url: string;
+  // Scrim direction/strength. "bottom" darkens lower half, "left" darkens
+  // left half, "full" applies an even overlay, "vignette" a radial darken.
+  scrim?: "bottom" | "left" | "right" | "top" | "full" | "vignette";
+  // 0..1 — how strongly the scrim covers the image (default 0.55).
+  scrimStrength?: number;
+  // 0..1 — how much to desaturate/darken the image itself (default 0).
+  imageDim?: number;
+  // Tint color for the scrim (defaults to brand ink navy).
+  tint?: string;
+};
+export const SlideBackdropContext = createContext<SlideBackdrop | null>(null);
+
 // A slide frame that owns the locked chrome — brand bar, footer, logo, page
 // number. Locked fields live here so variant renderers cannot override them.
 // The brand lockup is placed in an approved zone per chrome variant / layout;
