@@ -1,10 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDeckStore } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { exportDeckToPptx } from "@/lib/pptx-export";
+import { runQa, blockingIssues, warningIssues } from "@/lib/qa";
 
 
 export const Route = createFileRoute("/decks/$deckId/export")({
@@ -16,8 +17,14 @@ function ExportView() {
   const { deckId } = Route.useParams();
   const deck = useDeckStore((s) => s.decks[deckId]);
   const [exporting, setExporting] = useState(false);
+  const [override, setOverride] = useState(false);
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
+
+  const qa = useMemo(() => runQa(deck.slides), [deck.slides]);
+  const blocks = blockingIssues(qa);
+  const warns = warningIssues(qa);
+  const blocked = blocks.length > 0 && !override;
 
   useEffect(() => {
     document.body.classList.add("export-mode");
@@ -25,6 +32,7 @@ function ExportView() {
   }, []);
 
   async function handlePptx() {
+    if (blocked) return;
     setExporting(true);
     try {
       await exportDeckToPptx(deck, brand);
@@ -32,6 +40,7 @@ function ExportView() {
       setExporting(false);
     }
   }
+
 
   return (
     <div className="min-h-screen bg-neutral-100 py-12 print:bg-white print:py-0">
