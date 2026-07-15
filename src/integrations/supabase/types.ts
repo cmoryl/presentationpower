@@ -400,12 +400,16 @@ export type Database = {
           approved_at: string | null
           brand_mode_id: string | null
           content: Json
+          content_hash: string | null
           created_at: string
           expires_at: string | null
           id: string
           layout_id: string
           owner_id: string | null
+          review_notes: string | null
+          reviewer_id: string | null
           source_deck: string | null
+          submitted_at: string | null
           tags: Json
           thumbnail_url: string | null
           title: string | null
@@ -417,12 +421,16 @@ export type Database = {
           approved_at?: string | null
           brand_mode_id?: string | null
           content?: Json
+          content_hash?: string | null
           created_at?: string
           expires_at?: string | null
           id?: string
           layout_id: string
           owner_id?: string | null
+          review_notes?: string | null
+          reviewer_id?: string | null
           source_deck?: string | null
+          submitted_at?: string | null
           tags?: Json
           thumbnail_url?: string | null
           title?: string | null
@@ -434,12 +442,16 @@ export type Database = {
           approved_at?: string | null
           brand_mode_id?: string | null
           content?: Json
+          content_hash?: string | null
           created_at?: string
           expires_at?: string | null
           id?: string
           layout_id?: string
           owner_id?: string | null
+          review_notes?: string | null
+          reviewer_id?: string | null
           source_deck?: string | null
+          submitted_at?: string | null
           tags?: Json
           thumbnail_url?: string | null
           title?: string | null
