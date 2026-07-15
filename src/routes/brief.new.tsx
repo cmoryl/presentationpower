@@ -208,3 +208,46 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     </label>
   );
 }
+
+function BrandRelevancePanel({ brand }: { brand: BrandMode }) {
+  const scope = brand.contentScope;
+  if (!scope) return null;
+  const chip = (text: string, key: string) => (
+    <span
+      key={key}
+      className="rounded-full px-2.5 py-0.5 text-xs"
+      style={{ backgroundColor: `${brand.tokens.primary}0f`, color: brand.tokens.primary }}
+    >
+      {text}
+    </span>
+  );
+  const Row = ({ label, items }: { label: string; items: string[] }) =>
+    items.length === 0 ? null : (
+      <div className="flex flex-col gap-1.5">
+        <span className="text-[10px] uppercase tracking-widest text-black/50">{label}</span>
+        <div className="flex flex-wrap gap-1.5">{items.map((v, i) => chip(v, `${label}-${i}`))}</div>
+      </div>
+    );
+  return (
+    <div
+      className="rounded-2xl border p-5"
+      style={{ borderColor: `${brand.tokens.primary}22`, backgroundColor: `${brand.tokens.primary}05` }}
+    >
+      <div className="mb-3 flex items-center justify-between">
+        <div className="text-xs uppercase tracking-widest text-black/60">Relevant to this brand</div>
+        <span className="text-[10px] font-mono text-black/40">auto-filtered from brand scope</span>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Row label="Industries" items={scope.industries} />
+        <Row label="Service lines" items={scope.serviceLines} />
+        <Row label="Case study tags" items={scope.caseStudyTags} />
+        <Row label="Preferred narratives" items={scope.preferredArchetypes} />
+      </div>
+      {scope.restrictedFamilyIds && scope.restrictedFamilyIds.length > 0 && (
+        <div className="mt-3 text-xs text-black/50">
+          Off-limits for this brand: {scope.restrictedFamilyIds.join(", ")}
+        </div>
+      )}
+    </div>
+  );
+}
