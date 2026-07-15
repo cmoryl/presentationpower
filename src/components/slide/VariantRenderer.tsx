@@ -1949,8 +1949,8 @@ function renderVariantBody({
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// MediaTile — deterministic gradient/pattern placeholder used wherever a
-// module wants imagery. Feels like a photograph without shipping bytes.
+// MediaTile — deterministic image tile used wherever a module wants imagery.
+// Light mode stays plain; dark mode uses real backdrop assets only.
 // ────────────────────────────────────────────────────────────────────────────
 function hash(str: string): number {
   let h = 2166136261;
@@ -1960,16 +1960,6 @@ function hash(str: string): number {
   }
   return h >>> 0;
 }
-
-const MEDIA_PALETTES = [
-  ["#0B2A4A", "#4A90A4", "#F5F1EA"],
-  ["#2B1B17", "#E85A2C", "#F2C48D"],
-  ["#123524", "#3A6B4F", "#D9E2C3"],
-  ["#3D1E4A", "#8E44AD", "#EED9F5"],
-  ["#1A1F36", "#22C1C3", "#EDF6F6"],
-  ["#4A1F1F", "#C0392B", "#F4D8C6"],
-  ["#0F1A2B", "#E4C46B", "#F5EBD0"],
-];
 
 // Real photographic backdrops used inside MediaTile in dark mode.
 import mediaAmbient from "@/assets/backdrops/backdrop-ambient.jpg";
@@ -2000,13 +1990,7 @@ function MediaTile({
 }) {
   const mode = useContext(SlideModeContext);
   const h = hash(seed || brand.id);
-  const palette = MEDIA_PALETTES[h % MEDIA_PALETTES.length];
   const angle = (h % 12) * 30;
-  const shape = h % 4;
-  const x1 = 15 + ((h >> 3) % 50);
-  const y1 = 20 + ((h >> 6) % 40);
-  const x2 = 45 + ((h >> 9) % 45);
-  const y2 = 30 + ((h >> 12) % 50);
   const grayscale = muted ? "grayscale(60%) brightness(0.9)" : undefined;
 
   // Light mode: render a clean, basic neutral placeholder (no gradient blobs
@@ -2030,10 +2014,8 @@ function MediaTile({
     );
   }
 
-  // Dark mode: use a real photographic backdrop (bokeh/ambient/city/team/
-  // abstract + portraits) with a brand-tinted scrim and a soft-focus accent
-  // blob — same treatment as SlideFrame backdrops, so tiles inside slides
-  // match the outer imagery language instead of showing gradient blobs.
+  // Dark mode: use a real photographic backdrop with a simple scrim and
+  // translucent brand-color washes. No generated radial/dot/pattern layers.
   const tileBackdrops = MEDIA_TILE_BACKDROPS;
   const url = tileBackdrops[h % tileBackdrops.length];
   const accent = brand.tokens.accent;
@@ -2052,15 +2034,20 @@ function MediaTile({
       />
       <div
         aria-hidden
-        className="absolute inset-0 pointer-events-none"
+        className="pointer-events-none absolute -left-[18%] top-[8%] h-[52%] w-[58%] rounded-full"
         style={{
-          backgroundImage: [
-            `radial-gradient(45% 55% at ${x1}% ${y1}%, ${accent}66 0%, ${accent}00 70%)`,
-            `radial-gradient(50% 55% at ${x2}% ${y2}%, ${primary}88 0%, ${primary}00 72%)`,
-          ].join(", "),
-          filter: "blur(30px)",
+          backgroundColor: `${accent}2E`,
+          filter: "blur(34px)",
           mixBlendMode: "screen",
-          opacity: 0.85,
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-[18%] right-[-18%] h-[58%] w-[58%] rounded-full"
+        style={{
+          backgroundColor: `${primary}36`,
+          filter: "blur(38px)",
+          mixBlendMode: "screen",
         }}
       />
       <div
