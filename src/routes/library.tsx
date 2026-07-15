@@ -119,7 +119,27 @@ function Library() {
             {preferred.size} preferred · {restricted.size} family restrictions
           </span>
         )}
-        <div className="ml-auto text-sm text-black/50">{filtered.length} of {moduleVariants.length}</div>
+        <div className="ml-auto flex items-center gap-3">
+          <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs">
+            <button
+              type="button"
+              onClick={() => setMode("light")}
+              className={`px-3 py-1.5 ${mode === "light" ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"}`}
+              aria-pressed={mode === "light"}
+            >
+              ☀︎ Light
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("dark")}
+              className={`px-3 py-1.5 ${mode === "dark" ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"}`}
+              aria-pressed={mode === "dark"}
+            >
+              ☾ Dark
+            </button>
+          </div>
+          <span className="text-sm text-black/50">{filtered.length} of {moduleVariants.length}</span>
+        </div>
       </div>
 
       <div className="mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3">
@@ -131,13 +151,14 @@ function Library() {
             brand={scopeBrand ?? tpMaster}
             sectionId={sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? ""}
             preferred={preferred.has(v.id)}
+            mode={mode}
             onOpen={() => setOpenId(v.id)}
           />
         ))}
       </div>
 
       <div className="mt-10">
-        <Link to="/brief/new" className="rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm text-white">
+        <Link to="/brief/new" className="rounded-full bg-[#03002C] px-5 py-2.5 text-sm text-white">
           Start a brief →
         </Link>
       </div>
@@ -149,6 +170,8 @@ function Library() {
           brands={brandModes}
           brandIdx={brandIdx}
           setBrandIdx={setBrandIdx}
+          mode={mode}
+          setMode={setMode}
           family={byId(moduleFamilies, active.familyId)}
           fallback={active.fallbackVariantId ? byId(moduleVariants, active.fallbackVariantId) : undefined}
           layouts={active.permittedLayoutIds
