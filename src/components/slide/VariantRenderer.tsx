@@ -1971,6 +1971,20 @@ const MEDIA_PALETTES = [
   ["#0F1A2B", "#E4C46B", "#F5EBD0"],
 ];
 
+// Real photographic backdrops used inside MediaTile in dark mode.
+import mediaAmbient from "@/assets/backdrops/backdrop-ambient.jpg";
+import mediaCity from "@/assets/backdrops/backdrop-city.jpg";
+import mediaTeam from "@/assets/backdrops/backdrop-team.jpg";
+import mediaAbstract from "@/assets/backdrops/backdrop-abstract.png.asset.json";
+import mediaBokeh from "@/assets/backdrops/backdrop-bokeh.png.asset.json";
+const MEDIA_TILE_BACKDROPS = [
+  mediaBokeh.url,
+  mediaAmbient,
+  mediaCity,
+  mediaTeam,
+  mediaAbstract.url,
+];
+
 function MediaTile({
   brand,
   seed,
