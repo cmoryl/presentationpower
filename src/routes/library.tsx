@@ -324,6 +324,8 @@ function VariantDetailModal({
   setMode,
   showZones,
   setShowZones,
+  showImagery,
+  setShowImagery,
   family,
   fallback,
   layouts,
@@ -339,6 +341,8 @@ function VariantDetailModal({
   setMode: (m: "light" | "dark") => void;
   showZones: boolean;
   setShowZones: (b: boolean) => void;
+  showImagery: boolean;
+  setShowImagery: (b: boolean) => void;
   family: ReturnType<typeof useTaxonomy>["moduleFamilies"][number] | undefined;
   fallback: ModuleVariant | undefined;
   layouts: ReturnType<typeof useTaxonomy>["layoutFrameworks"];
