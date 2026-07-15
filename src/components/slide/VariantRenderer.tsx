@@ -338,7 +338,7 @@ function renderVariantBody({
               <div key={i} className="rounded-2xl border p-8" style={{ borderColor: "rgba(10,15,28,0.1)", backgroundColor: brand.tokens.surface }}>
                 <div
                   className="mb-6 h-32 w-32 rounded-full"
-                  style={{ background: `linear-gradient(135deg, ${brand.tokens.primary}, ${brand.tokens.accent})` }}
+                  style={{ backgroundColor: brand.tokens.accent }}
                 />
                 <div className="text-3xl font-semibold" style={{ color: brand.tokens.primary }}>
                   {s(p.name)}
@@ -504,7 +504,7 @@ function renderVariantBody({
           <div className="mt-12 grid grid-cols-2 gap-8" style={{ gridTemplateRows: "1fr 1fr" }}>
             <div
               className="row-span-2 rounded-2xl p-10 text-white"
-              style={{ background: `linear-gradient(135deg, ${brand.tokens.primary}, ${brand.tokens.accent})` }}
+              style={{ backgroundColor: brand.tokens.primary }}
             >
               <div className="text-xl uppercase tracking-[0.25em] opacity-80">Hero</div>
               <div className="mt-6 text-5xl font-semibold">{s(hero.title)}</div>
@@ -1363,7 +1363,7 @@ function renderVariantBody({
             </div>
             <div
               className="rounded-3xl p-10 text-center"
-              style={{ background: `linear-gradient(160deg, ${brand.tokens.primary}, ${brand.tokens.accent})`, color: "#fff" }}
+              style={{ backgroundColor: brand.tokens.primary, color: "#fff" }}
             >
               <div className="text-[140px] font-semibold leading-none">
                 {s(c.metric)}<span className="align-top text-6xl opacity-90">{s(c.unit)}</span>
@@ -1450,7 +1450,7 @@ function renderVariantBody({
                     className="flex h-24 items-center justify-between rounded-xl px-10 text-white"
                     style={{
                       width: `${widthPct}%`,
-                      background: `linear-gradient(90deg, ${brand.tokens.primary}, ${brand.tokens.accent})`,
+                      backgroundColor: brand.tokens.primary,
                       opacity: 0.55 + shade * 0.45,
                     }}
                   >
@@ -1516,7 +1516,7 @@ function renderVariantBody({
           <div className="relative mx-auto mt-8 h-[780px] w-[780px]">
             <div
               className="absolute inset-[28%] flex items-center justify-center rounded-full text-center text-white"
-              style={{ background: `linear-gradient(135deg, ${brand.tokens.primary}, ${brand.tokens.accent})` }}
+              style={{ backgroundColor: brand.tokens.primary }}
             >
               <div className="px-6 text-3xl font-semibold leading-tight">{s(c.hub, "Program")}</div>
             </div>
@@ -1564,7 +1564,7 @@ function renderVariantBody({
                     className="flex h-24 items-center justify-center rounded text-white"
                     style={{
                       width: `${widthPct}%`,
-                      background: `linear-gradient(90deg, ${brand.tokens.primary}, ${brand.tokens.accent})`,
+                      backgroundColor: brand.tokens.primary,
                       opacity: shade,
                     }}
                   >
@@ -1815,7 +1815,7 @@ function renderVariantBody({
           <div className="grid h-full grid-cols-[520px_1fr] items-center gap-16">
             <div
               className="overflow-hidden rounded-3xl text-center text-white shadow-2xl"
-              style={{ background: `linear-gradient(160deg, ${brand.tokens.primary}, ${brand.tokens.accent})` }}
+              style={{ backgroundColor: brand.tokens.primary }}
             >
               <div className="border-b border-white/20 py-5 text-xl uppercase tracking-[0.3em] opacity-90">Kickoff</div>
               <div className="px-10 py-14">
@@ -1855,7 +1855,7 @@ function renderVariantBody({
             <div className="flex flex-col justify-center">
               <div className="text-5xl font-semibold leading-tight" style={{ color: brand.tokens.primary }}>{s(c.title)}</div>
               <div className="mt-8 text-2xl leading-snug opacity-85">{s(c.body)}</div>
-              <div className="mt-12 rounded-2xl p-8 text-white" style={{ background: `linear-gradient(135deg, ${brand.tokens.primary}, ${brand.tokens.accent})` }}>
+              <div className="mt-12 rounded-2xl p-8 text-white" style={{ backgroundColor: brand.tokens.primary }}>
                 <div className="text-xs uppercase tracking-[0.3em] opacity-80">Call to action</div>
                 <div className="mt-3 text-4xl font-semibold">{s(c.ctaLabel)}</div>
                 <div className="mt-3 text-xl opacity-90">{s(c.ctaDetail)}</div>
