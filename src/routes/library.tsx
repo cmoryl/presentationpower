@@ -191,6 +191,7 @@ function VariantCard({
   brand,
   sectionId,
   preferred,
+  mode = "light",
   onOpen,
 }: {
   variant: ModuleVariant;
@@ -198,6 +199,7 @@ function VariantCard({
   brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
   sectionId: string;
   preferred?: boolean;
+  mode?: "light" | "dark";
   onOpen: () => void;
 }) {
   const previewSlide = {
