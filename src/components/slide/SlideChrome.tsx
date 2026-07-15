@@ -58,19 +58,53 @@ export function SlideFrame({
   logoPosition?: LogoPosition;
 }) {
   const mode = useSlideMode();
+  const backdrop = useContext(SlideBackdropContext);
   const isChromeDark = variant === "cover" || variant === "divider" || variant === "close";
   const slideDark = mode === "dark";
+  // With a backdrop, force dark text treatment for legibility over imagery.
+  const hasBackdrop = !!backdrop;
   // Cover/divider/close = branded hero backdrop. Regular content flips to a
   // near-black navy in dark mode so cards/text remain legible.
   const bg = isChromeDark ? brand.tokens.primary : slideDark ? "#0A0A22" : "#ffffff";
-  const fg = isChromeDark || slideDark ? "#ffffff" : brand.tokens.ink;
-  const logoColor = isChromeDark || slideDark ? "#ffffff" : brand.tokens.primary;
+  const fg = isChromeDark || slideDark || hasBackdrop ? "#ffffff" : brand.tokens.ink;
+  const logoColor = isChromeDark || slideDark || hasBackdrop ? "#ffffff" : brand.tokens.primary;
 
   const placement = resolveLogoPlacement(variant, layoutId, logoPosition);
   const showLogo = placement.position !== "hidden";
 
+  const scrimStrength = backdrop?.scrimStrength ?? 0.55;
+  const tint = backdrop?.tint ?? "#03002C";
+  const scrimGradient = (() => {
+    if (!backdrop) return "none";
+    const a = scrimStrength;
+    const t = tint;
+    const to = (dir: string) =>
+      `linear-gradient(${dir}, ${hexA(t, a)} 0%, ${hexA(t, a * 0.55)} 45%, ${hexA(t, 0)} 100%)`;
+    switch (backdrop.scrim ?? "bottom") {
+      case "bottom": return to("to top");
+      case "top":    return to("to bottom");
+      case "left":   return to("to right");
+      case "right":  return to("to left");
+      case "full":   return `linear-gradient(${hexA(t, a)}, ${hexA(t, a)})`;
+      case "vignette":
+        return `radial-gradient(ellipse at center, ${hexA(t, 0)} 30%, ${hexA(t, a)} 100%)`;
+    }
+  })();
+
   return (
-    <div className="relative h-full w-full" style={{ backgroundColor: bg, color: fg }}>
+    <div className="relative h-full w-full overflow-hidden" style={{ backgroundColor: hasBackdrop ? "#000" : bg, color: fg }}>
+      {hasBackdrop && (
+        <>
+          <img
+            src={backdrop.url}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ filter: backdrop.imageDim ? `brightness(${1 - backdrop.imageDim}) saturate(0.95)` : undefined }}
+          />
+          <div className="absolute inset-0" style={{ backgroundImage: scrimGradient }} />
+        </>
+      )}
       {/* Brand bar (locked) */}
       <div
         className="absolute left-0 top-0 h-2 w-full"
@@ -87,12 +121,21 @@ export function SlideFrame({
       {/* Footer (locked) */}
       <div
         className="absolute bottom-10 left-24 right-24 flex items-center justify-between text-sm"
-        style={{ color: isChromeDark || slideDark ? "rgba(255,255,255,0.7)" : "rgba(10,15,28,0.55)" }}
+        style={{ color: isChromeDark || slideDark || hasBackdrop ? "rgba(255,255,255,0.7)" : "rgba(10,15,28,0.55)" }}
       >
         <span>Confidential — for internal review</span>
         {pageNumber !== undefined && <span>{String(pageNumber).padStart(2, "0")}</span>}
       </div>
     </div>
   );
+}
+
+function hexA(hex: string, alpha: number): string {
+  const h = hex.replace("#", "");
+  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const r = parseInt(full.slice(0, 2), 16);
+  const g = parseInt(full.slice(2, 4), 16);
+  const b = parseInt(full.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, alpha))})`;
 }
 
