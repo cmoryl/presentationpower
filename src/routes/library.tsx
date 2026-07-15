@@ -429,6 +429,19 @@ function VariantDetailModal({
                 </div>
                 <button
                   type="button"
+                  onClick={() => setShowImagery(!showImagery)}
+                  aria-pressed={showImagery}
+                  className={`rounded-full border px-2.5 py-1 text-[11px] ${
+                    showImagery
+                      ? "border-[#03002C] bg-[#03002C] text-white"
+                      : "border-black/15 bg-white text-black/60"
+                  }`}
+                  title="Toggle background imagery + gradient scrim"
+                >
+                  ▤ Imagery
+                </button>
+                <button
+                  type="button"
                   onClick={() => setShowZones(!showZones)}
                   aria-pressed={showZones}
                   className={`rounded-full border px-2.5 py-1 text-[11px] ${
@@ -454,10 +467,10 @@ function VariantDetailModal({
             <div className="overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm">
               <div className="aspect-[16/9]">
                 <ScaledSlide>
-                  <>
+                  <SlideBackdropContext.Provider value={showImagery ? backdropForVariant(variant) : null}>
                     <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
                     {showZones && <MediaZoneOverlay variant={variant} />}
-                  </>
+                  </SlideBackdropContext.Provider>
                 </ScaledSlide>
               </div>
             </div>
