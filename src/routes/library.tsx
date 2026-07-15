@@ -41,6 +41,7 @@ function Library() {
   const [family, setFamily] = useState<string>("all");
   const [scopeBrandId, setScopeBrandId] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [mode, setMode] = useState<"light" | "dark">("light");
   const tpMasterIdx = Math.max(0, brandModes.findIndex((b) => b.id === "bm-enterprise"));
   const [brandIdx, setBrandIdx] = useState(tpMasterIdx);
 
@@ -118,7 +119,27 @@ function Library() {
             {preferred.size} preferred · {restricted.size} family restrictions
           </span>
         )}
-        <div className="ml-auto text-sm text-black/50">{filtered.length} of {moduleVariants.length}</div>
+        <div className="ml-auto flex items-center gap-3">
+          <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs">
+            <button
+              type="button"
+              onClick={() => setMode("light")}
+              className={`px-3 py-1.5 ${mode === "light" ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"}`}
+              aria-pressed={mode === "light"}
+            >
+              ☀︎ Light
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("dark")}
+              className={`px-3 py-1.5 ${mode === "dark" ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"}`}
+              aria-pressed={mode === "dark"}
+            >
+              ☾ Dark
+            </button>
+          </div>
+          <span className="text-sm text-black/50">{filtered.length} of {moduleVariants.length}</span>
+        </div>
       </div>
 
       <div className="mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3">
@@ -130,13 +151,14 @@ function Library() {
             brand={scopeBrand ?? tpMaster}
             sectionId={sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? ""}
             preferred={preferred.has(v.id)}
+            mode={mode}
             onOpen={() => setOpenId(v.id)}
           />
         ))}
       </div>
 
       <div className="mt-10">
-        <Link to="/brief/new" className="rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm text-white">
+        <Link to="/brief/new" className="rounded-full bg-[#03002C] px-5 py-2.5 text-sm text-white">
           Start a brief →
         </Link>
       </div>
@@ -148,6 +170,8 @@ function Library() {
           brands={brandModes}
           brandIdx={brandIdx}
           setBrandIdx={setBrandIdx}
+          mode={mode}
+          setMode={setMode}
           family={byId(moduleFamilies, active.familyId)}
           fallback={active.fallbackVariantId ? byId(moduleVariants, active.fallbackVariantId) : undefined}
           layouts={active.permittedLayoutIds
@@ -167,6 +191,7 @@ function VariantCard({
   brand,
   sectionId,
   preferred,
+  mode = "light",
   onOpen,
 }: {
   variant: ModuleVariant;
@@ -174,6 +199,7 @@ function VariantCard({
   brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
   sectionId: string;
   preferred?: boolean;
+  mode?: "light" | "dark";
   onOpen: () => void;
 }) {
   const previewSlide = {
@@ -193,7 +219,7 @@ function VariantCard({
     >
       <div className="relative aspect-[16/9] bg-white">
         <ScaledSlide>
-          <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} />
+          <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
         </ScaledSlide>
         <div className="absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 backdrop-blur transition group-hover:opacity-100">
           View details ↗
@@ -231,6 +257,8 @@ function VariantDetailModal({
   brands,
   brandIdx,
   setBrandIdx,
+  mode,
+  setMode,
   family,
   fallback,
   layouts,
@@ -242,6 +270,8 @@ function VariantDetailModal({
   brands: ReturnType<typeof useTaxonomy>["brandModes"];
   brandIdx: number;
   setBrandIdx: (i: number) => void;
+  mode: "light" | "dark";
+  setMode: (m: "light" | "dark") => void;
   family: ReturnType<typeof useTaxonomy>["moduleFamilies"][number] | undefined;
   fallback: ModuleVariant | undefined;
   layouts: ReturnType<typeof useTaxonomy>["layoutFrameworks"];
@@ -306,22 +336,40 @@ function VariantDetailModal({
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
           {/* Large preview */}
           <div className="border-b border-black/10 bg-neutral-50 p-6 lg:border-b-0 lg:border-r">
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-3 flex items-center justify-between gap-3">
               <div className="text-xs uppercase tracking-widest text-black/50">Preview</div>
-              <select
-                value={brandIdx}
-                onChange={(e) => setBrandIdx(Number(e.target.value))}
-                className="rounded-lg border border-black/15 bg-white px-2 py-1 text-xs"
-              >
-                {brands.map((b, i) => (
-                  <option key={b.id} value={i}>{b.name}</option>
-                ))}
-              </select>
+              <div className="flex items-center gap-2">
+                <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => setMode("light")}
+                    className={`px-2.5 py-1 ${mode === "light" ? "bg-[#03002C] text-white" : "text-black/60"}`}
+                  >
+                    ☀︎
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMode("dark")}
+                    className={`px-2.5 py-1 ${mode === "dark" ? "bg-[#03002C] text-white" : "text-black/60"}`}
+                  >
+                    ☾
+                  </button>
+                </div>
+                <select
+                  value={brandIdx}
+                  onChange={(e) => setBrandIdx(Number(e.target.value))}
+                  className="rounded-lg border border-black/15 bg-white px-2 py-1 text-xs"
+                >
+                  {brands.map((b, i) => (
+                    <option key={b.id} value={i}>{b.name}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className="overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm">
               <div className="aspect-[16/9]">
                 <ScaledSlide>
-                  <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} />
+                  <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
                 </ScaledSlide>
               </div>
             </div>

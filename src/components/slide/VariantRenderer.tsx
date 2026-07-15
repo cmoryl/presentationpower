@@ -1,5 +1,5 @@
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
-import { SlideFrame as BaseSlideFrame } from "./SlideChrome";
+import { SlideFrame as BaseSlideFrame, SlideModeContext, type SlideMode } from "./SlideChrome";
 import { createContext, useContext } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
@@ -160,6 +160,7 @@ type Props = {
   brand: BrandMode;
   pageNumber: number;
   clientName?: string;
+  mode?: SlideMode;
 };
 
 type Item = Record<string, unknown>;
@@ -168,16 +169,37 @@ const arr = (v: unknown): Item[] => (Array.isArray(v) ? (v as Item[]) : []);
 const obj = (v: unknown): Record<string, unknown> => (v && typeof v === "object" ? (v as Record<string, unknown>) : {});
 const strs = (v: unknown): string[] => (Array.isArray(v) ? (v as unknown[]).map((x) => s(x)) : []);
 
+// In dark mode, swap the token surfaces + text so any `brand.tokens.*` usage in
+// module bodies renders correctly on a dark slide. Primary becomes a lighter
+// on-brand blue (#4D88FF from the approved web ramp) so numeric/text usage of
+// primary stays legible on dark panels. Accent (Aqua/Lavender/Pink/etc.)
+// already pops on dark and is preserved.
+function themeBrandForMode(brand: BrandMode, mode: SlideMode): BrandMode {
+  if (mode === "light") return brand;
+  return {
+    ...brand,
+    tokens: {
+      primary: "#4D88FF",
+      accent: brand.tokens.accent,
+      surface: "#141435",
+      ink: "#FFFFFF",
+    },
+  };
+}
+
 export function VariantRenderer(props: Props) {
-  const { slide, variant, brand, pageNumber, clientName } = props;
+  const { slide, variant, brand, pageNumber, clientName, mode = "light" } = props;
   const c = slide.content as Record<string, unknown>;
   const contentClientName = s((slide.content as Record<string, unknown>).clientName) || undefined;
   const resolvedClient = clientName || contentClientName;
+  const themedBrand = themeBrandForMode(brand, mode);
 
   return (
-    <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId }}>
-      {renderVariantBody({ slide, variant, brand, pageNumber, c })}
-    </SlideFrameCtx.Provider>
+    <SlideModeContext.Provider value={mode}>
+      <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId }}>
+        {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c })}
+      </SlideFrameCtx.Provider>
+    </SlideModeContext.Provider>
   );
 }
 

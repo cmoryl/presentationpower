@@ -1,5 +1,6 @@
 import type { BrandMode } from "@/lib/taxonomy";
 import type { ReactNode } from "react";
+import { createContext, useContext } from "react";
 import { BrandLockup } from "@/components/BrandLockup";
 import {
   resolveLogoPlacement,
@@ -7,6 +8,15 @@ import {
   type ChromeVariant,
   type LogoPosition,
 } from "@/lib/logo-placement";
+
+// Every slide can render in light or dark mode. VariantRenderer sets this
+// context per slide; SlideFrame and helpers read it to flip content surfaces
+// and text colors without every switch case having to know about the mode.
+export type SlideMode = "light" | "dark";
+export const SlideModeContext = createContext<SlideMode>("light");
+export function useSlideMode(): SlideMode {
+  return useContext(SlideModeContext);
+}
 
 // A slide frame that owns the locked chrome — brand bar, footer, logo, page
 // number. Locked fields live here so variant renderers cannot override them.
@@ -30,10 +40,14 @@ export function SlideFrame({
   layoutId?: string;
   logoPosition?: LogoPosition;
 }) {
-  const isDark = variant === "cover" || variant === "divider" || variant === "close";
-  const bg = isDark ? brand.tokens.primary : "#ffffff";
-  const fg = isDark ? "#ffffff" : brand.tokens.ink;
-  const logoColor = isDark ? "#ffffff" : brand.tokens.primary;
+  const mode = useSlideMode();
+  const isChromeDark = variant === "cover" || variant === "divider" || variant === "close";
+  const slideDark = mode === "dark";
+  // Cover/divider/close = branded hero backdrop. Regular content flips to a
+  // near-black navy in dark mode so cards/text remain legible.
+  const bg = isChromeDark ? brand.tokens.primary : slideDark ? "#0A0A22" : "#ffffff";
+  const fg = isChromeDark || slideDark ? "#ffffff" : brand.tokens.ink;
+  const logoColor = isChromeDark || slideDark ? "#ffffff" : brand.tokens.primary;
 
   const placement = resolveLogoPlacement(variant, layoutId, logoPosition);
   const showLogo = placement.position !== "hidden";
@@ -56,7 +70,7 @@ export function SlideFrame({
       {/* Footer (locked) */}
       <div
         className="absolute bottom-10 left-24 right-24 flex items-center justify-between text-sm"
-        style={{ color: isDark ? "rgba(255,255,255,0.7)" : "rgba(10,15,28,0.55)" }}
+        style={{ color: isChromeDark || slideDark ? "rgba(255,255,255,0.7)" : "rgba(10,15,28,0.55)" }}
       >
         <span>Confidential — for internal review</span>
         {pageNumber !== undefined && <span>{String(pageNumber).padStart(2, "0")}</span>}
@@ -64,3 +78,4 @@ export function SlideFrame({
     </div>
   );
 }
+
