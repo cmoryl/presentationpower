@@ -198,6 +198,8 @@ function Library() {
           setBrandIdx={setBrandIdx}
           mode={mode}
           setMode={setMode}
+          showZones={showZones}
+          setShowZones={setShowZones}
           family={byId(moduleFamilies, active.familyId)}
           fallback={active.fallbackVariantId ? byId(moduleVariants, active.fallbackVariantId) : undefined}
           layouts={active.permittedLayoutIds
