@@ -145,6 +145,19 @@ function Library() {
           </div>
           <button
             type="button"
+            onClick={() => setShowImagery((v) => !v)}
+            aria-pressed={showImagery}
+            title="Render each module with a sample background image + alpha gradient scrim"
+            className={`rounded-full border px-3 py-1.5 text-xs ${
+              showImagery
+                ? "border-[#03002C] bg-[#03002C] text-white"
+                : "border-black/15 bg-white text-black/70 hover:text-black"
+            }`}
+          >
+            ▤ Sample imagery {showImagery ? "on" : "off"}
+          </button>
+          <button
+            type="button"
             onClick={() => setShowZones((v) => !v)}
             aria-pressed={showZones}
             title="Overlay demo imagery zones (human, shape, aura, scrim)"
