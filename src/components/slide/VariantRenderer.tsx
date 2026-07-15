@@ -1983,21 +1983,52 @@ function MediaTile({
   const h = hash(seed || brand.id);
   const grayscale = muted ? "grayscale(60%) brightness(0.9)" : undefined;
 
-  // Light mode: render a clean, basic neutral placeholder (no gradient blobs
-  // or dot-like shapes). Sample imagery is a dark-mode-only treatment.
+  const tileBackdrops = MEDIA_TILE_BACKDROPS;
+  const url = tileBackdrops[h % tileBackdrops.length];
+  const accent = brand.tokens.accent;
+  const primary = brand.tokens.primary;
+
+  // Light mode: same photographic backdrop treatment, but with a lighter
+  // scrim and softer washes so imagery reads bright and airy.
   if (mode === "light") {
     return (
       <div
         className={`relative overflow-hidden rounded-2xl ${className ?? ""}`}
-        style={{
-          background: "#F2F2F2",
-          filter: grayscale,
-        }}
+        style={{ background: "#F2F2F2", filter: grayscale }}
       >
+        <img
+          src={url}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ filter: "brightness(1.05) saturate(0.9)" }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-[18%] top-[8%] h-[52%] w-[58%] rounded-full"
+          style={{
+            backgroundColor: `${accent}26`,
+            filter: "blur(34px)",
+            mixBlendMode: "multiply",
+          }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -bottom-[18%] right-[-18%] h-[58%] w-[58%] rounded-full"
+          style={{
+            backgroundColor: `${primary}22`,
+            filter: "blur(38px)",
+            mixBlendMode: "multiply",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{ backgroundColor: "rgba(255,255,255,0.28)" }}
+        />
         {portrait && (
           <div
             className="absolute left-1/2 top-[58%] h-[70%] w-[45%] -translate-x-1/2 rounded-t-full"
-            style={{ background: "rgba(10,15,28,0.06)" }}
+            style={{ backgroundColor: "rgba(10,15,28,0.08)" }}
           />
         )}
       </div>
@@ -2006,10 +2037,6 @@ function MediaTile({
 
   // Dark mode: use a real photographic backdrop with a simple scrim and
   // translucent brand-color washes. No generated radial/dot/pattern layers.
-  const tileBackdrops = MEDIA_TILE_BACKDROPS;
-  const url = tileBackdrops[h % tileBackdrops.length];
-  const accent = brand.tokens.accent;
-  const primary = brand.tokens.primary;
   return (
     <div
       className={`relative overflow-hidden rounded-2xl ${className ?? ""}`}
