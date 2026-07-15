@@ -14,6 +14,11 @@ import {
   type IconSizeToken,
 } from "@/lib/iconography";
 import { Sparkles, Target, Workflow, Layers3, Users, Rocket } from "lucide-react";
+import {
+  LOGO_POSITIONS_META,
+  LOGO_POSITION_BY_LAYOUT,
+  resolveLogoPlacement,
+} from "@/lib/logo-placement";
 
 export const Route = createFileRoute("/atlas")({
   head: () => ({
