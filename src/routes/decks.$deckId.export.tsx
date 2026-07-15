@@ -15,6 +15,7 @@ export const Route = createFileRoute("/decks/$deckId/export")({
 function ExportView() {
   const { deckId } = Route.useParams();
   const deck = useDeckStore((s) => s.decks[deckId]);
+  const [exporting, setExporting] = useState(false);
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
 
@@ -22,6 +23,15 @@ function ExportView() {
     document.body.classList.add("export-mode");
     return () => document.body.classList.remove("export-mode");
   }, []);
+
+  async function handlePptx() {
+    setExporting(true);
+    try {
+      await exportDeckToPptx(deck, brand);
+    } finally {
+      setExporting(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-neutral-100 py-12 print:bg-white print:py-0">
@@ -33,24 +43,33 @@ function ExportView() {
         }
       `}</style>
 
-      <div className="no-print mx-auto mb-8 flex max-w-[1200px] items-center justify-between px-6">
+      <div className="no-print mx-auto mb-8 flex max-w-[1200px] items-center justify-between gap-6 px-6">
         <div>
           <Link to="/decks/$deckId" params={{ deckId }} className="text-xs uppercase tracking-widest text-black/50 hover:text-black">
             ← Back to editor
           </Link>
           <h1 className="mt-2 text-2xl font-semibold">Export · {deck.title}</h1>
           <p className="mt-1 text-sm text-black/60">
-            Use your browser's print dialog to save as PDF. Choose landscape and disable headers/footers for a clean export.
-            Native PPTX export lands in phase 3.
+            Download a native PowerPoint file, or use your browser's print dialog to save as PDF.
           </p>
         </div>
-        <button
-          onClick={() => window.print()}
-          className="rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0B2A4A]/90"
-        >
-          Print / Save PDF
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handlePptx}
+            disabled={exporting}
+            className="rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0B2A4A]/90 disabled:opacity-60"
+          >
+            {exporting ? "Preparing…" : "Download .pptx"}
+          </button>
+          <button
+            onClick={() => window.print()}
+            className="rounded-full border border-black/15 bg-white px-5 py-2.5 text-sm font-medium text-black hover:border-black/30"
+          >
+            Print / Save PDF
+          </button>
+        </div>
       </div>
+
 
       <div className="mx-auto flex max-w-[1400px] flex-col items-center gap-6 px-6 print:max-w-none print:gap-0 print:p-0">
         {deck.slides.map((slide, i) => {
