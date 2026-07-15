@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LibraryRouteImport } from './routes/library'
+import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as AtlasRouteImport } from './routes/atlas'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
@@ -30,6 +31,11 @@ const LibraryRoute = LibraryRouteImport.update({
   path: '/library',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KnowledgeRoute = KnowledgeRouteImport.update({
+  id: '/knowledge',
+  path: '/knowledge',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AtlasRoute = AtlasRouteImport.update({
   id: '/atlas',
   path: '/atlas',
@@ -41,24 +47,24 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const KnowledgeIndexRoute = KnowledgeIndexRouteImport.update({
-  id: '/knowledge/',
-  path: '/knowledge/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => KnowledgeRoute,
 } as any)
 const KnowledgeNewRoute = KnowledgeNewRouteImport.update({
-  id: '/knowledge/new',
-  path: '/knowledge/new',
-  getParentRoute: () => rootRouteImport,
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => KnowledgeRoute,
 } as any)
 const KnowledgeBrandGuidesRoute = KnowledgeBrandGuidesRouteImport.update({
-  id: '/knowledge/brand-guides',
-  path: '/knowledge/brand-guides',
-  getParentRoute: () => rootRouteImport,
+  id: '/brand-guides',
+  path: '/brand-guides',
+  getParentRoute: () => KnowledgeRoute,
 } as any)
 const KnowledgeEntryIdRoute = KnowledgeEntryIdRouteImport.update({
-  id: '/knowledge/$entryId',
-  path: '/knowledge/$entryId',
-  getParentRoute: () => rootRouteImport,
+  id: '/$entryId',
+  path: '/$entryId',
+  getParentRoute: () => KnowledgeRoute,
 } as any)
 const DecksDeckIdRoute = DecksDeckIdRouteImport.update({
   id: '/decks/$deckId',
@@ -105,6 +111,7 @@ const DecksDeckIdDocumentRoute = DecksDeckIdDocumentRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/atlas': typeof AtlasRoute
+  '/knowledge': typeof KnowledgeRouteWithChildren
   '/library': typeof LibraryRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/api/chat': typeof ApiChatRoute
@@ -140,6 +147,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/atlas': typeof AtlasRoute
+  '/knowledge': typeof KnowledgeRouteWithChildren
   '/library': typeof LibraryRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/api/chat': typeof ApiChatRoute
@@ -159,6 +167,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/atlas'
+    | '/knowledge'
     | '/library'
     | '/admin/approvals'
     | '/api/chat'
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/atlas'
+    | '/knowledge'
     | '/library'
     | '/admin/approvals'
     | '/api/chat'
@@ -211,15 +221,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AtlasRoute: typeof AtlasRoute
+  KnowledgeRoute: typeof KnowledgeRouteWithChildren
   LibraryRoute: typeof LibraryRoute
   AdminApprovalsRoute: typeof AdminApprovalsRoute
   ApiChatRoute: typeof ApiChatRoute
   BriefNewRoute: typeof BriefNewRoute
   DecksDeckIdRoute: typeof DecksDeckIdRouteWithChildren
-  KnowledgeEntryIdRoute: typeof KnowledgeEntryIdRoute
-  KnowledgeBrandGuidesRoute: typeof KnowledgeBrandGuidesRouteWithChildren
-  KnowledgeNewRoute: typeof KnowledgeNewRoute
-  KnowledgeIndexRoute: typeof KnowledgeIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -229,6 +236,13 @@ declare module '@tanstack/react-router' {
       path: '/library'
       fullPath: '/library'
       preLoaderRoute: typeof LibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/knowledge': {
+      id: '/knowledge'
+      path: '/knowledge'
+      fullPath: '/knowledge'
+      preLoaderRoute: typeof KnowledgeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/atlas': {
@@ -247,31 +261,31 @@ declare module '@tanstack/react-router' {
     }
     '/knowledge/': {
       id: '/knowledge/'
-      path: '/knowledge'
+      path: '/'
       fullPath: '/knowledge/'
       preLoaderRoute: typeof KnowledgeIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof KnowledgeRoute
     }
     '/knowledge/new': {
       id: '/knowledge/new'
-      path: '/knowledge/new'
+      path: '/new'
       fullPath: '/knowledge/new'
       preLoaderRoute: typeof KnowledgeNewRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof KnowledgeRoute
     }
     '/knowledge/brand-guides': {
       id: '/knowledge/brand-guides'
-      path: '/knowledge/brand-guides'
+      path: '/brand-guides'
       fullPath: '/knowledge/brand-guides'
       preLoaderRoute: typeof KnowledgeBrandGuidesRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof KnowledgeRoute
     }
     '/knowledge/$entryId': {
       id: '/knowledge/$entryId'
-      path: '/knowledge/$entryId'
+      path: '/$entryId'
       fullPath: '/knowledge/$entryId'
       preLoaderRoute: typeof KnowledgeEntryIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof KnowledgeRoute
     }
     '/decks/$deckId': {
       id: '/decks/$deckId'
@@ -332,6 +346,35 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface KnowledgeBrandGuidesRouteChildren {
+  KnowledgeBrandGuidesSlugRoute: typeof KnowledgeBrandGuidesSlugRoute
+}
+
+const KnowledgeBrandGuidesRouteChildren: KnowledgeBrandGuidesRouteChildren = {
+  KnowledgeBrandGuidesSlugRoute: KnowledgeBrandGuidesSlugRoute,
+}
+
+const KnowledgeBrandGuidesRouteWithChildren =
+  KnowledgeBrandGuidesRoute._addFileChildren(KnowledgeBrandGuidesRouteChildren)
+
+interface KnowledgeRouteChildren {
+  KnowledgeEntryIdRoute: typeof KnowledgeEntryIdRoute
+  KnowledgeBrandGuidesRoute: typeof KnowledgeBrandGuidesRouteWithChildren
+  KnowledgeNewRoute: typeof KnowledgeNewRoute
+  KnowledgeIndexRoute: typeof KnowledgeIndexRoute
+}
+
+const KnowledgeRouteChildren: KnowledgeRouteChildren = {
+  KnowledgeEntryIdRoute: KnowledgeEntryIdRoute,
+  KnowledgeBrandGuidesRoute: KnowledgeBrandGuidesRouteWithChildren,
+  KnowledgeNewRoute: KnowledgeNewRoute,
+  KnowledgeIndexRoute: KnowledgeIndexRoute,
+}
+
+const KnowledgeRouteWithChildren = KnowledgeRoute._addFileChildren(
+  KnowledgeRouteChildren,
+)
+
 interface DecksDeckIdRouteChildren {
   DecksDeckIdDocumentRoute: typeof DecksDeckIdDocumentRoute
   DecksDeckIdExportRoute: typeof DecksDeckIdExportRoute
@@ -348,30 +391,26 @@ const DecksDeckIdRouteWithChildren = DecksDeckIdRoute._addFileChildren(
   DecksDeckIdRouteChildren,
 )
 
-interface KnowledgeBrandGuidesRouteChildren {
-  KnowledgeBrandGuidesSlugRoute: typeof KnowledgeBrandGuidesSlugRoute
-}
-
-const KnowledgeBrandGuidesRouteChildren: KnowledgeBrandGuidesRouteChildren = {
-  KnowledgeBrandGuidesSlugRoute: KnowledgeBrandGuidesSlugRoute,
-}
-
-const KnowledgeBrandGuidesRouteWithChildren =
-  KnowledgeBrandGuidesRoute._addFileChildren(KnowledgeBrandGuidesRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AtlasRoute: AtlasRoute,
+  KnowledgeRoute: KnowledgeRouteWithChildren,
   LibraryRoute: LibraryRoute,
   AdminApprovalsRoute: AdminApprovalsRoute,
   ApiChatRoute: ApiChatRoute,
   BriefNewRoute: BriefNewRoute,
   DecksDeckIdRoute: DecksDeckIdRouteWithChildren,
-  KnowledgeEntryIdRoute: KnowledgeEntryIdRoute,
-  KnowledgeBrandGuidesRoute: KnowledgeBrandGuidesRouteWithChildren,
-  KnowledgeNewRoute: KnowledgeNewRoute,
-  KnowledgeIndexRoute: KnowledgeIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
