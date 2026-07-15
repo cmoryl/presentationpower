@@ -226,7 +226,7 @@ function ZoneRect({ zone, seed }: { zone: Zone; seed: number }) {
         width: zone.w,
         height: zone.h,
         background: isHuman
-          ? `${style.fill}, url(${portrait}) center/cover no-repeat`
+          ? `linear-gradient(${style.fill}, ${style.fill}), url(${portrait}) center/cover no-repeat`
           : style.fill,
         border,
         borderRadius: radius,
