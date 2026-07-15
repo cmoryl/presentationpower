@@ -23,6 +23,8 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
       serviceLines: ["Translation", "Localization", "AI Language Services", "Interpretation", "eDiscovery", "Content Production", "Global Marketing"],
       caseStudyTags: ["global-rollout", "regulated", "multilingual-content", "cost-savings", "speed-to-market"],
       preferredArchetypes: ["arch-value-story", "arch-decision-drive", "arch-market-fit"],
+      // Corporate narrative leans on long-form case stories + testimonial proof.
+      preferredVariantIds: ["MV-CASE-STORY", "MV-PROOF-TESTIMONIAL", "MV-SOL-PILLARS-3", "MV-CTX-CARDS-3"],
     },
   },
   "bm-subcompany": {
@@ -34,7 +36,8 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
       serviceLines: ["Regulatory translation", "Clinical trial content", "Patient recruitment", "eCTD submissions", "Medical writing"],
       caseStudyTags: ["clinical-trial", "regulatory", "fda-ema", "patient-facing", "pharma"],
       preferredArchetypes: ["arch-value-story", "arch-decision-drive"],
-      restrictedFamilyIds: [], // Life sciences uses everything but insists on strict-review MF-05 modules.
+      restrictedFamilyIds: [],
+      preferredVariantIds: ["MV-CASE-SPREAD", "MV-PROOF-STATS-3", "MV-DEC-CHECKLIST", "MV-CTX-COST"],
     },
   },
   "bm-division": {
@@ -46,6 +49,8 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
       serviceLines: ["Translation Management System", "Connectors & APIs", "Workflow automation", "Continuous localization"],
       caseStudyTags: ["platform", "integration", "automation", "self-serve", "developer"],
       preferredArchetypes: ["arch-market-fit", "arch-transformation"],
+      // Product-forward: lean on metrics + before/after + logo grid.
+      preferredVariantIds: ["MV-CASE-METRICS", "MV-PROC-BEFORE-AFTER", "MV-PROOF-LOGOS", "MV-SOL-PILLARS-4"],
     },
   },
   "bm-product": {
@@ -57,7 +62,8 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
       serviceLines: ["Data collection", "Data annotation", "Model evaluation", "Human-in-the-loop AI"],
       caseStudyTags: ["ai-training", "annotation", "llm", "computer-vision", "speech"],
       preferredArchetypes: ["arch-market-fit", "arch-transformation"],
-      restrictedFamilyIds: ["MF-06"], // Long-form case study spreads are unusual for this product brand.
+      restrictedFamilyIds: ["MF-06"],
+      preferredVariantIds: ["MV-CASE-METRICS", "MV-PROOF-STATS-3", "MV-CTX-STAT-GRID", "MV-INS-BIG-IDEA"],
     },
   },
   "bm-cobrand": {
@@ -69,6 +75,7 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
       serviceLines: ["Joint program", "Managed service", "Strategic partnership"],
       caseStudyTags: ["partnership", "joint-gtm", "shared-ownership"],
       preferredArchetypes: ["arch-value-story", "arch-decision-drive"],
+      preferredVariantIds: ["MV-CASE-STORY", "MV-DEC-CHECKLIST", "MV-PROOF-TESTIMONIAL"],
     },
   },
 };
