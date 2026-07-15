@@ -81,10 +81,13 @@ type DeckState = {
 function assembleDeck(brief: Brief): Deck {
   const arch = byId(NARRATIVE_ARCHETYPES, brief.archetypeId);
   const recipe = (arch?.sectionRecipe ?? []).slice(0, Math.max(brief.lengthTarget, 4));
+  const profile = BRAND_PROFILES[brief.brandModeId];
+  const restricted = new Set(profile?.contentScope.restrictedFamilyIds ?? []);
   const slides: DeckSlide[] = recipe.map((sfId, i) => {
     const sf = byId(SECTION_FRAMEWORKS, sfId);
-    const options = variantsForSection(sfId);
-    const variant = options[0] ?? MODULE_VARIANTS[0];
+    const options = variantsForSection(sfId).filter((v) => !restricted.has(v.familyId));
+    const fallback = variantsForSection(sfId);
+    const variant = options[0] ?? fallback[0] ?? MODULE_VARIANTS[0];
     const layoutId = variant.permittedLayoutIds[0];
     return {
       id: nanoid(8),
