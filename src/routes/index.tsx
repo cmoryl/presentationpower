@@ -18,9 +18,13 @@ export const Route = createFileRoute("/")({
 });
 
 function Dashboard() {
-  const decks = useDeckStore((s) => Object.values(s.decks).sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+  const decksMap = useDeckStore((s) => s.decks);
   const briefs = useDeckStore((s) => s.briefs);
   const deleteDeck = useDeckStore((s) => s.deleteDeck);
+  const decks = useMemo(
+    () => Object.values(decksMap).sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    [decksMap],
+  );
   return (
     <AppShell>
       <div className="flex items-end justify-between">
