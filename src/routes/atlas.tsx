@@ -14,6 +14,11 @@ import {
   type IconSizeToken,
 } from "@/lib/iconography";
 import { Sparkles, Target, Workflow, Layers3, Users, Rocket } from "lucide-react";
+import {
+  LOGO_POSITIONS_META,
+  LOGO_POSITION_BY_LAYOUT,
+  resolveLogoPlacement,
+} from "@/lib/logo-placement";
 
 export const Route = createFileRoute("/atlas")({
   head: () => ({
@@ -150,6 +155,8 @@ function Atlas() {
       </Section>
 
       <IconographySection />
+
+      <LogoPlacementSection />
 
       <div className="mt-14 rounded-2xl border border-dashed border-black/15 bg-white p-6 text-sm text-black/60">
         Want to see the pieces in action?{" "}
@@ -363,5 +370,107 @@ function Section({ title, count, children }: { title: string; count: number; chi
       </div>
       {children}
     </section>
+  );
+}
+
+function LogoZoneDiagram({ position }: { position: import("@/lib/logo-placement").LogoPosition }) {
+  const zone: Record<string, string> = {
+    "top-left":      "items-start justify-start",
+    "top-center":    "items-start justify-center",
+    "top-right":     "items-start justify-end",
+    "bottom-left":   "items-end justify-start",
+    "bottom-center": "items-end justify-center",
+    "bottom-right":  "items-end justify-end",
+    "hidden":        "items-center justify-center",
+  };
+  const isHidden = position === "hidden";
+  return (
+    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-black/10 bg-white">
+      <div className="absolute inset-x-0 top-0 h-[3px] bg-[#E85D2C]" aria-hidden />
+      <div className={`flex h-full w-full p-3 ${zone[position]}`}>
+        {isHidden ? (
+          <span className="text-[10px] uppercase tracking-widest text-black/30">hidden</span>
+        ) : (
+          <div className="flex items-center gap-1.5 rounded border border-[#0B2A4A] px-1.5 py-1">
+            <span className="grid h-4 w-4 place-items-center rounded-sm border border-[#0B2A4A] text-[7px] font-semibold text-[#0B2A4A]">TP</span>
+            <span className="text-[8px] font-semibold tracking-wider text-[#0B2A4A]">TRANSPERFECT</span>
+          </div>
+        )}
+      </div>
+      <div className="pointer-events-none absolute inset-2 rounded border border-dashed border-black/10" aria-hidden />
+    </div>
+  );
+}
+
+function LogoPlacementSection() {
+  const chromeDefaults = [
+    { chrome: "cover" as const,   label: "Cover chrome" },
+    { chrome: "content" as const, label: "Content chrome (default)" },
+    { chrome: "divider" as const, label: "Divider chrome" },
+    { chrome: "close" as const,   label: "Close chrome" },
+  ];
+
+  return (
+    <Section title="Logo placement" count={LOGO_POSITIONS_META.length}>
+      <p className="-mt-2 mb-6 max-w-3xl text-sm text-black/60">
+        Every slide places the brand lockup in one of seven approved zones. The zone is derived from the chrome
+        variant, with per-layout overrides for full-bleed, poster, and editorial moments. Variants may override in
+        rare cases via <span className="font-mono text-xs">logoPosition</span>.
+      </p>
+
+      <div className="mb-8">
+        <div className="mb-3 text-xs uppercase tracking-widest text-black/50">Approved zones</div>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          {LOGO_POSITIONS_META.map((p) => (
+            <div key={p.id} className="rounded-2xl border border-black/10 bg-white p-4">
+              <LogoZoneDiagram position={p.id} />
+              <div className="mt-3 flex items-baseline justify-between">
+                <div className="font-medium">{p.name}</div>
+                <span className="font-mono text-[10px] text-black/50">{p.id}</span>
+              </div>
+              <div className="mt-1 text-xs text-black/50">{p.typicalIn}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <div className="mb-3 text-xs uppercase tracking-widest text-black/50">Chrome-variant defaults</div>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          {chromeDefaults.map((c) => {
+            const spec = resolveLogoPlacement(c.chrome);
+            return (
+              <div key={c.chrome} className="rounded-2xl border border-black/10 bg-white p-4">
+                <LogoZoneDiagram position={spec.position} />
+                <div className="mt-3 text-sm font-medium">{c.label}</div>
+                <div className="mt-1 flex items-center justify-between text-xs text-black/50">
+                  <span>{spec.position}</span>
+                  <span className="font-mono text-[10px]">{c.chrome}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div>
+        <div className="mb-3 text-xs uppercase tracking-widest text-black/50">Layout-framework overrides</div>
+        <div className="rounded-2xl border border-black/10 bg-white p-5">
+          <ul className="grid gap-2 md:grid-cols-2">
+            {Object.entries(LOGO_POSITION_BY_LAYOUT).map(([lfId, pos]) => (
+              <li key={lfId} className="flex items-center justify-between text-sm">
+                <span>
+                  <span className="font-mono text-xs text-black/50">{lfId}</span>{" "}
+                  <span className="text-black/70">→ {pos}</span>
+                </span>
+                <span className="rounded-full bg-black/5 px-2 py-0.5 font-mono text-[10px]">
+                  {resolveLogoPlacement("content", lfId).rationale}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </Section>
   );
 }
