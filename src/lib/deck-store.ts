@@ -103,16 +103,15 @@ function assembleDeck(brief: Brief): Deck {
   };
 }
 
-function seedContent(variantId: string, brief: Brief, sectionName: string): SlideContent {
+export function seedContent(variantId: string, brief: Brief, sectionName: string): SlideContent {
+  const clientName = brief.prospect;
   switch (variantId) {
     case "MV-OP-COVER":
-      return {
-        title: `${brief.prospect}`,
-        subtitle: brief.meetingObjective,
-        clientName: brief.prospect,
-        presenter: "TransPerfect",
-        date: new Date().toLocaleDateString(),
-      };
+      return { title: clientName, subtitle: brief.meetingObjective, clientName, presenter: "TransPerfect", date: new Date().toLocaleDateString() };
+    case "MV-OP-COVER-MEDIA":
+      return { title: brief.meetingObjective || `${clientName} × TransPerfect`, subtitle: `A strategic partnership review`, clientName, date: new Date().toLocaleDateString() };
+    case "MV-OP-COVER-MINIMAL":
+      return { title: clientName, subtitle: brief.meetingObjective, date: new Date().toLocaleDateString() };
     case "MV-OP-AGENDA":
       return {
         title: "Agenda",
@@ -124,34 +123,111 @@ function seedContent(variantId: string, brief: Brief, sectionName: string): Slid
           { label: "Next steps" },
         ],
       };
+    case "MV-OP-AGENDA-VERTICAL":
+      return {
+        title: "Agenda",
+        items: [
+          { label: "Where you are today", body: "Market context and current-state view" },
+          { label: "What we heard", body: "The challenges you told us matter most" },
+          { label: "Our recommendation", body: "The path forward we're proposing" },
+          { label: "Proof", body: "How this has worked for similar clients" },
+          { label: "Next steps", body: "How we move from decision to action" },
+        ],
+      };
     case "MV-OP-DIVIDER":
       return { kicker: "Section", title: sectionName };
+    case "MV-OP-DIVIDER-NUMBERED":
+      return { chapterNumber: "01", kicker: "Chapter", title: sectionName };
+    case "MV-OP-INTRO-TEAM":
+      return {
+        title: "Who's presenting",
+        items: [
+          { name: "Alex Rivera", role: "Account Director", note: "Owns the relationship end to end." },
+          { name: "Priya Shah", role: "Solutions Lead", note: "Designs the program that fits your model." },
+          { name: "Marco Bianchi", role: "Delivery Lead", note: "Runs the day-to-day of the engagement." },
+        ],
+      };
+
+    case "MV-CTX-CARDS-2":
+      return {
+        title: `Where ${clientName} is today`,
+        items: [
+          { title: "Fragmented workflows", body: "Content moves across teams and tools without a single source of truth, and each handoff introduces rework." },
+          { title: "Compliance drag", body: "Regulated markets add review steps that slow every launch and stretch time-to-market well past target." },
+        ],
+      };
     case "MV-CTX-CARDS-3":
       return {
-        title: `Where ${brief.prospect} is today`,
+        title: `Where ${clientName} is today`,
         items: [
           { title: "Fragmented workflows", body: "Content moves across teams and tools without a single source of truth." },
           { title: "Rising volume", body: "Global content demand is outpacing the current review and QA capacity." },
           { title: "Compliance drag", body: "Regulated markets add review steps that slow every launch." },
         ],
       };
-    case "MV-CTX-COST":
+    case "MV-CTX-CARDS-4":
       return {
-        stat: "40",
-        unit: "%",
-        label: "of launch delays trace back to translation and review bottlenecks",
-        narrative: "Every quarter of delay in a regulated market compounds into lost revenue and audit exposure.",
+        title: `Where ${clientName} is today`,
+        items: [
+          { title: "Fragmented workflows", body: "Content moves across teams and tools without a single source of truth." },
+          { title: "Rising volume", body: "Global demand outpaces current review capacity." },
+          { title: "Compliance drag", body: "Regulated markets add review steps that slow launches." },
+          { title: "Cost visibility", body: "Program spend is hard to tie back to business outcomes." },
+        ],
       };
-    case "MV-INS-CALLOUT":
+    case "MV-CTX-COST":
+      return { stat: "40", unit: "%", label: "of launch delays trace back to translation and review bottlenecks", narrative: "Every quarter of delay in a regulated market compounds into lost revenue and audit exposure." };
+    case "MV-CTX-STAT-GRID":
       return {
-        insight: "The bottleneck is orchestration, not translation.",
-        narrative: `${brief.prospect} has the linguistic talent — what's missing is the connective tissue between briefing, review, and publish.`,
+        title: `Market context for ${brief.industry || "your sector"}`,
+        items: [
+          { value: "3.2", unit: "×", label: "content volume vs. 2020" },
+          { value: "62", unit: "%", label: "buyers expect native-language content" },
+          { value: "47", unit: "%", label: "of launches slip on localization" },
+          { value: "18", unit: "mo", label: "avg. time to fully localized rollout" },
+        ],
+      };
+    case "MV-CTX-TREND":
+      return { direction: "up", headline: "Regulated content volume is outpacing every localization program built before 2022.", narrative: "Volume is up, deadlines are compressed, and reviewers are the bottleneck. The programs pulling ahead have re-designed intake and QA — not just added headcount." };
+    case "MV-CTX-CHALLENGE-STACK":
+      return {
+        title: "What we heard from your team",
+        items: [
+          { title: "Handoffs lose context", body: "Every step between briefing, translation, and review re-explains the same requirements." },
+          { title: "Reviewers are the bottleneck", body: "In-market reviewers are asked to catch too much, too late." },
+          { title: "Reporting is manual", body: "Program leaders assemble status decks from spreadsheets each week." },
+        ],
+      };
+
+    case "MV-INS-CALLOUT":
+      return { insight: "The bottleneck is orchestration, not translation.", narrative: `${clientName} has the linguistic talent — what's missing is the connective tissue between briefing, review, and publish.` };
+    case "MV-INS-BIG-IDEA":
+      return { kicker: "The big idea", idea: "Treat localization as a supply chain, not a service." };
+    case "MV-INS-SO-WHAT":
+      return {
+        insight: "Reviewers see problems late because they see files, not context.",
+        soWhat: "Late review = late launches, and in regulated markets, missed windows.",
+        nowWhat: "Move reviewers earlier and give them the source brief, not just the translation.",
+      };
+    case "MV-INS-OPPORTUNITY-SIZE":
+      return {
+        title: "Opportunity size",
+        items: [
+          { value: "$4.2", unit: "B", label: "TAM — global enterprise localization" },
+          { value: "$680", unit: "M", label: "SAM — regulated segments" },
+          { value: "$72", unit: "M", label: "SOM — reachable in 3 years" },
+        ],
       };
     case "MV-INS-QUOTE":
+      return { quote: "We were spending more time chasing files than shipping content.", attribution: "Global Marketing Lead", role: "Enterprise client" };
+
+    case "MV-SOL-PILLARS-2":
       return {
-        quote: "We were spending more time chasing files than shipping content.",
-        attribution: "Global Marketing Lead",
-        role: "Enterprise client",
+        title: "Two shifts, one program",
+        items: [
+          { title: "Unified intake", body: "One request surface across content types and markets, with the brief carried through every step of the workflow." },
+          { title: "AI-assisted review", body: "Model-in-the-loop QA that keeps your specialists focused on the exceptions, not the routine." },
+        ],
       };
     case "MV-SOL-PILLARS-3":
       return {
@@ -172,6 +248,39 @@ function seedContent(variantId: string, brief: Brief, sectionName: string): Slid
           { title: "Analytics", body: "SLA, quality, and cost dashboards." },
         ],
       };
+    case "MV-SOL-PILLARS-5":
+      return {
+        title: "The program at a glance",
+        hero: { title: "Unified intake", body: "One request surface that carries your brief and rules through every downstream step." },
+        items: [
+          { title: "Translation", body: "150+ languages, subject-matter matched." },
+          { title: "AI-assisted QA", body: "Model-in-the-loop review." },
+          { title: "Governed publish", body: "Approved-only routing." },
+          { title: "Analytics", body: "SLA, quality, and cost dashboards." },
+        ],
+      };
+    case "MV-SOL-ARCHITECTURE":
+      return {
+        title: "How the program is built",
+        items: [
+          { label: "Experience layer", body: "Intake, review, and status surfaces for requesters and reviewers." },
+          { label: "Workflow engine", body: "Routing, SLAs, and approvals across content types and markets." },
+          { label: "AI + language services", body: "Translation, QA, and terminology enforcement." },
+          { label: "Integrations", body: "CMS, DAM, PIM, and channel systems your teams already use." },
+        ],
+      };
+    case "MV-SOL-FEATURE-LIST":
+      return {
+        title: "What's included",
+        items: [
+          { label: "Single intake", body: "One form, all content types." },
+          { label: "Terminology enforcement", body: "Approved glossaries at the source." },
+          { label: "AI-assisted QA", body: "Auto-flag off-brand or off-policy output." },
+          { label: "Reviewer workbench", body: "In-context edits, not spreadsheet comments." },
+          { label: "SLA dashboard", body: "Program leaders see status in real time." },
+          { label: "Channel connectors", body: "Publish only what's approved." },
+        ],
+      };
     case "MV-PROC-TIMELINE":
       return {
         title: "How we get there",
@@ -179,6 +288,30 @@ function seedContent(variantId: string, brief: Brief, sectionName: string): Slid
           { label: "Week 1", body: "Discovery + intake mapping" },
           { label: "Week 2–3", body: "Pilot market and content type" },
           { label: "Week 4", body: "Review + scale plan" },
+        ],
+      };
+    case "MV-PROC-PHASES":
+      return {
+        title: "A three-phase rollout",
+        items: [
+          { label: "Discover", body: "Two-week intake mapping across the priority content types and markets." },
+          { label: "Pilot", body: "One market, one content type — measurable results in a single quarter." },
+          { label: "Scale", body: "Expand to the full portfolio with governance and analytics in place." },
+        ],
+      };
+    case "MV-PROC-BEFORE-AFTER":
+      return {
+        title: "What changes",
+        before: { title: "Requests scattered across tools", body: "Each team files requests differently, reviewers see files without context, and status lives in spreadsheets." },
+        after: { title: "One intake, one workflow", body: "Every request carries its brief and rules downstream. Reviewers see context, and status is live for program leaders." },
+      };
+
+    case "MV-PROOF-STATS-2":
+      return {
+        title: "Proof",
+        items: [
+          { value: "36", unit: "%", label: "faster time to market", source: "TransPerfect benchmark, 2025" },
+          { value: "22", unit: "%", label: "lower cost per project", source: "Client rollout, 2024" },
         ],
       };
     case "MV-PROOF-STATS-3":
@@ -190,36 +323,165 @@ function seedContent(variantId: string, brief: Brief, sectionName: string): Slid
           { value: "99.5", unit: "%", label: "QA acceptance rate", source: "Managed program data, 2025" },
         ],
       };
-    case "MV-DEC-MATRIX":
+    case "MV-PROOF-STATS-4":
       return {
-        title: "Where each option lands",
-        axisX: "Speed",
-        axisY: "Control",
-        q1: "Managed program",
-        q2: "In-house team",
-        q3: "Freelance stack",
-        q4: "Point tools",
+        title: "Proof at scale",
+        items: [
+          { value: "36", unit: "%", label: "faster time to market", source: "2025" },
+          { value: "22", unit: "%", label: "lower cost per project", source: "2024" },
+          { value: "99.5", unit: "%", label: "QA acceptance rate", source: "2025" },
+          { value: "150", unit: "+", label: "languages supported", source: "2025" },
+        ],
       };
+    case "MV-PROOF-LOGOS":
+      return {
+        title: "Trusted by",
+        items: [
+          { name: "Client A" }, { name: "Client B" }, { name: "Client C" }, { name: "Client D" },
+          { name: "Client E" }, { name: "Client F" }, { name: "Client G" }, { name: "Client H" },
+        ],
+      };
+    case "MV-PROOF-TESTIMONIAL":
+      return {
+        quote: "The program cut our launch cycle nearly in half without adding a single reviewer.",
+        attribution: "VP, Global Marketing",
+        role: "Fortune 500 life sciences",
+        metric: "-46% cycle time",
+      };
+
+    case "MV-DEC-MATRIX":
+      return { title: "Where each option lands", axisX: "Speed", axisY: "Control", q1: "Managed program", q2: "In-house team", q3: "Freelance stack", q4: "Point tools" };
+    case "MV-DEC-COMPARE-TABLE":
+      return {
+        title: "Where TransPerfect wins",
+        columns: [{ label: "In-house" }, { label: "Freelance stack" }, { label: "TransPerfect" }],
+        items: [
+          { criterion: "Time to first launch", values: ["6 months", "10 weeks", "4 weeks"] },
+          { criterion: "SLA on QA", values: ["Best effort", "Per vendor", "Contractual"] },
+          { criterion: "Program analytics", values: ["Manual", "None", "Included"] },
+          { criterion: "Reviewer workbench", values: ["Ad hoc", "Files", "In-product"] },
+        ],
+      };
+    case "MV-DEC-CHECKLIST":
+      return {
+        title: "What a good decision looks like",
+        items: [
+          { label: "Reduces cycle time in a measurable window", note: "Signal by end of quarter one." },
+          { label: "Doesn't require growing the review team", note: "AI-assisted QA carries the routine load." },
+          { label: "Fits your existing CMS and DAM", note: "No system-of-record replacement." },
+          { label: "Meets regulated-market audit needs", note: "Full traceability of every change." },
+        ],
+      };
+    case "MV-COMM-PRICING":
+      return {
+        title: "Program options",
+        items: [
+          { name: "Pilot", price: "$45k", unit: "one quarter", features: ["1 market", "1 content type", "SLA on QA", "Program readout"] },
+          { name: "Program", price: "$220k", unit: "annualized", features: ["Up to 8 markets", "All content types", "Reviewer workbench", "Live SLA dashboard"] },
+          { name: "Enterprise", price: "Custom", unit: "portfolio-wide", features: ["Global rollout", "Dedicated delivery lead", "Executive QBRs", "Custom integrations"] },
+        ],
+      };
+    case "MV-COMM-INVESTMENT":
+      return {
+        title: "Investment",
+        amount: "$220k",
+        unit: "annualized · all-in",
+        items: [
+          { label: "Managed program with dedicated delivery lead" },
+          { label: "Up to 8 markets across all content types" },
+          { label: "AI-assisted QA + reviewer workbench" },
+          { label: "Live SLA and quality dashboards" },
+          { label: "Quarterly executive business reviews" },
+        ],
+      };
+    case "MV-RISK-MITIGATION":
+      return {
+        title: "Risk & mitigation",
+        items: [
+          { risk: "Pilot doesn't hit its cycle-time target", mitigation: "Weekly checkpoints in month one; scope adjustment built into the pilot SOW." },
+          { risk: "Reviewer adoption lags", mitigation: "In-product coaching and a named change lead assigned in week one." },
+          { risk: "Integration takes longer than planned", mitigation: "Parallel-run mode; program runs before full integration completes." },
+        ],
+      };
+
     case "MV-CASE-SPREAD":
+      return { client: "Global life-sciences leader", challenge: "Localized 4,000+ regulated documents / year across 28 markets.", solution: "TransPerfect managed program with AI-assisted QA and single intake.", result: "38% faster launches, zero regulatory reopenings.", metric: "38% ↓ time to market" };
+    case "MV-CASE-METRICS":
       return {
         client: "Global life-sciences leader",
-        challenge: "Localized 4,000+ regulated documents / year across 28 markets.",
-        solution: "TransPerfect managed program with AI-assisted QA and single intake.",
+        summary: "Regulated documents across 28 markets — moved from a fragmented vendor stack to a governed managed program.",
+        items: [
+          { value: "38", unit: "%", label: "faster launches" },
+          { value: "0", unit: "", label: "regulatory reopenings" },
+          { value: "22", unit: "%", label: "lower program cost" },
+        ],
+      };
+    case "MV-CASE-STORY":
+      return {
+        client: "Global life-sciences leader",
+        headline: "From 28 vendors to one program in two quarters.",
+        story: "The team was managing 28 in-market vendors, all with their own SLAs and none of them talking to each other. The fix wasn't more vendors — it was one program that carried the brief and the terminology all the way through review. In two quarters they were down to a single system of record and reviewers who saw context on day one.",
         result: "38% faster launches, zero regulatory reopenings.",
-        metric: "38% ↓ time to market",
       };
+    case "MV-CASE-LOGO-GRID":
+      return {
+        title: "How this has worked for others",
+        items: [
+          { client: "Life-sciences leader", result: "38% faster launches" },
+          { client: "Global bank", result: "Reg comms in 22 markets" },
+          { client: "Consumer tech", result: "Launch parity across 14 languages" },
+          { client: "Retail", result: "24% lower content cost" },
+          { client: "Insurance", result: "Audit-ready in every market" },
+          { client: "Automotive", result: "Model launches on one timeline" },
+        ],
+      };
+
+    case "MV-TEAM-BIOS-3":
+      return {
+        title: "Your core team",
+        items: [
+          { name: "Alex Rivera", role: "Account Director", bio: "12 years running enterprise language programs across regulated industries." },
+          { name: "Priya Shah", role: "Solutions Lead", bio: "Designs the operating model that fits your review, tooling, and audit needs." },
+          { name: "Marco Bianchi", role: "Delivery Lead", bio: "Owns the day-to-day of the program and the SLA you see in the dashboard." },
+        ],
+      };
+    case "MV-TEAM-BIOS-4":
+      return {
+        title: "Your core team",
+        items: [
+          { name: "Alex Rivera", role: "Account Director", bio: "Owns the relationship and the roadmap." },
+          { name: "Priya Shah", role: "Solutions Lead", bio: "Designs the operating model." },
+          { name: "Marco Bianchi", role: "Delivery Lead", bio: "Runs the day-to-day of the program." },
+          { name: "Sara Kim", role: "Language Ops Lead", bio: "Owns linguistic quality across markets." },
+        ],
+      };
+    case "MV-GOV-RACI":
+      return {
+        title: "How we run the program",
+        items: [
+          { forum: "Weekly stand-up", cadence: "Weekly · 30 min", purpose: "Delivery status, blockers, next-week plan." },
+          { forum: "Monthly steering", cadence: "Monthly · 60 min", purpose: "Program KPIs, escalations, upcoming market changes." },
+          { forum: "Quarterly business review", cadence: "Quarterly · 90 min", purpose: "Outcomes vs. targets, roadmap, investment decisions." },
+        ],
+      };
+
     case "MV-REC-NEXT":
-      return {
-        recommendation: `We recommend ${brief.prospect} start with a focused pilot in the highest-volume market.`,
-        rationale: "This isolates the workflow change, produces measurable results in one quarter, and de-risks the enterprise rollout.",
-      };
+      return { recommendation: `We recommend ${clientName} start with a focused pilot in the highest-volume market.`, rationale: "This isolates the workflow change, produces measurable results in one quarter, and de-risks the enterprise rollout." };
     case "MV-CLOSE-CTA":
+      return { message: "Ready to scope the pilot.", nextSteps: "Two-week discovery, then a two-month pilot in one priority market.", owner: "TransPerfect account team", followUp: "Kickoff within 10 business days of sign-off." };
+    case "MV-CLOSE-THANKS":
+      return { message: "Thank you.", signoff: "TransPerfect — Global Content, Local Precision" };
+    case "MV-CLOSE-QNA":
+      return { title: "Questions", prompt: "Open discussion — what's the piece you'd want to pressure-test first?" };
+    case "MV-CLOSE-CONTACT":
       return {
-        message: "Ready to scope the pilot.",
-        nextSteps: "Two-week discovery, then a two-month pilot in one priority market.",
-        owner: "TransPerfect account team",
-        followUp: "Kickoff within 10 business days of sign-off.",
+        title: "Stay in touch",
+        items: [
+          { name: "Alex Rivera", role: "Account Director", email: "alex.rivera@transperfect.com", phone: "+1 212 555 0123" },
+          { name: "Priya Shah", role: "Solutions Lead", email: "priya.shah@transperfect.com", phone: "+1 212 555 0456" },
+        ],
       };
+
     default:
       return { title: sectionName };
   }
