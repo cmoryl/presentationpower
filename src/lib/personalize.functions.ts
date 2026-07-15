@@ -20,6 +20,18 @@ const BriefInput = z.object({
   meetingObjective: z.string(),
   clientFacts: z.string().optional().default(""),
   archetypeName: z.string(),
+  // Optional brand-scoped context — when provided, the rewriter stays within
+  // the brand's world (industries, service lines, case-study tags) so a
+  // DataForce deck doesn't drift into eDiscovery language, etc.
+  brandScope: z
+    .object({
+      brandName: z.string().optional(),
+      role: z.string().optional(),
+      industries: z.array(z.string()).default([]),
+      serviceLines: z.array(z.string()).default([]),
+      caseStudyTags: z.array(z.string()).default([]),
+    })
+    .optional(),
 });
 
 const InputSchema = z.object({
