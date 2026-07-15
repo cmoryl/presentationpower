@@ -98,55 +98,64 @@ export const BRAND_MODES: BrandMode[] = [
     id: "bm-enterprise",
     name: "Enterprise",
     description: "TransPerfect master brand",
-    tokens: { primary: "#0B2A4A", accent: "#E85A2C", surface: "#F5F1EA", ink: "#0A0F1C" },
+    // TP Blue 800 primary + Blue 500 accent — master brand
+    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#F2F2F2", ink: "#03002C" },
   },
   {
     id: "bm-subcompany",
     name: "Subcompany",
     description: "Named subcompany within TransPerfect",
-    tokens: { primary: "#1F3A6B", accent: "#E85A2C", surface: "#F5F1EA", ink: "#0A0F1C" },
+    // TP Blue 500 primary + Aqua accent
+    tokens: { primary: "#003FC7", accent: "#A1FBF9", surface: "#E0E8F5", ink: "#03002C" },
   },
   {
     id: "bm-division",
     name: "Division",
     description: "Business division brand mode",
-    tokens: { primary: "#284B63", accent: "#F2A65A", surface: "#F5F1EA", ink: "#0A0F1C" },
+    // Blue 130F4D + Lavender accent
+    tokens: { primary: "#130F4D", accent: "#C2A3FF", surface: "#F2F2F2", ink: "#03002C" },
   },
   {
     id: "bm-product",
     name: "Product",
     description: "Named product brand mode",
-    tokens: { primary: "#111827", accent: "#22C1C3", surface: "#F5F1EA", ink: "#0A0F1C" },
+    // Blue 800 + Aqua
+    tokens: { primary: "#03002C", accent: "#A1FBF9", surface: "#F2F2F2", ink: "#03002C" },
   },
   {
     id: "bm-tp-media",
     name: "TransPerfect Media",
     description: "Media localization: dubbing, subtitling, access services",
-    tokens: { primary: "#141B34", accent: "#F04E45", surface: "#F5F1EA", ink: "#0A0F1C" },
+    // Blue 800 + Pink pop
+    tokens: { primary: "#03002C", accent: "#EC388A", surface: "#F2F2F2", ink: "#03002C" },
   },
   {
     id: "bm-tp-legal",
     name: "TransPerfect Legal",
     description: "Legal solutions: eDiscovery, litigation, IP, legal translation",
-    tokens: { primary: "#1B2A41", accent: "#B8862F", surface: "#F5F1EA", ink: "#0A0F1C" },
+    // Deep Blue 002673 + Yellow pop
+    tokens: { primary: "#002673", accent: "#FFEB66", surface: "#F2F2F2", ink: "#03002C" },
   },
   {
     id: "bm-tp-games",
     name: "TransPerfect Gaming",
     description: "Game localization, LQA, audio & community services",
-    tokens: { primary: "#0E1626", accent: "#7C3AED", surface: "#F5F1EA", ink: "#0A0F1C" },
+    // Blue 130F4D + Lavender
+    tokens: { primary: "#130F4D", accent: "#C2A3FF", surface: "#F2F2F2", ink: "#03002C" },
   },
   {
     id: "bm-tp-digital",
     name: "TransPerfect Digital",
     description: "Digital marketing, web localization & experience",
-    tokens: { primary: "#0B2A4A", accent: "#22C1C3", surface: "#F5F1EA", ink: "#0A0F1C" },
+    // Blue 500 + Aqua
+    tokens: { primary: "#003FC7", accent: "#A1FBF9", surface: "#E0E8F5", ink: "#03002C" },
   },
   {
     id: "bm-cobrand",
     name: "Co-brand",
     description: "Co-branded with client or partner",
-    tokens: { primary: "#0B2A4A", accent: "#8E44AD", surface: "#F5F1EA", ink: "#0A0F1C" },
+    // Blue 800 + Peach
+    tokens: { primary: "#03002C", accent: "#FF9B70", surface: "#F2F2F2", ink: "#03002C" },
   },
 ];
 
