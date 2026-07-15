@@ -9,9 +9,11 @@ import ambient from "@/assets/backdrops/backdrop-ambient.jpg";
 import team from "@/assets/backdrops/backdrop-team.jpg";
 import city from "@/assets/backdrops/backdrop-city.jpg";
 import abstractAsset from "@/assets/backdrops/backdrop-abstract.png.asset.json";
+import bokehAsset from "@/assets/backdrops/backdrop-bokeh.png.asset.json";
 
 const PORTRAITS = [portrait1, portrait2, portrait3, portrait4];
 const abstract = abstractAsset.url;
+const bokeh = bokehAsset.url;
 
 function hashStr(s: string): number {
   let h = 0;
