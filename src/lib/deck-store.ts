@@ -410,37 +410,44 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         ],
       };
 
-    case "MV-CASE-SPREAD":
-      return { client: "Global life-sciences leader", challenge: "Localized 4,000+ regulated documents / year across 28 markets.", solution: "TransPerfect managed program with AI-assisted QA and single intake.", result: "38% faster launches, zero regulatory reopenings.", metric: "38% ↓ time to market" };
-    case "MV-CASE-METRICS":
+    case "MV-CASE-SPREAD": {
+      const cs = pickCaseStudy(brief.brandModeId, brief.industry);
       return {
-        client: "Global life-sciences leader",
-        summary: "Regulated documents across 28 markets — moved from a fragmented vendor stack to a governed managed program.",
-        items: [
-          { value: "38", unit: "%", label: "faster launches" },
-          { value: "0", unit: "", label: "regulatory reopenings" },
-          { value: "22", unit: "%", label: "lower program cost" },
-        ],
+        client: cs.client,
+        challenge: cs.challenge,
+        solution: cs.solution,
+        result: cs.result,
+        metric: cs.metric,
       };
-    case "MV-CASE-STORY":
+    }
+    case "MV-CASE-METRICS": {
+      const cs = pickCaseStudy(brief.brandModeId, brief.industry);
       return {
-        client: "Global life-sciences leader",
-        headline: "From 28 vendors to one program in two quarters.",
-        story: "The team was managing 28 in-market vendors, all with their own SLAs and none of them talking to each other. The fix wasn't more vendors — it was one program that carried the brief and the terminology all the way through review. In two quarters they were down to a single system of record and reviewers who saw context on day one.",
-        result: "38% faster launches, zero regulatory reopenings.",
+        client: cs.client,
+        summary: cs.challenge,
+        items: cs.stats.slice(0, 3).map(({ value, unit, label }) => ({ value, unit, label })),
       };
-    case "MV-CASE-LOGO-GRID":
+    }
+    case "MV-CASE-STORY": {
+      const cs = pickCaseStudy(brief.brandModeId, brief.industry);
+      return {
+        client: cs.client,
+        headline: cs.headline,
+        story: cs.story,
+        result: cs.result,
+      };
+    }
+    case "MV-CASE-LOGO-GRID": {
+      // Round-robin through the library, prioritizing brand-matched studies.
+      const primary = pickCaseStudy(brief.brandModeId, brief.industry);
+      const { CASE_STUDIES } = require("./case-studies") as typeof import("./case-studies");
+      const rest = CASE_STUDIES.filter((c: { id: string }) => c.id !== primary.id).slice(0, 5);
+      const ordered = [primary, ...rest].slice(0, 6);
       return {
         title: "How this has worked for others",
-        items: [
-          { client: "Life-sciences leader", result: "38% faster launches" },
-          { client: "Global bank", result: "Reg comms in 22 markets" },
-          { client: "Consumer tech", result: "Launch parity across 14 languages" },
-          { client: "Retail", result: "24% lower content cost" },
-          { client: "Insurance", result: "Audit-ready in every market" },
-          { client: "Automotive", result: "Model launches on one timeline" },
-        ],
+        items: ordered.map((c) => ({ client: c.client, result: c.metric })),
       };
+    }
 
     case "MV-TEAM-BIOS-3":
       return {
