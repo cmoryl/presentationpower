@@ -346,16 +346,36 @@ function renderVariantBody({
     case "MV-SOL-PILLARS-4":
       return <CardGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} />;
 
-    case "MV-CTX-COST":
+    case "MV-CTX-COST": {
+      const value = s(c.stat);
+      const unit = s(c.unit);
+      const font = statFontSize(value, unit);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <div className="grid h-full grid-cols-2 gap-20 pt-10">
-            <div className="flex flex-col justify-center">
-              <div className="text-[240px] font-semibold leading-none" style={{ color: brand.tokens.accent }}>
-                {s(c.stat)}
-                <span className="align-top text-[120px]">{s(c.unit)}</span>
+          <div className="grid h-full grid-cols-2 gap-16 pt-6">
+            <div
+              className="relative flex flex-col justify-center overflow-hidden rounded-2xl p-14"
+              style={{ backgroundColor: brand.tokens.primary, color: "#ffffff" }}
+            >
+              <div
+                className="pointer-events-none absolute -right-24 -top-24 rounded-full"
+                style={{ width: 460, height: 460, border: `32px solid ${brand.tokens.accent}`, opacity: 0.35 }}
+              />
+              <div className="relative text-lg uppercase tracking-[0.3em]" style={{ color: "rgba(255,255,255,0.7)" }}>
+                Cost of inaction
               </div>
-              <div className="mt-6 text-3xl opacity-80">{s(c.label)}</div>
+              <div
+                className="relative mt-6 font-semibold leading-[0.95] tabular-nums"
+                style={{ fontSize: font.valuePx }}
+              >
+                {value}
+                {unit && (
+                  <span className="ml-2 align-top font-medium" style={{ fontSize: font.unitPx, color: brand.tokens.accent }}>
+                    {unit}
+                  </span>
+                )}
+              </div>
+              <div className="relative mt-6 text-3xl opacity-90">{s(c.label)}</div>
             </div>
             <div className="flex items-center">
               <div className="text-4xl leading-snug">{s(c.narrative)}</div>
@@ -363,6 +383,7 @@ function renderVariantBody({
           </div>
         </SlideFrame>
       );
+    }
 
     case "MV-CTX-STAT-GRID":
     case "MV-PROOF-STATS-4":
