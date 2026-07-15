@@ -154,9 +154,12 @@ function Atlas() {
         </div>
       </Section>
 
+      <TypographySection />
+
       <IconographySection />
 
       <LogoPlacementSection />
+
 
       <div className="mt-14 rounded-2xl border border-dashed border-black/15 bg-white p-6 text-sm text-black/60">
         Want to see the pieces in action?{" "}
@@ -474,3 +477,123 @@ function LogoPlacementSection() {
     </Section>
   );
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// Typography
+// ────────────────────────────────────────────────────────────────────────────
+
+const TYPE_SCALE = [
+  { token: "display",  role: "Display / hero titles",         className: "text-6xl md:text-7xl font-semibold tracking-tight leading-[1.05]", sample: "A modular deck system.", spec: "72–96px · 600 · -0.02em" },
+  { token: "h1",       role: "Slide titles, page H1",          className: "text-4xl font-semibold tracking-tight leading-[1.1]",              sample: "Section frameworks and variants",   spec: "36px · 600 · -0.015em" },
+  { token: "h2",       role: "Section headings",               className: "text-2xl font-semibold tracking-tight",                            sample: "Narrative archetypes",              spec: "24px · 600" },
+  { token: "h3",       role: "Card / sub-section",             className: "text-xl font-semibold",                                            sample: "Module families",                   spec: "20px · 600" },
+  { token: "h4",       role: "In-slide labels",                className: "text-base font-medium",                                            sample: "Preferred variants",                spec: "16px · 500" },
+  { token: "body-lg",  role: "Lead paragraph",                 className: "text-lg leading-relaxed",                                          sample: "Every deck is assembled from these pieces.", spec: "18px · 400 · 1.65" },
+  { token: "body",     role: "Default body",                   className: "text-base leading-relaxed",                                        sample: "Section frameworks decide where you are in the story.", spec: "16px · 400 · 1.6" },
+  { token: "body-sm",  role: "Secondary body, captions",       className: "text-sm text-black/70 leading-relaxed",                            sample: "Loaded live from the Cloud taxonomy tables.", spec: "14px · 400" },
+  { token: "eyebrow",  role: "Eyebrow / section label",        className: "text-xs uppercase tracking-[0.3em] text-black/50",                 sample: "The Atlas",                          spec: "12px · 500 · 0.3em tracking" },
+  { token: "meta",     role: "IDs, tags, code refs",           className: "font-mono text-xs text-black/60",                                  sample: "MV-CASE-STORY · SF-04 · MF-03",     spec: "12px · Geist Mono" },
+];
+
+const WEIGHTS = [
+  { w: 400, label: "Regular"  },
+  { w: 500, label: "Medium"   },
+  { w: 600, label: "Semibold" },
+  { w: 700, label: "Bold"     },
+];
+
+function TypographySection() {
+  return (
+    <Section title="Typography" count={TYPE_SCALE.length}>
+      <p className="-mt-2 mb-6 max-w-3xl text-sm text-black/60">
+        Geist is the master typeface across every surface — briefs, decks, atlas, and exports.
+        Geist Sans carries all headings and body copy; Geist Mono carries IDs, tags, and code references.
+        The hierarchy below is authoritative — never introduce new sizes ad-hoc in a slide.
+      </p>
+
+      {/* Master faces */}
+      <div className="mb-8 grid gap-4 md:grid-cols-2">
+        <div className="rounded-2xl border border-black/10 bg-white p-6">
+          <div className="mb-3 flex items-baseline justify-between">
+            <div className="text-xs uppercase tracking-widest text-black/50">Primary — Geist Sans</div>
+            <span className="font-mono text-[10px] text-black/50">--font-sans</span>
+          </div>
+          <div className="font-sans text-5xl font-semibold tracking-tight leading-none">Aa Bb Cc</div>
+          <div className="mt-2 font-sans text-sm text-black/60">
+            The quick brown fox jumps over the lazy dog. 0123456789
+          </div>
+          <div className="mt-4 flex flex-wrap gap-3">
+            {WEIGHTS.map((w) => (
+              <div key={w.w} className="rounded-lg border border-black/10 px-3 py-2">
+                <div className="font-sans text-lg" style={{ fontWeight: w.w }}>Ag</div>
+                <div className="mt-1 font-mono text-[10px] text-black/50">{w.w} · {w.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-black/10 bg-white p-6">
+          <div className="mb-3 flex items-baseline justify-between">
+            <div className="text-xs uppercase tracking-widest text-black/50">Secondary — Geist Mono</div>
+            <span className="font-mono text-[10px] text-black/50">--font-mono</span>
+          </div>
+          <div className="font-mono text-5xl font-semibold tracking-tight leading-none">Aa Bb Cc</div>
+          <div className="mt-2 font-mono text-sm text-black/60">
+            MV-CASE-STORY · SF-04 · MF-03 · 0123456789
+          </div>
+          <div className="mt-4 flex flex-wrap gap-3">
+            {WEIGHTS.slice(0, 3).map((w) => (
+              <div key={w.w} className="rounded-lg border border-black/10 px-3 py-2">
+                <div className="font-mono text-lg" style={{ fontWeight: w.w }}>Ag</div>
+                <div className="mt-1 font-mono text-[10px] text-black/50">{w.w} · {w.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Hierarchy */}
+      <div className="mb-3 text-xs uppercase tracking-widest text-black/50">Hierarchy</div>
+      <div className="overflow-hidden rounded-2xl border border-black/10 bg-white">
+        {TYPE_SCALE.map((t, i) => (
+          <div
+            key={t.token}
+            className={`grid grid-cols-[7rem_minmax(0,1fr)_11rem] items-baseline gap-4 px-6 py-5 ${
+              i > 0 ? "border-t border-black/5" : ""
+            }`}
+          >
+            <div>
+              <div className="font-mono text-xs text-black/70">{t.token}</div>
+              <div className="mt-0.5 text-[11px] text-black/45">{t.role}</div>
+            </div>
+            <div className={t.className}>{t.sample}</div>
+            <div className="text-right font-mono text-[10px] text-black/45">{t.spec}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Rules */}
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
+        <div className="rounded-2xl border border-black/10 bg-white p-5">
+          <div className="mb-2 font-medium">Usage rules</div>
+          <ul className="list-inside list-disc space-y-1 text-sm text-black/70">
+            <li>Every route sets exactly one <span className="font-mono text-xs">display</span> or <span className="font-mono text-xs">h1</span> — never both.</li>
+            <li>Body copy stays at <span className="font-mono text-xs">body</span> or <span className="font-mono text-xs">body-lg</span>; drop to <span className="font-mono text-xs">body-sm</span> only for captions and metadata.</li>
+            <li>IDs (variants, layouts, sections) always use <span className="font-mono text-xs">meta</span> — Geist Mono at 12px.</li>
+            <li>Eyebrows carry a section's context, not decoration — use once per section, above the heading.</li>
+          </ul>
+        </div>
+        <div className="rounded-2xl border border-black/10 bg-white p-5">
+          <div className="mb-2 font-medium">Do &amp; don't</div>
+          <ul className="list-inside list-disc space-y-1 text-sm text-black/70">
+            <li>Do keep <span className="font-mono text-xs">tracking-tight</span> on headings — Geist wants slightly negative letter-spacing above 24px.</li>
+            <li>Do reserve <span className="font-mono text-xs">700</span> for emphasis inside body copy; headings top out at <span className="font-mono text-xs">600</span>.</li>
+            <li>Don't introduce a serif or a competing sans anywhere in a deck.</li>
+            <li>Don't set line-height below 1.4 on body copy or below 1.05 on display.</li>
+          </ul>
+        </div>
+      </div>
+    </Section>
+  );
+}
+
