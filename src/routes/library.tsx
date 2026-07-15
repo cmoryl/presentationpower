@@ -257,6 +257,8 @@ function VariantDetailModal({
   brands,
   brandIdx,
   setBrandIdx,
+  mode,
+  setMode,
   family,
   fallback,
   layouts,
@@ -268,6 +270,8 @@ function VariantDetailModal({
   brands: ReturnType<typeof useTaxonomy>["brandModes"];
   brandIdx: number;
   setBrandIdx: (i: number) => void;
+  mode: "light" | "dark";
+  setMode: (m: "light" | "dark") => void;
   family: ReturnType<typeof useTaxonomy>["moduleFamilies"][number] | undefined;
   fallback: ModuleVariant | undefined;
   layouts: ReturnType<typeof useTaxonomy>["layoutFrameworks"];
@@ -332,22 +336,40 @@ function VariantDetailModal({
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
           {/* Large preview */}
           <div className="border-b border-black/10 bg-neutral-50 p-6 lg:border-b-0 lg:border-r">
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-3 flex items-center justify-between gap-3">
               <div className="text-xs uppercase tracking-widest text-black/50">Preview</div>
-              <select
-                value={brandIdx}
-                onChange={(e) => setBrandIdx(Number(e.target.value))}
-                className="rounded-lg border border-black/15 bg-white px-2 py-1 text-xs"
-              >
-                {brands.map((b, i) => (
-                  <option key={b.id} value={i}>{b.name}</option>
-                ))}
-              </select>
+              <div className="flex items-center gap-2">
+                <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => setMode("light")}
+                    className={`px-2.5 py-1 ${mode === "light" ? "bg-[#03002C] text-white" : "text-black/60"}`}
+                  >
+                    ☀︎
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMode("dark")}
+                    className={`px-2.5 py-1 ${mode === "dark" ? "bg-[#03002C] text-white" : "text-black/60"}`}
+                  >
+                    ☾
+                  </button>
+                </div>
+                <select
+                  value={brandIdx}
+                  onChange={(e) => setBrandIdx(Number(e.target.value))}
+                  className="rounded-lg border border-black/15 bg-white px-2 py-1 text-xs"
+                >
+                  {brands.map((b, i) => (
+                    <option key={b.id} value={i}>{b.name}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className="overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm">
               <div className="aspect-[16/9]">
                 <ScaledSlide>
-                  <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} />
+                  <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
                 </ScaledSlide>
               </div>
             </div>
