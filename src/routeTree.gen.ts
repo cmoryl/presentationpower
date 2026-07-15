@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DecksDeckIdRouteImport } from './routes/decks.$deckId'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
+import { Route as AdminApprovalsRouteImport } from './routes/admin.approvals'
 import { Route as DecksDeckIdPresentRouteImport } from './routes/decks.$deckId.present'
 import { Route as DecksDeckIdExportRouteImport } from './routes/decks.$deckId.export'
 
@@ -48,6 +49,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminApprovalsRoute = AdminApprovalsRouteImport.update({
+  id: '/admin/approvals',
+  path: '/admin/approvals',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DecksDeckIdPresentRoute = DecksDeckIdPresentRouteImport.update({
   id: '/present',
   path: '/present',
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/atlas': typeof AtlasRoute
   '/library': typeof LibraryRoute
+  '/admin/approvals': typeof AdminApprovalsRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/atlas': typeof AtlasRoute
   '/library': typeof LibraryRoute
+  '/admin/approvals': typeof AdminApprovalsRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/atlas': typeof AtlasRoute
   '/library': typeof LibraryRoute
+  '/admin/approvals': typeof AdminApprovalsRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/atlas'
     | '/library'
+    | '/admin/approvals'
     | '/api/chat'
     | '/brief/new'
     | '/decks/$deckId'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/atlas'
     | '/library'
+    | '/admin/approvals'
     | '/api/chat'
     | '/brief/new'
     | '/decks/$deckId'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/'
     | '/atlas'
     | '/library'
+    | '/admin/approvals'
     | '/api/chat'
     | '/brief/new'
     | '/decks/$deckId'
@@ -127,6 +139,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AtlasRoute: typeof AtlasRoute
   LibraryRoute: typeof LibraryRoute
+  AdminApprovalsRoute: typeof AdminApprovalsRoute
   ApiChatRoute: typeof ApiChatRoute
   BriefNewRoute: typeof BriefNewRoute
   DecksDeckIdRoute: typeof DecksDeckIdRouteWithChildren
@@ -176,6 +189,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/approvals': {
+      id: '/admin/approvals'
+      path: '/admin/approvals'
+      fullPath: '/admin/approvals'
+      preLoaderRoute: typeof AdminApprovalsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/decks/$deckId/present': {
       id: '/decks/$deckId/present'
       path: '/present'
@@ -211,6 +231,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AtlasRoute: AtlasRoute,
   LibraryRoute: LibraryRoute,
+  AdminApprovalsRoute: AdminApprovalsRoute,
   ApiChatRoute: ApiChatRoute,
   BriefNewRoute: BriefNewRoute,
   DecksDeckIdRoute: DecksDeckIdRouteWithChildren,
