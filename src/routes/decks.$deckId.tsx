@@ -95,7 +95,7 @@ function DeckEditor() {
                 >
                   <div className="aspect-[16/9] bg-white">
                     <ScaledSlide>
-                      {variant && <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} />}
+                      {variant && <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} />}
                     </ScaledSlide>
                   </div>
                   <div className="border-t border-black/10 bg-white px-3 py-2 text-xs">
@@ -124,7 +124,7 @@ function DeckEditor() {
           <div className="overflow-hidden rounded-2xl border border-black/10 shadow-lg">
             {active && mv && (
               <ScaledSlide>
-                <VariantRenderer slide={active} variant={mv} brand={brand} pageNumber={clamped + 1} />
+                <VariantRenderer slide={active} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} />
               </ScaledSlide>
             )}
           </div>

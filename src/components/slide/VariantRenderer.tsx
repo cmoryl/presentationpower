@@ -1,6 +1,25 @@
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
-import { SlideFrame } from "./SlideChrome";
+import { SlideFrame as BaseSlideFrame } from "./SlideChrome";
+import { createContext, useContext } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
+
+// Module-scoped context so helper components (CardGrid, StatGrid, NumberedList,
+// etc.) automatically pick up the current slide's clientName + layoutId when
+// they wrap themselves in <SlideFrame>. VariantRenderer sets the value once
+// per render.
+const SlideFrameCtx = createContext<{ clientName?: string; layoutId?: string }>({});
+
+function SlideFrame(props: ComponentProps<typeof BaseSlideFrame>) {
+  const ctx = useContext(SlideFrameCtx);
+  return (
+    <BaseSlideFrame
+      {...props}
+      clientName={props.clientName ?? ctx.clientName}
+      layoutId={props.layoutId ?? ctx.layoutId}
+    />
+  );
+}
 import {
   ICON_SIZES,
   resolveEmphasisColors,
@@ -140,6 +159,7 @@ type Props = {
   variant: ModuleVariant;
   brand: BrandMode;
   pageNumber: number;
+  clientName?: string;
 };
 
 type Item = Record<string, unknown>;
@@ -149,8 +169,31 @@ const obj = (v: unknown): Record<string, unknown> => (v && typeof v === "object"
 const strs = (v: unknown): string[] => (Array.isArray(v) ? (v as unknown[]).map((x) => s(x)) : []);
 
 export function VariantRenderer(props: Props) {
-  const { slide, variant, brand, pageNumber } = props;
+  const { slide, variant, brand, pageNumber, clientName } = props;
   const c = slide.content as Record<string, unknown>;
+  const contentClientName = s((slide.content as Record<string, unknown>).clientName) || undefined;
+  const resolvedClient = clientName || contentClientName;
+
+  return (
+    <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId }}>
+      {renderVariantBody({ slide, variant, brand, pageNumber, c })}
+    </SlideFrameCtx.Provider>
+  );
+}
+
+function renderVariantBody({
+  slide,
+  variant,
+  brand,
+  pageNumber,
+  c,
+}: {
+  slide: DeckSlide;
+  variant: ModuleVariant;
+  brand: BrandMode;
+  pageNumber: number;
+  c: Record<string, unknown>;
+}): ReactNode {
 
   switch (variant.id) {
     // ── Opening ────────────────────────────────────────────────────────

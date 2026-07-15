@@ -16,6 +16,7 @@ export const Route = createFileRoute("/decks/$deckId/export")({
 function ExportView() {
   const { deckId } = Route.useParams();
   const deck = useDeckStore((s) => s.decks[deckId]);
+  const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const [exporting, setExporting] = useState(false);
   const [override, setOverride] = useState(false);
   if (!deck) throw notFound();
@@ -144,7 +145,7 @@ function ExportView() {
             >
               <div className="aspect-[16/9] w-full">
                 <ScaledSlide>
-                  <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} />
+                  <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} />
                 </ScaledSlide>
               </div>
             </div>

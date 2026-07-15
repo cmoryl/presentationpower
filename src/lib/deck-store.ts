@@ -11,6 +11,8 @@ import {
   byId,
   variantsForSection,
 } from "./taxonomy";
+import { BRAND_PROFILES } from "./brand-profiles";
+import { pickCaseStudy, pickProofLogos, CASE_STUDIES } from "./case-studies";
 
 export type BrandModeId = string;
 
@@ -79,10 +81,13 @@ type DeckState = {
 function assembleDeck(brief: Brief): Deck {
   const arch = byId(NARRATIVE_ARCHETYPES, brief.archetypeId);
   const recipe = (arch?.sectionRecipe ?? []).slice(0, Math.max(brief.lengthTarget, 4));
+  const profile = BRAND_PROFILES[brief.brandModeId];
+  const restricted = new Set(profile?.contentScope.restrictedFamilyIds ?? []);
   const slides: DeckSlide[] = recipe.map((sfId, i) => {
     const sf = byId(SECTION_FRAMEWORKS, sfId);
-    const options = variantsForSection(sfId);
-    const variant = options[0] ?? MODULE_VARIANTS[0];
+    const options = variantsForSection(sfId).filter((v) => !restricted.has(v.familyId));
+    const fallback = variantsForSection(sfId);
+    const variant = options[0] ?? fallback[0] ?? MODULE_VARIANTS[0];
     const layoutId = variant.permittedLayoutIds[0];
     return {
       id: nanoid(8),
@@ -338,18 +343,17 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
     case "MV-PROOF-LOGOS":
       return {
         title: "Trusted by",
-        items: [
-          { name: "Client A" }, { name: "Client B" }, { name: "Client C" }, { name: "Client D" },
-          { name: "Client E" }, { name: "Client F" }, { name: "Client G" }, { name: "Client H" },
-        ],
+        items: pickProofLogos(brief.brandModeId),
       };
-    case "MV-PROOF-TESTIMONIAL":
+    case "MV-PROOF-TESTIMONIAL": {
+      const cs = pickCaseStudy(brief.brandModeId, brief.industry);
       return {
-        quote: "The program cut our launch cycle nearly in half without adding a single reviewer.",
-        attribution: "VP, Global Marketing",
-        role: "Fortune 500 life sciences",
-        metric: "-46% cycle time",
+        quote: cs.quote,
+        attribution: cs.attribution,
+        role: cs.role,
+        metric: cs.metric,
       };
+    }
 
     case "MV-DEC-MATRIX":
       return { title: "Where each option lands", axisX: "Speed", axisY: "Control", q1: "Managed program", q2: "In-house team", q3: "Freelance stack", q4: "Point tools" };
@@ -406,37 +410,43 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         ],
       };
 
-    case "MV-CASE-SPREAD":
-      return { client: "Global life-sciences leader", challenge: "Localized 4,000+ regulated documents / year across 28 markets.", solution: "TransPerfect managed program with AI-assisted QA and single intake.", result: "38% faster launches, zero regulatory reopenings.", metric: "38% ↓ time to market" };
-    case "MV-CASE-METRICS":
+    case "MV-CASE-SPREAD": {
+      const cs = pickCaseStudy(brief.brandModeId, brief.industry);
       return {
-        client: "Global life-sciences leader",
-        summary: "Regulated documents across 28 markets — moved from a fragmented vendor stack to a governed managed program.",
-        items: [
-          { value: "38", unit: "%", label: "faster launches" },
-          { value: "0", unit: "", label: "regulatory reopenings" },
-          { value: "22", unit: "%", label: "lower program cost" },
-        ],
+        client: cs.client,
+        challenge: cs.challenge,
+        solution: cs.solution,
+        result: cs.result,
+        metric: cs.metric,
       };
-    case "MV-CASE-STORY":
+    }
+    case "MV-CASE-METRICS": {
+      const cs = pickCaseStudy(brief.brandModeId, brief.industry);
       return {
-        client: "Global life-sciences leader",
-        headline: "From 28 vendors to one program in two quarters.",
-        story: "The team was managing 28 in-market vendors, all with their own SLAs and none of them talking to each other. The fix wasn't more vendors — it was one program that carried the brief and the terminology all the way through review. In two quarters they were down to a single system of record and reviewers who saw context on day one.",
-        result: "38% faster launches, zero regulatory reopenings.",
+        client: cs.client,
+        summary: cs.challenge,
+        items: cs.stats.slice(0, 3).map(({ value, unit, label }) => ({ value, unit, label })),
       };
-    case "MV-CASE-LOGO-GRID":
+    }
+    case "MV-CASE-STORY": {
+      const cs = pickCaseStudy(brief.brandModeId, brief.industry);
+      return {
+        client: cs.client,
+        headline: cs.headline,
+        story: cs.story,
+        result: cs.result,
+      };
+    }
+    case "MV-CASE-LOGO-GRID": {
+      // Round-robin through the library, prioritizing brand-matched studies.
+      const primary = pickCaseStudy(brief.brandModeId, brief.industry);
+      const rest = CASE_STUDIES.filter((c) => c.id !== primary.id).slice(0, 5);
+      const ordered = [primary, ...rest].slice(0, 6);
       return {
         title: "How this has worked for others",
-        items: [
-          { client: "Life-sciences leader", result: "38% faster launches" },
-          { client: "Global bank", result: "Reg comms in 22 markets" },
-          { client: "Consumer tech", result: "Launch parity across 14 languages" },
-          { client: "Retail", result: "24% lower content cost" },
-          { client: "Insurance", result: "Audit-ready in every market" },
-          { client: "Automotive", result: "Model launches on one timeline" },
-        ],
+        items: ordered.map((c) => ({ client: c.client, result: c.metric })),
       };
+    }
 
     case "MV-TEAM-BIOS-3":
       return {

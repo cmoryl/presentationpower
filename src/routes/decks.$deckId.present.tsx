@@ -13,6 +13,7 @@ export const Route = createFileRoute("/decks/$deckId/present")({
 function PresenterView() {
   const { deckId } = Route.useParams();
   const deck = useDeckStore((s) => s.decks[deckId]);
+  const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const navigate = useNavigate();
   const [i, setI] = useState(0);
 
@@ -39,7 +40,7 @@ function PresenterView() {
         <div className="mx-auto aspect-[16/9] w-full">
           {slide && variant && (
             <ScaledSlide>
-              <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} />
+              <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} />
             </ScaledSlide>
           )}
         </div>
