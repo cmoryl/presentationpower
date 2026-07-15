@@ -8,8 +8,10 @@ import portrait4 from "@/assets/portraits/portrait-4.png";
 import ambient from "@/assets/backdrops/backdrop-ambient.jpg";
 import team from "@/assets/backdrops/backdrop-team.jpg";
 import city from "@/assets/backdrops/backdrop-city.jpg";
+import abstractAsset from "@/assets/backdrops/backdrop-abstract.png.asset.json";
 
 const PORTRAITS = [portrait1, portrait2, portrait3, portrait4];
+const abstract = abstractAsset.url;
 
 function hashStr(s: string): number {
   let h = 0;
