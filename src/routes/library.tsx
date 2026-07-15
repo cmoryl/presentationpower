@@ -125,7 +125,7 @@ function Library() {
             key={v.id}
             variant={v}
             familyName={byId(moduleFamilies, v.familyId)?.name}
-            brand={scopeBrand ?? brandModes[0]}
+            brand={scopeBrand ?? tpMaster}
             sectionId={sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? ""}
             preferred={preferred.has(v.id)}
             onOpen={() => setOpenId(v.id)}
