@@ -68,12 +68,20 @@ function KnowledgeView() {
             divisions, or <em>global</em> to publish it across all of TransPerfect.
           </p>
         </div>
-        <button
-          onClick={() => navigate({ to: "/knowledge/new" as never })}
-          className="rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0B2A4A]/90"
-        >
-          + New entry
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            to={"/knowledge/brand-guides" as never}
+            className="rounded-full border border-black/15 px-4 py-2.5 text-sm text-black/70 hover:border-black/40"
+          >
+            Brand guides
+          </Link>
+          <button
+            onClick={() => navigate({ to: "/knowledge/new" as never })}
+            className="rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#03002C]/90"
+          >
+            + New entry
+          </button>
+        </div>
       </div>
 
       {/* Division tabs */}
