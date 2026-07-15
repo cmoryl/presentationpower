@@ -211,35 +211,42 @@ function VariantCard({
     content: seedContent(variant.id, SAMPLE_BRIEF, "Preview section") as Record<string, unknown>,
     changes: [],
   };
+  const isDark = mode === "dark";
   return (
     <button
       type="button"
       onClick={onOpen}
-      className="group block w-full overflow-hidden rounded-2xl border border-black/10 bg-white text-left transition hover:border-[#0B2A4A]/40 hover:shadow-lg"
+      className={`group glass-sheen block w-full overflow-hidden rounded-2xl text-left transition hover:-translate-y-0.5 hover:shadow-2xl ${
+        isDark ? "glass-dark text-white" : "glass text-[#03002C]"
+      }`}
     >
-      <div className="relative aspect-[16/9] bg-white">
+      <div className={`relative aspect-[16/9] ${isDark ? "bg-[#03002C]/40" : "bg-white/40"}`}>
         <ScaledSlide>
           <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
         </ScaledSlide>
-        <div className="absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 backdrop-blur transition group-hover:opacity-100">
+        <div className={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest opacity-0 backdrop-blur-md transition group-hover:opacity-100 ${
+          isDark ? "bg-white/15 text-white ring-1 ring-white/25" : "bg-black/60 text-white"
+        }`}>
           View details ↗
         </div>
         {preferred && (
-          <div className="absolute left-3 top-3 rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white shadow">
+          <div className="absolute left-3 top-3 rounded-full bg-emerald-500/80 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white shadow backdrop-blur-md ring-1 ring-white/30">
             In scope
           </div>
         )}
       </div>
-      <div className="border-t border-black/10 p-4">
+      <div className={`border-t p-4 ${isDark ? "border-white/10" : "border-white/40"}`}>
         <div className="flex items-baseline justify-between">
-          <div className="font-mono text-xs text-black/50">{variant.id}</div>
-          <span className="rounded-full bg-[#0B2A4A]/10 px-2 py-0.5 font-mono text-[10px] text-[#0B2A4A]">
+          <div className={`font-mono text-xs ${isDark ? "text-white/50" : "text-black/50"}`}>{variant.id}</div>
+          <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] backdrop-blur-md ${
+            isDark ? "bg-white/10 text-white/80 ring-1 ring-white/15" : "bg-[#0B2A4A]/10 text-[#0B2A4A]"
+          }`}>
             {variant.familyId}
           </span>
         </div>
         <div className="mt-1 font-medium">{variant.name}</div>
-        <div className="mt-1 line-clamp-2 text-sm text-black/60">{variant.description}</div>
-        <div className="mt-3 text-xs text-black/50">
+        <div className={`mt-1 line-clamp-2 text-sm ${isDark ? "text-white/60" : "text-black/60"}`}>{variant.description}</div>
+        <div className={`mt-3 text-xs ${isDark ? "text-white/50" : "text-black/50"}`}>
           <div>Family: {familyName}</div>
           <div>Layouts: {variant.permittedLayoutIds.join(", ")}</div>
           {variant.capacity.items && (
@@ -250,6 +257,7 @@ function VariantCard({
     </button>
   );
 }
+
 
 function VariantDetailModal({
   variant,
