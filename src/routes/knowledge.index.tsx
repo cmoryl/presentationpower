@@ -11,7 +11,7 @@ import {
   type KnowledgeKind,
 } from "@/lib/knowledge.functions";
 
-export const Route = createFileRoute("/_authenticated/knowledge/")({
+export const Route = createFileRoute("/knowledge/")({
   head: () => ({
     meta: [
       { title: "Knowledge · TransPerfect Modular" },
@@ -69,7 +69,7 @@ function KnowledgeView() {
           </p>
         </div>
         <button
-          onClick={() => navigate({ to: "/_authenticated/knowledge/new" as never })}
+          onClick={() => navigate({ to: "/knowledge/new" as never })}
           className="rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0B2A4A]/90"
         >
           + New entry
@@ -196,7 +196,7 @@ function EntryCard({ entry, accent }: { entry: KnowledgeEntry; accent: string })
   const expired = entry.expires_at ? new Date(entry.expires_at) < new Date() : false;
   return (
     <Link
-      to={"/_authenticated/knowledge/$entryId" as never}
+      to={"/knowledge/$entryId" as never}
       params={{ entryId: entry.id } as never}
       className="block rounded-xl border border-black/10 bg-white p-4 hover:border-black/25"
     >

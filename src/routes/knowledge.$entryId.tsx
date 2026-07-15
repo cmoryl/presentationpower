@@ -13,7 +13,7 @@ import {
   type KnowledgeVisibility,
 } from "@/lib/knowledge.functions";
 
-export const Route = createFileRoute("/_authenticated/knowledge/$entryId")({
+export const Route = createFileRoute("/knowledge/$entryId")({
   head: () => ({ meta: [{ title: "Knowledge entry · TransPerfect Modular" }] }),
   component: EntryView,
 });
@@ -75,7 +75,7 @@ function EntryView() {
 
   const remove = useMutation({
     mutationFn: () => del({ data: { id: entryId } }),
-    onSuccess: () => navigate({ to: "/_authenticated/knowledge" as never }),
+    onSuccess: () => navigate({ to: "/knowledge" as never }),
   });
 
   if (entry.isLoading) return <AppShell><div className="text-sm text-black/60">Loading…</div></AppShell>;
@@ -86,7 +86,7 @@ function EntryView() {
   return (
     <AppShell>
       <div className="mx-auto max-w-3xl">
-        <Link to={"/_authenticated/knowledge" as never} className="text-xs uppercase tracking-widest text-black/50 hover:text-black">
+        <Link to={"/knowledge" as never} className="text-xs uppercase tracking-widest text-black/50 hover:text-black">
           ← Back to knowledge
         </Link>
         <div className="mt-3 flex items-baseline justify-between gap-6">

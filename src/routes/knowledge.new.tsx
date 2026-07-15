@@ -11,7 +11,7 @@ import {
   type KnowledgeVisibility,
 } from "@/lib/knowledge.functions";
 
-export const Route = createFileRoute("/_authenticated/knowledge/new")({
+export const Route = createFileRoute("/knowledge/new")({
   head: () => ({ meta: [{ title: "New knowledge entry · TransPerfect Modular" }] }),
   component: NewEntryView,
 });
@@ -44,7 +44,7 @@ function NewEntryView() {
           expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
         },
       }),
-    onSuccess: () => navigate({ to: "/_authenticated/knowledge" as never }),
+    onSuccess: () => navigate({ to: "/knowledge" as never }),
   });
 
   const canSave = title.trim().length > 0;
@@ -148,7 +148,7 @@ function NewEntryView() {
 
         <div className="mt-6 flex items-center justify-end gap-3">
           <button
-            onClick={() => navigate({ to: "/_authenticated/knowledge" as never })}
+            onClick={() => navigate({ to: "/knowledge" as never })}
             className="rounded-full border border-black/15 bg-white px-5 py-2.5 text-sm text-black hover:border-black/30"
           >
             Cancel
