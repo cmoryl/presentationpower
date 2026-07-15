@@ -199,14 +199,14 @@ export function MediaZoneOverlay({
       aria-hidden
     >
       {zones.map((z, i) => (
-        <ZoneRect key={i} zone={z} />
+        <ZoneRect key={i} zone={z} seed={hashStr(variant.id) + i} />
       ))}
       <Legend zones={zones} />
     </div>
   );
 }
 
-function ZoneRect({ zone }: { zone: Zone }) {
+function ZoneRect({ zone, seed }: { zone: Zone; seed: number }) {
   const style = KIND_STYLES[zone.kind];
   const isCircle = zone.shape === "circle";
   const isBlob = zone.shape === "blob";
@@ -215,6 +215,8 @@ function ZoneRect({ zone }: { zone: Zone }) {
     zone.kind === "aura" || zone.kind === "overlay"
       ? "none"
       : `3px dashed ${style.ring}`;
+  const isHuman = zone.kind === "human";
+  const portrait = isHuman ? PORTRAITS[seed % PORTRAITS.length] : undefined;
   return (
     <div
       style={{
@@ -223,9 +225,12 @@ function ZoneRect({ zone }: { zone: Zone }) {
         top: zone.y,
         width: zone.w,
         height: zone.h,
-        background: style.fill,
+        background: isHuman
+          ? `${style.fill}, url(${portrait}) center/cover no-repeat`
+          : style.fill,
         border,
         borderRadius: radius,
+        overflow: "hidden",
         transform: zone.rotate ? `rotate(${zone.rotate}deg)` : undefined,
         backdropFilter: zone.kind === "aura" ? "blur(24px)" : undefined,
         mixBlendMode: zone.kind === "overlay" ? "multiply" : undefined,
