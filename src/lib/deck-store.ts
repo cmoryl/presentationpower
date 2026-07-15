@@ -440,8 +440,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
     case "MV-CASE-LOGO-GRID": {
       // Round-robin through the library, prioritizing brand-matched studies.
       const primary = pickCaseStudy(brief.brandModeId, brief.industry);
-      const { CASE_STUDIES } = require("./case-studies") as typeof import("./case-studies");
-      const rest = CASE_STUDIES.filter((c: { id: string }) => c.id !== primary.id).slice(0, 5);
+      const rest = CASE_STUDIES.filter((c) => c.id !== primary.id).slice(0, 5);
       const ordered = [primary, ...rest].slice(0, 6);
       return {
         title: "How this has worked for others",
