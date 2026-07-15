@@ -170,3 +170,112 @@ export const ICON_EMPHASIS_META: Array<{ id: IconEmphasis; name: string }> = [
   { id: "success", name: "Success" },
   { id: "warning", name: "Warning" },
 ];
+
+// ---------- Variant → spec resolver ----------
+// A variant may declare `iconography` inline in taxonomy.ts. When it doesn't,
+// this resolver assigns a sensible default from the variant id pattern so
+// every module still has an explicit contract without hand-editing 94 records.
+
+import type { ModuleVariant } from "@/lib/taxonomy";
+
+type PatternRule = {
+  test: (id: string) => boolean;
+  spec: Partial<IconSpec> & { placement: IconPlacement };
+  rationale: string;
+};
+
+const VARIANT_ICON_RULES: PatternRule[] = [
+  // Covers & dividers — restrained typography, no clutter.
+  { test: (id) => /^MV-OP-COVER/.test(id),                  spec: { placement: "none" },            rationale: "Cover slides stay typographic" },
+  { test: (id) => id === "MV-OP-DIVIDER",                   spec: { placement: "watermark", size: "display", emphasis: "muted" }, rationale: "Divider uses a soft watermark" },
+  { test: (id) => id === "MV-OP-DIVIDER-NUMBERED",          spec: { placement: "standalone-hero", size: "display", treatment: "glyph", emphasis: "primary" }, rationale: "Chapter number is the hero" },
+
+  // Agendas & timelines — numbered badges dominate.
+  { test: (id) => /^MV-OP-AGENDA/.test(id),                 spec: { placement: "numbered-badge", size: "md", treatment: "filled-tile", emphasis: "primary" }, rationale: "Agenda items are indexed" },
+  { test: (id) => /^MV-PROC-TIMELINE|MV-PROC-PHASES|MV-CLOSE-TIMELINE/.test(id), spec: { placement: "numbered-badge", size: "md", treatment: "filled-tile", emphasis: "primary" }, rationale: "Phased plans are indexed" },
+  { test: (id) => id === "MV-CLOSE-CALENDAR",               spec: { placement: "leading", size: "lg", treatment: "soft-tile", emphasis: "accent" }, rationale: "Calendar icon anchors the date" },
+
+  // Pillars & feature cards — icon above the label.
+  { test: (id) => /^MV-SOL-PILLARS/.test(id),               spec: { placement: "above", size: "lg", treatment: "soft-tile", emphasis: "accent" }, rationale: "Pillars stack icon over label" },
+  { test: (id) => id === "MV-SOL-FEATURE-LIST",             spec: { placement: "leading", size: "md", treatment: "soft-tile", emphasis: "accent" }, rationale: "Feature rows lead with icon" },
+  { test: (id) => id === "MV-SOL-ARCHITECTURE",             spec: { placement: "above", size: "md", treatment: "outline-tile", emphasis: "primary" }, rationale: "Architecture layers use restrained outline tiles" },
+
+  // Context / challenge cards.
+  { test: (id) => /^MV-CTX-CARDS/.test(id),                 spec: { placement: "above", size: "lg", treatment: "soft-tile", emphasis: "accent" }, rationale: "Context cards use above placement" },
+  { test: (id) => id === "MV-CTX-CHALLENGE-STACK",          spec: { placement: "leading", size: "md", treatment: "soft-tile", emphasis: "accent" }, rationale: "Stacked challenges lead with icon" },
+  { test: (id) => /^MV-CTX-(STAT-GRID|COST|TREND)/.test(id), spec: { placement: "corner", size: "sm", treatment: "outline-tile", emphasis: "muted" }, rationale: "Metric-heavy cards keep icons as corner metadata" },
+
+  // Insights — big-idea slides.
+  { test: (id) => id === "MV-INS-BIG-IDEA",                 spec: { placement: "standalone-hero", size: "display", treatment: "soft-circle", emphasis: "primary", a11yRole: "semantic" }, rationale: "Big idea is a hero glyph" },
+  { test: (id) => id === "MV-INS-CALLOUT",                  spec: { placement: "leading", size: "lg", treatment: "duotone", emphasis: "primary" }, rationale: "Callout leads with a duotone badge" },
+  { test: (id) => id === "MV-INS-SO-WHAT",                  spec: { placement: "leading", size: "lg", treatment: "filled-tile", emphasis: "primary" }, rationale: "So-what commands attention" },
+  { test: (id) => id === "MV-INS-OPPORTUNITY-SIZE",         spec: { placement: "corner", size: "sm", treatment: "outline-tile", emphasis: "muted" }, rationale: "Number is the hero, icon is metadata" },
+  { test: (id) => id === "MV-INS-QUOTE",                    spec: { placement: "none" },            rationale: "Quotes stay typographic" },
+
+  // Proof.
+  { test: (id) => /^MV-PROOF-STATS/.test(id),               spec: { placement: "corner", size: "sm", treatment: "outline-tile", emphasis: "muted" }, rationale: "Stats lead with the number" },
+  { test: (id) => id === "MV-PROOF-LOGOS",                  spec: { placement: "none" },            rationale: "Logo grids have no auxiliary icons" },
+  { test: (id) => id === "MV-PROOF-TESTIMONIAL",            spec: { placement: "inline", size: "sm", treatment: "glyph", emphasis: "accent" }, rationale: "Quote mark glyph inline" },
+
+  // Case studies.
+  { test: (id) => id === "MV-CASE-METRICS",                 spec: { placement: "corner", size: "sm", treatment: "outline-tile", emphasis: "muted" }, rationale: "Metrics dominate" },
+  { test: (id) => id === "MV-CASE-LOGO-GRID",               spec: { placement: "none" },            rationale: "Logos only" },
+  { test: (id) => /^MV-CASE-/.test(id),                     spec: { placement: "leading", size: "md", treatment: "soft-tile", emphasis: "accent" }, rationale: "Case narrative rows" },
+
+  // Decision & commercials.
+  { test: (id) => id === "MV-DEC-CHECKLIST",                spec: { placement: "bullet", size: "sm", treatment: "glyph", emphasis: "accent" }, rationale: "Checklist uses bullet icons" },
+  { test: (id) => id === "MV-DEC-MATRIX",                   spec: { placement: "corner", size: "sm", treatment: "outline-tile", emphasis: "muted" }, rationale: "Matrix cells stay chart-first" },
+  { test: (id) => id === "MV-DEC-COMPARE-TABLE",            spec: { placement: "inline", size: "xs", treatment: "glyph", emphasis: "primary" }, rationale: "Check/x marks inline in cells" },
+  { test: (id) => /^MV-COMM-/.test(id),                     spec: { placement: "leading", size: "sm", treatment: "outline-tile", emphasis: "muted" }, rationale: "Pricing rows keep icons quiet" },
+  { test: (id) => id === "MV-RISK-MITIGATION",              spec: { placement: "leading", size: "md", treatment: "soft-tile", emphasis: "warning" }, rationale: "Risk rows use warning emphasis" },
+
+  // Team & governance.
+  { test: (id) => /^MV-TEAM-BIOS/.test(id),                 spec: { placement: "none" },            rationale: "Portraits do the work" },
+  { test: (id) => id === "MV-GOV-RACI",                     spec: { placement: "inline", size: "xs", treatment: "glyph", emphasis: "muted" }, rationale: "RACI marks inline in table" },
+  { test: (id) => id === "MV-OP-INTRO-TEAM",                spec: { placement: "none" },            rationale: "Team intro is portrait-led" },
+
+  // Recommendation & closes.
+  { test: (id) => id === "MV-REC-NEXT",                     spec: { placement: "leading", size: "md", treatment: "soft-tile", emphasis: "accent" }, rationale: "Next-step rows" },
+  { test: (id) => id === "MV-CLOSE-CHECKLIST",              spec: { placement: "bullet", size: "sm", treatment: "glyph", emphasis: "accent" }, rationale: "Checklist bullets" },
+  { test: (id) => id === "MV-CLOSE-DECISION",               spec: { placement: "leading", size: "lg", treatment: "filled-tile", emphasis: "primary" }, rationale: "Decision ask commands attention" },
+  { test: (id) => id === "MV-CLOSE-STATEMENT",              spec: { placement: "standalone-hero", size: "display", treatment: "soft-circle", emphasis: "primary", a11yRole: "semantic" }, rationale: "Statement close is a hero" },
+  { test: (id) => id === "MV-CLOSE-SPLIT",                  spec: { placement: "leading", size: "md", treatment: "soft-tile", emphasis: "accent" }, rationale: "Split CTA panel" },
+  { test: (id) => id === "MV-CLOSE-DUAL-CTA",               spec: { placement: "above", size: "lg", treatment: "duotone", emphasis: "primary" }, rationale: "Two paths, each iconized" },
+  { test: (id) => id === "MV-CLOSE-METRIC-PROMISE",         spec: { placement: "standalone-hero", size: "xl", treatment: "soft-circle", emphasis: "success", a11yRole: "semantic" }, rationale: "Promise gets a hero" },
+  { test: (id) => id === "MV-CLOSE-CTA",                    spec: { placement: "leading", size: "md", treatment: "filled-tile", emphasis: "primary" }, rationale: "CTA row" },
+  { test: (id) => id === "MV-CLOSE-CONTACT",                spec: { placement: "leading", size: "sm", treatment: "glyph", emphasis: "muted" }, rationale: "Contact rows use quiet glyphs" },
+  { test: (id) => id === "MV-CLOSE-THANKS" || id === "MV-CLOSE-QNA", spec: { placement: "watermark", size: "display", emphasis: "muted" }, rationale: "Thanks / Q&A slides use a soft watermark" },
+
+  // Media families — pure imagery, no icons.
+  { test: (id) => /^MV-IMG-/.test(id),                      spec: { placement: "none" },            rationale: "Imagery-led modules" },
+
+  // Quotes.
+  { test: (id) => /^MV-QUOTE-/.test(id),                    spec: { placement: "inline", size: "sm", treatment: "glyph", emphasis: "accent" }, rationale: "Quote marks inline" },
+
+  // Infographics — icons anchor each node/segment.
+  { test: (id) => id === "MV-INFO-CIRCULAR-FLOW",           spec: { placement: "above", size: "md", treatment: "soft-circle", emphasis: "primary" }, rationale: "Nodes carry a glyph" },
+  { test: (id) => id === "MV-INFO-PYRAMID",                 spec: { placement: "leading", size: "sm", treatment: "glyph", emphasis: "accent" }, rationale: "Pyramid tiers" },
+  { test: (id) => /^MV-INFO-/.test(id),                     spec: { placement: "corner", size: "sm", treatment: "outline-tile", emphasis: "muted" }, rationale: "Chart-led infographics" },
+
+  // Client / matrix content.
+  { test: (id) => id === "MV-CLIENT-MATRIX" || id === "MV-CLIENT-COMPARE", spec: { placement: "corner", size: "sm", treatment: "outline-tile", emphasis: "muted" }, rationale: "Cells are outcome-led" },
+  { test: (id) => /^MV-CLIENT-/.test(id),                   spec: { placement: "above", size: "md", treatment: "soft-tile", emphasis: "accent" }, rationale: "Client detail cards" },
+];
+
+// Effective iconography for a variant. Inline declaration wins; otherwise the
+// pattern rule wins; otherwise a safe default.
+export function iconographyForVariant(variant: ModuleVariant): IconSpec & { source: "declared" | "pattern" | "default"; rationale: string } {
+  if (variant.iconography) {
+    return { ...withDefaults(variant.iconography), source: "declared", rationale: "Declared on the variant" };
+  }
+  for (const rule of VARIANT_ICON_RULES) {
+    if (rule.test(variant.id)) {
+      return { ...withDefaults(rule.spec), source: "pattern", rationale: rule.rationale };
+    }
+  }
+  return {
+    ...withDefaults({ placement: "leading" }),
+    source: "default",
+    rationale: "Fallback: leading soft-tile accent",
+  };
+}
