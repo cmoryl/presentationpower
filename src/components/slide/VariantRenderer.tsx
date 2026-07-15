@@ -82,29 +82,54 @@ function IconBadge({
   index,
   size = "md",
   tone = "accent",
+  placement = "leading",
+  treatment,
+  ariaLabel,
 }: {
   brand: BrandMode;
   label: string;
   index: number;
-  size?: "sm" | "md" | "lg";
-  tone?: "accent" | "primary" | "onDark";
+  size?: IconSizeToken;
+  tone?: "accent" | "primary" | "onDark" | IconEmphasis;
+  placement?: IconPlacement;
+  treatment?: IconTreatment;
+  ariaLabel?: string; // when set, badge is announced (role=img); otherwise decorative
 }) {
+  // Back-compat: map legacy `tone` values into the new emphasis/treatment axes.
+  const legacyOnDark = tone === "onDark";
+  const emphasis: IconEmphasis =
+    legacyOnDark ? "inverse"
+    : tone === "primary" ? "primary"
+    : tone === "accent" ? "accent"
+    : (tone as IconEmphasis);
+  const spec = withDefaults({
+    placement,
+    size,
+    treatment: treatment ?? (legacyOnDark ? "on-dark" : "soft-tile"),
+    emphasis,
+    a11yRole: ariaLabel ? "semantic" : "decorative",
+  });
+  const dims = ICON_SIZES[spec.size];
+  const colors = resolveEmphasisColors(brand, spec.treatment, spec.emphasis);
   const Icon = pickIcon(label, index);
-  const dim = size === "sm" ? 44 : size === "lg" ? 72 : 56;
-  const px = size === "sm" ? 22 : size === "lg" ? 34 : 28;
-  const bg =
-    tone === "onDark"
-      ? "rgba(255,255,255,0.15)"
-      : tone === "primary"
-        ? `${brand.tokens.primary}18`
-        : `${brand.tokens.accent}22`;
-  const fg = tone === "onDark" ? "#fff" : tone === "primary" ? brand.tokens.primary : brand.tokens.accent;
+  const isCircle = spec.treatment === "soft-circle";
+  const a11y = spec.a11yRole === "semantic"
+    ? { role: "img" as const, "aria-label": ariaLabel ?? label }
+    : { "aria-hidden": true as const };
   return (
     <div
-      className="flex shrink-0 items-center justify-center rounded-2xl"
-      style={{ width: dim, height: dim, backgroundColor: bg, color: fg }}
+      className={`flex shrink-0 items-center justify-center ${isCircle ? "rounded-full" : ""}`}
+      style={{
+        width: dims.containerPx,
+        height: dims.containerPx,
+        backgroundColor: colors.bg,
+        color: colors.fg,
+        border: colors.border ? `1px solid ${colors.border}` : undefined,
+        borderRadius: isCircle ? undefined : dims.radiusPx,
+      }}
+      {...a11y}
     >
-      <Icon size={px} strokeWidth={2} />
+      <Icon size={dims.glyphPx} strokeWidth={dims.strokeWidth} aria-hidden={spec.a11yRole === "decorative"} />
     </div>
   );
 }

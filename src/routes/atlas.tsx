@@ -2,6 +2,17 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { byId } from "@/lib/taxonomy";
+import {
+  ICON_SIZES,
+  ICON_PLACEMENTS_META,
+  ICON_TREATMENTS_META,
+  ICON_EMPHASIS_META,
+  resolveEmphasisColors,
+  type IconTreatment,
+  type IconEmphasis,
+  type IconSizeToken,
+} from "@/lib/iconography";
+import { Sparkles, Target, Workflow, Layers3, Users, Rocket } from "lucide-react";
 
 export const Route = createFileRoute("/atlas")({
   head: () => ({
@@ -122,12 +133,208 @@ function Atlas() {
         </div>
       </Section>
 
+      <IconographySection />
+
       <div className="mt-14 rounded-2xl border border-dashed border-black/15 bg-white p-6 text-sm text-black/60">
         Want to see the pieces in action?{" "}
         <Link to="/brief/new" className="font-medium text-[#0B2A4A] underline">Start a brief</Link>{" "}
         and the assembler will pick from this atlas.
       </div>
     </AppShell>
+  );
+}
+
+// Shared brand for the swatches — matches the TransPerfect default.
+const DEMO_BRAND = {
+  tokens: { primary: "#0B2A4A", accent: "#E85D2C" },
+} as const;
+
+function IconTile({
+  treatment,
+  emphasis,
+  size,
+}: {
+  treatment: IconTreatment;
+  emphasis: IconEmphasis;
+  size: IconSizeToken;
+}) {
+  const dims = ICON_SIZES[size];
+  const c = resolveEmphasisColors(DEMO_BRAND as never, treatment, emphasis);
+  const isCircle = treatment === "soft-circle";
+  return (
+    <div
+      className={`flex items-center justify-center ${isCircle ? "rounded-full" : ""}`}
+      style={{
+        width: dims.containerPx,
+        height: dims.containerPx,
+        backgroundColor: c.bg,
+        color: c.fg,
+        border: c.border ? `1px solid ${c.border}` : undefined,
+        borderRadius: isCircle ? undefined : dims.radiusPx,
+      }}
+      aria-hidden
+    >
+      <Sparkles size={dims.glyphPx} strokeWidth={dims.strokeWidth} />
+    </div>
+  );
+}
+
+function IconographySection() {
+  const sizeOrder: IconSizeToken[] = ["xs", "sm", "md", "lg", "xl", "display"];
+  const placementDemos: Record<string, React.ReactNode> = {
+    leading: (
+      <div className="flex items-center gap-3">
+        <IconTile treatment="soft-tile" emphasis="accent" size="md" />
+        <div className="text-sm">Intake · brief captured</div>
+      </div>
+    ),
+    above: (
+      <div className="flex flex-col items-start gap-2">
+        <IconTile treatment="soft-tile" emphasis="accent" size="lg" />
+        <div className="text-sm font-medium">Global reach</div>
+      </div>
+    ),
+    corner: (
+      <div className="relative w-full rounded-xl border border-black/10 p-4 pr-12">
+        <div className="text-sm font-medium">Risk card</div>
+        <div className="mt-1 text-xs text-black/50">Mitigation owner assigned</div>
+        <div className="absolute right-3 top-3">
+          <IconTile treatment="outline-tile" emphasis="muted" size="sm" />
+        </div>
+      </div>
+    ),
+    inline: (
+      <div className="text-sm leading-relaxed">
+        Cycle time drops <Sparkles size={14} className="inline align-[-2px]" aria-hidden /> by 43% across the pilot.
+      </div>
+    ),
+    bullet: (
+      <ul className="space-y-1.5 text-sm">
+        {["Intake SLA", "Reviewer coverage", "Publish routing"].map((t) => (
+          <li key={t} className="flex items-center gap-2">
+            <Sparkles size={16} style={{ color: "#E85D2C" }} aria-hidden />
+            <span>{t}</span>
+          </li>
+        ))}
+      </ul>
+    ),
+    "numbered-badge": (
+      <div className="flex items-center gap-3">
+        <div
+          className="grid place-items-center rounded-full font-mono text-sm font-semibold"
+          style={{ width: 56, height: 56, backgroundColor: "#0B2A4A", color: "#fff" }}
+          aria-hidden
+        >
+          01
+        </div>
+        <div className="text-sm">Kickoff · week 1</div>
+      </div>
+    ),
+    watermark: (
+      <div className="relative h-24 overflow-hidden rounded-xl bg-black/[0.03]">
+        <Sparkles
+          size={140}
+          strokeWidth={1}
+          className="absolute -right-6 -top-6 text-black/10"
+          aria-hidden
+        />
+        <div className="relative p-4 text-sm font-medium">Section opener</div>
+      </div>
+    ),
+    "standalone-hero": (
+      <div className="flex justify-center py-2">
+        <IconTile treatment="soft-circle" emphasis="primary" size="display" />
+      </div>
+    ),
+    none: (
+      <div className="text-sm italic text-black/50">Pure typography — no icon.</div>
+    ),
+  };
+
+  return (
+    <Section title="Iconography" count={ICON_PLACEMENTS_META.length}>
+      <p className="-mt-2 mb-6 max-w-3xl text-sm text-black/60">
+        Every module declares an <span className="font-mono text-xs">iconography</span> contract: placement, size,
+        treatment, emphasis, and accessibility role. Sizes ride an 8pt grid; decorative icons are hidden from screen
+        readers, semantic ones announce their label.
+      </p>
+
+      <div className="mb-8">
+        <div className="mb-3 text-xs uppercase tracking-widest text-black/50">Sizes (glyph / container / gap)</div>
+        <div className="flex flex-wrap items-end gap-6 rounded-2xl border border-black/10 bg-white p-6">
+          {sizeOrder.map((s) => {
+            const d = ICON_SIZES[s];
+            return (
+              <div key={s} className="flex flex-col items-center gap-2 text-center">
+                <IconTile treatment="soft-tile" emphasis="accent" size={s} />
+                <div className="font-mono text-xs">{s}</div>
+                <div className="font-mono text-[10px] text-black/50">
+                  {d.glyphPx}/{d.containerPx}/{d.gapPx}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <div className="mb-3 text-xs uppercase tracking-widest text-black/50">Treatments</div>
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {ICON_TREATMENTS_META.map((t) => (
+            <div key={t.id} className="flex items-center gap-3 rounded-xl border border-black/10 bg-white p-4">
+              <div
+                className={t.id === "on-dark" ? "rounded-lg bg-[#0B2A4A] p-2" : ""}
+              >
+                <IconTile treatment={t.id} emphasis="accent" size="md" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-sm font-medium">{t.name}</div>
+                <div className="truncate text-xs text-black/50">{t.description}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <div className="mb-3 text-xs uppercase tracking-widest text-black/50">Emphasis (color role)</div>
+        <div className="flex flex-wrap gap-3 rounded-2xl border border-black/10 bg-white p-6">
+          {ICON_EMPHASIS_META.map((e) => (
+            <div key={e.id} className="flex flex-col items-center gap-2">
+              <IconTile treatment="filled-tile" emphasis={e.id} size="md" />
+              <div className="font-mono text-xs">{e.name}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <div className="mb-3 text-xs uppercase tracking-widest text-black/50">Placements</div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {ICON_PLACEMENTS_META.map((p) => (
+            <div key={p.id} className="rounded-2xl border border-black/10 bg-white p-5">
+              <div className="flex items-baseline justify-between">
+                <div className="font-medium">{p.name}</div>
+                <span className="font-mono text-xs text-black/50">{p.id}</span>
+              </div>
+              <div className="mt-1 text-sm text-black/60">{p.description}</div>
+              <div className="mt-1 text-xs text-black/40">Typical in: {p.typicalIn}</div>
+              <div className="mt-4 rounded-xl bg-black/[0.02] p-4">{placementDemos[p.id]}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-2xl border border-black/10 bg-white p-5 text-sm text-black/70">
+        <div className="mb-1 font-medium">Accessibility rules</div>
+        <ul className="list-disc pl-5 text-sm text-black/60">
+          <li>Decorative icons render with <span className="font-mono text-xs">aria-hidden</span> and never announce.</li>
+          <li>Semantic icons (standalone hero, meaningful glyphs) use <span className="font-mono text-xs">role="img"</span> with an explicit label.</li>
+          <li>Interactive icon targets are at least 44×44 CSS px; sizes <span className="font-mono text-xs">sm</span> and up already satisfy this.</li>
+          <li>Filled treatments enforce inverse foreground for AA contrast; muted emphasis is reserved for non-critical metadata.</li>
+        </ul>
+      </div>
+    </Section>
   );
 }
 
