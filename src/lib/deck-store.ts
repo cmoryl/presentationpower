@@ -63,6 +63,12 @@ type DeckState = {
   createBriefAndAssemble: (brief: Omit<Brief, "id" | "createdAt">) => { briefId: string; deckId: string };
   updateSlideField: (deckId: string, slideId: string, field: string, value: unknown) => void;
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
+  moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
+  removeSlide: (deckId: string, slideId: string) => void;
+  addSlide: (deckId: string, sectionId: string, afterSlideId?: string) => void;
+  duplicateSlide: (deckId: string, slideId: string) => void;
+  renameDeck: (deckId: string, title: string) => void;
+  deleteDeck: (deckId: string) => void;
   reset: () => void;
 };
 
