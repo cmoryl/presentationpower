@@ -159,6 +159,8 @@ function BriefWizard() {
               }
               setAiStatus("personalizing");
               try {
+                const brandForCall = byId(brandModes, form.brandModeId);
+                const scope = brandForCall?.contentScope;
                 const result = await personalize({
                   data: {
                     brief: {
@@ -168,6 +170,15 @@ function BriefWizard() {
                       meetingObjective: form.meetingObjective,
                       clientFacts: form.clientFacts,
                       archetypeName: byId(NARRATIVE_ARCHETYPES, form.archetypeId)?.name ?? "Deck",
+                      brandScope: scope
+                        ? {
+                            brandName: brandForCall?.name,
+                            role: brandForCall?.role,
+                            industries: scope.industries,
+                            serviceLines: scope.serviceLines,
+                            caseStudyTags: scope.caseStudyTags,
+                          }
+                        : undefined,
                     },
                     slides: deck.slides.map((s) => ({
                       id: s.id,
