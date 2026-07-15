@@ -613,6 +613,30 @@ export const useDeckStore = create<DeckState>()(
         }));
       },
 
+      revertAiChange: (deckId, slideId, field) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const slide = deck.slides.find((s) => s.id === slideId);
+        if (!slide) return;
+        const change = slide.changes.find((c) => c.field === field && c.accepted);
+        if (!change) return;
+        const nextContent = setPath({ ...slide.content }, field, change.before);
+        const nextChanges = slide.changes.map((c) =>
+          c.field === field ? { ...c, accepted: false } : c,
+        );
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) =>
+                sl.id === slideId ? { ...sl, content: nextContent, changes: nextChanges } : sl,
+              ),
+            },
+          },
+        }));
+      },
+
       updateSlideField: (deckId, slideId, field, value) => {
         const deck = get().decks[deckId];
         if (!deck) return;
