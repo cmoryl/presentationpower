@@ -145,7 +145,7 @@ function ExportView() {
             >
               <div className="aspect-[16/9] w-full">
                 <ScaledSlide>
-                  <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} />
+                  <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} />
                 </ScaledSlide>
               </div>
             </div>
