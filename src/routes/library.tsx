@@ -177,6 +177,8 @@ function Library() {
             sectionId={sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? ""}
             preferred={preferred.has(v.id)}
             mode={mode}
+            showZones={showZones}
+            onOpen={() => setOpenId(v.id)}
             onOpen={() => setOpenId(v.id)}
           />
         ))}
