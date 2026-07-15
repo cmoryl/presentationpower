@@ -300,6 +300,8 @@ function VariantDetailModal({
   setBrandIdx,
   mode,
   setMode,
+  showZones,
+  setShowZones,
   family,
   fallback,
   layouts,
@@ -313,6 +315,8 @@ function VariantDetailModal({
   setBrandIdx: (i: number) => void;
   mode: "light" | "dark";
   setMode: (m: "light" | "dark") => void;
+  showZones: boolean;
+  setShowZones: (b: boolean) => void;
   family: ReturnType<typeof useTaxonomy>["moduleFamilies"][number] | undefined;
   fallback: ModuleVariant | undefined;
   layouts: ReturnType<typeof useTaxonomy>["layoutFrameworks"];
