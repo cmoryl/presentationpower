@@ -263,7 +263,7 @@ function VariantCard({
     changes: [],
   };
   const isDark = mode === "dark";
-  const backdrop = showImagery ? backdropForVariant(variant) : null;
+  const backdrop = showImagery && isDark ? backdropForVariant(variant) : null;
   return (
     <button
       type="button"
