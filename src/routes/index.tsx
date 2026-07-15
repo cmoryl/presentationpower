@@ -22,7 +22,7 @@ function Dashboard() {
   const decksMap = useDeckStore((s) => s.decks);
   const briefs = useDeckStore((s) => s.briefs);
   const deleteDeck = useDeckStore((s) => s.deleteDeck);
-  const decks = useMemo(
+  const decks = useMemo<Deck[]>(
     () => Object.values(decksMap).sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
     [decksMap],
   );
