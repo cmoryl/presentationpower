@@ -13,8 +13,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   ] as const;
 
   return (
-    <div className="min-h-screen bg-[#F5F1EA] text-[#0A0F1C]">
-      <header className="border-b border-black/10 bg-white">
+    <div className="ambient-field min-h-screen bg-[#F5F1EA] text-[#0A0F1C]">
+      <header className="glass sticky top-0 z-30 !rounded-none border-l-0 border-r-0 border-t-0">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between px-8 py-5">
           <Link to="/" className="flex items-center gap-3">
             <div className="h-2 w-8 bg-[#E85A2C]" />
@@ -27,7 +27,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link
                   key={n.to}
                   to={n.to}
-                  className={`rounded-full px-4 py-2 text-sm ${active ? "bg-[#0B2A4A] text-white" : "text-black/60 hover:text-black"}`}
+                  className={`rounded-full px-4 py-2 text-sm transition ${active ? "bg-[#0B2A4A] text-white shadow-lg" : "text-black/60 hover:bg-white/40 hover:text-black"}`}
                 >
                   {n.label}
                 </Link>
@@ -36,7 +36,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           </nav>
         </div>
       </header>
-      <main className="mx-auto max-w-[1400px] px-8 py-10">{children ?? <Outlet />}</main>
+      <main className="relative z-10 mx-auto max-w-[1400px] px-8 py-10">{children ?? <Outlet />}</main>
     </div>
   );
 }
+
