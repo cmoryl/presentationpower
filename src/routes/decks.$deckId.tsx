@@ -2,9 +2,10 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { DeckChat } from "@/components/DeckChat";
-import { useDeckStore, type DeckSlide } from "@/lib/deck-store";
+import { useDeckStore } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
 import {
   BRAND_MODES,
   MODULE_VARIANTS,
@@ -12,8 +13,8 @@ import {
   LAYOUT_FRAMEWORKS,
   byId,
   variantsForSection,
-  type ModuleVariant,
 } from "@/lib/taxonomy";
+
 
 export const Route = createFileRoute("/decks/$deckId")({
   head: ({ params }) => ({
