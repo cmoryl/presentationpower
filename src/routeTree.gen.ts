@@ -18,6 +18,7 @@ import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as AdminApprovalsRouteImport } from './routes/admin.approvals'
 import { Route as DecksDeckIdPresentRouteImport } from './routes/decks.$deckId.present'
 import { Route as DecksDeckIdExportRouteImport } from './routes/decks.$deckId.export'
+import { Route as DecksDeckIdDocumentRouteImport } from './routes/decks.$deckId.document'
 
 const LibraryRoute = LibraryRouteImport.update({
   id: '/library',
@@ -64,6 +65,11 @@ const DecksDeckIdExportRoute = DecksDeckIdExportRouteImport.update({
   path: '/export',
   getParentRoute: () => DecksDeckIdRoute,
 } as any)
+const DecksDeckIdDocumentRoute = DecksDeckIdDocumentRouteImport.update({
+  id: '/document',
+  path: '/document',
+  getParentRoute: () => DecksDeckIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
+  '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
 }
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
+  '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
 }
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
+  '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
 }
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/brief/new'
     | '/decks/$deckId'
+    | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/brief/new'
     | '/decks/$deckId'
+    | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
   id:
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/brief/new'
     | '/decks/$deckId'
+    | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
   fileRoutesById: FileRoutesById
@@ -210,15 +222,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DecksDeckIdExportRouteImport
       parentRoute: typeof DecksDeckIdRoute
     }
+    '/decks/$deckId/document': {
+      id: '/decks/$deckId/document'
+      path: '/document'
+      fullPath: '/decks/$deckId/document'
+      preLoaderRoute: typeof DecksDeckIdDocumentRouteImport
+      parentRoute: typeof DecksDeckIdRoute
+    }
   }
 }
 
 interface DecksDeckIdRouteChildren {
+  DecksDeckIdDocumentRoute: typeof DecksDeckIdDocumentRoute
   DecksDeckIdExportRoute: typeof DecksDeckIdExportRoute
   DecksDeckIdPresentRoute: typeof DecksDeckIdPresentRoute
 }
 
 const DecksDeckIdRouteChildren: DecksDeckIdRouteChildren = {
+  DecksDeckIdDocumentRoute: DecksDeckIdDocumentRoute,
   DecksDeckIdExportRoute: DecksDeckIdExportRoute,
   DecksDeckIdPresentRoute: DecksDeckIdPresentRoute,
 }

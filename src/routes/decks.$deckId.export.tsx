@@ -72,6 +72,13 @@ function ExportView() {
           >
             {exporting ? "Preparing…" : "Download .pptx"}
           </button>
+          <Link
+            to="/decks/$deckId/document"
+            params={{ deckId }}
+            className="rounded-full border border-black/15 bg-white px-5 py-2.5 text-sm font-medium text-black hover:border-black/30"
+          >
+            As document…
+          </Link>
           <button
             onClick={() => !blocked && window.print()}
             disabled={blocked}
