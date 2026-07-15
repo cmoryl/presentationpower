@@ -11,7 +11,7 @@ import {
   type KnowledgeKind,
 } from "@/lib/knowledge.functions";
 
-export const Route = createFileRoute("/knowledge")({
+export const Route = createFileRoute("/knowledge/")({
   head: () => ({
     meta: [
       { title: "Knowledge · TransPerfect Modular" },
