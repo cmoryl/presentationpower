@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { DeckChat } from "@/components/DeckChat";
 import { useDeckStore, type DeckSlide } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -31,6 +32,7 @@ function DeckEditor() {
   const removeSlide = useDeckStore((s) => s.removeSlide);
   const addSlide = useDeckStore((s) => s.addSlide);
   const duplicateSlide = useDeckStore((s) => s.duplicateSlide);
+  const revertAiChange = useDeckStore((s) => s.revertAiChange);
   const [activeIdx, setActiveIdx] = useState(0);
 
   if (!deck) throw notFound();
@@ -148,6 +150,42 @@ function DeckEditor() {
               )}
             </div>
           )}
+
+          {/* AI change log */}
+          {active && active.changes.filter((c) => c.accepted).length > 0 && (
+            <div className="mt-6 rounded-2xl border border-emerald-300/40 bg-emerald-50/40 p-6">
+              <div className="text-xs uppercase tracking-widest text-emerald-900/70">AI changes on this slide</div>
+              <ul className="mt-4 space-y-3 text-sm">
+                {active.changes.filter((c) => c.accepted).map((c) => (
+                  <li key={c.field} className="rounded-lg border border-emerald-200 bg-white p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="font-mono text-xs text-black/60">{c.field}</div>
+                      <button
+                        onClick={() => revertAiChange(deck.id, active.id, c.field)}
+                        className="rounded-full border border-black/15 px-2.5 py-0.5 text-xs hover:bg-black/5"
+                      >
+                        Revert
+                      </button>
+                    </div>
+                    <div className="mt-2 grid grid-cols-2 gap-3">
+                      <div>
+                        <div className="text-[10px] uppercase tracking-widest text-black/50">Before</div>
+                        <div className="mt-0.5 whitespace-pre-wrap text-xs text-black/60">
+                          {typeof c.before === "string" ? c.before : JSON.stringify(c.before)}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[10px] uppercase tracking-widest text-emerald-800/70">After (AI)</div>
+                        <div className="mt-0.5 whitespace-pre-wrap text-xs">
+                          {typeof c.after === "string" ? c.after : JSON.stringify(c.after)}
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Inspector */}
@@ -220,6 +258,7 @@ function DeckEditor() {
           )}
         </aside>
       </div>
+      <DeckChat deck={deck} brief={brief} />
     </AppShell>
   );
 }

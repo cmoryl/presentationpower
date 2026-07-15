@@ -62,6 +62,7 @@ type DeckState = {
   decks: Record<string, Deck>;
   createBriefAndAssemble: (brief: Omit<Brief, "id" | "createdAt">) => { briefId: string; deckId: string };
   applyAiContent: (deckId: string, aiSlides: Array<{ id: string; content: SlideContent }>) => void;
+  revertAiChange: (deckId: string, slideId: string, field: string) => void;
   updateSlideField: (deckId: string, slideId: string, field: string, value: unknown) => void;
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
@@ -607,6 +608,30 @@ export const useDeckStore = create<DeckState>()(
                   .map((field) => ({ field, before: sl.content[field], after: ai[field], reason: "AI personalization", accepted: true }));
                 return { ...sl, content: ai, changes };
               }),
+            },
+          },
+        }));
+      },
+
+      revertAiChange: (deckId, slideId, field) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const slide = deck.slides.find((s) => s.id === slideId);
+        if (!slide) return;
+        const change = slide.changes.find((c) => c.field === field && c.accepted);
+        if (!change) return;
+        const nextContent = setPath({ ...slide.content }, field, change.before);
+        const nextChanges = slide.changes.map((c) =>
+          c.field === field ? { ...c, accepted: false } : c,
+        );
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) =>
+                sl.id === slideId ? { ...sl, content: nextContent, changes: nextChanges } : sl,
+              ),
             },
           },
         }));
