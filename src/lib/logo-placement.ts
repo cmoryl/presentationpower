@@ -78,7 +78,7 @@ export function resolveLogoPlacement(
 
 // Absolute-position styles for a given zone. Values use the same 96/64px
 // padding budget already reserved by SlideFrame chrome.
-export function logoPositionStyles(position: LogoPosition): React.CSSProperties {
+export function logoPositionStyles(position: LogoPosition): CSSProperties {
   const inset = { top: 48, bottom: 48, left: 64, right: 64 };
   switch (position) {
     case "top-left":      return { position: "absolute", top: inset.top,    left: inset.left };
