@@ -219,7 +219,7 @@ function VariantCard({
     >
       <div className="relative aspect-[16/9] bg-white">
         <ScaledSlide>
-          <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} />
+          <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
         </ScaledSlide>
         <div className="absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 backdrop-blur transition group-hover:opacity-100">
           View details ↗
