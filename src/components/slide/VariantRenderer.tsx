@@ -181,7 +181,8 @@ function themeBrandForMode(brand: BrandMode, mode: SlideMode): BrandMode {
     tokens: {
       primary: "#4D88FF",
       accent: brand.tokens.accent,
-      surface: "#141435",
+      // Translucent panel so backdrop imagery shows through cards/boxes on dark slides.
+      surface: "rgba(20, 20, 53, 0.55)",
       ink: "#FFFFFF",
     },
   };

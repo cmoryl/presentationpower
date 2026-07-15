@@ -9,9 +9,11 @@ import ambient from "@/assets/backdrops/backdrop-ambient.jpg";
 import team from "@/assets/backdrops/backdrop-team.jpg";
 import city from "@/assets/backdrops/backdrop-city.jpg";
 import abstractAsset from "@/assets/backdrops/backdrop-abstract.png.asset.json";
+import bokehAsset from "@/assets/backdrops/backdrop-bokeh.png.asset.json";
 
 const PORTRAITS = [portrait1, portrait2, portrait3, portrait4];
 const abstract = abstractAsset.url;
+const bokeh = bokehAsset.url;
 
 function hashStr(s: string): number {
   let h = 0;
@@ -46,9 +48,9 @@ export function backdropForVariant(variant: ModuleVariant): SlideBackdrop | null
     return { url: ambient, scrim: "left", scrimStrength: 0.65, tint: "#03002C" };
   }
 
-  // Dividers — abstract/ambient/city with full-frame vignette.
+  // Dividers — abstract/bokeh/ambient/city with full-frame vignette.
   if (/^MV-OP-DIVIDER/.test(id)) {
-    const dividerImages = [abstract, ambient, city];
+    const dividerImages = [abstract, bokeh, ambient, city];
     return {
       url: dividerImages[seed % dividerImages.length],
       scrim: "vignette",
@@ -93,13 +95,15 @@ export function backdropForVariant(variant: ModuleVariant): SlideBackdrop | null
     return { url: city, scrim: "bottom", scrimStrength: 0.72, imageDim: 0.15 };
   }
 
-  // Closing / CTA — portrait or team with strong vignette.
+  // Closing / CTA — bokeh dominant (matches TransPerfect closing style), rotating in team/portraits.
   if (/^MV-CTA-|CLOSING|NEXT-STEPS|THANKS/.test(id)) {
+    const closingImages = [bokeh, bokeh, team, PORTRAITS[seed % PORTRAITS.length]];
     return {
-      url: seed % 2 === 0 ? team : PORTRAITS[seed % PORTRAITS.length],
-      scrim: "vignette",
-      scrimStrength: 0.7,
-      imageDim: 0.1,
+      url: closingImages[seed % closingImages.length],
+      scrim: "left",
+      scrimStrength: 0.8,
+      imageDim: 0.05,
+      tint: "#03002C",
     };
   }
 
