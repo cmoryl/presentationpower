@@ -55,6 +55,9 @@ export type BrandGuide = {
   subBrands?: { group: string; items: string[] }[];
   photography?: string;
   brandVisuals?: string;
+  iconography?: { headline: string; body: string; sourceUrl?: string };
+  socialMedia?: { platform: string; rules: string[] }[];
+  sourceUrl?: string;
 };
 
 // ─── Master TransPerfect Brand Guide (v3.0) ────────────────────────────────
@@ -155,8 +158,49 @@ export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
     "Brand visuals translate transformation into abstract form — glowing spheres, vertical light gradients, ambient blue/purple washes. Use as hero compositions, section dividers or subtle ambient gradients.",
 };
 
+// ─── TransPerfect Brand Guidelines v26.06 (Canva source import) ───────────
+export const MASTER_TRANSPERFECT_GUIDE_V26_06: BrandGuide = {
+  ...MASTER_TRANSPERFECT_GUIDE,
+  slug: "transperfect-v26-06",
+  title: "TransPerfect",
+  subtitle: "Brand Guidelines · Digital Edition",
+  version: "26.06",
+  updatedAt: "2026-06",
+  sourceUrl: "https://www.canva.com/design/DAHKB8qQPCs",
+  intro:
+    "TransPerfect's Identity brings the idea of Transforming Global Performance to life — expressing how clarity, collaboration and human intelligence drive continual progress. Every design asset contributes to this idea, creating a living system that adapts, evolves and connects across every touchpoint. Transformation isn't a single moment — it's an ongoing movement forward, made visible through interaction, light and rhythm.",
+  iconography: {
+    headline: "Hero Icons — soft, rounded, human",
+    body: "We use Hero Icons as the foundation of our icon system: a clean, open-source library aligned with modern UI standards. Small adjustments reflect TransPerfect's visual language. Icons serve both function and brand — they guide the eye, provide quick visual context and bring balance to text-heavy layouts. Their soft, rounded shapes complement the brand visuals, remaining clear at small sizes while expressing a friendly, human tone. Download the approved icon bank on Basecamp and re-download regularly as new icons are added.",
+    sourceUrl: "https://heroicons.com/",
+  },
+  socialMedia: [
+    {
+      platform: "Facebook, LinkedIn & X",
+      rules: [
+        "An all-white logo is preferred.",
+        "Never use a full-color logo on an image.",
+        "Use an all-black or all-navy logo on a light photo for visibility.",
+        "A side-by-side logo lockup is preferred.",
+        "Keep the logo in the bottom-right corner.",
+      ],
+    },
+    {
+      platform: "Instagram",
+      rules: [
+        "Do not watermark Instagram images — watermarks feel redundant and disingenuous to the platform.",
+        "Strive for authentic, behind-the-scenes-style interactions with followers.",
+        "Let imagery lead; brand shows through tone, color and composition rather than a logo overlay.",
+      ],
+    },
+  ],
+};
+
 // Registry — add future division guides here.
-export const BRAND_GUIDES: BrandGuide[] = [MASTER_TRANSPERFECT_GUIDE];
+export const BRAND_GUIDES: BrandGuide[] = [
+  MASTER_TRANSPERFECT_GUIDE_V26_06,
+  MASTER_TRANSPERFECT_GUIDE,
+];
 
 export function getBrandGuide(slug: string): BrandGuide | undefined {
   return BRAND_GUIDES.find((g) => g.slug === slug);
