@@ -5,7 +5,8 @@ import { AppShell } from "@/components/AppShell";
 import { useDeckStore } from "@/lib/deck-store";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { personalizeSlides } from "@/lib/personalize.functions";
-import { byId, SECTION_FRAMEWORKS, NARRATIVE_ARCHETYPES } from "@/lib/taxonomy";
+import { byId, SECTION_FRAMEWORKS, NARRATIVE_ARCHETYPES, type BrandMode } from "@/lib/taxonomy";
+import { BrandLockup } from "@/components/BrandLockup";
 
 export const Route = createFileRoute("/brief/new")({
   head: () => ({
