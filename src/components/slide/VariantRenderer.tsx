@@ -1984,6 +1984,7 @@ function MediaTile({
   portrait?: boolean;
   muted?: boolean;
 }) {
+  const mode = useContext(SlideModeContext);
   const h = hash(seed || brand.id);
   const palette = MEDIA_PALETTES[h % MEDIA_PALETTES.length];
   const angle = (h % 12) * 30;
@@ -1993,6 +1994,28 @@ function MediaTile({
   const x2 = 45 + ((h >> 9) % 45);
   const y2 = 30 + ((h >> 12) % 50);
   const grayscale = muted ? "grayscale(60%) brightness(0.9)" : undefined;
+
+  // Light mode: render a clean, basic neutral placeholder (no gradient blobs
+  // or dot-like shapes). Sample imagery is a dark-mode-only treatment.
+  if (mode === "light") {
+    return (
+      <div
+        className={`relative overflow-hidden rounded-2xl ${className ?? ""}`}
+        style={{
+          background: "#F2F2F2",
+          filter: grayscale,
+        }}
+      >
+        {portrait && (
+          <div
+            className="absolute left-1/2 top-[58%] h-[70%] w-[45%] -translate-x-1/2 rounded-t-full"
+            style={{ background: "rgba(10,15,28,0.06)" }}
+          />
+        )}
+      </div>
+    );
+  }
+
   return (
     <div
       className={`relative overflow-hidden rounded-2xl ${className ?? ""}`}
@@ -2071,6 +2094,7 @@ function MediaTile({
     </div>
   );
 }
+
 
 
 // ────────────────────────────────────────────────────────────────────────────
