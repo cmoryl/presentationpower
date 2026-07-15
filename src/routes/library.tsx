@@ -179,7 +179,6 @@ function Library() {
             mode={mode}
             showZones={showZones}
             onOpen={() => setOpenId(v.id)}
-            onOpen={() => setOpenId(v.id)}
           />
         ))}
       </div>
