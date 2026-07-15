@@ -61,6 +61,7 @@ type DeckState = {
   briefs: Record<string, Brief>;
   decks: Record<string, Deck>;
   createBriefAndAssemble: (brief: Omit<Brief, "id" | "createdAt">) => { briefId: string; deckId: string };
+  applyAiContent: (deckId: string, aiSlides: Array<{ id: string; content: SlideContent }>) => void;
   updateSlideField: (deckId: string, slideId: string, field: string, value: unknown) => void;
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
@@ -587,6 +588,28 @@ export const useDeckStore = create<DeckState>()(
           decks: { ...s.decks, [deck.id]: deck },
         }));
         return { briefId: brief.id, deckId: deck.id };
+      },
+
+      applyAiContent: (deckId, aiSlides) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const byIdMap = new Map(aiSlides.map((s) => [s.id, s.content]));
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) => {
+                const ai = byIdMap.get(sl.id);
+                if (!ai) return sl;
+                const changes: AiChange[] = Object.keys(ai)
+                  .filter((k) => JSON.stringify(sl.content[k]) !== JSON.stringify(ai[k]))
+                  .map((field) => ({ field, before: sl.content[field], after: ai[field], reason: "AI personalization", accepted: true }));
+                return { ...sl, content: ai, changes };
+              }),
+            },
+          },
+        }));
       },
 
       updateSlideField: (deckId, slideId, field, value) => {
