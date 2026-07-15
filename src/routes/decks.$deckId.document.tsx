@@ -125,7 +125,7 @@ function DocumentView() {
         <DocumentPage dims={dims}>
           <div className="flex h-full flex-col justify-between p-[0.6in]">
             <div className="flex items-center justify-between">
-              <BrandLockup brand={brand} tone="dark" />
+              <BrandLockup brand={brand} color="dark" size="lg" />
               <div className="text-[10px] uppercase tracking-[0.3em] text-black/50">{family.cover.eyebrow}</div>
             </div>
             <div>
@@ -153,7 +153,7 @@ function DocumentView() {
             <div className="flex h-full flex-col">
               {/* Header */}
               <div className="flex items-center justify-between border-b border-black/10 px-[0.5in] py-[0.3in]">
-                <BrandLockup brand={brand} tone="dark" compact />
+                <BrandLockup brand={brand} color="dark" size="sm" />
                 <div className="text-[10px] uppercase tracking-[0.3em] text-black/50">
                   {family.name} · {deck.title}
                 </div>
