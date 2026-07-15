@@ -293,6 +293,72 @@ export const useDeckStore = create<DeckState>()(
         }));
       },
 
+      moveSlide: (deckId, slideId, direction) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const idx = deck.slides.findIndex((s) => s.id === slideId);
+        const j = idx + direction;
+        if (idx < 0 || j < 0 || j >= deck.slides.length) return;
+        const next = [...deck.slides];
+        [next[idx], next[j]] = [next[j], next[idx]];
+        set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next.map((sl, i) => ({ ...sl, position: i })) } } }));
+      },
+
+      removeSlide: (deckId, slideId) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const next = deck.slides.filter((sl) => sl.id !== slideId).map((sl, i) => ({ ...sl, position: i }));
+        set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
+      },
+
+      addSlide: (deckId, sectionId, afterSlideId) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const brief = get().briefs[deck.briefId];
+        if (!brief) return;
+        const options = variantsForSection(sectionId);
+        const variant = options[0] ?? MODULE_VARIANTS[0];
+        const sf = byId(SECTION_FRAMEWORKS, sectionId);
+        const newSlide: DeckSlide = {
+          id: nanoid(8),
+          position: 0,
+          sectionId,
+          variantId: variant.id,
+          layoutId: variant.permittedLayoutIds[0],
+          content: seedContent(variant.id, brief, sf?.name ?? ""),
+          changes: [],
+        };
+        const idx = afterSlideId ? deck.slides.findIndex((sl) => sl.id === afterSlideId) : deck.slides.length - 1;
+        const insertAt = idx < 0 ? deck.slides.length : idx + 1;
+        const next = [...deck.slides.slice(0, insertAt), newSlide, ...deck.slides.slice(insertAt)].map((sl, i) => ({ ...sl, position: i }));
+        set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
+      },
+
+      duplicateSlide: (deckId, slideId) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const idx = deck.slides.findIndex((sl) => sl.id === slideId);
+        if (idx < 0) return;
+        const src = deck.slides[idx];
+        const copy: DeckSlide = { ...src, id: nanoid(8), content: structuredClone(src.content), changes: [] };
+        const next = [...deck.slides.slice(0, idx + 1), copy, ...deck.slides.slice(idx + 1)].map((sl, i) => ({ ...sl, position: i }));
+        set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
+      },
+
+      renameDeck: (deckId, title) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, title } } }));
+      },
+
+      deleteDeck: (deckId) => {
+        set((s) => {
+          const next = { ...s.decks };
+          delete next[deckId];
+          return { decks: next };
+        });
+      },
+
       reset: () => set({ briefs: {}, decks: {} }),
     }),
     { name: "tp-modular-deck" },
