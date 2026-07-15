@@ -46,6 +46,16 @@ export type ModuleVariant = {
   fallbackVariantId?: string;
   editableFields: string[];
   lockedFields: string[];
+  // Optional iconography contract — see src/lib/iconography.ts. When omitted,
+  // the renderer falls back to a "leading / md / soft-tile / accent" default
+  // for list-like modules and "none" for pure-text modules.
+  iconography?: {
+    placement: import("./iconography").IconPlacement;
+    size?: import("./iconography").IconSizeToken;
+    treatment?: import("./iconography").IconTreatment;
+    emphasis?: import("./iconography").IconEmphasis;
+    a11yRole?: import("./iconography").IconA11yRole;
+  };
 };
 
 export type NarrativeArchetype = {
