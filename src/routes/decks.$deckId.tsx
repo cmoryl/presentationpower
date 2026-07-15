@@ -1,0 +1,237 @@
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useState } from "react";
+import { AppShell } from "@/components/AppShell";
+import { useDeckStore } from "@/lib/deck-store";
+import { ScaledSlide } from "@/components/slide/ScaledSlide";
+import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import {
+  BRAND_MODES,
+  MODULE_VARIANTS,
+  SECTION_FRAMEWORKS,
+  LAYOUT_FRAMEWORKS,
+  byId,
+  variantsForSection,
+} from "@/lib/taxonomy";
+
+export const Route = createFileRoute("/decks/$deckId")({
+  head: ({ params }) => ({
+    meta: [{ title: `Deck ${params.deckId} · TransPerfect Modular` }],
+  }),
+  component: DeckEditor,
+});
+
+function DeckEditor() {
+  const { deckId } = Route.useParams();
+  const deck = useDeckStore((s) => s.decks[deckId]);
+  const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
+  const updateField = useDeckStore((s) => s.updateSlideField);
+  const swapVariant = useDeckStore((s) => s.swapVariant);
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  if (!deck) throw notFound();
+  const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
+  const active = deck.slides[activeIdx];
+  const sf = active ? byId(SECTION_FRAMEWORKS, active.sectionId) : undefined;
+  const mv = active ? byId(MODULE_VARIANTS, active.variantId) : undefined;
+  const lf = active ? byId(LAYOUT_FRAMEWORKS, active.layoutId) : undefined;
+
+  return (
+    <AppShell>
+      <div className="flex items-baseline justify-between">
+        <div>
+          <Link to="/" className="text-xs uppercase tracking-widest text-black/50 hover:text-black">← Dashboard</Link>
+          <h1 className="mt-2 text-3xl font-semibold">{deck.title}</h1>
+          <div className="mt-1 text-sm text-black/60">
+            {deck.slides.length} slides · Brand: {brand.name} · Archetype: {byId(SECTION_FRAMEWORKS, deck.slides[0]?.sectionId ?? "")?.name ?? ""}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-8 grid grid-cols-[260px_1fr_360px] gap-6">
+        {/* Overview grid */}
+        <div className="space-y-3">
+          {deck.slides.map((slide, i) => {
+            const variant = byId(MODULE_VARIANTS, slide.variantId);
+            return (
+              <button
+                key={slide.id}
+                onClick={() => setActiveIdx(i)}
+                className={`block w-full overflow-hidden rounded-xl border text-left transition ${
+                  i === activeIdx ? "border-[#0B2A4A] ring-2 ring-[#0B2A4A]/20" : "border-black/10 hover:border-black/30"
+                }`}
+              >
+                <div className="aspect-[16/9] bg-white">
+                  <ScaledSlide>
+                    {variant && <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} />}
+                  </ScaledSlide>
+                </div>
+                <div className="border-t border-black/10 bg-white px-3 py-2 text-xs">
+                  <div className="font-medium">{String(i + 1).padStart(2, "0")} · {byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}</div>
+                  <div className="text-black/50">{variant?.name}</div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Stage */}
+        <div>
+          <div className="overflow-hidden rounded-2xl border border-black/10 shadow-lg">
+            {active && mv && (
+              <ScaledSlide>
+                <VariantRenderer slide={active} variant={mv} brand={brand} pageNumber={activeIdx + 1} />
+              </ScaledSlide>
+            )}
+          </div>
+
+          {/* Editable fields */}
+          {active && mv && (
+            <div className="mt-6 rounded-2xl border border-black/10 bg-white p-6">
+              <div className="text-xs uppercase tracking-widest text-black/50">Editable fields</div>
+              <div className="mt-4 space-y-4">
+                {mv.editableFields.map((path) => (
+                  <FieldEditor
+                    key={path}
+                    path={path}
+                    content={active.content}
+                    onChange={(concretePath, value) => updateField(deck.id, active.id, concretePath, value)}
+                  />
+                ))}
+              </div>
+              {mv.lockedFields.length > 0 && (
+                <div className="mt-6 border-t border-black/10 pt-4 text-xs text-black/50">
+                  <span className="font-medium text-black/70">Locked by the module:</span>{" "}
+                  {mv.lockedFields.join(" · ")}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Inspector */}
+        <aside className="space-y-4">
+          {sf && (
+            <Panel label="Section framework">
+              <div className="font-mono text-xs text-black/50">{sf.id}</div>
+              <div className="mt-1 font-medium">{sf.name}</div>
+              <div className="mt-2 text-sm text-black/60">{sf.purpose}</div>
+            </Panel>
+          )}
+          {mv && (
+            <Panel label="Module variant">
+              <div className="font-mono text-xs text-black/50">{mv.id}</div>
+              <div className="mt-1 font-medium">{mv.name}</div>
+              <div className="mt-2 text-sm text-black/60">{mv.description}</div>
+              {active && (
+                <div className="mt-4">
+                  <div className="mb-2 text-xs uppercase tracking-widest text-black/50">Swap variant</div>
+                  <select
+                    className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                    value={mv.id}
+                    onChange={(e) => swapVariant(deck.id, active.id, e.target.value)}
+                  >
+                    {variantsForSection(active.sectionId).map((v) => (
+                      <option key={v.id} value={v.id}>{v.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </Panel>
+          )}
+          {lf && (
+            <Panel label="Layout framework">
+              <div className="font-mono text-xs text-black/50">{lf.id}</div>
+              <div className="mt-1 font-medium">{lf.name}</div>
+              <div className="mt-2 text-sm text-black/60">{lf.description}</div>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {lf.zones.map((z) => (
+                  <span key={z} className="rounded-full bg-black/5 px-2 py-0.5 text-xs">{z}</span>
+                ))}
+              </div>
+            </Panel>
+          )}
+          {brief && (
+            <Panel label="Brief">
+              <div className="text-sm">{brief.prospect}</div>
+              <div className="mt-1 text-xs text-black/50">{brief.industry} · {brief.audience}</div>
+            </Panel>
+          )}
+        </aside>
+      </div>
+    </AppShell>
+  );
+}
+
+function Panel({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-2xl border border-black/10 bg-white p-5">
+      <div className="text-xs uppercase tracking-widest text-black/50">{label}</div>
+      <div className="mt-3">{children}</div>
+    </div>
+  );
+}
+
+// Expand editable field patterns like "items[].title" against the current content.
+function FieldEditor({
+  path,
+  content,
+  onChange,
+}: {
+  path: string;
+  content: Record<string, unknown>;
+  onChange: (concretePath: string, value: unknown) => void;
+}) {
+  const concretePaths = expandPath(path, content);
+  return (
+    <div>
+      <div className="mb-1 text-xs uppercase tracking-widest text-black/50">{path}</div>
+      <div className="space-y-2">
+        {concretePaths.map((cp) => {
+          const value = String(readPath(content, cp) ?? "");
+          const long = value.length > 80;
+          return long ? (
+            <textarea
+              key={cp}
+              className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+              rows={3}
+              value={value}
+              onChange={(e) => onChange(cp, e.target.value)}
+            />
+          ) : (
+            <input
+              key={cp}
+              className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+              value={value}
+              onChange={(e) => onChange(cp, e.target.value)}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function expandPath(pattern: string, content: Record<string, unknown>): string[] {
+  if (!pattern.includes("[]")) return [pattern];
+  const [head, ...rest] = pattern.split("[]");
+  const arrKey = head.replace(/\.$/, "");
+  const arrVal = readPath(content, arrKey);
+  if (!Array.isArray(arrVal)) return [];
+  const tail = rest.join("[]");
+  return arrVal.map((_, i) => `${arrKey}[${i}]${tail}`);
+}
+
+function readPath(obj: unknown, path: string): unknown {
+  const parts = path.split(".").flatMap((p) => {
+    const m = /^([^\[]+)(\[(\d+)\])?$/.exec(p);
+    if (!m) return [p];
+    return m[3] !== undefined ? [m[1], Number(m[3])] : [m[1]];
+  });
+  let cur: unknown = obj;
+  for (const k of parts) {
+    if (cur == null) return undefined;
+    // @ts-expect-error dynamic
+    cur = cur[k];
+  }
+  return cur;
+}
