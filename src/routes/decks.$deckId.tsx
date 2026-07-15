@@ -258,6 +258,7 @@ function DeckEditor() {
           )}
         </aside>
       </div>
+      <DeckChat deck={deck} brief={brief} />
     </AppShell>
   );
 }
