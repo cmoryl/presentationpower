@@ -95,13 +95,15 @@ export function backdropForVariant(variant: ModuleVariant): SlideBackdrop | null
     return { url: city, scrim: "bottom", scrimStrength: 0.72, imageDim: 0.15 };
   }
 
-  // Closing / CTA — portrait or team with strong vignette.
+  // Closing / CTA — bokeh dominant (matches TransPerfect closing style), rotating in team/portraits.
   if (/^MV-CTA-|CLOSING|NEXT-STEPS|THANKS/.test(id)) {
+    const closingImages = [bokeh, bokeh, team, PORTRAITS[seed % PORTRAITS.length]];
     return {
-      url: seed % 2 === 0 ? team : PORTRAITS[seed % PORTRAITS.length],
-      scrim: "vignette",
-      scrimStrength: 0.7,
-      imageDim: 0.1,
+      url: closingImages[seed % closingImages.length],
+      scrim: "left",
+      scrimStrength: 0.8,
+      imageDim: 0.05,
+      tint: "#03002C",
     };
   }
 
