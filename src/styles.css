@@ -153,3 +153,133 @@
   }
 }
 
+/* -----------------------------------------------------------------------------
+ * Liquid glass system
+ * Frames read as thin, wet glass sitting over colored ambient light.
+ * `glass` = light-context (dark ink through frosted white).
+ * `glass-dark` = dark-context (thin white film over deep navy).
+ * Both stack: translucent tint + backdrop-blur + saturate + inner highlight ring.
+ * ---------------------------------------------------------------------------*/
+
+@utility glass {
+  background: linear-gradient(
+    140deg,
+    color-mix(in oklab, white 72%, transparent) 0%,
+    color-mix(in oklab, white 48%, transparent) 55%,
+    color-mix(in oklab, white 60%, transparent) 100%
+  );
+  backdrop-filter: blur(22px) saturate(160%);
+  border: 1px solid color-mix(in oklab, white 65%, transparent);
+  box-shadow:
+    0 1px 0 0 color-mix(in oklab, white 85%, transparent) inset,
+    0 -1px 0 0 color-mix(in oklab, #03002C 6%, transparent) inset,
+    0 20px 40px -20px color-mix(in oklab, #03002C 30%, transparent),
+    0 2px 8px -2px color-mix(in oklab, #03002C 12%, transparent);
+}
+
+@utility glass-dark {
+  background: linear-gradient(
+    140deg,
+    color-mix(in oklab, white 14%, transparent) 0%,
+    color-mix(in oklab, white 5%, transparent) 55%,
+    color-mix(in oklab, #4D88FF 8%, transparent) 100%
+  );
+  backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid color-mix(in oklab, white 18%, transparent);
+  box-shadow:
+    0 1px 0 0 color-mix(in oklab, white 28%, transparent) inset,
+    0 -1px 0 0 color-mix(in oklab, #03002C 60%, transparent) inset,
+    0 30px 60px -25px rgba(0, 0, 0, 0.6),
+    0 2px 12px -2px rgba(0, 0, 0, 0.35);
+}
+
+/* subtle top-highlight streak — the "wet lip" of the pane */
+@utility glass-sheen {
+  position: relative;
+  isolation: isolate;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, white 45%, transparent) 0%,
+      transparent 30%
+    );
+    pointer-events: none;
+    z-index: 1;
+    mix-blend-mode: overlay;
+  }
+}
+
+/* Ambient color field the glass floats over. Renders as fixed blurred blobs
+ * behind everything; without a color field to refract, backdrop-blur reads
+ * as flat grey and the "glass" collapses to a plain translucent card. */
+@utility ambient-field {
+  position: relative;
+  isolation: isolate;
+  &::before,
+  &::after {
+    content: "";
+    position: fixed;
+    z-index: 0;
+    width: 60vw;
+    height: 60vw;
+    border-radius: 9999px;
+    filter: blur(120px);
+    opacity: 0.55;
+    pointer-events: none;
+  }
+  &::before {
+    top: -20vw;
+    left: -10vw;
+    background: radial-gradient(circle at 30% 30%, #4D88FF, transparent 60%);
+  }
+  &::after {
+    bottom: -25vw;
+    right: -15vw;
+    background: radial-gradient(circle at 60% 40%, #A1FBF9, transparent 55%);
+    opacity: 0.4;
+  }
+  & > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+@utility ambient-field-dark {
+  position: relative;
+  isolation: isolate;
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    border-radius: 9999px;
+    filter: blur(90px);
+    pointer-events: none;
+  }
+  &::before {
+    top: -30%;
+    left: -10%;
+    width: 60%;
+    height: 120%;
+    background: radial-gradient(circle at 40% 40%, #4D88FF, transparent 60%);
+    opacity: 0.55;
+  }
+  &::after {
+    top: 10%;
+    right: -15%;
+    width: 55%;
+    height: 90%;
+    background: radial-gradient(circle at 60% 40%, #EC388A, transparent 55%);
+    opacity: 0.35;
+  }
+  & > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+
