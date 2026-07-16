@@ -100,11 +100,12 @@ export const saveDeckToCloud = createServerFn({ method: "POST" })
         section_id: s.sectionId,
         variant_id: s.variantId,
         layout_id: s.layoutId,
-        content: { ...s.content, __localId: s.id, __changes: s.changes } as Record<string, unknown>,
+        content: { ...s.content, __localId: s.id, __changes: s.changes } as never,
       }));
       const { error: slideErr } = await supabase.from("deck_slides").insert(rows);
       if (slideErr) throw new Error(slideErr.message);
     }
+
     return { deckUuid, briefUuid };
   });
 
