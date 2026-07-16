@@ -1,10 +1,17 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useContrastBoost } from "@/hooks/use-contrast-boost";
+import { useTheme, type ThemeMode } from "@/hooks/use-theme";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [boost, setBoost] = useContrastBoost();
+  const [theme, setTheme] = useTheme();
+  const themes: { id: ThemeMode; label: string }[] = [
+    { id: "cream", label: "Cream" },
+    { id: "light", label: "Light" },
+    { id: "dark",  label: "Dark" },
+  ];
   const nav = [
     { to: "/", label: "Dashboard" },
     { to: "/brief/new", label: "New brief" },
@@ -36,12 +43,35 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </Link>
               );
             })}
+            <div
+              role="radiogroup"
+              aria-label="Color theme"
+              className="ml-2 inline-flex items-center rounded-full border border-black/20 bg-white/40 p-0.5 text-xs"
+            >
+              {themes.map((t) => {
+                const on = theme === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={on}
+                    onClick={() => setTheme(t.id)}
+                    className={`rounded-full px-2.5 py-1 transition ${
+                      on ? "bg-[#03002C] text-white" : "text-black/70 hover:text-black"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
             <button
               type="button"
               onClick={() => setBoost(!boost)}
               aria-pressed={boost}
               aria-label={boost ? "Disable high contrast mode" : "Enable high contrast mode"}
-              title="Auto-adjust text contrast on glass surfaces"
+              title="Auto-adjust text contrast on glass surfaces (WCAG AA)"
               className={`ml-2 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition ${
                 boost
                   ? "border-[#03002C] bg-[#03002C] text-white"
@@ -51,6 +81,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span aria-hidden="true">◐</span>
               <span>Readable</span>
             </button>
+
           </nav>
         </div>
       </header>
