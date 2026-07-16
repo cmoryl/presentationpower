@@ -157,10 +157,18 @@ export function SlideFrame({
         className="absolute left-0 top-0 h-2 w-full"
         style={{ backgroundColor: brand.tokens.accent }}
       />
-      {/* Brand lockup (locked) — placed per approved zone */}
+      {/* Brand lockup (locked) — placed per approved zone.
+          Cover / divider / close chrome gets a hero-scale lockup so the
+          TransPerfect logo actually reads at 1920×1080. Content slides stay
+          quiet at md so titles keep the visual weight. */}
       {showLogo && (
         <div style={logoPositionStyles(placement.position)}>
-          <BrandLockup brand={brand} color={logoColor} size="md" clientName={clientName} />
+          <BrandLockup
+            brand={brand}
+            color={logoColor}
+            size={variant === "content" ? "md" : variant === "cover" ? "xl" : "lg"}
+            clientName={clientName}
+          />
         </div>
       )}
       {/* Content */}
