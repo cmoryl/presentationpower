@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.grant_admin_for_transperfect_domain() FROM PUBLIC, anon, authenticated;
