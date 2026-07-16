@@ -21,6 +21,8 @@ import {
   LOGO_POSITION_BY_LAYOUT,
   resolveLogoPlacement,
 } from "@/lib/logo-placement";
+import { BrandLockup } from "@/components/BrandLockup";
+
 
 export const Route = createFileRoute("/atlas")({
   head: () => ({
@@ -419,11 +421,17 @@ function LogoZoneDiagram({ position }: { position: import("@/lib/logo-placement"
         {isHidden ? (
           <span className="text-[10px] uppercase tracking-widest text-black/30">hidden</span>
         ) : (
-          <div className="flex items-center gap-1.5 rounded border border-[#0B2A4A] px-1.5 py-1">
-            <span className="grid h-4 w-4 place-items-center rounded-sm border border-[#0B2A4A] text-[7px] font-semibold text-[#0B2A4A]">TP</span>
-            <span className="text-[8px] font-semibold tracking-wider text-[#0B2A4A]">TRANSPERFECT</span>
+          <div style={{ color: "#000" }}>
+            <BrandLockup
+              brand={{ id: "tp", name: "TransPerfect", logo: { mark: "TP", wordmark: "TransPerfect" } } as any}
+              color="#000"
+              size="sm"
+              showMark={false}
+              showDivision={false}
+            />
           </div>
         )}
+
       </div>
       <div className="pointer-events-none absolute inset-2 rounded border border-dashed border-black/10" aria-hidden />
     </div>
