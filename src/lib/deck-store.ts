@@ -63,6 +63,11 @@ type DeckState = {
   briefs: Record<string, Brief>;
   decks: Record<string, Deck>;
   createBriefAndAssemble: (brief: Omit<Brief, "id" | "createdAt">) => { briefId: string; deckId: string };
+  createImportedDeck: (input: {
+    title: string;
+    brief: Omit<Brief, "id" | "createdAt">;
+    slides: Array<{ sectionId: string; variantId: string; layoutId: string; content: SlideContent }>;
+  }) => { briefId: string; deckId: string };
   applyAiContent: (deckId: string, aiSlides: Array<{ id: string; content: SlideContent }>) => void;
   revertAiChange: (deckId: string, slideId: string, field: string) => void;
   updateSlideField: (deckId: string, slideId: string, field: string, value: unknown) => void;
@@ -843,6 +848,38 @@ export const useDeckStore = create<DeckState>()(
         }));
         return { briefId: brief.id, deckId: deck.id };
       },
+
+      createImportedDeck: (input) => {
+        const brief: Brief = {
+          ...input.brief,
+          id: nanoid(8),
+          createdAt: new Date().toISOString(),
+        };
+        const deck: Deck = {
+          id: nanoid(10),
+          createdAt: new Date().toISOString(),
+          title: input.title,
+          briefId: brief.id,
+          brandModeId: brief.brandModeId,
+          archetypeId: brief.archetypeId,
+          slides: input.slides.map((s, i) => ({
+            id: nanoid(8),
+            position: i,
+            sectionId: s.sectionId,
+            variantId: s.variantId,
+            layoutId: s.layoutId,
+            content: s.content,
+            changes: [],
+          })),
+        };
+        set((s) => ({
+          briefs: { ...s.briefs, [brief.id]: brief },
+          decks: { ...s.decks, [deck.id]: deck },
+        }));
+        return { briefId: brief.id, deckId: deck.id };
+      },
+
+
 
       applyAiContent: (deckId, aiSlides) => {
         const deck = get().decks[deckId];

@@ -23,6 +23,7 @@ import { Route as KnowledgeOracleRouteImport } from './routes/knowledge.oracle'
 import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
 import { Route as KnowledgeBrandGuidesRouteImport } from './routes/knowledge.brand-guides'
 import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
+import { Route as DecksImportRouteImport } from './routes/decks.import'
 import { Route as DecksDeckIdRouteImport } from './routes/decks.$deckId'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
@@ -106,6 +107,11 @@ const KnowledgeEntryIdRoute = KnowledgeEntryIdRouteImport.update({
   id: '/$entryId',
   path: '/$entryId',
   getParentRoute: () => KnowledgeRoute,
+} as any)
+const DecksImportRoute = DecksImportRouteImport.update({
+  id: '/decks/import',
+  path: '/decks/import',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DecksDeckIdRoute = DecksDeckIdRouteImport.update({
   id: '/decks/$deckId',
@@ -192,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
+  '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesRouteWithChildren
   '/knowledge/new': typeof KnowledgeNewRoute
@@ -219,6 +226,7 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
+  '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesRouteWithChildren
   '/knowledge/new': typeof KnowledgeNewRoute
@@ -249,6 +257,7 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
+  '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesRouteWithChildren
   '/knowledge/new': typeof KnowledgeNewRoute
@@ -280,6 +289,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/brief/new'
     | '/decks/$deckId'
+    | '/decks/import'
     | '/knowledge/$entryId'
     | '/knowledge/brand-guides'
     | '/knowledge/new'
@@ -307,6 +317,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/brief/new'
     | '/decks/$deckId'
+    | '/decks/import'
     | '/knowledge/$entryId'
     | '/knowledge/brand-guides'
     | '/knowledge/new'
@@ -336,6 +347,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/brief/new'
     | '/decks/$deckId'
+    | '/decks/import'
     | '/knowledge/$entryId'
     | '/knowledge/brand-guides'
     | '/knowledge/new'
@@ -360,6 +372,7 @@ export interface RootRouteChildren {
   ApiChatRoute: typeof ApiChatRoute
   BriefNewRoute: typeof BriefNewRoute
   DecksDeckIdRoute: typeof DecksDeckIdRouteWithChildren
+  DecksImportRoute: typeof DecksImportRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -461,6 +474,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/knowledge/$entryId'
       preLoaderRoute: typeof KnowledgeEntryIdRouteImport
       parentRoute: typeof KnowledgeRoute
+    }
+    '/decks/import': {
+      id: '/decks/import'
+      path: '/decks/import'
+      fullPath: '/decks/import'
+      preLoaderRoute: typeof DecksImportRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/decks/$deckId': {
       id: '/decks/$deckId'
@@ -637,6 +657,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiChatRoute: ApiChatRoute,
   BriefNewRoute: BriefNewRoute,
   DecksDeckIdRoute: DecksDeckIdRouteWithChildren,
+  DecksImportRoute: DecksImportRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
