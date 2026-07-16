@@ -21,6 +21,8 @@ import {
   LOGO_POSITION_BY_LAYOUT,
   resolveLogoPlacement,
 } from "@/lib/logo-placement";
+import { BrandLockup } from "@/components/BrandLockup";
+
 
 export const Route = createFileRoute("/atlas")({
   head: () => ({
