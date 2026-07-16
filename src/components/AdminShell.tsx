@@ -54,53 +54,99 @@ function SessionRoleIndicator() {
   const isAdmin = info?.roles.includes("admin");
 
   return (
-    <div className="mt-6 flex flex-wrap items-center gap-3 rounded-2xl border border-black/10 bg-white/70 px-4 py-3 backdrop-blur">
-      <span className="flex items-center gap-2 text-sm">
-        <span
-          className={`inline-block h-2 w-2 rounded-full ${
-            loading ? "bg-black/30" : signedIn ? "bg-emerald-500" : "bg-red-500"
-          }`}
-          aria-hidden
-        />
-        <span className="font-medium text-black/80">
-          {loading ? "Checking session…" : signedIn ? "Signed in" : "Signed out"}
-        </span>
-      </span>
-      {signedIn && (
-        <>
-          <span className="text-sm text-black/60">{info?.email}</span>
-          <span className="flex flex-wrap gap-1">
-            {(info?.roles.length ? info.roles : ["no role"]).map((r) => (
-              <span
-                key={r}
-                className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                  r === "admin"
-                    ? "bg-[#003FC7] text-white"
-                    : r === "no role"
-                      ? "bg-amber-100 text-amber-900"
-                      : "bg-black/10 text-black/70"
-                }`}
-              >
-                {r}
-              </span>
-            ))}
-          </span>
-          {isAdmin && (
-            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-900">
-              Master access
-            </span>
-          )}
-          <button
-            onClick={handleSignOut}
-            className="ml-auto rounded-lg border border-black/10 px-3 py-1 text-xs font-medium text-black/70 hover:bg-black/5"
+    <div className="sticky top-0 z-40 -mx-4 mb-6 border-b border-black/10 bg-white/85 px-4 py-3 backdrop-blur-md md:-mx-8 md:px-8">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <span className="flex items-center gap-2 text-sm">
+          <span
+            className={`relative inline-flex h-2.5 w-2.5 items-center justify-center`}
+            aria-hidden
           >
-            Sign out
-          </button>
-        </>
-      )}
+            <span
+              className={`absolute inline-flex h-full w-full rounded-full opacity-70 ${
+                signedIn ? "animate-ping bg-emerald-400" : ""
+              }`}
+            />
+            <span
+              className={`relative inline-flex h-2.5 w-2.5 rounded-full ${
+                loading ? "bg-black/30" : signedIn ? "bg-emerald-500" : "bg-red-500"
+              }`}
+            />
+          </span>
+          <span className="font-semibold text-black/85">
+            {loading ? "Checking session…" : signedIn ? "Signed in" : "Signed out"}
+          </span>
+        </span>
+        {signedIn && (
+          <>
+            <span className="hidden text-black/20 sm:inline">·</span>
+            <span className="max-w-[220px] truncate text-sm text-black/70" title={info?.email ?? undefined}>
+              {info?.email}
+            </span>
+            <span className="flex flex-wrap gap-1">
+              {(info?.roles.length ? info.roles : ["no role"]).map((r) => (
+                <span
+                  key={r}
+                  className={`rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${
+                    r === "admin"
+                      ? "bg-[#003FC7] text-white"
+                      : r === "no role"
+                        ? "bg-amber-100 text-amber-900"
+                        : "bg-black/10 text-black/70"
+                  }`}
+                >
+                  {r}
+                </span>
+              ))}
+              {isAdmin && (
+                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-900">
+                  Master
+                </span>
+              )}
+            </span>
+            <div className="ml-auto flex flex-wrap items-center gap-1.5">
+              {quickActions.map((a) => (
+                <Link
+                  key={a.to}
+                  to={a.to}
+                  className="rounded-lg border border-black/10 bg-white px-2.5 py-1 text-xs font-medium text-black/75 shadow-sm transition hover:border-[#003FC7]/40 hover:bg-[#003FC7]/5 hover:text-[#003FC7]"
+                  title={a.hint}
+                >
+                  {a.label}
+                </Link>
+              ))}
+              <button
+                onClick={handleSignOut}
+                className="rounded-lg border border-black/10 bg-white px-2.5 py-1 text-xs font-medium text-black/70 shadow-sm hover:border-red-300 hover:bg-red-50 hover:text-red-700"
+              >
+                Sign out
+              </button>
+            </div>
+          </>
+        )}
+        {!signedIn && !loading && (
+          <a
+            href="/auth"
+            className="ml-auto rounded-lg bg-[#003FC7] px-3 py-1 text-xs font-semibold text-white hover:bg-[#0033a3]"
+          >
+            Sign in
+          </a>
+        )}
+      </div>
     </div>
   );
 }
+
+type QuickAction = { to: string; label: string; hint: string };
+
+const adminQuickActions: QuickAction[] = [
+  { to: "/admin/users", label: "Manage users", hint: "Grant or revoke roles" },
+  { to: "/admin/approvals", label: "Approvals", hint: "Review knowledgebase submissions" },
+  { to: "/admin/audit", label: "Audit log", hint: "Recent admin activity" },
+];
+
+const memberQuickActions: QuickAction[] = [
+  { to: "/", label: "Back to app", hint: "Return to the main workspace" },
+];
 
 const items: Array<{ to: string; label: string; exact?: boolean }> = [
   { to: "/admin", label: "Overview", exact: true },
@@ -117,6 +163,7 @@ export function AdminShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <AppShell>
+      <SessionRoleBanner />
       <div>
         <div className="text-xs uppercase tracking-[0.3em] text-black/50">Enterprise console</div>
         <h1 className="mt-3 text-4xl font-semibold">Admin</h1>
@@ -124,7 +171,6 @@ export function AdminShell() {
           Governance, analytics, and experimentation for the TransPerfect Modular system. Admin role required.
         </p>
       </div>
-      <SessionRoleIndicator />
       <nav className="mt-6 flex flex-wrap gap-1 rounded-2xl border border-black/10 bg-white/60 p-1 backdrop-blur">
         {items.map((it) => {
           const active = it.exact ? pathname === it.to : pathname === it.to || pathname.startsWith(it.to + "/");
