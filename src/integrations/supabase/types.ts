@@ -277,6 +277,110 @@ export type Database = {
         }
         Relationships: []
       }
+      brand_asset_chunks: {
+        Row: {
+          asset_id: string
+          chunk_index: number
+          content: string
+          created_at: string
+          division_id: string | null
+          embedding: string | null
+          id: string
+          metadata: Json
+          tags: string[]
+          token_count: number | null
+        }
+        Insert: {
+          asset_id: string
+          chunk_index: number
+          content: string
+          created_at?: string
+          division_id?: string | null
+          embedding?: string | null
+          id?: string
+          metadata?: Json
+          tags?: string[]
+          token_count?: number | null
+        }
+        Update: {
+          asset_id?: string
+          chunk_index?: number
+          content?: string
+          created_at?: string
+          division_id?: string | null
+          embedding?: string | null
+          id?: string
+          metadata?: Json
+          tags?: string[]
+          token_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_asset_chunks_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "brand_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brand_assets: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          division_id: string | null
+          entity_id: string | null
+          entity_type: string | null
+          extracted_text: string | null
+          id: string
+          kind: string
+          metadata: Json
+          source_filename: string | null
+          storage_path: string | null
+          tags: string[]
+          title: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          division_id?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          extracted_text?: string | null
+          id?: string
+          kind?: string
+          metadata?: Json
+          source_filename?: string | null
+          storage_path?: string | null
+          tags?: string[]
+          title: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          division_id?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          extracted_text?: string | null
+          id?: string
+          kind?: string
+          metadata?: Json
+          source_filename?: string | null
+          storage_path?: string | null
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       brand_intelligence: {
         Row: {
           brand_summary: string | null
@@ -1041,6 +1145,21 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      match_brand_chunks: {
+        Args: {
+          filter_division?: string
+          match_count?: number
+          query_embedding: string
+        }
+        Returns: {
+          asset_id: string
+          content: string
+          division_id: string
+          id: string
+          similarity: number
+          tags: string[]
+        }[]
       }
     }
     Enums: {
