@@ -47,19 +47,21 @@ export function BrandLockup({
 }: {
   brand: BrandMode;
   color: string;
-  size?: "xs" | "sm" | "md" | "lg";
+  size?: "2xs" | "xs" | "sm" | "md" | "lg";
   showMark?: boolean;
   showDivision?: boolean;
   clientName?: string; // Substituted into division line when it contains {client}
 }) {
   const dims =
-    size === "xs"
-      ? { markPx: 18, wordmarkPx: 11, wordPx: 11, dividerPx: 8, radiusPx: 5, gapPx: 6 }
-      : size === "sm"
-        ? { markPx: 24, wordmarkPx: 14, wordPx: 14, dividerPx: 10, radiusPx: 6, gapPx: 8 }
-        : size === "lg"
-          ? { markPx: 44, wordmarkPx: 26, wordPx: 22, dividerPx: 14, radiusPx: 10, gapPx: 12 }
-          : { markPx: 32, wordmarkPx: 18, wordPx: 17, dividerPx: 11, radiusPx: 8, gapPx: 10 };
+    size === "2xs"
+      ? { markPx: 14, wordmarkPx: 8, wordPx: 8, dividerPx: 6, radiusPx: 4, gapPx: 4 }
+      : size === "xs"
+        ? { markPx: 18, wordmarkPx: 11, wordPx: 11, dividerPx: 8, radiusPx: 5, gapPx: 6 }
+        : size === "sm"
+          ? { markPx: 24, wordmarkPx: 14, wordPx: 14, dividerPx: 10, radiusPx: 6, gapPx: 8 }
+          : size === "lg"
+            ? { markPx: 44, wordmarkPx: 26, wordPx: 22, dividerPx: 14, radiusPx: 10, gapPx: 12 }
+            : { markPx: 32, wordmarkPx: 18, wordPx: 17, dividerPx: 11, radiusPx: 8, gapPx: 10 };
   const logo = brand.logo ?? { mark: brand.name.slice(0, 2).toUpperCase(), wordmark: brand.name };
   const divisionLine = logo.divisionLine?.replace("{client}", clientName ?? "Client");
 
