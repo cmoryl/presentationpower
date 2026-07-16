@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 
-export type ThemeMode = "cream" | "light" | "dark";
+export type ThemeMode = "light" | "dark";
 const STORAGE_KEY = "tp:theme-mode";
 
 /**
  * App-wide theme. Persists to localStorage and applies:
- *  - `data-theme="cream|light|dark"` on <html>
+ *  - `data-theme="light|dark"` on <html>
  *  - `.dark` class on <html> (so Tailwind `dark:` variants + our overrides fire)
  *
  * Global overrides in styles.css re-map the hardcoded brand hexes
@@ -13,22 +13,22 @@ const STORAGE_KEY = "tp:theme-mode";
  * Tailwind color classes still flip correctly per theme.
  */
 function readStoredMode(): ThemeMode {
-  if (typeof window === "undefined") return "cream";
+  if (typeof window === "undefined") return "light";
   try {
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === "cream" || stored === "light" || stored === "dark") return stored;
+    if (stored === "light" || stored === "dark") return stored;
   } catch {
     /* ignore */
   }
-  return "cream";
+  return "light";
 }
 
 export function useTheme(): [ThemeMode, (next: ThemeMode) => void] {
-  // SSR-safe: start on cream during server render, then sync from localStorage
+  // SSR-safe: start on light during server render, then sync from localStorage
   // on the first client effect. Reading in useState would hydration-mismatch;
   // instead we hydrate to the stored value once and let multiple useTheme
   // instances agree on the same value before any write occurs.
-  const [mode, setModeState] = useState<ThemeMode>("cream");
+  const [mode, setModeState] = useState<ThemeMode>("light");
   const hydrated = useRef(false);
 
   useEffect(() => {

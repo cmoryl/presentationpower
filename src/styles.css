@@ -340,7 +340,6 @@
 
 /* Body base color per theme so anything relying on inherited text color
  * (e.g. plain <p> without a text- class) still meets contrast. */
-[data-theme="cream"] body { background-color: #F5F1EA; color: #0A0F1C; }
 [data-theme="light"] body { background-color: #FFFFFF; color: #0A0F1C; }
 [data-theme="dark"]  body { background-color: #0A0929; color: #E0E8F5; }
 
