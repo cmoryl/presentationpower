@@ -89,7 +89,11 @@ const ICON_KEYWORDS: Array<[RegExp, IconType]> = [
 
 const DEFAULT_ICONS: IconType[] = [Target, Layers3, Workflow, LineChart, Users, Rocket];
 
-function pickIcon(label: string, fallbackIndex = 0): IconType {
+import { iconByName } from "@/lib/icon-library";
+
+function pickIcon(label: string, fallbackIndex = 0, override?: string | null): IconType {
+  const forced = iconByName(override);
+  if (forced) return forced as IconType;
   const text = label || "";
   for (const [rx, Icon] of ICON_KEYWORDS) if (rx.test(text)) return Icon;
   return DEFAULT_ICONS[Math.abs(fallbackIndex) % DEFAULT_ICONS.length];
