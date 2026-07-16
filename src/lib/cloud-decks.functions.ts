@@ -74,8 +74,9 @@ export const saveDeckToCloud = createServerFn({ method: "POST" })
       brand_mode_id: data.brief.brandModeId,
       length_target: data.brief.lengthTarget,
       known_facts: data.brief.clientFacts,
-      inputs: data.brief as unknown as Record<string, unknown>,
+      inputs: data.brief as never,
     });
+
     if (briefErr) throw new Error(briefErr.message);
 
     const { error: deckErr } = await supabase.from("decks").upsert({
