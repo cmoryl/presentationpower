@@ -317,6 +317,16 @@ function DeckEditor() {
         </aside>
       </div>
       <DeckChat deck={deck} brief={brief} />
+      {zoomed && active && mv && (
+        <SlideLightbox
+          onClose={() => setZoomed(false)}
+          label={`Slide ${clamped + 1} of ${deck.slides.length}`}
+          onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
+          onNext={clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined}
+        >
+          <VariantRenderer slide={active} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} />
+        </SlideLightbox>
+      )}
     </AppShell>
   );
 }
