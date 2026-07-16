@@ -301,7 +301,7 @@ function renderVariantBody({
           <div className="mt-16 grid grid-cols-2 gap-x-24 gap-y-10">
             {arr(c.items).map((it, i) => (
               <div key={i} className="flex items-center gap-6">
-                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" />
+                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} />
                 <div className="text-5xl font-semibold" style={{ color: brand.tokens.accent }}>
                   {String(i + 1).padStart(2, "0")}
                 </div>
@@ -319,7 +319,7 @@ function renderVariantBody({
           <div className="mt-14 space-y-8">
             {arr(c.items).map((it, i) => (
               <div key={i} className="flex items-center gap-8 border-b border-black/10 pb-6">
-                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" />
+                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} />
                 <div className="w-24 text-5xl font-semibold" style={{ color: brand.tokens.accent }}>
                   {String(i + 1).padStart(2, "0")}
                 </div>
@@ -556,7 +556,7 @@ function renderVariantBody({
           <div className="mt-12 grid grid-cols-2 gap-x-16 gap-y-8">
             {arr(c.items).map((it, i) => (
               <div key={i} className="flex items-start gap-5">
-                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" />
+                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} />
                 <div className="flex-1">
                   <div className="text-3xl font-semibold" style={{ color: brand.tokens.primary }}>
                     {s(it.label)}
@@ -579,7 +579,7 @@ function renderVariantBody({
               {arr(c.items).map((it, i) => (
                 <div key={i} className="pr-10">
                   <div className="mb-6 -translate-y-4">
-                    <IconBadge brand={brand} label={s(it.label)} index={i} size="md" />
+                    <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} />
                   </div>
                   <div className="text-3xl font-semibold" style={{ color: brand.tokens.primary }}>
                     {s(it.label)}
@@ -2269,7 +2269,7 @@ function NumberedList({ brand, pageNumber, title, items }: { brand: BrandMode; p
           const label = s(it.title ?? it.label);
           return (
             <div key={i} className="flex items-start gap-8 rounded-xl border p-8" style={{ borderColor: "rgba(10,15,28,0.08)", backgroundColor: brand.tokens.surface }}>
-              <IconBadge brand={brand} label={label} index={i} size="lg" />
+              <IconBadge brand={brand} label={label} index={i} size="lg" override={s(it.icon)} />
               <div className="w-20 text-5xl font-semibold" style={{ color: brand.tokens.accent }}>
                 {String(i + 1).padStart(2, "0")}
               </div>
