@@ -6,8 +6,10 @@ import {
   useBrandLibrary,
   getBrandContext,
   aggregateMemory,
+  recommendImagery,
   type ImageEntry,
   type ImageryAnalytics,
+  type ImageMatch,
 } from "@/lib/imagery-library";
 import { generateBrandImage } from "@/lib/imagery.functions";
 
