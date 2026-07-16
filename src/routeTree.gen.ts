@@ -19,6 +19,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as KnowledgeOracleRouteImport } from './routes/knowledge.oracle'
 import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
 import { Route as KnowledgeBrandGuidesRouteImport } from './routes/knowledge.brand-guides'
 import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
@@ -85,6 +86,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const KnowledgeOracleRoute = KnowledgeOracleRouteImport.update({
+  id: '/oracle',
+  path: '/oracle',
+  getParentRoute: () => KnowledgeRoute,
 } as any)
 const KnowledgeNewRoute = KnowledgeNewRouteImport.update({
   id: '/new',
@@ -189,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesRouteWithChildren
   '/knowledge/new': typeof KnowledgeNewRoute
+  '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/admin/': typeof AdminIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
@@ -215,6 +222,7 @@ export interface FileRoutesByTo {
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesRouteWithChildren
   '/knowledge/new': typeof KnowledgeNewRoute
+  '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/admin': typeof AdminIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesRouteWithChildren
   '/knowledge/new': typeof KnowledgeNewRoute
+  '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/admin/': typeof AdminIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
@@ -274,6 +283,7 @@ export interface FileRouteTypes {
     | '/knowledge/$entryId'
     | '/knowledge/brand-guides'
     | '/knowledge/new'
+    | '/knowledge/oracle'
     | '/admin/'
     | '/knowledge/'
     | '/decks/$deckId/document'
@@ -300,6 +310,7 @@ export interface FileRouteTypes {
     | '/knowledge/$entryId'
     | '/knowledge/brand-guides'
     | '/knowledge/new'
+    | '/knowledge/oracle'
     | '/admin'
     | '/knowledge'
     | '/decks/$deckId/document'
@@ -328,6 +339,7 @@ export interface FileRouteTypes {
     | '/knowledge/$entryId'
     | '/knowledge/brand-guides'
     | '/knowledge/new'
+    | '/knowledge/oracle'
     | '/admin/'
     | '/knowledge/'
     | '/decks/$deckId/document'
@@ -421,6 +433,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/knowledge/oracle': {
+      id: '/knowledge/oracle'
+      path: '/oracle'
+      fullPath: '/knowledge/oracle'
+      preLoaderRoute: typeof KnowledgeOracleRouteImport
+      parentRoute: typeof KnowledgeRoute
     }
     '/knowledge/new': {
       id: '/knowledge/new'
@@ -574,6 +593,7 @@ interface KnowledgeRouteChildren {
   KnowledgeEntryIdRoute: typeof KnowledgeEntryIdRoute
   KnowledgeBrandGuidesRoute: typeof KnowledgeBrandGuidesRouteWithChildren
   KnowledgeNewRoute: typeof KnowledgeNewRoute
+  KnowledgeOracleRoute: typeof KnowledgeOracleRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
 }
 
@@ -581,6 +601,7 @@ const KnowledgeRouteChildren: KnowledgeRouteChildren = {
   KnowledgeEntryIdRoute: KnowledgeEntryIdRoute,
   KnowledgeBrandGuidesRoute: KnowledgeBrandGuidesRouteWithChildren,
   KnowledgeNewRoute: KnowledgeNewRoute,
+  KnowledgeOracleRoute: KnowledgeOracleRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,
 }
 
