@@ -53,13 +53,15 @@ export const getAdminOverview = createServerFn({ method: "GET" })
     const s = context.supabase as unknown as SbClient;
     const now = new Date();
     const from = new Date(now.getTime() - 30 * 24 * 3600 * 1000).toISOString();
-    const [ai, imgs, decks, users, kb, exps] = await Promise.all([
+    const [ai, imgs, decks, users, kb, exps, oracleKb, brandIntel] = await Promise.all([
       s.from("ai_events").select("cost_credits, tokens_in, tokens_out, latency_ms, status, created_at").gte("created_at", from),
       s.from("imagery_events").select("event_type, brand_id, created_at").gte("created_at", from),
       s.from("decks").select("id", { count: "exact", head: true }),
       s.from("profiles").select("id", { count: "exact", head: true }),
       s.from("knowledge_entries").select("id", { count: "exact", head: true }),
       s.from("ab_experiments").select("id, status"),
+      s.from("oracle_knowledge_base").select("id", { count: "exact", head: true }),
+      s.from("brand_intelligence").select("id", { count: "exact", head: true }),
     ]);
     const aiRows = (ai.data ?? []) as Array<{ cost_credits: number; tokens_in: number; tokens_out: number; latency_ms: number; status: string; created_at: string }>;
     const imgRows = (imgs.data ?? []) as Array<{ event_type: string; created_at: string; brand_id: string | null }>;
