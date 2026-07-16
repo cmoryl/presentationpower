@@ -151,8 +151,8 @@ function OracleView() {
                     <span className="text-black/50">{String(r.recommendation ?? r.title ?? `Rec ${i + 1}`)}</span>
                     <span className={priorityCls(String(r.priority ?? "medium"))}>{String(r.priority ?? "medium")}</span>
                   </div>
-                  {r.rationale && <div className="mt-2 text-xs text-black/60">{String(r.rationale)}</div>}
-                  {r.impact && <div className="mt-1 text-xs text-emerald-800">Impact: {String(r.impact)}</div>}
+                  {r.rationale ? <div className="mt-2 text-xs text-black/60">{String(r.rationale)}</div> : null}
+                  {r.impact ? <div className="mt-1 text-xs text-emerald-800">Impact: {String(r.impact)}</div> : null}
                 </li>
               ))}
             </ul>
