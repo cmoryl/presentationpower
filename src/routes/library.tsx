@@ -268,45 +268,93 @@ function VariantCard({
     <button
       type="button"
       onClick={onOpen}
-      className={`group glass-sheen block w-full overflow-hidden rounded-2xl text-left transition hover:-translate-y-0.5 hover:shadow-2xl ${
-        isDark ? "glass-dark text-white" : "glass text-[#03002C]"
-      }`}
+      className="group relative block w-full overflow-hidden rounded-[24px] border border-slate-200 bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:border-[#003FC7]/20 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)]"
     >
-      <div className={`relative aspect-[16/9] ${isDark ? "bg-[#03002C]/40" : "bg-white/40"}`}>
+      {/* Slide preview — inset with rounded frame */}
+      <div className={`relative m-2 aspect-[16/10] overflow-hidden rounded-[18px] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
         <ScaledSlide>
           <SlideBackdropContext.Provider value={backdrop}>
             <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
             {showZones && <MediaZoneOverlay variant={variant} />}
           </SlideBackdropContext.Provider>
         </ScaledSlide>
-        <div className={`absolute right-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest opacity-0 backdrop-blur-md transition group-hover:opacity-100 ${
-          isDark ? "bg-white/15 text-white ring-1 ring-white/25" : "bg-black/60 text-white"
-        }`}>
-          View details ↗
+
+        {/* Subtle top-right specular gradient */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.08]" />
+
+        {/* Diagonal light sweep on hover */}
+        <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.08] to-transparent opacity-0 transition-all duration-700 group-hover:translate-x-full group-hover:opacity-100" />
+
+        {/* Quick-action overlay */}
+        <div className="absolute inset-0 flex items-center justify-center gap-3 bg-[#03002C]/40 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100">
+          <span className="translate-y-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#03002C] shadow-lg transition-transform duration-300 group-hover:translate-y-0">
+            Preview
+          </span>
+          <span className="translate-y-2 rounded-full border border-white/30 bg-white/20 p-2 text-white backdrop-blur-md transition-transform delay-75 duration-300 group-hover:translate-y-0">
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </span>
         </div>
+
         {preferred && (
-          <div className="absolute left-3 top-3 rounded-full bg-emerald-500/80 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white shadow backdrop-blur-md ring-1 ring-white/30">
+          <div className="absolute left-3 top-3 rounded-full bg-emerald-500/85 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white shadow ring-1 ring-white/30 backdrop-blur-md">
             In scope
           </div>
         )}
       </div>
-      <div className={`border-t p-4 ${isDark ? "border-white/10" : "border-white/40"}`}>
-        <div className="flex items-baseline justify-between">
-          <div className={`font-mono text-xs ${isDark ? "text-white/50" : "text-black/50"}`}>{variant.id}</div>
-          <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] backdrop-blur-md ${
-            isDark ? "bg-white/10 text-white/80 ring-1 ring-white/15" : "bg-[#0B2A4A]/10 text-[#0B2A4A]"
-          }`}>
+
+      {/* Metadata footer */}
+      <div className="space-y-4 p-6 pt-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 space-y-1">
+            <div className="font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-[#003FC7]">
+              {variant.id}
+            </div>
+            <h3 className="truncate text-lg font-semibold tracking-tight text-[#03002C]">
+              {variant.name}
+            </h3>
+          </div>
+          <span className="shrink-0 rounded-md bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500">
             {variant.familyId}
           </span>
         </div>
-        <div className="mt-1 font-medium">{variant.name}</div>
-        <div className={`mt-1 line-clamp-2 text-sm ${isDark ? "text-white/60" : "text-black/60"}`}>{variant.description}</div>
-        <div className={`mt-3 text-xs ${isDark ? "text-white/50" : "text-black/50"}`}>
-          <div>Family: {familyName}</div>
-          <div>Layouts: {variant.permittedLayoutIds.join(", ")}</div>
-          {variant.capacity.items && (
-            <div>Items: {variant.capacity.items.min}–{variant.capacity.items.max}</div>
-          )}
+
+        <p className="line-clamp-2 text-sm leading-relaxed text-slate-500">
+          {variant.description}
+        </p>
+
+        <div className="flex items-center justify-between border-t border-slate-100 pt-4">
+          <div className="flex items-center gap-4">
+            <div className="flex flex-col">
+              <span className="text-[9px] font-bold uppercase tracking-tighter text-slate-400">Family</span>
+              <span className="truncate text-xs font-medium text-[#03002C]">{familyName ?? "—"}</span>
+            </div>
+            <div className="h-6 w-px bg-slate-100" />
+            <div className="flex flex-col">
+              <span className="text-[9px] font-bold uppercase tracking-tighter text-slate-400">Layouts</span>
+              <span className="text-xs font-medium text-[#03002C]">
+                {variant.permittedLayoutIds.length} {variant.permittedLayoutIds.length === 1 ? "variant" : "variants"}
+              </span>
+            </div>
+            {variant.capacity.items && (
+              <>
+                <div className="h-6 w-px bg-slate-100" />
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-bold uppercase tracking-tighter text-slate-400">Items</span>
+                  <span className="text-xs font-medium text-[#03002C]">
+                    {variant.capacity.items.min}–{variant.capacity.items.max}
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-1 text-xs font-semibold text-[#003FC7]">
+            <span>Details</span>
+            <svg className="h-3 w-3 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+            </svg>
+          </div>
         </div>
       </div>
     </button>
