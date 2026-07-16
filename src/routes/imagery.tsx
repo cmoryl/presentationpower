@@ -7,6 +7,7 @@ import {
   getBrandContext,
   aggregateMemory,
   type ImageEntry,
+  type ImageryAnalytics,
 } from "@/lib/imagery-library";
 import { generateBrandImage } from "@/lib/imagery.functions";
 
