@@ -89,8 +89,12 @@ export function SlideFrame({
     if (!backdrop) return "none";
     const a = scrimStrength;
     const t = tint;
+    // Light mode: keep the whole frame near-white and only let the image
+    // peek through as a faint tinted wash on the opposite edge.
+    const minA = lightBackdrop ? Math.min(1, a * 0.78) : 0;
+    const midA = lightBackdrop ? Math.min(1, a * 0.9) : a * 0.55;
     const to = (dir: string) =>
-      `linear-gradient(${dir}, ${hexA(t, a)} 0%, ${hexA(t, a * 0.55)} 45%, ${hexA(t, 0)} 100%)`;
+      `linear-gradient(${dir}, ${hexA(t, a)} 0%, ${hexA(t, midA)} 45%, ${hexA(t, minA)} 100%)`;
     switch (backdrop.scrim ?? "bottom") {
       case "bottom": return to("to top");
       case "top":    return to("to bottom");
@@ -98,8 +102,11 @@ export function SlideFrame({
       case "right":  return to("to left");
       case "full":   return `linear-gradient(${hexA(t, a)}, ${hexA(t, a)})`;
       case "vignette":
-        return `linear-gradient(${hexA(t, a * 0.35)}, ${hexA(t, a)})`;
+        return lightBackdrop
+          ? `radial-gradient(circle at 50% 50%, ${hexA(t, a * 0.85)} 0%, ${hexA(t, a)} 70%)`
+          : `linear-gradient(${hexA(t, a * 0.35)}, ${hexA(t, a)})`;
     }
+
   })();
 
   return (
