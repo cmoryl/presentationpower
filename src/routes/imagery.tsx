@@ -255,7 +255,13 @@ function ImageryPage() {
                     "--tw-ring-color": primary,
                   }}
                 >
-                  <button onClick={() => setSelected(e.id)} className="block aspect-[16/10] w-full">
+                  <button
+                    onClick={() => {
+                      setSelected(e.id);
+                      lib.recordUsage(e.id);
+                    }}
+                    className="block aspect-[16/10] w-full"
+                  >
                     <img src={e.url} alt="" className="h-full w-full object-cover" />
                   </button>
                   <div className="absolute left-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-[10px] uppercase tracking-wider text-white">
