@@ -387,6 +387,34 @@ function BriefWizard() {
                 </Field>
               </section>
 
+              {/* SECTION 05: Palette Lab (advanced A/B during creation) */}
+              <section className="space-y-4">
+                <div className="flex items-baseline justify-between">
+                  <label className={labelCls}>05 · Palette Lab</label>
+                  <span className="text-[10px] font-medium uppercase tracking-widest text-[#1E3A5F]/50">
+                    optional · attach an A/B test or pick an AI palette
+                  </span>
+                </div>
+                {brand && (
+                  <PaletteLab
+                    brandId={brand.id}
+                    brandName={brand.name}
+                    brandRole={brand.role}
+                    seedPalette={{
+                      primary: brand.tokens?.primary ?? PALETTE.blue,
+                      accent: brand.tokens?.accent ?? PALETTE.blue,
+                      ink: brand.tokens?.ink ?? PALETTE.ink,
+                      surface: brand.tokens?.surface ?? PALETTE.surface,
+                    }}
+                    audience={form.audience}
+                    objective={form.meetingObjective}
+                    accent={brandPrimary}
+                    onChange={setPaletteSel}
+                  />
+                )}
+              </section>
+
+
               {/* Footer CTAs — themed with brand primary */}
               <div
                 className="flex flex-col-reverse items-stretch justify-between gap-4 border-t pt-6 md:flex-row md:items-center"
