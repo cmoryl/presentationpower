@@ -1,0 +1,160 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { AppShell } from "@/components/AppShell";
+
+type QA = { q: string; a: string };
+
+const FAQS: Array<{ section: string; items: QA[] }> = [
+  {
+    section: "Getting started",
+    items: [
+      {
+        q: "What is TransPerfect Modular?",
+        a: "A modular slide directory and AI-assisted deck assembler for TransPerfect sales enablement. Build decks from vetted module variants, personalize them by industry and prospect, and export to PowerPoint.",
+      },
+      {
+        q: "Who can access the app?",
+        a: "Anyone with a TransPerfect email can sign up. Admin privileges are granted automatically for @transperfect.com addresses on first confirmed sign-in.",
+      },
+      {
+        q: "How do I build my first deck?",
+        a: "Start from Brief → New. Fill in prospect, industry, and objective; the system suggests an archetype and drafts module variants you can review, swap, and personalize before exporting.",
+      },
+    ],
+  },
+  {
+    section: "Modules & decks",
+    items: [
+      {
+        q: "What is a module variant?",
+        a: "A single vetted slide layout tied to a narrative purpose — e.g. cover, pillars, proof point, quote, closing. Every variant renders from structured content, so swapping variants keeps your data intact.",
+      },
+      {
+        q: "Can I import an existing PowerPoint?",
+        a: "Yes. Use Decks → Import to upload a .pptx. Text and structure are parsed server-side, auto-mapped to variants, and shown for review before assembly.",
+      },
+      {
+        q: "How do I export to PowerPoint?",
+        a: "Open any deck and click Export. The system generates a branded .pptx that matches TransPerfect's visual system.",
+      },
+    ],
+  },
+  {
+    section: "Knowledge & Oracle",
+    items: [
+      {
+        q: "What's the difference between Knowledge and Oracle KB?",
+        a: "Knowledge is the app's live entry system used by search, briefs, and generation. Oracle KB is a read-only imported snapshot from BrandHub. Admins can sync individual Oracle entries into Knowledge from Admin → Oracle KB.",
+      },
+      {
+        q: "Where does brand intelligence come from?",
+        a: "The brand_intelligence table holds per-entity summaries imported from BrandHub. It powers the Oracle overview but does not drive generation.",
+      },
+    ],
+  },
+  {
+    section: "Account & admin",
+    items: [
+      {
+        q: "How do I stay signed in?",
+        a: 'Check "Remember me on this device" at sign-in. Your email will be pre-filled next time.',
+      },
+      {
+        q: "How do I get admin access?",
+        a: "Ask an existing workspace admin from Admin → Users. TransPerfect email addresses receive admin automatically once their email is confirmed.",
+      },
+      {
+        q: "Can I install this as an app?",
+        a: 'Yes. On iOS use Safari → Share → "Add to Home Screen". On Android/desktop Chrome, use the install icon in the address bar. Works offline is not supported.',
+      },
+    ],
+  },
+];
+
+export const Route = createFileRoute("/faq")({
+  head: () => ({
+    meta: [
+      { title: "FAQ · TransPerfect Modular" },
+      {
+        name: "description",
+        content:
+          "Frequently asked questions about TransPerfect Modular: building decks, importing PowerPoint, knowledge and Oracle, admin, and installation.",
+      },
+      { property: "og:title", content: "FAQ · TransPerfect Modular" },
+      {
+        property: "og:description",
+        content:
+          "Frequently asked questions about TransPerfect Modular: building decks, importing PowerPoint, knowledge and Oracle, admin, and installation.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: FAQS.flatMap((s) =>
+            s.items.map((qa) => ({
+              "@type": "Question",
+              name: qa.q,
+              acceptedAnswer: { "@type": "Answer", text: qa.a },
+            })),
+          ),
+        }),
+      },
+    ],
+  }),
+  component: FAQPage,
+});
+
+function FAQPage() {
+  return (
+    <AppShell>
+      <div className="flex items-baseline justify-between gap-6">
+        <div>
+          <div className="text-xs uppercase tracking-[0.3em] text-black/50">Support</div>
+          <h1 className="mt-3 text-4xl font-semibold">Frequently asked questions</h1>
+          <p className="mt-3 max-w-2xl text-black/60">
+            Answers about building decks, importing PowerPoint, the knowledge system, and administration. Can't find
+            what you need?{" "}
+            <Link to="/knowledge" className="font-medium text-[#003FC7] hover:underline">
+              Browse the knowledge base
+            </Link>
+            .
+          </p>
+        </div>
+        <Link
+          to="/"
+          className="rounded-full border border-black/15 px-4 py-2.5 text-sm text-black/70 hover:border-black/40"
+        >
+          ← Home
+        </Link>
+      </div>
+
+      <div className="mt-10 space-y-10">
+        {FAQS.map((section) => (
+          <section key={section.section}>
+            <h2 className="text-xs font-semibold uppercase tracking-[0.25em] text-[#003FC7]">{section.section}</h2>
+            <div className="mt-4 divide-y divide-black/10 overflow-hidden rounded-2xl border border-black/10 bg-white/70 backdrop-blur">
+              {section.items.map((qa, i) => (
+                <details key={i} className="group open:bg-black/[0.02]">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-left">
+                    <span className="text-base font-medium text-black/90">{qa.q}</span>
+                    <span
+                      aria-hidden
+                      className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-black/15 text-black/60 transition group-open:rotate-45 group-open:border-[#003FC7] group-open:text-[#003FC7]"
+                    >
+                      +
+                    </span>
+                  </summary>
+                  <div className="px-5 pb-5 text-sm leading-relaxed text-black/70">{qa.a}</div>
+                </details>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </AppShell>
+  );
+}
