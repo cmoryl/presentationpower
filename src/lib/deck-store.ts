@@ -63,6 +63,11 @@ type DeckState = {
   briefs: Record<string, Brief>;
   decks: Record<string, Deck>;
   createBriefAndAssemble: (brief: Omit<Brief, "id" | "createdAt">) => { briefId: string; deckId: string };
+  createImportedDeck: (input: {
+    title: string;
+    brief: Omit<Brief, "id" | "createdAt">;
+    slides: Array<{ sectionId: string; variantId: string; layoutId: string; content: SlideContent }>;
+  }) => { briefId: string; deckId: string };
   applyAiContent: (deckId: string, aiSlides: Array<{ id: string; content: SlideContent }>) => void;
   revertAiChange: (deckId: string, slideId: string, field: string) => void;
   updateSlideField: (deckId: string, slideId: string, field: string, value: unknown) => void;
