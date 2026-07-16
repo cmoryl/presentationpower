@@ -60,17 +60,20 @@ export type BrandGuide = {
   sourceUrl?: string;
 };
 
-// ─── Master TransPerfect Brand Guide (v3.0) ────────────────────────────────
+// ─── Master TransPerfect Brand Guide (unified — v26.06 / v3.0) ───────────
+// Consolidates the BrandHub Canva source (v26.06) and the v3.0 digital
+// system into a single canonical master guide.
 export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
   slug: "transperfect-master",
   divisionId: "master",
   title: "TransPerfect",
-  subtitle: "Master Brand Guidelines",
-  version: "3.0",
-  updatedAt: "2026",
+  subtitle: "Master Brand Guidelines · Digital Edition",
+  version: "26.06 / 3.0",
+  updatedAt: "2026-06",
   tagline: "Transforming Global Performance",
+  sourceUrl: "https://www.canva.com/design/DAHKB8qQPCs",
   intro:
-    "TransPerfect's identity brings the idea of transformation to life — expressing how clarity, collaboration and human intelligence drive continual progress. Every design asset contributes to this idea, creating a living system that adapts, evolves and connects across every touchpoint.",
+    "TransPerfect's identity brings the idea of Transforming Global Performance to life — expressing how clarity, collaboration and human intelligence drive continual progress. Every design asset contributes to this idea, creating a living system that adapts, evolves and connects across every touchpoint. Transformation isn't a single moment — it's an ongoing movement forward, made visible through interaction, light and rhythm.",
   values: [
     { label: "Integrity", description: "Exhibit the utmost integrity" },
     { label: "Quality", description: "Deliver the highest quality" },
@@ -156,19 +159,6 @@ export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
     "Photography captures the human side of transformation — professional, collaborative settings with soft lighting and shallow depth of field. Use a soft-transition treatment (blurred gradient wash) to blend imagery with brand color.",
   brandVisuals:
     "Brand visuals translate transformation into abstract form — glowing spheres, vertical light gradients, ambient blue/purple washes. Use as hero compositions, section dividers or subtle ambient gradients.",
-};
-
-// ─── TransPerfect Brand Guidelines v26.06 (Canva source import) ───────────
-export const MASTER_TRANSPERFECT_GUIDE_V26_06: BrandGuide = {
-  ...MASTER_TRANSPERFECT_GUIDE,
-  slug: "transperfect-v26-06",
-  title: "TransPerfect",
-  subtitle: "Brand Guidelines · Digital Edition",
-  version: "26.06",
-  updatedAt: "2026-06",
-  sourceUrl: "https://www.canva.com/design/DAHKB8qQPCs",
-  intro:
-    "TransPerfect's Identity brings the idea of Transforming Global Performance to life — expressing how clarity, collaboration and human intelligence drive continual progress. Every design asset contributes to this idea, creating a living system that adapts, evolves and connects across every touchpoint. Transformation isn't a single moment — it's an ongoing movement forward, made visible through interaction, light and rhythm.",
   iconography: {
     headline: "Hero Icons — soft, rounded, human",
     body: "We use Hero Icons as the foundation of our icon system: a clean, open-source library aligned with modern UI standards. Small adjustments reflect TransPerfect's visual language. Icons serve both function and brand — they guide the eye, provide quick visual context and bring balance to text-heavy layouts. Their soft, rounded shapes complement the brand visuals, remaining clear at small sizes while expressing a friendly, human tone. Download the approved icon bank on Basecamp and re-download regularly as new icons are added.",
@@ -197,11 +187,10 @@ export const MASTER_TRANSPERFECT_GUIDE_V26_06: BrandGuide = {
 };
 
 // Registry — add future division guides here.
-export const BRAND_GUIDES: BrandGuide[] = [
-  MASTER_TRANSPERFECT_GUIDE_V26_06,
-  MASTER_TRANSPERFECT_GUIDE,
-];
+export const BRAND_GUIDES: BrandGuide[] = [MASTER_TRANSPERFECT_GUIDE];
 
 export function getBrandGuide(slug: string): BrandGuide | undefined {
+  // Redirect legacy v26.06 slug to the unified master guide.
+  if (slug === "transperfect-v26-06") return MASTER_TRANSPERFECT_GUIDE;
   return BRAND_GUIDES.find((g) => g.slug === slug);
 }
