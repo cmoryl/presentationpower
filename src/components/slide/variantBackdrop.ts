@@ -1,6 +1,8 @@
 import type { ModuleVariant } from "@/lib/taxonomy";
 import type { SlideBackdrop } from "./SlideChrome";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
+import { LIGHT_IMAGERY, LIGHT_TINT } from "@/assets/backdrops/light";
+
 
 import portrait1 from "@/assets/portraits/portrait-1.png";
 import portrait2 from "@/assets/portraits/portrait-2.png";
@@ -23,12 +25,34 @@ function hashStr(s: string): number {
 export function backdropForVariant(
   variant: ModuleVariant,
   brandId: string = "bm-enterprise",
+  mode: "light" | "dark" = "dark",
 ): SlideBackdrop | null {
+  const base = _computeBackdrop(variant, brandId, mode);
+  if (!base) return base;
+  if (mode !== "light") return base;
+  // White-mode override — swap heavy dark tints for a bright white wash,
+  // ease off scrim strength and dim so the near-white imagery reads as white.
+  return {
+    ...base,
+    tint: LIGHT_TINT,
+    scrimStrength: Math.min(base.scrimStrength ?? 0.6, 0.4),
+    imageDim: 0,
+  };
+}
+
+function _computeBackdrop(
+  variant: ModuleVariant,
+  brandId: string = "bm-enterprise",
+  mode: "light" | "dark" = "dark",
+): SlideBackdrop | null {
+
   const id = variant.id;
   const seed = hashStr(id);
-  const set = getDivisionImagery(brandId);
+  const isLight = mode === "light";
+  const set = isLight ? LIGHT_IMAGERY : getDivisionImagery(brandId);
   const photos = set.photos;
   const abstracts = set.abstracts;
+
   const pickPhoto = (offset = 0) => photos[(seed + offset) % photos.length];
   const pickAbstract = (offset = 0) => abstracts[(seed + offset) % abstracts.length];
   const pickPortrait = () => PORTRAITS[seed % PORTRAITS.length];

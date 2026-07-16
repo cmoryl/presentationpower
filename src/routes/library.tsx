@@ -263,7 +263,7 @@ function VariantCard({
     changes: [],
   };
   const isDark = mode === "dark";
-  const backdrop = showImagery ? backdropForVariant(variant, brand.id) : null;
+  const backdrop = showImagery ? backdropForVariant(variant, brand.id, mode) : null;
   return (
     <button
       type="button"
@@ -515,7 +515,7 @@ function VariantDetailModal({
             <div className="overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm">
               <div className="aspect-[16/9]">
                 <ScaledSlide>
-                  <SlideBackdropContext.Provider value={showImagery ? backdropForVariant(variant, brand.id) : null}>
+                  <SlideBackdropContext.Provider value={showImagery ? backdropForVariant(variant, brand.id, mode) : null}>
                     <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
                     {showZones && <MediaZoneOverlay variant={variant} />}
                   </SlideBackdropContext.Provider>
