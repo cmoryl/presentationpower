@@ -124,7 +124,8 @@ export function AdminShell() {
           Governance, analytics, and experimentation for the TransPerfect Modular system. Admin role required.
         </p>
       </div>
-      <nav className="mt-8 flex flex-wrap gap-1 rounded-2xl border border-black/10 bg-white/60 p-1 backdrop-blur">
+      <SessionRoleIndicator />
+      <nav className="mt-6 flex flex-wrap gap-1 rounded-2xl border border-black/10 bg-white/60 p-1 backdrop-blur">
         {items.map((it) => {
           const active = it.exact ? pathname === it.to : pathname === it.to || pathname.startsWith(it.to + "/");
           return (
