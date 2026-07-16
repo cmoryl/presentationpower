@@ -1973,7 +1973,9 @@ function MediaTile({
   const h = hash(seed || brand.id);
   const grayscale = muted ? "grayscale(60%) brightness(0.9)" : undefined;
 
-  const tileBackdrops = MEDIA_TILE_BACKDROPS;
+  // Division-specific imagery: photos + abstracts for the active brand.
+  const divSet = getDivisionImagery(brand.id);
+  const tileBackdrops = [...divSet.photos, ...divSet.abstracts];
   const url = tileBackdrops[h % tileBackdrops.length];
   const accent = brand.tokens.accent;
   const primary = brand.tokens.primary;
