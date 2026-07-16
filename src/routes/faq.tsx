@@ -198,11 +198,48 @@ function FAQPage() {
         </Link>
       </div>
 
-      <div className="mt-10 space-y-10">
+      <div className="mt-12">
+        <div className="flex items-baseline justify-between">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.25em] text-[#003FC7]">Step-by-step basics</h2>
+          <span className="text-xs text-black/40">{GUIDES.length} guides</span>
+        </div>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          {GUIDES.map((g, gi) => (
+            <article
+              key={g.title}
+              className="rounded-2xl border border-black/10 bg-white/70 p-5 backdrop-blur"
+            >
+              <div className="flex items-center gap-3">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#003FC7] text-xs font-semibold text-white">
+                  {String(gi + 1).padStart(2, "0")}
+                </span>
+                <h3 className="text-base font-semibold text-black/90">{g.title}</h3>
+              </div>
+              <p className="mt-2 text-sm text-black/60">{g.blurb}</p>
+              <ol className="mt-4 space-y-2 text-sm text-black/75">
+                {g.steps.map((s, si) => (
+                  <li key={si} className="flex gap-3">
+                    <span className="mt-0.5 shrink-0 text-xs font-semibold tabular-nums text-[#003FC7]">
+                      {si + 1}.
+                    </span>
+                    <span className="leading-relaxed">{s}</span>
+                  </li>
+                ))}
+              </ol>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-14">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.25em] text-[#003FC7]">Common questions</h2>
+      </div>
+
+      <div className="mt-4 space-y-10">
         {FAQS.map((section) => (
           <section key={section.section}>
-            <h2 className="text-xs font-semibold uppercase tracking-[0.25em] text-[#003FC7]">{section.section}</h2>
-            <div className="mt-4 divide-y divide-black/10 overflow-hidden rounded-2xl border border-black/10 bg-white/70 backdrop-blur">
+            <h3 className="text-sm font-semibold text-black/80">{section.section}</h3>
+            <div className="mt-3 divide-y divide-black/10 overflow-hidden rounded-2xl border border-black/10 bg-white/70 backdrop-blur">
               {section.items.map((qa, i) => (
                 <details key={i} className="group open:bg-black/[0.02]">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-left">
