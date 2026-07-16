@@ -248,6 +248,109 @@ export function aggregateMemory(brandId: string): { tags: string[]; notes: strin
   return { tags: Array.from(tags), notes };
 }
 
+// ─── Prompt-based recommendation ─────────────────────────────────────────
+const STOP = new Set([
+  "the","a","an","and","or","of","for","to","with","in","on","at","by","is","are","be",
+  "as","this","that","it","its","from","into","about","over","under","new","some","any",
+  "our","your","their","his","her","we","you","they","i","me","my","us","them",
+]);
+
+function tokenize(s: string): string[] {
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]+/g, " ")
+    .split(/\s+/)
+    .filter((t) => t.length > 2 && !STOP.has(t));
+}
+
+export type ImageMatch = {
+  entry: ImageEntry;
+  score: number;
+  reasons: string[];
+};
+
+/** Rank existing (active) library entries against a search prompt using brand
+ *  guideline context + per-image memory (tags, notes, generation prompt). */
+export function recommendImagery(
+  brandId: string,
+  userPrompt: string,
+  limit = 4,
+): ImageMatch[] {
+  const active = getActiveEntries(brandId);
+  const usage = getUsage(brandId);
+  const ctx = getBrandContext(brandId);
+
+  const queryTokens = new Set(tokenize(userPrompt));
+  if (queryTokens.size === 0) return [];
+
+  // Brand context tokens quietly boost matches that also align with brand direction.
+  const brandTokens = new Set<string>([
+    ...tokenize(ctx.name),
+    ...tokenize(ctx.description ?? ""),
+    ...tokenize(ctx.tagline ?? ""),
+    ...tokenize(ctx.photography ?? ""),
+    ...tokenize(ctx.brandVisuals ?? ""),
+  ]);
+
+  const scored: ImageMatch[] = active.map((e) => {
+    const reasons: string[] = [];
+    let score = 0;
+
+    // Tag overlap — strongest signal, memory is curated per image.
+    const tagMatches = e.tags.filter((t) => queryTokens.has(t.toLowerCase()));
+    if (tagMatches.length) {
+      score += tagMatches.length * 4;
+      reasons.push(`tags: ${tagMatches.join(", ")}`);
+    }
+
+    // Note text overlap.
+    if (e.note) {
+      const noteTokens = tokenize(e.note);
+      const hits = noteTokens.filter((t) => queryTokens.has(t));
+      if (hits.length) {
+        score += hits.length * 3;
+        reasons.push(`note: ${hits.slice(0, 3).join(", ")}`);
+      }
+    }
+
+    // Prior generation prompt overlap (AI-generated images).
+    if (e.prompt) {
+      const promptTokens = tokenize(e.prompt);
+      const hits = promptTokens.filter((t) => queryTokens.has(t));
+      if (hits.length) {
+        score += hits.length * 2;
+        reasons.push(`prior prompt: ${hits.slice(0, 3).join(", ")}`);
+      }
+    }
+
+    // Kind alignment.
+    for (const q of queryTokens) {
+      if (q === e.kind) {
+        score += 2;
+        reasons.push(`${e.kind} kind`);
+        break;
+      }
+    }
+
+    // Brand-guideline resonance — small tie-breaker so on-brand imagery wins
+    // when raw match scores are close.
+    const brandHits = e.tags.filter((t) => brandTokens.has(t.toLowerCase())).length;
+    if (brandHits) score += brandHits * 0.5;
+
+    // Usage popularity — tiny nudge for images the team already reaches for.
+    const used = usage[e.id]?.count ?? 0;
+    if (used) score += Math.min(used, 5) * 0.2;
+
+    return { entry: e, score, reasons };
+  });
+
+  return scored
+    .filter((m) => m.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit);
+}
+
+
 // ─── React hook ──────────────────────────────────────────────────────────
 export function useBrandLibrary(brandId: string) {
   const snapshot = useSyncExternalStore(
