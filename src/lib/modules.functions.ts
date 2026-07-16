@@ -4,6 +4,27 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+// ── Audit logging helper ──────────────────────────────────────────────────
+async function writeAudit(
+  actor: string,
+  action: string,
+  moduleId: string,
+  meta: Record<string, unknown> = {},
+) {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await (supabaseAdmin as unknown as {
+      from: (t: string) => { insert: (r: unknown) => Promise<unknown> };
+    })
+      .from("admin_audit_log")
+      .insert({ actor_user_id: actor, action, target_type: "slide_module", target_id: moduleId, meta });
+  } catch {
+    // Non-fatal — audit failure must not block the review action itself.
+  }
+}
+
+
+
 // Canonical, stable JSON stringifier for content-hash comparability.
 function stableStringify(v: unknown): string {
   if (v === null || typeof v !== "object") return JSON.stringify(v);
@@ -77,6 +98,7 @@ export const submitForReview = createServerFn({ method: "POST" })
       .update({ approval_status: "pending", submitted_at: new Date().toISOString() })
       .eq("id", data.moduleId);
     if (error) throw error;
+    await writeAudit(context.userId, "module.submit", data.moduleId);
     return { ok: true };
   });
 
@@ -96,6 +118,10 @@ export const approveModule = createServerFn({ method: "POST" })
       })
       .eq("id", data.moduleId);
     if (error) throw error;
+    await writeAudit(context.userId, "module.approve", data.moduleId, {
+      notes: data.notes ?? null,
+      expires_at: data.expiresAt ?? null,
+    });
     return { ok: true };
   });
 
@@ -113,6 +139,7 @@ export const rejectModule = createServerFn({ method: "POST" })
       })
       .eq("id", data.moduleId);
     if (error) throw error;
+    await writeAudit(context.userId, "module.reject", data.moduleId, { notes: data.notes });
     return { ok: true };
   });
 
@@ -130,8 +157,91 @@ export const requestChanges = createServerFn({ method: "POST" })
       })
       .eq("id", data.moduleId);
     if (error) throw error;
+    await writeAudit(context.userId, "module.changes_requested", data.moduleId, { notes: data.notes });
     return { ok: true };
   });
+
+// ── Bulk approve ──────────────────────────────────────────────────────────
+export const bulkApproveModules = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { moduleIds: string[]; expiresAt?: string | null }) => data)
+  .handler(async ({ data, context }) => {
+    await assertReviewer(context);
+    if (data.moduleIds.length === 0) return { ok: true, count: 0 };
+    const { error } = await context.supabase
+      .from("slide_modules")
+      .update({
+        approval_status: "approved",
+        approved_at: new Date().toISOString(),
+        reviewer_id: context.userId,
+        expires_at: data.expiresAt ?? null,
+      })
+      .in("id", data.moduleIds);
+    if (error) throw error;
+    await Promise.all(
+      data.moduleIds.map((id) =>
+        writeAudit(context.userId, "module.approve", id, { bulk: true, expires_at: data.expiresAt ?? null }),
+      ),
+    );
+    return { ok: true, count: data.moduleIds.length };
+  });
+
+// ── Expiring soon queue ───────────────────────────────────────────────────
+export const listExpiringSoon = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertReviewer(context);
+    const now = new Date();
+    const soon = new Date(now.getTime() + 1000 * 60 * 60 * 24 * 30).toISOString();
+    const { data, error } = await context.supabase
+      .from("slide_modules")
+      .select("id, title, variant_id, brand_mode_id, approval_status, expires_at, reviewer_id, approved_at")
+      .eq("approval_status", "approved")
+      .not("expires_at", "is", null)
+      .lte("expires_at", soon)
+      .order("expires_at", { ascending: true });
+    if (error) throw error;
+    return data ?? [];
+  });
+
+// ── Per-module audit trail ────────────────────────────────────────────────
+export const listModuleAudit = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { moduleId: string }) => data)
+  .handler(async ({ data, context }) => {
+    await assertReviewer(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sa = supabaseAdmin as unknown as {
+      from: (t: string) => {
+        select: (c: string) => {
+          eq: (col: string, v: string) => {
+            eq: (col: string, v: string) => {
+              order: (col: string, opts: { ascending: boolean }) => {
+                limit: (n: number) => Promise<{ data: unknown; error: unknown }>;
+              };
+            };
+          };
+        };
+      };
+    };
+    const { data: rows, error } = await sa
+      .from("admin_audit_log")
+      .select("id, actor_user_id, action, meta, created_at")
+      .eq("target_type", "slide_module")
+      .eq("target_id", data.moduleId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) throw error as Error;
+    return (rows ?? []) as Array<{
+      id: string;
+      actor_user_id: string;
+      action: string;
+      meta: Record<string, string | number | boolean | null> | null;
+      created_at: string;
+    }>;
+  });
+
+
 
 // ── Duplicate detection ────────────────────────────────────────────────────
 // Recompute + persist content_hash for a module, then return any other
