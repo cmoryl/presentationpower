@@ -158,7 +158,10 @@ function builtinEntries(brandId: string): ImageEntry[] {
 
 // ─── Public API ──────────────────────────────────────────────────────────
 export function getAllEntries(brandId: string): ImageEntry[] {
-  return [...builtinEntries(brandId), ...getBrandState(brandId).custom];
+  const state = getBrandState(brandId);
+  const removed = new Set(state.removed ?? []);
+  const builtins = builtinEntries(brandId).filter((e) => !removed.has(e.id));
+  return [...builtins, ...state.custom];
 }
 
 export function getActiveEntries(brandId: string): ImageEntry[] {
@@ -191,15 +194,47 @@ export function addCustomEntry(brandId: string, entry: Omit<ImageEntry, "id" | "
   return full;
 }
 
+/** Delete any image from the brand library. Built-in images are soft-deleted
+ *  (tracked in `removed`) so they can be restored later; custom entries are
+ *  purged outright. Also clears any related disabled/usage bookkeeping. */
 export function removeEntry(brandId: string, id: string) {
   const s = getBrandState(brandId);
+  const isBuiltin = builtinEntries(brandId).some((e) => e.id === id);
+  const usage = { ...(s.usage ?? {}) };
+  delete usage[id];
   cache = {
     ...cache,
     [brandId]: {
       disabled: s.disabled.filter((d) => d !== id),
-      custom: s.custom.filter((c) => c.id !== id),
+      custom: isBuiltin ? s.custom : s.custom.filter((c) => c.id !== id),
+      removed: isBuiltin
+        ? Array.from(new Set([...(s.removed ?? []), id]))
+        : s.removed ?? [],
+      usage,
     },
   };
+  persist();
+}
+
+/** List built-in ids currently soft-deleted for this brand. */
+export function getRemovedBuiltins(brandId: string): ImageEntry[] {
+  const removed = new Set(getBrandState(brandId).removed ?? []);
+  if (removed.size === 0) return [];
+  return builtinEntries(brandId).filter((e) => removed.has(e.id));
+}
+
+/** Restore a single soft-deleted built-in. */
+export function restoreEntry(brandId: string, id: string) {
+  const s = getBrandState(brandId);
+  const removed = (s.removed ?? []).filter((r) => r !== id);
+  cache = { ...cache, [brandId]: { ...s, removed } };
+  persist();
+}
+
+/** Restore every soft-deleted built-in for this brand. */
+export function restoreAllBuiltins(brandId: string) {
+  const s = getBrandState(brandId);
+  cache = { ...cache, [brandId]: { ...s, removed: [] } };
   persist();
 }
 
