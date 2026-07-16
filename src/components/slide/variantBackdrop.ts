@@ -1,6 +1,8 @@
 import type { ModuleVariant } from "@/lib/taxonomy";
 import type { SlideBackdrop } from "./SlideChrome";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
+import { LIGHT_IMAGERY, LIGHT_TINT } from "@/assets/backdrops/light";
+
 
 import portrait1 from "@/assets/portraits/portrait-1.png";
 import portrait2 from "@/assets/portraits/portrait-2.png";
