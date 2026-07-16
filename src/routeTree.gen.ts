@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
+import { Route as ImageryRouteImport } from './routes/imagery'
 import { Route as AtlasRouteImport } from './routes/atlas'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
@@ -34,6 +35,11 @@ const LibraryRoute = LibraryRouteImport.update({
 const KnowledgeRoute = KnowledgeRouteImport.update({
   id: '/knowledge',
   path: '/knowledge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImageryRoute = ImageryRouteImport.update({
+  id: '/imagery',
+  path: '/imagery',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AtlasRoute = AtlasRouteImport.update({
@@ -111,6 +117,7 @@ const DecksDeckIdDocumentRoute = DecksDeckIdDocumentRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/atlas': typeof AtlasRoute
+  '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/library': typeof LibraryRoute
   '/admin/approvals': typeof AdminApprovalsRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/atlas': typeof AtlasRoute
+  '/imagery': typeof ImageryRoute
   '/library': typeof LibraryRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/api/chat': typeof ApiChatRoute
@@ -147,6 +155,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/atlas': typeof AtlasRoute
+  '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/library': typeof LibraryRoute
   '/admin/approvals': typeof AdminApprovalsRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/atlas'
+    | '/imagery'
     | '/knowledge'
     | '/library'
     | '/admin/approvals'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/atlas'
+    | '/imagery'
     | '/library'
     | '/admin/approvals'
     | '/api/chat'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/atlas'
+    | '/imagery'
     | '/knowledge'
     | '/library'
     | '/admin/approvals'
@@ -221,6 +233,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AtlasRoute: typeof AtlasRoute
+  ImageryRoute: typeof ImageryRoute
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
   LibraryRoute: typeof LibraryRoute
   AdminApprovalsRoute: typeof AdminApprovalsRoute
@@ -243,6 +256,13 @@ declare module '@tanstack/react-router' {
       path: '/knowledge'
       fullPath: '/knowledge'
       preLoaderRoute: typeof KnowledgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/imagery': {
+      id: '/imagery'
+      path: '/imagery'
+      fullPath: '/imagery'
+      preLoaderRoute: typeof ImageryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/atlas': {
@@ -394,6 +414,7 @@ const DecksDeckIdRouteWithChildren = DecksDeckIdRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AtlasRoute: AtlasRoute,
+  ImageryRoute: ImageryRoute,
   KnowledgeRoute: KnowledgeRouteWithChildren,
   LibraryRoute: LibraryRoute,
   AdminApprovalsRoute: AdminApprovalsRoute,
