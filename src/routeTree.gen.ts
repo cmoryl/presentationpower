@@ -13,6 +13,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as ImageryRouteImport } from './routes/imagery'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AtlasRouteImport } from './routes/atlas'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -57,6 +58,11 @@ const KnowledgeRoute = KnowledgeRouteImport.update({
 const ImageryRoute = ImageryRouteImport.update({
   id: '/imagery',
   path: '/imagery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
+  '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/library': typeof LibraryRoute
@@ -221,6 +228,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
+  '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/library': typeof LibraryRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -252,6 +260,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
+  '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/library': typeof LibraryRoute
@@ -285,6 +294,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/atlas'
     | '/auth'
+    | '/faq'
     | '/imagery'
     | '/knowledge'
     | '/library'
@@ -315,6 +325,7 @@ export interface FileRouteTypes {
     | '/'
     | '/atlas'
     | '/auth'
+    | '/faq'
     | '/imagery'
     | '/library'
     | '/reset-password'
@@ -345,6 +356,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/atlas'
     | '/auth'
+    | '/faq'
     | '/imagery'
     | '/knowledge'
     | '/library'
@@ -377,6 +389,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AtlasRoute: typeof AtlasRoute
   AuthRoute: typeof AuthRoute
+  FaqRoute: typeof FaqRoute
   ImageryRoute: typeof ImageryRoute
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
   LibraryRoute: typeof LibraryRoute
@@ -415,6 +428,13 @@ declare module '@tanstack/react-router' {
       path: '/imagery'
       fullPath: '/imagery'
       preLoaderRoute: typeof ImageryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -671,6 +691,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AtlasRoute: AtlasRoute,
   AuthRoute: AuthRoute,
+  FaqRoute: FaqRoute,
   ImageryRoute: ImageryRoute,
   KnowledgeRoute: KnowledgeRouteWithChildren,
   LibraryRoute: LibraryRoute,
