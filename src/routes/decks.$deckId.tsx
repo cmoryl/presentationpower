@@ -306,6 +306,55 @@ function DeckEditor() {
   );
 }
 
+function IconsPanel({
+  slide,
+  onChange,
+}: {
+  slide: { content: Record<string, unknown> };
+  onChange: (path: string, value: unknown) => void;
+}) {
+  const items = Array.isArray(slide.content.items)
+    ? (slide.content.items as Array<Record<string, unknown>>)
+    : [];
+  // Only expose picker when items have a label/title (icons live next to labels).
+  const slots = items
+    .map((it, i) => {
+      const label =
+        (typeof it.label === "string" && it.label) ||
+        (typeof it.title === "string" && it.title) ||
+        "";
+      const currentIcon = typeof it.icon === "string" ? it.icon : "";
+      return { i, label, currentIcon };
+    })
+    .filter((s) => s.label);
+  if (slots.length === 0) return null;
+  return (
+    <Panel label="Icons">
+      <div className="mb-3 text-xs text-black/50">
+        Pick a specific icon for each row, or leave on Auto to match by label.
+      </div>
+      <ul className="space-y-2">
+        {slots.map((slot) => (
+          <li key={slot.i} className="flex items-center gap-3">
+            <div className="w-5 shrink-0 text-right font-mono text-[10px] text-black/40">
+              {String(slot.i + 1).padStart(2, "0")}
+            </div>
+            <div className="min-w-0 flex-1 truncate text-sm text-black/80" title={slot.label}>
+              {slot.label}
+            </div>
+            <IconPicker
+              value={slot.currentIcon || null}
+              autoLabel={slot.label}
+              onChange={(name) => onChange(`items[${slot.i}].icon`, name ?? "")}
+            />
+          </li>
+        ))}
+      </ul>
+    </Panel>
+  );
+}
+
+
 function IconBtn({ children, title, onClick }: { children: React.ReactNode; title: string; onClick: () => void }) {
   return (
     <button
