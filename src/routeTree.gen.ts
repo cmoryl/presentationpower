@@ -28,6 +28,7 @@ import { Route as DecksDeckIdRouteImport } from './routes/decks.$deckId'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
 import { Route as AdminImageryRouteImport } from './routes/admin.imagery'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminApprovalsRouteImport } from './routes/admin.approvals'
@@ -133,6 +134,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminOracleRoute = AdminOracleRouteImport.update({
+  id: '/oracle',
+  path: '/oracle',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminImageryRoute = AdminImageryRouteImport.update({
   id: '/imagery',
   path: '/imagery',
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/imagery': typeof AdminImageryRoute
+  '/admin/oracle': typeof AdminOracleRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
@@ -222,6 +229,7 @@ export interface FileRoutesByTo {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/imagery': typeof AdminImageryRoute
+  '/admin/oracle': typeof AdminOracleRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
@@ -253,6 +261,7 @@ export interface FileRoutesById {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/imagery': typeof AdminImageryRoute
+  '/admin/oracle': typeof AdminOracleRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
@@ -285,6 +294,7 @@ export interface FileRouteTypes {
     | '/admin/approvals'
     | '/admin/audit'
     | '/admin/imagery'
+    | '/admin/oracle'
     | '/admin/users'
     | '/api/chat'
     | '/brief/new'
@@ -313,6 +323,7 @@ export interface FileRouteTypes {
     | '/admin/approvals'
     | '/admin/audit'
     | '/admin/imagery'
+    | '/admin/oracle'
     | '/admin/users'
     | '/api/chat'
     | '/brief/new'
@@ -343,6 +354,7 @@ export interface FileRouteTypes {
     | '/admin/approvals'
     | '/admin/audit'
     | '/admin/imagery'
+    | '/admin/oracle'
     | '/admin/users'
     | '/api/chat'
     | '/brief/new'
@@ -510,6 +522,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/oracle': {
+      id: '/admin/oracle'
+      path: '/oracle'
+      fullPath: '/admin/oracle'
+      preLoaderRoute: typeof AdminOracleRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/imagery': {
       id: '/admin/imagery'
       path: '/imagery'
@@ -582,6 +601,7 @@ interface AdminRouteChildren {
   AdminApprovalsRoute: typeof AdminApprovalsRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminImageryRoute: typeof AdminImageryRoute
+  AdminOracleRoute: typeof AdminOracleRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -592,6 +612,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminApprovalsRoute: AdminApprovalsRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminImageryRoute: AdminImageryRoute,
+  AdminOracleRoute: AdminOracleRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
@@ -662,13 +683,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

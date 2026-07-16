@@ -26,6 +26,7 @@ function OverviewView() {
     { label: "Decks", value: t.decks },
     { label: "Users", value: t.users },
     { label: "Knowledge entries", value: t.knowledgeEntries },
+    { label: "Oracle KB", value: (t as { oracleKnowledge?: number }).oracleKnowledge ?? 0, sub: `${(t as { brandIntelligence?: number }).brandIntelligence ?? 0} brand intel` },
     { label: "Experiments running", value: t.runningExperiments, sub: `${t.experiments} total` },
   ];
 
