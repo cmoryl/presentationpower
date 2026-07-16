@@ -26,7 +26,7 @@ function hashStr(s: string): number {
 // forced-white text/logo treatment in SlideFrame. Their backdrops must stay
 // dark-scrimmed even in light mode, otherwise white text sits on a bright
 // photo and becomes illegible.
-const CHROME_DARK_ID = /^MV-OP-COVER(-MEDIA|-MINIMAL)?$|^MV-OP-DIVIDER|^MV-CS-HERO$|^MV-CTA-|CLOSING-HERO|CLOSE-CTA|CLOSE-THANKS|CLOSE-CONTACT/;
+const CHROME_DARK_ID = /^MV-OP-COVER(-MEDIA|-MINIMAL|-EDITORIAL)?$|^MV-OP-DIVIDER|^MV-CS-HERO$|^MV-CTA-|CLOSING-HERO/;
 
 export function backdropForVariant(
   variant: ModuleVariant,
