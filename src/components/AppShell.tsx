@@ -10,6 +10,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/brief/new", label: "New brief" },
     { to: "/atlas", label: "Atlas" },
     { to: "/library", label: "Library" },
+    { to: "/imagery", label: "Imagery" },
     { to: "/knowledge", label: "Knowledge" },
     { to: "/admin/approvals", label: "Approvals" },
   ] as const;
