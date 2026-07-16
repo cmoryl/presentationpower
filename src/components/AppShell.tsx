@@ -8,7 +8,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [boost, setBoost] = useContrastBoost();
   const [theme, setTheme] = useTheme();
   const themes: { id: ThemeMode; label: string }[] = [
-    { id: "cream", label: "Cream" },
     { id: "light", label: "Light" },
     { id: "dark",  label: "Dark" },
   ];
