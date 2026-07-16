@@ -13,15 +13,22 @@ import { Route as LibraryRouteImport } from './routes/library'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as ImageryRouteImport } from './routes/imagery'
 import { Route as AtlasRouteImport } from './routes/atlas'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
 import { Route as KnowledgeBrandGuidesRouteImport } from './routes/knowledge.brand-guides'
 import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
 import { Route as DecksDeckIdRouteImport } from './routes/decks.$deckId'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminImageryRouteImport } from './routes/admin.imagery'
+import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminApprovalsRouteImport } from './routes/admin.approvals'
+import { Route as AdminAiRouteImport } from './routes/admin.ai'
+import { Route as AdminAbRouteImport } from './routes/admin.ab'
 import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
 import { Route as DecksDeckIdPresentRouteImport } from './routes/decks.$deckId.present'
 import { Route as DecksDeckIdExportRouteImport } from './routes/decks.$deckId.export'
@@ -47,6 +54,11 @@ const AtlasRoute = AtlasRouteImport.update({
   path: '/atlas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -56,6 +68,11 @@ const KnowledgeIndexRoute = KnowledgeIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => KnowledgeRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const KnowledgeNewRoute = KnowledgeNewRouteImport.update({
   id: '/new',
@@ -87,10 +104,35 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminImageryRoute = AdminImageryRouteImport.update({
+  id: '/imagery',
+  path: '/imagery',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminApprovalsRoute = AdminApprovalsRouteImport.update({
-  id: '/admin/approvals',
-  path: '/admin/approvals',
-  getParentRoute: () => rootRouteImport,
+  id: '/approvals',
+  path: '/approvals',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAiRoute = AdminAiRouteImport.update({
+  id: '/ai',
+  path: '/ai',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAbRoute = AdminAbRouteImport.update({
+  id: '/ab',
+  path: '/ab',
+  getParentRoute: () => AdminRoute,
 } as any)
 const KnowledgeBrandGuidesSlugRoute =
   KnowledgeBrandGuidesSlugRouteImport.update({
@@ -116,17 +158,24 @@ const DecksDeckIdDocumentRoute = DecksDeckIdDocumentRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/atlas': typeof AtlasRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/library': typeof LibraryRoute
+  '/admin/ab': typeof AdminAbRoute
+  '/admin/ai': typeof AdminAiRoute
   '/admin/approvals': typeof AdminApprovalsRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/imagery': typeof AdminImageryRoute
+  '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesRouteWithChildren
   '/knowledge/new': typeof KnowledgeNewRoute
+  '/admin/': typeof AdminIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
@@ -138,13 +187,19 @@ export interface FileRoutesByTo {
   '/atlas': typeof AtlasRoute
   '/imagery': typeof ImageryRoute
   '/library': typeof LibraryRoute
+  '/admin/ab': typeof AdminAbRoute
+  '/admin/ai': typeof AdminAiRoute
   '/admin/approvals': typeof AdminApprovalsRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/imagery': typeof AdminImageryRoute
+  '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesRouteWithChildren
   '/knowledge/new': typeof KnowledgeNewRoute
+  '/admin': typeof AdminIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
@@ -154,17 +209,24 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/atlas': typeof AtlasRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/library': typeof LibraryRoute
+  '/admin/ab': typeof AdminAbRoute
+  '/admin/ai': typeof AdminAiRoute
   '/admin/approvals': typeof AdminApprovalsRoute
+  '/admin/audit': typeof AdminAuditRoute
+  '/admin/imagery': typeof AdminImageryRoute
+  '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesRouteWithChildren
   '/knowledge/new': typeof KnowledgeNewRoute
+  '/admin/': typeof AdminIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
@@ -175,17 +237,24 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/atlas'
     | '/imagery'
     | '/knowledge'
     | '/library'
+    | '/admin/ab'
+    | '/admin/ai'
     | '/admin/approvals'
+    | '/admin/audit'
+    | '/admin/imagery'
+    | '/admin/users'
     | '/api/chat'
     | '/brief/new'
     | '/decks/$deckId'
     | '/knowledge/$entryId'
     | '/knowledge/brand-guides'
     | '/knowledge/new'
+    | '/admin/'
     | '/knowledge/'
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
@@ -197,13 +266,19 @@ export interface FileRouteTypes {
     | '/atlas'
     | '/imagery'
     | '/library'
+    | '/admin/ab'
+    | '/admin/ai'
     | '/admin/approvals'
+    | '/admin/audit'
+    | '/admin/imagery'
+    | '/admin/users'
     | '/api/chat'
     | '/brief/new'
     | '/decks/$deckId'
     | '/knowledge/$entryId'
     | '/knowledge/brand-guides'
     | '/knowledge/new'
+    | '/admin'
     | '/knowledge'
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
@@ -212,17 +287,24 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/atlas'
     | '/imagery'
     | '/knowledge'
     | '/library'
+    | '/admin/ab'
+    | '/admin/ai'
     | '/admin/approvals'
+    | '/admin/audit'
+    | '/admin/imagery'
+    | '/admin/users'
     | '/api/chat'
     | '/brief/new'
     | '/decks/$deckId'
     | '/knowledge/$entryId'
     | '/knowledge/brand-guides'
     | '/knowledge/new'
+    | '/admin/'
     | '/knowledge/'
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
@@ -232,11 +314,11 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AtlasRoute: typeof AtlasRoute
   ImageryRoute: typeof ImageryRoute
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
   LibraryRoute: typeof LibraryRoute
-  AdminApprovalsRoute: typeof AdminApprovalsRoute
   ApiChatRoute: typeof ApiChatRoute
   BriefNewRoute: typeof BriefNewRoute
   DecksDeckIdRoute: typeof DecksDeckIdRouteWithChildren
@@ -272,6 +354,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AtlasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -285,6 +374,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/knowledge/'
       preLoaderRoute: typeof KnowledgeIndexRouteImport
       parentRoute: typeof KnowledgeRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/knowledge/new': {
       id: '/knowledge/new'
@@ -328,12 +424,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/imagery': {
+      id: '/admin/imagery'
+      path: '/imagery'
+      fullPath: '/admin/imagery'
+      preLoaderRoute: typeof AdminImageryRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/approvals': {
       id: '/admin/approvals'
-      path: '/admin/approvals'
+      path: '/approvals'
       fullPath: '/admin/approvals'
       preLoaderRoute: typeof AdminApprovalsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/ai': {
+      id: '/admin/ai'
+      path: '/ai'
+      fullPath: '/admin/ai'
+      preLoaderRoute: typeof AdminAiRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/ab': {
+      id: '/admin/ab'
+      path: '/ab'
+      fullPath: '/admin/ab'
+      preLoaderRoute: typeof AdminAbRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/knowledge/brand-guides/$slug': {
       id: '/knowledge/brand-guides/$slug'
@@ -365,6 +496,28 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AdminRouteChildren {
+  AdminAbRoute: typeof AdminAbRoute
+  AdminAiRoute: typeof AdminAiRoute
+  AdminApprovalsRoute: typeof AdminApprovalsRoute
+  AdminAuditRoute: typeof AdminAuditRoute
+  AdminImageryRoute: typeof AdminImageryRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAbRoute: AdminAbRoute,
+  AdminAiRoute: AdminAiRoute,
+  AdminApprovalsRoute: AdminApprovalsRoute,
+  AdminAuditRoute: AdminAuditRoute,
+  AdminImageryRoute: AdminImageryRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface KnowledgeBrandGuidesRouteChildren {
   KnowledgeBrandGuidesSlugRoute: typeof KnowledgeBrandGuidesSlugRoute
@@ -413,11 +566,11 @@ const DecksDeckIdRouteWithChildren = DecksDeckIdRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   AtlasRoute: AtlasRoute,
   ImageryRoute: ImageryRoute,
   KnowledgeRoute: KnowledgeRouteWithChildren,
   LibraryRoute: LibraryRoute,
-  AdminApprovalsRoute: AdminApprovalsRoute,
   ApiChatRoute: ApiChatRoute,
   BriefNewRoute: BriefNewRoute,
   DecksDeckIdRoute: DecksDeckIdRouteWithChildren,

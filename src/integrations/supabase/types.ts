@@ -14,6 +14,269 @@ export type Database = {
   }
   public: {
     Tables: {
+      ab_assignments: {
+        Row: {
+          created_at: string
+          experiment_id: string
+          id: string
+          session_id: string
+          user_id: string | null
+          variant_id: string
+        }
+        Insert: {
+          created_at?: string
+          experiment_id: string
+          id?: string
+          session_id: string
+          user_id?: string | null
+          variant_id: string
+        }
+        Update: {
+          created_at?: string
+          experiment_id?: string
+          id?: string
+          session_id?: string
+          user_id?: string | null
+          variant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ab_assignments_experiment_id_fkey"
+            columns: ["experiment_id"]
+            isOneToOne: false
+            referencedRelation: "ab_experiments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ab_assignments_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "ab_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ab_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          experiment_id: string
+          id: string
+          meta: Json | null
+          session_id: string
+          user_id: string | null
+          value: number | null
+          variant_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          experiment_id: string
+          id?: string
+          meta?: Json | null
+          session_id: string
+          user_id?: string | null
+          value?: number | null
+          variant_id: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          experiment_id?: string
+          id?: string
+          meta?: Json | null
+          session_id?: string
+          user_id?: string | null
+          value?: number | null
+          variant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ab_events_experiment_id_fkey"
+            columns: ["experiment_id"]
+            isOneToOne: false
+            referencedRelation: "ab_experiments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ab_events_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "ab_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ab_experiments: {
+        Row: {
+          brand_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          ended_at: string | null
+          hypothesis: string | null
+          id: string
+          name: string
+          primary_metric: string | null
+          started_at: string | null
+          status: string
+          target: string
+          updated_at: string
+        }
+        Insert: {
+          brand_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ended_at?: string | null
+          hypothesis?: string | null
+          id?: string
+          name: string
+          primary_metric?: string | null
+          started_at?: string | null
+          status?: string
+          target?: string
+          updated_at?: string
+        }
+        Update: {
+          brand_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          ended_at?: string | null
+          hypothesis?: string | null
+          id?: string
+          name?: string
+          primary_metric?: string | null
+          started_at?: string | null
+          status?: string
+          target?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ab_variants: {
+        Row: {
+          created_at: string
+          experiment_id: string
+          id: string
+          is_control: boolean | null
+          name: string
+          palette: Json
+          weight: number | null
+        }
+        Insert: {
+          created_at?: string
+          experiment_id: string
+          id?: string
+          is_control?: boolean | null
+          name: string
+          palette: Json
+          weight?: number | null
+        }
+        Update: {
+          created_at?: string
+          experiment_id?: string
+          id?: string
+          is_control?: boolean | null
+          name?: string
+          palette?: Json
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ab_variants_experiment_id_fkey"
+            columns: ["experiment_id"]
+            isOneToOne: false
+            referencedRelation: "ab_experiments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_audit_log: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          created_at: string
+          id: string
+          meta: Json | null
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          meta?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          meta?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
+      ai_events: {
+        Row: {
+          brand_id: string | null
+          cost_credits: number | null
+          created_at: string
+          error_message: string | null
+          id: string
+          latency_ms: number | null
+          meta: Json | null
+          model: string
+          operation: string
+          prompt_summary: string | null
+          status: string
+          surface: string | null
+          tokens_in: number | null
+          tokens_out: number | null
+          user_id: string | null
+        }
+        Insert: {
+          brand_id?: string | null
+          cost_credits?: number | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          latency_ms?: number | null
+          meta?: Json | null
+          model: string
+          operation: string
+          prompt_summary?: string | null
+          status: string
+          surface?: string | null
+          tokens_in?: number | null
+          tokens_out?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          brand_id?: string | null
+          cost_credits?: number | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          latency_ms?: number | null
+          meta?: Json | null
+          model?: string
+          operation?: string
+          prompt_summary?: string | null
+          status?: string
+          surface?: string | null
+          tokens_in?: number | null
+          tokens_out?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       brand_modes: {
         Row: {
           created_at: string
@@ -244,6 +507,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      imagery_events: {
+        Row: {
+          brand_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          image_id: string
+          memory_used: boolean | null
+          meta: Json | null
+          prompt: string | null
+          user_id: string | null
+        }
+        Insert: {
+          brand_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          image_id: string
+          memory_used?: boolean | null
+          meta?: Json | null
+          prompt?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          brand_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          image_id?: string
+          memory_used?: boolean | null
+          meta?: Json | null
+          prompt?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       knowledge_entries: {
         Row: {
@@ -562,7 +861,14 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "brand_reviewer" | "content_owner" | "sales"
+      app_role:
+        | "admin"
+        | "brand_reviewer"
+        | "content_owner"
+        | "sales"
+        | "editor"
+        | "viewer"
+        | "brand_lead"
       knowledge_kind:
         | "fact"
         | "proof_point"
@@ -698,7 +1004,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "brand_reviewer", "content_owner", "sales"],
+      app_role: [
+        "admin",
+        "brand_reviewer",
+        "content_owner",
+        "sales",
+        "editor",
+        "viewer",
+        "brand_lead",
+      ],
       knowledge_kind: [
         "fact",
         "proof_point",
