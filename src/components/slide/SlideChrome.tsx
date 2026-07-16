@@ -160,7 +160,8 @@ export function SlideFrame({
       {/* Footer (locked) */}
       <div
         className="absolute bottom-10 left-24 right-24 flex items-center justify-between text-sm"
-        style={{ color: isChromeDark || slideDark || hasBackdrop ? "rgba(255,255,255,0.7)" : "rgba(10,15,28,0.55)" }}
+        style={{ color: darkBackdrop || isChromeDark || slideDark ? "rgba(255,255,255,0.7)" : "rgba(10,15,28,0.55)" }}
+
       >
         <span>Confidential — for internal review</span>
         {pageNumber !== undefined && <span>{String(pageNumber).padStart(2, "0")}</span>}
