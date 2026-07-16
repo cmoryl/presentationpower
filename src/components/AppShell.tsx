@@ -18,10 +18,12 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/atlas", label: "Atlas" },
     { to: "/library", label: "Library" },
     { to: "/imagery", label: "Imagery" },
+    { to: "/admin", label: "Admin" },
+  ] as const;
+  const footerNav = [
     { to: "/knowledge", label: "Knowledge" },
     { to: "/about", label: "About" },
     { to: "/faq", label: "FAQ" },
-    { to: "/admin", label: "Admin" },
   ] as const;
 
   return (
