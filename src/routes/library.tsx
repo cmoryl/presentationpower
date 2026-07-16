@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
-import { MediaZoneOverlay } from "@/components/slide/MediaZoneOverlay";
+
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { seedContent, type Brief } from "@/lib/deck-store";
@@ -45,7 +45,7 @@ function Library() {
   const [scopeBrandId, setScopeBrandId] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
   const [mode, setMode] = useState<"light" | "dark">("light");
-  const [showZones, setShowZones] = useState(false);
+  
   const [showImagery, setShowImagery] = useState(false);
   const tpMasterIdx = Math.max(0, brandModes.findIndex((b) => b.id === "bm-enterprise"));
   const [brandIdx, setBrandIdx] = useState(tpMasterIdx);
@@ -156,32 +156,10 @@ function Library() {
           >
             ▤ Sample imagery {showImagery ? "on" : "off"}
           </button>
-          <button
-            type="button"
-            onClick={() => setShowZones((v) => !v)}
-            aria-pressed={showZones}
-            title="Overlay demo imagery zones (human, shape, aura, scrim)"
-            className={`rounded-full border px-3 py-1.5 text-xs ${
-              showZones
-                ? "border-[#03002C] bg-[#03002C] text-white"
-                : "border-black/15 bg-white text-black/70 hover:text-black"
-            }`}
-          >
-            ⌗ Media zones {showZones ? "on" : "off"}
-          </button>
           <span className="text-sm text-black/50">{filtered.length} of {moduleVariants.length}</span>
         </div>
       </div>
 
-      {showZones && (
-        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-black/10 bg-white/60 px-4 py-3 text-xs text-black/70 backdrop-blur-md">
-          <span className="font-medium text-black/80">Legend:</span>
-          <LegendChip color="rgba(0,63,199,0.55)" icon="👤" label="Human imagery — portraits, teams, hero photography" />
-          <LegendChip color="rgba(236,56,138,0.55)" icon="◆" label="Design shape — geometric accents, keylines, blocks" />
-          <LegendChip color="rgba(161,251,249,0.75)" icon="🌫" label="Soft overlay — transparent accent wash" />
-          <LegendChip color="rgba(3,0,44,0.55)" icon="▧" label="Overlay / scrim — transparent layer for legibility" />
-        </div>
-      )}
 
       <div className="mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3">
         {filtered.map((v) => (
@@ -193,7 +171,6 @@ function Library() {
             sectionId={sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? ""}
             preferred={preferred.has(v.id)}
             mode={mode}
-            showZones={showZones}
             showImagery={showImagery}
             onOpen={() => setOpenId(v.id)}
           />
@@ -215,8 +192,6 @@ function Library() {
           setBrandIdx={setBrandIdx}
           mode={mode}
           setMode={setMode}
-          showZones={showZones}
-          setShowZones={setShowZones}
           showImagery={showImagery}
           setShowImagery={setShowImagery}
           family={byId(moduleFamilies, active.familyId)}
@@ -239,7 +214,6 @@ function VariantCard({
   sectionId,
   preferred,
   mode = "light",
-  showZones = false,
   showImagery = false,
   onOpen,
 }: {
@@ -249,7 +223,6 @@ function VariantCard({
   sectionId: string;
   preferred?: boolean;
   mode?: "light" | "dark";
-  showZones?: boolean;
   showImagery?: boolean;
   onOpen: () => void;
 }) {
@@ -275,7 +248,6 @@ function VariantCard({
         <ScaledSlide>
           <SlideBackdropContext.Provider value={backdrop}>
             <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
-            {showZones && <MediaZoneOverlay variant={variant} />}
           </SlideBackdropContext.Provider>
         </ScaledSlide>
 
@@ -370,8 +342,6 @@ function VariantDetailModal({
   setBrandIdx,
   mode,
   setMode,
-  showZones,
-  setShowZones,
   showImagery,
   setShowImagery,
   family,
@@ -387,8 +357,6 @@ function VariantDetailModal({
   setBrandIdx: (i: number) => void;
   mode: "light" | "dark";
   setMode: (m: "light" | "dark") => void;
-  showZones: boolean;
-  setShowZones: (b: boolean) => void;
   showImagery: boolean;
   setShowImagery: (b: boolean) => void;
   family: ReturnType<typeof useTaxonomy>["moduleFamilies"][number] | undefined;
@@ -488,19 +456,6 @@ function VariantDetailModal({
                 >
                   ▤ Imagery
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setShowZones(!showZones)}
-                  aria-pressed={showZones}
-                  className={`rounded-full border px-2.5 py-1 text-[11px] ${
-                    showZones
-                      ? "border-[#03002C] bg-[#03002C] text-white"
-                      : "border-black/15 bg-white text-black/60"
-                  }`}
-                  title="Show media zones"
-                >
-                  ⌗ Zones
-                </button>
                 <select
                   value={brandIdx}
                   onChange={(e) => setBrandIdx(Number(e.target.value))}
@@ -517,7 +472,7 @@ function VariantDetailModal({
                 <ScaledSlide>
                   <SlideBackdropContext.Provider value={showImagery ? backdropForVariant(variant, brand.id, mode) : null}>
                     <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
-                    {showZones && <MediaZoneOverlay variant={variant} />}
+                    
                   </SlideBackdropContext.Provider>
                 </ScaledSlide>
               </div>
@@ -646,12 +601,3 @@ function FieldChips({ fields, tone }: { fields: string[]; tone: "emerald" | "red
 }
 
 
-function LegendChip({ color, icon, label }: { color: string; icon: string; label: string }) {
-  return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-2.5 py-1">
-      <span className="inline-block h-3 w-3 rounded" style={{ backgroundColor: color }} />
-      <span>{icon}</span>
-      <span>{label}</span>
-    </span>
-  );
-}
