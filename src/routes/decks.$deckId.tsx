@@ -41,6 +41,7 @@ function DeckEditor() {
   const duplicateSlide = useDeckStore((s) => s.duplicateSlide);
   const revertAiChange = useDeckStore((s) => s.revertAiChange);
   const [activeIdx, setActiveIdx] = useState(0);
+  const [zoomed, setZoomed] = useState(false);
 
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
