@@ -1,7 +1,7 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 
-const items = [
+const items: Array<{ to: string; label: string; exact?: boolean }> = [
   { to: "/admin", label: "Overview", exact: true },
   { to: "/admin/users", label: "Users & roles" },
   { to: "/admin/ai", label: "AI analytics" },
@@ -9,7 +9,8 @@ const items = [
   { to: "/admin/ab", label: "A/B color testing" },
   { to: "/admin/approvals", label: "Knowledgebase" },
   { to: "/admin/audit", label: "Audit log" },
-] as const;
+];
+
 
 export function AdminShell() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
