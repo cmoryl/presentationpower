@@ -70,6 +70,12 @@ function KnowledgeView() {
         </div>
         <div className="flex items-center gap-2">
           <Link
+            to={"/knowledge/oracle" as never}
+            className="rounded-full border border-black/15 px-4 py-2.5 text-sm text-black/70 hover:border-black/40"
+          >
+            Oracle intelligence
+          </Link>
+          <Link
             to={"/knowledge/brand-guides" as never}
             className="rounded-full border border-black/15 px-4 py-2.5 text-sm text-black/70 hover:border-black/40"
           >
