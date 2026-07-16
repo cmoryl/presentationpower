@@ -446,7 +446,13 @@ function BriefWizard() {
                     className="rounded-lg border-2 px-6 py-3 font-['Urbanist'] text-sm font-bold tracking-tight text-[#0F1B3D] transition-all hover:bg-[#F8FAFC] disabled:opacity-50"
                     style={{ borderColor: PALETTE.ink }}
                     onClick={() => {
-                      const submission = { ...form, archetypeId: effectiveArchetypeId };
+                      const submission = {
+                        ...form,
+                        archetypeId: effectiveArchetypeId,
+                        abExperimentId: paletteSel.experimentId,
+                        abVariantId: paletteSel.variantId,
+                        abPaletteOverride: paletteSel.paletteOverride,
+                      };
                       const { deckId } = create(submission);
                       navigate({ to: "/decks/$deckId", params: { deckId } });
                     }}
@@ -461,17 +467,63 @@ function BriefWizard() {
                     onClick={async () => {
                       setAiError(null);
                       setAiStatus("assembling");
-                      const submission = { ...form, archetypeId: effectiveArchetypeId };
+                      const brandForCall = byId(brandModes, form.brandModeId);
+                      const scope = brandForCall?.contentScope;
+
+                      // If an A/B experiment is attached, assign a variant now
+                      // (server may return a different variant based on weights).
+                      let effectiveSel = paletteSel;
+                      if (paletteSel.experimentId) {
+                        try {
+                          const sessionId = (typeof crypto !== "undefined" && "randomUUID" in crypto) ? crypto.randomUUID() : `s-${Date.now()}`;
+                          const res = await assignVariantFn({ data: { experimentId: paletteSel.experimentId, sessionId } });
+                          // Log initial view for the assigned variant.
+                          void logAbEventFn({ data: { experimentId: paletteSel.experimentId, variantId: res.variantId, sessionId, eventType: "view", value: null } });
+                          if (res.variantId !== paletteSel.variantId) {
+                            effectiveSel = { ...paletteSel, variantId: res.variantId };
+                          }
+                        } catch { /* non-fatal: fall through with local selection */ }
+                      }
+
+                      const submission = {
+                        ...form,
+                        archetypeId: effectiveArchetypeId,
+                        abExperimentId: effectiveSel.experimentId,
+                        abVariantId: effectiveSel.variantId,
+                        abPaletteOverride: effectiveSel.paletteOverride,
+                      };
                       const { deckId } = create(submission);
                       const deck = useDeckStore.getState().decks[deckId] ?? decks[deckId];
                       if (!deck) {
                         navigate({ to: "/decks/$deckId", params: { deckId } });
                         return;
                       }
+
+                      // Pull Oracle + KB snippets relevant to this brief.
+                      setAiStatus("knowledge");
+                      let knowledgeSnippets: Array<{ source: "oracle" | "kb"; title: string; snippet: string; tags: string[]; id: string }> = [];
+                      try {
+                        const kbRes = await retrieveKnowledge({
+                          data: {
+                            industry: submission.industry,
+                            audience: submission.audience,
+                            meetingObjective: submission.meetingObjective,
+                            clientFacts: submission.clientFacts,
+                            brandName: brandForCall?.name ?? null,
+                            brandTags: [
+                              ...(scope?.industries ?? []),
+                              ...(scope?.serviceLines ?? []),
+                              ...(scope?.caseStudyTags ?? []),
+                            ],
+                            limit: 6,
+                          },
+                        });
+                        knowledgeSnippets = kbRes as typeof knowledgeSnippets;
+                        setKbUsedCount(knowledgeSnippets.length);
+                      } catch { /* non-fatal */ }
+
                       setAiStatus("personalizing");
                       try {
-                        const brandForCall = byId(brandModes, submission.brandModeId);
-                        const scope = brandForCall?.contentScope;
                         const result = await personalize({
                           data: {
                             brief: {
@@ -497,6 +549,7 @@ function BriefWizard() {
                               sectionName: byId(SECTION_FRAMEWORKS, s.sectionId)?.name ?? "",
                               content: s.content as Record<string, unknown>,
                             })),
+                            knowledgeSnippets: knowledgeSnippets.map((k) => ({ source: k.source, title: k.title, snippet: k.snippet, tags: k.tags })),
                           },
                         });
                         if (result.error) {
