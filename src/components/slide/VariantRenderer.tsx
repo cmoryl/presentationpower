@@ -108,6 +108,7 @@ function IconBadge({
   placement = "leading",
   treatment,
   ariaLabel,
+  override,
 }: {
   brand: BrandMode;
   label: string;
@@ -117,6 +118,7 @@ function IconBadge({
   placement?: IconPlacement;
   treatment?: IconTreatment;
   ariaLabel?: string; // when set, badge is announced (role=img); otherwise decorative
+  override?: string | null;
 }) {
   // Back-compat: map legacy `tone` values into the new emphasis/treatment axes.
   const legacyOnDark = tone === "onDark";
@@ -134,7 +136,7 @@ function IconBadge({
   });
   const dims = ICON_SIZES[spec.size];
   const colors = resolveEmphasisColors(brand, spec.treatment, spec.emphasis);
-  const Icon = pickIcon(label, index);
+  const Icon = pickIcon(label, index, override);
   const isCircle = spec.treatment === "soft-circle";
   const a11y = spec.a11yRole === "semantic"
     ? { role: "img" as const, "aria-label": ariaLabel ?? label }
