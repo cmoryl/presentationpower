@@ -1952,19 +1952,9 @@ function hash(str: string): number {
   return h >>> 0;
 }
 
-// Real photographic backdrops used inside MediaTile in dark mode.
-import mediaAmbient from "@/assets/backdrops/backdrop-ambient.jpg";
-import mediaCity from "@/assets/backdrops/backdrop-city.jpg";
-import mediaTeam from "@/assets/backdrops/backdrop-team.jpg";
-import mediaAbstract from "@/assets/backdrops/backdrop-abstract.png.asset.json";
-import mediaBokeh from "@/assets/backdrops/backdrop-bokeh.png.asset.json";
-const MEDIA_TILE_BACKDROPS = [
-  mediaBokeh.url,
-  mediaAmbient,
-  mediaCity,
-  mediaTeam,
-  mediaAbstract.url,
-];
+// Real photographic backdrops used inside MediaTile.
+// MediaTile now pulls from division-specific image repositories keyed by brand id.
+import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
 function MediaTile({
   brand,
@@ -1983,7 +1973,9 @@ function MediaTile({
   const h = hash(seed || brand.id);
   const grayscale = muted ? "grayscale(60%) brightness(0.9)" : undefined;
 
-  const tileBackdrops = MEDIA_TILE_BACKDROPS;
+  // Division-specific imagery: photos + abstracts for the active brand.
+  const divSet = getDivisionImagery(brand.id);
+  const tileBackdrops = [...divSet.photos, ...divSet.abstracts];
   const url = tileBackdrops[h % tileBackdrops.length];
   const accent = brand.tokens.accent;
   const primary = brand.tokens.primary;
