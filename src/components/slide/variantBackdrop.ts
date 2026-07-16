@@ -1,19 +1,13 @@
 import type { ModuleVariant } from "@/lib/taxonomy";
 import type { SlideBackdrop } from "./SlideChrome";
+import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
 import portrait1 from "@/assets/portraits/portrait-1.png";
 import portrait2 from "@/assets/portraits/portrait-2.png";
 import portrait3 from "@/assets/portraits/portrait-3.png";
 import portrait4 from "@/assets/portraits/portrait-4.png";
-import ambient from "@/assets/backdrops/backdrop-ambient.jpg";
-import team from "@/assets/backdrops/backdrop-team.jpg";
-import city from "@/assets/backdrops/backdrop-city.jpg";
-import abstractAsset from "@/assets/backdrops/backdrop-abstract.png.asset.json";
-import bokehAsset from "@/assets/backdrops/backdrop-bokeh.png.asset.json";
 
 const PORTRAITS = [portrait1, portrait2, portrait3, portrait4];
-const abstract = abstractAsset.url;
-const bokeh = bokehAsset.url;
 
 function hashStr(s: string): number {
   let h = 0;
@@ -22,20 +16,27 @@ function hashStr(s: string): number {
 }
 
 /**
- * Returns a SlideBackdrop config for a variant: which image sits behind the
- * content, what direction the scrim runs, and how strong the alpha overlay is.
- * Different families get different treatments so the library visibly
- * demonstrates each imagery + gradient pattern.
+ * Returns a SlideBackdrop config for a variant, sourcing imagery from the
+ * active brand/division's dedicated image repository. Different families get
+ * different scrim treatments so each imagery pattern still reads distinctly.
  */
-export function backdropForVariant(variant: ModuleVariant): SlideBackdrop | null {
+export function backdropForVariant(
+  variant: ModuleVariant,
+  brandId: string = "bm-enterprise",
+): SlideBackdrop | null {
   const id = variant.id;
   const seed = hashStr(id);
+  const set = getDivisionImagery(brandId);
+  const photos = set.photos;
+  const abstracts = set.abstracts;
+  const pickPhoto = (offset = 0) => photos[(seed + offset) % photos.length];
+  const pickAbstract = (offset = 0) => abstracts[(seed + offset) % abstracts.length];
+  const pickPortrait = () => PORTRAITS[seed % PORTRAITS.length];
 
-  // Full-bleed cover / hero — portrait or scene, strong bottom scrim.
+  // Full-bleed cover / hero — division photograph, strong side scrim.
   if (/^MV-OP-COVER(-MEDIA)?$/.test(id) || id === "MV-CS-HERO" || id === "MV-CTA-CLOSING-HERO") {
-    const useTeam = seed % 2 === 0;
     return {
-      url: useTeam ? team : PORTRAITS[seed % PORTRAITS.length],
+      url: pickPhoto(0),
       scrim: "left",
       scrimStrength: 0.75,
       imageDim: 0.1,
@@ -43,36 +44,35 @@ export function backdropForVariant(variant: ModuleVariant): SlideBackdrop | null
     };
   }
 
-  // Minimal cover — soft ambient with gentle top scrim.
+  // Minimal cover — abstract atmospheric with gentle side scrim.
   if (id === "MV-OP-COVER-MINIMAL") {
-    return { url: ambient, scrim: "left", scrimStrength: 0.65, tint: "#03002C" };
+    return { url: pickAbstract(0), scrim: "left", scrimStrength: 0.65, tint: "#03002C" };
   }
 
-  // Dividers — abstract/bokeh/ambient/city with full-frame vignette.
+  // Dividers — abstract atmospherics with full-frame vignette.
   if (/^MV-OP-DIVIDER/.test(id)) {
-    const dividerImages = [abstract, bokeh, ambient, city];
     return {
-      url: dividerImages[seed % dividerImages.length],
+      url: pickAbstract(1),
       scrim: "vignette",
       scrimStrength: 0.55,
       imageDim: 0.15,
     };
   }
 
-  // Agendas — subtle side gradient over ambient.
+  // Agendas — subtle side gradient over a quieter division photo.
   if (/^MV-OP-AGENDA/.test(id)) {
-    return { url: ambient, scrim: "left", scrimStrength: 0.85, imageDim: 0.1 };
+    return { url: pickPhoto(1), scrim: "left", scrimStrength: 0.85, imageDim: 0.1 };
   }
 
-  // Team bios / intro — team backdrop with left scrim.
+  // Team bios / intro — portrait treatment layered over division photo.
   if (/BIOS|INTRO-TEAM/.test(id)) {
-    return { url: team, scrim: "bottom", scrimStrength: 0.7, imageDim: 0.05 };
+    return { url: pickPhoto(2), scrim: "bottom", scrimStrength: 0.7, imageDim: 0.05 };
   }
 
-  // Case studies / testimonials — portrait with strong left scrim.
+  // Case studies / testimonials — portrait with strong right scrim.
   if (/^MV-CS-/.test(id) || /TESTIMONIAL|QUOTE-BIG/.test(id)) {
     return {
-      url: PORTRAITS[seed % PORTRAITS.length],
+      url: pickPortrait(),
       scrim: "right",
       scrimStrength: 0.8,
       imageDim: 0.05,
@@ -80,26 +80,25 @@ export function backdropForVariant(variant: ModuleVariant): SlideBackdrop | null
     };
   }
 
-  // Stats / proof / cost — city bokeh backdrop, full-frame dim.
+  // Stats / proof / cost — division photo full-frame with heavier dim.
   if (/^MV-PROOF-|STAT-GRID|OPPORTUNITY-SIZE|MV-CTX-COST/.test(id)) {
-    return { url: city, scrim: "full", scrimStrength: 0.65, imageDim: 0.2 };
+    return { url: pickPhoto(3), scrim: "full", scrimStrength: 0.65, imageDim: 0.2 };
   }
 
-  // Cards / pillars — abstract or ambient with soft bottom scrim.
+  // Cards / pillars — abstract atmospheric with soft bottom scrim.
   if (/CARDS-|PILLARS-|PRINCIPLES|VALUE-PROPS/.test(id)) {
-    return { url: seed % 2 === 0 ? abstract : ambient, scrim: "bottom", scrimStrength: 0.75, imageDim: 0.15 };
+    return { url: pickAbstract(2), scrim: "bottom", scrimStrength: 0.75, imageDim: 0.15 };
   }
 
-  // Timeline / roadmap / process — city with bottom scrim.
+  // Timeline / roadmap / process — division photo with bottom scrim.
   if (/TIMELINE|ROADMAP|PROCESS|PHASES|JOURNEY|STEPS/.test(id)) {
-    return { url: city, scrim: "bottom", scrimStrength: 0.72, imageDim: 0.15 };
+    return { url: pickPhoto(4), scrim: "bottom", scrimStrength: 0.72, imageDim: 0.15 };
   }
 
-  // Closing / CTA — bokeh dominant (matches TransPerfect closing style), rotating in team/portraits.
+  // Closing / CTA — abstract atmospheric leaning on brand color.
   if (/^MV-CTA-|CLOSING|NEXT-STEPS|THANKS/.test(id)) {
-    const closingImages = [bokeh, bokeh, team, PORTRAITS[seed % PORTRAITS.length]];
     return {
-      url: closingImages[seed % closingImages.length],
+      url: pickAbstract(3),
       scrim: "left",
       scrimStrength: 0.8,
       imageDim: 0.05,
@@ -112,6 +111,6 @@ export function backdropForVariant(variant: ModuleVariant): SlideBackdrop | null
     return null;
   }
 
-  // Fallback — abstract or ambient with side scrim so content stays readable.
-  return { url: seed % 2 === 0 ? abstract : ambient, scrim: "left", scrimStrength: 0.8, imageDim: 0.1 };
+  // Fallback — abstract with side scrim so content stays readable.
+  return { url: pickAbstract(0), scrim: "left", scrimStrength: 0.8, imageDim: 0.1 };
 }
