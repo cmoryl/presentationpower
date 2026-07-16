@@ -89,7 +89,11 @@ const ICON_KEYWORDS: Array<[RegExp, IconType]> = [
 
 const DEFAULT_ICONS: IconType[] = [Target, Layers3, Workflow, LineChart, Users, Rocket];
 
-function pickIcon(label: string, fallbackIndex = 0): IconType {
+import { iconByName } from "@/lib/icon-library";
+
+function pickIcon(label: string, fallbackIndex = 0, override?: string | null): IconType {
+  const forced = iconByName(override);
+  if (forced) return forced as IconType;
   const text = label || "";
   for (const [rx, Icon] of ICON_KEYWORDS) if (rx.test(text)) return Icon;
   return DEFAULT_ICONS[Math.abs(fallbackIndex) % DEFAULT_ICONS.length];
@@ -104,6 +108,7 @@ function IconBadge({
   placement = "leading",
   treatment,
   ariaLabel,
+  override,
 }: {
   brand: BrandMode;
   label: string;
@@ -113,6 +118,7 @@ function IconBadge({
   placement?: IconPlacement;
   treatment?: IconTreatment;
   ariaLabel?: string; // when set, badge is announced (role=img); otherwise decorative
+  override?: string | null;
 }) {
   // Back-compat: map legacy `tone` values into the new emphasis/treatment axes.
   const legacyOnDark = tone === "onDark";
@@ -130,7 +136,7 @@ function IconBadge({
   });
   const dims = ICON_SIZES[spec.size];
   const colors = resolveEmphasisColors(brand, spec.treatment, spec.emphasis);
-  const Icon = pickIcon(label, index);
+  const Icon = pickIcon(label, index, override);
   const isCircle = spec.treatment === "soft-circle";
   const a11y = spec.a11yRole === "semantic"
     ? { role: "img" as const, "aria-label": ariaLabel ?? label }
@@ -295,7 +301,7 @@ function renderVariantBody({
           <div className="mt-16 grid grid-cols-2 gap-x-24 gap-y-10">
             {arr(c.items).map((it, i) => (
               <div key={i} className="flex items-center gap-6">
-                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" />
+                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} />
                 <div className="text-5xl font-semibold" style={{ color: brand.tokens.accent }}>
                   {String(i + 1).padStart(2, "0")}
                 </div>
@@ -313,7 +319,7 @@ function renderVariantBody({
           <div className="mt-14 space-y-8">
             {arr(c.items).map((it, i) => (
               <div key={i} className="flex items-center gap-8 border-b border-black/10 pb-6">
-                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" />
+                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} />
                 <div className="w-24 text-5xl font-semibold" style={{ color: brand.tokens.accent }}>
                   {String(i + 1).padStart(2, "0")}
                 </div>
@@ -511,7 +517,7 @@ function renderVariantBody({
               <div className="mt-6 text-2xl leading-snug opacity-90">{s(hero.body)}</div>
             </div>
             {arr(c.items).slice(0, 4).map((it, i) => (
-              <Card key={i} brand={brand} title={s(it.title)} body={s(it.body)} index={i + 1} />
+              <Card key={i} brand={brand} title={s(it.title)} body={s(it.body)} index={i + 1} icon={s(it.icon)} />
             ))}
           </div>
         </SlideFrame>
@@ -550,7 +556,7 @@ function renderVariantBody({
           <div className="mt-12 grid grid-cols-2 gap-x-16 gap-y-8">
             {arr(c.items).map((it, i) => (
               <div key={i} className="flex items-start gap-5">
-                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" />
+                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} />
                 <div className="flex-1">
                   <div className="text-3xl font-semibold" style={{ color: brand.tokens.primary }}>
                     {s(it.label)}
@@ -573,7 +579,7 @@ function renderVariantBody({
               {arr(c.items).map((it, i) => (
                 <div key={i} className="pr-10">
                   <div className="mb-6 -translate-y-4">
-                    <IconBadge brand={brand} label={s(it.label)} index={i} size="md" />
+                    <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} />
                   </div>
                   <div className="text-3xl font-semibold" style={{ color: brand.tokens.primary }}>
                     {s(it.label)}
@@ -1536,7 +1542,7 @@ function renderVariantBody({
                   }}
                 >
                   <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl text-white" style={{ backgroundColor: brand.tokens.accent }}>
-                    {(() => { const Ic = pickIcon(s(it.label), i); return <Ic size={26} strokeWidth={2} />; })()}
+                    {(() => { const Ic = pickIcon(s(it.label), i, s(it.icon)); return <Ic size={26} strokeWidth={2} />; })()}
                   </div>
                   <div className="mt-4 text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
                   <div className="mt-2 text-lg opacity-75">{s(it.body)}</div>
@@ -2101,7 +2107,7 @@ function CardGrid({
       <SlideTitle brand={brand} title={title} />
       <div className={`mt-14 grid gap-10 ${gridClass}`} style={rows ? { gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` } : undefined}>
         {items.map((it, i) => (
-          <Card key={i} brand={brand} title={s(it.title)} body={s(it.body)} index={i + 1} />
+          <Card key={i} brand={brand} title={s(it.title)} body={s(it.body)} index={i + 1} icon={s(it.icon)} />
         ))}
       </div>
     </SlideFrame>
@@ -2263,7 +2269,7 @@ function NumberedList({ brand, pageNumber, title, items }: { brand: BrandMode; p
           const label = s(it.title ?? it.label);
           return (
             <div key={i} className="flex items-start gap-8 rounded-xl border p-8" style={{ borderColor: "rgba(10,15,28,0.08)", backgroundColor: brand.tokens.surface }}>
-              <IconBadge brand={brand} label={label} index={i} size="lg" />
+              <IconBadge brand={brand} label={label} index={i} size="lg" override={s(it.icon)} />
               <div className="w-20 text-5xl font-semibold" style={{ color: brand.tokens.accent }}>
                 {String(i + 1).padStart(2, "0")}
               </div>
@@ -2290,11 +2296,11 @@ function SlideTitle({ brand, title }: { brand: BrandMode; title: string }) {
   );
 }
 
-function Card({ brand, title, body, index }: { brand: BrandMode; title: string; body: string; index: number }) {
+function Card({ brand, title, body, index, icon }: { brand: BrandMode; title: string; body: string; index: number; icon?: string }) {
   return (
     <div className="rounded-2xl border p-10" style={{ borderColor: "rgba(10,15,28,0.1)", backgroundColor: brand.tokens.surface }}>
       <div className="flex items-center gap-5">
-        <IconBadge brand={brand} label={title} index={index - 1} size="md" />
+        <IconBadge brand={brand} label={title} index={index - 1} size="md" override={icon} />
         <div className="text-2xl font-semibold" style={{ color: brand.tokens.accent }}>
           {String(index).padStart(2, "0")}
         </div>
