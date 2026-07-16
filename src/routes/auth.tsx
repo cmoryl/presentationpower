@@ -17,9 +17,25 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [remember, setRemember] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+
+  // Hydrate remembered email after mount (avoids SSR/localStorage mismatch).
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem("tp.rememberedEmail");
+      if (saved) {
+        setEmail(saved);
+        setRemember(true);
+      } else {
+        setRemember(false);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   // If already signed in, punt to /admin (or home). Skip the redirect for
   // the "forgot password" mode so a signed-in user can still request a reset
