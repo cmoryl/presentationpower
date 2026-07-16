@@ -554,3 +554,119 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
   }
   return btoa(binary);
 }
+
+function formatBytes(n: number): string {
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+function ProgressPanel({
+  steps,
+  progress,
+  fileInfo,
+  stage,
+}: {
+  steps: Step[];
+  progress: number;
+  fileInfo: { name: string; size: number } | null;
+  stage: Stage;
+}) {
+  const activeStep = steps.find((s) => s.status === "active");
+  const errored = steps.some((s) => s.status === "error");
+  const headline =
+    stage === "done"
+      ? "Import complete"
+      : stage === "creating"
+        ? "Creating your deck…"
+        : errored
+          ? "Something went wrong"
+          : activeStep
+            ? activeStep.label + "…"
+            : "Preparing…";
+
+  return (
+    <div className="mt-10 rounded-2xl border border-black/10 bg-white p-8">
+      <div className="flex items-baseline justify-between gap-6">
+        <div className="min-w-0">
+          <div className="text-xs uppercase tracking-[0.3em] text-black/50">
+            {stage === "done" ? "Ready" : "In progress"}
+          </div>
+          <div className="mt-2 truncate text-lg font-semibold">{headline}</div>
+          {fileInfo && (
+            <div className="mt-1 truncate text-xs text-black/50">
+              {fileInfo.name} · {formatBytes(fileInfo.size)}
+            </div>
+          )}
+        </div>
+        <div className="shrink-0 font-mono text-sm tabular-nums text-black/60">
+          {Math.min(100, Math.round(progress))}%
+        </div>
+      </div>
+
+      <div className="mt-5 h-1.5 w-full overflow-hidden rounded-full bg-black/[0.06]">
+        <div
+          className={`h-full transition-[width] duration-300 ease-out ${
+            errored ? "bg-red-500" : "bg-[#003FC7]"
+          }`}
+          style={{ width: `${Math.min(100, progress)}%` }}
+        />
+      </div>
+
+      <ol className="mt-6 space-y-3">
+        {steps.map((s) => (
+          <li key={s.key} className="flex items-start gap-3 text-sm">
+            <StepIcon status={s.status} />
+            <div className="min-w-0 flex-1">
+              <div
+                className={
+                  s.status === "done"
+                    ? "text-black/80"
+                    : s.status === "active"
+                      ? "font-medium text-black"
+                      : s.status === "error"
+                        ? "font-medium text-red-700"
+                        : "text-black/40"
+                }
+              >
+                {s.label}
+              </div>
+              {s.detail && (
+                <div
+                  className={`mt-0.5 text-xs ${
+                    s.status === "error" ? "text-red-600" : "text-black/50"
+                  }`}
+                >
+                  {s.detail}
+                </div>
+              )}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
+function StepIcon({ status }: { status: StepStatus }) {
+  const base = "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]";
+  if (status === "done") {
+    return (
+      <span className={`${base} bg-[#003FC7] text-white`}>
+        <svg viewBox="0 0 12 12" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M2.5 6.5l2.5 2.5 4.5-5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </span>
+    );
+  }
+  if (status === "active") {
+    return (
+      <span className={`${base} border-2 border-[#003FC7] border-t-transparent animate-spin bg-transparent`} />
+    );
+  }
+  if (status === "error") {
+    return <span className={`${base} bg-red-500 text-white font-bold`}>!</span>;
+  }
+  return <span className={`${base} border border-black/20 bg-white`} />;
+}
+
