@@ -50,7 +50,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertAdmin(context);
-    const s = context.supabase as SbClient;
+    const s = context.supabase as unknown as SbClient;
     const now = new Date();
     const from = new Date(now.getTime() - 30 * 24 * 3600 * 1000).toISOString();
     const [ai, imgs, decks, users, kb, exps] = await Promise.all([
@@ -198,7 +198,7 @@ export const getAiAnalytics = createServerFn({ method: "POST" })
   .inputValidator((input) => aiFilter.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const s = context.supabase as SbClient;
+    const s = context.supabase as unknown as SbClient;
     const from = new Date(Date.now() - data.days * 24 * 3600 * 1000).toISOString();
     let q = s.from("ai_events").select("*").gte("created_at", from).order("created_at", { ascending: false }).limit(5000);
     if (data.brandId) q = q.eq("brand_id", data.brandId);
@@ -251,7 +251,7 @@ export const logAiEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => logAiInput.parse(input))
   .handler(async ({ data, context }) => {
-    const s = context.supabase as SbClient;
+    const s = context.supabase as unknown as SbClient;
     await s.from("ai_events").insert({
       user_id: context.userId,
       brand_id: data.brandId ?? null,
@@ -278,7 +278,7 @@ export const getImageryAnalytics = createServerFn({ method: "POST" })
   .inputValidator((input) => aiFilter.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const s = context.supabase as SbClient;
+    const s = context.supabase as unknown as SbClient;
     const from = new Date(Date.now() - data.days * 24 * 3600 * 1000).toISOString();
     let q = s.from("imagery_events").select("*").gte("created_at", from).order("created_at", { ascending: false }).limit(5000);
     if (data.brandId) q = q.eq("brand_id", data.brandId);
@@ -328,7 +328,7 @@ export const logImageryEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => logImgInput.parse(input))
   .handler(async ({ data, context }) => {
-    const s = context.supabase as SbClient;
+    const s = context.supabase as unknown as SbClient;
     await s.from("imagery_events").insert({
       user_id: context.userId,
       image_id: data.imageId,
@@ -370,7 +370,7 @@ export const createAbExperiment = createServerFn({ method: "POST" })
   .inputValidator((input) => expInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const s = context.supabase as SbClient;
+    const s = context.supabase as unknown as SbClient;
     const { data: exp, error } = await s.from("ab_experiments").insert({
       name: data.name, description: data.description ?? null, hypothesis: data.hypothesis ?? null,
       primary_metric: data.primaryMetric, brand_id: data.brandId ?? null, created_by: context.userId,
@@ -388,7 +388,7 @@ export const listAbExperiments = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertAdmin(context);
-    const s = context.supabase as SbClient;
+    const s = context.supabase as unknown as SbClient;
     const [{ data: exps }, { data: variants }, { data: events }] = await Promise.all([
       s.from("ab_experiments").select("*").order("created_at", { ascending: false }),
       s.from("ab_variants").select("*"),
@@ -422,7 +422,7 @@ export const setAbExperimentStatus = createServerFn({ method: "POST" })
   .inputValidator((input) => expActionInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const s = context.supabase as SbClient;
+    const s = context.supabase as unknown as SbClient;
     const patch: Record<string, unknown> = { status: data.status };
     if (data.status === "running") patch.started_at = new Date().toISOString();
     if (data.status === "ended") patch.ended_at = new Date().toISOString();
@@ -437,7 +437,7 @@ export const deleteAbExperiment = createServerFn({ method: "POST" })
   .inputValidator((input) => delExpInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    const s = context.supabase as SbClient;
+    const s = context.supabase as unknown as SbClient;
     const { error } = await s.from("ab_experiments").delete().eq("id", data.id);
     if (error) throw new Error(String((error as any).message ?? error));
     return { ok: true };
@@ -449,7 +449,7 @@ export const abAssign = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => assignInput.parse(input))
   .handler(async ({ data, context }) => {
-    const s = context.supabase as SbClient;
+    const s = context.supabase as unknown as SbClient;
     const { data: existing } = await s.from("ab_assignments").select("variant_id").eq("experiment_id", data.experimentId).eq("session_id", data.sessionId).maybeSingle();
     if (existing) return { variantId: (existing as any).variant_id };
     const { data: variants } = await s.from("ab_variants").select("id, weight").eq("experiment_id", data.experimentId);
@@ -474,7 +474,7 @@ export const abLogEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => abEventInput.parse(input))
   .handler(async ({ data, context }) => {
-    const s = context.supabase as SbClient;
+    const s = context.supabase as unknown as SbClient;
     await s.from("ab_events").insert({
       experiment_id: data.experimentId, variant_id: data.variantId, session_id: data.sessionId,
       user_id: context.userId, event_type: data.eventType, value: data.value ?? null,
@@ -490,7 +490,7 @@ export const listAuditLog = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertAdmin(context);
-    const s = context.supabase as SbClient;
+    const s = context.supabase as unknown as SbClient;
     const { data } = await s.from("admin_audit_log").select("*").order("created_at", { ascending: false }).limit(300);
     return (data ?? []) as Array<{ id: string; actor_user_id: string | null; action: string; target_type: string | null; target_id: string | null; meta: Record<string, unknown>; created_at: string }>;
   });
