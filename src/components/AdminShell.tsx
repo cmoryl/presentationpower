@@ -51,7 +51,8 @@ function SessionRoleBanner() {
   }
 
   const signedIn = !!info?.userId;
-  const isAdmin = info?.roles.includes("admin");
+  const isAdmin = info?.roles.includes("admin") ?? false;
+  const quickActions: QuickAction[] = isAdmin ? adminQuickActions : memberQuickActions;
 
   return (
     <div className="sticky top-0 z-40 -mx-4 mb-6 border-b border-black/10 bg-white/85 px-4 py-3 backdrop-blur-md md:-mx-8 md:px-8">
