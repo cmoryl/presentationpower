@@ -22,6 +22,12 @@ function hashStr(s: string): number {
  * active brand/division's dedicated image repository. Different families get
  * different scrim treatments so each imagery pattern still reads distinctly.
  */
+// Chrome-dark variants (cover / divider / close / hero CTA) render with a
+// forced-white text/logo treatment in SlideFrame. Their backdrops must stay
+// dark-scrimmed even in light mode, otherwise white text sits on a bright
+// photo and becomes illegible.
+const CHROME_DARK_ID = /^MV-OP-COVER(-MEDIA|-MINIMAL|-EDITORIAL)?$|^MV-OP-DIVIDER|^MV-CS-HERO$|^MV-CTA-|CLOSING-HERO/;
+
 export function backdropForVariant(
   variant: ModuleVariant,
   brandId: string = "bm-enterprise",
@@ -30,8 +36,12 @@ export function backdropForVariant(
   const base = _computeBackdrop(variant, brandId, mode);
   if (!base) return base;
   if (mode !== "light") return base;
-  // White-mode override — swap heavy dark tints for a bright white wash,
-  // ease off scrim strength and dim so the near-white imagery reads as white.
+  // Chrome-dark hero variants: keep the base dark scrim so forced-white text
+  // stays legible over the photo in light mode.
+  if (CHROME_DARK_ID.test(variant.id)) return base;
+  // White-mode override for content slides — swap heavy dark tints for a
+  // bright white wash, ease off scrim strength and dim so the near-white
+  // imagery reads as white and ink text remains legible.
   return {
     ...base,
     tint: LIGHT_TINT,
