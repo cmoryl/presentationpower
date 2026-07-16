@@ -3,7 +3,9 @@ import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { DeckChat } from "@/components/DeckChat";
 import { IconPicker } from "@/components/IconPicker";
+import { SaveToCloudButton } from "@/components/CloudDeckControls";
 import { useDeckStore } from "@/lib/deck-store";
+
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
