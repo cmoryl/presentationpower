@@ -2296,11 +2296,11 @@ function SlideTitle({ brand, title }: { brand: BrandMode; title: string }) {
   );
 }
 
-function Card({ brand, title, body, index }: { brand: BrandMode; title: string; body: string; index: number }) {
+function Card({ brand, title, body, index, icon }: { brand: BrandMode; title: string; body: string; index: number; icon?: string }) {
   return (
     <div className="rounded-2xl border p-10" style={{ borderColor: "rgba(10,15,28,0.1)", backgroundColor: brand.tokens.surface }}>
       <div className="flex items-center gap-5">
-        <IconBadge brand={brand} label={title} index={index - 1} size="md" />
+        <IconBadge brand={brand} label={title} index={index - 1} size="md" override={icon} />
         <div className="text-2xl font-semibold" style={{ color: brand.tokens.accent }}>
           {String(index).padStart(2, "0")}
         </div>
