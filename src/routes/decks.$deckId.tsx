@@ -380,6 +380,87 @@ function IconsPanel({
 }
 
 
+function SlideLightbox({
+  children,
+  onClose,
+  label,
+  onPrev,
+  onNext,
+}: {
+  children: React.ReactNode;
+  onClose: () => void;
+  label: string;
+  onPrev?: () => void;
+  onNext?: () => void;
+}) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      else if (e.key === "ArrowLeft" && onPrev) onPrev();
+      else if (e.key === "ArrowRight" && onNext) onNext();
+    };
+    window.addEventListener("keydown", handler);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", handler);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose, onPrev, onNext]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex flex-col bg-black/85 backdrop-blur-sm"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Slide preview"
+    >
+      <div className="flex items-center justify-between px-6 py-4 text-white">
+        <div className="text-xs uppercase tracking-[0.3em] text-white/70">{label}</div>
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onClose(); }}
+          className="rounded-full border border-white/20 px-3 py-1 text-xs uppercase tracking-widest text-white/80 hover:border-white/60 hover:text-white"
+        >
+          Close · Esc
+        </button>
+      </div>
+      <div className="flex flex-1 items-center justify-center px-6 pb-6">
+        <div
+          className="relative w-full max-w-[min(1600px,95vw)]"
+          style={{ aspectRatio: "16 / 9" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="absolute inset-0 overflow-hidden rounded-xl bg-white shadow-2xl">
+            <ScaledSlide>{children}</ScaledSlide>
+          </div>
+          {onPrev && (
+            <button
+              type="button"
+              onClick={onPrev}
+              aria-label="Previous slide"
+              className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/60 px-4 py-3 text-lg text-white hover:bg-black/80"
+            >
+              ‹
+            </button>
+          )}
+          {onNext && (
+            <button
+              type="button"
+              onClick={onNext}
+              aria-label="Next slide"
+              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/60 px-4 py-3 text-lg text-white hover:bg-black/80"
+            >
+              ›
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function IconBtn({ children, title, onClick }: { children: React.ReactNode; title: string; onClick: () => void }) {
   return (
     <button
