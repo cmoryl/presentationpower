@@ -1,0 +1,31 @@
+{
+  "name": "TransPerfect Modular",
+  "short_name": "TP Modular",
+  "description": "Modular slide directory and AI-assembled decks for TransPerfect sales enablement.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#003FC7",
+  "background_color": "#03002C",
+  "icons": [
+    {
+      "src": "/icon-1024.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-1024.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
