@@ -250,6 +250,12 @@ function DeckEditor() {
             </Panel>
           )}
           {mv && active && (
+            <IconsPanel
+              slide={active}
+              onChange={(path, value) => updateField(deck.id, active.id, path, value)}
+            />
+          )}
+          {mv && active && (
             <Panel label="Related modules">
               <div className="mb-2 text-xs text-black/50">
                 Same family — ranked by shared layouts, section fit, and fallback links.
