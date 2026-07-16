@@ -27,6 +27,7 @@ export type ImageEntry = {
 type BrandLibraryState = {
   disabled: string[]; // ids turned off
   custom: ImageEntry[];
+  usage?: Record<string, { count: number; lastUsedAt: number }>;
 };
 
 type Store = Record<string, BrandLibraryState>;
