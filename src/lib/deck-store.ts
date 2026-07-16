@@ -1043,7 +1043,13 @@ export const useDeckStore = create<DeckState>()(
         });
       },
 
+      hydrate: ({ brief, deck }) =>
+        set((s) => ({
+          briefs: { ...s.briefs, [brief.id]: brief },
+          decks: { ...s.decks, [deck.id]: deck },
+        })),
       reset: () => set({ briefs: {}, decks: {} }),
+
     }),
     { name: "tp-modular-deck" },
   ),
