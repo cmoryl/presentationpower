@@ -134,11 +134,10 @@ export const loadCloudDeck = createServerFn({ method: "POST" })
       .maybeSingle();
     if (dErr) throw new Error(dErr.message);
     if (!deck) throw new Error("Deck not found");
-    const { data: brief } = await supabase
-      .from("briefs")
-      .select("*")
-      .eq("id", deck.brief_id)
-      .maybeSingle();
+    const brief = deck.brief_id
+      ? (await supabase.from("briefs").select("*").eq("id", deck.brief_id).maybeSingle()).data
+      : null;
+
     const { data: slides, error: sErr } = await supabase
       .from("deck_slides")
       .select("*")
