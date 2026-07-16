@@ -27,6 +27,12 @@ export type Brief = {
   archetypeId: string;
   lengthTarget: number; // slides
   clientFacts: string;
+  // Optional A/B palette experiment linkage (advanced creation flow).
+  abExperimentId?: string | null;
+  abVariantId?: string | null;
+  abPaletteOverride?: Record<string, string> | null;
+  // Knowledge context IDs used to boost personalization (audit trail).
+  knowledgeSourceIds?: string[];
 };
 
 export type SlideContent = Record<string, unknown>;
