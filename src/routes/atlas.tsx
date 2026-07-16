@@ -425,7 +425,7 @@ function LogoZoneDiagram({ position }: { position: import("@/lib/logo-placement"
             <BrandLockup
               brand={{ id: "tp", name: "TransPerfect", logo: { mark: "TP", wordmark: "TransPerfect" } } as any}
               color="#000"
-              size="xs"
+              size="2xs"
               showMark={false}
               showDivision={false}
             />
