@@ -78,9 +78,12 @@ export function SlideFrame({
 
   // Light backdrops use a cream/white tint so photography reads bright; dark
   // backdrops keep the original navy scrim. Callers can still override tint.
-  const defaultTint = lightBackdrop ? "#F5F1EA" : "#03002C";
-  const tint = backdrop?.tint ?? defaultTint;
-  const scrimStrength = backdrop?.scrimStrength ?? (lightBackdrop ? 0.65 : 0.55);
+  const defaultTint = lightBackdrop ? "#FFFFFF" : "#03002C";
+  // Light mode: force the backdrop tint to pure white and push the scrim
+  // near-opaque so imagery reads as a subtle wash on a white page.
+  const tint = lightBackdrop ? "#FFFFFF" : (backdrop?.tint ?? defaultTint);
+  const scrimStrength = lightBackdrop ? 0.92 : (backdrop?.scrimStrength ?? 0.55);
+
 
   const scrimGradient = (() => {
     if (!backdrop) return "none";
