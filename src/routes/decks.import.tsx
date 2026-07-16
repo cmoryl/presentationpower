@@ -237,25 +237,28 @@ function ImportView() {
 
         {stage === "upload" && <UploadCard onFile={onFile} />}
 
-        {stage === "parsing" && (
-          <div className="mt-10 rounded-2xl border border-black/10 bg-white p-10 text-center text-sm text-black/60">
-            Parsing your deck…
-          </div>
+        {(stage === "processing" || stage === "creating" || stage === "done") && (
+          <ProgressPanel
+            steps={steps}
+            progress={progress}
+            fileInfo={fileInfo}
+            stage={stage}
+          />
         )}
 
         {stage === "error" && (
-          <div className="mt-10 rounded-2xl border border-red-300 bg-red-50 p-8">
-            <div className="text-sm font-semibold text-red-900">Import failed</div>
-            <div className="mt-2 text-sm text-red-900/80">{error}</div>
-            <button
-              onClick={() => {
-                setStage("upload");
-                setError(null);
-              }}
-              className="mt-4 rounded-full border border-red-400 bg-white px-4 py-2 text-sm text-red-900 hover:bg-red-100"
-            >
-              Try another file
-            </button>
+          <div className="mt-10 space-y-4">
+            <ProgressPanel steps={steps} progress={progress} fileInfo={fileInfo} stage={stage} />
+            <div className="rounded-2xl border border-red-300 bg-red-50 p-6">
+              <div className="text-sm font-semibold text-red-900">Import failed</div>
+              <div className="mt-2 text-sm text-red-900/80">{error}</div>
+              <button
+                onClick={reset}
+                className="mt-4 rounded-full border border-red-400 bg-white px-4 py-2 text-sm text-red-900 hover:bg-red-100"
+              >
+                Try another file
+              </button>
+            </div>
           </div>
         )}
 
@@ -267,21 +270,12 @@ function ImportView() {
             setMeta={setMeta}
             onVariantChange={updateSlideVariant}
             onConfirm={createDeck}
-            onReupload={() => {
-              setStage("upload");
-              setParsed(null);
-              setMapping([]);
-            }}
+            onReupload={reset}
             brandModes={brandModes}
             archetypes={narrativeArchetypes}
           />
         )}
 
-        {stage === "creating" && (
-          <div className="mt-10 rounded-2xl border border-black/10 bg-white p-10 text-center text-sm text-black/60">
-            Creating your deck…
-          </div>
-        )}
       </div>
     </AppShell>
   );
