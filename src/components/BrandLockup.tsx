@@ -47,7 +47,7 @@ export function BrandLockup({
 }: {
   brand: BrandMode;
   color: string;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   showMark?: boolean;
   showDivision?: boolean;
   clientName?: string; // Substituted into division line when it contains {client}
