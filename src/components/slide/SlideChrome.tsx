@@ -61,17 +61,15 @@ export function SlideFrame({
   const backdrop = useContext(SlideBackdropContext);
   const isChromeDark = variant === "cover" || variant === "divider" || variant === "close";
   const slideDark = mode === "dark";
-  // With a backdrop, chrome/dark slides force light text over a dark scrim;
-  // in light-mode content slides we instead render a *light* scrim (cream/white
-  // tint) so ink text stays legible and imagery reads as a light-mode photo.
+  // Baseline variants are simple and readable: white slides with ink text in
+  // light mode, dark navy slides with white text in dark mode. Imagery only
+  // opts into the scrim treatment when explicitly enabled.
   const hasBackdrop = !!backdrop;
-  const lightBackdrop = hasBackdrop && !slideDark && !isChromeDark;
+  const lightBackdrop = hasBackdrop && !slideDark;
   const darkBackdrop = hasBackdrop && !lightBackdrop;
-  // Cover/divider/close = branded hero backdrop. Regular content flips to a
-  // near-black navy in dark mode so cards/text remain legible.
-  const bg = isChromeDark ? brand.tokens.primary : slideDark ? "#0A0A22" : "#ffffff";
-  const fg = darkBackdrop || isChromeDark || slideDark ? "#ffffff" : brand.tokens.ink;
-  const logoColor = darkBackdrop || isChromeDark || slideDark ? "#ffffff" : brand.tokens.primary;
+  const bg = slideDark ? "#03002C" : "#ffffff";
+  const fg = darkBackdrop || slideDark ? "#ffffff" : brand.tokens.ink;
+  const logoColor = darkBackdrop || slideDark ? "#ffffff" : brand.tokens.primary;
 
   const placement = resolveLogoPlacement(variant, layoutId, logoPosition);
   const showLogo = placement.position !== "hidden";
@@ -170,7 +168,7 @@ export function SlideFrame({
       {/* Footer (locked) */}
       <div
         className="absolute bottom-10 left-24 right-24 flex items-center justify-between text-sm"
-        style={{ color: darkBackdrop || isChromeDark || slideDark ? "rgba(255,255,255,0.7)" : "rgba(10,15,28,0.55)" }}
+        style={{ color: darkBackdrop || slideDark ? "rgba(255,255,255,0.7)" : "rgba(10,15,28,0.55)" }}
 
       >
         <span>Confidential — for internal review</span>

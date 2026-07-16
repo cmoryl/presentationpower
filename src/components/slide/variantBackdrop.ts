@@ -1,7 +1,6 @@
 import type { ModuleVariant } from "@/lib/taxonomy";
 import type { SlideBackdrop } from "./SlideChrome";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
-import { LIGHT_IMAGERY, LIGHT_TINT } from "@/assets/backdrops/light";
 
 
 import portrait1 from "@/assets/portraits/portrait-1.png";
@@ -22,44 +21,23 @@ function hashStr(s: string): number {
  * active brand/division's dedicated image repository. Different families get
  * different scrim treatments so each imagery pattern still reads distinctly.
  */
-// Chrome-dark variants (cover / divider / close / hero CTA) render with a
-// forced-white text/logo treatment in SlideFrame. Their backdrops must stay
-// dark-scrimmed even in light mode, otherwise white text sits on a bright
-// photo and becomes illegible.
-const CHROME_DARK_ID = /^MV-OP-COVER(-MEDIA|-MINIMAL|-EDITORIAL)?$|^MV-OP-DIVIDER|^MV-CS-HERO$|^MV-CTA-|CLOSING-HERO/;
-
 export function backdropForVariant(
   variant: ModuleVariant,
   brandId: string = "bm-enterprise",
   mode: "light" | "dark" = "dark",
 ): SlideBackdrop | null {
-  const base = _computeBackdrop(variant, brandId, mode);
-  if (!base) return base;
-  if (mode !== "light") return base;
-  // Chrome-dark hero variants: keep the base dark scrim so forced-white text
-  // stays legible over the photo in light mode.
-  if (CHROME_DARK_ID.test(variant.id)) return base;
-  // White-mode override for content slides — swap heavy dark tints for a
-  // bright white wash, ease off scrim strength and dim so the near-white
-  // imagery reads as white and ink text remains legible.
-  return {
-    ...base,
-    tint: LIGHT_TINT,
-    scrimStrength: Math.min(base.scrimStrength ?? 0.6, 0.4),
-    imageDim: 0,
-  };
+  return _computeBackdrop(variant, brandId, mode);
 }
 
 function _computeBackdrop(
   variant: ModuleVariant,
   brandId: string = "bm-enterprise",
-  mode: "light" | "dark" = "dark",
+  _mode: "light" | "dark" = "dark",
 ): SlideBackdrop | null {
 
   const id = variant.id;
   const seed = hashStr(id);
-  const isLight = mode === "light";
-  const set = isLight ? LIGHT_IMAGERY : getDivisionImagery(brandId);
+  const set = getDivisionImagery(brandId);
   const photos = set.photos;
   const abstracts = set.abstracts;
 
