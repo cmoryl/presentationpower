@@ -95,6 +95,8 @@ export const getAdminOverview = createServerFn({ method: "GET" })
         decks: decks.count ?? 0,
         users: users.count ?? 0,
         knowledgeEntries: kb.count ?? 0,
+        oracleKnowledge: oracleKb.count ?? 0,
+        brandIntelligence: brandIntel.count ?? 0,
         experiments: expRows.length,
         runningExperiments: expRows.filter((r) => r.status === "running").length,
       },
