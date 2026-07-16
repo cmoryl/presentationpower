@@ -75,7 +75,7 @@ function BriefWizard() {
     clientFacts: "Recently expanded into 12 new markets. Under regulatory review pressure.",
   });
 
-  const busy = aiStatus === "assembling" || aiStatus === "personalizing";
+  const busy = aiStatus === "assembling" || aiStatus === "knowledge" || aiStatus === "personalizing";
   const brand = useMemo(
     () => brandModes.find((b) => b.id === form.brandModeId) ?? brandModes[0],
     [brandModes, form.brandModeId]
