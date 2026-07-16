@@ -22,10 +22,16 @@ function AbView() {
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["admin", "ab"], queryFn: () => listFn(), retry: false });
 
+  type CreateInput = {
+    name: string; description?: string | null; hypothesis?: string | null;
+    primaryMetric: StatKey; brandId?: string | null;
+    variants: Array<{ name: string; palette: Record<string, string>; isControl: boolean; weight: number }>;
+  };
   const createM = useMutation({
-    mutationFn: (input: Parameters<typeof createFn>[0]["data"]) => createFn({ data: input }),
+    mutationFn: (input: CreateInput) => createFn({ data: input }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "ab"] }),
   });
+
   const statusM = useMutation({
     mutationFn: (input: { id: string; status: StatusKey }) => statusFn({ data: input }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "ab"] }),
