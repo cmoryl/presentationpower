@@ -27,6 +27,7 @@ export type ImageEntry = {
 type BrandLibraryState = {
   disabled: string[]; // ids turned off
   custom: ImageEntry[];
+  usage?: Record<string, { count: number; lastUsedAt: number }>;
 };
 
 type Store = Record<string, BrandLibraryState>;
@@ -57,7 +58,74 @@ function subscribe(l: () => void) {
 }
 
 function getBrandState(brandId: string): BrandLibraryState {
-  return cache[brandId] ?? { disabled: [], custom: [] };
+  return cache[brandId] ?? { disabled: [], custom: [], usage: {} };
+}
+
+// ─── Usage tracking ──────────────────────────────────────────────────────
+export function recordUsage(brandId: string, id: string) {
+  const s = getBrandState(brandId);
+  const usage = { ...(s.usage ?? {}) };
+  const prev = usage[id] ?? { count: 0, lastUsedAt: 0 };
+  usage[id] = { count: prev.count + 1, lastUsedAt: Date.now() };
+  cache = { ...cache, [brandId]: { ...s, usage } };
+  persist();
+}
+
+export function getUsage(brandId: string): Record<string, { count: number; lastUsedAt: number }> {
+  return getBrandState(brandId).usage ?? {};
+}
+
+export type ImageryAnalytics = {
+  totals: { active: number; muted: number; builtin: number; uploads: number; generated: number };
+  usageTotal: number;
+  uniqueUsed: number;
+  topUsed: Array<{ entry: ImageEntry; count: number; lastUsedAt: number }>;
+  recent: ImageEntry[];
+  prompts: Array<{ entry: ImageEntry; prompt: string; createdAt: number; count: number }>;
+};
+
+export function computeAnalytics(brandId: string): ImageryAnalytics {
+  const all = getAllEntries(brandId);
+  const disabled = new Set(getBrandState(brandId).disabled);
+  const usage = getUsage(brandId);
+  const byId = new Map(all.map((e) => [e.id, e]));
+
+  const usageRows = Object.entries(usage)
+    .map(([id, v]) => ({ entry: byId.get(id), count: v.count, lastUsedAt: v.lastUsedAt }))
+    .filter((r): r is { entry: ImageEntry; count: number; lastUsedAt: number } => !!r.entry)
+    .sort((a, b) => b.count - a.count || b.lastUsedAt - a.lastUsedAt);
+
+  const usageTotal = usageRows.reduce((s, r) => s + r.count, 0);
+
+  const recent = [...all]
+    .filter((e) => e.createdAt > 0)
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .slice(0, 6);
+
+  const prompts = all
+    .filter((e) => !!e.prompt)
+    .map((e) => ({
+      entry: e,
+      prompt: e.prompt ?? "",
+      createdAt: e.createdAt,
+      count: usage[e.id]?.count ?? 0,
+    }))
+    .sort((a, b) => b.createdAt - a.createdAt);
+
+  return {
+    totals: {
+      active: all.length - disabled.size,
+      muted: disabled.size,
+      builtin: all.filter((e) => e.source === "builtin").length,
+      uploads: all.filter((e) => e.source === "upload").length,
+      generated: all.filter((e) => e.source === "ai").length,
+    },
+    usageTotal,
+    uniqueUsed: usageRows.length,
+    topUsed: usageRows.slice(0, 5),
+    recent,
+    prompts,
+  };
 }
 
 // ─── Built-in entries ────────────────────────────────────────────────────
@@ -197,5 +265,8 @@ export function useBrandLibrary(brandId: string) {
     add: (e: Omit<ImageEntry, "id" | "createdAt">) => addCustomEntry(brandId, e),
     remove: (id: string) => removeEntry(brandId, id),
     updateMemory: (id: string, p: { tags?: string[]; note?: string }) => updateEntryMemory(brandId, id, p),
+    recordUsage: (id: string) => recordUsage(brandId, id),
+    analytics: computeAnalytics(brandId),
+    usage: getUsage(brandId),
   };
 }

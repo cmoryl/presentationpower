@@ -7,6 +7,7 @@ import {
   getBrandContext,
   aggregateMemory,
   type ImageEntry,
+  type ImageryAnalytics,
 } from "@/lib/imagery-library";
 import { generateBrandImage } from "@/lib/imagery.functions";
 
@@ -232,6 +233,9 @@ function ImageryPage() {
         </div>
       </div>
 
+      {/* Analytics */}
+      <AnalyticsPanel brandName={ctx.name} primary={primary} accent={accent} analytics={lib.analytics} onSelect={(id) => setSelected(id)} />
+
       {/* Imagery grid */}
       <div className="mt-8 grid gap-4 md:grid-cols-[2fr_1fr]">
         <div>
@@ -255,7 +259,13 @@ function ImageryPage() {
                     "--tw-ring-color": primary,
                   }}
                 >
-                  <button onClick={() => setSelected(e.id)} className="block aspect-[16/10] w-full">
+                  <button
+                    onClick={() => {
+                      setSelected(e.id);
+                      lib.recordUsage(e.id);
+                    }}
+                    className="block aspect-[16/10] w-full"
+                  >
                     <img src={e.url} alt="" className="h-full w-full object-cover" />
                   </button>
                   <div className="absolute left-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-[10px] uppercase tracking-wider text-white">
@@ -405,6 +415,181 @@ function MemoryPanel({
       {!editable && (
         <p className="mt-3 text-[11px] text-black/40">Built-in imagery memory is read-only.</p>
       )}
+    </div>
+  );
+}
+
+function AnalyticsPanel({
+  brandName,
+  primary,
+  accent,
+  analytics,
+  onSelect,
+}: {
+  brandName: string;
+  primary: string;
+  accent: string;
+  analytics: ImageryAnalytics;
+  onSelect: (id: string) => void;
+}) {
+  const { totals, usageTotal, uniqueUsed, topUsed, recent, prompts } = analytics;
+  const fmtAgo = (ts: number) => {
+    if (!ts) return "—";
+    const s = Math.floor((Date.now() - ts) / 1000);
+    if (s < 60) return `${s}s ago`;
+    if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+    if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+    return `${Math.floor(s / 86400)}d ago`;
+  };
+  const maxCount = Math.max(1, ...topUsed.map((r) => r.count));
+
+  return (
+    <div className="mt-8 rounded-2xl border border-black/10 bg-white p-6">
+      <div className="flex items-baseline justify-between">
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.25em]" style={{ color: primary }}>
+            Analytics · {brandName}
+          </div>
+          <div className="mt-1 text-lg font-semibold text-[#03002C]">
+            Image usage, recency & prompt lineage
+          </div>
+        </div>
+        <div className="text-xs text-black/50">
+          {usageTotal} views · {uniqueUsed} unique images used
+        </div>
+      </div>
+
+      {/* Totals */}
+      <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-5">
+        {[
+          { label: "Active", value: totals.active, color: primary },
+          { label: "Muted", value: totals.muted, color: "#666" },
+          { label: "Built-in", value: totals.builtin, color: "#03002C" },
+          { label: "Uploads", value: totals.uploads, color: accent },
+          { label: "AI generated", value: totals.generated, color: "#003FC7" },
+        ].map((s) => (
+          <div key={s.label} className="rounded-xl border border-black/5 bg-[#F7F5F0] p-3">
+            <div className="text-[10px] uppercase tracking-wider text-black/50">{s.label}</div>
+            <div className="mt-1 text-2xl font-semibold text-[#03002C]">{s.value}</div>
+            <div className="mt-2 h-1 w-full rounded-full" style={{ background: `${s.color}22` }}>
+              <div className="h-1 rounded-full" style={{ width: "40%", background: s.color }} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6 grid gap-6 md:grid-cols-2">
+        {/* Top used */}
+        <div>
+          <div className="text-[11px] uppercase tracking-wider text-black/50">Most used</div>
+          {topUsed.length === 0 ? (
+            <p className="mt-2 text-xs text-black/40">
+              Select images in the library to record usage.
+            </p>
+          ) : (
+            <ul className="mt-2 space-y-2">
+              {topUsed.map((r) => (
+                <li key={r.entry.id}>
+                  <button
+                    onClick={() => onSelect(r.entry.id)}
+                    className="flex w-full items-center gap-3 rounded-lg border border-black/5 bg-white p-2 text-left hover:border-black/20"
+                  >
+                    <img src={r.entry.url} alt="" className="h-10 w-16 rounded object-cover" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="truncate text-xs font-medium text-[#03002C]">
+                          {r.entry.source === "ai"
+                            ? "AI"
+                            : r.entry.source === "upload"
+                              ? "Upload"
+                              : r.entry.kind}
+                          <span className="ml-2 text-black/40">{r.entry.id.split(":").slice(-2).join(":")}</span>
+                        </span>
+                        <span className="text-[10px] text-black/50">{fmtAgo(r.lastUsedAt)}</span>
+                      </div>
+                      <div className="mt-1 h-1 w-full rounded-full bg-black/5">
+                        <div
+                          className="h-1 rounded-full"
+                          style={{ width: `${(r.count / maxCount) * 100}%`, background: primary }}
+                        />
+                      </div>
+                    </div>
+                    <span className="text-xs tabular-nums text-black/60">{r.count}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Recent additions */}
+        <div>
+          <div className="text-[11px] uppercase tracking-wider text-black/50">Recently added</div>
+          {recent.length === 0 ? (
+            <p className="mt-2 text-xs text-black/40">
+              Generate or upload imagery to see it appear here.
+            </p>
+          ) : (
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {recent.map((e) => (
+                <button
+                  key={e.id}
+                  onClick={() => onSelect(e.id)}
+                  className="group relative overflow-hidden rounded-lg border border-black/5 hover:border-black/20"
+                >
+                  <img src={e.url} alt="" className="aspect-[16/10] w-full object-cover" />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-1 text-[10px] text-white">
+                    {fmtAgo(e.createdAt)} · {e.source === "ai" ? "AI" : e.source === "upload" ? "upload" : e.kind}
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Prompt lineage */}
+      <div className="mt-6">
+        <div className="text-[11px] uppercase tracking-wider text-black/50">Prompt lineage</div>
+        {prompts.length === 0 ? (
+          <p className="mt-2 text-xs text-black/40">
+            AI-generated imagery for {brandName} will show its prompt here so you can trace what
+            produced each visual.
+          </p>
+        ) : (
+          <ul className="mt-2 divide-y divide-black/5 rounded-xl border border-black/5">
+            {prompts.map((p) => (
+              <li key={p.entry.id} className="flex gap-3 p-3">
+                <button
+                  onClick={() => onSelect(p.entry.id)}
+                  className="shrink-0"
+                  aria-label="Inspect image"
+                >
+                  <img
+                    src={p.entry.url}
+                    alt=""
+                    className="h-14 w-20 rounded object-cover ring-1 ring-black/5"
+                  />
+                </button>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span
+                      className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+                      style={{ background: `${primary}15`, color: primary }}
+                    >
+                      {p.entry.source === "ai" ? "AI generated" : p.entry.source}
+                    </span>
+                    <span className="text-[10px] text-black/50">
+                      {fmtAgo(p.createdAt)} · used {p.count}×
+                    </span>
+                  </div>
+                  <p className="mt-1 line-clamp-2 text-xs text-black/70">{p.prompt}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
