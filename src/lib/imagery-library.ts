@@ -265,5 +265,8 @@ export function useBrandLibrary(brandId: string) {
     add: (e: Omit<ImageEntry, "id" | "createdAt">) => addCustomEntry(brandId, e),
     remove: (id: string) => removeEntry(brandId, id),
     updateMemory: (id: string, p: { tags?: string[]; note?: string }) => updateEntryMemory(brandId, id, p),
+    recordUsage: (id: string) => recordUsage(brandId, id),
+    analytics: computeAnalytics(brandId),
+    usage: getUsage(brandId),
   };
 }
