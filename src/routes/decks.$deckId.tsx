@@ -130,13 +130,23 @@ function DeckEditor() {
 
         {/* Stage */}
         <div>
-          <div className="overflow-hidden rounded-2xl border border-black/10 shadow-lg">
+          <button
+            type="button"
+            onClick={() => setZoomed(true)}
+            title="Click to view larger"
+            aria-label="View slide larger"
+            className="group relative block w-full overflow-hidden rounded-2xl border border-black/10 shadow-lg transition hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B2A4A]"
+          >
             {active && mv && (
               <ScaledSlide>
                 <VariantRenderer slide={active} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} />
               </ScaledSlide>
             )}
-          </div>
+            <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100">
+              ⤢ Enlarge
+            </span>
+          </button>
+
 
           {/* Editable fields */}
           {active && mv && (
