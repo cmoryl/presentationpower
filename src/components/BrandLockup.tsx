@@ -12,7 +12,7 @@ function TransPerfectWordmark({ height }: { height: number }) {
       height={height}
       fill="currentColor"
       aria-hidden
-      style={{ display: "block" }}
+      style={{ display: "block", maxWidth: "100%", height: "auto" }}
     >
       <path d="M359.9,21.9c0-12.7,9.2-21.9,22-21.9s11.2,1.9,16,6.2l-3.8,5c-3.1-2.8-6.8-4.6-12-4.6-8.7,0-14.7,6.4-14.7,15.3s5.8,15.4,14.4,15.4,9.5-2.3,12.3-6l4.6,4.7c-4.1,5.1-9.9,7.9-17.1,7.9-13,0-21.7-9.7-21.7-22" />
       <polygon points="258 37 258 43.5 230.7 43.5 230.7 1 257.4 1 257.4 7.5 238.1 7.5 238.1 18.8 255 18.8 255 25.1 238.1 25.1 238.1 37 258 37" />
@@ -73,7 +73,7 @@ export function BrandLockup({
 
   return (
     <div
-      className="flex items-center"
+      className="flex min-w-0 max-w-full items-center"
       style={{ gap: dims.gapPx, color }}
       role="img"
       aria-label={`${logo.wordmark}${divisionLine ? " — " + divisionLine : ""} lockup`}
@@ -94,18 +94,18 @@ export function BrandLockup({
           {logo.mark}
         </div>
       )}
-      <div className="flex flex-col leading-none">
+      <div className="flex min-w-0 max-w-full flex-col leading-none">
         {useOfficialWordmark ? (
           <TransPerfectWordmark height={wordmarkHeight} />
         ) : (
 
-          <div className="font-semibold tracking-wide" style={{ fontSize: dims.wordPx, letterSpacing: "0.02em" }}>
+          <div className="min-w-0 max-w-full break-words font-semibold tracking-wide" style={{ fontSize: dims.wordPx, letterSpacing: "0.02em" }}>
             {logo.wordmark.toUpperCase()}
           </div>
         )}
         {showDivision && divisionLine && (
           <div
-            className="uppercase tracking-[0.2em] opacity-70"
+            className="max-w-full uppercase leading-tight tracking-[0.14em] opacity-70 [overflow-wrap:anywhere]"
             style={{ fontSize: dims.dividerPx, marginTop: useOfficialWordmark ? 6 : 4 }}
           >
             {divisionLine}

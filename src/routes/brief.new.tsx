@@ -99,17 +99,17 @@ function BriefWizard() {
   return (
     <AppShell>
       <div
-        className="min-h-full font-['Epilogue'] py-12 px-6"
+        className="min-h-full px-3 py-6 font-['Epilogue'] sm:px-6 sm:py-12"
         style={{ backgroundColor: PALETTE.page, color: PALETTE.ink }}
       >
-        <div className="mx-auto w-full max-w-[820px]">
+        <div className="mx-auto w-full max-w-[1040px]">
           <div
             className="overflow-hidden rounded-2xl border shadow-sm"
             style={{ backgroundColor: PALETTE.surface, borderColor: PALETTE.hairline }}
           >
             {/* Header */}
             <div
-              className="border-b px-10 pt-10 pb-8"
+              className="border-b px-5 pb-6 pt-7 sm:px-10 sm:pb-8 sm:pt-10"
               style={{ borderColor: PALETTE.page }}
             >
               <div
@@ -119,7 +119,7 @@ function BriefWizard() {
                 <span className="inline-block h-[2px] w-4" style={{ backgroundColor: brandPrimary }} />
                 Step 01 · Briefing engine
               </div>
-              <h1 className="mt-3 font-['Urbanist'] text-3xl font-extrabold uppercase tracking-tighter text-[#0F1B3D]">
+              <h1 className="mt-3 font-['Urbanist'] text-2xl font-extrabold uppercase tracking-tighter text-[#0F1B3D] sm:text-3xl">
                 New Pitch Deck Brief
               </h1>
               <p className="mt-2 text-[#1E3A5F]/80">
@@ -133,12 +133,12 @@ function BriefWizard() {
               </div>
             </div>
 
-            <form className="space-y-10 p-10" onSubmit={(e) => e.preventDefault()}>
+            <form className="space-y-10 px-5 py-7 sm:p-10" onSubmit={(e) => e.preventDefault()}>
               {/* SECTION 01: Brand Mode — drives everything below */}
               <section className="space-y-4">
-                <div className="flex items-baseline justify-between">
+                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
                   <label className={labelCls}>01 · Brand Mode</label>
-                  <span className="text-[10px] font-medium uppercase tracking-widest text-[#1E3A5F]/50">
+                  <span className="max-w-[11rem] text-right text-[10px] font-medium uppercase tracking-widest text-[#1E3A5F]/50 sm:max-w-none">
                     drives archetype + variant filters
                   </span>
                 </div>
@@ -146,23 +146,25 @@ function BriefWizard() {
                 {/* Selected brand banner */}
                 {brand && (
                   <div
-                    className="flex items-center gap-4 rounded-xl border p-4"
+                    className="grid grid-cols-1 gap-4 rounded-xl border p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
                     style={{
                       borderColor: `${brandPrimary}33`,
                       background: `linear-gradient(90deg, ${brandPrimary}0a, ${brandAccent}0a)`,
                     }}
                   >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <BrandLockup brand={brand} color={brandPrimary} size="sm" clientName={form.prospect} />
+                    <div className="min-w-0">
+                      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+                        <div className="min-w-0 max-w-full">
+                          <BrandLockup brand={brand} color={brandPrimary} size="sm" clientName={form.prospect} />
+                        </div>
                         <span
-                          className="rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
+                          className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
                           style={{ backgroundColor: brandPrimary, color: "#fff" }}
                         >
                           {brand.role ?? "brand"}
                         </span>
                       </div>
-                      <p className="mt-1.5 text-xs text-[#1E3A5F]/75 line-clamp-1">{brand.description}</p>
+                      <p className="mt-2 text-xs leading-relaxed text-[#1E3A5F]/75">{brand.description}</p>
                     </div>
                     <div className="hidden shrink-0 gap-3 text-right text-[10px] font-mono uppercase tracking-wider text-[#1E3A5F]/60 sm:flex">
                       <StatPill label="industries" value={brand.contentScope?.industries.length ?? 0} />
@@ -173,7 +175,7 @@ function BriefWizard() {
                 )}
 
                 {/* Brand grid */}
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
                   {brandModes.map((b) => {
                     const active = form.brandModeId === b.id;
                     const c = b.tokens?.primary || PALETTE.blue;
@@ -183,14 +185,14 @@ function BriefWizard() {
                         type="button"
                         onClick={() => selectBrand(b.id)}
                         aria-pressed={active}
-                        className="group flex cursor-pointer flex-col items-stretch gap-3 overflow-hidden rounded-xl border-2 p-4 text-left transition-all hover:-translate-y-0.5"
+                         className="group grid min-h-[148px] cursor-pointer grid-rows-[auto_1fr_auto] gap-3 rounded-xl border-2 p-4 text-left transition-all hover:-translate-y-0.5"
                         style={{
                           borderColor: active ? c : PALETTE.hairline,
                           backgroundColor: active ? `${c}0d` : PALETTE.surface,
                           boxShadow: active ? `0 0 0 3px ${c}22` : undefined,
                         }}
                       >
-                        <div className="flex items-center justify-end">
+                        <div className="flex min-w-0 items-center justify-end">
                           <span
                             className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
                             style={{
@@ -201,10 +203,10 @@ function BriefWizard() {
                             {b.role ?? "brand"}
                           </span>
                         </div>
-                        <div className="min-w-0 overflow-hidden">
+                        <div className="flex min-w-0 max-w-full items-center">
                           <BrandLockup brand={b} color={c} size="2xs" clientName={form.prospect} />
                         </div>
-                        <p className="text-[11px] leading-snug text-[#1E3A5F]/75 line-clamp-2">{b.description}</p>
+                        <p className="text-[11px] leading-snug text-[#1E3A5F]/75">{b.description}</p>
                       </button>
                     );
                   })}
