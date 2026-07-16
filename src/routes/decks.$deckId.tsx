@@ -68,6 +68,7 @@ function DeckEditor() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <SaveToCloudButton deckId={deckId} />
           <Link
             to="/decks/$deckId/export"
             params={{ deckId }}
@@ -82,6 +83,7 @@ function DeckEditor() {
           >
             Present ▶
           </Link>
+
         </div>
       </div>
 
