@@ -3,7 +3,9 @@ import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { DeckChat } from "@/components/DeckChat";
 import { IconPicker } from "@/components/IconPicker";
+import { SaveToCloudButton } from "@/components/CloudDeckControls";
 import { useDeckStore } from "@/lib/deck-store";
+
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
@@ -66,6 +68,7 @@ function DeckEditor() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <SaveToCloudButton deckId={deckId} />
           <Link
             to="/decks/$deckId/export"
             params={{ deckId }}
@@ -80,6 +83,7 @@ function DeckEditor() {
           >
             Present ▶
           </Link>
+
         </div>
       </div>
 

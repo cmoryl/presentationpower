@@ -78,8 +78,10 @@ type DeckState = {
   duplicateSlide: (deckId: string, slideId: string) => void;
   renameDeck: (deckId: string, title: string) => void;
   deleteDeck: (deckId: string) => void;
+  hydrate: (input: { brief: Brief; deck: Deck }) => void;
   reset: () => void;
 };
+
 
 // Assembly pipeline — deterministic seed content for the MVP.
 // AI-driven personalization slots into personalizeSlide() later.
@@ -1041,7 +1043,13 @@ export const useDeckStore = create<DeckState>()(
         });
       },
 
+      hydrate: ({ brief, deck }) =>
+        set((s) => ({
+          briefs: { ...s.briefs, [brief.id]: brief },
+          decks: { ...s.decks, [deck.id]: deck },
+        })),
       reset: () => set({ briefs: {}, decks: {} }),
+
     }),
     { name: "tp-modular-deck" },
   ),
