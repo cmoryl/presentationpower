@@ -18,10 +18,12 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/atlas", label: "Atlas" },
     { to: "/library", label: "Library" },
     { to: "/imagery", label: "Imagery" },
+    { to: "/admin", label: "Admin" },
+  ] as const;
+  const footerNav = [
     { to: "/knowledge", label: "Knowledge" },
     { to: "/about", label: "About" },
     { to: "/faq", label: "FAQ" },
-    { to: "/admin", label: "Admin" },
   ] as const;
 
   return (
@@ -88,6 +90,25 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <main className="relative z-10 mx-auto max-w-[1400px] px-8 py-10">{children ?? <Outlet />}</main>
+      <footer className="border-t border-black/10 bg-[#E8E4DC]/60">
+        <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-4 px-8 py-8 md:flex-row">
+          <div className="text-xs text-black/50">TransPerfect Modular · Built for sales enablement</div>
+          <nav className="flex items-center gap-1">
+            {footerNav.map((n) => {
+              const active = pathname === n.to;
+              return (
+                <Link
+                  key={n.to}
+                  to={n.to}
+                  className={`rounded-full px-4 py-2 text-sm transition ${active ? "bg-[#0B2A4A] text-white shadow-lg" : "text-black/60 hover:bg-white/40 hover:text-black"}`}
+                >
+                  {n.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      </footer>
     </div>
   );
 }
