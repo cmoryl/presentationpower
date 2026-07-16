@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as ImageryRouteImport } from './routes/imagery'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AtlasRouteImport } from './routes/atlas'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -47,6 +48,11 @@ const KnowledgeRoute = KnowledgeRouteImport.update({
 const ImageryRoute = ImageryRouteImport.update({
   id: '/imagery',
   path: '/imagery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AtlasRoute = AtlasRouteImport.update({
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/atlas': typeof AtlasRoute
+  '/auth': typeof AuthRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/library': typeof LibraryRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/atlas': typeof AtlasRoute
+  '/auth': typeof AuthRoute
   '/imagery': typeof ImageryRoute
   '/library': typeof LibraryRoute
   '/admin/ab': typeof AdminAbRoute
@@ -211,6 +219,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/atlas': typeof AtlasRoute
+  '/auth': typeof AuthRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/library': typeof LibraryRoute
@@ -239,6 +248,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/atlas'
+    | '/auth'
     | '/imagery'
     | '/knowledge'
     | '/library'
@@ -264,6 +274,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/atlas'
+    | '/auth'
     | '/imagery'
     | '/library'
     | '/admin/ab'
@@ -289,6 +300,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/atlas'
+    | '/auth'
     | '/imagery'
     | '/knowledge'
     | '/library'
@@ -316,6 +328,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   AtlasRoute: typeof AtlasRoute
+  AuthRoute: typeof AuthRoute
   ImageryRoute: typeof ImageryRoute
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
   LibraryRoute: typeof LibraryRoute
@@ -345,6 +358,13 @@ declare module '@tanstack/react-router' {
       path: '/imagery'
       fullPath: '/imagery'
       preLoaderRoute: typeof ImageryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/atlas': {
@@ -568,6 +588,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AtlasRoute: AtlasRoute,
+  AuthRoute: AuthRoute,
   ImageryRoute: ImageryRoute,
   KnowledgeRoute: KnowledgeRouteWithChildren,
   LibraryRoute: LibraryRoute,
