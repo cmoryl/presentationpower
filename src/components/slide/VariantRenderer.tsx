@@ -517,7 +517,7 @@ function renderVariantBody({
               <div className="mt-6 text-2xl leading-snug opacity-90">{s(hero.body)}</div>
             </div>
             {arr(c.items).slice(0, 4).map((it, i) => (
-              <Card key={i} brand={brand} title={s(it.title)} body={s(it.body)} index={i + 1} />
+              <Card key={i} brand={brand} title={s(it.title)} body={s(it.body)} index={i + 1} icon={s(it.icon)} />
             ))}
           </div>
         </SlideFrame>
@@ -1542,7 +1542,7 @@ function renderVariantBody({
                   }}
                 >
                   <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl text-white" style={{ backgroundColor: brand.tokens.accent }}>
-                    {(() => { const Ic = pickIcon(s(it.label), i); return <Ic size={26} strokeWidth={2} />; })()}
+                    {(() => { const Ic = pickIcon(s(it.label), i, s(it.icon)); return <Ic size={26} strokeWidth={2} />; })()}
                   </div>
                   <div className="mt-4 text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
                   <div className="mt-2 text-lg opacity-75">{s(it.body)}</div>
@@ -2107,7 +2107,7 @@ function CardGrid({
       <SlideTitle brand={brand} title={title} />
       <div className={`mt-14 grid gap-10 ${gridClass}`} style={rows ? { gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` } : undefined}>
         {items.map((it, i) => (
-          <Card key={i} brand={brand} title={s(it.title)} body={s(it.body)} index={i + 1} />
+          <Card key={i} brand={brand} title={s(it.title)} body={s(it.body)} index={i + 1} icon={s(it.icon)} />
         ))}
       </div>
     </SlideFrame>
