@@ -21,8 +21,11 @@ function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
 
-  // If already signed in, punt to /admin (or home).
+  // If already signed in, punt to /admin (or home). Skip the redirect for
+  // the "forgot password" mode so a signed-in user can still request a reset
+  // (rare, but the page shouldn't bounce them mid-flow).
   useEffect(() => {
+    if (mode === "forgot") return;
     let mounted = true;
     supabase.auth.getSession().then(({ data }) => {
       if (mounted && data.session) navigate({ to: "/admin", replace: true });
@@ -30,7 +33,7 @@ function AuthPage() {
     return () => {
       mounted = false;
     };
-  }, [navigate, pathname]);
+  }, [navigate, pathname, mode]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
