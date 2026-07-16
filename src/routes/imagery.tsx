@@ -345,22 +345,34 @@ function ImageryPage() {
                     >
                       {disabled ? "Include" : "Exclude"}
                     </button>
-                    {e.source !== "builtin" && (
-                      <button
-                        onClick={() => {
-                          lib.remove(e.id);
-                          if (selected === e.id) setSelected(null);
-                        }}
-                        className="rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-red-600 hover:bg-white"
-                      >
-                        Delete
-                      </button>
-                    )}
+                    <button
+                      onClick={() => {
+                        const label =
+                          e.source === "builtin"
+                            ? "Remove this built-in image from the library? You can restore it later."
+                            : "Delete this image permanently?";
+                        if (!confirm(label)) return;
+                        lib.remove(e.id);
+                        if (selected === e.id) setSelected(null);
+                      }}
+                      className="rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-red-600 hover:bg-white"
+                      title={e.source === "builtin" ? "Remove (restorable)" : "Delete permanently"}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               );
             })}
           </div>
+          {lib.removedBuiltins.length > 0 && (
+            <RestorePanel
+              primary={primary}
+              removed={lib.removedBuiltins}
+              onRestore={(id) => lib.restore(id)}
+              onRestoreAll={() => lib.restoreAll()}
+            />
+          )}
         </div>
 
         {/* Memory panel */}
