@@ -17,9 +17,25 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [remember, setRemember] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+
+  // Hydrate remembered email after mount (avoids SSR/localStorage mismatch).
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem("tp.rememberedEmail");
+      if (saved) {
+        setEmail(saved);
+        setRemember(true);
+      } else {
+        setRemember(false);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   // If already signed in, punt to /admin (or home). Skip the redirect for
   // the "forgot password" mode so a signed-in user can still request a reset
@@ -70,6 +86,10 @@ function AuthPage() {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        try {
+          if (remember) window.localStorage.setItem("tp.rememberedEmail", email);
+          else window.localStorage.removeItem("tp.rememberedEmail");
+        } catch { /* ignore */ }
         navigate({ to: "/admin", replace: true });
       }
     } catch (err: unknown) {
@@ -153,6 +173,20 @@ function AuthPage() {
                 />
               </label>
             )}
+
+            {mode === "signin" && (
+              <label className="flex items-center gap-2 text-sm text-black/70 select-none">
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  className="h-4 w-4 rounded border-black/25 accent-[#03002C]"
+                />
+                Remember me on this device
+              </label>
+            )}
+
+
 
             {error && (
               <div className="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-800">
