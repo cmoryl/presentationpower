@@ -345,22 +345,34 @@ function ImageryPage() {
                     >
                       {disabled ? "Include" : "Exclude"}
                     </button>
-                    {e.source !== "builtin" && (
-                      <button
-                        onClick={() => {
-                          lib.remove(e.id);
-                          if (selected === e.id) setSelected(null);
-                        }}
-                        className="rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-red-600 hover:bg-white"
-                      >
-                        Delete
-                      </button>
-                    )}
+                    <button
+                      onClick={() => {
+                        const label =
+                          e.source === "builtin"
+                            ? "Remove this built-in image from the library? You can restore it later."
+                            : "Delete this image permanently?";
+                        if (!confirm(label)) return;
+                        lib.remove(e.id);
+                        if (selected === e.id) setSelected(null);
+                      }}
+                      className="rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-red-600 hover:bg-white"
+                      title={e.source === "builtin" ? "Remove (restorable)" : "Delete permanently"}
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               );
             })}
           </div>
+          {lib.removedBuiltins.length > 0 && (
+            <RestorePanel
+              primary={primary}
+              removed={lib.removedBuiltins}
+              onRestore={(id) => lib.restore(id)}
+              onRestoreAll={() => lib.restoreAll()}
+            />
+          )}
         </div>
 
         {/* Memory panel */}
@@ -656,6 +668,60 @@ function AnalyticsPanel({
             ))}
           </ul>
         )}
+      </div>
+    </div>
+  );
+}
+
+function RestorePanel({
+  primary,
+  removed,
+  onRestore,
+  onRestoreAll,
+}: {
+  primary: string;
+  removed: ImageEntry[];
+  onRestore: (id: string) => void;
+  onRestoreAll: () => void;
+}) {
+  return (
+    <div
+      className="mt-6 rounded-2xl border p-4"
+      style={{ borderColor: `${primary}33`, background: `${primary}08` }}
+    >
+      <div className="flex items-baseline justify-between gap-3">
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.25em]" style={{ color: primary }}>
+            Recently removed
+          </div>
+          <div className="mt-1 text-sm text-black/70">
+            {removed.length} built-in image{removed.length === 1 ? "" : "s"} hidden from this
+            division. Restore individually or bring them all back.
+          </div>
+        </div>
+        <button
+          onClick={onRestoreAll}
+          className="shrink-0 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40"
+        >
+          Restore all
+        </button>
+      </div>
+      <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+        {removed.map((e) => (
+          <button
+            key={e.id}
+            onClick={() => onRestore(e.id)}
+            title="Restore to library"
+            className="group relative overflow-hidden rounded-md border border-black/10 bg-white"
+          >
+            <img src={e.url} alt="" className="aspect-[16/10] w-full object-cover opacity-70 transition group-hover:opacity-100" />
+            <span
+              className="absolute inset-x-0 bottom-0 bg-black/70 py-0.5 text-center text-[10px] font-medium text-white opacity-0 transition group-hover:opacity-100"
+            >
+              Restore
+            </span>
+          </button>
+        ))}
       </div>
     </div>
   );
