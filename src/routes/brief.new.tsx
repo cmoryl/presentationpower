@@ -55,10 +55,15 @@ function BriefWizard() {
   const applyAi = useDeckStore((s) => s.applyAiContent);
   const decks = useDeckStore((s) => s.decks);
   const personalize = useServerFn(personalizeSlides);
+  const retrieveKnowledge = useServerFn(retrieveKnowledgeForBrief);
+  const assignVariantFn = useServerFn(abAssign);
+  const logAbEventFn = useServerFn(abLogEvent);
   const { brandModes, narrativeArchetypes } = useTaxonomy();
-  const [aiStatus, setAiStatus] = useState<"idle" | "assembling" | "personalizing" | "error">("idle");
+  const [aiStatus, setAiStatus] = useState<"idle" | "assembling" | "knowledge" | "personalizing" | "error">("idle");
   const [aiError, setAiError] = useState<string | null>(null);
   const [showAllArchetypes, setShowAllArchetypes] = useState(false);
+  const [paletteSel, setPaletteSel] = useState<PaletteSelection>({ experimentId: null, variantId: null, paletteOverride: null });
+  const [kbUsedCount, setKbUsedCount] = useState<number>(0);
   const [form, setForm] = useState({
     prospect: "Acme Global",
     industry: "Life sciences",
