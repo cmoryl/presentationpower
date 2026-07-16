@@ -5,8 +5,10 @@ import { AppShell } from "@/components/AppShell";
 import { useDeckStore } from "@/lib/deck-store";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { personalizeSlides } from "@/lib/personalize.functions";
+import { retrieveKnowledgeForBrief, abAssign, abLogEvent } from "@/lib/admin.functions";
 import { byId, SECTION_FRAMEWORKS, NARRATIVE_ARCHETYPES, type BrandMode } from "@/lib/taxonomy";
 import { BrandLockup } from "@/components/BrandLockup";
+import { PaletteLab, type PaletteSelection } from "@/components/PaletteLab";
 
 export const Route = createFileRoute("/brief/new")({
   head: () => ({
