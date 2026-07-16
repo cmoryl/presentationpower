@@ -36,9 +36,12 @@ function AdminGate() {
     );
   }
   if (state === "anon") {
+    if (typeof window !== "undefined") {
+      window.location.replace("/auth");
+    }
     return (
       <AppShell>
-        <AdminForbidden message="You must be signed in with an admin account to access this console." />
+        <AdminForbidden message="Redirecting to sign in…" />
       </AppShell>
     );
   }
