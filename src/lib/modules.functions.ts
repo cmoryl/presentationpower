@@ -236,7 +236,7 @@ export const listModuleAudit = createServerFn({ method: "POST" })
       id: string;
       actor_user_id: string;
       action: string;
-      meta: Record<string, unknown> | null;
+      meta: Record<string, string | number | boolean | null> | null;
       created_at: string;
     }>;
   });
