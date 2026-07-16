@@ -31,6 +31,7 @@ import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
 import { Route as AdminImageryRouteImport } from './routes/admin.imagery'
+import { Route as AdminIconStudioRouteImport } from './routes/admin.icon-studio'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminApprovalsRouteImport } from './routes/admin.approvals'
 import { Route as AdminAiRouteImport } from './routes/admin.ai'
@@ -150,6 +151,11 @@ const AdminImageryRoute = AdminImageryRouteImport.update({
   path: '/imagery',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminIconStudioRoute = AdminIconStudioRouteImport.update({
+  id: '/icon-studio',
+  path: '/icon-studio',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAuditRoute = AdminAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -206,6 +212,7 @@ export interface FileRoutesByFullPath {
   '/admin/ai': typeof AdminAiRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/users': typeof AdminUsersRoute
@@ -236,6 +243,7 @@ export interface FileRoutesByTo {
   '/admin/ai': typeof AdminAiRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/users': typeof AdminUsersRoute
@@ -269,6 +277,7 @@ export interface FileRoutesById {
   '/admin/ai': typeof AdminAiRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/users': typeof AdminUsersRoute
@@ -303,6 +312,7 @@ export interface FileRouteTypes {
     | '/admin/ai'
     | '/admin/approvals'
     | '/admin/audit'
+    | '/admin/icon-studio'
     | '/admin/imagery'
     | '/admin/oracle'
     | '/admin/users'
@@ -333,6 +343,7 @@ export interface FileRouteTypes {
     | '/admin/ai'
     | '/admin/approvals'
     | '/admin/audit'
+    | '/admin/icon-studio'
     | '/admin/imagery'
     | '/admin/oracle'
     | '/admin/users'
@@ -365,6 +376,7 @@ export interface FileRouteTypes {
     | '/admin/ai'
     | '/admin/approvals'
     | '/admin/audit'
+    | '/admin/icon-studio'
     | '/admin/imagery'
     | '/admin/oracle'
     | '/admin/users'
@@ -556,6 +568,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminImageryRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/icon-studio': {
+      id: '/admin/icon-studio'
+      path: '/icon-studio'
+      fullPath: '/admin/icon-studio'
+      preLoaderRoute: typeof AdminIconStudioRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/audit': {
       id: '/admin/audit'
       path: '/audit'
@@ -620,6 +639,7 @@ interface AdminRouteChildren {
   AdminAiRoute: typeof AdminAiRoute
   AdminApprovalsRoute: typeof AdminApprovalsRoute
   AdminAuditRoute: typeof AdminAuditRoute
+  AdminIconStudioRoute: typeof AdminIconStudioRoute
   AdminImageryRoute: typeof AdminImageryRoute
   AdminOracleRoute: typeof AdminOracleRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -631,6 +651,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAiRoute: AdminAiRoute,
   AdminApprovalsRoute: AdminApprovalsRoute,
   AdminAuditRoute: AdminAuditRoute,
+  AdminIconStudioRoute: AdminIconStudioRoute,
   AdminImageryRoute: AdminImageryRoute,
   AdminOracleRoute: AdminOracleRoute,
   AdminUsersRoute: AdminUsersRoute,
