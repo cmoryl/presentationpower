@@ -61,19 +61,27 @@ export function SlideFrame({
   const backdrop = useContext(SlideBackdropContext);
   const isChromeDark = variant === "cover" || variant === "divider" || variant === "close";
   const slideDark = mode === "dark";
-  // With a backdrop, force dark text treatment for legibility over imagery.
+  // With a backdrop, chrome/dark slides force light text over a dark scrim;
+  // in light-mode content slides we instead render a *light* scrim (cream/white
+  // tint) so ink text stays legible and imagery reads as a light-mode photo.
   const hasBackdrop = !!backdrop;
+  const lightBackdrop = hasBackdrop && !slideDark && !isChromeDark;
+  const darkBackdrop = hasBackdrop && !lightBackdrop;
   // Cover/divider/close = branded hero backdrop. Regular content flips to a
   // near-black navy in dark mode so cards/text remain legible.
   const bg = isChromeDark ? brand.tokens.primary : slideDark ? "#0A0A22" : "#ffffff";
-  const fg = isChromeDark || slideDark || hasBackdrop ? "#ffffff" : brand.tokens.ink;
-  const logoColor = isChromeDark || slideDark || hasBackdrop ? "#ffffff" : brand.tokens.primary;
+  const fg = darkBackdrop || isChromeDark || slideDark ? "#ffffff" : brand.tokens.ink;
+  const logoColor = darkBackdrop || isChromeDark || slideDark ? "#ffffff" : brand.tokens.primary;
 
   const placement = resolveLogoPlacement(variant, layoutId, logoPosition);
   const showLogo = placement.position !== "hidden";
 
-  const scrimStrength = backdrop?.scrimStrength ?? 0.55;
-  const tint = backdrop?.tint ?? "#03002C";
+  // Light backdrops use a cream/white tint so photography reads bright; dark
+  // backdrops keep the original navy scrim. Callers can still override tint.
+  const defaultTint = lightBackdrop ? "#F5F1EA" : "#03002C";
+  const tint = backdrop?.tint ?? defaultTint;
+  const scrimStrength = backdrop?.scrimStrength ?? (lightBackdrop ? 0.65 : 0.55);
+
   const scrimGradient = (() => {
     if (!backdrop) return "none";
     const a = scrimStrength;
