@@ -166,7 +166,7 @@ export function SlideFrame({
           <BrandLockup
             brand={brand}
             color={logoColor}
-            size={variant === "content" ? "md" : "lg"}
+            size={variant === "content" ? "md" : variant === "cover" ? "xl" : "lg"}
             clientName={clientName}
           />
         </div>
