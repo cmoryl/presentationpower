@@ -3,6 +3,72 @@ import { AppShell } from "@/components/AppShell";
 
 type QA = { q: string; a: string };
 
+const GUIDES: Array<{ title: string; blurb: string; steps: string[] }> = [
+  {
+    title: "Sign in for the first time",
+    blurb: "Get into the workspace and set yourself up.",
+    steps: [
+      "Open the app and click Sign in on the header.",
+      "Enter your TransPerfect email and password, or use the magic-link option.",
+      'Check "Remember me on this device" so your email pre-fills next time.',
+      "On first confirmed sign-in, @transperfect.com addresses are granted admin automatically.",
+    ],
+  },
+  {
+    title: "Build your first deck from a brief",
+    blurb: "Go from prospect brief to a review-ready deck in under a minute.",
+    steps: [
+      "Go to Brief → New from the top navigation.",
+      "Fill in prospect name, industry, and the objective for the meeting.",
+      "Review the suggested archetype — swap it if a different narrative fits better.",
+      "Let the system draft module variants; scan the outline in the right rail.",
+      "Click Assemble deck to open the full deck in the Decks workspace.",
+    ],
+  },
+  {
+    title: "Personalize and swap module variants",
+    blurb: "Fine-tune any slide without losing your content.",
+    steps: [
+      "Open the deck and select a module from the left rail.",
+      'Click "Swap variant" to see alternate layouts for the same narrative purpose.',
+      "Edit copy directly in the slide preview — structured fields save on blur.",
+      'Use "Personalize" to rewrite copy for the current prospect and industry.',
+      "Reorder modules by dragging their handle in the outline.",
+    ],
+  },
+  {
+    title: "Import an existing PowerPoint",
+    blurb: "Bring a legacy .pptx into the modular system.",
+    steps: [
+      "Go to Decks → Import.",
+      "Drop your .pptx file or click to browse.",
+      "Wait for the parse — text and structure are auto-mapped to module variants.",
+      "Review the mapping; override any mis-matched slide by picking a different variant.",
+      "Click Assemble to create a deck you can personalize and export.",
+    ],
+  },
+  {
+    title: "Export a deck to PowerPoint",
+    blurb: "Ship a branded .pptx to your prospect.",
+    steps: [
+      "Open the deck from Decks.",
+      "Click Export in the top-right of the deck workspace.",
+      "Wait for the .pptx to generate — a download starts automatically.",
+      "Open in PowerPoint or Keynote; the file matches TransPerfect's visual system.",
+    ],
+  },
+  {
+    title: "Sync Oracle KB into Knowledge (admin)",
+    blurb: "Promote a vetted Oracle entry into the live Knowledge system.",
+    steps: [
+      "Go to Admin → Oracle KB.",
+      "Search or filter for the entry you want to promote.",
+      'Open the entry and click "Sync to Knowledge".',
+      "Review the mapped fields and confirm; the entry becomes searchable app-wide.",
+    ],
+  },
+];
+
 const FAQS: Array<{ section: string; items: QA[] }> = [
   {
     section: "Getting started",
