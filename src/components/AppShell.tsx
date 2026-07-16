@@ -1,10 +1,17 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useContrastBoost } from "@/hooks/use-contrast-boost";
+import { useTheme, type ThemeMode } from "@/hooks/use-theme";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [boost, setBoost] = useContrastBoost();
+  const [theme, setTheme] = useTheme();
+  const themes: { id: ThemeMode; label: string }[] = [
+    { id: "cream", label: "Cream" },
+    { id: "light", label: "Light" },
+    { id: "dark",  label: "Dark" },
+  ];
   const nav = [
     { to: "/", label: "Dashboard" },
     { to: "/brief/new", label: "New brief" },

@@ -293,4 +293,56 @@
   }
 }
 
+/* -----------------------------------------------------------------------------
+ * Theme modes (Cream / Light / Dark)
+ *
+ * Much of the app uses arbitrary Tailwind hex classes (`bg-[#F5F1EA]`,
+ * `text-[#03002C]`, …). Those compile to per-class CSS rules that we can
+ * safely re-map per theme via attribute selectors, so a global theme flip
+ * works without refactoring every component to design tokens.
+ *
+ * Rules target the *class attribute substring* (e.g. `[class*="text-[#03002C]"]`)
+ * so any element that opted into that hardcoded color inherits the theme
+ * variant. Accessibility: dark mode moves ink text (#03002C, #0A0F1C) to
+ * near-white and dark backgrounds to deep navy, restoring WCAG AA contrast.
+ * ---------------------------------------------------------------------------*/
+
+/* True Light — swap the branded cream for near-white surfaces */
+[data-theme="light"] [class*="bg-[#F5F1EA]"] { background-color: #FFFFFF !important; }
+[data-theme="light"] [class*="bg-[#F7F5F0]"] { background-color: #F8FAFC !important; }
+[data-theme="light"] [class*="bg-[#F2F2F2]"] { background-color: #F1F5F9 !important; }
+
+/* Dark — flip cream/ink pairing so light text sits on deep navy */
+.dark [class*="bg-[#F5F1EA]"] { background-color: #0A0929 !important; }
+.dark [class*="bg-[#F7F5F0]"] { background-color: #141435 !important; }
+.dark [class*="bg-[#F2F2F2]"] { background-color: #1A1A3A !important; }
+.dark [class*="bg-white/40"] { background-color: rgba(255,255,255,0.08) !important; }
+.dark [class*="bg-white/70"] { background-color: rgba(255,255,255,0.14) !important; }
+.dark [class*="bg-white/90"] { background-color: rgba(255,255,255,0.92) !important; }
+
+.dark [class*="text-[#03002C]"] { color: #E0E8F5 !important; }
+.dark [class*="text-[#0A0F1C]"] { color: #E0E8F5 !important; }
+.dark [class*="text-[#0B2A4A]"] { color: #A1FBF9 !important; }
+.dark [class*="text-[#003FC7]"] { color: #A1FBF9 !important; }
+.dark [class*="text-black/60"] { color: rgba(255,255,255,0.72) !important; }
+.dark [class*="text-black/70"] { color: rgba(255,255,255,0.8) !important; }
+.dark [class*="text-black/55"] { color: rgba(255,255,255,0.65) !important; }
+.dark [class*="text-black/50"] { color: rgba(255,255,255,0.6) !important; }
+
+/* Solid navy CTAs → brand blue on dark for separation from the page */
+.dark [class*="bg-[#03002C]"] { background-color: #003FC7 !important; }
+.dark [class*="bg-[#0B2A4A]"] { background-color: #003FC7 !important; }
+.dark [class*="border-[#03002C]"] { border-color: #003FC7 !important; }
+
+.dark [class*="border-black/5"]  { border-color: rgba(255,255,255,0.08) !important; }
+.dark [class*="border-black/10"] { border-color: rgba(255,255,255,0.12) !important; }
+.dark [class*="border-black/20"] { border-color: rgba(255,255,255,0.18) !important; }
+
+/* Body base color per theme so anything relying on inherited text color
+ * (e.g. plain <p> without a text- class) still meets contrast. */
+[data-theme="cream"] body { background-color: #F5F1EA; color: #0A0F1C; }
+[data-theme="light"] body { background-color: #FFFFFF; color: #0A0F1C; }
+[data-theme="dark"]  body { background-color: #0A0929; color: #E0E8F5; }
+
+
 
