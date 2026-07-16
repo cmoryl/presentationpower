@@ -27,6 +27,25 @@ export function backdropForVariant(
   brandId: string = "bm-enterprise",
   mode: "light" | "dark" = "dark",
 ): SlideBackdrop | null {
+  const base = _computeBackdrop(variant, brandId, mode);
+  if (!base) return base;
+  if (mode !== "light") return base;
+  // White-mode override — swap heavy dark tints for a bright white wash,
+  // ease off scrim strength and dim so the near-white imagery reads as white.
+  return {
+    ...base,
+    tint: LIGHT_TINT,
+    scrimStrength: Math.min(base.scrimStrength ?? 0.6, 0.4),
+    imageDim: 0,
+  };
+}
+
+function _computeBackdrop(
+  variant: ModuleVariant,
+  brandId: string = "bm-enterprise",
+  mode: "light" | "dark" = "dark",
+): SlideBackdrop | null {
+
   const id = variant.id;
   const seed = hashStr(id);
   const isLight = mode === "light";
