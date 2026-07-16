@@ -612,3 +612,156 @@ export const syncOracleToKnowledge = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+// ═════════════════════════════════════════════════════════════════════════
+// CREATION-FLOW HELPERS — signed-in (non-admin) surface for brief.new
+// ═════════════════════════════════════════════════════════════════════════
+
+// List running experiments, optionally scoped to a brand id. Used by the
+// brief flow so authors can attach a live palette experiment during creation.
+const activeExpInput = z.object({ brandId: z.string().nullable().optional() }).default({});
+export const listActiveExperiments = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => activeExpInput.parse(input ?? {}))
+  .handler(async ({ data, context }) => {
+    const s = context.supabase as unknown as SbClient;
+    const { data: exps } = await s
+      .from("ab_experiments")
+      .select("id, name, hypothesis, primary_metric, brand_id, status")
+      .eq("status", "running");
+    const rows = (exps ?? []) as Array<{ id: string; name: string; hypothesis: string | null; primary_metric: string; brand_id: string | null; status: string }>;
+    const matches = rows.filter((r) => !data.brandId || r.brand_id === null || r.brand_id === data.brandId);
+    if (matches.length === 0) return [] as Array<{ id: string; name: string; hypothesis: string | null; primary_metric: string; brand_id: string | null; variants: Array<{ id: string; name: string; palette: Record<string, string>; is_control: boolean; weight: number }> }>;
+    const { data: variants } = await s
+      .from("ab_variants")
+      .select("id, experiment_id, name, palette, is_control, weight")
+      .in("experiment_id" as any, matches.map((m) => m.id) as any);
+    const vList = (variants ?? []) as Array<{ id: string; experiment_id: string; name: string; palette: Record<string, string>; is_control: boolean; weight: number }>;
+    return matches.map((m) => ({
+      id: m.id, name: m.name, hypothesis: m.hypothesis, primary_metric: m.primary_metric, brand_id: m.brand_id,
+      variants: vList.filter((v) => v.experiment_id === m.id),
+    }));
+  });
+
+// Retrieve Oracle + KB snippets relevant to the brief. Keyword scored against
+// title / content / tags. Returns compact snippets suitable for prompt context.
+const kbInput = z.object({
+  industry: z.string().default(""),
+  audience: z.string().default(""),
+  meetingObjective: z.string().default(""),
+  clientFacts: z.string().default(""),
+  brandName: z.string().optional().nullable(),
+  brandTags: z.array(z.string()).default([]),
+  limit: z.number().int().min(1).max(12).default(6),
+});
+export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => kbInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const s = context.supabase as unknown as SbClient;
+    const [{ data: oracle }, { data: entries }] = await Promise.all([
+      s.from("oracle_knowledge_base").select("id, title, content, category, tags").eq("is_active", true).limit(200),
+      s.from("knowledge_entries").select("id, title, body, tags").limit(200),
+    ]);
+    const haystack = [
+      ...((oracle ?? []) as Array<{ id: string; title: string; content: string; category: string | null; tags: string[] | null }>).map((r) => ({
+        id: `oracle:${r.id}`, title: r.title, body: r.content ?? "", tags: [...(r.tags ?? []), r.category ?? ""].filter(Boolean), source: "oracle" as const,
+      })),
+      ...((entries ?? []) as Array<{ id: string; title: string; body: string; tags: string[] | null }>).map((r) => ({
+        id: `kb:${r.id}`, title: r.title, body: r.body ?? "", tags: r.tags ?? [], source: "kb" as const,
+      })),
+    ];
+    // Tokenize brief + brand context.
+    const bag = [data.industry, data.audience, data.meetingObjective, data.clientFacts, data.brandName ?? "", ...data.brandTags]
+      .join(" ")
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((w) => w.length > 3);
+    const tokenSet = new Set(bag);
+    const scored = haystack.map((h) => {
+      const hay = `${h.title} ${h.body} ${h.tags.join(" ")}`.toLowerCase();
+      let score = 0;
+      for (const t of tokenSet) if (hay.includes(t)) score += 1;
+      for (const bt of data.brandTags) if (h.tags.some((tg) => tg.toLowerCase().includes(bt.toLowerCase()))) score += 2;
+      return { ...h, score };
+    }).filter((h) => h.score > 0).sort((a, b) => b.score - a.score).slice(0, data.limit);
+    return scored.map((s2) => ({
+      id: s2.id, source: s2.source, title: s2.title, tags: s2.tags,
+      snippet: (s2.body ?? "").slice(0, 480).replace(/\s+/g, " ").trim(),
+    }));
+  });
+
+// AI-propose palette variants for the current brand. Uses brand tokens as
+// seed and returns 3 distinct palette candidates + rationale. Not persisted —
+// author can then either save one as a starting point or push to /admin/ab.
+const proposePalettesInput = z.object({
+  brandName: z.string(),
+  brandRole: z.string().optional().nullable(),
+  seedPalette: z.record(z.string(), z.string()),
+  audience: z.string().default(""),
+  objective: z.string().default(""),
+  vibe: z.string().default(""), // e.g. "bolder", "trust-forward", "energetic"
+});
+export const proposeAbPalettes = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => proposePalettesInput.parse(input))
+  .handler(async ({ data }): Promise<{ variants: Array<{ name: string; rationale: string; palette: { primary: string; accent: string; ink: string; surface: string } }>; error?: string }> => {
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) return { variants: [], error: "LOVABLE_API_KEY missing" };
+    const system = [
+      "You are a brand systems designer at TransPerfect.",
+      "Given a seed palette and audience/objective context, propose 3 distinct palette variants for A/B testing on rendered sales decks.",
+      "Rules:",
+      "- Each variant must remain professional and enterprise-appropriate.",
+      "- Primary should carry brand equity; accent is a supporting pop; ink is text; surface is background.",
+      "- Return valid 7-char hex codes (#RRGGBB).",
+      "- Make the 3 variants meaningfully different from each other so an A/B test can measure lift.",
+      "- Include one 'trust-forward' (calm, cool), one 'high-contrast', and one that leans into the requested vibe if any.",
+    ].join("\n");
+    const user = { brand: data.brandName, role: data.brandRole, seed: data.seedPalette, audience: data.audience, objective: data.objective, vibe: data.vibe };
+    const schema = {
+      type: "object", additionalProperties: false, required: ["variants"],
+      properties: {
+        variants: {
+          type: "array", items: {
+            type: "object", additionalProperties: false, required: ["name", "rationale", "palette"],
+            properties: {
+              name: { type: "string" }, rationale: { type: "string" },
+              palette: {
+                type: "object", additionalProperties: false, required: ["primary", "accent", "ink", "surface"],
+                properties: {
+                  primary: { type: "string" }, accent: { type: "string" }, ink: { type: "string" }, surface: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+    try {
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [{ role: "system", content: system }, { role: "user", content: JSON.stringify(user) }],
+          tools: [{ type: "function", function: { name: "return_palette_variants", description: "Return palette variants for A/B", parameters: schema } }],
+          tool_choice: { type: "function", function: { name: "return_palette_variants" } },
+        }),
+      });
+      if (!res.ok) return { variants: [], error: `AI gateway ${res.status}` };
+      const json = (await res.json()) as { choices?: Array<{ message?: { tool_calls?: Array<{ function?: { arguments?: string } }> } }> };
+      const argStr = json.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
+      if (!argStr) return { variants: [], error: "AI returned no tool call" };
+      const parsed = z.object({
+        variants: z.array(z.object({
+          name: z.string(), rationale: z.string(),
+          palette: z.object({ primary: z.string(), accent: z.string(), ink: z.string(), surface: z.string() }),
+        })).min(1).max(5),
+      }).safeParse(JSON.parse(argStr));
+      if (!parsed.success) return { variants: [], error: "AI output invalid" };
+      return { variants: parsed.data.variants };
+    } catch (e) {
+      return { variants: [], error: (e as Error).message };
+    }
+  });
