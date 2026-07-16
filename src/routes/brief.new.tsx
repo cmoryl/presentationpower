@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { useDeckStore } from "@/lib/deck-store";
@@ -56,6 +56,7 @@ function BriefWizard() {
   const { brandModes, narrativeArchetypes } = useTaxonomy();
   const [aiStatus, setAiStatus] = useState<"idle" | "assembling" | "personalizing" | "error">("idle");
   const [aiError, setAiError] = useState<string | null>(null);
+  const [showAllArchetypes, setShowAllArchetypes] = useState(false);
   const [form, setForm] = useState({
     prospect: "Acme Global",
     industry: "Life sciences",
@@ -68,6 +69,32 @@ function BriefWizard() {
   });
 
   const busy = aiStatus === "assembling" || aiStatus === "personalizing";
+  const brand = useMemo(
+    () => brandModes.find((b) => b.id === form.brandModeId) ?? brandModes[0],
+    [brandModes, form.brandModeId]
+  );
+  const brandPrimary = brand?.tokens?.primary || PALETTE.ink;
+  const brandAccent = brand?.tokens?.accent || PALETTE.blue;
+
+  // Brand-driven archetype filter
+  const preferredIds = brand?.contentScope?.preferredArchetypes ?? [];
+  const filteredArchetypes = useMemo(() => {
+    if (showAllArchetypes || preferredIds.length === 0) return narrativeArchetypes;
+    const filtered = narrativeArchetypes.filter((a) => preferredIds.includes(a.id));
+    return filtered.length > 0 ? filtered : narrativeArchetypes;
+  }, [narrativeArchetypes, preferredIds, showAllArchetypes]);
+
+  // Auto-swap archetype if current one falls outside brand's preferred set (and we're filtering)
+  const currentInFilter = filteredArchetypes.some((a) => a.id === form.archetypeId);
+  const effectiveArchetypeId = currentInFilter ? form.archetypeId : filteredArchetypes[0]?.id ?? form.archetypeId;
+
+  const industrySuggestions = brand?.contentScope?.industries ?? [];
+  const preferredVariantIds = brand?.contentScope?.preferredVariantIds ?? [];
+
+  const selectBrand = (id: string) => {
+    setForm((prev) => ({ ...prev, brandModeId: id }));
+    setShowAllArchetypes(false);
+  };
 
   return (
     <AppShell>
@@ -81,9 +108,15 @@ function BriefWizard() {
             style={{ backgroundColor: PALETTE.surface, borderColor: PALETTE.hairline }}
           >
             {/* Header */}
-            <div className="border-b px-10 pt-10 pb-8" style={{ borderColor: PALETTE.page }}>
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#3B6FA0]">
-                <span className="inline-block h-[2px] w-4 bg-[#3B6FA0]" />
+            <div
+              className="border-b px-10 pt-10 pb-8"
+              style={{ borderColor: PALETTE.page }}
+            >
+              <div
+                className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em]"
+                style={{ color: brandPrimary }}
+              >
+                <span className="inline-block h-[2px] w-4" style={{ backgroundColor: brandPrimary }} />
                 Step 01 · Briefing engine
               </div>
               <h1 className="mt-3 font-['Urbanist'] text-3xl font-extrabold uppercase tracking-tighter text-[#0F1B3D]">
@@ -100,12 +133,87 @@ function BriefWizard() {
               </div>
             </div>
 
-            <form
-              className="space-y-10 p-10"
-              onSubmit={(e) => e.preventDefault()}
-            >
-              {/* Section: Core Intelligence */}
+            <form className="space-y-10 p-10" onSubmit={(e) => e.preventDefault()}>
+              {/* SECTION 01: Brand Mode — drives everything below */}
+              <section className="space-y-4">
+                <div className="flex items-baseline justify-between">
+                  <label className={labelCls}>01 · Brand Mode</label>
+                  <span className="text-[10px] font-medium uppercase tracking-widest text-[#1E3A5F]/50">
+                    drives archetype + variant filters
+                  </span>
+                </div>
+
+                {/* Selected brand banner */}
+                {brand && (
+                  <div
+                    className="flex items-center gap-4 rounded-xl border p-4"
+                    style={{
+                      borderColor: `${brandPrimary}33`,
+                      background: `linear-gradient(90deg, ${brandPrimary}0a, ${brandAccent}0a)`,
+                    }}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <BrandLockup brand={brand} color={brandPrimary} size="sm" clientName={form.prospect} />
+                        <span
+                          className="rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
+                          style={{ backgroundColor: brandPrimary, color: "#fff" }}
+                        >
+                          {brand.role ?? "brand"}
+                        </span>
+                      </div>
+                      <p className="mt-1.5 text-xs text-[#1E3A5F]/75 line-clamp-1">{brand.description}</p>
+                    </div>
+                    <div className="hidden shrink-0 gap-3 text-right text-[10px] font-mono uppercase tracking-wider text-[#1E3A5F]/60 sm:flex">
+                      <StatPill label="industries" value={brand.contentScope?.industries.length ?? 0} />
+                      <StatPill label="archetypes" value={preferredIds.length} />
+                      <StatPill label="variants" value={preferredVariantIds.length} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Brand grid */}
+                <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+                  {brandModes.map((b) => {
+                    const active = form.brandModeId === b.id;
+                    const c = b.tokens?.primary || PALETTE.blue;
+                    return (
+                      <button
+                        key={b.id}
+                        type="button"
+                        onClick={() => selectBrand(b.id)}
+                        aria-pressed={active}
+                        className="group flex cursor-pointer flex-col items-start rounded-xl border-2 p-4 text-left transition-all hover:-translate-y-0.5"
+                        style={{
+                          borderColor: active ? c : PALETTE.hairline,
+                          backgroundColor: active ? `${c}0d` : PALETTE.surface,
+                          boxShadow: active ? `0 0 0 3px ${c}22` : undefined,
+                        }}
+                      >
+                        <div className="mb-3 flex w-full items-start justify-between gap-2">
+                          <BrandLockup brand={b} color={c} size="sm" clientName={form.prospect} />
+                          <span
+                            className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
+                            style={{
+                              backgroundColor: active ? c : PALETTE.page,
+                              color: active ? "#fff" : PALETTE.inkSoft,
+                            }}
+                          >
+                            {b.role ?? "brand"}
+                          </span>
+                        </div>
+                        <p className="text-[11px] leading-snug text-[#1E3A5F]/75 line-clamp-2">{b.description}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {brand && <BrandRelevancePanel brand={brand} />}
+              </section>
+
+              {/* SECTION 02: Core Intelligence */}
               <section className="space-y-6">
+                <label className={labelCls}>02 · Prospect</label>
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <Field label="Prospect Name">
                     <input
@@ -122,6 +230,31 @@ function BriefWizard() {
                       value={form.industry}
                       onChange={(e) => setForm({ ...form, industry: e.target.value })}
                     />
+                    {industrySuggestions.length > 0 && (
+                      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#1E3A5F]/50">
+                          Suggested for {brand?.name}:
+                        </span>
+                        {industrySuggestions.slice(0, 5).map((ind) => {
+                          const selected = form.industry.toLowerCase() === ind.toLowerCase();
+                          return (
+                            <button
+                              key={ind}
+                              type="button"
+                              onClick={() => setForm({ ...form, industry: ind })}
+                              className="rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors"
+                              style={{
+                                borderColor: selected ? brandPrimary : PALETTE.hairline,
+                                backgroundColor: selected ? brandPrimary : "transparent",
+                                color: selected ? "#fff" : PALETTE.inkSoft,
+                              }}
+                            >
+                              {ind}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </Field>
                 </div>
 
@@ -145,86 +278,93 @@ function BriefWizard() {
                 </Field>
               </section>
 
-              {/* Section: Brand Mode */}
+              {/* SECTION 03: Narrative — filtered by brand */}
               <section className="space-y-4">
-                <label className={labelCls}>Brand Mode</label>
-                <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-                  {brandModes.map((b) => {
-                    const active = form.brandModeId === b.id;
-                    return (
-                      <button
-                        key={b.id}
-                        type="button"
-                        onClick={() => setForm({ ...form, brandModeId: b.id })}
-                        aria-pressed={active}
-                        className="group flex cursor-pointer flex-col items-start rounded-xl border-2 p-4 text-left transition-all"
-                        style={{
-                          borderColor: active ? PALETTE.blue : PALETTE.hairline,
-                          backgroundColor: active ? `${PALETTE.blue}0d` : PALETTE.surface,
-                          boxShadow: active ? `0 0 0 3px ${PALETTE.blue}1f` : undefined,
-                        }}
-                      >
-                        <div className="mb-3 flex w-full items-center justify-between">
-                          <BrandLockup brand={b} color={PALETTE.ink} size="sm" clientName={form.prospect} />
-                          <span
-                            className="rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
-                            style={{
-                              backgroundColor: active ? PALETTE.blue : PALETTE.page,
-                              color: active ? "#fff" : PALETTE.inkSoft,
-                            }}
-                          >
-                            {b.role ?? "brand"}
-                          </span>
-                        </div>
-                        <p className="text-[11px] leading-snug text-[#1E3A5F]/75">{b.description}</p>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <BrandRelevancePanel brand={brandModes.find((b) => b.id === form.brandModeId) ?? brandModes[0]} />
-              </section>
-
-              {/* Section: Archetype & Length */}
-              <section className="grid grid-cols-1 gap-8 md:grid-cols-5 md:items-end">
-                <div className="md:col-span-3">
-                  <Field label="Narrative Archetype">
-                    <select
-                      className={inputCls + " appearance-none"}
-                      value={form.archetypeId}
-                      onChange={(e) => setForm({ ...form, archetypeId: e.target.value })}
+                <div className="flex items-baseline justify-between">
+                  <label className={labelCls}>03 · Narrative</label>
+                  {preferredIds.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowAllArchetypes((v) => !v)}
+                      className="text-[10px] font-bold uppercase tracking-widest text-[#3B6FA0] hover:text-[#0F1B3D]"
                     >
-                      {narrativeArchetypes.map((a) => (
-                        <option key={a.id} value={a.id}>
-                          {a.name}
-                        </option>
+                      {showAllArchetypes ? "← show brand-preferred only" : "show all archetypes →"}
+                    </button>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-5 md:items-end">
+                  <div className="md:col-span-3">
+                    <Field label={preferredIds.length > 0 && !showAllArchetypes ? `Narrative (${filteredArchetypes.length} suited to ${brand?.name})` : "Narrative Archetype"}>
+                      <select
+                        className={inputCls + " appearance-none"}
+                        value={effectiveArchetypeId}
+                        onChange={(e) => setForm({ ...form, archetypeId: e.target.value })}
+                      >
+                        {filteredArchetypes.map((a) => (
+                          <option key={a.id} value={a.id}>
+                            {a.name}
+                          </option>
+                        ))}
+                      </select>
+                    </Field>
+                  </div>
+                  <div className="space-y-3 md:col-span-2 md:pb-1">
+                    <div className="flex items-center justify-between">
+                      <span className={labelCls}>Length</span>
+                      <span className="text-xs font-bold" style={{ color: brandPrimary }}>
+                        {form.lengthTarget} slides
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={5}
+                      max={12}
+                      value={form.lengthTarget}
+                      onChange={(e) => setForm({ ...form, lengthTarget: Number(e.target.value) })}
+                      className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-[#E8EDF3]"
+                      style={{ accentColor: brandPrimary }}
+                    />
+                    <div className="flex justify-between text-[10px] font-bold uppercase tracking-tight text-[#1E3A5F]/50">
+                      <span>Brief</span>
+                      <span>Standard</span>
+                      <span>Full</span>
+                    </div>
+                  </div>
+                </div>
+
+                {preferredVariantIds.length > 0 && (
+                  <div className="rounded-lg border p-4" style={{ borderColor: PALETTE.hairline, backgroundColor: PALETTE.field }}>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-[#1E3A5F]/60">
+                        Preferred slide variants for {brand?.name}
+                      </span>
+                      <span className="font-mono text-[10px] text-[#1E3A5F]/40">
+                        {preferredVariantIds.length} pinned
+                      </span>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {preferredVariantIds.map((v) => (
+                        <span
+                          key={v}
+                          className="rounded-md border px-2 py-0.5 font-mono text-[10px]"
+                          style={{
+                            borderColor: `${brandPrimary}33`,
+                            backgroundColor: `${brandPrimary}0d`,
+                            color: brandPrimary,
+                          }}
+                        >
+                          {v}
+                        </span>
                       ))}
-                    </select>
-                  </Field>
-                </div>
-                <div className="space-y-3 md:col-span-2 md:pb-1">
-                  <div className="flex items-center justify-between">
-                    <span className={labelCls}>Length</span>
-                    <span className="text-xs font-bold text-[#3B6FA0]">{form.lengthTarget} slides</span>
+                    </div>
                   </div>
-                  <input
-                    type="range"
-                    min={5}
-                    max={12}
-                    value={form.lengthTarget}
-                    onChange={(e) => setForm({ ...form, lengthTarget: Number(e.target.value) })}
-                    className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-[#E8EDF3] accent-[#3B6FA0]"
-                  />
-                  <div className="flex justify-between text-[10px] font-bold uppercase tracking-tight text-[#1E3A5F]/50">
-                    <span>Brief</span>
-                    <span>Standard</span>
-                    <span>Full</span>
-                  </div>
-                </div>
+                )}
               </section>
 
-              {/* Section: Client Context */}
-              <section className="space-y-2">
+              {/* SECTION 04: Client Context */}
+              <section className="space-y-4">
+                <label className={labelCls}>04 · Context</label>
                 <Field label="Known Client Facts">
                   <textarea
                     rows={4}
@@ -236,14 +376,26 @@ function BriefWizard() {
                 </Field>
               </section>
 
-              {/* Footer CTAs */}
-              <div className="flex flex-col-reverse items-stretch justify-between gap-4 border-t pt-6 md:flex-row md:items-center" style={{ borderColor: PALETTE.hairline }}>
+              {/* Footer CTAs — themed with brand primary */}
+              <div
+                className="flex flex-col-reverse items-stretch justify-between gap-4 border-t pt-6 md:flex-row md:items-center"
+                style={{ borderColor: PALETTE.hairline }}
+              >
                 <div className="flex items-center gap-3 text-xs text-[#1E3A5F]/70">
+                  {brand && (
+                    <span className="flex items-center gap-2">
+                      <span
+                        className="inline-block h-2 w-2 rounded-full"
+                        style={{ backgroundColor: brandPrimary }}
+                      />
+                      Assembling under <strong className="font-semibold text-[#0F1B3D]">{brand.name}</strong>
+                    </span>
+                  )}
                   {aiStatus !== "idle" && (
                     <span>
-                      {aiStatus === "assembling" && "Assembling from atlas…"}
-                      {aiStatus === "personalizing" && "Personalizing with AI…"}
-                      {aiStatus === "error" && `AI fallback: ${aiError ?? "unknown error"}`}
+                      {aiStatus === "assembling" && "· Assembling from atlas…"}
+                      {aiStatus === "personalizing" && "· Personalizing with AI…"}
+                      {aiStatus === "error" && `· AI fallback: ${aiError ?? "unknown error"}`}
                     </span>
                   )}
                 </div>
@@ -254,7 +406,8 @@ function BriefWizard() {
                     className="rounded-lg border-2 px-6 py-3 font-['Urbanist'] text-sm font-bold tracking-tight text-[#0F1B3D] transition-all hover:bg-[#F8FAFC] disabled:opacity-50"
                     style={{ borderColor: PALETTE.ink }}
                     onClick={() => {
-                      const { deckId } = create(form);
+                      const submission = { ...form, archetypeId: effectiveArchetypeId };
+                      const { deckId } = create(submission);
                       navigate({ to: "/decks/$deckId", params: { deckId } });
                     }}
                   >
@@ -263,11 +416,13 @@ function BriefWizard() {
                   <button
                     type="button"
                     disabled={busy}
-                    className="rounded-lg bg-[#0F1B3D] px-8 py-3 font-['Urbanist'] text-sm font-bold tracking-tight text-white shadow-md transition-all hover:bg-[#1E3A5F] active:scale-[0.98] disabled:opacity-50"
+                    className="rounded-lg px-8 py-3 font-['Urbanist'] text-sm font-bold tracking-tight text-white shadow-md transition-all active:scale-[0.98] disabled:opacity-50"
+                    style={{ backgroundColor: brandPrimary }}
                     onClick={async () => {
                       setAiError(null);
                       setAiStatus("assembling");
-                      const { deckId } = create(form);
+                      const submission = { ...form, archetypeId: effectiveArchetypeId };
+                      const { deckId } = create(submission);
                       const deck = useDeckStore.getState().decks[deckId] ?? decks[deckId];
                       if (!deck) {
                         navigate({ to: "/decks/$deckId", params: { deckId } });
@@ -275,17 +430,17 @@ function BriefWizard() {
                       }
                       setAiStatus("personalizing");
                       try {
-                        const brandForCall = byId(brandModes, form.brandModeId);
+                        const brandForCall = byId(brandModes, submission.brandModeId);
                         const scope = brandForCall?.contentScope;
                         const result = await personalize({
                           data: {
                             brief: {
-                              prospect: form.prospect,
-                              industry: form.industry,
-                              audience: form.audience,
-                              meetingObjective: form.meetingObjective,
-                              clientFacts: form.clientFacts,
-                              archetypeName: byId(NARRATIVE_ARCHETYPES, form.archetypeId)?.name ?? "Deck",
+                              prospect: submission.prospect,
+                              industry: submission.industry,
+                              audience: submission.audience,
+                              meetingObjective: submission.meetingObjective,
+                              clientFacts: submission.clientFacts,
+                              archetypeName: byId(NARRATIVE_ARCHETYPES, submission.archetypeId)?.name ?? "Deck",
                               brandScope: scope
                                 ? {
                                     brandName: brandForCall?.name,
@@ -317,7 +472,7 @@ function BriefWizard() {
                       navigate({ to: "/decks/$deckId", params: { deckId } });
                     }}
                   >
-                    Assemble Pitch Deck →
+                    Assemble with {brand?.name ?? "brand"} →
                   </button>
                 </div>
               </div>
@@ -326,6 +481,15 @@ function BriefWizard() {
         </div>
       </div>
     </AppShell>
+  );
+}
+
+function StatPill({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="flex flex-col items-end leading-none">
+      <span className="font-['Urbanist'] text-base font-extrabold text-[#0F1B3D]">{value}</span>
+      <span className="mt-0.5 text-[9px] uppercase tracking-widest text-[#1E3A5F]/60">{label}</span>
+    </div>
   );
 }
 
@@ -341,14 +505,15 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 function BrandRelevancePanel({ brand }: { brand: BrandMode }) {
   const scope = brand.contentScope;
   if (!scope) return null;
+  const primary = brand.tokens?.primary || PALETTE.blue;
   const chip = (text: string, key: string) => (
     <span
       key={key}
       className="rounded-full border px-3 py-1 text-xs font-medium"
       style={{
-        backgroundColor: PALETTE.page,
+        backgroundColor: `${primary}0d`,
         color: PALETTE.inkSoft,
-        borderColor: PALETTE.hairline,
+        borderColor: `${primary}33`,
       }}
     >
       {text}
@@ -367,7 +532,7 @@ function BrandRelevancePanel({ brand }: { brand: BrandMode }) {
       style={{ borderColor: PALETTE.hairline, backgroundColor: PALETTE.field }}
     >
       <div className="mb-4 flex items-center justify-between">
-        <span className={labelCls}>Relevant to this brand</span>
+        <span className={labelCls}>Relevant to {brand.name}</span>
         <span className="font-mono text-[10px] text-[#1E3A5F]/50">auto-filtered</span>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
