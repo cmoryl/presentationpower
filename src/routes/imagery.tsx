@@ -40,6 +40,16 @@ function ImageryPage() {
   const [selected, setSelected] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Recommend existing imagery from the brand's library before spending a
+  // generation credit. Recomputed as the user types.
+  const recommendations = useMemo<ImageMatch[]>(
+    () => (prompt.trim().length >= 3 ? recommendImagery(brandId, prompt, 4) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [brandId, prompt, lib.all.length],
+  );
+  const topScore = recommendations[0]?.score ?? 0;
+  const strongMatch = topScore >= 6;
+
   async function handleGenerate() {
     setError(null);
     setBusy(true);
