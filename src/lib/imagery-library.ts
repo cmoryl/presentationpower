@@ -26,6 +26,7 @@ export type ImageEntry = {
 
 type BrandLibraryState = {
   disabled: string[]; // ids turned off
+  removed?: string[]; // built-in ids the user has deleted (soft delete)
   custom: ImageEntry[];
   usage?: Record<string, { count: number; lastUsedAt: number }>;
 };
@@ -58,7 +59,7 @@ function subscribe(l: () => void) {
 }
 
 function getBrandState(brandId: string): BrandLibraryState {
-  return cache[brandId] ?? { disabled: [], custom: [], usage: {} };
+  return cache[brandId] ?? { disabled: [], custom: [], usage: {}, removed: [] };
 }
 
 // ─── Usage tracking ──────────────────────────────────────────────────────
