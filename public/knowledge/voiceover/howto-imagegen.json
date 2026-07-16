@@ -1,0 +1,23 @@
+{
+  "duration": 41.285,
+  "target": "clean-narration-no-production-cues",
+  "visualLeadSeconds": 0.35,
+  "beats": [
+    {
+      "label": "Describe the visual world",
+      "start": 9.462
+    },
+    {
+      "label": "Let Claude write the prompt",
+      "start": 18.75
+    },
+    {
+      "label": "Paste into Midjourney",
+      "start": 27.324
+    },
+    {
+      "label": "Refine through Claude, not Midjourney",
+      "start": 35.898
+    }
+  ]
+}

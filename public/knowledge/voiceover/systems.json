@@ -1,0 +1,15 @@
+{
+  "duration": 22.431,
+  "target": "clean-narration-no-production-cues",
+  "visualLeadSeconds": 0.35,
+  "beats": [
+    {
+      "label": "Write a usage rule",
+      "start": 17.462
+    },
+    {
+      "label": "Define a voice and tone section",
+      "start": 20.829
+    }
+  ]
+}

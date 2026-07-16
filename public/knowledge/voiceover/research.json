@@ -1,0 +1,19 @@
+{
+  "duration": 25.96,
+  "target": "clean-narration-no-production-cues",
+  "visualLeadSeconds": 0.35,
+  "beats": [
+    {
+      "label": "Map a category's visual conventions",
+      "start": 6.432
+    },
+    {
+      "label": "Brief yourself on an unfamiliar client",
+      "start": 19.702
+    },
+    {
+      "label": "Important: Verify anything time-sensitive",
+      "start": 22.918
+    }
+  ]
+}

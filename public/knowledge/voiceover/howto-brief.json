@@ -1,0 +1,23 @@
+{
+  "duration": 33.901,
+  "target": "clean-narration-no-production-cues",
+  "visualLeadSeconds": 0.35,
+  "beats": [
+    {
+      "label": "Start with the vague ask",
+      "start": 8.928
+    },
+    {
+      "label": "Ask Claude to interrogate it",
+      "start": 15.685
+    },
+    {
+      "label": "Convert gaps into questions",
+      "start": 22.686
+    },
+    {
+      "label": "Get the rewritten brief",
+      "start": 29.687
+    }
+  ]
+}

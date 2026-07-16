@@ -1,0 +1,23 @@
+{
+  "duration": 31.881,
+  "target": "clean-narration-no-production-cues",
+  "visualLeadSeconds": 0.35,
+  "beats": [
+    {
+      "label": "Structured critique of an uploaded design",
+      "start": 17.287
+    },
+    {
+      "label": "Extract a usable palette from any image",
+      "start": 21.118
+    },
+    {
+      "label": "A/B test two directions against the brief",
+      "start": 25.205
+    },
+    {
+      "label": "Reverse-engineer a competitor's layout",
+      "start": 29.686
+    }
+  ]
+}

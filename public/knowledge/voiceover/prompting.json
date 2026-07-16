@@ -1,0 +1,11 @@
+{
+  "duration": 18.506,
+  "target": "clean-narration-no-production-cues",
+  "visualLeadSeconds": 0.35,
+  "beats": [
+    {
+      "label": "The output is only as good as the input",
+      "start": 2.09
+    }
+  ]
+}

@@ -277,6 +277,60 @@ export type Database = {
         }
         Relationships: []
       }
+      brand_intelligence: {
+        Row: {
+          brand_summary: string | null
+          brand_voice_profile: Json | null
+          competitive_advantages: Json | null
+          competitive_landscape: Json | null
+          created_at: string
+          cultural_insights: Json | null
+          entity_id: string
+          entity_type: string
+          growth_recommendations: Json | null
+          id: string
+          knowledge_entries: Json | null
+          market_position: string | null
+          organization_id: string | null
+          target_audience: Json | null
+          updated_at: string
+        }
+        Insert: {
+          brand_summary?: string | null
+          brand_voice_profile?: Json | null
+          competitive_advantages?: Json | null
+          competitive_landscape?: Json | null
+          created_at?: string
+          cultural_insights?: Json | null
+          entity_id: string
+          entity_type: string
+          growth_recommendations?: Json | null
+          id?: string
+          knowledge_entries?: Json | null
+          market_position?: string | null
+          organization_id?: string | null
+          target_audience?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          brand_summary?: string | null
+          brand_voice_profile?: Json | null
+          competitive_advantages?: Json | null
+          competitive_landscape?: Json | null
+          created_at?: string
+          cultural_insights?: Json | null
+          entity_id?: string
+          entity_type?: string
+          growth_recommendations?: Json | null
+          id?: string
+          knowledge_entries?: Json | null
+          market_position?: string | null
+          organization_id?: string | null
+          target_audience?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       brand_modes: {
         Row: {
           created_at: string
@@ -696,6 +750,135 @@ export type Database = {
           id?: string
           name?: string
           section_recipe?: string[]
+        }
+        Relationships: []
+      }
+      oracle_intelligence: {
+        Row: {
+          bias_awareness_insights: Json | null
+          competitive_overview: Json | null
+          confidence_scores: Json | null
+          created_at: string
+          cross_entity_patterns: Json | null
+          cultural_readiness: Json | null
+          entity_brain_count: number | null
+          id: string
+          knowledge_entry_count: number | null
+          last_synthesis_at: string | null
+          longitudinal_trends: Json | null
+          market_landscape: Json | null
+          org_summary: string | null
+          organization_id: string | null
+          portfolio_analysis: Json | null
+          strategic_recommendations: Json | null
+          synthesis_count: number | null
+          synthesis_history: Json | null
+          unified_audience_map: Json | null
+          unified_voice_profile: Json | null
+          updated_at: string
+        }
+        Insert: {
+          bias_awareness_insights?: Json | null
+          competitive_overview?: Json | null
+          confidence_scores?: Json | null
+          created_at?: string
+          cross_entity_patterns?: Json | null
+          cultural_readiness?: Json | null
+          entity_brain_count?: number | null
+          id?: string
+          knowledge_entry_count?: number | null
+          last_synthesis_at?: string | null
+          longitudinal_trends?: Json | null
+          market_landscape?: Json | null
+          org_summary?: string | null
+          organization_id?: string | null
+          portfolio_analysis?: Json | null
+          strategic_recommendations?: Json | null
+          synthesis_count?: number | null
+          synthesis_history?: Json | null
+          unified_audience_map?: Json | null
+          unified_voice_profile?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          bias_awareness_insights?: Json | null
+          competitive_overview?: Json | null
+          confidence_scores?: Json | null
+          created_at?: string
+          cross_entity_patterns?: Json | null
+          cultural_readiness?: Json | null
+          entity_brain_count?: number | null
+          id?: string
+          knowledge_entry_count?: number | null
+          last_synthesis_at?: string | null
+          longitudinal_trends?: Json | null
+          market_landscape?: Json | null
+          org_summary?: string | null
+          organization_id?: string | null
+          portfolio_analysis?: Json | null
+          strategic_recommendations?: Json | null
+          synthesis_count?: number | null
+          synthesis_history?: Json | null
+          unified_audience_map?: Json | null
+          unified_voice_profile?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      oracle_knowledge_base: {
+        Row: {
+          category: string | null
+          content: string
+          content_type: string
+          created_at: string
+          created_by: string | null
+          embedding_hash: string | null
+          id: string
+          is_active: boolean
+          metadata: Json | null
+          organization_id: string | null
+          source_entity_id: string | null
+          source_entity_type: string | null
+          source_type: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          content: string
+          content_type?: string
+          created_at?: string
+          created_by?: string | null
+          embedding_hash?: string | null
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          organization_id?: string | null
+          source_entity_id?: string | null
+          source_entity_type?: string | null
+          source_type?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          content?: string
+          content_type?: string
+          created_at?: string
+          created_by?: string | null
+          embedding_hash?: string | null
+          id?: string
+          is_active?: boolean
+          metadata?: Json | null
+          organization_id?: string | null
+          source_entity_id?: string | null
+          source_entity_type?: string | null
+          source_type?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }

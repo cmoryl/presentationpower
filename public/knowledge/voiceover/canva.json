@@ -1,0 +1,19 @@
+{
+  "duration": 12.26,
+  "target": "clean-narration-no-production-cues",
+  "visualLeadSeconds": 0.35,
+  "beats": [
+    {
+      "label": "Deck outline for Canva presentation",
+      "start": 4.156
+    },
+    {
+      "label": "Paste-ready slide copy block",
+      "start": 7.697
+    },
+    {
+      "label": "Quick template audit",
+      "start": 11.285
+    }
+  ]
+}
