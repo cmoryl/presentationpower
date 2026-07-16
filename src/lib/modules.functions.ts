@@ -4,6 +4,27 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+// ── Audit logging helper ──────────────────────────────────────────────────
+async function writeAudit(
+  actor: string,
+  action: string,
+  moduleId: string,
+  meta: Record<string, unknown> = {},
+) {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await (supabaseAdmin as unknown as {
+      from: (t: string) => { insert: (r: unknown) => Promise<unknown> };
+    })
+      .from("admin_audit_log")
+      .insert({ actor_user_id: actor, action, target_type: "slide_module", target_id: moduleId, meta });
+  } catch {
+    // Non-fatal — audit failure must not block the review action itself.
+  }
+}
+
+
+
 // Canonical, stable JSON stringifier for content-hash comparability.
 function stableStringify(v: unknown): string {
   if (v === null || typeof v !== "object") return JSON.stringify(v);
