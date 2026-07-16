@@ -37,12 +37,20 @@ function Dashboard() {
             variants — you review, personalize the editable fields, and export.
           </p>
         </div>
-        <Link
-          to="/brief/new"
-          className="rounded-full bg-[#0B2A4A] px-6 py-3 text-sm font-medium text-white hover:opacity-90"
-        >
-          New brief →
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/decks/import"
+            className="rounded-full border border-black/15 bg-white px-5 py-3 text-sm font-medium text-black/80 hover:border-black/30"
+          >
+            Import PowerPoint
+          </Link>
+          <Link
+            to="/brief/new"
+            className="rounded-full bg-[#0B2A4A] px-6 py-3 text-sm font-medium text-white hover:opacity-90"
+          >
+            New brief →
+          </Link>
+        </div>
       </div>
 
       <div className="mt-12 grid grid-cols-4 gap-6">

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
@@ -51,6 +51,15 @@ function BriefWizard() {
         <p className="mt-3 text-black/60">
           The system uses this to pick the narrative archetype, section frameworks, and approved module variants.
         </p>
+        <div className="mt-4 rounded-xl border border-black/10 bg-white/60 p-4 text-sm">
+          <span className="text-black/60">Already have a deck? </span>
+          <Link to="/decks/import" className="font-medium text-[#003FC7] hover:underline">
+            Import an existing PowerPoint →
+          </Link>
+          <span className="ml-2 text-xs text-black/45">
+            (we extract content and re-author it onto TransPerfect variants)
+          </span>
+        </div>
 
         <div className="mt-10 space-y-8 rounded-2xl border border-black/10 bg-white p-8">
           <Field label="Prospect">
