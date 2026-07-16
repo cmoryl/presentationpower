@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type ThemeMode = "cream" | "light" | "dark";
 const STORAGE_KEY = "tp:theme-mode";
