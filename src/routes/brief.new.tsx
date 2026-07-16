@@ -433,7 +433,8 @@ function BriefWizard() {
                   {aiStatus !== "idle" && (
                     <span>
                       {aiStatus === "assembling" && "· Assembling from atlas…"}
-                      {aiStatus === "personalizing" && "· Personalizing with AI…"}
+                      {aiStatus === "knowledge" && "· Pulling Oracle + KB context…"}
+                      {aiStatus === "personalizing" && `· Personalizing with AI${kbUsedCount ? ` (+${kbUsedCount} KB refs)` : ""}…`}
                       {aiStatus === "error" && `· AI fallback: ${aiError ?? "unknown error"}`}
                     </span>
                   )}
