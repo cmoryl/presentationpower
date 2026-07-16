@@ -1,0 +1,23 @@
+{
+  "duration": 39.346,
+  "target": "clean-narration-no-production-cues",
+  "visualLeadSeconds": 0.35,
+  "beats": [
+    {
+      "label": "Open Claude, drag the file in",
+      "start": 8.971
+    },
+    {
+      "label": "Ask for structured critique",
+      "start": 17.942
+    },
+    {
+      "label": "Read the specific feedback",
+      "start": 26.912
+    },
+    {
+      "label": "Iterate with a follow-up",
+      "start": 34.307
+    }
+  ]
+}

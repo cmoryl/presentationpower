@@ -1,0 +1,11 @@
+{
+  "duration": 25.054,
+  "target": "clean-narration-no-production-cues",
+  "visualLeadSeconds": 0.35,
+  "beats": [
+    {
+      "label": "Reusable, on-demand prompt packages that Claude loads…",
+      "start": 2.392
+    }
+  ]
+}

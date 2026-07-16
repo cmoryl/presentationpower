@@ -1,0 +1,19 @@
+{
+  "duration": 26.053,
+  "target": "clean-narration-no-production-cues",
+  "visualLeadSeconds": 0.35,
+  "beats": [
+    {
+      "label": "Write design rationale",
+      "start": 18.147
+    },
+    {
+      "label": "Prepare for pushback",
+      "start": 21.699
+    },
+    {
+      "label": "Write a project narrative",
+      "start": 24.753
+    }
+  ]
+}

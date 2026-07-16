@@ -1,0 +1,19 @@
+{
+  "duration": 23.011,
+  "target": "clean-narration-no-production-cues",
+  "visualLeadSeconds": 0.35,
+  "beats": [
+    {
+      "label": "Break from the obvious",
+      "start": 15.766
+    },
+    {
+      "label": "Steal from another world",
+      "start": 18.889
+    },
+    {
+      "label": "Push a concept further",
+      "start": 21.85
+    }
+  ]
+}

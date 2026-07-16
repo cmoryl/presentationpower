@@ -1,0 +1,23 @@
+{
+  "duration": 15.523,
+  "target": "clean-narration-no-production-cues",
+  "visualLeadSeconds": 0.35,
+  "beats": [
+    {
+      "label": "Rewrite an overloaded slide",
+      "start": 3.901
+    },
+    {
+      "label": "Write a data slide with insight-led title",
+      "start": 7.129
+    },
+    {
+      "label": "Write a strong opening slide",
+      "start": 10.995
+    },
+    {
+      "label": "Audit a complete deck",
+      "start": 14.245
+    }
+  ]
+}

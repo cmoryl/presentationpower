@@ -1,0 +1,19 @@
+{
+  "duration": 24.056,
+  "target": "clean-narration-no-production-cues",
+  "visualLeadSeconds": 0.35,
+  "beats": [
+    {
+      "label": "Structural critique",
+      "start": 17.055
+    },
+    {
+      "label": "Ask from the client's perspective",
+      "start": 19.923
+    },
+    {
+      "label": "Compare two directions",
+      "start": 22.837
+    }
+  ]
+}

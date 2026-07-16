@@ -1,0 +1,19 @@
+{
+  "duration": 25.043,
+  "target": "clean-narration-no-production-cues",
+  "visualLeadSeconds": 0.35,
+  "beats": [
+    {
+      "label": "Turn a vague ask into a brief",
+      "start": 16.799
+    },
+    {
+      "label": "Identify what's missing",
+      "start": 20.654
+    },
+    {
+      "label": "Write a challenger brief",
+      "start": 23.87
+    }
+  ]
+}
