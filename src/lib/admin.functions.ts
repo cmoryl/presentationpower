@@ -492,5 +492,5 @@ export const listAuditLog = createServerFn({ method: "GET" })
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
     const { data } = await s.from("admin_audit_log").select("*").order("created_at", { ascending: false }).limit(300);
-    return (data ?? []) as Array<{ id: string; actor_user_id: string | null; action: string; target_type: string | null; target_id: string | null; meta: Record<string, unknown>; created_at: string }>;
+    return (data ?? []) as Array<{ id: string; actor_user_id: string | null; action: string; target_type: string | null; target_id: string | null; meta: unknown; created_at: string }>;
   });
