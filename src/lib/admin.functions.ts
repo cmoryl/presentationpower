@@ -500,3 +500,115 @@ export const listAuditLog = createServerFn({ method: "GET" })
     return rows.map((r) => ({ ...r, meta: JSON.stringify(r.meta ?? {}) }));
 
   });
+
+// ═════════════════════════════════════════════════════════════════════════
+// ORACLE KNOWLEDGE BASE (imported BrandHub snapshot)
+// ═════════════════════════════════════════════════════════════════════════
+
+export const listOracleKnowledge = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context);
+    const s = context.supabase as unknown as SbClient;
+    const { data } = await s
+      .from("oracle_knowledge_base")
+      .select("id, organization_id, title, content, content_type, source_type, category, tags, is_active, created_at, updated_at")
+      .order("updated_at", { ascending: false })
+      .limit(500);
+    const rows = (data ?? []) as Array<{
+      id: string; organization_id: string | null; title: string; content: string;
+      content_type: string; source_type: string | null; category: string | null;
+      tags: string[] | null; is_active: boolean; created_at: string; updated_at: string;
+    }>;
+    // Cross-reference: which have already been unified into knowledge_entries.
+    const { data: mirrored } = await s
+      .from("knowledge_entries")
+      .select("sources")
+      .contains("tags", ["oracle-import"]);
+    const mirroredIds = new Set<string>();
+    for (const r of (mirrored ?? []) as Array<{ sources: string[] }>) {
+      for (const src of r.sources ?? []) {
+        if (src.startsWith("oracle:")) mirroredIds.add(src.slice("oracle:".length));
+      }
+    }
+    return rows.map((r) => ({ ...r, mirrored_in_kb: mirroredIds.has(r.id) }));
+  });
+
+const oracleUpdateInput = z.object({
+  id: z.string().uuid(),
+  title: z.string().min(1).optional(),
+  content: z.string().min(1).optional(),
+  category: z.string().nullable().optional(),
+  tags: z.array(z.string()).optional(),
+  is_active: z.boolean().optional(),
+});
+export const updateOracleKnowledge = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => oracleUpdateInput.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const s = context.supabase as unknown as SbClient;
+    const patch: Record<string, unknown> = {};
+    if (data.title !== undefined) patch.title = data.title;
+    if (data.content !== undefined) patch.content = data.content;
+    if (data.category !== undefined) patch.category = data.category;
+    if (data.tags !== undefined) patch.tags = data.tags;
+    if (data.is_active !== undefined) patch.is_active = data.is_active;
+    const { error } = await s.from("oracle_knowledge_base").update(patch).eq("id", data.id);
+    if (error) throw new Error(String((error as any).message ?? error));
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await logAudit(supabaseAdmin as unknown as SbClient, context.userId, "oracle.update", "oracle_knowledge_base", data.id, patch);
+    return { ok: true };
+  });
+
+const oracleDeleteInput = z.object({ id: z.string().uuid() });
+export const deleteOracleKnowledge = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => oracleDeleteInput.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const s = context.supabase as unknown as SbClient;
+    const { error } = await s.from("oracle_knowledge_base").delete().eq("id", data.id);
+    if (error) throw new Error(String((error as any).message ?? error));
+    // Also remove any mirrored knowledge_entries row.
+    await s.from("knowledge_entries").delete().contains("sources", [`oracle:${data.id}`]);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await logAudit(supabaseAdmin as unknown as SbClient, context.userId, "oracle.delete", "oracle_knowledge_base", data.id, {});
+    return { ok: true };
+  });
+
+const oracleSyncInput = z.object({ id: z.string().uuid() });
+export const syncOracleToKnowledge = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => oracleSyncInput.parse(input))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const s = context.supabase as unknown as SbClient;
+    const { data: row } = await s.from("oracle_knowledge_base").select("*").eq("id", data.id).maybeSingle();
+    const src = row as { id: string; title: string; content: string; content_type: string; tags: string[] | null } | null;
+    if (!src) throw new Error("Oracle entry not found");
+    // Upsert the mirrored knowledge_entries row (identified by sources marker).
+    const { data: existing } = await s
+      .from("knowledge_entries")
+      .select("id")
+      .contains("sources", [`oracle:${src.id}`])
+      .maybeSingle();
+    const payload = {
+      owner_division_id: "global",
+      title: src.title,
+      body: src.content,
+      kind: "note",
+      tags: ["oracle-import", `oracle:${src.content_type ?? "text"}`, ...(src.tags ?? [])],
+      sources: [`oracle:${src.id}`],
+      visibility: "global",
+      shared_with_division_ids: [] as string[],
+    };
+    if (existing) {
+      const { error } = await s.from("knowledge_entries").update(payload).eq("id", (existing as { id: string }).id);
+      if (error) throw new Error(String((error as any).message ?? error));
+    } else {
+      const { error } = await s.from("knowledge_entries").insert(payload);
+      if (error) throw new Error(String((error as any).message ?? error));
+    }
+    return { ok: true };
+  });
