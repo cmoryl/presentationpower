@@ -34,9 +34,17 @@ const BriefInput = z.object({
     .optional(),
 });
 
+const KnowledgeSnippet = z.object({
+  source: z.enum(["oracle", "kb"]),
+  title: z.string(),
+  snippet: z.string(),
+  tags: z.array(z.string()).default([]),
+});
+
 const InputSchema = z.object({
   brief: BriefInput,
   slides: z.array(SlideInput).min(1).max(30),
+  knowledgeSnippets: z.array(KnowledgeSnippet).max(12).optional(),
 });
 
 export type PersonalizeInput = z.infer<typeof InputSchema>;
