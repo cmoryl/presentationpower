@@ -5,8 +5,10 @@ import { AppShell } from "@/components/AppShell";
 import { useDeckStore } from "@/lib/deck-store";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { personalizeSlides } from "@/lib/personalize.functions";
+import { retrieveKnowledgeForBrief, abAssign, abLogEvent } from "@/lib/admin.functions";
 import { byId, SECTION_FRAMEWORKS, NARRATIVE_ARCHETYPES, type BrandMode } from "@/lib/taxonomy";
 import { BrandLockup } from "@/components/BrandLockup";
+import { PaletteLab, type PaletteSelection } from "@/components/PaletteLab";
 
 export const Route = createFileRoute("/brief/new")({
   head: () => ({
@@ -53,10 +55,15 @@ function BriefWizard() {
   const applyAi = useDeckStore((s) => s.applyAiContent);
   const decks = useDeckStore((s) => s.decks);
   const personalize = useServerFn(personalizeSlides);
+  const retrieveKnowledge = useServerFn(retrieveKnowledgeForBrief);
+  const assignVariantFn = useServerFn(abAssign);
+  const logAbEventFn = useServerFn(abLogEvent);
   const { brandModes, narrativeArchetypes } = useTaxonomy();
-  const [aiStatus, setAiStatus] = useState<"idle" | "assembling" | "personalizing" | "error">("idle");
+  const [aiStatus, setAiStatus] = useState<"idle" | "assembling" | "knowledge" | "personalizing" | "error">("idle");
   const [aiError, setAiError] = useState<string | null>(null);
   const [showAllArchetypes, setShowAllArchetypes] = useState(false);
+  const [paletteSel, setPaletteSel] = useState<PaletteSelection>({ experimentId: null, variantId: null, paletteOverride: null });
+  const [kbUsedCount, setKbUsedCount] = useState<number>(0);
   const [form, setForm] = useState({
     prospect: "Acme Global",
     industry: "Life sciences",
@@ -68,7 +75,7 @@ function BriefWizard() {
     clientFacts: "Recently expanded into 12 new markets. Under regulatory review pressure.",
   });
 
-  const busy = aiStatus === "assembling" || aiStatus === "personalizing";
+  const busy = aiStatus === "assembling" || aiStatus === "knowledge" || aiStatus === "personalizing";
   const brand = useMemo(
     () => brandModes.find((b) => b.id === form.brandModeId) ?? brandModes[0],
     [brandModes, form.brandModeId]
@@ -380,6 +387,34 @@ function BriefWizard() {
                 </Field>
               </section>
 
+              {/* SECTION 05: Palette Lab (advanced A/B during creation) */}
+              <section className="space-y-4">
+                <div className="flex items-baseline justify-between">
+                  <label className={labelCls}>05 · Palette Lab</label>
+                  <span className="text-[10px] font-medium uppercase tracking-widest text-[#1E3A5F]/50">
+                    optional · attach an A/B test or pick an AI palette
+                  </span>
+                </div>
+                {brand && (
+                  <PaletteLab
+                    brandId={brand.id}
+                    brandName={brand.name}
+                    brandRole={brand.role}
+                    seedPalette={{
+                      primary: brand.tokens?.primary ?? PALETTE.blue,
+                      accent: brand.tokens?.accent ?? PALETTE.blue,
+                      ink: brand.tokens?.ink ?? PALETTE.ink,
+                      surface: brand.tokens?.surface ?? PALETTE.surface,
+                    }}
+                    audience={form.audience}
+                    objective={form.meetingObjective}
+                    accent={brandPrimary}
+                    onChange={setPaletteSel}
+                  />
+                )}
+              </section>
+
+
               {/* Footer CTAs — themed with brand primary */}
               <div
                 className="flex flex-col-reverse items-stretch justify-between gap-4 border-t pt-6 md:flex-row md:items-center"
@@ -398,7 +433,8 @@ function BriefWizard() {
                   {aiStatus !== "idle" && (
                     <span>
                       {aiStatus === "assembling" && "· Assembling from atlas…"}
-                      {aiStatus === "personalizing" && "· Personalizing with AI…"}
+                      {aiStatus === "knowledge" && "· Pulling Oracle + KB context…"}
+                      {aiStatus === "personalizing" && `· Personalizing with AI${kbUsedCount ? ` (+${kbUsedCount} KB refs)` : ""}…`}
                       {aiStatus === "error" && `· AI fallback: ${aiError ?? "unknown error"}`}
                     </span>
                   )}
@@ -410,7 +446,13 @@ function BriefWizard() {
                     className="rounded-lg border-2 px-6 py-3 font-['Urbanist'] text-sm font-bold tracking-tight text-[#0F1B3D] transition-all hover:bg-[#F8FAFC] disabled:opacity-50"
                     style={{ borderColor: PALETTE.ink }}
                     onClick={() => {
-                      const submission = { ...form, archetypeId: effectiveArchetypeId };
+                      const submission = {
+                        ...form,
+                        archetypeId: effectiveArchetypeId,
+                        abExperimentId: paletteSel.experimentId,
+                        abVariantId: paletteSel.variantId,
+                        abPaletteOverride: paletteSel.paletteOverride,
+                      };
                       const { deckId } = create(submission);
                       navigate({ to: "/decks/$deckId", params: { deckId } });
                     }}
@@ -425,17 +467,63 @@ function BriefWizard() {
                     onClick={async () => {
                       setAiError(null);
                       setAiStatus("assembling");
-                      const submission = { ...form, archetypeId: effectiveArchetypeId };
+                      const brandForCall = byId(brandModes, form.brandModeId);
+                      const scope = brandForCall?.contentScope;
+
+                      // If an A/B experiment is attached, assign a variant now
+                      // (server may return a different variant based on weights).
+                      let effectiveSel = paletteSel;
+                      if (paletteSel.experimentId) {
+                        try {
+                          const sessionId = (typeof crypto !== "undefined" && "randomUUID" in crypto) ? crypto.randomUUID() : `s-${Date.now()}`;
+                          const res = await assignVariantFn({ data: { experimentId: paletteSel.experimentId, sessionId } });
+                          // Log initial view for the assigned variant.
+                          void logAbEventFn({ data: { experimentId: paletteSel.experimentId, variantId: res.variantId, sessionId, eventType: "view", value: null } });
+                          if (res.variantId !== paletteSel.variantId) {
+                            effectiveSel = { ...paletteSel, variantId: res.variantId };
+                          }
+                        } catch { /* non-fatal: fall through with local selection */ }
+                      }
+
+                      const submission = {
+                        ...form,
+                        archetypeId: effectiveArchetypeId,
+                        abExperimentId: effectiveSel.experimentId,
+                        abVariantId: effectiveSel.variantId,
+                        abPaletteOverride: effectiveSel.paletteOverride,
+                      };
                       const { deckId } = create(submission);
                       const deck = useDeckStore.getState().decks[deckId] ?? decks[deckId];
                       if (!deck) {
                         navigate({ to: "/decks/$deckId", params: { deckId } });
                         return;
                       }
+
+                      // Pull Oracle + KB snippets relevant to this brief.
+                      setAiStatus("knowledge");
+                      let knowledgeSnippets: Array<{ source: "oracle" | "kb"; title: string; snippet: string; tags: string[]; id: string }> = [];
+                      try {
+                        const kbRes = await retrieveKnowledge({
+                          data: {
+                            industry: submission.industry,
+                            audience: submission.audience,
+                            meetingObjective: submission.meetingObjective,
+                            clientFacts: submission.clientFacts,
+                            brandName: brandForCall?.name ?? null,
+                            brandTags: [
+                              ...(scope?.industries ?? []),
+                              ...(scope?.serviceLines ?? []),
+                              ...(scope?.caseStudyTags ?? []),
+                            ],
+                            limit: 6,
+                          },
+                        });
+                        knowledgeSnippets = kbRes as typeof knowledgeSnippets;
+                        setKbUsedCount(knowledgeSnippets.length);
+                      } catch { /* non-fatal */ }
+
                       setAiStatus("personalizing");
                       try {
-                        const brandForCall = byId(brandModes, submission.brandModeId);
-                        const scope = brandForCall?.contentScope;
                         const result = await personalize({
                           data: {
                             brief: {
@@ -461,6 +549,7 @@ function BriefWizard() {
                               sectionName: byId(SECTION_FRAMEWORKS, s.sectionId)?.name ?? "",
                               content: s.content as Record<string, unknown>,
                             })),
+                            knowledgeSnippets: knowledgeSnippets.map((k) => ({ source: k.source, title: k.title, snippet: k.snippet, tags: k.tags })),
                           },
                         });
                         if (result.error) {

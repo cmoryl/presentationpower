@@ -34,9 +34,17 @@ const BriefInput = z.object({
     .optional(),
 });
 
+const KnowledgeSnippet = z.object({
+  source: z.enum(["oracle", "kb"]),
+  title: z.string(),
+  snippet: z.string(),
+  tags: z.array(z.string()).default([]),
+});
+
 const InputSchema = z.object({
   brief: BriefInput,
   slides: z.array(SlideInput).min(1).max(30),
+  knowledgeSnippets: z.array(KnowledgeSnippet).max(12).optional(),
 });
 
 export type PersonalizeInput = z.infer<typeof InputSchema>;
@@ -60,17 +68,27 @@ export const personalizeSlides = createServerFn({ method: "POST" })
         ].filter(Boolean)
       : [];
 
+    const kb = data.knowledgeSnippets ?? [];
+    const kbBlock = kb.length
+      ? [
+          "You have access to the following curated Oracle + knowledgebase snippets. Draw on them for factual language, capabilities, proof points, and terminology — but do not fabricate specifics that aren't present:",
+          ...kb.map((k, i) => `[${i + 1}] (${k.source}) ${k.title}${k.tags.length ? ` [tags: ${k.tags.slice(0, 4).join(", ")}]` : ""}: ${k.snippet}`),
+        ]
+      : [];
+
     const system = [
       "You are a senior enterprise deck writer at TransPerfect.",
       "You will receive a sales brief and a set of slide content objects.",
       "Rewrite ONLY the string values inside each slide's `content` object so the copy speaks directly to the named prospect, their industry, audience, and objective.",
       ...scopeLines,
+      ...kbBlock,
       "Rules:",
       "- Preserve the EXACT JSON shape and keys of every slide.content. Do not add, remove, rename, or reorder keys or array items.",
       "- Never change numeric values, stat units, or source citations.",
       "- Keep titles under 80 chars, subtitles under 140 chars, body strings under 260 chars.",
       "- Write in a confident, plain, executive voice. No jargon, no hype words (unlock, revolutionize, seamless, leverage).",
       "- If the prospect's name or industry appears in the input, weave them in naturally where the copy already speaks about 'you' or the market.",
+      "- Prefer terminology and proof points from the provided knowledgebase snippets over generic phrasing.",
       "Return JSON matching the provided schema.",
     ].join("\n");
 
