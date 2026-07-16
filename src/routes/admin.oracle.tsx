@@ -28,7 +28,8 @@ function OracleAdminView() {
   const [editing, setEditing] = useState<Row | null>(null);
 
   const update = useMutation({
-    mutationFn: (input: Parameters<typeof updateFn>[0]["data"]) => updateFn({ data: input }),
+    mutationFn: (input: { id: string; title?: string; content?: string; category?: string | null; tags?: string[]; is_active?: boolean }) =>
+      updateFn({ data: input }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "oracle-kb"] }),
   });
   const del = useMutation({
