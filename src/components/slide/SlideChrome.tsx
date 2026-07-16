@@ -78,16 +78,23 @@ export function SlideFrame({
 
   // Light backdrops use a cream/white tint so photography reads bright; dark
   // backdrops keep the original navy scrim. Callers can still override tint.
-  const defaultTint = lightBackdrop ? "#F5F1EA" : "#03002C";
-  const tint = backdrop?.tint ?? defaultTint;
-  const scrimStrength = backdrop?.scrimStrength ?? (lightBackdrop ? 0.65 : 0.55);
+  const defaultTint = lightBackdrop ? "#FFFFFF" : "#03002C";
+  // Light mode: force the backdrop tint to pure white and push the scrim
+  // near-opaque so imagery reads as a subtle wash on a white page.
+  const tint = lightBackdrop ? "#FFFFFF" : (backdrop?.tint ?? defaultTint);
+  const scrimStrength = lightBackdrop ? 0.92 : (backdrop?.scrimStrength ?? 0.55);
+
 
   const scrimGradient = (() => {
     if (!backdrop) return "none";
     const a = scrimStrength;
     const t = tint;
+    // Light mode: keep the whole frame near-white and only let the image
+    // peek through as a faint tinted wash on the opposite edge.
+    const minA = lightBackdrop ? Math.min(1, a * 0.78) : 0;
+    const midA = lightBackdrop ? Math.min(1, a * 0.9) : a * 0.55;
     const to = (dir: string) =>
-      `linear-gradient(${dir}, ${hexA(t, a)} 0%, ${hexA(t, a * 0.55)} 45%, ${hexA(t, 0)} 100%)`;
+      `linear-gradient(${dir}, ${hexA(t, a)} 0%, ${hexA(t, midA)} 45%, ${hexA(t, minA)} 100%)`;
     switch (backdrop.scrim ?? "bottom") {
       case "bottom": return to("to top");
       case "top":    return to("to bottom");
@@ -95,8 +102,11 @@ export function SlideFrame({
       case "right":  return to("to left");
       case "full":   return `linear-gradient(${hexA(t, a)}, ${hexA(t, a)})`;
       case "vignette":
-        return `linear-gradient(${hexA(t, a * 0.35)}, ${hexA(t, a)})`;
+        return lightBackdrop
+          ? `radial-gradient(circle at 50% 50%, ${hexA(t, a * 0.85)} 0%, ${hexA(t, a)} 70%)`
+          : `linear-gradient(${hexA(t, a * 0.35)}, ${hexA(t, a)})`;
     }
+
   })();
 
   return (
