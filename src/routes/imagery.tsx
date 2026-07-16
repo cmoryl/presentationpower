@@ -232,6 +232,9 @@ function ImageryPage() {
         </div>
       </div>
 
+      {/* Analytics */}
+      <AnalyticsPanel brandName={ctx.name} primary={primary} accent={accent} analytics={lib.analytics} onSelect={(id) => setSelected(id)} />
+
       {/* Imagery grid */}
       <div className="mt-8 grid gap-4 md:grid-cols-[2fr_1fr]">
         <div>
