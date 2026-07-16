@@ -32,7 +32,24 @@ export const Route = createFileRoute("/decks/import")({
   notFoundComponent: () => <div className="p-10">Not found.</div>,
 });
 
-type Stage = "upload" | "parsing" | "review" | "creating" | "error";
+type Stage = "upload" | "processing" | "review" | "creating" | "done" | "error";
+
+type StepStatus = "pending" | "active" | "done" | "error";
+type StepKey = "read" | "upload" | "parse" | "map" | "create";
+type Step = {
+  key: StepKey;
+  label: string;
+  status: StepStatus;
+  detail?: string;
+};
+
+const INITIAL_STEPS: Step[] = [
+  { key: "read", label: "Reading file", status: "pending" },
+  { key: "upload", label: "Uploading to server", status: "pending" },
+  { key: "parse", label: "Extracting slide content", status: "pending" },
+  { key: "map", label: "Mapping to module variants", status: "pending" },
+  { key: "create", label: "Assembling deck", status: "pending" },
+];
 
 function ImportView() {
   const navigate = useNavigate();
@@ -44,6 +61,9 @@ function ImportView() {
   const [error, setError] = useState<string | null>(null);
   const [parsed, setParsed] = useState<ParsedDeck | null>(null);
   const [mapping, setMapping] = useState<MappedSlide[]>([]);
+  const [steps, setSteps] = useState<Step[]>(INITIAL_STEPS);
+  const [progress, setProgress] = useState(0);
+  const [fileInfo, setFileInfo] = useState<{ name: string; size: number } | null>(null);
   const [meta, setMeta] = useState({
     title: "",
     prospect: "",
@@ -52,9 +72,18 @@ function ImportView() {
     archetypeId: narrativeArchetypes[0]?.id ?? "arch-problem-solution",
   });
 
+  function setStep(key: StepKey, status: StepStatus, detail?: string) {
+    setSteps((prev) =>
+      prev.map((s) => (s.key === key ? { ...s, status, detail: detail ?? s.detail } : s)),
+    );
+  }
+
   async function onFile(file: File) {
     setError(null);
-    setStage("parsing");
+    setSteps(INITIAL_STEPS.map((s) => ({ ...s })));
+    setProgress(0);
+    setFileInfo({ name: file.name, size: file.size });
+    setStage("processing");
     try {
       if (!/\.pptx$/i.test(file.name)) {
         throw new Error("Please upload a .pptx file (not .ppt or another format).");
@@ -62,20 +91,63 @@ function ImportView() {
       if (file.size > 25 * 1024 * 1024) {
         throw new Error("File is larger than 25MB. Please slim it down or split it.");
       }
+
+      setStep("read", "active", formatBytes(file.size));
+      setProgress(5);
       const buf = await file.arrayBuffer();
       const base64 = arrayBufferToBase64(buf);
-      const result = await parse({ data: { filename: file.name, data: base64 } });
+      setStep("read", "done", `${formatBytes(file.size)} read`);
+      setProgress(20);
+
+      setStep("upload", "active", "Streaming to server…");
+      setProgress(30);
+      await new Promise((r) => setTimeout(r, 30));
+      const parsePromise = parse({ data: { filename: file.name, data: base64 } });
+      setStep("upload", "done");
+      setStep("parse", "active", "Reading slides on the server…");
+      setProgress(45);
+      const tick = setInterval(() => {
+        setProgress((p) => (p < 78 ? p + 2 : p));
+      }, 250);
+      let result: ParsedDeck;
+      try {
+        result = await parsePromise;
+      } finally {
+        clearInterval(tick);
+      }
+      setStep(
+        "parse",
+        "done",
+        `${result.slideCount} slide${result.slideCount === 1 ? "" : "s"} extracted`,
+      );
+      setProgress(82);
+
+      setStep("map", "active", "Matching each slide to the closest variant…");
+      await new Promise((r) => setTimeout(r, 30));
       const mapped = result.slides.map((s) => mapParsedSlide(s, result.slides.length));
+      setStep(
+        "map",
+        "done",
+        `${mapped.length} slide${mapped.length === 1 ? "" : "s"} mapped`,
+      );
+      setProgress(100);
+
       setParsed(result);
       setMapping(mapped);
       setMeta((m) => ({
         ...m,
         title: m.title || file.name.replace(/\.pptx$/i, ""),
-        prospect: m.prospect || file.name.replace(/\.pptx$/i, "").split(/[-_ ]/)[0] || "Imported deck",
+        prospect:
+          m.prospect || file.name.replace(/\.pptx$/i, "").split(/[-_ ]/)[0] || "Imported deck",
       }));
+      await new Promise((r) => setTimeout(r, 250));
       setStage("review");
     } catch (e) {
-      setError((e as Error).message);
+      const msg = (e as Error).message || "Unknown error";
+      setSteps((prev) =>
+        prev.map((s) => (s.status === "active" ? { ...s, status: "error", detail: msg } : s)),
+      );
+      setError(msg);
       setStage("error");
     }
   }
@@ -91,10 +163,14 @@ function ImportView() {
     );
   }
 
-  function createDeck() {
+  async function createDeck() {
     if (!parsed || mapping.length === 0) return;
+    setError(null);
     setStage("creating");
+    setStep("create", "active", "Building slides…");
+    setProgress(90);
     try {
+      await new Promise((r) => setTimeout(r, 30));
       const { deckId } = createImported({
         title: meta.title || parsed.filename.replace(/\.pptx$/i, ""),
         brief: {
@@ -114,12 +190,29 @@ function ImportView() {
           content: m.content,
         })),
       });
+      setStep("create", "done", `Deck ready · ${mapping.length} slides`);
+      setProgress(100);
+      setStage("done");
+      await new Promise((r) => setTimeout(r, 400));
       navigate({ to: "/decks/$deckId", params: { deckId } });
     } catch (e) {
-      setError((e as Error).message);
+      const msg = (e as Error).message || "Unknown error";
+      setStep("create", "error", msg);
+      setError(msg);
       setStage("error");
     }
   }
+
+  function reset() {
+    setStage("upload");
+    setError(null);
+    setParsed(null);
+    setMapping([]);
+    setSteps(INITIAL_STEPS.map((s) => ({ ...s })));
+    setProgress(0);
+    setFileInfo(null);
+  }
+
 
   return (
     <AppShell>
