@@ -61,19 +61,27 @@ export function SlideFrame({
   const backdrop = useContext(SlideBackdropContext);
   const isChromeDark = variant === "cover" || variant === "divider" || variant === "close";
   const slideDark = mode === "dark";
-  // With a backdrop, force dark text treatment for legibility over imagery.
+  // With a backdrop, chrome/dark slides force light text over a dark scrim;
+  // in light-mode content slides we instead render a *light* scrim (cream/white
+  // tint) so ink text stays legible and imagery reads as a light-mode photo.
   const hasBackdrop = !!backdrop;
+  const lightBackdrop = hasBackdrop && !slideDark && !isChromeDark;
+  const darkBackdrop = hasBackdrop && !lightBackdrop;
   // Cover/divider/close = branded hero backdrop. Regular content flips to a
   // near-black navy in dark mode so cards/text remain legible.
   const bg = isChromeDark ? brand.tokens.primary : slideDark ? "#0A0A22" : "#ffffff";
-  const fg = isChromeDark || slideDark || hasBackdrop ? "#ffffff" : brand.tokens.ink;
-  const logoColor = isChromeDark || slideDark || hasBackdrop ? "#ffffff" : brand.tokens.primary;
+  const fg = darkBackdrop || isChromeDark || slideDark ? "#ffffff" : brand.tokens.ink;
+  const logoColor = darkBackdrop || isChromeDark || slideDark ? "#ffffff" : brand.tokens.primary;
 
   const placement = resolveLogoPlacement(variant, layoutId, logoPosition);
   const showLogo = placement.position !== "hidden";
 
-  const scrimStrength = backdrop?.scrimStrength ?? 0.55;
-  const tint = backdrop?.tint ?? "#03002C";
+  // Light backdrops use a cream/white tint so photography reads bright; dark
+  // backdrops keep the original navy scrim. Callers can still override tint.
+  const defaultTint = lightBackdrop ? "#F5F1EA" : "#03002C";
+  const tint = backdrop?.tint ?? defaultTint;
+  const scrimStrength = backdrop?.scrimStrength ?? (lightBackdrop ? 0.65 : 0.55);
+
   const scrimGradient = (() => {
     if (!backdrop) return "none";
     const a = scrimStrength;
@@ -92,7 +100,7 @@ export function SlideFrame({
   })();
 
   return (
-    <div className="relative h-full w-full overflow-hidden" style={{ backgroundColor: hasBackdrop ? "#000" : bg, color: fg }}>
+    <div className="relative h-full w-full overflow-hidden" style={{ backgroundColor: hasBackdrop ? (lightBackdrop ? "#fff" : "#000") : bg, color: fg }}>
       {hasBackdrop && (
         <>
           <img
@@ -100,32 +108,41 @@ export function SlideFrame({
             alt=""
             aria-hidden
             className="absolute inset-0 h-full w-full object-cover"
-            style={{ filter: backdrop.imageDim ? `brightness(${1 - backdrop.imageDim}) saturate(0.95)` : undefined }}
+            style={{
+              filter: lightBackdrop
+                // Light mode: brighten and desaturate slightly so the photo
+                // reads as an airy background rather than a dark hero.
+                ? `brightness(${1.08 + (backdrop.imageDim ?? 0) * 0.2}) saturate(0.85) contrast(0.95)`
+                : backdrop.imageDim
+                  ? `brightness(${1 - backdrop.imageDim}) saturate(0.95)`
+                  : undefined,
+            }}
           />
-          {/* Soft-focus accent haze — tinted from the division's brand tokens,
-              but rendered as translucent blurred washes rather than generated
-              dot/gradient backgrounds. */}
+          {/* Soft-focus accent haze — tinted from the division's brand tokens.
+              On light backdrops we swap to `multiply` so the tint reads as a
+              gentle wash rather than a bright screen blend. */}
           <div
             aria-hidden
             className="pointer-events-none absolute -left-[12%] top-[4%] h-[48%] w-[54%] rounded-full"
             style={{
-              backgroundColor: hexA(brand.tokens.accent, 0.18),
+              backgroundColor: hexA(brand.tokens.accent, lightBackdrop ? 0.28 : 0.18),
               filter: "blur(58px)",
-              mixBlendMode: "screen",
+              mixBlendMode: lightBackdrop ? "multiply" : "screen",
             }}
           />
           <div
             aria-hidden
             className="pointer-events-none absolute -bottom-[12%] right-[-10%] h-[56%] w-[56%] rounded-full"
             style={{
-              backgroundColor: hexA(brand.tokens.primary, 0.22),
+              backgroundColor: hexA(brand.tokens.primary, lightBackdrop ? 0.14 : 0.22),
               filter: "blur(64px)",
-              mixBlendMode: "screen",
+              mixBlendMode: lightBackdrop ? "multiply" : "screen",
             }}
           />
           <div className="absolute inset-0" style={{ backgroundImage: scrimGradient }} />
         </>
       )}
+
 
       {/* Brand bar (locked) */}
       <div
@@ -143,7 +160,8 @@ export function SlideFrame({
       {/* Footer (locked) */}
       <div
         className="absolute bottom-10 left-24 right-24 flex items-center justify-between text-sm"
-        style={{ color: isChromeDark || slideDark || hasBackdrop ? "rgba(255,255,255,0.7)" : "rgba(10,15,28,0.55)" }}
+        style={{ color: darkBackdrop || isChromeDark || slideDark ? "rgba(255,255,255,0.7)" : "rgba(10,15,28,0.55)" }}
+
       >
         <span>Confidential — for internal review</span>
         {pageNumber !== undefined && <span>{String(pageNumber).padStart(2, "0")}</span>}
