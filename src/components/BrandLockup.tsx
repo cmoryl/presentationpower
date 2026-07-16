@@ -47,7 +47,7 @@ export function BrandLockup({
 }: {
   brand: BrandMode;
   color: string;
-  size?: "2xs" | "xs" | "sm" | "md" | "lg";
+  size?: "2xs" | "xs" | "sm" | "md" | "lg" | "xl";
   showMark?: boolean;
   showDivision?: boolean;
   clientName?: string; // Substituted into division line when it contains {client}
@@ -60,8 +60,10 @@ export function BrandLockup({
         : size === "sm"
           ? { markPx: 24, wordmarkPx: 14, wordPx: 14, dividerPx: 10, radiusPx: 6, gapPx: 8 }
           : size === "lg"
-            ? { markPx: 44, wordmarkPx: 26, wordPx: 22, dividerPx: 14, radiusPx: 10, gapPx: 12 }
-            : { markPx: 32, wordmarkPx: 18, wordPx: 17, dividerPx: 11, radiusPx: 8, gapPx: 10 };
+            ? { markPx: 64, wordmarkPx: 40, wordPx: 32, dividerPx: 18, radiusPx: 12, gapPx: 16 }
+            : size === "xl"
+              ? { markPx: 96, wordmarkPx: 64, wordPx: 48, dividerPx: 24, radiusPx: 16, gapPx: 22 }
+              : { markPx: 32, wordmarkPx: 18, wordPx: 17, dividerPx: 11, radiusPx: 8, gapPx: 10 };
   const logo = brand.logo ?? { mark: brand.name.slice(0, 2).toUpperCase(), wordmark: brand.name };
   const divisionLine = logo.divisionLine?.replace("{client}", clientName ?? "Client");
 
