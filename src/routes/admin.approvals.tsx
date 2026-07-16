@@ -32,32 +32,30 @@ function ApprovalsView() {
 
   if (forbidden) {
     return (
-      <AppShell>
-        <div className="rounded-2xl border border-amber-300 bg-amber-50 p-8">
-          <h1 className="text-2xl font-semibold">Reviewer access required</h1>
-          <p className="mt-2 text-sm text-black/70">
-            This queue is limited to accounts with the <span className="font-mono">admin</span> or{" "}
-            <span className="font-mono">brand_reviewer</span> role. Ask a workspace admin to grant access.
-          </p>
-        </div>
-      </AppShell>
+      <div className="rounded-2xl border border-amber-300 bg-amber-50 p-8">
+        <h1 className="text-2xl font-semibold">Reviewer access required</h1>
+        <p className="mt-2 text-sm text-black/70">
+          This queue is limited to accounts with the <span className="font-mono">admin</span> or{" "}
+          <span className="font-mono">brand_reviewer</span> role. Ask a workspace admin to grant access.
+        </p>
+      </div>
     );
   }
 
   return (
-    <AppShell>
+    <div className="space-y-10">
       <div>
         <div className="text-xs uppercase tracking-[0.3em] text-black/50">Governance</div>
-        <h1 className="mt-3 text-4xl font-semibold">Approvals queue</h1>
+        <h2 className="mt-3 text-3xl font-semibold">Knowledgebase & approvals</h2>
         <p className="mt-3 max-w-2xl text-black/60">
           Review, approve, or reject slide modules submitted to the library. Approved modules become available to the
           assembler and library search. Rejected modules stay with their owner with your notes attached.
         </p>
       </div>
 
-      <section className="mt-10">
+      <section>
         <div className="mb-4 flex items-baseline justify-between">
-          <h2 className="text-2xl font-semibold">Pending review</h2>
+          <h3 className="text-xl font-semibold">Pending review</h3>
           <span className="text-sm text-black/50">{pending.data?.length ?? 0}</span>
         </div>
         {pending.isLoading && <div className="text-sm text-black/50">Loading…</div>}
@@ -73,9 +71,9 @@ function ApprovalsView() {
         </div>
       </section>
 
-      <section className="mt-12">
+      <section>
         <div className="mb-4 flex items-baseline justify-between">
-          <h2 className="text-2xl font-semibold">Recently reviewed</h2>
+          <h3 className="text-xl font-semibold">Recently reviewed</h3>
           <span className="text-sm text-black/50">{recent.data?.length ?? 0}</span>
         </div>
         <div className="overflow-hidden rounded-2xl border border-black/10 bg-white">
@@ -87,9 +85,10 @@ function ApprovalsView() {
           )}
         </div>
       </section>
-    </AppShell>
+    </div>
   );
 }
+
 
 function PendingCard({ row }: { row: PendingRow }) {
   const { moduleVariants, moduleFamilies, brandModes } = useTaxonomy();
