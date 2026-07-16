@@ -32,7 +32,7 @@ export function backdropForVariant(
 function _computeBackdrop(
   variant: ModuleVariant,
   brandId: string = "bm-enterprise",
-  mode: "light" | "dark" = "dark",
+  _mode: "light" | "dark" = "dark",
 ): SlideBackdrop | null {
 
   const id = variant.id;
