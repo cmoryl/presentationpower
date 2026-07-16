@@ -9,7 +9,7 @@ type SessionInfo = {
   roles: string[];
 };
 
-function SessionRoleIndicator() {
+function SessionRoleBanner() {
   const [info, setInfo] = useState<SessionInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
