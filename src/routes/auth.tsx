@@ -86,6 +86,10 @@ function AuthPage() {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        try {
+          if (remember) window.localStorage.setItem("tp.rememberedEmail", email);
+          else window.localStorage.removeItem("tp.rememberedEmail");
+        } catch { /* ignore */ }
         navigate({ to: "/admin", replace: true });
       }
     } catch (err: unknown) {
