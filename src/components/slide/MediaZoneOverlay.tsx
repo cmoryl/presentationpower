@@ -169,9 +169,258 @@ function zonesFor(variant: ModuleVariant): Zone[] {
   }
 
   // Logos / brand strips — no imagery zones (keep clean)
-  if (/LOGO-STRIP|LOGOS/.test(id)) {
+  if (/LOGO-STRIP|LOGOS|LOGO-GRID/.test(id)) {
     return [
       { kind: "aura", x: 700, y: -200, w: 900, h: 800, label: "Soft overlay only" },
+    ];
+  }
+
+  // Editorial / split covers — left copy, right full-height portrait
+  if (id === "MV-OP-COVER-EDITORIAL" || id === "MV-OP-COVER-SPLIT") {
+    return [
+      { kind: "human", x: 960, y: 0, w: 960, h: 1080, label: "Editorial portrait" },
+      { kind: "overlay", x: 960, y: 720, w: 960, h: 360, label: "Right scrim" },
+      { kind: "shape", x: 60, y: 880, w: 160, h: 160, shape: "circle", label: "Accent" },
+    ];
+  }
+
+  // Poster / gradient / stacked covers — bold aura + typographic
+  if (/^MV-OP-COVER-(POSTER|GRADIENT|STACKED)$/.test(id)) {
+    return [
+      { kind: "aura", x: -200, y: -200, w: 2320, h: 1480, label: "Gradient wash" },
+      { kind: "shape", x: 1500, y: 720, w: 320, h: 320, shape: "circle", label: "Accent" },
+    ];
+  }
+
+  // Grid / dossier covers — small thumbnail matrix
+  if (id === "MV-OP-COVER-GRID" || id === "MV-OP-COVER-DOSSIER") {
+    const zones: Zone[] = [
+      { kind: "aura", x: -200, y: -200, w: 1400, h: 900, label: "Soft overlay" },
+    ];
+    const cols = 3, rows = 2, cellW = 220, cellH = 220, gap = 24;
+    const startX = 1200, startY = 200;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        zones.push({
+          kind: "human",
+          x: startX + c * (cellW + gap),
+          y: startY + r * (cellH + gap),
+          w: cellW,
+          h: cellH,
+          label: r === 0 && c === 0 ? "Thumbnail grid" : undefined,
+        });
+      }
+    }
+    return zones;
+  }
+
+  // Monogram cover — single dominant shape mark
+  if (id === "MV-OP-COVER-MONOGRAM") {
+    return [
+      { kind: "aura", x: -300, y: -200, w: 1500, h: 1400 },
+      { kind: "shape", x: 1180, y: 200, w: 680, h: 680, shape: "circle", label: "Monogram mark" },
+    ];
+  }
+
+  // Full-bleed image slides
+  if (id === "MV-IMG-FULL-BLEED" || id === "MV-IMG-QUOTE-BG") {
+    return [
+      { kind: "human", x: 0, y: 0, w: 1920, h: 1080, label: "Full-bleed image" },
+      { kind: "overlay", x: 0, y: 0, w: 1920, h: 1080, label: "Legibility scrim" },
+    ];
+  }
+
+  // Split image + copy
+  if (id === "MV-IMG-SPLIT" || id === "MV-IMG-CAPTION" || id === "MV-IMG-STAT-CALLOUT") {
+    return [
+      { kind: "human", x: 0, y: 0, w: 960, h: 1080, label: "Image half" },
+      { kind: "aura", x: 960, y: -100, w: 1100, h: 1200, label: "Copy side" },
+      { kind: "shape", x: 1740, y: 80, w: 140, h: 140, shape: "circle", label: "Accent" },
+    ];
+  }
+
+  // Image grids / matrices
+  if (/^MV-IMG-GRID-(3|6)$/.test(id) || /^MV-IMG-MATRIX-(4|6)$/.test(id)) {
+    const count = /6$/.test(id) ? 6 : /4$/.test(id) ? 4 : 3;
+    const cols = count === 3 ? 3 : count === 4 ? 2 : 3;
+    const rows = Math.ceil(count / cols);
+    const gap = 32;
+    const marginX = 120, marginY = 240, footer = 120;
+    const cellW = (1920 - marginX * 2 - gap * (cols - 1)) / cols;
+    const cellH = (1080 - marginY - footer - gap * (rows - 1)) / rows;
+    return Array.from({ length: count }, (_, i) => ({
+      kind: "human" as const,
+      x: marginX + (i % cols) * (cellW + gap),
+      y: marginY + Math.floor(i / cols) * (cellH + gap),
+      w: cellW,
+      h: cellH,
+      label: i === 0 ? "Image cell" : undefined,
+    }));
+  }
+
+  // Portrait spotlight
+  if (id === "MV-IMG-PORTRAIT" || id === "MV-QUOTE-PORTRAIT") {
+    return [
+      { kind: "human", x: 120, y: 120, w: 720, h: 840, label: "Portrait" },
+      { kind: "aura", x: 900, y: -80, w: 1200, h: 900 },
+      { kind: "shape", x: 1660, y: 800, w: 220, h: 220, shape: "circle", label: "Accent" },
+    ];
+  }
+
+  // Before / after comparisons
+  if (id === "MV-IMG-BEFORE-AFTER" || id === "MV-PROC-BEFORE-AFTER") {
+    return [
+      { kind: "human", x: 100, y: 240, w: 820, h: 700, label: "Before" },
+      { kind: "human", x: 1000, y: 240, w: 820, h: 700, label: "After" },
+    ];
+  }
+
+  // Image strip
+  if (id === "MV-IMG-STRIP") {
+    const cells = 5, gap = 20, marginX = 80;
+    const w = (1920 - marginX * 2 - gap * (cells - 1)) / cells;
+    return Array.from({ length: cells }, (_, i) => ({
+      kind: "human" as const,
+      x: marginX + i * (w + gap),
+      y: 340,
+      w,
+      h: 400,
+      label: i === 0 ? "Image strip" : undefined,
+    }));
+  }
+
+  // Quote variants — pull-quote emphasis
+  if (/^MV-(INS-QUOTE|QUOTE-(CARD|METRIC|POSTER|MULTI))$/.test(id)) {
+    return [
+      { kind: "aura", x: -200, y: -200, w: 1500, h: 1400, label: "Soft overlay" },
+      { kind: "shape", x: 120, y: 140, w: 140, h: 140, shape: "circle", label: "Quote mark" },
+      { kind: "shape", x: 1620, y: 780, w: 220, h: 220, shape: "circle", label: "Accent" },
+    ];
+  }
+
+  // Insight / big idea / callout — centered emphasis
+  if (/^MV-INS-(BIG-IDEA|CALLOUT|SO-WHAT)$/.test(id)) {
+    return [
+      { kind: "aura", x: 260, y: -100, w: 1400, h: 1280, label: "Soft overlay" },
+      { kind: "shape", x: 1720, y: 60, w: 160, h: 160, shape: "circle", label: "Accent" },
+      { kind: "shape", x: 60, y: 860, w: 160, h: 160, shape: "circle", label: "Accent" },
+    ];
+  }
+
+  // Context trend / challenge — analytic canvas
+  if (/^MV-CTX-(TREND|CHALLENGE-STACK)$/.test(id)) {
+    return [
+      { kind: "aura", x: 1100, y: -100, w: 1000, h: 900, label: "Soft overlay" },
+      { kind: "shape", x: 60, y: 800, w: 180, h: 180, shape: "circle", label: "Accent" },
+    ];
+  }
+
+  // Solution architecture / feature list — schematic canvas
+  if (/^MV-SOL-(ARCHITECTURE|FEATURE-LIST)$/.test(id)) {
+    return [
+      { kind: "aura", x: -200, y: 500, w: 1200, h: 900, label: "Soft overlay" },
+      { kind: "shape", x: 1700, y: 80, w: 180, h: 180, shape: "circle", label: "Accent" },
+    ];
+  }
+
+  // Decision aids — matrix / compare / checklist
+  if (/^MV-DEC-(MATRIX|COMPARE-TABLE|CHECKLIST)$/.test(id)) {
+    return [
+      { kind: "aura", x: 1200, y: -160, w: 900, h: 700, label: "Soft overlay" },
+      { kind: "shape", x: 60, y: 60, w: 140, h: 140, shape: "circle", label: "Accent" },
+    ];
+  }
+
+  // Commercial — pricing / investment
+  if (/^MV-COMM-(PRICING|INVESTMENT)$/.test(id)) {
+    return [
+      { kind: "aura", x: -200, y: -100, w: 1200, h: 1200, label: "Soft overlay" },
+      { kind: "shape", x: 1700, y: 780, w: 220, h: 220, shape: "circle", label: "Accent ring" },
+    ];
+  }
+
+  // Risk mitigation
+  if (id === "MV-RISK-MITIGATION") {
+    return [
+      { kind: "aura", x: 1100, y: 500, w: 1000, h: 700, label: "Soft overlay" },
+      { kind: "shape", x: 120, y: 120, w: 160, h: 160, shape: "circle", label: "Signal" },
+    ];
+  }
+
+  // Governance / RACI
+  if (id === "MV-GOV-RACI") {
+    return [
+      { kind: "aura", x: 1300, y: -100, w: 800, h: 700, label: "Soft overlay" },
+    ];
+  }
+
+  // Case study — spread / metrics / story
+  if (/^MV-CASE-(SPREAD|METRICS|STORY)$/.test(id)) {
+    return [
+      { kind: "human", x: 100, y: 180, w: 780, h: 780, label: "Case imagery" },
+      { kind: "aura", x: 920, y: -80, w: 1200, h: 1200, label: "Soft overlay" },
+      { kind: "shape", x: 1700, y: 100, w: 180, h: 180, shape: "circle", label: "Accent" },
+    ];
+  }
+
+  // Client-focused matrices / comparisons
+  if (/^MV-CLIENT-(MATRIX|DETAIL-3|COMPARE)$/.test(id)) {
+    const count = id === "MV-CLIENT-COMPARE" ? 2 : id === "MV-CLIENT-DETAIL-3" ? 3 : 4;
+    const cols = count;
+    const gap = 32, marginX = 120, marginY = 260;
+    const cellW = (1920 - marginX * 2 - gap * (cols - 1)) / cols;
+    return Array.from({ length: count }, (_, i) => ({
+      kind: "human" as const,
+      x: marginX + i * (cellW + gap),
+      y: marginY,
+      w: cellW,
+      h: 260,
+      label: i === 0 ? "Client mark" : undefined,
+    }));
+  }
+
+  // Infographics — donut / funnel / venn / pyramid / bars / circular flow
+  if (/^MV-INFO-(DONUT|FUNNEL|BAR-COMPARE|CIRCULAR-FLOW|PYRAMID|VENN)$/.test(id)) {
+    return [
+      { kind: "aura", x: -200, y: -200, w: 1200, h: 1400, label: "Soft overlay" },
+      { kind: "shape", x: 1100, y: 200, w: 640, h: 640, shape: "circle", label: "Data figure" },
+      { kind: "shape", x: 1720, y: 780, w: 180, h: 180, shape: "circle", label: "Accent" },
+    ];
+  }
+
+  // Recommendation / next-steps banner
+  if (id === "MV-REC-NEXT") {
+    return [
+      { kind: "aura", x: 900, y: -160, w: 1200, h: 900, label: "Soft overlay" },
+      { kind: "shape", x: 80, y: 800, w: 200, h: 200, shape: "circle", label: "Accent" },
+    ];
+  }
+
+  // Closing variants (MV-CLOSE-*) — pattern-specific
+  if (/^MV-CLOSE-(CTA|THANKS|STATEMENT|DUAL-CTA)$/.test(id)) {
+    return [
+      { kind: "aura", x: -200, y: -200, w: 2320, h: 1480, label: "Soft overlay" },
+      { kind: "overlay", x: 0, y: 720, w: 1920, h: 360, label: "Bottom scrim" },
+      { kind: "shape", x: 1620, y: 720, w: 260, h: 260, shape: "circle", label: "Accent" },
+    ];
+  }
+  if (id === "MV-CLOSE-QNA" || id === "MV-CLOSE-CONTACT") {
+    return [
+      { kind: "aura", x: 900, y: -200, w: 1300, h: 1400, label: "Soft overlay" },
+      { kind: "human", x: 120, y: 240, w: 640, h: 640, shape: "circle", label: "Contact portrait" },
+    ];
+  }
+  if (id === "MV-CLOSE-SPLIT") {
+    return [
+      { kind: "human", x: 0, y: 0, w: 960, h: 1080, label: "Split image" },
+      { kind: "aura", x: 960, y: -100, w: 1100, h: 1300, label: "Copy side" },
+    ];
+  }
+  if (/^MV-CLOSE-(TIMELINE|CHECKLIST|DECISION|CALENDAR|METRIC-PROMISE)$/.test(id)) {
+    return [
+      { kind: "aura", x: 1100, y: -100, w: 1000, h: 900, label: "Soft overlay" },
+      { kind: "shape", x: 60, y: 60, w: 140, h: 140, shape: "circle", label: "Accent" },
+      { kind: "shape", x: 1720, y: 800, w: 200, h: 200, shape: "circle", label: "Accent" },
     ];
   }
 
