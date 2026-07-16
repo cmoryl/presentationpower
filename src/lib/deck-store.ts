@@ -849,6 +849,38 @@ export const useDeckStore = create<DeckState>()(
         return { briefId: brief.id, deckId: deck.id };
       },
 
+      createImportedDeck: (input) => {
+        const brief: Brief = {
+          ...input.brief,
+          id: nanoid(8),
+          createdAt: new Date().toISOString(),
+        };
+        const deck: Deck = {
+          id: nanoid(10),
+          createdAt: new Date().toISOString(),
+          title: input.title,
+          briefId: brief.id,
+          brandModeId: brief.brandModeId,
+          archetypeId: brief.archetypeId,
+          slides: input.slides.map((s, i) => ({
+            id: nanoid(8),
+            position: i,
+            sectionId: s.sectionId,
+            variantId: s.variantId,
+            layoutId: s.layoutId,
+            content: s.content,
+            changes: [],
+          })),
+        };
+        set((s) => ({
+          briefs: { ...s.briefs, [brief.id]: brief },
+          decks: { ...s.decks, [deck.id]: deck },
+        }));
+        return { briefId: brief.id, deckId: deck.id };
+      },
+
+
+
       applyAiContent: (deckId, aiSlides) => {
         const deck = get().decks[deckId];
         if (!deck) return;
