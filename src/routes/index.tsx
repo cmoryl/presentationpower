@@ -111,7 +111,10 @@ function Dashboard() {
           </div>
         )}
       </div>
+
+      <MyCloudDecks />
     </AppShell>
+
   );
 }
 
