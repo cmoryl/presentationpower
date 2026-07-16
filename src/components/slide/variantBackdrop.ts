@@ -25,12 +25,15 @@ function hashStr(s: string): number {
 export function backdropForVariant(
   variant: ModuleVariant,
   brandId: string = "bm-enterprise",
+  mode: "light" | "dark" = "dark",
 ): SlideBackdrop | null {
   const id = variant.id;
   const seed = hashStr(id);
-  const set = getDivisionImagery(brandId);
+  const isLight = mode === "light";
+  const set = isLight ? LIGHT_IMAGERY : getDivisionImagery(brandId);
   const photos = set.photos;
   const abstracts = set.abstracts;
+
   const pickPhoto = (offset = 0) => photos[(seed + offset) % photos.length];
   const pickAbstract = (offset = 0) => abstracts[(seed + offset) % abstracts.length];
   const pickPortrait = () => PORTRAITS[seed % PORTRAITS.length];
