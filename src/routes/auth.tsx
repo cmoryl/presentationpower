@@ -59,6 +59,14 @@ function AuthPage() {
         } else {
           navigate({ to: "/admin", replace: true });
         }
+      } else if (mode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        setInfo(
+          "If an account exists for that email, we've sent a password reset link. Check your inbox (and spam folder).",
+        );
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
