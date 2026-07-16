@@ -213,17 +213,72 @@ function ImageryPage() {
             rows={2}
             className="mt-3 w-full resize-none rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-[#003FC7]"
           />
+
+          {/* Existing-imagery recommendations */}
+          {recommendations.length > 0 && (
+            <div className="mt-3 rounded-lg border border-black/5 bg-[#F7F5F0] p-3">
+              <div className="flex items-baseline justify-between">
+                <div className="text-[11px] uppercase tracking-wider" style={{ color: primary }}>
+                  {strongMatch ? "Strong matches already in your library" : "Possibly relevant existing imagery"}
+                </div>
+                <div className="text-[10px] text-black/40">
+                  ranked by tags · notes · prior prompts · brand fit
+                </div>
+              </div>
+              <div className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-4">
+                {recommendations.map((m) => (
+                  <button
+                    key={m.entry.id}
+                    onClick={() => {
+                      setSelected(m.entry.id);
+                      lib.recordUsage(m.entry.id);
+                    }}
+                    className="group overflow-hidden rounded-md border border-black/5 bg-white text-left hover:border-black/25"
+                    title={m.reasons.join(" · ")}
+                  >
+                    <div className="relative">
+                      <img src={m.entry.url} alt="" className="aspect-[16/10] w-full object-cover" />
+                      <span
+                        className="absolute right-1 top-1 rounded-full px-1.5 py-0.5 text-[9px] font-medium text-white"
+                        style={{ background: primary }}
+                      >
+                        {m.score.toFixed(1)}
+                      </span>
+                    </div>
+                    <div className="p-1.5">
+                      <div className="text-[10px] font-medium text-[#03002C]">
+                        {m.entry.source === "ai" ? "AI" : m.entry.source === "upload" ? "Upload" : m.entry.kind}
+                      </div>
+                      <div className="line-clamp-1 text-[10px] text-black/50">
+                        {m.reasons[0] ?? "brand fit"}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              {strongMatch && (
+                <p className="mt-2 text-[11px] text-black/60">
+                  Use one of these to stay cohesive, or generate a new variant if none quite fit.
+                </p>
+              )}
+            </div>
+          )}
+
           <div className="mt-3 flex items-center justify-between gap-3">
             <div className="text-xs text-black/50">
               Uses this brand's palette, tagline, photography guideline, and active library memory tags.
             </div>
             <button
               onClick={handleGenerate}
-              disabled={busy}
+              disabled={busy || !prompt.trim()}
               className="rounded-full px-4 py-2 text-sm font-medium text-white transition disabled:opacity-50"
-              style={{ background: primary }}
+              style={{ background: strongMatch ? "#03002C" : primary }}
             >
-              {busy ? "Generating…" : "Generate image"}
+              {busy
+                ? "Generating…"
+                : strongMatch
+                  ? "Generate anyway"
+                  : "Generate image"}
             </button>
           </div>
           {error && <div className="mt-2 text-xs text-red-600">{error}</div>}
