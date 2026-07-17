@@ -164,6 +164,7 @@ export function MyCloudDecks() {
 
       // Use a stable local id so re-loading the same cloud deck reuses the same slot.
       const localDeckId = `cloud-${d.id}`;
+      const deckContext = (d as unknown as { context?: Record<string, unknown> }).context;
       const deckLocal: Deck = {
         id: localDeckId,
         createdAt: d.created_at || new Date().toISOString(),
@@ -172,6 +173,7 @@ export function MyCloudDecks() {
         brandModeId: briefLocal.brandModeId,
         archetypeId: briefLocal.archetypeId,
         slides,
+        context: (deckContext && typeof deckContext === "object" ? deckContext : undefined) as Deck["context"],
       };
 
       hydrate({ brief: briefLocal, deck: deckLocal });

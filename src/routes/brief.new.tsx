@@ -52,6 +52,7 @@ const inputCls =
 function BriefWizard() {
   const navigate = useNavigate();
   const create = useDeckStore((s) => s.createBriefAndAssemble);
+  const setDeckContext = useDeckStore((s) => s.setDeckContext);
   const applyAi = useDeckStore((s) => s.applyAiContent);
   const decks = useDeckStore((s) => s.decks);
   const personalize = useServerFn(personalizeSlides);
@@ -520,7 +521,12 @@ function BriefWizard() {
                         });
                         knowledgeSnippets = kbRes as typeof knowledgeSnippets;
                         setKbUsedCount(knowledgeSnippets.length);
+                        setDeckContext(deckId, {
+                          knowledgeSourceIds: knowledgeSnippets.map((k) => k.id),
+                          knowledgeSources: knowledgeSnippets.map((k) => ({ id: k.id, source: k.source, title: k.title, tags: k.tags })),
+                        });
                       } catch { /* non-fatal */ }
+
 
                       setAiStatus("personalizing");
                       try {

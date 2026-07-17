@@ -64,6 +64,14 @@ export type DeckClientLogo = {
   monoUrl?: string | null;
 };
 
+export type DeckContext = {
+  abExperimentId?: string | null;
+  abVariantId?: string | null;
+  abPaletteOverride?: Record<string, string> | null;
+  knowledgeSourceIds?: string[];
+  knowledgeSources?: Array<{ id: string; source: "oracle" | "kb" | "asset" | "brand-intel"; title: string; tags?: string[] }>;
+};
+
 export type Deck = {
   id: string;
   createdAt: string;
@@ -73,7 +81,9 @@ export type Deck = {
   archetypeId: string;
   slides: DeckSlide[];
   clientLogo?: DeckClientLogo | null;
+  context?: DeckContext;
 };
+
 
 
 type DeckState = {
@@ -95,6 +105,7 @@ type DeckState = {
   duplicateSlide: (deckId: string, slideId: string) => void;
   renameDeck: (deckId: string, title: string) => void;
   setDeckClientLogo: (deckId: string, logo: DeckClientLogo | null) => void;
+  setDeckContext: (deckId: string, patch: Partial<DeckContext>) => void;
   deleteDeck: (deckId: string) => void;
 
   hydrate: (input: { brief: Brief; deck: Deck }) => void;
@@ -863,12 +874,19 @@ export const useDeckStore = create<DeckState>()(
           createdAt: new Date().toISOString(),
         };
         const deck = assembleDeck(brief);
+        deck.context = {
+          abExperimentId: brief.abExperimentId ?? null,
+          abVariantId: brief.abVariantId ?? null,
+          abPaletteOverride: brief.abPaletteOverride ?? null,
+          knowledgeSourceIds: brief.knowledgeSourceIds ?? [],
+        };
         set((s) => ({
           briefs: { ...s.briefs, [brief.id]: brief },
           decks: { ...s.decks, [deck.id]: deck },
         }));
         return { briefId: brief.id, deckId: deck.id };
       },
+
 
       createImportedDeck: (input) => {
         const brief: Brief = {
@@ -1061,6 +1079,13 @@ export const useDeckStore = create<DeckState>()(
       },
 
 
+      setDeckContext: (deckId, patch) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const next: DeckContext = { ...(deck.context ?? {}), ...patch };
+        set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, context: next } } }));
+      },
+
       deleteDeck: (deckId) => {
         set((s) => {
           const next = { ...s.decks };
@@ -1068,6 +1093,7 @@ export const useDeckStore = create<DeckState>()(
           return { decks: next };
         });
       },
+
 
       hydrate: ({ brief, deck }) =>
         set((s) => ({

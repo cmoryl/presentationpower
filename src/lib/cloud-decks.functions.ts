@@ -34,7 +34,9 @@ const DeckSchema = z.object({
   brandModeId: z.string(),
   archetypeId: z.string(),
   slides: z.array(SlideSchema),
+  context: z.record(z.string(), z.unknown()).optional(),
 });
+
 
 const SaveInput = z.object({ brief: BriefSchema, deck: DeckSchema });
 
@@ -87,6 +89,7 @@ export const saveDeckToCloud = createServerFn({ method: "POST" })
       archetype_id: data.deck.archetypeId,
       brand_mode_id: data.deck.brandModeId,
       status: "draft",
+      context: (data.deck.context ?? {}) as never,
     });
     if (deckErr) throw new Error(deckErr.message);
 

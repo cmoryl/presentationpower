@@ -682,6 +682,7 @@ export type Database = {
           archetype_id: string | null
           brand_mode_id: string | null
           brief_id: string | null
+          context: Json
           created_at: string
           id: string
           owner_id: string
@@ -693,6 +694,7 @@ export type Database = {
           archetype_id?: string | null
           brand_mode_id?: string | null
           brief_id?: string | null
+          context?: Json
           created_at?: string
           id?: string
           owner_id: string
@@ -704,6 +706,7 @@ export type Database = {
           archetype_id?: string | null
           brand_mode_id?: string | null
           brief_id?: string | null
+          context?: Json
           created_at?: string
           id?: string
           owner_id?: string
