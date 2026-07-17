@@ -223,3 +223,170 @@ export const getClientLogoSignedUrl = createServerFn({ method: "POST" })
     if (error) throw new Error((error as { message?: string }).message ?? "Sign failed");
     return { url: signed?.signedUrl ?? null };
   });
+
+// ── IMPORT FROM BRANDHUB (one-time seed utility) ────────────────────────
+// Reads public global_client_logos rows from BrandHUB's Supabase (anon-readable),
+// downloads each file server-side, uploads to our client-logos bucket, and
+// inserts a client_logos row per client. Batches with offset/limit so the
+// caller can page through the ~400 total logos without hitting timeouts.
+const BRANDHUB_URL = "https://nhxaijbyqfkkhhoornzy.supabase.co";
+const BRANDHUB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oeGFpamJ5cWZra2hob29ybnp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2NDU0ODYsImV4cCI6MjA4MzIyMTQ4Nn0.Uw6QPHoOo_15FWCfnSAZYyGZNEr-XlZ8NrVyLlcuiWk";
+
+type BrandhubFile = { url: string; format?: string; lockup?: string; variant?: string };
+type BrandhubLogo = {
+  id: string;
+  name: string;
+  description: string | null;
+  category: string | null;
+  website_url: string | null;
+  files: BrandhubFile[] | null;
+};
+
+function slugifyName(s: string): string {
+  return s.toLowerCase().trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "") || "logo";
+}
+
+function pickFiles(files: BrandhubFile[]): {
+  primary?: BrandhubFile; dark?: BrandhubFile; light?: BrandhubFile; mono?: BrandhubFile;
+} {
+  const find = (lockup: string, variant: string) =>
+    files.find((f) => (f.lockup ?? "") === lockup && (f.variant ?? "") === variant);
+  const primary = find("wordmark", "color") ?? find("icon", "color") ?? files[0];
+  const light = find("wordmark", "black") ?? find("icon", "black");
+  const dark = find("wordmark", "white") ?? find("icon", "white");
+  const mono = find("wordmark", "black") ?? find("icon", "black");
+  return { primary, dark, light, mono };
+}
+
+export const importBrandhubLogos = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({
+      offset: z.number().int().nonnegative().default(0),
+      limit: z.number().int().min(1).max(50).default(20),
+    }).parse(input),
+  )
+  .handler(async ({ data, context }): Promise<{
+    ok: boolean; total: number; processed: number; created: number; skipped: number;
+    filesUploaded: number; nextOffset: number | null; errors: string[];
+  }> => {
+    const s = context.supabase as unknown as SbClient;
+    const { data: isAdmin } = await s.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden: admin required");
+
+    const listRes = await fetch(
+      `${BRANDHUB_URL}/rest/v1/global_client_logos?select=id,name,description,category,website_url,files&order=name.asc&offset=${data.offset}&limit=${data.limit}`,
+      { headers: { apikey: BRANDHUB_ANON, Authorization: `Bearer ${BRANDHUB_ANON}`, Prefer: "count=exact" } },
+    );
+    if (!listRes.ok) {
+      return { ok: false, total: 0, processed: 0, created: 0, skipped: 0, filesUploaded: 0, nextOffset: null, errors: [`Fetch ${listRes.status}`] };
+    }
+    const contentRange = listRes.headers.get("content-range") ?? "";
+    const totalMatch = /\/(\d+)$/.exec(contentRange);
+    const total = totalMatch ? Number(totalMatch[1]) : 0;
+    const logos = (await listRes.json()) as BrandhubLogo[];
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sa = supabaseAdmin as unknown as (SbClient & {
+      storage: { from: (b: string) => { upload: (path: string, body: ArrayBuffer, opts: { contentType: string; upsert: boolean }) => Promise<{ error: unknown }> } };
+    });
+
+    let created = 0, skipped = 0, filesUploaded = 0;
+    const errors: string[] = [];
+
+    for (const logo of logos) {
+      try {
+        const slug = slugifyName(logo.name);
+        const { data: existing } = await sa.from("client_logos").select("id").eq("slug", slug).maybeSingle();
+        if (existing) { skipped++; continue; }
+
+        const files = Array.isArray(logo.files) ? logo.files : [];
+        if (files.length === 0) { skipped++; continue; }
+        const picks = pickFiles(files);
+        if (!picks.primary) { skipped++; continue; }
+
+        const paths: Record<"primary" | "dark" | "light" | "mono", string | null> = {
+          primary: null, dark: null, light: null, mono: null,
+        };
+        let firstMime = "image/svg+xml";
+        let firstSize = 0;
+        let firstFilename = "";
+        const uploaded = new Map<string, string>();
+
+        const variantList: Array<["primary" | "dark" | "light" | "mono", BrandhubFile | undefined]> = [
+          ["primary", picks.primary],
+          ["dark", picks.dark],
+          ["light", picks.light],
+          ["mono", picks.mono],
+        ];
+
+        for (const [slot, file] of variantList) {
+          if (!file) continue;
+          let path = uploaded.get(file.url);
+          if (!path) {
+            const dl = await fetch(file.url);
+            if (!dl.ok) { errors.push(`${logo.name}: download ${slot} ${dl.status}`); continue; }
+            const buf = await dl.arrayBuffer();
+            const format = (file.format || "svg").toLowerCase().replace(/[^a-z0-9]/g, "");
+            const mime =
+              format === "svg" ? "image/svg+xml" :
+              format === "png" ? "image/png" :
+              format === "jpg" || format === "jpeg" ? "image/jpeg" :
+              format === "webp" ? "image/webp" :
+              "application/octet-stream";
+            const filename = `${file.lockup ?? "logo"}-${file.variant ?? slot}.${format}`;
+            path = `${slug}/${filename}`;
+            const { error: upErr } = await sa.storage.from(BUCKET).upload(path, buf, {
+              contentType: mime,
+              upsert: true,
+            });
+            if (upErr) { errors.push(`${logo.name}: upload ${slot}: ${(upErr as { message?: string }).message ?? "err"}`); continue; }
+            uploaded.set(file.url, path);
+            filesUploaded++;
+            if (slot === "primary") { firstMime = mime; firstSize = buf.byteLength; firstFilename = filename; }
+          }
+          paths[slot] = path;
+        }
+
+        if (!paths.primary) { skipped++; continue; }
+
+        const { error: insErr } = await sa.from("client_logos").insert({
+          client_name: logo.name,
+          slug,
+          industry: logo.category ?? null,
+          division_id: null,
+          notes: logo.description ?? null,
+          website: logo.website_url ?? null,
+          source: "brandhub-import",
+          primary_path: paths.primary,
+          dark_path: paths.dark,
+          light_path: paths.light,
+          mono_path: paths.mono,
+          source_filename: firstFilename || `${slug}.svg`,
+          mime_type: firstMime,
+          file_size: firstSize || null,
+          tags: logo.category ? [logo.category.toLowerCase()] : [],
+          created_by: context.userId,
+        });
+        if (insErr) {
+          errors.push(`${logo.name}: insert ${(insErr as { message?: string }).message ?? "err"}`);
+          continue;
+        }
+        created++;
+      } catch (e) {
+        errors.push(`${logo.name}: ${(e as Error).message}`);
+      }
+    }
+
+    const nextOffset = data.offset + logos.length;
+    return {
+      ok: true, total,
+      processed: logos.length, created, skipped, filesUploaded,
+      nextOffset: nextOffset < total ? nextOffset : null,
+      errors: errors.slice(0, 20),
+    };
+  });
