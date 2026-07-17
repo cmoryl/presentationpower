@@ -1,0 +1,318 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import {
+  BRAND_GUIDES,
+  getBrandGuideForDivision,
+  TRANSPERFECT_SUBCOMPANIES,
+} from "@/lib/brand-guides";
+import { getBrandhubIntel } from "@/lib/brandhub-intel";
+
+// ---------------------------------------------------------------------------
+// Reusable Anthropic client — Phase A of the AI enhancement roadmap.
+// Uses claude-sonnet-4-6 via the Messages API. Two-part prompt shape
+// (stable system + variable user) is designed for prompt-caching.
+// ---------------------------------------------------------------------------
+
+const ANTHROPIC_MODEL = "claude-sonnet-4-6";
+const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
+
+type AnthropicResult =
+  | { ok: true; text: string }
+  | { ok: false; status: number; body: string };
+
+async function callAnthropic(
+  systemBlocks: string[],
+  userMessage: string,
+  opts?: { maxTokens?: number; temperature?: number },
+): Promise<AnthropicResult> {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) throw new Error("ANTHROPIC_API_KEY missing");
+
+  const res = await fetch(ANTHROPIC_URL, {
+    method: "POST",
+    headers: {
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      model: ANTHROPIC_MODEL,
+      max_tokens: opts?.maxTokens ?? 4096,
+      temperature: opts?.temperature ?? 0.2,
+      system: systemBlocks.map((text, i) => ({
+        type: "text" as const,
+        text,
+        ...(i === 0 ? { cache_control: { type: "ephemeral" as const } } : {}),
+      })),
+      messages: [{ role: "user", content: userMessage }],
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    return { ok: false, status: res.status, body: body.slice(0, 500) };
+  }
+  const json = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
+  const text = (json.content ?? []).map((c) => (c.type === "text" ? c.text ?? "" : "")).join("").trim();
+  return { ok: true, text };
+}
+
+// ---------------------------------------------------------------------------
+// Review schema
+// ---------------------------------------------------------------------------
+
+const Finding = z.object({
+  slideIndex: z.number().int().nonnegative(),
+  severity: z.enum(["critical", "warning", "suggestion"]),
+  category: z.enum(["terminology", "voice", "claims", "structure", "branding"]),
+  issue: z.string(),
+  evidence: z.string(),
+  suggestedFix: z.string(),
+});
+
+const ReviewSchema = z.object({
+  overallScore: z.number().min(0).max(100),
+  summary: z.string(),
+  findings: z.array(Finding),
+  strengths: z.array(z.string()),
+});
+
+export type BrandReview = z.infer<typeof ReviewSchema>;
+export type BrandReviewFinding = z.infer<typeof Finding>;
+
+// ---------------------------------------------------------------------------
+// Brand-guide serialization
+// ---------------------------------------------------------------------------
+
+function serializeBrandGuide(divisionId: string): string {
+  const guide = getBrandGuideForDivision(divisionId) ?? BRAND_GUIDES[0];
+  const lines: string[] = [];
+  lines.push(`# Brand Guide · ${guide.title} — ${guide.subtitle} (v${guide.version})`);
+  if (guide.tagline) lines.push(`Tagline: ${guide.tagline}`);
+  lines.push(`\n## Intro\n${guide.intro}`);
+  if (guide.values?.length) {
+    lines.push(`\n## Values`);
+    guide.values.forEach((v) => lines.push(`- ${v.label}: ${v.description}`));
+  }
+  lines.push(`\n## Logo Rules`);
+  guide.logoRules.forEach((r) =>
+    lines.push(`- ${r.do === false ? "DON'T" : "DO"} — ${r.title}: ${r.description}`),
+  );
+  lines.push(`\n## Colors`);
+  const swatchLine = (s: { name: string; hex: string; role?: string }) =>
+    `- ${s.name} ${s.hex}${s.role ? ` (${s.role})` : ""}`;
+  guide.primaryColors.forEach((s) => lines.push(swatchLine(s)));
+  guide.secondaryColors.forEach((s) => lines.push(swatchLine(s)));
+  guide.tertiaryColors.forEach((s) => lines.push(swatchLine(s)));
+  lines.push(`\n## Typography\nPrimary: ${guide.typefacePrimary}\nWeb: ${guide.typefaceWeb}`);
+  if (guide.subBrands?.length) {
+    lines.push(`\n## Sub-brands (governance)`);
+    guide.subBrands.forEach((g) => lines.push(`- ${g.group}: ${g.items.join(", ")}`));
+  }
+  return lines.join("\n");
+}
+
+function serializeBrandhubIntel(divisionId: string): string {
+  const intel = getBrandhubIntel(divisionId);
+  if (!intel) return "";
+  const lines: string[] = [`# BrandHub Intelligence · ${divisionId}`];
+  if (intel.summary) lines.push(`Summary: ${intel.summary}`);
+  if (intel.marketPosition) lines.push(`Market position: ${intel.marketPosition}`);
+  if (intel.voiceProfile) {
+    const v = intel.voiceProfile;
+    lines.push(`## Voice Profile`);
+    const norm = (x: unknown) => (Array.isArray(x) ? x.join(", ") : x ? String(x) : "");
+    if (v.tone) lines.push(`Tone: ${norm(v.tone)}`);
+    if (v.style) lines.push(`Style: ${norm(v.style)}`);
+    if (v.personality) lines.push(`Personality: ${norm(v.personality)}`);
+    if (v.communication_style) lines.push(`Communication: ${norm(v.communication_style)}`);
+  }
+  if (intel.competitiveAdvantages?.length) {
+    lines.push(`## Competitive Advantages`);
+    intel.competitiveAdvantages.forEach((a) => lines.push(`- ${a}`));
+  }
+  return lines.join("\n");
+}
+
+function governanceBlock(): string {
+  return [
+    "# TransPerfect Governance",
+    "Only these sub-companies are permitted; any other named sub-brand is a critical violation:",
+    TRANSPERFECT_SUBCOMPANIES.map((s) => `- ${s}`).join("\n"),
+    "Never distort, recolor, or keyline the logo. Never use banned hype words: unlock, revolutionize, seamless, leverage.",
+    "Numeric stats, dates, and citations must never be altered.",
+  ].join("\n");
+}
+
+// ---------------------------------------------------------------------------
+// Server function: reviewDeck
+// Accepts the deck payload from the client (works for local + saved decks).
+// If `cloudDeckId` is provided and owned by the user, the review is persisted.
+// ---------------------------------------------------------------------------
+
+const SlideInput = z.object({
+  index: z.number().int().nonnegative(),
+  sectionName: z.string().optional(),
+  variantId: z.string().optional(),
+  content: z.record(z.string(), z.unknown()),
+});
+
+const Input = z.object({
+  cloudDeckId: z.string().uuid().optional(),
+  deckTitle: z.string(),
+  brandModeId: z.string(),
+  subCompany: z.string().optional(),
+  brief: z
+    .object({
+      prospect: z.string().optional(),
+      industry: z.string().optional(),
+      audience: z.string().optional(),
+      meetingObjective: z.string().optional(),
+    })
+    .optional(),
+  slides: z.array(SlideInput).min(1).max(60),
+});
+
+export type ReviewDeckInput = z.infer<typeof Input>;
+
+export const reviewDeck = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => Input.parse(raw))
+  .handler(async ({ data, context }): Promise<
+    | { ok: true; review: BrandReview; reviewId: string | null }
+    | { ok: false; error: string; setup?: boolean }
+  > => {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return {
+        ok: false,
+        setup: true,
+        error:
+          "The Brand Reviewer needs an ANTHROPIC_API_KEY. Add it in Project Settings → Secrets, then run the review again.",
+      };
+    }
+
+    const { supabase, userId } = context;
+
+    const stableSystem = [
+      "You are the TransPerfect Brand Reviewer — a rigorous senior brand strategist.",
+      "You audit sales decks against a division's brand guide, voice profile, terminology, and governance rules.",
+      "Return STRICT JSON only — no prose, no markdown fences, no commentary.",
+      "",
+      serializeBrandGuide(data.brandModeId),
+      "",
+      serializeBrandhubIntel(data.brandModeId),
+      "",
+      governanceBlock(),
+    ].join("\n");
+
+    const variableUser = [
+      "Audit the following deck. For each slide (0-indexed), inspect every string in `content` against the brand guide above.",
+      "",
+      "Return JSON of the shape:",
+      `{
+  "overallScore": number 0-100,
+  "summary": string (<= 400 chars),
+  "findings": [{
+    "slideIndex": number,
+    "severity": "critical" | "warning" | "suggestion",
+    "category": "terminology" | "voice" | "claims" | "structure" | "branding",
+    "issue": string,
+    "evidence": string,
+    "suggestedFix": string
+  }],
+  "strengths": string[]
+}`,
+      "",
+      "Severity guidance:",
+      "- critical: banned terminology, wrong sub-brand, altered stats, or governance violations.",
+      "- warning: off-voice, weak claims, unclear structure.",
+      "- suggestion: polish opportunities.",
+      "",
+      `Deck title: ${data.deckTitle}`,
+      data.subCompany ? `Sub-company: ${data.subCompany}` : "",
+      data.brief ? `Brief context: ${JSON.stringify(data.brief)}` : "",
+      "Slides (JSON):",
+      JSON.stringify(data.slides, null, 0),
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    async function attempt(extra?: string) {
+      const res = await callAnthropic(
+        [stableSystem],
+        extra ? `${variableUser}\n\n${extra}` : variableUser,
+        { maxTokens: 4096 },
+      );
+      if (!res.ok) return { rawError: `Anthropic ${res.status}: ${res.body}` } as const;
+      const text = res.text;
+      const start = text.indexOf("{");
+      const end = text.lastIndexOf("}");
+      if (start < 0 || end < 0) return { rawError: "Model did not return JSON" } as const;
+      try {
+        const parsed = ReviewSchema.safeParse(JSON.parse(text.slice(start, end + 1)));
+        if (parsed.success) return { review: parsed.data } as const;
+        return { rawError: `Schema mismatch: ${parsed.error.message.slice(0, 200)}` } as const;
+      } catch (e) {
+        return { rawError: `JSON parse failed: ${(e as Error).message}` } as const;
+      }
+    }
+
+    let result = await attempt();
+    if (!("review" in result) || !result.review) {
+      result = await attempt(
+        "Your previous response was not valid JSON matching the schema. Return ONLY the JSON object described above — no prose, no markdown fences.",
+      );
+    }
+    if (!("review" in result) || !result.review) {
+      return { ok: false, error: ("rawError" in result && result.rawError) || "Review failed" };
+    }
+    const review = result.review;
+
+    // Persist only if we have a cloud deck owned by the caller
+    let reviewId: string | null = null;
+    if (data.cloudDeckId) {
+      const { data: deck } = await supabase
+        .from("decks")
+        .select("id, owner_id")
+        .eq("id", data.cloudDeckId)
+        .single();
+      if (deck && deck.owner_id === userId) {
+        const { data: ins } = await supabase
+          .from("deck_reviews")
+          .insert({
+            deck_id: data.cloudDeckId,
+            created_by: userId,
+            model: ANTHROPIC_MODEL,
+            overall_score: Math.round(review.overallScore),
+            summary: review.summary,
+            findings: review.findings as never,
+            strengths: review.strengths as never,
+          })
+          .select("id")
+          .single();
+        reviewId = ins?.id ?? null;
+      }
+    }
+
+    return { ok: true, review, reviewId };
+  });
+
+// ---------------------------------------------------------------------------
+// List prior reviews for a saved deck
+// ---------------------------------------------------------------------------
+
+export const listDeckReviews = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) => z.object({ cloudDeckId: z.string().uuid() }).parse(raw))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("deck_reviews")
+      .select("id, model, overall_score, summary, findings, strengths, created_at")
+      .eq("deck_id", data.cloudDeckId)
+      .order("created_at", { ascending: false })
+      .limit(20);
+    if (error) return { ok: false as const, error: error.message };
+    return { ok: true as const, reviews: rows ?? [] };
+  });
