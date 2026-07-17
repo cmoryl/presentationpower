@@ -102,12 +102,22 @@ export function BrandReviewPanel({
               })),
             }
           : undefined,
+        knowledgeFacts: deck.context?.knowledgeSources
+          ?.filter((k) => k.extractedFact)
+          .map((k) => ({
+            source: k.source,
+            title: k.title,
+            extractedFact: k.extractedFact!,
+            relevance: k.relevance,
+          })),
+        knowledgeSynthesis: deck.context?.knowledgeSynthesis ?? undefined,
         slides: deck.slides.map((s, i) => ({
           index: i,
           sectionName: byId(SECTION_FRAMEWORKS, s.sectionId)?.name ?? "",
           variantId: s.variantId,
           content: s.content as Record<string, unknown>,
         })),
+
       };
       const res = await run({ data: payload });
       if (!res.ok) {
