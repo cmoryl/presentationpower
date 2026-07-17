@@ -529,6 +529,18 @@ function BriefWizard() {
                 }}
               />
 
+              {(kbSelected.length > 0 || kbSynthesis) && (
+                <KnowledgeUsedPanel
+                  selected={kbSelected}
+                  synthesis={kbSynthesis}
+                  synthesized={kbSynthesized}
+                  open={showKbPanel}
+                  onToggle={() => setShowKbPanel((v) => !v)}
+                />
+              )}
+
+
+
 
               <div
                 className="flex flex-col-reverse items-stretch justify-between gap-4 border-t pt-6 md:flex-row md:items-center"
