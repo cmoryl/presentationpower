@@ -6,6 +6,7 @@ import { useDeckStore } from "@/lib/deck-store";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { personalizeSlides } from "@/lib/personalize.functions";
 import { retrieveKnowledgeForBrief, abAssign, abLogEvent } from "@/lib/admin.functions";
+import { planDeckStrategy, type DeckStrategy, type StrategySection } from "@/lib/ai-strategist.functions";
 import { byId, SECTION_FRAMEWORKS, NARRATIVE_ARCHETYPES, type BrandMode } from "@/lib/taxonomy";
 import { TRANSPERFECT_SUBCOMPANIES } from "@/lib/brand-guides";
 import { brandModeWithSubCompany, getSubCompanyProfile } from "@/lib/brand-profiles";
