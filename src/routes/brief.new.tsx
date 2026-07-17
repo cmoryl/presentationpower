@@ -52,6 +52,7 @@ const inputCls =
 function BriefWizard() {
   const navigate = useNavigate();
   const create = useDeckStore((s) => s.createBriefAndAssemble);
+  const setDeckContext = useDeckStore((s) => s.setDeckContext);
   const applyAi = useDeckStore((s) => s.applyAiContent);
   const decks = useDeckStore((s) => s.decks);
   const personalize = useServerFn(personalizeSlides);
