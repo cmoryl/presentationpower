@@ -95,6 +95,8 @@ export type DeckContext = {
   }>;
   knowledgeSynthesis?: string | null;
   strategy?: DeckStrategySnapshot;
+  lastExportedAt?: string;
+  lastExportKind?: "pptx" | "pdf" | "present";
 };
 
 
