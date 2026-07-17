@@ -63,6 +63,7 @@ function BriefWizard() {
   const decks = useDeckStore((s) => s.decks);
   const personalize = useServerFn(personalizeSlides);
   const retrieveKnowledge = useServerFn(retrieveKnowledgeForBrief);
+  const synthesizeKnowledge = useServerFn(synthesizeKnowledgeForBrief);
   const planStrategyFn = useServerFn(planDeckStrategy);
   const assignVariantFn = useServerFn(abAssign);
   const logAbEventFn = useServerFn(abLogEvent);
@@ -72,6 +73,11 @@ function BriefWizard() {
   const [showAllArchetypes, setShowAllArchetypes] = useState(false);
   const [paletteSel, setPaletteSel] = useState<PaletteSelection>({ experimentId: null, variantId: null, paletteOverride: null });
   const [kbUsedCount, setKbUsedCount] = useState<number>(0);
+  const [kbSelected, setKbSelected] = useState<SynthesizedSnippet[]>([]);
+  const [kbSynthesis, setKbSynthesis] = useState<string | null>(null);
+  const [kbSynthesized, setKbSynthesized] = useState(false);
+  const [showKbPanel, setShowKbPanel] = useState(false);
+
   // AI Narrative Strategist (Phase B) — optional pass before deck generation.
   const [strategy, setStrategy] = useState<DeckStrategy | null>(null);
   const [strategyStatus, setStrategyStatus] = useState<"idle" | "planning" | "ready" | "error">("idle");
