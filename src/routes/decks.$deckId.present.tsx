@@ -133,7 +133,7 @@ function PresenterView() {
                 }
               }}
               className={cn(
-                "group relative flex-shrink-0 overflow-hidden rounded-md border transition-all outline-none focus-visible:ring-2 focus-visible:ring-aqua-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black",
+                "group relative flex-shrink-0 overflow-hidden rounded-md border transition-all outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-black",
                 active
                   ? "border-white ring-2 ring-white/60 shadow-lg shadow-white/10"
                   : "border-white/15 hover:border-white/40 opacity-60 hover:opacity-100",
