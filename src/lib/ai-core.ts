@@ -139,8 +139,8 @@ export function serializeBrandhubIntel(divisionId: string): string {
   if (intel.competitiveLandscape) {
     const c = intel.competitiveLandscape;
     lines.push(`## Competitive Landscape`);
-    if (c.direct_competitors) lines.push(`Direct: ${norm(c.direct_competitors)}`);
-    if (c.differentiators) lines.push(`Differentiators: ${norm(c.differentiators)}`);
+    if (c.competitors?.length) lines.push(`Competitors: ${norm(c.competitors)}`);
+    if (c.competitive_gaps?.length) lines.push(`Gaps: ${norm(c.competitive_gaps)}`);
   }
   const audience = intel.targetAudience;
   if (audience) {
