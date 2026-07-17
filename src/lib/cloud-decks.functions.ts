@@ -34,7 +34,9 @@ const DeckSchema = z.object({
   brandModeId: z.string(),
   archetypeId: z.string(),
   slides: z.array(SlideSchema),
+  context: z.record(z.string(), z.unknown()).optional(),
 });
+
 
 const SaveInput = z.object({ brief: BriefSchema, deck: DeckSchema });
 
