@@ -559,7 +559,7 @@ function BriefWizard() {
                         abVariantId: paletteSel.variantId,
                         abPaletteOverride: paletteSel.paletteOverride,
                       };
-                      const { deckId } = create(submission);
+                      const { deckId } = create(submission, strategy ? { strategy } : undefined);
                       navigate({ to: "/decks/$deckId", params: { deckId } });
                     }}
                   >
