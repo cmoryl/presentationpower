@@ -156,8 +156,15 @@ export const reviewDeck = createServerFn({ method: "POST" })
       data.strategy
         ? `Intended narrative (from AI Strategist — use to flag drift under category "structure"): ${JSON.stringify(data.strategy)}`
         : "",
+      data.knowledgeFacts && data.knowledgeFacts.length
+        ? `Retrieved knowledge facts (use under category "claims" — flag any deck copy that contradicts, exaggerates, or fabricates specifics vs these facts): ${JSON.stringify(data.knowledgeFacts)}`
+        : "",
+      data.knowledgeSynthesis
+        ? `Knowledge synthesis (brief-specific summary from Deep-RAG): ${data.knowledgeSynthesis}`
+        : "",
       "Slides (JSON):",
       JSON.stringify(data.slides, null, 0),
+
     ]
       .filter(Boolean)
       .join("\n");
