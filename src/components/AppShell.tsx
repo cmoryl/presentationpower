@@ -8,6 +8,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [boost, setBoost] = useContrastBoost();
   const [theme, setTheme] = useTheme();
+  const [adminOpen, setAdminOpen] = useState(false);
   const themes: { id: ThemeMode; label: string }[] = [
     { id: "light", label: "Light" },
     { id: "dark",  label: "Dark" },
