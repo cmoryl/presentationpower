@@ -49,6 +49,24 @@ const SlideInput = z.object({
   content: z.record(z.string(), z.unknown()),
 });
 
+const StrategyInput = z
+  .object({
+    narrativeArc: z.string().optional(),
+    openingHook: z.string().optional(),
+    closingAsk: z.string().optional(),
+    risksToAvoid: z.array(z.string()).optional(),
+    recommendedSections: z
+      .array(
+        z.object({
+          sectionId: z.string(),
+          keyMessage: z.string().optional(),
+          rationale: z.string().optional(),
+        }),
+      )
+      .optional(),
+  })
+  .optional();
+
 const Input = z.object({
   cloudDeckId: z.string().uuid().optional(),
   deckTitle: z.string(),
@@ -62,8 +80,10 @@ const Input = z.object({
       meetingObjective: z.string().optional(),
     })
     .optional(),
+  strategy: StrategyInput,
   slides: z.array(SlideInput).min(1).max(60),
 });
+
 
 export type ReviewDeckInput = z.infer<typeof Input>;
 
