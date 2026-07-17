@@ -6,6 +6,10 @@ import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { cn } from "@/lib/utils";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 
+const focusThumb = (el: HTMLButtonElement | null) => {
+  el?.focus({ preventScroll: true });
+};
+
 export const Route = createFileRoute("/decks/$deckId/present")({
   head: () => ({ meta: [{ title: "Presenting · TransPerfect Modular" }] }),
   component: PresenterView,
