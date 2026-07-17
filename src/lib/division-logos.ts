@@ -11,11 +11,12 @@ export type DivisionLogoSet = {
 
 const B = "/brand-logos";
 
+// Master TransPerfect uses the classic (non-NEXT) wordmark from BrandHUB.
 const TP = {
-  color: `${B}/tp-color.png`,
-  white: `${B}/tp-white.png`,
-  stackedColor: `${B}/tp-stacked-color.png`,
-  stackedWhite: `${B}/tp-stacked-white.png`,
+  color: `${B}/tp-classic-color.svg`,
+  white: `${B}/tp-classic-white.svg`,
+  stackedColor: `${B}/tp-classic-color.svg`,
+  stackedWhite: `${B}/tp-classic-white.svg`,
 } satisfies DivisionLogoSet;
 
 const GLOBALLINK = {
