@@ -24,7 +24,7 @@ export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
   }),
   notFoundComponent: () => (
     <AppShell>
-      <div className="rounded-xl border border-black/10 p-8 text-sm text-black/60">
+      <div className="rounded-xl border border-border p-8 text-sm text-muted-foreground">
         Brand guide not found.{" "}
         <Link to="/knowledge/brand-guides" className="underline">Back to guides</Link>
       </div>
@@ -51,7 +51,7 @@ function BrandGuideView() {
   return (
     <AppShell>
       {/* Breadcrumb */}
-      <div className="text-xs text-black/50">
+      <div className="text-xs text-muted-foreground">
         <Link to="/knowledge" className="hover:underline">Knowledge</Link>
         <span className="mx-2">/</span>
         <Link to="/knowledge/brand-guides" className="hover:underline">Brand Guides</Link>
@@ -77,7 +77,7 @@ function BrandGuideView() {
         <p className="mt-6 max-w-2xl text-sm leading-[140%] opacity-80">{guide.intro}</p>
 
         {logos?.white || logos?.color ? (
-          <div className="mt-8 inline-flex items-center rounded-2xl bg-white/10 px-5 py-4 ring-1 ring-white/20 backdrop-blur">
+          <div className="mt-8 inline-flex items-center rounded-2xl bg-card/10 px-5 py-4 ring-1 ring-white/20 backdrop-blur">
             <img
               src={logos.white ?? logos.color!}
               alt={`${guide.title} logo`}
@@ -104,9 +104,9 @@ function BrandGuideView() {
         <Section title="Core values" eyebrow="01">
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
             {guide.values.map((v) => (
-              <div key={v.label} className="rounded-xl border border-black/10 bg-white p-4">
+              <div key={v.label} className="rounded-xl border border-border bg-card p-4">
                 <div className="text-sm font-semibold" style={{ color: hero }}>{v.label}</div>
-                <div className="mt-1 text-xs text-black/60">{v.description}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{v.description}</div>
               </div>
             ))}
           </div>
@@ -116,9 +116,9 @@ function BrandGuideView() {
       {/* Logo */}
       <Section title="Logo system" eyebrow="02">
         {guide.logoNotes && (
-          <div className="rounded-2xl border border-black/10 bg-white p-6">
+          <div className="rounded-2xl border border-border bg-card p-6">
             <div className="text-lg font-semibold">{guide.logoNotes.headline}</div>
-            <p className="mt-2 max-w-3xl text-sm text-black/70">{guide.logoNotes.body}</p>
+            <p className="mt-2 max-w-3xl text-sm text-foreground/80">{guide.logoNotes.body}</p>
           </div>
         )}
         {logos && (
@@ -154,8 +154,8 @@ function BrandGuideView() {
                 {r.do ? "DO" : "×"}
               </div>
               <div>
-                <div className="text-sm font-semibold text-black">{r.title}</div>
-                <div className="mt-0.5 text-xs text-black/60">{r.description}</div>
+                <div className="text-sm font-semibold text-foreground">{r.title}</div>
+                <div className="mt-0.5 text-xs text-muted-foreground">{r.description}</div>
               </div>
             </div>
           ))}
@@ -170,11 +170,11 @@ function BrandGuideView() {
         <SwatchRow label="Neutrals" swatches={guide.neutrals} />
 
         <div className="mt-8">
-          <div className="text-xs uppercase tracking-[0.25em] text-black/50">Full web ramps</div>
+          <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Full web ramps</div>
           <div className="mt-3 space-y-3">
             {guide.ramps.map((ramp) => (
               <div key={ramp.name} className="flex items-center gap-4">
-                <div className="w-28 text-xs text-black/60">{ramp.name}</div>
+                <div className="w-28 text-xs text-muted-foreground">{ramp.name}</div>
                 <div className="flex flex-1 gap-1">
                   {ramp.stops.map((s) => (
                     <div key={s} className="h-10 flex-1 rounded" style={{ background: s }} title={s} />
@@ -188,19 +188,19 @@ function BrandGuideView() {
 
       {/* Typography */}
       <Section title="Typography" eyebrow="04">
-        <div className="rounded-2xl border border-black/10 bg-white p-6">
+        <div className="rounded-2xl border border-border bg-card p-6">
           <div className="flex flex-wrap items-baseline gap-4">
             <div className="text-4xl font-medium tracking-[-0.04em]">{guide.typefacePrimary}</div>
-            <div className="text-sm text-black/50">Primary typeface · open source (Google Fonts)</div>
+            <div className="text-sm text-muted-foreground">Primary typeface · open source (Google Fonts)</div>
           </div>
-          <div className="mt-2 text-sm text-black/60">
-            Web-friendly fallback: <span className="font-medium text-black/80">{guide.typefaceWeb}</span>
+          <div className="mt-2 text-sm text-muted-foreground">
+            Web-friendly fallback: <span className="font-medium text-foreground/85">{guide.typefaceWeb}</span>
           </div>
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
-            <div className="text-xs uppercase tracking-[0.25em] text-black/50">Headings</div>
+            <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Headings</div>
             <div className="mt-3 space-y-4">
               {guide.headingScale.map((s) => (
                 <TypeSample key={s.label} style={s} />
@@ -208,7 +208,7 @@ function BrandGuideView() {
             </div>
           </div>
           <div>
-            <div className="text-xs uppercase tracking-[0.25em] text-black/50">Body</div>
+            <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Body</div>
             <div className="mt-3 space-y-4">
               {guide.bodyScale.map((s) => (
                 <TypeSample key={s.label} style={s} />
@@ -223,9 +223,9 @@ function BrandGuideView() {
         <Section title="Imagery" eyebrow="05">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {guide.photography && (
-              <div className="rounded-2xl border border-black/10 bg-white p-6">
+              <div className="rounded-2xl border border-border bg-card p-6">
                 <div className="text-sm font-semibold">Photography</div>
-                <p className="mt-2 text-sm text-black/70">{guide.photography}</p>
+                <p className="mt-2 text-sm text-foreground/80">{guide.photography}</p>
               </div>
             )}
             {guide.brandVisuals && (
@@ -246,11 +246,11 @@ function BrandGuideView() {
         <Section title="Sub-brand architecture" eyebrow="06">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {guide.subBrands.map((group) => (
-              <div key={group.group} className="rounded-2xl border border-black/10 bg-white p-5">
+              <div key={group.group} className="rounded-2xl border border-border bg-card p-5">
                 <div className="text-xs uppercase tracking-[0.25em]" style={{ color: hero }}>
                   {group.group}
                 </div>
-                <ul className="mt-3 space-y-1.5 text-sm text-black/80">
+                <ul className="mt-3 space-y-1.5 text-sm text-foreground/85">
                   {group.items.map((item) => (
                     <li key={item} className="flex items-center gap-2">
                       <span className="h-1 w-1 rounded-full" style={{ background: hero }} />
@@ -267,9 +267,9 @@ function BrandGuideView() {
       {/* Iconography */}
       {guide.iconography && (
         <Section title="Iconography" eyebrow="07">
-          <div className="rounded-2xl border border-black/10 bg-white p-6">
+          <div className="rounded-2xl border border-border bg-card p-6">
             <div className="text-lg font-semibold">{guide.iconography.headline}</div>
-            <p className="mt-2 max-w-3xl text-sm text-black/70">{guide.iconography.body}</p>
+            <p className="mt-2 max-w-3xl text-sm text-foreground/80">{guide.iconography.body}</p>
             {guide.iconography.sourceUrl && (
               <a
                 href={guide.iconography.sourceUrl}
@@ -290,11 +290,11 @@ function BrandGuideView() {
         <Section title="Social image watermarks" eyebrow="08">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {guide.socialMedia.map((platform) => (
-              <div key={platform.platform} className="rounded-2xl border border-black/10 bg-white p-6">
+              <div key={platform.platform} className="rounded-2xl border border-border bg-card p-6">
                 <div className="text-xs uppercase tracking-[0.25em]" style={{ color: hero }}>
                   {platform.platform}
                 </div>
-                <ul className="mt-3 space-y-2 text-sm text-black/80">
+                <ul className="mt-3 space-y-2 text-sm text-foreground/85">
                   {platform.rules.map((r) => (
                     <li key={r} className="flex gap-2">
                       <span className="mt-2 h-1 w-1 shrink-0 rounded-full" style={{ background: hero }} />
@@ -310,7 +310,7 @@ function BrandGuideView() {
 
       {intel && <BrandhubIntelSections intel={intel} hero={hero} accent={accent} />}
 
-      <div className="my-16 flex flex-wrap items-center justify-between gap-3 border-t border-black/10 pt-6 text-xs text-black/50">
+      <div className="my-16 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground">
 
         <div>
           {guide.title} · Brand Guidelines v{guide.version} · Last updated {guide.updatedAt}
@@ -329,7 +329,7 @@ function Section({ title, eyebrow, children }: { title: string; eyebrow: string;
   return (
     <section className="mt-14">
       <div className="flex items-baseline gap-4">
-        <div className="text-xs uppercase tracking-[0.3em] text-black/40">{eyebrow}</div>
+        <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">{eyebrow}</div>
         <h2 className="text-2xl font-semibold tracking-[-0.02em]">{title}</h2>
       </div>
       <div className="mt-6">{children}</div>
@@ -348,10 +348,10 @@ function SwatchRow({
 }) {
   return (
     <div className="mt-4 first:mt-0">
-      <div className="text-xs uppercase tracking-[0.25em] text-black/50">{label}</div>
+      <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">{label}</div>
       <div className={`mt-2 grid gap-3 ${large ? "grid-cols-1 md:grid-cols-2" : "grid-cols-2 md:grid-cols-3 lg:grid-cols-5"}`}>
         {swatches.map((c) => (
-          <div key={c.hex} className="overflow-hidden rounded-xl border border-black/10 bg-white">
+          <div key={c.hex} className="overflow-hidden rounded-xl border border-border bg-card">
             <div
               className={`flex items-end p-4 ${large ? "h-32" : "h-20"}`}
               style={{ background: c.hex, color: c.onDark ? "#fff" : "#03002C" }}
@@ -360,9 +360,9 @@ function SwatchRow({
             </div>
             <div className="p-3">
               <div className="text-sm font-semibold">{c.name}</div>
-              {c.role && <div className="text-[11px] text-black/50">{c.role}</div>}
+              {c.role && <div className="text-[11px] text-muted-foreground">{c.role}</div>}
               {(c.pantone || c.rgb) && (
-                <div className="mt-1 space-y-0.5 text-[10px] text-black/50">
+                <div className="mt-1 space-y-0.5 text-[10px] text-muted-foreground">
                   {c.pantone && <div>{c.pantone}</div>}
                   {c.rgb && <div>RGB {c.rgb}</div>}
                   {c.cmyk && <div>CMYK {c.cmyk}</div>}
@@ -378,10 +378,10 @@ function SwatchRow({
 
 function TypeSample({ style }: { style: TypeStyle }) {
   return (
-    <div className="rounded-xl border border-black/10 bg-white p-4">
+    <div className="rounded-xl border border-border bg-card p-4">
       <div className="flex items-baseline justify-between gap-4">
-        <div className="text-[11px] uppercase tracking-[0.25em] text-black/50">{style.label}</div>
-        <div className="text-[10px] text-black/40">
+        <div className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">{style.label}</div>
+        <div className="text-[10px] text-muted-foreground">
           {style.sizePx}px · {style.weight} · track {style.tracking} · lead {style.leading}
         </div>
       </div>
@@ -464,7 +464,7 @@ function BrandhubIntelSections({
             {intel.competitiveAdvantages.map((c, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-black/10 bg-white p-4 text-sm text-black/80"
+                className="rounded-xl border border-border bg-card p-4 text-sm text-foreground/85"
               >
                 <div
                   className="mb-1 text-[10px] font-semibold uppercase tracking-[0.25em]"
@@ -483,7 +483,7 @@ function BrandhubIntelSections({
         <Section title="Competitive landscape" eyebrow="12">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {competitors.length > 0 && (
-              <div className="rounded-2xl border border-black/10 bg-white p-6">
+              <div className="rounded-2xl border border-border bg-card p-6">
                 <div className="text-xs uppercase tracking-[0.25em]" style={{ color: hero }}>
                   Competitors tracked
                 </div>
@@ -491,7 +491,7 @@ function BrandhubIntelSections({
                   {competitors.map((c) => (
                     <span
                       key={c}
-                      className="rounded-full border border-black/10 bg-black/[0.03] px-3 py-1 text-xs text-black/80"
+                      className="rounded-full border border-border bg-foreground/[0.05] px-3 py-1 text-xs text-foreground/85"
                     >
                       {c}
                     </span>
@@ -500,11 +500,11 @@ function BrandhubIntelSections({
               </div>
             )}
             {gaps.length > 0 && (
-              <div className="rounded-2xl border border-black/10 bg-white p-6">
+              <div className="rounded-2xl border border-border bg-card p-6">
                 <div className="text-xs uppercase tracking-[0.25em]" style={{ color: hero }}>
                   Competitive gaps
                 </div>
-                <ul className="mt-3 space-y-2 text-sm text-black/80">
+                <ul className="mt-3 space-y-2 text-sm text-foreground/85">
                   {gaps.slice(0, 8).map((g, i) => (
                     <li key={i} className="flex gap-2">
                       <span
@@ -525,32 +525,32 @@ function BrandhubIntelSections({
         <Section title="Cultural & global readiness" eyebrow="13">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             {markets.length > 0 && (
-              <div className="rounded-2xl border border-black/10 bg-white p-6">
+              <div className="rounded-2xl border border-border bg-card p-6">
                 <div className="text-xs uppercase tracking-[0.25em]" style={{ color: hero }}>
                   Primary markets
                 </div>
-                <ul className="mt-3 space-y-1 text-sm text-black/80">
+                <ul className="mt-3 space-y-1 text-sm text-foreground/85">
                   {markets.map((m) => (
                     <li key={m}>· {m}</li>
                   ))}
                 </ul>
                 {typeof readiness === "number" && (
-                  <div className="mt-4 rounded-lg bg-black/[0.04] p-3 text-xs">
-                    <div className="text-black/50">Global readiness</div>
+                  <div className="mt-4 rounded-lg bg-foreground/[0.06] p-3 text-xs">
+                    <div className="text-muted-foreground">Global readiness</div>
                     <div className="text-2xl font-semibold" style={{ color: hero }}>
                       {readiness}
-                      <span className="text-sm text-black/40">/100</span>
+                      <span className="text-sm text-muted-foreground">/100</span>
                     </div>
                   </div>
                 )}
               </div>
             )}
             {cultural.length > 0 && (
-              <div className="rounded-2xl border border-black/10 bg-white p-6">
+              <div className="rounded-2xl border border-border bg-card p-6">
                 <div className="text-xs uppercase tracking-[0.25em]" style={{ color: hero }}>
                   Cultural considerations
                 </div>
-                <ul className="mt-3 space-y-2 text-sm text-black/80">
+                <ul className="mt-3 space-y-2 text-sm text-foreground/85">
                   {cultural.map((c, i) => (
                     <li key={i}>· {c}</li>
                   ))}
@@ -558,11 +558,11 @@ function BrandhubIntelSections({
               </div>
             )}
             {locPriorities.length > 0 && (
-              <div className="rounded-2xl border border-black/10 bg-white p-6">
+              <div className="rounded-2xl border border-border bg-card p-6">
                 <div className="text-xs uppercase tracking-[0.25em]" style={{ color: hero }}>
                   Localization priorities
                 </div>
-                <ul className="mt-3 space-y-2 text-sm text-black/80">
+                <ul className="mt-3 space-y-2 text-sm text-foreground/85">
                   {locPriorities.map((p, i) => (
                     <li key={i}>· {p}</li>
                   ))}
@@ -579,7 +579,7 @@ function BrandhubIntelSections({
             {growth.slice(0, 8).map((g, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-black/10 bg-white p-4"
+                className="rounded-xl border border-border bg-card p-4"
               >
                 <div className="flex items-center gap-2">
                   {g.priority && (
@@ -598,14 +598,14 @@ function BrandhubIntelSections({
                     </span>
                   )}
                   {typeof g.confidence === "number" && (
-                    <span className="text-[10px] text-black/40">
+                    <span className="text-[10px] text-muted-foreground">
                       confidence {Math.round(g.confidence * 100)}%
                     </span>
                   )}
                 </div>
-                <div className="mt-2 text-sm text-black/80">{g.recommendation}</div>
+                <div className="mt-2 text-sm text-foreground/85">{g.recommendation}</div>
                 {g.rationale && (
-                  <div className="mt-1 text-xs text-black/50">{g.rationale}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">{g.rationale}</div>
                 )}
               </div>
             ))}
@@ -619,7 +619,7 @@ function BrandhubIntelSections({
             {ke.slice(0, 12).map((entry, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-black/10 bg-white p-4 text-sm text-black/75"
+                className="rounded-xl border border-border bg-card p-4 text-sm text-foreground/85"
               >
                 <div
                   className="mb-1 text-[10px] font-semibold uppercase tracking-[0.25em]"
@@ -632,7 +632,7 @@ function BrandhubIntelSections({
             ))}
           </div>
           {ke.length > 12 && (
-            <div className="mt-3 text-xs text-black/50">
+            <div className="mt-3 text-xs text-muted-foreground">
               +{ke.length - 12} more entries in the knowledge base
             </div>
           )}
@@ -644,7 +644,7 @@ function BrandhubIntelSections({
 
 function IntelCard({ label, body }: { label: string; body: string }) {
   return (
-    <div className="rounded-2xl bg-white/10 p-5 backdrop-blur-sm ring-1 ring-white/20">
+    <div className="rounded-2xl bg-card/10 p-5 backdrop-blur-sm ring-1 ring-white/20">
       <div className="text-[10px] font-semibold uppercase tracking-[0.3em] opacity-70">
         {label}
       </div>
@@ -664,14 +664,14 @@ function VoiceCard({
 }) {
   if (!values.length) {
     return (
-      <div className="rounded-xl border border-dashed border-black/15 p-4">
-        <div className="text-[10px] uppercase tracking-[0.25em] text-black/40">{label}</div>
-        <div className="mt-2 text-xs text-black/30">—</div>
+      <div className="rounded-xl border border-dashed border-border p-4">
+        <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">{label}</div>
+        <div className="mt-2 text-xs text-muted-foreground/70">—</div>
       </div>
     );
   }
   return (
-    <div className="rounded-xl border border-black/10 bg-white p-4">
+    <div className="rounded-xl border border-border bg-card p-4">
       <div className="text-[10px] uppercase tracking-[0.25em]" style={{ color: hero }}>
         {label}
       </div>
@@ -679,7 +679,7 @@ function VoiceCard({
         {values.map((v) => (
           <span
             key={v}
-            className="rounded-full bg-black/[0.04] px-2.5 py-1 text-xs text-black/80"
+            className="rounded-full bg-foreground/[0.06] px-2.5 py-1 text-xs text-foreground/85"
           >
             {v}
           </span>
@@ -692,7 +692,7 @@ function VoiceCard({
 function LogoTile({ label, src, bg, border }: { label: string; src: string; bg: string; border?: boolean }) {
   return (
     <div
-      className={`flex flex-col items-center justify-center gap-3 rounded-2xl p-6 ${border ? "border border-black/10" : ""}`}
+      className={`flex flex-col items-center justify-center gap-3 rounded-2xl p-6 ${border ? "border border-border" : ""}`}
       style={{ background: bg, minHeight: 160 }}
     >
       <img src={src} alt={label} className="max-h-20 w-auto max-w-full object-contain" loading="lazy" />
