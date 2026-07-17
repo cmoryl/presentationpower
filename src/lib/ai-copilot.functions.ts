@@ -417,7 +417,7 @@ export const copilotTurn = createServerFn({ method: "POST" })
     }
 
     // Diff working vs originals.
-    const changed: CopilotResult extends { ok: true; updatedSlides: infer U } ? U : never = [];
+    const changed: CopilotUpdatedSlide[] = [];
     const changedIndices: number[] = [];
     for (const s of working) {
       const o = originals.get(s.index)!;
