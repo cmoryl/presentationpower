@@ -112,7 +112,7 @@ function DeckEditor() {
                 >
                   <div className="aspect-[16/9] bg-white">
                     <ScaledSlide>
-                      {variant && <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} />}
+                      {variant && <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />}
                     </ScaledSlide>
                   </div>
                   <div className="border-t border-black/10 bg-white px-3 py-2 text-xs">
