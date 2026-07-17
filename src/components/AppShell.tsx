@@ -165,7 +165,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div
               role="radiogroup"
               aria-label="Color theme"
-              className="ml-1 inline-flex items-center rounded-full border border-white/50 bg-white/40 p-0.5 text-xs shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] dark:!border-white/10 dark:!bg-white/[0.04] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]"
+              className="ml-1 inline-flex items-center rounded-full border border-white/40 bg-white/30 p-0.5 text-xs dark:!border-white/10 dark:!bg-white/[0.03]"
             >
               {themes.map((t) => {
                 const on = theme === t.id;
@@ -178,8 +178,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                     onClick={() => setTheme(t.id)}
                     className={`rounded-full px-2.5 py-1 transition ${
                       on
-                        ? "bg-white/80 text-[#03002C] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_2px_6px_-2px_rgba(11,42,74,0.3)] dark:!bg-gradient-to-b dark:!from-white/15 dark:!to-white/[0.04] dark:!text-white dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]"
-                        : "text-black/70 hover:text-black dark:text-white/70 dark:hover:text-white"
+                        ? "bg-white/70 text-[#03002C] ring-1 ring-black/[0.04] dark:!bg-white/[0.08] dark:!text-white dark:!ring-white/10"
+                        : "text-black/60 hover:text-black dark:text-white/65 dark:hover:text-white"
                     }`}
                   >
                     {t.label}
@@ -195,8 +195,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               title="Auto-adjust text contrast on glass surfaces (WCAG AA)"
               className={`ml-1 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition ${
                 boost
-                  ? "border-white/60 bg-white/80 text-[#03002C] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_4px_12px_-4px_rgba(11,42,74,0.3)] dark:!border-[#A1FBF9]/30 dark:!bg-[#A1FBF9]/10 dark:!text-[#A1FBF9] dark:shadow-[inset_0_1px_0_0_rgba(161,251,249,0.2)]"
-                  : "border-white/50 bg-white/40 text-black/70 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] hover:bg-white/60 dark:!border-white/10 dark:!bg-white/[0.04] dark:text-white/70 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] dark:hover:!bg-white/[0.08]"
+                  ? "border-[#0057FF]/25 bg-white/70 text-[#03002C] dark:!border-[#A1FBF9]/40 dark:!bg-[#A1FBF9]/[0.08] dark:!text-[#A1FBF9]"
+                  : "border-white/40 bg-white/25 text-black/65 hover:bg-white/50 dark:!border-white/10 dark:!bg-white/[0.03] dark:text-white/65 dark:hover:!bg-white/[0.06]"
               }`}
             >
               <span aria-hidden="true">◐</span>
