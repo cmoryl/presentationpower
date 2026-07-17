@@ -93,7 +93,7 @@ export function BrandLockup({
       role="img"
       aria-label={`${logo.wordmark}${divisionLine ? " — " + divisionLine : ""}${clientLogoUrl ? " × client" : ""} lockup`}
     >
-      {showMark && !useOfficialWordmark && (
+      {showMark && !useOfficialWordmark && !useOfficialImage && (
         <div
           className="flex items-center justify-center font-semibold tracking-tight"
           style={{
@@ -110,7 +110,13 @@ export function BrandLockup({
         </div>
       )}
       <div className="flex min-w-0 max-w-full flex-col leading-none">
-        {useOfficialWordmark ? (
+        {useOfficialImage ? (
+          <img
+            src={officialLogoUrl}
+            alt={`${logo.wordmark} logo`}
+            style={{ height: officialImageHeight, width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }}
+          />
+        ) : useOfficialWordmark ? (
           <TransPerfectWordmark height={wordmarkHeight} />
         ) : (
           <div className="min-w-0 max-w-full break-words font-semibold tracking-wide" style={{ fontSize: dims.wordPx, letterSpacing: "0.02em" }}>
@@ -120,7 +126,7 @@ export function BrandLockup({
         {showDivision && divisionLine && (
           <div
             className="max-w-full uppercase leading-tight tracking-[0.14em] opacity-70 [overflow-wrap:anywhere]"
-            style={{ fontSize: dims.dividerPx, marginTop: useOfficialWordmark ? 6 : 4 }}
+            style={{ fontSize: dims.dividerPx, marginTop: useOfficialWordmark || useOfficialImage ? 6 : 4 }}
           >
             {divisionLine}
           </div>
