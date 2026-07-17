@@ -132,9 +132,19 @@ type DeckState = {
 
 // Assembly pipeline — deterministic seed content for the MVP.
 // AI-driven personalization slots into personalizeSlide() later.
-function assembleDeck(brief: Brief): Deck {
+// An optional `strategyOverride` lets the AI Narrative Strategist inject
+// a specific section list + variant/layout preferences.
+function assembleDeck(
+  brief: Brief,
+  strategyOverride?: {
+    sections: string[];
+    variantById?: Record<string, string>;
+    layoutById?: Record<string, string>;
+  },
+): Deck {
   const arch = byId(NARRATIVE_ARCHETYPES, brief.archetypeId);
-  const recipe = (arch?.sectionRecipe ?? []).slice(0, Math.max(brief.lengthTarget, 4));
+  const defaultRecipe = (arch?.sectionRecipe ?? []).slice(0, Math.max(brief.lengthTarget, 4));
+  const recipe = strategyOverride?.sections?.length ? strategyOverride.sections : defaultRecipe;
   const profile =
     brief.subCompany && brief.brandModeId === "bm-subcompany"
       ? getSubCompanyProfile(brief.brandModeId, brief.subCompany)
@@ -145,14 +155,19 @@ function assembleDeck(brief: Brief): Deck {
     const sf = byId(SECTION_FRAMEWORKS, sfId);
     const permitted = variantsForSection(sfId).filter((v) => !restricted.has(v.familyId));
     const pool = permitted.length > 0 ? permitted : variantsForSection(sfId);
-    // Rank: preferredVariantIds first, then original order.
+    // Rank: strategy-suggested first, then preferredVariantIds, then original order.
+    const suggestedVariantId = strategyOverride?.variantById?.[sfId];
     const options = [...pool].sort((a, b) => {
-      const ap = preferred.has(a.id) ? 0 : 1;
-      const bp = preferred.has(b.id) ? 0 : 1;
-      return ap - bp;
+      const av = a.id === suggestedVariantId ? -1 : preferred.has(a.id) ? 0 : 1;
+      const bv = b.id === suggestedVariantId ? -1 : preferred.has(b.id) ? 0 : 1;
+      return av - bv;
     });
     const variant = options[0] ?? MODULE_VARIANTS[0];
-    const layoutId = variant.permittedLayoutIds[0];
+    const suggestedLayoutId = strategyOverride?.layoutById?.[sfId];
+    const layoutId =
+      suggestedLayoutId && variant.permittedLayoutIds.includes(suggestedLayoutId)
+        ? suggestedLayoutId
+        : variant.permittedLayoutIds[0];
     return {
       id: nanoid(8),
       position: i,
