@@ -40,9 +40,9 @@ function OverviewView() {
   const tokensPerCall = t.aiCalls ? Math.round(t.aiTokens / t.aiCalls) : 0;
 
   const heroStats = [
-    { label: "AI CALLS", value: t.aiCalls.toLocaleString(), delta: `${successRate.toFixed(1)}% success`, color: BRAND.blue, trend: q.data.aiPerDay.slice(-14) },
+    { label: "DECKS", value: t.decks.toLocaleString(), delta: `${t.decksInWindow ?? 0} created · 30d`, color: BRAND.blue, trend: q.data.decksPerDay?.slice(-14) },
+    { label: "AI CALLS", value: t.aiCalls.toLocaleString(), delta: `${successRate.toFixed(1)}% success`, color: BRAND.lavender, trend: q.data.aiPerDay.slice(-14) },
     { label: "IMAGES", value: t.imagesGenerated.toLocaleString(), delta: `${t.imageEvents} total events`, color: BRAND.pink, trend: q.data.imageryPerDay.slice(-14) },
-    { label: "DECKS", value: t.decks.toLocaleString(), delta: `${t.users} active users`, color: BRAND.lavender },
     { label: "KNOWLEDGE", value: (t.knowledgeEntries + (t.oracleKnowledge ?? 0)).toLocaleString(), delta: `${t.brandIntelligence ?? 0} brand intel`, color: BRAND.aqua },
   ];
 
