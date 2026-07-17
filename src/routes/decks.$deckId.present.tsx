@@ -29,8 +29,12 @@ function PresenterView() {
       else if (e.key === "ArrowLeft" || e.key === "PageUp") setI((n) => Math.max(n - 1, 0));
       else if (e.key === "Home") setI(0);
       else if (e.key === "End") setI(deck.slides.length - 1);
+      else if (e.key === "t" || e.key === "T") setStripOpen((v) => !v);
       else if (e.key === "Escape") navigate({ to: "/decks/$deckId", params: { deckId } });
     };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [deck.slides.length, deckId, navigate]);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [deck.slides.length, deckId, navigate]);
