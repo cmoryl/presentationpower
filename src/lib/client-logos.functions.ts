@@ -76,8 +76,11 @@ export const listClientLogos = createServerFn({ method: "GET" })
       ),
     );
     const urlMap = new Map<string, string>();
-    if (allPaths.length) {
-      const { data: signed } = await s.storage.from(BUCKET).createSignedUrls(allPaths, 3600);
+    // Supabase caps createSignedUrls per call; batch to be safe with large repos.
+    const BATCH = 200;
+    for (let i = 0; i < allPaths.length; i += BATCH) {
+      const chunk = allPaths.slice(i, i + BATCH);
+      const { data: signed } = await s.storage.from(BUCKET).createSignedUrls(chunk, 3600);
       for (const entry of signed ?? []) {
         if (entry.signedUrl) urlMap.set(entry.path, entry.signedUrl);
       }
