@@ -97,7 +97,7 @@ function OracleAskView() {
             >
               <option value="master">All divisions</option>
               {BRAND_MODES.map((m) => (
-                <option key={m.id} value={m.id}>{m.label ?? m.id}</option>
+                <option key={m.id} value={m.id}>{m.name}</option>
               ))}
             </select>
           </label>
