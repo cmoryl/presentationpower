@@ -121,6 +121,22 @@ function BrandGuideView() {
             <p className="mt-2 max-w-3xl text-sm text-black/70">{guide.logoNotes.body}</p>
           </div>
         )}
+        {logos && (
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {logos.color && (
+              <LogoTile label="Horizontal · Color" src={logos.color} bg="#ffffff" border />
+            )}
+            {logos.stackedColor && (
+              <LogoTile label="Stacked · Color" src={logos.stackedColor} bg="#ffffff" border />
+            )}
+            {logos.white && (
+              <LogoTile label="Horizontal · Reversed" src={logos.white} bg={hero} />
+            )}
+            {logos.stackedWhite && (
+              <LogoTile label="Stacked · Reversed" src={logos.stackedWhite} bg={hero} />
+            )}
+          </div>
+        )}
         <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
           {guide.logoRules.map((r) => (
             <div
