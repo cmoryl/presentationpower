@@ -159,9 +159,47 @@ function BrandAssetsAdminView() {
       <section>
         <h2 className="text-lg font-semibold">Import BrandHUB seed</h2>
         <p className="mt-1 text-sm text-black/60">
-          Paste the contents of <code>public/knowledge-export/database-seed.json</code> from the BrandHUB project.
+          Fetch directly from the BrandHUB export URL, or paste the contents of <code>public/knowledge-export/database-seed.json</code>.
           This upserts Oracle synthesis, Oracle knowledge base entries, and per-division brand intelligence rows.
         </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <button
+            onClick={async () => {
+              setStatus("Fetching seed from BrandHUB…");
+              try {
+                const res = await fetch("https://brandhubcreator.lovable.app/knowledge-export/database-seed.json", { cache: "no-store" });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const text = await res.text();
+                JSON.parse(text); // validate
+                setSeedText(text);
+                setStatus(`Fetched ${(text.length / 1024).toFixed(1)} KB. Ready to import.`);
+              } catch (e) {
+                setStatus(`Fetch failed: ${(e as Error).message}`);
+              }
+            }}
+            className="rounded-full border border-[#003FC7] px-4 py-1.5 text-xs font-semibold text-[#003FC7]"
+          >
+            Fetch from BrandHUB URL
+          </button>
+          <button
+            onClick={async () => {
+              setStatus("Fetching + importing…");
+              try {
+                const res = await fetch("https://brandhubcreator.lovable.app/knowledge-export/database-seed.json", { cache: "no-store" });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const text = await res.text();
+                JSON.parse(text);
+                setSeedText(text);
+                setTimeout(() => importSeed.mutate(), 0);
+              } catch (e) {
+                setStatus(`Fetch failed: ${(e as Error).message}`);
+              }
+            }}
+            className="rounded-full bg-[#03002C] px-4 py-1.5 text-xs font-semibold text-white"
+          >
+            Fetch & import now
+          </button>
+        </div>
         <textarea
           value={seedText}
           onChange={(e) => setSeedText(e.target.value)}
@@ -182,6 +220,7 @@ function BrandAssetsAdminView() {
             {importSeed.isPending ? "Importing…" : "Import seed"}
           </button>
         </div>
+
       </section>
 
       <section>
