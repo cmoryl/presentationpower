@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { DeckChat } from "@/components/DeckChat";
 import { IconPicker } from "@/components/IconPicker";
 import { SaveToCloudButton } from "@/components/CloudDeckControls";
+import { BrandReviewPanel } from "@/components/BrandReviewPanel";
 import { useDeckStore, type DeckClientLogo } from "@/lib/deck-store";
 import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.functions";
 
