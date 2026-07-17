@@ -11,69 +11,108 @@ export type DivisionLogoSet = {
 
 const B = "/brand-logos";
 
+const TP = {
+  color: `${B}/tp-color.png`,
+  white: `${B}/tp-white.png`,
+  stackedColor: `${B}/tp-stacked-color.png`,
+  stackedWhite: `${B}/tp-stacked-white.png`,
+} satisfies DivisionLogoSet;
+
+const GLOBALLINK = {
+  color: `${B}/globallink-color.png`,
+  stackedColor: `${B}/globallink-stacked-color.png`,
+} satisfies DivisionLogoSet;
+
+const GAMES = {
+  color: `${B}/games-color.png`,
+  white: `${B}/games-white.png`,
+  stackedColor: `${B}/games-stacked-color.png`,
+} satisfies DivisionLogoSet;
+
+const LEGAL = {
+  color: `${B}/legal-color.png`,
+  white: `${B}/legal-white.png`,
+  stackedColor: `${B}/legal-stacked-color.png`,
+} satisfies DivisionLogoSet;
+
+const LIFESCI = {
+  color: `${B}/lifesci-color.png`,
+  white: `${B}/lifesci-white.png`,
+  stackedColor: `${B}/lifesci-stacked-color.png`,
+} satisfies DivisionLogoSet;
+
+const MEDIA = {
+  color: `${B}/media-color.png`,
+  white: `${B}/media-white.png`,
+  stackedColor: `${B}/media-stacked-color.png`,
+} satisfies DivisionLogoSet;
+
+const DIGITAL = {
+  color: `${B}/digital-color.png`,
+  stackedColor: `${B}/digital-stacked-color.png`,
+} satisfies DivisionLogoSet;
+
+const FINANCE = {
+  color: `${B}/finance-color.png`,
+  stackedColor: `${B}/finance-stacked-color.png`,
+} satisfies DivisionLogoSet;
+
+const EXPERIENCE = {
+  color: `${B}/experience-color.png`,
+  stackedColor: `${B}/experience-stacked-color.png`,
+} satisfies DivisionLogoSet;
+
+const LEARN = {
+  color: `${B}/learn-color.png`,
+  stackedColor: `${B}/learn-stacked-color.png`,
+} satisfies DivisionLogoSet;
+
+const DATAFORCE = {
+  color: `${B}/dataforce-color.png`,
+  white: `${B}/dataforce-white.png`,
+  stackedColor: `${B}/dataforce-stacked-color.png`,
+} satisfies DivisionLogoSet;
+
 export const DIVISION_LOGOS: Record<string, DivisionLogoSet> = {
-  master: {
-    color: `${B}/tp-color.png`,
-    white: `${B}/tp-white.png`,
-    stackedColor: `${B}/tp-stacked-color.png`,
-    stackedWhite: `${B}/tp-stacked-white.png`,
-  },
-  transperfect: {
-    color: `${B}/tp-color.png`,
-    white: `${B}/tp-white.png`,
-    stackedColor: `${B}/tp-stacked-color.png`,
-    stackedWhite: `${B}/tp-stacked-white.png`,
-  },
-  globallink: {
-    color: `${B}/globallink-color.png`,
-    stackedColor: `${B}/globallink-stacked-color.png`,
-  },
-  games: {
-    color: `${B}/games-color.png`,
-    white: `${B}/games-white.png`,
-    stackedColor: `${B}/games-stacked-color.png`,
-  },
-  legal: {
-    color: `${B}/legal-color.png`,
-    white: `${B}/legal-white.png`,
-    stackedColor: `${B}/legal-stacked-color.png`,
-  },
-  lifesci: {
-    color: `${B}/lifesci-color.png`,
-    white: `${B}/lifesci-white.png`,
-    stackedColor: `${B}/lifesci-stacked-color.png`,
-  },
-  "life-sciences": {
-    color: `${B}/lifesci-color.png`,
-    white: `${B}/lifesci-white.png`,
-    stackedColor: `${B}/lifesci-stacked-color.png`,
-  },
-  media: {
-    color: `${B}/media-color.png`,
-    white: `${B}/media-white.png`,
-    stackedColor: `${B}/media-stacked-color.png`,
-  },
-  digital: {
-    color: `${B}/digital-color.png`,
-    stackedColor: `${B}/digital-stacked-color.png`,
-  },
-  finance: {
-    color: `${B}/finance-color.png`,
-    stackedColor: `${B}/finance-stacked-color.png`,
-  },
-  experience: {
-    color: `${B}/experience-color.png`,
-    stackedColor: `${B}/experience-stacked-color.png`,
-  },
-  learn: {
-    color: `${B}/learn-color.png`,
-    stackedColor: `${B}/learn-stacked-color.png`,
-  },
-  dataforce: {
-    color: `${B}/dataforce-color.png`,
-    white: `${B}/dataforce-white.png`,
-    stackedColor: `${B}/dataforce-stacked-color.png`,
-  },
+  // BRAND_MODES ids
+  master: TP,
+  "bm-master": TP,
+  "bm-division": GLOBALLINK,
+  "bm-subcompany": TP, // sub-company mode reuses master lockup by default
+  "bm-tp-legal": LEGAL,
+  "bm-tp-media": MEDIA,
+  "bm-tp-games": GAMES,
+  "bm-tp-digital": DIGITAL,
+  "bm-product": TP,
+  "bm-cobrand": TP,
+
+  // BrandGuide slugs
+  "transperfect-master": TP,
+  transperfect: TP,
+  globallink: GLOBALLINK,
+  "transperfect-life-sciences": LIFESCI,
+  "transperfect-legal": LEGAL,
+  "transperfect-media": MEDIA,
+  "transperfect-gaming": GAMES,
+  "transperfect-digital": DIGITAL,
+  "transperfect-finance": FINANCE,
+  "transperfect-experience": EXPERIENCE,
+  "transperfect-learn": LEARN,
+  "transperfect-ip": TP,
+  "transperfect-health": LIFESCI,
+  "transperfect-cobrand": TP,
+  dataforce: DATAFORCE,
+
+  // Convenience aliases
+  legal: LEGAL,
+  lifesci: LIFESCI,
+  "life-sciences": LIFESCI,
+  media: MEDIA,
+  games: GAMES,
+  digital: DIGITAL,
+  finance: FINANCE,
+  experience: EXPERIENCE,
+  learn: LEARN,
 };
 
 export function getDivisionLogos(key?: string | null): DivisionLogoSet | undefined {

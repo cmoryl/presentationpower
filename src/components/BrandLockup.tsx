@@ -1,4 +1,5 @@
 import type { BrandMode } from "@/lib/taxonomy";
+import { getDivisionLogos } from "@/lib/division-logos";
 
 // Inline SVG of the approved TransPerfect horizontal wordmark. Paths inherit
 // `currentColor` so a single component tints for both dark and light chrome.
@@ -71,8 +72,19 @@ export function BrandLockup({
   const logo = brand.logo ?? { mark: brand.name.slice(0, 2).toUpperCase(), wordmark: brand.name };
   const divisionLine = (subCompany ?? logo.divisionLine)?.replace("{client}", clientName ?? "Client");
 
-  const useOfficialWordmark = TP_BRANDS.has(logo.wordmark);
+  // Prefer an official PNG logo when we have one for this brand id. On dark
+  // chrome (color === white) use the white variant; otherwise the color one.
+  const isDarkChrome = /^#?fff(fff)?$/i.test(color) || color.toLowerCase() === "white";
+  const divisionLogos = getDivisionLogos(brand.id);
+  const officialLogoUrl = divisionLogos
+    ? (isDarkChrome ? (divisionLogos.white ?? divisionLogos.color) : (divisionLogos.color ?? divisionLogos.white))
+    : undefined;
+  const useOfficialImage = !!officialLogoUrl;
+  const useOfficialWordmark = !useOfficialImage && TP_BRANDS.has(logo.wordmark);
   const wordmarkHeight = dims.wordmarkPx;
+  // PNG lockups need more vertical presence than the raw wordmark height.
+  const officialImageHeight = Math.round(dims.wordmarkPx * 1.9);
+
 
   return (
     <div
@@ -81,7 +93,7 @@ export function BrandLockup({
       role="img"
       aria-label={`${logo.wordmark}${divisionLine ? " — " + divisionLine : ""}${clientLogoUrl ? " × client" : ""} lockup`}
     >
-      {showMark && !useOfficialWordmark && (
+      {showMark && !useOfficialWordmark && !useOfficialImage && (
         <div
           className="flex items-center justify-center font-semibold tracking-tight"
           style={{
@@ -98,7 +110,13 @@ export function BrandLockup({
         </div>
       )}
       <div className="flex min-w-0 max-w-full flex-col leading-none">
-        {useOfficialWordmark ? (
+        {useOfficialImage ? (
+          <img
+            src={officialLogoUrl}
+            alt={`${logo.wordmark} logo`}
+            style={{ height: officialImageHeight, width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }}
+          />
+        ) : useOfficialWordmark ? (
           <TransPerfectWordmark height={wordmarkHeight} />
         ) : (
           <div className="min-w-0 max-w-full break-words font-semibold tracking-wide" style={{ fontSize: dims.wordPx, letterSpacing: "0.02em" }}>
@@ -108,7 +126,7 @@ export function BrandLockup({
         {showDivision && divisionLine && (
           <div
             className="max-w-full uppercase leading-tight tracking-[0.14em] opacity-70 [overflow-wrap:anywhere]"
-            style={{ fontSize: dims.dividerPx, marginTop: useOfficialWordmark ? 6 : 4 }}
+            style={{ fontSize: dims.dividerPx, marginTop: useOfficialWordmark || useOfficialImage ? 6 : 4 }}
           >
             {divisionLine}
           </div>
