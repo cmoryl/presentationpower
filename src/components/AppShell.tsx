@@ -36,14 +36,17 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/faq", label: "FAQ" },
   ] as const;
 
-  // Liquid glass pills — translucent, refractive edge, inner highlight.
+  // Sleek liquid-glass pills — hairline rings, gradient wash on active, no drop-shadow stacks.
   const pillIdle =
-    "text-black/70 hover:text-black hover:bg-white/50 hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_1px_2px_0_rgba(0,0,0,0.04)] " +
-    "dark:text-white/75 dark:hover:text-white dark:hover:!bg-white/[0.08] dark:hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12),0_1px_0_0_rgba(0,0,0,0.4)]";
+    "relative text-black/65 hover:text-black hover:bg-white/40 " +
+    "dark:text-white/70 dark:hover:text-white dark:hover:!bg-white/[0.05]";
   const pillActive =
-    "bg-white/70 text-[#03002C] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),inset_0_-1px_0_0_rgba(11,42,74,0.08),0_8px_24px_-8px_rgba(11,42,74,0.35)] ring-1 ring-black/5 " +
-    "dark:!bg-gradient-to-b dark:!from-white/[0.14] dark:!to-white/[0.04] dark:!text-white dark:ring-1 dark:!ring-white/15 " +
-    "dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.22),inset_0_-1px_0_0_rgba(0,0,0,0.3),0_10px_30px_-12px_rgba(122,92,255,0.55)]";
+    "relative text-[#03002C] bg-white/60 ring-1 ring-black/[0.04] " +
+    "dark:!text-white dark:!bg-white/[0.06] dark:!ring-white/10 " +
+    // Aqua→violet underline glow instead of a heavy drop shadow
+    "after:pointer-events-none after:absolute after:inset-x-3 after:-bottom-[3px] after:h-px " +
+    "after:bg-gradient-to-r after:from-transparent after:via-[#0057FF]/60 after:to-transparent " +
+    "dark:after:via-[#A1FBF9]/70";
 
   return (
     <div className="min-h-screen bg-[#F5F1EA] text-[#0A0F1C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
