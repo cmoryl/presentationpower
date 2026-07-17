@@ -760,12 +760,26 @@ export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
           const eJson = (await eRes.json()) as { data?: Array<{ embedding: number[] }> };
           const vec = eJson.data?.[0]?.embedding;
           if (vec) {
-            const { data: chunks } = await s.rpc("match_brand_chunks", {
-              query_embedding: `[${vec.join(",")}]`,
+            const filterDivision = await resolveDivisionFilter(data.brandName, data.divisionId);
+            const embeddingLiteral = `[${vec.join(",")}]`;
+            let { data: chunks } = await s.rpc("match_brand_chunks", {
+              query_embedding: embeddingLiteral,
               match_count: 3,
-              filter_division: data.brandName ? data.brandName.toLowerCase().replace(/\s+/g, "-") : null,
+              filter_division: filterDivision,
             });
-            const chunkRows = (chunks ?? []) as Array<{ id: string; asset_id: string; content: string; tags: string[]; similarity: number }>;
+            let chunkRows = (chunks ?? []) as Array<{ id: string; asset_id: string; content: string; tags: string[]; similarity: number }>;
+            // Fallback: if a division filter was applied but returned nothing,
+            // re-run once unfiltered so briefs still get RAG context when the
+            // requested division has no ingested assets (or the divisionId
+            // doesn't line up with what's actually stored on chunks).
+            if (chunkRows.length === 0 && filterDivision) {
+              const { data: unfiltered } = await s.rpc("match_brand_chunks", {
+                query_embedding: embeddingLiteral,
+                match_count: 3,
+                filter_division: null,
+              });
+              chunkRows = (unfiltered ?? []) as typeof chunkRows;
+            }
             // Resolve asset titles
             if (chunkRows.length) {
               const { data: assets } = await s.from("brand_assets").select("id, title").in("id" as any, chunkRows.map((c) => c.asset_id) as any);
