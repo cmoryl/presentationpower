@@ -11,7 +11,7 @@ import {
   byId,
   variantsForSection,
 } from "./taxonomy";
-import { BRAND_PROFILES } from "./brand-profiles";
+import { BRAND_PROFILES, getSubCompanyProfile } from "./brand-profiles";
 import { pickCaseStudy, pickProofLogos, CASE_STUDIES } from "./case-studies";
 
 export type BrandModeId = string;
@@ -24,6 +24,7 @@ export type Brief = {
   meetingObjective: string;
   audience: string;
   brandModeId: BrandModeId;
+  subCompany?: string; // required when brandModeId is "bm-subcompany"
   archetypeId: string;
   lengthTarget: number; // slides
   clientFacts: string;
@@ -78,6 +79,7 @@ export type Deck = {
   title: string;
   briefId: string;
   brandModeId: BrandModeId;
+  subCompany?: string;
   archetypeId: string;
   slides: DeckSlide[];
   clientLogo?: DeckClientLogo | null;
@@ -118,7 +120,10 @@ type DeckState = {
 function assembleDeck(brief: Brief): Deck {
   const arch = byId(NARRATIVE_ARCHETYPES, brief.archetypeId);
   const recipe = (arch?.sectionRecipe ?? []).slice(0, Math.max(brief.lengthTarget, 4));
-  const profile = BRAND_PROFILES[brief.brandModeId];
+  const profile =
+    brief.subCompany && brief.brandModeId === "bm-subcompany"
+      ? getSubCompanyProfile(brief.brandModeId, brief.subCompany)
+      : BRAND_PROFILES[brief.brandModeId];
   const restricted = new Set(profile?.contentScope.restrictedFamilyIds ?? []);
   const preferred = new Set(profile?.contentScope.preferredVariantIds ?? []);
   const slides: DeckSlide[] = recipe.map((sfId, i) => {
@@ -149,6 +154,7 @@ function assembleDeck(brief: Brief): Deck {
     title: `${brief.prospect} — ${arch?.name ?? "Deck"}`,
     briefId: brief.id,
     brandModeId: brief.brandModeId,
+    subCompany: brief.subCompany,
     archetypeId: brief.archetypeId,
     slides,
   };

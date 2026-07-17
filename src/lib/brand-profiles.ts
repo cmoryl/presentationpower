@@ -4,7 +4,7 @@
 //
 // When real logo assets are uploaded, swap `logo` for URL-backed pointers.
 
-import type { BrandLogoLockup, BrandContentScope, BrandRole } from "@/lib/taxonomy";
+import type { BrandLogoLockup, BrandContentScope, BrandRole, BrandMode } from "@/lib/taxonomy";
 
 export type BrandProfile = {
   role: BrandRole;
@@ -40,6 +40,10 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
       preferredVariantIds: ["MV-CASE-SPREAD", "MV-PROOF-STATS-3", "MV-DEC-CHECKLIST", "MV-CTX-COST"],
     },
   },
+  // Sub-company-specific overrides are applied dynamically via
+  // `getSubCompanyProfile(baseId, subCompany)`. Keep the base record above
+  // so generic "Subcompany" still has a fallback before a named division is
+  // selected.
   "bm-division": {
     role: "division",
     parentId: "bm-enterprise",
@@ -148,5 +152,56 @@ export function enrichBrandProfile(
       caseStudyTags: [],
       preferredArchetypes: [],
     },
+  };
+}
+
+// Map a named TransPerfect sub-company onto a base profile. Used by the
+// generic "Subcompany" brand mode so the lockup and content scope always
+// resolve to a real division in the TransPerfect family.
+export function getSubCompanyProfile(baseId: string, subCompany: string): BrandProfile {
+  const base = BRAND_PROFILES[baseId] ?? enrichBrandProfile(baseId, subCompany);
+  const normalized = subCompany.trim();
+
+  // Known sub-companies that already have a dedicated brand mode. Re-use their
+  // content scope so the assembler pulls the right modules.
+  const knownScope = ((): BrandProfile["contentScope"] | undefined => {
+    if (/media/i.test(normalized)) return BRAND_PROFILES["bm-tp-media"]?.contentScope;
+    if (/legal/i.test(normalized) && normalized !== "Legal") return BRAND_PROFILES["bm-tp-legal"]?.contentScope;
+    if (/game/i.test(normalized)) return BRAND_PROFILES["bm-tp-games"]?.contentScope;
+    if (/digital/i.test(normalized)) return BRAND_PROFILES["bm-tp-digital"]?.contentScope;
+    if (/life science|clinical|medical|pharma/i.test(normalized)) return BRAND_PROFILES["bm-subcompany"]?.contentScope;
+    return undefined;
+  })();
+
+  const initials = normalized
+    .replace(/[^A-Z]/g, "")
+    .slice(0, 4) || normalized.slice(0, 2).toUpperCase();
+
+  return {
+    ...base,
+    role: "subcompany",
+    parentId: base.parentId ?? "bm-enterprise",
+    logo: {
+      ...base.logo,
+      mark: initials,
+      wordmark: "TransPerfect",
+      divisionLine: normalized,
+    },
+    contentScope: knownScope ?? base.contentScope,
+  };
+}
+
+// Derive a concrete BrandMode for a named sub-company. Use this anywhere a
+// BrandMode is consumed (brief preview, deck editor, assembler) so the lockup
+// and content scope are always resolved to a real TransPerfect entity.
+export function brandModeWithSubCompany(brand: BrandMode, subCompany?: string): BrandMode {
+  if (!subCompany || brand.id !== "bm-subcompany") return brand;
+  const profile = getSubCompanyProfile(brand.id, subCompany);
+  return {
+    ...brand,
+    name: subCompany,
+    role: "subcompany",
+    logo: profile.logo,
+    contentScope: profile.contentScope,
   };
 }

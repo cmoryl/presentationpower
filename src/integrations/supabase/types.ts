@@ -477,6 +477,7 @@ export type Database = {
           prospect: string | null
           risk_level: string | null
           sales_stage: string | null
+          sub_company: string | null
           title: string
           updated_at: string
         }
@@ -497,6 +498,7 @@ export type Database = {
           prospect?: string | null
           risk_level?: string | null
           sales_stage?: string | null
+          sub_company?: string | null
           title: string
           updated_at?: string
         }
@@ -517,6 +519,7 @@ export type Database = {
           prospect?: string | null
           risk_level?: string | null
           sales_stage?: string | null
+          sub_company?: string | null
           title?: string
           updated_at?: string
         }

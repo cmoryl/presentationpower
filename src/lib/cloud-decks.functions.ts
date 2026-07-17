@@ -11,6 +11,7 @@ const BriefSchema = z.object({
   meetingObjective: z.string(),
   audience: z.string(),
   brandModeId: z.string(),
+  subCompany: z.string().optional(),
   archetypeId: z.string(),
   lengthTarget: z.number(),
   clientFacts: z.string(),
@@ -32,6 +33,7 @@ const DeckSchema = z.object({
   title: z.string(),
   briefId: z.string(),
   brandModeId: z.string(),
+  subCompany: z.string().optional(),
   archetypeId: z.string(),
   slides: z.array(SlideSchema),
   context: z.record(z.string(), z.unknown()).optional(),
@@ -74,6 +76,7 @@ export const saveDeckToCloud = createServerFn({ method: "POST" })
       meeting_objective: data.brief.meetingObjective,
       audience: data.brief.audience,
       brand_mode_id: data.brief.brandModeId,
+      sub_company: data.brief.subCompany,
       length_target: data.brief.lengthTarget,
       known_facts: data.brief.clientFacts,
       inputs: data.brief as never,
@@ -81,6 +84,10 @@ export const saveDeckToCloud = createServerFn({ method: "POST" })
 
     if (briefErr) throw new Error(briefErr.message);
 
+    const deckContext = {
+      ...(data.deck.context ?? {}),
+      ...(data.deck.subCompany ? { subCompany: data.deck.subCompany } : {}),
+    };
     const { error: deckErr } = await supabase.from("decks").upsert({
       id: deckUuid,
       owner_id: userId,
@@ -89,7 +96,7 @@ export const saveDeckToCloud = createServerFn({ method: "POST" })
       archetype_id: data.deck.archetypeId,
       brand_mode_id: data.deck.brandModeId,
       status: "draft",
-      context: (data.deck.context ?? {}) as never,
+      context: deckContext as never,
     });
     if (deckErr) throw new Error(deckErr.message);
 

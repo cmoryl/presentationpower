@@ -8,7 +8,7 @@ import type { DeckSlide } from "@/lib/deck-store";
 // etc.) automatically pick up the current slide's clientName + layoutId when
 // they wrap themselves in <SlideFrame>. VariantRenderer sets the value once
 // per render.
-const SlideFrameCtx = createContext<{ clientName?: string; layoutId?: string; clientLogoUrl?: string | null }>({});
+const SlideFrameCtx = createContext<{ clientName?: string; layoutId?: string; clientLogoUrl?: string | null; subCompany?: string }>({});
 
 function SlideFrame(props: ComponentProps<typeof BaseSlideFrame>) {
   const ctx = useContext(SlideFrameCtx);
@@ -18,6 +18,7 @@ function SlideFrame(props: ComponentProps<typeof BaseSlideFrame>) {
       clientName={props.clientName ?? ctx.clientName}
       layoutId={props.layoutId ?? ctx.layoutId}
       clientLogoUrl={props.clientLogoUrl ?? ctx.clientLogoUrl ?? null}
+      subCompany={props.subCompany ?? ctx.subCompany}
     />
   );
 }
@@ -169,6 +170,7 @@ type Props = {
   pageNumber: number;
   clientName?: string;
   clientLogoUrl?: string | null;
+  subCompany?: string;
   mode?: SlideMode;
 };
 
@@ -198,7 +200,7 @@ function themeBrandForMode(brand: BrandMode, mode: SlideMode): BrandMode {
 }
 
 export function VariantRenderer(props: Props) {
-  const { slide, variant, brand, pageNumber, clientName, clientLogoUrl, mode = "light" } = props;
+  const { slide, variant, brand, pageNumber, clientName, clientLogoUrl, subCompany, mode = "light" } = props;
   const c = slide.content as Record<string, unknown>;
   const contentClientName = s((slide.content as Record<string, unknown>).clientName) || undefined;
   const resolvedClient = clientName || contentClientName;
@@ -206,7 +208,7 @@ export function VariantRenderer(props: Props) {
 
   return (
     <SlideModeContext.Provider value={mode}>
-      <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null }}>
+      <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany }}>
         {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c })}
       </SlideFrameCtx.Provider>
     </SlideModeContext.Provider>
