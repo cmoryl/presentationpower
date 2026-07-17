@@ -322,6 +322,12 @@ function DeckEditor() {
               <div className="mt-1 text-xs text-black/50">{brief.industry} · {brief.audience}</div>
             </Panel>
           )}
+          {active && (mv?.id === "MV-PROOF-LOGOS" || mv?.id === "MV-CASE-LOGO-GRID") && (
+            <LogoGridItemsPanel
+              items={Array.isArray((active.content as Record<string, unknown>).items) ? ((active.content as Record<string, unknown>).items as Array<Record<string, unknown>>) : []}
+              onChange={(items) => updateField(deck.id, active.id, "items", items)}
+            />
+          )}
           <ClientLogoPanel
             current={deck.clientLogo ?? null}
             onChange={(logo) => setDeckClientLogo(deck.id, logo)}
@@ -691,6 +697,174 @@ function ClientLogoPanel({
                         monoUrl: r.monoUrl,
                       });
                       setOpen(false);
+                    }}
+                    className="group rounded-xl border border-black/10 bg-white p-3 text-left transition hover:border-[#003FC7]/40 hover:shadow"
+                  >
+                    <div className="flex h-20 items-center justify-center rounded-lg bg-[#F5F7FB]">
+                      {r.primaryUrl ? (
+                        <img src={r.primaryUrl} alt={`${r.client_name} logo`} className="max-h-16 max-w-[85%] object-contain" />
+                      ) : (
+                        <span className="text-[10px] text-black/40">preview unavailable</span>
+                      )}
+                    </div>
+                    <div className="mt-2 truncate text-xs font-semibold">{r.client_name}</div>
+                    <div className="truncate text-[10px] text-black/50">{r.industry ?? "—"}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+type LogoItem = Record<string, unknown>;
+
+function LogoGridItemsPanel({
+  items,
+  onChange,
+}: {
+  items: LogoItem[];
+  onChange: (items: LogoItem[]) => void;
+}) {
+  const listFn = useServerFn(listClientLogos);
+  const [pickIdx, setPickIdx] = useState<number | null>(null);
+  const [q, setQ] = useState("");
+  const query = useQuery({
+    queryKey: ["logohub", "grid-picker"],
+    queryFn: () => listFn(),
+    enabled: pickIdx !== null,
+    retry: false,
+    staleTime: 60_000,
+  });
+
+  const filtered = useMemo(() => {
+    const rows = (query.data ?? []) as ClientLogoRow[];
+    const s = q.trim().toLowerCase();
+    if (!s) return rows.slice(0, 60);
+    return rows
+      .filter(
+        (r) =>
+          r.client_name.toLowerCase().includes(s) ||
+          r.slug.toLowerCase().includes(s) ||
+          (r.industry ?? "").toLowerCase().includes(s) ||
+          (r.tags ?? []).some((t) => t.toLowerCase().includes(s)),
+      )
+      .slice(0, 60);
+  }, [query.data, q]);
+
+  const update = (i: number, patch: Partial<Record<string, unknown>>) => {
+    const next = items.map((it, k) => (k === i ? { ...it, ...patch } : it));
+    onChange(next);
+  };
+  const addItem = () => onChange([...items, { name: "New client" }]);
+  const removeItem = (i: number) => onChange(items.filter((_, k) => k !== i));
+
+  return (
+    <div className="rounded-2xl border border-black/10 bg-white p-4">
+      <div className="flex items-center justify-between">
+        <div className="text-[10px] uppercase tracking-widest text-black/50">Logo grid items</div>
+        <button
+          type="button"
+          onClick={addItem}
+          className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest hover:border-[#003FC7]/40 hover:text-[#003FC7]"
+        >
+          + Add
+        </button>
+      </div>
+      <div className="mt-3 space-y-2">
+        {items.length === 0 && (
+          <div className="text-sm text-black/50">No items yet. Add clients and pick their logos from LogoHub.</div>
+        )}
+        {items.map((it, i) => {
+          const name = typeof it.name === "string" ? it.name : typeof it.client === "string" ? (it.client as string) : "";
+          const logoUrl = typeof it.logoUrl === "string" ? it.logoUrl : "";
+          return (
+            <div key={i} className="flex items-center gap-2 rounded-xl border border-black/10 p-2">
+              <div className="flex h-10 w-14 items-center justify-center rounded-md bg-[#F5F7FB]">
+                {logoUrl ? (
+                  <img src={logoUrl} alt="" className="max-h-8 max-w-[90%] object-contain" />
+                ) : (
+                  <span className="text-[10px] text-black/40">—</span>
+                )}
+              </div>
+              <input
+                value={name}
+                onChange={(e) => update(i, { name: e.target.value })}
+                placeholder="Client name"
+                className="min-w-0 flex-1 rounded-md border border-black/10 bg-white px-2 py-1 text-sm"
+              />
+              <button
+                type="button"
+                onClick={() => { setPickIdx(i); setQ(""); }}
+                className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest hover:border-[#003FC7]/40 hover:text-[#003FC7]"
+              >
+                {logoUrl ? "Change" : "Pick"}
+              </button>
+              {logoUrl && (
+                <button
+                  type="button"
+                  onClick={() => update(i, { logoUrl: "" })}
+                  className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] text-black/60 hover:border-black/30"
+                >
+                  Clear
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => removeItem(i)}
+                className="rounded-full border border-red-200 px-2 py-0.5 text-[10px] text-red-700 hover:bg-red-50"
+                title="Remove item"
+              >
+                ×
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      {pickIdx !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6" onClick={() => setPickIdx(null)}>
+          <div
+            className="max-h-[80vh] w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 border-b border-black/10 px-5 py-3">
+              <div className="text-sm font-semibold">Pick a logo from LogoHub</div>
+              <input
+                autoFocus
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search LogoHub…"
+                className="ml-3 flex-1 rounded-lg border border-black/15 bg-white px-3 py-1.5 text-sm"
+              />
+              <button
+                onClick={() => setPickIdx(null)}
+                className="rounded-full border border-black/10 px-3 py-1 text-xs hover:border-black/30"
+              >
+                Close
+              </button>
+            </div>
+            <div className="max-h-[65vh] overflow-y-auto p-5">
+              {query.isLoading && <div className="text-sm text-black/50">Loading LogoHub…</div>}
+              {query.error && (
+                <div className="text-sm text-red-700">Couldn't load LogoHub: {(query.error as Error).message}</div>
+              )}
+              {!query.isLoading && filtered.length === 0 && (
+                <div className="rounded-xl border border-dashed border-black/15 p-6 text-center text-sm text-black/50">
+                  No matches. Add logos in Admin → LogoHub first.
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                {filtered.map((r) => (
+                  <button
+                    type="button"
+                    key={r.id}
+                    onClick={() => {
+                      update(pickIdx, { name: r.client_name, logoUrl: r.primaryUrl });
+                      setPickIdx(null);
                     }}
                     className="group rounded-xl border border-black/10 bg-white p-3 text-left transition hover:border-[#003FC7]/40 hover:shadow"
                   >
