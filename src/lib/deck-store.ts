@@ -106,7 +106,10 @@ export type Deck = {
 type DeckState = {
   briefs: Record<string, Brief>;
   decks: Record<string, Deck>;
-  createBriefAndAssemble: (brief: Omit<Brief, "id" | "createdAt">) => { briefId: string; deckId: string };
+  createBriefAndAssemble: (
+    brief: Omit<Brief, "id" | "createdAt">,
+    opts?: { strategy?: DeckStrategySnapshot },
+  ) => { briefId: string; deckId: string };
   createImportedDeck: (input: {
     title: string;
     brief: Omit<Brief, "id" | "createdAt">;
