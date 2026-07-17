@@ -76,6 +76,17 @@ function BrandGuideView() {
         )}
         <p className="mt-6 max-w-2xl text-sm leading-[140%] opacity-80">{guide.intro}</p>
 
+        {logos?.white || logos?.color ? (
+          <div className="mt-8 inline-flex items-center rounded-2xl bg-white/10 px-5 py-4 ring-1 ring-white/20 backdrop-blur">
+            <img
+              src={logos.white ?? logos.color!}
+              alt={`${guide.title} logo`}
+              className="h-12 w-auto md:h-14"
+              loading="lazy"
+            />
+          </div>
+        ) : null}
+
         <div className="mt-10 flex items-center gap-2">
           {[...guide.primaryColors, ...guide.secondaryColors].map((c) => (
             <span
