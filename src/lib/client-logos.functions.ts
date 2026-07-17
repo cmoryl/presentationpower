@@ -27,10 +27,37 @@ async function assertCanManage(context: { supabase: unknown; userId: string }) {
   return Boolean(isReviewer);
 }
 
+export type ClientLogoRow = {
+  id: string;
+  client_name: string;
+  slug: string;
+  industry: string | null;
+  division_id: string | null;
+  notes: string | null;
+  primary_path: string;
+  dark_path: string | null;
+  light_path: string | null;
+  mono_path: string | null;
+  source_filename: string | null;
+  mime_type: string | null;
+  file_size: number | null;
+  source: string | null;
+  website: string | null;
+  tags: string[];
+  is_active: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  primaryUrl: string | null;
+  darkUrl: string | null;
+  lightUrl: string | null;
+  monoUrl: string | null;
+};
+
 // ── LIST ────────────────────────────────────────────────────────────────
 export const listClientLogos = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .handler(async ({ context }): Promise<ClientLogoRow[]> => {
     const s = context.supabase as unknown as SbClient;
     const { data, error } = await s
       .from("client_logos")
@@ -55,8 +82,27 @@ export const listClientLogos = createServerFn({ method: "GET" })
         if (entry.signedUrl) urlMap.set(entry.path, entry.signedUrl);
       }
     }
-    return rows.map((r) => ({
-      ...r,
+    return rows.map((r): ClientLogoRow => ({
+      id: r.id,
+      client_name: r.client_name,
+      slug: r.slug,
+      industry: r.industry ?? null,
+      division_id: r.division_id ?? null,
+      notes: r.notes ?? null,
+      primary_path: r.primary_path,
+      dark_path: r.dark_path ?? null,
+      light_path: r.light_path ?? null,
+      mono_path: r.mono_path ?? null,
+      source_filename: r.source_filename ?? null,
+      mime_type: r.mime_type ?? null,
+      file_size: r.file_size ?? null,
+      source: r.source ?? null,
+      website: r.website ?? null,
+      tags: r.tags ?? [],
+      is_active: r.is_active ?? true,
+      created_by: r.created_by ?? null,
+      created_at: r.created_at,
+      updated_at: r.updated_at,
       primaryUrl: urlMap.get(r.primary_path) ?? null,
       darkUrl: r.dark_path ? urlMap.get(r.dark_path) ?? null : null,
       lightUrl: r.light_path ? urlMap.get(r.light_path) ?? null : null,
