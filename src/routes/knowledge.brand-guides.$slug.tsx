@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { getBrandGuide, type BrandGuide, type ColorSwatch, type TypeStyle } from "@/lib/brand-guides";
 import { BRAND_MODES } from "@/lib/taxonomy";
+import { getDivisionLogos } from "@/lib/division-logos";
 import {
   getBrandhubIntel,
   normalizeVoiceValue,
@@ -45,6 +46,7 @@ function BrandGuideView() {
   const hero = guide.primaryColors[0]?.hex ?? "#03002C";
   const accent = guide.secondaryColors[0]?.hex ?? "#A1FBF9";
   const intel = getBrandhubIntel(guide.slug);
+  const logos = getDivisionLogos(guide.divisionId) ?? getDivisionLogos(guide.slug);
 
   return (
     <AppShell>
@@ -73,6 +75,17 @@ function BrandGuideView() {
           </div>
         )}
         <p className="mt-6 max-w-2xl text-sm leading-[140%] opacity-80">{guide.intro}</p>
+
+        {logos?.white || logos?.color ? (
+          <div className="mt-8 inline-flex items-center rounded-2xl bg-white/10 px-5 py-4 ring-1 ring-white/20 backdrop-blur">
+            <img
+              src={logos.white ?? logos.color!}
+              alt={`${guide.title} logo`}
+              className="h-12 w-auto md:h-14"
+              loading="lazy"
+            />
+          </div>
+        ) : null}
 
         <div className="mt-10 flex items-center gap-2">
           {[...guide.primaryColors, ...guide.secondaryColors].map((c) => (
@@ -106,6 +119,22 @@ function BrandGuideView() {
           <div className="rounded-2xl border border-black/10 bg-white p-6">
             <div className="text-lg font-semibold">{guide.logoNotes.headline}</div>
             <p className="mt-2 max-w-3xl text-sm text-black/70">{guide.logoNotes.body}</p>
+          </div>
+        )}
+        {logos && (
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {logos.color && (
+              <LogoTile label="Horizontal · Color" src={logos.color} bg="#ffffff" border />
+            )}
+            {logos.stackedColor && (
+              <LogoTile label="Stacked · Color" src={logos.stackedColor} bg="#ffffff" border />
+            )}
+            {logos.white && (
+              <LogoTile label="Horizontal · Reversed" src={logos.white} bg={hero} />
+            )}
+            {logos.stackedWhite && (
+              <LogoTile label="Stacked · Reversed" src={logos.stackedWhite} bg={hero} />
+            )}
           </div>
         )}
         <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -655,6 +684,23 @@ function VoiceCard({
             {v}
           </span>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function LogoTile({ label, src, bg, border }: { label: string; src: string; bg: string; border?: boolean }) {
+  return (
+    <div
+      className={`flex flex-col items-center justify-center gap-3 rounded-2xl p-6 ${border ? "border border-black/10" : ""}`}
+      style={{ background: bg, minHeight: 160 }}
+    >
+      <img src={src} alt={label} className="max-h-20 w-auto max-w-full object-contain" loading="lazy" />
+      <div
+        className="text-[10px] uppercase tracking-[0.25em]"
+        style={{ color: bg === "#ffffff" ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.7)" }}
+      >
+        {label}
       </div>
     </div>
   );
