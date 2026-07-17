@@ -1007,6 +1007,9 @@ export const useDeckStore = create<DeckState>()(
                   .map((field) => ({ field, before: sl.content[field], after: ai[field], reason: "AI personalization", accepted: true }));
                 return { ...sl, content: ai, changes };
               }),
+            },
+          },
+        }));
       },
 
       applyCopilotUpdates: (deckId, updates) => {
@@ -1039,9 +1042,6 @@ export const useDeckStore = create<DeckState>()(
                 };
               }),
             },
-          },
-        }));
-      },
           },
         }));
       },
