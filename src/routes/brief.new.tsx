@@ -458,7 +458,70 @@ function BriefWizard() {
               </section>
 
 
-              {/* Footer CTAs — themed with brand primary */}
+              {/* SECTION 06: AI Narrative Strategist (optional) */}
+              <StrategistSection
+                brandName={brand?.name ?? "brand"}
+                brandPrimary={brandPrimary}
+                status={strategyStatus}
+                error={strategyError}
+                setupNeeded={strategySetupNeeded}
+                strategy={strategy}
+                onPlan={async () => {
+                  setStrategyStatus("planning");
+                  setStrategyError(null);
+                  setStrategySetupNeeded(false);
+                  try {
+                    const res = await planStrategyFn({
+                      data: {
+                        brandModeId: form.brandModeId,
+                        subCompany: form.subCompany || undefined,
+                        brief: {
+                          prospect: form.prospect,
+                          industry: form.industry,
+                          audience: form.audience,
+                          meetingObjective: form.meetingObjective,
+                          clientFacts: form.clientFacts,
+                          archetypeId: effectiveArchetypeId,
+                          lengthTarget: form.lengthTarget,
+                        },
+                      },
+                    });
+                    if (!res.ok) {
+                      setStrategyError(res.error);
+                      setStrategySetupNeeded(!!res.setup);
+                      setStrategyStatus("error");
+                      return;
+                    }
+                    setStrategy(res.strategy);
+                    setStrategyStatus("ready");
+                  } catch (e) {
+                    setStrategyError((e as Error).message);
+                    setStrategyStatus("error");
+                  }
+                }}
+                onRemoveSection={(idx) =>
+                  setStrategy((s) =>
+                    s ? { ...s, recommendedSections: s.recommendedSections.filter((_, i) => i !== idx) } : s,
+                  )
+                }
+                onMoveSection={(idx, dir) =>
+                  setStrategy((s) => {
+                    if (!s) return s;
+                    const next = [...s.recommendedSections];
+                    const target = idx + dir;
+                    if (target < 0 || target >= next.length) return s;
+                    [next[idx], next[target]] = [next[target], next[idx]];
+                    return { ...s, recommendedSections: next };
+                  })
+                }
+                onDiscard={() => {
+                  setStrategy(null);
+                  setStrategyStatus("idle");
+                  setStrategyError(null);
+                }}
+              />
+
+
               <div
                 className="flex flex-col-reverse items-stretch justify-between gap-4 border-t pt-6 md:flex-row md:items-center"
                 style={{ borderColor: PALETTE.hairline }}
