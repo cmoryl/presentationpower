@@ -546,6 +546,7 @@ function BriefWizard() {
                             meetingObjective: submission.meetingObjective,
                             clientFacts: submission.clientFacts,
                             brandName: brandForCall?.name ?? null,
+                            divisionId: brandForCall?.id ?? null,
                             brandTags: [
                               ...(scope?.industries ?? []),
                               ...(scope?.serviceLines ?? []),

@@ -677,9 +677,34 @@ const kbInput = z.object({
   meetingObjective: z.string().default(""),
   clientFacts: z.string().default(""),
   brandName: z.string().optional().nullable(),
+  // BRAND_MODES id (e.g. "bm-tp-legal"). This is what brand_asset_chunks.division_id
+  // is populated with — use it directly instead of slugifying brandName.
+  divisionId: z.string().optional().nullable(),
   brandTags: z.array(z.string()).default([]),
   limit: z.number().int().min(1).max(12).default(6),
 });
+
+// Resolve a brand_asset_chunks.division_id filter value from the brief context.
+// Prefer explicit divisionId; otherwise try to match brandName against the
+// brand guide registry (title -> divisionId). Returns null when unresolved so
+// the vector search runs unfiltered rather than silently filtered-to-nothing.
+async function resolveDivisionFilter(
+  brandName: string | null | undefined,
+  divisionId: string | null | undefined,
+): Promise<string | null> {
+  if (divisionId && divisionId.trim()) return divisionId.trim();
+  if (!brandName) return null;
+  try {
+    const { BRAND_GUIDES } = await import("@/lib/brand-guides");
+    const needle = brandName.trim().toLowerCase();
+    const hit = BRAND_GUIDES.find(
+      (g) => g.title.toLowerCase() === needle || g.slug === needle.replace(/\s+/g, "-"),
+    );
+    return hit?.divisionId && hit.divisionId !== "master" ? hit.divisionId : null;
+  } catch {
+    return null;
+  }
+}
 export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => kbInput.parse(input))
@@ -735,12 +760,26 @@ export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
           const eJson = (await eRes.json()) as { data?: Array<{ embedding: number[] }> };
           const vec = eJson.data?.[0]?.embedding;
           if (vec) {
-            const { data: chunks } = await s.rpc("match_brand_chunks", {
-              query_embedding: `[${vec.join(",")}]`,
+            const filterDivision = await resolveDivisionFilter(data.brandName, data.divisionId);
+            const embeddingLiteral = `[${vec.join(",")}]`;
+            let { data: chunks } = await s.rpc("match_brand_chunks", {
+              query_embedding: embeddingLiteral,
               match_count: 3,
-              filter_division: data.brandName ? data.brandName.toLowerCase().replace(/\s+/g, "-") : null,
+              filter_division: filterDivision,
             });
-            const chunkRows = (chunks ?? []) as Array<{ id: string; asset_id: string; content: string; tags: string[]; similarity: number }>;
+            let chunkRows = (chunks ?? []) as Array<{ id: string; asset_id: string; content: string; tags: string[]; similarity: number }>;
+            // Fallback: if a division filter was applied but returned nothing,
+            // re-run once unfiltered so briefs still get RAG context when the
+            // requested division has no ingested assets (or the divisionId
+            // doesn't line up with what's actually stored on chunks).
+            if (chunkRows.length === 0 && filterDivision) {
+              const { data: unfiltered } = await s.rpc("match_brand_chunks", {
+                query_embedding: embeddingLiteral,
+                match_count: 3,
+                filter_division: null,
+              });
+              chunkRows = (unfiltered ?? []) as typeof chunkRows;
+            }
             // Resolve asset titles
             if (chunkRows.length) {
               const { data: assets } = await s.from("brand_assets").select("id, title").in("id" as any, chunkRows.map((c) => c.asset_id) as any);
