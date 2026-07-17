@@ -12,6 +12,7 @@ import {
   deleteBrandAsset,
   getBrandAssetSignedUrl,
   importBrandhubSeed,
+  fetchAndImportBrandhubSeed,
 } from "@/lib/brand-assets.functions";
 
 export const Route = createFileRoute("/admin/brand-assets")({
