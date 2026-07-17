@@ -70,6 +70,115 @@ export async function callAnthropic(
   return { ok: true, text };
 }
 
+// ---------------------------------------------------------------------------
+// Tool-use variant (Phase D · Conversational Copilot)
+// ---------------------------------------------------------------------------
+
+export type AnthropicToolDef = {
+  name: string;
+  description: string;
+  input_schema: Record<string, unknown>;
+};
+
+export type AnthropicToolCall = {
+  id: string;
+  name: string;
+  input: Record<string, unknown>;
+};
+
+export type AnthropicMsg = { role: "user" | "assistant"; content: unknown };
+
+export type ToolLoopResult =
+  | { ok: true; text: string; iterations: number }
+  | { ok: false; status: number; body: string };
+
+/**
+ * Multi-turn tool-use loop. `executeTool` runs server-side and returns a
+ * JSON-serializable result. The loop stops when the model returns a pure
+ * text response, when `maxIterations` (default 6) is hit, or on error.
+ * On max iterations, one final call is made forcing text-only output.
+ */
+export async function callAnthropicWithTools(
+  systemBlocks: string[],
+  messages: AnthropicMsg[],
+  tools: AnthropicToolDef[],
+  executeTool: (call: AnthropicToolCall) => Promise<unknown>,
+  opts?: { maxTokens?: number; temperature?: number; maxIterations?: number },
+): Promise<ToolLoopResult> {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) throw new Error("ANTHROPIC_API_KEY missing");
+  const maxIterations = opts?.maxIterations ?? 6;
+  const convo: AnthropicMsg[] = [...messages];
+
+  const doCall = async (withTools: boolean) => {
+    const body: Record<string, unknown> = {
+      model: ANTHROPIC_MODEL,
+      max_tokens: opts?.maxTokens ?? 4096,
+      temperature: opts?.temperature ?? 0.2,
+      system: systemBlocks.map((text, i) => ({
+        type: "text" as const,
+        text,
+        ...(i === 0 ? { cache_control: { type: "ephemeral" as const } } : {}),
+      })),
+      messages: convo,
+    };
+    if (withTools) body.tools = tools;
+    const res = await fetch(ANTHROPIC_URL, {
+      method: "POST",
+      headers: {
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+    return res;
+  };
+
+  for (let i = 0; i < maxIterations; i++) {
+    const res = await doCall(true);
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      return { ok: false, status: res.status, body: body.slice(0, 500) };
+    }
+    const json = (await res.json()) as {
+      stop_reason?: string;
+      content?: Array<
+        | { type: "text"; text: string }
+        | { type: "tool_use"; id: string; name: string; input: Record<string, unknown> }
+      >;
+    };
+    const parts = json.content ?? [];
+    convo.push({ role: "assistant", content: parts });
+    const toolUses = parts.filter((p): p is { type: "tool_use"; id: string; name: string; input: Record<string, unknown> } => p.type === "tool_use");
+    if (toolUses.length === 0 || json.stop_reason !== "tool_use") {
+      const text = parts.filter((p) => p.type === "text").map((p) => (p as { text: string }).text).join("").trim();
+      return { ok: true, text, iterations: i };
+    }
+    const toolResults = await Promise.all(
+      toolUses.map(async (tu) => {
+        try {
+          const result = await executeTool({ id: tu.id, name: tu.name, input: tu.input });
+          return { type: "tool_result" as const, tool_use_id: tu.id, content: JSON.stringify(result).slice(0, 8000) };
+        } catch (e) {
+          return { type: "tool_result" as const, tool_use_id: tu.id, is_error: true, content: (e as Error).message.slice(0, 500) };
+        }
+      }),
+    );
+    convo.push({ role: "user", content: toolResults });
+  }
+
+  // Force a final text-only response.
+  const res = await doCall(false);
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    return { ok: false, status: res.status, body: body.slice(0, 500) };
+  }
+  const json = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
+  const text = (json.content ?? []).map((c) => (c.type === "text" ? c.text ?? "" : "")).join("").trim();
+  return { ok: true, text, iterations: maxIterations };
+}
+
 /**
  * Extract the first top-level JSON object from a model response and parse
  * it. Returns `null` if no valid JSON object can be found.
