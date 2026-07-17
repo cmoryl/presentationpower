@@ -55,6 +55,15 @@ export type DeckSlide = {
   changes: AiChange[];
 };
 
+export type DeckClientLogo = {
+  id: string;
+  clientName: string;
+  primaryUrl: string | null;
+  darkUrl?: string | null;
+  lightUrl?: string | null;
+  monoUrl?: string | null;
+};
+
 export type Deck = {
   id: string;
   createdAt: string;
@@ -63,7 +72,9 @@ export type Deck = {
   brandModeId: BrandModeId;
   archetypeId: string;
   slides: DeckSlide[];
+  clientLogo?: DeckClientLogo | null;
 };
+
 
 type DeckState = {
   briefs: Record<string, Brief>;
@@ -83,7 +94,9 @@ type DeckState = {
   addSlide: (deckId: string, sectionId: string, afterSlideId?: string) => void;
   duplicateSlide: (deckId: string, slideId: string) => void;
   renameDeck: (deckId: string, title: string) => void;
+  setDeckClientLogo: (deckId: string, logo: DeckClientLogo | null) => void;
   deleteDeck: (deckId: string) => void;
+
   hydrate: (input: { brief: Brief; deck: Deck }) => void;
   reset: () => void;
 };
@@ -1040,6 +1053,13 @@ export const useDeckStore = create<DeckState>()(
         if (!deck) return;
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, title } } }));
       },
+
+      setDeckClientLogo: (deckId, logo) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, clientLogo: logo } } }));
+      },
+
 
       deleteDeck: (deckId) => {
         set((s) => {
