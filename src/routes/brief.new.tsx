@@ -604,7 +604,7 @@ function BriefWizard() {
                         setAiError((e as Error).message);
                         setAiStatus("error");
                       }
-                      navigate({ to: "/decks/$deckId", params: { deckId } });
+                      navigate({ to: "/decks/$deckId", params: { deckId }, hash: "brand-review" });
                     }}
                   >
                     Assemble with {brand?.name ?? "brand"} →

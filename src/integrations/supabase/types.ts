@@ -602,6 +602,50 @@ export type Database = {
         }
         Relationships: []
       }
+      deck_reviews: {
+        Row: {
+          created_at: string
+          created_by: string
+          deck_id: string
+          findings: Json
+          id: string
+          model: string
+          overall_score: number
+          strengths: Json
+          summary: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          deck_id: string
+          findings?: Json
+          id?: string
+          model: string
+          overall_score: number
+          strengths?: Json
+          summary?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          deck_id?: string
+          findings?: Json
+          id?: string
+          model?: string
+          overall_score?: number
+          strengths?: Json
+          summary?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deck_reviews_deck_id_fkey"
+            columns: ["deck_id"]
+            isOneToOne: false
+            referencedRelation: "decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deck_slides: {
         Row: {
           ai_change_log: Json
