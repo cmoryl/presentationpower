@@ -64,6 +64,14 @@ export type DeckClientLogo = {
   monoUrl?: string | null;
 };
 
+export type DeckContext = {
+  abExperimentId?: string | null;
+  abVariantId?: string | null;
+  abPaletteOverride?: Record<string, string> | null;
+  knowledgeSourceIds?: string[];
+  knowledgeSources?: Array<{ id: string; source: "oracle" | "kb" | "asset" | "brand-intel"; title: string; tags?: string[] }>;
+};
+
 export type Deck = {
   id: string;
   createdAt: string;
@@ -73,7 +81,9 @@ export type Deck = {
   archetypeId: string;
   slides: DeckSlide[];
   clientLogo?: DeckClientLogo | null;
+  context?: DeckContext;
 };
+
 
 
 type DeckState = {
