@@ -441,7 +441,7 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
           "Your previous response was not valid JSON matching the schema. Return ONLY the JSON object described above.",
         );
       }
-      if (!("value" in result)) {
+      if (!("value" in result) || !result.value) {
         // Fallback: return raw candidates rather than nothing.
         return {
           ok: true,
@@ -451,10 +451,11 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
           note: ("rawError" in result && result.rawError) || undefined,
         };
       }
+      const value = result.value;
 
       // Repair: drop any ids the model hallucinated; enforce candidate universe.
       const cleaned: SynthesizedSnippet[] = [];
-      for (const sel of result.value.selectedSnippets) {
+      for (const sel of value.selectedSnippets) {
         if (!candidateIds.has(sel.id)) continue;
         const base = candidateById.get(sel.id)!;
         cleaned.push({
@@ -476,9 +477,10 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
       return {
         ok: true,
         synthesized: cleaned.length > 0,
-        synthesis: result.value.synthesis,
-        discardedNote: result.value.discardedNote,
+        synthesis: value.synthesis,
+        discardedNote: value.discardedNote,
         selected,
       };
+
     },
   );
