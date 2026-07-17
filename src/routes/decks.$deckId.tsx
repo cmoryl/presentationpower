@@ -905,7 +905,18 @@ function LogoGridItemsPanel({
                     type="button"
                     key={r.id}
                     onClick={() => {
-                      update(pickIdx, { name: r.client_name, logoUrl: r.primaryUrl });
+                      const logoVariants = {
+                        primary: r.primaryUrl ?? null,
+                        light: r.lightUrl ?? null,
+                        dark: r.darkUrl ?? null,
+                        mono: r.monoUrl ?? null,
+                      };
+                      update(pickIdx, {
+                        name: r.client_name,
+                        logoUrl: r.primaryUrl,
+                        logoVariant: "primary",
+                        logoVariants,
+                      });
                       setPickIdx(null);
                     }}
                     className="group rounded-xl border border-black/10 bg-white p-3 text-left transition hover:border-[#003FC7]/40 hover:shadow"
