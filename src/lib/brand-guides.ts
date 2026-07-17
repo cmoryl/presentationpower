@@ -31,9 +31,17 @@ export type LogoRule = {
   do?: boolean; // true = do, false = don't
 };
 
+export type BrandGuideCategory =
+  | "master"
+  | "division"
+  | "product"
+  | "portfolio"
+  | "cobrand";
+
 export type BrandGuide = {
   slug: string;
   divisionId: string | "master";
+  category: BrandGuideCategory;
   title: string;
   subtitle: string;
   version: string;
