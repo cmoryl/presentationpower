@@ -147,7 +147,7 @@ function DeckEditor() {
           >
             {active && mv && (
               <ScaledSlide>
-                <VariantRenderer slide={active} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} />
+                <VariantRenderer slide={active} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />
               </ScaledSlide>
             )}
             <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100">
