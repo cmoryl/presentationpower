@@ -563,3 +563,154 @@ function FieldEditor({
     </div>
   );
 }
+
+function ClientLogoPanel({
+  current,
+  onChange,
+}: {
+  current: DeckClientLogo | null;
+  onChange: (logo: DeckClientLogo | null) => void;
+}) {
+  const listFn = useServerFn(listClientLogos);
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
+  const query = useQuery({
+    queryKey: ["logohub", "picker"],
+    queryFn: () => listFn(),
+    enabled: open,
+    retry: false,
+    staleTime: 60_000,
+  });
+
+  const filtered = useMemo(() => {
+    const rows = (query.data ?? []) as ClientLogoRow[];
+    const s = q.trim().toLowerCase();
+    if (!s) return rows.slice(0, 60);
+    return rows
+      .filter(
+        (r) =>
+          r.client_name.toLowerCase().includes(s) ||
+          r.slug.toLowerCase().includes(s) ||
+          (r.industry ?? "").toLowerCase().includes(s) ||
+          (r.tags ?? []).some((t) => t.toLowerCase().includes(s)),
+      )
+      .slice(0, 60);
+  }, [query.data, q]);
+
+  return (
+    <div className="rounded-2xl border border-black/10 bg-white p-4">
+      <div className="text-[10px] uppercase tracking-widest text-black/50">Client logo</div>
+      <div className="mt-3">
+        {current ? (
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-16 items-center justify-center rounded-md bg-[#F5F7FB]">
+              {current.primaryUrl ? (
+                <img src={current.primaryUrl} alt={`${current.clientName} logo`} className="max-h-10 max-w-[90%] object-contain" />
+              ) : (
+                <span className="text-[10px] text-black/40">no preview</span>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-sm font-medium">{current.clientName}</div>
+              <div className="text-[11px] text-black/50">Locks into every slide's brand lockup.</div>
+            </div>
+          </div>
+        ) : (
+          <div className="text-sm text-black/60">No client logo attached. Pick one from LogoHub to co-brand every slide.</div>
+        )}
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="rounded-full border border-black/15 px-3 py-1 text-xs font-medium hover:border-[#003FC7]/40 hover:text-[#003FC7]"
+          >
+            {current ? "Change" : "Attach from LogoHub"}
+          </button>
+          {current && (
+            <button
+              type="button"
+              onClick={() => onChange(null)}
+              className="rounded-full border border-red-200 px-3 py-1 text-xs text-red-700 hover:bg-red-50"
+            >
+              Remove
+            </button>
+          )}
+          <Link
+            to="/admin/logohub"
+            className="rounded-full border border-black/10 px-3 py-1 text-xs text-black/60 hover:border-black/30"
+          >
+            Manage LogoHub →
+          </Link>
+        </div>
+      </div>
+
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6" onClick={() => setOpen(false)}>
+          <div
+            className="max-h-[80vh] w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3 border-b border-black/10 px-5 py-3">
+              <div className="text-sm font-semibold">Attach a client logo</div>
+              <input
+                autoFocus
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search LogoHub…"
+                className="ml-3 flex-1 rounded-lg border border-black/15 bg-white px-3 py-1.5 text-sm"
+              />
+              <button
+                onClick={() => setOpen(false)}
+                className="rounded-full border border-black/10 px-3 py-1 text-xs hover:border-black/30"
+              >
+                Close
+              </button>
+            </div>
+            <div className="max-h-[65vh] overflow-y-auto p-5">
+              {query.isLoading && <div className="text-sm text-black/50">Loading LogoHub…</div>}
+              {query.error && (
+                <div className="text-sm text-red-700">Couldn't load LogoHub: {(query.error as Error).message}</div>
+              )}
+              {!query.isLoading && filtered.length === 0 && (
+                <div className="rounded-xl border border-dashed border-black/15 p-6 text-center text-sm text-black/50">
+                  No matches. Add logos in Admin → LogoHub first.
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                {filtered.map((r) => (
+                  <button
+                    type="button"
+                    key={r.id}
+                    onClick={() => {
+                      onChange({
+                        id: r.id,
+                        clientName: r.client_name,
+                        primaryUrl: r.primaryUrl,
+                        darkUrl: r.darkUrl,
+                        lightUrl: r.lightUrl,
+                        monoUrl: r.monoUrl,
+                      });
+                      setOpen(false);
+                    }}
+                    className="group rounded-xl border border-black/10 bg-white p-3 text-left transition hover:border-[#003FC7]/40 hover:shadow"
+                  >
+                    <div className="flex h-20 items-center justify-center rounded-lg bg-[#F5F7FB]">
+                      {r.primaryUrl ? (
+                        <img src={r.primaryUrl} alt={`${r.client_name} logo`} className="max-h-16 max-w-[85%] object-contain" />
+                      ) : (
+                        <span className="text-[10px] text-black/40">preview unavailable</span>
+                      )}
+                    </div>
+                    <div className="mt-2 truncate text-xs font-semibold">{r.client_name}</div>
+                    <div className="truncate text-[10px] text-black/50">{r.industry ?? "—"}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
