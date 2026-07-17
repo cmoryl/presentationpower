@@ -65,12 +65,27 @@ export type DeckClientLogo = {
   monoUrl?: string | null;
 };
 
+export type DeckStrategySnapshot = {
+  narrativeArc?: string;
+  openingHook?: string;
+  closingAsk?: string;
+  risksToAvoid?: string[];
+  recommendedSections?: Array<{
+    sectionId: string;
+    rationale?: string;
+    keyMessage?: string;
+    suggestedVariantId?: string;
+    suggestedLayoutId?: string;
+  }>;
+};
+
 export type DeckContext = {
   abExperimentId?: string | null;
   abVariantId?: string | null;
   abPaletteOverride?: Record<string, string> | null;
   knowledgeSourceIds?: string[];
   knowledgeSources?: Array<{ id: string; source: "oracle" | "kb" | "asset" | "brand-intel"; title: string; tags?: string[] }>;
+  strategy?: DeckStrategySnapshot;
 };
 
 export type Deck = {
