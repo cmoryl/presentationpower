@@ -322,7 +322,12 @@ function DeckEditor() {
               <div className="mt-1 text-xs text-black/50">{brief.industry} · {brief.audience}</div>
             </Panel>
           )}
+          <ClientLogoPanel
+            current={deck.clientLogo ?? null}
+            onChange={(logo) => setDeckClientLogo(deck.id, logo)}
+          />
         </aside>
+
       </div>
       <DeckChat deck={deck} brief={brief} />
       {zoomed && active && mv && (
