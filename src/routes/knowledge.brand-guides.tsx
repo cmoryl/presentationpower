@@ -66,14 +66,14 @@ function BrandGuidesIndex() {
         })}
 
         <div className="rounded-2xl border border-dashed border-black/20 bg-black/[0.02] p-6 text-sm text-black/50">
-          <div className="text-[11px] uppercase tracking-[0.25em]">Coming soon</div>
-          <div className="mt-3 text-lg font-medium text-black/70">Division sub-brand guides</div>
+          <div className="text-[11px] uppercase tracking-[0.25em]">Extend the system</div>
+          <div className="mt-3 text-lg font-medium text-black/70">Add a new division guide</div>
           <p className="mt-2">
-            GlobalLink, Legal, Life Sciences, Media, Gaming, Digital and regional divisions each get their own
-            digital guide extending the master system. Add a new entry in <code>src/lib/brand-guides.ts</code> to
-            publish one.
+            Regional divisions (Japan, India, Apostroph, Semantix) and product lines can each get a dedicated guide.
+            Add an entry to <code>DIVISION_SEEDS</code> in <code>src/lib/brand-guides.ts</code> and it appears here.
           </p>
         </div>
+
       </div>
     </AppShell>
   );
