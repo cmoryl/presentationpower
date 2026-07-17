@@ -406,10 +406,18 @@ const DIVISION_SEEDS: DivisionSeed[] = [
   },
 ];
 
+function inferCategory(seed: DivisionSeed): BrandGuideCategory {
+  if (seed.category) return seed.category;
+  if (seed.divisionId === "bm-cobrand") return "cobrand";
+  if (seed.divisionId === "bm-product") return "product";
+  return "division";
+}
+
 function buildDivisionGuide(seed: DivisionSeed): BrandGuide {
   return {
     slug: seed.slug,
     divisionId: seed.divisionId,
+    category: inferCategory(seed),
     title: seed.title,
     subtitle: seed.subtitle,
     version: MASTER_TRANSPERFECT_GUIDE.version,
