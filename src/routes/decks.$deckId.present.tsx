@@ -22,6 +22,7 @@ function PresenterView() {
   const navigate = useNavigate();
   const [i, setI] = useState(0);
   const [stripOpen, setStripOpen] = useState(true);
+  const [focusedThumb, setFocusedThumb] = useState(0);
 
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
@@ -30,6 +31,38 @@ function PresenterView() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      const active = document.activeElement;
+      const insideStrip = stripRef.current?.contains(active) ?? false;
+      if (insideStrip) {
+        if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+          e.preventDefault();
+          setFocusedThumb((n) => {
+            const next = Math.min(n + 1, deck.slides.length - 1);
+            setTimeout(() => focusThumb(thumbRefs.current[next]), 0);
+            return next;
+          });
+        } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+          e.preventDefault();
+          setFocusedThumb((n) => {
+            const prev = Math.max(n - 1, 0);
+            setTimeout(() => focusThumb(thumbRefs.current[prev]), 0);
+            return prev;
+          });
+        } else if (e.key === "Home") {
+          e.preventDefault();
+          setFocusedThumb(0);
+          setTimeout(() => focusThumb(thumbRefs.current[0]), 0);
+        } else if (e.key === "End") {
+          e.preventDefault();
+          const last = deck.slides.length - 1;
+          setFocusedThumb(last);
+          setTimeout(() => focusThumb(thumbRefs.current[last]), 0);
+        } else if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setI(focusedThumb);
+        }
+        return;
+      }
       if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") setI((n) => Math.min(n + 1, deck.slides.length - 1));
       else if (e.key === "ArrowLeft" || e.key === "PageUp") setI((n) => Math.max(n - 1, 0));
       else if (e.key === "Home") setI(0);
@@ -39,11 +72,16 @@ function PresenterView() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [deck.slides.length, deckId, navigate]);
+  }, [deck.slides.length, deckId, navigate, focusedThumb]);
+
+  useEffect(() => {
+    setFocusedThumb(i);
+  }, [i]);
 
   const pct = deck.slides.length > 0 ? ((i + 1) / deck.slides.length) * 100 : 0;
   const stripRef = useRef<HTMLDivElement>(null);
   const activeThumbRef = useRef<HTMLButtonElement>(null);
+  const thumbRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   useEffect(() => {
     activeThumbRef.current?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
