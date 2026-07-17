@@ -72,8 +72,19 @@ export function BrandLockup({
   const logo = brand.logo ?? { mark: brand.name.slice(0, 2).toUpperCase(), wordmark: brand.name };
   const divisionLine = (subCompany ?? logo.divisionLine)?.replace("{client}", clientName ?? "Client");
 
-  const useOfficialWordmark = TP_BRANDS.has(logo.wordmark);
+  // Prefer an official PNG logo when we have one for this brand id. On dark
+  // chrome (color === white) use the white variant; otherwise the color one.
+  const isDarkChrome = /^#?fff(fff)?$/i.test(color) || color.toLowerCase() === "white";
+  const divisionLogos = getDivisionLogos(brand.id);
+  const officialLogoUrl = divisionLogos
+    ? (isDarkChrome ? (divisionLogos.white ?? divisionLogos.color) : (divisionLogos.color ?? divisionLogos.white))
+    : undefined;
+  const useOfficialImage = !!officialLogoUrl;
+  const useOfficialWordmark = !useOfficialImage && TP_BRANDS.has(logo.wordmark);
   const wordmarkHeight = dims.wordmarkPx;
+  // PNG lockups need more vertical presence than the raw wordmark height.
+  const officialImageHeight = Math.round(dims.wordmarkPx * 1.9);
+
 
   return (
     <div
