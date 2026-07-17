@@ -8,13 +8,34 @@
 // Locked footer (logo text + page number) rendered on every non-cover slide.
 
 import PptxGenJS from "pptxgenjs";
-import type { Deck, DeckSlide } from "./deck-store";
+import type { Deck, DeckSlide, DeckStrategySnapshot } from "./deck-store";
 import type { BrandMode } from "./taxonomy";
+import { getDivisionLogos } from "./division-logos";
 
 const SLIDE_W = 13.333;
 const SLIDE_H = 7.5;
 
-export async function exportDeckToPptx(deck: Deck, brand: BrandMode) {
+async function fetchAsDataUrl(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return await new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result));
+      r.onerror = () => reject(r.error);
+      r.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+}
+
+export async function exportDeckToPptx(
+  deck: Deck,
+  brand: BrandMode,
+  opts?: { strategy?: DeckStrategySnapshot | null },
+) {
   const pptx = new PptxGenJS();
   pptx.layout = "LAYOUT_WIDE";
   pptx.title = deck.title;
@@ -25,13 +46,37 @@ export async function exportDeckToPptx(deck: Deck, brand: BrandMode) {
   const surface = brand.tokens.surface.replace("#", "");
   const ink = brand.tokens.ink.replace("#", "");
 
-  deck.slides.forEach((slide, i) => {
+  const strategy = opts?.strategy ?? deck.context?.strategy ?? null;
+  const keyMessageBySection = new Map<string, string>();
+  strategy?.recommendedSections?.forEach((r) => {
+    if (r.sectionId && r.keyMessage) keyMessageBySection.set(r.sectionId, r.keyMessage);
+  });
+
+  // Pre-load logos (color for light bg, white for dark cover) as data URLs
+  const logos = getDivisionLogos(deck.brandModeId) ?? getDivisionLogos("tp");
+  const [logoColor, logoWhite] = await Promise.all([
+    logos?.color ? fetchAsDataUrl(logos.color) : Promise.resolve(null),
+    logos?.white ? fetchAsDataUrl(logos.white) : (logos?.color ? fetchAsDataUrl(logos.color) : Promise.resolve(null)),
+  ]);
+
+  for (let i = 0; i < deck.slides.length; i++) {
+    const slide = deck.slides[i];
     const s = pptx.addSlide();
     const isCover = i === 0 || isCoverVariant(slide.variantId);
     s.background = { color: isCover ? primary : "FFFFFF" };
 
     if (isCover) renderCover(s, slide, { fg: "FFFFFF", accent });
     else renderContent(s, slide, { primary, accent, surface, ink });
+
+    // Logo — top-left on content slides, bottom-right on covers
+    const logoData = isCover ? logoWhite : logoColor;
+    if (logoData) {
+      if (isCover) {
+        s.addImage({ data: logoData, x: SLIDE_W - 2.2, y: SLIDE_H - 0.9, w: 1.7, h: 0.5, sizing: { type: "contain", w: 1.7, h: 0.5 } });
+      } else {
+        s.addImage({ data: logoData, x: 0.5, y: 0.35, w: 1.4, h: 0.4, sizing: { type: "contain", w: 1.4, h: 0.4 } });
+      }
+    }
 
     // Footer on non-cover slides
     if (!isCover) {
@@ -40,7 +85,11 @@ export async function exportDeckToPptx(deck: Deck, brand: BrandMode) {
         x: SLIDE_W - 1.0, y: 7.05, w: 0.5, h: 0.3, fontSize: 9, color: "666666", align: "right", fontFace: "Inter",
       });
     }
-  });
+
+    // Speaker notes from strategy key message when available
+    const km = slide.sectionId ? keyMessageBySection.get(slide.sectionId) : undefined;
+    if (km) s.addNotes(km);
+  }
 
   await pptx.writeFile({ fileName: `${sanitize(deck.title)}.pptx` });
 }
