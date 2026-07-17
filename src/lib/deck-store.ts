@@ -1007,7 +1007,41 @@ export const useDeckStore = create<DeckState>()(
                   .map((field) => ({ field, before: sl.content[field], after: ai[field], reason: "AI personalization", accepted: true }));
                 return { ...sl, content: ai, changes };
               }),
+      },
+
+      applyCopilotUpdates: (deckId, updates) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const byPos = new Map(updates.map((u) => [u.index, u]));
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) => {
+                const u = byPos.get(sl.position);
+                if (!u) return sl;
+                const changes: AiChange[] = [];
+                if (u.variantId !== sl.variantId) {
+                  changes.push({ field: "__variantId", before: sl.variantId, after: u.variantId, reason: "Copilot variant swap", accepted: true });
+                }
+                Object.keys(u.content).forEach((k) => {
+                  if (JSON.stringify(sl.content[k]) !== JSON.stringify(u.content[k])) {
+                    changes.push({ field: k, before: sl.content[k], after: u.content[k], reason: "Copilot edit", accepted: true });
+                  }
+                });
+                return {
+                  ...sl,
+                  variantId: u.variantId,
+                  layoutId: u.layoutId,
+                  content: u.content,
+                  changes: [...sl.changes.filter((c) => !changes.find((n) => n.field === c.field)), ...changes],
+                };
+              }),
             },
+          },
+        }));
+      },
           },
         }));
       },
