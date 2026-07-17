@@ -530,6 +530,75 @@ export type Database = {
           },
         ]
       }
+      client_logos: {
+        Row: {
+          client_name: string
+          created_at: string
+          created_by: string | null
+          dark_path: string | null
+          division_id: string | null
+          file_size: number | null
+          id: string
+          industry: string | null
+          is_active: boolean
+          light_path: string | null
+          mime_type: string | null
+          mono_path: string | null
+          notes: string | null
+          primary_path: string
+          slug: string
+          source: string | null
+          source_filename: string | null
+          tags: string[]
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          client_name: string
+          created_at?: string
+          created_by?: string | null
+          dark_path?: string | null
+          division_id?: string | null
+          file_size?: number | null
+          id?: string
+          industry?: string | null
+          is_active?: boolean
+          light_path?: string | null
+          mime_type?: string | null
+          mono_path?: string | null
+          notes?: string | null
+          primary_path: string
+          slug: string
+          source?: string | null
+          source_filename?: string | null
+          tags?: string[]
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          client_name?: string
+          created_at?: string
+          created_by?: string | null
+          dark_path?: string | null
+          division_id?: string | null
+          file_size?: number | null
+          id?: string
+          industry?: string | null
+          is_active?: boolean
+          light_path?: string | null
+          mime_type?: string | null
+          mono_path?: string | null
+          notes?: string | null
+          primary_path?: string
+          slug?: string
+          source?: string | null
+          source_filename?: string | null
+          tags?: string[]
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       deck_slides: {
         Row: {
           ai_change_log: Json
