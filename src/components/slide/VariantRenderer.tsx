@@ -8,7 +8,7 @@ import type { DeckSlide } from "@/lib/deck-store";
 // etc.) automatically pick up the current slide's clientName + layoutId when
 // they wrap themselves in <SlideFrame>. VariantRenderer sets the value once
 // per render.
-const SlideFrameCtx = createContext<{ clientName?: string; layoutId?: string; clientLogoUrl?: string | null }>({});
+const SlideFrameCtx = createContext<{ clientName?: string; layoutId?: string; clientLogoUrl?: string | null; subCompany?: string }>({});
 
 function SlideFrame(props: ComponentProps<typeof BaseSlideFrame>) {
   const ctx = useContext(SlideFrameCtx);
@@ -18,6 +18,7 @@ function SlideFrame(props: ComponentProps<typeof BaseSlideFrame>) {
       clientName={props.clientName ?? ctx.clientName}
       layoutId={props.layoutId ?? ctx.layoutId}
       clientLogoUrl={props.clientLogoUrl ?? ctx.clientLogoUrl ?? null}
+      subCompany={props.subCompany ?? ctx.subCompany}
     />
   );
 }
