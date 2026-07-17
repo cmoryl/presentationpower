@@ -174,6 +174,7 @@ export function SlideFrame({
             size={variant === "content" ? "md" : variant === "cover" ? "xl" : "lg"}
             clientName={clientName}
             clientLogoUrl={clientLogoUrl ?? null}
+            subCompany={subCompany}
           />
         </div>
       )}
