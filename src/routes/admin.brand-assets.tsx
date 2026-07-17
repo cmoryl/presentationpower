@@ -26,6 +26,7 @@ function BrandAssetsAdminView() {
   const deleteFn = useServerFn(deleteBrandAsset);
   const signFn = useServerFn(getBrandAssetSignedUrl);
   const importFn = useServerFn(importBrandhubSeed);
+  const fetchImportFn = useServerFn(fetchAndImportBrandhubSeed);
   const qc = useQueryClient();
 
   const q = useQuery({ queryKey: ["admin", "brand-assets"], queryFn: () => listFn(), retry: false });
