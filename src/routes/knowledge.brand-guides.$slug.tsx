@@ -154,7 +154,7 @@ function BrandGuideView() {
                 {r.do ? "DO" : "×"}
               </div>
               <div>
-                <div className="text-sm font-semibold text-black">{r.title}</div>
+                <div className="text-sm font-semibold text-foreground">{r.title}</div>
                 <div className="mt-0.5 text-xs text-muted-foreground">{r.description}</div>
               </div>
             </div>
@@ -619,7 +619,7 @@ function BrandhubIntelSections({
             {ke.slice(0, 12).map((entry, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-border bg-card p-4 text-sm text-black/75"
+                className="rounded-xl border border-border bg-card p-4 text-sm text-foreground/85"
               >
                 <div
                   className="mb-1 text-[10px] font-semibold uppercase tracking-[0.25em]"
