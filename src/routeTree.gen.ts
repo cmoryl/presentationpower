@@ -24,6 +24,7 @@ import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as KnowledgeOracleRouteImport } from './routes/knowledge.oracle'
 import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
+import { Route as KnowledgeAskRouteImport } from './routes/knowledge.ask'
 import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
 import { Route as DecksDeckIdRouteImport } from './routes/decks.$deckId'
@@ -119,6 +120,11 @@ const KnowledgeOracleRoute = KnowledgeOracleRouteImport.update({
 const KnowledgeNewRoute = KnowledgeNewRouteImport.update({
   id: '/new',
   path: '/new',
+  getParentRoute: () => KnowledgeRoute,
+} as any)
+const KnowledgeAskRoute = KnowledgeAskRouteImport.update({
+  id: '/ask',
+  path: '/ask',
   getParentRoute: () => KnowledgeRoute,
 } as any)
 const KnowledgeEntryIdRoute = KnowledgeEntryIdRouteImport.update({
@@ -257,6 +263,7 @@ export interface FileRoutesByFullPath {
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
   '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
+  '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/admin/': typeof AdminIndexRoute
@@ -293,6 +300,7 @@ export interface FileRoutesByTo {
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
   '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
+  '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/admin': typeof AdminIndexRoute
@@ -332,6 +340,7 @@ export interface FileRoutesById {
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
   '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
+  '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/admin/': typeof AdminIndexRoute
@@ -372,6 +381,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId'
     | '/decks/import'
     | '/knowledge/$entryId'
+    | '/knowledge/ask'
     | '/knowledge/new'
     | '/knowledge/oracle'
     | '/admin/'
@@ -408,6 +418,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId'
     | '/decks/import'
     | '/knowledge/$entryId'
+    | '/knowledge/ask'
     | '/knowledge/new'
     | '/knowledge/oracle'
     | '/admin'
@@ -446,6 +457,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId'
     | '/decks/import'
     | '/knowledge/$entryId'
+    | '/knowledge/ask'
     | '/knowledge/new'
     | '/knowledge/oracle'
     | '/admin/'
@@ -582,6 +594,13 @@ declare module '@tanstack/react-router' {
       path: '/new'
       fullPath: '/knowledge/new'
       preLoaderRoute: typeof KnowledgeNewRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
+    '/knowledge/ask': {
+      id: '/knowledge/ask'
+      path: '/ask'
+      fullPath: '/knowledge/ask'
+      preLoaderRoute: typeof KnowledgeAskRouteImport
       parentRoute: typeof KnowledgeRoute
     }
     '/knowledge/$entryId': {
@@ -766,6 +785,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface KnowledgeRouteChildren {
   KnowledgeEntryIdRoute: typeof KnowledgeEntryIdRoute
+  KnowledgeAskRoute: typeof KnowledgeAskRoute
   KnowledgeNewRoute: typeof KnowledgeNewRoute
   KnowledgeOracleRoute: typeof KnowledgeOracleRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
@@ -775,6 +795,7 @@ interface KnowledgeRouteChildren {
 
 const KnowledgeRouteChildren: KnowledgeRouteChildren = {
   KnowledgeEntryIdRoute: KnowledgeEntryIdRoute,
+  KnowledgeAskRoute: KnowledgeAskRoute,
   KnowledgeNewRoute: KnowledgeNewRoute,
   KnowledgeOracleRoute: KnowledgeOracleRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,
