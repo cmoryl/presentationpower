@@ -36,24 +36,25 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/faq", label: "FAQ" },
   ] as const;
 
-  // Liquid glass pills — translucent, refractive edge, inner highlight.
+  // Sleek liquid-glass pills — hairline rings, gradient wash on active, no drop-shadow stacks.
   const pillIdle =
-    "text-black/70 hover:text-black hover:bg-white/50 hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_1px_2px_0_rgba(0,0,0,0.04)] " +
-    "dark:text-white/75 dark:hover:text-white dark:hover:!bg-white/[0.08] dark:hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12),0_1px_0_0_rgba(0,0,0,0.4)]";
+    "relative text-black/65 hover:text-black hover:bg-white/40 " +
+    "dark:text-white/70 dark:hover:text-white dark:hover:!bg-white/[0.05]";
   const pillActive =
-    "bg-white/70 text-[#03002C] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),inset_0_-1px_0_0_rgba(11,42,74,0.08),0_8px_24px_-8px_rgba(11,42,74,0.35)] ring-1 ring-black/5 " +
-    "dark:!bg-gradient-to-b dark:!from-white/[0.14] dark:!to-white/[0.04] dark:!text-white dark:ring-1 dark:!ring-white/15 " +
-    "dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.22),inset_0_-1px_0_0_rgba(0,0,0,0.3),0_10px_30px_-12px_rgba(122,92,255,0.55)]";
+    "relative text-[#03002C] bg-white/60 ring-1 ring-black/[0.04] " +
+    "dark:!text-white dark:!bg-white/[0.06] dark:!ring-white/10 " +
+    // Aqua→violet underline glow instead of a heavy drop shadow
+    "after:pointer-events-none after:absolute after:inset-x-3 after:-bottom-[3px] after:h-px " +
+    "after:bg-gradient-to-r after:from-transparent after:via-[#0057FF]/60 after:to-transparent " +
+    "dark:after:via-[#A1FBF9]/70";
 
   return (
     <div className="min-h-screen bg-[#F5F1EA] text-[#0A0F1C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
       <header
         className={
-          "sticky top-0 z-30 border-b border-white/40 " +
-          "bg-[#F5F1EA]/50 [backdrop-filter:blur(28px)_saturate(180%)] " +
-          "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.7),0_1px_0_0_rgba(0,0,0,0.04),0_20px_50px_-30px_rgba(11,42,74,0.25)] " +
-          "dark:!bg-[#07061F]/50 dark:!border-white/10 " +
-          "dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_1px_0_0_rgba(0,0,0,0.5),0_20px_60px_-30px_rgba(0,63,199,0.4)]"
+          "sticky top-0 z-30 border-b border-white/30 " +
+          "bg-[#F5F1EA]/60 [backdrop-filter:blur(28px)_saturate(180%)] " +
+          "dark:!bg-[#07061F]/60 dark:!border-white/[0.08]"
         }
       >
         {/* Aurora sheen — sits over the glass, adds depth/refraction */}
@@ -101,7 +102,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               TRANSPERFECT · MODULAR
             </div>
           </Link>
-          <nav className="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-full border border-white/50 bg-white/30 p-1 [backdrop-filter:blur(20px)_saturate(160%)] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_10px_30px_-15px_rgba(11,42,74,0.2)] dark:!border-white/10 dark:!bg-white/[0.04] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_10px_30px_-12px_rgba(0,0,0,0.5)]">
+          <nav className="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-full border border-white/40 bg-white/25 p-1 [backdrop-filter:blur(24px)_saturate(160%)] dark:!border-white/10 dark:!bg-white/[0.03]">
             {nav.map((n) => {
               if (n.to === "/admin") {
                 const adminActive = pathname === "/admin" || pathname.startsWith("/admin/");
@@ -162,7 +163,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div
               role="radiogroup"
               aria-label="Color theme"
-              className="ml-1 inline-flex items-center rounded-full border border-white/50 bg-white/40 p-0.5 text-xs shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] dark:!border-white/10 dark:!bg-white/[0.04] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]"
+              className="ml-1 inline-flex items-center rounded-full border border-white/40 bg-white/30 p-0.5 text-xs dark:!border-white/10 dark:!bg-white/[0.03]"
             >
               {themes.map((t) => {
                 const on = theme === t.id;
@@ -175,8 +176,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                     onClick={() => setTheme(t.id)}
                     className={`rounded-full px-2.5 py-1 transition ${
                       on
-                        ? "bg-white/80 text-[#03002C] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_2px_6px_-2px_rgba(11,42,74,0.3)] dark:!bg-gradient-to-b dark:!from-white/15 dark:!to-white/[0.04] dark:!text-white dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]"
-                        : "text-black/70 hover:text-black dark:text-white/70 dark:hover:text-white"
+                        ? "bg-white/70 text-[#03002C] ring-1 ring-black/[0.04] dark:!bg-white/[0.08] dark:!text-white dark:!ring-white/10"
+                        : "text-black/60 hover:text-black dark:text-white/65 dark:hover:text-white"
                     }`}
                   >
                     {t.label}
@@ -192,8 +193,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               title="Auto-adjust text contrast on glass surfaces (WCAG AA)"
               className={`ml-1 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition ${
                 boost
-                  ? "border-white/60 bg-white/80 text-[#03002C] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_4px_12px_-4px_rgba(11,42,74,0.3)] dark:!border-[#A1FBF9]/30 dark:!bg-[#A1FBF9]/10 dark:!text-[#A1FBF9] dark:shadow-[inset_0_1px_0_0_rgba(161,251,249,0.2)]"
-                  : "border-white/50 bg-white/40 text-black/70 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] hover:bg-white/60 dark:!border-white/10 dark:!bg-white/[0.04] dark:text-white/70 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] dark:hover:!bg-white/[0.08]"
+                  ? "border-[#0057FF]/25 bg-white/70 text-[#03002C] dark:!border-[#A1FBF9]/40 dark:!bg-[#A1FBF9]/[0.08] dark:!text-[#A1FBF9]"
+                  : "border-white/40 bg-white/25 text-black/65 hover:bg-white/50 dark:!border-white/10 dark:!bg-white/[0.03] dark:text-white/65 dark:hover:!bg-white/[0.06]"
               }`}
             >
               <span aria-hidden="true">◐</span>
