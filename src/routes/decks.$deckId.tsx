@@ -49,6 +49,7 @@ function DeckEditor() {
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [zoomed, setZoomed] = useState(false);
+  const [flashIndices, setFlashIndices] = useState<number[]>([]);
 
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
