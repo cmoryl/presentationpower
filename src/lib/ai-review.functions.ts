@@ -94,14 +94,10 @@ export const reviewDeck = createServerFn({ method: "POST" })
     | { ok: true; review: BrandReview; reviewId: string | null }
     | { ok: false; error: string; setup?: boolean }
   > => {
-    if (!process.env.ANTHROPIC_API_KEY) {
-      return {
-        ok: false,
-        setup: true,
-        error:
-          "The Brand Reviewer needs an ANTHROPIC_API_KEY. Add it in Project Settings → Secrets, then run the review again.",
-      };
+    if (!hasAnthropicKey()) {
+      return { ok: false, setup: true, error: ANTHROPIC_SETUP_MESSAGE };
     }
+
 
     const { supabase, userId } = context;
 
