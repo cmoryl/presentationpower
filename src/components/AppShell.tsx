@@ -52,11 +52,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-[#F5F1EA] text-[#0A0F1C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
       <header
         className={
-          "sticky top-0 z-30 border-b border-white/40 " +
-          "bg-[#F5F1EA]/50 [backdrop-filter:blur(28px)_saturate(180%)] " +
-          "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.7),0_1px_0_0_rgba(0,0,0,0.04),0_20px_50px_-30px_rgba(11,42,74,0.25)] " +
-          "dark:!bg-[#07061F]/50 dark:!border-white/10 " +
-          "dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_1px_0_0_rgba(0,0,0,0.5),0_20px_60px_-30px_rgba(0,63,199,0.4)]"
+          "sticky top-0 z-30 border-b border-white/30 " +
+          "bg-[#F5F1EA]/60 [backdrop-filter:blur(28px)_saturate(180%)] " +
+          "dark:!bg-[#07061F]/60 dark:!border-white/[0.08]"
         }
       >
         {/* Aurora sheen — sits over the glass, adds depth/refraction */}
