@@ -614,10 +614,19 @@ function BriefWizard() {
                       }
 
                       // Pull Oracle + KB snippets relevant to this brief.
+                      // Try Deep-RAG synthesis first; on any failure fall
+                      // back silently to the raw retrieval path.
                       setAiStatus("knowledge");
-                      let knowledgeSnippets: Array<{ source: "oracle" | "kb" | "asset" | "brand-intel"; title: string; snippet: string; tags: string[]; id: string }> = [];
+                      let knowledgeSnippets: Array<{ source: "oracle" | "kb" | "asset" | "brand-intel" | "synthesis"; title: string; snippet: string; tags: string[]; id: string }> = [];
+                      let synthesisText: string | null = null;
+                      let synthesized = false;
+                      const kbTagsBundle = [
+                        ...(scope?.industries ?? []),
+                        ...(scope?.serviceLines ?? []),
+                        ...(scope?.caseStudyTags ?? []),
+                      ];
                       try {
-                        const kbRes = await retrieveKnowledge({
+                        const synth = await synthesizeKnowledge({
                           data: {
                             industry: submission.industry,
                             audience: submission.audience,
@@ -625,21 +634,81 @@ function BriefWizard() {
                             clientFacts: submission.clientFacts,
                             brandName: brandForCall?.name ?? null,
                             divisionId: brandForCall?.id ?? null,
-                            brandTags: [
-                              ...(scope?.industries ?? []),
-                              ...(scope?.serviceLines ?? []),
-                              ...(scope?.caseStudyTags ?? []),
-                            ],
+                            brandTags: kbTagsBundle,
                             limit: 6,
                           },
                         });
-                        knowledgeSnippets = kbRes as typeof knowledgeSnippets;
-                        setKbUsedCount(knowledgeSnippets.length);
-                        setDeckContext(deckId, {
-                          knowledgeSourceIds: knowledgeSnippets.map((k) => k.id),
-                          knowledgeSources: knowledgeSnippets.map((k) => ({ id: k.id, source: k.source, title: k.title, tags: k.tags })),
+                        if (synth.ok) {
+                          synthesized = synth.synthesized;
+                          synthesisText = synth.synthesis ?? null;
+                          knowledgeSnippets = synth.selected.map((k) => ({
+                            id: k.id,
+                            source: k.source as "oracle" | "kb" | "asset" | "brand-intel",
+                            title: k.title,
+                            snippet: k.snippet,
+                            tags: k.tags,
+                          }));
+                          setKbSelected(synth.selected);
+                          setKbSynthesis(synthesisText);
+                          setKbSynthesized(synthesized);
+                          setShowKbPanel(true);
+                        }
+                      } catch { /* fall through to raw retrieval */ }
+
+                      if (!knowledgeSnippets.length) {
+                        try {
+                          const kbRes = await retrieveKnowledge({
+                            data: {
+                              industry: submission.industry,
+                              audience: submission.audience,
+                              meetingObjective: submission.meetingObjective,
+                              clientFacts: submission.clientFacts,
+                              brandName: brandForCall?.name ?? null,
+                              divisionId: brandForCall?.id ?? null,
+                              brandTags: kbTagsBundle,
+                              limit: 6,
+                            },
+                          });
+                          knowledgeSnippets = kbRes as typeof knowledgeSnippets;
+                          setKbSelected(
+                            knowledgeSnippets.map((k) => ({
+                              id: k.id,
+                              source: k.source,
+                              title: k.title,
+                              tags: k.tags,
+                              snippet: k.snippet,
+                            })),
+                          );
+                        } catch { /* non-fatal */ }
+                      }
+
+                      setKbUsedCount(knowledgeSnippets.length);
+                      setDeckContext(deckId, {
+                        knowledgeSourceIds: knowledgeSnippets.map((k) => k.id),
+                        knowledgeSources: knowledgeSnippets.map((k) => ({
+                          id: k.id,
+                          source: k.source,
+                          title: k.title,
+                          tags: k.tags,
+                          snippet: k.snippet,
+                          extractedFact: k.snippet,
+                        })),
+                        knowledgeSynthesis: synthesisText,
+                      });
+
+                      // Personalizer receives the curated snippets plus, when
+                      // available, a special "synthesis" pseudo-snippet.
+                      const personalizerKb: Array<{ source: "oracle" | "kb" | "asset" | "brand-intel"; title: string; snippet: string; tags: string[] }> = knowledgeSnippets
+                        .filter((k) => k.source !== "synthesis")
+                        .map((k) => ({ source: k.source as "oracle" | "kb" | "asset" | "brand-intel", title: k.title, snippet: k.snippet, tags: k.tags }));
+                      if (synthesisText) {
+                        personalizerKb.unshift({
+                          source: "kb",
+                          title: "Brief-specific knowledge synthesis",
+                          snippet: synthesisText,
+                          tags: ["synthesis"],
                         });
-                      } catch { /* non-fatal */ }
+                      }
 
 
                       setAiStatus("personalizing");
@@ -669,9 +738,10 @@ function BriefWizard() {
                               sectionName: byId(SECTION_FRAMEWORKS, s.sectionId)?.name ?? "",
                               content: s.content as Record<string, unknown>,
                             })),
-                            knowledgeSnippets: knowledgeSnippets.map((k) => ({ source: k.source, title: k.title, snippet: k.snippet, tags: k.tags })),
+                            knowledgeSnippets: personalizerKb.slice(0, 12),
                           },
                         });
+
                         if (result.error) {
                           setAiError(result.error);
                           setAiStatus("error");
