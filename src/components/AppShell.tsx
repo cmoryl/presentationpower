@@ -47,6 +47,49 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Link>
           <nav className="flex max-w-full flex-wrap items-center justify-center gap-1">
             {nav.map((n) => {
+              if (n.to === "/admin") {
+                const adminActive = pathname === "/admin" || pathname.startsWith("/admin/");
+                return (
+                  <div
+                    key={n.to}
+                    className="relative"
+                    onMouseEnter={() => setAdminOpen(true)}
+                    onMouseLeave={() => setAdminOpen(false)}
+                  >
+                    <Link
+                      to={n.to}
+                      className={`inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm transition sm:px-4 ${
+                        adminActive ? "bg-[#0B2A4A] text-white shadow-lg" : "text-black/60 hover:bg-white/40 hover:text-black"
+                      }`}
+                      onClick={() => setAdminOpen(false)}
+                    >
+                      {n.label}
+                      <span aria-hidden className="text-[10px]">▾</span>
+                    </Link>
+                    {adminOpen && (
+                      <div className="absolute left-1/2 top-full z-50 w-48 -translate-x-1/2 pt-1">
+                        <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/95 p-1.5 shadow-xl backdrop-blur-md">
+                          {adminSubnav.map((s) => {
+                            const active = pathname === s.to || pathname.startsWith(s.to + "/");
+                            return (
+                              <Link
+                                key={s.to}
+                                to={s.to}
+                                className={`block rounded-xl px-3.5 py-2 text-sm transition ${
+                                  active ? "bg-[#03002C] text-white" : "text-black/70 hover:bg-black/5"
+                                }`}
+                                onClick={() => setAdminOpen(false)}
+                              >
+                                {s.label}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
               const active = pathname === n.to || (n.to !== "/" && pathname.startsWith(n.to));
               return (
                 <Link
