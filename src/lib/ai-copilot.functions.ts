@@ -64,11 +64,19 @@ const Input = z.object({
 
 export type CopilotInput = z.infer<typeof Input>;
 
+export type CopilotUpdatedSlide = {
+  index: number;
+  variantId: string;
+  layoutId: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  content: Record<string, any>;
+};
+
 export type CopilotResult =
   | {
       ok: true;
       reply: string;
-      updatedSlides: Array<{ index: number; variantId: string; layoutId: string; content: Record<string, unknown> }>;
+      updatedSlides: CopilotUpdatedSlide[];
       changedIndices: number[];
     }
   | { ok: false; error: string };
