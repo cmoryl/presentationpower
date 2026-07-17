@@ -37,7 +37,9 @@ export type CulturalInsights = {
 export type BrandhubIntel = {
   summary: string;
   marketPosition: string;
-  targetAudience: string;
+  targetAudience:
+    | string
+    | { primary?: string; secondary?: string[]; demographics?: string[] };
   competitiveAdvantages: string[];
   voiceProfile: VoiceProfile;
   growthRecommendations: GrowthRecommendation[];
@@ -46,7 +48,7 @@ export type BrandhubIntel = {
   knowledgeEntries: string[];
 };
 
-const INTEL = data as Record<string, BrandhubIntel>;
+const INTEL = data as unknown as Record<string, BrandhubIntel>;
 
 export function getBrandhubIntel(slug: string): BrandhubIntel | undefined {
   return INTEL[slug];
@@ -56,4 +58,14 @@ export function normalizeVoiceValue(v: unknown): string[] {
   if (!v) return [];
   if (Array.isArray(v)) return v.map(String);
   return [String(v)];
+}
+
+export function targetAudienceText(t: BrandhubIntel["targetAudience"]): string {
+  if (!t) return "";
+  if (typeof t === "string") return t;
+  const parts: string[] = [];
+  if (t.primary) parts.push(t.primary);
+  if (t.secondary?.length) parts.push(`Secondary: ${t.secondary.join(", ")}`);
+  if (t.demographics?.length) parts.push(`Demographics: ${t.demographics.join(", ")}`);
+  return parts.join(" · ");
 }
