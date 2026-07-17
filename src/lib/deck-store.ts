@@ -1072,6 +1072,13 @@ export const useDeckStore = create<DeckState>()(
       },
 
 
+      setDeckContext: (deckId, patch) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const next: DeckContext = { ...(deck.context ?? {}), ...patch };
+        set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, context: next } } }));
+      },
+
       deleteDeck: (deckId) => {
         set((s) => {
           const next = { ...s.decks };
@@ -1079,6 +1086,7 @@ export const useDeckStore = create<DeckState>()(
           return { decks: next };
         });
       },
+
 
       hydrate: ({ brief, deck }) =>
         set((s) => ({
