@@ -1,5 +1,6 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { useState } from "react";
 import { useContrastBoost } from "@/hooks/use-contrast-boost";
 import { useTheme, type ThemeMode } from "@/hooks/use-theme";
 
