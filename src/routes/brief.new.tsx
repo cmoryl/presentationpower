@@ -61,6 +61,7 @@ function BriefWizard() {
   const decks = useDeckStore((s) => s.decks);
   const personalize = useServerFn(personalizeSlides);
   const retrieveKnowledge = useServerFn(retrieveKnowledgeForBrief);
+  const planStrategyFn = useServerFn(planDeckStrategy);
   const assignVariantFn = useServerFn(abAssign);
   const logAbEventFn = useServerFn(abLogEvent);
   const { brandModes, narrativeArchetypes } = useTaxonomy();
@@ -69,6 +70,11 @@ function BriefWizard() {
   const [showAllArchetypes, setShowAllArchetypes] = useState(false);
   const [paletteSel, setPaletteSel] = useState<PaletteSelection>({ experimentId: null, variantId: null, paletteOverride: null });
   const [kbUsedCount, setKbUsedCount] = useState<number>(0);
+  // AI Narrative Strategist (Phase B) — optional pass before deck generation.
+  const [strategy, setStrategy] = useState<DeckStrategy | null>(null);
+  const [strategyStatus, setStrategyStatus] = useState<"idle" | "planning" | "ready" | "error">("idle");
+  const [strategyError, setStrategyError] = useState<string | null>(null);
+  const [strategySetupNeeded, setStrategySetupNeeded] = useState(false);
   const [form, setForm] = useState({
     prospect: "Acme Global",
     industry: "Life sciences",
