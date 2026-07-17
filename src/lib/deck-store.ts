@@ -906,18 +906,35 @@ export const useDeckStore = create<DeckState>()(
       briefs: {},
       decks: {},
 
-      createBriefAndAssemble: (input) => {
+      createBriefAndAssemble: (input, opts) => {
         const brief: Brief = {
           ...input,
           id: nanoid(8),
           createdAt: new Date().toISOString(),
         };
-        const deck = assembleDeck(brief);
+        const strategy = opts?.strategy;
+        const strategyOverride = strategy?.recommendedSections?.length
+          ? {
+              sections: strategy.recommendedSections.map((r) => r.sectionId),
+              variantById: Object.fromEntries(
+                strategy.recommendedSections
+                  .filter((r) => r.suggestedVariantId)
+                  .map((r) => [r.sectionId, r.suggestedVariantId as string]),
+              ),
+              layoutById: Object.fromEntries(
+                strategy.recommendedSections
+                  .filter((r) => r.suggestedLayoutId)
+                  .map((r) => [r.sectionId, r.suggestedLayoutId as string]),
+              ),
+            }
+          : undefined;
+        const deck = assembleDeck(brief, strategyOverride);
         deck.context = {
           abExperimentId: brief.abExperimentId ?? null,
           abVariantId: brief.abVariantId ?? null,
           abPaletteOverride: brief.abPaletteOverride ?? null,
           knowledgeSourceIds: brief.knowledgeSourceIds ?? [],
+          strategy: strategy ?? undefined,
         };
         set((s) => ({
           briefs: { ...s.briefs, [brief.id]: brief },
