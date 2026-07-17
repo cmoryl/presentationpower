@@ -1,4 +1,5 @@
 import type { BrandMode } from "@/lib/taxonomy";
+import { getDivisionLogos } from "@/lib/division-logos";
 
 // Inline SVG of the approved TransPerfect horizontal wordmark. Paths inherit
 // `currentColor` so a single component tints for both dark and light chrome.
