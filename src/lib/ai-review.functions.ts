@@ -139,6 +139,9 @@ export const reviewDeck = createServerFn({ method: "POST" })
       `Deck title: ${data.deckTitle}`,
       data.subCompany ? `Sub-company: ${data.subCompany}` : "",
       data.brief ? `Brief context: ${JSON.stringify(data.brief)}` : "",
+      data.strategy
+        ? `Intended narrative (from AI Strategist — use to flag drift under category "structure"): ${JSON.stringify(data.strategy)}`
+        : "",
       "Slides (JSON):",
       JSON.stringify(data.slides, null, 0),
     ]
