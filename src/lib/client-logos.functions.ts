@@ -340,7 +340,10 @@ export const importBrandhubLogos = createServerFn({ method: "POST" })
               "application/octet-stream";
             const filename = `${file.lockup ?? "logo"}-${file.variant ?? slot}.${format}`;
             path = `${slug}/${filename}`;
-            const { error: upErr } = await sa.storage.from(BUCKET).upload(path, buf, {
+            const bucket = sa.storage.from(BUCKET) as unknown as {
+              upload: (p: string, body: ArrayBuffer, o: { contentType: string; upsert: boolean }) => Promise<{ error: unknown }>;
+            };
+            const { error: upErr } = await bucket.upload(path, buf, {
               contentType: mime,
               upsert: true,
             });
