@@ -291,9 +291,7 @@ export const importBrandhubLogos = createServerFn({ method: "POST" })
     const logos = (await listRes.json()) as BrandhubLogo[];
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const sa = supabaseAdmin as unknown as (SbClient & {
-      storage: { from: (b: string) => { upload: (path: string, body: ArrayBuffer, opts: { contentType: string; upsert: boolean }) => Promise<{ error: unknown }> } };
-    });
+    const sa = supabaseAdmin as unknown as SbClient;
 
     let created = 0, skipped = 0, filesUploaded = 0;
     const errors: string[] = [];
