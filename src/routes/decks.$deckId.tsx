@@ -80,21 +80,7 @@ function DeckEditor() {
         </div>
         <div className="flex items-center gap-2">
           <SaveToCloudButton deckId={deckId} />
-          <Link
-            to="/decks/$deckId/export"
-            params={{ deckId }}
-            className="rounded-full border border-black/15 bg-white px-4 py-2 text-sm font-medium text-black hover:border-black/30"
-          >
-            Export
-          </Link>
-          <Link
-            to="/decks/$deckId/present"
-            params={{ deckId }}
-            className="rounded-full bg-[#0B2A4A] px-4 py-2 text-sm font-medium text-white hover:bg-[#0B2A4A]/90"
-          >
-            Present ▶
-          </Link>
-
+          <ShareMenu deckId={deckId} />
         </div>
       </div>
 

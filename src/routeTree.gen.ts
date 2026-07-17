@@ -42,6 +42,7 @@ import { Route as AdminAiRouteImport } from './routes/admin.ai'
 import { Route as AdminAbRouteImport } from './routes/admin.ab'
 import { Route as KnowledgeBrandGuidesIndexRouteImport } from './routes/knowledge.brand-guides.index'
 import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
+import { Route as DecksDeckIdPrintRouteImport } from './routes/decks.$deckId.print'
 import { Route as DecksDeckIdPresentRouteImport } from './routes/decks.$deckId.present'
 import { Route as DecksDeckIdExportRouteImport } from './routes/decks.$deckId.export'
 import { Route as DecksDeckIdDocumentRouteImport } from './routes/decks.$deckId.document'
@@ -214,6 +215,11 @@ const KnowledgeBrandGuidesSlugRoute =
     path: '/brand-guides/$slug',
     getParentRoute: () => KnowledgeRoute,
   } as any)
+const DecksDeckIdPrintRoute = DecksDeckIdPrintRouteImport.update({
+  id: '/print',
+  path: '/print',
+  getParentRoute: () => DecksDeckIdRoute,
+} as any)
 const DecksDeckIdPresentRoute = DecksDeckIdPresentRouteImport.update({
   id: '/present',
   path: '/present',
@@ -272,6 +278,7 @@ export interface FileRoutesByFullPath {
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
+  '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
 }
@@ -309,6 +316,7 @@ export interface FileRoutesByTo {
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
+  '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
 }
@@ -349,6 +357,7 @@ export interface FileRoutesById {
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
+  '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
 }
@@ -390,6 +399,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
+    | '/decks/$deckId/print'
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/'
   fileRoutesByTo: FileRoutesByTo
@@ -427,6 +437,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
+    | '/decks/$deckId/print'
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides'
   id:
@@ -466,6 +477,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
+    | '/decks/$deckId/print'
     | '/knowledge/brand-guides/$slug'
     | '/knowledge/brand-guides/'
   fileRoutesById: FileRoutesById
@@ -722,6 +734,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeBrandGuidesSlugRouteImport
       parentRoute: typeof KnowledgeRoute
     }
+    '/decks/$deckId/print': {
+      id: '/decks/$deckId/print'
+      path: '/print'
+      fullPath: '/decks/$deckId/print'
+      preLoaderRoute: typeof DecksDeckIdPrintRouteImport
+      parentRoute: typeof DecksDeckIdRoute
+    }
     '/decks/$deckId/present': {
       id: '/decks/$deckId/present'
       path: '/present'
@@ -811,12 +830,14 @@ interface DecksDeckIdRouteChildren {
   DecksDeckIdDocumentRoute: typeof DecksDeckIdDocumentRoute
   DecksDeckIdExportRoute: typeof DecksDeckIdExportRoute
   DecksDeckIdPresentRoute: typeof DecksDeckIdPresentRoute
+  DecksDeckIdPrintRoute: typeof DecksDeckIdPrintRoute
 }
 
 const DecksDeckIdRouteChildren: DecksDeckIdRouteChildren = {
   DecksDeckIdDocumentRoute: DecksDeckIdDocumentRoute,
   DecksDeckIdExportRoute: DecksDeckIdExportRoute,
   DecksDeckIdPresentRoute: DecksDeckIdPresentRoute,
+  DecksDeckIdPrintRoute: DecksDeckIdPrintRoute,
 }
 
 const DecksDeckIdRouteWithChildren = DecksDeckIdRoute._addFileChildren(
