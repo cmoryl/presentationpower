@@ -44,6 +44,8 @@ function DeckEditor() {
   const addSlide = useDeckStore((s) => s.addSlide);
   const duplicateSlide = useDeckStore((s) => s.duplicateSlide);
   const revertAiChange = useDeckStore((s) => s.revertAiChange);
+  const setDeckClientLogo = useDeckStore((s) => s.setDeckClientLogo);
+
   const [activeIdx, setActiveIdx] = useState(0);
   const [zoomed, setZoomed] = useState(false);
 
@@ -56,6 +58,8 @@ function DeckEditor() {
   const lf = active ? byId(LAYOUT_FRAMEWORKS, active.layoutId) : undefined;
 
   const qa = useMemo(() => runQa(deck.slides, deck.brandModeId), [deck.slides, deck.brandModeId]);
+  const clientLogoUrl = deck.clientLogo?.primaryUrl ?? null;
+
 
   return (
     <AppShell>
