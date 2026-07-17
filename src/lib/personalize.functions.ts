@@ -35,7 +35,7 @@ const BriefInput = z.object({
 });
 
 const KnowledgeSnippet = z.object({
-  source: z.enum(["oracle", "kb"]),
+  source: z.enum(["oracle", "kb", "asset", "brand-intel"]),
   title: z.string(),
   snippet: z.string(),
   tags: z.array(z.string()).default([]),

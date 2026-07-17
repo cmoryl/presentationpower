@@ -501,7 +501,7 @@ function BriefWizard() {
 
                       // Pull Oracle + KB snippets relevant to this brief.
                       setAiStatus("knowledge");
-                      let knowledgeSnippets: Array<{ source: "oracle" | "kb"; title: string; snippet: string; tags: string[]; id: string }> = [];
+                      let knowledgeSnippets: Array<{ source: "oracle" | "kb" | "asset" | "brand-intel"; title: string; snippet: string; tags: string[]; id: string }> = [];
                       try {
                         const kbRes = await retrieveKnowledge({
                           data: {

@@ -657,18 +657,26 @@ const kbInput = z.object({
 export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => kbInput.parse(input))
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data, context }): Promise<Array<{ id: string; source: "oracle" | "kb" | "asset" | "brand-intel"; title: string; tags: string[]; snippet: string }>> => {
     const s = context.supabase as unknown as SbClient;
-    const [{ data: oracle }, { data: entries }] = await Promise.all([
+    const [{ data: oracle }, { data: entries }, { data: brandIntel }] = await Promise.all([
       s.from("oracle_knowledge_base").select("id, title, content, category, tags").eq("is_active", true).limit(200),
       s.from("knowledge_entries").select("id, title, body, tags").limit(200),
+      s.from("brand_intelligence").select("id, entity_type, entity_id, brand_summary, market_position, competitive_advantages"),
     ]);
-    const haystack = [
+    const haystack: Array<{ id: string; title: string; body: string; tags: string[]; source: "oracle" | "kb" | "brand-intel" }> = [
       ...((oracle ?? []) as Array<{ id: string; title: string; content: string; category: string | null; tags: string[] | null }>).map((r) => ({
         id: `oracle:${r.id}`, title: r.title, body: r.content ?? "", tags: [...(r.tags ?? []), r.category ?? ""].filter(Boolean), source: "oracle" as const,
       })),
       ...((entries ?? []) as Array<{ id: string; title: string; body: string; tags: string[] | null }>).map((r) => ({
         id: `kb:${r.id}`, title: r.title, body: r.body ?? "", tags: r.tags ?? [], source: "kb" as const,
+      })),
+      ...((brandIntel ?? []) as Array<{ id: string; entity_type: string; entity_id: string; brand_summary: string | null; market_position: string | null; competitive_advantages: any }>).map((r) => ({
+        id: `bi:${r.id}`,
+        title: `Brand intelligence: ${r.entity_type}`,
+        body: [r.brand_summary, r.market_position, Array.isArray(r.competitive_advantages) ? r.competitive_advantages.join(" · ") : ""].filter(Boolean).join(" — "),
+        tags: [r.entity_type, r.entity_id].filter(Boolean),
+        source: "brand-intel" as const,
       })),
     ];
     // Tokenize brief + brand context.
@@ -684,11 +692,59 @@ export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
       for (const t of tokenSet) if (hay.includes(t)) score += 1;
       for (const bt of data.brandTags) if (h.tags.some((tg) => tg.toLowerCase().includes(bt.toLowerCase()))) score += 2;
       return { ...h, score };
-    }).filter((h) => h.score > 0).sort((a, b) => b.score - a.score).slice(0, data.limit);
-    return scored.map((s2) => ({
-      id: s2.id, source: s2.source, title: s2.title, tags: s2.tags,
-      snippet: (s2.body ?? "").slice(0, 480).replace(/\s+/g, " ").trim(),
-    }));
+    }).filter((h) => h.score > 0).sort((a, b) => b.score - a.score).slice(0, Math.max(1, data.limit - 3));
+
+    // Vector search over brand_asset_chunks (PDFs/brochures) using the brief context.
+    const assetSnippets: Array<{ id: string; source: "asset"; title: string; tags: string[]; snippet: string }> = [];
+    const apiKey = process.env.LOVABLE_API_KEY;
+    const query = [data.industry, data.audience, data.meetingObjective, data.clientFacts, data.brandName ?? "", ...data.brandTags].join(" ").trim();
+    if (apiKey && query.length > 6) {
+      try {
+        const eRes = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ model: "google/gemini-embedding-001", input: [query.slice(0, 4000)] }),
+        });
+        if (eRes.ok) {
+          const eJson = (await eRes.json()) as { data?: Array<{ embedding: number[] }> };
+          const vec = eJson.data?.[0]?.embedding;
+          if (vec) {
+            const { data: chunks } = await s.rpc("match_brand_chunks", {
+              query_embedding: `[${vec.join(",")}]`,
+              match_count: 3,
+              filter_division: data.brandName ? data.brandName.toLowerCase().replace(/\s+/g, "-") : null,
+            });
+            const chunkRows = (chunks ?? []) as Array<{ id: string; asset_id: string; content: string; tags: string[]; similarity: number }>;
+            // Resolve asset titles
+            if (chunkRows.length) {
+              const { data: assets } = await s.from("brand_assets").select("id, title").in("id" as any, chunkRows.map((c) => c.asset_id) as any);
+              const titleMap = new Map<string, string>();
+              for (const a of (assets ?? []) as Array<{ id: string; title: string }>) titleMap.set(a.id, a.title);
+              for (const c of chunkRows) {
+                assetSnippets.push({
+                  id: `asset:${c.id}`,
+                  source: "asset",
+                  title: titleMap.get(c.asset_id) ?? "Brand asset",
+                  tags: c.tags,
+                  snippet: (c.content ?? "").slice(0, 480).replace(/\s+/g, " ").trim(),
+                });
+              }
+            }
+          }
+        }
+      } catch {
+        // Silent: RAG is optional enrichment; keyword scoring still returned.
+      }
+    }
+
+    const combined = [
+      ...scored.map((s2) => ({
+        id: s2.id, source: s2.source, title: s2.title, tags: s2.tags,
+        snippet: (s2.body ?? "").slice(0, 480).replace(/\s+/g, " ").trim(),
+      })),
+      ...assetSnippets,
+    ];
+    return combined.slice(0, data.limit);
   });
 
 // AI-propose palette variants for the current brand. Uses brand tokens as

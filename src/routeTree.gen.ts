@@ -33,6 +33,7 @@ import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
 import { Route as AdminImageryRouteImport } from './routes/admin.imagery'
 import { Route as AdminIconStudioRouteImport } from './routes/admin.icon-studio'
+import { Route as AdminBrandAssetsRouteImport } from './routes/admin.brand-assets'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminApprovalsRouteImport } from './routes/admin.approvals'
 import { Route as AdminAiRouteImport } from './routes/admin.ai'
@@ -162,6 +163,11 @@ const AdminIconStudioRoute = AdminIconStudioRouteImport.update({
   path: '/icon-studio',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminBrandAssetsRoute = AdminBrandAssetsRouteImport.update({
+  id: '/brand-assets',
+  path: '/brand-assets',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAuditRoute = AdminAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -219,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/admin/ai': typeof AdminAiRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
   '/admin/oracle': typeof AdminOracleRoute
@@ -251,6 +258,7 @@ export interface FileRoutesByTo {
   '/admin/ai': typeof AdminAiRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
   '/admin/oracle': typeof AdminOracleRoute
@@ -286,6 +294,7 @@ export interface FileRoutesById {
   '/admin/ai': typeof AdminAiRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
+  '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
   '/admin/oracle': typeof AdminOracleRoute
@@ -322,6 +331,7 @@ export interface FileRouteTypes {
     | '/admin/ai'
     | '/admin/approvals'
     | '/admin/audit'
+    | '/admin/brand-assets'
     | '/admin/icon-studio'
     | '/admin/imagery'
     | '/admin/oracle'
@@ -354,6 +364,7 @@ export interface FileRouteTypes {
     | '/admin/ai'
     | '/admin/approvals'
     | '/admin/audit'
+    | '/admin/brand-assets'
     | '/admin/icon-studio'
     | '/admin/imagery'
     | '/admin/oracle'
@@ -388,6 +399,7 @@ export interface FileRouteTypes {
     | '/admin/ai'
     | '/admin/approvals'
     | '/admin/audit'
+    | '/admin/brand-assets'
     | '/admin/icon-studio'
     | '/admin/imagery'
     | '/admin/oracle'
@@ -595,6 +607,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIconStudioRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/brand-assets': {
+      id: '/admin/brand-assets'
+      path: '/brand-assets'
+      fullPath: '/admin/brand-assets'
+      preLoaderRoute: typeof AdminBrandAssetsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/audit': {
       id: '/admin/audit'
       path: '/audit'
@@ -659,6 +678,7 @@ interface AdminRouteChildren {
   AdminAiRoute: typeof AdminAiRoute
   AdminApprovalsRoute: typeof AdminApprovalsRoute
   AdminAuditRoute: typeof AdminAuditRoute
+  AdminBrandAssetsRoute: typeof AdminBrandAssetsRoute
   AdminIconStudioRoute: typeof AdminIconStudioRoute
   AdminImageryRoute: typeof AdminImageryRoute
   AdminOracleRoute: typeof AdminOracleRoute
@@ -671,6 +691,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAiRoute: AdminAiRoute,
   AdminApprovalsRoute: AdminApprovalsRoute,
   AdminAuditRoute: AdminAuditRoute,
+  AdminBrandAssetsRoute: AdminBrandAssetsRoute,
   AdminIconStudioRoute: AdminIconStudioRoute,
   AdminImageryRoute: AdminImageryRoute,
   AdminOracleRoute: AdminOracleRoute,
@@ -746,13 +767,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
