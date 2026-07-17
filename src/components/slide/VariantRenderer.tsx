@@ -170,6 +170,7 @@ type Props = {
   pageNumber: number;
   clientName?: string;
   clientLogoUrl?: string | null;
+  subCompany?: string;
   mode?: SlideMode;
 };
 
