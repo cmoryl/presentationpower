@@ -89,6 +89,19 @@ export function BrandReviewPanel({
               meetingObjective: brief.meetingObjective,
             }
           : undefined,
+        strategy: deck.context?.strategy
+          ? {
+              narrativeArc: deck.context.strategy.narrativeArc,
+              openingHook: deck.context.strategy.openingHook,
+              closingAsk: deck.context.strategy.closingAsk,
+              risksToAvoid: deck.context.strategy.risksToAvoid,
+              recommendedSections: deck.context.strategy.recommendedSections?.map((r) => ({
+                sectionId: r.sectionId,
+                keyMessage: r.keyMessage,
+                rationale: r.rationale,
+              })),
+            }
+          : undefined,
         slides: deck.slides.map((s, i) => ({
           index: i,
           sectionName: byId(SECTION_FRAMEWORKS, s.sectionId)?.name ?? "",
