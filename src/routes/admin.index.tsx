@@ -40,9 +40,9 @@ function OverviewView() {
   const tokensPerCall = t.aiCalls ? Math.round(t.aiTokens / t.aiCalls) : 0;
 
   const heroStats = [
-    { label: "AI CALLS", value: t.aiCalls.toLocaleString(), delta: `${successRate.toFixed(1)}% success`, color: BRAND.blue, trend: q.data.aiPerDay.slice(-14) },
+    { label: "DECKS", value: t.decks.toLocaleString(), delta: `${t.decksInWindow ?? 0} created · 30d`, color: BRAND.blue, trend: q.data.decksPerDay?.slice(-14) },
+    { label: "AI CALLS", value: t.aiCalls.toLocaleString(), delta: `${successRate.toFixed(1)}% success`, color: BRAND.lavender, trend: q.data.aiPerDay.slice(-14) },
     { label: "IMAGES", value: t.imagesGenerated.toLocaleString(), delta: `${t.imageEvents} total events`, color: BRAND.pink, trend: q.data.imageryPerDay.slice(-14) },
-    { label: "DECKS", value: t.decks.toLocaleString(), delta: `${t.users} active users`, color: BRAND.lavender },
     { label: "KNOWLEDGE", value: (t.knowledgeEntries + (t.oracleKnowledge ?? 0)).toLocaleString(), delta: `${t.brandIntelligence ?? 0} brand intel`, color: BRAND.aqua },
   ];
 
@@ -90,6 +90,184 @@ function OverviewView() {
             )}
           </div>
         ))}
+      </section>
+
+      {/* DECK COMMAND CENTER */}
+      <section className="rounded-3xl border border-black/10 bg-gradient-to-br from-[#03002C] via-[#0A1350] to-[#003FC7] p-8 text-white">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.3em] text-white/50">Deck Studio</div>
+            <h2 className="mt-1 font-[Geist] text-3xl font-semibold tracking-tight">Deck Command Center</h2>
+            <p className="mt-1 max-w-xl text-sm text-white/60">
+              End-to-end visibility across every generated deck — status pipeline, brand-mode distribution,
+              narrative archetypes, and the latest activity.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Link
+              to="/decks"
+              className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#03002C] transition hover:bg-white/90"
+            >
+              Open Decks →
+            </Link>
+            <Link
+              to="/brief/new"
+              className="rounded-full border border-white/30 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+            >
+              + New Brief
+            </Link>
+          </div>
+        </div>
+
+        {/* Deck KPI strip */}
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <DeckMetric label="Total Decks" value={t.decks.toLocaleString()} accent={BRAND.aqua} sub="all time" />
+          <DeckMetric label="Created · 30d" value={(t.decksInWindow ?? 0).toLocaleString()} accent={BRAND.lavender} sub={`peak ${Math.max(0, ...(q.data.decksPerDay ?? []).map((d) => d.count))}/day`} />
+          <DeckMetric
+            label="Brand Modes"
+            value={(q.data.decksByBrandMode?.length ?? 0).toString()}
+            accent={BRAND.yellow}
+            sub="in use"
+          />
+          <DeckMetric
+            label="Archetypes"
+            value={(q.data.decksByArchetype?.length ?? 0).toString()}
+            accent={BRAND.peach}
+            sub="active narratives"
+          />
+        </div>
+
+        {/* Deck body: trend + breakdowns */}
+        <div className="mt-6 grid gap-6 lg:grid-cols-12">
+          {/* Sparkline trend */}
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 lg:col-span-7">
+            <div className="flex items-end justify-between">
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">Creation Trend · 30d</div>
+                <div className="mt-1 font-[Geist] text-xl font-semibold">Decks per day</div>
+              </div>
+              <div className="text-[10px] uppercase tracking-widest text-white/50">
+                {(q.data.decksPerDay ?? []).reduce((a, d) => a + d.count, 0)} total
+              </div>
+            </div>
+            {q.data.decksPerDay && q.data.decksPerDay.length > 0 ? (
+              <div className="mt-5 flex h-36 items-end gap-1">
+                {q.data.decksPerDay.map((d) => {
+                  const dmax = Math.max(1, ...(q.data.decksPerDay ?? []).map((x) => x.count));
+                  return (
+                    <div key={d.date} className="group relative flex-1" title={`${d.date}: ${d.count}`}>
+                      <div
+                        className="w-full rounded-t"
+                        style={{
+                          height: `${Math.max(3, (d.count / dmax) * 100)}%`,
+                          background: `linear-gradient(180deg, ${BRAND.aqua}, ${BRAND.blue})`,
+                        }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="mt-5 flex h-36 items-center justify-center rounded-xl border border-dashed border-white/20 text-xs text-white/50">
+                No decks yet — create your first brief to populate.
+              </div>
+            )}
+          </div>
+
+          {/* Status pipeline */}
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 lg:col-span-5">
+            <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">Status Pipeline</div>
+            <div className="mt-1 font-[Geist] text-xl font-semibold">By workflow state</div>
+            <div className="mt-5 space-y-3">
+              {(q.data.decksByStatus ?? []).length === 0 ? (
+                <div className="rounded-lg border border-dashed border-white/20 p-4 text-center text-xs text-white/50">
+                  No decks tracked yet.
+                </div>
+              ) : (
+                (q.data.decksByStatus ?? []).map((row, i) => {
+                  const total = (q.data.decksByStatus ?? []).reduce((a, r) => a + r.count, 0) || 1;
+                  const pct = (row.count / total) * 100;
+                  const colors = [BRAND.aqua, BRAND.lavender, BRAND.yellow, BRAND.peach, BRAND.pink, BRAND.green];
+                  const c = colors[i % colors.length];
+                  return (
+                    <div key={row.label}>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="capitalize text-white/80">{row.label}</span>
+                        <span className="text-white/60">
+                          {row.count} <span className="text-white/40">· {pct.toFixed(0)}%</span>
+                        </span>
+                      </div>
+                      <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-white/10">
+                        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: c }} />
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Brand mode + Archetype + Recent decks */}
+        <div className="mt-6 grid gap-6 lg:grid-cols-12">
+          <BreakdownBlock
+            title="Brand Modes"
+            subtitle="Deck distribution"
+            rows={q.data.decksByBrandMode ?? []}
+            accent={BRAND.lavender}
+            className="lg:col-span-4"
+          />
+          <BreakdownBlock
+            title="Narrative Archetypes"
+            subtitle="Story frameworks in play"
+            rows={q.data.decksByArchetype ?? []}
+            accent={BRAND.yellow}
+            className="lg:col-span-4"
+          />
+
+          {/* Recent decks list */}
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 lg:col-span-4">
+            <div className="flex items-end justify-between">
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">Recent Activity</div>
+                <div className="mt-1 font-[Geist] text-lg font-semibold">Latest decks</div>
+              </div>
+              <Link to="/decks" className="text-[11px] text-white/60 hover:text-white">
+                All →
+              </Link>
+            </div>
+            <div className="mt-4 space-y-2">
+              {(q.data.recentDecks ?? []).length === 0 ? (
+                <div className="rounded-lg border border-dashed border-white/20 p-4 text-center text-xs text-white/50">
+                  No decks yet.
+                </div>
+              ) : (
+                (q.data.recentDecks ?? []).map((d) => (
+                  <Link
+                    key={d.id}
+                    to="/decks/$deckId"
+                    params={{ deckId: d.id }}
+                    className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3 transition hover:border-white/25 hover:bg-white/10"
+                  >
+                    <span
+                      className="h-8 w-1 rounded-full"
+                      style={{ background: statusColor(d.status) }}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-medium text-white">{d.title}</div>
+                      <div className="mt-0.5 flex items-center gap-2 text-[10px] uppercase tracking-wider text-white/50">
+                        <span>{d.brandMode}</span>
+                        <span>·</span>
+                        <span>{d.status}</span>
+                      </div>
+                    </div>
+                    <span className="text-white/30 transition group-hover:translate-x-0.5 group-hover:text-white">→</span>
+                  </Link>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* AI PERFORMANCE INFOGRAPHIC */}
@@ -472,4 +650,73 @@ function latencyLabel(ms: number) {
   if (ms < 1500) return "healthy";
   if (ms < 3000) return "elevated";
   return "slow";
+}
+
+function DeckMetric({ label, value, sub, accent }: { label: string; value: string; sub: string; accent: string }) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+      <div className="absolute right-0 top-0 h-14 w-14 rounded-bl-full opacity-20" style={{ background: accent }} />
+      <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/50">{label}</div>
+      <div className="mt-2 flex items-baseline gap-2">
+        <span className="font-[Geist] text-4xl font-semibold tracking-tight text-white">{value}</span>
+      </div>
+      <div className="mt-1 text-[11px] text-white/50">{sub}</div>
+    </div>
+  );
+}
+
+function BreakdownBlock({
+  title,
+  subtitle,
+  rows,
+  accent,
+  className = "",
+}: {
+  title: string;
+  subtitle: string;
+  rows: Array<{ label: string; count: number }>;
+  accent: string;
+  className?: string;
+}) {
+  const total = rows.reduce((a, r) => a + r.count, 0) || 1;
+  const top = rows.slice(0, 6);
+  return (
+    <div className={`rounded-2xl border border-white/10 bg-white/5 p-5 ${className}`}>
+      <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">{subtitle}</div>
+      <div className="mt-1 font-[Geist] text-lg font-semibold text-white">{title}</div>
+      <div className="mt-4 space-y-2.5">
+        {top.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-white/20 p-4 text-center text-xs text-white/50">
+            No data yet.
+          </div>
+        ) : (
+          top.map((r) => {
+            const pct = (r.count / total) * 100;
+            return (
+              <div key={r.label}>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="truncate pr-2 text-white/80">{r.label}</span>
+                  <span className="whitespace-nowrap text-white/60">
+                    {r.count} <span className="text-white/40">· {pct.toFixed(0)}%</span>
+                  </span>
+                </div>
+                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/10">
+                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: accent }} />
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}
+
+function statusColor(status: string) {
+  const s = status.toLowerCase();
+  if (s.includes("publish") || s.includes("approved") || s.includes("final")) return "#A6FA87";
+  if (s.includes("review") || s.includes("qa")) return "#FFEB66";
+  if (s.includes("error") || s.includes("reject")) return "#E53D2E";
+  if (s.includes("draft")) return "#C2A3FF";
+  return "#A1FBF9";
 }
