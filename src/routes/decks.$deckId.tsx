@@ -336,7 +336,7 @@ function DeckEditor() {
         </aside>
 
       </div>
-      <DeckChat deck={deck} brief={brief} />
+      <CopilotPanel deckId={deckId} onHighlight={setFlashIndices} />
       {zoomed && active && mv && (
         <SlideLightbox
           onClose={() => setZoomed(false)}
