@@ -158,6 +158,7 @@ const items: Array<{ to: string; label: string; exact?: boolean }> = [
   { to: "/admin/approvals", label: "Knowledgebase" },
   { to: "/admin/oracle", label: "Oracle KB" },
   { to: "/admin/brand-assets", label: "Brand assets" },
+  { to: "/admin/logohub", label: "LogoHub" },
   { to: "/admin/icon-studio", label: "Icon Studio" },
   { to: "/admin/audit", label: "Audit log" },
 ];
