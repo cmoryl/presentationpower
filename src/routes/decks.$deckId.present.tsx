@@ -1,8 +1,9 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDeckStore } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { cn } from "@/lib/utils";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 
 export const Route = createFileRoute("/decks/$deckId/present")({
