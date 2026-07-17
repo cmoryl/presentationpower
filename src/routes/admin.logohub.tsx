@@ -8,6 +8,7 @@ import { BRAND_MODES } from "@/lib/taxonomy";
 import {
   createClientLogo,
   deleteClientLogo,
+  importBrandhubLogos,
   listClientLogos,
   updateClientLogo,
 } from "@/lib/client-logos.functions";
@@ -171,6 +172,9 @@ function LogoHubAdmin() {
           </Link>
         </div>
       </section>
+
+      <BrandhubImportSection totalRows={totalRows} onDone={() => qc.invalidateQueries({ queryKey: ["admin", "logohub"] })} />
+
 
       <section>
         <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-black/60">Add a client</h3>
@@ -438,5 +442,84 @@ function AdminLogoCard({
         </button>
       </div>
     </div>
+  );
+}
+
+function BrandhubImportSection({ totalRows, onDone }: { totalRows: number; onDone: () => void }) {
+  const importFn = useServerFn(importBrandhubLogos);
+  const [running, setRunning] = useState(false);
+  const [log, setLog] = useState<string[]>([]);
+  const [progress, setProgress] = useState<{ processed: number; total: number; created: number; skipped: number; files: number } | null>(null);
+
+  async function runAll() {
+    setRunning(true);
+    setLog([]);
+    setProgress(null);
+    try {
+      let offset = 0;
+      let totalKnown = 0;
+      let created = 0;
+      let skipped = 0;
+      let files = 0;
+      let processed = 0;
+      const collectedErrors: string[] = [];
+      while (true) {
+        const res = await importFn({ data: { offset, limit: 15 } });
+        totalKnown = res.total || totalKnown;
+        created += res.created;
+        skipped += res.skipped;
+        files += res.filesUploaded;
+        processed += res.processed;
+        if (res.errors?.length) collectedErrors.push(...res.errors);
+        setProgress({ processed, total: totalKnown, created, skipped, files });
+        setLog((l) => [
+          ...l,
+          `Batch @${offset}: +${res.created} created, ${res.skipped} skipped, ${res.filesUploaded} files uploaded${res.errors?.length ? ` · ${res.errors.length} errors` : ""}`,
+        ]);
+        if (res.nextOffset == null) break;
+        offset = res.nextOffset;
+      }
+      setLog((l) => [
+        ...l,
+        `Done. ${created} created, ${skipped} skipped, ${files} files uploaded${collectedErrors.length ? ` · ${collectedErrors.length} errors (first: ${collectedErrors[0]})` : ""}`,
+      ]);
+      onDone();
+    } catch (e) {
+      setLog((l) => [...l, `Failed: ${(e as Error).message}`]);
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  return (
+    <section className="rounded-2xl border border-[#003FC7]/20 bg-gradient-to-br from-[#003FC7]/5 to-transparent p-5">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-[#003FC7]">Import from BrandHUB</h3>
+          <p className="mt-1 text-sm text-black/70">
+            One-time server-side import of the BrandHUB client-logo library. Downloads each variant, uploads to our
+            <code className="mx-1 rounded bg-black/5 px-1 py-0.5 text-[11px]">client-logos</code> bucket, and creates a row per client.
+            Existing slugs are skipped. Currently in DB: <strong>{totalRows}</strong>.
+          </p>
+        </div>
+        <button
+          onClick={runAll}
+          disabled={running}
+          className="rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#03002C] disabled:opacity-50"
+        >
+          {running ? "Importing…" : "Import BrandHUB logos"}
+        </button>
+      </div>
+      {progress ? (
+        <div className="mt-3 text-xs text-black/70">
+          Processed {progress.processed}/{progress.total || "?"} · Created {progress.created} · Skipped {progress.skipped} · Files uploaded {progress.files}
+        </div>
+      ) : null}
+      {log.length ? (
+        <div className="mt-3 max-h-40 overflow-y-auto rounded-lg border border-black/10 bg-white p-2 font-mono text-[11px] text-black/70">
+          {log.map((line, i) => (<div key={i}>{line}</div>))}
+        </div>
+      ) : null}
+    </section>
   );
 }
