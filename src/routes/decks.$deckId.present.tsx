@@ -17,6 +17,7 @@ function PresenterView() {
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const navigate = useNavigate();
   const [i, setI] = useState(0);
+  const [stripOpen, setStripOpen] = useState(true);
 
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
@@ -35,12 +36,8 @@ function PresenterView() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [deck.slides.length, deckId, navigate]);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [deck.slides.length, deckId, navigate]);
 
   const pct = deck.slides.length > 0 ? ((i + 1) / deck.slides.length) * 100 : 0;
-  const [stripOpen, setStripOpen] = useState(true);
   const stripRef = useRef<HTMLDivElement>(null);
   const activeThumbRef = useRef<HTMLButtonElement>(null);
 
