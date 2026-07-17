@@ -126,6 +126,10 @@ type DeckState = {
     slides: Array<{ sectionId: string; variantId: string; layoutId: string; content: SlideContent }>;
   }) => { briefId: string; deckId: string };
   applyAiContent: (deckId: string, aiSlides: Array<{ id: string; content: SlideContent }>) => void;
+  applyCopilotUpdates: (
+    deckId: string,
+    updates: Array<{ index: number; variantId: string; layoutId: string; content: SlideContent }>,
+  ) => void;
   revertAiChange: (deckId: string, slideId: string, field: string) => void;
   updateSlideField: (deckId: string, slideId: string, field: string, value: unknown) => void;
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
