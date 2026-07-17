@@ -2,6 +2,12 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { getBrandGuide, type BrandGuide, type ColorSwatch, type TypeStyle } from "@/lib/brand-guides";
 import { BRAND_MODES } from "@/lib/taxonomy";
+import {
+  getBrandhubIntel,
+  normalizeVoiceValue,
+  targetAudienceText,
+  type BrandhubIntel,
+} from "@/lib/brandhub-intel";
 
 export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
   loader: ({ params }) => {
