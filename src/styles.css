@@ -385,8 +385,31 @@
 
 /* Body base color per theme so anything relying on inherited text color
  * (e.g. plain <p> without a text- class) still meets contrast. */
+/* Brief page CSS variable palette (consumed via inline style={{...}}). */
+:root {
+  --brief-page: #E8EDF3;
+  --brief-surface: #FFFFFF;
+  --brief-ink: #0F1B3D;
+  --brief-ink-soft: #1E3A5F;
+  --brief-blue: #3B6FA0;
+  --brief-hairline: #D1DBE5;
+  --brief-field: #F8FAFC;
+}
+.dark {
+  --brief-page: #0A0929;
+  --brief-surface: #141435;
+  --brief-ink: #E0E8F5;
+  --brief-ink-soft: #C6D6EA;
+  --brief-blue: #A1FBF9;
+  --brief-hairline: rgba(255,255,255,0.14);
+  --brief-field: #0F0F30;
+}
+
+/* Body base color per theme so anything relying on inherited text color
+ * (e.g. plain <p> without a text- class) still meets contrast. */
 [data-theme="light"] body { background-color: #FFFFFF; color: #0A0F1C; }
 [data-theme="dark"]  body { background-color: #0A0929; color: #E0E8F5; }
+
 
 
 
