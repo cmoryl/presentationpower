@@ -37,14 +37,15 @@ export const Route = createFileRoute("/brief/new")({
 
 // Token-locked styles (Navy Trust palette + Urbanist/Epilogue)
 const PALETTE = {
-  page: "#E8EDF3",
-  surface: "#FFFFFF",
-  ink: "#0F1B3D",
-  inkSoft: "#1E3A5F",
-  blue: "#3B6FA0",
-  hairline: "#D1DBE5",
-  field: "#F8FAFC",
+  page: "var(--brief-page, #E8EDF3)",
+  surface: "var(--brief-surface, #FFFFFF)",
+  ink: "var(--brief-ink, #0F1B3D)",
+  inkSoft: "var(--brief-ink-soft, #1E3A5F)",
+  blue: "var(--brief-blue, #3B6FA0)",
+  hairline: "var(--brief-hairline, #D1DBE5)",
+  field: "var(--brief-field, #F8FAFC)",
 } as const;
+
 
 const labelCls =
   "text-[11px] font-bold uppercase tracking-[0.14em] text-[#0F1B3D] font-['Urbanist']";

@@ -336,12 +336,81 @@
 
 .dark [class*="border-black/5"]  { border-color: rgba(255,255,255,0.08) !important; }
 .dark [class*="border-black/10"] { border-color: rgba(255,255,255,0.12) !important; }
-.dark [class*="border-black/20"] { border-color: rgba(255,255,255,0.18) !important; }
+.dark [class*="border-black/15"] { border-color: rgba(255,255,255,0.16) !important; }
+.dark [class*="border-black/20"] { border-color: rgba(255,255,255,0.22) !important; }
+.dark [class*="border-black/25"] { border-color: rgba(255,255,255,0.24) !important; }
+.dark [class*="border-black/30"] { border-color: rgba(255,255,255,0.28) !important; }
+
+/* Additional light-surface hexes used across cards/listings */
+.dark [class*="bg-[#E8E4DC]"] { background-color: #141435 !important; }
+.dark [class*="bg-[#E8EDF3]"] { background-color: #141435 !important; }
+.dark [class*="bg-[#F5F7FB]"] { background-color: #0F0F30 !important; }
+.dark [class*="bg-[#F8FAFC]"] { background-color: #0F0F30 !important; }
+
+/* Bare white surfaces → dark navy cards. Uses [class~=] so it matches the
+ * exact `bg-white` token only (not `bg-white/70` or `text-white`). */
+.dark [class~="bg-white"] { background-color: #141435 !important; }
+.dark [class*="bg-white/95"] { background-color: rgba(20,20,53,0.95) !important; }
+.dark [class*="bg-white/80"] { background-color: rgba(20,20,53,0.85) !important; }
+.dark [class*="bg-white/60"] { background-color: rgba(255,255,255,0.10) !important; }
+.dark [class*="bg-white/50"] { background-color: rgba(255,255,255,0.09) !important; }
+.dark [class*="bg-white/30"] { background-color: rgba(255,255,255,0.07) !important; }
+.dark [class*="bg-white/20"] { background-color: rgba(255,255,255,0.06) !important; }
+.dark [class*="bg-white/10"] { background-color: rgba(255,255,255,0.05) !important; }
+.dark [class*="bg-white/5"]  { background-color: rgba(255,255,255,0.04) !important; }
+
+/* Mid-navy ink used on light cards → light foreground on dark for AA */
+.dark [class*="text-[#0F1B3D]"] { color: #E0E8F5 !important; }
+.dark [class*="text-[#1E3A5F]"] { color: #C6D6EA !important; }
+.dark [class*="text-[#3B6FA0]"] { color: #A1FBF9 !important; }
+.dark [class*="border-[#3B6FA0]"] { border-color: rgba(161,251,249,0.35) !important; }
+.dark [class*="border-[#D1DBE5]"] { border-color: rgba(255,255,255,0.14) !important; }
+
+/* Form controls: inputs, selects, textareas render legibly on dark */
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+.dark select,
+.dark textarea {
+  background-color: #0F0F30 !important;
+  color: #E0E8F5 !important;
+  border-color: rgba(255,255,255,0.18) !important;
+}
+.dark input::placeholder,
+.dark textarea::placeholder { color: rgba(224,232,245,0.55) !important; }
+
+/* <select> option list uses the OS renderer — force dark to avoid white flash */
+.dark select option { background-color: #0F0F30; color: #E0E8F5; }
+
+/* Divider/hr colors used across listings */
+.dark hr { border-color: rgba(255,255,255,0.12) !important; }
+
+/* Body base color per theme so anything relying on inherited text color
+ * (e.g. plain <p> without a text- class) still meets contrast. */
+/* Brief page CSS variable palette (consumed via inline style={{...}}). */
+:root {
+  --brief-page: #E8EDF3;
+  --brief-surface: #FFFFFF;
+  --brief-ink: #0F1B3D;
+  --brief-ink-soft: #1E3A5F;
+  --brief-blue: #3B6FA0;
+  --brief-hairline: #D1DBE5;
+  --brief-field: #F8FAFC;
+}
+.dark {
+  --brief-page: #0A0929;
+  --brief-surface: #141435;
+  --brief-ink: #E0E8F5;
+  --brief-ink-soft: #C6D6EA;
+  --brief-blue: #A1FBF9;
+  --brief-hairline: rgba(255,255,255,0.14);
+  --brief-field: #0F0F30;
+}
 
 /* Body base color per theme so anything relying on inherited text color
  * (e.g. plain <p> without a text- class) still meets contrast. */
 [data-theme="light"] body { background-color: #FFFFFF; color: #0A0F1C; }
 [data-theme="dark"]  body { background-color: #0A0929; color: #E0E8F5; }
+
+
 
 
 
