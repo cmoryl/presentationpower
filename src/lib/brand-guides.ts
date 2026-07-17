@@ -447,7 +447,7 @@ function buildDivisionGuide(seed: DivisionSeed): BrandGuide {
     brandVisuals: seed.brandVisuals,
     iconography: MASTER_TRANSPERFECT_GUIDE.iconography,
     socialMedia: MASTER_TRANSPERFECT_GUIDE.socialMedia,
-    sourceUrl: MASTER_TRANSPERFECT_GUIDE.sourceUrl,
+    sourceUrl: seed.sourceUrl ?? MASTER_TRANSPERFECT_GUIDE.sourceUrl,
   };
 }
 
