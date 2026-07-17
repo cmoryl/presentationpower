@@ -45,6 +45,7 @@ export function BrandLockup({
   showDivision = true,
   clientName,
   clientLogoUrl,
+  subCompany,
 }: {
   brand: BrandMode;
   color: string;
@@ -53,6 +54,7 @@ export function BrandLockup({
   showDivision?: boolean;
   clientName?: string; // Substituted into division line when it contains {client}
   clientLogoUrl?: string | null; // When set, co-brand with the client's logo
+  subCompany?: string; // Overrides the division line for TransPerfect sub-company mode
 }) {
   const dims =
     size === "2xs"
@@ -67,7 +69,7 @@ export function BrandLockup({
               ? { markPx: 96, wordmarkPx: 64, wordPx: 48, dividerPx: 24, radiusPx: 16, gapPx: 22 }
               : { markPx: 32, wordmarkPx: 18, wordPx: 17, dividerPx: 11, radiusPx: 8, gapPx: 10 };
   const logo = brand.logo ?? { mark: brand.name.slice(0, 2).toUpperCase(), wordmark: brand.name };
-  const divisionLine = logo.divisionLine?.replace("{client}", clientName ?? "Client");
+  const divisionLine = (subCompany ?? logo.divisionLine)?.replace("{client}", clientName ?? "Client");
 
   const useOfficialWordmark = TP_BRANDS.has(logo.wordmark);
   const wordmarkHeight = dims.wordmarkPx;

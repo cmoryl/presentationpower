@@ -113,6 +113,7 @@ export function MyCloudDecks() {
         meeting_objective: string | null;
         audience: string | null;
         brand_mode_id: string | null;
+        sub_company: string | null;
         length_target: number | null;
         known_facts: string | null;
         inputs: unknown;
@@ -131,6 +132,7 @@ export function MyCloudDecks() {
         meetingObjective: storedBrief?.meetingObjective ?? b?.meeting_objective ?? "",
         audience: storedBrief?.audience ?? b?.audience ?? "",
         brandModeId: storedBrief?.brandModeId ?? b?.brand_mode_id ?? d.brand_mode_id ?? "enterprise",
+        subCompany: storedBrief?.subCompany ?? b?.sub_company ?? undefined,
         archetypeId: storedBrief?.archetypeId ?? d.archetype_id ?? "",
         lengthTarget: storedBrief?.lengthTarget ?? b?.length_target ?? 8,
         clientFacts: storedBrief?.clientFacts ?? b?.known_facts ?? "",
@@ -165,12 +167,17 @@ export function MyCloudDecks() {
       // Use a stable local id so re-loading the same cloud deck reuses the same slot.
       const localDeckId = `cloud-${d.id}`;
       const deckContext = (d as unknown as { context?: Record<string, unknown> }).context;
+      const contextSubCompany =
+        deckContext && typeof deckContext === "object" && typeof deckContext.subCompany === "string"
+          ? deckContext.subCompany
+          : undefined;
       const deckLocal: Deck = {
         id: localDeckId,
         createdAt: d.created_at || new Date().toISOString(),
         title: d.title,
         briefId: briefLocal.id,
         brandModeId: briefLocal.brandModeId,
+        subCompany: contextSubCompany ?? briefLocal.subCompany,
         archetypeId: briefLocal.archetypeId,
         slides,
         context: (deckContext && typeof deckContext === "object" ? deckContext : undefined) as Deck["context"],

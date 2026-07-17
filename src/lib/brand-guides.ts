@@ -186,6 +186,14 @@ export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
   ],
 };
 
+// Flat, alphabetized list of every TransPerfect sub-company / sub-brand named
+// in the master guide. Used to constrain the generic "Subcompany" brand mode.
+export const TRANSPERFECT_SUBCOMPANIES: string[] = Array.from(
+  new Set(
+    (MASTER_TRANSPERFECT_GUIDE.subBrands ?? []).flatMap((g) => g.items),
+  ),
+).sort((a, b) => a.localeCompare(b));
+
 // ─── Division-scoped guides ──────────────────────────────────────────────
 // Each division extends the master system: same type ramp, same logo rules,
 // but a bespoke intro, accent tint, sub-brand slice, and photography /

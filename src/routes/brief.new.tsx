@@ -7,6 +7,8 @@ import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { personalizeSlides } from "@/lib/personalize.functions";
 import { retrieveKnowledgeForBrief, abAssign, abLogEvent } from "@/lib/admin.functions";
 import { byId, SECTION_FRAMEWORKS, NARRATIVE_ARCHETYPES, type BrandMode } from "@/lib/taxonomy";
+import { TRANSPERFECT_SUBCOMPANIES } from "@/lib/brand-guides";
+import { brandModeWithSubCompany, getSubCompanyProfile } from "@/lib/brand-profiles";
 import { BrandLockup } from "@/components/BrandLockup";
 import { PaletteLab, type PaletteSelection } from "@/components/PaletteLab";
 
@@ -71,15 +73,20 @@ function BriefWizard() {
     meetingObjective: "Secure pilot in the highest-volume market",
     audience: "VP Marketing + Head of Localization",
     brandModeId: brandModes[0]?.id ?? "bm-enterprise",
+    subCompany: "",
     archetypeId: narrativeArchetypes[0]?.id ?? "arch-problem-solution",
     lengthTarget: 9,
     clientFacts: "Recently expanded into 12 new markets. Under regulatory review pressure.",
   });
 
   const busy = aiStatus === "assembling" || aiStatus === "knowledge" || aiStatus === "personalizing";
-  const brand = useMemo(
+  const rawBrand = useMemo(
     () => brandModes.find((b) => b.id === form.brandModeId) ?? brandModes[0],
     [brandModes, form.brandModeId]
+  );
+  const brand = useMemo(
+    () => (rawBrand ? brandModeWithSubCompany(rawBrand, form.subCompany) : rawBrand),
+    [rawBrand, form.subCompany]
   );
   const brandPrimary = brand?.tokens?.primary || PALETTE.ink;
   const brandAccent = brand?.tokens?.accent || PALETTE.blue;
@@ -100,7 +107,10 @@ function BriefWizard() {
   const preferredVariantIds = brand?.contentScope?.preferredVariantIds ?? [];
 
   const selectBrand = (id: string) => {
-    setForm((prev) => ({ ...prev, brandModeId: id }));
+    setForm((prev) => {
+      const nextSubCompany = id === "bm-subcompany" ? prev.subCompany || TRANSPERFECT_SUBCOMPANIES[0] || "" : "";
+      return { ...prev, brandModeId: id, subCompany: nextSubCompany };
+    });
     setShowAllArchetypes(false);
   };
 
@@ -220,6 +230,30 @@ function BriefWizard() {
                   })}
                 </div>
 
+                {/* Sub-company selector (only for the generic Subcompany mode) */}
+                {form.brandModeId === "bm-subcompany" && (
+                  <div className="space-y-2">
+                    <label className={labelCls}>Select TransPerfect sub-company</label>
+                    <select
+                      className={inputCls}
+                      value={form.subCompany}
+                      onChange={(e) => setForm({ ...form, subCompany: e.target.value })}
+                    >
+                      <option value="" disabled>
+                        Choose a division
+                      </option>
+                      {TRANSPERFECT_SUBCOMPANIES.map((name) => (
+                        <option key={name} value={name}>
+                          {name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-[11px] text-[#1E3A5F]/60">
+                      The assembler, palette, and lockup will resolve to this TransPerfect entity.
+                    </p>
+                  </div>
+                )}
+
                 {brand && <BrandRelevancePanel brand={brand} />}
               </section>
 
@@ -247,7 +281,7 @@ function BriefWizard() {
                         <span className="text-[10px] font-bold uppercase tracking-widest text-[#1E3A5F]/50">
                           Suggested for {brand?.name}:
                         </span>
-                        {industrySuggestions.slice(0, 5).map((ind) => {
+                        {industrySuggestions.slice(0, 5).map((ind: string) => {
                           const selected = form.industry.toLowerCase() === ind.toLowerCase();
                           return (
                             <button
@@ -356,7 +390,7 @@ function BriefWizard() {
                       </span>
                     </div>
                     <div className="mt-2 flex flex-wrap gap-1.5">
-                      {preferredVariantIds.map((v) => (
+                      {preferredVariantIds.map((v: string) => (
                         <span
                           key={v}
                           className="rounded-md border px-2 py-0.5 font-mono text-[10px]"
