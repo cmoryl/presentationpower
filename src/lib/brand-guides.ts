@@ -186,11 +186,256 @@ export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
   ],
 };
 
-// Registry — add future division guides here.
-export const BRAND_GUIDES: BrandGuide[] = [MASTER_TRANSPERFECT_GUIDE];
+// ─── Division-scoped guides ──────────────────────────────────────────────
+// Each division extends the master system: same type ramp, same logo rules,
+// but a bespoke intro, accent tint, sub-brand slice, and photography /
+// visuals note that fits the division.
+
+type DivisionSeed = {
+  slug: string;
+  divisionId: string;
+  title: string;
+  subtitle: string;
+  tagline: string;
+  intro: string;
+  accent: ColorSwatch;
+  pops: ColorSwatch[];
+  subBrandGroup: { group: string; items: string[] };
+  photography: string;
+  brandVisuals: string;
+};
+
+const DIVISION_SEEDS: DivisionSeed[] = [
+  {
+    slug: "globallink",
+    divisionId: "bm-division",
+    title: "GlobalLink",
+    subtitle: "Language Technology Division · Brand Guidelines",
+    tagline: "Continuous localization, engineered.",
+    intro:
+      "GlobalLink is TransPerfect's translation-technology platform: connectors, workflow automation and continuous localization for product, marketing and support content. The visual system leans into the product side of the master brand — cleaner surfaces, more Aqua and Lavender, and diagrammatic visuals that read as software rather than campaign.",
+    accent: { name: "Aqua", hex: "#A1FBF9", role: "primary accent", pantone: "PMS 317 C" },
+    pops: [
+      { name: "Lavender", hex: "#C2A3FF", role: "secondary accent", pantone: "PMS 264 C" },
+      { name: "Green", hex: "#A6FA87", role: "success pop", pantone: "PMS 358 C" },
+    ],
+    subBrandGroup: {
+      group: "GlobalLink Products",
+      items: ["Enterprise", "Live", "Portal", "Now", "Strings", "Web", "CCMS"],
+    },
+    photography:
+      "Product-first imagery: UI captures, connector diagrams, and calm office scenes where technology is present but not the hero. Prefer light surfaces with Aqua and Lavender ambient washes.",
+    brandVisuals:
+      "Isometric flows, node-and-edge graphs, ambient Aqua→Lavender gradients. Avoid heavy people-first hero shots — GlobalLink is a platform brand.",
+  },
+  {
+    slug: "transperfect-life-sciences",
+    divisionId: "bm-subcompany",
+    title: "TransPerfect Life Sciences",
+    subtitle: "Life Sciences Division · Brand Guidelines",
+    tagline: "Global content for every trial, submission and patient.",
+    intro:
+      "TransPerfect Life Sciences supports pharma, medtech and clinical research with regulated content services — from eCTD submissions to patient-facing recruitment. The tone is measured, evidence-led and precise; the visual system favors calm neutrals with occasional Green pops that signal accuracy and forward motion.",
+    accent: { name: "Blue 500", hex: "#003FC7", role: "primary accent" },
+    pops: [
+      { name: "Green", hex: "#A6FA87", role: "accuracy pop", pantone: "PMS 358 C" },
+      { name: "Aqua", hex: "#A1FBF9", role: "clarity pop", pantone: "PMS 317 C" },
+    ],
+    subBrandGroup: {
+      group: "Life Sciences Practice",
+      items: ["Life Sciences", "LMK Clinical Research Consulting", "Medical Device", "Trial Interactive"],
+    },
+    photography:
+      "Clinical settings, patient-facing hands and screens, lab environments — always human-first, never sterile stock. Use soft-transition washes over imagery to keep tone warm.",
+    brandVisuals:
+      "Calm gradients, subtle grid infographics, timeline visuals for submission journeys. Green appears sparingly as a signal of accuracy or approval.",
+  },
+  {
+    slug: "transperfect-legal",
+    divisionId: "bm-tp-legal",
+    title: "TransPerfect Legal",
+    subtitle: "Legal Solutions Division · Brand Guidelines",
+    tagline: "Evidence, translated. Discovery, accelerated.",
+    intro:
+      "TransPerfect Legal serves law firms and corporate legal teams with eDiscovery, managed review, litigation support and legal translation. The palette runs deeper (Blue 002673) with a controlled Yellow pop reserved for callouts and decision points — never as a background.",
+    accent: { name: "Blue 002673", hex: "#002673", role: "primary accent" },
+    pops: [
+      { name: "Yellow", hex: "#FFEB66", role: "decision pop", pantone: "PMS 121 C" },
+      { name: "Red", hex: "#E53D2E", role: "risk / UI", pantone: "PMS 1788 C" },
+    ],
+    subBrandGroup: {
+      group: "Legal Technologies",
+      items: [
+        "ReefReview", "ReefClaims", "ReefStream", "ReefTranslate", "DigitalReef",
+        "ReefExhibit", "ReefCentral", "ReefDiscovery", "ReefECA", "VirtualReef",
+      ],
+    },
+    photography:
+      "Documents, courtrooms, review floors, cross-border scenes — grounded, professional, never dramatized. Keep imagery cool-toned to sit alongside the deeper blues.",
+    brandVisuals:
+      "Structured layouts: matrices, comparison tables, timeline evidence. Yellow reserved for decision moments; Red only for risk or destructive UI.",
+  },
+  {
+    slug: "transperfect-media",
+    divisionId: "bm-tp-media",
+    title: "TransPerfect Media",
+    subtitle: "Media & Entertainment Division · Brand Guidelines",
+    tagline: "Every story, every language, every screen.",
+    intro:
+      "TransPerfect Media localizes film, television, streaming and advertising content — dubbing, subtitling, audio description and access services. The system is the most expressive of the divisions: darker canvases, Pink pops, and cinematic imagery that leans into craft and performance.",
+    accent: { name: "Pink", hex: "#EC388A", role: "primary accent", pantone: "PMS 2395 C" },
+    pops: [
+      { name: "Lavender", hex: "#C2A3FF", role: "ambient pop", pantone: "PMS 264 C" },
+      { name: "Peach", hex: "#FF9B70", role: "warm pop", pantone: "PMS 163 C" },
+    ],
+    subBrandGroup: {
+      group: "Media Technologies",
+      items: ["Creator", "Media Inspector", "Media Conductor", "Media Director", "TransPerfect TV"],
+    },
+    photography:
+      "Cinematic stills: studios, dubbing booths, mixing desks, screens in low light. Prefer high-contrast frames with Pink or Lavender ambient wash rather than saturated real-world color.",
+    brandVisuals:
+      "Full-bleed media, editorial spreads, poster-scale type. Pink appears as a signature accent — never as a bulk background.",
+  },
+  {
+    slug: "transperfect-gaming",
+    divisionId: "bm-tp-games",
+    title: "TransPerfect Gaming",
+    subtitle: "Gaming Division · Brand Guidelines",
+    tagline: "Ship worldwide. Sound native.",
+    intro:
+      "TransPerfect Gaming delivers game localization, LQA, audio and community services for AAA, mobile and live-service titles. The visual language is bolder and more playful — Lavender leads, with Green and Yellow pops used for status, achievement and progression cues.",
+    accent: { name: "Lavender", hex: "#C2A3FF", role: "primary accent", pantone: "PMS 264 C" },
+    pops: [
+      { name: "Green", hex: "#A6FA87", role: "achievement pop", pantone: "PMS 358 C" },
+      { name: "Yellow", hex: "#FFEB66", role: "progression pop", pantone: "PMS 121 C" },
+    ],
+    subBrandGroup: {
+      group: "Gaming Services",
+      items: ["Game Localization", "LQA", "Audio & Voice", "Community", "Player Support", "Cinematics"],
+    },
+    photography:
+      "In-game captures, mocap stages, voice booths, community events. Prefer moody, high-contrast frames — never generic esports stock.",
+    brandVisuals:
+      "Layered gradients, animated ambient washes, bold poster type. Use Lavender as a scene-setter; Green/Yellow only for state or metric callouts.",
+  },
+  {
+    slug: "transperfect-digital",
+    divisionId: "bm-tp-digital",
+    title: "TransPerfect Digital",
+    subtitle: "Digital Experience Division · Brand Guidelines",
+    tagline: "Global brands, local relevance, measurable growth.",
+    intro:
+      "TransPerfect Digital blends web localization, multilingual SEO, creative production and analytics into full digital-experience programs. The palette stays closest to the master corporate identity — Blue 500 dominant, Aqua for surfaces — with tight, campaign-ready compositions.",
+    accent: { name: "Aqua", hex: "#A1FBF9", role: "primary accent", pantone: "PMS 317 C" },
+    pops: [
+      { name: "Peach", hex: "#FF9B70", role: "campaign pop", pantone: "PMS 163 C" },
+      { name: "Yellow", hex: "#FFEB66", role: "metric pop", pantone: "PMS 121 C" },
+    ],
+    subBrandGroup: {
+      group: "Digital & Agency",
+      items: ["TransPerfect Digital", "The Mill", "Bear Down", "Avatria"],
+    },
+    photography:
+      "E-commerce and retail settings, hands on devices, campaign photography with warm secondary tones. Keep imagery bright and human — this division sells experience, not infrastructure.",
+    brandVisuals:
+      "Before/after splits, metric callouts, campaign moodboards. Peach and Yellow appear as accents around numbers and KPIs.",
+  },
+  {
+    slug: "dataforce",
+    divisionId: "bm-product",
+    title: "DataForce",
+    subtitle: "AI Data Services · Brand Guidelines",
+    tagline: "Human intelligence for machine learning.",
+    intro:
+      "DataForce is TransPerfect's AI data business: data collection, annotation, model evaluation and human-in-the-loop services for LLMs, computer vision and speech. The system is the most technical of the divisions — dense stat grids, monospaced numerals, Green and Aqua pops that signal precision.",
+    accent: { name: "Aqua", hex: "#A1FBF9", role: "primary accent", pantone: "PMS 317 C" },
+    pops: [
+      { name: "Green", hex: "#A6FA87", role: "accuracy pop", pantone: "PMS 358 C" },
+      { name: "Lavender", hex: "#C2A3FF", role: "model pop", pantone: "PMS 264 C" },
+    ],
+    subBrandGroup: {
+      group: "AI Data Services",
+      items: ["Data Collection", "Annotation", "Model Evaluation", "HITL", "Voice & Speech"],
+    },
+    photography:
+      "Contributor networks, annotators at work, capture rigs, model dashboards. Prefer authentic scenes over stylized AI stock.",
+    brandVisuals:
+      "Stat grids, distribution charts, dense number blocks. Green signals accuracy; Aqua and Lavender frame model callouts.",
+  },
+  {
+    slug: "transperfect-cobrand",
+    divisionId: "bm-cobrand",
+    title: "TransPerfect + Client",
+    subtitle: "Co-brand Program · Brand Guidelines",
+    tagline: "One system, two names, shared outcomes.",
+    intro:
+      "The co-brand system governs how TransPerfect appears alongside a named client or strategic partner. It preserves the master identity while allowing the client mark equal weight in the lockup. Keep pops muted; the client brand color should be the loudest element on the page.",
+    accent: { name: "Peach", hex: "#FF9B70", role: "primary accent", pantone: "PMS 163 C" },
+    pops: [
+      { name: "Aqua", hex: "#A1FBF9", role: "surface pop", pantone: "PMS 317 C" },
+      { name: "Lavender", hex: "#C2A3FF", role: "surface pop", pantone: "PMS 264 C" },
+    ],
+    subBrandGroup: {
+      group: "Co-brand Uses",
+      items: ["Joint program", "Managed service", "Strategic partnership", "Named account"],
+    },
+    photography:
+      "Shared workspaces, joint teams, on-site partnerships. Keep imagery neutral so the client brand can lead.",
+    brandVisuals:
+      "Balanced lockups, side-by-side layouts, restrained backgrounds. Do not let TransPerfect accents overpower the client brand.",
+  },
+];
+
+function buildDivisionGuide(seed: DivisionSeed): BrandGuide {
+  return {
+    slug: seed.slug,
+    divisionId: seed.divisionId,
+    title: seed.title,
+    subtitle: seed.subtitle,
+    version: MASTER_TRANSPERFECT_GUIDE.version,
+    updatedAt: MASTER_TRANSPERFECT_GUIDE.updatedAt,
+    tagline: seed.tagline,
+    intro: seed.intro,
+    values: MASTER_TRANSPERFECT_GUIDE.values,
+    logoNotes: {
+      headline: `${seed.title} lockup follows the master rules`,
+      body: `${seed.title} uses the TransPerfect wordmark with a division line beneath it. All master logo rules apply — clear space, color use, no distortion. The division line is always secondary in weight to the wordmark.`,
+    },
+    logoRules: MASTER_TRANSPERFECT_GUIDE.logoRules,
+    primaryColors: MASTER_TRANSPERFECT_GUIDE.primaryColors,
+    secondaryColors: [seed.accent, ...MASTER_TRANSPERFECT_GUIDE.secondaryColors.filter((c) => c.hex !== seed.accent.hex)],
+    tertiaryColors: [
+      ...seed.pops,
+      ...MASTER_TRANSPERFECT_GUIDE.tertiaryColors.filter((c) => !seed.pops.some((p) => p.hex === c.hex)),
+    ],
+    neutrals: MASTER_TRANSPERFECT_GUIDE.neutrals,
+    ramps: MASTER_TRANSPERFECT_GUIDE.ramps,
+    typefacePrimary: MASTER_TRANSPERFECT_GUIDE.typefacePrimary,
+    typefaceWeb: MASTER_TRANSPERFECT_GUIDE.typefaceWeb,
+    headingScale: MASTER_TRANSPERFECT_GUIDE.headingScale,
+    bodyScale: MASTER_TRANSPERFECT_GUIDE.bodyScale,
+    subBrands: [seed.subBrandGroup],
+    photography: seed.photography,
+    brandVisuals: seed.brandVisuals,
+    iconography: MASTER_TRANSPERFECT_GUIDE.iconography,
+    socialMedia: MASTER_TRANSPERFECT_GUIDE.socialMedia,
+    sourceUrl: MASTER_TRANSPERFECT_GUIDE.sourceUrl,
+  };
+}
+
+export const DIVISION_GUIDES: BrandGuide[] = DIVISION_SEEDS.map(buildDivisionGuide);
+
+// Registry — master first, then divisions.
+export const BRAND_GUIDES: BrandGuide[] = [MASTER_TRANSPERFECT_GUIDE, ...DIVISION_GUIDES];
 
 export function getBrandGuide(slug: string): BrandGuide | undefined {
-  // Redirect legacy v26.06 slug to the unified master guide.
   if (slug === "transperfect-v26-06") return MASTER_TRANSPERFECT_GUIDE;
   return BRAND_GUIDES.find((g) => g.slug === slug);
+}
+
+// Look up a guide by brand-mode id (used by the brief flow to surface
+// division-scoped rules alongside the selected brand mode).
+export function getBrandGuideForDivision(divisionId: string): BrandGuide | undefined {
+  return BRAND_GUIDES.find((g) => g.divisionId === divisionId) ?? MASTER_TRANSPERFECT_GUIDE;
 }
