@@ -210,7 +210,7 @@ export const planDeckStrategy = createServerFn({ method: "POST" })
       return { ok: false, error: ("rawError" in result && result.rawError) || "Strategy failed" };
     }
 
-    const repaired = repairStrategy(result.strategy);
+    const repaired = repairStrategy(result.strategy as DeckStrategy);
     if (repaired.recommendedSections.length < 3) {
       return { ok: false, error: "Strategist returned too few valid sections after taxonomy validation." };
     }
