@@ -134,7 +134,7 @@ export function BrandReviewPanel({
   }
 
   return (
-    <section className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#03002C] via-[#0A1350] to-[#003FC7] text-white shadow-2xl">
+    <section id="brand-review" className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#03002C] via-[#0A1350] to-[#003FC7] text-white shadow-2xl scroll-mt-24">
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-white/10 px-8 py-6">
         <div>
           <div className="text-[10px] uppercase tracking-[0.3em] text-white/50">AI Reviewer · Phase A</div>
