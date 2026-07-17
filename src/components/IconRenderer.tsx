@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { loadPack, resolveIcon, iconViewBox, type IconPack } from "@/lib/icon-library";
+import { loadPack, resolveIcon, iconViewBox, type IconPack } from "@/lib/icon-packs";
 
 interface Props {
   pack: string;

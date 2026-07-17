@@ -6,7 +6,7 @@ import {
   iconSvgMarkup,
   type IconManifestPack,
   type IconPack,
-} from "@/lib/icon-library";
+} from "@/lib/icon-packs";
 import { IconRenderer } from "@/components/IconRenderer";
 
 export const Route = createFileRoute("/admin/icon-library")({
