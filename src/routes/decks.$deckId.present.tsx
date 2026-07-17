@@ -117,12 +117,23 @@ function PresenterView() {
           const v = byId(MODULE_VARIANTS, s.variantId);
           const active = idx === i;
           return (
-            <button
+          <button
               key={s.id}
-              ref={active ? activeThumbRef : undefined}
+              ref={(el) => {
+                thumbRefs.current[idx] = el;
+                if (active) activeThumbRef.current = el;
+              }}
+              tabIndex={idx === focusedThumb ? 0 : -1}
               onClick={() => setI(idx)}
+              onFocus={() => setFocusedThumb(idx)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setI(idx);
+                }
+              }}
               className={cn(
-                "group relative flex-shrink-0 overflow-hidden rounded-md border transition-all",
+                "group relative flex-shrink-0 overflow-hidden rounded-md border transition-all outline-none focus-visible:ring-2 focus-visible:ring-aqua-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black",
                 active
                   ? "border-white ring-2 ring-white/60 shadow-lg shadow-white/10"
                   : "border-white/15 hover:border-white/40 opacity-60 hover:opacity-100",
