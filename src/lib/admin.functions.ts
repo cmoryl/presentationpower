@@ -677,9 +677,34 @@ const kbInput = z.object({
   meetingObjective: z.string().default(""),
   clientFacts: z.string().default(""),
   brandName: z.string().optional().nullable(),
+  // BRAND_MODES id (e.g. "bm-tp-legal"). This is what brand_asset_chunks.division_id
+  // is populated with — use it directly instead of slugifying brandName.
+  divisionId: z.string().optional().nullable(),
   brandTags: z.array(z.string()).default([]),
   limit: z.number().int().min(1).max(12).default(6),
 });
+
+// Resolve a brand_asset_chunks.division_id filter value from the brief context.
+// Prefer explicit divisionId; otherwise try to match brandName against the
+// brand guide registry (title -> divisionId). Returns null when unresolved so
+// the vector search runs unfiltered rather than silently filtered-to-nothing.
+async function resolveDivisionFilter(
+  brandName: string | null | undefined,
+  divisionId: string | null | undefined,
+): Promise<string | null> {
+  if (divisionId && divisionId.trim()) return divisionId.trim();
+  if (!brandName) return null;
+  try {
+    const { BRAND_GUIDES } = await import("@/lib/brand-guides");
+    const needle = brandName.trim().toLowerCase();
+    const hit = BRAND_GUIDES.find(
+      (g) => g.title.toLowerCase() === needle || g.slug === needle.replace(/\s+/g, "-"),
+    );
+    return hit?.divisionId && hit.divisionId !== "master" ? hit.divisionId : null;
+  } catch {
+    return null;
+  }
+}
 export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => kbInput.parse(input))
