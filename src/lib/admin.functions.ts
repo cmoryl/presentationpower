@@ -56,7 +56,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
     const [ai, imgs, decks, users, kb, exps, oracleKb, brandIntel] = await Promise.all([
       s.from("ai_events").select("cost_credits, tokens_in, tokens_out, latency_ms, status, created_at").gte("created_at", from),
       s.from("imagery_events").select("event_type, brand_id, created_at").gte("created_at", from),
-      s.from("decks").select("id", { count: "exact", head: true }),
+      s.from("decks").select("id, title, status, brand_mode_id, archetype_id, owner_id, created_at, updated_at").order("updated_at", { ascending: false }),
       s.from("profiles").select("id", { count: "exact", head: true }),
       s.from("knowledge_entries").select("id", { count: "exact", head: true }),
       s.from("ab_experiments").select("id, status"),
@@ -65,6 +65,7 @@ export const getAdminOverview = createServerFn({ method: "GET" })
     ]);
     const aiRows = (ai.data ?? []) as Array<{ cost_credits: number; tokens_in: number; tokens_out: number; latency_ms: number; status: string; created_at: string }>;
     const imgRows = (imgs.data ?? []) as Array<{ event_type: string; created_at: string; brand_id: string | null }>;
+    const deckRows = (decks.data ?? []) as Array<{ id: string; title: string | null; status: string | null; brand_mode_id: string | null; archetype_id: string | null; owner_id: string | null; created_at: string; updated_at: string }>;
     const expRows = (exps.data ?? []) as Array<{ status: string }>;
 
     const totalCost = aiRows.reduce((a, r) => a + Number(r.cost_credits ?? 0), 0);
