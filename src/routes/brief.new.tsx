@@ -499,12 +499,12 @@ function BriefWizard() {
                     setStrategyStatus("error");
                   }
                 }}
-                onRemoveSection={(idx) =>
+                onRemoveSection={(idx: number) =>
                   setStrategy((s) =>
                     s ? { ...s, recommendedSections: s.recommendedSections.filter((_, i) => i !== idx) } : s,
                   )
                 }
-                onMoveSection={(idx, dir) =>
+                onMoveSection={(idx: number, dir: 1 | -1) =>
                   setStrategy((s) => {
                     if (!s) return s;
                     const next = [...s.recommendedSections];
