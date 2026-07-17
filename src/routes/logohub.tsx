@@ -114,47 +114,88 @@ function LogoHubBrowse() {
       ) : (
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((r: any) => (
-            <div key={r.id} className="rounded-2xl border border-black/10 bg-white p-4">
-              <div className="flex h-28 w-full items-center justify-center rounded-lg bg-[#F5F7FB]">
-                {r.primaryUrl ? (
-                  <img
-                    src={r.primaryUrl}
-                    alt={`${r.client_name} logo`}
-                    className="max-h-24 max-w-[80%] object-contain"
-                  />
-                ) : (
-                  <span className="text-xs text-black/40">no preview</span>
-                )}
-              </div>
-              <div className="mt-3 truncate text-sm font-semibold">{r.client_name}</div>
-              <div className="mt-0.5 text-[11px] text-black/50">
-                {r.industry ?? "—"}
-                {r.division_id && ` · ${BRAND_MODES.find((b) => b.id === r.division_id)?.name ?? r.division_id}`}
-              </div>
-              <div className="mt-2 flex flex-wrap gap-1">
-                {(["darkUrl", "lightUrl", "monoUrl"] as const).map((k) => {
-                  const url = r[k];
-                  const label = k.replace("Url", "");
-                  return url ? (
-                    <a
-                      key={k}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] text-black/60 hover:border-[#003FC7]/40 hover:text-[#003FC7]"
-                    >
-                      {label}
-                    </a>
-                  ) : null;
-                })}
-              </div>
-              {r.tags?.length ? (
-                <div className="mt-2 line-clamp-2 text-[11px] text-black/50">{r.tags.join(" · ")}</div>
-              ) : null}
-            </div>
+            <LogoCard key={r.id} row={r} />
           ))}
         </div>
       )}
     </AppShell>
+  );
+}
+
+const VARIANT_KEYS = [
+  { key: "primary", label: "Primary", urlField: "primaryUrl" },
+  { key: "light", label: "Light", urlField: "lightUrl" },
+  { key: "dark", label: "Dark", urlField: "darkUrl" },
+  { key: "mono", label: "Mono", urlField: "monoUrl" },
+] as const;
+
+function LogoCard({ row }: { row: any }) {
+  const available = VARIANT_KEYS.filter((v) => typeof row[v.urlField] === "string" && row[v.urlField].length > 0);
+  const initial = available[0]?.key ?? "primary";
+  const [active, setActive] = useState<string>(initial);
+  const activeUrl = row[VARIANT_KEYS.find((v) => v.key === active)?.urlField ?? "primaryUrl"];
+  const isDark = active === "dark";
+
+  return (
+    <div className="rounded-2xl border border-black/10 bg-white p-4">
+      <div
+        className="flex h-28 w-full items-center justify-center rounded-lg transition-colors"
+        style={{ backgroundColor: isDark ? "#03002C" : "#F5F7FB" }}
+      >
+        {activeUrl ? (
+          <img
+            src={activeUrl}
+            alt={`${row.client_name} logo (${active})`}
+            className="max-h-24 max-w-[80%] object-contain"
+          />
+        ) : (
+          <span className="text-xs text-black/40">no preview</span>
+        )}
+      </div>
+      <div className="mt-3 truncate text-sm font-semibold">{row.client_name}</div>
+      <div className="mt-0.5 text-[11px] text-black/50">
+        {row.industry ?? "—"}
+        {row.division_id && ` · ${BRAND_MODES.find((b) => b.id === row.division_id)?.name ?? row.division_id}`}
+      </div>
+      <div className="mt-2 flex flex-wrap gap-1">
+        {VARIANT_KEYS.map((v) => {
+          const url = row[v.urlField];
+          const has = typeof url === "string" && url.length > 0;
+          const isActive = v.key === active;
+          return (
+            <button
+              key={v.key}
+              type="button"
+              disabled={!has}
+              onClick={() => setActive(v.key)}
+              className={
+                "rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-widest transition " +
+                (isActive
+                  ? "border-[#003FC7] bg-[#003FC7] text-white"
+                  : has
+                    ? "border-black/10 text-black/60 hover:border-[#003FC7]/40 hover:text-[#003FC7]"
+                    : "cursor-not-allowed border-black/5 text-black/25")
+              }
+              title={has ? `Preview ${v.label} variant` : `No ${v.label} variant uploaded`}
+            >
+              {v.label}
+            </button>
+          );
+        })}
+      </div>
+      {activeUrl && (
+        <a
+          href={activeUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-block text-[11px] text-[#003FC7] hover:underline"
+        >
+          Open {active} file ↗
+        </a>
+      )}
+      {row.tags?.length ? (
+        <div className="mt-2 line-clamp-2 text-[11px] text-black/50">{row.tags.join(" · ")}</div>
+      ) : null}
+    </div>
   );
 }
