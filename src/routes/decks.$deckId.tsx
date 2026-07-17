@@ -781,45 +781,87 @@ function LogoGridItemsPanel({
         {items.map((it, i) => {
           const name = typeof it.name === "string" ? it.name : typeof it.client === "string" ? (it.client as string) : "";
           const logoUrl = typeof it.logoUrl === "string" ? it.logoUrl : "";
+          const variants = (it.logoVariants && typeof it.logoVariants === "object" ? it.logoVariants : {}) as Record<string, string | null | undefined>;
+          const activeVariant = typeof it.logoVariant === "string" ? it.logoVariant : "primary";
+          const VARIANTS: Array<{ key: string; label: string }> = [
+            { key: "primary", label: "P" },
+            { key: "light", label: "Light" },
+            { key: "dark", label: "Dark" },
+            { key: "mono", label: "Mono" },
+          ];
           return (
-            <div key={i} className="flex items-center gap-2 rounded-xl border border-black/10 p-2">
-              <div className="flex h-10 w-14 items-center justify-center rounded-md bg-[#F5F7FB]">
-                {logoUrl ? (
-                  <img src={logoUrl} alt="" className="max-h-8 max-w-[90%] object-contain" />
-                ) : (
-                  <span className="text-[10px] text-black/40">—</span>
-                )}
-              </div>
-              <input
-                value={name}
-                onChange={(e) => update(i, { name: e.target.value })}
-                placeholder="Client name"
-                className="min-w-0 flex-1 rounded-md border border-black/10 bg-white px-2 py-1 text-sm"
-              />
-              <button
-                type="button"
-                onClick={() => { setPickIdx(i); setQ(""); }}
-                className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest hover:border-[#003FC7]/40 hover:text-[#003FC7]"
-              >
-                {logoUrl ? "Change" : "Pick"}
-              </button>
-              {logoUrl && (
+            <div key={i} className="rounded-xl border border-black/10 p-2">
+              <div className="flex items-center gap-2">
+                <div
+                  className="flex h-10 w-14 items-center justify-center rounded-md"
+                  style={{ backgroundColor: activeVariant === "dark" ? "#03002C" : "#F5F7FB" }}
+                >
+                  {logoUrl ? (
+                    <img src={logoUrl} alt="" className="max-h-8 max-w-[90%] object-contain" />
+                  ) : (
+                    <span className="text-[10px] text-black/40">—</span>
+                  )}
+                </div>
+                <input
+                  value={name}
+                  onChange={(e) => update(i, { name: e.target.value })}
+                  placeholder="Client name"
+                  className="min-w-0 flex-1 rounded-md border border-black/10 bg-white px-2 py-1 text-sm"
+                />
                 <button
                   type="button"
-                  onClick={() => update(i, { logoUrl: "" })}
-                  className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] text-black/60 hover:border-black/30"
+                  onClick={() => { setPickIdx(i); setQ(""); }}
+                  className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest hover:border-[#003FC7]/40 hover:text-[#003FC7]"
                 >
-                  Clear
+                  {logoUrl ? "Change" : "Pick"}
                 </button>
+                {logoUrl && (
+                  <button
+                    type="button"
+                    onClick={() => update(i, { logoUrl: "", logoVariant: "primary", logoVariants: {} })}
+                    className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] text-black/60 hover:border-black/30"
+                  >
+                    Clear
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => removeItem(i)}
+                  className="rounded-full border border-red-200 px-2 py-0.5 text-[10px] text-red-700 hover:bg-red-50"
+                  title="Remove item"
+                >
+                  ×
+                </button>
+              </div>
+              {logoUrl && (
+                <div className="mt-2 flex items-center gap-1 pl-16">
+                  <span className="mr-1 text-[10px] uppercase tracking-widest text-black/40">Variant</span>
+                  {VARIANTS.map((v) => {
+                    const url = variants[v.key];
+                    const has = typeof url === "string" && url.length > 0;
+                    const isActive = v.key === activeVariant;
+                    return (
+                      <button
+                        key={v.key}
+                        type="button"
+                        disabled={!has}
+                        onClick={() => update(i, { logoVariant: v.key, logoUrl: url })}
+                        className={
+                          "rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-widest transition " +
+                          (isActive
+                            ? "border-[#003FC7] bg-[#003FC7] text-white"
+                            : has
+                              ? "border-black/15 text-black/70 hover:border-[#003FC7]/40 hover:text-[#003FC7]"
+                              : "cursor-not-allowed border-black/5 text-black/25")
+                        }
+                        title={has ? `Use ${v.label} variant` : `No ${v.label} variant uploaded`}
+                      >
+                        {v.label}
+                      </button>
+                    );
+                  })}
+                </div>
               )}
-              <button
-                type="button"
-                onClick={() => removeItem(i)}
-                className="rounded-full border border-red-200 px-2 py-0.5 text-[10px] text-red-700 hover:bg-red-50"
-                title="Remove item"
-              >
-                ×
-              </button>
             </div>
           );
         })}
