@@ -689,3 +689,20 @@ function VoiceCard({
   );
 }
 
+function LogoTile({ label, src, bg, border }: { label: string; src: string; bg: string; border?: boolean }) {
+  return (
+    <div
+      className={`flex flex-col items-center justify-center gap-3 rounded-2xl p-6 ${border ? "border border-black/10" : ""}`}
+      style={{ background: bg, minHeight: 160 }}
+    >
+      <img src={src} alt={label} className="max-h-20 w-auto max-w-full object-contain" loading="lazy" />
+      <div
+        className="text-[10px] uppercase tracking-[0.25em]"
+        style={{ color: bg === "#ffffff" ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.7)" }}
+      >
+        {label}
+      </div>
+    </div>
+  );
+}
+
