@@ -8,6 +8,7 @@ import { BRAND_MODES } from "@/lib/taxonomy";
 import {
   createClientLogo,
   deleteClientLogo,
+  importBrandhubLogos,
   listClientLogos,
   updateClientLogo,
 } from "@/lib/client-logos.functions";
@@ -171,6 +172,9 @@ function LogoHubAdmin() {
           </Link>
         </div>
       </section>
+
+      <BrandhubImportSection totalRows={totalRows} onDone={() => qc.invalidateQueries({ queryKey: ["admin", "logohub"] })} />
+
 
       <section>
         <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-black/60">Add a client</h3>
