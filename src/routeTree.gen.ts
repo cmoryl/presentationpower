@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as LogohubRouteImport } from './routes/logohub'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as ImageryRouteImport } from './routes/imagery'
@@ -31,6 +32,7 @@ import { Route as BriefNewRouteImport } from './routes/brief.new'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
+import { Route as AdminLogohubRouteImport } from './routes/admin.logohub'
 import { Route as AdminImageryRouteImport } from './routes/admin.imagery'
 import { Route as AdminIconStudioRouteImport } from './routes/admin.icon-studio'
 import { Route as AdminBrandAssetsRouteImport } from './routes/admin.brand-assets'
@@ -46,6 +48,11 @@ import { Route as DecksDeckIdDocumentRouteImport } from './routes/decks.$deckId.
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LogohubRoute = LogohubRouteImport.update({
+  id: '/logohub',
+  path: '/logohub',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LibraryRoute = LibraryRouteImport.update({
@@ -153,6 +160,11 @@ const AdminOracleRoute = AdminOracleRouteImport.update({
   path: '/oracle',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLogohubRoute = AdminLogohubRouteImport.update({
+  id: '/logohub',
+  path: '/logohub',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminImageryRoute = AdminImageryRouteImport.update({
   id: '/imagery',
   path: '/imagery',
@@ -220,6 +232,7 @@ export interface FileRoutesByFullPath {
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/library': typeof LibraryRoute
+  '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
@@ -228,6 +241,7 @@ export interface FileRoutesByFullPath {
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
+  '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
@@ -253,6 +267,7 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/library': typeof LibraryRoute
+  '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
@@ -261,6 +276,7 @@ export interface FileRoutesByTo {
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
+  '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
@@ -289,6 +305,7 @@ export interface FileRoutesById {
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/library': typeof LibraryRoute
+  '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
@@ -297,6 +314,7 @@ export interface FileRoutesById {
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
+  '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
@@ -326,6 +344,7 @@ export interface FileRouteTypes {
     | '/imagery'
     | '/knowledge'
     | '/library'
+    | '/logohub'
     | '/reset-password'
     | '/admin/ab'
     | '/admin/ai'
@@ -334,6 +353,7 @@ export interface FileRouteTypes {
     | '/admin/brand-assets'
     | '/admin/icon-studio'
     | '/admin/imagery'
+    | '/admin/logohub'
     | '/admin/oracle'
     | '/admin/users'
     | '/api/chat'
@@ -359,6 +379,7 @@ export interface FileRouteTypes {
     | '/faq'
     | '/imagery'
     | '/library'
+    | '/logohub'
     | '/reset-password'
     | '/admin/ab'
     | '/admin/ai'
@@ -367,6 +388,7 @@ export interface FileRouteTypes {
     | '/admin/brand-assets'
     | '/admin/icon-studio'
     | '/admin/imagery'
+    | '/admin/logohub'
     | '/admin/oracle'
     | '/admin/users'
     | '/api/chat'
@@ -394,6 +416,7 @@ export interface FileRouteTypes {
     | '/imagery'
     | '/knowledge'
     | '/library'
+    | '/logohub'
     | '/reset-password'
     | '/admin/ab'
     | '/admin/ai'
@@ -402,6 +425,7 @@ export interface FileRouteTypes {
     | '/admin/brand-assets'
     | '/admin/icon-studio'
     | '/admin/imagery'
+    | '/admin/logohub'
     | '/admin/oracle'
     | '/admin/users'
     | '/api/chat'
@@ -430,6 +454,7 @@ export interface RootRouteChildren {
   ImageryRoute: typeof ImageryRoute
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
   LibraryRoute: typeof LibraryRoute
+  LogohubRoute: typeof LogohubRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ApiChatRoute: typeof ApiChatRoute
   BriefNewRoute: typeof BriefNewRoute
@@ -444,6 +469,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/logohub': {
+      id: '/logohub'
+      path: '/logohub'
+      fullPath: '/logohub'
+      preLoaderRoute: typeof LogohubRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/library': {
@@ -593,6 +625,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminOracleRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/logohub': {
+      id: '/admin/logohub'
+      path: '/logohub'
+      fullPath: '/admin/logohub'
+      preLoaderRoute: typeof AdminLogohubRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/imagery': {
       id: '/admin/imagery'
       path: '/imagery'
@@ -681,6 +720,7 @@ interface AdminRouteChildren {
   AdminBrandAssetsRoute: typeof AdminBrandAssetsRoute
   AdminIconStudioRoute: typeof AdminIconStudioRoute
   AdminImageryRoute: typeof AdminImageryRoute
+  AdminLogohubRoute: typeof AdminLogohubRoute
   AdminOracleRoute: typeof AdminOracleRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -694,6 +734,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBrandAssetsRoute: AdminBrandAssetsRoute,
   AdminIconStudioRoute: AdminIconStudioRoute,
   AdminImageryRoute: AdminImageryRoute,
+  AdminLogohubRoute: AdminLogohubRoute,
   AdminOracleRoute: AdminOracleRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -758,6 +799,7 @@ const rootRouteChildren: RootRouteChildren = {
   ImageryRoute: ImageryRoute,
   KnowledgeRoute: KnowledgeRouteWithChildren,
   LibraryRoute: LibraryRoute,
+  LogohubRoute: LogohubRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ApiChatRoute: ApiChatRoute,
   BriefNewRoute: BriefNewRoute,

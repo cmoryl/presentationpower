@@ -42,13 +42,7 @@ export const listClientLogos = createServerFn({ method: "GET" })
       .limit(1000);
     if (error) throw new Error((error as { message?: string }).message ?? "Failed to load logos");
 
-    const rows = (data ?? []) as Array<{
-      id: string;
-      primary_path: string;
-      dark_path: string | null;
-      light_path: string | null;
-      mono_path: string | null;
-    }>;
+    const rows = (data ?? []) as Array<Record<string, any>>;
     const allPaths = Array.from(
       new Set(
         rows.flatMap((r) => [r.primary_path, r.dark_path, r.light_path, r.mono_path].filter((p): p is string => !!p)),
