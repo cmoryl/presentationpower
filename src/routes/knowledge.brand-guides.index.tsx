@@ -4,7 +4,7 @@ import { AppShell } from "@/components/AppShell";
 import { BRAND_GUIDES, type BrandGuide, type BrandGuideCategory } from "@/lib/brand-guides";
 import { BRAND_MODES } from "@/lib/taxonomy";
 
-export const Route = createFileRoute("/knowledge/brand-guides")({
+export const Route = createFileRoute("/knowledge/brand-guides/")({
   head: () => ({
     meta: [
       { title: "Brand Guides · Knowledge · TransPerfect" },
