@@ -628,18 +628,29 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
           <div className="mt-14 grid grid-cols-4 gap-6">
-            {arr(c.items).map((it, i) => (
-              <div
-                key={i}
-                className="flex aspect-[3/2] items-center justify-center rounded-xl border p-6 text-center text-2xl font-semibold"
-                style={{ borderColor: "rgba(10,15,28,0.12)", backgroundColor: "#fff", color: brand.tokens.primary }}
-              >
-                <div>
-                  <div>{s(it.name ?? it.client)}</div>
-                  {s(it.result) && <div className="mt-2 text-sm font-normal opacity-70">{s(it.result)}</div>}
+            {arr(c.items).map((it, i) => {
+              const name = s(it.name ?? it.client);
+              const logoUrl = s(it.logoUrl ?? it.logo ?? it.primaryUrl);
+              const result = s(it.result);
+              return (
+                <div
+                  key={i}
+                  className="flex aspect-[3/2] flex-col items-center justify-center gap-3 rounded-xl border p-6 text-center"
+                  style={{ borderColor: "rgba(10,15,28,0.12)", backgroundColor: "#fff", color: brand.tokens.primary }}
+                >
+                  {logoUrl ? (
+                    <img
+                      src={logoUrl}
+                      alt={name ? `${name} logo` : "Client logo"}
+                      className="max-h-[60%] max-w-[80%] object-contain"
+                    />
+                  ) : (
+                    <div className="text-2xl font-semibold">{name}</div>
+                  )}
+                  {result && <div className="text-sm font-normal opacity-70">{result}</div>}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </SlideFrame>
       );
