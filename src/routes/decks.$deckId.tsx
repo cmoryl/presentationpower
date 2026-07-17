@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
-import { DeckChat } from "@/components/DeckChat";
+import { CopilotPanel } from "@/components/CopilotPanel";
 import { IconPicker } from "@/components/IconPicker";
 import { SaveToCloudButton } from "@/components/CloudDeckControls";
 import { BrandReviewPanel } from "@/components/BrandReviewPanel";
