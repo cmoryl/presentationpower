@@ -2,6 +2,12 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { getBrandGuide, type BrandGuide, type ColorSwatch, type TypeStyle } from "@/lib/brand-guides";
 import { BRAND_MODES } from "@/lib/taxonomy";
+import {
+  getBrandhubIntel,
+  normalizeVoiceValue,
+  targetAudienceText,
+  type BrandhubIntel,
+} from "@/lib/brandhub-intel";
 
 export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
   loader: ({ params }) => {
@@ -38,6 +44,7 @@ function BrandGuideView() {
   const division = BRAND_MODES.find((b) => b.id === guide.divisionId);
   const hero = guide.primaryColors[0]?.hex ?? "#03002C";
   const accent = guide.secondaryColors[0]?.hex ?? "#A1FBF9";
+  const intel = getBrandhubIntel(guide.slug);
 
   return (
     <AppShell>
@@ -272,7 +279,10 @@ function BrandGuideView() {
         </Section>
       )}
 
+      {intel && <BrandhubIntelSections intel={intel} hero={hero} accent={accent} />}
+
       <div className="my-16 flex flex-wrap items-center justify-between gap-3 border-t border-black/10 pt-6 text-xs text-black/50">
+
         <div>
           {guide.title} · Brand Guidelines v{guide.version} · Last updated {guide.updatedAt}
         </div>
@@ -360,3 +370,293 @@ function TypeSample({ style }: { style: TypeStyle }) {
     </div>
   );
 }
+
+function BrandhubIntelSections({
+  intel,
+  hero,
+  accent,
+}: {
+  intel: BrandhubIntel;
+  hero: string;
+  accent: string;
+}) {
+  const audience = targetAudienceText(intel.targetAudience);
+  const tone = normalizeVoiceValue(intel.voiceProfile.tone);
+  const style = normalizeVoiceValue(intel.voiceProfile.style);
+  const personality = normalizeVoiceValue(intel.voiceProfile.personality);
+  const commStyle = normalizeVoiceValue(intel.voiceProfile.communication_style);
+  const competitors = intel.competitiveLandscape.competitors ?? [];
+  const gaps = intel.competitiveLandscape.competitive_gaps ?? [];
+  const markets = intel.culturalInsights.primary_markets ?? [];
+  const cultural = intel.culturalInsights.cultural_considerations ?? [];
+  const locPriorities = intel.culturalInsights.localization_priorities ?? [];
+  const readiness = intel.culturalInsights.global_readiness_score;
+  const growth = intel.growthRecommendations ?? [];
+  const ke = intel.knowledgeEntries ?? [];
+
+  return (
+    <>
+      <Section title="Brand intelligence" eyebrow="09">
+        <div
+          className="rounded-3xl p-8 text-white"
+          style={{ background: `linear-gradient(135deg, ${hero}, ${accent})` }}
+        >
+          <div className="text-[11px] uppercase tracking-[0.3em] opacity-70">
+            BrandHub · Oracle synthesis
+          </div>
+          {intel.summary && (
+            <p className="mt-3 max-w-3xl text-base leading-[150%] opacity-95">
+              {intel.summary}
+            </p>
+          )}
+          <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+            {intel.marketPosition && (
+              <IntelCard label="Market position" body={intel.marketPosition} />
+            )}
+            {audience && <IntelCard label="Target audience" body={audience} />}
+          </div>
+        </div>
+      </Section>
+
+      {(tone.length || style.length || personality.length || commStyle.length) > 0 && (
+        <Section title="Voice profile" eyebrow="10">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            <VoiceCard label="Tone" values={tone} hero={hero} />
+            <VoiceCard label="Style" values={style} hero={hero} />
+            <VoiceCard label="Personality" values={personality} hero={hero} />
+            <VoiceCard label="Communication" values={commStyle} hero={hero} />
+          </div>
+        </Section>
+      )}
+
+      {intel.competitiveAdvantages.length > 0 && (
+        <Section title="Competitive advantages" eyebrow="11">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {intel.competitiveAdvantages.map((c, i) => (
+              <div
+                key={i}
+                className="rounded-xl border border-black/10 bg-white p-4 text-sm text-black/80"
+              >
+                <div
+                  className="mb-1 text-[10px] font-semibold uppercase tracking-[0.25em]"
+                  style={{ color: hero }}
+                >
+                  Advantage {String(i + 1).padStart(2, "0")}
+                </div>
+                {c}
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {(competitors.length > 0 || gaps.length > 0) && (
+        <Section title="Competitive landscape" eyebrow="12">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {competitors.length > 0 && (
+              <div className="rounded-2xl border border-black/10 bg-white p-6">
+                <div className="text-xs uppercase tracking-[0.25em]" style={{ color: hero }}>
+                  Competitors tracked
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {competitors.map((c) => (
+                    <span
+                      key={c}
+                      className="rounded-full border border-black/10 bg-black/[0.03] px-3 py-1 text-xs text-black/80"
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {gaps.length > 0 && (
+              <div className="rounded-2xl border border-black/10 bg-white p-6">
+                <div className="text-xs uppercase tracking-[0.25em]" style={{ color: hero }}>
+                  Competitive gaps
+                </div>
+                <ul className="mt-3 space-y-2 text-sm text-black/80">
+                  {gaps.slice(0, 8).map((g, i) => (
+                    <li key={i} className="flex gap-2">
+                      <span
+                        className="mt-2 h-1 w-1 shrink-0 rounded-full"
+                        style={{ background: hero }}
+                      />
+                      <span>{g}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </Section>
+      )}
+
+      {(markets.length > 0 || cultural.length > 0 || locPriorities.length > 0) && (
+        <Section title="Cultural & global readiness" eyebrow="13">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {markets.length > 0 && (
+              <div className="rounded-2xl border border-black/10 bg-white p-6">
+                <div className="text-xs uppercase tracking-[0.25em]" style={{ color: hero }}>
+                  Primary markets
+                </div>
+                <ul className="mt-3 space-y-1 text-sm text-black/80">
+                  {markets.map((m) => (
+                    <li key={m}>· {m}</li>
+                  ))}
+                </ul>
+                {typeof readiness === "number" && (
+                  <div className="mt-4 rounded-lg bg-black/[0.04] p-3 text-xs">
+                    <div className="text-black/50">Global readiness</div>
+                    <div className="text-2xl font-semibold" style={{ color: hero }}>
+                      {readiness}
+                      <span className="text-sm text-black/40">/100</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+            {cultural.length > 0 && (
+              <div className="rounded-2xl border border-black/10 bg-white p-6">
+                <div className="text-xs uppercase tracking-[0.25em]" style={{ color: hero }}>
+                  Cultural considerations
+                </div>
+                <ul className="mt-3 space-y-2 text-sm text-black/80">
+                  {cultural.map((c, i) => (
+                    <li key={i}>· {c}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {locPriorities.length > 0 && (
+              <div className="rounded-2xl border border-black/10 bg-white p-6">
+                <div className="text-xs uppercase tracking-[0.25em]" style={{ color: hero }}>
+                  Localization priorities
+                </div>
+                <ul className="mt-3 space-y-2 text-sm text-black/80">
+                  {locPriorities.map((p, i) => (
+                    <li key={i}>· {p}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </Section>
+      )}
+
+      {growth.length > 0 && (
+        <Section title="Growth recommendations" eyebrow="14">
+          <div className="space-y-3">
+            {growth.slice(0, 8).map((g, i) => (
+              <div
+                key={i}
+                className="rounded-xl border border-black/10 bg-white p-4"
+              >
+                <div className="flex items-center gap-2">
+                  {g.priority && (
+                    <span
+                      className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white"
+                      style={{
+                        background:
+                          g.priority === "high"
+                            ? "#E53D2E"
+                            : g.priority === "medium"
+                              ? hero
+                              : "#666",
+                      }}
+                    >
+                      {g.priority}
+                    </span>
+                  )}
+                  {typeof g.confidence === "number" && (
+                    <span className="text-[10px] text-black/40">
+                      confidence {Math.round(g.confidence * 100)}%
+                    </span>
+                  )}
+                </div>
+                <div className="mt-2 text-sm text-black/80">{g.recommendation}</div>
+                {g.rationale && (
+                  <div className="mt-1 text-xs text-black/50">{g.rationale}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {ke.length > 0 && (
+        <Section title="Knowledge entries" eyebrow="15">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {ke.slice(0, 12).map((entry, i) => (
+              <div
+                key={i}
+                className="rounded-xl border border-black/10 bg-white p-4 text-sm text-black/75"
+              >
+                <div
+                  className="mb-1 text-[10px] font-semibold uppercase tracking-[0.25em]"
+                  style={{ color: hero }}
+                >
+                  Entry {String(i + 1).padStart(2, "0")}
+                </div>
+                {entry}
+              </div>
+            ))}
+          </div>
+          {ke.length > 12 && (
+            <div className="mt-3 text-xs text-black/50">
+              +{ke.length - 12} more entries in the knowledge base
+            </div>
+          )}
+        </Section>
+      )}
+    </>
+  );
+}
+
+function IntelCard({ label, body }: { label: string; body: string }) {
+  return (
+    <div className="rounded-2xl bg-white/10 p-5 backdrop-blur-sm ring-1 ring-white/20">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.3em] opacity-70">
+        {label}
+      </div>
+      <p className="mt-2 text-sm leading-[150%] opacity-95">{body}</p>
+    </div>
+  );
+}
+
+function VoiceCard({
+  label,
+  values,
+  hero,
+}: {
+  label: string;
+  values: string[];
+  hero: string;
+}) {
+  if (!values.length) {
+    return (
+      <div className="rounded-xl border border-dashed border-black/15 p-4">
+        <div className="text-[10px] uppercase tracking-[0.25em] text-black/40">{label}</div>
+        <div className="mt-2 text-xs text-black/30">—</div>
+      </div>
+    );
+  }
+  return (
+    <div className="rounded-xl border border-black/10 bg-white p-4">
+      <div className="text-[10px] uppercase tracking-[0.25em]" style={{ color: hero }}>
+        {label}
+      </div>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {values.map((v) => (
+          <span
+            key={v}
+            className="rounded-full bg-black/[0.04] px-2.5 py-1 text-xs text-black/80"
+          >
+            {v}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
