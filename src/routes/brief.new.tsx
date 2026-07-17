@@ -754,3 +754,199 @@ function BrandRelevancePanel({ brand }: { brand: BrandMode }) {
     </div>
   );
 }
+
+function StrategistSection({
+  brandName,
+  brandPrimary,
+  status,
+  error,
+  setupNeeded,
+  strategy,
+  onPlan,
+  onRemoveSection,
+  onMoveSection,
+  onDiscard,
+}: {
+  brandName: string;
+  brandPrimary: string;
+  status: "idle" | "planning" | "ready" | "error";
+  error: string | null;
+  setupNeeded: boolean;
+  strategy: DeckStrategy | null;
+  onPlan: () => void;
+  onRemoveSection: (idx: number) => void;
+  onMoveSection: (idx: number, dir: 1 | -1) => void;
+  onDiscard: () => void;
+}) {
+  const busy = status === "planning";
+  return (
+    <section className="space-y-4">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
+        <label className={labelCls}>06 · AI Narrative Strategist · optional</label>
+        <span className="max-w-[13rem] text-right text-[10px] font-medium uppercase tracking-widest text-[#1E3A5F]/50 sm:max-w-none">
+          plans arc + sections before generation
+        </span>
+      </div>
+
+      {!strategy && (
+        <div
+          className="flex flex-col gap-3 rounded-xl border p-5 sm:flex-row sm:items-center sm:justify-between"
+          style={{ borderColor: PALETTE.hairline, backgroundColor: PALETTE.field }}
+        >
+          <div className="text-sm text-[#1E3A5F]">
+            Let Claude architect the deck: opening hook, section order, key messages, and closing ask — grounded in {brandName}'s brand guide and BrandHub intel.
+          </div>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onPlan}
+            className="rounded-lg px-5 py-2.5 font-['Urbanist'] text-sm font-bold tracking-tight text-white transition-all disabled:opacity-50"
+            style={{ backgroundColor: brandPrimary }}
+          >
+            {busy ? "Planning…" : "Plan with AI strategist"}
+          </button>
+        </div>
+      )}
+
+      {status === "error" && error && (
+        <div className="rounded-xl border border-rose-300/50 bg-rose-50 px-4 py-3 text-xs text-rose-700">
+          {setupNeeded
+            ? error
+            : `Strategist failed: ${error}. `}
+          {!setupNeeded && (
+            <button type="button" onClick={onPlan} className="ml-1 font-semibold underline">
+              Retry
+            </button>
+          )}
+        </div>
+      )}
+
+      {strategy && (
+        <div
+          className="space-y-4 rounded-xl border p-5"
+          style={{ borderColor: `${brandPrimary}33`, backgroundColor: PALETTE.field }}
+        >
+          <div className="grid gap-3 md:grid-cols-3">
+            <MicroCard label="Opening hook" body={strategy.openingHook} />
+            <MicroCard label="Narrative arc" body={strategy.narrativeArc} />
+            <MicroCard label="Closing ask" body={strategy.closingAsk} />
+          </div>
+
+          {strategy.risksToAvoid.length > 0 && (
+            <div>
+              <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#1E3A5F]/60">
+                Risks to avoid
+              </div>
+              <ul className="ml-4 list-disc space-y-0.5 text-xs text-[#1E3A5F]/85">
+                {strategy.risksToAvoid.map((r, i) => (
+                  <li key={i}>{r}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div>
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#1E3A5F]/60">
+                Recommended sections · {strategy.recommendedSections.length}
+              </span>
+              <button
+                type="button"
+                onClick={onDiscard}
+                className="text-[10px] font-semibold uppercase tracking-widest text-[#1E3A5F]/60 hover:text-rose-600"
+              >
+                Discard plan
+              </button>
+            </div>
+            <ol className="space-y-2">
+              {strategy.recommendedSections.map((sec: StrategySection, i) => {
+                const sf = byId(SECTION_FRAMEWORKS, sec.sectionId);
+                return (
+                  <li
+                    key={`${sec.sectionId}-${i}`}
+                    className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 rounded-lg border bg-white px-3 py-2.5"
+                    style={{ borderColor: PALETTE.hairline }}
+                  >
+                    <span
+                      className="mt-0.5 rounded px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-widest text-white"
+                      style={{ backgroundColor: brandPrimary }}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <div className="min-w-0">
+                      <div className="font-['Urbanist'] text-sm font-bold text-[#0F1B3D]">
+                        {sf?.name ?? sec.sectionId}
+                      </div>
+                      <div className="mt-0.5 text-xs font-medium text-[#0F1B3D]/80">
+                        Key message · {sec.keyMessage}
+                      </div>
+                      <div className="mt-1 text-[11px] italic text-[#1E3A5F]/70">
+                        {sec.rationale}
+                      </div>
+                      {sec.suggestedVariantId && (
+                        <div className="mt-1 font-mono text-[10px] text-[#1E3A5F]/50">
+                          variant {sec.suggestedVariantId}
+                          {sec.suggestedLayoutId ? ` · layout ${sec.suggestedLayoutId}` : ""}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <button
+                        type="button"
+                        onClick={() => onMoveSection(i, -1)}
+                        className="rounded border border-[#D1DBE5] px-2 py-0.5 text-[10px] hover:bg-[#F8FAFC]"
+                        aria-label="Move up"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onMoveSection(i, 1)}
+                        className="rounded border border-[#D1DBE5] px-2 py-0.5 text-[10px] hover:bg-[#F8FAFC]"
+                        aria-label="Move down"
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onRemoveSection(i)}
+                        className="rounded border border-rose-200 px-2 py-0.5 text-[10px] text-rose-600 hover:bg-rose-50"
+                        aria-label="Remove"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+
+          <div className="flex items-center justify-between text-[11px] text-[#1E3A5F]/70">
+            <span>Assemble buttons below will use this plan.</span>
+            <button
+              type="button"
+              onClick={onPlan}
+              disabled={busy}
+              className="font-semibold uppercase tracking-widest text-[#3B6FA0] hover:text-[#0F1B3D] disabled:opacity-50"
+            >
+              {busy ? "Re-planning…" : "Re-plan"}
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function MicroCard({ label, body }: { label: string; body: string }) {
+  return (
+    <div className="rounded-lg border border-[#D1DBE5] bg-white p-3">
+      <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#1E3A5F]/60">
+        {label}
+      </div>
+      <div className="mt-1 text-xs leading-relaxed text-[#0F1B3D]">{body}</div>
+    </div>
+  );
+}
+
