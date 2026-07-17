@@ -34,6 +34,8 @@ function PresenterView() {
     return () => window.removeEventListener("keydown", onKey);
   }, [deck.slides.length, deckId, navigate]);
 
+  const pct = deck.slides.length > 0 ? ((i + 1) / deck.slides.length) * 100 : 0;
+
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-black">
       <div className="w-full max-w-[95vw]">
@@ -45,10 +47,14 @@ function PresenterView() {
           )}
         </div>
       </div>
+      {/* Progress bar */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-white/10">
+        <div className="h-full bg-white/70 transition-all duration-300" style={{ width: `${pct}%` }} />
+      </div>
       <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-4 rounded-full bg-white/10 px-5 py-2 text-xs text-white/80 backdrop-blur">
-        <button onClick={() => setI((n) => Math.max(0, n - 1))} className="hover:text-white">←</button>
+        <button onClick={() => setI((n) => Math.max(0, n - 1))} className="hover:text-white" aria-label="Previous slide">←</button>
         <span className="tabular-nums">{i + 1} / {deck.slides.length}</span>
-        <button onClick={() => setI((n) => Math.min(deck.slides.length - 1, n + 1))} className="hover:text-white">→</button>
+        <button onClick={() => setI((n) => Math.min(deck.slides.length - 1, n + 1))} className="hover:text-white" aria-label="Next slide">→</button>
         <Link to="/decks/$deckId" params={{ deckId }} className="ml-3 hover:text-white">Exit (Esc)</Link>
       </div>
     </div>
