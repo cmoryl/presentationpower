@@ -347,6 +347,8 @@ function DeckEditor() {
           <VariantRenderer slide={active} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />
         </SlideLightbox>
       )}
+
+      <BrandReviewPanel deckId={deckId} onNavigateToSlide={(i) => setActiveIdx(Math.max(0, Math.min(deck.slides.length - 1, i)))} />
     </AppShell>
   );
 }
