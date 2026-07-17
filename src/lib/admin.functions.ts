@@ -83,6 +83,18 @@ export const getAdminOverview = createServerFn({ method: "GET" })
       return Array.from(m.entries()).sort(([a], [b]) => a.localeCompare(b)).map(([date, count]) => ({ date, count }));
     };
 
+    // Deck analytics
+    const deckSince = new Date(now.getTime() - 30 * 24 * 3600 * 1000);
+    const decksInWindow = deckRows.filter((d) => new Date(d.created_at) >= deckSince);
+    const tally = (rows: Array<Record<string, string | null>>, key: string) => {
+      const m = new Map<string, number>();
+      for (const r of rows) {
+        const k = (r[key] ?? "unspecified") || "unspecified";
+        m.set(k, (m.get(k) ?? 0) + 1);
+      }
+      return Array.from(m.entries()).map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count);
+    };
+
     return {
       window: { from, to: now.toISOString(), days: 30 },
       totals: {
@@ -93,7 +105,8 @@ export const getAdminOverview = createServerFn({ method: "GET" })
         aiErrors: errors,
         imageEvents: imgRows.length,
         imagesGenerated: imgRows.filter((r) => r.event_type === "generate").length,
-        decks: decks.count ?? 0,
+        decks: deckRows.length,
+        decksInWindow: decksInWindow.length,
         users: users.count ?? 0,
         knowledgeEntries: kb.count ?? 0,
         oracleKnowledge: oracleKb.count ?? 0,
@@ -103,6 +116,18 @@ export const getAdminOverview = createServerFn({ method: "GET" })
       },
       aiPerDay: bucket(aiRows),
       imageryPerDay: bucket(imgRows),
+      decksPerDay: bucket(decksInWindow),
+      decksByStatus: tally(deckRows as unknown as Array<Record<string, string | null>>, "status"),
+      decksByBrandMode: tally(deckRows as unknown as Array<Record<string, string | null>>, "brand_mode_id"),
+      decksByArchetype: tally(deckRows as unknown as Array<Record<string, string | null>>, "archetype_id"),
+      recentDecks: deckRows.slice(0, 8).map((d) => ({
+        id: d.id,
+        title: d.title ?? "Untitled deck",
+        status: d.status ?? "draft",
+        brandMode: d.brand_mode_id ?? "—",
+        archetype: d.archetype_id ?? "—",
+        updatedAt: d.updated_at,
+      })),
     };
   });
 
