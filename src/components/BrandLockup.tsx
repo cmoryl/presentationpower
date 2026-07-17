@@ -44,6 +44,7 @@ export function BrandLockup({
   showMark = true,
   showDivision = true,
   clientName,
+  clientLogoUrl,
 }: {
   brand: BrandMode;
   color: string;
@@ -51,6 +52,7 @@ export function BrandLockup({
   showMark?: boolean;
   showDivision?: boolean;
   clientName?: string; // Substituted into division line when it contains {client}
+  clientLogoUrl?: string | null; // When set, co-brand with the client's logo
 }) {
   const dims =
     size === "2xs"
@@ -70,13 +72,12 @@ export function BrandLockup({
   const useOfficialWordmark = TP_BRANDS.has(logo.wordmark);
   const wordmarkHeight = dims.wordmarkPx;
 
-
   return (
     <div
       className="flex min-w-0 max-w-full items-center"
       style={{ gap: dims.gapPx, color }}
       role="img"
-      aria-label={`${logo.wordmark}${divisionLine ? " — " + divisionLine : ""} lockup`}
+      aria-label={`${logo.wordmark}${divisionLine ? " — " + divisionLine : ""}${clientLogoUrl ? " × client" : ""} lockup`}
     >
       {showMark && !useOfficialWordmark && (
         <div
@@ -98,7 +99,6 @@ export function BrandLockup({
         {useOfficialWordmark ? (
           <TransPerfectWordmark height={wordmarkHeight} />
         ) : (
-
           <div className="min-w-0 max-w-full break-words font-semibold tracking-wide" style={{ fontSize: dims.wordPx, letterSpacing: "0.02em" }}>
             {logo.wordmark.toUpperCase()}
           </div>
@@ -112,7 +112,28 @@ export function BrandLockup({
           </div>
         )}
       </div>
+      {clientLogoUrl && (
+        <>
+          <div
+            aria-hidden
+            style={{
+              width: 1,
+              height: dims.wordmarkPx * 1.6,
+              backgroundColor: "currentColor",
+              opacity: 0.35,
+              marginLeft: dims.gapPx / 2,
+              marginRight: dims.gapPx / 2,
+            }}
+          />
+          <img
+            src={clientLogoUrl}
+            alt={clientName ? `${clientName} logo` : "Client logo"}
+            style={{ height: dims.wordmarkPx * 1.6, width: "auto", maxWidth: dims.wordmarkPx * 6, objectFit: "contain", display: "block" }}
+          />
+        </>
+      )}
     </div>
   );
 }
+
 

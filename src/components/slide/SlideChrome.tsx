@@ -46,6 +46,7 @@ export function SlideFrame({
   children,
   variant = "content",
   clientName,
+  clientLogoUrl,
   layoutId,
   logoPosition,
 }: {
@@ -54,9 +55,11 @@ export function SlideFrame({
   children: ReactNode;
   variant?: ChromeVariant;
   clientName?: string;
+  clientLogoUrl?: string | null;
   layoutId?: string;
   logoPosition?: LogoPosition;
 }) {
+
   const mode = useSlideMode();
   const backdrop = useContext(SlideBackdropContext);
   const isChromeDark = variant === "cover" || variant === "divider" || variant === "close";
@@ -168,9 +171,11 @@ export function SlideFrame({
             color={logoColor}
             size={variant === "content" ? "md" : variant === "cover" ? "xl" : "lg"}
             clientName={clientName}
+            clientLogoUrl={clientLogoUrl ?? null}
           />
         </div>
       )}
+
       {/* Content */}
       <div className="absolute inset-0 pt-32 pb-24 px-24">{children}</div>
       {/* Footer (locked) */}
