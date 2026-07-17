@@ -46,6 +46,7 @@ function BrandGuideView() {
   const hero = guide.primaryColors[0]?.hex ?? "#03002C";
   const accent = guide.secondaryColors[0]?.hex ?? "#A1FBF9";
   const intel = getBrandhubIntel(guide.slug);
+  const logos = getDivisionLogos(guide.divisionId) ?? getDivisionLogos(guide.slug);
 
   return (
     <AppShell>
