@@ -874,12 +874,19 @@ export const useDeckStore = create<DeckState>()(
           createdAt: new Date().toISOString(),
         };
         const deck = assembleDeck(brief);
+        deck.context = {
+          abExperimentId: brief.abExperimentId ?? null,
+          abVariantId: brief.abVariantId ?? null,
+          abPaletteOverride: brief.abPaletteOverride ?? null,
+          knowledgeSourceIds: brief.knowledgeSourceIds ?? [],
+        };
         set((s) => ({
           briefs: { ...s.briefs, [brief.id]: brief },
           decks: { ...s.decks, [deck.id]: deck },
         }));
         return { briefId: brief.id, deckId: deck.id };
       },
+
 
       createImportedDeck: (input) => {
         const brief: Brief = {
