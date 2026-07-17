@@ -1,14 +1,18 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { DeckChat } from "@/components/DeckChat";
 import { IconPicker } from "@/components/IconPicker";
 import { SaveToCloudButton } from "@/components/CloudDeckControls";
-import { useDeckStore } from "@/lib/deck-store";
+import { useDeckStore, type DeckClientLogo } from "@/lib/deck-store";
+import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.functions";
 
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
+
 import {
   BRAND_MODES,
   MODULE_VARIANTS,
