@@ -126,6 +126,10 @@ type DeckState = {
     slides: Array<{ sectionId: string; variantId: string; layoutId: string; content: SlideContent }>;
   }) => { briefId: string; deckId: string };
   applyAiContent: (deckId: string, aiSlides: Array<{ id: string; content: SlideContent }>) => void;
+  applyCopilotUpdates: (
+    deckId: string,
+    updates: Array<{ index: number; variantId: string; layoutId: string; content: SlideContent }>,
+  ) => void;
   revertAiChange: (deckId: string, slideId: string, field: string) => void;
   updateSlideField: (deckId: string, slideId: string, field: string, value: unknown) => void;
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
@@ -1002,6 +1006,40 @@ export const useDeckStore = create<DeckState>()(
                   .filter((k) => JSON.stringify(sl.content[k]) !== JSON.stringify(ai[k]))
                   .map((field) => ({ field, before: sl.content[field], after: ai[field], reason: "AI personalization", accepted: true }));
                 return { ...sl, content: ai, changes };
+              }),
+            },
+          },
+        }));
+      },
+
+      applyCopilotUpdates: (deckId, updates) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const byPos = new Map(updates.map((u) => [u.index, u]));
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) => {
+                const u = byPos.get(sl.position);
+                if (!u) return sl;
+                const changes: AiChange[] = [];
+                if (u.variantId !== sl.variantId) {
+                  changes.push({ field: "__variantId", before: sl.variantId, after: u.variantId, reason: "Copilot variant swap", accepted: true });
+                }
+                Object.keys(u.content).forEach((k) => {
+                  if (JSON.stringify(sl.content[k]) !== JSON.stringify(u.content[k])) {
+                    changes.push({ field: k, before: sl.content[k], after: u.content[k], reason: "Copilot edit", accepted: true });
+                  }
+                });
+                return {
+                  ...sl,
+                  variantId: u.variantId,
+                  layoutId: u.layoutId,
+                  content: u.content,
+                  changes: [...sl.changes.filter((c) => !changes.find((n) => n.field === c.field)), ...changes],
+                };
               }),
             },
           },

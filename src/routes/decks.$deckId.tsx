@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
-import { DeckChat } from "@/components/DeckChat";
+import { CopilotPanel } from "@/components/CopilotPanel";
 import { IconPicker } from "@/components/IconPicker";
 import { SaveToCloudButton } from "@/components/CloudDeckControls";
 import { BrandReviewPanel } from "@/components/BrandReviewPanel";
@@ -49,6 +49,7 @@ function DeckEditor() {
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [zoomed, setZoomed] = useState(false);
+  const [flashIndices, setFlashIndices] = useState<number[]>([]);
 
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
@@ -109,7 +110,7 @@ function DeckEditor() {
                   onClick={() => setActiveIdx(i)}
                   className={`block w-full overflow-hidden rounded-xl border text-left transition ${
                     i === clamped ? "border-[#0B2A4A] ring-2 ring-[#0B2A4A]/20" : "border-black/10 hover:border-black/30"
-                  }`}
+                  } ${flashIndices.includes(i) ? "ring-4 ring-[#A1FBF9] animate-pulse" : ""}`}
                 >
                   <div className="aspect-[16/9] bg-white">
                     <ScaledSlide>
@@ -336,7 +337,7 @@ function DeckEditor() {
         </aside>
 
       </div>
-      <DeckChat deck={deck} brief={brief} />
+      <CopilotPanel deckId={deckId} onHighlight={setFlashIndices} />
       {zoomed && active && mv && (
         <SlideLightbox
           onClose={() => setZoomed(false)}
