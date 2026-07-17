@@ -211,7 +211,7 @@ export const TRANSPERFECT_SUBCOMPANIES: string[] = Array.from(
 type DivisionSeed = {
   slug: string;
   divisionId: string;
-  category: BrandGuideCategory;
+  category?: BrandGuideCategory;
   title: string;
   subtitle: string;
   tagline: string;
