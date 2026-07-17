@@ -173,7 +173,7 @@ function BriefWizard() {
                     <div className="min-w-0">
                       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
                         <div className="min-w-0 max-w-full">
-                          <BrandLockup brand={brand} color={brandPrimary} size="sm" clientName={form.prospect} />
+                          <BrandLockup brand={brand} color={brandPrimary} size="sm" clientName={form.prospect} subCompany={form.subCompany} />
                         </div>
                         <span
                           className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
