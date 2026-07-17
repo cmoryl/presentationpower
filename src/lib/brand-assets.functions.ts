@@ -112,10 +112,10 @@ export const getBrandAssetSignedUrl = createServerFn({ method: "POST" })
     const s = context.supabase as unknown as SbClient;
     const { data: row } = await s.from("brand_assets").select("storage_path").eq("id", data.id).maybeSingle();
     const path = (row as { storage_path: string } | null)?.storage_path;
-    if (!path) throw new Error("Asset not found");
+    if (!path) return { url: null as string | null };
     const { data: signed, error } = await s.storage.from("brand-assets").createSignedUrl(path, 60 * 60);
-    if (error) throw new Error(String((error as any).message ?? error));
-    return { url: signed?.signedUrl };
+    if (error) return { url: null as string | null, error: String((error as any).message ?? error) };
+    return { url: signed?.signedUrl ?? null };
   });
 
 // ── INGEST: extract text via AI, chunk, embed, store ───────────────────
