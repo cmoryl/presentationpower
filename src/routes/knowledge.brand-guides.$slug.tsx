@@ -279,7 +279,10 @@ function BrandGuideView() {
         </Section>
       )}
 
+      {intel && <BrandhubIntelSections intel={intel} hero={hero} accent={accent} />}
+
       <div className="my-16 flex flex-wrap items-center justify-between gap-3 border-t border-black/10 pt-6 text-xs text-black/50">
+
         <div>
           {guide.title} · Brand Guidelines v{guide.version} · Last updated {guide.updatedAt}
         </div>
