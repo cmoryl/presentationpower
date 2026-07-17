@@ -269,13 +269,27 @@ export const searchBrandChunks = createServerFn({ method: "POST" })
     const [vec] = await embedBatch(apiKey, [data.query]);
     if (!vec) return [];
     const s = context.supabase as unknown as SbClient;
+    const embeddingLiteral = `[${vec.join(",")}]`;
+    const filterDivision = data.divisionId ?? null;
     const { data: rows, error } = await s.rpc("match_brand_chunks", {
-      query_embedding: `[${vec.join(",")}]`,
+      query_embedding: embeddingLiteral,
       match_count: data.limit,
-      filter_division: data.divisionId ?? null,
+      filter_division: filterDivision,
     });
     if (error) return [];
-    return (rows ?? []) as Array<{ id: string; asset_id: string; division_id: string | null; content: string; tags: string[]; similarity: number }>;
+    const primary = (rows ?? []) as Array<{ id: string; asset_id: string; division_id: string | null; content: string; tags: string[]; similarity: number }>;
+    // Fallback: if a division filter yielded nothing, re-run unfiltered so
+    // callers don't lose RAG results when the requested division has no
+    // ingested chunks (or the id doesn't match what's stored).
+    if (primary.length === 0 && filterDivision) {
+      const { data: unfiltered } = await s.rpc("match_brand_chunks", {
+        query_embedding: embeddingLiteral,
+        match_count: Math.min(3, data.limit),
+        filter_division: null,
+      });
+      return (unfiltered ?? []) as typeof primary;
+    }
+    return primary;
   });
 
 // ── BRANDHUB SEED IMPORT ───────────────────────────────────────────────
