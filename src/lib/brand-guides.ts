@@ -74,6 +74,7 @@ export type BrandGuide = {
 export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
   slug: "transperfect-master",
   divisionId: "master",
+  category: "master",
   title: "TransPerfect",
   subtitle: "Master Brand Guidelines · Digital Edition",
   version: "26.06 / 3.0",
@@ -210,6 +211,7 @@ export const TRANSPERFECT_SUBCOMPANIES: string[] = Array.from(
 type DivisionSeed = {
   slug: string;
   divisionId: string;
+  category: BrandGuideCategory;
   title: string;
   subtitle: string;
   tagline: string;
@@ -219,6 +221,7 @@ type DivisionSeed = {
   subBrandGroup: { group: string; items: string[] };
   photography: string;
   brandVisuals: string;
+  sourceUrl?: string;
 };
 
 const DIVISION_SEEDS: DivisionSeed[] = [
