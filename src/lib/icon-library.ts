@@ -121,6 +121,20 @@ export function iconByName(name: string | undefined | null): LucideIcon | null {
   return BY_NAME[name] ?? null;
 }
 
+/**
+ * Parse a `pack:name` icon reference (e.g. "lucide:home", "ph:rocket").
+ * Returns null for plain curated names — those go through `iconByName`.
+ */
+export function parseIconRef(
+  ref: string | undefined | null,
+): { packId: string; name: string } | null {
+  if (!ref) return null;
+  const idx = ref.indexOf(":");
+  if (idx <= 0 || idx === ref.length - 1) return null;
+  return { packId: ref.slice(0, idx), name: ref.slice(idx + 1) };
+}
+
 export const ICON_GROUPS: Array<IconLibraryEntry["group"]> = [
   "Core", "Process", "People", "Data", "Industry", "Comms", "Object",
 ];
+

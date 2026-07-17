@@ -35,7 +35,6 @@ import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
 import { Route as AdminLogohubRouteImport } from './routes/admin.logohub'
 import { Route as AdminImageryRouteImport } from './routes/admin.imagery'
 import { Route as AdminIconStudioRouteImport } from './routes/admin.icon-studio'
-import { Route as AdminIconLibraryRouteImport } from './routes/admin.icon-library'
 import { Route as AdminBrandAssetsRouteImport } from './routes/admin.brand-assets'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminApprovalsRouteImport } from './routes/admin.approvals'
@@ -177,11 +176,6 @@ const AdminIconStudioRoute = AdminIconStudioRouteImport.update({
   path: '/icon-studio',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminIconLibraryRoute = AdminIconLibraryRouteImport.update({
-  id: '/icon-library',
-  path: '/icon-library',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminBrandAssetsRoute = AdminBrandAssetsRouteImport.update({
   id: '/brand-assets',
   path: '/brand-assets',
@@ -252,7 +246,6 @@ export interface FileRoutesByFullPath {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
-  '/admin/icon-library': typeof AdminIconLibraryRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
   '/admin/logohub': typeof AdminLogohubRoute
@@ -289,7 +282,6 @@ export interface FileRoutesByTo {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
-  '/admin/icon-library': typeof AdminIconLibraryRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
   '/admin/logohub': typeof AdminLogohubRoute
@@ -329,7 +321,6 @@ export interface FileRoutesById {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
-  '/admin/icon-library': typeof AdminIconLibraryRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
   '/admin/logohub': typeof AdminLogohubRoute
@@ -370,7 +361,6 @@ export interface FileRouteTypes {
     | '/admin/approvals'
     | '/admin/audit'
     | '/admin/brand-assets'
-    | '/admin/icon-library'
     | '/admin/icon-studio'
     | '/admin/imagery'
     | '/admin/logohub'
@@ -407,7 +397,6 @@ export interface FileRouteTypes {
     | '/admin/approvals'
     | '/admin/audit'
     | '/admin/brand-assets'
-    | '/admin/icon-library'
     | '/admin/icon-studio'
     | '/admin/imagery'
     | '/admin/logohub'
@@ -446,7 +435,6 @@ export interface FileRouteTypes {
     | '/admin/approvals'
     | '/admin/audit'
     | '/admin/brand-assets'
-    | '/admin/icon-library'
     | '/admin/icon-studio'
     | '/admin/imagery'
     | '/admin/logohub'
@@ -672,13 +660,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIconStudioRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/icon-library': {
-      id: '/admin/icon-library'
-      path: '/icon-library'
-      fullPath: '/admin/icon-library'
-      preLoaderRoute: typeof AdminIconLibraryRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/brand-assets': {
       id: '/admin/brand-assets'
       path: '/brand-assets'
@@ -758,7 +739,6 @@ interface AdminRouteChildren {
   AdminApprovalsRoute: typeof AdminApprovalsRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBrandAssetsRoute: typeof AdminBrandAssetsRoute
-  AdminIconLibraryRoute: typeof AdminIconLibraryRoute
   AdminIconStudioRoute: typeof AdminIconStudioRoute
   AdminImageryRoute: typeof AdminImageryRoute
   AdminLogohubRoute: typeof AdminLogohubRoute
@@ -773,7 +753,6 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminApprovalsRoute: AdminApprovalsRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminBrandAssetsRoute: AdminBrandAssetsRoute,
-  AdminIconLibraryRoute: AdminIconLibraryRoute,
   AdminIconStudioRoute: AdminIconStudioRoute,
   AdminImageryRoute: AdminImageryRoute,
   AdminLogohubRoute: AdminLogohubRoute,

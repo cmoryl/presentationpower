@@ -92,15 +92,35 @@ const ICON_KEYWORDS: Array<[RegExp, IconType]> = [
 
 const DEFAULT_ICONS: IconType[] = [Target, Layers3, Workflow, LineChart, Users, Rocket];
 
-import { iconByName } from "@/lib/icon-library";
+import { iconByName, parseIconRef } from "@/lib/icon-library";
+import { IconRenderer } from "@/components/IconRenderer";
+
+// Cache synthesized Lucide-shaped components per pack:name ref so React sees
+// stable component identity across renders.
+const packIconCompCache = new Map<string, IconType>();
+function packIconComponent(packId: string, name: string): IconType {
+  const key = `${packId}:${name}`;
+  let Comp = packIconCompCache.get(key);
+  if (!Comp) {
+    const C = ({ size = 24, color }: { size?: number; color?: string; strokeWidth?: number }) => (
+      <IconRenderer pack={packId} name={name} size={size} color={color} />
+    );
+    Comp = C as unknown as IconType;
+    packIconCompCache.set(key, Comp);
+  }
+  return Comp;
+}
 
 function pickIcon(label: string, fallbackIndex = 0, override?: string | null): IconType {
+  const ref = parseIconRef(override);
+  if (ref) return packIconComponent(ref.packId, ref.name);
   const forced = iconByName(override);
   if (forced) return forced as IconType;
   const text = label || "";
   for (const [rx, Icon] of ICON_KEYWORDS) if (rx.test(text)) return Icon;
   return DEFAULT_ICONS[Math.abs(fallbackIndex) % DEFAULT_ICONS.length];
 }
+
 
 function IconBadge({
   brand,

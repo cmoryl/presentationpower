@@ -49,7 +49,13 @@ export interface IconPack {
   height?: number;
 }
 
-// Packs externalized via lovable-assets (too large for repo).
+export interface SearchHit {
+  packId: string;
+  name: string;
+}
+
+// Packs externalized via lovable-assets (too large for repo). The .asset.json
+// pointer file is committed; at runtime we fetch the CDN URL transparently.
 const EXTERNAL_PACK_URLS: Record<string, string> = {
   fluent: fluentAsset.url,
   twemoji: twemojiAsset.url,
@@ -61,27 +67,45 @@ function packUrl(id: string): string {
 
 let manifestPromise: Promise<IconManifest> | null = null;
 const packPromises = new Map<string, Promise<IconPack>>();
+const packMem = new Map<string, IconPack>();
 
 export function loadManifest(): Promise<IconManifest> {
   if (!manifestPromise) {
     manifestPromise = fetch("/icon-library/manifest.json").then((r) => {
       if (!r.ok) throw new Error(`manifest ${r.status}`);
-      return r.json();
+      return r.json() as Promise<IconManifest>;
     });
   }
   return manifestPromise;
 }
 
+export async function listPacks(): Promise<IconManifestPack[]> {
+  const m = await loadManifest();
+  return [...m.packs].sort(
+    (a, b) =>
+      (b.priority ?? 0) - (a.priority ?? 0) || a.name.localeCompare(b.name),
+  );
+}
+
 export function loadPack(id: string): Promise<IconPack> {
   let p = packPromises.get(id);
   if (!p) {
-    p = fetch(packUrl(id)).then((r) => {
-      if (!r.ok) throw new Error(`pack ${id} ${r.status}`);
-      return r.json();
-    });
+    p = fetch(packUrl(id))
+      .then((r) => {
+        if (!r.ok) throw new Error(`pack ${id} ${r.status}`);
+        return r.json() as Promise<IconPack>;
+      })
+      .then((data) => {
+        packMem.set(id, data);
+        return data;
+      });
     packPromises.set(id, p);
   }
   return p;
+}
+
+export function getLoadedPack(id: string): IconPack | undefined {
+  return packMem.get(id);
 }
 
 export function resolveIcon(pack: IconPack, name: string): IconifyIcon | null {
@@ -102,7 +126,7 @@ export function iconViewBox(pack: IconPack, icon: IconifyIcon): string {
 export function iconSvgMarkup(
   pack: IconPack,
   icon: IconifyIcon,
-  opts?: { size?: number; color?: string }
+  opts?: { size?: number; color?: string },
 ): string {
   const size = opts?.size ?? 24;
   const color = opts?.color ?? "currentColor";
@@ -111,4 +135,62 @@ export function iconSvgMarkup(
     ? icon.body.replace(/currentColor/g, color)
     : icon.body;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="${vb}" aria-hidden="true">${body}</svg>`;
+}
+
+/**
+ * Cross-pack fuzzy search. Only iterates through already-loaded packs unless
+ * `packIds` is provided, in which case those packs are loaded (bounded
+ * concurrency) before scanning. This prevents an accidental "load all 111k
+ * icons" from a global search.
+ */
+export async function searchIcons(
+  query: string,
+  opts?: { packIds?: string[]; limit?: number; concurrency?: number },
+): Promise<SearchHit[]> {
+  const q = query.trim().toLowerCase();
+  if (!q) return [];
+  const limit = opts?.limit ?? 200;
+  const concurrency = opts?.concurrency ?? 4;
+
+  const targetIds = opts?.packIds;
+  if (targetIds && targetIds.length) {
+    // Bounded-concurrency loader.
+    const queue = [...targetIds];
+    const runners: Promise<void>[] = [];
+    for (let i = 0; i < Math.min(concurrency, queue.length); i++) {
+      runners.push(
+        (async () => {
+          while (queue.length) {
+            const id = queue.shift();
+            if (!id) return;
+            try {
+              await loadPack(id);
+            } catch {
+              /* ignore */
+            }
+          }
+        })(),
+      );
+    }
+    await Promise.all(runners);
+  }
+
+  const hits: SearchHit[] = [];
+  const scan = (packId: string, pack: IconPack) => {
+    for (const name of Object.keys(pack.icons)) {
+      if (name.toLowerCase().includes(q)) {
+        hits.push({ packId, name });
+        if (hits.length >= limit) return true;
+      }
+    }
+    return false;
+  };
+
+  const ids = targetIds ?? Array.from(packMem.keys());
+  for (const id of ids) {
+    const pack = packMem.get(id);
+    if (!pack) continue;
+    if (scan(id, pack)) break;
+  }
+  return hits;
 }
