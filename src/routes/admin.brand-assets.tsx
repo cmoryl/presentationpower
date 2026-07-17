@@ -133,8 +133,9 @@ function BrandAssetsAdminView() {
 
   async function handleOpen(id: string) {
     try {
-      const { url } = await signFn({ data: { id } });
-      if (url) window.open(url, "_blank", "noopener");
+      const res = await signFn({ data: { id } });
+      if (res?.url) window.open(res.url, "_blank", "noopener");
+      else setStatus("This asset has no downloadable file (seed/embedding-only record).");
     } catch (e) {
       setStatus(`Cannot open: ${(e as Error).message}`);
     }
