@@ -1,5 +1,6 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { useState } from "react";
 import { useContrastBoost } from "@/hooks/use-contrast-boost";
 import { useTheme, type ThemeMode } from "@/hooks/use-theme";
 
@@ -7,6 +8,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [boost, setBoost] = useContrastBoost();
   const [theme, setTheme] = useTheme();
+  const [adminOpen, setAdminOpen] = useState(false);
   const themes: { id: ThemeMode; label: string }[] = [
     { id: "light", label: "Light" },
     { id: "dark",  label: "Dark" },
@@ -16,8 +18,16 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/brief/new", label: "New brief" },
     { to: "/atlas", label: "Atlas" },
     { to: "/library", label: "Library" },
-    { to: "/imagery", label: "Imagery" },
     { to: "/admin", label: "Admin" },
+  ] as const;
+  const adminSubnav = [
+    { to: "/admin", label: "Overview" },
+    { to: "/admin/imagery", label: "Imagery" },
+    { to: "/admin/users", label: "Users" },
+    { to: "/admin/approvals", label: "Knowledgebase" },
+    { to: "/admin/oracle", label: "Oracle KB" },
+    { to: "/admin/brand-assets", label: "Brand assets" },
+    { to: "/admin/logohub", label: "LogoHub" },
   ] as const;
   const footerNav = [
     { to: "/knowledge", label: "Knowledge" },
@@ -37,6 +47,49 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Link>
           <nav className="flex max-w-full flex-wrap items-center justify-center gap-1">
             {nav.map((n) => {
+              if (n.to === "/admin") {
+                const adminActive = pathname === "/admin" || pathname.startsWith("/admin/");
+                return (
+                  <div
+                    key={n.to}
+                    className="relative"
+                    onMouseEnter={() => setAdminOpen(true)}
+                    onMouseLeave={() => setAdminOpen(false)}
+                  >
+                    <Link
+                      to={n.to}
+                      className={`inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm transition sm:px-4 ${
+                        adminActive ? "bg-[#0B2A4A] text-white shadow-lg" : "text-black/60 hover:bg-white/40 hover:text-black"
+                      }`}
+                      onClick={() => setAdminOpen(false)}
+                    >
+                      {n.label}
+                      <span aria-hidden className="text-[10px]">▾</span>
+                    </Link>
+                    {adminOpen && (
+                      <div className="absolute left-1/2 top-full z-50 w-48 -translate-x-1/2 pt-1">
+                        <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/95 p-1.5 shadow-xl backdrop-blur-md">
+                          {adminSubnav.map((s) => {
+                            const active = pathname === s.to || pathname.startsWith(s.to + "/");
+                            return (
+                              <Link
+                                key={s.to}
+                                to={s.to}
+                                className={`block rounded-xl px-3.5 py-2 text-sm transition ${
+                                  active ? "bg-[#03002C] text-white" : "text-black/70 hover:bg-black/5"
+                                }`}
+                                onClick={() => setAdminOpen(false)}
+                              >
+                                {s.label}
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
               const active = pathname === n.to || (n.to !== "/" && pathname.startsWith(n.to));
               return (
                 <Link
