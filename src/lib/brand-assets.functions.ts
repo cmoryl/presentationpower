@@ -377,6 +377,97 @@ export const importBrandhubSeed = createServerFn({ method: "POST" })
     return { ok: true, counts: { oracle, oracleKb, brandIntel } };
   });
 
+// Fetch the BrandHUB seed JSON server-side (avoids browser CORS) and import it.
+const fetchImportInput = z.object({
+  url: z.string().url().default("https://brandhubcreator.lovable.app/knowledge-export/database-seed.json"),
+  replace: z.boolean().default(false),
+});
+export const fetchAndImportBrandhubSeed = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => fetchImportInput.parse(input))
+  .handler(async ({ data, context }): Promise<{ ok: boolean; counts: { oracle: number; oracleKb: number; brandIntel: number }; sizeBytes: number; error?: string }> => {
+    await assertAdmin(context);
+    let seed: any;
+    let sizeBytes = 0;
+    try {
+      const res = await fetch(data.url, { headers: { accept: "application/json" } });
+      if (!res.ok) return { ok: false, counts: { oracle: 0, oracleKb: 0, brandIntel: 0 }, sizeBytes: 0, error: `Fetch ${res.status}` };
+      const text = await res.text();
+      sizeBytes = text.length;
+      seed = JSON.parse(text);
+    } catch (e) {
+      return { ok: false, counts: { oracle: 0, oracleKb: 0, brandIntel: 0 }, sizeBytes: 0, error: (e as Error).message };
+    }
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sa = supabaseAdmin as unknown as SbClient;
+
+    if (data.replace) {
+      await sa.from("brand_intelligence").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      await sa.from("oracle_knowledge_base").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+      await sa.from("oracle_intelligence").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    }
+
+    let oracle = 0, oracleKb = 0, brandIntel = 0;
+    const oiArr = Array.isArray(seed?.oracle_intelligence) ? seed.oracle_intelligence : [];
+    const okb = Array.isArray(seed?.oracle_knowledge_base) ? seed.oracle_knowledge_base : [];
+    const bi = Array.isArray(seed?.brand_intelligence) ? seed.brand_intelligence : [];
+
+    for (const row of oiArr) {
+      const payload: Record<string, any> = {
+        organization_id: row.organization_id ?? null,
+        org_summary: row.org_summary ?? null,
+        portfolio_analysis: row.portfolio_analysis ?? null,
+        market_landscape: row.market_landscape ?? null,
+        strategic_recommendations: row.strategic_recommendations ?? null,
+        cross_entity_patterns: row.cross_entity_patterns ?? null,
+        unified_voice_profile: row.unified_voice_profile ?? null,
+        unified_audience_map: row.unified_audience_map ?? null,
+        competitive_overview: row.competitive_overview ?? null,
+        cultural_readiness: row.cultural_readiness ?? null,
+        knowledge_entry_count: row.knowledge_entry_count ?? 0,
+        entity_brain_count: row.entity_brain_count ?? 0,
+        last_synthesis_at: row.last_synthesis_at ?? null,
+        synthesis_count: row.synthesis_count ?? 0,
+        confidence_scores: row.confidence_scores ?? {},
+        synthesis_history: row.synthesis_history ?? [],
+        bias_awareness_insights: row.bias_awareness_insights ?? {},
+        longitudinal_trends: row.longitudinal_trends ?? {},
+      };
+      if (row.id) payload.id = row.id;
+      const { error } = await sa.from("oracle_intelligence").upsert(payload, { onConflict: "id" });
+      if (!error) oracle++;
+    }
+
+    for (let i = 0; i < okb.length; i += 50) {
+      const slice = okb.slice(i, i + 50).map((r: any) => ({
+        id: r.id, organization_id: r.organization_id ?? null, title: r.title, content: r.content,
+        content_type: r.content_type ?? "text", source_type: r.source_type ?? null,
+        source_entity_id: r.source_entity_id ?? null, source_entity_type: r.source_entity_type ?? null,
+        tags: r.tags ?? [], metadata: r.metadata ?? {}, is_active: r.is_active ?? true, category: r.category ?? null,
+      }));
+      const { error } = await sa.from("oracle_knowledge_base").upsert(slice, { onConflict: "id" });
+      if (!error) oracleKb += slice.length;
+    }
+
+    for (let i = 0; i < bi.length; i += 50) {
+      const slice = bi.slice(i, i + 50).map((r: any) => ({
+        id: r.id, organization_id: r.organization_id ?? null, entity_type: r.entity_type, entity_id: r.entity_id,
+        brand_summary: r.brand_summary ?? null, market_position: r.market_position ?? null,
+        target_audience: r.target_audience ?? null, competitive_advantages: r.competitive_advantages ?? null,
+        competitive_landscape: r.competitive_landscape ?? null, brand_voice_profile: r.brand_voice_profile ?? null,
+        growth_recommendations: r.growth_recommendations ?? null, cultural_insights: r.cultural_insights ?? null,
+        knowledge_entries: r.knowledge_entries ?? [],
+      }));
+      const { error } = await sa.from("brand_intelligence").upsert(slice, { onConflict: "id" });
+      if (!error) brandIntel += slice.length;
+    }
+
+    return { ok: true, counts: { oracle, oracleKb, brandIntel }, sizeBytes };
+  });
+
+
+
 // ── Convenient list of divisions (from brand_intelligence + entity names)
 export const listDivisionsFromIntelligence = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

@@ -12,6 +12,7 @@ import {
   deleteBrandAsset,
   getBrandAssetSignedUrl,
   importBrandhubSeed,
+  fetchAndImportBrandhubSeed,
 } from "@/lib/brand-assets.functions";
 
 export const Route = createFileRoute("/admin/brand-assets")({
@@ -25,6 +26,7 @@ function BrandAssetsAdminView() {
   const deleteFn = useServerFn(deleteBrandAsset);
   const signFn = useServerFn(getBrandAssetSignedUrl);
   const importFn = useServerFn(importBrandhubSeed);
+  const fetchImportFn = useServerFn(fetchAndImportBrandhubSeed);
   const qc = useQueryClient();
 
   const q = useQuery({ queryKey: ["admin", "brand-assets"], queryFn: () => listFn(), retry: false });
@@ -166,12 +168,13 @@ function BrandAssetsAdminView() {
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <button
             onClick={async () => {
-              setStatus("Fetching seed from BrandHUB…");
+              setStatus("Fetching seed from BrandHUB (server-side)…");
               try {
-                const res = await fetch("https://brandhubcreator.lovable.app/knowledge-export/database-seed.json", { cache: "no-store" });
+                // Use a same-origin server route proxy to avoid CORS
+                const res = await fetch("/api/public/brandhub-seed-proxy", { cache: "no-store" });
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const text = await res.text();
-                JSON.parse(text); // validate
+                JSON.parse(text);
                 setSeedText(text);
                 setStatus(`Fetched ${(text.length / 1024).toFixed(1)} KB. Ready to import.`);
               } catch (e) {
@@ -184,16 +187,19 @@ function BrandAssetsAdminView() {
           </button>
           <button
             onClick={async () => {
-              setStatus("Fetching + importing…");
+              setStatus("Fetching + importing on server…");
               try {
-                const res = await fetch("https://brandhubcreator.lovable.app/knowledge-export/database-seed.json", { cache: "no-store" });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const text = await res.text();
-                JSON.parse(text);
-                setSeedText(text);
-                setTimeout(() => importSeed.mutate(), 0);
+                const res = await fetchImportFn({
+                  data: {
+                    url: "https://brandhubcreator.lovable.app/knowledge-export/database-seed.json",
+                    replace: replaceOnImport,
+                  },
+                });
+                if (!res.ok) throw new Error(res.error ?? "Import failed");
+                setStatus(`Imported ${(res.sizeBytes / 1024).toFixed(1)} KB → ${res.counts.oracle} oracle, ${res.counts.oracleKb} KB rows, ${res.counts.brandIntel} brand intel.`);
+                qc.invalidateQueries({ queryKey: ["admin", "overview"] });
               } catch (e) {
-                setStatus(`Fetch failed: ${(e as Error).message}`);
+                setStatus(`Import failed: ${(e as Error).message}`);
               }
             }}
             className="rounded-full bg-[#03002C] px-4 py-1.5 text-xs font-semibold text-white"

@@ -44,6 +44,7 @@ import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge
 import { Route as DecksDeckIdPresentRouteImport } from './routes/decks.$deckId.present'
 import { Route as DecksDeckIdExportRouteImport } from './routes/decks.$deckId.export'
 import { Route as DecksDeckIdDocumentRouteImport } from './routes/decks.$deckId.document'
+import { Route as ApiPublicBrandhubSeedProxyRouteImport } from './routes/api/public/brandhub-seed-proxy'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -221,6 +222,12 @@ const DecksDeckIdDocumentRoute = DecksDeckIdDocumentRouteImport.update({
   path: '/document',
   getParentRoute: () => DecksDeckIdRoute,
 } as any)
+const ApiPublicBrandhubSeedProxyRoute =
+  ApiPublicBrandhubSeedProxyRouteImport.update({
+    id: '/api/public/brandhub-seed-proxy',
+    path: '/api/public/brandhub-seed-proxy',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -254,6 +261,7 @@ export interface FileRoutesByFullPath {
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/admin/': typeof AdminIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
+  '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
@@ -289,6 +297,7 @@ export interface FileRoutesByTo {
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/admin': typeof AdminIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
+  '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
@@ -327,6 +336,7 @@ export interface FileRoutesById {
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/admin/': typeof AdminIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
+  '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
@@ -366,6 +376,7 @@ export interface FileRouteTypes {
     | '/knowledge/oracle'
     | '/admin/'
     | '/knowledge/'
+    | '/api/public/brandhub-seed-proxy'
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
@@ -401,6 +412,7 @@ export interface FileRouteTypes {
     | '/knowledge/oracle'
     | '/admin'
     | '/knowledge'
+    | '/api/public/brandhub-seed-proxy'
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
@@ -438,6 +450,7 @@ export interface FileRouteTypes {
     | '/knowledge/oracle'
     | '/admin/'
     | '/knowledge/'
+    | '/api/public/brandhub-seed-proxy'
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
@@ -460,6 +473,7 @@ export interface RootRouteChildren {
   BriefNewRoute: typeof BriefNewRoute
   DecksDeckIdRoute: typeof DecksDeckIdRouteWithChildren
   DecksImportRoute: typeof DecksImportRoute
+  ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -709,6 +723,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DecksDeckIdDocumentRouteImport
       parentRoute: typeof DecksDeckIdRoute
     }
+    '/api/public/brandhub-seed-proxy': {
+      id: '/api/public/brandhub-seed-proxy'
+      path: '/api/public/brandhub-seed-proxy'
+      fullPath: '/api/public/brandhub-seed-proxy'
+      preLoaderRoute: typeof ApiPublicBrandhubSeedProxyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -805,6 +826,7 @@ const rootRouteChildren: RootRouteChildren = {
   BriefNewRoute: BriefNewRoute,
   DecksDeckIdRoute: DecksDeckIdRouteWithChildren,
   DecksImportRoute: DecksImportRoute,
+  ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
