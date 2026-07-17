@@ -598,7 +598,7 @@ function BriefWizard() {
                         abVariantId: effectiveSel.variantId,
                         abPaletteOverride: effectiveSel.paletteOverride,
                       };
-                      const { deckId } = create(submission);
+                      const { deckId } = create(submission, strategy ? { strategy } : undefined);
                       const deck = useDeckStore.getState().decks[deckId] ?? decks[deckId];
                       if (!deck) {
                         navigate({ to: "/decks/$deckId", params: { deckId } });
