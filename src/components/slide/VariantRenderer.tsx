@@ -200,7 +200,7 @@ function themeBrandForMode(brand: BrandMode, mode: SlideMode): BrandMode {
 }
 
 export function VariantRenderer(props: Props) {
-  const { slide, variant, brand, pageNumber, clientName, clientLogoUrl, mode = "light" } = props;
+  const { slide, variant, brand, pageNumber, clientName, clientLogoUrl, subCompany, mode = "light" } = props;
   const c = slide.content as Record<string, unknown>;
   const contentClientName = s((slide.content as Record<string, unknown>).clientName) || undefined;
   const resolvedClient = clientName || contentClientName;
@@ -208,7 +208,7 @@ export function VariantRenderer(props: Props) {
 
   return (
     <SlideModeContext.Provider value={mode}>
-      <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null }}>
+      <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany }}>
         {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c })}
       </SlideFrameCtx.Provider>
     </SlideModeContext.Provider>
