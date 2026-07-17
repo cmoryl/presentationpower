@@ -6,7 +6,9 @@ import { useDeckStore } from "@/lib/deck-store";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { personalizeSlides } from "@/lib/personalize.functions";
 import { retrieveKnowledgeForBrief, abAssign, abLogEvent } from "@/lib/admin.functions";
+import { synthesizeKnowledgeForBrief, type SynthesizedSnippet } from "@/lib/ai-rag.functions";
 import { planDeckStrategy, type DeckStrategy, type StrategySection } from "@/lib/ai-strategist.functions";
+
 import { byId, SECTION_FRAMEWORKS, NARRATIVE_ARCHETYPES, type BrandMode } from "@/lib/taxonomy";
 import { TRANSPERFECT_SUBCOMPANIES } from "@/lib/brand-guides";
 import { brandModeWithSubCompany, getSubCompanyProfile } from "@/lib/brand-profiles";
@@ -61,6 +63,7 @@ function BriefWizard() {
   const decks = useDeckStore((s) => s.decks);
   const personalize = useServerFn(personalizeSlides);
   const retrieveKnowledge = useServerFn(retrieveKnowledgeForBrief);
+  const synthesizeKnowledge = useServerFn(synthesizeKnowledgeForBrief);
   const planStrategyFn = useServerFn(planDeckStrategy);
   const assignVariantFn = useServerFn(abAssign);
   const logAbEventFn = useServerFn(abLogEvent);
@@ -70,6 +73,11 @@ function BriefWizard() {
   const [showAllArchetypes, setShowAllArchetypes] = useState(false);
   const [paletteSel, setPaletteSel] = useState<PaletteSelection>({ experimentId: null, variantId: null, paletteOverride: null });
   const [kbUsedCount, setKbUsedCount] = useState<number>(0);
+  const [kbSelected, setKbSelected] = useState<SynthesizedSnippet[]>([]);
+  const [kbSynthesis, setKbSynthesis] = useState<string | null>(null);
+  const [kbSynthesized, setKbSynthesized] = useState(false);
+  const [showKbPanel, setShowKbPanel] = useState(false);
+
   // AI Narrative Strategist (Phase B) — optional pass before deck generation.
   const [strategy, setStrategy] = useState<DeckStrategy | null>(null);
   const [strategyStatus, setStrategyStatus] = useState<"idle" | "planning" | "ready" | "error">("idle");
@@ -521,6 +529,18 @@ function BriefWizard() {
                 }}
               />
 
+              {(kbSelected.length > 0 || kbSynthesis) && (
+                <KnowledgeUsedPanel
+                  selected={kbSelected}
+                  synthesis={kbSynthesis}
+                  synthesized={kbSynthesized}
+                  open={showKbPanel}
+                  onToggle={() => setShowKbPanel((v) => !v)}
+                />
+              )}
+
+
+
 
               <div
                 className="flex flex-col-reverse items-stretch justify-between gap-4 border-t pt-6 md:flex-row md:items-center"
@@ -606,10 +626,19 @@ function BriefWizard() {
                       }
 
                       // Pull Oracle + KB snippets relevant to this brief.
+                      // Try Deep-RAG synthesis first; on any failure fall
+                      // back silently to the raw retrieval path.
                       setAiStatus("knowledge");
-                      let knowledgeSnippets: Array<{ source: "oracle" | "kb" | "asset" | "brand-intel"; title: string; snippet: string; tags: string[]; id: string }> = [];
+                      let knowledgeSnippets: Array<{ source: "oracle" | "kb" | "asset" | "brand-intel" | "synthesis"; title: string; snippet: string; tags: string[]; id: string }> = [];
+                      let synthesisText: string | null = null;
+                      let synthesized = false;
+                      const kbTagsBundle = [
+                        ...(scope?.industries ?? []),
+                        ...(scope?.serviceLines ?? []),
+                        ...(scope?.caseStudyTags ?? []),
+                      ];
                       try {
-                        const kbRes = await retrieveKnowledge({
+                        const synth = await synthesizeKnowledge({
                           data: {
                             industry: submission.industry,
                             audience: submission.audience,
@@ -617,21 +646,81 @@ function BriefWizard() {
                             clientFacts: submission.clientFacts,
                             brandName: brandForCall?.name ?? null,
                             divisionId: brandForCall?.id ?? null,
-                            brandTags: [
-                              ...(scope?.industries ?? []),
-                              ...(scope?.serviceLines ?? []),
-                              ...(scope?.caseStudyTags ?? []),
-                            ],
+                            brandTags: kbTagsBundle,
                             limit: 6,
                           },
                         });
-                        knowledgeSnippets = kbRes as typeof knowledgeSnippets;
-                        setKbUsedCount(knowledgeSnippets.length);
-                        setDeckContext(deckId, {
-                          knowledgeSourceIds: knowledgeSnippets.map((k) => k.id),
-                          knowledgeSources: knowledgeSnippets.map((k) => ({ id: k.id, source: k.source, title: k.title, tags: k.tags })),
+                        if (synth.ok) {
+                          synthesized = synth.synthesized;
+                          synthesisText = synth.synthesis ?? null;
+                          knowledgeSnippets = synth.selected.map((k) => ({
+                            id: k.id,
+                            source: k.source as "oracle" | "kb" | "asset" | "brand-intel",
+                            title: k.title,
+                            snippet: k.snippet,
+                            tags: k.tags,
+                          }));
+                          setKbSelected(synth.selected);
+                          setKbSynthesis(synthesisText);
+                          setKbSynthesized(synthesized);
+                          setShowKbPanel(true);
+                        }
+                      } catch { /* fall through to raw retrieval */ }
+
+                      if (!knowledgeSnippets.length) {
+                        try {
+                          const kbRes = await retrieveKnowledge({
+                            data: {
+                              industry: submission.industry,
+                              audience: submission.audience,
+                              meetingObjective: submission.meetingObjective,
+                              clientFacts: submission.clientFacts,
+                              brandName: brandForCall?.name ?? null,
+                              divisionId: brandForCall?.id ?? null,
+                              brandTags: kbTagsBundle,
+                              limit: 6,
+                            },
+                          });
+                          knowledgeSnippets = kbRes as typeof knowledgeSnippets;
+                          setKbSelected(
+                            knowledgeSnippets.map((k) => ({
+                              id: k.id,
+                              source: k.source,
+                              title: k.title,
+                              tags: k.tags,
+                              snippet: k.snippet,
+                            })),
+                          );
+                        } catch { /* non-fatal */ }
+                      }
+
+                      setKbUsedCount(knowledgeSnippets.length);
+                      setDeckContext(deckId, {
+                        knowledgeSourceIds: knowledgeSnippets.map((k) => k.id),
+                        knowledgeSources: knowledgeSnippets.map((k) => ({
+                          id: k.id,
+                          source: k.source,
+                          title: k.title,
+                          tags: k.tags,
+                          snippet: k.snippet,
+                          extractedFact: k.snippet,
+                        })),
+                        knowledgeSynthesis: synthesisText,
+                      });
+
+                      // Personalizer receives the curated snippets plus, when
+                      // available, a special "synthesis" pseudo-snippet.
+                      const personalizerKb: Array<{ source: "oracle" | "kb" | "asset" | "brand-intel"; title: string; snippet: string; tags: string[] }> = knowledgeSnippets
+                        .filter((k) => k.source !== "synthesis")
+                        .map((k) => ({ source: k.source as "oracle" | "kb" | "asset" | "brand-intel", title: k.title, snippet: k.snippet, tags: k.tags }));
+                      if (synthesisText) {
+                        personalizerKb.unshift({
+                          source: "kb",
+                          title: "Brief-specific knowledge synthesis",
+                          snippet: synthesisText,
+                          tags: ["synthesis"],
                         });
-                      } catch { /* non-fatal */ }
+                      }
 
 
                       setAiStatus("personalizing");
@@ -661,9 +750,10 @@ function BriefWizard() {
                               sectionName: byId(SECTION_FRAMEWORKS, s.sectionId)?.name ?? "",
                               content: s.content as Record<string, unknown>,
                             })),
-                            knowledgeSnippets: knowledgeSnippets.map((k) => ({ source: k.source, title: k.title, snippet: k.snippet, tags: k.tags })),
+                            knowledgeSnippets: personalizerKb.slice(0, 12),
                           },
                         });
+
                         if (result.error) {
                           setAiError(result.error);
                           setAiStatus("error");
@@ -950,3 +1040,85 @@ function MicroCard({ label, body }: { label: string; body: string }) {
   );
 }
 
+
+function KnowledgeUsedPanel({
+  selected,
+  synthesis,
+  synthesized,
+  open,
+  onToggle,
+}: {
+  selected: SynthesizedSnippet[];
+  synthesis: string | null;
+  synthesized: boolean;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div
+      className="rounded-xl border bg-white p-5"
+      style={{ borderColor: "var(--brief-hairline, #D1DBE5)" }}
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex w-full items-center justify-between gap-4 text-left"
+      >
+        <div className="flex items-center gap-3">
+          <span className="rounded-full bg-[#0F1B3D] px-2.5 py-1 font-['Urbanist'] text-[10px] font-bold uppercase tracking-widest text-white">
+            {synthesized ? "Deep RAG" : "Retrieved"}
+          </span>
+          <span className="font-['Urbanist'] text-sm font-bold uppercase tracking-[0.14em] text-[#0F1B3D]">
+            Knowledge used ({selected.length})
+          </span>
+        </div>
+        <span className="text-xs text-[#1E3A5F]/70">{open ? "Hide" : "Show"}</span>
+      </button>
+      {open && (
+        <div className="mt-4 space-y-4">
+          {synthesis && (
+            <div className="rounded-lg border border-[#0F1B3D]/10 bg-[#F8FAFC] p-4">
+              <div className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#3B6FA0]">
+                Synthesis
+              </div>
+              <p className="text-sm leading-relaxed text-[#0F1B3D]">{synthesis}</p>
+            </div>
+          )}
+          <ul className="space-y-3">
+            {selected.map((k) => (
+              <li
+                key={k.id}
+                className="rounded-lg border border-[#D1DBE5] bg-white p-3"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded bg-[#E8EDF3] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#1E3A5F]">
+                      {k.source}
+                    </span>
+                    <span className="font-['Urbanist'] text-xs font-bold text-[#0F1B3D]">
+                      {k.title}
+                    </span>
+                  </div>
+                  {typeof k.relevance === "number" && (
+                    <span
+                      className="text-xs tracking-widest text-[#3B6FA0]"
+                      title={`Relevance ${k.relevance}/5`}
+                    >
+                      {"★".repeat(k.relevance)}
+                      <span className="text-[#D1DBE5]">
+                        {"★".repeat(Math.max(0, 5 - k.relevance))}
+                      </span>
+                    </span>
+                  )}
+                </div>
+                <p className="mt-2 text-xs leading-relaxed text-[#1E3A5F]">
+                  {k.extractedFact || k.snippet}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}

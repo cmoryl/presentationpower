@@ -84,9 +84,19 @@ export type DeckContext = {
   abVariantId?: string | null;
   abPaletteOverride?: Record<string, string> | null;
   knowledgeSourceIds?: string[];
-  knowledgeSources?: Array<{ id: string; source: "oracle" | "kb" | "asset" | "brand-intel"; title: string; tags?: string[] }>;
+  knowledgeSources?: Array<{
+    id: string;
+    source: "oracle" | "kb" | "asset" | "brand-intel" | "synthesis";
+    title: string;
+    tags?: string[];
+    relevance?: number;
+    extractedFact?: string;
+    snippet?: string;
+  }>;
+  knowledgeSynthesis?: string | null;
   strategy?: DeckStrategySnapshot;
 };
+
 
 export type Deck = {
   id: string;

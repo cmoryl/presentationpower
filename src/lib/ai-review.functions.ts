@@ -67,6 +67,17 @@ const StrategyInput = z
   })
   .optional();
 
+const KnowledgeFactInput = z
+  .array(
+    z.object({
+      source: z.string(),
+      title: z.string().optional(),
+      extractedFact: z.string(),
+      relevance: z.number().optional(),
+    }),
+  )
+  .optional();
+
 const Input = z.object({
   cloudDeckId: z.string().uuid().optional(),
   deckTitle: z.string(),
@@ -81,8 +92,11 @@ const Input = z.object({
     })
     .optional(),
   strategy: StrategyInput,
+  knowledgeFacts: KnowledgeFactInput,
+  knowledgeSynthesis: z.string().optional().nullable(),
   slides: z.array(SlideInput).min(1).max(60),
 });
+
 
 
 export type ReviewDeckInput = z.infer<typeof Input>;
@@ -142,8 +156,15 @@ export const reviewDeck = createServerFn({ method: "POST" })
       data.strategy
         ? `Intended narrative (from AI Strategist — use to flag drift under category "structure"): ${JSON.stringify(data.strategy)}`
         : "",
+      data.knowledgeFacts && data.knowledgeFacts.length
+        ? `Retrieved knowledge facts (use under category "claims" — flag any deck copy that contradicts, exaggerates, or fabricates specifics vs these facts): ${JSON.stringify(data.knowledgeFacts)}`
+        : "",
+      data.knowledgeSynthesis
+        ? `Knowledge synthesis (brief-specific summary from Deep-RAG): ${data.knowledgeSynthesis}`
+        : "",
       "Slides (JSON):",
       JSON.stringify(data.slides, null, 0),
+
     ]
       .filter(Boolean)
       .join("\n");
