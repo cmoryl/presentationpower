@@ -1040,3 +1040,85 @@ function MicroCard({ label, body }: { label: string; body: string }) {
   );
 }
 
+
+function KnowledgeUsedPanel({
+  selected,
+  synthesis,
+  synthesized,
+  open,
+  onToggle,
+}: {
+  selected: SynthesizedSnippet[];
+  synthesis: string | null;
+  synthesized: boolean;
+  open: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <div
+      className="rounded-xl border bg-white p-5"
+      style={{ borderColor: "var(--brief-hairline, #D1DBE5)" }}
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex w-full items-center justify-between gap-4 text-left"
+      >
+        <div className="flex items-center gap-3">
+          <span className="rounded-full bg-[#0F1B3D] px-2.5 py-1 font-['Urbanist'] text-[10px] font-bold uppercase tracking-widest text-white">
+            {synthesized ? "Deep RAG" : "Retrieved"}
+          </span>
+          <span className="font-['Urbanist'] text-sm font-bold uppercase tracking-[0.14em] text-[#0F1B3D]">
+            Knowledge used ({selected.length})
+          </span>
+        </div>
+        <span className="text-xs text-[#1E3A5F]/70">{open ? "Hide" : "Show"}</span>
+      </button>
+      {open && (
+        <div className="mt-4 space-y-4">
+          {synthesis && (
+            <div className="rounded-lg border border-[#0F1B3D]/10 bg-[#F8FAFC] p-4">
+              <div className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#3B6FA0]">
+                Synthesis
+              </div>
+              <p className="text-sm leading-relaxed text-[#0F1B3D]">{synthesis}</p>
+            </div>
+          )}
+          <ul className="space-y-3">
+            {selected.map((k) => (
+              <li
+                key={k.id}
+                className="rounded-lg border border-[#D1DBE5] bg-white p-3"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded bg-[#E8EDF3] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#1E3A5F]">
+                      {k.source}
+                    </span>
+                    <span className="font-['Urbanist'] text-xs font-bold text-[#0F1B3D]">
+                      {k.title}
+                    </span>
+                  </div>
+                  {typeof k.relevance === "number" && (
+                    <span
+                      className="text-xs tracking-widest text-[#3B6FA0]"
+                      title={`Relevance ${k.relevance}/5`}
+                    >
+                      {"★".repeat(k.relevance)}
+                      <span className="text-[#D1DBE5]">
+                        {"★".repeat(Math.max(0, 5 - k.relevance))}
+                      </span>
+                    </span>
+                  )}
+                </div>
+                <p className="mt-2 text-xs leading-relaxed text-[#1E3A5F]">
+                  {k.extractedFact || k.snippet}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
