@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { CopilotPanel } from "@/components/CopilotPanel";
 import { IconPicker } from "@/components/IconPicker";
 import { SaveToCloudButton } from "@/components/CloudDeckControls";
+import { ShareMenu } from "@/components/ShareMenu";
 import { BrandReviewPanel } from "@/components/BrandReviewPanel";
 import { useDeckStore, type DeckClientLogo } from "@/lib/deck-store";
 import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.functions";
