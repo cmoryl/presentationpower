@@ -261,7 +261,7 @@ function BrandAssetsAdminView() {
         <div className="flex items-baseline justify-between">
           <h2 className="text-lg font-semibold">Uploaded brand assets</h2>
           <div className="text-xs text-black/50">
-            {(q.data ?? []).length} assets · {(q.data ?? []).reduce((a, r: any) => a + (r.chunkCount ?? 0), 0)} chunks
+            {(q.data ?? []).length} assets · {(q.data ?? []).reduce((a: number, r: any) => a + (r.chunkCount ?? 0), 0)} chunks
           </div>
         </div>
         {q.isLoading ? (
