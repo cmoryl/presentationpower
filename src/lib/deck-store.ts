@@ -105,6 +105,7 @@ type DeckState = {
   duplicateSlide: (deckId: string, slideId: string) => void;
   renameDeck: (deckId: string, title: string) => void;
   setDeckClientLogo: (deckId: string, logo: DeckClientLogo | null) => void;
+  setDeckContext: (deckId: string, patch: Partial<DeckContext>) => void;
   deleteDeck: (deckId: string) => void;
 
   hydrate: (input: { brief: Brief; deck: Deck }) => void;
