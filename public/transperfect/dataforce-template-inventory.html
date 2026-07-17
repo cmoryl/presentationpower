@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dataforce Template Inventory | TransPerfect Canva Registry</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2330;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-faint: #484f58;
+    --green: #3fb950;
+    --green-bg: rgba(63,185,80,0.10);
+    --red: #f85149;
+    --red-bg: rgba(248,81,73,0.10);
+    --tp-green: #00c853;
+    --tp-navy: #0a2240;
+    --accent: #00c853;
+    --mono: 'SF Mono','Consolas','Menlo',monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  /* ── HEADER ─────────────────────────────── */
+  .site-header {
+    background: linear-gradient(135deg, #0a2240 0%, #0d3060 60%, #0a5c40 100%);
+    border-bottom: 1px solid rgba(0,200,83,0.25);
+    padding: 28px 40px 22px;
+  }
+  .site-header .eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--tp-green); margin-bottom: 6px;
+  }
+  .site-header h1 { font-size: 26px; font-weight: 700; color: #fff; line-height: 1.2; }
+  .site-header .subtitle { color: rgba(255,255,255,0.55); font-size: 13px; margin-top: 4px; max-width: 720px; }
+  .meta-row { display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+  .meta-pill {
+    font-size: 11.5px; padding: 3px 10px; border-radius: 12px;
+    background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+
+  /* ── SUMMARY STRIP ───────────────────────── */
+  .summary-strip { display: flex; gap: 0; border-bottom: 1px solid var(--border); }
+  .stat-box {
+    flex: 1; padding: 16px 20px; border-right: 1px solid var(--border);
+    background: var(--surface); text-align: center;
+  }
+  .stat-box:last-child { border-right: none; }
+  .stat-box .val { font-size: 26px; font-weight: 700; color: var(--text); display: block; }
+  .stat-box .lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  .stat-box.green .val { color: var(--green); }
+  .stat-box.amber .val { color: #d29922; }
+
+  /* ── CONTENT ───────────────────────────── */
+  .content { padding: 22px 40px 60px; }
+
+  .t-wrap { border-radius: 8px; border: 1px solid var(--border); overflow: hidden; background: var(--surface); margin-top: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  thead th {
+    background: var(--surface2); color: var(--text-muted);
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.07em; padding: 10px 12px; text-align: left;
+    border-bottom: 1px solid var(--border); cursor: pointer; user-select: none;
+    white-space: nowrap;
+  }
+  thead th:hover { color: var(--tp-green); }
+  thead th .arrow { opacity: 0.35; font-size: 9px; margin-left: 4px; }
+  thead th.sorted .arrow { opacity: 1; color: var(--tp-green); }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(0,200,83,0.04); }
+  td { padding: 10px 12px; vertical-align: middle; }
+  td.name { font-weight: 600; color: var(--text); max-width: 380px; }
+  td.size, td.id { font-family: var(--mono); font-size: 11.5px; color: var(--text-muted); white-space: nowrap; }
+  td.pages { font-family: var(--mono); font-size: 11.5px; color: var(--text-muted); text-align: center; }
+  td.date { color: var(--text-muted); white-space: nowrap; font-size: 12px; }
+  td.action { text-align: right; white-space: nowrap; }
+  .edit-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(0,200,83,0.10); color: var(--tp-green);
+    border: 1px solid rgba(0,200,83,0.30); border-radius: 6px;
+    padding: 5px 11px; font-size: 11.5px; font-weight: 600;
+    text-decoration: none; transition: all 0.15s;
+  }
+  .edit-btn:hover { background: var(--tp-green); color: #fff; border-color: var(--tp-green); }
+
+  .no-results { text-align: center; padding: 48px 20px; color: var(--text-muted); display: none; }
+  footer { padding: 18px 40px 30px; font-size: 11.5px; color: var(--text-faint); text-align: center; line-height: 1.6; }
+
+  /* ── FLAGS / AUDIT FINDINGS ─────────────── */
+  .flags-section {
+    padding: 22px 40px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .flags-section h2 {
+    font-size: 13px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 12px;
+  }
+  .flag-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 10px;
+  }
+  .flag-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 14px; border-radius: 8px; border: 1px solid;
+    font-size: 12.5px; line-height: 1.4;
+  }
+  .flag-item.red   { background: rgba(248,81,73,0.10); border-color: rgba(248,81,73,0.25); color: #f4a4a1; }
+  .flag-item.amber { background: rgba(210,153,34,0.12); border-color: rgba(210,153,34,0.25); color: #e3bc5a; }
+  .flag-item.blue  { background: rgba(88,166,255,0.10); border-color: rgba(88,166,255,0.25); color: #88c4ff; }
+  .flag-item.green { background: var(--green-bg); border-color: rgba(63,185,80,0.25); color: #7ee787; }
+  .flag-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .flag-title { font-weight: 700; display: block; margin-bottom: 2px; color: inherit; }
+  .flag-desc { font-size: 11.5px; opacity: 0.9; }
+  .flag-ids { font-family: var(--mono); font-size: 10.5px; opacity: 0.75; margin-top: 4px; word-break: break-all; }
+
+  /* ── COMMENTS ───────────────────────────── */
+  .lc-cmt-btn {
+    background: transparent; color: var(--text-muted);
+    border: 1px solid var(--border); border-radius: 999px;
+    padding: 3px 9px; font-size: 11px; font-weight: 600;
+    cursor: pointer; display: inline-flex; gap: 4px;
+    transition: all 0.15s; white-space: nowrap; font-family: inherit;
+  }
+  .lc-cmt-btn:hover { color: var(--tp-green); border-color: var(--tp-green); }
+  .lc-cmt-btn.has-notes { color: var(--tp-green); border-color: rgba(0,200,83,0.45); background: rgba(0,200,83,0.08); }
+  .lc-cmt-row > td { background: rgba(0,200,83,0.04); padding: 10px 16px 14px; }
+  .lc-cmt-row textarea {
+    width: 100%; min-height: 60px; padding: 8px 10px;
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px;
+    font-family: inherit; font-size: 12px; resize: vertical;
+  }
+  .lc-cmt-row textarea:focus { outline: none; border-color: var(--tp-green); }
+  .lc-cmt-actions { margin-top: 6px; display: flex; gap: 8px; align-items: center; }
+  .lc-cmt-actions button {
+    background: var(--surface2); color: var(--text-muted);
+    border: 1px solid var(--border); border-radius: 5px;
+    padding: 4px 10px; font-size: 11px; cursor: pointer; font-family: inherit;
+  }
+  .lc-cmt-actions button.save { background: var(--tp-green); color: #fff; border-color: var(--tp-green); }
+  .lc-cmt-meta { font-size: 10.5px; color: var(--text-faint); margin-left: auto; }
+
+
+  /* ── FILTER BAR ─────────────────────────── */
+  .lc-filter-bar {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+    padding: 12px 40px; background: var(--surface);
+    border-bottom: 1px solid var(--border); font-size: 12px;
+  }
+  .lc-filter-bar label {
+    color: var(--text-muted); font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; font-size: 10.5px; margin-right: 6px;
+  }
+  .lc-filter-bar select, .lc-filter-bar input[type="search"] {
+    background: var(--surface2); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 10px; font-size: 12px; min-width: 160px;
+    font-family: inherit;
+  }
+  .lc-filter-bar input[type="search"] { min-width: 240px; }
+  .lc-filter-bar .lc-count { margin-left: auto; color: var(--text-muted); font-size: 11.5px; }
+  .lc-filter-bar .lc-reset {
+    background: transparent; color: var(--tp-green);
+    border: 1px solid rgba(0,200,83,0.4); border-radius: 6px;
+    padding: 5px 12px; font-size: 11.5px; cursor: pointer; font-weight: 600;
+    font-family: inherit;
+  }
+  .lc-filter-bar .lc-reset:hover { background: rgba(0,200,83,0.10); }
+
+  /* ── CANVA CONNECT PANEL ────────────────── */
+  .connect-panel {
+    position: fixed; top: 0; right: 0;
+    width: 380px; max-width: 90vw; height: 100vh;
+    background: var(--surface); border-left: 1px solid var(--border);
+    box-shadow: -4px 0 24px rgba(0,0,0,0.5);
+    z-index: 1000; transform: translateX(100%);
+    transition: transform 0.3s ease;
+    display: flex; flex-direction: column;
+  }
+  .connect-panel.open { transform: translateX(0); }
+  .connect-panel .cp-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .connect-panel .cp-header h3 { font-size: 14px; font-weight: 700; margin: 0; display: flex; gap: 8px; align-items: center; }
+  .connect-panel .cp-body { flex: 1; overflow-y: auto; padding: 20px; }
+  .connect-panel .cp-body label {
+    display: block; font-size: 11.5px; font-weight: 600;
+    color: var(--text-muted); margin: 14px 0 5px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .connect-panel .cp-body input {
+    width: 100%; padding: 9px 11px; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--bg);
+    color: var(--text); font-size: 13px; font-family: inherit;
+  }
+  .connect-panel .cp-body input:focus { outline: none; border-color: var(--tp-green); }
+  .connect-panel .cp-body .hint { font-size: 11px; color: var(--text-faint); margin-top: 4px; line-height: 1.4; }
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; padding: 5px 10px;
+    border-radius: 6px; margin-top: 4px;
+  }
+  .status-badge.connected { background: var(--green-bg); color: var(--green); border: 1px solid rgba(63,185,80,0.3); }
+  .status-badge.disconnected { background: var(--red-bg); color: var(--red); border: 1px solid rgba(248,81,73,0.3); }
+  .connect-panel .cp-actions {
+    padding: 14px 20px; border-top: 1px solid var(--border);
+    display: flex; gap: 8px;
+  }
+  .connect-panel .cp-actions button {
+    flex: 1; padding: 9px 14px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--text); font-size: 12.5px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+  }
+  .connect-panel .cp-actions button.primary { background: var(--tp-green); color: #fff; border-color: var(--tp-green); }
+  .connect-panel .cp-actions button:hover { opacity: 0.9; }
+  .connect-panel-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+    z-index: 999; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .connect-panel-overlay.open { opacity: 1; pointer-events: auto; }
+  .cp-toggle {
+    position: fixed; top: 14px; right: 14px; z-index: 998;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-muted); padding: 7px 12px; border-radius: 6px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; font-family: inherit;
+  }
+  .cp-toggle:hover { color: var(--text); border-color: var(--tp-green); }
+
+  /* ── LIGHT MODE OVERRIDE ────────────────── */
+  body.light-mode {
+    --bg: #f6f7fb;
+    --surface: #ffffff;
+    --surface2: #fafafe;
+    --border: #e3e6ef;
+    --text: #1a1d29;
+    --text-muted: #4b5066;
+    --text-faint: #9296a8;
+  }
+  body.light-mode .site-header { background: linear-gradient(135deg, #5b3df0 0%, #4527d6 60%, #00c853 100%); }
+  body.light-mode tbody tr:hover { background: #fafaff; }
+</style>
+</head>
+<body>
+
+<!-- ─── CANVA CONNECT SIDE PANEL ────────────────────── -->
+<div class="connect-panel-overlay" id="cp-overlay"></div>
+<div class="connect-panel" id="connect-panel">
+  <div class="cp-header">
+    <h3>🔌 Canva Connect</h3>
+    <button type="button" id="cp-close" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;line-height:1;">×</button>
+  </div>
+  <div class="cp-body">
+    <label>Connection Status</label>
+    <div class="status-badge disconnected" id="cp-status-badge"><span>●</span> Not connected</div>
+    <p class="hint">Connect your Canva account to enable live template syncing for Dataforce.</p>
+
+    <label for="cp-client-id">Canva Client ID</label>
+    <input type="text" id="cp-client-id" placeholder="e.g. OA..." autocomplete="off" />
+    <p class="hint">From your Canva integration's <strong>Overview</strong> page.</p>
+
+    <label for="cp-client-secret">Canva Client Secret</label>
+    <input type="password" id="cp-client-secret" placeholder="••••••••••••••" autocomplete="off" />
+    <p class="hint">Generated in the integration's <strong>Authentication</strong> tab.</p>
+
+    <label for="cp-redirect">Redirect URI</label>
+    <input type="text" id="cp-redirect" readonly value="https://nhxaijbyqfkkhhoornzy.supabase.co/functions/v1/canva-oauth-callback" />
+    <p class="hint">Paste this exact URL into your Canva integration settings.</p>
+
+    <label>Requested Scopes</label>
+    <input type="text" readonly value="brandtemplate:meta:read, brandtemplate:content:read, design:meta:read" />
+  </div>
+  <div class="cp-actions">
+    <button type="button" id="cp-save">Save</button>
+    <button type="button" class="primary" id="cp-connect">Connect Canva</button>
+  </div>
+</div>
+
+<button class="cp-toggle" id="cp-toggle" title="Canva Connection Settings">
+  🔌 <span id="cp-toggle-text">Canva</span>
+</button>
+
+<!-- ─── HEADER ──────────────────────────────────────── -->
+<div class="site-header">
+  <div class="eyebrow">TransPerfect · Dataforce Division</div>
+  <h1>Dataforce Template Inventory</h1>
+  <div class="subtitle">Complete, live-syncable reference of every Dataforce brand template in the TransPerfect Canva team account — live asset sizes, page counts, creation/update dates, and direct Canva edit links.</div>
+  <div class="meta-row">
+    <span class="meta-pill">📅 Audit date: June 16, 2026</span>
+    <span class="meta-pill" id="generated-pill">🕒 Loaded: —</span>
+    <span class="meta-pill">🏢 TransPerfect Canva Team Account</span>
+  </div>
+</div>
+
+<!-- ─── SUMMARY STRIP ───────────────────────────────── -->
+<div class="summary-strip">
+  <div class="stat-box"><span class="val" id="stat-total">49</span><span class="lbl">Templates</span></div>
+  <div class="stat-box green"><span class="val" id="stat-square">0</span><span class="lbl">Square (1:1)</span></div>
+  <div class="stat-box"><span class="val" id="stat-story">0</span><span class="lbl">Stories (9:16)</span></div>
+  <div class="stat-box amber"><span class="val" id="stat-fb">0</span><span class="lbl">Facebook</span></div>
+  <div class="stat-box"><span class="val" id="stat-other">0</span><span class="lbl">Other</span></div>
+  <div class="stat-box amber"><span class="val" id="stat-flags">0</span><span class="lbl">Audit Flags</span></div>
+</div>
+
+<!-- ─── FLAGS / AUDIT FINDINGS ──────────────────────── -->
+<div class="flags-section">
+  <h2>🚩 Audit Findings &amp; Recommendations</h2>
+  <div class="flag-grid" id="flag-grid"></div>
+</div>
+
+<!-- ─── FILTER BAR ──────────────────────────────────── -->
+
+<div class="lc-filter-bar">
+  <label for="lc-type">Type</label>
+  <select id="lc-type"><option value="">All types</option></select>
+  <input id="lc-search" type="search" placeholder="Search name, size or ID…" />
+  <button class="lc-reset" type="button" id="lc-reset-btn">Reset</button>
+  <button class="lc-reset" type="button" id="lc-csv-btn">⬇ Export CSV</button>
+  <button class="lc-reset" type="button" id="lc-refresh-btn" style="background:rgba(0,200,83,0.10);">
+    <span class="lc-refresh-icon" style="display:inline-block;transition:transform 0.6s ease;">↻</span> Refresh Canva
+  </button>
+  <span class="lc-count" id="lc-count">0 / 0 templates</span>
+</div>
+
+<!-- ─── CONTENT ─────────────────────────────────────── -->
+<div class="content">
+  <div class="t-wrap">
+    <table id="templateTable">
+      <thead>
+        <tr>
+          <th data-key="title" data-type="string">Template Name <span class="arrow">▲</span></th>
+          <th data-key="w" data-type="number">Size (px) <span class="arrow">▲</span></th>
+          <th data-key="type" data-type="string">Type <span class="arrow">▲</span></th>
+          <th data-key="pages" data-type="number">Pages <span class="arrow">▲</span></th>
+          <th data-key="id" data-type="string">Template ID <span class="arrow">▲</span></th>
+          <th data-key="created_ts" data-type="number">Created <span class="arrow">▲</span></th>
+          <th data-key="updated_ts" data-type="number">Last Updated <span class="arrow">▲</span></th>
+          <th>Notes</th>
+          <th></th>
+
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <div class="no-results" id="noResults">No templates match your filters.</div>
+  </div>
+</div>
+
+<footer>
+  Sizes and page counts confirmed via Canva API (create-design-from-brand-template → get-design-pages) · Click <strong>Refresh Canva</strong> to re-scrub live · TransPerfect Canva Team Account · Dataforce Division
+</footer>
+
+<script>
+const DATA = [{"id": "EAGmDfNi57k", "title": "Case Study Quote 1 [DATAFORCE]", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Jan 1, 2024", "updated": "Apr 29, 2025", "created_ts": 1704149063, "updated_ts": 1745967402, "url": "https://www.canva.com/design?create=true&template=EAGmDfNi57k", "pages": 1}, {"id": "EAGmDTG2yNc", "title": "Case Study Quote 2 [DATAFORCE]", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Jan 1, 2024", "updated": "Apr 29, 2025", "created_ts": 1704149142, "updated_ts": 1745966784, "url": "https://www.canva.com/design?create=true&template=EAGmDTG2yNc", "pages": 1}, {"id": "EAGmDS8LVLY", "title": "Challenge/Solution [DATAFORCE]", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Jan 1, 2024", "updated": "Apr 29, 2025", "created_ts": 1704149065, "updated_ts": 1745966887, "url": "https://www.canva.com/design?create=true&template=EAGmDS8LVLY", "pages": 1}, {"id": "EAGmDYFPFWI", "title": "Copy of Copy of Copy of DATAFORCE B2C JOBS (Facebook Cover)", "w": 1640, "h": 924, "sizeLabel": "1640 × 924 (FB Cover)", "created": "Mar 30, 2023", "updated": "Apr 29, 2025", "created_ts": 1680190125, "updated_ts": 1745966838, "url": "https://www.canva.com/design?create=true&template=EAGmDYFPFWI", "pages": 1}, {"id": "EAGmDYuHuRc", "title": "Copy of Copy of Copy of DATAFORCE B2C JOBS (Facebook Post (Landscape))", "w": 940, "h": 788, "sizeLabel": "940 × 788 (FB Landscape)", "created": "Mar 30, 2023", "updated": "Apr 29, 2025", "created_ts": 1680190269, "updated_ts": 1745966924, "url": "https://www.canva.com/design?create=true&template=EAGmDYuHuRc", "pages": 1}, {"id": "EAGmDZLUn6I", "title": "Copy of Copy of DATAFORCE B2C JOBS INSTAGRAM POST", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Mar 30, 2023", "updated": "Apr 29, 2025", "created_ts": 1680183618, "updated_ts": 1745966794, "url": "https://www.canva.com/design?create=true&template=EAGmDZLUn6I", "pages": 1}, {"id": "EAGmDfTNjIg", "title": "Copy of DATAFORCE B2C CHALLENCE Facebook Post (Landscape)", "w": 940, "h": 788, "sizeLabel": "940 × 788 (FB Landscape)", "created": "Mar 29, 2023", "updated": "Apr 29, 2025", "created_ts": 1680132592, "updated_ts": 1745967195, "url": "https://www.canva.com/design?create=true&template=EAGmDfTNjIg", "pages": 1}, {"id": "EAGmDT0KC6I", "title": "Copy of DATAFORCE B2C CHALLENGE (Facebook Cover)", "w": 1640, "h": 924, "sizeLabel": "1640 × 924 (FB Cover)", "created": "Mar 29, 2023", "updated": "Apr 29, 2025", "created_ts": 1680132684, "updated_ts": 1745967329, "url": "https://www.canva.com/design?create=true&template=EAGmDT0KC6I", "pages": 1}, {"id": "EAGmDWXWikc", "title": "Copy of DATAFORCE B2C DF WORLD (Facebook Cover)", "w": 1640, "h": 924, "sizeLabel": "1640 × 924 (FB Cover)", "created": "Mar 30, 2023", "updated": "Apr 29, 2025", "created_ts": 1680190397, "updated_ts": 1745966832, "url": "https://www.canva.com/design?create=true&template=EAGmDWXWikc", "pages": 1}, {"id": "EAGmDdo_rkI", "title": "Copy of DATAFORCE B2C DF WORLD (Facebook Post (Landscape))", "w": 940, "h": 788, "sizeLabel": "940 × 788 (FB Landscape)", "created": "Mar 30, 2023", "updated": "Apr 29, 2025", "created_ts": 1680190477, "updated_ts": 1745967350, "url": "https://www.canva.com/design?create=true&template=EAGmDdo_rkI", "pages": 1}, {"id": "EAGmDVX1Nkw", "title": "Copy of DATAFORCE B2C JOBS INSTAGRAM POST", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Mar 29, 2023", "updated": "Apr 29, 2025", "created_ts": 1680131508, "updated_ts": 1745966573, "url": "https://www.canva.com/design?create=true&template=EAGmDVX1Nkw", "pages": 1}, {"id": "EAGmDfsq8fk", "title": "Copy of DATAFORCE B2C WHAT DAY IS IT? (Facebook Cover)", "w": 1640, "h": 924, "sizeLabel": "1640 × 924 (FB Cover)", "created": "Mar 30, 2023", "updated": "Apr 29, 2025", "created_ts": 1680190758, "updated_ts": 1745966817, "url": "https://www.canva.com/design?create=true&template=EAGmDfsq8fk", "pages": 1}, {"id": "EAGmDcHm-3c", "title": "Copy of DATAFORCE B2C WHAT DAY IS IT? (Facebook Post (Landscape))", "w": 940, "h": 788, "sizeLabel": "940 × 788 (FB Landscape)", "created": "Mar 30, 2023", "updated": "Apr 29, 2025", "created_ts": 1680190891, "updated_ts": 1745967335, "url": "https://www.canva.com/design?create=true&template=EAGmDcHm-3c", "pages": 1}, {"id": "EAHA67dCRt8", "title": "Copy of Meta B2C Ad 1440 x 1440 [Dataforce]", "w": 1440, "h": 1440, "sizeLabel": "1440 × 1440 (Square)", "created": "Feb 10, 2026", "updated": "Feb 10, 2026", "created_ts": 1770721651, "updated_ts": 1770721740, "url": "https://www.canva.com/design?create=true&template=EAHA67dCRt8", "pages": 1}, {"id": "EAGmDVy07lE", "title": "DATAFORCE B2C CHALLENCE Instagram Post (Square)", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Mar 29, 2023", "updated": "Apr 29, 2025", "created_ts": 1680132249, "updated_ts": 1745966747, "url": "https://www.canva.com/design?create=true&template=EAGmDVy07lE", "pages": 1}, {"id": "EAGmDd7wye8", "title": "DATAFORCE B2C CHALLENCE Instagram Story", "w": 1080, "h": 1920, "sizeLabel": "1080 × 1920 (Story 9:16)", "created": "Mar 29, 2023", "updated": "Apr 29, 2025", "created_ts": 1680132000, "updated_ts": 1745967313, "url": "https://www.canva.com/design?create=true&template=EAGmDd7wye8", "pages": 1}, {"id": "EAGmDUFto88", "title": "DATAFORCE B2C CHALLENGE (Facebook Cover)", "w": 1640, "h": 924, "sizeLabel": "1640 × 924 (FB Cover)", "created": "Apr 4, 2023", "updated": "Apr 29, 2025", "created_ts": 1680635063, "updated_ts": 1745966969, "url": "https://www.canva.com/design?create=true&template=EAGmDUFto88", "pages": 1}, {"id": "EAGmDUppSio", "title": "DATAFORCE B2C CHALLENGE (Facebook Post (Landscape))", "w": 940, "h": 788, "sizeLabel": "940 × 788 (FB Landscape)", "created": "Apr 4, 2023", "updated": "Apr 29, 2025", "created_ts": 1680635251, "updated_ts": 1745967385, "url": "https://www.canva.com/design?create=true&template=EAGmDUppSio", "pages": 1}, {"id": "EAGmDRwQhW0", "title": "DATAFORCE B2C CHALLENGE (Instagram Post (Square))", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Apr 4, 2023", "updated": "Apr 29, 2025", "created_ts": 1680634848, "updated_ts": 1745967429, "url": "https://www.canva.com/design?create=true&template=EAGmDRwQhW0", "pages": 1}, {"id": "EAGmDUw0Sh0", "title": "DATAFORCE B2C DF WORLD INSTAGRAM POST", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Mar 29, 2023", "updated": "Apr 29, 2025", "created_ts": 1680131515, "updated_ts": 1745966908, "url": "https://www.canva.com/design?create=true&template=EAGmDUw0Sh0", "pages": 1}, {"id": "EAGmDWgSU2U", "title": "DATAFORCE B2C DF WORLD Instagram Story", "w": 1080, "h": 1920, "sizeLabel": "1080 × 1920 (Story 9:16)", "created": "Mar 29, 2023", "updated": "Apr 29, 2025", "created_ts": 1680131852, "updated_ts": 1745966855, "url": "https://www.canva.com/design?create=true&template=EAGmDWgSU2U", "pages": 1}, {"id": "EAGmDXF9v6A", "title": "DATAFORCE B2C FACT (Facebook Cover)", "w": 1640, "h": 924, "sizeLabel": "1640 × 924 (FB Cover)", "created": "Mar 30, 2023", "updated": "Apr 29, 2025", "created_ts": 1680190553, "updated_ts": 1745967324, "url": "https://www.canva.com/design?create=true&template=EAGmDXF9v6A", "pages": 1}, {"id": "EAGmDT34Aw8", "title": "DATAFORCE B2C FACT (Facebook Post (Landscape))", "w": 940, "h": 788, "sizeLabel": "940 × 788 (FB Landscape)", "created": "Mar 30, 2023", "updated": "Apr 29, 2025", "created_ts": 1680190652, "updated_ts": 1745966934, "url": "https://www.canva.com/design?create=true&template=EAGmDT34Aw8", "pages": 1}, {"id": "EAGmDQAN-4Y", "title": "DATAFORCE B2C IT'S ME (Facebook Cover)", "w": 1640, "h": 924, "sizeLabel": "1640 × 924 (FB Cover)", "created": "Mar 30, 2023", "updated": "Apr 29, 2025", "created_ts": 1680184951, "updated_ts": 1745966966, "url": "https://www.canva.com/design?create=true&template=EAGmDQAN-4Y", "pages": 1}, {"id": "EAGmDbUV4tI", "title": "DATAFORCE B2C IT'S ME (Facebook Post (Landscape))", "w": 940, "h": 788, "sizeLabel": "940 × 788 (FB Landscape)", "created": "Mar 30, 2023", "updated": "Apr 29, 2025", "created_ts": 1680184739, "updated_ts": 1745966604, "url": "https://www.canva.com/design?create=true&template=EAGmDbUV4tI", "pages": 1}, {"id": "EAGmDaNSAxg", "title": "DATAFORCE B2C IT'S ME (Instagram Story)", "w": 1080, "h": 1920, "sizeLabel": "1080 × 1920 (Story 9:16)", "created": "Mar 30, 2023", "updated": "Apr 29, 2025", "created_ts": 1680184581, "updated_ts": 1745967336, "url": "https://www.canva.com/design?create=true&template=EAGmDaNSAxg", "pages": 1}, {"id": "EAGmDfppS8w", "title": "DATAFORCE B2C IT'S ME INSTAGRAM POST", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Mar 30, 2023", "updated": "Apr 29, 2025", "created_ts": 1680183623, "updated_ts": 1745966712, "url": "https://www.canva.com/design?create=true&template=EAGmDfppS8w", "pages": 1}, {"id": "EAGmDcVGrr8", "title": "DATAFORCE B2C JOBS 2 (Facebook Cover)", "w": 1640, "h": 924, "sizeLabel": "1640 × 924 (FB Cover)", "created": "Apr 4, 2023", "updated": "Apr 29, 2025", "created_ts": 1680633488, "updated_ts": 1745966658, "url": "https://www.canva.com/design?create=true&template=EAGmDcVGrr8", "pages": 1}, {"id": "EAGmDftlJDE", "title": "DATAFORCE B2C JOBS 2 (Instagram Story)", "w": 1080, "h": 1920, "sizeLabel": "1080 × 1920 (Story 9:16)", "created": "Apr 4, 2023", "updated": "Apr 29, 2025", "created_ts": 1680633393, "updated_ts": 1745966800, "url": "https://www.canva.com/design?create=true&template=EAGmDftlJDE", "pages": 1}, {"id": "EAGmDROQXX8", "title": "DATAFORCE B2C JOBS 2 INSTAGRAM POST", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Apr 4, 2023", "updated": "Apr 29, 2025", "created_ts": 1680633166, "updated_ts": 1745966853, "url": "https://www.canva.com/design?create=true&template=EAGmDROQXX8", "pages": 1}, {"id": "EAGmDbTSurM", "title": "DATAFORCE B2C JOBS INSTAGRAM POST", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Mar 10, 2023", "updated": "Apr 29, 2025", "created_ts": 1678463409, "updated_ts": 1745966811, "url": "https://www.canva.com/design?create=true&template=EAGmDbTSurM", "pages": 1}, {"id": "EAGmDcOSBGA", "title": "DATAFORCE B2C JOBS INSTAGRAM POST (Instagram Story)", "w": 1080, "h": 1920, "sizeLabel": "1080 × 1920 (Story 9:16)", "created": "Mar 10, 2023", "updated": "Apr 29, 2025", "created_ts": 1678464136, "updated_ts": 1745966721, "url": "https://www.canva.com/design?create=true&template=EAGmDcOSBGA", "pages": 1}, {"id": "EAGmDTlzunU", "title": "DATAFORCE B2C JOBS2 (Facebook Post (Landscape))", "w": 940, "h": 788, "sizeLabel": "940 × 788 (FB Landscape)", "created": "Apr 4, 2023", "updated": "Apr 29, 2025", "created_ts": 1680633557, "updated_ts": 1745967304, "url": "https://www.canva.com/design?create=true&template=EAGmDTlzunU", "pages": 1}, {"id": "EAGmDbgsOE4", "title": "DATAFORCE B2C WHAT DAY IS IT? (Instagram Post (Square))", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Mar 10, 2023", "updated": "Apr 29, 2025", "created_ts": 1678463168, "updated_ts": 1745967338, "url": "https://www.canva.com/design?create=true&template=EAGmDbgsOE4", "pages": 1}, {"id": "EAGmDVbVMfk", "title": "DATAFORCE B2C WHAT DAY IS IT? INSTAGRAM STORY", "w": 1080, "h": 1920, "sizeLabel": "1080 × 1920 (Story 9:16)", "created": "Mar 10, 2023", "updated": "Apr 29, 2025", "created_ts": 1678462634, "updated_ts": 1745966978, "url": "https://www.canva.com/design?create=true&template=EAGmDVbVMfk", "pages": 1}, {"id": "EAGmDR4A2lU", "title": "DataForceSpotlight", "w": 816, "h": 1056, "sizeLabel": "816 × 1056 (Letter Portrait)", "created": "May 24, 2022", "updated": "Apr 29, 2025", "created_ts": 1653397062, "updated_ts": 1745967209, "url": "https://www.canva.com/design?create=true&template=EAGmDR4A2lU", "pages": 1}, {"id": "EAGmDcjTCTk", "title": "Employee Advocacy [DATAFORCE]", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Jan 1, 2024", "updated": "Apr 29, 2025", "created_ts": 1704148539, "updated_ts": 1745966707, "url": "https://www.canva.com/design?create=true&template=EAGmDcjTCTk", "pages": 1}, {"id": "EAGmDR0HhhA", "title": "Event [DATAFORCE]", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Jan 1, 2024", "updated": "Apr 29, 2025", "created_ts": 1704149117, "updated_ts": 1745967252, "url": "https://www.canva.com/design?create=true&template=EAGmDR0HhhA", "pages": 1}, {"id": "EAGmDUYcnaE", "title": "Google B2C Ad 1200x1500 [Dataforce]", "w": 1200, "h": 1500, "sizeLabel": "1200 × 1500", "created": "Jan 23, 2025", "updated": "Apr 29, 2025", "created_ts": 1737664718, "updated_ts": 1745966816, "url": "https://www.canva.com/design?create=true&template=EAGmDUYcnaE", "pages": 1}, {"id": "EAGmDc5vFpE", "title": "Google B2C Ad 1200x628 [Dataforce]", "w": 1200, "h": 628, "sizeLabel": "1200 × 628", "created": "Jan 23, 2025", "updated": "Apr 29, 2025", "created_ts": 1737664651, "updated_ts": 1745967403, "url": "https://www.canva.com/design?create=true&template=EAGmDc5vFpE", "pages": 1}, {"id": "EAGmDQh5NAs", "title": "Holiday 1 [DATAFORCE]", "w": 1440, "h": 1440, "sizeLabel": "1440 × 1440 (Square)", "created": "Jan 1, 2024", "updated": "Apr 29, 2025", "created_ts": 1704147632, "updated_ts": 1745966940, "url": "https://www.canva.com/design?create=true&template=EAGmDQh5NAs", "pages": 1}, {"id": "EAGmDXDNacs", "title": "HOLIDAY 2 [DATAFORCE]", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Jan 1, 2024", "updated": "Apr 29, 2025", "created_ts": 1704149108, "updated_ts": 1745967248, "url": "https://www.canva.com/design?create=true&template=EAGmDXDNacs", "pages": 1}, {"id": "EAGmDXN-63Q", "title": "Join Our Network Carousel Ad [DataForce]", "w": 1200, "h": 1200, "sizeLabel": "1200 × 1200 (Square)", "created": "Feb 28, 2025", "updated": "Apr 29, 2025", "created_ts": 1740773834, "updated_ts": 1745966946, "url": "https://www.canva.com/design?create=true&template=EAGmDXN-63Q", "pages": 1}, {"id": "EAGmDRodzmk", "title": "Meta B2C Ad 1440 x 1440 [Dataforce]", "w": 1440, "h": 1440, "sizeLabel": "1440 × 1440 (Square)", "created": "Jan 23, 2025", "updated": "Apr 29, 2025", "created_ts": 1737664483, "updated_ts": 1745966804, "url": "https://www.canva.com/design?create=true&template=EAGmDRodzmk", "pages": 1}, {"id": "EAGmDcgAb0Q", "title": "Meta B2C Ad 1440x2560 [Dataforce]", "w": 1440, "h": 2560, "sizeLabel": "1440 × 2560", "created": "Jan 23, 2025", "updated": "Apr 29, 2025", "created_ts": 1737664618, "updated_ts": 1745967440, "url": "https://www.canva.com/design?create=true&template=EAGmDcgAb0Q", "pages": 1}, {"id": "EAGmDdU7Y9c", "title": "News/Announcements 1 [DATAFORCE]", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Jan 1, 2024", "updated": "Apr 29, 2025", "created_ts": 1704149148, "updated_ts": 1745966800, "url": "https://www.canva.com/design?create=true&template=EAGmDdU7Y9c", "pages": 1}, {"id": "EAGmDQ2ICoc", "title": "News/Announcements 2 [DATAFORCE]", "w": 1080, "h": 1080, "sizeLabel": "1080 × 1080 (Square)", "created": "Jan 1, 2024", "updated": "Apr 29, 2025", "created_ts": 1704149721, "updated_ts": 1745966864, "url": "https://www.canva.com/design?create=true&template=EAGmDQ2ICoc", "pages": 1}, {"id": "EAGmDZNpcmo", "title": "Solutions Highlight 1 [DATAFORCE]", "w": 1440, "h": 1440, "sizeLabel": "1440 × 1440 (Square)", "created": "Jan 1, 2024", "updated": "Apr 29, 2025", "created_ts": 1704147945, "updated_ts": 1745966914, "url": "https://www.canva.com/design?create=true&template=EAGmDZNpcmo", "pages": 1}, {"id": "EAGmDajvcFI", "title": "Solutions Highlight 2 [DATAFORCE]", "w": 1440, "h": 1440, "sizeLabel": "1440 × 1440 (Square)", "created": "Jan 1, 2024", "updated": "Apr 29, 2025", "created_ts": 1704148381, "updated_ts": 1745966696, "url": "https://www.canva.com/design?create=true&template=EAGmDajvcFI", "pages": 1}];
+
+const SUPABASE_URL = 'https://nhxaijbyqfkkhhoornzy.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oeGFpamJ5cWZra2hob29ybnp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2NDU0ODYsImV4cCI6MjA4MzIyMTQ4Nn0.Uw6QPHoOo_15FWCfnSAZYyGZNEr-XlZ8NrVyLlcuiWk';
+
+/* ───────────── DERIVE TYPE ───────────── */
+function deriveType(r) {
+  const l = r.sizeLabel.toLowerCase();
+  const t = r.title.toLowerCase();
+  if (/story|9:16/.test(l)) return 'Instagram Story';
+  if (/fb cover|facebook cover/.test(l) || /facebook cover/.test(t)) return 'Facebook Cover';
+  if (/fb landscape|facebook post/.test(l) || /facebook post/.test(t)) return 'Facebook Post';
+  if (/instagram post/.test(t)) return 'Instagram Post';
+  if (/letter/.test(l)) return 'Letter / Document';
+  if (/google/.test(t)) return 'Google Ad';
+  if (/meta/.test(t)) return 'Meta Ad';
+  if (/carousel/.test(t)) return 'Carousel Ad';
+  if (r.w === r.h) return 'Square';
+  return 'Other';
+}
+DATA.forEach(r => r.type = deriveType(r));
+
+let currentSort = { key: 'title', dir: 1 };
+let filtered = DATA.slice();
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderRows(rows) {
+  const tbody = document.getElementById('tableBody');
+  const noResults = document.getElementById('noResults');
+  if (rows.length === 0) {
+    tbody.innerHTML = '';
+    noResults.style.display = 'block';
+  } else {
+    noResults.style.display = 'none';
+    tbody.innerHTML = rows.map(r => {
+      const note = (NOTES[r.id]?.text || '').trim();
+      const hasNote = !!note;
+      return `
+      <tr data-id="${r.id}">
+        <td class="name">${escapeHtml(r.title)}</td>
+        <td class="size">${escapeHtml(r.sizeLabel)}</td>
+        <td>${escapeHtml(r.type)}</td>
+        <td class="pages">${r.pages}</td>
+        <td class="id"><a href="${r.url}" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;">${r.id}</a></td>
+        <td class="date">${r.created}</td>
+        <td class="date">${r.updated}</td>
+        <td><button class="lc-cmt-btn ${hasNote ? 'has-notes' : ''}" data-cmt-id="${r.id}">💬 ${hasNote ? 'Edit note' : 'Add note'}</button></td>
+        <td class="action"><a class="edit-btn" href="${r.url}" target="_blank" rel="noopener">Edit in Canva →</a></td>
+      </tr>
+    `;}).join('');
+
+  }
+  document.getElementById('lc-count').textContent = `${rows.length} / ${DATA.length} templates`;
+}
+
+function applySort() {
+  const { key, dir } = currentSort;
+  filtered.sort((a, b) => {
+    let av = a[key], bv = b[key];
+    if (typeof av === 'string') { av = av.toLowerCase(); bv = (bv||'').toLowerCase(); }
+    if (av < bv) return -1 * dir;
+    if (av > bv) return 1 * dir;
+    return 0;
+  });
+  renderRows(filtered);
+}
+
+function applyFilter() {
+  const q = document.getElementById('lc-search').value.trim().toLowerCase();
+  const t = document.getElementById('lc-type').value;
+  filtered = DATA.filter(r => {
+    const matchQ = !q || r.title.toLowerCase().includes(q) || r.sizeLabel.toLowerCase().includes(q) || r.id.toLowerCase().includes(q);
+    const matchT = !t || r.type === t;
+    return matchQ && matchT;
+  });
+  applySort();
+}
+
+/* ───────────── STATS ───────────── */
+function updateStats() {
+  document.getElementById('stat-total').textContent = DATA.length;
+  document.getElementById('stat-square').textContent = DATA.filter(r => /Square/.test(r.sizeLabel) || r.w === r.h).length;
+  document.getElementById('stat-story').textContent = DATA.filter(r => /Story/.test(r.sizeLabel)).length;
+  document.getElementById('stat-fb').textContent = DATA.filter(r => /FB/.test(r.sizeLabel)).length;
+  document.getElementById('stat-other').textContent = DATA.filter(r => !/Square|Story|FB/.test(r.sizeLabel) && r.w !== r.h).length;
+}
+updateStats();
+
+/* ───────────── TYPE FILTER OPTIONS ───────────── */
+const types = Array.from(new Set(DATA.map(r => r.type))).sort();
+const typeSel = document.getElementById('lc-type');
+types.forEach(t => {
+  const o = document.createElement('option');
+  o.value = t; o.textContent = t;
+  typeSel.appendChild(o);
+});
+
+/* ───────────── SORT HANDLERS ───────────── */
+document.querySelectorAll('thead th[data-key]').forEach(th => {
+  th.addEventListener('click', () => {
+    const key = th.getAttribute('data-key');
+    if (currentSort.key === key) currentSort.dir *= -1;
+    else { currentSort.key = key; currentSort.dir = 1; }
+    document.querySelectorAll('thead th').forEach(t => t.classList.remove('sorted'));
+    th.classList.add('sorted');
+    document.querySelectorAll('thead th .arrow').forEach(a => a.innerHTML = '▲');
+    if (currentSort.dir === -1) th.querySelector('.arrow').innerHTML = '▼';
+    applySort();
+  });
+});
+
+document.getElementById('lc-search').addEventListener('input', applyFilter);
+typeSel.addEventListener('change', applyFilter);
+document.getElementById('lc-reset-btn').addEventListener('click', () => {
+  document.getElementById('lc-search').value = '';
+  typeSel.value = '';
+  applyFilter();
+});
+
+/* ───────────── CSV EXPORT ───────────── */
+function csvEscape(v) {
+  const s = String(v == null ? '' : v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+}
+document.getElementById('lc-csv-btn').addEventListener('click', () => {
+  const headers = ['Template Name','Width','Height','Size Label','Type','Pages','Template ID','Created','Last Updated','Edit URL'];
+  const lines = [headers.join(',')];
+  filtered.forEach(r => {
+    lines.push([r.title, r.w, r.h, r.sizeLabel, r.type, r.pages, r.id, r.created, r.updated, r.url].map(csvEscape).join(','));
+  });
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'dataforce-template-inventory-' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+/* ───────────── TOAST ───────────── */
+function showToast(msg, kind) {
+  const toast = document.createElement('div');
+  toast.textContent = msg;
+  const border = kind === 'error' ? '#f85149' : 'var(--tp-green)';
+  toast.style.cssText = `position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0a2240;color:#fff;border:1px solid ${border};padding:10px 18px;border-radius:6px;font-size:12px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.4);max-width:560px;`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 5000);
+}
+
+/* ───────────── REFRESH CANVA ───────────── */
+const refreshBtn = document.getElementById('lc-refresh-btn');
+async function getAccessToken() {
+  try {
+    const raw = localStorage.getItem('sb-nhxaijbyqfkkhhoornzy-auth-token');
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.access_token ?? null;
+  } catch { return null; }
+}
+refreshBtn.addEventListener('click', async () => {
+  if (refreshBtn.disabled) return;
+  const icon = refreshBtn.querySelector('.lc-refresh-icon');
+  refreshBtn.disabled = true; refreshBtn.style.opacity = '0.7';
+  let spin;
+  if (icon) {
+    let deg = 0;
+    spin = setInterval(() => { deg += 30; icon.style.transform = `rotate(${deg}deg)`; }, 50);
+  }
+  try {
+    const token = await getAccessToken();
+    if (!token) {
+      showToast('⚠ Sign in as an admin first, then click Refresh again.', 'error');
+      window.open('/auth', '_blank');
+      return;
+    }
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/canva-sync`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
+    });
+    const json = await res.json().catch(() => ({}));
+    if (res.status === 401 || res.status === 403) { showToast('⚠ Admin role required to sync Canva.', 'error'); return; }
+    if (!res.ok) {
+      const msg = json?.error || `HTTP ${res.status}`;
+      if (/not connected/i.test(msg)) showToast('Canva is not connected yet. Click the 🔌 Canva button to authorize.', 'error');
+      else showToast(`✗ Sync failed: ${msg}`, 'error');
+      return;
+    }
+    const pill = document.getElementById('generated-pill');
+    if (pill) pill.textContent = '🕒 Synced: ' + new Date().toLocaleString();
+    showToast(`✓ Synced ${json.synced ?? 0} templates from Canva. Reloading…`);
+    setTimeout(() => location.reload(), 1200);
+  } catch (e) {
+    showToast(`✗ ${e.message || 'Unknown error'}`, 'error');
+  } finally {
+    if (spin) clearInterval(spin);
+    if (icon) icon.style.transform = 'rotate(0deg)';
+    refreshBtn.disabled = false; refreshBtn.style.opacity = '';
+  }
+});
+
+/* ───────────── HEADER PILL ───────────── */
+document.getElementById('generated-pill').textContent = '🕒 Loaded: ' + new Date().toLocaleString();
+fetch(`${SUPABASE_URL}/functions/v1/canva-list`, {
+  headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` },
+})
+  .then(r => r.json())
+  .then(info => {
+    if (info?.connected && info.last_sync) {
+      document.getElementById('generated-pill').textContent = '🕒 Last Canva sync: ' + new Date(info.last_sync).toLocaleString();
+    }
+  })
+  .catch(() => {});
+
+/* ───────────── CONNECT PANEL ───────────── */
+(function () {
+  const panel = document.getElementById('connect-panel');
+  const overlay = document.getElementById('cp-overlay');
+  const toggle = document.getElementById('cp-toggle');
+  const closeBtn = document.getElementById('cp-close');
+  const clientIdInput = document.getElementById('cp-client-id');
+  const clientSecretInput = document.getElementById('cp-client-secret');
+  const statusBadge = document.getElementById('cp-status-badge');
+  const saveBtn = document.getElementById('cp-save');
+  const connectBtn = document.getElementById('cp-connect');
+  const toggleText = document.getElementById('cp-toggle-text');
+
+  const LS_KEY = 'df-canva-connect-v1';
+
+  function open() { panel.classList.add('open'); overlay.classList.add('open'); }
+  function close() { panel.classList.remove('open'); overlay.classList.remove('open'); }
+  toggle.addEventListener('click', open);
+  closeBtn.addEventListener('click', close);
+  overlay.addEventListener('click', close);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+    if (saved.clientId) clientIdInput.value = saved.clientId;
+    if (saved.clientSecret) clientSecretInput.value = saved.clientSecret;
+  } catch {}
+
+  function updateStatus(connected, msg) {
+    if (connected) {
+      statusBadge.className = 'status-badge connected';
+      statusBadge.innerHTML = '<span>●</span> ' + (msg || 'Connected');
+      toggleText.textContent = 'Canva ✓';
+      toggle.style.borderColor = 'var(--tp-green)';
+      toggle.style.color = 'var(--tp-green)';
+    } else {
+      statusBadge.className = 'status-badge disconnected';
+      statusBadge.innerHTML = '<span>●</span> ' + (msg || 'Not connected');
+      toggleText.textContent = 'Canva';
+      toggle.style.borderColor = '';
+      toggle.style.color = '';
+    }
+  }
+
+  saveBtn.addEventListener('click', () => {
+    localStorage.setItem(LS_KEY, JSON.stringify({ clientId: clientIdInput.value.trim(), clientSecret: clientSecretInput.value.trim() }));
+    showToast('✓ Credentials saved locally.');
+  });
+
+  connectBtn.addEventListener('click', () => {
+    const clientId = clientIdInput.value.trim();
+    const clientSecret = clientSecretInput.value.trim();
+    if (!clientId || !clientSecret) { showToast('⚠ Enter both Client ID and Client Secret first.', 'error'); return; }
+    localStorage.setItem(LS_KEY, JSON.stringify({ clientId, clientSecret }));
+    const returnTo = encodeURIComponent(location.pathname);
+    window.location.href = `${SUPABASE_URL}/functions/v1/canva-oauth-start?return_to=${returnTo}&client_id=${encodeURIComponent(clientId)}&client_secret=${encodeURIComponent(clientSecret)}`;
+  });
+
+  fetch(`${SUPABASE_URL}/functions/v1/canva-list`, {
+    headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` },
+  })
+    .then(r => r.json())
+    .then(info => {
+      if (info?.connected) updateStatus(true, 'Connected · ' + (info.last_sync ? new Date(info.last_sync).toLocaleDateString() : 'unknown'));
+      else updateStatus(false, 'Not connected');
+    })
+    .catch(() => updateStatus(false, 'Not connected'));
+})();
+
+/* ───────────── COMMENTS / NOTES (localStorage) ───────────── */
+const NOTES_KEY = 'df-asset-notes-v1';
+let NOTES = {};
+try { NOTES = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}'); } catch {}
+function saveNotes() { try { localStorage.setItem(NOTES_KEY, JSON.stringify(NOTES)); } catch {} }
+
+document.getElementById('tableBody').addEventListener('click', (e) => {
+  const btn = e.target.closest('.lc-cmt-btn');
+  if (!btn) return;
+  const id = btn.getAttribute('data-cmt-id');
+  const tr = btn.closest('tr');
+  const existing = tr.nextElementSibling;
+  if (existing && existing.classList.contains('lc-cmt-row')) { existing.remove(); return; }
+  // close any other open
+  document.querySelectorAll('.lc-cmt-row').forEach(n => n.remove());
+  const row = document.createElement('tr');
+  row.className = 'lc-cmt-row';
+  const note = NOTES[id] || { text: '', updated: 0 };
+  row.innerHTML = `
+    <td colspan="9">
+      <textarea placeholder="Add an audit note for this template…">${escapeHtml(note.text)}</textarea>
+      <div class="lc-cmt-actions">
+        <button class="save">Save note</button>
+        <button class="clear">Clear</button>
+        <span class="lc-cmt-meta">${note.updated ? 'Updated ' + new Date(note.updated).toLocaleString() : ''}</span>
+      </div>
+    </td>`;
+  tr.parentNode.insertBefore(row, tr.nextSibling);
+  const ta = row.querySelector('textarea');
+  ta.focus();
+  row.querySelector('.save').addEventListener('click', () => {
+    const text = ta.value.trim();
+    if (text) NOTES[id] = { text, updated: Date.now() };
+    else delete NOTES[id];
+    saveNotes();
+    showToast(text ? '✓ Note saved' : '✓ Note cleared');
+    row.remove();
+    applySort();
+  });
+  row.querySelector('.clear').addEventListener('click', () => {
+    ta.value = '';
+    delete NOTES[id];
+    saveNotes();
+    row.remove();
+    applySort();
+  });
+});
+
+/* ───────────── AUDIT FINDINGS (computed from DATA) ───────────── */
+function computeFindings() {
+  const findings = [];
+  const copyOf = DATA.filter(r => /^copy of/i.test(r.title));
+  if (copyOf.length) findings.push({
+    level: 'amber', icon: '📝',
+    title: `${copyOf.length} templates start with "Copy of…"`,
+    desc: 'Legacy duplicates cluttering the library. Rename to a canonical title or archive after merging.',
+    ids: copyOf.map(r => r.id).slice(0, 8).join(', ') + (copyOf.length > 8 ? `, +${copyOf.length - 8} more` : '')
+  });
+  const typo = DATA.filter(r => /CHALLENCE/i.test(r.title));
+  if (typo.length) findings.push({
+    level: 'red', icon: '⚠️',
+    title: `Misspelling: "CHALLENCE" appears in ${typo.length} titles`,
+    desc: 'Should be spelled "CHALLENGE". Update titles for searchability and brand polish.',
+    ids: typo.map(r => r.id).join(', ')
+  });
+  const casings = new Set(DATA.map(r => (r.title.match(/dataforce/gi) || []).join('|')).filter(Boolean));
+  const variants = new Set();
+  DATA.forEach(r => {
+    const m = r.title.match(/dataforce/gi);
+    if (m) m.forEach(v => variants.add(v));
+  });
+  if (variants.size > 1) findings.push({
+    level: 'amber', icon: '🔤',
+    title: `Inconsistent "DataForce" capitalization (${variants.size} variants)`,
+    desc: `Found: ${Array.from(variants).join(', ')}. Pick one canonical brand-mark casing and apply across the library.`,
+    ids: ''
+  });
+  const brackets = new Set();
+  DATA.forEach(r => {
+    const m = r.title.match(/\[([^\]]+)\]/);
+    if (m && /dataforce/i.test(m[1])) brackets.add(m[1]);
+  });
+  if (brackets.size > 1) findings.push({
+    level: 'blue', icon: '🔖',
+    title: `Bracket suffix inconsistency (${brackets.size} styles)`,
+    desc: `Suffixes seen: ${Array.from(brackets).map(b => '['+b+']').join(', ')}. Standardize on one.`,
+    ids: ''
+  });
+  const stale = DATA.filter(r => r.created_ts < new Date('2023-01-01').getTime() / 1000);
+  if (stale.length) findings.push({
+    level: 'amber', icon: '🕰️',
+    title: `${stale.length} pre-2023 template${stale.length > 1 ? 's' : ''} still in active library`,
+    desc: 'Legacy assets that predate the current visual system. Audit for relevance and refresh or retire.',
+    ids: stale.map(r => `${r.title} (${r.id})`).join(' · ')
+  });
+  const bulkUpdate = DATA.filter(r => r.updated === 'Apr 29, 2025');
+  if (bulkUpdate.length > 30) findings.push({
+    level: 'blue', icon: '🔁',
+    title: `${bulkUpdate.length} templates share a bulk-update date (Apr 29, 2025)`,
+    desc: 'Likely a mass migration / re-save event. Confirm whether real content edits occurred or only metadata touched.',
+    ids: ''
+  });
+  const allSinglePage = DATA.every(r => r.pages === 1);
+  if (allSinglePage) findings.push({
+    level: 'blue', icon: '📄',
+    title: 'All 49 templates are single-page',
+    desc: 'Consider authoring multi-page master templates for case studies and campaigns to standardize narrative flow.',
+    ids: ''
+  });
+  // Duplicate concepts across formats
+  const concepts = {};
+  DATA.forEach(r => {
+    const m = r.title.match(/B2C\s+([A-Z' ]+?)(?:\s+\d|\s+\(|\s+INSTAGRAM|\s+Instagram|\s+Facebook|\s+FACT|$)/i);
+    if (m) {
+      const k = m[1].trim().toUpperCase().replace(/CHALLENCE/, 'CHALLENGE');
+      concepts[k] = (concepts[k] || 0) + 1;
+    }
+  });
+  const dupes = Object.entries(concepts).filter(([_, n]) => n >= 3);
+  if (dupes.length) findings.push({
+    level: 'amber', icon: '🧩',
+    title: `${dupes.length} B2C concept${dupes.length > 1 ? 's' : ''} duplicated across formats`,
+    desc: `Same concept exists in 3+ sizes: ${dupes.map(([k, n]) => `${k} (×${n})`).join(', ')}. Consider Canva Resize-from-master to keep variants in sync.`,
+    ids: ''
+  });
+  const recentNew = DATA.filter(r => r.created_ts > new Date('2025-01-01').getTime() / 1000);
+  if (recentNew.length) findings.push({
+    level: 'green', icon: '✨',
+    title: `${recentNew.length} new template${recentNew.length > 1 ? 's' : ''} added in 2025-2026`,
+    desc: 'Active library growth. Recent additions: ' + recentNew.map(r => r.title).slice(0, 4).join('; ') + (recentNew.length > 4 ? '…' : ''),
+    ids: ''
+  });
+  return findings;
+}
+
+function linkifyIds(str) {
+  // Replace any Canva template ID (EA + alphanumerics/_-) with a link to its template URL.
+  return escapeHtml(str).replace(/EA[A-Za-z0-9_-]{6,}/g, (id) => {
+    const row = DATA.find(d => d.id === id);
+    const url = row ? row.url : `https://www.canva.com/design?create=true&template=${id}`;
+    return `<a href="${url}" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;">${id}</a>`;
+  });
+}
+
+function renderFindings() {
+  const findings = computeFindings();
+  document.getElementById('stat-flags').textContent = findings.filter(f => f.level === 'red' || f.level === 'amber').length;
+  const grid = document.getElementById('flag-grid');
+  grid.innerHTML = findings.map(f => `
+    <div class="flag-item ${f.level}">
+      <div class="flag-icon">${f.icon}</div>
+      <div style="flex:1;min-width:0;">
+        <span class="flag-title">${escapeHtml(f.title)}</span>
+        <div class="flag-desc">${escapeHtml(f.desc)}</div>
+        ${f.ids ? `<div class="flag-ids">${linkifyIds(f.ids)}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+renderFindings();
+
+/* initial */
+applySort();
+
+</script>
+</body>
+</html>

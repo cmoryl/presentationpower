@@ -1,0 +1,2294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TransPerfect Life Sciences — Canva Template Audit</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2330;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-faint: #484f58;
+    --green: #3fb950;
+    --green-bg: rgba(63,185,80,0.10);
+    --amber: #d29922;
+    --amber-bg: rgba(210,153,34,0.12);
+    --red: #f85149;
+    --red-bg: rgba(248,81,73,0.10);
+    --blue: #58a6ff;
+    --blue-bg: rgba(88,166,255,0.10);
+    --purple: #bc8cff;
+    --purple-bg: rgba(188,140,255,0.10);
+    --teal: #39d353;
+    --tp-green: #00c853;
+    --tp-navy: #0a2240;
+    --accent: #00c853;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  /* ── HEADER ─────────────────────────────── */
+  .site-header {
+    background: linear-gradient(135deg, #0a2240 0%, #0d3060 60%, #0a5c40 100%);
+    border-bottom: 1px solid rgba(0,200,83,0.25);
+    padding: 28px 40px 22px;
+  }
+  .site-header .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--tp-green);
+    margin-bottom: 6px;
+  }
+  .site-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .site-header .subtitle {
+    color: rgba(255,255,255,0.55);
+    font-size: 13px;
+    margin-top: 4px;
+  }
+  .meta-row {
+    display: flex;
+    gap: 20px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .meta-pill {
+    font-size: 11.5px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+
+  /* ── SUMMARY STRIP ───────────────────────── */
+  .summary-strip {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .stat-box {
+    flex: 1;
+    padding: 16px 20px;
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+    text-align: center;
+  }
+  .stat-box:last-child { border-right: none; }
+  .stat-box .val {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    display: block;
+  }
+  .stat-box .lbl {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 2px;
+  }
+  .stat-box.green .val { color: var(--green); }
+  .stat-box.amber .val { color: var(--amber); }
+  .stat-box.red .val   { color: var(--red); }
+  .stat-box.blue .val  { color: var(--blue); }
+
+  /* ── FLAGS PANEL ──────────────────────────── */
+  .flags-section {
+    padding: 22px 40px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .flags-section h2 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .flag-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 10px;
+  }
+  .flag-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid;
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+  .flag-item.red   { background: var(--red-bg);   border-color: rgba(248,81,73,0.25);  color: #f4a4a1; }
+  .flag-item.amber { background: var(--amber-bg); border-color: rgba(210,153,34,0.25); color: #e3bc5a; }
+  .flag-item.blue  { background: var(--blue-bg);  border-color: rgba(88,166,255,0.25); color: #88c4ff; }
+  .flag-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .flag-id { font-family: monospace; font-size: 10.5px; opacity: 0.7; }
+
+  /* ── CONTENT LAYOUT ───────────────────────── */
+  .main { display: flex; }
+  .toc {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 16px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .toc h3 {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+    margin-bottom: 10px;
+  }
+  .toc a {
+    display: block;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 5px;
+    margin-bottom: 1px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .toc a:hover { background: var(--surface2); color: var(--text); }
+  .toc .count {
+    float: right;
+    font-size: 10px;
+    background: var(--border);
+    padding: 1px 5px;
+    border-radius: 8px;
+    color: var(--text-faint);
+  }
+  .toc .divider { border-top: 1px solid var(--border); margin: 10px 0; }
+
+  .content { flex: 1; padding: 30px 40px 60px; overflow: hidden; }
+
+  /* ── CATEGORY SECTION ─────────────────────── */
+  .cat-section { margin-bottom: 44px; }
+  .cat-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+  .cat-header:hover { border-bottom-color: var(--tp-green); }
+  .cat-toggle {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--text-muted);
+    transition: transform 0.2s ease;
+  }
+  .cat-section.collapsed .cat-toggle { transform: rotate(-90deg); }
+  .cat-section.collapsed .cat-desc,
+  .cat-section.collapsed .t-wrap,
+  .cat-section.collapsed > p,
+  .cat-section.collapsed > div:not(.cat-header) { display: none; }
+  .cat-icon { font-size: 18px; }
+  .cat-title { font-size: 16px; font-weight: 700; color: var(--text); }
+  .cat-count {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--surface2);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+  .cat-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── TABLE ────────────────────────────────── */
+  .t-wrap { border-radius: 8px; border: 1px solid var(--border); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  thead th {
+    background: var(--surface2);
+    color: var(--text-muted);
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    position: sticky;
+    top: 56px;
+    z-index: 5;
+  }
+  thead th.sortable { cursor: pointer; user-select: none; }
+  thead th.sortable:hover { color: var(--text); background: var(--surface3, var(--surface2)); }
+  thead th.sortable::after {
+    content: '⇅';
+    margin-left: 6px;
+    opacity: 0.35;
+    font-size: 10px;
+  }
+  thead th.sortable.sort-asc::after { content: '▲'; opacity: 1; color: var(--accent, #4a9eff); }
+  thead th.sortable.sort-desc::after { content: '▼'; opacity: 1; color: var(--accent, #4a9eff); }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody td { padding: 8px 12px; vertical-align: middle; }
+  .mono { font-family: 'SF Mono', monospace; font-size: 10.5px; color: var(--text-muted); }
+  a.id-link {
+    font-family: 'SF Mono', monospace;
+    font-size: 10.5px;
+    color: var(--blue);
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(88,166,255,0.4);
+    transition: color 0.12s, border-color 0.12s;
+  }
+  a.id-link:hover { color: #a8d4ff; border-bottom-color: rgba(88,166,255,0.85); }
+  .td-name { font-weight: 500; color: var(--text); }
+  .td-name small { display: block; font-size: 10.5px; color: var(--text-muted); font-weight: 400; margin-top: 1px; }
+
+  /* ── BADGES ───────────────────────────────── */
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 2px 7px;
+    border-radius: 5px;
+    white-space: nowrap;
+  }
+  .badge.in-skill  { background: var(--green-bg);  color: var(--green);  border: 1px solid rgba(63,185,80,0.3);  }
+  .badge.not-skill { background: var(--blue-bg);   color: var(--blue);   border: 1px solid rgba(88,166,255,0.3); }
+  .badge.duplicate { background: var(--amber-bg);  color: var(--amber);  border: 1px solid rgba(210,153,34,0.3); }
+  .badge.issue     { background: var(--red-bg);    color: var(--red);    border: 1px solid rgba(248,81,73,0.3);  }
+  .badge.legacy    { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(188,140,255,0.3);}
+  .badge.none      { background: transparent; color: var(--text-faint); border: 1px solid var(--border); }
+
+  .dim-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-family: monospace;
+    color: var(--text-muted);
+    background: var(--surface2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  /* ── LINKS ────────────────────────────────── */
+  a.canva-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--blue);
+    text-decoration: none;
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 5px;
+    background: var(--blue-bg);
+    border: 1px solid rgba(88,166,255,0.2);
+    transition: background 0.12s, border-color 0.12s;
+    white-space: nowrap;
+  }
+  a.canva-link:hover { background: rgba(88,166,255,0.22); border-color: rgba(88,166,255,0.45); }
+  a.canva-link.create { color: var(--green); background: var(--green-bg); border-color: rgba(63,185,80,0.2); }
+  a.canva-link.create:hover { background: rgba(63,185,80,0.22); border-color: rgba(63,185,80,0.45); }
+
+  /* ── ROW CLICK (opens live file) ────────── */
+  tbody tr.clickable-row { cursor: pointer; }
+  tbody tr.clickable-row:hover td { background: rgba(88,166,255,0.05); }
+  tbody tr.clickable-row:hover .td-name { color: var(--blue); }
+  tbody tr.clickable-row:hover .td-name small { color: rgba(88,166,255,0.65); }
+  .live-file-col { white-space: nowrap; }
+  thead th.live-file-col::after {
+    content: " ↗";
+    opacity: 0.45;
+    font-size: 9px;
+  }
+
+  /* ── RECS SECTION ─────────────────────────── */
+  .recs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .rec-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .rec-card h4 {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .rec-card p { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .rec-card.red { border-color: rgba(248,81,73,0.3); }
+  .rec-card.amber { border-color: rgba(210,153,34,0.3); }
+  .rec-card.blue { border-color: rgba(88,166,255,0.3); }
+  .rec-card.green { border-color: rgba(63,185,80,0.3); }
+
+
+  /* ── AUTOFILL COLUMN ──────────────────────── */
+  .af-badge {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 2px 7px; border-radius: 5px; white-space: nowrap;
+  }
+  .af-badge.yes { background: rgba(0,200,83,0.12); color: #00c853; border: 1px solid rgba(0,200,83,0.3); }
+  .af-badge.no  { background: var(--surface2);      color: var(--text-faint); border: 1px solid var(--border); }
+
+  /* ── DATASET FIELDS PANEL ─────────────────── */
+  .fields-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-top: 16px;
+    overflow: hidden;
+  }
+  .fields-panel summary {
+    padding: 10px 16px;
+    font-size: 12px; font-weight: 600; color: var(--text-muted);
+    cursor: pointer; user-select: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .fields-panel summary:hover { color: var(--text); }
+  .fields-panel[open] summary { border-bottom: 1px solid var(--border); }
+  .fields-panel .fields-body { padding: 14px 16px; }
+  .fields-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 6px;
+  }
+  .field-chip {
+    display: flex; align-items: center; gap: 7px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 5px; padding: 5px 9px; font-size: 11.5px;
+  }
+  .field-chip .ftype {
+    font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; padding: 1px 5px; border-radius: 3px;
+  }
+  .field-chip .ftype.text  { background: var(--blue-bg);  color: var(--blue);  border: 1px solid rgba(88,166,255,0.2); }
+  .field-chip .ftype.image { background: var(--purple-bg);color: var(--purple);border: 1px solid rgba(188,140,255,0.2);}
+  .fields-note { font-size: 11.5px; color: var(--text-muted); margin-top: 10px; }
+
+  /* ── UPDATED BADGE ────────────────────────── */
+  .updated-badge {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  .updated-badge.recent { background: var(--green); }
+  .updated-badge.mid    { background: var(--amber); }
+  .updated-badge.old    { background: var(--red); }
+
+  /* ── CANVA CONNECT PANEL ──────────────────── */
+  .connect-panel {
+    position: fixed;
+    top: 0; right: 0;
+    width: 380px; max-width: 90vw;
+    height: 100vh;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    box-shadow: -4px 0 24px rgba(0,0,0,0.5);
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    display: flex; flex-direction: column;
+  }
+  .connect-panel.open { transform: translateX(0); }
+  .connect-panel .cp-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .connect-panel .cp-header h3 {
+    font-size: 14px; font-weight: 700; margin: 0;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .connect-panel .cp-body {
+    flex: 1; overflow-y: auto; padding: 20px;
+  }
+  .connect-panel .cp-body label {
+    display: block; font-size: 11.5px; font-weight: 600;
+    color: var(--text-muted); margin-bottom: 5px; margin-top: 14px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .connect-panel .cp-body input,
+  .connect-panel .cp-body select {
+    width: 100%; padding: 9px 11px; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--bg);
+    color: var(--text); font-size: 13px; font-family: inherit;
+  }
+  .connect-panel .cp-body input:focus,
+  .connect-panel .cp-body select:focus {
+    outline: none; border-color: var(--tp-green);
+  }
+  .connect-panel .cp-body .hint {
+    font-size: 11px; color: var(--text-faint); margin-top: 4px; line-height: 1.4;
+  }
+  .connect-panel .cp-body .status-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; padding: 5px 10px;
+    border-radius: 6px; margin-top: 4px;
+  }
+  .status-badge.connected { background: var(--green-bg); color: var(--green); border: 1px solid rgba(63,185,80,0.3); }
+  .status-badge.disconnected { background: var(--red-bg); color: var(--red); border: 1px solid rgba(248,81,73,0.3); }
+  .connect-panel .cp-actions {
+    padding: 14px 20px; border-top: 1px solid var(--border);
+    display: flex; gap: 8px;
+  }
+  .connect-panel .cp-actions button {
+    flex: 1; padding: 9px 14px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--text); font-size: 12.5px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+  }
+  .connect-panel .cp-actions button.primary {
+    background: var(--green); color: #fff; border-color: var(--green);
+  }
+  .connect-panel .cp-actions button:hover { opacity: 0.9; }
+  .connect-panel-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+    z-index: 999; opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .connect-panel-overlay.open { opacity: 1; pointer-events: auto; }
+  .cp-toggle {
+    position: fixed; top: 14px; right: 14px; z-index: 998;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-muted); padding: 7px 12px; border-radius: 6px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .cp-toggle:hover { color: var(--text); border-color: var(--tp-green); }
+</style>
+</head>
+<body>
+
+<!-- ─── CANVA CONNECT SIDE PANEL ────────────────────── -->
+<div class="connect-panel-overlay" id="cp-overlay"></div>
+<div class="connect-panel" id="connect-panel">
+  <div class="cp-header">
+    <h3>🔌 Canva Connect</h3>
+    <button type="button" id="cp-close" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;line-height:1;">×</button>
+  </div>
+  <div class="cp-body">
+    <div id="cp-status">
+      <label>Connection Status</label>
+      <div class="status-badge disconnected" id="cp-status-badge">
+        <span>●</span> Not connected
+      </div>
+      <p class="hint">Connect your Canva account to enable live template syncing.</p>
+    </div>
+
+    <label for="cp-client-id">Canva Client ID</label>
+    <input type="text" id="cp-client-id" placeholder="e.g. OA..." autocomplete="off" />
+    <p class="hint">From your Canva integration's <strong>Overview</strong> page.</p>
+
+    <label for="cp-client-secret">Canva Client Secret</label>
+    <input type="password" id="cp-client-secret" placeholder="••••••••••••••" autocomplete="off" />
+    <p class="hint">Generated in the integration's <strong>Authentication</strong> tab.</p>
+
+    <label for="cp-redirect">Redirect URI</label>
+    <input type="text" id="cp-redirect" readonly value="https://nhxaijbyqfkkhhoornzy.supabase.co/functions/v1/canva-oauth-callback" />
+    <p class="hint">Paste this exact URL into your Canva integration settings.</p>
+
+    <label for="cp-scopes">Requested Scopes</label>
+    <input type="text" readonly value="brandtemplate:meta:read, brandtemplate:content:read, design:meta:read" />
+    <p class="hint">These scopes are required to read your brand template library.</p>
+  </div>
+  <div class="cp-actions">
+    <button type="button" id="cp-save">Save</button>
+    <button type="button" class="primary" id="cp-connect">Connect Canva</button>
+  </div>
+</div>
+
+<button class="cp-toggle" id="cp-toggle" title="Canva Connection Settings">
+  🔌 <span id="cp-toggle-text">Canva</span>
+</button>
+
+<!-- ─── HEADER ──────────────────────────────────────── -->
+<div class="site-header">
+  <div class="eyebrow">TransPerfect / Life Sciences Division</div>
+  <h1>Canva Template Audit</h1>
+  <div class="subtitle">Full inventory of all Life Sciences brand templates in the TransPerfect Canva account</div>
+  <div class="meta-row">
+    <span class="meta-pill">📅 Audit date: June 15, 2026</span>
+    <span class="meta-pill" id="generated-pill">🕒 Loaded: —</span>
+    <span class="meta-pill">🔍 70 templates returned by search</span>
+    <span class="meta-pill">✅ 59 confirmed LifeSci</span>
+    <span class="meta-pill">🛠 2 currently mapped in skill</span>
+  </div>
+</div>
+
+<!-- ─── SUMMARY STATS ────────────────────────────────── -->
+<div class="summary-strip">
+  <div class="stat-box"><span class="val">59</span><span class="lbl">LifeSci Templates</span></div>
+  <div class="stat-box green"><span class="val">2</span><span class="lbl">In Skill (mapped)</span></div>
+  <div class="stat-box blue"><span class="val">5</span><span class="lbl">Case Study Templates</span></div>
+  <div class="stat-box amber"><span class="val">5</span><span class="lbl">Flags / Issues</span></div>
+  <div class="stat-box"><span class="val">30</span><span class="lbl">Social Templates</span></div>
+  <div class="stat-box"><span class="val">11</span><span class="lbl">Webinar Templates</span></div>
+  <div class="stat-box red"><span class="val">11</span><span class="lbl">Non-LifeSci (filtered)</span></div>
+</div>
+
+<!-- ─── FLAGS PANEL ──────────────────────────────────── -->
+<div class="flags-section">
+  <h2>⚑ Audit Flags</h2>
+  <div class="flag-grid">
+
+    <div class="flag-item amber">
+      <div class="flag-icon">⚠️</div>
+      <div>
+        <strong>V2 Case Study — Duplicate template in account</strong><br>
+        <span class="flag-id">EAHK-byLabQ</span> has the same title as the skill-mapped V2 (<span class="flag-id">EAHK-v91PM0</span>) but is a separate template not in the skill. Likely an older or variant build. Needs review — delete or map to skill.
+      </div>
+    </div>
+
+    <div class="flag-item blue">
+      <div class="flag-icon">🔍</div>
+      <div>
+        <strong>Document - Case Study Overview — not mapped in skill</strong><br>
+        <span class="flag-id">EAHK3V7qQ8k</span> — A portrait case study document template exists that is not referenced in <code>canva-template-render</code>. Assess whether to add it as a V3 or separate type.
+      </div>
+    </div>
+
+    <div class="flag-item red">
+      <div class="flag-icon">🚨</div>
+      <div>
+        <strong>Populated design published as template</strong><br>
+        <span class="flag-id">EAHK4yZKdO0</span> "Cutting Deployment Cycles by 70%…" appears to be a filled-in content design that was accidentally published as a reusable brand template. Should be unpublished or replaced with a blank version.
+      </div>
+    </div>
+
+    <div class="flag-item amber">
+      <div class="flag-icon">⚠️</div>
+      <div>
+        <strong>Unnamed duplicate webinar template</strong><br>
+        <span class="flag-id">EAGmDf5724w</span> "Copy of Webinar Dark - 4 Speakers" — no [LifeSci] tag, appears to be an accidental duplicate of <span class="flag-id">EAGmDaE4XR4</span>. Candidate for cleanup.
+      </div>
+    </div>
+
+    <div class="flag-item red">
+      <div class="flag-icon">🗑️</div>
+      <div>
+        <strong>Self-labeled deprecated template</strong><br>
+        <span class="flag-id">EAGmDRoxmxM</span> is titled "No USE" — should be deleted from the brand template library. Currently surfacing in all searches.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── MAIN LAYOUT ──────────────────────────────────── -->
+<div class="main">
+
+  <!-- TOC -->
+  <nav class="toc">
+    <h3>Jump to Section</h3>
+    <a href="#cat-a">Case Study Templates <span class="count">5</span></a>
+    <a href="#cat-b">Social — Landscape <span class="count">17</span></a>
+    <a href="#cat-c">Social — Square <span class="count">13</span></a>
+    <a href="#cat-d">Webinar — Landscape <span class="count">5</span></a>
+    <a href="#cat-e">Webinar — Square <span class="count">6</span></a>
+    <a href="#cat-f">Event / Webinar Kit <span class="count">1</span></a>
+    <a href="#cat-g">LifeSci Talks <span class="count">5</span></a>
+    <a href="#cat-h">C3 Summit (Legacy) <span class="count">7</span></a>
+    <div class="divider"></div>
+    <a href="#cat-i">⚑ Cleanup / Issues <span class="count">2</span></a>
+    <a href="#cat-j">🚫 Non-LifeSci <span class="count">11</span></a>
+    <div class="divider"></div>
+    <a href="#recs">Recommendations</a>
+  </nav>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ══ CATEGORY A: CASE STUDIES ══════════════════════ -->
+    <div class="cat-section" id="cat-a">
+      <div class="cat-header">
+        <span class="cat-icon">📄</span>
+        <span class="cat-title">Case Study Templates</span>
+        <span class="cat-count">5 templates</span>
+      </div>
+      <p class="cat-desc">
+        Core deliverable templates for TransPerfect Life Sciences case study production. 
+        <strong style="color:var(--green)">Only these 5 templates have autofill dataset fields configured</strong> — 
+        all share an identical 13-field schema (12 text + 1 image). 
+        Only 2 of 5 are currently mapped in the <code>canva-template-render</code> skill. 
+        Two additional variants were discovered — one is a possible duplicate of V2, one is an uncategorized case study document.
+      </p>
+      <div class="t-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Template</th>
+              <th>Canva ID</th>
+              <th>Format</th>
+              <th>Skill</th>
+              <th class="live-file-col">Live File</th>
+              <th>Last Updated</th>
+              <th>Flag</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-name">LS Case Study Template<small>V1 Classic Layout — narrative text-heavy</small></td>
+              <td class="mono">EAHK9lpLFxk</td>
+              <td><span class="dim-tag">Portrait one-pager</span></td>
+              <td><span class="badge in-skill">✅ In Skill (V1)</span></td>
+              <td>
+                <a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAHK9lpLFxk" target="_blank">Open in Canva ↗</a>&nbsp;
+                <a class="canva-link create" href="https://www.canva.com/design?create=true&template=EAHK9lpLFxk" target="_blank">+ Create</a>
+              </td>
+              <td><span class="updated-badge recent"></span>Jun 2026</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td class="td-name">Life Sciences Case Study V2<small>Impact Stats Layout — metrics-first with stats band</small></td>
+              <td class="mono">EAHK-v91PM0</td>
+              <td><span class="dim-tag">Portrait one-pager</span></td>
+              <td><span class="badge in-skill">✅ In Skill (V2)</span></td>
+              <td>
+                <a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAHK-v91PM0" target="_blank">Open in Canva ↗</a>&nbsp;
+                <a class="canva-link create" href="https://www.canva.com/design?create=true&template=EAHK-v91PM0" target="_blank">+ Create</a>
+              </td>
+              <td><span class="updated-badge recent"></span>Jun 2026</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td class="td-name">Life Sciences Case Study V2 <em>(variant)</em><small>Same title as above — possible duplicate or older build</small></td>
+              <td class="mono">EAHK-byLabQ</td>
+              <td><span class="dim-tag">Portrait one-pager</span></td>
+              <td><span class="badge not-skill">Not in Skill</span></td>
+              <td>
+                <a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAHK-byLabQ" target="_blank">Open in Canva ↗</a>&nbsp;
+                <a class="canva-link create" href="https://www.canva.com/design?create=true&template=EAHK-byLabQ" target="_blank">+ Create</a>
+              </td>
+              <td><span class="updated-badge recent"></span>Jun 2026</td>
+              <td><span class="badge duplicate">⚠ Duplicate?</span></td>
+            </tr>
+            <tr>
+              <td class="td-name">Document — Case Study Overview<small>Longer-form case study document format</small></td>
+              <td class="mono">EAHK3V7qQ8k</td>
+              <td><span class="dim-tag">Portrait document</span></td>
+              <td><span class="badge not-skill">Not in Skill</span></td>
+              <td>
+                <a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAHK3V7qQ8k" target="_blank">Open in Canva ↗</a>&nbsp;
+                <a class="canva-link create" href="https://www.canva.com/design?create=true&template=EAHK3V7qQ8k" target="_blank">+ Create</a>
+              </td>
+              <td><span class="updated-badge recent"></span>May 2026</td>
+              <td><span class="badge not-skill">🔍 Review &amp; Map</span></td>
+            </tr>
+            <tr>
+              <td class="td-name">Cutting Deployment Cycles by 70% with AI-Powered Code Translation<small>⚠ Appears to be a filled content design, not a blank template</small></td>
+              <td class="mono">EAHK4yZKdO0</td>
+              <td><span class="dim-tag">Portrait one-pager</span></td>
+              <td><span class="badge issue">Not a Template</span></td>
+              <td>
+                <a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAHK4yZKdO0" target="_blank">Open in Canva ↗</a>
+              </td>
+              <td><span class="updated-badge recent"></span>May 2026</td>
+              <td><span class="badge issue">🚨 Unpublish</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <details class="fields-panel">
+        <summary>🗂 Autofill Dataset Schema — shared by all 5 case study templates (13 fields)</summary>
+        <div class="fields-body">
+          <div class="fields-grid">
+            <div class="field-chip"><span class="ftype text">text</span> TEXT_TITLE</div>
+            <div class="field-chip"><span class="ftype text">text</span> TEXT_TAGLINE</div>
+            <div class="field-chip"><span class="ftype text">text</span> TEXT_EMAIL</div>
+            <div class="field-chip"><span class="ftype text">text</span> TEXT_WEBSITE</div>
+            <div class="field-chip"><span class="ftype text">text</span> TEXT_CHALLENGE_HEADER</div>
+            <div class="field-chip"><span class="ftype text">text</span> TEXT_CHALLENGE</div>
+            <div class="field-chip"><span class="ftype text">text</span> TEXT_SOLUTION_HEADER</div>
+            <div class="field-chip"><span class="ftype text">text</span> TEXT_SOLUTION</div>
+            <div class="field-chip"><span class="ftype text">text</span> TEXT_RESULTS_HEADER</div>
+            <div class="field-chip"><span class="ftype text">text</span> TEXT_RESULTS</div>
+            <div class="field-chip"><span class="ftype text">text</span> TEXT_TESTIMONIAL</div>
+            <div class="field-chip"><span class="ftype text">text</span> TEXT_TESTIMONIAL_ATTRIBUTION</div>
+            <div class="field-chip"><span class="ftype image">image</span> IMAGE_HERO</div>
+          </div>
+          <p class="fields-note">⚠️ All 5 case study templates return an identical dataset schema — including the duplicate and the flagged populated design. This confirms they were all built from the same master template. The <code>canva-template-render</code> skill currently maps a subset of these fields for V1 and V2 via transaction-based element ID editing; the autofill schema gives a second, simpler population path.</p>
+        </div>
+      </details>
+    </div> ══════════════════ -->
+    <div class="cat-section" id="cat-b">
+      <div class="cat-header">
+        <span class="cat-icon">📱</span>
+        <span class="cat-title">Social Media — Landscape (LinkedIn / Facebook)</span>
+        <span class="cat-count">17 templates</span>
+      </div>
+      <p class="cat-desc">
+        LinkedIn/Facebook post templates in ~1200×628 format (1.91:1 landscape). All correctly tagged [LifeSci]. 
+        Cover four content pillars: Polls, Solutions, Testimonials, Fun Facts, Webinar Announcements, Holiday, Podcast.
+        <span style="color:var(--text-faint)">🔒 Manual Only — no autofill dataset fields configured on any of these templates.</span>
+      </p>
+      <div class="t-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Template</th>
+              <th>Canva ID</th>
+              <th>Format</th>
+              <th>Pillar</th>
+              <th class="live-file-col">Live File</th>
+              <th>Last Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-name">Poll Question [LifeSci]</td>
+              <td class="mono">EAGmDTUGWa4</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Poll</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDTUGWa4" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Poll Question 2 [LifeSci]</td>
+              <td class="mono">EAGmDQ9ygmw</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Poll</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDQ9ygmw" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Poll Question 3 [LifeSci]</td>
+              <td class="mono">EAGmDTK_szw</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Poll</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDTK_szw" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Solutions 1 [LifeSci]</td>
+              <td class="mono">EAGmDa99yM4</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Solutions</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDa99yM4" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Solutions 2 [LifeSci]</td>
+              <td class="mono">EAGmDVU5nDA</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Solutions</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDVU5nDA" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Solutions 3 [LifeSci]</td>
+              <td class="mono">EAGmDbHJF9Y</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Solutions</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDbHJF9Y" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Solutions 4 [LifeSci]</td>
+              <td class="mono">EAGmDW4W4RE</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Solutions</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDW4W4RE" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Testimonial Light [LifeSci]</td>
+              <td class="mono">EAGmDcofif4</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Testimonial</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDcofif4" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Testimonial Dark [LifeSci]</td>
+              <td class="mono">EAGmDeqhwtw</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Testimonial</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDeqhwtw" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Fun Facts Dark [LifeSci]</td>
+              <td class="mono">EAGmDUxm6TA</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Fun Facts</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDUxm6TA" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Fun Facts Light [LifeSci]</td>
+              <td class="mono">EAGmDSd9TNQ</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Fun Facts</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDSd9TNQ" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Webinar Announcement Dark [LifeSci]</td>
+              <td class="mono">EAGmDafT1q8</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Webinar Promo</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDafT1q8" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Webinar Announcement Dark 2 [LifeSci]</td>
+              <td class="mono">EAGmDaQ7rfY</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Webinar Promo</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDaQ7rfY" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Webinar Announcement Light [LifeSci]</td>
+              <td class="mono">EAGmDahVsjY</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Webinar Promo</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDahVsjY" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Webinar Announcement Light 2 [LifeSci]</td>
+              <td class="mono">EAGmDWK0HB8</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Webinar Promo</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDWK0HB8" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Holiday [LifeSci]</td>
+              <td class="mono">EAGmDRwsuKY</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Seasonal</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDRwsuKY" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Podcast [LifeSci]</td>
+              <td class="mono">EAGmDRQdLq4</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><span class="badge none">Podcast</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDRQdLq4" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ CATEGORY C: SOCIAL SQUARE ═════════════════════ -->
+    <div class="cat-section" id="cat-c">
+      <div class="cat-header">
+        <span class="cat-icon">⬛</span>
+        <span class="cat-title">Social Media — Square (Instagram 1:1)</span>
+        <span class="cat-count">13 templates</span>
+      </div>
+      <p class="cat-desc">
+        Square 1080×1080 companion versions of the landscape social templates. 
+        Most landscape pillars have a square counterpart — Polls, Solutions, Testimonials, Fun Facts, Webinar Announcements.
+        <span style="color:var(--text-faint)">🔒 Manual Only — no autofill dataset fields configured.</span>
+      </p>
+      <div class="t-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Template</th>
+              <th>Canva ID</th>
+              <th>Format</th>
+              <th>Pillar</th>
+              <th class="live-file-col">Live File</th>
+              <th>Last Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-name">Poll Question (Square) [LifeSci]</td>
+              <td class="mono">EAGmDZzJpjo</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td><span class="badge none">Poll</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDZzJpjo" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Poll Question 2 (Square) [LifeSci]</td>
+              <td class="mono">EAGmDWNjOFc</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td><span class="badge none">Poll</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDWNjOFc" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Solutions 1 (Square) [LifeSci]</td>
+              <td class="mono">EAGmDdJ64zg</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td><span class="badge none">Solutions</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDdJ64zg" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Solutions 2 (Square) [LifeSci]</td>
+              <td class="mono">EAGmDSCP7K4</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td><span class="badge none">Solutions</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDSCP7K4" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Solutions 3 (Square) [LifeSci]</td>
+              <td class="mono">EAGmDdqVDkk</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td><span class="badge none">Solutions</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDdqVDkk" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Solutions 4 (Square) [LifeSci]</td>
+              <td class="mono">EAGmDSI_uj8</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td><span class="badge none">Solutions</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDSI_uj8" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Testimonial Light (Square) [LifeSci]</td>
+              <td class="mono">EAGmDQZ5Xug</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td><span class="badge none">Testimonial</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDQZ5Xug" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Testimonial Dark (Square) [LifeSci]</td>
+              <td class="mono">EAGmDXb-Gtc</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td><span class="badge none">Testimonial</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDXb-Gtc" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Fun Facts Dark (Square) [LifeSci]</td>
+              <td class="mono">EAGmDYJ06b8</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td><span class="badge none">Fun Facts</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDYJ06b8" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Fun Facts Light (Square) [LifeSci]</td>
+              <td class="mono">EAGmDZGsmuI</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td><span class="badge none">Fun Facts</span></td>
+              <td><span class="updated-badge mid"></span>Apr 2025 — <a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDZGsmuI" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Webinar Announcement Light (Square) [LifeSci]</td>
+              <td class="mono">EAGmDdisvd8</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td><span class="badge none">Webinar Promo</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDdisvd8" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Webinar Announcement Dark (Square) [LifeSci]</td>
+              <td class="mono">EAGmDT-UY24</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td><span class="badge none">Webinar Promo</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDT-UY24" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Holiday (Square) [LifeSci]</td>
+              <td class="mono">EAGmDe54CHM</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td><span class="badge none">Seasonal</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDe54CHM" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ CATEGORY D: WEBINAR LANDSCAPE ══════════════════ -->
+    <div class="cat-section" id="cat-d">
+      <div class="cat-header">
+        <span class="cat-icon">🎙️</span>
+        <span class="cat-title">Webinar Speaker Templates — Landscape</span>
+        <span class="cat-count">5 templates</span>
+      </div>
+      <p class="cat-desc">
+        LinkedIn/Facebook format webinar templates with speaker photo slots (2–5 speakers). Dark and Light variants. 
+        Note: a 3-Speaker Dark landscape variant is missing — only the square version exists.
+      </p>
+      <div class="t-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Template</th>
+              <th>Canva ID</th>
+              <th>Format</th>
+              <th>Speakers</th>
+              <th>Theme</th>
+              <th class="live-file-col">Live File</th>
+              <th>Last Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-name">Webinar Dark - 2 Speakers [LifeSci]</td>
+              <td class="mono">EAGmDdu4NbU</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td>2</td>
+              <td>Dark</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDdu4NbU" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Webinar Dark - 4 Speakers [LifeSci]</td>
+              <td class="mono">EAGmDaE4XR4</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td>4</td>
+              <td>Dark</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDaE4XR4" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Webinar Light - 2 Speakers [LifeSci]</td>
+              <td class="mono">EAGmDZvEw6I</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td>2</td>
+              <td>Light</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDZvEw6I" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Webinar Light - 3 Speakers [LifeSci]</td>
+              <td class="mono">EAGmDZXm3VY</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td>3</td>
+              <td>Light</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDZXm3VY" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Webinar Light - 5 Speakers [LifeSci]</td>
+              <td class="mono">EAGmDY5zfpw</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td>5</td>
+              <td>Light</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDY5zfpw" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ CATEGORY E: WEBINAR SQUARE ════════════════════ -->
+    <div class="cat-section" id="cat-e">
+      <div class="cat-header">
+        <span class="cat-icon">🎙️</span>
+        <span class="cat-title">Webinar Speaker Templates — Square</span>
+        <span class="cat-count">6 templates</span>
+      </div>
+      <p class="cat-desc">
+        Square 1080×1080 webinar templates with speaker photo slots (2–4 speakers). Dark and Light variants. 
+        Square has a 3-Speaker Dark but lacks a 3-Speaker Light. Combined with landscape: 11 webinar speaker templates total.
+      </p>
+      <div class="t-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Template</th>
+              <th>Canva ID</th>
+              <th>Format</th>
+              <th>Speakers</th>
+              <th>Theme</th>
+              <th class="live-file-col">Live File</th>
+              <th>Last Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-name">Webinar Dark - 2 Speakers (Square) [LifeSci]</td>
+              <td class="mono">EAGmDZ5y6TE</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td>2</td>
+              <td>Dark</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDZ5y6TE" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Webinar Dark - 3 Speakers (Square) [LifeSci]</td>
+              <td class="mono">EAGmDVkLk_w</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td>3</td>
+              <td>Dark</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDVkLk_w" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Webinar Dark - 4 Speakers (Square) [LifeSci]</td>
+              <td class="mono">EAGmDShDTrU</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td>4</td>
+              <td>Dark</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDShDTrU" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Webinar Light - 2 Speakers (Square) [LifeSci]</td>
+              <td class="mono">EAGmDSy5k6I</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td>2</td>
+              <td>Light</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDSy5k6I" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Webinar Light - 3 Speakers (Square) [LifeSci]</td>
+              <td class="mono">EAGmDZGpucA</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td>3</td>
+              <td>Light</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDZGpucA" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+            <tr>
+              <td class="td-name">Webinar Light - 4 Speakers (Square) [LifeSci]</td>
+              <td class="mono">EAGmDVYq6VE</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td>4</td>
+              <td>Light</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDVYq6VE" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ CATEGORY F: EVENTS KIT ═════════════════════════ -->
+    <div class="cat-section" id="cat-f">
+      <div class="cat-header">
+        <span class="cat-icon">🗂️</span>
+        <span class="cat-title">Event &amp; Webinar Kit (Multi-Page)</span>
+        <span class="cat-count">1 template</span>
+      </div>
+      <p class="cat-desc">
+        A multi-page "kit" template covering multiple asset types for Life Sciences events and webinars in one template.
+      </p>
+      <div class="t-wrap">
+        <table>
+          <thead>
+            <tr><th>Template</th><th>Canva ID</th><th>Format</th><th class="live-file-col">Live File</th><th>Created</th><th>Last Updated</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-name">TP Life Sciences Events / Webinars Templates<small>Multi-page kit — multiple asset formats in one template</small></td>
+              <td class="mono">EAGmDVIXfAg</td>
+              <td><span class="dim-tag">Multi-page kit</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDVIXfAg" target="_blank">Open in Canva ↗</a></td>
+              <td>May 2023</td>
+              <td><span class="updated-badge mid"></span>Apr 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ CATEGORY G: LIFESCI TALKS ══════════════════════ -->
+    <div class="cat-section" id="cat-g">
+      <div class="cat-header">
+        <span class="cat-icon">🎤</span>
+        <span class="cat-title">LifeSci Talks Templates</span>
+        <span class="cat-count">5 templates</span>
+      </div>
+      <p class="cat-desc">
+        Templates for the "LifeSci Talks" branded series. Includes LinkedIn posts, email signature, and act-on banners. 
+        "Copy of LifeSci Talks LinkedIn Template" is a duplicate and should be consolidated.
+      </p>
+      <div class="t-wrap">
+        <table>
+          <thead>
+            <tr><th>Template</th><th>Canva ID</th><th>Format</th><th class="live-file-col">Live File</th><th>Created</th><th>Flag</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-name">LifeSci Talks LinkedIn Template</td>
+              <td class="mono">EAGmDU0sXes</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDU0sXes" target="_blank">Open in Canva ↗</a></td>
+              <td>Aug 2022</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td class="td-name">Copy of LifeSci Talks LinkedIn Template<small>Duplicate — should be removed</small></td>
+              <td class="mono">EAGmDbwsvFc</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDbwsvFc" target="_blank">Open in Canva ↗</a></td>
+              <td>May 2023</td>
+              <td><span class="badge duplicate">⚠ Duplicate</span></td>
+            </tr>
+            <tr>
+              <td class="td-name">LifeSci Talks Act On Template</td>
+              <td class="mono">EAGmDcDYkf4</td>
+              <td><span class="dim-tag">Wide banner</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDcDYkf4" target="_blank">Open in Canva ↗</a></td>
+              <td>Aug 2022</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td class="td-name">LifeSci Talks Email Signature Template</td>
+              <td class="mono">EAGmDSLDeuE</td>
+              <td><span class="dim-tag">Email signature</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDSLDeuE" target="_blank">Open in Canva ↗</a></td>
+              <td>Aug 2022</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td class="td-name">LifeSci__Spotlight_Template<small>Portrait spotlight format</small></td>
+              <td class="mono">EAGmDa6CvPA</td>
+              <td><span class="dim-tag">Portrait</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDa6CvPA" target="_blank">Open in Canva ↗</a></td>
+              <td>Jun 2022</td>
+              <td>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ CATEGORY H: C3 SUMMIT LEGACY ══════════════════ -->
+    <div class="cat-section" id="cat-h">
+      <div class="cat-header">
+        <span class="cat-icon">🏛️</span>
+        <span class="cat-title">C3 Summit (Legacy Branded Event Templates)</span>
+        <span class="cat-count">7 templates</span>
+      </div>
+      <p class="cat-desc">
+        Templates from the C3 Summit and related LifeSci Talks event series. These are legacy/event-specific 
+        rather than evergreen LifeSci brand templates. Consider archiving to a dedicated C3 folder if no longer active.
+      </p>
+      <div class="t-wrap">
+        <table>
+          <thead>
+            <tr><th>Template</th><th>Canva ID</th><th>Format</th><th class="live-file-col">Live File</th><th>Created</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-name">C3 Summit LI Banner</td>
+              <td class="mono">EAGmDZMNBjQ</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDZMNBjQ" target="_blank">Open in Canva ↗</a></td>
+              <td>Nov 2022</td>
+              <td><span class="badge legacy">Legacy</span></td>
+            </tr>
+            <tr>
+              <td class="td-name">C3 Speakers_LinkedIn</td>
+              <td class="mono">EAGmDYVfY1c</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDYVfY1c" target="_blank">Open in Canva ↗</a></td>
+              <td>Jan 2025</td>
+              <td><span class="badge legacy">Legacy</span></td>
+            </tr>
+            <tr>
+              <td class="td-name">C3 AO Posts</td>
+              <td class="mono">EAGmDZghuok</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDZghuok" target="_blank">Open in Canva ↗</a></td>
+              <td>Dec 2023</td>
+              <td><span class="badge legacy">Legacy</span></td>
+            </tr>
+            <tr>
+              <td class="td-name">C3 LI Post</td>
+              <td class="mono">EAGmDW4dP-s</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDW4dP-s" target="_blank">Open in Canva ↗</a></td>
+              <td>Dec 2023</td>
+              <td><span class="badge legacy">Legacy</span></td>
+            </tr>
+            <tr>
+              <td class="td-name">C3 LI Post Speakers</td>
+              <td class="mono">EAGmDfNCjYg</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDfNCjYg" target="_blank">Open in Canva ↗</a></td>
+              <td>Dec 2023</td>
+              <td><span class="badge legacy">Legacy</span></td>
+            </tr>
+            <tr>
+              <td class="td-name">C3 Agenda 2024</td>
+              <td class="mono">EAGmDRTncNM</td>
+              <td><span class="dim-tag">Portrait document</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDRTncNM" target="_blank">Open in Canva ↗</a></td>
+              <td>Dec 2023</td>
+              <td><span class="badge legacy">Legacy</span></td>
+            </tr>
+            <tr>
+              <td class="td-name">C3 IG Post</td>
+              <td class="mono">EAGmDRLj860</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDRLj860" target="_blank">Open in Canva ↗</a></td>
+              <td>Dec 2023</td>
+              <td><span class="badge legacy">Legacy</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ CATEGORY I: CLEANUP / DEPRECATED ══════════════ -->
+    <div class="cat-section" id="cat-i">
+      <div class="cat-header">
+        <span class="cat-icon">⚑</span>
+        <span class="cat-title">Cleanup Required</span>
+        <span class="cat-count">2 templates</span>
+      </div>
+      <p class="cat-desc">These templates should be reviewed and removed from the brand template library.</p>
+      <div class="t-wrap">
+        <table>
+          <thead>
+            <tr><th>Template</th><th>Canva ID</th><th>Format</th><th class="live-file-col">Live File</th><th>Issue</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-name">Copy of Webinar Dark - 4 Speakers<small>No [LifeSci] tag — unsanctioned duplicate</small></td>
+              <td class="mono">EAGmDf5724w</td>
+              <td><span class="dim-tag">1200×628 Landscape</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDf5724w" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="badge duplicate">Duplicate</span></td>
+              <td>Delete or merge with <span class="mono">EAGmDaE4XR4</span></td>
+            </tr>
+            <tr>
+              <td class="td-name">No USE<small>Self-labeled deprecated template</small></td>
+              <td class="mono">EAGmDRoxmxM</td>
+              <td><span class="dim-tag">1080×1080 Square</span></td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDRoxmxM" target="_blank">Open in Canva ↗</a></td>
+              <td><span class="badge issue">Deprecated</span></td>
+              <td>Delete immediately</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ CATEGORY J: NOT LIFESCI ════════════════════════ -->
+    <div class="cat-section" id="cat-j">
+      <div class="cat-header">
+        <span class="cat-icon">🚫</span>
+        <span class="cat-title">Non-LifeSci (Search False Positives)</span>
+        <span class="cat-count">11 templates</span>
+      </div>
+      <p class="cat-desc">
+        These templates appeared in the Life Sciences search results but belong to other divisions 
+        (Legal, Trial Interactive, Corporate) or are generic/untagged templates.
+      </p>
+      <div class="t-wrap">
+        <table>
+          <thead>
+            <tr><th>Template</th><th>Canva ID</th><th>Actual Division</th><th class="live-file-col">Live File</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-name">TP Legal Blog Headers</td>
+              <td class="mono">EAGmDYohfsA</td>
+              <td>Legal</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDYohfsA" target="_blank">Open in Canva ↗</a></td>
+            </tr>
+            <tr>
+              <td class="td-name">TI Service Snapshot Series</td>
+              <td class="mono">EAHBn_dGV0E</td>
+              <td>Trial Interactive</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAHBn_dGV0E" target="_blank">Open in Canva ↗</a></td>
+            </tr>
+            <tr>
+              <td class="td-name">TI Customer Quotes Templates</td>
+              <td class="mono">EAHAR7x8MmQ</td>
+              <td>Trial Interactive</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAHAR7x8MmQ" target="_blank">Open in Canva ↗</a></td>
+            </tr>
+            <tr>
+              <td class="td-name">TPLY | FB + LI [TP Corporate]</td>
+              <td class="mono">EAGmDYXdlr8</td>
+              <td>TP Corporate</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDYXdlr8" target="_blank">Open in Canva ↗</a></td>
+            </tr>
+            <tr>
+              <td class="td-name">TPLY | STORY [TP Corporate]</td>
+              <td class="mono">EAGmDcX-oeo</td>
+              <td>TP Corporate</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDcX-oeo" target="_blank">Open in Canva ↗</a></td>
+            </tr>
+            <tr>
+              <td class="td-name">Employee Spotlight Templates</td>
+              <td class="mono">EAGmDdIff6s</td>
+              <td>TP Corporate / HR</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDdIff6s" target="_blank">Open in Canva ↗</a></td>
+            </tr>
+            <tr>
+              <td class="td-name">TL Life &amp; Culture Templates</td>
+              <td class="mono">EAGmDeAB-JA</td>
+              <td>TP Corporate / HR</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDeAB-JA" target="_blank">Open in Canva ↗</a></td>
+            </tr>
+            <tr>
+              <td class="td-name">Template G3 Meets -- 1200x627</td>
+              <td class="mono">EAGmDb4BPmA</td>
+              <td>Unknown / Generic</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDb4BPmA" target="_blank">Open in Canva ↗</a></td>
+            </tr>
+            <tr>
+              <td class="td-name">Copy of Blog Post 1200x628</td>
+              <td class="mono">EAGmDZWS1Jg</td>
+              <td>Unknown / Generic</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDZWS1Jg" target="_blank">Open in Canva ↗</a></td>
+            </tr>
+            <tr>
+              <td class="td-name">C3 Speakers_LinkedIn (Corporate)</td>
+              <td class="mono">EAGmDYVfY1c</td>
+              <td>C3 Summit (cross-div)</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDYVfY1c" target="_blank">Open in Canva ↗</a></td>
+            </tr>
+            <tr>
+              <td class="td-name">No USE</td>
+              <td class="mono">EAGmDRoxmxM</td>
+              <td>Deprecated — delete</td>
+              <td><a class="canva-link" href="https://www.canva.com/brand/brand-templates/EAGmDRoxmxM" target="_blank">Open in Canva ↗</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ RECOMMENDATIONS ════════════════════════════════ -->
+    <div class="cat-section" id="recs">
+      <div class="cat-header">
+        <span class="cat-icon">🎯</span>
+        <span class="cat-title">Recommendations</span>
+      </div>
+      <div class="recs-grid">
+
+        <div class="rec-card red">
+          <h4>🚨 Immediate — Remove "No USE" template</h4>
+          <p><code>EAGmDRoxmxM</code> is self-labeled for deletion. It's still surfacing in all brand template searches and polluting team views. Delete it now.</p>
+        </div>
+
+        <div class="rec-card red">
+          <h4>🚨 Immediate — Unpublish populated design</h4>
+          <p><code>EAHK4yZKdO0</code> "Cutting Deployment Cycles by 70%…" is live copy published as a brand template. Anyone using it will clone filled content. Unpublish and replace with a blank version or remove entirely.</p>
+        </div>
+
+        <div class="rec-card amber">
+          <h4>⚠️ Review — V2 Duplicate case study</h4>
+          <p><code>EAHK-byLabQ</code> has the same title as the skill-mapped V2 (<code>EAHK-v91PM0</code>). Open both and compare visually. If it's an older iteration, delete it. If it's a distinct variant, name it properly and decide whether to map it to the skill.</p>
+        </div>
+
+        <div class="rec-card amber">
+          <h4>⚠️ Review — Delete "Copy of" duplicates</h4>
+          <p><code>EAGmDbwsvFc</code> (Copy of LifeSci Talks LinkedIn) and <code>EAGmDf5724w</code> (Copy of Webinar Dark - 4 Speakers) are unsanctioned copies. Verify they aren't in active use, then delete.</p>
+        </div>
+
+        <div class="rec-card blue">
+          <h4>🔍 Assess — Document Case Study Overview</h4>
+          <p><code>EAHK3V7qQ8k</code> is a portrait document template not in the skill. Open it to understand the layout. If it's a longer-form case study format, it should be named clearly and considered for mapping as a V3 option in the skill.</p>
+        </div>
+
+        <div class="rec-card blue">
+          <h4>🔍 Assess — C3 Summit legacy templates</h4>
+          <p>7 C3 Summit templates (<code>EAGmDZMNBjQ</code> etc.) are still live in the brand library. If C3 Summit is concluded, move them to an archived folder to reduce search clutter. If still active, tag them consistently as [C3] or [LifeSci-C3].</p>
+        </div>
+
+        <div class="rec-card green">
+          <h4>✅ Skill gap — Social templates</h4>
+          <p>The <code>canva-template-render</code> skill only maps case study templates (V1/V2). The 30 social templates (Solutions, Testimonials, Poll, Fun Facts, Webinar Announcements) are all accessible but have no skill automation. Consider a LifeSci Social Media skill or expanding the current skill.</p>
+        </div>
+
+        <div class="rec-card green">
+          <h4>✅ Naming convention — Standardize [LifeSci] tagging</h4>
+          <p>Most social/webinar templates correctly use the [LifeSci] suffix. The 5 "EAHK-" case study templates do not use this convention. Consider updating them to "LS Case Study V1 [LifeSci]" format for consistent filtering.</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// ── AUTOFILL DATA ──────────────────────────────────────────────────────────────
+const AUTOFILL_IDS = new Set(['EAHK9lpLFxk','EAHK-v91PM0','EAHK-byLabQ','EAHK3V7qQ8k','EAHK4yZKdO0']);
+
+// ── INJECT PREVIEW + AUTOFILL COLUMNS ─────────────────────────────────────────
+document.querySelectorAll('table').forEach(table => {
+  const thead = table.querySelector('thead tr');
+  const tbodyRows = table.querySelectorAll('tbody tr');
+  if (!thead || !tbodyRows.length) return;
+
+  // Add Autofill th
+  const thAF = document.createElement('th');
+  thAF.textContent = 'Autofill';
+  thead.appendChild(thAF);
+
+  tbodyRows.forEach(row => {
+    const idCell = row.querySelector('td.mono');
+    const rawId = idCell ? (idCell.querySelector('a') ? idCell.querySelector('a').textContent.trim() : idCell.textContent.trim()) : '';
+
+
+
+
+    // Autofill cell
+    const tdAF = document.createElement('td');
+    if (AUTOFILL_IDS.has(rawId)) {
+      tdAF.innerHTML = '<span class="af-badge yes">✅ 13 fields</span>';
+    } else {
+      tdAF.innerHTML = '<span class="af-badge no">— Manual</span>';
+    }
+    row.appendChild(tdAF);
+  });
+});
+</script>
+
+<script>
+// ── COLUMN SORTING ────────────────────────────────────────────────────────────
+(function initTableSorting() {
+  const parseCell = (td) => {
+    if (!td) return '';
+    const raw = (td.textContent || '').trim();
+    // Date detection (e.g. "Jan 5, 2025" or "2025-01-05")
+    const d = Date.parse(raw);
+    if (!isNaN(d) && /\d{4}|\d{1,2}[\/\-\s]/.test(raw)) return { type: 'date', v: d, s: raw };
+    // Numeric
+    const n = parseFloat(raw.replace(/[, ]/g, ''));
+    if (!isNaN(n) && /^[\-+]?[\d,. ]+$/.test(raw)) return { type: 'num', v: n, s: raw };
+    return { type: 'str', v: raw.toLowerCase(), s: raw };
+  };
+
+  document.querySelectorAll('table').forEach(table => {
+    const headRow = table.querySelector('thead tr');
+    const tbody = table.querySelector('tbody');
+    if (!headRow || !tbody) return;
+    const ths = Array.from(headRow.children);
+    ths.forEach((th, idx) => {
+      th.classList.add('sortable');
+      th.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const current = th.classList.contains('sort-asc') ? 'asc'
+                      : th.classList.contains('sort-desc') ? 'desc' : null;
+        const next = current === 'asc' ? 'desc' : 'asc';
+        ths.forEach(o => o.classList.remove('sort-asc', 'sort-desc'));
+        th.classList.add(next === 'asc' ? 'sort-asc' : 'sort-desc');
+
+        const rows = Array.from(tbody.querySelectorAll(':scope > tr'));
+        rows.sort((a, b) => {
+          const av = parseCell(a.children[idx]);
+          const bv = parseCell(b.children[idx]);
+          let cmp;
+          if (av.type === bv.type && av.type !== 'str') cmp = av.v - bv.v;
+          else cmp = String(av.v).localeCompare(String(bv.v), undefined, { numeric: true });
+          return next === 'asc' ? cmp : -cmp;
+        });
+        rows.forEach(r => tbody.appendChild(r));
+      });
+    });
+  });
+})();
+</script>
+
+<script>
+// Linkify Canva IDs in td.mono cells
+document.querySelectorAll('td.mono').forEach(td => {
+  const id = td.textContent.trim();
+  if (id && !td.querySelector('a')) {
+    td.innerHTML = `<a class="id-link" href="https://www.canva.com/brand/brand-templates/${encodeURIComponent(id)}" target="_blank" rel="noopener" title="Open ${id} in Canva">${id}</a>`;
+  }
+});
+
+// Also linkify .flag-id spans and inline <code> blocks that look like Canva IDs
+const canvaIdPattern = /^EA[A-Za-z0-9_\-]{6,}$/;
+document.querySelectorAll('.flag-id, .flag-item code, .rec-card code').forEach(el => {
+  const id = el.textContent.trim();
+  if (canvaIdPattern.test(id)) {
+    const a = document.createElement('a');
+    a.className = 'id-link';
+    a.href = `https://www.canva.com/brand/brand-templates/${encodeURIComponent(id)}`;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.title = `Open ${id} in Canva`;
+    a.textContent = id;
+    a.style.fontSize = 'inherit';
+    el.replaceWith(a);
+  }
+});
+</script>
+
+<script>
+// Make every tbody row clickable — opens the first canva-link href in a new tab.
+// Clicking an actual <a> tag still follows that link normally.
+document.querySelectorAll('tbody tr').forEach(row => {
+  const firstLink = row.querySelector('a.canva-link');
+  if (!firstLink) return;
+  row.classList.add('clickable-row');
+  row.dataset.href = firstLink.href;
+  row.addEventListener('click', e => {
+    if (e.target.closest('a')) return; // let real links work normally
+    window.open(row.dataset.href, '_blank', 'noopener');
+  });
+});
+
+// Add tooltip to every clickable row so users know it's clickable
+document.querySelectorAll('tbody tr.clickable-row').forEach(row => {
+  row.title = 'Click row to open live Canva file';
+});
+
+
+
+
+/* ───────────── FILTER BAR (Type / Segment / Region) ───────────── */
+(function () {
+  // Category id -> Template Type label
+  const TYPE_MAP = {
+    'cat-a': 'Case Study',
+    'cat-b': 'Social — Landscape',
+    'cat-c': 'Social — Square',
+    'cat-d': 'Webinar — Landscape',
+    'cat-e': 'Webinar — Square',
+    'cat-f': 'Event / Webinar Kit',
+    'cat-g': 'LifeSci Talks',
+    'cat-h': 'C3 Summit (Legacy)',
+    'cat-i': 'Cleanup / Issues',
+    'cat-j': 'Non-LifeSci',
+  };
+
+  // Segment inference: ordered keyword matching on row text
+  const SEGMENT_RULES = [
+    ['Clinical Trials',        /\b(clinical|trial|patient recruit|protocol|ctms|ecoa|ecrf)\b/i],
+    ['Regulatory',             /\b(regulatory|submission|fda|ema|ind|nda|cmc|labeling)\b/i],
+    ['Medical Devices',        /\b(medical device|device|ifu|udi|mdr|ivdr)\b/i],
+    ['Pharma & Biotech',       /\b(pharma|biotech|drug|biolog|oncolog|therapeut|vaccine)\b/i],
+    ['Translation & Language', /\b(translat|localiz|linguistic|language|globall?ink|mt|machine translation)\b/i],
+    ['AI & Technology',        /\b(\bai\b|artificial intelligence|automation|platform|tech|code|llm)\b/i],
+    ['Events & Webinars',      /\b(webinar|summit|talks|event|booth|conference|expo)\b/i],
+    ['Case Studies',           /\b(case stud|success story|impact stats|deployment)\b/i],
+  ];
+
+  // Region inference
+  const REGION_RULES = [
+    ['EMEA',          /\b(emea|europe|uk|united kingdom|germany|france|spain|italy)\b/i],
+    ['APAC',          /\b(apac|asia|japan|china|korea|singapore|australia|india)\b/i],
+    ['LATAM',         /\b(latam|latin america|brazil|mexico|argentina)\b/i],
+    ['North America', /\b(north america|\bus\b|usa|united states|canada|\bnam\b|\bna\b)\b/i],
+  ];
+
+  function classify(rowText, catId) {
+    let segment = 'General LifeSci';
+    for (const [label, rx] of SEGMENT_RULES) {
+      if (rx.test(rowText)) { segment = label; break; }
+    }
+    // Type-derived fallbacks for segment when nothing else hits
+    if (segment === 'General LifeSci') {
+      if (catId === 'cat-a') segment = 'Case Studies';
+      else if (catId === 'cat-g') segment = 'Events & Webinars';
+      else if (catId === 'cat-h') segment = 'Events & Webinars';
+      else if (catId === 'cat-f' || /webinar/i.test(TYPE_MAP[catId] || '')) segment = 'Events & Webinars';
+    }
+
+    let region = 'Global';
+    for (const [label, rx] of REGION_RULES) {
+      if (rx.test(rowText)) { region = label; break; }
+    }
+    return { segment, region };
+  }
+
+  // Tag every data row inside category sections
+  const rows = document.querySelectorAll('.cat-section tbody tr');
+  rows.forEach(tr => {
+    const cat = tr.closest('.cat-section');
+    if (!cat) return;
+    const catId = cat.id;
+    const type = TYPE_MAP[catId] || 'Other';
+    const text = tr.textContent || '';
+    const { segment, region } = classify(text, catId);
+    tr.dataset.type = type;
+    tr.dataset.segment = segment;
+    tr.dataset.region = region;
+  });
+
+  // Build filter bar
+  const types = Array.from(new Set(Array.from(rows).map(r => r.dataset.type))).sort();
+  const segments = Array.from(new Set(Array.from(rows).map(r => r.dataset.segment))).sort();
+  const regions = Array.from(new Set(Array.from(rows).map(r => r.dataset.region))).sort();
+
+  const bar = document.createElement('div');
+  bar.className = 'lc-filter-bar';
+  bar.innerHTML = `
+    <style>
+      .lc-filter-bar {
+        position: sticky; top: 0; z-index: 50;
+        display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+        padding: 12px 40px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        font-size: 12px;
+      }
+      .lc-filter-bar label {
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-size: 10.5px;
+        margin-right: 6px;
+      }
+      .lc-filter-bar select, .lc-filter-bar input[type="search"] {
+        background: var(--surface2);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 12px;
+        min-width: 160px;
+      }
+      .lc-filter-bar input[type="search"] { min-width: 220px; }
+      .lc-filter-bar .lc-count {
+        margin-left: auto;
+        color: var(--text-muted);
+        font-size: 11.5px;
+      }
+      .lc-filter-bar .lc-reset {
+        background: transparent;
+        color: var(--tp-green);
+        border: 1px solid rgba(0,200,83,0.4);
+        border-radius: 6px;
+        padding: 5px 12px;
+        font-size: 11.5px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .lc-filter-bar .lc-reset:hover { background: rgba(0,200,83,0.10); }
+      body.light-mode .lc-filter-bar { background: #f6f8fa; }
+      .cat-section.lc-hidden { display: none; }
+    </style>
+    <label for="lc-type">Type</label>
+    <select id="lc-type"><option value="">All types</option>${types.map(v => `<option value="${v}">${v}</option>`).join('')}</select>
+    <label for="lc-segment">Segment</label>
+    <select id="lc-segment"><option value="">All segments</option>${segments.map(v => `<option value="${v}">${v}</option>`).join('')}</select>
+    <label for="lc-region">Region</label>
+    <select id="lc-region"><option value="">All regions</option>${regions.map(v => `<option value="${v}">${v}</option>`).join('')}</select>
+    <input id="lc-search" type="search" placeholder="Search name or ID…" />
+    <button class="lc-reset" type="button">Reset</button>
+    <span class="lc-count" id="lc-count"></span>
+  `;
+
+  const summary = document.querySelector('.summary-strip');
+  if (summary && summary.parentNode) {
+    summary.parentNode.insertBefore(bar, summary.nextSibling);
+  } else {
+    document.body.insertBefore(bar, document.body.firstChild);
+  }
+
+  const typeSel = bar.querySelector('#lc-type');
+  const segSel = bar.querySelector('#lc-segment');
+  const regSel = bar.querySelector('#lc-region');
+  const search = bar.querySelector('#lc-search');
+  const reset = bar.querySelector('.lc-reset');
+  const count = bar.querySelector('#lc-count');
+
+  function applyFilters() {
+    const t = typeSel.value;
+    const s = segSel.value;
+    const r = regSel.value;
+    const q = (search.value || '').trim().toLowerCase();
+    let visible = 0;
+    rows.forEach(tr => {
+      const matchType = !t || tr.dataset.type === t;
+      const matchSeg = !s || tr.dataset.segment === s;
+      const matchReg = !r || tr.dataset.region === r;
+      const matchQ = !q || (tr.textContent || '').toLowerCase().includes(q);
+      const show = matchType && matchSeg && matchReg && matchQ;
+      tr.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    // Hide category sections that now have zero visible rows
+    document.querySelectorAll('.cat-section').forEach(sec => {
+      const any = sec.querySelectorAll('tbody tr:not([style*="display: none"])').length;
+      sec.classList.toggle('lc-hidden', any === 0);
+    });
+    count.textContent = `${visible} / ${rows.length} templates`;
+  }
+
+  [typeSel, segSel, regSel].forEach(el => el.addEventListener('change', applyFilters));
+  search.addEventListener('input', applyFilters);
+  reset.addEventListener('click', () => {
+    typeSel.value = ''; segSel.value = ''; regSel.value = ''; search.value = '';
+    applyFilters();
+  });
+
+  applyFilters();
+})();
+</script>
+
+<script>
+/* ───────────── COLLAPSIBLE SECTIONS ───────────── */
+(function () {
+  const COLLAPSE_KEY = 'lc-collapsed-sections-v1';
+  let collapsed = {};
+  try { collapsed = JSON.parse(localStorage.getItem(COLLAPSE_KEY) || '{}'); } catch {}
+
+  document.querySelectorAll('.cat-section').forEach(sec => {
+    const header = sec.querySelector('.cat-header');
+    if (!header) return;
+    const chev = document.createElement('span');
+    chev.className = 'cat-toggle';
+    chev.textContent = '▼';
+    header.appendChild(chev);
+    if (collapsed[sec.id]) sec.classList.add('collapsed');
+    header.addEventListener('click', () => {
+      sec.classList.toggle('collapsed');
+      collapsed[sec.id] = sec.classList.contains('collapsed');
+      try { localStorage.setItem(COLLAPSE_KEY, JSON.stringify(collapsed)); } catch {}
+    });
+  });
+})();
+
+/* ───────────── CSV EXPORT + LAST-LOADED TIMESTAMP ───────────── */
+(function () {
+  const pill = document.getElementById('generated-pill');
+  if (pill) pill.textContent = '🕒 Loaded: ' + new Date().toLocaleString();
+
+  function csvEscape(v) {
+    const s = String(v == null ? '' : v).replace(/\s+/g, ' ').trim();
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+  function exportCSV() {
+    const rows = [['Category','Type','Segment','Region','Name','Canva ID','Autofill','Comments']];
+    const store = (() => { try { return JSON.parse(localStorage.getItem('lc-asset-comments-v1') || '{}'); } catch { return {}; } })();
+    document.querySelectorAll('.cat-section').forEach(sec => {
+      const catTitle = (sec.querySelector('.cat-title')?.textContent || '').trim();
+      sec.querySelectorAll('tbody tr:not(.lc-cmt-row)').forEach(tr => {
+        if (tr.style.display === 'none') return;
+        const idEl = tr.querySelector('td.mono a, td.mono');
+        const id = idEl ? idEl.textContent.trim() : '';
+        const nameEl = tr.querySelector('.td-name');
+        const name = nameEl ? nameEl.childNodes[0].textContent.trim() : (tr.querySelector('td')?.textContent || '').trim();
+        const af = tr.querySelector('.af-badge')?.textContent.trim() || '';
+        const note = store[id]?.text || '';
+        rows.push([catTitle, tr.dataset.type || '', tr.dataset.segment || '', tr.dataset.region || '', name, id, af, note]);
+      });
+    });
+    const csv = rows.map(r => r.map(csvEscape).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'lifesci-canva-audit-' + new Date().toISOString().slice(0,10) + '.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  // Add buttons into the filter bar (created by the filter script above)
+  const bar = document.querySelector('.lc-filter-bar');
+  if (!bar) return;
+  const reset = bar.querySelector('.lc-reset');
+
+  const collapseAllBtn = document.createElement('button');
+  collapseAllBtn.type = 'button';
+  collapseAllBtn.className = 'lc-reset';
+  collapseAllBtn.textContent = 'Collapse all';
+  collapseAllBtn.addEventListener('click', () => {
+    const sections = document.querySelectorAll('.cat-section');
+    const allCollapsed = Array.from(sections).every(s => s.classList.contains('collapsed'));
+    const state = {};
+    sections.forEach(s => {
+      s.classList.toggle('collapsed', !allCollapsed);
+      state[s.id] = !allCollapsed;
+    });
+    collapseAllBtn.textContent = allCollapsed ? 'Collapse all' : 'Expand all';
+    try { localStorage.setItem('lc-collapsed-sections-v1', JSON.stringify(state)); } catch {}
+  });
+
+  const csvBtn = document.createElement('button');
+  csvBtn.type = 'button';
+  csvBtn.className = 'lc-reset';
+  csvBtn.textContent = '⬇ Export CSV';
+  csvBtn.addEventListener('click', exportCSV);
+
+  const refreshBtn = document.createElement('button');
+  refreshBtn.type = 'button';
+  refreshBtn.className = 'lc-reset';
+  refreshBtn.style.cssText = 'background:rgba(0,200,83,0.10);';
+  refreshBtn.innerHTML = '<span class="lc-refresh-icon" style="display:inline-block;transition:transform 0.6s ease;">↻</span> Refresh Canva';
+  refreshBtn.title = 'Re-scrub Canva for current templates';
+  const SUPABASE_URL = 'https://nhxaijbyqfkkhhoornzy.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oeGFpamJ5cWZra2hob29ybnp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2NDU0ODYsImV4cCI6MjA4MzIyMTQ4Nn0.Uw6QPHoOo_15FWCfnSAZYyGZNEr-XlZ8NrVyLlcuiWk';
+
+  function showToast(msg, kind) {
+    const toast = document.createElement('div');
+    toast.textContent = msg;
+    const border = kind === 'error' ? '#f85149' : 'var(--tp-green)';
+    toast.style.cssText = `position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0a2240;color:#fff;border:1px solid ${border};padding:10px 18px;border-radius:6px;font-size:12px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.4);max-width:560px;`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+  }
+
+  async function getAccessToken() {
+    try {
+      const raw = localStorage.getItem('sb-nhxaijbyqfkkhhoornzy-auth-token');
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed?.access_token ?? null;
+    } catch { return null; }
+  }
+
+  refreshBtn.addEventListener('click', async () => {
+    if (refreshBtn.disabled) return;
+    const icon = refreshBtn.querySelector('.lc-refresh-icon');
+    refreshBtn.disabled = true;
+    refreshBtn.style.opacity = '0.7';
+    if (icon) {
+      let deg = 0;
+      icon.dataset.spin = setInterval(() => { deg += 30; icon.style.transform = `rotate(${deg}deg)`; }, 50);
+    }
+
+    try {
+      const token = await getAccessToken();
+      if (!token) {
+        showToast('⚠ Sign in as an admin first, then click Refresh again.', 'error');
+        window.open('/auth', '_blank');
+        return;
+      }
+
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/canva-sync`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'apikey': SUPABASE_ANON,
+          'Content-Type': 'application/json',
+        },
+      });
+      const json = await res.json().catch(() => ({}));
+
+      if (res.status === 401 || res.status === 403) {
+        showToast('⚠ Admin role required to sync Canva.', 'error');
+        return;
+      }
+      if (!res.ok) {
+        const msg = json?.error || `HTTP ${res.status}`;
+        if (/not connected/i.test(msg)) {
+          showToast('Canva is not connected yet. Click "Connect Canva" to authorize.', 'error');
+        } else {
+          showToast(`✗ Sync failed: ${msg}`, 'error');
+        }
+        return;
+      }
+
+      const pill = document.getElementById('generated-pill');
+      if (pill) pill.textContent = '🕒 Synced: ' + new Date().toLocaleString();
+      showToast(`✓ Synced ${json.synced ?? 0} templates from Canva. Reloading…`);
+      setTimeout(() => location.reload(), 1200);
+    } catch (e) {
+      showToast(`✗ ${e.message || 'Unknown error'}`, 'error');
+    } finally {
+      if (icon && icon.dataset.spin) { clearInterval(Number(icon.dataset.spin)); icon.style.transform = 'rotate(0deg)'; }
+      refreshBtn.disabled = false;
+      refreshBtn.style.opacity = '';
+    }
+  });
+
+  // Show last-sync timestamp in the header pill if Canva is connected
+  fetch(`${SUPABASE_URL}/functions/v1/canva-list`, {
+    headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` },
+  })
+    .then(r => r.json())
+    .then(info => {
+      if (info?.connected && info.last_sync) {
+        const pill = document.getElementById('generated-pill');
+        if (pill) pill.textContent = '🕒 Last Canva sync: ' + new Date(info.last_sync).toLocaleString();
+      }
+    })
+    .catch(() => {/* ignore */});
+
+  if (reset) {
+    reset.parentNode.insertBefore(collapseAllBtn, reset.nextSibling);
+    reset.parentNode.insertBefore(csvBtn, collapseAllBtn.nextSibling);
+    reset.parentNode.insertBefore(refreshBtn, csvBtn.nextSibling);
+  } else {
+    bar.appendChild(collapseAllBtn);
+    bar.appendChild(csvBtn);
+    bar.appendChild(refreshBtn);
+  }
+})();
+</script>
+
+
+<script>
+/* ───────────── PER-ASSET COMMENTS ───────────── */
+(function () {
+  const STORAGE_KEY = 'lc-asset-comments-v1';
+  function loadAll() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+    catch { return {}; }
+  }
+  function saveAll(data) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch {}
+  }
+  const store = loadAll();
+
+  const style = document.createElement('style');
+  style.textContent = `
+    .lc-cmt-btn {
+      background: transparent; color: var(--text-muted);
+      border: 1px solid var(--border); border-radius: 999px;
+      padding: 3px 9px; font-size: 11px; font-weight: 600;
+      cursor: pointer; display: inline-flex; align-items: center;
+      gap: 4px; transition: all 0.15s ease; white-space: nowrap;
+      margin-top: 6px;
+    }
+    .lc-cmt-btn:hover { color: var(--tp-green); border-color: var(--tp-green); }
+    .lc-cmt-btn.has-notes {
+      color: var(--tp-green); border-color: rgba(0,200,83,0.45);
+      background: rgba(0,200,83,0.08);
+    }
+    .lc-cmt-row > td {
+      background: rgba(0,200,83,0.04);
+      padding: 14px 24px !important;
+      border-top: 1px dashed var(--border);
+    }
+    .lc-cmt-wrap { display: flex; flex-direction: column; gap: 8px; max-width: 900px; }
+    .lc-cmt-wrap > label {
+      font-size: 10.5px; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700;
+    }
+    .lc-cmt-wrap textarea {
+      width: 100%; min-height: 80px;
+      background: var(--surface); color: var(--text);
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 10px 12px; font: inherit; font-size: 13px;
+      line-height: 1.5; resize: vertical;
+    }
+    .lc-cmt-wrap textarea:focus { outline: none; border-color: var(--tp-green); }
+    .lc-cmt-actions { display: flex; gap: 8px; align-items: center; }
+    .lc-cmt-save {
+      background: var(--tp-green); color: #001a0a; border: none;
+      border-radius: 6px; padding: 6px 14px; font-size: 12px;
+      font-weight: 700; cursor: pointer;
+    }
+    .lc-cmt-clear {
+      background: transparent; color: var(--text-muted);
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .lc-cmt-clear:hover { color: #ff6b6b; border-color: #ff6b6b; }
+    .lc-cmt-meta { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+  `;
+  document.head.appendChild(style);
+
+  const canvaIdRx = /^EA[A-Za-z0-9_\-]{6,}$/;
+
+  document.querySelectorAll('.cat-section tbody tr').forEach(tr => {
+    let id = '';
+    tr.querySelectorAll('td').forEach(td => {
+      const t = (td.textContent || '').trim();
+      if (!id && canvaIdRx.test(t)) id = t;
+    });
+    if (!id) return;
+
+    const existing = store[id];
+    const colCount = tr.children.length;
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'lc-cmt-btn' + (existing && existing.text ? ' has-notes' : '');
+    btn.innerHTML = `💬 <span class="lc-cmt-label">${existing && existing.text ? 'Notes' : 'Add note'}</span>`;
+    btn.title = 'Add or view comments for this asset';
+    const lastTd = tr.lastElementChild;
+    if (lastTd) lastTd.appendChild(btn);
+
+    const cmtRow = document.createElement('tr');
+    cmtRow.className = 'lc-cmt-row';
+    cmtRow.style.display = 'none';
+    const cmtTd = document.createElement('td');
+    cmtTd.colSpan = colCount;
+    const safeText = existing ? (existing.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;') : '';
+    cmtTd.innerHTML = `
+      <div class="lc-cmt-wrap">
+        <label>Comments for <code>${id}</code></label>
+        <textarea placeholder="Notes, status, owner, review feedback…">${safeText}</textarea>
+        <div class="lc-cmt-actions">
+          <button type="button" class="lc-cmt-save">Save</button>
+          <button type="button" class="lc-cmt-clear">Clear</button>
+          <span class="lc-cmt-meta">${existing && existing.updated ? 'Last saved ' + new Date(existing.updated).toLocaleString() : ''}</span>
+        </div>
+      </div>
+    `;
+    cmtRow.appendChild(cmtTd);
+    tr.insertAdjacentElement('afterend', cmtRow);
+
+    const textarea = cmtTd.querySelector('textarea');
+    const meta = cmtTd.querySelector('.lc-cmt-meta');
+    const label = btn.querySelector('.lc-cmt-label');
+
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const open = cmtRow.style.display !== 'none';
+      cmtRow.style.display = open ? 'none' : '';
+      if (!open) setTimeout(() => textarea.focus(), 30);
+    });
+    cmtRow.addEventListener('click', e => e.stopPropagation());
+
+    cmtTd.querySelector('.lc-cmt-save').addEventListener('click', () => {
+      const txt = textarea.value.trim();
+      const all = loadAll();
+      if (txt) {
+        all[id] = { text: txt, updated: Date.now() };
+        btn.classList.add('has-notes');
+        label.textContent = 'Notes';
+      } else {
+        delete all[id];
+        btn.classList.remove('has-notes');
+        label.textContent = 'Add note';
+      }
+      saveAll(all);
+      meta.textContent = txt ? 'Last saved ' + new Date().toLocaleString() : '';
+    });
+
+    cmtTd.querySelector('.lc-cmt-clear').addEventListener('click', () => {
+      textarea.value = '';
+      const all = loadAll();
+      delete all[id];
+      saveAll(all);
+      btn.classList.remove('has-notes');
+      label.textContent = 'Add note';
+      meta.textContent = '';
+    });
+  });
+  // ── CANVA CONNECT PANEL ─────────────────────────────────────────────────
+  (function () {
+    const panel = document.getElementById('connect-panel');
+    const overlay = document.getElementById('cp-overlay');
+    const toggle = document.getElementById('cp-toggle');
+    const closeBtn = document.getElementById('cp-close');
+    const clientIdInput = document.getElementById('cp-client-id');
+    const clientSecretInput = document.getElementById('cp-client-secret');
+    const statusBadge = document.getElementById('cp-status-badge');
+    const saveBtn = document.getElementById('cp-save');
+    const connectBtn = document.getElementById('cp-connect');
+    const toggleText = document.getElementById('cp-toggle-text');
+
+    const LS_KEY = 'lc-canva-connect-v1';
+
+    function open() { panel.classList.add('open'); overlay.classList.add('open'); }
+    function close() { panel.classList.remove('open'); overlay.classList.remove('open'); }
+    toggle.addEventListener('click', open);
+    closeBtn.addEventListener('click', close);
+    overlay.addEventListener('click', close);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+
+    // Load saved credentials
+    try {
+      const saved = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+      if (saved.clientId) clientIdInput.value = saved.clientId;
+      if (saved.clientSecret) clientSecretInput.value = saved.clientSecret;
+    } catch {}
+
+    function updateStatus(connected, msg) {
+      if (connected) {
+        statusBadge.className = 'status-badge connected';
+        statusBadge.innerHTML = '<span>●</span> ' + (msg || 'Connected');
+        toggleText.textContent = 'Canva ✓';
+        toggle.style.borderColor = 'var(--green)';
+        toggle.style.color = 'var(--green)';
+      } else {
+        statusBadge.className = 'status-badge disconnected';
+        statusBadge.innerHTML = '<span>●</span> ' + (msg || 'Not connected');
+        toggleText.textContent = 'Canva';
+        toggle.style.borderColor = '';
+        toggle.style.color = '';
+      }
+    }
+
+    saveBtn.addEventListener('click', () => {
+      const payload = { clientId: clientIdInput.value.trim(), clientSecret: clientSecretInput.value.trim() };
+      localStorage.setItem(LS_KEY, JSON.stringify(payload));
+      showToast('✓ Credentials saved locally.');
+    });
+
+    connectBtn.addEventListener('click', () => {
+      const clientId = clientIdInput.value.trim();
+      const clientSecret = clientSecretInput.value.trim();
+      if (!clientId || !clientSecret) {
+        showToast('⚠ Enter both Client ID and Client Secret first.', 'error');
+        return;
+      }
+      localStorage.setItem(LS_KEY, JSON.stringify({ clientId, clientSecret }));
+      // Use the stored client_id for the OAuth flow (pass to edge fn as query param)
+      const returnTo = encodeURIComponent(location.pathname);
+      const url = `${SUPABASE_URL}/functions/v1/canva-oauth-start?return_to=${returnTo}&client_id=${encodeURIComponent(clientId)}&client_secret=${encodeURIComponent(clientSecret)}`;
+      window.location.href = url;
+    });
+
+    // Check connection status on load
+    fetch(`${SUPABASE_URL}/functions/v1/canva-list`, {
+      headers: { 'apikey': SUPABASE_ANON, 'Authorization': `Bearer ${SUPABASE_ANON}` },
+    })
+      .then(r => r.json())
+      .then(info => {
+        if (info?.connected) {
+          updateStatus(true, 'Connected · ' + (info.last_sync ? new Date(info.last_sync).toLocaleDateString() : 'unknown date'));
+        } else {
+          updateStatus(false, 'Not connected');
+        }
+      })
+      .catch(() => updateStatus(false, 'Not connected'));
+  })();
+  </script>
+</body>
+</html>
+

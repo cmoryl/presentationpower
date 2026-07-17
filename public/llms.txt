@@ -1,0 +1,21 @@
+# BrandHub
+
+> AI-powered brand management platform for creating and maintaining living brand guides — with cultural intelligence, localization (GlobalLink), competitive analysis, and AI-assisted creative tooling.
+
+BrandHub helps organizations centralize brand identity (logos, colors, typography, voice, imagery), publish interactive guides for products and events, and apply AI to keep brand assets compliant, culturally aware, and consistent across regions.
+
+## Pages
+
+- [Home](/): Platform overview and entry point.
+- [About](/about): What BrandHub is and who it's for.
+- [Contact](/contact): Get in touch with the BrandHub team.
+- [Help Center](/help): Step-by-step guides for using BrandHub.
+- [Knowledge Base](/knowledge): Articles on brand strategy and platform features.
+- [Imagery Hub](/imagery-hub): Centralized brand imagery management.
+- [Hero Effects](/hero-effects): Visual hero background gallery.
+- [Brand Export Schema](/docs/brand-export-schema): Reference for the brand export format.
+- [Sitemap](/sitemap): Full list of public routes.
+
+## Optional
+
+- [Sign In](/auth): Authentication for organization members.

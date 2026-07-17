@@ -1,0 +1,80 @@
+TransPerfect NEXT 2026 — Division color palette
+============================================================
+
+TransPerfect
+  HEX      : #13B1F3
+  RGB      : 19, 177, 243
+  CMYK     : 92, 27, 0, 5
+  HSV      : 198°, 92%, 95%
+  Pantone  : 306 C
+
+Games
+  HEX      : #A6FA87
+  RGB      : 166, 250, 135
+  CMYK     : 34, 0, 46, 2
+  HSV      : 104°, 46%, 98%
+  Pantone  : 7487 C
+
+GlobalLink
+  HEX      : #13B1F3
+  RGB      : 19, 177, 243
+  CMYK     : 92, 27, 0, 5
+  HSV      : 198°, 92%, 95%
+  Pantone  : 306 C
+
+Finance
+  HEX      : #FF9B70
+  RGB      : 255, 155, 112
+  CMYK     : 0, 39, 56, 0
+  HSV      : 18°, 56%, 100%
+  Pantone  : 1635 C
+
+Legal
+  HEX      : #3BBEB6
+  RGB      : 59, 190, 182
+  CMYK     : 69, 0, 4, 25
+  HSV      : 176°, 69%, 75%
+  Pantone  : 7465 C
+
+Life Sci
+  HEX      : #58ED21
+  RGB      : 88, 237, 33
+  CMYK     : 63, 0, 86, 7
+  HSV      : 104°, 86%, 93%
+  Pantone  : 802 C
+
+Experience
+  HEX      : #FF5757
+  RGB      : 255, 87, 87
+  CMYK     : 0, 66, 66, 0
+  HSV      : 0°, 66%, 100%
+  Pantone  : 1785 C
+
+Learn
+  HEX      : #FFEB66
+  RGB      : 255, 235, 102
+  CMYK     : 0, 8, 60, 0
+  HSV      : 52°, 60%, 100%
+  Pantone  : 100 C
+
+Media
+  HEX      : #EC388A
+  RGB      : 236, 56, 138
+  CMYK     : 0, 76, 42, 7
+  HSV      : 333°, 76%, 93%
+  Pantone  : 205 C
+
+Digital
+  HEX      : #C2A3FF
+  RGB      : 194, 163, 255
+  CMYK     : 24, 36, 0, 0
+  HSV      : 260°, 36%, 100%
+  Pantone  : 2645 C
+
+Dataforce
+  HEX      : #5CE1E6
+  RGB      : 92, 225, 230
+  CMYK     : 60, 2, 0, 10
+  HSV      : 182°, 60%, 90%
+  Pantone  : 3105 C
+

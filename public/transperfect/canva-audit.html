@@ -1,0 +1,2363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canva Master Registry + Audit — TransPerfect</title>
+<style>
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0B1628;color:#E8EDF8;font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;min-height:100vh}
+.header{background:linear-gradient(135deg,#0B1628 0%,#0E2240 60%,#091830 100%);border-bottom:1px solid #1E3050;padding:32px 40px 28px;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;top:-40px;right:-40px;width:280px;height:280px;border:36px solid #00C2C7;opacity:.05;transform:rotate(15deg)}
+.header::after{content:'';position:absolute;bottom:-60px;left:180px;width:220px;height:220px;border:28px solid #00C2C7;opacity:.03;transform:rotate(45deg)}
+.eyebrow{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#00C2C7;margin-bottom:8px}
+.title{font-size:28px;font-weight:800;color:#fff;letter-spacing:-.5px}
+.title span{color:#00C2C7}
+.meta-row{display:flex;gap:24px;margin-top:12px;flex-wrap:wrap}
+.meta-item{font-size:12px;color:#7A8BAA}
+.meta-item strong{color:#C8D8F0}
+.stats{display:flex;gap:16px;margin-top:20px;flex-wrap:wrap}
+.stat{background:#122040;border:1px solid #1E3050;border-radius:6px;padding:10px 18px;text-align:center;min-width:90px}
+.stat-num{font-size:22px;font-weight:800;color:#00C2C7;display:block}
+.stat-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#7A8BAA;margin-top:2px}
+.controls{padding:16px 40px;background:#0E1E35;border-bottom:1px solid #1E3050;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:200px}
+.search-wrap input{width:100%;background:#091525;border:1px solid #1E3050;border-radius:4px;padding:8px 12px 8px 34px;color:#E8EDF8;font-size:12px;outline:none}
+.search-wrap input:focus{border-color:#00C2C7}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#7A8BAA;font-size:14px}
+select{background:#091525;border:1px solid #1E3050;border-radius:4px;padding:8px 10px;color:#E8EDF8;font-size:12px;outline:none;cursor:pointer}
+select:focus{border-color:#00C2C7}
+select optgroup{color:#7A8BAA;font-size:10px;letter-spacing:1px}
+select option{color:#E8EDF8;background:#091525}
+.export-btn{background:transparent;border:1px solid #1E3050;border-radius:4px;padding:8px 14px;color:#7A8BAA;font-size:12px;cursor:pointer;white-space:nowrap}
+.export-btn:hover{border-color:#00C2C7;color:#00C2C7}
+.progress-bar-wrap{height:3px;background:#1E3050}
+.progress-bar{height:3px;background:#00C2C7;transition:width .3s ease}
+.section-header{padding:10px 40px;background:#0D1A30;border-bottom:1px solid #1E3050;border-top:1px solid #1E3050;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.section-name{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#00C2C7;font-weight:700}
+.section-count{font-size:11px;color:#7A8BAA;background:#122040;border-radius:10px;padding:2px 8px}
+table{width:100%;border-collapse:collapse}
+th{padding:9px 12px;text-align:left;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#7A8BAA;background:#0E1E35;border-bottom:1px solid #1E3050;white-space:nowrap;position:sticky;top:36px;z-index:9}
+th[onclick]:hover{color:#C8D8F0;background:#122040}
+td{padding:9px 12px;border-bottom:1px solid #111E32;vertical-align:middle}
+tr:nth-child(even) td{background:#0D1A2E}
+tr:hover td{background:#122040}
+.template-name{color:#C8D8F0;font-weight:500;font-size:12px;line-height:1.4}
+.template-id{font-family:'Courier New',monospace;font-size:10px;color:#7A8BAA;letter-spacing:.3px}
+.size-badge{display:inline-block;background:#0E2A1A;border:1px solid #0F4A2A;border-radius:3px;padding:2px 6px;font-size:10px;color:#4AE090;font-family:'Courier New',monospace;white-space:nowrap}
+.pages-badge{display:inline-block;background:#1A1A0E;border:1px solid #3A3A0E;border-radius:3px;padding:2px 6px;font-size:10px;color:#C2C240}
+.link-btn{display:inline-flex;align-items:center;gap:4px;background:#122040;border:1px solid #1E3050;border-radius:3px;padding:3px 8px;font-size:10px;color:#00C2C7;text-decoration:none;white-space:nowrap}
+.link-btn:hover{background:#1E3050;border-color:#00C2C7}
+.date-text{font-size:11px;color:#7A8BAA;white-space:nowrap}
+.pending{color:#3A4A60;font-size:11px}
+.fetching-anim{color:#00C2C7;font-size:11px}
+.error-text{color:#E74C3C;font-size:11px}
+.status-bar{padding:8px 40px;background:#091525;border-bottom:1px solid #1E3050;font-size:11px;color:#7A8BAA;display:flex;align-items:center;gap:8px}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#1E3050;flex-shrink:0}
+.status-dot.active{background:#00C2C7;animation:pulse 1.2s infinite}
+.status-dot.done{background:#4AE090}
+.status-dot.err{background:#E74C3C}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.empty-state{padding:40px;text-align:center;color:#7A8BAA}
+.brand-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+
+
+/* ---- combined shell ---- */
+.topbar{position:sticky;top:0;z-index:50;background:#091830;border-bottom:1px solid #1E3050;
+  display:flex;align-items:center;gap:18px;padding:12px 40px;flex-wrap:wrap}
+.topbar .brand{font-size:13px;font-weight:800;color:#fff;letter-spacing:-.2px}
+.topbar .brand span{color:#00C2C7}
+.tabs{display:flex;gap:6px;margin-left:6px}
+.tab{background:#122040;border:1px solid #1E3050;border-radius:5px;padding:7px 16px;color:#7A8BAA;
+  font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.tab:hover{color:#C8D8F0;border-color:#2A4060}
+.tab.active{background:#00C2C7;border-color:#00C2C7;color:#06283A}
+.usebtn{margin-left:auto;background:transparent;border:1px solid #1E3050;border-radius:5px;
+  padding:7px 14px;color:#7A8BAA;font-size:12px;cursor:pointer}
+.usebtn:hover{border-color:#00C2C7;color:#00C2C7}
+.usehint{display:none;padding:14px 40px;background:#0B1F38;border-bottom:1px solid #1E3050;
+  font-size:12px;color:#A8B8D0;line-height:1.6}
+.usehint.open{display:block}
+.usehint b{color:#E8EDF8}
+.usehint .k{color:#00C2C7;font-weight:700}
+.view{display:none}
+.view.active{display:block}
+
+#view-audit a{color:inherit}
+#view-audit .header{background:linear-gradient(135deg,#0B1628 0%,#0E2240 60%,#091830 100%);border-bottom:1px solid #1E3050;padding:32px 40px 28px;position:relative;overflow:hidden}
+#view-audit .header::before{content:'';position:absolute;top:-40px;right:-40px;width:280px;height:280px;border:36px solid #00C2C7;opacity:.05;transform:rotate(15deg)}
+#view-audit .header::after{content:'';position:absolute;bottom:-60px;left:180px;width:220px;height:220px;border:28px solid #00C2C7;opacity:.03;transform:rotate(45deg)}
+#view-audit .eyebrow{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#00C2C7;margin-bottom:8px}
+#view-audit .title{font-size:28px;font-weight:800;color:#fff;letter-spacing:-.5px}
+#view-audit .title span{color:#00C2C7}
+#view-audit .meta-row{display:flex;gap:24px;margin-top:12px;flex-wrap:wrap}
+#view-audit .meta-item{font-size:12px;color:#7A8BAA}
+#view-audit .meta-item strong{color:#C8D8F0}
+#view-audit .stats{display:flex;gap:16px;margin-top:20px;flex-wrap:wrap}
+#view-audit .stat{background:#122040;border:1px solid #1E3050;border-radius:6px;padding:10px 18px;text-align:center;min-width:96px}
+#view-audit .stat-num{font-size:22px;font-weight:800;color:#00C2C7;display:block}
+#view-audit .stat-num.red{color:#E74C3C}
+#view-audit .stat-num.amber{color:#E8A040}
+#view-audit .stat-num.green{color:#4AE090}
+#view-audit .stat-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#7A8BAA;margin-top:2px}
+#view-audit .progress-bar-wrap{height:3px;background:#1E3050}
+#view-audit .progress-bar{height:3px;background:#00C2C7;width:100%}
+#view-audit /* health strip */
+.health{padding:12px 40px;background:#091525;border-bottom:1px solid #1E3050;display:flex;gap:26px;flex-wrap:wrap;align-items:center}
+#view-audit .health .lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#7A8BAA}
+#view-audit .chk{font-size:12px;color:#C8D8F0;display:inline-flex;align-items:center;gap:7px}
+#view-audit .chk .dot{width:8px;height:8px;border-radius:50%;background:#4AE090;display:inline-block}
+#view-audit .chk.warn .dot{background:#E8A040}
+#view-audit /* layout */
+.wrap{padding:0 40px}
+#view-audit .section-header{padding:11px 40px;margin:0 -40px;background:#0D1A30;border-bottom:1px solid #1E3050;border-top:1px solid #1E3050;display:flex;align-items:center;gap:10px}
+#view-audit .section-name{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#00C2C7;font-weight:700}
+#view-audit .section-sub{font-size:11px;color:#7A8BAA;margin-left:4px}
+#view-audit /* finding cards */
+.finding{background:#0D1A2E;border:1px solid #1E3050;border-radius:8px;padding:20px 22px;margin:18px 0}
+#view-audit .finding-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:6px}
+#view-audit .sev{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:3px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+#view-audit .sev.high{background:#2A0E12;border:1px solid #E74C3C;color:#E74C3C}
+#view-audit .sev.med{background:#241A0A;border:1px solid #E8A040;color:#E8A040}
+#view-audit .sev.low{background:#0E2238;border:1px solid #3A5070;color:#7FA0C8}
+#view-audit .finding-title{font-size:16px;font-weight:700;color:#fff;line-height:1.3}
+#view-audit .finding-count{font-size:11px;color:#7A8BAA;margin-top:2px}
+#view-audit .finding-body{color:#A8B8D0;font-size:13px;line-height:1.6;margin-top:8px}
+#view-audit .finding-body b{color:#E8EDF8;font-weight:600}
+#view-audit .rec{margin-top:14px;padding:11px 14px;background:#091525;border-left:3px solid #00C2C7;border-radius:0 4px 4px 0;font-size:12px;color:#C8D8F0;line-height:1.55}
+#view-audit .rec b{color:#00C2C7;font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-size:10px;display:block;margin-bottom:3px}
+#view-audit /* bars */
+.bars{margin-top:14px}
+#view-audit .bar-row{display:flex;align-items:center;gap:10px;margin:5px 0;font-size:12px}
+#view-audit .bar-label{width:170px;flex-shrink:0;color:#C8D8F0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#view-audit .bar-track{flex:1;background:#091525;border-radius:3px;height:18px;position:relative;overflow:hidden}
+#view-audit .bar-fill{height:100%;border-radius:3px;min-width:2px;transition:width .4s ease}
+#view-audit .bar-val{width:54px;flex-shrink:0;color:#7A8BAA;font-family:'Courier New',monospace;font-size:11px}
+#view-audit .bar-flag{color:#E74C3C;font-size:10px;margin-left:6px}
+#view-audit /* tables */
+table{width:100%;border-collapse:collapse;margin-top:14px}
+#view-audit th{padding:8px 12px;text-align:left;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#7A8BAA;background:#0E1E35;border-bottom:1px solid #1E3050;white-space:nowrap}
+#view-audit td{padding:8px 12px;border-bottom:1px solid #111E32;vertical-align:middle;font-size:12px;color:#C8D8F0}
+#view-audit tr:nth-child(even) td{background:#0B1626}
+#view-audit tr:hover td{background:#122040}
+#view-audit .template-id{font-family:'Courier New',monospace;font-size:10px;color:#7A8BAA}
+#view-audit .size-badge{display:inline-block;background:#0E2A1A;border:1px solid #0F4A2A;border-radius:3px;padding:2px 6px;font-size:10px;color:#4AE090;font-family:'Courier New',monospace;white-space:nowrap}
+#view-audit .tag{display:inline-block;font-size:9px;border-radius:2px;padding:2px 6px;white-space:nowrap}
+#view-audit .tag.redundant{background:#2A0E12;border:1px solid #5A2030;color:#E78090}
+#view-audit .tag.orphan{background:#241A0A;border:1px solid #5A4520;color:#E8C080}
+#view-audit .tag.move{background:#0E2A1A;border:1px solid #1F5A38;color:#4AE090}
+#view-audit .brand-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#C8D8F0}
+#view-audit .brand-pill .d{width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block}
+#view-audit .link-btn{display:inline-flex;align-items:center;gap:4px;background:#122040;border:1px solid #1E3050;border-radius:3px;padding:3px 8px;font-size:10px;color:#00C2C7;text-decoration:none;white-space:nowrap}
+#view-audit .link-btn:hover{background:#1E3050;border-color:#00C2C7}
+#view-audit /* roadmap */
+.road{counter-reset:step;margin-top:8px}
+#view-audit .road-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #111E32}
+#view-audit .road-num{counter-increment:step;flex-shrink:0;width:30px;height:30px;border-radius:50%;background:#122040;border:1px solid #00C2C7;color:#00C2C7;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
+#view-audit .road-num::before{content:counter(step)}
+#view-audit .road-main{flex:1}
+#view-audit .road-title{font-size:13px;font-weight:700;color:#fff}
+#view-audit .road-desc{font-size:12px;color:#8A9BB8;margin-top:3px;line-height:1.5}
+#view-audit .road-meta{display:flex;gap:8px;margin-top:7px;flex-wrap:wrap}
+#view-audit .chip{font-size:9px;letter-spacing:.5px;text-transform:uppercase;padding:3px 8px;border-radius:3px;border:1px solid #1E3050;color:#7A8BAA}
+#view-audit .chip.impact-hi{color:#4AE090;border-color:#1F5A38}
+#view-audit .chip.effort-lo{color:#7FA0C8;border-color:#2A4060}
+#view-audit .chip.effort-md{color:#E8A040;border-color:#5A4520}
+#view-audit .chip.touch{color:#C8D8F0;border-color:#2A3A50}
+#view-audit .footnote{padding:22px 40px 0;color:#56688A;font-size:11px;line-height:1.6}
+#view-audit .callout{display:inline-flex;align-items:center;gap:8px;background:#091525;border:1px solid #2A3A50;border-radius:5px;padding:8px 12px;margin-top:12px;font-size:12px;color:#C8D8F0}
+#view-audit .callout b{color:#E74C3C}
+
+/* ============================================================
+   LIGHT MODE OVERRIDES
+   Toggled by adding `.light-mode` to <body> (from parent frame).
+   Preserves teal accent (#00C2C7) and severity colors.
+   ============================================================ */
+body.light-mode{background:#F5F7FA;color:#1B2840}
+body.light-mode .header,
+body.light-mode #view-audit .header{background:linear-gradient(135deg,#FFFFFF 0%,#EEF3FA 60%,#E4ECF6 100%);border-bottom:1px solid #D8E0EC}
+body.light-mode .header::before,body.light-mode #view-audit .header::before{opacity:.08}
+body.light-mode .header::after,body.light-mode #view-audit .header::after{opacity:.05}
+body.light-mode .title,body.light-mode #view-audit .title,
+body.list-mode .topbar .brand,body.light-mode .topbar .brand{color:#0B1628}
+body.light-mode .title span,body.light-mode #view-audit .title span,body.light-mode .topbar .brand span{color:#008A8E}
+body.light-mode .eyebrow,body.light-mode #view-audit .eyebrow,
+body.light-mode .section-name,body.light-mode #view-audit .section-name{color:#008A8E}
+body.light-mode .meta-item,body.light-mode #view-audit .meta-item,
+body.light-mode .status-bar,body.light-mode .stat-label,body.light-mode #view-audit .stat-label,
+body.light-mode .section-count,body.light-mode .section-sub,body.light-mode #view-audit .section-sub,
+body.light-mode .date-text,body.light-mode .empty-state,
+body.light-mode .usehint,body.light-mode .health .lbl,body.light-mode #view-audit .health .lbl,
+body.light-mode .footnote,body.light-mode #view-audit .footnote,
+body.light-mode .finding-count,body.light-mode #view-audit .finding-count,
+body.light-mode .road-desc,body.light-mode #view-audit .road-desc,
+body.light-mode .chip,body.light-mode #view-audit .chip{color:#5A6B85}
+body.light-mode .meta-item strong,body.light-mode #view-audit .meta-item strong,
+body.light-mode .template-name,body.light-mode .chk,body.light-mode #view-audit .chk,
+body.light-mode .brand-pill,body.light-mode #view-audit .brand-pill,
+body.light-mode .road-title,body.light-mode #view-audit .road-title,
+body.light-mode .finding-title,body.light-mode #view-audit .finding-title,
+body.light-mode .usehint b,body.light-mode .chip.touch,body.light-mode #view-audit .chip.touch{color:#0B1628}
+body.light-mode .finding-body,body.light-mode #view-audit .finding-body{color:#3A4A65}
+body.light-mode .finding-body b,body.light-mode #view-audit .finding-body b{color:#0B1628}
+body.light-mode .rec,body.light-mode #view-audit .rec{background:#F0F8F8;color:#1B2840}
+body.light-mode .stat,body.light-mode #view-audit .stat,
+body.light-mode .finding,body.light-mode #view-audit .finding,
+body.light-mode .tab,body.light-mode .link-btn,body.light-mode #view-audit .link-btn,
+body.light-mode .road-num,body.light-mode #view-audit .road-num,
+body.light-mode .callout,body.light-mode #view-audit .callout{background:#FFFFFF;border-color:#D8E0EC}
+body.light-mode .stat-num,body.light-mode #view-audit .stat-num{color:#008A8E}
+body.light-mode .tab{color:#5A6B85}
+body.light-mode .tab:hover{color:#0B1628;border-color:#B8C4D6}
+body.light-mode .tab.active{background:#00C2C7;border-color:#00C2C7;color:#06283A}
+body.light-mode .usebtn,body.light-mode .export-btn{color:#5A6B85;border-color:#D8E0EC}
+body.light-mode .usebtn:hover,body.light-mode .export-btn:hover{color:#008A8E;border-color:#00C2C7}
+body.light-mode .controls,body.light-mode .topbar,body.light-mode .usehint,body.light-mode .status-bar,
+body.light-mode .health,body.light-mode #view-audit .health{background:#FFFFFF;border-color:#D8E0EC}
+body.light-mode .search-wrap input,body.light-mode select{background:#F5F7FA;border-color:#D8E0EC;color:#0B1628}
+body.light-mode select option{background:#FFFFFF;color:#0B1628}
+body.light-mode .search-icon{color:#5A6B85}
+body.light-mode .progress-bar-wrap,body.light-mode #view-audit .progress-bar-wrap{background:#E0E6F0}
+body.light-mode .section-header,body.light-mode #view-audit .section-header{background:#EEF3FA;border-color:#D8E0EC}
+body.light-mode th,body.light-mode #view-audit th{background:#F0F4F9;color:#5A6B85;border-color:#D8E0EC}
+body.light-mode td,body.light-mode #view-audit td{border-color:#E4E9F1;color:#1B2840}
+body.light-mode tr:nth-child(even) td,body.light-mode #view-audit tr:nth-child(even) td{background:#FAFBFD}
+body.light-mode tr:hover td,body.light-mode #view-audit tr:hover td{background:#EEF3FA}
+body.light-mode th[onclick]:hover{color:#0B1628;background:#E4ECF6}
+body.light-mode .template-id,body.light-mode #view-audit .template-id{color:#5A6B85}
+body.light-mode .link-btn{color:#008A8E}
+body.light-mode .link-btn:hover,body.light-mode #view-audit .link-btn:hover{background:#F0F8F8;border-color:#00C2C7}
+body.light-mode .pending{color:#A8B4C8}
+body.light-mode .bar-track,body.light-mode #view-audit .bar-track{background:#E4E9F1}
+body.light-mode .bar-label,body.light-mode #view-audit .bar-label{color:#1B2840}
+body.light-mode .bar-val,body.light-mode #view-audit .bar-val{color:#5A6B85}
+body.light-mode .sev.high,body.light-mode #view-audit .sev.high{background:#FDECEE;border-color:#E74C3C;color:#B83020}
+body.light-mode .sev.med,body.light-mode #view-audit .sev.med{background:#FBF1E0;border-color:#D88020;color:#8C5410}
+body.light-mode .sev.low,body.light-mode #view-audit .sev.low{background:#EEF3FA;border-color:#7FA0C8;color:#3A5070}
+body.light-mode .tag.redundant,body.light-mode #view-audit .tag.redundant{background:#FDECEE;border-color:#E78090;color:#B83020}
+body.light-mode .tag.orphan,body.light-mode #view-audit .tag.orphan{background:#FBF1E0;border-color:#C89A40;color:#8C5410}
+body.light-mode .tag.move,body.light-mode #view-audit .tag.move{background:#E8F7EE;border-color:#1F8050;color:#1F6038}
+body.light-mode .size-badge,body.light-mode #view-audit .size-badge{background:#E8F7EE;border-color:#1F8050;color:#1F6038}
+body.light-mode .pages-badge{background:#FBF6E0;border-color:#C8B040;color:#7A6810}
+body.light-mode .stat-num.red,body.light-mode #view-audit .stat-num.red{color:#C0341E}
+body.light-mode .stat-num.amber,body.light-mode #view-audit .stat-num.amber{color:#A06010}
+body.light-mode .stat-num.green,body.light-mode #view-audit .stat-num.green{color:#1F7040}
+body.light-mode .callout b,body.light-mode #view-audit .callout b{color:#C0341E}
+body.light-mode .chip.impact-hi,body.light-mode #view-audit .chip.impact-hi{color:#1F7040;border-color:#A6D6BA}
+body.light-mode .chip.effort-lo,body.light-mode #view-audit .chip.effort-lo{color:#3A5070;border-color:#B8C4D6}
+body.light-mode .chip.effort-md,body.light-mode #view-audit .chip.effort-md{color:#8C5410;border-color:#D8C49A}
+body.light-mode .status-dot{background:#D8E0EC}
+body.light-mode .road-item,body.light-mode #view-audit .road-item{border-color:#E4E9F1}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">TransPerfect · Canva <span>Master Registry + Audit</span></div>
+  <div class="tabs">
+    <button class="tab active" id="tab-registry" onclick="showView('registry')">Registry</button>
+    <button class="tab" id="tab-audit" onclick="showView('audit')">Audit Analysis</button>
+  </div>
+  <button class="usebtn" onclick="document.getElementById('usehint').classList.toggle('open')">How to use / share ▾</button>
+</div>
+<div class="usehint" id="usehint">
+  <b>Sharing this file:</b> this is a single self-contained HTML file — no install, no internet needed to view it.
+  Recipients just <span class="k">open it in any web browser</span> (Chrome, Edge, Safari) on desktop or mobile.
+  If double-clicking opens code instead of the page, right-click → <span class="k">Open With → a browser</span>.
+  Sharing via an intranet/SharePoint/Drive link is smoother than email, since some mail clients quarantine .html attachments.
+  <br><br>
+  <b>The “Open ↗” links</b> jump into Canva and require internet plus a Canva login with access to the TransPerfect
+  team templates — the registry itself displays for everyone, but only permitted users can open the designs behind the links.
+</div>
+
+
+<div id="view-registry" class="view active">
+
+
+<div class="header">
+  <div class="eyebrow">TransPerfect · Canva Team Account</div>
+  <div class="title">Master Template <span>Registry</span></div>
+  <div class="meta-row">
+    <div class="meta-item">Data compiled <strong>Jun 11, 2026</strong></div>
+    <div class="meta-item">Account <strong>TransPerfect Team</strong></div>
+    <div class="meta-item">Status <strong style="color:#4AE090">&#10003; Complete</strong></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="stat-num" id="stat-total">293</span><span class="stat-label">Templates</span></div>
+    <div class="stat"><span class="stat-num" style="color:#4AE090">293</span><span class="stat-label">Complete</span></div>
+    <div class="stat"><span class="stat-num">13</span><span class="stat-label">Brands</span></div>
+    <div class="stat"><span class="stat-num" id="stat-shown">293</span><span class="stat-label">Shown</span></div>
+  </div>
+</div>
+
+<div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
+
+<div class="controls">
+  <div class="search-wrap">
+    <span class="search-icon">&#128269;</span>
+    <input type="text" id="search-input" placeholder="Search templates, IDs, brands…" oninput="filterTable()">
+  </div>
+  <select id="brand-filter" onchange="filterTable()">
+    <option value="">All brands</option>
+    <option>C3 Summit</option>
+    <option>GLNEXT</option>
+    <option>Legal</option>
+    <option>Life Sciences</option>
+    <option>Media</option>
+    <option>Dataforce</option>
+    <option>Trial Interactive</option>
+    <option>TPI</option>
+    <option>TP Corporate</option>
+    <option>TP India</option>
+    <option>ISS</option>
+    <option>Games</option>
+    <option>General</option>
+  </select>
+  <select id="sort-select" onchange="filterTable()">
+    <optgroup label="── Grouping">
+      <option value="brand">Group by brand</option>
+      <option value="brand-az">Brand A → Z</option>
+      <option value="brand-za">Brand Z → A</option>
+      <option value="aspect">Group by aspect ratio</option>
+      <option value="assettype">Group by asset type</option>
+      <option value="year-created">Group by year created</option>
+      <option value="year-updated">Group by year updated</option>
+      <option value="copies">Group originals / copies</option>
+    </optgroup>
+    <optgroup label="── Name">
+      <option value="name-az">Name A → Z</option>
+      <option value="name-za">Name Z → A</option>
+    </optgroup>
+    <optgroup label="── Date">
+      <option value="created-new">Created: newest first</option>
+      <option value="created-old">Created: oldest first</option>
+      <option value="updated-new">Updated: newest first</option>
+      <option value="updated-old">Updated: oldest first</option>
+      <option value="age-old">Oldest templates first</option>
+    </optgroup>
+    <optgroup label="── Size">
+      <option value="pages-high">Pages: most first</option>
+      <option value="pages-low">Pages: fewest first</option>
+      <option value="width-high">Width: largest first</option>
+      <option value="width-low">Width: smallest first</option>
+    </optgroup>
+    <optgroup label="── Status">
+      <option value="fetched-first">Live data first</option>
+      <option value="pending-first">Pending fetch first</option>
+    </optgroup>
+    <optgroup label="── Multi-column">
+      <option value="brand-name">Brand → then Name A→Z</option>
+      <option value="brand-updated">Brand → then Updated newest</option>
+      <option value="brand-created">Brand → then Created newest</option>
+    </optgroup>
+  </select>
+  <button class="export-btn" onclick="exportCSV()">&#8595; Export CSV</button>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0">
+    <span style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#7A8BAA">Last updated</span>
+    <span style="font-size:12px;font-weight:600;color:#00C2C7">Jun 11, 2026</span>
+    <span style="width:6px;height:6px;border-radius:50%;background:#4AE090;display:inline-block" title="All size data complete"></span>
+  </div>
+</div>
+
+<div class="status-bar">
+  <div class="status-dot done" id="status-dot"></div>
+  <span id="status-text">293 templates · All sizes, pages &amp; edit links confirmed · TransPerfect Canva Team Account</span>
+</div>
+
+<div id="table-container"></div>
+
+
+</div>
+
+<div id="view-audit" class="view">
+
+<!-- Interactive summary + controls (populated by enhancement script) -->
+<div id="audit-summary" class="audit-summary"></div>
+<div id="audit-controls" class="audit-controls">
+  <div class="audit-search">
+    <span class="search-icon">&#128269;</span>
+    <input type="text" id="audit-search-input" placeholder="Search findings, recommendations, templates…">
+  </div>
+  <div class="audit-sev-chips" id="audit-sev-chips">
+    <button class="sev-chip active" data-sev="all">All <span class="sev-chip-count" data-count="all">·</span></button>
+    <button class="sev-chip" data-sev="high">High <span class="sev-chip-count" data-count="high">·</span></button>
+    <button class="sev-chip" data-sev="med">Medium <span class="sev-chip-count" data-count="med">·</span></button>
+    <button class="sev-chip" data-sev="low">Low <span class="sev-chip-count" data-count="low">·</span></button>
+  </div>
+  <button class="audit-collapse-btn" id="audit-collapse-toggle" type="button">Collapse all</button>
+</div>
+<div id="audit-empty" class="audit-empty" style="display:none">No findings match the current filter.</div>
+
+<div class="health">
+  <span class="lbl">Data integrity</span>
+  <span class="chk"><span class="dot"></span>0 duplicate template IDs</span>
+  <span class="chk"><span class="dot"></span>0 exact-duplicate titles</span>
+  <span class="chk"><span class="dot"></span>100% complete (size · pages · URL)</span>
+  <span class="chk warn"><span class="dot"></span>Issues are organizational, not data quality</span>
+</div>
+
+<div class="section-header"><span class="section-name">Findings</span><span class="section-sub">6 issues · ranked by cleanup value</span></div>
+<div class="wrap" id="findings"></div>
+
+<div class="section-header"><span class="section-name">Prioritized Cleanup Roadmap</span></div>
+<div class="wrap"><div class="road" id="roadmap"></div></div>
+
+<div class="footnote" id="footnote"></div>
+
+
+</div>
+
+<script>
+const TEMPLATES = [
+  {brand:"C3 Summit",id:"EAGmDYVfY1c",title:"C3 Speakers_LinkedIn",created:1737246599,updated:1771521108,w:1600,h:837,pages:2,createUrl:"https://www.canva.com/design?create=true&template=EAGmDYVfY1c"},
+  {brand:"C3 Summit",id:"EAGmDZMNBjQ",title:"C3 Summit LI Banner",created:1669650358,updated:1745967313,w:1200,h:627,pages:2,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZMNBjQ"},
+  {brand:"C3 Summit",id:"EAGmDRTncNM",title:"C3 Agenda 2024",created:1702341945,updated:1745967323,w:794,h:1123,pages:1,createUrl:"https://www.canva.com/design?create=true&template=EAGmDRTncNM"},
+  {brand:"C3 Summit",id:"EAGmDZghuok",title:"C3 AO Posts",created:1702355010,updated:1745967369,w:1600,h:837,pages:2,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZghuok"},
+  {brand:"C3 Summit",id:"EAGmDW4dP-s",title:"C3 LI Post",created:1702352186,updated:1745966939,w:1600,h:837,pages:1,createUrl:"https://www.canva.com/design?create=true&template=EAGmDW4dP-s"},
+  {brand:"C3 Summit",id:"EAGmDRLj860",title:"C3 IG Post",created:1702341942,updated:1745966803,w:1080,h:1080,pages:1,createUrl:"https://www.canva.com/design?create=true&template=EAGmDRLj860"},
+  {brand:"C3 Summit",id:"EAGmDfNCjYg",title:"C3 LI Post Speakers",created:1702354603,updated:1745966856,w:1600,h:837,pages:1,createUrl:"https://www.canva.com/design?create=true&template=EAGmDfNCjYg"},
+  {brand:"GLNEXT",id:"EAHDGIq1eP8",title:"GLNEXT 26 Social Templates",created:1772728032,updated:1773670129,createUrl:"https://www.canva.com/design?create=true&template=EAHDGIq1eP8",w:1200,h:628,pages:39},
+  {brand:"GLNEXT",id:"EAHEIkFIdEE",title:"GLNEXT Social Templates",created:1773684107,updated:1773684213,createUrl:"https://www.canva.com/design?create=true&template=EAHEIkFIdEE",w:1200,h:628,pages:23},
+  {brand:"GLNEXT",id:"EAGmDa-PX9I",title:"GLNEXT 24 Social Templates",created:1711641222,updated:1745967405,createUrl:"https://www.canva.com/design?create=true&template=EAGmDa-PX9I",w:1200,h:628,pages:22},
+  {brand:"GLNEXT",id:"EAGmDc0e3X0",title:"GLNEXT 23 Social Templates",created:1689598184,updated:1745966936,createUrl:"https://www.canva.com/design?create=true&template=EAGmDc0e3X0",w:1200,h:628,pages:24},
+  {brand:"GLNEXT",id:"EAGmDaMMS_M",title:"GLNEXT 23 Social Templates (B)",created:1691424202,updated:1745966947,createUrl:"https://www.canva.com/design?create=true&template=EAGmDaMMS_M",w:1200,h:628,pages:12},
+  {brand:"GLNEXT",id:"EAGmDbIoucQ",title:"GLNEXT SF Quotes",created:1689598667,updated:1745966883,createUrl:"https://www.canva.com/design?create=true&template=EAGmDbIoucQ",w:1200,h:628,pages:1},
+  {brand:"GLNEXT",id:"EAGmDWpcjL8",title:"GLNEXT 570x570 NYC2024",created:1715115857,updated:1745967388,createUrl:"https://www.canva.com/design?create=true&template=EAGmDWpcjL8",w:570,h:570,pages:1},
+  {brand:"GLNEXT",id:"EAGmDQHhaXI",title:"GLNEXT USA Social Media Post",created:1692124993,updated:1745966865,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQHhaXI",w:1200,h:627,pages:1},
+  {brand:"GLNEXT",id:"EAGmDaNpy-Y",title:"GLNEXT EVENT Screens",created:1695247084,updated:1745967359,createUrl:"https://www.canva.com/design?create=true&template=EAGmDaNpy-Y",w:1920,h:1080,pages:10},
+  {brand:"GLNEXT",id:"EAHDGN52_Vs",title:"GL NEXT General Email Header Variations",created:1772728156,updated:1773683175,createUrl:"https://www.canva.com/design?create=true&template=EAHDGN52_Vs",w:2500,h:834,pages:15},
+  {brand:"GLNEXT",id:"EAHEIlUNd5M",title:"GL NEXT General Email Header Variations (B)",created:1773684284,updated:1773684352,createUrl:"https://www.canva.com/design?create=true&template=EAHEIlUNd5M",w:2500,h:834,pages:8},
+  {brand:"GLNEXT",id:"EAHDGMVAKZo",title:"GLNEXT 2026 Email Footer",created:1772728109,updated:1773323950,createUrl:"https://www.canva.com/design?create=true&template=EAHDGMVAKZo",w:800,h:250,pages:5},
+  {brand:"GLNEXT",id:"EAHEIqmyo1s",title:"GLNEXT Email Footers",created:1773684473,updated:1773684552,createUrl:"https://www.canva.com/design?create=true&template=EAHEIqmyo1s",w:800,h:250,pages:5},
+  {brand:"GLNEXT",id:"EAGmDVI-Ob4",title:"GLNEXT Email Footer NYC2024",created:1711054934,updated:1745967299,createUrl:"https://www.canva.com/design?create=true&template=EAGmDVI-Ob4",w:800,h:250,pages:2},
+  {brand:"GLNEXT",id:"EAGmDdYNdZo",title:"GLNEXT Email Footer",created:1687186847,updated:1745967346,createUrl:"https://www.canva.com/design?create=true&template=EAGmDdYNdZo",w:800,h:250,pages:3},
+  {brand:"GLNEXT",id:"EAHB_T6omP4",title:"Copy of GLNEXT Email Footer",created:1771707601,updated:1771707674,createUrl:"https://www.canva.com/design?create=true&template=EAHB_T6omP4",w:800,h:250,pages:3},
+  {brand:"GLNEXT",id:"EAGmDUjVPWg",title:"GLNEXT GL Homepage Banner",created:1690488273,updated:1745967012,createUrl:"https://www.canva.com/design?create=true&template=EAGmDUjVPWg",w:1500,h:600,pages:1},
+  {brand:"GLNEXT",id:"EAGmDQRYKrE",title:"GLNEXT USA Save The Date",created:1708550211,updated:1745966920,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQRYKrE",w:1200,h:627,pages:7},
+  {brand:"GLNEXT",id:"EAHDMZdJe3M",title:"GLNEXT USA Direct Mailer Post Card",created:1772816925,updated:1773333481,createUrl:"https://www.canva.com/design?create=true&template=EAHDMZdJe3M",w:528,h:408,pages:4},
+  {brand:"GLNEXT",id:"EAGmDcrF-sc",title:"GLNEXT USA Direct Mailer Post Card (B)",created:1722518439,updated:1745966907,createUrl:"https://www.canva.com/design?create=true&template=EAGmDcrF-sc",w:528,h:408,pages:2},
+  {brand:"GLNEXT",id:"EAGmDW2xDb8",title:"GLNEXT EMEA Direct Mailer Post Card",created:1691583459,updated:1745967376,createUrl:"https://www.canva.com/design?create=true&template=EAGmDW2xDb8",w:528,h:408,pages:2},
+  {brand:"GLNEXT",id:"EAGmDScY9CU",title:"GLNEXT 23 Blast Sections",created:1679674874,updated:1745967306,createUrl:"https://www.canva.com/design?create=true&template=EAGmDScY9CU",w:600,h:500,pages:2},
+  {brand:"GLNEXT",id:"EAGmDeGpsdw",title:"GLNEXT 24 NYC PPT Template",created:1711113967,updated:1745967284,createUrl:"https://www.canva.com/design?create=true&template=EAGmDeGpsdw",w:1920,h:1080,pages:14},
+  {brand:"GLNEXT",id:"EAHDGZoeSxM",title:"GLNEXT Sponsorship 26_USA",created:1772730747,updated:1772730853,createUrl:"https://www.canva.com/design?create=true&template=EAHDGZoeSxM",w:816,h:1056,pages:13},
+  {brand:"GLNEXT",id:"EAGmDZ9_OOQ",title:"GLNEXT Sponsorship 24_USA",created:1708351641,updated:1745967282,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZ9_OOQ",w:816,h:1056,pages:8},
+  {brand:"GLNEXT",id:"EAHMARZY8YQ",title:"CM GLNEXT Sponsorship 26_USA",created:1780938006,updated:1780938094,createUrl:"https://www.canva.com/design?create=true&template=EAHMARZY8YQ",w:816,h:1056,pages:15},
+  {brand:"GLNEXT",id:"EAHB_DEXvUo",title:"GLNEXT Client Session Recaps w/ QR Codes",created:1771707130,updated:1771707217,createUrl:"https://www.canva.com/design?create=true&template=EAHB_DEXvUo",w:816,h:1056,pages:6},
+  {brand:"GLNEXT",id:"EAHB_DF6H0E",title:"GL 25 Schedule Template (A4)",created:1771707306,updated:1771707374,createUrl:"https://www.canva.com/design?create=true&template=EAHB_DF6H0E",w:794,h:1123,pages:2},
+  {brand:"GLNEXT",id:"EAHDGqkSrh0",title:"GL NEXT App Homeimage",created:1772733768,updated:1772733831,createUrl:"https://www.canva.com/design?create=true&template=EAHDGqkSrh0",w:1080,h:3500,pages:1},
+  {brand:"GLNEXT",id:"EAGmDb2vy44",title:"GL NEXT App Homeimage (B)",created:1716583199,updated:1745966899,createUrl:"https://www.canva.com/design?create=true&template=EAGmDb2vy44",w:1080,h:3500,pages:1},
+  {brand:"GLNEXT",id:"EAGmDZzZPkA",title:"GLNEXT App 1025x500",created:1716581081,updated:1772734910,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZzZPkA",w:1025,h:500,pages:1},
+  {brand:"GLNEXT",id:"EAGmDb3_UAE",title:"GLNEXT App 1080x1920",created:1716580909,updated:1772734591,createUrl:"https://www.canva.com/design?create=true&template=EAGmDb3_UAE",w:1080,h:1920,pages:1},
+  {brand:"GLNEXT",id:"EAGmDSaF3EI",title:"GLNEXT App 1125x2036",created:1716581008,updated:1772734771,createUrl:"https://www.canva.com/design?create=true&template=EAGmDSaF3EI",w:1125,h:2036,pages:1},
+  {brand:"GLNEXT",id:"EAGmDaTuoYA",title:"GLNEXT App 1280x1920",created:1716580632,updated:1772734690,createUrl:"https://www.canva.com/design?create=true&template=EAGmDaTuoYA",w:1280,h:1920,pages:1},
+  {brand:"GLNEXT",id:"EAGmDWU6ixg",title:"GL NEXT App Icon",created:1726248299,updated:1772735061,createUrl:"https://www.canva.com/design?create=true&template=EAGmDWU6ixg",w:1024,h:1024,pages:4},
+  {brand:"GLNEXT",id:"EAHCJnSsSA0",title:"GL Next Ads",created:1771855895,updated:1771855996,createUrl:"https://www.canva.com/design?create=true&template=EAHCJnSsSA0",w:1024,h:1024,pages:16},
+  {brand:"GLNEXT",id:"EAGmDT2Vx_c",title:"GL Next Ads (B)",created:1716909783,updated:1745966764,createUrl:"https://www.canva.com/design?create=true&template=EAGmDT2Vx_c",w:1024,h:1024,pages:16},
+  {brand:"GLNEXT",id:"EAHDGLJMWe4",title:"GlobalLink Social Banners Square 2026",created:1772728229,updated:1773676171,createUrl:"https://www.canva.com/design?create=true&template=EAHDGLJMWe4",w:1200,h:1200,pages:21},
+  {brand:"GLNEXT",id:"EAHEIoWWt2o",title:"GlobalLink Social Banners Square",created:1773686922,updated:1773687016,createUrl:"https://www.canva.com/design?create=true&template=EAHEIoWWt2o",w:1200,h:1200,pages:13},
+  {brand:"GLNEXT",id:"EAGmDfMLu_k",title:"GlobalLink LinkedIn Banner Header",created:1730147379,updated:1745966805,createUrl:"https://www.canva.com/design?create=true&template=EAGmDfMLu_k",w:1584,h:396,pages:4},
+  {brand:"GLNEXT",id:"EAGmDcur_sw",title:"GlobalLink OH Social Posts",created:1728580667,updated:1745967411,createUrl:"https://www.canva.com/design?create=true&template=EAGmDcur_sw",w:1200,h:628,pages:6},
+  {brand:"GLNEXT",id:"EAGmDeltMVA",title:"GlobalLink G2 Organic Posts",created:1729188299,updated:1745967388,createUrl:"https://www.canva.com/design?create=true&template=EAGmDeltMVA",w:1200,h:628,pages:7},
+  {brand:"GLNEXT",id:"EAGmDfsD5nw",title:"GlobalLink Web Retailers Guide LinkedIn",created:1729624081,updated:1745966815,createUrl:"https://www.canva.com/design?create=true&template=EAGmDfsD5nw",w:1200,h:628,pages:7},
+  {brand:"GLNEXT",id:"EAGmDanvRhU",title:"GlobalLink Website Localization Playbook LinkedIn",created:1729886063,updated:1745966799,createUrl:"https://www.canva.com/design?create=true&template=EAGmDanvRhU",w:1200,h:628,pages:6},
+  {brand:"GLNEXT",id:"EAGmDddyQHs",title:"2024 GLNEXT Web Hero 2200x550",created:1725469479,updated:1745967272,createUrl:"https://www.canva.com/design?create=true&template=EAGmDddyQHs",w:2200,h:550,pages:2},
+  {brand:"GLNEXT",id:"EAGmDVaYmNc",title:"2024 GLNEXT Web Leaderboard 1200x200",created:1722518471,updated:1745967032,createUrl:"https://www.canva.com/design?create=true&template=EAGmDVaYmNc",w:1200,h:200,pages:5},
+  {brand:"Legal",id:"EAHK_ICqI-E",title:"TPLegal_CaseStudy_US",created:1779998712,updated:1781097154,createUrl:"https://www.canva.com/design?create=true&template=EAHK_ICqI-E",w:816,h:1056,pages:1},
+  {brand:"Legal",id:"EAGmDYohfsA",title:"TP Legal Blog Headers",created:1638812279,updated:1745967292,createUrl:"https://www.canva.com/design?create=true&template=EAGmDYohfsA",w:1200,h:627,pages:127},
+  {brand:"Legal",id:"EAGmDU1u2h4",title:"TP Legal Recruitment Drive Flyer 2024",created:1732728513,updated:1745966798,createUrl:"https://www.canva.com/design?create=true&template=EAGmDU1u2h4",w:816,h:1056,pages:2},
+  {brand:"Legal",id:"EAGpZ2OggXs",title:"TP Legal CLE Educational Program LI",created:1749051294,updated:1749683236,createUrl:"https://www.canva.com/design?create=true&template=EAGpZ2OggXs",w:1200,h:627,pages:2},
+  {brand:"Legal",id:"EAGpZ5lOQX0",title:"TP Legal CLE Educational Program AO",created:1749051427,updated:1749687904,createUrl:"https://www.canva.com/design?create=true&template=EAGpZ5lOQX0",w:1600,h:837,pages:2},
+  {brand:"Legal",id:"EAGmDdD-ew8",title:"TransPerfectLegal DinnerRSVPs",created:1724444866,updated:1745967422,createUrl:"https://www.canva.com/design?create=true&template=EAGmDdD-ew8",w:816,h:1056,pages:1},
+  {brand:"Legal",id:"EAGmDWPAaCk",title:"TransPerfectLegal CLE October24",created:1729608074,updated:1745966775,createUrl:"https://www.canva.com/design?create=true&template=EAGmDWPAaCk",w:816,h:1056,pages:2},
+  {brand:"Legal",id:"EAGmDRizM00",title:"CLE Flyer",created:1709657844,updated:1745967027,createUrl:"https://www.canva.com/design?create=true&template=EAGmDRizM00",w:816,h:1056,pages:9},
+  {brand:"Legal",id:"EAGmDRJ_s_4",title:"Free CLE Friday Assets Template",created:1668528026,updated:1745967246,createUrl:"https://www.canva.com/design?create=true&template=EAGmDRJ_s_4",w:1200,h:627,pages:2},
+  {brand:"Legal",id:"EAGmDYzRL7Y",title:"Animated Free CLE Friday Email Signature Banner",created:1671463858,updated:1745967367,createUrl:"https://www.canva.com/design?create=true&template=EAGmDYzRL7Y",w:600,h:150,pages:1},
+  {brand:"Legal",id:"EAGmDePxIGk",title:"Copy of Animated Free CLE Friday Email Sig Banner",created:1734689976,updated:1745967315,createUrl:"https://www.canva.com/design?create=true&template=EAGmDePxIGk",w:600,h:150,pages:1},
+  {brand:"Legal",id:"EAGmDRTdKHw",title:"Legal Tips",created:1695319927,updated:1745967302,createUrl:"https://www.canva.com/design?create=true&template=EAGmDRTdKHw",w:1080,h:1080,pages:1},
+  {brand:"Legal",id:"EAGmDW4_C1c",title:"(LinkedIn) Legal Tips",created:1695407913,updated:1745967339,createUrl:"https://www.canva.com/design?create=true&template=EAGmDW4_C1c",w:1200,h:628,pages:1},
+  {brand:"Legal",id:"EAGmDfk7VYU",title:"NYLJ Best of 300x250",created:1665581138,updated:1745967430,createUrl:"https://www.canva.com/design?create=true&template=EAGmDfk7VYU",w:300,h:250,pages:5},
+  {brand:"Legal",id:"EAGuBNrbFOI",title:"LegalNext Email Banners",created:1753303689,updated:1753303784,createUrl:"https://www.canva.com/design?create=true&template=EAGuBNrbFOI",w:2500,h:834,pages:5},
+  {brand:"Legal",id:"EAGrk0FLSX4",title:"LegalNext Social Wide 1200x627",created:1751054220,updated:1754585389,createUrl:"https://www.canva.com/design?create=true&template=EAGrk0FLSX4",w:1200,h:627,pages:21},
+  {brand:"Legal",id:"EAG_FCFd5k0",title:"LegalWeek 2026 Social LI",created:1769028963,updated:1769029057,createUrl:"https://www.canva.com/design?create=true&template=EAG_FCFd5k0",w:1200,h:1200,pages:9},
+  {brand:"Legal",id:"EAG_FDS6yx8",title:"LegalWeek2026 IG Stories",created:1769027396,updated:1769027488,createUrl:"https://www.canva.com/design?create=true&template=EAG_FDS6yx8",w:1080,h:1920,pages:7},
+  {brand:"Legal",id:"EAGmDYffbOI",title:"March Madness HH Invite",created:1644275105,updated:1745967243,createUrl:"https://www.canva.com/design?create=true&template=EAGmDYffbOI",w:1080,h:1080,pages:1},
+  {brand:"Legal",id:"EAGmDdxPdtc",title:"March Madness Generic HH Invite",created:1644509995,updated:1745967297,createUrl:"https://www.canva.com/design?create=true&template=EAGmDdxPdtc",w:1080,h:1080,pages:1},
+  {brand:"Life Sciences",id:"EAHK9lpLFxk",title:"LS Case Study Template V1",created:1779976918,updated:1779999425,createUrl:"https://www.canva.com/design?create=true&template=EAHK9lpLFxk",w:816,h:1056,pages:1},
+  {brand:"Life Sciences",id:"EAHK-v91PM0",title:"Life Sciences Case Study V2",created:1779992213,updated:1779999263,createUrl:"https://www.canva.com/design?create=true&template=EAHK-v91PM0",w:816,h:1056,pages:1},
+  {brand:"Life Sciences",id:"EAHK-byLabQ",title:"Life Sciences Case Study V2 (B)",created:1779990037,updated:1779990986,createUrl:"https://www.canva.com/design?create=true&template=EAHK-byLabQ",w:816,h:1056,pages:1},
+  {brand:"Life Sciences",id:"EAGmDVIXfAg",title:"TP Life Sciences Events / Webinars Templates",created:1683637324,updated:1745967365,createUrl:"https://www.canva.com/design?create=true&template=EAGmDVIXfAg",w:1200,h:628,pages:14},
+  {brand:"Life Sciences",id:"EAGmDU0sXes",title:"LifeSci Talks LinkedIn Template",created:1659565673,updated:1745966733,createUrl:"https://www.canva.com/design?create=true&template=EAGmDU0sXes",w:1200,h:627,pages:1},
+  {brand:"Life Sciences",id:"EAGmDbwsvFc",title:"Copy of LifeSci Talks LinkedIn Template",created:1683637507,updated:1745966980,createUrl:"https://www.canva.com/design?create=true&template=EAGmDbwsvFc",w:1200,h:627,pages:1},
+  {brand:"Life Sciences",id:"EAGmDSLDeuE",title:"LifeSci Talks Email Signature Template",created:1659566106,updated:1745967202,createUrl:"https://www.canva.com/design?create=true&template=EAGmDSLDeuE",w:800,h:200,pages:1},
+  {brand:"Life Sciences",id:"EAGmDa6CvPA",title:"LifeSci Spotlight Template",created:1654091835,updated:1745967337,createUrl:"https://www.canva.com/design?create=true&template=EAGmDa6CvPA",w:816,h:1056,pages:1},
+  {brand:"Life Sciences",id:"EAGmDafT1q8",title:"Webinar Announcement Dark [LifeSci]",created:1700083889,updated:1745967327,createUrl:"https://www.canva.com/design?create=true&template=EAGmDafT1q8",w:1600,h:837,pages:1},
+  {brand:"Life Sciences",id:"EAGmDdu4NbU",title:"Webinar Dark 2 Speakers [LifeSci]",created:1700506021,updated:1745967321,createUrl:"https://www.canva.com/design?create=true&template=EAGmDdu4NbU",w:1600,h:837,pages:1},
+  {brand:"Life Sciences",id:"EAGmDVkLk_w",title:"Webinar Dark 3 Speakers Square [LifeSci]",created:1706730255,updated:1745967335,createUrl:"https://www.canva.com/design?create=true&template=EAGmDVkLk_w",w:1080,h:1080,pages:1},
+  {brand:"Life Sciences",id:"EAGmDaE4XR4",title:"Webinar Dark 4 Speakers [LifeSci]",created:1700506942,updated:1745967310,createUrl:"https://www.canva.com/design?create=true&template=EAGmDaE4XR4",w:1600,h:837,pages:1},
+  {brand:"Life Sciences",id:"EAGmDZXm3VY",title:"Webinar Light 3 Speakers [LifeSci]",created:1700086837,updated:1745966889,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZXm3VY",w:1600,h:837,pages:1},
+  {brand:"Life Sciences",id:"EAGmDY5zfpw",title:"Webinar Light 5 Speakers [LifeSci]",created:1700506278,updated:1745967214,createUrl:"https://www.canva.com/design?create=true&template=EAGmDY5zfpw",w:1600,h:837,pages:1},
+  {brand:"Life Sciences",id:"EAGmDeqhwtw",title:"Testimonial Dark [LifeSci]",created:1700084485,updated:1745966736,createUrl:"https://www.canva.com/design?create=true&template=EAGmDeqhwtw",w:1600,h:837,pages:1},
+  {brand:"Life Sciences",id:"EAGmDcofif4",title:"Testimonial Light [LifeSci]",created:1700084485,updated:1745966916,createUrl:"https://www.canva.com/design?create=true&template=EAGmDcofif4",w:1600,h:837,pages:1},
+  {brand:"Life Sciences",id:"EAGmDSd9TNQ",title:"Fun Facts Light [LifeSci]",created:1700086516,updated:1745967252,createUrl:"https://www.canva.com/design?create=true&template=EAGmDSd9TNQ",w:1600,h:837,pages:1},
+  {brand:"Life Sciences",id:"EAGmDTUGWa4",title:"Poll Question [LifeSci]",created:1700082947,updated:1745967345,createUrl:"https://www.canva.com/design?create=true&template=EAGmDTUGWa4",w:1600,h:837,pages:2},
+  {brand:"Life Sciences",id:"EAGmDQ9ygmw",title:"Poll Question 2 [LifeSci]",created:1700083356,updated:1745967330,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQ9ygmw",w:1600,h:837,pages:2},
+  {brand:"Life Sciences",id:"EAGmDRwsuKY",title:"Holiday [LifeSci]",created:1700084483,updated:1745966937,createUrl:"https://www.canva.com/design?create=true&template=EAGmDRwsuKY",w:1600,h:837,pages:3},
+  {brand:"Life Sciences",id:"EAGmDa99yM4",title:"Solutions 1 [LifeSci]",created:1700084490,updated:1745967205,createUrl:"https://www.canva.com/design?create=true&template=EAGmDa99yM4",w:1600,h:837,pages:2},
+  {brand:"Media",id:"EAHK-2GEjLY",title:"TPMedia_eBro",created:1779996976,updated:1780059188,createUrl:"https://www.canva.com/design?create=true&template=EAHK-2GEjLY",w:816,h:1056,pages:1},
+  {brand:"Media",id:"EAHMLV89_OU",title:"TransPerfect Media PPT 1 2025",created:1781099191,updated:1781099301,pages:49,createUrl:"https://www.canva.com/design?create=true&template=EAHMLV89_OU",w:1920,h:1080},
+  {brand:"Media",id:"EAGmDUXUCLs",title:"Event Speaker Landing Page Banner [TP Media]",created:1741305537,updated:1745966837,createUrl:"https://www.canva.com/design?create=true&template=EAGmDUXUCLs",w:2535,h:637,pages:13},
+  {brand:"Media",id:"EAGmDfwhMNA",title:"Event Speaker Landing Page Banner 6912x3456 [TP Media]",created:1736969310,updated:1745967020,createUrl:"https://www.canva.com/design?create=true&template=EAGmDfwhMNA",w:6912,h:3456,pages:9},
+  {brand:"Media",id:"EAGmDbodhqQ",title:"Event Speaker Social Posts [TP Media]",created:1736969352,updated:1745967008,createUrl:"https://www.canva.com/design?create=true&template=EAGmDbodhqQ",w:1440,h:1440,pages:14},
+  {brand:"Media",id:"EAGmDXb84j4",title:"1 Upcoming Events V1 [TP Media]",created:1697477215,updated:1745967264,createUrl:"https://www.canva.com/design?create=true&template=EAGmDXb84j4",w:1400,h:1400,pages:1},
+  {brand:"Media",id:"EAGmDWEmn5A",title:"1 Upcoming Events V2 [TP Media]",created:1697477220,updated:1745966724,createUrl:"https://www.canva.com/design?create=true&template=EAGmDWEmn5A",w:1400,h:1400,pages:2},
+  {brand:"Media",id:"EAGmDf6iznI",title:"3 Upcoming Events V1 [TP Media]",created:1697477155,updated:1745966966,createUrl:"https://www.canva.com/design?create=true&template=EAGmDf6iznI",w:1400,h:1400,pages:1},
+  {brand:"Media",id:"EAGmDVMEvpA",title:"3 Upcoming Events V3 [TP Media]",created:1697476980,updated:1745966817,createUrl:"https://www.canva.com/design?create=true&template=EAGmDVMEvpA",w:1400,h:1400,pages:1},
+  {brand:"Media",id:"EAGmDSwhRb4",title:"Agency Highlight 1 [TP Media]",created:1697477410,updated:1745967340,createUrl:"https://www.canva.com/design?create=true&template=EAGmDSwhRb4",w:1440,h:1440,pages:1},
+  {brand:"Media",id:"EAGmDQa0Hhw",title:"Holiday Blue [TP Media]",created:1697477271,updated:1745967246,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQa0Hhw",w:1440,h:1440,pages:1},
+  {brand:"Media",id:"EAGmDftX3NQ",title:"Picture with Text Yellow [TP Media]",created:1697477872,updated:1745967292,createUrl:"https://www.canva.com/design?create=true&template=EAGmDftX3NQ",w:1440,h:1440,pages:1},
+  {brand:"Media",id:"EAGmDRV7JfQ",title:"Services Yellow [TP Media]",created:1697477540,updated:1745966974,createUrl:"https://www.canva.com/design?create=true&template=EAGmDRV7JfQ",w:1440,h:1440,pages:1},
+  {brand:"Media",id:"EAGmDbCIluE",title:"Competition Question 2 [TP Media]",created:1697477493,updated:1745966965,createUrl:"https://www.canva.com/design?create=true&template=EAGmDbCIluE",w:1440,h:1440,pages:1},
+  {brand:"Media",id:"EAGt1NTGUV4",title:"TP Media IBC AMS Email Banner",created:1753130824,updated:1753130893,createUrl:"https://www.canva.com/design?create=true&template=EAGt1NTGUV4",w:650,h:150,pages:2},
+  {brand:"Media",id:"EAGzcfAW7H4",title:"Media Templates (ISA) 2",created:1758304773,updated:1758304855,createUrl:"https://www.canva.com/design?create=true&template=EAGzcfAW7H4",w:1080,h:1350,pages:18},
+  {brand:"Dataforce",id:"EAGmDfNi57k",title:"Case Study Quote 1 [DATAFORCE]",created:1704149063,updated:1745967402,createUrl:"https://www.canva.com/design?create=true&template=EAGmDfNi57k",w:1080,h:1080,pages:1},
+  {brand:"Dataforce",id:"EAGmDTG2yNc",title:"Case Study Quote 2 [DATAFORCE]",created:1704149142,updated:1745966784,createUrl:"https://www.canva.com/design?create=true&template=EAGmDTG2yNc",w:1080,h:1080,pages:1},
+  {brand:"Dataforce",id:"EAGmDS8LVLY",title:"Challenge/Solution [DATAFORCE]",created:1704149065,updated:1745966887,createUrl:"https://www.canva.com/design?create=true&template=EAGmDS8LVLY",w:1080,h:1080,pages:2},
+  {brand:"Dataforce",id:"EAGmDQ2ICoc",title:"News/Announcements 2 [DATAFORCE]",created:1704149721,updated:1745966864,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQ2ICoc",w:1080,h:1080,pages:1},
+  {brand:"Dataforce",id:"EAGmDajvcFI",title:"Solutions Highlight 2 [DATAFORCE]",created:1704148381,updated:1745966696,createUrl:"https://www.canva.com/design?create=true&template=EAGmDajvcFI",w:1440,h:1440,pages:1},
+  {brand:"Dataforce",id:"EAGmDR0HhhA",title:"Event [DATAFORCE]",created:1704149117,updated:1745967252,createUrl:"https://www.canva.com/design?create=true&template=EAGmDR0HhhA",w:1080,h:1080,pages:1},
+  {brand:"Dataforce",id:"EAGmDXDNacs",title:"HOLIDAY 2 [DATAFORCE]",created:1704149108,updated:1745967248,createUrl:"https://www.canva.com/design?create=true&template=EAGmDXDNacs",w:1080,h:1080,pages:1},
+  {brand:"Dataforce",id:"EAGmDcgAb0Q",title:"Meta B2C Ad 1440x2560 [Dataforce]",created:1737664618,updated:1745967440,createUrl:"https://www.canva.com/design?create=true&template=EAGmDcgAb0Q",w:1440,h:2560,pages:5},
+  {brand:"Dataforce",id:"EAGmDRodzmk",title:"Meta B2C Ad 1440x1440 [Dataforce]",created:1737664483,updated:1745966804,createUrl:"https://www.canva.com/design?create=true&template=EAGmDRodzmk",w:1440,h:1440,pages:5},
+  {brand:"Dataforce",id:"EAHA67dCRt8",title:"Copy of Meta B2C Ad 1440x1440 [Dataforce]",created:1770721651,updated:1770721740,createUrl:"https://www.canva.com/design?create=true&template=EAHA67dCRt8",w:1440,h:1440,pages:5},
+  {brand:"Dataforce",id:"EAGmDc5vFpE",title:"Google B2C Ad 1200x628 [Dataforce]",created:1737664651,updated:1745967403,createUrl:"https://www.canva.com/design?create=true&template=EAGmDc5vFpE",w:1200,h:628,pages:4},
+  {brand:"Dataforce",id:"EAGmDUYcnaE",title:"Google B2C Ad 1200x1500 [Dataforce]",created:1737664718,updated:1745966816,createUrl:"https://www.canva.com/design?create=true&template=EAGmDUYcnaE",w:1200,h:1500,pages:6},
+  {brand:"Dataforce",id:"EAGmDXN-63Q",title:"Join Our Network Carousel Ad [DataForce]",created:1740773834,updated:1745966946,createUrl:"https://www.canva.com/design?create=true&template=EAGmDXN-63Q",w:1200,h:1200,pages:4},
+  {brand:"Dataforce",id:"EAGmDZLUn6I",title:"Copy of DATAFORCE B2C JOBS Instagram Post",created:1680183618,updated:1745966794,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZLUn6I",w:1080,h:1080,pages:1},
+  {brand:"Dataforce",id:"EAGmDR4A2lU",title:"DataForceSpotlight",created:1653397062,updated:1745967209,createUrl:"https://www.canva.com/design?create=true&template=EAGmDR4A2lU",w:816,h:1056,pages:1},
+  {brand:"Dataforce",id:"EAGmDTlzunU",title:"DATAFORCE B2C JOBS2 Facebook Landscape",created:1680633557,updated:1745967304,createUrl:"https://www.canva.com/design?create=true&template=EAGmDTlzunU",w:940,h:788,pages:1},
+  {brand:"Dataforce",id:"EAGmDUppSio",title:"DATAFORCE B2C CHALLENGE Facebook Landscape",created:1680635251,updated:1745967385,createUrl:"https://www.canva.com/design?create=true&template=EAGmDUppSio",w:940,h:788,pages:1},
+  {brand:"Dataforce",id:"EAGmDcHm-3c",title:"Copy of DATAFORCE B2C WHAT DAY IS IT Facebook",created:1680190891,updated:1745967335,createUrl:"https://www.canva.com/design?create=true&template=EAGmDcHm-3c",w:940,h:788,pages:1},
+  {brand:"Dataforce",id:"EAGmDdo_rkI",title:"Copy of DATAFORCE B2C DF WORLD Facebook",created:1680190477,updated:1745967350,createUrl:"https://www.canva.com/design?create=true&template=EAGmDdo_rkI",w:940,h:788,pages:1},
+  {brand:"Dataforce",id:"EAGmDT34Aw8",title:"DATAFORCE B2C FACT Facebook Landscape",created:1680190652,updated:1745966934,createUrl:"https://www.canva.com/design?create=true&template=EAGmDT34Aw8",w:940,h:788,pages:1},
+  {brand:"Dataforce",id:"EAGmDfppS8w",title:"DATAFORCE B2C ITS ME Instagram Post",created:1680183623,updated:1745966712,createUrl:"https://www.canva.com/design?create=true&template=EAGmDfppS8w",w:1080,h:1080,pages:1},
+  {brand:"Trial Interactive",id:"EAHBn_dGV0E",title:"TI Service Snapshot Series",created:1771370570,updated:1771370664,createUrl:"https://www.canva.com/design?create=true&template=EAHBn_dGV0E",w:1080,h:1350,pages:8},
+  {brand:"Trial Interactive",id:"EAHAR7x8MmQ",title:"TI Customer Quotes Templates",created:1770132358,updated:1770132434,createUrl:"https://www.canva.com/design?create=true&template=EAHAR7x8MmQ",w:1600,h:837,pages:3},
+  {brand:"TPI",id:"EAGmDUEmSwE",title:"General Quote [TPi]",created:1683567484,updated:1748423083,createUrl:"https://www.canva.com/design?create=true&template=EAGmDUEmSwE",w:1080,h:1080,pages:1},
+  {brand:"TPI",id:"EAGmDTxW5gM",title:"General Quote 2 [TPI]",created:1683567496,updated:1748417455,createUrl:"https://www.canva.com/design?create=true&template=EAGmDTxW5gM",w:1080,h:1080,pages:1},
+  {brand:"TPI",id:"EAGmDQH85lk",title:"Collab 1 [TPI]",created:1682305368,updated:1768212634,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQH85lk",w:1080,h:1080,pages:1},
+  {brand:"TPI",id:"EAGmDT1KMRA",title:"Blog [TPI]",created:1697478386,updated:1748417331,createUrl:"https://www.canva.com/design?create=true&template=EAGmDT1KMRA",w:1080,h:1080,pages:1},
+  {brand:"TPI",id:"EAGmDeYZRJU",title:"Blog 2 [TPI]",created:1698246831,updated:1748422724,createUrl:"https://www.canva.com/design?create=true&template=EAGmDeYZRJU",w:1080,h:1080,pages:1},
+  {brand:"TPI",id:"EAGmDSAWGKk",title:"Services [TPI]",created:1683576780,updated:1748422653,createUrl:"https://www.canva.com/design?create=true&template=EAGmDSAWGKk",w:1080,h:1080,pages:4},
+  {brand:"TPI",id:"EAGmDZWz-j0",title:"Success Stories 1 [TPI]",created:1682300078,updated:1748423315,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZWz-j0",w:1080,h:1080,pages:2},
+  {brand:"TPI",id:"EAGmDf7lDuc",title:"Content Advertisement 2 [TPI]",created:1698772772,updated:1749553248,createUrl:"https://www.canva.com/design?create=true&template=EAGmDf7lDuc",w:1080,h:1080,pages:1},
+  {brand:"TPI",id:"EAGmDQldhmo",title:"Content Advertisement 3 [TPI]",created:1698772806,updated:1748422377,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQldhmo",w:1080,h:1080,pages:1},
+  {brand:"TPI",id:"EAGmDWhnrsk",title:"Extras Testimonials [TPI]",created:1682301636,updated:1748423230,createUrl:"https://www.canva.com/design?create=true&template=EAGmDWhnrsk",w:1080,h:1080,pages:1},
+  {brand:"TPI",id:"EAGmDcZd2AE",title:"Announcement TPI",created:1682303779,updated:1748423485,createUrl:"https://www.canva.com/design?create=true&template=EAGmDcZd2AE",w:1080,h:1080,pages:1},
+  {brand:"TP Corporate",id:"EAGmDcQe4eQ",title:"Static Case Studies FB+LI [TP Corporate]",created:1740624684,updated:1745967391,createUrl:"https://www.canva.com/design?create=true&template=EAGmDcQe4eQ",w:1200,h:1200,pages:3},
+  {brand:"TP Corporate",id:"EAGmDbuW-iw",title:"Static Case Studies Instagram [TP Corporate]",created:1745454200,updated:1745966996,createUrl:"https://www.canva.com/design?create=true&template=EAGmDbuW-iw",w:1080,h:1350,pages:3},
+  {brand:"TP Corporate",id:"EAGmDQx_VpA",title:"Static Case Studies Story [TP Corporate]",created:1745159439,updated:1745966985,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQx_VpA",w:1080,h:1920,pages:3},
+  {brand:"TP Corporate",id:"EAGmDUiUwHY",title:"Blogs/Articles FB+LI [TP Corporate]",created:1740007374,updated:1745967017,createUrl:"https://www.canva.com/design?create=true&template=EAGmDUiUwHY",w:1200,h:628,pages:3},
+  {brand:"TP Corporate",id:"EAGmDRWdJGw",title:"Webinars FB+LI [TP Corporate]",created:1740007918,updated:1745967022,createUrl:"https://www.canva.com/design?create=true&template=EAGmDRWdJGw",w:1200,h:628,pages:3},
+  {brand:"TP Corporate",id:"EAGmDS8w95Q",title:"Event Announcements FB+LI [TP Corporate]",created:1740007711,updated:1745966989,createUrl:"https://www.canva.com/design?create=true&template=EAGmDS8w95Q",w:1200,h:628,pages:3},
+  {brand:"TP Corporate",id:"EAGmDdomqss",title:"Post-Event FB+LI [TP Corporate]",created:1740008054,updated:1745967304,createUrl:"https://www.canva.com/design?create=true&template=EAGmDdomqss",w:1200,h:628,pages:3},
+  {brand:"TP Corporate",id:"EAGmDelQJE8",title:"Post-Event Instagram [TP Corporate]",created:1745454225,updated:1745966807,createUrl:"https://www.canva.com/design?create=true&template=EAGmDelQJE8",w:1080,h:1350,pages:3},
+  {brand:"TP Corporate",id:"EAGmDYHgLEo",title:"Post-Event Story [TP Corporate]",created:1745159467,updated:1745967419,createUrl:"https://www.canva.com/design?create=true&template=EAGmDYHgLEo",w:1080,h:1920,pages:3},
+  {brand:"TP Corporate",id:"EAGmDUAq6gQ",title:"Testimonials FB+LI [TP Corporate]",created:1740007938,updated:1745967445,createUrl:"https://www.canva.com/design?create=true&template=EAGmDUAq6gQ",w:1200,h:628,pages:3},
+  {brand:"TP Corporate",id:"EAGmDVV4y-8",title:"Infographics FB+LI [TP Corporate]",created:1740007504,updated:1745967398,createUrl:"https://www.canva.com/design?create=true&template=EAGmDVV4y-8",w:1200,h:628,pages:3},
+  {brand:"TP Corporate",id:"EAGmDcaT-jM",title:"SME FB+LI [TP Corporate]",created:1740624664,updated:1745966800,createUrl:"https://www.canva.com/design?create=true&template=EAGmDcaT-jM",w:1200,h:628,pages:3},
+  {brand:"TP Corporate",id:"EAGmDSWTPmQ",title:"Cultural Holidays FB+LI [TP Corporate]",created:1740007767,updated:1745966972,createUrl:"https://www.canva.com/design?create=true&template=EAGmDSWTPmQ",w:1200,h:628,pages:3},
+  {brand:"TP Corporate",id:"EAGmDZNxNaE",title:"Cultural Holidays Instagram [TP Corporate]",created:1745454183,updated:1745966959,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZNxNaE",w:1080,h:1350,pages:3},
+  {brand:"TP Corporate",id:"EAGmDfzAag8",title:"Cultural Holidays Story [TP Corporate]",created:1745159409,updated:1745966996,createUrl:"https://www.canva.com/design?create=true&template=EAGmDfzAag8",w:1080,h:1920,pages:3},
+  {brand:"TP Corporate",id:"EAGmDTEtu04",title:"Phil News FB+LI [TP Corporate]",created:1740007988,updated:1745966981,createUrl:"https://www.canva.com/design?create=true&template=EAGmDTEtu04",w:1200,h:628,pages:3},
+  {brand:"TP Corporate",id:"EAGmDQqrwjI",title:"Phil News Instagram [TP Corporate]",created:1745454148,updated:1745966785,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQqrwjI",w:1080,h:1350,pages:3},
+  {brand:"TP Corporate",id:"EAGmDfxDi6w",title:"Phil News Story [TP Corporate]",created:1745159460,updated:1745966978,createUrl:"https://www.canva.com/design?create=true&template=EAGmDfxDi6w",w:1080,h:1920,pages:3},
+  {brand:"TP Corporate",id:"EAGmDYZ3o8w",title:"Press Release Minimal FB+LI [TP Corporate]",created:1740007088,updated:1745966983,createUrl:"https://www.canva.com/design?create=true&template=EAGmDYZ3o8w",w:1200,h:628,pages:3},
+  {brand:"TP Corporate",id:"EAGmDSgea5A",title:"Press Release Minimal Instagram [TP Corporate]",created:1745454167,updated:1745966994,createUrl:"https://www.canva.com/design?create=true&template=EAGmDSgea5A",w:1080,h:1350,pages:3},
+  {brand:"TP Corporate",id:"EAGmDQaZeq8",title:"Press Release Minimal Story [TP Corporate]",created:1745159291,updated:1745967380,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQaZeq8",w:1080,h:1920,pages:3},
+  {brand:"TP Corporate",id:"EAGmDflAjIc",title:"Press Release Headshot Quote FB+LI [TP Corporate]",created:1740006911,updated:1745966816,createUrl:"https://www.canva.com/design?create=true&template=EAGmDflAjIc",w:1200,h:628,pages:3},
+  {brand:"TP Corporate",id:"EAGmDeVa0ew",title:"Press Release Headshot Quote Instagram [TP Corporate]",created:1745454164,updated:1745967016,createUrl:"https://www.canva.com/design?create=true&template=EAGmDeVa0ew",w:1080,h:1350,pages:3},
+  {brand:"TP Corporate",id:"EAGmDezsNfw",title:"Press Release Headshot Quote Story [TP Corporate]",created:1745159287,updated:1745966822,createUrl:"https://www.canva.com/design?create=true&template=EAGmDezsNfw",w:1080,h:1920,pages:3},
+  {brand:"TP Corporate",id:"EAGmDevDEBY",title:"Press Release Phil Quote FB+LI [TP Corporate]",created:1740006628,updated:1745967018,createUrl:"https://www.canva.com/design?create=true&template=EAGmDevDEBY",w:1200,h:628,pages:3},
+  {brand:"TP Corporate",id:"EAGmDZ_vABA",title:"Press Release Phil Quote Instagram [TP Corporate]",created:1745454152,updated:1745966957,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZ_vABA",w:1080,h:1350,pages:3},
+  {brand:"TP Corporate",id:"EAGmDQSjQPw",title:"Press Release Phil Quote Story [TP Corporate]",created:1745159276,updated:1745966967,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQSjQPw",w:1080,h:1920,pages:3},
+  {brand:"TP Corporate",id:"EAGmDUFqq2k",title:"Press Release Landscape FB+LI [TP Corporate]",created:1740006779,updated:1745967379,createUrl:"https://www.canva.com/design?create=true&template=EAGmDUFqq2k",w:1200,h:628,pages:3},
+  {brand:"TP Corporate",id:"EAGmDbYi9ww",title:"Press Release Landscape Instagram [TP Corporate]",created:1745454156,updated:1745966991,createUrl:"https://www.canva.com/design?create=true&template=EAGmDbYi9ww",w:1080,h:1350,pages:3},
+  {brand:"TP Corporate",id:"EAGmDUO4j6U",title:"Press Release Landscape Story [TP Corporate]",created:1745159280,updated:1745967431,createUrl:"https://www.canva.com/design?create=true&template=EAGmDUO4j6U",w:1080,h:1920,pages:3},
+  {brand:"TP Corporate",id:"EAGmDYXdlr8",title:"TPLY FB+LI [TP Corporate]",created:1740007178,updated:1745967387,createUrl:"https://www.canva.com/design?create=true&template=EAGmDYXdlr8",w:1200,h:628,pages:3},
+  {brand:"TP Corporate",id:"EAGmDcX-oeo",title:"TPLY Story [TP Corporate]",created:1745159310,updated:1745967356,createUrl:"https://www.canva.com/design?create=true&template=EAGmDcX-oeo",w:1080,h:1920,pages:3},
+  {brand:"TP Corporate",id:"EAGmDQuu0OQ",title:"TP60 FB+LI [TP Corporate]",created:1740007327,updated:1745966998,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQuu0OQ",w:1200,h:628,pages:3},
+  {brand:"TP India",id:"EAGmDc17qt4",title:"Office Culture Template TP India",created:1721924407,updated:1745967212,createUrl:"https://www.canva.com/design?create=true&template=EAGmDc17qt4",w:1080,h:1080,pages:1},
+  {brand:"TP India",id:"EAGmDd9mo0g",title:"Educational Content Templates TP India",created:1721924637,updated:1745967305,createUrl:"https://www.canva.com/design?create=true&template=EAGmDd9mo0g",w:1080,h:1080,pages:1},
+  {brand:"TP India",id:"EAGmDRmHrX8",title:"Infographic Templates TP India",created:1721924501,updated:1745967310,createUrl:"https://www.canva.com/design?create=true&template=EAGmDRmHrX8",w:1080,h:1080,pages:1},
+  {brand:"TP India",id:"EAGmDXp7dm8",title:"News/Updates Template TP India",created:1721924485,updated:1745967359,createUrl:"https://www.canva.com/design?create=true&template=EAGmDXp7dm8",w:1080,h:1080,pages:1},
+  {brand:"TP India",id:"EAGmDQ-QDxc",title:"Polls/Quizes Template TP India",created:1721924576,updated:1745967368,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQ-QDxc",w:1080,h:1080,pages:1},
+  {brand:"TP India",id:"EAGmDSyhwQ0",title:"Introduction Templates TP India",created:1721924376,updated:1745966958,createUrl:"https://www.canva.com/design?create=true&template=EAGmDSyhwQ0",w:1080,h:1080,pages:1},
+  {brand:"TP India",id:"EAGmDT95CSA",title:"Festive Celebrations Template TP India",created:1721924454,updated:1745967312,createUrl:"https://www.canva.com/design?create=true&template=EAGmDT95CSA",w:1080,h:1080,pages:1},
+  {brand:"TP India",id:"EAGmDd_5IHY",title:"Language of the Month TP India",created:1722438662,updated:1745966798,createUrl:"https://www.canva.com/design?create=true&template=EAGmDd_5IHY",w:1080,h:1080,pages:1},
+  {brand:"TP India",id:"EAGmDR5bE8I",title:"CSR Activity Showcase Templates TP India",created:1721924535,updated:1745967376,createUrl:"https://www.canva.com/design?create=true&template=EAGmDR5bE8I",w:1080,h:1080,pages:1},
+  {brand:"TP India",id:"EAGmDZ7MCCI",title:"Employee Profile Template TP India",created:1721924435,updated:1745966882,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZ7MCCI",w:1080,h:1080,pages:1},
+  {brand:"ISS",id:"EAHIQf0OqIo",title:"ISS Social Banners Square 2026",created:1777483131,updated:1777483244,createUrl:"https://www.canva.com/design?create=true&template=EAHIQf0OqIo",w:1200,h:1200,pages:21},
+  {brand:"ISS",id:"EAHIP4CsJbI",title:"ISS Sponsorship 26_USA",created:1777475500,updated:1777475619,createUrl:"https://www.canva.com/design?create=true&template=EAHIP4CsJbI",w:816,h:1056,pages:13},
+  {brand:"Games",id:"EAGmDVeXRYE",title:"GameTech Blue",created:1696611712,updated:1745967408,createUrl:"https://www.canva.com/design?create=true&template=EAGmDVeXRYE",w:1440,h:1440,pages:1},
+  {brand:"Games",id:"EAGmDdo4z8o",title:"GameTech Purple",created:1696607999,updated:1745967344,createUrl:"https://www.canva.com/design?create=true&template=EAGmDdo4z8o",w:1440,h:1440,pages:1},
+  {brand:"Games",id:"EAGmDblWYno",title:"GameTech Yellow",created:1696611709,updated:1745966926,createUrl:"https://www.canva.com/design?create=true&template=EAGmDblWYno",w:1440,h:1440,pages:1},
+  {brand:"Games",id:"EAGmDU6VSI4",title:"TP Gaming Banner",created:1715955787,updated:1745967291,createUrl:"https://www.canva.com/design?create=true&template=EAGmDU6VSI4",w:800,h:250,pages:1},
+  {brand:"General",id:"EAHK3V7qQ8k",title:"Document Case Study Overview",created:1779887657,updated:1779887723,createUrl:"https://www.canva.com/design?create=true&template=EAHK3V7qQ8k",w:816,h:1056,pages:1},
+  {brand:"General",id:"EAHK4yZKdO0",title:"Cutting Deployment Cycles 70% AI Code Translation",created:1779910057,updated:1779910126,createUrl:"https://www.canva.com/design?create=true&template=EAHK4yZKdO0",w:816,h:1056,pages:1},
+  {brand:"General",id:"EAGmDUjooYQ",title:"TP Exec Summit Bios Template",created:1726443604,updated:1745966896,createUrl:"https://www.canva.com/design?create=true&template=EAGmDUjooYQ",w:1200,h:627,pages:4},
+  {brand:"General",id:"EAGmDdjvGic",title:"Exec Summit Agenda Template",created:1642694505,updated:1745966716,createUrl:"https://www.canva.com/design?create=true&template=EAGmDdjvGic",w:794,h:1123,pages:2},
+  {brand:"General",id:"EAGmDeQnpZk",title:"Welcome Packet Template Small/Medium Meeting",created:1642683285,updated:1745967324,createUrl:"https://www.canva.com/design?create=true&template=EAGmDeQnpZk",w:794,h:1123,pages:3},
+  {brand:"General",id:"EAGmDdIff6s",title:"Employee Spotlight Templates",created:1637682318,updated:1745967016,createUrl:"https://www.canva.com/design?create=true&template=EAGmDdIff6s",w:1200,h:627,pages:4},
+  {brand:"General",id:"EAGmDeXDUlY",title:"New Hire Graphic",created:1733239270,updated:1745967000,createUrl:"https://www.canva.com/design?create=true&template=EAGmDeXDUlY",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDfwevno",title:"Webinar Headers",created:1716991065,updated:1745967462,createUrl:"https://www.canva.com/design?create=true&template=EAGmDfwevno",w:1200,h:627,pages:8},
+  {brand:"General",id:"EAGmDbR1Cbg",title:"Co-Branded Webinar Dark with Speakers",created:1700069792,updated:1745967381,createUrl:"https://www.canva.com/design?create=true&template=EAGmDbR1Cbg",w:1440,h:1440,pages:2},
+  {brand:"General",id:"EAGmDf5724w",title:"Copy of Webinar Dark 4 Speakers",created:1724871300,updated:1745967289,createUrl:"https://www.canva.com/design?create=true&template=EAGmDf5724w",w:1600,h:837,pages:1},
+  {brand:"General",id:"EAGmDejMze0",title:"Webinar Template 1 Instagram",created:1603981980,updated:1745966792,createUrl:"https://www.canva.com/design?create=true&template=EAGmDejMze0",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDeubhu4",title:"Webinar Template 1 LinkedIn",created:1604333131,updated:1745967268,createUrl:"https://www.canva.com/design?create=true&template=EAGmDeubhu4",w:1200,h:628,pages:1},
+  {brand:"General",id:"EAGmDdbc1TQ",title:"Webinar Template 1 Twitter",created:1604340372,updated:1745967365,createUrl:"https://www.canva.com/design?create=true&template=EAGmDdbc1TQ",w:1600,h:900,pages:1},
+  {brand:"General",id:"EAGmDeN89pY",title:"Case Study 1",created:1697484892,updated:1745967378,createUrl:"https://www.canva.com/design?create=true&template=EAGmDeN89pY",w:1440,h:1440,pages:2},
+  {brand:"General",id:"EAGmDev2YEU",title:"Case Study Teaser",created:1700070566,updated:1745967266,createUrl:"https://www.canva.com/design?create=true&template=EAGmDev2YEU",w:1440,h:1440,pages:1},
+  {brand:"General",id:"EAGmDUsjgbU",title:"Copy of Case Study Teaser",created:1744235056,updated:1745967354,createUrl:"https://www.canva.com/design?create=true&template=EAGmDUsjgbU",w:1440,h:1440,pages:1},
+  {brand:"General",id:"EAGmDZJJtRA",title:"Adobe Summit EMEA 2023 Social/Act On",created:1685019878,updated:1745967411,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZJJtRA",w:1200,h:628,pages:1},
+  {brand:"General",id:"EAGmDcvhd3c",title:"TransPerfect Live Banners",created:1739892664,updated:1745966998,createUrl:"https://www.canva.com/design?create=true&template=EAGmDcvhd3c",w:2160,h:4608,pages:4},
+  {brand:"General",id:"EAGmDQTOS1E",title:"TransPerfect Health and Safety Posters EN-US",created:1589914262,updated:1745967418,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQTOS1E",w:1588,h:2246,pages:29},
+  {brand:"General",id:"EAGmDWHBgMM",title:"HR Health and Safety Policy EN",created:1655823678,updated:1745967193,createUrl:"https://www.canva.com/design?create=true&template=EAGmDWHBgMM",w:794,h:1123,pages:1},
+  {brand:"General",id:"EAGmDTSkk9w",title:"Merger Partner Template",created:1573669624,updated:1745966948,createUrl:"https://www.canva.com/design?create=true&template=EAGmDTSkk9w",w:1056,h:816,pages:2},
+  {brand:"General",id:"EAGmDcexBK0",title:"TP KPI HARMAN INT Report",created:1549643255,updated:1745966996,createUrl:"https://www.canva.com/design?create=true&template=EAGmDcexBK0",w:794,h:1123,pages:1},
+  {brand:"General",id:"EAGmDb1X6c4",title:"Upcoming Events",created:1695324049,updated:1745966778,createUrl:"https://www.canva.com/design?create=true&template=EAGmDb1X6c4",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDZkvuIU",title:"Central Open Enrollment Template",created:1605640239,updated:1745966869,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZkvuIU",w:955,h:566,pages:1},
+  {brand:"General",id:"EAGmDbssv7Y",title:"Copy of Central Open Enrollment Template",created:1745325717,updated:1745966788,createUrl:"https://www.canva.com/design?create=true&template=EAGmDbssv7Y",w:955,h:566,pages:1},
+  {brand:"General",id:"EAGmDanIhWI",title:"Central Working Women",created:1642525037,updated:1745967242,createUrl:"https://www.canva.com/design?create=true&template=EAGmDanIhWI",w:955,h:566,pages:1},
+  {brand:"General",id:"EAGmDa-WnVQ",title:"TLS Social Event 2022",created:1665580061,updated:1745967394,createUrl:"https://www.canva.com/design?create=true&template=EAGmDa-WnVQ",w:1200,h:627,pages:4},
+  {brand:"General",id:"EAGmDaeP7ss",title:"TLS Testimonial One-Pager",created:1665580705,updated:1745967357,createUrl:"https://www.canva.com/design?create=true&template=EAGmDaeP7ss",w:816,h:1056,pages:1},
+  {brand:"General",id:"EAGmDZnn5-Q",title:"TLS Tabletop Sign A4 Basic",created:1674152231,updated:1745967317,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZnn5-Q",w:794,h:1123,pages:4},
+  {brand:"General",id:"EAGmDSXsSvU",title:"Staff Stories TLS 2022",created:1664894675,updated:1745967352,createUrl:"https://www.canva.com/design?create=true&template=EAGmDSXsSvU",w:1200,h:627,pages:6},
+  {brand:"General",id:"EAHK-yU2x8c",title:"Unbabel Town Hall and Reception",created:1779997202,updated:1779997274,createUrl:"https://www.canva.com/design?create=true&template=EAHK-yU2x8c",w:480,h:672,pages:2},
+  {brand:"General",id:"EAGmDe612h4",title:"Blog Template",created:1653572399,updated:1745967377,createUrl:"https://www.canva.com/design?create=true&template=EAGmDe612h4",w:816,h:1056,pages:2},
+  {brand:"General",id:"EAGmDeEPsVc",title:"Reef Express",created:1731531638,updated:1745967358,createUrl:"https://www.canva.com/design?create=true&template=EAGmDeEPsVc",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDcZKkSc",title:"Costa Cruises Spotlight",created:1602533542,updated:1745967459,createUrl:"https://www.canva.com/design?create=true&template=EAGmDcZKkSc",w:1920,h:1080,pages:7},
+  {brand:"General",id:"EAGmDWLORx8",title:"Mission Minds",created:1709849490,updated:1745966861,createUrl:"https://www.canva.com/design?create=true&template=EAGmDWLORx8",w:1200,h:1200,pages:3},
+  {brand:"General",id:"EAGmDeSbZaY",title:"Share Your Race Day Photos",created:1708106835,updated:1745966877,createUrl:"https://www.canva.com/design?create=true&template=EAGmDeSbZaY",w:1200,h:1200,pages:1},
+  {brand:"General",id:"EAGmDaR_AyA",title:"Candid Photo Sharing 2",created:1709850781,updated:1745966908,createUrl:"https://www.canva.com/design?create=true&template=EAGmDaR_AyA",w:1200,h:1200,pages:2},
+  {brand:"General",id:"EAGmDXoqBIY",title:"Winner Posts",created:1710883484,updated:1745966978,createUrl:"https://www.canva.com/design?create=true&template=EAGmDXoqBIY",w:1200,h:1200,pages:1},
+  {brand:"General",id:"EAGmDd3MwjU",title:"Candid Photo Sharing",created:1709844854,updated:1745966783,createUrl:"https://www.canva.com/design?create=true&template=EAGmDd3MwjU",w:1200,h:1200,pages:1},
+  {brand:"General",id:"EAGmDZsbSGo",title:"Race Day Tips",created:1708108548,updated:1745967413,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZsbSGo",w:1200,h:1200,pages:1},
+  {brand:"General",id:"EAGmDXc83kk",title:"Previous Winner Insights",created:1709852784,updated:1745967253,createUrl:"https://www.canva.com/design?create=true&template=EAGmDXc83kk",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDRmNHXY",title:"Awards",created:1710885075,updated:1745967278,createUrl:"https://www.canva.com/design?create=true&template=EAGmDRmNHXY",w:1200,h:1200,pages:1},
+  {brand:"General",id:"EAGmDRzVhpY",title:"Podcast",created:1695321444,updated:1745967192,createUrl:"https://www.canva.com/design?create=true&template=EAGmDRzVhpY",w:1440,h:1440,pages:1},
+  {brand:"General",id:"EAGmDcefKlI",title:"Podcast Dark",created:1694985753,updated:1745966796,createUrl:"https://www.canva.com/design?create=true&template=EAGmDcefKlI",w:1440,h:1440,pages:1},
+  {brand:"General",id:"EAGmDQc6MCA",title:"Podcast Dark (B)",created:1700070556,updated:1745967347,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQc6MCA",w:1440,h:1440,pages:1},
+  {brand:"General",id:"EAGmDVm2ZXQ",title:"LinkedIn Podcast",created:1695408968,updated:1745966719,createUrl:"https://www.canva.com/design?create=true&template=EAGmDVm2ZXQ",w:1200,h:628,pages:1},
+  {brand:"General",id:"EAGmDeAB-JA",title:"TL Life and Culture Templates",created:1721083651,updated:1745967367,createUrl:"https://www.canva.com/design?create=true&template=EAGmDeAB-JA",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDR7jvZo",title:"TL General",created:1721079649,updated:1745967416,createUrl:"https://www.canva.com/design?create=true&template=EAGmDR7jvZo",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDdcd3-8",title:"TL Educational Carousel Template",created:1721080782,updated:1745967337,createUrl:"https://www.canva.com/design?create=true&template=EAGmDdcd3-8",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDcyAQCM",title:"TL Events",created:1721083957,updated:1745967370,createUrl:"https://www.canva.com/design?create=true&template=EAGmDcyAQCM",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDexoF_s",title:"TL Spotlights",created:1716410676,updated:1745967407,createUrl:"https://www.canva.com/design?create=true&template=EAGmDexoF_s",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDYj1_nQ",title:"TL Technology Campaign",created:1722450439,updated:1745967370,createUrl:"https://www.canva.com/design?create=true&template=EAGmDYj1_nQ",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDc74Xwc",title:"TL Tips Template",created:1721080722,updated:1745967322,createUrl:"https://www.canva.com/design?create=true&template=EAGmDc74Xwc",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDYpe3ZM",title:"TL Testimonials",created:1721080785,updated:1745967301,createUrl:"https://www.canva.com/design?create=true&template=EAGmDYpe3ZM",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDVI9EPM",title:"TL Holidays",created:1721080787,updated:1745967298,createUrl:"https://www.canva.com/design?create=true&template=EAGmDVI9EPM",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDaPvoU0",title:"TL Case Study Template",created:1721077813,updated:1745966936,createUrl:"https://www.canva.com/design?create=true&template=EAGmDaPvoU0",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDTelwpo",title:"Giveaway",created:1709849135,updated:1745966952,createUrl:"https://www.canva.com/design?create=true&template=EAGmDTelwpo",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDbuqeBI",title:"Holiday",created:1708100721,updated:1745966842,createUrl:"https://www.canva.com/design?create=true&template=EAGmDbuqeBI",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDbzeQ10",title:"Announcement",created:1710882640,updated:1745967293,createUrl:"https://www.canva.com/design?create=true&template=EAGmDbzeQ10",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDUwQll0",title:"Thank You",created:1710880241,updated:1745966880,createUrl:"https://www.canva.com/design?create=true&template=EAGmDUwQll0",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDejAwAI",title:"Simplified",created:1709845863,updated:1745966964,createUrl:"https://www.canva.com/design?create=true&template=EAGmDejAwAI",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDZyq54E",title:"Spotlight On Collabs",created:1710886974,updated:1745966747,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZyq54E",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDX2FM5k",title:"Spotlight",created:1696611883,updated:1745966987,createUrl:"https://www.canva.com/design?create=true&template=EAGmDX2FM5k",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDRqpM6U",title:"Services Left",created:1695323067,updated:1745967308,createUrl:"https://www.canva.com/design?create=true&template=EAGmDRqpM6U",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDS3BKx8",title:"LinkedIn Services Left",created:1695407764,updated:1745967340,createUrl:"https://www.canva.com/design?create=true&template=EAGmDS3BKx8",w:1200,h:628,pages:1},
+  {brand:"General",id:"EAGmDZ7qQEg",title:"Services Dark Blue Gradient",created:1695323482,updated:1745966718,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZ7qQEg",w:1080,h:1080,pages:2},
+  {brand:"General",id:"EAGmDZNGA8o",title:"Solutions Dark",created:1700071699,updated:1745966740,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZNGA8o",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDeCH41Y",title:"Services Teal Gradient",created:1695323892,updated:1745967010,createUrl:"https://www.canva.com/design?create=true&template=EAGmDeCH41Y",w:1080,h:1080,pages:2},
+  {brand:"General",id:"EAGmDQUxX1g",title:"Services Light Blue Gradient",created:1695323758,updated:1745967370,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQUxX1g",w:1080,h:1080,pages:2},
+  {brand:"General",id:"EAGmDXHRn_Q",title:"Services Blue",created:1696605997,updated:1745967401,createUrl:"https://www.canva.com/design?create=true&template=EAGmDXHRn_Q",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDVICtGM",title:"LinkedIn Services Teal Gradient",created:1695404087,updated:1745967393,createUrl:"https://www.canva.com/design?create=true&template=EAGmDVICtGM",w:1200,h:628,pages:2},
+  {brand:"General",id:"EAGmDV6uN0g",title:"LinkedIn Services Light Blue Gradient",created:1695405729,updated:1745967362,createUrl:"https://www.canva.com/design?create=true&template=EAGmDV6uN0g",w:1200,h:628,pages:2},
+  {brand:"General",id:"EAGmDV-pPB0",title:"LinkedIn Corporate News Teal",created:1695406994,updated:1745967360,createUrl:"https://www.canva.com/design?create=true&template=EAGmDV-pPB0",w:1200,h:628,pages:1},
+  {brand:"General",id:"EAGmDXvVXks",title:"Corporate News Blue",created:1695322903,updated:1745967293,createUrl:"https://www.canva.com/design?create=true&template=EAGmDXvVXks",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDQleV2M",title:"Corporate News Teal",created:1695322975,updated:1745967420,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQleV2M",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDXj6amg",title:"LinkedIn Motivation/Inspirational Swipe",created:1695408683,updated:1745967430,createUrl:"https://www.canva.com/design?create=true&template=EAGmDXj6amg",w:1200,h:628,pages:2},
+  {brand:"General",id:"EAGmDWEZru0",title:"LinkedIn Testimonial",created:1695408165,updated:1745966966,createUrl:"https://www.canva.com/design?create=true&template=EAGmDWEZru0",w:1200,h:628,pages:3},
+  {brand:"General",id:"EAGmDSEQoAk",title:"Testimonial",created:1695325749,updated:1745967383,createUrl:"https://www.canva.com/design?create=true&template=EAGmDSEQoAk",w:1080,h:1080,pages:3},
+  {brand:"General",id:"EAGmDVW2beg",title:"Misc Headline Blue",created:1695325350,updated:1745967323,createUrl:"https://www.canva.com/design?create=true&template=EAGmDVW2beg",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDYBFTvE",title:"Misc Headline Teal",created:1695325227,updated:1745967294,createUrl:"https://www.canva.com/design?create=true&template=EAGmDYBFTvE",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDV8qAds",title:"LinkedIn Misc Headline Teal",created:1695401581,updated:1745967331,createUrl:"https://www.canva.com/design?create=true&template=EAGmDV8qAds",w:1200,h:628,pages:1},
+  {brand:"General",id:"EAGmDS3wxSU",title:"LinkedIn Misc Picture and Text",created:1695326916,updated:1745967328,createUrl:"https://www.canva.com/design?create=true&template=EAGmDS3wxSU",w:1200,h:628,pages:1},
+  {brand:"General",id:"EAGmDSkRhBw",title:"Misc Picture and Text",created:1695325507,updated:1745967190,createUrl:"https://www.canva.com/design?create=true&template=EAGmDSkRhBw",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDQ4nKis",title:"Event Yellow",created:1696606921,updated:1745966862,createUrl:"https://www.canva.com/design?create=true&template=EAGmDQ4nKis",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDZF_UDs",title:"Event Blue",created:1696606638,updated:1745966808,createUrl:"https://www.canva.com/design?create=true&template=EAGmDZF_UDs",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDfhC03Q",title:"LinkedIn Holiday Blue",created:1695402905,updated:1745967339,createUrl:"https://www.canva.com/design?create=true&template=EAGmDfhC03Q",w:1200,h:628,pages:1},
+  {brand:"General",id:"EAGmDRR8yAQ",title:"LinkedIn Holiday Teal",created:1695403045,updated:1745967327,createUrl:"https://www.canva.com/design?create=true&template=EAGmDRR8yAQ",w:1200,h:628,pages:1},
+  {brand:"General",id:"EAGmDaWKLuI",title:"Holiday Light Blue",created:1695324455,updated:1745967202,createUrl:"https://www.canva.com/design?create=true&template=EAGmDaWKLuI",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDaBu6eI",title:"Meme or Photo Re-Share Yellow",created:1695322406,updated:1745967310,createUrl:"https://www.canva.com/design?create=true&template=EAGmDaBu6eI",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDUZX9Sw",title:"LinkedIn Employee Awards",created:1695407091,updated:1745967281,createUrl:"https://www.canva.com/design?create=true&template=EAGmDUZX9Sw",w:1200,h:628,pages:1},
+  {brand:"General",id:"EAGmDUGmuvY",title:"Press 2",created:1696611883,updated:1745967378,createUrl:"https://www.canva.com/design?create=true&template=EAGmDUGmuvY",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDXPYU8I",title:"Blue World Turtle Day Poster",created:1713994316,updated:1745966894,createUrl:"https://www.canva.com/design?create=true&template=EAGmDXPYU8I",w:1080,h:1350,pages:6},
+  {brand:"General",id:"EAGmDdmatGY",title:"LinkedIn Upcoming Events",created:1695409495,updated:1745966660,createUrl:"https://www.canva.com/design?create=true&template=EAGmDdmatGY",w:1200,h:628,pages:1},
+  {brand:"General",id:"EAGmDTTUhWE",title:"TranServices verbl",created:1707254521,updated:1745966816,createUrl:"https://www.canva.com/design?create=true&template=EAGmDTTUhWE",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDWCDomk",title:"TLS X TPT DIGITAL 2",created:1653321382,updated:1745967278,createUrl:"https://www.canva.com/design?create=true&template=EAGmDWCDomk",w:1080,h:1080,pages:1},
+  {brand:"General",id:"EAGmDSNWkDI",title:"Copy of SME FB+LI TP Corporate",created:1745159422,updated:1745966974,createUrl:"https://www.canva.com/design?create=true&template=EAGmDSNWkDI",w:1200,h:628,pages:2},
+  {brand:"General",id:"EAGmDRVS9cI",title:"Copy of Blogs/Articles FB+LI TP Corporate",created:1745159322,updated:1745967401,createUrl:"https://www.canva.com/design?create=true&template=EAGmDRVS9cI",w:1200,h:628,pages:6},
+  {brand:"General",id:"EAGmDXToJrs",title:"Copy of Event Announcements FB+LI TP Corporate",created:1745159633,updated:1745966989,createUrl:"https://www.canva.com/design?create=true&template=EAGmDXToJrs",w:1200,h:628,pages:7},
+  {brand:"General",id:"EAGmDYkQZCY",title:"Copy of Infographics FB+LI TP Corporate",created:1745159334,updated:1745967404,createUrl:"https://www.canva.com/design?create=true&template=EAGmDYkQZCY",w:1200,h:628,pages:8},
+  {brand:"General",id:"EAGmDWTPqPA",title:"Copy of Phil News FB+LI TP Corporate",created:1745454138,updated:1745966984,createUrl:"https://www.canva.com/design?create=true&template=EAGmDWTPqPA",w:1200,h:628,pages:2},
+];
+
+const BRAND_COLORS={
+  "C3 Summit":"#7B2FBE","GLNEXT":"#00C2C7","Legal":"#E8A040","Life Sciences":"#40C87B",
+  "Media":"#E74C3C","Dataforce":"#3B82F6","Trial Interactive":"#A855F7","TPI":"#06B6D4",
+  "TP Corporate":"#64748B","TP India":"#F97316","ISS":"#EAB308","Games":"#10B981",
+  "General":"#94A3B8"
+};
+
+let allData = TEMPLATES.map(t=>({...t,designId:null,editUrl:null,fetched:!!(t.w||t.pages),error:false}));
+let fetchInProgress=false;
+let fetchedCount=allData.filter(t=>t.fetched).length;
+
+function fmtDate(ts){
+  if(!ts) return '—';
+  return new Date(ts*1000).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+let activeSortCol=null, activeSortDir=1;
+
+// ── Helper: infer asset type from title/size
+function inferAssetType(t){
+  const ti=t.title.toLowerCase();
+  if(/ppt|powerpoint|presentation|deck|slides?/.test(ti)) return 'Presentation';
+  if(/email|footer|header|blast|sig(nature)?/.test(ti)) return 'Email';
+  if(/banner|leaderboard|hero|web/.test(ti)) return 'Web Banner';
+  if(/app\s*(icon|home|screen|\d)/.test(ti)||/icon/.test(ti)) return 'App Asset';
+  if(/mailer|postcard|flyer|poster|print|a4|tabletop|sign/.test(ti)) return 'Print';
+  if(/badge|lanyard|credential/.test(ti)) return 'Badge';
+  if(/agenda|schedule|program|run.of/.test(ti)) return 'Agenda / Schedule';
+  if(/sponsorship|sponsor/.test(ti)) return 'Sponsorship';
+  if(/case.stud/.test(ti)) return 'Case Study';
+  if(/testimonial|quote/.test(ti)) return 'Testimonial / Quote';
+  if(/webinar|event|speaker/.test(ti)) return 'Event / Webinar';
+  if(/story|stories/.test(ti)) return 'Stories';
+  if(/ig|instagram/.test(ti)) return 'Instagram Post';
+  if(/li|linkedin/.test(ti)) return 'LinkedIn Post';
+  if(/twitter|tweet/.test(ti)) return 'Twitter / X';
+  if(/facebook|fb/.test(ti)) return 'Facebook Post';
+  if(/social|post|ao\s/.test(ti)) return 'Social Post';
+  if(/ad\b|ads\b|advert/.test(ti)) return 'Ad';
+  if(/blog/.test(ti)) return 'Blog';
+  if(t.w&&t.h){
+    if(t.w===t.h) return 'Square Social';
+    if(t.w>t.h*1.5) return 'Landscape Banner';
+    if(t.h>t.w*1.2) return 'Portrait / Story';
+  }
+  return 'General';
+}
+
+// ── Helper: infer aspect ratio label
+function inferAspect(t){
+  if(!t.w||!t.h) return 'Unknown size';
+  const r=t.w/t.h;
+  if(Math.abs(r-1)<0.05) return '1:1 Square';
+  if(Math.abs(r-16/9)<0.08) return '16:9 Widescreen';
+  if(Math.abs(r-1.91)<0.08) return '1.91:1 LinkedIn / Web';
+  if(Math.abs(r-4/5)<0.08) return '4:5 Instagram Portrait';
+  if(Math.abs(r-9/16)<0.08) return '9:16 Story / Vertical';
+  if(Math.abs(r-2.2)<0.15) return '~2.2:1 Wide Banner';
+  if(r>2.5) return 'Ultra-wide Banner';
+  if(r<0.7) return 'Tall Portrait';
+  return 'Custom ratio';
+}
+
+// ── Helper: is copy?
+function isCopy(t){ return /^copy\s+of\b/i.test(t.title.trim()); }
+
+// ── Flat sort
+function sortData(rows, mode){
+  const s=[...rows];
+  switch(mode){
+    case 'name-az':       return s.sort((a,b)=>a.title.localeCompare(b.title));
+    case 'name-za':       return s.sort((a,b)=>b.title.localeCompare(a.title));
+    case 'created-new':   return s.sort((a,b)=>(b.created||0)-(a.created||0));
+    case 'created-old':
+    case 'age-old':       return s.sort((a,b)=>(a.created||0)-(b.created||0));
+    case 'updated-new':   return s.sort((a,b)=>(b.updated||0)-(a.updated||0));
+    case 'updated-old':   return s.sort((a,b)=>(a.updated||0)-(b.updated||0));
+    case 'pages-high':    return s.sort((a,b)=>(b.pages||0)-(a.pages||0));
+    case 'pages-low':     return s.sort((a,b)=>(a.pages||0)-(b.pages||0));
+    case 'width-high':    return s.sort((a,b)=>(b.w||0)-(a.w||0));
+    case 'width-low':     return s.sort((a,b)=>(a.w||0)-(b.w||0));
+    case 'fetched-first': return s.sort((a,b)=>(b.fetched?1:0)-(a.fetched?1:0));
+    case 'pending-first': return s.sort((a,b)=>(a.fetched?1:0)-(b.fetched?1:0));
+    case 'brand-az':      return s.sort((a,b)=>a.brand.localeCompare(b.brand)||a.title.localeCompare(b.title));
+    case 'brand-za':      return s.sort((a,b)=>b.brand.localeCompare(a.brand)||a.title.localeCompare(b.title));
+    case 'brand-name':    return s.sort((a,b)=>a.brand.localeCompare(b.brand)||a.title.localeCompare(b.title));
+    case 'brand-updated': return s.sort((a,b)=>a.brand.localeCompare(b.brand)||(b.updated||0)-(a.updated||0));
+    case 'brand-created': return s.sort((a,b)=>a.brand.localeCompare(b.brand)||(b.created||0)-(a.created||0));
+    default: return s;
+  }
+}
+
+// ── Group modes: return array of {label, rows}
+function groupData(rows, mode){
+  const groups={};
+  const order=[];
+  rows.forEach(t=>{
+    let key;
+    if(mode==='aspect') key=inferAspect(t);
+    else if(mode==='assettype') key=inferAssetType(t);
+    else if(mode==='year-created') key=t.created?new Date(t.created*1000).getFullYear()+'':'Unknown';
+    else if(mode==='year-updated') key=t.updated?new Date(t.updated*1000).getFullYear()+'':'Unknown';
+    else if(mode==='copies') key=isCopy(t)?'Copies / Duplicates':'Originals';
+    else key=t.brand;
+    if(!groups[key]){groups[key]=[];order.push(key);}
+    groups[key].push(t);
+  });
+  // Sort group keys sensibly
+  if(mode==='year-created'||mode==='year-updated') order.sort((a,b)=>b.localeCompare(a));
+  else if(mode==='copies') order.sort((a,b)=>a==='Originals'?-1:1);
+  else order.sort((a,b)=>a.localeCompare(b));
+  return order.map(k=>({label:k,rows:groups[k]}));
+}
+
+const GROUP_MODES=new Set(['brand','aspect','assettype','year-created','year-updated','copies']);
+const FLAT_SORT_LABELS={
+  'name-az':'Name A→Z','name-za':'Name Z→A',
+  'created-new':'Created: newest','created-old':'Created: oldest','age-old':'Oldest templates',
+  'updated-new':'Updated: newest','updated-old':'Updated: oldest',
+  'pages-high':'Pages: most','pages-low':'Pages: fewest',
+  'width-high':'Width: largest','width-low':'Width: smallest',
+  'fetched-first':'Live data first','pending-first':'Pending first',
+  'brand-az':'Brand A→Z','brand-za':'Brand Z→A',
+  'brand-name':'Brand → Name','brand-updated':'Brand → Updated','brand-created':'Brand → Created',
+};
+
+function colSort(col){
+  const sel=document.getElementById('sort-select');
+  const map={name:['name-az','name-za'],created:['created-new','created-old'],updated:['updated-new','updated-old'],pages:['pages-high','pages-low'],width:['width-high','width-low']};
+  if(!map[col]) return;
+  const [a,b]=map[col];
+  sel.value = sel.value===a ? b : a;
+  renderTable();
+}
+
+function thArrow(col){
+  const sel=document.getElementById('sort-select');
+  const v=sel?sel.value:'';
+  const upCols={name:'name-az',created:'created-new',updated:'updated-new',pages:'pages-high',width:'width-high'};
+  const dnCols={name:'name-za',created:'created-old',updated:'updated-old',pages:'pages-low',width:'width-low'};
+  if(upCols[col]===v) return ' <span style="color:#00C2C7">↑</span>';
+  if(dnCols[col]===v) return ' <span style="color:#00C2C7">↓</span>';
+  return ' <span style="color:#2A3A50;font-size:9px">⇅</span>';
+}
+
+function thStyle(){ return 'cursor:pointer;user-select:none'; }
+
+function buildThead(showBrand, extraCol){
+  return `<table><thead><tr>
+    <th style="width:230px;${thStyle()}" onclick="colSort('name')">Template${thArrow('name')}</th>
+    ${showBrand?`<th style="width:96px">Brand</th>`:''}
+    ${extraCol?`<th style="width:110px">${extraCol}</th>`:''}
+    <th style="width:120px">Template ID</th>
+    <th style="width:96px;${thStyle()}" onclick="colSort('width')">Size${thArrow('width')}</th>
+    <th style="width:50px;${thStyle()}" onclick="colSort('pages')">Pages${thArrow('pages')}</th>
+    <th style="width:100px;${thStyle()}" onclick="colSort('created')">Created${thArrow('created')}</th>
+    <th style="width:100px;${thStyle()}" onclick="colSort('updated')">Updated${thArrow('updated')}</th>
+    <th style="width:80px">Open</th>
+  </tr></thead><tbody>`;
+}
+
+function buildRow(t, showBrand, extraColFn){
+  const sz=t.w&&t.h?`<span class="size-badge">${t.w}×${t.h}</span>`:`<span class="pending">–</span>`;
+  const pg=t.pages?`<span class="pages-badge">${t.pages}p</span>`:`<span class="pending">–</span>`;
+  const lnk=t.createUrl||t.editUrl?`<a href="${t.createUrl||t.editUrl}" class="link-btn" target="_blank">Open ↗</a>`:`<span class="pending">–</span>`;
+  const bc=BRAND_COLORS[t.brand]||'#94A3B8';
+  const brandCell=showBrand?`<td><span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#C8D8F0"><span style="width:6px;height:6px;border-radius:50%;background:${bc};flex-shrink:0;display:inline-block"></span>${t.brand}</span></td>`:'';
+  const extraCell=extraColFn?`<td><span style="font-size:11px;color:#A0B0CC">${extraColFn(t)}</span></td>`:'';
+  const copyTag=isCopy(t)?` <span style="font-size:9px;background:#1A2A40;border:1px solid #2A3A50;border-radius:2px;padding:1px 4px;color:#7A8BAA;vertical-align:middle">copy</span>`:'';
+  return `<tr>
+    <td><div class="template-name">${t.title}${copyTag}</div></td>
+    ${brandCell}${extraCell}
+    <td><span class="template-id">${t.id}</span></td>
+    <td>${sz}</td><td>${pg}</td>
+    <td><span class="date-text">${fmtDate(t.created)}</span></td>
+    <td><span class="date-text">${fmtDate(t.updated)}</span></td>
+    <td>${lnk}</td>
+  </tr>`;
+}
+
+function renderTable(){
+  const search=document.getElementById('search-input').value.toLowerCase();
+  const brandF=document.getElementById('brand-filter').value;
+  const sortMode=document.getElementById('sort-select').value;
+  const container=document.getElementById('table-container');
+  let html='', total=0;
+
+  let pool=allData.filter(t=>{
+    if(brandF && t.brand!==brandF) return false;
+    if(search && !t.title.toLowerCase().includes(search) && !t.id.toLowerCase().includes(search) && !t.brand.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  if(GROUP_MODES.has(sortMode)){
+    // Grouped views
+    const grouped=groupData(pool, sortMode);
+    const showBrand=sortMode!=='brand';
+    // Extra column for some group modes
+    const extraColLabel = sortMode==='assettype' ? null : sortMode==='aspect' ? null : null;
+    grouped.forEach(({label,rows})=>{
+      if(!rows.length) return;
+      total+=rows.length;
+      const c = sortMode==='brand' ? (BRAND_COLORS[label]||'#94A3B8') : '#00C2C7';
+      const dot = sortMode==='brand' ? `<span class="brand-dot" style="background:${c}"></span>` : '';
+      // Sort rows within group by name by default
+      const sortedRows = sortMode==='brand' ? rows : rows.sort((a,b)=>a.title.localeCompare(b.title));
+      html+=`<div>
+        <div class="section-header">
+          ${dot}<span class="section-name">${label}</span>
+          <span class="section-count">${rows.length}</span>
+        </div>
+        ${buildThead(showBrand, null)}`;
+      sortedRows.forEach(t=>{ html+=buildRow(t, showBrand, null); });
+      html+=`</tbody></table></div>`;
+    });
+  } else {
+    // Flat sorted view
+    const sorted=sortData(pool, sortMode);
+    total=sorted.length;
+    const label=FLAT_SORT_LABELS[sortMode]||sortMode;
+    // Show asset type as extra col for brand-* sorts
+    const showExtra=['brand-name','brand-updated','brand-created'].includes(sortMode);
+    html+=`<div>
+      <div class="section-header">
+        <span class="section-name">All Templates</span>
+        <span class="section-count">${total}</span>
+        <span style="font-size:10px;color:#7A8BAA;margin-left:6px">sorted by ${label}</span>
+      </div>
+      ${buildThead(true, showExtra?'Asset Type':null)}`;
+    sorted.forEach(t=>{ html+=buildRow(t, true, showExtra?inferAssetType:null); });
+    html+=`</tbody></table></div>`;
+  }
+
+  if(!total) html=`<div class="empty-state">No templates match your search.</div>`;
+  container.innerHTML=html;
+  document.getElementById('stat-shown').textContent=total;
+  document.getElementById('stat-total').textContent=allData.length;
+}
+
+function filterTable(){ renderTable(); }
+
+// Data is complete — no fetch required
+
+function exportCSV(){
+  const rows=[['Brand','Title','Template ID','Width','Height','Pages','Created','Updated','Edit URL']];
+  allData.forEach(t=>{
+    rows.push([t.brand,t.title,t.id,t.w||'',t.h||'',t.pages||'',fmtDate(t.created),fmtDate(t.updated),t.editUrl||'']);
+  });
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='canva-master-template-registry.csv';
+  a.click();
+}
+
+renderTable();
+</script>
+
+
+<script>
+(function(){
+
+const BRAND_COLORS={
+  "C3 Summit":"#7B2FBE","GLNEXT":"#00C2C7","Legal":"#E8A040","Life Sciences":"#40C87B",
+  "Media":"#E74C3C","Dataforce":"#3B82F6","Trial Interactive":"#A855F7","TPI":"#06B6D4",
+  "TP Corporate":"#64748B","TP India":"#F97316","ISS":"#EAB308","Games":"#10B981",
+  "General":"#94A3B8"
+};
+const url=id=>`https://www.canva.com/design?create=true&template=${id}`;
+
+const DATA={
+  byBrand:[["General",100],["GLNEXT",46],["TP Corporate",33],["Life Sciences",21],["Dataforce",21],["Legal",20],["Media",16],["TPI",11],["TP India",10],["C3 Summit",7],["Games",4],["Trial Interactive",2],["ISS",2]],
+  clusters:[["TL / TransLanguages",10],["Services / Solutions",10],["Race / Photo / Contest",10],["Webinar",6],["HR / Health & Safety",5],["TLS",5],['"Copy of … TP Corporate"',5],["Case Study",4],["Podcast",4],["One-offs / uncategorized",41]],
+  tag:[["TP Corporate",33,33],["TPI",10,11],["Media",12,16],["Life Sciences",13,21],["Dataforce",13,21],["C3 Summit",0,7],["GLNEXT",0,46],["Legal",0,20],["TP India",0,10],["Games",0,4],["ISS",0,2],["Trial Interactive",0,2],["General",0,100]],
+  copies:[
+    {brand:"GLNEXT",title:"Copy of GLNEXT Email Footer",id:"EAHB_T6omP4",origExists:true},
+    {brand:"Legal",title:"Copy of Animated Free CLE Friday Email Sig Banner",id:"EAGmDePxIGk",origExists:false},
+    {brand:"Life Sciences",title:"Copy of LifeSci Talks LinkedIn Template",id:"EAGmDbwsvFc",origExists:true},
+    {brand:"Dataforce",title:"Copy of Meta B2C Ad 1440x1440 [Dataforce]",id:"EAHA67dCRt8",origExists:true},
+    {brand:"Dataforce",title:"Copy of DATAFORCE B2C JOBS Instagram Post",id:"EAGmDZLUn6I",origExists:false},
+    {brand:"Dataforce",title:"Copy of DATAFORCE B2C WHAT DAY IS IT Facebook",id:"EAGmDcHm-3c",origExists:false},
+    {brand:"Dataforce",title:"Copy of DATAFORCE B2C DF WORLD Facebook",id:"EAGmDdo_rkI",origExists:false},
+    {brand:"General",title:"Copy of Webinar Dark 4 Speakers",id:"EAGmDf5724w",origExists:false},
+    {brand:"General",title:"Copy of Case Study Teaser",id:"EAGmDUsjgbU",origExists:true},
+    {brand:"General",title:"Copy of Central Open Enrollment Template",id:"EAGmDbssv7Y",origExists:true},
+    {brand:"General",title:"Copy of SME FB+LI TP Corporate",id:"EAGmDSNWkDI",origExists:false,misfile:true},
+    {brand:"General",title:"Copy of Blogs/Articles FB+LI TP Corporate",id:"EAGmDRVS9cI",origExists:false,misfile:true},
+    {brand:"General",title:"Copy of Event Announcements FB+LI TP Corporate",id:"EAGmDXToJrs",origExists:false,misfile:true},
+    {brand:"General",title:"Copy of Infographics FB+LI TP Corporate",id:"EAGmDYkQZCY",origExists:false,misfile:true},
+    {brand:"General",title:"Copy of Phil News FB+LI TP Corporate",id:"EAGmDWTPqPA",origExists:false,misfile:true},
+  ],
+  topSizes:[["1080×1080",75],["1200×628",48],["816×1056",20],["1600×837",19],["1440×1440",19],["1200×627",14],["1200×1200",13],["1080×1920",11],["1080×1350",11],["794×1123",7],["800×250",6],["940×788",5]],
+  oldest:[
+    {d:"2019-02-08",brand:"General",title:"TP KPI HARMAN INT Report",id:"EAGmDcexBK0"},
+    {d:"2019-11-13",brand:"General",title:"Merger Partner Template",id:"EAGmDTSkk9w"},
+    {d:"2020-05-19",brand:"General",title:"TransPerfect Health and Safety Posters EN-US",id:"EAGmDQTOS1E"},
+    {d:"2020-10-12",brand:"General",title:"Costa Cruises Spotlight",id:"EAGmDcZKkSc"},
+    {d:"2020-10-29",brand:"General",title:"Webinar Template 1 Instagram",id:"EAGmDejMze0"},
+    {d:"2020-11-02",brand:"General",title:"Webinar Template 1 LinkedIn",id:"EAGmDeubhu4"},
+    {d:"2020-11-02",brand:"General",title:"Webinar Template 1 Twitter",id:"EAGmDdbc1TQ"},
+    {d:"2020-11-17",brand:"General",title:"Central Open Enrollment Template",id:"EAGmDZkvuIU"},
+  ],
+};
+
+const brandPill=b=>`<span class="brand-pill"><span class="d" style="background:${BRAND_COLORS[b]||'#94A3B8'}"></span>${b}</span>`;
+function bars(rows,max,colorFn,flagFn,kind){
+  const kAttr = kind ? ` data-bar-kind="${kind}"` : '';
+  return `<div class="bars"${kAttr}>`+rows.map(([label,val,extra])=>{
+    const pct=Math.max(2,(val/max)*100);
+    const flag=flagFn&&flagFn(label,val)?`<span class="bar-flag">${flagFn(label,val)}</span>`:'';
+    const safeKey = String(label).replace(/"/g,'&quot;');
+    const rowAttrs = kind ? ` class="bar-row drillable" data-bar-key="${safeKey}" data-bar-val="${val}" tabindex="0" role="button"` : ' class="bar-row"';
+    return `<div${rowAttrs}><div class="bar-label">${label}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${colorFn(label,val)}"></div></div>
+      <div class="bar-val">${extra!==undefined?extra:val}</div>${flag}</div>`;
+  }).join('')+`</div>`;
+}
+
+/* ---- Findings ---- */
+const findings=[];
+
+// F1 — General bloat
+findings.push(`
+<div class="finding">
+  <div class="finding-top"><span class="sev high">High</span>
+    <div><div class="finding-title">The "General" bucket is a 100-template catch-all</div>
+    <div class="finding-count">100 of 293 templates (34%) — larger than the next 3 brands combined</div></div>
+  </div>
+  <div class="finding-body">"General" holds more than a third of the entire library, but most of it isn't actually general. Clustering the titles shows <b>~59 templates fall into recognizable groups</b> that could be promoted to their own category or reassigned to an existing brand. Only ~41 are true one-offs.</div>
+  ${bars(DATA.byBrand,100,(l)=>l==='General'?'#E74C3C':(BRAND_COLORS[l]||'#94A3B8'),(l)=>l==='General'?'← 34% of library':'','brand')}
+  <div class="finding-body" style="margin-top:18px"><b>Inside "General" — thematic clusters:</b></div>
+  ${bars(DATA.clusters,41,(l)=>l==='One-offs / uncategorized'?'#3A5070':'#00C2C7',null,'cluster')}
+  <div class="rec"><b>Recommended</b>Split "General" into real categories (TransLanguages, Services/Solutions, Webinar, Podcast, Case Study, HR) and reassign the 5 TP Corporate copies out. Leaves a lean ~41-item "General/Misc" bucket.</div>
+</div>`);
+
+// F2 — Misfiles
+const misRows=DATA.copies.filter(c=>c.misfile).map(c=>`<tr>
+  <td>${c.title}</td><td>${brandPill('General')}</td>
+  <td><span class="tag move">→ TP Corporate</span></td>
+  <td><span class="template-id">${c.id}</span></td>
+  <td><a class="link-btn" href="${url(c.id)}" target="_blank">Open ↗</a></td></tr>`).join('');
+findings.push(`
+<div class="finding">
+  <div class="finding-top"><span class="sev high">High</span>
+    <div><div class="finding-title">Five TP Corporate templates misfiled under "General"</div>
+    <div class="finding-count">5 templates · brand field says General, title says TP Corporate</div></div>
+  </div>
+  <div class="finding-body">Each of these is a "Copy of … FB+LI TP Corporate" sitting in the General bucket. The title explicitly names the brand, and they're copies on top of it — your single cleanest quick win.</div>
+  <table><thead><tr><th>Template</th><th>Current brand</th><th>Action</th><th>ID</th><th>Open</th></tr></thead><tbody>${misRows}</tbody></table>
+  <div class="rec"><b>Recommended</b>Reassign all 5 to TP Corporate — or delete if confirmed redundant against the live TP Corporate set. Resolve the "Copy of" prefix at the same time (see Finding 3).</div>
+</div>`);
+
+// F3 — Copies
+const copyRows=DATA.copies.map(c=>`<tr>
+  <td>${c.title}</td><td>${brandPill(c.brand)}</td>
+  <td>${c.origExists?'<span class="tag redundant">Original exists → merge/delete</span>':'<span class="tag orphan">No original → rename as master</span>'}</td>
+  <td><span class="template-id">${c.id}</span></td>
+  <td><a class="link-btn" href="${url(c.id)}" target="_blank">Open ↗</a></td></tr>`).join('');
+findings.push(`
+<div class="finding">
+  <div class="finding-top"><span class="sev med">Medium</span>
+    <div><div class="finding-title">Fifteen "Copy of …" working files left in the registry</div>
+    <div class="finding-count">15 templates · 5 redundant duplicates · 10 orphaned masters</div></div>
+  </div>
+  <div class="finding-body"><b>5 have their original still present</b> — genuine redundant duplicates to merge or delete. The other <b>10 have no matching original</b>, meaning the source was renamed or deleted and the "Copy of" became the de facto master. Either way the "Copy of" prefix is stale and should be resolved.</div>
+  <table><thead><tr><th>Template</th><th>Brand</th><th>Status / action</th><th>ID</th><th>Open</th></tr></thead><tbody>${copyRows}</tbody></table>
+  <div class="rec"><b>Recommended</b>Delete or merge the 5 redundant copies; for the 10 orphans, drop the "Copy of" prefix and adopt them as the official master.</div>
+</div>`);
+
+// F4 — Tagging inconsistency
+const tagRows=DATA.tag.map(([b,t,tot])=>[b, Math.round(t/tot*100), `${t}/${tot}`]);
+findings.push(`
+<div class="finding">
+  <div class="finding-top"><span class="sev med">Medium</span>
+    <div><div class="finding-title">No house standard for brand tags in titles</div>
+    <div class="finding-count">% of each brand's titles carrying a [bracket] tag</div></div>
+  </div>
+  <div class="finding-body">TP Corporate tags every title <b>[TP Corporate]</b> (100%), but Dataforce, Life Sciences, Media, and TPI are split roughly half-and-half, while six brands never tag at all. Since a dedicated brand <b>field</b> already exists, the tags are redundant metadata — but the inconsistency makes search and sorting unpredictable.</div>
+  ${bars(tagRows,100,(l,v)=>v===100?'#4AE090':v===0?'#3A5070':'#E8A040',(l,v)=>(v>0&&v<100)?'inconsistent':'','tag')}
+  <div class="rec"><b>Recommended</b>Pick one rule and apply it everywhere. Cleanest: drop bracket tags from titles and rely on the brand field — or, if tags aid in-Canva search, enforce them on 100% of titles per brand.</div>
+</div>`);
+
+// F5 — Size fragmentation
+findings.push(`
+<div class="finding">
+  <div class="finding-top"><span class="sev med">Medium</span>
+    <div><div class="finding-title">Canvas sizes are fragmented across 41 distinct dimensions</div>
+    <div class="finding-count">Top 12 sizes shown · 41 unique W×H total</div></div>
+  </div>
+  <div class="finding-body">A handful of sizes dominate, but the long tail of 41 distinct dimensions adds friction. The clearest offender: two near-identical LinkedIn/Facebook sizes that should be one.</div>
+  ${bars(DATA.topSizes,75,(l)=>(l==='1200×628'||l==='1200×627')?'#E8A040':'#00C2C7',null,'size')}
+  <div class="callout"><b>1200×628</b> (48 templates) vs <b>1200×627</b> (14 templates) — effectively identical, should collapse to a single standard.</div>
+  <div class="rec"><b>Recommended</b>Define a canonical size palette (1080×1080, 1200×628, 1080×1920, 1080×1350, 816×1056, 1600×837) and standardize the 1-px LinkedIn variants. Flag anything outside the palette for review.</div>
+</div>`);
+
+// F6 — Aging
+const oldRows=DATA.oldest.map(t=>`<tr>
+  <td><span class="template-id">${t.d}</span></td><td>${t.title}</td><td>${brandPill(t.brand)}</td>
+  <td><span class="template-id">${t.id}</span></td>
+  <td><a class="link-btn" href="${url(t.id)}" target="_blank">Open ↗</a></td></tr>`).join('');
+findings.push(`
+<div class="finding">
+  <div class="finding-top"><span class="sev low">Low</span>
+    <div><div class="finding-title">A handful of aging originals worth a "still relevant?" review</div>
+    <div class="finding-count">8 oldest by creation date (2019–2020)</div></div>
+  </div>
+  <div class="finding-body">Note: the mass <b>2025-04-29</b> "updated" timestamp across 254 records is an import/migration event, not real edits — so the Updated column is not a reliable freshness signal. Creation date is the better lens, and it surfaces several legacy items (e.g. a 2019 HARMAN KPI report, a 2019 merger template, 2020 Costa Cruises spotlight) that may be obsolete.</div>
+  <table><thead><tr><th>Created</th><th>Template</th><th>Brand</th><th>ID</th><th>Open</th></tr></thead><tbody>${oldRows}</tbody></table>
+  <div class="rec"><b>Recommended</b>Spot-check each for current relevance; archive any tied to closed campaigns or former clients.</div>
+</div>`);
+
+document.getElementById('findings').innerHTML=findings.join('');
+
+/* ---- Roadmap ---- */
+const roadmap=[
+  {t:'Reassign the 5 misfiled TP Corporate copies',d:'Move out of "General" into TP Corporate (or delete if redundant). Zero ambiguity — titles already name the brand.',impact:'High',effort:'Low',touch:'5 templates'},
+  {t:'Resolve the 15 "Copy of …" files',d:'Delete/merge the 5 with surviving originals; rename the 10 orphans to drop the "Copy of" prefix and adopt as masters.',impact:'High',effort:'Low',touch:'15 templates'},
+  {t:'Split the "General" bucket',d:'Promote TransLanguages, Services/Solutions, Webinar, Podcast, Case Study & HR clusters into real categories; reassign to existing brands where they fit.',impact:'High',effort:'Medium',touch:'~59 templates'},
+  {t:'Set a brand-tag convention',d:'Decide tags-everywhere or tags-nowhere, then normalize all 293 titles to match. Removes search/sort inconsistency.',impact:'Medium',effort:'Medium',touch:'293 templates'},
+  {t:'Standardize the size palette',d:'Adopt a canonical set of dimensions and collapse the 1200×627 / 1200×628 LinkedIn duplicates.',impact:'Medium',effort:'Low',touch:'62 templates'},
+  {t:'Archive aging legacy originals',d:'Review the 2019–2020 one-offs; archive anything tied to closed campaigns or former clients.',impact:'Low',effort:'Low',touch:'~8 templates'},
+];
+document.getElementById('roadmap').innerHTML=roadmap.map(r=>`
+  <div class="road-item"><div class="road-num"></div>
+    <div class="road-main"><div class="road-title">${r.t}</div>
+      <div class="road-desc">${r.d}</div>
+      <div class="road-meta">
+        <span class="chip impact-hi" style="${r.impact!=='High'?'color:#7A8BAA;border-color:#1E3050':''}">Impact: ${r.impact}</span>
+        <span class="chip ${r.effort==='Low'?'effort-lo':'effort-md'}">Effort: ${r.effort}</span>
+        <span class="chip touch">${r.touch}</span>
+      </div>
+    </div>
+  </div>`).join('');
+
+document.getElementById('footnote').innerHTML=`Generated from TP_canva-master-template-registry.html · 293 templates · TransPerfect Canva Team Account · companion to the Master Template Registry. Counts reflect the registry snapshot dated Jun 11, 2026.`;
+
+})();
+</script>
+
+
+<script>
+function showView(v){
+  document.getElementById('view-registry').classList.toggle('active', v==='registry');
+  document.getElementById('view-audit').classList.toggle('active', v==='audit');
+  document.getElementById('tab-registry').classList.toggle('active', v==='registry');
+  document.getElementById('tab-audit').classList.toggle('active', v==='audit');
+  window.scrollTo(0,0);
+}
+</script>
+
+<!-- ===================================================================
+     INTERACTIVE AUDIT ENHANCEMENTS
+     - Summary charts (severity donut + impact mix bar)
+     - Severity filter chips + live search
+     - Collapsible findings
+     - Sortable tables (click any <th>)
+     - Sticky table of contents (right rail)
+     =================================================================== -->
+<style>
+/* Summary panel */
+.audit-summary{display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center;
+  padding:22px 40px;background:#0B1F38;border-bottom:1px solid #1E3050}
+.audit-summary .donut-wrap{display:flex;align-items:center;gap:18px}
+.audit-summary .donut-legend{display:flex;flex-direction:column;gap:6px;font-size:11px;color:#A8B8D0}
+.audit-summary .donut-legend .lg{display:inline-flex;align-items:center;gap:7px}
+.audit-summary .donut-legend .lg .sw{width:9px;height:9px;border-radius:2px;display:inline-block}
+.audit-summary .donut-legend .lg b{color:#E8EDF8;font-weight:700;font-size:12px;margin-right:3px}
+.audit-summary .panel-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#7A8BAA;margin-bottom:8px;font-weight:700}
+.audit-summary .impact-mix{display:flex;flex-direction:column;gap:6px}
+.audit-summary .imp-row{display:flex;align-items:center;gap:10px;font-size:12px;color:#C8D8F0}
+.audit-summary .imp-label{width:120px;flex-shrink:0;color:#A8B8D0}
+.audit-summary .imp-track{flex:1;background:#091525;border-radius:3px;height:14px;overflow:hidden;display:flex}
+.audit-summary .imp-seg{height:100%;transition:width .3s ease}
+.audit-summary .imp-val{width:120px;font-size:11px;color:#7A8BAA;font-family:'Courier New',monospace}
+
+/* Controls */
+.audit-controls{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;
+  padding:12px 40px;background:#091525;border-bottom:1px solid #1E3050;flex-wrap:wrap}
+.audit-search{position:relative;flex:1;min-width:220px;max-width:420px}
+.audit-search input{width:100%;background:#0B1628;border:1px solid #1E3050;border-radius:4px;
+  padding:8px 12px 8px 34px;color:#E8EDF8;font-size:12px;outline:none}
+.audit-search input:focus{border-color:#00C2C7}
+.audit-search .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#7A8BAA}
+.audit-sev-chips{display:flex;gap:6px;flex-wrap:wrap}
+.sev-chip{background:#0B1628;border:1px solid #1E3050;border-radius:14px;padding:5px 12px;
+  color:#7A8BAA;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;
+  display:inline-flex;align-items:center;gap:6px;letter-spacing:.3px}
+.sev-chip:hover{border-color:#2A4060;color:#C8D8F0}
+.sev-chip .sev-chip-count{font-size:10px;color:#7A8BAA;background:#122040;border-radius:10px;padding:1px 7px;font-weight:700}
+.sev-chip.active{background:#00C2C7;border-color:#00C2C7;color:#06283A}
+.sev-chip.active .sev-chip-count{background:rgba(6,40,58,.18);color:#06283A}
+.sev-chip[data-sev="high"].active{background:#E74C3C;border-color:#E74C3C;color:#fff}
+.sev-chip[data-sev="med"].active{background:#E8A040;border-color:#E8A040;color:#241A0A}
+.sev-chip[data-sev="low"].active{background:#7FA0C8;border-color:#7FA0C8;color:#0E2238}
+.audit-collapse-btn{margin-left:auto;background:transparent;border:1px solid #1E3050;border-radius:4px;
+  padding:7px 12px;color:#7A8BAA;font-size:11px;cursor:pointer;font-weight:600}
+.audit-collapse-btn:hover{border-color:#00C2C7;color:#00C2C7}
+.audit-empty{padding:60px 40px;text-align:center;color:#7A8BAA;font-size:13px;font-style:italic}
+
+/* Collapsible finding */
+.finding{transition:all .2s ease}
+.finding-top{cursor:pointer;user-select:none;position:relative;padding-right:32px}
+.finding-top:hover .finding-title{color:#00C2C7}
+.finding-chevron{position:absolute;right:0;top:4px;color:#7A8BAA;font-size:14px;
+  transition:transform .2s ease;display:inline-block}
+.finding.collapsed .finding-chevron{transform:rotate(-90deg)}
+.finding-body-wrap{overflow:hidden;transition:max-height .25s ease,opacity .2s ease,margin .2s ease}
+.finding.collapsed .finding-body-wrap{max-height:0!important;opacity:0;margin:0;pointer-events:none}
+.finding.hidden{display:none}
+
+/* Sortable tables */
+.finding th{cursor:pointer;user-select:none;position:relative;padding-right:22px}
+.finding th:hover{color:#00C2C7;background:#122040}
+.finding th.sort-asc::after{content:'▲';position:absolute;right:8px;font-size:9px;color:#00C2C7}
+.finding th.sort-desc::after{content:'▼';position:absolute;right:8px;font-size:9px;color:#00C2C7}
+.finding th.sort-none::after{content:'⇅';position:absolute;right:8px;font-size:10px;color:#3A4A60;opacity:.7}
+
+/* Sticky TOC */
+.audit-toc{position:fixed;top:120px;right:18px;width:240px;max-height:calc(100vh - 160px);
+  background:#0B1F38;border:1px solid #1E3050;border-radius:8px;padding:14px 14px 12px;
+  font-size:11px;z-index:30;box-shadow:0 8px 24px rgba(0,0,0,.35);
+  display:flex;flex-direction:column;gap:8px}
+.audit-toc-head{display:flex;align-items:center;justify-content:space-between;
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#00C2C7;font-weight:700}
+.audit-toc-toggle{background:transparent;border:none;color:#7A8BAA;cursor:pointer;font-size:14px;padding:0 2px;line-height:1}
+.audit-toc-toggle:hover{color:#00C2C7}
+.audit-toc-list{overflow-y:auto;display:flex;flex-direction:column;gap:2px;padding-right:4px;margin:0;list-style:none}
+.audit-toc-list::-webkit-scrollbar{width:6px}
+.audit-toc-list::-webkit-scrollbar-thumb{background:#1E3050;border-radius:3px}
+.audit-toc-list a{display:flex;align-items:flex-start;gap:8px;padding:7px 9px;border-radius:4px;
+  color:#A8B8D0;text-decoration:none;line-height:1.35;border-left:2px solid transparent}
+.audit-toc-list a:hover{background:#122040;color:#E8EDF8}
+.audit-toc-list a.active{background:#0E2A38;color:#00C2C7;border-left-color:#00C2C7}
+.audit-toc-list a.is-section{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;
+  color:#7A8BAA;font-weight:700;margin-top:6px;padding-top:6px;border-top:1px solid #1E3050}
+.audit-toc-list a.is-section:first-child{margin-top:0;padding-top:7px;border-top:none}
+.audit-toc-sev{flex-shrink:0;width:7px;height:7px;border-radius:50%;margin-top:5px}
+.audit-toc-sev.high{background:#E74C3C}
+.audit-toc-sev.med{background:#E8A040}
+.audit-toc-sev.low{background:#7FA0C8}
+.audit-toc.collapsed{width:42px;padding:10px 8px;align-items:center}
+.audit-toc.collapsed .audit-toc-list,.audit-toc.collapsed .audit-toc-head .lbl{display:none}
+.audit-toc.collapsed .audit-toc-toggle{font-size:16px}
+@media (max-width:1100px){.audit-toc{display:none}}
+
+/* Light-mode overrides for new components */
+body.light-mode .audit-summary{background:#FFFFFF;border-color:#D8E0EC}
+body.light-mode .audit-summary .donut-legend,
+body.light-mode .audit-summary .panel-title,
+body.light-mode .audit-summary .imp-label,
+body.light-mode .audit-summary .imp-val{color:#5A6B85}
+body.light-mode .audit-summary .donut-legend .lg b,
+body.light-mode .audit-summary .imp-row{color:#0B1628}
+body.light-mode .audit-summary .imp-track{background:#EEF3FA}
+body.light-mode .audit-controls{background:#FFFFFF;border-color:#D8E0EC}
+body.light-mode .audit-search input{background:#F5F7FA;border-color:#D8E0EC;color:#0B1628}
+body.light-mode .audit-search .search-icon{color:#5A6B85}
+body.light-mode .sev-chip{background:#F5F7FA;border-color:#D8E0EC;color:#5A6B85}
+body.light-mode .sev-chip:hover{border-color:#B8C4D6;color:#0B1628}
+body.light-mode .sev-chip .sev-chip-count{background:#EEF3FA;color:#5A6B85}
+body.light-mode .audit-collapse-btn{color:#5A6B85;border-color:#D8E0EC}
+body.light-mode .audit-collapse-btn:hover{color:#008A8E;border-color:#00C2C7}
+body.light-mode .audit-empty{color:#5A6B85}
+body.light-mode .finding-chevron{color:#5A6B85}
+body.light-mode .finding th:hover{color:#008A8E;background:#EEF3FA}
+body.light-mode .audit-toc{background:#FFFFFF;border-color:#D8E0EC;box-shadow:0 8px 24px rgba(15,30,55,.08)}
+body.light-mode .audit-toc-head{color:#008A8E}
+body.light-mode .audit-toc-toggle{color:#5A6B85}
+body.light-mode .audit-toc-list a{color:#3A4A65}
+body.light-mode .audit-toc-list a:hover{background:#EEF3FA;color:#0B1628}
+body.light-mode .audit-toc-list a.active{background:#E8F6F6;color:#008A8E;border-left-color:#00C2C7}
+body.light-mode .audit-toc-list a.is-section{color:#5A6B85;border-color:#D8E0EC}
+body.light-mode .audit-toc-list::-webkit-scrollbar-thumb{background:#D8E0EC}
+
+/* Drillable bars + drill-down panel */
+.bar-row.drillable{cursor:pointer;border-radius:4px;padding:3px 6px;margin-left:-6px;margin-right:-6px;
+  transition:background .12s ease,transform .12s ease}
+.bar-row.drillable:hover{background:rgba(0,194,199,.08)}
+.bar-row.drillable:hover .bar-fill{filter:brightness(1.15)}
+.bar-row.drillable.active{background:rgba(0,194,199,.14)}
+.bar-row.drillable.active .bar-label::before{content:'▾ ';color:#00C2C7;font-size:10px}
+.bar-row.drillable:focus-visible{outline:2px solid #00C2C7;outline-offset:2px}
+.bar-drill{margin:6px 0 14px;background:#091525;border:1px solid #1E3050;border-radius:6px;
+  padding:0;overflow:hidden;animation:drillIn .22s ease}
+@keyframes drillIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.bar-drill-head{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#0B1F38;
+  border-bottom:1px solid #1E3050}
+.bar-drill-title{font-size:12px;font-weight:700;color:#E8EDF8;letter-spacing:.2px}
+.bar-drill-meta{font-size:11px;color:#7A8BAA}
+.bar-drill-close{margin-left:auto;background:transparent;border:1px solid #1E3050;border-radius:3px;
+  color:#7A8BAA;font-size:11px;padding:3px 9px;cursor:pointer}
+.bar-drill-close:hover{border-color:#00C2C7;color:#00C2C7}
+.bar-drill-body{max-height:340px;overflow-y:auto}
+.bar-drill-body::-webkit-scrollbar{width:8px}
+.bar-drill-body::-webkit-scrollbar-thumb{background:#1E3050;border-radius:4px}
+.bar-drill table{margin:0}
+.bar-drill td{font-size:11px;padding:6px 12px}
+.bar-drill .empty{padding:18px;text-align:center;color:#7A8BAA;font-size:12px;font-style:italic}
+.bar-drill .pill-on{display:inline-block;background:#0E2A1A;border:1px solid #1F5A38;color:#4AE090;
+  border-radius:3px;padding:1px 6px;font-size:10px;font-family:'Courier New',monospace}
+.bar-drill .pill-off{display:inline-block;background:#241A0A;border:1px solid #5A4520;color:#E8C080;
+  border-radius:3px;padding:1px 6px;font-size:10px;font-family:'Courier New',monospace}
+
+body.light-mode .bar-row.drillable:hover{background:rgba(0,138,142,.10)}
+body.light-mode .bar-row.drillable.active{background:rgba(0,138,142,.16)}
+body.light-mode .bar-drill{background:#F5F7FA;border-color:#D8E0EC}
+body.light-mode .bar-drill-head{background:#FFFFFF;border-color:#D8E0EC}
+body.light-mode .bar-drill-title{color:#0B1628}
+body.light-mode .bar-drill-meta,body.light-mode .bar-drill .empty,
+body.light-mode .bar-drill-close{color:#5A6B85}
+body.light-mode .bar-drill-close{border-color:#D8E0EC}
+body.light-mode .bar-drill-close:hover{color:#008A8E;border-color:#00C2C7}
+body.light-mode .bar-drill-body::-webkit-scrollbar-thumb{background:#D8E0EC}
+
+/* Section detail panels */
+.section-detail{margin:0 -40px 4px;padding:18px 40px 22px;background:#0A1A30;
+  border-bottom:1px solid #1E3050;animation:secIn .25s ease}
+@keyframes secIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.section-detail .sd-toggle{display:inline-flex;align-items:center;gap:6px;background:transparent;
+  border:none;color:#00C2C7;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  cursor:pointer;padding:0;margin-bottom:12px}
+.section-detail .sd-toggle:hover{color:#7FE5E8}
+.section-detail.collapsed .sd-content{display:none}
+.section-detail.collapsed{padding-bottom:14px}
+.section-detail .sd-toggle .sd-chev{transition:transform .2s ease;display:inline-block}
+.section-detail.collapsed .sd-toggle .sd-chev{transform:rotate(-90deg)}
+.section-detail .sd-lede{font-size:13px;color:#C8D8F0;line-height:1.55;max-width:880px;margin-bottom:14px}
+.section-detail .sd-lede b{color:#E8EDF8;font-weight:700}
+.section-detail .sd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;margin-bottom:14px}
+.section-detail .sd-card{background:#0B1F38;border:1px solid #1E3050;border-radius:6px;padding:12px 14px}
+.section-detail .sd-card-num{font-size:22px;font-weight:800;color:#00C2C7;line-height:1;display:block;margin-bottom:6px}
+.section-detail .sd-card-num.high{color:#E74C3C}
+.section-detail .sd-card-num.med{color:#E8A040}
+.section-detail .sd-card-num.low{color:#7FA0C8}
+.section-detail .sd-card-num.green{color:#4AE090}
+.section-detail .sd-card-lbl{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:#7A8BAA;
+  font-weight:700;margin-bottom:4px}
+.section-detail .sd-card-sub{font-size:11px;color:#A8B8D0;line-height:1.4;margin-top:6px}
+.section-detail .sd-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.section-detail .sd-list li{display:flex;gap:10px;align-items:flex-start;font-size:12px;color:#A8B8D0;line-height:1.5}
+.section-detail .sd-list li .sd-num{flex-shrink:0;width:22px;height:22px;border-radius:50%;
+  background:#0B1F38;border:1px solid #00C2C7;color:#00C2C7;font-weight:800;font-size:11px;
+  display:flex;align-items:center;justify-content:center}
+.section-detail .sd-list li b{color:#E8EDF8;font-weight:700}
+.section-detail .sd-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+.section-detail .sd-col h5{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#7A8BAA;
+  font-weight:700;margin-bottom:8px}
+
+body.light-mode .section-detail{background:#FAFBFD;border-color:#D8E0EC}
+body.light-mode .section-detail .sd-toggle{color:#008A8E}
+body.light-mode .section-detail .sd-toggle:hover{color:#00606A}
+body.light-mode .section-detail .sd-lede{color:#1B2840}
+body.light-mode .section-detail .sd-lede b{color:#0B1628}
+body.light-mode .section-detail .sd-card{background:#FFFFFF;border-color:#D8E0EC}
+body.light-mode .section-detail .sd-card-num{color:#008A8E}
+body.light-mode .section-detail .sd-card-num.high{color:#C0341E}
+body.light-mode .section-detail .sd-card-num.med{color:#A06010}
+body.light-mode .section-detail .sd-card-num.low{color:#3A5070}
+body.light-mode .section-detail .sd-card-num.green{color:#1F7040}
+body.light-mode .section-detail .sd-card-lbl,
+body.light-mode .section-detail .sd-card-sub,
+body.light-mode .section-detail .sd-list li,
+body.light-mode .section-detail .sd-col h5{color:#5A6B85}
+body.light-mode .section-detail .sd-card-sub,
+body.light-mode .section-detail .sd-list li{color:#3A4A65}
+body.light-mode .section-detail .sd-list li b{color:#0B1628}
+body.light-mode .section-detail .sd-list li .sd-num{background:#FFFFFF;border-color:#00C2C7;color:#008A8E}
+
+/* === Audit analysis enhancements: status tags, progress, quick wins, brand mix === */
+.audit-qw{margin:14px 40px 0;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.audit-qw .qw{background:linear-gradient(135deg,#0E2A1A 0%,#0B1F18 100%);border:1px solid #1F5A38;border-radius:8px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:transform .15s,border-color .15s}
+.audit-qw .qw:hover{transform:translateY(-1px);border-color:#4AE090}
+.audit-qw .qw.alt{background:linear-gradient(135deg,#091525 0%,#0B1628 100%);border-color:#1E3050}
+.audit-qw .qw.alt:hover{border-color:#00C2C7}
+.audit-qw .qw .ico{width:38px;height:38px;border-radius:8px;background:#0B1628;display:flex;align-items:center;justify-content:center;color:#4AE090;font-size:18px;font-weight:800;border:1px solid #1F5A38;flex-shrink:0}
+.audit-qw .qw.alt .ico{color:#00C2C7;border-color:#1E3050}
+.audit-qw .qw .body{flex:1;min-width:0}
+.audit-qw .qw .ttl{font-size:13px;font-weight:700;color:#E8EDF8;letter-spacing:-.2px}
+.audit-qw .qw .sub{font-size:11px;color:#8A9BB8;margin-top:2px;line-height:1.4}
+.audit-qw .qw .arrow{color:#4AE090;font-size:18px;font-weight:700}
+.audit-qw .qw.alt .arrow{color:#00C2C7}
+
+.audit-progress{margin:14px 40px 0;background:#0E1E35;border:1px solid #1E3050;border-radius:8px;padding:14px 16px}
+.audit-progress .pg-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.audit-progress .pg-ttl{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#7A8BAA;font-weight:700}
+.audit-progress .pg-stat{font-size:12px;color:#C8D8F0}
+.audit-progress .pg-stat b{color:#4AE090;font-weight:800}
+.audit-progress .pg-bar{height:8px;background:#091525;border-radius:4px;overflow:hidden;position:relative}
+.audit-progress .pg-fill{height:100%;background:linear-gradient(90deg,#00C2C7 0%,#4AE090 100%);border-radius:4px;transition:width .4s ease;width:0}
+.audit-progress .pg-reset{background:transparent;border:1px solid #1E3050;border-radius:4px;padding:5px 10px;color:#7A8BAA;font-size:10px;cursor:pointer;letter-spacing:.5px;text-transform:uppercase}
+.audit-progress .pg-reset:hover{border-color:#E74C3C;color:#E74C3C}
+
+.audit-status-chips{display:flex;gap:6px;flex-wrap:wrap;margin-left:8px}
+.audit-status-chips .sc{background:#091525;border:1px solid #1E3050;border-radius:14px;padding:4px 10px;color:#7A8BAA;font-size:10px;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;font-weight:600;transition:all .12s}
+.audit-status-chips .sc:hover{color:#C8D8F0;border-color:#2A4060}
+.audit-status-chips .sc.active{background:#00C2C7;border-color:#00C2C7;color:#06283A}
+.audit-status-chips .sc .ct{margin-left:4px;opacity:.7;font-weight:700}
+
+.status-pill{display:inline-flex;align-items:center;gap:5px;background:#091525;border:1px solid #1E3050;border-radius:12px;padding:3px 10px;font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:#7A8BAA;font-weight:700;cursor:pointer;margin-left:auto;white-space:nowrap;transition:all .12s}
+.status-pill:hover{border-color:#2A4060;color:#C8D8F0}
+.status-pill .dot{width:7px;height:7px;border-radius:50%;background:#3A4A60;display:inline-block}
+.status-pill.s-doing{background:#241A0A;border-color:#5A4520;color:#E8A040}
+.status-pill.s-doing .dot{background:#E8A040}
+.status-pill.s-done{background:#0E2A1A;border-color:#1F5A38;color:#4AE090}
+.status-pill.s-done .dot{background:#4AE090}
+.status-pill.s-skip{background:#0B1628;border-color:#2A3A50;color:#56688A;text-decoration:line-through}
+.status-pill.s-skip .dot{background:#56688A}
+.status-menu{position:absolute;z-index:200;background:#0E1E35;border:1px solid #1E3050;border-radius:6px;padding:4px;box-shadow:0 8px 24px rgba(0,0,0,.5);min-width:140px}
+.status-menu button{display:flex;align-items:center;gap:8px;width:100%;background:transparent;border:0;color:#C8D8F0;font-size:11px;padding:7px 10px;text-align:left;cursor:pointer;border-radius:4px;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+.status-menu button:hover{background:#122040;color:#fff}
+.status-menu button .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+.finding.s-done{opacity:.55}
+.finding.s-done .finding-title{text-decoration:line-through;text-decoration-color:#4AE090;text-decoration-thickness:1px}
+.finding.s-skip{opacity:.4}
+.finding.s-skip .finding-title{text-decoration:line-through;color:#7A8BAA}
+.finding.s-doing{box-shadow:inset 3px 0 0 #E8A040}
+
+.road-item.rd-done{opacity:.55}
+.road-item.rd-done .road-title{text-decoration:line-through;text-decoration-color:#4AE090}
+.road-check{flex-shrink:0;width:22px;height:22px;border-radius:5px;border:1.5px solid #2A4060;background:#091525;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#4AE090;font-size:13px;font-weight:800;transition:all .15s;margin-top:3px}
+.road-check:hover{border-color:#00C2C7}
+.road-check.checked{background:#0E2A1A;border-color:#4AE090}
+.road-check.checked::after{content:"✓"}
+
+.audit-brand-mix{background:#0E1E35;border:1px solid #1E3050;border-radius:8px;padding:14px 16px;margin-top:14px}
+.audit-brand-mix .bm-head{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#7A8BAA;font-weight:700;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.audit-brand-mix .bm-sub{color:#56688A;font-weight:600;letter-spacing:.5px;text-transform:none;font-size:10px}
+.audit-brand-mix .bm-row{display:flex;align-items:center;gap:10px;margin:5px 0;font-size:11px}
+.audit-brand-mix .bm-lbl{width:130px;flex-shrink:0;color:#C8D8F0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.audit-brand-mix .bm-track{flex:1;background:#091525;border-radius:3px;height:14px;position:relative;overflow:hidden}
+.audit-brand-mix .bm-fill{height:100%;background:linear-gradient(90deg,#00C2C7 0%,#4AE090 100%);border-radius:3px;min-width:2px;transition:width .4s ease}
+.audit-brand-mix .bm-val{width:60px;flex-shrink:0;color:#7A8BAA;font-family:'Courier New',monospace;font-size:10px}
+
+body.light-mode .audit-progress{background:#FFFFFF;border-color:#D8E0EC}
+body.light-mode .audit-progress .pg-ttl,
+body.light-mode .audit-progress .pg-reset{color:#5A6B85}
+body.light-mode .audit-progress .pg-stat{color:#0B1628}
+body.light-mode .audit-progress .pg-bar{background:#EEF3FA}
+body.light-mode .status-pill{background:#FFFFFF;border-color:#D8E0EC;color:#5A6B85}
+body.light-mode .status-menu{background:#FFFFFF;border-color:#D8E0EC}
+body.light-mode .status-menu button{color:#0B1628}
+body.light-mode .status-menu button:hover{background:#EEF3FA}
+body.light-mode .audit-status-chips .sc{background:#FFFFFF;border-color:#D8E0EC;color:#5A6B85}
+body.light-mode .audit-brand-mix{background:#FFFFFF;border-color:#D8E0EC}
+body.light-mode .audit-brand-mix .bm-lbl{color:#0B1628}
+body.light-mode .audit-brand-mix .bm-track{background:#EEF3FA}
+body.light-mode .road-check{background:#FFFFFF;border-color:#D8E0EC}
+body.light-mode .road-check.checked{background:#E8F8EE;border-color:#1F8A4A;color:#1F8A4A}
+</style>
+
+<script>
+(function(){
+  function init(){
+    const audit = document.getElementById('view-audit');
+    if(!audit) return;
+    const findingsRoot = document.getElementById('findings');
+    if(!findingsRoot || !findingsRoot.children.length){
+      // Findings not rendered yet — retry on next frame
+      return requestAnimationFrame(init);
+    }
+    enhanceFindings();
+    buildSummary();
+    buildToc();
+    wireControls();
+    wireBarDrilldowns();
+    buildSectionDetails();
+    buildAnalysisLayer();
+  }
+
+  /* -------- Finding cards: collapse + sortable tables + sev tagging -------- */
+  function enhanceFindings(){
+    const findings = document.querySelectorAll('#findings .finding');
+    findings.forEach((f, i) => {
+      const sevEl = f.querySelector('.sev');
+      const sev = sevEl ? (sevEl.classList.contains('high') ? 'high'
+                         : sevEl.classList.contains('med')  ? 'med'
+                         : 'low') : 'low';
+      f.dataset.sev = sev;
+      f.dataset.idx = i;
+      const titleEl = f.querySelector('.finding-title');
+      if(titleEl){
+        const slug = 'finding-' + (i+1) + '-' + (titleEl.textContent || '')
+          .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,50);
+        f.id = slug;
+      }
+
+      // Wrap everything after .finding-top into a collapsible container
+      const top = f.querySelector('.finding-top');
+      if(top && !f.querySelector('.finding-body-wrap')){
+        const wrap = document.createElement('div');
+        wrap.className = 'finding-body-wrap';
+        let n = top.nextSibling;
+        while(n){
+          const next = n.nextSibling;
+          wrap.appendChild(n);
+          n = next;
+        }
+        f.appendChild(wrap);
+
+        // Chevron
+        const chev = document.createElement('span');
+        chev.className = 'finding-chevron';
+        chev.innerHTML = '▾';
+        top.appendChild(chev);
+
+        top.addEventListener('click', () => {
+          // Capture current height before toggle for smooth animation
+          if(!f.classList.contains('collapsed')){
+            wrap.style.maxHeight = wrap.scrollHeight + 'px';
+            requestAnimationFrame(() => { wrap.style.maxHeight = '0px'; });
+            f.classList.add('collapsed');
+          } else {
+            f.classList.remove('collapsed');
+            wrap.style.maxHeight = wrap.scrollHeight + 'px';
+            wrap.addEventListener('transitionend', function te(){
+              wrap.style.maxHeight = '';
+              wrap.removeEventListener('transitionend', te);
+            });
+          }
+        });
+      }
+
+      // Make tables sortable
+      f.querySelectorAll('table').forEach(makeSortable);
+    });
+  }
+
+  function makeSortable(table){
+    const ths = table.querySelectorAll('thead th');
+    const tbody = table.querySelector('tbody');
+    if(!ths.length || !tbody) return;
+    ths.forEach((th, ci) => {
+      th.classList.add('sort-none');
+      th.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const asc = !th.classList.contains('sort-asc');
+        ths.forEach(o => o.classList.remove('sort-asc','sort-desc','sort-none'));
+        ths.forEach(o => { if(o!==th) o.classList.add('sort-none'); });
+        th.classList.add(asc ? 'sort-asc' : 'sort-desc');
+        const getKey = (tr) => {
+          const td = tr.children[ci];
+          if(!td) return '';
+          const t = (td.textContent || '').trim();
+          // Numeric? (ints, floats, dates as YYYY-MM-DD all sort lexically OK)
+          const n = parseFloat(t.replace(/[, ]/g,''));
+          return (!isNaN(n) && /^[-0-9.,\s]+$/.test(t)) ? n : t.toLowerCase();
+        };
+        rows.sort((a,b) => {
+          const ka = getKey(a), kb = getKey(b);
+          if(ka < kb) return asc ? -1 : 1;
+          if(ka > kb) return asc ? 1 : -1;
+          return 0;
+        });
+        rows.forEach(r => tbody.appendChild(r));
+      });
+    });
+  }
+
+  /* -------- Summary: severity donut + impact mix bars -------- */
+  function buildSummary(){
+    const findings = Array.from(document.querySelectorAll('#findings .finding'));
+    const counts = {high:0, med:0, low:0};
+    findings.forEach(f => counts[f.dataset.sev]++);
+    const total = findings.length || 1;
+
+    // Update chip counts
+    document.querySelector('[data-count="all"]').textContent = total;
+    document.querySelector('[data-count="high"]').textContent = counts.high;
+    document.querySelector('[data-count="med"]').textContent = counts.med;
+    document.querySelector('[data-count="low"]').textContent = counts.low;
+
+    // Donut SVG
+    const R = 38, C = 2 * Math.PI * R;
+    const segs = [
+      {k:'high', color:'#E74C3C', label:'High',   v:counts.high},
+      {k:'med',  color:'#E8A040', label:'Medium', v:counts.med},
+      {k:'low',  color:'#7FA0C8', label:'Low',    v:counts.low}
+    ];
+    let offset = 0;
+    const arcs = segs.map(s => {
+      const len = (s.v / total) * C;
+      const el = `<circle r="${R}" cx="50" cy="50" fill="none" stroke="${s.color}" stroke-width="14"
+                    stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-offset}"
+                    transform="rotate(-90 50 50)"/>`;
+      offset += len;
+      return el;
+    }).join('');
+    const donut = `
+      <svg width="100" height="100" viewBox="0 0 100 100" aria-label="Severity breakdown">
+        <circle r="${R}" cx="50" cy="50" fill="none" stroke="#1E3050" stroke-width="14"/>
+        ${arcs}
+        <text x="50" y="48" text-anchor="middle" fill="currentColor" font-size="22" font-weight="800">${total}</text>
+        <text x="50" y="64" text-anchor="middle" fill="#7A8BAA" font-size="9" letter-spacing="1">FINDINGS</text>
+      </svg>`;
+    const legend = segs.map(s =>
+      `<span class="lg"><span class="sw" style="background:${s.color}"></span><b>${s.v}</b> ${s.label}</span>`
+    ).join('');
+
+    // Impact-mix bar (roadmap items by impact × effort)
+    const roadItems = Array.from(document.querySelectorAll('#roadmap .road-item'));
+    const impactMix = {High:0, Medium:0, Low:0};
+    const effortMix = {Low:0, Medium:0, High:0};
+    roadItems.forEach(r => {
+      const chips = r.querySelectorAll('.chip');
+      chips.forEach(c => {
+        const t = c.textContent.trim();
+        const m = t.match(/Impact:\s*(\w+)/); if(m && impactMix[m[1]] !== undefined) impactMix[m[1]]++;
+        const e = t.match(/Effort:\s*(\w+)/); if(e && effortMix[e[1]] !== undefined) effortMix[e[1]]++;
+      });
+    });
+    const roadTotal = roadItems.length || 1;
+    const seg = (label, data, colors) => {
+      const parts = Object.entries(data).map(([k,v]) => {
+        const w = (v/roadTotal*100).toFixed(1);
+        return v ? `<div class="imp-seg" style="width:${w}%;background:${colors[k]}" title="${k}: ${v}"></div>` : '';
+      }).join('');
+      const vals = Object.entries(data).filter(([,v])=>v).map(([k,v])=>`${v} ${k.toLowerCase()}`).join(' · ');
+      return `<div class="imp-row"><div class="imp-label">${label}</div>
+        <div class="imp-track">${parts}</div>
+        <div class="imp-val">${vals}</div></div>`;
+    };
+
+    document.getElementById('audit-summary').innerHTML = `
+      <div class="donut-wrap">
+        <div>${donut}</div>
+        <div class="donut-legend">
+          <div class="panel-title">Severity mix</div>
+          ${legend}
+        </div>
+      </div>
+      <div>
+        <div class="panel-title">Cleanup roadmap · ${roadTotal} actions</div>
+        <div class="impact-mix">
+          ${seg('Impact',  impactMix, {High:'#4AE090', Medium:'#E8A040', Low:'#7FA0C8'})}
+          ${seg('Effort',  effortMix, {Low:'#4AE090', Medium:'#E8A040', High:'#E74C3C'})}
+        </div>
+      </div>`;
+  }
+
+  /* -------- Sticky table of contents -------- */
+  let tocLinks = [];
+  function buildToc(){
+    const toc = document.createElement('aside');
+    toc.className = 'audit-toc';
+    toc.innerHTML = `
+      <div class="audit-toc-head">
+        <span class="lbl">On this page</span>
+        <button class="audit-toc-toggle" type="button" title="Collapse">×</button>
+      </div>
+      <ul class="audit-toc-list"></ul>`;
+    document.getElementById('view-audit').appendChild(toc);
+    const list = toc.querySelector('.audit-toc-list');
+    const toggle = toc.querySelector('.audit-toc-toggle');
+    toggle.addEventListener('click', () => {
+      const collapsed = toc.classList.toggle('collapsed');
+      toggle.textContent = collapsed ? '☰' : '×';
+      toggle.title = collapsed ? 'Expand' : 'Collapse';
+    });
+
+    const items = [];
+    // Findings section
+    const findHeader = Array.from(document.querySelectorAll('#view-audit .section-header'))
+      .find(h => /Findings/i.test(h.textContent));
+    if(findHeader){
+      if(!findHeader.id) findHeader.id = 'toc-findings';
+      items.push({el:findHeader, label:'Findings', section:true});
+    }
+    document.querySelectorAll('#findings .finding').forEach(f => {
+      const title = f.querySelector('.finding-title');
+      if(!title) return;
+      items.push({el:f, label:title.textContent.trim(), sev:f.dataset.sev});
+    });
+    // Roadmap section
+    const roadHeader = Array.from(document.querySelectorAll('#view-audit .section-header'))
+      .find(h => /Roadmap/i.test(h.textContent));
+    if(roadHeader){
+      if(!roadHeader.id) roadHeader.id = 'toc-roadmap';
+      items.push({el:roadHeader, label:'Cleanup Roadmap', section:true});
+    }
+
+    list.innerHTML = items.map(it => {
+      if(it.section){
+        return `<li><a href="#${it.el.id}" class="is-section" data-target="${it.el.id}">${it.label}</a></li>`;
+      }
+      return `<li><a href="#${it.el.id}" data-target="${it.el.id}" data-sev="${it.sev}">
+        <span class="audit-toc-sev ${it.sev}"></span><span>${it.label}</span>
+      </a></li>`;
+    }).join('');
+
+    tocLinks = Array.from(list.querySelectorAll('a'));
+    tocLinks.forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const t = document.getElementById(a.dataset.target);
+        if(!t) return;
+        const el = document.getElementById(a.dataset.target);
+        if(el && el.classList.contains('finding') && el.classList.contains('collapsed')){
+          el.querySelector('.finding-top').click();
+        }
+        const y = t.getBoundingClientRect().top + window.pageYOffset - 80;
+        window.scrollTo({top:y, behavior:'smooth'});
+      });
+    });
+
+    // Scroll spy
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if(ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY + 120;
+        let active = null;
+        items.forEach(it => {
+          const top = it.el.getBoundingClientRect().top + window.pageYOffset;
+          if(top <= y) active = it.el.id;
+        });
+        tocLinks.forEach(a => a.classList.toggle('active', a.dataset.target === active));
+        ticking = false;
+      });
+    }, {passive:true});
+  }
+
+  /* -------- Controls: filter chips + search + collapse all -------- */
+  function wireControls(){
+    const chips = document.querySelectorAll('.sev-chip');
+    const search = document.getElementById('audit-search-input');
+    const empty = document.getElementById('audit-empty');
+    const collapseBtn = document.getElementById('audit-collapse-toggle');
+    let activeSev = 'all';
+    let query = '';
+
+    function apply(){
+      const q = query.trim().toLowerCase();
+      const findings = document.querySelectorAll('#findings .finding');
+      let visible = 0;
+      findings.forEach(f => {
+        const sevOk = activeSev === 'all' || f.dataset.sev === activeSev;
+        const text = (f.textContent || '').toLowerCase();
+        const qOk = !q || text.includes(q);
+        const show = sevOk && qOk;
+        f.classList.toggle('hidden', !show);
+        if(show) visible++;
+        // Sync TOC visibility
+        const link = tocLinks.find(a => a.dataset.target === f.id);
+        if(link) link.parentElement.style.display = show ? '' : 'none';
+      });
+      empty.style.display = visible ? 'none' : 'block';
+    }
+
+    chips.forEach(c => c.addEventListener('click', () => {
+      chips.forEach(o => o.classList.remove('active'));
+      c.classList.add('active');
+      activeSev = c.dataset.sev;
+      apply();
+    }));
+    search.addEventListener('input', (e) => { query = e.target.value; apply(); });
+
+    let allCollapsed = false;
+    collapseBtn.addEventListener('click', () => {
+      allCollapsed = !allCollapsed;
+      document.querySelectorAll('#findings .finding').forEach(f => {
+        const isCollapsed = f.classList.contains('collapsed');
+        if(allCollapsed !== isCollapsed){
+          f.querySelector('.finding-top').click();
+        }
+      });
+      collapseBtn.textContent = allCollapsed ? 'Expand all' : 'Collapse all';
+    });
+  }
+
+  /* -------- Click-through drill-down on finding bars -------- */
+  function wireBarDrilldowns(){
+    const T = (typeof window !== 'undefined' && Array.isArray(window.TEMPLATES)) ? window.TEMPLATES
+            : (typeof TEMPLATES !== 'undefined' ? TEMPLATES : []);
+    if(!T.length) return;
+
+    // Cluster matchers for the "General" bucket
+    const CLUSTERS = {
+      'TL / TransLanguages':   t => /\bTL\b|TransLanguages/i.test(t.title),
+      'Services / Solutions':  t => /Service|Solution/i.test(t.title),
+      'Race / Photo / Contest':t => /Race|Photo|Contest/i.test(t.title),
+      'Webinar':               t => /Webinar/i.test(t.title),
+      'HR / Health & Safety':  t => /\bHR\b|Health|Safety/i.test(t.title),
+      'TLS':                   t => /\bTLS\b/i.test(t.title),
+      '"Copy of … TP Corporate"': t => /^Copy of/i.test(t.title) && /TP Corporate/i.test(t.title),
+      'Case Study':            t => /Case Study/i.test(t.title),
+      'Podcast':               t => /Podcast/i.test(t.title),
+    };
+    function generalCluster(t){
+      if(t.brand !== 'General') return null;
+      for(const [name, fn] of Object.entries(CLUSTERS)){
+        if(fn(t)) return name;
+      }
+      return 'One-offs / uncategorized';
+    }
+
+    function templatesFor(kind, key){
+      switch(kind){
+        case 'brand':
+          return T.filter(t => t.brand === key);
+        case 'size':
+          return T.filter(t => `${t.w}×${t.h}` === key);
+        case 'cluster':
+          return T.filter(t => generalCluster(t) === key);
+        case 'tag': {
+          // Show all templates of that brand, marking which carry a [bracket] tag
+          return T.filter(t => t.brand === key);
+        }
+        default: return [];
+      }
+    }
+
+    function renderRows(kind, list){
+      if(!list.length) return `<div class="empty">No templates matched.</div>`;
+      const fmt = ts => ts ? new Date(ts*1000).toISOString().slice(0,10) : '—';
+      if(kind === 'tag'){
+        return `<table><thead><tr>
+          <th>Template</th><th>Tag in title</th><th>Size</th><th>ID</th><th>Open</th>
+        </tr></thead><tbody>${list.map(t => {
+          const hasTag = /\[[^\]]+\]/.test(t.title);
+          return `<tr>
+            <td class="template-name">${escapeHtml(t.title)}</td>
+            <td>${hasTag ? '<span class="pill-on">[ tagged ]</span>' : '<span class="pill-off">no tag</span>'}</td>
+            <td><span class="size-badge">${t.w}×${t.h}</span></td>
+            <td><span class="template-id">${t.id}</span></td>
+            <td><a class="link-btn" href="${t.createUrl}" target="_blank" rel="noopener">Open ↗</a></td>
+          </tr>`;
+        }).join('')}</tbody></table>`;
+      }
+      return `<table><thead><tr>
+        <th>Template</th><th>Brand</th><th>Size</th><th>Pages</th><th>Created</th><th>ID</th><th>Open</th>
+      </tr></thead><tbody>${list.map(t => `<tr>
+        <td class="template-name">${escapeHtml(t.title)}</td>
+        <td>${escapeHtml(t.brand)}</td>
+        <td><span class="size-badge">${t.w}×${t.h}</span></td>
+        <td>${t.pages || '—'}</td>
+        <td><span class="date-text">${fmt(t.created)}</span></td>
+        <td><span class="template-id">${t.id}</span></td>
+        <td><a class="link-btn" href="${t.createUrl}" target="_blank" rel="noopener">Open ↗</a></td>
+      </tr>`).join('')}</tbody></table>`;
+    }
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function kindLabel(kind, key){
+      switch(kind){
+        case 'brand':   return `Templates in <span style="color:#00C2C7">${escapeHtml(key)}</span>`;
+        case 'size':    return `Templates sized <span style="color:#00C2C7">${escapeHtml(key)}</span>`;
+        case 'cluster': return `"General" templates matching <span style="color:#00C2C7">${escapeHtml(key)}</span>`;
+        case 'tag':     return `<span style="color:#00C2C7">${escapeHtml(key)}</span> — tag usage across titles`;
+        default:        return key;
+      }
+    }
+
+    function closeDrill(barsEl){
+      const existing = barsEl.parentElement.querySelector(`.bar-drill[data-drill-for="${barsEl.dataset.barKind}"]`);
+      if(existing) existing.remove();
+      barsEl.querySelectorAll('.bar-row.drillable.active').forEach(r => r.classList.remove('active'));
+    }
+
+    function openDrill(row){
+      const barsEl = row.closest('.bars');
+      if(!barsEl) return;
+      const kind = barsEl.dataset.barKind;
+      const key = row.dataset.barKey;
+      const wasActive = row.classList.contains('active');
+      closeDrill(barsEl);
+      if(wasActive) return; // clicking active row toggles it off
+
+      row.classList.add('active');
+      const list = templatesFor(kind, key);
+      const panel = document.createElement('div');
+      panel.className = 'bar-drill';
+      panel.dataset.drillFor = kind;
+      panel.innerHTML = `
+        <div class="bar-drill-head">
+          <div>
+            <div class="bar-drill-title">${kindLabel(kind, key)}</div>
+            <div class="bar-drill-meta">${list.length} template${list.length===1?'':'s'} · click any "Open ↗" to launch in Canva</div>
+          </div>
+          <button class="bar-drill-close" type="button" aria-label="Close">Close ×</button>
+        </div>
+        <div class="bar-drill-body">${renderRows(kind, list)}</div>`;
+      barsEl.insertAdjacentElement('afterend', panel);
+
+      // Re-apply sortable behavior to the new table
+      const tbl = panel.querySelector('table');
+      if(tbl){
+        const ths = tbl.querySelectorAll('thead th');
+        const tbody = tbl.querySelector('tbody');
+        ths.forEach((th, ci) => {
+          th.classList.add('sort-none');
+          th.addEventListener('click', () => {
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const asc = !th.classList.contains('sort-asc');
+            ths.forEach(o => o.classList.remove('sort-asc','sort-desc','sort-none'));
+            ths.forEach(o => { if(o!==th) o.classList.add('sort-none'); });
+            th.classList.add(asc ? 'sort-asc' : 'sort-desc');
+            rows.sort((a,b) => {
+              const ka = (a.children[ci]?.textContent || '').trim().toLowerCase();
+              const kb = (b.children[ci]?.textContent || '').trim().toLowerCase();
+              const na = parseFloat(ka), nb = parseFloat(kb);
+              const numeric = !isNaN(na) && !isNaN(nb) && /^[-0-9.,\s×x]+$/.test(ka) && /^[-0-9.,\s×x]+$/.test(kb);
+              if(numeric) return asc ? na-nb : nb-na;
+              if(ka < kb) return asc ? -1 : 1;
+              if(ka > kb) return asc ? 1 : -1;
+              return 0;
+            });
+            rows.forEach(r => tbody.appendChild(r));
+          });
+        });
+      }
+
+      panel.querySelector('.bar-drill-close').addEventListener('click', () => closeDrill(barsEl));
+    }
+
+    // Delegated click + keyboard activation
+    document.getElementById('findings').addEventListener('click', (e) => {
+      const row = e.target.closest('.bar-row.drillable');
+      if(!row) return;
+      if(e.target.closest('.bar-drill')) return;
+      openDrill(row);
+    });
+    document.getElementById('findings').addEventListener('keydown', (e) => {
+      if(e.key !== 'Enter' && e.key !== ' ') return;
+      const row = e.target.closest('.bar-row.drillable');
+      if(!row) return;
+      e.preventDefault();
+      openDrill(row);
+    });
+  }
+
+  /* -------- Section detail panels -------- */
+  function buildSectionDetails(){
+    const audit = document.getElementById('view-audit');
+    if(!audit) return;
+
+    // Tally findings & roadmap
+    const findings = Array.from(document.querySelectorAll('#findings .finding'));
+    const sevCounts = {high:0, med:0, low:0};
+    findings.forEach(f => sevCounts[f.dataset.sev]++);
+
+    const roadItems = Array.from(document.querySelectorAll('#roadmap .road-item'));
+    let touchTotal = 0;
+    let quickWins = 0;
+    const effortMix = {Low:0, Medium:0, High:0};
+    roadItems.forEach(r => {
+      const chips = Array.from(r.querySelectorAll('.chip')).map(c => c.textContent.trim());
+      const touchChip = chips.find(c => /template/i.test(c)) || '';
+      const m = touchChip.match(/(\d+)/);
+      if(m) touchTotal += parseInt(m[1],10);
+      const impactChip = chips.find(c => /Impact:/i.test(c)) || '';
+      const effortChip = chips.find(c => /Effort:/i.test(c)) || '';
+      if(/Impact:\s*High/i.test(impactChip) && /Effort:\s*Low/i.test(effortChip)) quickWins++;
+      const e = effortChip.match(/Effort:\s*(\w+)/);
+      if(e && effortMix[e[1]] !== undefined) effortMix[e[1]]++;
+    });
+
+    const totalFindings = findings.length;
+    const totalActions = roadItems.length;
+    const TOTAL_TEMPLATES = (typeof TEMPLATES !== 'undefined' ? TEMPLATES.length : 293);
+
+    // Find each section's header element
+    const sectionHeaders = Array.from(audit.querySelectorAll('.section-header'));
+    const findHeader = sectionHeaders.find(h => /Findings/i.test(h.textContent));
+    const roadHeader = sectionHeaders.find(h => /Roadmap/i.test(h.textContent));
+
+    // --- Build a detail panel for the Data Integrity strip (.health) ---
+    const health = audit.querySelector('.health');
+    if(health){
+      const intro = buildPanel({
+        title: 'About this section',
+        lede: `Before drawing any conclusions, we verified the underlying registry data. <b>All ${TOTAL_TEMPLATES} templates</b> have a valid Canva ID, exact W×H, page count, and a working edit link — so every finding below is about <b>how the library is organized</b>, not about missing or broken data.`,
+        cards: [
+          {num: TOTAL_TEMPLATES, lbl:'Templates audited', sub:'Pulled from the TransPerfect Canva Team account', cls:'green'},
+          {num: '0', lbl:'Duplicate IDs', sub:'No two records share the same Canva template ID'},
+          {num: '0', lbl:'Duplicate titles', sub:'No exact-string title collisions across the library'},
+          {num: '100%', lbl:'Field completeness', sub:'Size · pages · URL filled on every record', cls:'green'},
+        ],
+      });
+      health.insertAdjacentElement('beforebegin', intro);
+    }
+
+    // --- Findings section detail ---
+    if(findHeader){
+      const panel = buildPanel({
+        title: 'About the findings',
+        lede: `Six organizational issues surfaced across the ${TOTAL_TEMPLATES}-template library, ranked by <b>cleanup value</b> (impact ÷ effort). Two are <b>high-severity</b> bloat or misfile issues you can resolve in an afternoon; the remaining four are workflow/standards questions that benefit from a team decision.`,
+        cards: [
+          {num: totalFindings, lbl:'Total findings', sub:'Click any bar in a finding to drill into the underlying templates'},
+          {num: sevCounts.high, lbl:'High severity', sub:'Material organizational debt · do these first', cls:'high'},
+          {num: sevCounts.med,  lbl:'Medium severity', sub:'Standards/consistency issues · plan a sprint', cls:'med'},
+          {num: sevCounts.low,  lbl:'Low severity', sub:'Worth a periodic review, not urgent', cls:'low'},
+        ],
+        extra: `
+          <div class="sd-cols">
+            <div class="sd-col">
+              <h5>How to read a finding</h5>
+              <ul class="sd-list">
+                <li><span class="sd-num">1</span><div><b>Severity pill</b> (High/Med/Low) at the top of the card sets the priority lens.</div></li>
+                <li><span class="sd-num">2</span><div><b>Bars or tables</b> show the supporting data. <b>Click a bar</b> to expand the matching templates inline.</div></li>
+                <li><span class="sd-num">3</span><div>The teal <b>Recommended</b> callout at the bottom is the suggested action — these flow directly into the Cleanup Roadmap below.</div></li>
+              </ul>
+            </div>
+            <div class="sd-col">
+              <h5>Tips for reviewing</h5>
+              <ul class="sd-list">
+                <li><span class="sd-num">★</span><div>Use the <b>severity chips</b> above to focus on a single tier at a time.</div></li>
+                <li><span class="sd-num">★</span><div>The <b>search bar</b> matches any text inside any finding — useful for hunting a specific brand or template.</div></li>
+                <li><span class="sd-num">★</span><div><b>Click a card header</b> to collapse it, or use <b>"Collapse all"</b> for a top-down scan.</div></li>
+              </ul>
+            </div>
+          </div>`,
+      });
+      findHeader.insertAdjacentElement('afterend', panel);
+    }
+
+    // --- Roadmap section detail ---
+    if(roadHeader){
+      const panel = buildPanel({
+        title: 'About the roadmap',
+        lede: `${totalActions} concrete actions, ordered by <b>cleanup value</b>. The first ${quickWins || 2} are <b>quick wins</b> — high impact, low effort — and together cover roughly <b>${touchTotal} template touches</b>. We recommend tackling them in order; each step assumes the previous one is done.`,
+        cards: [
+          {num: totalActions, lbl:'Cleanup actions', sub:'Each maps to one or more findings above'},
+          {num: quickWins,    lbl:'Quick wins', sub:'High impact · Low effort — start here', cls:'green'},
+          {num: touchTotal,   lbl:'Template touches', sub:'Approximate edits required if every action is completed'},
+          {num: effortMix.Low + '/' + (effortMix.Medium + (effortMix.High||0)), lbl:'Low ÷ heavier effort', sub:`${effortMix.Low} low-effort vs ${effortMix.Medium + (effortMix.High||0)} requiring a sprint`},
+        ],
+        extra: `
+          <div class="sd-cols">
+            <div class="sd-col">
+              <h5>Suggested sequencing</h5>
+              <ul class="sd-list">
+                <li><span class="sd-num">A</span><div><b>This week:</b> reassign the 5 misfiled TP Corporate copies + resolve the 15 "Copy of …" files. 20 templates, no judgement calls.</div></li>
+                <li><span class="sd-num">B</span><div><b>Next sprint:</b> split the "General" bucket into real categories — biggest single-action impact on findability.</div></li>
+                <li><span class="sd-num">C</span><div><b>Standards pass:</b> decide on brand-tag and canvas-size conventions, then normalize the library to match.</div></li>
+                <li><span class="sd-num">D</span><div><b>Periodic:</b> archive aging 2019–2020 one-offs once campaigns/clients are confirmed closed.</div></li>
+              </ul>
+            </div>
+            <div class="sd-col">
+              <h5>What "Impact" and "Effort" mean</h5>
+              <ul class="sd-list">
+                <li><span class="sd-num">I</span><div><b>Impact</b> measures library-wide visibility and search/findability gain — e.g. splitting "General" affects 34% of the catalog.</div></li>
+                <li><span class="sd-num">E</span><div><b>Effort</b> reflects person-time: <b>Low</b> = ≤1 hour of mechanical edits; <b>Medium</b> = a half-day requiring some judgement on categorization.</div></li>
+                <li><span class="sd-num">T</span><div><b>Templates touched</b> is the ceiling — many edits are batch-renames or tag adjustments, not full redesigns.</div></li>
+              </ul>
+            </div>
+          </div>`,
+      });
+      roadHeader.insertAdjacentElement('afterend', panel);
+    }
+
+    function buildPanel({title, lede, cards, extra}){
+      const wrap = document.createElement('div');
+      wrap.className = 'section-detail';
+      const cardsHtml = cards ? `<div class="sd-grid">${cards.map(c => `
+        <div class="sd-card">
+          <div class="sd-card-lbl">${c.lbl}</div>
+          <span class="sd-card-num ${c.cls||''}">${c.num}</span>
+          ${c.sub ? `<div class="sd-card-sub">${c.sub}</div>` : ''}
+        </div>`).join('')}</div>` : '';
+      wrap.innerHTML = `
+        <button class="sd-toggle" type="button">
+          <span class="sd-chev">▾</span> ${title}
+        </button>
+        <div class="sd-content">
+          ${lede ? `<div class="sd-lede">${lede}</div>` : ''}
+          ${cardsHtml}
+          ${extra || ''}
+        </div>`;
+      wrap.querySelector('.sd-toggle').addEventListener('click', () => {
+        wrap.classList.toggle('collapsed');
+      });
+      return wrap;
+    }
+  }
+
+
+
+
+
+
+  /* ====== Analysis layer: status tagging, progress, quick wins, brand mix ====== */
+  function buildAnalysisLayer(){
+    const audit = document.getElementById('view-audit');
+    if(!audit) return;
+    const LS_FIND = 'tp-audit-finding-status-v1';
+    const LS_ROAD = 'tp-audit-roadmap-done-v1';
+    const readJSON = (k) => { try { return JSON.parse(localStorage.getItem(k) || '{}'); } catch(e){ return {}; } };
+    const writeJSON = (k,v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} };
+    let findStatus = readJSON(LS_FIND);   // {findingId: 'open'|'doing'|'done'|'skip'}
+    let roadDone   = readJSON(LS_ROAD);   // {roadIdx: true}
+
+    const STATUSES = [
+      {k:'open',  lbl:'Open',         dot:'#3A4A60'},
+      {k:'doing', lbl:'In progress',  dot:'#E8A040'},
+      {k:'done',  lbl:'Done',         dot:'#4AE090'},
+      {k:'skip',  lbl:'Skip',         dot:'#56688A'},
+    ];
+
+    /* ---- 1. Quick wins spotlight (before the summary) ---- */
+    const roadItems = Array.from(document.querySelectorAll('#roadmap .road-item'));
+    let quickWinTouches = 0;
+    const quickWinIdxs = [];
+    roadItems.forEach((r,i) => {
+      const chips = Array.from(r.querySelectorAll('.chip')).map(c => c.textContent.trim());
+      const isQW = chips.some(c => /Impact:\s*High/i.test(c)) && chips.some(c => /Effort:\s*Low/i.test(c));
+      if(isQW){
+        quickWinIdxs.push(i);
+        const tc = chips.find(c => /template/i.test(c)) || '';
+        const m = tc.match(/(\d+)/);
+        if(m) quickWinTouches += parseInt(m[1],10);
+      }
+      r.dataset.roadIdx = i;
+    });
+    const totalActions = roadItems.length;
+
+    const qwHost = document.createElement('div');
+    qwHost.className = 'audit-qw';
+    qwHost.innerHTML = `
+      <div class="qw" data-jump="roadmap">
+        <div class="ico">★</div>
+        <div class="body">
+          <div class="ttl">${quickWinIdxs.length} quick win${quickWinIdxs.length===1?'':'s'} ready to ship</div>
+          <div class="sub">High impact · low effort · ~${quickWinTouches} template touches — start here</div>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="qw alt" data-jump="findings">
+        <div class="ico">⚑</div>
+        <div class="body">
+          <div class="ttl">Jump to the findings</div>
+          <div class="sub">Browse all issues, filter by severity or status, and drill into the templates</div>
+        </div>
+        <div class="arrow">→</div>
+      </div>`;
+    const summaryEl = document.getElementById('audit-summary');
+    if(summaryEl) summaryEl.insertAdjacentElement('afterend', qwHost);
+    qwHost.addEventListener('click', (e) => {
+      const card = e.target.closest('.qw');
+      if(!card) return;
+      const tgtId = card.dataset.jump === 'roadmap' ? 'toc-roadmap' : 'toc-findings';
+      const t = document.getElementById(tgtId);
+      if(t){
+        const y = t.getBoundingClientRect().top + window.pageYOffset - 80;
+        window.scrollTo({top:y, behavior:'smooth'});
+      }
+    });
+
+    /* ---- 2. Brand-mix mini chart (appended to summary) ---- */
+    if(typeof TEMPLATES !== 'undefined' && Array.isArray(TEMPLATES) && TEMPLATES.length){
+      const brandCounts = {};
+      TEMPLATES.forEach(t => { brandCounts[t.brand] = (brandCounts[t.brand]||0) + 1; });
+      const ranked = Object.entries(brandCounts).sort((a,b) => b[1]-a[1]).slice(0,8);
+      const max = ranked[0][1];
+      const bm = document.createElement('div');
+      bm.className = 'audit-brand-mix';
+      bm.innerHTML = `
+        <div class="bm-head"><span>Library volume by brand</span><span class="bm-sub">top ${ranked.length} · ${TEMPLATES.length} templates total</span></div>
+        ${ranked.map(([b,n]) => `
+          <div class="bm-row">
+            <div class="bm-lbl" title="${b}">${b}</div>
+            <div class="bm-track"><div class="bm-fill" style="width:${(n/max*100).toFixed(1)}%"></div></div>
+            <div class="bm-val">${n} · ${(n/TEMPLATES.length*100).toFixed(0)}%</div>
+          </div>`).join('')}`;
+      qwHost.insertAdjacentElement('afterend', bm);
+    }
+
+    /* ---- 3. Status pill on each finding ---- */
+    const findings = Array.from(document.querySelectorAll('#findings .finding'));
+    function statusFor(id){ return findStatus[id] || 'open'; }
+    function applyFindingStatusClass(f){
+      f.classList.remove('s-open','s-doing','s-done','s-skip');
+      f.classList.add('s-' + statusFor(f.id));
+    }
+    function renderPill(f){
+      const s = statusFor(f.id);
+      const meta = STATUSES.find(x => x.k === s);
+      let pill = f.querySelector('.status-pill');
+      if(!pill){
+        pill = document.createElement('button');
+        pill.type = 'button';
+        pill.className = 'status-pill';
+        const top = f.querySelector('.finding-top');
+        if(top) top.appendChild(pill);
+      }
+      pill.className = 'status-pill s-' + s;
+      pill.innerHTML = `<span class="dot"></span>${meta.lbl}`;
+      pill.onclick = (e) => { e.stopPropagation(); openStatusMenu(pill, f); };
+    }
+    function openStatusMenu(anchor, f){
+      document.querySelectorAll('.status-menu').forEach(m => m.remove());
+      const menu = document.createElement('div');
+      menu.className = 'status-menu';
+      menu.innerHTML = STATUSES.map(s =>
+        `<button data-st="${s.k}"><span class="dot" style="background:${s.dot}"></span>${s.lbl}</button>`
+      ).join('');
+      document.body.appendChild(menu);
+      const r = anchor.getBoundingClientRect();
+      menu.style.top  = (r.bottom + window.scrollY + 6) + 'px';
+      menu.style.left = (r.right  + window.scrollX - 150) + 'px';
+      menu.addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-st]');
+        if(!btn) return;
+        findStatus[f.id] = btn.dataset.st;
+        writeJSON(LS_FIND, findStatus);
+        renderPill(f);
+        applyFindingStatusClass(f);
+        renderStatusCounts();
+        applyStatusFilter();
+        menu.remove();
+      });
+      setTimeout(() => {
+        const off = (ev) => { if(!menu.contains(ev.target)){ menu.remove(); document.removeEventListener('click', off); } };
+        document.addEventListener('click', off);
+      }, 0);
+    }
+    findings.forEach(f => { renderPill(f); applyFindingStatusClass(f); });
+
+    /* ---- 4. Status filter chips (added inside the existing controls bar) ---- */
+    const controls = document.getElementById('audit-controls');
+    if(controls){
+      const chips = document.createElement('div');
+      chips.className = 'audit-status-chips';
+      chips.id = 'audit-status-chips';
+      chips.innerHTML = `
+        <button class="sc active" data-st="all">All <span class="ct" data-ct="all"></span></button>
+        <button class="sc" data-st="open">Open <span class="ct" data-ct="open"></span></button>
+        <button class="sc" data-st="doing">Doing <span class="ct" data-ct="doing"></span></button>
+        <button class="sc" data-st="done">Done <span class="ct" data-ct="done"></span></button>
+        <button class="sc" data-st="skip">Skip <span class="ct" data-ct="skip"></span></button>`;
+      const sevChips = document.getElementById('audit-sev-chips');
+      if(sevChips) sevChips.insertAdjacentElement('afterend', chips);
+      else controls.appendChild(chips);
+      let activeStatus = 'all';
+      chips.addEventListener('click', (e) => {
+        const b = e.target.closest('.sc');
+        if(!b) return;
+        chips.querySelectorAll('.sc').forEach(o => o.classList.remove('active'));
+        b.classList.add('active');
+        activeStatus = b.dataset.st;
+        applyStatusFilter();
+      });
+      window.__applyStatusFilter = () => {
+        const empty = document.getElementById('audit-empty');
+        let visible = 0;
+        findings.forEach(f => {
+          const okSev = !f.classList.contains('hidden-sev');
+          const s = statusFor(f.id);
+          const stOk = activeStatus === 'all' || s === activeStatus;
+          // Re-evaluate visibility using existing filter state (search + sev) plus status
+          // We piggy-back on the existing .hidden class by toggling a separate hidden-status class.
+          f.classList.toggle('hidden-status', !stOk);
+          const show = !f.classList.contains('hidden') && stOk;
+          // The combined visible state respects both filters.
+          if(show) visible++;
+        });
+        if(empty){
+          const anyVis = Array.from(findings).some(f => !f.classList.contains('hidden') && !f.classList.contains('hidden-status'));
+          empty.style.display = anyVis ? 'none' : 'block';
+        }
+      };
+    }
+    function applyStatusFilter(){ if(window.__applyStatusFilter) window.__applyStatusFilter(); }
+    // Hide via class
+    const styleHide = document.createElement('style');
+    styleHide.textContent = '.finding.hidden-status{display:none !important}';
+    document.head.appendChild(styleHide);
+    function renderStatusCounts(){
+      const counts = {all:findings.length, open:0, doing:0, done:0, skip:0};
+      findings.forEach(f => counts[statusFor(f.id)]++);
+      Object.entries(counts).forEach(([k,v]) => {
+        const el = document.querySelector(`[data-ct="${k}"]`);
+        if(el) el.textContent = v;
+      });
+      renderProgress();
+    }
+
+    /* ---- 5. Roadmap checkboxes + progress bar ---- */
+    roadItems.forEach((r,i) => {
+      const num = r.querySelector('.road-num');
+      if(!num) return;
+      const check = document.createElement('button');
+      check.type = 'button';
+      check.className = 'road-check' + (roadDone[i] ? ' checked' : '');
+      check.title = 'Mark complete';
+      check.setAttribute('aria-label','Mark roadmap step ' + (i+1) + ' complete');
+      num.insertAdjacentElement('afterend', check);
+      if(roadDone[i]) r.classList.add('rd-done');
+      check.addEventListener('click', () => {
+        const now = !check.classList.contains('checked');
+        check.classList.toggle('checked', now);
+        r.classList.toggle('rd-done', now);
+        if(now) roadDone[i] = true; else delete roadDone[i];
+        writeJSON(LS_ROAD, roadDone);
+        renderProgress();
+      });
+    });
+
+    /* ---- 6. Progress strip (after the sticky controls bar) ---- */
+    const progressEl = document.createElement('div');
+    progressEl.className = 'audit-progress';
+    progressEl.innerHTML = `
+      <div class="pg-head">
+        <span class="pg-ttl">Cleanup progress</span>
+        <span class="pg-stat" id="pg-stat-text">—</span>
+        <button class="pg-reset" type="button" id="pg-reset">Reset</button>
+      </div>
+      <div class="pg-bar"><div class="pg-fill" id="pg-fill"></div></div>`;
+    if(controls) controls.insertAdjacentElement('afterend', progressEl);
+    progressEl.querySelector('#pg-reset').addEventListener('click', () => {
+      if(!confirm('Reset all status tags and roadmap progress on this device?')) return;
+      findStatus = {}; roadDone = {};
+      writeJSON(LS_FIND, findStatus); writeJSON(LS_ROAD, roadDone);
+      findings.forEach(f => { renderPill(f); applyFindingStatusClass(f); });
+      roadItems.forEach((r,i) => {
+        r.classList.remove('rd-done');
+        const c = r.querySelector('.road-check'); if(c) c.classList.remove('checked');
+      });
+      renderStatusCounts();
+      applyStatusFilter();
+    });
+
+    function renderProgress(){
+      const findingsDone = findings.filter(f => {
+        const s = statusFor(f.id); return s === 'done' || s === 'skip';
+      }).length;
+      const roadDoneCount = Object.keys(roadDone).length;
+      const totalUnits = findings.length + totalActions;
+      const doneUnits  = findingsDone + roadDoneCount;
+      const pct = totalUnits ? Math.round(doneUnits/totalUnits*100) : 0;
+      const fill = document.getElementById('pg-fill');
+      const txt  = document.getElementById('pg-stat-text');
+      if(fill) fill.style.width = pct + '%';
+      if(txt)  txt.innerHTML = `<b>${pct}%</b> · ${findingsDone}/${findings.length} findings resolved · ${roadDoneCount}/${totalActions} roadmap actions complete`;
+    }
+
+    renderStatusCounts();
+    renderProgress();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>
