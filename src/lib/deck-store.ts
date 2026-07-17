@@ -65,12 +65,27 @@ export type DeckClientLogo = {
   monoUrl?: string | null;
 };
 
+export type DeckStrategySnapshot = {
+  narrativeArc?: string;
+  openingHook?: string;
+  closingAsk?: string;
+  risksToAvoid?: string[];
+  recommendedSections?: Array<{
+    sectionId: string;
+    rationale?: string;
+    keyMessage?: string;
+    suggestedVariantId?: string;
+    suggestedLayoutId?: string;
+  }>;
+};
+
 export type DeckContext = {
   abExperimentId?: string | null;
   abVariantId?: string | null;
   abPaletteOverride?: Record<string, string> | null;
   knowledgeSourceIds?: string[];
   knowledgeSources?: Array<{ id: string; source: "oracle" | "kb" | "asset" | "brand-intel"; title: string; tags?: string[] }>;
+  strategy?: DeckStrategySnapshot;
 };
 
 export type Deck = {
@@ -91,7 +106,10 @@ export type Deck = {
 type DeckState = {
   briefs: Record<string, Brief>;
   decks: Record<string, Deck>;
-  createBriefAndAssemble: (brief: Omit<Brief, "id" | "createdAt">) => { briefId: string; deckId: string };
+  createBriefAndAssemble: (
+    brief: Omit<Brief, "id" | "createdAt">,
+    opts?: { strategy?: DeckStrategySnapshot },
+  ) => { briefId: string; deckId: string };
   createImportedDeck: (input: {
     title: string;
     brief: Omit<Brief, "id" | "createdAt">;
@@ -117,9 +135,19 @@ type DeckState = {
 
 // Assembly pipeline — deterministic seed content for the MVP.
 // AI-driven personalization slots into personalizeSlide() later.
-function assembleDeck(brief: Brief): Deck {
+// An optional `strategyOverride` lets the AI Narrative Strategist inject
+// a specific section list + variant/layout preferences.
+function assembleDeck(
+  brief: Brief,
+  strategyOverride?: {
+    sections: string[];
+    variantById?: Record<string, string>;
+    layoutById?: Record<string, string>;
+  },
+): Deck {
   const arch = byId(NARRATIVE_ARCHETYPES, brief.archetypeId);
-  const recipe = (arch?.sectionRecipe ?? []).slice(0, Math.max(brief.lengthTarget, 4));
+  const defaultRecipe = (arch?.sectionRecipe ?? []).slice(0, Math.max(brief.lengthTarget, 4));
+  const recipe = strategyOverride?.sections?.length ? strategyOverride.sections : defaultRecipe;
   const profile =
     brief.subCompany && brief.brandModeId === "bm-subcompany"
       ? getSubCompanyProfile(brief.brandModeId, brief.subCompany)
@@ -130,14 +158,19 @@ function assembleDeck(brief: Brief): Deck {
     const sf = byId(SECTION_FRAMEWORKS, sfId);
     const permitted = variantsForSection(sfId).filter((v) => !restricted.has(v.familyId));
     const pool = permitted.length > 0 ? permitted : variantsForSection(sfId);
-    // Rank: preferredVariantIds first, then original order.
+    // Rank: strategy-suggested first, then preferredVariantIds, then original order.
+    const suggestedVariantId = strategyOverride?.variantById?.[sfId];
     const options = [...pool].sort((a, b) => {
-      const ap = preferred.has(a.id) ? 0 : 1;
-      const bp = preferred.has(b.id) ? 0 : 1;
-      return ap - bp;
+      const av = a.id === suggestedVariantId ? -1 : preferred.has(a.id) ? 0 : 1;
+      const bv = b.id === suggestedVariantId ? -1 : preferred.has(b.id) ? 0 : 1;
+      return av - bv;
     });
     const variant = options[0] ?? MODULE_VARIANTS[0];
-    const layoutId = variant.permittedLayoutIds[0];
+    const suggestedLayoutId = strategyOverride?.layoutById?.[sfId];
+    const layoutId =
+      suggestedLayoutId && variant.permittedLayoutIds.includes(suggestedLayoutId)
+        ? suggestedLayoutId
+        : variant.permittedLayoutIds[0];
     return {
       id: nanoid(8),
       position: i,
@@ -873,18 +906,35 @@ export const useDeckStore = create<DeckState>()(
       briefs: {},
       decks: {},
 
-      createBriefAndAssemble: (input) => {
+      createBriefAndAssemble: (input, opts) => {
         const brief: Brief = {
           ...input,
           id: nanoid(8),
           createdAt: new Date().toISOString(),
         };
-        const deck = assembleDeck(brief);
+        const strategy = opts?.strategy;
+        const strategyOverride = strategy?.recommendedSections?.length
+          ? {
+              sections: strategy.recommendedSections.map((r) => r.sectionId),
+              variantById: Object.fromEntries(
+                strategy.recommendedSections
+                  .filter((r) => r.suggestedVariantId)
+                  .map((r) => [r.sectionId, r.suggestedVariantId as string]),
+              ),
+              layoutById: Object.fromEntries(
+                strategy.recommendedSections
+                  .filter((r) => r.suggestedLayoutId)
+                  .map((r) => [r.sectionId, r.suggestedLayoutId as string]),
+              ),
+            }
+          : undefined;
+        const deck = assembleDeck(brief, strategyOverride);
         deck.context = {
           abExperimentId: brief.abExperimentId ?? null,
           abVariantId: brief.abVariantId ?? null,
           abPaletteOverride: brief.abPaletteOverride ?? null,
           knowledgeSourceIds: brief.knowledgeSourceIds ?? [],
+          strategy: strategy ?? undefined,
         };
         set((s) => ({
           briefs: { ...s.briefs, [brief.id]: brief },
