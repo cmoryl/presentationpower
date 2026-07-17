@@ -32,6 +32,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   ] as const;
   const footerNav = [
     { to: "/knowledge", label: "Knowledge" },
+    { to: "/knowledge/ask", label: "Ask Oracle" },
     { to: "/about", label: "About" },
     { to: "/faq", label: "FAQ" },
   ] as const;
