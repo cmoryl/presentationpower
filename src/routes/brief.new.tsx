@@ -521,7 +521,12 @@ function BriefWizard() {
                         });
                         knowledgeSnippets = kbRes as typeof knowledgeSnippets;
                         setKbUsedCount(knowledgeSnippets.length);
+                        setDeckContext(deckId, {
+                          knowledgeSourceIds: knowledgeSnippets.map((k) => k.id),
+                          knowledgeSources: knowledgeSnippets.map((k) => ({ id: k.id, source: k.source, title: k.title, tags: k.tags })),
+                        });
                       } catch { /* non-fatal */ }
+
 
                       setAiStatus("personalizing");
                       try {
