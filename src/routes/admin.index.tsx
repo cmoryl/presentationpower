@@ -651,3 +651,72 @@ function latencyLabel(ms: number) {
   if (ms < 3000) return "elevated";
   return "slow";
 }
+
+function DeckMetric({ label, value, sub, accent }: { label: string; value: string; sub: string; accent: string }) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+      <div className="absolute right-0 top-0 h-14 w-14 rounded-bl-full opacity-20" style={{ background: accent }} />
+      <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/50">{label}</div>
+      <div className="mt-2 flex items-baseline gap-2">
+        <span className="font-[Geist] text-4xl font-semibold tracking-tight text-white">{value}</span>
+      </div>
+      <div className="mt-1 text-[11px] text-white/50">{sub}</div>
+    </div>
+  );
+}
+
+function BreakdownBlock({
+  title,
+  subtitle,
+  rows,
+  accent,
+  className = "",
+}: {
+  title: string;
+  subtitle: string;
+  rows: Array<{ label: string; count: number }>;
+  accent: string;
+  className?: string;
+}) {
+  const total = rows.reduce((a, r) => a + r.count, 0) || 1;
+  const top = rows.slice(0, 6);
+  return (
+    <div className={`rounded-2xl border border-white/10 bg-white/5 p-5 ${className}`}>
+      <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">{subtitle}</div>
+      <div className="mt-1 font-[Geist] text-lg font-semibold text-white">{title}</div>
+      <div className="mt-4 space-y-2.5">
+        {top.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-white/20 p-4 text-center text-xs text-white/50">
+            No data yet.
+          </div>
+        ) : (
+          top.map((r) => {
+            const pct = (r.count / total) * 100;
+            return (
+              <div key={r.label}>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="truncate pr-2 text-white/80">{r.label}</span>
+                  <span className="whitespace-nowrap text-white/60">
+                    {r.count} <span className="text-white/40">· {pct.toFixed(0)}%</span>
+                  </span>
+                </div>
+                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/10">
+                  <div className="h-full rounded-full" style={{ width: `${pct}%`, background: accent }} />
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}
+
+function statusColor(status: string) {
+  const s = status.toLowerCase();
+  if (s.includes("publish") || s.includes("approved") || s.includes("final")) return "#A6FA87";
+  if (s.includes("review") || s.includes("qa")) return "#FFEB66";
+  if (s.includes("error") || s.includes("reject")) return "#E53D2E";
+  if (s.includes("draft")) return "#C2A3FF";
+  return "#A1FBF9";
+}
