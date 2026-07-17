@@ -24,7 +24,6 @@ import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as KnowledgeOracleRouteImport } from './routes/knowledge.oracle'
 import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
-import { Route as KnowledgeBrandGuidesRouteImport } from './routes/knowledge.brand-guides'
 import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
 import { Route as DecksDeckIdRouteImport } from './routes/decks.$deckId'
@@ -40,6 +39,7 @@ import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminApprovalsRouteImport } from './routes/admin.approvals'
 import { Route as AdminAiRouteImport } from './routes/admin.ai'
 import { Route as AdminAbRouteImport } from './routes/admin.ab'
+import { Route as KnowledgeBrandGuidesIndexRouteImport } from './routes/knowledge.brand-guides.index'
 import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
 import { Route as DecksDeckIdPresentRouteImport } from './routes/decks.$deckId.present'
 import { Route as DecksDeckIdExportRouteImport } from './routes/decks.$deckId.export'
@@ -121,11 +121,6 @@ const KnowledgeNewRoute = KnowledgeNewRouteImport.update({
   path: '/new',
   getParentRoute: () => KnowledgeRoute,
 } as any)
-const KnowledgeBrandGuidesRoute = KnowledgeBrandGuidesRouteImport.update({
-  id: '/brand-guides',
-  path: '/brand-guides',
-  getParentRoute: () => KnowledgeRoute,
-} as any)
 const KnowledgeEntryIdRoute = KnowledgeEntryIdRouteImport.update({
   id: '/$entryId',
   path: '/$entryId',
@@ -201,11 +196,17 @@ const AdminAbRoute = AdminAbRouteImport.update({
   path: '/ab',
   getParentRoute: () => AdminRoute,
 } as any)
+const KnowledgeBrandGuidesIndexRoute =
+  KnowledgeBrandGuidesIndexRouteImport.update({
+    id: '/brand-guides/',
+    path: '/brand-guides/',
+    getParentRoute: () => KnowledgeRoute,
+  } as any)
 const KnowledgeBrandGuidesSlugRoute =
   KnowledgeBrandGuidesSlugRouteImport.update({
-    id: '/$slug',
-    path: '/$slug',
-    getParentRoute: () => KnowledgeBrandGuidesRoute,
+    id: '/brand-guides/$slug',
+    path: '/brand-guides/$slug',
+    getParentRoute: () => KnowledgeRoute,
   } as any)
 const DecksDeckIdPresentRoute = DecksDeckIdPresentRouteImport.update({
   id: '/present',
@@ -256,7 +257,6 @@ export interface FileRoutesByFullPath {
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
   '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
-  '/knowledge/brand-guides': typeof KnowledgeBrandGuidesRouteWithChildren
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/admin/': typeof AdminIndexRoute
@@ -266,6 +266,7 @@ export interface FileRoutesByFullPath {
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
+  '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -292,7 +293,6 @@ export interface FileRoutesByTo {
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
   '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
-  '/knowledge/brand-guides': typeof KnowledgeBrandGuidesRouteWithChildren
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/admin': typeof AdminIndexRoute
@@ -302,6 +302,7 @@ export interface FileRoutesByTo {
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
+  '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -331,7 +332,6 @@ export interface FileRoutesById {
   '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
   '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
-  '/knowledge/brand-guides': typeof KnowledgeBrandGuidesRouteWithChildren
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/admin/': typeof AdminIndexRoute
@@ -341,6 +341,7 @@ export interface FileRoutesById {
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
+  '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -371,7 +372,6 @@ export interface FileRouteTypes {
     | '/decks/$deckId'
     | '/decks/import'
     | '/knowledge/$entryId'
-    | '/knowledge/brand-guides'
     | '/knowledge/new'
     | '/knowledge/oracle'
     | '/admin/'
@@ -381,6 +381,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
     | '/knowledge/brand-guides/$slug'
+    | '/knowledge/brand-guides/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -407,7 +408,6 @@ export interface FileRouteTypes {
     | '/decks/$deckId'
     | '/decks/import'
     | '/knowledge/$entryId'
-    | '/knowledge/brand-guides'
     | '/knowledge/new'
     | '/knowledge/oracle'
     | '/admin'
@@ -417,6 +417,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
     | '/knowledge/brand-guides/$slug'
+    | '/knowledge/brand-guides'
   id:
     | '__root__'
     | '/'
@@ -445,7 +446,6 @@ export interface FileRouteTypes {
     | '/decks/$deckId'
     | '/decks/import'
     | '/knowledge/$entryId'
-    | '/knowledge/brand-guides'
     | '/knowledge/new'
     | '/knowledge/oracle'
     | '/admin/'
@@ -455,6 +455,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
     | '/knowledge/brand-guides/$slug'
+    | '/knowledge/brand-guides/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -583,13 +584,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeNewRouteImport
       parentRoute: typeof KnowledgeRoute
     }
-    '/knowledge/brand-guides': {
-      id: '/knowledge/brand-guides'
-      path: '/brand-guides'
-      fullPath: '/knowledge/brand-guides'
-      preLoaderRoute: typeof KnowledgeBrandGuidesRouteImport
-      parentRoute: typeof KnowledgeRoute
-    }
     '/knowledge/$entryId': {
       id: '/knowledge/$entryId'
       path: '/$entryId'
@@ -695,12 +689,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAbRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/knowledge/brand-guides/': {
+      id: '/knowledge/brand-guides/'
+      path: '/brand-guides'
+      fullPath: '/knowledge/brand-guides/'
+      preLoaderRoute: typeof KnowledgeBrandGuidesIndexRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
     '/knowledge/brand-guides/$slug': {
       id: '/knowledge/brand-guides/$slug'
-      path: '/$slug'
+      path: '/brand-guides/$slug'
       fullPath: '/knowledge/brand-guides/$slug'
       preLoaderRoute: typeof KnowledgeBrandGuidesSlugRouteImport
-      parentRoute: typeof KnowledgeBrandGuidesRoute
+      parentRoute: typeof KnowledgeRoute
     }
     '/decks/$deckId/present': {
       id: '/decks/$deckId/present'
@@ -763,31 +764,22 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
-interface KnowledgeBrandGuidesRouteChildren {
-  KnowledgeBrandGuidesSlugRoute: typeof KnowledgeBrandGuidesSlugRoute
-}
-
-const KnowledgeBrandGuidesRouteChildren: KnowledgeBrandGuidesRouteChildren = {
-  KnowledgeBrandGuidesSlugRoute: KnowledgeBrandGuidesSlugRoute,
-}
-
-const KnowledgeBrandGuidesRouteWithChildren =
-  KnowledgeBrandGuidesRoute._addFileChildren(KnowledgeBrandGuidesRouteChildren)
-
 interface KnowledgeRouteChildren {
   KnowledgeEntryIdRoute: typeof KnowledgeEntryIdRoute
-  KnowledgeBrandGuidesRoute: typeof KnowledgeBrandGuidesRouteWithChildren
   KnowledgeNewRoute: typeof KnowledgeNewRoute
   KnowledgeOracleRoute: typeof KnowledgeOracleRoute
   KnowledgeIndexRoute: typeof KnowledgeIndexRoute
+  KnowledgeBrandGuidesSlugRoute: typeof KnowledgeBrandGuidesSlugRoute
+  KnowledgeBrandGuidesIndexRoute: typeof KnowledgeBrandGuidesIndexRoute
 }
 
 const KnowledgeRouteChildren: KnowledgeRouteChildren = {
   KnowledgeEntryIdRoute: KnowledgeEntryIdRoute,
-  KnowledgeBrandGuidesRoute: KnowledgeBrandGuidesRouteWithChildren,
   KnowledgeNewRoute: KnowledgeNewRoute,
   KnowledgeOracleRoute: KnowledgeOracleRoute,
   KnowledgeIndexRoute: KnowledgeIndexRoute,
+  KnowledgeBrandGuidesSlugRoute: KnowledgeBrandGuidesSlugRoute,
+  KnowledgeBrandGuidesIndexRoute: KnowledgeBrandGuidesIndexRoute,
 }
 
 const KnowledgeRouteWithChildren = KnowledgeRoute._addFileChildren(
