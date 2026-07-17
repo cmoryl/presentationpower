@@ -17,8 +17,16 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/brief/new", label: "New brief" },
     { to: "/atlas", label: "Atlas" },
     { to: "/library", label: "Library" },
-    { to: "/imagery", label: "Imagery" },
     { to: "/admin", label: "Admin" },
+  ] as const;
+  const adminSubnav = [
+    { to: "/admin", label: "Overview" },
+    { to: "/admin/imagery", label: "Imagery" },
+    { to: "/admin/users", label: "Users" },
+    { to: "/admin/approvals", label: "Knowledgebase" },
+    { to: "/admin/oracle", label: "Oracle KB" },
+    { to: "/admin/brand-assets", label: "Brand assets" },
+    { to: "/admin/logohub", label: "LogoHub" },
   ] as const;
   const footerNav = [
     { to: "/knowledge", label: "Knowledge" },
