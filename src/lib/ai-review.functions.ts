@@ -67,6 +67,17 @@ const StrategyInput = z
   })
   .optional();
 
+const KnowledgeFactInput = z
+  .array(
+    z.object({
+      source: z.string(),
+      title: z.string().optional(),
+      extractedFact: z.string(),
+      relevance: z.number().optional(),
+    }),
+  )
+  .optional();
+
 const Input = z.object({
   cloudDeckId: z.string().uuid().optional(),
   deckTitle: z.string(),
@@ -81,8 +92,11 @@ const Input = z.object({
     })
     .optional(),
   strategy: StrategyInput,
+  knowledgeFacts: KnowledgeFactInput,
+  knowledgeSynthesis: z.string().optional().nullable(),
   slides: z.array(SlideInput).min(1).max(60),
 });
+
 
 
 export type ReviewDeckInput = z.infer<typeof Input>;
