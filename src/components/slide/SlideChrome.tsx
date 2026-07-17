@@ -47,6 +47,7 @@ export function SlideFrame({
   variant = "content",
   clientName,
   clientLogoUrl,
+  subCompany,
   layoutId,
   logoPosition,
 }: {
@@ -56,6 +57,7 @@ export function SlideFrame({
   variant?: ChromeVariant;
   clientName?: string;
   clientLogoUrl?: string | null;
+  subCompany?: string;
   layoutId?: string;
   logoPosition?: LogoPosition;
 }) {
