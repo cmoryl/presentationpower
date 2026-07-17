@@ -322,6 +322,12 @@ function DeckEditor() {
               <div className="mt-1 text-xs text-black/50">{brief.industry} · {brief.audience}</div>
             </Panel>
           )}
+          {active && (mv?.id === "MV-PROOF-LOGOS" || mv?.id === "MV-CASE-LOGO-GRID") && (
+            <LogoGridItemsPanel
+              items={Array.isArray((active.content as Record<string, unknown>).items) ? ((active.content as Record<string, unknown>).items as Array<Record<string, unknown>>) : []}
+              onChange={(items) => updateField(deck.id, active.id, "items", items)}
+            />
+          )}
           <ClientLogoPanel
             current={deck.clientLogo ?? null}
             onChange={(logo) => setDeckClientLogo(deck.id, logo)}
