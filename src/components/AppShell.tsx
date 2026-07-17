@@ -104,7 +104,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               TRANSPERFECT · MODULAR
             </div>
           </Link>
-          <nav className="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-full border border-white/50 bg-white/30 p-1 [backdrop-filter:blur(20px)_saturate(160%)] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_10px_30px_-15px_rgba(11,42,74,0.2)] dark:!border-white/10 dark:!bg-white/[0.04] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_10px_30px_-12px_rgba(0,0,0,0.5)]">
+          <nav className="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-full border border-white/40 bg-white/25 p-1 [backdrop-filter:blur(24px)_saturate(160%)] dark:!border-white/10 dark:!bg-white/[0.03]">
             {nav.map((n) => {
               if (n.to === "/admin") {
                 const adminActive = pathname === "/admin" || pathname.startsWith("/admin/");
