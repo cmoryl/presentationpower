@@ -31,9 +31,17 @@ export type LogoRule = {
   do?: boolean; // true = do, false = don't
 };
 
+export type BrandGuideCategory =
+  | "master"
+  | "division"
+  | "product"
+  | "portfolio"
+  | "cobrand";
+
 export type BrandGuide = {
   slug: string;
   divisionId: string | "master";
+  category: BrandGuideCategory;
   title: string;
   subtitle: string;
   version: string;
@@ -66,6 +74,7 @@ export type BrandGuide = {
 export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
   slug: "transperfect-master",
   divisionId: "master",
+  category: "master",
   title: "TransPerfect",
   subtitle: "Master Brand Guidelines · Digital Edition",
   version: "26.06 / 3.0",
@@ -202,6 +211,7 @@ export const TRANSPERFECT_SUBCOMPANIES: string[] = Array.from(
 type DivisionSeed = {
   slug: string;
   divisionId: string;
+  category?: BrandGuideCategory;
   title: string;
   subtitle: string;
   tagline: string;
@@ -211,6 +221,7 @@ type DivisionSeed = {
   subBrandGroup: { group: string; items: string[] };
   photography: string;
   brandVisuals: string;
+  sourceUrl?: string;
 };
 
 const DIVISION_SEEDS: DivisionSeed[] = [
@@ -393,12 +404,269 @@ const DIVISION_SEEDS: DivisionSeed[] = [
     brandVisuals:
       "Balanced lockups, side-by-side layouts, restrained backgrounds. Do not let TransPerfect accents overpower the client brand.",
   },
+
+  // ── TransPerfect IP ──────────────────────────────────────────────
+  {
+    slug: "transperfect-ip",
+    divisionId: "bm-subcompany",
+    category: "division",
+    title: "TransPerfect IP",
+    subtitle: "Intellectual Property Division · Brand Guidelines",
+    tagline: "Protecting invention across every jurisdiction.",
+    intro:
+      "TransPerfect IP delivers patent translation, filing support and IP portfolio services for the world's largest patent holders. The tone is precise and procedural; the visual system leans on Blue 800 depth with restrained Aqua accents — nothing that reads as marketing flourish over evidence.",
+    accent: { name: "Aqua", hex: "#A1FBF9", role: "primary accent", pantone: "PMS 317 C" },
+    pops: [
+      { name: "Yellow", hex: "#FFEB66", role: "reference pop", pantone: "PMS 121 C" },
+      { name: "Green", hex: "#A6FA87", role: "approval pop", pantone: "PMS 358 C" },
+    ],
+    subBrandGroup: {
+      group: "IP Services",
+      items: ["Patent Translation", "Foreign Filing", "IP Portfolio Management", "Prior Art Search", "Litigation Support"],
+    },
+    photography:
+      "Documents, technical drawings, courtroom-adjacent scenes; hands on paper as often as hands on screens. Keep imagery cool-toned and evidentiary — never dramatized.",
+    brandVisuals:
+      "Structured layouts: filing timelines, jurisdiction maps, comparison matrices. Accent colors reserved for reference marks and approval states — not backgrounds.",
+  },
+
+  // ── TransPerfect Health ──────────────────────────────────────────
+  {
+    slug: "transperfect-health",
+    divisionId: "bm-subcompany",
+    category: "division",
+    title: "TransPerfect Health",
+    subtitle: "Healthcare Division · Brand Guidelines",
+    tagline: "Access, translated. Outcomes, improved.",
+    intro:
+      "TransPerfect Health serves payers, providers and public-health organizations with member communication, interpretation, and health-equity content programs. The tone is empathetic and plain-language; the visual system favors soft Green/Aqua washes with legible typography over dense infographics.",
+    accent: { name: "Green", hex: "#A6FA87", role: "primary accent", pantone: "PMS 358 C" },
+    pops: [
+      { name: "Aqua", hex: "#A1FBF9", role: "clarity pop", pantone: "PMS 317 C" },
+      { name: "Peach", hex: "#FF9B70", role: "warmth pop", pantone: "PMS 163 C" },
+    ],
+    subBrandGroup: {
+      group: "Health Services",
+      items: ["Member Communications", "Interpretation", "Health Equity", "Clinical Trials Access", "Regulated Content"],
+    },
+    photography:
+      "Patient-facing scenes, community health settings, member service moments. Prefer human warmth and real environments over stock 'healthcare' imagery.",
+    brandVisuals:
+      "Soft gradients, generous white space, oversized readable type. Green appears as a signal of access and inclusion — never as decoration.",
+  },
+
+  // ── Trial Interactive (portfolio product) ────────────────────────
+  {
+    slug: "trial-interactive",
+    divisionId: "bm-product",
+    category: "product",
+    title: "Trial Interactive",
+    subtitle: "eClinical Platform · Brand Guidelines",
+    tagline: "The eTMF that runs the trial, not the other way around.",
+    intro:
+      "Trial Interactive is the eClinical platform for eTMF, study start-up and investigator portals used by sponsors and CROs. Housed under TransPerfect Life Sciences, its brand system carries the clinical calm of the master identity with tighter, product-first typography and data-forward compositions.",
+    accent: { name: "Blue 500", hex: "#003FC7", role: "primary accent" },
+    pops: [
+      { name: "Green", hex: "#A6FA87", role: "compliance pop", pantone: "PMS 358 C" },
+      { name: "Aqua", hex: "#A1FBF9", role: "surface pop", pantone: "PMS 317 C" },
+    ],
+    subBrandGroup: {
+      group: "Trial Interactive Modules",
+      items: ["eTMF", "Study Start-Up", "Investigator Portal", "Safety & Compliance", "Analytics"],
+    },
+    photography:
+      "Clinical operations settings — coordinators, monitors, sites in action. Balance UI captures with human moments.",
+    brandVisuals:
+      "Dashboard-first product screens, milestone timelines, compliance state indicators. Green signals compliance / approved; Aqua frames data callouts.",
+  },
+
+  // ── Unbabel (portfolio brand) ────────────────────────────────────
+  {
+    slug: "unbabel",
+    divisionId: "bm-product",
+    category: "portfolio",
+    title: "Unbabel",
+    subtitle: "AI-Powered Language Operations · Portfolio Guide",
+    tagline: "Language operations, powered by AI, refined by people.",
+    intro:
+      "Unbabel is a language-operations platform that pairs LLM translation with human quality loops for customer support, product, and content teams. Inside the TransPerfect portfolio it retains its own product-first identity while inheriting master-level rules for logo restraint and typography discipline.",
+    accent: { name: "Lavender", hex: "#C2A3FF", role: "primary accent", pantone: "PMS 264 C" },
+    pops: [
+      { name: "Aqua", hex: "#A1FBF9", role: "flow pop", pantone: "PMS 317 C" },
+      { name: "Green", hex: "#A6FA87", role: "quality pop", pantone: "PMS 358 C" },
+    ],
+    subBrandGroup: {
+      group: "Unbabel Products",
+      items: ["Customer Service AI", "LangOps Platform", "Human QE", "API"],
+    },
+    photography:
+      "Product-first, screen-first. Support and CX scenes, agent + AI collaboration. Avoid generic 'AI abstract' stock.",
+    brandVisuals:
+      "Flow diagrams for human-in-the-loop quality, side-by-side machine vs. reviewed translations, dashboard callouts. Lavender leads; Green signals QE approval.",
+  },
+
+  // ── Sterling ────────────────────────────────────────────────────
+  {
+    slug: "sterling",
+    divisionId: "bm-product",
+    category: "portfolio",
+    title: "Sterling",
+    subtitle: "Portfolio Brand · Brand Guidelines",
+    tagline: "Precision services for regulated industries.",
+    intro:
+      "Sterling is a portfolio brand delivering specialized professional services inside the TransPerfect group. Its brand system is quiet and authoritative — Blue 800 dominant, minimal accents, generous negative space — chosen to sit alongside legal, financial and life-sciences clients without competing for attention.",
+    accent: { name: "Blue 002673", hex: "#002673", role: "primary accent" },
+    pops: [
+      { name: "Aqua", hex: "#A1FBF9", role: "reference pop", pantone: "PMS 317 C" },
+    ],
+    subBrandGroup: {
+      group: "Sterling Practice",
+      items: ["Managed Services", "Regulated Operations", "Client Success"],
+    },
+    photography:
+      "Understated, professional environments; documents and interfaces over people. Cool tones only.",
+    brandVisuals:
+      "Restrained layouts, structured type, evidence-forward compositions. No decorative gradients.",
+  },
+
+  // ── Paybooks ────────────────────────────────────────────────────
+  {
+    slug: "paybooks",
+    divisionId: "bm-product",
+    category: "portfolio",
+    title: "Paybooks",
+    subtitle: "Payroll & HR Platform · Portfolio Guide",
+    tagline: "Payroll that keeps up with growing teams.",
+    intro:
+      "Paybooks is a cloud payroll and HR platform serving Indian SMBs and enterprises within the TransPerfect portfolio. The brand system is approachable and practical — warmer accents, product screenshots first, and copy that reads as SaaS product rather than enterprise deck.",
+    accent: { name: "Peach", hex: "#FF9B70", role: "primary accent", pantone: "PMS 163 C" },
+    pops: [
+      { name: "Yellow", hex: "#FFEB66", role: "payroll pop", pantone: "PMS 121 C" },
+      { name: "Green", hex: "#A6FA87", role: "success pop", pantone: "PMS 358 C" },
+    ],
+    subBrandGroup: {
+      group: "Paybooks Products",
+      items: ["Payroll", "HRMS", "Statutory Compliance", "Employee Self-Service"],
+    },
+    photography:
+      "SMB workplaces, small teams, real Indian workplaces — not generic stock. Prefer everyday moments over corporate posed shots.",
+    brandVisuals:
+      "Product screenshots, pay-slip and dashboard mocks, benefit callouts. Peach and Yellow appear around numbers and payday moments.",
+  },
+
+  // ── Wordbee ─────────────────────────────────────────────────────
+  {
+    slug: "wordbee",
+    divisionId: "bm-product",
+    category: "portfolio",
+    title: "Wordbee",
+    subtitle: "Translation Management Platform · Portfolio Guide",
+    tagline: "Collaborative translation, engineered for scale.",
+    intro:
+      "Wordbee is a collaborative Translation Management System and translation CAT platform used by LSPs, corporations and public institutions. Within the portfolio it keeps its distinct identity as a specialist TMS while inheriting master logo restraint and typography rules.",
+    accent: { name: "Aqua", hex: "#A1FBF9", role: "primary accent", pantone: "PMS 317 C" },
+    pops: [
+      { name: "Lavender", hex: "#C2A3FF", role: "workflow pop", pantone: "PMS 264 C" },
+      { name: "Green", hex: "#A6FA87", role: "quality pop", pantone: "PMS 358 C" },
+    ],
+    subBrandGroup: {
+      group: "Wordbee Products",
+      items: ["Translator", "Beebox Connector", "Public Sector Edition"],
+    },
+    photography:
+      "Translator workspaces, editor UI, project-manager scenes. Screens are the hero.",
+    brandVisuals:
+      "Workflow diagrams, editor screenshots, connector maps. Aqua leads; Lavender frames workflow states.",
+  },
+
+  // ── The Mill (agency) ───────────────────────────────────────────
+  {
+    slug: "the-mill",
+    divisionId: "bm-tp-digital",
+    category: "portfolio",
+    title: "The Mill",
+    subtitle: "Creative Studio · Portfolio Guide",
+    tagline: "Craft that moves brands, at global scale.",
+    intro:
+      "The Mill is a global creative studio inside the TransPerfect Digital portfolio, delivering VFX, design and content production for the world's most demanding brands. Its brand system is the most editorial in the portfolio — dark canvases, oversized type, cinematic imagery — while adopting the master logo and typography rules.",
+    accent: { name: "Pink", hex: "#EC388A", role: "primary accent", pantone: "PMS 2395 C" },
+    pops: [
+      { name: "Peach", hex: "#FF9B70", role: "editorial pop", pantone: "PMS 163 C" },
+      { name: "Lavender", hex: "#C2A3FF", role: "ambient pop", pantone: "PMS 264 C" },
+    ],
+    subBrandGroup: {
+      group: "The Mill Capabilities",
+      items: ["Design", "VFX", "Content Production", "Global Campaigns"],
+    },
+    photography:
+      "Cinematic stills, production sets, craft in progress. High contrast, editorial pacing.",
+    brandVisuals:
+      "Full-bleed hero frames, poster-scale type, editorial spreads. Accents used as signature — never as backdrop.",
+  },
+
+  // ── Bear Down (agency) ──────────────────────────────────────────
+  {
+    slug: "bear-down",
+    divisionId: "bm-tp-digital",
+    category: "portfolio",
+    title: "Bear Down",
+    subtitle: "Growth Marketing Agency · Portfolio Guide",
+    tagline: "Growth work with sharp edges.",
+    intro:
+      "Bear Down is a performance and growth-marketing agency in the TransPerfect Digital portfolio, focused on measurable outcomes for ecommerce and DTC brands. Its brand system is bolder than the rest of the portfolio — more Yellow, more type contrast — while staying within master rules for logo and typography.",
+    accent: { name: "Yellow", hex: "#FFEB66", role: "primary accent", pantone: "PMS 121 C" },
+    pops: [
+      { name: "Peach", hex: "#FF9B70", role: "campaign pop", pantone: "PMS 163 C" },
+      { name: "Red", hex: "#E53D2E", role: "signal pop", pantone: "PMS 1788 C" },
+    ],
+    subBrandGroup: {
+      group: "Bear Down Services",
+      items: ["Paid Media", "SEO & Content", "CRO", "Analytics"],
+    },
+    photography:
+      "Retail moments, product close-ups, campaign shoots. Bold, saturated, unafraid of edge.",
+    brandVisuals:
+      "Metric callouts, before/after splits, campaign strips. Yellow leads; Red reserved for signal — churn, risk, urgency.",
+  },
+
+  // ── Avatria (ecommerce analytics) ───────────────────────────────
+  {
+    slug: "avatria",
+    divisionId: "bm-tp-digital",
+    category: "portfolio",
+    title: "Avatria",
+    subtitle: "Ecommerce Merchandising Analytics · Portfolio Guide",
+    tagline: "Merchandising decisions, powered by data.",
+    intro:
+      "Avatria is an ecommerce merchandising analytics and optimization platform inside TransPerfect Digital. The system leans product-first and data-forward — dense stat grids, monospaced numerals, Aqua and Green pops that signal accuracy and lift.",
+    accent: { name: "Aqua", hex: "#A1FBF9", role: "primary accent", pantone: "PMS 317 C" },
+    pops: [
+      { name: "Green", hex: "#A6FA87", role: "lift pop", pantone: "PMS 358 C" },
+      { name: "Yellow", hex: "#FFEB66", role: "metric pop", pantone: "PMS 121 C" },
+    ],
+    subBrandGroup: {
+      group: "Avatria Products",
+      items: ["Convert", "Analytics", "Search Optimization", "Personalization"],
+    },
+    photography:
+      "Ecommerce ops, merchandiser workspaces, storefront screens. Screens forward; humans as context.",
+    brandVisuals:
+      "Stat grids, KPI blocks, lift charts. Green signals positive lift; Yellow used sparingly around headline numbers.",
+  },
 ];
+
+function inferCategory(seed: DivisionSeed): BrandGuideCategory {
+  if (seed.category) return seed.category;
+  if (seed.divisionId === "bm-cobrand") return "cobrand";
+  if (seed.divisionId === "bm-product") return "product";
+  return "division";
+}
 
 function buildDivisionGuide(seed: DivisionSeed): BrandGuide {
   return {
     slug: seed.slug,
     divisionId: seed.divisionId,
+    category: inferCategory(seed),
     title: seed.title,
     subtitle: seed.subtitle,
     version: MASTER_TRANSPERFECT_GUIDE.version,
@@ -428,7 +696,7 @@ function buildDivisionGuide(seed: DivisionSeed): BrandGuide {
     brandVisuals: seed.brandVisuals,
     iconography: MASTER_TRANSPERFECT_GUIDE.iconography,
     socialMedia: MASTER_TRANSPERFECT_GUIDE.socialMedia,
-    sourceUrl: MASTER_TRANSPERFECT_GUIDE.sourceUrl,
+    sourceUrl: seed.sourceUrl ?? MASTER_TRANSPERFECT_GUIDE.sourceUrl,
   };
 }
 
