@@ -35,32 +35,50 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/faq", label: "FAQ" },
   ] as const;
 
-  // Shared class fragments — light stays as-is; dark gets a refined high-end treatment.
+  // Liquid glass pills — translucent, refractive edge, inner highlight.
   const pillIdle =
-    "text-black/60 hover:bg-white/40 hover:text-black " +
-    "dark:text-white/70 dark:hover:!bg-white/[0.06] dark:hover:text-white";
+    "text-black/70 hover:text-black hover:bg-white/50 hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_1px_2px_0_rgba(0,0,0,0.04)] " +
+    "dark:text-white/75 dark:hover:text-white dark:hover:!bg-white/[0.08] dark:hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12),0_1px_0_0_rgba(0,0,0,0.4)]";
   const pillActive =
-    "bg-[#0B2A4A] text-white shadow-lg " +
-    "dark:!bg-gradient-to-r dark:!from-[#0057FF] dark:!to-[#7A5CFF] dark:!text-white " +
-    "dark:shadow-[0_0_0_1px_rgba(161,251,249,0.25),0_10px_30px_-12px_rgba(0,63,199,0.65)]";
+    "bg-white/70 text-[#03002C] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),inset_0_-1px_0_0_rgba(11,42,74,0.08),0_8px_24px_-8px_rgba(11,42,74,0.35)] ring-1 ring-black/5 " +
+    "dark:!bg-gradient-to-b dark:!from-white/[0.14] dark:!to-white/[0.04] dark:!text-white dark:ring-1 dark:!ring-white/15 " +
+    "dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.22),inset_0_-1px_0_0_rgba(0,0,0,0.3),0_10px_30px_-12px_rgba(122,92,255,0.55)]";
 
   return (
     <div className="min-h-screen bg-[#F5F1EA] text-[#0A0F1C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
       <header
         className={
-          "sticky top-0 z-30 border-b border-black/10 backdrop-blur-xl " +
-          "bg-[#F5F1EA]/75 " +
-          "dark:!bg-[#07061F]/85 dark:!border-white/[0.06] " +
-          "dark:shadow-[0_1px_0_0_rgba(161,251,249,0.05),0_20px_60px_-30px_rgba(0,63,199,0.35)]"
+          "sticky top-0 z-30 border-b border-white/40 " +
+          "bg-[#F5F1EA]/50 [backdrop-filter:blur(28px)_saturate(180%)] " +
+          "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.7),0_1px_0_0_rgba(0,0,0,0.04),0_20px_50px_-30px_rgba(11,42,74,0.25)] " +
+          "dark:!bg-[#07061F]/50 dark:!border-white/10 " +
+          "dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_1px_0_0_rgba(0,0,0,0.5),0_20px_60px_-30px_rgba(0,63,199,0.4)]"
         }
       >
-        {/* Ambient brand accent line — replaces the flat orange chip in dark */}
+        {/* Aurora sheen — sits over the glass, adds depth/refraction */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-60 dark:opacity-70"
+          style={{
+            background:
+              "radial-gradient(120% 100% at 15% 0%, rgba(161,251,249,0.18) 0%, transparent 55%), radial-gradient(100% 100% at 85% 0%, rgba(122,92,255,0.18) 0%, transparent 55%)",
+          }}
+        />
+        {/* Top edge highlight — the meniscus */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-px"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.7) 20%, rgba(255,255,255,0.9) 50%, rgba(255,255,255,0.7) 80%, transparent 100%)",
+          }}
+        />
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 hidden h-px dark:block"
           style={{
             background:
-              "linear-gradient(90deg, transparent 0%, rgba(161,251,249,0.35) 20%, rgba(122,92,255,0.45) 50%, rgba(0,63,199,0.35) 80%, transparent 100%)",
+              "linear-gradient(90deg, transparent 0%, rgba(161,251,249,0.4) 20%, rgba(122,92,255,0.5) 50%, rgba(0,63,199,0.4) 80%, transparent 100%)",
           }}
         />
         <div className="relative mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-4 px-4 py-4 lg:flex-row lg:px-8 lg:py-5">
@@ -82,7 +100,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               TRANSPERFECT · MODULAR
             </div>
           </Link>
-          <nav className="flex max-w-full flex-wrap items-center justify-center gap-1">
+          <nav className="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-full border border-white/50 bg-white/30 p-1 [backdrop-filter:blur(20px)_saturate(160%)] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.9),0_10px_30px_-15px_rgba(11,42,74,0.2)] dark:!border-white/10 dark:!bg-white/[0.04] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08),0_10px_30px_-12px_rgba(0,0,0,0.5)]">
             {nav.map((n) => {
               if (n.to === "/admin") {
                 const adminActive = pathname === "/admin" || pathname.startsWith("/admin/");
@@ -95,7 +113,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   >
                     <Link
                       to={n.to}
-                      className={`inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm transition sm:px-4 ${
+                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm transition sm:px-4 ${
                         adminActive ? pillActive : pillIdle
                       }`}
                       onClick={() => setAdminOpen(false)}
@@ -104,8 +122,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                       <span aria-hidden className="text-[10px]">▾</span>
                     </Link>
                     {adminOpen && (
-                      <div className="absolute left-1/2 top-full z-50 w-52 -translate-x-1/2 pt-1">
-                        <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/95 p-1.5 shadow-xl backdrop-blur-md dark:!border-white/[0.08] dark:!bg-[#0B0A2A]/95 dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)]">
+                      <div className="absolute left-1/2 top-full z-50 w-52 -translate-x-1/2 pt-2">
+                        <div className="overflow-hidden rounded-2xl border border-white/50 bg-white/70 p-1.5 [backdrop-filter:blur(28px)_saturate(180%)] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_20px_60px_-15px_rgba(11,42,74,0.35)] dark:!border-white/10 dark:!bg-[#0B0A2A]/70 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_20px_60px_-15px_rgba(0,0,0,0.8)]">
                           {adminSubnav.map((s) => {
                             const active = pathname === s.to || pathname.startsWith(s.to + "/");
                             return (
@@ -114,8 +132,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                                 to={s.to}
                                 className={`block rounded-xl px-3.5 py-2 text-sm transition ${
                                   active
-                                    ? "bg-[#03002C] text-white dark:!bg-gradient-to-r dark:!from-[#0057FF] dark:!to-[#7A5CFF]"
-                                    : "text-black/70 hover:bg-black/5 dark:text-white/75 dark:hover:!bg-white/[0.05] dark:hover:text-white"
+                                    ? "bg-white/80 text-[#03002C] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_4px_12px_-4px_rgba(11,42,74,0.3)] dark:!bg-gradient-to-b dark:!from-white/15 dark:!to-white/[0.04] dark:!text-white dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]"
+                                    : "text-black/70 hover:bg-white/50 hover:text-black dark:text-white/75 dark:hover:!bg-white/[0.06] dark:hover:text-white"
                                 }`}
                                 onClick={() => setAdminOpen(false)}
                               >
@@ -134,7 +152,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link
                   key={n.to}
                   to={n.to}
-                  className={`rounded-full px-3 py-2 text-sm transition sm:px-4 ${active ? pillActive : pillIdle}`}
+                  className={`rounded-full px-3 py-1.5 text-sm transition sm:px-4 ${active ? pillActive : pillIdle}`}
                 >
                   {n.label}
                 </Link>
@@ -143,7 +161,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div
               role="radiogroup"
               aria-label="Color theme"
-              className="inline-flex items-center rounded-full border border-black/20 bg-white/40 p-0.5 text-xs sm:ml-2 dark:!border-white/10 dark:!bg-white/[0.04]"
+              className="ml-1 inline-flex items-center rounded-full border border-white/50 bg-white/40 p-0.5 text-xs shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] dark:!border-white/10 dark:!bg-white/[0.04] dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)]"
             >
               {themes.map((t) => {
                 const on = theme === t.id;
@@ -156,7 +174,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     onClick={() => setTheme(t.id)}
                     className={`rounded-full px-2.5 py-1 transition ${
                       on
-                        ? "bg-[#03002C] text-white dark:!bg-gradient-to-r dark:!from-[#0057FF] dark:!to-[#7A5CFF] dark:!text-white"
+                        ? "bg-white/80 text-[#03002C] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_2px_6px_-2px_rgba(11,42,74,0.3)] dark:!bg-gradient-to-b dark:!from-white/15 dark:!to-white/[0.04] dark:!text-white dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]"
                         : "text-black/70 hover:text-black dark:text-white/70 dark:hover:text-white"
                     }`}
                   >
@@ -171,10 +189,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               aria-pressed={boost}
               aria-label={boost ? "Disable high contrast mode" : "Enable high contrast mode"}
               title="Auto-adjust text contrast on glass surfaces (WCAG AA)"
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition sm:ml-2 ${
+              className={`ml-1 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition ${
                 boost
-                  ? "border-[#03002C] bg-[#03002C] text-white dark:!border-[#A1FBF9]/40 dark:!bg-[#A1FBF9]/10 dark:!text-[#A1FBF9]"
-                  : "border-black/20 bg-white/40 text-black/70 hover:bg-white/70 dark:!border-white/10 dark:!bg-white/[0.04] dark:text-white/70 dark:hover:!bg-white/[0.08]"
+                  ? "border-white/60 bg-white/80 text-[#03002C] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_4px_12px_-4px_rgba(11,42,74,0.3)] dark:!border-[#A1FBF9]/30 dark:!bg-[#A1FBF9]/10 dark:!text-[#A1FBF9] dark:shadow-[inset_0_1px_0_0_rgba(161,251,249,0.2)]"
+                  : "border-white/50 bg-white/40 text-black/70 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.8)] hover:bg-white/60 dark:!border-white/10 dark:!bg-white/[0.04] dark:text-white/70 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.08)] dark:hover:!bg-white/[0.08]"
               }`}
             >
               <span aria-hidden="true">◐</span>
