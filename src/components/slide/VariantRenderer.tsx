@@ -875,21 +875,31 @@ function renderVariantBody({
     case "MV-COMM-INVESTMENT":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <div className="grid h-full grid-cols-2 gap-16 pt-10">
-            <div className="flex flex-col justify-center">
-              <div className="text-2xl uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>{s(c.title, "Investment")}</div>
-              <div className="mt-8 text-[180px] font-semibold leading-none" style={{ color: brand.tokens.primary }}>
-                {s(c.amount)}
-              </div>
-              <div className="mt-4 text-3xl opacity-70">{s(c.unit)}</div>
+          <div className="grid h-full grid-cols-2 items-center gap-24">
+            <div>
+              <Kicker brand={brand}>{s(c.title, "Investment")}</Kicker>
+              <Hairline color={brand.tokens.accent} widthPx={88} thicknessPx={2} className="mt-6 mb-10" />
+              <StatFigure
+                brand={brand}
+                value={s(c.amount)}
+                unit={s(c.unit)}
+                size="monumental"
+              />
             </div>
-            <div className="flex flex-col justify-center">
-              <div className="text-xl uppercase tracking-[0.2em] opacity-60">Included</div>
-              <div className="mt-6 space-y-4">
+            <div>
+              <Hairline color={brand.tokens.accent} widthPx={56} thicknessPx={2} className="mb-6" />
+              <Kicker brand={brand}>Included</Kicker>
+              <div className="mt-8 space-y-5">
                 {arr(c.items).map((it, i) => (
-                  <div key={i} className="flex items-start gap-4 text-2xl">
-                    <span className="mt-2 h-2 w-2 rounded-full" style={{ backgroundColor: brand.tokens.accent }} />
-                    <span className="opacity-90">{s(it.label)}</span>
+                  <div
+                    key={i}
+                    className="flex items-start gap-5 pt-5"
+                    style={{ borderTop: i === 0 ? "none" : "1px solid rgba(10,15,28,0.10)" }}
+                  >
+                    <span className="mt-3 h-2 w-8" style={{ backgroundColor: brand.tokens.accent }} />
+                    <span style={{ fontSize: 26, lineHeight: 1.3, letterSpacing: "-0.01em", color: brand.tokens.primary }}>
+                      {s(it.label)}
+                    </span>
                   </div>
                 ))}
               </div>
