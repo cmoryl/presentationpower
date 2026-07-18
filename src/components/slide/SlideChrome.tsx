@@ -23,22 +23,18 @@ export function useSlideMode(): SlideMode {
 // (`url`) or a CSS background layer (`css` — used by the curated background
 // library for gradients / SVG patterns).
 export type SlideBackdrop = {
-  // Photo URL (upload / AI / library photo). Optional when `css` is set.
   url?: string;
-  // Raw CSS `background` shorthand (gradient or pattern). Used when `url`
-  // is absent — allows on-brand gradients & patterns without an image.
   css?: string;
-  // Scrim direction/strength. "bottom" darkens lower half, "left" darkens
-  // left half, "full" applies an even overlay, "vignette" a radial darken.
   scrim?: "bottom" | "left" | "right" | "top" | "full" | "vignette";
-  // 0..1 — how strongly the scrim covers the image (default 0.55).
   scrimStrength?: number;
-  // 0..1 — how much to desaturate/darken the image itself (default 0).
   imageDim?: number;
-  // Tint color for the scrim (defaults to brand ink navy).
   tint?: string;
-  // Hint that chrome text/logo should render on a dark surface.
   darkChrome?: boolean;
+  // Image positioning (only used when `url` is set).
+  fit?: "cover" | "contain";
+  zoom?: number; // 1..3 — CSS scale on the image
+  offsetX?: number; // -100..100 (percent). 0 = center.
+  offsetY?: number; // -100..100 (percent). 0 = center.
 };
 export const SlideBackdropContext = createContext<SlideBackdrop | null>(null);
 
@@ -140,11 +136,13 @@ export function SlideFrame({
             src={backdrop!.url}
             alt=""
             aria-hidden
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full"
             style={{
+              objectFit: backdrop!.fit ?? "cover",
+              objectPosition: `${50 + (backdrop!.offsetX ?? 0) / 2}% ${50 + (backdrop!.offsetY ?? 0) / 2}%`,
+              transform: backdrop!.zoom && backdrop!.zoom !== 1 ? `scale(${backdrop!.zoom})` : undefined,
+              transformOrigin: "center center",
               filter: lightBackdrop
-                // Light mode: brighten and desaturate slightly so the photo
-                // reads as an airy background rather than a dark hero.
                 ? `brightness(${1.08 + (backdrop!.imageDim ?? 0) * 0.2}) saturate(0.85) contrast(0.95)`
                 : backdrop!.imageDim
                   ? `brightness(${1 - backdrop!.imageDim}) saturate(0.95)`

@@ -242,6 +242,10 @@ export function VariantRenderer(props: Props) {
         imageDim: resolvedBg.imageDim,
         tint: resolvedBg.tint,
         darkChrome: resolvedBg.darkChrome,
+        fit: resolvedBg.fit,
+        zoom: resolvedBg.zoom,
+        offsetX: resolvedBg.offsetX,
+        offsetY: resolvedBg.offsetY,
       }
     : null;
 
