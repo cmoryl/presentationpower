@@ -1700,6 +1700,8 @@ export const useDeckStore = create<DeckState>()(
             },
           },
         }));
+      },
+
 
       swapVariant: (deckId, slideId, newVariantId) => {
         const deck = get().decks[deckId];
