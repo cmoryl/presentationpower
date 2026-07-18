@@ -2,11 +2,12 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Bookmark, Loader2, Sparkles } from "lucide-react";
+import { Bookmark, Download, Loader2, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { listTeamTemplates, getTemplateDeck } from "@/lib/cloud-decks.functions";
-import { BRAND_MODES, byId } from "@/lib/taxonomy";
+import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
+import { COMMUNITY_EVENT_TEMPLATE } from "@/lib/imported-templates/community-event";
 
 export const Route = createFileRoute("/templates")({
   head: () => ({ meta: [{ title: "Team templates · TransPerfect Modular" }] }),
