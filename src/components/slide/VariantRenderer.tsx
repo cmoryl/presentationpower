@@ -518,11 +518,14 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex h-full flex-col justify-center">
-            <div className="text-2xl uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>
-              Insight
-            </div>
-            <div className="mt-6 text-[76px] font-semibold leading-[1.1]">{s(c.insight)}</div>
-            <div className="mt-10 max-w-5xl text-3xl opacity-80">{s(c.narrative)}</div>
+            <Kicker brand={brand}>Insight</Kicker>
+            <Hairline color={brand.tokens.accent} widthPx={88} thicknessPx={2} className="mt-6 mb-10" />
+            <DisplayTitle size="section" color={brand.tokens.primary} maxWidthPx={1520}>
+              {s(c.insight)}
+            </DisplayTitle>
+            <SupportingText size="lg" opacity={0.8} maxWidthPx={1180} className="mt-10">
+              {s(c.narrative)}
+            </SupportingText>
           </div>
         </SlideFrame>
       );
@@ -531,10 +534,11 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex h-full flex-col justify-center">
-            <div className="text-2xl uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>
-              {s(c.kicker, "The big idea")}
-            </div>
-            <div className="mt-8 text-[120px] font-semibold leading-[1.02]">{s(c.idea)}</div>
+            <Kicker brand={brand}>{s(c.kicker, "The big idea")}</Kicker>
+            <Hairline color={brand.tokens.accent} widthPx={120} thicknessPx={2} className="mt-8 mb-12" />
+            <DisplayTitle size="cover" color={brand.tokens.primary} maxWidthPx={1620}>
+              {s(c.idea)}
+            </DisplayTitle>
           </div>
         </SlideFrame>
       );
@@ -542,19 +546,24 @@ function renderVariantBody({
     case "MV-INS-SO-WHAT":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <div className="grid h-full grid-cols-3 gap-10 pt-14">
-            {[
-              { label: "Insight", body: s(c.insight) },
-              { label: "So what", body: s(c.soWhat) },
-              { label: "Now what", body: s(c.nowWhat) },
-            ].map((b, i) => (
-              <div key={i} className="rounded-2xl p-10" style={{ backgroundColor: brand.tokens.surface }}>
-                <div className="text-xl uppercase tracking-[0.25em]" style={{ color: brand.tokens.accent }}>
-                  {b.label}
+          <div className="flex h-full flex-col justify-center">
+            <div className="grid grid-cols-3">
+              {[
+                { label: "Insight", body: s(c.insight) },
+                { label: "So what", body: s(c.soWhat) },
+                { label: "Now what", body: s(c.nowWhat) },
+              ].map((b, i) => (
+                <div key={i} className="px-10 first:pl-0 last:pr-0" style={{
+                  borderLeft: i === 0 ? undefined : "1px solid rgba(10,15,28,0.10)",
+                }}>
+                  <Hairline color={brand.tokens.accent} widthPx={44} thicknessPx={2} className="mb-6" />
+                  <Kicker brand={brand}>{b.label}</Kicker>
+                  <div className="mt-6" style={{ fontSize: 34, lineHeight: 1.28, letterSpacing: "-0.01em", color: brand.tokens.primary }}>
+                    {b.body}
+                  </div>
                 </div>
-                <div className="mt-6 text-3xl leading-snug">{b.body}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </SlideFrame>
       );
@@ -562,11 +571,17 @@ function renderVariantBody({
     case "MV-INS-QUOTE":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <div className="flex h-full flex-col justify-center">
-            <div className="text-[220px] leading-none opacity-15" style={{ color: brand.tokens.accent }}>“</div>
-            <div className="-mt-16 text-6xl font-medium leading-[1.15]">{s(c.quote)}</div>
-            <div className="mt-10 text-2xl opacity-70">
-              {s(c.attribution)} <span className="mx-2">·</span> {s(c.role)}
+          <div className="relative flex h-full flex-col justify-center">
+            <QuoteMark color={brand.tokens.accent} size={620} className="absolute -top-4 -left-4" />
+            <div className="relative">
+              <Kicker brand={brand}>In their words</Kicker>
+              <Hairline color={brand.tokens.accent} widthPx={88} thicknessPx={2} className="mt-6 mb-10" />
+              <div style={{ fontSize: 78, fontWeight: 500, lineHeight: 1.14, letterSpacing: "-0.02em", maxWidth: 1520, color: brand.tokens.primary }}>
+                {s(c.quote)}
+              </div>
+              <div className="mt-14">
+                <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} />
+              </div>
             </div>
           </div>
         </SlideFrame>
