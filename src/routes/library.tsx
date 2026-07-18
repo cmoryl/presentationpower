@@ -616,15 +616,8 @@ function ModulePresetKitsBlock() {
 
   function importKit(kit: (typeof MODULE_PRESET_KITS)[number]) {
     setBusy(kit.key);
-    const payload: TemplatePayload = {
-      ...kit.payload,
-      slides: kit.payload.slides.map((s) => {
-        const mv = byId(MODULE_VARIANTS, s.variantId);
-        const layoutId = s.layoutId || mv?.permittedLayoutIds[0] || "LF-01";
-        return { ...s, layoutId };
-      }),
-    };
-    const { deckId } = createDeckFromTemplate(payload);
+    // layoutId fallback is enforced inside createDeckFromTemplate.
+    const { deckId } = createDeckFromTemplate(kit.payload);
     navigate({ to: "/decks/$deckId", params: { deckId } });
   }
 

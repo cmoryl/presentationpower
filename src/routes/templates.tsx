@@ -197,17 +197,8 @@ function StarterKits() {
 
   function importKit(kit: TemplatePayload, key: string) {
     setBusy(key);
-    // Resolve a valid layoutId for each slide from the taxonomy so renderers
-    // don't fall back to defaults.
-    const payload: TemplatePayload = {
-      ...kit,
-      slides: kit.slides.map((s) => {
-        const mv = byId(MODULE_VARIANTS, s.variantId);
-        const layoutId = s.layoutId || mv?.permittedLayoutIds[0] || "LF-01";
-        return { ...s, layoutId };
-      }),
-    };
-    const { deckId } = createDeckFromTemplate(payload);
+    // layoutId fallback is now enforced inside createDeckFromTemplate.
+    const { deckId } = createDeckFromTemplate(kit);
     setDeckTemplateFlag(deckId, true);
     navigate({ to: "/decks/$deckId", params: { deckId } });
   }

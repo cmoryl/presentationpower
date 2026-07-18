@@ -8,9 +8,36 @@ import PptxGenJS from "pptxgenjs";
 import type { Deck, DeckSlide, DeckStrategySnapshot } from "./deck-store";
 import type { BrandMode } from "./taxonomy";
 import { getDivisionLogos } from "./division-logos";
+import { pickDivisionImage } from "@/assets/backdrops/divisions";
 
 const SLIDE_W = 13.333;
 const SLIDE_H = 7.5;
+
+// Deterministic seed→index hash, matches MediaTile in VariantRenderer so
+// the exported PPTX uses the same photograph the editor previewed.
+function seedHash(str: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+/** Resolve the best photograph to embed for a slide. Priority:
+ *  1. `content.mediaUrl` — usually set by PPTX import to preserve the
+ *     original picture round-trip.
+ *  2. `content.mediaSeed` — curated kits and generated decks pick from
+ *     the division-specific imagery library via a deterministic hash.
+ *  Returns null when no imagery is warranted (agenda / stats / etc.).
+ */
+function resolveSlideImageUrl(brandId: string, c: Record<string, unknown>): string | null {
+  const url = typeof c.mediaUrl === "string" && c.mediaUrl.length > 0 ? c.mediaUrl : null;
+  if (url) return url;
+  const seed = typeof c.mediaSeed === "string" && c.mediaSeed.length > 0 ? c.mediaSeed : null;
+  if (!seed) return null;
+  return pickDivisionImage(brandId, seedHash(seed));
+}
 
 async function fetchAsDataUrl(url: string): Promise<string | null> {
   try {
@@ -63,6 +90,15 @@ export async function exportDeckToPptx(
       : Promise.resolve(null),
   ]);
 
+  // Prefetch all slide imagery in parallel so the export runs quickly.
+  const slideImages: Array<string | null> = await Promise.all(
+    deck.slides.map((slide) => {
+      const c = slide.content as Record<string, unknown>;
+      const url = resolveSlideImageUrl(deck.brandModeId, c);
+      return url ? fetchAsDataUrl(url) : Promise.resolve(null);
+    }),
+  );
+
   for (let i = 0; i < deck.slides.length; i++) {
     const slide = deck.slides[i];
     const kind = classifyVariant(slide.variantId, i);
@@ -72,6 +108,27 @@ export async function exportDeckToPptx(
     const useWhiteLogo = isDark || slide.variantId === "MV-SPLIT-MANIFESTO";
     const hideFooter = useWhiteLogo;
     s.background = { color: isDark ? palette.primary : "FFFFFF" };
+
+    // Underlay imagery — preserves both PPTX-imported photos (content.mediaUrl)
+    // and curated kit imagery (content.mediaSeed → division library). Full-bleed
+    // treatment is only applied to cover/divider kinds where existing renderers
+    // draw text over a dark scrim; other renderers use full-width text boxes
+    // and would clip a side-panel image, so those keep their current layout.
+    const imgData = slideImages[i];
+    if (imgData && (kind === "cover" || kind === "divider")) {
+      s.addImage({
+        data: imgData, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H,
+        sizing: { type: "cover", w: SLIDE_W, h: SLIDE_H },
+      });
+      s.addShape("rect", {
+        x: 0, y: 0, w: SLIDE_W, h: SLIDE_H,
+        fill: { color: palette.primary, transparency: 35 },
+        line: { color: palette.primary, transparency: 100 },
+      });
+    }
+
+
+
 
     try {
       if (!renderAdvancedVariant(s, slide, palette)) {
