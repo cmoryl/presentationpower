@@ -127,10 +127,17 @@ export function SlideFrame({
 
   return (
     <div className="relative h-full w-full overflow-hidden" style={{ backgroundColor: hasBackdrop ? (lightBackdrop ? "#fff" : "#000") : bg, color: fg }}>
-      {hasBackdrop && (
+      {hasBackdropCss && (
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{ background: backdrop!.css }}
+        />
+      )}
+      {hasBackdropImage && (
         <>
           <img
-            src={backdrop.url}
+            src={backdrop!.url}
             alt=""
             aria-hidden
             className="absolute inset-0 h-full w-full object-cover"
@@ -138,9 +145,9 @@ export function SlideFrame({
               filter: lightBackdrop
                 // Light mode: brighten and desaturate slightly so the photo
                 // reads as an airy background rather than a dark hero.
-                ? `brightness(${1.08 + (backdrop.imageDim ?? 0) * 0.2}) saturate(0.85) contrast(0.95)`
-                : backdrop.imageDim
-                  ? `brightness(${1 - backdrop.imageDim}) saturate(0.95)`
+                ? `brightness(${1.08 + (backdrop!.imageDim ?? 0) * 0.2}) saturate(0.85) contrast(0.95)`
+                : backdrop!.imageDim
+                  ? `brightness(${1 - backdrop!.imageDim}) saturate(0.95)`
                   : undefined,
             }}
           />
