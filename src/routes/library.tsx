@@ -251,18 +251,43 @@ function VariantCard({
     changes: [],
   };
   const isDark = mode === "dark";
-  const backdrop = showImagery ? backdropForVariant(variant, brand.id, mode) : null;
+  const isAB = mode === "ab";
+  const lightBackdrop = showImagery ? backdropForVariant(variant, brand.id, "light") : null;
+  const darkBackdrop = showImagery ? backdropForVariant(variant, brand.id, "dark") : null;
+  const singleBackdrop = showImagery ? backdropForVariant(variant, brand.id, isDark ? "dark" : "light") : null;
   return (
     <button
       type="button"
       onClick={onOpen}
       className="group relative block w-full overflow-hidden rounded-[24px] border border-slate-200 bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:border-[#003FC7]/20 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)]"
     >
-      {/* Slide preview — inset with rounded frame */}
+      {isAB ? (
+        <div className="m-2 grid grid-cols-2 gap-2">
+          {(["light", "dark"] as const).map((m) => (
+            <div key={m} className="relative">
+              <div className={`relative aspect-[16/10] overflow-hidden rounded-[14px] ${m === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
+                <ScaledSlide>
+                  <SlideBackdropContext.Provider value={m === "dark" ? darkBackdrop : lightBackdrop}>
+                    <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={m} />
+                  </SlideBackdropContext.Provider>
+                </ScaledSlide>
+              </div>
+              <div className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest backdrop-blur ${m === "dark" ? "bg-white/15 text-white ring-1 ring-white/25" : "bg-black/70 text-white"}`}>
+                {m === "dark" ? "☾ B · Dark" : "☀︎ A · Light"}
+              </div>
+            </div>
+          ))}
+          {preferred && (
+            <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-emerald-500/85 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white shadow ring-1 ring-white/30 backdrop-blur-md">
+              In scope
+            </div>
+          )}
+        </div>
+      ) : (
       <div className={`relative m-2 aspect-[16/10] overflow-hidden rounded-[18px] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
         <ScaledSlide>
-          <SlideBackdropContext.Provider value={backdrop}>
-            <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
+          <SlideBackdropContext.Provider value={singleBackdrop}>
+            <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={isDark ? "dark" : "light"} />
           </SlideBackdropContext.Provider>
         </ScaledSlide>
 
@@ -290,6 +315,7 @@ function VariantCard({
           </div>
         )}
       </div>
+      )}
 
       {/* Metadata footer */}
       <div className="space-y-4 p-6 pt-4">
