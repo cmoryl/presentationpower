@@ -1,0 +1,5 @@
+{
+  "$schema": "visual-regression-library",
+  "note": "variantIds listed here are known/accepted overlap cases and won't fail CI. Keep empty to enforce zero overlaps.",
+  "allowedOverlaps": []
+}

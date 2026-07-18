@@ -1,0 +1,706 @@
+{
+  "url": "http://localhost:8080/library",
+  "mode": "ab",
+  "tolerancePx": 2,
+  "ranAt": "2026-07-18T23:05:04.126Z",
+  "totalCards": 139,
+  "overlappingCards": 0,
+  "overlaps": [],
+  "captured": [
+    {
+      "variantId": "MV-BENTO-5",
+      "shot": "tests/snapshots/library/MV-BENTO-5.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CASE-LOGO-GRID",
+      "shot": "tests/snapshots/library/MV-CASE-LOGO-GRID.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CASE-METRICS",
+      "shot": "tests/snapshots/library/MV-CASE-METRICS.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CASE-SPREAD",
+      "shot": "tests/snapshots/library/MV-CASE-SPREAD.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CASE-STORY",
+      "shot": "tests/snapshots/library/MV-CASE-STORY.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CLIENT-COMPARE",
+      "shot": "tests/snapshots/library/MV-CLIENT-COMPARE.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CLIENT-DETAIL-3",
+      "shot": "tests/snapshots/library/MV-CLIENT-DETAIL-3.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CLIENT-MATRIX",
+      "shot": "tests/snapshots/library/MV-CLIENT-MATRIX.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CLOSE-CALENDAR",
+      "shot": "tests/snapshots/library/MV-CLOSE-CALENDAR.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CLOSE-CHECKLIST",
+      "shot": "tests/snapshots/library/MV-CLOSE-CHECKLIST.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CLOSE-CONTACT",
+      "shot": "tests/snapshots/library/MV-CLOSE-CONTACT.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CLOSE-CTA",
+      "shot": "tests/snapshots/library/MV-CLOSE-CTA.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CLOSE-DECISION",
+      "shot": "tests/snapshots/library/MV-CLOSE-DECISION.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CLOSE-DUAL-CTA",
+      "shot": "tests/snapshots/library/MV-CLOSE-DUAL-CTA.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CLOSE-METRIC-PROMISE",
+      "shot": "tests/snapshots/library/MV-CLOSE-METRIC-PROMISE.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CLOSE-QNA",
+      "shot": "tests/snapshots/library/MV-CLOSE-QNA.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CLOSE-SPLIT",
+      "shot": "tests/snapshots/library/MV-CLOSE-SPLIT.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CLOSE-STATEMENT",
+      "shot": "tests/snapshots/library/MV-CLOSE-STATEMENT.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CLOSE-THANKS",
+      "shot": "tests/snapshots/library/MV-CLOSE-THANKS.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CLOSE-TIMELINE",
+      "shot": "tests/snapshots/library/MV-CLOSE-TIMELINE.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-COMM-INVESTMENT",
+      "shot": "tests/snapshots/library/MV-COMM-INVESTMENT.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-COMM-PRICING",
+      "shot": "tests/snapshots/library/MV-COMM-PRICING.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-COMPARE-SLIDER",
+      "shot": "tests/snapshots/library/MV-COMPARE-SLIDER.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-COUNTDOWN",
+      "shot": "tests/snapshots/library/MV-COUNTDOWN.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CTX-CARDS-2",
+      "shot": "tests/snapshots/library/MV-CTX-CARDS-2.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CTX-CARDS-3",
+      "shot": "tests/snapshots/library/MV-CTX-CARDS-3.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CTX-CARDS-4",
+      "shot": "tests/snapshots/library/MV-CTX-CARDS-4.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CTX-CHALLENGE-STACK",
+      "shot": "tests/snapshots/library/MV-CTX-CHALLENGE-STACK.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CTX-COST",
+      "shot": "tests/snapshots/library/MV-CTX-COST.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CTX-STAT-GRID",
+      "shot": "tests/snapshots/library/MV-CTX-STAT-GRID.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-CTX-TREND",
+      "shot": "tests/snapshots/library/MV-CTX-TREND.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-DASH-BREAKDOWN",
+      "shot": "tests/snapshots/library/MV-DASH-BREAKDOWN.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-DASH-DONUT-TRIO",
+      "shot": "tests/snapshots/library/MV-DASH-DONUT-TRIO.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-DASH-GAUGE-ROW",
+      "shot": "tests/snapshots/library/MV-DASH-GAUGE-ROW.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-DASH-GROWTH-COLUMNS",
+      "shot": "tests/snapshots/library/MV-DASH-GROWTH-COLUMNS.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-DASH-PERFORMANCE",
+      "shot": "tests/snapshots/library/MV-DASH-PERFORMANCE.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-DASH-REGION-STATS",
+      "shot": "tests/snapshots/library/MV-DASH-REGION-STATS.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-DASH-REPORT-CARDS",
+      "shot": "tests/snapshots/library/MV-DASH-REPORT-CARDS.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-DASH-SALES-CHART",
+      "shot": "tests/snapshots/library/MV-DASH-SALES-CHART.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-DASH-SUMMARY",
+      "shot": "tests/snapshots/library/MV-DASH-SUMMARY.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-DEC-CHECKLIST",
+      "shot": "tests/snapshots/library/MV-DEC-CHECKLIST.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-DEC-COMPARE-TABLE",
+      "shot": "tests/snapshots/library/MV-DEC-COMPARE-TABLE.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-DEC-MATRIX",
+      "shot": "tests/snapshots/library/MV-DEC-MATRIX.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-DEFINITION",
+      "shot": "tests/snapshots/library/MV-DEFINITION.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-EDITORIAL-SPREAD",
+      "shot": "tests/snapshots/library/MV-EDITORIAL-SPREAD.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-FLYWHEEL",
+      "shot": "tests/snapshots/library/MV-FLYWHEEL.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-FUNNEL",
+      "shot": "tests/snapshots/library/MV-FUNNEL.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GOV-RACI",
+      "shot": "tests/snapshots/library/MV-GOV-RACI.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GRAPH-AREA-STACK",
+      "shot": "tests/snapshots/library/MV-GRAPH-AREA-STACK.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GRAPH-AXIS-BARS",
+      "shot": "tests/snapshots/library/MV-GRAPH-AXIS-BARS.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GRAPH-BUBBLE",
+      "shot": "tests/snapshots/library/MV-GRAPH-BUBBLE.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GRAPH-CATEGORY-BARS",
+      "shot": "tests/snapshots/library/MV-GRAPH-CATEGORY-BARS.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GRAPH-COMBO",
+      "shot": "tests/snapshots/library/MV-GRAPH-COMBO.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GRAPH-DECADE-AREA",
+      "shot": "tests/snapshots/library/MV-GRAPH-DECADE-AREA.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GRAPH-DUAL-DONUT",
+      "shot": "tests/snapshots/library/MV-GRAPH-DUAL-DONUT.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GRAPH-HEATMAP",
+      "shot": "tests/snapshots/library/MV-GRAPH-HEATMAP.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GRAPH-LINE-MULTI",
+      "shot": "tests/snapshots/library/MV-GRAPH-LINE-MULTI.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GRAPH-PERCENT-COMPARE",
+      "shot": "tests/snapshots/library/MV-GRAPH-PERCENT-COMPARE.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GRAPH-RINGS",
+      "shot": "tests/snapshots/library/MV-GRAPH-RINGS.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GRAPH-STACKED-BAR",
+      "shot": "tests/snapshots/library/MV-GRAPH-STACKED-BAR.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GRAPH-TASK-CARDS",
+      "shot": "tests/snapshots/library/MV-GRAPH-TASK-CARDS.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GRAPH-TREEMAP",
+      "shot": "tests/snapshots/library/MV-GRAPH-TREEMAP.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GRAPH-WATERFALL",
+      "shot": "tests/snapshots/library/MV-GRAPH-WATERFALL.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-GRAPH-YEAR-SERIES",
+      "shot": "tests/snapshots/library/MV-GRAPH-YEAR-SERIES.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-HORIZON",
+      "shot": "tests/snapshots/library/MV-HORIZON.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-ICEBERG",
+      "shot": "tests/snapshots/library/MV-ICEBERG.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-IMG-BEFORE-AFTER",
+      "shot": "tests/snapshots/library/MV-IMG-BEFORE-AFTER.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-IMG-CAPTION",
+      "shot": "tests/snapshots/library/MV-IMG-CAPTION.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-IMG-FULL-BLEED",
+      "shot": "tests/snapshots/library/MV-IMG-FULL-BLEED.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-IMG-GRID-3",
+      "shot": "tests/snapshots/library/MV-IMG-GRID-3.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-IMG-GRID-6",
+      "shot": "tests/snapshots/library/MV-IMG-GRID-6.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-IMG-MATRIX-4",
+      "shot": "tests/snapshots/library/MV-IMG-MATRIX-4.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-IMG-MATRIX-6",
+      "shot": "tests/snapshots/library/MV-IMG-MATRIX-6.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-IMG-PORTRAIT",
+      "shot": "tests/snapshots/library/MV-IMG-PORTRAIT.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-IMG-QUOTE-BG",
+      "shot": "tests/snapshots/library/MV-IMG-QUOTE-BG.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-IMG-SPLIT",
+      "shot": "tests/snapshots/library/MV-IMG-SPLIT.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-IMG-STAT-CALLOUT",
+      "shot": "tests/snapshots/library/MV-IMG-STAT-CALLOUT.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-IMG-STRIP",
+      "shot": "tests/snapshots/library/MV-IMG-STRIP.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-INFO-BAR-COMPARE",
+      "shot": "tests/snapshots/library/MV-INFO-BAR-COMPARE.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-INFO-CIRCULAR-FLOW",
+      "shot": "tests/snapshots/library/MV-INFO-CIRCULAR-FLOW.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-INFO-DONUT",
+      "shot": "tests/snapshots/library/MV-INFO-DONUT.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-INFO-FUNNEL",
+      "shot": "tests/snapshots/library/MV-INFO-FUNNEL.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-INFO-PYRAMID",
+      "shot": "tests/snapshots/library/MV-INFO-PYRAMID.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-INFO-VENN",
+      "shot": "tests/snapshots/library/MV-INFO-VENN.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-INS-BIG-IDEA",
+      "shot": "tests/snapshots/library/MV-INS-BIG-IDEA.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-INS-CALLOUT",
+      "shot": "tests/snapshots/library/MV-INS-CALLOUT.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-INS-OPPORTUNITY-SIZE",
+      "shot": "tests/snapshots/library/MV-INS-OPPORTUNITY-SIZE.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-INS-QUOTE",
+      "shot": "tests/snapshots/library/MV-INS-QUOTE.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-INS-SO-WHAT",
+      "shot": "tests/snapshots/library/MV-INS-SO-WHAT.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-JOURNEY-MAP",
+      "shot": "tests/snapshots/library/MV-JOURNEY-MAP.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-KPI-DASHBOARD",
+      "shot": "tests/snapshots/library/MV-KPI-DASHBOARD.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-LOGO-WALL",
+      "shot": "tests/snapshots/library/MV-LOGO-WALL.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-MATRIX-2X2",
+      "shot": "tests/snapshots/library/MV-MATRIX-2X2.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-MATURITY-CURVE",
+      "shot": "tests/snapshots/library/MV-MATURITY-CURVE.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-NUMBERS-TRIPTYCH",
+      "shot": "tests/snapshots/library/MV-NUMBERS-TRIPTYCH.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-OP-AGENDA",
+      "shot": "tests/snapshots/library/MV-OP-AGENDA.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-OP-AGENDA-VERTICAL",
+      "shot": "tests/snapshots/library/MV-OP-AGENDA-VERTICAL.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-OP-COVER",
+      "shot": "tests/snapshots/library/MV-OP-COVER.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-OP-COVER-DOSSIER",
+      "shot": "tests/snapshots/library/MV-OP-COVER-DOSSIER.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-OP-COVER-EDITORIAL",
+      "shot": "tests/snapshots/library/MV-OP-COVER-EDITORIAL.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-OP-COVER-GRADIENT",
+      "shot": "tests/snapshots/library/MV-OP-COVER-GRADIENT.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-OP-COVER-GRID",
+      "shot": "tests/snapshots/library/MV-OP-COVER-GRID.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-OP-COVER-MEDIA",
+      "shot": "tests/snapshots/library/MV-OP-COVER-MEDIA.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-OP-COVER-MINIMAL",
+      "shot": "tests/snapshots/library/MV-OP-COVER-MINIMAL.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-OP-COVER-MONOGRAM",
+      "shot": "tests/snapshots/library/MV-OP-COVER-MONOGRAM.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-OP-COVER-POSTER",
+      "shot": "tests/snapshots/library/MV-OP-COVER-POSTER.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-OP-COVER-SPLIT",
+      "shot": "tests/snapshots/library/MV-OP-COVER-SPLIT.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-OP-COVER-STACKED",
+      "shot": "tests/snapshots/library/MV-OP-COVER-STACKED.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-OP-DIVIDER",
+      "shot": "tests/snapshots/library/MV-OP-DIVIDER.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-OP-DIVIDER-NUMBERED",
+      "shot": "tests/snapshots/library/MV-OP-DIVIDER-NUMBERED.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-OP-INTRO-TEAM",
+      "shot": "tests/snapshots/library/MV-OP-INTRO-TEAM.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-PRINCIPLES",
+      "shot": "tests/snapshots/library/MV-PRINCIPLES.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-PROC-BEFORE-AFTER",
+      "shot": "tests/snapshots/library/MV-PROC-BEFORE-AFTER.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-PROC-PHASES",
+      "shot": "tests/snapshots/library/MV-PROC-PHASES.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-PROC-TIMELINE",
+      "shot": "tests/snapshots/library/MV-PROC-TIMELINE.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-PROOF-LOGOS",
+      "shot": "tests/snapshots/library/MV-PROOF-LOGOS.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-PROOF-STATS-2",
+      "shot": "tests/snapshots/library/MV-PROOF-STATS-2.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-PROOF-STATS-3",
+      "shot": "tests/snapshots/library/MV-PROOF-STATS-3.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-PROOF-STATS-4",
+      "shot": "tests/snapshots/library/MV-PROOF-STATS-4.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-PROOF-TESTIMONIAL",
+      "shot": "tests/snapshots/library/MV-PROOF-TESTIMONIAL.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-PULL-QUOTE-STACK",
+      "shot": "tests/snapshots/library/MV-PULL-QUOTE-STACK.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-QUOTE-CARD",
+      "shot": "tests/snapshots/library/MV-QUOTE-CARD.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-QUOTE-METRIC",
+      "shot": "tests/snapshots/library/MV-QUOTE-METRIC.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-QUOTE-MULTI",
+      "shot": "tests/snapshots/library/MV-QUOTE-MULTI.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-QUOTE-PORTRAIT",
+      "shot": "tests/snapshots/library/MV-QUOTE-PORTRAIT.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-QUOTE-POSTER",
+      "shot": "tests/snapshots/library/MV-QUOTE-POSTER.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-REC-NEXT",
+      "shot": "tests/snapshots/library/MV-REC-NEXT.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-RISK-MITIGATION",
+      "shot": "tests/snapshots/library/MV-RISK-MITIGATION.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-ROADMAP-QUARTERS",
+      "shot": "tests/snapshots/library/MV-ROADMAP-QUARTERS.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-SOL-ARCHITECTURE",
+      "shot": "tests/snapshots/library/MV-SOL-ARCHITECTURE.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-SOL-FEATURE-LIST",
+      "shot": "tests/snapshots/library/MV-SOL-FEATURE-LIST.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-SOL-PILLARS-2",
+      "shot": "tests/snapshots/library/MV-SOL-PILLARS-2.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-SOL-PILLARS-3",
+      "shot": "tests/snapshots/library/MV-SOL-PILLARS-3.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-SOL-PILLARS-4",
+      "shot": "tests/snapshots/library/MV-SOL-PILLARS-4.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-SOL-PILLARS-5",
+      "shot": "tests/snapshots/library/MV-SOL-PILLARS-5.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-SPLIT-MANIFESTO",
+      "shot": "tests/snapshots/library/MV-SPLIT-MANIFESTO.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-TEAM-BIOS-3",
+      "shot": "tests/snapshots/library/MV-TEAM-BIOS-3.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-TEAM-BIOS-4",
+      "shot": "tests/snapshots/library/MV-TEAM-BIOS-4.png",
+      "overlapCount": 0
+    },
+    {
+      "variantId": "MV-TIMELINE-VERTICAL",
+      "shot": "tests/snapshots/library/MV-TIMELINE-VERTICAL.png",
+      "overlapCount": 0
+    }
+  ]
+}
