@@ -112,8 +112,14 @@ function DeckEditor() {
                   <div className="border-t border-black/10 bg-white px-3 py-2 text-xs">
                     <div className="flex items-center justify-between">
                       <span className="font-medium">{String(i + 1).padStart(2, "0")} · {byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}</span>
-                      {hasIssue && <span className="text-amber-600">●</span>}
+                      <span className="flex items-center gap-1.5">
+                        {slide.notes && slide.notes.trim() && (
+                          <span title="Has speaker notes" className="text-[#0B2A4A]">✎</span>
+                        )}
+                        {hasIssue && <span className="text-amber-600">●</span>}
+                      </span>
                     </div>
+
                     <div className="text-black/50">{variant?.name}</div>
                   </div>
                 </button>
