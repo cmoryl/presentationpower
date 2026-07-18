@@ -733,6 +733,8 @@ export type Database = {
           created_at: string
           id: string
           owner_id: string
+          share_token: string | null
+          shared_at: string | null
           status: string
           title: string
           updated_at: string
@@ -745,6 +747,8 @@ export type Database = {
           created_at?: string
           id?: string
           owner_id: string
+          share_token?: string | null
+          shared_at?: string | null
           status?: string
           title: string
           updated_at?: string
@@ -757,6 +761,8 @@ export type Database = {
           created_at?: string
           id?: string
           owner_id?: string
+          share_token?: string | null
+          shared_at?: string | null
           status?: string
           title?: string
           updated_at?: string
@@ -1258,6 +1264,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_shared_deck: { Args: { _token: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
