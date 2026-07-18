@@ -279,7 +279,7 @@ function renderVariantBody({
     case "MV-OP-COVER-MEDIA":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
           {/* Cinematic scrim — gradient from primary bottom-left to transparent top-right */}
           <div
             className="absolute inset-0"
