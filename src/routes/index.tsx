@@ -263,6 +263,8 @@ function DeckCard({ deck: d, industry }: { deck: Deck; industry?: string }) {
   const brand = byId(BRAND_MODES, d.brandModeId) ?? BRAND_MODES[0];
   const cover = d.slides[0];
   const coverVariant = cover ? byId(MODULE_VARIANTS, cover.variantId) : undefined;
+  const duplicateDeck = useDeckStore((s) => s.duplicateDeck);
+  const navigate = useNavigate();
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-black/10 bg-white transition hover:-translate-y-0.5 hover:border-black/30 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04]">
       <Link to="/decks/$deckId" params={{ deckId: d.id }} className="block">
@@ -277,6 +279,9 @@ function DeckCard({ deck: d, industry }: { deck: Deck; industry?: string }) {
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-8 rounded-full" style={{ backgroundColor: brand.tokens.accent }} />
             <span className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">{brand.name}</span>
+            {d.isTemplate && (
+              <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">Template</span>
+            )}
           </div>
           <div className="mt-3 line-clamp-2 text-lg font-semibold">{d.title}</div>
           <div className="mt-1 text-sm text-black/60 dark:text-white/60">
@@ -288,6 +293,17 @@ function DeckCard({ deck: d, industry }: { deck: Deck; industry?: string }) {
         </div>
       </Link>
       <div className="absolute inset-x-3 bottom-3 flex items-center justify-end gap-1.5 opacity-0 transition group-hover:opacity-100">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            const id = duplicateDeck(d.id);
+            if (id) navigate({ to: "/decks/$deckId", params: { deckId: id } });
+          }}
+          className="rounded-full bg-white/95 px-3 py-1 text-xs font-medium text-black shadow ring-1 ring-black/10 hover:bg-white"
+        >
+          Duplicate
+        </button>
         <Link
           to="/decks/$deckId/present"
           params={{ deckId: d.id }}
