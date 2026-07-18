@@ -111,6 +111,24 @@ export type Deck = {
   slides: DeckSlide[];
   clientLogo?: DeckClientLogo | null;
   context?: DeckContext;
+  isTemplate?: boolean;
+};
+
+export type TemplatePayload = {
+  title: string;
+  brandModeId: string;
+  archetypeId: string;
+  subCompany?: string | null;
+  context?: Record<string, unknown> | null;
+  slides: Array<{ sectionId: string; variantId: string; layoutId: string; content: SlideContent }>;
+  brief?: {
+    prospect?: string;
+    industry?: string;
+    audience?: string;
+    meetingObjective?: string;
+    lengthTarget?: number;
+    clientFacts?: string;
+  } | null;
 };
 
 
