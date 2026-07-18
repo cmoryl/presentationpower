@@ -1006,11 +1006,11 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       return {
         title: `${clientName}'s buyer journey across markets`,
         items: [
-          { phase: "Discover", touchpoint: "Paid + organic search", sentiment: 2 },
-          { phase: "Evaluate", touchpoint: "Product pages, docs", sentiment: 3 },
-          { phase: "Decide", touchpoint: "Sales, legal, compliance", sentiment: 2 },
-          { phase: "Onboard", touchpoint: "Training + support", sentiment: 4 },
-          { phase: "Expand", touchpoint: "In-market campaigns", sentiment: 5 },
+          { icon: "Search", phase: "Discover", touchpoint: "Paid + organic search", sentiment: 2 },
+          { icon: "ClipboardList", phase: "Evaluate", touchpoint: "Product pages, docs", sentiment: 3 },
+          { icon: "Handshake", phase: "Decide", touchpoint: "Sales, legal, compliance", sentiment: 2 },
+          { icon: "Rocket", phase: "Onboard", touchpoint: "Training + support", sentiment: 4 },
+          { icon: "TrendingUp", phase: "Expand", touchpoint: "In-market campaigns", sentiment: 5 },
         ],
       };
     case "MV-LOGO-WALL":
@@ -1042,14 +1042,14 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         title: "The real cost of decentralized translation",
         waterline: "What executives see",
         above: [
-          { label: "Vendor invoices", body: "The line item everyone tracks." },
-          { label: "Cycle time", body: "Weeks between HQ launch and in-market live." },
+          { icon: "Coins", label: "Vendor invoices", body: "The line item everyone tracks." },
+          { icon: "Timer", label: "Cycle time", body: "Weeks between HQ launch and in-market live." },
         ],
         below: [
-          { label: "Rework in-market", body: "Local teams re-editing off-brand copy." },
-          { label: "Compliance risk", body: "Regulated content published without terminology control." },
-          { label: "Lost revenue", body: "Campaigns that miss the local season entirely." },
-          { label: "Brand drift", body: "Voice fragments across every market and channel." },
+          { icon: "Wrench", label: "Rework in-market", body: "Local teams re-editing off-brand copy." },
+          { icon: "AlertTriangle", label: "Compliance risk", body: "Regulated content published without terminology control." },
+          { icon: "TrendingUp", label: "Lost revenue", body: "Campaigns that miss the local season entirely." },
+          { icon: "MessagesSquare", label: "Brand drift", body: "Voice fragments across every market and channel." },
         ],
       };
 
