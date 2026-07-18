@@ -356,3 +356,80 @@ export function revertAutoFix(root: HTMLElement) {
 }
 
 
+// ---- Type scale audit + auto-fix ----
+//
+// Slide content is authored on a 1920×1080 stage. Text below ~14–16px in
+// stage space becomes unreadable once a card scales down. We bump too-small
+// stage text to a floor and report a "min body px" diagnostic for the A/B panel.
+
+export type TypeReport = {
+  sampled: number;
+  minBodyPx: number;
+  maxHeadlinePx: number;
+  ratio: number;
+  bumped: number;
+};
+
+const TYPE_BODY_FLOOR_PX = 16;
+const TYPE_CAPTION_FLOOR_PX = 14;
+
+/**
+ * Bumps stage text below the readable floor and returns type diagnostics.
+ * Non-destructive: writes `data-type-fixed` + `data-type-original`.
+ */
+export function auditAndFixTypography(root: HTMLElement): TypeReport {
+  const nodes = root.querySelectorAll<HTMLElement>("*");
+  let sampled = 0;
+  let bumped = 0;
+  let minBodyPx = Infinity;
+  let maxHeadlinePx = 0;
+
+  nodes.forEach((el) => {
+    if (el instanceof SVGElement) return;
+    const ownText = Array.from(el.childNodes).some(
+      (n) => n.nodeType === 3 && (n.textContent ?? "").trim(),
+    );
+    if (!ownText) return;
+    const cs = getComputedStyle(el);
+    if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
+    const px = parseFloat(cs.fontSize);
+    if (!Number.isFinite(px) || px <= 0) return;
+    const txt = (el.textContent ?? "").trim();
+    const shortLabel = txt.length <= 12;
+    const floor = shortLabel ? TYPE_CAPTION_FLOOR_PX : TYPE_BODY_FLOOR_PX;
+
+    sampled++;
+    let applied = px;
+    if (px < floor) {
+      if (!el.dataset.typeOriginal) el.dataset.typeOriginal = el.style.fontSize;
+      el.style.setProperty("font-size", `${floor}px`, "important");
+      el.dataset.typeFixed = "1";
+      bumped++;
+      applied = floor;
+    }
+    if (applied < minBodyPx) minBodyPx = applied;
+    if (applied > maxHeadlinePx) maxHeadlinePx = applied;
+  });
+
+  const min = minBodyPx === Infinity ? 0 : Math.round(minBodyPx);
+  const max = Math.round(maxHeadlinePx);
+  return {
+    sampled,
+    minBodyPx: min,
+    maxHeadlinePx: max,
+    ratio: min > 0 ? Math.round((max / min) * 10) / 10 : 0,
+    bumped,
+  };
+}
+
+export function revertTypeFix(root: HTMLElement) {
+  const nodes = root.querySelectorAll<HTMLElement>("[data-type-fixed]");
+  nodes.forEach((el) => {
+    el.style.fontSize = el.dataset.typeOriginal ?? "";
+    delete el.dataset.typeFixed;
+    delete el.dataset.typeOriginal;
+  });
+}
+
+
+
