@@ -580,6 +580,14 @@ function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette)
     case "MV-DASH-GROWTH-COLUMNS": renderDashGrowthColumns(s, c, p); return true;
     case "MV-DASH-BREAKDOWN": renderDashBreakdown(s, c, p); return true;
     case "MV-DASH-REGION-STATS": renderDashRegionStats(s, c, p); return true;
+    case "MV-GRAPH-YEAR-SERIES": renderGraphYearSeries(s, c, p); return true;
+    case "MV-GRAPH-AXIS-BARS": renderGraphAxisBars(s, c, p); return true;
+    case "MV-GRAPH-CATEGORY-BARS": renderGraphCategoryBars(s, c, p); return true;
+    case "MV-GRAPH-DUAL-DONUT": renderGraphDualDonut(s, c, p); return true;
+    case "MV-GRAPH-RINGS": renderGraphRings(s, c, p); return true;
+    case "MV-GRAPH-TASK-CARDS": renderGraphTaskCards(s, c, p); return true;
+    case "MV-GRAPH-DECADE-AREA": renderGraphDecadeArea(s, c, p); return true;
+    case "MV-GRAPH-PERCENT-COMPARE": renderGraphPercentCompare(s, c, p); return true;
     default: return false;
   }
 }
@@ -1633,5 +1641,199 @@ function renderDashRegionStats(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     const barW = SLIDE_W - rx - 0.6;
     s.addShape("rect", { x: rx, y: ry + rowH - 0.22, w: barW, h: 0.08, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
     s.addShape("rect", { x: rx, y: ry + rowH - 0.22, w: (barW * pct) / 100, h: 0.08, fill: { color: p.accent }, line: { color: p.accent } });
+  });
+}
+
+// ────────────────── Advanced variant renderers (Batch 4 — graph) ──────────────────
+
+// ── MV-GRAPH-YEAR-SERIES ──
+function renderGraphYearSeries(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items);
+  // left rail
+  s.addShape("rect", { x: 0.6, y: y0, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
+  s.addText(str(c.kicker || "Trend").toUpperCase(), { x: 0.6, y: y0 + 0.15, w: 3.4, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
+  s.addText(str(c.headline), { x: 0.6, y: y0 + 0.55, w: 3.4, h: 3.6, fontSize: 22, bold: true, color: p.primary, fontFace: "Inter", valign: "top" });
+  // bars via native chart
+  try {
+    s.addChart(
+      "bar" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+      [{ name: "years", labels: items.map((it) => str(it.year)), values: items.map((it) => num(it.value)) }],
+      { x: 4.2, y: y0 + 0.1, w: SLIDE_W - 4.8, h: 4.6, barDir: "col", chartColors: [p.primary], showLegend: false, showTitle: false, catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 11, catAxisLabelColor: DARK_GRAY, valAxisLabelFontFace: "Inter", valAxisLabelFontSize: 10, valAxisLabelColor: DARK_GRAY, showValue: true, dataLabelFontFace: "Inter", dataLabelFontSize: 10, dataLabelColor: p.primary, dataLabelPosition: "outEnd" },
+    );
+  } catch { /* no-op */ }
+  // accent tag over last year
+  if (items.length) {
+    const cellW = (SLIDE_W - 4.8) / items.length;
+    const cx = 4.2 + (items.length - 1) * cellW + cellW / 2 - 1;
+    const last = items[items.length - 1];
+    s.addText(`${str(last.value)}${str(last.unit) ? ` ${str(last.unit)}` : ""}`, { x: cx, y: y0 - 0.05, w: 2, h: 0.5, fontSize: 20, bold: true, color: p.accent, fontFace: "Inter", align: "center" });
+  }
+}
+
+// ── MV-GRAPH-AXIS-BARS ──
+function renderGraphAxisBars(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const bars = arr(c.bars);
+  try {
+    s.addChart(
+      "bar" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+      [{ name: "monthly", labels: bars.map((b) => str(b.label)), values: bars.map((b) => num(b.value)) }],
+      { x: 0.6, y: y0 + 0.1, w: SLIDE_W - 1.2, h: 4.4, barDir: "col", chartColors: [p.primary], showLegend: false, showTitle: false, catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 11, valAxisLabelFontFace: "Inter", valAxisLabelFontSize: 10, valAxisLabelColor: DARK_GRAY, valGridLine: { style: "solid", size: 1, color: LIGHT_GRAY }, showValue: false },
+    );
+  } catch { /* no-op */ }
+  if (str(c.legend)) {
+    s.addShape("rect", { x: 0.6, y: y0 + 4.7, w: 0.2, h: 0.2, fill: { color: p.accent }, line: { color: p.accent } });
+    s.addText(str(c.legend).toUpperCase(), { x: 0.9, y: y0 + 4.65, w: SLIDE_W - 1.5, h: 0.35, fontSize: 11, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Inter" });
+  }
+}
+
+// ── MV-GRAPH-CATEGORY-BARS ──
+function renderGraphCategoryBars(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items);
+  const stat = obj(c.stat);
+  try {
+    s.addChart(
+      "bar" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+      [{ name: "cats", labels: items.map((it) => str(it.label)), values: items.map((it) => num(it.value)) }],
+      { x: 0.6, y: y0 + 0.1, w: 8.0, h: 4.6, barDir: "bar", chartColors: [p.primary], showLegend: false, showTitle: false, catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 12, valAxisLabelFontFace: "Inter", valAxisLabelFontSize: 10, showValue: true, dataLabelFontFace: "Inter", dataLabelFontSize: 11, dataLabelColor: p.primary, dataLabelPosition: "outEnd" },
+    );
+  } catch { /* no-op */ }
+  const rx = 9.0;
+  s.addShape("rect", { x: rx, y: y0, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
+  s.addText(`${str(stat.value)}${str(stat.unit) ? ` ${str(stat.unit)}` : ""}`, { x: rx, y: y0 + 0.4, w: 3.7, h: 2.4, fontSize: 96, bold: true, color: p.primary, fontFace: "Inter" });
+  s.addText(str(stat.label).toUpperCase(), { x: rx, y: y0 + 3.0, w: 3.7, h: 0.5, fontSize: 12, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Inter" });
+}
+
+// ── MV-GRAPH-DUAL-DONUT ──
+function renderGraphDualDonut(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).slice(0, 2);
+  items.forEach((it, i) => {
+    const cx = 0.6 + i * 6.4;
+    const cardW = 5.9;
+    const pct = Math.max(0, Math.min(100, num(it.value)));
+    s.addShape("rect", { x: cx, y: y0, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
+    s.addText(str(it.meta).toUpperCase(), { x: cx, y: y0 + 0.15, w: cardW, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
+    try {
+      s.addChart(
+        "doughnut" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+        [{ name: "d", labels: ["v", "r"], values: [pct, 100 - pct] }],
+        { x: cx + (cardW - 3) / 2, y: y0 + 0.5, w: 3, h: 3, chartColors: [p.accent, LIGHT_GRAY], showLegend: false, showTitle: false, holeSize: 70 },
+      );
+    } catch { /* no-op */ }
+    s.addText(`${Math.round(pct)}%`, { x: cx, y: y0 + 1.7, w: cardW, h: 0.8, fontSize: 44, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
+    s.addText(str(it.label).toUpperCase(), { x: cx, y: y0 + 3.7, w: cardW, h: 0.4, fontSize: 12, bold: true, color: p.primary, charSpacing: 3, fontFace: "Inter", align: "center" });
+    s.addText(str(it.body), { x: cx + 0.2, y: y0 + 4.15, w: cardW - 0.4, h: 1.0, fontSize: 13, color: DARK_GRAY, fontFace: "Inter", align: "center" });
+  });
+  s.addShape("line", { x: 6.55, y: y0, w: 0, h: 5.0, line: { color: LIGHT_GRAY, width: 1 } });
+}
+
+// ── MV-GRAPH-RINGS ──
+function renderGraphRings(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).slice(0, 4);
+  // Row of 4 mini doughnuts (concentric is awkward in pptxgenjs — this is the clean fallback)
+  const chartW = 7.0;
+  const each = chartW / Math.max(items.length, 1);
+  items.forEach((it, i) => {
+    const cx = 0.6 + i * each;
+    const pct = Math.max(0, Math.min(100, num(it.value)));
+    const color = i === 0 ? p.accent : p.primary;
+    try {
+      s.addChart(
+        "doughnut" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+        [{ name: "r", labels: ["v", "r"], values: [pct, 100 - pct] }],
+        { x: cx, y: y0 + 0.5, w: each - 0.2, h: each - 0.2, chartColors: [color, LIGHT_GRAY], showLegend: false, showTitle: false, holeSize: 65 },
+      );
+    } catch { /* no-op */ }
+    s.addText(`${pct}%`, { x: cx, y: y0 + each * 0.4, w: each - 0.2, h: 0.5, fontSize: 20, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
+  });
+  // Legend right side
+  const lx = 8.0;
+  s.addShape("rect", { x: lx, y: y0, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
+  s.addText("BREAKDOWN", { x: lx, y: y0 + 0.15, w: 4.7, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
+  items.forEach((it, i) => {
+    const ry = y0 + 0.7 + i * 0.9;
+    const color = i === 0 ? p.accent : p.primary;
+    s.addShape("line", { x: lx, y: ry, w: 4.7, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
+    s.addShape("rect", { x: lx, y: ry + 0.18, w: 0.2, h: 0.2, fill: { color }, line: { color } });
+    s.addText(str(it.label), { x: lx + 0.35, y: ry + 0.1, w: 3.0, h: 0.4, fontSize: 14, bold: true, color: p.primary, fontFace: "Inter" });
+    s.addText(`${num(it.value)}%`, { x: lx + 3.4, y: ry + 0.1, w: 1.3, h: 0.4, fontSize: 14, bold: true, color: p.accent, fontFace: "Inter", align: "right" });
+    s.addText(str(it.body), { x: lx + 0.35, y: ry + 0.45, w: 4.3, h: 0.35, fontSize: 11, color: DARK_GRAY, fontFace: "Inter" });
+  });
+}
+
+// ── MV-GRAPH-TASK-CARDS ──
+function renderGraphTaskCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).slice(0, 3);
+  const cardW = (SLIDE_W - 1.2 - 0.6) / 3;
+  items.forEach((it, i) => {
+    const cx = 0.6 + i * (cardW + 0.3);
+    const done = num(it.done);
+    const total = Math.max(1, num(it.total, 100));
+    const pct = Math.min(100, Math.round((done / total) * 100));
+    s.addShape("rect", { x: cx, y: y0, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
+    s.addText(str(it.label).toUpperCase(), { x: cx, y: y0 + 0.15, w: cardW, h: 0.3, fontSize: 11, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Inter" });
+    s.addText(`${pct}%`, { x: cx, y: y0 + 0.55, w: cardW, h: 1.5, fontSize: 64, bold: true, color: p.primary, fontFace: "Inter" });
+    s.addText("of 100%", { x: cx + 2.4, y: y0 + 1.4, w: 2, h: 0.4, fontSize: 12, color: MID_GRAY, fontFace: "Inter" });
+    s.addText(`${done.toLocaleString()} / ${total.toLocaleString()}`, { x: cx, y: y0 + 2.1, w: cardW, h: 0.35, fontSize: 11, color: MID_GRAY, fontFace: "Inter" });
+    const barW = cardW - 0.1;
+    s.addShape("rect", { x: cx, y: y0 + 2.6, w: barW, h: 0.12, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
+    s.addShape("rect", { x: cx, y: y0 + 2.6, w: (barW * pct) / 100, h: 0.12, fill: { color: p.accent }, line: { color: p.accent } });
+    s.addText(str(it.body), { x: cx, y: y0 + 2.95, w: cardW, h: 1.4, fontSize: 13, color: DARK_GRAY, fontFace: "Inter" });
+  });
+}
+
+// ── MV-GRAPH-DECADE-AREA ──
+function renderGraphDecadeArea(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  // Custom title zone with kicker + headline
+  s.addShape("rect", { x: 0.6, y: 0.55, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
+  s.addText(str(c.kicker || "Trajectory").toUpperCase(), { x: 0.6, y: 0.7, w: SLIDE_W - 1.2, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
+  s.addText(str(c.headline || c.title), { x: 0.6, y: 1.05, w: SLIDE_W - 1.2, h: 1.1, fontSize: 28, bold: true, color: p.primary, fontFace: "Inter" });
+  const y0 = 2.2;
+  const series = arr(c.series);
+  const callout = obj(c.callout);
+  try {
+    s.addChart(
+      "area" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+      [{ name: "decade", labels: series.map((pt) => str(pt.label)), values: series.map((pt) => num(pt.value)) }],
+      { x: 0.6, y: y0, w: SLIDE_W - 1.2, h: 4.6, chartColors: [p.accent], chartColorsOpacity: 30, lineSize: 3, showLegend: false, showTitle: false, catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 11, catAxisLabelColor: DARK_GRAY, valAxisLabelFontFace: "Inter", valAxisLabelFontSize: 10, valAxisLabelColor: DARK_GRAY, showValue: false },
+    );
+  } catch { /* no-op */ }
+  // Callout box (positioned above chart, roughly at callout year x-slot)
+  const idx = series.findIndex((pt) => str(pt.label) === str(callout.year));
+  if (idx >= 0 && series.length > 1) {
+    const chartL = 0.6, chartW = SLIDE_W - 1.2;
+    const cx = chartL + (idx / (series.length - 1)) * chartW;
+    const boxX = Math.max(0.6, Math.min(SLIDE_W - 3.6, cx - 1.5));
+    s.addShape("rect", { x: boxX, y: y0 + 0.3, w: 3.0, h: 0.9, fill: { color: "FFFFFF" }, line: { color: p.accent, width: 2 } });
+    s.addText(str(callout.year), { x: boxX + 0.1, y: y0 + 0.35, w: 2.8, h: 0.35, fontSize: 14, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
+    s.addText(str(callout.note), { x: boxX + 0.1, y: y0 + 0.68, w: 2.8, h: 0.5, fontSize: 11, color: DARK_GRAY, fontFace: "Inter", align: "center" });
+  }
+}
+
+// ── MV-GRAPH-PERCENT-COMPARE ──
+function renderGraphPercentCompare(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).slice(0, 5);
+  const rowH = Math.min(1.3, (5.4 - y0) / Math.max(items.length, 1));
+  items.forEach((it, i) => {
+    const ry = y0 + i * rowH;
+    const cur = Math.max(0, Math.min(100, num(it.current)));
+    const bench = Math.max(0, Math.min(100, num(it.benchmark)));
+    s.addShape("line", { x: 0.6, y: ry, w: SLIDE_W - 1.2, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
+    s.addText(str(it.label), { x: 0.6, y: ry + 0.15, w: 5.0, h: 0.5, fontSize: 18, bold: true, color: p.primary, fontFace: "Inter" });
+    s.addText(`${cur}%`, { x: 8.0, y: ry + 0.1, w: 2.0, h: 0.6, fontSize: 32, bold: true, color: p.accent, fontFace: "Inter", align: "right" });
+    s.addText(`${bench}%`, { x: 10.4, y: ry + 0.2, w: 2.0, h: 0.5, fontSize: 22, bold: true, color: MID_GRAY, fontFace: "Inter", align: "right" });
+    const barW = SLIDE_W - 1.2;
+    const barY = ry + 0.8;
+    s.addShape("rect", { x: 0.6, y: barY, w: barW, h: 0.08, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
+    s.addShape("rect", { x: 0.6, y: barY, w: (barW * cur) / 100, h: 0.08, fill: { color: p.accent }, line: { color: p.accent } });
+    s.addShape("rect", { x: 0.6, y: barY + 0.14, w: barW, h: 0.08, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
+    s.addShape("rect", { x: 0.6, y: barY + 0.14, w: (barW * bench) / 100, h: 0.08, fill: { color: p.primary }, line: { color: p.primary } });
+    if (str(it.range)) s.addText(str(it.range).toUpperCase(), { x: 0.6, y: ry + rowH - 0.32, w: SLIDE_W - 1.2, h: 0.3, fontSize: 10, bold: true, color: MID_GRAY, charSpacing: 3, fontFace: "Inter" });
   });
 }
