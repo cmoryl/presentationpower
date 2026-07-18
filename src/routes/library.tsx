@@ -54,26 +54,7 @@ function Library() {
   const [mode, setMode] = useState<"light" | "dark" | "ab">("light");
   
   const [showImagery, setShowImagery] = useState(false);
-  const [wcagOn, setWcagOn] = useState(false);
   const autoFixOn = true;
-  const [approvalTick, setApprovalTick] = useState(0);
-  const approvals = useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    approvalTick;
-    if (typeof window === "undefined") return {} as Record<string, { status: "approved" | "rejected" }>;
-    try {
-      return JSON.parse(localStorage.getItem("wcag-approvals-v1") ?? "{}");
-    } catch {
-      return {} as Record<string, { status: "approved" | "rejected" }>;
-    }
-  }, [approvalTick]);
-  const approvalSummary = useMemo(() => {
-    const values = Object.values(approvals) as Array<{ status: "approved" | "rejected" }>;
-    return {
-      approved: values.filter((v) => v.status === "approved").length,
-      rejected: values.filter((v) => v.status === "rejected").length,
-    };
-  }, [approvals]);
   const tpMasterIdx = Math.max(0, brandModes.findIndex((b) => b.id === "bm-enterprise"));
   const [brandIdx, setBrandIdx] = useState(tpMasterIdx);
 
