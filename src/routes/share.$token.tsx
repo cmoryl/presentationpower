@@ -83,7 +83,7 @@ function NotActive({ message }: { message?: string }) {
   );
 }
 
-function SharedDeckView({ deck }: { deck: SharedDeck }) {
+function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
   const brand = byId(BRAND_MODES, deck.brand_mode_id ?? "") ?? BRAND_MODES[0];
   const slides: DeckSlide[] = useMemo(
     () =>
@@ -101,6 +101,113 @@ function SharedDeckView({ deck }: { deck: SharedDeck }) {
   const clientName = deck.brief?.prospect ?? undefined;
   const [presenting, setPresenting] = useState(false);
   const [i, setI] = useState(0);
+
+  // ---- Analytics: record share view (excludes owner) ----
+  const recordFn = useServerFn(recordShareView);
+  const viewedSlidesRef = useRef<Set<number>>(new Set());
+  const maxSlideRef = useRef<number>(0);
+  const sessionKeyRef = useRef<string | null>(null);
+  const skipRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      // Determine if current viewer is the deck owner; skip recording if so.
+      try {
+        const { data } = await supabase.auth.getSession();
+        const uid = data.session?.user.id;
+        if (uid && deckCloudId(uid, "" /* unused: match by deck.id below */)) {
+          // Better: compare deck.id to any deck owned by user. Cheap client-side check:
+          // If a signed-in user's id + any local nano would map — we can't invert. Instead
+          // query decks table for ownership of this specific deck.id.
+          const { data: own } = await supabase
+            .from("decks")
+            .select("id")
+            .eq("id", deck.id)
+            .maybeSingle();
+          if (own?.id) skipRef.current = true;
+        }
+      } catch {
+        // ignore
+      }
+      if (cancelled || skipRef.current) return;
+
+      // Session key per-token in sessionStorage
+      const storageKey = `share-session:${token}`;
+      let sk: string | null = null;
+      try {
+        sk = sessionStorage.getItem(storageKey);
+        if (!sk) {
+          sk = (crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)).slice(0, 64);
+          sessionStorage.setItem(storageKey, sk);
+        }
+      } catch {
+        sk = Math.random().toString(36).slice(2, 34);
+      }
+      sessionKeyRef.current = sk;
+
+      const send = () => {
+        const key = sessionKeyRef.current;
+        if (!key || skipRef.current) return;
+        recordFn({
+          data: {
+            token,
+            sessionKey: key,
+            slidesViewed: viewedSlidesRef.current.size,
+            maxSlide: maxSlideRef.current,
+          },
+        }).catch(() => {});
+      };
+      send();
+      const interval = window.setInterval(send, 30_000);
+      const onHide = () => send();
+      window.addEventListener("pagehide", onHide);
+      window.addEventListener("beforeunload", onHide);
+
+      // stash cleanup
+      (window as unknown as { __shareCleanup?: () => void }).__shareCleanup = () => {
+        window.clearInterval(interval);
+        window.removeEventListener("pagehide", onHide);
+        window.removeEventListener("beforeunload", onHide);
+      };
+    })();
+    return () => {
+      cancelled = true;
+      const w = window as unknown as { __shareCleanup?: () => void };
+      w.__shareCleanup?.();
+      w.__shareCleanup = undefined;
+    };
+  }, [token, deck.id, recordFn]);
+
+  // Track presented slide index
+  useEffect(() => {
+    if (presenting) {
+      viewedSlidesRef.current.add(i);
+      if (i > maxSlideRef.current) maxSlideRef.current = i;
+    }
+  }, [i, presenting]);
+
+  // IntersectionObserver on scrolled slides
+  const slideRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined") return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            const idx = Number((e.target as HTMLElement).dataset.slideIdx);
+            if (!Number.isNaN(idx)) {
+              viewedSlidesRef.current.add(idx);
+              if (idx > maxSlideRef.current) maxSlideRef.current = idx;
+            }
+          }
+        }
+      },
+      { threshold: 0.5 },
+    );
+    slideRefs.current.forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, [slides.length]);
 
   useEffect(() => {
     if (!presenting) return;
