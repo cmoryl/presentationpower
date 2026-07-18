@@ -740,17 +740,24 @@ function renderVariantBody({
     case "MV-PROOF-TESTIMONIAL":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <div className="grid h-full grid-cols-[1fr_320px] items-center gap-16">
-            <div>
-              <div className="text-[180px] leading-none opacity-15" style={{ color: brand.tokens.accent }}>“</div>
-              <div className="-mt-14 text-5xl font-medium leading-[1.2]">{s(c.quote)}</div>
-              <div className="mt-8 text-2xl opacity-70">
-                {s(c.attribution)} <span className="mx-2">·</span> {s(c.role)}
+          <div className="relative grid h-full grid-cols-[1.35fr_1fr] items-center gap-24">
+            <QuoteMark color={brand.tokens.accent} size={560} className="absolute -top-6 -left-4" />
+            <div className="relative">
+              <Kicker brand={brand}>Testimonial</Kicker>
+              <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
+              <div style={{ fontSize: 60, fontWeight: 500, lineHeight: 1.2, letterSpacing: "-0.015em", color: brand.tokens.primary, maxWidth: 980 }}>
+                {s(c.quote)}
+              </div>
+              <div className="mt-12">
+                <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} />
               </div>
             </div>
-            <div className="rounded-2xl p-10 text-center" style={{ backgroundColor: brand.tokens.primary, color: "#fff" }}>
-              <div className="text-6xl font-semibold" style={{ color: brand.tokens.accent }}>{s(c.metric)}</div>
-              <div className="mt-4 text-xl opacity-80">measurable outcome</div>
+            <div className="flex flex-col items-start">
+              <Hairline color={brand.tokens.accent} widthPx={56} thicknessPx={2} className="mb-6" />
+              <Kicker brand={brand}>Measurable outcome</Kicker>
+              <div className="mt-8">
+                <StatFigure brand={brand} value={s(c.metric)} size="lg" />
+              </div>
             </div>
           </div>
         </SlideFrame>
