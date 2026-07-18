@@ -8,8 +8,6 @@ import { listTeamTemplates, getTemplateDeck } from "@/lib/cloud-decks.functions"
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
 import { COMMUNITY_EVENT_TEMPLATE } from "@/lib/imported-templates/community-event";
-import { SQUARE_IMAGE_TEMPLATE } from "@/lib/imported-templates/square-image";
-import { INFOGRAPHICS_IMAGES_TEMPLATE } from "@/lib/imported-templates/infographics-images";
 
 export const Route = createFileRoute("/templates")({
   head: () => ({ meta: [{ title: "Team templates · TransPerfect Modular" }] }),
@@ -220,18 +218,6 @@ function StarterKits() {
       title: "Pulse Fest · Community Event Kit",
       blurb: "20 editable slides mapped onto our modular variants — cover, agenda, program, stats, pricing, venue, register.",
       payload: COMMUNITY_EVENT_TEMPLATE,
-    },
-    {
-      key: "square-image",
-      title: "Square Image · Editorial Library Kit",
-      blurb: "18 image-forward editorial slides — timelines, image grids, team, stats, trivia quotes, and closing agenda.",
-      payload: SQUARE_IMAGE_TEMPLATE,
-    },
-    {
-      key: "infographics-images",
-      title: "Infographics with Images · Data Library Kit",
-      blurb: "20 modular infographic layouts — 2/3/4-point splits, matrix, bento, funnels, journey maps, KPI dashboard and stat grids.",
-      payload: INFOGRAPHICS_IMAGES_TEMPLATE,
     },
   ];
 
