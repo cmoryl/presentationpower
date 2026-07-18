@@ -8,6 +8,7 @@ import { listTeamTemplates, getTemplateDeck } from "@/lib/cloud-decks.functions"
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
 import { COMMUNITY_EVENT_TEMPLATE } from "@/lib/imported-templates/community-event";
+import { SQUARE_IMAGE_TEMPLATE } from "@/lib/imported-templates/square-image";
 
 export const Route = createFileRoute("/templates")({
   head: () => ({ meta: [{ title: "Team templates · TransPerfect Modular" }] }),
