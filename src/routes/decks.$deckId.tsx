@@ -15,6 +15,7 @@ import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.function
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BackgroundImageryPanel } from "@/components/slide/BackgroundImageryPanel";
+import { PptxPreviewModal } from "@/components/slide/PptxPreviewModal";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
 
 import {
@@ -56,6 +57,7 @@ function DeckEditor() {
   const [activeIdx, setActiveIdx] = useState(0);
   const [zoomed, setZoomed] = useState(false);
   const [flashIndices, setFlashIndices] = useState<number[]>([]);
+  const [pptxPreviewOpen, setPptxPreviewOpen] = useState(false);
 
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
@@ -217,6 +219,38 @@ function DeckEditor() {
               onApplyToSlides={(ids, next) => applySlideBackground(deck.id, ids, next)}
             />
           )}
+
+          {active && (
+            <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-dashed border-black/15 bg-black/[0.02] px-5 py-4">
+              <div>
+                <div className="text-[11px] uppercase tracking-widest text-black/50">
+                  PowerPoint fidelity
+                </div>
+                <div className="mt-0.5 text-sm text-black/70">
+                  Verify scrim opacity, crop/fit, and overlays before export.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPptxPreviewOpen(true)}
+                className="rounded-full bg-[#003FC7] px-4 py-2 text-[11px] uppercase tracking-widest text-white hover:bg-[#03002C]"
+              >
+                Preview in PowerPoint
+              </button>
+            </div>
+          )}
+
+          {active && (
+            <PptxPreviewModal
+              deck={deck}
+              slide={active}
+              brand={brand}
+              open={pptxPreviewOpen}
+              onClose={() => setPptxPreviewOpen(false)}
+            />
+          )}
+
+
 
           {/* AI change log */}
 
