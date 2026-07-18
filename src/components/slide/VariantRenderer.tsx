@@ -2359,7 +2359,10 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-10 grid gap-6" style={{ gridTemplateColumns: "1.5fr 1fr 1fr", gridTemplateRows: "1fr 1fr", height: 720 }}>
             <div className={cellClass} style={{ ...cellBorder, gridRow: "1 / span 2" }}>
-              <Kicker brand={brand}>Anchor</Kicker>
+              <div className="flex items-center gap-4">
+                <IconBadge brand={brand} label={s(anchor.title)} index={0} size="md" override={s(anchor.icon)} treatment="soft-tile" />
+                <Kicker brand={brand}>Anchor</Kicker>
+              </div>
               <div className="mt-auto">
                 <div style={{ fontSize: 44, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(anchor.title)}</div>
                 <div className="mt-5" style={{ fontSize: 24, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(anchor.body)}</div>
