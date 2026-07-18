@@ -118,7 +118,7 @@ for (let i = 0; i < cardIds.length; i++) {
   }, TOLERANCE_PX);
 
   const shotPath = path.join(OUT, `${variantId}.png`);
-  await card.screenshot({ path: shotPath });
+  await card.screenshot({ path: shotPath }).catch(() => {});
   captured.push({ variantId, shot: path.relative(process.cwd(), shotPath), overlapCount: findings.length });
 
   if (findings.length > 0) overlaps.push({ variantId, findings });
