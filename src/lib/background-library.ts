@@ -327,6 +327,10 @@ export function resolveSlideBackground(
       imageDim: b.imageDim ?? 0.1,
       tint: b.tint ?? NAVY,
       darkChrome: b.darkChrome ?? true,
+      fit: b.fit ?? "cover",
+      zoom: typeof b.zoom === "number" ? b.zoom : 1,
+      offsetX: typeof b.offsetX === "number" ? b.offsetX : 0,
+      offsetY: typeof b.offsetY === "number" ? b.offsetY : 0,
     };
   }
   if (b.kind === "color" && (b.color || b.solid)) {
