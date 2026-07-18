@@ -1,6 +1,8 @@
 // Client-side seed of the "Community Event" PowerPoint template (imported from
 // a user-uploaded .pptx). Content is mapped onto our existing section /
-// variant taxonomy so the deck is fully editable in the app.
+// variant taxonomy so the deck is fully editable in the app — and every slide
+// that supports imagery ships with a `mediaSeed` so the MediaTile system
+// renders a real photo (not a blank fallback).
 import type { TemplatePayload } from "../deck-store";
 
 export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
@@ -20,13 +22,17 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
   },
   slides: [
     {
+      // Cinematic cover with photography behind the title.
       sectionId: "SF-01",
-      variantId: "MV-OP-COVER-POSTER",
+      variantId: "MV-OP-COVER-MEDIA",
       layoutId: "",
       content: {
         kicker: "PULSE FEST · Annual Community Gathering",
         title: "Gather & Grow Together",
-        meta: "12–14 SEP 2026 · Riverside Park, Portland · Edition 09",
+        subtitle: "Three days of makers, ideas, and the community that keeps them moving.",
+        clientName: "Pulse Fest",
+        date: "12–14 SEP 2026 · Portland",
+        mediaSeed: "pulsefest-crowd-festival-lights",
       },
     },
     {
@@ -48,15 +54,28 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
       },
     },
     {
+      // Big editorial image with copy — sets the tone for the weekend.
+      sectionId: "SF-03",
+      variantId: "MV-IMG-FULL-BLEED",
+      layoutId: "",
+      content: {
+        kicker: "The weekend",
+        title: "A gathering built for people who make things happen.",
+        body: "Three days, one park, dozens of sessions — and the collaborators you didn't know you were looking for.",
+        mediaSeed: "pulsefest-outdoor-stage-golden-hour",
+      },
+    },
+    {
       sectionId: "SF-03",
       variantId: "MV-CTX-STAT-GRID",
       layoutId: "",
       content: {
-        title: "A weekend built for people who make things happen",
+        title: "The weekend, by the numbers",
         items: [
           { value: "3", unit: "", label: "days of program" },
           { value: "40", unit: "+", label: "live sessions" },
           { value: "12", unit: "", label: "experience tracks" },
+          { value: "60", unit: "+", label: "speakers & mentors" },
         ],
       },
     },
@@ -70,7 +89,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
         quote: "Designing for momentum, not just moments.",
         narrative:
           "Maya builds tools that help communities organize themselves. She has spent a decade turning messy collective energy into things that ship — and she opens Pulse Fest with a talk on designing for momentum.",
-        mediaSeed: "maya-okonkwo",
+        mediaSeed: "maya-okonkwo-founder-portrait-studio-warm",
       },
     },
     {
@@ -105,18 +124,22 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
           {
             title: "Build & Make",
             body: "Hands-on labs where ideas become working prototypes. 14 sessions.",
+            mediaSeed: "makers-workshop-hands-tools",
           },
           {
             title: "Lead & Organize",
             body: "Playbooks for running groups that actually keep moving. 9 sessions.",
+            mediaSeed: "community-leaders-roundtable-discussion",
           },
           {
             title: "Tell & Share",
             body: "Turn your work into stories people want to pass on. 11 sessions.",
+            mediaSeed: "storyteller-on-stage-microphone-warm",
           },
           {
             title: "Connect & Grow",
             body: "Slow rooms for meeting collaborators and mentors. 7 sessions.",
+            mediaSeed: "small-group-coffee-conversation",
           },
         ],
       },
@@ -126,7 +149,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
       variantId: "MV-PROOF-STATS-4",
       layoutId: "",
       content: {
-        title: "What we built together",
+        title: "What we built together — Edition 08",
         items: [
           { value: "140", unit: "", label: "sessions delivered", source: "Edition 08" },
           { value: "8,400", unit: "+", label: "total attendance", source: "Edition 08" },
@@ -136,21 +159,33 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
       },
     },
     {
+      // Divider now uses a media-forward section break.
       sectionId: "SF-01",
-      variantId: "MV-OP-DIVIDER",
-      layoutId: "",
-      content: { kicker: "Scenes from the floor", title: "A weekend in motion" },
-    },
-    {
-      sectionId: "SF-08",
-      variantId: "MV-PROOF-TESTIMONIAL",
+      variantId: "MV-IMG-QUOTE-BG",
       layoutId: "",
       content: {
         quote:
           "I arrived with half an idea and left with a team, a plan, and three people I now call friends.",
         attribution: "Lena Torres",
         role: "Second-time attendee · Community Lead, Austin",
-        metric: "",
+        mediaSeed: "festival-crowd-hands-raised-warm",
+      },
+    },
+    {
+      // Six-up gallery of scenes from the floor — pure imagery.
+      sectionId: "SF-05",
+      variantId: "MV-IMG-GRID-6",
+      layoutId: "",
+      content: {
+        title: "Scenes from the floor",
+        items: [
+          { caption: "Opening night", seed: "festival-opening-night-lights" },
+          { caption: "Maker labs", seed: "hands-on-maker-workshop" },
+          { caption: "Main stage", seed: "keynote-speaker-main-stage" },
+          { caption: "Community dinner", seed: "long-table-community-dinner-outdoors" },
+          { caption: "Mentor rooms", seed: "small-mentor-circle-notebook" },
+          { caption: "Closing circle", seed: "closing-circle-outdoors-sunset" },
+        ],
       },
     },
     {
@@ -223,18 +258,21 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
               "The rare event where hallway chats turn into real projects. I left with collaborators, not just contacts.",
             attribution: "Devon Park",
             role: "Product Designer",
+            mediaSeed: "devon-park-designer-portrait",
           },
           {
             quote:
               "Every track felt hands-on. I shipped a working prototype before lunch on day two and demoed it that night.",
             attribution: "Amara Singh",
             role: "Indie Maker",
+            mediaSeed: "amara-singh-maker-portrait",
           },
           {
             quote:
               "The most welcoming room I have organised in. People show up generous and leave a little braver.",
             attribution: "Theo Marsh",
             role: "Community Lead",
+            mediaSeed: "theo-marsh-community-portrait",
           },
         ],
       },
@@ -290,25 +328,15 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
       },
     },
     {
+      // Venue block — with location imagery on the split.
       sectionId: "SF-03",
-      variantId: "MV-CTX-CARDS-3",
+      variantId: "MV-IMG-SPLIT",
       layoutId: "",
       content: {
         title: "Find us at The Commons",
-        items: [
-          {
-            title: "Address",
-            body: "48 Maker Lane, East Quarter — a restored warehouse turned community campus.",
-          },
-          {
-            title: "Nearest transit",
-            body: "Quarter Line · Commons stop. Ten minutes from the central station.",
-          },
-          {
-            title: "Parking & access",
-            body: "Free bike racks, paid lot next door. Full accessibility info on the event site.",
-          },
-        ],
+        body: "A restored warehouse turned community campus in the East Quarter — ten minutes from central station, with bike racks, an accessible venue, and a park across the street.",
+        caption: "48 Maker Lane · East Quarter · Portland",
+        mediaSeed: "restored-warehouse-community-venue-portland",
       },
     },
     {
@@ -318,10 +346,30 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
       content: {
         title: "The crew making it happen",
         items: [
-          { name: "Maya Okonkwo", role: "Festival Director", bio: "@maya" },
-          { name: "Ravi Desai", role: "Program & Tracks", bio: "@ravi" },
-          { name: "Nadia Cole", role: "Community & Care", bio: "@nadia" },
-          { name: "Sam Whitfield", role: "Space & Logistics", bio: "@sam" },
+          {
+            name: "Maya Okonkwo",
+            role: "Festival Director",
+            bio: "@maya",
+            mediaSeed: "maya-okonkwo-director-portrait",
+          },
+          {
+            name: "Ravi Desai",
+            role: "Program & Tracks",
+            bio: "@ravi",
+            mediaSeed: "ravi-desai-program-portrait",
+          },
+          {
+            name: "Nadia Cole",
+            role: "Community & Care",
+            bio: "@nadia",
+            mediaSeed: "nadia-cole-community-portrait",
+          },
+          {
+            name: "Sam Whitfield",
+            role: "Space & Logistics",
+            bio: "@sam",
+            mediaSeed: "sam-whitfield-logistics-portrait",
+          },
         ],
       },
     },
@@ -346,40 +394,24 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
       variantId: "MV-CLOSE-CTA",
       layoutId: "",
       content: {
+        title: "Get your pass.",
         message: "Get your pass.",
         nextSteps:
           "Three days, one community, and a weekend you will keep talking about. Spots are limited — lock yours in today.",
         owner: "Pulse Fest team",
         followUp: "pulsefest.events/2026",
-      },
-    },
-    {
-      sectionId: "SF-16",
-      variantId: "MV-CLOSE-CONTACT",
-      layoutId: "",
-      content: {
-        title: "Stay in the loop",
-        items: [
-          {
-            name: "Hello",
-            role: "General enquiries",
-            email: "hello@pulsefest.events",
-            phone: "Newsletter: pulsefest.events/join",
-          },
-          {
-            name: "Press",
-            role: "Media & partnerships",
-            email: "press@pulsefest.events",
-            phone: "Schedule drops & speaker reveals",
-          },
-        ],
+        mediaSeed: "festival-audience-hands-raised-cta",
       },
     },
     {
       sectionId: "SF-16",
       variantId: "MV-CLOSE-THANKS",
       layoutId: "",
-      content: { message: "Thank you.", signoff: "Pulse Fest · See you in Portland" },
+      content: {
+        message: "Thank you.",
+        title: "Thank you.",
+        signoff: "Pulse Fest · See you in Portland",
+      },
     },
   ],
 };
