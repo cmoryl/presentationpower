@@ -1353,6 +1353,116 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         ],
       };
 
+    case "MV-GRAPH-LINE-MULTI":
+      return {
+        title: `${clientName} — quality vs. throughput over time`,
+        kicker: "Two curves, one program",
+        headline: "Throughput compounds while quality holds the line",
+        unit: "%",
+        series: [
+          { label: "First-pass approval", points: [82, 84, 86, 89, 91, 93, 94] },
+          { label: "On-time delivery", points: [88, 89, 91, 93, 95, 96, 97] },
+          { label: "Reviewer utilization", points: [61, 64, 68, 72, 76, 80, 82] },
+        ],
+        axis: { x: ["Q1'24", "Q2'24", "Q3'24", "Q4'24", "Q1'25", "Q2'25", "Q3'25"] },
+      };
+    case "MV-GRAPH-STACKED-BAR":
+      return {
+        title: `${clientName} — words by content type, per quarter`,
+        unit: "M words",
+        segments: [
+          { label: "Marketing" },
+          { label: "Product & support" },
+          { label: "Legal & regulatory" },
+        ],
+        columns: [
+          { label: "Q1", values: [3.2, 2.4, 0.8] },
+          { label: "Q2", values: [3.8, 2.9, 0.9] },
+          { label: "Q3", values: [4.4, 3.3, 1.1] },
+          { label: "Q4", values: [5.1, 3.9, 1.3] },
+          { label: "Q1'25", values: [5.9, 4.5, 1.5] },
+          { label: "Q2'25", values: [6.7, 5.2, 1.7] },
+        ],
+      };
+    case "MV-GRAPH-AREA-STACK":
+      return {
+        title: `${clientName} — program composition over time`,
+        kicker: "Where the growth is coming from",
+        headline: "Product and support are the compounding layer",
+        unit: "M words",
+        series: [
+          { label: "Marketing", points: [2.1, 2.4, 2.8, 3.2, 3.8, 4.4, 5.1] },
+          { label: "Product & support", points: [1.4, 1.9, 2.5, 3.3, 4.2, 5.4, 6.8] },
+          { label: "Legal & regulatory", points: [0.4, 0.5, 0.6, 0.8, 1.0, 1.2, 1.5] },
+        ],
+        axis: { x: ["2020", "2021", "2022", "2023", "2024", "2025", "2026"] },
+      };
+    case "MV-GRAPH-WATERFALL":
+      return {
+        title: `${clientName} — from baseline cost to optimized run-rate`,
+        unit: "$M",
+        steps: [
+          { label: "Baseline spend", value: 12.4, kind: "start" },
+          { label: "Adaptive MT", value: -2.1, kind: "down" },
+          { label: "Reviewer network", value: -1.4, kind: "down" },
+          { label: "Terminology reuse", value: -0.9, kind: "down" },
+          { label: "New markets", value: 1.2, kind: "up" },
+          { label: "Optimized", value: 9.2, kind: "end" },
+        ],
+      };
+    case "MV-GRAPH-BUBBLE":
+      return {
+        title: `${clientName} — market prioritization`,
+        axis: { x: "Growth potential", y: "Content readiness" },
+        items: [
+          { label: "DE", x: 78, y: 84, size: 42 },
+          { label: "FR", x: 72, y: 79, size: 36 },
+          { label: "JP", x: 88, y: 61, size: 48 },
+          { label: "BR", x: 82, y: 54, size: 34 },
+          { label: "MX", x: 66, y: 71, size: 28 },
+          { label: "KR", x: 74, y: 66, size: 30 },
+        ],
+      };
+    case "MV-GRAPH-HEATMAP":
+      return {
+        title: `${clientName} — turnaround by market and content type`,
+        rows: ["Marketing", "Product", "Support", "Legal", "Web"],
+        columns: ["DE", "FR", "ES", "JP", "BR", "KR"],
+        cells: [
+          [92, 90, 91, 74, 82, 78],
+          [88, 87, 85, 72, 80, 76],
+          [94, 92, 93, 81, 86, 82],
+          [70, 72, 71, 62, 66, 64],
+          [90, 88, 89, 76, 84, 80],
+        ],
+        scale: { min: 60, max: 100 },
+      };
+    case "MV-GRAPH-TREEMAP":
+      return {
+        title: `${clientName} — program mix by weight`,
+        items: [
+          { label: "Product & support", value: 44, meta: "Docs, UI, help" },
+          { label: "Marketing", value: 26, meta: "Web, brand, campaigns" },
+          { label: "Legal & regulatory", value: 14, meta: "Contracts, disclosures" },
+          { label: "Learning", value: 9, meta: "Enablement, training" },
+          { label: "Internal", value: 7, meta: "HR, comms" },
+        ],
+      };
+    case "MV-GRAPH-COMBO":
+      return {
+        title: `${clientName} — volume vs. first-pass approval`,
+        bars: { label: "Words delivered", unit: "M" },
+        line: { label: "First-pass approval", unit: "%" },
+        points: [
+          { label: "Q1'24", bar: 5.2, line: 84 },
+          { label: "Q2'24", bar: 6.1, line: 86 },
+          { label: "Q3'24", bar: 7.4, line: 89 },
+          { label: "Q4'24", bar: 8.8, line: 91 },
+          { label: "Q1'25", bar: 10.2, line: 93 },
+          { label: "Q2'25", bar: 12.1, line: 94 },
+        ],
+      };
+
     default:
 
 
