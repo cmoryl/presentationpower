@@ -489,7 +489,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-[1.05fr_1fr] items-center gap-24">
-            <div>
+            <div className="min-w-0">
               <Kicker brand={brand}>Cost of inaction</Kicker>
               <Hairline color={brand.tokens.accent} widthPx={88} thicknessPx={2} className="mt-6 mb-10" />
               <StatFigure
@@ -497,7 +497,7 @@ function renderVariantBody({
                 value={s(c.stat)}
                 unit={s(c.unit)}
                 label={s(c.label)}
-                size="monumental"
+                size="xl"
               />
             </div>
             <SupportingText size="xl" opacity={0.85} maxWidthPx={720}>
@@ -988,17 +988,17 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-2 items-center gap-24">
-            <div>
+            <div className="min-w-0">
               <Kicker brand={brand}>{s(c.title, "Investment")}</Kicker>
               <Hairline color={brand.tokens.accent} widthPx={88} thicknessPx={2} className="mt-6 mb-10" />
               <StatFigure
                 brand={brand}
                 value={s(c.amount)}
                 unit={s(c.unit)}
-                size="monumental"
+                size="xl"
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <Hairline color={brand.tokens.accent} widthPx={56} thicknessPx={2} className="mb-6" />
               <Kicker brand={brand}>Included</Kicker>
               <div className="mt-8 space-y-5">
@@ -1008,7 +1008,7 @@ function renderVariantBody({
                     className="flex items-start gap-5 pt-5"
                     style={{ borderTop: i === 0 ? "none" : "1px solid rgba(10,15,28,0.10)" }}
                   >
-                    <span className="mt-3 h-2 w-8" style={{ backgroundColor: brand.tokens.accent }} />
+                    <span className="mt-3 h-2 w-8 shrink-0" style={{ backgroundColor: brand.tokens.accent }} />
                     <span style={{ fontSize: 26, lineHeight: 1.3, letterSpacing: "-0.01em", color: brand.tokens.primary }}>
                       {s(it.label)}
                     </span>
@@ -3287,8 +3287,8 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-10 grid gap-16" style={{ gridTemplateColumns: "1fr 1.2fr" }}>
-            <div className="flex flex-col justify-center pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-              <StatFigure brand={brand} value={s(stat.value)} unit={s(stat.unit)} label={s(stat.label)} size="monumental" />
+            <div className="flex min-w-0 flex-col justify-center pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+              <StatFigure brand={brand} value={s(stat.value)} unit={s(stat.unit)} label={s(stat.label)} size="xl" />
             </div>
             <div>
               {items.map((it, i) => {
