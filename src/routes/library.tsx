@@ -173,26 +173,6 @@ function Library() {
           >
             ▤ Sample imagery {showImagery ? "on" : "off"}
           </button>
-          <button
-            type="button"
-            onClick={() => setWcagOn((v) => !v)}
-            aria-pressed={wcagOn}
-            title="Run WCAG 2.1 contrast audit on each rendered slide"
-            className={`rounded-full border px-3 py-1.5 text-xs ${
-              wcagOn
-                ? "border-emerald-600 bg-emerald-600 text-white"
-                : "border-black/15 bg-white text-black/70 hover:text-black"
-            }`}
-          >
-            ⚖ WCAG {wcagOn ? "on" : "off"}
-          </button>
-          {wcagOn && (approvalSummary.approved + approvalSummary.rejected > 0) && (
-            <span className="rounded-full bg-black/5 px-3 py-1 text-[11px] text-black/70">
-              <span className="font-semibold text-emerald-700">{approvalSummary.approved} approved</span>
-              {" · "}
-              <span className="font-semibold text-red-600">{approvalSummary.rejected} rejected</span>
-            </span>
-          )}
           <span className="text-sm text-black/50">{filtered.length} of {moduleVariants.length}</span>
         </div>
       </div>
