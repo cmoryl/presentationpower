@@ -540,16 +540,8 @@ function VariantDetailModal({
                 </select>
               </div>
             </div>
-            <div className="overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm">
-              <div className="aspect-[16/9]">
-                <ScaledSlide>
-                  <SlideBackdropContext.Provider value={showImagery ? backdropForVariant(variant, brand.id, mode) : null}>
-                    <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
-                    
-                  </SlideBackdropContext.Provider>
-                </ScaledSlide>
-              </div>
-            </div>
+            <ModalABPreview variant={variant} brand={brand} previewSlide={previewSlide} showImagery={showImagery} />
+
             <p className="mt-4 text-sm text-black/60">{variant.description}</p>
           </div>
 
