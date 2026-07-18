@@ -15,6 +15,7 @@ import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.function
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BackgroundImageryPanel } from "@/components/slide/BackgroundImageryPanel";
+import { PptxPreviewModal } from "@/components/slide/PptxPreviewModal";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
 
 import {
