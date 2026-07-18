@@ -986,10 +986,10 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         title: `${clientName}'s content flywheel`,
         hub: "Global content engine",
         items: [
-          { label: "Create", note: "Author once at HQ", icon: "sparkles" },
-          { label: "Localize", note: "Adaptive MT + reviewers", icon: "globe2" },
-          { label: "Publish", note: "Route to every market", icon: "send" },
-          { label: "Measure", note: "Feedback loop to source", icon: "linechart" },
+          { label: "Create", note: "Author once at HQ", icon: "Sparkles" },
+          { label: "Localize", note: "Adaptive MT + reviewers", icon: "Globe2" },
+          { label: "Publish", note: "Route to every market", icon: "Send" },
+          { label: "Measure", note: "Feedback loop to source", icon: "LineChart" },
         ],
       };
     case "MV-MATURITY-CURVE":
