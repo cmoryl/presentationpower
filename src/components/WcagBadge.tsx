@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  applyAutoFix,
   auditNode,
   clearApproval,
   loadApprovals,
@@ -7,6 +8,7 @@ import {
   type Approval,
   type WcagReport,
 } from "@/lib/wcag";
+
 
 type Props = {
   variantId: string;
@@ -38,19 +40,30 @@ export function WcagBadge({ variantId, mode, targetRef, enabled, compact = false
     const el = targetRef.current;
     if (!el) return;
     const id = ++runId.current;
-    // Delay to let VariantRenderer paint and fonts settle.
+    // Delay to let VariantRenderer paint and fonts settle, then auto-fix
+    // failing text before auditing so the badge reflects the fixed state.
     const t = window.setTimeout(() => {
       if (id !== runId.current) return;
       try {
-        const r = auditNode(el);
-        setReport(r);
-        onReport?.(r);
+        applyAutoFix(el);
+        // Give the browser a frame to apply the inline styles before measuring.
+        requestAnimationFrame(() => {
+          if (id !== runId.current) return;
+          try {
+            const r = auditNode(el);
+            setReport(r);
+            onReport?.(r);
+          } catch {
+            /* ignore */
+          }
+        });
       } catch {
         /* ignore */
       }
-    }, 260);
+    }, 400);
     return () => window.clearTimeout(t);
   }, [targetRef, mode, variantId, onReport]);
+
 
   useEffect(() => {
     const all = loadApprovals();
