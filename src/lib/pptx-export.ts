@@ -116,23 +116,66 @@ export async function exportDeckToPptx(
     }),
   );
 
+  // Rasterize each slide's Backgrounds & Imagery selection in parallel. This
+  // covers library presets, solid/gradient/pattern, and image (upload/ai)
+  // choices — everything set through the Background & Imagery panel.
+  const backgroundPlans: PptxBackgroundPlan[] = await Promise.all(
+    deck.slides.map((slide) => {
+      const c = slide.content as Record<string, unknown>;
+      return planPptxBackground(c.background);
+    }),
+  );
+
   for (let i = 0; i < deck.slides.length; i++) {
     const slide = deck.slides[i];
     const kind = classifyVariant(slide.variantId, i);
     const s = pptx.addSlide();
     const advancedDark = slide.variantId === "MV-COUNTDOWN";
-    const isDark = advancedDark || kind === "cover" || kind === "divider";
+    const plan = backgroundPlans[i];
+    const bgIsImage = plan.kind === "image";
+    // Slide chrome dark/light selection: honor an explicit background choice
+    // (color solid, image tint) so text/logos flip to legible palettes.
+    const isDark = advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
     const useWhiteLogo = isDark || slide.variantId === "MV-SPLIT-MANIFESTO";
     const hideFooter = useWhiteLogo;
-    s.background = { color: isDark ? palette.primary : "FFFFFF" };
 
-    // Underlay imagery — preserves both PPTX-imported photos (content.mediaUrl)
-    // and curated kit imagery (content.mediaSeed → division library). Full-bleed
-    // treatment is only applied to cover/divider kinds where existing renderers
-    // draw text over a dark scrim; other renderers use full-width text boxes
-    // and would clip a side-panel image, so those keep their current layout.
+    // 1. Native PPTX background fill — always set so exported slides never
+    //    default to opaque white when the editor showed a dark scene.
+    if (plan.kind === "solid") {
+      s.background = { color: plan.color };
+    } else if (plan.kind === "image") {
+      s.background = { color: plan.solidFallback };
+    } else {
+      s.background = { color: isDark ? palette.primary : "FFFFFF" };
+    }
+
+    // 2. Full-bleed rasterized background image — covers gradients, patterns,
+    //    library presets, and user-picked photographs alike. Positioning
+    //    mirrors CSS object-fit / zoom / offset from SlideChrome.
+    if (plan.kind === "image") {
+      const sz = imageBackgroundSizing(plan, SLIDE_W, SLIDE_H);
+      s.addImage({
+        data: plan.data,
+        x: sz.x,
+        y: sz.y,
+        w: sz.w,
+        h: sz.h,
+        sizing: { type: sz.fit, w: sz.w, h: sz.h },
+      });
+      for (const rect of scrimRectSpec(plan, SLIDE_W, SLIDE_H)) {
+        s.addShape("rect", {
+          x: rect.x, y: rect.y, w: rect.w, h: rect.h,
+          fill: { color: rect.color, transparency: rect.transparency },
+          line: { color: rect.color, transparency: 100 },
+        });
+      }
+    }
+
+    // 3. Legacy cover/divider imagery underlay — only when the slide has no
+    //    explicit Backgrounds & Imagery selection. Preserves prior behavior
+    //    for decks that predate the panel.
     const imgData = slideImages[i];
-    if (imgData && (kind === "cover" || kind === "divider")) {
+    if (!bgIsImage && imgData && (kind === "cover" || kind === "divider")) {
       s.addImage({
         data: imgData, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H,
         sizing: { type: "cover", w: SLIDE_W, h: SLIDE_H },
