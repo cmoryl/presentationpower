@@ -60,7 +60,9 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
             variantId: s.variantId,
             layoutId: s.layoutId,
             content: s.content as Record<string, unknown>,
+            notes: s.notes,
           })),
+
           messages: messages.slice(-10),
           userMessage: text,
         },
@@ -77,7 +79,9 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
               variantId: u.variantId,
               layoutId: u.layoutId,
               content: u.content,
+              notes: u.notes,
             })),
+
           );
           onHighlight?.(result.changedIndices);
           setTimeout(() => onHighlight?.([]), 2400);

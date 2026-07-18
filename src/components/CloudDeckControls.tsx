@@ -145,6 +145,7 @@ export function MyCloudDecks() {
         variant_id: string;
         layout_id: string;
         content: Record<string, unknown> | null;
+        notes?: string | null;
       }>;
 
       const slides: DeckSlide[] = rawSlides.map((s, i) => {
@@ -161,8 +162,10 @@ export function MyCloudDecks() {
           layoutId: s.layout_id,
           content,
           changes: Array.isArray(__changes) ? (__changes as DeckSlide["changes"]) : [],
+          notes: typeof s.notes === "string" ? s.notes : undefined,
         };
       });
+
 
       // Use a stable local id so re-loading the same cloud deck reuses the same slot.
       const localDeckId = `cloud-${d.id}`;

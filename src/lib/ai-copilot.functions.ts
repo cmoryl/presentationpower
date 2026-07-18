@@ -32,7 +32,9 @@ const SlideIn = z.object({
   variantId: z.string(),
   layoutId: z.string(),
   content: z.record(z.unknown()),
+  notes: z.string().optional(),
 });
+
 
 const ChatMsg = z.object({
   role: z.enum(["user", "assistant"]),
@@ -70,7 +72,9 @@ export type CopilotUpdatedSlide = {
   layoutId: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   content: Record<string, any>;
+  notes?: string;
 };
+
 
 export type CopilotResult =
   | {
@@ -228,7 +232,21 @@ const TOOLS: AnthropicToolDef[] = [
       required: ["index", "variantId"],
     },
   },
+  {
+    name: "update_slide_notes",
+    description:
+      "Set the private speaker notes for a slide. Notes are free text used only during presenter mode and PPTX export; they never appear on the slide itself.",
+    input_schema: {
+      type: "object",
+      properties: {
+        index: { type: "integer", minimum: 0 },
+        notes: { type: "string", description: "Full speaker notes text. Replaces existing notes." },
+      },
+      required: ["index", "notes"],
+    },
+  },
 ];
+
 
 // ---------------------------------------------------------------------------
 // Server function
@@ -246,6 +264,7 @@ export const copilotTurn = createServerFn({ method: "POST" })
       variantId: string;
       layoutId: string;
       content: Record<string, unknown>;
+      notes: string;
       originalNumerics: string[];
     };
     const originals = new Map<number, WorkSlide>();
@@ -256,11 +275,13 @@ export const copilotTurn = createServerFn({ method: "POST" })
         variantId: s.variantId,
         layoutId: s.layoutId,
         content: structuredClone(s.content) as Record<string, unknown>,
+        notes: s.notes ?? "",
         originalNumerics: collectNumericLeaves(s.content),
       };
-      originals.set(s.index, ws);
+      originals.set(s.index, { ...ws, content: structuredClone(ws.content) });
       return ws;
     });
+
     const findSlide = (idx: number) => working.find((s) => s.index === idx);
 
     const canTouchStats = userMentionsNumbers(data.userMessage);
@@ -364,6 +385,16 @@ export const copilotTurn = createServerFn({ method: "POST" })
           }
           return { ok: true, variantId, layoutId: s.layoutId };
         }
+        case "update_slide_notes": {
+          const idx = Number(call.input.index);
+          const notes = String(call.input.notes ?? "");
+          const s = findSlide(idx);
+          if (!s) return { error: `No slide at index ${idx}` };
+          s.notes = notes;
+          return { ok: true, index: idx, length: notes.length };
+        }
+
+
         default:
           return { error: `Unknown tool: ${call.name}` };
       }
@@ -421,19 +452,24 @@ export const copilotTurn = createServerFn({ method: "POST" })
     const changedIndices: number[] = [];
     for (const s of working) {
       const o = originals.get(s.index)!;
-      const contentChanged = !deepEqual(o.content, s.content) ||
-        s.variantId !== data.slides.find((d) => d.index === s.index)!.variantId ||
-        s.layoutId !== data.slides.find((d) => d.index === s.index)!.layoutId;
-      if (contentChanged) {
+      const orig = data.slides.find((d) => d.index === s.index)!;
+      const notesChanged = s.notes !== (orig.notes ?? "");
+      const changedAny = !deepEqual(o.content, s.content) ||
+        s.variantId !== orig.variantId ||
+        s.layoutId !== orig.layoutId ||
+        notesChanged;
+      if (changedAny) {
         changed.push({
           index: s.index,
           variantId: s.variantId,
           layoutId: s.layoutId,
           content: s.content,
+          notes: notesChanged ? s.notes : undefined,
         });
         changedIndices.push(s.index);
       }
     }
+
 
     return {
       ok: true,

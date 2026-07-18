@@ -141,7 +141,9 @@ export async function exportDeckToPptx(
     }
 
     const km = slide.sectionId ? keyMessageBySection.get(slide.sectionId) : undefined;
-    if (km) s.addNotes(km);
+    const noteText = (slide.notes && slide.notes.trim()) ? slide.notes.trim() : (km ?? "");
+    if (noteText) s.addNotes(noteText);
+
   }
 
   await pptx.writeFile({ fileName: `${sanitize(deck.title)}.pptx` });

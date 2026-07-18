@@ -54,7 +54,9 @@ export type DeckSlide = {
   layoutId: string;
   content: SlideContent;
   changes: AiChange[];
+  notes?: string;
 };
+
 
 export type DeckClientLogo = {
   id: string;
@@ -120,7 +122,7 @@ export type TemplatePayload = {
   archetypeId: string;
   subCompany?: string | null;
   context?: Record<string, unknown> | null;
-  slides: Array<{ sectionId: string; variantId: string; layoutId: string; content: SlideContent }>;
+  slides: Array<{ sectionId: string; variantId: string; layoutId: string; content: SlideContent; notes?: string | null }>;
   brief?: {
     prospect?: string;
     industry?: string;
@@ -130,6 +132,7 @@ export type TemplatePayload = {
     clientFacts?: string;
   } | null;
 };
+
 
 
 
@@ -148,10 +151,12 @@ type DeckState = {
   applyAiContent: (deckId: string, aiSlides: Array<{ id: string; content: SlideContent }>) => void;
   applyCopilotUpdates: (
     deckId: string,
-    updates: Array<{ index: number; variantId: string; layoutId: string; content: SlideContent }>,
+    updates: Array<{ index: number; variantId: string; layoutId: string; content: SlideContent; notes?: string }>,
   ) => void;
   revertAiChange: (deckId: string, slideId: string, field: string) => void;
   updateSlideField: (deckId: string, slideId: string, field: string, value: unknown) => void;
+  updateSlideNotes: (deckId: string, slideId: string, notes: string) => void;
+
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
   removeSlide: (deckId: string, slideId: string) => void;
@@ -1056,11 +1061,16 @@ export const useDeckStore = create<DeckState>()(
                     changes.push({ field: k, before: sl.content[k], after: u.content[k], reason: "Copilot edit", accepted: true });
                   }
                 });
+                const notesChanged = u.notes !== undefined && u.notes !== (sl.notes ?? "");
+                if (notesChanged) {
+                  changes.push({ field: "__notes", before: sl.notes ?? "", after: u.notes, reason: "Copilot notes", accepted: true });
+                }
                 return {
                   ...sl,
                   variantId: u.variantId,
                   layoutId: u.layoutId,
                   content: u.content,
+                  notes: u.notes !== undefined ? u.notes : sl.notes,
                   changes: [...sl.changes.filter((c) => !changes.find((n) => n.field === c.field)), ...changes],
                 };
               }),
@@ -1068,6 +1078,21 @@ export const useDeckStore = create<DeckState>()(
           },
         }));
       },
+
+      updateSlideNotes: (deckId, slideId, notes) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) => (sl.id === slideId ? { ...sl, notes } : sl)),
+            },
+          },
+        }));
+      },
+
 
       revertAiChange: (deckId, slideId, field) => {
         const deck = get().decks[deckId];
@@ -1287,7 +1312,9 @@ export const useDeckStore = create<DeckState>()(
             layoutId: s.layoutId,
             content: structuredClone(s.content),
             changes: [],
+            notes: s.notes ?? undefined,
           })),
+
         };
         set((s) => ({
           briefs: { ...s.briefs, [briefId]: brief },

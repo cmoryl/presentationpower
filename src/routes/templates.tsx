@@ -89,7 +89,7 @@ function TemplateCard({ row }: { row: TemplateRow }) {
               archetype_id: string;
               sub_company?: string | null;
               context?: Record<string, unknown> | null;
-              slides: Array<{ section_id: string; variant_id: string; layout_id: string; content: Record<string, unknown>; position?: number }>;
+              slides: Array<{ section_id: string; variant_id: string; layout_id: string; content: Record<string, unknown>; position?: number; notes?: string | null }>;
               brief?: Record<string, unknown> | null;
             })
           | null;
@@ -106,7 +106,9 @@ function TemplateCard({ row }: { row: TemplateRow }) {
           variantId: s.variant_id,
           layoutId: s.layout_id,
           content: (s.content as Record<string, unknown>) ?? {},
+          notes: typeof s.notes === "string" ? s.notes : null,
         })),
+
         brief: res.deck.brief
           ? {
               prospect: (res.deck.brief as Record<string, unknown>).prospect as string | undefined,
