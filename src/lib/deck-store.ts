@@ -1259,7 +1259,102 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         ],
       };
 
+    case "MV-GRAPH-YEAR-SERIES":
+      return {
+        title: `${clientName} program value — multi-year view`,
+        kicker: "Program growth",
+        headline: "Every year has compounded on the last",
+        items: [
+          { year: "2020", value: 4, unit: "M" },
+          { year: "2021", value: 7, unit: "M" },
+          { year: "2022", value: 12, unit: "M" },
+          { year: "2023", value: 18, unit: "M" },
+          { year: "2024", value: 27, unit: "M" },
+          { year: "2025", value: 38, unit: "M" },
+          { year: "2026", value: 56, unit: "M" },
+        ],
+      };
+    case "MV-GRAPH-AXIS-BARS":
+      return {
+        title: `Monthly words delivered — ${clientName}`,
+        unit: "M",
+        highlight: "Jul",
+        legend: "Bars in accent = highest-volume month",
+        bars: [
+          { label: "Jan", value: 2.1 },
+          { label: "Feb", value: 2.4 },
+          { label: "Mar", value: 2.7 },
+          { label: "Apr", value: 3.1 },
+          { label: "May", value: 3.4 },
+          { label: "Jun", value: 3.8 },
+          { label: "Jul", value: 4.6 },
+        ],
+      };
+    case "MV-GRAPH-CATEGORY-BARS":
+      return {
+        title: `${clientName} — content types by volume`,
+        stat: { value: "22.1", unit: "M", label: "Total words, last quarter" },
+        items: [
+          { label: "Support", value: 6.8, unit: "M" },
+          { label: "Product", value: 5.1, unit: "M" },
+          { label: "Marketing", value: 4.5, unit: "M" },
+          { label: "Web", value: 3.4, unit: "M" },
+          { label: "Legal", value: 2.3, unit: "M" },
+        ],
+      };
+    case "MV-GRAPH-DUAL-DONUT":
+      return {
+        title: `${clientName} — before and after adaptive MT`,
+        items: [
+          { value: 74, label: "First-pass approval", body: "Legacy vendor mix, human-only workflow.", meta: "2023" },
+          { value: 94, label: "First-pass approval", body: "Adaptive MT + reviewer network, tuned to your terminology.", meta: "2026" },
+        ],
+      };
+    case "MV-GRAPH-RINGS":
+      return {
+        title: `${clientName} — program mix`,
+        items: [
+          { label: "Marketing", value: 44, body: "Campaigns, web, brand." },
+          { label: "Product & support", value: 37, body: "Docs, UI, help center." },
+          { label: "Legal & regulatory", value: 12, body: "Contracts, disclosures." },
+          { label: "Internal", value: 7, body: "HR, training, comms." },
+        ],
+      };
+    case "MV-GRAPH-TASK-CARDS":
+      return {
+        title: `${clientName} program — quarterly status`,
+        items: [
+          { label: "Markets onboarded", done: 32, total: 38, body: "6 remaining in EMEA rollout." },
+          { label: "Terminology base", done: 8400, total: 10000, body: "Glossary coverage across content types." },
+          { label: "Reviewer training", done: 71, total: 100, body: "Localized reviewers certified to v3 brand voice." },
+        ],
+      };
+    case "MV-GRAPH-DECADE-AREA":
+      return {
+        title: `${clientName} localization spend — decade view`,
+        kicker: "Trajectory",
+        headline: "The inflection point is behind us — the compounding is ahead",
+        series: [
+          { label: "2017", value: 1.1 }, { label: "2018", value: 1.4 }, { label: "2019", value: 1.7 },
+          { label: "2020", value: 2.0 }, { label: "2021", value: 2.6 }, { label: "2022", value: 3.4 },
+          { label: "2023", value: 4.1 }, { label: "2024", value: 5.2 }, { label: "2025", value: 6.8 },
+          { label: "2026", value: 8.4 },
+        ],
+        callout: { year: "2023", note: "Adaptive MT + reviewer network go live" },
+      };
+    case "MV-GRAPH-PERCENT-COMPARE":
+      return {
+        title: `${clientName} vs. peer benchmark`,
+        items: [
+          { label: "On-time delivery", current: 97, benchmark: 84, range: "Industry band: 78–89%" },
+          { label: "First-pass approval", current: 94, benchmark: 76, range: "Industry band: 68–82%" },
+          { label: "Terminology adherence", current: 91, benchmark: 72, range: "Industry band: 61–78%" },
+          { label: "Reviewer utilization", current: 82, benchmark: 65, range: "Industry band: 55–70%" },
+        ],
+      };
+
     default:
+
 
 
 
