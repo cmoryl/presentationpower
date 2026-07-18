@@ -3262,7 +3262,226 @@ function renderVariantBody({
       );
     }
 
+    // ── Graph family (Batch 4) ──────────────────────────────────────────
+    case "MV-GRAPH-YEAR-SERIES": {
+      const items = arr(c.items);
+      const vals = items.map((it) => Number(it.value) || 0);
+      const max = Math.max(1, ...vals);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-8 grid gap-14" style={{ gridTemplateColumns: "1fr 2.4fr" }}>
+            <div className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+              <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
+              <div className="mt-6" style={{ fontSize: 38, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(c.headline)}</div>
+            </div>
+            <div className="grid items-end gap-4" style={{ gridTemplateColumns: `repeat(${items.length || 1}, 1fr)`, minHeight: 520 }}>
+              {items.map((it, i) => {
+                const v = Number(it.value) || 0;
+                const h = Math.max(20, (v / max) * 420);
+                const isLast = i === items.length - 1;
+                const color = isLast ? brand.tokens.accent : brand.tokens.primary;
+                const opacity = isLast ? 1 : 0.3 + (i / Math.max(items.length - 1, 1)) * 0.55;
+                return (
+                  <div key={i} className="flex flex-col items-center justify-end">
+                    <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: brand.tokens.primary }}>
+                      {s(it.value)}<span style={{ fontSize: 14, color: brand.tokens.accent, marginLeft: 2 }}>{s(it.unit)}</span>
+                    </div>
+                    <div className="mt-3 w-full" style={{ height: h, background: color, opacity, maxWidth: 90 }} />
+                    <div className="mt-3 uppercase" style={{ fontSize: 14, letterSpacing: "0.22em", color: isLast ? brand.tokens.accent : "rgba(10,15,28,0.55)", fontWeight: 600 }}>{s(it.year)}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="mt-1" style={{ height: 1, background: "rgba(10,15,28,0.2)" }} />
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-AXIS-BARS": {
+      const bars = arr(c.bars).map((b) => ({ label: s(b.label), value: Number(b.value) || 0 }));
+      const highlight = s(c.highlight);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-10">
+            <AxisBarChart brand={brand} bars={bars} height={520} highlight={highlight} unit={s(c.unit)} />
+          </div>
+          {s(c.legend) && (
+            <div className="mt-6 flex items-center gap-4">
+              <div style={{ width: 14, height: 14, background: brand.tokens.accent }} />
+              <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.24em", color: "rgba(10,15,28,0.65)", fontWeight: 600 }}>{s(c.legend)}</div>
+            </div>
+          )}
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-CATEGORY-BARS": {
+      const items = arr(c.items).map((it) => ({ label: s(it.label), value: Number(it.value) || 0, unit: s(it.unit) }));
+      const max = Math.max(1, ...items.map((it) => it.value));
+      const stat = obj(c.stat);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-10 grid gap-16" style={{ gridTemplateColumns: "1.6fr 1fr" }}>
+            <div>
+              {items.map((it, i) => {
+                const pct = (it.value / max) * 100;
+                const isTop = i === 0;
+                return (
+                  <div key={i} className="py-5" style={{ borderTop: i === 0 ? `2px solid ${brand.tokens.accent}` : "1px solid rgba(10,15,28,0.12)", borderBottom: i === items.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
+                    <div className="flex items-baseline justify-between mb-3">
+                      <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.24em", color: brand.tokens.primary, fontWeight: 600 }}>{it.label}</div>
+                      <div className="tabular-nums" style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary }}>
+                        {it.value}<span style={{ fontSize: 16, color: brand.tokens.accent, marginLeft: 4 }}>{it.unit}</span>
+                      </div>
+                    </div>
+                    <div style={{ position: "relative", height: 12, background: "rgba(10,15,28,0.08)" }}>
+                      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${pct}%`, background: isTop ? brand.tokens.accent : brand.tokens.primary, opacity: isTop ? 1 : 0.4 + (1 - i / items.length) * 0.4 }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex flex-col justify-center pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+              <StatFigure brand={brand} value={s(stat.value)} unit={s(stat.unit)} label={s(stat.label)} size="xl" />
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-DUAL-DONUT": {
+      const items = arr(c.items).slice(0, 2);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-10 grid gap-16" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
+            {items[0] && <DonutBlock brand={brand} item={items[0]} />}
+            <div style={{ background: "rgba(10,15,28,0.12)" }} />
+            {items[1] && <DonutBlock brand={brand} item={items[1]} />}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-RINGS": {
+      const items = arr(c.items).slice(0, 4).map((it) => ({ label: s(it.label), value: Number(it.value) || 0, body: s(it.body) }));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-10 grid gap-16 items-center" style={{ gridTemplateColumns: "1fr 1fr" }}>
+            <div className="flex items-center justify-center">
+              <ConcentricRings brand={brand} items={items} size={520} />
+            </div>
+            <div>
+              {items.map((it, i) => {
+                const color = i === 0 ? brand.tokens.accent : brand.tokens.primary;
+                const opacity = i === 0 ? 1 : 0.35 + (1 - i / items.length) * 0.5;
+                return (
+                  <div key={i} className="py-4 flex items-start gap-5" style={{ borderTop: "1px solid rgba(10,15,28,0.12)", borderBottom: i === items.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
+                    <div style={{ width: 16, height: 16, background: color, opacity, marginTop: 8 }} />
+                    <div style={{ flex: 1 }}>
+                      <div className="flex items-baseline justify-between">
+                        <div style={{ fontSize: 22, fontWeight: 600, color: brand.tokens.primary }}>{it.label}</div>
+                        <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: brand.tokens.accent }}>{it.value}%</div>
+                      </div>
+                      <div className="mt-2" style={{ fontSize: 16, color: "rgba(10,15,28,0.65)", lineHeight: 1.4 }}>{it.body}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-TASK-CARDS": {
+      const items = arr(c.items).slice(0, 3);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-12 grid gap-10" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+            {items.map((it, i) => {
+              const done = Number(it.done) || 0;
+              const total = Math.max(1, Number(it.total) || 100);
+              const pct = Math.min(100, Math.round((done / total) * 100));
+              return (
+                <div key={i} className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+                  <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "rgba(10,15,28,0.6)", fontWeight: 600 }}>{s(it.label)}</div>
+                  <div className="mt-6 flex items-baseline gap-3">
+                    <div className="tabular-nums" style={{ fontSize: 88, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.03em", lineHeight: 1 }}>{pct}%</div>
+                    <div style={{ fontSize: 20, color: "rgba(10,15,28,0.5)" }}>of 100%</div>
+                  </div>
+                  <div className="mt-4 tabular-nums" style={{ fontSize: 16, color: "rgba(10,15,28,0.55)" }}>{done.toLocaleString()} / {total.toLocaleString()}</div>
+                  <div className="mt-6"><ProgressBar brand={brand} percent={pct} /></div>
+                  <div className="mt-6" style={{ fontSize: 18, color: "rgba(10,15,28,0.7)", lineHeight: 1.45 }}>{s(it.body)}</div>
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-DECADE-AREA": {
+      const series = arr(c.series).map((p) => ({ label: s(p.label), value: Number(p.value) || 0 }));
+      const callout = obj(c.callout);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="mb-6 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+            <Kicker brand={brand}>{s(c.kicker, "Trajectory")}</Kicker>
+            <div className="mt-4" style={{ fontSize: 44, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
+          </div>
+          <div className="mt-4">
+            <DecadeAreaChart brand={brand} series={series} height={520} calloutLabel={s(callout.year)} calloutNote={s(callout.note)} />
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-PERCENT-COMPARE": {
+      const items = arr(c.items).slice(0, 5);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-8">
+            {items.map((it, i) => {
+              const cur = Math.max(0, Math.min(100, Number(it.current) || 0));
+              const bench = Math.max(0, Math.min(100, Number(it.benchmark) || 0));
+              return (
+                <div key={i} className="py-6" style={{ borderTop: "1px solid rgba(10,15,28,0.12)", borderBottom: i === items.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
+                  <div className="flex items-baseline justify-between gap-8 mb-4">
+                    <div style={{ fontSize: 24, fontWeight: 600, color: brand.tokens.primary }}>{s(it.label)}</div>
+                    <div className="flex items-baseline gap-10">
+                      <div className="tabular-nums" style={{ fontSize: 40, fontWeight: 600, color: brand.tokens.accent, letterSpacing: "-0.02em" }}>{cur}%</div>
+                      <div className="tabular-nums" style={{ fontSize: 30, fontWeight: 600, color: "rgba(10,15,28,0.4)" }}>{bench}%</div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <div style={{ position: "relative", height: 8, background: "rgba(10,15,28,0.08)" }}>
+                      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${cur}%`, background: brand.tokens.accent }} />
+                    </div>
+                    <div style={{ position: "relative", height: 8, background: "rgba(10,15,28,0.08)" }}>
+                      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${bench}%`, background: brand.tokens.primary, opacity: 0.35 }} />
+                    </div>
+                  </div>
+                  {s(it.range) && (
+                    <div className="mt-3 uppercase" style={{ fontSize: 14, letterSpacing: "0.24em", color: "rgba(10,15,28,0.5)", fontWeight: 600 }}>{s(it.range)}</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+    }
+
     default:
+
 
 
 
