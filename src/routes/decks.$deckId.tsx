@@ -47,7 +47,9 @@ function DeckEditor() {
   const addSlide = useDeckStore((s) => s.addSlide);
   const duplicateSlide = useDeckStore((s) => s.duplicateSlide);
   const revertAiChange = useDeckStore((s) => s.revertAiChange);
+  const updateSlideNotes = useDeckStore((s) => s.updateSlideNotes);
   const setDeckClientLogo = useDeckStore((s) => s.setDeckClientLogo);
+
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [zoomed, setZoomed] = useState(false);
