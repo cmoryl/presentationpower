@@ -8,9 +8,36 @@ import PptxGenJS from "pptxgenjs";
 import type { Deck, DeckSlide, DeckStrategySnapshot } from "./deck-store";
 import type { BrandMode } from "./taxonomy";
 import { getDivisionLogos } from "./division-logos";
+import { pickDivisionImage } from "@/assets/backdrops/divisions";
 
 const SLIDE_W = 13.333;
 const SLIDE_H = 7.5;
+
+// Deterministic seed→index hash, matches MediaTile in VariantRenderer so
+// the exported PPTX uses the same photograph the editor previewed.
+function seedHash(str: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+/** Resolve the best photograph to embed for a slide. Priority:
+ *  1. `content.mediaUrl` — usually set by PPTX import to preserve the
+ *     original picture round-trip.
+ *  2. `content.mediaSeed` — curated kits and generated decks pick from
+ *     the division-specific imagery library via a deterministic hash.
+ *  Returns null when no imagery is warranted (agenda / stats / etc.).
+ */
+function resolveSlideImageUrl(brandId: string, c: Record<string, unknown>): string | null {
+  const url = typeof c.mediaUrl === "string" && c.mediaUrl.length > 0 ? c.mediaUrl : null;
+  if (url) return url;
+  const seed = typeof c.mediaSeed === "string" && c.mediaSeed.length > 0 ? c.mediaSeed : null;
+  if (!seed) return null;
+  return pickDivisionImage(brandId, seedHash(seed));
+}
 
 async function fetchAsDataUrl(url: string): Promise<string | null> {
   try {
