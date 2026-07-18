@@ -205,6 +205,19 @@ function Library() {
           >
             ⚖ WCAG {wcagOn ? "on" : "off"}
           </button>
+          <button
+            type="button"
+            onClick={() => setAutoFixOn((v) => !v)}
+            aria-pressed={autoFixOn}
+            title="Auto-boost failing text nodes to the nearest AA-passing color on every card"
+            className={`rounded-full border px-3 py-1.5 text-xs ${
+              autoFixOn
+                ? "border-blue-600 bg-blue-600 text-white"
+                : "border-black/15 bg-white text-black/70 hover:text-black"
+            }`}
+          >
+            ✨ Auto-fix {autoFixOn ? "on" : "off"}
+          </button>
           {wcagOn && (approvalSummary.approved + approvalSummary.rejected > 0) && (
             <span className="rounded-full bg-black/5 px-3 py-1 text-[11px] text-black/70">
               <span className="font-semibold text-emerald-700">{approvalSummary.approved} approved</span>
@@ -235,6 +248,7 @@ function Library() {
             mode={mode}
             showImagery={showImagery}
             wcagOn={wcagOn}
+            autoFixOn={autoFixOn}
             onOpen={() => setOpenId(v.id)}
           />
         ))}
