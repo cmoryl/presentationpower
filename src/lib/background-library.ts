@@ -5,20 +5,28 @@
 // Rendered by SlideChrome via SlideBackdropContext. See PPTX export for the
 // mapping to native PowerPoint background fills.
 
-export type BackgroundKind = "library" | "upload" | "ai" | "color" | "gradient";
+export type BackgroundKind = "library" | "upload" | "ai" | "color" | "gradient" | "pattern";
 export type BackgroundScrim = "bottom" | "left" | "right" | "top" | "full" | "vignette";
+export type PatternId = "dots" | "grid" | "diagonal" | "waves" | "checker" | "cross" | "triangles";
 
 export type SlideBackgroundValue = {
   kind: BackgroundKind;
   presetId?: string;
-  url?: string; // for upload / ai / photo-library
-  css?: string; // full CSS `background` shorthand (color + image)
-  solid?: string; // hex fallback for PPTX export
+  url?: string;
+  css?: string;
+  solid?: string;
   scrim?: BackgroundScrim;
-  scrimStrength?: number; // 0..1
-  imageDim?: number; // 0..1
-  tint?: string; // hex
-  darkChrome?: boolean; // hint that chrome should render on dark mode
+  scrimStrength?: number;
+  imageDim?: number;
+  tint?: string;
+  darkChrome?: boolean;
+  // Parametric — round-trip user color / intensity choices.
+  color?: string;
+  colorB?: string;
+  angle?: number;
+  intensity?: number;
+  patternId?: PatternId;
+  patternScale?: number;
 };
 
 export type BackgroundPreset = {
@@ -196,9 +204,94 @@ export function getBackgroundPreset(id: string | undefined): BackgroundPreset | 
   return BACKGROUND_PRESETS.find((p) => p.id === id) ?? null;
 }
 
-/** Resolve a persisted `content.background` into a fully hydrated value.
- *  Fills in preset CSS from the library so slide records only need to store
- *  the preset id. */
+// ── Parametric helpers ────────────────────────────────────────────────
+function clamp01(n: number | undefined, d = 1): number {
+  if (typeof n !== "number" || Number.isNaN(n)) return d;
+  return Math.max(0, Math.min(1, n));
+}
+
+export function hexToRgba(hex: string, alpha = 1): string {
+  const h = hex.replace("#", "").trim();
+  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const r = parseInt(full.slice(0, 2), 16) || 0;
+  const g = parseInt(full.slice(2, 4), 16) || 0;
+  const b = parseInt(full.slice(4, 6), 16) || 0;
+  return `rgba(${r}, ${g}, ${b}, ${clamp01(alpha)})`;
+}
+
+export function isDarkHex(hex: string): boolean {
+  const h = hex.replace("#", "");
+  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const r = parseInt(full.slice(0, 2), 16) || 0;
+  const g = parseInt(full.slice(2, 4), 16) || 0;
+  const b = parseInt(full.slice(4, 6), 16) || 0;
+  // relative luminance
+  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 < 0.55;
+}
+
+export function buildSolidCss(color: string, intensity = 1): string {
+  return hexToRgba(color, intensity);
+}
+
+export function buildGradientCss(
+  colorA: string,
+  colorB: string,
+  angle = 135,
+  intensity = 1,
+): string {
+  return `linear-gradient(${angle}deg, ${hexToRgba(colorA, intensity)} 0%, ${hexToRgba(
+    colorB,
+    intensity,
+  )} 100%)`;
+}
+
+export const PATTERN_LIBRARY: { id: PatternId; name: string }[] = [
+  { id: "dots", name: "Dots" },
+  { id: "grid", name: "Grid" },
+  { id: "diagonal", name: "Diagonal" },
+  { id: "waves", name: "Waves" },
+  { id: "checker", name: "Checker" },
+  { id: "cross", name: "Cross" },
+  { id: "triangles", name: "Triangles" },
+];
+
+function patternSvg(id: PatternId, fg: string, scale: number): string {
+  const s = Math.max(8, Math.min(80, Math.round(scale)));
+  const stroke = encodeURIComponent(fg);
+  switch (id) {
+    case "dots":
+      return `<circle cx='${s / 2}' cy='${s / 2}' r='${Math.max(1, s / 16)}' fill='${stroke}'/>`;
+    case "grid":
+      return `<path d='M${s} 0H0V${s}' fill='none' stroke='${stroke}' stroke-width='1'/>`;
+    case "diagonal":
+      return `<path d='M-1 ${s / 2} L${s / 2} -1 M${s / 2} ${s + 1} L${s + 1} ${s / 2}' stroke='${stroke}' stroke-width='1'/>`;
+    case "waves":
+      return `<path d='M0 ${s / 2} Q ${s / 4} 0, ${s / 2} ${s / 2} T ${s} ${s / 2}' fill='none' stroke='${stroke}' stroke-width='1'/>`;
+    case "checker":
+      return `<rect width='${s / 2}' height='${s / 2}' fill='${stroke}'/><rect x='${s / 2}' y='${s / 2}' width='${s / 2}' height='${s / 2}' fill='${stroke}'/>`;
+    case "cross":
+      return `<path d='M${s / 2} ${s / 4} V${(3 * s) / 4} M${s / 4} ${s / 2} H${(3 * s) / 4}' stroke='${stroke}' stroke-width='1'/>`;
+    case "triangles":
+      return `<path d='M0 ${s} L${s / 2} 0 L${s} ${s} Z' fill='none' stroke='${stroke}' stroke-width='1'/>`;
+  }
+}
+
+export function buildPatternCss(
+  patternId: PatternId,
+  fg: string,
+  bg: string,
+  intensity = 0.35,
+  scale = 24,
+): string {
+  const alpha = clamp01(intensity);
+  const inner = patternSvg(patternId, hexToRgba(fg, alpha), scale);
+  const uri = `url("data:image/svg+xml;utf8,${encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' width='${scale}' height='${scale}'>${inner}</svg>`,
+  )}")`;
+  return `${uri}, ${bg}`;
+}
+
+/** Resolve a persisted `content.background` into a fully hydrated value. */
 export function resolveSlideBackground(
   raw: unknown,
 ): SlideBackgroundValue | null {
@@ -231,11 +324,50 @@ export function resolveSlideBackground(
       darkChrome: b.darkChrome ?? true,
     };
   }
-  if (b.kind === "color" && b.solid) {
-    return { kind: "color", solid: b.solid, css: b.solid, darkChrome: b.darkChrome };
+  if (b.kind === "color" && (b.color || b.solid)) {
+    const color = b.color ?? b.solid ?? NAVY;
+    const intensity = clamp01(b.intensity, 1);
+    return {
+      kind: "color",
+      color,
+      intensity,
+      solid: color,
+      css: buildSolidCss(color, intensity),
+      darkChrome: isDarkHex(color),
+    };
   }
-  if (b.kind === "gradient" && b.css) {
-    return { kind: "gradient", css: b.css, solid: b.solid, darkChrome: b.darkChrome };
+  if (b.kind === "gradient") {
+    const colorA = b.color ?? BLUE;
+    const colorB = b.colorB ?? NAVY;
+    const angle = typeof b.angle === "number" ? b.angle : 135;
+    const intensity = clamp01(b.intensity, 1);
+    return {
+      kind: "gradient",
+      color: colorA,
+      colorB,
+      angle,
+      intensity,
+      css: buildGradientCss(colorA, colorB, angle, intensity),
+      solid: colorA,
+      darkChrome: isDarkHex(colorA) && isDarkHex(colorB),
+    };
+  }
+  if (b.kind === "pattern" && b.patternId) {
+    const fg = b.color ?? "#03002C";
+    const bg = b.colorB ?? "#F2F2F2";
+    const intensity = clamp01(b.intensity, 0.35);
+    const scale = b.patternScale ?? 24;
+    return {
+      kind: "pattern",
+      patternId: b.patternId,
+      color: fg,
+      colorB: bg,
+      intensity,
+      patternScale: scale,
+      css: buildPatternCss(b.patternId, fg, bg, intensity, scale),
+      solid: bg,
+      darkChrome: isDarkHex(bg),
+    };
   }
   return null;
 }
