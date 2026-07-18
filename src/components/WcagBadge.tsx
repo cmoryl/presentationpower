@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  applyAutoFix,
   auditNode,
   clearApproval,
   loadApprovals,
@@ -7,6 +8,7 @@ import {
   type Approval,
   type WcagReport,
 } from "@/lib/wcag";
+
 
 type Props = {
   variantId: string;
