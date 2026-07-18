@@ -220,6 +220,38 @@ function DeckEditor() {
             />
           )}
 
+          {active && (
+            <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-dashed border-black/15 bg-black/[0.02] px-5 py-4">
+              <div>
+                <div className="text-[11px] uppercase tracking-widest text-black/50">
+                  PowerPoint fidelity
+                </div>
+                <div className="mt-0.5 text-sm text-black/70">
+                  Verify scrim opacity, crop/fit, and overlays before export.
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPptxPreviewOpen(true)}
+                className="rounded-full bg-[#003FC7] px-4 py-2 text-[11px] uppercase tracking-widest text-white hover:bg-[#03002C]"
+              >
+                Preview in PowerPoint
+              </button>
+            </div>
+          )}
+
+          {active && (
+            <PptxPreviewModal
+              deck={deck}
+              slide={active}
+              brand={brand}
+              open={pptxPreviewOpen}
+              onClose={() => setPptxPreviewOpen(false)}
+            />
+          )}
+
+
+
           {/* AI change log */}
 
           {active && active.changes.filter((c) => c.accepted).length > 0 && (
