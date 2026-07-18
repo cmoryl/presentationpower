@@ -385,6 +385,32 @@ export const copilotTurn = createServerFn({ method: "POST" })
           }
           return { ok: true, variantId, layoutId: s.layoutId };
         }
+        case "update_slide_notes": {
+          const idx = Number(call.input.index);
+          const notes = String(call.input.notes ?? "");
+          const s = findSlide(idx);
+          if (!s) return { error: `No slide at index ${idx}` };
+          s.notes = notes;
+          return { ok: true, index: idx, length: notes.length };
+        }
+
+          const idx = Number(call.input.index);
+          const variantId = String(call.input.variantId ?? "");
+          const s = findSlide(idx);
+          if (!s) return { error: `No slide at index ${idx}` };
+          const permitted = variantsForSection(s.sectionId);
+          const next = permitted.find((v) => v.id === variantId);
+          if (!next) {
+            return {
+              error: `Variant ${variantId} not permitted for section ${s.sectionId}. Call list_taxonomy_variants first.`,
+            };
+          }
+          s.variantId = variantId;
+          if (!next.permittedLayoutIds.includes(s.layoutId)) {
+            s.layoutId = next.permittedLayoutIds[0];
+          }
+          return { ok: true, variantId, layoutId: s.layoutId };
+        }
         default:
           return { error: `Unknown tool: ${call.name}` };
       }
