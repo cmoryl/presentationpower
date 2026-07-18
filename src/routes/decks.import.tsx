@@ -639,6 +639,8 @@ function ReviewPanel({
         </div>
       </div>
 
+      <DiagnosticsPanel parsed={parsed} mapping={mapping} />
+
       <div>
         <div className="mb-3 flex items-baseline justify-between">
           <h2 className="text-xl font-semibold">Review the mapping</h2>
