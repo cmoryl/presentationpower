@@ -10,7 +10,9 @@ import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { seedContent, useDeckStore, type Brief, type TemplatePayload } from "@/lib/deck-store";
 import { byId, MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
-import { MODULE_PRESET_KITS } from "@/lib/module-preset-kits";
+import { MODULE_PRESET_KITS, validateKit } from "@/lib/module-preset-kits";
+import { formatKitValidationError } from "@/lib/kit-validation";
+
 
 const SAMPLE_BRIEF: Brief = {
   id: "preview",
@@ -615,11 +617,17 @@ function ModulePresetKitsBlock() {
   const [busy, setBusy] = useState<string | null>(null);
 
   function importKit(kit: (typeof MODULE_PRESET_KITS)[number]) {
+    const result = validateKit(kit);
+    if (!result.valid) {
+      alert(formatKitValidationError(kit.title, result));
+      return;
+    }
     setBusy(kit.key);
     // layoutId fallback is enforced inside createDeckFromTemplate.
     const { deckId } = createDeckFromTemplate(kit.payload);
     navigate({ to: "/decks/$deckId", params: { deckId } });
   }
+
 
   return (
     <section className="mt-16">

@@ -3,7 +3,9 @@ import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { byId, MODULE_VARIANTS } from "@/lib/taxonomy";
-import { MODULE_PRESET_KITS } from "@/lib/module-preset-kits";
+import { MODULE_PRESET_KITS, validateKit } from "@/lib/module-preset-kits";
+import { formatKitValidationError } from "@/lib/kit-validation";
+
 import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
 import { Download, Loader2 } from "lucide-react";
 import {
@@ -647,11 +649,17 @@ function ModulePresetKitsSection() {
   const [busy, setBusy] = useState<string | null>(null);
 
   function importKit(kit: (typeof MODULE_PRESET_KITS)[number]) {
+    const result = validateKit(kit);
+    if (!result.valid) {
+      alert(formatKitValidationError(kit.title, result));
+      return;
+    }
     setBusy(kit.key);
     // layoutId fallback is enforced inside createDeckFromTemplate.
     const { deckId } = createDeckFromTemplate(kit.payload);
     navigate({ to: "/decks/$deckId", params: { deckId } });
   }
+
 
   return (
     <Section title="Module preset kits" count={MODULE_PRESET_KITS.length}>
