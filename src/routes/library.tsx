@@ -694,3 +694,124 @@ function ModulePresetKitsBlock() {
     </section>
   );
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// User-imported decks — any deck flagged as a template or brought in via
+// the PPTX import flow surfaces here as a one-click reusable kit.
+// ────────────────────────────────────────────────────────────────────────────
+function UserImportedKitsBlock() {
+  const decks = useDeckStore((s) => s.decks);
+  const briefs = useDeckStore((s) => s.briefs);
+  const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
+  const setDeckTemplateFlag = useDeckStore((s) => s.setDeckTemplateFlag);
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const imported = useMemo(() => {
+    const list = Object.values(decks).filter((d) => {
+      if (d.isTemplate) return true;
+      const b = briefs[d.briefId];
+      return b?.prospect === "Imported deck";
+    });
+    return list.sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1));
+  }, [decks, briefs]);
+
+  if (imported.length === 0) return null;
+
+  function importAsKit(deck: (typeof imported)[number]) {
+    const payload: TemplatePayload = {
+      title: `${deck.title} · copy`,
+      brandModeId: deck.brandModeId,
+      archetypeId: deck.archetypeId,
+      subCompany: deck.subCompany ?? null,
+      context: deck.context ?? null,
+      slides: deck.slides.map((s) => ({
+        sectionId: s.sectionId,
+        variantId: s.variantId,
+        layoutId: s.layoutId,
+        content: s.content,
+        notes: s.notes ?? null,
+      })),
+    };
+    setBusy(deck.id);
+    const { deckId } = createDeckFromTemplate(payload);
+    navigate({ to: "/decks/$deckId", params: { deckId } });
+  }
+
+  return (
+    <section className="mt-16">
+      <div className="flex items-end justify-between gap-4 border-b border-black/10 pb-4">
+        <div>
+          <div className="text-xs uppercase tracking-[0.3em] text-black/50">Your imports</div>
+          <h2 className="mt-2 text-2xl font-semibold text-[#03002C]">Imported graphs & uploads</h2>
+          <p className="mt-2 max-w-2xl text-sm text-black/60">
+            Decks you brought in via PPTX import or flagged as a template — reusable as module kits alongside the curated collections above.
+          </p>
+        </div>
+        <span className="shrink-0 rounded-full bg-black/5 px-3 py-1 text-xs text-black/60">
+          {imported.length} deck{imported.length === 1 ? "" : "s"}
+        </span>
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-2">
+        {imported.map((deck) => {
+          const familyCounts = deck.slides.reduce<Record<string, number>>((acc, s) => {
+            const mv = byId(MODULE_VARIANTS, s.variantId);
+            const fam = mv?.familyId ?? "unknown";
+            acc[fam] = (acc[fam] ?? 0) + 1;
+            return acc;
+          }, {});
+          const graphCount = deck.slides.filter((s) => s.variantId.startsWith("MV-GRAPH")).length;
+          return (
+            <div key={deck.id} className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02)]">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="text-[10px] uppercase tracking-widest text-[#003FC7]">
+                    {deck.isTemplate ? "Template" : "Imported"}
+                    {graphCount > 0 ? ` · ${graphCount} graph${graphCount === 1 ? "" : "s"}` : ""}
+                  </div>
+                  <div className="mt-1 text-lg font-semibold text-[#03002C]">{deck.title}</div>
+                </div>
+                <span className="shrink-0 rounded-full bg-[#003FC7]/10 px-2.5 py-0.5 text-xs font-medium text-[#003FC7]">
+                  {deck.slides.length} slides
+                </span>
+              </div>
+
+              <div className="mt-4 border-t border-black/10 pt-3">
+                <div className="text-[9px] uppercase tracking-widest text-black/40">Variant mix</div>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {Object.entries(familyCounts).map(([fam, n]) => (
+                    <span key={fam} className="rounded-full bg-[#0B2A4A]/10 px-2 py-0.5 font-mono text-[10px] text-[#0B2A4A]">
+                      {fam} · {n}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-5 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => importAsKit(deck)}
+                  disabled={busy !== null}
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#03002C] px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
+                >
+                  {busy === deck.id ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+                  {busy === deck.id ? "Duplicating…" : "Use as kit"}
+                </button>
+                {!deck.isTemplate && (
+                  <button
+                    type="button"
+                    onClick={() => setDeckTemplateFlag(deck.id, true)}
+                    className="rounded-full border border-black/15 bg-white px-4 py-2.5 text-xs uppercase tracking-widest text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+                  >
+                    Pin as template
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
