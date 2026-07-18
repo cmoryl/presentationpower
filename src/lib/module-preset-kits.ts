@@ -6,6 +6,7 @@ import type { TemplatePayload } from "./deck-store";
 import { SQUARE_IMAGE_TEMPLATE } from "./imported-templates/square-image";
 import { INFOGRAPHICS_IMAGES_TEMPLATE } from "./imported-templates/infographics-images";
 import { COMMUNITY_EVENT_TEMPLATE } from "./imported-templates/community-event";
+import { GRAPH_LIBRARY_TEMPLATE } from "./imported-templates/graph-library";
 import { validateKitPayload, formatKitValidationError, type KitValidationResult } from "./kit-validation";
 
 export type ModulePresetKit = {
@@ -32,6 +33,14 @@ export const MODULE_PRESET_KITS: ModulePresetKit[] = [
     blurb:
       "20 modular infographic layouts — 2/3/4-point splits, matrix, bento, funnels, journey maps, KPI dashboard and stat grids.",
     payload: INFOGRAPHICS_IMAGES_TEMPLATE,
+  },
+  {
+    key: "graph-library",
+    title: "Graph Variants · Data Library",
+    tag: "Charts",
+    blurb:
+      "16 chart-driven proof slides — year series, axis + category bars, stacked bars, area stack, waterfall, bubble, heatmap, treemap, donut, rings, combo — each with editable data.",
+    payload: GRAPH_LIBRARY_TEMPLATE,
   },
   {
     key: "community-event",
