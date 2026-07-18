@@ -16,7 +16,7 @@ import {
 } from "@/lib/taxonomy";
 import { BRAND_GUIDES } from "@/lib/brand-guides";
 import { hasAiKey } from "@/lib/ai-status.functions";
-import { listMyCloudDecks } from "@/lib/cloud-decks.functions";
+import { listMyCloudDecks, deleteCloudDeck } from "@/lib/cloud-decks.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -264,7 +264,28 @@ function DeckCard({ deck: d, industry }: { deck: Deck; industry?: string }) {
   const cover = d.slides[0];
   const coverVariant = cover ? byId(MODULE_VARIANTS, cover.variantId) : undefined;
   const duplicateDeck = useDeckStore((s) => s.duplicateDeck);
+  const deleteDeck = useDeckStore((s) => s.deleteDeck);
+  const removeCloud = useServerFn(deleteCloudDeck);
   const navigate = useNavigate();
+  const [deleting, setDeleting] = useState(false);
+
+  const onDelete = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const ok = window.confirm(`Delete "${d.title}"? This can't be undone.`);
+    if (!ok) return;
+    setDeleting(true);
+    // Best-effort: remove the cloud copy if it exists, then always drop the local record.
+    try {
+      await removeCloud({ data: { deckId: d.id } });
+    } catch {
+      // Deck may only exist locally, or the user may be signed out — ignore.
+    }
+    deleteDeck(d.id);
+  };
+
+  if (deleting) return null;
+
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-black/10 bg-white transition hover:-translate-y-0.5 hover:border-black/30 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04]">
       <Link to="/decks/$deckId" params={{ deckId: d.id }} className="block">
@@ -295,6 +316,14 @@ function DeckCard({ deck: d, industry }: { deck: Deck; industry?: string }) {
       <div className="absolute inset-x-3 bottom-3 flex items-center justify-end gap-1.5 opacity-0 transition group-hover:opacity-100">
         <button
           type="button"
+          onClick={onDelete}
+          className="rounded-full bg-white/95 px-3 py-1 text-xs font-medium text-red-700 shadow ring-1 ring-red-200 hover:bg-red-50"
+          aria-label={`Delete ${d.title}`}
+        >
+          Delete
+        </button>
+        <button
+          type="button"
           onClick={(e) => {
             e.preventDefault();
             const id = duplicateDeck(d.id);
@@ -322,6 +351,7 @@ function DeckCard({ deck: d, industry }: { deck: Deck; industry?: string }) {
     </div>
   );
 }
+
 
 function ResourceTile({
   to, icon, title, count, caption,
