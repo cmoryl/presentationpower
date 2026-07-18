@@ -237,9 +237,10 @@ function ImportView() {
             <div className="text-xs uppercase tracking-[0.3em] text-black/50">Import</div>
             <h1 className="mt-3 text-4xl font-semibold">Reformat an existing PowerPoint.</h1>
             <p className="mt-3 max-w-2xl text-black/60">
-              We extract titles, bullets, and speaker notes and re-author each slide onto the
-              closest TransPerfect module variant. Original layout, fonts, and images are
-              discarded — content only.
+              We extract titles, bullets, speaker notes, embedded images, and theme
+              colors — then re-author each slide onto the closest TransPerfect module
+              variant. Original imagery and accent palette carry through so the
+              reformatted deck still looks like your source.
             </p>
           </div>
           <Link
