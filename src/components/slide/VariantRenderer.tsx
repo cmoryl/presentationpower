@@ -2755,7 +2755,10 @@ function renderVariantBody({
             <div className="grid gap-8" style={{ gridTemplateColumns: `repeat(${Math.max(Math.min(below.length, 3), 2)}, minmax(0, 1fr))` }}>
               {below.map((it, i) => (
                 <div key={i} className="p-6" style={{ background: "rgba(10,15,28,0.04)", border: "1px solid rgba(10,15,28,0.08)" }}>
-                  <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", color: "rgba(10,15,28,0.55)", fontWeight: 600 }}>Hidden</div>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", color: "rgba(10,15,28,0.55)", fontWeight: 600 }}>Hidden</div>
+                    <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="soft-tile" />
+                  </div>
                   <div className="mt-3" style={{ fontSize: 24, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
                   <div className="mt-2" style={{ fontSize: 18, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(it.body)}</div>
                 </div>
