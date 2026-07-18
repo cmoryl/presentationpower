@@ -2743,6 +2743,290 @@ function renderVariantBody({
       );
     }
 
+    // ── Advanced variants — BATCH 2 ─────────────────────────────────────
+    case "MV-EDITORIAL-SPREAD": {
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="grid h-full gap-16" style={{ gridTemplateColumns: "40% 1fr" }}>
+            <div className="flex flex-col justify-between">
+              <Kicker brand={brand}>{s(c.kicker, "Editorial")}</Kicker>
+              <div>
+                <StatFigure brand={brand} value={s(c.pullValue, "3×")} unit={s(c.pullUnit)} label={s(c.pullLabel)} size="xl" />
+              </div>
+              <MetaRow><span>{s(c.folio)}</span></MetaRow>
+            </div>
+            <div className="flex flex-col">
+              <Hairline color={brand.tokens.accent} widthPx={120} thicknessPx={2} className="mb-6" />
+              <DisplayTitle size="section" color={brand.tokens.primary} maxWidthPx={1080}>{s(c.title)}</DisplayTitle>
+              <div className="mt-12 grid gap-12" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
+                <div style={{ fontSize: 22, lineHeight: 1.5, color: "rgba(10,15,28,0.78)" }}>{s(c.bodyLeft)}</div>
+                <div style={{ background: "rgba(10,15,28,0.15)" }} />
+                <div style={{ fontSize: 22, lineHeight: 1.5, color: "rgba(10,15,28,0.78)" }}>{s(c.bodyRight)}</div>
+              </div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-SPLIT-MANIFESTO": {
+      const items = arr(c.items).slice(0, 3);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="grid h-full gap-0" style={{ gridTemplateColumns: "40% 1fr", margin: "-64px", minHeight: "calc(100% + 128px)" }}>
+            <div className="relative flex flex-col justify-between overflow-hidden p-16" style={{ background: brand.tokens.primary, color: "#fff" }}>
+              <div aria-hidden className="pointer-events-none absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full" style={{ background: `radial-gradient(circle, ${brand.tokens.accent}55, transparent 70%)` }} />
+              <Kicker brand={brand} color="#ffffff">{s(c.kicker, "Our belief")}</Kicker>
+              <div className="relative">
+                <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mb-8" />
+                <DisplayTitle size="section" color="#ffffff">{s(c.statement)}</DisplayTitle>
+              </div>
+              <MetaRow><span>{s(c.signoff, "TransPerfect")}</span></MetaRow>
+            </div>
+            <div className="flex flex-col justify-center gap-12 p-16">
+              {items.map((it, i) => (
+                <div key={i} className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+                  <div className="flex items-baseline gap-6">
+                    <span className="tabular-nums font-semibold" style={{ fontSize: 26, color: brand.tokens.accent, letterSpacing: "-0.01em" }}>{String(i + 1).padStart(2, "0")}</span>
+                    <div className="flex-1">
+                      <div style={{ fontSize: 34, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.title)}</div>
+                      <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(it.body)}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-NUMBERS-TRIPTYCH": {
+      const items = arr(c.items).slice(0, 3);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-16 grid" style={{ gridTemplateColumns: "1fr 1px 1fr 1px 1fr" }}>
+            {items.map((it, i) => (
+              <>
+                {i > 0 && <div key={`d-${i}`} style={{ background: "rgba(10,15,28,0.12)" }} />}
+                <div key={i} className="px-10">
+                  <StatFigure brand={brand} value={s(it.value)} unit={s(it.unit)} label={s(it.label)} source={s(it.source) || undefined} size="xl" />
+                  {s(it.note) && (
+                    <div className="mt-6" style={{ fontSize: 22, lineHeight: 1.4, color: "rgba(10,15,28,0.72)", maxWidth: 420 }}>{s(it.note)}</div>
+                  )}
+                </div>
+              </>
+            ))}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-TIMELINE-VERTICAL": {
+      const items = arr(c.items);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="relative mt-12 pl-32">
+            <div className="absolute bottom-2 left-24 top-2 w-[2px]" style={{ background: brand.tokens.accent }} />
+            <div className="flex flex-col gap-10">
+              {items.map((it, i) => (
+                <div key={i} className="relative">
+                  <div className="absolute -left-[38px] top-3 h-4 w-4 rounded-full" style={{ background: "#fff", border: `3px solid ${brand.tokens.accent}` }} />
+                  <div className="absolute -left-32 top-1 w-24 pr-4 text-right tabular-nums uppercase" style={{ fontSize: 18, letterSpacing: "0.24em", color: brand.tokens.accent, fontWeight: 600 }}>
+                    {s(it.date)}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 30, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.label)}</div>
+                    <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: "rgba(10,15,28,0.72)", maxWidth: 1080 }}>{s(it.body)}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-COMPARE-SLIDER": {
+      const before = obj(c.before);
+      const after = obj(c.after);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="relative mt-16 grid gap-0" style={{ gridTemplateColumns: "1fr 1fr" }}>
+            <div className="pr-16" style={{ opacity: 0.6 }}>
+              <div className="mb-6" style={{ height: 2, background: "rgba(10,15,28,0.15)", width: 96 }} />
+              <Kicker brand={brand} color="rgba(10,15,28,0.6)">{s(before.label, "Before")}</Kicker>
+              <div className="mt-8">
+                <StatFigure brand={brand} value={s(before.value)} unit={s(before.unit)} size="lg" valueColor="rgba(10,15,28,0.7)" />
+              </div>
+              <div className="mt-6" style={{ fontSize: 22, lineHeight: 1.42, color: "rgba(10,15,28,0.65)" }}>{s(before.body)}</div>
+            </div>
+            <div className="pl-16" style={{ borderLeft: `2px solid ${brand.tokens.accent}` }}>
+              <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mb-6" />
+              <Kicker brand={brand}>{s(after.label, "After")}</Kicker>
+              <div className="mt-8">
+                <StatFigure brand={brand} value={s(after.value)} unit={s(after.unit)} size="xl" />
+              </div>
+              <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.42, color: "rgba(10,15,28,0.82)" }}>{s(after.body)}</div>
+            </div>
+            <div
+              aria-hidden
+              className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
+              style={{ left: "50%" }}
+            >
+              <div className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: brand.tokens.accent, color: "#fff", fontSize: 28, fontWeight: 600 }}>
+                <ArrowRight size={28} strokeWidth={2.4} />
+              </div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-PULL-QUOTE-STACK": {
+      const hero = obj(c.hero);
+      const items = arr(c.items).slice(0, 2);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="relative">
+            <QuoteMark color={brand.tokens.accent} size={520} className="absolute -left-6 -top-24" />
+            <div className="relative">
+              <Kicker brand={brand}>Voices</Kicker>
+              <div className="mt-8 max-w-[1500px]" style={{ fontSize: 60, lineHeight: 1.1, letterSpacing: "-0.02em", fontWeight: 600, color: brand.tokens.primary }}>
+                &ldquo;{s(hero.quote)}&rdquo;
+              </div>
+              <div className="mt-10">
+                <Attribution brand={brand} name={s(hero.name)} role={s(hero.role)} org={s(hero.org)} />
+              </div>
+            </div>
+          </div>
+          <div className="mt-16 grid gap-12" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
+            {items[0] && (
+              <div className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+                <div style={{ fontSize: 26, lineHeight: 1.35, color: "rgba(10,15,28,0.82)", fontStyle: "italic" }}>&ldquo;{s(items[0].quote)}&rdquo;</div>
+                <div className="mt-5">
+                  <Attribution brand={brand} name={s(items[0].name)} role={s(items[0].role)} org={s(items[0].org)} />
+                </div>
+              </div>
+            )}
+            <div style={{ background: "rgba(10,15,28,0.12)" }} />
+            {items[1] && (
+              <div className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+                <div style={{ fontSize: 26, lineHeight: 1.35, color: "rgba(10,15,28,0.82)", fontStyle: "italic" }}>&ldquo;{s(items[1].quote)}&rdquo;</div>
+                <div className="mt-5">
+                  <Attribution brand={brand} name={s(items[1].name)} role={s(items[1].role)} org={s(items[1].org)} />
+                </div>
+              </div>
+            )}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-DEFINITION": {
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="flex h-full flex-col justify-center" style={{ maxWidth: 1500 }}>
+            <Kicker brand={brand}>Definition</Kicker>
+            <div className="mt-6">
+              <DisplayTitle size="section" color={brand.tokens.primary}>{s(c.term)}</DisplayTitle>
+            </div>
+            <div className="mt-6 flex flex-wrap items-baseline gap-6">
+              <span className="uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: "rgba(10,15,28,0.55)", fontWeight: 500 }}>{s(c.pronunciation)}</span>
+              <span style={{ fontSize: 24, color: brand.tokens.accent, fontStyle: "italic", fontWeight: 600 }}>{s(c.partOfSpeech, "n.")}</span>
+            </div>
+            <div className="mt-10" style={{ fontSize: 34, lineHeight: 1.35, color: "rgba(10,15,28,0.85)", maxWidth: 1400 }}>
+              {s(c.definition)}
+            </div>
+            {s(c.usage) && (
+              <div className="mt-12 pt-8" style={{ borderTop: "1px solid rgba(10,15,28,0.15)", maxWidth: 1400 }}>
+                <span className="uppercase mr-4" style={{ fontSize: 14, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600 }}>Usage</span>
+                <span style={{ fontSize: 24, lineHeight: 1.45, color: "rgba(10,15,28,0.65)", fontStyle: "italic" }}>{s(c.usage)}</span>
+              </div>
+            )}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-PRINCIPLES": {
+      const items = arr(c.items);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-12">
+            {items.map((it, i) => (
+              <div key={i} className="relative grid items-center gap-8 py-8" style={{ gridTemplateColumns: "160px 1fr", borderTop: i === 0 ? "1px solid rgba(10,15,28,0.12)" : "none", borderBottom: "1px solid rgba(10,15,28,0.12)" }}>
+                <div className="tabular-nums font-semibold" style={{ fontSize: 120, lineHeight: 1, letterSpacing: "-0.03em", color: brand.tokens.accent, opacity: 0.18 }}>
+                  {String(i + 1).padStart(2, "0")}
+                </div>
+                <div>
+                  <div style={{ fontSize: 40, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.1 }}>{s(it.statement)}</div>
+                  <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(it.body)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-COUNTDOWN": {
+      const items = arr(c.items).slice(0, 3);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
+          <div className="flex h-full flex-col justify-center">
+            <Kicker brand={brand} color={brand.tokens.accent}>{s(c.kicker, "Three to remember")}</Kicker>
+            <Hairline color={brand.tokens.accent} widthPx={120} thicknessPx={2} className="mt-6 mb-10" />
+            <DisplayTitle size="section" color="#ffffff" maxWidthPx={1600}>{s(c.title)}</DisplayTitle>
+            <div className="mt-12">
+              {items.map((it, i) => {
+                const n = items.length - i;
+                return (
+                  <div key={i} className="grid items-center gap-10 py-8" style={{ gridTemplateColumns: "220px 1fr", borderTop: i === 0 ? "1px solid rgba(255,255,255,0.18)" : "none", borderBottom: "1px solid rgba(255,255,255,0.18)" }}>
+                    <div className="tabular-nums font-semibold" style={{ fontSize: 180, lineHeight: 0.9, letterSpacing: "-0.03em", color: brand.tokens.accent }}>
+                      {n}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 44, fontWeight: 600, color: "#ffffff", letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(it.statement)}</div>
+                      <div className="mt-3" style={{ fontSize: 22, lineHeight: 1.42, color: "rgba(255,255,255,0.72)" }}>{s(it.body)}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-HORIZON": {
+      const items = arr(c.items).slice(0, 3);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-10">
+            {items.map((it, i) => {
+              const ink = i === 0 ? "rgba(10,15,28,0.92)" : i === 1 ? "rgba(10,15,28,0.72)" : "rgba(10,15,28,0.52)";
+              const labelColor = i === 0 ? brand.tokens.accent : "rgba(10,15,28,0.55)";
+              return (
+                <div key={i} className="grid gap-12 py-10" style={{ gridTemplateColumns: "200px 1fr", borderTop: "1px solid rgba(10,15,28,0.12)", borderBottom: i === items.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
+                  <div className="uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: labelColor, fontWeight: 600 }}>{s(it.label)}</div>
+                  <div>
+                    <div style={{ fontSize: 44, fontWeight: 600, color: ink, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(it.headline)}</div>
+                    <div className="mt-3" style={{ fontSize: 22, lineHeight: 1.42, color: ink, opacity: 0.85, maxWidth: 1200 }}>{s(it.body)}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+    }
+
     default:
 
 
