@@ -113,7 +113,8 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 flex h-[640px] w-[440px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#050B18]/95 text-white shadow-[0_40px_120px_-30px_rgba(0,0,0,0.8)] backdrop-blur-2xl">
+    <div className="fixed inset-x-0 bottom-0 z-40 flex h-[85vh] flex-col overflow-hidden rounded-t-2xl border border-white/10 bg-[#050B18]/95 text-white shadow-[0_40px_120px_-30px_rgba(0,0,0,0.8)] backdrop-blur-2xl sm:inset-x-auto sm:bottom-6 sm:right-6 sm:h-[640px] sm:w-[440px] sm:rounded-2xl">
+
       {/* Header */}
       <div className="flex items-center justify-between border-b border-white/10 bg-gradient-to-r from-[#0B2A4A]/80 to-transparent px-5 py-4">
         <div className="flex items-center gap-3">

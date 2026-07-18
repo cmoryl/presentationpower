@@ -14,25 +14,35 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#03002C] px-6 text-white">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-60"
+        style={{
+          background:
+            "radial-gradient(120% 100% at 15% 0%, rgba(161,251,249,0.16) 0%, transparent 55%), radial-gradient(100% 100% at 85% 0%, rgba(122,92,255,0.18) 0%, transparent 55%)",
+        }}
+      />
+      <div className="relative max-w-md text-center">
+        <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">TransPerfect Modular</div>
+        <h1 className="mt-4 text-6xl font-bold tracking-tight sm:text-7xl">404</h1>
+        <h2 className="mt-3 text-xl font-semibold">This page couldn't be found</h2>
+        <p className="mt-3 text-sm text-white/60">
+          The route you followed may have moved, been renamed, or never existed. Head back to the dashboard to keep working.
         </p>
         <div className="mt-6">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-medium text-[#03002C] transition hover:bg-white/90"
           >
-            Go home
+            Back to dashboard
           </Link>
         </div>
       </div>
     </div>
   );
 }
+
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
