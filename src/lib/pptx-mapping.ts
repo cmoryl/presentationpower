@@ -7,6 +7,7 @@
 import type { ParsedSlide, ParsedTheme } from "./pptx-import.functions";
 import { MODULE_VARIANTS, byId } from "./taxonomy";
 import type { SlideContent } from "./deck-store";
+import { variantSupportsImagery, normalizeSlideMedia } from "./variant-media";
 
 export type MappedSlide = {
   sectionId: string;
