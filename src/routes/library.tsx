@@ -178,13 +178,7 @@ function Library() {
       </div>
 
 
-      <div
-        className="mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3"
-        onClickCapture={() => {
-          // Refresh approvals summary when badges are clicked.
-          if (wcagOn) window.setTimeout(() => setApprovalTick((t) => t + 1), 50);
-        }}
-      >
+      <div className="mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3">
         {filtered.map((v) => (
           <VariantCard
             key={v.id}
@@ -195,7 +189,6 @@ function Library() {
             preferred={preferred.has(v.id)}
             mode={mode}
             showImagery={showImagery}
-            wcagOn={wcagOn}
             autoFixOn={autoFixOn}
             onOpen={() => setOpenId(v.id)}
           />
