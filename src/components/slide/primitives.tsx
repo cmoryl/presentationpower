@@ -218,3 +218,160 @@ export function TitleBlock({
     </div>
   );
 }
+
+// ── StatFigure ────────────────────────────────────────────────────────────
+// A single stat, sized like a display headline: huge tabular numeral in
+// primary, unit/suffix in accent, small-caps label beneath. Sizes are named
+// so a stat row baseline-aligns and a single-stat slide can go monumental.
+type StatSize = "sm" | "md" | "lg" | "xl" | "monumental";
+const STAT_SPECS: Record<StatSize, { valuePx: number; unitPx: number; labelPx: number }> = {
+  sm:          { valuePx: 108, unitPx: 40, labelPx: 20 },
+  md:          { valuePx: 148, unitPx: 52, labelPx: 22 },
+  lg:          { valuePx: 200, unitPx: 68, labelPx: 24 },
+  xl:          { valuePx: 260, unitPx: 84, labelPx: 26 },
+  monumental:  { valuePx: 360, unitPx: 108, labelPx: 28 },
+};
+
+export function StatFigure({
+  brand,
+  value,
+  unit,
+  label,
+  source,
+  size = "md",
+  align = "start",
+  valueColor,
+  unitColor,
+  monoLabel = true,
+}: {
+  brand: BrandMode;
+  value: string;
+  unit?: string;
+  label?: string;
+  source?: string;
+  size?: StatSize;
+  align?: "start" | "center";
+  valueColor?: string;
+  unitColor?: string;
+  monoLabel?: boolean;
+}) {
+  const mode = useSlideMode();
+  const spec = STAT_SPECS[size];
+  const vc = valueColor ?? (mode === "dark" ? "#ffffff" : brand.tokens.primary);
+  const uc = unitColor ?? brand.tokens.accent;
+  const labelColor = mode === "dark" ? "rgba(255,255,255,0.72)" : "rgba(10,15,28,0.65)";
+  return (
+    <div className={align === "center" ? "flex flex-col items-center text-center" : ""}>
+      <div
+        className="font-semibold tabular-nums"
+        style={{ fontSize: spec.valuePx, lineHeight: 0.92, letterSpacing: "-0.03em", color: vc }}
+      >
+        {value || "—"}
+        {unit && (
+          <span
+            className="ml-2 font-medium align-top"
+            style={{ fontSize: spec.unitPx, color: uc, letterSpacing: "-0.02em" }}
+          >
+            {unit}
+          </span>
+        )}
+      </div>
+      {label && (
+        <div
+          className={monoLabel ? "mt-6 font-semibold uppercase" : "mt-6"}
+          style={{
+            fontSize: spec.labelPx,
+            letterSpacing: monoLabel ? "0.28em" : "-0.005em",
+            color: labelColor,
+            lineHeight: 1.25,
+            maxWidth: 560,
+          }}
+        >
+          {label}
+        </div>
+      )}
+      {source && (
+        <div
+          className="mt-4 uppercase"
+          style={{ fontSize: 16, letterSpacing: "0.28em", color: labelColor, opacity: 0.75 }}
+        >
+          Source · {source}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── QuoteMark ─────────────────────────────────────────────────────────────
+// The typographic curly quote glyph in accent at low opacity, positioned
+// behind or above a pull quote. Never a card ornament — always the sheet.
+export function QuoteMark({
+  color,
+  size = 520,
+  opacity = 0.12,
+  className = "",
+  style = {},
+  glyph = "\u201C",
+}: {
+  color: string;
+  size?: number;
+  opacity?: number;
+  className?: string;
+  style?: CSSProperties;
+  glyph?: string;
+}) {
+  return (
+    <div
+      aria-hidden
+      className={`pointer-events-none select-none ${className}`}
+      style={{
+        color,
+        opacity,
+        fontSize: size,
+        lineHeight: 0.72,
+        fontWeight: 600,
+        letterSpacing: "-0.06em",
+        ...style,
+      }}
+    >
+      {glyph}
+    </div>
+  );
+}
+
+// ── Attribution ───────────────────────────────────────────────────────────
+// Small-caps meta line for quote attributions, preceded by a short hairline.
+export function Attribution({
+  brand,
+  name,
+  role,
+  org,
+  align = "start",
+}: {
+  brand: BrandMode;
+  name: string;
+  role?: string;
+  org?: string;
+  align?: "start" | "center";
+}) {
+  const mode = useSlideMode();
+  const nameColor = mode === "dark" ? "#ffffff" : brand.tokens.primary;
+  const metaColor = mode === "dark" ? "rgba(255,255,255,0.70)" : "rgba(10,15,28,0.62)";
+  return (
+    <div className={align === "center" ? "flex flex-col items-center text-center" : ""}>
+      <Hairline color={brand.tokens.accent} widthPx={56} thicknessPx={2} className="mb-5" />
+      <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.015em", color: nameColor }}>
+        {name}
+      </div>
+      {(role || org) && (
+        <div
+          className="mt-2 uppercase"
+          style={{ fontSize: 18, letterSpacing: "0.28em", color: metaColor, fontWeight: 500 }}
+        >
+          {[role, org].filter(Boolean).join("  ·  ")}
+        </div>
+      )}
+    </div>
+  );
+}
+
