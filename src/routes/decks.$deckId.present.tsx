@@ -171,8 +171,49 @@ function PresenterView() {
         <button onClick={() => setStripOpen((v) => !v)} className="ml-2 hover:text-white" aria-label="Toggle thumbnails" title="Toggle thumbnails (T)">
           {stripOpen ? "▾ Thumbs" : "▴ Thumbs"}
         </button>
+        <button onClick={() => setNotesOpen((v) => !v)} className={cn("hover:text-white", notesOpen && "text-white")} aria-label="Toggle presenter notes" title="Toggle notes (N)">
+          {notesOpen ? "▾ Notes" : "▴ Notes"}
+        </button>
         <Link to="/decks/$deckId" params={{ deckId }} className="ml-3 hover:text-white">Exit (Esc)</Link>
+      </div>
+
+      {/* Presenter notes drawer */}
+      <div
+        className={cn(
+          "absolute inset-x-0 bottom-0 mx-auto max-w-[95vw] transition-all duration-300",
+          notesOpen ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-full opacity-0",
+        )}
+        aria-hidden={!notesOpen}
+      >
+        <div className="mx-4 mb-20 grid grid-cols-[1fr_240px] gap-6 rounded-2xl border border-white/15 bg-black/85 p-6 backdrop-blur-xl">
+          <div>
+            <div className="text-[10px] font-medium uppercase tracking-widest text-white/50">Speaker notes · Slide {i + 1}</div>
+            <div className="mt-3 max-h-[38vh] overflow-y-auto whitespace-pre-wrap text-[19px] leading-relaxed text-white/95">
+              {notesText || <span className="text-white/40">No notes</span>}
+            </div>
+          </div>
+          <div>
+            <div className="text-[10px] font-medium uppercase tracking-widest text-white/50">Up next</div>
+            <div className="mt-3 aspect-[16/9] overflow-hidden rounded-lg border border-white/15 bg-black">
+              {nextSlide && nextVariant ? (
+                <div className="relative h-full w-full">
+                  <div className="absolute inset-0" style={{ transform: "scale(0.125)", transformOrigin: "top left", width: 1920, height: 1080 }}>
+                    <VariantRenderer slide={nextSlide} variant={nextVariant} brand={brand} pageNumber={i + 2} clientName={brief?.prospect} />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex h-full items-center justify-center text-xs text-white/40">End of deck</div>
+              )}
+            </div>
+            {nextSlide && (
+              <div className="mt-2 text-xs text-white/60">
+                {i + 2}. {byId(MODULE_VARIANTS, nextSlide.variantId)?.name}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+
