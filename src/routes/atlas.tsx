@@ -168,6 +168,8 @@ function Atlas() {
         </div>
       </Section>
 
+      <ModulePresetKitsSection />
+
       <Section title="Layout frameworks" count={LAYOUT_FRAMEWORKS.length}>
         <div className="grid grid-cols-4 gap-4">
           {LAYOUT_FRAMEWORKS.map((lf) => (
