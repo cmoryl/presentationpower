@@ -6,6 +6,7 @@ import type { TemplatePayload } from "./deck-store";
 import { SQUARE_IMAGE_TEMPLATE } from "./imported-templates/square-image";
 import { INFOGRAPHICS_IMAGES_TEMPLATE } from "./imported-templates/infographics-images";
 import { COMMUNITY_EVENT_TEMPLATE } from "./imported-templates/community-event";
+import { GRAPH_LIBRARY_TEMPLATE } from "./imported-templates/graph-library";
 import { validateKitPayload, formatKitValidationError, type KitValidationResult } from "./kit-validation";
 
 export type ModulePresetKit = {
