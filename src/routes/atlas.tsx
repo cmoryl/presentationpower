@@ -3,7 +3,9 @@ import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { byId, MODULE_VARIANTS } from "@/lib/taxonomy";
-import { MODULE_PRESET_KITS } from "@/lib/module-preset-kits";
+import { MODULE_PRESET_KITS, validateKit } from "@/lib/module-preset-kits";
+import { formatKitValidationError } from "@/lib/kit-validation";
+
 import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
 import { Download, Loader2 } from "lucide-react";
 import {
