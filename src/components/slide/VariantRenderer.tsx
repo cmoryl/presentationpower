@@ -1005,13 +1005,22 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
           <div className="flex h-full flex-col justify-center">
-            <div className="text-2xl uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>Next</div>
-            <div className="mt-6 text-[110px] font-semibold leading-[1.05]">{s(c.message)}</div>
-            <div className="mt-10 max-w-5xl text-3xl opacity-90">{s(c.nextSteps)}</div>
-            <div className="mt-12 flex gap-16 text-2xl opacity-70">
-              <div>{s(c.owner)}</div>
-              <div>{s(c.followUp)}</div>
-            </div>
+            <Kicker brand={brand}>What happens next</Kicker>
+            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-8" />
+            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1520} className="mt-10">
+              {s(c.message)}
+            </DisplayTitle>
+            {s(c.nextSteps) && (
+              <SupportingText size="xl" opacity={0.85} maxWidthPx={1280} className="mt-10">
+                {s(c.nextSteps)}
+              </SupportingText>
+            )}
+            {(s(c.owner) || s(c.followUp)) && (
+              <MetaRow className="mt-16">
+                {s(c.owner) && <span>{s(c.owner)}</span>}
+                {s(c.followUp) && <span>{s(c.followUp)}</span>}
+              </MetaRow>
+            )}
           </div>
         </SlideFrame>
       );
@@ -1019,11 +1028,16 @@ function renderVariantBody({
     case "MV-CLOSE-THANKS":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
-          <div className="flex h-full flex-col items-start justify-center">
-            <div className="text-[180px] font-semibold leading-[0.95]" style={{ color: brand.tokens.primary }}>
+          <div className="flex h-full flex-col justify-center">
+            <Hairline color={brand.tokens.accent} widthPx={120} thicknessPx={2} />
+            <DisplayTitle size="hero" color="#ffffff" maxWidthPx={1600} className="mt-10">
               {s(c.message, "Thank you.")}
-            </div>
-            <div className="mt-10 text-3xl opacity-70">{s(c.signoff)}</div>
+            </DisplayTitle>
+            {s(c.signoff) && (
+              <SupportingText size="xl" opacity={0.72} maxWidthPx={1180} className="mt-10">
+                {s(c.signoff)}
+              </SupportingText>
+            )}
           </div>
         </SlideFrame>
       );
@@ -1031,10 +1045,34 @@ function renderVariantBody({
     case "MV-CLOSE-QNA":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
-          <div className="flex h-full flex-col items-center justify-center text-center">
-            <div className="text-[220px] font-semibold leading-none" style={{ color: brand.tokens.accent }}>?</div>
-            <div className="mt-8 text-6xl font-semibold">{s(c.title, "Questions")}</div>
-            <div className="mt-6 max-w-4xl text-2xl opacity-70">{s(c.prompt)}</div>
+          <div className="relative flex h-full flex-col items-center justify-center text-center">
+            {/* Oversized quote glyph, low-opacity, sits behind the title */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+              style={{
+                color: brand.tokens.accent,
+                fontSize: 720,
+                lineHeight: 0.7,
+                fontWeight: 600,
+                opacity: 0.12,
+                letterSpacing: "-0.06em",
+              }}
+            >
+              ?
+            </div>
+            <div className="relative flex flex-col items-center">
+              <Kicker brand={brand}>The floor is yours</Kicker>
+              <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6" />
+              <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1400} className="mt-10">
+                {s(c.title, "Questions")}
+              </DisplayTitle>
+              {s(c.prompt) && (
+                <SupportingText size="lg" opacity={0.7} maxWidthPx={980} className="mt-8">
+                  {s(c.prompt)}
+                </SupportingText>
+              )}
+            </div>
           </div>
         </SlideFrame>
       );
@@ -1042,21 +1080,33 @@ function renderVariantBody({
     case "MV-CLOSE-CONTACT":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
-          <SlideTitle brand={brand} title={s(c.title, "Stay in touch")} />
-          <div className={`mt-14 grid gap-10 ${arr(c.items).length >= 3 ? "grid-cols-3" : arr(c.items).length === 2 ? "grid-cols-2" : "grid-cols-1"}`}>
+          <div>
+            <Kicker brand={brand}>Stay in touch</Kicker>
+            <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6" />
+            <DisplayTitle size="section" color="#ffffff" className="mt-8">
+              {s(c.title, "Get in touch")}
+            </DisplayTitle>
+          </div>
+          <div className={`mt-14 grid gap-x-20 gap-y-12 ${arr(c.items).length >= 3 ? "grid-cols-3" : arr(c.items).length === 2 ? "grid-cols-2" : "grid-cols-1"}`}>
             {arr(c.items).map((p, i) => (
-              <div key={i} className="rounded-2xl border p-8" style={{ borderColor: "rgba(10,15,28,0.1)", backgroundColor: brand.tokens.surface }}>
-                <div className="text-3xl font-semibold" style={{ color: brand.tokens.primary }}>{s(p.name)}</div>
-                <div className="mt-2 text-xl uppercase tracking-[0.2em] opacity-70">{s(p.role)}</div>
-                <div className="mt-6 space-y-2 text-2xl">
+              <div key={i} className="border-t pt-8" style={{ borderColor: "rgba(255,255,255,0.16)" }}>
+                <div style={{ fontSize: 32, fontWeight: 600, color: "#ffffff", letterSpacing: "-0.015em" }}>
+                  {s(p.name)}
+                </div>
+                <div className="mt-2 uppercase" style={{ color: brand.tokens.accent, fontSize: 18, letterSpacing: "0.28em", fontWeight: 600 }}>
+                  {s(p.role)}
+                </div>
+                <div className="mt-6 space-y-2" style={{ fontSize: 24, color: "rgba(255,255,255,0.88)" }}>
                   <div>{s(p.email)}</div>
-                  <div className="opacity-70">{s(p.phone)}</div>
+                  <div style={{ opacity: 0.65 }}>{s(p.phone)}</div>
                 </div>
               </div>
             ))}
           </div>
         </SlideFrame>
       );
+
+
 
     // ── Extended covers ────────────────────────────────────────────────
     case "MV-OP-COVER-EDITORIAL":
