@@ -3027,7 +3027,243 @@ function renderVariantBody({
       );
     }
 
+    // ── Dashboard family ────────────────────────────────────────────────
+    case "MV-DASH-SUMMARY": {
+      const primary = obj(c.primary);
+      const secondary = obj(c.secondary);
+      const balance = obj(c.balance);
+      const bItems = arr(balance.items);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-10 grid gap-14" style={{ gridTemplateColumns: "1fr 1fr" }}>
+            <div className="flex flex-col gap-10">
+              <SummaryStatCard brand={brand} label={s(primary.label)} value={s(primary.value)} unit={s(primary.unit)} series={toNums(primary.series)} />
+              <SummaryStatCard brand={brand} label={s(secondary.label)} value={s(secondary.value)} unit={s(secondary.unit)} series={toNums(secondary.series)} />
+            </div>
+            <div className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+              <Kicker brand={brand}>Balance</Kicker>
+              <div className="mt-8">
+                <StatFigure brand={brand} value={s(balance.value)} unit={s(balance.unit)} label={s(balance.label)} size="xl" />
+              </div>
+              <div className="mt-10">
+                {bItems.map((it, i) => (
+                  <div key={i} className="flex items-baseline justify-between py-5" style={{ borderTop: "1px solid rgba(10,15,28,0.12)", borderBottom: i === bItems.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
+                    <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.24em", color: "rgba(10,15,28,0.6)", fontWeight: 600 }}>{s(it.label)}</div>
+                    <div className="tabular-nums" style={{ fontSize: 32, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em" }}>{s(it.value)}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-DASH-DONUT-TRIO": {
+      const items = arr(c.items).slice(0, 3);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-14 grid gap-10" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+            {items.map((it, i) => (
+              <div key={i} className="flex flex-col items-center pt-8 text-center" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+                <Donut brand={brand} percent={Number(it.value) || 0} size={280} />
+                <div className="mt-8 uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: brand.tokens.primary, fontWeight: 600 }}>{s(it.label)}</div>
+                <div className="mt-4" style={{ fontSize: 22, lineHeight: 1.4, color: "rgba(10,15,28,0.68)", maxWidth: 380 }}>{s(it.body)}</div>
+              </div>
+            ))}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-DASH-SALES-CHART": {
+      const series = arr(c.series).map((p) => ({ label: s(p.label), value: Number(p.value) || 0 }));
+      const stat = obj(c.stat);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-10 grid gap-16" style={{ gridTemplateColumns: "1.6fr 1fr" }}>
+            <div>
+              <AreaChart brand={brand} series={series} height={520} />
+            </div>
+            <div className="flex flex-col justify-center pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+              <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
+              <div className="mt-6" style={{ fontSize: 44, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(c.headline)}</div>
+              <div className="mt-10">
+                <StatFigure brand={brand} value={s(stat.value)} unit={s(stat.unit)} label={s(stat.label)} size="lg" />
+                {s(stat.delta) && (
+                  <div className="mt-4 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600 }}>{s(stat.delta)}</div>
+                )}
+              </div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-DASH-GAUGE-ROW": {
+      const items = arr(c.items).slice(0, 5);
+      const cols = items.length || 1;
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-16 grid gap-10" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+            {items.map((it, i) => (
+              <div key={i} className="flex flex-col items-center">
+                <SemiGauge brand={brand} percent={Number(it.value) || 0} size={280} />
+                <div className="mt-6 uppercase text-center" style={{ fontSize: 18, letterSpacing: "0.24em", color: brand.tokens.primary, fontWeight: 600, maxWidth: 260 }}>{s(it.label)}</div>
+              </div>
+            ))}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-DASH-PERFORMANCE": {
+      const bars = arr(c.bars).map((b) => ({ label: s(b.label), value: Number(b.value) || 0 }));
+      const highlight = s(c.highlight);
+      const stat = obj(c.stat);
+      const legend = arr(c.legend);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-10 grid gap-16" style={{ gridTemplateColumns: "1.2fr 1fr" }}>
+            <div>
+              <BarChart brand={brand} bars={bars} height={520} highlight={highlight} />
+            </div>
+            <div className="flex flex-col justify-center">
+              <StatFigure brand={brand} value={s(stat.value)} unit={s(stat.unit)} label={s(stat.label)} size="xl" />
+              <div className="mt-12">
+                {legend.map((l, i) => (
+                  <div key={i} className="flex items-center justify-between py-4" style={{ borderTop: i === 0 ? "1px solid rgba(10,15,28,0.12)" : "none", borderBottom: "1px solid rgba(10,15,28,0.12)" }}>
+                    <div className="flex items-center gap-4">
+                      <div style={{ width: 14, height: 14, background: i === 0 ? brand.tokens.accent : brand.tokens.primary, opacity: i === 0 ? 1 : Math.max(0.4, 1 - i * 0.2) }} />
+                      <div style={{ fontSize: 22, color: brand.tokens.primary, fontWeight: 600 }}>{s(l.label)}</div>
+                    </div>
+                    <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 600, color: "rgba(10,15,28,0.72)" }}>{s(l.value)}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-DASH-REPORT-CARDS": {
+      const items = arr(c.items).slice(0, 2);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-14 grid gap-14" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
+            {items[0] && <ReportCard brand={brand} item={items[0]} />}
+            <div style={{ background: "rgba(10,15,28,0.12)" }} />
+            {items[1] && <ReportCard brand={brand} item={items[1]} />}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-DASH-GROWTH-COLUMNS": {
+      const items = arr(c.items).slice(0, 5);
+      const vals = items.map((it) => Number(it.value) || 0);
+      const max = Math.max(1, ...vals);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-14 grid items-end gap-10" style={{ gridTemplateColumns: `repeat(${items.length || 1}, 1fr)`, minHeight: 520 }}>
+            {items.map((it, i) => {
+              const v = Number(it.value) || 0;
+              const h = Math.max(40, (v / max) * 420);
+              const isLast = i === items.length - 1;
+              const color = isLast ? brand.tokens.accent : brand.tokens.primary;
+              const opacity = isLast ? 1 : 0.35 + (i / Math.max(items.length - 1, 1)) * 0.5;
+              return (
+                <div key={i} className="flex flex-col items-center justify-end">
+                  <div style={{ fontSize: 44, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1 }}>
+                    {s(it.value)}<span style={{ fontSize: 26, color: brand.tokens.accent, marginLeft: 4 }}>{s(it.unit)}</span>
+                  </div>
+                  <div className="mt-6 w-full" style={{ height: h, background: color, opacity, maxWidth: 220 }} />
+                  <div className="mt-6 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: isLast ? brand.tokens.accent : "rgba(10,15,28,0.6)", fontWeight: 600 }}>{s(it.year)}</div>
+                  {s(it.note) && <div className="mt-2 text-center" style={{ fontSize: 16, color: "rgba(10,15,28,0.6)", maxWidth: 220 }}>{s(it.note)}</div>}
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-DASH-BREAKDOWN": {
+      const items = arr(c.items).slice(0, 4);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-10">
+            {items.map((it, i) => {
+              const pct = Math.max(0, Math.min(100, Number(it.percent) || 0));
+              const delta = s(it.delta);
+              const negative = delta.trim().startsWith("-");
+              return (
+                <div key={i} className="py-8" style={{ borderTop: "1px solid rgba(10,15,28,0.12)", borderBottom: i === items.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
+                  <div className="flex items-baseline justify-between gap-6">
+                    <div className="flex items-baseline gap-8">
+                      <div style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.01em" }}>{s(it.label)}</div>
+                      {delta && (
+                        <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.24em", fontWeight: 600, color: negative ? "#E53D2E" : brand.tokens.accent }}>{delta}</div>
+                      )}
+                    </div>
+                    <div className="tabular-nums" style={{ fontSize: 40, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em" }}>
+                      {s(it.value)}<span style={{ fontSize: 22, marginLeft: 6, color: "rgba(10,15,28,0.55)" }}>{s(it.unit)}</span>
+                    </div>
+                  </div>
+                  <div className="mt-6 flex items-center gap-6">
+                    <ProgressBar brand={brand} percent={pct} />
+                    <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: brand.tokens.accent, minWidth: 70, textAlign: "right" }}>{pct}%</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-DASH-REGION-STATS": {
+      const stat = obj(c.stat);
+      const items = arr(c.items).slice(0, 6);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-10 grid gap-16" style={{ gridTemplateColumns: "1fr 1.2fr" }}>
+            <div className="flex flex-col justify-center pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+              <StatFigure brand={brand} value={s(stat.value)} unit={s(stat.unit)} label={s(stat.label)} size="monumental" />
+            </div>
+            <div>
+              {items.map((it, i) => {
+                const pct = Math.max(0, Math.min(100, Number(it.percent) || 0));
+                const delta = s(it.delta);
+                const negative = delta.trim().startsWith("-");
+                return (
+                  <div key={i} className="py-5" style={{ borderTop: "1px solid rgba(10,15,28,0.12)", borderBottom: i === items.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
+                    <div className="flex items-baseline justify-between">
+                      <div style={{ fontSize: 26, fontWeight: 600, color: brand.tokens.primary }}>{s(it.label)}</div>
+                      <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.24em", fontWeight: 600, color: negative ? "#E53D2E" : brand.tokens.accent }}>{delta}</div>
+                    </div>
+                    <div className="mt-3"><ProgressBar brand={brand} percent={pct} /></div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
     default:
+
 
 
       return (
