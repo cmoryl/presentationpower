@@ -105,7 +105,7 @@ function OverviewView() {
           </div>
           <div className="flex gap-2">
             <Link
-              to="/decks"
+              to="/atlas"
               className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#03002C] transition hover:bg-white/90"
             >
               Open Decks →
@@ -232,7 +232,7 @@ function OverviewView() {
                 <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">Recent Activity</div>
                 <div className="mt-1 font-[Geist] text-lg font-semibold">Latest decks</div>
               </div>
-              <Link to="/decks" className="text-[11px] text-white/60 hover:text-white">
+              <Link to="/atlas" className="text-[11px] text-white/60 hover:text-white">
                 All →
               </Link>
             </div>
