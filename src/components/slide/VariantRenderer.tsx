@@ -2631,7 +2631,10 @@ function renderVariantBody({
             <div className="grid" style={{ gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }}>
               {items.map((it, i) => (
                 <div key={i} className="pb-5" style={{ borderBottom: `2px solid ${brand.tokens.accent}` }}>
-                  <Kicker brand={brand}>Phase {String(i + 1).padStart(2, "0")}</Kicker>
+                  <div className="flex items-center gap-3">
+                    <IconBadge brand={brand} label={s(it.phase)} index={i} size="sm" override={s(it.icon)} treatment="soft-circle" />
+                    <Kicker brand={brand}>Phase {String(i + 1).padStart(2, "0")}</Kicker>
+                  </div>
                   <div className="mt-2" style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.phase)}</div>
                   <div className="mt-2" style={{ fontSize: 18, color: "rgba(10,15,28,0.7)", lineHeight: 1.4 }}>{s(it.touchpoint)}</div>
                 </div>
