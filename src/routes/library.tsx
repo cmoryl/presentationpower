@@ -400,6 +400,14 @@ function VariantCard({
           {warnLabel}
         </div>
       )}
+      {autoFixOn && fixedCount > 0 && (
+        <div
+          className="pointer-events-none absolute right-3 top-11 z-20 inline-flex items-center gap-1 rounded-full bg-blue-600 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-blue-200 backdrop-blur"
+          title={`Auto-fix boosted ${fixedCount} text node${fixedCount === 1 ? "" : "s"} to an AA-passing color.`}
+        >
+          ✨ Fixed {fixedCount}
+        </div>
+      )}
 
       {isAB ? (
         <div className="m-2 grid grid-cols-2 gap-2">
