@@ -10,6 +10,12 @@ import type { BrandMode } from "./taxonomy";
 import { getDivisionLogos } from "./division-logos";
 import { pickDivisionImage } from "@/assets/backdrops/divisions";
 import { variantSupportsImagery } from "./variant-media";
+import {
+  planPptxBackground,
+  scrimRectSpec,
+  imageBackgroundSizing,
+  type PptxBackgroundPlan,
+} from "./pptx-background";
 
 const SLIDE_W = 13.333;
 const SLIDE_H = 7.5;
