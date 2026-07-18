@@ -264,6 +264,7 @@ export const copilotTurn = createServerFn({ method: "POST" })
       variantId: string;
       layoutId: string;
       content: Record<string, unknown>;
+      notes: string;
       originalNumerics: string[];
     };
     const originals = new Map<number, WorkSlide>();
@@ -274,11 +275,13 @@ export const copilotTurn = createServerFn({ method: "POST" })
         variantId: s.variantId,
         layoutId: s.layoutId,
         content: structuredClone(s.content) as Record<string, unknown>,
+        notes: s.notes ?? "",
         originalNumerics: collectNumericLeaves(s.content),
       };
-      originals.set(s.index, ws);
+      originals.set(s.index, { ...ws, content: structuredClone(ws.content) });
       return ws;
     });
+
     const findSlide = (idx: number) => working.find((s) => s.index === idx);
 
     const canTouchStats = userMentionsNumbers(data.userMessage);
