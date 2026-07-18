@@ -19,10 +19,15 @@ export function useSlideMode(): SlideMode {
 }
 
 // Optional imagery layer rendered BEHIND the slide content. When set, the
-// SlideFrame replaces its opaque token background with the image + a gradient
-// scrim so content stays legible with real alpha-blended photography.
+// SlideFrame replaces its opaque token background with either a photo + scrim
+// (`url`) or a CSS background layer (`css` — used by the curated background
+// library for gradients / SVG patterns).
 export type SlideBackdrop = {
-  url: string;
+  // Photo URL (upload / AI / library photo). Optional when `css` is set.
+  url?: string;
+  // Raw CSS `background` shorthand (gradient or pattern). Used when `url`
+  // is absent — allows on-brand gradients & patterns without an image.
+  css?: string;
   // Scrim direction/strength. "bottom" darkens lower half, "left" darkens
   // left half, "full" applies an even overlay, "vignette" a radial darken.
   scrim?: "bottom" | "left" | "right" | "top" | "full" | "vignette";
@@ -32,6 +37,8 @@ export type SlideBackdrop = {
   imageDim?: number;
   // Tint color for the scrim (defaults to brand ink navy).
   tint?: string;
+  // Hint that chrome text/logo should render on a dark surface.
+  darkChrome?: boolean;
 };
 export const SlideBackdropContext = createContext<SlideBackdrop | null>(null);
 
@@ -70,7 +77,12 @@ export function SlideFrame({
   // light mode, dark navy slides with white text in dark mode. Imagery only
   // opts into the scrim treatment when explicitly enabled.
   const hasBackdrop = !!backdrop;
-  const lightBackdrop = hasBackdrop && !slideDark;
+  const hasBackdropImage = !!backdrop?.url;
+  const hasBackdropCss = !!(backdrop?.css && !backdrop?.url);
+  // A backdrop is "dark" when the caller flagged darkChrome, or when it's a
+  // photo backdrop on a non-light slide (legacy behavior).
+  const backdropIsDark = hasBackdrop && (backdrop?.darkChrome ?? (hasBackdropImage && !slideDark));
+  const lightBackdrop = hasBackdrop && !backdropIsDark && !slideDark;
   const darkBackdrop = hasBackdrop && !lightBackdrop;
   const bg = slideDark ? "#03002C" : "#ffffff";
   const fg = darkBackdrop || slideDark ? "#ffffff" : brand.tokens.ink;
@@ -78,6 +90,7 @@ export function SlideFrame({
 
   const placement = resolveLogoPlacement(variant, layoutId, logoPosition);
   const showLogo = placement.position !== "hidden";
+
 
   // Light backdrops use a cream/white tint so photography reads bright; dark
   // backdrops keep the original navy scrim. Callers can still override tint.
@@ -114,10 +127,17 @@ export function SlideFrame({
 
   return (
     <div className="relative h-full w-full overflow-hidden" style={{ backgroundColor: hasBackdrop ? (lightBackdrop ? "#fff" : "#000") : bg, color: fg }}>
-      {hasBackdrop && (
+      {hasBackdropCss && (
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{ background: backdrop!.css }}
+        />
+      )}
+      {hasBackdropImage && (
         <>
           <img
-            src={backdrop.url}
+            src={backdrop!.url}
             alt=""
             aria-hidden
             className="absolute inset-0 h-full w-full object-cover"
@@ -125,9 +145,9 @@ export function SlideFrame({
               filter: lightBackdrop
                 // Light mode: brighten and desaturate slightly so the photo
                 // reads as an airy background rather than a dark hero.
-                ? `brightness(${1.08 + (backdrop.imageDim ?? 0) * 0.2}) saturate(0.85) contrast(0.95)`
-                : backdrop.imageDim
-                  ? `brightness(${1 - backdrop.imageDim}) saturate(0.95)`
+                ? `brightness(${1.08 + (backdrop!.imageDim ?? 0) * 0.2}) saturate(0.85) contrast(0.95)`
+                : backdrop!.imageDim
+                  ? `brightness(${1 - backdrop!.imageDim}) saturate(0.95)`
                   : undefined,
             }}
           />

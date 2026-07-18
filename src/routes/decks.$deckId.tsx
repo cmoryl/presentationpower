@@ -14,6 +14,7 @@ import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.function
 
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { BackgroundImageryPanel } from "@/components/slide/BackgroundImageryPanel";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
 
 import {
@@ -185,6 +186,15 @@ function DeckEditor() {
               key={active.id}
               value={active.notes ?? ""}
               onChange={(v) => updateSlideNotes(deck.id, active.id, v)}
+            />
+          )}
+
+          {/* Background & Imagery */}
+          {active && (
+            <BackgroundImageryPanel
+              key={`bg-${active.id}`}
+              value={(active.content as Record<string, unknown>).background}
+              onChange={(next) => updateField(deck.id, active.id, "background", next)}
             />
           )}
 
