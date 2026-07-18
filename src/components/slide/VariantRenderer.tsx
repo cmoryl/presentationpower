@@ -229,11 +229,29 @@ export function VariantRenderer(props: Props) {
   const resolvedClient = clientName || contentClientName;
   const themedBrand = themeBrandForMode(brand, mode);
 
+  // Custom background per slide (from content.background). Falls back to null
+  // so variants that render their own MediaTile / deterministic backdrops are
+  // unaffected.
+  const resolvedBg = resolveSlideBackground((slide.content as Record<string, unknown>).background);
+  const backdrop: SlideBackdrop | null = resolvedBg
+    ? {
+        url: resolvedBg.url,
+        css: resolvedBg.css,
+        scrim: resolvedBg.scrim,
+        scrimStrength: resolvedBg.scrimStrength,
+        imageDim: resolvedBg.imageDim,
+        tint: resolvedBg.tint,
+        darkChrome: resolvedBg.darkChrome,
+      }
+    : null;
+
   return (
     <SlideModeContext.Provider value={mode}>
-      <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany }}>
-        {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c })}
-      </SlideFrameCtx.Provider>
+      <SlideBackdropContext.Provider value={backdrop}>
+        <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany }}>
+          {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c })}
+        </SlideFrameCtx.Provider>
+      </SlideBackdropContext.Provider>
     </SlideModeContext.Provider>
   );
 }
