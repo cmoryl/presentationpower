@@ -237,7 +237,7 @@ function VariantCard({
   brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
   sectionId: string;
   preferred?: boolean;
-  mode?: "light" | "dark";
+  mode?: "light" | "dark" | "ab";
   showImagery?: boolean;
   onOpen: () => void;
 }) {
