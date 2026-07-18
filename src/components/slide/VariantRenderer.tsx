@@ -2370,7 +2370,12 @@ function renderVariantBody({
               return (
                 <div key={i} className={cellClass} style={cellBorder}>
                   {kind === "stat" ? (
-                    <StatFigure brand={brand} value={s(it.value)} unit={s(it.unit)} label={s(it.label)} size="md" />
+                    <>
+                      <IconBadge brand={brand} label={s(it.label)} index={i + 1} size="sm" override={s(it.icon)} treatment="soft-tile" />
+                      <div className="mt-auto">
+                        <StatFigure brand={brand} value={s(it.value)} unit={s(it.unit)} label={s(it.label)} size="md" />
+                      </div>
+                    </>
                   ) : kind === "media" ? (
                     <div className="relative -m-10 h-full overflow-hidden">
                       <MediaTile brand={brand} seed={s(it.mediaSeed, s(it.title, `bento-${i}`))} className="absolute inset-0 h-full w-full rounded-none" />
@@ -2378,7 +2383,10 @@ function renderVariantBody({
                     </div>
                   ) : (
                     <>
-                      <Kicker brand={brand}>{String(i + 2).padStart(2, "0")}</Kicker>
+                      <div className="flex items-center gap-4">
+                        <IconBadge brand={brand} label={s(it.title)} index={i + 1} size="sm" override={s(it.icon)} treatment="soft-tile" />
+                        <Kicker brand={brand}>{String(i + 2).padStart(2, "0")}</Kicker>
+                      </div>
                       <div className="mt-auto">
                         <div style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.title)}</div>
                         <div className="mt-3" style={{ fontSize: 20, lineHeight: 1.4, color: "rgba(10,15,28,0.7)" }}>{s(it.body)}</div>
