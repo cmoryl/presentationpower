@@ -296,12 +296,25 @@ function buildChecks(
 ): Check[] {
   const out: Check[] = [];
 
+  const base = (bg ?? {}) as Record<string, unknown>;
+  const merge = (p: Record<string, unknown>) => ({ ...base, ...p });
+
   // 1. Background mapping
   if (!bg) {
     out.push({
       level: "warn",
       label: "No background configured",
       detail: "PowerPoint will emit a plain white fill for this slide.",
+      fix: {
+        label: "Apply Navy Aurora preset",
+        patch: {
+          kind: "library",
+          presetId: "bg-navy-aurora",
+          solid: "#03002C",
+          css: "radial-gradient(130% 90% at 12% 8%, #003FC755 0%, transparent 55%), radial-gradient(80% 60% at 100% 100%, #A1FBF922 0%, transparent 60%), linear-gradient(180deg, #03002C 0%, #05003C 100%)",
+          darkChrome: true,
+        },
+      },
     });
   } else if (!plan) {
     out.push({ level: "warn", label: "Background plan pending…" });
@@ -322,6 +335,10 @@ function buildChecks(
       level: "fail",
       label: "Background could not be planned",
       detail: "Falling back to solid color — check CSS or image URL.",
+      fix: {
+        label: "Use safe solid fill (#03002C)",
+        patch: merge({ kind: "color", color: "#03002C", solid: "#03002C", darkChrome: true }),
+      },
     });
   }
 
@@ -335,6 +352,20 @@ function buildChecks(
           level: "warn",
           label: "No scrim will render",
           detail: "Text over the image may be hard to read.",
+          fix: {
+            label: "Add bottom scrim @ 55%",
+            patch: merge({ scrim: "bottom", scrimStrength: 0.55 }),
+          },
+        });
+      } else if (strength < 0.25) {
+        out.push({
+          level: "warn",
+          label: `Scrim faint (${Math.round(strength * 100)}%)`,
+          detail: "Copy on top of the image may lack contrast in PowerPoint.",
+          fix: {
+            label: "Boost scrim to 55%",
+            patch: merge({ scrimStrength: 0.55 }),
+          },
         });
       } else {
         const primary = rects[0];
@@ -356,6 +387,10 @@ function buildChecks(
         level: "warn",
         label: "Fit = contain",
         detail: "PPTX will letterbox the image; edges will show the fallback color.",
+        fix: {
+          label: "Switch to cover (full-bleed)",
+          patch: merge({ fit: "cover" }),
+        },
       });
     } else if (zoomed || offset) {
       out.push({
@@ -381,13 +416,27 @@ function buildChecks(
       ? "divider"
       : "other";
   const isDark = advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
-  out.push({
-    level: "pass",
-    label: isDark ? "Overlays will use light chrome" : "Overlays will use dark chrome",
-    detail: isDark
-      ? "White logo + light text on dark/photo background."
-      : "Color logo + dark text on light background.",
-  });
+  const chromeMismatch =
+    bg && typeof bg.darkChrome === "boolean" && bg.darkChrome !== isDark;
+  if (chromeMismatch) {
+    out.push({
+      level: "warn",
+      label: "Overlay chrome mismatch",
+      detail: `Background is marked ${bg!.darkChrome ? "dark" : "light"} but rendering expects ${isDark ? "light chrome (dark bg)" : "dark chrome (light bg)"}.`,
+      fix: {
+        label: `Flip chrome to ${isDark ? "dark bg / light chrome" : "light bg / dark chrome"}`,
+        patch: merge({ darkChrome: isDark }),
+      },
+    });
+  } else {
+    out.push({
+      level: "pass",
+      label: isDark ? "Overlays will use light chrome" : "Overlays will use dark chrome",
+      detail: isDark
+        ? "White logo + light text on dark/photo background."
+        : "Color logo + dark text on light background.",
+    });
+  }
 
   // 5. Slide-level imagery (mediaUrl / mediaSeed)
   const c = slide.content as Record<string, unknown>;
