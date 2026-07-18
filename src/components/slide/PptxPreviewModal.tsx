@@ -80,6 +80,13 @@ export function PptxPreviewModal({
     };
   }, [open, content.background]);
 
+  // Clear applied-fix banner shortly after the plan re-computes.
+  useEffect(() => {
+    if (!appliedFix) return;
+    const t = setTimeout(() => setAppliedFix(null), 2200);
+    return () => clearTimeout(t);
+  }, [appliedFix, plan]);
+
   const checks: Check[] = useMemo(
     () => buildChecks(slide, bg, plan),
     [slide, bg, plan],
