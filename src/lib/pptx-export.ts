@@ -580,6 +580,14 @@ function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette)
     case "MV-DASH-GROWTH-COLUMNS": renderDashGrowthColumns(s, c, p); return true;
     case "MV-DASH-BREAKDOWN": renderDashBreakdown(s, c, p); return true;
     case "MV-DASH-REGION-STATS": renderDashRegionStats(s, c, p); return true;
+    case "MV-GRAPH-YEAR-SERIES": renderGraphYearSeries(s, c, p); return true;
+    case "MV-GRAPH-AXIS-BARS": renderGraphAxisBars(s, c, p); return true;
+    case "MV-GRAPH-CATEGORY-BARS": renderGraphCategoryBars(s, c, p); return true;
+    case "MV-GRAPH-DUAL-DONUT": renderGraphDualDonut(s, c, p); return true;
+    case "MV-GRAPH-RINGS": renderGraphRings(s, c, p); return true;
+    case "MV-GRAPH-TASK-CARDS": renderGraphTaskCards(s, c, p); return true;
+    case "MV-GRAPH-DECADE-AREA": renderGraphDecadeArea(s, c, p); return true;
+    case "MV-GRAPH-PERCENT-COMPARE": renderGraphPercentCompare(s, c, p); return true;
     default: return false;
   }
 }
