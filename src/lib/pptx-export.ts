@@ -90,6 +90,15 @@ export async function exportDeckToPptx(
       : Promise.resolve(null),
   ]);
 
+  // Prefetch all slide imagery in parallel so the export runs quickly.
+  const slideImages: Array<string | null> = await Promise.all(
+    deck.slides.map((slide) => {
+      const c = slide.content as Record<string, unknown>;
+      const url = resolveSlideImageUrl(deck.brandModeId, c);
+      return url ? fetchAsDataUrl(url) : Promise.resolve(null);
+    }),
+  );
+
   for (let i = 0; i < deck.slides.length; i++) {
     const slide = deck.slides[i];
     const kind = classifyVariant(slide.variantId, i);
@@ -99,6 +108,29 @@ export async function exportDeckToPptx(
     const useWhiteLogo = isDark || slide.variantId === "MV-SPLIT-MANIFESTO";
     const hideFooter = useWhiteLogo;
     s.background = { color: isDark ? palette.primary : "FFFFFF" };
+
+    // Underlay imagery — preserves both PPTX-imported photos (content.mediaUrl)
+    // and curated kit imagery (content.mediaSeed → division library). Placement
+    // varies by slide kind so text stays legible over the image.
+    const imgData = slideImages[i];
+    if (imgData) {
+      if (kind === "cover" || kind === "divider") {
+        // Full-bleed image with a dark scrim so hero text keeps contrast.
+        s.addImage({ data: imgData, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H, sizing: { type: "cover", w: SLIDE_W, h: SLIDE_H } });
+        s.addShape("rect", {
+          x: 0, y: 0, w: SLIDE_W, h: SLIDE_H,
+          fill: { color: palette.primary, transparency: 35 },
+          line: { color: palette.primary, transparency: 100 },
+        });
+      } else if (kind === "quote" || kind === "callout" || kind === "content" || kind === "cards") {
+        // Right-side panel image, ~40% width, keeps left column for text.
+        const panelW = 5.0;
+        const panelX = SLIDE_W - panelW - 0.4;
+        s.addImage({ data: imgData, x: panelX, y: 0.9, w: panelW, h: 5.7, sizing: { type: "cover", w: panelW, h: 5.7 } });
+      }
+    }
+
+
 
     try {
       if (!renderAdvancedVariant(s, slide, palette)) {
