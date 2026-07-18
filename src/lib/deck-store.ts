@@ -1053,7 +1053,105 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         ],
       };
 
-
+    // ── Advanced variants — BATCH 2 ────────────────────────────────────
+    case "MV-EDITORIAL-SPREAD":
+      return {
+        kicker: `${sectionName} · ${clientName}`,
+        title: `The economics of global content have changed for ${clientName}.`,
+        pullValue: "3×",
+        pullUnit: "",
+        pullLabel: "Content velocity vs. legacy vendors",
+        bodyLeft: `${clientName} publishes across dozens of markets every week — and every market has a local audience that expects the same brand voice, precision, and speed as the source. That reality isn't served by translation-as-a-line-item.`,
+        bodyRight: "The programs that win treat localization as an operating capability: shared voice, adaptive AI, a reviewer network in every market, and analytics that close the loop back to source content. That's the shift this deck argues for.",
+        folio: `TransPerfect · Prepared for ${clientName}`,
+      };
+    case "MV-SPLIT-MANIFESTO":
+      return {
+        kicker: "Our belief",
+        statement: `${clientName} deserves one global voice — spoken fluently in every market, without waiting.`,
+        signoff: "TransPerfect",
+        items: [
+          { title: "One operating model", body: "A single program across every market, content type, and channel." },
+          { title: "Human + AI", body: "Adaptive machine translation paired with an in-market reviewer network." },
+          { title: "Governance-ready", body: "Terminology, voice, and regulatory guardrails codified per market." },
+        ],
+      };
+    case "MV-NUMBERS-TRIPTYCH":
+      return {
+        title: `The case for ${clientName}, in three numbers`,
+        items: [
+          { value: "62", unit: "%", label: "Faster launch cycles", note: "Source-to-market in one quarter, not three.", source: "TransPerfect program benchmarks" },
+          { value: "38", unit: "M", label: "Words per year", note: "Delivered under one governance model.", source: `${clientName} pilot forecast` },
+          { value: "97.4", unit: "%", label: "On-time in-market", note: "Across every market and content type.", source: "12-month rolling avg." },
+        ],
+      };
+    case "MV-TIMELINE-VERTICAL":
+      return {
+        title: `${clientName} × TransPerfect — path to scale`,
+        items: [
+          { date: "Wk 1–2", label: "Discovery", body: "Voice profile, glossary base, priority markets and content types." },
+          { date: "Wk 3–6", label: "Pilot", body: "One market, one content type. Measured against baseline." },
+          { date: "Mo 3–6", label: "Program launch", body: "Extend to remaining priority markets under one governance model." },
+          { date: "Mo 6–12", label: "AI expansion", body: "Adaptive MT + reviewer network unlocked across the portfolio." },
+          { date: "Yr 2+", label: "Optimized", body: "Real-time in-market, feedback loop to source, program-wide analytics." },
+        ],
+      };
+    case "MV-COMPARE-SLIDER":
+      return {
+        title: `What changes when ${clientName} runs one program`,
+        before: { label: "Before — vendor per market", value: "84", unit: "d", body: "Average cycle from HQ launch to in-market live, across 12 vendors." },
+        after: { label: "After — TransPerfect program", value: "31", unit: "d", body: "One operating model, adaptive MT + in-market reviewers, live SLA telemetry." },
+      };
+    case "MV-PULL-QUOTE-STACK":
+      return {
+        hero: {
+          quote: `TransPerfect gave us one voice in every market — without slowing our launch calendar.`,
+          name: "VP, Global Marketing",
+          role: "Enterprise Tech",
+          org: "Fortune 100 client",
+        },
+        items: [
+          { quote: "Regulatory content that used to take a quarter is now weeks.", name: "Head of Regulatory", role: "Life Sciences", org: "Global pharma" },
+          { quote: "Our reviewer network is finally an asset, not a bottleneck.", name: "Localization Director", role: "Consumer Tech", org: "Public company" },
+        ],
+      };
+    case "MV-DEFINITION":
+      return {
+        term: "Global content, local precision",
+        pronunciation: "/ˈɡloʊbəl ˈkɑːntɛnt, ˈloʊkəl prɪˈsɪʒən/",
+        partOfSpeech: "n.",
+        definition: "The operating discipline of publishing one brand voice across every market at source-speed, with the terminology, regulatory, and cultural fidelity a local audience expects.",
+        usage: `"${clientName} treats every market as a first market — not a translated afterthought."`,
+      };
+    case "MV-PRINCIPLES":
+      return {
+        title: "Principles for the program",
+        items: [
+          { statement: "One voice, everywhere.", body: `Every market speaks ${clientName} — not a translated approximation of it.` },
+          { statement: "Human decides, AI accelerates.", body: "Adaptive MT handles volume; the reviewer network owns brand and compliance." },
+          { statement: "Governance is the substrate.", body: "Terminology, tone, and regulatory rules live in one place, per market." },
+          { statement: "Signal, not opinion.", body: "Program SLAs, cycle times, and quality scores steer the next quarter's plan." },
+        ],
+      };
+    case "MV-COUNTDOWN":
+      return {
+        kicker: "Three things to remember",
+        title: `Leave the room with this for ${clientName}`,
+        items: [
+          { statement: "One program, every market.", body: "Not a vendor stack — an operating model." },
+          { statement: "Human + AI, on your voice.", body: "Adaptive MT trained on your terminology and tone." },
+          { statement: "Measurable in one quarter.", body: "Pilot in a priority market, decide with data." },
+        ],
+      };
+    case "MV-HORIZON":
+      return {
+        title: `${clientName} — Now, Next, Later`,
+        items: [
+          { label: "Now", headline: "Pilot in one priority market", body: "Two-week discovery, then live in one market and one content type inside a quarter." },
+          { label: "Next", headline: "Program rollout", body: "Extend to the remaining priority markets under one governance model." },
+          { label: "Later", headline: "AI-assisted expansion", body: "Adaptive MT + reviewer network unlocked across the full portfolio with real-time telemetry." },
+        ],
+      };
 
     default:
 
