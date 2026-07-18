@@ -416,35 +416,113 @@ export function BackgroundImageryPanel({
         </div>
       )}
 
-      {/* Scrim controls — image-backed backgrounds */}
+      {/* Image positioning + scrim — upload / AI backgrounds */}
       {(current?.kind === "upload" || current?.kind === "ai") && (
-        <div className="mt-4 space-y-3 border-t border-black/10 pt-4">
-          <div className="text-[10px] uppercase tracking-widest text-black/50">Legibility scrim</div>
+        <div className="mt-4 space-y-4 border-t border-black/10 pt-4">
+          {/* Live preview with position applied */}
+          {current.url && (
+            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl border border-black/10 bg-black">
+              <img
+                src={current.url}
+                alt=""
+                className="absolute inset-0 h-full w-full"
+                style={{
+                  objectFit: current.fit ?? "cover",
+                  objectPosition: `${50 + (current.offsetX ?? 0) / 2}% ${50 + (current.offsetY ?? 0) / 2}%`,
+                  transform:
+                    current.zoom && current.zoom !== 1 ? `scale(${current.zoom})` : undefined,
+                  transformOrigin: "center center",
+                  filter: current.imageDim ? `brightness(${1 - current.imageDim})` : undefined,
+                }}
+              />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `linear-gradient(to top, rgba(3,0,44,${current.scrimStrength ?? 0.55}), rgba(3,0,44,0))`,
+                }}
+              />
+            </div>
+          )}
+
+          {/* Fit */}
+          <div>
+            <div className="text-[10px] uppercase tracking-widest text-black/50">Crop / Fit</div>
+            <div className="mt-1.5 flex gap-1.5">
+              {(["cover", "contain"] as const).map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => onChange({ ...current, fit: f })}
+                  className={`flex-1 rounded-full px-3 py-1.5 text-[10px] uppercase tracking-widest transition ${
+                    (current.fit ?? "cover") === f
+                      ? "bg-black text-white"
+                      : "border border-black/15 text-black/70 hover:bg-black/5"
+                  }`}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <Slider
-            label="Scrim strength"
-            value={Math.round((current.scrimStrength ?? 0.55) * 100)}
-            onChange={(n) => onChange({ ...current, scrimStrength: n / 100 })}
+            label="Zoom"
+            min={100}
+            max={300}
+            value={Math.round((current.zoom ?? 1) * 100)}
+            onChange={(n) => onChange({ ...current, zoom: n / 100 })}
+            suffix="%"
           />
           <Slider
-            label="Image dim"
-            value={Math.round((current.imageDim ?? 0.1) * 100)}
-            onChange={(n) => onChange({ ...current, imageDim: n / 100 })}
+            label="Pan · Horizontal"
+            min={-100}
+            max={100}
+            value={current.offsetX ?? 0}
+            onChange={(n) => onChange({ ...current, offsetX: n })}
           />
-          <div className="flex flex-wrap gap-1.5">
-            {(["bottom", "top", "left", "right", "full", "vignette"] as const).map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => onChange({ ...current, scrim: s })}
-                className={`rounded-full px-2.5 py-1 text-[10px] uppercase tracking-widest transition ${
-                  (current.scrim ?? "bottom") === s
-                    ? "bg-black text-white"
-                    : "border border-black/15 text-black/70 hover:bg-black/5"
-                }`}
-              >
-                {s}
-              </button>
-            ))}
+          <Slider
+            label="Pan · Vertical"
+            min={-100}
+            max={100}
+            value={current.offsetY ?? 0}
+            onChange={(n) => onChange({ ...current, offsetY: n })}
+          />
+          <button
+            type="button"
+            onClick={() => onChange({ ...current, zoom: 1, offsetX: 0, offsetY: 0, fit: "cover" })}
+            className="w-full rounded-full border border-black/15 px-3 py-1.5 text-[10px] uppercase tracking-widest text-black/70 hover:bg-black/5"
+          >
+            Reset framing
+          </button>
+
+          <div className="border-t border-black/10 pt-4">
+            <div className="text-[10px] uppercase tracking-widest text-black/50">Legibility scrim</div>
+            <Slider
+              label="Scrim opacity"
+              value={Math.round((current.scrimStrength ?? 0.55) * 100)}
+              onChange={(n) => onChange({ ...current, scrimStrength: n / 100 })}
+            />
+            <Slider
+              label="Image dim"
+              value={Math.round((current.imageDim ?? 0.1) * 100)}
+              onChange={(n) => onChange({ ...current, imageDim: n / 100 })}
+            />
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {(["bottom", "top", "left", "right", "full", "vignette"] as const).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => onChange({ ...current, scrim: s })}
+                  className={`rounded-full px-2.5 py-1 text-[10px] uppercase tracking-widest transition ${
+                    (current.scrim ?? "bottom") === s
+                      ? "bg-black text-white"
+                      : "border border-black/15 text-black/70 hover:bg-black/5"
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
