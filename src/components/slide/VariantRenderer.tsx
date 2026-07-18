@@ -2738,7 +2738,10 @@ function renderVariantBody({
             <div className="grid gap-8" style={{ gridTemplateColumns: `repeat(${Math.max(above.length, 2)}, minmax(0, 1fr))` }}>
               {above.map((it, i) => (
                 <div key={i}>
-                  <Kicker brand={brand}>Visible</Kicker>
+                  <div className="flex items-center gap-3">
+                    <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="glyph" />
+                    <Kicker brand={brand}>Visible</Kicker>
+                  </div>
                   <div className="mt-3" style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
                   <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(it.body)}</div>
                 </div>
