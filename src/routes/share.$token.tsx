@@ -261,6 +261,11 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
           return (
             <div
               key={slide.id}
+              data-slide-idx={idx}
+              ref={(el) => {
+                if (el) slideRefs.current.set(idx, el);
+                else slideRefs.current.delete(idx);
+              }}
               className="w-full overflow-hidden rounded-2xl border border-white/10 bg-white shadow-2xl"
               style={{ maxWidth: 1280 }}
             >
