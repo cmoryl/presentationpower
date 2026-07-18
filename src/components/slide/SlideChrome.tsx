@@ -77,14 +77,16 @@ export function SlideFrame({
   // light mode, dark navy slides with white text in dark mode. Imagery only
   // opts into the scrim treatment when explicitly enabled.
   const hasBackdrop = !!backdrop;
-  const lightBackdrop = hasBackdrop && !slideDark;
+  const hasBackdropImage = !!backdrop?.url;
+  const hasBackdropCss = !!(backdrop?.css && !backdrop?.url);
+  // A backdrop is "dark" when the caller flagged darkChrome, or when it's a
+  // photo backdrop on a non-light slide (legacy behavior).
+  const backdropIsDark = hasBackdrop && (backdrop?.darkChrome ?? (hasBackdropImage && !slideDark));
+  const lightBackdrop = hasBackdrop && !backdropIsDark && !slideDark;
   const darkBackdrop = hasBackdrop && !lightBackdrop;
   const bg = slideDark ? "#03002C" : "#ffffff";
   const fg = darkBackdrop || slideDark ? "#ffffff" : brand.tokens.ink;
   const logoColor = darkBackdrop || slideDark ? "#ffffff" : brand.tokens.primary;
-
-  const placement = resolveLogoPlacement(variant, layoutId, logoPosition);
-  const showLogo = placement.position !== "hidden";
 
   // Light backdrops use a cream/white tint so photography reads bright; dark
   // backdrops keep the original navy scrim. Callers can still override tint.
