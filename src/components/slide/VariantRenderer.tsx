@@ -1608,7 +1608,7 @@ function renderVariantBody({
     case "MV-IMG-QUOTE-BG":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote"))} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
           <div
             aria-hidden
             className="absolute inset-0"
