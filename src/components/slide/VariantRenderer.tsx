@@ -3638,12 +3638,20 @@ function MediaTile({
   className,
   portrait,
   muted,
+  overrideUrl,
 }: {
   brand: BrandMode;
   seed: string;
   className?: string;
   portrait?: boolean;
   muted?: boolean;
+  /**
+   * When set (e.g. from a PPTX import that carried through the original
+   * picture), skip the deterministic backdrop lookup and render this exact
+   * image. Non-empty strings only — falsy values fall back to the seeded
+   * division imagery so text-only decks keep their curated look.
+   */
+  overrideUrl?: string;
 }) {
   const mode = useContext(SlideModeContext);
   const h = hash(seed || brand.id);
@@ -3652,7 +3660,10 @@ function MediaTile({
   // Division-specific imagery: photos + abstracts for the active brand.
   const divSet = getDivisionImagery(brand.id);
   const tileBackdrops = [...divSet.photos, ...divSet.abstracts];
-  const url = tileBackdrops[h % tileBackdrops.length];
+  const url =
+    overrideUrl && overrideUrl.length > 0
+      ? overrideUrl
+      : tileBackdrops[h % tileBackdrops.length];
   const accent = brand.tokens.accent;
   const primary = brand.tokens.primary;
 
