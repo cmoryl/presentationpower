@@ -1524,15 +1524,21 @@ function renderVariantBody({
     case "MV-IMG-STAT-CALLOUT":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <div className="grid h-full grid-cols-2 gap-14">
+          <div className="grid h-full grid-cols-2 gap-16">
             <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.label, "stat"))} className="h-full w-full" />
             <div className="flex flex-col justify-center">
-              <div className="text-[220px] font-semibold leading-none" style={{ color: brand.tokens.accent }}>
-                {s(c.stat)}
-                <span className="align-top text-[110px]">{s(c.unit)}</span>
-              </div>
-              <div className="mt-6 text-3xl">{s(c.label)}</div>
-              <div className="mt-8 max-w-xl text-2xl opacity-80">{s(c.narrative)}</div>
+              <Kicker brand={brand}>Signal</Kicker>
+              <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
+              <StatFigure
+                brand={brand}
+                value={s(c.stat)}
+                unit={s(c.unit)}
+                label={s(c.label)}
+                size="xl"
+              />
+              <SupportingText size="lg" opacity={0.8} maxWidthPx={560} className="mt-10">
+                {s(c.narrative)}
+              </SupportingText>
             </div>
           </div>
         </SlideFrame>
@@ -1542,11 +1548,15 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "A quick look")} />
-          <div className="mt-14 grid grid-cols-5 gap-4">
+          <div className="mt-14 grid grid-cols-5 gap-6">
             {arr(c.items).slice(0, 5).map((it, i) => (
               <div key={i}>
                 <MediaTile brand={brand} seed={s(it.seed, `strip-${i}`)} className="aspect-[3/4] w-full" />
-                {s(it.caption) && <div className="mt-3 text-lg opacity-75">{s(it.caption)}</div>}
+                {s(it.caption) && (
+                  <MetaRow className="mt-4">
+                    <span>{s(it.caption)}</span>
+                  </MetaRow>
+                )}
               </div>
             ))}
           </div>
@@ -1558,18 +1568,19 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "What clients tell us")} />
-          <div className="mt-12 space-y-6">
+          <div className="mt-14 grid grid-cols-1 gap-0">
             {arr(c.items).slice(0, 3).map((it, i) => (
               <div
                 key={i}
-                className="grid grid-cols-[60px_1fr_260px] items-center gap-8 rounded-2xl border p-8"
-                style={{ borderColor: "rgba(10,15,28,0.1)", backgroundColor: brand.tokens.surface }}
+                className="grid grid-cols-[80px_1fr_320px] items-start gap-10 py-10"
+                style={{ borderTop: i === 0 ? "none" : "1px solid rgba(10,15,28,0.10)" }}
               >
-                <div className="text-7xl leading-none" style={{ color: brand.tokens.accent }}>“</div>
-                <div className="text-2xl leading-snug">{s(it.quote)}</div>
+                <QuoteMark color={brand.tokens.accent} size={110} opacity={0.9} className="-mt-4" />
+                <div style={{ fontSize: 30, lineHeight: 1.32, letterSpacing: "-0.01em", color: brand.tokens.primary }}>
+                  {s(it.quote)}
+                </div>
                 <div className="text-right">
-                  <div className="text-xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.attribution)}</div>
-                  <div className="mt-1 text-lg opacity-70">{s(it.role)}</div>
+                  <Attribution brand={brand} name={s(it.attribution)} role={s(it.role)} />
                 </div>
               </div>
             ))}
@@ -1580,14 +1591,19 @@ function renderVariantBody({
     case "MV-QUOTE-PORTRAIT":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <div className="grid h-full grid-cols-[420px_1fr] items-stretch gap-14">
+          <div className="grid h-full grid-cols-[420px_1fr] items-stretch gap-16">
             <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "portrait"))} className="h-full w-full" portrait />
-            <div className="flex flex-col justify-center">
-              <div className="text-[180px] leading-none opacity-15" style={{ color: brand.tokens.accent }}>“</div>
-              <div className="-mt-14 text-5xl font-medium leading-[1.2]">{s(c.quote)}</div>
-              <div className="mt-10">
-                <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(c.attribution)}</div>
-                <div className="mt-2 text-xl opacity-70">{s(c.role)}{s(c.org) && <> <span className="mx-2">·</span> {s(c.org)}</>}</div>
+            <div className="relative flex flex-col justify-center">
+              <QuoteMark color={brand.tokens.accent} size={520} className="absolute -top-4 -left-2" />
+              <div className="relative">
+                <Kicker brand={brand}>In their words</Kicker>
+                <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
+                <div style={{ fontSize: 60, fontWeight: 500, lineHeight: 1.2, letterSpacing: "-0.015em", color: brand.tokens.primary, maxWidth: 1080 }}>
+                  {s(c.quote)}
+                </div>
+                <div className="mt-14">
+                  <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} org={s(c.org)} />
+                </div>
               </div>
             </div>
           </div>
@@ -1598,19 +1614,22 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex h-full items-center justify-center">
-            <div
-              className="relative max-w-5xl rounded-3xl border p-16"
-              style={{ borderColor: "rgba(10,15,28,0.1)", backgroundColor: brand.tokens.surface }}
-            >
-              <div className="absolute -top-2 left-16 h-2 w-40" style={{ backgroundColor: brand.tokens.accent }} />
-              <div className="text-6xl leading-none" style={{ color: brand.tokens.accent }}>“</div>
-              <div className="mt-6 text-4xl font-medium leading-[1.25]">{s(c.quote)}</div>
-              <div className="mt-10 flex items-baseline justify-between">
-                <div>
-                  <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(c.attribution)}</div>
-                  <div className="mt-1 text-xl opacity-70">{s(c.role)}</div>
+            <div className="relative max-w-[1300px]">
+              <QuoteMark color={brand.tokens.accent} size={560} className="absolute -top-10 -left-6" />
+              <div className="relative">
+                <Kicker brand={brand}>Testimonial</Kicker>
+                <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
+                <div style={{ fontSize: 56, fontWeight: 500, lineHeight: 1.22, letterSpacing: "-0.015em", color: brand.tokens.primary }}>
+                  {s(c.quote)}
                 </div>
-                <div className="text-lg opacity-60">{s(c.org)}</div>
+                <div className="mt-14 flex items-end justify-between gap-10">
+                  <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} />
+                  {s(c.org) && (
+                    <MetaRow>
+                      <span>{s(c.org)}</span>
+                    </MetaRow>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -1620,20 +1639,24 @@ function renderVariantBody({
     case "MV-QUOTE-METRIC":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <div className="grid h-full grid-cols-[1fr_360px] items-center gap-16">
-            <div>
-              <div className="text-[180px] leading-none opacity-15" style={{ color: brand.tokens.accent }}>“</div>
-              <div className="-mt-14 text-5xl font-medium leading-[1.2]">{s(c.quote)}</div>
-              <div className="mt-8 text-2xl opacity-70">{s(c.attribution)} <span className="mx-2">·</span> {s(c.role)}</div>
-            </div>
-            <div
-              className="rounded-3xl p-10 text-center"
-              style={{ backgroundColor: brand.tokens.primary, color: "#fff" }}
-            >
-              <div className="text-[140px] font-semibold leading-none">
-                {s(c.metric)}<span className="align-top text-6xl opacity-90">{s(c.unit)}</span>
+          <div className="relative grid h-full grid-cols-[1.3fr_1fr] items-center gap-24">
+            <QuoteMark color={brand.tokens.accent} size={520} className="absolute -top-6 -left-4" />
+            <div className="relative">
+              <Kicker brand={brand}>In their words</Kicker>
+              <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
+              <div style={{ fontSize: 58, fontWeight: 500, lineHeight: 1.2, letterSpacing: "-0.015em", color: brand.tokens.primary }}>
+                {s(c.quote)}
               </div>
-              <div className="mt-4 text-2xl opacity-90">{s(c.metricLabel)}</div>
+              <div className="mt-12">
+                <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} />
+              </div>
+            </div>
+            <div>
+              <Hairline color={brand.tokens.accent} widthPx={56} thicknessPx={2} className="mb-6" />
+              <Kicker brand={brand}>{s(c.metricLabel, "Outcome")}</Kicker>
+              <div className="mt-8">
+                <StatFigure brand={brand} value={s(c.metric)} unit={s(c.unit)} size="xl" />
+              </div>
             </div>
           </div>
         </SlideFrame>
@@ -1642,19 +1665,21 @@ function renderVariantBody({
     case "MV-QUOTE-POSTER":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <div className="absolute inset-0" style={{ backgroundColor: brand.tokens.primary }} />
           <div className="relative flex h-full flex-col justify-center text-white">
-            <div className="text-[240px] leading-none opacity-25" style={{ color: brand.tokens.accent }}>“</div>
-            <div className="-mt-20 max-w-6xl text-8xl font-semibold leading-[1.05] tracking-tight">{s(c.quote)}</div>
-            <div className="mt-14 text-2xl uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>
-              {s(c.attribution)}
+            <QuoteMark color={brand.tokens.accent} size={780} opacity={0.16} className="absolute -top-6 -left-4" />
+            <div className="relative">
+              <Kicker brand={brand} color={brand.tokens.accent}>Testimonial</Kicker>
+              <Hairline color={brand.tokens.accent} widthPx={120} thicknessPx={2} className="mt-8 mb-12" />
+              <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1620}>
+                {s(c.quote)}
+              </DisplayTitle>
+              <div className="mt-16">
+                <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} />
+              </div>
             </div>
-            <div className="mt-2 text-xl opacity-70">{s(c.role)}</div>
           </div>
         </SlideFrame>
       );
-
-    // ── Infographic options ───────────────────────────────────────────
     case "MV-INFO-DONUT": {
       const items = arr(c.items);
       const total = items.reduce((sum, it) => sum + (typeof it.value === "number" ? it.value : Number(it.value) || 0), 0) || 1;
