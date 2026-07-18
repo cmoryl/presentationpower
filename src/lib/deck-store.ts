@@ -1312,7 +1312,9 @@ export const useDeckStore = create<DeckState>()(
             layoutId: s.layoutId,
             content: structuredClone(s.content),
             changes: [],
+            notes: s.notes ?? undefined,
           })),
+
         };
         set((s) => ({
           briefs: { ...s.briefs, [briefId]: brief },
