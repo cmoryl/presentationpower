@@ -4454,7 +4454,7 @@ function HeatmapChart({ brand, rows, cols, cells, min, max }: { brand: BrandMode
           <div key={i} className="text-center uppercase" style={{ fontSize: 14, letterSpacing: "0.24em", color: "rgba(10,15,28,0.55)", fontWeight: 600, paddingBottom: 8 }}>{c}</div>
         ))}
         {rows.map((r, ri) => (
-          <React.Fragment key={ri}>
+          <Fragment key={ri}>
             <div className="pr-4 flex items-center justify-end uppercase" style={{ fontSize: 14, letterSpacing: "0.2em", color: brand.tokens.primary, fontWeight: 600 }}>{r}</div>
             {cols.map((_, ci) => {
               const v = cells[ri]?.[ci] ?? 0;
@@ -4465,7 +4465,7 @@ function HeatmapChart({ brand, rows, cols, cells, min, max }: { brand: BrandMode
                 </div>
               );
             })}
-          </React.Fragment>
+          </Fragment>
         ))}
       </div>
       <div className="mt-6 flex items-center gap-3">
