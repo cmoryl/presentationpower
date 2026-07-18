@@ -1,6 +1,6 @@
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import { SlideFrame as BaseSlideFrame, SlideModeContext, type SlideMode } from "./SlideChrome";
-import { createContext, useContext } from "react";
+import { createContext, useContext, Fragment } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
 import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, StatFigure, QuoteMark, Attribution, SoftDivider } from "./primitives";
@@ -3480,6 +3480,101 @@ function renderVariantBody({
       );
     }
 
+    case "MV-GRAPH-LINE-MULTI": {
+      const series = arr(c.series).slice(0, 3).map((p) => ({ label: s(p.label), points: arr(p.points).map((v: unknown) => Number(v) || 0) }));
+      const xLabels = arr(obj(c.axis).x).map((v: unknown) => String(v));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="mb-6 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+            <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
+            <div className="mt-4" style={{ fontSize: 42, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
+          </div>
+          <div className="mt-4"><LineMultiChart brand={brand} series={series} xLabels={xLabels} unit={s(c.unit, "%")} height={500} /></div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-STACKED-BAR": {
+      const segments = arr(c.segments).map((sg) => ({ label: s(sg.label) }));
+      const columns = arr(c.columns).map((col) => ({ label: s(col.label), values: arr(col.values).map((v: unknown) => Number(v) || 0) }));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-8"><StackedBarChart brand={brand} segments={segments} columns={columns} unit={s(c.unit)} height={520} /></div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-AREA-STACK": {
+      const series = arr(c.series).slice(0, 4).map((p) => ({ label: s(p.label), points: arr(p.points).map((v: unknown) => Number(v) || 0) }));
+      const xLabels = arr(obj(c.axis).x).map((v: unknown) => String(v));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="mb-6 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+            <Kicker brand={brand}>{s(c.kicker, "Composition")}</Kicker>
+            <div className="mt-4" style={{ fontSize: 42, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
+          </div>
+          <div className="mt-4"><StackedAreaChart brand={brand} series={series} xLabels={xLabels} unit={s(c.unit)} height={500} /></div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-WATERFALL": {
+      const steps = arr(c.steps).map((st) => ({ label: s(st.label), value: Number(st.value) || 0, kind: s(st.kind, "up") as "start" | "up" | "down" | "end" }));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-8"><WaterfallChart brand={brand} steps={steps} unit={s(c.unit)} height={540} /></div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-BUBBLE": {
+      const axis = obj(c.axis);
+      const items = arr(c.items).map((it) => ({ label: s(it.label), x: Number(it.x) || 0, y: Number(it.y) || 0, size: Number(it.size) || 20 }));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-8"><BubbleChart brand={brand} items={items} axisX={s(axis.x, "X")} axisY={s(axis.y, "Y")} height={560} /></div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-HEATMAP": {
+      const rows = arr(c.rows).map((v: unknown) => String(v));
+      const cols = arr(c.columns).map((v: unknown) => String(v));
+      const cells = arr(c.cells).map((row: unknown) => arr(row).map((v: unknown) => Number(v) || 0));
+      const scale = obj(c.scale);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-8"><HeatmapChart brand={brand} rows={rows} cols={cols} cells={cells} min={Number(scale.min) || 0} max={Number(scale.max) || 100} /></div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-TREEMAP": {
+      const items = arr(c.items).map((it) => ({ label: s(it.label), value: Number(it.value) || 0, meta: s(it.meta) }));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-8"><Treemap brand={brand} items={items} height={560} /></div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-COMBO": {
+      const bars = obj(c.bars);
+      const line = obj(c.line);
+      const points = arr(c.points).map((p) => ({ label: s(p.label), bar: Number(p.bar) || 0, line: Number(p.line) || 0 }));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-8"><ComboChart brand={brand} points={points} barLabel={s(bars.label, "Volume")} barUnit={s(bars.unit)} lineLabel={s(line.label, "Rate")} lineUnit={s(line.unit, "%")} height={540} /></div>
+        </SlideFrame>
+      );
+    }
+
     default:
 
 
@@ -4127,3 +4222,361 @@ function DecadeAreaChart({ brand, series, height = 480, calloutLabel, calloutNot
     </svg>
   );
 }
+
+// ── Extended graph helpers ───────────────────────────────────────────────
+function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand: BrandMode; series: { label: string; points: number[] }[]; xLabels: string[]; unit?: string; height?: number }) {
+  const w = 1720, h = height;
+  const padL = 90, padR = 40, padT = 30, padB = 80;
+  const cols = [brand.tokens.accent, brand.tokens.primary, "rgba(10,15,28,0.45)"];
+  const all = series.flatMap((s) => s.points);
+  const max = Math.max(1, ...all);
+  const niceMax = Math.ceil(max / 10) * 10 || max;
+  const chartH = h - padT - padB;
+  const n = Math.max(...series.map((s) => s.points.length), 1);
+  const step = n > 1 ? (w - padL - padR) / (n - 1) : 0;
+  const ticks = 4;
+  return (
+    <div>
+      <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+        {Array.from({ length: ticks + 1 }, (_, i) => {
+          const y = padT + (chartH / ticks) * i;
+          const val = niceMax * (1 - i / ticks);
+          return (
+            <g key={i}>
+              <line x1={padL} y1={y} x2={w - padR} y2={y} stroke="rgba(10,15,28,0.08)" strokeWidth={1} />
+              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={16} fill="rgba(10,15,28,0.5)">{Math.round(val)}{unit || ""}</text>
+            </g>
+          );
+        })}
+        {series.map((sr, si) => {
+          const pts = sr.points.map((v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number]);
+          const d = pts.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(" ");
+          return (
+            <g key={si}>
+              <path d={d} fill="none" stroke={cols[si] || brand.tokens.primary} strokeWidth={si === 0 ? 3 : 2} strokeLinecap="round" strokeLinejoin="round" opacity={si === 0 ? 1 : 0.85} />
+              {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={si === 0 ? 5 : 4} fill={cols[si] || brand.tokens.primary} />)}
+            </g>
+          );
+        })}
+        {xLabels.map((lb, i) => (
+          <text key={i} x={padL + i * step} y={h - padB + 34} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.55)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{lb}</text>
+        ))}
+      </svg>
+      <div className="mt-2 flex flex-wrap gap-6">
+        {series.map((sr, i) => (
+          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: "rgba(10,15,28,0.7)" }}>
+            <span style={{ display: "inline-block", width: 22, height: 3, background: cols[i] || brand.tokens.primary }} />
+            <span style={{ fontWeight: 600, color: brand.tokens.primary }}>{sr.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { brand: BrandMode; segments: { label: string }[]; columns: { label: string; values: number[] }[]; unit?: string; height?: number }) {
+  const w = 1720, h = height;
+  const padL = 90, padR = 40, padT = 30, padB = 80;
+  const totals = columns.map((c) => c.values.reduce((a, b) => a + b, 0));
+  const max = Math.max(1, ...totals);
+  const niceMax = Math.ceil(max * 1.1);
+  const chartH = h - padT - padB;
+  const slot = (w - padL - padR) / Math.max(columns.length, 1);
+  const barW = slot * 0.55;
+  const cols = [brand.tokens.accent, brand.tokens.primary, "rgba(10,15,28,0.4)"];
+  const ticks = 4;
+  return (
+    <div>
+      <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+        {Array.from({ length: ticks + 1 }, (_, i) => {
+          const y = padT + (chartH / ticks) * i;
+          return <line key={i} x1={padL} y1={y} x2={w - padR} y2={y} stroke="rgba(10,15,28,0.08)" strokeWidth={1} />;
+        })}
+        {columns.map((col, i) => {
+          const x = padL + i * slot + (slot - barW) / 2;
+          let yCursor = h - padB;
+          return (
+            <g key={i}>
+              {col.values.map((v, si) => {
+                const bh = (v / niceMax) * chartH;
+                yCursor -= bh;
+                return <rect key={si} x={x} y={yCursor} width={barW} height={bh} fill={cols[si] || brand.tokens.primary} opacity={si === 0 ? 1 : 0.7 - si * 0.15} />;
+              })}
+              <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{col.label}</text>
+            </g>
+          );
+        })}
+      </svg>
+      <div className="mt-3 flex flex-wrap gap-6">
+        {segments.map((sg, i) => (
+          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: "rgba(10,15,28,0.7)" }}>
+            <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || brand.tokens.primary, opacity: i === 0 ? 1 : 0.7 - i * 0.15 }} />
+            <span style={{ fontWeight: 600, color: brand.tokens.primary }}>{sg.label}</span>
+          </div>
+        ))}
+        {unit && <div style={{ fontSize: 14, color: "rgba(10,15,28,0.5)", marginLeft: "auto" }}>Units: {unit}</div>}
+      </div>
+    </div>
+  );
+}
+
+function StackedAreaChart({ brand, series, xLabels, unit, height = 480 }: { brand: BrandMode; series: { label: string; points: number[] }[]; xLabels: string[]; unit?: string; height?: number }) {
+  const w = 1720, h = height;
+  const padL = 60, padR = 40, padT = 30, padB = 80;
+  const n = Math.max(...series.map((s) => s.points.length), 1);
+  const totals = Array.from({ length: n }, (_, i) => series.reduce((a, s) => a + (s.points[i] || 0), 0));
+  const max = Math.max(1, ...totals);
+  const niceMax = Math.ceil(max * 1.1);
+  const chartH = h - padT - padB;
+  const step = n > 1 ? (w - padL - padR) / (n - 1) : 0;
+  const cols = [brand.tokens.accent, brand.tokens.primary, "rgba(10,15,28,0.45)", "rgba(10,15,28,0.25)"];
+  let stacks = Array(n).fill(0) as number[];
+  const layers = series.map((sr, si) => {
+    const bottom = stacks.slice();
+    const top = stacks.map((v, i) => v + (sr.points[i] || 0));
+    stacks = top;
+    const topPts = top.map((v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number]);
+    const botPts = bottom.map((v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number]).reverse();
+    const d = [...topPts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`), ...botPts.map((p) => `L${p[0]},${p[1]}`), "Z"].join(" ");
+    return { d, color: cols[si] || brand.tokens.primary, si };
+  });
+  return (
+    <div>
+      <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+        <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
+        {layers.map((l) => <path key={l.si} d={l.d} fill={l.color} opacity={l.si === 0 ? 0.95 : 0.7 - l.si * 0.15} />)}
+        {xLabels.map((lb, i) => (
+          <text key={i} x={padL + i * step} y={h - padB + 34} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.55)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{lb}</text>
+        ))}
+      </svg>
+      <div className="mt-3 flex flex-wrap gap-6">
+        {series.map((sr, i) => (
+          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: "rgba(10,15,28,0.7)" }}>
+            <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || brand.tokens.primary, opacity: i === 0 ? 0.95 : 0.7 - i * 0.15 }} />
+            <span style={{ fontWeight: 600, color: brand.tokens.primary }}>{sr.label}</span>
+          </div>
+        ))}
+        {unit && <div style={{ fontSize: 14, color: "rgba(10,15,28,0.5)", marginLeft: "auto" }}>Units: {unit}</div>}
+      </div>
+    </div>
+  );
+}
+
+function WaterfallChart({ brand, steps, unit, height = 500 }: { brand: BrandMode; steps: { label: string; value: number; kind: "start" | "up" | "down" | "end" }[]; unit?: string; height?: number }) {
+  const w = 1720, h = height;
+  const padL = 90, padR = 40, padT = 30, padB = 90;
+  const chartH = h - padT - padB;
+  const slot = (w - padL - padR) / Math.max(steps.length, 1);
+  const barW = slot * 0.55;
+  let running = 0;
+  const bars = steps.map((st) => {
+    if (st.kind === "start" || st.kind === "end") {
+      running = st.value;
+      return { base: 0, top: st.value, kind: st.kind, label: st.label, value: st.value };
+    }
+    const base = running;
+    running += st.value;
+    return { base: Math.min(base, running), top: Math.max(base, running), kind: st.kind, label: st.label, value: st.value };
+  });
+  const maxVal = Math.max(1, ...bars.map((b) => b.top));
+  const niceMax = Math.ceil(maxVal * 1.1);
+  const scale = (v: number) => padT + chartH * (1 - v / niceMax);
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
+      {bars.map((b, i) => {
+        const x = padL + i * slot + (slot - barW) / 2;
+        const y = scale(b.top);
+        const bh = scale(b.base) - scale(b.top);
+        let fill = brand.tokens.primary;
+        if (b.kind === "up") fill = brand.tokens.accent;
+        else if (b.kind === "down") fill = "rgba(10,15,28,0.55)";
+        else if (b.kind === "start" || b.kind === "end") fill = brand.tokens.primary;
+        const prev = bars[i - 1];
+        return (
+          <g key={i}>
+            {prev && (
+              <line x1={x - (slot - barW)} y1={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} x2={x} y2={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} stroke="rgba(10,15,28,0.25)" strokeDasharray="4 4" />
+            )}
+            <rect x={x} y={y} width={barW} height={Math.max(2, bh)} fill={fill} opacity={b.kind === "start" || b.kind === "end" ? 1 : 0.92} />
+            <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={18} fontWeight={600} fill={brand.tokens.primary}>
+              {b.kind === "up" ? "+" : b.kind === "down" ? "−" : ""}{Math.abs(b.value).toFixed(1)}{unit || ""}
+            </text>
+            <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={15} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.12em", textTransform: "uppercase" }}>{b.label}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function BubbleChart({ brand, items, axisX, axisY, height = 560 }: { brand: BrandMode; items: { label: string; x: number; y: number; size: number }[]; axisX: string; axisY: string; height?: number }) {
+  const w = 1720, h = height;
+  const padL = 110, padR = 60, padT = 40, padB = 90;
+  const chartW = w - padL - padR;
+  const chartH = h - padT - padB;
+  const maxSize = Math.max(1, ...items.map((i) => i.size));
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      {[0, 0.25, 0.5, 0.75, 1].map((t, i) => (
+        <line key={i} x1={padL} y1={padT + chartH * t} x2={w - padR} y2={padT + chartH * t} stroke="rgba(10,15,28,0.06)" strokeWidth={1} />
+      ))}
+      {[0, 0.25, 0.5, 0.75, 1].map((t, i) => (
+        <line key={`v${i}`} x1={padL + chartW * t} y1={padT} x2={padL + chartW * t} y2={h - padB} stroke="rgba(10,15,28,0.06)" strokeWidth={1} />
+      ))}
+      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.3)" strokeWidth={1} />
+      <line x1={padL} y1={padT} x2={padL} y2={h - padB} stroke="rgba(10,15,28,0.3)" strokeWidth={1} />
+      {items.map((it, i) => {
+        const cx = padL + (it.x / 100) * chartW;
+        const cy = padT + (1 - it.y / 100) * chartH;
+        const r = 20 + (it.size / maxSize) * 60;
+        return (
+          <g key={i}>
+            <circle cx={cx} cy={cy} r={r} fill={brand.tokens.accent} opacity={0.28} />
+            <circle cx={cx} cy={cy} r={r} fill="none" stroke={brand.tokens.accent} strokeWidth={2} />
+            <text x={cx} y={cy + 6} textAnchor="middle" fontSize={22} fontWeight={700} fill={brand.tokens.primary}>{it.label}</text>
+          </g>
+        );
+      })}
+      <text x={w / 2} y={h - 24} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }}>{axisX} →</text>
+      <text x={30} y={h / 2} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }} transform={`rotate(-90 30 ${h / 2})`}>{axisY} →</text>
+    </svg>
+  );
+}
+
+function HeatmapChart({ brand, rows, cols, cells, min, max }: { brand: BrandMode; rows: string[]; cols: string[]; cells: number[][]; min: number; max: number }) {
+  const range = Math.max(1, max - min);
+  return (
+    <div>
+      <div className="grid" style={{ gridTemplateColumns: `160px repeat(${cols.length}, minmax(0, 1fr))`, gap: 4 }}>
+        <div />
+        {cols.map((c, i) => (
+          <div key={i} className="text-center uppercase" style={{ fontSize: 14, letterSpacing: "0.24em", color: "rgba(10,15,28,0.55)", fontWeight: 600, paddingBottom: 8 }}>{c}</div>
+        ))}
+        {rows.map((r, ri) => (
+          <Fragment key={ri}>
+            <div className="pr-4 flex items-center justify-end uppercase" style={{ fontSize: 14, letterSpacing: "0.2em", color: brand.tokens.primary, fontWeight: 600 }}>{r}</div>
+            {cols.map((_, ci) => {
+              const v = cells[ri]?.[ci] ?? 0;
+              const t = Math.max(0, Math.min(1, (v - min) / range));
+              return (
+                <div key={ci} style={{ aspectRatio: "1.6 / 1", background: brand.tokens.accent, opacity: 0.15 + t * 0.85, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ fontSize: 22, fontWeight: 700, color: t > 0.55 ? brand.tokens.primary : "rgba(10,15,28,0.75)" }}>{v}</span>
+                </div>
+              );
+            })}
+          </Fragment>
+        ))}
+      </div>
+      <div className="mt-6 flex items-center gap-3">
+        <span className="uppercase" style={{ fontSize: 12, letterSpacing: "0.24em", color: "rgba(10,15,28,0.55)", fontWeight: 600 }}>Low</span>
+        <div style={{ flex: 1, height: 8, background: `linear-gradient(90deg, ${brand.tokens.accent}22, ${brand.tokens.accent})` }} />
+        <span className="uppercase" style={{ fontSize: 12, letterSpacing: "0.24em", color: "rgba(10,15,28,0.55)", fontWeight: 600 }}>High</span>
+        <span style={{ fontSize: 14, color: "rgba(10,15,28,0.55)" }}>{min}–{max}</span>
+      </div>
+    </div>
+  );
+}
+
+function Treemap({ brand, items, height = 560 }: { brand: BrandMode; items: { label: string; value: number; meta?: string }[]; height?: number }) {
+  // Simple squarified layout: sort desc, slice vertically then horizontally alternately.
+  const total = items.reduce((a, b) => a + b.value, 0) || 1;
+  const w = 1720;
+  const sorted = [...items].sort((a, b) => b.value - a.value);
+  const rects: { x: number; y: number; w: number; h: number; label: string; value: number; meta?: string }[] = [];
+  let x = 0, y = 0, remW = w, remH = height;
+  let remainingTotal = total;
+  let vertical = true;
+  for (let i = 0; i < sorted.length; i++) {
+    const it = sorted[i];
+    const share = it.value / remainingTotal;
+    const isLast = i === sorted.length - 1;
+    if (isLast) {
+      rects.push({ x, y, w: remW, h: remH, label: it.label, value: it.value, meta: it.meta });
+      break;
+    }
+    if (vertical) {
+      const rw = remW * share;
+      rects.push({ x, y, w: rw, h: remH, label: it.label, value: it.value, meta: it.meta });
+      x += rw; remW -= rw;
+    } else {
+      const rh = remH * share;
+      rects.push({ x, y, w: remW, h: rh, label: it.label, value: it.value, meta: it.meta });
+      y += rh; remH -= rh;
+    }
+    remainingTotal -= it.value;
+    vertical = !vertical;
+  }
+  const cols = [brand.tokens.accent, brand.tokens.primary, "rgba(10,15,28,0.55)", "rgba(10,15,28,0.35)", "rgba(10,15,28,0.22)"];
+  return (
+    <svg viewBox={`0 0 ${w} ${height}`} width="100%" height={height} preserveAspectRatio="none" aria-hidden>
+      {rects.map((r, i) => (
+        <g key={i}>
+          <rect x={r.x + 4} y={r.y + 4} width={Math.max(0, r.w - 8)} height={Math.max(0, r.h - 8)} fill={cols[i] || brand.tokens.primary} opacity={i === 0 ? 1 : 0.9} />
+          <text x={r.x + 24} y={r.y + 46} fontSize={r.w > 380 ? 26 : 18} fontWeight={700} fill={i === 0 ? brand.tokens.primary : "#fff"} style={{ letterSpacing: "-0.01em" }}>{r.label}</text>
+          <text x={r.x + 24} y={r.y + 80} fontSize={r.w > 380 ? 40 : 24} fontWeight={700} fill={i === 0 ? brand.tokens.primary : "#fff"} style={{ letterSpacing: "-0.02em" }}>{r.value}%</text>
+          {r.meta && r.w > 260 && r.h > 120 && (
+            <text x={r.x + 24} y={r.y + 116} fontSize={16} fill={i === 0 ? "rgba(10,15,28,0.7)" : "rgba(255,255,255,0.85)"}>{r.meta}</text>
+          )}
+        </g>
+      ))}
+    </svg>
+  );
+}
+
+function ComboChart({ brand, points, barLabel, barUnit, lineLabel, lineUnit, height = 520 }: { brand: BrandMode; points: { label: string; bar: number; line: number }[]; barLabel: string; barUnit?: string; lineLabel: string; lineUnit?: string; height?: number }) {
+  const w = 1720, h = height;
+  const padL = 100, padR = 100, padT = 30, padB = 90;
+  const chartH = h - padT - padB;
+  const slot = (w - padL - padR) / Math.max(points.length, 1);
+  const barW = slot * 0.5;
+  const barMax = Math.max(1, ...points.map((p) => p.bar));
+  const lineMax = Math.max(1, ...points.map((p) => p.line));
+  const niceBar = Math.ceil(barMax * 1.15);
+  const niceLine = Math.ceil(lineMax * 1.05);
+  const pts = points.map((p, i) => [padL + i * slot + slot / 2, padT + chartH * (1 - p.line / niceLine)] as [number, number]);
+  const d = pts.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(" ");
+  const ticks = 4;
+  return (
+    <div>
+      <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+        {Array.from({ length: ticks + 1 }, (_, i) => {
+          const y = padT + (chartH / ticks) * i;
+          const bv = niceBar * (1 - i / ticks);
+          const lv = niceLine * (1 - i / ticks);
+          return (
+            <g key={i}>
+              <line x1={padL} y1={y} x2={w - padR} y2={y} stroke="rgba(10,15,28,0.08)" strokeWidth={1} />
+              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={14} fill="rgba(10,15,28,0.5)">{bv.toFixed(1)}{barUnit || ""}</text>
+              <text x={w - padR + 12} y={y + 6} textAnchor="start" fontSize={14} fill={brand.tokens.accent}>{Math.round(lv)}{lineUnit || ""}</text>
+            </g>
+          );
+        })}
+        {points.map((p, i) => {
+          const bh = (p.bar / niceBar) * chartH;
+          const x = padL + i * slot + (slot - barW) / 2;
+          const y = h - padB - bh;
+          return (
+            <g key={i}>
+              <rect x={x} y={y} width={barW} height={bh} fill={brand.tokens.primary} opacity={0.85} />
+              <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
+            </g>
+          );
+        })}
+        <path d={d} fill="none" stroke={brand.tokens.accent} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+        {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={6} fill={brand.tokens.accent} />)}
+      </svg>
+      <div className="mt-2 flex flex-wrap gap-6">
+        <div className="flex items-center gap-2" style={{ fontSize: 16, color: "rgba(10,15,28,0.7)" }}>
+          <span style={{ display: "inline-block", width: 16, height: 16, background: brand.tokens.primary, opacity: 0.85 }} />
+          <span style={{ fontWeight: 600, color: brand.tokens.primary }}>{barLabel}</span>
+        </div>
+        <div className="flex items-center gap-2" style={{ fontSize: 16, color: "rgba(10,15,28,0.7)" }}>
+          <span style={{ display: "inline-block", width: 22, height: 3, background: brand.tokens.accent }} />
+          <span style={{ fontWeight: 600, color: brand.tokens.primary }}>{lineLabel}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
