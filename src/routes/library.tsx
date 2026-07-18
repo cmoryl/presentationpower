@@ -55,7 +55,7 @@ function Library() {
   
   const [showImagery, setShowImagery] = useState(false);
   const [wcagOn, setWcagOn] = useState(false);
-  const [autoFixOn, setAutoFixOn] = useState(false);
+  const autoFixOn = true;
   const [approvalTick, setApprovalTick] = useState(0);
   const approvals = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -204,19 +204,6 @@ function Library() {
             }`}
           >
             ⚖ WCAG {wcagOn ? "on" : "off"}
-          </button>
-          <button
-            type="button"
-            onClick={() => setAutoFixOn((v) => !v)}
-            aria-pressed={autoFixOn}
-            title="Auto-boost failing text nodes to the nearest AA-passing color on every card"
-            className={`rounded-full border px-3 py-1.5 text-xs ${
-              autoFixOn
-                ? "border-blue-600 bg-blue-600 text-white"
-                : "border-black/15 bg-white text-black/70 hover:text-black"
-            }`}
-          >
-            ✨ Auto-fix {autoFixOn ? "on" : "off"}
           </button>
           {wcagOn && (approvalSummary.approved + approvalSummary.rejected > 0) && (
             <span className="rounded-full bg-black/5 px-3 py-1 text-[11px] text-black/70">
@@ -391,23 +378,11 @@ function VariantCard({
       onClick={onOpen}
       className="group relative block w-full overflow-hidden rounded-[24px] border border-slate-200 bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:border-[#003FC7]/20 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)]"
     >
-      {/* Card-level automatic contrast warning (always on, both modes checked) */}
-      {warnLabel && warnTone && (
-        <div
-          className={`pointer-events-none absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest shadow ring-1 backdrop-blur ${warnTone}`}
-          title={worstDetail || "Automatic WCAG audit flagged low-contrast text in this variant."}
-        >
-          {warnLabel}
-        </div>
-      )}
-      {autoFixOn && fixedCount > 0 && (
-        <div
-          className="pointer-events-none absolute right-3 top-11 z-20 inline-flex items-center gap-1 rounded-full bg-blue-600 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-blue-200 backdrop-blur"
-          title={`Auto-fix boosted ${fixedCount} text node${fixedCount === 1 ? "" : "s"} to an AA-passing color.`}
-        >
-          ✨ Fixed {fixedCount}
-        </div>
-      )}
+      {/* Auto-fix is always on; warning badges intentionally hidden. */}
+      {void warnLabel}
+      {void warnTone}
+      {void worstDetail}
+      {void fixedCount}
 
       {isAB ? (
         <div className="m-2 grid grid-cols-2 gap-2">
