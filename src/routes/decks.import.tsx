@@ -171,6 +171,16 @@ function ImportView() {
     setProgress(90);
     try {
       await new Promise((r) => setTimeout(r, 30));
+      const theme = parsed.theme;
+      const abPaletteOverride: Record<string, string> = {};
+      if (theme.accent1) abPaletteOverride.primary = theme.accent1;
+      if (theme.accent2) abPaletteOverride.accent = theme.accent2;
+      if (theme.dark1) abPaletteOverride.foreground = theme.dark1;
+      const imageCount = mapping.reduce(
+        (n, m) => n + (typeof m.content.mediaUrl === "string" && m.content.mediaUrl ? 1 : 0),
+        0,
+      );
+
       const { deckId } = createImported({
         title: meta.title || parsed.filename.replace(/\.pptx$/i, ""),
         brief: {
@@ -181,14 +191,19 @@ function ImportView() {
           brandModeId: meta.brandModeId,
           archetypeId: meta.archetypeId,
           lengthTarget: mapping.length,
-          clientFacts: `Imported from PowerPoint (${parsed.slideCount} slides).`,
+          clientFacts: `Imported from PowerPoint (${parsed.slideCount} slides, ${imageCount} image${imageCount === 1 ? "" : "s"} preserved).`,
         },
         slides: mapping.map((m) => ({
           sectionId: m.sectionId,
           variantId: m.variantId,
           layoutId: m.layoutId,
           content: m.content,
+          notes: m.source.notes || undefined,
         })),
+        context:
+          Object.keys(abPaletteOverride).length > 0
+            ? { abPaletteOverride }
+            : undefined,
       });
       setStep("create", "done", `Deck ready · ${mapping.length} slides`);
       setProgress(100);
