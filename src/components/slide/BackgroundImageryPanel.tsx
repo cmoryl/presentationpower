@@ -8,6 +8,7 @@
 // SlideBackdropContext in VariantRenderer wires it into SlideChrome.
 
 import { useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { BACKGROUND_PRESETS, resolveSlideBackground, type SlideBackgroundValue } from "@/lib/background-library";
 import { uploadDataUrl, uploadSlideMedia } from "@/lib/slide-media";
 import { generateBackgroundImage } from "@/lib/ai-image.functions";
