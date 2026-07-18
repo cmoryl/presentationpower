@@ -669,7 +669,10 @@ function ReviewPanel({
                   {String(i + 1).padStart(2, "0")}
                 </div>
                 <div>
-                  <div className="font-medium">{row.source.title || "(untitled)"}</div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="font-medium">{row.source.title || "(untitled)"}</div>
+                    <DiagnosticChip diag={diagnoseSlide(row)} />
+                  </div>
                   {row.source.bullets.length > 0 && (
                     <ul className="mt-1 list-disc space-y-0.5 pl-4 text-xs text-black/60">
                       {row.source.bullets.slice(0, 4).map((b, k) => (
