@@ -1587,7 +1587,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-[1fr_1.3fr] gap-14">
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.name, "portrait"))} className="h-full w-full" portrait />
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.name, "portrait"))} overrideUrl={s(c.mediaUrl)} className="h-full w-full" portrait />
             <div className="flex flex-col justify-center">
               <Kicker brand={brand}>{s(c.role)}</Kicker>
               <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
