@@ -114,12 +114,26 @@ function Slider({
   );
 }
 
+export type ApplyTargetSlide = {
+  id: string;
+  position: number;
+  sectionId: string;
+  sectionName: string;
+  title: string;
+};
+
 export function BackgroundImageryPanel({
   value,
   onChange,
+  slides,
+  activeSlideId,
+  onApplyToSlides,
 }: {
   value: unknown;
   onChange: (next: SlideBackgroundValue | null) => void;
+  slides?: ApplyTargetSlide[];
+  activeSlideId?: string;
+  onApplyToSlides?: (slideIds: string[], next: SlideBackgroundValue | null) => void;
 }) {
   const current = useMemo(() => resolveSlideBackground(value), [value]);
   const [tab, setTab] = useState<Tab>(() => {
