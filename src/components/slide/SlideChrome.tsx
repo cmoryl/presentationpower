@@ -219,7 +219,13 @@ export function SlideFrame({
       )}
 
       {/* Content — 96px side margin, 128px top / 96px bottom reserve. */}
-      <div className="absolute inset-0 pt-32 pb-24 px-24">{children}</div>
+      <div className="absolute inset-0 pt-32 pb-24 px-24">
+        {isChromeDark && mode !== "dark" ? (
+          <SlideModeContext.Provider value="dark">{children}</SlideModeContext.Provider>
+        ) : (
+          children
+        )}
+      </div>
       {/* Footer (locked) — micro uppercase, hairline aligned to page number. */}
       <div
         className="absolute bottom-10 left-24 right-24 flex items-center justify-between uppercase"
