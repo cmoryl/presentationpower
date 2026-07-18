@@ -279,6 +279,7 @@ export function StatFigure({
     : `min(${spec.unitPx}px, 6.5cqw)`;
   return (
     <div
+      data-stat-figure={size}
       className={`min-w-0 max-w-full overflow-hidden ${align === "center" ? "flex flex-col items-center text-center" : ""}`}
       style={{ containerType: "inline-size", contain: "inline-size" }}
     >
