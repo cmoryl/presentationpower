@@ -1674,6 +1674,33 @@ export const useDeckStore = create<DeckState>()(
         }));
       },
 
+      applySlideBackground: (deckId, slideIds, background) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const ids = new Set(slideIds);
+        if (ids.size === 0) return;
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) =>
+                ids.has(sl.id)
+                  ? {
+                      ...sl,
+                      content: (background === null || background === undefined
+                        ? (() => {
+                            const { background: _drop, ...rest } = sl.content as Record<string, unknown>;
+                            return rest as SlideContent;
+                          })()
+                        : ({ ...(sl.content as Record<string, unknown>), background } as SlideContent)),
+                    }
+                  : sl,
+              ),
+            },
+          },
+        }));
+
       swapVariant: (deckId, slideId, newVariantId) => {
         const deck = get().decks[deckId];
         if (!deck) return;
