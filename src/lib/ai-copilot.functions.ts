@@ -452,19 +452,24 @@ export const copilotTurn = createServerFn({ method: "POST" })
     const changedIndices: number[] = [];
     for (const s of working) {
       const o = originals.get(s.index)!;
-      const contentChanged = !deepEqual(o.content, s.content) ||
-        s.variantId !== data.slides.find((d) => d.index === s.index)!.variantId ||
-        s.layoutId !== data.slides.find((d) => d.index === s.index)!.layoutId;
-      if (contentChanged) {
+      const orig = data.slides.find((d) => d.index === s.index)!;
+      const notesChanged = s.notes !== (orig.notes ?? "");
+      const changedAny = !deepEqual(o.content, s.content) ||
+        s.variantId !== orig.variantId ||
+        s.layoutId !== orig.layoutId ||
+        notesChanged;
+      if (changedAny) {
         changed.push({
           index: s.index,
           variantId: s.variantId,
           layoutId: s.layoutId,
           content: s.content,
+          notes: notesChanged ? s.notes : undefined,
         });
         changedIndices.push(s.index);
       }
     }
+
 
     return {
       ok: true,
