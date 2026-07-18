@@ -309,12 +309,60 @@ function VariantCard({
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
   const singleRef = useRef<HTMLDivElement | null>(null);
+
+  // Track WCAG reports for BOTH modes so the card can display a persistent
+  // warning even when only one mode is visible on screen.
+  const [reportLight, setReportLight] = useState<WcagReport | null>(null);
+  const [reportDark, setReportDark] = useState<WcagReport | null>(null);
+  const onLight = useCallback((r: WcagReport) => setReportLight(r), []);
+  const onDark = useCallback((r: WcagReport) => setReportDark(r), []);
+
+  const worstLevel = (() => {
+    const levels = [reportLight?.overall, reportDark?.overall].filter(Boolean) as WcagReport["overall"][];
+    if (!levels.length) return null;
+    if (levels.includes("FAIL")) return "FAIL" as const;
+    if (levels.includes("AA-Large")) return "AA-Large" as const;
+    if (levels.every((l) => l === "AAA")) return "AAA" as const;
+    return "AA" as const;
+  })();
+  const warnTone =
+    worstLevel === "FAIL"
+      ? "bg-red-600 text-white ring-red-200"
+      : worstLevel === "AA-Large"
+        ? "bg-amber-500 text-amber-950 ring-amber-100"
+        : null;
+  const warnLabel =
+    worstLevel === "FAIL"
+      ? "⚠ Low contrast"
+      : worstLevel === "AA-Large"
+        ? "⚠ AA-Large only"
+        : null;
+  const worstDetail = (() => {
+    if (!warnLabel) return "";
+    const parts: string[] = [];
+    if (reportLight && reportLight.overall !== "AA" && reportLight.overall !== "AAA")
+      parts.push(`Light: ${reportLight.minRatio}:1 (${reportLight.aaFail} failing)`);
+    if (reportDark && reportDark.overall !== "AA" && reportDark.overall !== "AAA")
+      parts.push(`Dark: ${reportDark.minRatio}:1 (${reportDark.aaFail} failing)`);
+    return parts.join(" · ");
+  })();
+
   return (
     <button
       type="button"
       onClick={onOpen}
       className="group relative block w-full overflow-hidden rounded-[24px] border border-slate-200 bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:border-[#003FC7]/20 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)]"
     >
+      {/* Card-level automatic contrast warning (always on, both modes checked) */}
+      {warnLabel && warnTone && (
+        <div
+          className={`pointer-events-none absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest shadow ring-1 backdrop-blur ${warnTone}`}
+          title={worstDetail || "Automatic WCAG audit flagged low-contrast text in this variant."}
+        >
+          {warnLabel}
+        </div>
+      )}
+
       {isAB ? (
         <div className="m-2 grid grid-cols-2 gap-2">
           {(["light", "dark"] as const).map((m) => (
@@ -334,6 +382,7 @@ function VariantCard({
                   targetRef={m === "dark" ? darkRef : lightRef}
                   enabled={wcagOn}
                   compact
+                  onReport={m === "dark" ? onDark : onLight}
                 />
               </div>
               <div className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest backdrop-blur ${m === "dark" ? "bg-white/15 text-white ring-1 ring-white/25" : "bg-black/70 text-white"}`}>
@@ -362,7 +411,28 @@ function VariantCard({
           mode={isDark ? "dark" : "light"}
           targetRef={singleRef}
           enabled={wcagOn}
+          onReport={isDark ? onDark : onLight}
         />
+
+        {/* Off-screen audit of the OPPOSITE mode so the card can warn about
+            low contrast in a theme that isn't currently displayed. */}
+        <HiddenAuditFrame
+          bg={isDark ? "#F2F2F2" : "#03002C"}
+          deps={[variant.id, brand.id, isDark, showImagery]}
+          onReport={isDark ? onLight : onDark}
+        >
+          <SlideBackdropContext.Provider
+            value={showImagery ? backdropForVariant(variant, brand.id, isDark ? "light" : "dark") : null}
+          >
+            <VariantRenderer
+              slide={previewSlide}
+              variant={variant}
+              brand={brand}
+              pageNumber={1}
+              mode={isDark ? "light" : "dark"}
+            />
+          </SlideBackdropContext.Provider>
+        </HiddenAuditFrame>
 
         {/* Subtle top-right specular gradient */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.08]" />
