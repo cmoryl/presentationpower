@@ -5,6 +5,7 @@
 import type { TemplatePayload } from "./deck-store";
 import { SQUARE_IMAGE_TEMPLATE } from "./imported-templates/square-image";
 import { INFOGRAPHICS_IMAGES_TEMPLATE } from "./imported-templates/infographics-images";
+import { validateKitPayload, formatKitValidationError, type KitValidationResult } from "./kit-validation";
 
 export type ModulePresetKit = {
   key: string;
@@ -32,3 +33,20 @@ export const MODULE_PRESET_KITS: ModulePresetKit[] = [
     payload: INFOGRAPHICS_IMAGES_TEMPLATE,
   },
 ];
+
+/** Validate a kit's slides against SECTION_FRAMEWORKS permitted families. */
+export function validateKit(kit: ModulePresetKit): KitValidationResult {
+  return validateKitPayload(kit.payload);
+}
+
+// Dev-time integrity check — surface mismatches in the registry loudly.
+if (import.meta.env.DEV) {
+  for (const kit of MODULE_PRESET_KITS) {
+    const result = validateKit(kit);
+    if (!result.valid) {
+      // eslint-disable-next-line no-console
+      console.warn("[module-preset-kits] " + formatKitValidationError(kit.title, result));
+    }
+  }
+}
+
