@@ -122,7 +122,7 @@ export type TemplatePayload = {
   archetypeId: string;
   subCompany?: string | null;
   context?: Record<string, unknown> | null;
-  slides: Array<{ sectionId: string; variantId: string; layoutId: string; content: SlideContent }>;
+  slides: Array<{ sectionId: string; variantId: string; layoutId: string; content: SlideContent; notes?: string | null }>;
   brief?: {
     prospect?: string;
     industry?: string;
@@ -132,6 +132,7 @@ export type TemplatePayload = {
     clientFacts?: string;
   } | null;
 };
+
 
 
 
