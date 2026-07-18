@@ -13,24 +13,28 @@ type Props = {
   mode: "light" | "dark";
   /** Rendered slide container ref to audit. */
   targetRef: React.RefObject<HTMLElement | null>;
-  /** When true, run audit and render badge. */
+  /** When true, render the full detailed badge with approve controls. */
   enabled: boolean;
   /** Compact placement inside preview card. */
   compact?: boolean;
+  /** Fired whenever a fresh report is computed (even when `enabled` is false). */
+  onReport?: (report: WcagReport) => void;
 };
 
 /**
  * Non-interactive WCAG contrast badge that scans the rendered slide DOM,
  * computes the lowest text/background contrast ratio, classifies it against
  * WCAG 2.1, and lets a reviewer approve or reject the pairing per (variant × mode).
+ *
+ * The audit itself always runs so the card can surface a warning icon; only
+ * the visible badge chrome is gated behind `enabled`.
  */
-export function WcagBadge({ variantId, mode, targetRef, enabled, compact = false }: Props) {
+export function WcagBadge({ variantId, mode, targetRef, enabled, compact = false, onReport }: Props) {
   const [report, setReport] = useState<WcagReport | null>(null);
   const [approval, setApproval] = useState<Approval | null>(null);
   const runId = useRef(0);
 
   useEffect(() => {
-    if (!enabled) return;
     const el = targetRef.current;
     if (!el) return;
     const id = ++runId.current;
@@ -38,19 +42,20 @@ export function WcagBadge({ variantId, mode, targetRef, enabled, compact = false
     const t = window.setTimeout(() => {
       if (id !== runId.current) return;
       try {
-        setReport(auditNode(el));
+        const r = auditNode(el);
+        setReport(r);
+        onReport?.(r);
       } catch {
         /* ignore */
       }
     }, 260);
     return () => window.clearTimeout(t);
-  }, [enabled, targetRef, mode, variantId]);
+  }, [targetRef, mode, variantId, onReport]);
 
   useEffect(() => {
-    if (!enabled) return;
     const all = loadApprovals();
     setApproval(all[`${variantId}::${mode}`] ?? null);
-  }, [enabled, variantId, mode]);
+  }, [variantId, mode]);
 
   if (!enabled) return null;
 
