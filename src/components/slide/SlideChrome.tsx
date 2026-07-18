@@ -68,10 +68,11 @@ export function SlideFrame({
   const mode = useSlideMode();
   const backdrop = useContext(SlideBackdropContext);
   const isChromeDark = variant === "cover" || variant === "divider" || variant === "close";
-  const slideDark = mode === "dark";
+  const slideDark = mode === "dark" || isChromeDark;
   // Baseline variants are simple and readable: white slides with ink text in
-  // light mode, dark navy slides with white text in dark mode. Imagery only
-  // opts into the scrim treatment when explicitly enabled.
+  // light mode, dark navy slides with white text in dark mode. Cover / divider
+  // / close chrome always renders on the dark navy surface regardless of
+  // theme so hero titles keep their editorial contrast.
   const hasBackdrop = !!backdrop;
   const hasBackdropImage = !!backdrop?.url;
   const hasBackdropCss = !!(backdrop?.css && !backdrop?.url);
