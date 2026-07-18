@@ -185,21 +185,36 @@ export function applyAutoFix(root: HTMLElement): number {
     const large = fontSize >= 24 || (fontSize >= 18.66 && weight >= 700);
     const ratio = contrastRatio(fg, bg);
     if (!ratio) return;
-    const lvl = levelFor(ratio, large);
-    if (lvl !== "FAIL" && lvl !== "AA-Large") return;
+    // Boost anything below AA (4.5:1 for normal, 3:1 for large text).
+    const passesAA = large ? ratio >= 3 : ratio >= 4.5;
+    if (passesAA) return;
 
     // Pick the polarity that maximizes contrast against the effective bg.
     const rDark = contrastRatio(DARK_ON_LIGHT, bg);
     const rLight = contrastRatio(LIGHT_ON_DARK, bg);
-    const target = rLight > rDark ? LIGHT_ON_DARK : DARK_ON_LIGHT;
+    const useLight = rLight >= rDark;
+    const target = useLight ? LIGHT_ON_DARK : DARK_ON_LIGHT;
     if (!el.dataset.wcagOriginal) el.dataset.wcagOriginal = el.style.color;
     el.style.setProperty("color", target, "important");
     el.style.setProperty("opacity", "1", "important");
+
+    // If even the best polarity still doesn't clear AA (common over midtone
+    // imagery), add a legibility text-shadow scrim so the badge audit and the
+    // human eye both see a clear pass against the actual pixels behind it.
+    const bestRatio = Math.max(rDark, rLight);
+    if (bestRatio < (large ? 3 : 4.5)) {
+      const shadow = useLight
+        ? "0 1px 2px rgba(0,0,0,0.85), 0 0 6px rgba(0,0,0,0.65)"
+        : "0 1px 2px rgba(255,255,255,0.85), 0 0 6px rgba(255,255,255,0.65)";
+      el.style.setProperty("text-shadow", shadow, "important");
+      if (!el.dataset.wcagShadow) el.dataset.wcagShadow = "1";
+    }
     el.dataset.wcagFixed = "1";
     fixed++;
   });
   return fixed;
 }
+
 
 export function revertAutoFix(root: HTMLElement) {
   const nodes = root.querySelectorAll<HTMLElement>("[data-wcag-fixed]");
