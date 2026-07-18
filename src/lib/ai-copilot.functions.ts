@@ -232,7 +232,21 @@ const TOOLS: AnthropicToolDef[] = [
       required: ["index", "variantId"],
     },
   },
+  {
+    name: "update_slide_notes",
+    description:
+      "Set the private speaker notes for a slide. Notes are free text used only during presenter mode and PPTX export; they never appear on the slide itself.",
+    input_schema: {
+      type: "object",
+      properties: {
+        index: { type: "integer", minimum: 0 },
+        notes: { type: "string", description: "Full speaker notes text. Replaces existing notes." },
+      },
+      required: ["index", "notes"],
+    },
+  },
 ];
+
 
 // ---------------------------------------------------------------------------
 // Server function
