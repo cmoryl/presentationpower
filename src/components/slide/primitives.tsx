@@ -269,12 +269,18 @@ export function StatFigure({
   //     font-size ceiling so very wide values step down automatically before
   //     they touch the next column;
   //   • tighten letter-spacing on the value so long strings stay compact.
-  const valueFontSize = `min(${spec.valuePx}px, 22cqw)`;
-  const unitFontSize = `min(${spec.unitPx}px, 8cqw)`;
+  const unitText = unit?.trim() ?? "";
+  const unitIsLong = /\s|·|\/|–|-/.test(unitText) || unitText.length > 6;
+  const valueFontSize = unitIsLong
+    ? `min(${spec.valuePx}px, 18cqw)`
+    : `min(${spec.valuePx}px, 20cqw)`;
+  const unitFontSize = unitIsLong
+    ? `min(${Math.max(32, Math.round(spec.unitPx * 0.58))}px, 5.6cqw)`
+    : `min(${spec.unitPx}px, 6.5cqw)`;
   return (
     <div
-      className={`min-w-0 max-w-full ${align === "center" ? "flex flex-col items-center text-center" : ""}`}
-      style={{ containerType: "inline-size" }}
+      className={`min-w-0 max-w-full overflow-hidden ${align === "center" ? "flex flex-col items-center text-center" : ""}`}
+      style={{ containerType: "inline-size", contain: "inline-size" }}
     >
       <div
         className="font-semibold tabular-nums"
@@ -286,18 +292,37 @@ export function StatFigure({
           whiteSpace: "nowrap",
           overflowWrap: "normal",
           maxWidth: "100%",
+          overflow: "hidden",
+          textOverflow: "clip",
         }}
       >
-        {value || "—"}
-        {unit && (
+        <span>{value || "—"}</span>
+        {unitText && !unitIsLong && (
           <span
             className="ml-2 font-medium align-top"
             style={{ fontSize: unitFontSize, color: uc, letterSpacing: "-0.02em" }}
           >
-            {unit}
+            {unitText}
           </span>
         )}
       </div>
+      {unitText && unitIsLong && (
+        <div
+          className={align === "center" ? "mx-auto mt-2 font-medium" : "mt-2 font-medium"}
+          style={{
+            fontSize: unitFontSize,
+            lineHeight: 1.08,
+            letterSpacing: "-0.015em",
+            color: uc,
+            maxWidth: "100%",
+            overflow: "hidden",
+            overflowWrap: "anywhere",
+            wordBreak: "normal",
+          }}
+        >
+          {unitText}
+        </div>
+      )}
       {label && (
         <div
           className={monoLabel ? "mt-6 font-semibold uppercase" : "mt-6"}
