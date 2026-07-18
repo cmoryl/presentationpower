@@ -39,6 +39,7 @@ const DeckSchema = z.object({
   archetypeId: z.string(),
   slides: z.array(SlideSchema),
   context: z.record(z.string(), z.unknown()).optional(),
+  isTemplate: z.boolean().optional(),
 });
 
 
