@@ -2416,7 +2416,10 @@ function renderVariantBody({
               const trendColor = trend === "down" ? brand.tokens.accent : brand.tokens.accent;
               return (
                 <div key={i} className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                  <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "rgba(10,15,28,0.6)", fontWeight: 600 }}>{s(it.label)}</div>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "rgba(10,15,28,0.6)", fontWeight: 600 }}>{s(it.label)}</div>
+                    <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="glyph" />
+                  </div>
                   <div className="mt-4 flex items-baseline gap-2">
                     <span className="tabular-nums font-semibold" style={{ fontSize: 88, lineHeight: 0.95, letterSpacing: "-0.025em", color: brand.tokens.primary }}>{s(it.value)}</span>
                     {s(it.unit) && <span className="font-medium" style={{ fontSize: 34, color: brand.tokens.accent, letterSpacing: "-0.015em" }}>{s(it.unit)}</span>}
