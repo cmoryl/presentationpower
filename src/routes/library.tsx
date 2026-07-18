@@ -1,8 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { WcagBadge } from "@/components/WcagBadge";
-import { HiddenAuditFrame } from "@/components/HiddenAuditFrame";
-import type { WcagReport } from "@/lib/wcag";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Download, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
@@ -235,7 +232,6 @@ function VariantCard({
   preferred,
   mode = "light",
   showImagery = false,
-  wcagOn = false,
   autoFixOn = false,
   onOpen,
 }: {
@@ -246,7 +242,6 @@ function VariantCard({
   preferred?: boolean;
   mode?: "light" | "dark" | "ab";
   showImagery?: boolean;
-  wcagOn?: boolean;
   autoFixOn?: boolean;
   onOpen: () => void;
 }) {
