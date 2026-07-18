@@ -105,7 +105,7 @@ export async function exportDeckToPptx(
   const slideImages: Array<string | null> = await Promise.all(
     deck.slides.map((slide) => {
       const c = slide.content as Record<string, unknown>;
-      const url = resolveSlideImageUrl(deck.brandModeId, c);
+      const url = resolveSlideImageUrl(slide.variantId, deck.brandModeId, c);
       return url ? fetchAsDataUrl(url) : Promise.resolve(null);
     }),
   );
