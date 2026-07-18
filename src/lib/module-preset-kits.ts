@@ -5,6 +5,7 @@
 import type { TemplatePayload } from "./deck-store";
 import { SQUARE_IMAGE_TEMPLATE } from "./imported-templates/square-image";
 import { INFOGRAPHICS_IMAGES_TEMPLATE } from "./imported-templates/infographics-images";
+import { COMMUNITY_EVENT_TEMPLATE } from "./imported-templates/community-event";
 import { validateKitPayload, formatKitValidationError, type KitValidationResult } from "./kit-validation";
 
 export type ModulePresetKit = {
@@ -31,6 +32,14 @@ export const MODULE_PRESET_KITS: ModulePresetKit[] = [
     blurb:
       "20 modular infographic layouts — 2/3/4-point splits, matrix, bento, funnels, journey maps, KPI dashboard and stat grids.",
     payload: INFOGRAPHICS_IMAGES_TEMPLATE,
+  },
+  {
+    key: "community-event",
+    title: "Community Event · Pulse Fest Kit",
+    tag: "Event",
+    blurb:
+      "Imported event deck — covers, agenda, speaker bios, program grid, sponsor logos, quote posters, and closing CTA slides.",
+    payload: COMMUNITY_EVENT_TEMPLATE,
   },
 ];
 
