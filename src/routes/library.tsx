@@ -205,7 +205,7 @@ function Library() {
           brands={brandModes}
           brandIdx={brandIdx}
           setBrandIdx={setBrandIdx}
-          mode={mode}
+          mode={mode === "ab" ? "light" : mode}
           setMode={setMode}
           showImagery={showImagery}
           setShowImagery={setShowImagery}
