@@ -100,6 +100,7 @@ export const saveDeckToCloud = createServerFn({ method: "POST" })
       brand_mode_id: data.deck.brandModeId,
       status: "draft",
       context: deckContext as never,
+      is_template: data.deck.isTemplate ?? false,
     });
     if (deckErr) throw new Error(deckErr.message);
 
