@@ -295,6 +295,7 @@ function VariantCard({
   mode = "light",
   showImagery = false,
   wcagOn = false,
+  autoFixOn = false,
   onOpen,
 }: {
   variant: ModuleVariant;
@@ -305,6 +306,7 @@ function VariantCard({
   mode?: "light" | "dark" | "ab";
   showImagery?: boolean;
   wcagOn?: boolean;
+  autoFixOn?: boolean;
   onOpen: () => void;
 }) {
   const previewSlide = {
