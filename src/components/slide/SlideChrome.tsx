@@ -19,10 +19,15 @@ export function useSlideMode(): SlideMode {
 }
 
 // Optional imagery layer rendered BEHIND the slide content. When set, the
-// SlideFrame replaces its opaque token background with the image + a gradient
-// scrim so content stays legible with real alpha-blended photography.
+// SlideFrame replaces its opaque token background with either a photo + scrim
+// (`url`) or a CSS background layer (`css` — used by the curated background
+// library for gradients / SVG patterns).
 export type SlideBackdrop = {
-  url: string;
+  // Photo URL (upload / AI / library photo). Optional when `css` is set.
+  url?: string;
+  // Raw CSS `background` shorthand (gradient or pattern). Used when `url`
+  // is absent — allows on-brand gradients & patterns without an image.
+  css?: string;
   // Scrim direction/strength. "bottom" darkens lower half, "left" darkens
   // left half, "full" applies an even overlay, "vignette" a radial darken.
   scrim?: "bottom" | "left" | "right" | "top" | "full" | "vignette";
@@ -32,6 +37,8 @@ export type SlideBackdrop = {
   imageDim?: number;
   // Tint color for the scrim (defaults to brand ink navy).
   tint?: string;
+  // Hint that chrome text/logo should render on a dark surface.
+  darkChrome?: boolean;
 };
 export const SlideBackdropContext = createContext<SlideBackdrop | null>(null);
 
