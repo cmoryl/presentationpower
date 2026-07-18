@@ -188,6 +188,15 @@ function DeckEditor() {
             />
           )}
 
+          {/* Background & Imagery */}
+          {active && (
+            <BackgroundImageryPanel
+              key={`bg-${active.id}`}
+              value={(active.content as Record<string, unknown>).background}
+              onChange={(next) => updateField(deck.id, active.id, "background", next)}
+            />
+          )}
+
           {/* AI change log */}
 
           {active && active.changes.filter((c) => c.accepted).length > 0 && (
