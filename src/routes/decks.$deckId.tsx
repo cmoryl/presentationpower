@@ -247,6 +247,7 @@ function DeckEditor() {
               brand={brand}
               open={pptxPreviewOpen}
               onClose={() => setPptxPreviewOpen(false)}
+              onApplyBackground={(next) => applySlideBackground(deck.id, [active.id], next)}
             />
           )}
 
