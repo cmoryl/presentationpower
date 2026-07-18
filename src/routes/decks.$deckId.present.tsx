@@ -22,12 +22,20 @@ function PresenterView() {
   const navigate = useNavigate();
   const [i, setI] = useState(0);
   const [stripOpen, setStripOpen] = useState(true);
+  const [notesOpen, setNotesOpen] = useState(false);
   const [focusedThumb, setFocusedThumb] = useState(0);
 
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
   const slide = deck.slides[i];
+  const nextSlide = deck.slides[i + 1];
+  const nextVariant = nextSlide ? byId(MODULE_VARIANTS, nextSlide.variantId) : undefined;
   const variant = slide ? byId(MODULE_VARIANTS, slide.variantId) : undefined;
+  const sectionKeyMsg = slide
+    ? deck.strategy?.recommendedSections?.find((r) => r.sectionId === slide.sectionId)?.keyMessage
+    : undefined;
+  const notesText = slide?.notes?.trim() || sectionKeyMsg || "";
+
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
