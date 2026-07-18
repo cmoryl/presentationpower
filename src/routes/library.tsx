@@ -181,7 +181,7 @@ function Library() {
         ))}
       </div>
 
-      <ModulePresetKitsBlock />
+      
 
       <div className="mt-10">
         <Link to="/brief/new" className="rounded-full bg-[#03002C] px-5 py-2.5 text-sm text-white">
