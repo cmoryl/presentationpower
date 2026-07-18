@@ -67,40 +67,45 @@ export async function exportDeckToPptx(
     const slide = deck.slides[i];
     const kind = classifyVariant(slide.variantId, i);
     const s = pptx.addSlide();
-    const isDark = kind === "cover" || kind === "divider";
+    const advancedDark = slide.variantId === "MV-COUNTDOWN";
+    const isDark = advancedDark || kind === "cover" || kind === "divider";
+    const useWhiteLogo = isDark || slide.variantId === "MV-SPLIT-MANIFESTO";
+    const hideFooter = useWhiteLogo;
     s.background = { color: isDark ? palette.primary : "FFFFFF" };
 
     try {
-      switch (kind) {
-        case "cover":
-          renderCover(s, slide, palette);
-          break;
-        case "divider":
-          renderDivider(s, slide, palette);
-          break;
-        case "agenda":
-          renderAgenda(s, slide, palette);
-          break;
-        case "stats":
-          renderStats(s, slide, palette);
-          break;
-        case "quote":
-          renderQuote(s, slide, palette);
-          break;
-        case "callout":
-          renderCallout(s, slide, palette);
-          break;
-        case "cards":
-          renderCards(s, slide, palette);
-          break;
-        case "timeline":
-          renderTimeline(s, slide, palette);
-          break;
-        case "compare":
-          renderCompare(s, slide, palette);
-          break;
-        default:
-          renderContent(s, slide, palette);
+      if (!renderAdvancedVariant(s, slide, palette)) {
+        switch (kind) {
+          case "cover":
+            renderCover(s, slide, palette);
+            break;
+          case "divider":
+            renderDivider(s, slide, palette);
+            break;
+          case "agenda":
+            renderAgenda(s, slide, palette);
+            break;
+          case "stats":
+            renderStats(s, slide, palette);
+            break;
+          case "quote":
+            renderQuote(s, slide, palette);
+            break;
+          case "callout":
+            renderCallout(s, slide, palette);
+            break;
+          case "cards":
+            renderCards(s, slide, palette);
+            break;
+          case "timeline":
+            renderTimeline(s, slide, palette);
+            break;
+          case "compare":
+            renderCompare(s, slide, palette);
+            break;
+          default:
+            renderContent(s, slide, palette);
+        }
       }
     } catch {
       // Any per-slide renderer bug falls back to the generic mapping.
