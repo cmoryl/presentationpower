@@ -153,3 +153,61 @@ export function clearApproval(variantId: string, mode: "light" | "dark") {
   delete all[`${variantId}::${mode}`];
   localStorage.setItem(APPROVAL_KEY, JSON.stringify(all));
 }
+
+// ---- Auto-fix: color-boost failing text nodes ----
+
+/**
+ * Walks the subtree and, for every text-bearing node whose computed contrast
+ * ratio falls below 4.5:1 (or 3:1 for large text), forces its color to the
+ * nearest AA-passing token (near-black on light, near-white on dark). Returns
+ * the number of nodes patched.
+ *
+ * Non-destructive: writes an inline `color` style on the failing element and
+ * tags it with `data-wcag-fixed` so the change can be reverted with
+ * `revertAutoFix`.
+ */
+export function applyAutoFix(root: HTMLElement): number {
+  const LIGHT_ON_DARK = "#FFFFFF";
+  const DARK_ON_LIGHT = "#03002C";
+  let fixed = 0;
+  const nodes = root.querySelectorAll<HTMLElement>("*");
+  nodes.forEach((el) => {
+    const ownText = Array.from(el.childNodes).some(
+      (n) => n.nodeType === 3 && (n.textContent ?? "").trim(),
+    );
+    if (!ownText) return;
+    const cs = getComputedStyle(el);
+    if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
+    const fg = cs.color;
+    const bg = effectiveBg(el);
+    const fontSize = parseFloat(cs.fontSize);
+    const weight = parseInt(cs.fontWeight, 10) || 400;
+    const large = fontSize >= 24 || (fontSize >= 18.66 && weight >= 700);
+    const ratio = contrastRatio(fg, bg);
+    if (!ratio) return;
+    const lvl = levelFor(ratio, large);
+    if (lvl !== "FAIL" && lvl !== "AA-Large") return;
+
+    // Pick the polarity that maximizes contrast against the effective bg.
+    const rDark = contrastRatio(DARK_ON_LIGHT, bg);
+    const rLight = contrastRatio(LIGHT_ON_DARK, bg);
+    const target = rLight > rDark ? LIGHT_ON_DARK : DARK_ON_LIGHT;
+    if (!el.dataset.wcagOriginal) el.dataset.wcagOriginal = el.style.color;
+    el.style.setProperty("color", target, "important");
+    el.style.setProperty("opacity", "1", "important");
+    el.dataset.wcagFixed = "1";
+    fixed++;
+  });
+  return fixed;
+}
+
+export function revertAutoFix(root: HTMLElement) {
+  const nodes = root.querySelectorAll<HTMLElement>("[data-wcag-fixed]");
+  nodes.forEach((el) => {
+    el.style.color = el.dataset.wcagOriginal ?? "";
+    el.style.removeProperty("opacity");
+    delete el.dataset.wcagFixed;
+    delete el.dataset.wcagOriginal;
+  });
+}
+

@@ -55,6 +55,7 @@ function Library() {
   
   const [showImagery, setShowImagery] = useState(false);
   const [wcagOn, setWcagOn] = useState(false);
+  const [autoFixOn, setAutoFixOn] = useState(false);
   const [approvalTick, setApprovalTick] = useState(0);
   const approvals = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -204,6 +205,19 @@ function Library() {
           >
             ⚖ WCAG {wcagOn ? "on" : "off"}
           </button>
+          <button
+            type="button"
+            onClick={() => setAutoFixOn((v) => !v)}
+            aria-pressed={autoFixOn}
+            title="Auto-boost failing text nodes to the nearest AA-passing color on every card"
+            className={`rounded-full border px-3 py-1.5 text-xs ${
+              autoFixOn
+                ? "border-blue-600 bg-blue-600 text-white"
+                : "border-black/15 bg-white text-black/70 hover:text-black"
+            }`}
+          >
+            ✨ Auto-fix {autoFixOn ? "on" : "off"}
+          </button>
           {wcagOn && (approvalSummary.approved + approvalSummary.rejected > 0) && (
             <span className="rounded-full bg-black/5 px-3 py-1 text-[11px] text-black/70">
               <span className="font-semibold text-emerald-700">{approvalSummary.approved} approved</span>
@@ -234,6 +248,7 @@ function Library() {
             mode={mode}
             showImagery={showImagery}
             wcagOn={wcagOn}
+            autoFixOn={autoFixOn}
             onOpen={() => setOpenId(v.id)}
           />
         ))}
@@ -280,6 +295,7 @@ function VariantCard({
   mode = "light",
   showImagery = false,
   wcagOn = false,
+  autoFixOn = false,
   onOpen,
 }: {
   variant: ModuleVariant;
@@ -290,6 +306,7 @@ function VariantCard({
   mode?: "light" | "dark" | "ab";
   showImagery?: boolean;
   wcagOn?: boolean;
+  autoFixOn?: boolean;
   onOpen: () => void;
 }) {
   const previewSlide = {
@@ -309,6 +326,27 @@ function VariantCard({
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
   const singleRef = useRef<HTMLDivElement | null>(null);
+  const [fixedCount, setFixedCount] = useState(0);
+
+  // Apply / revert the auto-fix on the currently-visible slide refs.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const targets = isAB
+      ? [lightRef.current, darkRef.current]
+      : [singleRef.current];
+    let total = 0;
+    // Delay so VariantRenderer's paint settles and audit has a chance to run.
+    const t = window.setTimeout(async () => {
+      const { applyAutoFix, revertAutoFix } = await import("@/lib/wcag");
+      for (const el of targets) {
+        if (!el) continue;
+        revertAutoFix(el);
+        if (autoFixOn) total += applyAutoFix(el);
+      }
+      setFixedCount(total);
+    }, 320);
+    return () => window.clearTimeout(t);
+  }, [autoFixOn, isAB, variant.id, brand.id, showImagery, isDark]);
 
   // Track WCAG reports for BOTH modes so the card can display a persistent
   // warning even when only one mode is visible on screen.
@@ -360,6 +398,14 @@ function VariantCard({
           title={worstDetail || "Automatic WCAG audit flagged low-contrast text in this variant."}
         >
           {warnLabel}
+        </div>
+      )}
+      {autoFixOn && fixedCount > 0 && (
+        <div
+          className="pointer-events-none absolute right-3 top-11 z-20 inline-flex items-center gap-1 rounded-full bg-blue-600 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-blue-200 backdrop-blur"
+          title={`Auto-fix boosted ${fixedCount} text node${fixedCount === 1 ? "" : "s"} to an AA-passing color.`}
+        >
+          ✨ Fixed {fixedCount}
         </div>
       )}
 
