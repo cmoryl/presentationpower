@@ -233,6 +233,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
                     {shareBusy ? "Working…" : "Disable"}
                   </button>
                 </div>
+                <AnalyticsLine analytics={analytics} />
               </div>
             ) : (
               <button
