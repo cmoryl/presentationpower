@@ -32,7 +32,17 @@ function seedHash(str: string): number {
  *     the division-specific imagery library via a deterministic hash.
  *  Returns null when no imagery is warranted (agenda / stats / etc.).
  */
-function resolveSlideImageUrl(brandId: string, c: Record<string, unknown>): string | null {
+function resolveSlideImageUrl(
+  variantId: string,
+  brandId: string,
+  c: Record<string, unknown>,
+): string | null {
+  // Only variants that render slide-level imagery are eligible. This
+  // matches `variantSupportsImagery` in src/lib/variant-media.ts and
+  // prevents non-image variants from surfacing an orphaned photograph
+  // during export even if `mediaUrl` / `mediaSeed` accidentally leaked
+  // through from an older deck record.
+  if (!variantSupportsImagery(variantId)) return null;
   const url = typeof c.mediaUrl === "string" && c.mediaUrl.length > 0 ? c.mediaUrl : null;
   if (url) return url;
   const seed = typeof c.mediaSeed === "string" && c.mediaSeed.length > 0 ? c.mediaSeed : null;
