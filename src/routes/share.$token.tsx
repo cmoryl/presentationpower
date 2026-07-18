@@ -65,7 +65,7 @@ function ShareView() {
   if (state.kind === "error") {
     return <NotActive message={state.message} />;
   }
-  return <SharedDeckView deck={state.deck} />;
+  return <SharedDeckView deck={state.deck} token={token} />;
 }
 
 function NotActive({ message }: { message?: string }) {
