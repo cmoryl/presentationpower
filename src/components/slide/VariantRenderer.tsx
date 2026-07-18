@@ -279,7 +279,7 @@ function renderVariantBody({
     case "MV-OP-COVER-MEDIA":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
           {/* Cinematic scrim — gradient from primary bottom-left to transparent top-right */}
           <div
             className="absolute inset-0"
@@ -1499,7 +1499,7 @@ function renderVariantBody({
     case "MV-IMG-FULL-BLEED":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "hero"))} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "hero"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
           <div
             className="absolute inset-0"
             style={{ backgroundImage: `linear-gradient(180deg, ${brand.tokens.primary}33 0%, ${brand.tokens.primary}99 55%, ${brand.tokens.primary}E6 100%)` }}
@@ -1517,7 +1517,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-2 gap-14">
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "split"))} className="h-full w-full" />
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "split"))} overrideUrl={s(c.mediaUrl)} className="h-full w-full" />
             <div className="flex flex-col justify-center">
               <SlideTitle brand={brand} title={s(c.title)} />
               <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={720}>{s(c.body)}</SupportingText>
@@ -1537,7 +1537,7 @@ function renderVariantBody({
           <div className="flex h-full flex-col items-center justify-center">
             <Kicker brand={brand}>{s(c.title, "In focus")}</Kicker>
             <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "framed"))} className="aspect-[16/9] w-[80%]" />
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "framed"))} overrideUrl={s(c.mediaUrl)} className="aspect-[16/9] w-[80%]" />
             <SupportingText size="lg" opacity={0.85} className="mt-10 text-center" maxWidthPx={1100}>{s(c.caption)}</SupportingText>
             {s(c.credit) && (
               <MetaRow className="mt-6">
@@ -1587,7 +1587,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-[1fr_1.3fr] gap-14">
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.name, "portrait"))} className="h-full w-full" portrait />
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.name, "portrait"))} overrideUrl={s(c.mediaUrl)} className="h-full w-full" portrait />
             <div className="flex flex-col justify-center">
               <Kicker brand={brand}>{s(c.role)}</Kicker>
               <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
@@ -1608,7 +1608,7 @@ function renderVariantBody({
     case "MV-IMG-QUOTE-BG":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote"))} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
           <div
             aria-hidden
             className="absolute inset-0"
@@ -3638,12 +3638,20 @@ function MediaTile({
   className,
   portrait,
   muted,
+  overrideUrl,
 }: {
   brand: BrandMode;
   seed: string;
   className?: string;
   portrait?: boolean;
   muted?: boolean;
+  /**
+   * When set (e.g. from a PPTX import that carried through the original
+   * picture), skip the deterministic backdrop lookup and render this exact
+   * image. Non-empty strings only — falsy values fall back to the seeded
+   * division imagery so text-only decks keep their curated look.
+   */
+  overrideUrl?: string;
 }) {
   const mode = useContext(SlideModeContext);
   const h = hash(seed || brand.id);
@@ -3652,7 +3660,10 @@ function MediaTile({
   // Division-specific imagery: photos + abstracts for the active brand.
   const divSet = getDivisionImagery(brand.id);
   const tileBackdrops = [...divSet.photos, ...divSet.abstracts];
-  const url = tileBackdrops[h % tileBackdrops.length];
+  const url =
+    overrideUrl && overrideUrl.length > 0
+      ? overrideUrl
+      : tileBackdrops[h % tileBackdrops.length];
   const accent = brand.tokens.accent;
   const primary = brand.tokens.primary;
 

@@ -146,7 +146,8 @@ type DeckState = {
   createImportedDeck: (input: {
     title: string;
     brief: Omit<Brief, "id" | "createdAt">;
-    slides: Array<{ sectionId: string; variantId: string; layoutId: string; content: SlideContent }>;
+    slides: Array<{ sectionId: string; variantId: string; layoutId: string; content: SlideContent; notes?: string }>;
+    context?: Partial<DeckContext>;
   }) => { briefId: string; deckId: string };
   applyAiContent: (deckId: string, aiSlides: Array<{ id: string; content: SlideContent }>) => void;
   applyCopilotUpdates: (
@@ -1536,8 +1537,10 @@ export const useDeckStore = create<DeckState>()(
             variantId: s.variantId,
             layoutId: s.layoutId,
             content: s.content,
+            notes: s.notes,
             changes: [],
           })),
+          context: input.context ? { ...input.context } : undefined,
         };
         set((s) => ({
           briefs: { ...s.briefs, [brief.id]: brief },
