@@ -1153,7 +1153,114 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         ],
       };
 
+    case "MV-DASH-SUMMARY":
+      return {
+        title: `${clientName} — this week's program pulse`,
+        primary: { label: "Words delivered", value: "1.24", unit: "M", series: [42, 51, 48, 60, 66, 71, 78] },
+        secondary: { label: "Cost avoided vs. legacy", value: "$284", unit: "K", series: [30, 32, 41, 45, 48, 52, 58] },
+        balance: {
+          value: "97.4",
+          unit: "%",
+          label: "On-time delivery",
+          items: [
+            { label: "Markets live", value: "38" },
+            { label: "Avg. cycle time", value: "12d" },
+            { label: "Reviewer NPS", value: "72" },
+          ],
+        },
+      };
+    case "MV-DASH-DONUT-TRIO":
+      return {
+        title: `${clientName} — program health`,
+        items: [
+          { label: "On-time delivery", value: 97, body: "Across 38 live markets and 6 content types." },
+          { label: "In-market approval", value: 94, body: "Reviewer first-pass approval, trailing 90 days." },
+          { label: "MT quality (est.)", value: 88, body: "Adaptive MT trained on your terminology." },
+        ],
+      };
+    case "MV-DASH-SALES-CHART":
+      return {
+        title: "Words delivered — trailing 12 months",
+        kicker: `${clientName} program volume`,
+        headline: "Volume up 3.4× in a year",
+        stat: { value: "42", unit: "M", label: "Words / year, run rate", delta: "+18% YoY" },
+        series: [
+          { label: "Jan", value: 1.9 }, { label: "Feb", value: 2.1 }, { label: "Mar", value: 2.4 },
+          { label: "Apr", value: 2.8 }, { label: "May", value: 3.1 }, { label: "Jun", value: 3.3 },
+          { label: "Jul", value: 3.6 }, { label: "Aug", value: 3.9 }, { label: "Sep", value: 4.2 },
+          { label: "Oct", value: 4.6 }, { label: "Nov", value: 5.1 }, { label: "Dec", value: 5.5 },
+        ],
+      };
+    case "MV-DASH-GAUGE-ROW":
+      return {
+        title: `SLA scorecard — ${clientName}`,
+        items: [
+          { label: "On-time", value: 97 },
+          { label: "First-pass approval", value: 94 },
+          { label: "Terminology adherence", value: 91 },
+          { label: "Reviewer utilization", value: 82 },
+        ],
+      };
+    case "MV-DASH-PERFORMANCE":
+      return {
+        title: "Words by content type — last quarter",
+        bars: [
+          { label: "Web", value: 3.4 },
+          { label: "Product", value: 5.1 },
+          { label: "Legal", value: 2.3 },
+          { label: "Support", value: 6.8 },
+          { label: "Marketing", value: 4.5 },
+        ],
+        highlight: "Support",
+        stat: { value: "22.1", unit: "M", label: "Total words, last quarter" },
+        legend: [
+          { label: "Support", value: "6.8M" },
+          { label: "Product", value: "5.1M" },
+          { label: "Marketing", value: "4.5M" },
+        ],
+      };
+    case "MV-DASH-REPORT-CARDS":
+      return {
+        title: `${clientName} — quarterly deltas`,
+        items: [
+          { delta: "+2.4M words", label: "Volume growth vs. prior quarter", meta: "38 markets / 6 content types", series: [21, 24, 28, 31, 34, 38, 42] },
+          { delta: "-4 days", label: "Avg. cycle time reduction", meta: "Since adaptive MT rollout", series: [22, 20, 19, 17, 15, 13, 12] },
+        ],
+      };
+    case "MV-DASH-GROWTH-COLUMNS":
+      return {
+        title: `${clientName} program value — 4-year view`,
+        items: [
+          { year: "2023", value: "12", unit: "M", note: "Pilot markets" },
+          { year: "2024", value: "24", unit: "M", note: "Program rollout" },
+          { year: "2025", value: "38", unit: "M", note: "Adaptive MT + reviewers" },
+          { year: "2026", value: "56", unit: "M", note: "Portfolio-wide" },
+        ],
+      };
+    case "MV-DASH-BREAKDOWN":
+      return {
+        title: `${clientName} program breakdown`,
+        items: [
+          { label: "Marketing content", value: "18.4", unit: "M words", delta: "+22%", percent: 44 },
+          { label: "Product & support", value: "15.7", unit: "M words", delta: "+18%", percent: 37 },
+          { label: "Legal & regulatory", value: "8.0", unit: "M words", delta: "+9%", percent: 19 },
+        ],
+      };
+    case "MV-DASH-REGION-STATS":
+      return {
+        title: `${clientName} — where growth is coming from`,
+        stat: { value: "$4.2", unit: "M", label: "Program value, trailing 12 months" },
+        items: [
+          { label: "EMEA", delta: "+28%", percent: 82 },
+          { label: "APAC", delta: "+41%", percent: 68 },
+          { label: "LATAM", delta: "+19%", percent: 44 },
+          { label: "North America", delta: "+11%", percent: 91 },
+          { label: "MEA", delta: "+7%", percent: 22 },
+        ],
+      };
+
     default:
+
 
 
       return { title: sectionName };

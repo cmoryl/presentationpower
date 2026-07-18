@@ -571,6 +571,15 @@ function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette)
     case "MV-PRINCIPLES": renderPrinciples(s, c, p); return true;
     case "MV-COUNTDOWN": renderCountdown(s, c, p); return true;
     case "MV-HORIZON": renderHorizon(s, c, p); return true;
+    case "MV-DASH-SUMMARY": renderDashSummary(s, c, p); return true;
+    case "MV-DASH-DONUT-TRIO": renderDashDonutTrio(s, c, p); return true;
+    case "MV-DASH-SALES-CHART": renderDashSalesChart(s, c, p); return true;
+    case "MV-DASH-GAUGE-ROW": renderDashGaugeRow(s, c, p); return true;
+    case "MV-DASH-PERFORMANCE": renderDashPerformance(s, c, p); return true;
+    case "MV-DASH-REPORT-CARDS": renderDashReportCards(s, c, p); return true;
+    case "MV-DASH-GROWTH-COLUMNS": renderDashGrowthColumns(s, c, p); return true;
+    case "MV-DASH-BREAKDOWN": renderDashBreakdown(s, c, p); return true;
+    case "MV-DASH-REGION-STATS": renderDashRegionStats(s, c, p); return true;
     default: return false;
   }
 }
@@ -1380,5 +1389,249 @@ function renderHorizon(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palett
       x: 2.8, y: y + 0.9, w: SLIDE_W - 3.4, h: bandH - 1.05,
       fontSize: 12, color: p.ink, fontFace: "Inter", valign: "top",
     });
+  });
+}
+
+// ────────────────── Advanced variant renderers (Batch 3 — dashboard) ──────────────────
+
+function numArr(v: unknown): number[] {
+  if (!Array.isArray(v)) return [];
+  return v.map((x) => (typeof x === "number" ? x : Number(x))).filter((n) => Number.isFinite(n));
+}
+function num(v: unknown, fb = 0): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : fb;
+}
+function obj(v: unknown): Record<string, unknown> {
+  return v && typeof v === "object" ? (v as Record<string, unknown>) : {};
+}
+
+// ── MV-DASH-SUMMARY ──
+function renderDashSummary(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const primary = obj(c.primary);
+  const secondary = obj(c.secondary);
+  const balance = obj(c.balance);
+  const bItems = arr(balance.items);
+  const colW = 5.9;
+  const rightX = 6.9;
+  // Left column: two stat cards stacked
+  [primary, secondary].forEach((card, i) => {
+    const cy = y0 + i * 2.6;
+    s.addShape("rect", { x: 0.6, y: cy, w: 2.2, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
+    s.addText(str(card.label).toUpperCase(), { x: 0.6, y: cy + 0.15, w: colW, h: 0.3, fontSize: 11, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Inter" });
+    s.addText(`${str(card.value)}${str(card.unit) ? ` ${str(card.unit)}` : ""}`, { x: 0.6, y: cy + 0.5, w: colW, h: 1.1, fontSize: 60, bold: true, color: p.primary, fontFace: "Inter" });
+    // Sparkline via native line chart
+    const series = numArr(card.series);
+    if (series.length >= 2) {
+      try {
+        s.addChart(
+          "line" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+          [{ name: "series", labels: series.map((_, i) => String(i + 1)), values: series }],
+          { x: 0.6, y: cy + 1.7, w: colW, h: 0.7, chartColors: [p.accent], lineSize: 2, showLegend: false, showTitle: false, catAxisHidden: true, valAxisHidden: true, showValue: false },
+        );
+      } catch { /* no-op */ }
+    }
+  });
+  // Right: balance panel
+  s.addShape("rect", { x: rightX, y: y0, w: 2.2, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
+  s.addText("BALANCE", { x: rightX, y: y0 + 0.15, w: colW, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
+  s.addText(`${str(balance.value)}${str(balance.unit) ? ` ${str(balance.unit)}` : ""}`, { x: rightX, y: y0 + 0.55, w: colW, h: 1.6, fontSize: 96, bold: true, color: p.primary, fontFace: "Inter" });
+  s.addText(str(balance.label), { x: rightX, y: y0 + 2.2, w: colW, h: 0.4, fontSize: 14, color: DARK_GRAY, fontFace: "Inter" });
+  bItems.slice(0, 4).forEach((it, i) => {
+    const ry = y0 + 2.9 + i * 0.55;
+    s.addShape("line", { x: rightX, y: ry, w: colW, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
+    s.addText(str(it.label).toUpperCase(), { x: rightX, y: ry + 0.08, w: colW - 1.5, h: 0.4, fontSize: 11, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Inter" });
+    s.addText(str(it.value), { x: rightX + colW - 1.5, y: ry + 0.05, w: 1.5, h: 0.4, fontSize: 18, bold: true, color: p.primary, fontFace: "Inter", align: "right" });
+  });
+}
+
+// ── MV-DASH-DONUT-TRIO ──
+function renderDashDonutTrio(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).slice(0, 3);
+  const colW = (SLIDE_W - 1.2) / Math.max(items.length, 1);
+  items.forEach((it, i) => {
+    const cx = 0.6 + i * colW;
+    const pct = Math.max(0, Math.min(100, num(it.value)));
+    s.addShape("rect", { x: cx, y: y0, w: colW - 0.4, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
+    try {
+      s.addChart(
+        "doughnut" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+        [{ name: "d", labels: ["value", "rest"], values: [pct, 100 - pct] }],
+        { x: cx + (colW - 3) / 2, y: y0 + 0.3, w: 3, h: 3, chartColors: [p.accent, LIGHT_GRAY], showLegend: false, showTitle: false, dataLabelPosition: "outEnd", showValue: false, holeSize: 70 },
+      );
+    } catch { /* no-op */ }
+    s.addText(`${Math.round(pct)}%`, { x: cx, y: y0 + 1.4, w: colW - 0.4, h: 0.8, fontSize: 36, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
+    s.addText(str(it.label).toUpperCase(), { x: cx, y: y0 + 3.5, w: colW - 0.4, h: 0.35, fontSize: 12, bold: true, color: p.primary, charSpacing: 3, fontFace: "Inter", align: "center" });
+    s.addText(str(it.body), { x: cx + 0.2, y: y0 + 3.9, w: colW - 0.8, h: 1.2, fontSize: 12, color: DARK_GRAY, fontFace: "Inter", align: "center" });
+  });
+}
+
+// ── MV-DASH-SALES-CHART ──
+function renderDashSalesChart(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const series = arr(c.series).map((pt) => ({ label: str(pt.label), value: num(pt.value) }));
+  const stat = obj(c.stat);
+  const chartW = 8.0;
+  try {
+    s.addChart(
+      "line" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+      [{ name: "series", labels: series.map((p) => p.label), values: series.map((p) => p.value) }],
+      { x: 0.6, y: y0 + 0.1, w: chartW, h: 4.6, chartColors: [p.accent], lineSize: 3, showLegend: false, showTitle: false, catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 10, catAxisLabelColor: DARK_GRAY, valAxisLabelFontFace: "Inter", valAxisLabelFontSize: 10, valAxisLabelColor: DARK_GRAY, showValue: false },
+    );
+  } catch { /* no-op */ }
+  const rx = 9.0;
+  s.addShape("rect", { x: rx, y: y0, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
+  s.addText(str(c.kicker).toUpperCase(), { x: rx, y: y0 + 0.15, w: 3.5, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
+  s.addText(str(c.headline), { x: rx, y: y0 + 0.5, w: 3.7, h: 1.8, fontSize: 22, bold: true, color: p.primary, fontFace: "Inter" });
+  s.addText(`${str(stat.value)}${str(stat.unit) ? ` ${str(stat.unit)}` : ""}`, { x: rx, y: y0 + 2.5, w: 3.7, h: 1.0, fontSize: 44, bold: true, color: p.primary, fontFace: "Inter" });
+  s.addText(str(stat.label), { x: rx, y: y0 + 3.4, w: 3.7, h: 0.4, fontSize: 12, color: DARK_GRAY, fontFace: "Inter" });
+  if (str(stat.delta)) {
+    s.addText(str(stat.delta).toUpperCase(), { x: rx, y: y0 + 3.9, w: 3.7, h: 0.4, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
+  }
+}
+
+// ── MV-DASH-GAUGE-ROW ──
+function renderDashGaugeRow(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).slice(0, 5);
+  const cols = Math.max(items.length, 1);
+  const colW = (SLIDE_W - 1.2) / cols;
+  const gaugeSize = Math.min(2.6, colW - 0.4);
+  items.forEach((it, i) => {
+    const cx = 0.6 + i * colW;
+    const pct = Math.max(0, Math.min(100, num(it.value)));
+    try {
+      // Half-doughnut simulated via doughnut chart with 50% invisible bottom
+      s.addChart(
+        "doughnut" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+        [{ name: "g", labels: ["v", "r", "hidden"], values: [pct / 2, (100 - pct) / 2, 50] }],
+        { x: cx + (colW - gaugeSize) / 2, y: y0 + 0.3, w: gaugeSize, h: gaugeSize, chartColors: [p.accent, LIGHT_GRAY, "FFFFFF"], chartColorsOpacity: 100, showLegend: false, showTitle: false, holeSize: 65, firstSliceAng: 270 },
+      );
+    } catch { /* no-op */ }
+    s.addText(`${Math.round(pct)}%`, { x: cx, y: y0 + gaugeSize * 0.55, w: colW, h: 0.7, fontSize: 32, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
+    s.addText(str(it.label).toUpperCase(), { x: cx + 0.1, y: y0 + gaugeSize + 0.5, w: colW - 0.2, h: 0.5, fontSize: 11, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Inter", align: "center" });
+  });
+}
+
+// ── MV-DASH-PERFORMANCE ──
+function renderDashPerformance(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const bars = arr(c.bars).map((b) => ({ label: str(b.label), value: num(b.value) }));
+  const stat = obj(c.stat);
+  const legend = arr(c.legend);
+  try {
+    s.addChart(
+      "bar" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+      [{ name: "bars", labels: bars.map((b) => b.label), values: bars.map((b) => b.value) }],
+      { x: 0.6, y: y0 + 0.1, w: 6.6, h: 4.6, barDir: "col", chartColors: [p.primary], showLegend: false, showTitle: false, catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 10, valAxisLabelFontFace: "Inter", valAxisLabelFontSize: 10 },
+    );
+  } catch { /* no-op */ }
+  const rx = 7.6;
+  s.addText(`${str(stat.value)}${str(stat.unit) ? ` ${str(stat.unit)}` : ""}`, { x: rx, y: y0 + 0.3, w: 5.0, h: 1.6, fontSize: 72, bold: true, color: p.primary, fontFace: "Inter" });
+  s.addText(str(stat.label), { x: rx, y: y0 + 1.9, w: 5.0, h: 0.5, fontSize: 13, color: DARK_GRAY, fontFace: "Inter" });
+  legend.slice(0, 4).forEach((l, i) => {
+    const ry = y0 + 2.7 + i * 0.55;
+    s.addShape("line", { x: rx, y: ry, w: 5.0, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
+    s.addShape("rect", { x: rx, y: ry + 0.18, w: 0.2, h: 0.2, fill: { color: i === 0 ? p.accent : p.primary }, line: { color: i === 0 ? p.accent : p.primary } });
+    s.addText(str(l.label), { x: rx + 0.35, y: ry + 0.1, w: 3.0, h: 0.4, fontSize: 14, bold: true, color: p.primary, fontFace: "Inter" });
+    s.addText(str(l.value), { x: rx + 3.4, y: ry + 0.1, w: 1.6, h: 0.4, fontSize: 14, bold: true, color: DARK_GRAY, fontFace: "Inter", align: "right" });
+  });
+}
+
+// ── MV-DASH-REPORT-CARDS ──
+function renderDashReportCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).slice(0, 2);
+  const cardW = 5.9;
+  items.forEach((it, i) => {
+    const cx = 0.6 + i * 6.4;
+    const delta = str(it.delta);
+    const negative = delta.trim().startsWith("-");
+    s.addShape("rect", { x: cx, y: y0, w: 2.2, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
+    s.addText((negative ? "REDUCTION" : "GROWTH"), { x: cx, y: y0 + 0.15, w: cardW, h: 0.3, fontSize: 11, bold: true, color: negative ? "E53D2E" : p.accent, charSpacing: 3, fontFace: "Inter" });
+    s.addText(delta, { x: cx, y: y0 + 0.55, w: cardW, h: 1.6, fontSize: 66, bold: true, color: p.primary, fontFace: "Inter" });
+    s.addText(str(it.label), { x: cx, y: y0 + 2.2, w: cardW, h: 0.9, fontSize: 15, color: DARK_GRAY, fontFace: "Inter" });
+    const series = numArr(it.series);
+    if (series.length >= 2) {
+      try {
+        s.addChart(
+          "line" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+          [{ name: "s", labels: series.map((_, k) => String(k + 1)), values: series }],
+          { x: cx, y: y0 + 3.3, w: cardW, h: 1.1, chartColors: [p.accent], lineSize: 2, showLegend: false, showTitle: false, catAxisHidden: true, valAxisHidden: true, showValue: false },
+        );
+      } catch { /* no-op */ }
+    }
+    s.addText(str(it.meta).toUpperCase(), { x: cx, y: y0 + 4.5, w: cardW, h: 0.35, fontSize: 10, bold: true, color: MID_GRAY, charSpacing: 3, fontFace: "Inter" });
+  });
+  // vertical hairline divider
+  s.addShape("line", { x: 6.55, y: y0, w: 0, h: 4.8, line: { color: LIGHT_GRAY, width: 1 } });
+}
+
+// ── MV-DASH-GROWTH-COLUMNS ──
+function renderDashGrowthColumns(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).slice(0, 5);
+  try {
+    s.addChart(
+      "bar" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+      [{ name: "growth", labels: items.map((it) => str(it.year)), values: items.map((it) => num(it.value)) }],
+      { x: 0.6, y: y0 + 0.4, w: SLIDE_W - 1.2, h: 4.6, barDir: "col", chartColors: [p.primary], showLegend: false, showTitle: false, catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 12, catAxisLabelColor: DARK_GRAY, valAxisLabelFontFace: "Inter", valAxisLabelFontSize: 10, valAxisLabelColor: DARK_GRAY, showValue: true, dataLabelFontFace: "Inter", dataLabelFontSize: 12, dataLabelColor: p.primary, dataLabelPosition: "outEnd" },
+    );
+  } catch { /* no-op */ }
+  // Highlight final column with accent overlay by drawing a tag above it
+  if (items.length > 0) {
+    const last = items[items.length - 1];
+    const cellW = (SLIDE_W - 1.2) / items.length;
+    const cx = 0.6 + (items.length - 1) * cellW + cellW * 0.5 - 1;
+    s.addText(`${str(last.value)}${str(last.unit) ? ` ${str(last.unit)}` : ""}`, { x: cx, y: y0 + 0.05, w: 2, h: 0.5, fontSize: 20, bold: true, color: p.accent, fontFace: "Inter", align: "center" });
+  }
+}
+
+// ── MV-DASH-BREAKDOWN ──
+function renderDashBreakdown(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).slice(0, 4);
+  const rowH = Math.min(1.35, (5.5 - y0) / Math.max(items.length, 1));
+  items.forEach((it, i) => {
+    const ry = y0 + i * rowH;
+    const delta = str(it.delta);
+    const negative = delta.trim().startsWith("-");
+    const pct = Math.max(0, Math.min(100, num(it.percent)));
+    s.addShape("line", { x: 0.6, y: ry, w: SLIDE_W - 1.2, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
+    s.addText(str(it.label), { x: 0.6, y: ry + 0.15, w: 5.0, h: 0.5, fontSize: 20, bold: true, color: p.primary, fontFace: "Inter" });
+    if (delta) s.addText(delta.toUpperCase(), { x: 5.6, y: ry + 0.2, w: 1.6, h: 0.4, fontSize: 11, bold: true, color: negative ? "E53D2E" : p.accent, charSpacing: 3, fontFace: "Inter" });
+    s.addText(`${str(it.value)}${str(it.unit) ? ` ${str(it.unit)}` : ""}`, { x: 8.5, y: ry + 0.05, w: 4.2, h: 0.6, fontSize: 28, bold: true, color: p.primary, fontFace: "Inter", align: "right" });
+    // progress bar
+    const barY = ry + rowH - 0.35;
+    const barW = SLIDE_W - 1.2 - 0.8;
+    s.addShape("rect", { x: 0.6, y: barY, w: barW, h: 0.12, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
+    s.addShape("rect", { x: 0.6, y: barY, w: (barW * pct) / 100, h: 0.12, fill: { color: p.accent }, line: { color: p.accent } });
+    s.addText(`${pct}%`, { x: SLIDE_W - 1.2 - 0.6, y: barY - 0.08, w: 0.6, h: 0.3, fontSize: 12, bold: true, color: p.accent, fontFace: "Inter", align: "right" });
+  });
+}
+
+// ── MV-DASH-REGION-STATS ──
+function renderDashRegionStats(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const stat = obj(c.stat);
+  const items = arr(c.items).slice(0, 6);
+  s.addShape("rect", { x: 0.6, y: y0, w: 2.2, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
+  s.addText(`${str(stat.value)}${str(stat.unit) ? ` ${str(stat.unit)}` : ""}`, { x: 0.6, y: y0 + 0.4, w: 5.5, h: 2.6, fontSize: 120, bold: true, color: p.primary, fontFace: "Inter" });
+  s.addText(str(stat.label).toUpperCase(), { x: 0.6, y: y0 + 3.2, w: 5.5, h: 0.5, fontSize: 12, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Inter" });
+  const rx = 6.8;
+  const rowH = Math.min(0.85, (5.5 - y0) / Math.max(items.length, 1));
+  items.forEach((it, i) => {
+    const ry = y0 + i * rowH;
+    const delta = str(it.delta);
+    const negative = delta.trim().startsWith("-");
+    const pct = Math.max(0, Math.min(100, num(it.percent)));
+    s.addShape("line", { x: rx, y: ry, w: SLIDE_W - rx - 0.6, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
+    s.addText(str(it.label), { x: rx, y: ry + 0.1, w: 4.0, h: 0.4, fontSize: 15, bold: true, color: p.primary, fontFace: "Inter" });
+    if (delta) s.addText(delta.toUpperCase(), { x: SLIDE_W - 2.0, y: ry + 0.13, w: 1.4, h: 0.35, fontSize: 11, bold: true, color: negative ? "E53D2E" : p.accent, charSpacing: 3, fontFace: "Inter", align: "right" });
+    const barW = SLIDE_W - rx - 0.6;
+    s.addShape("rect", { x: rx, y: ry + rowH - 0.22, w: barW, h: 0.08, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
+    s.addShape("rect", { x: rx, y: ry + rowH - 0.22, w: (barW * pct) / 100, h: 0.08, fill: { color: p.accent }, line: { color: p.accent } });
   });
 }
