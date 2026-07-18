@@ -2494,18 +2494,29 @@ function NumberedList({ brand, pageNumber, title, items }: { brand: BrandMode; p
   return (
     <SlideFrame brand={brand} pageNumber={pageNumber}>
       <SlideTitle brand={brand} title={title} />
-      <div className="mt-12 space-y-6">
+      <div className="mt-14">
         {items.map((it, i) => {
           const label = s(it.title ?? it.label);
           return (
-            <div key={i} className="flex items-start gap-8 rounded-xl border p-8" style={{ borderColor: "rgba(10,15,28,0.08)", backgroundColor: brand.tokens.surface }}>
-              <IconBadge brand={brand} label={label} index={i} size="lg" override={s(it.icon)} />
-              <div className="w-20 text-5xl font-semibold" style={{ color: brand.tokens.accent }}>
+            <div
+              key={i}
+              className="grid grid-cols-[80px_88px_1fr] items-start gap-10 py-7"
+              style={{ borderTop: i === 0 ? "1px solid rgba(10,15,28,0.10)" : "none", borderBottom: "1px solid rgba(10,15,28,0.10)" }}
+            >
+              <div
+                className="pt-1 font-semibold tabular-nums"
+                style={{ fontSize: 40, color: brand.tokens.accent, letterSpacing: "-0.02em" }}
+              >
                 {String(i + 1).padStart(2, "0")}
               </div>
-              <div className="flex-1">
-                <div className="text-3xl font-semibold" style={{ color: brand.tokens.primary }}>{label}</div>
-                <div className="mt-3 text-2xl opacity-80">{s(it.body)}</div>
+              <IconBadge brand={brand} label={label} index={i} size="md" override={s(it.icon)} />
+              <div>
+                <div style={{ fontSize: 32, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>
+                  {label}
+                </div>
+                <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.4, color: "rgba(10,15,28,0.72)" }}>
+                  {s(it.body)}
+                </div>
               </div>
             </div>
           );
@@ -2521,18 +2532,22 @@ function SlideTitle({ brand, title, kicker }: { brand: BrandMode; title: string;
 
 
 function Card({ brand, title, body, index, icon }: { brand: BrandMode; title: string; body: string; index: number; icon?: string }) {
+  // Hairline-topped column card — borderless surface, single accent rule at
+  // top, small-caps ordinal, bold title with tight tracking, muted body.
   return (
-    <div className="rounded-2xl border p-10" style={{ borderColor: "rgba(10,15,28,0.1)", backgroundColor: brand.tokens.surface }}>
-      <div className="flex items-center gap-5">
-        <IconBadge brand={brand} label={title} index={index - 1} size="md" override={icon} />
-        <div className="text-2xl font-semibold" style={{ color: brand.tokens.accent }}>
+    <div className="flex flex-col pt-8" style={{ borderTop: "2px solid currentColor", color: brand.tokens.accent }}>
+      <div className="flex items-center justify-between" style={{ color: "rgba(10,15,28,0.55)" }}>
+        <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", fontWeight: 600, color: brand.tokens.accent }}>
           {String(index).padStart(2, "0")}
         </div>
+        <IconBadge brand={brand} label={title} index={index - 1} size="sm" override={icon} treatment="soft-circle" />
       </div>
-      <div className="mt-6 text-4xl font-semibold" style={{ color: brand.tokens.primary }}>
+      <div className="mt-8" style={{ fontSize: 36, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.12 }}>
         {title}
       </div>
-      <div className="mt-6 text-2xl leading-snug opacity-80">{body}</div>
+      <div className="mt-5" style={{ fontSize: 22, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>
+        {body}
+      </div>
     </div>
   );
 }
@@ -2540,11 +2555,15 @@ function Card({ brand, title, body, index, icon }: { brand: BrandMode; title: st
 function Quadrant({ brand, label, highlight }: { brand: BrandMode; label: string; highlight?: boolean }) {
   return (
     <div
-      className="flex items-center justify-center rounded-xl border p-6 text-3xl font-medium"
+      className="flex items-center justify-center p-8 text-center"
       style={{
-        borderColor: "rgba(10,15,28,0.15)",
-        backgroundColor: highlight ? brand.tokens.primary : brand.tokens.surface,
-        color: highlight ? "#fff" : brand.tokens.ink,
+        border: `1px solid ${highlight ? brand.tokens.accent : "rgba(10,15,28,0.10)"}`,
+        backgroundColor: highlight ? `${brand.tokens.accent}18` : "transparent",
+        color: brand.tokens.primary,
+        fontSize: 30,
+        fontWeight: 600,
+        letterSpacing: "-0.015em",
+        lineHeight: 1.25,
       }}
     >
       {label}
@@ -2555,10 +2574,15 @@ function Quadrant({ brand, label, highlight }: { brand: BrandMode; label: string
 function LabelBlock({ brand, label, body }: { brand: BrandMode; label: string; body: string }) {
   return (
     <div>
-      <div className="text-xl uppercase tracking-[0.25em]" style={{ color: brand.tokens.accent }}>
-        {label}
+      <Hairline color={brand.tokens.accent} widthPx={56} thicknessPx={2} className="mb-5" />
+      <Kicker brand={brand}>{label}</Kicker>
+      <div
+        className="mt-5"
+        style={{ fontSize: 26, lineHeight: 1.38, letterSpacing: "-0.005em", color: "rgba(10,15,28,0.85)" }}
+      >
+        {body}
       </div>
-      <div className="mt-4 text-2xl leading-snug">{body}</div>
     </div>
   );
 }
+
