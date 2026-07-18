@@ -221,8 +221,13 @@ export function revertAutoFix(root: HTMLElement) {
   nodes.forEach((el) => {
     el.style.color = el.dataset.wcagOriginal ?? "";
     el.style.removeProperty("opacity");
+    if (el.dataset.wcagShadow) {
+      el.style.removeProperty("text-shadow");
+      delete el.dataset.wcagShadow;
+    }
     delete el.dataset.wcagFixed;
     delete el.dataset.wcagOriginal;
   });
 }
+
 
