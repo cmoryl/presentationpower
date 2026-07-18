@@ -3480,6 +3480,101 @@ function renderVariantBody({
       );
     }
 
+    case "MV-GRAPH-LINE-MULTI": {
+      const series = arr(c.series).slice(0, 3).map((p) => ({ label: s(p.label), points: arr(p.points).map((v: unknown) => Number(v) || 0) }));
+      const xLabels = arr(obj(c.axis).x).map((v: unknown) => String(v));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="mb-6 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+            <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
+            <div className="mt-4" style={{ fontSize: 42, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
+          </div>
+          <div className="mt-4"><LineMultiChart brand={brand} series={series} xLabels={xLabels} unit={s(c.unit, "%")} height={500} /></div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-STACKED-BAR": {
+      const segments = arr(c.segments).map((sg) => ({ label: s(sg.label) }));
+      const columns = arr(c.columns).map((col) => ({ label: s(col.label), values: arr(col.values).map((v: unknown) => Number(v) || 0) }));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-8"><StackedBarChart brand={brand} segments={segments} columns={columns} unit={s(c.unit)} height={520} /></div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-AREA-STACK": {
+      const series = arr(c.series).slice(0, 4).map((p) => ({ label: s(p.label), points: arr(p.points).map((v: unknown) => Number(v) || 0) }));
+      const xLabels = arr(obj(c.axis).x).map((v: unknown) => String(v));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="mb-6 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+            <Kicker brand={brand}>{s(c.kicker, "Composition")}</Kicker>
+            <div className="mt-4" style={{ fontSize: 42, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
+          </div>
+          <div className="mt-4"><StackedAreaChart brand={brand} series={series} xLabels={xLabels} unit={s(c.unit)} height={500} /></div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-WATERFALL": {
+      const steps = arr(c.steps).map((st) => ({ label: s(st.label), value: Number(st.value) || 0, kind: s(st.kind, "up") as "start" | "up" | "down" | "end" }));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-8"><WaterfallChart brand={brand} steps={steps} unit={s(c.unit)} height={540} /></div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-BUBBLE": {
+      const axis = obj(c.axis);
+      const items = arr(c.items).map((it) => ({ label: s(it.label), x: Number(it.x) || 0, y: Number(it.y) || 0, size: Number(it.size) || 20 }));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-8"><BubbleChart brand={brand} items={items} axisX={s(axis.x, "X")} axisY={s(axis.y, "Y")} height={560} /></div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-HEATMAP": {
+      const rows = arr(c.rows).map((v: unknown) => String(v));
+      const cols = arr(c.columns).map((v: unknown) => String(v));
+      const cells = arr(c.cells).map((row: unknown) => arr(row).map((v: unknown) => Number(v) || 0));
+      const scale = obj(c.scale);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-8"><HeatmapChart brand={brand} rows={rows} cols={cols} cells={cells} min={Number(scale.min) || 0} max={Number(scale.max) || 100} /></div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-TREEMAP": {
+      const items = arr(c.items).map((it) => ({ label: s(it.label), value: Number(it.value) || 0, meta: s(it.meta) }));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-8"><Treemap brand={brand} items={items} height={560} /></div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-GRAPH-COMBO": {
+      const bars = obj(c.bars);
+      const line = obj(c.line);
+      const points = arr(c.points).map((p) => ({ label: s(p.label), bar: Number(p.bar) || 0, line: Number(p.line) || 0 }));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-8"><ComboChart brand={brand} points={points} barLabel={s(bars.label, "Volume")} barUnit={s(bars.unit)} lineLabel={s(line.label, "Rate")} lineUnit={s(line.unit, "%")} height={540} /></div>
+        </SlideFrame>
+      );
+    }
+
     default:
 
 
