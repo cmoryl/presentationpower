@@ -818,22 +818,52 @@ function renderVariantBody({
     case "MV-DEC-COMPARE-TABLE": {
       const columns = arr(c.columns);
       const rows = arr(c.items);
+      const winnerIdx = typeof (c as { winnerIndex?: number }).winnerIndex === "number" ? (c as { winnerIndex?: number }).winnerIndex : undefined;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-12 overflow-hidden rounded-2xl border" style={{ borderColor: "rgba(10,15,28,0.1)" }}>
-            <div className="grid" style={{ gridTemplateColumns: `2fr ${columns.map(() => "1fr").join(" ")}` }}>
-              <div className="p-6 text-xl uppercase tracking-[0.2em] opacity-60">Criteria</div>
+          <div className="mt-14">
+            <div className="grid gap-x-8" style={{ gridTemplateColumns: `2fr ${columns.map(() => "1fr").join(" ")}` }}>
+              {/* Editorial column headers — small caps + hairline underline */}
+              <div className="pb-4 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "rgba(10,15,28,0.55)", fontWeight: 600, borderBottom: "1px solid rgba(10,15,28,0.15)" }}>
+                Criteria
+              </div>
               {columns.map((col, i) => (
-                <div key={i} className="p-6 text-2xl font-semibold" style={{ color: brand.tokens.primary }}>
+                <div
+                  key={i}
+                  className="pb-4 uppercase"
+                  style={{
+                    fontSize: 20,
+                    letterSpacing: "0.24em",
+                    fontWeight: 600,
+                    color: winnerIdx === i ? brand.tokens.accent : brand.tokens.primary,
+                    borderBottom: `${winnerIdx === i ? 2 : 1}px solid ${winnerIdx === i ? brand.tokens.accent : "rgba(10,15,28,0.15)"}`,
+                  }}
+                >
                   {s(col.label)}
                 </div>
               ))}
               {rows.map((r, ri) => (
                 <div key={ri} className="contents">
-                  <div className="border-t p-6 text-2xl" style={{ borderColor: "rgba(10,15,28,0.08)" }}>{s(r.criterion)}</div>
+                  <div
+                    className="py-5"
+                    style={{ fontSize: 24, letterSpacing: "-0.01em", color: brand.tokens.primary, borderBottom: "1px solid rgba(10,15,28,0.10)" }}
+                  >
+                    {s(r.criterion)}
+                  </div>
                   {strs(r.values).map((v, ci) => (
-                    <div key={ci} className="border-t p-6 text-2xl" style={{ borderColor: "rgba(10,15,28,0.08)" }}>{v}</div>
+                    <div
+                      key={ci}
+                      className="py-5"
+                      style={{
+                        fontSize: 24,
+                        color: winnerIdx === ci ? brand.tokens.primary : "rgba(10,15,28,0.75)",
+                        fontWeight: winnerIdx === ci ? 600 : 400,
+                        borderBottom: "1px solid rgba(10,15,28,0.10)",
+                      }}
+                    >
+                      {v}
+                    </div>
                   ))}
                 </div>
               ))}
@@ -847,24 +877,35 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-12 grid grid-cols-2 gap-x-14 gap-y-6">
+          <div className="mt-14 grid grid-cols-2 gap-x-20 gap-y-0">
             {arr(c.items).map((it, i) => (
-              <div key={i} className="flex items-start gap-5">
+              <div
+                key={i}
+                className="flex items-start gap-6 py-6"
+                style={{ borderBottom: "1px solid rgba(10,15,28,0.10)" }}
+              >
                 <div
-                  className="mt-2 flex h-9 w-9 items-center justify-center rounded-full text-white"
-                  style={{ backgroundColor: brand.tokens.accent }}
+                  className="mt-2 flex h-7 w-7 shrink-0 items-center justify-center"
+                  style={{ border: `2px solid ${brand.tokens.accent}`, color: brand.tokens.accent, fontSize: 18, fontWeight: 700 }}
                 >
                   ✓
                 </div>
                 <div>
-                  <div className="text-2xl font-semibold">{s(it.label)}</div>
-                  {s(it.note) && <div className="mt-1 text-xl opacity-70">{s(it.note)}</div>}
+                  <div style={{ fontSize: 26, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.01em", lineHeight: 1.25 }}>
+                    {s(it.label)}
+                  </div>
+                  {s(it.note) && (
+                    <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.4, color: "rgba(10,15,28,0.65)" }}>
+                      {s(it.note)}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         </SlideFrame>
       );
+
 
     case "MV-COMM-PRICING":
       return (
