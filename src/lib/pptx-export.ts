@@ -571,6 +571,15 @@ function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette)
     case "MV-PRINCIPLES": renderPrinciples(s, c, p); return true;
     case "MV-COUNTDOWN": renderCountdown(s, c, p); return true;
     case "MV-HORIZON": renderHorizon(s, c, p); return true;
+    case "MV-DASH-SUMMARY": renderDashSummary(s, c, p); return true;
+    case "MV-DASH-DONUT-TRIO": renderDashDonutTrio(s, c, p); return true;
+    case "MV-DASH-SALES-CHART": renderDashSalesChart(s, c, p); return true;
+    case "MV-DASH-GAUGE-ROW": renderDashGaugeRow(s, c, p); return true;
+    case "MV-DASH-PERFORMANCE": renderDashPerformance(s, c, p); return true;
+    case "MV-DASH-REPORT-CARDS": renderDashReportCards(s, c, p); return true;
+    case "MV-DASH-GROWTH-COLUMNS": renderDashGrowthColumns(s, c, p); return true;
+    case "MV-DASH-BREAKDOWN": renderDashBreakdown(s, c, p); return true;
+    case "MV-DASH-REGION-STATS": renderDashRegionStats(s, c, p); return true;
     default: return false;
   }
 }
