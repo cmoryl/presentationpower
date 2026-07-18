@@ -695,6 +695,7 @@ export type Database = {
           deck_id: string
           id: string
           layout_id: string
+          notes: string | null
           position: number
           section_id: string | null
           source_module_id: string | null
@@ -708,6 +709,7 @@ export type Database = {
           deck_id: string
           id?: string
           layout_id: string
+          notes?: string | null
           position: number
           section_id?: string | null
           source_module_id?: string | null
@@ -721,6 +723,7 @@ export type Database = {
           deck_id?: string
           id?: string
           layout_id?: string
+          notes?: string | null
           position?: number
           section_id?: string | null
           source_module_id?: string | null
