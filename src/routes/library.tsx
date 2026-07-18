@@ -146,6 +146,15 @@ function Library() {
             >
               ☾ Dark
             </button>
+            <button
+              type="button"
+              onClick={() => setMode("ab")}
+              className={`px-3 py-1.5 ${mode === "ab" ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"}`}
+              aria-pressed={mode === "ab"}
+              title="Compare light vs dark side-by-side"
+            >
+              ⇋ A/B
+            </button>
           </div>
           <button
             type="button"
