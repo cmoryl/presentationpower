@@ -2509,10 +2509,13 @@ function renderVariantBody({
                       color: "#fff",
                     }}
                   >
-                    <div>
-                      <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", opacity: 0.85 }}>{String(i + 1).padStart(2, "0")}</div>
-                      <div className="mt-2" style={{ fontSize: 32, fontWeight: 600, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
-                      {s(it.note) && <div className="mt-1" style={{ fontSize: 18, opacity: 0.85 }}>{s(it.note)}</div>}
+                    <div className="flex items-center gap-5">
+                      <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} treatment="on-dark" tone="onDark" />
+                      <div>
+                        <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", opacity: 0.85 }}>{String(i + 1).padStart(2, "0")}</div>
+                        <div className="mt-2" style={{ fontSize: 32, fontWeight: 600, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
+                        {s(it.note) && <div className="mt-1" style={{ fontSize: 18, opacity: 0.85 }}>{s(it.note)}</div>}
+                      </div>
                     </div>
                     <div className="tabular-nums font-semibold text-right" style={{ fontSize: 56, letterSpacing: "-0.02em", lineHeight: 1 }}>
                       {s(it.value)}<span className="ml-1" style={{ fontSize: 26, opacity: 0.9 }}>{s(it.unit)}</span>
