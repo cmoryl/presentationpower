@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { auditNode, type WcagReport } from "@/lib/wcag";
+import type { WcagReport } from "@/lib/wcag";
 
 /**
  * Renders `children` into an off-screen, absolutely-positioned slide-sized
@@ -22,14 +22,25 @@ export function HiddenAuditFrame({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const t = window.setTimeout(() => {
+    let cancelled = false;
+    const t = window.setTimeout(async () => {
       try {
-        onReport(auditNode(el));
+        // Auto-fix first so the audit reflects the actually-rendered (fixed) state.
+        const { applyAutoFix, revertAutoFix, auditNode: audit } = await import("@/lib/wcag");
+        revertAutoFix(el);
+        applyAutoFix(el);
+        // Second pass in case first pass shifted backgrounds.
+        applyAutoFix(el);
+        if (cancelled) return;
+        onReport(audit(el));
       } catch {
         /* ignore */
       }
     }, 300);
-    return () => window.clearTimeout(t);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(t);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
