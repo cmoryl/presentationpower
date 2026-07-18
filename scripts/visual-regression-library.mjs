@@ -36,7 +36,11 @@ const baseline = existsSync(BASELINE)
   ? JSON.parse(await readFile(BASELINE, "utf8"))
   : { allowedOverlaps: [] };
 
-const browser = await chromium.launch({ headless: true });
+const launchOpts = { headless: true };
+if (process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH) {
+  launchOpts.executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+}
+const browser = await chromium.launch(launchOpts);
 const context = await browser.newContext({ viewport: { width: 1440, height: 1800 }, deviceScaleFactor: 1 });
 const page = await context.newPage();
 
