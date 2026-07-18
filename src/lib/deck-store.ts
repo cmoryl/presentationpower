@@ -1537,8 +1537,10 @@ export const useDeckStore = create<DeckState>()(
             variantId: s.variantId,
             layoutId: s.layoutId,
             content: s.content,
+            notes: s.notes,
             changes: [],
           })),
+          context: input.context ? { ...input.context } : undefined,
         };
         set((s) => ({
           briefs: { ...s.briefs, [brief.id]: brief },
