@@ -3,6 +3,8 @@ import { SlideFrame as BaseSlideFrame, SlideModeContext, type SlideMode } from "
 import { createContext, useContext } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
+import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow } from "./primitives";
+
 
 // Module-scoped context so helper components (CardGrid, StatGrid, NumberedList,
 // etc.) automatically pick up the current slide's clientName + layoutId when
