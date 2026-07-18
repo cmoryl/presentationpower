@@ -148,7 +148,43 @@ export function BackgroundImageryPanel({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [aiPrompt, setAiPrompt] = useState("");
+  const [applyOpen, setApplyOpen] = useState(false);
+  const [applyMode, setApplyMode] = useState<"section" | "custom">("section");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [applyFlash, setApplyFlash] = useState<string | null>(null);
   const generate = useServerFn(generateBackgroundImage);
+
+  const activeSlide = useMemo(
+    () => (slides ?? []).find((s) => s.id === activeSlideId) ?? null,
+    [slides, activeSlideId],
+  );
+  const sectionSlides = useMemo(
+    () => (slides ?? []).filter((s) => activeSlide && s.sectionId === activeSlide.sectionId),
+    [slides, activeSlide],
+  );
+  const canApplyMany = Boolean(onApplyToSlides && slides && slides.length > 1);
+
+  function toggleSelected(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+  function commitApply(ids: string[]) {
+    if (!onApplyToSlides || ids.length === 0) return;
+    const target = ids.filter((id) => id !== activeSlideId);
+    if (target.length === 0) {
+      setApplyFlash("Nothing to apply — only this slide selected.");
+      return;
+    }
+    onApplyToSlides(target, current);
+    setApplyFlash(`Applied to ${target.length} slide${target.length === 1 ? "" : "s"}.`);
+    setApplyOpen(false);
+    setSelectedIds(new Set());
+    setTimeout(() => setApplyFlash(null), 2400);
+  }
 
   // Local parametric state — seeded from `current`, updates emit via onChange.
   const solidColor = current?.kind === "color" ? current.color ?? "#03002C" : "#03002C";
