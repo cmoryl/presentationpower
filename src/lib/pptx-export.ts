@@ -110,25 +110,23 @@ export async function exportDeckToPptx(
     s.background = { color: isDark ? palette.primary : "FFFFFF" };
 
     // Underlay imagery — preserves both PPTX-imported photos (content.mediaUrl)
-    // and curated kit imagery (content.mediaSeed → division library). Placement
-    // varies by slide kind so text stays legible over the image.
+    // and curated kit imagery (content.mediaSeed → division library). Full-bleed
+    // treatment is only applied to cover/divider kinds where existing renderers
+    // draw text over a dark scrim; other renderers use full-width text boxes
+    // and would clip a side-panel image, so those keep their current layout.
     const imgData = slideImages[i];
-    if (imgData) {
-      if (kind === "cover" || kind === "divider") {
-        // Full-bleed image with a dark scrim so hero text keeps contrast.
-        s.addImage({ data: imgData, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H, sizing: { type: "cover", w: SLIDE_W, h: SLIDE_H } });
-        s.addShape("rect", {
-          x: 0, y: 0, w: SLIDE_W, h: SLIDE_H,
-          fill: { color: palette.primary, transparency: 35 },
-          line: { color: palette.primary, transparency: 100 },
-        });
-      } else if (kind === "quote" || kind === "callout" || kind === "content" || kind === "cards") {
-        // Right-side panel image, ~40% width, keeps left column for text.
-        const panelW = 5.0;
-        const panelX = SLIDE_W - panelW - 0.4;
-        s.addImage({ data: imgData, x: panelX, y: 0.9, w: panelW, h: 5.7, sizing: { type: "cover", w: panelW, h: 5.7 } });
-      }
+    if (imgData && (kind === "cover" || kind === "divider")) {
+      s.addImage({
+        data: imgData, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H,
+        sizing: { type: "cover", w: SLIDE_W, h: SLIDE_H },
+      });
+      s.addShape("rect", {
+        x: 0, y: 0, w: SLIDE_W, h: SLIDE_H,
+        fill: { color: palette.primary, transparency: 35 },
+        line: { color: palette.primary, transparency: 100 },
+      });
     }
+
 
 
 
