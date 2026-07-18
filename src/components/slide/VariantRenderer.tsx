@@ -493,17 +493,19 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex h-full flex-col justify-center">
-            <div className="flex items-center gap-8">
-              <div
-                className="text-[96px] font-semibold"
-                style={{ color: brand.tokens.accent }}
-              >
-                {s(c.direction) === "down" ? "↓" : "↑"}
-              </div>
-              <div className="text-2xl uppercase tracking-[0.3em] opacity-70">Trend</div>
-            </div>
-            <div className="mt-8 text-[76px] font-semibold leading-[1.1]">{s(c.headline)}</div>
-            <div className="mt-10 max-w-5xl text-3xl opacity-80">{s(c.narrative)}</div>
+            <Kicker brand={brand}>
+              <span className="mr-4 inline-block align-[-0.15em]" style={{ fontSize: 44, letterSpacing: 0 }}>
+                {s(c.direction) === "down" ? "\u2193" : "\u2191"}
+              </span>
+              Trend
+            </Kicker>
+            <Hairline color={brand.tokens.accent} widthPx={88} thicknessPx={2} className="mt-6 mb-8" />
+            <DisplayTitle size="section" color={brand.tokens.primary} maxWidthPx={1500}>
+              {s(c.headline)}
+            </DisplayTitle>
+            <SupportingText size="lg" opacity={0.8} maxWidthPx={1180} className="mt-10">
+              {s(c.narrative)}
+            </SupportingText>
           </div>
         </SlideFrame>
       );
