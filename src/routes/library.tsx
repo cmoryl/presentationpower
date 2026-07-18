@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { WcagBadge } from "@/components/WcagBadge";
+import { HiddenAuditFrame } from "@/components/HiddenAuditFrame";
+import type { WcagReport } from "@/lib/wcag";
 import { Download, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
