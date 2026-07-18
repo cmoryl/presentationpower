@@ -379,12 +379,10 @@ function VariantCard({
       className="group relative block w-full overflow-hidden rounded-[24px] border border-slate-200 bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:border-[#003FC7]/20 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)]"
     >
       {/* Auto-fix is always on; warning badges intentionally hidden. */}
-      {false && warnLabel && warnTone && (
-        <div className={warnTone} title={worstDetail}>{warnLabel}</div>
-      )}
-      {false && autoFixOn && fixedCount > 0 && (
-        <div title={`Auto-fixed ${fixedCount}`}>✨ Fixed {fixedCount}</div>
-      )}
+      {void warnLabel}
+      {void warnTone}
+      {void worstDetail}
+      {void fixedCount}
 
       {isAB ? (
         <div className="m-2 grid grid-cols-2 gap-2">
