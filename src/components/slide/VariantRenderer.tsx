@@ -3612,3 +3612,172 @@ function LabelBlock({ brand, label, body }: { brand: BrandMode; label: string; b
   );
 }
 
+
+// ── Dashboard helpers ──────────────────────────────────────────────────
+function toNums(v: unknown): number[] {
+  if (!Array.isArray(v)) return [];
+  return v.map((x) => (typeof x === "number" ? x : Number(x))).filter((n) => Number.isFinite(n));
+}
+
+function Sparkline({ brand, values, w = 380, h = 100, filled = true }: { brand: BrandMode; values: number[]; w?: number; h?: number; filled?: boolean }) {
+  const vals = values.length ? values : [1, 1];
+  const min = Math.min(...vals);
+  const max = Math.max(...vals);
+  const range = max - min || 1;
+  const pad = 4;
+  const step = (w - pad * 2) / Math.max(vals.length - 1, 1);
+  const pts = vals.map((v, i) => [pad + i * step, h - pad - ((v - min) / range) * (h - pad * 2)] as [number, number]);
+  const linePath = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
+  const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - pad} L${pts[0][0].toFixed(1)},${h - pad} Z` : "";
+  const id = `spark-${brand.id}-${vals.length}-${Math.round(min * 10)}-${Math.round(max * 10)}`;
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      <defs>
+        <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor={brand.tokens.accent} stopOpacity="0.35" />
+          <stop offset="100%" stopColor={brand.tokens.accent} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {filled && <path d={areaPath} fill={`url(#${id})`} />}
+      <path d={linePath} fill="none" stroke={brand.tokens.accent} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={5} fill={brand.tokens.accent} />}
+    </svg>
+  );
+}
+
+function SummaryStatCard({ brand, label, value, unit, series }: { brand: BrandMode; label: string; value: string; unit: string; series: number[] }) {
+  return (
+    <div className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+      <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "rgba(10,15,28,0.6)", fontWeight: 600 }}>{label}</div>
+      <div className="mt-4 flex items-baseline" style={{ fontSize: 84, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.03em", lineHeight: 1 }}>
+        <span className="tabular-nums">{value || "—"}</span>
+        {unit && <span style={{ fontSize: 40, marginLeft: 8, color: brand.tokens.accent }}>{unit}</span>}
+      </div>
+      <div className="mt-4"><Sparkline brand={brand} values={series} h={70} /></div>
+    </div>
+  );
+}
+
+function Donut({ brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
+  const p = Math.max(0, Math.min(100, percent));
+  const stroke = 14;
+  const r = (size - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+  const dash = (p / 100) * circ;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={brand.tokens.primary} strokeOpacity={0.1} strokeWidth={stroke} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={brand.tokens.accent} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+      <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central" fontSize={size * 0.24} fontWeight={600} fill={brand.tokens.primary} style={{ letterSpacing: "-0.02em" }}>
+        {Math.round(p)}%
+      </text>
+    </svg>
+  );
+}
+
+function SemiGauge({ brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
+  const p = Math.max(0, Math.min(100, percent));
+  const stroke = 14;
+  const r = (size - stroke) / 2;
+  const cy = size / 2 + r / 2;
+  const arcC = Math.PI * r;
+  const dash = (p / 100) * arcC;
+  const h = size / 2 + stroke;
+  const arc = `M ${stroke / 2} ${cy} A ${r} ${r} 0 0 1 ${size - stroke / 2} ${cy}`;
+  return (
+    <svg width={size} height={h} viewBox={`0 0 ${size} ${h}`} aria-hidden>
+      <path d={arc} fill="none" stroke={brand.tokens.primary} strokeOpacity={0.1} strokeWidth={stroke} strokeLinecap="round" />
+      <path d={arc} fill="none" stroke={brand.tokens.accent} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${arcC}`} />
+      <text x={size / 2} y={cy - 20} textAnchor="middle" fontSize={size * 0.22} fontWeight={600} fill={brand.tokens.primary} style={{ letterSpacing: "-0.02em" }}>
+        {Math.round(p)}%
+      </text>
+    </svg>
+  );
+}
+
+function AreaChart({ brand, series, height = 480 }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number }) {
+  const w = 1000;
+  const h = height;
+  const padL = 20, padR = 20, padT = 20, padB = 60;
+  const vals = series.map((p) => p.value);
+  const max = Math.max(1, ...vals);
+  const min = Math.min(0, ...vals);
+  const range = max - min || 1;
+  const step = series.length > 1 ? (w - padL - padR) / (series.length - 1) : 0;
+  const pts = series.map((p, i) => [padL + i * step, padT + (h - padT - padB) * (1 - (p.value - min) / range)] as [number, number]);
+  const linePath = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
+  const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z` : "";
+  const id = `area-${brand.id}-${series.length}`;
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      <defs>
+        <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor={brand.tokens.primary} stopOpacity="0.22" />
+          <stop offset="100%" stopColor={brand.tokens.primary} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
+      {areaPath && <path d={areaPath} fill={`url(#${id})`} />}
+      <path d={linePath} fill="none" stroke={brand.tokens.accent} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={7} fill={brand.tokens.accent} />}
+      {series.map((p, i) => (
+        <text key={i} x={pts[i]?.[0]} y={h - padB + 32} textAnchor="middle" fontSize={20} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
+      ))}
+    </svg>
+  );
+}
+
+function BarChart({ brand, bars, height = 480, highlight }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string }) {
+  const w = 900;
+  const h = height;
+  const padL = 20, padR = 20, padT = 30, padB = 60;
+  const max = Math.max(1, ...bars.map((b) => b.value));
+  const chartH = h - padT - padB;
+  const slot = (w - padL - padR) / Math.max(bars.length, 1);
+  const barW = slot * 0.55;
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
+      {bars.map((b, i) => {
+        const bh = (b.value / max) * chartH;
+        const x = padL + i * slot + (slot - barW) / 2;
+        const y = h - padB - bh;
+        const isHi = highlight ? b.label === highlight : false;
+        const color = isHi ? brand.tokens.accent : brand.tokens.primary;
+        const opacity = isHi ? 1 : 0.35 + (i / Math.max(bars.length - 1, 1)) * 0.45;
+        return (
+          <g key={i}>
+            <rect x={x} y={y} width={barW} height={bh} fill={color} opacity={opacity} />
+            <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={20} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{b.label}</text>
+            <text x={x + barW / 2} y={y - 10} textAnchor="middle" fontSize={22} fontWeight={600} fill={brand.tokens.primary}>{b.value}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function ReportCard({ brand, item }: { brand: BrandMode; item: Item }) {
+  const delta = s(item.delta);
+  const negative = delta.trim().startsWith("-");
+  return (
+    <div className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+      <Kicker brand={brand} color={negative ? "#E53D2E" : undefined}>{negative ? "Reduction" : "Growth"}</Kicker>
+      <div className="mt-6" style={{ fontSize: 96, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.035em", lineHeight: 0.95 }}>{delta}</div>
+      <div className="mt-6" style={{ fontSize: 26, color: "rgba(10,15,28,0.75)", lineHeight: 1.35, maxWidth: 520 }}>{s(item.label)}</div>
+      <div className="mt-8"><Sparkline brand={brand} values={toNums(item.series)} h={80} /></div>
+      {s(item.meta) && (
+        <div className="mt-4 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "rgba(10,15,28,0.5)", fontWeight: 600 }}>{s(item.meta)}</div>
+      )}
+    </div>
+  );
+}
+
+function ProgressBar({ brand, percent }: { brand: BrandMode; percent: number }) {
+  const p = Math.max(0, Math.min(100, percent));
+  return (
+    <div style={{ position: "relative", height: 10, background: "rgba(10,15,28,0.08)", flex: 1, borderRadius: 0 }}>
+      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${p}%`, background: brand.tokens.accent }} />
+    </div>
+  );
+}
