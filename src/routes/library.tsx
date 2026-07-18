@@ -1,8 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { WcagBadge } from "@/components/WcagBadge";
-import { HiddenAuditFrame } from "@/components/HiddenAuditFrame";
-import type { WcagReport } from "@/lib/wcag";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Download, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
@@ -54,26 +51,7 @@ function Library() {
   const [mode, setMode] = useState<"light" | "dark" | "ab">("light");
   
   const [showImagery, setShowImagery] = useState(false);
-  const [wcagOn, setWcagOn] = useState(false);
   const autoFixOn = true;
-  const [approvalTick, setApprovalTick] = useState(0);
-  const approvals = useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    approvalTick;
-    if (typeof window === "undefined") return {} as Record<string, { status: "approved" | "rejected" }>;
-    try {
-      return JSON.parse(localStorage.getItem("wcag-approvals-v1") ?? "{}");
-    } catch {
-      return {} as Record<string, { status: "approved" | "rejected" }>;
-    }
-  }, [approvalTick]);
-  const approvalSummary = useMemo(() => {
-    const values = Object.values(approvals) as Array<{ status: "approved" | "rejected" }>;
-    return {
-      approved: values.filter((v) => v.status === "approved").length,
-      rejected: values.filter((v) => v.status === "rejected").length,
-    };
-  }, [approvals]);
   const tpMasterIdx = Math.max(0, brandModes.findIndex((b) => b.id === "bm-enterprise"));
   const [brandIdx, setBrandIdx] = useState(tpMasterIdx);
 
@@ -192,38 +170,12 @@ function Library() {
           >
             ▤ Sample imagery {showImagery ? "on" : "off"}
           </button>
-          <button
-            type="button"
-            onClick={() => setWcagOn((v) => !v)}
-            aria-pressed={wcagOn}
-            title="Run WCAG 2.1 contrast audit on each rendered slide"
-            className={`rounded-full border px-3 py-1.5 text-xs ${
-              wcagOn
-                ? "border-emerald-600 bg-emerald-600 text-white"
-                : "border-black/15 bg-white text-black/70 hover:text-black"
-            }`}
-          >
-            ⚖ WCAG {wcagOn ? "on" : "off"}
-          </button>
-          {wcagOn && (approvalSummary.approved + approvalSummary.rejected > 0) && (
-            <span className="rounded-full bg-black/5 px-3 py-1 text-[11px] text-black/70">
-              <span className="font-semibold text-emerald-700">{approvalSummary.approved} approved</span>
-              {" · "}
-              <span className="font-semibold text-red-600">{approvalSummary.rejected} rejected</span>
-            </span>
-          )}
           <span className="text-sm text-black/50">{filtered.length} of {moduleVariants.length}</span>
         </div>
       </div>
 
 
-      <div
-        className="mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3"
-        onClickCapture={() => {
-          // Refresh approvals summary when badges are clicked.
-          if (wcagOn) window.setTimeout(() => setApprovalTick((t) => t + 1), 50);
-        }}
-      >
+      <div className="mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3">
         {filtered.map((v) => (
           <VariantCard
             key={v.id}
@@ -234,7 +186,6 @@ function Library() {
             preferred={preferred.has(v.id)}
             mode={mode}
             showImagery={showImagery}
-            wcagOn={wcagOn}
             autoFixOn={autoFixOn}
             onOpen={() => setOpenId(v.id)}
           />
@@ -281,7 +232,6 @@ function VariantCard({
   preferred,
   mode = "light",
   showImagery = false,
-  wcagOn = false,
   autoFixOn = false,
   onOpen,
 }: {
@@ -292,7 +242,6 @@ function VariantCard({
   preferred?: boolean;
   mode?: "light" | "dark" | "ab";
   showImagery?: boolean;
-  wcagOn?: boolean;
   autoFixOn?: boolean;
   onOpen: () => void;
 }) {
@@ -313,64 +262,22 @@ function VariantCard({
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
   const singleRef = useRef<HTMLDivElement | null>(null);
-  const [fixedCount, setFixedCount] = useState(0);
-
   // Apply / revert the auto-fix on the currently-visible slide refs.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const targets = isAB
       ? [lightRef.current, darkRef.current]
       : [singleRef.current];
-    let total = 0;
-    // Delay so VariantRenderer's paint settles and audit has a chance to run.
     const t = window.setTimeout(async () => {
       const { applyAutoFix, revertAutoFix } = await import("@/lib/wcag");
       for (const el of targets) {
         if (!el) continue;
         revertAutoFix(el);
-        if (autoFixOn) total += applyAutoFix(el);
+        if (autoFixOn) applyAutoFix(el);
       }
-      setFixedCount(total);
     }, 320);
     return () => window.clearTimeout(t);
   }, [autoFixOn, isAB, variant.id, brand.id, showImagery, isDark]);
-
-  // Track WCAG reports for BOTH modes so the card can display a persistent
-  // warning even when only one mode is visible on screen.
-  const [reportLight, setReportLight] = useState<WcagReport | null>(null);
-  const [reportDark, setReportDark] = useState<WcagReport | null>(null);
-  const onLight = useCallback((r: WcagReport) => setReportLight(r), []);
-  const onDark = useCallback((r: WcagReport) => setReportDark(r), []);
-
-  const worstLevel = (() => {
-    const levels = [reportLight?.overall, reportDark?.overall].filter(Boolean) as WcagReport["overall"][];
-    if (!levels.length) return null;
-    if (levels.includes("FAIL")) return "FAIL" as const;
-    if (levels.includes("AA-Large")) return "AA-Large" as const;
-    if (levels.every((l) => l === "AAA")) return "AAA" as const;
-    return "AA" as const;
-  })();
-  const warnTone =
-    worstLevel === "FAIL"
-      ? "bg-red-600 text-white ring-red-200"
-      : worstLevel === "AA-Large"
-        ? "bg-amber-500 text-amber-950 ring-amber-100"
-        : null;
-  const warnLabel =
-    worstLevel === "FAIL"
-      ? "⚠ Low contrast"
-      : worstLevel === "AA-Large"
-        ? "⚠ AA-Large only"
-        : null;
-  const worstDetail = (() => {
-    if (!warnLabel) return "";
-    const parts: string[] = [];
-    if (reportLight && reportLight.overall !== "AA" && reportLight.overall !== "AAA")
-      parts.push(`Light: ${reportLight.minRatio}:1 (${reportLight.aaFail} failing)`);
-    if (reportDark && reportDark.overall !== "AA" && reportDark.overall !== "AAA")
-      parts.push(`Dark: ${reportDark.minRatio}:1 (${reportDark.aaFail} failing)`);
-    return parts.join(" · ");
-  })();
 
   return (
     <button
@@ -378,12 +285,6 @@ function VariantCard({
       onClick={onOpen}
       className="group relative block w-full overflow-hidden rounded-[24px] border border-slate-200 bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:border-[#003FC7]/20 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)]"
     >
-      {/* Auto-fix is always on; warning badges intentionally hidden. */}
-      {void warnLabel}
-      {void warnTone}
-      {void worstDetail}
-      {void fixedCount}
-
       {isAB ? (
         <div className="m-2 grid grid-cols-2 gap-2">
           {(["light", "dark"] as const).map((m) => (
@@ -397,14 +298,6 @@ function VariantCard({
                     <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={m} />
                   </SlideBackdropContext.Provider>
                 </ScaledSlide>
-                <WcagBadge
-                  variantId={variant.id}
-                  mode={m}
-                  targetRef={m === "dark" ? darkRef : lightRef}
-                  enabled={wcagOn}
-                  compact
-                  onReport={m === "dark" ? onDark : onLight}
-                />
               </div>
               <div className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest backdrop-blur ${m === "dark" ? "bg-white/15 text-white ring-1 ring-white/25" : "bg-black/70 text-white"}`}>
                 {m === "dark" ? "☾ B · Dark" : "☀︎ A · Light"}
@@ -427,33 +320,6 @@ function VariantCard({
             <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={isDark ? "dark" : "light"} />
           </SlideBackdropContext.Provider>
         </ScaledSlide>
-        <WcagBadge
-          variantId={variant.id}
-          mode={isDark ? "dark" : "light"}
-          targetRef={singleRef}
-          enabled={wcagOn}
-          onReport={isDark ? onDark : onLight}
-        />
-
-        {/* Off-screen audit of the OPPOSITE mode so the card can warn about
-            low contrast in a theme that isn't currently displayed. */}
-        <HiddenAuditFrame
-          bg={isDark ? "#F2F2F2" : "#03002C"}
-          deps={[variant.id, brand.id, isDark, showImagery]}
-          onReport={isDark ? onLight : onDark}
-        >
-          <SlideBackdropContext.Provider
-            value={showImagery ? backdropForVariant(variant, brand.id, isDark ? "light" : "dark") : null}
-          >
-            <VariantRenderer
-              slide={previewSlide}
-              variant={variant}
-              brand={brand}
-              pageNumber={1}
-              mode={isDark ? "light" : "dark"}
-            />
-          </SlideBackdropContext.Provider>
-        </HiddenAuditFrame>
 
         {/* Subtle top-right specular gradient */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.08]" />
