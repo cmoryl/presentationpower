@@ -307,10 +307,21 @@ export function revertAutoFix(root: HTMLElement) {
   const nodes = root.querySelectorAll<HTMLElement>("[data-wcag-fixed]");
   nodes.forEach((el) => {
     el.style.color = el.dataset.wcagOriginal ?? "";
+    el.style.removeProperty("-webkit-text-fill-color");
+    el.style.removeProperty("background-clip");
+    el.style.removeProperty("-webkit-background-clip");
     el.style.removeProperty("opacity");
     if (el.dataset.wcagShadow) {
       el.style.removeProperty("text-shadow");
       delete el.dataset.wcagShadow;
+    }
+    if (el.dataset.wcagChip) {
+      el.style.removeProperty("background-color");
+      el.style.removeProperty("padding");
+      el.style.removeProperty("border-radius");
+      el.style.removeProperty("box-decoration-break");
+      el.style.removeProperty("-webkit-box-decoration-break");
+      delete el.dataset.wcagChip;
     }
     delete el.dataset.wcagFixed;
     delete el.dataset.wcagOriginal;
