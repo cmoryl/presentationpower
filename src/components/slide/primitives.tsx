@@ -260,17 +260,39 @@ export function StatFigure({
   const vc = valueColor ?? (mode === "dark" ? "#ffffff" : brand.tokens.primary);
   const uc = unitColor ?? brand.tokens.accent;
   const labelColor = mode === "dark" ? "rgba(255,255,255,0.72)" : "rgba(10,15,28,0.65)";
+  // Overflow safeguards: wide values (e.g. "$220k", "1,240 pts") sitting in
+  // half-width grid columns previously spilled into the neighbor. We now:
+  //   • constrain the wrapper with `min-w-0 max-w-full` so it can actually
+  //     shrink inside a grid track (grid children default to `min-width: auto`
+  //     and refuse to compress, which is what caused the overlap);
+  //   • keep the numeral on one line but let it shrink via a viewport-clamped
+  //     font-size ceiling so very wide values step down automatically before
+  //     they touch the next column;
+  //   • tighten letter-spacing on the value so long strings stay compact.
+  const valueFontSize = `min(${spec.valuePx}px, 22cqw)`;
+  const unitFontSize = `min(${spec.unitPx}px, 8cqw)`;
   return (
-    <div className={align === "center" ? "flex flex-col items-center text-center" : ""}>
+    <div
+      className={`min-w-0 max-w-full ${align === "center" ? "flex flex-col items-center text-center" : ""}`}
+      style={{ containerType: "inline-size" }}
+    >
       <div
         className="font-semibold tabular-nums"
-        style={{ fontSize: spec.valuePx, lineHeight: 0.92, letterSpacing: "-0.03em", color: vc }}
+        style={{
+          fontSize: valueFontSize,
+          lineHeight: 0.92,
+          letterSpacing: "-0.035em",
+          color: vc,
+          whiteSpace: "nowrap",
+          overflowWrap: "normal",
+          maxWidth: "100%",
+        }}
       >
         {value || "—"}
         {unit && (
           <span
             className="ml-2 font-medium align-top"
-            style={{ fontSize: spec.unitPx, color: uc, letterSpacing: "-0.02em" }}
+            style={{ fontSize: unitFontSize, color: uc, letterSpacing: "-0.02em" }}
           >
             {unit}
           </span>
