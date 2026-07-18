@@ -60,18 +60,22 @@ if (MODE === "ab") {
 await page.waitForSelector("[data-variant-card]", { timeout: 30_000 });
 await page.waitForTimeout(1500);
 
-const cards = await page.$$("[data-variant-card]");
-console.log(`→ ${cards.length} cards found · mode=${MODE}`);
+const cardIds = await page.$$eval("[data-variant-card]", (els) =>
+  els.map((el, i) => el.getAttribute("data-variant-id") ?? `card-${i}`),
+);
+console.log(`→ ${cardIds.length} cards found · mode=${MODE}`);
 
 const overlaps = [];
 const captured = [];
 
-for (let i = 0; i < cards.length; i++) {
-  const card = cards[i];
-  const variantId = (await card.getAttribute("data-variant-id")) ?? `card-${i}`;
+for (let i = 0; i < cardIds.length; i++) {
+  const variantId = cardIds[i];
+  const selector = `[data-variant-card][data-variant-id="${variantId.replace(/"/g, '\\"')}"]`;
+  const card = await page.$(selector);
+  if (!card) continue;
 
   // Scroll into view so layout stabilizes and container-query sizes settle.
-  await card.scrollIntoViewIfNeeded();
+  await card.scrollIntoViewIfNeeded().catch(() => {});
   await page.waitForTimeout(120);
 
   // Per-card overlap probe: for each stat figure, walk up until we find a
