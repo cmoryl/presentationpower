@@ -258,13 +258,20 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div className="flex h-full flex-col justify-end">
-            <div className="text-3xl uppercase tracking-[0.3em] opacity-70">Prepared for</div>
-            <div className="mt-6 text-[110px] font-semibold leading-none">{s(c.title, "Client")}</div>
-            <div className="mt-10 max-w-4xl text-4xl opacity-90">{s(c.subtitle)}</div>
-            <div className="mt-16 flex gap-16 text-2xl opacity-80">
-              <div>{s(c.presenter)}</div>
-              <div>{s(c.date)}</div>
-            </div>
+            <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
+            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-8" />
+            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1520} className="mt-10">
+              {s(c.title, "Client")}
+            </DisplayTitle>
+            {s(c.subtitle) && (
+              <SupportingText size="xl" opacity={0.82} maxWidthPx={1180} className="mt-10">
+                {s(c.subtitle)}
+              </SupportingText>
+            )}
+            <MetaRow className="mt-16">
+              {s(c.presenter) && <span>{s(c.presenter)}</span>}
+              {s(c.date) && <span>{s(c.date)}</span>}
+            </MetaRow>
           </div>
         </SlideFrame>
       );
@@ -273,12 +280,27 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} className="absolute inset-0 h-full w-full rounded-none" />
-          <div className="absolute inset-0" style={{ backgroundColor: "rgba(3,0,44,0.62)" }} />
+          {/* Cinematic scrim — gradient from primary bottom-left to transparent top-right */}
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `linear-gradient(115deg, ${brand.tokens.primary}f0 0%, ${brand.tokens.primary}b8 40%, rgba(0,0,0,0.35) 100%)`,
+            }}
+          />
           <div className="relative flex h-full flex-col justify-end text-white">
-            <div className="text-2xl uppercase tracking-[0.3em] opacity-80">Prepared for {s(c.clientName)}</div>
-            <div className="mt-4 text-[128px] font-semibold leading-[0.95]">{s(c.title)}</div>
-            <div className="mt-8 max-w-4xl text-3xl opacity-90">{s(c.subtitle)}</div>
-            <div className="mt-14 text-xl opacity-70">{s(c.date)}</div>
+            <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
+            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-8" />
+            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1520} className="mt-10">
+              {s(c.title)}
+            </DisplayTitle>
+            {s(c.subtitle) && (
+              <SupportingText size="xl" opacity={0.88} maxWidthPx={1180} className="mt-10">
+                {s(c.subtitle)}
+              </SupportingText>
+            )}
+            <MetaRow className="mt-16">
+              {s(c.date) && <span>{s(c.date)}</span>}
+            </MetaRow>
           </div>
         </SlideFrame>
       );
@@ -287,10 +309,20 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div className="flex h-full flex-col justify-center">
-            <div className="h-[4px] w-32" style={{ backgroundColor: brand.tokens.accent }} />
-            <div className="mt-12 text-[96px] font-semibold leading-tight">{s(c.title)}</div>
-            <div className="mt-6 max-w-3xl text-3xl opacity-70">{s(c.subtitle)}</div>
-            <div className="mt-16 text-xl uppercase tracking-[0.3em] opacity-60">{s(c.date)}</div>
+            <Hairline color={brand.tokens.accent} widthPx={120} thicknessPx={2} />
+            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1520} className="mt-12">
+              {s(c.title)}
+            </DisplayTitle>
+            {s(c.subtitle) && (
+              <SupportingText size="xl" opacity={0.72} maxWidthPx={1080} className="mt-8">
+                {s(c.subtitle)}
+              </SupportingText>
+            )}
+            {s(c.date) && (
+              <MetaRow className="mt-16">
+                <span>{s(c.date)}</span>
+              </MetaRow>
+            )}
           </div>
         </SlideFrame>
       );
@@ -299,10 +331,11 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="divider">
           <div className="flex h-full flex-col justify-center">
-            <div className="text-2xl uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>
-              {s(c.kicker, "Section")}
-            </div>
-            <div className="mt-6 text-[130px] font-semibold leading-[1.05]">{s(c.title)}</div>
+            <Kicker brand={brand}>{s(c.kicker, "Section")}</Kicker>
+            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-8" />
+            <DisplayTitle size="divider" color="#ffffff" maxWidthPx={1600} className="mt-10">
+              {s(c.title)}
+            </DisplayTitle>
           </div>
         </SlideFrame>
       );
@@ -310,13 +343,26 @@ function renderVariantBody({
     case "MV-OP-DIVIDER-NUMBERED":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="divider">
-          <div className="flex h-full items-center gap-16">
-            <div className="text-[320px] font-semibold leading-none" style={{ color: brand.tokens.accent }}>
+          <div className="flex h-full items-center gap-20">
+            <div
+              className="tabular-nums"
+              style={{
+                fontSize: 340,
+                lineHeight: 0.85,
+                fontWeight: 600,
+                letterSpacing: "-0.05em",
+                color: brand.tokens.accent,
+                opacity: 0.95,
+              }}
+            >
               {s(c.chapterNumber, "01")}
             </div>
-            <div>
-              <div className="text-2xl uppercase tracking-[0.3em] opacity-70">{s(c.kicker, "Chapter")}</div>
-              <div className="mt-6 text-[96px] font-semibold leading-[1.05]">{s(c.title)}</div>
+            <div className="flex-1">
+              <Kicker brand={brand} color="rgba(255,255,255,0.7)">{s(c.kicker, "Chapter")}</Kicker>
+              <Hairline color={brand.tokens.accent} widthPx={64} thicknessPx={2} className="mt-6" />
+              <DisplayTitle size="section" color="#ffffff" maxWidthPx={1100} className="mt-8">
+                {s(c.title)}
+              </DisplayTitle>
             </div>
           </div>
         </SlideFrame>
@@ -325,15 +371,17 @@ function renderVariantBody({
     case "MV-OP-AGENDA":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, "Agenda")} />
-          <div className="mt-16 grid grid-cols-2 gap-x-24 gap-y-10">
+          <SlideTitle brand={brand} title={s(c.title, "Agenda")} kicker="Contents" />
+          <div className="mt-16 grid grid-cols-2 gap-x-24 gap-y-8">
             {arr(c.items).map((it, i) => (
-              <div key={i} className="flex items-center gap-6">
-                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} />
-                <div className="text-5xl font-semibold" style={{ color: brand.tokens.accent }}>
+              <div key={i} className="flex items-baseline gap-8 border-t pt-6" style={{ borderColor: "rgba(10,15,28,0.10)" }}>
+                <div
+                  className="tabular-nums"
+                  style={{ color: brand.tokens.accent, fontSize: 40, fontWeight: 600, letterSpacing: "-0.02em", minWidth: 76 }}
+                >
                   {String(i + 1).padStart(2, "0")}
                 </div>
-                <div className="text-4xl">{s(it.label)}</div>
+                <div style={{ fontSize: 36, lineHeight: 1.2, fontWeight: 500 }}>{s(it.label)}</div>
               </div>
             ))}
           </div>
@@ -343,23 +391,32 @@ function renderVariantBody({
     case "MV-OP-AGENDA-VERTICAL":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, "Agenda")} />
-          <div className="mt-14 space-y-8">
+          <SlideTitle brand={brand} title={s(c.title, "Agenda")} kicker="Contents" />
+          <div className="mt-12">
             {arr(c.items).map((it, i) => (
-              <div key={i} className="flex items-center gap-8 border-b border-black/10 pb-6">
-                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} />
-                <div className="w-24 text-5xl font-semibold" style={{ color: brand.tokens.accent }}>
+              <div key={i} className="flex items-baseline gap-10 border-t py-7" style={{ borderColor: "rgba(10,15,28,0.10)" }}>
+                <div
+                  className="tabular-nums"
+                  style={{ color: brand.tokens.accent, fontSize: 40, fontWeight: 600, letterSpacing: "-0.02em", minWidth: 90 }}
+                >
                   {String(i + 1).padStart(2, "0")}
                 </div>
                 <div className="flex-1">
-                  <div className="text-3xl font-semibold">{s(it.label)}</div>
-                  {s(it.body) && <div className="mt-2 text-2xl opacity-70">{s(it.body)}</div>}
+                  <div style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.015em", lineHeight: 1.15 }}>
+                    {s(it.label)}
+                  </div>
+                  {s(it.body) && (
+                    <div className="mt-2" style={{ fontSize: 24, opacity: 0.66, lineHeight: 1.35 }}>
+                      {s(it.body)}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         </SlideFrame>
       );
+
 
     case "MV-OP-INTRO-TEAM":
     case "MV-TEAM-BIOS-3":
