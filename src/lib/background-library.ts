@@ -5,20 +5,28 @@
 // Rendered by SlideChrome via SlideBackdropContext. See PPTX export for the
 // mapping to native PowerPoint background fills.
 
-export type BackgroundKind = "library" | "upload" | "ai" | "color" | "gradient";
+export type BackgroundKind = "library" | "upload" | "ai" | "color" | "gradient" | "pattern";
 export type BackgroundScrim = "bottom" | "left" | "right" | "top" | "full" | "vignette";
+export type PatternId = "dots" | "grid" | "diagonal" | "waves" | "checker" | "cross" | "triangles";
 
 export type SlideBackgroundValue = {
   kind: BackgroundKind;
   presetId?: string;
-  url?: string; // for upload / ai / photo-library
-  css?: string; // full CSS `background` shorthand (color + image)
-  solid?: string; // hex fallback for PPTX export
+  url?: string;
+  css?: string;
+  solid?: string;
   scrim?: BackgroundScrim;
-  scrimStrength?: number; // 0..1
-  imageDim?: number; // 0..1
-  tint?: string; // hex
-  darkChrome?: boolean; // hint that chrome should render on dark mode
+  scrimStrength?: number;
+  imageDim?: number;
+  tint?: string;
+  darkChrome?: boolean;
+  // Parametric — round-trip user color / intensity choices.
+  color?: string;
+  colorB?: string;
+  angle?: number;
+  intensity?: number;
+  patternId?: PatternId;
+  patternScale?: number;
 };
 
 export type BackgroundPreset = {
