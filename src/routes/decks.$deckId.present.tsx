@@ -77,6 +77,8 @@ function PresenterView() {
       else if (e.key === "Home") setI(0);
       else if (e.key === "End") setI(deck.slides.length - 1);
       else if (e.key === "t" || e.key === "T") setStripOpen((v) => !v);
+      else if (e.key === "n" || e.key === "N") setNotesOpen((v) => !v);
+
       else if (e.key === "Escape") navigate({ to: "/decks/$deckId", params: { deckId } });
     };
     window.addEventListener("keydown", onKey);
