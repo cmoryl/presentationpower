@@ -5,8 +5,8 @@ import type { TemplatePayload } from "../deck-store";
 
 export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
   title: "Pulse Fest · Community Event Kit",
-  brandModeId: "bm-masterbrand",
-  archetypeId: "NA-01",
+  brandModeId: "bm-enterprise",
+  archetypeId: "arch-product-pitch",
   subCompany: null,
   context: null,
   brief: {
@@ -22,7 +22,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-01",
       variantId: "MV-OP-COVER-POSTER",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         kicker: "PULSE FEST · Annual Community Gathering",
         title: "Gather & Grow Together",
@@ -32,7 +32,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-01",
       variantId: "MV-OP-AGENDA-VERTICAL",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         title: "Inside this deck",
         items: [
@@ -50,7 +50,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-03",
       variantId: "MV-CTX-STAT-GRID",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         title: "A weekend built for people who make things happen",
         items: [
@@ -63,7 +63,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-05",
       variantId: "MV-IMG-PORTRAIT",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         name: "Maya Okonkwo",
         role: "Founder & Systems Thinker",
@@ -76,7 +76,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-10",
       variantId: "MV-PROC-PHASES",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         title: "Three days, one rhythm",
         items: [
@@ -98,7 +98,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-06",
       variantId: "MV-SOL-PILLARS-4",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         title: "Pick your path",
         items: [
@@ -124,7 +124,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-08",
       variantId: "MV-PROOF-STATS-4",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         title: "What we built together",
         items: [
@@ -138,13 +138,13 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-01",
       variantId: "MV-OP-DIVIDER",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: { kicker: "Scenes from the floor", title: "A weekend in motion" },
     },
     {
       sectionId: "SF-08",
       variantId: "MV-PROOF-TESTIMONIAL",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         quote:
           "I arrived with half an idea and left with a team, a plan, and three people I now call friends.",
@@ -156,7 +156,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-13",
       variantId: "MV-COMM-PRICING",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         title: "Choose your level of access",
         items: [
@@ -198,7 +198,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-10",
       variantId: "MV-DEC-COMPARE-TABLE",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         title: "The weekend at a glance",
         columns: [{ label: "Fri 12" }, { label: "Sat 13" }, { label: "Sun 14" }],
@@ -214,7 +214,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-08",
       variantId: "MV-QUOTE-MULTI",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         title: "Voices from the community",
         items: [
@@ -242,7 +242,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-07",
       variantId: "MV-SOL-FEATURE-LIST",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         title: "Frequently asked questions",
         items: [
@@ -276,7 +276,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-11",
       variantId: "MV-DEC-CHECKLIST",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         title: "Pack light, arrive ready",
         items: [
@@ -292,7 +292,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-03",
       variantId: "MV-CTX-CARDS-3",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         title: "Find us at The Commons",
         items: [
@@ -314,7 +314,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-12",
       variantId: "MV-TEAM-BIOS-4",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         title: "The crew making it happen",
         items: [
@@ -328,7 +328,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-08",
       variantId: "MV-PROOF-LOGOS",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         title: "Our partners & friends",
         items: [
@@ -344,7 +344,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-16",
       variantId: "MV-CLOSE-CTA",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         message: "Get your pass.",
         nextSteps:
@@ -356,7 +356,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-16",
       variantId: "MV-CLOSE-CONTACT",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: {
         title: "Stay in the loop",
         items: [
@@ -378,7 +378,7 @@ export const COMMUNITY_EVENT_TEMPLATE: TemplatePayload = {
     {
       sectionId: "SF-16",
       variantId: "MV-CLOSE-THANKS",
-      layoutId: "LT-FULL",
+      layoutId: "",
       content: { message: "Thank you.", signoff: "Pulse Fest · See you in Portland" },
     },
   ],
