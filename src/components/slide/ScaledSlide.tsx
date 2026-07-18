@@ -17,13 +17,19 @@ export function ScaledSlide({
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => {
+    const measure = () => {
       const w = el.clientWidth;
       const h = el.clientHeight;
-      setScale(Math.min(w / 1920, h / 1080));
-    });
+      if (w > 0 && h > 0) setScale(Math.min(w / 1920, h / 1080));
+    };
+    const ro = new ResizeObserver(measure);
     ro.observe(el);
-    return () => ro.disconnect();
+    measure();
+    const raf = requestAnimationFrame(measure);
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
   }, []);
 
   return (
