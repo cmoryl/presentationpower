@@ -203,12 +203,17 @@ export function mapParsedSlide(
 
   const variant = byId(MODULE_VARIANTS, variantId) ?? MODULE_VARIANTS[0];
   const layoutId = variant.permittedLayoutIds[0];
+  // Final safety net: if any earlier branch left a slide-level media
+  // reference on a content record whose final variant does not render
+  // imagery, strip it here so exporters and renderers stay consistent.
+  const safeContent = normalizeSlideMedia(variant.id, content as Record<string, unknown>) as SlideContent;
   return {
     sectionId,
     variantId: variant.id,
     layoutId,
-    content,
+    content: safeContent,
     source: s,
     rationale,
   };
 }
+
