@@ -935,6 +935,126 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         owner: "TransPerfect account team",
       };
 
+    // ── Advanced variants — BATCH 1 ────────────────────────────────────
+    case "MV-BENTO-5":
+      return {
+        title: `Why ${clientName} chooses TransPerfect`,
+        items: [
+          { kind: "feature", title: "One operating model", body: `A single global program spanning every ${clientName} market, content type, and channel — with local precision built in.` },
+          { kind: "stat", value: "62", unit: "%", label: "Faster launch cycles" },
+          { kind: "body", title: "Human + AI", body: "Reviewer network paired with adaptive MT — quality that survives audit, at the speed of publish." },
+          { kind: "media", title: "In-market presence", mediaSeed: `${clientName}-bento` },
+          { kind: "body", title: "Governance-ready", body: "Terminology, brand voice, and regulatory guardrails codified per market." },
+        ],
+      };
+    case "MV-KPI-DASHBOARD":
+      return {
+        title: `${clientName} program — current state`,
+        items: [
+          { value: "42", unit: "M", label: "Words / year", delta: "+18%", trend: "up" },
+          { value: "38", unit: "", label: "Markets live", delta: "+6", trend: "up" },
+          { value: "97.4", unit: "%", label: "On-time delivery", delta: "+2.1", trend: "up" },
+          { value: "4.7", unit: "/5", label: "Reviewer quality", delta: "+0.3", trend: "up" },
+          { value: "12", unit: "d", label: "Avg. cycle time", delta: "-4d", trend: "down" },
+          { value: "$0.09", unit: "", label: "Cost / word", delta: "-14%", trend: "down" },
+        ],
+      };
+    case "MV-ROADMAP-QUARTERS":
+      return {
+        title: `${clientName} × TransPerfect — 12-month roadmap`,
+        quarters: ["Q1", "Q2", "Q3", "Q4"],
+        items: [
+          { label: "Discovery & terminology base", start: 1, end: 1, note: "Voice, glossaries, priority markets" },
+          { label: "Pilot in one market", start: 1, end: 2, note: "Measured against baseline" },
+          { label: "Program rollout", start: 2, end: 3, note: "Add markets, content types" },
+          { label: "AI-assisted expansion", start: 3, end: 4, note: "Adaptive MT + reviewer network" },
+          { label: "Governance & analytics", start: 3, end: 4, note: "SLA dashboards, audits" },
+        ],
+      };
+    case "MV-FUNNEL":
+      return {
+        title: `Where content is lost between HQ and ${clientName}'s markets`,
+        items: [
+          { label: "Content produced at HQ", value: "100", unit: "%", note: "Original creative in source language" },
+          { label: "Translated on time", value: "68", unit: "%", note: "Rest slips a full cycle" },
+          { label: "Reviewed in-market", value: "44", unit: "%", note: "Local voice check" },
+          { label: "Published on brand", value: "31", unit: "%", note: "Meeting compliance + tone" },
+        ],
+      };
+    case "MV-FLYWHEEL":
+      return {
+        title: `${clientName}'s content flywheel`,
+        hub: "Global content engine",
+        items: [
+          { label: "Create", note: "Author once at HQ", icon: "sparkles" },
+          { label: "Localize", note: "Adaptive MT + reviewers", icon: "globe2" },
+          { label: "Publish", note: "Route to every market", icon: "send" },
+          { label: "Measure", note: "Feedback loop to source", icon: "linechart" },
+        ],
+      };
+    case "MV-MATURITY-CURVE":
+      return {
+        title: `${clientName}'s localization maturity`,
+        items: [
+          { label: "Ad hoc", note: "Vendor per market, no shared voice" },
+          { label: "Repeatable", note: "Shared glossaries, uneven quality", current: true },
+          { label: "Managed", note: "One program, SLAs, analytics" },
+          { label: "Optimized", note: "AI + human, real-time in-market" },
+        ],
+      };
+    case "MV-JOURNEY-MAP":
+      return {
+        title: `${clientName}'s buyer journey across markets`,
+        items: [
+          { phase: "Discover", touchpoint: "Paid + organic search", sentiment: 2 },
+          { phase: "Evaluate", touchpoint: "Product pages, docs", sentiment: 3 },
+          { phase: "Decide", touchpoint: "Sales, legal, compliance", sentiment: 2 },
+          { phase: "Onboard", touchpoint: "Training + support", sentiment: 4 },
+          { phase: "Expand", touchpoint: "In-market campaigns", sentiment: 5 },
+        ],
+      };
+    case "MV-LOGO-WALL":
+      return {
+        title: "Teams we run global programs for",
+        items: [
+          { name: "Meta" }, { name: "Netflix" }, { name: "Pfizer" }, { name: "Bosch" },
+          { name: "L'Oréal" }, { name: "Airbnb" }, { name: "Stripe" }, { name: "Siemens" },
+          { name: "Roche" }, { name: "Adobe" },
+        ],
+      };
+    case "MV-MATRIX-2X2":
+      return {
+        title: `Where ${clientName} plays vs. where the market is heading`,
+        axisX: "Speed to market",
+        axisY: "Local precision",
+        quadrants: ["Legacy vendors", "Boutique agencies", "In-house teams", "TransPerfect program"],
+        target: 4,
+        items: [
+          { label: "Legacy LSP", x: 0.25, y: 0.30 },
+          { label: "Boutique", x: 0.30, y: 0.72 },
+          { label: "In-house", x: 0.55, y: 0.55 },
+          { label: `${clientName} today`, x: 0.45, y: 0.48 },
+          { label: "TransPerfect", x: 0.80, y: 0.82 },
+        ],
+      };
+    case "MV-ICEBERG":
+      return {
+        title: "The real cost of decentralized translation",
+        waterline: "What executives see",
+        above: [
+          { label: "Vendor invoices", body: "The line item everyone tracks." },
+          { label: "Cycle time", body: "Weeks between HQ launch and in-market live." },
+        ],
+        below: [
+          { label: "Rework in-market", body: "Local teams re-editing off-brand copy." },
+          { label: "Compliance risk", body: "Regulated content published without terminology control." },
+          { label: "Lost revenue", body: "Campaigns that miss the local season entirely." },
+          { label: "Brand drift", body: "Voice fragments across every market and channel." },
+        ],
+      };
+
+
+
     default:
 
 
