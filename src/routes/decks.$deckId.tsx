@@ -50,6 +50,7 @@ function DeckEditor() {
   const revertAiChange = useDeckStore((s) => s.revertAiChange);
   const updateSlideNotes = useDeckStore((s) => s.updateSlideNotes);
   const setDeckClientLogo = useDeckStore((s) => s.setDeckClientLogo);
+  const applySlideBackground = useDeckStore((s) => s.applySlideBackground);
 
 
   const [activeIdx, setActiveIdx] = useState(0);
@@ -195,6 +196,25 @@ function DeckEditor() {
               key={`bg-${active.id}`}
               value={(active.content as Record<string, unknown>).background}
               onChange={(next) => updateField(deck.id, active.id, "background", next)}
+              activeSlideId={active.id}
+              slides={deck.slides.map((sl) => {
+                const section = byId(SECTION_FRAMEWORKS, sl.sectionId);
+                const c = sl.content as Record<string, unknown>;
+                const title =
+                  (typeof c.title === "string" && c.title) ||
+                  (typeof c.headline === "string" && (c.headline as string)) ||
+                  (typeof c.kicker === "string" && (c.kicker as string)) ||
+                  section?.name ||
+                  "Slide";
+                return {
+                  id: sl.id,
+                  position: sl.position,
+                  sectionId: sl.sectionId,
+                  sectionName: section?.name ?? sl.sectionId,
+                  title: title as string,
+                };
+              })}
+              onApplyToSlides={(ids, next) => applySlideBackground(deck.id, ids, next)}
             />
           )}
 

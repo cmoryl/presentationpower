@@ -157,6 +157,7 @@ type DeckState = {
   revertAiChange: (deckId: string, slideId: string, field: string) => void;
   updateSlideField: (deckId: string, slideId: string, field: string, value: unknown) => void;
   updateSlideNotes: (deckId: string, slideId: string, notes: string) => void;
+  applySlideBackground: (deckId: string, slideIds: string[], background: unknown) => void;
 
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
@@ -1672,6 +1673,35 @@ export const useDeckStore = create<DeckState>()(
           },
         }));
       },
+
+      applySlideBackground: (deckId, slideIds, background) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const ids = new Set(slideIds);
+        if (ids.size === 0) return;
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) =>
+                ids.has(sl.id)
+                  ? {
+                      ...sl,
+                      content: (background === null || background === undefined
+                        ? (() => {
+                            const { background: _drop, ...rest } = sl.content as Record<string, unknown>;
+                            return rest as SlideContent;
+                          })()
+                        : ({ ...(sl.content as Record<string, unknown>), background } as SlideContent)),
+                    }
+                  : sl,
+              ),
+            },
+          },
+        }));
+      },
+
 
       swapVariant: (deckId, slideId, newVariantId) => {
         const deck = get().decks[deckId];

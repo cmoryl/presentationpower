@@ -114,12 +114,26 @@ function Slider({
   );
 }
 
+export type ApplyTargetSlide = {
+  id: string;
+  position: number;
+  sectionId: string;
+  sectionName: string;
+  title: string;
+};
+
 export function BackgroundImageryPanel({
   value,
   onChange,
+  slides,
+  activeSlideId,
+  onApplyToSlides,
 }: {
   value: unknown;
   onChange: (next: SlideBackgroundValue | null) => void;
+  slides?: ApplyTargetSlide[];
+  activeSlideId?: string;
+  onApplyToSlides?: (slideIds: string[], next: SlideBackgroundValue | null) => void;
 }) {
   const current = useMemo(() => resolveSlideBackground(value), [value]);
   const [tab, setTab] = useState<Tab>(() => {
@@ -134,7 +148,43 @@ export function BackgroundImageryPanel({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [aiPrompt, setAiPrompt] = useState("");
+  const [applyOpen, setApplyOpen] = useState(false);
+  const [applyMode, setApplyMode] = useState<"section" | "custom">("section");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [applyFlash, setApplyFlash] = useState<string | null>(null);
   const generate = useServerFn(generateBackgroundImage);
+
+  const activeSlide = useMemo(
+    () => (slides ?? []).find((s) => s.id === activeSlideId) ?? null,
+    [slides, activeSlideId],
+  );
+  const sectionSlides = useMemo(
+    () => (slides ?? []).filter((s) => activeSlide && s.sectionId === activeSlide.sectionId),
+    [slides, activeSlide],
+  );
+  const canApplyMany = Boolean(onApplyToSlides && slides && slides.length > 1);
+
+  function toggleSelected(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+  function commitApply(ids: string[]) {
+    if (!onApplyToSlides || ids.length === 0) return;
+    const target = ids.filter((id) => id !== activeSlideId);
+    if (target.length === 0) {
+      setApplyFlash("Nothing to apply — only this slide selected.");
+      return;
+    }
+    onApplyToSlides(target, current);
+    setApplyFlash(`Applied to ${target.length} slide${target.length === 1 ? "" : "s"}.`);
+    setApplyOpen(false);
+    setSelectedIds(new Set());
+    setTimeout(() => setApplyFlash(null), 2400);
+  }
 
   // Local parametric state — seeded from `current`, updates emit via onChange.
   const solidColor = current?.kind === "color" ? current.color ?? "#03002C" : "#03002C";
@@ -230,18 +280,155 @@ export function BackgroundImageryPanel({
 
   return (
     <div className="mt-6 rounded-2xl border border-black/10 bg-white p-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <div className="text-xs uppercase tracking-widest text-black/50">Background & Imagery</div>
-        {current && (
-          <button
-            type="button"
-            onClick={() => onChange(null)}
-            className="rounded-full border border-black/15 px-2.5 py-0.5 text-[11px] uppercase tracking-widest hover:bg-black/5"
-          >
-            Clear
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {canApplyMany && (
+            <button
+              type="button"
+              onClick={() => setApplyOpen((v) => !v)}
+              className="rounded-full border border-black/15 px-2.5 py-0.5 text-[11px] uppercase tracking-widest hover:bg-black/5"
+              title="Apply this background to other slides"
+            >
+              Apply to…
+            </button>
+          )}
+          {current && (
+            <button
+              type="button"
+              onClick={() => onChange(null)}
+              className="rounded-full border border-black/15 px-2.5 py-0.5 text-[11px] uppercase tracking-widest hover:bg-black/5"
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </div>
+
+      {applyFlash && (
+        <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-900">
+          {applyFlash}
+        </div>
+      )}
+
+      {applyOpen && canApplyMany && activeSlide && (
+        <div className="mt-3 rounded-2xl border border-black/10 bg-black/[0.02] p-4">
+          <div className="flex items-center justify-between">
+            <div className="text-[11px] uppercase tracking-widest text-black/60">
+              Apply current background to
+            </div>
+            <button
+              type="button"
+              onClick={() => setApplyOpen(false)}
+              className="text-[11px] uppercase tracking-widest text-black/50 hover:text-black"
+            >
+              Close
+            </button>
+          </div>
+
+          <div className="mt-3 flex gap-1 rounded-full border border-black/10 bg-white p-1 text-[10px]">
+            {(["section", "custom"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setApplyMode(m)}
+                className={`flex-1 rounded-full px-2 py-1.5 uppercase tracking-widest transition ${
+                  applyMode === m ? "bg-black text-white" : "text-black/60 hover:text-black"
+                }`}
+              >
+                {m === "section" ? `Section · ${activeSlide.sectionName}` : "Custom selection"}
+              </button>
+            ))}
+          </div>
+
+          {applyMode === "section" && (
+            <div className="mt-3 text-xs text-black/70">
+              <div>
+                {sectionSlides.length} slide{sectionSlides.length === 1 ? "" : "s"} in{" "}
+                <span className="font-medium text-black">{activeSlide.sectionName}</span>.
+                {sectionSlides.length > 1 && " Other slides in this section will inherit the current background."}
+              </div>
+              <div className="mt-3 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => commitApply(sectionSlides.map((s) => s.id))}
+                  disabled={sectionSlides.length <= 1}
+                  className="rounded-full bg-black px-3 py-1.5 text-[11px] uppercase tracking-widest text-white disabled:opacity-40"
+                >
+                  Apply to section
+                </button>
+              </div>
+            </div>
+          )}
+
+          {applyMode === "custom" && (
+            <div className="mt-3">
+              <div className="flex items-center justify-between text-[11px] text-black/60">
+                <span>Pick slides ({selectedIds.size} selected)</span>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedIds(new Set((slides ?? []).map((s) => s.id)))}
+                    className="uppercase tracking-widest hover:text-black"
+                  >
+                    All
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedIds(new Set())}
+                    className="uppercase tracking-widest hover:text-black"
+                  >
+                    None
+                  </button>
+                </div>
+              </div>
+              <div className="mt-2 max-h-64 overflow-y-auto rounded-xl border border-black/10 bg-white">
+                {(slides ?? []).map((s) => {
+                  const checked = selectedIds.has(s.id);
+                  const isActive = s.id === activeSlideId;
+                  return (
+                    <label
+                      key={s.id}
+                      className={`flex cursor-pointer items-center gap-2 border-b border-black/5 px-3 py-2 text-xs last:border-b-0 ${
+                        checked ? "bg-black/[0.03]" : "hover:bg-black/[0.02]"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleSelected(s.id)}
+                        className="h-3.5 w-3.5"
+                      />
+                      <span className="w-6 font-mono text-[10px] text-black/40">
+                        {String(s.position + 1).padStart(2, "0")}
+                      </span>
+                      <span className="flex-1 truncate">
+                        <span className="text-black/50">{s.sectionName} · </span>
+                        <span className="text-black">{s.title || "Untitled slide"}</span>
+                      </span>
+                      {isActive && (
+                        <span className="rounded-full bg-black/10 px-1.5 py-0.5 text-[9px] uppercase tracking-widest text-black/70">
+                          Current
+                        </span>
+                      )}
+                    </label>
+                  );
+                })}
+              </div>
+              <div className="mt-3 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => commitApply([...selectedIds])}
+                  disabled={selectedIds.size === 0}
+                  className="rounded-full bg-black px-3 py-1.5 text-[11px] uppercase tracking-widest text-white disabled:opacity-40"
+                >
+                  Apply to {selectedIds.size} slide{selectedIds.size === 1 ? "" : "s"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="mt-4 grid grid-cols-6 gap-1 rounded-full border border-black/10 bg-black/[0.03] p-1 text-[10px]">
