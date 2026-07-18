@@ -27,6 +27,7 @@ export function BackgroundImageryPanel({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [aiPrompt, setAiPrompt] = useState("");
+  const generate = useServerFn(generateBackgroundImage);
 
   async function handleUpload(file: File) {
     setBusy(true);
