@@ -138,7 +138,7 @@ function SystemTab() {
         <Link to="/atlas" className="rounded-full border border-black/15 px-3 py-1.5 text-black/70 hover:border-black/40 dark:border-white/15 dark:text-white/70">
           View in Atlas →
         </Link>
-        <Link to="/knowledge/brand-guides/transperfect-master" className="rounded-full border border-black/15 px-3 py-1.5 text-black/70 hover:border-black/40 dark:border-white/15 dark:text-white/70">
+        <Link to="/knowledge/brand-guides" className="rounded-full border border-black/15 px-3 py-1.5 text-black/70 hover:border-black/40 dark:border-white/15 dark:text-white/70">
           Brand guide · Hero Icons →
         </Link>
       </div>
