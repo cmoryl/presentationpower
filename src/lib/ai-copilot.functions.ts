@@ -32,7 +32,9 @@ const SlideIn = z.object({
   variantId: z.string(),
   layoutId: z.string(),
   content: z.record(z.unknown()),
+  notes: z.string().optional(),
 });
+
 
 const ChatMsg = z.object({
   role: z.enum(["user", "assistant"]),
