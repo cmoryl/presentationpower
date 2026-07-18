@@ -6,6 +6,7 @@ import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { WcagBadge } from "@/components/WcagBadge";
 import { TypeBadge } from "@/components/TypeBadge";
+import { OnScreenSizeBadge } from "@/components/OnScreenSizeBadge";
 
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
@@ -351,6 +352,7 @@ function VariantCard({
             In scope
           </div>
         )}
+        <OnScreenSizeBadge targetRef={singleRef} compact />
       </div>
       )}
 
