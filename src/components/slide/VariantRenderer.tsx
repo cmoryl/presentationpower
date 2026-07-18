@@ -2322,16 +2322,10 @@ function NumberedList({ brand, pageNumber, title, items }: { brand: BrandMode; p
   );
 }
 
-function SlideTitle({ brand, title }: { brand: BrandMode; title: string }) {
-  return (
-    <div>
-      <div className="h-[3px] w-24" style={{ backgroundColor: brand.tokens.accent }} />
-      <h2 className="mt-6 text-6xl font-semibold leading-tight" style={{ color: brand.tokens.primary }}>
-        {title}
-      </h2>
-    </div>
-  );
+function SlideTitle({ brand, title, kicker }: { brand: BrandMode; title: string; kicker?: string }) {
+  return <TitleBlock brand={brand} title={title} kicker={kicker} size="title" />;
 }
+
 
 function Card({ brand, title, body, index, icon }: { brand: BrandMode; title: string; body: string; index: number; icon?: string }) {
   return (
