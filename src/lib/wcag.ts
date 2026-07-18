@@ -194,6 +194,9 @@ export function applyAutoFix(root: HTMLElement): number {
     const target = useLight ? LIGHT_ON_DARK : DARK_ON_LIGHT;
     if (!el.dataset.wcagOriginal) el.dataset.wcagOriginal = el.style.color;
     el.style.setProperty("color", target, "important");
+    el.style.setProperty("-webkit-text-fill-color", target, "important");
+    el.style.setProperty("background-clip", "border-box", "important");
+    el.style.setProperty("-webkit-background-clip", "border-box", "important");
     el.style.setProperty("opacity", "1", "important");
 
     const bestRatio = Math.max(rDark, rLight);
@@ -255,6 +258,9 @@ function applyAutoFixInternal(root: HTMLElement) {
     const target = useLight ? LIGHT_ON_DARK : DARK_ON_LIGHT;
     if (!el.dataset.wcagOriginal) el.dataset.wcagOriginal = el.style.color;
     el.style.setProperty("color", target, "important");
+    el.style.setProperty("-webkit-text-fill-color", target, "important");
+    el.style.setProperty("background-clip", "border-box", "important");
+    el.style.setProperty("-webkit-background-clip", "border-box", "important");
     el.style.setProperty("opacity", "1", "important");
     const bestRatio = Math.max(rDark, rLight);
     if (bestRatio < (large ? 3 : 4.5)) {
