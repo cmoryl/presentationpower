@@ -2208,21 +2208,31 @@ function renderVariantBody({
 
     case "MV-CLOSE-METRIC-PROMISE":
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
           <div className="flex h-full flex-col justify-center">
-            <div className="flex items-center gap-4 text-xl uppercase tracking-[0.35em]" style={{ color: brand.tokens.accent }}>
-              <Trophy size={26} strokeWidth={2} />
-              <span>{s(c.kicker, "Our commitment")}</span>
+            <Kicker brand={brand} color={brand.tokens.accent}>
+              <Trophy size={22} strokeWidth={2} className="mr-3 inline-block align-[-0.15em]" />
+              {s(c.kicker, "Our commitment")}
+            </Kicker>
+            <Hairline color={brand.tokens.accent} widthPx={120} thicknessPx={2} className="mt-8 mb-12" />
+            <StatFigure
+              brand={brand}
+              value={s(c.metric)}
+              unit={s(c.unit)}
+              size="monumental"
+              valueColor="#ffffff"
+            />
+            <div className="mt-14 max-w-[1500px]">
+              <DisplayTitle size="section" color="#ffffff">
+                {s(c.promise)}
+              </DisplayTitle>
             </div>
-            <div className="mt-10 flex items-baseline gap-6">
-              <div className="text-[320px] font-semibold leading-none" style={{ color: brand.tokens.primary }}>
-                {s(c.metric)}
-              </div>
-              <div className="text-8xl font-semibold" style={{ color: brand.tokens.accent }}>{s(c.unit)}</div>
-            </div>
-            <div className="mt-6 max-w-5xl text-5xl font-semibold leading-tight" style={{ color: brand.tokens.primary }}>{s(c.promise)}</div>
-            <div className="mt-10 text-2xl opacity-80">{s(c.timeframe)}</div>
-            <div className="mt-12 text-lg uppercase tracking-[0.3em] opacity-60">{s(c.owner)}</div>
+            {(s(c.timeframe) || s(c.owner)) && (
+              <MetaRow className="mt-16">
+                {s(c.timeframe) && <span>{s(c.timeframe)}</span>}
+                {s(c.owner) && <span>{s(c.owner)}</span>}
+              </MetaRow>
+            )}
           </div>
         </SlideFrame>
       );
