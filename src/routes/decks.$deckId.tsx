@@ -179,7 +179,17 @@ function DeckEditor() {
             </div>
           )}
 
+          {/* Speaker notes */}
+          {active && (
+            <SpeakerNotesPanel
+              key={active.id}
+              value={active.notes ?? ""}
+              onChange={(v) => updateSlideNotes(deck.id, active.id, v)}
+            />
+          )}
+
           {/* AI change log */}
+
           {active && active.changes.filter((c) => c.accepted).length > 0 && (
             <div className="mt-6 rounded-2xl border border-emerald-300/40 bg-emerald-50/40 p-6">
               <div className="text-xs uppercase tracking-widest text-emerald-900/70">AI changes on this slide</div>
