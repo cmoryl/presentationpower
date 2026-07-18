@@ -185,22 +185,37 @@ export function applyAutoFix(root: HTMLElement): number {
     const large = fontSize >= 24 || (fontSize >= 18.66 && weight >= 700);
     const ratio = contrastRatio(fg, bg);
     if (!ratio) return;
-    // Boost anything below AA (4.5:1 for normal, 3:1 for large text).
     const passesAA = large ? ratio >= 3 : ratio >= 4.5;
     if (passesAA) return;
 
-    // Pick the polarity that maximizes contrast against the effective bg.
     const rDark = contrastRatio(DARK_ON_LIGHT, bg);
     const rLight = contrastRatio(LIGHT_ON_DARK, bg);
     const useLight = rLight >= rDark;
     const target = useLight ? LIGHT_ON_DARK : DARK_ON_LIGHT;
     if (!el.dataset.wcagOriginal) el.dataset.wcagOriginal = el.style.color;
     el.style.setProperty("color", target, "important");
+    el.style.setProperty("-webkit-text-fill-color", target, "important");
+    el.style.setProperty("background-clip", "border-box", "important");
+    el.style.setProperty("-webkit-background-clip", "border-box", "important");
     el.style.setProperty("opacity", "1", "important");
 
-    // If even the best polarity still doesn't clear AA (common over midtone
-    // imagery), add a legibility text-shadow scrim so the badge audit and the
-    // human eye both see a clear pass against the actual pixels behind it.
+    // Re-measure post-fix. If contrast is still failing (usually because the
+    // effective bg walker resolves to a different ancestor than we expected —
+    // e.g. text pinned inside a transparent card that sits on a same-tone
+    // parent), install a self-contained legibility chip: a semi-opaque bg
+    // on the element itself, guaranteeing contrast against its own pixels.
+    const postBg = effectiveBg(el);
+    const postRatio = contrastRatio(target, postBg);
+    if (postRatio < (large ? 3 : 4.5)) {
+      const chipBg = useLight ? "rgba(3,0,44,0.82)" : "rgba(255,255,255,0.9)";
+      el.style.setProperty("background-color", chipBg, "important");
+      el.style.setProperty("padding", "0.05em 0.35em", "important");
+      el.style.setProperty("border-radius", "0.25em", "important");
+      el.style.setProperty("box-decoration-break", "clone", "important");
+      el.style.setProperty("-webkit-box-decoration-break", "clone", "important");
+      if (!el.dataset.wcagChip) el.dataset.wcagChip = "1";
+    }
+
     const bestRatio = Math.max(rDark, rLight);
     if (bestRatio < (large ? 3 : 4.5)) {
       const shadow = useLight
@@ -212,7 +227,79 @@ export function applyAutoFix(root: HTMLElement): number {
     el.dataset.wcagFixed = "1";
     fixed++;
   });
+
+  // Persist fixes against React re-renders: watch for style / subtree changes
+  // and re-run the auto-fixer. Only install one observer per root.
+  const rootAny = root as HTMLElement & { __wcagObserver?: MutationObserver };
+  if (typeof MutationObserver !== "undefined" && !rootAny.__wcagObserver) {
+    let scheduled = false;
+    const obs = new MutationObserver(() => {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(() => {
+        scheduled = false;
+        // Re-run without re-installing (guard prevents infinite loop).
+        applyAutoFixInternal(root);
+      });
+    });
+    obs.observe(root, { subtree: true, childList: true, attributes: true, attributeFilter: ["style", "class"] });
+    rootAny.__wcagObserver = obs;
+  }
   return fixed;
+}
+
+/** Same as applyAutoFix but skips (re)installing the MutationObserver. */
+function applyAutoFixInternal(root: HTMLElement) {
+  const LIGHT_ON_DARK = "#FFFFFF";
+  const DARK_ON_LIGHT = "#03002C";
+  const nodes = root.querySelectorAll<HTMLElement>("*");
+  nodes.forEach((el) => {
+    const ownText = Array.from(el.childNodes).some(
+      (n) => n.nodeType === 3 && (n.textContent ?? "").trim(),
+    );
+    if (!ownText) return;
+    const cs = getComputedStyle(el);
+    if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
+    const fg = cs.color;
+    const bg = effectiveBg(el);
+    const fontSize = parseFloat(cs.fontSize);
+    const weight = parseInt(cs.fontWeight, 10) || 400;
+    const large = fontSize >= 24 || (fontSize >= 18.66 && weight >= 700);
+    const ratio = contrastRatio(fg, bg);
+    if (!ratio) return;
+    const passesAA = large ? ratio >= 3 : ratio >= 4.5;
+    if (passesAA) return;
+    const rDark = contrastRatio(DARK_ON_LIGHT, bg);
+    const rLight = contrastRatio(LIGHT_ON_DARK, bg);
+    const useLight = rLight >= rDark;
+    const target = useLight ? LIGHT_ON_DARK : DARK_ON_LIGHT;
+    if (!el.dataset.wcagOriginal) el.dataset.wcagOriginal = el.style.color;
+    el.style.setProperty("color", target, "important");
+    el.style.setProperty("-webkit-text-fill-color", target, "important");
+    el.style.setProperty("background-clip", "border-box", "important");
+    el.style.setProperty("-webkit-background-clip", "border-box", "important");
+    el.style.setProperty("opacity", "1", "important");
+    const postBg = effectiveBg(el);
+    const postRatio = contrastRatio(target, postBg);
+    if (postRatio < (large ? 3 : 4.5)) {
+      const chipBg = useLight ? "rgba(3,0,44,0.82)" : "rgba(255,255,255,0.9)";
+      el.style.setProperty("background-color", chipBg, "important");
+      el.style.setProperty("padding", "0.05em 0.35em", "important");
+      el.style.setProperty("border-radius", "0.25em", "important");
+      el.style.setProperty("box-decoration-break", "clone", "important");
+      el.style.setProperty("-webkit-box-decoration-break", "clone", "important");
+      if (!el.dataset.wcagChip) el.dataset.wcagChip = "1";
+    }
+    const bestRatio = Math.max(rDark, rLight);
+    if (bestRatio < (large ? 3 : 4.5)) {
+      const shadow = useLight
+        ? "0 1px 2px rgba(0,0,0,0.85), 0 0 6px rgba(0,0,0,0.65)"
+        : "0 1px 2px rgba(255,255,255,0.85), 0 0 6px rgba(255,255,255,0.65)";
+      el.style.setProperty("text-shadow", shadow, "important");
+      if (!el.dataset.wcagShadow) el.dataset.wcagShadow = "1";
+    }
+    el.dataset.wcagFixed = "1";
+  });
 }
 
 
@@ -220,10 +307,21 @@ export function revertAutoFix(root: HTMLElement) {
   const nodes = root.querySelectorAll<HTMLElement>("[data-wcag-fixed]");
   nodes.forEach((el) => {
     el.style.color = el.dataset.wcagOriginal ?? "";
+    el.style.removeProperty("-webkit-text-fill-color");
+    el.style.removeProperty("background-clip");
+    el.style.removeProperty("-webkit-background-clip");
     el.style.removeProperty("opacity");
     if (el.dataset.wcagShadow) {
       el.style.removeProperty("text-shadow");
       delete el.dataset.wcagShadow;
+    }
+    if (el.dataset.wcagChip) {
+      el.style.removeProperty("background-color");
+      el.style.removeProperty("padding");
+      el.style.removeProperty("border-radius");
+      el.style.removeProperty("box-decoration-break");
+      el.style.removeProperty("-webkit-box-decoration-break");
+      delete el.dataset.wcagChip;
     }
     delete el.dataset.wcagFixed;
     delete el.dataset.wcagOriginal;

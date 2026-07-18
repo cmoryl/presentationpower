@@ -230,7 +230,9 @@ export function SlideFrame({
       <div
         className="absolute bottom-10 left-24 right-24 flex items-center justify-between uppercase"
         style={{
-          color: darkBackdrop || slideDark ? "rgba(255,255,255,0.55)" : "rgba(10,15,28,0.5)",
+          // Bumped alpha to clear AA against the actual chrome surface — the
+          // previous 0.5 values dropped below 4.5:1 on both light and dark bg.
+          color: darkBackdrop || slideDark ? "rgba(255,255,255,0.78)" : "rgba(10,15,28,0.72)",
           fontSize: 18,
           letterSpacing: "0.28em",
         }}

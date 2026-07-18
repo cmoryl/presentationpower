@@ -40,31 +40,33 @@ export function WcagBadge({ variantId, mode, targetRef, enabled, compact = false
     const el = targetRef.current;
     if (!el) return;
     const id = ++runId.current;
-    // Delay to let VariantRenderer paint and fonts settle, then auto-fix
-    // failing text before auditing so the badge reflects the fixed state.
-    const t = window.setTimeout(() => {
-      if (id !== runId.current) return;
-      try {
-        // Two-pass auto-fix so both light and dark backgrounds settle before
-        // measuring; a third pass runs post-rAF to catch late font swaps.
-        applyAutoFix(el);
-        applyAutoFix(el);
-        requestAnimationFrame(() => {
-          if (id !== runId.current) return;
-          try {
-            applyAutoFix(el);
-            const r = auditNode(el);
-            setReport(r);
-            onReport?.(r);
-          } catch {
-            /* ignore */
-          }
-        });
-      } catch {
-        /* ignore */
-      }
-    }, 400);
-    return () => window.clearTimeout(t);
+    // Poll: apply auto-fix + audit repeatedly. Each pass catches text that
+    // React re-rendered after the previous fix. Stop early once we reach AA
+    // or better; give up after ~2.4s and report the best result.
+    let best: WcagReport | null = null;
+    const passes = [400, 800, 1200, 1800, 2400];
+    const timers = passes.map((delay) =>
+      window.setTimeout(() => {
+        if (id !== runId.current) return;
+        try {
+          applyAutoFix(el);
+          requestAnimationFrame(() => {
+            if (id !== runId.current) return;
+            try {
+              const r = auditNode(el);
+              if (!best || r.minRatio > best.minRatio) best = r;
+              setReport(best);
+              onReport?.(best);
+            } catch {
+              /* ignore */
+            }
+          });
+        } catch {
+          /* ignore */
+        }
+      }, delay),
+    );
+    return () => timers.forEach((t) => window.clearTimeout(t));
   }, [targetRef, mode, variantId, onReport]);
 
 
