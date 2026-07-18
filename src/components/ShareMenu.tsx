@@ -12,6 +12,7 @@ import {
   enableDeckSharing,
   disableDeckSharing,
   getDeckShareStatus,
+  getShareAnalytics,
 } from "@/lib/deck-sharing.functions";
 
 export function ShareMenu({ deckId }: { deckId: string }) {
