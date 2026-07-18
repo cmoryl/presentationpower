@@ -1,5 +1,6 @@
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
-import { SlideFrame as BaseSlideFrame, SlideModeContext, type SlideMode } from "./SlideChrome";
+import { SlideFrame as BaseSlideFrame, SlideModeContext, SlideBackdropContext, type SlideMode, type SlideBackdrop } from "./SlideChrome";
+import { resolveSlideBackground } from "@/lib/background-library";
 import { createContext, useContext, Fragment } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
