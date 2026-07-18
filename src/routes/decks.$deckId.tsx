@@ -80,6 +80,8 @@ function DeckEditor() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <DuplicateDeckButton deckId={deckId} />
+          <TemplateToggleButton deckId={deckId} />
           <SaveToCloudButton deckId={deckId} />
           <ShareMenu deckId={deckId} />
         </div>
