@@ -45,11 +45,14 @@ export function WcagBadge({ variantId, mode, targetRef, enabled, compact = false
     const t = window.setTimeout(() => {
       if (id !== runId.current) return;
       try {
+        // Two-pass auto-fix so both light and dark backgrounds settle before
+        // measuring; a third pass runs post-rAF to catch late font swaps.
         applyAutoFix(el);
-        // Give the browser a frame to apply the inline styles before measuring.
+        applyAutoFix(el);
         requestAnimationFrame(() => {
           if (id !== runId.current) return;
           try {
+            applyAutoFix(el);
             const r = auditNode(el);
             setReport(r);
             onReport?.(r);
