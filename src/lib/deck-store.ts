@@ -940,23 +940,23 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       return {
         title: `Why ${clientName} chooses TransPerfect`,
         items: [
-          { kind: "feature", title: "One operating model", body: `A single global program spanning every ${clientName} market, content type, and channel — with local precision built in.` },
-          { kind: "stat", value: "62", unit: "%", label: "Faster launch cycles" },
-          { kind: "body", title: "Human + AI", body: "Reviewer network paired with adaptive MT — quality that survives audit, at the speed of publish." },
+          { kind: "feature", icon: "Layers3", title: "One operating model", body: `A single global program spanning every ${clientName} market, content type, and channel — with local precision built in.` },
+          { kind: "stat", icon: "Timer", value: "62", unit: "%", label: "Faster launch cycles" },
+          { kind: "body", icon: "Cpu", title: "Human + AI", body: "Reviewer network paired with adaptive MT — quality that survives audit, at the speed of publish." },
           { kind: "media", title: "In-market presence", mediaSeed: `${clientName}-bento` },
-          { kind: "body", title: "Governance-ready", body: "Terminology, brand voice, and regulatory guardrails codified per market." },
+          { kind: "body", icon: "ShieldCheck", title: "Governance-ready", body: "Terminology, brand voice, and regulatory guardrails codified per market." },
         ],
       };
     case "MV-KPI-DASHBOARD":
       return {
         title: `${clientName} program — current state`,
         items: [
-          { value: "42", unit: "M", label: "Words / year", delta: "+18%", trend: "up" },
-          { value: "38", unit: "", label: "Markets live", delta: "+6", trend: "up" },
-          { value: "97.4", unit: "%", label: "On-time delivery", delta: "+2.1", trend: "up" },
-          { value: "4.7", unit: "/5", label: "Reviewer quality", delta: "+0.3", trend: "up" },
-          { value: "12", unit: "d", label: "Avg. cycle time", delta: "-4d", trend: "down" },
-          { value: "$0.09", unit: "", label: "Cost / word", delta: "-14%", trend: "down" },
+          { icon: "FileText", value: "42", unit: "M", label: "Words / year", delta: "+18%", trend: "up" },
+          { icon: "Globe2", value: "38", unit: "", label: "Markets live", delta: "+6", trend: "up" },
+          { icon: "CheckCircle2", value: "97.4", unit: "%", label: "On-time delivery", delta: "+2.1", trend: "up" },
+          { icon: "Star", value: "4.7", unit: "/5", label: "Reviewer quality", delta: "+0.3", trend: "up" },
+          { icon: "Timer", value: "12", unit: "d", label: "Avg. cycle time", delta: "-4d", trend: "down" },
+          { icon: "Coins", value: "$0.09", unit: "", label: "Cost / word", delta: "-14%", trend: "down" },
         ],
       };
     case "MV-ROADMAP-QUARTERS":
@@ -975,10 +975,10 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       return {
         title: `Where content is lost between HQ and ${clientName}'s markets`,
         items: [
-          { label: "Content produced at HQ", value: "100", unit: "%", note: "Original creative in source language" },
-          { label: "Translated on time", value: "68", unit: "%", note: "Rest slips a full cycle" },
-          { label: "Reviewed in-market", value: "44", unit: "%", note: "Local voice check" },
-          { label: "Published on brand", value: "31", unit: "%", note: "Meeting compliance + tone" },
+          { icon: "Sparkles", label: "Content produced at HQ", value: "100", unit: "%", note: "Original creative in source language" },
+          { icon: "Send", label: "Translated on time", value: "68", unit: "%", note: "Rest slips a full cycle" },
+          { icon: "FileCheck2", label: "Reviewed in-market", value: "44", unit: "%", note: "Local voice check" },
+          { icon: "Trophy", label: "Published on brand", value: "31", unit: "%", note: "Meeting compliance + tone" },
         ],
       };
     case "MV-FLYWHEEL":
