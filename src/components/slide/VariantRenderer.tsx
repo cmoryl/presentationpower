@@ -2548,7 +2548,7 @@ function renderVariantBody({
               return (
                 <div key={i} className="absolute -translate-x-1/2 -translate-y-1/2 text-center" style={{ left: x, top: y, width: 220 }}>
                   <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full" style={{ background: "#fff", border: `2px solid ${brand.tokens.accent}` }}>
-                    <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="ghost" />
+                    <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="glyph" />
                   </div>
                   <div style={{ fontSize: 24, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
                   {s(it.note) && <div className="mt-1" style={{ fontSize: 16, color: "rgba(10,15,28,0.66)" }}>{s(it.note)}</div>}
