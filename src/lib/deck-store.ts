@@ -157,6 +157,7 @@ type DeckState = {
   revertAiChange: (deckId: string, slideId: string, field: string) => void;
   updateSlideField: (deckId: string, slideId: string, field: string, value: unknown) => void;
   updateSlideNotes: (deckId: string, slideId: string, notes: string) => void;
+  applySlideBackground: (deckId: string, slideIds: string[], background: unknown) => void;
 
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
