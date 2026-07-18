@@ -456,39 +456,23 @@ function renderVariantBody({
       return <CardGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} />;
 
     case "MV-CTX-COST": {
-      const value = s(c.stat);
-      const unit = s(c.unit);
-      const font = statFontSize(value, unit);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <div className="grid h-full grid-cols-2 gap-16 pt-6">
-            <div
-              className="relative flex flex-col justify-center overflow-hidden rounded-2xl p-14"
-              style={{ backgroundColor: brand.tokens.primary, color: "#ffffff" }}
-            >
-              <div
-                className="pointer-events-none absolute -right-24 -top-24 rounded-full"
-                style={{ width: 460, height: 460, border: `32px solid ${brand.tokens.accent}`, opacity: 0.35 }}
+          <div className="grid h-full grid-cols-[1.05fr_1fr] items-center gap-24">
+            <div>
+              <Kicker brand={brand}>Cost of inaction</Kicker>
+              <Hairline color={brand.tokens.accent} widthPx={88} thicknessPx={2} className="mt-6 mb-10" />
+              <StatFigure
+                brand={brand}
+                value={s(c.stat)}
+                unit={s(c.unit)}
+                label={s(c.label)}
+                size="monumental"
               />
-              <div className="relative text-lg uppercase tracking-[0.3em]" style={{ color: "rgba(255,255,255,0.7)" }}>
-                Cost of inaction
-              </div>
-              <div
-                className="relative mt-6 font-semibold leading-[0.95] tabular-nums"
-                style={{ fontSize: font.valuePx }}
-              >
-                {value}
-                {unit && (
-                  <span className="ml-2 align-top font-medium" style={{ fontSize: font.unitPx, color: brand.tokens.accent }}>
-                    {unit}
-                  </span>
-                )}
-              </div>
-              <div className="relative mt-6 text-3xl opacity-90">{s(c.label)}</div>
             </div>
-            <div className="flex items-center">
-              <div className="text-4xl leading-snug">{s(c.narrative)}</div>
-            </div>
+            <SupportingText size="xl" opacity={0.85} maxWidthPx={720}>
+              {s(c.narrative)}
+            </SupportingText>
           </div>
         </SlideFrame>
       );
