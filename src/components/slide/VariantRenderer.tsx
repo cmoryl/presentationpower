@@ -1517,7 +1517,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-2 gap-14">
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "split"))} className="h-full w-full" />
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "split"))} overrideUrl={s(c.mediaUrl)} className="h-full w-full" />
             <div className="flex flex-col justify-center">
               <SlideTitle brand={brand} title={s(c.title)} />
               <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={720}>{s(c.body)}</SupportingText>
