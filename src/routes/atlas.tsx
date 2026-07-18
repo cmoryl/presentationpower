@@ -1,7 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
-import { byId } from "@/lib/taxonomy";
+import { byId, MODULE_VARIANTS } from "@/lib/taxonomy";
+import { MODULE_PRESET_KITS } from "@/lib/module-preset-kits";
+import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
+import { Download, Loader2 } from "lucide-react";
 import {
   ICON_SIZES,
   ICON_PLACEMENTS_META,
