@@ -27,6 +27,11 @@ export type SlideBackgroundValue = {
   intensity?: number;
   patternId?: PatternId;
   patternScale?: number;
+  // Image positioning (upload / ai kinds).
+  fit?: "cover" | "contain";
+  zoom?: number;
+  offsetX?: number;
+  offsetY?: number;
 };
 
 export type BackgroundPreset = {
