@@ -270,10 +270,13 @@ function VariantCard({
       ? [lightRef.current, darkRef.current]
       : [singleRef.current];
     const t = window.setTimeout(async () => {
-      const { applyAutoFix, revertAutoFix } = await import("@/lib/wcag");
+      const { applyAutoFix, revertAutoFix, auditAndFixTypography, revertTypeFix } = await import("@/lib/wcag");
       for (const el of targets) {
         if (!el) continue;
         revertAutoFix(el);
+        revertTypeFix(el);
+        // Type fix first so contrast audit sees the final rendered sizes.
+        auditAndFixTypography(el);
         if (autoFixOn) applyAutoFix(el);
       }
     }, 320);
