@@ -88,6 +88,10 @@ export function SlideFrame({
   const fg = darkBackdrop || slideDark ? "#ffffff" : brand.tokens.ink;
   const logoColor = darkBackdrop || slideDark ? "#ffffff" : brand.tokens.primary;
 
+  const placement = resolveLogoPlacement(variant, layoutId, logoPosition);
+  const showLogo = placement.position !== "hidden";
+
+
   // Light backdrops use a cream/white tint so photography reads bright; dark
   // backdrops keep the original navy scrim. Callers can still override tint.
   const defaultTint = lightBackdrop ? "#FFFFFF" : "#03002C";
