@@ -647,11 +647,17 @@ function ModulePresetKitsSection() {
   const [busy, setBusy] = useState<string | null>(null);
 
   function importKit(kit: (typeof MODULE_PRESET_KITS)[number]) {
+    const result = validateKit(kit);
+    if (!result.valid) {
+      alert(formatKitValidationError(kit.title, result));
+      return;
+    }
     setBusy(kit.key);
     // layoutId fallback is enforced inside createDeckFromTemplate.
     const { deckId } = createDeckFromTemplate(kit.payload);
     navigate({ to: "/decks/$deckId", params: { deckId } });
   }
+
 
   return (
     <Section title="Module preset kits" count={MODULE_PRESET_KITS.length}>
