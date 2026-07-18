@@ -1,14 +1,16 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { Download, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
-import { seedContent, type Brief } from "@/lib/deck-store";
-import { byId, type ModuleVariant } from "@/lib/taxonomy";
+import { seedContent, useDeckStore, type Brief, type TemplatePayload } from "@/lib/deck-store";
+import { byId, MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
+import { MODULE_PRESET_KITS } from "@/lib/module-preset-kits";
 
 const SAMPLE_BRIEF: Brief = {
   id: "preview",
