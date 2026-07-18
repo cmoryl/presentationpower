@@ -37,6 +37,7 @@ const DeckSchema = z.object({
   archetypeId: z.string(),
   slides: z.array(SlideSchema),
   context: z.record(z.string(), z.unknown()).optional(),
+  isTemplate: z.boolean().optional(),
 });
 
 
@@ -97,6 +98,7 @@ export const saveDeckToCloud = createServerFn({ method: "POST" })
       brand_mode_id: data.deck.brandModeId,
       status: "draft",
       context: deckContext as never,
+      is_template: data.deck.isTemplate ?? false,
     });
     if (deckErr) throw new Error(deckErr.message);
 
@@ -125,11 +127,57 @@ export const listMyCloudDecks = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("decks")
-      .select("id, title, brand_mode_id, archetype_id, updated_at, created_at, brief_id")
+      .select("id, title, brand_mode_id, archetype_id, updated_at, created_at, brief_id, is_template")
       .eq("owner_id", userId)
       .order("updated_at", { ascending: false });
     if (error) throw new Error(error.message);
     return data ?? [];
+  });
+
+export const setDeckTemplateFlag = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) => z.object({ deckId: z.string().uuid(), isTemplate: z.boolean() }).parse(raw))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { error } = await supabase
+      .from("decks")
+      .update({ is_template: data.isTemplate })
+      .eq("id", data.deckId)
+      .eq("owner_id", userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const listTeamTemplates = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase } = context;
+    const { data, error } = await supabase
+      .from("decks")
+      .select("id, title, brand_mode_id, archetype_id, updated_at")
+      .eq("is_template", true)
+      .order("updated_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    if (!data || data.length === 0) return [] as Array<{ id: string; title: string; brand_mode_id: string; archetype_id: string; updated_at: string | null; slide_count: number }>;
+    const ids = data.map((d) => d.id);
+    const { data: counts } = await supabase
+      .from("deck_slides")
+      .select("deck_id")
+      .in("deck_id", ids);
+    const bucket = new Map<string, number>();
+    (counts ?? []).forEach((r) => bucket.set(r.deck_id as string, (bucket.get(r.deck_id as string) ?? 0) + 1));
+    return data.map((d) => ({ ...d, slide_count: bucket.get(d.id) ?? 0 }));
+  });
+
+export const getTemplateDeck = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: payload, error } = await supabase.rpc("get_template_deck", { _deck_id: data.deckId });
+    if (error) throw new Error(error.message);
+    return { deck: (payload as unknown) ?? null };
   });
 
 export const loadCloudDeck = createServerFn({ method: "POST" })

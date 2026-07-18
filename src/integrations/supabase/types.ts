@@ -773,6 +773,7 @@ export type Database = {
           context: Json
           created_at: string
           id: string
+          is_template: boolean
           owner_id: string
           share_token: string | null
           shared_at: string | null
@@ -787,6 +788,7 @@ export type Database = {
           context?: Json
           created_at?: string
           id?: string
+          is_template?: boolean
           owner_id: string
           share_token?: string | null
           shared_at?: string | null
@@ -801,6 +803,7 @@ export type Database = {
           context?: Json
           created_at?: string
           id?: string
+          is_template?: boolean
           owner_id?: string
           share_token?: string | null
           shared_at?: string | null
@@ -1306,6 +1309,7 @@ export type Database = {
     }
     Functions: {
       get_shared_deck: { Args: { _token: string }; Returns: Json }
+      get_template_deck: { Args: { _deck_id: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

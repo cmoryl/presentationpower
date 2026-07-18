@@ -111,6 +111,24 @@ export type Deck = {
   slides: DeckSlide[];
   clientLogo?: DeckClientLogo | null;
   context?: DeckContext;
+  isTemplate?: boolean;
+};
+
+export type TemplatePayload = {
+  title: string;
+  brandModeId: string;
+  archetypeId: string;
+  subCompany?: string | null;
+  context?: Record<string, unknown> | null;
+  slides: Array<{ sectionId: string; variantId: string; layoutId: string; content: SlideContent }>;
+  brief?: {
+    prospect?: string;
+    industry?: string;
+    audience?: string;
+    meetingObjective?: string;
+    lengthTarget?: number;
+    clientFacts?: string;
+  } | null;
 };
 
 
@@ -142,6 +160,9 @@ type DeckState = {
   renameDeck: (deckId: string, title: string) => void;
   setDeckClientLogo: (deckId: string, logo: DeckClientLogo | null) => void;
   setDeckContext: (deckId: string, patch: Partial<DeckContext>) => void;
+  setDeckTemplateFlag: (deckId: string, isTemplate: boolean) => void;
+  duplicateDeck: (deckId: string) => string | null;
+  createDeckFromTemplate: (payload: TemplatePayload) => { briefId: string; deckId: string };
   deleteDeck: (deckId: string) => void;
 
   hydrate: (input: { brief: Brief; deck: Deck }) => void;
@@ -1191,6 +1212,90 @@ export const useDeckStore = create<DeckState>()(
         const next: DeckContext = { ...(deck.context ?? {}), ...patch };
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, context: next } } }));
       },
+
+      setDeckTemplateFlag: (deckId, isTemplate) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, isTemplate } } }));
+      },
+
+      duplicateDeck: (deckId) => {
+        const src = get().decks[deckId];
+        if (!src) return null;
+        const srcBrief = get().briefs[src.briefId];
+        const newBrief: Brief | null = srcBrief
+          ? { ...structuredClone(srcBrief), id: nanoid(8), createdAt: new Date().toISOString() }
+          : null;
+        const newDeckId = nanoid(10);
+        const clonedContext = src.context ? structuredClone(src.context) : undefined;
+        if (clonedContext) {
+          delete (clonedContext as DeckContext).lastExportedAt;
+          delete (clonedContext as DeckContext).lastExportKind;
+        }
+        const newDeck: Deck = {
+          ...structuredClone(src),
+          id: newDeckId,
+          createdAt: new Date().toISOString(),
+          title: `${src.title} (Copy)`,
+          briefId: newBrief ? newBrief.id : src.briefId,
+          isTemplate: false,
+          context: clonedContext,
+          slides: src.slides.map((sl, i) => ({
+            ...structuredClone(sl),
+            id: nanoid(8),
+            position: i,
+          })),
+        };
+        set((s) => ({
+          briefs: newBrief ? { ...s.briefs, [newBrief.id]: newBrief } : s.briefs,
+          decks: { ...s.decks, [newDeckId]: newDeck },
+        }));
+        return newDeckId;
+      },
+
+      createDeckFromTemplate: (payload) => {
+        const briefId = nanoid(8);
+        const brief: Brief = {
+          id: briefId,
+          createdAt: new Date().toISOString(),
+          prospect: payload.brief?.prospect ?? "",
+          industry: payload.brief?.industry ?? "",
+          meetingObjective: payload.brief?.meetingObjective ?? "",
+          audience: payload.brief?.audience ?? "",
+          brandModeId: payload.brandModeId,
+          subCompany: payload.subCompany ?? undefined,
+          archetypeId: payload.archetypeId,
+          lengthTarget: payload.brief?.lengthTarget ?? payload.slides.length,
+          clientFacts: payload.brief?.clientFacts ?? "",
+        };
+        const deckId = nanoid(10);
+        const deck: Deck = {
+          id: deckId,
+          createdAt: new Date().toISOString(),
+          title: payload.title,
+          briefId,
+          brandModeId: payload.brandModeId,
+          subCompany: payload.subCompany ?? undefined,
+          archetypeId: payload.archetypeId,
+          isTemplate: false,
+          context: (payload.context as DeckContext) ?? undefined,
+          slides: payload.slides.map((s, i) => ({
+            id: nanoid(8),
+            position: i,
+            sectionId: s.sectionId,
+            variantId: s.variantId,
+            layoutId: s.layoutId,
+            content: structuredClone(s.content),
+            changes: [],
+          })),
+        };
+        set((s) => ({
+          briefs: { ...s.briefs, [briefId]: brief },
+          decks: { ...s.decks, [deckId]: deck },
+        }));
+        return { briefId, deckId };
+      },
+
 
       deleteDeck: (deckId) => {
         set((s) => {

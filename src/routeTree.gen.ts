@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LogohubRouteImport } from './routes/logohub'
 import { Route as LibraryRouteImport } from './routes/library'
@@ -49,6 +50,11 @@ import { Route as DecksDeckIdExportRouteImport } from './routes/decks.$deckId.ex
 import { Route as DecksDeckIdDocumentRouteImport } from './routes/decks.$deckId.document'
 import { Route as ApiPublicBrandhubSeedProxyRouteImport } from './routes/api/public/brandhub-seed-proxy'
 
+const TemplatesRoute = TemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -260,6 +266,7 @@ export interface FileRoutesByFullPath {
   '/library': typeof LibraryRoute
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
   '/admin/approvals': typeof AdminApprovalsRoute
@@ -299,6 +306,7 @@ export interface FileRoutesByTo {
   '/library': typeof LibraryRoute
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
   '/admin/approvals': typeof AdminApprovalsRoute
@@ -341,6 +349,7 @@ export interface FileRoutesById {
   '/library': typeof LibraryRoute
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
   '/admin/approvals': typeof AdminApprovalsRoute
@@ -384,6 +393,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/logohub'
     | '/reset-password'
+    | '/templates'
     | '/admin/ab'
     | '/admin/ai'
     | '/admin/approvals'
@@ -423,6 +433,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/logohub'
     | '/reset-password'
+    | '/templates'
     | '/admin/ab'
     | '/admin/ai'
     | '/admin/approvals'
@@ -464,6 +475,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/logohub'
     | '/reset-password'
+    | '/templates'
     | '/admin/ab'
     | '/admin/ai'
     | '/admin/approvals'
@@ -506,6 +518,7 @@ export interface RootRouteChildren {
   LibraryRoute: typeof LibraryRoute
   LogohubRoute: typeof LogohubRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  TemplatesRoute: typeof TemplatesRoute
   ApiChatRoute: typeof ApiChatRoute
   BriefNewRoute: typeof BriefNewRoute
   DecksDeckIdRoute: typeof DecksDeckIdRouteWithChildren
@@ -516,6 +529,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/templates': {
+      id: '/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -876,6 +896,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryRoute: LibraryRoute,
   LogohubRoute: LogohubRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  TemplatesRoute: TemplatesRoute,
   ApiChatRoute: ApiChatRoute,
   BriefNewRoute: BriefNewRoute,
   DecksDeckIdRoute: DecksDeckIdRouteWithChildren,

@@ -7,6 +7,7 @@ import { CopilotPanel } from "@/components/CopilotPanel";
 import { IconPicker } from "@/components/IconPicker";
 import { SaveToCloudButton } from "@/components/CloudDeckControls";
 import { ShareMenu } from "@/components/ShareMenu";
+import { DuplicateDeckButton, TemplateToggleButton } from "@/components/DeckActions";
 import { BrandReviewPanel } from "@/components/BrandReviewPanel";
 import { useDeckStore, type DeckClientLogo } from "@/lib/deck-store";
 import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.functions";
@@ -80,6 +81,8 @@ function DeckEditor() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <DuplicateDeckButton deckId={deckId} />
+          <TemplateToggleButton deckId={deckId} />
           <SaveToCloudButton deckId={deckId} />
           <ShareMenu deckId={deckId} />
         </div>
