@@ -29,7 +29,12 @@ const SLIDE_W_IN = 13.333;
 const SLIDE_H_IN = 7.5;
 const PX_PER_IN = PREVIEW_W / SLIDE_W_IN;
 
-type Check = { level: "pass" | "warn" | "fail"; label: string; detail?: string };
+type Check = {
+  level: "pass" | "warn" | "fail";
+  label: string;
+  detail?: string;
+  fix?: { label: string; patch: Record<string, unknown> };
+};
 
 export function PptxPreviewModal({
   deck,
@@ -37,17 +42,20 @@ export function PptxPreviewModal({
   brand,
   open,
   onClose,
+  onApplyBackground,
 }: {
   deck: Deck;
   slide: DeckSlide;
   brand: BrandMode;
   open: boolean;
   onClose: () => void;
+  onApplyBackground?: (next: Record<string, unknown>) => void;
 }) {
   const [plan, setPlan] = useState<PptxBackgroundPlan | null>(null);
   const [busy, setBusy] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [appliedFix, setAppliedFix] = useState<string | null>(null);
 
   const content = slide.content as Record<string, unknown>;
   const bg = useMemo(() => resolveSlideBackground(content.background), [content.background]);
