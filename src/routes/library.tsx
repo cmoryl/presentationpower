@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { WcagBadge } from "@/components/WcagBadge";
 import { Download, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
@@ -51,6 +52,25 @@ function Library() {
   const [mode, setMode] = useState<"light" | "dark" | "ab">("light");
   
   const [showImagery, setShowImagery] = useState(false);
+  const [wcagOn, setWcagOn] = useState(false);
+  const [approvalTick, setApprovalTick] = useState(0);
+  const approvals = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    approvalTick;
+    if (typeof window === "undefined") return {} as Record<string, { status: "approved" | "rejected" }>;
+    try {
+      return JSON.parse(localStorage.getItem("wcag-approvals-v1") ?? "{}");
+    } catch {
+      return {} as Record<string, { status: "approved" | "rejected" }>;
+    }
+  }, [approvalTick]);
+  const approvalSummary = useMemo(() => {
+    const values = Object.values(approvals) as Array<{ status: "approved" | "rejected" }>;
+    return {
+      approved: values.filter((v) => v.status === "approved").length,
+      rejected: values.filter((v) => v.status === "rejected").length,
+    };
+  }, [approvals]);
   const tpMasterIdx = Math.max(0, brandModes.findIndex((b) => b.id === "bm-enterprise"));
   const [brandIdx, setBrandIdx] = useState(tpMasterIdx);
 
@@ -169,12 +189,38 @@ function Library() {
           >
             ▤ Sample imagery {showImagery ? "on" : "off"}
           </button>
+          <button
+            type="button"
+            onClick={() => setWcagOn((v) => !v)}
+            aria-pressed={wcagOn}
+            title="Run WCAG 2.1 contrast audit on each rendered slide"
+            className={`rounded-full border px-3 py-1.5 text-xs ${
+              wcagOn
+                ? "border-emerald-600 bg-emerald-600 text-white"
+                : "border-black/15 bg-white text-black/70 hover:text-black"
+            }`}
+          >
+            ⚖ WCAG {wcagOn ? "on" : "off"}
+          </button>
+          {wcagOn && (approvalSummary.approved + approvalSummary.rejected > 0) && (
+            <span className="rounded-full bg-black/5 px-3 py-1 text-[11px] text-black/70">
+              <span className="font-semibold text-emerald-700">{approvalSummary.approved} approved</span>
+              {" · "}
+              <span className="font-semibold text-red-600">{approvalSummary.rejected} rejected</span>
+            </span>
+          )}
           <span className="text-sm text-black/50">{filtered.length} of {moduleVariants.length}</span>
         </div>
       </div>
 
 
-      <div className="mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3">
+      <div
+        className="mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3"
+        onClickCapture={() => {
+          // Refresh approvals summary when badges are clicked.
+          if (wcagOn) window.setTimeout(() => setApprovalTick((t) => t + 1), 50);
+        }}
+      >
         {filtered.map((v) => (
           <VariantCard
             key={v.id}
@@ -185,6 +231,7 @@ function Library() {
             preferred={preferred.has(v.id)}
             mode={mode}
             showImagery={showImagery}
+            wcagOn={wcagOn}
             onOpen={() => setOpenId(v.id)}
           />
         ))}
@@ -230,6 +277,7 @@ function VariantCard({
   preferred,
   mode = "light",
   showImagery = false,
+  wcagOn = false,
   onOpen,
 }: {
   variant: ModuleVariant;
@@ -239,6 +287,7 @@ function VariantCard({
   preferred?: boolean;
   mode?: "light" | "dark" | "ab";
   showImagery?: boolean;
+  wcagOn?: boolean;
   onOpen: () => void;
 }) {
   const previewSlide = {
@@ -255,6 +304,9 @@ function VariantCard({
   const lightBackdrop = showImagery ? backdropForVariant(variant, brand.id, "light") : null;
   const darkBackdrop = showImagery ? backdropForVariant(variant, brand.id, "dark") : null;
   const singleBackdrop = showImagery ? backdropForVariant(variant, brand.id, isDark ? "dark" : "light") : null;
+  const lightRef = useRef<HTMLDivElement | null>(null);
+  const darkRef = useRef<HTMLDivElement | null>(null);
+  const singleRef = useRef<HTMLDivElement | null>(null);
   return (
     <button
       type="button"
@@ -265,12 +317,22 @@ function VariantCard({
         <div className="m-2 grid grid-cols-2 gap-2">
           {(["light", "dark"] as const).map((m) => (
             <div key={m} className="relative">
-              <div className={`relative aspect-[16/10] overflow-hidden rounded-[14px] ${m === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
+              <div
+                ref={m === "dark" ? darkRef : lightRef}
+                className={`relative aspect-[16/10] overflow-hidden rounded-[14px] ${m === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
+              >
                 <ScaledSlide>
                   <SlideBackdropContext.Provider value={m === "dark" ? darkBackdrop : lightBackdrop}>
                     <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={m} />
                   </SlideBackdropContext.Provider>
                 </ScaledSlide>
+                <WcagBadge
+                  variantId={variant.id}
+                  mode={m}
+                  targetRef={m === "dark" ? darkRef : lightRef}
+                  enabled={wcagOn}
+                  compact
+                />
               </div>
               <div className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest backdrop-blur ${m === "dark" ? "bg-white/15 text-white ring-1 ring-white/25" : "bg-black/70 text-white"}`}>
                 {m === "dark" ? "☾ B · Dark" : "☀︎ A · Light"}
@@ -284,12 +346,21 @@ function VariantCard({
           )}
         </div>
       ) : (
-      <div className={`relative m-2 aspect-[16/10] overflow-hidden rounded-[18px] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
+      <div
+        ref={singleRef}
+        className={`relative m-2 aspect-[16/10] overflow-hidden rounded-[18px] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
+      >
         <ScaledSlide>
           <SlideBackdropContext.Provider value={singleBackdrop}>
             <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={isDark ? "dark" : "light"} />
           </SlideBackdropContext.Provider>
         </ScaledSlide>
+        <WcagBadge
+          variantId={variant.id}
+          mode={isDark ? "dark" : "light"}
+          targetRef={singleRef}
+          enabled={wcagOn}
+        />
 
         {/* Subtle top-right specular gradient */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.08]" />
