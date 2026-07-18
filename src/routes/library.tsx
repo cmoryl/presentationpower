@@ -4,6 +4,7 @@ import { Download, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { WcagBadge } from "@/components/WcagBadge";
 
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
@@ -299,6 +300,7 @@ function VariantCard({
                   </SlideBackdropContext.Provider>
                 </ScaledSlide>
               </div>
+              <WcagBadge variantId={variant.id} mode={m} targetRef={m === "dark" ? darkRef : lightRef} enabled={isAB} compact />
               <div className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest backdrop-blur ${m === "dark" ? "bg-white/15 text-white ring-1 ring-white/25" : "bg-black/70 text-white"}`}>
                 {m === "dark" ? "☾ B · Dark" : "☀︎ A · Light"}
               </div>
