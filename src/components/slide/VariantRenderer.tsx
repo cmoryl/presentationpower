@@ -2347,6 +2347,402 @@ function renderVariantBody({
         </SlideFrame>
       );
 
+    // ── Advanced variants — BATCH 1 ──────────────────────────────────────
+    case "MV-BENTO-5": {
+      const items = arr(c.items);
+      const anchor = items[0] ?? {};
+      const rest = items.slice(1, 5);
+      const cellClass = "flex flex-col justify-between p-10";
+      const cellBorder = { border: "1px solid rgba(10,15,28,0.10)" } as const;
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-10 grid gap-6" style={{ gridTemplateColumns: "1.5fr 1fr 1fr", gridTemplateRows: "1fr 1fr", height: 720 }}>
+            <div className={cellClass} style={{ ...cellBorder, gridRow: "1 / span 2" }}>
+              <Kicker brand={brand}>Anchor</Kicker>
+              <div className="mt-auto">
+                <div style={{ fontSize: 44, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(anchor.title)}</div>
+                <div className="mt-5" style={{ fontSize: 24, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(anchor.body)}</div>
+              </div>
+            </div>
+            {rest.map((it, i) => {
+              const kind = s(it.kind, "body");
+              return (
+                <div key={i} className={cellClass} style={cellBorder}>
+                  {kind === "stat" ? (
+                    <StatFigure brand={brand} value={s(it.value)} unit={s(it.unit)} label={s(it.label)} size="md" />
+                  ) : kind === "media" ? (
+                    <div className="relative -m-10 h-full overflow-hidden">
+                      <MediaTile brand={brand} seed={s(it.mediaSeed, s(it.title, `bento-${i}`))} className="absolute inset-0 h-full w-full rounded-none" />
+                      <div className="absolute inset-x-6 bottom-6 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "#fff" }}>{s(it.title)}</div>
+                    </div>
+                  ) : (
+                    <>
+                      <Kicker brand={brand}>{String(i + 2).padStart(2, "0")}</Kicker>
+                      <div className="mt-auto">
+                        <div style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.title)}</div>
+                        <div className="mt-3" style={{ fontSize: 20, lineHeight: 1.4, color: "rgba(10,15,28,0.7)" }}>{s(it.body)}</div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-KPI-DASHBOARD": {
+      const items = arr(c.items).slice(0, 8);
+      const cols = items.length <= 6 ? 3 : 4;
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-14 grid gap-x-12 gap-y-14" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+            {items.map((it, i) => {
+              const trend = s(it.trend);
+              const trendColor = trend === "down" ? brand.tokens.accent : brand.tokens.accent;
+              return (
+                <div key={i} className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+                  <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "rgba(10,15,28,0.6)", fontWeight: 600 }}>{s(it.label)}</div>
+                  <div className="mt-4 flex items-baseline gap-2">
+                    <span className="tabular-nums font-semibold" style={{ fontSize: 88, lineHeight: 0.95, letterSpacing: "-0.025em", color: brand.tokens.primary }}>{s(it.value)}</span>
+                    {s(it.unit) && <span className="font-medium" style={{ fontSize: 34, color: brand.tokens.accent, letterSpacing: "-0.015em" }}>{s(it.unit)}</span>}
+                  </div>
+                  {s(it.delta) && (
+                    <div className="mt-3 flex items-center gap-2" style={{ fontSize: 18, color: trendColor, letterSpacing: "0.02em" }}>
+                      {trend === "down" ? "▼" : "▲"} <span className="tabular-nums font-semibold">{s(it.delta)}</span>
+                      <span style={{ color: "rgba(10,15,28,0.55)" }}>vs. baseline</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-ROADMAP-QUARTERS": {
+      const quarters = strs(c.quarters).length ? strs(c.quarters) : ["Q1", "Q2", "Q3", "Q4"];
+      const items = arr(c.items);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-14">
+            <div className="grid gap-6" style={{ gridTemplateColumns: `240px repeat(${quarters.length}, minmax(0, 1fr))` }}>
+              <div />
+              {quarters.map((q, i) => (
+                <div key={i} className="pb-4 uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600, borderBottom: `2px solid ${brand.tokens.accent}` }}>{q}</div>
+              ))}
+              {items.map((it, i) => {
+                const start = Math.max(1, Number(it.start ?? 1));
+                const end = Math.min(quarters.length, Number(it.end ?? start));
+                const span = end - start + 1;
+                return (
+                  <>
+                    <div key={`l-${i}`} className="py-5 pr-6" style={{ fontSize: 22, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.01em", borderTop: "1px solid rgba(10,15,28,0.08)" }}>
+                      {s(it.label)}
+                      {s(it.note) && <div className="mt-1" style={{ fontSize: 16, fontWeight: 400, color: "rgba(10,15,28,0.6)", letterSpacing: 0 }}>{s(it.note)}</div>}
+                    </div>
+                    {Array.from({ length: quarters.length }).map((_, q) => {
+                      const active = q + 1 >= start && q + 1 <= end;
+                      const isStart = q + 1 === start;
+                      return (
+                        <div key={`c-${i}-${q}`} className="py-5" style={{ borderTop: "1px solid rgba(10,15,28,0.08)" }}>
+                          {isStart && (
+                            <div
+                              style={{
+                                gridColumn: `span ${span}`,
+                                height: 24,
+                                background: `linear-gradient(90deg, ${brand.tokens.primary}, ${brand.tokens.accent})`,
+                                width: `calc(${span * 100}% + ${(span - 1) * 24}px)`,
+                                opacity: 0.9,
+                              }}
+                            />
+                          )}
+                          {!active && !isStart && <div style={{ height: 24 }} />}
+                        </div>
+                      );
+                    })}
+                  </>
+                );
+              })}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-FUNNEL": {
+      const items = arr(c.items);
+      const n = items.length || 1;
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-12 flex flex-col items-center gap-3">
+            {items.map((it, i) => {
+              const width = 100 - (i / n) * 55;
+              return (
+                <div key={i} className="flex w-full items-center justify-center">
+                  <div
+                    className="flex items-center justify-between px-10 py-6"
+                    style={{
+                      width: `${width}%`,
+                      background: `linear-gradient(90deg, ${brand.tokens.primary}${i === 0 ? "" : ""}, ${brand.tokens.accent})`,
+                      opacity: 0.92 - i * 0.08,
+                      color: "#fff",
+                    }}
+                  >
+                    <div>
+                      <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", opacity: 0.85 }}>{String(i + 1).padStart(2, "0")}</div>
+                      <div className="mt-2" style={{ fontSize: 32, fontWeight: 600, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
+                      {s(it.note) && <div className="mt-1" style={{ fontSize: 18, opacity: 0.85 }}>{s(it.note)}</div>}
+                    </div>
+                    <div className="tabular-nums font-semibold text-right" style={{ fontSize: 56, letterSpacing: "-0.02em", lineHeight: 1 }}>
+                      {s(it.value)}<span className="ml-1" style={{ fontSize: 26, opacity: 0.9 }}>{s(it.unit)}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-FLYWHEEL": {
+      const items = arr(c.items);
+      const n = items.length || 4;
+      const R = 300;
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="relative mx-auto mt-10" style={{ width: 820, height: 720 }}>
+            <svg viewBox="-400 -360 800 720" className="absolute inset-0 h-full w-full">
+              <circle cx="0" cy="0" r={R} fill="none" stroke={brand.tokens.accent} strokeWidth={2} opacity={0.5} />
+              {items.map((_, i) => {
+                const a1 = (i / n) * Math.PI * 2 - Math.PI / 2;
+                const a2 = ((i + 0.85) / n) * Math.PI * 2 - Math.PI / 2;
+                const x1 = Math.cos(a1) * R, y1 = Math.sin(a1) * R;
+                const x2 = Math.cos(a2) * R, y2 = Math.sin(a2) * R;
+                return <path key={i} d={`M ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2}`} stroke={brand.tokens.primary} strokeWidth={4} fill="none" markerEnd="url(#fw-arrow)" opacity={0.9} />;
+              })}
+              <defs>
+                <marker id="fw-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill={brand.tokens.primary} />
+                </marker>
+              </defs>
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center" style={{ width: 260 }}>
+                <Kicker brand={brand}>Hub</Kicker>
+                <div className="mt-3" style={{ fontSize: 30, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(c.hub, "Program")}</div>
+              </div>
+            </div>
+            {items.map((it, i) => {
+              const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+              const x = Math.cos(angle) * R + 400;
+              const y = Math.sin(angle) * R + 360;
+              return (
+                <div key={i} className="absolute -translate-x-1/2 -translate-y-1/2 text-center" style={{ left: x, top: y, width: 220 }}>
+                  <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full" style={{ background: "#fff", border: `2px solid ${brand.tokens.accent}` }}>
+                    <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="glyph" />
+                  </div>
+                  <div style={{ fontSize: 24, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
+                  {s(it.note) && <div className="mt-1" style={{ fontSize: 16, color: "rgba(10,15,28,0.66)" }}>{s(it.note)}</div>}
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-MATURITY-CURVE": {
+      const items = arr(c.items);
+      const n = Math.max(items.length, 2);
+      const W = 1600, H = 460;
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-12">
+            <svg viewBox={`0 0 ${W} ${H + 140}`} className="w-full">
+              <line x1="0" y1={H} x2={W} y2={H} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
+              <path
+                d={`M 40 ${H - 20} Q ${W * 0.35} ${H - 40} ${W * 0.55} ${H * 0.6} T ${W - 40} 40`}
+                fill="none"
+                stroke={brand.tokens.primary}
+                strokeWidth={4}
+              />
+              {items.map((it, i) => {
+                const t = i / (n - 1);
+                const x = 40 + t * (W - 80);
+                const y = H - 20 - t * (H - 60);
+                const current = Boolean(it.current);
+                return (
+                  <g key={i}>
+                    <circle cx={x} cy={y} r={current ? 16 : 10} fill={current ? brand.tokens.accent : "#fff"} stroke={brand.tokens.primary} strokeWidth={3} />
+                    <text x={x} y={y - 28} textAnchor="middle" fontSize={26} fontWeight={600} fill={brand.tokens.primary} style={{ letterSpacing: "-0.01em" }}>{s(it.label)}</text>
+                    <text x={x} y={H + 40} textAnchor="middle" fontSize={18} fill="rgba(10,15,28,0.65)">{s(it.note)}</text>
+                    {current && <text x={x} y={y + 44} textAnchor="middle" fontSize={16} fontWeight={600} fill={brand.tokens.accent} style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>You are here</text>}
+                  </g>
+                );
+              })}
+            </svg>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-JOURNEY-MAP": {
+      const items = arr(c.items);
+      const n = Math.max(items.length, 2);
+      const W = 1600, H = 260;
+      const points = items.map((it, i) => {
+        const x = 60 + (i / (n - 1)) * (W - 120);
+        const sent = Math.max(1, Math.min(5, Number(it.sentiment ?? 3)));
+        const y = H - ((sent - 1) / 4) * (H - 40) - 20;
+        return { x, y, it };
+      });
+      const path = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-10">
+            <div className="grid" style={{ gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }}>
+              {items.map((it, i) => (
+                <div key={i} className="pb-5" style={{ borderBottom: `2px solid ${brand.tokens.accent}` }}>
+                  <Kicker brand={brand}>Phase {String(i + 1).padStart(2, "0")}</Kicker>
+                  <div className="mt-2" style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.phase)}</div>
+                  <div className="mt-2" style={{ fontSize: 18, color: "rgba(10,15,28,0.7)", lineHeight: 1.4 }}>{s(it.touchpoint)}</div>
+                </div>
+              ))}
+            </div>
+            <svg viewBox={`0 0 ${W} ${H + 40}`} className="mt-8 w-full">
+              <path d={path} fill="none" stroke={brand.tokens.primary} strokeWidth={3} />
+              {points.map((p, i) => (
+                <g key={i}>
+                  <circle cx={p.x} cy={p.y} r={11} fill={brand.tokens.accent} stroke="#fff" strokeWidth={3} />
+                  <text x={p.x} y={p.y - 20} textAnchor="middle" fontSize={18} fontWeight={600} fill={brand.tokens.primary}>{String(p.it.sentiment ?? "")}/5</text>
+                </g>
+              ))}
+              <text x={20} y={20} fontSize={14} fill="rgba(10,15,28,0.55)" style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>High</text>
+              <text x={20} y={H} fontSize={14} fill="rgba(10,15,28,0.55)" style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>Low</text>
+            </svg>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-LOGO-WALL": {
+      const items = arr(c.items);
+      const cols = items.length <= 8 ? 4 : items.length <= 10 ? 5 : 6;
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-14 grid" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+            {items.map((it, i) => {
+              const name = s(it.name);
+              const initials = name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+              return (
+                <div key={i} className="flex aspect-[4/3] items-center justify-center" style={{ borderRight: (i + 1) % cols === 0 ? "none" : "1px solid rgba(10,15,28,0.10)", borderBottom: "1px solid rgba(10,15,28,0.10)", borderTop: i < cols ? "1px solid rgba(10,15,28,0.10)" : "none", borderLeft: i % cols === 0 ? "1px solid rgba(10,15,28,0.10)" : "none" }}>
+                  {s(it.logoUrl) ? (
+                    <img src={s(it.logoUrl)} alt={name} className="max-h-16 max-w-[70%] object-contain" style={{ filter: "grayscale(100%) opacity(0.75)" }} />
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <div style={{ fontSize: 44, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em" }}>{initials || "—"}</div>
+                      <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", color: "rgba(10,15,28,0.55)" }}>{name}</div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-MATRIX-2X2": {
+      const quadrants = strs(c.quadrants);
+      const target = Number(c.target ?? 0);
+      const items = arr(c.items);
+      const S = 720;
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-8 grid gap-10" style={{ gridTemplateColumns: "1fr 320px" }}>
+            <div className="relative" style={{ height: S }}>
+              <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
+                {[0, 1, 2, 3].map((q) => {
+                  const isTarget = q + 1 === target;
+                  return (
+                    <div key={q} className="flex items-start justify-start p-6" style={{ border: "1px solid rgba(10,15,28,0.12)", background: isTarget ? `${brand.tokens.accent}14` : "transparent" }}>
+                      <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: isTarget ? brand.tokens.accent : "rgba(10,15,28,0.55)", fontWeight: 600 }}>{quadrants[q] ?? `Q${q + 1}`}</div>
+                    </div>
+                  );
+                })}
+              </div>
+              {items.map((it, i) => {
+                const x = Math.max(0.05, Math.min(0.95, Number(it.x ?? 0.5))) * S;
+                const y = (1 - Math.max(0.05, Math.min(0.95, Number(it.y ?? 0.5)))) * S;
+                return (
+                  <div key={i} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: x, top: y }}>
+                    <div className="h-4 w-4 rounded-full" style={{ background: brand.tokens.primary, boxShadow: `0 0 0 4px ${brand.tokens.primary}22` }} />
+                    <div className="mt-2 whitespace-nowrap" style={{ fontSize: 18, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.01em" }}>{s(it.label)}</div>
+                  </div>
+                );
+              })}
+              <div className="absolute -left-2 top-1/2 -translate-y-1/2 -rotate-90 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600 }}>{s(c.axisY)}</div>
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600 }}>{s(c.axisX)}</div>
+            </div>
+            <div className="flex flex-col justify-center gap-6">
+              <Kicker brand={brand}>Reading</Kicker>
+              <div style={{ fontSize: 22, lineHeight: 1.45, color: "rgba(10,15,28,0.78)" }}>
+                Position on <b>{s(c.axisX)}</b> and <b>{s(c.axisY)}</b>. The tinted quadrant is where the program should live.
+              </div>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-ICEBERG": {
+      const above = arr(c.above);
+      const below = arr(c.below);
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-8">
+            <div className="grid gap-8" style={{ gridTemplateColumns: `repeat(${Math.max(above.length, 2)}, minmax(0, 1fr))` }}>
+              {above.map((it, i) => (
+                <div key={i}>
+                  <Kicker brand={brand}>Visible</Kicker>
+                  <div className="mt-3" style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
+                  <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(it.body)}</div>
+                </div>
+              ))}
+            </div>
+            <div className="my-10 flex items-center gap-6">
+              <div className="h-[2px] flex-1" style={{ background: brand.tokens.accent }} />
+              <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600 }}>Waterline — {s(c.waterline, "what leadership sees")}</div>
+              <div className="h-[2px] flex-1" style={{ background: brand.tokens.accent }} />
+            </div>
+            <div className="grid gap-8" style={{ gridTemplateColumns: `repeat(${Math.max(Math.min(below.length, 3), 2)}, minmax(0, 1fr))` }}>
+              {below.map((it, i) => (
+                <div key={i} className="p-6" style={{ background: "rgba(10,15,28,0.04)", border: "1px solid rgba(10,15,28,0.08)" }}>
+                  <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", color: "rgba(10,15,28,0.55)", fontWeight: 600 }}>Hidden</div>
+                  <div className="mt-3" style={{ fontSize: 24, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
+                  <div className="mt-2" style={{ fontSize: 18, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(it.body)}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
     default:
 
 
