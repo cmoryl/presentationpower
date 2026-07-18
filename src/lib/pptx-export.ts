@@ -1426,7 +1426,7 @@ function renderDashSummary(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
     if (series.length >= 2) {
       try {
         s.addChart(
-          "line" as PptxGenJS.ChartType,
+          "line" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
           [{ name: "series", labels: series.map((_, i) => String(i + 1)), values: series }],
           { x: 0.6, y: cy + 1.7, w: colW, h: 0.7, chartColors: [p.accent], lineSize: 2, showLegend: false, showTitle: false, catAxisHidden: true, valAxisHidden: true, showValue: false },
         );
@@ -1457,7 +1457,7 @@ function renderDashDonutTrio(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
     s.addShape("rect", { x: cx, y: y0, w: colW - 0.4, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
     try {
       s.addChart(
-        "doughnut" as PptxGenJS.ChartType,
+        "doughnut" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
         [{ name: "d", labels: ["value", "rest"], values: [pct, 100 - pct] }],
         { x: cx + (colW - 3) / 2, y: y0 + 0.3, w: 3, h: 3, chartColors: [p.accent, LIGHT_GRAY], showLegend: false, showTitle: false, dataLabelPosition: "outEnd", showValue: false, holeSize: 70 },
       );
@@ -1476,7 +1476,7 @@ function renderDashSalesChart(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
   const chartW = 8.0;
   try {
     s.addChart(
-      "line" as PptxGenJS.ChartType,
+      "line" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
       [{ name: "series", labels: series.map((p) => p.label), values: series.map((p) => p.value) }],
       { x: 0.6, y: y0 + 0.1, w: chartW, h: 4.6, chartColors: [p.accent], lineSize: 3, showLegend: false, showTitle: false, catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 10, catAxisLabelColor: DARK_GRAY, valAxisLabelFontFace: "Inter", valAxisLabelFontSize: 10, valAxisLabelColor: DARK_GRAY, showValue: false },
     );
@@ -1505,7 +1505,7 @@ function renderDashGaugeRow(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     try {
       // Half-doughnut simulated via doughnut chart with 50% invisible bottom
       s.addChart(
-        "doughnut" as PptxGenJS.ChartType,
+        "doughnut" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
         [{ name: "g", labels: ["v", "r", "hidden"], values: [pct / 2, (100 - pct) / 2, 50] }],
         { x: cx + (colW - gaugeSize) / 2, y: y0 + 0.3, w: gaugeSize, h: gaugeSize, chartColors: [p.accent, LIGHT_GRAY, "FFFFFF"], chartColorsOpacity: 100, showLegend: false, showTitle: false, holeSize: 65, firstSliceAng: 270 },
       );
@@ -1523,7 +1523,7 @@ function renderDashPerformance(s: PptxGenJS.Slide, c: Record<string, unknown>, p
   const legend = arr(c.legend);
   try {
     s.addChart(
-      "bar" as PptxGenJS.ChartType,
+      "bar" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
       [{ name: "bars", labels: bars.map((b) => b.label), values: bars.map((b) => b.value) }],
       { x: 0.6, y: y0 + 0.1, w: 6.6, h: 4.6, barDir: "col", chartColors: [p.primary], showLegend: false, showTitle: false, catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 10, valAxisLabelFontFace: "Inter", valAxisLabelFontSize: 10 },
     );
@@ -1557,7 +1557,7 @@ function renderDashReportCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     if (series.length >= 2) {
       try {
         s.addChart(
-          "line" as PptxGenJS.ChartType,
+          "line" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
           [{ name: "s", labels: series.map((_, k) => String(k + 1)), values: series }],
           { x: cx, y: y0 + 3.3, w: cardW, h: 1.1, chartColors: [p.accent], lineSize: 2, showLegend: false, showTitle: false, catAxisHidden: true, valAxisHidden: true, showValue: false },
         );
@@ -1575,7 +1575,7 @@ function renderDashGrowthColumns(s: PptxGenJS.Slide, c: Record<string, unknown>,
   const items = arr(c.items).slice(0, 5);
   try {
     s.addChart(
-      "bar" as PptxGenJS.ChartType,
+      "bar" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
       [{ name: "growth", labels: items.map((it) => str(it.year)), values: items.map((it) => num(it.value)) }],
       { x: 0.6, y: y0 + 0.4, w: SLIDE_W - 1.2, h: 4.6, barDir: "col", chartColors: [p.primary], showLegend: false, showTitle: false, catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 12, catAxisLabelColor: DARK_GRAY, valAxisLabelFontFace: "Inter", valAxisLabelFontSize: 10, valAxisLabelColor: DARK_GRAY, showValue: true, dataLabelFontFace: "Inter", dataLabelFontSize: 12, dataLabelColor: p.primary, dataLabelPosition: "outEnd" },
     );
