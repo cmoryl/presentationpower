@@ -157,21 +157,41 @@ export function SlideFrame({
       )}
 
 
-      {/* Brand bar (locked) */}
+      {/* Editorial dark-chrome glow — a very subtle radial from brand primary
+          toward near-black so cover/divider/close slides feel rich rather
+          than flat. Only applied when the slide is on its dark chrome and
+          no backdrop image is already handling the atmosphere. */}
+      {slideDark && !hasBackdrop && (
+        <>
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage: `radial-gradient(120% 90% at 8% 12%, ${hexA(brand.tokens.primary, 0.55)} 0%, ${hexA(brand.tokens.primary, 0.0)} 55%), radial-gradient(80% 60% at 100% 100%, ${hexA(brand.tokens.accent, 0.10)} 0%, rgba(0,0,0,0) 60%)`,
+            }}
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{ backgroundImage: "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.35))" }}
+          />
+        </>
+      )}
+
+      {/* Brand bar (locked) — hairline accent rule, editorial not decorative. */}
       <div
-        className="absolute left-0 top-0 h-2 w-full"
-        style={{ backgroundColor: brand.tokens.accent }}
+        className="absolute left-0 top-0 h-[2px] w-full"
+        style={{ backgroundColor: brand.tokens.accent, opacity: slideDark || darkBackdrop ? 0.85 : 0.9 }}
       />
-      {/* Brand lockup (locked) — placed per approved zone.
-          Cover / divider / close chrome gets a hero-scale lockup so the
-          TransPerfect logo actually reads at 1920×1080. Content slides stay
-          quiet at md so titles keep the visual weight. */}
+      {/* Brand lockup (locked) — placed per approved zone. Content slides
+          stay quiet at sm so titles carry the composition; cover / divider /
+          close slides scale up so the mark reads at hero size. */}
       {showLogo && (
         <div style={logoPositionStyles(placement.position)}>
           <BrandLockup
             brand={brand}
             color={logoColor}
-            size={variant === "content" ? "md" : variant === "cover" ? "xl" : "lg"}
+            size={variant === "content" ? "sm" : variant === "cover" ? "xl" : "md"}
             clientName={clientName}
             clientLogoUrl={clientLogoUrl ?? null}
             subCompany={subCompany}
@@ -179,17 +199,25 @@ export function SlideFrame({
         </div>
       )}
 
-      {/* Content */}
+      {/* Content — 96px side margin, 128px top / 96px bottom reserve. */}
       <div className="absolute inset-0 pt-32 pb-24 px-24">{children}</div>
-      {/* Footer (locked) */}
+      {/* Footer (locked) — micro uppercase, hairline aligned to page number. */}
       <div
-        className="absolute bottom-10 left-24 right-24 flex items-center justify-between text-sm"
-        style={{ color: darkBackdrop || slideDark ? "rgba(255,255,255,0.7)" : "rgba(10,15,28,0.55)" }}
-
+        className="absolute bottom-10 left-24 right-24 flex items-center justify-between uppercase"
+        style={{
+          color: darkBackdrop || slideDark ? "rgba(255,255,255,0.55)" : "rgba(10,15,28,0.5)",
+          fontSize: 18,
+          letterSpacing: "0.28em",
+        }}
       >
-        <span>Confidential — for internal review</span>
-        {pageNumber !== undefined && <span>{String(pageNumber).padStart(2, "0")}</span>}
+        <span>Confidential · Internal review</span>
+        {pageNumber !== undefined && (
+          <span className="tabular-nums" style={{ letterSpacing: "0.18em" }}>
+            {String(pageNumber).padStart(2, "0")}
+          </span>
+        )}
       </div>
+
     </div>
   );
 }
