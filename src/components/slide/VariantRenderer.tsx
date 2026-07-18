@@ -659,18 +659,41 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="relative mt-20">
-            <div className="absolute left-0 right-0 top-7 h-[3px]" style={{ backgroundColor: brand.tokens.accent }} />
-            <div className="grid" style={{ gridTemplateColumns: `repeat(${Math.max(arr(c.items).length, 1)}, minmax(0, 1fr))` }}>
+          <div className="relative mt-24">
+            {/* Hairline connector at node baseline */}
+            <div
+              className="absolute left-0 right-8 top-[9px] h-px"
+              style={{ backgroundColor: brand.tokens.accent, opacity: 0.55 }}
+            />
+            <div className="grid gap-10" style={{ gridTemplateColumns: `repeat(${Math.max(arr(c.items).length, 1)}, minmax(0, 1fr))` }}>
               {arr(c.items).map((it, i) => (
-                <div key={i} className="pr-10">
-                  <div className="mb-6 -translate-y-4">
-                    <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} />
+                <div key={i} className="pr-8">
+                  {/* Refined node — small precise dot on the rule */}
+                  <div className="relative mb-8" style={{ height: 18 }}>
+                    <div
+                      className="absolute left-0"
+                      style={{
+                        top: 3,
+                        width: 14,
+                        height: 14,
+                        borderRadius: "50%",
+                        backgroundColor: brand.tokens.accent,
+                        boxShadow: `0 0 0 4px ${brand.tokens.surface}`,
+                      }}
+                    />
                   </div>
-                  <div className="text-3xl font-semibold" style={{ color: brand.tokens.primary }}>
+                  <div
+                    className="mb-3 uppercase tabular-nums"
+                    style={{ fontSize: 18, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600 }}
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </div>
+                  <div style={{ fontSize: 30, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>
                     {s(it.label)}
                   </div>
-                  <div className="mt-4 text-2xl opacity-80">{s(it.body)}</div>
+                  <div className="mt-4" style={{ fontSize: 22, lineHeight: 1.4, color: "rgba(10,15,28,0.72)" }}>
+                    {s(it.body)}
+                  </div>
                 </div>
               ))}
             </div>
@@ -687,21 +710,30 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-14 grid grid-cols-2 gap-10">
-            <div className="rounded-2xl border p-10" style={{ borderColor: "rgba(10,15,28,0.15)", backgroundColor: brand.tokens.surface }}>
-              <div className="text-xl uppercase tracking-[0.25em] opacity-60">Before</div>
-              <div className="mt-4 text-4xl font-semibold">{s(before.title)}</div>
-              <div className="mt-6 text-2xl leading-snug opacity-80">{s(before.body)}</div>
+          <div className="mt-14 grid grid-cols-2 gap-16">
+            <div className="flex flex-col pt-8" style={{ borderTop: "1px solid rgba(10,15,28,0.15)" }}>
+              <Kicker brand={brand} color="rgba(10,15,28,0.55)">Before</Kicker>
+              <div className="mt-8" style={{ fontSize: 40, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
+                {s(before.title)}
+              </div>
+              <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.4, color: "rgba(10,15,28,0.72)" }}>
+                {s(before.body)}
+              </div>
             </div>
-            <div className="rounded-2xl p-10 text-white" style={{ backgroundColor: brand.tokens.primary }}>
-              <div className="text-xl uppercase tracking-[0.25em]" style={{ color: brand.tokens.accent }}>After</div>
-              <div className="mt-4 text-4xl font-semibold">{s(after.title)}</div>
-              <div className="mt-6 text-2xl leading-snug opacity-90">{s(after.body)}</div>
+            <div className="flex flex-col pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+              <Kicker brand={brand}>After</Kicker>
+              <div className="mt-8" style={{ fontSize: 40, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
+                {s(after.title)}
+              </div>
+              <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.4, color: "rgba(10,15,28,0.82)" }}>
+                {s(after.body)}
+              </div>
             </div>
           </div>
         </SlideFrame>
       );
     }
+
 
     // ── Proof & Data ──────────────────────────────────────────────────
     case "MV-PROOF-LOGOS":
