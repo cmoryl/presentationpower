@@ -160,6 +160,9 @@ type DeckState = {
   renameDeck: (deckId: string, title: string) => void;
   setDeckClientLogo: (deckId: string, logo: DeckClientLogo | null) => void;
   setDeckContext: (deckId: string, patch: Partial<DeckContext>) => void;
+  setDeckTemplateFlag: (deckId: string, isTemplate: boolean) => void;
+  duplicateDeck: (deckId: string) => string | null;
+  createDeckFromTemplate: (payload: TemplatePayload) => { briefId: string; deckId: string };
   deleteDeck: (deckId: string) => void;
 
   hydrate: (input: { brief: Brief; deck: Deck }) => void;
