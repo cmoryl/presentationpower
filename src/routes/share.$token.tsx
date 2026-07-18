@@ -1,12 +1,14 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getSharedDeck } from "@/lib/deck-sharing.functions";
+import { getSharedDeck, recordShareView } from "@/lib/deck-sharing.functions";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
 import { Play, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { deckCloudId } from "@/lib/deck-uuid";
 
 type SharedDeck = {
   id: string;
