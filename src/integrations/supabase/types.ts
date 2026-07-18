@@ -646,6 +646,47 @@ export type Database = {
           },
         ]
       }
+      deck_share_views: {
+        Row: {
+          created_at: string
+          deck_id: string
+          id: string
+          max_slide_reached: number | null
+          session_key: string | null
+          slides_viewed: number | null
+          updated_at: string
+          viewed_at: string
+        }
+        Insert: {
+          created_at?: string
+          deck_id: string
+          id?: string
+          max_slide_reached?: number | null
+          session_key?: string | null
+          slides_viewed?: number | null
+          updated_at?: string
+          viewed_at?: string
+        }
+        Update: {
+          created_at?: string
+          deck_id?: string
+          id?: string
+          max_slide_reached?: number | null
+          session_key?: string | null
+          slides_viewed?: number | null
+          updated_at?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deck_share_views_deck_id_fkey"
+            columns: ["deck_id"]
+            isOneToOne: false
+            referencedRelation: "decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deck_slides: {
         Row: {
           ai_change_log: Json
@@ -1286,6 +1327,15 @@ export type Database = {
           similarity: number
           tags: string[]
         }[]
+      }
+      record_share_view: {
+        Args: {
+          _max_slide: number
+          _session_key: string
+          _slides_viewed: number
+          _token: string
+        }
+        Returns: undefined
       }
     }
     Enums: {

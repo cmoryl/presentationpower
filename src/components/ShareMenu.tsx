@@ -12,6 +12,7 @@ import {
   enableDeckSharing,
   disableDeckSharing,
   getDeckShareStatus,
+  getShareAnalytics,
 } from "@/lib/deck-sharing.functions";
 
 export function ShareMenu({ deckId }: { deckId: string }) {
@@ -27,6 +28,10 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   const getStatus = useServerFn(getDeckShareStatus);
   const enableFn = useServerFn(enableDeckSharing);
   const disableFn = useServerFn(disableDeckSharing);
+  const getAnalytics = useServerFn(getShareAnalytics);
+
+  type Analytics = { totalViews: number; uniqueSessions: number; lastViewedAt: string | null; avgMaxSlide: number };
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
 
   const [shareToken, setShareToken] = useState<string | null>(null);
   const [shareBusy, setShareBusy] = useState(false);
@@ -68,6 +73,21 @@ export function ShareMenu({ deckId }: { deckId: string }) {
       cancelled = true;
     };
   }, [open, cloudDeckId, getStatus]);
+
+  // Fetch analytics whenever a live share token is present and menu is open.
+  useEffect(() => {
+    if (!open || !cloudDeckId || !shareToken) {
+      setAnalytics(null);
+      return;
+    }
+    let cancelled = false;
+    getAnalytics({ data: { deckId: cloudDeckId } })
+      .then((r) => !cancelled && setAnalytics(r as Analytics))
+      .catch(() => !cancelled && setAnalytics(null));
+    return () => {
+      cancelled = true;
+    };
+  }, [open, cloudDeckId, shareToken, getAnalytics]);
 
   if (!deck) return null;
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
@@ -213,6 +233,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
                     {shareBusy ? "Working…" : "Disable"}
                   </button>
                 </div>
+                <AnalyticsLine analytics={analytics} />
               </div>
             ) : (
               <button
@@ -293,4 +314,40 @@ function ShareItem({
       </span>
     </button>
   );
+}
+
+function AnalyticsLine({
+  analytics,
+}: {
+  analytics: { totalViews: number; uniqueSessions: number; lastViewedAt: string | null; avgMaxSlide: number } | null;
+}) {
+  if (!analytics) {
+    return (
+      <div className="mt-2 text-[10px] text-black/40 dark:text-white/40">Loading views…</div>
+    );
+  }
+  if (analytics.totalViews === 0) {
+    return <div className="mt-2 text-[10px] text-black/50 dark:text-white/50">No views yet</div>;
+  }
+  const last = analytics.lastViewedAt ? relativeTime(analytics.lastViewedAt) : null;
+  return (
+    <div className="mt-2 text-[10px] text-black/60 dark:text-white/60">
+      {analytics.totalViews} view{analytics.totalViews === 1 ? "" : "s"} ·{" "}
+      {analytics.uniqueSessions} viewer{analytics.uniqueSessions === 1 ? "" : "s"}
+      {last ? ` · last viewed ${last}` : ""}
+    </div>
+  );
+}
+
+function relativeTime(iso: string): string {
+  const then = new Date(iso).getTime();
+  const diff = Date.now() - then;
+  const m = Math.round(diff / 60_000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m ago`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.round(h / 24);
+  if (d < 30) return `${d}d ago`;
+  return new Date(iso).toLocaleDateString();
 }
