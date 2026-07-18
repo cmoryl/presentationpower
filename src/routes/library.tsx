@@ -276,6 +276,7 @@ function VariantCard({
   preferred,
   mode = "light",
   showImagery = false,
+  wcagOn = false,
   onOpen,
 }: {
   variant: ModuleVariant;
@@ -285,6 +286,7 @@ function VariantCard({
   preferred?: boolean;
   mode?: "light" | "dark" | "ab";
   showImagery?: boolean;
+  wcagOn?: boolean;
   onOpen: () => void;
 }) {
   const previewSlide = {
@@ -301,6 +303,9 @@ function VariantCard({
   const lightBackdrop = showImagery ? backdropForVariant(variant, brand.id, "light") : null;
   const darkBackdrop = showImagery ? backdropForVariant(variant, brand.id, "dark") : null;
   const singleBackdrop = showImagery ? backdropForVariant(variant, brand.id, isDark ? "dark" : "light") : null;
+  const lightRef = useRef<HTMLDivElement | null>(null);
+  const darkRef = useRef<HTMLDivElement | null>(null);
+  const singleRef = useRef<HTMLDivElement | null>(null);
   return (
     <button
       type="button"
@@ -311,12 +316,22 @@ function VariantCard({
         <div className="m-2 grid grid-cols-2 gap-2">
           {(["light", "dark"] as const).map((m) => (
             <div key={m} className="relative">
-              <div className={`relative aspect-[16/10] overflow-hidden rounded-[14px] ${m === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
+              <div
+                ref={m === "dark" ? darkRef : lightRef}
+                className={`relative aspect-[16/10] overflow-hidden rounded-[14px] ${m === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
+              >
                 <ScaledSlide>
                   <SlideBackdropContext.Provider value={m === "dark" ? darkBackdrop : lightBackdrop}>
                     <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={m} />
                   </SlideBackdropContext.Provider>
                 </ScaledSlide>
+                <WcagBadge
+                  variantId={variant.id}
+                  mode={m}
+                  targetRef={m === "dark" ? darkRef : lightRef}
+                  enabled={wcagOn}
+                  compact
+                />
               </div>
               <div className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest backdrop-blur ${m === "dark" ? "bg-white/15 text-white ring-1 ring-white/25" : "bg-black/70 text-white"}`}>
                 {m === "dark" ? "☾ B · Dark" : "☀︎ A · Light"}
@@ -330,12 +345,21 @@ function VariantCard({
           )}
         </div>
       ) : (
-      <div className={`relative m-2 aspect-[16/10] overflow-hidden rounded-[18px] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
+      <div
+        ref={singleRef}
+        className={`relative m-2 aspect-[16/10] overflow-hidden rounded-[18px] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
+      >
         <ScaledSlide>
           <SlideBackdropContext.Provider value={singleBackdrop}>
             <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={isDark ? "dark" : "light"} />
           </SlideBackdropContext.Provider>
         </ScaledSlide>
+        <WcagBadge
+          variantId={variant.id}
+          mode={isDark ? "dark" : "light"}
+          targetRef={singleRef}
+          enabled={wcagOn}
+        />
 
         {/* Subtle top-right specular gradient */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.08]" />
