@@ -326,6 +326,27 @@ function VariantCard({
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
   const singleRef = useRef<HTMLDivElement | null>(null);
+  const [fixedCount, setFixedCount] = useState(0);
+
+  // Apply / revert the auto-fix on the currently-visible slide refs.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const targets = isAB
+      ? [lightRef.current, darkRef.current]
+      : [singleRef.current];
+    let total = 0;
+    // Delay so VariantRenderer's paint settles and audit has a chance to run.
+    const t = window.setTimeout(async () => {
+      const { applyAutoFix, revertAutoFix } = await import("@/lib/wcag");
+      for (const el of targets) {
+        if (!el) continue;
+        revertAutoFix(el);
+        if (autoFixOn) total += applyAutoFix(el);
+      }
+      setFixedCount(total);
+    }, 320);
+    return () => window.clearTimeout(t);
+  }, [autoFixOn, isAB, variant.id, brand.id, showImagery, isDark]);
 
   // Track WCAG reports for BOTH modes so the card can display a persistent
   // warning even when only one mode is visible on screen.
