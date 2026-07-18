@@ -953,3 +953,43 @@ function LogoGridItemsPanel({
   );
 }
 
+function SpeakerNotesPanel({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(() => value.trim().length > 0);
+  const [draft, setDraft] = useState(value);
+  useEffect(() => { setDraft(value); }, [value]);
+  useEffect(() => {
+    if (draft === value) return;
+    const t = setTimeout(() => onChange(draft), 400);
+    return () => clearTimeout(t);
+  }, [draft, value, onChange]);
+  const chars = draft.length;
+  return (
+    <div className="mt-6 rounded-2xl border border-black/10 bg-white">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center justify-between px-6 py-4 text-left"
+      >
+        <span className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-black/70">
+          <span className="text-[#0B2A4A]">✎</span> Speaker notes
+          {chars > 0 && <span className="rounded-full bg-[#0B2A4A]/10 px-2 py-0.5 text-[10px] text-[#0B2A4A]">{chars}</span>}
+        </span>
+        <span className="text-xs text-black/40">{open ? "Hide" : "Show"}</span>
+      </button>
+      {open && (
+        <div className="border-t border-black/10 px-6 py-4">
+          <textarea
+            className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm leading-relaxed"
+            rows={6}
+            placeholder="Private notes for the presenter. Shown in presenter mode and exported as PPTX notes — never visible on the slide."
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+          />
+          <div className="mt-2 text-[11px] text-black/40">Autosaves · Private to your team · Excluded from share links</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
