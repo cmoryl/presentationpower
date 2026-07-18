@@ -378,22 +378,12 @@ function VariantCard({
       onClick={onOpen}
       className="group relative block w-full overflow-hidden rounded-[24px] border border-slate-200 bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:border-[#003FC7]/20 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)]"
     >
-      {/* Card-level automatic contrast warning (always on, both modes checked) */}
-      {warnLabel && warnTone && (
-        <div
-          className={`pointer-events-none absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest shadow ring-1 backdrop-blur ${warnTone}`}
-          title={worstDetail || "Automatic WCAG audit flagged low-contrast text in this variant."}
-        >
-          {warnLabel}
-        </div>
+      {/* Auto-fix is always on; warning badges intentionally hidden. */}
+      {false && warnLabel && warnTone && (
+        <div className={warnTone} title={worstDetail}>{warnLabel}</div>
       )}
-      {autoFixOn && fixedCount > 0 && (
-        <div
-          className="pointer-events-none absolute right-3 top-11 z-20 inline-flex items-center gap-1 rounded-full bg-blue-600 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-blue-200 backdrop-blur"
-          title={`Auto-fix boosted ${fixedCount} text node${fixedCount === 1 ? "" : "s"} to an AA-passing color.`}
-        >
-          ✨ Fixed {fixedCount}
-        </div>
+      {false && autoFixOn && fixedCount > 0 && (
+        <div title={`Auto-fixed ${fixedCount}`}>✨ Fixed {fixedCount}</div>
       )}
 
       {isAB ? (
