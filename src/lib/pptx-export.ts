@@ -9,6 +9,7 @@ import type { Deck, DeckSlide, DeckStrategySnapshot } from "./deck-store";
 import type { BrandMode } from "./taxonomy";
 import { getDivisionLogos } from "./division-logos";
 import { pickDivisionImage } from "@/assets/backdrops/divisions";
+import { variantSupportsImagery } from "./variant-media";
 
 const SLIDE_W = 13.333;
 const SLIDE_H = 7.5;
