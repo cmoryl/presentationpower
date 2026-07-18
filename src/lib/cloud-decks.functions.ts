@@ -25,7 +25,9 @@ const SlideSchema = z.object({
   layoutId: z.string(),
   content: z.record(z.string(), z.unknown()),
   changes: z.array(z.any()).default([]),
+  notes: z.string().optional(),
 });
+
 
 const DeckSchema = z.object({
   id: z.string(),
