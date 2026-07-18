@@ -180,13 +180,31 @@ export function PptxPreviewModal({
                           : "bg-red-500"
                     }`}
                   />
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <div className="font-medium">{c.label}</div>
                     {c.detail && <div className="text-xs text-black/60">{c.detail}</div>}
+                    {c.fix && onApplyBackground && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onApplyBackground(c.fix!.patch);
+                          setAppliedFix(c.fix!.label);
+                        }}
+                        className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-black/20 bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-black/80 hover:border-[#003FC7] hover:text-[#003FC7]"
+                      >
+                        <span aria-hidden>✨</span>
+                        {c.fix.label}
+                      </button>
+                    )}
                   </div>
                 </li>
               ))}
             </ul>
+            {appliedFix && (
+              <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-900">
+                Applied: {appliedFix}. Re-running validation…
+              </div>
+            )}
             {error && (
               <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-900">
                 {error}
