@@ -1837,16 +1837,23 @@ export const useDeckStore = create<DeckState>()(
           archetypeId: payload.archetypeId,
           isTemplate: false,
           context: (payload.context as DeckContext) ?? undefined,
-          slides: payload.slides.map((s, i) => ({
-            id: nanoid(8),
-            position: i,
-            sectionId: s.sectionId,
-            variantId: s.variantId,
-            layoutId: s.layoutId,
-            content: structuredClone(s.content),
-            changes: [],
-            notes: s.notes ?? undefined,
-          })),
+          slides: payload.slides.map((s, i) => {
+            const mv = byId(MODULE_VARIANTS, s.variantId);
+            const resolvedLayoutId =
+              (s.layoutId && mv?.permittedLayoutIds.includes(s.layoutId) ? s.layoutId : undefined) ??
+              mv?.permittedLayoutIds[0] ??
+              "LF-01";
+            return {
+              id: nanoid(8),
+              position: i,
+              sectionId: s.sectionId,
+              variantId: s.variantId,
+              layoutId: resolvedLayoutId,
+              content: structuredClone(s.content),
+              changes: [],
+              notes: s.notes ?? undefined,
+            };
+          }),
 
         };
         set((s) => ({
