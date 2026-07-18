@@ -146,7 +146,8 @@ type DeckState = {
   createImportedDeck: (input: {
     title: string;
     brief: Omit<Brief, "id" | "createdAt">;
-    slides: Array<{ sectionId: string; variantId: string; layoutId: string; content: SlideContent }>;
+    slides: Array<{ sectionId: string; variantId: string; layoutId: string; content: SlideContent; notes?: string }>;
+    context?: Partial<DeckContext>;
   }) => { briefId: string; deckId: string };
   applyAiContent: (deckId: string, aiSlides: Array<{ id: string; content: SlideContent }>) => void;
   applyCopilotUpdates: (
