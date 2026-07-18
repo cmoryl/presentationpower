@@ -194,15 +194,15 @@ function StarterKits() {
   const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
   const setDeckTemplateFlag = useDeckStore((s) => s.setDeckTemplateFlag);
   const navigate = useNavigate();
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
 
-  function onImport() {
-    setBusy(true);
+  function importKit(kit: TemplatePayload, key: string) {
+    setBusy(key);
     // Resolve a valid layoutId for each slide from the taxonomy so renderers
     // don't fall back to defaults.
     const payload: TemplatePayload = {
-      ...COMMUNITY_EVENT_TEMPLATE,
-      slides: COMMUNITY_EVENT_TEMPLATE.slides.map((s) => {
+      ...kit,
+      slides: kit.slides.map((s) => {
         const mv = byId(MODULE_VARIANTS, s.variantId);
         const layoutId = s.layoutId || mv?.permittedLayoutIds[0] || "LF-01";
         return { ...s, layoutId };
@@ -213,25 +213,53 @@ function StarterKits() {
     navigate({ to: "/decks/$deckId", params: { deckId } });
   }
 
+  const kits: Array<{ key: string; title: string; blurb: string; payload: TemplatePayload }> = [
+    {
+      key: "community-event",
+      title: "Pulse Fest · Community Event Kit",
+      blurb: "20 editable slides mapped onto our modular variants — cover, agenda, program, stats, pricing, venue, register.",
+      payload: COMMUNITY_EVENT_TEMPLATE,
+    },
+    {
+      key: "square-image",
+      title: "Square Image · Editorial Library Kit",
+      blurb: "18 image-forward editorial slides — timelines, image grids, team, stats, trivia quotes, and closing agenda.",
+      payload: SQUARE_IMAGE_TEMPLATE,
+    },
+  ];
+
   return (
     <div className="mt-8 rounded-3xl border border-black/10 bg-gradient-to-br from-[#03002C] to-[#003FC7] p-6 text-white dark:border-white/10">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4">
         <div>
           <div className="text-[10px] uppercase tracking-widest text-white/60">Starter kits</div>
           <div className="mt-1 text-lg font-semibold">Import a sample team template</div>
-          <p className="mt-1 max-w-xl text-sm text-white/70">
-            Pulse Fest · Community Event Kit — 20 editable slides mapped onto our modular variants. Import, tweak, and save as a team template.
+          <p className="mt-1 max-w-2xl text-sm text-white/70">
+            Kick-start a deck from one of our modular starter kits. Import, tweak, and save as a team template.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={onImport}
-          disabled={busy}
-          className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-[#03002C] hover:opacity-90 disabled:opacity-60"
-        >
-          {busy ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
-          Import Community Event template
-        </button>
+      </div>
+      <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
+        {kits.map((k) => (
+          <div
+            key={k.key}
+            className="flex flex-col justify-between rounded-2xl border border-white/15 bg-white/5 p-4 backdrop-blur-sm"
+          >
+            <div>
+              <div className="text-sm font-semibold">{k.title}</div>
+              <p className="mt-1 text-xs leading-relaxed text-white/70">{k.blurb}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => importKit(k.payload, k.key)}
+              disabled={busy !== null}
+              className="mt-4 inline-flex items-center justify-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-medium text-[#03002C] hover:opacity-90 disabled:opacity-60"
+            >
+              {busy === k.key ? <Loader2 size={13} className="animate-spin" /> : <Download size={13} />}
+              {busy === k.key ? "Importing…" : "Import kit"}
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );
