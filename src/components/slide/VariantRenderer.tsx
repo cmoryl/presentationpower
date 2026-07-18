@@ -4000,3 +4000,130 @@ function ProgressBar({ brand, percent }: { brand: BrandMode; percent: number }) 
     </div>
   );
 }
+
+// ── Graph helpers (Batch 4) ────────────────────────────────────────────
+function AxisBarChart({ brand, bars, height = 480, highlight, unit }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string; unit?: string }) {
+  const w = 1720;
+  const h = height;
+  const padL = 90, padR = 40, padT = 30, padB = 60;
+  const max = Math.max(1, ...bars.map((b) => b.value));
+  const niceMax = Math.ceil(max * 1.1);
+  const chartH = h - padT - padB;
+  const slot = (w - padL - padR) / Math.max(bars.length, 1);
+  const barW = slot * 0.5;
+  const ticks = 4;
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      {Array.from({ length: ticks + 1 }, (_, i) => {
+        const y = padT + (chartH / ticks) * i;
+        const val = niceMax * (1 - i / ticks);
+        return (
+          <g key={i}>
+            <line x1={padL} y1={y} x2={w - padR} y2={y} stroke="rgba(10,15,28,0.08)" strokeWidth={1} />
+            <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={16} fill="rgba(10,15,28,0.5)">{val.toFixed(1)}{unit || ""}</text>
+          </g>
+        );
+      })}
+      {bars.map((b, i) => {
+        const bh = (b.value / niceMax) * chartH;
+        const x = padL + i * slot + (slot - barW) / 2;
+        const y = h - padB - bh;
+        const isHi = highlight ? b.label === highlight : false;
+        return (
+          <g key={i}>
+            <rect x={x} y={y} width={barW} height={bh} fill={isHi ? brand.tokens.accent : brand.tokens.primary} opacity={isHi ? 1 : 0.55} />
+            <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={18} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{b.label}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function DonutBlock({ brand, item }: { brand: BrandMode; item: Item }) {
+  return (
+    <div className="flex flex-col items-center text-center pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+      <Kicker brand={brand}>{s(item.meta, "Snapshot")}</Kicker>
+      <div className="mt-6"><Donut brand={brand} percent={Number(item.value) || 0} size={340} /></div>
+      <div className="mt-8 uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: brand.tokens.primary, fontWeight: 600 }}>{s(item.label)}</div>
+      <div className="mt-4" style={{ fontSize: 20, lineHeight: 1.45, color: "rgba(10,15,28,0.68)", maxWidth: 480 }}>{s(item.body)}</div>
+    </div>
+  );
+}
+
+function ConcentricRings({ brand, items, size = 480 }: { brand: BrandMode; items: { label: string; value: number }[]; size?: number }) {
+  const stroke = 22;
+  const gap = 8;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
+      {items.map((it, i) => {
+        const r = (size - stroke) / 2 - i * (stroke + gap);
+        if (r <= 0) return null;
+        const circ = 2 * Math.PI * r;
+        const dash = (Math.max(0, Math.min(100, it.value)) / 100) * circ;
+        const color = i === 0 ? brand.tokens.accent : brand.tokens.primary;
+        const opacity = i === 0 ? 1 : 0.35 + (1 - i / items.length) * 0.5;
+        return (
+          <g key={i}>
+            <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={brand.tokens.primary} strokeOpacity={0.08} strokeWidth={stroke} />
+            <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeOpacity={opacity} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function DecadeAreaChart({ brand, series, height = 480, calloutLabel, calloutNote }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; calloutLabel?: string; calloutNote?: string }) {
+  const w = 1720;
+  const h = height;
+  const padL = 30, padR = 30, padT = 40, padB = 60;
+  const vals = series.map((p) => p.value);
+  const max = Math.max(1, ...vals);
+  const min = Math.min(0, ...vals);
+  const range = max - min || 1;
+  const step = series.length > 1 ? (w - padL - padR) / (series.length - 1) : 0;
+  const pts = series.map((p, i) => [padL + i * step, padT + (h - padT - padB) * (1 - (p.value - min) / range)] as [number, number]);
+  const smooth = (points: [number, number][]) => {
+    if (points.length < 2) return "";
+    let d = `M${points[0][0]},${points[0][1]}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      const midX = (p0[0] + p1[0]) / 2;
+      d += ` C${midX},${p0[1]} ${midX},${p1[1]} ${p1[0]},${p1[1]}`;
+    }
+    return d;
+  };
+  const linePath = smooth(pts);
+  const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z` : "";
+  const id = `dec-${brand.id}`;
+  const highlightIdx = series.findIndex((p) => p.label === calloutLabel);
+  const hi = highlightIdx >= 0 ? pts[highlightIdx] : null;
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      <defs>
+        <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor={brand.tokens.primary} stopOpacity="0.28" />
+          <stop offset="100%" stopColor={brand.tokens.primary} stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
+      {areaPath && <path d={areaPath} fill={`url(#${id})`} />}
+      <path d={linePath} fill="none" stroke={brand.tokens.accent} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+      {series.map((p, i) => (
+        <text key={i} x={pts[i]?.[0]} y={h - padB + 34} textAnchor="middle" fontSize={18} fill="rgba(10,15,28,0.55)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
+      ))}
+      {hi && (
+        <g>
+          <circle cx={hi[0]} cy={hi[1]} r={9} fill={brand.tokens.accent} />
+          <circle cx={hi[0]} cy={hi[1]} r={16} fill="none" stroke={brand.tokens.accent} strokeWidth={2} strokeOpacity={0.35} />
+          <line x1={hi[0]} y1={hi[1] - 20} x2={hi[0]} y2={hi[1] - 90} stroke={brand.tokens.accent} strokeWidth={1} />
+          <rect x={hi[0] - 240} y={hi[1] - 190} width={480} height={100} fill="#fff" stroke={brand.tokens.accent} strokeWidth={2} />
+          <text x={hi[0]} y={hi[1] - 148} textAnchor="middle" fontSize={20} fontWeight={600} fill={brand.tokens.primary} style={{ letterSpacing: "-0.01em" }}>{calloutLabel}</text>
+          <text x={hi[0]} y={hi[1] - 118} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.7)">{calloutNote}</text>
+        </g>
+      )}
+    </svg>
+  );
+}
