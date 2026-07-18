@@ -74,6 +74,21 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     };
   }, [open, cloudDeckId, getStatus]);
 
+  // Fetch analytics whenever a live share token is present and menu is open.
+  useEffect(() => {
+    if (!open || !cloudDeckId || !shareToken) {
+      setAnalytics(null);
+      return;
+    }
+    let cancelled = false;
+    getAnalytics({ data: { deckId: cloudDeckId } })
+      .then((r) => !cancelled && setAnalytics(r as Analytics))
+      .catch(() => !cancelled && setAnalytics(null));
+    return () => {
+      cancelled = true;
+    };
+  }, [open, cloudDeckId, shareToken, getAnalytics]);
+
   if (!deck) return null;
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
   const stamp = (kind: "pptx" | "pdf" | "present") =>
