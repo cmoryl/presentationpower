@@ -1112,19 +1112,24 @@ function renderVariantBody({
     case "MV-OP-COVER-EDITORIAL":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <div className="grid h-full grid-cols-[1.6fr_1fr] gap-12">
+          <div className="grid h-full grid-cols-[1.5fr_1fr] gap-16">
             <div className="flex flex-col justify-between">
-              <div className="text-2xl uppercase tracking-[0.35em]" style={{ color: brand.tokens.accent }}>
-                {s(c.kicker, "Vol. 01")}
-              </div>
+              <Kicker brand={brand} tracking="0.32em">{s(c.kicker, "Vol. 01")}</Kicker>
               <div>
-                <div className="text-[128px] font-semibold leading-[0.9]">{s(c.title)}</div>
-                <div className="mt-8 max-w-2xl text-3xl opacity-80">{s(c.subtitle)}</div>
+                <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mb-8" />
+                <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1080}>
+                  {s(c.title)}
+                </DisplayTitle>
+                {s(c.subtitle) && (
+                  <SupportingText size="xl" opacity={0.82} maxWidthPx={860} className="mt-8">
+                    {s(c.subtitle)}
+                  </SupportingText>
+                )}
               </div>
-              <div className="flex gap-16 text-xl opacity-70">
-                <div>Prepared for {s(c.clientName)}</div>
-                <div>{s(c.date)}</div>
-              </div>
+              <MetaRow>
+                <span>Prepared for {s(c.clientName)}</span>
+                <span>{s(c.date)}</span>
+              </MetaRow>
             </div>
             <div className="flex items-center">
               <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "editorial"))} className="aspect-[3/4] w-full" />
@@ -1138,13 +1143,30 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div className="-m-24 grid h-[calc(100%+192px)] grid-cols-2">
             <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "split"))} className="h-full w-full rounded-none" />
-            <div className="flex flex-col justify-center p-24" style={{ backgroundColor: brand.tokens.primary, color: "#fff" }}>
-              <div className="text-2xl uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>
-                Prepared for {s(c.clientName)}
+            <div className="relative flex flex-col justify-center p-24 text-white" style={{ backgroundColor: brand.tokens.primary }}>
+              {/* Subtle radial glow inside the primary panel */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage: `radial-gradient(80% 60% at 20% 20%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 60%)`,
+                }}
+              />
+              <div className="relative">
+                <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
+                <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6" />
+                <DisplayTitle size="section" color="#ffffff" maxWidthPx={720} className="mt-8">
+                  {s(c.title)}
+                </DisplayTitle>
+                {s(c.subtitle) && (
+                  <SupportingText size="lg" opacity={0.85} maxWidthPx={620} className="mt-8">
+                    {s(c.subtitle)}
+                  </SupportingText>
+                )}
+                <MetaRow className="mt-14">
+                  <span>{s(c.date)}</span>
+                </MetaRow>
               </div>
-              <div className="mt-8 text-[92px] font-semibold leading-[1.02]">{s(c.title)}</div>
-              <div className="mt-8 max-w-xl text-2xl opacity-85">{s(c.subtitle)}</div>
-              <div className="mt-14 text-xl uppercase tracking-[0.3em] opacity-70">{s(c.date)}</div>
             </div>
           </div>
         </SlideFrame>
@@ -1154,15 +1176,20 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div className="flex h-full flex-col justify-between">
-            <div className="text-2xl uppercase tracking-[0.4em]" style={{ color: brand.tokens.accent }}>
-              {s(c.kicker, "A briefing")}
-            </div>
-            <div className="text-[220px] font-semibold uppercase leading-[0.88] tracking-tight">
+            <Kicker brand={brand} tracking="0.42em">{s(c.kicker, "A briefing")}</Kicker>
+            <DisplayTitle
+              size="hero"
+              color="#ffffff"
+              className="uppercase"
+            >
               {s(c.title, "Signal")}
-            </div>
-            <div className="flex justify-between text-xl uppercase tracking-[0.3em] opacity-70">
-              <span>{s(c.meta, "Confidential")}</span>
-              <span>№ 01</span>
+            </DisplayTitle>
+            <div className="flex items-center justify-between">
+              <Hairline color={brand.tokens.accent} widthPx={140} thicknessPx={2} />
+              <MetaRow>
+                <span>{s(c.meta, "Confidential")}</span>
+                <span>№ 01</span>
+              </MetaRow>
             </div>
           </div>
         </SlideFrame>
@@ -1177,11 +1204,23 @@ function renderVariantBody({
               <MediaTile key={i} brand={brand} seed={s(it.seed, `grid-${i}`)} className="h-full w-full rounded-none" />
             ))}
           </div>
-          <div className="absolute inset-0 bg-black/45" />
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `linear-gradient(180deg, rgba(3,0,44,0.15) 0%, rgba(3,0,44,0.55) 55%, rgba(3,0,44,0.85) 100%)`,
+            }}
+          />
           <div className="relative flex h-full flex-col justify-end text-white">
-            <div className="text-2xl uppercase tracking-[0.3em] opacity-90">{s(c.date)}</div>
-            <div className="mt-4 text-[112px] font-semibold leading-[0.95]">{s(c.title)}</div>
-            <div className="mt-6 max-w-4xl text-3xl opacity-90">{s(c.subtitle)}</div>
+            <Kicker brand={brand}>{s(c.date, "Briefing")}</Kicker>
+            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-8" />
+            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1520} className="mt-10">
+              {s(c.title)}
+            </DisplayTitle>
+            {s(c.subtitle) && (
+              <SupportingText size="xl" opacity={0.9} maxWidthPx={1180} className="mt-8">
+                {s(c.subtitle)}
+              </SupportingText>
+            )}
           </div>
         </SlideFrame>
       );
@@ -1192,27 +1231,42 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex h-full flex-col justify-between" style={{ color: brand.tokens.ink }}>
             <div className="flex items-start justify-between">
-              <div className="text-xl uppercase tracking-[0.35em] opacity-70">
+              <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.32em", opacity: 0.65 }}>
                 Dossier · Ref {s(c.reference, "TP-0001")}
               </div>
               <div
-                className="rounded-md border-2 px-4 py-2 text-2xl font-semibold uppercase tracking-[0.25em] -rotate-6"
-                style={{ borderColor: brand.tokens.accent, color: brand.tokens.accent }}
+                className="px-4 py-2 uppercase"
+                style={{
+                  border: `1px solid ${brand.tokens.accent}`,
+                  color: brand.tokens.accent,
+                  fontSize: 18,
+                  letterSpacing: "0.32em",
+                  fontWeight: 600,
+                }}
               >
                 Confidential
               </div>
             </div>
             <div>
-              <div className="h-[3px] w-40" style={{ backgroundColor: brand.tokens.accent }} />
-              <div className="mt-8 text-[104px] font-semibold leading-[1.02]" style={{ color: brand.tokens.primary }}>
+              <Hairline color={brand.tokens.accent} widthPx={120} thicknessPx={2} />
+              <DisplayTitle size="cover" color={brand.tokens.primary} maxWidthPx={1520} className="mt-10">
                 {s(c.title)}
-              </div>
-              <div className="mt-8 max-w-4xl text-3xl opacity-80">Prepared for {s(c.clientName)}</div>
+              </DisplayTitle>
+              <SupportingText size="lg" opacity={0.75} maxWidthPx={1180} className="mt-8">
+                Prepared for {s(c.clientName)}
+              </SupportingText>
             </div>
-            <div className="grid grid-cols-3 gap-16 border-t pt-8 text-xl uppercase tracking-[0.3em] opacity-70" style={{ borderColor: "rgba(10,15,28,0.15)" }}>
-              <div>Prepared by · {s(c.prepared, "TransPerfect")}</div>
-              <div>Date · {s(c.date)}</div>
-              <div>Distribution · Internal</div>
+            <div className="grid grid-cols-3 gap-16 border-t pt-8" style={{ borderColor: "rgba(10,15,28,0.14)" }}>
+              {[
+                ["Prepared by", s(c.prepared, "TransPerfect")],
+                ["Date", s(c.date)],
+                ["Distribution", "Internal"],
+              ].map(([label, value], i) => (
+                <div key={i}>
+                  <Kicker brand={brand} size={14} tracking="0.32em">{label}</Kicker>
+                  <div className="mt-3" style={{ fontSize: 22, letterSpacing: "-0.01em" }}>{value}</div>
+                </div>
+              ))}
             </div>
           </div>
         </SlideFrame>
@@ -1222,12 +1276,26 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-image"))} className="absolute inset-0 h-full w-full rounded-none" />
-          <div className="absolute inset-0" style={{ backgroundColor: "rgba(3,0,44,0.58)" }} />
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage: `linear-gradient(120deg, ${brand.tokens.primary}f5 0%, ${brand.tokens.primary}c8 45%, rgba(0,0,0,0.35) 100%)`,
+            }}
+          />
           <div className="relative flex h-full flex-col justify-end text-white">
-            <div className="text-2xl uppercase tracking-[0.35em] opacity-85">Prepared for {s(c.clientName)}</div>
-            <div className="mt-6 text-[136px] font-semibold leading-[0.95]">{s(c.title)}</div>
-            <div className="mt-8 max-w-4xl text-3xl opacity-90">{s(c.subtitle)}</div>
-            <div className="mt-14 text-xl uppercase tracking-[0.3em] opacity-70">{s(c.date)}</div>
+            <Kicker brand={brand} tracking="0.32em">Prepared for {s(c.clientName)}</Kicker>
+            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-8" />
+            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1520} className="mt-10">
+              {s(c.title)}
+            </DisplayTitle>
+            {s(c.subtitle) && (
+              <SupportingText size="xl" opacity={0.9} maxWidthPx={1180} className="mt-10">
+                {s(c.subtitle)}
+              </SupportingText>
+            )}
+            <MetaRow className="mt-16">
+              <span>{s(c.date)}</span>
+            </MetaRow>
           </div>
         </SlideFrame>
       );
@@ -1235,23 +1303,44 @@ function renderVariantBody({
     case "MV-OP-COVER-MONOGRAM":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <div className="grid h-full grid-cols-[1.2fr_1fr] gap-12">
+          <div className="grid h-full grid-cols-[1.15fr_1fr] gap-16">
             <div
-              className="flex items-center justify-center rounded-3xl"
+              className="relative flex items-center justify-center overflow-hidden rounded-3xl"
               style={{ backgroundColor: brand.tokens.primary, color: "#fff" }}
             >
               <div
-                className="text-[520px] font-semibold leading-none"
-                style={{ color: brand.tokens.accent }}
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage: `radial-gradient(70% 55% at 30% 25%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 60%)`,
+                }}
+              />
+              <div
+                className="relative"
+                style={{
+                  color: brand.tokens.accent,
+                  fontSize: 520,
+                  lineHeight: 0.82,
+                  fontWeight: 600,
+                  letterSpacing: "-0.06em",
+                }}
               >
                 {s(c.monogram, "TP").slice(0, 2).toUpperCase()}
               </div>
             </div>
             <div className="flex flex-col justify-center">
-              <div className="h-[3px] w-24" style={{ backgroundColor: brand.tokens.accent }} />
-              <div className="mt-8 text-[76px] font-semibold leading-[1.05]">{s(c.title)}</div>
-              <div className="mt-6 text-2xl opacity-75">{s(c.subtitle)}</div>
-              <div className="mt-12 text-xl uppercase tracking-[0.3em] opacity-60">{s(c.date)}</div>
+              <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} />
+              <DisplayTitle size="section" color="#ffffff" maxWidthPx={720} className="mt-8">
+                {s(c.title)}
+              </DisplayTitle>
+              {s(c.subtitle) && (
+                <SupportingText size="lg" opacity={0.75} maxWidthPx={620} className="mt-6">
+                  {s(c.subtitle)}
+                </SupportingText>
+              )}
+              <MetaRow className="mt-14">
+                <span>{s(c.date)}</span>
+              </MetaRow>
             </div>
           </div>
         </SlideFrame>
@@ -1261,23 +1350,29 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div className="flex h-full flex-col justify-between">
-            <div className="text-2xl uppercase tracking-[0.3em]" style={{ color: brand.tokens.accent }}>
-              {s(c.kicker, "A proposal")}
-            </div>
-            <div className="grid grid-cols-[1fr_1.4fr] items-end gap-12">
+            <Kicker brand={brand}>{s(c.kicker, "A proposal")}</Kicker>
+            <div className="grid grid-cols-[1fr_1.4fr] items-end gap-16">
               <MediaTile brand={brand} seed={s(c.mediaSeed, "stacked")} className="aspect-[4/5] w-full" />
               <div>
-                <div className="text-[96px] font-semibold leading-[0.95]">{s(c.title)}</div>
-                <div className="mt-6 text-3xl opacity-80">{s(c.subtitle)}</div>
+                <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mb-8" />
+                <DisplayTitle size="section" color="#ffffff" maxWidthPx={1000}>
+                  {s(c.title)}
+                </DisplayTitle>
+                {s(c.subtitle) && (
+                  <SupportingText size="xl" opacity={0.82} maxWidthPx={880} className="mt-8">
+                    {s(c.subtitle)}
+                  </SupportingText>
+                )}
               </div>
             </div>
-            <div className="flex justify-between text-xl uppercase tracking-[0.3em] opacity-70">
+            <MetaRow>
               <span>Prepared with care</span>
               <span>{s(c.date)}</span>
-            </div>
+            </MetaRow>
           </div>
         </SlideFrame>
       );
+
 
     // ── Image-forward content ──────────────────────────────────────────
     case "MV-IMG-FULL-BLEED":
