@@ -2,11 +2,12 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Bookmark, Loader2, Sparkles } from "lucide-react";
+import { Bookmark, Download, Loader2, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { listTeamTemplates, getTemplateDeck } from "@/lib/cloud-decks.functions";
-import { BRAND_MODES, byId } from "@/lib/taxonomy";
+import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
+import { COMMUNITY_EVENT_TEMPLATE } from "@/lib/imported-templates/community-event";
 
 export const Route = createFileRoute("/templates")({
   head: () => ({ meta: [{ title: "Team templates · TransPerfect Modular" }] }),
@@ -44,7 +45,10 @@ function TemplatesGallery() {
         </Link>
       </div>
 
+      <StarterKits />
+
       <div className="mt-10">
+
         {q.isLoading ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -184,3 +188,51 @@ function EmptyState() {
     </div>
   );
 }
+
+function StarterKits() {
+  const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
+  const setDeckTemplateFlag = useDeckStore((s) => s.setDeckTemplateFlag);
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
+
+  function onImport() {
+    setBusy(true);
+    // Resolve a valid layoutId for each slide from the taxonomy so renderers
+    // don't fall back to defaults.
+    const payload: TemplatePayload = {
+      ...COMMUNITY_EVENT_TEMPLATE,
+      slides: COMMUNITY_EVENT_TEMPLATE.slides.map((s) => {
+        const mv = byId(MODULE_VARIANTS, s.variantId);
+        const layoutId = s.layoutId || mv?.permittedLayoutIds[0] || "LF-01";
+        return { ...s, layoutId };
+      }),
+    };
+    const { deckId } = createDeckFromTemplate(payload);
+    setDeckTemplateFlag(deckId, true);
+    navigate({ to: "/decks/$deckId", params: { deckId } });
+  }
+
+  return (
+    <div className="mt-8 rounded-3xl border border-black/10 bg-gradient-to-br from-[#03002C] to-[#003FC7] p-6 text-white dark:border-white/10">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <div className="text-[10px] uppercase tracking-widest text-white/60">Starter kits</div>
+          <div className="mt-1 text-lg font-semibold">Import a sample team template</div>
+          <p className="mt-1 max-w-xl text-sm text-white/70">
+            Pulse Fest · Community Event Kit — 20 editable slides mapped onto our modular variants. Import, tweak, and save as a team template.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onImport}
+          disabled={busy}
+          className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium text-[#03002C] hover:opacity-90 disabled:opacity-60"
+        >
+          {busy ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
+          Import Community Event template
+        </button>
+      </div>
+    </div>
+  );
+}
+
