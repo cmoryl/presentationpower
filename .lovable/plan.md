@@ -1,71 +1,70 @@
+# Backgrounds & Imagery — Everywhere
 
-# Full BrandHUB Integration
+Goal: give every slide a real "Background & Imagery" control that works in the editor, survives imports, renders in the preview/share viewer, and embeds into PPTX exports. Three sources: curated library, user upload, AI generation.
 
-Bringing the entire BrandHUB knowledge system into this project so every division, sub-brand, brand guide, and uploaded PDF/brochure feeds our deck personalization and Oracle retrieval.
+## 1. Data model (single source of truth)
 
-The source project is BrandHUB (workspace project, visited via cross-project tools). It holds 30 Oracle knowledge rows, 40 brand_intelligence rows (one per division/product/event), a full Oracle synthesis, per-division guide data in `src/data/`, and per-division assets under `public/canva-master-reference/`, `public/transperfect/`, `public/booths/`, `public/knowledge/`.
+Add two optional fields to `SlideContent` (typed as loose keys today):
 
-Because cross-project file reads paginate at ~400 lines and the seed is 8,645 lines, ingestion runs in phases across turns. Each phase leaves the app fully working; nothing is half-wired.
+- `content.background`: `{ kind: 'library' | 'upload' | 'ai' | 'color' | 'gradient'; url?: string; presetId?: string; css?: string; scrim?: 'bottom'|'left'|'right'|'top'|'full'|'vignette'; scrimStrength?: number; imageDim?: number; tint?: string }` — applies to ANY slide as a layer behind chrome.
+- `content.mediaUrl`: already exists for image-supporting variants; extend `variant-media.ts` so `normalizeSlideMedia` also preserves `background` on all variants (backgrounds are variant-agnostic).
 
-## Phase 1 — Data plumbing + Oracle + Knowledge Base (this turn)
+## 2. Curated background library
 
-1. Schema
-   - Add `brand_assets` table: `id, division_id, kind (pdf|brochure|guide|logo|image|other), title, description, url (CDN), source_filename, tags text[], extracted_text text, created_at`.
-   - Add `brand_asset_chunks` table for RAG: `id, asset_id, chunk_index, content, embedding vector(3072), tags text[], division_id, created_at`, pgvector index.
-   - Extend `brand_intelligence` if columns from BrandHUB don't already exist (they do — 15 cols); confirm and map.
-   - GRANT + RLS on both new tables (admin write, authenticated read).
+`src/lib/background-library.ts` — 12–16 on-brand presets grouped by category (Navy Gradient, Aqua Mist, Editorial Grid, Dot Grid, Diagonal Rule, Concentric Rings, Aurora, Paper Grain, Duotone Photo, etc.). Each preset stores a CSS string (linear/radial gradients + SVG data-URI patterns) — no binary uploads needed, works offline.
 
-2. Data import (via `supabase--insert`)
-   - Read `public/knowledge-export/database-seed.json` from BrandHUB in chunks, rebuild locally as `/tmp/brandhub-seed.json`, then bulk insert:
-     - 1 row into `oracle_intelligence` (upsert on organization_id).
-     - 30 rows into `oracle_knowledge_base`.
-     - 40 rows into `brand_intelligence` (one per entity — TransPerfect master, GlobalLink, Legal, Life Sciences, Media, Games, Digital, DataForce, Reef suite, regional, etc.).
-   - Preserve UUIDs so cross-references inside `bias_awareness_insights.entity_scores` still resolve.
+## 3. Custom upload (Supabase Storage)
 
-3. Static knowledge assets
-   - Copy `public/knowledge/**` (voiceover captions, `icon-iconography-history.md`, `claude-for-designers.html`) into this project's `public/knowledge/`.
-   - Copy `public/transperfect/*.html` (Canva audits, template inventories) into `public/transperfect/`.
-   - Copy `public/canva-master-reference/next-2026-color-palette.{csv,json,txt}` and `next-2026.html`.
+- Create private bucket `slide-media` via `supabase--storage_create_bucket`.
+- RLS on `storage.objects`: users can insert/select/delete only under `slide-media/<auth.uid()>/…`.
+- `src/lib/slide-media.ts` — `uploadSlideMedia(file) → { path, signedUrl }` using `createSignedUrl` (long-lived, refreshed on load).
 
-## Phase 2 — Per-division brand guides (next turn)
+## 4. AI image generation
 
-4. Extend `src/lib/brand-guides.ts` with one `BrandGuide` per division sourced from BrandHUB's `src/data/demoBrandHub.ts`, `demoGuides.ts`, and the 40 brand_intelligence rows:
-   - GlobalLink (+ Enterprise, Live, Portal, NOW, Strings, Web, CCMS, Share, Media, Scribe)
-   - Legal (+ Reef suite: ReefReview, ReefClaims, ReefStream, ReefTranslate, DigitalReef, ReefExhibit, ReefCentral, ReefDiscovery, ReefECA, VirtualReef)
-   - Life Sciences (+ Trial Interactive, LMK)
-   - Media (+ Creator, Inspector, Conductor, Director)
-   - Games, Digital, DataForce, IP, Health, Legal Tech
-   - Portfolio: The Mill, Bear Down, Avatria, Unbabel, Sterling, Paybooks, Wordbee
-5. Add the division logos already in `public/canva-master-reference/*.png` as `.asset.json` pointers.
-6. Update `src/routes/knowledge.brand-guides.tsx` and `.$slug.tsx` to render division-scoped colors, sub-brands, brand_intelligence summary, and linked knowledge entries.
-7. Add a division switcher on the brand-guides index that filters by `brand_intelligence.entity_type`.
+`src/routes/api/generate-slide-image.ts` — streaming server route using `openai/gpt-image-2` with `stream: true` per the TanStack streaming knowledge. Client uses the existing `streamImage` helper (or a small copy) to show a live progressive image. When finalized, upload the data URL into the `slide-media` bucket so it persists.
 
-## Phase 3 — PDFs & brochures + vector RAG (next turn)
+## 5. Editor UI
 
-8. Admin uploader on `/admin/knowledge` (or `/admin/oracle`) for PDFs/brochures per division:
-   - Upload to Lovable Storage bucket `brand-assets` (private, signed URLs for admin, public URLs opt-in per asset).
-   - Server function `ingestBrandAsset` extracts text via pdfjs (Worker-compatible), chunks to ~1200 chars with 200 overlap, embeds each chunk via Lovable AI Gateway (`google/gemini-embedding-001`, 3072 dims), stores in `brand_asset_chunks`.
-   - Batch script `scripts/seed-brandhub-assets.ts` bulk-ingests all BrandHUB PDFs the user uploads into this project (I'll wait for the actual PDF files — they aren't in the BrandHUB repo, they're in the user's Basecamp/Canva).
+`src/components/slide/BackgroundImageryPanel.tsx` — a glassy inspector panel with three tabs:
 
-9. RAG retrieval
-   - Extend `retrieveKnowledgeForBrief` (already exists in `src/lib/admin.functions.ts`) to embed the brief context and cosine-match against `brand_asset_chunks` filtered by `division_id` + tags, alongside the existing keyword scoring on `oracle_knowledge_base` and `knowledge_entries`.
-   - Return combined snippets to `personalizeSlides`; system prompt already accepts `knowledgeSnippets`.
+- **Library**: grid of previews; click to set `content.background = { kind: 'library', presetId, css }`.
+- **Upload**: drag-and-drop → upload → set `background.kind='upload'` with signed URL.
+- **AI**: prompt input → streams into preview → "Use this" persists to storage and sets `background.kind='ai'`.
 
-10. UI surfacing
-    - Per-division brand-guide page shows: guide colors/type/logo + linked PDFs + brand_intelligence card + Oracle snippets.
-    - `/brief/new` "Palette Lab" section shows which brand_intelligence + asset chunks will inform generation for the chosen division.
+For image-forward variants, a second sub-section overrides slide `mediaUrl` with the same three sources (reuses tabs). Includes scrim controls (position slider, strength, dim).
 
-## Technical Details
+Mount into the existing slide inspector on `/decks/$deckId`.
 
-- Cross-project file reads paginate at 400 lines; I'll stream the seed in ~22 chunks and reconstruct locally, then `supabase--insert` in batches (200 rows/batch).
-- `brand_asset_chunks.embedding` uses `vector(3072)` with `hnsw ((embedding::halfvec(3072)) halfvec_cosine_ops)` per pgvector limits.
-- Existing `brand_intelligence` table is 15 columns and mirrors BrandHUB's schema; direct insert with the source UUIDs.
-- `oracle_intelligence` in this project has 21 columns; BrandHUB rows have compatible JSONB shape. Any extra columns get null.
-- PDFs live on user's Basecamp — I need them uploaded here (chat file attach or Storage) to ingest. I'll wire the upload UI in Phase 3 and ingest whatever's present; nothing hardcoded per file.
-- No voice integration (per memory).
-- All admin ingestion functions gated by `has_role(uid,'admin')`.
+## 6. Renderer wiring
 
-## What I need from you
+- Wrap the current slide render in the editor and share viewer with a `SlideBackdropContext.Provider` that derives from `content.background` first, then falls back to the current `backdropForVariant` result for image-supporting variants.
+- `SlideFrame` already renders a backdrop layer — extend it to accept CSS-only backgrounds (no image URL) by rendering the CSS string as `backgroundImage` on the base div, and keep scrim/tint controls intact.
 
-- Confirm plan.
-- Phase 3 needs the actual PDFs/brochures — do you have them ready to upload here, or should I finish Phases 1–2 and ship the uploader so you drop them in when convenient?
+## 7. PPTX export
+
+In `src/lib/pptx-export.ts`:
+
+- If `content.background.url` is set → prefetch as data URL and add as first slide layer (`slide.background = { data: 'image/...;base64,...' }` for full-bleed, or a scaled `addImage` for patterns) plus a `addShape` scrim rectangle matching the on-screen scrim.
+- If `content.background.css` describes a solid/linear gradient → convert to `slide.background = { color: HEX }` (solid) or emit a full-bleed rectangle with `pptxgenjs` gradient-approximation (two-color linear).
+- For image-supporting variants that also carry `content.mediaUrl` override, keep existing embed behavior (already implemented) but read from override first.
+
+## 8. Import round-trip
+
+In `src/lib/pptx-mapping.ts`:
+
+- When the extracted slide has a full-bleed background image AND the mapped variant does NOT support slide-level imagery, promote it to `content.background = { kind: 'upload', url, scrim: 'bottom', scrimStrength: 0.55 }` instead of dumping into `extraImages`.
+- When the extracted slide has a solid theme color, set `content.background = { kind: 'color', css: 'linear-gradient(...)' }`.
+- Diagnostics panel already surfaces preserved vs dropped — hook the new promotion path into the "Preserved" counter.
+
+## 9. Files touched / added
+
+Added: `background-library.ts`, `slide-media.ts`, `BackgroundImageryPanel.tsx`, `api/generate-slide-image.ts`, migration for storage RLS.
+Modified: `variant-media.ts`, `SlideChrome.tsx`, `VariantRenderer.tsx` (context provider only), `decks.$deckId.tsx` (mount panel), `pptx-export.ts`, `pptx-mapping.ts`, `share.$token.tsx` (provider), `decks.$deckId.print.tsx` and `.present.tsx` (providers).
+
+## Out of scope this pass
+
+- Video backgrounds.
+- Per-shape image replacement inside grid/bento cells (already covered by item-level `seed`).
+- Batch "apply background to all slides in section" — trivial follow-up once the single-slide flow is proven.
+
+Confirm and I'll execute in one batched pass.
