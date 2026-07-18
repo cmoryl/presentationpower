@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { auditNode, type WcagReport } from "@/lib/wcag";
+import type { WcagReport } from "@/lib/wcag";
 
 /**
  * Renders `children` into an off-screen, absolutely-positioned slide-sized
