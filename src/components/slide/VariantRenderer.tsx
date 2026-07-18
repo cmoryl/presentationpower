@@ -1537,7 +1537,7 @@ function renderVariantBody({
           <div className="flex h-full flex-col items-center justify-center">
             <Kicker brand={brand}>{s(c.title, "In focus")}</Kicker>
             <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "framed"))} className="aspect-[16/9] w-[80%]" />
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "framed"))} overrideUrl={s(c.mediaUrl)} className="aspect-[16/9] w-[80%]" />
             <SupportingText size="lg" opacity={0.85} className="mt-10 text-center" maxWidthPx={1100}>{s(c.caption)}</SupportingText>
             {s(c.credit) && (
               <MetaRow className="mt-6">
