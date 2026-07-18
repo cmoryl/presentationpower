@@ -7,6 +7,7 @@
 import type { ParsedSlide, ParsedTheme } from "./pptx-import.functions";
 import { MODULE_VARIANTS, byId } from "./taxonomy";
 import type { SlideContent } from "./deck-store";
+import { variantSupportsImagery, normalizeSlideMedia } from "./variant-media";
 
 export type MappedSlide = {
   sectionId: string;
@@ -177,14 +178,21 @@ export function mapParsedSlide(
     rationale = "Callout — headline + supporting text";
   }
 
-  // If we didn't route to an image-forward variant but still have imagery,
-  // keep the primary image on the record so downstream tooling (and manual
-  // variant swaps to an image-friendly one) can still surface it.
-  if (hasImages && !("mediaUrl" in content)) {
-    content = { ...content, mediaUrl: primaryImage, extraImages: images.slice(1) };
-  } else if (images.length > 1) {
-    content = { ...content, extraImages: images.slice(1) };
+  // Only attach `mediaUrl` when the resolved variant actually renders a
+  // slide-level photograph. For non-image variants we still preserve the
+  // extracted images in `extraImages` so a user can swap into an image
+  // variant later, but never leave an orphan `mediaUrl` pointing at a
+  // slot the renderer will not draw.
+  if (hasImages) {
+    if (variantSupportsImagery(variantId) && !("mediaUrl" in content)) {
+      content = { ...content, mediaUrl: primaryImage, extraImages: images.slice(1) };
+    } else if (!variantSupportsImagery(variantId)) {
+      content = normalizeSlideMedia(variantId, { ...content, extraImages: images });
+    } else if (images.length > 1) {
+      content = { ...content, extraImages: images.slice(1) };
+    }
   }
+
 
   if (isLast && !/^SF-16$/.test(sectionId) && bullets.length === 0 && !hasImages) {
     sectionId = "SF-16";
@@ -195,12 +203,17 @@ export function mapParsedSlide(
 
   const variant = byId(MODULE_VARIANTS, variantId) ?? MODULE_VARIANTS[0];
   const layoutId = variant.permittedLayoutIds[0];
+  // Final safety net: if any earlier branch left a slide-level media
+  // reference on a content record whose final variant does not render
+  // imagery, strip it here so exporters and renderers stay consistent.
+  const safeContent = normalizeSlideMedia(variant.id, content as Record<string, unknown>) as SlideContent;
   return {
     sectionId,
     variantId: variant.id,
     layoutId,
-    content,
+    content: safeContent,
     source: s,
     rationale,
   };
 }
+
