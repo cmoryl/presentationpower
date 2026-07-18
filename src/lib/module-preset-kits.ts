@@ -35,6 +35,14 @@ export const MODULE_PRESET_KITS: ModulePresetKit[] = [
     payload: INFOGRAPHICS_IMAGES_TEMPLATE,
   },
   {
+    key: "graph-library",
+    title: "Graph Variants · Data Library",
+    tag: "Charts",
+    blurb:
+      "16 chart-driven proof slides — year series, axis + category bars, stacked bars, area stack, waterfall, bubble, heatmap, treemap, donut, rings, combo — each with editable data.",
+    payload: GRAPH_LIBRARY_TEMPLATE,
+  },
+  {
     key: "community-event",
     title: "Community Event · Pulse Fest Kit",
     tag: "Event",
