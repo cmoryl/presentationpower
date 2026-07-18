@@ -131,7 +131,7 @@ const report = {
   mode: MODE,
   tolerancePx: TOLERANCE_PX,
   ranAt: new Date().toISOString(),
-  totalCards: cards.length,
+  totalCards: cardIds.length,
   overlappingCards: overlaps.length,
   overlaps,
   captured,
