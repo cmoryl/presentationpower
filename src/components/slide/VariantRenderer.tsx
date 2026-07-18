@@ -1478,12 +1478,22 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote"))} className="absolute inset-0 h-full w-full rounded-none" />
-          <div className="absolute inset-0" style={{ backgroundColor: "rgba(3,0,44,0.68)" }} />
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{ background: `linear-gradient(115deg, ${brand.tokens.primary} 8%, ${brand.tokens.primary}CC 42%, ${brand.tokens.primary}66 78%, rgba(0,0,0,0.25) 100%)` }}
+          />
           <div className="relative flex h-full flex-col justify-center text-white">
-            <div className="text-[200px] leading-none opacity-20" style={{ color: brand.tokens.accent }}>“</div>
-            <div className="-mt-12 max-w-6xl text-5xl font-medium leading-[1.2]">{s(c.quote)}</div>
-            <div className="mt-10 text-2xl opacity-85">
-              {s(c.attribution)} <span className="mx-2 opacity-60">·</span> {s(c.role)}
+            <QuoteMark color={brand.tokens.accent} size={520} opacity={0.18} className="absolute -top-4 -left-4" />
+            <div className="relative max-w-[1500px]">
+              <Kicker brand={brand} color={brand.tokens.accent}>In their words</Kicker>
+              <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
+              <div style={{ fontSize: 72, fontWeight: 500, lineHeight: 1.18, letterSpacing: "-0.02em", color: "#ffffff" }}>
+                {s(c.quote)}
+              </div>
+              <div className="mt-14">
+                <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} />
+              </div>
             </div>
           </div>
         </SlideFrame>
