@@ -339,6 +339,228 @@ function UploadCard({ onFile }: { onFile: (f: File) => void }) {
   );
 }
 
+// ---- Import diagnostics ----------------------------------------------------
+// Classify each mapped slide so users can see, before creating the deck,
+// which slides will render with the source imagery/styles and which fall
+// back to seeded stock or default palette — and why.
+
+const IMAGE_FORWARD_PREFIXES = ["MV-IMG-", "MV-OP-COVER-MEDIA"];
+
+function isImageForwardVariant(variantId: string): boolean {
+  return IMAGE_FORWARD_PREFIXES.some((p) => variantId.startsWith(p));
+}
+
+type SlideDiagnostic = {
+  kind: "image-preserved" | "image-dropped" | "image-fallback" | "text-only";
+  label: string;
+  detail: string;
+  tone: "ok" | "warn" | "info";
+};
+
+function diagnoseSlide(row: MappedSlide): SlideDiagnostic {
+  const sourceImages = row.source.images?.length ?? 0;
+  const mediaUrl = (row.content as { mediaUrl?: string }).mediaUrl;
+  const imageForward = isImageForwardVariant(row.variantId);
+
+  if (sourceImages > 0 && mediaUrl) {
+    return {
+      kind: "image-preserved",
+      label: "Image preserved",
+      detail: `Original picture from the source slide is carried through into the ${row.variantId} variant.`,
+      tone: "ok",
+    };
+  }
+  if (sourceImages > 0 && !mediaUrl) {
+    return {
+      kind: "image-dropped",
+      label: "Image dropped",
+      detail: `Source has ${sourceImages} image${sourceImages === 1 ? "" : "s"} but the selected variant is text-only. Switch to an image-forward variant to keep it.`,
+      tone: "warn",
+    };
+  }
+  if (sourceImages === 0 && imageForward) {
+    return {
+      kind: "image-fallback",
+      label: "Seeded imagery",
+      detail: "Source slide had no embedded picture — deterministic brand-mode stock is used to fill the image area.",
+      tone: "info",
+    };
+  }
+  return {
+    kind: "text-only",
+    label: "Text only",
+    detail: "No imagery expected on this slide.",
+    tone: "ok",
+  };
+}
+
+function DiagnosticsPanel({
+  parsed,
+  mapping,
+}: {
+  parsed: ParsedDeck;
+  mapping: MappedSlide[];
+}) {
+  const diagnostics = mapping.map(diagnoseSlide);
+  const counts = {
+    preserved: diagnostics.filter((d) => d.kind === "image-preserved").length,
+    dropped: diagnostics.filter((d) => d.kind === "image-dropped").length,
+    fallback: diagnostics.filter((d) => d.kind === "image-fallback").length,
+    textOnly: diagnostics.filter((d) => d.kind === "text-only").length,
+  };
+  const theme = parsed.theme;
+  const themeApplied = Boolean(theme?.accent1 || theme?.accent2);
+
+  const deckNotes: Array<{ tone: "ok" | "warn" | "info"; label: string; detail: string }> = [];
+  deckNotes.push(
+    themeApplied
+      ? {
+          tone: "ok",
+          label: "Theme accents applied",
+          detail: `Source palette (${[theme?.accent1, theme?.accent2].filter(Boolean).join(" · ")}) is carried through as a palette override on the new deck.`,
+        }
+      : {
+          tone: "info",
+          label: "Default palette",
+          detail: "No theme accents were found in the source file — the deck uses the TransPerfect default palette.",
+        },
+  );
+  if (theme?.headingFont || theme?.bodyFont) {
+    deckNotes.push({
+      tone: "info",
+      label: "Fonts not applied",
+      detail: `Source references ${[theme.headingFont, theme.bodyFont].filter(Boolean).join(" / ")}. The deck uses Geist to keep brand typography consistent.`,
+    });
+  }
+  if (parsed.imagesTruncated) {
+    deckNotes.push({
+      tone: "warn",
+      label: "Images truncated",
+      detail: "Some images in the source file exceeded the per-file limit and were skipped during extraction. Those slides will use seeded stock imagery.",
+    });
+  }
+  const problems = diagnostics
+    .map((d, i) => ({ d, i }))
+    .filter((x) => x.d.tone !== "ok");
+
+  return (
+    <div className="rounded-2xl border border-black/10 bg-white p-6">
+      <div className="flex items-baseline justify-between">
+        <div>
+          <div className="text-xs uppercase tracking-widest text-black/50">
+            Import diagnostics
+          </div>
+          <div className="mt-1 text-lg font-semibold">
+            What will carry through, and what won't
+          </div>
+        </div>
+        <div className="text-xs text-black/50">
+          {mapping.length} slide{mapping.length === 1 ? "" : "s"} analysed
+        </div>
+      </div>
+
+      <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <StatTile label="Image preserved" value={counts.preserved} tone="ok" />
+        <StatTile label="Seeded fallback" value={counts.fallback} tone="info" />
+        <StatTile label="Image dropped" value={counts.dropped} tone="warn" />
+        <StatTile label="Text only" value={counts.textOnly} tone="ok" />
+      </div>
+
+      <div className="mt-5 space-y-2">
+        {deckNotes.map((n, i) => (
+          <DiagnosticRow key={i} tone={n.tone} label={n.label} detail={n.detail} />
+        ))}
+      </div>
+
+      {problems.length > 0 && (
+        <div className="mt-5 rounded-xl border border-amber-300/70 bg-amber-50 p-4">
+          <div className="text-xs font-semibold uppercase tracking-widest text-amber-900">
+            {problems.length} slide{problems.length === 1 ? "" : "s"} need a look
+          </div>
+          <ul className="mt-2 space-y-1 text-xs text-amber-950/90">
+            {problems.slice(0, 8).map(({ d, i }) => (
+              <li key={i}>
+                <span className="font-mono">{String(i + 1).padStart(2, "0")}</span>
+                {" · "}
+                <span className="font-medium">{d.label}</span>
+                {" — "}
+                {d.detail}
+              </li>
+            ))}
+            {problems.length > 8 && (
+              <li className="text-amber-900/70">+ {problems.length - 8} more below…</li>
+            )}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StatTile({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "ok" | "warn" | "info";
+}) {
+  const toneRing =
+    tone === "warn"
+      ? "border-amber-300 bg-amber-50"
+      : tone === "info"
+        ? "border-[#003FC7]/25 bg-[#003FC7]/[0.04]"
+        : "border-black/10 bg-black/[0.02]";
+  return (
+    <div className={`rounded-xl border ${toneRing} px-4 py-3`}>
+      <div className="text-3xl font-semibold tabular-nums">{value}</div>
+      <div className="mt-1 text-[10px] uppercase tracking-widest text-black/55">
+        {label}
+      </div>
+    </div>
+  );
+}
+
+function DiagnosticRow({
+  tone,
+  label,
+  detail,
+}: {
+  tone: "ok" | "warn" | "info";
+  label: string;
+  detail: string;
+}) {
+  const dot =
+    tone === "warn" ? "bg-amber-500" : tone === "info" ? "bg-[#003FC7]" : "bg-emerald-500";
+  return (
+    <div className="flex items-start gap-3 text-sm">
+      <span className={`mt-1.5 h-2 w-2 flex-none rounded-full ${dot}`} aria-hidden />
+      <div>
+        <span className="font-medium">{label}</span>
+        <span className="text-black/60"> — {detail}</span>
+      </div>
+    </div>
+  );
+}
+
+function DiagnosticChip({ diag }: { diag: SlideDiagnostic }) {
+  const style =
+    diag.tone === "warn"
+      ? "border-amber-300 bg-amber-50 text-amber-900"
+      : diag.tone === "info"
+        ? "border-[#003FC7]/30 bg-[#003FC7]/[0.06] text-[#003FC7]"
+        : "border-emerald-300/70 bg-emerald-50 text-emerald-900";
+  return (
+    <span
+      title={diag.detail}
+      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest ${style}`}
+    >
+      {diag.label}
+    </span>
+  );
+}
+
 function ReviewPanel({
   parsed,
   mapping,
