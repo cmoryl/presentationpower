@@ -55,6 +55,7 @@ function Library() {
   
   const [showImagery, setShowImagery] = useState(false);
   const [wcagOn, setWcagOn] = useState(false);
+  const [autoFixOn, setAutoFixOn] = useState(false);
   const [approvalTick, setApprovalTick] = useState(0);
   const approvals = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
