@@ -28,6 +28,10 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   const getStatus = useServerFn(getDeckShareStatus);
   const enableFn = useServerFn(enableDeckSharing);
   const disableFn = useServerFn(disableDeckSharing);
+  const getAnalytics = useServerFn(getShareAnalytics);
+
+  type Analytics = { totalViews: number; uniqueSessions: number; lastViewedAt: string | null; avgMaxSlide: number };
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
 
   const [shareToken, setShareToken] = useState<string | null>(null);
   const [shareBusy, setShareBusy] = useState(false);
