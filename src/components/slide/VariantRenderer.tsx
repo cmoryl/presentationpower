@@ -3,7 +3,7 @@ import { SlideFrame as BaseSlideFrame, SlideModeContext, type SlideMode } from "
 import { createContext, useContext } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
-import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow } from "./primitives";
+import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, StatFigure, QuoteMark, Attribution, SoftDivider } from "./primitives";
 
 
 // Module-scoped context so helper components (CardGrid, StatGrid, NumberedList,
