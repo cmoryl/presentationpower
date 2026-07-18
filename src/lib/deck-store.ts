@@ -940,23 +940,23 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       return {
         title: `Why ${clientName} chooses TransPerfect`,
         items: [
-          { kind: "feature", title: "One operating model", body: `A single global program spanning every ${clientName} market, content type, and channel — with local precision built in.` },
-          { kind: "stat", value: "62", unit: "%", label: "Faster launch cycles" },
-          { kind: "body", title: "Human + AI", body: "Reviewer network paired with adaptive MT — quality that survives audit, at the speed of publish." },
+          { kind: "feature", icon: "Layers3", title: "One operating model", body: `A single global program spanning every ${clientName} market, content type, and channel — with local precision built in.` },
+          { kind: "stat", icon: "Timer", value: "62", unit: "%", label: "Faster launch cycles" },
+          { kind: "body", icon: "Cpu", title: "Human + AI", body: "Reviewer network paired with adaptive MT — quality that survives audit, at the speed of publish." },
           { kind: "media", title: "In-market presence", mediaSeed: `${clientName}-bento` },
-          { kind: "body", title: "Governance-ready", body: "Terminology, brand voice, and regulatory guardrails codified per market." },
+          { kind: "body", icon: "ShieldCheck", title: "Governance-ready", body: "Terminology, brand voice, and regulatory guardrails codified per market." },
         ],
       };
     case "MV-KPI-DASHBOARD":
       return {
         title: `${clientName} program — current state`,
         items: [
-          { value: "42", unit: "M", label: "Words / year", delta: "+18%", trend: "up" },
-          { value: "38", unit: "", label: "Markets live", delta: "+6", trend: "up" },
-          { value: "97.4", unit: "%", label: "On-time delivery", delta: "+2.1", trend: "up" },
-          { value: "4.7", unit: "/5", label: "Reviewer quality", delta: "+0.3", trend: "up" },
-          { value: "12", unit: "d", label: "Avg. cycle time", delta: "-4d", trend: "down" },
-          { value: "$0.09", unit: "", label: "Cost / word", delta: "-14%", trend: "down" },
+          { icon: "FileText", value: "42", unit: "M", label: "Words / year", delta: "+18%", trend: "up" },
+          { icon: "Globe2", value: "38", unit: "", label: "Markets live", delta: "+6", trend: "up" },
+          { icon: "CheckCircle2", value: "97.4", unit: "%", label: "On-time delivery", delta: "+2.1", trend: "up" },
+          { icon: "Star", value: "4.7", unit: "/5", label: "Reviewer quality", delta: "+0.3", trend: "up" },
+          { icon: "Timer", value: "12", unit: "d", label: "Avg. cycle time", delta: "-4d", trend: "down" },
+          { icon: "Coins", value: "$0.09", unit: "", label: "Cost / word", delta: "-14%", trend: "down" },
         ],
       };
     case "MV-ROADMAP-QUARTERS":
@@ -975,10 +975,10 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       return {
         title: `Where content is lost between HQ and ${clientName}'s markets`,
         items: [
-          { label: "Content produced at HQ", value: "100", unit: "%", note: "Original creative in source language" },
-          { label: "Translated on time", value: "68", unit: "%", note: "Rest slips a full cycle" },
-          { label: "Reviewed in-market", value: "44", unit: "%", note: "Local voice check" },
-          { label: "Published on brand", value: "31", unit: "%", note: "Meeting compliance + tone" },
+          { icon: "Sparkles", label: "Content produced at HQ", value: "100", unit: "%", note: "Original creative in source language" },
+          { icon: "Send", label: "Translated on time", value: "68", unit: "%", note: "Rest slips a full cycle" },
+          { icon: "FileCheck2", label: "Reviewed in-market", value: "44", unit: "%", note: "Local voice check" },
+          { icon: "Trophy", label: "Published on brand", value: "31", unit: "%", note: "Meeting compliance + tone" },
         ],
       };
     case "MV-FLYWHEEL":
@@ -986,10 +986,10 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         title: `${clientName}'s content flywheel`,
         hub: "Global content engine",
         items: [
-          { label: "Create", note: "Author once at HQ", icon: "sparkles" },
-          { label: "Localize", note: "Adaptive MT + reviewers", icon: "globe2" },
-          { label: "Publish", note: "Route to every market", icon: "send" },
-          { label: "Measure", note: "Feedback loop to source", icon: "linechart" },
+          { label: "Create", note: "Author once at HQ", icon: "Sparkles" },
+          { label: "Localize", note: "Adaptive MT + reviewers", icon: "Globe2" },
+          { label: "Publish", note: "Route to every market", icon: "Send" },
+          { label: "Measure", note: "Feedback loop to source", icon: "LineChart" },
         ],
       };
     case "MV-MATURITY-CURVE":
@@ -1006,11 +1006,11 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       return {
         title: `${clientName}'s buyer journey across markets`,
         items: [
-          { phase: "Discover", touchpoint: "Paid + organic search", sentiment: 2 },
-          { phase: "Evaluate", touchpoint: "Product pages, docs", sentiment: 3 },
-          { phase: "Decide", touchpoint: "Sales, legal, compliance", sentiment: 2 },
-          { phase: "Onboard", touchpoint: "Training + support", sentiment: 4 },
-          { phase: "Expand", touchpoint: "In-market campaigns", sentiment: 5 },
+          { icon: "Search", phase: "Discover", touchpoint: "Paid + organic search", sentiment: 2 },
+          { icon: "ClipboardList", phase: "Evaluate", touchpoint: "Product pages, docs", sentiment: 3 },
+          { icon: "Handshake", phase: "Decide", touchpoint: "Sales, legal, compliance", sentiment: 2 },
+          { icon: "Rocket", phase: "Onboard", touchpoint: "Training + support", sentiment: 4 },
+          { icon: "TrendingUp", phase: "Expand", touchpoint: "In-market campaigns", sentiment: 5 },
         ],
       };
     case "MV-LOGO-WALL":
@@ -1042,14 +1042,14 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         title: "The real cost of decentralized translation",
         waterline: "What executives see",
         above: [
-          { label: "Vendor invoices", body: "The line item everyone tracks." },
-          { label: "Cycle time", body: "Weeks between HQ launch and in-market live." },
+          { icon: "Coins", label: "Vendor invoices", body: "The line item everyone tracks." },
+          { icon: "Timer", label: "Cycle time", body: "Weeks between HQ launch and in-market live." },
         ],
         below: [
-          { label: "Rework in-market", body: "Local teams re-editing off-brand copy." },
-          { label: "Compliance risk", body: "Regulated content published without terminology control." },
-          { label: "Lost revenue", body: "Campaigns that miss the local season entirely." },
-          { label: "Brand drift", body: "Voice fragments across every market and channel." },
+          { icon: "Wrench", label: "Rework in-market", body: "Local teams re-editing off-brand copy." },
+          { icon: "AlertTriangle", label: "Compliance risk", body: "Regulated content published without terminology control." },
+          { icon: "TrendingUp", label: "Lost revenue", body: "Campaigns that miss the local season entirely." },
+          { icon: "MessagesSquare", label: "Brand drift", body: "Voice fragments across every market and channel." },
         ],
       };
 

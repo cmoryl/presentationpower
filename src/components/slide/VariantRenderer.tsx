@@ -2359,7 +2359,10 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-10 grid gap-6" style={{ gridTemplateColumns: "1.5fr 1fr 1fr", gridTemplateRows: "1fr 1fr", height: 720 }}>
             <div className={cellClass} style={{ ...cellBorder, gridRow: "1 / span 2" }}>
-              <Kicker brand={brand}>Anchor</Kicker>
+              <div className="flex items-center gap-4">
+                <IconBadge brand={brand} label={s(anchor.title)} index={0} size="md" override={s(anchor.icon)} treatment="soft-tile" />
+                <Kicker brand={brand}>Anchor</Kicker>
+              </div>
               <div className="mt-auto">
                 <div style={{ fontSize: 44, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(anchor.title)}</div>
                 <div className="mt-5" style={{ fontSize: 24, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(anchor.body)}</div>
@@ -2370,7 +2373,12 @@ function renderVariantBody({
               return (
                 <div key={i} className={cellClass} style={cellBorder}>
                   {kind === "stat" ? (
-                    <StatFigure brand={brand} value={s(it.value)} unit={s(it.unit)} label={s(it.label)} size="md" />
+                    <>
+                      <IconBadge brand={brand} label={s(it.label)} index={i + 1} size="sm" override={s(it.icon)} treatment="soft-tile" />
+                      <div className="mt-auto">
+                        <StatFigure brand={brand} value={s(it.value)} unit={s(it.unit)} label={s(it.label)} size="md" />
+                      </div>
+                    </>
                   ) : kind === "media" ? (
                     <div className="relative -m-10 h-full overflow-hidden">
                       <MediaTile brand={brand} seed={s(it.mediaSeed, s(it.title, `bento-${i}`))} className="absolute inset-0 h-full w-full rounded-none" />
@@ -2378,7 +2386,10 @@ function renderVariantBody({
                     </div>
                   ) : (
                     <>
-                      <Kicker brand={brand}>{String(i + 2).padStart(2, "0")}</Kicker>
+                      <div className="flex items-center gap-4">
+                        <IconBadge brand={brand} label={s(it.title)} index={i + 1} size="sm" override={s(it.icon)} treatment="soft-tile" />
+                        <Kicker brand={brand}>{String(i + 2).padStart(2, "0")}</Kicker>
+                      </div>
                       <div className="mt-auto">
                         <div style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.title)}</div>
                         <div className="mt-3" style={{ fontSize: 20, lineHeight: 1.4, color: "rgba(10,15,28,0.7)" }}>{s(it.body)}</div>
@@ -2405,7 +2416,10 @@ function renderVariantBody({
               const trendColor = trend === "down" ? brand.tokens.accent : brand.tokens.accent;
               return (
                 <div key={i} className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                  <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "rgba(10,15,28,0.6)", fontWeight: 600 }}>{s(it.label)}</div>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "rgba(10,15,28,0.6)", fontWeight: 600 }}>{s(it.label)}</div>
+                    <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="glyph" />
+                  </div>
                   <div className="mt-4 flex items-baseline gap-2">
                     <span className="tabular-nums font-semibold" style={{ fontSize: 88, lineHeight: 0.95, letterSpacing: "-0.025em", color: brand.tokens.primary }}>{s(it.value)}</span>
                     {s(it.unit) && <span className="font-medium" style={{ fontSize: 34, color: brand.tokens.accent, letterSpacing: "-0.015em" }}>{s(it.unit)}</span>}
@@ -2495,10 +2509,13 @@ function renderVariantBody({
                       color: "#fff",
                     }}
                   >
-                    <div>
-                      <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", opacity: 0.85 }}>{String(i + 1).padStart(2, "0")}</div>
-                      <div className="mt-2" style={{ fontSize: 32, fontWeight: 600, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
-                      {s(it.note) && <div className="mt-1" style={{ fontSize: 18, opacity: 0.85 }}>{s(it.note)}</div>}
+                    <div className="flex items-center gap-5">
+                      <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} treatment="on-dark" tone="onDark" />
+                      <div>
+                        <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", opacity: 0.85 }}>{String(i + 1).padStart(2, "0")}</div>
+                        <div className="mt-2" style={{ fontSize: 32, fontWeight: 600, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
+                        {s(it.note) && <div className="mt-1" style={{ fontSize: 18, opacity: 0.85 }}>{s(it.note)}</div>}
+                      </div>
                     </div>
                     <div className="tabular-nums font-semibold text-right" style={{ fontSize: 56, letterSpacing: "-0.02em", lineHeight: 1 }}>
                       {s(it.value)}<span className="ml-1" style={{ fontSize: 26, opacity: 0.9 }}>{s(it.unit)}</span>
@@ -2614,7 +2631,10 @@ function renderVariantBody({
             <div className="grid" style={{ gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }}>
               {items.map((it, i) => (
                 <div key={i} className="pb-5" style={{ borderBottom: `2px solid ${brand.tokens.accent}` }}>
-                  <Kicker brand={brand}>Phase {String(i + 1).padStart(2, "0")}</Kicker>
+                  <div className="flex items-center gap-3">
+                    <IconBadge brand={brand} label={s(it.phase)} index={i} size="sm" override={s(it.icon)} treatment="soft-circle" />
+                    <Kicker brand={brand}>Phase {String(i + 1).padStart(2, "0")}</Kicker>
+                  </div>
                   <div className="mt-2" style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.phase)}</div>
                   <div className="mt-2" style={{ fontSize: 18, color: "rgba(10,15,28,0.7)", lineHeight: 1.4 }}>{s(it.touchpoint)}</div>
                 </div>
@@ -2718,7 +2738,10 @@ function renderVariantBody({
             <div className="grid gap-8" style={{ gridTemplateColumns: `repeat(${Math.max(above.length, 2)}, minmax(0, 1fr))` }}>
               {above.map((it, i) => (
                 <div key={i}>
-                  <Kicker brand={brand}>Visible</Kicker>
+                  <div className="flex items-center gap-3">
+                    <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="glyph" />
+                    <Kicker brand={brand}>Visible</Kicker>
+                  </div>
                   <div className="mt-3" style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
                   <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(it.body)}</div>
                 </div>
@@ -2732,7 +2755,10 @@ function renderVariantBody({
             <div className="grid gap-8" style={{ gridTemplateColumns: `repeat(${Math.max(Math.min(below.length, 3), 2)}, minmax(0, 1fr))` }}>
               {below.map((it, i) => (
                 <div key={i} className="p-6" style={{ background: "rgba(10,15,28,0.04)", border: "1px solid rgba(10,15,28,0.08)" }}>
-                  <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", color: "rgba(10,15,28,0.55)", fontWeight: 600 }}>Hidden</div>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", color: "rgba(10,15,28,0.55)", fontWeight: 600 }}>Hidden</div>
+                    <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="soft-tile" />
+                  </div>
                   <div className="mt-3" style={{ fontSize: 24, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
                   <div className="mt-2" style={{ fontSize: 18, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(it.body)}</div>
                 </div>
