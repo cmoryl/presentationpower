@@ -112,9 +112,9 @@ export async function exportDeckToPptx(
       renderContent(s, slide, palette);
     }
 
-    const logoData = isDark ? logoWhite : logoColor;
+    const logoData = useWhiteLogo ? logoWhite : logoColor;
     if (logoData) {
-      if (isDark) {
+      if (useWhiteLogo) {
         s.addImage({
           data: logoData,
           x: SLIDE_W - 2.2,
@@ -135,7 +135,7 @@ export async function exportDeckToPptx(
       }
     }
 
-    if (!isDark) {
+    if (!hideFooter) {
       s.addText("TransPerfect", {
         x: 0.5, y: 7.05, w: 4, h: 0.3, fontSize: 9, color: "666666", fontFace: "Inter",
       });
