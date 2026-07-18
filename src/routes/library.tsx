@@ -540,16 +540,8 @@ function VariantDetailModal({
                 </select>
               </div>
             </div>
-            <div className="overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm">
-              <div className="aspect-[16/9]">
-                <ScaledSlide>
-                  <SlideBackdropContext.Provider value={showImagery ? backdropForVariant(variant, brand.id, mode) : null}>
-                    <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
-                    
-                  </SlideBackdropContext.Provider>
-                </ScaledSlide>
-              </div>
-            </div>
+            <ModalABPreview variant={variant} brand={brand} previewSlide={previewSlide} showImagery={showImagery} />
+
             <p className="mt-4 text-sm text-black/60">{variant.description}</p>
           </div>
 
@@ -642,6 +634,64 @@ function VariantDetailModal({
   );
 }
 
+function ModalABPreview({
+  variant,
+  brand,
+  previewSlide,
+  showImagery,
+}: {
+  variant: ModuleVariant;
+  brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
+  previewSlide: Parameters<typeof VariantRenderer>[0]["slide"];
+  showImagery: boolean;
+}) {
+  const lightRef = useRef<HTMLDivElement | null>(null);
+  const darkRef = useRef<HTMLDivElement | null>(null);
+  const lightBackdrop = showImagery ? backdropForVariant(variant, brand.id, "light") : null;
+  const darkBackdrop = showImagery ? backdropForVariant(variant, brand.id, "dark") : null;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const targets = [lightRef.current, darkRef.current];
+    const t = window.setTimeout(async () => {
+      const { applyAutoFix, revertAutoFix } = await import("@/lib/wcag");
+      for (const el of targets) {
+        if (!el) continue;
+        revertAutoFix(el);
+        applyAutoFix(el);
+      }
+    }, 320);
+    return () => window.clearTimeout(t);
+  }, [variant.id, brand.id, showImagery]);
+
+  return (
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+      {(["light", "dark"] as const).map((m) => (
+        <div key={m} className="relative">
+          <div className="mb-1.5 flex items-center justify-between">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
+              {m === "light" ? "☀︎ A · Light" : "☾ B · Dark"}
+            </span>
+          </div>
+          <div className="relative overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm">
+            <div
+              ref={m === "dark" ? darkRef : lightRef}
+              className={`relative aspect-[16/9] overflow-hidden ${m === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
+            >
+              <ScaledSlide>
+                <SlideBackdropContext.Provider value={m === "dark" ? darkBackdrop : lightBackdrop}>
+                  <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={m} />
+                </SlideBackdropContext.Provider>
+              </ScaledSlide>
+            </div>
+            <WcagBadge variantId={variant.id} mode={m} targetRef={m === "dark" ? darkRef : lightRef} enabled />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function Spec({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
@@ -650,6 +700,7 @@ function Spec({ label, children }: { label: string; children: React.ReactNode })
     </div>
   );
 }
+
 
 function Row({ k, v }: { k: string; v: string }) {
   return (
