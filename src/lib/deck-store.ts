@@ -54,7 +54,9 @@ export type DeckSlide = {
   layoutId: string;
   content: SlideContent;
   changes: AiChange[];
+  notes?: string;
 };
+
 
 export type DeckClientLogo = {
   id: string;
