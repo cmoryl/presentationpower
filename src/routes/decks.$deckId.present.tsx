@@ -32,9 +32,10 @@ function PresenterView() {
   const nextVariant = nextSlide ? byId(MODULE_VARIANTS, nextSlide.variantId) : undefined;
   const variant = slide ? byId(MODULE_VARIANTS, slide.variantId) : undefined;
   const sectionKeyMsg = slide
-    ? deck.strategy?.recommendedSections?.find((r) => r.sectionId === slide.sectionId)?.keyMessage
+    ? deck.context?.strategy?.recommendedSections?.find((r) => r.sectionId === slide.sectionId)?.keyMessage
     : undefined;
   const notesText = slide?.notes?.trim() || sectionKeyMsg || "";
+
 
 
   useEffect(() => {
