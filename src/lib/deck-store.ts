@@ -1060,11 +1060,16 @@ export const useDeckStore = create<DeckState>()(
                     changes.push({ field: k, before: sl.content[k], after: u.content[k], reason: "Copilot edit", accepted: true });
                   }
                 });
+                const notesChanged = u.notes !== undefined && u.notes !== (sl.notes ?? "");
+                if (notesChanged) {
+                  changes.push({ field: "__notes", before: sl.notes ?? "", after: u.notes, reason: "Copilot notes", accepted: true });
+                }
                 return {
                   ...sl,
                   variantId: u.variantId,
                   layoutId: u.layoutId,
                   content: u.content,
+                  notes: u.notes !== undefined ? u.notes : sl.notes,
                   changes: [...sl.changes.filter((c) => !changes.find((n) => n.field === c.field)), ...changes],
                 };
               }),
@@ -1072,6 +1077,21 @@ export const useDeckStore = create<DeckState>()(
           },
         }));
       },
+
+      updateSlideNotes: (deckId, slideId, notes) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) => (sl.id === slideId ? { ...sl, notes } : sl)),
+            },
+          },
+        }));
+      },
+
 
       revertAiChange: (deckId, slideId, field) => {
         const deck = get().decks[deckId];
