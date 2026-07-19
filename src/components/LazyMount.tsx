@@ -59,6 +59,11 @@ export function LazyMount({
     return () => io.disconnect();
   }, [visible, rootMargin]);
 
+  useEffect(() => {
+    if (visible) onMount?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
+
   return (
     <div ref={ref} className={className} data-lazy-mount={visible ? "on" : "off"}>
       {visible ? children : placeholder}
