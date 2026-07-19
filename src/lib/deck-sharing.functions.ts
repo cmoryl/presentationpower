@@ -90,14 +90,15 @@ export const getDeckShareStatus = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { data: row, error } = await supabase
       .from("decks")
-      .select("share_token, shared_at, share_expires_at")
+      .select("share_token, shared_at, share_expires_at" as never)
       .eq("id", data.deckId)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    const token = (row?.share_token as string | null) ?? null;
-    const expiresAt = (row?.share_expires_at as string | null) ?? null;
+    const r = (row ?? null) as { share_token: string | null; shared_at: string | null; share_expires_at: string | null } | null;
+    const token = r?.share_token ?? null;
+    const expiresAt = r?.share_expires_at ?? null;
     const expired = !!(expiresAt && new Date(expiresAt).getTime() <= Date.now());
-    return { token, sharedAt: row?.shared_at ?? null, expiresAt, expired };
+    return { token, sharedAt: r?.shared_at ?? null, expiresAt, expired };
   });
 
 // Public — no auth middleware. Calls SECURITY DEFINER RPC that only returns
