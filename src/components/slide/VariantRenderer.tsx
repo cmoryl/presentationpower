@@ -3667,6 +3667,11 @@ function hash(str: string): number {
 // MediaTile now pulls from division-specific image repositories keyed by brand id.
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
+// Fine film-grain overlay used to keep imagery from looking flat/plasticky.
+// Data-URI SVG turbulence — cached by the browser once and reused everywhere.
+const GRAIN_SVG =
+  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")";
+
 function MediaTile({
   brand,
   seed,
@@ -3690,7 +3695,7 @@ function MediaTile({
 }) {
   const mode = useContext(SlideModeContext);
   const h = hash(seed || brand.id);
-  const grayscale = muted ? "grayscale(60%) brightness(0.9)" : undefined;
+  const grayscale = muted ? "grayscale(55%) brightness(0.95)" : undefined;
 
   // Division-specific imagery: photos + abstracts for the active brand.
   const divSet = getDivisionImagery(brand.id);
@@ -3701,56 +3706,78 @@ function MediaTile({
       : tileBackdrops[h % tileBackdrops.length];
   const accent = brand.tokens.accent;
   const primary = brand.tokens.primary;
+  // Rotate scrim direction deterministically so a wall of image tiles never
+  // reads as one repeated composition.
+  const scrimAngle = [180, 200, 165, 190][h % 4]; // ~bottom-heavy variance
 
-  // Light mode: same photographic backdrop treatment, but with a lighter
-  // scrim and softer washes so imagery reads bright and airy.
+  // ── Light mode ────────────────────────────────────────────────────────
+  // Bright, airy photographic backdrop. Directional scrim keeps overlaid
+  // text legible; brand-accent duotone tints imagery so a division swap
+  // visibly re-tones the tile, not just the chrome.
   if (mode === "light") {
     return (
       <div
         className={`relative overflow-hidden rounded-2xl ${className ?? ""}`}
-        style={{ background: "#F2F2F2", filter: grayscale }}
+        style={{ background: "#EEF2F8", filter: grayscale }}
       >
         <img
           src={url}
           alt=""
           aria-hidden
           className="absolute inset-0 h-full w-full object-cover"
-          style={{ filter: "brightness(1.05) saturate(0.9)" }}
+          style={{ filter: "brightness(1.06) saturate(0.92) contrast(1.02)" }}
         />
+        {/* Brand accent duotone — subtle multiply so division tokens actually
+             tint the photo instead of only floating over it. */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -left-[18%] top-[8%] h-[52%] w-[58%] rounded-full"
-          style={{
-            backgroundColor: `${accent}26`,
-            filter: "blur(34px)",
-            mixBlendMode: "multiply",
-          }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -bottom-[18%] right-[-18%] h-[58%] w-[58%] rounded-full"
-          style={{
-            backgroundColor: `${primary}22`,
-            filter: "blur(38px)",
-            mixBlendMode: "multiply",
-          }}
-        />
-        <div
           className="absolute inset-0"
-          style={{ backgroundColor: "rgba(255,255,255,0.28)" }}
+          style={{
+            background: `linear-gradient(180deg, ${accent}1F 0%, transparent 45%, ${primary}14 100%)`,
+            mixBlendMode: "multiply",
+          }}
+        />
+        {/* Directional legibility scrim — bottom-heavy so title/caption
+             overlays always land on a darker-than-image band. */}
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(${scrimAngle}deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.28) 42%, rgba(255,255,255,0.06) 100%)`,
+          }}
+        />
+        {/* Top vignette to soften busy skies / ceilings */}
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-[28%]"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 100%)",
+          }}
+        />
+        {/* Fine grain */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.06] mix-blend-multiply"
+          style={{ backgroundImage: GRAIN_SVG, backgroundSize: "160px 160px" }}
         />
         {portrait && (
           <div
-            className="absolute left-1/2 top-[58%] h-[70%] w-[45%] -translate-x-1/2 rounded-t-full"
-            style={{ backgroundColor: "rgba(10,15,28,0.08)" }}
+            aria-hidden
+            className="absolute left-1/2 bottom-[-10%] h-[70%] w-[55%] -translate-x-1/2 rounded-full"
+            style={{
+              background: `radial-gradient(closest-side, ${primary}22 0%, transparent 75%)`,
+              filter: "blur(10px)",
+            }}
           />
         )}
       </div>
     );
   }
 
-  // Dark mode: use a real photographic backdrop with a simple scrim and
-  // translucent brand-color washes. No generated radial/dot/pattern layers.
+  // ── Dark mode ─────────────────────────────────────────────────────────
+  // Photographic backdrop with a cinematic bottom scrim + brand duotone.
+  // Slightly less crush than before (0.85 → 0.92) so imagery keeps depth.
   return (
     <div
       className={`relative overflow-hidden rounded-2xl ${className ?? ""}`}
@@ -3761,34 +3788,51 @@ function MediaTile({
         alt=""
         aria-hidden
         className="absolute inset-0 h-full w-full object-cover"
-        style={{ filter: "brightness(0.85) saturate(0.95)" }}
+        style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)" }}
       />
+      {/* Brand accent duotone — tints imagery with the active division's
+           accent/primary so a brand switch visibly re-tones tiles. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-[18%] top-[8%] h-[52%] w-[58%] rounded-full"
-        style={{
-          backgroundColor: `${accent}2E`,
-          filter: "blur(34px)",
-          mixBlendMode: "screen",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-[18%] right-[-18%] h-[58%] w-[58%] rounded-full"
-        style={{
-          backgroundColor: `${primary}36`,
-          filter: "blur(38px)",
-          mixBlendMode: "screen",
-        }}
-      />
-      <div
         className="absolute inset-0"
-        style={{ backgroundColor: "rgba(3,0,44,0.42)" }}
+        style={{
+          background: `linear-gradient(180deg, ${accent}22 0%, transparent 55%, ${primary}3D 100%)`,
+          mixBlendMode: "soft-light",
+        }}
+      />
+      {/* Directional legibility scrim — bottom-heavy dark ramp so title,
+           attribution, and confidentiality footers keep AA contrast. */}
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          background: `linear-gradient(${scrimAngle}deg, rgba(3,0,44,0.78) 0%, rgba(3,0,44,0.38) 45%, rgba(3,0,44,0.12) 100%)`,
+        }}
+      />
+      {/* Top vignette to anchor the frame */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-[32%]"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(3,0,44,0.55) 0%, rgba(3,0,44,0) 100%)",
+        }}
+      />
+      {/* Fine grain — screen blend so it lifts shadows without milking mids. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.09] mix-blend-screen"
+        style={{ backgroundImage: GRAIN_SVG, backgroundSize: "160px 160px" }}
       />
       {portrait && (
         <div
-          className="absolute left-1/2 top-[58%] h-[70%] w-[45%] -translate-x-1/2 rounded-t-full"
-          style={{ backgroundColor: `${accent}33`, mixBlendMode: "soft-light" }}
+          aria-hidden
+          className="absolute left-1/2 bottom-[-10%] h-[70%] w-[55%] -translate-x-1/2 rounded-full"
+          style={{
+            background: `radial-gradient(closest-side, ${accent}2E 0%, transparent 75%)`,
+            filter: "blur(12px)",
+            mixBlendMode: "screen",
+          }}
         />
       )}
     </div>
