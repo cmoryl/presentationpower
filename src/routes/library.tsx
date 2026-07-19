@@ -753,12 +753,42 @@ function VariantDetailModal({
             </div>
             <div className="mt-1 truncate text-xl font-semibold">{variant.name}</div>
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-full border border-black/15 px-3 py-1.5 text-sm hover:bg-black/5"
-          >
-            Close ✕
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={copyId}
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7]/40 hover:text-[#003FC7]"
+              title="Copy variant ID to clipboard"
+            >
+              {copied ? <Check size={12} className="text-emerald-600" /> : <Copy size={12} />}
+              {copied ? "Copied" : "Copy ID"}
+            </button>
+            <button
+              type="button"
+              onClick={onTogglePin}
+              aria-pressed={pinned}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition ${
+                pinned
+                  ? "border-amber-500 bg-amber-400/20 text-amber-900"
+                  : "border-black/15 bg-white text-black/70 hover:border-amber-400 hover:text-amber-800"
+              }`}
+              title={pinned ? "Unpin from favorites" : "Pin to favorites"}
+            >
+              <Star size={12} className={pinned ? "fill-amber-500 text-amber-600" : ""} />
+              {pinned ? "Pinned" : "Pin"}
+            </button>
+            {usageCount > 0 && (
+              <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
+                Used · {usageCount}
+              </span>
+            )}
+            <button
+              onClick={onClose}
+              className="rounded-full border border-black/15 px-3 py-1.5 text-sm hover:bg-black/5"
+            >
+              Close ✕
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
