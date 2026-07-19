@@ -13,6 +13,7 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const applyCopilotUpdates = useDeckStore((s) => s.applyCopilotUpdates);
   const call = useServerFn(copilotTurn);
+  const snapshot = useServerFn(snapshotDeckVersion);
 
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
