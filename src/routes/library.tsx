@@ -844,6 +844,8 @@ function VariantDetailModal({
 
           {/* Specifics */}
           <div className="max-h-[70vh] space-y-5 overflow-y-auto p-6 text-sm">
+            <AddToDeckPanel variant={variant} onDone={onClose} />
+
             <Spec label="Module family">
               <div className="font-mono text-xs text-black/50">{variant.familyId}</div>
               <div>{family?.name ?? "—"}</div>
