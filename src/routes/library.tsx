@@ -626,6 +626,33 @@ function VariantCard({
         </div>
       </div>
     </button>
+    {onTogglePin && (
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onTogglePin(); }}
+        aria-pressed={pinned}
+        aria-label={pinned ? "Unpin variant" : "Pin variant"}
+        title={pinned ? "Pinned — click to unpin" : "Pin to Favorites"}
+        data-variant-pin=""
+        className={`absolute right-3 top-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full backdrop-blur transition ${
+          pinned
+            ? "bg-amber-400 text-[#03002C] shadow ring-1 ring-amber-500/40"
+            : "bg-white/85 text-black/60 shadow-sm ring-1 ring-black/10 hover:bg-white hover:text-amber-600"
+        }`}
+      >
+        <Star size={14} className={pinned ? "fill-current" : ""} />
+      </button>
+    )}
+    {usageCount > 0 && (
+      <span
+        data-variant-usage-badge=""
+        className="pointer-events-none absolute right-3 bottom-3 z-10 rounded-full bg-[#03002C]/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest text-white shadow-sm ring-1 ring-white/10 backdrop-blur"
+        title={`Used in ${usageCount} of your slides`}
+      >
+        Used · {usageCount}
+      </span>
+    )}
+    </div>
   );
 }
 
