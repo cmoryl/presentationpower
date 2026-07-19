@@ -7,6 +7,7 @@ import { CopilotPanel } from "@/components/CopilotPanel";
 import { IconPicker } from "@/components/IconPicker";
 import { SaveToCloudButton } from "@/components/CloudDeckControls";
 import { ShareMenu } from "@/components/ShareMenu";
+import { VersionHistoryButton } from "@/components/VersionHistoryDrawer";
 import { DuplicateDeckButton, TemplateToggleButton } from "@/components/DeckActions";
 import { BrandReviewPanel } from "@/components/BrandReviewPanel";
 import { useDeckStore, type DeckClientLogo } from "@/lib/deck-store";
