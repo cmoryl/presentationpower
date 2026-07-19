@@ -301,7 +301,7 @@ function renderVariantBody({
 
     case "MV-OP-COVER-MEDIA": {
       const _titleLen = s(c.title).length + s(c.subtitle).length;
-      const _titleSize = _titleLen > 60 ? "section" : "cover";
+      const _titleSize = _titleLen > 60 ? "title" : _titleLen > 30 ? "section" : "cover";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
@@ -1425,7 +1425,7 @@ function renderVariantBody({
 
     case "MV-OP-COVER-GRADIENT": {
       const _titleLen = s(c.title).length + s(c.subtitle).length;
-      const _titleSize = _titleLen > 60 ? "section" : "cover";
+      const _titleSize = _titleLen > 60 ? "title" : _titleLen > 30 ? "section" : "cover";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-image"))} className="absolute inset-0 h-full w-full rounded-none" />
@@ -1529,7 +1529,7 @@ function renderVariantBody({
     // ── Image-forward content ──────────────────────────────────────────
     case "MV-IMG-FULL-BLEED": {
       const _titleLen = s(c.title).length + s(c.body).length;
-      const _titleSize = _titleLen > 60 ? "section" : "cover";
+      const _titleSize = _titleLen > 60 ? "title" : _titleLen > 30 ? "section" : "cover";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "hero"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
