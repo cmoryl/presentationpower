@@ -422,3 +422,103 @@ function relativeTime(iso: string): string {
   if (d < 30) return `${d}d ago`;
   return new Date(iso).toLocaleDateString();
 }
+
+function StatusPill({ expired, expiresAt }: { expired: boolean; expiresAt: string | null }) {
+  if (expired) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-red-500">
+        <Clock size={9} /> Expired
+      </span>
+    );
+  }
+  if (expiresAt) {
+    const ms = new Date(expiresAt).getTime() - Date.now();
+    const days = Math.max(0, Math.ceil(ms / 86_400_000));
+    const label = days <= 1 ? "<1d" : `${days}d`;
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400">
+        <Clock size={9} /> Expires in {label}
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+      Active
+    </span>
+  );
+}
+
+function ExpiryPicker({
+  value,
+  disabled,
+  onChange,
+}: {
+  value: string | null;
+  disabled?: boolean;
+  onChange: (v: string | null) => void;
+}) {
+  const preset = (() => {
+    if (!value) return "never";
+    const ms = new Date(value).getTime() - Date.now();
+    const days = Math.round(ms / 86_400_000);
+    if (Math.abs(days - 7) <= 1) return "7d";
+    if (Math.abs(days - 30) <= 1) return "30d";
+    return "custom";
+  })();
+
+  function pick(next: string) {
+    if (next === "never") return onChange(null);
+    if (next === "7d") return onChange(new Date(Date.now() + 7 * 86_400_000).toISOString());
+    if (next === "30d") return onChange(new Date(Date.now() + 30 * 86_400_000).toISOString());
+  }
+
+  const options: Array<{ id: string; label: string }> = [
+    { id: "never", label: "No expiry" },
+    { id: "7d", label: "7 days" },
+    { id: "30d", label: "30 days" },
+    { id: "custom", label: "Custom" },
+  ];
+
+  const dateValue = value ? new Date(value).toISOString().slice(0, 10) : "";
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex flex-wrap gap-1">
+        {options.map((opt) => (
+          <button
+            key={opt.id}
+            type="button"
+            disabled={disabled}
+            onClick={() => {
+              if (opt.id === "custom") return; // handled by date input below
+              pick(opt.id);
+            }}
+            className={`rounded-full border px-2 py-0.5 text-[10px] transition ${
+              preset === opt.id
+                ? "border-[#003FC7] bg-[#003FC7]/10 text-[#003FC7] dark:border-[#A1FBF9] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]"
+                : "border-black/10 text-black/60 hover:border-black/30 dark:border-white/10 dark:text-white/60 dark:hover:border-white/30"
+            } disabled:opacity-40`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+      {(preset === "custom" || preset === "never") && (
+        <input
+          type="date"
+          disabled={disabled}
+          value={dateValue}
+          min={new Date().toISOString().slice(0, 10)}
+          onChange={(e) => {
+            const v = e.target.value;
+            if (!v) return onChange(null);
+            // Set to end of chosen day (UTC) so the link works the whole day
+            const iso = new Date(`${v}T23:59:59.000Z`).toISOString();
+            onChange(iso);
+          }}
+          className="w-full rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] text-black outline-none dark:border-white/10 dark:bg-white/[0.05] dark:text-white"
+        />
+      )}
+    </div>
+  );
+}
