@@ -2,7 +2,7 @@
   "url": "http://localhost:8080/library",
   "mode": "ab",
   "tolerancePx": 2,
-  "ranAt": "2026-07-19T15:47:37.742Z",
+  "ranAt": "2026-07-19T15:51:18.621Z",
   "breakpoints": [
     {
       "breakpoint": "mobile",
@@ -12,14 +12,14 @@
         "deviceScaleFactor": 1
       },
       "totalCards": 139,
-      "overlappingCards": 3,
-      "unexpectedCount": 3,
+      "overlappingCards": 0,
+      "unexpectedCount": 0,
       "byFamily": [
         {
           "family": "MF-01",
           "total": 16,
           "overlapping": 0,
-          "overflowing": 2
+          "overflowing": 0
         },
         {
           "family": "MF-02",
@@ -37,7 +37,7 @@
           "family": "MF-04",
           "total": 25,
           "overlapping": 0,
-          "overflowing": 1
+          "overflowing": 0
         },
         {
           "family": "MF-05",
@@ -58,94 +58,7 @@
           "overflowing": 0
         }
       ],
-      "overlaps": [
-        {
-          "variantId": "MV-IMG-FULL-BLEED",
-          "family": "MF-04",
-          "layout": "LF-05",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "Content moves at the speed of your program.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 53
-                }
-              },
-              {
-                "text": "Every asset, every market, every review — one connected flow.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 59
-                }
-              }
-            ]
-          }
-        },
-        {
-          "variantId": "MV-OP-COVER-GRADIENT",
-          "family": "MF-01",
-          "layout": "LF-05",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "Strategic partnership review",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 48
-                }
-              },
-              {
-                "text": "A strategic conversation with Acme Corp.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 53
-                }
-              },
-              {
-                "text": "7/19/2026",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 59
-                }
-              }
-            ]
-          }
-        },
-        {
-          "variantId": "MV-OP-COVER-MEDIA",
-          "family": "MF-01",
-          "layout": "LF-05",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "Strategic partnership review",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 48
-                }
-              },
-              {
-                "text": "A strategic partnership review",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 53
-                }
-              },
-              {
-                "text": "7/19/2026",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 59
-                }
-              }
-            ]
-          }
-        }
-      ],
+      "overlaps": [],
       "captured": [
         {
           "variantId": "MV-BENTO-5",
@@ -697,7 +610,7 @@
           "layout": "LF-05",
           "shot": "tests/snapshots/library/mobile/MF-04/MV-IMG-FULL-BLEED.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 2
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-IMG-GRID-3",
@@ -953,7 +866,7 @@
           "layout": "LF-05",
           "shot": "tests/snapshots/library/mobile/MF-01/MV-OP-COVER-GRADIENT.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 3
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-OP-COVER-GRID",
@@ -969,7 +882,7 @@
           "layout": "LF-05",
           "shot": "tests/snapshots/library/mobile/MF-01/MV-OP-COVER-MEDIA.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 3
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-OP-COVER-MINIMAL",
@@ -1269,14 +1182,14 @@
         "deviceScaleFactor": 1
       },
       "totalCards": 139,
-      "overlappingCards": 3,
-      "unexpectedCount": 3,
+      "overlappingCards": 0,
+      "unexpectedCount": 0,
       "byFamily": [
         {
           "family": "MF-01",
           "total": 16,
           "overlapping": 0,
-          "overflowing": 2
+          "overflowing": 0
         },
         {
           "family": "MF-02",
@@ -1294,7 +1207,7 @@
           "family": "MF-04",
           "total": 25,
           "overlapping": 0,
-          "overflowing": 1
+          "overflowing": 0
         },
         {
           "family": "MF-05",
@@ -1315,94 +1228,7 @@
           "overflowing": 0
         }
       ],
-      "overlaps": [
-        {
-          "variantId": "MV-IMG-FULL-BLEED",
-          "family": "MF-04",
-          "layout": "LF-05",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "Content moves at the speed of your program.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 123
-                }
-              },
-              {
-                "text": "Every asset, every market, every review — one connected flow.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 136
-                }
-              }
-            ]
-          }
-        },
-        {
-          "variantId": "MV-OP-COVER-GRADIENT",
-          "family": "MF-01",
-          "layout": "LF-05",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "Strategic partnership review",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 111
-                }
-              },
-              {
-                "text": "A strategic conversation with Acme Corp.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 123
-                }
-              },
-              {
-                "text": "7/19/2026",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 136
-                }
-              }
-            ]
-          }
-        },
-        {
-          "variantId": "MV-OP-COVER-MEDIA",
-          "family": "MF-01",
-          "layout": "LF-05",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "Strategic partnership review",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 111
-                }
-              },
-              {
-                "text": "A strategic partnership review",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 123
-                }
-              },
-              {
-                "text": "7/19/2026",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 136
-                }
-              }
-            ]
-          }
-        }
-      ],
+      "overlaps": [],
       "captured": [
         {
           "variantId": "MV-BENTO-5",
@@ -1954,7 +1780,7 @@
           "layout": "LF-05",
           "shot": "tests/snapshots/library/tablet/MF-04/MV-IMG-FULL-BLEED.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 2
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-IMG-GRID-3",
@@ -2210,7 +2036,7 @@
           "layout": "LF-05",
           "shot": "tests/snapshots/library/tablet/MF-01/MV-OP-COVER-GRADIENT.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 3
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-OP-COVER-GRID",
@@ -2226,7 +2052,7 @@
           "layout": "LF-05",
           "shot": "tests/snapshots/library/tablet/MF-01/MV-OP-COVER-MEDIA.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 3
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-OP-COVER-MINIMAL",
@@ -2526,14 +2352,14 @@
         "deviceScaleFactor": 1
       },
       "totalCards": 139,
-      "overlappingCards": 3,
-      "unexpectedCount": 3,
+      "overlappingCards": 0,
+      "unexpectedCount": 0,
       "byFamily": [
         {
           "family": "MF-01",
           "total": 16,
           "overlapping": 0,
-          "overflowing": 2
+          "overflowing": 0
         },
         {
           "family": "MF-02",
@@ -2551,7 +2377,7 @@
           "family": "MF-04",
           "total": 25,
           "overlapping": 0,
-          "overflowing": 1
+          "overflowing": 0
         },
         {
           "family": "MF-05",
@@ -2572,94 +2398,7 @@
           "overflowing": 0
         }
       ],
-      "overlaps": [
-        {
-          "variantId": "MV-IMG-FULL-BLEED",
-          "family": "MF-04",
-          "layout": "LF-05",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "Content moves at the speed of your program.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 143
-                }
-              },
-              {
-                "text": "Every asset, every market, every review — one connected flow.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 157
-                }
-              }
-            ]
-          }
-        },
-        {
-          "variantId": "MV-OP-COVER-GRADIENT",
-          "family": "MF-01",
-          "layout": "LF-05",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "Strategic partnership review",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 128
-                }
-              },
-              {
-                "text": "A strategic conversation with Acme Corp.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 142
-                }
-              },
-              {
-                "text": "7/19/2026",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 157
-                }
-              }
-            ]
-          }
-        },
-        {
-          "variantId": "MV-OP-COVER-MEDIA",
-          "family": "MF-01",
-          "layout": "LF-05",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "Strategic partnership review",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 128
-                }
-              },
-              {
-                "text": "A strategic partnership review",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 142
-                }
-              },
-              {
-                "text": "7/19/2026",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 157
-                }
-              }
-            ]
-          }
-        }
-      ],
+      "overlaps": [],
       "captured": [
         {
           "variantId": "MV-BENTO-5",
@@ -3211,7 +2950,7 @@
           "layout": "LF-05",
           "shot": "tests/snapshots/library/desktop/MF-04/MV-IMG-FULL-BLEED.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 2
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-IMG-GRID-3",
@@ -3467,7 +3206,7 @@
           "layout": "LF-05",
           "shot": "tests/snapshots/library/desktop/MF-01/MV-OP-COVER-GRADIENT.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 3
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-OP-COVER-GRID",
@@ -3483,7 +3222,7 @@
           "layout": "LF-05",
           "shot": "tests/snapshots/library/desktop/MF-01/MV-OP-COVER-MEDIA.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 3
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-OP-COVER-MINIMAL",
