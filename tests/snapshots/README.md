@@ -19,7 +19,7 @@ Any finding not whitelisted in `library.baseline.json` fails the run
 ```bash
 # dev server must be running on :8080
 node scripts/visual-regression-library.mjs --mode ab
-# → tests/snapshots/library/<breakpoint>/*.png + report.json
+# → tests/snapshots/library/<breakpoint>/<family>/<variantId>.png + report.json
 ```
 
 Flags:
