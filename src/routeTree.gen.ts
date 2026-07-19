@@ -18,6 +18,7 @@ import { Route as ImageryRouteImport } from './routes/imagery'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AtlasRouteImport } from './routes/atlas'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -93,6 +94,11 @@ const AuthRoute = AuthRouteImport.update({
 const AtlasRoute = AtlasRouteImport.update({
   id: '/atlas',
   path: '/atlas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -258,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
+  '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
   '/faq': typeof FaqRoute
@@ -299,6 +306,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
   '/faq': typeof FaqRoute
@@ -341,6 +349,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
+  '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
   '/faq': typeof FaqRoute
@@ -385,6 +394,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/analytics'
     | '/atlas'
     | '/auth'
     | '/faq'
@@ -426,6 +436,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/analytics'
     | '/atlas'
     | '/auth'
     | '/faq'
@@ -467,6 +478,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/analytics'
     | '/atlas'
     | '/auth'
     | '/faq'
@@ -510,6 +522,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AnalyticsRoute: typeof AnalyticsRoute
   AtlasRoute: typeof AtlasRoute
   AuthRoute: typeof AuthRoute
   FaqRoute: typeof FaqRoute
@@ -590,6 +603,13 @@ declare module '@tanstack/react-router' {
       path: '/atlas'
       fullPath: '/atlas'
       preLoaderRoute: typeof AtlasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -888,6 +908,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
+  AnalyticsRoute: AnalyticsRoute,
   AtlasRoute: AtlasRoute,
   AuthRoute: AuthRoute,
   FaqRoute: FaqRoute,

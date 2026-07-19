@@ -19,6 +19,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/atlas", label: "Atlas" },
     { to: "/templates", label: "Templates" },
     { to: "/library", label: "Library" },
+    { to: "/analytics", label: "Analytics" },
     { to: "/admin", label: "Admin" },
   ] as const;
   const adminSubnav = [
