@@ -91,6 +91,7 @@ function DeckEditor() {
           <DuplicateDeckButton deckId={deckId} />
           <TemplateToggleButton deckId={deckId} />
           <SaveToCloudButton deckId={deckId} />
+          <VersionHistoryButton deckId={deckId} />
           <ShareMenu deckId={deckId} />
         </div>
       </div>
