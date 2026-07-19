@@ -433,7 +433,7 @@ function Library() {
   );
 }
 
-function VariantCard({
+const VariantCard = memo(function VariantCard({
   variant,
   familyName,
   brand,
