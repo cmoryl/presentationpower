@@ -115,7 +115,7 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
     let alive = true;
     (async () => {
       try {
-        const v = (await fetchVersion({ data: { versionId: selectedId } })) as VersionRecord;
+        const v = (await fetchVersion({ data: { versionId: selectedId } })) as unknown as VersionRecord;
         if (alive) setSelected(v);
       } catch (e) {
         if (alive) setError((e as Error).message);
