@@ -18,6 +18,7 @@ type SharedDeck = {
   sub_company: string | null;
   client_logo_url: string | null;
   shared_at: string | null;
+  expires_at?: string | null;
   slides: Array<{
     position: number;
     section_id: string;
@@ -28,6 +29,8 @@ type SharedDeck = {
   brief: { prospect?: string | null; industry?: string | null } | null;
 };
 
+type SharedPayload = { status?: "active" | "expired" } & Partial<SharedDeck>;
+
 export const Route = createFileRoute("/share/$token")({
   head: () => ({ meta: [{ title: "Shared deck · TransPerfect" }] }),
   component: ShareView,
@@ -37,7 +40,11 @@ function ShareView() {
   const { token } = Route.useParams();
   const fetchShared = useServerFn(getSharedDeck);
   const [state, setState] = useState<
-    { kind: "loading" } | { kind: "ready"; deck: SharedDeck } | { kind: "gone" } | { kind: "error"; message: string }
+    | { kind: "loading" }
+    | { kind: "ready"; deck: SharedDeck }
+    | { kind: "expired" }
+    | { kind: "gone" }
+    | { kind: "error"; message: string }
   >({ kind: "loading" });
 
   useEffect(() => {
@@ -45,8 +52,14 @@ function ShareView() {
     fetchShared({ data: { token } })
       .then((res) => {
         if (cancelled) return;
-        if (!res.deck) setState({ kind: "gone" });
-        else setState({ kind: "ready", deck: res.deck as SharedDeck });
+        const payload = res.deck as SharedPayload | null;
+        if (!payload) {
+          setState({ kind: "gone" });
+        } else if (payload.status === "expired") {
+          setState({ kind: "expired" });
+        } else {
+          setState({ kind: "ready", deck: payload as SharedDeck });
+        }
       })
       .catch((e) => !cancelled && setState({ kind: "error", message: e instanceof Error ? e.message : "Failed to load" }));
     return () => {
@@ -59,24 +72,31 @@ function ShareView() {
       <div className="grid min-h-screen place-items-center bg-[#03002C] text-white/70 text-sm">Loading…</div>
     );
   }
-  if (state.kind === "gone") {
-    return <NotActive />;
-  }
-  if (state.kind === "error") {
-    return <NotActive message={state.message} />;
-  }
+  if (state.kind === "expired") return <LinkGate variant="expired" />;
+  if (state.kind === "gone") return <LinkGate variant="disabled" />;
+  if (state.kind === "error") return <LinkGate variant="disabled" message={state.message} />;
   return <SharedDeckView deck={state.deck} token={token} />;
 }
 
-function NotActive({ message }: { message?: string }) {
+function LinkGate({ variant, message }: { variant: "expired" | "disabled"; message?: string }) {
+  const copy =
+    variant === "expired"
+      ? {
+          eyebrow: "Link expired",
+          title: "This link has expired",
+          body: "The deck owner set an expiration date on this share link. Reach out to them for a fresh link.",
+        }
+      : {
+          eyebrow: "Link unavailable",
+          title: "This link is no longer active",
+          body: "The deck owner disabled sharing or the link is invalid. Reach out to them for an updated link.",
+        };
   return (
     <div className="grid min-h-screen place-items-center bg-[#03002C] px-6 text-center text-white">
       <div>
-        <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">TransPerfect</div>
-        <h1 className="mt-3 text-3xl font-semibold">This link is no longer active</h1>
-        <p className="mt-3 max-w-md text-sm text-white/60">
-          The deck owner may have disabled sharing or the link is invalid. Reach out to them for an updated link.
-        </p>
+        <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">TransPerfect · {copy.eyebrow}</div>
+        <h1 className="mt-3 text-3xl font-semibold">{copy.title}</h1>
+        <p className="mt-3 max-w-md text-sm text-white/60">{copy.body}</p>
         {message && <p className="mt-4 text-xs text-white/30">{message}</p>}
       </div>
     </div>
