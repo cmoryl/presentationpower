@@ -77,7 +77,7 @@ export const disableDeckSharing = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { error } = await supabase
       .from("decks")
-      .update({ share_token: null, shared_at: null, share_expires_at: null })
+      .update({ share_token: null, shared_at: null, share_expires_at: null } as never)
       .eq("id", data.deckId);
     if (error) throw new Error(error.message);
     return { ok: true };
