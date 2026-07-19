@@ -1,11 +1,18 @@
-# Visual regression — module library
+# Visual regression — module library (per template)
 
 `scripts/visual-regression-library.mjs` opens `/library` in headless Chromium
 at each configured responsive breakpoint (mobile / tablet / desktop),
-captures a PNG per module-variant card, and inspects every
-`[data-stat-figure]` for bounding-box overlap against sibling grid tracks.
-Any overlap not whitelisted in `library.baseline.json` fails the run
-(exit 1) so CI catches width-specific stat/layout regressions.
+captures a PNG per module-variant card **bucketed by family** so each
+template/layout has its own snapshot folder, and runs two overlap checks
+against every template:
+
+1. **Stat vs grid-track overlap** — `[data-stat-figure]` boxes that intersect
+   a sibling grid/flex track inside the same card.
+2. **Stage overflow** — any headline / body / stat that escapes the
+   1920×1080 slide stage (`[data-slide-stage]`).
+
+Any finding not whitelisted in `library.baseline.json` fails the run
+(exit 1) so template-specific regressions cannot slip in.
 
 ## Run locally
 
