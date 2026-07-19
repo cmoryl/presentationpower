@@ -494,6 +494,7 @@ function VariantCard({
   }, [autoFixOn, isAB, variant.id, brand.id, showImagery, isDark]);
 
   return (
+    <div className="group relative">
     <button
       type="button"
       onClick={onOpen}
@@ -502,7 +503,9 @@ function VariantCard({
       data-variant-family={variant.familyId}
       data-variant-layout={variant.permittedLayoutIds[0] ?? ""}
       data-variant-mode={mode}
-      className="group relative block w-full overflow-hidden rounded-[24px] border border-slate-200 bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:border-[#003FC7]/20 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)]"
+      data-variant-pinned={pinned ? "1" : "0"}
+      data-variant-usage={usageCount}
+      className="block w-full overflow-hidden rounded-[24px] border border-slate-200 bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:border-[#003FC7]/20 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)]"
     >
       {isAB ? (
         <div className="m-2 grid grid-cols-2 gap-2">
