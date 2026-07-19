@@ -8,6 +8,7 @@ import {
   type ChromeVariant,
   type LogoPosition,
 } from "@/lib/logo-placement";
+import { GRAIN_SVG } from "@/components/slide/grain";
 
 // Every slide can render in light or dark mode. VariantRenderer sets this
 // context per slide; SlideFrame and helpers read it to flip content surfaces
@@ -176,26 +177,105 @@ export function SlideFrame({
       )}
 
 
-      {/* Editorial dark-chrome glow — a very subtle radial from brand primary
-          toward near-black so cover/divider/close slides feel rich rather
-          than flat. Only applied when the slide is on its dark chrome and
-          no backdrop image is already handling the atmosphere. */}
-      {slideDark && !hasBackdrop && (
-        <>
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              backgroundImage: `radial-gradient(120% 90% at 8% 12%, ${hexA(brand.tokens.primary, 0.55)} 0%, ${hexA(brand.tokens.primary, 0.0)} 55%), radial-gradient(80% 60% at 100% 100%, ${hexA(brand.tokens.accent, 0.10)} 0%, rgba(0,0,0,0) 60%)`,
-            }}
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{ backgroundImage: "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.35))" }}
-          />
-        </>
-      )}
+      {/* ─────────────────────────────────────────────────────────────────
+          Abstract ground grammar (no-backdrop slides). One layered system
+          echoing the photographic grammar from MediaTile / HeroScrim:
+            • angled brand-primary→ink wash (direction, not centered blob)
+            • accent corner glow — carries the division re-tone
+            • soft top-highlight + bottom vignette for depth
+            • shared GRAIN_SVG at low alpha so abstract slides have the
+              same tactile finish as photographic ones
+          Chrome variants (cover / divider / close) get a bolder sweep and
+          stronger accent presence — those are the deck's dramatic moments.
+          Content variants stay quiet and recessive so data reads clean.
+          ───────────────────────────────────────────────────────────────── */}
+      {!hasBackdrop && slideDark && (() => {
+        const isHero = variant === "cover" || variant === "divider" || variant === "close";
+        const primary = brand.tokens.primary;
+        const accent = brand.tokens.accent;
+        const sweepA = isHero ? 0.72 : 0.48;
+        const sweepB = isHero ? 0.28 : 0.14;
+        const accentA = isHero ? 0.30 : 0.14;
+        const accentB = isHero ? 0.14 : 0.06;
+        return (
+          <>
+            {/* Angled primary wash — bottom-left → top-right, so light rakes
+                across the slide the way it does across a photograph. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                backgroundImage: `linear-gradient(118deg, ${hexA(primary, sweepA)} 0%, ${hexA(primary, sweepB)} 48%, rgba(0,0,0,0) 82%)`,
+              }}
+            />
+            {/* Accent corner glow — the moment of division re-tone. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                backgroundImage: `radial-gradient(58% 44% at 92% 96%, ${hexA(accent, accentA)} 0%, ${hexA(accent, 0)} 70%), radial-gradient(42% 30% at 6% 8%, ${hexA(accent, accentB)} 0%, ${hexA(accent, 0)} 70%)`,
+                mixBlendMode: "screen",
+              }}
+            />
+            {/* Depth: subtle top highlight + bottom vignette. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{ backgroundImage: "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 22%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.32) 100%)" }}
+            />
+            {/* Grain — matches MediaTile / HeroScrim tactile finish. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{ backgroundImage: GRAIN_SVG, backgroundSize: "160px 160px", opacity: isHero ? 0.14 : 0.08, mixBlendMode: "overlay" }}
+            />
+          </>
+        );
+      })()}
+
+      {/* Light-mode abstract ground — same grammar, airy mood. Extremely
+          recessive by default so content variants stay clean; hero chrome
+          variants in light mode already flip to dark chrome above so they
+          take the dark branch, not this one. */}
+      {!hasBackdrop && !slideDark && (() => {
+        const primary = brand.tokens.primary;
+        const accent = brand.tokens.accent;
+        return (
+          <>
+            {/* Angled wash — off-white with a whisper of primary along the
+                bottom-left → top-right axis, kept far below AA-impact. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                backgroundImage: `linear-gradient(118deg, ${hexA(primary, 0.05)} 0%, ${hexA(primary, 0.02)} 45%, rgba(255,255,255,0) 80%), linear-gradient(180deg, rgba(255,255,255,1) 0%, ${hexA(brand.tokens.surface, 0.55)} 100%)`,
+              }}
+            />
+            {/* Accent corner glow — division re-tone as a faint tint. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                backgroundImage: `radial-gradient(50% 38% at 96% 96%, ${hexA(accent, 0.12)} 0%, ${hexA(accent, 0)} 70%), radial-gradient(36% 26% at 4% 8%, ${hexA(primary, 0.06)} 0%, ${hexA(primary, 0)} 72%)`,
+                mixBlendMode: "multiply",
+              }}
+            />
+            {/* Vignette — very faint, keeps corners from feeling paper-cut. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{ backgroundImage: "radial-gradient(120% 100% at 50% 50%, rgba(0,0,0,0) 60%, rgba(3,0,44,0.05) 100%)" }}
+            />
+            {/* Grain — barely-there tactile finish. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{ backgroundImage: GRAIN_SVG, backgroundSize: "160px 160px", opacity: 0.05, mixBlendMode: "multiply" }}
+            />
+          </>
+        );
+      })()}
+
 
       {/* Brand bar (locked) — hairline accent rule, editorial not decorative. */}
       <div
