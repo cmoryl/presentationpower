@@ -230,6 +230,30 @@ function Library() {
               {preferred.size} preferred · {restricted.size} family restrictions
             </span>
           )}
+          <button
+            type="button"
+            onClick={() => setPinnedOnly((v) => !v)}
+            aria-pressed={pinnedOnly}
+            title={pins.size > 0 ? `${pins.size} pinned` : "No pins yet — star a card"}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition ${
+              pinnedOnly
+                ? "border-amber-500 bg-amber-400/20 text-amber-900"
+                : "border-black/15 bg-white text-black/70 hover:border-amber-400 hover:text-amber-800"
+            }`}
+          >
+            <Star size={12} className={pinnedOnly ? "fill-amber-500 text-amber-600" : ""} />
+            Pinned{pins.size > 0 ? ` · ${pins.size}` : ""}
+          </button>
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as typeof sort)}
+            className="rounded-lg border border-black/15 bg-white px-2.5 py-2 text-xs text-black/70"
+            title="Sort variants"
+          >
+            <option value="default">Sort: default</option>
+            <option value="pinned-first">Pinned first</option>
+            <option value="most-used">Most used by you</option>
+          </select>
           {hasFilters && (
             <button
               type="button"
