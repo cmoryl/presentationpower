@@ -35,6 +35,7 @@ export function ScaledSlide({
   return (
     <div ref={wrapRef} className={`relative w-full aspect-[16/9] overflow-hidden bg-white ${className}`}>
       <div
+        data-slide-stage=""
         className="absolute left-0 top-0 origin-top-left"
         style={{
           width: 1920,
