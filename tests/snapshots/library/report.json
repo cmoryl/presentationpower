@@ -2,7 +2,7 @@
   "url": "http://localhost:8080/library",
   "mode": "ab",
   "tolerancePx": 2,
-  "ranAt": "2026-07-19T15:15:31.586Z",
+  "ranAt": "2026-07-19T15:47:37.742Z",
   "breakpoints": [
     {
       "breakpoint": "mobile",
@@ -12,8 +12,8 @@
         "deviceScaleFactor": 1
       },
       "totalCards": 139,
-      "overlappingCards": 7,
-      "unexpectedCount": 0,
+      "overlappingCards": 3,
+      "unexpectedCount": 3,
       "byFamily": [
         {
           "family": "MF-01",
@@ -43,13 +43,13 @@
           "family": "MF-05",
           "total": 54,
           "overlapping": 0,
-          "overflowing": 2
+          "overflowing": 0
         },
         {
           "family": "MF-06",
           "total": 7,
           "overlapping": 0,
-          "overflowing": 2
+          "overflowing": 0
         },
         {
           "family": "MF-07",
@@ -59,71 +59,6 @@
         }
       ],
       "overlaps": [
-        {
-          "variantId": "MV-CASE-SPREAD",
-          "family": "MF-06",
-          "layout": "LF-18",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "38% ↓ time to market",
-                "overflowPx": {
-                  "x": 92,
-                  "y": 0
-                }
-              }
-            ]
-          }
-        },
-        {
-          "variantId": "MV-CLIENT-COMPARE",
-          "family": "MF-06",
-          "layout": "LF-08",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "14 langs, one release",
-                "overflowPx": {
-                  "x": 374,
-                  "y": 0
-                }
-              }
-            ]
-          }
-        },
-        {
-          "variantId": "MV-GRAPH-HEATMAP",
-          "family": "MF-05",
-          "layout": "LF-08",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "Low",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 6
-                }
-              },
-              {
-                "text": "High",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 6
-                }
-              },
-              {
-                "text": "60–100",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 6
-                }
-              }
-            ]
-          }
-        },
         {
           "variantId": "MV-IMG-FULL-BLEED",
           "family": "MF-04",
@@ -135,45 +70,14 @@
                 "text": "Content moves at the speed of your program.",
                 "overflowPx": {
                   "x": 0,
-                  "y": 54
+                  "y": 53
                 }
               },
               {
                 "text": "Every asset, every market, every review — one connected flow.",
                 "overflowPx": {
                   "x": 0,
-                  "y": 61
-                }
-              }
-            ]
-          }
-        },
-        {
-          "variantId": "MV-IMG-MATRIX-6",
-          "family": "MF-05",
-          "layout": "LF-37",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "Localized support at scale.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 8
-                }
-              },
-              {
-                "text": "Training content, every language.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 8
-                }
-              },
-              {
-                "text": "Contracts and disclosures.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 8
+                  "y": 59
                 }
               }
             ]
@@ -190,7 +94,7 @@
                 "text": "Strategic partnership review",
                 "overflowPx": {
                   "x": 0,
-                  "y": 45
+                  "y": 48
                 }
               },
               {
@@ -204,7 +108,7 @@
                 "text": "7/19/2026",
                 "overflowPx": {
                   "x": 0,
-                  "y": 61
+                  "y": 59
                 }
               }
             ]
@@ -221,7 +125,7 @@
                 "text": "Strategic partnership review",
                 "overflowPx": {
                   "x": 0,
-                  "y": 45
+                  "y": 48
                 }
               },
               {
@@ -235,7 +139,7 @@
                 "text": "7/19/2026",
                 "overflowPx": {
                   "x": 0,
-                  "y": 61
+                  "y": 59
                 }
               }
             ]
@@ -273,7 +177,7 @@
           "layout": "LF-18",
           "shot": "tests/snapshots/library/mobile/MF-06/MV-CASE-SPREAD.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 1
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-CASE-STORY",
@@ -289,7 +193,7 @@
           "layout": "LF-08",
           "shot": "tests/snapshots/library/mobile/MF-06/MV-CLIENT-COMPARE.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 1
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-CLIENT-DETAIL-3",
@@ -689,7 +593,7 @@
           "layout": "LF-08",
           "shot": "tests/snapshots/library/mobile/MF-05/MV-GRAPH-HEATMAP.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 3
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-GRAPH-LINE-MULTI",
@@ -825,7 +729,7 @@
           "layout": "LF-37",
           "shot": "tests/snapshots/library/mobile/MF-05/MV-IMG-MATRIX-6.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 3
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-IMG-PORTRAIT",
@@ -1365,8 +1269,8 @@
         "deviceScaleFactor": 1
       },
       "totalCards": 139,
-      "overlappingCards": 7,
-      "unexpectedCount": 0,
+      "overlappingCards": 3,
+      "unexpectedCount": 3,
       "byFamily": [
         {
           "family": "MF-01",
@@ -1396,13 +1300,13 @@
           "family": "MF-05",
           "total": 54,
           "overlapping": 0,
-          "overflowing": 2
+          "overflowing": 0
         },
         {
           "family": "MF-06",
           "total": 7,
           "overlapping": 0,
-          "overflowing": 2
+          "overflowing": 0
         },
         {
           "family": "MF-07",
@@ -1412,71 +1316,6 @@
         }
       ],
       "overlaps": [
-        {
-          "variantId": "MV-CASE-SPREAD",
-          "family": "MF-06",
-          "layout": "LF-18",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "38% ↓ time to market",
-                "overflowPx": {
-                  "x": 92,
-                  "y": 0
-                }
-              }
-            ]
-          }
-        },
-        {
-          "variantId": "MV-CLIENT-COMPARE",
-          "family": "MF-06",
-          "layout": "LF-08",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "14 langs, one release",
-                "overflowPx": {
-                  "x": 374,
-                  "y": 0
-                }
-              }
-            ]
-          }
-        },
-        {
-          "variantId": "MV-GRAPH-HEATMAP",
-          "family": "MF-05",
-          "layout": "LF-08",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "Low",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 13
-                }
-              },
-              {
-                "text": "High",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 13
-                }
-              },
-              {
-                "text": "60–100",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 13
-                }
-              }
-            ]
-          }
-        },
         {
           "variantId": "MV-IMG-FULL-BLEED",
           "family": "MF-04",
@@ -1488,45 +1327,14 @@
                 "text": "Content moves at the speed of your program.",
                 "overflowPx": {
                   "x": 0,
-                  "y": 124
+                  "y": 123
                 }
               },
               {
                 "text": "Every asset, every market, every review — one connected flow.",
                 "overflowPx": {
                   "x": 0,
-                  "y": 141
-                }
-              }
-            ]
-          }
-        },
-        {
-          "variantId": "MV-IMG-MATRIX-6",
-          "family": "MF-05",
-          "layout": "LF-37",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "Localized support at scale.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 18
-                }
-              },
-              {
-                "text": "Training content, every language.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 18
-                }
-              },
-              {
-                "text": "Contracts and disclosures.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 18
+                  "y": 136
                 }
               }
             ]
@@ -1543,7 +1351,7 @@
                 "text": "Strategic partnership review",
                 "overflowPx": {
                   "x": 0,
-                  "y": 106
+                  "y": 111
                 }
               },
               {
@@ -1557,7 +1365,7 @@
                 "text": "7/19/2026",
                 "overflowPx": {
                   "x": 0,
-                  "y": 141
+                  "y": 136
                 }
               }
             ]
@@ -1574,7 +1382,7 @@
                 "text": "Strategic partnership review",
                 "overflowPx": {
                   "x": 0,
-                  "y": 106
+                  "y": 111
                 }
               },
               {
@@ -1588,7 +1396,7 @@
                 "text": "7/19/2026",
                 "overflowPx": {
                   "x": 0,
-                  "y": 141
+                  "y": 136
                 }
               }
             ]
@@ -1626,7 +1434,7 @@
           "layout": "LF-18",
           "shot": "tests/snapshots/library/tablet/MF-06/MV-CASE-SPREAD.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 1
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-CASE-STORY",
@@ -1642,7 +1450,7 @@
           "layout": "LF-08",
           "shot": "tests/snapshots/library/tablet/MF-06/MV-CLIENT-COMPARE.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 1
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-CLIENT-DETAIL-3",
@@ -2042,7 +1850,7 @@
           "layout": "LF-08",
           "shot": "tests/snapshots/library/tablet/MF-05/MV-GRAPH-HEATMAP.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 3
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-GRAPH-LINE-MULTI",
@@ -2178,7 +1986,7 @@
           "layout": "LF-37",
           "shot": "tests/snapshots/library/tablet/MF-05/MV-IMG-MATRIX-6.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 3
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-IMG-PORTRAIT",
@@ -2718,8 +2526,8 @@
         "deviceScaleFactor": 1
       },
       "totalCards": 139,
-      "overlappingCards": 7,
-      "unexpectedCount": 0,
+      "overlappingCards": 3,
+      "unexpectedCount": 3,
       "byFamily": [
         {
           "family": "MF-01",
@@ -2749,13 +2557,13 @@
           "family": "MF-05",
           "total": 54,
           "overlapping": 0,
-          "overflowing": 2
+          "overflowing": 0
         },
         {
           "family": "MF-06",
           "total": 7,
           "overlapping": 0,
-          "overflowing": 2
+          "overflowing": 0
         },
         {
           "family": "MF-07",
@@ -2765,71 +2573,6 @@
         }
       ],
       "overlaps": [
-        {
-          "variantId": "MV-CASE-SPREAD",
-          "family": "MF-06",
-          "layout": "LF-18",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "38% ↓ time to market",
-                "overflowPx": {
-                  "x": 20,
-                  "y": 0
-                }
-              }
-            ]
-          }
-        },
-        {
-          "variantId": "MV-CLIENT-COMPARE",
-          "family": "MF-06",
-          "layout": "LF-08",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "14 langs, one release",
-                "overflowPx": {
-                  "x": 80,
-                  "y": 0
-                }
-              }
-            ]
-          }
-        },
-        {
-          "variantId": "MV-GRAPH-HEATMAP",
-          "family": "MF-05",
-          "layout": "LF-08",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "Low",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 15
-                }
-              },
-              {
-                "text": "High",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 15
-                }
-              },
-              {
-                "text": "60–100",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 15
-                }
-              }
-            ]
-          }
-        },
         {
           "variantId": "MV-IMG-FULL-BLEED",
           "family": "MF-04",
@@ -2841,45 +2584,14 @@
                 "text": "Content moves at the speed of your program.",
                 "overflowPx": {
                   "x": 0,
-                  "y": 144
+                  "y": 143
                 }
               },
               {
                 "text": "Every asset, every market, every review — one connected flow.",
                 "overflowPx": {
                   "x": 0,
-                  "y": 163
-                }
-              }
-            ]
-          }
-        },
-        {
-          "variantId": "MV-IMG-MATRIX-6",
-          "family": "MF-05",
-          "layout": "LF-37",
-          "findings": {
-            "statOverlaps": [],
-            "stageOverflows": [
-              {
-                "text": "Localized support at scale.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 21
-                }
-              },
-              {
-                "text": "Training content, every language.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 21
-                }
-              },
-              {
-                "text": "Contracts and disclosures.",
-                "overflowPx": {
-                  "x": 0,
-                  "y": 21
+                  "y": 157
                 }
               }
             ]
@@ -2896,7 +2608,7 @@
                 "text": "Strategic partnership review",
                 "overflowPx": {
                   "x": 0,
-                  "y": 122
+                  "y": 128
                 }
               },
               {
@@ -2910,7 +2622,7 @@
                 "text": "7/19/2026",
                 "overflowPx": {
                   "x": 0,
-                  "y": 163
+                  "y": 157
                 }
               }
             ]
@@ -2927,7 +2639,7 @@
                 "text": "Strategic partnership review",
                 "overflowPx": {
                   "x": 0,
-                  "y": 122
+                  "y": 128
                 }
               },
               {
@@ -2941,7 +2653,7 @@
                 "text": "7/19/2026",
                 "overflowPx": {
                   "x": 0,
-                  "y": 163
+                  "y": 157
                 }
               }
             ]
@@ -2979,7 +2691,7 @@
           "layout": "LF-18",
           "shot": "tests/snapshots/library/desktop/MF-06/MV-CASE-SPREAD.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 1
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-CASE-STORY",
@@ -2995,7 +2707,7 @@
           "layout": "LF-08",
           "shot": "tests/snapshots/library/desktop/MF-06/MV-CLIENT-COMPARE.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 1
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-CLIENT-DETAIL-3",
@@ -3395,7 +3107,7 @@
           "layout": "LF-08",
           "shot": "tests/snapshots/library/desktop/MF-05/MV-GRAPH-HEATMAP.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 3
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-GRAPH-LINE-MULTI",
@@ -3531,7 +3243,7 @@
           "layout": "LF-37",
           "shot": "tests/snapshots/library/desktop/MF-05/MV-IMG-MATRIX-6.png",
           "statOverlapCount": 0,
-          "stageOverflowCount": 3
+          "stageOverflowCount": 0
         },
         {
           "variantId": "MV-IMG-PORTRAIT",

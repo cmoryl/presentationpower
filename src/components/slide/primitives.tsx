@@ -271,9 +271,23 @@ export function StatFigure({
   //   • tighten letter-spacing on the value so long strings stay compact.
   const unitText = unit?.trim() ?? "";
   const unitIsLong = /\s|·|\/|–|-/.test(unitText) || unitText.length > 6;
-  const valueFontSize = unitIsLong
-    ? `min(${spec.valuePx}px, 18cqw)`
-    : `min(${spec.valuePx}px, 20cqw)`;
+  // A "phrase value" is a value that isn't just a number+suffix but a full
+  // clause like "38% ↓ time to market". These previously overflowed their
+  // grid track because `white-space:nowrap` refused to wrap. Detect the case
+  // and switch into a wrapping, size-stepped-down mode so the phrase fits
+  // inside its column at the same visual weight.
+  const valueText = value ?? "";
+  const valueIsPhrase =
+    valueText.trim().length > 8 &&
+    /\s/.test(valueText.trim()) &&
+    // exclude thousand-separated numerics like "1 240" (rare) — require at
+    // least one alphabetic word of 3+ chars to qualify as a phrase.
+    /[A-Za-z]{3,}/.test(valueText);
+  const valueFontSize = valueIsPhrase
+    ? `min(${Math.round(spec.valuePx * 0.5)}px, 9cqw)`
+    : unitIsLong
+      ? `min(${spec.valuePx}px, 18cqw)`
+      : `min(${spec.valuePx}px, 20cqw)`;
   const unitFontSize = unitIsLong
     ? `min(${Math.max(32, Math.round(spec.unitPx * 0.58))}px, 5.6cqw)`
     : `min(${spec.unitPx}px, 6.5cqw)`;
@@ -284,14 +298,15 @@ export function StatFigure({
       style={{ containerType: "inline-size", contain: "inline-size" }}
     >
       <div
-        className="font-semibold tabular-nums"
+        className={valueIsPhrase ? "font-semibold" : "font-semibold tabular-nums"}
         style={{
           fontSize: valueFontSize,
-          lineHeight: 0.92,
-          letterSpacing: "-0.035em",
+          lineHeight: valueIsPhrase ? 1.05 : 0.92,
+          letterSpacing: valueIsPhrase ? "-0.02em" : "-0.035em",
           color: vc,
-          whiteSpace: "nowrap",
-          overflowWrap: "normal",
+          whiteSpace: valueIsPhrase ? "normal" : "nowrap",
+          overflowWrap: valueIsPhrase ? "anywhere" : "normal",
+          wordBreak: "normal",
           maxWidth: "100%",
           overflow: "hidden",
           textOverflow: "clip",

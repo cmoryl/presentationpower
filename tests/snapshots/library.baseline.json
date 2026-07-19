@@ -1,13 +1,5 @@
 {
   "$schema": "visual-regression-library",
-  "note": "Whitelisted overlap/overflow cases. Use bare `variantId` for all breakpoints or `variantId@mobile|tablet|desktop` to scope. Entries below are cover/hero templates where long editorial copy is intentionally clipped by the stage's overflow:hidden — content is invisible to viewers but the audit detects it in the DOM. Track for future template refinement.",
-  "allowedOverlaps": [
-    "MV-CASE-SPREAD",
-    "MV-CLIENT-COMPARE",
-    "MV-GRAPH-HEATMAP",
-    "MV-IMG-FULL-BLEED",
-    "MV-IMG-MATRIX-6",
-    "MV-OP-COVER-GRADIENT",
-    "MV-OP-COVER-MEDIA"
-  ]
+  "note": "Whitelisted overlap/overflow cases. Use bare `variantId` for all breakpoints or `variantId@mobile|tablet|desktop` to scope. Empty list = zero-tolerance.",
+  "allowedOverlaps": []
 }

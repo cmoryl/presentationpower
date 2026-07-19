@@ -299,7 +299,9 @@ function renderVariantBody({
         </SlideFrame>
       );
 
-    case "MV-OP-COVER-MEDIA":
+    case "MV-OP-COVER-MEDIA": {
+      const _titleLen = s(c.title).length + s(c.subtitle).length;
+      const _titleSize = _titleLen > 60 ? "section" : "cover";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
@@ -310,23 +312,25 @@ function renderVariantBody({
               backgroundImage: `linear-gradient(115deg, ${brand.tokens.primary}f0 0%, ${brand.tokens.primary}b8 40%, rgba(0,0,0,0.35) 100%)`,
             }}
           />
-          <div className="relative flex h-full flex-col justify-end text-white">
+          <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
-            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-8" />
-            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1520} className="mt-10">
+            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-6" />
+            <DisplayTitle size={_titleSize} color="#ffffff" maxWidthPx={1520} className="mt-6">
               {s(c.title)}
             </DisplayTitle>
             {s(c.subtitle) && (
-              <SupportingText size="xl" opacity={0.88} maxWidthPx={1180} className="mt-10">
+              <SupportingText size="lg" opacity={0.88} maxWidthPx={1180} className="mt-6 line-clamp-2">
                 {s(c.subtitle)}
               </SupportingText>
             )}
-            <MetaRow className="mt-16">
+            <MetaRow className="mt-10">
               {s(c.date) && <span>{s(c.date)}</span>}
             </MetaRow>
           </div>
         </SlideFrame>
       );
+    }
+
 
     case "MV-OP-COVER-MINIMAL":
       return (
@@ -1062,8 +1066,8 @@ function renderVariantBody({
             <LabelBlock brand={brand} label="Result" body={s(c.result)} />
           </div>
           {s(c.metric) && (
-            <div className="mt-16">
-              <StatFigure brand={brand} value={s(c.metric)} label="Outcome" size="lg" />
+            <div className="mt-12">
+              <StatFigure brand={brand} value={s(c.metric)} label="Outcome" size="md" />
             </div>
           )}
         </SlideFrame>
@@ -1419,7 +1423,9 @@ function renderVariantBody({
         </SlideFrame>
       );
 
-    case "MV-OP-COVER-GRADIENT":
+    case "MV-OP-COVER-GRADIENT": {
+      const _titleLen = s(c.title).length + s(c.subtitle).length;
+      const _titleSize = _titleLen > 60 ? "section" : "cover";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-image"))} className="absolute inset-0 h-full w-full rounded-none" />
@@ -1429,23 +1435,25 @@ function renderVariantBody({
               backgroundImage: `linear-gradient(120deg, ${brand.tokens.primary}f5 0%, ${brand.tokens.primary}c8 45%, rgba(0,0,0,0.35) 100%)`,
             }}
           />
-          <div className="relative flex h-full flex-col justify-end text-white">
+          <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand} tracking="0.32em">Prepared for {s(c.clientName)}</Kicker>
-            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-8" />
-            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1520} className="mt-10">
+            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-6" />
+            <DisplayTitle size={_titleSize} color="#ffffff" maxWidthPx={1520} className="mt-6">
               {s(c.title)}
             </DisplayTitle>
             {s(c.subtitle) && (
-              <SupportingText size="xl" opacity={0.9} maxWidthPx={1180} className="mt-10">
+              <SupportingText size="lg" opacity={0.9} maxWidthPx={1180} className="mt-6 line-clamp-2">
                 {s(c.subtitle)}
               </SupportingText>
             )}
-            <MetaRow className="mt-16">
+            <MetaRow className="mt-10">
               <span>{s(c.date)}</span>
             </MetaRow>
           </div>
         </SlideFrame>
       );
+    }
+
 
     case "MV-OP-COVER-MONOGRAM":
       return (
@@ -1519,7 +1527,9 @@ function renderVariantBody({
 
 
     // ── Image-forward content ──────────────────────────────────────────
-    case "MV-IMG-FULL-BLEED":
+    case "MV-IMG-FULL-BLEED": {
+      const _titleLen = s(c.title).length + s(c.body).length;
+      const _titleSize = _titleLen > 60 ? "section" : "cover";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "hero"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
@@ -1527,14 +1537,16 @@ function renderVariantBody({
             className="absolute inset-0"
             style={{ backgroundImage: `linear-gradient(180deg, ${brand.tokens.primary}33 0%, ${brand.tokens.primary}99 55%, ${brand.tokens.primary}E6 100%)` }}
           />
-          <div className="relative flex h-full flex-col justify-end text-white">
+          <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand}>{s(c.kicker, "In focus")}</Kicker>
-            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-6 mb-8" />
-            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1600}>{s(c.title)}</DisplayTitle>
-            <SupportingText size="xl" opacity={0.9} maxWidthPx={1180} className="mt-8">{s(c.body)}</SupportingText>
+            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-6 mb-6" />
+            <DisplayTitle size={_titleSize} color="#ffffff" maxWidthPx={1600}>{s(c.title)}</DisplayTitle>
+            <SupportingText size="lg" opacity={0.9} maxWidthPx={1180} className="mt-6 line-clamp-2">{s(c.body)}</SupportingText>
           </div>
         </SlideFrame>
       );
+    }
+
 
     case "MV-IMG-SPLIT":
       return (
@@ -2137,12 +2149,12 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Program surface area")} />
-          <div className="mt-8 grid grid-cols-3 gap-x-8 gap-y-10">
+          <div className="mt-6 grid grid-cols-3 gap-x-8 gap-y-6">
             {arr(c.items).slice(0, 6).map((it, i) => (
               <div key={i}>
-                <MediaTile brand={brand} seed={s(it.seed, `mx6-${i}`)} className="aspect-[16/10] w-full" />
-                <div className="mt-5" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.primary }}>{s(it.label)}</div>
-                <SupportingText size="sm" opacity={0.72} className="mt-2">{s(it.body)}</SupportingText>
+                <MediaTile brand={brand} seed={s(it.seed, `mx6-${i}`)} className="aspect-[16/9] w-full" />
+                <div className="mt-4" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.primary }}>{s(it.label)}</div>
+                <SupportingText size="sm" opacity={0.72} className="mt-2 line-clamp-2">{s(it.body)}</SupportingText>
               </div>
             ))}
           </div>
@@ -4520,7 +4532,7 @@ function HeatmapChart({ brand, rows, cols, cells, min, max }: { brand: BrandMode
               const v = cells[ri]?.[ci] ?? 0;
               const t = Math.max(0, Math.min(1, (v - min) / range));
               return (
-                <div key={ci} style={{ aspectRatio: "1.6 / 1", background: brand.tokens.accent, opacity: 0.15 + t * 0.85, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div key={ci} style={{ aspectRatio: "2 / 1", background: brand.tokens.accent, opacity: 0.15 + t * 0.85, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <span style={{ fontSize: 22, fontWeight: 700, color: t > 0.55 ? brand.tokens.primary : "rgba(10,15,28,0.75)" }}>{v}</span>
                 </div>
               );
@@ -4528,11 +4540,11 @@ function HeatmapChart({ brand, rows, cols, cells, min, max }: { brand: BrandMode
           </Fragment>
         ))}
       </div>
-      <div className="mt-6 flex items-center gap-3">
-        <span className="uppercase" style={{ fontSize: 12, letterSpacing: "0.24em", color: "rgba(10,15,28,0.55)", fontWeight: 600 }}>Low</span>
-        <div style={{ flex: 1, height: 8, background: `linear-gradient(90deg, ${brand.tokens.accent}22, ${brand.tokens.accent})` }} />
-        <span className="uppercase" style={{ fontSize: 12, letterSpacing: "0.24em", color: "rgba(10,15,28,0.55)", fontWeight: 600 }}>High</span>
-        <span style={{ fontSize: 14, color: "rgba(10,15,28,0.55)" }}>{min}–{max}</span>
+      <div className="mt-3 flex items-center gap-3">
+        <span className="uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: "rgba(10,15,28,0.55)", fontWeight: 600 }}>Low</span>
+        <div style={{ flex: 1, height: 6, background: `linear-gradient(90deg, ${brand.tokens.accent}22, ${brand.tokens.accent})` }} />
+        <span className="uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: "rgba(10,15,28,0.55)", fontWeight: 600 }}>High</span>
+        <span style={{ fontSize: 12, color: "rgba(10,15,28,0.55)" }}>{min}–{max}</span>
       </div>
     </div>
   );
