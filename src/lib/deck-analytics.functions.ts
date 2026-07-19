@@ -15,6 +15,16 @@ export type DeckAnalyticsSummary = {
     shareToken: string | null;
     updatedAt: string;
   }>;
+  /** Same shape as topDecks but includes every owned deck, unsliced. */
+  deckStats: Array<{
+    deckId: string;
+    title: string;
+    views: number;
+    uniqueViewers: number;
+    lastViewedAt: string | null;
+    shareToken: string | null;
+    updatedAt: string;
+  }>;
   trend: Array<{ date: string; views: number }>; // last 30 days
 };
 
