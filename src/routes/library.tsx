@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Download, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Download, Loader2, Star, Copy, Check, Plus } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -15,6 +15,41 @@ import { byId, MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { MODULE_PRESET_KITS, validateKit } from "@/lib/module-preset-kits";
 import { formatKitValidationError } from "@/lib/kit-validation";
+
+// ─── Pinned variants (per-user, local) ──────────────────────────────────────
+const PINS_KEY = "library.pinnedVariants.v1";
+function readPins(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = window.localStorage.getItem(PINS_KEY);
+    if (!raw) return new Set();
+    const arr = JSON.parse(raw) as unknown;
+    return new Set(Array.isArray(arr) ? (arr as string[]) : []);
+  } catch {
+    return new Set();
+  }
+}
+function writePins(set: Set<string>) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(PINS_KEY, JSON.stringify([...set]));
+  } catch { /* quota */ }
+}
+function usePins() {
+  const [pins, setPins] = useState<Set<string>>(() => new Set());
+  // Hydrate after mount to avoid SSR mismatch.
+  useEffect(() => { setPins(readPins()); }, []);
+  const toggle = useCallback((id: string) => {
+    setPins((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      writePins(next);
+      return next;
+    });
+  }, []);
+  return { pins, toggle } as const;
+}
+
 
 
 const SAMPLE_BRIEF: Brief = {
