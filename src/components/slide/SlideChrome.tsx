@@ -8,6 +8,7 @@ import {
   type ChromeVariant,
   type LogoPosition,
 } from "@/lib/logo-placement";
+import { GRAIN_SVG } from "@/components/slide/VariantRenderer";
 
 // Every slide can render in light or dark mode. VariantRenderer sets this
 // context per slide; SlideFrame and helpers read it to flip content surfaces
