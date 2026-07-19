@@ -64,7 +64,7 @@ export const setDeckShareExpiry = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { error } = await supabase
       .from("decks")
-      .update({ share_expires_at: data.expiresAt })
+      .update({ share_expires_at: data.expiresAt } as never)
       .eq("id", data.deckId);
     if (error) throw new Error(error.message);
     return { ok: true };
