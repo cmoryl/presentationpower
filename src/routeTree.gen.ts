@@ -23,6 +23,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
+import { Route as DecksIndexRouteImport } from './routes/decks.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as KnowledgeOracleRouteImport } from './routes/knowledge.oracle'
@@ -121,6 +122,11 @@ const KnowledgeIndexRoute = KnowledgeIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => KnowledgeRoute,
+} as any)
+const DecksIndexRoute = DecksIndexRouteImport.update({
+  id: '/decks/',
+  path: '/decks/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
@@ -301,6 +307,7 @@ export interface FileRoutesByFullPath {
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/share/$token': typeof ShareTokenRoute
   '/admin/': typeof AdminIndexRoute
+  '/decks/': typeof DecksIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
@@ -343,6 +350,7 @@ export interface FileRoutesByTo {
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/share/$token': typeof ShareTokenRoute
   '/admin': typeof AdminIndexRoute
+  '/decks': typeof DecksIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
@@ -388,6 +396,7 @@ export interface FileRoutesById {
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/share/$token': typeof ShareTokenRoute
   '/admin/': typeof AdminIndexRoute
+  '/decks/': typeof DecksIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
@@ -434,6 +443,7 @@ export interface FileRouteTypes {
     | '/knowledge/oracle'
     | '/share/$token'
     | '/admin/'
+    | '/decks/'
     | '/knowledge/'
     | '/api/public/brandhub-seed-proxy'
     | '/decks/$deckId/document'
@@ -476,6 +486,7 @@ export interface FileRouteTypes {
     | '/knowledge/oracle'
     | '/share/$token'
     | '/admin'
+    | '/decks'
     | '/knowledge'
     | '/api/public/brandhub-seed-proxy'
     | '/decks/$deckId/document'
@@ -520,6 +531,7 @@ export interface FileRouteTypes {
     | '/knowledge/oracle'
     | '/share/$token'
     | '/admin/'
+    | '/decks/'
     | '/knowledge/'
     | '/api/public/brandhub-seed-proxy'
     | '/decks/$deckId/document'
@@ -549,6 +561,7 @@ export interface RootRouteChildren {
   DecksDeckIdRoute: typeof DecksDeckIdRouteWithChildren
   DecksImportRoute: typeof DecksImportRoute
   ShareTokenRoute: typeof ShareTokenRoute
+  DecksIndexRoute: typeof DecksIndexRoute
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
 }
 
@@ -651,6 +664,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/knowledge/'
       preLoaderRoute: typeof KnowledgeIndexRouteImport
       parentRoute: typeof KnowledgeRoute
+    }
+    '/decks/': {
+      id: '/decks/'
+      path: '/decks'
+      fullPath: '/decks/'
+      preLoaderRoute: typeof DecksIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/': {
       id: '/admin/'
@@ -944,6 +964,7 @@ const rootRouteChildren: RootRouteChildren = {
   DecksDeckIdRoute: DecksDeckIdRouteWithChildren,
   DecksImportRoute: DecksImportRoute,
   ShareTokenRoute: ShareTokenRoute,
+  DecksIndexRoute: DecksIndexRoute,
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
 }
 export const routeTree = rootRouteImport

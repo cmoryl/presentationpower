@@ -15,6 +15,16 @@ export type DeckAnalyticsSummary = {
     shareToken: string | null;
     updatedAt: string;
   }>;
+  /** Same shape as topDecks but includes every owned deck, unsliced. */
+  deckStats: Array<{
+    deckId: string;
+    title: string;
+    views: number;
+    uniqueViewers: number;
+    lastViewedAt: string | null;
+    shareToken: string | null;
+    updatedAt: string;
+  }>;
   trend: Array<{ date: string; views: number }>; // last 30 days
 };
 
@@ -32,7 +42,7 @@ export const getLibraryAnalytics = createServerFn({ method: "GET" })
     const deckIds = deckRows.map((d) => d.id);
 
     if (deckIds.length === 0) {
-      return { totalDecks: 0, sharedDecks: 0, totalViews: 0, uniqueViewers: 0, topDecks: [], trend: [] };
+      return { totalDecks: 0, sharedDecks: 0, totalViews: 0, uniqueViewers: 0, topDecks: [], deckStats: [], trend: [] };
     }
 
     const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
@@ -54,7 +64,7 @@ export const getLibraryAnalytics = createServerFn({ method: "GET" })
       byDeck.set(v.deck_id, b);
     }
 
-    const topDecks = deckRows
+    const deckStatsAll = deckRows
       .map((d) => {
         const b = byDeck.get(d.id);
         return {
@@ -67,8 +77,8 @@ export const getLibraryAnalytics = createServerFn({ method: "GET" })
           updatedAt: d.updated_at,
         };
       })
-      .sort((a, b) => b.views - a.views || b.updatedAt.localeCompare(a.updatedAt))
-      .slice(0, 10);
+      .sort((a, b) => b.views - a.views || b.updatedAt.localeCompare(a.updatedAt));
+    const topDecks = deckStatsAll.slice(0, 10);
 
     // Trend: last 30 days
     const dayMap = new Map<string, number>();
@@ -92,6 +102,7 @@ export const getLibraryAnalytics = createServerFn({ method: "GET" })
       totalViews: viewRows.length,
       uniqueViewers: allSessions.size,
       topDecks,
+      deckStats: deckStatsAll,
       trend,
     };
   });

@@ -151,7 +151,7 @@ function Dashboard() {
       <section className="mt-12">
         <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
           <SectionHeader kicker="Workspace" title="Recent decks" hint={`${allDecks.length} total`} inline />
-          <Link to="/atlas" className="text-sm text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white">
+          <Link to="/decks" className="text-sm text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white">
             View all →
           </Link>
         </div>
