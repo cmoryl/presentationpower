@@ -64,7 +64,7 @@ export const getLibraryAnalytics = createServerFn({ method: "GET" })
       byDeck.set(v.deck_id, b);
     }
 
-    const topDecks = deckRows
+    const deckStatsAll = deckRows
       .map((d) => {
         const b = byDeck.get(d.id);
         return {
@@ -77,8 +77,8 @@ export const getLibraryAnalytics = createServerFn({ method: "GET" })
           updatedAt: d.updated_at,
         };
       })
-      .sort((a, b) => b.views - a.views || b.updatedAt.localeCompare(a.updatedAt))
-      .slice(0, 10);
+      .sort((a, b) => b.views - a.views || b.updatedAt.localeCompare(a.updatedAt));
+    const topDecks = deckStatsAll.slice(0, 10);
 
     // Trend: last 30 days
     const dayMap = new Map<string, number>();
