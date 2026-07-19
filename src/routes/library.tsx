@@ -515,16 +515,21 @@ const VariantCard = memo(function VariantCard({
         <div className="m-2 grid grid-cols-2 gap-2">
           {(["light", "dark"] as const).map((m) => (
             <div key={m} className="relative">
-              <div
-                ref={m === "dark" ? darkRef : lightRef}
+              <LazyMount
                 className={`relative aspect-[16/10] overflow-hidden rounded-[14px] ${m === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
+                placeholder={<PreviewSkeleton dark={m === "dark"} label={variant.familyId} />}
               >
-                <ScaledSlide>
-                  <SlideBackdropContext.Provider value={m === "dark" ? darkBackdrop : lightBackdrop}>
-                    <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={m} />
-                  </SlideBackdropContext.Provider>
-                </ScaledSlide>
-              </div>
+                <div
+                  ref={m === "dark" ? darkRef : lightRef}
+                  className="absolute inset-0"
+                >
+                  <ScaledSlide>
+                    <SlideBackdropContext.Provider value={m === "dark" ? darkBackdrop : lightBackdrop}>
+                      <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={m} />
+                    </SlideBackdropContext.Provider>
+                  </ScaledSlide>
+                </div>
+              </LazyMount>
               <WcagBadge variantId={variant.id} mode={m} targetRef={m === "dark" ? darkRef : lightRef} enabled={isAB} compact />
               <TypeBadge targetRef={m === "dark" ? darkRef : lightRef} compact />
               <div className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest backdrop-blur ${m === "dark" ? "bg-white/15 text-white ring-1 ring-white/25" : "bg-black/70 text-white"}`}>
@@ -539,10 +544,11 @@ const VariantCard = memo(function VariantCard({
           )}
         </div>
       ) : (
-      <div
-        ref={singleRef}
+      <LazyMount
         className={`relative m-2 aspect-[16/10] overflow-hidden rounded-[18px] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
+        placeholder={<PreviewSkeleton dark={isDark} label={variant.familyId} />}
       >
+      <div ref={singleRef} className="absolute inset-0">
         <ScaledSlide>
           <SlideBackdropContext.Provider value={singleBackdrop}>
             <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={isDark ? "dark" : "light"} />
@@ -574,6 +580,7 @@ const VariantCard = memo(function VariantCard({
         )}
         <OnScreenSizeBadge targetRef={singleRef} compact />
       </div>
+      </LazyMount>
       )}
 
       {/* Metadata footer */}
