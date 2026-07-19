@@ -102,6 +102,7 @@ export const getLibraryAnalytics = createServerFn({ method: "GET" })
       totalViews: viewRows.length,
       uniqueViewers: allSessions.size,
       topDecks,
+      deckStats: deckStatsAll,
       trend,
     };
   });
