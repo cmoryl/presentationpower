@@ -2,7 +2,7 @@
   "url": "http://localhost:8080/library",
   "mode": "ab",
   "tolerancePx": 2,
-  "ranAt": "2026-07-19T15:10:54.308Z",
+  "ranAt": "2026-07-19T15:15:31.586Z",
   "breakpoints": [
     {
       "breakpoint": "mobile",
@@ -13,7 +13,7 @@
       },
       "totalCards": 139,
       "overlappingCards": 7,
-      "unexpectedCount": 7,
+      "unexpectedCount": 0,
       "byFamily": [
         {
           "family": "MF-01",
@@ -1366,7 +1366,7 @@
       },
       "totalCards": 139,
       "overlappingCards": 7,
-      "unexpectedCount": 7,
+      "unexpectedCount": 0,
       "byFamily": [
         {
           "family": "MF-01",
@@ -2719,7 +2719,7 @@
       },
       "totalCards": 139,
       "overlappingCards": 7,
-      "unexpectedCount": 7,
+      "unexpectedCount": 0,
       "byFamily": [
         {
           "family": "MF-01",
@@ -2775,7 +2775,7 @@
               {
                 "text": "38% ↓ time to market",
                 "overflowPx": {
-                  "x": 92,
+                  "x": 20,
                   "y": 0
                 }
               }
