@@ -9,6 +9,7 @@ import {
   loadCloudDeck,
   deleteCloudDeck,
 } from "@/lib/cloud-decks.functions";
+import { snapshotDeckVersion } from "@/lib/deck-versions.functions";
 
 export function useSignedIn() {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
@@ -24,6 +25,7 @@ export function SaveToCloudButton({ deckId }: { deckId: string }) {
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const save = useServerFn(saveDeckToCloud);
+  const snapshot = useServerFn(snapshotDeckVersion);
   const signedIn = useSignedIn();
   const [busy, setBusy] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
@@ -50,6 +52,12 @@ export function SaveToCloudButton({ deckId }: { deckId: string }) {
     try {
       await save({ data: { deck: deck as Deck, brief: brief as Brief } });
       setSavedAt(new Date().toLocaleTimeString());
+      // Snapshot version after successful save (non-blocking on failure).
+      try {
+        await snapshot({ data: { deckId, changeSummary: "Manual save" } });
+      } catch {
+        // versioning is best-effort — never break saves
+      }
     } catch (e) {
       alert(`Save failed: ${e instanceof Error ? e.message : "unknown"}`);
     } finally {

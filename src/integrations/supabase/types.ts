@@ -768,6 +768,44 @@ export type Database = {
           },
         ]
       }
+      deck_versions: {
+        Row: {
+          change_summary: string | null
+          created_at: string
+          created_by: string | null
+          deck_id: string
+          id: string
+          snapshot: Json
+          version_number: number
+        }
+        Insert: {
+          change_summary?: string | null
+          created_at?: string
+          created_by?: string | null
+          deck_id: string
+          id?: string
+          snapshot: Json
+          version_number: number
+        }
+        Update: {
+          change_summary?: string | null
+          created_at?: string
+          created_by?: string | null
+          deck_id?: string
+          id?: string
+          snapshot?: Json
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deck_versions_deck_id_fkey"
+            columns: ["deck_id"]
+            isOneToOne: false
+            referencedRelation: "decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       decks: {
         Row: {
           archetype_id: string | null

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Sparkles, X, ArrowUp, Loader2 } from "lucide-react";
 import { copilotTurn, type CopilotResult } from "@/lib/ai-copilot.functions";
+import { snapshotDeckVersion } from "@/lib/deck-versions.functions";
 import { useDeckStore } from "@/lib/deck-store";
 import { byId, MODULE_VARIANTS, SECTION_FRAMEWORKS } from "@/lib/taxonomy";
 
@@ -12,6 +13,7 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const applyCopilotUpdates = useDeckStore((s) => s.applyCopilotUpdates);
   const call = useServerFn(copilotTurn);
+  const snapshot = useServerFn(snapshotDeckVersion);
 
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -85,6 +87,14 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
           );
           onHighlight?.(result.changedIndices);
           setTimeout(() => onHighlight?.([]), 2400);
+          // Best-effort version snapshot after Copilot batch edits.
+          const n = result.changedIndices.length;
+          void snapshot({
+            data: {
+              deckId,
+              changeSummary: `Copilot: edited ${n} slide${n === 1 ? "" : "s"}`,
+            },
+          }).catch(() => {});
         }
         const summary = result.changedIndices.length
           ? `\n\n_Updated slide${result.changedIndices.length === 1 ? "" : "s"} ${result.changedIndices.map((i) => i + 1).join(", ")}._`
