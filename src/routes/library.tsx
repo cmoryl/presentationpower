@@ -551,6 +551,7 @@ const VariantCard = memo(function VariantCard({
       <LazyMount
         className={`relative m-2 aspect-[16/10] overflow-hidden rounded-[18px] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
         placeholder={<PreviewSkeleton dark={isDark} label={variant.familyId} />}
+        onMount={bumpMount}
       >
       <div ref={singleRef} className="absolute inset-0">
         <ScaledSlide>
