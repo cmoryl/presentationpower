@@ -477,12 +477,15 @@ const VariantCard = memo(function VariantCard({
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
   const singleRef = useRef<HTMLDivElement | null>(null);
+  const [mountTick, setMountTick] = useState(0);
+  const bumpMount = useCallback(() => setMountTick((n) => n + 1), []);
   // Apply / revert the auto-fix on the currently-visible slide refs.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const targets = isAB
       ? [lightRef.current, darkRef.current]
       : [singleRef.current];
+    if (!targets.some(Boolean)) return;
     const t = window.setTimeout(async () => {
       const { applyAutoFix, revertAutoFix, auditAndFixTypography, revertTypeFix } = await import("@/lib/wcag");
       for (const el of targets) {
@@ -495,7 +498,7 @@ const VariantCard = memo(function VariantCard({
       }
     }, 320);
     return () => window.clearTimeout(t);
-  }, [autoFixOn, isAB, variant.id, brand.id, showImagery, isDark]);
+  }, [autoFixOn, isAB, variant.id, brand.id, showImagery, isDark, mountTick]);
 
   return (
     <div className="group relative">
