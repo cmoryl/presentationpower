@@ -1,11 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { AdminShell } from "@/components/AdminShell";
-import { BRAND_GUIDES, type BrandGuide, type ColorSwatch } from "@/lib/brand-guides";
+import { BRAND_GUIDES, type BrandGuide, type ColorSwatch, type TypeStyle, type LogoRule } from "@/lib/brand-guides";
 import { getBrandhubIntel, targetAudienceText, normalizeVoiceValue } from "@/lib/brandhub-intel";
 
 export const Route = createFileRoute("/admin/knowledge")({
-  ssr: false,
   head: () => ({
     meta: [
       { title: "Knowledge Browser · Admin · TransPerfect" },
@@ -62,7 +60,6 @@ function AdminKnowledgeBrowser() {
     );
   }, [q]);
 
-  // Load Canva 2026 palette once
   useEffect(() => {
     fetch("/canva-master-reference/next-2026-color-palette.json")
       .then((r) => r.json())
@@ -70,7 +67,6 @@ function AdminKnowledgeBrowser() {
       .catch(() => setCanva([]));
   }, []);
 
-  // Lazy-load voiceover beat index when tab first opened
   useEffect(() => {
     if (tab !== "voiceover" || voIndex.length > 0) return;
     Promise.all(
@@ -87,92 +83,80 @@ function AdminKnowledgeBrowser() {
     ).then(setVoIndex);
   }, [tab, voIndex.length]);
 
-  if (!guide) {
-    return (
-      <AdminShell>
-        <div className="text-sm text-black/60">Guide not found.</div>
-      </AdminShell>
-    );
-  }
+  if (!guide) return <div className="text-sm text-black/60">Guide not found.</div>;
 
   return (
-    <AdminShell>
-      <div className="grid gap-6 md:grid-cols-[280px_1fr]">
-        {/* DIVISION PICKER */}
-        <aside className="rounded-2xl border border-black/10 bg-white/70 p-3">
-          <div className="mb-2 px-2 text-[10px] uppercase tracking-widest text-black/50">Division</div>
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search guides…"
-            className="mb-2 w-full rounded-lg border border-black/10 bg-white px-3 py-1.5 text-xs outline-none placeholder:text-black/40 focus:border-black/30"
-          />
-          <div className="max-h-[70vh] space-y-0.5 overflow-y-auto pr-1">
-            {filteredGuides.map((g) => (
-              <button
-                key={g.slug}
-                type="button"
-                onClick={() => setSlug(g.slug)}
-                className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-xs transition ${
-                  g.slug === slug ? "bg-[#03002C] text-white" : "text-black/80 hover:bg-black/[0.04]"
-                }`}
-              >
-                <span className="min-w-0 flex-1 truncate">{g.title}</span>
-                <span className={`ml-2 shrink-0 text-[9px] uppercase tracking-widest ${g.slug === slug ? "text-white/60" : "text-black/40"}`}>
-                  {g.category}
-                </span>
-              </button>
-            ))}
-          </div>
-        </aside>
-
-        {/* CONTENT */}
-        <div>
-          {/* Header */}
-          <div className="flex items-baseline justify-between gap-4">
-            <div>
-              <div className="text-[10px] uppercase tracking-widest text-black/50">{guide.category} · v{guide.version}</div>
-              <h2 className="mt-1 text-3xl font-semibold text-black">{guide.title}</h2>
-              <p className="mt-1 text-sm text-black/60">{guide.subtitle}</p>
-            </div>
-            <Link
-              to="/knowledge/brand-guides/$slug"
-              params={{ slug: guide.slug }}
-              target="_blank"
-              className="rounded-full border border-black/15 px-3 py-1.5 text-xs text-black/70 hover:border-black/40"
+    <div className="grid gap-6 md:grid-cols-[280px_1fr]">
+      <aside className="rounded-2xl border border-black/10 bg-white/70 p-3">
+        <div className="mb-2 px-2 text-[10px] uppercase tracking-widest text-black/50">Division</div>
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search guides…"
+          className="mb-2 w-full rounded-lg border border-black/10 bg-white px-3 py-1.5 text-xs outline-none placeholder:text-black/40 focus:border-black/30"
+        />
+        <div className="max-h-[70vh] space-y-0.5 overflow-y-auto pr-1">
+          {filteredGuides.map((g) => (
+            <button
+              key={g.slug}
+              type="button"
+              onClick={() => setSlug(g.slug)}
+              className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-xs transition ${
+                g.slug === slug ? "bg-[#03002C] text-white" : "text-black/80 hover:bg-black/[0.04]"
+              }`}
             >
-              Public view ↗
-            </Link>
-          </div>
+              <span className="min-w-0 flex-1 truncate">{g.title}</span>
+              <span className={`ml-2 shrink-0 text-[9px] uppercase tracking-widest ${g.slug === slug ? "text-white/60" : "text-black/40"}`}>
+                {g.category}
+              </span>
+            </button>
+          ))}
+        </div>
+      </aside>
 
-          {/* Tabs */}
-          <nav className="mt-6 flex flex-wrap gap-1 rounded-2xl border border-black/10 bg-white/60 p-1">
-            {TABS.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setTab(t.id)}
-                className={`rounded-xl px-3 py-1.5 text-xs transition ${
-                  tab === t.id ? "bg-[#03002C] text-white" : "text-black/70 hover:bg-black/5"
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </nav>
-
-          <div className="mt-6">
-            {tab === "overview" && <OverviewTab guide={guide} />}
-            {tab === "colors" && <ColorsTab guide={guide} canva={canva} />}
-            {tab === "type" && <TypeTab guide={guide} />}
-            {tab === "logo" && <LogoTab guide={guide} />}
-            {tab === "subbrands" && <SubBrandsTab guide={guide} />}
-            {tab === "intel" && <IntelTab slug={guide.slug} />}
-            {tab === "voiceover" && <VoiceoverTab index={voIndex} />}
+      <div>
+        <div className="flex items-baseline justify-between gap-4">
+          <div>
+            <div className="text-[10px] uppercase tracking-widest text-black/50">{guide.category} · v{guide.version}</div>
+            <h2 className="mt-1 text-3xl font-semibold text-black">{guide.title}</h2>
+            <p className="mt-1 text-sm text-black/60">{guide.subtitle}</p>
           </div>
+          <Link
+            to="/knowledge/brand-guides/$slug"
+            params={{ slug: guide.slug }}
+            target="_blank"
+            className="rounded-full border border-black/15 px-3 py-1.5 text-xs text-black/70 hover:border-black/40"
+          >
+            Public view ↗
+          </Link>
+        </div>
+
+        <nav className="mt-6 flex flex-wrap gap-1 rounded-2xl border border-black/10 bg-white/60 p-1">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setTab(t.id)}
+              className={`rounded-xl px-3 py-1.5 text-xs transition ${
+                tab === t.id ? "bg-[#03002C] text-white" : "text-black/70 hover:bg-black/5"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="mt-6">
+          {tab === "overview" && <OverviewTab guide={guide} />}
+          {tab === "colors" && <ColorsTab guide={guide} canva={canva} />}
+          {tab === "type" && <TypeTab guide={guide} />}
+          {tab === "logo" && <LogoTab guide={guide} />}
+          {tab === "subbrands" && <SubBrandsTab guide={guide} />}
+          {tab === "intel" && <IntelTab slug={guide.slug} />}
+          {tab === "voiceover" && <VoiceoverTab index={voIndex} />}
         </div>
       </div>
-    </AdminShell>
+    </div>
   );
 }
 
@@ -230,7 +214,8 @@ function Swatch({ s }: { s: ColorSwatch }) {
       <div className="p-2.5">
         <div className="truncate text-xs font-medium text-black">{s.name}</div>
         <div className="mt-0.5 font-mono text-[10px] uppercase text-black/60">{s.hex}</div>
-        {s.usage && <div className="mt-1 line-clamp-2 text-[10px] text-black/50">{s.usage}</div>}
+        {s.role && <div className="mt-1 text-[10px] text-black/50">{s.role}</div>}
+        {s.pantone && <div className="text-[10px] text-black/40">Pantone {s.pantone}</div>}
       </div>
     </div>
   );
@@ -240,7 +225,8 @@ function ColorsTab({ guide, canva }: { guide: BrandGuide; canva: CanvaPaletteEnt
   const canvaMatch = useMemo(() => {
     if (!canva) return [];
     const needle = guide.title.toLowerCase();
-    return canva.filter((c) => needle.includes(c.division.toLowerCase()) || c.division.toLowerCase().includes(needle.split(" ")[0]));
+    const firstWord = needle.split(" ")[0] ?? "";
+    return canva.filter((c) => needle.includes(c.division.toLowerCase()) || (firstWord && c.division.toLowerCase().includes(firstWord)));
   }, [canva, guide.title]);
 
   return (
@@ -275,11 +261,11 @@ function ColorsTab({ guide, canva }: { guide: BrandGuide; canva: CanvaPaletteEnt
         {canva === null ? (
           <div className="text-xs text-black/50">Loading…</div>
         ) : canvaMatch.length === 0 ? (
-          <div className="text-xs text-black/50">No division-specific entry in the Canva 2026 palette. Browse the full palette in the master guide.</div>
+          <div className="text-xs text-black/50">No division-specific entry in the Canva 2026 palette.</div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {canvaMatch.map((c) => (
-              <div key={c.hex} className="overflow-hidden rounded-xl border border-black/10 bg-white">
+              <div key={c.hex + c.division} className="overflow-hidden rounded-xl border border-black/10 bg-white">
                 <div className="h-14 w-full" style={{ background: c.hex }} />
                 <div className="p-2.5 text-[10px] text-black/60">
                   <div className="text-xs font-medium text-black">{c.division}</div>
@@ -294,6 +280,19 @@ function ColorsTab({ guide, canva }: { guide: BrandGuide; canva: CanvaPaletteEnt
         )}
       </Section>
     </div>
+  );
+}
+
+function TypeRow({ s }: { s: TypeStyle }) {
+  return (
+    <li className="flex items-center justify-between gap-4 py-2 text-sm">
+      <span className="font-medium text-black">{s.label}</span>
+      <span className="text-right text-xs text-black/60">
+        {s.sizePx}px · {s.weight}
+        {s.leading && ` · ${s.leading}`}
+        {s.tracking && ` · ${s.tracking}`}
+      </span>
+    </li>
   );
 }
 
@@ -313,29 +312,10 @@ function TypeTab({ guide }: { guide: BrandGuide }) {
         </div>
       </Section>
       <Section title="Heading scale">
-        <ul className="divide-y divide-black/[0.06]">
-          {guide.headingScale.map((s) => (
-            <li key={s.name} className="flex items-center justify-between py-2 text-sm">
-              <span className="font-medium text-black">{s.name}</span>
-              <span className="text-xs text-black/60">
-                {s.size} · {s.weight} · {s.leading}
-                {s.tracking && ` · ${s.tracking}`}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <ul className="divide-y divide-black/[0.06]">{guide.headingScale.map((s, i) => <TypeRow key={s.label + i} s={s} />)}</ul>
       </Section>
       <Section title="Body scale">
-        <ul className="divide-y divide-black/[0.06]">
-          {guide.bodyScale.map((s) => (
-            <li key={s.name} className="flex items-center justify-between py-2 text-sm">
-              <span className="font-medium text-black">{s.name}</span>
-              <span className="text-xs text-black/60">
-                {s.size} · {s.weight} · {s.leading}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <ul className="divide-y divide-black/[0.06]">{guide.bodyScale.map((s, i) => <TypeRow key={s.label + i} s={s} />)}</ul>
       </Section>
     </div>
   );
@@ -351,15 +331,15 @@ function LogoTab({ guide }: { guide: BrandGuide }) {
       )}
       <Section title={`Rules (${guide.logoRules.length})`}>
         <ul className="space-y-3">
-          {guide.logoRules.map((r) => (
-            <li key={r.title} className="rounded-lg border border-black/[0.06] bg-white p-3">
+          {guide.logoRules.map((r: LogoRule, i) => (
+            <li key={r.title + i} className="rounded-lg border border-black/[0.06] bg-white p-3">
               <div className="flex items-center gap-2">
                 <span className={`inline-flex h-5 items-center rounded-full px-2 text-[10px] font-medium uppercase tracking-widest ${
-                  r.kind === "do" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                }`}>{r.kind}</span>
+                  r.do === false ? "bg-red-100 text-red-800" : "bg-green-100 text-green-800"
+                }`}>{r.do === false ? "don't" : "do"}</span>
                 <span className="text-sm font-medium text-black">{r.title}</span>
               </div>
-              <p className="mt-1.5 text-xs leading-relaxed text-black/60">{r.detail}</p>
+              <p className="mt-1.5 text-xs leading-relaxed text-black/60">{r.description}</p>
             </li>
           ))}
         </ul>
@@ -378,9 +358,7 @@ function SubBrandsTab({ guide }: { guide: BrandGuide }) {
         <Section key={grp.group} title={grp.group}>
           <div className="flex flex-wrap gap-2">
             {grp.items.map((it) => (
-              <span key={it} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs text-black/70">
-                {it}
-              </span>
+              <span key={it} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs text-black/70">{it}</span>
             ))}
           </div>
         </Section>
@@ -400,28 +378,27 @@ function IntelTab({ slug }: { slug: string }) {
       </Section>
     );
   }
-  const audience = targetAudienceText(intel);
-  const voice = intel.voice ? normalizeVoiceValue(intel.voice.tone) : [];
+  const audience = targetAudienceText(intel.targetAudience);
+  const tone = normalizeVoiceValue(intel.voiceProfile?.tone);
+  const style = normalizeVoiceValue(intel.voiceProfile?.style);
   return (
     <div className="space-y-4">
-      <Section title="Summary">
-        <p className="text-sm leading-relaxed text-black/75">{intel.summary}</p>
-      </Section>
-      <Section title="Market position">
-        <p className="text-sm leading-relaxed text-black/75">{intel.marketPosition}</p>
-      </Section>
-      {audience && (
-        <Section title="Target audience">
-          <p className="text-sm leading-relaxed text-black/75">{audience}</p>
+      <Section title="Summary"><p className="text-sm leading-relaxed text-black/75">{intel.summary}</p></Section>
+      <Section title="Market position"><p className="text-sm leading-relaxed text-black/75">{intel.marketPosition}</p></Section>
+      {audience && <Section title="Target audience"><p className="text-sm leading-relaxed text-black/75">{audience}</p></Section>}
+      {(tone.length > 0 || style.length > 0) && (
+        <Section title="Voice profile">
+          <div className="flex flex-wrap gap-2">
+            {tone.map((v) => <span key={"t" + v} className="rounded-full bg-[#003FC7]/10 px-3 py-1 text-xs text-[#003FC7]">{v}</span>)}
+            {style.map((v) => <span key={"s" + v} className="rounded-full bg-[#C2A3FF]/20 px-3 py-1 text-xs text-black/80">{v}</span>)}
+          </div>
         </Section>
       )}
-      {voice.length > 0 && (
-        <Section title="Voice · tone">
-          <div className="flex flex-wrap gap-2">
-            {voice.map((v) => (
-              <span key={v} className="rounded-full bg-[#003FC7]/10 px-3 py-1 text-xs text-[#003FC7]">{v}</span>
-            ))}
-          </div>
+      {intel.competitiveAdvantages && intel.competitiveAdvantages.length > 0 && (
+        <Section title="Competitive advantages">
+          <ul className="space-y-1.5 text-sm text-black/75">
+            {intel.competitiveAdvantages.map((c, i) => <li key={i}>· {c}</li>)}
+          </ul>
         </Section>
       )}
       {intel.growthRecommendations && intel.growthRecommendations.length > 0 && (
@@ -438,7 +415,7 @@ function IntelTab({ slug }: { slug: string }) {
         </Section>
       )}
       {intel.competitiveLandscape?.competitors && intel.competitiveLandscape.competitors.length > 0 && (
-        <Section title="Competitive landscape">
+        <Section title="Competitors">
           <div className="flex flex-wrap gap-2">
             {intel.competitiveLandscape.competitors.map((c) => (
               <span key={c} className="rounded-full border border-black/10 bg-white px-3 py-1 text-xs text-black/70">{c}</span>
@@ -466,7 +443,7 @@ function VoiceoverTab({ index }: { index: VoiceoverIndex[] }) {
   return (
     <Section title={`Voiceover topics (${index.length})`}>
       <p className="mb-3 text-xs text-black/50">
-        Narration beat index across the knowledgebase VTT set. Voiceover is display-only per project constraints — no STT/TTS wiring.
+        Narration beat index across the knowledgebase VTT set. Voiceover is display-only — no STT/TTS wiring per project constraints.
       </p>
       <ul className="grid gap-3 sm:grid-cols-2">
         {index.map((v) => (
