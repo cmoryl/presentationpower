@@ -422,6 +422,9 @@ function Library() {
             .map((id) => byId(layoutFrameworks, id))
             .filter(Boolean) as ReturnType<typeof useTaxonomy>["layoutFrameworks"]}
           sections={sectionFrameworks.filter((s) => s.permittedFamilyIds.includes(active.familyId))}
+          pinned={pins.has(active.id)}
+          onTogglePin={() => togglePin(active.id)}
+          usageCount={usageByVariant.get(active.id) ?? 0}
           onClose={() => setOpenId(null)}
         />
       )}
