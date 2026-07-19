@@ -435,6 +435,9 @@ function VariantCard({
   brand,
   sectionId,
   preferred,
+  pinned = false,
+  usageCount = 0,
+  onTogglePin,
   mode = "light",
   showImagery = false,
   autoFixOn = false,
@@ -445,6 +448,9 @@ function VariantCard({
   brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
   sectionId: string;
   preferred?: boolean;
+  pinned?: boolean;
+  usageCount?: number;
+  onTogglePin?: () => void;
   mode?: "light" | "dark" | "ab";
   showImagery?: boolean;
   autoFixOn?: boolean;
