@@ -521,6 +521,7 @@ const VariantCard = memo(function VariantCard({
               <LazyMount
                 className={`relative aspect-[16/10] overflow-hidden rounded-[14px] ${m === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
                 placeholder={<PreviewSkeleton dark={m === "dark"} label={variant.familyId} />}
+                onMount={bumpMount}
               >
                 <div
                   ref={m === "dark" ? darkRef : lightRef}
