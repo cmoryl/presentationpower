@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Share2, Play, Printer, FileDown, ChevronDown, Link2, Copy, Check, Loader2 } from "lucide-react";
+import { Share2, Play, Printer, FileDown, ChevronDown, Link2, Copy, Check, Loader2, RefreshCw, Clock } from "lucide-react";
 import { useDeckStore, type Deck, type Brief } from "@/lib/deck-store";
 import { exportDeckToPptx } from "@/lib/pptx-export";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
