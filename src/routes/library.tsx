@@ -105,15 +105,27 @@ function Library() {
   const [scopeBrandId, setScopeBrandId] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
   const [mode, setMode] = useState<"light" | "dark" | "ab">("light");
-  
+  const [pinnedOnly, setPinnedOnly] = useState(false);
+  const [sort, setSort] = useState<"default" | "most-used" | "pinned-first">("default");
+
   const [showImagery, setShowImagery] = useState(false);
   const autoFixOn = true;
   const tpMasterIdx = Math.max(0, brandModes.findIndex((b) => b.id === "bm-enterprise"));
   const [brandIdx, setBrandIdx] = useState(tpMasterIdx);
 
+  const { pins, toggle: togglePin } = usePins();
+
+  // Usage counts across the local deck store — cheap, client-only.
+  const decks = useDeckStore((s) => s.decks);
+  const usageByVariant = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const d of Object.values(decks)) {
+      for (const sl of d.slides) m.set(sl.variantId, (m.get(sl.variantId) ?? 0) + 1);
+    }
+    return m;
+  }, [decks]);
 
   const scopeBrand = scopeBrandId === "all" ? undefined : brandModes.find((b) => b.id === scopeBrandId);
-  // Master TransPerfect brand is the default lockup for library previews.
   const tpMaster = brandModes.find((b) => b.id === "bm-enterprise") ?? brandModes[0];
   const restricted = new Set(scopeBrand?.contentScope?.restrictedFamilyIds ?? []);
   const preferred = new Set(scopeBrand?.contentScope?.preferredVariantIds ?? []);
@@ -133,6 +145,7 @@ function Library() {
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     const matched = moduleVariants.filter((v) => {
+      if (pinnedOnly && !pins.has(v.id)) return false;
       if (familyIds.size > 0 && !familyIds.has(v.familyId)) return false;
       if (scopeBrand && restricted.has(v.familyId)) return false;
       if (activeTags.length > 0 && !activeTags.every((t) => t.test(v))) return false;
@@ -146,22 +159,28 @@ function Library() {
         familyName.includes(needle)
       );
     });
-    // Rank preferred variants first when a brand scope is chosen.
-    if (!scopeBrand) return matched;
-    return [...matched].sort((a, b) => {
-      const ap = preferred.has(a.id) ? 0 : 1;
-      const bp = preferred.has(b.id) ? 0 : 1;
-      return ap - bp;
-    });
-  }, [q, familyIds, activeTags, moduleVariants, moduleFamilies, scopeBrand, restricted, preferred]);
+    const scored = [...matched];
+    if (sort === "most-used") {
+      scored.sort((a, b) => (usageByVariant.get(b.id) ?? 0) - (usageByVariant.get(a.id) ?? 0));
+    } else if (sort === "pinned-first") {
+      scored.sort((a, b) => (pins.has(b.id) ? 1 : 0) - (pins.has(a.id) ? 1 : 0));
+    } else if (scopeBrand) {
+      scored.sort((a, b) => (preferred.has(a.id) ? 0 : 1) - (preferred.has(b.id) ? 0 : 1));
+    }
+    return scored;
+  }, [q, familyIds, activeTags, moduleVariants, moduleFamilies, scopeBrand, restricted, preferred, pinnedOnly, pins, sort, usageByVariant]);
 
-  const hasFilters = q.trim().length > 0 || familyIds.size > 0 || tagIds.size > 0 || scopeBrandId !== "all";
+  const hasFilters =
+    q.trim().length > 0 || familyIds.size > 0 || tagIds.size > 0 || scopeBrandId !== "all" || pinnedOnly || sort !== "default";
   const clearFilters = () => {
     setQ("");
     setFamilyIds(new Set());
     setTagIds(new Set());
     setScopeBrandId("all");
+    setPinnedOnly(false);
+    setSort("default");
   };
+
 
   const active = openId ? moduleVariants.find((v) => v.id === openId) : null;
 
