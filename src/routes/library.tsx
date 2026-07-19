@@ -45,10 +45,28 @@ export const Route = createFileRoute("/library")({
   notFoundComponent: () => <div className="p-10">Not found.</div>,
 });
 
+// Structural tags derived from variant id prefixes + capacity signals.
+// This avoids inventing new taxonomy metadata — we key off patterns that
+// already exist across MODULE_VARIANTS.
+type StructuralTag = { id: string; label: string; test: (v: ModuleVariant) => boolean };
+const STRUCTURAL_TAGS: StructuralTag[] = [
+  { id: "stat", label: "Stats", test: (v) => /^MV-(NUMBERS|KPI|DASH|PROOF|COUNTDOWN|ICEBERG)/.test(v.id) },
+  { id: "chart", label: "Charts", test: (v) => /^MV-(GRAPH|DASH|KPI)/.test(v.id) },
+  { id: "bento", label: "Bento", test: (v) => /^MV-BENTO/.test(v.id) },
+  { id: "image", label: "Image-led", test: (v) => /^MV-(IMG|EDITORIAL|OP-COVER-MEDIA)/.test(v.id) },
+  { id: "editorial", label: "Editorial", test: (v) => /^MV-(EDITORIAL|PULL|QUOTE|SPLIT|DEFINITION|PRINCIPLES)/.test(v.id) },
+  { id: "timeline", label: "Timeline & journey", test: (v) => /^MV-(TIMELINE|JOURNEY|ROADMAP|HORIZON|PROC|FLYWHEEL|MATURITY|FUNNEL)/.test(v.id) },
+  { id: "comparison", label: "Comparison", test: (v) => /^MV-(COMPARE|MATRIX|DEC|CLIENT-COMPARE)/.test(v.id) },
+  { id: "logo", label: "Logo walls", test: (v) => /^MV-LOGO/.test(v.id) },
+  { id: "case", label: "Case & proof", test: (v) => /^MV-(CASE|PROOF)/.test(v.id) },
+  { id: "cover", label: "Cover & close", test: (v) => /^MV-(OP|CLOSE|REC|CTA)/.test(v.id) },
+];
+
 function Library() {
   const { brandModes, moduleFamilies, moduleVariants, layoutFrameworks, sectionFrameworks } = useTaxonomy();
   const [q, setQ] = useState("");
-  const [family, setFamily] = useState<string>("all");
+  const [familyIds, setFamilyIds] = useState<Set<string>>(new Set());
+  const [tagIds, setTagIds] = useState<Set<string>>(new Set());
   const [scopeBrandId, setScopeBrandId] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
   const [mode, setMode] = useState<"light" | "dark" | "ab">("light");
@@ -65,17 +83,32 @@ function Library() {
   const restricted = new Set(scopeBrand?.contentScope?.restrictedFamilyIds ?? []);
   const preferred = new Set(scopeBrand?.contentScope?.preferredVariantIds ?? []);
 
+  const toggle = (set: Set<string>, id: string) => {
+    const next = new Set(set);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    return next;
+  };
+
+  const activeTags = useMemo(
+    () => STRUCTURAL_TAGS.filter((t) => tagIds.has(t.id)),
+    [tagIds],
+  );
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     const matched = moduleVariants.filter((v) => {
-      if (family !== "all" && v.familyId !== family) return false;
+      if (familyIds.size > 0 && !familyIds.has(v.familyId)) return false;
       if (scopeBrand && restricted.has(v.familyId)) return false;
+      if (activeTags.length > 0 && !activeTags.every((t) => t.test(v))) return false;
       if (!needle) return true;
+      const familyName = byId(moduleFamilies, v.familyId)?.name.toLowerCase() ?? "";
       return (
         v.id.toLowerCase().includes(needle) ||
         v.name.toLowerCase().includes(needle) ||
-        v.description.toLowerCase().includes(needle)
+        v.description.toLowerCase().includes(needle) ||
+        v.familyId.toLowerCase().includes(needle) ||
+        familyName.includes(needle)
       );
     });
     // Rank preferred variants first when a brand scope is chosen.
@@ -85,7 +118,15 @@ function Library() {
       const bp = preferred.has(b.id) ? 0 : 1;
       return ap - bp;
     });
-  }, [q, family, moduleVariants, scopeBrand, restricted, preferred]);
+  }, [q, familyIds, activeTags, moduleVariants, moduleFamilies, scopeBrand, restricted, preferred]);
+
+  const hasFilters = q.trim().length > 0 || familyIds.size > 0 || tagIds.size > 0 || scopeBrandId !== "all";
+  const clearFilters = () => {
+    setQ("");
+    setFamilyIds(new Set());
+    setTagIds(new Set());
+    setScopeBrandId("all");
+  };
 
   const active = openId ? moduleVariants.find((v) => v.id === openId) : null;
 
