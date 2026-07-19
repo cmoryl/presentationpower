@@ -45,7 +45,8 @@ export const enableDeckSharing = createServerFn({ method: "POST" })
 
     const { error: upErr } = await supabase
       .from("decks")
-      .update(patch)
+      // Types file not yet regenerated with share_expires_at column.
+      .update(patch as never)
       .eq("id", data.deckId);
     if (upErr) throw new Error(upErr.message);
     return { token: token as string };
