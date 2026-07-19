@@ -82,9 +82,12 @@ for (const bp of BREAKPOINTS) {
 
   const context = await browser.newContext({ viewport, deviceScaleFactor: viewport.deviceScaleFactor });
   const page = await context.newPage();
+  // Force all preview cards to mount eagerly so no snapshot captures a skeleton.
+  await page.addInitScript(() => { (window).__EAGER_PREVIEWS__ = true; });
 
-  console.log(`\n→ [${bp}] ${viewport.width}×${viewport.height} · loading ${URL}`);
-  await page.goto(URL, { waitUntil: "domcontentloaded", timeout: 60_000 });
+  const eagerUrl = URL.includes("?") ? `${URL}&eager=1` : `${URL}?eager=1`;
+  console.log(`\n→ [${bp}] ${viewport.width}×${viewport.height} · loading ${eagerUrl}`);
+  await page.goto(eagerUrl, { waitUntil: "domcontentloaded", timeout: 60_000 });
 
   if (MODE === "ab") {
     const ab = page.getByRole("button", { name: /A\/B/i }).first();

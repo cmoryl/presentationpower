@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Download, Loader2, Star, Copy, Check, Plus } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { LazyMount } from "@/components/LazyMount";
 import { WcagBadge } from "@/components/WcagBadge";
 import { TypeBadge } from "@/components/TypeBadge";
 import { OnScreenSizeBadge } from "@/components/OnScreenSizeBadge";
@@ -432,7 +433,7 @@ function Library() {
   );
 }
 
-function VariantCard({
+const VariantCard = memo(function VariantCard({
   variant,
   familyName,
   brand,
@@ -476,12 +477,15 @@ function VariantCard({
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
   const singleRef = useRef<HTMLDivElement | null>(null);
+  const [mountTick, setMountTick] = useState(0);
+  const bumpMount = useCallback(() => setMountTick((n) => n + 1), []);
   // Apply / revert the auto-fix on the currently-visible slide refs.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const targets = isAB
       ? [lightRef.current, darkRef.current]
       : [singleRef.current];
+    if (!targets.some(Boolean)) return;
     const t = window.setTimeout(async () => {
       const { applyAutoFix, revertAutoFix, auditAndFixTypography, revertTypeFix } = await import("@/lib/wcag");
       for (const el of targets) {
@@ -494,7 +498,7 @@ function VariantCard({
       }
     }, 320);
     return () => window.clearTimeout(t);
-  }, [autoFixOn, isAB, variant.id, brand.id, showImagery, isDark]);
+  }, [autoFixOn, isAB, variant.id, brand.id, showImagery, isDark, mountTick]);
 
   return (
     <div className="group relative">
@@ -514,16 +518,22 @@ function VariantCard({
         <div className="m-2 grid grid-cols-2 gap-2">
           {(["light", "dark"] as const).map((m) => (
             <div key={m} className="relative">
-              <div
-                ref={m === "dark" ? darkRef : lightRef}
+              <LazyMount
                 className={`relative aspect-[16/10] overflow-hidden rounded-[14px] ${m === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
+                placeholder={<PreviewSkeleton dark={m === "dark"} label={variant.familyId} />}
+                onMount={bumpMount}
               >
-                <ScaledSlide>
-                  <SlideBackdropContext.Provider value={m === "dark" ? darkBackdrop : lightBackdrop}>
-                    <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={m} />
-                  </SlideBackdropContext.Provider>
-                </ScaledSlide>
-              </div>
+                <div
+                  ref={m === "dark" ? darkRef : lightRef}
+                  className="absolute inset-0"
+                >
+                  <ScaledSlide>
+                    <SlideBackdropContext.Provider value={m === "dark" ? darkBackdrop : lightBackdrop}>
+                      <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={m} />
+                    </SlideBackdropContext.Provider>
+                  </ScaledSlide>
+                </div>
+              </LazyMount>
               <WcagBadge variantId={variant.id} mode={m} targetRef={m === "dark" ? darkRef : lightRef} enabled={isAB} compact />
               <TypeBadge targetRef={m === "dark" ? darkRef : lightRef} compact />
               <div className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest backdrop-blur ${m === "dark" ? "bg-white/15 text-white ring-1 ring-white/25" : "bg-black/70 text-white"}`}>
@@ -538,10 +548,12 @@ function VariantCard({
           )}
         </div>
       ) : (
-      <div
-        ref={singleRef}
+      <LazyMount
         className={`relative m-2 aspect-[16/10] overflow-hidden rounded-[18px] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
+        placeholder={<PreviewSkeleton dark={isDark} label={variant.familyId} />}
+        onMount={bumpMount}
       >
+      <div ref={singleRef} className="absolute inset-0">
         <ScaledSlide>
           <SlideBackdropContext.Provider value={singleBackdrop}>
             <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={isDark ? "dark" : "light"} />
@@ -573,6 +585,7 @@ function VariantCard({
         )}
         <OnScreenSizeBadge targetRef={singleRef} compact />
       </div>
+      </LazyMount>
       )}
 
       {/* Metadata footer */}
@@ -655,6 +668,37 @@ function VariantCard({
         Used · {usageCount}
       </span>
     )}
+    </div>
+  );
+});
+
+function PreviewSkeleton({ dark = false, label }: { dark?: boolean; label?: string }) {
+  const bg = dark ? "#03002C" : "#F2F2F2";
+  const line = dark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.06)";
+  const tint = dark ? "rgba(161,251,249,0.14)" : "rgba(0,63,199,0.08)";
+  return (
+    <div
+      aria-hidden
+      className="absolute inset-0 flex items-center justify-center"
+      style={{ background: `radial-gradient(120% 100% at 50% 0%, ${tint}, ${bg} 55%)` }}
+    >
+      <div className="flex w-4/5 flex-col gap-3">
+        <div className="h-3 w-1/3 rounded" style={{ background: line }} />
+        <div className="h-6 w-3/4 rounded" style={{ background: line }} />
+        <div className="mt-2 grid grid-cols-3 gap-3">
+          <div className="h-10 rounded" style={{ background: line }} />
+          <div className="h-10 rounded" style={{ background: line }} />
+          <div className="h-10 rounded" style={{ background: line }} />
+        </div>
+      </div>
+      {label && (
+        <div
+          className="absolute bottom-2 right-2 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
+          style={{ color: dark ? "rgba(255,255,255,0.55)" : "rgba(3,0,44,0.45)", background: dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)" }}
+        >
+          {label}
+        </div>
+      )}
     </div>
   );
 }
