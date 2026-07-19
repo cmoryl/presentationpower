@@ -242,8 +242,13 @@ export function ShareMenu({ deckId }: { deckId: string }) {
 
           {/* Share link section */}
           <div className="border-b border-black/[0.06] px-4 py-3 dark:border-white/10">
-            <div className="mb-2 flex items-center gap-2 text-[10px] font-medium uppercase tracking-widest text-black/50 dark:text-white/50">
-              <Link2 size={12} /> Share link
+            <div className="mb-2 flex items-center justify-between gap-2 text-[10px] font-medium uppercase tracking-widest text-black/50 dark:text-white/50">
+              <span className="inline-flex items-center gap-2">
+                <Link2 size={12} /> Share link
+              </span>
+              {shareToken && (
+                <StatusPill expired={shareExpired} expiresAt={shareExpiresAt} />
+              )}
             </div>
             {!signedIn ? (
               <button
@@ -265,14 +270,30 @@ export function ShareMenu({ deckId }: { deckId: string }) {
                   <button
                     type="button"
                     onClick={onCopyLink}
-                    className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[#003FC7] px-2 py-1 text-[10px] font-medium text-white hover:opacity-90"
+                    disabled={shareExpired}
+                    className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[#003FC7] px-2 py-1 text-[10px] font-medium text-white hover:opacity-90 disabled:opacity-40"
                   >
                     {copied ? <Check size={11} /> : <Copy size={11} />}
                     {copied ? "Copied" : "Copy"}
                   </button>
                 </div>
-                <div className="flex items-center justify-between text-[10px] text-black/50 dark:text-white/50">
-                  <span>Anyone with the link can view.</span>
+
+                <ExpiryPicker
+                  value={shareExpiresAt}
+                  disabled={shareBusy}
+                  onChange={(v) => void onSetExpiry(v)}
+                />
+
+                <div className="flex items-center justify-between gap-3 text-[10px] text-black/60 dark:text-white/60">
+                  <button
+                    type="button"
+                    onClick={() => void onRegenerate()}
+                    disabled={shareBusy}
+                    className="inline-flex items-center gap-1 text-black/70 hover:text-black disabled:opacity-50 dark:text-white/70 dark:hover:text-white"
+                    title="Generates a brand-new link. The old URL stops working."
+                  >
+                    <RefreshCw size={11} /> Regenerate
+                  </button>
                   <button
                     type="button"
                     onClick={onDisableShare}
@@ -287,7 +308,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
             ) : (
               <button
                 type="button"
-                onClick={onEnableShare}
+                onClick={() => void onEnableShare(null)}
                 disabled={shareBusy}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#003FC7] px-3 py-2 text-xs font-medium text-white hover:opacity-90 disabled:opacity-60"
               >
@@ -297,6 +318,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
             )}
             {shareErr && <div className="mt-2 text-[10px] text-red-500">{shareErr}</div>}
           </div>
+
 
           <ShareItem
             icon={<Play size={16} />}
