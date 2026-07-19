@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Download, Loader2, Star, Copy, Check, Plus } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { LazyMount } from "@/components/LazyMount";
 import { WcagBadge } from "@/components/WcagBadge";
 import { TypeBadge } from "@/components/TypeBadge";
 import { OnScreenSizeBadge } from "@/components/OnScreenSizeBadge";
