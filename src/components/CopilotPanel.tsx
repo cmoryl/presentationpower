@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Sparkles, X, ArrowUp, Loader2 } from "lucide-react";
 import { copilotTurn, type CopilotResult } from "@/lib/ai-copilot.functions";
+import { snapshotDeckVersion } from "@/lib/deck-versions.functions";
 import { useDeckStore } from "@/lib/deck-store";
 import { byId, MODULE_VARIANTS, SECTION_FRAMEWORKS } from "@/lib/taxonomy";
 
