@@ -25,6 +25,7 @@ export function SaveToCloudButton({ deckId }: { deckId: string }) {
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const save = useServerFn(saveDeckToCloud);
+  const snapshot = useServerFn(snapshotDeckVersion);
   const signedIn = useSignedIn();
   const [busy, setBusy] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
