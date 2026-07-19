@@ -658,7 +658,7 @@ const VariantCard = memo(function VariantCard({
     )}
     </div>
   );
-}
+});
 
 
 function VariantDetailModal({
