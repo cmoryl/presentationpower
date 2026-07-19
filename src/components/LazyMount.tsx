@@ -16,12 +16,14 @@ export function LazyMount({
   rootMargin = "600px 0px",
   className,
   eager: eagerProp = false,
+  onMount,
 }: {
   children: ReactNode;
   placeholder: ReactNode;
   rootMargin?: string;
   className?: string;
   eager?: boolean;
+  onMount?: () => void;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState<boolean>(() => {
