@@ -384,6 +384,9 @@ function Library() {
             brand={scopeBrand ?? tpMaster}
             sectionId={sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? ""}
             preferred={preferred.has(v.id)}
+            pinned={pins.has(v.id)}
+            usageCount={usageByVariant.get(v.id) ?? 0}
+            onTogglePin={() => togglePin(v.id)}
             mode={mode}
             showImagery={showImagery}
             autoFixOn={autoFixOn}
