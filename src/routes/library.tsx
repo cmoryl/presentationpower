@@ -1023,6 +1023,87 @@ function FieldChips({ fields, tone }: { fields: string[]; tone: "emerald" | "red
   );
 }
 
+function AddToDeckPanel({ variant, onDone }: { variant: ModuleVariant; onDone: () => void }) {
+  const decks = useDeckStore((s) => s.decks);
+  const insertVariantSlide = useDeckStore((s) => s.insertVariantSlide);
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState<string | null>(null);
+  const [note, setNote] = useState<string | null>(null);
+
+  const list = useMemo(
+    () => Object.values(decks).sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1)).slice(0, 8),
+    [decks],
+  );
+
+  function addTo(deckId: string, andOpen: boolean) {
+    setBusy(deckId);
+    const res = insertVariantSlide(deckId, variant.id);
+    setBusy(null);
+    if (!res) {
+      setNote("Couldn't add — deck brief missing.");
+      return;
+    }
+    if (andOpen) {
+      onDone();
+      navigate({ to: "/decks/$deckId", params: { deckId } });
+    } else {
+      setNote(`Added to “${decks[deckId]?.title ?? "deck"}”.`);
+      window.setTimeout(() => setNote(null), 2200);
+    }
+  }
+
+  return (
+    <div className="rounded-xl border border-[#003FC7]/25 bg-gradient-to-br from-[#003FC7]/5 to-transparent p-4">
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-[#003FC7]">Add to deck</div>
+          <div className="mt-1 text-sm text-black/70">
+            Append <span className="font-mono text-xs">{variant.id}</span> as a new slide with its default content seed.
+          </div>
+        </div>
+        <Plus size={16} className="text-[#003FC7]" />
+      </div>
+      {list.length === 0 ? (
+        <div className="mt-3 rounded-lg border border-dashed border-black/15 bg-white/60 p-3 text-xs text-black/60">
+          No decks yet. <Link to="/brief/new" className="font-medium text-[#003FC7] hover:underline">Start a brief</Link> to create one.
+        </div>
+      ) : (
+        <ul className="mt-3 space-y-1.5">
+          {list.map((d) => (
+            <li key={d.id} className="flex items-center gap-2 rounded-lg border border-black/10 bg-white px-3 py-2">
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-medium text-[#03002C]">{d.title}</div>
+                <div className="text-[10px] uppercase tracking-widest text-black/45">
+                  {d.slides.length} slides{d.isTemplate ? " · template" : ""}
+                </div>
+              </div>
+              <button
+                type="button"
+                disabled={busy !== null}
+                onClick={() => addTo(d.id, false)}
+                className="rounded-full border border-black/15 bg-white px-2.5 py-1 text-[11px] text-black/70 hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-50"
+              >
+                {busy === d.id ? "…" : "Add"}
+              </button>
+              <button
+                type="button"
+                disabled={busy !== null}
+                onClick={() => addTo(d.id, true)}
+                className="rounded-full bg-[#03002C] px-2.5 py-1 text-[11px] font-medium text-white hover:opacity-90 disabled:opacity-50"
+              >
+                Add & open
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {note && (
+        <div className="mt-2 text-[11px] text-emerald-700">{note}</div>
+      )}
+    </div>
+  );
+}
+
 
 
 // ────────────────────────────────────────────────────────────────────────────
