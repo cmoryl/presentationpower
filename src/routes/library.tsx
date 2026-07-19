@@ -45,10 +45,28 @@ export const Route = createFileRoute("/library")({
   notFoundComponent: () => <div className="p-10">Not found.</div>,
 });
 
+// Structural tags derived from variant id prefixes + capacity signals.
+// This avoids inventing new taxonomy metadata — we key off patterns that
+// already exist across MODULE_VARIANTS.
+type StructuralTag = { id: string; label: string; test: (v: ModuleVariant) => boolean };
+const STRUCTURAL_TAGS: StructuralTag[] = [
+  { id: "stat", label: "Stats", test: (v) => /^MV-(NUMBERS|KPI|DASH|PROOF|COUNTDOWN|ICEBERG)/.test(v.id) },
+  { id: "chart", label: "Charts", test: (v) => /^MV-(GRAPH|DASH|KPI)/.test(v.id) },
+  { id: "bento", label: "Bento", test: (v) => /^MV-BENTO/.test(v.id) },
+  { id: "image", label: "Image-led", test: (v) => /^MV-(IMG|EDITORIAL|OP-COVER-MEDIA)/.test(v.id) },
+  { id: "editorial", label: "Editorial", test: (v) => /^MV-(EDITORIAL|PULL|QUOTE|SPLIT|DEFINITION|PRINCIPLES)/.test(v.id) },
+  { id: "timeline", label: "Timeline & journey", test: (v) => /^MV-(TIMELINE|JOURNEY|ROADMAP|HORIZON|PROC|FLYWHEEL|MATURITY|FUNNEL)/.test(v.id) },
+  { id: "comparison", label: "Comparison", test: (v) => /^MV-(COMPARE|MATRIX|DEC|CLIENT-COMPARE)/.test(v.id) },
+  { id: "logo", label: "Logo walls", test: (v) => /^MV-LOGO/.test(v.id) },
+  { id: "case", label: "Case & proof", test: (v) => /^MV-(CASE|PROOF)/.test(v.id) },
+  { id: "cover", label: "Cover & close", test: (v) => /^MV-(OP|CLOSE|REC|CTA)/.test(v.id) },
+];
+
 function Library() {
   const { brandModes, moduleFamilies, moduleVariants, layoutFrameworks, sectionFrameworks } = useTaxonomy();
   const [q, setQ] = useState("");
-  const [family, setFamily] = useState<string>("all");
+  const [familyIds, setFamilyIds] = useState<Set<string>>(new Set());
+  const [tagIds, setTagIds] = useState<Set<string>>(new Set());
   const [scopeBrandId, setScopeBrandId] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
   const [mode, setMode] = useState<"light" | "dark" | "ab">("light");
@@ -65,17 +83,32 @@ function Library() {
   const restricted = new Set(scopeBrand?.contentScope?.restrictedFamilyIds ?? []);
   const preferred = new Set(scopeBrand?.contentScope?.preferredVariantIds ?? []);
 
+  const toggle = (set: Set<string>, id: string) => {
+    const next = new Set(set);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    return next;
+  };
+
+  const activeTags = useMemo(
+    () => STRUCTURAL_TAGS.filter((t) => tagIds.has(t.id)),
+    [tagIds],
+  );
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     const matched = moduleVariants.filter((v) => {
-      if (family !== "all" && v.familyId !== family) return false;
+      if (familyIds.size > 0 && !familyIds.has(v.familyId)) return false;
       if (scopeBrand && restricted.has(v.familyId)) return false;
+      if (activeTags.length > 0 && !activeTags.every((t) => t.test(v))) return false;
       if (!needle) return true;
+      const familyName = byId(moduleFamilies, v.familyId)?.name.toLowerCase() ?? "";
       return (
         v.id.toLowerCase().includes(needle) ||
         v.name.toLowerCase().includes(needle) ||
-        v.description.toLowerCase().includes(needle)
+        v.description.toLowerCase().includes(needle) ||
+        v.familyId.toLowerCase().includes(needle) ||
+        familyName.includes(needle)
       );
     });
     // Rank preferred variants first when a brand scope is chosen.
@@ -85,7 +118,15 @@ function Library() {
       const bp = preferred.has(b.id) ? 0 : 1;
       return ap - bp;
     });
-  }, [q, family, moduleVariants, scopeBrand, restricted, preferred]);
+  }, [q, familyIds, activeTags, moduleVariants, moduleFamilies, scopeBrand, restricted, preferred]);
+
+  const hasFilters = q.trim().length > 0 || familyIds.size > 0 || tagIds.size > 0 || scopeBrandId !== "all";
+  const clearFilters = () => {
+    setQ("");
+    setFamilyIds(new Set());
+    setTagIds(new Set());
+    setScopeBrandId("all");
+  };
 
   const active = openId ? moduleVariants.find((v) => v.id === openId) : null;
 
@@ -99,85 +140,163 @@ function Library() {
         </p>
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center gap-3">
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search modules…"
-          className="w-72 rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
-        />
-        <select
-          value={family}
-          onChange={(e) => setFamily(e.target.value)}
-          className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
-        >
-          <option value="all">All families</option>
-          {moduleFamilies.map((mf) => (
-            <option key={mf.id} value={mf.id}>{mf.id} · {mf.name}</option>
-          ))}
-        </select>
-        <select
-          value={scopeBrandId}
-          onChange={(e) => setScopeBrandId(e.target.value)}
-          className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
-          title="Filter to what's in-scope for a brand"
-        >
-          <option value="all">Any brand scope</option>
-          {brandModes.map((b) => (
-            <option key={b.id} value={b.id}>Scope: {b.name}</option>
-          ))}
-        </select>
-        {scopeBrand && (
-          <span className="rounded-full bg-black/5 px-3 py-1 text-xs text-black/70">
-            {preferred.size} preferred · {restricted.size} family restrictions
-          </span>
-        )}
-        <div className="ml-auto flex items-center gap-3">
-          <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs">
-            <button
-              type="button"
-              onClick={() => setMode("light")}
-              className={`px-3 py-1.5 ${mode === "light" ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"}`}
-              aria-pressed={mode === "light"}
-            >
-              ☀︎ Light
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("dark")}
-              className={`px-3 py-1.5 ${mode === "dark" ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"}`}
-              aria-pressed={mode === "dark"}
-            >
-              ☾ Dark
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode("ab")}
-              className={`px-3 py-1.5 ${mode === "ab" ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"}`}
-              aria-pressed={mode === "ab"}
-              title="Compare light vs dark side-by-side"
-            >
-              ⇋ A/B
-            </button>
+      <div className="mt-8 space-y-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative w-80">
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search by name, id, family, description…"
+              className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 pr-8 text-sm shadow-sm focus:border-[#003FC7] focus:outline-none focus:ring-2 focus:ring-[#003FC7]/20"
+            />
+            {q && (
+              <button
+                type="button"
+                onClick={() => setQ("")}
+                aria-label="Clear search"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-black/40 hover:bg-black/5 hover:text-black"
+              >
+                ✕
+              </button>
+            )}
           </div>
-          <button
-            type="button"
-            onClick={() => setShowImagery((v) => !v)}
-            aria-pressed={showImagery}
-            title="Render each module with sample background imagery"
-            className={`rounded-full border px-3 py-1.5 text-xs ${
-              showImagery
-                ? "border-[#03002C] bg-[#03002C] text-white"
-                : "border-black/15 bg-white text-black/70 hover:text-black"
-            }`}
+          <select
+            value={scopeBrandId}
+            onChange={(e) => setScopeBrandId(e.target.value)}
+            className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+            title="Filter to what's in-scope for a brand"
           >
-            ▤ Sample imagery {showImagery ? "on" : "off"}
-          </button>
-          <span className="text-sm text-black/50">{filtered.length} of {moduleVariants.length}</span>
+            <option value="all">Any brand scope</option>
+            {brandModes.map((b) => (
+              <option key={b.id} value={b.id}>Scope: {b.name}</option>
+            ))}
+          </select>
+          {scopeBrand && (
+            <span className="rounded-full bg-black/5 px-3 py-1 text-xs text-black/70">
+              {preferred.size} preferred · {restricted.size} family restrictions
+            </span>
+          )}
+          {hasFilters && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:border-black/30 hover:text-black"
+            >
+              Clear filters
+            </button>
+          )}
+          <div className="ml-auto flex items-center gap-3">
+            <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs">
+              <button
+                type="button"
+                onClick={() => setMode("light")}
+                className={`px-3 py-1.5 ${mode === "light" ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"}`}
+                aria-pressed={mode === "light"}
+              >
+                ☀︎ Light
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("dark")}
+                className={`px-3 py-1.5 ${mode === "dark" ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"}`}
+                aria-pressed={mode === "dark"}
+              >
+                ☾ Dark
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode("ab")}
+                className={`px-3 py-1.5 ${mode === "ab" ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"}`}
+                aria-pressed={mode === "ab"}
+                title="Compare light vs dark side-by-side"
+              >
+                ⇋ A/B
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowImagery((v) => !v)}
+              aria-pressed={showImagery}
+              title="Render each module with sample background imagery"
+              className={`rounded-full border px-3 py-1.5 text-xs ${
+                showImagery
+                  ? "border-[#03002C] bg-[#03002C] text-white"
+                  : "border-black/15 bg-white text-black/70 hover:text-black"
+              }`}
+            >
+              ▤ Sample imagery {showImagery ? "on" : "off"}
+            </button>
+            <span className="text-sm tabular-nums text-black/50">{filtered.length} of {moduleVariants.length}</span>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">Family</span>
+          {moduleFamilies.map((mf) => {
+            const on = familyIds.has(mf.id);
+            return (
+              <button
+                key={mf.id}
+                type="button"
+                onClick={() => setFamilyIds((s) => toggle(s, mf.id))}
+                aria-pressed={on}
+                className={`rounded-full border px-3 py-1 text-xs transition ${
+                  on
+                    ? "border-[#03002C] bg-[#03002C] text-white shadow-sm"
+                    : "border-black/15 bg-white text-black/70 hover:border-black/30 hover:text-black"
+                }`}
+                title={mf.name}
+              >
+                {mf.name}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">Structure</span>
+          {STRUCTURAL_TAGS.map((t) => {
+            const on = tagIds.has(t.id);
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTagIds((s) => toggle(s, t.id))}
+                aria-pressed={on}
+                className={`rounded-full border px-3 py-1 text-xs transition ${
+                  on
+                    ? "border-[#003FC7] bg-[#003FC7] text-white shadow-sm"
+                    : "border-black/15 bg-white text-black/70 hover:border-[#003FC7]/40 hover:text-black"
+                }`}
+              >
+                {t.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
 
+      {filtered.length === 0 ? (
+        <div className="mt-10 flex flex-col items-center justify-center rounded-3xl border border-dashed border-black/15 bg-white/50 px-8 py-16 text-center">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#03002C]/5 text-2xl">
+            ⌕
+          </div>
+          <h3 className="text-lg font-semibold text-[#03002C]">No modules match those filters.</h3>
+          <p className="mt-2 max-w-md text-sm text-black/60">
+            Try loosening your search, removing a structural tag, or clearing the brand scope. The library holds {moduleVariants.length} approved variants.
+          </p>
+          {hasFilters && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="mt-5 rounded-full bg-[#03002C] px-4 py-2 text-sm text-white hover:bg-[#003FC7]"
+            >
+              Clear all filters
+            </button>
+          )}
+        </div>
+      ) : (
       <div className="mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3">
         {filtered.map((v) => (
           <VariantCard
@@ -194,6 +313,8 @@ function Library() {
           />
         ))}
       </div>
+      )}
+
 
       
 
