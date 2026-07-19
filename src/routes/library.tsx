@@ -19,7 +19,7 @@ import { formatKitValidationError } from "@/lib/kit-validation";
 
 const SAMPLE_BRIEF: Brief = {
   id: "preview",
-  createdAt: new Date().toISOString(),
+  createdAt: "2026-01-01T00:00:00.000Z",
   prospect: "Acme Corp",
   industry: "Life sciences",
   meetingObjective: "Strategic partnership review",
