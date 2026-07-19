@@ -144,7 +144,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     return cloudDeckId;
   }
 
-  async function onEnableShare() {
+  async function onEnableShare(expiresAt: string | null = null) {
     if (!signedIn) {
       navigate({ to: "/auth" });
       return;
@@ -153,8 +153,10 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     setShareErr(null);
     try {
       const id = await ensureCloudSaved();
-      const res = await enableFn({ data: { deckId: id } });
+      const res = await enableFn({ data: { deckId: id, expiresAt } });
       setShareToken(res.token);
+      setShareExpiresAt(expiresAt);
+      setShareExpired(false);
     } catch (e) {
       setShareErr(e instanceof Error ? e.message : "Could not enable sharing");
     } finally {
@@ -169,8 +171,41 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     try {
       await disableFn({ data: { deckId: cloudDeckId } });
       setShareToken(null);
+      setShareExpiresAt(null);
+      setShareExpired(false);
     } catch (e) {
       setShareErr(e instanceof Error ? e.message : "Could not disable sharing");
+    } finally {
+      setShareBusy(false);
+    }
+  }
+
+  async function onRegenerate() {
+    if (!cloudDeckId) return;
+    setShareBusy(true);
+    setShareErr(null);
+    try {
+      const id = await ensureCloudSaved();
+      const res = await enableFn({ data: { deckId: id, regenerate: true, expiresAt: shareExpiresAt } });
+      setShareToken(res.token);
+      setShareExpired(false);
+    } catch (e) {
+      setShareErr(e instanceof Error ? e.message : "Could not regenerate link");
+    } finally {
+      setShareBusy(false);
+    }
+  }
+
+  async function onSetExpiry(expiresAt: string | null) {
+    if (!cloudDeckId) return;
+    setShareBusy(true);
+    setShareErr(null);
+    try {
+      await setExpiryFn({ data: { deckId: cloudDeckId, expiresAt } });
+      setShareExpiresAt(expiresAt);
+      setShareExpired(!!(expiresAt && new Date(expiresAt).getTime() <= Date.now()));
+    } catch (e) {
+      setShareErr(e instanceof Error ? e.message : "Could not update expiry");
     } finally {
       setShareBusy(false);
     }
