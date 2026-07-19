@@ -163,6 +163,7 @@ type DeckState = {
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
   removeSlide: (deckId: string, slideId: string) => void;
   addSlide: (deckId: string, sectionId: string, afterSlideId?: string) => void;
+  insertVariantSlide: (deckId: string, variantId: string) => { slideId: string } | null;
   duplicateSlide: (deckId: string, slideId: string) => void;
   renameDeck: (deckId: string, title: string) => void;
   setDeckClientLogo: (deckId: string, logo: DeckClientLogo | null) => void;
@@ -1768,6 +1769,33 @@ export const useDeckStore = create<DeckState>()(
         const insertAt = idx < 0 ? deck.slides.length : idx + 1;
         const next = [...deck.slides.slice(0, insertAt), newSlide, ...deck.slides.slice(insertAt)].map((sl, i) => ({ ...sl, position: i }));
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
+      },
+
+      insertVariantSlide: (deckId, variantId) => {
+        const deck = get().decks[deckId];
+        if (!deck) return null;
+        const brief = get().briefs[deck.briefId];
+        if (!brief) return null;
+        const variant = byId(MODULE_VARIANTS, variantId);
+        if (!variant) return null;
+        // Pick a section framework that permits this variant's family; fall
+        // back to the last slide's section, then the first framework.
+        const sf =
+          SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.includes(variant.familyId)) ??
+          byId(SECTION_FRAMEWORKS, deck.slides[deck.slides.length - 1]?.sectionId ?? "") ??
+          SECTION_FRAMEWORKS[0];
+        const newSlide: DeckSlide = {
+          id: nanoid(8),
+          position: deck.slides.length,
+          sectionId: sf.id,
+          variantId: variant.id,
+          layoutId: variant.permittedLayoutIds[0],
+          content: seedContent(variant.id, brief, sf.name),
+          changes: [],
+        };
+        const next = [...deck.slides, newSlide].map((sl, i) => ({ ...sl, position: i }));
+        set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
+        return { slideId: newSlide.id };
       },
 
       duplicateSlide: (deckId, slideId) => {

@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Download, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Download, Loader2, Star, Copy, Check, Plus } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -15,6 +15,41 @@ import { byId, MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { MODULE_PRESET_KITS, validateKit } from "@/lib/module-preset-kits";
 import { formatKitValidationError } from "@/lib/kit-validation";
+
+// ─── Pinned variants (per-user, local) ──────────────────────────────────────
+const PINS_KEY = "library.pinnedVariants.v1";
+function readPins(): Set<string> {
+  if (typeof window === "undefined") return new Set();
+  try {
+    const raw = window.localStorage.getItem(PINS_KEY);
+    if (!raw) return new Set();
+    const arr = JSON.parse(raw) as unknown;
+    return new Set(Array.isArray(arr) ? (arr as string[]) : []);
+  } catch {
+    return new Set();
+  }
+}
+function writePins(set: Set<string>) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(PINS_KEY, JSON.stringify([...set]));
+  } catch { /* quota */ }
+}
+function usePins() {
+  const [pins, setPins] = useState<Set<string>>(() => new Set());
+  // Hydrate after mount to avoid SSR mismatch.
+  useEffect(() => { setPins(readPins()); }, []);
+  const toggle = useCallback((id: string) => {
+    setPins((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      writePins(next);
+      return next;
+    });
+  }, []);
+  return { pins, toggle } as const;
+}
+
 
 
 const SAMPLE_BRIEF: Brief = {
@@ -70,15 +105,27 @@ function Library() {
   const [scopeBrandId, setScopeBrandId] = useState<string>("all");
   const [openId, setOpenId] = useState<string | null>(null);
   const [mode, setMode] = useState<"light" | "dark" | "ab">("light");
-  
+  const [pinnedOnly, setPinnedOnly] = useState(false);
+  const [sort, setSort] = useState<"default" | "most-used" | "pinned-first">("default");
+
   const [showImagery, setShowImagery] = useState(false);
   const autoFixOn = true;
   const tpMasterIdx = Math.max(0, brandModes.findIndex((b) => b.id === "bm-enterprise"));
   const [brandIdx, setBrandIdx] = useState(tpMasterIdx);
 
+  const { pins, toggle: togglePin } = usePins();
+
+  // Usage counts across the local deck store — cheap, client-only.
+  const decks = useDeckStore((s) => s.decks);
+  const usageByVariant = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const d of Object.values(decks)) {
+      for (const sl of d.slides) m.set(sl.variantId, (m.get(sl.variantId) ?? 0) + 1);
+    }
+    return m;
+  }, [decks]);
 
   const scopeBrand = scopeBrandId === "all" ? undefined : brandModes.find((b) => b.id === scopeBrandId);
-  // Master TransPerfect brand is the default lockup for library previews.
   const tpMaster = brandModes.find((b) => b.id === "bm-enterprise") ?? brandModes[0];
   const restricted = new Set(scopeBrand?.contentScope?.restrictedFamilyIds ?? []);
   const preferred = new Set(scopeBrand?.contentScope?.preferredVariantIds ?? []);
@@ -98,6 +145,7 @@ function Library() {
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     const matched = moduleVariants.filter((v) => {
+      if (pinnedOnly && !pins.has(v.id)) return false;
       if (familyIds.size > 0 && !familyIds.has(v.familyId)) return false;
       if (scopeBrand && restricted.has(v.familyId)) return false;
       if (activeTags.length > 0 && !activeTags.every((t) => t.test(v))) return false;
@@ -111,22 +159,28 @@ function Library() {
         familyName.includes(needle)
       );
     });
-    // Rank preferred variants first when a brand scope is chosen.
-    if (!scopeBrand) return matched;
-    return [...matched].sort((a, b) => {
-      const ap = preferred.has(a.id) ? 0 : 1;
-      const bp = preferred.has(b.id) ? 0 : 1;
-      return ap - bp;
-    });
-  }, [q, familyIds, activeTags, moduleVariants, moduleFamilies, scopeBrand, restricted, preferred]);
+    const scored = [...matched];
+    if (sort === "most-used") {
+      scored.sort((a, b) => (usageByVariant.get(b.id) ?? 0) - (usageByVariant.get(a.id) ?? 0));
+    } else if (sort === "pinned-first") {
+      scored.sort((a, b) => (pins.has(b.id) ? 1 : 0) - (pins.has(a.id) ? 1 : 0));
+    } else if (scopeBrand) {
+      scored.sort((a, b) => (preferred.has(a.id) ? 0 : 1) - (preferred.has(b.id) ? 0 : 1));
+    }
+    return scored;
+  }, [q, familyIds, activeTags, moduleVariants, moduleFamilies, scopeBrand, restricted, preferred, pinnedOnly, pins, sort, usageByVariant]);
 
-  const hasFilters = q.trim().length > 0 || familyIds.size > 0 || tagIds.size > 0 || scopeBrandId !== "all";
+  const hasFilters =
+    q.trim().length > 0 || familyIds.size > 0 || tagIds.size > 0 || scopeBrandId !== "all" || pinnedOnly || sort !== "default";
   const clearFilters = () => {
     setQ("");
     setFamilyIds(new Set());
     setTagIds(new Set());
     setScopeBrandId("all");
+    setPinnedOnly(false);
+    setSort("default");
   };
+
 
   const active = openId ? moduleVariants.find((v) => v.id === openId) : null;
 
@@ -176,6 +230,30 @@ function Library() {
               {preferred.size} preferred · {restricted.size} family restrictions
             </span>
           )}
+          <button
+            type="button"
+            onClick={() => setPinnedOnly((v) => !v)}
+            aria-pressed={pinnedOnly}
+            title={pins.size > 0 ? `${pins.size} pinned` : "No pins yet — star a card"}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition ${
+              pinnedOnly
+                ? "border-amber-500 bg-amber-400/20 text-amber-900"
+                : "border-black/15 bg-white text-black/70 hover:border-amber-400 hover:text-amber-800"
+            }`}
+          >
+            <Star size={12} className={pinnedOnly ? "fill-amber-500 text-amber-600" : ""} />
+            Pinned{pins.size > 0 ? ` · ${pins.size}` : ""}
+          </button>
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as typeof sort)}
+            className="rounded-lg border border-black/15 bg-white px-2.5 py-2 text-xs text-black/70"
+            title="Sort variants"
+          >
+            <option value="default">Sort: default</option>
+            <option value="pinned-first">Pinned first</option>
+            <option value="most-used">Most used by you</option>
+          </select>
           {hasFilters && (
             <button
               type="button"
@@ -306,6 +384,9 @@ function Library() {
             brand={scopeBrand ?? tpMaster}
             sectionId={sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? ""}
             preferred={preferred.has(v.id)}
+            pinned={pins.has(v.id)}
+            usageCount={usageByVariant.get(v.id) ?? 0}
+            onTogglePin={() => togglePin(v.id)}
             mode={mode}
             showImagery={showImagery}
             autoFixOn={autoFixOn}
@@ -341,6 +422,9 @@ function Library() {
             .map((id) => byId(layoutFrameworks, id))
             .filter(Boolean) as ReturnType<typeof useTaxonomy>["layoutFrameworks"]}
           sections={sectionFrameworks.filter((s) => s.permittedFamilyIds.includes(active.familyId))}
+          pinned={pins.has(active.id)}
+          onTogglePin={() => togglePin(active.id)}
+          usageCount={usageByVariant.get(active.id) ?? 0}
           onClose={() => setOpenId(null)}
         />
       )}
@@ -354,6 +438,9 @@ function VariantCard({
   brand,
   sectionId,
   preferred,
+  pinned = false,
+  usageCount = 0,
+  onTogglePin,
   mode = "light",
   showImagery = false,
   autoFixOn = false,
@@ -364,6 +451,9 @@ function VariantCard({
   brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
   sectionId: string;
   preferred?: boolean;
+  pinned?: boolean;
+  usageCount?: number;
+  onTogglePin?: () => void;
   mode?: "light" | "dark" | "ab";
   showImagery?: boolean;
   autoFixOn?: boolean;
@@ -407,6 +497,7 @@ function VariantCard({
   }, [autoFixOn, isAB, variant.id, brand.id, showImagery, isDark]);
 
   return (
+    <div className="group relative">
     <button
       type="button"
       onClick={onOpen}
@@ -415,7 +506,9 @@ function VariantCard({
       data-variant-family={variant.familyId}
       data-variant-layout={variant.permittedLayoutIds[0] ?? ""}
       data-variant-mode={mode}
-      className="group relative block w-full overflow-hidden rounded-[24px] border border-slate-200 bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:border-[#003FC7]/20 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)]"
+      data-variant-pinned={pinned ? "1" : "0"}
+      data-variant-usage={usageCount}
+      className="block w-full overflow-hidden rounded-[24px] border border-slate-200 bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:border-[#003FC7]/20 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)]"
     >
       {isAB ? (
         <div className="m-2 grid grid-cols-2 gap-2">
@@ -536,6 +629,33 @@ function VariantCard({
         </div>
       </div>
     </button>
+    {onTogglePin && (
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onTogglePin(); }}
+        aria-pressed={pinned}
+        aria-label={pinned ? "Unpin variant" : "Pin variant"}
+        title={pinned ? "Pinned — click to unpin" : "Pin to Favorites"}
+        data-variant-pin=""
+        className={`absolute right-3 top-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full backdrop-blur transition ${
+          pinned
+            ? "bg-amber-400 text-[#03002C] shadow ring-1 ring-amber-500/40"
+            : "bg-white/85 text-black/60 shadow-sm ring-1 ring-black/10 hover:bg-white hover:text-amber-600"
+        }`}
+      >
+        <Star size={14} className={pinned ? "fill-current" : ""} />
+      </button>
+    )}
+    {usageCount > 0 && (
+      <span
+        data-variant-usage-badge=""
+        className="pointer-events-none absolute right-3 bottom-3 z-10 rounded-full bg-[#03002C]/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest text-white shadow-sm ring-1 ring-white/10 backdrop-blur"
+        title={`Used in ${usageCount} of your slides`}
+      >
+        Used · {usageCount}
+      </span>
+    )}
+    </div>
   );
 }
 
@@ -554,6 +674,9 @@ function VariantDetailModal({
   fallback,
   layouts,
   sections,
+  pinned,
+  onTogglePin,
+  usageCount,
   onClose,
 }: {
   variant: ModuleVariant;
@@ -569,8 +692,19 @@ function VariantDetailModal({
   fallback: ModuleVariant | undefined;
   layouts: ReturnType<typeof useTaxonomy>["layoutFrameworks"];
   sections: ReturnType<typeof useTaxonomy>["sectionFrameworks"];
+  pinned: boolean;
+  onTogglePin: () => void;
+  usageCount: number;
   onClose: () => void;
 }) {
+  const [copied, setCopied] = useState(false);
+  const copyId = async () => {
+    try {
+      if (navigator?.clipboard) await navigator.clipboard.writeText(variant.id);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1400);
+    } catch { /* ignore */ }
+  };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
@@ -619,12 +753,42 @@ function VariantDetailModal({
             </div>
             <div className="mt-1 truncate text-xl font-semibold">{variant.name}</div>
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-full border border-black/15 px-3 py-1.5 text-sm hover:bg-black/5"
-          >
-            Close ✕
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={copyId}
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7]/40 hover:text-[#003FC7]"
+              title="Copy variant ID to clipboard"
+            >
+              {copied ? <Check size={12} className="text-emerald-600" /> : <Copy size={12} />}
+              {copied ? "Copied" : "Copy ID"}
+            </button>
+            <button
+              type="button"
+              onClick={onTogglePin}
+              aria-pressed={pinned}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition ${
+                pinned
+                  ? "border-amber-500 bg-amber-400/20 text-amber-900"
+                  : "border-black/15 bg-white text-black/70 hover:border-amber-400 hover:text-amber-800"
+              }`}
+              title={pinned ? "Unpin from favorites" : "Pin to favorites"}
+            >
+              <Star size={12} className={pinned ? "fill-amber-500 text-amber-600" : ""} />
+              {pinned ? "Pinned" : "Pin"}
+            </button>
+            {usageCount > 0 && (
+              <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
+                Used · {usageCount}
+              </span>
+            )}
+            <button
+              onClick={onClose}
+              className="rounded-full border border-black/15 px-3 py-1.5 text-sm hover:bg-black/5"
+            >
+              Close ✕
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
@@ -680,6 +844,8 @@ function VariantDetailModal({
 
           {/* Specifics */}
           <div className="max-h-[70vh] space-y-5 overflow-y-auto p-6 text-sm">
+            <AddToDeckPanel variant={variant} onDone={onClose} />
+
             <Spec label="Module family">
               <div className="font-mono text-xs text-black/50">{variant.familyId}</div>
               <div>{family?.name ?? "—"}</div>
@@ -853,6 +1019,87 @@ function FieldChips({ fields, tone }: { fields: string[]; tone: "emerald" | "red
       {fields.map((f) => (
         <span key={f} className={`rounded border px-2 py-0.5 font-mono text-[10px] ${cls}`}>{f}</span>
       ))}
+    </div>
+  );
+}
+
+function AddToDeckPanel({ variant, onDone }: { variant: ModuleVariant; onDone: () => void }) {
+  const decks = useDeckStore((s) => s.decks);
+  const insertVariantSlide = useDeckStore((s) => s.insertVariantSlide);
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState<string | null>(null);
+  const [note, setNote] = useState<string | null>(null);
+
+  const list = useMemo(
+    () => Object.values(decks).sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1)).slice(0, 8),
+    [decks],
+  );
+
+  function addTo(deckId: string, andOpen: boolean) {
+    setBusy(deckId);
+    const res = insertVariantSlide(deckId, variant.id);
+    setBusy(null);
+    if (!res) {
+      setNote("Couldn't add — deck brief missing.");
+      return;
+    }
+    if (andOpen) {
+      onDone();
+      navigate({ to: "/decks/$deckId", params: { deckId } });
+    } else {
+      setNote(`Added to “${decks[deckId]?.title ?? "deck"}”.`);
+      window.setTimeout(() => setNote(null), 2200);
+    }
+  }
+
+  return (
+    <div className="rounded-xl border border-[#003FC7]/25 bg-gradient-to-br from-[#003FC7]/5 to-transparent p-4">
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-[#003FC7]">Add to deck</div>
+          <div className="mt-1 text-sm text-black/70">
+            Append <span className="font-mono text-xs">{variant.id}</span> as a new slide with its default content seed.
+          </div>
+        </div>
+        <Plus size={16} className="text-[#003FC7]" />
+      </div>
+      {list.length === 0 ? (
+        <div className="mt-3 rounded-lg border border-dashed border-black/15 bg-white/60 p-3 text-xs text-black/60">
+          No decks yet. <Link to="/brief/new" className="font-medium text-[#003FC7] hover:underline">Start a brief</Link> to create one.
+        </div>
+      ) : (
+        <ul className="mt-3 space-y-1.5">
+          {list.map((d) => (
+            <li key={d.id} className="flex items-center gap-2 rounded-lg border border-black/10 bg-white px-3 py-2">
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-medium text-[#03002C]">{d.title}</div>
+                <div className="text-[10px] uppercase tracking-widest text-black/45">
+                  {d.slides.length} slides{d.isTemplate ? " · template" : ""}
+                </div>
+              </div>
+              <button
+                type="button"
+                disabled={busy !== null}
+                onClick={() => addTo(d.id, false)}
+                className="rounded-full border border-black/15 bg-white px-2.5 py-1 text-[11px] text-black/70 hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-50"
+              >
+                {busy === d.id ? "…" : "Add"}
+              </button>
+              <button
+                type="button"
+                disabled={busy !== null}
+                onClick={() => addTo(d.id, true)}
+                className="rounded-full bg-[#03002C] px-2.5 py-1 text-[11px] font-medium text-white hover:opacity-90 disabled:opacity-50"
+              >
+                Add & open
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {note && (
+        <div className="mt-2 text-[11px] text-emerald-700">{note}</div>
+      )}
     </div>
   );
 }
