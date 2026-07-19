@@ -305,13 +305,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
-          {/* Cinematic scrim — gradient from primary bottom-left to transparent top-right */}
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `linear-gradient(115deg, ${brand.tokens.primary}f0 0%, ${brand.tokens.primary}b8 40%, rgba(0,0,0,0.35) 100%)`,
-            }}
-          />
+          <HeroScrim brand={brand} anchor="bottom" />
           <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
             <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-6" />
@@ -1429,12 +1423,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-image"))} className="absolute inset-0 h-full w-full rounded-none" />
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `linear-gradient(120deg, ${brand.tokens.primary}f5 0%, ${brand.tokens.primary}c8 45%, rgba(0,0,0,0.35) 100%)`,
-            }}
-          />
+          <HeroScrim brand={brand} anchor="bottom" />
           <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand} tracking="0.32em">Prepared for {s(c.clientName)}</Kicker>
             <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-6" />
@@ -1533,10 +1522,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "hero"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
-          <div
-            className="absolute inset-0"
-            style={{ backgroundImage: `linear-gradient(180deg, ${brand.tokens.primary}33 0%, ${brand.tokens.primary}99 55%, ${brand.tokens.primary}E6 100%)` }}
-          />
+          <HeroScrim brand={brand} anchor="bottom" />
           <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand}>{s(c.kicker, "In focus")}</Kicker>
             <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-6 mb-6" />
@@ -1644,11 +1630,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
-          <div
-            aria-hidden
-            className="absolute inset-0"
-            style={{ background: `linear-gradient(115deg, ${brand.tokens.primary} 8%, ${brand.tokens.primary}CC 42%, ${brand.tokens.primary}66 78%, rgba(0,0,0,0.25) 100%)` }}
-          />
+          <HeroScrim brand={brand} anchor="center" />
           <div className="relative flex h-full flex-col justify-center text-white">
             <QuoteMark color={brand.tokens.accent} size={520} opacity={0.18} className="absolute -top-4 -left-4" />
             <div className="relative max-w-[1500px]">
@@ -3651,6 +3633,76 @@ function renderVariantBody({
 }
 
 // ────────────────────────────────────────────────────────────────────────────
+// HeroScrim — the single overlay stack that sits on top of a full-bleed
+// MediaTile for hero-scale variants (covers, full-bleed, quote-bg). MediaTile
+// already applies photo exposure, brand duotone, and grain, so this layer's
+// only job is text-anchor legibility:
+//   • anchor="bottom" → title sits lower-left; bottom-heavy primary scrim
+//     fades to transparent by ~78% up, so the top ~40% of the photo remains
+//     visible and the top-center wordmark reads on a small near-black shield
+//     rather than a muddy primary wash.
+//   • anchor="center" → text sits centered (quote-bg); soft radial vignette
+//     from primary at center to transparent at edges + the same top shield.
+// A tiny accent glow in the bottom-left signals division re-toning without
+// re-doubling MediaTile's duotone.
+function HeroScrim({
+  brand,
+  anchor = "bottom",
+}: {
+  brand: BrandMode;
+  anchor?: "bottom" | "center";
+}) {
+  const mode = useContext(SlideModeContext);
+  const primary = brand.tokens.primary;
+  const accent = brand.tokens.accent;
+  const isLight = mode === "light";
+
+  // Text-anchor scrim. Light mode uses a near-white wash; dark mode uses the
+  // brand primary so titles still land on brand-colored ground.
+  const anchorScrim = (() => {
+    if (anchor === "center") {
+      return isLight
+        ? `radial-gradient(130% 100% at 50% 55%, rgba(255,255,255,0.86) 0%, rgba(255,255,255,0.58) 42%, rgba(255,255,255,0.18) 90%)`
+        : `radial-gradient(130% 100% at 50% 55%, ${primary}D6 0%, ${primary}96 42%, ${primary}30 90%)`;
+    }
+    // bottom-heavy
+    return isLight
+      ? `linear-gradient(to top, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.78) 18%, rgba(255,255,255,0.32) 42%, rgba(255,255,255,0.06) 68%, rgba(255,255,255,0) 84%)`
+      : `linear-gradient(to top, ${primary}EE 0%, ${primary}D6 14%, ${primary}8C 34%, ${primary}30 58%, rgba(0,0,0,0) 82%)`;
+  })();
+
+  // Small wordmark shield — a low, near-black band at the very top so the
+  // top-center brand lockup reads crisply without dumping brand color onto
+  // the photo. Light mode uses white.
+  const wordmarkShield = isLight
+    ? `linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.28) 40%, rgba(255,255,255,0) 100%)`
+    : `linear-gradient(180deg, rgba(3,0,44,0.62) 0%, rgba(3,0,44,0.22) 45%, rgba(3,0,44,0) 100%)`;
+
+  // Accent glow — a soft brand-accent radial in the corner where the title
+  // will sit (bottom-left for anchor=bottom, bottom for center). Signals a
+  // brand re-tone on division switch without stacking a second duotone.
+  const accentGlow =
+    anchor === "center"
+      ? `radial-gradient(50% 30% at 50% 100%, ${accent}${isLight ? "22" : "33"} 0%, transparent 70%)`
+      : `radial-gradient(55% 42% at 6% 96%, ${accent}${isLight ? "24" : "3A"} 0%, transparent 72%)`;
+
+  return (
+    <>
+      <div aria-hidden className="absolute inset-0" style={{ backgroundImage: anchorScrim }} />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[18%]"
+        style={{ backgroundImage: wordmarkShield }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{ backgroundImage: accentGlow, mixBlendMode: isLight ? "multiply" : "screen" }}
+      />
+    </>
+  );
+}
+
 // MediaTile — deterministic image tile used wherever a module wants imagery.
 // Light mode stays plain; dark mode uses real backdrop assets only.
 // ────────────────────────────────────────────────────────────────────────────
