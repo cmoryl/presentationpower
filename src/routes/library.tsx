@@ -671,6 +671,9 @@ function VariantDetailModal({
   fallback,
   layouts,
   sections,
+  pinned,
+  onTogglePin,
+  usageCount,
   onClose,
 }: {
   variant: ModuleVariant;
@@ -686,8 +689,19 @@ function VariantDetailModal({
   fallback: ModuleVariant | undefined;
   layouts: ReturnType<typeof useTaxonomy>["layoutFrameworks"];
   sections: ReturnType<typeof useTaxonomy>["sectionFrameworks"];
+  pinned: boolean;
+  onTogglePin: () => void;
+  usageCount: number;
   onClose: () => void;
 }) {
+  const [copied, setCopied] = useState(false);
+  const copyId = async () => {
+    try {
+      if (navigator?.clipboard) await navigator.clipboard.writeText(variant.id);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1400);
+    } catch { /* ignore */ }
+  };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
