@@ -52,6 +52,12 @@ export function SaveToCloudButton({ deckId }: { deckId: string }) {
     try {
       await save({ data: { deck: deck as Deck, brief: brief as Brief } });
       setSavedAt(new Date().toLocaleTimeString());
+      // Snapshot version after successful save (non-blocking on failure).
+      try {
+        await snapshot({ data: { deckId, changeSummary: "Manual save" } });
+      } catch {
+        // versioning is best-effort — never break saves
+      }
     } catch (e) {
       alert(`Save failed: ${e instanceof Error ? e.message : "unknown"}`);
     } finally {
