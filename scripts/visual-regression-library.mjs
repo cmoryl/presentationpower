@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 /**
- * Automated visual regression + stat-overlap check for the module library
- * across responsive breakpoints (mobile, tablet, desktop).
+ * Automated visual regression for the module library, per template/layout.
  *
- * Loads http://localhost:8080/library at each configured viewport, iterates
- * every [data-variant-card], inspects each preview stage for
- * [data-stat-figure] elements that overlap a sibling grid track, and
- * captures per-breakpoint PNGs + a JSON report. Any overlap not
- * whitelisted in library.baseline.json fails the run (exit 1).
+ * Loads http://localhost:8080/library at each responsive breakpoint
+ * (mobile / tablet / desktop), captures a PNG per module-variant card
+ * bucketed by family — `tests/snapshots/library/<breakpoint>/<family>/<variantId>.png` —
+ * and runs two overlap checks against every template:
+ *
+ *   1. Stat vs sibling-grid-track overlap  ([data-stat-figure] neighbors)
+ *   2. Stage overflow                      (text escaping the 1920×1080 stage)
+ *
+ * Any finding not whitelisted in `library.baseline.json` fails the run
+ * (exit 1) so template-specific regressions cannot slip in.
  *
  *   node scripts/visual-regression-library.mjs \
  *     [--mode light|dark|ab] [--out DIR] [--baseline PATH] \
