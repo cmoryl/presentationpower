@@ -305,13 +305,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
-          {/* Cinematic scrim — gradient from primary bottom-left to transparent top-right */}
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `linear-gradient(115deg, ${brand.tokens.primary}f0 0%, ${brand.tokens.primary}b8 40%, rgba(0,0,0,0.35) 100%)`,
-            }}
-          />
+          <HeroScrim brand={brand} anchor="bottom" />
           <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
             <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-6" />
@@ -1429,12 +1423,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-image"))} className="absolute inset-0 h-full w-full rounded-none" />
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `linear-gradient(120deg, ${brand.tokens.primary}f5 0%, ${brand.tokens.primary}c8 45%, rgba(0,0,0,0.35) 100%)`,
-            }}
-          />
+          <HeroScrim brand={brand} anchor="bottom" />
           <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand} tracking="0.32em">Prepared for {s(c.clientName)}</Kicker>
             <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-6" />
@@ -1533,10 +1522,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "hero"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
-          <div
-            className="absolute inset-0"
-            style={{ backgroundImage: `linear-gradient(180deg, ${brand.tokens.primary}33 0%, ${brand.tokens.primary}99 55%, ${brand.tokens.primary}E6 100%)` }}
-          />
+          <HeroScrim brand={brand} anchor="bottom" />
           <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand}>{s(c.kicker, "In focus")}</Kicker>
             <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-6 mb-6" />
@@ -1644,11 +1630,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
-          <div
-            aria-hidden
-            className="absolute inset-0"
-            style={{ background: `linear-gradient(115deg, ${brand.tokens.primary} 8%, ${brand.tokens.primary}CC 42%, ${brand.tokens.primary}66 78%, rgba(0,0,0,0.25) 100%)` }}
-          />
+          <HeroScrim brand={brand} anchor="center" />
           <div className="relative flex h-full flex-col justify-center text-white">
             <QuoteMark color={brand.tokens.accent} size={520} opacity={0.18} className="absolute -top-4 -left-4" />
             <div className="relative max-w-[1500px]">
