@@ -667,6 +667,37 @@ const VariantCard = memo(function VariantCard({
   );
 });
 
+function PreviewSkeleton({ dark = false, label }: { dark?: boolean; label?: string }) {
+  const bg = dark ? "#03002C" : "#F2F2F2";
+  const line = dark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.06)";
+  const tint = dark ? "rgba(161,251,249,0.14)" : "rgba(0,63,199,0.08)";
+  return (
+    <div
+      aria-hidden
+      className="absolute inset-0 flex items-center justify-center"
+      style={{ background: `radial-gradient(120% 100% at 50% 0%, ${tint}, ${bg} 55%)` }}
+    >
+      <div className="flex w-4/5 flex-col gap-3">
+        <div className="h-3 w-1/3 rounded" style={{ background: line }} />
+        <div className="h-6 w-3/4 rounded" style={{ background: line }} />
+        <div className="mt-2 grid grid-cols-3 gap-3">
+          <div className="h-10 rounded" style={{ background: line }} />
+          <div className="h-10 rounded" style={{ background: line }} />
+          <div className="h-10 rounded" style={{ background: line }} />
+        </div>
+      </div>
+      {label && (
+        <div
+          className="absolute bottom-2 right-2 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
+          style={{ color: dark ? "rgba(255,255,255,0.55)" : "rgba(3,0,44,0.45)", background: dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)" }}
+        >
+          {label}
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 function VariantDetailModal({
   variant,
