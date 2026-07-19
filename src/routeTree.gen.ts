@@ -36,6 +36,7 @@ import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
 import { Route as AdminLogohubRouteImport } from './routes/admin.logohub'
+import { Route as AdminKnowledgeRouteImport } from './routes/admin.knowledge'
 import { Route as AdminImageryRouteImport } from './routes/admin.imagery'
 import { Route as AdminIconStudioRouteImport } from './routes/admin.icon-studio'
 import { Route as AdminBrandAssetsRouteImport } from './routes/admin.brand-assets'
@@ -186,6 +187,11 @@ const AdminLogohubRoute = AdminLogohubRouteImport.update({
   path: '/logohub',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminKnowledgeRoute = AdminKnowledgeRouteImport.update({
+  id: '/knowledge',
+  path: '/knowledge',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminImageryRoute = AdminImageryRouteImport.update({
   id: '/imagery',
   path: '/imagery',
@@ -281,6 +287,7 @@ export interface FileRoutesByFullPath {
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
+  '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/users': typeof AdminUsersRoute
@@ -322,6 +329,7 @@ export interface FileRoutesByTo {
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
+  '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/users': typeof AdminUsersRoute
@@ -366,6 +374,7 @@ export interface FileRoutesById {
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery': typeof AdminImageryRoute
+  '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/users': typeof AdminUsersRoute
@@ -411,6 +420,7 @@ export interface FileRouteTypes {
     | '/admin/brand-assets'
     | '/admin/icon-studio'
     | '/admin/imagery'
+    | '/admin/knowledge'
     | '/admin/logohub'
     | '/admin/oracle'
     | '/admin/users'
@@ -452,6 +462,7 @@ export interface FileRouteTypes {
     | '/admin/brand-assets'
     | '/admin/icon-studio'
     | '/admin/imagery'
+    | '/admin/knowledge'
     | '/admin/logohub'
     | '/admin/oracle'
     | '/admin/users'
@@ -495,6 +506,7 @@ export interface FileRouteTypes {
     | '/admin/brand-assets'
     | '/admin/icon-studio'
     | '/admin/imagery'
+    | '/admin/knowledge'
     | '/admin/logohub'
     | '/admin/oracle'
     | '/admin/users'
@@ -731,6 +743,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLogohubRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/knowledge': {
+      id: '/admin/knowledge'
+      path: '/knowledge'
+      fullPath: '/admin/knowledge'
+      preLoaderRoute: typeof AdminKnowledgeRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/imagery': {
       id: '/admin/imagery'
       path: '/imagery'
@@ -840,6 +859,7 @@ interface AdminRouteChildren {
   AdminBrandAssetsRoute: typeof AdminBrandAssetsRoute
   AdminIconStudioRoute: typeof AdminIconStudioRoute
   AdminImageryRoute: typeof AdminImageryRoute
+  AdminKnowledgeRoute: typeof AdminKnowledgeRoute
   AdminLogohubRoute: typeof AdminLogohubRoute
   AdminOracleRoute: typeof AdminOracleRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -854,6 +874,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBrandAssetsRoute: AdminBrandAssetsRoute,
   AdminIconStudioRoute: AdminIconStudioRoute,
   AdminImageryRoute: AdminImageryRoute,
+  AdminKnowledgeRoute: AdminKnowledgeRoute,
   AdminLogohubRoute: AdminLogohubRoute,
   AdminOracleRoute: AdminOracleRoute,
   AdminUsersRoute: AdminUsersRoute,
