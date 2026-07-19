@@ -3721,7 +3721,7 @@ import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
 // Fine film-grain overlay used to keep imagery from looking flat/plasticky.
 // Data-URI SVG turbulence — cached by the browser once and reused everywhere.
-const GRAIN_SVG =
+export const GRAIN_SVG =
   "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")";
 
 function MediaTile({
