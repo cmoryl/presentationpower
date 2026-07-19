@@ -87,6 +87,14 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
           );
           onHighlight?.(result.changedIndices);
           setTimeout(() => onHighlight?.([]), 2400);
+          // Best-effort version snapshot after Copilot batch edits.
+          const n = result.changedIndices.length;
+          void snapshot({
+            data: {
+              deckId,
+              changeSummary: `Copilot: edited ${n} slide${n === 1 ? "" : "s"}`,
+            },
+          }).catch(() => {});
         }
         const summary = result.changedIndices.length
           ? `\n\n_Updated slide${result.changedIndices.length === 1 ? "" : "s"} ${result.changedIndices.map((i) => i + 1).join(", ")}._`
