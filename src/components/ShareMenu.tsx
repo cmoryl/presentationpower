@@ -71,8 +71,18 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     if (!open || !cloudDeckId) return;
     let cancelled = false;
     getStatus({ data: { deckId: cloudDeckId } })
-      .then((r) => !cancelled && setShareToken(r.token))
-      .catch(() => !cancelled && setShareToken(null));
+      .then((r) => {
+        if (cancelled) return;
+        setShareToken(r.token);
+        setShareExpiresAt(r.expiresAt ?? null);
+        setShareExpired(!!r.expired);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setShareToken(null);
+        setShareExpiresAt(null);
+        setShareExpired(false);
+      });
     return () => {
       cancelled = true;
     };
