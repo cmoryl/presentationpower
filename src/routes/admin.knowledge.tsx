@@ -373,7 +373,7 @@ function IntelTab({ slug }: { slug: string }) {
     return (
       <Section title="BrandHub intelligence">
         <div className="text-xs text-black/50">
-          No BrandHub intelligence record was distilled for this division. Intel currently covers: life sciences, master, legal, gaming, media, GlobalLink, DataForce, digital, cobrand.
+          No BrandHub intelligence record was distilled for this division. Intel currently covers 10 divisions: TransPerfect master, Life Sciences, Legal, Gaming, Media, Digital, GlobalLink, DataForce, Cobrand, and Trial Interactive. The remaining divisions have no source material in the BrandHub export — awaiting user-supplied intel.
         </div>
       </Section>
     );
