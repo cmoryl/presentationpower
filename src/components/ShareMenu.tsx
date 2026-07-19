@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Share2, Play, Printer, FileDown, ChevronDown, Link2, Copy, Check, Loader2 } from "lucide-react";
+import { Share2, Play, Printer, FileDown, ChevronDown, Link2, Copy, Check, Loader2, RefreshCw, Clock } from "lucide-react";
 import { useDeckStore, type Deck, type Brief } from "@/lib/deck-store";
 import { exportDeckToPptx } from "@/lib/pptx-export";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
@@ -13,6 +13,7 @@ import {
   disableDeckSharing,
   getDeckShareStatus,
   getShareAnalytics,
+  setDeckShareExpiry,
 } from "@/lib/deck-sharing.functions";
 
 export function ShareMenu({ deckId }: { deckId: string }) {
@@ -29,11 +30,14 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   const enableFn = useServerFn(enableDeckSharing);
   const disableFn = useServerFn(disableDeckSharing);
   const getAnalytics = useServerFn(getShareAnalytics);
+  const setExpiryFn = useServerFn(setDeckShareExpiry);
 
   type Analytics = { totalViews: number; uniqueSessions: number; lastViewedAt: string | null; avgMaxSlide: number };
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
 
   const [shareToken, setShareToken] = useState<string | null>(null);
+  const [shareExpiresAt, setShareExpiresAt] = useState<string | null>(null);
+  const [shareExpired, setShareExpired] = useState(false);
   const [shareBusy, setShareBusy] = useState(false);
   const [shareErr, setShareErr] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -67,8 +71,18 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     if (!open || !cloudDeckId) return;
     let cancelled = false;
     getStatus({ data: { deckId: cloudDeckId } })
-      .then((r) => !cancelled && setShareToken(r.token))
-      .catch(() => !cancelled && setShareToken(null));
+      .then((r) => {
+        if (cancelled) return;
+        setShareToken(r.token);
+        setShareExpiresAt(r.expiresAt ?? null);
+        setShareExpired(!!r.expired);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setShareToken(null);
+        setShareExpiresAt(null);
+        setShareExpired(false);
+      });
     return () => {
       cancelled = true;
     };
@@ -130,7 +144,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     return cloudDeckId;
   }
 
-  async function onEnableShare() {
+  async function onEnableShare(expiresAt: string | null = null) {
     if (!signedIn) {
       navigate({ to: "/auth" });
       return;
@@ -139,8 +153,10 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     setShareErr(null);
     try {
       const id = await ensureCloudSaved();
-      const res = await enableFn({ data: { deckId: id } });
+      const res = await enableFn({ data: { deckId: id, expiresAt } });
       setShareToken(res.token);
+      setShareExpiresAt(expiresAt);
+      setShareExpired(false);
     } catch (e) {
       setShareErr(e instanceof Error ? e.message : "Could not enable sharing");
     } finally {
@@ -155,8 +171,41 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     try {
       await disableFn({ data: { deckId: cloudDeckId } });
       setShareToken(null);
+      setShareExpiresAt(null);
+      setShareExpired(false);
     } catch (e) {
       setShareErr(e instanceof Error ? e.message : "Could not disable sharing");
+    } finally {
+      setShareBusy(false);
+    }
+  }
+
+  async function onRegenerate() {
+    if (!cloudDeckId) return;
+    setShareBusy(true);
+    setShareErr(null);
+    try {
+      const id = await ensureCloudSaved();
+      const res = await enableFn({ data: { deckId: id, regenerate: true, expiresAt: shareExpiresAt } });
+      setShareToken(res.token);
+      setShareExpired(false);
+    } catch (e) {
+      setShareErr(e instanceof Error ? e.message : "Could not regenerate link");
+    } finally {
+      setShareBusy(false);
+    }
+  }
+
+  async function onSetExpiry(expiresAt: string | null) {
+    if (!cloudDeckId) return;
+    setShareBusy(true);
+    setShareErr(null);
+    try {
+      await setExpiryFn({ data: { deckId: cloudDeckId, expiresAt } });
+      setShareExpiresAt(expiresAt);
+      setShareExpired(!!(expiresAt && new Date(expiresAt).getTime() <= Date.now()));
+    } catch (e) {
+      setShareErr(e instanceof Error ? e.message : "Could not update expiry");
     } finally {
       setShareBusy(false);
     }
@@ -193,8 +242,13 @@ export function ShareMenu({ deckId }: { deckId: string }) {
 
           {/* Share link section */}
           <div className="border-b border-black/[0.06] px-4 py-3 dark:border-white/10">
-            <div className="mb-2 flex items-center gap-2 text-[10px] font-medium uppercase tracking-widest text-black/50 dark:text-white/50">
-              <Link2 size={12} /> Share link
+            <div className="mb-2 flex items-center justify-between gap-2 text-[10px] font-medium uppercase tracking-widest text-black/50 dark:text-white/50">
+              <span className="inline-flex items-center gap-2">
+                <Link2 size={12} /> Share link
+              </span>
+              {shareToken && (
+                <StatusPill expired={shareExpired} expiresAt={shareExpiresAt} />
+              )}
             </div>
             {!signedIn ? (
               <button
@@ -216,14 +270,30 @@ export function ShareMenu({ deckId }: { deckId: string }) {
                   <button
                     type="button"
                     onClick={onCopyLink}
-                    className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[#003FC7] px-2 py-1 text-[10px] font-medium text-white hover:opacity-90"
+                    disabled={shareExpired}
+                    className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[#003FC7] px-2 py-1 text-[10px] font-medium text-white hover:opacity-90 disabled:opacity-40"
                   >
                     {copied ? <Check size={11} /> : <Copy size={11} />}
                     {copied ? "Copied" : "Copy"}
                   </button>
                 </div>
-                <div className="flex items-center justify-between text-[10px] text-black/50 dark:text-white/50">
-                  <span>Anyone with the link can view.</span>
+
+                <ExpiryPicker
+                  value={shareExpiresAt}
+                  disabled={shareBusy}
+                  onChange={(v) => void onSetExpiry(v)}
+                />
+
+                <div className="flex items-center justify-between gap-3 text-[10px] text-black/60 dark:text-white/60">
+                  <button
+                    type="button"
+                    onClick={() => void onRegenerate()}
+                    disabled={shareBusy}
+                    className="inline-flex items-center gap-1 text-black/70 hover:text-black disabled:opacity-50 dark:text-white/70 dark:hover:text-white"
+                    title="Generates a brand-new link. The old URL stops working."
+                  >
+                    <RefreshCw size={11} /> Regenerate
+                  </button>
                   <button
                     type="button"
                     onClick={onDisableShare}
@@ -238,7 +308,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
             ) : (
               <button
                 type="button"
-                onClick={onEnableShare}
+                onClick={() => void onEnableShare(null)}
                 disabled={shareBusy}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#003FC7] px-3 py-2 text-xs font-medium text-white hover:opacity-90 disabled:opacity-60"
               >
@@ -248,6 +318,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
             )}
             {shareErr && <div className="mt-2 text-[10px] text-red-500">{shareErr}</div>}
           </div>
+
 
           <ShareItem
             icon={<Play size={16} />}
@@ -350,4 +421,104 @@ function relativeTime(iso: string): string {
   const d = Math.round(h / 24);
   if (d < 30) return `${d}d ago`;
   return new Date(iso).toLocaleDateString();
+}
+
+function StatusPill({ expired, expiresAt }: { expired: boolean; expiresAt: string | null }) {
+  if (expired) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-red-500">
+        <Clock size={9} /> Expired
+      </span>
+    );
+  }
+  if (expiresAt) {
+    const ms = new Date(expiresAt).getTime() - Date.now();
+    const days = Math.max(0, Math.ceil(ms / 86_400_000));
+    const label = days <= 1 ? "<1d" : `${days}d`;
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-amber-600 dark:text-amber-400">
+        <Clock size={9} /> Expires in {label}
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+      Active
+    </span>
+  );
+}
+
+function ExpiryPicker({
+  value,
+  disabled,
+  onChange,
+}: {
+  value: string | null;
+  disabled?: boolean;
+  onChange: (v: string | null) => void;
+}) {
+  const preset = (() => {
+    if (!value) return "never";
+    const ms = new Date(value).getTime() - Date.now();
+    const days = Math.round(ms / 86_400_000);
+    if (Math.abs(days - 7) <= 1) return "7d";
+    if (Math.abs(days - 30) <= 1) return "30d";
+    return "custom";
+  })();
+
+  function pick(next: string) {
+    if (next === "never") return onChange(null);
+    if (next === "7d") return onChange(new Date(Date.now() + 7 * 86_400_000).toISOString());
+    if (next === "30d") return onChange(new Date(Date.now() + 30 * 86_400_000).toISOString());
+  }
+
+  const options: Array<{ id: string; label: string }> = [
+    { id: "never", label: "No expiry" },
+    { id: "7d", label: "7 days" },
+    { id: "30d", label: "30 days" },
+    { id: "custom", label: "Custom" },
+  ];
+
+  const dateValue = value ? new Date(value).toISOString().slice(0, 10) : "";
+
+  return (
+    <div className="space-y-1.5">
+      <div className="flex flex-wrap gap-1">
+        {options.map((opt) => (
+          <button
+            key={opt.id}
+            type="button"
+            disabled={disabled}
+            onClick={() => {
+              if (opt.id === "custom") return; // handled by date input below
+              pick(opt.id);
+            }}
+            className={`rounded-full border px-2 py-0.5 text-[10px] transition ${
+              preset === opt.id
+                ? "border-[#003FC7] bg-[#003FC7]/10 text-[#003FC7] dark:border-[#A1FBF9] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]"
+                : "border-black/10 text-black/60 hover:border-black/30 dark:border-white/10 dark:text-white/60 dark:hover:border-white/30"
+            } disabled:opacity-40`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+      {(preset === "custom" || preset === "never") && (
+        <input
+          type="date"
+          disabled={disabled}
+          value={dateValue}
+          min={new Date().toISOString().slice(0, 10)}
+          onChange={(e) => {
+            const v = e.target.value;
+            if (!v) return onChange(null);
+            // Set to end of chosen day (UTC) so the link works the whole day
+            const iso = new Date(`${v}T23:59:59.000Z`).toISOString();
+            onChange(iso);
+          }}
+          className="w-full rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] text-black outline-none dark:border-white/10 dark:bg-white/[0.05] dark:text-white"
+        />
+      )}
+    </div>
+  );
 }

@@ -816,6 +816,7 @@ export type Database = {
           id: string
           is_template: boolean
           owner_id: string
+          share_expires_at: string | null
           share_token: string | null
           shared_at: string | null
           status: string
@@ -831,6 +832,7 @@ export type Database = {
           id?: string
           is_template?: boolean
           owner_id: string
+          share_expires_at?: string | null
           share_token?: string | null
           shared_at?: string | null
           status?: string
@@ -846,6 +848,7 @@ export type Database = {
           id?: string
           is_template?: boolean
           owner_id?: string
+          share_expires_at?: string | null
           share_token?: string | null
           shared_at?: string | null
           status?: string

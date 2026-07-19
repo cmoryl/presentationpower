@@ -13,12 +13,17 @@ function randomToken(bytes = 24): string {
   return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
 
+const enableInput = z.object({
+  deckId: z.string().uuid(),
+  expiresAt: z.string().datetime().nullable().optional(),
+  regenerate: z.boolean().optional(),
+});
+
 export const enableDeckSharing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
+  .inputValidator((raw) => enableInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    // Load — RLS ensures only the owner sees this row.
     const { data: existing, error: readErr } = await supabase
       .from("decks")
       .select("id, owner_id, share_token")
@@ -29,15 +34,40 @@ export const enableDeckSharing = createServerFn({ method: "POST" })
     if (existing.owner_id !== userId) throw new Error("Forbidden");
 
     let token = existing.share_token as string | null;
-    if (!token) {
-      token = randomToken(24);
-      const { error: upErr } = await supabase
-        .from("decks")
-        .update({ share_token: token, shared_at: new Date().toISOString() })
-        .eq("id", data.deckId);
-      if (upErr) throw new Error(upErr.message);
-    }
-    return { token };
+    const needsNew = !token || data.regenerate === true;
+    if (needsNew) token = randomToken(24);
+
+    const patch: Record<string, unknown> = {
+      share_token: token,
+      shared_at: new Date().toISOString(),
+    };
+    if (data.expiresAt !== undefined) patch.share_expires_at = data.expiresAt;
+
+    const { error: upErr } = await supabase
+      .from("decks")
+      // Types file not yet regenerated with share_expires_at column.
+      .update(patch as never)
+      .eq("id", data.deckId);
+    if (upErr) throw new Error(upErr.message);
+    return { token: token as string };
+  });
+
+export const setDeckShareExpiry = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) =>
+    z.object({
+      deckId: z.string().uuid(),
+      expiresAt: z.string().datetime().nullable(),
+    }).parse(raw),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { error } = await supabase
+      .from("decks")
+      .update({ share_expires_at: data.expiresAt } as never)
+      .eq("id", data.deckId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
 
 export const disableDeckSharing = createServerFn({ method: "POST" })
@@ -47,7 +77,7 @@ export const disableDeckSharing = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { error } = await supabase
       .from("decks")
-      .update({ share_token: null, shared_at: null })
+      .update({ share_token: null, shared_at: null, share_expires_at: null } as never)
       .eq("id", data.deckId);
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -60,11 +90,15 @@ export const getDeckShareStatus = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { data: row, error } = await supabase
       .from("decks")
-      .select("share_token, shared_at")
+      .select("share_token, shared_at, share_expires_at" as never)
       .eq("id", data.deckId)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    return { token: (row?.share_token as string | null) ?? null, sharedAt: row?.shared_at ?? null };
+    const r = (row ?? null) as { share_token: string | null; shared_at: string | null; share_expires_at: string | null } | null;
+    const token = r?.share_token ?? null;
+    const expiresAt = r?.share_expires_at ?? null;
+    const expired = !!(expiresAt && new Date(expiresAt).getTime() <= Date.now());
+    return { token, sharedAt: r?.shared_at ?? null, expiresAt, expired };
   });
 
 // Public — no auth middleware. Calls SECURITY DEFINER RPC that only returns
