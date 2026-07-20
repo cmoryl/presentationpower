@@ -246,7 +246,9 @@ function DecksIndex() {
               client={r.client}
               views={r.views}
               shared={r.shared}
+              reviewStatus={r.reviewStatus}
             />
+
           ))}
         </div>
       )}
