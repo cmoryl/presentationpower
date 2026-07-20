@@ -197,7 +197,7 @@ function DeckEditor() {
                 >
                   <div className="aspect-[16/9] bg-white">
                     <ScaledSlide>
-                      {variant && <VariantRenderer slide={applyOverlay(slide)} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />}
+                      {variant && <VariantRenderer slide={applyOverlay(slide)} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />}
                     </ScaledSlide>
                   </div>
                   <div className="border-t border-black/10 bg-white px-3 py-2 text-xs">
