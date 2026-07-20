@@ -1,70 +1,97 @@
-# Backgrounds & Imagery — Everywhere
+# Deck & Slide Translation
 
-Goal: give every slide a real "Background & Imagery" control that works in the editor, survives imports, renders in the preview/share viewer, and embeds into PPTX exports. Three sources: curated library, user upload, AI generation.
+Ship a full translation surface for decks and slides using **TransPerfect GlobalLink** as the engine, with a protected brand glossary and four workflows (in-place, per-slide, translated copy, batch multi-language).
 
-## 1. Data model (single source of truth)
+## 1. GlobalLink connection
 
-Add two optional fields to `SlideContent` (typed as loose keys today):
+No standard connector exists for GlobalLink in this workspace. We'll wire it as a first-class integration using project secrets:
 
-- `content.background`: `{ kind: 'library' | 'upload' | 'ai' | 'color' | 'gradient'; url?: string; presetId?: string; css?: string; scrim?: 'bottom'|'left'|'right'|'top'|'full'|'vignette'; scrimStrength?: number; imageDim?: number; tint?: string }` — applies to ANY slide as a layer behind chrome.
-- `content.mediaUrl`: already exists for image-supporting variants; extend `variant-media.ts` so `normalizeSlideMedia` also preserves `background` on all variants (backgrounds are variant-agnostic).
+- `GLOBALLINK_API_BASE_URL` (e.g. `https://connect.translations.com` or the tenant's endpoint)
+- `GLOBALLINK_API_KEY` (or `GLOBALLINK_CLIENT_ID` + `GLOBALLINK_CLIENT_SECRET` for OAuth-style — I'll adapt to whichever your GlobalLink tenant uses)
+- `GLOBALLINK_SUBMITTER` / project code (optional metadata for job routing)
 
-## 2. Curated background library
+I'll request these via `add_secret` after this plan is approved. Until they're in place, the UI shows a "Connect GlobalLink" empty state in `/admin` and translation actions stay disabled — no fake/mock fallback.
 
-`src/lib/background-library.ts` — 12–16 on-brand presets grouped by category (Navy Gradient, Aqua Mist, Editorial Grid, Dot Grid, Diagonal Rule, Concentric Rings, Aurora, Paper Grain, Duotone Photo, etc.). Each preset stores a CSS string (linear/radial gradients + SVG data-URI patterns) — no binary uploads needed, works offline.
+**Engine abstraction.** Server code goes through a `TranslationEngine` interface so we can swap in DeepL/Google later without touching UI. First implementation: `globallink.ts` (MT + submit-for-human-review supported).
 
-## 3. Custom upload (Supabase Storage)
+## 2. Data model (one migration)
 
-- Create private bucket `slide-media` via `supabase--storage_create_bucket`.
-- RLS on `storage.objects`: users can insert/select/delete only under `slide-media/<auth.uid()>/…`.
-- `src/lib/slide-media.ts` — `uploadSlideMedia(file) → { path, signedUrl }` using `createSignedUrl` (long-lived, refreshed on load).
+```text
+languages            id text pk, label text, native text, rtl bool, active bool
+deck_translations    id, source_deck_id, target_lang, status(draft|translating|ready|failed),
+                     engine text, job_ref text, translated_deck_id, error, created_by, timestamps
+slide_translations   id, slide_id, target_lang, source_hash, translated_content jsonb,
+                     status, engine, job_ref, timestamps  (unique slide_id+target_lang)
+glossary_terms       id, term, do_not_translate bool, translations jsonb (per-lang overrides),
+                     scope('global'|'division'|'deck'), scope_id text, notes, created_by, timestamps
+```
 
-## 4. AI image generation
+All tables get RLS + GRANTs. Seed `languages` with ~40 major locales (es, fr, de, it, pt-BR, pt-PT, nl, pl, cs, sv, da, fi, no, tr, ru, uk, ar, he, ja, ko, zh-CN, zh-TW, th, vi, id, ms, hi, bn, ta, ur, fa, el, ro, hu, bg, sk, sl, hr, sr, et, lv, lt).
 
-`src/routes/api/generate-slide-image.ts` — streaming server route using `openai/gpt-image-2` with `stream: true` per the TanStack streaming knowledge. Client uses the existing `streamImage` helper (or a small copy) to show a live progressive image. When finalized, upload the data URL into the `slide-media` bucket so it persists.
+Glossary seed: `TransPerfect`, all 10 division names, product names (GlobalLink, Ai Studio, Wordfast, etc.) as `do_not_translate=true, scope='global'`.
 
-## 5. Editor UI
+## 3. Server functions (`src/lib/translation.functions.ts`)
 
-`src/components/slide/BackgroundImageryPanel.tsx` — a glassy inspector panel with three tabs:
+- `listLanguages()` — active locales for pickers
+- `translateSlide({ slideId, targetLang, engine, glossaryScope })` — single slide, returns translated content
+- `translateDeckInPlace({ deckId, targetLang })` — overwrites current deck; auto-snapshots version first
+- `translateDeckToCopy({ deckId, targetLang })` — duplicates deck, translates copy, returns new `deckId`
+- `translateDeckBatch({ deckId, targetLangs[] })` — parallel copies; returns `{ lang → deckId | error }`
+- `getTranslationStatus({ jobId })` — poll GlobalLink jobs
+- `listGlossary({ scope, scopeId })`, `upsertGlossaryTerm(...)`, `deleteGlossaryTerm(...)` — admin CRUD
 
-- **Library**: grid of previews; click to set `content.background = { kind: 'library', presetId, css }`.
-- **Upload**: drag-and-drop → upload → set `background.kind='upload'` with signed URL.
-- **AI**: prompt input → streams into preview → "Use this" persists to storage and sets `background.kind='ai'`.
+**Translation flow per slide**
+1. Extract user-visible strings from `slide.content` (title, subtitle, body, bullets, quotes, stat labels/values where non-numeric, cell text, captions, notes).
+2. Wrap protected terms in `<span translate="no">…</span>` using glossary matches (case-insensitive, word-boundary).
+3. Send batched string array to GlobalLink; receive translated array with tags preserved.
+4. Unwrap protections, map results back to structured `content` shape, persist to `slide_translations` and (for in-place / copy) into `deck_slides.content`.
+5. Auto-tag RTL languages so `SlideChrome` flips text direction.
 
-For image-forward variants, a second sub-section overrides slide `mediaUrl` with the same three sources (reuses tabs). Includes scrim controls (position slider, strength, dim).
+Version snapshot is captured **before** in-place translation so undo is possible.
 
-Mount into the existing slide inspector on `/decks/$deckId`.
+## 4. UI
 
-## 6. Renderer wiring
+**Editor (`decks.$deckId`)**
+- New "Translate" button in header menu → drawer with:
+  - Target language picker (searchable, flags, RTL badge)
+  - Mode radio: `In-place` / `New copy` / `Multi-language batch` (multi-select langs)
+  - Glossary preview ("12 protected terms")
+  - "Submit for human review" checkbox (routes as GlobalLink human job vs MT)
+- Per-slide context menu → **Translate this slide** → inline preview with accept/reject
+- Progress toast + status pill (`Translating 4/12 slides…`)
 
-- Wrap the current slide render in the editor and share viewer with a `SlideBackdropContext.Provider` that derives from `content.background` first, then falls back to the current `backdropForVariant` result for image-supporting variants.
-- `SlideFrame` already renders a backdrop layer — extend it to accept CSS-only backgrounds (no image URL) by rendering the CSS string as `backgroundImage` on the base div, and keep scrim/tint controls intact.
+**Deck list (`/decks`)**
+- Row action: **Translate deck** (same drawer)
+- Language badge on cards when deck has translations; click reveals language variants
 
-## 7. PPTX export
+**Admin (`/admin/translation` — new)**
+- GlobalLink connection status + secrets check
+- Glossary manager (global, per-division, per-deck) with import/export CSV
+- Translation jobs log (filter by status, language, engine, retry failed)
+- Language activation toggles
 
-In `src/lib/pptx-export.ts`:
+**Present / Share**
+- Language switcher in `/present` and `/share/$token` when translated copies exist
 
-- If `content.background.url` is set → prefetch as data URL and add as first slide layer (`slide.background = { data: 'image/...;base64,...' }` for full-bleed, or a scaled `addImage` for patterns) plus a `addShape` scrim rectangle matching the on-screen scrim.
-- If `content.background.css` describes a solid/linear gradient → convert to `slide.background = { color: HEX }` (solid) or emit a full-bleed rectangle with `pptxgenjs` gradient-approximation (two-color linear).
-- For image-supporting variants that also carry `content.mediaUrl` override, keep existing embed behavior (already implemented) but read from override first.
+## 5. Export fidelity
 
-## 8. Import round-trip
+`pptx-export.ts` and `/print` already read `deck_slides.content`, so translated copies export correctly with zero changes. RTL languages set slide-level `dir="rtl"` and mirror hero image alignment. Font stack falls back to Noto Sans (CJK / Arabic / Hebrew) via `<link>` in `__root.tsx` to avoid missing-glyph boxes.
 
-In `src/lib/pptx-mapping.ts`:
+## 6. Tests / verification
 
-- When the extracted slide has a full-bleed background image AND the mapped variant does NOT support slide-level imagery, promote it to `content.background = { kind: 'upload', url, scrim: 'bottom', scrimStrength: 0.55 }` instead of dumping into `extraImages`.
-- When the extracted slide has a solid theme color, set `content.background = { kind: 'color', css: 'linear-gradient(...)' }`.
-- Diagnostics panel already surfaces preserved vs dropped — hook the new promotion path into the "Preserved" counter.
+- Simulate a 12-slide deck → translate in-place to Spanish → verify glossary protection kept "TransPerfect" and "GlobalLink" untranslated, snapshot exists, undo restores English.
+- Batch translate to `[es, fr, de, ja, ar]` → verify 5 new deck rows, RTL flag on Arabic.
+- Per-slide translation preview accept/reject round-trip.
+- PPTX export of Japanese copy renders with CJK font.
 
-## 9. Files touched / added
+## 7. What I need from you after approval
 
-Added: `background-library.ts`, `slide-media.ts`, `BackgroundImageryPanel.tsx`, `api/generate-slide-image.ts`, migration for storage RLS.
-Modified: `variant-media.ts`, `SlideChrome.tsx`, `VariantRenderer.tsx` (context provider only), `decks.$deckId.tsx` (mount panel), `pptx-export.ts`, `pptx-mapping.ts`, `share.$token.tsx` (provider), `decks.$deckId.print.tsx` and `.present.tsx` (providers).
+1. Confirm you have a GlobalLink tenant + API credentials, and which auth style (bearer key vs OAuth client id/secret).
+2. I'll open `add_secret` prompts for the values above.
+3. Optional: a CSV of extra do-not-translate terms specific to your accounts — otherwise glossary starts with brand + divisions + product names.
 
-## Out of scope this pass
+## Out of scope (call out for a future pass)
 
-- Video backgrounds.
-- Per-shape image replacement inside grid/bento cells (already covered by item-level `seed`).
-- Batch "apply background to all slides in section" — trivial follow-up once the single-slide flow is proven.
-
-Confirm and I'll execute in one batched pass.
+- Live TM/TB sync back to GlobalLink projects
+- In-context reviewer round-trips inside GlobalLink UI
+- Locale-specific imagery swaps
