@@ -161,29 +161,47 @@ function BriefWizard() {
           >
             {/* Header */}
             <div
-              className="border-b px-5 pb-6 pt-7 sm:px-10 sm:pb-8 sm:pt-10"
+              className="relative overflow-hidden border-b px-5 pb-7 pt-8 sm:px-10 sm:pb-10 sm:pt-12"
               style={{ borderColor: PALETTE.page }}
             >
               <div
-                className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em]"
-                style={{ color: brandPrimary }}
-              >
-                <span className="inline-block h-[2px] w-4" style={{ backgroundColor: brandPrimary }} />
-                Briefing engine
-              </div>
-              <h1 className="mt-3 font-['Urbanist'] text-2xl font-extrabold uppercase tracking-tighter text-[#0F1B3D] sm:text-3xl">
-                New Pitch Deck Brief
-              </h1>
-              <p className="mt-2 text-[#1E3A5F]/80">
-                Configure the AI narrative engine for your next presentation.
-              </p>
-              <div className="mt-5 rounded-lg border border-dashed border-[#D1DBE5] bg-[#F8FAFC] px-4 py-3 text-xs">
-                <span className="text-[#1E3A5F]/70">Already have a deck? </span>
-                <Link to="/decks/import" className="font-semibold text-[#3B6FA0] hover:text-[#0F1B3D] hover:underline">
-                  Import an existing PowerPoint →
-                </Link>
+                aria-hidden
+                className="pointer-events-none absolute inset-0 transition-opacity duration-500"
+                style={{
+                  background: `radial-gradient(120% 140% at 0% 0%, ${brandPrimary}1f 0%, transparent 55%), radial-gradient(90% 120% at 100% 0%, ${brandAccent}26 0%, transparent 60%), linear-gradient(180deg, ${brandPrimary}0a 0%, transparent 100%)`,
+                }}
+              />
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
+                style={{ background: `linear-gradient(90deg, transparent, ${brandPrimary}55, transparent)` }}
+              />
+              <div className="relative">
+                <div
+                  className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.24em]"
+                  style={{ color: brandPrimary }}
+                >
+                  <span className="inline-block h-[2px] w-6 rounded-full" style={{ backgroundColor: brandPrimary }} />
+                  Briefing engine
+                </div>
+                <h1 className="mt-4 font-['Urbanist'] text-3xl font-extrabold uppercase leading-[0.95] tracking-tighter text-[#0F1B3D] sm:text-[44px]">
+                  New Pitch Deck Brief
+                </h1>
+                <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#1E3A5F]/80 sm:text-base">
+                  Configure the AI narrative engine for your next presentation.
+                </p>
+                <div
+                  className="mt-6 inline-flex items-center gap-2 rounded-full border bg-white/70 px-4 py-2 text-xs backdrop-blur transition-all hover:bg-white"
+                  style={{ borderColor: `${brandPrimary}33` }}
+                >
+                  <span className="text-[#1E3A5F]/70">Already have a deck?</span>
+                  <Link to="/decks/import" className="font-semibold text-[#3B6FA0] hover:text-[#0F1B3D] hover:underline">
+                    Import an existing PowerPoint →
+                  </Link>
+                </div>
               </div>
             </div>
+
 
             <form className="space-y-10 px-5 py-7 sm:p-10" onSubmit={(e) => e.preventDefault()}>
               {/* SECTION 01: Brand Mode — drives everything below */}
