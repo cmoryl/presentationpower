@@ -198,6 +198,16 @@ function DeckEditor() {
             />
           )}
 
+          {/* Slide imagery (photograph override for image-forward variants) */}
+          {active && variantSupportsImagery(active.variantId) && (
+            <SlideImageryPanel
+              key={`img-${active.id}`}
+              mediaUrl={(active.content as Record<string, unknown>).mediaUrl as string | undefined}
+              mediaSeed={(active.content as Record<string, unknown>).mediaSeed as string | undefined}
+              onChange={(next) => updateField(deck.id, active.id, "mediaUrl", next ?? undefined)}
+            />
+          )}
+
           {/* Background & Imagery */}
           {active && (
             <BackgroundImageryPanel
