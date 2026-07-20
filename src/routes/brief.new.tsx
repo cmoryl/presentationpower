@@ -776,6 +776,7 @@ function BriefWizard() {
                           setKbSynthesized(synthesized);
                           setKbFallbackNote(synth.fallbackNote ?? null);
                           setKbDivisionScoped(synth.divisionScoped);
+                          setKbSetup(!!synth.setup);
                           setShowKbPanel(true);
                         }
                       } catch { /* fall through to raw retrieval */ }
