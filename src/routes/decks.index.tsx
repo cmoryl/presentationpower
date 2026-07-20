@@ -345,6 +345,7 @@ function DeckTile({
                 <Share2 size={9} /> Shared
               </span>
             )}
+            {reviewStatus && reviewStatus !== "draft" && <ReviewStatusBadge status={reviewStatus} />}
           </div>
           <div className="mt-3 line-clamp-2 text-lg font-semibold">{d.title}</div>
           <div className="mt-1 text-sm text-black/60 dark:text-white/60">
