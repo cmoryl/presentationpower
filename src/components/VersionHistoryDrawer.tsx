@@ -1,4 +1,5 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
+import { useModalA11y } from "@/hooks/use-modal-a11y";
 import { useServerFn } from "@tanstack/react-start";
 import { History, X, RotateCcw, Eye, Loader2, Clock, User, Sparkles } from "lucide-react";
 import {
@@ -86,6 +87,8 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
 
   const [rows, setRows] = useState<VersionRow[] | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useModalA11y({ open: true, onClose, containerRef: dialogRef });
   const [selected, setSelected] = useState<VersionRecord | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -230,7 +233,7 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
   const previewClient = selected?.snapshot.brief?.prospect ?? brief?.prospect;
 
   return (
-    <div className="fixed inset-0 z-50 flex" role="dialog" aria-modal="true">
+    <div ref={dialogRef} className="fixed inset-0 z-50 flex outline-none" role="dialog" aria-modal="true" aria-labelledby="version-history-title" tabIndex={-1}>
       <button
         type="button"
         aria-label="Close history"
