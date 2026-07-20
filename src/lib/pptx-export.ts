@@ -777,6 +777,14 @@ function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette)
     case "MV-GRAPH-TASK-CARDS": renderGraphTaskCards(s, c, p); return true;
     case "MV-GRAPH-DECADE-AREA": renderGraphDecadeArea(s, c, p); return true;
     case "MV-GRAPH-PERCENT-COMPARE": renderGraphPercentCompare(s, c, p); return true;
+    case "MV-GRAPH-LINE-MULTI": renderGraphLineMulti(s, c, p); return true;
+    case "MV-GRAPH-STACKED-BAR": renderGraphStackedBar(s, c, p); return true;
+    case "MV-GRAPH-AREA-STACK": renderGraphAreaStack(s, c, p); return true;
+    case "MV-GRAPH-WATERFALL": renderGraphWaterfall(s, c, p); return true;
+    case "MV-GRAPH-BUBBLE": renderGraphBubble(s, c, p); return true;
+    case "MV-GRAPH-HEATMAP": renderGraphHeatmap(s, c, p); return true;
+    case "MV-GRAPH-TREEMAP": renderGraphTreemap(s, c, p); return true;
+    case "MV-GRAPH-COMBO": renderGraphCombo(s, c, p); return true;
     default: return false;
   }
 }
