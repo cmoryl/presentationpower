@@ -128,6 +128,28 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     };
   }, [open, cloudDeckId, shareToken, getAnalytics]);
 
+  // Fetch cached translations available for this deck.
+  useEffect(() => {
+    if (!open || !cloudDeckId) {
+      setCachedLocales(null);
+      return;
+    }
+    let cancelled = false;
+    Promise.all([
+      getCachedLocalesFn({ data: { deckId: cloudDeckId } }).catch(() => ({ locales: [] as CachedLocale[] })),
+      listLangsFn().catch(() => [] as Array<{ id: string; label: string }>),
+    ]).then(([r, langs]) => {
+      if (cancelled) return;
+      setCachedLocales(((r as { locales: CachedLocale[] }).locales ?? []).filter((l) => l.ready > 0));
+      const map: Record<string, string> = {};
+      for (const l of langs as Array<{ id: string; label: string }>) map[l.id] = l.label;
+      setLangLabels(map);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, cloudDeckId, getCachedLocalesFn, listLangsFn]);
+
   if (!deck) return null;
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
   const stamp = (kind: "pptx" | "pdf" | "present") =>
