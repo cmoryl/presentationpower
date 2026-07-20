@@ -7,7 +7,7 @@ import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LazyMount } from "@/components/LazyMount";
 import { WcagBadge } from "@/components/WcagBadge";
 import { TypeBadge } from "@/components/TypeBadge";
-import { OnScreenSizeBadge } from "@/components/OnScreenSizeBadge";
+
 
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
