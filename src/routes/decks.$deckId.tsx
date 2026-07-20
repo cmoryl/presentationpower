@@ -352,17 +352,28 @@ function DeckEditor() {
               <div className="mt-1 font-medium">{mv.name}</div>
               <div className="mt-2 text-sm text-black/60">{mv.description}</div>
               {active && (
-                <div className="mt-4">
-                  <div className="mb-2 text-xs uppercase tracking-widest text-black/50">Swap variant</div>
-                  <select
-                    className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
-                    value={mv.id}
-                    onChange={(e) => swapVariant(deck.id, active.id, e.target.value)}
-                  >
-                    {variantsForSection(active.sectionId).map((v) => (
-                      <option key={v.id} value={v.id}>{v.name}</option>
-                    ))}
-                  </select>
+                <div className="mt-4 space-y-2">
+                  <div className="text-xs uppercase tracking-widest text-black/50">Swap layout</div>
+                  <SwapLayoutButton
+                    slide={active}
+                    brand={brand}
+                    onSwap={(vid) => swapVariant(deck.id, active.id, vid)}
+                    clientLogoUrl={clientLogoUrl}
+                    clientName={brief?.prospect}
+                    subCompany={deck?.subCompany}
+                  />
+                  <details className="text-[11px] text-black/50">
+                    <summary className="cursor-pointer hover:text-black/70">Quick select…</summary>
+                    <select
+                      className="mt-1.5 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                      value={mv.id}
+                      onChange={(e) => swapVariant(deck.id, active.id, e.target.value)}
+                    >
+                      {variantsForSection(active.sectionId).map((v) => (
+                        <option key={v.id} value={v.id}>{v.name}</option>
+                      ))}
+                    </select>
+                  </details>
                 </div>
               )}
             </Panel>
