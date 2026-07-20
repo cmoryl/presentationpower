@@ -355,15 +355,18 @@ export const translateDeckInPlace = createServerFn({ method: "POST" })
 
     try {
       const translated = await translateAllSlides(
+        supabase,
         slides,
         data.targetLang,
         glossary,
         engine,
         data.humanReview,
+        trackingId,
       );
-      // Apply
+      const failed = translated.filter((t) => !t.ok);
+      // Apply only successful slides so a partial run still updates what worked.
       for (const t of translated) {
-        await supabase.from("deck_slides").update({ content: t.content }).eq("id", t.id);
+        if (t.ok) await supabase.from("deck_slides").update({ content: t.content }).eq("id", t.id);
       }
       // Tag deck with locale + rtl in context
       const { data: lang } = await supabase.from("languages").select("rtl").eq("id", data.targetLang).maybeSingle();
@@ -377,17 +380,26 @@ export const translateDeckInPlace = createServerFn({ method: "POST" })
       if (trackingId) {
         await supabase
           .from("deck_translations")
-          .update({ status: "ready", progress_current: slides.length })
+          .update({
+            status: failed.length === 0 ? "ready" : "failed",
+            progress_current: translated.length,
+            error: failed.length === 0 ? null : `${failed.length} slide(s) failed`,
+          })
           .eq("id", trackingId);
       }
-      return { ok: true, deckId: deck.id };
+      return { ok: true, deckId: deck.id, failed: failed.length };
     } catch (e) {
+      const isCancel = e instanceof TranslationCancelledError;
       if (trackingId) {
         await supabase
           .from("deck_translations")
-          .update({ status: "failed", error: (e as Error).message.slice(0, 500) })
+          .update({
+            status: isCancel ? "cancelled" : "failed",
+            error: isCancel ? null : (e as Error).message.slice(0, 500),
+          })
           .eq("id", trackingId);
       }
+      if (isCancel) return { ok: false, cancelled: true };
       throw e;
     }
   });
