@@ -159,8 +159,6 @@ const KEY_TO_SLUG: Record<string, string> = {
   "transperfect-finance": "finance",
   "transperfect-experience": "experience",
   "transperfect-learn": "learn",
-  "transperfect-ip": "tp",
-  "transperfect-health": "lifesci",
   "transperfect-cobrand": "tp",
   dataforce: "dataforce",
 
