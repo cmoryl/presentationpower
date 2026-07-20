@@ -7,8 +7,10 @@ import {
   ingestPdfBatch,
   listPdfExtractions,
   getPdfExtractionText,
+  embedPdfExtractions,
   type PdfExtractionRow,
 } from "@/lib/pdf-ingest.functions";
+
 
 export const Route = createFileRoute("/admin/pdf-ingest")({
   head: () => ({
