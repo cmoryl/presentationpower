@@ -326,6 +326,10 @@ function PendingCard({
               <span className="font-mono">{row.variant_id}</span>
               {family && <span>· {family.name}</span>}
               {brand && <span>· {brand.name}</span>}
+              {(() => {
+                const b = slaBadge(hoursSince(row.submitted_at));
+                return <span className={`rounded-full px-2 py-0.5 font-medium ${b.tone}`}>{b.label}</span>;
+              })()}
               {expired && (
                 <span className="rounded-full bg-red-100 px-2 py-0.5 font-medium text-red-900">expired</span>
               )}
