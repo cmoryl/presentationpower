@@ -39,6 +39,14 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   type Analytics = { totalViews: number; uniqueSessions: number; lastViewedAt: string | null; avgMaxSlide: number };
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
 
+  const getCachedLocalesFn = useServerFn(listCachedLocales);
+  const getSlideTxFn = useServerFn(getDeckSlideTranslations);
+  const listLangsFn = useServerFn(listLanguages);
+  type CachedLocale = { target_lang: string; ready: number; total: number; updated_at: string };
+  const [cachedLocales, setCachedLocales] = useState<CachedLocale[] | null>(null);
+  const [langLabels, setLangLabels] = useState<Record<string, string>>({});
+  const [translatedBusy, setTranslatedBusy] = useState<string | null>(null);
+
   const [shareToken, setShareToken] = useState<string | null>(null);
   const [shareExpiresAt, setShareExpiresAt] = useState<string | null>(null);
   const [shareExpired, setShareExpired] = useState(false);
