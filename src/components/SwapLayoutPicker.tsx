@@ -24,6 +24,8 @@ export function SwapLayoutButton({
   subCompany?: string | null;
 }) {
   const [open, setOpen] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useModalA11y({ open, onClose: () => setOpen(false), containerRef: dialogRef });
   const currentVariant = byId(MODULE_VARIANTS, slide.variantId);
   const currentFamilyId = currentVariant?.familyId;
 
@@ -51,16 +53,19 @@ export function SwapLayoutButton({
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6"
           onClick={() => setOpen(false)}
-          role="dialog"
-          aria-modal="true"
         >
           <div
-            className="max-h-[85vh] w-full max-w-6xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="swap-layout-title"
+            tabIndex={-1}
+            className="max-h-[85vh] w-full max-w-6xl overflow-hidden rounded-2xl bg-white shadow-2xl outline-none"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between gap-3 border-b border-black/10 px-6 py-4">
               <div>
-                <div className="text-xs uppercase tracking-widest text-black/50">
+                <div id="swap-layout-title" className="text-xs uppercase tracking-widest text-black/50">
                   Swap layout · {byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}
                 </div>
                 <div className="mt-1 text-sm text-black/70">

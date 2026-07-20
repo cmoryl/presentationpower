@@ -7,7 +7,8 @@
 // .pptx file. A "Download test .pptx" button emits a single-slide deck for
 // the user to open in PowerPoint to sanity-check the round-trip.
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useModalA11y } from "@/hooks/use-modal-a11y";
 import type { Deck, DeckSlide } from "@/lib/deck-store";
 import type { BrandMode } from "@/lib/taxonomy";
 import {
@@ -108,6 +109,9 @@ export function PptxPreviewModal({
     }
   }
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useModalA11y({ open, onClose, containerRef: dialogRef });
+
   if (!open) return null;
 
   return (
@@ -116,7 +120,12 @@ export function PptxPreviewModal({
       onClick={onClose}
     >
       <div
-        className="max-h-[92vh] w-full max-w-[1080px] overflow-y-auto rounded-2xl border border-white/15 bg-white text-black shadow-2xl"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pptx-preview-title"
+        tabIndex={-1}
+        className="max-h-[92vh] w-full max-w-[1080px] overflow-y-auto rounded-2xl border border-white/15 bg-white text-black shadow-2xl outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         <header className="flex items-start justify-between gap-6 border-b border-black/10 px-6 py-5">
@@ -124,7 +133,7 @@ export function PptxPreviewModal({
             <div className="text-[11px] uppercase tracking-widest text-black/50">
               Preview in PowerPoint
             </div>
-            <h2 className="mt-1 text-xl font-semibold">
+            <h2 id="pptx-preview-title" className="mt-1 text-xl font-semibold">
               Slide {String(slide.position + 1).padStart(2, "0")} — .pptx fidelity check
             </h2>
             <p className="mt-1 text-sm text-black/60">

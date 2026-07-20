@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { useModalA11y } from "@/hooks/use-modal-a11y";
 import { useServerFn } from "@tanstack/react-start";
 import { Palette, Loader2, X } from "lucide-react";
 import { useDeckStore } from "@/lib/deck-store";
@@ -55,6 +56,8 @@ function buildTargets(): BrandTarget[] {
 
 export function RebrandMenu({ deckId }: { deckId: string }) {
   const [open, setOpen] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useModalA11y({ open, onClose: () => setOpen(false), containerRef: dialogRef });
   const [busy, setBusy] = useState(false);
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
@@ -120,11 +123,18 @@ export function RebrandMenu({ deckId }: { deckId: string }) {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-          <div className="relative flex h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#03002C] text-white shadow-2xl">
+          <div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="rebrand-menu-title"
+            tabIndex={-1}
+            className="relative flex h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#03002C] text-white shadow-2xl outline-none"
+          >
             <div className="flex items-start justify-between border-b border-white/10 px-8 py-5">
               <div>
                 <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">Rebrand deck</div>
-                <h2 className="mt-1 text-2xl font-semibold">Re-tone this presentation for another division</h2>
+                <h2 id="rebrand-menu-title" className="mt-1 text-2xl font-semibold">Re-tone this presentation for another division</h2>
                 <p className="mt-1 max-w-2xl text-sm text-white/60">
                   Colors, backdrops, imagery treatment and the wordmark will re-render in the selected brand.
                   Slide text is not rewritten — review copy for division-specific references.
