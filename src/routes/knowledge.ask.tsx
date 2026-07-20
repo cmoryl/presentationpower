@@ -66,7 +66,7 @@ function OracleAskView() {
         setErr(res.error);
         setMessages([...optimistic, { role: "assistant", content: `Sorry — ${res.error}` }]);
       } else {
-        setMessages([...optimistic, { role: "assistant", content: res.reply, sources: res.sources, fallbackNote: res.fallbackNote }]);
+        setMessages([...optimistic, { role: "assistant", content: res.reply, sources: res.sources, fallbackNote: res.fallbackNote, setup: res.setup }]);
       }
     } catch (e) {
       setErr((e as Error).message);
