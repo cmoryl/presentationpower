@@ -10,6 +10,7 @@ import {
   uploadImportedDeck,
   getImportedDeckSlides,
   deleteImportedDeck,
+  embedImportedDecks,
 } from "@/lib/imported-decks.functions";
 
 
