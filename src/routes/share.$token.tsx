@@ -305,7 +305,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#03002C] text-white">
+    <div className="min-h-screen bg-[#03002C] text-white" dir={isRtl ? "rtl" : undefined}>
       {/* Minimal header */}
       <header className="sticky top-0 z-20 border-b border-white/10 bg-[#03002C]/85 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-6 py-4">
@@ -313,19 +313,71 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
             <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">TransPerfect · Shared</div>
             <div className="mt-0.5 truncate text-base font-semibold">{deck.title}</div>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              setPresenting(true);
-              setI(0);
-              requestFullscreen();
-            }}
-            className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-medium text-[#03002C] hover:bg-white/90"
-          >
-            <Play size={14} /> Present
-          </button>
+          <div className="flex items-center gap-2">
+            {(locales.length > 0 || currentLang !== "en") && (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setLangOpen((v) => !v)}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.06] px-4 py-2 text-xs font-medium text-white/90 hover:border-white/40"
+                >
+                  <Languages size={12} className="text-[#A1FBF9]" />
+                  {currentLang === "en" ? "Source (EN)" : langById.get(currentLang)?.label ?? currentLang.toUpperCase()}
+                </button>
+                {langOpen && (
+                  <div className="absolute right-0 z-30 mt-2 w-64 overflow-hidden rounded-xl border border-white/10 bg-[#0B0B18] shadow-xl">
+                    <button
+                      type="button"
+                      onClick={() => selectLocale("en")}
+                      className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-white/5 ${
+                        currentLang === "en" ? "bg-[#A1FBF9]/10" : ""
+                      }`}
+                    >
+                      <span>Source (EN)</span>
+                      {currentLang === "en" && <Check size={14} className="text-[#A1FBF9]" />}
+                    </button>
+                    {locales.map((c) => {
+                      const l = langById.get(c.target_lang);
+                      return (
+                        <button
+                          key={c.target_lang}
+                          type="button"
+                          onClick={() => selectLocale(c.target_lang)}
+                          className={`flex w-full items-center justify-between border-t border-white/5 px-3 py-2 text-left text-sm hover:bg-white/5 ${
+                            currentLang === c.target_lang ? "bg-[#A1FBF9]/10" : ""
+                          }`}
+                        >
+                          <span className="truncate">
+                            <span>{l?.label ?? c.target_lang}</span>{" "}
+                            <span className="text-[10px] text-white/40">{l?.native}</span>
+                          </span>
+                          {langBusy === c.target_lang ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : currentLang === c.target_lang ? (
+                            <Check size={14} className="text-[#A1FBF9]" />
+                          ) : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                setPresenting(true);
+                setI(0);
+                requestFullscreen();
+              }}
+              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-medium text-[#03002C] hover:bg-white/90"
+            >
+              <Play size={14} /> Present
+            </button>
+          </div>
         </div>
       </header>
+
 
       <main className="mx-auto flex max-w-[1280px] flex-col items-center gap-6 px-6 py-10">
         {slides.map((slide, idx) => {
