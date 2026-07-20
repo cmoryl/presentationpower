@@ -179,14 +179,15 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     }
 
     return {
-      filename: data.filename,
+      filename,
       slideCount: slides.length,
       slides,
       theme,
       imagePayloadBytes: totalImageBytes,
       imagesTruncated,
     };
-  });
+}
+
 
 function slideNumber(path: string): number {
   const m = path.match(/(\d+)\.xml$/);
