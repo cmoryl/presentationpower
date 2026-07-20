@@ -18,6 +18,8 @@ import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BackgroundImageryPanel } from "@/components/slide/BackgroundImageryPanel";
 import { PptxPreviewModal } from "@/components/slide/PptxPreviewModal";
+import { SlideImageryPanel } from "@/components/slide/SlideImageryPanel";
+import { variantSupportsImagery } from "@/lib/variant-media";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
 
 import {
@@ -193,6 +195,16 @@ function DeckEditor() {
               key={active.id}
               value={active.notes ?? ""}
               onChange={(v) => updateSlideNotes(deck.id, active.id, v)}
+            />
+          )}
+
+          {/* Slide imagery (photograph override for image-forward variants) */}
+          {active && variantSupportsImagery(active.variantId) && (
+            <SlideImageryPanel
+              key={`img-${active.id}`}
+              mediaUrl={(active.content as Record<string, unknown>).mediaUrl as string | undefined}
+              mediaSeed={(active.content as Record<string, unknown>).mediaSeed as string | undefined}
+              onChange={(next) => updateField(deck.id, active.id, "mediaUrl", next ?? undefined)}
             />
           )}
 
