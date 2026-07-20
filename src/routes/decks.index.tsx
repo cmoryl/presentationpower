@@ -8,6 +8,7 @@ import { useDeckStore, type Deck } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 import { getLibraryAnalytics, type DeckAnalyticsSummary } from "@/lib/deck-analytics.functions";
 import { deleteCloudDeck, listMyCloudDecks } from "@/lib/cloud-decks.functions";
 import { ReviewStatusBadge, type ReviewStatus } from "@/components/ReviewStatusControl";

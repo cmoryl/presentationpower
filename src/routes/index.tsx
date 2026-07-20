@@ -14,6 +14,7 @@ import {
   BRAND_MODES, MODULE_FAMILIES, MODULE_VARIANTS,
   SECTION_FRAMEWORKS, LAYOUT_FRAMEWORKS, byId,
 } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 import { BRAND_GUIDES } from "@/lib/brand-guides";
 import { hasAiKey } from "@/lib/ai-status.functions";
 import { listMyCloudDecks, deleteCloudDeck } from "@/lib/cloud-decks.functions";

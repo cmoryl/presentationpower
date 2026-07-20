@@ -4,6 +4,7 @@ import { useDeckStore } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 import { exportDeckToPptx } from "@/lib/pptx-export";
 import { runQa, blockingIssues, warningIssues } from "@/lib/qa";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";

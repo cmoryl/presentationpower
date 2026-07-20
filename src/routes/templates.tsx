@@ -6,6 +6,7 @@ import { Bookmark, Download, Loader2, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { listTeamTemplates, getTemplateDeck } from "@/lib/cloud-decks.functions";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
 import { COMMUNITY_EVENT_TEMPLATE } from "@/lib/imported-templates/community-event";
 

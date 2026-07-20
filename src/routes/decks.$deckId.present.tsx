@@ -5,6 +5,7 @@ import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { cn } from "@/lib/utils";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 
 const focusThumb = (el: HTMLButtonElement | null) => {
   el?.focus({ preventScroll: true });

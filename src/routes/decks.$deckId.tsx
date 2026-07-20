@@ -41,6 +41,7 @@ import {
   variantsForSection,
   relatedVariants,
 } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 
 
 

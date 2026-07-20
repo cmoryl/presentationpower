@@ -13,6 +13,7 @@ import { useDeckStore, type Brief, type Deck, type DeckSlide } from "@/lib/deck-
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 import { useSignedIn } from "@/components/CloudDeckControls";
 
 type VersionRow = {

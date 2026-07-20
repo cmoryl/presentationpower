@@ -7,6 +7,7 @@ import { exportDeckToPptx } from "@/lib/pptx-export";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 import { supabase } from "@/integrations/supabase/client";
 import { deckCloudId } from "@/lib/deck-uuid";
 import { saveDeckToCloud } from "@/lib/cloud-decks.functions";

@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Palette, Loader2, X } from "lucide-react";
 import { useDeckStore } from "@/lib/deck-store";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 import { BRAND_GUIDES } from "@/lib/brand-guides";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
