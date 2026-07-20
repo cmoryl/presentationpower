@@ -39,7 +39,7 @@ import { Route as AdminPdfIngestRouteImport } from './routes/admin.pdf-ingest'
 import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
 import { Route as AdminLogohubRouteImport } from './routes/admin.logohub'
 import { Route as AdminKnowledgeRouteImport } from './routes/admin.knowledge'
-import { Route as AdminImageryRouteImport } from './routes/admin.imagery'
+import { Route as AdminImageryAnalyticsRouteImport } from './routes/admin.imagery-analytics'
 import { Route as AdminIconStudioRouteImport } from './routes/admin.icon-studio'
 import { Route as AdminBrandAssetsRouteImport } from './routes/admin.brand-assets'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
@@ -205,9 +205,9 @@ const AdminKnowledgeRoute = AdminKnowledgeRouteImport.update({
   path: '/knowledge',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminImageryRoute = AdminImageryRouteImport.update({
-  id: '/imagery',
-  path: '/imagery',
+const AdminImageryAnalyticsRoute = AdminImageryAnalyticsRouteImport.update({
+  id: '/imagery-analytics',
+  path: '/imagery-analytics',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminIconStudioRoute = AdminIconStudioRouteImport.update({
@@ -304,7 +304,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
-  '/admin/imagery': typeof AdminImageryRoute
+  '/admin/imagery-analytics': typeof AdminImageryAnalyticsRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
@@ -349,7 +349,7 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
-  '/admin/imagery': typeof AdminImageryRoute
+  '/admin/imagery-analytics': typeof AdminImageryAnalyticsRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
@@ -397,7 +397,7 @@ export interface FileRoutesById {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
-  '/admin/imagery': typeof AdminImageryRoute
+  '/admin/imagery-analytics': typeof AdminImageryAnalyticsRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
@@ -446,7 +446,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/brand-assets'
     | '/admin/icon-studio'
-    | '/admin/imagery'
+    | '/admin/imagery-analytics'
     | '/admin/knowledge'
     | '/admin/logohub'
     | '/admin/oracle'
@@ -491,7 +491,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/brand-assets'
     | '/admin/icon-studio'
-    | '/admin/imagery'
+    | '/admin/imagery-analytics'
     | '/admin/knowledge'
     | '/admin/logohub'
     | '/admin/oracle'
@@ -538,7 +538,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/brand-assets'
     | '/admin/icon-studio'
-    | '/admin/imagery'
+    | '/admin/imagery-analytics'
     | '/admin/knowledge'
     | '/admin/logohub'
     | '/admin/oracle'
@@ -802,11 +802,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminKnowledgeRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/imagery': {
-      id: '/admin/imagery'
-      path: '/imagery'
-      fullPath: '/admin/imagery'
-      preLoaderRoute: typeof AdminImageryRouteImport
+    '/admin/imagery-analytics': {
+      id: '/admin/imagery-analytics'
+      path: '/imagery-analytics'
+      fullPath: '/admin/imagery-analytics'
+      preLoaderRoute: typeof AdminImageryAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/icon-studio': {
@@ -917,7 +917,7 @@ interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBrandAssetsRoute: typeof AdminBrandAssetsRoute
   AdminIconStudioRoute: typeof AdminIconStudioRoute
-  AdminImageryRoute: typeof AdminImageryRoute
+  AdminImageryAnalyticsRoute: typeof AdminImageryAnalyticsRoute
   AdminKnowledgeRoute: typeof AdminKnowledgeRoute
   AdminLogohubRoute: typeof AdminLogohubRoute
   AdminOracleRoute: typeof AdminOracleRoute
@@ -933,7 +933,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
   AdminBrandAssetsRoute: AdminBrandAssetsRoute,
   AdminIconStudioRoute: AdminIconStudioRoute,
-  AdminImageryRoute: AdminImageryRoute,
+  AdminImageryAnalyticsRoute: AdminImageryAnalyticsRoute,
   AdminKnowledgeRoute: AdminKnowledgeRoute,
   AdminLogohubRoute: AdminLogohubRoute,
   AdminOracleRoute: AdminOracleRoute,

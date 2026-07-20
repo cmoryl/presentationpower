@@ -421,7 +421,7 @@ function OverviewView() {
             {[
               { href: "/admin/users", label: "Users & Roles", color: BRAND.blue },
               { href: "/admin/ai", label: "AI Analytics", color: BRAND.lavender },
-              { href: "/admin/imagery", label: "Imagery", color: BRAND.pink },
+              { href: "/admin/imagery-analytics", label: "Imagery", color: BRAND.pink },
               { href: "/admin/oracle", label: "Oracle KB", color: BRAND.aqua },
               { href: "/admin/brand-assets", label: "Brand Assets", color: BRAND.yellow },
               { href: "/admin/logohub", label: "LogoHub", color: BRAND.green },
