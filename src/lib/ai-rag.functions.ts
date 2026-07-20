@@ -491,9 +491,18 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
       // If the model hallucinated everything, fall back to top raw candidates.
       const selected = cleaned.length ? cleaned : candidates.slice(0, data.limit);
 
+      // If Claude hallucinated every id and we fell back to raw candidates,
+      // surface a synthesis-quality note so the UI can flag it the same way
+      // the division-fallback does.
+      const hallucinationNote = cleaned.length === 0
+        ? "AI couldn't reliably synthesize the retrieved chunks — showing top raw matches instead. Treat them as leads, not verified facts."
+        : undefined;
+
       return {
         ok: true,
         synthesized: cleaned.length > 0,
+        divisionScoped,
+        fallbackNote: fallbackNote ?? hallucinationNote,
         synthesis: value.synthesis,
         discardedNote: value.discardedNote,
         selected,
