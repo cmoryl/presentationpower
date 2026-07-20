@@ -77,6 +77,7 @@ function BriefWizard() {
   const [kbSynthesis, setKbSynthesis] = useState<string | null>(null);
   const [kbSynthesized, setKbSynthesized] = useState(false);
   const [showKbPanel, setShowKbPanel] = useState(false);
+  const [customizeOpen, setCustomizeOpen] = useState(false);
 
   // AI Narrative Strategist (Phase B) — optional pass before deck generation.
   const [strategy, setStrategy] = useState<DeckStrategy | null>(null);
