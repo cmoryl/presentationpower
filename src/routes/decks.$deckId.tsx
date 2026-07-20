@@ -88,6 +88,28 @@ function DeckEditor() {
     return t ? { ...slide, content: t } : slide;
   };
 
+  // Per-slide translation status badges — indexed by slide index (deck order).
+  const listSlideStatus = useServerFn(listSlideTranslationStatus);
+  const slideStatusQuery = useQuery({
+    queryKey: ["slide-translation-status", cloudDeckId],
+    queryFn: () => (cloudDeckId ? listSlideStatus({ data: { deckId: cloudDeckId } }) : Promise.resolve([])),
+    enabled: !!cloudDeckId,
+    staleTime: 20_000,
+    refetchInterval: 30_000,
+  });
+  const slideLangMap = useMemo(() => {
+    const m = new Map<number, { ready: string[]; pending: string[] }>();
+    for (const r of slideStatusQuery.data ?? []) {
+      const entry = m.get(r.position) ?? { ready: [], pending: [] };
+      if (r.status === "ready") entry.ready.push(r.target_lang);
+      else entry.pending.push(r.target_lang);
+      m.set(r.position, entry);
+    }
+    return m;
+  }, [slideStatusQuery.data]);
+
+
+
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
   const clamped = Math.min(activeIdx, deck.slides.length - 1);
