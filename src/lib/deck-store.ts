@@ -1840,15 +1840,10 @@ export const useDeckStore = create<DeckState>()(
         const deck = get().decks[deckId];
         if (!deck) return;
         const nextSub = subCompany ?? undefined;
-        const nextContext: DeckContext = {
-          ...(deck.context ?? {}),
-          subCompany: nextSub,
-        };
         const nextDeck: Deck = {
           ...deck,
           brandModeId: brandModeId as BrandModeId,
           subCompany: nextSub,
-          context: nextContext,
         };
         set((s) => {
           const brief = s.briefs[deck.briefId];
