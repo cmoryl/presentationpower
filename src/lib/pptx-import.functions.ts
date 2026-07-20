@@ -55,6 +55,7 @@ const MAX_TOTAL_IMAGE_BYTES = 10_000_000; // ~10MB across the whole deck
 const MAX_IMAGES_PER_SLIDE = 6;
 
 export const importPowerpoint = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((v) => InputSchema.parse(v))
   .handler(async ({ data }): Promise<ParsedDeck> => {
     const buf = Buffer.from(data.data, "base64");
