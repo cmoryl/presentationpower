@@ -405,55 +405,7 @@ const DIVISION_SEEDS: DivisionSeed[] = [
       "Balanced lockups, side-by-side layouts, restrained backgrounds. Do not let TransPerfect accents overpower the client brand.",
   },
 
-  // ── TransPerfect IP ──────────────────────────────────────────────
-  {
-    slug: "transperfect-ip",
-    divisionId: "bm-subcompany",
-    category: "division",
-    title: "TransPerfect IP",
-    subtitle: "Intellectual Property Division · Brand Guidelines",
-    tagline: "Protecting invention across every jurisdiction.",
-    intro:
-      "TransPerfect IP delivers patent translation, filing support and IP portfolio services for the world's largest patent holders. The tone is precise and procedural; the visual system leans on Blue 800 depth with restrained Aqua accents — nothing that reads as marketing flourish over evidence.",
-    accent: { name: "Aqua", hex: "#A1FBF9", role: "primary accent", pantone: "PMS 317 C" },
-    pops: [
-      { name: "Yellow", hex: "#FFEB66", role: "reference pop", pantone: "PMS 121 C" },
-      { name: "Green", hex: "#A6FA87", role: "approval pop", pantone: "PMS 358 C" },
-    ],
-    subBrandGroup: {
-      group: "IP Services",
-      items: ["Patent Translation", "Foreign Filing", "IP Portfolio Management", "Prior Art Search", "Litigation Support"],
-    },
-    photography:
-      "Documents, technical drawings, courtroom-adjacent scenes; hands on paper as often as hands on screens. Keep imagery cool-toned and evidentiary — never dramatized.",
-    brandVisuals:
-      "Structured layouts: filing timelines, jurisdiction maps, comparison matrices. Accent colors reserved for reference marks and approval states — not backgrounds.",
-  },
 
-  // ── TransPerfect Health ──────────────────────────────────────────
-  {
-    slug: "transperfect-health",
-    divisionId: "bm-subcompany",
-    category: "division",
-    title: "TransPerfect Health",
-    subtitle: "Healthcare Division · Brand Guidelines",
-    tagline: "Access, translated. Outcomes, improved.",
-    intro:
-      "TransPerfect Health serves payers, providers and public-health organizations with member communication, interpretation, and health-equity content programs. The tone is empathetic and plain-language; the visual system favors soft Green/Aqua washes with legible typography over dense infographics.",
-    accent: { name: "Green", hex: "#A6FA87", role: "primary accent", pantone: "PMS 358 C" },
-    pops: [
-      { name: "Aqua", hex: "#A1FBF9", role: "clarity pop", pantone: "PMS 317 C" },
-      { name: "Peach", hex: "#FF9B70", role: "warmth pop", pantone: "PMS 163 C" },
-    ],
-    subBrandGroup: {
-      group: "Health Services",
-      items: ["Member Communications", "Interpretation", "Health Equity", "Clinical Trials Access", "Regulated Content"],
-    },
-    photography:
-      "Patient-facing scenes, community health settings, member service moments. Prefer human warmth and real environments over stock 'healthcare' imagery.",
-    brandVisuals:
-      "Soft gradients, generous white space, oversized readable type. Green appears as a signal of access and inclusion — never as decoration.",
-  },
 
   // ── Trial Interactive (portfolio product) ────────────────────────
   {
