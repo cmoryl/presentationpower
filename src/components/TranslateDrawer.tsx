@@ -234,7 +234,7 @@ export function TranslateDrawer({
             {([
               { id: "new", label: "New job", icon: <Languages size={12} /> },
               { id: "history", label: `History${jobs.length ? ` (${jobs.length})` : ""}`, icon: <History size={12} /> },
-            ] as Array<{ id: Tab; label: string; icon: JSX.Element }>).map((t) => (
+            ] as Array<{ id: Tab; label: string; icon: React.ReactNode }>).map((t) => (
               <button
                 key={t.id}
                 type="button"
