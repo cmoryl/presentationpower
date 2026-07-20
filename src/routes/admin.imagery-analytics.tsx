@@ -5,7 +5,7 @@ import { useState } from "react";
 import { getImageryAnalytics } from "@/lib/admin.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 
-export const Route = createFileRoute("/admin/imagery")({
+export const Route = createFileRoute("/admin/imagery-analytics")({
   component: ImageryView,
 });
 

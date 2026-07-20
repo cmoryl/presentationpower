@@ -24,7 +24,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   ] as const;
   const adminSubnav = [
     { to: "/admin", label: "Overview" },
-    { to: "/admin/imagery", label: "Imagery" },
+    { to: "/admin/imagery-analytics", label: "Imagery" },
     { to: "/admin/users", label: "Users" },
     { to: "/admin/approvals", label: "Knowledgebase" },
     { to: "/admin/oracle", label: "Oracle KB" },

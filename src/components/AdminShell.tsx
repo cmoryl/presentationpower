@@ -153,7 +153,7 @@ const items: Array<{ to: string; label: string; exact?: boolean }> = [
   { to: "/admin", label: "Overview", exact: true },
   { to: "/admin/users", label: "Users & roles" },
   { to: "/admin/ai", label: "AI analytics" },
-  { to: "/admin/imagery", label: "Imagery analytics" },
+  { to: "/admin/imagery-analytics", label: "Imagery analytics" },
   { to: "/admin/ab", label: "A/B color testing" },
   { to: "/admin/approvals", label: "Knowledgebase" },
   { to: "/admin/knowledge", label: "Knowledge browser" },
