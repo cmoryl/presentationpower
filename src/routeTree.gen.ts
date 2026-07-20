@@ -35,6 +35,7 @@ import { Route as DecksDeckIdRouteImport } from './routes/decks.$deckId'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminPdfIngestRouteImport } from './routes/admin.pdf-ingest'
 import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
 import { Route as AdminLogohubRouteImport } from './routes/admin.logohub'
 import { Route as AdminKnowledgeRouteImport } from './routes/admin.knowledge'
@@ -51,6 +52,7 @@ import { Route as DecksDeckIdPrintRouteImport } from './routes/decks.$deckId.pri
 import { Route as DecksDeckIdPresentRouteImport } from './routes/decks.$deckId.present'
 import { Route as DecksDeckIdExportRouteImport } from './routes/decks.$deckId.export'
 import { Route as DecksDeckIdDocumentRouteImport } from './routes/decks.$deckId.document'
+import { Route as ApiPublicPdfIndexProxyRouteImport } from './routes/api/public/pdf-index-proxy'
 import { Route as ApiPublicBrandhubSeedProxyRouteImport } from './routes/api/public/brandhub-seed-proxy'
 
 const TemplatesRoute = TemplatesRouteImport.update({
@@ -183,6 +185,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPdfIngestRoute = AdminPdfIngestRouteImport.update({
+  id: '/pdf-ingest',
+  path: '/pdf-ingest',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminOracleRoute = AdminOracleRouteImport.update({
   id: '/oracle',
   path: '/oracle',
@@ -265,6 +272,11 @@ const DecksDeckIdDocumentRoute = DecksDeckIdDocumentRouteImport.update({
   path: '/document',
   getParentRoute: () => DecksDeckIdRoute,
 } as any)
+const ApiPublicPdfIndexProxyRoute = ApiPublicPdfIndexProxyRouteImport.update({
+  id: '/api/public/pdf-index-proxy',
+  path: '/api/public/pdf-index-proxy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicBrandhubSeedProxyRoute =
   ApiPublicBrandhubSeedProxyRouteImport.update({
     id: '/api/public/brandhub-seed-proxy',
@@ -296,6 +308,7 @@ export interface FileRoutesByFullPath {
   '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
+  '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
@@ -310,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/decks/': typeof DecksIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
+  '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
@@ -339,6 +353,7 @@ export interface FileRoutesByTo {
   '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
+  '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
@@ -353,6 +368,7 @@ export interface FileRoutesByTo {
   '/decks': typeof DecksIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
+  '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
@@ -385,6 +401,7 @@ export interface FileRoutesById {
   '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
+  '/admin/pdf-ingest': typeof AdminPdfIngestRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
@@ -399,6 +416,7 @@ export interface FileRoutesById {
   '/decks/': typeof DecksIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
+  '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
@@ -432,6 +450,7 @@ export interface FileRouteTypes {
     | '/admin/knowledge'
     | '/admin/logohub'
     | '/admin/oracle'
+    | '/admin/pdf-ingest'
     | '/admin/users'
     | '/api/chat'
     | '/brief/new'
@@ -446,6 +465,7 @@ export interface FileRouteTypes {
     | '/decks/'
     | '/knowledge/'
     | '/api/public/brandhub-seed-proxy'
+    | '/api/public/pdf-index-proxy'
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
@@ -475,6 +495,7 @@ export interface FileRouteTypes {
     | '/admin/knowledge'
     | '/admin/logohub'
     | '/admin/oracle'
+    | '/admin/pdf-ingest'
     | '/admin/users'
     | '/api/chat'
     | '/brief/new'
@@ -489,6 +510,7 @@ export interface FileRouteTypes {
     | '/decks'
     | '/knowledge'
     | '/api/public/brandhub-seed-proxy'
+    | '/api/public/pdf-index-proxy'
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
@@ -520,6 +542,7 @@ export interface FileRouteTypes {
     | '/admin/knowledge'
     | '/admin/logohub'
     | '/admin/oracle'
+    | '/admin/pdf-ingest'
     | '/admin/users'
     | '/api/chat'
     | '/brief/new'
@@ -534,6 +557,7 @@ export interface FileRouteTypes {
     | '/decks/'
     | '/knowledge/'
     | '/api/public/brandhub-seed-proxy'
+    | '/api/public/pdf-index-proxy'
     | '/decks/$deckId/document'
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
@@ -563,6 +587,7 @@ export interface RootRouteChildren {
   ShareTokenRoute: typeof ShareTokenRoute
   DecksIndexRoute: typeof DecksIndexRoute
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
+  ApiPublicPdfIndexProxyRoute: typeof ApiPublicPdfIndexProxyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -749,6 +774,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/pdf-ingest': {
+      id: '/admin/pdf-ingest'
+      path: '/pdf-ingest'
+      fullPath: '/admin/pdf-ingest'
+      preLoaderRoute: typeof AdminPdfIngestRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/oracle': {
       id: '/admin/oracle'
       path: '/oracle'
@@ -861,6 +893,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DecksDeckIdDocumentRouteImport
       parentRoute: typeof DecksDeckIdRoute
     }
+    '/api/public/pdf-index-proxy': {
+      id: '/api/public/pdf-index-proxy'
+      path: '/api/public/pdf-index-proxy'
+      fullPath: '/api/public/pdf-index-proxy'
+      preLoaderRoute: typeof ApiPublicPdfIndexProxyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/brandhub-seed-proxy': {
       id: '/api/public/brandhub-seed-proxy'
       path: '/api/public/brandhub-seed-proxy'
@@ -882,6 +921,7 @@ interface AdminRouteChildren {
   AdminKnowledgeRoute: typeof AdminKnowledgeRoute
   AdminLogohubRoute: typeof AdminLogohubRoute
   AdminOracleRoute: typeof AdminOracleRoute
+  AdminPdfIngestRoute: typeof AdminPdfIngestRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -897,6 +937,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminKnowledgeRoute: AdminKnowledgeRoute,
   AdminLogohubRoute: AdminLogohubRoute,
   AdminOracleRoute: AdminOracleRoute,
+  AdminPdfIngestRoute: AdminPdfIngestRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
@@ -966,6 +1007,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShareTokenRoute: ShareTokenRoute,
   DecksIndexRoute: DecksIndexRoute,
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
+  ApiPublicPdfIndexProxyRoute: ApiPublicPdfIndexProxyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
