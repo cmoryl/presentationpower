@@ -77,15 +77,15 @@ type ClassicPresence = {
 };
 
 const CLASSIC_MANIFEST: Record<string, ClassicPresence> = {
-  tp: { color: "svg", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
-  // Sub-brand classic files: uncomment / add once dropped into /public/brand-logos/.
-  // globallink: { color: "png", white: "png", stackedColor: "png" },
-  // legal:      { color: "png", white: "png", stackedColor: "png" },
-  // lifesci:    { color: "png", white: "png", stackedColor: "png" },
-  // media:      { color: "png", white: "png", stackedColor: "png" },
-  // games:      { color: "png", white: "png", stackedColor: "png" },
-  // digital:    { color: "png", stackedColor: "png" },
-  // dataforce:  { color: "png", white: "png", stackedColor: "png" },
+  // Official TransPerfect BrandHUB classic marks (sourced from BrandHub seed).
+  // These override the NEXT (2026) rebrand set field-by-field via resolvedSetFor().
+  tp:      { color: "svg", white: "svg", stackedColor: "svg" },
+  games:   { color: "svg", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
+  legal:   { color: "png", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
+  lifesci: { color: "svg", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
+  media:   { color: "svg", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
+  // digital / dataforce / globallink: no classic BrandHub logos in seed yet;
+  // continue using the existing NEXT set on disk until BrandHub publishes them.
 };
 
 function classicSetFor(slug: string): DivisionLogoSet | undefined {
