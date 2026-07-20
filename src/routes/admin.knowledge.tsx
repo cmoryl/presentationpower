@@ -1,7 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { BRAND_GUIDES, type BrandGuide, type ColorSwatch, type TypeStyle, type LogoRule } from "@/lib/brand-guides";
 import { getBrandhubIntel, targetAudienceText, normalizeVoiceValue } from "@/lib/brandhub-intel";
+import { listPdfExtractionsForDivision, getPdfExtractionText } from "@/lib/pdf-ingest.functions";
+
 
 export const Route = createFileRoute("/admin/knowledge")({
   head: () => ({
