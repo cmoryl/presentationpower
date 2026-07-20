@@ -866,16 +866,20 @@ function BriefWizard() {
                           },
                         });
 
+                        let personalizeFailed = false;
                         if (result.error) {
                           setAiError(result.error);
                           setAiStatus("error");
+                          personalizeFailed = true;
                         } else {
                           applyAi(deckId, result.slides as Array<{ id: string; content: Record<string, unknown> }>);
                         }
                       } catch (e) {
                         setAiError((e as Error).message);
                         setAiStatus("error");
+                        return; // stay on brief so user sees the error banner
                       }
+                      if (personalizeFailedRef.current) return; // set below on non-throw error
                       navigate({ to: "/decks/$deckId", params: { deckId }, hash: "brand-review" });
                     }}
                   >
