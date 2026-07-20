@@ -119,11 +119,16 @@ export async function exportDeckToPptx(
   ]);
 
   // Prefetch all slide imagery in parallel so the export runs quickly.
+  // Custom `content.mediaUrl` failures are logged with the slide index so a
+  // client-photo-drop is visible in the console, not silent.
   const slideImages: Array<string | null> = await Promise.all(
-    deck.slides.map((slide) => {
+    deck.slides.map((slide, idx) => {
       const c = slide.content as Record<string, unknown>;
       const url = resolveSlideImageUrl(slide.variantId, deck.brandModeId, c);
-      return url ? fetchAsDataUrl(url) : Promise.resolve(null);
+      if (!url) return Promise.resolve(null);
+      const isCustom =
+        typeof c.mediaUrl === "string" && c.mediaUrl.length > 0 && c.mediaUrl === url;
+      return fetchAsDataUrl(url, isCustom ? `slide ${idx + 1} custom image` : `slide ${idx + 1} imagery`);
     }),
   );
 
