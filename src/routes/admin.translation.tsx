@@ -86,17 +86,18 @@ function TranslationAdminPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-6 pb-16">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
+    <div className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
+      <header className="mb-8 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
+        <div className="min-w-0">
           <div className="text-[10px] uppercase tracking-[0.35em] text-black/50">Admin · Localization</div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#03002C]">Translation</h1>
+          <h1 className="mt-2 truncate text-2xl font-semibold tracking-tight text-[#03002C] sm:text-3xl">Translation</h1>
           <p className="mt-2 max-w-2xl text-sm text-black/65">
             Configure GlobalLink, review the protected term glossary, and toggle target languages available to authors.
           </p>
         </div>
-        <Languages size={28} className="text-[#003FC7]" />
-      </div>
+        <Languages size={28} className="shrink-0 text-[#003FC7]" />
+      </header>
+
 
       {/* Engine status */}
       <section className="mb-8 rounded-2xl border border-black/10 bg-white p-6">
