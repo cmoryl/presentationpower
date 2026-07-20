@@ -58,6 +58,55 @@ const GUIDES: Array<{ title: string; blurb: string; steps: string[] }> = [
     ],
   },
   {
+    title: "Share a deck view-only",
+    blurb: "Send a colleague a live link without giving them edit access.",
+    steps: [
+      "Open the deck and click Share in the top-right.",
+      "Generate a link — optionally set an expiry.",
+      "Copy the /share/$token URL and send it.",
+      "Track views over time in /analytics; revoke or regenerate the token at any point.",
+    ],
+  },
+  {
+    title: "Translate a deck",
+    blurb: "Produce a localized version of a deck without touching the source.",
+    steps: [
+      "Open the deck and click Translate to open the drawer.",
+      "Pick target languages; jobs run via the AI/GlobalLink engine.",
+      "Use the language switcher in the toolbar to preview overlays live.",
+      "Retry any failed slide from the job history, then export a localized PPTX or PDF.",
+    ],
+  },
+  {
+    title: "Rebrand an existing deck",
+    blurb: "Retone every slide to a different brand mode.",
+    steps: [
+      "Open the deck and choose Rebrand in the editor toolbar.",
+      "Pick the target brand mode and preview it live across all slides.",
+      "Commit — an auto-snapshot is written to version history for rollback.",
+    ],
+  },
+  {
+    title: "Review, comment, and approve",
+    blurb: "Move a deck through the review workflow with your team.",
+    steps: [
+      "Open the deck and open the Comments panel on any slide.",
+      "Leave threaded comments — reviewers get RLS-scoped access.",
+      "Use ReviewStatusControl to move Draft → In review → Approved.",
+      "Use Version history to compare and restore any snapshot non-destructively.",
+    ],
+  },
+  {
+    title: "Configure GlobalLink (admin)",
+    blurb: "Wire up the translation connector for the workspace.",
+    steps: [
+      "Go to Admin → GlobalLink.",
+      "Set the API base URL, project code, and callback secret; add the API key as a secret.",
+      "Save the settings — the status badge flips to Connected once the required secrets are present.",
+      "Click Test connection to probe the API and confirm the credentials.",
+    ],
+  },
+  {
     title: "Sync Oracle KB into Knowledge (admin)",
     blurb: "Promote a vetted Oracle entry into the live Knowledge system.",
     steps: [
@@ -68,6 +117,7 @@ const GUIDES: Array<{ title: string; blurb: string; steps: string[] }> = [
     ],
   },
 ];
+
 
 const FAQS: Array<{ section: string; items: QA[] }> = [
   {
