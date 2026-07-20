@@ -5,6 +5,7 @@
 // slide had a picture, and preserving theme colors as a deck-level override).
 
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import JSZip from "jszip";
 import { XMLParser } from "fast-xml-parser";
@@ -54,6 +55,7 @@ const MAX_TOTAL_IMAGE_BYTES = 10_000_000; // ~10MB across the whole deck
 const MAX_IMAGES_PER_SLIDE = 6;
 
 export const importPowerpoint = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((v) => InputSchema.parse(v))
   .handler(async ({ data }): Promise<ParsedDeck> => {
     const buf = Buffer.from(data.data, "base64");

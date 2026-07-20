@@ -78,6 +78,7 @@ function BriefWizard() {
   const [kbSynthesized, setKbSynthesized] = useState(false);
   const [kbFallbackNote, setKbFallbackNote] = useState<string | null>(null);
   const [kbDivisionScoped, setKbDivisionScoped] = useState<boolean | undefined>(undefined);
+  const [kbSetup, setKbSetup] = useState(false);
   const [showKbPanel, setShowKbPanel] = useState(false);
   const [customizeOpen, setCustomizeOpen] = useState(false);
 
@@ -628,13 +629,14 @@ function BriefWizard() {
                         }}
                       />
 
-                      {(kbSelected.length > 0 || kbSynthesis) && (
+                      {(kbSelected.length > 0 || kbSynthesis || kbSetup) && (
                         <KnowledgeUsedPanel
                           selected={kbSelected}
                           synthesis={kbSynthesis}
                           synthesized={kbSynthesized}
                           divisionScoped={kbDivisionScoped}
                           fallbackNote={kbFallbackNote}
+                          setup={kbSetup}
                           open={showKbPanel}
                           onToggle={() => setShowKbPanel((v) => !v)}
                         />
@@ -775,6 +777,7 @@ function BriefWizard() {
                           setKbSynthesized(synthesized);
                           setKbFallbackNote(synth.fallbackNote ?? null);
                           setKbDivisionScoped(synth.divisionScoped);
+                          setKbSetup(!!synth.setup);
                           setShowKbPanel(true);
                         }
                       } catch { /* fall through to raw retrieval */ }
@@ -869,12 +872,13 @@ function BriefWizard() {
                         if (result.error) {
                           setAiError(result.error);
                           setAiStatus("error");
-                        } else {
-                          applyAi(deckId, result.slides as Array<{ id: string; content: Record<string, unknown> }>);
+                          return; // stay on brief so user sees the error banner
                         }
+                        applyAi(deckId, result.slides as Array<{ id: string; content: Record<string, unknown> }>);
                       } catch (e) {
                         setAiError((e as Error).message);
                         setAiStatus("error");
+                        return; // stay on brief so user sees the error banner
                       }
                       navigate({ to: "/decks/$deckId", params: { deckId }, hash: "brand-review" });
                     }}
@@ -1161,6 +1165,7 @@ function KnowledgeUsedPanel({
   synthesized,
   divisionScoped,
   fallbackNote,
+  setup,
   open,
   onToggle,
 }: {
@@ -1169,14 +1174,17 @@ function KnowledgeUsedPanel({
   synthesized: boolean;
   divisionScoped?: boolean;
   fallbackNote?: string | null;
+  setup?: boolean;
   open: boolean;
   onToggle: () => void;
 }) {
-  const confidence = !synthesized
-    ? { label: "Unverified", tone: "warn" as const }
-    : divisionScoped === false
-      ? { label: "Cross-division", tone: "warn" as const }
-      : { label: "Deep RAG", tone: "ok" as const };
+  const confidence = setup
+    ? { label: "Setup needed", tone: "warn" as const }
+    : !synthesized
+      ? { label: "Unverified", tone: "warn" as const }
+      : divisionScoped === false
+        ? { label: "Cross-division", tone: "warn" as const }
+        : { label: "Deep RAG", tone: "ok" as const };
   return (
     <div
       className="rounded-xl border bg-white p-5"
@@ -1203,7 +1211,12 @@ function KnowledgeUsedPanel({
         </div>
         <span className="text-xs text-[#1E3A5F]/70">{open ? "Hide" : "Show"}</span>
       </button>
-      {fallbackNote && (
+      {setup ? (
+        <div className="mt-3 rounded-lg border border-[#F59E0B]/60 bg-[#FFF7ED] px-3 py-2 text-xs leading-relaxed text-[#7C2D12]">
+          <div className="mb-1 font-['Urbanist'] text-[10px] font-bold uppercase tracking-widest">AI setup needed</div>
+          Add <code className="rounded bg-white/60 px-1 font-mono">ANTHROPIC_API_KEY</code> in Project Settings → Secrets to enable deep synthesis. Falling back to raw retrieval.
+        </div>
+      ) : fallbackNote && (
         <div className="mt-3 rounded-lg border border-[#F59E0B]/40 bg-[#FFF7ED] px-3 py-2 text-xs leading-relaxed text-[#7C2D12]">
           ⚠︎ {fallbackNote}
         </div>
