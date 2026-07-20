@@ -59,11 +59,24 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   }, []);
 
   useEffect(() => {
+    if (!open) return;
     const onDoc = (e: MouseEvent) => {
       if (!ref.current?.contains(e.target as Node)) setOpen(false);
     };
-    if (open) document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    const onKey = (e: KeyboardEvent) => {
+      // Popover menu — Escape closes and returns focus to the trigger button.
+      if (e.key === "Escape") {
+        setOpen(false);
+        const btn = ref.current?.querySelector<HTMLButtonElement>("button");
+        btn?.focus();
+      }
+    };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [open]);
 
   const cloudDeckId = userId && deck ? deckCloudId(userId, deck.id) : null;
