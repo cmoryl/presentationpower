@@ -11,6 +11,7 @@ import { VersionHistoryButton } from "@/components/VersionHistoryDrawer";
 import { DuplicateDeckButton, TemplateToggleButton } from "@/components/DeckActions";
 import { TranslateButton } from "@/components/TranslateDrawer";
 import { LanguageSwitcher, type LocaleOverlay } from "@/components/LanguageSwitcher";
+import { listSlideTranslationStatus } from "@/lib/translation.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { deckCloudId } from "@/lib/deck-uuid";
 import { RebrandMenu } from "@/components/RebrandMenu";
