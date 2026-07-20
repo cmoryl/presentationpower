@@ -177,6 +177,11 @@ function MessageBubble({ msg }: { msg: ChatMsg }) {
         }
       >
         <div className="whitespace-pre-wrap leading-relaxed">{msg.content}</div>
+        {!isUser && msg.fallbackNote && (
+          <div className="mt-3 rounded-md border border-amber-300/60 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-200">
+            ⚠︎ {msg.fallbackNote}
+          </div>
+        )}
         {!isUser && msg.sources && msg.sources.length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1.5 border-t border-black/[0.06] pt-2 dark:border-white/10">
             {msg.sources.map((s) => (
