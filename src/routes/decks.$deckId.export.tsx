@@ -21,6 +21,8 @@ function ExportView() {
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const [exporting, setExporting] = useState(false);
   const [override, setOverride] = useState(false);
+  const [preflightIssues, setPreflightIssues] = useState<PreflightIssue[] | null>(null);
+  const [preflightBusy, setPreflightBusy] = useState(false);
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
 
@@ -34,13 +36,28 @@ function ExportView() {
     return () => document.body.classList.remove("export-mode");
   }, []);
 
-  async function handlePptx() {
-    if (blocked) return;
+  async function runPptxExport() {
     setExporting(true);
     try {
       await exportDeckToPptx(deck, brand);
     } finally {
       setExporting(false);
+      setPreflightIssues(null);
+    }
+  }
+
+  async function handlePptx() {
+    if (blocked || exporting || preflightBusy) return;
+    setPreflightBusy(true);
+    try {
+      const issues = await runExportPreflight(deck);
+      if (issues.length === 0) {
+        await runPptxExport();
+      } else {
+        setPreflightIssues(issues);
+      }
+    } finally {
+      setPreflightBusy(false);
     }
   }
 
