@@ -9,6 +9,7 @@ import { SaveToCloudButton } from "@/components/CloudDeckControls";
 import { ShareMenu } from "@/components/ShareMenu";
 import { VersionHistoryButton } from "@/components/VersionHistoryDrawer";
 import { DuplicateDeckButton, TemplateToggleButton } from "@/components/DeckActions";
+import { RebrandMenu } from "@/components/RebrandMenu";
 import { BrandReviewPanel } from "@/components/BrandReviewPanel";
 import { useDeckStore, type DeckClientLogo } from "@/lib/deck-store";
 import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.functions";
