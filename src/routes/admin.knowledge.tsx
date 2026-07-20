@@ -162,8 +162,10 @@ function AdminKnowledgeBrowser() {
           {tab === "subbrands" && <SubBrandsTab guide={guide} />}
           {tab === "intel" && <IntelTab slug={guide.slug} />}
           {tab === "sources" && <SourcesTab slug={guide.slug} />}
+          {tab === "imported" && <ImportedDecksTab slug={guide.slug} />}
 
           {tab === "voiceover" && <VoiceoverTab index={voIndex} />}
+
         </div>
       </div>
     </div>
