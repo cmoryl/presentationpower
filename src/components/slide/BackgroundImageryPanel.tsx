@@ -454,8 +454,8 @@ export function BackgroundImageryPanel({
       )}
 
       {/* Tabs */}
-      <div className="mt-4 grid grid-cols-6 gap-1 rounded-full border border-black/10 bg-black/[0.03] p-1 text-[10px]">
-        {(["library", "solid", "gradient", "pattern", "upload", "ai"] as Tab[]).map((t) => (
+      <div className="mt-4 grid grid-cols-7 gap-1 rounded-full border border-black/10 bg-black/[0.03] p-1 text-[10px]">
+        {(["library", "brand", "solid", "gradient", "pattern", "upload", "ai"] as Tab[]).map((t) => (
           <button
             key={t}
             type="button"
