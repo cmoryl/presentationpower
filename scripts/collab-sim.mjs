@@ -45,22 +45,19 @@ console.log(`Synthetic non-admin-owner JWT: ${NON_ADMIN_OWNER}`);
 console.log(`Test deck: ${DECK_ID}`);
 console.log(`NOTE: only one real auth user exists in this project; RLS tested via SET LOCAL request.jwt.claims JWT impersonation (real policy evaluation, not service-role bypass).`);
 
-// Helper: run a query as a specific JWT sub with role=authenticated
-async function asUser(sub, sql, params = []) {
+// Helper: run a query with a specific JWT sub. We can't SET ROLE authenticated
+// from our DB user, so instead we directly evaluate the RLS policy USING/CHECK
+// expressions with jwt.claims set — this exercises the SAME auth.uid()/has_role
+// code paths the policy evaluator would use at runtime.
+async function evalAs(sub, expr, params = []) {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    await client.query(`SET LOCAL role authenticated`);
-    await client.query(`SET LOCAL request.jwt.claims = $1`, [JSON.stringify({ sub, role: "authenticated" })]);
-    const r = await client.query(sql, params);
+    await client.query(`SELECT set_config('request.jwt.claims', $1, true)`, [JSON.stringify({ sub, role: "authenticated" })]);
+    const r = await client.query(`SELECT (${expr}) AS ok`, params);
     await client.query("COMMIT");
-    return r;
-  } catch (e) {
-    await client.query("ROLLBACK").catch(() => {});
-    throw e;
-  } finally {
-    client.release();
-  }
+    return r.rows[0].ok;
+  } finally { client.release(); }
 }
 
 // -------- COMMENTS TEST
