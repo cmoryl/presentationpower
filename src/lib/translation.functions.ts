@@ -471,7 +471,16 @@ export const translateDeckToCopy = createServerFn({ method: "POST" })
     const trackingId = trackingRow?.id as string | undefined;
 
     try {
-      const translated = await translateAllSlides(slides, data.targetLang, glossary, engine, data.humanReview);
+      const translated = await translateAllSlides(
+        supabase,
+        slides,
+        data.targetLang,
+        glossary,
+        engine,
+        data.humanReview,
+        trackingId,
+      );
+      const failed = translated.filter((t) => !t.ok);
       const rows = (slides as Array<any>).map((s: any, i: number) => ({
         deck_id: newDeck.id,
         position: s.position,
@@ -488,19 +497,28 @@ export const translateDeckToCopy = createServerFn({ method: "POST" })
       if (trackingId) {
         await supabase
           .from("deck_translations")
-          .update({ status: "ready", progress_current: slides.length })
+          .update({
+            status: failed.length === 0 ? "ready" : "failed",
+            progress_current: translated.length,
+            error: failed.length === 0 ? null : `${failed.length} slide(s) failed`,
+          })
           .eq("id", trackingId);
       }
-      return { ok: true, deckId: newDeck.id, title: newTitle };
+      return { ok: true, deckId: newDeck.id, title: newTitle, failed: failed.length };
     } catch (e) {
+      const isCancel = e instanceof TranslationCancelledError;
       if (trackingId) {
         await supabase
           .from("deck_translations")
-          .update({ status: "failed", error: (e as Error).message.slice(0, 500) })
+          .update({
+            status: isCancel ? "cancelled" : "failed",
+            error: isCancel ? null : (e as Error).message.slice(0, 500),
+          })
           .eq("id", trackingId);
       }
-      // Clean up the empty deck row so failure doesn't leave orphaned shells.
+      // Clean up the empty deck row so failure/cancel doesn't leave orphaned shells.
       await supabase.from("decks").delete().eq("id", newDeck.id);
+      if (isCancel) return { ok: false, cancelled: true };
       throw e;
     }
   });
