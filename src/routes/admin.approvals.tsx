@@ -50,6 +50,8 @@ function ApprovalsView() {
 
   const [tab, setTab] = useState<Tab>("pending");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [search, setSearch] = useState("");
+  const [variantFilter, setVariantFilter] = useState<string>("all");
 
   const pending = useQuery({ queryKey: ["approvals", "pending"], queryFn: () => listPending() });
   const recent = useQuery({ queryKey: ["approvals", "recent"], queryFn: () => listReviewed() });
@@ -60,7 +62,31 @@ function ApprovalsView() {
   const pendingRows = (pending.data ?? []) as PendingRow[];
   const inPending = pendingRows.filter((r) => r.approval_status === "pending" || r.approval_status === "draft");
   const inChanges = pendingRows.filter((r) => r.approval_status === "changes-requested");
-  const currentRows = tab === "pending" ? inPending : tab === "changes" ? inChanges : [];
+
+  const variantOptions = useMemo(() => {
+    const s = new Set<string>();
+    pendingRows.forEach((r) => r.variant_id && s.add(r.variant_id));
+    return Array.from(s).sort();
+  }, [pendingRows]);
+
+  const filterRows = (rows: PendingRow[]) => {
+    const q = search.trim().toLowerCase();
+    return rows.filter((r) => {
+      if (variantFilter !== "all" && r.variant_id !== variantFilter) return false;
+      if (!q) return true;
+      const hay = `${r.title ?? ""} ${r.variant_id ?? ""} ${r.brand_mode_id ?? ""} ${JSON.stringify(r.content ?? "")}`.toLowerCase();
+      return hay.includes(q);
+    });
+  };
+
+  const currentRows = tab === "pending" ? filterRows(inPending) : tab === "changes" ? filterRows(inChanges) : [];
+
+  const slaBreaches = inPending.filter((r) => (hoursSince(r.submitted_at) ?? 0) > SLA_HOURS).length;
+  const avgAge = inPending.length
+    ? Math.round(
+        inPending.reduce((s, r) => s + (hoursSince(r.submitted_at) ?? 0), 0) / inPending.length,
+      )
+    : 0;
 
   const invalidateAll = () => {
     qc.invalidateQueries({ queryKey: ["approvals", "pending"] });
