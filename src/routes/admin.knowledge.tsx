@@ -180,6 +180,7 @@ function AdminKnowledgeBrowser() {
           {tab === "intel" && <IntelTab slug={guide.slug} />}
           {tab === "sources" && <SourcesTab slug={guide.slug} />}
           {tab === "imported" && <ImportedDecksTab slug={guide.slug} />}
+          {tab === "imagery" && <DivisionImageryTab guide={guide} />}
 
           {tab === "voiceover" && <VoiceoverTab index={voIndex} />}
 
