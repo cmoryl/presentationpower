@@ -84,8 +84,12 @@ const CLASSIC_MANIFEST: Record<string, ClassicPresence> = {
   legal:   { color: "png", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
   lifesci: { color: "svg", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
   media:   { color: "svg", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
-  // digital / dataforce / globallink: no classic BrandHub logos in seed yet;
-  // continue using the existing NEXT set on disk until BrandHub publishes them.
+  // TransPerfect Digital + DataForce classic horizontal marks sourced from
+  // transperfectdigital.com and dataforcecommunity.transperfect.com. Stacked
+  // variants continue to fall back to the NEXT set until classics land.
+  digital:   { color: "png", white: "png" },
+  dataforce: { color: "png", white: "png" },
+  // globallink: no classic BrandHub logo in seed yet; continue using NEXT.
 };
 
 function classicSetFor(slug: string): DivisionLogoSet | undefined {
