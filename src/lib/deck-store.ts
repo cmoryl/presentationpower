@@ -1997,10 +1997,74 @@ export const useDeckStore = create<DeckState>()(
           briefs: { ...s.briefs, [brief.id]: brief },
           decks: { ...s.decks, [deck.id]: deck },
         })),
-      reset: () => set({ briefs: {}, decks: {} }),
+      reset: () => set({ briefs: {}, decks: {}, _past: [], _future: [], _cloudLinked: {} }),
 
-    }),
-    { name: "tp-modular-deck" },
+      // ---- Undo / redo ----------------------------------------------------
+      canUndo: () => (get()._past ?? []).length > 0,
+      canRedo: () => (get()._future ?? []).length > 0,
+      undo: () => {
+        const cur = get();
+        const past = cur._past ?? [];
+        if (past.length === 0) return false;
+        const prev = past[past.length - 1];
+        const future = [...(cur._future ?? []), { decks: cur.decks, briefs: cur.briefs }];
+        set({
+          decks: prev.decks,
+          briefs: prev.briefs,
+          _past: past.slice(0, -1),
+          _future: future,
+          _historyKey: undefined,
+          _historyAt: undefined,
+        });
+        return true;
+      },
+      redo: () => {
+        const cur = get();
+        const future = cur._future ?? [];
+        if (future.length === 0) return false;
+        const next = future[future.length - 1];
+        const past = [...(cur._past ?? []), { decks: cur.decks, briefs: cur.briefs }];
+        set({
+          decks: next.decks,
+          briefs: next.briefs,
+          _past: past,
+          _future: future.slice(0, -1),
+          _historyKey: undefined,
+          _historyAt: undefined,
+        });
+        return true;
+      },
+
+      // ---- Cloud linkage --------------------------------------------------
+      markCloudLinked: (deckId, linked = true) => {
+        set((s) => ({ _cloudLinked: { ...s._cloudLinked, [deckId]: linked } }));
+      },
+      isCloudLinked: (deckId) => Boolean(get()._cloudLinked?.[deckId]),
+
+      // ---- Reorder (drag / from-index → to-index) -------------------------
+      reorderSlides: (deckId, fromIndex, toIndex) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        if (fromIndex === toIndex) return;
+        if (fromIndex < 0 || fromIndex >= deck.slides.length) return;
+        if (toIndex < 0 || toIndex >= deck.slides.length) return;
+        pushHistory();
+        const next = [...deck.slides];
+        const [moved] = next.splice(fromIndex, 1);
+        next.splice(toIndex, 0, moved);
+        set((s) => ({
+          decks: { ...s.decks, [deckId]: { ...deck, slides: next.map((sl, i) => ({ ...sl, position: i })) } },
+        }));
+      },
+
+      };
+    },
+    {
+      name: "tp-modular-deck",
+      // Persist deck/brief data only — never the session-only history or
+      // cloud-linkage caches (both are rebuilt on load).
+      partialize: (s) => ({ briefs: s.briefs, decks: s.decks }) as unknown as DeckState,
+    },
   ),
 );
 
