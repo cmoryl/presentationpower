@@ -254,6 +254,7 @@ const TOOLS: AnthropicToolDef[] = [
 // ---------------------------------------------------------------------------
 
 export const copilotTurn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((v: unknown) => Input.parse(v))
   .handler(async ({ data }): Promise<CopilotResult> => {
     if (!hasAnthropicKey()) return { ok: false, error: ANTHROPIC_SETUP_MESSAGE };

@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 // AI personalization pipeline.
@@ -52,6 +53,7 @@ export type PersonalizeInput = z.infer<typeof InputSchema>;
 export type PersonalizedSlide = { id: string; content: Record<string, any> };
 
 export const personalizeSlides = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => InputSchema.parse(raw))
   .handler(async ({ data }): Promise<{ slides: PersonalizedSlide[]; error?: string }> => {
     const apiKey = process.env.LOVABLE_API_KEY;
