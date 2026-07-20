@@ -317,11 +317,17 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
         })),
       ];
 
+      const fallbackNote = divisionScoped === false
+        ? "No division-specific brand-asset chunks matched — snippets below include content from other divisions. Verify facts before treating them as division-accurate."
+        : undefined;
+
       // ── 3. Missing-key fallback → return raw candidates trimmed to limit
       if (!hasAnthropicKey()) {
         return {
           ok: true,
           synthesized: false,
+          divisionScoped,
+          fallbackNote,
           synthesis: null,
           selected: candidates.slice(0, data.limit),
           setup: true,
