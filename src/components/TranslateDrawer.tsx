@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Languages, X, Loader2, Check, AlertTriangle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { deckCloudId } from "@/lib/deck-uuid";
+import { Languages, X, Loader2, Check, AlertTriangle, History, RotateCcw, Square, ChevronDown, ChevronRight } from "lucide-react";
 import {
   listLanguages,
   listTranslationEngines,
@@ -8,9 +10,14 @@ import {
   translateDeckToCopy,
   translateDeckBatch,
   listGlossary,
+  listDeckTranslations,
+  getDeckTranslationJobDetail,
+  cancelDeckTranslation,
+  retryDeckTranslation,
 } from "@/lib/translation.functions";
 
 type Mode = "in_place" | "copy" | "batch";
+type Tab = "new" | "history";
 
 export function TranslateDrawer({
   deckId,
