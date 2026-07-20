@@ -619,9 +619,11 @@ function ImportedDecksTab({ slug }: { slug: string }) {
   const listFn = useServerFn(listImportedDecksForDivision);
   const uploadFn = useServerFn(uploadImportedDeck);
   const getSlidesFn = useServerFn(getImportedDeckSlides);
+  const getFullFn = useServerFn(getImportedDeckFull);
   const deleteFn = useServerFn(deleteImportedDeck);
 
   const [openId, setOpenId] = useState<string | null>(null);
+  const [showText, setShowText] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -631,10 +633,20 @@ function ImportedDecksTab({ slug }: { slug: string }) {
     queryFn: () => listFn({ data: { divisionId: slug } }),
   });
 
+  // Lightweight metadata (filename + signed download url + status)
   const detailQ = useQuery({
     queryKey: ["admin-knowledge-imported-detail", openId],
     queryFn: () => (openId ? getSlidesFn({ data: { id: openId } }) : Promise.resolve(null)),
     enabled: !!openId,
+  });
+
+  // Full re-parse (title + bullets + notes + embedded images + theme) for
+  // reconstructed visual previews. Runs on-demand when the modal opens.
+  const fullQ = useQuery({
+    queryKey: ["admin-knowledge-imported-full", openId],
+    queryFn: () => (openId ? getFullFn({ data: { id: openId } }) : Promise.resolve(null)),
+    enabled: !!openId,
+    staleTime: 5 * 60_000,
   });
 
   async function handleFile(file: File) {
