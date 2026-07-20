@@ -569,7 +569,7 @@ export const translateDeckBatch = createServerFn({ method: "POST" })
           .select()
           .maybeSingle();
         if (!newDeck) throw new Error("Failed to create translated deck");
-        const translated = await translateAllSlides(slides, lang, glossary, engine, data.humanReview);
+        const translated = await translateAllSlides(supabase, slides, lang, glossary, engine, data.humanReview, undefined);
         const rows = (slides as Array<any>).map((s: any, i: number) => ({
           deck_id: newDeck.id,
           position: s.position,
