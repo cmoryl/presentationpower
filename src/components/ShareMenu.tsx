@@ -17,6 +17,8 @@ import {
   getShareAnalytics,
   setDeckShareExpiry,
 } from "@/lib/deck-sharing.functions";
+import { listCachedLocales, getDeckSlideTranslations, listLanguages } from "@/lib/translation.functions";
+import { Languages } from "lucide-react";
 
 export function ShareMenu({ deckId }: { deckId: string }) {
   const deck = useDeckStore((s) => s.decks[deckId]);
@@ -36,6 +38,14 @@ export function ShareMenu({ deckId }: { deckId: string }) {
 
   type Analytics = { totalViews: number; uniqueSessions: number; lastViewedAt: string | null; avgMaxSlide: number };
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
+
+  const getCachedLocalesFn = useServerFn(listCachedLocales);
+  const getSlideTxFn = useServerFn(getDeckSlideTranslations);
+  const listLangsFn = useServerFn(listLanguages);
+  type CachedLocale = { target_lang: string; ready: number; total: number; updated_at: string };
+  const [cachedLocales, setCachedLocales] = useState<CachedLocale[] | null>(null);
+  const [langLabels, setLangLabels] = useState<Record<string, string>>({});
+  const [translatedBusy, setTranslatedBusy] = useState<string | null>(null);
 
   const [shareToken, setShareToken] = useState<string | null>(null);
   const [shareExpiresAt, setShareExpiresAt] = useState<string | null>(null);
@@ -118,6 +128,28 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     };
   }, [open, cloudDeckId, shareToken, getAnalytics]);
 
+  // Fetch cached translations available for this deck.
+  useEffect(() => {
+    if (!open || !cloudDeckId) {
+      setCachedLocales(null);
+      return;
+    }
+    let cancelled = false;
+    Promise.all([
+      getCachedLocalesFn({ data: { deckId: cloudDeckId } }).catch(() => ({ locales: [] as CachedLocale[] })),
+      listLangsFn().catch(() => [] as Array<{ id: string; label: string }>),
+    ]).then(([r, langs]) => {
+      if (cancelled) return;
+      setCachedLocales(((r as { locales: CachedLocale[] }).locales ?? []).filter((l) => l.ready > 0));
+      const map: Record<string, string> = {};
+      for (const l of langs as Array<{ id: string; label: string }>) map[l.id] = l.label;
+      setLangLabels(map);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, cloudDeckId, getCachedLocalesFn, listLangsFn]);
+
   if (!deck) return null;
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
   const stamp = (kind: "pptx" | "pdf" | "present") =>
@@ -162,6 +194,39 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     } finally {
       setPreflightBusy(false);
     }
+  };
+
+  const onTranslatedPptx = async (lang: string) => {
+    if (!deck || !cloudDeckId) return;
+    setTranslatedBusy(`pptx:${lang}`);
+    try {
+      const rows = (await getSlideTxFn({ data: { deckId: cloudDeckId, targetLang: lang } })) as Array<{
+        position: number;
+        content: Record<string, unknown>;
+      }>;
+      const overlay = new Map(rows.map((r) => [r.position, r.content]));
+      const langLabel = langLabels[lang] ?? lang.toUpperCase();
+      const translatedDeck: Deck = {
+        ...deck,
+        title: `${deck.title} — ${langLabel}`,
+        slides: deck.slides.map((s) => {
+          const t = overlay.get(s.position);
+          return t ? { ...s, content: t as typeof s.content } : s;
+        }),
+      };
+      await exportDeckToPptx(translatedDeck, brand, { strategy: deck.context?.strategy ?? null });
+      stamp("pptx");
+    } catch (e) {
+      console.error("[translated pptx export]", e);
+    } finally {
+      setTranslatedBusy(null);
+    }
+  };
+
+  const onTranslatedPdf = (lang: string) => {
+    stamp("pdf");
+    setOpen(false);
+    window.open(`/decks/${deckId}/print?lang=${encodeURIComponent(lang)}`, "_blank", "noopener,noreferrer");
   };
 
   const shareUrl = shareToken
@@ -375,6 +440,52 @@ export function ShareMenu({ deckId }: { deckId: string }) {
             onClick={onPptx}
             disabled={busy}
           />
+
+          {cachedLocales && cachedLocales.length > 0 && (
+            <div className="border-t border-black/[0.06] px-4 py-3 dark:border-white/10">
+              <div className="mb-2 flex items-center gap-2 text-[10px] font-medium uppercase tracking-widest text-black/50 dark:text-white/50">
+                <Languages size={12} /> Translated exports
+              </div>
+              <ul className="space-y-1.5">
+                {cachedLocales.map((l) => {
+                  const label = langLabels[l.target_lang] ?? l.target_lang.toUpperCase();
+                  const partial = l.ready < l.total;
+                  const pptxBusy = translatedBusy === `pptx:${l.target_lang}`;
+                  return (
+                    <li key={l.target_lang} className="flex items-center gap-2">
+                      <span className="min-w-0 flex-1 truncate text-xs text-black dark:text-white">
+                        {label}
+                        <span className="ml-1 text-[10px] text-black/45 dark:text-white/45">
+                          {l.ready}/{l.total}{partial ? " · partial" : ""}
+                        </span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => void onTranslatedPptx(l.target_lang)}
+                        disabled={!!translatedBusy}
+                        className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] font-medium text-black hover:border-black/30 disabled:opacity-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white"
+                        title={`Export .pptx in ${label}`}
+                      >
+                        {pptxBusy ? <Loader2 size={10} className="animate-spin" /> : <FileDown size={10} />}
+                        PPTX
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onTranslatedPdf(l.target_lang)}
+                        className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] font-medium text-black hover:border-black/30 dark:border-white/15 dark:bg-white/[0.06] dark:text-white"
+                        title={`Print/PDF in ${label}`}
+                      >
+                        <Printer size={10} /> PDF
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="mt-2 text-[10px] text-black/45 dark:text-white/45">
+                Manage languages in the deck's Translate panel.
+              </div>
+            </div>
+          )}
           <div className="border-t border-black/[0.06] px-4 py-2 text-[10px] text-black/50 dark:border-white/10 dark:text-white/50">
             <Link to="/decks/$deckId/export" params={{ deckId }} className="hover:text-black dark:hover:text-white">
               Advanced export &amp; QA →
