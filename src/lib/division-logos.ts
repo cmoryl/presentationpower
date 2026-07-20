@@ -138,6 +138,7 @@ const KEY_TO_SLUG: Record<string, string> = {
   // BRAND_MODES ids
   master: "tp",
   "bm-master": "tp",
+  "bm-enterprise": "tp",
   "bm-division": "globallink",
   "bm-subcompany": "tp",
   "bm-tp-legal": "legal",
