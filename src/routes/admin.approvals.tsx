@@ -244,6 +244,19 @@ function ApprovalsView() {
   );
 }
 
+function StatCard({ label, value, accent }: { label: string; value: number | string; accent: string }) {
+  return (
+    <div className="rounded-2xl border border-black/10 bg-white p-4">
+      <div className="text-[10px] uppercase tracking-[0.25em] text-black/50">{label}</div>
+      <div className="mt-2 flex items-center gap-2">
+        <span className={`inline-flex min-w-[2.5rem] justify-center rounded-full px-3 py-1 text-lg font-semibold tabular-nums ${accent}`}>
+          {value}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function TabButton({ active, onClick, label, count }: { active: boolean; onClick: () => void; label: string; count: number }) {
   return (
     <button
