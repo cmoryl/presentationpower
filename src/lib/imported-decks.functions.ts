@@ -130,11 +130,12 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
     if (!row) throw new Error("Not found");
     const r = row as {
       id: string; original_filename: string; slide_count: number;
-      theme: Record<string, unknown> | null;
+      theme: { accent1?: string; accent2?: string; dark1?: string; headingFont?: string; bodyFont?: string } | null;
       slides: Array<{ index: number; title: string; bullets: string[]; notes: string; imageCount: number }> | null;
       status: string; error: string | null;
       storage_path: string;
     };
+
     // Signed URL so the owner can re-download the original .pptx.
     const signed = await s.storage.from(BUCKET).createSignedUrl(r.storage_path, 60 * 10).catch(() => ({ data: null }));
     return {
