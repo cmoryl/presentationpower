@@ -136,9 +136,18 @@ export type TemplatePayload = {
 
 
 
+type HistoryEntry = { decks: Record<string, Deck>; briefs: Record<string, Brief> };
+
 type DeckState = {
   briefs: Record<string, Brief>;
   decks: Record<string, Deck>;
+  // Session-only history (excluded from persistence).
+  _past: HistoryEntry[];
+  _future: HistoryEntry[];
+  _historyKey?: string;
+  _historyAt?: number;
+  // Session-only cloud-linkage marker (excluded from persistence).
+  _cloudLinked: Record<string, boolean>;
   createBriefAndAssemble: (
     brief: Omit<Brief, "id" | "createdAt">,
     opts?: { strategy?: DeckStrategySnapshot },
@@ -161,6 +170,7 @@ type DeckState = {
 
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
+  reorderSlides: (deckId: string, fromIndex: number, toIndex: number) => void;
   removeSlide: (deckId: string, slideId: string) => void;
   addSlide: (deckId: string, sectionId: string, afterSlideId?: string) => void;
   insertVariantSlide: (deckId: string, variantId: string) => { slideId: string } | null;
@@ -173,6 +183,15 @@ type DeckState = {
   duplicateDeck: (deckId: string) => string | null;
   createDeckFromTemplate: (payload: TemplatePayload) => { briefId: string; deckId: string };
   deleteDeck: (deckId: string) => void;
+
+  // Undo / redo — session-scoped, bounded to 50 entries.
+  undo: () => boolean;
+  redo: () => boolean;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
+
+  markCloudLinked: (deckId: string, linked?: boolean) => void;
+  isCloudLinked: (deckId: string) => boolean;
 
   hydrate: (input: { brief: Brief; deck: Deck }) => void;
   reset: () => void;
