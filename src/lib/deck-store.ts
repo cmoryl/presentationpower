@@ -13,6 +13,7 @@ import {
 } from "./taxonomy";
 import { BRAND_PROFILES, getSubCompanyProfile } from "./brand-profiles";
 import { pickCaseStudy, pickProofLogos, CASE_STUDIES } from "./case-studies";
+import { variantSupportsImagery } from "./variant-media";
 
 export type BrandModeId = string;
 
@@ -136,9 +137,18 @@ export type TemplatePayload = {
 
 
 
+type HistoryEntry = { decks: Record<string, Deck>; briefs: Record<string, Brief> };
+
 type DeckState = {
   briefs: Record<string, Brief>;
   decks: Record<string, Deck>;
+  // Session-only history (excluded from persistence).
+  _past: HistoryEntry[];
+  _future: HistoryEntry[];
+  _historyKey?: string;
+  _historyAt?: number;
+  // Session-only cloud-linkage marker (excluded from persistence).
+  _cloudLinked: Record<string, boolean>;
   createBriefAndAssemble: (
     brief: Omit<Brief, "id" | "createdAt">,
     opts?: { strategy?: DeckStrategySnapshot },
@@ -161,6 +171,7 @@ type DeckState = {
 
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
+  reorderSlides: (deckId: string, fromIndex: number, toIndex: number) => void;
   removeSlide: (deckId: string, slideId: string) => void;
   addSlide: (deckId: string, sectionId: string, afterSlideId?: string) => void;
   insertVariantSlide: (deckId: string, variantId: string) => { slideId: string } | null;
@@ -173,6 +184,15 @@ type DeckState = {
   duplicateDeck: (deckId: string) => string | null;
   createDeckFromTemplate: (payload: TemplatePayload) => { briefId: string; deckId: string };
   deleteDeck: (deckId: string) => void;
+
+  // Undo / redo — session-scoped, bounded to 50 entries.
+  undo: () => boolean;
+  redo: () => boolean;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
+
+  markCloudLinked: (deckId: string, linked?: boolean) => void;
+  isCloudLinked: (deckId: string) => boolean;
 
   hydrate: (input: { brief: Brief; deck: Deck }) => void;
   reset: () => void;
@@ -1478,9 +1498,32 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
 
 export const useDeckStore = create<DeckState>()(
   persist(
-    (set, get) => ({
+    (set, get) => {
+      // ---- History helpers (session-only) --------------------------------
+      const HISTORY_LIMIT = 50;
+      const pushHistory = (key?: string) => {
+        const cur = get();
+        const now = Date.now();
+        // Coalesce rapid edits sharing the same key (e.g. typing in one field).
+        if (key && cur._historyKey === key && now - (cur._historyAt ?? 0) < 900) {
+          set({ _historyAt: now });
+          return;
+        }
+        const snap: HistoryEntry = { decks: cur.decks, briefs: cur.briefs };
+        const past = [...(cur._past ?? []), snap];
+        while (past.length > HISTORY_LIMIT) past.shift();
+        set({ _past: past, _future: [], _historyKey: key, _historyAt: now });
+      };
+
+      return {
       briefs: {},
       decks: {},
+      _past: [],
+      _future: [],
+      _historyKey: undefined,
+      _historyAt: undefined,
+      _cloudLinked: {},
+
 
       createBriefAndAssemble: (input, opts) => {
         const brief: Brief = {
@@ -1555,6 +1598,7 @@ export const useDeckStore = create<DeckState>()(
 
 
       applyAiContent: (deckId, aiSlides) => {
+        pushHistory();
         const deck = get().decks[deckId];
         if (!deck) return;
         const byIdMap = new Map(aiSlides.map((s) => [s.id, s.content]));
@@ -1577,6 +1621,7 @@ export const useDeckStore = create<DeckState>()(
       },
 
       applyCopilotUpdates: (deckId, updates) => {
+        pushHistory();
         const deck = get().decks[deckId];
         if (!deck) return;
         const byPos = new Map(updates.map((u) => [u.index, u]));
@@ -1616,6 +1661,7 @@ export const useDeckStore = create<DeckState>()(
       },
 
       updateSlideNotes: (deckId, slideId, notes) => {
+        pushHistory(`notes:${deckId}:${slideId}`);
         const deck = get().decks[deckId];
         if (!deck) return;
         set((s) => ({
@@ -1631,6 +1677,7 @@ export const useDeckStore = create<DeckState>()(
 
 
       revertAiChange: (deckId, slideId, field) => {
+        pushHistory();
         const deck = get().decks[deckId];
         if (!deck) return;
         const slide = deck.slides.find((s) => s.id === slideId);
@@ -1655,6 +1702,7 @@ export const useDeckStore = create<DeckState>()(
       },
 
       updateSlideField: (deckId, slideId, field, value) => {
+        pushHistory(`field:${deckId}:${slideId}:${field}`);
         const deck = get().decks[deckId];
         if (!deck) return;
         const slide = deck.slides.find((s) => s.id === slideId);
@@ -1677,6 +1725,7 @@ export const useDeckStore = create<DeckState>()(
       },
 
       applySlideBackground: (deckId, slideIds, background) => {
+        pushHistory();
         const deck = get().decks[deckId];
         if (!deck) return;
         const ids = new Set(slideIds);
@@ -1708,23 +1757,44 @@ export const useDeckStore = create<DeckState>()(
       swapVariant: (deckId, slideId, newVariantId) => {
         const deck = get().decks[deckId];
         if (!deck) return;
+        const slide = deck.slides.find((sl) => sl.id === slideId);
+        if (!slide) return;
         const nextVariant = byId(MODULE_VARIANTS, newVariantId);
         if (!nextVariant) return;
+        pushHistory();
         const layoutId = nextVariant.permittedLayoutIds[0];
+        const brief = get().briefs[deck.briefId];
+        const sectionName = SECTION_FRAMEWORKS.find((sf) => sf.id === slide.sectionId)?.name ?? "";
+        const seeded = brief ? seedContent(newVariantId, brief, sectionName) : {};
+        // Preserve overlapping field values from the old content (title,
+        // headline, kicker, subhead, body, items, etc.) so the user's
+        // edits carry over. Only shared keys are kept; the seeded defaults
+        // fill everything else the new variant expects.
+        const prev = slide.content as Record<string, unknown>;
+        const merged: Record<string, unknown> = { ...(seeded as Record<string, unknown>) };
+        for (const key of Object.keys(prev)) {
+          if (key in merged && prev[key] !== undefined && prev[key] !== "") {
+            merged[key] = prev[key];
+          }
+        }
+        // Preserve mediaUrl only when the new variant supports imagery;
+        // otherwise strip it so non-image variants don't carry orphans.
+        if (variantSupportsImagery(newVariantId)) {
+          if (typeof prev.mediaUrl === "string") merged.mediaUrl = prev.mediaUrl;
+          if (typeof prev.mediaSeed === "string") merged.mediaSeed = prev.mediaSeed;
+        } else {
+          delete merged.mediaUrl;
+          delete merged.mediaSeed;
+        }
+        // Preserve background settings across swaps.
+        if (prev.background !== undefined) merged.background = prev.background;
         set((s) => ({
           decks: {
             ...s.decks,
             [deckId]: {
               ...deck,
               slides: deck.slides.map((sl) =>
-                sl.id === slideId
-                  ? {
-                      ...sl,
-                      variantId: newVariantId,
-                      layoutId,
-                      content: seedContent(newVariantId, s.briefs[deck.briefId], SECTION_FRAMEWORKS.find((sf) => sf.id === sl.sectionId)?.name ?? ""),
-                    }
-                  : sl,
+                sl.id === slideId ? { ...sl, variantId: newVariantId, layoutId, content: merged as SlideContent } : sl,
               ),
             },
           },
@@ -1737,6 +1807,7 @@ export const useDeckStore = create<DeckState>()(
         const idx = deck.slides.findIndex((s) => s.id === slideId);
         const j = idx + direction;
         if (idx < 0 || j < 0 || j >= deck.slides.length) return;
+        pushHistory();
         const next = [...deck.slides];
         [next[idx], next[j]] = [next[j], next[idx]];
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next.map((sl, i) => ({ ...sl, position: i })) } } }));
@@ -1745,6 +1816,7 @@ export const useDeckStore = create<DeckState>()(
       removeSlide: (deckId, slideId) => {
         const deck = get().decks[deckId];
         if (!deck) return;
+        pushHistory();
         const next = deck.slides.filter((sl) => sl.id !== slideId).map((sl, i) => ({ ...sl, position: i }));
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
       },
@@ -1754,6 +1826,7 @@ export const useDeckStore = create<DeckState>()(
         if (!deck) return;
         const brief = get().briefs[deck.briefId];
         if (!brief) return;
+        pushHistory();
         const options = variantsForSection(sectionId);
         const variant = options[0] ?? MODULE_VARIANTS[0];
         const sf = byId(SECTION_FRAMEWORKS, sectionId);
@@ -1779,8 +1852,7 @@ export const useDeckStore = create<DeckState>()(
         if (!brief) return null;
         const variant = byId(MODULE_VARIANTS, variantId);
         if (!variant) return null;
-        // Pick a section framework that permits this variant's family; fall
-        // back to the last slide's section, then the first framework.
+        pushHistory();
         const sf =
           SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.includes(variant.familyId)) ??
           byId(SECTION_FRAMEWORKS, deck.slides[deck.slides.length - 1]?.sectionId ?? "") ??
@@ -1804,19 +1876,23 @@ export const useDeckStore = create<DeckState>()(
         if (!deck) return;
         const idx = deck.slides.findIndex((sl) => sl.id === slideId);
         if (idx < 0) return;
+        pushHistory();
         const src = deck.slides[idx];
         const copy: DeckSlide = { ...src, id: nanoid(8), content: structuredClone(src.content), changes: [] };
         const next = [...deck.slides.slice(0, idx + 1), copy, ...deck.slides.slice(idx + 1)].map((sl, i) => ({ ...sl, position: i }));
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
       },
 
+
       renameDeck: (deckId, title) => {
+        pushHistory(`rename:${deckId}`);
         const deck = get().decks[deckId];
         if (!deck) return;
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, title } } }));
       },
 
       setDeckClientLogo: (deckId, logo) => {
+        pushHistory();
         const deck = get().decks[deckId];
         if (!deck) return;
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, clientLogo: logo } } }));
@@ -1837,6 +1913,7 @@ export const useDeckStore = create<DeckState>()(
       },
 
       rebrandDeck: (deckId, brandModeId, subCompany) => {
+        pushHistory();
         const deck = get().decks[deckId];
         if (!deck) return;
         const nextSub = subCompany ?? undefined;
@@ -1955,10 +2032,74 @@ export const useDeckStore = create<DeckState>()(
           briefs: { ...s.briefs, [brief.id]: brief },
           decks: { ...s.decks, [deck.id]: deck },
         })),
-      reset: () => set({ briefs: {}, decks: {} }),
+      reset: () => set({ briefs: {}, decks: {}, _past: [], _future: [], _cloudLinked: {} }),
 
-    }),
-    { name: "tp-modular-deck" },
+      // ---- Undo / redo ----------------------------------------------------
+      canUndo: () => (get()._past ?? []).length > 0,
+      canRedo: () => (get()._future ?? []).length > 0,
+      undo: () => {
+        const cur = get();
+        const past = cur._past ?? [];
+        if (past.length === 0) return false;
+        const prev = past[past.length - 1];
+        const future = [...(cur._future ?? []), { decks: cur.decks, briefs: cur.briefs }];
+        set({
+          decks: prev.decks,
+          briefs: prev.briefs,
+          _past: past.slice(0, -1),
+          _future: future,
+          _historyKey: undefined,
+          _historyAt: undefined,
+        });
+        return true;
+      },
+      redo: () => {
+        const cur = get();
+        const future = cur._future ?? [];
+        if (future.length === 0) return false;
+        const next = future[future.length - 1];
+        const past = [...(cur._past ?? []), { decks: cur.decks, briefs: cur.briefs }];
+        set({
+          decks: next.decks,
+          briefs: next.briefs,
+          _past: past,
+          _future: future.slice(0, -1),
+          _historyKey: undefined,
+          _historyAt: undefined,
+        });
+        return true;
+      },
+
+      // ---- Cloud linkage --------------------------------------------------
+      markCloudLinked: (deckId, linked = true) => {
+        set((s) => ({ _cloudLinked: { ...s._cloudLinked, [deckId]: linked } }));
+      },
+      isCloudLinked: (deckId) => Boolean(get()._cloudLinked?.[deckId]),
+
+      // ---- Reorder (drag / from-index → to-index) -------------------------
+      reorderSlides: (deckId, fromIndex, toIndex) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        if (fromIndex === toIndex) return;
+        if (fromIndex < 0 || fromIndex >= deck.slides.length) return;
+        if (toIndex < 0 || toIndex >= deck.slides.length) return;
+        pushHistory();
+        const next = [...deck.slides];
+        const [moved] = next.splice(fromIndex, 1);
+        next.splice(toIndex, 0, moved);
+        set((s) => ({
+          decks: { ...s.decks, [deckId]: { ...deck, slides: next.map((sl, i) => ({ ...sl, position: i })) } },
+        }));
+      },
+
+      };
+    },
+    {
+      name: "tp-modular-deck",
+      // Persist deck/brief data only — never the session-only history or
+      // cloud-linkage caches (both are rebuilt on load).
+      partialize: (s) => ({ briefs: s.briefs, decks: s.decks }) as unknown as DeckState,
+    },
   ),
 );
 

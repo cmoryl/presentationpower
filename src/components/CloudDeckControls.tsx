@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +24,7 @@ export function useSignedIn() {
 export function SaveToCloudButton({ deckId }: { deckId: string }) {
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
+  const markCloudLinked = useDeckStore((s) => s.markCloudLinked);
   const save = useServerFn(saveDeckToCloud);
   const snapshot = useServerFn(snapshotDeckVersion);
   const signedIn = useSignedIn();
@@ -52,6 +53,7 @@ export function SaveToCloudButton({ deckId }: { deckId: string }) {
     try {
       await save({ data: { deck: deck as Deck, brief: brief as Brief } });
       setSavedAt(new Date().toLocaleTimeString());
+      markCloudLinked(deckId, true);
       // Snapshot version after successful save (non-blocking on failure).
       try {
         await snapshot({ data: { deckId, changeSummary: "Manual save" } });
@@ -74,6 +76,97 @@ export function SaveToCloudButton({ deckId }: { deckId: string }) {
     >
       {busy ? "Saving…" : savedAt ? `Saved ${savedAt}` : "Save to my account"}
     </button>
+  );
+}
+
+/**
+ * Debounced autosave + status indicator. Only engages once the deck is
+ * cloud-linked (i.e. the user has performed at least one successful manual
+ * save, or the deck was loaded from cloud). Autosave never creates a version
+ * snapshot — snapshots stay on manual save.
+ */
+export function AutosaveIndicator({ deckId }: { deckId: string }) {
+  const deck = useDeckStore((s) => s.decks[deckId]);
+  const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
+  const isCloudLinked = useDeckStore((s) => s._cloudLinked[deckId]);
+  const markCloudLinked = useDeckStore((s) => s.markCloudLinked);
+  const save = useServerFn(saveDeckToCloud);
+  const signedIn = useSignedIn();
+
+  const [status, setStatus] = useState<"idle" | "dirty" | "saving" | "saved" | "error">("idle");
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const lastSerialized = useRef<string | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const firstRun = useRef(true);
+
+  // Cloud-loaded decks use "cloud-<id>" — treat as pre-linked so autosave
+  // engages without waiting for a manual save.
+  useEffect(() => {
+    if (!isCloudLinked && deckId.startsWith("cloud-")) {
+      markCloudLinked(deckId, true);
+    }
+  }, [deckId, isCloudLinked, markCloudLinked]);
+
+  useEffect(() => {
+    if (!deck || !brief) return;
+    if (!signedIn || !isCloudLinked) return;
+    const serialized = JSON.stringify({ d: deck, b: brief });
+    // Skip the very first observation (no user edit has happened yet).
+    if (firstRun.current) {
+      firstRun.current = false;
+      lastSerialized.current = serialized;
+      setStatus("saved");
+      return;
+    }
+    if (serialized === lastSerialized.current) return;
+    setStatus("dirty");
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(async () => {
+      setStatus("saving");
+      try {
+        await save({ data: { deck: deck as Deck, brief: brief as Brief } });
+        lastSerialized.current = serialized;
+        setSavedAt(new Date().toLocaleTimeString());
+        setStatus("saved");
+      } catch {
+        setStatus("error");
+      }
+    }, 3500);
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, [deck, brief, signedIn, isCloudLinked, save]);
+
+  if (!signedIn || !deck || !brief) return null;
+  if (!isCloudLinked) return null;
+
+  const label =
+    status === "saving"
+      ? "Saving…"
+      : status === "dirty"
+        ? "Unsaved changes"
+        : status === "error"
+          ? "Save failed — retrying on next edit"
+          : savedAt
+            ? `Saved · ${savedAt}`
+            : "Autosave on";
+  const dotClass =
+    status === "saving"
+      ? "bg-amber-500 animate-pulse"
+      : status === "dirty"
+        ? "bg-amber-500"
+        : status === "error"
+          ? "bg-red-500"
+          : "bg-emerald-500";
+
+  return (
+    <div
+      className="flex items-center gap-1.5 rounded-full border border-black/10 bg-white/70 px-2.5 py-1 text-[11px] font-medium text-black/60"
+      title="Autosave keeps this deck synced to your account after every edit."
+    >
+      <span className={`inline-block h-1.5 w-1.5 rounded-full ${dotClass}`} />
+      <span>{label}</span>
+    </div>
   );
 }
 
@@ -195,6 +288,7 @@ export function MyCloudDecks() {
       };
 
       hydrate({ brief: briefLocal, deck: deckLocal });
+      useDeckStore.getState().markCloudLinked(localDeckId, true);
       navigate({ to: "/decks/$deckId", params: { deckId: localDeckId } });
     } catch (e) {
       alert(`Load failed: ${e instanceof Error ? e.message : "unknown"}`);
