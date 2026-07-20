@@ -1004,7 +1004,10 @@ function ModalABPreview({
     return () => window.clearTimeout(t);
   }, [variant.id, brand.id, showImagery]);
 
+  const [zoom, setZoom] = useState<null | "light" | "dark">(null);
+
   return (
+    <>
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
       {(["light", "dark"] as const).map((m) => (
         <div key={m} className="relative">
@@ -1012,8 +1015,14 @@ function ModalABPreview({
             <span className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
               {m === "light" ? "☀︎ A · Light" : "☾ B · Dark"}
             </span>
+            <span className="text-[10px] text-black/40">Click to zoom</span>
           </div>
-          <div className="relative overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm">
+          <button
+            type="button"
+            onClick={() => setZoom(m)}
+            aria-label={`Zoom ${m} preview`}
+            className="group relative block w-full overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm transition hover:border-[#003FC7]/50 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#003FC7]/40"
+          >
             <div
               ref={m === "dark" ? darkRef : lightRef}
               className={`relative aspect-[16/9] overflow-hidden ${m === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
@@ -1023,14 +1032,61 @@ function ModalABPreview({
                   <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={m} />
                 </SlideBackdropContext.Provider>
               </ScaledSlide>
+              <div className="pointer-events-none absolute inset-0 flex items-end justify-end p-2 opacity-0 transition group-hover:opacity-100">
+                <span className="rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white">⤢ Zoom</span>
+              </div>
             </div>
             <WcagBadge variantId={variant.id} mode={m} targetRef={m === "dark" ? darkRef : lightRef} enabled />
-          </div>
+          </button>
         </div>
       ))}
     </div>
+    {zoom && (
+      <div
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-6 backdrop-blur-sm"
+        onClick={() => setZoom(null)}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Enlarged slide preview"
+      >
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); setZoom(null); }}
+          className="absolute right-6 top-6 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm text-white hover:bg-white/20"
+        >
+          Close ✕
+        </button>
+        <div className="absolute left-6 top-6 flex items-center gap-2">
+          {(["light", "dark"] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={(e) => { e.stopPropagation(); setZoom(m); }}
+              className={`rounded-full border px-3 py-1.5 text-xs ${zoom === m ? "border-white bg-white text-black" : "border-white/30 bg-white/10 text-white hover:bg-white/20"}`}
+            >
+              {m === "light" ? "☀︎ Light" : "☾ Dark"}
+            </button>
+          ))}
+        </div>
+        <div
+          className="relative w-full max-w-[92vw]"
+          style={{ aspectRatio: "16 / 9", maxHeight: "86vh" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className={`relative h-full w-full overflow-hidden rounded-2xl border border-white/15 shadow-2xl ${zoom === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
+            <ScaledSlide>
+              <SlideBackdropContext.Provider value={zoom === "dark" ? darkBackdrop : lightBackdrop}>
+                <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={zoom} />
+              </SlideBackdropContext.Provider>
+            </ScaledSlide>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
+
 
 function Spec({ label, children }: { label: string; children: React.ReactNode }) {
   return (
