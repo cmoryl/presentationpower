@@ -3,6 +3,7 @@
 // and returns the changed slides + assistant reply.
 
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import {
   ANTHROPIC_SETUP_MESSAGE,
@@ -253,6 +254,7 @@ const TOOLS: AnthropicToolDef[] = [
 // ---------------------------------------------------------------------------
 
 export const copilotTurn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((v: unknown) => Input.parse(v))
   .handler(async ({ data }): Promise<CopilotResult> => {
     if (!hasAnthropicKey()) return { ok: false, error: ANTHROPIC_SETUP_MESSAGE };

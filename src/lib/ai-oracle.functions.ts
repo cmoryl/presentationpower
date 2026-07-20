@@ -43,13 +43,18 @@ export const oracleChat = createServerFn({ method: "POST" })
       data,
       context,
     }): Promise<
-      | { ok: true; reply: string; sources: OracleSource[]; setup?: boolean }
+      | { ok: true; reply: string; sources: OracleSource[]; setup?: boolean; divisionScoped?: boolean; fallbackNote?: string }
       | { ok: false; error: string }
     > => {
       const s = context.supabase as unknown as {
         from: (t: string) => { select: (c?: string) => any };
         rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
       };
+      // Tracks whether the vector search stayed within the requested division.
+      // `undefined` = no division filter was requested (e.g. "All divisions").
+      // `true` = filter applied and returned matches.
+      // `false` = filter applied but returned zero rows; we fell back to unfiltered.
+      let divisionScoped: boolean | undefined = undefined;
 
       // ── 1. Keyword search over oracle_knowledge_base + knowledge_entries ─
       const [oracleRes, entriesRes] = await Promise.all([
@@ -105,11 +110,14 @@ export const oracleChat = createServerFn({ method: "POST" })
                 filter_division: filterDivision,
               });
               let rows = (chunks ?? []) as Array<{ id: string; asset_id: string; content: string }>;
-              if (rows.length === 0 && filterDivision) {
-                const { data: un } = await s.rpc("match_brand_chunks", {
-                  query_embedding: embeddingLiteral, match_count: 5, filter_division: null,
-                });
-                rows = (un ?? []) as typeof rows;
+              if (filterDivision) {
+                divisionScoped = rows.length > 0;
+                if (rows.length === 0) {
+                  const { data: un } = await s.rpc("match_brand_chunks", {
+                    query_embedding: embeddingLiteral, match_count: 5, filter_division: null,
+                  });
+                  rows = (un ?? []) as typeof rows;
+                }
               }
               if (rows.length) {
                 const { data: assets } = await (s.from("brand_assets").select("id, title") as any).in("id", rows.map((r) => r.asset_id));
@@ -150,6 +158,10 @@ export const oracleChat = createServerFn({ method: "POST" })
         };
       }
 
+      const fallbackNote = divisionScoped === false
+        ? "No division-specific sources found — showing general knowledge from other divisions. Verify facts before relying on them as division-accurate."
+        : undefined;
+
       if (!hasAnthropicKey()) {
         const preview = combined
           .slice(0, 3)
@@ -160,6 +172,8 @@ export const oracleChat = createServerFn({ method: "POST" })
           setup: true,
           reply: `${ANTHROPIC_SETUP_MESSAGE}\n\nTop matches:\n\n${preview}`,
           sources,
+          divisionScoped,
+          fallbackNote,
         };
       }
 
@@ -193,6 +207,6 @@ export const oracleChat = createServerFn({ method: "POST" })
       const res = await callAnthropic(system, user, { maxTokens: 1200, temperature: 0.3 });
       if (!res.ok) return { ok: false, error: `Claude ${res.status}` };
 
-      return { ok: true, reply: res.text, sources };
+      return { ok: true, reply: res.text, sources, divisionScoped, fallbackNote };
     },
   );

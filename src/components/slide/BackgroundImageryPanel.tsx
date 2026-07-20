@@ -24,6 +24,7 @@ import {
 import { uploadDataUrl, uploadSlideMedia } from "@/lib/slide-media";
 import { generateBackgroundImage } from "@/lib/ai-image.functions";
 import { listDivisionImagery } from "@/lib/division-imagery.functions";
+import { logImageryEvent } from "@/lib/admin.functions";
 
 type Tab = "library" | "brand" | "solid" | "gradient" | "pattern" | "upload" | "ai";
 
@@ -535,7 +536,7 @@ export function BackgroundImageryPanel({
                       <button
                         key={r.id}
                         type="button"
-                        onClick={() =>
+                        onClick={() => {
                           onChange({
                             kind: "upload",
                             url,
@@ -543,8 +544,11 @@ export function BackgroundImageryPanel({
                             scrimStrength: 0.55,
                             imageDim: 0.1,
                             darkChrome: true,
-                          })
-                        }
+                          });
+                          void logImageryEvent({
+                            data: { imageId: `division-imagery:${r.id}`, brandId: divisionId ?? null, eventType: "use" },
+                          }).catch(() => {});
+                        }}
                         className={`group relative aspect-[4/3] overflow-hidden rounded-xl border transition ${
                           selected
                             ? "border-black ring-2 ring-black/80"

@@ -3,6 +3,7 @@
 // image stays visually coherent with the existing library for that brand.
 
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
 const Input = z.object({
@@ -19,8 +20,9 @@ const Input = z.object({
 });
 
 export const generateBrandImage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => Input.parse(raw))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
 
@@ -75,5 +77,19 @@ export const generateBrandImage = createServerFn({ method: "POST" })
       ? `data:image/png;base64,${first.b64_json}`
       : first?.url;
     if (!url) throw new Error("No image returned");
+    // Log a generate event so /admin/imagery-analytics reflects real usage.
+    // We synthesize an ephemeral id since the image isn't yet persisted.
+    const genId = `gen:${data.brandId}:${Date.now()}`;
+    try {
+      const s = context.supabase as unknown as { from: (t: string) => { insert: (row: unknown) => Promise<unknown> } };
+      await s.from("imagery_events").insert({
+        user_id: context.userId,
+        image_id: genId,
+        brand_id: data.brandId ?? null,
+        event_type: "generate",
+        prompt: data.userPrompt,
+        memory_used: data.memoryTags.length > 0 || data.memoryNotes.length > 0,
+      });
+    } catch { /* analytics best-effort */ }
     return { url, prompt };
   });

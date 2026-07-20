@@ -76,6 +76,8 @@ function BriefWizard() {
   const [kbSelected, setKbSelected] = useState<SynthesizedSnippet[]>([]);
   const [kbSynthesis, setKbSynthesis] = useState<string | null>(null);
   const [kbSynthesized, setKbSynthesized] = useState(false);
+  const [kbFallbackNote, setKbFallbackNote] = useState<string | null>(null);
+  const [kbDivisionScoped, setKbDivisionScoped] = useState<boolean | undefined>(undefined);
   const [showKbPanel, setShowKbPanel] = useState(false);
   const [customizeOpen, setCustomizeOpen] = useState(false);
 
@@ -631,6 +633,8 @@ function BriefWizard() {
                           selected={kbSelected}
                           synthesis={kbSynthesis}
                           synthesized={kbSynthesized}
+                          divisionScoped={kbDivisionScoped}
+                          fallbackNote={kbFallbackNote}
                           open={showKbPanel}
                           onToggle={() => setShowKbPanel((v) => !v)}
                         />
@@ -769,6 +773,8 @@ function BriefWizard() {
                           setKbSelected(synth.selected);
                           setKbSynthesis(synthesisText);
                           setKbSynthesized(synthesized);
+                          setKbFallbackNote(synth.fallbackNote ?? null);
+                          setKbDivisionScoped(synth.divisionScoped);
                           setShowKbPanel(true);
                         }
                       } catch { /* fall through to raw retrieval */ }
@@ -1153,15 +1159,24 @@ function KnowledgeUsedPanel({
   selected,
   synthesis,
   synthesized,
+  divisionScoped,
+  fallbackNote,
   open,
   onToggle,
 }: {
   selected: SynthesizedSnippet[];
   synthesis: string | null;
   synthesized: boolean;
+  divisionScoped?: boolean;
+  fallbackNote?: string | null;
   open: boolean;
   onToggle: () => void;
 }) {
+  const confidence = !synthesized
+    ? { label: "Unverified", tone: "warn" as const }
+    : divisionScoped === false
+      ? { label: "Cross-division", tone: "warn" as const }
+      : { label: "Deep RAG", tone: "ok" as const };
   return (
     <div
       className="rounded-xl border bg-white p-5"
@@ -1173,8 +1188,14 @@ function KnowledgeUsedPanel({
         className="flex w-full items-center justify-between gap-4 text-left"
       >
         <div className="flex items-center gap-3">
-          <span className="rounded-full bg-[#0F1B3D] px-2.5 py-1 font-['Urbanist'] text-[10px] font-bold uppercase tracking-widest text-white">
-            {synthesized ? "Deep RAG" : "Retrieved"}
+          <span
+            className={
+              confidence.tone === "ok"
+                ? "rounded-full bg-[#0F1B3D] px-2.5 py-1 font-['Urbanist'] text-[10px] font-bold uppercase tracking-widest text-white"
+                : "rounded-full bg-[#B45309] px-2.5 py-1 font-['Urbanist'] text-[10px] font-bold uppercase tracking-widest text-white"
+            }
+          >
+            {confidence.label}
           </span>
           <span className="font-['Urbanist'] text-sm font-bold uppercase tracking-[0.14em] text-[#0F1B3D]">
             Knowledge used ({selected.length})
@@ -1182,6 +1203,11 @@ function KnowledgeUsedPanel({
         </div>
         <span className="text-xs text-[#1E3A5F]/70">{open ? "Hide" : "Show"}</span>
       </button>
+      {fallbackNote && (
+        <div className="mt-3 rounded-lg border border-[#F59E0B]/40 bg-[#FFF7ED] px-3 py-2 text-xs leading-relaxed text-[#7C2D12]">
+          ⚠︎ {fallbackNote}
+        </div>
+      )}
       {open && (
         <div className="mt-4 space-y-4">
           {synthesis && (

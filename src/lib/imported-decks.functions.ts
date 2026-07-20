@@ -202,6 +202,18 @@ export function normalizeImportedDeckDivision(v: string): string {
   return IMPORTED_DECK_SLUG_TO_DIVISION[v] ?? v;
 }
 
+// Inverse: given a bm-* id (or an already-slug string), return the slug used
+// by the imported_decks table so we can filter that table safely from callers
+// that speak the canonical bm-* scheme. Falls back to the input for legacy
+// callers that already pass a slug.
+export function importedDeckSlugForDivision(v: string): string {
+  if (Object.prototype.hasOwnProperty.call(IMPORTED_DECK_SLUG_TO_DIVISION, v)) return v;
+  for (const [slug, div] of Object.entries(IMPORTED_DECK_SLUG_TO_DIVISION)) {
+    if (div === v) return slug;
+  }
+  return v;
+}
+
 function chunkText(text: string, size = 1200, overlap = 200): string[] {
   const clean = text.replace(/\r\n/g, "\n").replace(/[ \t]+\n/g, "\n").trim();
   if (clean.length <= size) return clean.length > 40 ? [clean] : [];
@@ -290,7 +302,7 @@ export const embedImportedDecks = createServerFn({ method: "POST" })
       .select("id, division_id, original_filename, slides, chunk_count, status")
       .eq("status", "parsed");
     if (data.id) q = q.eq("id", data.id);
-    if (data.divisionId) q = q.eq("division_id", data.divisionId);
+    if (data.divisionId) q = q.eq("division_id", importedDeckSlugForDivision(data.divisionId));
     if (data.skipEmbedded) q = q.eq("chunk_count", 0);
     const { data: rows } = await q.limit(data.limit);
     const list = ((rows ?? []) as Array<{

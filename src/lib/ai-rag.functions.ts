@@ -107,11 +107,17 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
       selected: SynthesizedSnippet[];
       synthesis: string | null;
       synthesized: boolean;
+      divisionScoped?: boolean;
+      fallbackNote?: string;
       discardedNote?: string;
       setup?: boolean;
       note?: string;
     }> => {
       const s = context.supabase as unknown as SbClient;
+      // Vector-search division scoping. Same semantics as ai-oracle.functions:
+      // undefined = no division filter requested; true = filter returned matches;
+      // false = filter returned nothing so we fell back to unfiltered results.
+      let divisionScoped: boolean | undefined = undefined;
 
       // ── 1. Hybrid retrieval ─────────────────────────────────────────────
       const [oracleRes, entriesRes, brandIntelRes] = await Promise.all([
@@ -255,13 +261,16 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
                 tags: string[];
                 similarity: number;
               }>;
-              if (chunkRows.length === 0 && filterDivision) {
-                const { data: unfiltered } = await s.rpc("match_brand_chunks", {
-                  query_embedding: embeddingLiteral,
-                  match_count: 10,
-                  filter_division: null,
-                });
-                chunkRows = (unfiltered ?? []) as typeof chunkRows;
+              if (filterDivision) {
+                divisionScoped = chunkRows.length > 0;
+                if (chunkRows.length === 0) {
+                  const { data: unfiltered } = await s.rpc("match_brand_chunks", {
+                    query_embedding: embeddingLiteral,
+                    match_count: 10,
+                    filter_division: null,
+                  });
+                  chunkRows = (unfiltered ?? []) as typeof chunkRows;
+                }
               }
               if (chunkRows.length) {
                 const { data: assets } = await s
@@ -308,11 +317,17 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
         })),
       ];
 
+      const fallbackNote = divisionScoped === false
+        ? "No division-specific brand-asset chunks matched — snippets below include content from other divisions. Verify facts before treating them as division-accurate."
+        : undefined;
+
       // ── 3. Missing-key fallback → return raw candidates trimmed to limit
       if (!hasAnthropicKey()) {
         return {
           ok: true,
           synthesized: false,
+          divisionScoped,
+          fallbackNote,
           synthesis: null,
           selected: candidates.slice(0, data.limit),
           setup: true,
@@ -446,6 +461,8 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
         return {
           ok: true,
           synthesized: false,
+          divisionScoped,
+          fallbackNote,
           synthesis: null,
           selected: candidates.slice(0, data.limit),
           note: ("rawError" in result && result.rawError) || undefined,
@@ -474,9 +491,18 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
       // If the model hallucinated everything, fall back to top raw candidates.
       const selected = cleaned.length ? cleaned : candidates.slice(0, data.limit);
 
+      // If Claude hallucinated every id and we fell back to raw candidates,
+      // surface a synthesis-quality note so the UI can flag it the same way
+      // the division-fallback does.
+      const hallucinationNote = cleaned.length === 0
+        ? "AI couldn't reliably synthesize the retrieved chunks — showing top raw matches instead. Treat them as leads, not verified facts."
+        : undefined;
+
       return {
         ok: true,
         synthesized: cleaned.length > 0,
+        divisionScoped,
+        fallbackNote: fallbackNote ?? hallucinationNote,
         synthesis: value.synthesis,
         discardedNote: value.discardedNote,
         selected,

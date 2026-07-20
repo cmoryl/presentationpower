@@ -12,6 +12,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadSlideMedia } from "@/lib/slide-media";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
+import { logImageryEvent } from "@/lib/admin.functions";
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
 // Formats that render natively in every browser AND embed cleanly in
@@ -110,6 +111,10 @@ export function SlideImageryPanel({
       const prepared = RASTERIZE.includes(file.type) ? await rasterizeToPng(file) : file;
       const uploaded = await uploadSlideMedia(prepared);
       onChange(uploaded.signedUrl);
+      // Fire-and-forget: record usage so /admin/imagery-analytics reflects it.
+      void logImageryEvent({
+        data: { imageId: `upload:${uploaded.path ?? uploaded.signedUrl}`, brandId: divisionId ?? null, eventType: "use" },
+      }).catch(() => {});
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed.");
     } finally {
@@ -309,7 +314,13 @@ export function SlideImageryPanel({
                         key={r.id}
                         type="button"
                         title={`${r.filename}${r.tags?.length ? "\nTags: " + r.tags.join(", ") : ""}${r.note ? "\n" + r.note : ""}`}
-                        onClick={() => r.signedUrl && onChange(r.signedUrl)}
+                        onClick={() => {
+                          if (!r.signedUrl) return;
+                          onChange(r.signedUrl);
+                          void logImageryEvent({
+                            data: { imageId: `division-imagery:${r.id}`, brandId: divisionId ?? null, eventType: "use" },
+                          }).catch(() => {});
+                        }}
                         disabled={!r.signedUrl}
                         className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-black/10 bg-black/5 transition hover:border-black/40 disabled:opacity-40"
                       >
