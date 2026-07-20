@@ -6,9 +6,12 @@
 // Sources: upload to the private `slide-media` Supabase bucket, paste an
 // image URL, or reset to the deterministic division-seeded imagery.
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadSlideMedia } from "@/lib/slide-media";
+import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
 // Formats that render natively in every browser AND embed cleanly in
