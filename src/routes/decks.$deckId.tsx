@@ -81,7 +81,7 @@ function DeckEditor() {
   }, []);
   const cloudDeckId = userId ? deckCloudId(userId, deckId) : null;
   // Apply translation overlay by slide position without mutating the deck store.
-  const applyOverlay = (slide: { position: number; content: Record<string, unknown> }) => {
+  const applyOverlay = <T extends { position: number; content: Record<string, unknown> }>(slide: T): T => {
     if (!overlay) return slide;
     const t = overlay.byPosition.get(slide.position);
     return t ? { ...slide, content: t } : slide;
