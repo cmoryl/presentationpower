@@ -5,6 +5,7 @@
 // slide had a picture, and preserving theme colors as a deck-level override).
 
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 import JSZip from "jszip";
 import { XMLParser } from "fast-xml-parser";
