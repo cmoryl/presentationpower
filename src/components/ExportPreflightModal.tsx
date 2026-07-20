@@ -45,7 +45,7 @@ export function ExportPreflightModal({
           <div className="text-[11px] uppercase tracking-widest text-amber-700">
             Export preflight
           </div>
-          <h2 className="mt-1 text-xl font-semibold">
+          <h2 id="export-preflight-title" className="mt-1 text-xl font-semibold">
             {issues.length} {issues.length === 1 ? "issue" : "issues"} may affect this export
           </h2>
           {corsCount > 0 && (
