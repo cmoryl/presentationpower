@@ -61,6 +61,24 @@ function PdfIngestPage() {
     onError: (e: Error) => setRunLog(`Error: ${e.message}`),
   });
 
+  const embedMut = useMutation({
+    mutationFn: async () =>
+      embed({
+        data: {
+          entitySlug: embedEntity || undefined,
+          limit: embedLimit,
+          skipEmbedded: true,
+        },
+      }),
+    onSuccess: (res) => {
+      setEmbedLog(
+        `Considered ${res.considered} · Embedded ${res.embedded} · Skipped ${res.skipped} · Failed ${res.failed} · ${res.totalChunks} chunks`,
+      );
+      rowsQ.refetch();
+    },
+    onError: (e: Error) => setEmbedLog(`Error: ${e.message}`),
+  });
+
   const openTextQ = useQuery({
     queryKey: ["pdf-extraction-text", openId],
     queryFn: () => (openId ? getText({ data: { id: openId } }) : Promise.resolve(null)),
