@@ -11,6 +11,7 @@
 
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import {
   BACKGROUND_PRESETS,
   PATTERN_LIBRARY,
@@ -22,8 +23,9 @@ import {
 } from "@/lib/background-library";
 import { uploadDataUrl, uploadSlideMedia } from "@/lib/slide-media";
 import { generateBackgroundImage } from "@/lib/ai-image.functions";
+import { listDivisionImagery } from "@/lib/division-imagery.functions";
 
-type Tab = "library" | "solid" | "gradient" | "pattern" | "upload" | "ai";
+type Tab = "library" | "brand" | "solid" | "gradient" | "pattern" | "upload" | "ai";
 
 const BRAND_SWATCHES = [
   "#03002C", "#003FC7", "#A1FBF9", "#C2A3FF",
