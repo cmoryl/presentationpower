@@ -115,6 +115,9 @@ export function LanguageSwitcher({
 
   async function selectLocale(lang: string) {
     if (!cloudDeckId) return;
+    if (storageKey && typeof window !== "undefined") {
+      window.localStorage.setItem(storageKey, lang);
+    }
     if (lang === "en") {
       setCurrent("en");
       onChange(null);
