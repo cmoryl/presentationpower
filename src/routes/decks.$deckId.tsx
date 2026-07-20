@@ -90,6 +90,7 @@ function DeckEditor() {
         </div>
         <div className="flex items-center gap-2">
           <DuplicateDeckButton deckId={deckId} />
+          <RebrandMenu deckId={deckId} />
           <TemplateToggleButton deckId={deckId} />
           <SaveToCloudButton deckId={deckId} />
           <VersionHistoryButton deckId={deckId} />
