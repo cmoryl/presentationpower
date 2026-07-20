@@ -379,11 +379,10 @@ export function ShareMenu({ deckId }: { deckId: string }) {
         busy={busy}
         onCancel={() => setPreflightIssues(null)}
         onExportAnyway={runPptxExport}
-        onJumpToSlide={(slideId) => {
+        onJumpToSlide={(_slideId) => {
           setPreflightIssues(null);
           setOpen(false);
           navigate({ to: "/decks/$deckId", params: { deckId } });
-          void slideId;
         }}
       />
     </div>
