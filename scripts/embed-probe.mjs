@@ -19,7 +19,6 @@ async function probe(query, division) {
   const { data, error } = await sa.rpc("match_brand_chunks", {
     query_embedding: `[${v.join(",")}]`,
     filter_division: division,
-    match_threshold: 0.3,
     match_count: 5,
   });
   console.log(`\n▸ "${query}" [division=${division}]`);
