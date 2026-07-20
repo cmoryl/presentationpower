@@ -187,18 +187,25 @@ export async function exportDeckToPptx(
       }
     }
 
-    // 3. Legacy cover/divider imagery underlay — only when the slide has no
-    //    explicit Backgrounds & Imagery selection. Preserves prior behavior
-    //    for decks that predate the panel.
+    // 3. Slide-imagery underlay — a full-bleed photograph with a palette
+    //    scrim. Fires for every variant whose editor renderer surfaces a
+    //    photograph (see `variantSupportsImagery`), so custom `mediaUrl`
+    //    uploads from SlideImageryPanel survive PPTX export the same way
+    //    covers and dividers already do. Skipped when the slide already
+    //    carries an explicit image-typed Backgrounds & Imagery selection.
     const imgData = slideImages[i];
-    if (!bgIsImage && imgData && (kind === "cover" || kind === "divider")) {
+    if (!bgIsImage && imgData && variantSupportsImagery(slide.variantId)) {
       s.addImage({
         data: imgData, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H,
         sizing: { type: "cover", w: SLIDE_W, h: SLIDE_H },
       });
+      // Cover/divider get the strong brand wash they historically had;
+      // other image variants use a lighter scrim so the picture reads
+      // through while remaining legible under the renderer's text.
+      const scrimTransparency = kind === "cover" || kind === "divider" ? 35 : 55;
       s.addShape("rect", {
         x: 0, y: 0, w: SLIDE_W, h: SLIDE_H,
-        fill: { color: palette.primary, transparency: 35 },
+        fill: { color: palette.primary, transparency: scrimTransparency },
         line: { color: palette.primary, transparency: 100 },
       });
     }
