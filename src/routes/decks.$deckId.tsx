@@ -11,6 +11,7 @@ import { VersionHistoryButton } from "@/components/VersionHistoryDrawer";
 import { DuplicateDeckButton, TemplateToggleButton } from "@/components/DeckActions";
 import { TranslateButton } from "@/components/TranslateDrawer";
 import { LanguageSwitcher, type LocaleOverlay } from "@/components/LanguageSwitcher";
+import { listSlideTranslationStatus } from "@/lib/translation.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { deckCloudId } from "@/lib/deck-uuid";
 import { RebrandMenu } from "@/components/RebrandMenu";
@@ -86,6 +87,28 @@ function DeckEditor() {
     const t = overlay.byPosition.get(slide.position);
     return t ? { ...slide, content: t } : slide;
   };
+
+  // Per-slide translation status badges — indexed by slide index (deck order).
+  const listSlideStatus = useServerFn(listSlideTranslationStatus);
+  const slideStatusQuery = useQuery({
+    queryKey: ["slide-translation-status", cloudDeckId],
+    queryFn: () => (cloudDeckId ? listSlideStatus({ data: { deckId: cloudDeckId } }) : Promise.resolve([])),
+    enabled: !!cloudDeckId,
+    staleTime: 20_000,
+    refetchInterval: 30_000,
+  });
+  const slideLangMap = useMemo(() => {
+    const m = new Map<number, { ready: string[]; pending: string[] }>();
+    for (const r of slideStatusQuery.data ?? []) {
+      const entry = m.get(r.position) ?? { ready: [], pending: [] };
+      if (r.status === "ready") entry.ready.push(r.target_lang);
+      else entry.pending.push(r.target_lang);
+      m.set(r.position, entry);
+    }
+    return m;
+  }, [slideStatusQuery.data]);
+
+
 
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
@@ -185,6 +208,32 @@ function DeckEditor() {
                     </div>
 
                     <div className="text-black/50">{variant?.name}</div>
+                    {(() => {
+                      const st = slideLangMap.get(i);
+                      if (!st || (st.ready.length === 0 && st.pending.length === 0)) return null;
+                      return (
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {st.ready.map((l) => (
+                            <span
+                              key={`r-${l}`}
+                              title={`${l.toUpperCase()} · cached`}
+                              className="inline-flex items-center rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-emerald-700"
+                            >
+                              {l}
+                            </span>
+                          ))}
+                          {st.pending.map((l) => (
+                            <span
+                              key={`p-${l}`}
+                              title={`${l.toUpperCase()} · pending`}
+                              className="inline-flex items-center rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-amber-700"
+                            >
+                              {l}…
+                            </span>
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </button>
                 <div className="absolute right-1 top-1 flex gap-1 opacity-0 transition group-hover:opacity-100">

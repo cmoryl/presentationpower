@@ -742,6 +742,33 @@ export const listCachedLocales = createServerFn({ method: "POST" })
     return { total, locales };
   });
 
+// Per-slide-per-locale status matrix for the editor badges.
+export const listSlideTranslationStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
+  .handler(async ({ data, context }) => {
+    const supabase = context.supabase as AnySupabase;
+    const { data: slides } = await supabase
+      .from("deck_slides")
+      .select("id, position")
+      .eq("deck_id", data.deckId);
+    const list = ((slides ?? []) as Array<{ id: string; position: number }>);
+    if (list.length === 0) return [] as Array<{ position: number; target_lang: string; status: string; updated_at: string }>;
+    const idToPos = new Map(list.map((s) => [s.id, s.position]));
+    const { data: rows } = await supabase
+      .from("slide_translations")
+      .select("slide_id, target_lang, status, updated_at")
+      .in("slide_id", list.map((s) => s.id));
+    const out: Array<{ position: number; target_lang: string; status: string; updated_at: string }> = [];
+    for (const r of (rows ?? []) as Array<{ slide_id: string; target_lang: string; status: string; updated_at: string }>) {
+      const pos = idToPos.get(r.slide_id);
+      if (pos == null) continue;
+      out.push({ position: pos, target_lang: r.target_lang, status: r.status, updated_at: r.updated_at });
+    }
+    return out;
+  });
+
+
 // Fetch translated content keyed by slide position for the editor overlay.
 export const getDeckSlideTranslations = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
