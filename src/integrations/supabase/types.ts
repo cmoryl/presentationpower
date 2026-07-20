@@ -942,6 +942,54 @@ export type Database = {
           },
         ]
       }
+      division_imagery: {
+        Row: {
+          content_type: string | null
+          created_at: string
+          division_id: string
+          filename: string
+          id: string
+          kind: string
+          note: string | null
+          prompt: string | null
+          size_bytes: number
+          storage_path: string
+          tags: string[]
+          updated_at: string
+          uploaded_by: string
+        }
+        Insert: {
+          content_type?: string | null
+          created_at?: string
+          division_id: string
+          filename: string
+          id?: string
+          kind?: string
+          note?: string | null
+          prompt?: string | null
+          size_bytes?: number
+          storage_path: string
+          tags?: string[]
+          updated_at?: string
+          uploaded_by: string
+        }
+        Update: {
+          content_type?: string | null
+          created_at?: string
+          division_id?: string
+          filename?: string
+          id?: string
+          kind?: string
+          note?: string | null
+          prompt?: string | null
+          size_bytes?: number
+          storage_path?: string
+          tags?: string[]
+          updated_at?: string
+          uploaded_by?: string
+        }
+        Relationships: []
+      }
       imagery_events: {
         Row: {
           brand_id: string | null
