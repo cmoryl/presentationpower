@@ -7,8 +7,6 @@ import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LazyMount } from "@/components/LazyMount";
 import { WcagBadge } from "@/components/WcagBadge";
 import { TypeBadge } from "@/components/TypeBadge";
-
-
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { seedContent, useDeckStore, type Brief, type TemplatePayload } from "@/lib/deck-store";
