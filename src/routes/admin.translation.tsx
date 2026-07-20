@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { AdminShell } from "@/components/AdminShell";
 import { Languages, Plus, Trash2, Check, AlertTriangle, ShieldCheck } from "lucide-react";
 import {
   listLanguages,
@@ -87,7 +86,7 @@ function TranslationAdminPage() {
   }
 
   return (
-    <AdminShell>
+    <div className="mx-auto max-w-6xl px-6 pb-16">
       <div className="mb-8 flex items-center justify-between">
         <div>
           <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">Admin · Localization</div>
@@ -228,6 +227,6 @@ function TranslationAdminPage() {
       </section>
 
       {status && <div className="mt-6 text-xs text-white/60">{status}</div>}
-    </AdminShell>
+    </div>
   );
 }
