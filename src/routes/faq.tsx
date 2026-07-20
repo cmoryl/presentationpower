@@ -155,7 +155,54 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
     ],
   },
   {
-    section: "Knowledge & Oracle",
+    section: "Collaboration & sharing",
+    items: [
+      {
+        q: "How do I share a deck without giving edit access?",
+        a: "Click Share on the deck and generate a token. You'll get a /share/$token URL you can send. Set an expiry, revoke, or regenerate anytime, and track views in /analytics.",
+      },
+      {
+        q: "Can teammates comment on a deck?",
+        a: "Yes. Open Comments on any slide to leave threaded comments. Move the deck through Draft → In review → Approved using ReviewStatusControl. All access is enforced at the RLS layer.",
+      },
+      {
+        q: "Is there version history and undo?",
+        a: "Yes. Autosave writes snapshots as you work; Version history lets you restore any snapshot non-destructively. The editor also has session Undo/Redo.",
+      },
+    ],
+  },
+  {
+    section: "Translation & GlobalLink",
+    items: [
+      {
+        q: "How do I translate a deck?",
+        a: "Open the Translate drawer on any deck, pick target languages, and let the AI/GlobalLink engine produce overlays. Preview live with the language switcher and export a localized PPTX or PDF.",
+      },
+      {
+        q: "Are translations destructive?",
+        a: "No. Translations are stored as per-slide overlays. The source deck is never overwritten, and you can switch languages live or retry failed jobs from job history.",
+      },
+      {
+        q: "How do I configure GlobalLink?",
+        a: "Admin → GlobalLink. Set the API base URL, project code, and callback secret; add the API key as a secret. The status badge flips to Connected once the required secrets are present, and Test connection probes the API.",
+      },
+    ],
+  },
+  {
+    section: "Rebrand, templates & duplication",
+    items: [
+      {
+        q: "Can I retone an entire deck to a different brand?",
+        a: "Yes. Use Rebrand in the editor toolbar to preview a target brand mode live across every slide. Committing writes an auto-snapshot for rollback.",
+      },
+      {
+        q: "Can I duplicate a deck or save it as a template?",
+        a: "Yes. Duplicate any deck from the deck menu, and flag it as a team template. Templates surface in /templates for anyone in the workspace to start from.",
+      },
+    ],
+  },
+  {
+    section: "Knowledge, RAG & Oracle",
     items: [
       {
         q: "What's the difference between Knowledge and Oracle KB?",
@@ -163,7 +210,32 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
       },
       {
         q: "Where does brand intelligence come from?",
-        a: "The brand_intelligence table holds per-entity summaries imported from BrandHub. It powers the Oracle overview but does not drive generation.",
+        a: "The brand_intelligence table holds per-entity summaries. It powers the Oracle overview but does not drive generation directly — RAG retrieval does.",
+      },
+      {
+        q: "What's embedded into the RAG index?",
+        a: "170 division PDFs and per-division imported PPTX decks, chunked and embedded with gemini-embedding-001 (3072-dim). Deep RAG synthesis runs Claude over the retrieved documents with hybrid retrieval.",
+      },
+      {
+        q: "How do I add division-specific imagery?",
+        a: "Admin → Knowledge → Imagery. Upload assets against a division; they appear as a searchable Team library inside SlideImageryPanel and BackgroundImageryPanel in the editor.",
+      },
+    ],
+  },
+  {
+    section: "Exports & presenting",
+    items: [
+      {
+        q: "How do I export to PowerPoint?",
+        a: "Open any deck and click Export. A preflight scan checks for CORS and asset risks before generating a branded .pptx that matches TransPerfect's visual system.",
+      },
+      {
+        q: "Which image formats can I upload?",
+        a: "JPEG, PNG, WebP, GIF (passthrough), AVIF (rasterized), and SVG (vector-preserving passthrough — rasterized on-the-fly during PPTX export).",
+      },
+      {
+        q: "Is there a presenter view?",
+        a: "Yes. Presenter view runs the deck fullscreen with speaker notes and keyboard navigation. Present mode is also available for a clean fullscreen show.",
       },
     ],
   },
@@ -180,7 +252,7 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
       },
       {
         q: "Can I install this as an app?",
-        a: 'Yes. On iOS use Safari → Share → "Add to Home Screen". On Android/desktop Chrome, use the install icon in the address bar. Works offline is not supported.',
+        a: 'Yes. On iOS use Safari → Share → "Add to Home Screen". On Android/desktop Chrome, use the install icon in the address bar. Offline is not supported.',
       },
     ],
   },
