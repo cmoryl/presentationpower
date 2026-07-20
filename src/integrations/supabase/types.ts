@@ -1795,6 +1795,18 @@ export type Database = {
     }
     Functions: {
       get_shared_deck: { Args: { _token: string }; Returns: Json }
+      get_shared_deck_locales: {
+        Args: { _token: string }
+        Returns: {
+          ready: number
+          target_lang: string
+          total: number
+        }[]
+      }
+      get_shared_deck_translations: {
+        Args: { _lang: string; _token: string }
+        Returns: Json
+      }
       get_template_deck: { Args: { _deck_id: string }; Returns: Json }
       has_role: {
         Args: {

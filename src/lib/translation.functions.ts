@@ -526,3 +526,206 @@ export const listDeckTranslations = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return rows ?? [];
   });
+
+// ---------------------------------------------------------------------------
+// Non-destructive per-slide translation cache.
+// Populates public.slide_translations for every slide in a deck so the editor
+// and share viewer can switch languages at render time without re-running jobs.
+// ---------------------------------------------------------------------------
+
+export const cacheDeckTranslation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) =>
+    z
+      .object({
+        deckId: z.string().uuid(),
+        targetLang: z.string().min(2).max(10),
+        engine: z.enum(["globallink", "ai"]).optional(),
+        humanReview: z.boolean().default(false),
+        force: z.boolean().default(false),
+      })
+      .parse(raw),
+  )
+  .handler(async ({ data, context }) => {
+    const supabase = context.supabase as AnySupabase;
+    const { deck, slides } = await loadDeckBundle(supabase, data.deckId);
+    if (deck.owner_id !== context.userId) throw new Error("Forbidden");
+
+    const divisionId = deck.brand_mode_id as string | null;
+    const glossary = await loadRelevantGlossary(supabase, divisionId, deck.id);
+    const engine = data.engine ?? "ai";
+
+    const slideIds: string[] = (slides as Array<{ id: string }>).map((s) => s.id);
+    const existingByKey = new Map<string, { source_hash: string; status: string }>();
+    if (slideIds.length > 0) {
+      const { data: existing } = await supabase
+        .from("slide_translations")
+        .select("slide_id, source_hash, status")
+        .eq("target_lang", data.targetLang)
+        .in("slide_id", slideIds);
+      for (const r of (existing ?? []) as Array<{ slide_id: string; source_hash: string; status: string }>) {
+        existingByKey.set(r.slide_id, { source_hash: r.source_hash, status: r.status });
+      }
+    }
+
+    let translatedCount = 0;
+    let skippedCount = 0;
+    for (const s of slides as Array<{ id: string; content: unknown }>) {
+      const hash = contentHash(s.content);
+      const prior = existingByKey.get(s.id);
+      if (!data.force && prior && prior.status === "ready" && prior.source_hash === hash) {
+        skippedCount++;
+        continue;
+      }
+      try {
+        const { content: translated, jobRef } = await translateContent(
+          s.content,
+          data.targetLang,
+          glossary,
+          engine,
+          data.humanReview,
+        );
+        await supabase.from("slide_translations").upsert(
+          {
+            slide_id: s.id,
+            target_lang: data.targetLang,
+            source_hash: hash,
+            translated_content: translated,
+            status: "ready",
+            engine,
+            job_ref: jobRef ?? null,
+            error: null,
+          },
+          { onConflict: "slide_id,target_lang" },
+        );
+        translatedCount++;
+      } catch (e) {
+        await supabase.from("slide_translations").upsert(
+          {
+            slide_id: s.id,
+            target_lang: data.targetLang,
+            source_hash: hash,
+            translated_content: null,
+            status: "failed",
+            engine,
+            error: (e as Error).message.slice(0, 500),
+          },
+          { onConflict: "slide_id,target_lang" },
+        );
+      }
+    }
+
+    return {
+      ok: true,
+      deckId: deck.id,
+      targetLang: data.targetLang,
+      total: slides.length,
+      translated: translatedCount,
+      skipped: skippedCount,
+    };
+  });
+
+// Which locales are cached for this deck, and how complete each is.
+export const listCachedLocales = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
+  .handler(async ({ data, context }) => {
+    const supabase = context.supabase as AnySupabase;
+    const { data: slides } = await supabase
+      .from("deck_slides")
+      .select("id")
+      .eq("deck_id", data.deckId);
+    const slideIds: string[] = ((slides ?? []) as Array<{ id: string }>).map((s) => s.id);
+    const total = slideIds.length;
+    if (total === 0) return { total: 0, locales: [] as Array<{ target_lang: string; ready: number; total: number; updated_at: string }> };
+    const { data: rows } = await supabase
+      .from("slide_translations")
+      .select("target_lang, status, updated_at")
+      .in("slide_id", slideIds);
+    const agg = new Map<string, { ready: number; updated_at: string }>();
+    for (const r of (rows ?? []) as Array<{ target_lang: string; status: string; updated_at: string }>) {
+      const cur = agg.get(r.target_lang) ?? { ready: 0, updated_at: r.updated_at };
+      if (r.status === "ready") cur.ready += 1;
+      if (r.updated_at > cur.updated_at) cur.updated_at = r.updated_at;
+      agg.set(r.target_lang, cur);
+    }
+    const locales = Array.from(agg.entries())
+      .map(([target_lang, v]) => ({ target_lang, ready: v.ready, total, updated_at: v.updated_at }))
+      .sort((a, b) => (a.target_lang < b.target_lang ? -1 : 1));
+    return { total, locales };
+  });
+
+// Fetch translated content keyed by slide position for the editor overlay.
+export const getDeckSlideTranslations = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) =>
+    z.object({ deckId: z.string().uuid(), targetLang: z.string().min(2).max(10) }).parse(raw),
+  )
+  .handler(async ({ data, context }) => {
+    const supabase = context.supabase as AnySupabase;
+    const { data: rows, error } = await supabase
+      .from("deck_slides")
+      .select("id, position, slide_translations!inner(translated_content, status, target_lang)")
+      .eq("deck_id", data.deckId)
+      .eq("slide_translations.target_lang", data.targetLang)
+      .eq("slide_translations.status", "ready");
+    if (error) throw new Error(error.message);
+    const out: Array<{ position: number; content: Record<string, never> }> = [];
+    for (const r of (rows ?? []) as Array<{ position: number; slide_translations: Array<{ translated_content: unknown }> }>) {
+      const t = r.slide_translations?.[0]?.translated_content;
+      if (t && typeof t === "object") out.push({ position: r.position, content: t as Record<string, never> });
+    }
+    out.sort((a, b) => a.position - b.position);
+    return out;
+  });
+
+// Public: fetch translated content for a share token. Uses SECURITY DEFINER RPC.
+export const getSharedDeckTranslations = createServerFn({ method: "POST" })
+  .inputValidator((raw) =>
+    z.object({ token: z.string().min(16), targetLang: z.string().min(2).max(10) }).parse(raw),
+  )
+  .handler(async ({ data }) => {
+    const { createClient } = await import("@supabase/supabase-js");
+    const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
+    const url = process.env.SUPABASE_URL!;
+    const client = createClient(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: {
+        fetch: (input, init) => {
+          const h = new Headers(init?.headers);
+          if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+          h.set("apikey", key);
+          return fetch(input, { ...init, headers: h });
+        },
+      },
+    });
+    const { data: rows, error } = await client.rpc("get_shared_deck_translations", {
+      _token: data.token,
+      _lang: data.targetLang,
+    });
+    if (error) throw new Error(error.message);
+    return (rows ?? []) as Array<{ position: number; content: Record<string, never> }>;
+  });
+
+// Public: list cached locales for a shared deck (token-gated).
+export const listSharedLocales = createServerFn({ method: "POST" })
+  .inputValidator((raw) => z.object({ token: z.string().min(16) }).parse(raw))
+  .handler(async ({ data }) => {
+    const { createClient } = await import("@supabase/supabase-js");
+    const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
+    const url = process.env.SUPABASE_URL!;
+    const client = createClient(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: {
+        fetch: (input, init) => {
+          const h = new Headers(init?.headers);
+          if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+          h.set("apikey", key);
+          return fetch(input, { ...init, headers: h });
+        },
+      },
+    });
+    const { data: rows, error } = await client.rpc("get_shared_deck_locales", { _token: data.token });
+    if (error) throw new Error(error.message);
+    return (rows ?? []) as Array<{ target_lang: string; ready: number; total: number }>;
+  });

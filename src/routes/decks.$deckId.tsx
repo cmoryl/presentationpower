@@ -10,6 +10,9 @@ import { ShareMenu } from "@/components/ShareMenu";
 import { VersionHistoryButton } from "@/components/VersionHistoryDrawer";
 import { DuplicateDeckButton, TemplateToggleButton } from "@/components/DeckActions";
 import { TranslateButton } from "@/components/TranslateDrawer";
+import { LanguageSwitcher, type LocaleOverlay } from "@/components/LanguageSwitcher";
+import { supabase } from "@/integrations/supabase/client";
+import { deckCloudId } from "@/lib/deck-uuid";
 import { RebrandMenu } from "@/components/RebrandMenu";
 import { BrandReviewPanel } from "@/components/BrandReviewPanel";
 import { CommentsPanel } from "@/components/CommentsPanel";
@@ -71,6 +74,18 @@ function DeckEditor() {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [commentCounts, setCommentCounts] = useState<Map<number | "deck", number>>(new Map());
   const totalOpen = useMemo(() => Array.from(commentCounts.values()).reduce((a, b) => a + b, 0), [commentCounts]);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [overlay, setOverlay] = useState<LocaleOverlay | null>(null);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setUserId(data.session?.user.id ?? null));
+  }, []);
+  const cloudDeckId = userId ? deckCloudId(userId, deckId) : null;
+  // Apply translation overlay by slide position without mutating the deck store.
+  const applyOverlay = <T extends { position: number; content: Record<string, unknown> }>(slide: T): T => {
+    if (!overlay) return slide;
+    const t = overlay.byPosition.get(slide.position);
+    return t ? { ...slide, content: t } : slide;
+  };
 
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
@@ -126,6 +141,7 @@ function DeckEditor() {
           <SaveToCloudButton deckId={deckId} />
           <VersionHistoryButton deckId={deckId} />
           <TranslateButton deckId={deckId} />
+          <LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} />
           <ShareMenu deckId={deckId} />
         </div>
       </div>
@@ -146,7 +162,7 @@ function DeckEditor() {
                 >
                   <div className="aspect-[16/9] bg-white">
                     <ScaledSlide>
-                      {variant && <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />}
+                      {variant && <VariantRenderer slide={applyOverlay(slide)} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />}
                     </ScaledSlide>
                   </div>
                   <div className="border-t border-black/10 bg-white px-3 py-2 text-xs">
@@ -195,7 +211,7 @@ function DeckEditor() {
           >
             {active && mv && (
               <ScaledSlide>
-                <VariantRenderer slide={active} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />
+                <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />
               </ScaledSlide>
             )}
             <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100">
@@ -485,7 +501,7 @@ function DeckEditor() {
           onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
           onNext={clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined}
         >
-          <VariantRenderer slide={active} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />
+          <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />
         </SlideLightbox>
       )}
 

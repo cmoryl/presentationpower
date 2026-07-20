@@ -2,11 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getSharedDeck, recordShareView } from "@/lib/deck-sharing.functions";
+import { getSharedDeckTranslations, listSharedLocales, listLanguages } from "@/lib/translation.functions";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
-import { Play, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Play, X, ChevronLeft, ChevronRight, Languages, Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { deckCloudId } from "@/lib/deck-uuid";
 
@@ -121,6 +122,58 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
   const clientName = deck.brief?.prospect ?? undefined;
   const [presenting, setPresenting] = useState(false);
   const [i, setI] = useState(0);
+
+  // ---- Language overlay ----
+  const listLocalesFn = useServerFn(listSharedLocales);
+  const fetchTxFn = useServerFn(getSharedDeckTranslations);
+  const listLangsFn = useServerFn(listLanguages);
+  const [locales, setLocales] = useState<Array<{ target_lang: string; ready: number; total: number }>>([]);
+  const [langs, setLangs] = useState<Array<{ id: string; label: string; native: string; rtl: boolean }>>([]);
+  const [currentLang, setCurrentLang] = useState<string>("en");
+  const [overlay, setOverlay] = useState<Map<number, Record<string, unknown>> | null>(null);
+  const [langOpen, setLangOpen] = useState(false);
+  const [langBusy, setLangBusy] = useState<string | null>(null);
+
+  useEffect(() => {
+    listLocalesFn({ data: { token } })
+      .then((r) => setLocales((r as typeof locales) ?? []))
+      .catch(() => {});
+    listLangsFn()
+      .then((r) => setLangs(r as typeof langs))
+      .catch(() => {});
+  }, [token, listLocalesFn, listLangsFn]);
+
+  const langById = useMemo(() => new Map(langs.map((l) => [l.id, l])), [langs]);
+  const isRtl = currentLang !== "en" && (langById.get(currentLang)?.rtl ?? false);
+
+  async function selectLocale(lang: string) {
+    if (lang === "en") {
+      setCurrentLang("en");
+      setOverlay(null);
+      setLangOpen(false);
+      return;
+    }
+    setLangBusy(lang);
+    try {
+      const rows = (await fetchTxFn({ data: { token, targetLang: lang } })) as Array<{
+        position: number;
+        content: unknown;
+      }>;
+      const map = new Map<number, Record<string, unknown>>();
+      for (const r of rows) if (r.content && typeof r.content === "object") map.set(r.position, r.content as Record<string, unknown>);
+      setOverlay(map);
+      setCurrentLang(lang);
+      setLangOpen(false);
+    } finally {
+      setLangBusy(null);
+    }
+  }
+
+  const viewSlide = (s: DeckSlide): DeckSlide => {
+    if (!overlay) return s;
+    const t = overlay.get(s.position);
+    return t ? { ...s, content: t } : s;
+  };
 
   // ---- Analytics: record share view (excludes owner) ----
   const recordFn = useServerFn(recordShareView);
@@ -252,7 +305,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#03002C] text-white">
+    <div className="min-h-screen bg-[#03002C] text-white" dir={isRtl ? "rtl" : undefined}>
       {/* Minimal header */}
       <header className="sticky top-0 z-20 border-b border-white/10 bg-[#03002C]/85 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-6 py-4">
@@ -260,19 +313,71 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
             <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">TransPerfect · Shared</div>
             <div className="mt-0.5 truncate text-base font-semibold">{deck.title}</div>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              setPresenting(true);
-              setI(0);
-              requestFullscreen();
-            }}
-            className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-medium text-[#03002C] hover:bg-white/90"
-          >
-            <Play size={14} /> Present
-          </button>
+          <div className="flex items-center gap-2">
+            {(locales.length > 0 || currentLang !== "en") && (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setLangOpen((v) => !v)}
+                  className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.06] px-4 py-2 text-xs font-medium text-white/90 hover:border-white/40"
+                >
+                  <Languages size={12} className="text-[#A1FBF9]" />
+                  {currentLang === "en" ? "Source (EN)" : langById.get(currentLang)?.label ?? currentLang.toUpperCase()}
+                </button>
+                {langOpen && (
+                  <div className="absolute right-0 z-30 mt-2 w-64 overflow-hidden rounded-xl border border-white/10 bg-[#0B0B18] shadow-xl">
+                    <button
+                      type="button"
+                      onClick={() => selectLocale("en")}
+                      className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-white/5 ${
+                        currentLang === "en" ? "bg-[#A1FBF9]/10" : ""
+                      }`}
+                    >
+                      <span>Source (EN)</span>
+                      {currentLang === "en" && <Check size={14} className="text-[#A1FBF9]" />}
+                    </button>
+                    {locales.map((c) => {
+                      const l = langById.get(c.target_lang);
+                      return (
+                        <button
+                          key={c.target_lang}
+                          type="button"
+                          onClick={() => selectLocale(c.target_lang)}
+                          className={`flex w-full items-center justify-between border-t border-white/5 px-3 py-2 text-left text-sm hover:bg-white/5 ${
+                            currentLang === c.target_lang ? "bg-[#A1FBF9]/10" : ""
+                          }`}
+                        >
+                          <span className="truncate">
+                            <span>{l?.label ?? c.target_lang}</span>{" "}
+                            <span className="text-[10px] text-white/40">{l?.native}</span>
+                          </span>
+                          {langBusy === c.target_lang ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : currentLang === c.target_lang ? (
+                            <Check size={14} className="text-[#A1FBF9]" />
+                          ) : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                setPresenting(true);
+                setI(0);
+                requestFullscreen();
+              }}
+              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-medium text-[#03002C] hover:bg-white/90"
+            >
+              <Play size={14} /> Present
+            </button>
+          </div>
         </div>
       </header>
+
 
       <main className="mx-auto flex max-w-[1280px] flex-col items-center gap-6 px-6 py-10">
         {slides.map((slide, idx) => {
@@ -291,7 +396,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
             >
               <ScaledSlide>
                 <VariantRenderer
-                  slide={slide}
+                  slide={viewSlide(slide)}
                   variant={variant}
                   brand={brand}
                   pageNumber={idx + 1}
@@ -341,7 +446,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
                     <div className="overflow-hidden rounded-xl bg-white shadow-2xl">
                       <ScaledSlide>
                         <VariantRenderer
-                          slide={s}
+                          slide={viewSlide(s)}
                           variant={v}
                           brand={brand}
                           pageNumber={i + 1}
