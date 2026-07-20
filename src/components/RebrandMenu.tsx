@@ -6,6 +6,7 @@ import { useDeckStore } from "@/lib/deck-store";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { BRAND_GUIDES } from "@/lib/brand-guides";
+import { getDivisionLogos } from "@/lib/division-logos";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { MODULE_VARIANTS } from "@/lib/taxonomy";
@@ -168,11 +169,32 @@ export function RebrandMenu({ deckId }: { deckId: string }) {
                             : "border-white/10 bg-white/[0.03] hover:border-white/25 hover:bg-white/[0.06]")
                         }
                       >
-                        <div className="flex h-8 shrink-0 items-center gap-0.5 overflow-hidden rounded-md ring-1 ring-white/10">
-                          {t.swatches.slice(0, 4).map((hex, i) => (
-                            <span key={i} className="block h-8 w-3.5" style={{ background: hex }} />
-                          ))}
-                        </div>
+                        {(() => {
+                          const logos = getDivisionLogos(t.key);
+                          const logoSrc = logos?.white ?? logos?.color ?? logos?.stackedWhite ?? logos?.stackedColor;
+                          const bg = `linear-gradient(135deg, ${t.swatches[0] ?? "#03002C"}, ${t.swatches[1] ?? "#003FC7"})`;
+                          return (
+                            <div
+                              className="flex h-10 w-14 shrink-0 items-center justify-center overflow-hidden rounded-md ring-1 ring-white/10"
+                              style={{ background: bg }}
+                            >
+                              {logoSrc ? (
+                                <img
+                                  src={logoSrc}
+                                  alt={`${t.label} logo`}
+                                  className="max-h-7 max-w-[48px] object-contain"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <div className="flex h-full w-full items-center gap-0.5">
+                                  {t.swatches.slice(0, 4).map((hex, i) => (
+                                    <span key={i} className="block h-full flex-1" style={{ background: hex }} />
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
                             <span className="truncate text-sm font-semibold">{t.label}</span>
