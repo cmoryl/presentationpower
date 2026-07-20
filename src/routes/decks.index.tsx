@@ -304,7 +304,7 @@ function Chip({
 function DeckTile({
   deck: d, industry, client, views, shared, reviewStatus,
 }: { deck: Deck; industry: string; client: string; views: number; shared: boolean; reviewStatus: ReviewStatus | null }) {
-  const brand = byId(BRAND_MODES, d.brandModeId) ?? BRAND_MODES[0];
+  const brand = resolveBrandMode(d.brandModeId, d.subCompany);
   const cover = d.slides[0];
   const coverVariant = cover ? byId(MODULE_VARIANTS, cover.variantId) : undefined;
   const duplicateDeck = useDeckStore((s) => s.duplicateDeck);

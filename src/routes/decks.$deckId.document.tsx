@@ -41,7 +41,7 @@ function DocumentView() {
   }, []);
 
   if (!deck) throw notFound();
-  const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
+  const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
   const slides = useMemo(() => projectDeckToDocument(deck, family), [deck, family]);
   const dims = pageDims(size, orientation);
 

@@ -24,7 +24,7 @@ function ExportView() {
   const [preflightIssues, setPreflightIssues] = useState<PreflightIssue[] | null>(null);
   const [preflightBusy, setPreflightBusy] = useState(false);
   if (!deck) throw notFound();
-  const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
+  const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
 
   const qa = useMemo(() => runQa(deck.slides, deck.brandModeId), [deck.slides, deck.brandModeId]);
   const blocks = blockingIssues(qa);

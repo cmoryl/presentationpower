@@ -76,8 +76,8 @@ export function RebrandMenu({ deckId }: { deckId: string }) {
   const [selectedKey, setSelectedKey] = useState<string>(currentKey);
   const selected = targets.find((t) => t.key === selectedKey) ?? targets[0];
   const previewBrand = selected
-    ? { ...(byId(BRAND_MODES, selected.brandModeId) ?? BRAND_MODES[0]) }
-    : BRAND_MODES[0];
+    ? resolveBrandMode(selected.brandModeId, selected.subCompany)
+    : resolveBrandMode(BRAND_MODES[0].id);
 
   const activeSlide = deck?.slides[0];
   const activeVariant = activeSlide ? byId(MODULE_VARIANTS, activeSlide.variantId) : undefined;

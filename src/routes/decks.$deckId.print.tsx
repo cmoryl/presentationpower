@@ -79,7 +79,7 @@ function PrintView() {
   }, [deck, overlay]);
 
   if (!deck) throw notFound();
-  const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
+  const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
   const clientLogoUrl = deck.clientLogo?.primaryUrl ?? null;
 
   return (

@@ -151,7 +151,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   }, [open, cloudDeckId, getCachedLocalesFn, listLangsFn]);
 
   if (!deck) return null;
-  const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
+  const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
   const stamp = (kind: "pptx" | "pdf" | "present") =>
     setDeckContext(deckId, { lastExportedAt: new Date().toISOString(), lastExportKind: kind });
 

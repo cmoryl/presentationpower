@@ -105,7 +105,7 @@ function LinkGate({ variant, message }: { variant: "expired" | "disabled"; messa
 }
 
 function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
-  const brand = byId(BRAND_MODES, deck.brand_mode_id ?? "") ?? BRAND_MODES[0];
+  const brand = resolveBrandMode(deck.brand_mode_id ?? "", deck.sub_company);
   const slides: DeckSlide[] = useMemo(
     () =>
       (deck.slides ?? []).map((s, i) => ({

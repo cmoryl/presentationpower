@@ -227,8 +227,8 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
   }
 
   const previewBrand = useMemo(() => {
-    const id = selected?.snapshot.deck?.brand_mode_id;
-    return byId(BRAND_MODES, id ?? "") ?? BRAND_MODES[0];
+    const snap = selected?.snapshot.deck;
+    return resolveBrandMode(snap?.brand_mode_id ?? "", snap?.sub_company);
   }, [selected]);
   const previewClient = selected?.snapshot.brief?.prospect ?? brief?.prospect;
 

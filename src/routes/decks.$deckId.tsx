@@ -111,7 +111,7 @@ function DeckEditor() {
 
 
   if (!deck) throw notFound();
-  const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
+  const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
   const clamped = Math.min(activeIdx, deck.slides.length - 1);
   const active = deck.slides[clamped];
   const sf = active ? byId(SECTION_FRAMEWORKS, active.sectionId) : undefined;

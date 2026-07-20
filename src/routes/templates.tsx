@@ -74,7 +74,7 @@ function TemplatesGallery() {
 }
 
 function TemplateCard({ row }: { row: TemplateRow }) {
-  const brand = byId(BRAND_MODES, row.brand_mode_id) ?? BRAND_MODES[0];
+  const brand = resolveBrandMode(row.brand_mode_id);
   const create = useServerFn(getTemplateDeck);
   const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
   const navigate = useNavigate();
