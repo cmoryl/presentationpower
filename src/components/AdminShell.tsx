@@ -158,6 +158,8 @@ const items: Array<{ to: string; label: string; exact?: boolean }> = [
   { to: "/admin/approvals", label: "Knowledgebase" },
   { to: "/admin/knowledge", label: "Knowledge browser" },
   { to: "/admin/oracle", label: "Oracle KB" },
+  { to: "/admin/translation", label: "Translation" },
+  { to: "/admin/globallink", label: "GlobalLink" },
   { to: "/admin/brand-assets", label: "Brand assets" },
   { to: "/admin/pdf-ingest", label: "PDF ingestion" },
   { to: "/admin/logohub", label: "LogoHub" },
