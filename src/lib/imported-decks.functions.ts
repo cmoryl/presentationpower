@@ -174,3 +174,201 @@ export const deleteImportedDeck = createServerFn({ method: "POST" })
     if (error) throw new Error((error as { message?: string }).message ?? "Delete failed");
     return { ok: true };
   });
+
+// ── RAG EMBEDDING PIPELINE (Layer 2a) ──────────────────────────────────
+// Chunk + embed imported_decks (slide title + bullets + notes) into the
+// SAME brand_asset_chunks table used by pdf_extractions, so RAG queries by
+// division retrieve PDF + PPTX chunks together. Mirrors embedPdfExtractions
+// exactly (chunkText 1200/200, google/gemini-embedding-001, companion
+// brand_assets row, chunk_count/embedded_at idempotency).
+
+// imported_decks.division_id stores the brand-guide slug ("transperfect-life-sciences");
+// brand_asset_chunks.division_id uses the bare divisionId ("life-sciences").
+// Strip the "transperfect-" prefix — matches PDF_ENTITY_TO_DIVISION values.
+export function normalizeImportedDeckDivision(v: string): string {
+  return v.replace(/^transperfect-/, "");
+}
+
+function chunkText(text: string, size = 1200, overlap = 200): string[] {
+  const clean = text.replace(/\r\n/g, "\n").replace(/[ \t]+\n/g, "\n").trim();
+  if (clean.length <= size) return clean.length > 40 ? [clean] : [];
+  const chunks: string[] = [];
+  let i = 0;
+  while (i < clean.length) {
+    const end = Math.min(clean.length, i + size);
+    let cut = end;
+    if (end < clean.length) {
+      const p = clean.lastIndexOf("\n\n", end);
+      if (p > i + size / 2) cut = p;
+    }
+    chunks.push(clean.slice(i, cut).trim());
+    if (cut >= clean.length) break;
+    i = Math.max(cut - overlap, i + 1);
+  }
+  return chunks.filter((c) => c.length > 40);
+}
+
+async function embedBatch(apiKey: string, inputs: string[]): Promise<number[][]> {
+  const out: number[][] = [];
+  const bs = 50;
+  for (let i = 0; i < inputs.length; i += bs) {
+    const batch = inputs.slice(i, i + bs);
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/embeddings", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "google/gemini-embedding-001", input: batch }),
+    });
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      throw new Error(`Embedding gateway ${res.status}: ${body.slice(0, 200)}`);
+    }
+    const j = (await res.json()) as { data?: Array<{ embedding: number[] }> };
+    for (const d of j.data ?? []) out.push(d.embedding);
+  }
+  return out;
+}
+
+type ImportedSlideLite = { index: number; title: string; bullets: string[]; notes: string; imageCount: number };
+
+function buildDeckDocument(slides: ImportedSlideLite[]): string {
+  const parts: string[] = [];
+  for (const s of slides) {
+    const title = (s.title ?? "").trim() || "(untitled)";
+    const bullets = (s.bullets ?? []).filter((b) => b && b.trim().length > 0).map((b) => `• ${b.trim()}`).join("\n");
+    const notes = (s.notes ?? "").trim();
+    let block = `Slide ${s.index + 1}: ${title}`;
+    if (bullets) block += `\n${bullets}`;
+    if (notes) block += `\nNotes: ${notes}`;
+    parts.push(block);
+  }
+  return parts.join("\n\n");
+}
+
+const embedInput = z.object({
+  divisionId: z.string().optional(),
+  id: z.string().uuid().optional(),
+  limit: z.number().int().min(1).max(100).default(20),
+  skipEmbedded: z.boolean().default(true),
+});
+
+export const embedImportedDecks = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => embedInput.parse(v))
+  .handler(async ({ data, context }): Promise<{
+    considered: number;
+    embedded: number;
+    skipped: number;
+    failed: number;
+    totalChunks: number;
+    results: Array<{ id: string; filename: string; status: "ok" | "skipped" | "failed"; chunks: number; error?: string }>;
+  }> => {
+    // Admin-gate (same as pdf pipeline)
+    const s = context.supabase as unknown as { from: (t: string) => any; rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown }> };
+    const { data: isAdmin } = await s.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!isAdmin) throw new Error("Forbidden: admin required");
+
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sa = supabaseAdmin as unknown as { from: (t: string) => any };
+
+    let q = (sa as any)
+      .from("imported_decks")
+      .select("id, division_id, original_filename, slides, chunk_count, status")
+      .eq("status", "parsed");
+    if (data.id) q = q.eq("id", data.id);
+    if (data.divisionId) q = q.eq("division_id", data.divisionId);
+    if (data.skipEmbedded) q = q.eq("chunk_count", 0);
+    const { data: rows } = await q.limit(data.limit);
+    const list = ((rows ?? []) as Array<{
+      id: string; division_id: string; original_filename: string;
+      slides: ImportedSlideLite[] | null; chunk_count: number; status: string;
+    }>);
+
+    const results: Array<{ id: string; filename: string; status: "ok" | "skipped" | "failed"; chunks: number; error?: string }> = [];
+    let embedded = 0, skipped = 0, failed = 0, totalChunks = 0;
+
+    for (const row of list) {
+      try {
+        const doc = buildDeckDocument(row.slides ?? []);
+        if (doc.trim().length < 60) {
+          results.push({ id: row.id, filename: row.original_filename, status: "skipped", chunks: 0, error: "empty text" });
+          skipped++;
+          continue;
+        }
+        const divisionId = normalizeImportedDeckDivision(row.division_id);
+
+        // Companion brand_assets row keyed by metadata.imported_deck_id.
+        const { data: existingAsset } = await sa
+          .from("brand_assets")
+          .select("id")
+          .eq("metadata->>imported_deck_id", row.id)
+          .maybeSingle();
+        let assetId = (existingAsset as { id: string } | null)?.id ?? null;
+        if (!assetId) {
+          const { data: ins, error: insErr } = await sa
+            .from("brand_assets")
+            .insert({
+              division_id: divisionId,
+              kind: "pptx",
+              title: row.original_filename,
+              description: `Imported deck · ${(row.slides ?? []).length} slides`,
+              source_filename: row.original_filename,
+              tags: ["imported_deck", divisionId],
+              metadata: {
+                source: "imported_deck",
+                imported_deck_id: row.id,
+                original_filename: row.original_filename,
+                division_slug: row.division_id,
+              },
+              created_by: context.userId,
+            })
+            .select("id")
+            .single();
+          if (insErr || !ins) throw new Error(String((insErr as any)?.message ?? "asset insert failed"));
+          assetId = (ins as { id: string }).id;
+        } else {
+          await sa.from("brand_asset_chunks").delete().eq("asset_id", assetId);
+        }
+
+        const chunks = chunkText(doc);
+        if (chunks.length === 0) {
+          results.push({ id: row.id, filename: row.original_filename, status: "skipped", chunks: 0, error: "no chunks" });
+          skipped++;
+          continue;
+        }
+        const vectors = await embedBatch(apiKey, chunks);
+        const chunkRows = chunks.map((content, i) => ({
+          asset_id: assetId,
+          division_id: divisionId,
+          chunk_index: i,
+          content,
+          embedding: `[${vectors[i].join(",")}]`,
+          tags: ["imported_deck", divisionId],
+          metadata: {
+            source: "imported_deck",
+            imported_deck_id: row.id,
+            original_filename: row.original_filename,
+          },
+        }));
+        for (let i = 0; i < chunkRows.length; i += 100) {
+          const slice = chunkRows.slice(i, i + 100);
+          const { error } = await sa.from("brand_asset_chunks").insert(slice);
+          if (error) throw new Error(String((error as any).message ?? error));
+        }
+        await sa
+          .from("imported_decks")
+          .update({ chunk_count: chunkRows.length, embedded_at: new Date().toISOString() })
+          .eq("id", row.id);
+
+        embedded++;
+        totalChunks += chunkRows.length;
+        results.push({ id: row.id, filename: row.original_filename, status: "ok", chunks: chunkRows.length });
+      } catch (e) {
+        failed++;
+        results.push({ id: row.id, filename: row.original_filename, status: "failed", chunks: 0, error: (e as Error).message });
+      }
+    }
+
+    return { considered: list.length, embedded, skipped, failed, totalChunks, results };
+  });
