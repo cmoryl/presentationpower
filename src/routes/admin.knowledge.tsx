@@ -885,3 +885,303 @@ function ImportedDecksTab({ slug }: { slug: string }) {
     </>
   );
 }
+
+// ─────────────────────────────────────────────────────────────────────────
+// Division Imagery Tab — upload, tag, and manage per-division photography /
+// abstract backdrops. Entries live in the private `division-imagery` bucket
+// and are visible to every signed-in teammate as shared brand knowledge.
+// ─────────────────────────────────────────────────────────────────────────
+function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
+  const divisionId = guide.divisionId;
+  const listFn = useServerFn(listDivisionImagery);
+  const uploadFn = useServerFn(uploadDivisionImagery);
+  const updateFn = useServerFn(updateDivisionImagery);
+  const deleteFn = useServerFn(deleteDivisionImagery);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [kind, setKind] = useState<"photo" | "abstract" | "upload">("photo");
+  const [tagsDraft, setTagsDraft] = useState("");
+  const [noteDraft, setNoteDraft] = useState("");
+  const [editing, setEditing] = useState<DivisionImageryEntry | null>(null);
+  const [editTags, setEditTags] = useState("");
+  const [editNote, setEditNote] = useState("");
+
+  const q = useQuery({
+    queryKey: ["division-imagery", divisionId, refreshKey],
+    queryFn: () => listFn({ data: { divisionId } }),
+    retry: false,
+  });
+
+  async function handleFiles(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    setError(null);
+    setBusy(true);
+    try {
+      const tags = tagsDraft
+        .split(",")
+        .map((t) => t.trim().toLowerCase())
+        .filter(Boolean);
+      for (const f of Array.from(files)) {
+        if (!f.type.startsWith("image/")) {
+          setError(`${f.name}: not an image.`);
+          continue;
+        }
+        if (f.size > 20 * 1024 * 1024) {
+          setError(`${f.name}: exceeds 20MB.`);
+          continue;
+        }
+        const b64 = await new Promise<string>((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result as string);
+          r.onerror = () => reject(r.error);
+          r.readAsDataURL(f);
+        });
+        await uploadFn({
+          data: {
+            divisionId,
+            filename: f.name,
+            contentType: f.type || "application/octet-stream",
+            data: b64,
+            kind: kind === "upload" ? "upload" : kind,
+            tags,
+            note: noteDraft || undefined,
+          },
+        });
+      }
+      setTagsDraft("");
+      setNoteDraft("");
+      if (fileRef.current) fileRef.current.value = "";
+      setRefreshKey((k) => k + 1);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Upload failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("Delete this image from the division library?")) return;
+    try {
+      await deleteFn({ data: { id } });
+      setRefreshKey((k) => k + 1);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Delete failed.");
+    }
+  }
+
+  function openEditor(e: DivisionImageryEntry) {
+    setEditing(e);
+    setEditTags(e.tags.join(", "));
+    setEditNote(e.note ?? "");
+  }
+
+  async function saveEditor() {
+    if (!editing) return;
+    try {
+      await updateFn({
+        data: {
+          id: editing.id,
+          tags: editTags
+            .split(",")
+            .map((t) => t.trim().toLowerCase())
+            .filter(Boolean),
+          note: editNote || null,
+        },
+      });
+      setEditing(null);
+      setRefreshKey((k) => k + 1);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Update failed.");
+    }
+  }
+
+  const rows = q.data ?? [];
+
+  return (
+    <>
+      <Section title="Upload division imagery">
+        <p className="mb-3 text-xs text-black/60">
+          Add photography, abstracts, or references for <span className="font-medium">{guide.title}</span>.
+          Everything you upload becomes part of the shared imagery pool for this division and is available
+          across the app (imagery repository, slide backgrounds, AI matching).
+        </p>
+        <div className="grid gap-3 md:grid-cols-[auto_1fr_1fr]">
+          <div className="inline-flex overflow-hidden rounded-full border border-black/15 text-[11px]">
+            {(["photo", "abstract", "upload"] as const).map((k) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setKind(k)}
+                className={`px-3 py-1.5 ${kind === k ? "bg-[#03002C] text-white" : "text-black/70 hover:bg-black/5"}`}
+              >
+                {k}
+              </button>
+            ))}
+          </div>
+          <input
+            value={tagsDraft}
+            onChange={(e) => setTagsDraft(e.target.value)}
+            placeholder="Tags (comma separated)"
+            className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs outline-none focus:border-black/40"
+          />
+          <input
+            value={noteDraft}
+            onChange={(e) => setNoteDraft(e.target.value)}
+            placeholder="Note / context (optional)"
+            className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs outline-none focus:border-black/40"
+          />
+        </div>
+        <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#003FC7] bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:opacity-90">
+          {busy ? "Uploading…" : "Choose images"}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            multiple
+            disabled={busy}
+            onChange={(e) => handleFiles(e.target.files)}
+            className="hidden"
+          />
+        </label>
+        {error && <div className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{error}</div>}
+      </Section>
+
+      <Section title={`Division imagery (${rows.length})`}>
+        {q.isLoading ? (
+          <div className="text-xs text-black/50">Loading…</div>
+        ) : rows.length === 0 ? (
+          <div className="text-xs text-black/50">No imagery uploaded for this division yet.</div>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {rows.map((r) => (
+              <div key={r.id} className="group overflow-hidden rounded-xl border border-black/10 bg-white">
+                <div className="relative aspect-[4/3] w-full bg-black/[0.04]">
+                  {r.signedUrl ? (
+                    <img
+                      src={r.signedUrl}
+                      alt={r.filename}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-[10px] text-black/40">
+                      preview unavailable
+                    </div>
+                  )}
+                  <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-[9px] uppercase tracking-widest text-white">
+                    {r.kind}
+                  </span>
+                </div>
+                <div className="p-2.5">
+                  <div className="truncate text-xs font-medium text-black" title={r.filename}>
+                    {r.filename}
+                  </div>
+                  <div className="mt-0.5 text-[10px] text-black/40">
+                    {(r.size_bytes / 1024).toFixed(0)} KB · {new Date(r.created_at).toLocaleDateString()}
+                  </div>
+                  {r.tags.length > 0 && (
+                    <div className="mt-1.5 flex flex-wrap gap-1">
+                      {r.tags.slice(0, 5).map((t) => (
+                        <span
+                          key={t}
+                          className="rounded-full bg-black/[0.06] px-1.5 py-0.5 text-[9px] text-black/60"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {r.note && (
+                    <div className="mt-1.5 line-clamp-2 text-[10px] italic text-black/50">{r.note}</div>
+                  )}
+                  <div className="mt-2 flex gap-1">
+                    <button
+                      type="button"
+                      onClick={() => openEditor(r)}
+                      className="flex-1 rounded-full border border-black/15 px-2 py-0.5 text-[10px] text-black/70 hover:border-black/40"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(r.id)}
+                      className="rounded-full border border-red-200 px-2 py-0.5 text-[10px] text-red-700 hover:border-red-500"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </Section>
+
+      {editing && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          onClick={() => setEditing(null)}
+        >
+          <div
+            className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-black/10 px-4 py-3">
+              <div className="min-w-0">
+                <div className="truncate text-sm font-medium text-black">{editing.filename}</div>
+                <div className="text-[10px] text-black/40">Update memory (tags + note)</div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditing(null)}
+                className="rounded-full border border-black/15 px-3 py-1 text-[11px] text-black/70 hover:border-black/40"
+              >
+                Close
+              </button>
+            </div>
+            {editing.signedUrl && (
+              <img src={editing.signedUrl} alt={editing.filename} className="max-h-64 w-full object-contain bg-black/[0.03]" />
+            )}
+            <div className="space-y-3 p-4">
+              <label className="block">
+                <div className="mb-1 text-[10px] uppercase tracking-widest text-black/50">Tags (comma separated)</div>
+                <input
+                  value={editTags}
+                  onChange={(e) => setEditTags(e.target.value)}
+                  className="w-full rounded-lg border border-black/15 bg-white px-3 py-1.5 text-xs outline-none focus:border-black/40"
+                />
+              </label>
+              <label className="block">
+                <div className="mb-1 text-[10px] uppercase tracking-widest text-black/50">Note</div>
+                <textarea
+                  value={editNote}
+                  onChange={(e) => setEditNote(e.target.value)}
+                  rows={3}
+                  className="w-full rounded-lg border border-black/15 bg-white px-3 py-1.5 text-xs outline-none focus:border-black/40"
+                />
+              </label>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEditing(null)}
+                  className="rounded-full border border-black/15 px-3 py-1.5 text-xs text-black/70 hover:border-black/40"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={saveEditor}
+                  className="rounded-full border border-[#003FC7] bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
