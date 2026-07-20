@@ -1710,7 +1710,11 @@ export const useDeckStore = create<DeckState>()(
         const variant = byId(MODULE_VARIANTS, slide.variantId);
         if (!variant) return;
         // Server-of-truth would enforce this; enforce it here for now.
-        const editable = variant.editableFields.some((f) => matchesField(f, field));
+        // Meta fields (imagery override, background, slide-level media seed)
+        // are always editable — they're driven by dedicated panels, not the
+        // variant's authored field list.
+        const META_FIELDS = new Set(["mediaUrl", "mediaSeed", "background"]);
+        const editable = META_FIELDS.has(field) || variant.editableFields.some((f) => matchesField(f, field));
         if (!editable) return;
         const nextContent = setPath({ ...slide.content }, field, value);
         set((s) => ({
