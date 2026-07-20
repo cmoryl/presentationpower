@@ -21,6 +21,20 @@ export const Route = createFileRoute("/admin/approvals")({
   component: ApprovalsView,
 });
 
+const SLA_HOURS = 48;
+
+function hoursSince(ts: string | null | undefined): number | null {
+  if (!ts) return null;
+  return Math.max(0, (Date.now() - new Date(ts).getTime()) / (1000 * 60 * 60));
+}
+
+function slaBadge(hours: number | null) {
+  if (hours == null) return { label: "no submit time", tone: "bg-black/5 text-black/60" };
+  if (hours > SLA_HOURS) return { label: `${Math.round(hours)}h · SLA breach`, tone: "bg-red-100 text-red-900" };
+  if (hours > SLA_HOURS * 0.6) return { label: `${Math.round(hours)}h · due soon`, tone: "bg-amber-100 text-amber-900" };
+  return { label: `${Math.round(hours)}h in queue`, tone: "bg-emerald-100 text-emerald-900" };
+}
+
 type PendingRow = Awaited<ReturnType<typeof listPendingModules>>[number];
 type ReviewedRow = Awaited<ReturnType<typeof listRecentReviewed>>[number];
 type ExpiringRow = Awaited<ReturnType<typeof listExpiringSoon>>[number];
