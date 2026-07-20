@@ -668,12 +668,12 @@ function BriefWizard() {
                     </span>
                   )}
                 </div>
-                <div className="flex flex-col gap-3 sm:flex-row">
+                <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
                   <button
                     type="button"
                     disabled={busy}
-                    className="rounded-lg border-2 px-6 py-3 font-['Urbanist'] text-sm font-bold tracking-tight text-[#0F1B3D] transition-all hover:bg-[#F8FAFC] disabled:opacity-50"
-                    style={{ borderColor: PALETTE.ink }}
+                    className="rounded-lg border-2 bg-white px-6 py-3 font-['Urbanist'] text-sm font-bold tracking-tight text-[#0F1B3D] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#F8FAFC] hover:shadow-sm disabled:opacity-50"
+                    style={{ borderColor: PALETTE.hairline }}
                     onClick={() => {
                       const submission = {
                         ...form,
