@@ -230,17 +230,74 @@ async function loadDeckBundle(supabase: AnySupabase, deckId: string) {
   return { deck, slides: slides ?? [] };
 }
 
+export class TranslationCancelledError extends Error {
+  constructor() {
+    super("Translation cancelled");
+    this.name = "TranslationCancelledError";
+  }
+}
+
+// Translate slides one at a time, writing per-slide status to
+// slide_translations (keyed by source slide id) and bumping
+// deck_translations.progress_current. Between slides we re-read the tracking
+// row's status so a `cancelled` flag from another request stops the loop.
 async function translateAllSlides(
+  supabase: AnySupabase,
   slides: Array<{ id: string; content: unknown }>,
   targetLang: string,
   glossary: GlossaryTerm[],
   engineId: "globallink" | "ai",
   humanReview: boolean,
-): Promise<Array<{ id: string; content: unknown }>> {
-  const out: Array<{ id: string; content: unknown }> = [];
+  trackingId: string | undefined,
+): Promise<Array<{ id: string; content: unknown; ok: boolean; error?: string }>> {
+  const out: Array<{ id: string; content: unknown; ok: boolean; error?: string }> = [];
+  let done = 0;
   for (const s of slides) {
-    const { content } = await translateContent(s.content, targetLang, glossary, engineId, humanReview);
-    out.push({ id: s.id, content });
+    // Cancel check
+    if (trackingId) {
+      const { data: cur } = await supabase
+        .from("deck_translations")
+        .select("status")
+        .eq("id", trackingId)
+        .maybeSingle();
+      if (cur?.status === "cancelled") throw new TranslationCancelledError();
+    }
+    try {
+      const { content, jobRef } = await translateContent(s.content, targetLang, glossary, engineId, humanReview);
+      await supabase.from("slide_translations").upsert(
+        {
+          slide_id: s.id,
+          target_lang: targetLang,
+          source_hash: contentHash(s.content),
+          translated_content: content,
+          status: "ready",
+          engine: engineId,
+          job_ref: jobRef ?? null,
+          error: null,
+        },
+        { onConflict: "slide_id,target_lang" },
+      );
+      out.push({ id: s.id, content, ok: true });
+    } catch (e) {
+      const msg = (e as Error).message.slice(0, 500);
+      await supabase.from("slide_translations").upsert(
+        {
+          slide_id: s.id,
+          target_lang: targetLang,
+          source_hash: contentHash(s.content),
+          translated_content: {},
+          status: "failed",
+          engine: engineId,
+          error: msg,
+        },
+        { onConflict: "slide_id,target_lang" },
+      );
+      out.push({ id: s.id, content: s.content, ok: false, error: msg });
+    }
+    done += 1;
+    if (trackingId) {
+      await supabase.from("deck_translations").update({ progress_current: done }).eq("id", trackingId);
+    }
   }
   return out;
 }
