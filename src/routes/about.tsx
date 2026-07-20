@@ -43,28 +43,113 @@ type Pillar = {
 const CHANGELOG: Array<{ date: string; title: string; body: string }> = [
   {
     date: "2026-07",
-    title: "Icon selection in the deck editor",
-    body: "Curated Lucide library exposed as a per-item picker in the inspector; overrides the label-based auto-match.",
+    title: "GlobalLink admin + translation engine",
+    body: "New /admin/globallink dashboard for API base URL, key, project code and callback secret. Powers the AI/GlobalLink translation overlay engine used by TranslateDrawer, LanguageSwitcher and localized PPTX/PDF exports.",
   },
   {
     date: "2026-07",
-    title: "Icon Studio in Admin",
-    body: "New /admin/icon-studio surfaces placements, treatments, emphasis and size tokens with live brand-palette previews.",
+    title: "Multi-language decks & slide overlays",
+    body: "Non-destructive translation overlays per slide with per-slide language status badges, job history, retries, and localized exports.",
   },
   {
     date: "2026-07",
-    title: "Unified master brand guide",
-    body: "Consolidated the two master TransPerfect guides into one canonical entry sourced from BrandHub 26.06 / 3.0.",
+    title: "Division-specific imagery library",
+    body: "New division-imagery bucket managed from /admin/knowledge → Imagery, surfaced as a searchable Team library inside SlideImageryPanel and BackgroundImageryPanel.",
   },
   {
     date: "2026-07",
-    title: "FAQ + step-by-step basics",
-    body: "New /faq page with numbered walk-throughs for the six most common workflows plus the full Q&A.",
+    title: "Per-division PPTX import + RAG",
+    body: "Upload .pptx per division into imported_decks, view outlines, and chunk/embed them into the same gemini-embedding-001 (3072-dim) index the PDF extractions use.",
   },
   {
     date: "2026-07",
-    title: "PWA manifest + installable app",
-    body: "manifest.webmanifest, 1024px maskable icon and root <link rel=manifest> wired in.",
+    title: "Batch PDF ingestion + embeddings",
+    body: "170 pdf_extractions processed with Gemini, 1,035 chunks embedded across all 10 divisions. Sources surface per-division in /admin/knowledge.",
+  },
+  {
+    date: "2026-07",
+    title: "Deck collaboration & review workflow",
+    body: "deck_comments table with CommentsPanel and ReviewStatusControl. Version snapshots and autosave validated at the RLS layer.",
+  },
+  {
+    date: "2026-07",
+    title: "Shareable deck links + analytics",
+    body: "View-only /share/$token viewer with expiry, revocation and token regeneration. /analytics dashboard tracks views per link.",
+  },
+  {
+    date: "2026-07",
+    title: "Deck duplication, templates & presenter view",
+    body: "Duplicate any deck, flag as team template, browse /templates gallery, and run Presenter view with speaker notes.",
+  },
+  {
+    date: "2026-07",
+    title: "Deck-level rebranding with live preview",
+    body: "Rebrand action re-tones the entire deck to any brand mode with auto-snapshot for safe rollback.",
+  },
+  {
+    date: "2026-07",
+    title: "Editor ergonomics bundle",
+    body: "Session Undo/Redo, SwapLayoutPicker, debounced autosave, slide reorder/duplicate, and modal-wide focus trapping via use-modal-a11y.",
+  },
+  {
+    date: "2026-07",
+    title: "Backgrounds & imagery system",
+    body: "Per-slide solids, gradients, patterns and image positioning. Expanded uploads to GIF, AVIF and SVG with vector-preserving passthrough.",
+  },
+  {
+    date: "2026-07",
+    title: "Export preflight + custom image fidelity",
+    body: "ExportPreflightModal scans CORS and asset risks before PPTX/PDF/Present. pptx-export renders custom mediaUrls with SVG rasterization on the fly.",
+  },
+  {
+    date: "2026-07",
+    title: "Conversational deck Copilot",
+    body: "Glass drawer in the deck editor executes natural-language instructions via Claude tool-use — add, edit, reorder, swap variants, rewrite copy.",
+  },
+  {
+    date: "2026-07",
+    title: "Narrative Strategist + Deep RAG synthesis",
+    body: "Brief flow gets a deck-architecture pass, and Claude reasons over full documents with hybrid retrieval across the embedded corpus.",
+  },
+  {
+    date: "2026-07",
+    title: "Semantic icon + logo suggestions & Oracle chat",
+    body: "Embedding-driven asset picks, plus a conversational Oracle knowledge chat.",
+  },
+  {
+    date: "2026-07",
+    title: "Brand Reviewer agent",
+    body: "Claude scores decks against the owned brand guides. All ~405 logos and 111k icons migrated locally — no BrandHub runtime dependency.",
+  },
+  {
+    date: "2026-07",
+    title: "LogoHub + client co-branding",
+    body: "client_logos storage with a logo picker inside the deck editor and SlideChrome. Managed at /admin/logohub.",
+  },
+  {
+    date: "2026-07",
+    title: "High-end variant design pass",
+    body: "28 new editorial layouts including Bento and Dashboard families with native PPTX chart mappings and cinematic hero scrims.",
+  },
+  {
+    date: "2026-07",
+    title: "Library search, filtering & A/B audit",
+    body: "Multi-select filters, virtualization, and WCAG 2.1 audit with automated Playwright visual regression across light/dark A/B variants.",
+  },
+  {
+    date: "2026-07",
+    title: "Home & Admin Command Centers",
+    body: "Signed-in home and /admin upgraded with KPI sparklines, recent activity and quick actions.",
+  },
+  {
+    date: "2026-07",
+    title: "Icon Studio + curated Lucide picker",
+    body: "/admin/icon-studio for iconography tokens; per-item icon picker in the deck editor overrides label-based auto-match.",
+  },
+  {
+    date: "2026-07",
+    title: "10 divisions, fully owned",
+    body: "Scope corrected to 10 canonical divisions with locally-hosted logos, brand intel and embedded source docs.",
   },
 ];
 
