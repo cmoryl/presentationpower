@@ -225,7 +225,7 @@ function themeBrandForMode(brand: BrandMode, mode: SlideMode): BrandMode {
 }
 
 export function VariantRenderer(props: Props) {
-  const { slide, variant, brand, pageNumber, clientName, clientLogoUrl, subCompany, mode = "light" } = props;
+  const { slide, variant, brand, pageNumber, clientName, clientLogoUrl, subCompany, mode = "light", logoOrientation } = props;
   const c = slide.content as Record<string, unknown>;
   const contentClientName = s((slide.content as Record<string, unknown>).clientName) || undefined;
   const resolvedClient = clientName || contentClientName;
