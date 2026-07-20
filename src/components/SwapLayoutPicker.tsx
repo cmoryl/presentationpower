@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { useModalA11y } from "@/hooks/use-modal-a11y";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId, variantsForSection } from "@/lib/taxonomy";
 import type { BRAND_MODES } from "@/lib/taxonomy";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
