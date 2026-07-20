@@ -396,7 +396,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
             >
               <ScaledSlide>
                 <VariantRenderer
-                  slide={slide}
+                  slide={viewSlide(slide)}
                   variant={variant}
                   brand={brand}
                   pageNumber={idx + 1}
@@ -446,7 +446,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
                     <div className="overflow-hidden rounded-xl bg-white shadow-2xl">
                       <ScaledSlide>
                         <VariantRenderer
-                          slide={s}
+                          slide={viewSlide(s)}
                           variant={v}
                           brand={brand}
                           pageNumber={i + 1}
