@@ -85,7 +85,7 @@ export function SlideImageryPanel({
   async function handleFile(file: File) {
     setError(null);
     if (!ALLOWED.includes(file.type)) {
-      setError("Only JPEG, PNG, or WebP images are supported.");
+      setError("Supported formats: JPEG, PNG, WebP, GIF, SVG, AVIF.");
       return;
     }
     if (file.size > MAX_BYTES) {
@@ -94,7 +94,8 @@ export function SlideImageryPanel({
     }
     setBusy(true);
     try {
-      const uploaded = await uploadSlideMedia(file);
+      const prepared = RASTERIZE.includes(file.type) ? await rasterizeToPng(file) : file;
+      const uploaded = await uploadSlideMedia(prepared);
       onChange(uploaded.signedUrl);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed.");
