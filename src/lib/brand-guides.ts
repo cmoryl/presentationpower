@@ -156,13 +156,13 @@ export const MASTER_TRANSPERFECT_GUIDE: BrandGuide = {
     { label: "Body XS", sample: "We see responsible use of data as a powerful tool for creating positive change in the world.", sizePx: 14, weight: 400, tracking: "0", leading: "140%" },
   ],
   subBrands: [
-    { group: "Industry Solutions", items: ["Life Sciences", "LMK Clinical Research Consulting", "Medical Device", "IP", "Legal", "Health", "Games", "Media"] },
+    { group: "Industry Solutions", items: ["Life Sciences", "LMK Clinical Research Consulting", "Medical Device", "Legal", "Games", "Media"] },
     { group: "GlobalLink Language Technologies", items: ["Enterprise", "Live", "Portal", "Now", "Strings", "Web", "CCMS"] },
-    { group: "Specialized Agencies", items: ["TransPerfect Digital", "The Mill", "Bear Down", "Avatria", "Dataforce"] },
+    { group: "Specialized Agencies", items: ["TransPerfect Digital", "Dataforce"] },
     { group: "Regional Divisions", items: ["Japan", "India", "Apostroph", "Semantix"] },
     { group: "Legal Technologies", items: ["ReefReview", "ReefClaims", "ReefStream", "ReefTranslate", "DigitalReef", "ReefExhibit", "ReefCentral", "ReefDiscovery", "ReefECA", "VirtualReef"] },
     { group: "Media Technologies", items: ["Creator", "Media Inspector", "Media Conductor", "Media Director"] },
-    { group: "Portfolio Technologies", items: ["Trial Interactive", "Unbabel", "Share", "Sterling", "Paybooks", "Scribe", "Wordbee", "TransPerfect TV"] },
+    { group: "Portfolio Technologies", items: ["Trial Interactive", "Share", "Scribe", "TransPerfect TV"] },
   ],
   photography:
     "Photography captures the human side of transformation — professional, collaborative settings with soft lighting and shallow depth of field. Use a soft-transition treatment (blurred gradient wash) to blend imagery with brand color.",
