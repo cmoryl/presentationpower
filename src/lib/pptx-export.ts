@@ -56,6 +56,43 @@ function resolveSlideImageUrl(
   return pickDivisionImage(brandId, seedHash(seed));
 }
 
+// Rasterize an SVG data URL (or SVG text blob) to a PNG data URL via canvas.
+// PowerPoint's SVG support is inconsistent across versions; the editor and
+// print/present paths keep the crisp vector, but export flattens to PNG so
+// every audience sees the same picture. Runs in the browser only; the export
+// helper is invoked from client code.
+async function rasterizeSvgToPngDataUrl(svgDataUrl: string): Promise<string | null> {
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.crossOrigin = "anonymous";
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error("SVG decode failed"));
+      el.src = svgDataUrl;
+    });
+    // SVGs without intrinsic size default to 300×150 in most browsers; scale
+    // up so slide-sized embeds stay crisp.
+    let w = img.naturalWidth || 1600;
+    let h = img.naturalHeight || 900;
+    const longest = Math.max(w, h);
+    if (longest < 1600) {
+      const scale = 1600 / longest;
+      w = Math.round(w * scale);
+      h = Math.round(h * scale);
+    }
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    ctx.drawImage(img, 0, 0, w, h);
+    return canvas.toDataURL("image/png", 0.95);
+  } catch (e) {
+    console.warn("[pptx-export] SVG rasterization failed", e);
+    return null;
+  }
+}
+
 async function fetchAsDataUrl(url: string, label?: string): Promise<string | null> {
   try {
     // `mode: "cors"` is the default for cross-origin fetches, but stating it
@@ -68,12 +105,24 @@ async function fetchAsDataUrl(url: string, label?: string): Promise<string | nul
       return null;
     }
     const blob = await res.blob();
-    return await new Promise<string>((resolve, reject) => {
+    const dataUrl = await new Promise<string>((resolve, reject) => {
       const r = new FileReader();
       r.onload = () => resolve(String(r.result));
       r.onerror = () => reject(r.error);
       r.readAsDataURL(blob);
     });
+    // PowerPoint can't reliably embed SVG via addImage — rasterize on the fly.
+    const isSvg =
+      blob.type === "image/svg+xml" ||
+      /^data:image\/svg\+xml/i.test(dataUrl) ||
+      /\.svg(\?|#|$)/i.test(url);
+    if (isSvg) {
+      const png = await rasterizeSvgToPngDataUrl(dataUrl);
+      if (png) return png;
+      console.warn(`[pptx-export] ${label ?? "image"} SVG rasterization failed, skipping: ${url}`);
+      return null;
+    }
+    return dataUrl;
   } catch (e) {
     console.warn(
       `[pptx-export] ${label ?? "image"} fetch failed (likely CORS): ${url}`,
