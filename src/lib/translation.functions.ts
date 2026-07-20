@@ -704,5 +704,5 @@ export const getSharedDeckTranslations = createServerFn({ method: "POST" })
       _lang: data.targetLang,
     });
     if (error) throw new Error(error.message);
-    return (rows ?? []) as Array<{ position: number; content: unknown }>;
+    return (rows ?? []) as Array<{ position: number; content: Record<string, never> }>;
   });
