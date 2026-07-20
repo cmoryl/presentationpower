@@ -261,13 +261,16 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
                 tags: string[];
                 similarity: number;
               }>;
-              if (chunkRows.length === 0 && filterDivision) {
-                const { data: unfiltered } = await s.rpc("match_brand_chunks", {
-                  query_embedding: embeddingLiteral,
-                  match_count: 10,
-                  filter_division: null,
-                });
-                chunkRows = (unfiltered ?? []) as typeof chunkRows;
+              if (filterDivision) {
+                divisionScoped = chunkRows.length > 0;
+                if (chunkRows.length === 0) {
+                  const { data: unfiltered } = await s.rpc("match_brand_chunks", {
+                    query_embedding: embeddingLiteral,
+                    match_count: 10,
+                    filter_division: null,
+                  });
+                  chunkRows = (unfiltered ?? []) as typeof chunkRows;
+                }
               }
               if (chunkRows.length) {
                 const { data: assets } = await s
