@@ -20,6 +20,7 @@ type ChatMsg = {
   role: "user" | "assistant";
   content: string;
   sources?: OracleSource[];
+  fallbackNote?: string;
 };
 
 const STARTERS = [
