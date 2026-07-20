@@ -859,7 +859,7 @@ function ImportedDecksTab({ slug }: { slug: string }) {
               ) : (
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   {fullQ.data.slides.map((sl) => (
-                    <ReconstructedSlideCard key={sl.index} slide={sl} theme={fullQ.data.theme ?? {}} />
+                    <ReconstructedSlideCard key={sl.index} slide={sl} theme={fullQ.data?.theme ?? {}} />
                   ))}
                 </div>
               )}
