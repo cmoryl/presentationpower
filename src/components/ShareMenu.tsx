@@ -4,6 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { Share2, Play, Printer, FileDown, ChevronDown, Link2, Copy, Check, Loader2, RefreshCw, Clock } from "lucide-react";
 import { useDeckStore, type Deck, type Brief } from "@/lib/deck-store";
 import { exportDeckToPptx } from "@/lib/pptx-export";
+import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
+import { ExportPreflightModal } from "@/components/ExportPreflightModal";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
 import { supabase } from "@/integrations/supabase/client";
 import { deckCloudId } from "@/lib/deck-uuid";
@@ -118,8 +120,11 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     setOpen(false);
     window.open(`/decks/${deckId}/print`, "_blank", "noopener,noreferrer");
   };
-  const onPptx = async () => {
-    if (busy) return;
+  const [preflightIssues, setPreflightIssues] = useState<PreflightIssue[] | null>(null);
+  const [preflightBusy, setPreflightBusy] = useState(false);
+
+  const runPptxExport = async () => {
+    if (!deck) return;
     setBusy(true);
     try {
       await exportDeckToPptx(deck, brand, { strategy: deck.context?.strategy ?? null });
@@ -127,6 +132,22 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     } finally {
       setBusy(false);
       setOpen(false);
+      setPreflightIssues(null);
+    }
+  };
+
+  const onPptx = async () => {
+    if (busy || preflightBusy || !deck) return;
+    setPreflightBusy(true);
+    try {
+      const issues = await runExportPreflight(deck);
+      if (issues.length === 0) {
+        await runPptxExport();
+      } else {
+        setPreflightIssues(issues);
+      }
+    } finally {
+      setPreflightBusy(false);
     }
   };
 
@@ -352,6 +373,18 @@ export function ShareMenu({ deckId }: { deckId: string }) {
           </div>
         </div>
       )}
+      <ExportPreflightModal
+        open={preflightIssues !== null && preflightIssues.length > 0}
+        issues={preflightIssues ?? []}
+        busy={busy}
+        onCancel={() => setPreflightIssues(null)}
+        onExportAnyway={runPptxExport}
+        onJumpToSlide={(_slideId) => {
+          setPreflightIssues(null);
+          setOpen(false);
+          navigate({ to: "/decks/$deckId", params: { deckId } });
+        }}
+      />
     </div>
   );
 }

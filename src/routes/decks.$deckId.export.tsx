@@ -6,6 +6,8 @@ import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { exportDeckToPptx } from "@/lib/pptx-export";
 import { runQa, blockingIssues, warningIssues } from "@/lib/qa";
+import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
+import { ExportPreflightModal } from "@/components/ExportPreflightModal";
 
 
 export const Route = createFileRoute("/decks/$deckId/export")({
@@ -19,6 +21,8 @@ function ExportView() {
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const [exporting, setExporting] = useState(false);
   const [override, setOverride] = useState(false);
+  const [preflightIssues, setPreflightIssues] = useState<PreflightIssue[] | null>(null);
+  const [preflightBusy, setPreflightBusy] = useState(false);
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
 
@@ -32,13 +36,28 @@ function ExportView() {
     return () => document.body.classList.remove("export-mode");
   }, []);
 
-  async function handlePptx() {
-    if (blocked) return;
+  async function runPptxExport() {
     setExporting(true);
     try {
       await exportDeckToPptx(deck, brand);
     } finally {
       setExporting(false);
+      setPreflightIssues(null);
+    }
+  }
+
+  async function handlePptx() {
+    if (blocked || exporting || preflightBusy) return;
+    setPreflightBusy(true);
+    try {
+      const issues = await runExportPreflight(deck);
+      if (issues.length === 0) {
+        await runPptxExport();
+      } else {
+        setPreflightIssues(issues);
+      }
+    } finally {
+      setPreflightBusy(false);
     }
   }
 
@@ -66,11 +85,11 @@ function ExportView() {
         <div className="flex items-center gap-2">
           <button
             onClick={handlePptx}
-            disabled={exporting || blocked}
+            disabled={exporting || preflightBusy || blocked}
             title={blocked ? "Resolve blocking QA issues first" : ""}
             className="rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0B2A4A]/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {exporting ? "Preparing…" : "Download .pptx"}
+            {exporting ? "Preparing…" : preflightBusy ? "Checking…" : "Download .pptx"}
           </button>
           <Link
             to="/decks/$deckId/document"
@@ -159,6 +178,13 @@ function ExportView() {
           );
         })}
       </div>
+      <ExportPreflightModal
+        open={preflightIssues !== null && preflightIssues.length > 0}
+        issues={preflightIssues ?? []}
+        busy={exporting}
+        onCancel={() => setPreflightIssues(null)}
+        onExportAnyway={runPptxExport}
+      />
     </div>
   );
 }
