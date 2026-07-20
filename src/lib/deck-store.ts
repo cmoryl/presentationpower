@@ -1598,6 +1598,7 @@ export const useDeckStore = create<DeckState>()(
 
 
       applyAiContent: (deckId, aiSlides) => {
+        pushHistory();
         const deck = get().decks[deckId];
         if (!deck) return;
         const byIdMap = new Map(aiSlides.map((s) => [s.id, s.content]));
@@ -1620,6 +1621,7 @@ export const useDeckStore = create<DeckState>()(
       },
 
       applyCopilotUpdates: (deckId, updates) => {
+        pushHistory();
         const deck = get().decks[deckId];
         if (!deck) return;
         const byPos = new Map(updates.map((u) => [u.index, u]));
@@ -1659,6 +1661,7 @@ export const useDeckStore = create<DeckState>()(
       },
 
       updateSlideNotes: (deckId, slideId, notes) => {
+        pushHistory(`notes:${deckId}:${slideId}`);
         const deck = get().decks[deckId];
         if (!deck) return;
         set((s) => ({
@@ -1674,6 +1677,7 @@ export const useDeckStore = create<DeckState>()(
 
 
       revertAiChange: (deckId, slideId, field) => {
+        pushHistory();
         const deck = get().decks[deckId];
         if (!deck) return;
         const slide = deck.slides.find((s) => s.id === slideId);
@@ -1698,6 +1702,7 @@ export const useDeckStore = create<DeckState>()(
       },
 
       updateSlideField: (deckId, slideId, field, value) => {
+        pushHistory(`field:${deckId}:${slideId}:${field}`);
         const deck = get().decks[deckId];
         if (!deck) return;
         const slide = deck.slides.find((s) => s.id === slideId);
@@ -1720,6 +1725,7 @@ export const useDeckStore = create<DeckState>()(
       },
 
       applySlideBackground: (deckId, slideIds, background) => {
+        pushHistory();
         const deck = get().decks[deckId];
         if (!deck) return;
         const ids = new Set(slideIds);
@@ -1879,12 +1885,14 @@ export const useDeckStore = create<DeckState>()(
 
 
       renameDeck: (deckId, title) => {
+        pushHistory(`rename:${deckId}`);
         const deck = get().decks[deckId];
         if (!deck) return;
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, title } } }));
       },
 
       setDeckClientLogo: (deckId, logo) => {
+        pushHistory();
         const deck = get().decks[deckId];
         if (!deck) return;
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, clientLogo: logo } } }));
@@ -1905,6 +1913,7 @@ export const useDeckStore = create<DeckState>()(
       },
 
       rebrandDeck: (deckId, brandModeId, subCompany) => {
+        pushHistory();
         const deck = get().decks[deckId];
         if (!deck) return;
         const nextSub = subCompany ?? undefined;
