@@ -302,7 +302,7 @@ export const embedImportedDecks = createServerFn({ method: "POST" })
       .select("id, division_id, original_filename, slides, chunk_count, status")
       .eq("status", "parsed");
     if (data.id) q = q.eq("id", data.id);
-    if (data.divisionId) q = q.eq("division_id", data.divisionId);
+    if (data.divisionId) q = q.eq("division_id", importedDeckSlugForDivision(data.divisionId));
     if (data.skipEmbedded) q = q.eq("chunk_count", 0);
     const { data: rows } = await q.limit(data.limit);
     const list = ((rows ?? []) as Array<{
