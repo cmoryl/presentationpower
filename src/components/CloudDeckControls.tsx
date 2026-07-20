@@ -288,6 +288,7 @@ export function MyCloudDecks() {
       };
 
       hydrate({ brief: briefLocal, deck: deckLocal });
+      useDeckStore.getState().markCloudLinked(localDeckId, true);
       navigate({ to: "/decks/$deckId", params: { deckId: localDeckId } });
     } catch (e) {
       alert(`Load failed: ${e instanceof Error ? e.message : "unknown"}`);
