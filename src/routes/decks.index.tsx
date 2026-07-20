@@ -31,17 +31,34 @@ function DecksIndex() {
   const briefs = useDeckStore((s) => s.briefs);
   const signedIn = useSignedIn();
   const fetchAnalytics = useServerFn(getLibraryAnalytics);
+  const fetchCloud = useServerFn(listMyCloudDecks);
 
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<SortKey>("recent");
   const [kind, setKind] = useState<Kind>("all");
   const [reach, setReach] = useState<Reach>("all");
   const [analytics, setAnalytics] = useState<DeckAnalyticsSummary | null>(null);
+  const [cloudDecks, setCloudDecks] = useState<Array<{ title: string; review_status: string | null }>>([]);
 
   useEffect(() => {
-    if (!signedIn) { setAnalytics(null); return; }
+    if (!signedIn) { setAnalytics(null); setCloudDecks([]); return; }
     fetchAnalytics().then(setAnalytics).catch(() => setAnalytics(null));
-  }, [signedIn, fetchAnalytics]);
+    fetchCloud()
+      .then((rows) => setCloudDecks(rows.map((r) => ({ title: r.title, review_status: r.review_status ?? null }))))
+      .catch(() => setCloudDecks([]));
+  }, [signedIn, fetchAnalytics, fetchCloud]);
+
+  const reviewByTitle = useMemo(() => {
+    const m = new Map<string, ReviewStatus>();
+    const order: ReviewStatus[] = ["approved", "in_review", "changes_requested", "draft"];
+    for (const r of cloudDecks) {
+      const key = r.title.trim().toLowerCase();
+      const rs = (r.review_status ?? "draft") as ReviewStatus;
+      const prev = m.get(key);
+      if (!prev || order.indexOf(rs) < order.indexOf(prev)) m.set(key, rs);
+    }
+    return m;
+  }, [cloudDecks]);
 
   // Map local decks to view/share data via title match (best-effort — local
   // deck IDs are nanoids while analytics keys by DB uuid). Multiple same-title
