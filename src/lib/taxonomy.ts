@@ -151,6 +151,20 @@ export const BRAND_MODES: BrandMode[] = [
     tokens: { primary: "#003FC7", accent: "#A1FBF9", surface: "#E0E8F5", ink: "#03002C" },
   },
   {
+    id: "bm-tp-lifesci",
+    name: "TransPerfect Life Sciences",
+    description: "Life sciences: regulatory, clinical, medical translation",
+    // Blue 500 + Green accuracy pop
+    tokens: { primary: "#003FC7", accent: "#A6FA87", surface: "#E0E8F5", ink: "#03002C" },
+  },
+  {
+    id: "bm-trial-interactive",
+    name: "Trial Interactive",
+    description: "eClinical platform for eTMF, study start-up and investigator portals",
+    // Blue 500 + Aqua clarity — housed under Life Sciences
+    tokens: { primary: "#003FC7", accent: "#A1FBF9", surface: "#F2F2F2", ink: "#03002C" },
+  },
+  {
     id: "bm-cobrand",
     name: "Co-brand",
     description: "Co-branded with client or partner",

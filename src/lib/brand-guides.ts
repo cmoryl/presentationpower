@@ -249,7 +249,7 @@ const DIVISION_SEEDS: DivisionSeed[] = [
   },
   {
     slug: "transperfect-life-sciences",
-    divisionId: "bm-subcompany",
+    divisionId: "bm-tp-lifesci",
     title: "TransPerfect Life Sciences",
     subtitle: "Life Sciences Division · Brand Guidelines",
     tagline: "Global content for every trial, submission and patient.",
@@ -410,7 +410,7 @@ const DIVISION_SEEDS: DivisionSeed[] = [
   // ── Trial Interactive (portfolio product) ────────────────────────
   {
     slug: "trial-interactive",
-    divisionId: "bm-product",
+    divisionId: "bm-trial-interactive",
     category: "product",
     title: "Trial Interactive",
     subtitle: "eClinical Platform · Brand Guidelines",

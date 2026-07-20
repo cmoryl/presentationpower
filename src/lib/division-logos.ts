@@ -54,18 +54,6 @@ const NEXT: Record<string, DivisionLogoSet> = {
     color: `${B}/digital-color.png`,
     stackedColor: `${B}/digital-stacked-color.png`,
   },
-  finance: {
-    color: `${B}/finance-color.png`,
-    stackedColor: `${B}/finance-stacked-color.png`,
-  },
-  experience: {
-    color: `${B}/experience-color.png`,
-    stackedColor: `${B}/experience-stacked-color.png`,
-  },
-  learn: {
-    color: `${B}/learn-color.png`,
-    stackedColor: `${B}/learn-stacked-color.png`,
-  },
   dataforce: {
     color: `${B}/dataforce-color.png`,
     white: `${B}/dataforce-white.png`,
@@ -97,9 +85,6 @@ const CLASSIC_MANIFEST: Record<string, ClassicPresence> = {
   // media:      { color: "png", white: "png", stackedColor: "png" },
   // games:      { color: "png", white: "png", stackedColor: "png" },
   // digital:    { color: "png", stackedColor: "png" },
-  // finance:    { color: "png", stackedColor: "png" },
-  // experience: { color: "png", stackedColor: "png" },
-  // learn:      { color: "png", stackedColor: "png" },
   // dataforce:  { color: "png", white: "png", stackedColor: "png" },
 };
 
@@ -145,7 +130,9 @@ const KEY_TO_SLUG: Record<string, string> = {
   "bm-tp-media": "media",
   "bm-tp-games": "games",
   "bm-tp-digital": "digital",
-  "bm-product": "tp",
+  "bm-tp-lifesci": "lifesci",
+  "bm-trial-interactive": "tp",
+  "bm-product": "dataforce",
   "bm-cobrand": "tp",
 
   // BrandGuide slugs
@@ -157,11 +144,9 @@ const KEY_TO_SLUG: Record<string, string> = {
   "transperfect-media": "media",
   "transperfect-gaming": "games",
   "transperfect-digital": "digital",
-  "transperfect-finance": "finance",
-  "transperfect-experience": "experience",
-  "transperfect-learn": "learn",
   "transperfect-cobrand": "tp",
   dataforce: "dataforce",
+  "trial-interactive": "tp",
 
   // Convenience aliases
   legal: "legal",
@@ -170,9 +155,6 @@ const KEY_TO_SLUG: Record<string, string> = {
   media: "media",
   games: "games",
   digital: "digital",
-  finance: "finance",
-  experience: "experience",
-  learn: "learn",
 };
 
 export const DIVISION_LOGOS: Record<string, DivisionLogoSet> = Object.fromEntries(

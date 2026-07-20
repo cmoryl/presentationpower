@@ -28,6 +28,19 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
     },
   },
   "bm-subcompany": {
+    // Neutral fallback for free-typed subcompany names not in the fixed list.
+    // Concrete divisions live in their own `bm-tp-*` entries below.
+    role: "subcompany",
+    parentId: "bm-enterprise",
+    logo: { mark: "TP", wordmark: "TransPerfect" },
+    contentScope: {
+      industries: [],
+      serviceLines: [],
+      caseStudyTags: [],
+      preferredArchetypes: ["arch-value-story", "arch-decision-drive"],
+    },
+  },
+  "bm-tp-lifesci": {
     role: "subcompany",
     parentId: "bm-enterprise",
     logo: { mark: "TPLS", wordmark: "TransPerfect", divisionLine: "Life Sciences" },
@@ -38,6 +51,18 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
       preferredArchetypes: ["arch-value-story", "arch-decision-drive"],
       restrictedFamilyIds: [],
       preferredVariantIds: ["MV-CASE-SPREAD", "MV-PROOF-STATS-3", "MV-DEC-CHECKLIST", "MV-CTX-COST"],
+    },
+  },
+  "bm-trial-interactive": {
+    role: "product",
+    parentId: "bm-tp-lifesci",
+    logo: { mark: "TI", wordmark: "Trial Interactive" },
+    contentScope: {
+      industries: ["Life Sciences", "Clinical Operations", "Sponsors", "CROs"],
+      serviceLines: ["eTMF", "Study Start-Up", "Investigator Portal", "Safety & Compliance", "Analytics"],
+      caseStudyTags: ["etmf", "study-start-up", "investigator-portal", "clinical-operations", "compliance"],
+      preferredArchetypes: ["arch-market-fit", "arch-decision-drive"],
+      preferredVariantIds: ["MV-CASE-METRICS", "MV-PROOF-STATS-3", "MV-DEC-CHECKLIST", "MV-CTX-STAT-GRID"],
     },
   },
   // Sub-company-specific overrides are applied dynamically via
@@ -169,7 +194,7 @@ export function getSubCompanyProfile(baseId: string, subCompany: string): BrandP
     if (/legal/i.test(normalized) && normalized !== "Legal") return BRAND_PROFILES["bm-tp-legal"]?.contentScope;
     if (/game/i.test(normalized)) return BRAND_PROFILES["bm-tp-games"]?.contentScope;
     if (/digital/i.test(normalized)) return BRAND_PROFILES["bm-tp-digital"]?.contentScope;
-    if (/life science|clinical|medical|pharma/i.test(normalized)) return BRAND_PROFILES["bm-subcompany"]?.contentScope;
+    if (/life science|clinical|medical|pharma/i.test(normalized)) return BRAND_PROFILES["bm-tp-lifesci"]?.contentScope;
     return undefined;
   })();
 
