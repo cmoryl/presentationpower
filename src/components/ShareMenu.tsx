@@ -17,6 +17,8 @@ import {
   getShareAnalytics,
   setDeckShareExpiry,
 } from "@/lib/deck-sharing.functions";
+import { listCachedLocales, getDeckSlideTranslations, listLanguages } from "@/lib/translation.functions";
+import { Languages } from "lucide-react";
 
 export function ShareMenu({ deckId }: { deckId: string }) {
   const deck = useDeckStore((s) => s.decks[deckId]);
