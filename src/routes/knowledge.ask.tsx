@@ -21,6 +21,7 @@ type ChatMsg = {
   content: string;
   sources?: OracleSource[];
   fallbackNote?: string;
+  setup?: boolean;
 };
 
 const STARTERS = [
