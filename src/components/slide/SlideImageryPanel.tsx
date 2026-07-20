@@ -267,7 +267,69 @@ export function SlideImageryPanel({
             </button>
           </div>
         </div>
+
+        {/* Team library — search and reuse division-scoped shared imagery */}
+        {divisionId && signedIn && (
+          <div>
+            <div className="flex items-center justify-between">
+              <div className="text-[11px] uppercase tracking-widest text-black/50">
+                Team library {libQ.data ? `· ${libResults.length}` : ""}
+              </div>
+              <button
+                type="button"
+                onClick={() => setLibOpen((v) => !v)}
+                className="rounded-full border border-black/15 px-2.5 py-0.5 text-[10px] uppercase tracking-widest hover:bg-black/5"
+              >
+                {libOpen ? "Hide" : "Browse"}
+              </button>
+            </div>
+            {libOpen && (
+              <div className="mt-2 space-y-2">
+                <input
+                  type="search"
+                  value={libQuery}
+                  onChange={(e) => setLibQuery(e.target.value)}
+                  placeholder="Search by tag, filename, note…"
+                  className="w-full rounded-lg border border-black/10 bg-white px-3 py-1.5 text-xs outline-none focus:border-black/30"
+                />
+                {libQ.isLoading ? (
+                  <div className="text-[11px] text-black/40">Loading…</div>
+                ) : libQ.isError ? (
+                  <div className="text-[11px] text-red-600">Could not load library.</div>
+                ) : libResults.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-black/10 px-3 py-4 text-center text-[11px] text-black/50">
+                    {libQ.data && libQ.data.length > 0
+                      ? "No matches — try different keywords."
+                      : "No shared imagery yet. Upload in Knowledge → Imagery."}
+                  </div>
+                ) : (
+                  <div className="grid max-h-64 grid-cols-4 gap-2 overflow-y-auto pr-1">
+                    {libResults.map((r) => (
+                      <button
+                        key={r.id}
+                        type="button"
+                        title={`${r.filename}${r.tags?.length ? "\nTags: " + r.tags.join(", ") : ""}${r.note ? "\n" + r.note : ""}`}
+                        onClick={() => r.signedUrl && onChange(r.signedUrl)}
+                        disabled={!r.signedUrl}
+                        className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-black/10 bg-black/5 transition hover:border-black/40 disabled:opacity-40"
+                      >
+                        {r.signedUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={r.signedUrl} alt={r.filename} className="h-full w-full object-cover" loading="lazy" />
+                        ) : null}
+                        <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/70 to-transparent px-1.5 py-1 text-left text-[9px] text-white opacity-0 group-hover:opacity-100">
+                          {r.tags?.[0] ?? r.kind}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
+
   );
 }
