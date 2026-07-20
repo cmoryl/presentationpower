@@ -43,13 +43,18 @@ export const oracleChat = createServerFn({ method: "POST" })
       data,
       context,
     }): Promise<
-      | { ok: true; reply: string; sources: OracleSource[]; setup?: boolean }
+      | { ok: true; reply: string; sources: OracleSource[]; setup?: boolean; divisionScoped?: boolean; fallbackNote?: string }
       | { ok: false; error: string }
     > => {
       const s = context.supabase as unknown as {
         from: (t: string) => { select: (c?: string) => any };
         rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
       };
+      // Tracks whether the vector search stayed within the requested division.
+      // `undefined` = no division filter was requested (e.g. "All divisions").
+      // `true` = filter applied and returned matches.
+      // `false` = filter applied but returned zero rows; we fell back to unfiltered.
+      let divisionScoped: boolean | undefined = undefined;
 
       // ── 1. Keyword search over oracle_knowledge_base + knowledge_entries ─
       const [oracleRes, entriesRes] = await Promise.all([
