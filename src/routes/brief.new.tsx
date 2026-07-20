@@ -76,6 +76,8 @@ function BriefWizard() {
   const [kbSelected, setKbSelected] = useState<SynthesizedSnippet[]>([]);
   const [kbSynthesis, setKbSynthesis] = useState<string | null>(null);
   const [kbSynthesized, setKbSynthesized] = useState(false);
+  const [kbFallbackNote, setKbFallbackNote] = useState<string | null>(null);
+  const [kbDivisionScoped, setKbDivisionScoped] = useState<boolean | undefined>(undefined);
   const [showKbPanel, setShowKbPanel] = useState(false);
   const [customizeOpen, setCustomizeOpen] = useState(false);
 
