@@ -81,7 +81,8 @@ function DecksIndex() {
 
   const enriched = useMemo(() => {
     return allDecks.map((d) => {
-      const s = statsByTitle.get(d.title.trim().toLowerCase());
+      const key = d.title.trim().toLowerCase();
+      const s = statsByTitle.get(key);
       const brief = briefs[d.briefId];
       return {
         deck: d,
@@ -89,9 +90,10 @@ function DecksIndex() {
         shared: s?.shared ?? false,
         client: brief?.prospect ?? "",
         industry: brief?.industry ?? "",
+        reviewStatus: reviewByTitle.get(key) ?? null,
       };
     });
-  }, [allDecks, statsByTitle, briefs]);
+  }, [allDecks, statsByTitle, briefs, reviewByTitle]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
