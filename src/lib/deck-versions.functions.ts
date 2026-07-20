@@ -69,7 +69,7 @@ export const snapshotDeckVersion = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const deckUuid = await resolveDeckUuid(supabase, userId, data.deckId);
-    if (!deckUuid) throw new Error("Deck not found in cloud — save the deck first.");
+    if (!deckUuid) return { ok: false as const, skipped: true as const, reason: "not-in-cloud" };
 
     const { data: deck, error: deckErr } = await supabase
       .from("decks")
