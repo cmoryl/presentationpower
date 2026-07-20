@@ -98,6 +98,7 @@ export type DeckContext = {
   }>;
   knowledgeSynthesis?: string | null;
   strategy?: DeckStrategySnapshot;
+  logoOrientation?: "horizontal" | "stacked";
   lastExportedAt?: string;
   lastExportKind?: "pptx" | "pdf" | "present";
 };

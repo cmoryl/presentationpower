@@ -130,6 +130,7 @@ function PrintView() {
                   clientName={brief?.prospect}
                   clientLogoUrl={clientLogoUrl}
                   subCompany={deck.subCompany}
+                  logoOrientation={deck.context?.logoOrientation}
                 />
               </ScaledSlide>
             </div>

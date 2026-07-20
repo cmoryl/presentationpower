@@ -54,6 +54,7 @@ export function SlideFrame({
   subCompany,
   layoutId,
   logoPosition,
+  logoOrientation = "horizontal",
 }: {
   brand: BrandMode;
   pageNumber?: number;
@@ -64,6 +65,7 @@ export function SlideFrame({
   subCompany?: string;
   layoutId?: string;
   logoPosition?: LogoPosition;
+  logoOrientation?: "horizontal" | "stacked";
 }) {
 
   const mode = useSlideMode();
@@ -294,6 +296,7 @@ export function SlideFrame({
             clientName={clientName}
             clientLogoUrl={clientLogoUrl ?? null}
             subCompany={subCompany}
+            orientation={logoOrientation}
           />
         </div>
       )}

@@ -11,7 +11,7 @@ import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, St
 // etc.) automatically pick up the current slide's clientName + layoutId when
 // they wrap themselves in <SlideFrame>. VariantRenderer sets the value once
 // per render.
-const SlideFrameCtx = createContext<{ clientName?: string; layoutId?: string; clientLogoUrl?: string | null; subCompany?: string }>({});
+const SlideFrameCtx = createContext<{ clientName?: string; layoutId?: string; clientLogoUrl?: string | null; subCompany?: string; logoOrientation?: "horizontal" | "stacked" }>({});
 
 function SlideFrame(props: ComponentProps<typeof BaseSlideFrame>) {
   const ctx = useContext(SlideFrameCtx);
@@ -22,6 +22,7 @@ function SlideFrame(props: ComponentProps<typeof BaseSlideFrame>) {
       layoutId={props.layoutId ?? ctx.layoutId}
       clientLogoUrl={props.clientLogoUrl ?? ctx.clientLogoUrl ?? null}
       subCompany={props.subCompany ?? ctx.subCompany}
+      logoOrientation={props.logoOrientation ?? ctx.logoOrientation}
     />
   );
 }
@@ -195,6 +196,7 @@ type Props = {
   clientLogoUrl?: string | null;
   subCompany?: string;
   mode?: SlideMode;
+  logoOrientation?: "horizontal" | "stacked";
 };
 
 type Item = Record<string, unknown>;
@@ -223,7 +225,7 @@ function themeBrandForMode(brand: BrandMode, mode: SlideMode): BrandMode {
 }
 
 export function VariantRenderer(props: Props) {
-  const { slide, variant, brand, pageNumber, clientName, clientLogoUrl, subCompany, mode = "light" } = props;
+  const { slide, variant, brand, pageNumber, clientName, clientLogoUrl, subCompany, mode = "light", logoOrientation } = props;
   const c = slide.content as Record<string, unknown>;
   const contentClientName = s((slide.content as Record<string, unknown>).clientName) || undefined;
   const resolvedClient = clientName || contentClientName;
@@ -252,7 +254,7 @@ export function VariantRenderer(props: Props) {
   return (
     <SlideModeContext.Provider value={mode}>
       <SlideBackdropContext.Provider value={backdrop}>
-        <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany }}>
+        <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany, logoOrientation }}>
           {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c })}
         </SlideFrameCtx.Provider>
       </SlideBackdropContext.Provider>

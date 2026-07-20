@@ -47,6 +47,7 @@ export function BrandLockup({
   clientName,
   clientLogoUrl,
   subCompany,
+  orientation = "horizontal",
 }: {
   brand: BrandMode;
   color: string;
@@ -56,6 +57,7 @@ export function BrandLockup({
   clientName?: string; // Substituted into division line when it contains {client}
   clientLogoUrl?: string | null; // When set, co-brand with the client's logo
   subCompany?: string; // Overrides the division line for TransPerfect sub-company mode
+  orientation?: "horizontal" | "stacked"; // Layout of wordmark/mark
 }) {
   const dims =
     size === "2xs"
@@ -74,21 +76,31 @@ export function BrandLockup({
 
   // Prefer an official PNG logo when we have one for this brand id. On dark
   // chrome (color === white) use the white variant; otherwise the color one.
+  // In stacked orientation, prefer the stacked artwork; horizontal falls back
+  // to stacked only when no horizontal file exists.
   const isDarkChrome = /^#?fff(fff)?$/i.test(color) || color.toLowerCase() === "white";
   const divisionLogos = getDivisionLogos(brand.id);
-  const officialLogoUrl = divisionLogos
+  const stackedUrl = divisionLogos
+    ? (isDarkChrome ? (divisionLogos.stackedWhite ?? divisionLogos.stackedColor) : (divisionLogos.stackedColor ?? divisionLogos.stackedWhite))
+    : undefined;
+  const horizontalUrl = divisionLogos
     ? (isDarkChrome ? (divisionLogos.white ?? divisionLogos.color) : (divisionLogos.color ?? divisionLogos.white))
     : undefined;
+  const officialLogoUrl =
+    orientation === "stacked"
+      ? (stackedUrl ?? horizontalUrl)
+      : (horizontalUrl ?? stackedUrl);
   const useOfficialImage = !!officialLogoUrl;
   const useOfficialWordmark = !useOfficialImage && TP_BRANDS.has(logo.wordmark);
   const wordmarkHeight = dims.wordmarkPx;
   // PNG lockups need more vertical presence than the raw wordmark height.
-  const officialImageHeight = Math.round(dims.wordmarkPx * 1.9);
+  // Stacked artwork is squarer, so give it more room.
+  const officialImageHeight = Math.round(dims.wordmarkPx * (orientation === "stacked" ? 3.2 : 1.9));
 
 
   return (
     <div
-      className="flex min-w-0 max-w-full items-center"
+      className={"flex min-w-0 max-w-full " + (orientation === "stacked" ? "flex-col items-start" : "items-center")}
       style={{ gap: dims.gapPx, color }}
       role="img"
       aria-label={`${logo.wordmark}${divisionLine ? " — " + divisionLine : ""}${clientLogoUrl ? " × client" : ""} lockup`}

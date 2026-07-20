@@ -66,6 +66,7 @@ function DeckEditor() {
   const revertAiChange = useDeckStore((s) => s.revertAiChange);
   const updateSlideNotes = useDeckStore((s) => s.updateSlideNotes);
   const setDeckClientLogo = useDeckStore((s) => s.setDeckClientLogo);
+  const setDeckContext = useDeckStore((s) => s.setDeckContext);
   const applySlideBackground = useDeckStore((s) => s.applySlideBackground);
 
 
@@ -121,6 +122,8 @@ function DeckEditor() {
 
   const qa = useMemo(() => runQa(deck.slides, deck.brandModeId), [deck.slides, deck.brandModeId]);
   const clientLogoUrl = deck.clientLogo?.primaryUrl ?? null;
+  const logoOrientation = deck.context?.logoOrientation ?? "horizontal";
+
 
 
   return (
@@ -161,6 +164,14 @@ function DeckEditor() {
           <AutosaveIndicator deckId={deckId} />
           <DuplicateDeckButton deckId={deckId} />
           <RebrandMenu deckId={deckId} />
+          <button
+            type="button"
+            onClick={() => setDeckContext(deckId, { logoOrientation: logoOrientation === "horizontal" ? "stacked" : "horizontal" })}
+            className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 px-3 py-2 text-xs font-medium text-black hover:border-black/30 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:border-white/30"
+            title="Toggle logo orientation"
+          >
+            Logo: {logoOrientation === "stacked" ? "Stacked" : "Horizontal"}
+          </button>
           <TemplateToggleButton deckId={deckId} />
           <SaveToCloudButton deckId={deckId} />
           <VersionHistoryButton deckId={deckId} />
@@ -186,7 +197,7 @@ function DeckEditor() {
                 >
                   <div className="aspect-[16/9] bg-white">
                     <ScaledSlide>
-                      {variant && <VariantRenderer slide={applyOverlay(slide)} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />}
+                      {variant && <VariantRenderer slide={applyOverlay(slide)} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />}
                     </ScaledSlide>
                   </div>
                   <div className="border-t border-black/10 bg-white px-3 py-2 text-xs">
@@ -261,7 +272,7 @@ function DeckEditor() {
           >
             {active && mv && (
               <ScaledSlide>
-                <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />
+                <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
               </ScaledSlide>
             )}
             <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100">
@@ -552,7 +563,7 @@ function DeckEditor() {
           onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
           onNext={clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined}
         >
-          <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />
+          <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
         </SlideLightbox>
       )}
 

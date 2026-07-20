@@ -179,6 +179,8 @@ function DocumentView() {
                             brand={brand}
                             pageNumber={globalIdx + 1}
                             clientName={brief?.prospect}
+                            subCompany={deck.subCompany}
+                            logoOrientation={deck.context?.logoOrientation}
                           />
                         </ScaledSlide>
                       </div>
