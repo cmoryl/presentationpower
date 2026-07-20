@@ -38,7 +38,7 @@ type VersionRecord = {
   change_summary: string | null;
   created_at: string;
   snapshot: {
-    deck: { title: string; brand_mode_id: string } | null;
+    deck: { title: string; brand_mode_id: string; sub_company?: string | null } | null;
     slides: SnapshotSlideRow[];
     brief: { prospect: string | null } | null;
   };
