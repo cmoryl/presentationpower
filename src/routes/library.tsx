@@ -581,7 +581,6 @@ const VariantCard = memo(function VariantCard({
             In scope
           </div>
         )}
-        
       </div>
       </LazyMount>
       )}
