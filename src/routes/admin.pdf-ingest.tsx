@@ -220,6 +220,64 @@ function PdfIngestPage() {
         </p>
       </section>
 
+      {/* Embedding pipeline */}
+      <section className="rounded-2xl border border-black/10 bg-white/70 p-5">
+        <div className="mb-1 text-[10px] uppercase tracking-widest text-black/50">Embed into RAG</div>
+        <p className="mb-3 text-xs text-black/60">
+          Chunks OK extractions (1200/200) and embeds with <code className="rounded bg-black/[0.05] px-1">google/gemini-embedding-001</code> into
+          <code className="ml-1 rounded bg-black/[0.05] px-1">brand_asset_chunks</code>, tagged with the mapped <code className="rounded bg-black/[0.05] px-1">division_id</code>.
+          Idempotent — already-embedded docs are skipped.
+        </p>
+        <div className="mb-3 grid gap-1 rounded-lg border border-black/[0.06] bg-white p-3 text-[11px] text-black/70 sm:grid-cols-2 md:grid-cols-3">
+          <div className="font-semibold text-black/60">Embedded coverage</div>
+          <div className="col-span-full text-black/50">
+            {stats.embedded}/{stats.ok} OK docs · {stats.totalChunks.toLocaleString()} chunks total
+          </div>
+          {embedByEntity.map(([slug, s]) => (
+            <div key={slug} className="flex items-center justify-between rounded bg-black/[0.03] px-2 py-1">
+              <span className="font-mono">{slug}</span>
+              <span className={s.embedded === s.ok ? "text-emerald-700" : "text-amber-700"}>
+                {s.embedded}/{s.ok} · {s.chunks} ch
+              </span>
+            </div>
+          ))}
+        </div>
+        <div className="grid gap-3 sm:grid-cols-[1fr_120px_auto]">
+          <select
+            value={embedEntity}
+            onChange={(e) => setEmbedEntity(e.target.value)}
+            className="rounded-lg border border-black/10 bg-white px-3 py-2 text-sm"
+          >
+            <option value="">All entities</option>
+            {embedByEntity.map(([slug, s]) => (
+              <option key={slug} value={slug}>
+                {slug} ({s.ok - s.embedded} pending)
+              </option>
+            ))}
+          </select>
+          <input
+            type="number"
+            value={embedLimit}
+            min={1}
+            max={100}
+            onChange={(e) => setEmbedLimit(Number(e.target.value) || 5)}
+            className="rounded-lg border border-black/10 bg-white px-3 py-2 text-sm"
+            placeholder="Docs"
+          />
+          <button
+            type="button"
+            disabled={embedMut.isPending}
+            onClick={() => embedMut.mutate()}
+            className="rounded-lg bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+          >
+            {embedMut.isPending ? "Embedding…" : "Embed batch"}
+          </button>
+        </div>
+        {embedLog && <div className="mt-3 rounded-lg bg-black/[0.04] p-3 font-mono text-xs text-black/80">{embedLog}</div>}
+      </section>
+
+
+
       {/* Extractions table */}
       <section className="rounded-2xl border border-black/10 bg-white/70 p-5">
         <div className="flex items-baseline justify-between">
