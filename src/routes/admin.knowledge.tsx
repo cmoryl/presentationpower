@@ -5,6 +5,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { BRAND_GUIDES, type BrandGuide, type ColorSwatch, type TypeStyle, type LogoRule } from "@/lib/brand-guides";
 import { getBrandhubIntel, targetAudienceText, normalizeVoiceValue } from "@/lib/brandhub-intel";
 import { listPdfExtractionsForDivision, getPdfExtractionText } from "@/lib/pdf-ingest.functions";
+import {
+  listImportedDecksForDivision,
+  uploadImportedDeck,
+  getImportedDeckSlides,
+  deleteImportedDeck,
+} from "@/lib/imported-decks.functions";
+
 
 
 export const Route = createFileRoute("/admin/knowledge")({
@@ -17,7 +24,7 @@ export const Route = createFileRoute("/admin/knowledge")({
   component: AdminKnowledgeBrowser,
 });
 
-type Tab = "overview" | "colors" | "type" | "logo" | "subbrands" | "intel" | "sources" | "voiceover";
+type Tab = "overview" | "colors" | "type" | "logo" | "subbrands" | "intel" | "sources" | "imported" | "voiceover";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "overview", label: "Overview" },
@@ -27,8 +34,10 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "subbrands", label: "Sub-brands" },
   { id: "intel", label: "BrandHub intel" },
   { id: "sources", label: "Source documents" },
+  { id: "imported", label: "Imported decks" },
   { id: "voiceover", label: "Voiceover topics" },
 ];
+
 
 
 type CanvaPaletteEntry = {
@@ -160,8 +169,10 @@ function AdminKnowledgeBrowser() {
           {tab === "subbrands" && <SubBrandsTab guide={guide} />}
           {tab === "intel" && <IntelTab slug={guide.slug} />}
           {tab === "sources" && <SourcesTab slug={guide.slug} />}
+          {tab === "imported" && <ImportedDecksTab slug={guide.slug} />}
 
           {tab === "voiceover" && <VoiceoverTab index={voIndex} />}
+
         </div>
       </div>
     </div>
@@ -599,5 +610,220 @@ function VoiceoverTab({ index }: { index: VoiceoverIndex[] }) {
         ))}
       </ul>
     </Section>
+  );
+}
+
+function ImportedDecksTab({ slug }: { slug: string }) {
+  const listFn = useServerFn(listImportedDecksForDivision);
+  const uploadFn = useServerFn(uploadImportedDeck);
+  const getSlidesFn = useServerFn(getImportedDeckSlides);
+  const deleteFn = useServerFn(deleteImportedDeck);
+
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const rowsQ = useQuery({
+    queryKey: ["admin-knowledge-imported", slug, refreshKey],
+    queryFn: () => listFn({ data: { divisionId: slug } }),
+  });
+
+  const detailQ = useQuery({
+    queryKey: ["admin-knowledge-imported-detail", openId],
+    queryFn: () => (openId ? getSlidesFn({ data: { id: openId } }) : Promise.resolve(null)),
+    enabled: !!openId,
+  });
+
+  async function handleFile(file: File) {
+    setError(null);
+    if (!file.name.toLowerCase().endsWith(".pptx")) {
+      setError("Only .pptx files are supported.");
+      return;
+    }
+    if (file.size > 50 * 1024 * 1024) {
+      setError("File exceeds 50MB.");
+      return;
+    }
+    setUploading(true);
+    try {
+      const buf = await file.arrayBuffer();
+      const bytes = new Uint8Array(buf);
+      let bin = "";
+      for (let i = 0; i < bytes.length; i += 0x8000) {
+        bin += String.fromCharCode.apply(null, Array.from(bytes.subarray(i, i + 0x8000)));
+      }
+      const b64 = btoa(bin);
+      await uploadFn({ data: { divisionId: slug, filename: file.name, data: b64 } });
+      setRefreshKey((k) => k + 1);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Upload failed.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm("Delete this imported deck?")) return;
+    try {
+      await deleteFn({ data: { id } });
+      setRefreshKey((k) => k + 1);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Delete failed.");
+    }
+  }
+
+  const rows = rowsQ.data ?? [];
+  const detail = detailQ.data;
+
+  return (
+    <>
+      <Section title="Upload PowerPoint">
+        <p className="mb-3 text-xs text-black/60">
+          Upload a .pptx to store it against <span className="font-medium">{slug}</span>. We extract slide text, notes, and theme colors — pixel-perfect visual thumbnails are a later layer.
+        </p>
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[#003FC7] bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:opacity-90">
+          {uploading ? "Uploading…" : "Choose .pptx"}
+          <input
+            type="file"
+            accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+            disabled={uploading}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleFile(f);
+              e.currentTarget.value = "";
+            }}
+            className="hidden"
+          />
+        </label>
+        {error && <div className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{error}</div>}
+      </Section>
+
+      <Section title={`Imported decks (${rows.length})`}>
+        {rowsQ.isLoading ? (
+          <div className="text-xs text-black/50">Loading…</div>
+        ) : rows.length === 0 ? (
+          <div className="text-xs text-black/50">No decks imported for this division yet.</div>
+        ) : (
+          <ul className="divide-y divide-black/[0.06]">
+            {rows.map((r) => (
+              <li key={r.id} className="flex items-center justify-between gap-3 py-2 text-xs">
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-black">{r.original_filename}</div>
+                  <div className="mt-0.5 text-[10px] text-black/40">
+                    {new Date(r.created_at).toLocaleString()} · {(r.file_size / 1024).toFixed(0)} KB
+                  </div>
+                </div>
+                <span className="shrink-0 rounded-full bg-black/[0.06] px-2 py-0.5 font-mono text-[10px] text-black/60">
+                  {r.slide_count} slides
+                </span>
+                <span
+                  className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest ${
+                    r.status === "parsed"
+                      ? "bg-[#003FC7]/10 text-[#003FC7]"
+                      : r.status === "failed"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-amber-100 text-amber-800"
+                  }`}
+                >
+                  {r.status}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setOpenId(r.id)}
+                  className="shrink-0 rounded-full border border-black/15 px-2 py-0.5 text-[10px] text-black/70 hover:border-black/40"
+                >
+                  View
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(r.id)}
+                  className="shrink-0 rounded-full border border-red-200 px-2 py-0.5 text-[10px] text-red-700 hover:border-red-500"
+                >
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Section>
+
+      {openId && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4" onClick={() => setOpenId(null)}>
+          <div
+            className="max-h-[85vh] w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-black/10 px-4 py-3">
+              <div className="min-w-0">
+                <div className="truncate text-sm font-medium text-black">
+                  {detail?.original_filename ?? "Loading…"}
+                </div>
+                {detail && (
+                  <div className="text-[10px] text-black/50">
+                    {detail.slide_count} slides
+                    {detail.theme?.accent1 && (
+                      <span className="ml-2 inline-flex items-center gap-1">
+                        <span className="inline-block h-2 w-2 rounded-full" style={{ background: detail.theme.accent1 }} />
+                        {detail.theme.accent1}
+                      </span>
+                    )}
+                    {detail.theme?.headingFont && <span className="ml-2">· {detail.theme.headingFont}</span>}
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                {detail?.downloadUrl && (
+                  <a
+                    href={detail.downloadUrl}
+                    className="rounded-full border border-black/15 px-3 py-1 text-[11px] text-black/70 hover:border-black/40"
+                  >
+                    Download
+                  </a>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setOpenId(null)}
+                  className="rounded-full border border-black/15 px-3 py-1 text-[11px] text-black/70 hover:border-black/40"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+            <div className="max-h-[70vh] overflow-y-auto px-4 py-3">
+              {detailQ.isLoading || !detail ? (
+                <div className="text-xs text-black/50">Loading…</div>
+              ) : (
+                <ol className="space-y-4">
+                  {(detail.slides ?? []).map((sl) => (
+                    <li key={sl.index} className="rounded-xl border border-black/10 p-3">
+                      <div className="mb-1 flex items-baseline gap-2">
+                        <span className="font-mono text-[10px] text-black/40">#{sl.index + 1}</span>
+                        <span className="text-sm font-medium text-black">{sl.title}</span>
+                        {sl.imageCount > 0 && (
+                          <span className="ml-auto text-[10px] text-black/40">{sl.imageCount} image{sl.imageCount === 1 ? "" : "s"}</span>
+                        )}
+                      </div>
+                      {sl.bullets.length > 0 && (
+                        <ul className="ml-4 list-disc space-y-0.5 text-xs text-black/70">
+                          {sl.bullets.map((b, i) => (
+                            <li key={i}>{b}</li>
+                          ))}
+                        </ul>
+                      )}
+                      {sl.notes && (
+                        <div className="mt-2 rounded-lg bg-black/[0.03] p-2 text-[11px] italic text-black/60">
+                          Notes: {sl.notes}
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

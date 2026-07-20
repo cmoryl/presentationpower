@@ -57,6 +57,11 @@ export const importPowerpoint = createServerFn({ method: "POST" })
   .inputValidator((v) => InputSchema.parse(v))
   .handler(async ({ data }): Promise<ParsedDeck> => {
     const buf = Buffer.from(data.data, "base64");
+    return parsePptxBuffer(buf, data.filename);
+  });
+
+/** Plain helper — parses a .pptx buffer into a ParsedDeck. Reusable from other server functions. */
+export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string): Promise<ParsedDeck> {
     if (buf.length < 32) throw new Error("File is empty or invalid.");
     // PPTX is a zip; magic bytes PK\x03\x04
     if (buf[0] !== 0x50 || buf[1] !== 0x4b) {
@@ -69,6 +74,7 @@ export const importPowerpoint = createServerFn({ method: "POST" })
       preserveOrder: false,
       trimValues: true,
     });
+
 
     // ── Theme ─────────────────────────────────────────────────────────────
     const theme = await extractTheme(zip, parser);
@@ -173,14 +179,15 @@ export const importPowerpoint = createServerFn({ method: "POST" })
     }
 
     return {
-      filename: data.filename,
+      filename,
       slideCount: slides.length,
       slides,
       theme,
       imagePayloadBytes: totalImageBytes,
       imagesTruncated,
     };
-  });
+}
+
 
 function slideNumber(path: string): number {
   const m = path.match(/(\d+)\.xml$/);
