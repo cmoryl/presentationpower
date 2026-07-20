@@ -21,6 +21,20 @@ export const Route = createFileRoute("/admin/approvals")({
   component: ApprovalsView,
 });
 
+const SLA_HOURS = 48;
+
+function hoursSince(ts: string | null | undefined): number | null {
+  if (!ts) return null;
+  return Math.max(0, (Date.now() - new Date(ts).getTime()) / (1000 * 60 * 60));
+}
+
+function slaBadge(hours: number | null) {
+  if (hours == null) return { label: "no submit time", tone: "bg-black/5 text-black/60" };
+  if (hours > SLA_HOURS) return { label: `${Math.round(hours)}h · SLA breach`, tone: "bg-red-100 text-red-900" };
+  if (hours > SLA_HOURS * 0.6) return { label: `${Math.round(hours)}h · due soon`, tone: "bg-amber-100 text-amber-900" };
+  return { label: `${Math.round(hours)}h in queue`, tone: "bg-emerald-100 text-emerald-900" };
+}
+
 type PendingRow = Awaited<ReturnType<typeof listPendingModules>>[number];
 type ReviewedRow = Awaited<ReturnType<typeof listRecentReviewed>>[number];
 type ExpiringRow = Awaited<ReturnType<typeof listExpiringSoon>>[number];
@@ -36,6 +50,8 @@ function ApprovalsView() {
 
   const [tab, setTab] = useState<Tab>("pending");
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [search, setSearch] = useState("");
+  const [variantFilter, setVariantFilter] = useState<string>("all");
 
   const pending = useQuery({ queryKey: ["approvals", "pending"], queryFn: () => listPending() });
   const recent = useQuery({ queryKey: ["approvals", "recent"], queryFn: () => listReviewed() });
@@ -46,7 +62,31 @@ function ApprovalsView() {
   const pendingRows = (pending.data ?? []) as PendingRow[];
   const inPending = pendingRows.filter((r) => r.approval_status === "pending" || r.approval_status === "draft");
   const inChanges = pendingRows.filter((r) => r.approval_status === "changes-requested");
-  const currentRows = tab === "pending" ? inPending : tab === "changes" ? inChanges : [];
+
+  const variantOptions = useMemo(() => {
+    const s = new Set<string>();
+    pendingRows.forEach((r) => r.variant_id && s.add(r.variant_id));
+    return Array.from(s).sort();
+  }, [pendingRows]);
+
+  const filterRows = (rows: PendingRow[]) => {
+    const q = search.trim().toLowerCase();
+    return rows.filter((r) => {
+      if (variantFilter !== "all" && r.variant_id !== variantFilter) return false;
+      if (!q) return true;
+      const hay = `${r.title ?? ""} ${r.variant_id ?? ""} ${r.brand_mode_id ?? ""} ${JSON.stringify(r.content ?? "")}`.toLowerCase();
+      return hay.includes(q);
+    });
+  };
+
+  const currentRows = tab === "pending" ? filterRows(inPending) : tab === "changes" ? filterRows(inChanges) : [];
+
+  const slaBreaches = inPending.filter((r) => (hoursSince(r.submitted_at) ?? 0) > SLA_HOURS).length;
+  const avgAge = inPending.length
+    ? Math.round(
+        inPending.reduce((s, r) => s + (hoursSince(r.submitted_at) ?? 0), 0) / inPending.length,
+      )
+    : 0;
 
   const invalidateAll = () => {
     qc.invalidateQueries({ queryKey: ["approvals", "pending"] });
@@ -101,11 +141,42 @@ function ApprovalsView() {
     <div className="space-y-8">
       <div>
         <div className="text-xs uppercase tracking-[0.3em] text-black/50">Governance</div>
-        <h2 className="mt-3 text-3xl font-semibold">Knowledgebase & approvals</h2>
+        <h2 className="mt-3 text-3xl font-semibold">Approvals command center</h2>
         <p className="mt-3 max-w-2xl text-black/60">
-          Review, approve, or reject slide modules submitted to the library. Approved modules become available to the
-          assembler and library search. Every decision is written to the audit trail.
+          The gate between contributor drafts and the shipped module library. Knowledge lookups live in the{" "}
+          <span className="font-medium text-black/80">Knowledge browser</span> and{" "}
+          <span className="font-medium text-black/80">Oracle KB</span> — this queue is for reviewer decisions only.
+          Every action is written to the audit trail.
         </p>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="Awaiting review" value={counts.pending} accent="bg-black text-white" />
+        <StatCard label="Changes requested" value={counts.changes} accent="bg-amber-100 text-amber-900" />
+        <StatCard label="SLA breaches (>48h)" value={slaBreaches} accent={slaBreaches ? "bg-red-100 text-red-900" : "bg-emerald-100 text-emerald-900"} />
+        <StatCard label="Avg age in queue" value={`${avgAge}h`} accent="bg-black/5 text-black/70" />
+      </div>
+
+      <div className="grid gap-3 md:grid-cols-[1fr_14rem]">
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search title, content, variant, brand mode…"
+          className="w-full rounded-full border border-black/10 bg-white px-4 py-2 text-sm focus:border-black/40 focus:outline-none"
+        />
+        <select
+          value={variantFilter}
+          onChange={(e) => setVariantFilter(e.target.value)}
+          className="rounded-full border border-black/10 bg-white px-4 py-2 text-sm"
+        >
+          <option value="all">All variants</option>
+          {variantOptions.map((v) => (
+            <option key={v} value={v}>
+              {v}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 border-b border-black/10">
@@ -169,6 +240,19 @@ function ApprovalsView() {
           )}
         </section>
       )}
+    </div>
+  );
+}
+
+function StatCard({ label, value, accent }: { label: string; value: number | string; accent: string }) {
+  return (
+    <div className="rounded-2xl border border-black/10 bg-white p-4">
+      <div className="text-[10px] uppercase tracking-[0.25em] text-black/50">{label}</div>
+      <div className="mt-2 flex items-center gap-2">
+        <span className={`inline-flex min-w-[2.5rem] justify-center rounded-full px-3 py-1 text-lg font-semibold tabular-nums ${accent}`}>
+          {value}
+        </span>
+      </div>
     </div>
   );
 }
@@ -255,6 +339,10 @@ function PendingCard({
               <span className="font-mono">{row.variant_id}</span>
               {family && <span>· {family.name}</span>}
               {brand && <span>· {brand.name}</span>}
+              {(() => {
+                const b = slaBadge(hoursSince(row.submitted_at));
+                return <span className={`rounded-full px-2 py-0.5 font-medium ${b.tone}`}>{b.label}</span>;
+              })()}
               {expired && (
                 <span className="rounded-full bg-red-100 px-2 py-0.5 font-medium text-red-900">expired</span>
               )}
