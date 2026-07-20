@@ -178,6 +178,13 @@ function ExportView() {
           );
         })}
       </div>
+      <ExportPreflightModal
+        open={preflightIssues !== null && preflightIssues.length > 0}
+        issues={preflightIssues ?? []}
+        busy={exporting}
+        onCancel={() => setPreflightIssues(null)}
+        onExportAnyway={runPptxExport}
+      />
     </div>
   );
 }
