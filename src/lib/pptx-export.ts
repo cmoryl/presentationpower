@@ -56,10 +56,17 @@ function resolveSlideImageUrl(
   return pickDivisionImage(brandId, seedHash(seed));
 }
 
-async function fetchAsDataUrl(url: string): Promise<string | null> {
+async function fetchAsDataUrl(url: string, label?: string): Promise<string | null> {
   try {
-    const res = await fetch(url);
-    if (!res.ok) return null;
+    // `mode: "cors"` is the default for cross-origin fetches, but stating it
+    // explicitly makes the failure mode obvious in devtools when a pasted
+    // image URL lacks CORS headers. Supabase signed URLs and most CDNs
+    // (Unsplash, Cloudinary, etc.) send `access-control-allow-origin: *`.
+    const res = await fetch(url, { mode: "cors", credentials: "omit" });
+    if (!res.ok) {
+      console.warn(`[pptx-export] ${label ?? "image"} fetch ${res.status}: ${url}`);
+      return null;
+    }
     const blob = await res.blob();
     return await new Promise<string>((resolve, reject) => {
       const r = new FileReader();
@@ -67,7 +74,11 @@ async function fetchAsDataUrl(url: string): Promise<string | null> {
       r.onerror = () => reject(r.error);
       r.readAsDataURL(blob);
     });
-  } catch {
+  } catch (e) {
+    console.warn(
+      `[pptx-export] ${label ?? "image"} fetch failed (likely CORS): ${url}`,
+      e,
+    );
     return null;
   }
 }
