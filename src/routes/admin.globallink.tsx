@@ -343,7 +343,7 @@ function GlobalLinkAdminPage() {
             />
             <Toggle
               label="Enforce glossary"
-              hint="Protect DNT terms via inline span translate=\"no\" markers."
+              hint='Protect DNT terms via inline span translate="no" markers.'
               checked={config.enforce_glossary}
               onChange={(v) => setConfig({ ...config, enforce_glossary: v })}
             />
