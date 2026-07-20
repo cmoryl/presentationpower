@@ -6,6 +6,8 @@ import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { exportDeckToPptx } from "@/lib/pptx-export";
 import { runQa, blockingIssues, warningIssues } from "@/lib/qa";
+import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
+import { ExportPreflightModal } from "@/components/ExportPreflightModal";
 
 
 export const Route = createFileRoute("/decks/$deckId/export")({
