@@ -373,6 +373,18 @@ export function ShareMenu({ deckId }: { deckId: string }) {
           </div>
         </div>
       )}
+      <ExportPreflightModal
+        open={preflightIssues !== null && preflightIssues.length > 0}
+        issues={preflightIssues ?? []}
+        busy={busy}
+        onCancel={() => setPreflightIssues(null)}
+        onExportAnyway={runPptxExport}
+        onJumpToSlide={(slideId) => {
+          setPreflightIssues(null);
+          setOpen(false);
+          navigate({ to: "/decks/$deckId", params: { deckId }, hash: `slide-${slideId}` });
+        }}
+      />
     </div>
   );
 }
