@@ -9,7 +9,8 @@ import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { getLibraryAnalytics, type DeckAnalyticsSummary } from "@/lib/deck-analytics.functions";
-import { deleteCloudDeck } from "@/lib/cloud-decks.functions";
+import { deleteCloudDeck, listMyCloudDecks } from "@/lib/cloud-decks.functions";
+import { ReviewStatusBadge, type ReviewStatus } from "@/components/ReviewStatusControl";
 
 export const Route = createFileRoute("/decks/")({
   head: () => ({
@@ -30,17 +31,34 @@ function DecksIndex() {
   const briefs = useDeckStore((s) => s.briefs);
   const signedIn = useSignedIn();
   const fetchAnalytics = useServerFn(getLibraryAnalytics);
+  const fetchCloud = useServerFn(listMyCloudDecks);
 
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<SortKey>("recent");
   const [kind, setKind] = useState<Kind>("all");
   const [reach, setReach] = useState<Reach>("all");
   const [analytics, setAnalytics] = useState<DeckAnalyticsSummary | null>(null);
+  const [cloudDecks, setCloudDecks] = useState<Array<{ title: string; review_status: string | null }>>([]);
 
   useEffect(() => {
-    if (!signedIn) { setAnalytics(null); return; }
+    if (!signedIn) { setAnalytics(null); setCloudDecks([]); return; }
     fetchAnalytics().then(setAnalytics).catch(() => setAnalytics(null));
-  }, [signedIn, fetchAnalytics]);
+    fetchCloud()
+      .then((rows) => setCloudDecks(rows.map((r) => ({ title: r.title, review_status: r.review_status ?? null }))))
+      .catch(() => setCloudDecks([]));
+  }, [signedIn, fetchAnalytics, fetchCloud]);
+
+  const reviewByTitle = useMemo(() => {
+    const m = new Map<string, ReviewStatus>();
+    const order: ReviewStatus[] = ["approved", "in_review", "changes_requested", "draft"];
+    for (const r of cloudDecks) {
+      const key = r.title.trim().toLowerCase();
+      const rs = (r.review_status ?? "draft") as ReviewStatus;
+      const prev = m.get(key);
+      if (!prev || order.indexOf(rs) < order.indexOf(prev)) m.set(key, rs);
+    }
+    return m;
+  }, [cloudDecks]);
 
   // Map local decks to view/share data via title match (best-effort — local
   // deck IDs are nanoids while analytics keys by DB uuid). Multiple same-title
@@ -63,7 +81,8 @@ function DecksIndex() {
 
   const enriched = useMemo(() => {
     return allDecks.map((d) => {
-      const s = statsByTitle.get(d.title.trim().toLowerCase());
+      const key = d.title.trim().toLowerCase();
+      const s = statsByTitle.get(key);
       const brief = briefs[d.briefId];
       return {
         deck: d,
@@ -71,9 +90,10 @@ function DecksIndex() {
         shared: s?.shared ?? false,
         client: brief?.prospect ?? "",
         industry: brief?.industry ?? "",
+        reviewStatus: reviewByTitle.get(key) ?? null,
       };
     });
-  }, [allDecks, statsByTitle, briefs]);
+  }, [allDecks, statsByTitle, briefs, reviewByTitle]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -226,7 +246,9 @@ function DecksIndex() {
               client={r.client}
               views={r.views}
               shared={r.shared}
+              reviewStatus={r.reviewStatus}
             />
+
           ))}
         </div>
       )}
@@ -280,8 +302,8 @@ function Chip({
 }
 
 function DeckTile({
-  deck: d, industry, client, views, shared,
-}: { deck: Deck; industry: string; client: string; views: number; shared: boolean }) {
+  deck: d, industry, client, views, shared, reviewStatus,
+}: { deck: Deck; industry: string; client: string; views: number; shared: boolean; reviewStatus: ReviewStatus | null }) {
   const brand = byId(BRAND_MODES, d.brandModeId) ?? BRAND_MODES[0];
   const cover = d.slides[0];
   const coverVariant = cover ? byId(MODULE_VARIANTS, cover.variantId) : undefined;
@@ -323,6 +345,7 @@ function DeckTile({
                 <Share2 size={9} /> Shared
               </span>
             )}
+            {reviewStatus && reviewStatus !== "draft" && <ReviewStatusBadge status={reviewStatus} />}
           </div>
           <div className="mt-3 line-clamp-2 text-lg font-semibold">{d.title}</div>
           <div className="mt-1 text-sm text-black/60 dark:text-white/60">

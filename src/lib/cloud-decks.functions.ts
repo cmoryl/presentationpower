@@ -131,7 +131,7 @@ export const listMyCloudDecks = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("decks")
-      .select("id, title, brand_mode_id, archetype_id, updated_at, created_at, brief_id, is_template")
+      .select("id, title, brand_mode_id, archetype_id, updated_at, created_at, brief_id, is_template, review_status")
       .eq("owner_id", userId)
       .order("updated_at", { ascending: false });
     if (error) throw new Error(error.message);
