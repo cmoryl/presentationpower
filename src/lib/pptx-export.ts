@@ -777,6 +777,14 @@ function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette)
     case "MV-GRAPH-TASK-CARDS": renderGraphTaskCards(s, c, p); return true;
     case "MV-GRAPH-DECADE-AREA": renderGraphDecadeArea(s, c, p); return true;
     case "MV-GRAPH-PERCENT-COMPARE": renderGraphPercentCompare(s, c, p); return true;
+    case "MV-GRAPH-LINE-MULTI": renderGraphLineMulti(s, c, p); return true;
+    case "MV-GRAPH-STACKED-BAR": renderGraphStackedBar(s, c, p); return true;
+    case "MV-GRAPH-AREA-STACK": renderGraphAreaStack(s, c, p); return true;
+    case "MV-GRAPH-WATERFALL": renderGraphWaterfall(s, c, p); return true;
+    case "MV-GRAPH-BUBBLE": renderGraphBubble(s, c, p); return true;
+    case "MV-GRAPH-HEATMAP": renderGraphHeatmap(s, c, p); return true;
+    case "MV-GRAPH-TREEMAP": renderGraphTreemap(s, c, p); return true;
+    case "MV-GRAPH-COMBO": renderGraphCombo(s, c, p); return true;
     default: return false;
   }
 }
@@ -2025,4 +2033,254 @@ function renderGraphPercentCompare(s: PptxGenJS.Slide, c: Record<string, unknown
     s.addShape("rect", { x: 0.6, y: barY + 0.14, w: (barW * bench) / 100, h: 0.08, fill: { color: p.primary }, line: { color: p.primary } });
     if (str(it.range)) s.addText(str(it.range).toUpperCase(), { x: 0.6, y: ry + rowH - 0.32, w: SLIDE_W - 1.2, h: 0.3, fontSize: 10, bold: true, color: MID_GRAY, charSpacing: 3, fontFace: "Inter" });
   });
+}
+
+// ────────────── H1 fix: 8 chart variants with real export fidelity ──────────────
+// Palette hue rotation for multi-series charts (keeps within brand tones).
+function seriesColors(p: Palette): string[] {
+  return [p.primary, p.accent, DARK_GRAY, MID_GRAY, LIGHT_GRAY];
+}
+
+// ── MV-GRAPH-LINE-MULTI ──
+function renderGraphLineMulti(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const series = arr(c.series);
+  const axis = obj(c.axis);
+  const labels = arr(axis.x).length ? arr(axis.x).map((v) => str(v)) : (Array.isArray(axis.x) ? (axis.x as unknown[]).map((v) => str(v)) : []);
+  const xLabels = labels.length ? labels : (series[0]?.points as unknown[] | undefined)?.map((_, i) => `${i + 1}`) ?? [];
+  const data = series.map((sr) => ({
+    name: str(sr.label),
+    labels: xLabels,
+    values: numArr(sr.points),
+  }));
+  if (str(c.kicker)) {
+    s.addShape("rect", { x: 0.6, y: y0, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
+    s.addText(str(c.kicker).toUpperCase(), { x: 0.6, y: y0 + 0.15, w: SLIDE_W - 1.2, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
+  }
+  const chartY = y0 + (str(c.kicker) ? 0.55 : 0.1);
+  try {
+    s.addChart(
+      "line" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+      data,
+      { x: 0.6, y: chartY, w: SLIDE_W - 1.2, h: 5.4 - chartY, chartColors: seriesColors(p), showLegend: true, legendPos: "b", legendFontFace: "Inter", legendFontSize: 11, legendColor: DARK_GRAY, showTitle: false, catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 11, catAxisLabelColor: DARK_GRAY, valAxisLabelFontFace: "Inter", valAxisLabelFontSize: 10, valAxisLabelColor: DARK_GRAY, valGridLine: { style: "solid", size: 1, color: LIGHT_GRAY }, lineDataSymbol: "circle", lineDataSymbolSize: 6, lineSize: 2 },
+    );
+  } catch { /* no-op */ }
+}
+
+// ── MV-GRAPH-STACKED-BAR ──
+function renderGraphStackedBar(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const segments = arr(c.segments);
+  const columns = arr(c.columns);
+  const catLabels = columns.map((col) => str(col.label));
+  const data = segments.map((seg, si) => ({
+    name: str(seg.label),
+    labels: catLabels,
+    values: columns.map((col) => num((numArr(col.values) as number[])[si])),
+  }));
+  try {
+    s.addChart(
+      "bar" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+      data,
+      { x: 0.6, y: y0 + 0.1, w: SLIDE_W - 1.2, h: 5.2, barDir: "col", barGrouping: "stacked", chartColors: seriesColors(p), showLegend: true, legendPos: "b", legendFontFace: "Inter", legendFontSize: 11, legendColor: DARK_GRAY, showTitle: false, catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 11, valAxisLabelFontFace: "Inter", valAxisLabelFontSize: 10, valAxisLabelColor: DARK_GRAY, valGridLine: { style: "solid", size: 1, color: LIGHT_GRAY } },
+    );
+  } catch { /* no-op */ }
+  if (str(c.unit)) {
+    s.addText(`Values in ${str(c.unit)}`, { x: 0.6, y: 5.35, w: SLIDE_W - 1.2, h: 0.3, fontSize: 10, italic: true, color: MID_GRAY, fontFace: "Inter" });
+  }
+}
+
+// ── MV-GRAPH-AREA-STACK ──
+function renderGraphAreaStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const series = arr(c.series);
+  const axis = obj(c.axis);
+  const xLabels = Array.isArray(axis.x) ? (axis.x as unknown[]).map((v) => str(v)) : [];
+  const data = series.map((sr) => ({
+    name: str(sr.label),
+    labels: xLabels,
+    values: numArr(sr.points),
+  }));
+  if (str(c.kicker)) {
+    s.addShape("rect", { x: 0.6, y: y0, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
+    s.addText(str(c.kicker).toUpperCase(), { x: 0.6, y: y0 + 0.15, w: SLIDE_W - 1.2, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
+  }
+  const chartY = y0 + (str(c.kicker) ? 0.55 : 0.1);
+  try {
+    s.addChart(
+      "area" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+      data,
+      { x: 0.6, y: chartY, w: SLIDE_W - 1.2, h: 5.4 - chartY, chartColors: seriesColors(p), barGrouping: "stacked", showLegend: true, legendPos: "b", legendFontFace: "Inter", legendFontSize: 11, legendColor: DARK_GRAY, showTitle: false, catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 11, valAxisLabelFontFace: "Inter", valAxisLabelFontSize: 10, valAxisLabelColor: DARK_GRAY, valGridLine: { style: "solid", size: 1, color: LIGHT_GRAY } },
+    );
+  } catch { /* no-op */ }
+}
+
+// ── MV-GRAPH-WATERFALL ──
+// PowerPoint's native waterfall type isn't exposed by pptxgenjs; draw manually with rects.
+function renderGraphWaterfall(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const steps = arr(c.steps);
+  if (!steps.length) return;
+  // Compute running totals for each step; start/end are absolute, up/down are deltas.
+  const bars: Array<{ label: string; base: number; delta: number; abs: number; kind: string }> = [];
+  let running = 0;
+  steps.forEach((st) => {
+    const kind = str(st.kind);
+    const value = num(st.value);
+    if (kind === "start" || kind === "end") {
+      bars.push({ label: str(st.label), base: 0, delta: value, abs: value, kind });
+      running = value;
+    } else {
+      const base = value >= 0 ? running : running + value;
+      bars.push({ label: str(st.label), base, delta: Math.abs(value), abs: running + value, kind: value >= 0 ? "up" : "down" });
+      running += value;
+    }
+  });
+  const chartX = 0.6, chartY = y0 + 0.4, chartW = SLIDE_W - 1.2, chartH = 4.4;
+  const maxVal = Math.max(...bars.map((b) => b.base + b.delta), ...bars.map((b) => b.abs));
+  const barW = (chartW - 0.2) / bars.length * 0.7;
+  const gap = (chartW - 0.2) / bars.length;
+  bars.forEach((b, i) => {
+    const bx = chartX + 0.1 + i * gap + (gap - barW) / 2;
+    const bh = (b.delta / Math.max(maxVal, 1)) * chartH;
+    const by = chartY + chartH - ((b.base + b.delta) / Math.max(maxVal, 1)) * chartH;
+    const fill = b.kind === "start" || b.kind === "end" ? p.primary : b.kind === "up" ? p.accent : MID_GRAY;
+    s.addShape("rect", { x: bx, y: by, w: barW, h: bh, fill: { color: fill }, line: { color: fill } });
+    // connector line to next bar
+    if (i < bars.length - 1) {
+      const topY = chartY + chartH - (bars[i].abs / Math.max(maxVal, 1)) * chartH;
+      s.addShape("line", { x: bx + barW, y: topY, w: gap - barW, h: 0, line: { color: LIGHT_GRAY, width: 1, dashType: "dash" } });
+    }
+    // value label
+    const sign = b.kind === "down" ? "-" : b.kind === "up" ? "+" : "";
+    s.addText(`${sign}${b.delta}${str(c.unit) ? ` ${str(c.unit)}` : ""}`, { x: bx - 0.3, y: by - 0.35, w: barW + 0.6, h: 0.3, fontSize: 10, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
+    // x label
+    s.addText(str(b.label), { x: chartX + 0.1 + i * gap, y: chartY + chartH + 0.1, w: gap, h: 0.5, fontSize: 10, color: DARK_GRAY, fontFace: "Inter", align: "center" });
+  });
+  // baseline
+  s.addShape("line", { x: chartX, y: chartY + chartH, w: chartW, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
+}
+
+// ── MV-GRAPH-BUBBLE ──
+function renderGraphBubble(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items);
+  const axis = obj(c.axis);
+  // pptxgenjs bubble chart: series with values (y), xValues (x), sizes.
+  try {
+    s.addChart(
+      "bubble" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+      [{
+        name: "Markets",
+        labels: items.map((it) => str(it.label)),
+        values: items.map((it) => num(it.y)),
+        xValues: items.map((it) => num(it.x)),
+        sizes: items.map((it) => num(it.size, 20)),
+      }],
+      { x: 0.6, y: y0 + 0.1, w: SLIDE_W - 1.2, h: 5.0, chartColors: [p.accent], showLegend: false, showTitle: false, catAxisTitle: str(axis.x), catAxisTitleFontFace: "Inter", catAxisTitleFontSize: 12, catAxisTitleColor: DARK_GRAY, showCatAxisTitle: !!str(axis.x), valAxisTitle: str(axis.y), valAxisTitleFontFace: "Inter", valAxisTitleFontSize: 12, valAxisTitleColor: DARK_GRAY, showValAxisTitle: !!str(axis.y), catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 10, valAxisLabelFontFace: "Inter", valAxisLabelFontSize: 10, valGridLine: { style: "solid", size: 1, color: LIGHT_GRAY }, showLabel: true, dataLabelFontFace: "Inter", dataLabelFontSize: 10, dataLabelColor: p.primary, dataLabelPosition: "ctr" },
+    );
+  } catch { /* no-op */ }
+}
+
+// ── MV-GRAPH-HEATMAP ──
+// No native heatmap in pptxgenjs; draw a colored grid with value interpolation.
+function renderGraphHeatmap(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const rows = Array.isArray(c.rows) ? (c.rows as unknown[]).map((v) => str(v)) : [];
+  const cols = Array.isArray(c.columns) ? (c.columns as unknown[]).map((v) => str(v)) : [];
+  const cells = Array.isArray(c.cells) ? (c.cells as unknown[][]).map((row) => (Array.isArray(row) ? row.map((v) => num(v)) : [])) : [];
+  const scale = obj(c.scale);
+  const smin = num(scale.min, Math.min(...cells.flat().filter((v) => Number.isFinite(v))));
+  const smax = num(scale.max, Math.max(...cells.flat().filter((v) => Number.isFinite(v))));
+  const gridX = 2.2, gridY = y0 + 0.5, gridW = SLIDE_W - gridX - 0.6, gridH = 4.4;
+  const cellW = gridW / Math.max(cols.length, 1);
+  const cellH = gridH / Math.max(rows.length, 1);
+  // column headers
+  cols.forEach((cl, i) => {
+    s.addText(cl, { x: gridX + i * cellW, y: gridY - 0.35, w: cellW, h: 0.3, fontSize: 10, bold: true, color: DARK_GRAY, fontFace: "Inter", align: "center" });
+  });
+  // row labels + cells
+  rows.forEach((rl, ri) => {
+    s.addText(rl, { x: 0.6, y: gridY + ri * cellH + cellH / 2 - 0.15, w: gridX - 0.7, h: 0.3, fontSize: 11, bold: true, color: p.primary, fontFace: "Inter" });
+    (cells[ri] ?? []).forEach((val, ci) => {
+      const t = smax === smin ? 0.5 : Math.max(0, Math.min(1, (val - smin) / (smax - smin)));
+      // interpolate accent (hot) with LIGHT_GRAY (cold)
+      const fill = mixHex(LIGHT_GRAY, p.accent, t);
+      const textColor = t > 0.55 ? "FFFFFF" : p.primary;
+      s.addShape("rect", { x: gridX + ci * cellW + 0.02, y: gridY + ri * cellH + 0.02, w: cellW - 0.04, h: cellH - 0.04, fill: { color: fill }, line: { color: "FFFFFF", width: 1 } });
+      s.addText(`${val}`, { x: gridX + ci * cellW, y: gridY + ri * cellH + cellH / 2 - 0.15, w: cellW, h: 0.3, fontSize: 11, bold: true, color: textColor, fontFace: "Inter", align: "center" });
+    });
+  });
+  // scale legend
+  s.addText(`Scale: ${smin} — ${smax}`, { x: gridX, y: gridY + gridH + 0.1, w: gridW, h: 0.3, fontSize: 10, italic: true, color: MID_GRAY, fontFace: "Inter" });
+}
+
+function mixHex(a: string, b: string, t: number): string {
+  const pa = [parseInt(a.slice(0, 2), 16), parseInt(a.slice(2, 4), 16), parseInt(a.slice(4, 6), 16)];
+  const pb = [parseInt(b.slice(0, 2), 16), parseInt(b.slice(2, 4), 16), parseInt(b.slice(4, 6), 16)];
+  const mix = pa.map((v, i) => Math.round(v + (pb[i] - v) * t));
+  return mix.map((v) => v.toString(16).padStart(2, "0")).join("").toUpperCase();
+}
+
+// ── MV-GRAPH-TREEMAP ──
+// No native treemap; draw a slice-and-dice layout (rows split by proportional weight).
+function renderGraphTreemap(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).map((it) => ({ label: str(it.label), value: num(it.value), meta: str(it.meta) }));
+  const total = items.reduce((sum, it) => sum + it.value, 0) || 1;
+  const gx = 0.6, gy = y0 + 0.3, gw = SLIDE_W - 1.2, gh = 4.8;
+  // Simple squarified approximation: first (biggest) item takes left column, rest split right column vertically.
+  items.sort((a, b) => b.value - a.value);
+  if (items.length === 0) return;
+  const colors = [p.primary, p.accent, DARK_GRAY, MID_GRAY, LIGHT_GRAY];
+  const first = items[0];
+  const firstW = gw * (first.value / total);
+  s.addShape("rect", { x: gx, y: gy, w: firstW - 0.05, h: gh, fill: { color: colors[0] }, line: { color: "FFFFFF", width: 2 } });
+  s.addText(first.label, { x: gx + 0.2, y: gy + 0.3, w: firstW - 0.5, h: 0.5, fontSize: 20, bold: true, color: "FFFFFF", fontFace: "Inter" });
+  s.addText(`${first.value}%`, { x: gx + 0.2, y: gy + 0.9, w: firstW - 0.5, h: 0.6, fontSize: 40, bold: true, color: "FFFFFF", fontFace: "Inter" });
+  if (first.meta) s.addText(first.meta, { x: gx + 0.2, y: gy + 1.7, w: firstW - 0.5, h: 0.5, fontSize: 11, color: "FFFFFF", fontFace: "Inter" });
+  // stack remaining vertically in right column
+  const rest = items.slice(1);
+  const restTotal = rest.reduce((sum, it) => sum + it.value, 0) || 1;
+  const rx = gx + firstW + 0.05;
+  const rw = gw - firstW - 0.05;
+  let cy = gy;
+  rest.forEach((it, i) => {
+    const rh = gh * (it.value / restTotal);
+    const color = colors[(i + 1) % colors.length];
+    s.addShape("rect", { x: rx, y: cy, w: rw, h: rh - 0.05, fill: { color }, line: { color: "FFFFFF", width: 2 } });
+    const textColor = color === LIGHT_GRAY ? p.primary : "FFFFFF";
+    s.addText(it.label, { x: rx + 0.2, y: cy + 0.15, w: rw - 0.4, h: 0.35, fontSize: 13, bold: true, color: textColor, fontFace: "Inter" });
+    s.addText(`${it.value}%`, { x: rx + 0.2, y: cy + rh / 2 - 0.25, w: rw - 0.4, h: 0.5, fontSize: 22, bold: true, color: textColor, fontFace: "Inter" });
+    if (it.meta && rh > 0.9) s.addText(it.meta, { x: rx + 0.2, y: cy + rh - 0.4, w: rw - 0.4, h: 0.3, fontSize: 10, color: textColor, fontFace: "Inter" });
+    cy += rh;
+  });
+}
+
+// ── MV-GRAPH-COMBO ──
+// Bars + line on one plot via pptxgenjs multi-type addChart.
+function renderGraphCombo(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const points = arr(c.points);
+  const barsMeta = obj(c.bars);
+  const lineMeta = obj(c.line);
+  const labels = points.map((pt) => str(pt.label));
+  try {
+    s.addChart(
+      [
+        {
+          type: "bar" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+          data: [{ name: str(barsMeta.label) || "Bars", labels, values: points.map((pt) => num(pt.bar)) }],
+          options: { barDir: "col", chartColors: [p.primary], barGrouping: "clustered" },
+        },
+        {
+          type: "line" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+          data: [{ name: str(lineMeta.label) || "Line", labels, values: points.map((pt) => num(pt.line)) }],
+          options: { chartColors: [p.accent], secondaryValAxis: true, secondaryCatAxis: true, lineDataSymbol: "circle", lineDataSymbolSize: 8, lineSize: 3 },
+        },
+      ] as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+      [] as unknown as Parameters<PptxGenJS.Slide["addChart"]>[1],
+      { x: 0.6, y: y0 + 0.1, w: SLIDE_W - 1.2, h: 5.0, showLegend: true, legendPos: "b", legendFontFace: "Inter", legendFontSize: 11, legendColor: DARK_GRAY, showTitle: false, catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 11, valAxisLabelFontFace: "Inter", valAxisLabelFontSize: 10, valAxisLabelColor: DARK_GRAY, valGridLine: { style: "solid", size: 1, color: LIGHT_GRAY }, valAxes: [{ showValAxisTitle: !!str(barsMeta.unit), valAxisTitle: str(barsMeta.unit), valAxisTitleFontFace: "Inter", valAxisTitleFontSize: 11 }, { showValAxisTitle: !!str(lineMeta.unit), valAxisTitle: str(lineMeta.unit), valAxisTitleFontFace: "Inter", valAxisTitleFontSize: 11, valGridLine: { style: "none" } }], catAxes: [{ catAxisLabelFontFace: "Inter", catAxisLabelFontSize: 11 }, { catAxisHidden: true }] } as unknown as Parameters<PptxGenJS.Slide["addChart"]>[2],
+    );
+  } catch { /* no-op */ }
 }

@@ -565,7 +565,7 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Two large stats with narrative",
     permittedLayoutIds: ["LF-04"],
     capacity: { items: { min: 2, max: 2 } },
-    editableFields: ["title", "items[].value", "items[].unit", "items[].label", "items[].style"],
+    editableFields: ["title", "items[].value", "items[].unit", "items[].label"],
     lockedFields: ["items[].source", "footer", "logo"],
   },
   {
@@ -575,7 +575,7 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Three big-number stats with labels + sources",
     permittedLayoutIds: ["LF-08"],
     capacity: { items: { min: 3, max: 3 } },
-    editableFields: ["title", "items[].value", "items[].unit", "items[].label", "items[].style"],
+    editableFields: ["title", "items[].value", "items[].unit", "items[].label"],
     lockedFields: ["items[].source", "footer", "logo"],
   },
   {
@@ -585,7 +585,7 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Four big-number stats in a 2×2 grid",
     permittedLayoutIds: ["LF-10"],
     capacity: { items: { min: 4, max: 4 } },
-    editableFields: ["title", "items[].value", "items[].unit", "items[].label", "items[].style"],
+    editableFields: ["title", "items[].value", "items[].unit", "items[].label"],
     lockedFields: ["items[].source", "footer", "logo"],
   },
   {
