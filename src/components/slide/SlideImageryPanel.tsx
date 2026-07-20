@@ -111,6 +111,10 @@ export function SlideImageryPanel({
       const prepared = RASTERIZE.includes(file.type) ? await rasterizeToPng(file) : file;
       const uploaded = await uploadSlideMedia(prepared);
       onChange(uploaded.signedUrl);
+      // Fire-and-forget: record usage so /admin/imagery-analytics reflects it.
+      void logImageryEvent({
+        data: { imageId: `upload:${uploaded.path ?? uploaded.signedUrl}`, brandId: divisionId ?? null, eventType: "use" },
+      }).catch(() => {});
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed.");
     } finally {
