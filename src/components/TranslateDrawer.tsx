@@ -48,6 +48,113 @@ export function TranslateDrawer({
   const [status, setStatus] = useState<{ kind: "idle" | "running" | "ok" | "err"; msg?: string }>({ kind: "idle" });
   const [batchResults, setBatchResults] = useState<Record<string, { ok: true; deckId: string; title: string } | { ok: false; error: string }> | null>(null);
 
+  // Job history state
+  const [tab, setTab] = useState<Tab>("new");
+  const [cloudDeckId, setCloudDeckId] = useState<string | null>(null);
+  type JobRow = {
+    id: string;
+    target_lang: string;
+    mode: Mode;
+    status: "draft" | "translating" | "ready" | "failed" | "cancelled";
+    engine: "globallink" | "ai";
+    progress_current: number | null;
+    progress_total: number | null;
+    error: string | null;
+    translated_deck_id: string | null;
+    created_at: string;
+    updated_at: string;
+  };
+  const [jobs, setJobs] = useState<JobRow[]>([]);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [details, setDetails] = useState<Record<string, Awaited<ReturnType<typeof getDeckTranslationJobDetail>>>>({});
+  const [busyJobId, setBusyJobId] = useState<string | null>(null);
+  const pollRef = useRef<number | null>(null);
+
+  const listJobs = useServerFn(listDeckTranslations);
+  const jobDetail = useServerFn(getDeckTranslationJobDetail);
+  const cancelJob = useServerFn(cancelDeckTranslation);
+  const retryJob = useServerFn(retryDeckTranslation);
+
+  // Resolve cloud deck id (deck_translations rows use it).
+  useEffect(() => {
+    let alive = true;
+    supabase.auth.getUser().then(({ data }) => {
+      const uid = data.user?.id;
+      if (!alive || !uid) return;
+      setCloudDeckId(deckCloudId(uid, deckId));
+    });
+    return () => { alive = false; };
+  }, [deckId]);
+
+  const refreshJobs = useCallback(async () => {
+    if (!cloudDeckId) return;
+    try {
+      const rows = (await listJobs({ data: { deckId: cloudDeckId } })) as JobRow[];
+      setJobs(rows);
+      // Refresh detail for any expanded rows so per-slide progress updates too.
+      const expandedIds = Object.keys(expanded).filter((k) => expanded[k]);
+      if (expandedIds.length > 0) {
+        const results = await Promise.all(
+          expandedIds.map((id) => jobDetail({ data: { jobId: id } }).catch(() => null)),
+        );
+        setDetails((prev) => {
+          const next = { ...prev };
+          expandedIds.forEach((id, i) => {
+            if (results[i]) next[id] = results[i] as never;
+          });
+          return next;
+        });
+      }
+    } catch {
+      /* ignore transient */
+    }
+  }, [cloudDeckId, listJobs, jobDetail, expanded]);
+
+  useEffect(() => { void refreshJobs(); }, [refreshJobs]);
+
+  // Poll while there is an active job or the history tab is open.
+  useEffect(() => {
+    const hasActive = jobs.some((j) => j.status === "translating" || j.status === "draft");
+    if (!hasActive && tab !== "history") return;
+    pollRef.current = window.setInterval(() => { void refreshJobs(); }, 2500) as unknown as number;
+    return () => {
+      if (pollRef.current) window.clearInterval(pollRef.current);
+      pollRef.current = null;
+    };
+  }, [jobs, tab, refreshJobs]);
+
+  async function toggleExpand(jobId: string) {
+    const next = !expanded[jobId];
+    setExpanded((p) => ({ ...p, [jobId]: next }));
+    if (next && !details[jobId]) {
+      try {
+        const d = await jobDetail({ data: { jobId } });
+        setDetails((p) => ({ ...p, [jobId]: d as never }));
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  async function onCancel(jobId: string) {
+    setBusyJobId(jobId);
+    try {
+      await cancelJob({ data: { jobId } });
+      await refreshJobs();
+    } finally {
+      setBusyJobId(null);
+    }
+  }
+  async function onRetry(jobId: string) {
+    setBusyJobId(jobId);
+    try {
+      await retryJob({ data: { jobId } });
+      await refreshJobs();
+    } finally {
+      setBusyJobId(null);
+    }
+  }
+
   useEffect(() => {
     let alive = true;
     Promise.all([
