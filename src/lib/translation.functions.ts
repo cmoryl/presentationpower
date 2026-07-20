@@ -670,10 +670,10 @@ export const getDeckSlideTranslations = createServerFn({ method: "POST" })
       .eq("slide_translations.target_lang", data.targetLang)
       .eq("slide_translations.status", "ready");
     if (error) throw new Error(error.message);
-    const out: Array<{ position: number; content: Record<string, never> | null }> = [];
+    const out: Array<{ position: number; content: Record<string, never> }> = [];
     for (const r of (rows ?? []) as Array<{ position: number; slide_translations: Array<{ translated_content: unknown }> }>) {
       const t = r.slide_translations?.[0]?.translated_content;
-      if (t !== undefined && t !== null) out.push({ position: r.position, content: t });
+      if (t && typeof t === "object") out.push({ position: r.position, content: t as Record<string, never> });
     }
     out.sort((a, b) => a.position - b.position);
     return out;
