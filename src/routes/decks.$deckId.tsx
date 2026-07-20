@@ -501,7 +501,7 @@ function DeckEditor() {
           onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
           onNext={clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined}
         >
-          <VariantRenderer slide={active} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />
+          <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />
         </SlideLightbox>
       )}
 
