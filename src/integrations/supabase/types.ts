@@ -819,6 +819,82 @@ export type Database = {
           },
         ]
       }
+      deck_translations: {
+        Row: {
+          created_at: string
+          created_by: string
+          engine: string
+          error: string | null
+          human_review: boolean
+          id: string
+          job_ref: string | null
+          mode: string
+          progress_current: number
+          progress_total: number
+          source_deck_id: string
+          status: string
+          target_lang: string
+          translated_deck_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          engine?: string
+          error?: string | null
+          human_review?: boolean
+          id?: string
+          job_ref?: string | null
+          mode?: string
+          progress_current?: number
+          progress_total?: number
+          source_deck_id: string
+          status?: string
+          target_lang: string
+          translated_deck_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          engine?: string
+          error?: string | null
+          human_review?: boolean
+          id?: string
+          job_ref?: string | null
+          mode?: string
+          progress_current?: number
+          progress_total?: number
+          source_deck_id?: string
+          status?: string
+          target_lang?: string
+          translated_deck_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deck_translations_source_deck_id_fkey"
+            columns: ["source_deck_id"]
+            isOneToOne: false
+            referencedRelation: "decks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deck_translations_target_lang_fkey"
+            columns: ["target_lang"]
+            isOneToOne: false
+            referencedRelation: "languages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deck_translations_translated_deck_id_fkey"
+            columns: ["translated_deck_id"]
+            isOneToOne: false
+            referencedRelation: "decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deck_versions: {
         Row: {
           change_summary: string | null
@@ -990,6 +1066,45 @@ export type Database = {
         }
         Relationships: []
       }
+      glossary_terms: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          do_not_translate: boolean
+          id: string
+          notes: string | null
+          scope: string
+          scope_id: string | null
+          term: string
+          translations: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          do_not_translate?: boolean
+          id?: string
+          notes?: string | null
+          scope?: string
+          scope_id?: string | null
+          term: string
+          translations?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          do_not_translate?: boolean
+          id?: string
+          notes?: string | null
+          scope?: string
+          scope_id?: string | null
+          term?: string
+          translations?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       imagery_events: {
         Row: {
           brand_id: string | null
@@ -1125,6 +1240,39 @@ export type Database = {
           title?: string
           updated_at?: string
           visibility?: Database["public"]["Enums"]["knowledge_visibility"]
+        }
+        Relationships: []
+      }
+      languages: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          label: string
+          native: string
+          rtl: boolean
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id: string
+          label: string
+          native: string
+          rtl?: boolean
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          label?: string
+          native?: string
+          rtl?: boolean
+          sort_order?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1562,6 +1710,63 @@ export type Database = {
             columns: ["variant_id"]
             isOneToOne: false
             referencedRelation: "module_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      slide_translations: {
+        Row: {
+          created_at: string
+          engine: string
+          error: string | null
+          id: string
+          job_ref: string | null
+          slide_id: string
+          source_hash: string | null
+          status: string
+          target_lang: string
+          translated_content: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          engine?: string
+          error?: string | null
+          id?: string
+          job_ref?: string | null
+          slide_id: string
+          source_hash?: string | null
+          status?: string
+          target_lang: string
+          translated_content?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          engine?: string
+          error?: string | null
+          id?: string
+          job_ref?: string | null
+          slide_id?: string
+          source_hash?: string | null
+          status?: string
+          target_lang?: string
+          translated_content?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "slide_translations_slide_id_fkey"
+            columns: ["slide_id"]
+            isOneToOne: false
+            referencedRelation: "deck_slides"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "slide_translations_target_lang_fkey"
+            columns: ["target_lang"]
+            isOneToOne: false
+            referencedRelation: "languages"
             referencedColumns: ["id"]
           },
         ]

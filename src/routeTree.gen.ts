@@ -35,6 +35,7 @@ import { Route as DecksDeckIdRouteImport } from './routes/decks.$deckId'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminTranslationRouteImport } from './routes/admin.translation'
 import { Route as AdminPdfIngestRouteImport } from './routes/admin.pdf-ingest'
 import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
 import { Route as AdminLogohubRouteImport } from './routes/admin.logohub'
@@ -185,6 +186,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminTranslationRoute = AdminTranslationRouteImport.update({
+  id: '/translation',
+  path: '/translation',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPdfIngestRoute = AdminPdfIngestRouteImport.update({
   id: '/pdf-ingest',
   path: '/pdf-ingest',
@@ -309,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
+  '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
@@ -354,6 +361,7 @@ export interface FileRoutesByTo {
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
+  '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
@@ -402,6 +410,7 @@ export interface FileRoutesById {
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
+  '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
@@ -451,6 +460,7 @@ export interface FileRouteTypes {
     | '/admin/logohub'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
+    | '/admin/translation'
     | '/admin/users'
     | '/api/chat'
     | '/brief/new'
@@ -496,6 +506,7 @@ export interface FileRouteTypes {
     | '/admin/logohub'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
+    | '/admin/translation'
     | '/admin/users'
     | '/api/chat'
     | '/brief/new'
@@ -543,6 +554,7 @@ export interface FileRouteTypes {
     | '/admin/logohub'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
+    | '/admin/translation'
     | '/admin/users'
     | '/api/chat'
     | '/brief/new'
@@ -774,6 +786,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/translation': {
+      id: '/admin/translation'
+      path: '/translation'
+      fullPath: '/admin/translation'
+      preLoaderRoute: typeof AdminTranslationRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/pdf-ingest': {
       id: '/admin/pdf-ingest'
       path: '/pdf-ingest'
@@ -922,6 +941,7 @@ interface AdminRouteChildren {
   AdminLogohubRoute: typeof AdminLogohubRoute
   AdminOracleRoute: typeof AdminOracleRoute
   AdminPdfIngestRoute: typeof AdminPdfIngestRoute
+  AdminTranslationRoute: typeof AdminTranslationRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -938,6 +958,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLogohubRoute: AdminLogohubRoute,
   AdminOracleRoute: AdminOracleRoute,
   AdminPdfIngestRoute: AdminPdfIngestRoute,
+  AdminTranslationRoute: AdminTranslationRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
