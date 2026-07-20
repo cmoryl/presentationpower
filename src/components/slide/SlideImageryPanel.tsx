@@ -6,9 +6,12 @@
 // Sources: upload to the private `slide-media` Supabase bucket, paste an
 // image URL, or reset to the deterministic division-seeded imagery.
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadSlideMedia } from "@/lib/slide-media";
+import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
 // Formats that render natively in every browser AND embed cleanly in
@@ -62,16 +65,20 @@ async function rasterizeToPng(file: File): Promise<File> {
 export function SlideImageryPanel({
   mediaUrl,
   mediaSeed,
+  divisionId,
   onChange,
 }: {
   mediaUrl?: string;
   mediaSeed?: string;
+  divisionId?: string;
   onChange: (nextUrl: string | null) => void;
 }) {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [urlDraft, setUrlDraft] = useState("");
+  const [libQuery, setLibQuery] = useState("");
+  const [libOpen, setLibOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -121,6 +128,34 @@ export function SlideImageryPanel({
     onChange(v);
     setUrlDraft("");
   }
+
+  // ── Team library (division-scoped shared imagery) ──────────────────────
+  const listFn = useServerFn(listDivisionImagery);
+  const libQ = useQuery({
+    queryKey: ["division-imagery", divisionId ?? "none", signedIn],
+    queryFn: () => listFn({ data: { divisionId: divisionId as string } }),
+    enabled: Boolean(divisionId) && signedIn === true && libOpen,
+    retry: false,
+    staleTime: 30_000,
+  });
+  const libResults = useMemo(() => {
+    const rows: DivisionImageryEntry[] = libQ.data ?? [];
+    const q = libQuery.trim().toLowerCase();
+    if (!q) return rows;
+    const tokens = q.split(/\s+/).filter(Boolean);
+    return rows.filter((r) => {
+      const hay = [
+        r.filename,
+        r.note ?? "",
+        r.prompt ?? "",
+        r.kind,
+        ...(r.tags ?? []),
+      ]
+        .join(" ")
+        .toLowerCase();
+      return tokens.every((t) => hay.includes(t));
+    });
+  }, [libQ.data, libQuery]);
 
   const hasCustom = Boolean(mediaUrl);
 
@@ -232,7 +267,69 @@ export function SlideImageryPanel({
             </button>
           </div>
         </div>
+
+        {/* Team library — search and reuse division-scoped shared imagery */}
+        {divisionId && signedIn && (
+          <div>
+            <div className="flex items-center justify-between">
+              <div className="text-[11px] uppercase tracking-widest text-black/50">
+                Team library {libQ.data ? `· ${libResults.length}` : ""}
+              </div>
+              <button
+                type="button"
+                onClick={() => setLibOpen((v) => !v)}
+                className="rounded-full border border-black/15 px-2.5 py-0.5 text-[10px] uppercase tracking-widest hover:bg-black/5"
+              >
+                {libOpen ? "Hide" : "Browse"}
+              </button>
+            </div>
+            {libOpen && (
+              <div className="mt-2 space-y-2">
+                <input
+                  type="search"
+                  value={libQuery}
+                  onChange={(e) => setLibQuery(e.target.value)}
+                  placeholder="Search by tag, filename, note…"
+                  className="w-full rounded-lg border border-black/10 bg-white px-3 py-1.5 text-xs outline-none focus:border-black/30"
+                />
+                {libQ.isLoading ? (
+                  <div className="text-[11px] text-black/40">Loading…</div>
+                ) : libQ.isError ? (
+                  <div className="text-[11px] text-red-600">Could not load library.</div>
+                ) : libResults.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-black/10 px-3 py-4 text-center text-[11px] text-black/50">
+                    {libQ.data && libQ.data.length > 0
+                      ? "No matches — try different keywords."
+                      : "No shared imagery yet. Upload in Knowledge → Imagery."}
+                  </div>
+                ) : (
+                  <div className="grid max-h-64 grid-cols-4 gap-2 overflow-y-auto pr-1">
+                    {libResults.map((r) => (
+                      <button
+                        key={r.id}
+                        type="button"
+                        title={`${r.filename}${r.tags?.length ? "\nTags: " + r.tags.join(", ") : ""}${r.note ? "\n" + r.note : ""}`}
+                        onClick={() => r.signedUrl && onChange(r.signedUrl)}
+                        disabled={!r.signedUrl}
+                        className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-black/10 bg-black/5 transition hover:border-black/40 disabled:opacity-40"
+                      >
+                        {r.signedUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={r.signedUrl} alt={r.filename} className="h-full w-full object-cover" loading="lazy" />
+                        ) : null}
+                        <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/70 to-transparent px-1.5 py-1 text-left text-[9px] text-white opacity-0 group-hover:opacity-100">
+                          {r.tags?.[0] ?? r.kind}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
+
   );
 }
