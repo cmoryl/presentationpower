@@ -9,10 +9,8 @@ import {
   listImportedDecksForDivision,
   uploadImportedDeck,
   getImportedDeckSlides,
-  getImportedDeckFull,
   deleteImportedDeck,
 } from "@/lib/imported-decks.functions";
-import { ReconstructedSlideCard } from "@/components/slide/ReconstructedSlideCard";
 
 
 
@@ -619,11 +617,9 @@ function ImportedDecksTab({ slug }: { slug: string }) {
   const listFn = useServerFn(listImportedDecksForDivision);
   const uploadFn = useServerFn(uploadImportedDeck);
   const getSlidesFn = useServerFn(getImportedDeckSlides);
-  const getFullFn = useServerFn(getImportedDeckFull);
   const deleteFn = useServerFn(deleteImportedDeck);
 
   const [openId, setOpenId] = useState<string | null>(null);
-  const [showText, setShowText] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -633,21 +629,13 @@ function ImportedDecksTab({ slug }: { slug: string }) {
     queryFn: () => listFn({ data: { divisionId: slug } }),
   });
 
-  // Lightweight metadata (filename + signed download url + status)
+  // Lightweight metadata (filename + signed download url + status + outline)
   const detailQ = useQuery({
     queryKey: ["admin-knowledge-imported-detail", openId],
     queryFn: () => (openId ? getSlidesFn({ data: { id: openId } }) : Promise.resolve(null)),
     enabled: !!openId,
   });
 
-  // Full re-parse (title + bullets + notes + embedded images + theme) for
-  // reconstructed visual previews. Runs on-demand when the modal opens.
-  const fullQ = useQuery({
-    queryKey: ["admin-knowledge-imported-full", openId],
-    queryFn: () => (openId ? getFullFn({ data: { id: openId } }) : Promise.resolve(null)),
-    enabled: !!openId,
-    staleTime: 5 * 60_000,
-  });
 
   async function handleFile(file: File) {
     setError(null);
@@ -783,20 +771,10 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                       </span>
                     )}
                     {detail.theme?.headingFont && <span className="ml-2">· {detail.theme.headingFont}</span>}
-                    <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 uppercase tracking-widest text-amber-800">
-                      Reconstructed preview · not the original rendering
-                    </span>
                   </div>
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowText((v) => !v)}
-                  className="rounded-full border border-black/15 px-3 py-1 text-[11px] text-black/70 hover:border-black/40"
-                >
-                  {showText ? "Show previews" : "Show text outline"}
-                </button>
                 {detail?.downloadUrl && (
                   <a
                     href={detail.downloadUrl}
@@ -815,55 +793,39 @@ function ImportedDecksTab({ slug }: { slug: string }) {
               </div>
             </div>
             <div className="max-h-[76vh] overflow-y-auto bg-black/[0.02] px-4 py-4">
-              {showText ? (
-                detailQ.isLoading || !detail ? (
-                  <div className="text-xs text-black/50">Loading…</div>
-                ) : (
-                  <ol className="space-y-4">
-                    {(detail.slides ?? []).map((sl) => (
-                      <li key={sl.index} className="rounded-xl border border-black/10 bg-white p-3">
-                        <div className="mb-1 flex items-baseline gap-2">
-                          <span className="font-mono text-[10px] text-black/40">#{sl.index + 1}</span>
-                          <span className="text-sm font-medium text-black">{sl.title}</span>
-                          {sl.imageCount > 0 && (
-                            <span className="ml-auto text-[10px] text-black/40">
-                              {sl.imageCount} image{sl.imageCount === 1 ? "" : "s"}
-                            </span>
-                          )}
-                        </div>
-                        {sl.bullets.length > 0 && (
-                          <ul className="ml-4 list-disc space-y-0.5 text-xs text-black/70">
-                            {sl.bullets.map((b, i) => (
-                              <li key={i}>{b}</li>
-                            ))}
-                          </ul>
-                        )}
-                        {sl.notes && (
-                          <div className="mt-2 rounded-lg bg-black/[0.03] p-2 text-[11px] italic text-black/60">
-                            Notes: {sl.notes}
-                          </div>
-                        )}
-                      </li>
-                    ))}
-                  </ol>
-                )
-              ) : fullQ.isLoading || !fullQ.data ? (
-                <div className="flex items-center gap-2 text-xs text-black/50">
-                  <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[#003FC7]" />
-                  Re-parsing the original .pptx to rebuild previews (this reads embedded images + theme)…
-                </div>
-              ) : fullQ.isError ? (
-                <div className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
-                  Preview failed: {(fullQ.error as Error)?.message ?? "unknown"}
-                </div>
+              {detailQ.isLoading || !detail ? (
+                <div className="text-xs text-black/50">Loading…</div>
               ) : (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {fullQ.data.slides.map((sl) => (
-                    <ReconstructedSlideCard key={sl.index} slide={sl} theme={fullQ.data?.theme ?? {}} />
+                <ol className="space-y-4">
+                  {(detail.slides ?? []).map((sl) => (
+                    <li key={sl.index} className="rounded-xl border border-black/10 bg-white p-3">
+                      <div className="mb-1 flex items-baseline gap-2">
+                        <span className="font-mono text-[10px] text-black/40">#{sl.index + 1}</span>
+                        <span className="text-sm font-medium text-black">{sl.title}</span>
+                        {sl.imageCount > 0 && (
+                          <span className="ml-auto text-[10px] text-black/40">
+                            {sl.imageCount} image{sl.imageCount === 1 ? "" : "s"}
+                          </span>
+                        )}
+                      </div>
+                      {sl.bullets.length > 0 && (
+                        <ul className="ml-4 list-disc space-y-0.5 text-xs text-black/70">
+                          {sl.bullets.map((b, i) => (
+                            <li key={i}>{b}</li>
+                          ))}
+                        </ul>
+                      )}
+                      {sl.notes && (
+                        <div className="mt-2 rounded-lg bg-black/[0.03] p-2 text-[11px] italic text-black/60">
+                          Notes: {sl.notes}
+                        </div>
+                      )}
+                    </li>
                   ))}
-                </div>
+                </ol>
               )}
             </div>
+
           </div>
         </div>
       )}
