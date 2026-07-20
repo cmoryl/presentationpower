@@ -305,7 +305,57 @@ function DeckEditor() {
             </div>
           )}
 
-          {/* Speaker notes */}
+          {/* Per-slide logo placement */}
+          {active && (
+            <div className="mt-6 rounded-2xl border border-black/10 bg-white p-6">
+              <div className="flex items-baseline justify-between">
+                <div className="text-xs uppercase tracking-widest text-black/50">Logo on this slide</div>
+                <button
+                  type="button"
+                  onClick={() => setSlideLogo(deck.id, active.id, { position: "auto", orientation: "auto" })}
+                  className="text-[11px] uppercase tracking-widest text-black/40 hover:text-black"
+                >
+                  Reset
+                </button>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-4">
+                <label className="block text-xs">
+                  <span className="mb-1 block font-medium text-black/70">Orientation</span>
+                  <select
+                    value={active.logoOrientation ?? "auto"}
+                    onChange={(e) => setSlideLogo(deck.id, active.id, { orientation: e.target.value as "auto" | "horizontal" | "stacked" })}
+                    className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                  >
+                    <option value="auto">Auto (deck default · {logoOrientation})</option>
+                    <option value="horizontal">Horizontal (side-by-side)</option>
+                    <option value="stacked">Stacked</option>
+                  </select>
+                </label>
+                <label className="block text-xs">
+                  <span className="mb-1 block font-medium text-black/70">Position</span>
+                  <select
+                    value={active.logoPosition ?? "auto"}
+                    onChange={(e) => setSlideLogo(deck.id, active.id, { position: e.target.value as never })}
+                    className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                  >
+                    <option value="auto">Auto (layout default)</option>
+                    <option value="top-left">Top left</option>
+                    <option value="top-center">Top center</option>
+                    <option value="top-right">Top right</option>
+                    <option value="bottom-left">Bottom left</option>
+                    <option value="bottom-center">Bottom center</option>
+                    <option value="bottom-right">Bottom right</option>
+                    <option value="hidden">Hidden</option>
+                  </select>
+                </label>
+              </div>
+              <p className="mt-3 text-[11px] text-black/50">
+                Overrides the deck-wide logo settings for this slide only. "Auto" follows the deck toggle and the layout's approved placement.
+              </p>
+            </div>
+          )}
+
+
           {active && (
             <SpeakerNotesPanel
               key={active.id}
