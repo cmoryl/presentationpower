@@ -1203,9 +1203,11 @@ export type Database = {
         Row: {
           category: string | null
           char_count: number
+          chunk_count: number
           content_hash: string | null
           created_at: string
           description: string | null
+          embedded_at: string | null
           entity_name: string | null
           entity_slug: string
           entity_type: string
@@ -1224,9 +1226,11 @@ export type Database = {
         Insert: {
           category?: string | null
           char_count?: number
+          chunk_count?: number
           content_hash?: string | null
           created_at?: string
           description?: string | null
+          embedded_at?: string | null
           entity_name?: string | null
           entity_slug: string
           entity_type: string
@@ -1245,9 +1249,11 @@ export type Database = {
         Update: {
           category?: string | null
           char_count?: number
+          chunk_count?: number
           content_hash?: string | null
           created_at?: string
           description?: string | null
+          embedded_at?: string | null
           entity_name?: string | null
           entity_slug?: string
           entity_type?: string

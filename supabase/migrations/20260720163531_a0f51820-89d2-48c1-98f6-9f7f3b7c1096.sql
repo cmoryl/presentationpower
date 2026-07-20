@@ -1,0 +1,1 @@
+ALTER TABLE public.pdf_extractions ADD COLUMN IF NOT EXISTS chunk_count integer NOT NULL DEFAULT 0; ALTER TABLE public.pdf_extractions ADD COLUMN IF NOT EXISTS embedded_at timestamptz;

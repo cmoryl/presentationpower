@@ -1,7 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { BRAND_GUIDES, type BrandGuide, type ColorSwatch, type TypeStyle, type LogoRule } from "@/lib/brand-guides";
 import { getBrandhubIntel, targetAudienceText, normalizeVoiceValue } from "@/lib/brandhub-intel";
+import { listPdfExtractionsForDivision, getPdfExtractionText } from "@/lib/pdf-ingest.functions";
+
 
 export const Route = createFileRoute("/admin/knowledge")({
   head: () => ({
@@ -13,7 +17,7 @@ export const Route = createFileRoute("/admin/knowledge")({
   component: AdminKnowledgeBrowser,
 });
 
-type Tab = "overview" | "colors" | "type" | "logo" | "subbrands" | "intel" | "voiceover";
+type Tab = "overview" | "colors" | "type" | "logo" | "subbrands" | "intel" | "sources" | "voiceover";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "overview", label: "Overview" },
@@ -22,8 +26,10 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "logo", label: "Logo rules" },
   { id: "subbrands", label: "Sub-brands" },
   { id: "intel", label: "BrandHub intel" },
+  { id: "sources", label: "Source documents" },
   { id: "voiceover", label: "Voiceover topics" },
 ];
+
 
 type CanvaPaletteEntry = {
   division: string;
@@ -153,6 +159,8 @@ function AdminKnowledgeBrowser() {
           {tab === "logo" && <LogoTab guide={guide} />}
           {tab === "subbrands" && <SubBrandsTab guide={guide} />}
           {tab === "intel" && <IntelTab slug={guide.slug} />}
+          {tab === "sources" && <SourcesTab slug={guide.slug} />}
+
           {tab === "voiceover" && <VoiceoverTab index={voIndex} />}
         </div>
       </div>
@@ -435,6 +443,129 @@ function IntelTab({ slug }: { slug: string }) {
     </div>
   );
 }
+
+function SourcesTab({ slug }: { slug: string }) {
+  const listFn = useServerFn(listPdfExtractionsForDivision);
+  const getText = useServerFn(getPdfExtractionText);
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  const rowsQ = useQuery({
+    queryKey: ["admin-knowledge-sources", slug],
+    queryFn: () => listFn({ data: { divisionOrSlug: slug } }),
+  });
+  const textQ = useQuery({
+    queryKey: ["admin-knowledge-source-text", openId],
+    queryFn: () => (openId ? getText({ data: { id: openId } }) : Promise.resolve(null)),
+    enabled: !!openId,
+  });
+
+  const rows = rowsQ.data ?? [];
+  const totals = useMemo(() => {
+    return {
+      ok: rows.filter((r) => r.status === "ok").length,
+      embedded: rows.filter((r) => (r.chunk_count ?? 0) > 0).length,
+      chunks: rows.reduce((n, r) => n + (r.chunk_count ?? 0), 0),
+      chars: rows.reduce((n, r) => n + (r.char_count ?? 0), 0),
+    };
+  }, [rows]);
+
+  if (rowsQ.isLoading) {
+    return <Section title="Source documents"><div className="text-xs text-black/50">Loading…</div></Section>;
+  }
+  if (rows.length === 0) {
+    return (
+      <Section title="Source documents">
+        <div className="text-xs text-black/50">
+          No source PDFs are ingested for this division yet. Run ingestion at{" "}
+          <Link to="/admin/pdf-ingest" className="underline">Admin → PDF Ingestion</Link>.
+        </div>
+      </Section>
+    );
+  }
+
+  return (
+    <>
+      <Section title={`Source documents (${rows.length})`}>
+        <div className="mb-3 flex flex-wrap gap-3 text-[11px] text-black/60">
+          <span>OK: <b className="text-emerald-700">{totals.ok}</b></span>
+          <span>Embedded: <b className="text-[#003FC7]">{totals.embedded}/{totals.ok}</b></span>
+          <span>{totals.chunks.toLocaleString()} chunks</span>
+          <span>{totals.chars.toLocaleString()} chars</span>
+        </div>
+        <ul className="divide-y divide-black/[0.06]">
+          {rows.map((r) => (
+            <li key={r.id} className="flex items-center justify-between gap-3 py-2 text-xs">
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-black">{r.title}</div>
+                <a
+                  href={r.source_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-0.5 block truncate text-[10px] text-black/40 hover:text-[#003FC7]"
+                >
+                  {r.source_url}
+                </a>
+              </div>
+              <span className="shrink-0 font-mono text-[10px] text-black/50">{r.char_count.toLocaleString()} ch</span>
+              <span
+                className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest ${
+                  (r.chunk_count ?? 0) > 0
+                    ? "bg-[#003FC7]/10 text-[#003FC7]"
+                    : r.status === "ok"
+                      ? "bg-amber-100 text-amber-800"
+                      : "bg-black/[0.06] text-black/50"
+                }`}
+              >
+                {(r.chunk_count ?? 0) > 0 ? `${r.chunk_count} ch` : r.status === "ok" ? "not embedded" : r.status}
+              </span>
+              {r.status === "ok" && (
+                <button
+                  type="button"
+                  onClick={() => setOpenId(r.id)}
+                  className="shrink-0 rounded-full border border-black/15 px-2 py-0.5 text-[10px] text-black/70 hover:border-black/40"
+                >
+                  View text
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      </Section>
+      {openId && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4" onClick={() => setOpenId(null)}>
+          <div
+            className="max-h-[85vh] w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-black/10 px-4 py-3">
+              <div className="min-w-0">
+                <div className="truncate text-sm font-medium">{textQ.data?.title ?? "…"}</div>
+                <div className="truncate text-[10px] text-black/50">{textQ.data?.source_url}</div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpenId(null)}
+                className="rounded-full border border-black/15 px-3 py-1 text-xs text-black/70"
+              >
+                Close
+              </button>
+            </div>
+            <div className="max-h-[70vh] overflow-y-auto p-4">
+              {textQ.isLoading ? (
+                <div className="text-sm text-black/50">Loading…</div>
+              ) : (
+                <pre className="whitespace-pre-wrap font-sans text-xs leading-relaxed text-black/80">
+                  {textQ.data?.extracted_text ?? "(no text)"}
+                </pre>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 
 function VoiceoverTab({ index }: { index: VoiceoverIndex[] }) {
   if (index.length === 0) {
