@@ -88,9 +88,9 @@ function BriefWizard() {
     industry: "Life sciences",
     meetingObjective: "Secure pilot in the highest-volume market",
     audience: "VP Marketing + Head of Localization",
-    brandModeId: brandModes[0]?.id ?? "bm-enterprise",
+    brandModeId: brandModes.find((b) => b.id === "bm-enterprise")?.id ?? brandModes[0]?.id ?? "bm-enterprise",
     subCompany: "",
-    archetypeId: narrativeArchetypes[0]?.id ?? "arch-problem-solution",
+    archetypeId: narrativeArchetypes.find((a) => a.id === "arch-problem-solution")?.id ?? narrativeArchetypes[0]?.id ?? "arch-problem-solution",
     lengthTarget: 9,
     clientFacts: "Recently expanded into 12 new markets. Under regulatory review pressure.",
   });
