@@ -497,6 +497,83 @@ export function BackgroundImageryPanel({
         </div>
       )}
 
+      {tab === "brand" && (
+        <div className="mt-4 space-y-3">
+          {!divisionId && (
+            <div className="rounded-xl border border-dashed border-black/15 px-4 py-6 text-center text-xs text-black/60">
+              Set a brand / division on the deck to unlock approved imagery uploads.
+            </div>
+          )}
+          {divisionId && (
+            <>
+              <div className="flex items-center justify-between gap-2">
+                <input
+                  type="text"
+                  value={brandQ}
+                  onChange={(e) => setBrandQ(e.target.value)}
+                  placeholder="Search approved imagery…"
+                  className="flex-1 rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs outline-none focus:border-black/30"
+                />
+                <span className="whitespace-nowrap text-[10px] uppercase tracking-widest text-black/40">
+                  {brandQuery.isLoading ? "Loading…" : `${brandResults.length} of ${(brandQuery.data ?? []).length}`}
+                </span>
+              </div>
+              {brandQuery.data && brandQuery.data.length === 0 && !brandQuery.isLoading && (
+                <div className="rounded-xl border border-dashed border-black/15 px-4 py-6 text-center text-xs text-black/60">
+                  No approved imagery uploaded yet for this brand.
+                  <div className="mt-1 text-[11px] text-black/40">Add uploads in Admin · Knowledge · Imagery.</div>
+                </div>
+              )}
+              {brandResults.length > 0 && (
+                <div className="grid grid-cols-3 gap-2">
+                  {brandResults.map((r) => {
+                    const url = r.signedUrl;
+                    if (!url) return null;
+                    const selected =
+                      (current?.kind === "upload" || current?.kind === "ai") && current.url === url;
+                    return (
+                      <button
+                        key={r.id}
+                        type="button"
+                        onClick={() =>
+                          onChange({
+                            kind: "upload",
+                            url,
+                            scrim: "bottom",
+                            scrimStrength: 0.55,
+                            imageDim: 0.1,
+                            darkChrome: true,
+                          })
+                        }
+                        className={`group relative aspect-[4/3] overflow-hidden rounded-xl border transition ${
+                          selected
+                            ? "border-black ring-2 ring-black/80"
+                            : "border-black/10 hover:border-black/30"
+                        }`}
+                        title={r.filename}
+                      >
+                        <img src={url} alt={r.filename} className="absolute inset-0 h-full w-full object-cover" />
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-1.5">
+                          <div className="text-[9px] uppercase tracking-widest text-white/90 line-clamp-1">
+                            {r.filename}
+                          </div>
+                          {(r.tags?.length ?? 0) > 0 && (
+                            <div className="mt-0.5 line-clamp-1 text-[9px] text-white/60">
+                              {r.tags.slice(0, 3).join(" · ")}
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+
       {tab === "solid" && (
         <div className="mt-4 space-y-4">
           <div className="aspect-[16/6] w-full rounded-xl border border-black/10" style={{ background: solidPreview }} />
