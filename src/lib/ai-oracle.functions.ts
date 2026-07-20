@@ -158,6 +158,10 @@ export const oracleChat = createServerFn({ method: "POST" })
         };
       }
 
+      const fallbackNote = divisionScoped === false
+        ? "No division-specific sources found — showing general knowledge from other divisions. Verify facts before relying on them as division-accurate."
+        : undefined;
+
       if (!hasAnthropicKey()) {
         const preview = combined
           .slice(0, 3)
@@ -168,6 +172,8 @@ export const oracleChat = createServerFn({ method: "POST" })
           setup: true,
           reply: `${ANTHROPIC_SETUP_MESSAGE}\n\nTop matches:\n\n${preview}`,
           sources,
+          divisionScoped,
+          fallbackNote,
         };
       }
 
