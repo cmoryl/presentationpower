@@ -179,3 +179,50 @@ export function hasClassicLogos(key?: string | null): boolean {
   const slug = KEY_TO_SLUG[key.toLowerCase()];
   return !!slug && !!CLASSIC_MANIFEST[slug];
 }
+
+// ---- Classic-manifest integrity check ---------------------------------
+// Guards against regressions where a classic-branded division silently falls
+// back to NEXT (2026) artwork because:
+//   - a variant was declared in CLASSIC_MANIFEST but the classic file was
+//     removed / renamed on disk, or
+//   - resolvedSetFor() logic was changed and no longer prefers classic.
+// Every variant listed in CLASSIC_MANIFEST MUST resolve to a `-classic-` path.
+export type ClassicManifestIssue = {
+  slug: string;
+  variant: "color" | "white" | "stackedColor" | "stackedWhite";
+  reason: "missing_resolved_path" | "resolved_to_next";
+  resolved?: string;
+};
+
+export function validateClassicManifest(): ClassicManifestIssue[] {
+  const issues: ClassicManifestIssue[] = [];
+  for (const [slug, presence] of Object.entries(CLASSIC_MANIFEST)) {
+    const resolved = resolvedSetFor(slug);
+    (Object.keys(presence) as (keyof ClassicPresence)[]).forEach((variant) => {
+      if (!presence[variant]) return;
+      const path = resolved?.[variant as keyof DivisionLogoSet];
+      if (!path) {
+        issues.push({ slug, variant, reason: "missing_resolved_path" });
+        return;
+      }
+      if (!path.includes("-classic-")) {
+        issues.push({ slug, variant, reason: "resolved_to_next", resolved: path });
+      }
+    });
+  }
+  return issues;
+}
+
+// Dev-only sanity log: surfaces regressions immediately when the module loads.
+if (typeof import.meta !== "undefined" && (import.meta as ImportMeta).env?.DEV) {
+  const issues = validateClassicManifest();
+  if (issues.length) {
+    // eslint-disable-next-line no-console
+    console.error(
+      "[division-logos] Classic manifest regression — the following variants " +
+        "are declared classic but resolve to NEXT (2026) artwork:",
+      issues,
+    );
+  }
+}
+
