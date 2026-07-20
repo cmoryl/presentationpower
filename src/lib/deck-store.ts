@@ -169,6 +169,7 @@ type DeckState = {
   setDeckClientLogo: (deckId: string, logo: DeckClientLogo | null) => void;
   setDeckContext: (deckId: string, patch: Partial<DeckContext>) => void;
   setDeckTemplateFlag: (deckId: string, isTemplate: boolean) => void;
+  rebrandDeck: (deckId: string, brandModeId: string, subCompany?: string | null) => void;
   duplicateDeck: (deckId: string) => string | null;
   createDeckFromTemplate: (payload: TemplatePayload) => { briefId: string; deckId: string };
   deleteDeck: (deckId: string) => void;
