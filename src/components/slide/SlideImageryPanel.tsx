@@ -129,6 +129,34 @@ export function SlideImageryPanel({
     setUrlDraft("");
   }
 
+  // ── Team library (division-scoped shared imagery) ──────────────────────
+  const listFn = useServerFn(listDivisionImagery);
+  const libQ = useQuery({
+    queryKey: ["division-imagery", divisionId ?? "none", signedIn],
+    queryFn: () => listFn({ data: { divisionId: divisionId as string } }),
+    enabled: Boolean(divisionId) && signedIn === true && libOpen,
+    retry: false,
+    staleTime: 30_000,
+  });
+  const libResults = useMemo(() => {
+    const rows: DivisionImageryEntry[] = libQ.data ?? [];
+    const q = libQuery.trim().toLowerCase();
+    if (!q) return rows;
+    const tokens = q.split(/\s+/).filter(Boolean);
+    return rows.filter((r) => {
+      const hay = [
+        r.filename,
+        r.note ?? "",
+        r.prompt ?? "",
+        r.kind,
+        ...(r.tags ?? []),
+      ]
+        .join(" ")
+        .toLowerCase();
+      return tokens.every((t) => hay.includes(t));
+    });
+  }, [libQ.data, libQuery]);
+
   const hasCustom = Boolean(mediaUrl);
 
   return (
