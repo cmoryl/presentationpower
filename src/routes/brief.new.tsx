@@ -88,9 +88,9 @@ function BriefWizard() {
     industry: "Life sciences",
     meetingObjective: "Secure pilot in the highest-volume market",
     audience: "VP Marketing + Head of Localization",
-    brandModeId: brandModes[0]?.id ?? "bm-enterprise",
+    brandModeId: brandModes.find((b) => b.id === "bm-enterprise")?.id ?? brandModes[0]?.id ?? "bm-enterprise",
     subCompany: "",
-    archetypeId: narrativeArchetypes[0]?.id ?? "arch-problem-solution",
+    archetypeId: narrativeArchetypes.find((a) => a.id === "arch-problem-solution")?.id ?? narrativeArchetypes[0]?.id ?? "arch-problem-solution",
     lengthTarget: 9,
     clientFacts: "Recently expanded into 12 new markets. Under regulatory review pressure.",
   });
@@ -122,9 +122,26 @@ function BriefWizard() {
   const industrySuggestions = brand?.contentScope?.industries ?? [];
   const preferredVariantIds = brand?.contentScope?.preferredVariantIds ?? [];
 
+  // Exclude entries that already have their own dedicated brand-mode card —
+  // picking them here would route to the generic sub-company path instead of
+  // their real division scope. Keep long-tail entities without a dedicated card.
+  const SUBCOMPANY_EXCLUDES = new Set<string>([
+    "Life Sciences",
+    "Legal",
+    "Games",
+    "Media",
+    "TransPerfect Digital",
+    "Dataforce",
+    "Trial Interactive",
+  ]);
+  const subCompanyOptions = useMemo(
+    () => TRANSPERFECT_SUBCOMPANIES.filter((n) => !SUBCOMPANY_EXCLUDES.has(n)),
+    []
+  );
+
   const selectBrand = (id: string) => {
     setForm((prev) => {
-      const nextSubCompany = id === "bm-subcompany" ? prev.subCompany || TRANSPERFECT_SUBCOMPANIES[0] || "" : "";
+      const nextSubCompany = id === "bm-subcompany" ? prev.subCompany || subCompanyOptions[0] || "" : "";
       return { ...prev, brandModeId: id, subCompany: nextSubCompany };
     });
     setShowAllArchetypes(false);
@@ -258,7 +275,7 @@ function BriefWizard() {
                       <option value="" disabled>
                         Choose a division
                       </option>
-                      {TRANSPERFECT_SUBCOMPANIES.map((name) => (
+                      {subCompanyOptions.map((name) => (
                         <option key={name} value={name}>
                           {name}
                         </option>
