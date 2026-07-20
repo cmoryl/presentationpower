@@ -691,8 +691,11 @@ function BriefWizard() {
                   <button
                     type="button"
                     disabled={busy}
-                    className="rounded-lg px-8 py-3 font-['Urbanist'] text-sm font-bold tracking-tight text-white shadow-md transition-all active:scale-[0.98] disabled:opacity-50"
-                    style={{ backgroundColor: brandPrimary }}
+                    className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-lg px-9 py-3.5 font-['Urbanist'] text-[15px] font-bold tracking-tight text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50"
+                    style={{
+                      background: `linear-gradient(135deg, ${brandPrimary} 0%, ${brandAccent} 100%)`,
+                      boxShadow: `0 14px 30px -10px ${brandAccent}80, 0 6px 14px -8px ${brandPrimary}80, inset 0 1px 0 rgba(255,255,255,0.18)`,
+                    }}
                     onClick={async () => {
                       setAiError(null);
                       setAiStatus("assembling");
