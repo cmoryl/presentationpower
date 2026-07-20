@@ -275,7 +275,7 @@ function BriefWizard() {
                       <option value="" disabled>
                         Choose a division
                       </option>
-                      {TRANSPERFECT_SUBCOMPANIES.map((name) => (
+                      {subCompanyOptions.map((name) => (
                         <option key={name} value={name}>
                           {name}
                         </option>
