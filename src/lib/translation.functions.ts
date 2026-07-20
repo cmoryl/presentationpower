@@ -206,7 +206,7 @@ export const translateSlide = createServerFn({ method: "POST" })
       await supabase.from("deck_slides").update({ content: translated }).eq("id", data.slideId);
     }
 
-    return { translated: translated as unknown as Record<string, unknown>, jobRef: jobRef ?? null };
+    return { translated: JSON.parse(JSON.stringify(translated)) as Record<string, never>, jobRef: jobRef ?? null };
   });
 
 // ---------------------------------------------------------------------------
