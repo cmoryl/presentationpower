@@ -11,6 +11,7 @@
 
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import {
   BACKGROUND_PRESETS,
   PATTERN_LIBRARY,
@@ -22,8 +23,9 @@ import {
 } from "@/lib/background-library";
 import { uploadDataUrl, uploadSlideMedia } from "@/lib/slide-media";
 import { generateBackgroundImage } from "@/lib/ai-image.functions";
+import { listDivisionImagery } from "@/lib/division-imagery.functions";
 
-type Tab = "library" | "solid" | "gradient" | "pattern" | "upload" | "ai";
+type Tab = "library" | "brand" | "solid" | "gradient" | "pattern" | "upload" | "ai";
 
 const BRAND_SWATCHES = [
   "#03002C", "#003FC7", "#A1FBF9", "#C2A3FF",
@@ -128,12 +130,14 @@ export function BackgroundImageryPanel({
   slides,
   activeSlideId,
   onApplyToSlides,
+  divisionId,
 }: {
   value: unknown;
   onChange: (next: SlideBackgroundValue | null) => void;
   slides?: ApplyTargetSlide[];
   activeSlideId?: string;
   onApplyToSlides?: (slideIds: string[], next: SlideBackgroundValue | null) => void;
+  divisionId?: string | null;
 }) {
   const current = useMemo(() => resolveSlideBackground(value), [value]);
   const [tab, setTab] = useState<Tab>(() => {
@@ -153,6 +157,25 @@ export function BackgroundImageryPanel({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [applyFlash, setApplyFlash] = useState<string | null>(null);
   const generate = useServerFn(generateBackgroundImage);
+
+  // Brand library — approved division imagery uploaded via Admin > Knowledge.
+  const listDivImagery = useServerFn(listDivisionImagery);
+  const [brandQ, setBrandQ] = useState("");
+  const brandQuery = useQuery({
+    queryKey: ["bg-division-imagery", divisionId ?? "none"],
+    queryFn: () => (divisionId ? listDivImagery({ data: { divisionId } }) : Promise.resolve([])),
+    enabled: !!divisionId,
+    staleTime: 60_000,
+  });
+  const brandResults = useMemo(() => {
+    const rows = brandQuery.data ?? [];
+    const q = brandQ.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter((r) => {
+      const hay = `${r.filename} ${r.note ?? ""} ${r.prompt ?? ""} ${(r.tags ?? []).join(" ")}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }, [brandQuery.data, brandQ]);
 
   const activeSlide = useMemo(
     () => (slides ?? []).find((s) => s.id === activeSlideId) ?? null,
@@ -431,8 +454,8 @@ export function BackgroundImageryPanel({
       )}
 
       {/* Tabs */}
-      <div className="mt-4 grid grid-cols-6 gap-1 rounded-full border border-black/10 bg-black/[0.03] p-1 text-[10px]">
-        {(["library", "solid", "gradient", "pattern", "upload", "ai"] as Tab[]).map((t) => (
+      <div className="mt-4 grid grid-cols-7 gap-1 rounded-full border border-black/10 bg-black/[0.03] p-1 text-[10px]">
+        {(["library", "brand", "solid", "gradient", "pattern", "upload", "ai"] as Tab[]).map((t) => (
           <button
             key={t}
             type="button"
@@ -473,6 +496,83 @@ export function BackgroundImageryPanel({
           })}
         </div>
       )}
+
+      {tab === "brand" && (
+        <div className="mt-4 space-y-3">
+          {!divisionId && (
+            <div className="rounded-xl border border-dashed border-black/15 px-4 py-6 text-center text-xs text-black/60">
+              Set a brand / division on the deck to unlock approved imagery uploads.
+            </div>
+          )}
+          {divisionId && (
+            <>
+              <div className="flex items-center justify-between gap-2">
+                <input
+                  type="text"
+                  value={brandQ}
+                  onChange={(e) => setBrandQ(e.target.value)}
+                  placeholder="Search approved imagery…"
+                  className="flex-1 rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs outline-none focus:border-black/30"
+                />
+                <span className="whitespace-nowrap text-[10px] uppercase tracking-widest text-black/40">
+                  {brandQuery.isLoading ? "Loading…" : `${brandResults.length} of ${(brandQuery.data ?? []).length}`}
+                </span>
+              </div>
+              {brandQuery.data && brandQuery.data.length === 0 && !brandQuery.isLoading && (
+                <div className="rounded-xl border border-dashed border-black/15 px-4 py-6 text-center text-xs text-black/60">
+                  No approved imagery uploaded yet for this brand.
+                  <div className="mt-1 text-[11px] text-black/40">Add uploads in Admin · Knowledge · Imagery.</div>
+                </div>
+              )}
+              {brandResults.length > 0 && (
+                <div className="grid grid-cols-3 gap-2">
+                  {brandResults.map((r) => {
+                    const url = r.signedUrl;
+                    if (!url) return null;
+                    const selected =
+                      (current?.kind === "upload" || current?.kind === "ai") && current.url === url;
+                    return (
+                      <button
+                        key={r.id}
+                        type="button"
+                        onClick={() =>
+                          onChange({
+                            kind: "upload",
+                            url,
+                            scrim: "bottom",
+                            scrimStrength: 0.55,
+                            imageDim: 0.1,
+                            darkChrome: true,
+                          })
+                        }
+                        className={`group relative aspect-[4/3] overflow-hidden rounded-xl border transition ${
+                          selected
+                            ? "border-black ring-2 ring-black/80"
+                            : "border-black/10 hover:border-black/30"
+                        }`}
+                        title={r.filename}
+                      >
+                        <img src={url} alt={r.filename} className="absolute inset-0 h-full w-full object-cover" />
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-1.5">
+                          <div className="text-[9px] uppercase tracking-widest text-white/90 line-clamp-1">
+                            {r.filename}
+                          </div>
+                          {(r.tags?.length ?? 0) > 0 && (
+                            <div className="mt-0.5 line-clamp-1 text-[9px] text-white/60">
+                              {r.tags.slice(0, 3).join(" · ")}
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
 
       {tab === "solid" && (
         <div className="mt-4 space-y-4">

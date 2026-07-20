@@ -271,6 +271,7 @@ function DeckEditor() {
               value={(active.content as Record<string, unknown>).background}
               onChange={(next) => updateField(deck.id, active.id, "background", next)}
               activeSlideId={active.id}
+              divisionId={deck.brandModeId}
               slides={deck.slides.map((sl) => {
                 const section = byId(SECTION_FRAMEWORKS, sl.sectionId);
                 const c = sl.content as Record<string, unknown>;
