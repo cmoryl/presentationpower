@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Languages, X, Loader2, Check, AlertTriangle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { deckCloudId } from "@/lib/deck-uuid";
+import { Languages, X, Loader2, Check, AlertTriangle, History, RotateCcw, Square, ChevronDown, ChevronRight } from "lucide-react";
 import {
   listLanguages,
   listTranslationEngines,
@@ -8,9 +10,14 @@ import {
   translateDeckToCopy,
   translateDeckBatch,
   listGlossary,
+  listDeckTranslations,
+  getDeckTranslationJobDetail,
+  cancelDeckTranslation,
+  retryDeckTranslation,
 } from "@/lib/translation.functions";
 
 type Mode = "in_place" | "copy" | "batch";
+type Tab = "new" | "history";
 
 export function TranslateDrawer({
   deckId,
@@ -40,6 +47,113 @@ export function TranslateDrawer({
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<{ kind: "idle" | "running" | "ok" | "err"; msg?: string }>({ kind: "idle" });
   const [batchResults, setBatchResults] = useState<Record<string, { ok: true; deckId: string; title: string } | { ok: false; error: string }> | null>(null);
+
+  // Job history state
+  const [tab, setTab] = useState<Tab>("new");
+  const [cloudDeckId, setCloudDeckId] = useState<string | null>(null);
+  type JobRow = {
+    id: string;
+    target_lang: string;
+    mode: Mode;
+    status: "draft" | "translating" | "ready" | "failed" | "cancelled";
+    engine: "globallink" | "ai";
+    progress_current: number | null;
+    progress_total: number | null;
+    error: string | null;
+    translated_deck_id: string | null;
+    created_at: string;
+    updated_at: string;
+  };
+  const [jobs, setJobs] = useState<JobRow[]>([]);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [details, setDetails] = useState<Record<string, Awaited<ReturnType<typeof getDeckTranslationJobDetail>>>>({});
+  const [busyJobId, setBusyJobId] = useState<string | null>(null);
+  const pollRef = useRef<number | null>(null);
+
+  const listJobs = useServerFn(listDeckTranslations);
+  const jobDetail = useServerFn(getDeckTranslationJobDetail);
+  const cancelJob = useServerFn(cancelDeckTranslation);
+  const retryJob = useServerFn(retryDeckTranslation);
+
+  // Resolve cloud deck id (deck_translations rows use it).
+  useEffect(() => {
+    let alive = true;
+    supabase.auth.getUser().then(({ data }) => {
+      const uid = data.user?.id;
+      if (!alive || !uid) return;
+      setCloudDeckId(deckCloudId(uid, deckId));
+    });
+    return () => { alive = false; };
+  }, [deckId]);
+
+  const refreshJobs = useCallback(async () => {
+    if (!cloudDeckId) return;
+    try {
+      const rows = (await listJobs({ data: { deckId: cloudDeckId } })) as JobRow[];
+      setJobs(rows);
+      // Refresh detail for any expanded rows so per-slide progress updates too.
+      const expandedIds = Object.keys(expanded).filter((k) => expanded[k]);
+      if (expandedIds.length > 0) {
+        const results = await Promise.all(
+          expandedIds.map((id) => jobDetail({ data: { jobId: id } }).catch(() => null)),
+        );
+        setDetails((prev) => {
+          const next = { ...prev };
+          expandedIds.forEach((id, i) => {
+            if (results[i]) next[id] = results[i] as never;
+          });
+          return next;
+        });
+      }
+    } catch {
+      /* ignore transient */
+    }
+  }, [cloudDeckId, listJobs, jobDetail, expanded]);
+
+  useEffect(() => { void refreshJobs(); }, [refreshJobs]);
+
+  // Poll while there is an active job or the history tab is open.
+  useEffect(() => {
+    const hasActive = jobs.some((j) => j.status === "translating" || j.status === "draft");
+    if (!hasActive && tab !== "history") return;
+    pollRef.current = window.setInterval(() => { void refreshJobs(); }, 2500) as unknown as number;
+    return () => {
+      if (pollRef.current) window.clearInterval(pollRef.current);
+      pollRef.current = null;
+    };
+  }, [jobs, tab, refreshJobs]);
+
+  async function toggleExpand(jobId: string) {
+    const next = !expanded[jobId];
+    setExpanded((p) => ({ ...p, [jobId]: next }));
+    if (next && !details[jobId]) {
+      try {
+        const d = await jobDetail({ data: { jobId } });
+        setDetails((p) => ({ ...p, [jobId]: d as never }));
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  async function onCancel(jobId: string) {
+    setBusyJobId(jobId);
+    try {
+      await cancelJob({ data: { jobId } });
+      await refreshJobs();
+    } finally {
+      setBusyJobId(null);
+    }
+  }
+  async function onRetry(jobId: string) {
+    setBusyJobId(jobId);
+    try {
+      await retryJob({ data: { jobId } });
+      await refreshJobs();
+    } finally {
+      setBusyJobId(null);
+    }
+  }
 
   useEffect(() => {
     let alive = true;
@@ -106,16 +220,39 @@ export function TranslateDrawer({
         className="h-full w-[440px] max-w-full overflow-y-auto bg-white text-black shadow-2xl dark:bg-[#0B0B18] dark:text-white"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-black/10 bg-white/95 px-5 py-4 backdrop-blur dark:border-white/10 dark:bg-[#0B0B18]/95">
-          <div className="flex items-center gap-2">
-            <Languages size={16} className="text-[#003FC7] dark:text-[#A1FBF9]" />
-            <h2 className="text-lg font-semibold tracking-tight">Translate deck</h2>
+        <div className="sticky top-0 z-10 border-b border-black/10 bg-white/95 backdrop-blur dark:border-white/10 dark:bg-[#0B0B18]/95">
+          <div className="flex items-center justify-between px-5 py-4">
+            <div className="flex items-center gap-2">
+              <Languages size={16} className="text-[#003FC7] dark:text-[#A1FBF9]" />
+              <h2 className="text-lg font-semibold tracking-tight">Translate deck</h2>
+            </div>
+            <button onClick={onClose} className="rounded-full p-1.5 hover:bg-black/5 dark:hover:bg-white/10" aria-label="Close">
+              <X size={16} />
+            </button>
           </div>
-          <button onClick={onClose} className="rounded-full p-1.5 hover:bg-black/5 dark:hover:bg-white/10" aria-label="Close">
-            <X size={16} />
-          </button>
+          <div className="flex gap-1 px-5 pb-2 text-xs">
+            {([
+              { id: "new", label: "New job", icon: <Languages size={12} /> },
+              { id: "history", label: `History${jobs.length ? ` (${jobs.length})` : ""}`, icon: <History size={12} /> },
+            ] as Array<{ id: Tab; label: string; icon: React.ReactNode }>).map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTab(t.id)}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-medium transition ${
+                  tab === t.id
+                    ? "bg-[#003FC7] text-white dark:bg-[#A1FBF9] dark:text-[#03002C]"
+                    : "text-black/60 hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/10"
+                }`}
+              >
+                {t.icon}
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
 
+        {tab === "new" && (
         <div className="space-y-6 px-5 py-5">
           {/* Engine */}
           <section>
@@ -293,6 +430,139 @@ export function TranslateDrawer({
             </button>
           </div>
         </div>
+        )}
+
+        {tab === "history" && (
+        <div className="space-y-3 px-5 py-5">
+          {jobs.length === 0 && (
+            <div className="rounded-lg border border-dashed border-black/15 px-4 py-8 text-center text-sm text-black/50 dark:border-white/15 dark:text-white/50">
+              No translation jobs yet. Start one from the "New job" tab.
+            </div>
+          )}
+          {jobs.map((j) => {
+            const total = j.progress_total ?? 0;
+            const current = j.progress_current ?? 0;
+            const pct = total > 0 ? Math.round((current / total) * 100) : 0;
+            const active = j.status === "translating" || j.status === "draft";
+            const canRetry = j.status === "failed" || j.status === "cancelled";
+            const detail = details[j.id];
+            const isOpen = !!expanded[j.id];
+            const statusColor =
+              j.status === "ready"
+                ? "text-emerald-600 dark:text-emerald-300"
+                : j.status === "failed"
+                  ? "text-red-600 dark:text-red-300"
+                  : j.status === "cancelled"
+                    ? "text-amber-700 dark:text-amber-300"
+                    : "text-[#003FC7] dark:text-[#A1FBF9]";
+            return (
+              <div key={j.id} className="rounded-lg border border-black/10 dark:border-white/10">
+                <div className="flex items-center gap-2 px-3 py-2.5">
+                  <button
+                    type="button"
+                    onClick={() => toggleExpand(j.id)}
+                    className="rounded p-0.5 hover:bg-black/5 dark:hover:bg-white/10"
+                    aria-label={isOpen ? "Collapse" : "Expand"}
+                  >
+                    {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                  </button>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="font-mono text-[11px] uppercase tracking-wide">{j.target_lang}</span>
+                      <span className="rounded bg-black/5 px-1.5 py-0.5 text-[10px] uppercase tracking-wide dark:bg-white/10">
+                        {j.mode === "in_place" ? "in place" : j.mode}
+                      </span>
+                      <span className={`text-[11px] font-medium uppercase tracking-wide ${statusColor}`}>{j.status}</span>
+                    </div>
+                    <div className="mt-1 flex items-center gap-2">
+                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
+                        <div
+                          className={`h-full transition-all ${
+                            j.status === "failed"
+                              ? "bg-red-500"
+                              : j.status === "cancelled"
+                                ? "bg-amber-500"
+                                : j.status === "ready"
+                                  ? "bg-emerald-500"
+                                  : "bg-[#003FC7] dark:bg-[#A1FBF9]"
+                          }`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className="text-[11px] tabular-nums text-black/60 dark:text-white/60">
+                        {current}/{total}
+                      </span>
+                    </div>
+                    {j.error && <div className="mt-1 text-[11px] text-red-600 dark:text-red-300">{j.error}</div>}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {active && (
+                      <button
+                        type="button"
+                        onClick={() => onCancel(j.id)}
+                        disabled={busyJobId === j.id}
+                        className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 px-2.5 py-1 text-[11px] font-medium text-amber-700 hover:bg-amber-500/10 disabled:opacity-50 dark:text-amber-300"
+                        title="Cancel job"
+                      >
+                        <Square size={10} /> Cancel
+                      </button>
+                    )}
+                    {canRetry && (
+                      <button
+                        type="button"
+                        onClick={() => onRetry(j.id)}
+                        disabled={busyJobId === j.id}
+                        className="inline-flex items-center gap-1 rounded-full border border-[#003FC7]/40 px-2.5 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/10 disabled:opacity-50 dark:border-[#A1FBF9]/40 dark:text-[#A1FBF9] dark:hover:bg-[#A1FBF9]/10"
+                        title="Retry failed slides"
+                      >
+                        {busyJobId === j.id ? <Loader2 size={10} className="animate-spin" /> : <RotateCcw size={10} />} Retry
+                      </button>
+                    )}
+                  </div>
+                </div>
+                {isOpen && (
+                  <div className="border-t border-black/5 bg-black/[0.02] px-3 py-2 dark:border-white/5 dark:bg-white/[0.02]">
+                    {!detail && <div className="text-[11px] text-black/50 dark:text-white/50">Loading slide progress…</div>}
+                    {detail && detail.slides.length === 0 && (
+                      <div className="text-[11px] text-black/50 dark:text-white/50">No slides on source deck.</div>
+                    )}
+                    {detail && detail.slides.length > 0 && (
+                      <div className="grid grid-cols-8 gap-1">
+                        {detail.slides.map((s) => {
+                          const color =
+                            s.status === "ready"
+                              ? "bg-emerald-500"
+                              : s.status === "failed"
+                                ? "bg-red-500"
+                                : "bg-black/15 dark:bg-white/15";
+                          return (
+                            <div
+                              key={s.slideId}
+                              title={`Slide ${s.position + 1} — ${s.status}${s.error ? `: ${s.error}` : ""}`}
+                              className={`h-6 rounded ${color} flex items-center justify-center text-[10px] font-mono text-white/90`}
+                            >
+                              {s.position + 1}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          <div className="pt-2 text-right">
+            <button
+              type="button"
+              onClick={() => void refreshJobs()}
+              className="text-[11px] text-black/50 hover:text-black/80 dark:text-white/50 dark:hover:text-white/80"
+            >
+              Refresh
+            </button>
+          </div>
+        </div>
+        )}
       </div>
     </div>
   );

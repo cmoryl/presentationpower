@@ -230,17 +230,74 @@ async function loadDeckBundle(supabase: AnySupabase, deckId: string) {
   return { deck, slides: slides ?? [] };
 }
 
+export class TranslationCancelledError extends Error {
+  constructor() {
+    super("Translation cancelled");
+    this.name = "TranslationCancelledError";
+  }
+}
+
+// Translate slides one at a time, writing per-slide status to
+// slide_translations (keyed by source slide id) and bumping
+// deck_translations.progress_current. Between slides we re-read the tracking
+// row's status so a `cancelled` flag from another request stops the loop.
 async function translateAllSlides(
+  supabase: AnySupabase,
   slides: Array<{ id: string; content: unknown }>,
   targetLang: string,
   glossary: GlossaryTerm[],
   engineId: "globallink" | "ai",
   humanReview: boolean,
-): Promise<Array<{ id: string; content: unknown }>> {
-  const out: Array<{ id: string; content: unknown }> = [];
+  trackingId: string | undefined,
+): Promise<Array<{ id: string; content: unknown; ok: boolean; error?: string }>> {
+  const out: Array<{ id: string; content: unknown; ok: boolean; error?: string }> = [];
+  let done = 0;
   for (const s of slides) {
-    const { content } = await translateContent(s.content, targetLang, glossary, engineId, humanReview);
-    out.push({ id: s.id, content });
+    // Cancel check
+    if (trackingId) {
+      const { data: cur } = await supabase
+        .from("deck_translations")
+        .select("status")
+        .eq("id", trackingId)
+        .maybeSingle();
+      if (cur?.status === "cancelled") throw new TranslationCancelledError();
+    }
+    try {
+      const { content, jobRef } = await translateContent(s.content, targetLang, glossary, engineId, humanReview);
+      await supabase.from("slide_translations").upsert(
+        {
+          slide_id: s.id,
+          target_lang: targetLang,
+          source_hash: contentHash(s.content),
+          translated_content: content,
+          status: "ready",
+          engine: engineId,
+          job_ref: jobRef ?? null,
+          error: null,
+        },
+        { onConflict: "slide_id,target_lang" },
+      );
+      out.push({ id: s.id, content, ok: true });
+    } catch (e) {
+      const msg = (e as Error).message.slice(0, 500);
+      await supabase.from("slide_translations").upsert(
+        {
+          slide_id: s.id,
+          target_lang: targetLang,
+          source_hash: contentHash(s.content),
+          translated_content: {},
+          status: "failed",
+          engine: engineId,
+          error: msg,
+        },
+        { onConflict: "slide_id,target_lang" },
+      );
+      out.push({ id: s.id, content: s.content, ok: false, error: msg });
+    }
+    done += 1;
+    if (trackingId) {
+      await supabase.from("deck_translations").update({ progress_current: done }).eq("id", trackingId);
+    }
   }
   return out;
 }
@@ -298,15 +355,18 @@ export const translateDeckInPlace = createServerFn({ method: "POST" })
 
     try {
       const translated = await translateAllSlides(
+        supabase,
         slides,
         data.targetLang,
         glossary,
         engine,
         data.humanReview,
+        trackingId,
       );
-      // Apply
+      const failed = translated.filter((t) => !t.ok);
+      // Apply only successful slides so a partial run still updates what worked.
       for (const t of translated) {
-        await supabase.from("deck_slides").update({ content: t.content }).eq("id", t.id);
+        if (t.ok) await supabase.from("deck_slides").update({ content: t.content }).eq("id", t.id);
       }
       // Tag deck with locale + rtl in context
       const { data: lang } = await supabase.from("languages").select("rtl").eq("id", data.targetLang).maybeSingle();
@@ -320,17 +380,26 @@ export const translateDeckInPlace = createServerFn({ method: "POST" })
       if (trackingId) {
         await supabase
           .from("deck_translations")
-          .update({ status: "ready", progress_current: slides.length })
+          .update({
+            status: failed.length === 0 ? "ready" : "failed",
+            progress_current: translated.length,
+            error: failed.length === 0 ? null : `${failed.length} slide(s) failed`,
+          })
           .eq("id", trackingId);
       }
-      return { ok: true, deckId: deck.id };
+      return { ok: true, deckId: deck.id, failed: failed.length };
     } catch (e) {
+      const isCancel = e instanceof TranslationCancelledError;
       if (trackingId) {
         await supabase
           .from("deck_translations")
-          .update({ status: "failed", error: (e as Error).message.slice(0, 500) })
+          .update({
+            status: isCancel ? "cancelled" : "failed",
+            error: isCancel ? null : (e as Error).message.slice(0, 500),
+          })
           .eq("id", trackingId);
       }
+      if (isCancel) return { ok: false, cancelled: true };
       throw e;
     }
   });
@@ -402,7 +471,16 @@ export const translateDeckToCopy = createServerFn({ method: "POST" })
     const trackingId = trackingRow?.id as string | undefined;
 
     try {
-      const translated = await translateAllSlides(slides, data.targetLang, glossary, engine, data.humanReview);
+      const translated = await translateAllSlides(
+        supabase,
+        slides,
+        data.targetLang,
+        glossary,
+        engine,
+        data.humanReview,
+        trackingId,
+      );
+      const failed = translated.filter((t) => !t.ok);
       const rows = (slides as Array<any>).map((s: any, i: number) => ({
         deck_id: newDeck.id,
         position: s.position,
@@ -419,19 +497,28 @@ export const translateDeckToCopy = createServerFn({ method: "POST" })
       if (trackingId) {
         await supabase
           .from("deck_translations")
-          .update({ status: "ready", progress_current: slides.length })
+          .update({
+            status: failed.length === 0 ? "ready" : "failed",
+            progress_current: translated.length,
+            error: failed.length === 0 ? null : `${failed.length} slide(s) failed`,
+          })
           .eq("id", trackingId);
       }
-      return { ok: true, deckId: newDeck.id, title: newTitle };
+      return { ok: true, deckId: newDeck.id, title: newTitle, failed: failed.length };
     } catch (e) {
+      const isCancel = e instanceof TranslationCancelledError;
       if (trackingId) {
         await supabase
           .from("deck_translations")
-          .update({ status: "failed", error: (e as Error).message.slice(0, 500) })
+          .update({
+            status: isCancel ? "cancelled" : "failed",
+            error: isCancel ? null : (e as Error).message.slice(0, 500),
+          })
           .eq("id", trackingId);
       }
-      // Clean up the empty deck row so failure doesn't leave orphaned shells.
+      // Clean up the empty deck row so failure/cancel doesn't leave orphaned shells.
       await supabase.from("decks").delete().eq("id", newDeck.id);
+      if (isCancel) return { ok: false, cancelled: true };
       throw e;
     }
   });
@@ -482,7 +569,7 @@ export const translateDeckBatch = createServerFn({ method: "POST" })
           .select()
           .maybeSingle();
         if (!newDeck) throw new Error("Failed to create translated deck");
-        const translated = await translateAllSlides(slides, lang, glossary, engine, data.humanReview);
+        const translated = await translateAllSlides(supabase, slides, lang, glossary, engine, data.humanReview, undefined);
         const rows = (slides as Array<any>).map((s: any, i: number) => ({
           deck_id: newDeck.id,
           position: s.position,
@@ -728,4 +815,229 @@ export const listSharedLocales = createServerFn({ method: "POST" })
     const { data: rows, error } = await client.rpc("get_shared_deck_locales", { _token: data.token });
     if (error) throw new Error(error.message);
     return (rows ?? []) as Array<{ target_lang: string; ready: number; total: number }>;
+  });
+
+// ---------------------------------------------------------------------------
+// Job history + per-slide progress + cancel/retry
+// ---------------------------------------------------------------------------
+
+// Detailed per-slide breakdown for one deck_translations job. Joins
+// slide_translations by (source slide id, target_lang) so partial progress,
+// per-slide errors, and unfinished slides are all visible.
+export const getDeckTranslationJobDetail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) => z.object({ jobId: z.string().uuid() }).parse(raw))
+  .handler(async ({ data, context }) => {
+    const supabase = context.supabase as AnySupabase;
+    const { data: job, error: jErr } = await supabase
+      .from("deck_translations")
+      .select(
+        "id, source_deck_id, translated_deck_id, target_lang, mode, status, engine, human_review, progress_current, progress_total, error, created_at, updated_at",
+      )
+      .eq("id", data.jobId)
+      .maybeSingle();
+    if (jErr) throw new Error(jErr.message);
+    if (!job) throw new Error("Job not found");
+
+    const { data: slides } = await supabase
+      .from("deck_slides")
+      .select("id, position")
+      .eq("deck_id", job.source_deck_id)
+      .order("position", { ascending: true });
+    const slideList = (slides ?? []) as Array<{ id: string; position: number }>;
+    const ids = slideList.map((s) => s.id);
+    let trByKey = new Map<string, { status: string; error: string | null; updated_at: string }>();
+    if (ids.length > 0) {
+      const { data: trs } = await supabase
+        .from("slide_translations")
+        .select("slide_id, status, error, updated_at")
+        .in("slide_id", ids)
+        .eq("target_lang", job.target_lang);
+      trByKey = new Map(
+        ((trs ?? []) as Array<{ slide_id: string; status: string; error: string | null; updated_at: string }>).map(
+          (r) => [r.slide_id, { status: r.status, error: r.error, updated_at: r.updated_at }],
+        ),
+      );
+    }
+    const slidesOut = slideList.map((s) => {
+      const t = trByKey.get(s.id);
+      return {
+        slideId: s.id,
+        position: s.position,
+        status: (t?.status ?? "pending") as "pending" | "ready" | "failed",
+        error: t?.error ?? null,
+        updatedAt: t?.updated_at ?? null,
+      };
+    });
+    return { job, slides: slidesOut };
+  });
+
+// Flip a running job to `cancelled`. The translation loop re-reads the row's
+// status between slides and throws TranslationCancelledError to stop.
+export const cancelDeckTranslation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) => z.object({ jobId: z.string().uuid() }).parse(raw))
+  .handler(async ({ data, context }) => {
+    const supabase = context.supabase as AnySupabase;
+    const { data: job } = await supabase
+      .from("deck_translations")
+      .select("id, source_deck_id, status")
+      .eq("id", data.jobId)
+      .maybeSingle();
+    if (!job) throw new Error("Job not found");
+    // RLS scopes writes to deck owners; still, only mark active jobs.
+    if (job.status !== "translating" && job.status !== "draft") {
+      return { ok: false, reason: "not_running" as const, status: job.status };
+    }
+    const { error } = await supabase
+      .from("deck_translations")
+      .update({ status: "cancelled" })
+      .eq("id", data.jobId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// Re-run failed / pending slides for an existing job. For in_place jobs,
+// updated slides land on the source deck. For copy jobs, updates land on
+// translated_deck_id at the same position. Batch jobs are treated like copy.
+export const retryDeckTranslation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) => z.object({ jobId: z.string().uuid() }).parse(raw))
+  .handler(async ({ data, context }) => {
+    const supabase = context.supabase as AnySupabase;
+    const { data: job, error: jErr } = await supabase
+      .from("deck_translations")
+      .select("*")
+      .eq("id", data.jobId)
+      .maybeSingle();
+    if (jErr) throw new Error(jErr.message);
+    if (!job) throw new Error("Job not found");
+
+    const { data: deck } = await supabase.from("decks").select("owner_id, brand_mode_id").eq("id", job.source_deck_id).maybeSingle();
+    if (!deck || deck.owner_id !== context.userId) throw new Error("Forbidden");
+
+    const { data: slides } = await supabase
+      .from("deck_slides")
+      .select("id, position, content")
+      .eq("deck_id", job.source_deck_id)
+      .order("position", { ascending: true });
+    const slideList = (slides ?? []) as Array<{ id: string; position: number; content: unknown }>;
+
+    // Find which slides need work: not 'ready' in slide_translations for this lang.
+    const { data: trs } = await supabase
+      .from("slide_translations")
+      .select("slide_id, status")
+      .in("slide_id", slideList.map((s) => s.id))
+      .eq("target_lang", job.target_lang);
+    const readySet = new Set(
+      ((trs ?? []) as Array<{ slide_id: string; status: string }>).filter((r) => r.status === "ready").map((r) => r.slide_id),
+    );
+    const todo = slideList.filter((s) => !readySet.has(s.id));
+    if (todo.length === 0) {
+      await supabase
+        .from("deck_translations")
+        .update({ status: "ready", progress_current: slideList.length, error: null })
+        .eq("id", job.id);
+      return { ok: true, retried: 0 };
+    }
+
+    // Reset job → translating, seed progress to already-ready count.
+    const startingDone = slideList.length - todo.length;
+    await supabase
+      .from("deck_translations")
+      .update({ status: "translating", progress_current: startingDone, progress_total: slideList.length, error: null })
+      .eq("id", job.id);
+
+    const glossary = await loadRelevantGlossary(supabase, deck.brand_mode_id as string | null, job.source_deck_id);
+    const engine = (job.engine ?? "globallink") as "globallink" | "ai";
+
+    try {
+      const results: Array<{ id: string; content: unknown; ok: boolean; error?: string }> = [];
+      let done = startingDone;
+      for (const s of todo) {
+        // cancel check
+        const { data: cur } = await supabase
+          .from("deck_translations")
+          .select("status")
+          .eq("id", job.id)
+          .maybeSingle();
+        if (cur?.status === "cancelled") throw new TranslationCancelledError();
+        try {
+          const { content, jobRef } = await translateContent(s.content, job.target_lang, glossary, engine, !!job.human_review);
+          await supabase.from("slide_translations").upsert(
+            {
+              slide_id: s.id,
+              target_lang: job.target_lang,
+              source_hash: contentHash(s.content),
+              translated_content: content,
+              status: "ready",
+              engine,
+              job_ref: jobRef ?? null,
+              error: null,
+            },
+            { onConflict: "slide_id,target_lang" },
+          );
+          results.push({ id: s.id, content, ok: true });
+        } catch (e) {
+          const msg = (e as Error).message.slice(0, 500);
+          await supabase.from("slide_translations").upsert(
+            {
+              slide_id: s.id,
+              target_lang: job.target_lang,
+              source_hash: contentHash(s.content),
+              translated_content: {},
+              status: "failed",
+              engine,
+              error: msg,
+            },
+            { onConflict: "slide_id,target_lang" },
+          );
+          results.push({ id: s.id, content: s.content, ok: false, error: msg });
+        }
+        done += 1;
+        await supabase.from("deck_translations").update({ progress_current: done }).eq("id", job.id);
+      }
+
+      // Apply the fresh content depending on job mode.
+      const okResults = results.filter((r) => r.ok);
+      if (job.mode === "in_place") {
+        for (const r of okResults) {
+          await supabase.from("deck_slides").update({ content: r.content }).eq("id", r.id);
+        }
+      } else if (job.translated_deck_id) {
+        // Map source slide id → position, then update the copy at that position.
+        const positionById = new Map(slideList.map((s) => [s.id, s.position] as const));
+        for (const r of okResults) {
+          const pos = positionById.get(r.id);
+          if (pos == null) continue;
+          await supabase
+            .from("deck_slides")
+            .update({ content: r.content })
+            .eq("deck_id", job.translated_deck_id)
+            .eq("position", pos);
+        }
+      }
+
+      const failed = results.filter((r) => !r.ok).length;
+      await supabase
+        .from("deck_translations")
+        .update({
+          status: failed === 0 ? "ready" : "failed",
+          progress_current: slideList.length,
+          error: failed === 0 ? null : `${failed} slide(s) failed`,
+        })
+        .eq("id", job.id);
+      return { ok: true, retried: todo.length, failed };
+    } catch (e) {
+      const isCancel = e instanceof TranslationCancelledError;
+      await supabase
+        .from("deck_translations")
+        .update({
+          status: isCancel ? "cancelled" : "failed",
+          error: isCancel ? null : (e as Error).message.slice(0, 500),
+        })
+        .eq("id", job.id);
+      if (isCancel) return { ok: false, cancelled: true };
+      throw e;
+    }
   });
