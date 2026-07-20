@@ -206,7 +206,7 @@ export const translateSlide = createServerFn({ method: "POST" })
       await supabase.from("deck_slides").update({ content: translated }).eq("id", data.slideId);
     }
 
-    return { translated, jobRef };
+    return { translated: translated as unknown as Record<string, unknown>, jobRef: jobRef ?? null };
   });
 
 // ---------------------------------------------------------------------------
@@ -403,7 +403,7 @@ export const translateDeckToCopy = createServerFn({ method: "POST" })
 
     try {
       const translated = await translateAllSlides(slides, data.targetLang, glossary, engine, data.humanReview);
-      const rows = slides.map((s, i) => ({
+      const rows = (slides as Array<any>).map((s: any, i: number) => ({
         deck_id: newDeck.id,
         position: s.position,
         section_id: s.section_id,
@@ -483,7 +483,7 @@ export const translateDeckBatch = createServerFn({ method: "POST" })
           .maybeSingle();
         if (!newDeck) throw new Error("Failed to create translated deck");
         const translated = await translateAllSlides(slides, lang, glossary, engine, data.humanReview);
-        const rows = slides.map((s, i) => ({
+        const rows = (slides as Array<any>).map((s: any, i: number) => ({
           deck_id: newDeck.id,
           position: s.position,
           section_id: s.section_id,
