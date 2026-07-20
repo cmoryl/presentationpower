@@ -461,6 +461,8 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
         return {
           ok: true,
           synthesized: false,
+          divisionScoped,
+          fallbackNote,
           synthesis: null,
           selected: candidates.slice(0, data.limit),
           note: ("rawError" in result && result.rawError) || undefined,
