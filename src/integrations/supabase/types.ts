@@ -980,8 +980,10 @@ export type Database = {
       }
       imported_decks: {
         Row: {
+          chunk_count: number
           created_at: string
           division_id: string
+          embedded_at: string | null
           error: string | null
           file_size: number
           id: string
@@ -995,8 +997,10 @@ export type Database = {
           uploaded_by: string
         }
         Insert: {
+          chunk_count?: number
           created_at?: string
           division_id: string
+          embedded_at?: string | null
           error?: string | null
           file_size?: number
           id?: string
@@ -1010,8 +1014,10 @@ export type Database = {
           uploaded_by: string
         }
         Update: {
+          chunk_count?: number
           created_at?: string
           division_id?: string
+          embedded_at?: string | null
           error?: string | null
           file_size?: number
           id?: string
