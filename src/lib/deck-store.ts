@@ -1750,23 +1750,44 @@ export const useDeckStore = create<DeckState>()(
       swapVariant: (deckId, slideId, newVariantId) => {
         const deck = get().decks[deckId];
         if (!deck) return;
+        const slide = deck.slides.find((sl) => sl.id === slideId);
+        if (!slide) return;
         const nextVariant = byId(MODULE_VARIANTS, newVariantId);
         if (!nextVariant) return;
+        pushHistory();
         const layoutId = nextVariant.permittedLayoutIds[0];
+        const brief = get().briefs[deck.briefId];
+        const sectionName = SECTION_FRAMEWORKS.find((sf) => sf.id === slide.sectionId)?.name ?? "";
+        const seeded = brief ? seedContent(newVariantId, brief, sectionName) : {};
+        // Preserve overlapping field values from the old content (title,
+        // headline, kicker, subhead, body, items, etc.) so the user's
+        // edits carry over. Only shared keys are kept; the seeded defaults
+        // fill everything else the new variant expects.
+        const prev = slide.content as Record<string, unknown>;
+        const merged: Record<string, unknown> = { ...(seeded as Record<string, unknown>) };
+        for (const key of Object.keys(prev)) {
+          if (key in merged && prev[key] !== undefined && prev[key] !== "") {
+            merged[key] = prev[key];
+          }
+        }
+        // Preserve mediaUrl only when the new variant supports imagery;
+        // otherwise strip it so non-image variants don't carry orphans.
+        if (variantSupportsImagery(newVariantId)) {
+          if (typeof prev.mediaUrl === "string") merged.mediaUrl = prev.mediaUrl;
+          if (typeof prev.mediaSeed === "string") merged.mediaSeed = prev.mediaSeed;
+        } else {
+          delete merged.mediaUrl;
+          delete merged.mediaSeed;
+        }
+        // Preserve background settings across swaps.
+        if (prev.background !== undefined) merged.background = prev.background;
         set((s) => ({
           decks: {
             ...s.decks,
             [deckId]: {
               ...deck,
               slides: deck.slides.map((sl) =>
-                sl.id === slideId
-                  ? {
-                      ...sl,
-                      variantId: newVariantId,
-                      layoutId,
-                      content: seedContent(newVariantId, s.briefs[deck.briefId], SECTION_FRAMEWORKS.find((sf) => sf.id === sl.sectionId)?.name ?? ""),
-                    }
-                  : sl,
+                sl.id === slideId ? { ...sl, variantId: newVariantId, layoutId, content: merged as SlideContent } : sl,
               ),
             },
           },
@@ -1779,6 +1800,7 @@ export const useDeckStore = create<DeckState>()(
         const idx = deck.slides.findIndex((s) => s.id === slideId);
         const j = idx + direction;
         if (idx < 0 || j < 0 || j >= deck.slides.length) return;
+        pushHistory();
         const next = [...deck.slides];
         [next[idx], next[j]] = [next[j], next[idx]];
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next.map((sl, i) => ({ ...sl, position: i })) } } }));
@@ -1787,6 +1809,7 @@ export const useDeckStore = create<DeckState>()(
       removeSlide: (deckId, slideId) => {
         const deck = get().decks[deckId];
         if (!deck) return;
+        pushHistory();
         const next = deck.slides.filter((sl) => sl.id !== slideId).map((sl, i) => ({ ...sl, position: i }));
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
       },
@@ -1796,6 +1819,7 @@ export const useDeckStore = create<DeckState>()(
         if (!deck) return;
         const brief = get().briefs[deck.briefId];
         if (!brief) return;
+        pushHistory();
         const options = variantsForSection(sectionId);
         const variant = options[0] ?? MODULE_VARIANTS[0];
         const sf = byId(SECTION_FRAMEWORKS, sectionId);
@@ -1821,8 +1845,7 @@ export const useDeckStore = create<DeckState>()(
         if (!brief) return null;
         const variant = byId(MODULE_VARIANTS, variantId);
         if (!variant) return null;
-        // Pick a section framework that permits this variant's family; fall
-        // back to the last slide's section, then the first framework.
+        pushHistory();
         const sf =
           SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.includes(variant.familyId)) ??
           byId(SECTION_FRAMEWORKS, deck.slides[deck.slides.length - 1]?.sectionId ?? "") ??
@@ -1846,11 +1869,13 @@ export const useDeckStore = create<DeckState>()(
         if (!deck) return;
         const idx = deck.slides.findIndex((sl) => sl.id === slideId);
         if (idx < 0) return;
+        pushHistory();
         const src = deck.slides[idx];
         const copy: DeckSlide = { ...src, id: nanoid(8), content: structuredClone(src.content), changes: [] };
         const next = [...deck.slides.slice(0, idx + 1), copy, ...deck.slides.slice(idx + 1)].map((sl, i) => ({ ...sl, position: i }));
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
       },
+
 
       renameDeck: (deckId, title) => {
         const deck = get().decks[deckId];
