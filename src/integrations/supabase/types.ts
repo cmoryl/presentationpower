@@ -978,6 +978,54 @@ export type Database = {
         }
         Relationships: []
       }
+      imported_decks: {
+        Row: {
+          created_at: string
+          division_id: string
+          error: string | null
+          file_size: number
+          id: string
+          original_filename: string
+          slide_count: number
+          slides: Json
+          status: string
+          storage_path: string
+          theme: Json | null
+          updated_at: string
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          division_id: string
+          error?: string | null
+          file_size?: number
+          id?: string
+          original_filename: string
+          slide_count?: number
+          slides?: Json
+          status?: string
+          storage_path: string
+          theme?: Json | null
+          updated_at?: string
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          division_id?: string
+          error?: string | null
+          file_size?: number
+          id?: string
+          original_filename?: string
+          slide_count?: number
+          slides?: Json
+          status?: string
+          storage_path?: string
+          theme?: Json | null
+          updated_at?: string
+          uploaded_by?: string
+        }
+        Relationships: []
+      }
       knowledge_entries: {
         Row: {
           body: string
