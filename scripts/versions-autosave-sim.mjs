@@ -50,8 +50,8 @@ console.log(`Owner: ${OWNER}  Deck: ${DECK_ID}  title="${originalDeck.title}" sl
 // Seed two slides so restore has content to verify against.
 if (originalSlides.length === 0) {
   const { error: seedErr } = await sa.from("deck_slides").insert([
-    { deck_id: DECK_ID, position: 0, section_id: "hero", variant_id: "hero-a", layout_id: "layout-hero-a", content: { headline: "V1 headline" }, notes: null },
-    { deck_id: DECK_ID, position: 1, section_id: "value", variant_id: "value-a", layout_id: "layout-value-a", content: { body: "V1 body" }, notes: null },
+    { deck_id: DECK_ID, position: 0, section_id: "SF-01", variant_id: "MV-OP-COVER", layout_id: "LF-01", content: { headline: "V1 headline" }, notes: null },
+    { deck_id: DECK_ID, position: 1, section_id: "SF-01", variant_id: "MV-OP-COVER", layout_id: "LF-01", content: { body: "V1 body" }, notes: null },
   ]);
   if (seedErr) throw new Error(`seed slides failed: ${seedErr.message}`);
   const { count } = await sa.from("deck_slides").select("id", { count: "exact", head: true }).eq("deck_id", DECK_ID);
