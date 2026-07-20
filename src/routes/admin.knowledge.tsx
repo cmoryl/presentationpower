@@ -159,6 +159,8 @@ function AdminKnowledgeBrowser() {
           {tab === "logo" && <LogoTab guide={guide} />}
           {tab === "subbrands" && <SubBrandsTab guide={guide} />}
           {tab === "intel" && <IntelTab slug={guide.slug} />}
+          {tab === "sources" && <SourcesTab slug={guide.slug} />}
+
           {tab === "voiceover" && <VoiceoverTab index={voIndex} />}
         </div>
       </div>
