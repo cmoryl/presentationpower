@@ -183,10 +183,23 @@ export const deleteImportedDeck = createServerFn({ method: "POST" })
 // brand_assets row, chunk_count/embedded_at idempotency).
 
 // imported_decks.division_id stores the brand-guide slug ("transperfect-life-sciences");
-// brand_asset_chunks.division_id uses the bare divisionId ("life-sciences").
-// Strip the "transperfect-" prefix — matches PDF_ENTITY_TO_DIVISION values.
+// brand_asset_chunks.division_id uses the canonical bm-* brand mode id
+// ("bm-tp-lifesci"). Translate slug → bm-* so RAG retrieval matches by the
+// same key used everywhere else in the app.
+const IMPORTED_DECK_SLUG_TO_DIVISION: Record<string, string> = {
+  "transperfect-master": "bm-enterprise",
+  globallink: "bm-division",
+  "transperfect-life-sciences": "bm-tp-lifesci",
+  "transperfect-legal": "bm-tp-legal",
+  "transperfect-media": "bm-tp-media",
+  "transperfect-gaming": "bm-tp-games",
+  "transperfect-digital": "bm-tp-digital",
+  dataforce: "bm-product",
+  "transperfect-cobrand": "bm-cobrand",
+  "trial-interactive": "bm-trial-interactive",
+};
 export function normalizeImportedDeckDivision(v: string): string {
-  return v.replace(/^transperfect-/, "");
+  return IMPORTED_DECK_SLUG_TO_DIVISION[v] ?? v;
 }
 
 function chunkText(text: string, size = 1200, overlap = 200): string[] {
