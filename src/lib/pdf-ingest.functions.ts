@@ -286,27 +286,56 @@ export const ingestPdfBatch = createServerFn({ method: "POST" })
   });
 
 // ── READ APIS ──────────────────────────────────────────────────────────
+export type PdfExtractionRow = {
+  id: string;
+  entity_type: string;
+  entity_slug: string;
+  entity_name: string | null;
+  section: string | null;
+  title: string;
+  category: string | null;
+  source_url: string;
+  thumbnail_url: string | null;
+  char_count: number;
+  status: string;
+  error: string | null;
+  extracted_at: string | null;
+  updated_at: string;
+};
+
 export const listPdfExtractions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .handler(async ({ context }): Promise<PdfExtractionRow[]> => {
     const s = context.supabase as unknown as SbClient;
     const { data } = await s
       .from("pdf_extractions")
       .select("id, entity_type, entity_slug, entity_name, section, title, category, source_url, thumbnail_url, char_count, status, error, extracted_at, updated_at")
       .order("updated_at", { ascending: false })
       .limit(1000);
-    return (data ?? []) as Array<Record<string, unknown>>;
+    return (data ?? []) as PdfExtractionRow[];
   });
+
+export type PdfExtractionText = {
+  id: string;
+  title: string;
+  entity_slug: string;
+  source_url: string;
+  extracted_text: string | null;
+  char_count: number;
+  status: string;
+  error: string | null;
+};
 
 export const getPdfExtractionText = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
-  .handler(async ({ data, context }) => {
+  .handler(async ({ data, context }): Promise<PdfExtractionText | null> => {
     const s = context.supabase as unknown as SbClient;
     const { data: row } = await s
       .from("pdf_extractions")
       .select("id, title, entity_slug, source_url, extracted_text, char_count, status, error")
       .eq("id", data.id)
       .maybeSingle();
-    return row as Record<string, unknown> | null;
+    return (row ?? null) as PdfExtractionText | null;
   });
+
