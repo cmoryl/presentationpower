@@ -77,6 +77,7 @@ function BriefWizard() {
   const [kbSynthesis, setKbSynthesis] = useState<string | null>(null);
   const [kbSynthesized, setKbSynthesized] = useState(false);
   const [showKbPanel, setShowKbPanel] = useState(false);
+  const [customizeOpen, setCustomizeOpen] = useState(false);
 
   // AI Narrative Strategist (Phase B) — optional pass before deck generation.
   const [strategy, setStrategy] = useState<DeckStrategy | null>(null);
@@ -160,29 +161,47 @@ function BriefWizard() {
           >
             {/* Header */}
             <div
-              className="border-b px-5 pb-6 pt-7 sm:px-10 sm:pb-8 sm:pt-10"
+              className="relative overflow-hidden border-b px-5 pb-7 pt-8 sm:px-10 sm:pb-10 sm:pt-12"
               style={{ borderColor: PALETTE.page }}
             >
               <div
-                className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em]"
-                style={{ color: brandPrimary }}
-              >
-                <span className="inline-block h-[2px] w-4" style={{ backgroundColor: brandPrimary }} />
-                Briefing engine
-              </div>
-              <h1 className="mt-3 font-['Urbanist'] text-2xl font-extrabold uppercase tracking-tighter text-[#0F1B3D] sm:text-3xl">
-                New Pitch Deck Brief
-              </h1>
-              <p className="mt-2 text-[#1E3A5F]/80">
-                Configure the AI narrative engine for your next presentation.
-              </p>
-              <div className="mt-5 rounded-lg border border-dashed border-[#D1DBE5] bg-[#F8FAFC] px-4 py-3 text-xs">
-                <span className="text-[#1E3A5F]/70">Already have a deck? </span>
-                <Link to="/decks/import" className="font-semibold text-[#3B6FA0] hover:text-[#0F1B3D] hover:underline">
-                  Import an existing PowerPoint →
-                </Link>
+                aria-hidden
+                className="pointer-events-none absolute inset-0 transition-opacity duration-500"
+                style={{
+                  background: `radial-gradient(120% 140% at 0% 0%, ${brandPrimary}1f 0%, transparent 55%), radial-gradient(90% 120% at 100% 0%, ${brandAccent}26 0%, transparent 60%), linear-gradient(180deg, ${brandPrimary}0a 0%, transparent 100%)`,
+                }}
+              />
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
+                style={{ background: `linear-gradient(90deg, transparent, ${brandPrimary}55, transparent)` }}
+              />
+              <div className="relative">
+                <div
+                  className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.24em]"
+                  style={{ color: brandPrimary }}
+                >
+                  <span className="inline-block h-[2px] w-6 rounded-full" style={{ backgroundColor: brandPrimary }} />
+                  Briefing engine
+                </div>
+                <h1 className="mt-4 font-['Urbanist'] text-3xl font-extrabold uppercase leading-[0.95] tracking-tighter text-[#0F1B3D] sm:text-[44px]">
+                  New Pitch Deck Brief
+                </h1>
+                <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#1E3A5F]/80 sm:text-base">
+                  Configure the AI narrative engine for your next presentation.
+                </p>
+                <div
+                  className="mt-6 inline-flex items-center gap-2 rounded-full border bg-white/70 px-4 py-2 text-xs backdrop-blur transition-all hover:bg-white"
+                  style={{ borderColor: `${brandPrimary}33` }}
+                >
+                  <span className="text-[#1E3A5F]/70">Already have a deck?</span>
+                  <Link to="/decks/import" className="font-semibold text-[#3B6FA0] hover:text-[#0F1B3D] hover:underline">
+                    Import an existing PowerPoint →
+                  </Link>
+                </div>
               </div>
             </div>
+
 
             <form className="space-y-10 px-5 py-7 sm:p-10" onSubmit={(e) => e.preventDefault()}>
               {/* SECTION 01: Brand Mode — drives everything below */}
@@ -230,38 +249,56 @@ function BriefWizard() {
                   {brandModes.map((b) => {
                     const active = form.brandModeId === b.id;
                     const c = b.tokens?.primary || PALETTE.blue;
+                    const a = b.tokens?.accent || c;
                     return (
                       <button
                         key={b.id}
                         type="button"
                         onClick={() => selectBrand(b.id)}
                         aria-pressed={active}
-                         className="group grid min-h-[148px] cursor-pointer grid-rows-[auto_1fr_auto] gap-3 rounded-xl border-2 p-4 text-left transition-all hover:-translate-y-0.5"
+                        className="group relative grid min-h-[172px] cursor-pointer grid-rows-[auto_1fr_auto] gap-3 overflow-hidden rounded-xl border-2 p-4 text-left transition-all duration-300 ease-out hover:-translate-y-1"
                         style={{
                           borderColor: active ? c : PALETTE.hairline,
-                          backgroundColor: active ? `${c}0d` : PALETTE.surface,
-                          boxShadow: active ? `0 0 0 3px ${c}22` : undefined,
+                          backgroundColor: PALETTE.surface,
+                          boxShadow: active
+                            ? `0 12px 28px -12px ${c}55, 0 0 0 3px ${c}22`
+                            : "0 1px 2px rgba(15,27,61,0.04)",
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!active) e.currentTarget.style.boxShadow = `0 14px 30px -16px ${c}66, 0 0 0 1px ${c}22`;
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!active) e.currentTarget.style.boxShadow = "0 1px 2px rgba(15,27,61,0.04)";
                         }}
                       >
-                        <div className="flex min-w-0 items-center justify-end">
+                        <span
+                          aria-hidden
+                          className="pointer-events-none absolute inset-0 transition-opacity duration-300"
+                          style={{
+                            background: `radial-gradient(120% 100% at 0% 0%, ${c}14 0%, transparent 55%), linear-gradient(135deg, ${c}0a 0%, ${a}10 100%)`,
+                            opacity: active ? 1 : 0.55,
+                          }}
+                        />
+                        <div className="relative flex min-w-0 items-center justify-end">
                           <span
-                            className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
+                            className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest transition-colors"
                             style={{
-                              backgroundColor: active ? c : PALETTE.page,
-                              color: active ? "#fff" : PALETTE.inkSoft,
+                              backgroundColor: active ? c : `${c}14`,
+                              color: active ? "#fff" : c,
                             }}
                           >
                             {b.role ?? "brand"}
                           </span>
                         </div>
-                        <div className="flex min-w-0 max-w-full items-center">
-                          <BrandLockup brand={b} color={c} size="2xs" clientName={form.prospect} />
+                        <div className="relative flex min-w-0 max-w-full items-center">
+                          <BrandLockup brand={b} color={c} size="xs" clientName={form.prospect} />
                         </div>
-                        <p className="text-[11px] leading-snug text-[#1E3A5F]/75">{b.description}</p>
+                        <p className="relative text-[11px] leading-snug text-[#1E3A5F]/80">{b.description}</p>
                       </button>
                     );
                   })}
                 </div>
+
 
                 {/* Sub-company selector (only for the generic Subcompany mode) */}
                 {form.brandModeId === "bm-subcompany" && (
@@ -314,8 +351,20 @@ function BriefWizard() {
               </section>
 
               {/* OPTIONAL: Everything else, collapsed by default */}
-              <details className="group rounded-xl border" style={{ borderColor: PALETTE.hairline, backgroundColor: PALETTE.field }}>
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 [&::-webkit-details-marker]:hidden">
+              <div
+                className="overflow-hidden rounded-xl border transition-shadow duration-300"
+                style={{
+                  borderColor: customizeOpen ? `${brandPrimary}44` : PALETTE.hairline,
+                  backgroundColor: PALETTE.field,
+                  boxShadow: customizeOpen ? `0 10px 30px -18px ${brandPrimary}55` : undefined,
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setCustomizeOpen((v) => !v)}
+                  aria-expanded={customizeOpen}
+                  className="flex w-full cursor-pointer items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-white/40"
+                >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <span className={labelCls}>Customize</span>
@@ -331,256 +380,266 @@ function BriefWizard() {
                     </p>
                   </div>
                   <span
-                    className="shrink-0 font-['Urbanist'] text-[11px] font-bold uppercase tracking-widest transition-transform group-open:rotate-180"
-                    style={{ color: brandPrimary }}
+                    className="shrink-0 font-['Urbanist'] text-[11px] font-bold uppercase tracking-widest transition-transform duration-300"
+                    style={{ color: brandPrimary, transform: customizeOpen ? "rotate(180deg)" : "rotate(0deg)" }}
                     aria-hidden
                   >
                     ▾
                   </span>
-                </summary>
+                </button>
 
-                <div className="space-y-10 border-t px-5 py-7 sm:px-8 sm:py-8" style={{ borderColor: PALETTE.hairline, backgroundColor: PALETTE.surface }}>
-                  {/* Industry + Audience + Facts */}
-                  <div className="space-y-6">
-                    <Field label="Industry">
-                      <input
-                        className={inputCls}
-                        placeholder="e.g. Fintech"
-                        value={form.industry}
-                        onChange={(e) => setForm({ ...form, industry: e.target.value })}
-                      />
-                      {industrySuggestions.length > 0 && (
-                        <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1E3A5F]/50">
-                            Suggested for {brand?.name}:
-                          </span>
-                          {industrySuggestions.slice(0, 5).map((ind: string) => {
-                            const selected = form.industry.toLowerCase() === ind.toLowerCase();
-                            return (
+                <div
+                  className="grid transition-[grid-template-rows] duration-500 ease-out"
+                  style={{ gridTemplateRows: customizeOpen ? "1fr" : "0fr" }}
+                >
+                  <div className="min-h-0 overflow-hidden">
+                    <div
+                      className="space-y-10 border-t px-5 py-7 sm:px-8 sm:py-8"
+                      style={{ borderColor: PALETTE.hairline, backgroundColor: PALETTE.surface }}
+                    >
+                      {/* Two-column split at xl: context (left) / narrative (right) */}
+                      <div className="grid grid-cols-1 gap-x-10 gap-y-8 xl:grid-cols-2">
+                        <div className="space-y-6">
+                          <Field label="Industry">
+                            <input
+                              className={inputCls}
+                              placeholder="e.g. Fintech"
+                              value={form.industry}
+                              onChange={(e) => setForm({ ...form, industry: e.target.value })}
+                            />
+                            {industrySuggestions.length > 0 && (
+                              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#1E3A5F]/50">
+                                  Suggested for {brand?.name}:
+                                </span>
+                                {industrySuggestions.slice(0, 5).map((ind: string) => {
+                                  const selected = form.industry.toLowerCase() === ind.toLowerCase();
+                                  return (
+                                    <button
+                                      key={ind}
+                                      type="button"
+                                      onClick={() => setForm({ ...form, industry: ind })}
+                                      className="rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors"
+                                      style={{
+                                        borderColor: selected ? brandPrimary : PALETTE.hairline,
+                                        backgroundColor: selected ? brandPrimary : "transparent",
+                                        color: selected ? "#fff" : PALETTE.inkSoft,
+                                      }}
+                                    >
+                                      {ind}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </Field>
+
+                          <Field label="Target Audience">
+                            <input
+                              className={inputCls}
+                              placeholder="e.g. C-Suite Executives, CTOs"
+                              value={form.audience}
+                              onChange={(e) => setForm({ ...form, audience: e.target.value })}
+                            />
+                          </Field>
+
+                          <Field label="Known Client Facts">
+                            <textarea
+                              rows={4}
+                              className={inputCls + " resize-none"}
+                              placeholder="List key pain points, previous interactions, or specific requirements…"
+                              value={form.clientFacts}
+                              onChange={(e) => setForm({ ...form, clientFacts: e.target.value })}
+                            />
+                          </Field>
+                        </div>
+
+                        {/* Narrative — filtered by brand */}
+                        <section className="space-y-4">
+                          <div className="flex items-baseline justify-between">
+                            <label className={labelCls}>Narrative</label>
+                            {preferredIds.length > 0 && (
                               <button
-                                key={ind}
                                 type="button"
-                                onClick={() => setForm({ ...form, industry: ind })}
-                                className="rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors"
-                                style={{
-                                  borderColor: selected ? brandPrimary : PALETTE.hairline,
-                                  backgroundColor: selected ? brandPrimary : "transparent",
-                                  color: selected ? "#fff" : PALETTE.inkSoft,
-                                }}
+                                onClick={() => setShowAllArchetypes((v) => !v)}
+                                className="text-[10px] font-bold uppercase tracking-widest text-[#3B6FA0] transition-colors hover:text-[#0F1B3D]"
                               >
-                                {ind}
+                                {showAllArchetypes ? "← show brand-preferred only" : "show all archetypes →"}
                               </button>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </Field>
+                            )}
+                          </div>
 
-                    <Field label="Target Audience">
-                      <input
-                        className={inputCls}
-                        placeholder="e.g. C-Suite Executives, CTOs"
-                        value={form.audience}
-                        onChange={(e) => setForm({ ...form, audience: e.target.value })}
-                      />
-                    </Field>
-
-                    <Field label="Known Client Facts">
-                      <textarea
-                        rows={4}
-                        className={inputCls + " resize-none"}
-                        placeholder="List key pain points, previous interactions, or specific requirements…"
-                        value={form.clientFacts}
-                        onChange={(e) => setForm({ ...form, clientFacts: e.target.value })}
-                      />
-                    </Field>
-                  </div>
-
-                  {/* Narrative — filtered by brand */}
-                  <section className="space-y-4">
-                    <div className="flex items-baseline justify-between">
-                      <label className={labelCls}>Narrative</label>
-                      {preferredIds.length > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => setShowAllArchetypes((v) => !v)}
-                          className="text-[10px] font-bold uppercase tracking-widest text-[#3B6FA0] hover:text-[#0F1B3D]"
-                        >
-                          {showAllArchetypes ? "← show brand-preferred only" : "show all archetypes →"}
-                        </button>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-8 md:grid-cols-5 md:items-end">
-                      <div className="md:col-span-3">
-                        <Field label={preferredIds.length > 0 && !showAllArchetypes ? `Narrative (${filteredArchetypes.length} suited to ${brand?.name})` : "Narrative Archetype"}>
-                          <select
-                            className={inputCls + " appearance-none"}
-                            value={effectiveArchetypeId}
-                            onChange={(e) => setForm({ ...form, archetypeId: e.target.value })}
-                          >
-                            {filteredArchetypes.map((a) => (
-                              <option key={a.id} value={a.id}>
-                                {a.name}
-                              </option>
-                            ))}
-                          </select>
-                        </Field>
-                      </div>
-                      <div className="space-y-3 md:col-span-2 md:pb-1">
-                        <div className="flex items-center justify-between">
-                          <span className={labelCls}>Length</span>
-                          <span className="text-xs font-bold" style={{ color: brandPrimary }}>
-                            {form.lengthTarget} slides
-                          </span>
-                        </div>
-                        <input
-                          type="range"
-                          min={5}
-                          max={12}
-                          value={form.lengthTarget}
-                          onChange={(e) => setForm({ ...form, lengthTarget: Number(e.target.value) })}
-                          className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-[#E8EDF3]"
-                          style={{ accentColor: brandPrimary }}
-                        />
-                        <div className="flex justify-between text-[10px] font-bold uppercase tracking-tight text-[#1E3A5F]/50">
-                          <span>Brief</span>
-                          <span>Standard</span>
-                          <span>Full</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {preferredVariantIds.length > 0 && (
-                      <div className="rounded-lg border p-4" style={{ borderColor: PALETTE.hairline, backgroundColor: PALETTE.field }}>
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#1E3A5F]/60">
-                            Preferred slide variants for {brand?.name}
-                          </span>
-                          <span className="font-mono text-[10px] text-[#1E3A5F]/40">
-                            {preferredVariantIds.length} pinned
-                          </span>
-                        </div>
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                          {preferredVariantIds.map((v: string) => (
-                            <span
-                              key={v}
-                              className="rounded-md border px-2 py-0.5 font-mono text-[10px]"
-                              style={{
-                                borderColor: `${brandPrimary}33`,
-                                backgroundColor: `${brandPrimary}0d`,
-                                color: brandPrimary,
-                              }}
+                          <Field label={preferredIds.length > 0 && !showAllArchetypes ? `Archetype (${filteredArchetypes.length} suited to ${brand?.name})` : "Narrative Archetype"}>
+                            <select
+                              className={inputCls + " appearance-none"}
+                              value={effectiveArchetypeId}
+                              onChange={(e) => setForm({ ...form, archetypeId: e.target.value })}
                             >
-                              {v}
-                            </span>
-                          ))}
-                        </div>
+                              {filteredArchetypes.map((a) => (
+                                <option key={a.id} value={a.id}>
+                                  {a.name}
+                                </option>
+                              ))}
+                            </select>
+                          </Field>
+
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className={labelCls}>Length</span>
+                              <span className="text-xs font-bold" style={{ color: brandPrimary }}>
+                                {form.lengthTarget} slides
+                              </span>
+                            </div>
+                            <input
+                              type="range"
+                              min={5}
+                              max={12}
+                              value={form.lengthTarget}
+                              onChange={(e) => setForm({ ...form, lengthTarget: Number(e.target.value) })}
+                              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-[#E8EDF3]"
+                              style={{ accentColor: brandPrimary }}
+                            />
+                            <div className="flex justify-between text-[10px] font-bold uppercase tracking-tight text-[#1E3A5F]/50">
+                              <span>Brief</span>
+                              <span>Standard</span>
+                              <span>Full</span>
+                            </div>
+                          </div>
+
+                          {preferredVariantIds.length > 0 && (
+                            <div className="rounded-lg border p-4" style={{ borderColor: PALETTE.hairline, backgroundColor: PALETTE.field }}>
+                              <div className="flex items-center justify-between">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#1E3A5F]/60">
+                                  Preferred slide variants for {brand?.name}
+                                </span>
+                                <span className="font-mono text-[10px] text-[#1E3A5F]/40">
+                                  {preferredVariantIds.length} pinned
+                                </span>
+                              </div>
+                              <div className="mt-2 flex flex-wrap gap-1.5">
+                                {preferredVariantIds.map((v: string) => (
+                                  <span
+                                    key={v}
+                                    className="rounded-md border px-2 py-0.5 font-mono text-[10px]"
+                                    style={{
+                                      borderColor: `${brandPrimary}33`,
+                                      backgroundColor: `${brandPrimary}0d`,
+                                      color: brandPrimary,
+                                    }}
+                                  >
+                                    {v}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </section>
                       </div>
-                    )}
-                  </section>
 
-                  {/* Palette Lab */}
-                  <section className="space-y-4">
-                    <div className="flex items-baseline justify-between">
-                      <label className={labelCls}>Palette Lab</label>
-                      <span className="text-[10px] font-medium uppercase tracking-widest text-[#1E3A5F]/50">
-                        optional · attach an A/B test or pick an AI palette
-                      </span>
-                    </div>
-                    {brand && (
-                      <PaletteLab
-                        brandId={brand.id}
-                        brandName={brand.name}
-                        brandRole={brand.role}
-                        seedPalette={{
-                          primary: brand.tokens?.primary ?? PALETTE.blue,
-                          accent: brand.tokens?.accent ?? PALETTE.blue,
-                          ink: brand.tokens?.ink ?? PALETTE.ink,
-                          surface: brand.tokens?.surface ?? PALETTE.surface,
+                      {/* Palette Lab — full width */}
+                      <section className="space-y-4">
+                        <div className="flex items-baseline justify-between">
+                          <label className={labelCls}>Palette Lab</label>
+                          <span className="text-[10px] font-medium uppercase tracking-widest text-[#1E3A5F]/50">
+                            optional · attach an A/B test or pick an AI palette
+                          </span>
+                        </div>
+                        {brand && (
+                          <PaletteLab
+                            brandId={brand.id}
+                            brandName={brand.name}
+                            brandRole={brand.role}
+                            seedPalette={{
+                              primary: brand.tokens?.primary ?? PALETTE.blue,
+                              accent: brand.tokens?.accent ?? PALETTE.blue,
+                              ink: brand.tokens?.ink ?? PALETTE.ink,
+                              surface: brand.tokens?.surface ?? PALETTE.surface,
+                            }}
+                            audience={form.audience}
+                            objective={form.meetingObjective}
+                            accent={brandPrimary}
+                            onChange={setPaletteSel}
+                          />
+                        )}
+                      </section>
+
+                      {/* AI Narrative Strategist — full width */}
+                      <StrategistSection
+                        brandName={brand?.name ?? "brand"}
+                        brandPrimary={brandPrimary}
+                        status={strategyStatus}
+                        error={strategyError}
+                        setupNeeded={strategySetupNeeded}
+                        strategy={strategy}
+                        onPlan={async () => {
+                          setStrategyStatus("planning");
+                          setStrategyError(null);
+                          setStrategySetupNeeded(false);
+                          try {
+                            const res = await planStrategyFn({
+                              data: {
+                                brandModeId: form.brandModeId,
+                                subCompany: form.subCompany || undefined,
+                                brief: {
+                                  prospect: form.prospect,
+                                  industry: form.industry,
+                                  audience: form.audience,
+                                  meetingObjective: form.meetingObjective,
+                                  clientFacts: form.clientFacts,
+                                  archetypeId: effectiveArchetypeId,
+                                  lengthTarget: form.lengthTarget,
+                                },
+                              },
+                            });
+                            if (!res.ok) {
+                              setStrategyError(res.error);
+                              setStrategySetupNeeded(!!res.setup);
+                              setStrategyStatus("error");
+                              return;
+                            }
+                            setStrategy(res.strategy);
+                            setStrategyStatus("ready");
+                          } catch (e) {
+                            setStrategyError((e as Error).message);
+                            setStrategyStatus("error");
+                          }
                         }}
-                        audience={form.audience}
-                        objective={form.meetingObjective}
-                        accent={brandPrimary}
-                        onChange={setPaletteSel}
-                      />
-                    )}
-                  </section>
-
-                  {/* AI Narrative Strategist */}
-                  <StrategistSection
-                    brandName={brand?.name ?? "brand"}
-                    brandPrimary={brandPrimary}
-                    status={strategyStatus}
-                    error={strategyError}
-                    setupNeeded={strategySetupNeeded}
-                    strategy={strategy}
-                    onPlan={async () => {
-                      setStrategyStatus("planning");
-                      setStrategyError(null);
-                      setStrategySetupNeeded(false);
-                      try {
-                        const res = await planStrategyFn({
-                          data: {
-                            brandModeId: form.brandModeId,
-                            subCompany: form.subCompany || undefined,
-                            brief: {
-                              prospect: form.prospect,
-                              industry: form.industry,
-                              audience: form.audience,
-                              meetingObjective: form.meetingObjective,
-                              clientFacts: form.clientFacts,
-                              archetypeId: effectiveArchetypeId,
-                              lengthTarget: form.lengthTarget,
-                            },
-                          },
-                        });
-                        if (!res.ok) {
-                          setStrategyError(res.error);
-                          setStrategySetupNeeded(!!res.setup);
-                          setStrategyStatus("error");
-                          return;
+                        onRemoveSection={(idx: number) =>
+                          setStrategy((s) =>
+                            s ? { ...s, recommendedSections: s.recommendedSections.filter((_, i) => i !== idx) } : s,
+                          )
                         }
-                        setStrategy(res.strategy);
-                        setStrategyStatus("ready");
-                      } catch (e) {
-                        setStrategyError((e as Error).message);
-                        setStrategyStatus("error");
-                      }
-                    }}
-                    onRemoveSection={(idx: number) =>
-                      setStrategy((s) =>
-                        s ? { ...s, recommendedSections: s.recommendedSections.filter((_, i) => i !== idx) } : s,
-                      )
-                    }
-                    onMoveSection={(idx: number, dir: 1 | -1) =>
-                      setStrategy((s) => {
-                        if (!s) return s;
-                        const next = [...s.recommendedSections];
-                        const target = idx + dir;
-                        if (target < 0 || target >= next.length) return s;
-                        [next[idx], next[target]] = [next[target], next[idx]];
-                        return { ...s, recommendedSections: next };
-                      })
-                    }
-                    onDiscard={() => {
-                      setStrategy(null);
-                      setStrategyStatus("idle");
-                      setStrategyError(null);
-                    }}
-                  />
+                        onMoveSection={(idx: number, dir: 1 | -1) =>
+                          setStrategy((s) => {
+                            if (!s) return s;
+                            const next = [...s.recommendedSections];
+                            const target = idx + dir;
+                            if (target < 0 || target >= next.length) return s;
+                            [next[idx], next[target]] = [next[target], next[idx]];
+                            return { ...s, recommendedSections: next };
+                          })
+                        }
+                        onDiscard={() => {
+                          setStrategy(null);
+                          setStrategyStatus("idle");
+                          setStrategyError(null);
+                        }}
+                      />
 
-                  {(kbSelected.length > 0 || kbSynthesis) && (
-                    <KnowledgeUsedPanel
-                      selected={kbSelected}
-                      synthesis={kbSynthesis}
-                      synthesized={kbSynthesized}
-                      open={showKbPanel}
-                      onToggle={() => setShowKbPanel((v) => !v)}
-                    />
-                  )}
+                      {(kbSelected.length > 0 || kbSynthesis) && (
+                        <KnowledgeUsedPanel
+                          selected={kbSelected}
+                          synthesis={kbSynthesis}
+                          synthesized={kbSynthesized}
+                          open={showKbPanel}
+                          onToggle={() => setShowKbPanel((v) => !v)}
+                        />
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </details>
+              </div>
+
 
 
 
@@ -609,12 +668,12 @@ function BriefWizard() {
                     </span>
                   )}
                 </div>
-                <div className="flex flex-col gap-3 sm:flex-row">
+                <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
                   <button
                     type="button"
                     disabled={busy}
-                    className="rounded-lg border-2 px-6 py-3 font-['Urbanist'] text-sm font-bold tracking-tight text-[#0F1B3D] transition-all hover:bg-[#F8FAFC] disabled:opacity-50"
-                    style={{ borderColor: PALETTE.ink }}
+                    className="rounded-lg border-2 bg-white px-6 py-3 font-['Urbanist'] text-sm font-bold tracking-tight text-[#0F1B3D] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#F8FAFC] hover:shadow-sm disabled:opacity-50"
+                    style={{ borderColor: PALETTE.hairline }}
                     onClick={() => {
                       const submission = {
                         ...form,
@@ -632,8 +691,11 @@ function BriefWizard() {
                   <button
                     type="button"
                     disabled={busy}
-                    className="rounded-lg px-8 py-3 font-['Urbanist'] text-sm font-bold tracking-tight text-white shadow-md transition-all active:scale-[0.98] disabled:opacity-50"
-                    style={{ backgroundColor: brandPrimary }}
+                    className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-lg px-9 py-3.5 font-['Urbanist'] text-[15px] font-bold tracking-tight text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50"
+                    style={{
+                      background: `linear-gradient(135deg, ${brandPrimary} 0%, ${brandAccent} 100%)`,
+                      boxShadow: `0 14px 30px -10px ${brandAccent}80, 0 6px 14px -8px ${brandPrimary}80, inset 0 1px 0 rgba(255,255,255,0.18)`,
+                    }}
                     onClick={async () => {
                       setAiError(null);
                       setAiStatus("assembling");
@@ -811,7 +873,9 @@ function BriefWizard() {
                       navigate({ to: "/decks/$deckId", params: { deckId }, hash: "brand-review" });
                     }}
                   >
-                    Assemble with {brand?.name ?? "brand"} →
+                    <svg aria-hidden viewBox="0 0 24 24" width="16" height="16" fill="currentColor" className="relative -ml-1 opacity-90"><path d="M12 2l1.7 5.3L19 9l-5.3 1.7L12 16l-1.7-5.3L5 9l5.3-1.7L12 2zm7 11l.9 2.6L22 16.5l-2.1.9L19 20l-.9-2.6L16 16.5l2.1-.9L19 13z"/></svg>
+                    <span className="relative">Assemble with {brand?.name ?? "brand"}</span>
+                    <span aria-hidden className="relative transition-transform duration-200 group-hover:translate-x-0.5">→</span>
                   </button>
                 </div>
               </div>
