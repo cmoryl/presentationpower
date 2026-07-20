@@ -122,6 +122,8 @@ function DeckEditor() {
 
   const qa = useMemo(() => runQa(deck.slides, deck.brandModeId), [deck.slides, deck.brandModeId]);
   const clientLogoUrl = deck.clientLogo?.primaryUrl ?? null;
+  const logoOrientation = deck.context?.logoOrientation ?? "horizontal";
+
 
 
   return (
