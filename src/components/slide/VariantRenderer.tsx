@@ -254,7 +254,7 @@ export function VariantRenderer(props: Props) {
   return (
     <SlideModeContext.Provider value={mode}>
       <SlideBackdropContext.Provider value={backdrop}>
-        <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany }}>
+        <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany, logoOrientation }}>
           {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c })}
         </SlideFrameCtx.Provider>
       </SlideBackdropContext.Provider>
