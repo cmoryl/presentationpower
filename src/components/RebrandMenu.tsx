@@ -6,6 +6,7 @@ import { useDeckStore } from "@/lib/deck-store";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { BRAND_GUIDES } from "@/lib/brand-guides";
+import { getDivisionLogos } from "@/lib/division-logos";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { MODULE_VARIANTS } from "@/lib/taxonomy";
