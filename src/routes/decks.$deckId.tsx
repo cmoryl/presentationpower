@@ -240,8 +240,10 @@ function DeckEditor() {
               key={`img-${active.id}`}
               mediaUrl={(active.content as Record<string, unknown>).mediaUrl as string | undefined}
               mediaSeed={(active.content as Record<string, unknown>).mediaSeed as string | undefined}
+              divisionId={deck.brandModeId}
               onChange={(next) => updateField(deck.id, active.id, "mediaUrl", next ?? undefined)}
             />
+
           )}
 
           {/* Background & Imagery */}
