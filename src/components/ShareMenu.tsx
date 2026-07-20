@@ -59,11 +59,24 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   }, []);
 
   useEffect(() => {
+    if (!open) return;
     const onDoc = (e: MouseEvent) => {
       if (!ref.current?.contains(e.target as Node)) setOpen(false);
     };
-    if (open) document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    const onKey = (e: KeyboardEvent) => {
+      // Popover menu — Escape closes and returns focus to the trigger button.
+      if (e.key === "Escape") {
+        setOpen(false);
+        const btn = ref.current?.querySelector<HTMLButtonElement>("button");
+        btn?.focus();
+      }
+    };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [open]);
 
   const cloudDeckId = userId && deck ? deckCloudId(userId, deck.id) : null;
@@ -248,6 +261,8 @@ export function ShareMenu({ deckId }: { deckId: string }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
         className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 px-4 py-2 text-sm font-medium text-black backdrop-blur hover:border-black/30 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:border-white/30"
       >
         <Share2 size={14} />

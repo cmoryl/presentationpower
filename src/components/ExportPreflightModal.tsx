@@ -3,7 +3,9 @@
 // fetch in the exporter). Users can jump to an affected slide, cancel,
 // or export anyway.
 
+import { useRef } from "react";
 import type { PreflightIssue } from "@/lib/export-preflight";
+import { useModalA11y } from "@/hooks/use-modal-a11y";
 
 export function ExportPreflightModal({
   open,
@@ -20,6 +22,8 @@ export function ExportPreflightModal({
   onExportAnyway: () => void;
   onJumpToSlide?: (slideId: string) => void;
 }) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useModalA11y({ open, onClose: onCancel, containerRef: dialogRef });
   if (!open) return null;
   const corsCount = issues.filter((i) => i.kind === "cors-image").length;
 
@@ -29,14 +33,19 @@ export function ExportPreflightModal({
       onClick={onCancel}
     >
       <div
-        className="w-full max-w-[560px] rounded-2xl border border-white/15 bg-white text-black shadow-2xl"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="export-preflight-title"
+        tabIndex={-1}
+        className="w-full max-w-[560px] rounded-2xl border border-white/15 bg-white text-black shadow-2xl outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         <header className="border-b border-black/10 px-6 py-5">
           <div className="text-[11px] uppercase tracking-widest text-amber-700">
             Export preflight
           </div>
-          <h2 className="mt-1 text-xl font-semibold">
+          <h2 id="export-preflight-title" className="mt-1 text-xl font-semibold">
             {issues.length} {issues.length === 1 ? "issue" : "issues"} may affect this export
           </h2>
           {corsCount > 0 && (
