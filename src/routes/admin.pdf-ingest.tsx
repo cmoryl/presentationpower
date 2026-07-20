@@ -24,6 +24,7 @@ function PdfIngestPage() {
   const ingest = useServerFn(ingestPdfBatch);
   const listRows = useServerFn(listPdfExtractions);
   const getText = useServerFn(getPdfExtractionText);
+  const embed = useServerFn(embedPdfExtractions);
 
   const indexQ = useQuery({ queryKey: ["pdf-index"], queryFn: () => fetchIndex() });
   const rowsQ = useQuery({ queryKey: ["pdf-extractions"], queryFn: () => listRows() });
@@ -33,6 +34,10 @@ function PdfIngestPage() {
   const [skipExisting, setSkipExisting] = useState(true);
   const [openId, setOpenId] = useState<string | null>(null);
   const [runLog, setRunLog] = useState<string>("");
+  const [embedEntity, setEmbedEntity] = useState<string>("");
+  const [embedLimit, setEmbedLimit] = useState<number>(5);
+  const [embedLog, setEmbedLog] = useState<string>("");
+
 
   const ingestMut = useMutation({
     mutationFn: async () => {
