@@ -1,32 +1,89 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useMemo, useState } from "react";
+import { z } from "zod";
 import { useDeckStore } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { supabase } from "@/integrations/supabase/client";
+import { deckCloudId } from "@/lib/deck-uuid";
+import { getDeckSlideTranslations, listLanguages } from "@/lib/translation.functions";
 
 export const Route = createFileRoute("/decks/$deckId/print")({
   head: () => ({ meta: [{ title: "Print · TransPerfect Modular" }] }),
+  validateSearch: (raw) =>
+    z.object({ lang: z.string().min(2).max(10).optional() }).parse(raw),
   component: PrintView,
 });
 
 function PrintView() {
   const { deckId } = Route.useParams();
+  const { lang } = Route.useSearch();
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
 
+  const fetchTx = useServerFn(getDeckSlideTranslations);
+  const listLangs = useServerFn(listLanguages);
+  const [overlay, setOverlay] = useState<Map<number, Record<string, unknown>> | null>(null);
+  const [isRtl, setIsRtl] = useState(false);
+  const [loading, setLoading] = useState<boolean>(!!lang);
+
+  // Fetch translations for the requested language, then trigger print.
   useEffect(() => {
-    // Auto-open print dialog after slides mount
-    const t = setTimeout(() => window.print(), 700);
-    return () => clearTimeout(t);
-  }, []);
+    let cancelled = false;
+    if (!lang || !deck) {
+      setLoading(false);
+      const t = setTimeout(() => window.print(), 700);
+      return () => clearTimeout(t);
+    }
+    (async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        const uid = data.session?.user.id;
+        if (!uid) throw new Error("Sign in required for translated print");
+        const cloudId = deckCloudId(uid, deckId);
+        const [rows, langs] = await Promise.all([
+          fetchTx({ data: { deckId: cloudId, targetLang: lang } }),
+          listLangs().catch(() => [] as Array<{ id: string; rtl: boolean }>),
+        ]);
+        if (cancelled) return;
+        const map = new Map<number, Record<string, unknown>>();
+        for (const r of rows as Array<{ position: number; content: unknown }>) {
+          if (r.content && typeof r.content === "object") map.set(r.position, r.content as Record<string, unknown>);
+        }
+        setOverlay(map);
+        const l = (langs as Array<{ id: string; rtl: boolean }>).find((x) => x.id === lang);
+        setIsRtl(!!l?.rtl);
+      } catch {
+        // fall through with no overlay
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+          setTimeout(() => window.print(), 700);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [lang, deckId, deck, fetchTx, listLangs]);
+
+  const overlaidSlides = useMemo(() => {
+    if (!deck) return [];
+    if (!overlay) return deck.slides;
+    return deck.slides.map((s) => {
+      const t = overlay.get(s.position);
+      return t ? { ...s, content: t } : s;
+    });
+  }, [deck, overlay]);
 
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
   const clientLogoUrl = deck.clientLogo?.primaryUrl ?? null;
 
   return (
-    <div className="print-root min-h-screen bg-neutral-200 py-8 print:bg-white print:py-0">
+    <div className="print-root min-h-screen bg-neutral-200 py-8 print:bg-white print:py-0" dir={isRtl ? "rtl" : undefined}>
       <style>{`
         @media print {
           @page { size: 1280px 720px landscape; margin: 0; }
@@ -40,13 +97,21 @@ function PrintView() {
       `}</style>
       <div className="no-print mx-auto mb-6 max-w-[1280px] px-6 text-xs text-black/60">
         <div className="rounded-lg border border-black/10 bg-white p-3">
-          <strong>Ready to print.</strong> If the dialog didn't open,{" "}
-          <button className="underline" onClick={() => window.print()}>click here</button>.
-          Select "Save as PDF" as the destination for a print-faithful PDF at 16:9.
+          <strong>{loading ? "Preparing translated slides…" : "Ready to print."}</strong>{" "}
+          {!loading && (
+            <>
+              If the dialog didn't open,{" "}
+              <button className="underline" onClick={() => window.print()}>click here</button>. Select "Save as PDF" for
+              a print-faithful PDF at 16:9.
+            </>
+          )}
+          {lang && !loading && (
+            <span className="ml-1 text-black/40">Language: {lang.toUpperCase()}</span>
+          )}
         </div>
       </div>
       <div className="mx-auto flex max-w-[1280px] flex-col items-center gap-6 print:max-w-none print:gap-0">
-        {deck.slides.map((slide, i) => {
+        {overlaidSlides.map((slide, i) => {
           const variant = byId(MODULE_VARIANTS, slide.variantId);
           if (!variant) return null;
           return (
