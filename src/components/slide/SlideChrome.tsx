@@ -296,6 +296,7 @@ export function SlideFrame({
             clientName={clientName}
             clientLogoUrl={clientLogoUrl ?? null}
             subCompany={subCompany}
+            orientation={logoOrientation}
           />
         </div>
       )}
