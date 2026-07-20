@@ -65,16 +65,20 @@ async function rasterizeToPng(file: File): Promise<File> {
 export function SlideImageryPanel({
   mediaUrl,
   mediaSeed,
+  divisionId,
   onChange,
 }: {
   mediaUrl?: string;
   mediaSeed?: string;
+  divisionId?: string;
   onChange: (nextUrl: string | null) => void;
 }) {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [urlDraft, setUrlDraft] = useState("");
+  const [libQuery, setLibQuery] = useState("");
+  const [libOpen, setLibOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
