@@ -18,7 +18,6 @@ type SbClient = {
       upload: (path: string, body: ArrayBuffer | Uint8Array | Blob, opts?: { contentType?: string; upsert?: boolean }) => Promise<{ data: unknown; error: { message?: string } | null }>;
       remove: (paths: string[]) => Promise<{ data: unknown; error: unknown }>;
       createSignedUrl: (path: string, expires: number) => Promise<{ data: { signedUrl: string } | null; error: unknown }>;
-      download: (path: string) => Promise<{ data: Blob | null; error: { message?: string } | null }>;
     };
   };
 };
