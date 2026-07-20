@@ -11,6 +11,9 @@ import { VersionHistoryButton } from "@/components/VersionHistoryDrawer";
 import { DuplicateDeckButton, TemplateToggleButton } from "@/components/DeckActions";
 import { RebrandMenu } from "@/components/RebrandMenu";
 import { BrandReviewPanel } from "@/components/BrandReviewPanel";
+import { CommentsPanel } from "@/components/CommentsPanel";
+import { ReviewStatusControl } from "@/components/ReviewStatusControl";
+import { MessageSquare } from "lucide-react";
 import { UndoRedoControls } from "@/components/UndoRedoControls";
 import { SwapLayoutButton } from "@/components/SwapLayoutPicker";
 import { useDeckStore, type DeckClientLogo } from "@/lib/deck-store";
@@ -64,6 +67,9 @@ function DeckEditor() {
   const [zoomed, setZoomed] = useState(false);
   const [flashIndices, setFlashIndices] = useState<number[]>([]);
   const [pptxPreviewOpen, setPptxPreviewOpen] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [commentCounts, setCommentCounts] = useState<Map<number | "deck", number>>(new Map());
+  const totalOpen = useMemo(() => Array.from(commentCounts.values()).reduce((a, b) => a + b, 0), [commentCounts]);
 
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
@@ -92,7 +98,25 @@ function DeckEditor() {
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap justify-end">
+          <ReviewStatusControl localDeckId={deckId} />
+          <button
+            type="button"
+            onClick={() => setCommentsOpen((v) => !v)}
+            className={`relative inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium backdrop-blur transition ${
+              commentsOpen
+                ? "border-[#003FC7]/40 bg-[#003FC7]/10 text-[#003FC7] dark:border-[#A1FBF9]/30 dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]"
+                : "border-black/15 bg-white/70 text-black hover:border-black/30 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:border-white/30"
+            }`}
+            title="Comments"
+          >
+            <MessageSquare size={14} /> Comments
+            {totalOpen > 0 && (
+              <span className="ml-0.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-[#003FC7] px-1.5 text-[10px] font-semibold text-white">
+                {totalOpen}
+              </span>
+            )}
+          </button>
           <UndoRedoControls />
           <AutosaveIndicator deckId={deckId} />
           <DuplicateDeckButton deckId={deckId} />
@@ -127,6 +151,14 @@ function DeckEditor() {
                     <div className="flex items-center justify-between">
                       <span className="font-medium">{String(i + 1).padStart(2, "0")} · {byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}</span>
                       <span className="flex items-center gap-1.5">
+                        {(commentCounts.get(i) ?? 0) > 0 && (
+                          <span
+                            title={`${commentCounts.get(i)} open comment${commentCounts.get(i) === 1 ? "" : "s"}`}
+                            className="inline-flex items-center gap-0.5 rounded-full bg-[#003FC7]/10 px-1.5 text-[10px] font-medium text-[#003FC7]"
+                          >
+                            💬{commentCounts.get(i)}
+                          </span>
+                        )}
                         {slide.notes && slide.notes.trim() && (
                           <span title="Has speaker notes" className="text-[#0B2A4A]">✎</span>
                         )}
@@ -454,6 +486,27 @@ function DeckEditor() {
       )}
 
       <BrandReviewPanel deckId={deckId} onNavigateToSlide={(i) => setActiveIdx(Math.max(0, Math.min(deck.slides.length - 1, i)))} />
+
+      {commentsOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]"
+            onClick={() => setCommentsOpen(false)}
+            aria-hidden="true"
+          />
+          <aside
+            role="dialog"
+            aria-label="Deck comments"
+            className="fixed right-4 top-20 z-50 w-[400px] max-w-[calc(100vw-2rem)]"
+          >
+            <CommentsPanel
+              localDeckId={deckId}
+              slideIndex={clamped}
+              onCountChange={setCommentCounts}
+            />
+          </aside>
+        </>
+      )}
     </AppShell>
   );
 }

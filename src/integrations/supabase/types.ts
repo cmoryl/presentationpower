@@ -602,6 +602,57 @@ export type Database = {
         }
         Relationships: []
       }
+      deck_comments: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          deck_id: string
+          id: string
+          parent_id: string | null
+          resolved: boolean
+          slide_index: number | null
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          deck_id: string
+          id?: string
+          parent_id?: string | null
+          resolved?: boolean
+          slide_index?: number | null
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          deck_id?: string
+          id?: string
+          parent_id?: string | null
+          resolved?: boolean
+          slide_index?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deck_comments_deck_id_fkey"
+            columns: ["deck_id"]
+            isOneToOne: false
+            referencedRelation: "decks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deck_comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "deck_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deck_reviews: {
         Row: {
           created_at: string
@@ -816,6 +867,10 @@ export type Database = {
           id: string
           is_template: boolean
           owner_id: string
+          review_note: string | null
+          review_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
           share_expires_at: string | null
           share_token: string | null
           shared_at: string | null
@@ -832,6 +887,10 @@ export type Database = {
           id?: string
           is_template?: boolean
           owner_id: string
+          review_note?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           share_expires_at?: string | null
           share_token?: string | null
           shared_at?: string | null
@@ -848,6 +907,10 @@ export type Database = {
           id?: string
           is_template?: boolean
           owner_id?: string
+          review_note?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           share_expires_at?: string | null
           share_token?: string | null
           shared_at?: string | null
