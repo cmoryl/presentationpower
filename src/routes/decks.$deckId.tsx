@@ -208,6 +208,32 @@ function DeckEditor() {
                     </div>
 
                     <div className="text-black/50">{variant?.name}</div>
+                    {(() => {
+                      const st = slideLangMap.get(i);
+                      if (!st || (st.ready.length === 0 && st.pending.length === 0)) return null;
+                      return (
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {st.ready.map((l) => (
+                            <span
+                              key={`r-${l}`}
+                              title={`${l.toUpperCase()} · cached`}
+                              className="inline-flex items-center rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-emerald-700"
+                            >
+                              {l}
+                            </span>
+                          ))}
+                          {st.pending.map((l) => (
+                            <span
+                              key={`p-${l}`}
+                              title={`${l.toUpperCase()} · pending`}
+                              className="inline-flex items-center rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-amber-700"
+                            >
+                              {l}…
+                            </span>
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </button>
                 <div className="absolute right-1 top-1 flex gap-1 opacity-0 transition group-hover:opacity-100">
