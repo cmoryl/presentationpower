@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AdminShell } from "@/components/AdminShell";
 import {
   fetchPdfIndex,
   ingestPdfBatch,
@@ -15,11 +14,7 @@ export const Route = createFileRoute("/admin/pdf-ingest")({
   head: () => ({
     meta: [{ title: "PDF Ingestion · Admin · TransPerfect" }],
   }),
-  component: () => (
-    <AdminShell>
-      <PdfIngestPage />
-    </AdminShell>
-  ),
+  component: PdfIngestPage,
 });
 
 function PdfIngestPage() {
