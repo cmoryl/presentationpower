@@ -110,11 +110,14 @@ export const oracleChat = createServerFn({ method: "POST" })
                 filter_division: filterDivision,
               });
               let rows = (chunks ?? []) as Array<{ id: string; asset_id: string; content: string }>;
-              if (rows.length === 0 && filterDivision) {
-                const { data: un } = await s.rpc("match_brand_chunks", {
-                  query_embedding: embeddingLiteral, match_count: 5, filter_division: null,
-                });
-                rows = (un ?? []) as typeof rows;
+              if (filterDivision) {
+                divisionScoped = rows.length > 0;
+                if (rows.length === 0) {
+                  const { data: un } = await s.rpc("match_brand_chunks", {
+                    query_embedding: embeddingLiteral, match_count: 5, filter_division: null,
+                  });
+                  rows = (un ?? []) as typeof rows;
+                }
               }
               if (rows.length) {
                 const { data: assets } = await (s.from("brand_assets").select("id, title") as any).in("id", rows.map((r) => r.asset_id));
