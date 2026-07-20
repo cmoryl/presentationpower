@@ -35,6 +35,8 @@ export function LanguageSwitcher({
   const fetchTx = useServerFn(getDeckSlideTranslations);
   const cacheTx = useServerFn(cacheDeckTranslation);
 
+  const storageKey = cloudDeckId ? `deck-locale:${cloudDeckId}` : null;
+
   const [open, setOpen] = useState(false);
   const [languages, setLanguages] = useState<LangRow[]>([]);
   const [cached, setCached] = useState<LocaleRow[]>([]);
@@ -42,6 +44,7 @@ export function LanguageSwitcher({
   const [busy, setBusy] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [restored, setRestored] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -66,9 +69,47 @@ export function LanguageSwitcher({
   };
 
   useEffect(() => {
+    setRestored(false);
     refreshCached();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cloudDeckId]);
+
+  // Restore last-selected locale for this deck after refresh — translated rows
+  // live in public.slide_translations, so we replay the fetch and re-apply.
+  useEffect(() => {
+    if (restored || !cloudDeckId || !storageKey || languages.length === 0) return;
+    const saved = typeof window !== "undefined" ? window.localStorage.getItem(storageKey) : null;
+    if (!saved || saved === "en") {
+      setRestored(true);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const rows = (await fetchTx({ data: { deckId: cloudDeckId, targetLang: saved } })) as Array<{
+          position: number;
+          content: unknown;
+        }>;
+        if (cancelled || rows.length === 0) return;
+        const byPosition = new Map<number, Record<string, unknown>>();
+        for (const r of rows) {
+          if (r.content && typeof r.content === "object")
+            byPosition.set(r.position, r.content as Record<string, unknown>);
+        }
+        const rtl = languages.find((l) => l.id === saved)?.rtl ?? false;
+        setCurrent(saved);
+        onChange({ lang: saved, byPosition, rtl });
+      } catch {
+        /* ignore — fall back to source */
+      } finally {
+        if (!cancelled) setRestored(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cloudDeckId, languages.length, restored]);
 
   const langById = useMemo(() => new Map(languages.map((l) => [l.id, l])), [languages]);
 
