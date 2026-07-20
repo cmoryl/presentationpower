@@ -184,6 +184,7 @@ export const getImportedDeckFull = createServerFn({ method: "GET" })
     };
   });
 
+export const deleteImportedDeck = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
   .handler(async ({ data, context }) => {
