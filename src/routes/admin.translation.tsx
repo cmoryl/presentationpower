@@ -184,8 +184,8 @@ function TranslationAdminPage() {
           ))}
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-black/10">
-          <table className="w-full text-sm text-black/80">
+        <div className="overflow-x-auto rounded-xl border border-black/10">
+          <table className="w-full min-w-[560px] text-sm text-black/80">
             <thead className="bg-black/[0.03] text-xs uppercase tracking-widest text-black/50">
               <tr>
                 <th className="px-3 py-2 text-left">Term</th>
@@ -197,10 +197,14 @@ function TranslationAdminPage() {
             </thead>
             <tbody>
               {filtered.map((g) => (
-                <tr key={g.id} className="border-t border-black/5">
-                  <td className="px-3 py-2 font-medium text-[#03002C]">{g.term}</td>
+                <tr key={g.id} className="border-t border-black/5 align-top">
+                  <td className="px-3 py-2 font-medium text-[#03002C]">
+                    <div className="max-w-[220px] truncate" title={g.term}>{g.term}</div>
+                  </td>
                   <td className="px-3 py-2">{g.scope}</td>
-                  <td className="px-3 py-2 font-mono text-xs text-black/50">{g.scope_id ?? "—"}</td>
+                  <td className="px-3 py-2 font-mono text-xs text-black/50">
+                    <div className="max-w-[160px] truncate" title={g.scope_id ?? ""}>{g.scope_id ?? "—"}</div>
+                  </td>
                   <td className="px-3 py-2">{g.do_not_translate ? "Yes" : "No"}</td>
                   <td className="px-3 py-2 text-right">
                     <button
@@ -223,6 +227,7 @@ function TranslationAdminPage() {
             </tbody>
           </table>
         </div>
+
       </section>
 
       {/* Languages */}
