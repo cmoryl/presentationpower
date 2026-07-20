@@ -196,6 +196,39 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     }
   };
 
+  const onTranslatedPptx = async (lang: string) => {
+    if (!deck || !cloudDeckId) return;
+    setTranslatedBusy(`pptx:${lang}`);
+    try {
+      const rows = (await getSlideTxFn({ data: { deckId: cloudDeckId, targetLang: lang } })) as Array<{
+        position: number;
+        content: Record<string, unknown>;
+      }>;
+      const overlay = new Map(rows.map((r) => [r.position, r.content]));
+      const langLabel = langLabels[lang] ?? lang.toUpperCase();
+      const translatedDeck: Deck = {
+        ...deck,
+        title: `${deck.title} — ${langLabel}`,
+        slides: deck.slides.map((s) => {
+          const t = overlay.get(s.position);
+          return t ? { ...s, content: t as typeof s.content } : s;
+        }),
+      };
+      await exportDeckToPptx(translatedDeck, brand, { strategy: deck.context?.strategy ?? null });
+      stamp("pptx");
+    } catch (e) {
+      console.error("[translated pptx export]", e);
+    } finally {
+      setTranslatedBusy(null);
+    }
+  };
+
+  const onTranslatedPdf = (lang: string) => {
+    stamp("pdf");
+    setOpen(false);
+    window.open(`/decks/${deckId}/print?lang=${encodeURIComponent(lang)}`, "_blank", "noopener,noreferrer");
+  };
+
   const shareUrl = shareToken
     ? `${typeof window !== "undefined" ? window.location.origin : ""}/share/${shareToken}`
     : null;
