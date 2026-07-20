@@ -130,12 +130,14 @@ export function BackgroundImageryPanel({
   slides,
   activeSlideId,
   onApplyToSlides,
+  divisionId,
 }: {
   value: unknown;
   onChange: (next: SlideBackgroundValue | null) => void;
   slides?: ApplyTargetSlide[];
   activeSlideId?: string;
   onApplyToSlides?: (slideIds: string[], next: SlideBackgroundValue | null) => void;
+  divisionId?: string | null;
 }) {
   const current = useMemo(() => resolveSlideBackground(value), [value]);
   const [tab, setTab] = useState<Tab>(() => {
