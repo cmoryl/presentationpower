@@ -168,7 +168,7 @@ function BriefWizard() {
                 style={{ color: brandPrimary }}
               >
                 <span className="inline-block h-[2px] w-4" style={{ backgroundColor: brandPrimary }} />
-                Step 01 · Briefing engine
+                Briefing engine
               </div>
               <h1 className="mt-3 font-['Urbanist'] text-2xl font-extrabold uppercase tracking-tighter text-[#0F1B3D] sm:text-3xl">
                 New Pitch Deck Brief
