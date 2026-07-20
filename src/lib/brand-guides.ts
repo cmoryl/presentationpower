@@ -353,7 +353,7 @@ const DIVISION_SEEDS: DivisionSeed[] = [
     ],
     subBrandGroup: {
       group: "Digital & Agency",
-      items: ["TransPerfect Digital", "The Mill", "Bear Down", "Avatria"],
+      items: ["TransPerfect Digital"],
     },
     photography:
       "E-commerce and retail settings, hands on devices, campaign photography with warm secondary tones. Keep imagery bright and human — this division sells experience, not infrastructure.",
