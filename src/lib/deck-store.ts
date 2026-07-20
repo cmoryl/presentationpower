@@ -47,6 +47,16 @@ export type AiChange = {
   accepted: boolean;
 };
 
+export type SlideLogoPosition =
+  | "auto"
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right"
+  | "hidden";
+
 export type DeckSlide = {
   id: string;
   position: number;
@@ -56,7 +66,10 @@ export type DeckSlide = {
   content: SlideContent;
   changes: AiChange[];
   notes?: string;
+  logoPosition?: SlideLogoPosition;
+  logoOrientation?: "auto" | "horizontal" | "stacked";
 };
+
 
 
 export type DeckClientLogo = {
