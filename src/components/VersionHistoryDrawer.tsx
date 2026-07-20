@@ -248,7 +248,7 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
               <History className="h-4 w-4 text-[#050B18]" />
             </div>
             <div>
-              <div className="text-[10px] uppercase tracking-[0.24em] text-white/50">Version history</div>
+              <div id="version-history-title" className="text-[10px] uppercase tracking-[0.24em] text-white/50">Version history</div>
               <div className="text-base font-medium">{deck?.title ?? "Deck"}</div>
             </div>
           </div>
