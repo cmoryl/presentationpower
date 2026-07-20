@@ -249,38 +249,56 @@ function BriefWizard() {
                   {brandModes.map((b) => {
                     const active = form.brandModeId === b.id;
                     const c = b.tokens?.primary || PALETTE.blue;
+                    const a = b.tokens?.accent || c;
                     return (
                       <button
                         key={b.id}
                         type="button"
                         onClick={() => selectBrand(b.id)}
                         aria-pressed={active}
-                         className="group grid min-h-[148px] cursor-pointer grid-rows-[auto_1fr_auto] gap-3 rounded-xl border-2 p-4 text-left transition-all hover:-translate-y-0.5"
+                        className="group relative grid min-h-[172px] cursor-pointer grid-rows-[auto_1fr_auto] gap-3 overflow-hidden rounded-xl border-2 p-4 text-left transition-all duration-300 ease-out hover:-translate-y-1"
                         style={{
                           borderColor: active ? c : PALETTE.hairline,
-                          backgroundColor: active ? `${c}0d` : PALETTE.surface,
-                          boxShadow: active ? `0 0 0 3px ${c}22` : undefined,
+                          backgroundColor: PALETTE.surface,
+                          boxShadow: active
+                            ? `0 12px 28px -12px ${c}55, 0 0 0 3px ${c}22`
+                            : "0 1px 2px rgba(15,27,61,0.04)",
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!active) e.currentTarget.style.boxShadow = `0 14px 30px -16px ${c}66, 0 0 0 1px ${c}22`;
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!active) e.currentTarget.style.boxShadow = "0 1px 2px rgba(15,27,61,0.04)";
                         }}
                       >
-                        <div className="flex min-w-0 items-center justify-end">
+                        <span
+                          aria-hidden
+                          className="pointer-events-none absolute inset-0 transition-opacity duration-300"
+                          style={{
+                            background: `radial-gradient(120% 100% at 0% 0%, ${c}14 0%, transparent 55%), linear-gradient(135deg, ${c}0a 0%, ${a}10 100%)`,
+                            opacity: active ? 1 : 0.55,
+                          }}
+                        />
+                        <div className="relative flex min-w-0 items-center justify-end">
                           <span
-                            className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
+                            className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest transition-colors"
                             style={{
-                              backgroundColor: active ? c : PALETTE.page,
-                              color: active ? "#fff" : PALETTE.inkSoft,
+                              backgroundColor: active ? c : `${c}14`,
+                              color: active ? "#fff" : c,
                             }}
                           >
                             {b.role ?? "brand"}
                           </span>
                         </div>
-                        <div className="flex min-w-0 max-w-full items-center">
-                          <BrandLockup brand={b} color={c} size="2xs" clientName={form.prospect} />
+                        <div className="relative flex min-w-0 max-w-full items-center">
+                          <BrandLockup brand={b} color={c} size="xs" clientName={form.prospect} />
                         </div>
-                        <p className="text-[11px] leading-snug text-[#1E3A5F]/75">{b.description}</p>
+                        <p className="relative text-[11px] leading-snug text-[#1E3A5F]/80">{b.description}</p>
                       </button>
                     );
                   })}
                 </div>
+
 
                 {/* Sub-company selector (only for the generic Subcompany mode) */}
                 {form.brandModeId === "bm-subcompany" && (
