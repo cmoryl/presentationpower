@@ -123,6 +123,58 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
   const [presenting, setPresenting] = useState(false);
   const [i, setI] = useState(0);
 
+  // ---- Language overlay ----
+  const listLocalesFn = useServerFn(listSharedLocales);
+  const fetchTxFn = useServerFn(getSharedDeckTranslations);
+  const listLangsFn = useServerFn(listLanguages);
+  const [locales, setLocales] = useState<Array<{ target_lang: string; ready: number; total: number }>>([]);
+  const [langs, setLangs] = useState<Array<{ id: string; label: string; native: string; rtl: boolean }>>([]);
+  const [currentLang, setCurrentLang] = useState<string>("en");
+  const [overlay, setOverlay] = useState<Map<number, Record<string, unknown>> | null>(null);
+  const [langOpen, setLangOpen] = useState(false);
+  const [langBusy, setLangBusy] = useState<string | null>(null);
+
+  useEffect(() => {
+    listLocalesFn({ data: { token } })
+      .then((r) => setLocales((r as typeof locales) ?? []))
+      .catch(() => {});
+    listLangsFn()
+      .then((r) => setLangs(r as typeof langs))
+      .catch(() => {});
+  }, [token, listLocalesFn, listLangsFn]);
+
+  const langById = useMemo(() => new Map(langs.map((l) => [l.id, l])), [langs]);
+  const isRtl = currentLang !== "en" && (langById.get(currentLang)?.rtl ?? false);
+
+  async function selectLocale(lang: string) {
+    if (lang === "en") {
+      setCurrentLang("en");
+      setOverlay(null);
+      setLangOpen(false);
+      return;
+    }
+    setLangBusy(lang);
+    try {
+      const rows = (await fetchTxFn({ data: { token, targetLang: lang } })) as Array<{
+        position: number;
+        content: unknown;
+      }>;
+      const map = new Map<number, Record<string, unknown>>();
+      for (const r of rows) if (r.content && typeof r.content === "object") map.set(r.position, r.content as Record<string, unknown>);
+      setOverlay(map);
+      setCurrentLang(lang);
+      setLangOpen(false);
+    } finally {
+      setLangBusy(null);
+    }
+  }
+
+  const viewSlide = (s: DeckSlide): DeckSlide => {
+    if (!overlay) return s;
+    const t = overlay.get(s.position);
+    return t ? { ...s, content: t } : s;
+  };
+
   // ---- Analytics: record share view (excludes owner) ----
   const recordFn = useServerFn(recordShareView);
   const viewedSlidesRef = useRef<Set<number>>(new Set());
