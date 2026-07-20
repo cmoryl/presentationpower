@@ -84,11 +84,11 @@ const CLASSIC_MANIFEST: Record<string, ClassicPresence> = {
   legal:   { color: "png", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
   lifesci: { color: "svg", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
   media:   { color: "svg", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
-  // TransPerfect Digital + DataForce classic horizontal marks sourced from
-  // transperfectdigital.com and dataforcecommunity.transperfect.com. Stacked
-  // variants continue to fall back to the NEXT set until classics land.
-  digital:   { color: "png", white: "png" },
-  dataforce: { color: "png", white: "png" },
+  // TransPerfect Digital + DataForce classic marks sourced from
+  // transperfectdigital.com and dataforcecommunity.transperfect.com.
+  // Stacked variants derived from the horizontal wordmarks (top/bottom split).
+  digital:   { color: "png", white: "png", stackedColor: "png", stackedWhite: "png" },
+  dataforce: { color: "png", white: "png", stackedColor: "png", stackedWhite: "png" },
   // globallink: no classic BrandHub logo in seed yet; continue using NEXT.
 };
 
