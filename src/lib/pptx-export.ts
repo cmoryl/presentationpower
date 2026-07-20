@@ -56,10 +56,17 @@ function resolveSlideImageUrl(
   return pickDivisionImage(brandId, seedHash(seed));
 }
 
-async function fetchAsDataUrl(url: string): Promise<string | null> {
+async function fetchAsDataUrl(url: string, label?: string): Promise<string | null> {
   try {
-    const res = await fetch(url);
-    if (!res.ok) return null;
+    // `mode: "cors"` is the default for cross-origin fetches, but stating it
+    // explicitly makes the failure mode obvious in devtools when a pasted
+    // image URL lacks CORS headers. Supabase signed URLs and most CDNs
+    // (Unsplash, Cloudinary, etc.) send `access-control-allow-origin: *`.
+    const res = await fetch(url, { mode: "cors", credentials: "omit" });
+    if (!res.ok) {
+      console.warn(`[pptx-export] ${label ?? "image"} fetch ${res.status}: ${url}`);
+      return null;
+    }
     const blob = await res.blob();
     return await new Promise<string>((resolve, reject) => {
       const r = new FileReader();
@@ -67,7 +74,11 @@ async function fetchAsDataUrl(url: string): Promise<string | null> {
       r.onerror = () => reject(r.error);
       r.readAsDataURL(blob);
     });
-  } catch {
+  } catch (e) {
+    console.warn(
+      `[pptx-export] ${label ?? "image"} fetch failed (likely CORS): ${url}`,
+      e,
+    );
     return null;
   }
 }
@@ -108,11 +119,16 @@ export async function exportDeckToPptx(
   ]);
 
   // Prefetch all slide imagery in parallel so the export runs quickly.
+  // Custom `content.mediaUrl` failures are logged with the slide index so a
+  // client-photo-drop is visible in the console, not silent.
   const slideImages: Array<string | null> = await Promise.all(
-    deck.slides.map((slide) => {
+    deck.slides.map((slide, idx) => {
       const c = slide.content as Record<string, unknown>;
       const url = resolveSlideImageUrl(slide.variantId, deck.brandModeId, c);
-      return url ? fetchAsDataUrl(url) : Promise.resolve(null);
+      if (!url) return Promise.resolve(null);
+      const isCustom =
+        typeof c.mediaUrl === "string" && c.mediaUrl.length > 0 && c.mediaUrl === url;
+      return fetchAsDataUrl(url, isCustom ? `slide ${idx + 1} custom image` : `slide ${idx + 1} imagery`);
     }),
   );
 
@@ -171,18 +187,25 @@ export async function exportDeckToPptx(
       }
     }
 
-    // 3. Legacy cover/divider imagery underlay — only when the slide has no
-    //    explicit Backgrounds & Imagery selection. Preserves prior behavior
-    //    for decks that predate the panel.
+    // 3. Slide-imagery underlay — a full-bleed photograph with a palette
+    //    scrim. Fires for every variant whose editor renderer surfaces a
+    //    photograph (see `variantSupportsImagery`), so custom `mediaUrl`
+    //    uploads from SlideImageryPanel survive PPTX export the same way
+    //    covers and dividers already do. Skipped when the slide already
+    //    carries an explicit image-typed Backgrounds & Imagery selection.
     const imgData = slideImages[i];
-    if (!bgIsImage && imgData && (kind === "cover" || kind === "divider")) {
+    if (!bgIsImage && imgData && variantSupportsImagery(slide.variantId)) {
       s.addImage({
         data: imgData, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H,
         sizing: { type: "cover", w: SLIDE_W, h: SLIDE_H },
       });
+      // Cover/divider get the strong brand wash they historically had;
+      // other image variants use a lighter scrim so the picture reads
+      // through while remaining legible under the renderer's text.
+      const scrimTransparency = kind === "cover" || kind === "divider" ? 35 : 55;
       s.addShape("rect", {
         x: 0, y: 0, w: SLIDE_W, h: SLIDE_H,
-        fill: { color: palette.primary, transparency: 35 },
+        fill: { color: palette.primary, transparency: scrimTransparency },
         line: { color: palette.primary, transparency: 100 },
       });
     }
