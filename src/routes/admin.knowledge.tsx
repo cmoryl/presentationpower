@@ -17,7 +17,7 @@ export const Route = createFileRoute("/admin/knowledge")({
   component: AdminKnowledgeBrowser,
 });
 
-type Tab = "overview" | "colors" | "type" | "logo" | "subbrands" | "intel" | "sources" | "voiceover";
+type Tab = "overview" | "colors" | "type" | "logo" | "subbrands" | "intel" | "sources" | "imported" | "voiceover";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "overview", label: "Overview" },
@@ -27,8 +27,10 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "subbrands", label: "Sub-brands" },
   { id: "intel", label: "BrandHub intel" },
   { id: "sources", label: "Source documents" },
+  { id: "imported", label: "Imported decks" },
   { id: "voiceover", label: "Voiceover topics" },
 ];
+
 
 
 type CanvaPaletteEntry = {
