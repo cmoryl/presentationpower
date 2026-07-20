@@ -153,7 +153,37 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
   });
 
 
-export const deleteImportedDeck = createServerFn({ method: "POST" })
+// Re-parses the stored .pptx to return per-slide extracted content INCLUDING
+// embedded images + theme. Used by the View modal to render reconstructed
+// (not pixel-perfect) slide previews without bloating the imported_decks row.
+export const getImportedDeckFull = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
+  .handler(async ({ data, context }) => {
+    const s = context.supabase as unknown as SbClient;
+    const { data: row } = await s
+      .from("imported_decks")
+      .select("id, original_filename, slide_count, storage_path, theme")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!row) throw new Error("Not found");
+    const r = row as { id: string; original_filename: string; slide_count: number; storage_path: string; theme: unknown };
+
+    const dl = await s.storage.from(BUCKET).download(r.storage_path);
+    if (dl.error || !dl.data) throw new Error(`Could not read stored file: ${dl.error?.message ?? "missing"}`);
+    const ab = await dl.data.arrayBuffer();
+    const parsed = await parsePptxBuffer(new Uint8Array(ab), r.original_filename);
+    return {
+      id: r.id,
+      original_filename: r.original_filename,
+      slide_count: parsed.slideCount,
+      theme: parsed.theme,
+      slides: parsed.slides,
+      imagePayloadBytes: parsed.imagePayloadBytes,
+      imagesTruncated: parsed.imagesTruncated,
+    };
+  });
+
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
   .handler(async ({ data, context }) => {
