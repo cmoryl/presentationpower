@@ -11,7 +11,9 @@ import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, St
 // etc.) automatically pick up the current slide's clientName + layoutId when
 // they wrap themselves in <SlideFrame>. VariantRenderer sets the value once
 // per render.
-const SlideFrameCtx = createContext<{ clientName?: string; layoutId?: string; clientLogoUrl?: string | null; subCompany?: string; logoOrientation?: "horizontal" | "stacked" }>({});
+import type { LogoPosition } from "@/lib/logo-placement";
+
+const SlideFrameCtx = createContext<{ clientName?: string; layoutId?: string; clientLogoUrl?: string | null; subCompany?: string; logoOrientation?: "horizontal" | "stacked"; logoPosition?: LogoPosition }>({});
 
 function SlideFrame(props: ComponentProps<typeof BaseSlideFrame>) {
   const ctx = useContext(SlideFrameCtx);
@@ -23,9 +25,11 @@ function SlideFrame(props: ComponentProps<typeof BaseSlideFrame>) {
       clientLogoUrl={props.clientLogoUrl ?? ctx.clientLogoUrl ?? null}
       subCompany={props.subCompany ?? ctx.subCompany}
       logoOrientation={props.logoOrientation ?? ctx.logoOrientation}
+      logoPosition={props.logoPosition ?? ctx.logoPosition}
     />
   );
 }
+
 
 import {
   ICON_SIZES,
@@ -254,7 +258,7 @@ export function VariantRenderer(props: Props) {
   return (
     <SlideModeContext.Provider value={mode}>
       <SlideBackdropContext.Provider value={backdrop}>
-        <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany, logoOrientation }}>
+        <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany, logoOrientation: slide.logoOrientation && slide.logoOrientation !== "auto" ? slide.logoOrientation : logoOrientation, logoPosition: slide.logoPosition && slide.logoPosition !== "auto" ? slide.logoPosition : undefined }}>
           {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c })}
         </SlideFrameCtx.Provider>
       </SlideBackdropContext.Provider>

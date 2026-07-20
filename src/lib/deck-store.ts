@@ -47,6 +47,16 @@ export type AiChange = {
   accepted: boolean;
 };
 
+export type SlideLogoPosition =
+  | "auto"
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right"
+  | "hidden";
+
 export type DeckSlide = {
   id: string;
   position: number;
@@ -56,7 +66,10 @@ export type DeckSlide = {
   content: SlideContent;
   changes: AiChange[];
   notes?: string;
+  logoPosition?: SlideLogoPosition;
+  logoOrientation?: "auto" | "horizontal" | "stacked";
 };
+
 
 
 export type DeckClientLogo = {
@@ -168,6 +181,7 @@ type DeckState = {
   revertAiChange: (deckId: string, slideId: string, field: string) => void;
   updateSlideField: (deckId: string, slideId: string, field: string, value: unknown) => void;
   updateSlideNotes: (deckId: string, slideId: string, notes: string) => void;
+  setSlideLogo: (deckId: string, slideId: string, patch: { position?: SlideLogoPosition; orientation?: "auto" | "horizontal" | "stacked" }) => void;
   applySlideBackground: (deckId: string, slideIds: string[], background: unknown) => void;
 
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
@@ -1675,6 +1689,35 @@ export const useDeckStore = create<DeckState>()(
           },
         }));
       },
+
+      setSlideLogo: (deckId, slideId, patch) => {
+        pushHistory(`slide-logo:${deckId}:${slideId}`);
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) => {
+                if (sl.id !== slideId) return sl;
+                const next = { ...sl };
+                if (patch.position !== undefined) {
+                  if (patch.position === "auto") delete next.logoPosition;
+                  else next.logoPosition = patch.position;
+                }
+                if (patch.orientation !== undefined) {
+                  if (patch.orientation === "auto") delete next.logoOrientation;
+                  else next.logoOrientation = patch.orientation;
+                }
+                return next;
+              }),
+            },
+          },
+        }));
+      },
+
+
 
 
       revertAiChange: (deckId, slideId, field) => {
