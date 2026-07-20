@@ -323,30 +323,44 @@ export const listPdfExtractions = createServerFn({ method: "GET" })
 // chunkText 1200/200) so match_brand_chunks finds them via the same query
 // path used by ai-rag.functions.ts and brand-assets.functions.searchBrandChunks.
 
-// Maps pdf_extractions.entity_slug → brand_asset_chunks.division_id
-// (the brand-guides `divisionId`). Divisions with no matching PDFs
-// (digital, cobrand, trial-interactive) simply have no source docs.
+// Maps pdf_extractions.entity_slug → brand_asset_chunks.division_id.
+// Values are the canonical bm-* brand mode ids used everywhere else in the
+// app (resolveBrandMode, RebrandMenu, brief wizard, brand-guides.divisionId).
+// Divisions with no matching PDFs (digital, cobrand, trial-interactive)
+// simply have no source docs.
 export const PDF_ENTITY_TO_DIVISION: Record<string, string> = {
-  transperfect: "master",
-  games: "gaming",
-  legal: "legal",
-  "life-sciences": "life-sciences",
-  media: "media",
-  dataforce: "dataforce",
-  globallink: "globallink",
+  transperfect: "bm-enterprise",
+  games: "bm-tp-games",
+  legal: "bm-tp-legal",
+  "life-sciences": "bm-tp-lifesci",
+  media: "bm-tp-media",
+  dataforce: "bm-product",
+  globallink: "bm-division",
+};
+
+// Brand-guide slug → bm-* division id. Mirrors brand-guides.ts.
+const BRAND_GUIDE_SLUG_TO_DIVISION: Record<string, string> = {
+  "transperfect-master": "bm-enterprise",
+  globallink: "bm-division",
+  "transperfect-life-sciences": "bm-tp-lifesci",
+  "transperfect-legal": "bm-tp-legal",
+  "transperfect-media": "bm-tp-media",
+  "transperfect-gaming": "bm-tp-games",
+  "transperfect-digital": "bm-tp-digital",
+  dataforce: "bm-product",
+  "transperfect-cobrand": "bm-cobrand",
+  "trial-interactive": "bm-trial-interactive",
 };
 
 export function divisionIdForPdfEntity(entitySlug: string): string | null {
   return PDF_ENTITY_TO_DIVISION[entitySlug] ?? null;
 }
 
-// Reverse — brand-guide slug (e.g. "transperfect-master") → pdf entity_slug.
-// brand-guides use `slug` like "transperfect-master" / "transperfect-legal";
-// we accept either the full slug or the bare divisionId ("master","legal",...).
+// Reverse — brand-guide slug OR bm-* division id → pdf entity_slug.
 export function pdfEntityForDivision(divisionOrSlug: string): string | null {
-  const bare = divisionOrSlug.replace(/^transperfect-/, "");
+  const bm = BRAND_GUIDE_SLUG_TO_DIVISION[divisionOrSlug] ?? divisionOrSlug;
   for (const [pdfSlug, div] of Object.entries(PDF_ENTITY_TO_DIVISION)) {
-    if (div === bare) return pdfSlug;
+    if (div === bm) return pdfSlug;
   }
   return null;
 }
