@@ -440,6 +440,52 @@ export function ShareMenu({ deckId }: { deckId: string }) {
             onClick={onPptx}
             disabled={busy}
           />
+
+          {cachedLocales && cachedLocales.length > 0 && (
+            <div className="border-t border-black/[0.06] px-4 py-3 dark:border-white/10">
+              <div className="mb-2 flex items-center gap-2 text-[10px] font-medium uppercase tracking-widest text-black/50 dark:text-white/50">
+                <Languages size={12} /> Translated exports
+              </div>
+              <ul className="space-y-1.5">
+                {cachedLocales.map((l) => {
+                  const label = langLabels[l.target_lang] ?? l.target_lang.toUpperCase();
+                  const partial = l.ready < l.total;
+                  const pptxBusy = translatedBusy === `pptx:${l.target_lang}`;
+                  return (
+                    <li key={l.target_lang} className="flex items-center gap-2">
+                      <span className="min-w-0 flex-1 truncate text-xs text-black dark:text-white">
+                        {label}
+                        <span className="ml-1 text-[10px] text-black/45 dark:text-white/45">
+                          {l.ready}/{l.total}{partial ? " · partial" : ""}
+                        </span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => void onTranslatedPptx(l.target_lang)}
+                        disabled={!!translatedBusy}
+                        className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] font-medium text-black hover:border-black/30 disabled:opacity-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white"
+                        title={`Export .pptx in ${label}`}
+                      >
+                        {pptxBusy ? <Loader2 size={10} className="animate-spin" /> : <FileDown size={10} />}
+                        PPTX
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onTranslatedPdf(l.target_lang)}
+                        className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] font-medium text-black hover:border-black/30 dark:border-white/15 dark:bg-white/[0.06] dark:text-white"
+                        title={`Print/PDF in ${label}`}
+                      >
+                        <Printer size={10} /> PDF
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="mt-2 text-[10px] text-black/45 dark:text-white/45">
+                Manage languages in the deck's Translate panel.
+              </div>
+            </div>
+          )}
           <div className="border-t border-black/[0.06] px-4 py-2 text-[10px] text-black/50 dark:border-white/10 dark:text-white/50">
             <Link to="/decks/$deckId/export" params={{ deckId }} className="hover:text-black dark:hover:text-white">
               Advanced export &amp; QA →
