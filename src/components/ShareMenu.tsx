@@ -382,7 +382,8 @@ export function ShareMenu({ deckId }: { deckId: string }) {
         onJumpToSlide={(slideId) => {
           setPreflightIssues(null);
           setOpen(false);
-          navigate({ to: "/decks/$deckId", params: { deckId }, hash: `slide-${slideId}` });
+          navigate({ to: "/decks/$deckId", params: { deckId } });
+          void slideId;
         }}
       />
     </div>
