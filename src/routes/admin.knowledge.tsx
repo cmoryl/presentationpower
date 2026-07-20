@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { BRAND_GUIDES, type BrandGuide, type ColorSwatch, type TypeStyle, type LogoRule } from "@/lib/brand-guides";
@@ -12,6 +12,13 @@ import {
   deleteImportedDeck,
   embedImportedDecks,
 } from "@/lib/imported-decks.functions";
+import {
+  listDivisionImagery,
+  uploadDivisionImagery,
+  updateDivisionImagery,
+  deleteDivisionImagery,
+  type DivisionImageryEntry,
+} from "@/lib/division-imagery.functions";
 
 
 
@@ -25,7 +32,7 @@ export const Route = createFileRoute("/admin/knowledge")({
   component: AdminKnowledgeBrowser,
 });
 
-type Tab = "overview" | "colors" | "type" | "logo" | "subbrands" | "intel" | "sources" | "imported" | "voiceover";
+type Tab = "overview" | "colors" | "type" | "logo" | "subbrands" | "intel" | "sources" | "imported" | "imagery" | "voiceover";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "overview", label: "Overview" },
@@ -36,8 +43,10 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "intel", label: "BrandHub intel" },
   { id: "sources", label: "Source documents" },
   { id: "imported", label: "Imported decks" },
+  { id: "imagery", label: "Imagery" },
   { id: "voiceover", label: "Voiceover topics" },
 ];
+
 
 
 
