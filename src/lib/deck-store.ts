@@ -1836,6 +1836,29 @@ export const useDeckStore = create<DeckState>()(
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, isTemplate } } }));
       },
 
+      rebrandDeck: (deckId, brandModeId, subCompany) => {
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const nextSub = subCompany ?? undefined;
+        const nextContext: DeckContext = {
+          ...(deck.context ?? {}),
+          subCompany: nextSub,
+        };
+        const nextDeck: Deck = {
+          ...deck,
+          brandModeId: brandModeId as BrandModeId,
+          subCompany: nextSub,
+          context: nextContext,
+        };
+        set((s) => {
+          const brief = s.briefs[deck.briefId];
+          const nextBriefs = brief
+            ? { ...s.briefs, [deck.briefId]: { ...brief, brandModeId: brandModeId as BrandModeId, subCompany: nextSub } }
+            : s.briefs;
+          return { decks: { ...s.decks, [deckId]: nextDeck }, briefs: nextBriefs };
+        });
+      },
+
       duplicateDeck: (deckId) => {
         const src = get().decks[deckId];
         if (!src) return null;
