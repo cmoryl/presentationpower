@@ -202,6 +202,18 @@ export function normalizeImportedDeckDivision(v: string): string {
   return IMPORTED_DECK_SLUG_TO_DIVISION[v] ?? v;
 }
 
+// Inverse: given a bm-* id (or an already-slug string), return the slug used
+// by the imported_decks table so we can filter that table safely from callers
+// that speak the canonical bm-* scheme. Falls back to the input for legacy
+// callers that already pass a slug.
+export function importedDeckSlugForDivision(v: string): string {
+  if (Object.prototype.hasOwnProperty.call(IMPORTED_DECK_SLUG_TO_DIVISION, v)) return v;
+  for (const [slug, div] of Object.entries(IMPORTED_DECK_SLUG_TO_DIVISION)) {
+    if (div === v) return slug;
+  }
+  return v;
+}
+
 function chunkText(text: string, size = 1200, overlap = 200): string[] {
   const clean = text.replace(/\r\n/g, "\n").replace(/[ \t]+\n/g, "\n").trim();
   if (clean.length <= size) return clean.length > 40 ? [clean] : [];
