@@ -239,17 +239,18 @@ function TranslationAdminPage() {
           {languages.map((l) => (
             <div
               key={l.id}
-              className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/80"
+              className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/80"
               title={l.native}
             >
-              <span className="font-medium text-[#03002C]">{l.label}</span>{" "}
-              <span className="text-black/50">· {l.native}</span>
+              <span className="truncate font-medium text-[#03002C]">{l.label}</span>
+              <span className="truncate text-black/50">· {l.native}</span>
               {l.rtl && (
-                <span className="ml-2 rounded bg-[#003FC7]/10 px-1.5 text-[10px] text-[#003FC7]">RTL</span>
+                <span className="shrink-0 rounded bg-[#003FC7]/10 px-1.5 text-[10px] text-[#003FC7]">RTL</span>
               )}
             </div>
           ))}
         </div>
+
       </section>
 
       {status && <div className="mt-6 text-xs text-black/60">{status}</div>}
