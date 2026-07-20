@@ -5,12 +5,14 @@ import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { CopilotPanel } from "@/components/CopilotPanel";
 import { IconPicker } from "@/components/IconPicker";
-import { SaveToCloudButton } from "@/components/CloudDeckControls";
+import { SaveToCloudButton, AutosaveIndicator } from "@/components/CloudDeckControls";
 import { ShareMenu } from "@/components/ShareMenu";
 import { VersionHistoryButton } from "@/components/VersionHistoryDrawer";
 import { DuplicateDeckButton, TemplateToggleButton } from "@/components/DeckActions";
 import { RebrandMenu } from "@/components/RebrandMenu";
 import { BrandReviewPanel } from "@/components/BrandReviewPanel";
+import { UndoRedoControls } from "@/components/UndoRedoControls";
+import { SwapLayoutButton } from "@/components/SwapLayoutPicker";
 import { useDeckStore, type DeckClientLogo } from "@/lib/deck-store";
 import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.functions";
 
