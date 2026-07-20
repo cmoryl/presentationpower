@@ -93,6 +93,8 @@ function DeckEditor() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <UndoRedoControls />
+          <AutosaveIndicator deckId={deckId} />
           <DuplicateDeckButton deckId={deckId} />
           <RebrandMenu deckId={deckId} />
           <TemplateToggleButton deckId={deckId} />
