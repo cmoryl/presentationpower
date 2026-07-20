@@ -86,17 +86,18 @@ function TranslationAdminPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-6 pb-16">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
+    <div className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
+      <header className="mb-8 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
+        <div className="min-w-0">
           <div className="text-[10px] uppercase tracking-[0.35em] text-black/50">Admin · Localization</div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#03002C]">Translation</h1>
+          <h1 className="mt-2 truncate text-2xl font-semibold tracking-tight text-[#03002C] sm:text-3xl">Translation</h1>
           <p className="mt-2 max-w-2xl text-sm text-black/65">
             Configure GlobalLink, review the protected term glossary, and toggle target languages available to authors.
           </p>
         </div>
-        <Languages size={28} className="text-[#003FC7]" />
-      </div>
+        <Languages size={28} className="shrink-0 text-[#003FC7]" />
+      </header>
+
 
       {/* Engine status */}
       <section className="mb-8 rounded-2xl border border-black/10 bg-white p-6">
@@ -135,17 +136,17 @@ function TranslationAdminPage() {
         </div>
 
         {/* Add row */}
-        <div className="mb-4 grid grid-cols-1 gap-2 rounded-xl border border-black/10 bg-black/[0.02] p-3 sm:grid-cols-[1fr_140px_140px_auto]">
+        <div className="mb-4 grid grid-cols-1 gap-2 rounded-xl border border-black/10 bg-black/[0.02] p-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_140px_160px_auto]">
           <input
             value={newTerm}
             onChange={(e) => setNewTerm(e.target.value)}
             placeholder="Term (e.g. GlobalLink)"
-            className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] placeholder:text-black/40 outline-none focus:border-[#003FC7]"
+            className="min-w-0 rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] placeholder:text-black/40 outline-none focus:border-[#003FC7]"
           />
           <select
             value={newScope}
             onChange={(e) => setNewScope(e.target.value as "global" | "division")}
-            className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C]"
+            className="min-w-0 rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C]"
           >
             <option value="global">Global</option>
             <option value="division">Division</option>
@@ -155,15 +156,16 @@ function TranslationAdminPage() {
             onChange={(e) => setNewScopeId(e.target.value)}
             placeholder={newScope === "division" ? "Division id" : "(n/a)"}
             disabled={newScope !== "division"}
-            className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] placeholder:text-black/40 outline-none focus:border-[#003FC7] disabled:opacity-40"
+            className="min-w-0 rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] placeholder:text-black/40 outline-none focus:border-[#003FC7] disabled:opacity-40"
           />
           <button
             onClick={addTerm}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:bg-[#003FC7]/90"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:bg-[#003FC7]/90"
           >
             <Plus size={14} /> Add
           </button>
         </div>
+
 
         {/* Filter */}
         <div className="mb-3 flex items-center gap-2 text-xs">
@@ -182,8 +184,8 @@ function TranslationAdminPage() {
           ))}
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-black/10">
-          <table className="w-full text-sm text-black/80">
+        <div className="overflow-x-auto rounded-xl border border-black/10">
+          <table className="w-full min-w-[560px] text-sm text-black/80">
             <thead className="bg-black/[0.03] text-xs uppercase tracking-widest text-black/50">
               <tr>
                 <th className="px-3 py-2 text-left">Term</th>
@@ -195,10 +197,14 @@ function TranslationAdminPage() {
             </thead>
             <tbody>
               {filtered.map((g) => (
-                <tr key={g.id} className="border-t border-black/5">
-                  <td className="px-3 py-2 font-medium text-[#03002C]">{g.term}</td>
+                <tr key={g.id} className="border-t border-black/5 align-top">
+                  <td className="px-3 py-2 font-medium text-[#03002C]">
+                    <div className="max-w-[220px] truncate" title={g.term}>{g.term}</div>
+                  </td>
                   <td className="px-3 py-2">{g.scope}</td>
-                  <td className="px-3 py-2 font-mono text-xs text-black/50">{g.scope_id ?? "—"}</td>
+                  <td className="px-3 py-2 font-mono text-xs text-black/50">
+                    <div className="max-w-[160px] truncate" title={g.scope_id ?? ""}>{g.scope_id ?? "—"}</div>
+                  </td>
                   <td className="px-3 py-2">{g.do_not_translate ? "Yes" : "No"}</td>
                   <td className="px-3 py-2 text-right">
                     <button
@@ -221,6 +227,7 @@ function TranslationAdminPage() {
             </tbody>
           </table>
         </div>
+
       </section>
 
       {/* Languages */}
@@ -232,17 +239,18 @@ function TranslationAdminPage() {
           {languages.map((l) => (
             <div
               key={l.id}
-              className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/80"
+              className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/80"
               title={l.native}
             >
-              <span className="font-medium text-[#03002C]">{l.label}</span>{" "}
-              <span className="text-black/50">· {l.native}</span>
+              <span className="truncate font-medium text-[#03002C]">{l.label}</span>
+              <span className="truncate text-black/50">· {l.native}</span>
               {l.rtl && (
-                <span className="ml-2 rounded bg-[#003FC7]/10 px-1.5 text-[10px] text-[#003FC7]">RTL</span>
+                <span className="shrink-0 rounded bg-[#003FC7]/10 px-1.5 text-[10px] text-[#003FC7]">RTL</span>
               )}
             </div>
           ))}
         </div>
+
       </section>
 
       {status && <div className="mt-6 text-xs text-black/60">{status}</div>}
