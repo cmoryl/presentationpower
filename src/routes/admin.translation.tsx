@@ -136,17 +136,17 @@ function TranslationAdminPage() {
         </div>
 
         {/* Add row */}
-        <div className="mb-4 grid grid-cols-1 gap-2 rounded-xl border border-black/10 bg-black/[0.02] p-3 sm:grid-cols-[1fr_140px_140px_auto]">
+        <div className="mb-4 grid grid-cols-1 gap-2 rounded-xl border border-black/10 bg-black/[0.02] p-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_140px_160px_auto]">
           <input
             value={newTerm}
             onChange={(e) => setNewTerm(e.target.value)}
             placeholder="Term (e.g. GlobalLink)"
-            className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] placeholder:text-black/40 outline-none focus:border-[#003FC7]"
+            className="min-w-0 rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] placeholder:text-black/40 outline-none focus:border-[#003FC7]"
           />
           <select
             value={newScope}
             onChange={(e) => setNewScope(e.target.value as "global" | "division")}
-            className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C]"
+            className="min-w-0 rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C]"
           >
             <option value="global">Global</option>
             <option value="division">Division</option>
@@ -156,15 +156,16 @@ function TranslationAdminPage() {
             onChange={(e) => setNewScopeId(e.target.value)}
             placeholder={newScope === "division" ? "Division id" : "(n/a)"}
             disabled={newScope !== "division"}
-            className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] placeholder:text-black/40 outline-none focus:border-[#003FC7] disabled:opacity-40"
+            className="min-w-0 rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] placeholder:text-black/40 outline-none focus:border-[#003FC7] disabled:opacity-40"
           />
           <button
             onClick={addTerm}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:bg-[#003FC7]/90"
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:bg-[#003FC7]/90"
           >
             <Plus size={14} /> Add
           </button>
         </div>
+
 
         {/* Filter */}
         <div className="mb-3 flex items-center gap-2 text-xs">
