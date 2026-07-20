@@ -11,12 +11,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { uploadSlideMedia } from "@/lib/slide-media";
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
-// PPTX (pptxgenjs → PowerPoint) reliably embeds JPEG, PNG, GIF, and WebP
-// (WebP in Office 2021+). AVIF and SVG have flaky PowerPoint support, so we
-// accept them for convenience and rasterize to PNG client-side before upload
-// so exports stay faithful. HEIC/HEIF is skipped — no native browser decode.
-const PASSTHROUGH = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const RASTERIZE = ["image/svg+xml", "image/avif"];
+// Formats that render natively in every browser AND embed cleanly in
+// pptxgenjs → PowerPoint are stored as-is. SVG also passes through: browsers
+// render it crisply as a vector via <img>, and pptx-export rasterizes SVG
+// on the fly at export time (only PowerPoint needs the raster fallback).
+// AVIF is rasterized on upload because Office decode support is unreliable
+// and older Safari builds still choke on it in some contexts.
+const PASSTHROUGH = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/svg+xml",
+];
+const RASTERIZE = ["image/avif"];
 const ALLOWED = [...PASSTHROUGH, ...RASTERIZE];
 
 async function rasterizeToPng(file: File): Promise<File> {
@@ -29,13 +37,11 @@ async function rasterizeToPng(file: File): Promise<File> {
       el.crossOrigin = "anonymous";
       el.src = url;
     });
-    // SVGs without intrinsic size default to 300×150; scale up for clarity.
     const w = img.naturalWidth || 1600;
     const h = img.naturalHeight || 900;
-    const scale = file.type === "image/svg+xml" && Math.max(w, h) < 1600 ? 1600 / Math.max(w, h) : 1;
     const canvas = document.createElement("canvas");
-    canvas.width = Math.round(w * scale);
-    canvas.height = Math.round(h * scale);
+    canvas.width = w;
+    canvas.height = h;
     const ctx = canvas.getContext("2d");
     if (!ctx) throw new Error("Canvas unavailable for conversion.");
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -46,7 +52,7 @@ async function rasterizeToPng(file: File): Promise<File> {
         0.95,
       );
     });
-    const base = file.name.replace(/\.(svg|avif)$/i, "") || "image";
+    const base = file.name.replace(/\.(avif)$/i, "") || "image";
     return new File([blob], `${base}.png`, { type: "image/png" });
   } finally {
     URL.revokeObjectURL(url);
