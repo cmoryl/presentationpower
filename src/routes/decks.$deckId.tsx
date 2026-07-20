@@ -74,6 +74,18 @@ function DeckEditor() {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [commentCounts, setCommentCounts] = useState<Map<number | "deck", number>>(new Map());
   const totalOpen = useMemo(() => Array.from(commentCounts.values()).reduce((a, b) => a + b, 0), [commentCounts]);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [overlay, setOverlay] = useState<LocaleOverlay | null>(null);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setUserId(data.session?.user.id ?? null));
+  }, []);
+  const cloudDeckId = userId ? deckCloudId(userId, deckId) : null;
+  // Apply translation overlay by slide position without mutating the deck store.
+  const applyOverlay = (slide: { position: number; content: Record<string, unknown> }) => {
+    if (!overlay) return slide;
+    const t = overlay.byPosition.get(slide.position);
+    return t ? { ...slide, content: t } : slide;
+  };
 
   if (!deck) throw notFound();
   const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
