@@ -130,13 +130,26 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
     if (!row) throw new Error("Not found");
     const r = row as {
       id: string; original_filename: string; slide_count: number;
-      theme: unknown; slides: unknown; status: string; error: string | null;
+      theme: Record<string, unknown> | null;
+      slides: Array<{ index: number; title: string; bullets: string[]; notes: string; imageCount: number }> | null;
+      status: string; error: string | null;
       storage_path: string;
     };
     // Signed URL so the owner can re-download the original .pptx.
     const signed = await s.storage.from(BUCKET).createSignedUrl(r.storage_path, 60 * 10).catch(() => ({ data: null }));
-    return { ...r, downloadUrl: signed.data?.signedUrl ?? null };
+    return {
+      id: r.id,
+      original_filename: r.original_filename,
+      slide_count: r.slide_count,
+      theme: r.theme ?? {},
+      slides: r.slides ?? [],
+      status: r.status,
+      error: r.error,
+      storage_path: r.storage_path,
+      downloadUrl: signed.data?.signedUrl ?? null,
+    };
   });
+
 
 export const deleteImportedDeck = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
