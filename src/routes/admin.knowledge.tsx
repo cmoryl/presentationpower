@@ -724,6 +724,16 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                   {r.slide_count} slides
                 </span>
                 <span
+                  className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${
+                    r.chunk_count > 0
+                      ? "bg-emerald-100 text-emerald-800"
+                      : "bg-black/[0.06] text-black/50"
+                  }`}
+                  title={r.embedded_at ? `Embedded ${new Date(r.embedded_at).toLocaleString()}` : "Not embedded into RAG"}
+                >
+                  {r.chunk_count > 0 ? `${r.chunk_count} chunks` : "not embedded"}
+                </span>
+                <span
                   className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest ${
                     r.status === "parsed"
                       ? "bg-[#003FC7]/10 text-[#003FC7]"
@@ -743,6 +753,31 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                 </button>
                 <button
                   type="button"
+                  disabled={embedding === r.id || r.status !== "parsed"}
+                  onClick={async () => {
+                    setEmbedding(r.id);
+                    setEmbedMsg(null);
+                    try {
+                      const res = await embedFn({ data: { id: r.id, skipEmbedded: false } });
+                      const first = res.results[0];
+                      setEmbedMsg(
+                        first?.status === "ok"
+                          ? `Embedded "${first.filename}" → ${first.chunks} chunks`
+                          : `Embed ${first?.status ?? "done"}: ${first?.error ?? ""}`,
+                      );
+                      setRefreshKey((k) => k + 1);
+                    } catch (e) {
+                      setEmbedMsg(`Embed failed: ${e instanceof Error ? e.message : "unknown"}`);
+                    } finally {
+                      setEmbedding(null);
+                    }
+                  }}
+                  className="shrink-0 rounded-full border border-emerald-300 px-2 py-0.5 text-[10px] text-emerald-800 hover:border-emerald-600 disabled:opacity-50"
+                >
+                  {embedding === r.id ? "Embedding…" : r.chunk_count > 0 ? "Re-embed" : "Embed → RAG"}
+                </button>
+                <button
+                  type="button"
                   onClick={() => handleDelete(r.id)}
                   className="shrink-0 rounded-full border border-red-200 px-2 py-0.5 text-[10px] text-red-700 hover:border-red-500"
                 >
@@ -752,7 +787,11 @@ function ImportedDecksTab({ slug }: { slug: string }) {
             ))}
           </ul>
         )}
+        {embedMsg && (
+          <div className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-800">{embedMsg}</div>
+        )}
       </Section>
+
 
       {openId && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4" onClick={() => setOpenId(null)}>
