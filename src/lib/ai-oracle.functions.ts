@@ -207,6 +207,6 @@ export const oracleChat = createServerFn({ method: "POST" })
       const res = await callAnthropic(system, user, { maxTokens: 1200, temperature: 0.3 });
       if (!res.ok) return { ok: false, error: `Claude ${res.status}` };
 
-      return { ok: true, reply: res.text, sources };
+      return { ok: true, reply: res.text, sources, divisionScoped, fallbackNote };
     },
   );
