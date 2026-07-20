@@ -275,7 +275,58 @@ function AboutPage() {
     { to: "/knowledge", label: "Knowledge", blurb: "Oracle KB, brand guides, glossary, videos." },
     { to: "/admin", label: "Admin", blurb: "Users, approvals, A/B, imagery, Oracle, icons." },
     { to: "/faq", label: "FAQ", blurb: "Step-by-step basics and common questions." },
-  ];
+      {
+        kicker: "09 · Collaboration",
+        title: "Comments, reviews, versions.",
+        body:
+          "Reviewers leave threaded comments on any slide, move decks through review states, and roll back to any snapshot. Autosave and version history are enforced at the RLS layer.",
+        bullets: [
+          "deck_comments with CommentsPanel",
+          "ReviewStatusControl transitions",
+          "Non-destructive version restore",
+        ],
+      },
+      {
+        kicker: "10 · Share & analyze",
+        title: "View-only links with analytics.",
+        body:
+          "Generate a share token with expiry, revoke or regenerate anytime, and see views over time per link in /analytics.",
+        bullets: [
+          "/share/$token viewer route",
+          "Expiry + revocation controls",
+          "Per-link engagement analytics",
+        ],
+        to: "/analytics",
+        toLabel: "Open analytics →",
+      },
+      {
+        kicker: "11 · Translate",
+        title: "Multi-language decks, non-destructive.",
+        body:
+          "Overlay translations per slide via the AI/GlobalLink engine. Switch languages live, retry failed jobs, and export localized PPTX/PDF.",
+        bullets: [
+          "TranslateDrawer + LanguageSwitcher",
+          "Per-slide language status badges",
+          "GlobalLink connector at /admin/globallink",
+        ],
+        to: "/admin/globallink",
+        toLabel: "Configure GlobalLink →",
+      },
+      {
+        kicker: "12 · Rebrand",
+        title: "Retone an entire deck in one click.",
+        body:
+          "The Rebrand action re-applies any brand mode across every slide with a live preview and an auto-snapshot for safe rollback.",
+        bullets: [
+          "Live preview before commit",
+          "Auto version snapshot",
+          "Works with client co-brand via LogoHub",
+        ],
+      },
+    ];
+
+    const _originalMarker = (
+
 
   return (
     <AppShell>
