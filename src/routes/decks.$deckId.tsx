@@ -164,6 +164,14 @@ function DeckEditor() {
           <AutosaveIndicator deckId={deckId} />
           <DuplicateDeckButton deckId={deckId} />
           <RebrandMenu deckId={deckId} />
+          <button
+            type="button"
+            onClick={() => setDeckContext(deckId, { logoOrientation: logoOrientation === "horizontal" ? "stacked" : "horizontal" })}
+            className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 px-3 py-2 text-xs font-medium text-black hover:border-black/30 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:border-white/30"
+            title="Toggle logo orientation"
+          >
+            Logo: {logoOrientation === "stacked" ? "Stacked" : "Horizontal"}
+          </button>
           <TemplateToggleButton deckId={deckId} />
           <SaveToCloudButton deckId={deckId} />
           <VersionHistoryButton deckId={deckId} />
