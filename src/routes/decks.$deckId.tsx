@@ -9,6 +9,7 @@ import { SaveToCloudButton, AutosaveIndicator } from "@/components/CloudDeckCont
 import { ShareMenu } from "@/components/ShareMenu";
 import { VersionHistoryButton } from "@/components/VersionHistoryDrawer";
 import { DuplicateDeckButton, TemplateToggleButton } from "@/components/DeckActions";
+import { TranslateButton } from "@/components/TranslateDrawer";
 import { RebrandMenu } from "@/components/RebrandMenu";
 import { BrandReviewPanel } from "@/components/BrandReviewPanel";
 import { CommentsPanel } from "@/components/CommentsPanel";
@@ -124,6 +125,7 @@ function DeckEditor() {
           <TemplateToggleButton deckId={deckId} />
           <SaveToCloudButton deckId={deckId} />
           <VersionHistoryButton deckId={deckId} />
+          <TranslateButton deckId={deckId} />
           <ShareMenu deckId={deckId} />
         </div>
       </div>
