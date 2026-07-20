@@ -619,6 +619,9 @@ function ImportedDecksTab({ slug }: { slug: string }) {
   const uploadFn = useServerFn(uploadImportedDeck);
   const getSlidesFn = useServerFn(getImportedDeckSlides);
   const deleteFn = useServerFn(deleteImportedDeck);
+  const embedFn = useServerFn(embedImportedDecks);
+  const [embedding, setEmbedding] = useState<string | null>(null);
+  const [embedMsg, setEmbedMsg] = useState<string | null>(null);
 
   const [openId, setOpenId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
