@@ -1497,9 +1497,32 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
 
 export const useDeckStore = create<DeckState>()(
   persist(
-    (set, get) => ({
+    (set, get) => {
+      // ---- History helpers (session-only) --------------------------------
+      const HISTORY_LIMIT = 50;
+      const pushHistory = (key?: string) => {
+        const cur = get();
+        const now = Date.now();
+        // Coalesce rapid edits sharing the same key (e.g. typing in one field).
+        if (key && cur._historyKey === key && now - (cur._historyAt ?? 0) < 900) {
+          set({ _historyAt: now });
+          return;
+        }
+        const snap: HistoryEntry = { decks: cur.decks, briefs: cur.briefs };
+        const past = [...(cur._past ?? []), snap];
+        while (past.length > HISTORY_LIMIT) past.shift();
+        set({ _past: past, _future: [], _historyKey: key, _historyAt: now });
+      };
+
+      return {
       briefs: {},
       decks: {},
+      _past: [],
+      _future: [],
+      _historyKey: undefined,
+      _historyAt: undefined,
+      _cloudLinked: {},
+
 
       createBriefAndAssemble: (input, opts) => {
         const brief: Brief = {
