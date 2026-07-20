@@ -5,6 +5,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { BRAND_GUIDES, type BrandGuide, type ColorSwatch, type TypeStyle, type LogoRule } from "@/lib/brand-guides";
 import { getBrandhubIntel, targetAudienceText, normalizeVoiceValue } from "@/lib/brandhub-intel";
 import { listPdfExtractionsForDivision, getPdfExtractionText } from "@/lib/pdf-ingest.functions";
+import {
+  listImportedDecksForDivision,
+  uploadImportedDeck,
+  getImportedDeckSlides,
+  deleteImportedDeck,
+} from "@/lib/imported-decks.functions";
+
 
 
 export const Route = createFileRoute("/admin/knowledge")({
