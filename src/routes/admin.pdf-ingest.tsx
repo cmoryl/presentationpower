@@ -92,8 +92,26 @@ function PdfIngestPage() {
       ok: rows.filter((r) => r.status === "ok").length,
       failed: rows.filter((r) => r.status === "failed").length,
       skipped: rows.filter((r) => r.status === "skipped").length,
+      embedded: rows.filter((r) => (r.chunk_count ?? 0) > 0).length,
+      totalChunks: rows.reduce((n, r) => n + (r.chunk_count ?? 0), 0),
     };
   }, [rowsQ.data]);
+
+  const embedByEntity = useMemo(() => {
+    const map = new Map<string, { ok: number; embedded: number; chunks: number }>();
+    for (const r of rowsQ.data ?? []) {
+      if (r.status !== "ok") continue;
+      const cur = map.get(r.entity_slug) ?? { ok: 0, embedded: 0, chunks: 0 };
+      cur.ok += 1;
+      if ((r.chunk_count ?? 0) > 0) {
+        cur.embedded += 1;
+        cur.chunks += r.chunk_count ?? 0;
+      }
+      map.set(r.entity_slug, cur);
+    }
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [rowsQ.data]);
+
 
   const rowsByEntity = useMemo(() => {
     const map = new Map<string, PdfExtractionRow[]>();
