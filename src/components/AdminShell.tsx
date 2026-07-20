@@ -155,7 +155,7 @@ const items: Array<{ to: string; label: string; exact?: boolean }> = [
   { to: "/admin/ai", label: "AI analytics" },
   { to: "/admin/imagery-analytics", label: "Imagery analytics" },
   { to: "/admin/ab", label: "A/B color testing" },
-  { to: "/admin/approvals", label: "Knowledgebase" },
+  { to: "/admin/approvals", label: "Approvals" },
   { to: "/admin/knowledge", label: "Knowledge browser" },
   { to: "/admin/oracle", label: "Oracle KB" },
   { to: "/admin/translation", label: "Translation" },
