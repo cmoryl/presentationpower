@@ -633,6 +633,8 @@ function BriefWizard() {
                           selected={kbSelected}
                           synthesis={kbSynthesis}
                           synthesized={kbSynthesized}
+                          divisionScoped={kbDivisionScoped}
+                          fallbackNote={kbFallbackNote}
                           open={showKbPanel}
                           onToggle={() => setShowKbPanel((v) => !v)}
                         />
