@@ -178,7 +178,13 @@ function MessageBubble({ msg }: { msg: ChatMsg }) {
         }
       >
         <div className="whitespace-pre-wrap leading-relaxed">{msg.content}</div>
-        {!isUser && msg.fallbackNote && (
+        {!isUser && msg.setup && (
+          <div className="mt-3 rounded-md border border-amber-400/60 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900 dark:border-amber-400/40 dark:bg-amber-500/10 dark:text-amber-200">
+            <div className="font-semibold uppercase tracking-wider text-[10px] mb-1">AI setup needed</div>
+            Add <code className="font-mono">ANTHROPIC_API_KEY</code> in Project Settings → Secrets to enable synthesized answers. Showing raw top matches instead.
+          </div>
+        )}
+        {!isUser && !msg.setup && msg.fallbackNote && (
           <div className="mt-3 rounded-md border border-amber-300/60 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-200">
             ⚠︎ {msg.fallbackNote}
           </div>
