@@ -583,7 +583,7 @@ const VariantCard = memo(function VariantCard({
             In scope
           </div>
         )}
-        <OnScreenSizeBadge targetRef={singleRef} compact />
+        
       </div>
       </LazyMount>
       )}
