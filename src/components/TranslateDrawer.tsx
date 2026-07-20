@@ -220,16 +220,39 @@ export function TranslateDrawer({
         className="h-full w-[440px] max-w-full overflow-y-auto bg-white text-black shadow-2xl dark:bg-[#0B0B18] dark:text-white"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-black/10 bg-white/95 px-5 py-4 backdrop-blur dark:border-white/10 dark:bg-[#0B0B18]/95">
-          <div className="flex items-center gap-2">
-            <Languages size={16} className="text-[#003FC7] dark:text-[#A1FBF9]" />
-            <h2 className="text-lg font-semibold tracking-tight">Translate deck</h2>
+        <div className="sticky top-0 z-10 border-b border-black/10 bg-white/95 backdrop-blur dark:border-white/10 dark:bg-[#0B0B18]/95">
+          <div className="flex items-center justify-between px-5 py-4">
+            <div className="flex items-center gap-2">
+              <Languages size={16} className="text-[#003FC7] dark:text-[#A1FBF9]" />
+              <h2 className="text-lg font-semibold tracking-tight">Translate deck</h2>
+            </div>
+            <button onClick={onClose} className="rounded-full p-1.5 hover:bg-black/5 dark:hover:bg-white/10" aria-label="Close">
+              <X size={16} />
+            </button>
           </div>
-          <button onClick={onClose} className="rounded-full p-1.5 hover:bg-black/5 dark:hover:bg-white/10" aria-label="Close">
-            <X size={16} />
-          </button>
+          <div className="flex gap-1 px-5 pb-2 text-xs">
+            {([
+              { id: "new", label: "New job", icon: <Languages size={12} /> },
+              { id: "history", label: `History${jobs.length ? ` (${jobs.length})` : ""}`, icon: <History size={12} /> },
+            ] as Array<{ id: Tab; label: string; icon: JSX.Element }>).map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTab(t.id)}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-medium transition ${
+                  tab === t.id
+                    ? "bg-[#003FC7] text-white dark:bg-[#A1FBF9] dark:text-[#03002C]"
+                    : "text-black/60 hover:bg-black/5 dark:text-white/60 dark:hover:bg-white/10"
+                }`}
+              >
+                {t.icon}
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
 
+        {tab === "new" && (
         <div className="space-y-6 px-5 py-5">
           {/* Engine */}
           <section>
