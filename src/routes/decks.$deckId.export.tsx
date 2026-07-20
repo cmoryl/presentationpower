@@ -85,11 +85,11 @@ function ExportView() {
         <div className="flex items-center gap-2">
           <button
             onClick={handlePptx}
-            disabled={exporting || blocked}
+            disabled={exporting || preflightBusy || blocked}
             title={blocked ? "Resolve blocking QA issues first" : ""}
             className="rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0B2A4A]/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {exporting ? "Preparing…" : "Download .pptx"}
+            {exporting ? "Preparing…" : preflightBusy ? "Checking…" : "Download .pptx"}
           </button>
           <Link
             to="/decks/$deckId/document"
