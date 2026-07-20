@@ -5,6 +5,7 @@ import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { cn } from "@/lib/utils";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 
 const focusThumb = (el: HTMLButtonElement | null) => {
   el?.focus({ preventScroll: true });
@@ -26,7 +27,7 @@ function PresenterView() {
   const [focusedThumb, setFocusedThumb] = useState(0);
 
   if (!deck) throw notFound();
-  const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
+  const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
   const slide = deck.slides[i];
   const nextSlide = deck.slides[i + 1];
   const nextVariant = nextSlide ? byId(MODULE_VARIANTS, nextSlide.variantId) : undefined;

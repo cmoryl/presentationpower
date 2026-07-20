@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Palette, Loader2, X } from "lucide-react";
 import { useDeckStore } from "@/lib/deck-store";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 import { BRAND_GUIDES } from "@/lib/brand-guides";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -76,8 +77,8 @@ export function RebrandMenu({ deckId }: { deckId: string }) {
   const [selectedKey, setSelectedKey] = useState<string>(currentKey);
   const selected = targets.find((t) => t.key === selectedKey) ?? targets[0];
   const previewBrand = selected
-    ? { ...(byId(BRAND_MODES, selected.brandModeId) ?? BRAND_MODES[0]) }
-    : BRAND_MODES[0];
+    ? resolveBrandMode(selected.brandModeId, selected.subCompany)
+    : resolveBrandMode(BRAND_MODES[0].id);
 
   const activeSlide = deck?.slides[0];
   const activeVariant = activeSlide ? byId(MODULE_VARIANTS, activeSlide.variantId) : undefined;

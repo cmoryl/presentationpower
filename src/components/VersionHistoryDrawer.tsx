@@ -13,6 +13,7 @@ import { useDeckStore, type Brief, type Deck, type DeckSlide } from "@/lib/deck-
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 import { useSignedIn } from "@/components/CloudDeckControls";
 
 type VersionRow = {
@@ -38,7 +39,7 @@ type VersionRecord = {
   change_summary: string | null;
   created_at: string;
   snapshot: {
-    deck: { title: string; brand_mode_id: string } | null;
+    deck: { title: string; brand_mode_id: string; sub_company?: string | null } | null;
     slides: SnapshotSlideRow[];
     brief: { prospect: string | null } | null;
   };
@@ -227,8 +228,8 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
   }
 
   const previewBrand = useMemo(() => {
-    const id = selected?.snapshot.deck?.brand_mode_id;
-    return byId(BRAND_MODES, id ?? "") ?? BRAND_MODES[0];
+    const snap = selected?.snapshot.deck;
+    return resolveBrandMode(snap?.brand_mode_id ?? "", snap?.sub_company);
   }, [selected]);
   const previewClient = selected?.snapshot.brief?.prospect ?? brief?.prospect;
 

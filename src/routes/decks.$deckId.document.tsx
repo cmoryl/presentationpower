@@ -5,6 +5,7 @@ import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BrandLockup } from "@/components/BrandLockup";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 import {
   DOCUMENT_FAMILIES,
   documentFamily,
@@ -41,7 +42,7 @@ function DocumentView() {
   }, []);
 
   if (!deck) throw notFound();
-  const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
+  const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
   const slides = useMemo(() => projectDeckToDocument(deck, family), [deck, family]);
   const dims = pageDims(size, orientation);
 

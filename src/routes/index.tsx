@@ -14,6 +14,7 @@ import {
   BRAND_MODES, MODULE_FAMILIES, MODULE_VARIANTS,
   SECTION_FRAMEWORKS, LAYOUT_FRAMEWORKS, byId,
 } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 import { BRAND_GUIDES } from "@/lib/brand-guides";
 import { hasAiKey } from "@/lib/ai-status.functions";
 import { listMyCloudDecks, deleteCloudDeck } from "@/lib/cloud-decks.functions";
@@ -260,7 +261,7 @@ function AiCard({
 }
 
 function DeckCard({ deck: d, industry }: { deck: Deck; industry?: string }) {
-  const brand = byId(BRAND_MODES, d.brandModeId) ?? BRAND_MODES[0];
+  const brand = resolveBrandMode(d.brandModeId, d.subCompany);
   const cover = d.slides[0];
   const coverVariant = cover ? byId(MODULE_VARIANTS, cover.variantId) : undefined;
   const duplicateDeck = useDeckStore((s) => s.duplicateDeck);

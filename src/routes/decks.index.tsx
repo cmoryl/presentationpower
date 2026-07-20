@@ -8,6 +8,7 @@ import { useDeckStore, type Deck } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 import { getLibraryAnalytics, type DeckAnalyticsSummary } from "@/lib/deck-analytics.functions";
 import { deleteCloudDeck, listMyCloudDecks } from "@/lib/cloud-decks.functions";
 import { ReviewStatusBadge, type ReviewStatus } from "@/components/ReviewStatusControl";
@@ -304,7 +305,7 @@ function Chip({
 function DeckTile({
   deck: d, industry, client, views, shared, reviewStatus,
 }: { deck: Deck; industry: string; client: string; views: number; shared: boolean; reviewStatus: ReviewStatus | null }) {
-  const brand = byId(BRAND_MODES, d.brandModeId) ?? BRAND_MODES[0];
+  const brand = resolveBrandMode(d.brandModeId, d.subCompany);
   const cover = d.slides[0];
   const coverVariant = cover ? byId(MODULE_VARIANTS, cover.variantId) : undefined;
   const duplicateDeck = useDeckStore((s) => s.duplicateDeck);

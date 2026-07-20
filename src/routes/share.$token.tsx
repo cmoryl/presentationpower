@@ -6,6 +6,7 @@ import { getSharedDeckTranslations, listSharedLocales, listLanguages } from "@/l
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 import type { DeckSlide } from "@/lib/deck-store";
 import { Play, X, ChevronLeft, ChevronRight, Languages, Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -105,7 +106,7 @@ function LinkGate({ variant, message }: { variant: "expired" | "disabled"; messa
 }
 
 function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
-  const brand = byId(BRAND_MODES, deck.brand_mode_id ?? "") ?? BRAND_MODES[0];
+  const brand = resolveBrandMode(deck.brand_mode_id ?? "", deck.sub_company);
   const slides: DeckSlide[] = useMemo(
     () =>
       (deck.slides ?? []).map((s, i) => ({

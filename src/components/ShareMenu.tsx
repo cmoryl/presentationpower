@@ -7,6 +7,7 @@ import { exportDeckToPptx } from "@/lib/pptx-export";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 import { supabase } from "@/integrations/supabase/client";
 import { deckCloudId } from "@/lib/deck-uuid";
 import { saveDeckToCloud } from "@/lib/cloud-decks.functions";
@@ -151,7 +152,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   }, [open, cloudDeckId, getCachedLocalesFn, listLangsFn]);
 
   if (!deck) return null;
-  const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
+  const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
   const stamp = (kind: "pptx" | "pdf" | "present") =>
     setDeckContext(deckId, { lastExportedAt: new Date().toISOString(), lastExportKind: kind });
 

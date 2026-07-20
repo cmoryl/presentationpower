@@ -5,6 +5,7 @@
 // When real logo assets are uploaded, swap `logo` for URL-backed pointers.
 
 import type { BrandLogoLockup, BrandContentScope, BrandRole, BrandMode } from "@/lib/taxonomy";
+import { BRAND_MODES, byId } from "@/lib/taxonomy";
 
 export type BrandProfile = {
   role: BrandRole;
@@ -226,6 +227,39 @@ export function brandModeWithSubCompany(brand: BrandMode, subCompany?: string): 
     ...brand,
     name: subCompany,
     role: "subcompany",
+    logo: profile.logo,
+    contentScope: profile.contentScope,
+  };
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Canonical BrandMode resolver.
+//
+// The rows in BRAND_MODES (in taxonomy.ts) only carry id/name/description/tokens —
+// the `role`, `parentId`, `logo` and `contentScope` fields live in BRAND_PROFILES.
+// Every render path that needs a deck's / brief's *active* brand should go
+// through this resolver so the enrichment layer is always merged in. Without
+// it, the text-lockup fallback in <BrandLockup/> renders the mode's `name`
+// (e.g. "ENTERPRISE") because `brand.logo` is undefined.
+//
+// - `brandModeId === "bm-subcompany"` + `subCompany` set  → typed sub-company
+//   variant via `brandModeWithSubCompany`.
+// - Otherwise → merge the matching BRAND_PROFILES entry (or a neutral
+//   `enrichBrandProfile` fallback) onto the base BrandMode.
+// ────────────────────────────────────────────────────────────────────────────
+export function resolveBrandMode(
+  brandModeId: string,
+  subCompany?: string | null,
+): BrandMode {
+  const base = byId(BRAND_MODES, brandModeId) ?? BRAND_MODES[0];
+  if (base.id === "bm-subcompany" && subCompany) {
+    return brandModeWithSubCompany(base, subCompany);
+  }
+  const profile = BRAND_PROFILES[base.id] ?? enrichBrandProfile(base.id, base.name);
+  return {
+    ...base,
+    role: profile.role,
+    parentId: profile.parentId,
     logo: profile.logo,
     contentScope: profile.contentScope,
   };

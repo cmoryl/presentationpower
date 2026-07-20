@@ -4,6 +4,7 @@ import { useDeckStore } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 import { exportDeckToPptx } from "@/lib/pptx-export";
 import { runQa, blockingIssues, warningIssues } from "@/lib/qa";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
@@ -24,7 +25,7 @@ function ExportView() {
   const [preflightIssues, setPreflightIssues] = useState<PreflightIssue[] | null>(null);
   const [preflightBusy, setPreflightBusy] = useState(false);
   if (!deck) throw notFound();
-  const brand = byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
+  const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
 
   const qa = useMemo(() => runQa(deck.slides, deck.brandModeId), [deck.slides, deck.brandModeId]);
   const blocks = blockingIssues(qa);
