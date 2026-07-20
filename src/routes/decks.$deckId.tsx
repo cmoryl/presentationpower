@@ -141,6 +141,7 @@ function DeckEditor() {
           <SaveToCloudButton deckId={deckId} />
           <VersionHistoryButton deckId={deckId} />
           <TranslateButton deckId={deckId} />
+          <LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} />
           <ShareMenu deckId={deckId} />
         </div>
       </div>
@@ -161,7 +162,7 @@ function DeckEditor() {
                 >
                   <div className="aspect-[16/9] bg-white">
                     <ScaledSlide>
-                      {variant && <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />}
+                      {variant && <VariantRenderer slide={applyOverlay(slide)} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />}
                     </ScaledSlide>
                   </div>
                   <div className="border-t border-black/10 bg-white px-3 py-2 text-xs">
@@ -210,7 +211,7 @@ function DeckEditor() {
           >
             {active && mv && (
               <ScaledSlide>
-                <VariantRenderer slide={active} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />
+                <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} />
               </ScaledSlide>
             )}
             <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100">
