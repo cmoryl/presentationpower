@@ -114,6 +114,10 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
       note?: string;
     }> => {
       const s = context.supabase as unknown as SbClient;
+      // Vector-search division scoping. Same semantics as ai-oracle.functions:
+      // undefined = no division filter requested; true = filter returned matches;
+      // false = filter returned nothing so we fell back to unfiltered results.
+      let divisionScoped: boolean | undefined = undefined;
 
       // ── 1. Hybrid retrieval ─────────────────────────────────────────────
       const [oracleRes, entriesRes, brandIntelRes] = await Promise.all([
