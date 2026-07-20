@@ -1,0 +1,2739 @@
+{
+  "generated_at": "2026-07-20T14:20:49.199922Z",
+  "brands": [
+    {
+      "type": "brand",
+      "name": "G3 Translate",
+      "slug": "g3-translate",
+      "pdfs": [
+        {
+          "section": "templates",
+          "title": "Case Study Template",
+          "category": "",
+          "description": "",
+          "url": "/images/brands/template-g3-case-study.jpg",
+          "thumbnail": "",
+          "source": "internal"
+        }
+      ]
+    },
+    {
+      "type": "brand",
+      "name": "Games",
+      "slug": "games",
+      "pdfs": [
+        {
+          "section": "brochures",
+          "title": "TPGaming_AI_MT_for_Games_eBro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/migrated/brochures_2_1771032587255.pdf",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/migrated/brochures_3_1771032587916.png",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_CaseStudy_TripWire",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775226895521-1775226895521.pdf?t=1775226895521",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-b3a97feb-357d-4751-a669-50c24c075aa1-1775226898150.jpg?t=1775226898150",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_Success Story_fatshark",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775226909944-1775226909944.pdf?t=1775226909944",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-7d65423d-ac75-47af-9f1c-219d383ec383-1775226912076.jpg?t=1775226912076",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_Success Story_InXileEntertainment",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775226928110-1775226928110.pdf?t=1775226928110",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-b96194b2-9c86-4def-be56-3e18bf3fb89a-1775226931694.jpg?t=1775226931694",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_Success Story_Netmarble",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775226945341-1775226945341.pdf?t=1775226945341",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-c860fcf9-d40f-48bb-b66b-19fe373958c5-1775226946731.jpg?t=1775226946731",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_Success Story_NimbleGiantEntertainment",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775226960332-1775226960332.pdf?t=1775226960332",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-28c93777-9695-4b94-a466-ab353d989ebe-1775226963726.jpg?t=1775226963726",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_Success Story_OliveX",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775226980546-1775226980546.pdf?t=1775226980546",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-2b4c1087-0f03-4b3a-a619-3f1e5e32ee12-1775226982359.jpg?t=1775226982359",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_Success Story_Team17",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775226995510-1775226995510.pdf?t=1775226995510",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-6ec9a73a-67f2-4713-b9e4-706353cb26c9-1775226997643.jpg?t=1775226997643",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_Success Story_Xbox",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227010273-1775227010273.pdf?t=1775227010273",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-f4888bce-33a7-4568-beb4-f2f03e753207-1775227011798.jpg?t=1775227011798",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TGS-2025-A4-ENG-fin-updated_Outlined 1",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227358251-1775227358251.pdf?t=1775227358251",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-60671cdf-a5d2-49af-8861-2d30f226ef29-1775227367479.jpg?t=1775227367479",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_Accessibility Solutions_eBro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227384382-1775227384382.pdf?t=1775227384382",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-e4b7597e-3e84-40c7-ae87-ee299bbb5b24-1775227385976.jpg?t=1775227385976",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_AI-Powered-Platform_eBro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227406206-1775227406206.pdf?t=1775227406206",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-d92e41aa-c7c2-4667-aa7a-76764cc3b8d7-1775227409677.jpg?t=1775227409677",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_AISolutions_eBro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227432918-1775227432918.pdf?t=1775227432918",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-36063505-1e70-400a-afa8-e2c9997d63ca-1775227435482.jpg?t=1775227435482",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_ArtServices_eBro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227454874-1775227454874.pdf?t=1775227454874",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-14a0a78e-dea9-4361-abd7-f9d91971c04b-1775227459245.jpg?t=1775227459245",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_Audio Services_Ebro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227473773-1775227473773.pdf?t=1775227473773",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-990c9e63-5cc4-43b3-8e12-92066d93539c-1775227476427.jpg?t=1775227476427",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_Community Management_Ebro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227492710-1775227492710.pdf?t=1775227492710",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-013bbf8e-c2e8-41f6-880f-36cc1b292df4-1775227495224.jpg?t=1775227495224",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_Conversational AI Player Support eBro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227512773-1775227512773.pdf?t=1775227512773",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-d6a834eb-03c4-4a86-a2be-56a6e37c7caf-1775227516073.jpg?t=1775227516073",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_FunctionalQA_eBro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227539672-1775227539672.pdf?t=1775227539672",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-22d5dbe4-462b-4f51-a700-0d92dfd692af-1775227542515.jpg?t=1775227542515",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_Internalization Solutions eBro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227590010-1775227590010.pdf?t=1775227590010",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-874474af-7742-4e01-ae02-b53a403307cc-1775227592643.jpg?t=1775227592643",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_Localization_eBro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227610105-1775227610105.pdf?t=1775227610105",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-da74a771-1d90-437f-99d2-c4bb5e05189a-1775227613474.jpg?t=1775227613474",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_LocalizationQA_eBro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227630464-1775227630464.pdf?t=1775227630464",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-8cb416b1-5509-4943-85a1-1c06bae92bdd-1775227632652.jpg?t=1775227632652",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_MarketingServices_eBro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227672397-1775227672397.pdf?t=1775227672397",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-6e2ae423-dde1-4079-a73b-297ec9eb3bdb-1775227674433.jpg?t=1775227674433",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_PlayerSupport_eBro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227693642-1775227693642.pdf?t=1775227693642",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-f6f12be6-c594-4288-8b7f-2d0ffe90a41e-1775227696275.jpg?t=1775227696275",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPgames_UXTestingSolutions_eBrochure",
+          "category": "Brief",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227712967-1775227712967.pdf?t=1775227712967",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-0215f3a4-8dd6-4bee-a43b-fa0afa87176d-1775227717084.jpg?t=1775227717084",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_Zendesk Adaptor Brief",
+          "category": "Brief",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227756101-1775227756101.pdf?t=1775227756101",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-01413d62-e710-4a59-9d24-4d84b3e7ae5a-1775227758313.jpg?t=1775227758313",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPGames_GLVoice_eBrochure",
+          "category": "Brief",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/collateral-1775227803879-1775227803879.pdf?t=1775227803879",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/af4c1015-def2-4bb4-befc-8054c1cffb62/pdf-thumb-7ea92def-2600-40f4-ba24-dec9c528a5dc-1775227807524.jpg?t=1775227807524",
+          "source": "external"
+        },
+        {
+          "section": "caseStudies",
+          "title": "AAA RPG Localization",
+          "category": "",
+          "description": "Full localization for epic fantasy role-playing game across 15 languages",
+          "url": "/images/brands/games-case-1.jpg",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "Mobile Battle Arena",
+          "category": "",
+          "description": "Real-time multiplayer game localization with culturalization",
+          "url": "/images/brands/games-case-2.jpg",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "Sci-Fi Strategy Game",
+          "category": "",
+          "description": "Complex UI/UX adaptation for futuristic strategy title",
+          "url": "/images/brands/games-case-3.jpg",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "Indie Achievement Platform",
+          "category": "",
+          "description": "Multi-platform indie game localization success story",
+          "url": "/images/brands/games-case-4.jpg",
+          "thumbnail": "",
+          "source": "internal"
+        }
+      ]
+    },
+    {
+      "type": "brand",
+      "name": "Legal",
+      "slug": "legal",
+      "pdfs": [
+        {
+          "section": "brochures",
+          "title": "TL_Compliance Investigations FCPA Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/bbdeaaae-b756-4c7e-8537-1c854ed2cb27/migrated/brochures_0_1771032556205.pdf",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/bbdeaaae-b756-4c7e-8537-1c854ed2cb27/migrated/brochures_1_1771032557297.png",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TL_APG (1)",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/bbdeaaae-b756-4c7e-8537-1c854ed2cb27/migrated/brochures_2_1771032557458.pdf",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/bbdeaaae-b756-4c7e-8537-1c854ed2cb27/migrated/brochures_3_1771032557795.png",
+          "source": "internal"
+        },
+        {
+          "section": "templates",
+          "title": "Brand Assets",
+          "category": "",
+          "description": "",
+          "url": "https://www.dropbox.com/scl/fo/aw2zadayxp8swkc7ipjbc/AA7ImYVMXcrJQllTRgbkojI?rlkey=vsrikbd3jv7h2cs0ql7zptieb&dl=0",
+          "thumbnail": "",
+          "source": "external"
+        }
+      ]
+    },
+    {
+      "type": "brand",
+      "name": "Life Sciences",
+      "slug": "life-sciences",
+      "pdfs": [
+        {
+          "section": "brochures",
+          "title": "LifeSci_PsychedelicsTreatment_article",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/migrated/brochures_6_1771024300300.pdf",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/migrated/brochures_7_1771024300975.png",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPLS - Data Standardization Whitepaper",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/migrated/brochures_8_1771024301229.pdf",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/migrated/brochures_9_1771024301722.png",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "LifeSci_GL_ForresterReport_25_v1",
+          "category": "Product Brochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/migrated/brochures_10_1771024301913.pdf",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/migrated/brochures_11_1771024302115.png",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_CCMS_eLabeling_whitepaper",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774985091113-1774985091113.pdf?t=1774985091113",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Life Sciences How Medical Communications Teams Can Scale Reviews Without Sacrificing Speed",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774985137499-1774985137499.pdf?t=1774985137499",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Life Sciences Imperative of Automation in Pharmacovigilance",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774985420731-1774985420731.pdf?t=1774985420731",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPLS_Clinical-Trial-Web-Localization_Playbook",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774985447398-1774985447398.pdf?t=1774985447398",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPLS_COA_Whitepaper_25",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774985462465-1774985462465.pdf?t=1774985462465",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPLS_How-to-Increase-Your-Likelihood-of-Scientific-Publication_whitepaper",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774985486132-1774985486132.pdf?t=1774985486132",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPLS_Patient_Recruitment_Strategies_FINAL",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774985498731-1774985498731.pdf?t=1774985498731",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Web Localization Playbook for Life Sciences",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774985510198-1774985510198.pdf?t=1774985510198",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TP_LifeSci_ClinicalTrials_Infographic Final 1",
+          "category": "Infographic",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774985544373-1774985544373.pdf?t=1774985544373",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPLS Infographic - COA Lifecycle v2",
+          "category": "Infographic",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774985566038-1774985566038.pdf?t=1774985566038",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "LifeSci_J_J_CaseStudy_1",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990461316-1774990461316.pdf?t=1774990461316",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "LifeSci_LeadingPharmaAutomating_Spotlight 2",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990469521-1774990469521.pdf?t=1774990469521",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "LifeSci_Web Loc_CaseStudy_FINAL",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990488786-1774990488786.pdf?t=1774990488786",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences_Critical Deadlines COA Solutions_Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990499085-1774990499085.pdf?t=1774990499085",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences_Improve Patient Communication Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990509645-1774990509645.pdf?t=1774990509645",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences_Leveraging DTP Workflows for Consistency Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990526352-1774990526352.pdf?t=1774990526352",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences_Plain Language Expertise Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990559856-1774990559856.pdf?t=1774990559856",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences_Leveraging DTP Workflows for Consistency Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990575810-1774990575810.pdf?t=1774990575810",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences_Reduce Literature Screening Time Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990590119-1774990590119.pdf?t=1774990590119",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences_Reduce Time to Route Safety Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990604343-1774990604343.pdf?t=1774990604343",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences_TMF Management Midsize Pharma Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990617709-1774990617709.pdf?t=1774990617709",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences_Top10 Biotech Advisory Deadlines Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990627675-1774990627675.pdf?t=1774990627675",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences_Top10 Pharma EC Deadlines Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990638220-1774990638220.pdf?t=1774990638220",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Life Sci Vivacy Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990710099-1774990710099.pdf?t=1774990710099",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "LifeSci_Cytel_Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990724642-1774990724642.pdf?t=1774990724642",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "LifeSci_parexel_Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990732645-1774990732645.pdf?t=1774990732645",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "LifeSci_Shire_Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990741146-1774990741146.pdf?t=1774990741146",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "LifeSci_UnitedImaging_Spotlight_zh-CN",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990751509-1774990751509.pdf?t=1774990751509",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "MDS_Carestream_CS_eBro",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990762156-1774990762156.pdf?t=1774990762156",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Technology_GL_Adobe  Novo Nordisk Spotlight_JA",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990773855-1774990773855.pdf?t=1774990773855",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences Spotlight_AHA",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990785922-1774990785922.pdf?t=1774990785922",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences Spotlight_CDMP",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990800678-1774990800678.pdf?t=1774990800678",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences Spotlight_Clinispace_ESES",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990810376-1774990810376.pdf?t=1774990810376",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences Spotlight_Complexa_UKEN",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990822742-1774990822742.pdf?t=1774990822742",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences Spotlight_Cytel_UKEN",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990849856-1774990849856.pdf?t=1774990849856",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences Spotlight_Geicam",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990859589-1774990859589.pdf?t=1774990859589",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences Spotlight_Karyopharm_UKEN",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990873955-1774990873955.pdf?t=1774990873955",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences Spotlight_Merck",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990886878-1774990886878.pdf?t=1774990886878",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences Spotlight_Novartis",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990897656-1774990897656.pdf?t=1774990897656",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences Spotlight_Praxis Precision",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990907810-1774990907810.pdf?t=1774990907810",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences Spotlight_Sanofi_UKEN",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990928643-1774990928643.pdf?t=1774990928643",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences Spotlight_PTC Theraputics_UKEN",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990938221-1774990938221.pdf?t=1774990938221",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences Spotlight_Shire_UKEN",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990950855-1774990950855.pdf?t=1774990950855",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences Spotlight_Signant Health",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990967544-1774990967544.pdf?t=1774990967544",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences Spotlihght_Casanova",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990977877-1774990977877.pdf?t=1774990977877",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Life Sciences_Amicus Theraputics Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/725d5397-a2bc-4cba-8764-18c218015ed0/collateral-1774990986787-1774990986787.pdf?t=1774990986787",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "templates",
+          "title": "Brand Assets",
+          "category": "",
+          "description": "Brand Assets",
+          "url": "https://www.dropbox.com/scl/fo/jamqqtgj4qn59qb9lzict/AKVymnQHRTCkmu1fwIa-3q8?rlkey=by8hb3316sgin1yj6qs7wq00z&dl=0",
+          "thumbnail": "",
+          "source": "external"
+        }
+      ]
+    },
+    {
+      "type": "brand",
+      "name": "Media",
+      "slug": "media",
+      "pdfs": [
+        {
+          "section": "brochures",
+          "title": "TPMedia_BeHive_ServiceOffering_eBro",
+          "category": "Product Brochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/migrated/brochures_4_1771032588487.pdf",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/migrated/brochures_5_1771032588658.png",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "MediaNext Infographic",
+          "category": "Infographic",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/migrated/brochures_8_1771032589191.pdf",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/migrated/brochures_9_1771032589487.png",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPMedia_Ryanair_Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231061735-1775231061735.pdf?t=1775231061735",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-45300841-44b1-406f-b97f-a12aef2e42df-1775231064372.jpg?t=1775231064372",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect Media Monster Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231114009-1775231114009.pdf?t=1775231114009",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-c870fb92-bbf7-4dd0-af71-6b9eefc352b4-1775231116955.jpg?t=1775231116955",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect Media Red Bull Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231129277-1775231129277.pdf?t=1775231129277",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-a8b962ee-681a-4519-9460-f6d07ab72100-1775231132807.jpg?t=1775231132807",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect Media TEDEd Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231146104-1775231146104.pdf?t=1775231146104",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-0c70258c-4dba-49ba-83e4-b0b6a9d9f40d-1775231149610.jpg?t=1775231149610",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "GLMedia_TOEI_CaseStudy 2",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231177674-1775231177674.pdf?t=1775231177674",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-29f29404-2cd1-45c5-8678-120a0b49f401-1775231180584.jpg?t=1775231180584",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GlobalLinkMedai_HBOMax_CaseStudy",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231192368-1775231192368.pdf?t=1775231192368",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-0046deef-f90f-4df1-a062-897e7b1fae58-1775231193728.jpg?t=1775231193728",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPMedia_Accessibility_CaseStudy_FINAL 2",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231212272-1775231212272.pdf?t=1775231212272",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-3bc07ee0-df09-4c69-94f9-a0e26c159f24-1775231213918.jpg?t=1775231213918",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPMedia_CrunchyRoll_CaseStudy",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231230435-1775231230435.pdf?t=1775231230435",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-7fbc9da3-2b23-49af-b057-b7a1f2be6569-1775231232017.jpg?t=1775231232017",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPMedia_TV5Monde_CaseStudy 1",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231274235-1775231274235.pdf?t=1775231274235",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-72bbc2ac-48b1-4598-9efe-ef7c564592c6-1775231276349.jpg?t=1775231276349",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPMedia_SportDocuseries_SuccessStory",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231294135-1775231294135.pdf?t=1775231294135",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-6a8a1375-d2a0-4fc7-b54c-9c8affd095da-1775231296316.jpg?t=1775231296316",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect Media Curiosity Stream Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231317808-1775231317808.pdf?t=1775231317808",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-716ddcd9-96dc-47a8-a797-e4e552e54eb9-1775231320752.jpg?t=1775231320752",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect Media HPE Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231339309-1775231339309.pdf?t=1775231339309",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-91f73ba4-3cef-4fc2-9b32-d634d1315600-1775231341875.jpg?t=1775231341875",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect Media MGA Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231365108-1775231365108.pdf?t=1775231365108",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-d9efae66-7660-4419-b703-757403ae363d-1775231368160.jpg?t=1775231368160",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect Media Medical Training Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231385370-1775231385370.pdf?t=1775231385370",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-7f15beba-e456-45c6-89dc-64f32250f23b-1775231386569.jpg?t=1775231386569",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect Media Text-to-Speech Dual Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231405468-1775231405468.pdf?t=1775231405468",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-55f6e7b0-21ce-4987-8c4e-a7fdea7d2524-1775231407272.jpg?t=1775231407272",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect Media Viacom Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231422735-1775231422735.pdf?t=1775231422735",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-25fb9e30-8f57-498e-a81b-103c11b15262-1775231424203.jpg?t=1775231424203",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect Media Wondery Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231442436-1775231442436.pdf?t=1775231442436",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-ffd1b2a0-ccee-4579-9300-e36d65c172cd-1775231443870.jpg?t=1775231443870",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "GLmedia_ebro_25 3",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231846578-1775231846578.pdf?t=1775231846578",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-c1aec35c-4269-4f85-bd97-17e89970aac1-1775231848114.jpg?t=1775231848114",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "MPC One Pager",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231863428-1775231863428.pdf?t=1775231863428",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-cf7828d0-b885-4840-b495-4d778388d87f-1775231864656.jpg?t=1775231864656",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TP_THE MILL_ONE PAGER",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231880828-1775231880828.pdf?t=1775231880828",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-f866956b-b8a0-46d1-9932-6a591fdfed08-1775231883353.jpg?t=1775231883353",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPMedia_eBrochure_Conductor_v5 1",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231897841-1775231897841.pdf?t=1775231897841",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-ec9f0384-b464-4baf-ae60-e77932152116-1775231901880.jpg?t=1775231901880",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPMedia_eBrochure_Director_v4 2",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231915744-1775231915744.pdf?t=1775231915744",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-776047c3-6397-41f4-b32c-f959af03b9a2-1775231918712.jpg?t=1775231918712",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPMedia_eBrochure_Inspector_v4 1",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231944412-1775231944412.pdf?t=1775231944412",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-cb2ef920-9a99-473b-b0d9-1f5289b55830-1775231948271.jpg?t=1775231948271",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect Media - Anime Expertise",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231965536-1775231965536.pdf?t=1775231965536",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-62aa4ddf-b844-448a-af2a-b1304fadac48-1775231967103.jpg?t=1775231967103",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect Media - Kids  Family Expertise",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231984208-1775231984208.pdf?t=1775231984208",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-55d737ff-257e-43a6-b4d6-fd036e905b31-1775231985844.jpg?t=1775231985844",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect Media - Theatrical Expertise",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775231999472-1775231999472.pdf?t=1775231999472",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-dccc3664-900f-42fd-8ca7-eb249d9ec4f0-1775232003658.jpg?t=1775232003658",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect Media Accessibility Services",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775232020033-1775232020033.pdf?t=1775232020033",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-c9cd17b1-60a2-4f8e-860d-74837704af34-1775232021112.jpg?t=1775232021112",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect Media One-Pager",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775232034366-1775232034366.pdf?t=1775232034366",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-854279f9-5b3b-416b-8c7f-06278ac36cd1-1775232036119.jpg?t=1775232036119",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPMedia_Brightcove_Integration_eBro_ENT",
+          "category": "Solutions Briefs",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775232112605-1775232112605.pdf?t=1775232112605",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-cc37fcf5-3555-446c-a80b-dc21c78e2418-1775232114350.jpg?t=1775232114350",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPMedia_Brightcove_Integration_eBro",
+          "category": "Solutions Briefs",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775232217410-1775232217410.pdf?t=1775232217410",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-0ee428fb-73c6-40e3-b132-20ed3444a056-1775232219160.jpg?t=1775232219160",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPMedia_ExtremeReach_Integration_eBro",
+          "category": "Solutions Briefs",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775232232975-1775232232975.pdf?t=1775232232975",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-9ed2e3eb-dc96-4958-afd6-9c407f574510-1775232234092.jpg?t=1775232234092",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect Media Kaltura Integration",
+          "category": "Solutions Briefs",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775232248802-1775232248802.pdf?t=1775232248802",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-65341002-092a-47f7-8d70-f23d7c4c5273-1775232249860.jpg?t=1775232249860",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPMedia_FilmClassics_brochure_FINAL",
+          "category": "Brochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775232302000-1775232302000.pdf?t=1775232302000",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-3f55cc71-7e6e-4e56-9514-ac54b5e45d31-1775232304814.jpg?t=1775232304814",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "contentlabs ebro-V12",
+          "category": "ContentLabs",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775232457367-1775232457367.pdf?t=1775232457367",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-1b1f7623-d7d0-4072-98eb-b0d42b370b18-1775232459634.jpg?t=1775232459634",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "ContentLabs_Life Sciences_Service Offering 1 5",
+          "category": "ContentLabs",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/collateral-1775232479174-1775232479174.pdf?t=1775232479174",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/cb0f36e6-e533-44d1-a56f-6baf4a5eb2c2/pdf-thumb-359eb1b4-c1fc-49e4-bef7-565e0454e113-1775232480519.jpg?t=1775232480519",
+          "source": "external"
+        }
+      ]
+    },
+    {
+      "type": "brand",
+      "name": "TransPerfect",
+      "slug": "transperfect",
+      "pdfs": [
+        {
+          "section": "brochures",
+          "title": "TPT_Healthcare_eBro_25",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/migrated/brochures_0_1771024262137.pdf",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/migrated/brochures_1_1771024262454.png",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect_Generative AI_Consulting_EBrochure",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774991319058-1774991319058.pdf?t=1774991319058",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Artwork Management",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774991555124-1774991555124.pdf?t=1774991555124",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Bill 96_ENUS",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774991563938-1774991563938.pdf?t=1774991563938",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_GDPR Translations",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774991575324-1774991575324.pdf?t=1774991575324",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_HR Transformation",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774991584639-1774991584639.pdf?t=1774991584639",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_VeevaVault_GL_Integrations_eBro_October2025",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774991597825-1774991597825.pdf?t=1774991597825",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect_General Brief_USEN",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774991612126-1774991612126.pdf?t=1774991612126",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Manufacturing_Forrester - Total Economic Impact Of GlobalLink_2022",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774991629197-1774991629197.pdf?t=1774991629197",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TP Accessibility_EAA Ebro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774991752963-1774991752963.pdf?t=1774991752963",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TP Accessibility_Services EBro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774991763541-1774991763541.pdf?t=1774991763541",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Accessibility Audit Process",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774991771359-1774991771359.pdf?t=1774991771359",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Accessibility Solutions",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774991783192-1774991783192.pdf?t=1774991783192",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Citrix_Spotlight_Final",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774992014694-1774992014694.pdf?t=1774992014694",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/thumbnail-236a63bc-859e-483a-aee6-6a9cfdb9355c-1775156084353.png?t=1775156084353",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_TrendMicro_Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774992023263-1774992023263.pdf?t=1774992023263",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TDC_Spotlight_SAS",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774992030794-1774992030794.pdf?t=1774992030794",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Citrix_Spotlight_JA",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774992040094-1774992040094.pdf?t=1774992040094",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Spotlight_HP Enterprise_ZHCN",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774992048761-1774992048761.pdf?t=1774992048761",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Western Digital_Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774992060476-1774992060476.pdf?t=1774992060476",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TransPerfect_GL Connect_KIOXIA Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774992070361-1774992070361.pdf?t=1774992070361",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Spotlight_Hamamatsu",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774992172229-1774992172229.pdf?t=1774992172229",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Spotlight_Clariant",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774992181895-1774992181895.pdf?t=1774992181895",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_RogersCorp_Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774992194695-1774992194695.pdf?t=1774992194695",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Gewiss_Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774992203893-1774992203893.pdf?t=1774992203893",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TDC_Spotlight_Zebra_UKEN",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774992258642-1774992258642.pdf?t=1774992258642",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Elearning_Spotlight_PGandE",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/brands/0d6d5a5f-0dd0-4e62-9ac2-285a4095de84/collateral-1774992308909-1774992308909.pdf?t=1774992308909",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Visual Asset Documentation \u2014 Digital Toolbox",
+          "category": "Brand Guidelines",
+          "description": "Complete reference for the TransPerfect web identity: visual foundation, colors, typography, imagery, icon style, motion, logotype and expression flex. November 2025.",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/transperfect/visual-asset-documentation-2025-11.pdf",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/transperfect/visual-asset-documentation-2025-11.pdf",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "Global Tech Company Expansion",
+          "category": "",
+          "description": "Helped a major tech company launch their platform in 45 new markets simultaneously",
+          "url": "/images/brands/imagery-transperfect-do-1.jpg",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "Financial Services Compliance",
+          "category": "",
+          "description": "Delivered regulatory-compliant translations for global financial reporting",
+          "url": "/images/brands/imagery-transperfect-do-2.jpg",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "E-Commerce Global Launch",
+          "category": "",
+          "description": "Localized complete e-commerce platform for 30 international markets",
+          "url": "/images/brands/imagery-transperfect-do-1.jpg",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "Healthcare Trial Support",
+          "category": "",
+          "description": "Provided clinical trial translation support across 50 countries",
+          "url": "/images/brands/imagery-transperfect-do-2.jpg",
+          "thumbnail": "",
+          "source": "internal"
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "type": "product",
+      "name": "DataForce",
+      "slug": "dataforce",
+      "pdfs": [
+        {
+          "section": "brochures",
+          "title": "DataForce_BPO_SolutionsBrief",
+          "category": "Brief",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775225553735-1775225553735.pdf?t=1775225553735",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-6d548c40-559e-4ecf-a7ce-4dd6050d752a-1775225556323.jpg?t=1775225556323",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_ComputerVision_Solutions Brief",
+          "category": "Brief",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775225612118-1775225612118.pdf?t=1775225612118",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-d45a5240-d41d-4e2e-b847-c95709bcaecd-1775225615370.jpg?t=1775225615370",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_ComputerVision_Workflow",
+          "category": "Brief",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775225640153-1775225640153.pdf?t=1775225640153",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-03028f62-97a6-439a-8362-e11c3254e8c9-1775225647821.jpg?t=1775225647821",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_Data_Collection_User_Studies_Guide",
+          "category": "Brief",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775225667144-1775225667144.pdf?t=1775225667144",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-ea7ea4ce-40fd-4002-8969-27672365386c-1775225669717.jpg?t=1775225669717",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_Retail Solutions Brief",
+          "category": "Brief",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775225690142-1775225690142.pdf?t=1775225690142",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-d60c478e-b300-4279-81e6-713751df99ad-1775225691992.jpg?t=1775225691992",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_Search Product Ad Relevance Guide",
+          "category": "Brief",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775225713609-1775225713609.pdf?t=1775225713609",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-47f0e2d5-cb15-4c4c-91f7-c3ef874f4afe-1775225715934.jpg?t=1775225715934",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_Sourcing_Process_SolutionsBrief",
+          "category": "Brief",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775225735754-1775225735754.pdf?t=1775225735754",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-987db0a4-658b-433b-a9c6-f97e15358a49-1775225738836.jpg?t=1775225738836",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_Workflow_LLM",
+          "category": "Brief",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775225756508-1775225756508.pdf?t=1775225756508",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-7654f023-6434-4944-ad97-2c56707d04ff-1775225770466.jpg?t=1775225770466",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_ClinicalAI_DataServices_ebro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775225805713-1775225805713.pdf?t=1775225805713",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-4a8c9c1e-5728-4aae-8e6a-c7537b771cf7-1775225810006.jpg?t=1775225810006",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_FactSheet",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775225823407-1775225823407.pdf?t=1775225823407",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-5f361253-1a95-4da1-9c37-6e442373797d-1775225825038.jpg?t=1775225825038",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_General_EBro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775225860303-1775225860303.pdf?t=1775225860303",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-6365f893-a05d-4072-acc9-1741523ab44d-1775225861370.jpg?t=1775225861370",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_MachineTranslation_eBro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775225880839-1775225880839.pdf?t=1775225880839",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-fb407376-86ca-4a98-8378-468d5e218864-1775225883138.jpg?t=1775225883138",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_RedTeamingAI_eBro_r2 1",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775225898812-1775225898812.pdf?t=1775225898812",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-0d7c3f64-e309-4a83-a112-0bcd9bdf4d2e-1775225900062.jpg?t=1775225900062",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_ResearchServices_eBro_r2pdf",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775225915105-1775225915105.pdf?t=1775225915105",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-1e04ca92-fea8-402c-9ae0-054742884d2a-1775225916230.jpg?t=1775225916230",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_Secure_Data_Collection_Labeling_ENUS",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775225934546-1775225934546.pdf?t=1775225934546",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-5c55e799-f754-4e9b-b14d-a299b95f2890-1775225936034.jpg?t=1775225936034",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DF_GenerativeAI eBro_2025",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775226055496-1775226055496.pdf?t=1775226055496",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-4b02b157-5112-4be0-aefe-b679bebca914-1775226060135.jpg?t=1775226060135",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_Success Story_Data Entry_Pharmaceutical Company",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775226089222-1775226089222.pdf?t=1775226089222",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-bb04671f-25cb-4bf3-acb2-54b7d701f872-1775226092694.jpg?t=1775226092694",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_Success Story_Large Scale Image Dataset",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775226109178-1775226109178.pdf?t=1775226109178",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-ea2a6dd8-7d9a-433e-8d0f-f0e5d6ca1504-1775226112582.jpg?t=1775226112582",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_Success Story_Robotic Arm",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775226122080-1775226122080.pdf?t=1775226122080",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-7528770c-f898-4c22-abcd-df6b05125479-1775226125030.jpg?t=1775226125030",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_Success Story_Safety Text Translation",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775226141458-1775226141458.pdf?t=1775226141458",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-bd185ae4-a538-4eda-828d-279880fb5972-1775226143679.jpg?t=1775226143679",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_Success Story_STEM Datasets",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775226158114-1775226158114.pdf?t=1775226158114",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-61afbeed-9349-4fcd-bf7c-c173ea0b6237-1775226159649.jpg?t=1775226159649",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_Success Story_STEM Talent Sourcing",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775226177789-1775226177789.pdf?t=1775226177789",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-59a49584-2612-4503-8750-12dd0ba346e8-1775226179398.jpg?t=1775226179398",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_Success Story_Textual Content Creation",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775226191645-1775226191645.pdf?t=1775226191645",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-3190c263-6867-4aff-927c-830e635c611b-1775226194483.jpg?t=1775226194483",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DF_Autonomous Driving Annotation_Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775226207621-1775226207621.pdf?t=1775226207621",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-4398d1b6-4169-48fa-b127-d20545b0b6a7-1775226208620.jpg?t=1775226208620",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "DataForce_LifeSciences_Annotation_Whitepaper",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/collateral-1775226250777-1775226250777.pdf?t=1775226250777",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/63e1cbc5-fcc8-4ae5-a547-55a9bc1af863/pdf-thumb-85c2bb79-3e2e-47df-83f8-006f60e35af3-1775226253788.jpg?t=1775226253788",
+          "source": "external"
+        },
+        {
+          "section": "templates",
+          "title": "Brand Assets Folder",
+          "category": "",
+          "description": "DataForce Brand Assets",
+          "url": "https://www.dropbox.com/scl/fo/n89b6uvbl0n5gilj7a4ua/ALzGgUDNpXDky8xOk0UUyhg?rlkey=jk7ku5eeq9m9qziyfz1v83i50&dl=0",
+          "thumbnail": "",
+          "source": "external"
+        }
+      ]
+    },
+    {
+      "type": "product",
+      "name": "GlobalLink",
+      "slug": "globallink",
+      "pdfs": [
+        {
+          "section": "brochures",
+          "title": "TP_GL_InRiver_Indiska_Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/migrated/brochures_4_1771032721228.pdf",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/migrated/brochures_5_1771032722068.png",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_vVardis_Spotlight-Final",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/migrated/brochures_6_1771032722300.pdf",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/migrated/brochures_7_1771032722501.png",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_CCMSvsPIM_whitepaper_Final",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/migrated/brochures_10_1771032723044.pdf",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/migrated/brochures_11_1771032723272.png",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_GLNOW_AI as a Program_VS_AI as a Plug In",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/migrated/brochures_12_1771032723451.pdf",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/migrated/brochures_13_1771032723658.png",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "lookbook",
+          "category": "Product Brochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/migrated/brochures_14_1771032723820.png",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/thumbnail-20c10b10-2cef-4058-b3bb-a066ab562bed-1771865994788.png?t=1771865994788",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "solutions ",
+          "category": "Capability Statement",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/migrated/brochures_15_1771032723988.png",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Ai in Localization",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://www.dropbox.com/scl/fi/otp6d4l2kt3nidf1sjcxf/GL_AI-in-Localization-How-to-Win.pdf?rlkey=e6f2nbnnjexk2rd3mh9qhzqvw&dl=0",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/thumbnail-598d5925-2813-4881-b975-bfab721f15e9-1772208083746.png?t=1772208083746",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "GlobalLink TaaF Whitepaper A Risk-Based Framework for Translation Decisions clone",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581672445-akkn-1775581672446.pdf?t=1775581672446",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-9f9a0ac7-8f25-4c7a-9f56-c809c7e814cc-1775581673562.jpg?t=1775581673562",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Partner_Akeneo Cross-Border Strategy_Whitepaper",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581674118-7itr-1775581674118.pdf?t=1775581674118",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-2601da09-5e77-4922-9ecb-7e213be92120-1775581689654.jpg?t=1775581689654",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Technology_Forrester Total Economic Impact GlobalLink Managed Services Program Infographic_2020",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581690295-s4ts-1775581690295.pdf?t=1775581690295",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-ac36b8dc-48b9-4b48-864c-e4883f9c240c-1775581691603.jpg?t=1775581691603",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Technology_Forrester Total Economic Impact GlobalLink Managed Services Program White Paper_2020",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581692290-7abo-1775581692290.pdf?t=1775581692290",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-37aca305-4f74-45d4-ba0a-037dd012aae8-1775581693598.jpg?t=1775581693598",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Technology_Forrester Total Economic Impact GlobalLink White Paper_2020",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581694186-2o0u-1775581694186.pdf?t=1775581694186",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-e0560238-321d-4872-bd7a-891c8512a92a-1775581695370.jpg?t=1775581695370",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "The Total Economic Impact Of TransPerfects GL Web and Now_Final",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581696135-sdbo-1775581696135.pdf?t=1775581696135",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-02d6d8fc-9af9-43b9-ab9c-621134a69404-1775581697548.jpg?t=1775581697548",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TheTEIOfTransPerfectGlobalLinkForLifeSciences",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581698079-md3b-1775581698079.pdf?t=1775581698079",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-96d7eb49-4451-46da-9d3e-129d8723400d-1775581699081.jpg?t=1775581699081",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Adobe_Beyond Borders Whitepaper Gold Tier",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581699658-qqih-1775581699658.pdf?t=1775581699658",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-677b71bb-57cf-4472-ade3-5a5d37c7f84b-1775581700900.jpg?t=1775581700900",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_HaasAutomation_CaseStudy_final",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581782396-lpcy-1775581782396.pdf?t=1775581782396",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-ed9f47ef-5ec1-472f-9edb-668c3a512dc8-1775581784544.jpg?t=1775581784544",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_Intelligent-Performance_PureStorage_CaseStudy_final",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581785351-vw7c-1775581785351.pdf?t=1775581785351",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-fe9f5935-ecb6-4f9f-97b0-dcac67a4a5d9-1775581786766.jpg?t=1775581786766",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GlobalLink Business Outlook Report_Global Content in the Age of AI",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581787395-iw6m-1775581787395.pdf?t=1775581787395",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-d421a644-ee9c-41d5-ba74-6345a64c6d5a-1775581802135.jpg?t=1775581802135",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GlobalLink Intelligent Performance Pharma Case Study",
+          "category": "Case Study",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581803122-h87x-1775581803122.pdf?t=1775581803122",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-0d13674c-66bc-4078-ab74-4ea0f694c2cd-1775581804908.jpg?t=1775581804908",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GlobalLink TMS Retail Buyers Checklist Enterprise Evaluation Criteria for Retail Localization",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581812460-94qt-1775581812460.pdf?t=1775581812460",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-0202e117-8c3e-44df-be6b-a52bcb2fb0d8-1775581813343.jpg?t=1775581813343",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Retail TMS Buyers Guide Evaluating Multilingual Product Content Infrastructure",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581814117-nvaf-1775581814117.pdf?t=1775581814117",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-bb93cb15-5029-4bab-b803-045298085016-1775581817723.jpg?t=1775581817723",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Sanofi  Pure Storage_Intelligent Performance_Final",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581818397-5nih-1775581818397.pdf?t=1775581818397",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-bde3b637-2eb9-48cc-95f9-0e200439b8dd-1775581820613.jpg?t=1775581820613",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Technology_Fluke Spotlight_USEN",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581821268-19nq-1775581821268.pdf?t=1775581821268",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-cf7b7c26-137b-4290-8d4e-ce68a7098546-1775581822667.jpg?t=1775581822667",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Technology_GL_Adobe  Novo Nordisk_Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581823361-1lys-1775581823361.pdf?t=1775581823361",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-ff3eefd8-68c1-410a-8c3f-6a5eba0a9d94-1775581826597.jpg?t=1775581826597",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Technology_GL_InRiver  Fjallraven_Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581827349-tjrb-1775581827349.pdf?t=1775581827349",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-475d5b43-0cf1-4d79-8951-e8c7edb6c709-1775581833154.jpg?t=1775581833154",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Technology_GlobalLink_Akeneo  Pierce Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581834072-l1gc-1775581834072.pdf?t=1775581834072",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-0fe55b4a-8439-4ef9-9875-fe4b8293020c-1775581899869.jpg?t=1775581899869",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Technology_GlobalLink_Contentful  Mailchimp Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581900903-bxsr-1775581900903.pdf?t=1775581900903",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-fbe8c3e8-56e8-4c29-9b0e-13592824a803-1775581902893.jpg?t=1775581902893",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Technology_GlobalLink_Indiska_InRiver and Optimizely_Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581903610-5cfd-1775581903610.pdf?t=1775581903610",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-48d1c084-dc26-4b9f-a09b-382c0ab92687-1775581908902.jpg?t=1775581908902",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Technology_HP Restructuring Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581909658-l7os-1775581909658.pdf?t=1775581909658",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-88f4e6cd-6af8-4d22-9ef2-c24fef7f51e6-1775581910651.jpg?t=1775581910651",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPLS_AI MT Use Cases_23july24",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581911286-negm-1775581911286.pdf?t=1775581911286",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-14ee5ea0-fea5-438f-95ba-b7bc3933c9ca-1775581919372.jpg?t=1775581919372",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Accessibility",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581920087-zdq8-1775581920087.pdf?t=1775581920087",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-1daee111-ae71-4a43-aa09-616733cac153-1775581921703.jpg?t=1775581921703",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_GL_Guaranteed Rate Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581922583-eduj-1775581922583.pdf?t=1775581922583",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-15507627-a08f-4bfd-98a1-8c39d8a0775c-1775581926711.jpg?t=1775581926711",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_GlobalLink AI_MT Services",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581927433-nn6n-1775581927433.pdf?t=1775581927433",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-d5bf189b-68a2-404e-b8aa-fe9d13d343c9-1775581928482.jpg?t=1775581928482",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_GlobalLink_AI Engine Customization",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581929112-2sn1-1775581929112.pdf?t=1775581929112",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-34a428b7-52d5-4166-b44e-c0a256bca44f-1775581930577.jpg?t=1775581930577",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_GlobalLink_PIM Brief",
+          "category": "Brief",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581931246-i2fs-1775581931246.pdf?t=1775581931246",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-8e13e405-2ed4-4b3c-91c2-19efd24cd677-1775581934215.jpg?t=1775581934215",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_UXTestingSolutions",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775581934924-f7dw-1775581934924.pdf?t=1775581934924",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-3f0f8df1-457e-4253-994a-c18705d92fdd-1775581937169.jpg?t=1775581937169",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_SEO Tools for Multilingual Success",
+          "category": "Infographic",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775582212162-n0dl-1775582212162.pdf?t=1775582212162",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-4ae71b45-cb36-4af9-a989-b30bc82a6abf-1775582213714.jpg?t=1775582213714",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GLPortal_TSR_eBro 8",
+          "category": "Infographic",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775582214427-121b-1775582214427.pdf?t=1775582214427",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-773c894b-cede-461a-b5e9-0d3c8e36a5d9-1775582217168.jpg?t=1775582217168",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TP_HolidayShopping_Infographic_24 4",
+          "category": "Infographic",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775582218014-dctd-1775582218014.pdf?t=1775582218014",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-6cba8379-0ef6-4c5e-9f01-6738c6b0b53b-1775582225740.jpg?t=1775582225740",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Travel_Infographic_Multilingual Customer Journey",
+          "category": "Infographic",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/collateral-1775582227093-8asw-1775582227093.pdf?t=1775582227093",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/d4cc286f-1047-4bda-80a1-888e158e1244/pdf-thumb-5499046e-ee66-478e-84eb-05a83e637e32-1775582228643.jpg?t=1775582228643",
+          "source": "internal"
+        },
+        {
+          "section": "templates",
+          "title": "GLobalLink Droopbox",
+          "category": "",
+          "description": "",
+          "url": "https://www.dropbox.com/scl/fo/f1kv1d0twow5hagpmrd1k/AIGLyWpIQ25NXdB6Qukhiuc?rlkey=4g0e3avhek4z029at7iffdvtf&dl=0",
+          "thumbnail": "",
+          "source": "external"
+        }
+      ]
+    },
+    {
+      "type": "product",
+      "name": "GlobalLink CCMS",
+      "slug": "globallink-ccms",
+      "pdfs": [
+        {
+          "section": "brochures",
+          "title": "Astoria_Functional Comparison_PTC Windhall",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579739512-8msm-1775579739513.pdf?t=1775579739513",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-575d1da2-7cbc-480f-9fe8-5bf927d0cd36-1775579741778.jpg?t=1775579741778",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_OnePager_GlobalLink-Mariott_GLCCMS_CaseStudy-Design_r05",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579742621-3edx-1775579742621.pdf?t=1775579742621",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-44396399-2144-4c1d-8803-96b9387bb269-1775579744423.jpg?t=1775579744423",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GL-CCMC_MultiPageCaseStudy_Agilent_Biotech_r06",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579745183-4ntn-1775579745183.pdf?t=1775579745183",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-c3a28629-db7b-4535-88a6-6d8743db72a9-1775579746848.jpg?t=1775579746848",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GlobalLinkCCMS Case Study AgilentBioTek_One Pager",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579747389-kfqf-1775579747389.pdf?t=1775579747389",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-613091c7-aeea-40e0-9abd-e0dcc64c35dd-1775579750076.jpg?t=1775579750076",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Vasont_Functional Comparison PTC Windhill",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579750879-2tn1-1775579750879.pdf?t=1775579750879",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-d80e9a9f-2a0c-49ee-b483-429432fb5fb4-1775579751711.jpg?t=1775579751711",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Vasont_Inspire Brief",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579752322-vk74-1775579752322.pdf?t=1775579752322",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-eec3ed37-e015-49d4-9e17-7a6f859a8202-1775579753569.jpg?t=1775579753569",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Vasont_Once  Done Content Management Brief",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579754407-drmx-1775579754407.pdf?t=1775579754407",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-9d79854e-83a2-4169-9ba3-43f6f6b0c2a9-1775579755783.jpg?t=1775579755783",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_CCMS_eLabeling_whitepaper",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579775028-96wb-1775579775028.pdf?t=1775579775028",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-104d92c0-2794-49da-b35e-a8b32e8320d2-1775579778539.jpg?t=1775579778539",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "glccms_white_paper_-_use_case_de-DE",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579779153-3qn9-1775579779153.pdf?t=1775579779153",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-ed958cd3-ac8d-4b63-8d07-f8e08360ed16-1775579821383.jpg?t=1775579821383",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GlobalLink_CCMS_white_paper_-_use_case",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579822064-siiz-1775579822064.pdf?t=1775579822064",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-b905b5f5-f1d4-4baf-b11f-181f1f637e4e-1775579824366.jpg?t=1775579824366",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Technology_GlobalLink CCMS_ABCs of Structured Content_White Paper",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579824975-oc3c-1775579824975.pdf?t=1775579824975",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-07b2b7d7-669c-4039-b059-880c70e1d4cd-1775579826061.jpg?t=1775579826061",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Technology_GlobalLink CCMS_Content  Process Audit Trails White Paper",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579826532-e72z-1775579826532.pdf?t=1775579826532",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-48b3d21c-d03d-4681-9c87-52ee8d0ce6c5-1775579827553.jpg?t=1775579827553",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Technology_GlobalLink_CCMS vs PIM Whitepaper",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579828526-9bbq-1775579828526.pdf?t=1775579828526",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-e47f6ec5-36c5-49aa-a878-7ca7c06c1cd0-1775579829540.jpg?t=1775579829540",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Technology_GlobalLink_Dynamic CCMS Optimize White Paper",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579830124-esaf-1775579830124.pdf?t=1775579830124",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-a18465c7-5718-4c3c-9a0f-92846b00a8d7-1775579831348.jpg?t=1775579831348",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Technology_GlobalLink_XML CCMS Multiple Channels Whitepaper",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579831863-1e49-1775579831863.pdf?t=1775579831863",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-130b7aa0-b315-43c7-8dd6-3522a663471e-1775579833223.jpg?t=1775579833223",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_GlobalLink CCMS_Dita XML for Technical Content Whitepaper",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579833859-cypb-1775579833859.pdf?t=1775579833859",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-8f47117e-fd9a-4ae8-bb3d-ad50c4ea6b5e-1775579834907.jpg?t=1775579834907",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "Whats next - Getting Started with a CCMS",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579835453-56tz-1775579835453.pdf?t=1775579835453",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-f9720b6e-a234-4e67-a017-42956012343d-1775579862816.jpg?t=1775579862816",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "WP_AS_Automated Content Governance-APPROVED",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579863466-nq0u-1775579863466.pdf?t=1775579863466",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-b8436065-955c-48f6-b560-2b882862bbfa-1775579864464.jpg?t=1775579864464",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "WP_GLCCMS_CCMS-WebCMS-APPROVED",
+          "category": "Whitepaper",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/collateral-1775579865097-xvl3-1775579865097.pdf?t=1775579865097",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1f62efd4-9c21-41e7-9682-18efa5c1c437/pdf-thumb-69eec6cc-9953-431f-b982-916e72ddd2c3-1775579866056.jpg?t=1775579866056",
+          "source": "internal"
+        }
+      ]
+    },
+    {
+      "type": "product",
+      "name": "GlobalLink Live",
+      "slug": "globallink-live",
+      "pdfs": [
+        {
+          "section": "brochures",
+          "title": "GLLive_Baxter_Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/6798835c-191c-4f41-8f32-ea1d15b160db/collateral-1775580017908-swep-1775580017909.pdf?t=1775580017909",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/6798835c-191c-4f41-8f32-ea1d15b160db/pdf-thumb-a05b774e-1cdc-4f2a-8483-c8da42d489b5-1775580020550.jpg?t=1775580020550",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GLLive_COP29_SuccessStory",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/6798835c-191c-4f41-8f32-ea1d15b160db/collateral-1775580021254-4fp9-1775580021254.pdf?t=1775580021254",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/6798835c-191c-4f41-8f32-ea1d15b160db/pdf-thumb-98b37ce4-b24c-4db9-9e15-db3ef75a8be7-1775580027450.jpg?t=1775580027450",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GLLive_Enovis_Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/6798835c-191c-4f41-8f32-ea1d15b160db/collateral-1775580028244-jyj6-1775580028244.pdf?t=1775580028244",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/6798835c-191c-4f41-8f32-ea1d15b160db/pdf-thumb-7766c892-7d4c-427d-aae8-e73433cad2df-1775580031438.jpg?t=1775580031438",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GlobalLink_Live AI One-Pager Update",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/6798835c-191c-4f41-8f32-ea1d15b160db/collateral-1775580032230-6y3n-1775580032230.pdf?t=1775580032230",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/6798835c-191c-4f41-8f32-ea1d15b160db/pdf-thumb-3a63ef38-e86b-4018-9ace-ed929652ca66-1775580034263.jpg?t=1775580034263",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "One -Pager l GlobalLink Live for Cast l Peter Cselenyi _ 8810 Design_r02",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/6798835c-191c-4f41-8f32-ea1d15b160db/collateral-1775580034984-1ho1-1775580034984.pdf?t=1775580034984",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/6798835c-191c-4f41-8f32-ea1d15b160db/pdf-thumb-3d034daa-d761-41f9-9434-74e0ff3a2222-1775580049257.jpg?t=1775580049257",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPLive_Spotlight_Real Time Event Interpretation",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/6798835c-191c-4f41-8f32-ea1d15b160db/collateral-1775580050036-329s-1775580050036.pdf?t=1775580050036",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/6798835c-191c-4f41-8f32-ea1d15b160db/pdf-thumb-d730d4e3-7052-4d7c-8a25-1577130a3cec-1775580052048.jpg?t=1775580052048",
+          "source": "internal"
+        }
+      ]
+    },
+    {
+      "type": "product",
+      "name": "GlobalLink NOW",
+      "slug": "globallink-now",
+      "pdfs": [
+        {
+          "section": "brochures",
+          "title": "GLNow_Generate_eBro-1",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/2ac1cbe5-9848-4683-9095-5fef80558af7/collateral-1775580603700-l9h4-1775580603700.pdf?t=1775580603700",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/2ac1cbe5-9848-4683-9095-5fef80558af7/pdf-thumb-fb4db666-4a31-491c-92b2-b0d539c47f90-1775580606643.jpg?t=1775580606643",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPLS_11 Ways Asset",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/2ac1cbe5-9848-4683-9095-5fef80558af7/collateral-1775580607299-dqve-1775580607299.pdf?t=1775580607299",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/2ac1cbe5-9848-4683-9095-5fef80558af7/pdf-thumb-00ac42bd-692e-4d51-a804-60867a270293-1775580611954.jpg?t=1775580611954",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPLS_GL Asset 1_14may24 (1)",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/2ac1cbe5-9848-4683-9095-5fef80558af7/collateral-1775580612519-paog-1775580612519.pdf?t=1775580612519",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/2ac1cbe5-9848-4683-9095-5fef80558af7/pdf-thumb-eaebb73f-1563-4312-af5b-2411de7f15be-1775580619350.jpg?t=1775580619350",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPLS_GL Asset 1_14may24",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/2ac1cbe5-9848-4683-9095-5fef80558af7/collateral-1775580619998-u3e1-1775580619998.pdf?t=1775580619998",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/2ac1cbe5-9848-4683-9095-5fef80558af7/pdf-thumb-c48f385e-19a9-4465-b352-72a4a53d4508-1775580627060.jpg?t=1775580627060",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "TPLS_GL Asset 2_19july24",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/2ac1cbe5-9848-4683-9095-5fef80558af7/collateral-1775580627683-070o-1775580627683.pdf?t=1775580627683",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/2ac1cbe5-9848-4683-9095-5fef80558af7/pdf-thumb-852554ff-636e-403d-a48a-b274f8c8d2e5-1775580636492.jpg?t=1775580636492",
+          "source": "internal"
+        }
+      ]
+    },
+    {
+      "type": "product",
+      "name": "GlobalLink Share",
+      "slug": "globallink-share",
+      "pdfs": [
+        {
+          "section": "brochures",
+          "title": "GlobalLink Share - File sharing solutions comparison chart 1",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/2e44007b-194a-4a1a-afe2-6b0d5517d3cd/collateral-1775580824187-7qj7-1775580824188.pdf?t=1775580824188",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/2e44007b-194a-4a1a-afe2-6b0d5517d3cd/pdf-thumb-de861edc-813e-497e-9369-b742d83a1cca-1775580825602.jpg?t=1775580825602",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GLshare_Legalteams_eBro_V2",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/2e44007b-194a-4a1a-afe2-6b0d5517d3cd/collateral-1775580826409-vuhn-1775580826409.pdf?t=1775580826409",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/2e44007b-194a-4a1a-afe2-6b0d5517d3cd/pdf-thumb-3eda80e4-39b4-4815-a51a-dcec01a38aa8-1775580831256.jpg?t=1775580831256",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "secure file sharing solution PDF",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/2e44007b-194a-4a1a-afe2-6b0d5517d3cd/collateral-1775580831915-vcb3-1775580831915.pdf?t=1775580831915",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/2e44007b-194a-4a1a-afe2-6b0d5517d3cd/pdf-thumb-620b1679-b9db-447b-a5ad-191f79bf0cdd-1775580833403.jpg?t=1775580833403",
+          "source": "internal"
+        }
+      ]
+    },
+    {
+      "type": "product",
+      "name": "GlobalLink Strings",
+      "slug": "globallink-strings",
+      "pdfs": [
+        {
+          "section": "brochures",
+          "title": "Life Sciences Applanga for Digital Health and eCOA 2024",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/73c9ecc0-45a8-4daa-94f9-2dad8708f16b/collateral-1775581210132-xy1v-1775581210132.pdf?t=1775581210132",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/73c9ecc0-45a8-4daa-94f9-2dad8708f16b/pdf-thumb-4ab85488-e773-4779-a5f7-afac0b234550-1775581212127.jpg?t=1775581212127",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GlobalLink_Applanga Advantage for eCOA",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/73c9ecc0-45a8-4daa-94f9-2dad8708f16b/collateral-1775581351398-w72p-1775581351398.pdf?t=1775581351398",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/73c9ecc0-45a8-4daa-94f9-2dad8708f16b/pdf-thumb-53978e09-34e3-4636-bea9-2cacedd1376e-1775581354955.jpg?t=1775581354955",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GlobalLink_Applanga Advantage_KO",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/73c9ecc0-45a8-4daa-94f9-2dad8708f16b/collateral-1775581355568-nc0w-1775581355568.pdf?t=1775581355568",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/73c9ecc0-45a8-4daa-94f9-2dad8708f16b/pdf-thumb-fcddc3a0-ccdf-4b50-a4f8-6a1af298954d-1775581356560.jpg?t=1775581356560",
+          "source": "internal"
+        }
+      ]
+    },
+    {
+      "type": "product",
+      "name": "GlobalLink TMS",
+      "slug": "globallink-tms",
+      "pdfs": [
+        {
+          "section": "brochures",
+          "title": "GL-TMS_eBro",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1114d604-db86-4d0b-98d2-888dd33cdeaa/collateral-1775581436320-vgqw-1775581436320.pdf?t=1775581436320",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1114d604-db86-4d0b-98d2-888dd33cdeaa/pdf-thumb-79b54382-068e-48e0-a0a3-80d631f96e04-1775581438491.jpg?t=1775581438491",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GlobalLink TMS_Product_FactSheet",
+          "category": "Brief",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1114d604-db86-4d0b-98d2-888dd33cdeaa/collateral-1775581439101-ha0b-1775581439102.pdf?t=1775581439102",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1114d604-db86-4d0b-98d2-888dd33cdeaa/pdf-thumb-7cf3a65e-85d5-432e-9e09-5445acd4797a-1775581440210.jpg?t=1775581440210",
+          "source": "internal"
+        },
+        {
+          "section": "brochures",
+          "title": "GlobalLink_TMS is not dead_eBro_2026",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1114d604-db86-4d0b-98d2-888dd33cdeaa/collateral-1775581440830-q9ty-1775581440830.pdf?t=1775581440830",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/1114d604-db86-4d0b-98d2-888dd33cdeaa/pdf-thumb-cffdadf9-89bf-46f2-afc4-63780d563db0-1775581441723.jpg?t=1775581441723",
+          "source": "internal"
+        }
+      ]
+    },
+    {
+      "type": "product",
+      "name": "GlobalLink Web",
+      "slug": "globallink-web",
+      "pdfs": [
+        {
+          "section": "brochures",
+          "title": "TPT_Travel_Spotlight_Heathrow",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775479667566-1775479667566.pdf?t=1775479667566",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-522a82da-2b7b-435d-9659-66c3239a4e27-1775479671698.jpg?t=1775479671698",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Travel_Spotlight_Discover Palm Beach",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775479690426-1775479690426.pdf?t=1775479690426",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-1926e21e-c41d-4fdd-93a2-1e4c6eed4b2a-1775479692996.jpg?t=1775479692996",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Retail_Spotlight_BarrysBootcamp",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775479706025-1775479706025.pdf?t=1775479706025",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-395f8a65-ab5a-4f2f-a0e7-c5a93ae42354-1775479708742.jpg?t=1775479708742",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_GlobalLink_Retail_vVardis_Spotlight",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775479725925-1775479725925.pdf?t=1775479725925",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-f702c4bb-ab57-4411-8156-3fa2ddeee2a1-1775479728028.jpg?t=1775479728028",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPT_Retail_Spotlight_BALR.",
+          "category": "Spotlight",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775479744485-1775479744485.pdf?t=1775479744485",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-3dc833a6-0907-423d-b92c-30cb9d5e2756-1775479747585.jpg?t=1775479747585",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPLS_Web Localization Playbook Travel Brands Guide",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775479823760-1775479823760.pdf?t=1775479823760",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-bd39731f-14be-4855-8c5f-515f231ab78e-1775479826712.jpg?t=1775479826712",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPLS_Retail Asset_10sep24 1",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775479842912-1775479842913.pdf?t=1775479842913",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-0aca78ad-ee38-48e6-9bd5-be7943ab43ca-1775479849854.jpg?t=1775479849854",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "TPLS_Considerations for Localization_5sep24",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775479866722-1775479866722.pdf?t=1775479866722",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-29501569-5b7f-434c-8895-feae01fc9efa-1775479869484.jpg?t=1775479869484",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "Guide_Multilingual_Websites_How_to_Obtain_Executive_BuyIn 3",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775479884751-1775479884751.pdf?t=1775479884751",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-843bbd66-b419-4de1-b20a-7d371d02ae65-1775479891613.jpg?t=1775479891613",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_Web Localization Playbook - Marketers_April2025",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775479911767-1775479911767.pdf?t=1775479911767",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-acbd3b9d-ba8d-42be-9b2f-06000ae47f2f-1775479914666.jpg?t=1775479914666",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_Top 5 GenAI Solutions to Power a High-Performing Global Website 1",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775479936546-1775479936547.pdf?t=1775479936547",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-3a783019-8986-4afd-a7bd-3e4aede3b968-1775479939066.jpg?t=1775479939066",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_Retail Compilation_Dec2024_V2",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775479962802-1775479962803.pdf?t=1775479962803",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-d3022754-850d-4440-99e7-a44279ce96b0-1775479969561.jpg?t=1775479969561",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_AI in Localization How to Win 1",
+          "category": "eBrochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775479991087-1775479991087.pdf?t=1775479991087",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-e401a647-0992-479c-b3cf-ca221d349561-1775479993300.jpg?t=1775479993300",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_Top Search Engines by Region",
+          "category": "Infographic",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775480014700-1775480014700.pdf?t=1775480014700",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-ba5fbaba-1438-4286-88e9-a3d2dd2b37d4-1775480016843.jpg?t=1775480016843",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "GLWeb_Cross-Border-Market-Expansion-Readiness_Checklist 1",
+          "category": "Check Lists",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775480055651-1775480055651.pdf?t=1775480055651",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-65ef0879-b45a-4005-86eb-9dbc84167f87-1775480057770.jpg?t=1775480057770",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_Your Multilingual SEO Success Checklist 1",
+          "category": "Check Lists",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775480082112-1775480082112.pdf?t=1775480082112",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-1b386c77-7087-4d00-95b3-d36c65b7d2db-1775480083138.jpg?t=1775480083138",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_Success_Infographic_alternates_23sep2024",
+          "category": "Infographic",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775480098031-1775480098032.pdf?t=1775480098032",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-fdfb84db-f398-4381-a0ca-bcd55742a0a3-1775480106599.jpg?t=1775480106599",
+          "source": "external"
+        },
+        {
+          "section": "brochures",
+          "title": "GL_GL Web_Manual vs Auto Trans.pdf",
+          "category": "Infographic",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/collateral-1775480139447-1775480139447.pdf?t=1775480139447",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/b418831d-d8b4-4de1-889c-12b4eb3cf83d/pdf-thumb-5cf528bd-b448-4b1d-816a-380f1ec3651e-1775480140242.jpg?t=1775480140242",
+          "source": "external"
+        }
+      ]
+    },
+    {
+      "type": "product",
+      "name": "Trial Interactive",
+      "slug": "trial-interactive",
+      "pdfs": [
+        {
+          "section": "brochures",
+          "title": "TMF Processing Ebro",
+          "category": "Product Brochure",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/0a7a2532-4b57-4890-8c1f-bea5ae6b6ca4/migrated/brochures_0_1771032720164.pdf",
+          "thumbnail": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/0a7a2532-4b57-4890-8c1f-bea5ae6b6ca4/migrated/brochures_1_1771032720463.png",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "New Case Study",
+          "category": "",
+          "description": "Describe the project, goals, and outcomes",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/0a7a2532-4b57-4890-8c1f-bea5ae6b6ca4/migrated/caseStudies_0_1771032879694.png",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "New Case Study",
+          "category": "",
+          "description": "Describe the project, goals, and outcomes",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/0a7a2532-4b57-4890-8c1f-bea5ae6b6ca4/migrated/caseStudies_1_1771032879917.png",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "New Case Study",
+          "category": "",
+          "description": "Describe the project, goals, and outcomes",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/0a7a2532-4b57-4890-8c1f-bea5ae6b6ca4/migrated/caseStudies_2_1771032880224.png",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "New Case Study",
+          "category": "",
+          "description": "Describe the project, goals, and outcomes",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/0a7a2532-4b57-4890-8c1f-bea5ae6b6ca4/migrated/caseStudies_3_1771032880398.png",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "New Case Study",
+          "category": "",
+          "description": "Describe the project, goals, and outcomes",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/0a7a2532-4b57-4890-8c1f-bea5ae6b6ca4/migrated/caseStudies_4_1771032880546.png",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "New Case Study",
+          "category": "",
+          "description": "Describe the project, goals, and outcomes",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/0a7a2532-4b57-4890-8c1f-bea5ae6b6ca4/migrated/caseStudies_5_1771032880753.png",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "New Case Study",
+          "category": "",
+          "description": "Describe the project, goals, and outcomes",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/0a7a2532-4b57-4890-8c1f-bea5ae6b6ca4/migrated/caseStudies_6_1771032880874.png",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "New Case Study",
+          "category": "",
+          "description": "Describe the project, goals, and outcomes",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/0a7a2532-4b57-4890-8c1f-bea5ae6b6ca4/migrated/caseStudies_7_1771032881090.png",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "New Case Study",
+          "category": "",
+          "description": "Describe the project, goals, and outcomes",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/0a7a2532-4b57-4890-8c1f-bea5ae6b6ca4/migrated/caseStudies_8_1771032881256.png",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "New Case Study",
+          "category": "",
+          "description": "Describe the project, goals, and outcomes",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/0a7a2532-4b57-4890-8c1f-bea5ae6b6ca4/migrated/caseStudies_9_1771032881415.png",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "New Case Study",
+          "category": "",
+          "description": "Describe the project, goals, and outcomes",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/0a7a2532-4b57-4890-8c1f-bea5ae6b6ca4/migrated/caseStudies_10_1771032881561.png",
+          "thumbnail": "",
+          "source": "internal"
+        },
+        {
+          "section": "caseStudies",
+          "title": "New Case Study",
+          "category": "",
+          "description": "Describe the project, goals, and outcomes",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/products/0a7a2532-4b57-4890-8c1f-bea5ae6b6ca4/migrated/caseStudies_11_1771032881733.png",
+          "thumbnail": "",
+          "source": "internal"
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "type": "event",
+      "name": "GlobalLink NEXT",
+      "slug": "globallink-next",
+      "pdfs": [
+        {
+          "section": "brochures",
+          "title": "Welcome to GlobalLink NEXT 2025",
+          "category": "Other",
+          "description": "",
+          "url": "https://nhxaijbyqfkkhhoornzy.supabase.co/storage/v1/object/public/organization-assets/ec180296-dfe8-4345-869e-66b524e0a12c/events/a1b2c3d4-e5f6-7890-abcd-ef1234567890/migrated/brochures_0_1771032763772.png",
+          "thumbnail": "",
+          "source": "internal"
+        }
+      ]
+    }
+  ],
+  "total_pdfs": 290
+}
