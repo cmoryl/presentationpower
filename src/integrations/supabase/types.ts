@@ -1066,6 +1066,60 @@ export type Database = {
         }
         Relationships: []
       }
+      globallink_config: {
+        Row: {
+          batch_size: number
+          callback_url: string | null
+          created_at: string
+          default_source_lang: string
+          enforce_glossary: boolean
+          human_review_default: boolean
+          id: boolean
+          notes: string | null
+          project_code: string | null
+          request_timeout_ms: number
+          submitter_override: string | null
+          updated_at: string
+          updated_by: string | null
+          use_translation_memory: boolean
+          workflow: string
+        }
+        Insert: {
+          batch_size?: number
+          callback_url?: string | null
+          created_at?: string
+          default_source_lang?: string
+          enforce_glossary?: boolean
+          human_review_default?: boolean
+          id?: boolean
+          notes?: string | null
+          project_code?: string | null
+          request_timeout_ms?: number
+          submitter_override?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          use_translation_memory?: boolean
+          workflow?: string
+        }
+        Update: {
+          batch_size?: number
+          callback_url?: string | null
+          created_at?: string
+          default_source_lang?: string
+          enforce_glossary?: boolean
+          human_review_default?: boolean
+          id?: boolean
+          notes?: string | null
+          project_code?: string | null
+          request_timeout_ms?: number
+          submitter_override?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          use_translation_memory?: boolean
+          workflow?: string
+        }
+        Relationships: []
+      }
       glossary_terms: {
         Row: {
           created_at: string
