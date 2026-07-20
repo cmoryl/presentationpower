@@ -31,6 +31,8 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/admin/brand-assets", label: "Brand assets" },
     { to: "/admin/logohub", label: "LogoHub" },
     { to: "/admin/icon-studio", label: "Icon Studio" },
+    { to: "/admin/translation", label: "Translation" },
+    { to: "/admin/globallink", label: "GlobalLink" },
   ] as const;
   const footerNav = [
     { to: "/knowledge", label: "Knowledge" },
