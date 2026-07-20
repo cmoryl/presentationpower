@@ -200,7 +200,7 @@ export function SlideImageryPanel({
             <span className="text-[11px] text-black/50">
               {signedIn === false
                 ? "Sign in to upload images"
-                : "JPEG, PNG, or WebP · up to 8 MB"}
+                : "JPEG, PNG, WebP, GIF, SVG, or AVIF · up to 8 MB"}
             </span>
           </div>
         </div>
