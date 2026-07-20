@@ -107,6 +107,8 @@ export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
       selected: SynthesizedSnippet[];
       synthesis: string | null;
       synthesized: boolean;
+      divisionScoped?: boolean;
+      fallbackNote?: string;
       discardedNote?: string;
       setup?: boolean;
       note?: string;
