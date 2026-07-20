@@ -100,7 +100,7 @@ export const listImportedDecksForDivision = createServerFn({ method: "GET" })
     const s = context.supabase as unknown as SbClient;
     const { data: rows } = await s
       .from("imported_decks")
-      .select("id, division_id, original_filename, file_size, slide_count, status, error, created_at, uploaded_by")
+      .select("id, division_id, original_filename, file_size, slide_count, status, error, created_at, uploaded_by, chunk_count, embedded_at")
       .eq("division_id", data.divisionId)
       .order("created_at", { ascending: false })
       .limit(200);
@@ -114,8 +114,11 @@ export const listImportedDecksForDivision = createServerFn({ method: "GET" })
       error: string | null;
       created_at: string;
       uploaded_by: string;
+      chunk_count: number;
+      embedded_at: string | null;
     }>;
   });
+
 
 export const getImportedDeckSlides = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
