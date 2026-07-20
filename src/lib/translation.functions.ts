@@ -706,3 +706,26 @@ export const getSharedDeckTranslations = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return (rows ?? []) as Array<{ position: number; content: Record<string, never> }>;
   });
+
+// Public: list cached locales for a shared deck (token-gated).
+export const listSharedLocales = createServerFn({ method: "POST" })
+  .inputValidator((raw) => z.object({ token: z.string().min(16) }).parse(raw))
+  .handler(async ({ data }) => {
+    const { createClient } = await import("@supabase/supabase-js");
+    const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
+    const url = process.env.SUPABASE_URL!;
+    const client = createClient(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+      global: {
+        fetch: (input, init) => {
+          const h = new Headers(init?.headers);
+          if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+          h.set("apikey", key);
+          return fetch(input, { ...init, headers: h });
+        },
+      },
+    });
+    const { data: rows, error } = await client.rpc("get_shared_deck_locales", { _token: data.token });
+    if (error) throw new Error(error.message);
+    return (rows ?? []) as Array<{ target_lang: string; ready: number; total: number }>;
+  });
