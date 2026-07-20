@@ -158,6 +158,25 @@ export function BackgroundImageryPanel({
   const [applyFlash, setApplyFlash] = useState<string | null>(null);
   const generate = useServerFn(generateBackgroundImage);
 
+  // Brand library — approved division imagery uploaded via Admin > Knowledge.
+  const listDivImagery = useServerFn(listDivisionImagery);
+  const [brandQ, setBrandQ] = useState("");
+  const brandQuery = useQuery({
+    queryKey: ["bg-division-imagery", divisionId ?? "none"],
+    queryFn: () => (divisionId ? listDivImagery({ data: { divisionId } }) : Promise.resolve([])),
+    enabled: !!divisionId,
+    staleTime: 60_000,
+  });
+  const brandResults = useMemo(() => {
+    const rows = brandQuery.data ?? [];
+    const q = brandQ.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter((r) => {
+      const hay = `${r.filename} ${r.note ?? ""} ${r.prompt ?? ""} ${(r.tags ?? []).join(" ")}`.toLowerCase();
+      return hay.includes(q);
+    });
+  }, [brandQuery.data, brandQ]);
+
   const activeSlide = useMemo(
     () => (slides ?? []).find((s) => s.id === activeSlideId) ?? null,
     [slides, activeSlideId],
