@@ -24,6 +24,7 @@ import {
 import { uploadDataUrl, uploadSlideMedia } from "@/lib/slide-media";
 import { generateBackgroundImage } from "@/lib/ai-image.functions";
 import { listDivisionImagery } from "@/lib/division-imagery.functions";
+import { logImageryEvent } from "@/lib/admin.functions";
 
 type Tab = "library" | "brand" | "solid" | "gradient" | "pattern" | "upload" | "ai";
 
