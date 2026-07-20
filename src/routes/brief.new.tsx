@@ -629,13 +629,14 @@ function BriefWizard() {
                         }}
                       />
 
-                      {(kbSelected.length > 0 || kbSynthesis) && (
+                      {(kbSelected.length > 0 || kbSynthesis || kbSetup) && (
                         <KnowledgeUsedPanel
                           selected={kbSelected}
                           synthesis={kbSynthesis}
                           synthesized={kbSynthesized}
                           divisionScoped={kbDivisionScoped}
                           fallbackNote={kbFallbackNote}
+                          setup={kbSetup}
                           open={showKbPanel}
                           onToggle={() => setShowKbPanel((v) => !v)}
                         />
