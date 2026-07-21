@@ -190,6 +190,12 @@ type DeckState = {
   removeSlide: (deckId: string, slideId: string) => void;
   addSlide: (deckId: string, sectionId: string, afterSlideId?: string) => void;
   insertVariantSlide: (deckId: string, variantId: string) => { slideId: string } | null;
+  insertExampleSlide: (
+    deckId: string,
+    variantId: string,
+    content: Record<string, unknown>,
+    afterSlideId?: string,
+  ) => { slideId: string } | null;
   duplicateSlide: (deckId: string, slideId: string) => void;
   renameDeck: (deckId: string, title: string) => void;
   setDeckClientLogo: (deckId: string, logo: DeckClientLogo | null) => void;
@@ -1932,6 +1938,38 @@ export const useDeckStore = create<DeckState>()(
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
         return { slideId: newSlide.id };
       },
+
+      insertExampleSlide: (deckId, variantId, content, afterSlideId) => {
+        const deck = get().decks[deckId];
+        if (!deck) return null;
+        const variant = byId(MODULE_VARIANTS, variantId);
+        if (!variant) return null;
+        pushHistory();
+        const sf =
+          SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.includes(variant.familyId)) ??
+          byId(SECTION_FRAMEWORKS, deck.slides[deck.slides.length - 1]?.sectionId ?? "") ??
+          SECTION_FRAMEWORKS[0];
+        // Deep clone so the shared example content object isn't mutated by
+        // subsequent field edits.
+        const cloned = JSON.parse(JSON.stringify(content)) as Record<string, unknown>;
+        const newSlide: DeckSlide = {
+          id: nanoid(8),
+          position: 0,
+          sectionId: sf.id,
+          variantId: variant.id,
+          layoutId: variant.permittedLayoutIds[0],
+          content: cloned,
+          changes: [],
+        };
+        const list = [...deck.slides];
+        const idx = afterSlideId ? list.findIndex((s) => s.id === afterSlideId) : -1;
+        if (idx >= 0) list.splice(idx + 1, 0, newSlide);
+        else list.push(newSlide);
+        const next = list.map((sl, i) => ({ ...sl, position: i }));
+        set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
+        return { slideId: newSlide.id };
+      },
+
 
       duplicateSlide: (deckId, slideId) => {
         const deck = get().decks[deckId];
