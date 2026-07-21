@@ -51,7 +51,7 @@ export const MODULE_PRESET_KITS: ModulePresetKit[] = [
     tag: "Editorial",
     blurb:
       "18 image-forward editorial slides — cinematic covers, vertical timelines, 3/4/6-up image grids, team bios, stat callouts, quote posters, and closing agenda.",
-    payload: SQUARE_IMAGE_TEMPLATE,
+    payload: normalizeKitPayload(SQUARE_IMAGE_TEMPLATE),
   },
   {
     key: "infographics-images",
@@ -59,7 +59,7 @@ export const MODULE_PRESET_KITS: ModulePresetKit[] = [
     tag: "Data",
     blurb:
       "20 modular infographic layouts — 2/3/4-point splits, matrix, bento, funnels, journey maps, KPI dashboard and stat grids.",
-    payload: INFOGRAPHICS_IMAGES_TEMPLATE,
+    payload: normalizeKitPayload(INFOGRAPHICS_IMAGES_TEMPLATE),
   },
   {
     key: "graph-library",
@@ -67,7 +67,7 @@ export const MODULE_PRESET_KITS: ModulePresetKit[] = [
     tag: "Charts",
     blurb:
       "16 chart-driven proof slides — year series, axis + category bars, stacked bars, area stack, waterfall, bubble, heatmap, treemap, donut, rings, combo — each with editable data.",
-    payload: GRAPH_LIBRARY_TEMPLATE,
+    payload: normalizeKitPayload(GRAPH_LIBRARY_TEMPLATE),
   },
   {
     key: "community-event",
@@ -75,7 +75,7 @@ export const MODULE_PRESET_KITS: ModulePresetKit[] = [
     tag: "Event",
     blurb:
       "Imported event deck — covers, agenda, speaker bios, program grid, sponsor logos, quote posters, and closing CTA slides.",
-    payload: COMMUNITY_EVENT_TEMPLATE,
+    payload: normalizeKitPayload(COMMUNITY_EVENT_TEMPLATE),
   },
 ];
 
