@@ -321,7 +321,7 @@ function UploadCard({ onFile }: { onFile: (f: File) => void }) {
     >
       <div className="text-lg font-medium">Drop a .pptx here</div>
       <div className="mt-2 text-sm text-black/55">
-        or click to select. Max 25MB. Content is parsed on our server; the original file is not
+        or click to select. Max 100MB. Content is parsed on our server; the original file is not
         stored.
       </div>
       <input
