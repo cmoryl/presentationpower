@@ -1,97 +1,58 @@
-# Deck & Slide Translation
+# Division-Aware Library Previews
 
-Ship a full translation surface for decks and slides using **TransPerfect GlobalLink** as the engine, with a protected brand glossary and four workflows (in-place, per-slide, translated copy, batch multi-language).
+Today every library card renders the same "Acme Corp / Life sciences" placeholder text regardless of brand mode. Only colors and logos change. This plan makes the **text on the preview slides** reflect the selected division (Life Sciences, GlobalLink, DataForce, Trial Interactive, etc.) — headline copy, stats, quotes, case-study story, agenda topics, service lines, industry chips.
 
-## 1. GlobalLink connection
+## What the user will see
 
-No standard connector exists for GlobalLink in this workspace. We'll wire it as a first-class integration using project secrets:
+- Pick "Life Sciences" in the library brand switcher → preview slides talk about regulated content, 28 markets, clinical launches; case cards show the pharma case study; stats show `38%` and `0 regulatory reopenings`.
+- Pick "GlobalLink" → the same layouts now show the SaaS/continuous-localization story, `18 languages`, `0 release delays`.
+- Pick "DataForce" → frontier AI lab story, `3.1M pairs · 42 langs`, annotation stats.
+- Pick "TransPerfect (Enterprise)" → the current neutral corporate content stays.
 
-- `GLOBALLINK_API_BASE_URL` (e.g. `https://connect.translations.com` or the tenant's endpoint)
-- `GLOBALLINK_API_KEY` (or `GLOBALLINK_CLIENT_ID` + `GLOBALLINK_CLIENT_SECRET` for OAuth-style — I'll adapt to whichever your GlobalLink tenant uses)
-- `GLOBALLINK_SUBMITTER` / project code (optional metadata for job routing)
+Layouts, spacing, and structure are unchanged. Only the words, numbers, and industry tags swap.
 
-I'll request these via `add_secret` after this plan is approved. Until they're in place, the UI shows a "Connect GlobalLink" empty state in `/admin` and translation actions stay disabled — no fake/mock fallback.
+## How it works (technical)
 
-**Engine abstraction.** Server code goes through a `TranslationEngine` interface so we can swap in DeepL/Google later without touching UI. First implementation: `globallink.ts` (MT + submit-for-human-review supported).
+1. **New resolver `seedDivisionContent(variantId, brief, sectionName, brandModeId)`** in `src/lib/deck-store.ts`
+   - Wraps existing `seedContent()` and post-processes the returned object.
+   - Pulls division context: `BRAND_PROFILES[brandModeId]` (industries, serviceLines, tags) + `pickCaseStudy(brandModeId)` from `src/lib/case-studies.ts`.
+   - Overlays per-family fields on the placeholder object:
+     - `MV-CASE-*` → `headline / story / metric / quote / attribution` from the picked case study.
+     - `MV-PROOF-STATS-*` → `items[]` from `caseStudy.stats`.
+     - `MV-PROOF-TESTIMONIAL` → `quote / attribution / role`.
+     - `MV-PROOF-LOGO-*` / `MV-CLIENT-*` → `pickProofLogos(brandModeId)` names.
+     - `MV-CTX-*` (industries/segments) → `profile.contentScope.industries`.
+     - `MV-SOL-PILLARS-*` / `MV-OFFER-*` → `profile.contentScope.serviceLines`.
+     - `MV-COVER-*`, `MV-OP-AGENDA-*`, `MV-OP-INTRO-*` → division name into `subtitle`/`meta`; agenda topics derived from serviceLines.
+     - `MV-QUOTE-*` → case-study quote.
+     - Any variant not in the map → returns `seedContent()` output unchanged.
+   - Pure function, synchronous, no async / no DB call — safe to run per-card in the grid.
 
-## 2. Data model (one migration)
+2. **Update `src/routes/library.tsx`** (two call sites, ~L468 and ~L766)
+   - Replace `seedContent(variant.id, SAMPLE_BRIEF, ...)` with `seedDivisionContent(variant.id, brief, section, brandId)`.
+   - Derive `brief` from the currently-selected brand: keep `SAMPLE_BRIEF` shape but set `brandModeId = scopeBrand?.id ?? tpMaster.id` and `industry = profile.contentScope.industries[0] ?? "Life sciences"`, `prospect` from the case study's `client`.
+   - Compute the resolved brief once per `scopeBrandId` change using `useMemo` — grid cards read the same object.
 
-```text
-languages            id text pk, label text, native text, rtl bool, active bool
-deck_translations    id, source_deck_id, target_lang, status(draft|translating|ready|failed),
-                     engine text, job_ref text, translated_deck_id, error, created_by, timestamps
-slide_translations   id, slide_id, target_lang, source_hash, translated_content jsonb,
-                     status, engine, job_ref, timestamps  (unique slide_id+target_lang)
-glossary_terms       id, term, do_not_translate bool, translations jsonb (per-lang overrides),
-                     scope('global'|'division'|'deck'), scope_id text, notes, created_by, timestamps
-```
+3. **Case-study coverage check** (`src/lib/case-studies.ts`)
+   - The 6 existing entries cover: Life Sciences, AI/ML, SaaS/Tech, Financial Services, Retail, Client-partnership.
+   - Add 3-4 new entries to fill gaps for divisions that currently fall back to Life Sciences:
+     - `cs-legal-ediscovery` (TP Legal Solutions) — regulated e-discovery, review acceleration.
+     - `cs-media-dubbing` (TP Media) — dubbing/subtitling at scale.
+     - `cs-marketing-transcreation` (TP Global Marketing) — transcreation, campaign velocity.
+     - `cs-trial-interactive-etmf` (Trial Interactive) — eTMF study start-up.
+   - Each follows the existing `CaseStudy` shape (headline, story, quote, stats[3]).
 
-All tables get RLS + GRANTs. Seed `languages` with ~40 major locales (es, fr, de, it, pt-BR, pt-PT, nl, pl, cs, sv, da, fi, no, tr, ru, uk, ar, he, ja, ko, zh-CN, zh-TW, th, vi, id, ms, hi, bn, ta, ur, fa, el, ro, hu, bg, sk, sl, hr, sr, et, lv, lt).
+4. **No changes to** `VariantRenderer`, `taxonomy.ts`, `brand-profiles.ts`, or PPTX export — the overlay only injects existing content-shape fields that renderers already read.
 
-Glossary seed: `TransPerfect`, all 10 division names, product names (GlobalLink, Ai Studio, Wordfast, etc.) as `do_not_translate=true, scope='global'`.
+## Out of scope (deliberately)
 
-## 3. Server functions (`src/lib/translation.functions.ts`)
+- No async KB / RAG retrieval into library previews. Reason: 50+ cards render at once; per-card `knowledge_entries` lookups would need caching + loading UI. This plan uses the already-in-memory `BRAND_PROFILES` + `CASE_STUDIES` which is instant.
+- No changes to the `/brief/new` flow — that pipeline already has full KB retrieval.
+- No new imagery — imagery kits stay as-is; only text swaps.
 
-- `listLanguages()` — active locales for pickers
-- `translateSlide({ slideId, targetLang, engine, glossaryScope })` — single slide, returns translated content
-- `translateDeckInPlace({ deckId, targetLang })` — overwrites current deck; auto-snapshots version first
-- `translateDeckToCopy({ deckId, targetLang })` — duplicates deck, translates copy, returns new `deckId`
-- `translateDeckBatch({ deckId, targetLangs[] })` — parallel copies; returns `{ lang → deckId | error }`
-- `getTranslationStatus({ jobId })` — poll GlobalLink jobs
-- `listGlossary({ scope, scopeId })`, `upsertGlossaryTerm(...)`, `deleteGlossaryTerm(...)` — admin CRUD
+## Verification
 
-**Translation flow per slide**
-1. Extract user-visible strings from `slide.content` (title, subtitle, body, bullets, quotes, stat labels/values where non-numeric, cell text, captions, notes).
-2. Wrap protected terms in `<span translate="no">…</span>` using glossary matches (case-insensitive, word-boundary).
-3. Send batched string array to GlobalLink; receive translated array with tags preserved.
-4. Unwrap protections, map results back to structured `content` shape, persist to `slide_translations` and (for in-place / copy) into `deck_slides.content`.
-5. Auto-tag RTL languages so `SlideChrome` flips text direction.
-
-Version snapshot is captured **before** in-place translation so undo is possible.
-
-## 4. UI
-
-**Editor (`decks.$deckId`)**
-- New "Translate" button in header menu → drawer with:
-  - Target language picker (searchable, flags, RTL badge)
-  - Mode radio: `In-place` / `New copy` / `Multi-language batch` (multi-select langs)
-  - Glossary preview ("12 protected terms")
-  - "Submit for human review" checkbox (routes as GlobalLink human job vs MT)
-- Per-slide context menu → **Translate this slide** → inline preview with accept/reject
-- Progress toast + status pill (`Translating 4/12 slides…`)
-
-**Deck list (`/decks`)**
-- Row action: **Translate deck** (same drawer)
-- Language badge on cards when deck has translations; click reveals language variants
-
-**Admin (`/admin/translation` — new)**
-- GlobalLink connection status + secrets check
-- Glossary manager (global, per-division, per-deck) with import/export CSV
-- Translation jobs log (filter by status, language, engine, retry failed)
-- Language activation toggles
-
-**Present / Share**
-- Language switcher in `/present` and `/share/$token` when translated copies exist
-
-## 5. Export fidelity
-
-`pptx-export.ts` and `/print` already read `deck_slides.content`, so translated copies export correctly with zero changes. RTL languages set slide-level `dir="rtl"` and mirror hero image alignment. Font stack falls back to Noto Sans (CJK / Arabic / Hebrew) via `<link>` in `__root.tsx` to avoid missing-glyph boxes.
-
-## 6. Tests / verification
-
-- Simulate a 12-slide deck → translate in-place to Spanish → verify glossary protection kept "TransPerfect" and "GlobalLink" untranslated, snapshot exists, undo restores English.
-- Batch translate to `[es, fr, de, ja, ar]` → verify 5 new deck rows, RTL flag on Arabic.
-- Per-slide translation preview accept/reject round-trip.
-- PPTX export of Japanese copy renders with CJK font.
-
-## 7. What I need from you after approval
-
-1. Confirm you have a GlobalLink tenant + API credentials, and which auth style (bearer key vs OAuth client id/secret).
-2. I'll open `add_secret` prompts for the values above.
-3. Optional: a CSV of extra do-not-translate terms specific to your accounts — otherwise glossary starts with brand + divisions + product names.
-
-## Out of scope (call out for a future pass)
-
-- Live TM/TB sync back to GlobalLink projects
-- In-context reviewer round-trips inside GlobalLink UI
-- Locale-specific imagery swaps
+- Open `/library`, cycle through brand modes: Enterprise → Life Sciences → GlobalLink → DataForce → Trial Interactive → TP Legal → TP Media.
+- Confirm at least these families visibly change text: `MV-CASE-STORY`, `MV-PROOF-STATS-3`, `MV-QUOTE-POSTER`, `MV-CTX-CARDS-3`, `MV-SOL-PILLARS-3`, `MV-OP-AGENDA-*`.
+- Click into the lightbox on 2-3 cards per brand to verify content coherence at full size.
+- Run typecheck; no `VariantRenderer` prop changes so no downstream type churn expected.
