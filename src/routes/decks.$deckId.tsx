@@ -267,6 +267,13 @@ function DeckEditor() {
           })}
 
           <AddSlideMenu onAdd={(sectionId) => addSlide(deck.id, sectionId, active?.id)} />
+          <VideoExamplesPicker
+            brand={brand}
+            onInsert={(variantId, content) => {
+              const res = insertExampleSlide(deck.id, variantId, content, active?.id);
+              if (res) setIndex((i) => i + 1);
+            }}
+          />
         </div>
 
         {/* Stage */}
