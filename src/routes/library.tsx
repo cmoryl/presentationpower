@@ -9,7 +9,9 @@ import { LazyMount } from "@/components/LazyMount";
 import { WcagBadge } from "@/components/WcagBadge";
 import { TypeBadge } from "@/components/TypeBadge";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
+import { SlideVideoPreviewContext } from "@/lib/slide-media-refresh";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
+
 import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
 import {
   resolveDivisionBrief,
