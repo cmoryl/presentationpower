@@ -138,6 +138,15 @@ function Library() {
   const restricted = new Set(scopeBrand?.contentScope?.restrictedFamilyIds ?? []);
   const preferred = new Set(scopeBrand?.contentScope?.preferredVariantIds ?? []);
 
+  // Keep the modal's brand preview in sync with the active scope filter so
+  // opening a card while scope=TP Media (etc.) shows that brand's imagery in
+  // the A/B previews instead of defaulting back to Enterprise.
+  useEffect(() => {
+    if (!scopeBrand) return;
+    const i = brandModes.findIndex((b) => b.id === scopeBrand.id);
+    if (i >= 0) setBrandIdx(i);
+  }, [scopeBrand?.id, brandModes]);
+
   const toggle = (set: Set<string>, id: string) => {
     const next = new Set(set);
     if (next.has(id)) next.delete(id);
