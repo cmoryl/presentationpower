@@ -120,18 +120,35 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
       savedEmbedIdsBySlide[sl.index].forEach((eid, idx) => {
         if (eid) embedToPath.set(eid, savedPathsBySlide[sl.index][idx]);
       });
+      const rewriteFill = (fill: unknown): unknown => {
+        if (!fill || typeof fill !== "object") return fill;
+        const f = fill as { kind?: string; embedId?: string; path?: string };
+        if (f.kind === "image" && f.embedId) {
+          const path = embedToPath.get(f.embedId);
+          if (path) return { ...f, path };
+        }
+        return fill;
+      };
       const layout = sl.layout
         ? {
             ...sl.layout,
+            background: rewriteFill(sl.layout.background) as typeof sl.layout.background,
             shapes: sl.layout.shapes.map((sh) => {
+              let next: typeof sh = sh;
               if (sh.kind === "image" && sh.embedId) {
                 const path = embedToPath.get(sh.embedId);
-                if (path) return { ...sh, path };
+                if (path) next = { ...sh, path };
               }
-              return sh;
+              // Image fills on any shape (background art, watermark blocks, etc.)
+              if ("fill" in next && next.fill) {
+                const rewritten = rewriteFill(next.fill);
+                if (rewritten !== next.fill) next = { ...next, fill: rewritten as typeof next.fill };
+              }
+              return next;
             }),
           }
         : undefined;
+
       return {
         index: sl.index,
         title: sl.title,
