@@ -1834,6 +1834,14 @@ export const useDeckStore = create<DeckState>()(
           delete merged.mediaUrl;
           delete merged.mediaSeed;
         }
+        // Same treatment for video fields.
+        if (variantSupportsVideo(newVariantId)) {
+          if (typeof prev.videoUrl === "string") merged.videoUrl = prev.videoUrl;
+          if (typeof prev.videoPosterUrl === "string") merged.videoPosterUrl = prev.videoPosterUrl;
+        } else {
+          delete merged.videoUrl;
+          delete merged.videoPosterUrl;
+        }
         // Preserve background settings across swaps.
         if (prev.background !== undefined) merged.background = prev.background;
         set((s) => ({
