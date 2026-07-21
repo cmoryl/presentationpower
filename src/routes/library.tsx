@@ -759,13 +759,14 @@ function VariantDetailModal({
     };
   }, [onClose]);
 
+  const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
   const previewSlide = {
     id: variant.id,
     position: 0,
     sectionId: sections[0]?.id ?? "",
     variantId: variant.id,
     layoutId: variant.permittedLayoutIds[0],
-    content: seedContent(variant.id, SAMPLE_BRIEF, sections[0]?.name ?? "Preview section") as Record<string, unknown>,
+    content: seedDivisionContent(variant.id, brief, sections[0]?.name ?? "Preview section", brand) as Record<string, unknown>,
     changes: [],
   };
 
