@@ -633,6 +633,38 @@ function Library() {
           onClose={() => setOpenId(null)}
         />
       )}
+
+      {(() => {
+        if (!videoZoomKey) return null;
+        const ex = VIDEO_SLIDE_EXAMPLES.find((e) => e.key === videoZoomKey);
+        if (!ex) return null;
+        const variant = byId(MODULE_VARIANTS, ex.variantId);
+        if (!variant) return null;
+        const brand = scopeBrand ?? tpMaster;
+        const previewSlide = {
+          id: ex.key,
+          position: 0,
+          sectionId: sectionForVariant(ex.variantId),
+          variantId: ex.variantId,
+          layoutId: variant.permittedLayoutIds[0] ?? "",
+          content: ex.content as Record<string, unknown>,
+          changes: [],
+        };
+        return (
+          <LightboxPortal
+            mode={videoZoomMode}
+            setMode={(m) => {
+              if (m === null) setVideoZoomKey(null);
+              else setVideoZoomMode(m);
+            }}
+            variant={variant}
+            brand={brand}
+            previewSlide={previewSlide}
+            lightBackdrop={backdropForVariant(variant, brand.id, "light")}
+            darkBackdrop={backdropForVariant(variant, brand.id, "dark")}
+          />
+        );
+      })()}
     </AppShell>
   );
 }
