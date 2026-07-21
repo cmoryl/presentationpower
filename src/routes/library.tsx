@@ -764,6 +764,59 @@ function Library() {
           />
         );
       })()}
+
+      {exampleZoom && typeof window !== "undefined" && createPortal(
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#03002C]/85 p-6 backdrop-blur-xl"
+          onClick={() => setExampleZoom(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="relative w-full max-w-6xl overflow-hidden rounded-[28px] border border-white/10 bg-[#03002C] shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-6 px-6 py-4">
+              <div>
+                <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#A1FBF9]">
+                  Team-saved slide
+                </div>
+                <h3 className="mt-1 text-lg font-semibold text-white">{exampleZoom.title || "Untitled slide"}</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setExampleZoom(null)}
+                className="rounded-full bg-white/10 px-3 py-1 text-xs text-white hover:bg-white/20"
+              >
+                Close ✕
+              </button>
+            </div>
+            <div className="max-h-[75vh] overflow-y-auto px-6 pb-6">
+              <div className="grid gap-4">
+                {exampleZoom.imageUrls.map((u, i) => (
+                  <img
+                    key={i}
+                    src={u}
+                    alt={`${exampleZoom.title} · ${i + 1}`}
+                    className="w-full rounded-2xl border border-white/10"
+                  />
+                ))}
+              </div>
+              {exampleZoom.bullets?.length > 0 && (
+                <ul className="mt-4 space-y-1 text-sm text-white/80">
+                  {exampleZoom.bullets.map((b, i) => (
+                    <li key={i}>• {b}</li>
+                  ))}
+                </ul>
+              )}
+              {exampleZoom.notes && (
+                <p className="mt-3 text-xs text-white/50">{exampleZoom.notes}</p>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )}
     </AppShell>
   );
 }
