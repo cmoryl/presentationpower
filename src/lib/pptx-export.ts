@@ -463,7 +463,16 @@ export async function exportDeckToPptx(
     }
 
     const km = slide.sectionId ? keyMessageBySection.get(slide.sectionId) : undefined;
-    const noteText = (slide.notes && slide.notes.trim()) ? slide.notes.trim() : (km ?? "");
+    let noteText = (slide.notes && slide.notes.trim()) ? slide.notes.trim() : (km ?? "");
+    // Video fallback path: PPTX embeds the poster (see resolveSlideImageUrl)
+    // and links the source video in speaker notes so the presenter can open
+    // it out-of-band. pptxgenjs's addMedia has spotty PowerPoint fidelity for
+    // large/hosted files, so we ship reliable poster + link instead.
+    const videoUrl = (slide.content as Record<string, unknown>).videoUrl;
+    if (typeof videoUrl === "string" && videoUrl.trim()) {
+      const line = `▶ Video: ${videoUrl.trim()}`;
+      noteText = noteText ? `${noteText}\n\n${line}` : line;
+    }
     if (noteText) s.addNotes(noteText);
 
   }
