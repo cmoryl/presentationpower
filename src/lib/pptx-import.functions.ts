@@ -15,7 +15,14 @@ import { z } from "zod";
 import JSZip from "jszip";
 import { XMLParser } from "fast-xml-parser";
 
-export type ParsedChartSeries = { label: string; values: number[] };
+export type ParsedChartSeries = {
+  label: string;
+  values: number[];
+  /** Series stroke/fill color in `#RRGGBB` form (from c:spPr on c:ser), when declared. */
+  color?: string;
+  /** Per-datapoint colors — used for pie/doughnut segments and any c:dPt overrides. */
+  pointColors?: string[];
+};
 export type ParsedChart = {
   /** bar | column | line | area | pie | doughnut | scatter | radar | other */
   kind: "bar" | "column" | "line" | "area" | "pie" | "doughnut" | "scatter" | "radar" | "other";
@@ -24,6 +31,16 @@ export type ParsedChart = {
   series: ParsedChartSeries[];
   /** True if the chart declared stacked/percentStacked grouping. */
   stacked?: boolean;
+  /** Legend visibility + position (r/l/t/b/tr) — undefined when unspecified. */
+  legend?: { visible: boolean; position?: "r" | "l" | "t" | "b" | "tr" };
+  /** Category / value axis titles read from c:catAx/c:title and c:valAx/c:title. */
+  axis?: { category?: string; value?: string };
+  /** Excel-style number format code (e.g. "0%", "#,##0", "$#,##0"). */
+  numberFormat?: string;
+  /** Inferred unit character from numberFormat, e.g. "%" or "$". */
+  unit?: string;
+  /** Source typography — latin font family + primary text color. */
+  font?: { family?: string; color?: string };
 };
 
 export type ParsedTable = {
@@ -33,7 +50,12 @@ export type ParsedTable = {
 };
 
 /** SmartArt / diagram node with hierarchy depth (0 = root). */
-export type ParsedDiagramNode = { text: string; level: number };
+export type ParsedDiagramNode = {
+  text: string;
+  level: number;
+  /** Node fill color (from prSet/style/solidFill or the shape's spPr) when declared. */
+  color?: string;
+};
 export type ParsedDiagram = {
   kind: "smartart" | "shape-group";
   nodes: ParsedDiagramNode[];
@@ -55,9 +77,12 @@ export type ParsedSlide = {
 };
 
 export type ParsedTheme = {
+  /** accent1..accent6 in slot order — used to resolve c:schemeClr references. */
+  accents: string[];
   accent1?: string;
   accent2?: string;
   dark1?: string;
+  light1?: string;
   bodyFont?: string;
   headingFont?: string;
 };
@@ -76,6 +101,7 @@ export type ParsedDeck = {
     diagrams: number;
   };
 };
+
 
 const InputSchema = z.object({
   filename: z.string().min(1).max(300),
