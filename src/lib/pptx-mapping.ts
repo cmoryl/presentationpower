@@ -295,25 +295,48 @@ function mapFromGraphics(args: {
 function mapChartToVariant(title: string, c: ParsedChart, bullets: string[]): GraphicMap {
   const series0 = c.series[0];
   const cats = c.categories.length ? c.categories : series0.values.map((_, i) => `Item ${i + 1}`);
-  const unit = /%|percent/i.test(c.title ?? title) ? "%" : "";
+  // Prefer the unit inferred from the chart's declared number format
+  // (e.g. "0%" → "%", "$#,##0" → "$"); fall back to the title keyword hint.
+  const unit = c.unit ?? (/%|percent/i.test(c.title ?? title) ? "%" : "");
   const headline = c.title ?? bullets[0] ?? "";
+
+  // Source metadata — colors, legend, axis titles, and typography carried
+  // from the original chart so the renderer/exporter can honor them without
+  // affecting the variant's editableFields.
+  const seriesColors = c.series.map((s) => s.color).filter((x): x is string => Boolean(x));
+  const source: Record<string, unknown> = {
+    kind: c.kind,
+    stacked: !!c.stacked,
+    numberFormat: c.numberFormat,
+    unit: c.unit,
+    legend: c.legend,
+    axis: c.axis,
+    font: c.font,
+    palette: seriesColors,
+    seriesColors: c.series.map((s) => s.color ?? null),
+    pointColors: series0.pointColors ?? null,
+  };
+  const withSource = <T extends object>(content: T) =>
+    ({ ...content, _source: source } as unknown as SlideContent);
 
   // Multi-series line/area
   if ((c.kind === "line" || c.kind === "area" || c.kind === "scatter") && c.series.length >= 2) {
     return {
       sectionId: "SF-08",
       variantId: c.kind === "area" ? "MV-GRAPH-AREA-STACK" : "MV-GRAPH-LINE-MULTI",
-      content: {
+      content: withSource({
         title,
         kicker: c.title ?? "",
         headline,
         unit,
+        axisLabel: c.axis?.value ?? "",
         series: c.series.slice(0, 3).map((s) => ({
           label: s.label,
+          color: s.color,
           points: s.values.slice(0, cats.length).map((v, i) => ({ x: cats[i] ?? `${i + 1}`, y: v })),
         })),
-      } as unknown as SlideContent,
-      rationale: `${c.kind} chart · ${c.series.length} series preserved`,
+      }),
+      rationale: `${c.kind} chart · ${c.series.length} series · colors + legend preserved`,
     };
   }
 
@@ -322,40 +345,55 @@ function mapChartToVariant(title: string, c: ParsedChart, bullets: string[]): Gr
     return {
       sectionId: "SF-08",
       variantId: "MV-GRAPH-DECADE-AREA",
-      content: {
+      content: withSource({
         title,
         kicker: c.title ?? "",
         headline,
+        color: series0.color,
         series: series0.values.slice(0, 12).map((v, i) => ({ label: cats[i] ?? `${i + 1}`, value: v })),
-      } as unknown as SlideContent,
-      rationale: `${c.kind} chart · single series preserved`,
+      }),
+      rationale: `${c.kind} chart · single series · source color preserved`,
     };
   }
 
   // Pie / doughnut
   if (c.kind === "pie" || c.kind === "doughnut") {
-    const items = cats.map((label, i) => ({ label, value: series0.values[i] ?? 0 }));
-    // Prefer dual-donut when exactly 2 categories, info-donut otherwise.
+    const segColors = series0.pointColors ?? [];
+    const items = cats.map((label, i) => ({
+      label,
+      value: series0.values[i] ?? 0,
+      color: segColors[i] ?? undefined,
+    }));
     if (items.length === 2) {
       return {
         sectionId: "SF-08",
         variantId: "MV-GRAPH-DUAL-DONUT",
-        content: {
+        content: withSource({
           title,
-          items: items.map((it) => ({ label: it.label, value: `${Math.round(it.value)}${unit}`, body: "", meta: "" })),
-        } as unknown as SlideContent,
-        rationale: `${c.kind} chart · dual donut`,
+          items: items.map((it) => ({
+            label: it.label,
+            value: `${Math.round(it.value)}${unit}`,
+            body: "",
+            meta: "",
+            color: it.color,
+          })),
+        }),
+        rationale: `${c.kind} chart · dual donut · segment colors preserved`,
       };
     }
     return {
       sectionId: "SF-08",
       variantId: "MV-INFO-DONUT",
-      content: {
+      content: withSource({
         title,
         headline,
-        items: items.slice(0, 6).map((it) => ({ label: it.label, value: `${Math.round(it.value)}${unit}` })),
-      } as unknown as SlideContent,
-      rationale: `${c.kind} chart · segment breakdown`,
+        items: items.slice(0, 6).map((it) => ({
+          label: it.label,
+          value: `${Math.round(it.value)}${unit}`,
+          color: it.color,
+        })),
+      }),
+      rationale: `${c.kind} chart · segment breakdown · colors preserved`,
     };
   }
 
@@ -364,16 +402,16 @@ function mapChartToVariant(title: string, c: ParsedChart, bullets: string[]): Gr
     return {
       sectionId: "SF-08",
       variantId: "MV-GRAPH-STACKED-BAR",
-      content: {
+      content: withSource({
         title,
         unit,
-        segments: c.series.map((s) => ({ label: s.label })),
+        segments: c.series.map((s) => ({ label: s.label, color: s.color })),
         columns: cats.map((label, i) => ({
           label,
           values: c.series.map((s) => s.values[i] ?? 0),
         })),
-      } as unknown as SlideContent,
-      rationale: `${c.kind} chart · stacked segments`,
+      }),
+      rationale: `${c.kind} chart · stacked · segment colors preserved`,
     };
   }
 
@@ -382,16 +420,17 @@ function mapChartToVariant(title: string, c: ParsedChart, bullets: string[]): Gr
     return {
       sectionId: "SF-08",
       variantId: "MV-GRAPH-CATEGORY-BARS",
-      content: {
+      content: withSource({
         title,
         items: cats.slice(0, 6).map((label, i) => ({
           label,
           value: `${Math.round(series0.values[i] ?? 0)}`,
           unit,
+          color: (series0.pointColors ?? [])[i] ?? series0.color,
         })),
         stat: { value: "", unit: "", label: "" },
-      } as unknown as SlideContent,
-      rationale: "bar chart · category bars",
+      }),
+      rationale: "bar chart · category bars · source colors preserved",
     };
   }
 
@@ -400,16 +439,21 @@ function mapChartToVariant(title: string, c: ParsedChart, bullets: string[]): Gr
   return {
     sectionId: "SF-08",
     variantId: "MV-GRAPH-AXIS-BARS",
-    content: {
+    content: withSource({
       title,
       unit,
-      bars: cats.slice(0, 12).map((label, i) => ({ label, value: series0.values[i] ?? 0 })),
+      bars: cats.slice(0, 12).map((label, i) => ({
+        label,
+        value: series0.values[i] ?? 0,
+        color: (series0.pointColors ?? [])[i] ?? series0.color,
+      })),
       highlight: cats[maxIdx] ?? "",
-      legend: series0.label ?? "",
-    } as unknown as SlideContent,
-    rationale: "column chart · axis bars",
+      legend: c.legend?.visible ? (series0.label ?? "") : "",
+    }),
+    rationale: "column chart · axis bars · source palette + legend preserved",
   };
 }
+
 
 function mapTableToVariant(title: string, t: ParsedTable): GraphicMap {
   // Compare table if 2–3 columns of comparable data.
@@ -443,6 +487,14 @@ function mapTableToVariant(title: string, t: ParsedTable): GraphicMap {
 function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[]): GraphicMap {
   const nodes = d.nodes.filter((n) => n.text.trim().length > 0);
   const n = nodes.length;
+  const palette = nodes.map((node) => node.color).filter((c): c is string => Boolean(c));
+  const source = {
+    kind: d.kind,
+    palette,
+    nodeColors: nodes.map((node) => node.color ?? null),
+  } as Record<string, unknown>;
+  const withSource = <T extends object>(content: T) =>
+    ({ ...content, _source: source } as unknown as SlideContent);
 
   // Journey / process family — sequential steps.
   const journeyRe = /journey|roadmap|process|flow|steps|stages|phases|timeline/i;
@@ -450,15 +502,16 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
     return {
       sectionId: "SF-07",
       variantId: "MV-JOURNEY-MAP",
-      content: {
+      content: withSource({
         title,
         stages: nodes.slice(0, 6).map((node, i) => ({
           label: node.text,
           step: `${i + 1}`,
           body: bullets[i] ?? "",
+          color: node.color,
         })),
-      } as unknown as SlideContent,
-      rationale: `SmartArt · ${n} nodes → journey`,
+      }),
+      rationale: `SmartArt · ${n} nodes → journey · node colors preserved`,
     };
   }
 
@@ -467,11 +520,11 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
     return {
       sectionId: "SF-08",
       variantId: "MV-FUNNEL",
-      content: {
+      content: withSource({
         title,
-        stages: nodes.slice(0, 6).map((node) => ({ label: node.text, value: "" })),
-      } as unknown as SlideContent,
-      rationale: `SmartArt · ${n} nodes → funnel`,
+        stages: nodes.slice(0, 6).map((node) => ({ label: node.text, value: "", color: node.color })),
+      }),
+      rationale: `SmartArt · ${n} nodes → funnel · colors preserved`,
     };
   }
 
@@ -480,11 +533,11 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
     return {
       sectionId: "SF-06",
       variantId: "MV-SOL-PILLARS-4",
-      content: {
+      content: withSource({
         title,
-        items: nodes.slice(0, 4).map((node) => ({ title: node.text, body: "" })),
-      } as unknown as SlideContent,
-      rationale: `SmartArt · ${n} nodes → pillars`,
+        items: nodes.slice(0, 4).map((node) => ({ title: node.text, body: "", color: node.color })),
+      }),
+      rationale: `SmartArt · ${n} nodes → pillars · node colors preserved`,
     };
   }
 
@@ -496,15 +549,17 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
   return {
     sectionId: "SF-06",
     variantId: pillar,
-    content: {
+    content: withSource({
       title,
       items: nodes.slice(0, 5).map((node, i) => ({
         title: node.text.slice(0, 80),
         body: bullets[i] ?? "",
+        color: node.color,
       })),
-    } as unknown as SlideContent,
-    rationale: `${d.kind === "smartart" ? "SmartArt" : "grouped shapes"} · ${n} nodes → pillars`,
+    }),
+    rationale: `${d.kind === "smartart" ? "SmartArt" : "grouped shapes"} · ${n} nodes → pillars · colors preserved`,
   };
 }
+
 
 
