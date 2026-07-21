@@ -21,14 +21,6 @@ export const Route = createFileRoute("/brief/new")({
       { title: "New brief · TransPerfect Modular" },
       { name: "description", content: "Guided brief that resolves into an assembled deck." },
     ],
-    links: [
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Urbanist:wght@600;700;800&family=Epilogue:wght@400;500;600&display=swap",
-      },
-    ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(taxonomyQueryOptions),
   component: BriefWizard,
@@ -38,22 +30,27 @@ export const Route = createFileRoute("/brief/new")({
   notFoundComponent: () => <div className="p-10">Not found.</div>,
 });
 
-// Token-locked styles (Navy Trust palette + Urbanist/Epilogue)
+// TransPerfect brand palette — matches the rest of the build.
+// Ink = Blue 800, Blue = Blue 500, Accent = Aqua.
 const PALETTE = {
-  page: "var(--brief-page, #E8EDF3)",
+  page: "var(--brief-page, #F2F5FA)",
   surface: "var(--brief-surface, #FFFFFF)",
-  ink: "var(--brief-ink, #0F1B3D)",
-  inkSoft: "var(--brief-ink-soft, #1E3A5F)",
-  blue: "var(--brief-blue, #3B6FA0)",
-  hairline: "var(--brief-hairline, #D1DBE5)",
-  field: "var(--brief-field, #F8FAFC)",
+  ink: "var(--brief-ink, #03002C)",
+  inkSoft: "var(--brief-ink-soft, #1E2749)",
+  blue: "var(--brief-blue, #003FC7)",
+  accent: "var(--brief-accent, #A1FBF9)",
+  hairline: "var(--brief-hairline, #E4E9F2)",
+  field: "var(--brief-field, #F7F9FC)",
 } as const;
 
 
+// Minimal typographic system — Geist Sans throughout (already loaded globally),
+// tight tracking, no all-caps pills. Small labels use monospace numerals for
+// the section index only.
 const labelCls =
-  "text-[11px] font-bold uppercase tracking-[0.14em] text-[#0F1B3D] font-['Urbanist']";
+  "text-[11px] font-semibold uppercase tracking-[0.18em] text-[#03002C]";
 const inputCls =
-  "w-full rounded-lg border border-[#D1DBE5] bg-[#F8FAFC] px-4 py-3 text-sm text-[#0F1B3D] placeholder:text-[#3B6FA0]/50 focus:border-[#3B6FA0] focus:outline-none focus:ring-2 focus:ring-[#3B6FA0]/25 transition-all";
+  "w-full rounded-md border border-[#E4E9F2] bg-white px-4 py-3 text-sm text-[#03002C] placeholder:text-[#03002C]/35 focus:border-[#003FC7] focus:outline-none focus:ring-2 focus:ring-[#003FC7]/15 transition-all";
 
 function BriefWizard() {
   const navigate = useNavigate();
@@ -154,7 +151,7 @@ function BriefWizard() {
   return (
     <AppShell>
       <div
-        className="min-h-full px-3 py-6 font-['Epilogue'] sm:px-6 sm:py-12"
+        className="min-h-full px-3 py-6 font-['Geist'] sm:px-6 sm:py-12"
         style={{ backgroundColor: PALETTE.page, color: PALETTE.ink }}
       >
         <div className="mx-auto w-full max-w-[1040px]">
@@ -184,21 +181,21 @@ function BriefWizard() {
                   className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.24em]"
                   style={{ color: brandPrimary }}
                 >
-                  <span className="inline-block h-[2px] w-6 rounded-full" style={{ backgroundColor: brandPrimary }} />
+                  <span className="inline-block h-[10px] w-[2px] rounded-none" style={{ backgroundColor: brandPrimary }} />
                   Briefing engine
                 </div>
-                <h1 className="mt-4 font-['Urbanist'] text-3xl font-extrabold uppercase leading-[0.95] tracking-tighter text-[#0F1B3D] sm:text-[44px]">
+                <h1 className="mt-4 font-['Geist'] text-3xl font-extrabold uppercase leading-[0.95] tracking-tighter text-[#03002C] sm:text-[44px]">
                   New Pitch Deck Brief
                 </h1>
-                <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#1E3A5F]/80 sm:text-base">
+                <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#1E2749]/80 sm:text-base">
                   Configure the AI narrative engine for your next presentation.
                 </p>
                 <div
-                  className="mt-6 inline-flex items-center gap-2 rounded-full border bg-white/70 px-4 py-2 text-xs backdrop-blur transition-all hover:bg-white"
+                  className="mt-6 inline-flex items-center gap-2 rounded-md border bg-white/70 px-4 py-2 text-xs backdrop-blur transition-all hover:bg-white"
                   style={{ borderColor: `${brandPrimary}33` }}
                 >
-                  <span className="text-[#1E3A5F]/70">Already have a deck?</span>
-                  <Link to="/decks/import" className="font-semibold text-[#3B6FA0] hover:text-[#0F1B3D] hover:underline">
+                  <span className="text-[#1E2749]/70">Already have a deck?</span>
+                  <Link to="/decks/import" className="font-semibold text-[#003FC7] hover:text-[#03002C] hover:underline">
                     Import an existing PowerPoint →
                   </Link>
                 </div>
@@ -211,7 +208,7 @@ function BriefWizard() {
               <section className="space-y-4">
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
                   <label className={labelCls}>01 · Brand Mode</label>
-                  <span className="max-w-[11rem] text-right text-[10px] font-medium uppercase tracking-widest text-[#1E3A5F]/50 sm:max-w-none">
+                  <span className="max-w-[11rem] text-right text-[10px] font-medium uppercase tracking-widest text-[#1E2749]/50 sm:max-w-none">
                     drives archetype + variant filters
                   </span>
                 </div>
@@ -231,15 +228,15 @@ function BriefWizard() {
                           <BrandLockup brand={brand} color={brandPrimary} size="sm" clientName={form.prospect} subCompany={form.subCompany} />
                         </div>
                         <span
-                          className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
+                          className="shrink-0 rounded-sm px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em]"
                           style={{ backgroundColor: brandPrimary, color: "#fff" }}
                         >
                           {brand.role ?? "brand"}
                         </span>
                       </div>
-                      <p className="mt-2 text-xs leading-relaxed text-[#1E3A5F]/75">{brand.description}</p>
+                      <p className="mt-2 text-xs leading-relaxed text-[#1E2749]/75">{brand.description}</p>
                     </div>
-                    <div className="hidden shrink-0 gap-3 text-right text-[10px] font-mono uppercase tracking-wider text-[#1E3A5F]/60 sm:flex">
+                    <div className="hidden shrink-0 gap-3 text-right text-[10px] font-mono uppercase tracking-wider text-[#1E2749]/60 sm:flex">
                       <StatPill label="industries" value={brand.contentScope?.industries.length ?? 0} />
                       <StatPill label="archetypes" value={preferredIds.length} />
                       <StatPill label="variants" value={preferredVariantIds.length} />
@@ -253,38 +250,71 @@ function BriefWizard() {
                     const active = form.brandModeId === b.id;
                     const c = b.tokens?.primary || PALETTE.blue;
                     const a = b.tokens?.accent || c;
+                    const isEnterprise = b.id === "bm-enterprise";
                     return (
                       <button
                         key={b.id}
                         type="button"
                         onClick={() => selectBrand(b.id)}
                         aria-pressed={active}
-                        className="group relative grid min-h-[172px] cursor-pointer grid-rows-[auto_1fr_auto] gap-3 overflow-hidden rounded-xl border-2 p-4 text-left transition-all duration-300 ease-out hover:-translate-y-1"
+                        className={`group relative grid min-h-[184px] cursor-pointer grid-rows-[auto_1fr_auto] gap-3 overflow-hidden ${isEnterprise ? "rounded-[18px] border" : "rounded-xl border"} p-5 text-left transition-all duration-300 ease-out hover:-translate-y-0.5`}
                         style={{
                           borderColor: active ? c : PALETTE.hairline,
+                          borderWidth: isEnterprise ? 1 : active ? 2 : 1,
                           backgroundColor: PALETTE.surface,
                           boxShadow: active
-                            ? `0 12px 28px -12px ${c}55, 0 0 0 3px ${c}22`
-                            : "0 1px 2px rgba(15,27,61,0.04)",
+                            ? isEnterprise
+                              ? `0 22px 44px -20px ${c}55, 0 0 0 1px ${c}, inset 0 1px 0 rgba(255,255,255,0.9)`
+                              : `0 12px 28px -12px ${c}55, 0 0 0 2px ${c}22`
+                            : "0 1px 2px rgba(3,0,44,0.03)",
                         }}
                         onMouseEnter={(e) => {
                           if (!active) e.currentTarget.style.boxShadow = `0 14px 30px -16px ${c}66, 0 0 0 1px ${c}22`;
                         }}
                         onMouseLeave={(e) => {
-                          if (!active) e.currentTarget.style.boxShadow = "0 1px 2px rgba(15,27,61,0.04)";
+                          if (!active) e.currentTarget.style.boxShadow = "0 1px 2px rgba(3,0,44,0.03)";
                         }}
                       >
+                        {/* Ambient background */}
                         <span
                           aria-hidden
                           className="pointer-events-none absolute inset-0 transition-opacity duration-300"
-                          style={{
-                            background: `radial-gradient(120% 100% at 0% 0%, ${c}14 0%, transparent 55%), linear-gradient(135deg, ${c}0a 0%, ${a}10 100%)`,
-                            opacity: active ? 1 : 0.55,
-                          }}
+                          style={
+                            isEnterprise
+                              ? {
+                                  background: `linear-gradient(180deg, ${c}0d 0%, transparent 42%), linear-gradient(135deg, transparent 40%, ${a}12 100%)`,
+                                  opacity: active ? 1 : 0.7,
+                                }
+                              : {
+                                  background: `radial-gradient(120% 100% at 0% 0%, ${c}14 0%, transparent 55%), linear-gradient(135deg, ${c}0a 0%, ${a}10 100%)`,
+                                  opacity: active ? 1 : 0.55,
+                                }
+                          }
                         />
-                        <div className="relative flex min-w-0 items-center justify-end">
+                        {/* Enterprise-only: architectural corner brackets + top hairline rule */}
+                        {isEnterprise && (
+                          <>
+                            <span
+                              aria-hidden
+                              className="pointer-events-none absolute inset-x-5 top-0 h-[2px]"
+                              style={{ background: `linear-gradient(90deg, ${c}, ${a})` }}
+                            />
+                            <span aria-hidden className="pointer-events-none absolute left-3 top-3 h-2 w-2 border-l border-t" style={{ borderColor: `${c}80` }} />
+                            <span aria-hidden className="pointer-events-none absolute right-3 top-3 h-2 w-2 border-r border-t" style={{ borderColor: `${c}80` }} />
+                            <span aria-hidden className="pointer-events-none absolute left-3 bottom-3 h-2 w-2 border-l border-b" style={{ borderColor: `${c}80` }} />
+                            <span aria-hidden className="pointer-events-none absolute right-3 bottom-3 h-2 w-2 border-r border-b" style={{ borderColor: `${c}80` }} />
+                          </>
+                        )}
+                        <div className="relative flex min-w-0 items-center justify-between gap-2">
+                          {isEnterprise ? (
+                            <span className="font-mono text-[9px] uppercase tracking-[0.24em] text-[#03002C]/55">
+                              Master · TransPerfect
+                            </span>
+                          ) : (
+                            <span />
+                          )}
                           <span
-                            className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest transition-colors"
+                            className="shrink-0 rounded-sm px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em] transition-colors"
                             style={{
                               backgroundColor: active ? c : `${c}14`,
                               color: active ? "#fff" : c,
@@ -294,9 +324,9 @@ function BriefWizard() {
                           </span>
                         </div>
                         <div className="relative flex min-w-0 max-w-full items-center">
-                          <BrandLockup brand={b} color={c} size="xs" clientName={form.prospect} />
+                          <BrandLockup brand={b} color={c} size={isEnterprise ? "sm" : "xs"} clientName={form.prospect} />
                         </div>
-                        <p className="relative text-[11px] leading-snug text-[#1E3A5F]/80">{b.description}</p>
+                        <p className="relative text-[11px] leading-snug text-[#1E2749]/80">{b.description}</p>
                       </button>
                     );
                   })}
@@ -321,7 +351,7 @@ function BriefWizard() {
                         </option>
                       ))}
                     </select>
-                    <p className="text-[11px] text-[#1E3A5F]/60">
+                    <p className="text-[11px] text-[#1E2749]/60">
                       The assembler, palette, and lockup will resolve to this TransPerfect entity.
                     </p>
                   </div>
@@ -372,18 +402,18 @@ function BriefWizard() {
                     <div className="flex items-center gap-2">
                       <span className={labelCls}>Customize</span>
                       <span
-                        className="rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
+                        className="rounded-sm px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em]"
                         style={{ backgroundColor: `${brandPrimary}14`, color: brandPrimary }}
                       >
                         optional
                       </span>
                     </div>
-                    <p className="mt-1 truncate text-[11px] text-[#1E3A5F]/70">
+                    <p className="mt-1 truncate text-[11px] text-[#1E2749]/70">
                       Industry, audience, narrative, palette, AI planning
                     </p>
                   </div>
                   <span
-                    className="shrink-0 font-['Urbanist'] text-[11px] font-bold uppercase tracking-widest transition-transform duration-300"
+                    className="shrink-0 font-['Geist'] text-[11px] font-bold uppercase tracking-widest transition-transform duration-300"
                     style={{ color: brandPrimary, transform: customizeOpen ? "rotate(180deg)" : "rotate(0deg)" }}
                     aria-hidden
                   >
@@ -412,7 +442,7 @@ function BriefWizard() {
                             />
                             {industrySuggestions.length > 0 && (
                               <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#1E3A5F]/50">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#1E2749]/50">
                                   Suggested for {brand?.name}:
                                 </span>
                                 {industrySuggestions.slice(0, 5).map((ind: string) => {
@@ -422,7 +452,7 @@ function BriefWizard() {
                                       key={ind}
                                       type="button"
                                       onClick={() => setForm({ ...form, industry: ind })}
-                                      className="rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors"
+                                      className="rounded-md border px-2.5 py-1 text-[10px] font-medium transition-colors"
                                       style={{
                                         borderColor: selected ? brandPrimary : PALETTE.hairline,
                                         backgroundColor: selected ? brandPrimary : "transparent",
@@ -465,7 +495,7 @@ function BriefWizard() {
                               <button
                                 type="button"
                                 onClick={() => setShowAllArchetypes((v) => !v)}
-                                className="text-[10px] font-bold uppercase tracking-widest text-[#3B6FA0] transition-colors hover:text-[#0F1B3D]"
+                                className="text-[10px] font-bold uppercase tracking-widest text-[#003FC7] transition-colors hover:text-[#03002C]"
                               >
                                 {showAllArchetypes ? "← show brand-preferred only" : "show all archetypes →"}
                               </button>
@@ -499,10 +529,10 @@ function BriefWizard() {
                               max={12}
                               value={form.lengthTarget}
                               onChange={(e) => setForm({ ...form, lengthTarget: Number(e.target.value) })}
-                              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-[#E8EDF3]"
+                              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-[#F2F5FA]"
                               style={{ accentColor: brandPrimary }}
                             />
-                            <div className="flex justify-between text-[10px] font-bold uppercase tracking-tight text-[#1E3A5F]/50">
+                            <div className="flex justify-between text-[10px] font-bold uppercase tracking-tight text-[#1E2749]/50">
                               <span>Brief</span>
                               <span>Standard</span>
                               <span>Full</span>
@@ -512,10 +542,10 @@ function BriefWizard() {
                           {preferredVariantIds.length > 0 && (
                             <div className="rounded-lg border p-4" style={{ borderColor: PALETTE.hairline, backgroundColor: PALETTE.field }}>
                               <div className="flex items-center justify-between">
-                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#1E3A5F]/60">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-[#1E2749]/60">
                                   Preferred slide variants for {brand?.name}
                                 </span>
-                                <span className="font-mono text-[10px] text-[#1E3A5F]/40">
+                                <span className="font-mono text-[10px] text-[#1E2749]/40">
                                   {preferredVariantIds.length} pinned
                                 </span>
                               </div>
@@ -543,7 +573,7 @@ function BriefWizard() {
                       <section className="space-y-4">
                         <div className="flex items-baseline justify-between">
                           <label className={labelCls}>Palette Lab</label>
-                          <span className="text-[10px] font-medium uppercase tracking-widest text-[#1E3A5F]/50">
+                          <span className="text-[10px] font-medium uppercase tracking-widest text-[#1E2749]/50">
                             optional · attach an A/B test or pick an AI palette
                           </span>
                         </div>
@@ -655,14 +685,14 @@ function BriefWizard() {
                 className="flex flex-col-reverse items-stretch justify-between gap-4 border-t pt-6 md:flex-row md:items-center"
                 style={{ borderColor: PALETTE.hairline }}
               >
-                <div className="flex items-center gap-3 text-xs text-[#1E3A5F]/70">
+                <div className="flex items-center gap-3 text-xs text-[#1E2749]/70">
                   {brand && (
                     <span className="flex items-center gap-2">
                       <span
-                        className="inline-block h-2 w-2 rounded-full"
+                        className="inline-block h-3 w-[3px] rounded-sm"
                         style={{ backgroundColor: brandPrimary }}
                       />
-                      Assembling under <strong className="font-semibold text-[#0F1B3D]">{brand.name}</strong>
+                      Assembling under <strong className="font-semibold text-[#03002C]">{brand.name}</strong>
                     </span>
                   )}
                   {aiStatus !== "idle" && (
@@ -678,7 +708,7 @@ function BriefWizard() {
                   <button
                     type="button"
                     disabled={busy}
-                    className="rounded-lg border-2 bg-white px-6 py-3 font-['Urbanist'] text-sm font-bold tracking-tight text-[#0F1B3D] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#F8FAFC] hover:shadow-sm disabled:opacity-50"
+                    className="rounded-lg border-2 bg-white px-6 py-3 font-['Geist'] text-sm font-bold tracking-tight text-[#03002C] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#F7F9FC] hover:shadow-sm disabled:opacity-50"
                     style={{ borderColor: PALETTE.hairline }}
                     onClick={() => {
                       const submission = {
@@ -697,7 +727,7 @@ function BriefWizard() {
                   <button
                     type="button"
                     disabled={busy}
-                    className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-lg px-9 py-3.5 font-['Urbanist'] text-[15px] font-bold tracking-tight text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50"
+                    className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-lg px-9 py-3.5 font-['Geist'] text-[15px] font-bold tracking-tight text-white transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-50"
                     style={{
                       background: `linear-gradient(135deg, ${brandPrimary} 0%, ${brandAccent} 100%)`,
                       boxShadow: `0 14px 30px -10px ${brandAccent}80, 0 6px 14px -8px ${brandPrimary}80, inset 0 1px 0 rgba(255,255,255,0.18)`,
@@ -900,8 +930,8 @@ function BriefWizard() {
 function StatPill({ label, value }: { label: string; value: number }) {
   return (
     <div className="flex flex-col items-end leading-none">
-      <span className="font-['Urbanist'] text-base font-extrabold text-[#0F1B3D]">{value}</span>
-      <span className="mt-0.5 text-[9px] uppercase tracking-widest text-[#1E3A5F]/60">{label}</span>
+      <span className="font-['Geist'] text-base font-extrabold text-[#03002C]">{value}</span>
+      <span className="mt-0.5 text-[9px] uppercase tracking-widest text-[#1E2749]/60">{label}</span>
     </div>
   );
 }
@@ -922,7 +952,7 @@ function BrandRelevancePanel({ brand }: { brand: BrandMode }) {
   const chip = (text: string, key: string) => (
     <span
       key={key}
-      className="rounded-full border px-3 py-1 text-xs font-medium"
+      className="rounded-md border px-2.5 py-1 text-xs font-medium"
       style={{
         backgroundColor: `${primary}0d`,
         color: PALETTE.inkSoft,
@@ -935,7 +965,7 @@ function BrandRelevancePanel({ brand }: { brand: BrandMode }) {
   const Row = ({ label, items }: { label: string; items: string[] }) =>
     items.length === 0 ? null : (
       <div className="flex flex-col gap-2">
-        <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#1E3A5F]/60">{label}</span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#1E2749]/60">{label}</span>
         <div className="flex flex-wrap gap-1.5">{items.map((v, i) => chip(v, `${label}-${i}`))}</div>
       </div>
     );
@@ -946,7 +976,7 @@ function BrandRelevancePanel({ brand }: { brand: BrandMode }) {
     >
       <div className="mb-4 flex items-center justify-between">
         <span className={labelCls}>Relevant to {brand.name}</span>
-        <span className="font-mono text-[10px] text-[#1E3A5F]/50">auto-filtered</span>
+        <span className="font-mono text-[10px] text-[#1E2749]/50">auto-filtered</span>
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         <Row label="Industries" items={scope.industries} />
@@ -955,7 +985,7 @@ function BrandRelevancePanel({ brand }: { brand: BrandMode }) {
         <Row label="Preferred narratives" items={scope.preferredArchetypes} />
       </div>
       {scope.restrictedFamilyIds && scope.restrictedFamilyIds.length > 0 && (
-        <div className="mt-3 text-xs text-[#1E3A5F]/60">
+        <div className="mt-3 text-xs text-[#1E2749]/60">
           Off-limits for this brand: {scope.restrictedFamilyIds.join(", ")}
         </div>
       )}
@@ -991,7 +1021,7 @@ function StrategistSection({
     <section className="space-y-4">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
         <label className={labelCls}>06 · AI Narrative Strategist · optional</label>
-        <span className="max-w-[13rem] text-right text-[10px] font-medium uppercase tracking-widest text-[#1E3A5F]/50 sm:max-w-none">
+        <span className="max-w-[13rem] text-right text-[10px] font-medium uppercase tracking-widest text-[#1E2749]/50 sm:max-w-none">
           plans arc + sections before generation
         </span>
       </div>
@@ -1001,14 +1031,14 @@ function StrategistSection({
           className="flex flex-col gap-3 rounded-xl border p-5 sm:flex-row sm:items-center sm:justify-between"
           style={{ borderColor: PALETTE.hairline, backgroundColor: PALETTE.field }}
         >
-          <div className="text-sm text-[#1E3A5F]">
+          <div className="text-sm text-[#1E2749]">
             Let Claude architect the deck: opening hook, section order, key messages, and closing ask — grounded in {brandName}'s brand guide and BrandHub intel.
           </div>
           <button
             type="button"
             disabled={busy}
             onClick={onPlan}
-            className="rounded-lg px-5 py-2.5 font-['Urbanist'] text-sm font-bold tracking-tight text-white transition-all disabled:opacity-50"
+            className="rounded-lg px-5 py-2.5 font-['Geist'] text-sm font-bold tracking-tight text-white transition-all disabled:opacity-50"
             style={{ backgroundColor: brandPrimary }}
           >
             {busy ? "Planning…" : "Plan with AI strategist"}
@@ -1042,10 +1072,10 @@ function StrategistSection({
 
           {strategy.risksToAvoid.length > 0 && (
             <div>
-              <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#1E3A5F]/60">
+              <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#1E2749]/60">
                 Risks to avoid
               </div>
-              <ul className="ml-4 list-disc space-y-0.5 text-xs text-[#1E3A5F]/85">
+              <ul className="ml-4 list-disc space-y-0.5 text-xs text-[#1E2749]/85">
                 {strategy.risksToAvoid.map((r, i) => (
                   <li key={i}>{r}</li>
                 ))}
@@ -1055,13 +1085,13 @@ function StrategistSection({
 
           <div>
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#1E3A5F]/60">
+              <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#1E2749]/60">
                 Recommended sections · {strategy.recommendedSections.length}
               </span>
               <button
                 type="button"
                 onClick={onDiscard}
-                className="text-[10px] font-semibold uppercase tracking-widest text-[#1E3A5F]/60 hover:text-rose-600"
+                className="text-[10px] font-semibold uppercase tracking-widest text-[#1E2749]/60 hover:text-rose-600"
               >
                 Discard plan
               </button>
@@ -1082,17 +1112,17 @@ function StrategistSection({
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <div className="min-w-0">
-                      <div className="font-['Urbanist'] text-sm font-bold text-[#0F1B3D]">
+                      <div className="font-['Geist'] text-sm font-bold text-[#03002C]">
                         {sf?.name ?? sec.sectionId}
                       </div>
-                      <div className="mt-0.5 text-xs font-medium text-[#0F1B3D]/80">
+                      <div className="mt-0.5 text-xs font-medium text-[#03002C]/80">
                         Key message · {sec.keyMessage}
                       </div>
-                      <div className="mt-1 text-[11px] italic text-[#1E3A5F]/70">
+                      <div className="mt-1 text-[11px] italic text-[#1E2749]/70">
                         {sec.rationale}
                       </div>
                       {sec.suggestedVariantId && (
-                        <div className="mt-1 font-mono text-[10px] text-[#1E3A5F]/50">
+                        <div className="mt-1 font-mono text-[10px] text-[#1E2749]/50">
                           variant {sec.suggestedVariantId}
                           {sec.suggestedLayoutId ? ` · layout ${sec.suggestedLayoutId}` : ""}
                         </div>
@@ -1102,7 +1132,7 @@ function StrategistSection({
                       <button
                         type="button"
                         onClick={() => onMoveSection(i, -1)}
-                        className="rounded border border-[#D1DBE5] px-2 py-0.5 text-[10px] hover:bg-[#F8FAFC]"
+                        className="rounded border border-[#E4E9F2] px-2 py-0.5 text-[10px] hover:bg-[#F7F9FC]"
                         aria-label="Move up"
                       >
                         ↑
@@ -1110,7 +1140,7 @@ function StrategistSection({
                       <button
                         type="button"
                         onClick={() => onMoveSection(i, 1)}
-                        className="rounded border border-[#D1DBE5] px-2 py-0.5 text-[10px] hover:bg-[#F8FAFC]"
+                        className="rounded border border-[#E4E9F2] px-2 py-0.5 text-[10px] hover:bg-[#F7F9FC]"
                         aria-label="Move down"
                       >
                         ↓
@@ -1130,13 +1160,13 @@ function StrategistSection({
             </ol>
           </div>
 
-          <div className="flex items-center justify-between text-[11px] text-[#1E3A5F]/70">
+          <div className="flex items-center justify-between text-[11px] text-[#1E2749]/70">
             <span>Assemble buttons below will use this plan.</span>
             <button
               type="button"
               onClick={onPlan}
               disabled={busy}
-              className="font-semibold uppercase tracking-widest text-[#3B6FA0] hover:text-[#0F1B3D] disabled:opacity-50"
+              className="font-semibold uppercase tracking-widest text-[#003FC7] hover:text-[#03002C] disabled:opacity-50"
             >
               {busy ? "Re-planning…" : "Re-plan"}
             </button>
@@ -1149,11 +1179,11 @@ function StrategistSection({
 
 function MicroCard({ label, body }: { label: string; body: string }) {
   return (
-    <div className="rounded-lg border border-[#D1DBE5] bg-white p-3">
-      <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#1E3A5F]/60">
+    <div className="rounded-lg border border-[#E4E9F2] bg-white p-3">
+      <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#1E2749]/60">
         {label}
       </div>
-      <div className="mt-1 text-xs leading-relaxed text-[#0F1B3D]">{body}</div>
+      <div className="mt-1 text-xs leading-relaxed text-[#03002C]">{body}</div>
     </div>
   );
 }
@@ -1188,7 +1218,7 @@ function KnowledgeUsedPanel({
   return (
     <div
       className="rounded-xl border bg-white p-5"
-      style={{ borderColor: "var(--brief-hairline, #D1DBE5)" }}
+      style={{ borderColor: "var(--brief-hairline, #E4E9F2)" }}
     >
       <button
         type="button"
@@ -1199,21 +1229,21 @@ function KnowledgeUsedPanel({
           <span
             className={
               confidence.tone === "ok"
-                ? "rounded-full bg-[#0F1B3D] px-2.5 py-1 font-['Urbanist'] text-[10px] font-bold uppercase tracking-widest text-white"
-                : "rounded-full bg-[#B45309] px-2.5 py-1 font-['Urbanist'] text-[10px] font-bold uppercase tracking-widest text-white"
+                ? "rounded-sm bg-[#03002C] px-2.5 py-1 font-['Geist'] text-[10px] font-bold uppercase tracking-[0.16em] text-white"
+                : "rounded-sm bg-[#B45309] px-2.5 py-1 font-['Geist'] text-[10px] font-bold uppercase tracking-[0.16em] text-white"
             }
           >
             {confidence.label}
           </span>
-          <span className="font-['Urbanist'] text-sm font-bold uppercase tracking-[0.14em] text-[#0F1B3D]">
+          <span className="font-['Geist'] text-sm font-bold uppercase tracking-[0.14em] text-[#03002C]">
             Knowledge used ({selected.length})
           </span>
         </div>
-        <span className="text-xs text-[#1E3A5F]/70">{open ? "Hide" : "Show"}</span>
+        <span className="text-xs text-[#1E2749]/70">{open ? "Hide" : "Show"}</span>
       </button>
       {setup ? (
         <div className="mt-3 rounded-lg border border-[#F59E0B]/60 bg-[#FFF7ED] px-3 py-2 text-xs leading-relaxed text-[#7C2D12]">
-          <div className="mb-1 font-['Urbanist'] text-[10px] font-bold uppercase tracking-widest">AI setup needed</div>
+          <div className="mb-1 font-['Geist'] text-[10px] font-bold uppercase tracking-widest">AI setup needed</div>
           Add <code className="rounded bg-white/60 px-1 font-mono">ANTHROPIC_API_KEY</code> in Project Settings → Secrets to enable deep synthesis. Falling back to raw retrieval.
         </div>
       ) : fallbackNote && (
@@ -1224,41 +1254,41 @@ function KnowledgeUsedPanel({
       {open && (
         <div className="mt-4 space-y-4">
           {synthesis && (
-            <div className="rounded-lg border border-[#0F1B3D]/10 bg-[#F8FAFC] p-4">
-              <div className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#3B6FA0]">
+            <div className="rounded-lg border border-[#03002C]/10 bg-[#F7F9FC] p-4">
+              <div className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#003FC7]">
                 Synthesis
               </div>
-              <p className="text-sm leading-relaxed text-[#0F1B3D]">{synthesis}</p>
+              <p className="text-sm leading-relaxed text-[#03002C]">{synthesis}</p>
             </div>
           )}
           <ul className="space-y-3">
             {selected.map((k) => (
               <li
                 key={k.id}
-                className="rounded-lg border border-[#D1DBE5] bg-white p-3"
+                className="rounded-lg border border-[#E4E9F2] bg-white p-3"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
-                    <span className="rounded bg-[#E8EDF3] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#1E3A5F]">
+                    <span className="rounded bg-[#F2F5FA] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#1E2749]">
                       {k.source}
                     </span>
-                    <span className="font-['Urbanist'] text-xs font-bold text-[#0F1B3D]">
+                    <span className="font-['Geist'] text-xs font-bold text-[#03002C]">
                       {k.title}
                     </span>
                   </div>
                   {typeof k.relevance === "number" && (
                     <span
-                      className="text-xs tracking-widest text-[#3B6FA0]"
+                      className="text-xs tracking-widest text-[#003FC7]"
                       title={`Relevance ${k.relevance}/5`}
                     >
                       {"★".repeat(k.relevance)}
-                      <span className="text-[#D1DBE5]">
+                      <span className="text-[#E4E9F2]">
                         {"★".repeat(Math.max(0, 5 - k.relevance))}
                       </span>
                     </span>
                   )}
                 </div>
-                <p className="mt-2 text-xs leading-relaxed text-[#1E3A5F]">
+                <p className="mt-2 text-xs leading-relaxed text-[#1E2749]">
                   {k.extractedFact || k.snippet}
                 </p>
               </li>
