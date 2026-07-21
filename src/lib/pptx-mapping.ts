@@ -35,11 +35,39 @@ export function mapParsedSlide(
   const images = s.images ?? [];
   const hasImages = images.length > 0;
   const primaryImage = images[0];
+  const charts = s.charts ?? [];
+  const tables = s.tables ?? [];
+  const diagrams = s.diagrams ?? [];
 
   let sectionId = "SF-05";
   let variantId = "MV-INS-CALLOUT";
   let content: SlideContent = { title };
   let rationale = "Narrative callout";
+
+  // ── Graphical-intelligence pass ───────────────────────────────────────
+  // When the source slide contains a real chart, table, or SmartArt diagram
+  // we re-author onto a native TransPerfect data/process variant instead of
+  // collapsing to a text-only callout. This runs before the text heuristics
+  // so structured graphics always take precedence.
+  const graphical = mapFromGraphics({ title, bullets, notes: s.notes, charts, tables, diagrams });
+  if (graphical) {
+    sectionId = graphical.sectionId;
+    variantId = graphical.variantId;
+    content = graphical.content;
+    rationale = graphical.rationale;
+    // Continue to the media-attachment tail below; skip text heuristics.
+    const variant = byId(MODULE_VARIANTS, variantId) ?? MODULE_VARIANTS[0];
+    const layoutId = variant.permittedLayoutIds[0];
+    const safeContent = normalizeSlideMedia(variant.id, content as Record<string, unknown>) as SlideContent;
+    return {
+      sectionId,
+      variantId: variant.id,
+      layoutId,
+      content: safeContent,
+      source: s,
+      rationale,
+    };
+  }
 
   if (isFirst || /^(cover|title)\b/i.test(title)) {
     // Cover: prefer a media-forward cover when we have a hero image.
