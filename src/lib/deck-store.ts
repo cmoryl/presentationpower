@@ -1852,11 +1852,17 @@ export const useDeckStore = create<DeckState>()(
           if (typeof prev.videoPosterUrl === "string") merged.videoPosterUrl = prev.videoPosterUrl;
           if (typeof prev.videoPath === "string") merged.videoPath = prev.videoPath;
           if (typeof prev.videoPosterPath === "string") merged.videoPosterPath = prev.videoPosterPath;
+          for (const k of ["videoAutoplay", "videoLoop", "videoMuted", "videoControls"] as const) {
+            if (typeof prev[k] === "boolean") merged[k] = prev[k];
+          }
         } else {
           delete merged.videoUrl;
           delete merged.videoPosterUrl;
           delete merged.videoPath;
           delete merged.videoPosterPath;
+          for (const k of ["videoAutoplay", "videoLoop", "videoMuted", "videoControls"] as const) {
+            delete merged[k];
+          }
         }
         // Preserve background settings across swaps.
         if (prev.background !== undefined) merged.background = prev.background;
