@@ -244,17 +244,38 @@ export async function exportDeckToPptx(
       // Best-effort — fall through to whatever URL is stored on the item.
     }
   }
+  // Per-slide dark/light decision must match the render loop below so that
+  // the prefetched item-logo picks the correct color variant (white marks on
+  // dark chrome, color marks on light chrome).
+  const slideIsDark: boolean[] = deck.slides.map((slide, i) => {
+    const kind = classifyVariant(slide.variantId, i);
+    const advancedDark = slide.variantId === "MV-COUNTDOWN";
+    const bgIsImage = backgroundPlans[i].kind === "image";
+    return advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
+  });
   const slideItemLogos: Array<Array<string | null>> = await Promise.all(
     deck.slides.map(async (slide, idx) => {
       if (!LOGO_ITEM_VARIANTS.has(slide.variantId)) return [];
       const items = Array.isArray((slide.content as Record<string, unknown>).items)
         ? ((slide.content as Record<string, unknown>).items as Array<Record<string, unknown>>)
         : [];
+      const wantDark = slideIsDark[idx];
       return Promise.all(
         items.map((it, k) => {
           const path = typeof it.logoPath === "string" ? it.logoPath : "";
-          const stored = typeof it.logoUrl === "string" ? it.logoUrl : "";
-          const url = (path && logoPathUrls[path]) || stored;
+          const light = typeof it.logoUrl === "string" ? it.logoUrl : "";
+          const dark =
+            (typeof it.logoUrlDark === "string" && it.logoUrlDark) ||
+            (typeof (it as Record<string, unknown>).logoWhite === "string"
+              ? ((it as Record<string, unknown>).logoWhite as string)
+              : "");
+          const signed = path ? logoPathUrls[path] : "";
+          // Prefer the mode-appropriate mark; fall back through the other
+          // variant, then the signed storage URL, so exports never show a
+          // black mark on a dark slide when a white variant exists.
+          const url = wantDark
+            ? (dark || signed || light)
+            : (light || signed || dark);
           if (!url) return Promise.resolve(null);
           return fetchAsDataUrl(url, `slide ${idx + 1} item ${k + 1} logo`);
         }),
