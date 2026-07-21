@@ -3776,6 +3776,8 @@ function MediaTile({
   portrait,
   muted,
   overrideUrl,
+  videoUrl,
+  videoPosterUrl,
 }: {
   brand: BrandMode;
   seed: string;
@@ -3789,18 +3791,41 @@ function MediaTile({
    * division imagery so text-only decks keep their curated look.
    */
   overrideUrl?: string;
+  /** Slide-level video override. Takes precedence over overrideUrl/seed. */
+  videoUrl?: string;
+  /** Optional still shown before the video plays / in non-playback modes. */
+  videoPosterUrl?: string;
 }) {
   const mode = useContext(SlideModeContext);
   const h = hash(seed || brand.id);
   const grayscale = muted ? "grayscale(55%) brightness(0.95)" : undefined;
 
+  // Detect present/share playback context (client-only) so we autoplay
+  // video there but not in the editor's slide grid — a wall of autoplaying
+  // videos is a perf and attention disaster.
+  const [autoplay, setAutoplay] = useState(false);
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const check = () => {
+      const cls = document.body.classList;
+      setAutoplay(cls.contains("present-mode") || cls.contains("share-mode"));
+    };
+    check();
+    const obs = new MutationObserver(check);
+    obs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    return () => obs.disconnect();
+  }, []);
+
   // Division-specific imagery: photos + abstracts for the active brand.
   const divSet = getDivisionImagery(brand.id);
   const tileBackdrops = [...divSet.photos, ...divSet.abstracts];
   const url =
-    overrideUrl && overrideUrl.length > 0
+    videoPosterUrl && videoPosterUrl.length > 0
+      ? videoPosterUrl
+      : overrideUrl && overrideUrl.length > 0
       ? overrideUrl
       : tileBackdrops[h % tileBackdrops.length];
+  const hasVideo = Boolean(videoUrl && videoUrl.length > 0);
   const accent = brand.tokens.accent;
   const primary = brand.tokens.primary;
   // Rotate scrim direction deterministically so a wall of image tiles never
