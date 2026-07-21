@@ -113,14 +113,14 @@ function columnChartXml(): string {
    </c:valAx>
   </c:plotArea>
   <c:legend><c:legendPos val="b"/></c:legend>
+  <c:txPr>
+   <a:bodyPr/>
+   <a:p><a:pPr><a:defRPr>
+    <a:solidFill><a:srgbClr val="123456"/></a:solidFill>
+    <a:latin typeface="Custom Sans"/>
+   </a:defRPr></a:pPr></a:p>
+  </c:txPr>
  </c:chart>
- <c:txPr>
-  <a:bodyPr/>
-  <a:p><a:pPr><a:defRPr>
-   <a:solidFill><a:srgbClr val="123456"/></a:solidFill>
-   <a:latin typeface="Custom Sans"/>
-  </a:defRPr></a:pPr></a:p>
- </c:txPr>
 </c:chartSpace>`;
 }
 
