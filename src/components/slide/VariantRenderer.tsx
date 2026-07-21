@@ -3085,13 +3085,13 @@ function renderVariantBody({
               const name = s(it.name);
               const initials = name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
               return (
-                <div key={i} className="flex aspect-[4/3] items-center justify-center" style={{ borderRight: (i + 1) % cols === 0 ? "none" : "1px solid rgba(10,15,28,0.10)", borderBottom: "1px solid rgba(10,15,28,0.10)", borderTop: i < cols ? "1px solid rgba(10,15,28,0.10)" : "none", borderLeft: i % cols === 0 ? "1px solid rgba(10,15,28,0.10)" : "none" }}>
-                  {(s(it.logoUrl) || s(it.logoPath)) ? (
-                    <ClientLogoImg path={s(it.logoPath)} url={s(it.logoUrl)} alt={name} className="max-h-16 max-w-[70%] object-contain" style={{ filter: "grayscale(100%) opacity(0.75)" }} />
+                <div key={i} className="flex aspect-[4/3] items-center justify-center" style={{ borderRight: (i + 1) % cols === 0 ? "none" : `1px solid ${ink.divider}`, borderBottom: `1px solid ${ink.divider}`, borderTop: i < cols ? `1px solid ${ink.divider}` : "none", borderLeft: i % cols === 0 ? `1px solid ${ink.divider}` : "none" }}>
+                  {(pickLogoForMode(it, mode) || s(it.logoPath)) ? (
+                    <ClientLogoImg path={s(it.logoPath)} url={pickLogoForMode(it, mode)} alt={name} className="max-h-16 max-w-[70%] object-contain" style={{ opacity: 0.9 }} />
                   ) : (
                     <div className="flex flex-col items-center gap-2">
                       <div style={{ fontSize: 44, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em" }}>{initials || "—"}</div>
-                      <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", color: "rgba(10,15,28,0.55)" }}>{name}</div>
+                      <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", color: ink.faint }}>{name}</div>
                     </div>
                   )}
                 </div>
