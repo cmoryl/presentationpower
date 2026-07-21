@@ -188,15 +188,37 @@ function ShapeNode({ shape, theme }: { shape: SlideLayoutWithUrls["shapes"][numb
   const style = frameStyle(shape.frame);
 
   if (shape.kind === "text") {
-    const bg = shape.fill ? fillToCss(shape.fill, theme) : undefined;
+    const fillIsImage = shape.fill?.kind === "image";
+    const bg = shape.fill && !fillIsImage ? fillToCss(shape.fill, theme) : undefined;
     const border = shape.line?.color
       ? `${(shape.line.widthPt ?? 0.75).toFixed(2)}pt ${shape.line.dashStyle === "dash" ? "dashed" : "solid"} ${resolveColor(shape.line.color, theme)}`
       : undefined;
-    const isRound = shape.prst === "roundRect" || shape.prst === "ellipse";
+    const mask = prstToMask(shape.prst);
     const anchor = shape.text.anchor;
+    const fillUrl = fillIsImage
+      ? (shape.fill as LayoutFill & { url?: string; srcRect?: LayoutSrcRect; opacity?: number }).url
+      : undefined;
     return (
-      <div style={{ ...style, background: bg, border, borderRadius: shape.prst === "ellipse" ? "50%" : isRound ? "0.08in" : 0, overflow: "hidden" }}>
+      <div
+        style={{
+          ...style,
+          background: bg,
+          border,
+          borderRadius: mask.borderRadius,
+          clipPath: mask.clipPath,
+          overflow: "hidden",
+        }}
+      >
+        {fillIsImage && fillUrl && (
+          <CroppedImage
+            url={fillUrl}
+            srcRect={(shape.fill as { srcRect?: LayoutSrcRect }).srcRect}
+            opacity={(shape.fill as { opacity?: number }).opacity}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+          />
+        )}
         <div style={{
+          position: "relative",
           padding: "0.08in 0.12in",
           height: "100%",
           display: "flex",
@@ -211,9 +233,23 @@ function ShapeNode({ shape, theme }: { shape: SlideLayoutWithUrls["shapes"][numb
 
   if (shape.kind === "image") {
     const url = shape.url;
-    if (!url) return <div style={{ ...style, background: "#E5E7EB" }} />;
-    return <img src={url} alt="" style={{ ...style, objectFit: "cover" }} draggable={false} />;
+    const mask = prstToMask(shape.prst);
+    const border = shape.line?.color
+      ? `${(shape.line.widthPt ?? 0.75).toFixed(2)}pt ${shape.line.dashStyle === "dash" ? "dashed" : "solid"} ${resolveColor(shape.line.color, theme)}`
+      : undefined;
+    if (!url) {
+      return <div style={{ ...style, background: "#E5E7EB", borderRadius: mask.borderRadius, clipPath: mask.clipPath, border }} />;
+    }
+    return (
+      <CroppedImage
+        url={url}
+        srcRect={shape.srcRect}
+        opacity={shape.opacity}
+        style={{ ...style, borderRadius: mask.borderRadius, clipPath: mask.clipPath, border }}
+      />
+    );
   }
+
 
   if (shape.kind === "line") {
     // Render as an SVG line inside the shape's bounding box (with flips baked
