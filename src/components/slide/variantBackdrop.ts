@@ -110,11 +110,14 @@ function _computeBackdrop(
   // Other divisions keep their existing division imagery.
   const useCorporateDark = mode === "dark" && brandId === "bm-enterprise";
   const useMediaDark = mode === "dark" && brandId === "bm-tp-media";
+  const useGamesDark = mode === "dark" && brandId === "bm-tp-games";
   const corporateBg = useCorporateDark
     ? pickCorporateDarkBackdrop(id)
     : useMediaDark
       ? pickTpMediaDarkBackdrop(id)
-      : null;
+      : useGamesDark
+        ? pickTpGamesDarkBackdrop(id)
+        : null;
 
   const pickPhoto = (offset = 0) =>
     corporateBg ?? photos[(seed + offset) % photos.length];
