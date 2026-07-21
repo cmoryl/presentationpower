@@ -181,7 +181,7 @@ function BriefWizard() {
                   className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.24em]"
                   style={{ color: brandPrimary }}
                 >
-                  <span className="inline-block h-[2px] w-6 rounded-full" style={{ backgroundColor: brandPrimary }} />
+                  <span className="inline-block h-[10px] w-[2px] rounded-none" style={{ backgroundColor: brandPrimary }} />
                   Briefing engine
                 </div>
                 <h1 className="mt-4 font-['Geist'] text-3xl font-extrabold uppercase leading-[0.95] tracking-tighter text-[#03002C] sm:text-[44px]">
@@ -191,7 +191,7 @@ function BriefWizard() {
                   Configure the AI narrative engine for your next presentation.
                 </p>
                 <div
-                  className="mt-6 inline-flex items-center gap-2 rounded-full border bg-white/70 px-4 py-2 text-xs backdrop-blur transition-all hover:bg-white"
+                  className="mt-6 inline-flex items-center gap-2 rounded-md border bg-white/70 px-4 py-2 text-xs backdrop-blur transition-all hover:bg-white"
                   style={{ borderColor: `${brandPrimary}33` }}
                 >
                   <span className="text-[#1E2749]/70">Already have a deck?</span>
@@ -228,7 +228,7 @@ function BriefWizard() {
                           <BrandLockup brand={brand} color={brandPrimary} size="sm" clientName={form.prospect} subCompany={form.subCompany} />
                         </div>
                         <span
-                          className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
+                          className="shrink-0 rounded-sm px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em]"
                           style={{ backgroundColor: brandPrimary, color: "#fff" }}
                         >
                           {brand.role ?? "brand"}
@@ -281,7 +281,7 @@ function BriefWizard() {
                         />
                         <div className="relative flex min-w-0 items-center justify-end">
                           <span
-                            className="shrink-0 rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest transition-colors"
+                            className="shrink-0 rounded-sm px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em] transition-colors"
                             style={{
                               backgroundColor: active ? c : `${c}14`,
                               color: active ? "#fff" : c,
@@ -369,7 +369,7 @@ function BriefWizard() {
                     <div className="flex items-center gap-2">
                       <span className={labelCls}>Customize</span>
                       <span
-                        className="rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
+                        className="rounded-sm px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em]"
                         style={{ backgroundColor: `${brandPrimary}14`, color: brandPrimary }}
                       >
                         optional
@@ -419,7 +419,7 @@ function BriefWizard() {
                                       key={ind}
                                       type="button"
                                       onClick={() => setForm({ ...form, industry: ind })}
-                                      className="rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors"
+                                      className="rounded-md border px-2.5 py-1 text-[10px] font-medium transition-colors"
                                       style={{
                                         borderColor: selected ? brandPrimary : PALETTE.hairline,
                                         backgroundColor: selected ? brandPrimary : "transparent",
@@ -656,7 +656,7 @@ function BriefWizard() {
                   {brand && (
                     <span className="flex items-center gap-2">
                       <span
-                        className="inline-block h-2 w-2 rounded-full"
+                        className="inline-block h-3 w-[3px] rounded-sm"
                         style={{ backgroundColor: brandPrimary }}
                       />
                       Assembling under <strong className="font-semibold text-[#03002C]">{brand.name}</strong>
@@ -919,7 +919,7 @@ function BrandRelevancePanel({ brand }: { brand: BrandMode }) {
   const chip = (text: string, key: string) => (
     <span
       key={key}
-      className="rounded-full border px-3 py-1 text-xs font-medium"
+      className="rounded-md border px-2.5 py-1 text-xs font-medium"
       style={{
         backgroundColor: `${primary}0d`,
         color: PALETTE.inkSoft,
@@ -1196,8 +1196,8 @@ function KnowledgeUsedPanel({
           <span
             className={
               confidence.tone === "ok"
-                ? "rounded-full bg-[#03002C] px-2.5 py-1 font-['Geist'] text-[10px] font-bold uppercase tracking-widest text-white"
-                : "rounded-full bg-[#B45309] px-2.5 py-1 font-['Geist'] text-[10px] font-bold uppercase tracking-widest text-white"
+                ? "rounded-sm bg-[#03002C] px-2.5 py-1 font-['Geist'] text-[10px] font-bold uppercase tracking-[0.16em] text-white"
+                : "rounded-sm bg-[#B45309] px-2.5 py-1 font-['Geist'] text-[10px] font-bold uppercase tracking-[0.16em] text-white"
             }
           >
             {confidence.label}
