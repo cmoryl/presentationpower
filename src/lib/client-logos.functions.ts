@@ -227,6 +227,30 @@ export const getClientLogoSignedUrl = createServerFn({ method: "POST" })
     return { url: signed?.signedUrl ?? null };
   });
 
+// ── SIGNED URLs (batch) ─────────────────────────────────────────────────
+// Used by SlideMediaRefreshProvider + PPTX export to keep the 1-hour TTL
+// on picked client logos from breaking decks. Returns a path→url map for
+// each requested path that resolved to a signed URL.
+export const signClientLogoPaths = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ paths: z.array(z.string().min(1)).min(1).max(500) }).parse(input),
+  )
+  .handler(async ({ data, context }): Promise<{ urls: Record<string, string> }> => {
+    const s = context.supabase as unknown as SbClient;
+    const unique = Array.from(new Set(data.paths));
+    const urls: Record<string, string> = {};
+    const BATCH = 200;
+    for (let i = 0; i < unique.length; i += BATCH) {
+      const chunk = unique.slice(i, i + BATCH);
+      const { data: signed } = await s.storage.from(BUCKET).createSignedUrls(chunk, 3600);
+      for (const entry of signed ?? []) {
+        if (entry.signedUrl && entry.path) urls[entry.path] = entry.signedUrl;
+      }
+    }
+    return { urls };
+  });
+
 // ── IMPORT FROM BRANDHUB (one-time seed utility) ────────────────────────
 // Reads public global_client_logos rows from BrandHUB's Supabase (anon-readable),
 // downloads each file server-side, uploads to our client-logos bucket, and

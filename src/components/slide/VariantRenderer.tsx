@@ -1,6 +1,6 @@
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import { SlideFrame as BaseSlideFrame, SlideModeContext, SlideBackdropContext, type SlideMode, type SlideBackdrop } from "./SlideChrome";
-import { SlideThumbnailContext, SlideVideoPreviewContext, useResolvedVideoUrl, useResolvedPosterUrl } from "@/lib/slide-media-refresh";
+import { SlideThumbnailContext, SlideVideoPreviewContext, useResolvedVideoUrl, useResolvedPosterUrl, useResolvedImageUrl, useResolvedLogoUrl } from "@/lib/slide-media-refresh";
 import { resolveSlideBackground } from "@/lib/background-library";
 import { createContext, useContext, useEffect, useState, Fragment } from "react";
 import type { ComponentProps, ReactNode } from "react";
@@ -782,6 +782,7 @@ function renderVariantBody({
             {arr(c.items).map((it, i) => {
               const name = s(it.name ?? it.client);
               const logoUrl = s(it.logoUrl ?? it.logo ?? it.primaryUrl);
+              const logoPath = s(it.logoPath);
               const result = s(it.result);
               return (
                 <div
@@ -789,9 +790,10 @@ function renderVariantBody({
                   className="flex aspect-[3/2] flex-col items-center justify-center gap-3 rounded-xl border p-6 text-center"
                   style={{ borderColor: "rgba(10,15,28,0.12)", backgroundColor: "#fff", color: brand.tokens.primary }}
                 >
-                  {logoUrl ? (
-                    <img
-                      src={logoUrl}
+                  {logoUrl || logoPath ? (
+                    <ClientLogoImg
+                      path={logoPath}
+                      url={logoUrl}
                       alt={name ? `${name} logo` : "Client logo"}
                       className="max-h-[60%] max-w-[80%] object-contain"
                     />
@@ -2074,12 +2076,14 @@ function renderVariantBody({
           <div className="mt-10 grid grid-cols-3 gap-x-10 gap-y-12">
             {arr(c.items).slice(0, 6).map((it, i) => {
               const logoUrl = s(it.logoUrl);
+              const logoPath = s(it.logoPath);
               return (
                 <div key={i} className="pt-6" style={{ borderTop: `1px solid rgba(10,15,28,0.12)` }}>
                   <div className="flex items-center justify-between">
-                    {logoUrl ? (
-                      <img
-                        src={logoUrl}
+                    {logoUrl || logoPath ? (
+                      <ClientLogoImg
+                        path={logoPath}
+                        url={logoUrl}
                         alt={s(it.client) ? `${s(it.client)} logo` : "Client logo"}
                         style={{ maxHeight: 36, maxWidth: 140, objectFit: "contain" }}
                       />
@@ -2109,15 +2113,17 @@ function renderVariantBody({
           <div className="mt-10 grid grid-cols-3 gap-8">
             {arr(c.items).slice(0, 3).map((it, i) => {
               const logoUrl = s(it.logoUrl);
+              const logoPath = s(it.logoPath);
               return (
                 <div key={i}>
-                  {logoUrl ? (
+                  {logoUrl || logoPath ? (
                     <div
                       className="flex aspect-[16/10] w-full items-center justify-center rounded-md"
                       style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(10,15,28,0.08)" }}
                     >
-                      <img
-                        src={logoUrl}
+                      <ClientLogoImg
+                        path={logoPath}
+                        url={logoUrl}
                         alt={s(it.client) ? `${s(it.client)} logo` : "Client logo"}
                         style={{ maxHeight: "70%", maxWidth: "75%", objectFit: "contain" }}
                       />
@@ -2184,13 +2190,15 @@ function renderVariantBody({
           <div className="mt-10 grid grid-cols-3 gap-12">
             {arr(c.items).slice(0, 3).map((it, i) => {
               const logoUrl = s(it.logoUrl);
+              const logoPath = s(it.logoPath);
               return (
                 <div key={i} className="flex flex-col pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
                   <Kicker brand={brand} color="rgba(10,15,28,0.55)" size={16}>Client</Kicker>
                   <div className="mt-3 flex items-center gap-4">
-                    {logoUrl && (
-                      <img
-                        src={logoUrl}
+                    {(logoUrl || logoPath) && (
+                      <ClientLogoImg
+                        path={logoPath}
+                        url={logoUrl}
                         alt={s(it.client) ? `${s(it.client)} logo` : "Client logo"}
                         style={{ maxHeight: 36, maxWidth: 120, objectFit: "contain" }}
                       />
@@ -2731,8 +2739,8 @@ function renderVariantBody({
               const initials = name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
               return (
                 <div key={i} className="flex aspect-[4/3] items-center justify-center" style={{ borderRight: (i + 1) % cols === 0 ? "none" : "1px solid rgba(10,15,28,0.10)", borderBottom: "1px solid rgba(10,15,28,0.10)", borderTop: i < cols ? "1px solid rgba(10,15,28,0.10)" : "none", borderLeft: i % cols === 0 ? "1px solid rgba(10,15,28,0.10)" : "none" }}>
-                  {s(it.logoUrl) ? (
-                    <img src={s(it.logoUrl)} alt={name} className="max-h-16 max-w-[70%] object-contain" style={{ filter: "grayscale(100%) opacity(0.75)" }} />
+                  {(s(it.logoUrl) || s(it.logoPath)) ? (
+                    <ClientLogoImg path={s(it.logoPath)} url={s(it.logoUrl)} alt={name} className="max-h-16 max-w-[70%] object-contain" style={{ filter: "grayscale(100%) opacity(0.75)" }} />
                   ) : (
                     <div className="flex flex-col items-center gap-2">
                       <div style={{ fontSize: 44, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em" }}>{initials || "—"}</div>
@@ -3770,6 +3778,27 @@ import { getDivisionImagery } from "@/assets/backdrops/divisions";
 // as MediaTile / HeroScrim without duplicating the SVG data URI.
 import { GRAIN_SVG } from "@/components/slide/grain";
 
+// Small helper for client-listing variants — resolves a per-item logo
+// through SlideMediaRefreshProvider so the 1-hour client-logos TTL can't
+// silently break a shipped deck.
+function ClientLogoImg({
+  path,
+  url,
+  alt,
+  style,
+  className,
+}: {
+  path?: string;
+  url?: string;
+  alt: string;
+  style?: React.CSSProperties;
+  className?: string;
+}) {
+  const resolved = useResolvedLogoUrl(path, url);
+  if (!resolved) return null;
+  return <img src={resolved} alt={alt} style={style} className={className} />;
+}
+
 function MediaTile({
   brand,
   seed,
@@ -3777,6 +3806,7 @@ function MediaTile({
   portrait,
   muted,
   overrideUrl,
+  mediaPath,
   videoUrl,
   videoPosterUrl,
   videoPath,
@@ -3788,6 +3818,9 @@ function MediaTile({
   portrait?: boolean;
   muted?: boolean;
   overrideUrl?: string;
+  /** Storage path in the private `slide-media` bucket for the override
+   *  image. Re-signed on load via SlideMediaRefreshProvider. */
+  mediaPath?: string;
   videoUrl?: string;
   videoPosterUrl?: string;
   /** Storage paths (private bucket). When present the URL is re-signed on
@@ -3800,6 +3833,7 @@ function MediaTile({
   const openVideoPreview = useContext(SlideVideoPreviewContext);
   const resolvedVideoUrl = useResolvedVideoUrl(videoPath, videoUrl);
   const resolvedPosterUrl = useResolvedPosterUrl(videoPosterPath, videoPosterUrl);
+  const resolvedOverrideUrl = useResolvedImageUrl(mediaPath, overrideUrl);
   const h = hash(seed || brand.id);
   const grayscale = muted ? "grayscale(55%) brightness(0.95)" : undefined;
 
@@ -3824,8 +3858,8 @@ function MediaTile({
   const url =
     resolvedPosterUrl && resolvedPosterUrl.length > 0
       ? resolvedPosterUrl
-      : overrideUrl && overrideUrl.length > 0
-      ? overrideUrl
+      : resolvedOverrideUrl && resolvedOverrideUrl.length > 0
+      ? resolvedOverrideUrl
       : tileBackdrops[h % tileBackdrops.length];
   const hasVideo = Boolean(resolvedVideoUrl && resolvedVideoUrl.length > 0);
   const accent = brand.tokens.accent;
