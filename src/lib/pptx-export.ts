@@ -861,7 +861,7 @@ const LIGHT_GRAY = "E5E1DA";
 const MID_GRAY = "9CA3AF";
 const DARK_GRAY = "4B5563";
 
-function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette): boolean {
+function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette, itemLogos: Array<string | null> = []): boolean {
   const c = (slide.content ?? {}) as Record<string, unknown>;
   switch (slide.variantId) {
     case "MV-BENTO-5": renderBento5(s, c, p); return true;
