@@ -32,7 +32,7 @@ function EntryView() {
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [kind, setKind] = useState<KnowledgeKind>("fact");
+  const [kind, setKind] = useState<EditableKnowledgeKind>("fact");
   const [tags, setTags] = useState("");
   const [sources, setSources] = useState("");
   const [visibility, setVisibility] = useState<KnowledgeVisibility>("private");
