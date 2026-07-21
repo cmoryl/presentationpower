@@ -871,7 +871,7 @@ function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette,
     case "MV-FLYWHEEL": renderFlywheel(s, c, p); return true;
     case "MV-MATURITY-CURVE": renderMaturityCurve(s, c, p); return true;
     case "MV-JOURNEY-MAP": renderJourneyMap(s, c, p); return true;
-    case "MV-LOGO-WALL": renderLogoWall(s, c, p); return true;
+    case "MV-LOGO-WALL": renderLogoWall(s, c, p, itemLogos); return true;
     case "MV-MATRIX-2X2": renderMatrix2x2(s, c, p); return true;
     case "MV-ICEBERG": renderIceberg(s, c, p); return true;
     case "MV-EDITORIAL-SPREAD": renderEditorialSpread(s, c, p); return true;
