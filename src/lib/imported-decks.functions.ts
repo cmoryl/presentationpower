@@ -59,43 +59,13 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
       });
     if (up.error) throw new Error(`Upload failed: ${up.error.message ?? "unknown"}`);
 
-    // Store slide outline (drop base64 images from row payload to keep it small;
-    // images live in the .pptx file itself and can be re-extracted in Layer 2).
-    const slidesLite = parsed.slides.map((sl) => ({
-      index: sl.index,
-      title: sl.title,
-      bullets: sl.bullets,
-      notes: sl.notes,
-      imageCount: sl.images.length,
-    }));
-
-    const { data: row, error } = await s
-      .from("imported_decks")
-      .insert({
-        id,
-        division_id: data.divisionId,
-        uploaded_by: context.userId,
-        original_filename: data.filename,
-        storage_path: storagePath,
-        file_size: buf.length,
-        slide_count: parsed.slideCount,
-        status: "parsed",
-        theme: parsed.theme,
-        slides: slidesLite,
-      })
-      .select()
-      .single();
-    if (error) {
-      // Roll back the storage upload if the row insert failed.
-      await s.storage.from(BUCKET).remove([storagePath]).catch(() => {});
-      throw new Error(`Save failed: ${(error as { message?: string }).message ?? "unknown"}`);
-    }
-
     // Persist each embedded slide image into the shared `division-imagery`
     // bucket so it surfaces in the Imagery tab and is reusable across decks.
-    // Best-effort: image failures don't roll back the deck upload.
+    // Best-effort: image failures don't roll back the deck upload. We record
+    // the resulting storage paths per slide so the "Send to library" flow
+    // can attach them to a library submission.
     const imageryDivision = normalizeImportedDeckDivision(data.divisionId);
-    const savedImagePaths: string[] = [];
+    const savedPathsBySlide: string[][] = parsed.slides.map(() => []);
     let imgSeq = 0;
     for (const sl of parsed.slides) {
       for (let j = 0; j < sl.images.length; j++) {
@@ -107,7 +77,8 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
         if (bin.length === 0) continue;
         const ext = contentType.split("/")[1]?.split("+")[0] ?? "bin";
         const imgId = crypto.randomUUID();
-        const imgFilename = `${data.filename.replace(/\.pptx$/i, "")}__slide-${sl.index + 1}-${j + 1}.${ext}`.replace(/[^\w.\-]+/g, "_").slice(-160);
+        const baseName = data.filename.replace(/\.pptx$/i, "");
+        const imgFilename = `${baseName}__slide-${sl.index + 1}-${j + 1}.${ext}`.replace(/[^\w.\-]+/g, "_").slice(-160);
         const imgPath = `${context.userId}/${imgId}-${imgFilename}`;
         const upImg = await s.storage
           .from("division-imagery")
@@ -129,13 +100,51 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
           await s.storage.from("division-imagery").remove([imgPath]).catch(() => {});
           continue;
         }
-        savedImagePaths.push(imgPath);
+        savedPathsBySlide[sl.index].push(imgPath);
         imgSeq++;
       }
     }
 
+    // Slide outline includes the saved image paths so downstream flows
+    // (send-to-library, imagery cross-refs) can find the imagery without
+    // re-parsing the .pptx.
+    const slidesLite = parsed.slides.map((sl) => ({
+      index: sl.index,
+      title: sl.title,
+      bullets: sl.bullets,
+      notes: sl.notes,
+      imageCount: sl.images.length,
+      imagePaths: savedPathsBySlide[sl.index],
+    }));
+
+    const { data: row, error } = await s
+      .from("imported_decks")
+      .insert({
+        id,
+        division_id: data.divisionId,
+        uploaded_by: context.userId,
+        original_filename: data.filename,
+        storage_path: storagePath,
+        file_size: buf.length,
+        slide_count: parsed.slideCount,
+        status: "parsed",
+        theme: parsed.theme,
+        slides: slidesLite,
+      })
+      .select()
+      .single();
+    if (error) {
+      // Roll back the .pptx AND any imagery we created.
+      await s.storage.from(BUCKET).remove([storagePath]).catch(() => {});
+      const allImg = savedPathsBySlide.flat();
+      if (allImg.length) await s.storage.from("division-imagery").remove(allImg).catch(() => {});
+      throw new Error(`Save failed: ${(error as { message?: string }).message ?? "unknown"}`);
+    }
+
     return { ...(row as { id: string; slide_count: number; status: string }), imagesSaved: imgSeq };
   });
+
+
 
 
 export const listImportedDecksForDivision = createServerFn({ method: "GET" })
