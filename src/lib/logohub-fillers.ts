@@ -14,13 +14,32 @@ export type LogoFiller = {
   logoUrlDark: string;
 };
 
-export function toLogoFillers(rows: ClientLogoRow[] | undefined | null): LogoFiller[] {
+/**
+ * Convert LogoHub rows into filler items.
+ *
+ * By default (used for logo-wall style variants), only rows that ship BOTH
+ * a color/light mark AND a dedicated white/dark mark are included — so
+ * dark-mode walls never fall back to a color logo that fights the backdrop.
+ * Pass `{ requireBoth: false }` for looser callers (e.g. single-logo
+ * placements where any variant is acceptable).
+ */
+export function toLogoFillers(
+  rows: ClientLogoRow[] | undefined | null,
+  opts: { requireBoth?: boolean } = {},
+): LogoFiller[] {
   if (!rows || rows.length === 0) return [];
+  const requireBoth = opts.requireBoth !== false;
   const out: LogoFiller[] = [];
   for (const r of rows) {
     const light = r.lightUrl || r.primaryUrl;
-    const dark = r.darkUrl || r.primaryUrl;
-    if (!light && !dark) continue;
+    // `darkUrl` is the explicit white/on-dark variant. Only fall back to
+    // primary when the caller doesn't require a real dark asset.
+    const dark = r.darkUrl || (requireBoth ? null : r.primaryUrl);
+    if (requireBoth) {
+      if (!light || !dark) continue;
+    } else if (!light && !dark) {
+      continue;
+    }
     out.push({
       name: r.client_name,
       logoUrl: (light ?? dark) as string,
