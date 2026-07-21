@@ -33,7 +33,7 @@ export const Route = createFileRoute("/brief/new")({
 // TransPerfect brand palette — matches the rest of the build.
 // Ink = Blue 800, Blue = Blue 500, Accent = Aqua.
 const PALETTE = {
-  page: "var(--brief-page, #F2F5FA)",
+  page: "var(--background)",
   surface: "var(--brief-surface, #FFFFFF)",
   ink: "var(--brief-ink, #03002C)",
   inkSoft: "var(--brief-ink-soft, #1E2749)",
