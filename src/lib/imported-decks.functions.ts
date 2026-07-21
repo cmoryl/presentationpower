@@ -24,11 +24,11 @@ type SbClient = {
 
 const BUCKET = "division-pptx";
 
-// ~50MB raw → ~67MB base64. Client will chunk if needed; we cap here.
+// ~100MB raw → ~140MB base64. Client validates size; server caps here.
 const UploadInput = z.object({
   divisionId: z.string().min(1).max(120),
   filename: z.string().min(1).max(300),
-  data: z.string().min(1).max(70_000_000),
+  data: z.string().min(1).max(140_000_000),
 });
 
 export const uploadImportedDeck = createServerFn({ method: "POST" })
@@ -37,7 +37,7 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const buf = Buffer.from(data.data, "base64");
-    if (buf.length > 55_000_000) throw new Error("File exceeds 55MB.");
+    if (buf.length > 105_000_000) throw new Error("File exceeds 100MB.");
 
     // Parse first so a broken file never lands in storage.
     let parsed: ParsedDeck;
