@@ -3861,6 +3861,31 @@ function MediaTile({
     return () => obs.disconnect();
   }, [isThumbnail]);
 
+  // Per-slide playback settings (defaults preserve current behavior).
+  const wantAutoplay = videoAutoplay !== false;
+  const wantLoop = videoLoop !== false;
+  const wantMuted = videoMuted !== false;
+  const wantControls = videoControls === true;
+  const [userStarted, setUserStarted] = useState(false);
+  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
+  const shouldPlay = (autoplay && wantAutoplay && !autoplayBlocked) || userStarted;
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v || !shouldPlay) return;
+    const p = v.play();
+    if (p && typeof (p as Promise<void>).catch === "function") {
+      (p as Promise<void>).catch(() => {
+        if (!wantMuted) {
+          v.muted = true;
+          v.play().catch(() => setAutoplayBlocked(true));
+        } else {
+          setAutoplayBlocked(true);
+        }
+      });
+    }
+  }, [shouldPlay, wantMuted, resolvedVideoUrl]);
+
   const divSet = getDivisionImagery(brand.id);
   const tileBackdrops = [...divSet.photos, ...divSet.abstracts];
   const url =
