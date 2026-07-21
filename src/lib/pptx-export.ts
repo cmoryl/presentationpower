@@ -50,6 +50,10 @@ function resolveSlideImageUrl(
   // during export even if `mediaUrl` / `mediaSeed` accidentally leaked
   // through from an older deck record.
   if (!variantSupportsImagery(variantId)) return null;
+  // If the slide has a video, prefer its poster as the static image for
+  // PPTX/PDF fallback — the video itself is linked in speaker notes below.
+  const poster = typeof c.videoPosterUrl === "string" && c.videoPosterUrl.length > 0 ? c.videoPosterUrl : null;
+  if (poster) return poster;
   const url = typeof c.mediaUrl === "string" && c.mediaUrl.length > 0 ? c.mediaUrl : null;
   if (url) return url;
   const seed = typeof c.mediaSeed === "string" && c.mediaSeed.length > 0 ? c.mediaSeed : null;
@@ -459,7 +463,16 @@ export async function exportDeckToPptx(
     }
 
     const km = slide.sectionId ? keyMessageBySection.get(slide.sectionId) : undefined;
-    const noteText = (slide.notes && slide.notes.trim()) ? slide.notes.trim() : (km ?? "");
+    let noteText = (slide.notes && slide.notes.trim()) ? slide.notes.trim() : (km ?? "");
+    // Video fallback path: PPTX embeds the poster (see resolveSlideImageUrl)
+    // and links the source video in speaker notes so the presenter can open
+    // it out-of-band. pptxgenjs's addMedia has spotty PowerPoint fidelity for
+    // large/hosted files, so we ship reliable poster + link instead.
+    const videoUrl = (slide.content as Record<string, unknown>).videoUrl;
+    if (typeof videoUrl === "string" && videoUrl.trim()) {
+      const line = `▶ Video: ${videoUrl.trim()}`;
+      noteText = noteText ? `${noteText}\n\n${line}` : line;
+    }
     if (noteText) s.addNotes(noteText);
 
   }

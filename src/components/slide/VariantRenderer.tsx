@@ -1,7 +1,7 @@
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import { SlideFrame as BaseSlideFrame, SlideModeContext, SlideBackdropContext, type SlideMode, type SlideBackdrop } from "./SlideChrome";
 import { resolveSlideBackground } from "@/lib/background-library";
-import { createContext, useContext, Fragment } from "react";
+import { createContext, useContext, useEffect, useState, Fragment } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
 import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, StatFigure, QuoteMark, Attribution, SoftDivider } from "./primitives";
@@ -310,7 +310,7 @@ function renderVariantBody({
       const _titleSize = _titleLen > 60 ? "title" : _titleLen > 30 ? "section" : "cover";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} overrideUrl={s(c.mediaUrl)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} className="absolute inset-0 h-full w-full rounded-none" />
           <HeroScrim brand={brand} anchor="bottom" />
           <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
@@ -1527,7 +1527,7 @@ function renderVariantBody({
       const _titleSize = _titleLen > 60 ? "title" : _titleLen > 30 ? "section" : "cover";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "hero"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "hero"))} overrideUrl={s(c.mediaUrl)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} className="absolute inset-0 h-full w-full rounded-none" />
           <HeroScrim brand={brand} anchor="bottom" />
           <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand}>{s(c.kicker, "In focus")}</Kicker>
@@ -1544,7 +1544,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-2 gap-14">
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "split"))} overrideUrl={s(c.mediaUrl)} className="h-full w-full" />
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "split"))} overrideUrl={s(c.mediaUrl)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} className="h-full w-full" />
             <div className="flex flex-col justify-center">
               <SlideTitle brand={brand} title={s(c.title)} />
               <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={720}>{s(c.body)}</SupportingText>
@@ -1564,7 +1564,7 @@ function renderVariantBody({
           <div className="flex h-full flex-col items-center justify-center">
             <Kicker brand={brand}>{s(c.title, "In focus")}</Kicker>
             <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "framed"))} overrideUrl={s(c.mediaUrl)} className="aspect-[16/9] w-[80%]" />
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "framed"))} overrideUrl={s(c.mediaUrl)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} className="aspect-[16/9] w-[80%]" />
             <SupportingText size="lg" opacity={0.85} className="mt-10 text-center" maxWidthPx={1100}>{s(c.caption)}</SupportingText>
             {s(c.credit) && (
               <MetaRow className="mt-6">
@@ -1614,7 +1614,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-[1fr_1.3fr] gap-14">
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.name, "portrait"))} overrideUrl={s(c.mediaUrl)} className="h-full w-full" portrait />
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.name, "portrait"))} overrideUrl={s(c.mediaUrl)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} className="h-full w-full" portrait />
             <div className="flex flex-col justify-center">
               <Kicker brand={brand}>{s(c.role)}</Kicker>
               <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
@@ -1635,7 +1635,7 @@ function renderVariantBody({
     case "MV-IMG-QUOTE-BG":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote"))} overrideUrl={s(c.mediaUrl)} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote"))} overrideUrl={s(c.mediaUrl)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} className="absolute inset-0 h-full w-full rounded-none" />
           <HeroScrim brand={brand} anchor="center" />
           <div className="relative flex h-full flex-col justify-center text-white">
             <QuoteMark color={brand.tokens.accent} size={520} opacity={0.18} className="absolute -top-4 -left-4" />
@@ -3776,6 +3776,8 @@ function MediaTile({
   portrait,
   muted,
   overrideUrl,
+  videoUrl,
+  videoPosterUrl,
 }: {
   brand: BrandMode;
   seed: string;
@@ -3789,18 +3791,41 @@ function MediaTile({
    * division imagery so text-only decks keep their curated look.
    */
   overrideUrl?: string;
+  /** Slide-level video override. Takes precedence over overrideUrl/seed. */
+  videoUrl?: string;
+  /** Optional still shown before the video plays / in non-playback modes. */
+  videoPosterUrl?: string;
 }) {
   const mode = useContext(SlideModeContext);
   const h = hash(seed || brand.id);
   const grayscale = muted ? "grayscale(55%) brightness(0.95)" : undefined;
 
+  // Detect present/share playback context (client-only) so we autoplay
+  // video there but not in the editor's slide grid — a wall of autoplaying
+  // videos is a perf and attention disaster.
+  const [autoplay, setAutoplay] = useState(false);
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const check = () => {
+      const cls = document.body.classList;
+      setAutoplay(cls.contains("present-mode") || cls.contains("share-mode"));
+    };
+    check();
+    const obs = new MutationObserver(check);
+    obs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    return () => obs.disconnect();
+  }, []);
+
   // Division-specific imagery: photos + abstracts for the active brand.
   const divSet = getDivisionImagery(brand.id);
   const tileBackdrops = [...divSet.photos, ...divSet.abstracts];
   const url =
-    overrideUrl && overrideUrl.length > 0
+    videoPosterUrl && videoPosterUrl.length > 0
+      ? videoPosterUrl
+      : overrideUrl && overrideUrl.length > 0
       ? overrideUrl
       : tileBackdrops[h % tileBackdrops.length];
+  const hasVideo = Boolean(videoUrl && videoUrl.length > 0);
   const accent = brand.tokens.accent;
   const primary = brand.tokens.primary;
   // Rotate scrim direction deterministically so a wall of image tiles never
@@ -3817,13 +3842,34 @@ function MediaTile({
         className={`relative overflow-hidden rounded-2xl ${className ?? ""}`}
         style={{ background: "#EEF2F8", filter: grayscale }}
       >
-        <img
-          src={url}
-          alt=""
-          aria-hidden
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ filter: "brightness(1.06) saturate(0.92) contrast(1.02)" }}
-        />
+        {hasVideo && autoplay ? (
+          <video
+            key={videoUrl}
+            src={videoUrl}
+            poster={videoPosterUrl || undefined}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            aria-hidden
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ filter: "brightness(1.02) saturate(0.95) contrast(1.02)" }}
+          />
+        ) : (
+          <img
+            src={url}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ filter: "brightness(1.06) saturate(0.92) contrast(1.02)" }}
+          />
+        )}
+        {hasVideo && !autoplay && (
+          <div aria-hidden className="absolute inset-0 flex items-center justify-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-black shadow-lg">▶</div>
+          </div>
+        )}
         {/* Brand accent duotone — subtle multiply so division tokens actually
              tint the photo instead of only floating over it. */}
         <div
@@ -3880,13 +3926,34 @@ function MediaTile({
       className={`relative overflow-hidden rounded-2xl ${className ?? ""}`}
       style={{ background: "#03002C", filter: grayscale }}
     >
-      <img
-        src={url}
-        alt=""
-        aria-hidden
-        className="absolute inset-0 h-full w-full object-cover"
-        style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)" }}
-      />
+      {hasVideo && autoplay ? (
+        <video
+          key={videoUrl}
+          src={videoUrl}
+          poster={videoPosterUrl || undefined}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)" }}
+        />
+      ) : (
+        <img
+          src={url}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)" }}
+        />
+      )}
+      {hasVideo && !autoplay && (
+        <div aria-hidden className="absolute inset-0 flex items-center justify-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-black shadow-lg">▶</div>
+        </div>
+      )}
       {/* Brand accent duotone — tints imagery with the active division's
            accent/primary so a brand switch visibly re-tones tiles. */}
       <div

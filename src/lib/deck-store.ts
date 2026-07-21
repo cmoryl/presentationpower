@@ -13,7 +13,7 @@ import {
 } from "./taxonomy";
 import { BRAND_PROFILES, getSubCompanyProfile } from "./brand-profiles";
 import { pickCaseStudy, pickProofLogos, CASE_STUDIES } from "./case-studies";
-import { variantSupportsImagery } from "./variant-media";
+import { variantSupportsImagery, variantSupportsVideo } from "./variant-media";
 
 export type BrandModeId = string;
 
@@ -1757,7 +1757,7 @@ export const useDeckStore = create<DeckState>()(
         // Meta fields (imagery override, background, slide-level media seed)
         // are always editable — they're driven by dedicated panels, not the
         // variant's authored field list.
-        const META_FIELDS = new Set(["mediaUrl", "mediaSeed", "background"]);
+        const META_FIELDS = new Set(["mediaUrl", "mediaSeed", "background", "videoUrl", "videoPosterUrl"]);
         const editable = META_FIELDS.has(field) || variant.editableFields.some((f) => matchesField(f, field));
         if (!editable) return;
         const nextContent = setPath({ ...slide.content }, field, value);
@@ -1833,6 +1833,14 @@ export const useDeckStore = create<DeckState>()(
         } else {
           delete merged.mediaUrl;
           delete merged.mediaSeed;
+        }
+        // Same treatment for video fields.
+        if (variantSupportsVideo(newVariantId)) {
+          if (typeof prev.videoUrl === "string") merged.videoUrl = prev.videoUrl;
+          if (typeof prev.videoPosterUrl === "string") merged.videoPosterUrl = prev.videoPosterUrl;
+        } else {
+          delete merged.videoUrl;
+          delete merged.videoPosterUrl;
         }
         // Preserve background settings across swaps.
         if (prev.background !== undefined) merged.background = prev.background;
