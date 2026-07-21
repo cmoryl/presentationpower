@@ -7,7 +7,7 @@ import { BRAND_MODES } from "@/lib/taxonomy";
 import {
   upsertKnowledgeEntry,
   KNOWLEDGE_KIND_META,
-  type KnowledgeKind,
+  type EditableKnowledgeKind,
   type KnowledgeVisibility,
 } from "@/lib/knowledge.functions";
 
