@@ -30,6 +30,14 @@ function ExportView() {
   const [override, setOverride] = useState(false);
   const [preflightIssues, setPreflightIssues] = useState<PreflightIssue[] | null>(null);
   const [preflightBusy, setPreflightBusy] = useState(false);
+  const [glShareConfigured, setGlShareConfigured] = useState(false);
+  const [glShareBusy, setGlShareBusy] = useState(false);
+  const [glShareUrl, setGlShareUrl] = useState<string | null>(null);
+  const [glShareError, setGlShareError] = useState<string | null>(null);
+  const [glCopied, setGlCopied] = useState(false);
+  const lastBlobRef = useRef<{ blob: Blob; fileName: string } | null>(null);
+  const statusFn = useServerFn(getGlobalLinkShareStatus);
+  const uploadFn = useServerFn(uploadToGlobalLinkShare);
   if (!deck) throw notFound();
   const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
 
@@ -43,10 +51,40 @@ function ExportView() {
     return () => document.body.classList.remove("export-mode");
   }, []);
 
+  // Load status in the background — never block the export UI on it.
+  useEffect(() => {
+    let cancelled = false;
+    statusFn()
+      .then((s) => {
+        if (!cancelled) setGlShareConfigured(!!s?.configured);
+      })
+      .catch(() => {
+        /* silent — default to Tier 1 handoff */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [statusFn]);
+
+  function openShareHandoff() {
+    window.open("https://share.transperfect.com", "_blank", "noopener,noreferrer");
+  }
+
   async function runPptxExport() {
     setExporting(true);
     try {
-      await exportDeckToPptx(deck, brand);
+      const blob = (await exportDeckToPptx(deck, brand, { output: "blob" })) as Blob;
+      const fileName = `${deck.title.replace(/[^a-z0-9-_]+/gi, "-")}.pptx`;
+      lastBlobRef.current = { blob, fileName };
+      // Trigger download for the user.
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
     } finally {
       setExporting(false);
       setPreflightIssues(null);
@@ -67,6 +105,70 @@ function ExportView() {
       setPreflightBusy(false);
     }
   }
+
+  async function blobToBase64(blob: Blob): Promise<string> {
+    const buf = await blob.arrayBuffer();
+    let binary = "";
+    const bytes = new Uint8Array(buf);
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode.apply(
+        null,
+        Array.from(bytes.subarray(i, i + chunk)) as unknown as number[],
+      );
+    }
+    return btoa(binary);
+  }
+
+  async function handleShareViaGlobalLink() {
+    if (blocked || glShareBusy) return;
+    setGlShareBusy(true);
+    setGlShareError(null);
+    setGlShareUrl(null);
+    setGlCopied(false);
+    try {
+      let held = lastBlobRef.current;
+      if (!held) {
+        const blob = (await exportDeckToPptx(deck, brand, { output: "blob" })) as Blob;
+        held = { blob, fileName: `${deck.title.replace(/[^a-z0-9-_]+/gi, "-")}.pptx` };
+        lastBlobRef.current = held;
+      }
+      if (held.blob.size > 90 * 1024 * 1024) {
+        setGlShareError("File exceeds the 90MB GlobalLink Share limit — use the manual handoff.");
+        return;
+      }
+      const contentBase64 = await blobToBase64(held.blob);
+      const result = await uploadFn({
+        data: {
+          fileName: held.fileName,
+          contentBase64,
+          mimeType:
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        },
+      });
+      if (result.ok) {
+        setGlShareUrl(result.shareUrl);
+      } else {
+        setGlShareError(result.message);
+      }
+    } catch (e) {
+      setGlShareError((e as Error).message);
+    } finally {
+      setGlShareBusy(false);
+    }
+  }
+
+  async function copyShareUrl() {
+    if (!glShareUrl) return;
+    try {
+      await navigator.clipboard.writeText(glShareUrl);
+      setGlCopied(true);
+      setTimeout(() => setGlCopied(false), 2000);
+    } catch {
+      /* ignore */
+    }
+  }
+
 
 
   return (
