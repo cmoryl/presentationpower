@@ -2181,7 +2181,7 @@ function renderVariantBody({
               return (
                 <div key={i} className="grid grid-cols-[260px_1fr_120px] items-center gap-6">
                   <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
-                  <div className="h-14 w-full rounded-lg" style={{ backgroundColor: "rgba(10,15,28,0.06)" }}>
+                  <div className="h-14 w-full rounded-lg" style={{ backgroundColor: ink.surface }}>
                     <div
                       className="flex h-full items-center rounded-lg px-4 text-white"
                       style={{
@@ -3049,8 +3049,8 @@ function renderVariantBody({
                   <text x={p.x} y={p.y - 20} textAnchor="middle" fontSize={18} fontWeight={600} fill={brand.tokens.primary}>{String(p.it.sentiment ?? "")}/5</text>
                 </g>
               ))}
-              <text x={20} y={20} fontSize={14} fill="rgba(10,15,28,0.55)" style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>High</text>
-              <text x={20} y={H} fontSize={14} fill="rgba(10,15,28,0.55)" style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>Low</text>
+              <text x={20} y={20} fontSize={14} fill=ink.faint style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>High</text>
+              <text x={20} y={H} fontSize={14} fill=ink.faint style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>Low</text>
             </svg>
           </div>
         </SlideFrame>
@@ -3100,7 +3100,7 @@ function renderVariantBody({
                   const isTarget = q + 1 === target;
                   return (
                     <div key={q} className="flex items-start justify-start p-6" style={{ border: "1px solid rgba(10,15,28,0.12)", background: isTarget ? `${brand.tokens.accent}14` : "transparent" }}>
-                      <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: isTarget ? brand.tokens.accent : "rgba(10,15,28,0.55)", fontWeight: 600 }}>{quadrants[q] ?? `Q${q + 1}`}</div>
+                      <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: isTarget ? brand.tokens.accent : ink.faint, fontWeight: 600 }}>{quadrants[q] ?? `Q${q + 1}`}</div>
                     </div>
                   );
                 })}
@@ -3120,7 +3120,7 @@ function renderVariantBody({
             </div>
             <div className="flex flex-col justify-center gap-6">
               <Kicker brand={brand}>Reading</Kicker>
-              <div style={{ fontSize: 22, lineHeight: 1.45, color: "rgba(10,15,28,0.78)" }}>
+              <div style={{ fontSize: 22, lineHeight: 1.45, color: ink.body }}>
                 Position on <b>{s(c.axisX)}</b> and <b>{s(c.axisY)}</b>. The tinted quadrant is where the program should live.
               </div>
             </div>
@@ -3144,7 +3144,7 @@ function renderVariantBody({
                     <Kicker brand={brand}>Visible</Kicker>
                   </div>
                   <div className="mt-3" style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
-                  <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(it.body)}</div>
+                  <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.42, color: ink.body }}>{s(it.body)}</div>
                 </div>
               ))}
             </div>
@@ -3155,13 +3155,13 @@ function renderVariantBody({
             </div>
             <div className="grid gap-8" style={{ gridTemplateColumns: `repeat(${Math.max(Math.min(below.length, 3), 2)}, minmax(0, 1fr))` }}>
               {below.map((it, i) => (
-                <div key={i} className="p-6" style={{ background: "rgba(10,15,28,0.04)", border: "1px solid rgba(10,15,28,0.08)" }}>
+                <div key={i} className="p-6" style={{ background: ink.surface, border: "1px solid rgba(10,15,28,0.08)" }}>
                   <div className="flex items-center justify-between gap-3">
-                    <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", color: "rgba(10,15,28,0.55)", fontWeight: 600 }}>Hidden</div>
+                    <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", color: ink.faint, fontWeight: 600 }}>Hidden</div>
                     <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="soft-tile" />
                   </div>
                   <div className="mt-3" style={{ fontSize: 24, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
-                  <div className="mt-2" style={{ fontSize: 18, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(it.body)}</div>
+                  <div className="mt-2" style={{ fontSize: 18, lineHeight: 1.42, color: ink.body }}>{s(it.body)}</div>
                 </div>
               ))}
             </div>
@@ -3236,11 +3236,11 @@ function renderVariantBody({
           <div className="mt-16 grid" style={{ gridTemplateColumns: "1fr 1px 1fr 1px 1fr" }}>
             {items.map((it, i) => (
               <>
-                {i > 0 && <div key={`d-${i}`} style={{ background: "rgba(10,15,28,0.12)" }} />}
+                {i > 0 && <div key={`d-${i}`} style={{ background: ink.divider }} />}
                 <div key={i} className="px-10">
                   <StatFigure brand={brand} value={s(it.value)} unit={s(it.unit)} label={s(it.label)} source={s(it.source) || undefined} size="xl" />
                   {s(it.note) && (
-                    <div className="mt-6" style={{ fontSize: 22, lineHeight: 1.4, color: "rgba(10,15,28,0.72)", maxWidth: 420 }}>{s(it.note)}</div>
+                    <div className="mt-6" style={{ fontSize: 22, lineHeight: 1.4, color: ink.body, maxWidth: 420 }}>{s(it.note)}</div>
                   )}
                 </div>
               </>
@@ -3266,7 +3266,7 @@ function renderVariantBody({
                   </div>
                   <div>
                     <div style={{ fontSize: 30, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.label)}</div>
-                    <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: "rgba(10,15,28,0.72)", maxWidth: 1080 }}>{s(it.body)}</div>
+                    <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: ink.body, maxWidth: 1080 }}>{s(it.body)}</div>
                   </div>
                 </div>
               ))}
@@ -3284,12 +3284,12 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="relative mt-16 grid gap-0" style={{ gridTemplateColumns: "1fr 1fr" }}>
             <div className="pr-16" style={{ opacity: 0.6 }}>
-              <div className="mb-6" style={{ height: 2, background: "rgba(10,15,28,0.15)", width: 96 }} />
-              <Kicker brand={brand} color="rgba(10,15,28,0.6)">{s(before.label, "Before")}</Kicker>
+              <div className="mb-6" style={{ height: 2, background: ink.axis, width: 96 }} />
+              <Kicker brand={brand} color=ink.muted>{s(before.label, "Before")}</Kicker>
               <div className="mt-8">
                 <StatFigure brand={brand} value={s(before.value)} unit={s(before.unit)} size="lg" valueColor="rgba(10,15,28,0.7)" />
               </div>
-              <div className="mt-6" style={{ fontSize: 22, lineHeight: 1.42, color: "rgba(10,15,28,0.65)" }}>{s(before.body)}</div>
+              <div className="mt-6" style={{ fontSize: 22, lineHeight: 1.42, color: ink.muted }}>{s(before.body)}</div>
             </div>
             <div className="pl-16" style={{ borderLeft: `2px solid ${brand.tokens.accent}` }}>
               <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mb-6" />
@@ -3297,7 +3297,7 @@ function renderVariantBody({
               <div className="mt-8">
                 <StatFigure brand={brand} value={s(after.value)} unit={s(after.unit)} size="xl" />
               </div>
-              <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.42, color: "rgba(10,15,28,0.82)" }}>{s(after.body)}</div>
+              <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.42, color: ink.body }}>{s(after.body)}</div>
             </div>
             <div
               aria-hidden
