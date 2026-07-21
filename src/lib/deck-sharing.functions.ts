@@ -173,7 +173,7 @@ export const getSharedDeck = createServerFn({ method: "POST" })
         }
       }
     }
-    return { deck: p ?? null };
+    return { deck: (p ?? null) as unknown };
   });
 
 // Public — records/updates a share view. Never throws to the caller.
