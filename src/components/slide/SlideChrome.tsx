@@ -91,6 +91,17 @@ export function SlideFrame({
 
   const placement = resolveLogoPlacement(variant, layoutId, logoPosition);
   const showLogo = placement.position !== "hidden";
+  // Bottom-adjacent logos sit above the footer band; content needs extra
+  // pb so titles / bullets / cards don't slide under the lockup. Top-adjacent
+  // logos need a little more pt on hero (cover) chrome where the mark is xl.
+  const bottomLogo = showLogo && (
+    placement.position === "bottom-left" ||
+    placement.position === "bottom-right" ||
+    placement.position === "bottom-center"
+  );
+  const topCenterLogo = showLogo && placement.position === "top-center";
+  const bottomCenterLogo = showLogo && placement.position === "bottom-center";
+
 
 
   // Light backdrops use a cream/white tint so photography reads bright; dark
@@ -307,15 +318,18 @@ export function SlideFrame({
         const effectiveSize = isMarkOnly ? (shrink[sizeAfterHalf] ?? sizeAfterHalf) : sizeAfterHalf;
 
         // Vertical orientations pin to the corresponding edge, vertically
-        // centered. Position dropdown selection is preserved as a soft hint
-        // (top vs bottom biasing) but the anchor snaps to the correct edge.
+        // centered. We clamp max-height so the rotated lockup can't drift
+        // into the top brand-bar band or the bottom footer band.
         const containerStyle = isVertical
           ? (() => {
               const onLeft = logoOrientation === "vertical-left";
               const style: React.CSSProperties = {
                 position: "absolute",
-                top: "50%",
-                transform: "translateY(-50%)",
+                top: 140,                              // clears brand bar + safe zone
+                bottom: 120,                           // clears footer + safe zone
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               };
               if (onLeft) style.left = 32;
               else style.right = 32;
@@ -339,32 +353,63 @@ export function SlideFrame({
         );
       })()}
 
-      {/* Content — 96px side margin, 128px top / 96px bottom reserve. */}
-      <div className="absolute inset-0 pt-32 pb-24 px-24">
+
+      {/* Content — 96px side margin. Vertical reserves grow when a logo
+          hugs the top or bottom so text never runs under the lockup or the
+          locked footer band. Baseline: pt=128, pb=96. */}
+      <div
+        className="absolute inset-0 px-24"
+        style={{
+          // Cover-mode top-center logo is xl; add breathing room so titles
+          // don't kiss the wordmark.
+          paddingTop: topCenterLogo && variant === "cover" ? 224 : 128,
+          // Bottom logos: reserve enough room for the lockup (≈ 72px) plus
+          // the 96px inset above the footer. Also pushes clear of the footer
+          // (~62px band) even without a logo.
+          paddingBottom: bottomLogo ? 208 : 96,
+        }}
+      >
         {isChromeDark && mode !== "dark" ? (
           <SlideModeContext.Provider value="dark">{children}</SlideModeContext.Provider>
         ) : (
           children
         )}
       </div>
-      {/* Footer (locked) — micro uppercase, hairline aligned to page number. */}
+      {/* Footer (locked) — micro uppercase, hairline aligned to page number.
+          When a bottom-center lockup is present, the centered footer text
+          would collide with it; we tuck each half further out and up so the
+          three elements share the band cleanly. */}
       <div
-        className="absolute bottom-10 left-24 right-24 flex items-center justify-between uppercase"
+        className="absolute left-24 right-24 flex items-center justify-between uppercase"
         style={{
-          // Bumped alpha to clear AA against the actual chrome surface — the
-          // previous 0.5 values dropped below 4.5:1 on both light and dark bg.
+          bottom: bottomCenterLogo ? 40 : 40,
           color: darkBackdrop || slideDark ? "rgba(255,255,255,0.78)" : "rgba(10,15,28,0.72)",
           fontSize: 18,
           letterSpacing: "0.28em",
+          // Fade the footer copy under a centered logo so it doesn't compete
+          // — the page number on the right still reads clearly.
+          opacity: bottomCenterLogo ? 0.9 : 1,
         }}
       >
-        <span>Confidential · Internal review</span>
+        <span
+          style={{
+            // If a centered logo eats the middle, keep left copy short and
+            // clipped so it never crawls under the mark.
+            maxWidth: bottomCenterLogo ? "38%" : undefined,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Confidential · Internal review
+        </span>
         {pageNumber !== undefined && (
           <span className="tabular-nums" style={{ letterSpacing: "0.18em" }}>
             {String(pageNumber).padStart(2, "0")}
           </span>
         )}
       </div>
+
 
     </div>
   );

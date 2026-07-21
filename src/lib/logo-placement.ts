@@ -97,10 +97,12 @@ export function resolveLogoPlacement(
   };
 }
 
-// Absolute-position styles for a given zone. Values use the same 96/64px
-// padding budget already reserved by SlideFrame chrome.
+// Absolute-position styles for a given zone. Insets are tuned so the lockup
+// never collides with the locked footer (bottom band ≈ 40-70px) or the
+// hairline brand bar (top 2px). Bottom zones sit ABOVE the footer with a
+// visible gap; top zones stay tight against the hairline.
 export function logoPositionStyles(position: LogoPosition): CSSProperties {
-  const inset = { top: 48, bottom: 48, left: 64, right: 64 };
+  const inset = { top: 48, bottom: 96, left: 64, right: 64 };
   switch (position) {
     case "top-left":      return { position: "absolute", top: inset.top,    left: inset.left };
     case "top-right":     return { position: "absolute", top: inset.top,    right: inset.right };
@@ -108,6 +110,7 @@ export function logoPositionStyles(position: LogoPosition): CSSProperties {
     case "bottom-left":   return { position: "absolute", bottom: inset.bottom, left: inset.left };
     case "bottom-right":  return { position: "absolute", bottom: inset.bottom, right: inset.right };
     case "bottom-center": return { position: "absolute", bottom: inset.bottom, left: "50%", transform: "translateX(-50%)" };
+
     case "hidden":        return { display: "none" };
   }
 }
