@@ -2,10 +2,10 @@ import type { ModuleVariant } from "@/lib/taxonomy";
 import type { SlideBackdrop } from "./SlideChrome";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
-import portrait1 from "@/assets/portraits/portrait-1.png";
-import portrait2 from "@/assets/portraits/portrait-2.png";
-import portrait3 from "@/assets/portraits/portrait-3.png";
-import portrait4 from "@/assets/portraits/portrait-4.png";
+import portrait1 from "@/assets/portraits/portrait-1.webp";
+import portrait2 from "@/assets/portraits/portrait-2.webp";
+import portrait3 from "@/assets/portraits/portrait-3.webp";
+import portrait4 from "@/assets/portraits/portrait-4.webp";
 
 // Master TransPerfect / Corporate dark-mode backdrop set — 10 curated
 // on-brand gradient stills. Applied deterministically per variant id so a
