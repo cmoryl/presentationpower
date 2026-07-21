@@ -10,7 +10,8 @@ import { WcagBadge } from "@/components/WcagBadge";
 import { TypeBadge } from "@/components/TypeBadge";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
-import { seedContent, useDeckStore, type Brief, type TemplatePayload } from "@/lib/deck-store";
+import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
+import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { byId, MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { MODULE_PRESET_KITS, validateKit } from "@/lib/module-preset-kits";
@@ -51,19 +52,6 @@ function usePins() {
 }
 
 
-
-const SAMPLE_BRIEF: Brief = {
-  id: "preview",
-  createdAt: "2026-01-01T00:00:00.000Z",
-  prospect: "Acme Corp",
-  industry: "Life sciences",
-  meetingObjective: "Strategic partnership review",
-  audience: "Executive team",
-  brandModeId: "bm-corporate",
-  archetypeId: "arch-problem-solution",
-  lengthTarget: 12,
-  clientFacts: "",
-};
 
 export const Route = createFileRoute("/library")({
   head: () => ({
@@ -459,13 +447,14 @@ const VariantCard = memo(function VariantCard({
   autoFixOn?: boolean;
   onOpen: () => void;
 }) {
+  const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
   const previewSlide = {
     id: variant.id,
     position: 0,
     sectionId,
     variantId: variant.id,
     layoutId: variant.permittedLayoutIds[0],
-    content: seedContent(variant.id, SAMPLE_BRIEF, "Preview section") as Record<string, unknown>,
+    content: seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<string, unknown>,
     changes: [],
   };
   const isDark = mode === "dark";
@@ -757,13 +746,14 @@ function VariantDetailModal({
     };
   }, [onClose]);
 
+  const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
   const previewSlide = {
     id: variant.id,
     position: 0,
     sectionId: sections[0]?.id ?? "",
     variantId: variant.id,
     layoutId: variant.permittedLayoutIds[0],
-    content: seedContent(variant.id, SAMPLE_BRIEF, sections[0]?.name ?? "Preview section") as Record<string, unknown>,
+    content: seedDivisionContent(variant.id, brief, sections[0]?.name ?? "Preview section", brand) as Record<string, unknown>,
     changes: [],
   };
 
