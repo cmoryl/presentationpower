@@ -650,8 +650,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Bento-style asymmetric mosaic mixing wordmark tiles at different scales",
     permittedLayoutIds: ["LF-09"],
     capacity: { items: { min: 6, max: 8 }, titleChars: 60 },
-    editableFields: ["title", "kicker", "items[].name"],
-    lockedFields: ["items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "kicker", "items[].name", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
   {
     id: "MV-PROOF-TESTIMONIAL",
