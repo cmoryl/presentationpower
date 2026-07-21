@@ -1747,12 +1747,15 @@ function VideoExamplesBlock({
                   className="relative m-2 aspect-[16/10] overflow-hidden rounded-[18px] bg-[#03002C]"
                   placeholder={<PreviewSkeleton dark label={variant.familyId} />}
                 >
+                  {/* Thumbnail context = true so MediaTile skips <video> autoplay and keeps the ▶ badge non-interactive (SlideVideoPreviewContext is NOT provided here — only inside LightboxPortal — which matters because this preview sits inside the zoom <button> above; a nested <button> would be invalid HTML). */}
                   <div className="absolute inset-0">
-                    <ScaledSlide>
-                      <SlideBackdropContext.Provider value={backdrop}>
-                        <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode="dark" />
-                      </SlideBackdropContext.Provider>
-                    </ScaledSlide>
+                    <SlideThumbnailContext.Provider value={true}>
+                      <ScaledSlide>
+                        <SlideBackdropContext.Provider value={backdrop}>
+                          <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode="dark" />
+                        </SlideBackdropContext.Provider>
+                      </ScaledSlide>
+                    </SlideThumbnailContext.Provider>
                   </div>
                   <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#EC388A]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
                     <Play size={10} className="fill-white" /> Video
