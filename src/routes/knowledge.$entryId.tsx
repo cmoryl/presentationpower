@@ -9,7 +9,7 @@ import {
   upsertKnowledgeEntry,
   deleteKnowledgeEntry,
   KNOWLEDGE_KIND_META,
-  type KnowledgeKind,
+  type EditableKnowledgeKind,
   type KnowledgeVisibility,
 } from "@/lib/knowledge.functions";
 
@@ -32,7 +32,7 @@ function EntryView() {
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [kind, setKind] = useState<KnowledgeKind>("fact");
+  const [kind, setKind] = useState<EditableKnowledgeKind>("fact");
   const [tags, setTags] = useState("");
   const [sources, setSources] = useState("");
   const [visibility, setVisibility] = useState<KnowledgeVisibility>("private");
@@ -45,7 +45,7 @@ function EntryView() {
     if (!e) return;
     setTitle(e.title);
     setBody(e.body);
-    setKind(e.kind);
+    setKind(e.kind === "source_deck" || e.kind === "source_pdf" ? "note" : e.kind);
     setTags(e.tags.join(", "));
     setSources(e.sources.join("\n"));
     setVisibility(e.visibility);
@@ -110,10 +110,12 @@ function EntryView() {
           </Field>
           <div className="grid grid-cols-2 gap-6">
             <Field label="Kind">
-              <select value={kind} onChange={(e) => setKind(e.target.value as KnowledgeKind)} className={inputCls}>
-                {Object.entries(KNOWLEDGE_KIND_META).map(([k, m]) => (
-                  <option key={k} value={k}>{m.label}</option>
-                ))}
+              <select value={kind} onChange={(e) => setKind(e.target.value as EditableKnowledgeKind)} className={inputCls}>
+                {Object.entries(KNOWLEDGE_KIND_META)
+                  .filter(([k]) => k !== "source_deck" && k !== "source_pdf")
+                  .map(([k, m]) => (
+                    <option key={k} value={k}>{m.label}</option>
+                  ))}
               </select>
             </Field>
             <Field label="Expires">

@@ -208,12 +208,10 @@ function EntryCard({ entry, accent }: { entry: KnowledgeEntry; accent: string })
   const owner = BRAND_MODES.find((b) => b.id === entry.owner_division_id);
   const kindMeta = KNOWLEDGE_KIND_META[entry.kind];
   const expired = entry.expires_at ? new Date(entry.expires_at) < new Date() : false;
-  return (
-    <Link
-      to={"/knowledge/$entryId" as never}
-      params={{ entryId: entry.id } as never}
-      className="block rounded-xl border border-black/10 bg-white p-4 hover:border-black/25"
-    >
+  const isSource = entry.kind === "source_deck" || entry.kind === "source_pdf";
+
+  const inner = (
+    <>
       <div className="flex items-center justify-between gap-2 text-[10px] uppercase tracking-[0.2em]">
         <span style={{ color: accent }}>{kindMeta.label}</span>
         <span className="text-black/40">{owner?.name}</span>
@@ -237,7 +235,32 @@ function EntryCard({ entry, accent }: { entry: KnowledgeEntry; accent: string })
         {expired && (
           <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] text-red-800">Expired</span>
         )}
+        {isSource && (
+          <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[10px] text-sky-800">Uploaded source</span>
+        )}
       </div>
+    </>
+  );
+
+  if (isSource) {
+    return (
+      <Link
+        to={"/admin/knowledge" as never}
+        className="block rounded-xl border border-sky-200 bg-sky-50/40 p-4 hover:border-sky-400"
+      >
+        {inner}
+      </Link>
+    );
+  }
+
+  return (
+    <Link
+      to={"/knowledge/$entryId" as never}
+      params={{ entryId: entry.id } as never}
+      className="block rounded-xl border border-black/10 bg-white p-4 hover:border-black/25"
+    >
+      {inner}
     </Link>
   );
 }
+
