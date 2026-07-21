@@ -117,6 +117,16 @@ function Library() {
     return m;
   }, [decks]);
 
+  // Validate that every brand mode has division-specific content coverage
+  // before we render the grid. Runs once (cached inside the helper).
+  const coverage = useMemo(() => validateDivisionContent(), []);
+  useEffect(() => {
+    if (!coverage.ok && import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.warn("[library] division content coverage gaps", coverage.failing);
+    }
+  }, [coverage]);
+
   const scopeBrand = scopeBrandId === "all" ? undefined : brandModes.find((b) => b.id === scopeBrandId);
   const tpMaster = brandModes.find((b) => b.id === "bm-enterprise") ?? brandModes[0];
   const restricted = new Set(scopeBrand?.contentScope?.restrictedFamilyIds ?? []);
