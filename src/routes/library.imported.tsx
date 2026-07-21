@@ -5,6 +5,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { Loader2, ExternalLink, Send, Image as ImageIcon, FileText, ChevronRight, X, Check } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
+import { FaithfulSlideCanvas } from "@/components/slide/FaithfulSlideCanvas";
+import type { SlideLayout } from "@/lib/pptx-import.functions";
 import {
   listImportedDecksForDivision,
   getImportedDeckSlides,
