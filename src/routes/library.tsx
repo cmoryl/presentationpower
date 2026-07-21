@@ -368,14 +368,52 @@ function Library() {
                 {coverage.failing.length} brand mode
                 {coverage.failing.length === 1 ? "" : "s"} missing division-specific content
               </div>
-              <ul className="mt-2 space-y-1">
+              <ul className="mt-3 space-y-3">
                 {coverage.failing.map((r) => (
-                  <li key={r.brandId}>
-                    <span className="font-medium">{r.brandName}</span>
-                    <span className="text-amber-900/70"> — {r.issues.join(", ")}</span>
+                  <li
+                    key={r.brandId}
+                    className="rounded-xl border border-amber-300/60 bg-white/70 p-3"
+                  >
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="font-semibold text-amber-950">{r.brandName}</span>
+                      <code className="rounded bg-amber-100 px-1.5 py-0.5 text-[11px] text-amber-900/80">
+                        {r.brandId}
+                      </code>
+                    </div>
                     {r.notes.length > 0 && (
-                      <span className="text-amber-900/60"> · {r.notes.join("; ")}</span>
+                      <div className="mt-1 text-[12px] text-amber-900/70">
+                        {r.notes.join(" · ")}
+                      </div>
                     )}
+                    <ul className="mt-2 space-y-1.5">
+                      {r.issues.map((code) => {
+                        const fix = COVERAGE_FIX_HINTS[code];
+                        return (
+                          <li key={code} className="text-[12px] leading-snug">
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span className="rounded bg-amber-200/70 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-amber-950">
+                                {code}
+                              </span>
+                              {fix && (
+                                <>
+                                  <span className="text-amber-900/60">edit</span>
+                                  <code className="rounded bg-amber-100/80 px-1.5 py-0.5 font-mono text-[11px] text-amber-950">
+                                    {fix.file}
+                                  </code>
+                                  <span className="text-amber-900/60">→</span>
+                                  <code className="rounded bg-amber-100/80 px-1.5 py-0.5 font-mono text-[11px] text-amber-950">
+                                    {fix.field.replace(/<brandId>/g, r.brandId)}
+                                  </code>
+                                </>
+                              )}
+                            </div>
+                            {fix && (
+                              <div className="mt-0.5 pl-1 text-amber-900/75">{fix.hint}</div>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
                   </li>
                 ))}
               </ul>
