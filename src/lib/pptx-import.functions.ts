@@ -1672,6 +1672,8 @@ async function loadParent(
     attributeNamePrefix: "@_",
     preserveOrder: true,
     trimValues: true,
+    processEntities: false,
+    htmlEntities: false,
   });
   const root = orderParser.parse(xml) as PNode[];
   const rootNode = root.find((n) => {
