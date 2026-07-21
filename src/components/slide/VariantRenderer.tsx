@@ -4017,18 +4017,20 @@ function MediaTile({
       className={`relative overflow-hidden rounded-2xl ${className ?? ""}`}
       style={{ background: "#03002C", filter: grayscale }}
     >
-      {hasVideo && autoplay ? (
+      {hasVideo && shouldPlay ? (
         <video
+          ref={videoRef}
           key={resolvedVideoUrl}
           src={resolvedVideoUrl}
           poster={resolvedPosterUrl || undefined}
           autoPlay
-          muted
-          loop
+          muted={wantMuted}
+          loop={wantLoop}
+          controls={wantControls}
           playsInline
           preload="auto"
-          aria-hidden
-          className="absolute inset-0 h-full w-full object-cover"
+          aria-hidden={!wantControls}
+          className="absolute inset-0 block h-full w-full object-cover"
           style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)" }}
         />
       ) : (
@@ -4036,12 +4038,21 @@ function MediaTile({
           src={url}
           alt=""
           aria-hidden
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 block h-full w-full object-cover"
           style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)" }}
         />
       )}
-      {hasVideo && !autoplay && (
-        openVideoPreview ? (
+      {hasVideo && !shouldPlay && (
+        autoplay ? (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setUserStarted(true); }}
+            className="absolute inset-0 flex items-center justify-center"
+            aria-label="Play video"
+          >
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-black shadow-lg">▶</span>
+          </button>
+        ) : openVideoPreview ? (
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); if (resolvedVideoUrl) openVideoPreview(resolvedVideoUrl); }}
