@@ -596,55 +596,6 @@ function Library() {
       )}
 
 
-      {examples.length > 0 && (
-        <section className="mt-8">
-          <div className="mb-3 flex items-baseline justify-between">
-            <div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#003FC7]">
-                Team-saved slides
-              </div>
-              <h2 className="mt-1 text-lg font-semibold text-[#03002C]">
-                From uploaded decks · {brandModes.find((b) => b.id === exampleDivisionId)?.name ?? exampleDivisionId}
-              </h2>
-            </div>
-            <span className="text-xs text-black/50">{examples.length} saved</span>
-          </div>
-          <div className="grid grid-cols-2 gap-6 xl:grid-cols-3">
-            {examples.map((ex) => (
-              <button
-                key={ex.id}
-                type="button"
-                onClick={() => setExampleZoom(ex)}
-                className="group relative overflow-hidden rounded-[24px] border border-slate-200 bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:border-[#003FC7]/20 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)]"
-              >
-                <div className="relative m-2 aspect-[16/10] overflow-hidden rounded-[18px] bg-[#F2F2F2]">
-                  {ex.imageUrls[0] ? (
-                    <img
-                      src={ex.imageUrls[0]}
-                      alt={ex.title}
-                      className="h-full w-full object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-xs text-black/40">
-                      No preview
-                    </div>
-                  )}
-                  <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-[#003FC7]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
-                    Team saved
-                  </div>
-                </div>
-                <div className="px-4 pb-4 pt-1">
-                  <div className="line-clamp-1 text-sm font-semibold text-[#03002C]">{ex.title || "Untitled slide"}</div>
-                  {ex.bullets?.length > 0 && (
-                    <div className="mt-1 line-clamp-2 text-xs text-black/55">{ex.bullets.slice(0, 3).join(" · ")}</div>
-                  )}
-                </div>
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
 
       {filtered.length === 0 ? (
         <div className="mt-10 flex flex-col items-center justify-center rounded-3xl border border-dashed border-black/15 bg-white/50 px-8 py-16 text-center">
