@@ -277,18 +277,25 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     const relTargetsByType = extractRelTargetsByType(relsDoc);
 
     // ── Embedded images ─────────────────────────────────────────────────
+    // We keep two parallel arrays so a downstream faithful renderer can map
+    // a shape's r:embed rId → the base64/data-url (or, later, a signed
+    // storage path).
     const images: string[] = [];
+    const imageEmbedIds: string[] = [];
     if (relsDoc) {
       const imageTargets = relTargetsByType.image;
       const embedIds = extractEmbedIds(doc);
-      const ordered = embedIds
-        .map((id) => imageTargets[id])
-        .filter((t): t is string => Boolean(t));
-      const seen = new Set(ordered);
-      for (const t of Object.values(imageTargets)) if (!seen.has(t)) ordered.push(t);
+      // De-duplicate while preserving reading order + include stragglers.
+      const orderedIds: string[] = [];
+      const seen = new Set<string>();
+      for (const id of embedIds) {
+        if (!seen.has(id) && imageTargets[id]) { orderedIds.push(id); seen.add(id); }
+      }
+      for (const id of Object.keys(imageTargets)) if (!seen.has(id)) { orderedIds.push(id); seen.add(id); }
 
-      for (const target of ordered.slice(0, MAX_IMAGES_PER_SLIDE)) {
+      for (const id of orderedIds.slice(0, MAX_IMAGES_PER_SLIDE)) {
         if (totalImageBytes >= MAX_TOTAL_IMAGE_BYTES) { imagesTruncated = true; break; }
+        const target = imageTargets[id];
         const resolved = resolveRelPath(slidePath, target);
         const entry = zip.files[resolved];
         if (!entry) continue;
@@ -301,6 +308,7 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         if (dataUrl.length > MAX_PER_IMAGE_BYTES) { imagesTruncated = true; continue; }
         if (totalImageBytes + dataUrl.length > MAX_TOTAL_IMAGE_BYTES) { imagesTruncated = true; continue; }
         images.push(dataUrl);
+        imageEmbedIds.push(id);
         totalImageBytes += dataUrl.length;
       }
     }
