@@ -21,14 +21,6 @@ export const Route = createFileRoute("/brief/new")({
       { title: "New brief · TransPerfect Modular" },
       { name: "description", content: "Guided brief that resolves into an assembled deck." },
     ],
-    links: [
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Urbanist:wght@600;700;800&family=Epilogue:wght@400;500;600&display=swap",
-      },
-    ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(taxonomyQueryOptions),
   component: BriefWizard,
@@ -38,22 +30,27 @@ export const Route = createFileRoute("/brief/new")({
   notFoundComponent: () => <div className="p-10">Not found.</div>,
 });
 
-// Token-locked styles (Navy Trust palette + Urbanist/Epilogue)
+// TransPerfect brand palette — matches the rest of the build.
+// Ink = Blue 800, Blue = Blue 500, Accent = Aqua.
 const PALETTE = {
-  page: "var(--brief-page, #E8EDF3)",
+  page: "var(--brief-page, #F2F5FA)",
   surface: "var(--brief-surface, #FFFFFF)",
-  ink: "var(--brief-ink, #0F1B3D)",
-  inkSoft: "var(--brief-ink-soft, #1E3A5F)",
-  blue: "var(--brief-blue, #3B6FA0)",
-  hairline: "var(--brief-hairline, #D1DBE5)",
-  field: "var(--brief-field, #F8FAFC)",
+  ink: "var(--brief-ink, #03002C)",
+  inkSoft: "var(--brief-ink-soft, #1E2749)",
+  blue: "var(--brief-blue, #003FC7)",
+  accent: "var(--brief-accent, #A1FBF9)",
+  hairline: "var(--brief-hairline, #E4E9F2)",
+  field: "var(--brief-field, #F7F9FC)",
 } as const;
 
 
+// Minimal typographic system — Geist Sans throughout (already loaded globally),
+// tight tracking, no all-caps pills. Small labels use monospace numerals for
+// the section index only.
 const labelCls =
-  "text-[11px] font-bold uppercase tracking-[0.14em] text-[#0F1B3D] font-['Urbanist']";
+  "text-[11px] font-semibold uppercase tracking-[0.18em] text-[#03002C]";
 const inputCls =
-  "w-full rounded-lg border border-[#D1DBE5] bg-[#F8FAFC] px-4 py-3 text-sm text-[#0F1B3D] placeholder:text-[#3B6FA0]/50 focus:border-[#3B6FA0] focus:outline-none focus:ring-2 focus:ring-[#3B6FA0]/25 transition-all";
+  "w-full rounded-md border border-[#E4E9F2] bg-white px-4 py-3 text-sm text-[#03002C] placeholder:text-[#03002C]/35 focus:border-[#003FC7] focus:outline-none focus:ring-2 focus:ring-[#003FC7]/15 transition-all";
 
 function BriefWizard() {
   const navigate = useNavigate();
