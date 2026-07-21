@@ -82,6 +82,7 @@ function PrintView() {
     });
   }, [deck, overlay]);
 
+  if (!hydrated) return <DeckHydratingFallback label="Preparing print view…" />;
   if (!deck) throw notFound();
   const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
   const clientLogoUrl = deck.clientLogo?.primaryUrl ?? null;
