@@ -26,6 +26,7 @@ function PrintView() {
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
 
+  const hydrated = useDeckHydrated();
   const fetchTx = useServerFn(getDeckSlideTranslations);
   const listLangs = useServerFn(listLanguages);
   const [overlay, setOverlay] = useState<Map<number, Record<string, unknown>> | null>(null);
