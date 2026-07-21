@@ -534,6 +534,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         title: "Anchor partner + supporting proof",
         featuredName: featured.name,
         featuredLogoUrl: featured.logoUrl,
+        featuredLogoUrlDark: featured.logoUrlDark,
         featuredNote: "Anchor engagement running against the shared program KPIs.",
         items: rest,
       };
