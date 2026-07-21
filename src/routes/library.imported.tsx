@@ -202,12 +202,23 @@ function EmptyState() {
   );
 }
 
+type ImportedSlide = {
+  index: number;
+  title: string;
+  bullets: string[];
+  notes: string;
+  imageCount: number;
+  imagePaths?: string[];
+  imageUrls?: string[];
+  layout?: SlideLayout;
+};
+
 type DeckSlidesData = {
   id: string;
   original_filename: string;
   slide_count: number;
   theme: { accent1?: string; accent2?: string; dark1?: string; headingFont?: string; bodyFont?: string };
-  slides: Array<{ index: number; title: string; bullets: string[]; notes: string; imageCount: number }>;
+  slides: ImportedSlide[];
   status: string;
   error: string | null;
   downloadUrl: string | null;
