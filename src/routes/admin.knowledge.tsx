@@ -857,16 +857,38 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                 <div className="text-xs text-black/50">Loading…</div>
               ) : (
                 <ol className="space-y-4">
-                  {(detail.slides ?? []).map((sl) => (
+                  {(detail.slides ?? []).map((sl) => {
+                    const key = `${openId}:${sl.index}`;
+                    return (
                     <li key={sl.index} className="rounded-xl border border-black/10 bg-white p-3">
                       <div className="mb-1 flex items-baseline gap-2">
                         <span className="font-mono text-[10px] text-black/40">#{sl.index + 1}</span>
                         <span className="text-sm font-medium text-black">{sl.title}</span>
                         {sl.imageCount > 0 && (
-                          <span className="ml-auto text-[10px] text-black/40">
-                            {sl.imageCount} image{sl.imageCount === 1 ? "" : "s"}
+                          <span className="text-[10px] text-black/40">
+                            · {sl.imageCount} image{sl.imageCount === 1 ? "" : "s"}
                           </span>
                         )}
+                        <button
+                          type="button"
+                          disabled={sendingKey === key}
+                          onClick={async () => {
+                            if (!openId) return;
+                            setSendingKey(key);
+                            setSendMsg(null);
+                            try {
+                              await sendFn({ data: { importedDeckId: openId, slideIndex: sl.index } });
+                              setSendMsg(`Sent slide ${sl.index + 1} to the ${slug} library.`);
+                            } catch (e) {
+                              setSendMsg(`Send failed: ${e instanceof Error ? e.message : "unknown"}`);
+                            } finally {
+                              setSendingKey(null);
+                            }
+                          }}
+                          className="ml-auto shrink-0 rounded-full border border-[#003FC7]/40 px-2 py-0.5 text-[10px] text-[#003FC7] hover:border-[#003FC7] disabled:opacity-50"
+                        >
+                          {sendingKey === key ? "Sending…" : "Send to library"}
+                        </button>
                       </div>
                       {sl.bullets.length > 0 && (
                         <ul className="ml-4 list-disc space-y-0.5 text-xs text-black/70">
@@ -881,7 +903,8 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                         </div>
                       )}
                     </li>
-                  ))}
+                    );
+                  })}
                 </ol>
               )}
             </div>
