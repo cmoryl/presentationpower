@@ -1276,15 +1276,18 @@ function ModalABPreview({
     if (typeof window === "undefined") return;
     const targets = [lightRef.current, darkRef.current];
     const t = window.setTimeout(async () => {
-      const { applyAutoFix, revertAutoFix } = await import("@/lib/wcag");
+      const { applyAutoFix, revertAutoFix, auditAndFixTypography, revertTypeFix } = await import("@/lib/wcag");
       for (const el of targets) {
         if (!el) continue;
         revertAutoFix(el);
+        revertTypeFix(el);
+        auditAndFixTypography(el);
         applyAutoFix(el);
       }
     }, 320);
     return () => window.clearTimeout(t);
   }, [variant.id, brand.id, showImagery]);
+
 
   const [zoom, setZoom] = useState<null | "light" | "dark">(null);
 
@@ -1356,6 +1359,7 @@ function LightboxPortal({
   darkBackdrop: ReturnType<typeof backdropForVariant>;
 }) {
   const [playUrl, setPlayUrl] = useState<string | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -1375,6 +1379,25 @@ function LightboxPortal({
       document.body.style.overflow = prev;
     };
   }, [mode, setMode, playUrl]);
+
+  // Run the same typography + WCAG auto-fix on the zoomed stage that the
+  // grid A/B compare uses, so dark-mode primitives with hardcoded ink text
+  // (e.g. LabelBlock, comparison tables) don't render as ghost text on the
+  // navy backdrop. Re-runs whenever the mode or variant changes.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const el = stageRef.current;
+    if (!el) return;
+    const t = window.setTimeout(async () => {
+      const { applyAutoFix, revertAutoFix, auditAndFixTypography, revertTypeFix } = await import("@/lib/wcag");
+      revertAutoFix(el);
+      revertTypeFix(el);
+      auditAndFixTypography(el);
+      applyAutoFix(el);
+    }, 320);
+    return () => window.clearTimeout(t);
+  }, [mode, variant.id, brand.id]);
+
 
 
   const isDark = mode === "dark";
@@ -1439,7 +1462,7 @@ function LightboxPortal({
           className="relative w-full"
           style={{ aspectRatio: "16 / 9", maxWidth: "min(96vw, 168vh)", maxHeight: "100%" }}
         >
-          <div className={`relative h-full w-full overflow-hidden rounded-2xl ring-1 ring-white/10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.7)] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
+          <div ref={stageRef} className={`relative h-full w-full overflow-hidden rounded-2xl ring-1 ring-white/10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.7)] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
             <ScaledSlide>
               <SlideBackdropContext.Provider value={isDark ? darkBackdrop : lightBackdrop}>
                 <SlideVideoPreviewContext.Provider value={setPlayUrl}>
@@ -1448,6 +1471,7 @@ function LightboxPortal({
               </SlideBackdropContext.Provider>
             </ScaledSlide>
           </div>
+
         </div>
       </div>
 

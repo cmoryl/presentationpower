@@ -4250,19 +4250,22 @@ function Quadrant({ brand, label, highlight }: { brand: BrandMode; label: string
 }
 
 function LabelBlock({ brand, label, body }: { brand: BrandMode; label: string; body: string }) {
+  const mode = useContext(SlideModeContext);
+  const bodyColor = mode === "dark" ? "rgba(255,255,255,0.86)" : "rgba(10,15,28,0.85)";
   return (
     <div>
       <Hairline color={brand.tokens.accent} widthPx={56} thicknessPx={2} className="mb-5" />
       <Kicker brand={brand}>{label}</Kicker>
       <div
         className="mt-5"
-        style={{ fontSize: 26, lineHeight: 1.38, letterSpacing: "-0.005em", color: "rgba(10,15,28,0.85)" }}
+        style={{ fontSize: 26, lineHeight: 1.38, letterSpacing: "-0.005em", color: bodyColor }}
       >
         {body}
       </div>
     </div>
   );
 }
+
 
 
 // ── Dashboard helpers ──────────────────────────────────────────────────
