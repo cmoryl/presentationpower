@@ -26,6 +26,7 @@ import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as DecksIndexRouteImport } from './routes/decks.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
+import { Route as LibraryImportedRouteImport } from './routes/library.imported'
 import { Route as KnowledgeOracleRouteImport } from './routes/knowledge.oracle'
 import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
 import { Route as KnowledgeAskRouteImport } from './routes/knowledge.ask'
@@ -142,6 +143,11 @@ const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
   path: '/share/$token',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryImportedRoute = LibraryImportedRouteImport.update({
+  id: '/imported',
+  path: '/imported',
+  getParentRoute: () => LibraryRoute,
 } as any)
 const KnowledgeOracleRoute = KnowledgeOracleRouteImport.update({
   id: '/oracle',
@@ -312,7 +318,7 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
-  '/library': typeof LibraryRoute
+  '/library': typeof LibraryRouteWithChildren
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
   '/templates': typeof TemplatesRoute
@@ -338,6 +344,7 @@ export interface FileRoutesByFullPath {
   '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
+  '/library/imported': typeof LibraryImportedRoute
   '/share/$token': typeof ShareTokenRoute
   '/admin/': typeof AdminIndexRoute
   '/decks/': typeof DecksIndexRoute
@@ -360,7 +367,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
-  '/library': typeof LibraryRoute
+  '/library': typeof LibraryRouteWithChildren
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
   '/templates': typeof TemplatesRoute
@@ -386,6 +393,7 @@ export interface FileRoutesByTo {
   '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
+  '/library/imported': typeof LibraryImportedRoute
   '/share/$token': typeof ShareTokenRoute
   '/admin': typeof AdminIndexRoute
   '/decks': typeof DecksIndexRoute
@@ -411,7 +419,7 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
-  '/library': typeof LibraryRoute
+  '/library': typeof LibraryRouteWithChildren
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
   '/templates': typeof TemplatesRoute
@@ -437,6 +445,7 @@ export interface FileRoutesById {
   '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
+  '/library/imported': typeof LibraryImportedRoute
   '/share/$token': typeof ShareTokenRoute
   '/admin/': typeof AdminIndexRoute
   '/decks/': typeof DecksIndexRoute
@@ -489,6 +498,7 @@ export interface FileRouteTypes {
     | '/knowledge/ask'
     | '/knowledge/new'
     | '/knowledge/oracle'
+    | '/library/imported'
     | '/share/$token'
     | '/admin/'
     | '/decks/'
@@ -537,6 +547,7 @@ export interface FileRouteTypes {
     | '/knowledge/ask'
     | '/knowledge/new'
     | '/knowledge/oracle'
+    | '/library/imported'
     | '/share/$token'
     | '/admin'
     | '/decks'
@@ -587,6 +598,7 @@ export interface FileRouteTypes {
     | '/knowledge/ask'
     | '/knowledge/new'
     | '/knowledge/oracle'
+    | '/library/imported'
     | '/share/$token'
     | '/admin/'
     | '/decks/'
@@ -612,7 +624,7 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   ImageryRoute: typeof ImageryRoute
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
-  LibraryRoute: typeof LibraryRoute
+  LibraryRoute: typeof LibraryRouteWithChildren
   LogohubRoute: typeof LogohubRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TemplatesRoute: typeof TemplatesRoute
@@ -750,6 +762,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/share/$token'
       preLoaderRoute: typeof ShareTokenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/library/imported': {
+      id: '/library/imported'
+      path: '/imported'
+      fullPath: '/library/imported'
+      preLoaderRoute: typeof LibraryImportedRouteImport
+      parentRoute: typeof LibraryRoute
     }
     '/knowledge/oracle': {
       id: '/knowledge/oracle'
@@ -1035,6 +1054,17 @@ const KnowledgeRouteWithChildren = KnowledgeRoute._addFileChildren(
   KnowledgeRouteChildren,
 )
 
+interface LibraryRouteChildren {
+  LibraryImportedRoute: typeof LibraryImportedRoute
+}
+
+const LibraryRouteChildren: LibraryRouteChildren = {
+  LibraryImportedRoute: LibraryImportedRoute,
+}
+
+const LibraryRouteWithChildren =
+  LibraryRoute._addFileChildren(LibraryRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -1045,7 +1075,7 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   ImageryRoute: ImageryRoute,
   KnowledgeRoute: KnowledgeRouteWithChildren,
-  LibraryRoute: LibraryRoute,
+  LibraryRoute: LibraryRouteWithChildren,
   LogohubRoute: LogohubRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TemplatesRoute: TemplatesRoute,
