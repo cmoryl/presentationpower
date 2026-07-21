@@ -25,15 +25,27 @@ const POSTER_MIME = ["image/jpeg", "image/png", "image/webp"];
 export function SlideVideoPanel({
   videoUrl,
   posterUrl,
+  autoplay = true,
+  loop = true,
+  muted = true,
+  controls = false,
   onChange,
 }: {
   videoUrl?: string;
   posterUrl?: string;
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  controls?: boolean;
   onChange: (next: {
-    videoUrl: string | null;
+    videoUrl?: string | null;
     videoPath?: string | null;
     videoPosterUrl?: string | null;
     videoPosterPath?: string | null;
+    videoAutoplay?: boolean;
+    videoLoop?: boolean;
+    videoMuted?: boolean;
+    videoControls?: boolean;
   }) => void;
 }) {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
