@@ -1,0 +1,418 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { Loader2, ExternalLink, Send, Image as ImageIcon, FileText, ChevronRight, X, Check } from "lucide-react";
+import { AppShell } from "@/components/AppShell";
+import { BRAND_MODES } from "@/lib/taxonomy";
+import {
+  listImportedDecksForDivision,
+  getImportedDeckSlides,
+  sendImportedSlideToLibrary,
+  listLibrarySlideExamples,
+  importedDeckSlugForDivision,
+} from "@/lib/imported-decks.functions";
+
+export const Route = createFileRoute("/library/imported")({
+  head: () => ({
+    meta: [
+      { title: "Imported Slides · Library" },
+      { name: "description", content: "Browse imported PPTX slides, assess layout and look, and promote them into the approved module library." },
+      { property: "og:title", content: "Imported Slides · Library" },
+      { property: "og:description", content: "Staging area for imported PPTX slides before they become approved module variants." },
+    ],
+  }),
+  component: ImportedLibrary,
+});
+
+type Deck = {
+  id: string;
+  division_id: string;
+  original_filename: string;
+  file_size: number;
+  slide_count: number;
+  status: string;
+  error: string | null;
+  created_at: string;
+};
+
+function ImportedLibrary() {
+  const [brandModeId, setBrandModeId] = useState<string>("bm-enterprise");
+  const [activeDeckId, setActiveDeckId] = useState<string | null>(null);
+  const [previewSlideIdx, setPreviewSlideIdx] = useState<number | null>(null);
+
+  const divisionSlug = useMemo(() => importedDeckSlugForDivision(brandModeId), [brandModeId]);
+
+  const listFn = useServerFn(listImportedDecksForDivision);
+  const getSlidesFn = useServerFn(getImportedDeckSlides);
+  const listApprovedFn = useServerFn(listLibrarySlideExamples);
+
+  const decksQ = useQuery({
+    queryKey: ["imported-library-decks", divisionSlug],
+    queryFn: () => listFn({ data: { divisionId: divisionSlug } }),
+  });
+
+  const decks = (decksQ.data ?? []) as Deck[];
+
+  const slidesQ = useQuery({
+    queryKey: ["imported-library-slides", activeDeckId],
+    queryFn: () => getSlidesFn({ data: { id: activeDeckId! } }),
+    enabled: !!activeDeckId,
+  });
+
+  const approvedQ = useQuery({
+    queryKey: ["approved-library-examples", brandModeId],
+    queryFn: () => listApprovedFn({ data: { divisionId: brandModeId } }),
+  });
+
+  const approvedKey = useMemo(() => {
+    const set = new Set<string>();
+    for (const row of approvedQ.data ?? []) {
+      if (row.imported_deck_id) set.add(`${row.imported_deck_id}:${row.slide_index}`);
+    }
+    return set;
+  }, [approvedQ.data]);
+
+  return (
+    <AppShell>
+      <div>
+        <div className="flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-black/50">
+          <Link to="/library" className="hover:text-[#003FC7]">Library</Link>
+          <ChevronRight size={12} className="opacity-40" />
+          <span className="text-black">Imported</span>
+        </div>
+        <h1 className="mt-3 text-4xl font-semibold text-[#03002C]">Imported slide staging.</h1>
+        <p className="mt-3 max-w-2xl text-black/60">
+          Every PPTX you upload lands here first. Inspect layout, hierarchy and imagery, then promote the strongest slides into the approved module library so the assembler can reuse them.
+        </p>
+      </div>
+
+      {/* Brand mode scope */}
+      <div className="mt-8 flex flex-wrap items-center gap-2 border-b border-black/10 pb-6">
+        <span className="mr-2 text-xs uppercase tracking-widest text-black/40">Scope</span>
+        {BRAND_MODES.map((bm) => {
+          const active = bm.id === brandModeId;
+          return (
+            <button
+              key={bm.id}
+              type="button"
+              onClick={() => { setBrandModeId(bm.id); setActiveDeckId(null); }}
+              className={`rounded-full px-3 py-1.5 text-xs transition ${
+                active
+                  ? "bg-[#03002C] text-white"
+                  : "border border-black/15 bg-white text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+              }`}
+            >
+              {bm.name}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[320px_1fr]">
+        {/* Deck sidebar */}
+        <aside className="space-y-2">
+          <div className="flex items-center justify-between px-1 pb-2">
+            <div className="text-xs uppercase tracking-widest text-black/40">Imported decks</div>
+            <div className="text-xs text-black/40">{decks.length}</div>
+          </div>
+          {decksQ.isLoading ? (
+            <div className="rounded-lg border border-black/10 bg-white p-4 text-sm text-black/40">
+              <Loader2 size={14} className="mr-2 inline animate-spin" />
+              Loading…
+            </div>
+          ) : decks.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-black/15 bg-white p-6 text-sm text-black/50">
+              No decks imported for this scope yet. Upload a PPTX from{" "}
+              <Link to="/admin/knowledge" className="text-[#003FC7] underline">Admin → Knowledge</Link>.
+            </div>
+          ) : (
+            decks.map((d) => {
+              const active = d.id === activeDeckId;
+              return (
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => setActiveDeckId(d.id)}
+                  className={`block w-full rounded-lg border p-3 text-left transition ${
+                    active
+                      ? "border-[#003FC7] bg-[#003FC7]/5"
+                      : "border-black/10 bg-white hover:border-black/25"
+                  }`}
+                >
+                  <div className="truncate text-sm font-medium text-[#03002C]">{d.original_filename}</div>
+                  <div className="mt-1 flex items-center gap-2 text-xs text-black/50">
+                    <span>{d.slide_count} slides</span>
+                    <span>·</span>
+                    <span>{(d.file_size / 1024 / 1024).toFixed(1)} MB</span>
+                    {d.status !== "parsed" && (
+                      <>
+                        <span>·</span>
+                        <span className={d.status === "error" ? "text-red-600" : "text-amber-600"}>
+                          {d.status}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </button>
+              );
+            })
+          )}
+        </aside>
+
+        {/* Slide grid */}
+        <section>
+          {!activeDeckId ? (
+            <EmptyState />
+          ) : slidesQ.isLoading ? (
+            <div className="flex items-center gap-2 text-sm text-black/50">
+              <Loader2 size={14} className="animate-spin" /> Loading slides…
+            </div>
+          ) : slidesQ.data ? (
+            <DeckSlides
+              deck={slidesQ.data}
+              brandModeId={brandModeId}
+              approvedKey={approvedKey}
+              onPreview={(idx) => setPreviewSlideIdx(idx)}
+            />
+          ) : null}
+        </section>
+      </div>
+
+      {previewSlideIdx !== null && slidesQ.data && (
+        <SlidePreview
+          slide={slidesQ.data.slides.find((s) => s.index === previewSlideIdx)!}
+          deckName={slidesQ.data.original_filename}
+          onClose={() => setPreviewSlideIdx(null)}
+        />
+      )}
+    </AppShell>
+  );
+}
+
+function EmptyState() {
+  return (
+    <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-dashed border-black/15 bg-white text-center">
+      <FileText size={28} className="text-black/25" />
+      <div className="mt-3 text-sm font-medium text-[#03002C]">Select an imported deck</div>
+      <div className="mt-1 text-xs text-black/50">Its slides will appear here as inspectable cards.</div>
+    </div>
+  );
+}
+
+type DeckSlidesData = {
+  id: string;
+  original_filename: string;
+  slide_count: number;
+  theme: { accent1?: string; accent2?: string; dark1?: string; headingFont?: string; bodyFont?: string };
+  slides: Array<{ index: number; title: string; bullets: string[]; notes: string; imageCount: number }>;
+  status: string;
+  error: string | null;
+  downloadUrl: string | null;
+};
+
+function DeckSlides({
+  deck,
+  brandModeId,
+  approvedKey,
+  onPreview,
+}: {
+  deck: DeckSlidesData;
+  brandModeId: string;
+  approvedKey: Set<string>;
+  onPreview: (idx: number) => void;
+}) {
+  return (
+    <div>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-black/10 pb-4">
+        <div>
+          <div className="text-xs uppercase tracking-widest text-black/40">Deck</div>
+          <div className="mt-1 text-xl font-semibold text-[#03002C]">{deck.original_filename}</div>
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-black/50">
+            <span>{deck.slide_count} slides</span>
+            {deck.theme?.accent1 && (
+              <span className="inline-flex items-center gap-1.5">
+                <span className="h-3 w-3 rounded-full border border-black/10" style={{ background: deck.theme.accent1 }} />
+                accent
+              </span>
+            )}
+            {deck.theme?.headingFont && <span>{deck.theme.headingFont}</span>}
+          </div>
+        </div>
+        {deck.downloadUrl && (
+          <a
+            href={deck.downloadUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+          >
+            <ExternalLink size={12} /> Original .pptx
+          </a>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {deck.slides.map((s) => (
+          <SlideCard
+            key={s.index}
+            slide={s}
+            deckId={deck.id}
+            brandModeId={brandModeId}
+            approved={approvedKey.has(`${deck.id}:${s.index}`)}
+            onPreview={() => onPreview(s.index)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SlideCard({
+  slide,
+  deckId,
+  brandModeId,
+  approved,
+  onPreview,
+}: {
+  slide: { index: number; title: string; bullets: string[]; notes: string; imageCount: number };
+  deckId: string;
+  brandModeId: string;
+  approved: boolean;
+  onPreview: () => void;
+}) {
+  const sendFn = useServerFn(sendImportedSlideToLibrary);
+  const qc = useQueryClient();
+
+  const send = useMutation({
+    mutationFn: () => sendFn({ data: { importedDeckId: deckId, slideIndex: slide.index, brandModeId } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["approved-library-examples", brandModeId] });
+    },
+  });
+
+  return (
+    <div className="group flex flex-col rounded-xl border border-black/10 bg-white p-4 transition hover:border-black/25 hover:shadow-sm">
+      <div className="flex items-start justify-between gap-2">
+        <div className="text-[10px] font-mono uppercase tracking-widest text-black/40">
+          Slide {slide.index + 1}
+        </div>
+        {approved && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-700">
+            <Check size={10} /> Approved
+          </span>
+        )}
+      </div>
+
+      <button
+        type="button"
+        onClick={onPreview}
+        className="mt-2 text-left"
+      >
+        <div className="line-clamp-2 text-sm font-semibold text-[#03002C] group-hover:text-[#003FC7]">
+          {slide.title || <span className="italic text-black/40">Untitled</span>}
+        </div>
+      </button>
+
+      {slide.bullets.length > 0 && (
+        <ul className="mt-3 space-y-1 text-xs text-black/60">
+          {slide.bullets.slice(0, 3).map((b, i) => (
+            <li key={i} className="line-clamp-1">• {b}</li>
+          ))}
+          {slide.bullets.length > 3 && (
+            <li className="text-black/40">+{slide.bullets.length - 3} more</li>
+          )}
+        </ul>
+      )}
+
+      <div className="mt-4 flex items-center gap-2 border-t border-black/5 pt-3 text-[11px] text-black/50">
+        {slide.imageCount > 0 && (
+          <span className="inline-flex items-center gap-1"><ImageIcon size={11} />{slide.imageCount}</span>
+        )}
+        {slide.notes && <span>• Notes</span>}
+        <div className="ml-auto flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={onPreview}
+            className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[10px] uppercase tracking-widest text-black/60 hover:border-[#003FC7] hover:text-[#003FC7]"
+          >
+            Inspect
+          </button>
+          <button
+            type="button"
+            onClick={() => send.mutate()}
+            disabled={send.isPending || approved}
+            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] uppercase tracking-widest ${
+              approved
+                ? "bg-green-50 text-green-700"
+                : "bg-[#03002C] text-white hover:opacity-90 disabled:opacity-60"
+            }`}
+          >
+            {send.isPending ? <Loader2 size={10} className="animate-spin" /> : <Send size={10} />}
+            {approved ? "Approved" : send.isPending ? "Sending…" : "Approve"}
+          </button>
+        </div>
+      </div>
+      {send.error && (
+        <div className="mt-2 text-[10px] text-red-600">{(send.error as Error).message}</div>
+      )}
+    </div>
+  );
+}
+
+function SlidePreview({
+  slide,
+  deckName,
+  onClose,
+}: {
+  slide: { index: number; title: string; bullets: string[]; notes: string; imageCount: number };
+  deckName: string;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="relative max-h-[90vh] w-full max-w-3xl overflow-auto rounded-2xl bg-white p-8 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-full p-2 text-black/40 hover:bg-black/5 hover:text-black"
+        >
+          <X size={16} />
+        </button>
+        <div className="text-xs uppercase tracking-widest text-black/40">
+          {deckName} · Slide {slide.index + 1}
+        </div>
+        <h3 className="mt-3 text-2xl font-semibold text-[#03002C]">
+          {slide.title || <span className="italic text-black/40">Untitled</span>}
+        </h3>
+        {slide.bullets.length > 0 && (
+          <ul className="mt-6 space-y-2 text-sm text-black/70">
+            {slide.bullets.map((b, i) => (
+              <li key={i} className="flex gap-2">
+                <span className="text-[#003FC7]">•</span>
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {slide.notes && (
+          <div className="mt-6 rounded-lg border border-black/10 bg-black/[0.02] p-4">
+            <div className="text-[10px] uppercase tracking-widest text-black/40">Speaker notes</div>
+            <div className="mt-2 whitespace-pre-wrap text-xs text-black/70">{slide.notes}</div>
+          </div>
+        )}
+        <div className="mt-6 flex items-center gap-4 border-t border-black/10 pt-4 text-xs text-black/50">
+          {slide.imageCount > 0 && (
+            <span className="inline-flex items-center gap-1"><ImageIcon size={12} />{slide.imageCount} image{slide.imageCount === 1 ? "" : "s"}</span>
+          )}
+          <span>{slide.bullets.length} bullets</span>
+        </div>
+      </div>
+    </div>
+  );
+}
