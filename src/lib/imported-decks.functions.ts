@@ -59,14 +59,62 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
       });
     if (up.error) throw new Error(`Upload failed: ${up.error.message ?? "unknown"}`);
 
-    // Store slide outline (drop base64 images from row payload to keep it small;
-    // images live in the .pptx file itself and can be re-extracted in Layer 2).
+    // Persist each embedded slide image into the shared `division-imagery`
+    // bucket so it surfaces in the Imagery tab and is reusable across decks.
+    // Best-effort: image failures don't roll back the deck upload. We record
+    // the resulting storage paths per slide so the "Send to library" flow
+    // can attach them to a library submission.
+    const imageryDivision = normalizeImportedDeckDivision(data.divisionId);
+    const savedPathsBySlide: string[][] = parsed.slides.map(() => []);
+    let imgSeq = 0;
+    for (const sl of parsed.slides) {
+      for (let j = 0; j < sl.images.length; j++) {
+        const dataUrl = sl.images[j];
+        const m = /^data:([^;]+);base64,(.+)$/.exec(dataUrl);
+        if (!m) continue;
+        const contentType = m[1];
+        const bin = Buffer.from(m[2], "base64");
+        if (bin.length === 0) continue;
+        const ext = contentType.split("/")[1]?.split("+")[0] ?? "bin";
+        const imgId = crypto.randomUUID();
+        const baseName = data.filename.replace(/\.pptx$/i, "");
+        const imgFilename = `${baseName}__slide-${sl.index + 1}-${j + 1}.${ext}`.replace(/[^\w.\-]+/g, "_").slice(-160);
+        const imgPath = `${context.userId}/${imgId}-${imgFilename}`;
+        const upImg = await s.storage
+          .from("division-imagery")
+          .upload(imgPath, bin, { contentType, upsert: false });
+        if (upImg.error) continue;
+        const { error: rowErr } = await s.from("division_imagery").insert({
+          id: imgId,
+          division_id: imageryDivision,
+          uploaded_by: context.userId,
+          filename: imgFilename,
+          content_type: contentType,
+          size_bytes: bin.length,
+          storage_path: imgPath,
+          kind: "upload",
+          tags: ["imported_deck", `slide-${sl.index + 1}`, data.divisionId],
+          note: `Extracted from ${data.filename} · slide ${sl.index + 1}`,
+        });
+        if (rowErr) {
+          await s.storage.from("division-imagery").remove([imgPath]).catch(() => {});
+          continue;
+        }
+        savedPathsBySlide[sl.index].push(imgPath);
+        imgSeq++;
+      }
+    }
+
+    // Slide outline includes the saved image paths so downstream flows
+    // (send-to-library, imagery cross-refs) can find the imagery without
+    // re-parsing the .pptx.
     const slidesLite = parsed.slides.map((sl) => ({
       index: sl.index,
       title: sl.title,
       bullets: sl.bullets,
       notes: sl.notes,
       imageCount: sl.images.length,
+      imagePaths: savedPathsBySlide[sl.index],
     }));
 
     const { data: row, error } = await s
@@ -86,12 +134,18 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
       .select()
       .single();
     if (error) {
-      // Roll back the storage upload if the row insert failed.
+      // Roll back the .pptx AND any imagery we created.
       await s.storage.from(BUCKET).remove([storagePath]).catch(() => {});
+      const allImg = savedPathsBySlide.flat();
+      if (allImg.length) await s.storage.from("division-imagery").remove(allImg).catch(() => {});
       throw new Error(`Save failed: ${(error as { message?: string }).message ?? "unknown"}`);
     }
-    return row as { id: string; slide_count: number; status: string };
+
+    return { ...(row as { id: string; slide_count: number; status: string }), imagesSaved: imgSeq };
   });
+
+
+
 
 export const listImportedDecksForDivision = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -397,3 +451,108 @@ export const embedImportedDecks = createServerFn({ method: "POST" })
 
     return { considered: list.length, embedded, skipped, failed, totalChunks, results };
   });
+
+// ── LIBRARY SUBMISSIONS ────────────────────────────────────────────────
+// A user can promote any parsed slide from an imported deck into a
+// division-scoped "example" that shows up in the Approved Module
+// Variants library as a real-world reference. We copy the slide's
+// title/bullets/notes/imagePaths at submission time so the entry is
+// stable even if the source deck is later deleted.
+
+const SendToLibraryInput = z.object({
+  importedDeckId: z.string().uuid(),
+  slideIndex: z.number().int().min(0).max(999),
+  brandModeId: z.string().min(1).max(120).optional(),
+});
+
+export const sendImportedSlideToLibrary = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => SendToLibraryInput.parse(v))
+  .handler(async ({ data, context }) => {
+    const s = context.supabase as unknown as SbClient;
+    const { data: row } = await s
+      .from("imported_decks")
+      .select("id, division_id, slides")
+      .eq("id", data.importedDeckId)
+      .maybeSingle();
+    if (!row) throw new Error("Imported deck not found");
+    const r = row as {
+      id: string;
+      division_id: string;
+      slides: Array<{ index: number; title: string; bullets: string[]; notes: string; imageCount: number; imagePaths?: string[] }> | null;
+    };
+    const slide = (r.slides ?? []).find((sl) => sl.index === data.slideIndex);
+    if (!slide) throw new Error("Slide not found in this deck");
+
+    const divisionId = normalizeImportedDeckDivision(r.division_id);
+    const { data: ins, error } = await s
+      .from("library_slide_examples")
+      .insert({
+        division_id: divisionId,
+        brand_mode_id: data.brandModeId ?? divisionId,
+        imported_deck_id: r.id,
+        slide_index: slide.index,
+        title: slide.title ?? "",
+        bullets: slide.bullets ?? [],
+        notes: slide.notes ?? "",
+        image_paths: slide.imagePaths ?? [],
+        submitted_by: context.userId,
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error((error as { message?: string }).message ?? "Send failed");
+    return { id: (ins as { id: string }).id };
+  });
+
+export type LibrarySlideExample = {
+  id: string;
+  division_id: string;
+  brand_mode_id: string | null;
+  imported_deck_id: string | null;
+  slide_index: number;
+  title: string;
+  bullets: string[];
+  notes: string;
+  image_paths: string[];
+  submitted_by: string;
+  created_at: string;
+  imageUrls: string[];
+};
+
+export const listLibrarySlideExamples = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => z.object({ divisionId: z.string().min(1).max(120) }).parse(v))
+  .handler(async ({ data, context }): Promise<LibrarySlideExample[]> => {
+    const s = context.supabase as unknown as SbClient;
+    const divisionId = normalizeImportedDeckDivision(data.divisionId);
+    const { data: rows } = await s
+      .from("library_slide_examples")
+      .select("id, division_id, brand_mode_id, imported_deck_id, slide_index, title, bullets, notes, image_paths, submitted_by, created_at")
+      .eq("division_id", divisionId)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    const list = (rows ?? []) as Array<Omit<LibrarySlideExample, "imageUrls">>;
+    // Re-sign each image path from the `division-imagery` bucket (24h).
+    const signed = await Promise.all(
+      list.map(async (row) => {
+        const urls: string[] = [];
+        for (const p of row.image_paths ?? []) {
+          const res = await s.storage.from("division-imagery").createSignedUrl(p, 60 * 60 * 24).catch(() => ({ data: null }));
+          if (res.data?.signedUrl) urls.push(res.data.signedUrl);
+        }
+        return { ...row, imageUrls: urls };
+      }),
+    );
+    return signed;
+  });
+
+export const deleteLibrarySlideExample = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
+  .handler(async ({ data, context }) => {
+    const s = context.supabase as unknown as SbClient;
+    const { error } = await s.from("library_slide_examples").delete().eq("id", data.id);
+    if (error) throw new Error((error as { message?: string }).message ?? "Delete failed");
+    return { ok: true };
+  });
+

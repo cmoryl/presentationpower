@@ -11,6 +11,10 @@ import {
   getImportedDeckSlides,
   deleteImportedDeck,
   embedImportedDecks,
+  sendImportedSlideToLibrary,
+  listLibrarySlideExamples,
+  deleteLibrarySlideExample,
+  type LibrarySlideExample,
 } from "@/lib/imported-decks.functions";
 import {
   listDivisionImagery,
@@ -630,8 +634,11 @@ function ImportedDecksTab({ slug }: { slug: string }) {
   const getSlidesFn = useServerFn(getImportedDeckSlides);
   const deleteFn = useServerFn(deleteImportedDeck);
   const embedFn = useServerFn(embedImportedDecks);
+  const sendFn = useServerFn(sendImportedSlideToLibrary);
   const [embedding, setEmbedding] = useState<string | null>(null);
   const [embedMsg, setEmbedMsg] = useState<string | null>(null);
+  const [sendingKey, setSendingKey] = useState<string | null>(null);
+  const [sendMsg, setSendMsg] = useState<string | null>(null);
 
   const [openId, setOpenId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -800,7 +807,14 @@ function ImportedDecksTab({ slug }: { slug: string }) {
         {embedMsg && (
           <div className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-800">{embedMsg}</div>
         )}
+        {sendMsg && (
+          <div className="mt-3 rounded-lg bg-[#003FC7]/10 px-3 py-2 text-xs text-[#003FC7]">{sendMsg}</div>
+        )}
       </Section>
+
+      <LibrarySubmissionsSection slug={slug} />
+
+
 
 
       {openId && (
@@ -850,16 +864,38 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                 <div className="text-xs text-black/50">Loading…</div>
               ) : (
                 <ol className="space-y-4">
-                  {(detail.slides ?? []).map((sl) => (
+                  {(detail.slides ?? []).map((sl) => {
+                    const key = `${openId}:${sl.index}`;
+                    return (
                     <li key={sl.index} className="rounded-xl border border-black/10 bg-white p-3">
                       <div className="mb-1 flex items-baseline gap-2">
                         <span className="font-mono text-[10px] text-black/40">#{sl.index + 1}</span>
                         <span className="text-sm font-medium text-black">{sl.title}</span>
                         {sl.imageCount > 0 && (
-                          <span className="ml-auto text-[10px] text-black/40">
-                            {sl.imageCount} image{sl.imageCount === 1 ? "" : "s"}
+                          <span className="text-[10px] text-black/40">
+                            · {sl.imageCount} image{sl.imageCount === 1 ? "" : "s"}
                           </span>
                         )}
+                        <button
+                          type="button"
+                          disabled={sendingKey === key}
+                          onClick={async () => {
+                            if (!openId) return;
+                            setSendingKey(key);
+                            setSendMsg(null);
+                            try {
+                              await sendFn({ data: { importedDeckId: openId, slideIndex: sl.index } });
+                              setSendMsg(`Sent slide ${sl.index + 1} to the ${slug} library.`);
+                            } catch (e) {
+                              setSendMsg(`Send failed: ${e instanceof Error ? e.message : "unknown"}`);
+                            } finally {
+                              setSendingKey(null);
+                            }
+                          }}
+                          className="ml-auto shrink-0 rounded-full border border-[#003FC7]/40 px-2 py-0.5 text-[10px] text-[#003FC7] hover:border-[#003FC7] disabled:opacity-50"
+                        >
+                          {sendingKey === key ? "Sending…" : "Send to library"}
+                        </button>
                       </div>
                       {sl.bullets.length > 0 && (
                         <ul className="ml-4 list-disc space-y-0.5 text-xs text-black/70">
@@ -874,7 +910,8 @@ function ImportedDecksTab({ slug }: { slug: string }) {
                         </div>
                       )}
                     </li>
-                  ))}
+                    );
+                  })}
                 </ol>
               )}
             </div>
@@ -885,6 +922,84 @@ function ImportedDecksTab({ slug }: { slug: string }) {
     </>
   );
 }
+
+function LibrarySubmissionsSection({ slug }: { slug: string }) {
+  const listFn = useServerFn(listLibrarySlideExamples);
+  const deleteFn = useServerFn(deleteLibrarySlideExample);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const q = useQuery({
+    queryKey: ["library-slide-examples", slug, refreshKey],
+    queryFn: () => listFn({ data: { divisionId: slug } }),
+  });
+  const rows = (q.data ?? []) as LibrarySlideExample[];
+
+  async function handleDelete(id: string) {
+    if (!confirm("Remove this submission from the library?")) return;
+    try {
+      await deleteFn({ data: { id } });
+      setRefreshKey((k) => k + 1);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return (
+    <Section title={`Library submissions (${rows.length})`}>
+      <p className="mb-3 text-xs text-black/60">
+        Slides teammates have sent to the <span className="font-medium">{slug}</span> approved-variants library. Each one keeps its extracted imagery so it stays visually intact.
+      </p>
+      {q.isLoading ? (
+        <div className="text-xs text-black/50">Loading…</div>
+      ) : rows.length === 0 ? (
+        <div className="text-xs text-black/50">No slides sent yet. Use “Send to library” on any slide in an imported deck above.</div>
+      ) : (
+        <ul className="grid gap-3 sm:grid-cols-2">
+          {rows.map((r) => (
+            <li key={r.id} className="rounded-xl border border-black/10 bg-white p-3">
+              <div className="flex items-baseline justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium text-black">{r.title || `Slide ${r.slide_index + 1}`}</div>
+                  <div className="mt-0.5 text-[10px] text-black/40">
+                    #{r.slide_index + 1} · {new Date(r.created_at).toLocaleDateString()}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleDelete(r.id)}
+                  className="shrink-0 rounded-full border border-red-200 px-2 py-0.5 text-[10px] text-red-700 hover:border-red-500"
+                >
+                  Remove
+                </button>
+              </div>
+              {r.imageUrls.length > 0 && (
+                <div className="mt-2 grid grid-cols-3 gap-1.5">
+                  {r.imageUrls.slice(0, 6).map((u, i) => (
+                    <img
+                      key={i}
+                      src={u}
+                      alt=""
+                      className="aspect-[4/3] w-full rounded-md object-cover"
+                      loading="lazy"
+                    />
+                  ))}
+                </div>
+              )}
+              {r.bullets.length > 0 && (
+                <ul className="mt-2 ml-4 list-disc space-y-0.5 text-xs text-black/70">
+                  {r.bullets.slice(0, 5).map((b, i) => (
+                    <li key={i}>{b}</li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </Section>
+  );
+}
+
+
 
 // ─────────────────────────────────────────────────────────────────────────
 // Division Imagery Tab — upload, tag, and manage per-division photography /
