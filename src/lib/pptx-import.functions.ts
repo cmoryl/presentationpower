@@ -1559,6 +1559,8 @@ function extractSlideLayout(
     attributeNamePrefix: "@_",
     preserveOrder: true,
     trimValues: true,
+    processEntities: false,
+    htmlEntities: false,
   });
   const root = orderParser.parse(xml) as PNode[];
   const sld = root.find((n) => pTag(n) === "p:sld");
