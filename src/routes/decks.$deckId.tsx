@@ -892,6 +892,70 @@ function AddSlideMenu({ onAdd }: { onAdd: (sectionId: string) => void }) {
   );
 }
 
+function VideoExamplesPicker({
+  brand,
+  onInsert,
+}: {
+  brand: ReturnType<typeof resolveBrandMode>;
+  onInsert: (variantId: string, content: Record<string, unknown>) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-xl border border-dashed border-[#0B2A4A]/30 bg-[#0B2A4A]/[0.03] p-3">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between text-left text-xs font-medium uppercase tracking-widest text-[#0B2A4A]/80 hover:text-[#0B2A4A]"
+      >
+        <span>▶ Video examples</span>
+        <span className="rounded-full bg-[#0B2A4A]/10 px-2 py-0.5 text-[10px]">
+          {VIDEO_SLIDE_EXAMPLES.length}
+        </span>
+      </button>
+      {open && (
+        <div className="mt-3 grid grid-cols-1 gap-3">
+          {VIDEO_SLIDE_EXAMPLES.map((ex) => {
+            const mv = byId(MODULE_VARIANTS, ex.variantId);
+            if (!mv) return null;
+            const previewSlide: DeckSlide = {
+              id: `preview-${ex.key}`,
+              position: 0,
+              sectionId: "SEC-01",
+              variantId: ex.variantId,
+              layoutId: mv.permittedLayoutIds[0],
+              content: ex.content,
+              changes: [],
+            };
+            return (
+              <button
+                key={ex.key}
+                type="button"
+                onClick={() => onInsert(ex.variantId, ex.content)}
+                className="group overflow-hidden rounded-lg border border-black/10 bg-white text-left transition hover:border-[#0B2A4A]/40 hover:shadow"
+              >
+                <div className="relative aspect-[16/10] overflow-hidden bg-[#03002C]">
+                  <SlideThumbnailContext.Provider value={true}>
+                    <ScaledSlide>
+                      <VariantRenderer slide={previewSlide} variant={mv} brand={brand} pageNumber={1} />
+                    </ScaledSlide>
+                  </SlideThumbnailContext.Provider>
+                  <span className="pointer-events-none absolute right-1.5 top-1.5 rounded-full bg-black/70 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-white">
+                    ▶ Video
+                  </span>
+                </div>
+                <div className="px-2.5 py-2">
+                  <div className="truncate text-[11px] font-semibold text-black/80">{ex.title}</div>
+                  <div className="mt-0.5 line-clamp-2 text-[10px] text-black/50">{ex.blurb}</div>
+                  <div className="mt-1 font-mono text-[9px] text-black/35">{ex.variantId}</div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+
+
 function Panel({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="rounded-2xl border border-black/10 bg-white p-5">
