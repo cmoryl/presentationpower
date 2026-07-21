@@ -4,7 +4,7 @@
 // so the renderer preserves the original picture. Theme colors are surfaced
 // separately and applied at the deck level.
 
-import type { ParsedSlide, ParsedTheme } from "./pptx-import.functions";
+import type { ParsedSlide, ParsedTheme, ParsedChart, ParsedTable, ParsedDiagram } from "./pptx-import.functions";
 import { MODULE_VARIANTS, byId } from "./taxonomy";
 import type { SlideContent } from "./deck-store";
 import { variantSupportsImagery, normalizeSlideMedia } from "./variant-media";
