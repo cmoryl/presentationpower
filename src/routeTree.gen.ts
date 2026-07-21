@@ -271,24 +271,24 @@ const KnowledgeBrandGuidesSlugRoute =
     getParentRoute: () => KnowledgeRoute,
   } as any)
 const DecksDeckIdPrintRoute = DecksDeckIdPrintRouteImport.update({
-  id: '/print',
-  path: '/print',
-  getParentRoute: () => DecksDeckIdRoute,
+  id: '/decks/$deckId/print',
+  path: '/decks/$deckId/print',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DecksDeckIdPresentRoute = DecksDeckIdPresentRouteImport.update({
-  id: '/present',
-  path: '/present',
-  getParentRoute: () => DecksDeckIdRoute,
+  id: '/decks/$deckId/present',
+  path: '/decks/$deckId/present',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DecksDeckIdExportRoute = DecksDeckIdExportRouteImport.update({
-  id: '/export',
-  path: '/export',
-  getParentRoute: () => DecksDeckIdRoute,
+  id: '/decks/$deckId/export',
+  path: '/decks/$deckId/export',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DecksDeckIdDocumentRoute = DecksDeckIdDocumentRouteImport.update({
-  id: '/document',
-  path: '/document',
-  getParentRoute: () => DecksDeckIdRoute,
+  id: '/decks/$deckId/document',
+  path: '/decks/$deckId/document',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicPdfIndexProxyRoute = ApiPublicPdfIndexProxyRouteImport.update({
   id: '/api/public/pdf-index-proxy',
@@ -623,6 +623,10 @@ export interface RootRouteChildren {
   DecksIndexRoute: typeof DecksIndexRoute
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
   ApiPublicPdfIndexProxyRoute: typeof ApiPublicPdfIndexProxyRoute
+  DecksDeckIdDocumentRoute: typeof DecksDeckIdDocumentRoute
+  DecksDeckIdExportRoute: typeof DecksDeckIdExportRoute
+  DecksDeckIdPresentRoute: typeof DecksDeckIdPresentRoute
+  DecksDeckIdPrintRoute: typeof DecksDeckIdPrintRoute
   DecksDeckIdIndexRoute: typeof DecksDeckIdIndexRoute
 }
 
@@ -924,31 +928,31 @@ declare module '@tanstack/react-router' {
     }
     '/decks/$deckId/print': {
       id: '/decks/$deckId/print'
-      path: '/print'
+      path: '/decks/$deckId/print'
       fullPath: '/decks/$deckId/print'
       preLoaderRoute: typeof DecksDeckIdPrintRouteImport
-      parentRoute: typeof DecksDeckIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/decks/$deckId/present': {
       id: '/decks/$deckId/present'
-      path: '/present'
+      path: '/decks/$deckId/present'
       fullPath: '/decks/$deckId/present'
       preLoaderRoute: typeof DecksDeckIdPresentRouteImport
-      parentRoute: typeof DecksDeckIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/decks/$deckId/export': {
       id: '/decks/$deckId/export'
-      path: '/export'
+      path: '/decks/$deckId/export'
       fullPath: '/decks/$deckId/export'
       preLoaderRoute: typeof DecksDeckIdExportRouteImport
-      parentRoute: typeof DecksDeckIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/decks/$deckId/document': {
       id: '/decks/$deckId/document'
-      path: '/document'
+      path: '/decks/$deckId/document'
       fullPath: '/decks/$deckId/document'
       preLoaderRoute: typeof DecksDeckIdDocumentRouteImport
-      parentRoute: typeof DecksDeckIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/pdf-index-proxy': {
       id: '/api/public/pdf-index-proxy'
@@ -1052,18 +1056,12 @@ const rootRouteChildren: RootRouteChildren = {
   DecksIndexRoute: DecksIndexRoute,
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
   ApiPublicPdfIndexProxyRoute: ApiPublicPdfIndexProxyRoute,
+  DecksDeckIdDocumentRoute: DecksDeckIdDocumentRoute,
+  DecksDeckIdExportRoute: DecksDeckIdExportRoute,
+  DecksDeckIdPresentRoute: DecksDeckIdPresentRoute,
+  DecksDeckIdPrintRoute: DecksDeckIdPrintRoute,
   DecksDeckIdIndexRoute: DecksDeckIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
