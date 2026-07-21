@@ -598,10 +598,20 @@ function DeckEditor() {
               <div className="mt-1 text-xs text-black/50">{brief.industry} · {brief.audience}</div>
             </Panel>
           )}
-          {active && (mv?.id === "MV-PROOF-LOGOS" || mv?.id === "MV-CASE-LOGO-GRID") && (
+          {active && mv && [
+            "MV-PROOF-LOGOS",
+            "MV-CASE-LOGO-GRID",
+            "MV-LOGO-WALL",
+            "MV-CLIENT-MATRIX",
+            "MV-CLIENT-DETAIL-3",
+            "MV-CLIENT-COMPARE",
+          ].includes(mv.id) && (
             <LogoGridItemsPanel
               items={Array.isArray((active.content as Record<string, unknown>).items) ? ((active.content as Record<string, unknown>).items as Array<Record<string, unknown>>) : []}
               onChange={(items) => updateField(deck.id, active.id, "items", items)}
+              nameField={
+                mv.id === "MV-PROOF-LOGOS" || mv.id === "MV-LOGO-WALL" ? "name" : "client"
+              }
             />
           )}
           <ClientLogoPanel
@@ -1024,9 +1034,11 @@ type LogoItem = Record<string, unknown>;
 function LogoGridItemsPanel({
   items,
   onChange,
+  nameField = "name",
 }: {
   items: LogoItem[];
   onChange: (items: LogoItem[]) => void;
+  nameField?: "name" | "client";
 }) {
   const listFn = useServerFn(listClientLogos);
   const [pickIdx, setPickIdx] = useState<number | null>(null);
@@ -1058,7 +1070,7 @@ function LogoGridItemsPanel({
     const next = items.map((it, k) => (k === i ? { ...it, ...patch } : it));
     onChange(next);
   };
-  const addItem = () => onChange([...items, { name: "New client" }]);
+  const addItem = () => onChange([...items, { [nameField]: "New client" }]);
   const removeItem = (i: number) => onChange(items.filter((_, k) => k !== i));
 
   return (
@@ -1103,7 +1115,7 @@ function LogoGridItemsPanel({
                 </div>
                 <input
                   value={name}
-                  onChange={(e) => update(i, { name: e.target.value })}
+                  onChange={(e) => update(i, { [nameField]: e.target.value })}
                   placeholder="Client name"
                   className="min-w-0 flex-1 rounded-md border border-black/10 bg-white px-2 py-1 text-sm"
                 />
@@ -1210,12 +1222,18 @@ function LogoGridItemsPanel({
                         dark: r.darkUrl ?? null,
                         mono: r.monoUrl ?? null,
                       };
-                      update(pickIdx, {
-                        name: r.client_name,
+                      // Only fill the name field if empty — preserve any existing
+                      // client name the author has already customized.
+                      const existing = items[pickIdx] ?? {};
+                      const currentName =
+                        typeof existing[nameField] === "string" ? (existing[nameField] as string) : "";
+                      const patch: Record<string, unknown> = {
                         logoUrl: r.primaryUrl,
                         logoVariant: "primary",
                         logoVariants,
-                      });
+                      };
+                      if (!currentName.trim()) patch[nameField] = r.client_name;
+                      update(pickIdx, patch);
                       setPickIdx(null);
                     }}
                     className="group rounded-xl border border-black/10 bg-white p-3 text-left transition hover:border-[#003FC7]/40 hover:shadow"
