@@ -307,44 +307,44 @@ function DeckEditor() {
               {liveEdit ? "● Live edit on" : "✎ Live edit"}
             </button>
           </div>
-          {(() => {
-            const StageTag: "button" | "div" = liveEdit ? "div" : "button";
-            const stageProps = liveEdit
-              ? { className: "relative block w-full overflow-hidden rounded-2xl border border-[#003FC7]/40 shadow-lg ring-1 ring-[#003FC7]/20" }
-              : {
-                  type: "button" as const,
-                  onClick: () => setZoomed(true),
-                  title: "Click to view larger",
-                  "aria-label": "View slide larger",
-                  className:
-                    "group relative block w-full overflow-hidden rounded-2xl border border-black/10 shadow-lg transition hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B2A4A]",
-                };
-            return (
-              // @ts-expect-error dynamic tag
-              <StageTag {...stageProps}>
-            {active && mv && (
-              <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
-                <ScaledSlide>
-                  <LiveEditOverlay
-                    enabled={liveEdit}
-                    slideId={active.id}
-                    content={active.content as Record<string, unknown>}
-                    editableFields={mv.editableFields}
-                    onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
-                  >
+          {liveEdit ? (
+            <div className="relative block w-full overflow-hidden rounded-2xl border border-[#003FC7]/40 shadow-lg ring-1 ring-[#003FC7]/20">
+              {active && mv && (
+                <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
+                  <ScaledSlide>
+                    <LiveEditOverlay
+                      enabled={liveEdit}
+                      slideId={active.id}
+                      content={active.content as Record<string, unknown>}
+                      editableFields={mv.editableFields}
+                      onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
+                    >
+                      <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
+                    </LiveEditOverlay>
+                  </ScaledSlide>
+                </SlideVideoPreviewContext.Provider>
+              )}
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setZoomed(true)}
+              title="Click to view larger"
+              aria-label="View slide larger"
+              className="group relative block w-full overflow-hidden rounded-2xl border border-black/10 shadow-lg transition hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B2A4A]"
+            >
+              {active && mv && (
+                <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
+                  <ScaledSlide>
                     <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
-                  </LiveEditOverlay>
-                </ScaledSlide>
-              </SlideVideoPreviewContext.Provider>
-            )}
-            {!liveEdit && (
+                  </ScaledSlide>
+                </SlideVideoPreviewContext.Provider>
+              )}
               <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100">
                 ⤢ Enlarge
               </span>
-            )}
-              </StageTag>
-            );
-          })()}
+            </button>
+          )}
           {liveEdit && (
             <p className="mt-2 text-[11px] text-black/50">
               Click any highlighted text on the slide to edit it. <kbd className="rounded border border-black/15 bg-white px-1 text-[10px]">Enter</kbd> saves · <kbd className="rounded border border-black/15 bg-white px-1 text-[10px]">Esc</kbd> cancels. Fields that appear more than once, or are locked by the module, still edit through the panel below.
