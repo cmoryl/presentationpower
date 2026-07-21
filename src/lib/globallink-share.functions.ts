@@ -252,7 +252,7 @@ const uploadSchema = z.object({
   fileName: z.string().min(1).max(255),
   contentBase64: z.string().min(1).max(MAX_BASE64_BYTES),
   mimeType: z.string().min(1).max(200),
-  deckId: z.string().uuid().nullable().optional(),
+  deckId: z.string().max(64).nullable().optional(),
   deckTitle: z.string().max(300).nullable().optional(),
 });
 
