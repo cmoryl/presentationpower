@@ -62,9 +62,11 @@ export function overlayLogoHubFillers(
   switch (variantId) {
     case "MV-PROOF-LOGOS":
     case "MV-CASE-LOGO-GRID":
+    case "MV-LOGO-WALL":
     case "MV-PROOF-LOGOS-STRIP":
     case "MV-PROOF-LOGOS-MARQUEE":
     case "MV-PROOF-LOGOS-MOSAIC": {
+
       const n = Math.max(items.length, 1);
       const picks = pickN(pool, n, variantId);
       return {

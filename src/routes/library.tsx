@@ -751,7 +751,7 @@ const VariantCard = memo(function VariantCard({
   const previewContent = useMemo(() => {
     if (videoExample) return rawContent;
     if (!logoHubPool || logoHubPool.length === 0) return rawContent;
-    if (!/^MV-(PROOF-LOGOS|CASE-LOGO-GRID)/.test(variant.id)) return rawContent;
+    if (!/^MV-(PROOF-LOGOS|CASE-LOGO-GRID|LOGO-WALL)/.test(variant.id)) return rawContent;
     return overlayLogoHubFillers(rawContent, variant.id, logoHubPool);
   }, [rawContent, videoExample, logoHubPool, variant.id]);
   const previewSlide = {
@@ -1089,7 +1089,7 @@ function VariantDetailModal({
   const detailContent = useMemo(() => {
     const raw = seedDivisionContent(variant.id, brief, sections[0]?.name ?? "Preview section", brand) as Record<string, unknown>;
     if (!logoHubPool || logoHubPool.length === 0) return raw;
-    if (!/^MV-(PROOF-LOGOS|CASE-LOGO-GRID)/.test(variant.id)) return raw;
+    if (!/^MV-(PROOF-LOGOS|CASE-LOGO-GRID|LOGO-WALL)/.test(variant.id)) return raw;
     return overlayLogoHubFillers(raw, variant.id, logoHubPool);
   }, [variant.id, brief, sections, brand, logoHubPool]);
   const previewSlide = {
