@@ -202,6 +202,7 @@ function DocumentView() {
         ))}
       </div>
     </div>
+    </SlideMediaRefreshProvider>
   );
 }
 
