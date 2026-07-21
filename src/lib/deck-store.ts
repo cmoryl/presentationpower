@@ -190,6 +190,12 @@ type DeckState = {
   removeSlide: (deckId: string, slideId: string) => void;
   addSlide: (deckId: string, sectionId: string, afterSlideId?: string) => void;
   insertVariantSlide: (deckId: string, variantId: string) => { slideId: string } | null;
+  insertExampleSlide: (
+    deckId: string,
+    variantId: string,
+    content: Record<string, unknown>,
+    afterSlideId?: string,
+  ) => { slideId: string } | null;
   duplicateSlide: (deckId: string, slideId: string) => void;
   renameDeck: (deckId: string, title: string) => void;
   setDeckClientLogo: (deckId: string, logo: DeckClientLogo | null) => void;
