@@ -251,6 +251,9 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
     for (const sl of r.slides ?? []) {
       for (const p of sl.imagePaths ?? []) allPaths.add(p);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const bg = (sl.layout as any)?.background;
+      if (bg?.kind === "image" && typeof bg.path === "string") allPaths.add(bg.path);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       for (const sh of (sl.layout?.shapes ?? []) as any[]) {
         if (sh?.kind === "image" && typeof sh.path === "string") allPaths.add(sh.path);
         if (sh?.fill?.kind === "image" && typeof sh.fill.path === "string") allPaths.add(sh.fill.path);
@@ -267,19 +270,27 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
       const imageUrls = (sl.imagePaths ?? []).map((p) => pathToUrl.get(p)).filter((u): u is string => Boolean(u));
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const shapes = sl.layout?.shapes?.map((sh: any) => {
+        let next = sh;
         if (sh?.kind === "image" && sh.path) {
           const url = pathToUrl.get(sh.path);
-          return url ? { ...sh, url } : sh;
+          if (url) next = { ...next, url };
         }
         if (sh?.fill?.kind === "image" && sh.fill.path) {
           const url = pathToUrl.get(sh.fill.path);
-          return url ? { ...sh, fill: { ...sh.fill, url } } : sh;
+          if (url) next = { ...next, fill: { ...sh.fill, url } };
         }
-        return sh;
+        return next;
       });
-      const layout = sl.layout ? { ...sl.layout, shapes } : undefined;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let background: any = (sl.layout as any)?.background;
+      if (background?.kind === "image" && background.path) {
+        const url = pathToUrl.get(background.path);
+        if (url) background = { ...background, url };
+      }
+      const layout = sl.layout ? { ...sl.layout, shapes, background } : undefined;
       return { ...sl, imageUrls, layout };
     });
+
 
     return {
       id: r.id,
