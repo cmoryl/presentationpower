@@ -1278,6 +1278,12 @@ function LogoGridItemsPanel({
                         dark: r.darkUrl ?? null,
                         mono: r.monoUrl ?? null,
                       };
+                      const logoPaths = {
+                        primary: r.primary_path ?? null,
+                        light: r.light_path ?? null,
+                        dark: r.dark_path ?? null,
+                        mono: r.mono_path ?? null,
+                      };
                       // Only fill the name field if empty — preserve any existing
                       // client name the author has already customized.
                       const existing = items[pickIdx] ?? {};
@@ -1287,6 +1293,8 @@ function LogoGridItemsPanel({
                         logoUrl: r.primaryUrl,
                         logoVariant: "primary",
                         logoVariants,
+                        logoPath: r.primary_path ?? "",
+                        logoPaths,
                       };
                       if (!currentName.trim()) patch[nameField] = r.client_name;
                       update(pickIdx, patch);
