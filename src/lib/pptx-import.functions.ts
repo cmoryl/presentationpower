@@ -1440,7 +1440,24 @@ function walkSpTree(
       const blipFill = pFind(node, "p:blipFill");
       const blip = blipFill ? pFind(blipFill, "a:blip") : undefined;
       const embedId = blip ? (pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"]) : undefined;
-      out.push({ kind: "image", z: zRef.z++, frame, embedId, line: readLine(spPr) });
+      const srcRect = readSrcRect(blipFill);
+      // Geometry mask (roundRect / ellipse / triangle / hexagon / etc.)
+      const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
+      const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
+      // Blip-level opacity via a:alphaModFix
+      let opacity: number | undefined;
+      if (blip) {
+        const alphaMod = pFind(blip, "a:alphaModFix");
+        if (alphaMod) {
+          const v = pAttrs(alphaMod)["@_amt"];
+          if (v) {
+            const n = Number(v) / 100000;
+            if (isFinite(n) && n >= 0 && n <= 1) opacity = n;
+          }
+        }
+      }
+      out.push({ kind: "image", z: zRef.z++, frame, embedId, line: readLine(spPr), srcRect, prst, opacity });
+
     } else if (t === "p:cxnSp") {
       const spPr = pFind(node, "p:spPr");
       let frame = readFrame(spPr);
