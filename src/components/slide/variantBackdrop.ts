@@ -46,6 +46,11 @@ export function pickCorporateDarkBackdrop(variantId: string): string {
   return CORPORATE_DARK_BACKDROPS[hashStr(variantId) % CORPORATE_DARK_BACKDROPS.length];
 }
 
+/** Returns the deterministic TP Media dark backdrop URL for a variant id. */
+export function pickTpMediaDarkBackdrop(variantId: string): string {
+  return TP_MEDIA_DARK_BACKDROPS[hashStr(variantId) % TP_MEDIA_DARK_BACKDROPS.length];
+}
+
 function hashStr(s: string): number {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
