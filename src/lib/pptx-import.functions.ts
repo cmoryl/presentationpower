@@ -227,6 +227,7 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
   });
 
   const theme = await extractTheme(zip, parser);
+  const slideSize = await extractSlideSize(zip, parser);
 
   const slideFiles = Object.keys(zip.files)
     .filter((f) => /^ppt\/slides\/slide\d+\.xml$/.test(f))
