@@ -74,11 +74,27 @@ export type DiagramLayoutHint =
   | "radial"
   | "funnel"
   | "list";
+export type ConnectorStyle = {
+  /** Stroke color resolved through theme (hex, e.g. "#003FC7"). */
+  color?: string;
+  /** Line width in points (EMU / 12700). */
+  widthPt?: number;
+  /** DrawingML preset dash value: solid, dash, dashDot, sysDash, dot, etc. */
+  dashStyle?: string;
+  /** Head arrowhead type: triangle, stealth, arrow, oval, diamond, none. */
+  headArrow?: string;
+  /** Tail arrowhead type. */
+  tailArrow?: string;
+};
 export type ParsedDiagram = {
   kind: "smartart" | "shape-group";
   nodes: ParsedDiagramNode[];
   /** Layout family inferred from SmartArt layoutDef or shape geometry. */
   layoutHint?: DiagramLayoutHint;
+  /** Every connector line style discovered in the diagram, in reading order. */
+  connectors?: ConnectorStyle[];
+  /** Dominant/aggregated connector style — used by renderers/exporters. */
+  connectorStyle?: ConnectorStyle;
 };
 
 export type ParsedSlide = {
@@ -259,6 +275,7 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     const diagrams: ParsedDiagram[] = [];
     const layoutTargets = Object.values(relTargetsByType.diagramLayout);
     const dataTargets = Object.values(relTargetsByType.diagramData);
+    const drawingTargets = Object.values(relTargetsByType.diagramDrawing);
     for (let di = 0; di < dataTargets.length; di++) {
       const target = dataTargets[di];
       const resolved = resolveRelPath(slidePath, target);
@@ -285,7 +302,40 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         }
         // Fall back to inferring from node hierarchy if no layout hint.
         if (!layoutHint && nodes.some((n) => n.level > 0)) layoutHint = "hierarchy";
-        diagrams.push({ kind: "smartart", nodes, layoutHint });
+        // Pull connector styles from the paired diagramDrawing (dsp:cxnSp) —
+        // this is where the fully-rendered SmartArt geometry lives (color,
+        // stroke width, dash, arrowheads). Preserve them so downstream
+        // journey/funnel/pillar renderers can honor the original look.
+        let connectors: ConnectorStyle[] = [];
+        const drawingTarget = drawingTargets[di];
+        if (drawingTarget) {
+          const drawingPath = resolveRelPath(slidePath, drawingTarget);
+          const drawingEntry = zip.files[drawingPath];
+          if (drawingEntry) {
+            try {
+              const xml = await drawingEntry.async("string");
+              const drawDoc = parser.parse(xml);
+              walk(drawDoc, (value, key) => {
+                if (key !== "dsp:cxnSp" && key !== "cxnSp") return;
+                const arr = Array.isArray(value) ? value : [value];
+                for (const c of arr) {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const spPr = (c as any)?.["dsp:spPr"] ?? (c as any)?.["spPr"] ?? (c as any)?.["p:spPr"];
+                  const st = readConnectorStyle(spPr, theme);
+                  if (st) connectors.push(st);
+                }
+              });
+            } catch { /* ignore malformed drawing */ }
+          }
+        }
+        const connectorStyle = aggregateConnectorStyle(connectors);
+        diagrams.push({
+          kind: "smartart",
+          nodes,
+          layoutHint,
+          connectors: connectors.length ? connectors : undefined,
+          connectorStyle,
+        });
       } catch { /* skip */ }
     }
     // Grouped custom shapes → lightweight diagram fallback (only when there
@@ -394,10 +444,11 @@ type RelBuckets = {
   chart: Record<string, string>;
   diagramData: Record<string, string>;
   diagramLayout: Record<string, string>;
+  diagramDrawing: Record<string, string>;
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function extractRelTargetsByType(relsDoc: any): RelBuckets {
-  const out: RelBuckets = { image: {}, chart: {}, diagramData: {}, diagramLayout: {} };
+  const out: RelBuckets = { image: {}, chart: {}, diagramData: {}, diagramLayout: {}, diagramDrawing: {} };
   if (!relsDoc) return out;
   const rels = relsDoc?.Relationships?.Relationship;
   const arr = Array.isArray(rels) ? rels : rels ? [rels] : [];
@@ -410,6 +461,7 @@ function extractRelTargetsByType(relsDoc: any): RelBuckets {
     else if (/\/chart$/i.test(type)) out.chart[id] = target;
     else if (/\/diagramData$/i.test(type)) out.diagramData[id] = target;
     else if (/\/diagramLayout$/i.test(type)) out.diagramLayout[id] = target;
+    else if (/\/diagramDrawing$/i.test(type)) out.diagramDrawing[id] = target;
   }
   return out;
 }
@@ -583,6 +635,52 @@ function readAxisTitles(plotArea: any): ParsedChart["axis"] {
   const valTitle = readChartTitle(plotArea?.["c:valAx"]?.["c:title"]);
   if (!catTitle && !valTitle) return undefined;
   return { category: catTitle, value: valTitle };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function readConnectorStyle(spPr: any, theme: ParsedTheme): ConnectorStyle | undefined {
+  const ln = spPr?.["a:ln"];
+  if (!ln) return undefined;
+  const style: ConnectorStyle = {};
+  const color = readFillColor(ln?.["a:solidFill"], theme)
+    ?? readFillColor(ln?.["a:gradFill"]?.["a:gsLst"]?.["a:gs"]?.[0], theme);
+  if (color) style.color = color;
+  const w = Number(ln?.["@_w"]);
+  if (Number.isFinite(w) && w > 0) style.widthPt = Math.round((w / 12700) * 100) / 100;
+  const dash = ln?.["a:prstDash"]?.["@_val"];
+  if (typeof dash === "string") style.dashStyle = dash;
+  const head = ln?.["a:headEnd"]?.["@_type"];
+  if (typeof head === "string") style.headArrow = head;
+  const tail = ln?.["a:tailEnd"]?.["@_type"];
+  if (typeof tail === "string") style.tailArrow = tail;
+  return Object.keys(style).length ? style : undefined;
+}
+
+function aggregateConnectorStyle(list: ConnectorStyle[]): ConnectorStyle | undefined {
+  if (!list.length) return undefined;
+  const tally = <K extends keyof ConnectorStyle>(k: K): ConnectorStyle[K] | undefined => {
+    const counts = new Map<string, number>();
+    for (const c of list) {
+      const v = c[k];
+      if (v === undefined || v === null) continue;
+      const key = String(v);
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    let best: string | undefined; let n = 0;
+    for (const [k2, v] of counts) if (v > n) { best = k2; n = v; }
+    if (best === undefined) return undefined;
+    return (k === "widthPt" ? Number(best) : best) as ConnectorStyle[K];
+  };
+  const out: ConnectorStyle = {
+    color: tally("color") as string | undefined,
+    widthPt: tally("widthPt") as number | undefined,
+    dashStyle: tally("dashStyle") as string | undefined,
+    headArrow: tally("headArrow") as string | undefined,
+    tailArrow: tally("tailArrow") as string | undefined,
+  };
+  // Strip undefined
+  for (const k of Object.keys(out) as (keyof ConnectorStyle)[]) if (out[k] === undefined) delete out[k];
+  return Object.keys(out).length ? out : undefined;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -803,12 +901,21 @@ function extractGroupShapeDiagram(doc: unknown, theme: ParsedTheme): ParsedDiagr
     nodes.push({ text: cap(text, 200), level: 0, color });
   }
   // Detect connector shapes (p:cxnSp) inside the same group — a strong hint
-  // for hierarchies (org charts) and processes.
-  const cxns = bestGroup?.["p:cxnSp"];
-  if (cxns) hasConnector = true;
+  // for hierarchies (org charts) and processes. We also collect each connector's
+  // line style so downstream variants can honor original color/weight/arrowheads.
+  const cxnsRaw = bestGroup?.["p:cxnSp"];
+  const cxnArr = Array.isArray(cxnsRaw) ? cxnsRaw : cxnsRaw ? [cxnsRaw] : [];
+  if (cxnArr.length) hasConnector = true;
+  const connectors: ConnectorStyle[] = [];
+  for (const c of cxnArr) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const st = readConnectorStyle((c as any)?.["p:spPr"], theme);
+    if (st) connectors.push(st);
+  }
   if (nodes.length < 2) return null;
   const layoutHint = inferShapeGroupLayoutHint(prstTally, hasConnector);
-  return { kind: "shape-group", nodes, layoutHint };
+  const connectorStyle = aggregateConnectorStyle(connectors);
+  return { kind: "shape-group", nodes, layoutHint, connectors: connectors.length ? connectors : undefined, connectorStyle };
 }
 
 /**

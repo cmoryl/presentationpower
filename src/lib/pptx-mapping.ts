@@ -493,6 +493,8 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
     layoutHint: d.layoutHint,
     palette,
     nodeColors: nodes.map((node) => node.color ?? null),
+    connectorStyle: d.connectorStyle,
+    connectors: d.connectors,
   } as Record<string, unknown>;
   const withSource = <T extends object>(content: T) =>
     ({ ...content, _source: source } as unknown as SlideContent);
