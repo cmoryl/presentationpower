@@ -414,3 +414,21 @@
 
 
 
+
+/* Live edit overlay — click-to-edit fields on the deck preview. */
+.live-edit-active [data-live-path] {
+  outline: 1.5px dashed rgba(0, 63, 199, 0.55);
+  outline-offset: 3px;
+  border-radius: 4px;
+  cursor: text;
+  transition: outline-color 120ms ease, background-color 120ms ease;
+}
+.live-edit-active [data-live-path]:hover {
+  outline-color: rgba(0, 63, 199, 0.95);
+  background-color: rgba(0, 63, 199, 0.06);
+}
+.live-edit-active [data-live-path]:focus {
+  outline: 2px solid #003FC7;
+  outline-offset: 3px;
+  background-color: rgba(0, 63, 199, 0.09);
+}
