@@ -2,6 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Download, Loader2, Star, Copy, Check, Plus, Play } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -26,6 +28,9 @@ import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { MODULE_PRESET_KITS, validateKit } from "@/lib/module-preset-kits";
 import { formatKitValidationError } from "@/lib/kit-validation";
 import { VIDEO_SLIDE_EXAMPLES, type VideoSlideExample } from "@/lib/video-slide-examples";
+import { listClientLogos } from "@/lib/client-logos.functions";
+import { toLogoFillers, overlayLogoHubFillers, type LogoFiller } from "@/lib/logohub-fillers";
+
 
 // ─── Pinned variants (per-user, local) ──────────────────────────────────────
 const PINS_KEY = "library.pinnedVariants.v1";
@@ -112,6 +117,22 @@ function Library() {
   const [brandIdx, setBrandIdx] = useState(tpMasterIdx);
 
   const { pins, toggle: togglePin } = usePins();
+
+  // LogoHub filler pool — used to replace built-in APPROVED_LOGOS fillers on
+  // every MV-PROOF-LOGOS-* card so previews reflect the real client roster.
+  // Falls back gracefully when the user isn't signed in or LogoHub is empty.
+  const listLogosFn = useServerFn(listClientLogos);
+  const logoHubQuery = useQuery({
+    queryKey: ["logohub", "fillers"],
+    queryFn: () => listLogosFn(),
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+  const logoHubPool = useMemo<LogoFiller[]>(
+    () => toLogoFillers(logoHubQuery.data),
+    [logoHubQuery.data],
+  );
+
 
   // Usage counts across the local deck store — cheap, client-only.
   const decks = useDeckStore((s) => s.decks);
@@ -598,6 +619,7 @@ function Library() {
               mode={mode}
               showImagery={showImagery}
               autoFixOn={autoFixOn}
+              logoHubPool={logoHubPool}
               onOpen={() =>
                 isVideo ? setVideoZoomKey(entry.example.key) : setOpenId(v.id)
               }
@@ -605,6 +627,7 @@ function Library() {
               onImportExample={isVideo ? () => importVideoExample(entry.example) : undefined}
               importBusy={isVideo && videoBusy === entry.example.key}
             />
+
           );
         })}
       </div>
@@ -640,6 +663,8 @@ function Library() {
           onTogglePin={() => togglePin(active.id)}
           usageCount={usageByVariant.get(active.id) ?? 0}
           onClose={() => setOpenId(null)}
+          logoHubPool={logoHubPool}
+
         />
       )}
 
@@ -694,6 +719,7 @@ const VariantCard = memo(function VariantCard({
   videoExample,
   onImportExample,
   importBusy = false,
+  logoHubPool,
 }: {
   variant: ModuleVariant;
   familyName?: string;
@@ -714,17 +740,28 @@ const VariantCard = memo(function VariantCard({
   videoExample?: VideoSlideExample;
   onImportExample?: () => void;
   importBusy?: boolean;
+  /** LogoHub filler pool; when non-empty, MV-PROOF-LOGOS-* variants swap
+   *  their filler logos for real LogoHub rows. */
+  logoHubPool?: LogoFiller[];
 }) {
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
+  const rawContent = videoExample
+    ? (videoExample.content as Record<string, unknown>)
+    : (seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<string, unknown>);
+  const previewContent = useMemo(() => {
+    if (videoExample) return rawContent;
+    if (!logoHubPool || logoHubPool.length === 0) return rawContent;
+    if (!/^MV-(PROOF-LOGOS|CASE-LOGO-GRID)/.test(variant.id)) return rawContent;
+    return overlayLogoHubFillers(rawContent, variant.id, logoHubPool);
+  }, [rawContent, videoExample, logoHubPool, variant.id]);
   const previewSlide = {
     id: videoExample ? `${variant.id}:video:${videoExample.key}` : variant.id,
     position: 0,
     sectionId,
     variantId: variant.id,
     layoutId: variant.permittedLayoutIds[0],
-    content: (videoExample
-      ? (videoExample.content as Record<string, unknown>)
-      : (seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<string, unknown>)),
+    content: previewContent,
+
     changes: [],
   };
   const isDark = mode === "dark";
@@ -1009,6 +1046,7 @@ function VariantDetailModal({
   onTogglePin,
   usageCount,
   onClose,
+  logoHubPool,
 }: {
   variant: ModuleVariant;
   brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
@@ -1027,6 +1065,7 @@ function VariantDetailModal({
   onTogglePin: () => void;
   usageCount: number;
   onClose: () => void;
+  logoHubPool?: LogoFiller[];
 }) {
   const [copied, setCopied] = useState(false);
   const copyId = async () => {
@@ -1047,15 +1086,22 @@ function VariantDetailModal({
   }, [onClose]);
 
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
+  const detailContent = useMemo(() => {
+    const raw = seedDivisionContent(variant.id, brief, sections[0]?.name ?? "Preview section", brand) as Record<string, unknown>;
+    if (!logoHubPool || logoHubPool.length === 0) return raw;
+    if (!/^MV-(PROOF-LOGOS|CASE-LOGO-GRID)/.test(variant.id)) return raw;
+    return overlayLogoHubFillers(raw, variant.id, logoHubPool);
+  }, [variant.id, brief, sections, brand, logoHubPool]);
   const previewSlide = {
     id: variant.id,
     position: 0,
     sectionId: sections[0]?.id ?? "",
     variantId: variant.id,
     layoutId: variant.permittedLayoutIds[0],
-    content: seedDivisionContent(variant.id, brief, sections[0]?.name ?? "Preview section", brand) as Record<string, unknown>,
+    content: detailContent,
     changes: [],
   };
+
 
   return (
     <div
