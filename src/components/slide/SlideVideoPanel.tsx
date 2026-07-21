@@ -29,7 +29,12 @@ export function SlideVideoPanel({
 }: {
   videoUrl?: string;
   posterUrl?: string;
-  onChange: (next: { videoUrl: string | null; videoPosterUrl?: string | null }) => void;
+  onChange: (next: {
+    videoUrl: string | null;
+    videoPath?: string | null;
+    videoPosterUrl?: string | null;
+    videoPosterPath?: string | null;
+  }) => void;
 }) {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
@@ -81,16 +86,23 @@ export function SlideVideoPanel({
       // Capture poster BEFORE uploading — file is still on disk, faster.
       const posterDataUrl = await captureVideoPoster(file).catch(() => null);
       const uploaded = await uploadSlideVideo(file);
-      let posterFinal: string | null = null;
+      let posterFinalUrl: string | null = null;
+      let posterFinalPath: string | null = null;
       if (posterDataUrl) {
         try {
           const stored = await uploadDataUrl(posterDataUrl, `${file.name.replace(/\.[^.]+$/, "")}-poster.png`);
-          posterFinal = stored.signedUrl;
+          posterFinalUrl = stored.signedUrl;
+          posterFinalPath = stored.path;
         } catch {
           // Poster capture is best-effort — video still uploads.
         }
       }
-      onChange({ videoUrl: uploaded.signedUrl, videoPosterUrl: posterFinal ?? undefined });
+      onChange({
+        videoUrl: uploaded.signedUrl,
+        videoPath: uploaded.path,
+        videoPosterUrl: posterFinalUrl ?? undefined,
+        videoPosterPath: posterFinalPath ?? undefined,
+      });
       if (libQ.data) void libQ.refetch();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed.");
@@ -112,7 +124,7 @@ export function SlideVideoPanel({
     setBusy(true);
     try {
       const up = await uploadSlideMedia(file);
-      onChange({ videoUrl: videoUrl ?? null, videoPosterUrl: up.signedUrl });
+      onChange({ videoUrl: videoUrl ?? null, videoPosterUrl: up.signedUrl, videoPosterPath: up.path });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Poster upload failed.");
     } finally {
@@ -128,7 +140,9 @@ export function SlideVideoPanel({
       return;
     }
     setError(null);
-    onChange({ videoUrl: v });
+    // Pasted external URL: no path — clear any prior storage-path so refresh
+    // doesn't overwrite the pasted URL with a stale re-sign.
+    onChange({ videoUrl: v, videoPath: null });
     setUrlDraft("");
   }
 
@@ -141,7 +155,7 @@ export function SlideVideoPanel({
         {hasVideo && (
           <button
             type="button"
-            onClick={() => onChange({ videoUrl: null, videoPosterUrl: null })}
+            onClick={() => onChange({ videoUrl: null, videoPath: null, videoPosterUrl: null, videoPosterPath: null })}
             className="rounded-full border border-black/15 px-2.5 py-0.5 text-[11px] uppercase tracking-widest hover:bg-black/5"
           >
             Remove
@@ -262,7 +276,7 @@ export function SlideVideoPanel({
               {posterUrl && (
                 <button
                   type="button"
-                  onClick={() => onChange({ videoUrl: videoUrl ?? null, videoPosterUrl: null })}
+                  onClick={() => onChange({ videoUrl: videoUrl ?? null, videoPosterUrl: null, videoPosterPath: null })}
                   className="text-[11px] text-black/50 hover:text-black underline"
                 >
                   Clear poster
@@ -310,7 +324,7 @@ export function SlideVideoPanel({
                       <li key={r.path} className="flex items-center gap-2 rounded-lg border border-black/10 bg-white px-2 py-1.5">
                         <button
                           type="button"
-                          onClick={() => r.signedUrl && onChange({ videoUrl: r.signedUrl })}
+                          onClick={() => r.signedUrl && onChange({ videoUrl: r.signedUrl, videoPath: r.path })}
                           disabled={!r.signedUrl}
                           className="flex-1 truncate text-left text-[11px] text-black hover:underline"
                           title={r.name}

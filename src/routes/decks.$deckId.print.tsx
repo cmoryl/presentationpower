@@ -5,6 +5,7 @@ import { z } from "zod";
 import { useDeckStore } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { SlideMediaRefreshProvider } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { supabase } from "@/integrations/supabase/client";
@@ -84,6 +85,7 @@ function PrintView() {
   const clientLogoUrl = deck.clientLogo?.primaryUrl ?? null;
 
   return (
+    <SlideMediaRefreshProvider slides={deck.slides}>
     <div className="print-root min-h-screen bg-neutral-200 py-8 print:bg-white print:py-0" dir={isRtl ? "rtl" : undefined}>
       <style>{`
         @media print {
@@ -138,5 +140,6 @@ function PrintView() {
         })}
       </div>
     </div>
+    </SlideMediaRefreshProvider>
   );
 }

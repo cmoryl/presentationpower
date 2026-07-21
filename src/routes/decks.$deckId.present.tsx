@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDeckStore } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { SlideMediaRefreshProvider, SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { cn } from "@/lib/utils";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
@@ -106,6 +107,7 @@ function PresenterView() {
   }, [i]);
 
   return (
+    <SlideMediaRefreshProvider slides={deck.slides}>
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-black">
       <div className="w-full max-w-[95vw]">
         <div className="mx-auto aspect-[16/9] w-full">
@@ -131,6 +133,7 @@ function PresenterView() {
         )}
         aria-label="Slide thumbnails"
       >
+        <SlideThumbnailContext.Provider value={true}>
         {deck.slides.map((s, idx) => {
           const v = byId(MODULE_VARIANTS, s.variantId);
           const active = idx === i;
@@ -169,6 +172,7 @@ function PresenterView() {
             </button>
           );
         })}
+        </SlideThumbnailContext.Provider>
       </div>
 
       <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-4 rounded-full bg-white/10 px-5 py-2 text-xs text-white/80 backdrop-blur">
@@ -205,7 +209,9 @@ function PresenterView() {
               {nextSlide && nextVariant ? (
                 <div className="relative h-full w-full">
                   <div className="absolute inset-0" style={{ transform: "scale(0.125)", transformOrigin: "top left", width: 1920, height: 1080 }}>
-                    <VariantRenderer slide={nextSlide} variant={nextVariant} brand={brand} pageNumber={i + 2} clientName={brief?.prospect} />
+                    <SlideThumbnailContext.Provider value={true}>
+                      <VariantRenderer slide={nextSlide} variant={nextVariant} brand={brand} pageNumber={i + 2} clientName={brief?.prospect} />
+                    </SlideThumbnailContext.Provider>
                   </div>
                 </div>
               ) : (
@@ -221,6 +227,7 @@ function PresenterView() {
         </div>
       </div>
     </div>
+    </SlideMediaRefreshProvider>
   );
 }
 
