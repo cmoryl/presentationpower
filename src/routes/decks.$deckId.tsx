@@ -1184,7 +1184,7 @@ function LogoGridItemsPanel({
                 {logoUrl && (
                   <button
                     type="button"
-                    onClick={() => update(i, { logoUrl: "", logoVariant: "primary", logoVariants: {} })}
+                    onClick={() => update(i, { logoUrl: "", logoVariant: "primary", logoVariants: {}, logoPath: "", logoPaths: {} })}
                     className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] text-black/60 hover:border-black/30"
                   >
                     Clear
