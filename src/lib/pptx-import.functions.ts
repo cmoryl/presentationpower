@@ -239,13 +239,14 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
       try {
         const dxml = await entry.async("string");
         const ddoc = parser.parse(dxml);
-        const nodes = extractDiagramNodes(ddoc);
+        const nodes = extractDiagramNodes(ddoc, theme);
         if (nodes.length > 0) diagrams.push({ kind: "smartart", nodes });
       } catch { /* skip */ }
     }
     // Grouped custom shapes → lightweight diagram fallback (only when there
     // is a real group of shapes carrying non-title, non-bullet text).
-    const groupDiagram = extractGroupShapeDiagram(doc);
+    const groupDiagram = extractGroupShapeDiagram(doc, theme);
+
     if (groupDiagram && groupDiagram.nodes.length >= 2) diagrams.push(groupDiagram);
 
     chartTotal += charts.length;
