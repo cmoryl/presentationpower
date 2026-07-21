@@ -74,11 +74,27 @@ export type DiagramLayoutHint =
   | "radial"
   | "funnel"
   | "list";
+export type ConnectorStyle = {
+  /** Stroke color resolved through theme (hex, e.g. "#003FC7"). */
+  color?: string;
+  /** Line width in points (EMU / 12700). */
+  widthPt?: number;
+  /** DrawingML preset dash value: solid, dash, dashDot, sysDash, dot, etc. */
+  dashStyle?: string;
+  /** Head arrowhead type: triangle, stealth, arrow, oval, diamond, none. */
+  headArrow?: string;
+  /** Tail arrowhead type. */
+  tailArrow?: string;
+};
 export type ParsedDiagram = {
   kind: "smartart" | "shape-group";
   nodes: ParsedDiagramNode[];
   /** Layout family inferred from SmartArt layoutDef or shape geometry. */
   layoutHint?: DiagramLayoutHint;
+  /** Every connector line style discovered in the diagram, in reading order. */
+  connectors?: ConnectorStyle[];
+  /** Dominant/aggregated connector style — used by renderers/exporters. */
+  connectorStyle?: ConnectorStyle;
 };
 
 export type ParsedSlide = {
