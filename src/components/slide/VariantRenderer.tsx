@@ -2106,19 +2106,35 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Client engagements")} />
           <div className="mt-10 grid grid-cols-3 gap-8">
-            {arr(c.items).slice(0, 3).map((it, i) => (
-              <div key={i}>
-                <MediaTile brand={brand} seed={s(it.seed, s(it.client, `client-${i}`))} className="aspect-[16/10] w-full" />
-                <div className="mt-6 pt-5" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                  <Kicker brand={brand} color="rgba(10,15,28,0.55)" size={16}>{s(it.sector)}</Kicker>
-                  <div className="mt-4" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: brand.tokens.primary }}>{s(it.client)}</div>
-                  <SupportingText size="md" opacity={0.78} className="mt-3">{s(it.story)}</SupportingText>
-                  <div className="mt-6" style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.accent }}>
-                    {s(it.metric)}
+            {arr(c.items).slice(0, 3).map((it, i) => {
+              const logoUrl = s(it.logoUrl);
+              return (
+                <div key={i}>
+                  {logoUrl ? (
+                    <div
+                      className="flex aspect-[16/10] w-full items-center justify-center rounded-md"
+                      style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(10,15,28,0.08)" }}
+                    >
+                      <img
+                        src={logoUrl}
+                        alt={s(it.client) ? `${s(it.client)} logo` : "Client logo"}
+                        style={{ maxHeight: "70%", maxWidth: "75%", objectFit: "contain" }}
+                      />
+                    </div>
+                  ) : (
+                    <MediaTile brand={brand} seed={s(it.seed, s(it.client, `client-${i}`))} className="aspect-[16/10] w-full" />
+                  )}
+                  <div className="mt-6 pt-5" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+                    <Kicker brand={brand} color="rgba(10,15,28,0.55)" size={16}>{s(it.sector)}</Kicker>
+                    <div className="mt-4" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: brand.tokens.primary }}>{s(it.client)}</div>
+                    <SupportingText size="md" opacity={0.78} className="mt-3">{s(it.story)}</SupportingText>
+                    <div className="mt-6" style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.accent }}>
+                      {s(it.metric)}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </SlideFrame>
       );
