@@ -41,7 +41,6 @@ const VIDEO_VARIANT_IDS = new Set<string>([
   "MV-IMG-CAPTION",
   "MV-IMG-PORTRAIT",
   "MV-IMG-QUOTE-BG",
-  "MV-CLOSE-CTA",
 ]);
 
 /** True when the variant renders a slide-level photograph from
