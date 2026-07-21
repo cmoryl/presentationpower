@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useDeckStore } from "@/lib/deck-store";
+import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { SlideMediaRefreshProvider, SlideThumbnailContext } from "@/lib/slide-media-refresh";
@@ -14,8 +15,17 @@ const focusThumb = (el: HTMLButtonElement | null) => {
 
 export const Route = createFileRoute("/decks/$deckId/present")({
   head: () => ({ meta: [{ title: "Presenting · TransPerfect Modular" }] }),
-  component: PresenterView,
+  component: PresenterGate,
 });
+
+function PresenterGate() {
+  const { deckId } = Route.useParams();
+  const hydrated = useDeckHydrated();
+  const hasDeck = useDeckStore((s) => Boolean(s.decks[deckId]));
+  if (!hydrated) return <DeckHydratingFallback label="Loading presentation…" />;
+  if (!hasDeck) throw notFound();
+  return <PresenterView />;
+}
 
 function PresenterView() {
   const { deckId } = Route.useParams();

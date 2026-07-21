@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { useDeckStore } from "@/lib/deck-store";
+import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { SlideMediaRefreshProvider } from "@/lib/slide-media-refresh";
@@ -16,14 +17,24 @@ export const Route = createFileRoute("/decks/$deckId/print")({
   head: () => ({ meta: [{ title: "Print · TransPerfect Modular" }] }),
   validateSearch: (raw) =>
     z.object({ lang: z.string().min(2).max(10).optional() }).parse(raw),
-  component: PrintView,
+  component: PrintGate,
 });
+
+function PrintGate() {
+  const { deckId } = Route.useParams();
+  const hydrated = useDeckHydrated();
+  const hasDeck = useDeckStore((s) => Boolean(s.decks[deckId]));
+  if (!hydrated) return <DeckHydratingFallback label="Preparing print view…" />;
+  if (!hasDeck) throw notFound();
+  return <PrintView />;
+}
 
 function PrintView() {
   const { deckId } = Route.useParams();
   const { lang } = Route.useSearch();
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
+
 
   const fetchTx = useServerFn(getDeckSlideTranslations);
   const listLangs = useServerFn(listLanguages);
