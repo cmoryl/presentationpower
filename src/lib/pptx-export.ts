@@ -299,7 +299,7 @@ export async function exportDeckToPptx(
 
 
     try {
-      if (!renderAdvancedVariant(s, slide, palette)) {
+      if (!renderAdvancedVariant(s, slide, palette, slideItemLogos[i])) {
         switch (kind) {
           case "cover":
             renderCover(s, slide, palette);
