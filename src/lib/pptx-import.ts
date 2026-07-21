@@ -9,9 +9,6 @@
 // graph/table/process variant when structured graphics are detected, instead
 // of collapsing to a text-only callout.
 
-import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { z } from "zod";
 import JSZip from "jszip";
 import { XMLParser } from "fast-xml-parser";
 
