@@ -3085,7 +3085,7 @@ function renderVariantBody({
               const name = s(it.name);
               const initials = name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
               return (
-                <div key={i} className="flex aspect-[4/3] items-center justify-center" style={{ borderRight: (i + 1) % cols === 0 ? "none" : `1px solid ${ink.hairline}`, borderBottom: `1px solid ${ink.hairline}`, borderTop: i < cols ? `1px solid ${ink.hairline}` : "none", borderLeft: i % cols === 0 ? `1px solid ${ink.hairline}` : "none" }}>
+                <div key={i} className="flex aspect-[4/3] items-center justify-center" style={{ borderRight: (i + 1) % cols === 0 ? "none" : `1px solid ${ink.divider}`, borderBottom: `1px solid ${ink.divider}`, borderTop: i < cols ? `1px solid ${ink.divider}` : "none", borderLeft: i % cols === 0 ? `1px solid ${ink.divider}` : "none" }}>
                   {(pickLogoForMode(it, mode) || s(it.logoPath)) ? (
                     <ClientLogoImg path={s(it.logoPath)} url={pickLogoForMode(it, mode)} alt={name} className="max-h-16 max-w-[70%] object-contain" style={{ opacity: 0.9 }} />
                   ) : (
