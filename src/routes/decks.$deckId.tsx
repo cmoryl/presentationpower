@@ -21,7 +21,8 @@ import { ReviewStatusControl } from "@/components/ReviewStatusControl";
 import { MessageSquare } from "lucide-react";
 import { UndoRedoControls } from "@/components/UndoRedoControls";
 import { SwapLayoutButton } from "@/components/SwapLayoutPicker";
-import { useDeckStore, type DeckClientLogo } from "@/lib/deck-store";
+import { useDeckStore, type DeckClientLogo, type DeckSlide } from "@/lib/deck-store";
+import { VIDEO_SLIDE_EXAMPLES } from "@/lib/video-slide-examples";
 import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.functions";
 
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
