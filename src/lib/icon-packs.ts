@@ -3,8 +3,25 @@
 // results in memory. This module owns the 111k+ icons imported from BrandHUB;
 // the smaller curated Lucide set lives in ./icon-library.ts.
 
+import carbonAsset from "../../public/icon-library/packs/carbon.json.asset.json";
+import deviconAsset from "../../public/icon-library/packs/devicon.json.asset.json";
+import flagAsset from "../../public/icon-library/packs/flag.json.asset.json";
 import fluentAsset from "../../public/icon-library/packs/fluent.json.asset.json";
+import gameIconsAsset from "../../public/icon-library/packs/game-icons.json.asset.json";
+import hugeiconsAsset from "../../public/icon-library/packs/hugeicons.json.asset.json";
+import ionAsset from "../../public/icon-library/packs/ion.json.asset.json";
+import materialSymbolsAsset from "../../public/icon-library/packs/material-symbols.json.asset.json";
+import mdiAsset from "../../public/icon-library/packs/mdi.json.asset.json";
+import meteoconsAsset from "../../public/icon-library/packs/meteocons.json.asset.json";
+import mingcuteAsset from "../../public/icon-library/packs/mingcute.json.asset.json";
+import openmojiAsset from "../../public/icon-library/packs/openmoji.json.asset.json";
+import phAsset from "../../public/icon-library/packs/ph.json.asset.json";
+import riAsset from "../../public/icon-library/packs/ri.json.asset.json";
+import simpleIconsAsset from "../../public/icon-library/packs/simple-icons.json.asset.json";
+import solarAsset from "../../public/icon-library/packs/solar.json.asset.json";
+import tablerAsset from "../../public/icon-library/packs/tabler.json.asset.json";
 import twemojiAsset from "../../public/icon-library/packs/twemoji.json.asset.json";
+
 
 export interface IconManifestPack {
   id: string;
@@ -57,7 +74,23 @@ export interface SearchHit {
 // Packs externalized via lovable-assets (too large for repo). The .asset.json
 // pointer file is committed; at runtime we fetch the CDN URL transparently.
 const EXTERNAL_PACK_URLS: Record<string, string> = {
+  carbon: carbonAsset.url,
+  devicon: deviconAsset.url,
+  flag: flagAsset.url,
   fluent: fluentAsset.url,
+  "game-icons": gameIconsAsset.url,
+  hugeicons: hugeiconsAsset.url,
+  ion: ionAsset.url,
+  "material-symbols": materialSymbolsAsset.url,
+  mdi: mdiAsset.url,
+  meteocons: meteoconsAsset.url,
+  mingcute: mingcuteAsset.url,
+  openmoji: openmojiAsset.url,
+  ph: phAsset.url,
+  ri: riAsset.url,
+  "simple-icons": simpleIconsAsset.url,
+  solar: solarAsset.url,
+  tabler: tablerAsset.url,
   twemoji: twemojiAsset.url,
 };
 
