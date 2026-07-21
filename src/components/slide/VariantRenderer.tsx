@@ -3049,8 +3049,8 @@ function renderVariantBody({
                   <text x={p.x} y={p.y - 20} textAnchor="middle" fontSize={18} fontWeight={600} fill={brand.tokens.primary}>{String(p.it.sentiment ?? "")}/5</text>
                 </g>
               ))}
-              <text x={20} y={20} fontSize={14} fill=ink.faint style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>High</text>
-              <text x={20} y={H} fontSize={14} fill=ink.faint style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>Low</text>
+              <text x={20} y={20} fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>High</text>
+              <text x={20} y={H} fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>Low</text>
             </svg>
           </div>
         </SlideFrame>
@@ -3285,7 +3285,7 @@ function renderVariantBody({
           <div className="relative mt-16 grid gap-0" style={{ gridTemplateColumns: "1fr 1fr" }}>
             <div className="pr-16" style={{ opacity: 0.6 }}>
               <div className="mb-6" style={{ height: 2, background: ink.axis, width: 96 }} />
-              <Kicker brand={brand} color=ink.muted>{s(before.label, "Before")}</Kicker>
+              <Kicker brand={brand} color={ink.muted}>{s(before.label, "Before")}</Kicker>
               <div className="mt-8">
                 <StatFigure brand={brand} value={s(before.value)} unit={s(before.unit)} size="lg" valueColor="rgba(10,15,28,0.7)" />
               </div>
