@@ -1115,6 +1115,17 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
 
   const rows = q.data ?? [];
 
+  // Curated built-in imagery for this division (bundled in the app build).
+  // Master TransPerfect maps to the enterprise (corporate-dark) pool.
+  const builtInKey = divisionId === "master" ? "bm-enterprise" : divisionId;
+  const builtInSet = DIVISION_IMAGERY[builtInKey];
+  const builtIn = builtInSet
+    ? [
+        ...builtInSet.photos.map((src, i) => ({ src, kind: "photo" as const, name: `built-in / photo-${String(i + 1).padStart(2, "0")}` })),
+        ...builtInSet.abstracts.map((src, i) => ({ src, kind: "abstract" as const, name: `built-in / abstract-${String(i + 1).padStart(2, "0")}` })),
+      ]
+    : [];
+
   return (
     <>
       <Section title="Upload division imagery">
