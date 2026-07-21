@@ -291,8 +291,9 @@ export function SlideVideoPanel({
           </div>
         )}
 
-
+        {hasVideo && (
           <div>
+
             <div className="text-[11px] uppercase tracking-widest text-black/50">Poster frame</div>
             <div className="mt-1 flex items-center gap-2">
               <input
