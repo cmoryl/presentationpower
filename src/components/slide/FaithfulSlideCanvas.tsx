@@ -329,13 +329,29 @@ export function FaithfulSlideCanvas({
   const scale = width / innerPx;
   const height = (size.h * 96) * scale;
 
-  const bg = useMemo(() => fillToCss(layout?.background, theme) ?? "#FFFFFF", [layout?.background, theme]);
+  const backgroundIsImage = layout?.background?.kind === "image";
+  const bg = useMemo(
+    () => (backgroundIsImage ? undefined : fillToCss(layout?.background, theme) ?? "#FFFFFF"),
+    [layout?.background, theme, backgroundIsImage],
+  );
+  const bgImage = backgroundIsImage
+    ? (layout?.background as LayoutFill & { url?: string; srcRect?: LayoutSrcRect; opacity?: number })
+    : undefined;
 
   return (
     <div
       className={className}
-      style={{ width, height, position: "relative", overflow: "hidden", background: bg }}
+      style={{ width, height, position: "relative", overflow: "hidden", background: bg ?? "#FFFFFF" }}
     >
+      {bgImage?.url && (
+        <CroppedImage
+          url={bgImage.url}
+          srcRect={bgImage.srcRect}
+          opacity={bgImage.opacity}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+        />
+      )}
+
       <div
         style={{
           width: `${size.w}in`,
