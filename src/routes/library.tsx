@@ -222,6 +222,59 @@ function Library() {
 
   const active = openId ? moduleVariants.find((v) => v.id === openId) : null;
 
+  // Video example zoom (uses the same LightboxPortal as before, so the
+  // ▶ badge inside the enlarged stage still plays the clip in-place).
+  // Video card previews in the grid intentionally do NOT provide
+  // SlideVideoPreviewContext — they're wrapped in the outer zoom <button>,
+  // which forbids a nested <button> from MediaTile's badge.
+  const [videoZoomKey, setVideoZoomKey] = useState<string | null>(null);
+  const [videoZoomMode, setVideoZoomMode] = useState<"light" | "dark">(
+    mode === "dark" ? "dark" : "light",
+  );
+  const [videoBusy, setVideoBusy] = useState<string | null>(null);
+
+  const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
+  const navigate = useNavigate();
+
+  function sectionForVariant(variantId: string): string {
+    const v = byId(MODULE_VARIANTS, variantId);
+    if (!v) return "SF-01";
+    return sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? "SF-01";
+  }
+
+  function importVideoExample(ex: VideoSlideExample) {
+    const variant = byId(MODULE_VARIANTS, ex.variantId);
+    if (!variant) return;
+    setVideoBusy(ex.key);
+    const brand = scopeBrand ?? tpMaster;
+    const payload: TemplatePayload = {
+      title: `${ex.title} · Video starter`,
+      brandModeId: brand.id,
+      archetypeId: "arch-product-pitch",
+      subCompany: null,
+      context: null,
+      brief: {
+        prospect: "Video Example",
+        industry: "Media",
+        audience: "Internal review",
+        meetingObjective: `Demonstrate the ${variant.name} video layout`,
+        lengthTarget: 1,
+        clientFacts: ex.blurb,
+      },
+      slides: [
+        {
+          sectionId: sectionForVariant(ex.variantId),
+          variantId: ex.variantId,
+          layoutId: variant.permittedLayoutIds[0] ?? "",
+          content: structuredClone(ex.content) as Record<string, unknown>,
+        },
+      ],
+    };
+    const { deckId } = createDeckFromTemplate(payload);
+    navigate({ to: "/decks/$deckId", params: { deckId } });
+  }
+
+
   return (
     <AppShell>
       <div>
