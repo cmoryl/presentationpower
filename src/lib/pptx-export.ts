@@ -2824,7 +2824,7 @@ function renderCaseStory(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pale
 }
 
 // ── MV-CASE-LOGO-GRID ── 6 client wordmark tiles with metric
-function renderCaseLogoGrid(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+function renderCaseLogoGrid(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette, itemLogos: Array<string | null> = []) {
   const y0 = drawTitle(s, c, p);
   const items = arr(c.items).slice(0, 6);
   const cols = 3, rows = 2;
@@ -2837,7 +2837,16 @@ function renderCaseLogoGrid(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     const x = 0.6 + col * (colW + gap);
     const y = y0 + r * (rowH + gap);
     s.addShape("rect", { x, y, w: colW, h: rowH, fill: { color: "FFFFFF" }, line: { color: LIGHT_GRAY } });
-    s.addText(initials(str(it.client)), { x, y: y + 0.2, w: colW, h: rowH * 0.5, fontSize: 34, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
+    const logoData = itemLogos[k];
+    if (logoData) {
+      s.addImage({
+        data: logoData,
+        x: x + 0.2, y: y + 0.2, w: colW - 0.4, h: rowH * 0.5,
+        sizing: { type: "contain", w: colW - 0.4, h: rowH * 0.5 },
+      });
+    } else {
+      s.addText(initials(str(it.client)), { x, y: y + 0.2, w: colW, h: rowH * 0.5, fontSize: 34, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
+    }
     s.addText(str(it.client).toUpperCase(), { x, y: y + rowH * 0.55, w: colW, h: 0.35, fontSize: 10, bold: true, color: DARK_GRAY, fontFace: "Inter", align: "center", charSpacing: 3 });
     s.addShape("rect", { x: x + colW / 2 - 0.3, y: y + rowH * 0.75, w: 0.6, h: 0.03, fill: { color: p.accent }, line: { color: p.accent } });
     s.addText(str(it.result), { x: x + 0.2, y: y + rowH * 0.8, w: colW - 0.4, h: rowH * 0.2, fontSize: 11, italic: true, color: p.accent, fontFace: "Inter", align: "center" });
@@ -2845,7 +2854,7 @@ function renderCaseLogoGrid(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
 }
 
 // ── MV-CLIENT-MATRIX ── 6-cell client outcome grid
-function renderClientMatrix(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+function renderClientMatrix(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette, itemLogos: Array<string | null> = []) {
   const y0 = drawTitle(s, c, p);
   const items = arr(c.items).slice(0, 6);
   const cols = 3, rows = 2;
@@ -2859,15 +2868,25 @@ function renderClientMatrix(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     const y = y0 + r * (rowH + gap);
     s.addShape("rect", { x, y, w: colW, h: rowH, fill: { color: p.surface }, line: { color: LIGHT_GRAY } });
     s.addText(str(it.sector).toUpperCase(), { x: x + 0.2, y: y + 0.2, w: colW - 0.4, h: 0.3, fontSize: 9, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 3 });
-    s.addText(str(it.client), { x: x + 0.2, y: y + 0.5, w: colW - 0.4, h: 0.5, fontSize: 15, bold: true, color: p.primary, fontFace: "Inter" });
-    s.addText(str(it.result), { x: x + 0.2, y: y + 1.05, w: colW - 0.4, h: 0.9, fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top" });
+    const logoData = itemLogos[k];
+    if (logoData) {
+      s.addImage({
+        data: logoData,
+        x: x + 0.2, y: y + 0.48, w: colW - 0.4, h: 0.45,
+        sizing: { type: "contain", w: colW - 0.4, h: 0.45 },
+      });
+      s.addText(str(it.client), { x: x + 0.2, y: y + 0.98, w: colW - 0.4, h: 0.3, fontSize: 10, color: DARK_GRAY, fontFace: "Inter", charSpacing: 2 });
+    } else {
+      s.addText(str(it.client), { x: x + 0.2, y: y + 0.5, w: colW - 0.4, h: 0.5, fontSize: 15, bold: true, color: p.primary, fontFace: "Inter" });
+    }
+    s.addText(str(it.result), { x: x + 0.2, y: y + 1.35, w: colW - 0.4, h: 0.9, fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top" });
     s.addShape("rect", { x: x + 0.2, y: y + rowH - 0.7, w: colW - 0.4, h: 0.02, fill: { color: p.accent }, line: { color: p.accent } });
     s.addText(`${str(it.metric)} ${str(it.unit)}`.trim(), { x: x + 0.2, y: y + rowH - 0.6, w: colW - 0.4, h: 0.5, fontSize: 22, bold: true, color: p.accent, fontFace: "Inter" });
   });
 }
 
 // ── MV-CLIENT-DETAIL-3 ── 3 tall client cards with image placeholder + metric
-function renderClientDetail3(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+function renderClientDetail3(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette, itemLogos: Array<string | null> = []) {
   const y0 = drawTitle(s, c, p);
   const items = arr(c.items).slice(0, 3);
   const gap = 0.25;
@@ -2876,9 +2895,18 @@ function renderClientDetail3(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
     const x = 0.6 + k * (colW + gap);
     const y = y0;
     const h = 5.7 - y0;
-    // image placeholder
-    s.addShape("rect", { x, y, w: colW, h: h * 0.35, fill: { color: p.primary }, line: { color: p.primary } });
-    s.addText(str(it.client).slice(0, 2).toUpperCase(), { x, y, w: colW, h: h * 0.35, fontSize: 44, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle" });
+    const logoData = itemLogos[k];
+    if (logoData) {
+      s.addShape("rect", { x, y, w: colW, h: h * 0.35, fill: { color: "FFFFFF" }, line: { color: LIGHT_GRAY } });
+      s.addImage({
+        data: logoData,
+        x: x + 0.3, y: y + 0.3, w: colW - 0.6, h: h * 0.35 - 0.6,
+        sizing: { type: "contain", w: colW - 0.6, h: h * 0.35 - 0.6 },
+      });
+    } else {
+      s.addShape("rect", { x, y, w: colW, h: h * 0.35, fill: { color: p.primary }, line: { color: p.primary } });
+      s.addText(str(it.client).slice(0, 2).toUpperCase(), { x, y, w: colW, h: h * 0.35, fontSize: 44, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle" });
+    }
     // body
     s.addShape("rect", { x, y: y + h * 0.35, w: colW, h: h * 0.65, fill: { color: "FFFFFF" }, line: { color: LIGHT_GRAY } });
     s.addText(str(it.sector).toUpperCase(), { x: x + 0.25, y: y + h * 0.37, w: colW - 0.5, h: 0.35, fontSize: 10, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 3 });
