@@ -2918,13 +2918,12 @@ function renderClientDetail3(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
 }
 
 // ── MV-CLIENT-COMPARE ── 3 rows: challenge → outcome → metric
-function renderClientCompare(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+function renderClientCompare(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette, itemLogos: Array<string | null> = []) {
   const y0 = drawTitle(s, c, p);
   const items = arr(c.items).slice(0, 3);
   const headers = ["CLIENT", "CHALLENGE", "OUTCOME", "METRIC"];
   const cols = [0.6, 3.0, 6.0, 10.8];
   const colWs = [2.3, 2.9, 4.7, SLIDE_W - 0.6 - 10.8];
-  // header row
   headers.forEach((h, k) => {
     s.addText(h, { x: cols[k], y: y0, w: colWs[k] - 0.2, h: 0.4, fontSize: 10, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 3 });
   });
@@ -2933,7 +2932,18 @@ function renderClientCompare(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
   items.forEach((it, k) => {
     const y = y0 + 0.55 + k * rowH;
     if (k > 0) s.addShape("rect", { x: 0.6, y: y - 0.05, w: SLIDE_W - 1.2, h: 0.01, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
-    s.addText(str(it.client), { x: cols[0], y, w: colWs[0] - 0.2, h: rowH - 0.1, fontSize: 14, bold: true, color: p.primary, fontFace: "Inter", valign: "top" });
+    const logoData = itemLogos[k];
+    if (logoData) {
+      // Compact logo mark above the client name inside the CLIENT column.
+      s.addImage({
+        data: logoData,
+        x: cols[0], y: y + 0.05, w: 0.9, h: 0.45,
+        sizing: { type: "contain", w: 0.9, h: 0.45 },
+      });
+      s.addText(str(it.client), { x: cols[0], y: y + 0.55, w: colWs[0] - 0.2, h: rowH - 0.6, fontSize: 12, bold: true, color: p.primary, fontFace: "Inter", valign: "top" });
+    } else {
+      s.addText(str(it.client), { x: cols[0], y, w: colWs[0] - 0.2, h: rowH - 0.1, fontSize: 14, bold: true, color: p.primary, fontFace: "Inter", valign: "top" });
+    }
     s.addText(str(it.challenge), { x: cols[1], y, w: colWs[1] - 0.2, h: rowH - 0.1, fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top" });
     s.addText(str(it.outcome), { x: cols[2], y, w: colWs[2] - 0.2, h: rowH - 0.1, fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top" });
     s.addText(str(it.metric), { x: cols[3], y, w: colWs[3] - 0.2, h: rowH - 0.1, fontSize: 15, bold: true, color: p.accent, fontFace: "Inter", valign: "top" });
