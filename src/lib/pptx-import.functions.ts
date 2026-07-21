@@ -693,7 +693,7 @@ function extractTables(doc: unknown): ParsedTable[] {
 }
 
 // ─── SmartArt / diagram nodes ────────────────────────────────────────────
-function extractDiagramNodes(ddoc: unknown): ParsedDiagramNode[] {
+function extractDiagramNodes(ddoc: unknown, theme: ParsedTheme): ParsedDiagramNode[] {
   const nodes: ParsedDiagramNode[] = [];
   // dgm:dataModel/dgm:ptLst/dgm:pt (type="node") each with dgm:t/a:p/a:r/a:t
   // and dgm:prSet/@lvl or presLayoutVars
@@ -708,14 +708,18 @@ function extractDiagramNodes(ddoc: unknown): ParsedDiagramNode[] {
     const text = pArr.map((p: unknown) => readParagraphText(p)).filter(Boolean).join(" ").trim();
     if (!text) continue;
     const lvl = Number(pt?.["dgm:prSet"]?.["@_custT"] ?? pt?.["dgm:prSet"]?.["@_lvl"] ?? 0);
-    nodes.push({ text: cap(text, 200), level: Number.isFinite(lvl) ? lvl : 0 });
+    // dgm:spPr sometimes present on the point; fall back to prSet/style solidFill.
+    const color =
+      readShapeColor(pt?.["dgm:spPr"], theme) ??
+      readFillColor(pt?.["dgm:prSet"]?.["dgm:style"]?.["a:fillRef"]?.["a:srgbClr"] ? pt?.["dgm:prSet"]?.["dgm:style"]?.["a:fillRef"] : undefined, theme);
+    nodes.push({ text: cap(text, 200), level: Number.isFinite(lvl) ? lvl : 0, color });
   }
   return nodes.slice(0, 24);
 }
 
 // ─── Grouped custom shapes (lightweight diagram fallback) ────────────────
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function extractGroupShapeDiagram(doc: unknown): ParsedDiagram | null {
+function extractGroupShapeDiagram(doc: unknown, theme: ParsedTheme): ParsedDiagram | null {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let bestGroup: any | null = null;
   let bestCount = 0;
@@ -734,10 +738,14 @@ function extractGroupShapeDiagram(doc: unknown): ParsedDiagram | null {
   for (const sp of sps) {
     const info = readShape(sp);
     const text = info.paragraphs.map((p) => p.trim()).filter(Boolean).join(" ").trim();
-    if (text) nodes.push({ text: cap(text, 200), level: 0 });
+    if (!text) continue;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const color = readShapeColor((sp as any)?.["p:spPr"], theme);
+    nodes.push({ text: cap(text, 200), level: 0, color });
   }
   if (nodes.length < 2) return null;
   return { kind: "shape-group", nodes };
+
 }
 
 // ─── Theme extraction ────────────────────────────────────────────────────
