@@ -88,8 +88,9 @@ function ImportView() {
       if (!/\.pptx$/i.test(file.name)) {
         throw new Error("Please upload a .pptx file (not .ppt or another format).");
       }
-      if (file.size > 25 * 1024 * 1024) {
-        throw new Error("File is larger than 25MB. Please slim it down or split it.");
+      if (file.size > 100 * 1024 * 1024) {
+        throw new Error("File is larger than 100MB. Please slim it down or split it.");
+
       }
 
       setStep("read", "active", formatBytes(file.size));
