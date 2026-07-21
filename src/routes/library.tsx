@@ -1356,6 +1356,7 @@ function LightboxPortal({
   darkBackdrop: ReturnType<typeof backdropForVariant>;
 }) {
   const [playUrl, setPlayUrl] = useState<string | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -1375,6 +1376,25 @@ function LightboxPortal({
       document.body.style.overflow = prev;
     };
   }, [mode, setMode, playUrl]);
+
+  // Run the same typography + WCAG auto-fix on the zoomed stage that the
+  // grid A/B compare uses, so dark-mode primitives with hardcoded ink text
+  // (e.g. LabelBlock, comparison tables) don't render as ghost text on the
+  // navy backdrop. Re-runs whenever the mode or variant changes.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const el = stageRef.current;
+    if (!el) return;
+    const t = window.setTimeout(async () => {
+      const { applyAutoFix, revertAutoFix, auditAndFixTypography, revertTypeFix } = await import("@/lib/wcag");
+      revertAutoFix(el);
+      revertTypeFix(el);
+      auditAndFixTypography(el);
+      applyAutoFix(el);
+    }, 320);
+    return () => window.clearTimeout(t);
+  }, [mode, variant.id, brand.id]);
+
 
 
   const isDark = mode === "dark";
