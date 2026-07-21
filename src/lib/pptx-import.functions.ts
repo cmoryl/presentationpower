@@ -221,10 +221,11 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
       try {
         const cxml = await entry.async("string");
         const cdoc = parser.parse(cxml);
-        const parsedCharts = extractChartsFromChartXml(cdoc);
+        const parsedCharts = extractChartsFromChartXml(cdoc, theme);
         for (const c of parsedCharts) charts.push(c);
       } catch { /* skip malformed chart */ }
     }
+
 
     // ── Tables ──────────────────────────────────────────────────────────
     const tables = extractTables(doc);
