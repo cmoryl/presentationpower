@@ -395,7 +395,7 @@ function Library() {
             >
               ▤ Sample imagery {showImagery ? "on" : "off"}
             </button>
-            <span className="text-sm tabular-nums text-black/50">{filtered.length} of {moduleVariants.length}</span>
+            <span className="text-sm tabular-nums text-black/50">{filtered.length} of {allEntries.length}</span>
           </div>
         </div>
 
