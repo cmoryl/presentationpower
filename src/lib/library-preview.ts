@@ -303,11 +303,54 @@ export const COVERAGE_FIX_HINTS: Record<
   },
 };
 
+export type OverlaySlot =
+  | "stats"
+  | "quote"
+  | "cover"
+  | "pillars"
+  | "agenda"
+  | "contextCards"
+  | "logos";
+
+export interface SlotMetric {
+  /** Number of populated items the overlay produced (1/0 for scalar slots). */
+  count: number;
+  /** Minimum count expected for this slot to be considered complete. */
+  expected: number;
+  /** count >= expected AND every populated entry is non-empty. */
+  ok: boolean;
+  /** True when the slot is not applicable to this brand (e.g. no service lines). */
+  skipped?: boolean;
+  /** Short reason surfaced in the UI when !ok or skipped. */
+  note?: string;
+}
+
+export const OVERLAY_SLOT_LABELS: Record<OverlaySlot, string> = {
+  stats: "Stats",
+  quote: "Quote",
+  cover: "Cover",
+  pillars: "Pillars",
+  agenda: "Agenda",
+  contextCards: "Context",
+  logos: "Logos",
+};
+
+const SLOT_ISSUE: Record<OverlaySlot, BrandCoverageIssue> = {
+  stats: "empty-stats",
+  quote: "empty-quote",
+  cover: "cover-title-blank",
+  pillars: "pillars-empty",
+  agenda: "agenda-empty",
+  contextCards: "context-cards-empty",
+  logos: "logos-empty",
+};
+
 export interface BrandCoverageReport {
   brandId: string;
   brandName: string;
   issues: BrandCoverageIssue[];
   notes: string[];
+  metrics: Record<OverlaySlot, SlotMetric>;
 }
 
 export interface DivisionCoverageResult {
