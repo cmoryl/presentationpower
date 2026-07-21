@@ -1278,8 +1278,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Vertical strip comparing three client engagements side-by-side",
     permittedLayoutIds: ["LF-08"],
     capacity: { items: { min: 3, max: 3 }, titleChars: 60, bodyChars: 160 },
-    editableFields: ["title", "items[].client", "items[].challenge", "items[].outcome", "items[].metric"],
-    lockedFields: ["items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "items[].client", "items[].challenge", "items[].outcome", "items[].metric", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
 
   // ── Advanced variants — BATCH 1 (structure & data-forward) ──────────────
