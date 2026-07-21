@@ -13,9 +13,18 @@
 // the normal `insertExampleSlide` deck-store action, so
 // normalizeSlideMedia and variant-swap invariants still apply.
 
-// Stable public sample host — Google's HTML5 test bucket. Every clip has a
-// matching poster JPG at .../images/<Name>.jpg.
-const GTV = "https://storage.googleapis.com/gtv-videos-bucket/sample";
+// Stable public sample host — W3C media samples. Google's former
+// `gtv-videos-bucket` public alias now returns 403, so we cycle across a
+// handful of long-lived W3C mp4/poster pairs. Every clip has a matching
+// poster PNG at the same path.
+const W3 = "https://media.w3.org/2010/05";
+const CLIPS = [
+  { v: `${W3}/sintel/trailer.mp4`, p: `${W3}/sintel/poster.png` },
+  { v: `${W3}/bunny/trailer.mp4`, p: `${W3}/bunny/poster.png` },
+  { v: `${W3}/bunny/movie.mp4`, p: `${W3}/bunny/poster.png` },
+  { v: `${W3}/video/movie_300.mp4`, p: `${W3}/video/poster.png` },
+] as const;
+const clip = (i: number) => CLIPS[i % CLIPS.length];
 
 export type VideoSlideExample = {
   key: string;
@@ -37,8 +46,8 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
       subtitle: "170+ languages, 24/7 human + AI orchestration.",
       prospect: "TransPerfect",
       date: "January 2026",
-      videoUrl: `${GTV}/ElephantsDream.mp4`,
-      videoPosterUrl: `${GTV}/images/ElephantsDream.jpg`,
+      videoUrl: clip(0).v,
+      videoPosterUrl: clip(0).p,
     },
   },
   {
@@ -51,8 +60,8 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
       title: "A single partner for every market you enter.",
       subtitle: "One workflow, one QA layer, one accountable team.",
       dateline: "TransPerfect · Q1 2026",
-      videoUrl: `${GTV}/Sintel.mp4`,
-      videoPosterUrl: `${GTV}/images/Sintel.jpg`,
+      videoUrl: clip(1).v,
+      videoPosterUrl: clip(1).p,
     },
   },
   {
@@ -65,8 +74,8 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
       title: "Built for regulated industries at global scale.",
       subtitle: "Life sciences, legal, finance — with the certifications to prove it.",
       prospect: "Prospect Ltd.",
-      videoUrl: `${GTV}/TearsOfSteel.mp4`,
-      videoPosterUrl: `${GTV}/images/TearsOfSteel.jpg`,
+      videoUrl: clip(2).v,
+      videoPosterUrl: clip(2).p,
     },
   },
   {
@@ -77,8 +86,8 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
     content: {
       title: "Everywhere your customer is.",
       caption: "24 offices · 90 countries · one operating model.",
-      videoUrl: `${GTV}/ForBiggerBlazes.mp4`,
-      videoPosterUrl: `${GTV}/images/ForBiggerBlazes.jpg`,
+      videoUrl: clip(3).v,
+      videoPosterUrl: clip(3).p,
     },
   },
   {
@@ -90,8 +99,8 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
       kicker: "How it works",
       title: "One orchestration layer. Every content type.",
       body: "Ingest, translate, review, and publish through a single API — human linguists in the loop where regulation requires it.",
-      videoUrl: `${GTV}/ForBiggerJoyrides.mp4`,
-      videoPosterUrl: `${GTV}/images/ForBiggerJoyrides.jpg`,
+      videoUrl: clip(4).v,
+      videoPosterUrl: clip(4).p,
     },
   },
   {
@@ -104,8 +113,8 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
       caption:
         "Billions of words a year, delivered against SLAs that regulated buyers actually accept.",
       credit: "Source · TransPerfect internal 2025",
-      videoUrl: `${GTV}/ForBiggerEscapes.mp4`,
-      videoPosterUrl: `${GTV}/images/ForBiggerEscapes.jpg`,
+      videoUrl: clip(5).v,
+      videoPosterUrl: clip(5).p,
     },
   },
   {
@@ -118,8 +127,8 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
       role: "Global Program Director",
       quote:
         "The bar is simple: our clients should never have to choose between speed and quality.",
-      videoUrl: `${GTV}/ForBiggerMeltdowns.mp4`,
-      videoPosterUrl: `${GTV}/images/ForBiggerMeltdowns.jpg`,
+      videoUrl: clip(6).v,
+      videoPosterUrl: clip(6).p,
     },
   },
   {
@@ -131,8 +140,8 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
       quote:
         "TransPerfect became the localization backbone for every product launch we run — no exceptions.",
       attribution: "VP, Global Marketing · Fortune 100 Life Sciences",
-      videoUrl: `${GTV}/ForBiggerFun.mp4`,
-      videoPosterUrl: `${GTV}/images/ForBiggerFun.jpg`,
+      videoUrl: clip(7).v,
+      videoPosterUrl: clip(7).p,
     },
   },
 ];
