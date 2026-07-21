@@ -410,10 +410,11 @@ type RelBuckets = {
   chart: Record<string, string>;
   diagramData: Record<string, string>;
   diagramLayout: Record<string, string>;
+  diagramDrawing: Record<string, string>;
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function extractRelTargetsByType(relsDoc: any): RelBuckets {
-  const out: RelBuckets = { image: {}, chart: {}, diagramData: {}, diagramLayout: {} };
+  const out: RelBuckets = { image: {}, chart: {}, diagramData: {}, diagramLayout: {}, diagramDrawing: {} };
   if (!relsDoc) return out;
   const rels = relsDoc?.Relationships?.Relationship;
   const arr = Array.isArray(rels) ? rels : rels ? [rels] : [];
@@ -426,6 +427,7 @@ function extractRelTargetsByType(relsDoc: any): RelBuckets {
     else if (/\/chart$/i.test(type)) out.chart[id] = target;
     else if (/\/diagramData$/i.test(type)) out.diagramData[id] = target;
     else if (/\/diagramLayout$/i.test(type)) out.diagramLayout[id] = target;
+    else if (/\/diagramDrawing$/i.test(type)) out.diagramDrawing[id] = target;
   }
   return out;
 }
