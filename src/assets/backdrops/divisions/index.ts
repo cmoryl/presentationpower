@@ -42,17 +42,18 @@ import divA2 from "./bm-division/abstract-02.jpg";
 import divA3 from "./bm-division/abstract-03.jpg";
 import divA4 from "./bm-division/abstract-04.jpg";
 
-// Media
-import medP1 from "./bm-tp-media/photo-01.jpg";
-import medP2 from "./bm-tp-media/photo-02.jpg";
-import medP3 from "./bm-tp-media/photo-03.jpg";
-import medP4 from "./bm-tp-media/photo-04.jpg";
-import medP5 from "./bm-tp-media/photo-05.jpg";
-import medP6 from "./bm-tp-media/photo-06.jpg";
-import medA1 from "./bm-tp-media/abstract-01.jpg";
-import medA2 from "./bm-tp-media/abstract-02.jpg";
-import medA3 from "./bm-tp-media/abstract-03.jpg";
-import medA4 from "./bm-tp-media/abstract-04.jpg";
+// Media — uses the curated TP Media dark gradient set as the canonical
+// imagery pool. 6 gradients split 4 "photo" + 2 "abstract" slots.
+import medP1 from "../tp-media-dark/bg-01.webp";
+import medP2 from "../tp-media-dark/bg-02.webp";
+import medP3 from "../tp-media-dark/bg-03.webp";
+import medP4 from "../tp-media-dark/bg-04.webp";
+import medP5 from "../tp-media-dark/bg-05.webp";
+import medP6 from "../tp-media-dark/bg-06.webp";
+import medA1 from "../tp-media-dark/bg-01.webp";
+import medA2 from "../tp-media-dark/bg-03.webp";
+import medA3 from "../tp-media-dark/bg-05.webp";
+import medA4 from "../tp-media-dark/bg-06.webp";
 
 // Legal
 import lgP1 from "./bm-tp-legal/photo-01.jpg";
