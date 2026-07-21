@@ -214,19 +214,62 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
     const r = row as {
       id: string; original_filename: string; slide_count: number;
       theme: { accent1?: string; accent2?: string; dark1?: string; headingFont?: string; bodyFont?: string } | null;
-      slides: Array<{ index: number; title: string; bullets: string[]; notes: string; imageCount: number }> | null;
+      slides: Array<{
+        index: number; title: string; bullets: string[]; notes: string; imageCount: number;
+        imagePaths?: string[];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        layout?: any;
+      }> | null;
       status: string; error: string | null;
       storage_path: string;
     };
 
     // Signed URL so the owner can re-download the original .pptx.
     const signed = await s.storage.from(BUCKET).createSignedUrl(r.storage_path, 60 * 10).catch(() => ({ data: null }));
+
+    // Collect every image storage_path used by any layout shape and per-slide
+    // imagePaths[], batch-sign them, and rewrite so the client can render
+    // faithfully without a follow-up round trip.
+    const allPaths = new Set<string>();
+    for (const sl of r.slides ?? []) {
+      for (const p of sl.imagePaths ?? []) allPaths.add(p);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      for (const sh of (sl.layout?.shapes ?? []) as any[]) {
+        if (sh?.kind === "image" && typeof sh.path === "string") allPaths.add(sh.path);
+        if (sh?.fill?.kind === "image" && typeof sh.fill.path === "string") allPaths.add(sh.fill.path);
+      }
+    }
+    const pathToUrl = new Map<string, string>();
+    await Promise.all(
+      Array.from(allPaths).map(async (p) => {
+        const res = await s.storage.from("division-imagery").createSignedUrl(p, 60 * 60 * 24).catch(() => ({ data: null }));
+        if (res.data?.signedUrl) pathToUrl.set(p, res.data.signedUrl);
+      }),
+    );
+    const slidesWithUrls = (r.slides ?? []).map((sl) => {
+      const imageUrls = (sl.imagePaths ?? []).map((p) => pathToUrl.get(p)).filter((u): u is string => Boolean(u));
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const shapes = sl.layout?.shapes?.map((sh: any) => {
+        if (sh?.kind === "image" && sh.path) {
+          const url = pathToUrl.get(sh.path);
+          return url ? { ...sh, url } : sh;
+        }
+        if (sh?.fill?.kind === "image" && sh.fill.path) {
+          const url = pathToUrl.get(sh.fill.path);
+          return url ? { ...sh, fill: { ...sh.fill, url } } : sh;
+        }
+        return sh;
+      });
+      const layout = sl.layout ? { ...sl.layout, shapes } : undefined;
+      return { ...sl, imageUrls, layout };
+    });
+
     return {
       id: r.id,
       original_filename: r.original_filename,
       slide_count: r.slide_count,
       theme: r.theme ?? {},
-      slides: r.slides ?? [],
+      slides: slidesWithUrls,
       status: r.status,
       error: r.error,
       storage_path: r.storage_path,
