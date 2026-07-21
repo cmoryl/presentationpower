@@ -72,7 +72,12 @@ export function SlideImageryPanel({
   mediaUrl?: string;
   mediaSeed?: string;
   divisionId?: string;
-  onChange: (nextUrl: string | null) => void;
+  /** Second arg is the storage path (private slide-media bucket) when the
+   *  URL came from an upload; the editor persists it so the refresh
+   *  provider can re-sign after the 30-day TTL. `null` clears the
+   *  override; `undefined` for the path means "external / pasted URL —
+   *  no path to store". */
+  onChange: (nextUrl: string | null, nextPath?: string | null) => void;
 }) {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
