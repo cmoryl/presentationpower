@@ -56,9 +56,29 @@ export type ParsedDiagramNode = {
   /** Node fill color (from prSet/style/solidFill or the shape's spPr) when declared. */
   color?: string;
 };
+/**
+ * High-level layout family inferred from either the SmartArt
+ * `layoutDef/@uniqueId` or, for grouped custom shapes, the dominant
+ * `prstGeom` present on the group. Downstream mapping (`pptx-mapping.ts`)
+ * routes onto native process / timeline / hierarchy / cycle / pyramid /
+ * venn / matrix variants.
+ */
+export type DiagramLayoutHint =
+  | "process"
+  | "timeline"
+  | "cycle"
+  | "hierarchy"
+  | "pyramid"
+  | "venn"
+  | "matrix"
+  | "radial"
+  | "funnel"
+  | "list";
 export type ParsedDiagram = {
   kind: "smartart" | "shape-group";
   nodes: ParsedDiagramNode[];
+  /** Layout family inferred from SmartArt layoutDef or shape geometry. */
+  layoutHint?: DiagramLayoutHint;
 };
 
 export type ParsedSlide = {
@@ -231,8 +251,16 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     const tables = extractTables(doc);
 
     // ── SmartArt diagrams ───────────────────────────────────────────────
+    // Each SmartArt on the slide is expressed as a diagramData rel (the
+    // text/hierarchy tree) plus a diagramLayout rel (the layout definition
+    // whose `uniqueId` tells us if it's a process/cycle/hierarchy/etc.).
+    // We pair them positionally — a slide rarely has more than one — and
+    // read the layout's `uniqueId` to derive a `layoutHint`.
     const diagrams: ParsedDiagram[] = [];
-    for (const target of Object.values(relTargetsByType.diagramData)) {
+    const layoutTargets = Object.values(relTargetsByType.diagramLayout);
+    const dataTargets = Object.values(relTargetsByType.diagramData);
+    for (let di = 0; di < dataTargets.length; di++) {
+      const target = dataTargets[di];
       const resolved = resolveRelPath(slidePath, target);
       const entry = zip.files[resolved];
       if (!entry) continue;
@@ -240,7 +268,24 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         const dxml = await entry.async("string");
         const ddoc = parser.parse(dxml);
         const nodes = extractDiagramNodes(ddoc, theme);
-        if (nodes.length > 0) diagrams.push({ kind: "smartart", nodes });
+        if (nodes.length === 0) continue;
+        // Resolve paired layout file (if any) and read uniqueId.
+        let layoutHint: DiagramLayoutHint | undefined;
+        const layoutTarget = layoutTargets[di];
+        if (layoutTarget) {
+          const layoutPath = resolveRelPath(slidePath, layoutTarget);
+          const layoutEntry = zip.files[layoutPath];
+          if (layoutEntry) {
+            try {
+              const lxml = await layoutEntry.async("string");
+              const ldoc = parser.parse(lxml);
+              layoutHint = readSmartArtLayoutHint(ldoc);
+            } catch { /* ignore malformed layout */ }
+          }
+        }
+        // Fall back to inferring from node hierarchy if no layout hint.
+        if (!layoutHint && nodes.some((n) => n.level > 0)) layoutHint = "hierarchy";
+        diagrams.push({ kind: "smartart", nodes, layoutHint });
       } catch { /* skip */ }
     }
     // Grouped custom shapes → lightweight diagram fallback (only when there
@@ -348,10 +393,11 @@ type RelBuckets = {
   image: Record<string, string>;
   chart: Record<string, string>;
   diagramData: Record<string, string>;
+  diagramLayout: Record<string, string>;
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function extractRelTargetsByType(relsDoc: any): RelBuckets {
-  const out: RelBuckets = { image: {}, chart: {}, diagramData: {} };
+  const out: RelBuckets = { image: {}, chart: {}, diagramData: {}, diagramLayout: {} };
   if (!relsDoc) return out;
   const rels = relsDoc?.Relationships?.Relationship;
   const arr = Array.isArray(rels) ? rels : rels ? [rels] : [];
@@ -363,6 +409,7 @@ function extractRelTargetsByType(relsDoc: any): RelBuckets {
     if (/\/image$/i.test(type) || /\/image\b/i.test(type)) out.image[id] = target;
     else if (/\/chart$/i.test(type)) out.chart[id] = target;
     else if (/\/diagramData$/i.test(type)) out.diagramData[id] = target;
+    else if (/\/diagramLayout$/i.test(type)) out.diagramLayout[id] = target;
   }
   return out;
 }
@@ -736,18 +783,86 @@ function extractGroupShapeDiagram(doc: unknown, theme: ParsedTheme): ParsedDiagr
   if (!bestGroup || bestCount < 3) return null;
   const sps = Array.isArray(bestGroup["p:sp"]) ? bestGroup["p:sp"] : [bestGroup["p:sp"]];
   const nodes: ParsedDiagramNode[] = [];
+  // Tally shape-preset geometries to infer the diagram family. PowerPoint
+  // authors commonly build custom "process" strips out of chevrons / arrows,
+  // cycles out of circles + curved connectors, hierarchies out of rectangles
+  // joined by straight connectors, pyramids out of triangles, and venn
+  // diagrams out of overlapping ellipses. We use the dominant preset as a
+  // hint when the parent slide isn't a real SmartArt.
+  const prstTally: Record<string, number> = {};
+  let hasConnector = false;
   for (const sp of sps) {
     const info = readShape(sp);
     const text = info.paragraphs.map((p) => p.trim()).filter(Boolean).join(" ").trim();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const prst = (sp as any)?.["p:spPr"]?.["a:prstGeom"]?.["@_prst"] as string | undefined;
+    if (prst) prstTally[prst] = (prstTally[prst] ?? 0) + 1;
     if (!text) continue;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const color = readShapeColor((sp as any)?.["p:spPr"], theme);
     nodes.push({ text: cap(text, 200), level: 0, color });
   }
+  // Detect connector shapes (p:cxnSp) inside the same group — a strong hint
+  // for hierarchies (org charts) and processes.
+  const cxns = bestGroup?.["p:cxnSp"];
+  if (cxns) hasConnector = true;
   if (nodes.length < 2) return null;
-  return { kind: "shape-group", nodes };
-
+  const layoutHint = inferShapeGroupLayoutHint(prstTally, hasConnector);
+  return { kind: "shape-group", nodes, layoutHint };
 }
+
+/**
+ * Read the SmartArt layout definition's `uniqueId` and coarsely classify it.
+ * Microsoft's built-in layouts follow a stable naming convention such as
+ * `urn:microsoft.com/office/officeart/2005/8/layout/orgChart1`,
+ * `.../hierarchy1`, `.../basicProcess`, `.../continuousCycle`,
+ * `.../pyramid1`, `.../linearVenn`, `.../basicMatrix`, `.../basicTimeline`.
+ */
+function readSmartArtLayoutHint(ldoc: unknown): DiagramLayoutHint | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const uid = (ldoc as any)?.["dgm:layoutDef"]?.["@_uniqueId"];
+  if (typeof uid !== "string") return undefined;
+  const last = uid.split("/").pop()?.toLowerCase() ?? "";
+  if (!last) return undefined;
+  if (/timeline/.test(last)) return "timeline";
+  if (/funnel/.test(last)) return "funnel";
+  if (/pyramid/.test(last)) return "pyramid";
+  if (/venn/.test(last)) return "venn";
+  if (/matrix/.test(last)) return "matrix";
+  if (/radial/.test(last)) return "radial";
+  if (/cycle/.test(last)) return "cycle";
+  if (/orgchart|hierarchy|hierlist|hierlabel/.test(last)) return "hierarchy";
+  if (/process|chevron|arrow|step|phase/.test(last)) return "process";
+  if (/list|target|block/.test(last)) return "list";
+  return undefined;
+}
+
+/**
+ * Infer a layout family from the dominant `prstGeom` preset counts in a
+ * grouped shape family. Only fires when a preset is clearly dominant
+ * (accounts for ≥ 50% of shapes) so mixed decorative groups don't get
+ * mis-routed.
+ */
+function inferShapeGroupLayoutHint(
+  prstTally: Record<string, number>,
+  hasConnector: boolean,
+): DiagramLayoutHint | undefined {
+  const entries = Object.entries(prstTally);
+  const total = entries.reduce((s, [, n]) => s + n, 0);
+  if (total === 0) return hasConnector ? "hierarchy" : undefined;
+  entries.sort((a, b) => b[1] - a[1]);
+  const [topName, topCount] = entries[0];
+  const dominant = topCount / total >= 0.5;
+  if (!dominant) return hasConnector ? "hierarchy" : undefined;
+  const n = topName.toLowerCase();
+  if (/chevron|rightarrow|leftarrow|pentagon|arrow/.test(n)) return "process";
+  if (/triangle/.test(n)) return "pyramid";
+  if (/ellipse|oval|circle/.test(n)) return hasConnector ? "cycle" : "venn";
+  if (/rect|round/.test(n)) return hasConnector ? "hierarchy" : "list";
+  if (/star|diamond/.test(n)) return "radial";
+  return undefined;
+}
+
 
 // ─── Theme extraction ────────────────────────────────────────────────────
 const EMPTY_THEME: ParsedTheme = { accents: [] };

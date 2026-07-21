@@ -490,15 +490,75 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
   const palette = nodes.map((node) => node.color).filter((c): c is string => Boolean(c));
   const source = {
     kind: d.kind,
+    layoutHint: d.layoutHint,
     palette,
     nodeColors: nodes.map((node) => node.color ?? null),
   } as Record<string, unknown>;
   const withSource = <T extends object>(content: T) =>
     ({ ...content, _source: source } as unknown as SlideContent);
 
-  // Journey / process family — sequential steps.
+  // Prefer the structural layoutHint extracted from the SmartArt layoutDef
+  // (or inferred from the dominant prstGeom in a grouped shape family) over
+  // fragile title keyword heuristics. Falls back to keyword + hierarchy
+  // detection when no hint is present.
+  const hint = d.layoutHint;
   const journeyRe = /journey|roadmap|process|flow|steps|stages|phases|timeline/i;
-  if (journeyRe.test(title) && n >= 3) {
+
+  // ── Timeline ─────────────────────────────────────────────────────────
+  if (hint === "timeline" || (n >= 3 && /timeline|roadmap|quarterly|calendar/i.test(title))) {
+    // Route quarterly/annual roadmaps onto the quarters variant when we
+    // can detect a Q1/Q2… or year pattern in the node labels.
+    const quarters = nodes.filter((node) => /^q[1-4]\b|^quarter\s*[1-4]|20\d\d/i.test(node.text));
+    if (quarters.length >= 3) {
+      return {
+        sectionId: "SF-13",
+        variantId: "MV-ROADMAP-QUARTERS",
+        content: withSource({
+          title,
+          quarters: nodes.slice(0, 4).map((node, i) => ({
+            label: node.text.slice(0, 40),
+            body: bullets[i] ?? "",
+            color: node.color,
+          })),
+        }),
+        rationale: `SmartArt · ${n} nodes → quarterly roadmap`,
+      };
+    }
+    return {
+      sectionId: "SF-07",
+      variantId: "MV-TIMELINE-VERTICAL",
+      content: withSource({
+        title,
+        events: nodes.slice(0, 6).map((node, i) => ({
+          date: `${i + 1}`,
+          label: node.text.slice(0, 80),
+          body: bullets[i] ?? "",
+          color: node.color,
+        })),
+      }),
+      rationale: `SmartArt · ${n} nodes → vertical timeline · colors preserved`,
+    };
+  }
+
+  // ── Process / journey / phases ───────────────────────────────────────
+  if (hint === "process" || (!hint && journeyRe.test(title) && n >= 3)) {
+    // 3-6 phases → PROC-PHASES (native phased process); otherwise journey map.
+    if (n >= 3 && n <= 6) {
+      return {
+        sectionId: "SF-07",
+        variantId: "MV-PROC-PHASES",
+        content: withSource({
+          title,
+          phases: nodes.slice(0, 6).map((node, i) => ({
+            step: `${i + 1}`,
+            label: node.text.slice(0, 60),
+            body: bullets[i] ?? "",
+            color: node.color,
+          })),
+        }),
+        rationale: `SmartArt · ${n} nodes → phased process · colors preserved`,
+      };
+    }
     return {
       sectionId: "SF-07",
       variantId: "MV-JOURNEY-MAP",
@@ -515,8 +575,8 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
     };
   }
 
-  // Funnel — top-down decreasing hierarchy.
-  if (/funnel|convert|pipeline/i.test(title) && n >= 3 && n <= 6) {
+  // ── Funnel ───────────────────────────────────────────────────────────
+  if (hint === "funnel" || (/funnel|convert|pipeline/i.test(title) && n >= 3 && n <= 6)) {
     return {
       sectionId: "SF-08",
       variantId: "MV-FUNNEL",
@@ -528,20 +588,92 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
     };
   }
 
-  // Pyramid / hierarchy — SmartArt hierarchy or level-tagged nodes.
-  if (nodes.some((node) => node.level > 0) || /pyramid|hierarchy|maslow/i.test(title)) {
+  // ── Cycle / flywheel ─────────────────────────────────────────────────
+  if (hint === "cycle" || hint === "radial" || /cycle|loop|flywheel|continuous/i.test(title)) {
+    // 3-6 nodes fits the flywheel variant nicely.
+    if (n >= 3 && n <= 6) {
+      return {
+        sectionId: "SF-08",
+        variantId: "MV-FLYWHEEL",
+        content: withSource({
+          title,
+          nodes: nodes.slice(0, 6).map((node) => ({ label: node.text.slice(0, 60), color: node.color })),
+        }),
+        rationale: `SmartArt · ${n} nodes → flywheel · colors preserved`,
+      };
+    }
     return {
-      sectionId: "SF-06",
-      variantId: "MV-SOL-PILLARS-4",
+      sectionId: "SF-08",
+      variantId: "MV-INFO-CIRCULAR-FLOW",
       content: withSource({
         title,
-        items: nodes.slice(0, 4).map((node) => ({ title: node.text, body: "", color: node.color })),
+        items: nodes.slice(0, 8).map((node) => ({ label: node.text.slice(0, 60), color: node.color })),
       }),
-      rationale: `SmartArt · ${n} nodes → pillars · node colors preserved`,
+      rationale: `SmartArt · ${n} nodes → circular flow · colors preserved`,
     };
   }
 
-  // Default: map n nodes to N-pillar layout, capped at 5.
+  // ── Hierarchy / org chart ────────────────────────────────────────────
+  if (hint === "hierarchy" || nodes.some((node) => node.level > 0)) {
+    const root = nodes.find((node) => node.level === 0) ?? nodes[0];
+    const children = nodes.filter((node) => node !== root);
+    return {
+      sectionId: "SF-06",
+      variantId: "MV-SOL-ARCHITECTURE",
+      content: withSource({
+        title,
+        root: { label: root.text.slice(0, 80), color: root.color },
+        branches: children.slice(0, 6).map((node, i) => ({
+          label: node.text.slice(0, 60),
+          body: bullets[i] ?? "",
+          level: node.level,
+          color: node.color,
+        })),
+      }),
+      rationale: `SmartArt · ${n} nodes → org / architecture · hierarchy preserved`,
+    };
+  }
+
+  // ── Pyramid ──────────────────────────────────────────────────────────
+  if (hint === "pyramid" || /pyramid|maslow|hierarchy/i.test(title)) {
+    return {
+      sectionId: "SF-08",
+      variantId: "MV-INFO-PYRAMID",
+      content: withSource({
+        title,
+        levels: nodes.slice(0, 5).map((node) => ({ label: node.text.slice(0, 80), color: node.color })),
+      }),
+      rationale: `SmartArt · ${n} nodes → pyramid · colors preserved`,
+    };
+  }
+
+  // ── Venn ─────────────────────────────────────────────────────────────
+  if (hint === "venn" || /venn|overlap|intersection/i.test(title)) {
+    return {
+      sectionId: "SF-08",
+      variantId: "MV-INFO-VENN",
+      content: withSource({
+        title,
+        circles: nodes.slice(0, 3).map((node) => ({ label: node.text.slice(0, 40), color: node.color })),
+      }),
+      rationale: `SmartArt · ${n} nodes → venn · colors preserved`,
+    };
+  }
+
+  // ── Matrix ───────────────────────────────────────────────────────────
+  if (hint === "matrix" || /matrix|quadrant/i.test(title)) {
+    return {
+      sectionId: "SF-09",
+      variantId: "MV-MATRIX-2X2",
+      content: withSource({
+        title,
+        quadrants: nodes.slice(0, 4).map((node) => ({ label: node.text.slice(0, 60), color: node.color })),
+      }),
+      rationale: `SmartArt · ${n} nodes → 2×2 matrix · colors preserved`,
+    };
+  }
+
+  // ── Default: n nodes → N-pillar layout, capped at 5. ─────────────────
   const pillar =
     n <= 2 ? "MV-SOL-PILLARS-2" :
     n === 3 ? "MV-SOL-PILLARS-3" :
