@@ -23,6 +23,7 @@ import {
   deleteDivisionImagery,
   type DivisionImageryEntry,
 } from "@/lib/division-imagery.functions";
+import { DIVISION_IMAGERY } from "@/assets/backdrops/divisions";
 
 
 
@@ -1114,6 +1115,17 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
 
   const rows = q.data ?? [];
 
+  // Curated built-in imagery for this division (bundled in the app build).
+  // Master TransPerfect maps to the enterprise (corporate-dark) pool.
+  const builtInKey = divisionId === "master" ? "bm-enterprise" : divisionId;
+  const builtInSet = DIVISION_IMAGERY[builtInKey];
+  const builtIn = builtInSet
+    ? [
+        ...builtInSet.photos.map((src, i) => ({ src, kind: "photo" as const, name: `built-in / photo-${String(i + 1).padStart(2, "0")}` })),
+        ...builtInSet.abstracts.map((src, i) => ({ src, kind: "abstract" as const, name: `built-in / abstract-${String(i + 1).padStart(2, "0")}` })),
+      ]
+    : [];
+
   return (
     <>
       <Section title="Upload division imagery">
@@ -1162,6 +1174,35 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
         </label>
         {error && <div className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{error}</div>}
       </Section>
+
+      {builtIn.length > 0 && (
+        <Section title={`Built-in imagery (${builtIn.length})`}>
+          <p className="mb-3 text-xs text-black/60">
+            Curated backdrops bundled with the app for <span className="font-medium">{guide.title}</span>.
+            Used automatically as slide backgrounds and available across the module library. Uploads below
+            extend this pool.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {builtIn.map((b) => (
+              <div key={b.src} className="overflow-hidden rounded-xl border border-black/10 bg-white">
+                <div className="relative aspect-[4/3] w-full bg-black/[0.04]">
+                  <img src={b.src} alt={b.name} className="h-full w-full object-cover" loading="lazy" />
+                  <span className="absolute left-2 top-2 rounded-full bg-[#003FC7] px-2 py-0.5 text-[9px] uppercase tracking-widest text-white">
+                    Built-in
+                  </span>
+                  <span className="absolute right-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-[9px] uppercase tracking-widest text-white">
+                    {b.kind}
+                  </span>
+                </div>
+                <div className="p-2.5">
+                  <div className="truncate text-xs font-medium text-black" title={b.name}>{b.name}</div>
+                  <div className="mt-0.5 text-[10px] text-black/40">Bundled asset · always available</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
 
       <Section title={`Division imagery (${rows.length})`}>
         {q.isLoading ? (
