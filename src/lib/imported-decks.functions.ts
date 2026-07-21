@@ -90,8 +90,53 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
       await s.storage.from(BUCKET).remove([storagePath]).catch(() => {});
       throw new Error(`Save failed: ${(error as { message?: string }).message ?? "unknown"}`);
     }
-    return row as { id: string; slide_count: number; status: string };
+
+    // Persist each embedded slide image into the shared `division-imagery`
+    // bucket so it surfaces in the Imagery tab and is reusable across decks.
+    // Best-effort: image failures don't roll back the deck upload.
+    const imageryDivision = normalizeImportedDeckDivision(data.divisionId);
+    const savedImagePaths: string[] = [];
+    let imgSeq = 0;
+    for (const sl of parsed.slides) {
+      for (let j = 0; j < sl.images.length; j++) {
+        const dataUrl = sl.images[j];
+        const m = /^data:([^;]+);base64,(.+)$/.exec(dataUrl);
+        if (!m) continue;
+        const contentType = m[1];
+        const bin = Buffer.from(m[2], "base64");
+        if (bin.length === 0) continue;
+        const ext = contentType.split("/")[1]?.split("+")[0] ?? "bin";
+        const imgId = crypto.randomUUID();
+        const imgFilename = `${data.filename.replace(/\.pptx$/i, "")}__slide-${sl.index + 1}-${j + 1}.${ext}`.replace(/[^\w.\-]+/g, "_").slice(-160);
+        const imgPath = `${context.userId}/${imgId}-${imgFilename}`;
+        const upImg = await s.storage
+          .from("division-imagery")
+          .upload(imgPath, bin, { contentType, upsert: false });
+        if (upImg.error) continue;
+        const { error: rowErr } = await s.from("division_imagery").insert({
+          id: imgId,
+          division_id: imageryDivision,
+          uploaded_by: context.userId,
+          filename: imgFilename,
+          content_type: contentType,
+          size_bytes: bin.length,
+          storage_path: imgPath,
+          kind: "upload",
+          tags: ["imported_deck", `slide-${sl.index + 1}`, data.divisionId],
+          note: `Extracted from ${data.filename} · slide ${sl.index + 1}`,
+        });
+        if (rowErr) {
+          await s.storage.from("division-imagery").remove([imgPath]).catch(() => {});
+          continue;
+        }
+        savedImagePaths.push(imgPath);
+        imgSeq++;
+      }
+    }
+
+    return { ...(row as { id: string; slide_count: number; status: string }), imagesSaved: imgSeq };
   });
+
 
 export const listImportedDecksForDivision = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
