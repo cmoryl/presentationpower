@@ -639,8 +639,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Two grouped columns of logos with a category label each",
     permittedLayoutIds: ["LF-04"],
     capacity: { items: { min: 2, max: 2 }, titleChars: 60, bodyChars: 60 },
-    editableFields: ["title", "items[].label", "items[].logos[].name"],
-    lockedFields: ["items[].logos[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "items[].label", "items[].logos[].name", "items[].logos[].logoUrl", "items[].logos[].logoPath", "items[].logos[].logoVariant", "items[].logos[].logoVariants", "items[].logos[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
   {
     id: "MV-PROOF-LOGOS-MOSAIC",
