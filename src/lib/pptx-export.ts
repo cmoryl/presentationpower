@@ -8,6 +8,7 @@ import PptxGenJS from "pptxgenjs";
 import type { Deck, DeckSlide, DeckStrategySnapshot } from "./deck-store";
 import type { BrandMode } from "./taxonomy";
 import { getDivisionLogos } from "./division-logos";
+import { resolveLogoPlacement, type ChromeVariant, type LogoPosition } from "./logo-placement";
 import { pickDivisionImage } from "@/assets/backdrops/divisions";
 import { variantSupportsImagery } from "./variant-media";
 import {
@@ -158,14 +159,22 @@ export async function exportDeckToPptx(
   });
 
   const logos = getDivisionLogos(deck.brandModeId) ?? getDivisionLogos("tp");
-  const [logoColor, logoWhite] = await Promise.all([
+  const [logoColor, logoWhite, logoStackedColor, logoStackedWhite] = await Promise.all([
     logos?.color ? fetchAsDataUrl(logos.color) : Promise.resolve(null),
     logos?.white
       ? fetchAsDataUrl(logos.white)
       : logos?.color
       ? fetchAsDataUrl(logos.color)
       : Promise.resolve(null),
+    logos?.stackedColor ? fetchAsDataUrl(logos.stackedColor) : Promise.resolve(null),
+    logos?.stackedWhite
+      ? fetchAsDataUrl(logos.stackedWhite)
+      : logos?.stackedColor
+      ? fetchAsDataUrl(logos.stackedColor)
+      : Promise.resolve(null),
   ]);
+  const deckLogoOrientation: "horizontal" | "stacked" =
+    deck.context?.logoOrientation === "stacked" ? "stacked" : "horizontal";
 
   // Prefetch all slide imagery in parallel so the export runs quickly.
   // Custom `content.mediaUrl` failures are logged with the slide index so a
@@ -301,27 +310,69 @@ export async function exportDeckToPptx(
       renderContent(s, slide, palette);
     }
 
-    const logoData = useWhiteLogo ? logoWhite : logoColor;
-    if (logoData) {
-      if (useWhiteLogo) {
-        s.addImage({
-          data: logoData,
-          x: SLIDE_W - 2.2,
-          y: SLIDE_H - 0.9,
-          w: 1.7,
-          h: 0.5,
-          sizing: { type: "contain", w: 1.7, h: 0.5 },
-        });
-      } else {
-        s.addImage({
-          data: logoData,
-          x: 0.5,
-          y: 0.35,
-          w: 1.4,
-          h: 0.4,
-          sizing: { type: "contain", w: 1.4, h: 0.4 },
-        });
-      }
+    // Per-slide logo placement — mirrors SlideChrome's contract:
+    //  · position honors per-slide override → layout default → chrome default
+    //  · orientation honors per-slide override → deck default
+    //  · top/bottom-center + left-side positions render at half size so the
+    //    mark stays a quiet signature (matches the editor)
+    //  · logo is added AFTER content so it renders as the top-most layer
+    const chrome: ChromeVariant =
+      kind === "cover" ? "cover"
+        : kind === "divider" ? "divider"
+        : slide.variantId?.startsWith("MV-CLOSE-") ? "close"
+        : "content";
+    const perSlidePos = (slide.logoPosition && slide.logoPosition !== "auto")
+      ? (slide.logoPosition as LogoPosition)
+      : undefined;
+    const placement = resolveLogoPlacement(chrome, slide.layoutId, perSlidePos);
+    const perSlideOrient = slide.logoOrientation && slide.logoOrientation !== "auto"
+      ? slide.logoOrientation
+      : deckLogoOrientation;
+    const orient: "horizontal" | "stacked" = perSlideOrient === "stacked" ? "stacked" : "horizontal";
+    const logoData = orient === "stacked"
+      ? (useWhiteLogo ? (logoStackedWhite ?? logoWhite) : (logoStackedColor ?? logoColor))
+      : (useWhiteLogo ? logoWhite : logoColor);
+
+    if (logoData && placement.position !== "hidden") {
+      const isHalf =
+        placement.position === "top-center" ||
+        placement.position === "bottom-center" ||
+        placement.position === "top-left" ||
+        placement.position === "bottom-left";
+      // Base size mirrors the editor's per-chrome sizing: cover uses the hero
+      // lockup (xl), close/divider use mid (md), content stays quiet (sm).
+      // Half-size positions drop one size band.
+      const base: "sm" | "md" | "xl" = chrome === "content" ? "sm" : chrome === "cover" ? "xl" : "md";
+      const dims = (() => {
+        // Widths in inches; heights preserve the aspect ratio for the two
+        // orientations (~3.4:1 horizontal, ~1.4:1 stacked).
+        const table: Record<string, number> = { sm: 1.4, md: 1.9, xl: 2.8 };
+        const shrunk: Record<string, string> = { xl: "sm", md: "sm", sm: "sm" };
+        const key = isHalf ? shrunk[base] : base;
+        const w = table[key] ?? 1.4;
+        const h = orient === "stacked" ? w / 1.4 : w / 3.4;
+        return { w, h };
+      })();
+      const inset = 0.45;
+      const pos = (() => {
+        switch (placement.position) {
+          case "top-left":      return { x: inset, y: inset };
+          case "top-right":     return { x: SLIDE_W - inset - dims.w, y: inset };
+          case "top-center":    return { x: (SLIDE_W - dims.w) / 2, y: inset };
+          case "bottom-left":   return { x: inset, y: SLIDE_H - inset - dims.h };
+          case "bottom-right":  return { x: SLIDE_W - inset - dims.w, y: SLIDE_H - inset - dims.h };
+          case "bottom-center": return { x: (SLIDE_W - dims.w) / 2, y: SLIDE_H - inset - dims.h };
+          default:              return { x: inset, y: inset };
+        }
+      })();
+      s.addImage({
+        data: logoData,
+        x: pos.x,
+        y: pos.y,
+        w: dims.w,
+        h: dims.h,
+        sizing: { type: "contain", w: dims.w, h: dims.h },
+      });
     }
 
     if (!hideFooter) {
