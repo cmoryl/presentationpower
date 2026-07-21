@@ -54,8 +54,18 @@ export const Route = createFileRoute("/decks/$deckId/")({
   head: ({ params }) => ({
     meta: [{ title: `Deck ${params.deckId} · TransPerfect Modular` }],
   }),
-  component: DeckEditor,
+  component: DeckEditorGate,
 });
+
+function DeckEditorGate() {
+  const { deckId } = Route.useParams();
+  const hydrated = useDeckHydrated();
+  const hasDeck = useDeckStore((s) => Boolean(s.decks[deckId]));
+  if (!hydrated) return <DeckHydratingFallback label="Loading deck…" />;
+  if (!hasDeck) throw notFound();
+  return <DeckEditor />;
+}
+
 
 function DeckEditor() {
   const { deckId } = Route.useParams();
