@@ -2,8 +2,34 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-export type KnowledgeKind = "fact" | "proof_point" | "case_study" | "policy" | "terminology" | "note";
+export type KnowledgeKind =
+  | "fact"
+  | "proof_point"
+  | "case_study"
+  | "policy"
+  | "terminology"
+  | "note"
+  | "source_deck"
+  | "source_pdf";
 export type KnowledgeVisibility = "private" | "shared" | "global";
+
+// Map a public bm-* division id to the brand-guide slug used by admin
+// uploads (imported_decks.division_id, pdf_extractions entity slugs).
+// Mirrors BRAND_GUIDES in src/lib/brand-guides.ts. Kept local so this
+// server-only module stays free of client asset imports.
+const BM_TO_GUIDE_SLUG: Record<string, string> = {
+  "bm-enterprise": "transperfect-master",
+  "bm-tp-lifesci": "transperfect-life-sciences",
+  "bm-tp-legal": "transperfect-legal",
+  "bm-tp-media": "transperfect-media",
+  "bm-tp-games": "transperfect-gaming",
+  "bm-tp-digital": "transperfect-digital",
+  "bm-trial-interactive": "trial-interactive",
+  "bm-cobrand": "transperfect-cobrand",
+  "bm-product": "dataforce",
+  "bm-division": "globallink",
+};
+
 
 export type KnowledgeEntry = {
   id: string;
