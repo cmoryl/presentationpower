@@ -424,12 +424,15 @@ const CHART_KIND_MAP: Record<string, ParsedChart["kind"]> = {
   "c:radarChart": "radar",
 };
 
-function extractChartsFromChartXml(cdoc: unknown): ParsedChart[] {
+function extractChartsFromChartXml(cdoc: unknown, theme: ParsedTheme): ParsedChart[] {
   const out: ParsedChart[] = [];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const plotArea = (cdoc as any)?.["c:chartSpace"]?.["c:chart"]?.["c:plotArea"];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const chartTitle = readChartTitle((cdoc as any)?.["c:chartSpace"]?.["c:chart"]?.["c:title"]);
+  const chart = (cdoc as any)?.["c:chartSpace"]?.["c:chart"];
+  const plotArea = chart?.["c:plotArea"];
+  const chartTitle = readChartTitle(chart?.["c:title"]);
+  const legend = readLegend(chart?.["c:legend"]);
+  const axis = readAxisTitles(plotArea);
+  const chartFont = readTxPrFont(chart?.["c:txPr"], theme);
   if (!plotArea || typeof plotArea !== "object") return out;
 
   for (const key of Object.keys(plotArea)) {
@@ -452,6 +455,7 @@ function extractChartsFromChartXml(cdoc: unknown): ParsedChart[] {
       const serArr = Array.isArray(serRaw) ? serRaw : serRaw ? [serRaw] : [];
       let categories: string[] = [];
       const series: ParsedChartSeries[] = [];
+      let numberFormat: string | undefined;
       for (const s of serArr) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const label = readNumStrTitle((s as any)?.["c:tx"]) ?? `Series ${series.length + 1}`;
@@ -460,15 +464,53 @@ function extractChartsFromChartXml(cdoc: unknown): ParsedChart[] {
         if (cats.length && categories.length === 0) categories = cats;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const vals = readNumValues((s as any)?.["c:val"]);
-        if (vals.length > 0) series.push({ label, values: vals });
+        if (!numberFormat) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          numberFormat = (s as any)?.["c:val"]?.["c:numRef"]?.["c:numCache"]?.["c:formatCode"];
+          if (numberFormat && typeof numberFormat === "object" && "#text" in (numberFormat as object)) {
+            numberFormat = String((numberFormat as { "#text": unknown })["#text"]);
+          }
+          if (typeof numberFormat !== "string") numberFormat = undefined;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const seriesColor = readShapeColor((s as any)?.["c:spPr"], theme);
+        // Per-datapoint color overrides (pie/donut segments especially).
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const dPtRaw = (s as any)?.["c:dPt"];
+        const dPts = Array.isArray(dPtRaw) ? dPtRaw : dPtRaw ? [dPtRaw] : [];
+        let pointColors: string[] | undefined;
+        if (dPts.length > 0) {
+          pointColors = [];
+          for (const p of dPts) {
+            const idx = Number(p?.["c:idx"]?.["@_val"] ?? -1);
+            const col = readShapeColor(p?.["c:spPr"], theme);
+            if (Number.isFinite(idx) && idx >= 0 && col) pointColors[idx] = col;
+          }
+          // Compact undefineds → keep the array length matching declared points.
+          if (pointColors.every((c) => !c)) pointColors = undefined;
+        }
+        if (vals.length > 0) {
+          series.push({
+            label,
+            values: vals,
+            color: seriesColor,
+            pointColors,
+          });
+        }
       }
       if (series.length > 0) {
+        const unit = inferUnitFromFormat(numberFormat);
         out.push({
           kind,
           title: chartTitle,
           categories: categories.length ? categories : series[0].values.map((_, i) => `Item ${i + 1}`),
           series,
           stacked,
+          legend,
+          axis,
+          numberFormat,
+          unit,
+          font: chartFont,
         });
       }
     }
@@ -477,23 +519,78 @@ function extractChartsFromChartXml(cdoc: unknown): ParsedChart[] {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function readChartTitle(t: any): string | undefined {
-  if (!t) return undefined;
-  const runs: string[] = [];
-  walk(t, (v, k) => {
-    if (k === "a:t") {
-      if (typeof v === "string") runs.push(v);
-      else if (v && typeof v === "object" && "#text" in v) runs.push(String(v["#text"]));
+function readLegend(l: any): ParsedChart["legend"] {
+  if (l == null) return undefined;
+  const posRaw = l?.["c:legendPos"]?.["@_val"];
+  const pos: "r" | "l" | "t" | "b" | "tr" | undefined =
+    posRaw === "r" || posRaw === "l" || posRaw === "t" || posRaw === "b" || posRaw === "tr" ? posRaw : undefined;
+  // c:overlay does not turn the legend off — a missing c:legend does.
+  return { visible: true, position: pos };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function readAxisTitles(plotArea: any): ParsedChart["axis"] {
+  if (!plotArea) return undefined;
+  const catTitle = readChartTitle(plotArea?.["c:catAx"]?.["c:title"]);
+  const valTitle = readChartTitle(plotArea?.["c:valAx"]?.["c:title"]);
+  if (!catTitle && !valTitle) return undefined;
+  return { category: catTitle, value: valTitle };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function readTxPrFont(txPr: any, theme: ParsedTheme): ParsedChart["font"] | undefined {
+  if (!txPr) return undefined;
+  const defRPr = txPr?.["a:p"]?.["a:pPr"]?.["a:defRPr"] ?? txPr?.["a:bodyPr"]?.["a:defRPr"];
+  const family = defRPr?.["a:latin"]?.["@_typeface"] ?? theme.bodyFont;
+  const color = readFillColor(defRPr?.["a:solidFill"], theme) ?? theme.dark1;
+  if (!family && !color) return undefined;
+  return { family, color };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function readShapeColor(spPr: any, theme: ParsedTheme): string | undefined {
+  if (!spPr) return undefined;
+  return (
+    readFillColor(spPr?.["a:solidFill"], theme) ??
+    readFillColor(spPr?.["a:gradFill"]?.["a:gsLst"]?.["a:gs"]?.[0], theme) ??
+    readFillColor(spPr?.["a:ln"]?.["a:solidFill"], theme)
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function readFillColor(fill: any, theme: ParsedTheme): string | undefined {
+  if (!fill) return undefined;
+  const srgb = fill?.["a:srgbClr"]?.["@_val"];
+  if (typeof srgb === "string" && /^[0-9a-fA-F]{6}$/.test(srgb)) return `#${srgb.toUpperCase()}`;
+  const scheme = fill?.["a:schemeClr"]?.["@_val"];
+  if (typeof scheme === "string") {
+    const m = /^accent([1-6])$/.exec(scheme);
+    if (m) {
+      const idx = Number(m[1]) - 1;
+      return theme.accents[idx];
     }
-  });
-  const s = runs.join("").trim();
-  return s.length ? s : undefined;
+    if (scheme === "dk1" || scheme === "dk2" || scheme === "tx1") return theme.dark1;
+    if (scheme === "lt1" || scheme === "lt2" || scheme === "bg1") return theme.light1;
+  }
+  const sys = fill?.["a:sysClr"]?.["@_lastClr"];
+  if (typeof sys === "string" && /^[0-9a-fA-F]{6}$/.test(sys)) return `#${sys.toUpperCase()}`;
+  return undefined;
+}
+
+function inferUnitFromFormat(fmt: string | undefined): string | undefined {
+  if (!fmt) return undefined;
+  if (/%/.test(fmt)) return "%";
+  if (/\$/.test(fmt)) return "$";
+  if (/€/.test(fmt)) return "€";
+  if (/£/.test(fmt)) return "£";
+  return undefined;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function readNumStrTitle(tx: any): string | undefined {
   if (!tx) return undefined;
   // c:tx/c:strRef/c:strCache/c:pt/c:v  OR  c:tx/c:v
+
   const cache = tx?.["c:strRef"]?.["c:strCache"] ?? tx?.["c:numRef"]?.["c:numCache"];
   const pts = cache?.["c:pt"];
   const arr = Array.isArray(pts) ? pts : pts ? [pts] : [];
