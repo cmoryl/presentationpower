@@ -326,6 +326,209 @@ export const deleteImportedDeck = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ── IMAGE RELINKING (Layer 1b) ─────────────────────────────────────────
+// Some embedded PPTX images cannot be reified into `division-imagery`:
+// EMF/WMF vectors, externally-linked pictures with no local blob,
+// unsupported content-types, or blobs stripped by an intermediate editor.
+// The parser preserves the layout shape (position, mask, embedId) but with
+// no `path`, so `FaithfulSlideCanvas` renders a gray placeholder. This
+// flow lets the owner replace those refs with an uploaded file or an
+// existing entry from the Division Imagery library.
+//
+// A ref is addressed by:
+//   { slideIndex, target: "shape" | "fill" | "background", shapeIndex? }
+// `shapeIndex` is the position within layout.shapes[]; kept stable because
+// the layout array is written once at import time and only patched
+// in-place here.
+
+type BrokenRef = {
+  slideIndex: number;
+  target: "shape" | "fill" | "background";
+  shapeIndex?: number;
+  embedId?: string;
+  frame?: { x: number; y: number; w: number; h: number };
+  prst?: string;
+};
+
+export const listBrokenDeckImages = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
+  .handler(async ({ data, context }): Promise<{
+    deckId: string;
+    filename: string;
+    slideCount: number;
+    broken: BrokenRef[];
+  }> => {
+    const s = context.supabase as unknown as SbClient;
+    const { data: row } = await s
+      .from("imported_decks")
+      .select("id, uploaded_by, original_filename, slide_count, slides")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!row) throw new Error("Not found");
+    const r = row as {
+      id: string; uploaded_by: string; original_filename: string; slide_count: number;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      slides: Array<{ index: number; layout?: any }> | null;
+    };
+    if (r.uploaded_by !== context.userId) {
+      const { data: isAdmin } = await (s as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }> })
+        .rpc("has_role", { _user_id: context.userId, _role: "admin" });
+      if (!isAdmin) throw new Error("Forbidden");
+    }
+    const broken: BrokenRef[] = [];
+    for (const sl of r.slides ?? []) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const bg = (sl.layout as any)?.background;
+      if (bg?.kind === "image" && !bg.path) {
+        broken.push({ slideIndex: sl.index, target: "background", embedId: bg.embedId });
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const shapes = (sl.layout?.shapes ?? []) as any[];
+      for (let i = 0; i < shapes.length; i++) {
+        const sh = shapes[i];
+        if (sh?.kind === "image" && !sh.path) {
+          broken.push({
+            slideIndex: sl.index, target: "shape", shapeIndex: i,
+            embedId: sh.embedId, frame: sh.frame, prst: sh.prst,
+          });
+        }
+        if (sh?.fill?.kind === "image" && !sh.fill.path) {
+          broken.push({
+            slideIndex: sl.index, target: "fill", shapeIndex: i,
+            embedId: sh.fill.embedId, frame: sh.frame, prst: sh.prst,
+          });
+        }
+      }
+    }
+    return {
+      deckId: r.id, filename: r.original_filename, slideCount: r.slide_count, broken,
+    };
+  });
+
+const RelinkInput = z.object({
+  deckId: z.string().uuid(),
+  slideIndex: z.number().int().min(0),
+  target: z.enum(["shape", "fill", "background"]),
+  shapeIndex: z.number().int().min(0).optional(),
+  // Either upload a new file (base64 up to ~15MB) …
+  dataBase64: z.string().min(1).max(20_000_000).optional(),
+  contentType: z.string().min(3).max(120).optional(),
+  filename: z.string().min(1).max(200).optional(),
+  // … or reuse an existing entry from Division Imagery.
+  reusePath: z.string().min(1).max(500).optional(),
+}).refine((v) => (v.dataBase64 && v.contentType && v.filename) || v.reusePath, {
+  message: "Provide either an uploaded file (dataBase64+contentType+filename) or reusePath.",
+});
+
+export const relinkDeckImage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => RelinkInput.parse(v))
+  .handler(async ({ data, context }): Promise<{ ok: true; path: string }> => {
+    const s = context.supabase as unknown as SbClient;
+    // Fetch the deck we intend to mutate. Only the uploader (or an admin)
+    // may relink; other viewers can render, not edit.
+    const { data: row } = await s
+      .from("imported_decks")
+      .select("id, uploaded_by, division_id, original_filename, slides")
+      .eq("id", data.deckId)
+      .maybeSingle();
+    if (!row) throw new Error("Not found");
+    const r = row as {
+      id: string; uploaded_by: string; division_id: string; original_filename: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      slides: Array<{ index: number; imagePaths?: string[]; layout?: any }> | null;
+    };
+    if (r.uploaded_by !== context.userId) {
+      const { data: isAdmin } = await (s as unknown as { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown }> })
+        .rpc("has_role", { _user_id: context.userId, _role: "admin" });
+      if (!isAdmin) throw new Error("Forbidden");
+    }
+
+    // Resolve the storage path — either the reused Division Imagery entry
+    // or a fresh upload into `division-imagery` (same bucket, same tags).
+    let storagePath: string;
+    if (data.reusePath) {
+      storagePath = data.reusePath;
+    } else {
+      const bin = Buffer.from(data.dataBase64!, "base64");
+      if (bin.length === 0) throw new Error("Empty file");
+      const contentType = data.contentType!;
+      const ext = contentType.split("/")[1]?.split("+")[0] ?? "bin";
+      const imgId = crypto.randomUUID();
+      const base = data.filename!.replace(/\.[a-z0-9]+$/i, "");
+      const imgFilename = `${base}__relink-s${data.slideIndex + 1}.${ext}`
+        .replace(/[^\w.\-]+/g, "_")
+        .slice(-160);
+      const imgPath = `${context.userId}/${imgId}-${imgFilename}`;
+      const up = await s.storage.from("division-imagery").upload(imgPath, bin, { contentType, upsert: false });
+      if (up.error) throw new Error(`Upload failed: ${up.error.message ?? "unknown"}`);
+      const imageryDivision = normalizeImportedDeckDivision(r.division_id);
+      const { error: rowErr } = await s.from("division_imagery").insert({
+        id: imgId,
+        division_id: imageryDivision,
+        uploaded_by: context.userId,
+        filename: imgFilename,
+        content_type: contentType,
+        size_bytes: bin.length,
+        storage_path: imgPath,
+        kind: "upload",
+        tags: ["imported_deck_relink", `slide-${data.slideIndex + 1}`, r.division_id],
+        note: `Relinked image for ${r.original_filename} · slide ${data.slideIndex + 1}`,
+      });
+      if (rowErr) {
+        await s.storage.from("division-imagery").remove([imgPath]).catch(() => {});
+        throw new Error("Could not register image in Division Imagery.");
+      }
+      storagePath = imgPath;
+    }
+
+    // Patch the slide's layout JSON in-place. We rewrite by (target,
+    // shapeIndex) so ambiguous embedIds (multiple broken refs pointing
+    // at the same missing rId) resolve deterministically.
+    const slides = r.slides ?? [];
+    const idx = slides.findIndex((sl) => sl.index === data.slideIndex);
+    if (idx < 0) throw new Error("Slide not found in deck");
+    const sl = slides[idx];
+    if (!sl.layout) throw new Error("Slide has no captured layout");
+    const layout = { ...sl.layout };
+
+    if (data.target === "background") {
+      const bg = layout.background;
+      if (!bg || bg.kind !== "image") throw new Error("Slide background is not an image reference");
+      layout.background = { ...bg, path: storagePath };
+    } else {
+      if (data.shapeIndex === undefined) throw new Error("shapeIndex required for shape/fill target");
+      const shapes = [...(layout.shapes ?? [])];
+      const shape = shapes[data.shapeIndex];
+      if (!shape) throw new Error("Shape not found at shapeIndex");
+      if (data.target === "shape") {
+        if (shape.kind !== "image") throw new Error("Shape is not an image");
+        shapes[data.shapeIndex] = { ...shape, path: storagePath };
+      } else {
+        if (shape.fill?.kind !== "image") throw new Error("Shape fill is not an image reference");
+        shapes[data.shapeIndex] = { ...shape, fill: { ...shape.fill, path: storagePath } };
+      }
+      layout.shapes = shapes;
+    }
+
+    // Keep imagePaths[] (used for signed-URL prefetch and library preview
+    // fallbacks) in sync so the new asset appears alongside originals.
+    const imagePaths = Array.from(new Set([...(sl.imagePaths ?? []), storagePath]));
+    const nextSlides = slides.slice();
+    nextSlides[idx] = { ...sl, layout, imagePaths };
+
+    const { error } = await s
+      .from("imported_decks")
+      .update({ slides: nextSlides })
+      .eq("id", data.deckId);
+    if (error) throw new Error((error as { message?: string }).message ?? "Save failed");
+
+    return { ok: true, path: storagePath };
+  });
+
+
+
 // ── RAG EMBEDDING PIPELINE (Layer 2a) ──────────────────────────────────
 // Chunk + embed imported_decks (slide title + bullets + notes) into the
 // SAME brand_asset_chunks table used by pdf_extractions, so RAG queries by

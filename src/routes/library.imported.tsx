@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, ExternalLink, Send, Image as ImageIcon, FileText, ChevronRight, X, Check } from "lucide-react";
+import { Loader2, ExternalLink, Send, Image as ImageIcon, FileText, ChevronRight, X, Check, Wrench, Upload } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { FaithfulSlideCanvas } from "@/components/slide/FaithfulSlideCanvas";
@@ -13,7 +13,11 @@ import {
   sendImportedSlideToLibrary,
   listLibrarySlideExamples,
   importedDeckSlugForDivision,
+  listBrokenDeckImages,
+  relinkDeckImage,
 } from "@/lib/imported-decks.functions";
+import { listDivisionImagery } from "@/lib/division-imagery.functions";
+
 
 export const Route = createFileRoute("/library/imported")({
   head: () => ({
@@ -245,6 +249,7 @@ function DeckSlides({
   approvedKey: Set<string>;
   onPreview: (idx: number) => void;
 }) {
+  const [relinkOpen, setRelinkOpen] = useState(false);
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-black/10 pb-4">
@@ -262,17 +267,34 @@ function DeckSlides({
             {deck.theme?.headingFont && <span>{deck.theme.headingFont}</span>}
           </div>
         </div>
-        {deck.downloadUrl && (
-          <a
-            href={deck.downloadUrl}
-            target="_blank"
-            rel="noreferrer"
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setRelinkOpen(true)}
             className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
           >
-            <ExternalLink size={12} /> Original .pptx
-          </a>
-        )}
+            <Wrench size={12} /> Fix images
+          </button>
+          {deck.downloadUrl && (
+            <a
+              href={deck.downloadUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+            >
+              <ExternalLink size={12} /> Original .pptx
+            </a>
+          )}
+        </div>
       </div>
+      {relinkOpen && (
+        <RelinkDrawer
+          deckId={deck.id}
+          brandModeId={brandModeId}
+          onClose={() => setRelinkOpen(false)}
+        />
+      )}
+
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {deck.slides.map((s) => (
@@ -459,3 +481,273 @@ function SlidePreview({
     </div>
   );
 }
+
+// ── RelinkDrawer ───────────────────────────────────────────────────────
+// Missing/broken embedded image refs → replace with an uploaded file or
+// an existing Division Imagery entry. Patches the deck's stored layout
+// so FaithfulSlideCanvas immediately renders the new asset.
+
+type BrokenRefRow = {
+  slideIndex: number;
+  target: "shape" | "fill" | "background";
+  shapeIndex?: number;
+  embedId?: string;
+  frame?: { x: number; y: number; w: number; h: number };
+  prst?: string;
+};
+
+function refKey(r: BrokenRefRow): string {
+  return `${r.slideIndex}:${r.target}:${r.shapeIndex ?? "-"}`;
+}
+
+function RelinkDrawer({
+  deckId,
+  brandModeId,
+  onClose,
+}: {
+  deckId: string;
+  brandModeId: string;
+  onClose: () => void;
+}) {
+  const listFn = useServerFn(listBrokenDeckImages);
+  const imageryFn = useServerFn(listDivisionImagery);
+  const qc = useQueryClient();
+
+  const brokenQ = useQuery({
+    queryKey: ["deck-broken-images", deckId],
+    queryFn: () => listFn({ data: { id: deckId } }),
+  });
+
+  const imageryQ = useQuery({
+    queryKey: ["division-imagery", brandModeId],
+    queryFn: () => imageryFn({ data: { divisionId: brandModeId } }),
+  });
+
+  const broken = (brokenQ.data?.broken ?? []) as BrokenRefRow[];
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="flex h-full w-full max-w-2xl flex-col bg-white shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between border-b border-black/10 px-5 py-3">
+          <div>
+            <div className="text-xs uppercase tracking-widest text-black/40">Fix images</div>
+            <div className="text-sm font-medium text-[#03002C]">
+              {brokenQ.data?.filename ?? "Deck"}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full p-2 text-black/50 hover:bg-black/5 hover:text-black"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          {brokenQ.isLoading ? (
+            <div className="flex h-40 items-center justify-center text-sm text-black/50">
+              <Loader2 size={16} className="mr-2 animate-spin" /> Scanning slides…
+            </div>
+          ) : brokenQ.error ? (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+              {(brokenQ.error as Error).message}
+            </div>
+          ) : broken.length === 0 ? (
+            <div className="flex h-40 flex-col items-center justify-center text-center">
+              <Check size={22} className="text-green-600" />
+              <div className="mt-2 text-sm font-medium text-[#03002C]">All image refs resolved.</div>
+              <div className="mt-1 text-xs text-black/50">No missing embeds to remap.</div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                {broken.length} image reference{broken.length === 1 ? "" : "s"} could not be extracted from the original .pptx. Attach a replacement below — the deck will re-render immediately.
+              </div>
+              {broken.map((r) => (
+                <RelinkRow
+                  key={refKey(r)}
+                  deckId={deckId}
+                  brandModeId={brandModeId}
+                  broken={r}
+                  imagery={imageryQ.data ?? []}
+                  onDone={async () => {
+                    await qc.invalidateQueries({ queryKey: ["deck-broken-images", deckId] });
+                    await qc.invalidateQueries({ queryKey: ["imported-library-slides", deckId] });
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RelinkRow({
+  deckId,
+  brandModeId,
+  broken,
+  imagery,
+  onDone,
+}: {
+  deckId: string;
+  brandModeId: string;
+  broken: BrokenRefRow;
+  imagery: Array<{ storage_path: string; filename: string; signedUrl: string | null }>;
+  onDone: () => void | Promise<void>;
+}) {
+  const relinkFn = useServerFn(relinkDeckImage);
+  const [mode, setMode] = useState<"upload" | "reuse">("upload");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [done, setDone] = useState(false);
+  void brandModeId;
+
+  async function handleFile(file: File) {
+    setBusy(true); setErr(null);
+    try {
+      const buf = await file.arrayBuffer();
+      const bytes = new Uint8Array(buf);
+      let bin = "";
+      for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+      const dataBase64 = btoa(bin);
+      await relinkFn({
+        data: {
+          deckId,
+          slideIndex: broken.slideIndex,
+          target: broken.target,
+          shapeIndex: broken.shapeIndex,
+          dataBase64,
+          contentType: file.type || "image/png",
+          filename: file.name,
+        },
+      });
+      setDone(true);
+      await onDone();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleReuse(path: string) {
+    setBusy(true); setErr(null);
+    try {
+      await relinkFn({
+        data: {
+          deckId,
+          slideIndex: broken.slideIndex,
+          target: broken.target,
+          shapeIndex: broken.shapeIndex,
+          reusePath: path,
+        },
+      });
+      setDone(true);
+      await onDone();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Relink failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="rounded-xl border border-black/10 bg-white p-3">
+      <div className="flex items-center justify-between gap-3">
+        <div className="text-xs">
+          <div className="font-medium text-[#03002C]">
+            Slide {broken.slideIndex + 1} · {broken.target}
+            {broken.shapeIndex !== undefined ? ` #${broken.shapeIndex}` : ""}
+          </div>
+          <div className="mt-0.5 text-[11px] text-black/50">
+            {broken.embedId ? `Missing embed ${broken.embedId}` : "Missing image blob"}
+            {broken.frame && ` · ${broken.frame.w.toFixed(2)}″ × ${broken.frame.h.toFixed(2)}″`}
+            {broken.prst && ` · ${broken.prst}`}
+          </div>
+        </div>
+        {done && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-700">
+            <Check size={10} /> Linked
+          </span>
+        )}
+      </div>
+
+      {!done && (
+        <>
+          <div className="mt-3 flex gap-1 text-[10px] uppercase tracking-widest">
+            <button
+              type="button"
+              onClick={() => setMode("upload")}
+              className={`rounded-full px-2.5 py-1 ${mode === "upload" ? "bg-[#03002C] text-white" : "bg-black/5 text-black/60 hover:bg-black/10"}`}
+            >
+              Upload
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("reuse")}
+              className={`rounded-full px-2.5 py-1 ${mode === "reuse" ? "bg-[#03002C] text-white" : "bg-black/5 text-black/60 hover:bg-black/10"}`}
+            >
+              Pick from library
+            </button>
+          </div>
+
+          {mode === "upload" ? (
+            <label className="mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-black/20 bg-black/[0.02] px-3 py-4 text-xs text-black/60 hover:border-[#003FC7] hover:text-[#003FC7]">
+              {busy ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+              {busy ? "Uploading…" : "Choose image (PNG, JPG, WebP, SVG)"}
+              <input
+                type="file"
+                className="hidden"
+                accept="image/*"
+                disabled={busy}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) void handleFile(f);
+                  e.target.value = "";
+                }}
+              />
+            </label>
+          ) : (
+            <div className="mt-3 max-h-56 overflow-y-auto rounded-lg border border-black/10 bg-black/[0.02] p-2">
+              {imagery.length === 0 ? (
+                <div className="p-4 text-center text-[11px] text-black/40">
+                  No imagery in this division yet.
+                </div>
+              ) : (
+                <div className="grid grid-cols-4 gap-2">
+                  {imagery.map((it) => (
+                    <button
+                      key={it.storage_path}
+                      type="button"
+                      disabled={busy}
+                      onClick={() => handleReuse(it.storage_path)}
+                      className="group overflow-hidden rounded-md border border-black/10 bg-white hover:border-[#003FC7] disabled:opacity-50"
+                      title={it.filename}
+                    >
+                      {it.signedUrl ? (
+                        <img src={it.signedUrl} alt={it.filename} className="aspect-square w-full object-cover" />
+                      ) : (
+                        <div className="flex aspect-square w-full items-center justify-center text-[9px] text-black/30">
+                          <ImageIcon size={14} />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {err && <div className="mt-2 text-[10px] text-red-600">{err}</div>}
+        </>
+      )}
+    </div>
+  );
+}
+
