@@ -89,10 +89,14 @@ export function getApprovedLogoItems(
   count = 8,
   excludeId?: string,
 ): ApprovedLogoItem[] {
-  const pool = excludeId
-    ? APPROVED_LOGOS.filter((l) => l.id !== excludeId)
-    : APPROVED_LOGOS;
+  // Logo walls should only ever show marks that have a genuine white
+  // variant, so dark-mode previews never fall back to a color mark on a
+  // navy backdrop. A logo whose `white` === `color` (no dedicated white
+  // asset) is excluded from the pool entirely.
+  let pool = APPROVED_LOGOS.filter((l) => l.white && l.white !== l.color);
+  if (excludeId) pool = pool.filter((l) => l.id !== excludeId);
   const out: ApprovedLogoItem[] = [];
+  if (pool.length === 0) return out;
   for (let i = 0; i < count; i++) {
     const l = pool[i % pool.length];
     out.push({
