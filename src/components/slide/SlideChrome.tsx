@@ -91,6 +91,17 @@ export function SlideFrame({
 
   const placement = resolveLogoPlacement(variant, layoutId, logoPosition);
   const showLogo = placement.position !== "hidden";
+  // Bottom-adjacent logos sit above the footer band; content needs extra
+  // pb so titles / bullets / cards don't slide under the lockup. Top-adjacent
+  // logos need a little more pt on hero (cover) chrome where the mark is xl.
+  const bottomLogo = showLogo && (
+    placement.position === "bottom-left" ||
+    placement.position === "bottom-right" ||
+    placement.position === "bottom-center"
+  );
+  const topCenterLogo = showLogo && placement.position === "top-center";
+  const bottomCenterLogo = showLogo && placement.position === "bottom-center";
+
 
 
   // Light backdrops use a cream/white tint so photography reads bright; dark
