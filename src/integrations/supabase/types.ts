@@ -1426,6 +1426,56 @@ export type Database = {
         }
         Relationships: []
       }
+      library_slide_examples: {
+        Row: {
+          brand_mode_id: string | null
+          bullets: string[]
+          created_at: string
+          division_id: string
+          id: string
+          image_paths: string[]
+          imported_deck_id: string | null
+          notes: string
+          slide_index: number
+          submitted_by: string
+          title: string
+        }
+        Insert: {
+          brand_mode_id?: string | null
+          bullets?: string[]
+          created_at?: string
+          division_id: string
+          id?: string
+          image_paths?: string[]
+          imported_deck_id?: string | null
+          notes?: string
+          slide_index?: number
+          submitted_by: string
+          title?: string
+        }
+        Update: {
+          brand_mode_id?: string | null
+          bullets?: string[]
+          created_at?: string
+          division_id?: string
+          id?: string
+          image_paths?: string[]
+          imported_deck_id?: string | null
+          notes?: string
+          slide_index?: number
+          submitted_by?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_slide_examples_imported_deck_id_fkey"
+            columns: ["imported_deck_id"]
+            isOneToOne: false
+            referencedRelation: "imported_decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       module_families: {
         Row: {
           description: string | null
