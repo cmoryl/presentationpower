@@ -271,7 +271,7 @@ function DeckEditor() {
             brand={brand}
             onInsert={(variantId, content) => {
               const res = insertExampleSlide(deck.id, variantId, content, active?.id);
-              if (res) setIndex((i) => i + 1);
+              if (res) setActiveIdx(clamped + 1);
             }}
           />
         </div>
