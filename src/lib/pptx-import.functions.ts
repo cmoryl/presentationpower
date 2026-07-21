@@ -1337,25 +1337,48 @@ function transformFrame(child: LayoutFrame, group: PNode | undefined): LayoutFra
   };
 }
 
-function walkSpTree(nodes: PNode[], zRef: { z: number }, group: PNode | undefined, out: LayoutShape[], imageEmbedIds: string[]) {
+function walkSpTree(
+  nodes: PNode[],
+  zRef: { z: number },
+  group: PNode | undefined,
+  out: LayoutShape[],
+  imageEmbedIds: string[],
+  parents?: ResolvedParents,
+) {
   for (const node of nodes) {
     const t = pTag(node);
     if (!t) continue;
     if (t === "p:sp") {
       const spPr = pFind(node, "p:spPr");
-      let frame = readFrame(spPr);
-      if (!frame) continue;
-      if (group) frame = transformFrame(frame, group);
-      const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
-      const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
-      const fill = readFill(spPr, imageEmbedIds);
-      const line = readLine(spPr);
-      const txBody = pFind(node, "p:txBody");
-      const text = readTextBody(txBody) ?? { paras: [] };
       const nvSpPr = pFind(node, "p:nvSpPr");
       const nvPr = nvSpPr ? pFind(nvSpPr, "p:nvPr") : undefined;
       const ph = nvPr ? pFind(nvPr, "p:ph") : undefined;
       const phType = ph ? pAttrs(ph)["@_type"] : undefined;
+      const phIdx = ph ? pAttrs(ph)["@_idx"] : undefined;
+      const phProtos = ph && parents ? lookupPlaceholderChain(parents, phType, phIdx) : [];
+
+      let frame = readFrame(spPr);
+      if (!frame && phProtos.length) {
+        for (const proto of phProtos) { if (proto.frame) { frame = { ...proto.frame }; break; } }
+      }
+      if (!frame) continue;
+      if (group) frame = transformFrame(frame, group);
+
+      const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
+      let prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
+      let fill = readFill(spPr, imageEmbedIds);
+      let line = readLine(spPr);
+      for (const proto of phProtos) {
+        if (!prst && proto.prst) prst = proto.prst;
+        if (!fill && proto.fill) fill = proto.fill;
+        if (!line && proto.line) line = proto.line;
+      }
+
+      const txBody = pFind(node, "p:txBody");
+      let text = readTextBody(txBody) ?? { paras: [] };
+      // Inherit paragraph defaults (font/size/color) from layout → master
+      if (phProtos.length) text = applyPlaceholderTextInheritance(text, phType, phProtos, parents);
+
       const isTitle = phType === "title" || phType === "ctrTitle" || undefined;
       out.push({ kind: "text", z: zRef.z++, frame, fill, line, prst, text, isTitle });
     } else if (t === "p:pic") {
@@ -1377,13 +1400,9 @@ function walkSpTree(nodes: PNode[], zRef: { z: number }, group: PNode | undefine
       out.push({ kind: "line", z: zRef.z++, frame, line: readLine(spPr), prst });
     } else if (t === "p:grpSp") {
       const grpSpPr = pFind(node, "p:grpSpPr");
-      walkSpTree(pChildren(node), zRef, grpSpPr ?? group, out, imageEmbedIds);
+      walkSpTree(pChildren(node), zRef, grpSpPr ?? group, out, imageEmbedIds, parents);
     } else if (t === "p:graphicFrame") {
       const xfrm = pFind(node, "p:xfrm");
-      // graphicFrame uses p:xfrm (no wrapping spPr). Build a synthetic spPr.
-      const spPrLike = xfrm ? { "p:spPr": [xfrm], ":@": {} } as unknown as PNode : undefined;
-      // Re-read via readFrame after normalizing: readFrame looks for a:xfrm.
-      // p:xfrm and a:xfrm share attribute structure, so read directly:
       let frame: LayoutFrame | undefined;
       if (xfrm) {
         const off = pFind(xfrm, "a:off");
@@ -1402,7 +1421,6 @@ function walkSpTree(nodes: PNode[], zRef: { z: number }, group: PNode | undefine
       const gKids = gData ? pChildren(gData) : [];
       const gTag = gKids[0] ? pTag(gKids[0]) : undefined;
       if (gTag === "a:tbl" || pDeepFind(gKids, "a:tbl")) {
-        // Table: pull rows + header from a:tbl
         const tbl = pDeepFind(gKids, "a:tbl");
         const header: string[] = [];
         const rows: string[][] = [];
@@ -1426,12 +1444,16 @@ function walkSpTree(nodes: PNode[], zRef: { z: number }, group: PNode | undefine
       } else {
         out.push({ kind: "diagram", z: zRef.z++, frame });
       }
-      void spPrLike;
     }
   }
 }
 
-function extractSlideLayout(xml: string, size: { w: number; h: number }, imageEmbedIds: string[]): SlideLayout {
+function extractSlideLayout(
+  xml: string,
+  size: { w: number; h: number },
+  imageEmbedIds: string[],
+  parents?: ResolvedParents,
+): SlideLayout {
   const orderParser = new XMLParser({
     ignoreAttributes: false,
     attributeNamePrefix: "@_",
@@ -1439,22 +1461,307 @@ function extractSlideLayout(xml: string, size: { w: number; h: number }, imageEm
     trimValues: true,
   });
   const root = orderParser.parse(xml) as PNode[];
-  // Find p:sld → p:cSld → p:spTree
-  const sld = pFind({ root } as unknown as PNode, "root") ? undefined : (root.find((n) => pTag(n) === "p:sld"));
+  const sld = root.find((n) => pTag(n) === "p:sld");
   const sldNode = sld ?? root[0];
   const cSld = sldNode ? pFind(sldNode, "p:cSld") : undefined;
   const spTree = cSld ? pFind(cSld, "p:spTree") : undefined;
   const shapes: LayoutShape[] = [];
-  // Background fill (cSld → p:bg → p:bgPr)
+
+  // Background: slide → layout → master
   let background: LayoutFill | undefined;
   if (cSld) {
     const bg = pFind(cSld, "p:bg");
     const bgPr = bg ? pFind(bg, "p:bgPr") : undefined;
     if (bgPr) background = readFill(bgPr, imageEmbedIds);
   }
+  if (!background) background = parents?.layout?.background;
+  if (!background) background = parents?.master?.background;
+
   if (spTree) {
     const zRef = { z: 0 };
-    walkSpTree(pChildren(spTree), zRef, undefined, shapes, imageEmbedIds);
+    walkSpTree(pChildren(spTree), zRef, undefined, shapes, imageEmbedIds, parents);
   }
   return { size, background, shapes };
 }
+
+// ─── Slide master / layout inheritance ─────────────────────────────────
+// Placeholders inherit frame, fill, line and default text styling from
+// their slideLayout and slideMaster ancestors. Without this pass, imported
+// slides render placeholder shapes with no position or typography.
+
+type PhProto = {
+  key: string;         // `${type}|${idx}`
+  type: string;        // "title" | "ctrTitle" | "body" | "subTitle" | "" | ...
+  idx: string;         // "" if unspecified
+  frame?: LayoutFrame;
+  fill?: LayoutFill;
+  line?: LayoutLine;
+  prst?: string;
+  // Per-level default run styling harvested from txBody > lstStyle > lvlXpPr > defRPr
+  lvlDefaults?: Map<number, RunDefaults>;
+};
+
+type RunDefaults = { sizePt?: number; color?: string; font?: string; bold?: boolean; italic?: boolean };
+
+type ParentSlideData = {
+  background?: LayoutFill;
+  placeholders: PhProto[];
+  // Master-level fallback text styles: title / body / other, keyed by level.
+  txStyles?: {
+    title?: Map<number, RunDefaults>;
+    body?: Map<number, RunDefaults>;
+    other?: Map<number, RunDefaults>;
+  };
+};
+
+type ResolvedParents = { layout?: ParentSlideData; master?: ParentSlideData };
+
+async function resolveParents(
+  zip: JSZip,
+  parser: XMLParser,
+  slidePath: string,
+  relsDoc: unknown,
+  cache: Map<string, ParentSlideData>,
+): Promise<ResolvedParents> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rels = (relsDoc as any)?.Relationships?.Relationship;
+  const arr = Array.isArray(rels) ? rels : rels ? [rels] : [];
+  const layoutRel = arr.find((r) => /\/slideLayout$/i.test(String(r?.["@_Type"] ?? "")));
+  if (!layoutRel?.["@_Target"]) return {};
+  const layoutPath = resolveRelPath(slidePath, String(layoutRel["@_Target"]));
+  const layoutData = await loadParent(zip, parser, layoutPath, cache);
+  if (!layoutData) return {};
+
+  // Layout rels → master
+  const layoutRelsPath = layoutPath.replace(/([^/]+)$/, "_rels/$1.rels");
+  let masterData: ParentSlideData | undefined;
+  if (zip.files[layoutRelsPath]) {
+    const rxml = await zip.files[layoutRelsPath].async("string");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rdoc = parser.parse(rxml) as any;
+    const rrels = rdoc?.Relationships?.Relationship;
+    const rarr = Array.isArray(rrels) ? rrels : rrels ? [rrels] : [];
+    const masterRel = rarr.find((r: unknown) => {
+      const rec = r as Record<string, unknown>;
+      return /\/slideMaster$/i.test(String(rec?.["@_Type"] ?? ""));
+    });
+    const masterTarget = masterRel ? (masterRel as Record<string, unknown>)["@_Target"] : undefined;
+    if (masterTarget) {
+      const masterPath = resolveRelPath(layoutPath, String(masterTarget));
+      masterData = await loadParent(zip, parser, masterPath, cache);
+    }
+  }
+  return { layout: layoutData, master: masterData };
+}
+
+async function loadParent(
+  zip: JSZip,
+  _parser: XMLParser,
+  path: string,
+  cache: Map<string, ParentSlideData>,
+): Promise<ParentSlideData | undefined> {
+  const cached = cache.get(path);
+  if (cached) return cached;
+  const entry = zip.files[path];
+  if (!entry) return undefined;
+  const xml = await entry.async("string");
+  const orderParser = new XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: "@_",
+    preserveOrder: true,
+    trimValues: true,
+  });
+  const root = orderParser.parse(xml) as PNode[];
+  const rootNode = root.find((n) => {
+    const t = pTag(n);
+    return t === "p:sldLayout" || t === "p:sldMaster";
+  }) ?? root[0];
+  const isMaster = pTag(rootNode) === "p:sldMaster";
+  const cSld = rootNode ? pFind(rootNode, "p:cSld") : undefined;
+  const spTree = cSld ? pFind(cSld, "p:spTree") : undefined;
+
+  // Background
+  let background: LayoutFill | undefined;
+  if (cSld) {
+    const bg = pFind(cSld, "p:bg");
+    const bgPr = bg ? pFind(bg, "p:bgPr") : undefined;
+    if (bgPr) background = readFill(bgPr, []);
+  }
+
+  const placeholders: PhProto[] = [];
+  if (spTree) {
+    for (const node of pChildren(spTree)) {
+      if (pTag(node) !== "p:sp") continue;
+      const nvSpPr = pFind(node, "p:nvSpPr");
+      const nvPr = nvSpPr ? pFind(nvSpPr, "p:nvPr") : undefined;
+      const ph = nvPr ? pFind(nvPr, "p:ph") : undefined;
+      if (!ph) continue;
+      const phType = String(pAttrs(ph)["@_type"] ?? "");
+      const phIdx = String(pAttrs(ph)["@_idx"] ?? "");
+      const spPr = pFind(node, "p:spPr");
+      const frame = readFrame(spPr);
+      const fill = readFill(spPr, []);
+      const line = readLine(spPr);
+      const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
+      const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
+      const txBody = pFind(node, "p:txBody");
+      const lvlDefaults = txBody ? readLstStyleDefaults(pFind(txBody, "a:lstStyle")) : undefined;
+      placeholders.push({
+        key: `${phType}|${phIdx}`,
+        type: phType,
+        idx: phIdx,
+        frame,
+        fill,
+        line,
+        prst,
+        lvlDefaults,
+      });
+    }
+  }
+
+  let txStyles: ParentSlideData["txStyles"];
+  if (isMaster) {
+    const tx = rootNode ? pFind(rootNode, "p:txStyles") : undefined;
+    if (tx) {
+      txStyles = {
+        title: readTxStyleLevels(pFind(tx, "p:titleStyle")),
+        body: readTxStyleLevels(pFind(tx, "p:bodyStyle")),
+        other: readTxStyleLevels(pFind(tx, "p:otherStyle")),
+      };
+    }
+  }
+
+  const data: ParentSlideData = { background, placeholders, txStyles };
+  cache.set(path, data);
+  return data;
+}
+
+function readLstStyleDefaults(lstStyle: PNode | undefined): Map<number, RunDefaults> | undefined {
+  if (!lstStyle) return undefined;
+  const out = new Map<number, RunDefaults>();
+  for (const child of pChildren(lstStyle)) {
+    const tag = pTag(child);
+    if (!tag) continue;
+    const m = tag.match(/^a:(?:def|lvl(\d+))pPr$/);
+    if (!m) continue;
+    const level = m[1] ? Number(m[1]) - 1 : 0;
+    const defRPr = pFind(child, "a:defRPr");
+    if (defRPr) {
+      const rd = readRunDefaults(defRPr);
+      if (rd) out.set(level, rd);
+    }
+  }
+  return out.size ? out : undefined;
+}
+
+function readTxStyleLevels(styleNode: PNode | undefined): Map<number, RunDefaults> | undefined {
+  if (!styleNode) return undefined;
+  const out = new Map<number, RunDefaults>();
+  for (const child of pChildren(styleNode)) {
+    const tag = pTag(child);
+    if (!tag) continue;
+    const m = tag.match(/^a:(?:def|lvl(\d+))pPr$/);
+    if (!m) continue;
+    const level = m[1] ? Number(m[1]) - 1 : 0;
+    const defRPr = pFind(child, "a:defRPr");
+    if (defRPr) {
+      const rd = readRunDefaults(defRPr);
+      if (rd) out.set(level, rd);
+    }
+  }
+  return out.size ? out : undefined;
+}
+
+function readRunDefaults(defRPr: PNode): RunDefaults | undefined {
+  const a = pAttrs(defRPr);
+  const rd: RunDefaults = {};
+  if (a["@_sz"]) rd.sizePt = Number(a["@_sz"]) / 100;
+  if (a["@_b"] === "1") rd.bold = true;
+  if (a["@_i"] === "1") rd.italic = true;
+  const solid = pFind(defRPr, "a:solidFill");
+  const color = solid ? readColorFromNode(solid) : undefined;
+  if (color) rd.color = color;
+  const latin = pFind(defRPr, "a:latin");
+  if (latin) {
+    const tf = pAttrs(latin)["@_typeface"];
+    if (tf) rd.font = tf;
+  }
+  return Object.keys(rd).length ? rd : undefined;
+}
+
+function lookupPlaceholderChain(
+  parents: ResolvedParents,
+  phType: string | undefined,
+  phIdx: string | undefined,
+): PhProto[] {
+  const chain: PhProto[] = [];
+  const norm = phType ?? "";
+  const idxN = phIdx ?? "";
+  for (const level of [parents.layout, parents.master]) {
+    if (!level) continue;
+    // 1) exact type+idx
+    let hit = level.placeholders.find((p) => p.type === norm && p.idx === idxN);
+    // 2) same type (any idx)
+    if (!hit) hit = level.placeholders.find((p) => p.type === norm);
+    // 3) title fallbacks
+    if (!hit && (norm === "title" || norm === "ctrTitle")) {
+      hit = level.placeholders.find((p) => p.type === "title" || p.type === "ctrTitle");
+    }
+    // 4) body fallbacks
+    if (!hit && (norm === "body" || norm === "subTitle" || norm === "")) {
+      hit = level.placeholders.find((p) => p.type === "body" || p.type === "");
+    }
+    if (hit) chain.push(hit);
+  }
+  return chain;
+}
+
+function pickTxStyleKind(phType: string | undefined): "title" | "body" | "other" {
+  if (phType === "title" || phType === "ctrTitle") return "title";
+  if (phType === "body" || phType === "subTitle" || phType === "" || phType === undefined) return "body";
+  return "other";
+}
+
+function applyPlaceholderTextInheritance(
+  text: LayoutTextBody,
+  phType: string | undefined,
+  chain: PhProto[],
+  parents?: ResolvedParents,
+): LayoutTextBody {
+  const kind = pickTxStyleKind(phType);
+  const masterLevels = parents?.master?.txStyles?.[kind];
+  if (!chain.length && !masterLevels) return text;
+  const nextParas: LayoutPara[] = text.paras.map((p) => {
+    const level = typeof p.level === "number" ? p.level : 0;
+    // Collect defaults with precedence: layout ph lvl → master ph lvl → master txStyles lvl
+    const defaults: RunDefaults = {};
+    for (const proto of chain) {
+      const d = proto.lvlDefaults?.get(level) ?? proto.lvlDefaults?.get(0);
+      if (d) mergeDefaults(defaults, d);
+    }
+    if (masterLevels) {
+      const d = masterLevels.get(level) ?? masterLevels.get(0);
+      if (d) mergeDefaults(defaults, d);
+    }
+    if (Object.keys(defaults).length === 0) return p;
+    const runs = p.runs.map((r) => ({
+      ...r,
+      sizePt: r.sizePt ?? defaults.sizePt,
+      color: r.color ?? defaults.color,
+      font: r.font ?? defaults.font,
+      bold: r.bold ?? defaults.bold,
+      italic: r.italic ?? defaults.italic,
+    }));
+    return { ...p, runs };
+  });
+  return { ...text, paras: nextParas };
+}
+
+function mergeDefaults(target: RunDefaults, src: RunDefaults) {
+  if (target.sizePt === undefined && src.sizePt !== undefined) target.sizePt = src.sizePt;
+  if (target.color === undefined && src.color !== undefined) target.color = src.color;
+  if (target.font === undefined && src.font !== undefined) target.font = src.font;
+  if (target.bold === undefined && src.bold !== undefined) target.bold = src.bold;
+  if (target.italic === undefined && src.italic !== undefined) target.italic = src.italic;
+}
+
