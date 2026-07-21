@@ -1763,7 +1763,11 @@ export const useDeckStore = create<DeckState>()(
         // Meta fields (imagery override, background, slide-level media seed)
         // are always editable — they're driven by dedicated panels, not the
         // variant's authored field list.
-        const META_FIELDS = new Set(["mediaUrl", "mediaPath", "mediaSeed", "background", "videoUrl", "videoPosterUrl", "videoPath", "videoPosterPath"]);
+        const META_FIELDS = new Set([
+          "mediaUrl", "mediaPath", "mediaSeed", "background",
+          "videoUrl", "videoPosterUrl", "videoPath", "videoPosterPath",
+          "videoAutoplay", "videoLoop", "videoMuted", "videoControls",
+        ]);
         const editable = META_FIELDS.has(field) || variant.editableFields.some((f) => matchesField(f, field));
         if (!editable) return;
         const nextContent = setPath({ ...slide.content }, field, value);
@@ -1848,11 +1852,17 @@ export const useDeckStore = create<DeckState>()(
           if (typeof prev.videoPosterUrl === "string") merged.videoPosterUrl = prev.videoPosterUrl;
           if (typeof prev.videoPath === "string") merged.videoPath = prev.videoPath;
           if (typeof prev.videoPosterPath === "string") merged.videoPosterPath = prev.videoPosterPath;
+          for (const k of ["videoAutoplay", "videoLoop", "videoMuted", "videoControls"] as const) {
+            if (typeof prev[k] === "boolean") merged[k] = prev[k];
+          }
         } else {
           delete merged.videoUrl;
           delete merged.videoPosterUrl;
           delete merged.videoPath;
           delete merged.videoPosterPath;
+          for (const k of ["videoAutoplay", "videoLoop", "videoMuted", "videoControls"] as const) {
+            delete merged[k];
+          }
         }
         // Preserve background settings across swaps.
         if (prev.background !== undefined) merged.background = prev.background;

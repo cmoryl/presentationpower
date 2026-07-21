@@ -25,15 +25,27 @@ const POSTER_MIME = ["image/jpeg", "image/png", "image/webp"];
 export function SlideVideoPanel({
   videoUrl,
   posterUrl,
+  autoplay = true,
+  loop = true,
+  muted = true,
+  controls = false,
   onChange,
 }: {
   videoUrl?: string;
   posterUrl?: string;
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  controls?: boolean;
   onChange: (next: {
-    videoUrl: string | null;
+    videoUrl?: string | null;
     videoPath?: string | null;
     videoPosterUrl?: string | null;
     videoPosterPath?: string | null;
+    videoAutoplay?: boolean;
+    videoLoop?: boolean;
+    videoMuted?: boolean;
+    videoControls?: boolean;
   }) => void;
 }) {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
@@ -251,7 +263,37 @@ export function SlideVideoPanel({
         </div>
 
         {hasVideo && (
+          <div className="rounded-xl border border-black/10 bg-black/[0.02] p-3">
+            <div className="text-[11px] uppercase tracking-widest text-black/50">Playback</div>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <label className="flex items-center gap-2 text-xs text-black/80">
+                <input type="checkbox" checked={autoplay} onChange={(e) => onChange({ videoAutoplay: e.target.checked })} />
+                Autoplay
+              </label>
+              <label className="flex items-center gap-2 text-xs text-black/80">
+                <input type="checkbox" checked={loop} onChange={(e) => onChange({ videoLoop: e.target.checked })} />
+                Loop
+              </label>
+              <label className="flex items-center gap-2 text-xs text-black/80">
+                <input type="checkbox" checked={muted} onChange={(e) => onChange({ videoMuted: e.target.checked })} />
+                Muted
+              </label>
+              <label className="flex items-center gap-2 text-xs text-black/80">
+                <input type="checkbox" checked={controls} onChange={(e) => onChange({ videoControls: e.target.checked })} />
+                Show controls
+              </label>
+            </div>
+            {autoplay && !muted && (
+              <div className="mt-2 text-[11px] text-amber-700">
+                Browsers block unmuted autoplay. Playback will start muted or fall back to a click-to-play button.
+              </div>
+            )}
+          </div>
+        )}
+
+        {hasVideo && (
           <div>
+
             <div className="text-[11px] uppercase tracking-widest text-black/50">Poster frame</div>
             <div className="mt-1 flex items-center gap-2">
               <input
