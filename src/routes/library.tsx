@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Download, Loader2, Star, Copy, Check, Plus } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
@@ -1092,9 +1093,11 @@ function LightboxPortal({
 
   const isDark = mode === "dark";
 
-  return (
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex flex-col bg-[#03002C]/95 backdrop-blur-xl animate-in fade-in duration-200"
+      className="fixed inset-0 z-[9999] flex flex-col bg-[#03002C]/95 backdrop-blur-xl animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-label="Enlarged slide preview"
@@ -1165,7 +1168,8 @@ function LightboxPortal({
         <span className="mx-2"><kbd className="rounded border border-white/20 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-white/70">Esc</kbd> close</span>
         <span className="mx-2"><kbd className="rounded border border-white/20 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-white/70">← →</kbd> toggle theme</span>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
