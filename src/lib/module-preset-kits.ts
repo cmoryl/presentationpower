@@ -8,6 +8,33 @@ import { INFOGRAPHICS_IMAGES_TEMPLATE } from "./imported-templates/infographics-
 import { COMMUNITY_EVENT_TEMPLATE } from "./imported-templates/community-event";
 import { GRAPH_LIBRARY_TEMPLATE } from "./imported-templates/graph-library";
 import { validateKitPayload, formatKitValidationError, type KitValidationResult } from "./kit-validation";
+import { SECTION_FRAMEWORKS, MODULE_VARIANTS, byId } from "./taxonomy";
+
+/**
+ * Auto-remap slide sectionIds so each slide's section permits its variant's
+ * family. Preset kits were authored before the section-family whitelist
+ * tightened; this normalizes them at load-time so validation is clean and
+ * kits still drop into the correct section on import.
+ */
+function normalizeKitPayload(payload: TemplatePayload): TemplatePayload {
+  const familyToSection = new Map<string, string>();
+  for (const s of SECTION_FRAMEWORKS) {
+    for (const f of s.permittedFamilyIds) {
+      if (!familyToSection.has(f)) familyToSection.set(f, s.id);
+    }
+  }
+  return {
+    ...payload,
+    slides: payload.slides.map((slide) => {
+      const section = byId(SECTION_FRAMEWORKS, slide.sectionId);
+      const variant = byId(MODULE_VARIANTS, slide.variantId);
+      if (!section || !variant) return slide;
+      if (section.permittedFamilyIds.includes(variant.familyId)) return slide;
+      const remapped = familyToSection.get(variant.familyId);
+      return remapped ? { ...slide, sectionId: remapped } : slide;
+    }),
+  };
+}
 
 export type ModulePresetKit = {
   key: string;
