@@ -159,14 +159,22 @@ export async function exportDeckToPptx(
   });
 
   const logos = getDivisionLogos(deck.brandModeId) ?? getDivisionLogos("tp");
-  const [logoColor, logoWhite] = await Promise.all([
+  const [logoColor, logoWhite, logoStackedColor, logoStackedWhite] = await Promise.all([
     logos?.color ? fetchAsDataUrl(logos.color) : Promise.resolve(null),
     logos?.white
       ? fetchAsDataUrl(logos.white)
       : logos?.color
       ? fetchAsDataUrl(logos.color)
       : Promise.resolve(null),
+    logos?.stackedColor ? fetchAsDataUrl(logos.stackedColor) : Promise.resolve(null),
+    logos?.stackedWhite
+      ? fetchAsDataUrl(logos.stackedWhite)
+      : logos?.stackedColor
+      ? fetchAsDataUrl(logos.stackedColor)
+      : Promise.resolve(null),
   ]);
+  const deckLogoOrientation: "horizontal" | "stacked" =
+    deck.context?.logoOrientation === "stacked" ? "stacked" : "horizontal";
 
   // Prefetch all slide imagery in parallel so the export runs quickly.
   // Custom `content.mediaUrl` failures are logged with the slide index so a
