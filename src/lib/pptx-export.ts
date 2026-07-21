@@ -285,10 +285,12 @@ export async function exportDeckToPptx(
     }),
   );
 
+  const failedSlides: string[] = [];
   for (let i = 0; i < deck.slides.length; i++) {
     const slide = deck.slides[i];
-    const kind = classifyVariant(slide.variantId, i);
     const s = pptx.addSlide();
+    try {
+    const kind = classifyVariant(slide.variantId, i);
     const advancedDark = slide.variantId === "MV-COUNTDOWN";
     const plan = backgroundPlans[i];
     const bgIsImage = plan.kind === "image";
