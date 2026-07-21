@@ -602,6 +602,7 @@ export function validateDivisionContent(): DivisionCoverageResult {
       brandName: "Case-study inventory",
       issues: ["missing-case-study"],
       notes: inventoryNotes,
+      metrics: emptyMetrics(),
     });
   }
   const failing = reports.filter((r) => r.issues.length > 0);
