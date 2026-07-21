@@ -134,20 +134,6 @@ function Library() {
     [logoHubQuery.data],
   );
 
-  // Team-saved slide examples — surfaced per-division so slides sent to the
-  // master library from admin.knowledge appear alongside the approved
-  // variants for whichever division scope is active. Silently no-ops for
-  // signed-out visitors (server fn requires auth).
-  const listExamplesFn = useServerFn(listLibrarySlideExamples);
-  const exampleDivisionId = scopeBrandId === "all" ? "bm-enterprise" : scopeBrandId;
-  const examplesQuery = useQuery({
-    queryKey: ["library", "examples", exampleDivisionId],
-    queryFn: () => listExamplesFn({ data: { divisionId: exampleDivisionId } }),
-    retry: false,
-    staleTime: 60 * 1000,
-  });
-  const examples: LibrarySlideExample[] = examplesQuery.data ?? [];
-  const [exampleZoom, setExampleZoom] = useState<LibrarySlideExample | null>(null);
 
 
   // Usage counts across the local deck store — cheap, client-only.
