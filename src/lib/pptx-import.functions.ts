@@ -786,6 +786,7 @@ function readCategoryValues(cat: any): string[] {
   return arr.map((p) => {
     const v = p?.["c:v"];
     if (typeof v === "string") return v;
+    if (typeof v === "number") return String(v);
     if (v && typeof v === "object" && "#text" in v) return String(v["#text"]);
     return "";
   });
@@ -800,6 +801,7 @@ function readNumValues(val: any): number[] {
   const arr = Array.isArray(pts) ? pts : pts ? [pts] : [];
   return arr.map((p) => {
     const v = p?.["c:v"];
+    if (typeof v === "number") return Number.isFinite(v) ? v : 0;
     const raw = typeof v === "string" ? v : (v && typeof v === "object" && "#text" in v) ? String(v["#text"]) : "";
     const n = Number(raw);
     return Number.isFinite(n) ? n : 0;
