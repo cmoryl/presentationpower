@@ -786,6 +786,7 @@ function readCategoryValues(cat: any): string[] {
   return arr.map((p) => {
     const v = p?.["c:v"];
     if (typeof v === "string") return v;
+    if (typeof v === "number") return String(v);
     if (v && typeof v === "object" && "#text" in v) return String(v["#text"]);
     return "";
   });
