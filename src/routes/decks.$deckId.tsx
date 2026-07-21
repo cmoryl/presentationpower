@@ -31,6 +31,7 @@ import { PptxPreviewModal } from "@/components/slide/PptxPreviewModal";
 import { SlideImageryPanel } from "@/components/slide/SlideImageryPanel";
 import { SlideVideoPanel } from "@/components/slide/SlideVideoPanel";
 import { variantSupportsImagery, variantSupportsVideo } from "@/lib/variant-media";
+import { SlideMediaRefreshProvider, SlideThumbnailContext, SlideVideoPreviewContext } from "@/lib/slide-media-refresh";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
 
 import {
@@ -74,6 +75,7 @@ function DeckEditor() {
 
   const [activeIdx, setActiveIdx] = useState(0);
   const [zoomed, setZoomed] = useState(false);
+  const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
   const [flashIndices, setFlashIndices] = useState<number[]>([]);
   const [pptxPreviewOpen, setPptxPreviewOpen] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
@@ -130,6 +132,7 @@ function DeckEditor() {
 
   return (
     <AppShell>
+    <SlideMediaRefreshProvider slides={deck.slides}>
       <div className="flex items-baseline justify-between gap-6">
         <div className="min-w-0">
           <Link to="/" className="text-xs uppercase tracking-widest text-black/50 hover:text-black">← Dashboard</Link>
@@ -198,9 +201,11 @@ function DeckEditor() {
                   } ${flashIndices.includes(i) ? "ring-4 ring-[#A1FBF9] animate-pulse" : ""}`}
                 >
                   <div className="aspect-[16/9] bg-white">
-                    <ScaledSlide>
-                      {variant && <VariantRenderer slide={applyOverlay(slide)} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />}
-                    </ScaledSlide>
+                    <SlideThumbnailContext.Provider value={true}>
+                      <ScaledSlide>
+                        {variant && <VariantRenderer slide={applyOverlay(slide)} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />}
+                      </ScaledSlide>
+                    </SlideThumbnailContext.Provider>
                   </div>
                   <div className="border-t border-black/10 bg-white px-3 py-2 text-xs">
                     <div className="flex items-center justify-between">
@@ -273,9 +278,11 @@ function DeckEditor() {
             className="group relative block w-full overflow-hidden rounded-2xl border border-black/10 shadow-lg transition hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B2A4A]"
           >
             {active && mv && (
-              <ScaledSlide>
-                <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
-              </ScaledSlide>
+              <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
+                <ScaledSlide>
+                  <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
+                </ScaledSlide>
+              </SlideVideoPreviewContext.Provider>
             )}
             <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100">
               ⤢ Enlarge
@@ -390,8 +397,14 @@ function DeckEditor() {
               posterUrl={(active.content as Record<string, unknown>).videoPosterUrl as string | undefined}
               onChange={(next) => {
                 updateField(deck.id, active.id, "videoUrl", next.videoUrl ?? undefined);
+                if (next.videoPath !== undefined) {
+                  updateField(deck.id, active.id, "videoPath", next.videoPath ?? undefined);
+                }
                 if (next.videoPosterUrl !== undefined) {
                   updateField(deck.id, active.id, "videoPosterUrl", next.videoPosterUrl ?? undefined);
+                }
+                if (next.videoPosterPath !== undefined) {
+                  updateField(deck.id, active.id, "videoPosterPath", next.videoPosterPath ?? undefined);
                 }
               }}
             />
@@ -672,6 +685,26 @@ function DeckEditor() {
           </aside>
         </>
       )}
+      {videoPreviewUrl && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/90 p-6"
+          onClick={() => setVideoPreviewUrl(null)}
+        >
+          <div className="relative w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
+            <video src={videoPreviewUrl} controls autoPlay className="w-full rounded-lg bg-black" />
+            <button
+              type="button"
+              onClick={() => setVideoPreviewUrl(null)}
+              className="absolute -top-10 right-0 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs text-white hover:bg-white/20"
+            >
+              Close ✕
+            </button>
+          </div>
+        </div>
+      )}
+    </SlideMediaRefreshProvider>
     </AppShell>
   );
 }

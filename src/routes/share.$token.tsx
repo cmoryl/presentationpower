@@ -60,7 +60,7 @@ function ShareView() {
     fetchShared({ data: { token } })
       .then((res) => {
         if (cancelled) return;
-        const payload = res.deck as SharedPayload | null;
+        const payload = (res as { deck: unknown }).deck as SharedPayload | null;
         if (!payload) {
           setState({ kind: "gone" });
         } else if (payload.status === "expired") {

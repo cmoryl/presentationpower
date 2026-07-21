@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useDeckStore } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
+import { SlideMediaRefreshProvider } from "@/lib/slide-media-refresh";
 import { BrandLockup } from "@/components/BrandLockup";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
@@ -55,6 +56,7 @@ function DocumentView() {
   const dateStr = new Date().toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
 
   return (
+    <SlideMediaRefreshProvider slides={deck.slides}>
     <div className="min-h-screen bg-neutral-100 py-10 print:bg-white print:py-0">
       <style>{`
         @media print {
@@ -200,6 +202,7 @@ function DocumentView() {
         ))}
       </div>
     </div>
+    </SlideMediaRefreshProvider>
   );
 }
 

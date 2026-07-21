@@ -70,8 +70,11 @@ export function normalizeSlideMedia<T extends Record<string, unknown>>(
     const { mediaUrl: _u, mediaSeed: _s, ...rest } = next;
     next = rest;
   }
-  if (!variantSupportsVideo(variantId) && ("videoUrl" in next || "videoPosterUrl" in next)) {
-    const { videoUrl: _v, videoPosterUrl: _p, ...rest } = next;
+  if (
+    !variantSupportsVideo(variantId) &&
+    ("videoUrl" in next || "videoPosterUrl" in next || "videoPath" in next || "videoPosterPath" in next)
+  ) {
+    const { videoUrl: _v, videoPosterUrl: _p, videoPath: _vp, videoPosterPath: _pp, ...rest } = next;
     next = rest;
   }
   return next as T;
