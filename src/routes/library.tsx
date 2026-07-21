@@ -11,7 +11,11 @@ import { TypeBadge } from "@/components/TypeBadge";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
-import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
+import {
+  resolveDivisionBrief,
+  seedDivisionContent,
+  validateDivisionContent,
+} from "@/lib/library-preview";
 import { byId, MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { MODULE_PRESET_KITS, validateKit } from "@/lib/module-preset-kits";
