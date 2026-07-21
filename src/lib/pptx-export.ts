@@ -200,6 +200,33 @@ export async function exportDeckToPptx(
     }),
   );
 
+  // Prefetch per-item client logos for the six client-listing variants so the
+  // export renderers can embed real wordmarks (falling back to the initials
+  // tile only when a slot has no logoUrl set).
+  const LOGO_ITEM_VARIANTS = new Set([
+    "MV-PROOF-LOGOS",
+    "MV-CASE-LOGO-GRID",
+    "MV-LOGO-WALL",
+    "MV-CLIENT-MATRIX",
+    "MV-CLIENT-DETAIL-3",
+    "MV-CLIENT-COMPARE",
+  ]);
+  const slideItemLogos: Array<Array<string | null>> = await Promise.all(
+    deck.slides.map(async (slide, idx) => {
+      if (!LOGO_ITEM_VARIANTS.has(slide.variantId)) return [];
+      const items = Array.isArray((slide.content as Record<string, unknown>).items)
+        ? ((slide.content as Record<string, unknown>).items as Array<Record<string, unknown>>)
+        : [];
+      return Promise.all(
+        items.map((it, k) => {
+          const url = typeof it.logoUrl === "string" ? it.logoUrl : "";
+          if (!url) return Promise.resolve(null);
+          return fetchAsDataUrl(url, `slide ${idx + 1} item ${k + 1} logo`);
+        }),
+      );
+    }),
+  );
+
   for (let i = 0; i < deck.slides.length; i++) {
     const slide = deck.slides[i];
     const kind = classifyVariant(slide.variantId, i);
