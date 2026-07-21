@@ -311,7 +311,7 @@ function renderVariantBody({
       const _titleSize = _titleLen > 60 ? "title" : _titleLen > 30 ? "section" : "cover";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} overrideUrl={s(c.mediaUrl)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} className="absolute inset-0 h-full w-full rounded-none" />
           <HeroScrim brand={brand} anchor="bottom" />
           <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
@@ -1530,7 +1530,7 @@ function renderVariantBody({
       const _titleSize = _titleLen > 60 ? "title" : _titleLen > 30 ? "section" : "cover";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "hero"))} overrideUrl={s(c.mediaUrl)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "hero"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} className="absolute inset-0 h-full w-full rounded-none" />
           <HeroScrim brand={brand} anchor="bottom" />
           <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand}>{s(c.kicker, "In focus")}</Kicker>
@@ -1547,7 +1547,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-2 gap-14">
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "split"))} overrideUrl={s(c.mediaUrl)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} className="h-full w-full" />
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "split"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} className="h-full w-full" />
             <div className="flex flex-col justify-center">
               <SlideTitle brand={brand} title={s(c.title)} />
               <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={720}>{s(c.body)}</SupportingText>
@@ -1567,7 +1567,7 @@ function renderVariantBody({
           <div className="flex h-full flex-col items-center justify-center">
             <Kicker brand={brand}>{s(c.title, "In focus")}</Kicker>
             <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "framed"))} overrideUrl={s(c.mediaUrl)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} className="aspect-[16/9] w-[80%]" />
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "framed"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} className="aspect-[16/9] w-[80%]" />
             <SupportingText size="lg" opacity={0.85} className="mt-10 text-center" maxWidthPx={1100}>{s(c.caption)}</SupportingText>
             {s(c.credit) && (
               <MetaRow className="mt-6">
@@ -1617,7 +1617,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-[1fr_1.3fr] gap-14">
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.name, "portrait"))} overrideUrl={s(c.mediaUrl)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} className="h-full w-full" portrait />
+            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.name, "portrait"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} className="h-full w-full" portrait />
             <div className="flex flex-col justify-center">
               <Kicker brand={brand}>{s(c.role)}</Kicker>
               <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
@@ -1638,7 +1638,7 @@ function renderVariantBody({
     case "MV-IMG-QUOTE-BG":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote"))} overrideUrl={s(c.mediaUrl)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} className="absolute inset-0 h-full w-full rounded-none" />
           <HeroScrim brand={brand} anchor="center" />
           <div className="relative flex h-full flex-col justify-center text-white">
             <QuoteMark color={brand.tokens.accent} size={520} opacity={0.18} className="absolute -top-4 -left-4" />
