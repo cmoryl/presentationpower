@@ -49,6 +49,12 @@ function ShareView() {
     | { kind: "error"; message: string }
   >({ kind: "loading" });
 
+  // Signals MediaTile to autoplay <video> on shared viewer.
+  useEffect(() => {
+    document.body.classList.add("share-mode");
+    return () => document.body.classList.remove("share-mode");
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     fetchShared({ data: { token } })
