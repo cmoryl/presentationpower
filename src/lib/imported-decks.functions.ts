@@ -66,10 +66,15 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
     // can attach them to a library submission.
     const imageryDivision = normalizeImportedDeckDivision(data.divisionId);
     const savedPathsBySlide: string[][] = parsed.slides.map(() => []);
+    // Parallel to savedPathsBySlide: r:embed id for each saved image so we
+    // can rewrite layout shapes (kind:"image") to reference the durable
+    // storage path instead of the transient .pptx rId.
+    const savedEmbedIdsBySlide: string[][] = parsed.slides.map(() => []);
     let imgSeq = 0;
     for (const sl of parsed.slides) {
       for (let j = 0; j < sl.images.length; j++) {
         const dataUrl = sl.images[j];
+        const embedId = sl.imageEmbedIds[j];
         const m = /^data:([^;]+);base64,(.+)$/.exec(dataUrl);
         if (!m) continue;
         const contentType = m[1];
@@ -101,21 +106,42 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
           continue;
         }
         savedPathsBySlide[sl.index].push(imgPath);
+        if (embedId) savedEmbedIdsBySlide[sl.index].push(embedId);
+        else savedEmbedIdsBySlide[sl.index].push("");
         imgSeq++;
       }
     }
 
-    // Slide outline includes the saved image paths so downstream flows
-    // (send-to-library, imagery cross-refs) can find the imagery without
-    // re-parsing the .pptx.
-    const slidesLite = parsed.slides.map((sl) => ({
-      index: sl.index,
-      title: sl.title,
-      bullets: sl.bullets,
-      notes: sl.notes,
-      imageCount: sl.images.length,
-      imagePaths: savedPathsBySlide[sl.index],
-    }));
+    // Rewrite each slide's captured layout so image shapes carry the durable
+    // storage path (not the .pptx rId). This lets FaithfulSlideCanvas fetch
+    // via signed URL long after the original .pptx is deleted.
+    const slidesLite = parsed.slides.map((sl) => {
+      const embedToPath = new Map<string, string>();
+      savedEmbedIdsBySlide[sl.index].forEach((eid, idx) => {
+        if (eid) embedToPath.set(eid, savedPathsBySlide[sl.index][idx]);
+      });
+      const layout = sl.layout
+        ? {
+            ...sl.layout,
+            shapes: sl.layout.shapes.map((sh) => {
+              if (sh.kind === "image" && sh.embedId) {
+                const path = embedToPath.get(sh.embedId);
+                if (path) return { ...sh, path };
+              }
+              return sh;
+            }),
+          }
+        : undefined;
+      return {
+        index: sl.index,
+        title: sl.title,
+        bullets: sl.bullets,
+        notes: sl.notes,
+        imageCount: sl.images.length,
+        imagePaths: savedPathsBySlide[sl.index],
+        layout,
+      };
+    });
 
     const { data: row, error } = await s
       .from("imported_decks")
