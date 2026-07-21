@@ -15,21 +15,28 @@ const focusThumb = (el: HTMLButtonElement | null) => {
 
 export const Route = createFileRoute("/decks/$deckId/present")({
   head: () => ({ meta: [{ title: "Presenting · TransPerfect Modular" }] }),
-  component: PresenterView,
+  component: PresenterGate,
 });
+
+function PresenterGate() {
+  const { deckId } = Route.useParams();
+  const hydrated = useDeckHydrated();
+  const hasDeck = useDeckStore((s) => Boolean(s.decks[deckId]));
+  if (!hydrated) return <DeckHydratingFallback label="Loading presentation…" />;
+  if (!hasDeck) throw notFound();
+  return <PresenterView />;
+}
 
 function PresenterView() {
   const { deckId } = Route.useParams();
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
-  const hydrated = useDeckHydrated();
   const navigate = useNavigate();
   const [i, setI] = useState(0);
   const [stripOpen, setStripOpen] = useState(true);
   const [notesOpen, setNotesOpen] = useState(false);
   const [focusedThumb, setFocusedThumb] = useState(0);
 
-  if (!hydrated) return <DeckHydratingFallback label="Loading presentation…" />;
   if (!deck) throw notFound();
   const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
   const slide = deck.slides[i];
