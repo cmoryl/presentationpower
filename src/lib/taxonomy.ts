@@ -628,8 +628,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "One hero client logo with four supporting proof logos",
     permittedLayoutIds: ["LF-12"],
     capacity: { items: { min: 5, max: 5 }, titleChars: 60, bodyChars: 220 },
-    editableFields: ["title", "featuredName", "featuredNote", "items[].name"],
-    lockedFields: ["featuredLogoUrl", "items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "featuredName", "featuredNote", "featuredLogoUrl", "items[].name", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
   {
     id: "MV-PROOF-LOGOS-CATEGORIZED",
