@@ -68,13 +68,21 @@ export const APPROVED_LOGOS: ApprovedLogo[] = [
   },
 ];
 
-export type ApprovedLogoItem = { name: string; logoUrl: string };
+export type ApprovedLogoItem = {
+  name: string;
+  /** Color variant — used on light slides. */
+  logoUrl: string;
+  /** White variant — used on dark slides. Falls back to color when the
+   *  brand has no dedicated white classic mark. */
+  logoUrlDark: string;
+};
 
 /**
  * Return `count` approved-logo items suitable for filler in logo-wall
- * variants. `mode` picks white marks for dark slides, color marks for
- * light. `excludeId` skips a specific brand (useful when the deck itself
- * is branded to that division and you don't want it in the wall).
+ * variants. Each item carries BOTH a light-mode (color) URL and a
+ * dark-mode (white) URL so the renderer can pick the right variant at
+ * paint time via SlideModeContext. `mode` here only affects which URL
+ * is stored in the legacy `logoUrl` field.
  */
 export function getApprovedLogoItems(
   mode: "light" | "dark",
@@ -87,7 +95,11 @@ export function getApprovedLogoItems(
   const out: ApprovedLogoItem[] = [];
   for (let i = 0; i < count; i++) {
     const l = pool[i % pool.length];
-    out.push({ name: l.name, logoUrl: mode === "dark" ? l.white : l.color });
+    out.push({
+      name: l.name,
+      logoUrl: mode === "dark" ? l.white : l.color,
+      logoUrlDark: l.white,
+    });
   }
   return out;
 }
