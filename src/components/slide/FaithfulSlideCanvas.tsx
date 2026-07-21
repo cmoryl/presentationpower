@@ -39,11 +39,20 @@ function resolveColor(c: string | undefined, theme?: Record<string, string>): st
 
 function fillToCss(fill: LayoutFill | undefined, theme?: Record<string, string>): string | undefined {
   if (!fill) return undefined;
-  if (fill.kind === "solid") return resolveColor(fill.color, theme);
+  if (fill.kind === "solid") {
+    const base = resolveColor(fill.color, theme);
+    if (!base) return undefined;
+    if (fill.opacity !== undefined && fill.opacity < 1) return withAlpha(base, fill.opacity);
+    return base;
+  }
   if (fill.kind === "none") return "transparent";
   if (fill.kind === "gradient") {
     const stops = fill.stops
-      .map((s) => `${resolveColor(s.color, theme) ?? "#000"} ${(s.pos * 100).toFixed(1)}%`)
+      .map((s) => {
+        const c = resolveColor(s.color, theme) ?? "#000";
+        const withA = s.opacity !== undefined && s.opacity < 1 ? withAlpha(c, s.opacity) : c;
+        return `${withA} ${(s.pos * 100).toFixed(1)}%`;
+      })
       .join(", ");
     // DrawingML angles: 0° goes right; CSS `linear-gradient` 0deg goes up.
     const cssDeg = 90 - fill.angle;
@@ -51,6 +60,84 @@ function fillToCss(fill: LayoutFill | undefined, theme?: Record<string, string>)
   }
   return undefined;
 }
+
+function withAlpha(color: string, alpha: number): string {
+  const m = /^#([0-9a-fA-F]{6})$/.exec(color);
+  if (m) {
+    const a = Math.round(Math.max(0, Math.min(1, alpha)) * 255).toString(16).padStart(2, "0");
+    return `#${m[1]}${a}`;
+  }
+  return color;
+}
+
+// PPTX preset-geometry → CSS clip-path / border-radius. Covers the common
+// masks used for pictures: roundRect, ellipse, triangle, right-triangle,
+// diamond, hexagon, octagon, pentagon, parallelogram, chevron, star.
+function prstToMask(prst: string | undefined): { borderRadius?: string; clipPath?: string } {
+  if (!prst) return {};
+  switch (prst) {
+    case "ellipse": return { borderRadius: "50%" };
+    case "roundRect": return { borderRadius: "8%" };
+    case "round1Rect": return { borderRadius: "8% 8% 0 0" };
+    case "round2SameRect": return { borderRadius: "8% 0 0 8%" };
+    case "triangle": return { clipPath: "polygon(50% 0, 100% 100%, 0 100%)" };
+    case "rtTriangle": return { clipPath: "polygon(0 0, 0 100%, 100% 100%)" };
+    case "diamond": return { clipPath: "polygon(50% 0, 100% 50%, 50% 100%, 0 50%)" };
+    case "parallelogram": return { clipPath: "polygon(20% 0, 100% 0, 80% 100%, 0 100%)" };
+    case "trapezoid": return { clipPath: "polygon(20% 0, 80% 0, 100% 100%, 0 100%)" };
+    case "pentagon": return { clipPath: "polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%)" };
+    case "hexagon": return { clipPath: "polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%)" };
+    case "octagon": return { clipPath: "polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%)" };
+    case "chevron": return { clipPath: "polygon(0 0, 75% 0, 100% 50%, 75% 100%, 0 100%, 25% 50%)" };
+    case "star5": return { clipPath: "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)" };
+    default: return {};
+  }
+}
+
+/** Renders `<img>` inside a `frame`-sized clipped box, honoring a:srcRect
+ * crop by scaling the image up so the visible src region fills the frame. */
+function CroppedImage({
+  url,
+  srcRect,
+  opacity,
+  style,
+}: {
+  url: string;
+  srcRect?: LayoutSrcRect;
+  opacity?: number;
+  style: React.CSSProperties;
+}) {
+  if (!srcRect) {
+    return <img src={url} alt="" draggable={false} style={{ ...style, objectFit: "cover", opacity }} />;
+  }
+  // Visible fraction of the source in each axis.
+  const vw = Math.max(0.01, 1 - srcRect.l - srcRect.r);
+  const vh = Math.max(0.01, 1 - srcRect.t - srcRect.b);
+  // Scale the underlying <img> so the visible src rect exactly matches the frame.
+  const scaleX = 1 / vw;
+  const scaleY = 1 / vh;
+  const offX = srcRect.l / vw; // fraction of the (scaled) image to shift left by
+  const offY = srcRect.t / vh;
+  return (
+    <div style={{ ...style, overflow: "hidden" }}>
+      <img
+        src={url}
+        alt=""
+        draggable={false}
+        style={{
+          display: "block",
+          width: `${scaleX * 100}%`,
+          height: `${scaleY * 100}%`,
+          marginLeft: `${-offX * 100}%`,
+          marginTop: `${-offY * 100}%`,
+          objectFit: "fill",
+          opacity,
+        }}
+      />
+    </div>
+  );
+}
+
 
 function frameStyle(frame: LayoutFrame): React.CSSProperties {
   const style: React.CSSProperties = {
