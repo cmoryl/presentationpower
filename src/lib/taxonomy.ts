@@ -595,8 +595,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Grid of representative client / partner logos",
     permittedLayoutIds: ["LF-19"],
     capacity: { items: { min: 6, max: 12 }, titleChars: 60 },
-    editableFields: ["title", "items[].name"],
-    lockedFields: ["items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "items[].name", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
   {
     id: "MV-PROOF-LOGOS-STRIP",
@@ -605,8 +606,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Minimal single-row strip of six client / partner logos",
     permittedLayoutIds: ["LF-19"],
     capacity: { items: { min: 4, max: 6 }, titleChars: 60 },
-    editableFields: ["title", "kicker", "items[].name"],
-    lockedFields: ["items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "kicker", "items[].name", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
   {
     id: "MV-PROOF-LOGOS-MARQUEE",
@@ -615,8 +617,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Two-row offset grid of up to ten client logos for scale",
     permittedLayoutIds: ["LF-19"],
     capacity: { items: { min: 8, max: 10 }, titleChars: 60 },
-    editableFields: ["title", "subtitle", "items[].name"],
-    lockedFields: ["items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "subtitle", "items[].name", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
   {
     id: "MV-PROOF-LOGOS-FEATURED",
@@ -625,8 +628,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "One hero client logo with four supporting proof logos",
     permittedLayoutIds: ["LF-12"],
     capacity: { items: { min: 5, max: 5 }, titleChars: 60, bodyChars: 220 },
-    editableFields: ["title", "featuredName", "featuredNote", "items[].name"],
-    lockedFields: ["featuredLogoUrl", "items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "featuredName", "featuredNote", "featuredLogoUrl", "items[].name", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
   {
     id: "MV-PROOF-LOGOS-CATEGORIZED",
@@ -635,8 +639,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Two grouped columns of logos with a category label each",
     permittedLayoutIds: ["LF-04"],
     capacity: { items: { min: 2, max: 2 }, titleChars: 60, bodyChars: 60 },
-    editableFields: ["title", "items[].label", "items[].logos[].name"],
-    lockedFields: ["items[].logos[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "items[].label", "items[].logos[].name", "items[].logos[].logoUrl", "items[].logos[].logoPath", "items[].logos[].logoVariant", "items[].logos[].logoVariants", "items[].logos[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
   {
     id: "MV-PROOF-LOGOS-MOSAIC",
@@ -645,8 +650,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Bento-style asymmetric mosaic mixing wordmark tiles at different scales",
     permittedLayoutIds: ["LF-09"],
     capacity: { items: { min: 6, max: 8 }, titleChars: 60 },
-    editableFields: ["title", "kicker", "items[].name"],
-    lockedFields: ["items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "kicker", "items[].name", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
   {
     id: "MV-PROOF-TESTIMONIAL",
@@ -757,8 +763,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Grid of case studies with client + one-line result",
     permittedLayoutIds: ["LF-11"],
     capacity: { items: { min: 4, max: 6 }, titleChars: 60, bodyChars: 100 },
-    editableFields: ["title", "items[].client", "items[].result"],
-    lockedFields: ["items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "items[].client", "items[].result", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
 
   // ── MF-07 Team, Governance & Close ──────────────────────────────────────
@@ -1229,8 +1236,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Grid of client cards — logo, one-line result, headline metric",
     permittedLayoutIds: ["LF-39"],
     capacity: { items: { min: 4, max: 6 }, titleChars: 60, bodyChars: 100 },
-    editableFields: ["title", "items[].client", "items[].sector", "items[].result", "items[].metric", "items[].unit"],
-    lockedFields: ["items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "items[].client", "items[].sector", "items[].result", "items[].metric", "items[].unit", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
   {
     id: "MV-CLIENT-DETAIL-3",
@@ -1239,8 +1247,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Three client cards with portrait, logo, and short story",
     permittedLayoutIds: ["LF-08"],
     capacity: { items: { min: 3, max: 3 }, titleChars: 60, bodyChars: 200 },
-    editableFields: ["title", "items[].client", "items[].sector", "items[].story", "items[].metric", "items[].seed"],
-    lockedFields: ["items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "items[].client", "items[].sector", "items[].story", "items[].metric", "items[].seed", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
   {
     id: "MV-IMG-MATRIX-4",
@@ -1269,8 +1278,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Vertical strip comparing three client engagements side-by-side",
     permittedLayoutIds: ["LF-08"],
     capacity: { items: { min: 3, max: 3 }, titleChars: 60, bodyChars: 160 },
-    editableFields: ["title", "items[].client", "items[].challenge", "items[].outcome", "items[].metric"],
-    lockedFields: ["items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "items[].client", "items[].challenge", "items[].outcome", "items[].metric", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
 
   // ── Advanced variants — BATCH 1 (structure & data-forward) ──────────────

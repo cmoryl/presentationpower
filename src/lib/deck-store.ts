@@ -1808,7 +1808,21 @@ export const useDeckStore = create<DeckState>()(
           "videoUrl", "videoPosterUrl", "videoPath", "videoPosterPath",
           "videoAutoplay", "videoLoop", "videoMuted", "videoControls",
         ]);
-        const editable = META_FIELDS.has(field) || variant.editableFields.some((f) => matchesField(f, field));
+        // A field is editable when: it's a META field, matches an
+        // editableFields pattern directly, OR it's an array root ("items",
+        // "logos", "bullets", …) whose element sub-paths appear in
+        // editableFields — panels that pick logos, reorder rows, or add /
+        // remove entries commit the whole array in a single call, so a
+        // literal pattern like `items[].name` would otherwise silently
+        // reject those writes.
+        const isArrayRootWrite =
+          Array.isArray(value) &&
+          variant.editableFields.some((f) => f.startsWith(`${field}[]`));
+        const editable =
+          META_FIELDS.has(field) ||
+          isArrayRootWrite ||
+          variant.editableFields.some((f) => matchesField(f, field));
+
         if (!editable) return;
         const nextContent = setPath({ ...slide.content }, field, value);
         set((s) => ({
