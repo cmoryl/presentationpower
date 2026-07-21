@@ -244,8 +244,9 @@ export function VariantRenderer(props: Props) {
   const resolvedBg = resolveSlideBackground((slide.content as Record<string, unknown>).background);
   // Fallback: master TransPerfect/Corporate brand in dark mode auto-applies
   // the curated 10-gradient backdrop set when the slide has no explicit
-  // background configured. Keeps existing decks & new slides on-brand.
-  const fallbackBackdrop = !resolvedBg ? backdropForVariant(variant, brand.id, mode) : null;
+  // background configured. Light mode intentionally stays clean (white
+  // surface + ink text) — do not inject a photo backdrop there.
+  const fallbackBackdrop = !resolvedBg && mode === "dark" ? backdropForVariant(variant, brand.id, mode) : null;
   const backdrop: SlideBackdrop | null = resolvedBg
     ? {
         url: resolvedBg.url,
