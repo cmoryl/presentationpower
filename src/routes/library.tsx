@@ -669,9 +669,14 @@ const VariantCard = memo(function VariantCard({
               </div>
             </div>
           ))}
-          {preferred && (
+          {preferred && !videoExample && (
             <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-emerald-500/85 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white shadow ring-1 ring-white/30 backdrop-blur-md">
               In scope
+            </div>
+          )}
+          {videoExample && (
+            <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#EC388A]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
+              <Play size={10} className="fill-white" /> Video
             </div>
           )}
         </div>
