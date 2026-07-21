@@ -150,64 +150,38 @@ function BriefWizard() {
 
   return (
     <AppShell>
-      <div
-        className="min-h-full px-3 py-6 font-['Geist'] sm:px-6 sm:py-12"
-        style={{ backgroundColor: PALETTE.page, color: PALETTE.ink }}
-      >
-        <div className="mx-auto w-full max-w-[1040px]">
-          <div
-            className="overflow-hidden rounded-2xl border shadow-sm"
-            style={{ backgroundColor: PALETTE.surface, borderColor: PALETTE.hairline }}
-          >
-            {/* Header */}
-            <div
-              className="relative overflow-hidden border-b px-5 pb-7 pt-8 sm:px-10 sm:pb-10 sm:pt-12"
-              style={{ borderColor: PALETTE.page }}
-            >
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0 transition-opacity duration-500"
-                style={{
-                  background: `radial-gradient(120% 140% at 0% 0%, ${brandPrimary}1f 0%, transparent 55%), radial-gradient(90% 120% at 100% 0%, ${brandAccent}26 0%, transparent 60%), linear-gradient(180deg, ${brandPrimary}0a 0%, transparent 100%)`,
-                }}
-              />
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-x-0 bottom-0 h-px"
-                style={{ background: `linear-gradient(90deg, transparent, ${brandPrimary}55, transparent)` }}
-              />
-              <div className="relative">
-                <div
-                  className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.24em]"
-                  style={{ color: brandPrimary }}
-                >
-                  <span className="inline-block h-[10px] w-[2px] rounded-none" style={{ backgroundColor: brandPrimary }} />
-                  Briefing engine
-                </div>
-                <h1 className="mt-4 font-['Geist'] text-3xl font-extrabold uppercase leading-[0.95] tracking-tighter text-[#03002C] sm:text-[44px]">
-                  New Pitch Deck Brief
-                </h1>
-                <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#1E2749]/80 sm:text-base">
-                  Configure the AI narrative engine for your next presentation.
-                </p>
-                <div
-                  className="mt-6 inline-flex items-center gap-2 rounded-md border bg-white/70 px-4 py-2 text-xs backdrop-blur transition-all hover:bg-white"
-                  style={{ borderColor: `${brandPrimary}33` }}
-                >
-                  <span className="text-[#1E2749]/70">Already have a deck?</span>
-                  <Link to="/decks/import" className="font-semibold text-[#003FC7] hover:text-[#03002C] hover:underline">
-                    Import an existing PowerPoint →
-                  </Link>
-                </div>
-              </div>
+      <div className="font-['Geist']" style={{ color: PALETTE.ink }}>
+        {/* HERO — matches homepage command-center language */}
+        <section className="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-[#03002C] via-[#0B2A4A] to-[#003FC7] p-8 text-white sm:p-10">
+          <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#A1FBF9]/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-[#C2A3FF]/20 blur-3xl" />
+          <div className="relative max-w-3xl">
+            <div className="text-xs uppercase tracking-[0.35em] text-[#A1FBF9]">Briefing engine</div>
+            <h1 className="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
+              New pitch deck brief
+            </h1>
+            <p className="mt-4 max-w-xl text-base text-white/70 sm:text-lg">
+              Configure the AI narrative engine. Brief the system and it picks the archetype,
+              sections, and approved modules for your next presentation.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center gap-2">
+              <Link
+                to="/decks/import"
+                className="rounded-full border border-white/25 bg-white/5 px-5 py-2.5 text-sm font-medium text-white backdrop-blur transition hover:bg-white/10"
+              >
+                Import an existing PowerPoint →
+              </Link>
             </div>
+          </div>
+        </section>
 
-
-            <form className="space-y-10 px-5 py-7 sm:p-10" onSubmit={(e) => e.preventDefault()}>
+        <div className="mt-8">
+          <form className="space-y-10" onSubmit={(e) => e.preventDefault()}>
               {/* SECTION 01: Brand Mode — drives everything below */}
               <section className="space-y-4">
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
                   <label className={labelCls}>01 · Brand Mode</label>
+
                   <span className="max-w-[11rem] text-right text-[10px] font-medium uppercase tracking-widest text-[#1E2749]/50 sm:max-w-none">
                     drives archetype + variant filters
                   </span>
