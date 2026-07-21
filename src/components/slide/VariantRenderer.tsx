@@ -303,7 +303,24 @@ function renderVariantBody({
   mode: SlideMode;
 }): ReactNode {
 
+  // Mode-aware ink palette for charts and data viz. Every chart/graph variant
+  // MUST use these tokens (never hardcoded `rgba(10,15,28,X)`) so text stays
+  // readable when a dark backdrop is applied.
+  const isDark = mode === "dark";
+  const ink = {
+    strong:      isDark ? "#ffffff"                 : "rgba(10,15,28,0.92)",
+    body:        isDark ? "rgba(255,255,255,0.86)"  : "rgba(10,15,28,0.82)",
+    muted:       isDark ? "rgba(255,255,255,0.70)"  : "rgba(10,15,28,0.66)",
+    faint:       isDark ? "rgba(255,255,255,0.52)"  : "rgba(10,15,28,0.48)",
+    axis:        isDark ? "rgba(255,255,255,0.22)"  : "rgba(10,15,28,0.18)",
+    divider:     isDark ? "rgba(255,255,255,0.14)"  : "rgba(10,15,28,0.12)",
+    surface:     isDark ? "rgba(255,255,255,0.06)"  : "rgba(10,15,28,0.04)",
+    surfaceRing: isDark ? "rgba(255,255,255,0.12)"  : "rgba(10,15,28,0.10)",
+    ringOnDark:  isDark ? "#0b1024"                 : "#ffffff",
+  };
+
   switch (variant.id) {
+
     // ── Opening ────────────────────────────────────────────────────────
     case "MV-OP-COVER":
       return (
