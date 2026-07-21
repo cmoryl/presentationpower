@@ -925,10 +925,10 @@ function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette,
     case "MV-CASE-SPREAD": renderCaseSpread(s, c, p); return true;
     case "MV-CASE-METRICS": renderCaseMetrics(s, c, p); return true;
     case "MV-CASE-STORY": renderCaseStory(s, c, p); return true;
-    case "MV-CASE-LOGO-GRID": renderCaseLogoGrid(s, c, p); return true;
-    case "MV-CLIENT-MATRIX": renderClientMatrix(s, c, p); return true;
-    case "MV-CLIENT-DETAIL-3": renderClientDetail3(s, c, p); return true;
-    case "MV-CLIENT-COMPARE": renderClientCompare(s, c, p); return true;
+    case "MV-CASE-LOGO-GRID": renderCaseLogoGrid(s, c, p, itemLogos); return true;
+    case "MV-CLIENT-MATRIX": renderClientMatrix(s, c, p, itemLogos); return true;
+    case "MV-CLIENT-DETAIL-3": renderClientDetail3(s, c, p, itemLogos); return true;
+    case "MV-CLIENT-COMPARE": renderClientCompare(s, c, p, itemLogos); return true;
     case "MV-GOV-RACI": renderGovRaci(s, c, p); return true;
     case "MV-COMM-PRICING": renderCommPricing(s, c, p); return true;
     case "MV-COMM-INVESTMENT": renderCommInvestment(s, c, p); return true;
