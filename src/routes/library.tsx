@@ -1623,6 +1623,8 @@ function VideoExamplesBlock({
   const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
   const navigate = useNavigate();
   const [busy, setBusy] = useState<string | null>(null);
+  const [zoomKey, setZoomKey] = useState<string | null>(null);
+  const [zoomMode, setZoomMode] = useState<"light" | "dark">("dark");
 
   function sectionForVariant(variantId: string): string {
     const variant = byId(MODULE_VARIANTS, variantId);
@@ -1698,24 +1700,35 @@ function VideoExamplesBlock({
               key={ex.key}
               className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:border-[#003FC7]/20 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)]"
             >
-              <LazyMount
-                className="relative m-2 aspect-[16/10] overflow-hidden rounded-[18px] bg-[#03002C]"
-                placeholder={<PreviewSkeleton dark label={variant.familyId} />}
+              <button
+                type="button"
+                onClick={() => setZoomKey(ex.key)}
+                aria-label={`Zoom ${ex.title}`}
+                className="block w-full text-left focus:outline-none focus:ring-2 focus:ring-[#003FC7]/40"
               >
-                <div className="absolute inset-0">
-                  <ScaledSlide>
-                    <SlideBackdropContext.Provider value={backdrop}>
-                      <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode="dark" />
-                    </SlideBackdropContext.Provider>
-                  </ScaledSlide>
-                </div>
-                <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#EC388A]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
-                  <Play size={10} className="fill-white" /> Video
-                </div>
-                <div className="pointer-events-none absolute right-3 top-3 rounded-full bg-white/15 px-2 py-0.5 font-mono text-[10px] text-white ring-1 ring-white/25 backdrop-blur">
-                  {ex.variantId}
-                </div>
-              </LazyMount>
+                <LazyMount
+                  className="relative m-2 aspect-[16/10] overflow-hidden rounded-[18px] bg-[#03002C]"
+                  placeholder={<PreviewSkeleton dark label={variant.familyId} />}
+                >
+                  <div className="absolute inset-0">
+                    <ScaledSlide>
+                      <SlideBackdropContext.Provider value={backdrop}>
+                        <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode="dark" />
+                      </SlideBackdropContext.Provider>
+                    </ScaledSlide>
+                  </div>
+                  <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#EC388A]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
+                    <Play size={10} className="fill-white" /> Video
+                  </div>
+                  <div className="pointer-events-none absolute right-3 top-3 rounded-full bg-white/15 px-2 py-0.5 font-mono text-[10px] text-white ring-1 ring-white/25 backdrop-blur">
+                    {ex.variantId}
+                  </div>
+                  <div className="pointer-events-none absolute inset-x-3 bottom-3 flex items-center justify-end opacity-0 transition group-hover:opacity-100">
+                    <span className="rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white">⤢ Zoom</span>
+                  </div>
+                </LazyMount>
+              </button>
+
 
               <div className="p-5">
                 <div className="text-[10px] uppercase tracking-widest text-[#003FC7]">{variant.name}</div>
@@ -1735,6 +1748,37 @@ function VideoExamplesBlock({
           );
         })}
       </div>
+
+      {(() => {
+        if (!zoomKey) return null;
+        const ex = VIDEO_SLIDE_EXAMPLES.find((e) => e.key === zoomKey);
+        if (!ex) return null;
+        const variant = byId(MODULE_VARIANTS, ex.variantId);
+        if (!variant) return null;
+        const previewSlide = {
+          id: ex.key,
+          position: 0,
+          sectionId: sectionForVariant(ex.variantId),
+          variantId: ex.variantId,
+          layoutId: variant.permittedLayoutIds[0] ?? "",
+          content: ex.content as Record<string, unknown>,
+          changes: [],
+        };
+        return (
+          <LightboxPortal
+            mode={zoomMode}
+            setMode={(m) => {
+              if (m === null) setZoomKey(null);
+              else setZoomMode(m);
+            }}
+            variant={variant}
+            brand={brand}
+            previewSlide={previewSlide}
+            lightBackdrop={backdropForVariant(variant, brand.id, "light")}
+            darkBackdrop={backdropForVariant(variant, brand.id, "dark")}
+          />
+        );
+      })()}
     </section>
   );
 }
