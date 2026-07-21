@@ -3,6 +3,7 @@ import { AppShell } from "@/components/AppShell";
 import { getBrandGuide, type BrandGuide, type ColorSwatch, type TypeStyle } from "@/lib/brand-guides";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { getDivisionLogos } from "@/lib/division-logos";
+import { getDivisionImagery } from "@/assets/backdrops/divisions";
 import {
   getBrandhubIntel,
   normalizeVoiceValue,
