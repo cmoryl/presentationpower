@@ -1044,6 +1044,7 @@ function VariantDetailModal({
   onTogglePin,
   usageCount,
   onClose,
+  logoHubPool,
 }: {
   variant: ModuleVariant;
   brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
@@ -1062,6 +1063,7 @@ function VariantDetailModal({
   onTogglePin: () => void;
   usageCount: number;
   onClose: () => void;
+  logoHubPool?: LogoFiller[];
 }) {
   const [copied, setCopied] = useState(false);
   const copyId = async () => {
@@ -1082,15 +1084,22 @@ function VariantDetailModal({
   }, [onClose]);
 
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
+  const detailContent = useMemo(() => {
+    const raw = seedDivisionContent(variant.id, brief, sections[0]?.name ?? "Preview section", brand) as Record<string, unknown>;
+    if (!logoHubPool || logoHubPool.length === 0) return raw;
+    if (!/^MV-(PROOF-LOGOS|CASE-LOGO-GRID)/.test(variant.id)) return raw;
+    return overlayLogoHubFillers(raw, variant.id, logoHubPool);
+  }, [variant.id, brief, sections, brand, logoHubPool]);
   const previewSlide = {
     id: variant.id,
     position: 0,
     sectionId: sections[0]?.id ?? "",
     variantId: variant.id,
     layoutId: variant.permittedLayoutIds[0],
-    content: seedDivisionContent(variant.id, brief, sections[0]?.name ?? "Preview section", brand) as Record<string, unknown>,
+    content: detailContent,
     changes: [],
   };
+
 
   return (
     <div
