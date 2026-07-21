@@ -689,7 +689,9 @@ const VariantCard = memo(function VariantCard({
       <div ref={singleRef} className="absolute inset-0">
         <ScaledSlide>
           <SlideBackdropContext.Provider value={singleBackdrop}>
-            <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={isDark ? "dark" : "light"} />
+            <SlideThumbnailContext.Provider value={true}>
+              <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={isDark ? "dark" : "light"} />
+            </SlideThumbnailContext.Provider>
           </SlideBackdropContext.Provider>
         </ScaledSlide>
 
