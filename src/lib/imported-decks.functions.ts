@@ -451,3 +451,108 @@ export const embedImportedDecks = createServerFn({ method: "POST" })
 
     return { considered: list.length, embedded, skipped, failed, totalChunks, results };
   });
+
+// ── LIBRARY SUBMISSIONS ────────────────────────────────────────────────
+// A user can promote any parsed slide from an imported deck into a
+// division-scoped "example" that shows up in the Approved Module
+// Variants library as a real-world reference. We copy the slide's
+// title/bullets/notes/imagePaths at submission time so the entry is
+// stable even if the source deck is later deleted.
+
+const SendToLibraryInput = z.object({
+  importedDeckId: z.string().uuid(),
+  slideIndex: z.number().int().min(0).max(999),
+  brandModeId: z.string().min(1).max(120).optional(),
+});
+
+export const sendImportedSlideToLibrary = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => SendToLibraryInput.parse(v))
+  .handler(async ({ data, context }) => {
+    const s = context.supabase as unknown as SbClient;
+    const { data: row } = await s
+      .from("imported_decks")
+      .select("id, division_id, slides")
+      .eq("id", data.importedDeckId)
+      .maybeSingle();
+    if (!row) throw new Error("Imported deck not found");
+    const r = row as {
+      id: string;
+      division_id: string;
+      slides: Array<{ index: number; title: string; bullets: string[]; notes: string; imageCount: number; imagePaths?: string[] }> | null;
+    };
+    const slide = (r.slides ?? []).find((sl) => sl.index === data.slideIndex);
+    if (!slide) throw new Error("Slide not found in this deck");
+
+    const divisionId = normalizeImportedDeckDivision(r.division_id);
+    const { data: ins, error } = await s
+      .from("library_slide_examples")
+      .insert({
+        division_id: divisionId,
+        brand_mode_id: data.brandModeId ?? divisionId,
+        imported_deck_id: r.id,
+        slide_index: slide.index,
+        title: slide.title ?? "",
+        bullets: slide.bullets ?? [],
+        notes: slide.notes ?? "",
+        image_paths: slide.imagePaths ?? [],
+        submitted_by: context.userId,
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error((error as { message?: string }).message ?? "Send failed");
+    return { id: (ins as { id: string }).id };
+  });
+
+export type LibrarySlideExample = {
+  id: string;
+  division_id: string;
+  brand_mode_id: string | null;
+  imported_deck_id: string | null;
+  slide_index: number;
+  title: string;
+  bullets: string[];
+  notes: string;
+  image_paths: string[];
+  submitted_by: string;
+  created_at: string;
+  imageUrls: string[];
+};
+
+export const listLibrarySlideExamples = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => z.object({ divisionId: z.string().min(1).max(120) }).parse(v))
+  .handler(async ({ data, context }): Promise<LibrarySlideExample[]> => {
+    const s = context.supabase as unknown as SbClient;
+    const divisionId = normalizeImportedDeckDivision(data.divisionId);
+    const { data: rows } = await s
+      .from("library_slide_examples")
+      .select("id, division_id, brand_mode_id, imported_deck_id, slide_index, title, bullets, notes, image_paths, submitted_by, created_at")
+      .eq("division_id", divisionId)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    const list = (rows ?? []) as Array<Omit<LibrarySlideExample, "imageUrls">>;
+    // Re-sign each image path from the `division-imagery` bucket (24h).
+    const signed = await Promise.all(
+      list.map(async (row) => {
+        const urls: string[] = [];
+        for (const p of row.image_paths ?? []) {
+          const res = await s.storage.from("division-imagery").createSignedUrl(p, 60 * 60 * 24).catch(() => ({ data: null }));
+          if (res.data?.signedUrl) urls.push(res.data.signedUrl);
+        }
+        return { ...row, imageUrls: urls };
+      }),
+    );
+    return signed;
+  });
+
+export const deleteLibrarySlideExample = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
+  .handler(async ({ data, context }) => {
+    const s = context.supabase as unknown as SbClient;
+    const { error } = await s.from("library_slide_examples").delete().eq("id", data.id);
+    if (error) throw new Error((error as { message?: string }).message ?? "Delete failed");
+    return { ok: true };
+  });
+
