@@ -16,6 +16,27 @@ export type LogoPosition =
   | "bottom-right"
   | "hidden";
 
+// Orientation of the brand lockup. The deck-wide default is limited to
+// `horizontal | stacked`; the rotated + mark-only orientations below are
+// per-slide options for editorial spreads, portrait features, and dense
+// content slides where a full lockup would compete with the content.
+export type LogoOrientation =
+  | "horizontal"
+  | "stacked"
+  | "vertical-left"
+  | "vertical-right"
+  | "mark-only";
+export type DeckLogoOrientation = "horizontal" | "stacked";
+export type SlideLogoOrientationInput = LogoOrientation | "auto";
+
+export const LOGO_ORIENTATION_META: Array<{ id: LogoOrientation; name: string; hint: string }> = [
+  { id: "horizontal",     name: "Horizontal",     hint: "Side-by-side mark + wordmark (default)" },
+  { id: "stacked",        name: "Stacked",        hint: "Mark above wordmark — covers, heroes" },
+  { id: "vertical-left",  name: "Vertical · left", hint: "Rotated −90°, pinned to the left edge" },
+  { id: "vertical-right", name: "Vertical · right", hint: "Rotated +90°, pinned to the right edge" },
+  { id: "mark-only",      name: "Mark only",      hint: "Monogram / symbol only, no wordmark" },
+];
+
 // Chrome variants align to SlideFrame's `variant` prop.
 export type ChromeVariant = "cover" | "content" | "divider" | "close";
 
