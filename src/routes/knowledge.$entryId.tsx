@@ -9,7 +9,7 @@ import {
   upsertKnowledgeEntry,
   deleteKnowledgeEntry,
   KNOWLEDGE_KIND_META,
-  type KnowledgeKind,
+  type EditableKnowledgeKind,
   type KnowledgeVisibility,
 } from "@/lib/knowledge.functions";
 
