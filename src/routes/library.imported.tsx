@@ -280,6 +280,7 @@ function DeckSlides({
             key={s.index}
             slide={s}
             deckId={deck.id}
+            deckTheme={themeToTokens(deck.theme)}
             brandModeId={brandModeId}
             approved={approvedKey.has(`${deck.id}:${s.index}`)}
             onPreview={() => onPreview(s.index)}
