@@ -26,9 +26,8 @@ export const APPROVED_LOGOS: ApprovedLogo[] = [
   {
     id: "globallink",
     name: "GlobalLink",
-    // No white classic variant — the color mark works on both surfaces.
-    color: "/brand-logos/globallink-color.png",
-    white: "/brand-logos/globallink-color.png",
+    color: "/brand-logos/globallink-color.svg",
+    white: "/brand-logos/globallink-white.svg",
   },
   {
     id: "lifesci",
