@@ -1748,6 +1748,37 @@ function VideoExamplesBlock({
           );
         })}
       </div>
+
+      {(() => {
+        if (!zoomKey) return null;
+        const ex = VIDEO_SLIDE_EXAMPLES.find((e) => e.key === zoomKey);
+        if (!ex) return null;
+        const variant = byId(MODULE_VARIANTS, ex.variantId);
+        if (!variant) return null;
+        const previewSlide = {
+          id: ex.key,
+          position: 0,
+          sectionId: sectionForVariant(ex.variantId),
+          variantId: ex.variantId,
+          layoutId: variant.permittedLayoutIds[0] ?? "",
+          content: ex.content as Record<string, unknown>,
+          changes: [],
+        };
+        return (
+          <LightboxPortal
+            mode={zoomMode}
+            setMode={(m) => {
+              if (m === null) setZoomKey(null);
+              else setZoomMode(m);
+            }}
+            variant={variant}
+            brand={brand}
+            previewSlide={previewSlide}
+            lightBackdrop={backdropForVariant(variant, brand.id, "light")}
+            darkBackdrop={backdropForVariant(variant, brand.id, "dark")}
+          />
+        );
+      })()}
     </section>
   );
 }
