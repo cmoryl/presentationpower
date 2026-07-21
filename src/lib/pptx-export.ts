@@ -209,6 +209,11 @@ export async function exportDeckToPptx(
   // tile only when a slot has no logoUrl set).
   const LOGO_ITEM_VARIANTS = new Set([
     "MV-PROOF-LOGOS",
+    "MV-PROOF-LOGOS-STRIP",
+    "MV-PROOF-LOGOS-MARQUEE",
+    "MV-PROOF-LOGOS-FEATURED",
+    "MV-PROOF-LOGOS-CATEGORIZED",
+    "MV-PROOF-LOGOS-MOSAIC",
     "MV-CASE-LOGO-GRID",
     "MV-LOGO-WALL",
     "MV-CLIENT-MATRIX",
@@ -980,6 +985,11 @@ function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette,
     case "MV-DEC-COMPARE-TABLE": renderDecCompareTable(s, c, p); return true;
     case "MV-DEC-CHECKLIST": renderDecChecklist(s, c, p); return true;
     case "MV-PROOF-LOGOS": renderProofLogos(s, c, p, itemLogos); return true;
+    case "MV-PROOF-LOGOS-STRIP": renderProofLogos(s, c, p, itemLogos); return true;
+    case "MV-PROOF-LOGOS-MARQUEE": renderProofLogos(s, c, p, itemLogos); return true;
+    case "MV-PROOF-LOGOS-FEATURED": renderProofLogos(s, c, p, itemLogos); return true;
+    case "MV-PROOF-LOGOS-CATEGORIZED": renderProofLogos(s, c, p, itemLogos); return true;
+    case "MV-PROOF-LOGOS-MOSAIC": renderProofLogos(s, c, p, itemLogos); return true;
     case "MV-PROOF-TESTIMONIAL": renderProofTestimonial(s, c, p); return true;
     case "MV-RISK-MITIGATION": renderRiskMitigation(s, c, p); return true;
     case "MV-TEAM-BIOS-3": renderTeamBios(s, c, p, 3); return true;
