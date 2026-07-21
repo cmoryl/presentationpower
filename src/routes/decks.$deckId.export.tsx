@@ -215,8 +215,62 @@ function ExportView() {
           >
             Print / Save PDF
           </button>
+          {glShareConfigured ? (
+            <button
+              onClick={handleShareViaGlobalLink}
+              disabled={glShareBusy || blocked}
+              title={blocked ? "Resolve blocking QA issues first" : "Upload the .pptx directly to GlobalLink Share"}
+              className="rounded-full bg-[#E11D48] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#be1740] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {glShareBusy ? "Uploading…" : "Share via GlobalLink"}
+            </button>
+          ) : (
+            <button
+              onClick={openShareHandoff}
+              title="Direct upload available once GlobalLink Share API credentials are added in Settings → Secrets."
+              className="rounded-full border border-black/15 bg-white px-5 py-2.5 text-sm font-medium text-black hover:border-black/30"
+            >
+              Send via GlobalLink Share ↗
+            </button>
+          )}
         </div>
       </div>
+
+      {/* GlobalLink Share result / handoff note */}
+      <div className="no-print mx-auto mb-6 max-w-[1200px] px-6">
+        {glShareUrl ? (
+          <div className="flex items-center justify-between gap-4 rounded-2xl border border-emerald-300 bg-emerald-50 p-4">
+            <div className="min-w-0">
+              <div className="text-xs font-semibold uppercase tracking-widest text-emerald-900">
+                Uploaded to GlobalLink Share
+              </div>
+              <a
+                href={glShareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 block truncate text-sm text-emerald-900 underline"
+              >
+                {glShareUrl}
+              </a>
+            </div>
+            <button
+              onClick={copyShareUrl}
+              className="shrink-0 rounded-full border border-emerald-300 bg-white px-4 py-2 text-xs font-medium text-emerald-900 hover:border-emerald-500"
+            >
+              {glCopied ? "Copied ✓" : "Copy link"}
+            </button>
+          </div>
+        ) : glShareError ? (
+          <div className="rounded-2xl border border-red-300 bg-red-50 p-4 text-sm text-red-900">
+            {glShareError}
+          </div>
+        ) : !glShareConfigured ? (
+          <p className="text-xs text-black/50">
+            After downloading, your exported file will be in your Downloads folder — drag it into GlobalLink Share to send it securely (SSO-gated).
+          </p>
+        ) : null}
+      </div>
+
 
       {(blocks.length > 0 || warns.length > 0) && (
         <div className="no-print mx-auto mb-8 max-w-[1200px] px-6">
