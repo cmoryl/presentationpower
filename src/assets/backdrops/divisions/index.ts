@@ -4,17 +4,19 @@
 // bm-product and bm-cobrand fall back to bm-enterprise.
 // ──────────────────────────────────────────────────────────────────────
 
-// Enterprise
-import entP1 from "./bm-enterprise/photo-01.jpg";
-import entP2 from "./bm-enterprise/photo-02.jpg";
-import entP3 from "./bm-enterprise/photo-03.jpg";
-import entP4 from "./bm-enterprise/photo-04.jpg";
-import entP5 from "./bm-enterprise/photo-05.jpg";
-import entP6 from "./bm-enterprise/photo-06.jpg";
-import entA1 from "./bm-enterprise/abstract-01.jpg";
-import entA2 from "./bm-enterprise/abstract-02.jpg";
-import entA3 from "./bm-enterprise/abstract-03.jpg";
-import entA4 from "./bm-enterprise/abstract-04.jpg";
+// Enterprise — uses the curated 10-gradient corporate backdrop set as the
+// canonical imagery pool. Split into 6 "photo" slots + 4 "abstract" slots so
+// the existing variant-family scrim/tint rules keep working unchanged.
+import entP1 from "./corporate-dark/bg-01.webp";
+import entP2 from "./corporate-dark/bg-02.webp";
+import entP3 from "./corporate-dark/bg-03.webp";
+import entP4 from "./corporate-dark/bg-04.webp";
+import entP5 from "./corporate-dark/bg-05.webp";
+import entP6 from "./corporate-dark/bg-06.webp";
+import entA1 from "./corporate-dark/bg-07.webp";
+import entA2 from "./corporate-dark/bg-08.webp";
+import entA3 from "./corporate-dark/bg-09.webp";
+import entA4 from "./corporate-dark/bg-10.webp";
 
 // Subcompany (Industry Solutions)
 import subP1 from "./bm-subcompany/photo-01.jpg";
