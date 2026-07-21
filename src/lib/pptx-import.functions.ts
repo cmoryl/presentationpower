@@ -45,9 +45,10 @@ export type ParsedDeck = {
 
 const InputSchema = z.object({
   filename: z.string().min(1).max(300),
-  // Base64-encoded .pptx bytes. Capped at ~30MB base64 (~22MB raw).
-  data: z.string().min(1).max(40_000_000),
+  // Base64-encoded .pptx bytes. Capped at ~140MB base64 (~100MB raw).
+  data: z.string().min(1).max(140_000_000),
 });
+
 
 // Caps to keep localStorage usable. Users can raise these later if needed.
 const MAX_PER_IMAGE_BYTES = 900_000; // ~900KB per image (base64 payload)
