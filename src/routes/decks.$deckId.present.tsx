@@ -39,6 +39,12 @@ function PresenterView() {
 
 
 
+  // Signals MediaTile to autoplay <video> in present mode.
+  useEffect(() => {
+    document.body.classList.add("present-mode");
+    return () => document.body.classList.remove("present-mode");
+  }, []);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const active = document.activeElement;
