@@ -460,13 +460,14 @@ const VariantCard = memo(function VariantCard({
   autoFixOn?: boolean;
   onOpen: () => void;
 }) {
+  const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
   const previewSlide = {
     id: variant.id,
     position: 0,
     sectionId,
     variantId: variant.id,
     layoutId: variant.permittedLayoutIds[0],
-    content: seedContent(variant.id, SAMPLE_BRIEF, "Preview section") as Record<string, unknown>,
+    content: seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<string, unknown>,
     changes: [],
   };
   const isDark = mode === "dark";
