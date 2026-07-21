@@ -807,7 +807,14 @@ function ImportedDecksTab({ slug }: { slug: string }) {
         {embedMsg && (
           <div className="mt-3 rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-800">{embedMsg}</div>
         )}
+        {sendMsg && (
+          <div className="mt-3 rounded-lg bg-[#003FC7]/10 px-3 py-2 text-xs text-[#003FC7]">{sendMsg}</div>
+        )}
       </Section>
+
+      <LibrarySubmissionsSection slug={slug} />
+
+
 
 
       {openId && (
