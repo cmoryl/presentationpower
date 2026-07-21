@@ -1608,3 +1608,134 @@ function UserImportedKitsBlock() {
     </section>
   );
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// Video example slides — one per video-supporting variant. Each renders a
+// live VariantRenderer preview and imports as a single-slide starter deck.
+// ────────────────────────────────────────────────────────────────────────────
+function VideoExamplesBlock({
+  brand,
+  sectionFrameworks,
+}: {
+  brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
+  sectionFrameworks: ReturnType<typeof useTaxonomy>["sectionFrameworks"];
+}) {
+  const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState<string | null>(null);
+
+  function sectionForVariant(variantId: string): string {
+    const variant = byId(MODULE_VARIANTS, variantId);
+    if (!variant) return "SF-01";
+    const match = sectionFrameworks.find((s) =>
+      s.permittedFamilyIds.includes(variant.familyId),
+    );
+    return match?.id ?? "SF-01";
+  }
+
+  function importExample(ex: VideoSlideExample) {
+    const variant = byId(MODULE_VARIANTS, ex.variantId);
+    if (!variant) return;
+    setBusy(ex.key);
+    const payload: TemplatePayload = {
+      title: `${ex.title} · Video starter`,
+      brandModeId: brand.id,
+      archetypeId: "arch-product-pitch",
+      subCompany: null,
+      context: null,
+      brief: {
+        prospect: "Video Example",
+        industry: "Media",
+        audience: "Internal review",
+        meetingObjective: `Demonstrate the ${variant.name} video layout`,
+        lengthTarget: 1,
+        clientFacts: ex.blurb,
+      },
+      slides: [
+        {
+          sectionId: sectionForVariant(ex.variantId),
+          variantId: ex.variantId,
+          layoutId: variant.permittedLayoutIds[0] ?? "",
+          content: structuredClone(ex.content) as Record<string, unknown>,
+        },
+      ],
+    };
+    const { deckId } = createDeckFromTemplate(payload);
+    navigate({ to: "/decks/$deckId", params: { deckId } });
+  }
+
+  return (
+    <section className="mt-16">
+      <div className="flex items-end justify-between gap-4 border-b border-black/10 pb-4">
+        <div>
+          <div className="text-xs uppercase tracking-[0.3em] text-black/50">Video examples</div>
+          <h2 className="mt-2 text-2xl font-semibold text-[#03002C]">Motion-ready module variants</h2>
+          <p className="mt-2 max-w-2xl text-sm text-black/60">
+            Pre-built demonstrations of every module variant that supports slide-level video. Import one as a starter deck and swap in your own footage.
+          </p>
+        </div>
+        <span className="shrink-0 rounded-full bg-black/5 px-3 py-1 text-xs text-black/60">
+          {VIDEO_SLIDE_EXAMPLES.length} examples
+        </span>
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+        {VIDEO_SLIDE_EXAMPLES.map((ex) => {
+          const variant = byId(MODULE_VARIANTS, ex.variantId);
+          if (!variant) return null;
+          const previewSlide = {
+            id: ex.key,
+            position: 0,
+            sectionId: sectionForVariant(ex.variantId),
+            variantId: ex.variantId,
+            layoutId: variant.permittedLayoutIds[0] ?? "",
+            content: ex.content as Record<string, unknown>,
+            changes: [],
+          };
+          const backdrop = backdropForVariant(variant, brand.id, "light");
+          return (
+            <div
+              key={ex.key}
+              className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:border-[#003FC7]/20 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)]"
+            >
+              <LazyMount
+                className="relative m-2 aspect-[16/10] overflow-hidden rounded-[18px] bg-[#03002C]"
+                placeholder={<PreviewSkeleton dark label={variant.familyId} />}
+              >
+                <div className="absolute inset-0">
+                  <ScaledSlide>
+                    <SlideBackdropContext.Provider value={backdrop}>
+                      <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode="dark" />
+                    </SlideBackdropContext.Provider>
+                  </ScaledSlide>
+                </div>
+                <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#EC388A]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
+                  <Play size={10} className="fill-white" /> Video
+                </div>
+                <div className="pointer-events-none absolute right-3 top-3 rounded-full bg-white/15 px-2 py-0.5 font-mono text-[10px] text-white ring-1 ring-white/25 backdrop-blur">
+                  {ex.variantId}
+                </div>
+              </LazyMount>
+
+              <div className="p-5">
+                <div className="text-[10px] uppercase tracking-widest text-[#003FC7]">{variant.name}</div>
+                <div className="mt-1 text-base font-semibold text-[#03002C]">{ex.title}</div>
+                <p className="mt-2 text-sm text-black/60">{ex.blurb}</p>
+                <button
+                  type="button"
+                  onClick={() => importExample(ex)}
+                  disabled={busy !== null}
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#03002C] px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
+                >
+                  {busy === ex.key ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                  {busy === ex.key ? "Importing…" : "Import as starter deck"}
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
