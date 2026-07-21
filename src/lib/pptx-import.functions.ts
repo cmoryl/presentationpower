@@ -242,6 +242,8 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
   let tableTotal = 0;
   let diagramTotal = 0;
 
+  const parentCache = new Map<string, ParentSlideData>();
+
   for (let i = 0; i < slideFiles.length; i++) {
     const slidePath = slideFiles[i];
     const xml = await zip.files[slidePath].async("string");
@@ -268,7 +270,7 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
       notes = nshapes.flatMap((s) => s.paragraphs).map((p) => p.trim()).filter(Boolean).join("\n");
     }
 
-    // ── Slide rels (needed for images + charts + diagrams) ──────────────
+    // ── Slide rels (needed for images + charts + diagrams + parents) ────
     const relsPath = `ppt/slides/_rels/slide${slideNumber(slidePath)}.xml.rels`;
     let relsDoc: unknown = null;
     if (zip.files[relsPath]) {
@@ -276,6 +278,10 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
       relsDoc = parser.parse(relsXml);
     }
     const relTargetsByType = extractRelTargetsByType(relsDoc);
+
+    // ── Resolve slideLayout + slideMaster parent chain ──────────────────
+    const parents = await resolveParents(zip, parser, slidePath, relsDoc, parentCache);
+
 
     // ── Embedded images ─────────────────────────────────────────────────
     // We keep two parallel arrays so a downstream faithful renderer can map
