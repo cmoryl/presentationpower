@@ -1236,8 +1236,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Grid of client cards — logo, one-line result, headline metric",
     permittedLayoutIds: ["LF-39"],
     capacity: { items: { min: 4, max: 6 }, titleChars: 60, bodyChars: 100 },
-    editableFields: ["title", "items[].client", "items[].sector", "items[].result", "items[].metric", "items[].unit"],
-    lockedFields: ["items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "items[].client", "items[].sector", "items[].result", "items[].metric", "items[].unit", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
   {
     id: "MV-CLIENT-DETAIL-3",
