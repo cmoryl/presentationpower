@@ -135,7 +135,7 @@ export function SlideImageryPanel({
       return;
     }
     setError(null);
-    onChange(v);
+    onChange(v, null);
     setUrlDraft("");
   }
 
@@ -176,7 +176,7 @@ export function SlideImageryPanel({
         {hasCustom && (
           <button
             type="button"
-            onClick={() => onChange(null)}
+            onClick={() => onChange(null, null)}
             className="rounded-full border border-black/15 px-2.5 py-0.5 text-[11px] uppercase tracking-widest hover:bg-black/5"
             title="Reset to seeded division imagery"
           >
@@ -321,7 +321,7 @@ export function SlideImageryPanel({
                         title={`${r.filename}${r.tags?.length ? "\nTags: " + r.tags.join(", ") : ""}${r.note ? "\n" + r.note : ""}`}
                         onClick={() => {
                           if (!r.signedUrl) return;
-                          onChange(r.signedUrl);
+                          onChange(r.signedUrl, null);
                           void logImageryEvent({
                             data: { imageId: `division-imagery:${r.id}`, brandId: divisionId ?? null, eventType: "use" },
                           }).catch(() => {});
