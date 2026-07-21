@@ -2904,38 +2904,115 @@ function renderVariantBody({
     case "MV-MATURITY-CURVE": {
       const items = arr(c.items);
       const n = Math.max(items.length, 2);
-      const W = 1600, H = 460;
+      // Reserve generous horizontal padding so the leftmost/rightmost labels
+      // never get clipped, and vertical padding for stage-label + note lines.
+      const PAD_X = 200;
+      const PAD_TOP = 90;
+      const PAD_BOT = 110;
+      const W = 1760;
+      const H = 520;
+      const curveId = `mc-fill-${variant.id}`;
+      const glowId = `mc-glow-${variant.id}`;
+      const gradId = `mc-line-${variant.id}`;
+      const primary = brand.tokens.primary;
+      const accent = brand.tokens.accent;
+      // Anchor left/right, sinusoidal ease so the S-curve reads as a real
+      // maturity ramp rather than a straight diagonal.
+      const px = (i: number) => PAD_X + (i / (n - 1)) * (W - PAD_X * 2);
+      const py = (i: number) => {
+        const t = i / (n - 1);
+        const eased = 0.5 - 0.5 * Math.cos(Math.PI * t);
+        return PAD_TOP + (1 - eased) * (H - PAD_TOP - PAD_BOT) * 0.9 + (H - PAD_BOT) * 0.05;
+      };
+      const points = items.map((_, i) => ({ x: px(i), y: py(i) }));
+      const path = points
+        .map((p, i) => {
+          if (i === 0) return `M ${p.x} ${p.y}`;
+          const prev = points[i - 1];
+          const mx = (prev.x + p.x) / 2;
+          return `C ${mx} ${prev.y} ${mx} ${p.y} ${p.x} ${p.y}`;
+        })
+        .join(" ");
+      const areaPath = `${path} L ${points[points.length - 1]?.x ?? W - PAD_X} ${H - PAD_BOT} L ${points[0]?.x ?? PAD_X} ${H - PAD_BOT} Z`;
+      const currentIdx = items.findIndex((it) => Boolean(it.current));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-12">
-            <svg viewBox={`0 0 ${W} ${H + 140}`} className="w-full">
-              <line x1="0" y1={H} x2={W} y2={H} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
-              <path
-                d={`M 40 ${H - 20} Q ${W * 0.35} ${H - 40} ${W * 0.55} ${H * 0.6} T ${W - 40} 40`}
-                fill="none"
-                stroke={brand.tokens.primary}
-                strokeWidth={4}
-              />
+          {s(c.subtitle) && (
+            <div className="mt-4 max-w-[1080px]" style={{ fontSize: 22, lineHeight: 1.4, color: ink.muted }}>
+              {s(c.subtitle)}
+            </div>
+          )}
+          <div className="mt-10">
+            <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ overflow: "visible" }}>
+              <defs>
+                <linearGradient id={gradId} x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="0%" stopColor={primary} stopOpacity={0.55} />
+                  <stop offset="55%" stopColor={primary} />
+                  <stop offset="100%" stopColor={accent} />
+                </linearGradient>
+                <linearGradient id={curveId} x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor={accent} stopOpacity={isDark ? 0.28 : 0.20} />
+                  <stop offset="100%" stopColor={accent} stopOpacity={0} />
+                </linearGradient>
+                <filter id={glowId} x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="6" result="b" />
+                  <feMerge>
+                    <feMergeNode in="b" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              {/* Baseline & tick guides */}
+              {Array.from({ length: 4 }, (_, i) => {
+                const y = PAD_TOP + ((H - PAD_TOP - PAD_BOT) / 3) * i;
+                return <line key={i} x1={PAD_X} y1={y} x2={W - PAD_X} y2={y} stroke={ink.axis} strokeDasharray={i === 3 ? "0" : "2 8"} strokeWidth={1} />;
+              })}
+              {/* Y-axis frame labels */}
+              <text x={PAD_X - 24} y={PAD_TOP + 6} textAnchor="end" fontSize={16} letterSpacing="0.28em" fill={ink.faint} style={{ textTransform: "uppercase", fontWeight: 600 }}>High</text>
+              <text x={PAD_X - 24} y={H - PAD_BOT + 6} textAnchor="end" fontSize={16} letterSpacing="0.28em" fill={ink.faint} style={{ textTransform: "uppercase", fontWeight: 600 }}>Low</text>
+              {/* Curve fill under-glow */}
+              <path d={areaPath} fill={`url(#${curveId})`} />
+              {/* Curve stroke */}
+              <path d={path} fill="none" stroke={`url(#${gradId})`} strokeWidth={5} strokeLinecap="round" filter={`url(#${glowId})`} />
+              {/* Nodes */}
               {items.map((it, i) => {
-                const t = i / (n - 1);
-                const x = 40 + t * (W - 80);
-                const y = H - 20 - t * (H - 60);
-                const current = Boolean(it.current);
+                const current = Boolean(it.current) || i === currentIdx;
+                const p = points[i];
+                const isFirst = i === 0;
+                const isLast = i === n - 1;
+                const anchor: "start" | "middle" | "end" = isFirst ? "start" : isLast ? "end" : "middle";
+                const labelX = isFirst ? p.x - 6 : isLast ? p.x + 6 : p.x;
+                const noteX = labelX;
+                const label = s(it.label);
+                const note = s(it.note);
                 return (
                   <g key={i}>
-                    <circle cx={x} cy={y} r={current ? 16 : 10} fill={current ? brand.tokens.accent : "#fff"} stroke={brand.tokens.primary} strokeWidth={3} />
-                    <text x={x} y={y - 28} textAnchor="middle" fontSize={26} fontWeight={600} fill={brand.tokens.primary} style={{ letterSpacing: "-0.01em" }}>{s(it.label)}</text>
-                    <text x={x} y={H + 40} textAnchor="middle" fontSize={18} fill="rgba(10,15,28,0.65)">{s(it.note)}</text>
-                    {current && <text x={x} y={y + 44} textAnchor="middle" fontSize={16} fontWeight={600} fill={brand.tokens.accent} style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>You are here</text>}
+                    {current && (
+                      <circle cx={p.x} cy={p.y} r={26} fill={accent} opacity={0.18} />
+                    )}
+                    <circle cx={p.x} cy={p.y} r={current ? 14 : 9} fill={current ? accent : ink.ringOnDark} stroke={current ? accent : primary} strokeWidth={current ? 0 : 3} />
+                    {current && <circle cx={p.x} cy={p.y} r={5} fill={ink.ringOnDark} />}
+                    <text x={labelX} y={p.y - 32} textAnchor={anchor} fontSize={28} fontWeight={700} fill={ink.strong} style={{ letterSpacing: "-0.015em" }}>{label}</text>
+                    {note && (
+                      <text x={noteX} y={H - PAD_BOT + 40} textAnchor={anchor} fontSize={18} fill={ink.muted}>
+                        {note}
+                      </text>
+                    )}
+                    {current && (
+                      <text x={p.x} y={p.y + 44} textAnchor="middle" fontSize={13} fontWeight={700} fill={accent} style={{ letterSpacing: "0.32em", textTransform: "uppercase" }}>You are here</text>
+                    )}
                   </g>
                 );
               })}
+              {/* X-axis kicker */}
+              <text x={PAD_X} y={H - 14} fontSize={13} letterSpacing="0.32em" fill={ink.faint} style={{ textTransform: "uppercase", fontWeight: 700 }}>{s(c.axisLabel, "Program maturity")}</text>
             </svg>
           </div>
         </SlideFrame>
       );
     }
+
 
     case "MV-JOURNEY-MAP": {
       const items = arr(c.items);
