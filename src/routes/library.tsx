@@ -15,6 +15,7 @@ import {
   resolveDivisionBrief,
   seedDivisionContent,
   validateDivisionContent,
+  COVERAGE_FIX_HINTS,
 } from "@/lib/library-preview";
 import { byId, MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
