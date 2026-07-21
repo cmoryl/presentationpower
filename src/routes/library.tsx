@@ -1168,7 +1168,8 @@ function LightboxPortal({
         <span className="mx-2"><kbd className="rounded border border-white/20 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-white/70">Esc</kbd> close</span>
         <span className="mx-2"><kbd className="rounded border border-white/20 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-white/70">← →</kbd> toggle theme</span>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
