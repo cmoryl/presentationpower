@@ -2,6 +2,8 @@ import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import { SlideFrame as BaseSlideFrame, SlideModeContext, SlideBackdropContext, type SlideMode, type SlideBackdrop } from "./SlideChrome";
 import { SlideThumbnailContext, SlideVideoPreviewContext, useResolvedVideoUrl, useResolvedPosterUrl, useResolvedImageUrl, useResolvedLogoUrl } from "@/lib/slide-media-refresh";
 import { resolveSlideBackground } from "@/lib/background-library";
+import { backdropForVariant } from "./variantBackdrop";
+
 import { createContext, useContext, useEffect, useRef, useState, Fragment } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
