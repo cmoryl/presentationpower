@@ -7,6 +7,7 @@ import {
   logoPositionStyles,
   type ChromeVariant,
   type LogoPosition,
+  type LogoOrientation,
 } from "@/lib/logo-placement";
 import { GRAIN_SVG } from "@/components/slide/grain";
 
@@ -65,7 +66,7 @@ export function SlideFrame({
   subCompany?: string;
   layoutId?: string;
   logoPosition?: LogoPosition;
-  logoOrientation?: "horizontal" | "stacked";
+  logoOrientation?: LogoOrientation;
 }) {
 
   const mode = useSlideMode();
