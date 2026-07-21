@@ -657,8 +657,8 @@ function ImportedDecksTab({ slug }: { slug: string }) {
       setError("Only .pptx files are supported.");
       return;
     }
-    if (file.size > 50 * 1024 * 1024) {
-      setError("File exceeds 50MB.");
+    if (file.size > 100 * 1024 * 1024) {
+      setError("File exceeds 100MB.");
       return;
     }
     setUploading(true);
