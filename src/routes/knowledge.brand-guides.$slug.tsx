@@ -3,6 +3,7 @@ import { AppShell } from "@/components/AppShell";
 import { getBrandGuide, type BrandGuide, type ColorSwatch, type TypeStyle } from "@/lib/brand-guides";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { getDivisionLogos } from "@/lib/division-logos";
+import { getDivisionImagery } from "@/assets/backdrops/divisions";
 import {
   getBrandhubIntel,
   normalizeVoiceValue,
@@ -240,6 +241,48 @@ function BrandGuideView() {
           </div>
         </Section>
       )}
+
+      {/* Imagery library — division backdrop pool */}
+      {(() => {
+        const imagery = getDivisionImagery(guide.divisionId);
+        if (!imagery || (imagery.photos.length === 0 && imagery.abstracts.length === 0)) return null;
+        return (
+          <Section title="Imagery library" eyebrow="05B">
+            <p className="max-w-3xl text-sm text-foreground/75">
+              The curated backdrop pool used across decks, exports, and live previews for this division.
+              Photography slots drive hero and full-bleed layouts; abstracts back stats, quotes, and section dividers.
+            </p>
+
+            {imagery.photos.length > 0 && (
+              <div className="mt-6">
+                <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Photography · {imagery.photos.length}</div>
+                <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+                  {imagery.photos.map((src, i) => (
+                    <div key={`p-${i}`} className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-muted">
+                      <img src={src} alt={`${guide.title} photography backdrop ${i + 1}`} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                      <div className="absolute bottom-1.5 left-1.5 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">P{String(i + 1).padStart(2, "0")}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {imagery.abstracts.length > 0 && (
+              <div className="mt-6">
+                <div className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Abstract · {imagery.abstracts.length}</div>
+                <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
+                  {imagery.abstracts.map((src, i) => (
+                    <div key={`a-${i}`} className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-muted">
+                      <img src={src} alt={`${guide.title} abstract backdrop ${i + 1}`} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                      <div className="absolute bottom-1.5 left-1.5 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">A{String(i + 1).padStart(2, "0")}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </Section>
+        );
+      })()}
 
       {/* Sub-brands */}
       {guide.subBrands && guide.subBrands.length > 0 && (
