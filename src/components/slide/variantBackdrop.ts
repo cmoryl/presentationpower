@@ -11,20 +11,20 @@ import portrait4 from "@/assets/portraits/portrait-4.png";
 // on-brand gradient stills. Applied deterministically per variant id so a
 // given variant always renders with the same backdrop across every surface
 // (library grid, lightbox, editor, present, print, share).
-import corp01 from "@/assets/backdrops/corporate-dark/bg-01.png.asset.json";
-import corp02 from "@/assets/backdrops/corporate-dark/bg-02.png.asset.json";
-import corp03 from "@/assets/backdrops/corporate-dark/bg-03.png.asset.json";
-import corp04 from "@/assets/backdrops/corporate-dark/bg-04.png.asset.json";
-import corp05 from "@/assets/backdrops/corporate-dark/bg-05.png.asset.json";
-import corp06 from "@/assets/backdrops/corporate-dark/bg-06.png.asset.json";
-import corp07 from "@/assets/backdrops/corporate-dark/bg-07.png.asset.json";
-import corp08 from "@/assets/backdrops/corporate-dark/bg-08.png.asset.json";
-import corp09 from "@/assets/backdrops/corporate-dark/bg-09.png.asset.json";
-import corp10 from "@/assets/backdrops/corporate-dark/bg-10.png.asset.json";
+import corp01 from "@/assets/backdrops/corporate-dark/bg-01.webp";
+import corp02 from "@/assets/backdrops/corporate-dark/bg-02.webp";
+import corp03 from "@/assets/backdrops/corporate-dark/bg-03.webp";
+import corp04 from "@/assets/backdrops/corporate-dark/bg-04.webp";
+import corp05 from "@/assets/backdrops/corporate-dark/bg-05.webp";
+import corp06 from "@/assets/backdrops/corporate-dark/bg-06.webp";
+import corp07 from "@/assets/backdrops/corporate-dark/bg-07.webp";
+import corp08 from "@/assets/backdrops/corporate-dark/bg-08.webp";
+import corp09 from "@/assets/backdrops/corporate-dark/bg-09.webp";
+import corp10 from "@/assets/backdrops/corporate-dark/bg-10.webp";
 
 export const CORPORATE_DARK_BACKDROPS: string[] = [
-  corp01.url, corp02.url, corp03.url, corp04.url, corp05.url,
-  corp06.url, corp07.url, corp08.url, corp09.url, corp10.url,
+  corp01, corp02, corp03, corp04, corp05,
+  corp06, corp07, corp08, corp09, corp10,
 ];
 
 const PORTRAITS = [portrait1, portrait2, portrait3, portrait4];
