@@ -250,36 +250,69 @@ function BriefWizard() {
                     const active = form.brandModeId === b.id;
                     const c = b.tokens?.primary || PALETTE.blue;
                     const a = b.tokens?.accent || c;
+                    const isEnterprise = b.id === "bm-enterprise";
                     return (
                       <button
                         key={b.id}
                         type="button"
                         onClick={() => selectBrand(b.id)}
                         aria-pressed={active}
-                        className="group relative grid min-h-[172px] cursor-pointer grid-rows-[auto_1fr_auto] gap-3 overflow-hidden rounded-xl border-2 p-4 text-left transition-all duration-300 ease-out hover:-translate-y-1"
+                        className={`group relative grid min-h-[184px] cursor-pointer grid-rows-[auto_1fr_auto] gap-3 overflow-hidden ${isEnterprise ? "rounded-[18px] border" : "rounded-xl border"} p-5 text-left transition-all duration-300 ease-out hover:-translate-y-0.5`}
                         style={{
                           borderColor: active ? c : PALETTE.hairline,
+                          borderWidth: isEnterprise ? 1 : active ? 2 : 1,
                           backgroundColor: PALETTE.surface,
                           boxShadow: active
-                            ? `0 12px 28px -12px ${c}55, 0 0 0 3px ${c}22`
-                            : "0 1px 2px rgba(15,27,61,0.04)",
+                            ? isEnterprise
+                              ? `0 22px 44px -20px ${c}55, 0 0 0 1px ${c}, inset 0 1px 0 rgba(255,255,255,0.9)`
+                              : `0 12px 28px -12px ${c}55, 0 0 0 2px ${c}22`
+                            : "0 1px 2px rgba(3,0,44,0.03)",
                         }}
                         onMouseEnter={(e) => {
                           if (!active) e.currentTarget.style.boxShadow = `0 14px 30px -16px ${c}66, 0 0 0 1px ${c}22`;
                         }}
                         onMouseLeave={(e) => {
-                          if (!active) e.currentTarget.style.boxShadow = "0 1px 2px rgba(15,27,61,0.04)";
+                          if (!active) e.currentTarget.style.boxShadow = "0 1px 2px rgba(3,0,44,0.03)";
                         }}
                       >
+                        {/* Ambient background */}
                         <span
                           aria-hidden
                           className="pointer-events-none absolute inset-0 transition-opacity duration-300"
-                          style={{
-                            background: `radial-gradient(120% 100% at 0% 0%, ${c}14 0%, transparent 55%), linear-gradient(135deg, ${c}0a 0%, ${a}10 100%)`,
-                            opacity: active ? 1 : 0.55,
-                          }}
+                          style={
+                            isEnterprise
+                              ? {
+                                  background: `linear-gradient(180deg, ${c}0d 0%, transparent 42%), linear-gradient(135deg, transparent 40%, ${a}12 100%)`,
+                                  opacity: active ? 1 : 0.7,
+                                }
+                              : {
+                                  background: `radial-gradient(120% 100% at 0% 0%, ${c}14 0%, transparent 55%), linear-gradient(135deg, ${c}0a 0%, ${a}10 100%)`,
+                                  opacity: active ? 1 : 0.55,
+                                }
+                          }
                         />
-                        <div className="relative flex min-w-0 items-center justify-end">
+                        {/* Enterprise-only: architectural corner brackets + top hairline rule */}
+                        {isEnterprise && (
+                          <>
+                            <span
+                              aria-hidden
+                              className="pointer-events-none absolute inset-x-5 top-0 h-[2px]"
+                              style={{ background: `linear-gradient(90deg, ${c}, ${a})` }}
+                            />
+                            <span aria-hidden className="pointer-events-none absolute left-3 top-3 h-2 w-2 border-l border-t" style={{ borderColor: `${c}80` }} />
+                            <span aria-hidden className="pointer-events-none absolute right-3 top-3 h-2 w-2 border-r border-t" style={{ borderColor: `${c}80` }} />
+                            <span aria-hidden className="pointer-events-none absolute left-3 bottom-3 h-2 w-2 border-l border-b" style={{ borderColor: `${c}80` }} />
+                            <span aria-hidden className="pointer-events-none absolute right-3 bottom-3 h-2 w-2 border-r border-b" style={{ borderColor: `${c}80` }} />
+                          </>
+                        )}
+                        <div className="relative flex min-w-0 items-center justify-between gap-2">
+                          {isEnterprise ? (
+                            <span className="font-mono text-[9px] uppercase tracking-[0.24em] text-[#03002C]/55">
+                              Master · TransPerfect
+                            </span>
+                          ) : (
+                            <span />
+                          )}
                           <span
                             className="shrink-0 rounded-sm px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em] transition-colors"
                             style={{
@@ -291,7 +324,7 @@ function BriefWizard() {
                           </span>
                         </div>
                         <div className="relative flex min-w-0 max-w-full items-center">
-                          <BrandLockup brand={b} color={c} size="xs" clientName={form.prospect} />
+                          <BrandLockup brand={b} color={c} size={isEnterprise ? "sm" : "xs"} clientName={form.prospect} />
                         </div>
                         <p className="relative text-[11px] leading-snug text-[#1E2749]/80">{b.description}</p>
                       </button>
