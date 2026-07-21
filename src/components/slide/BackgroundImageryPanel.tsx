@@ -454,13 +454,24 @@ export function BackgroundImageryPanel({
         </div>
       )}
 
-      {/* Tabs */}
+      {/* Tabs — switching into solid / gradient / pattern auto-applies the
+          current preview values so the slide updates the moment the user
+          picks a kind (previously required jogging a slider first). */}
       <div className="mt-4 grid grid-cols-7 gap-1 rounded-full border border-black/10 bg-black/[0.03] p-1 text-[10px]">
         {(["library", "brand", "solid", "gradient", "pattern", "upload", "ai"] as Tab[]).map((t) => (
           <button
             key={t}
             type="button"
-            onClick={() => setTab(t)}
+            onClick={() => {
+              setTab(t);
+              if (t === "solid" && current?.kind !== "color") {
+                commitSolid({});
+              } else if (t === "gradient" && current?.kind !== "gradient") {
+                commitGradient({});
+              } else if (t === "pattern" && current?.kind !== "pattern") {
+                commitPattern({});
+              }
+            }}
             className={`rounded-full px-2 py-1.5 uppercase tracking-widest transition ${
               tab === t ? "bg-black text-white" : "text-black/60 hover:text-black"
             }`}
@@ -469,6 +480,7 @@ export function BackgroundImageryPanel({
           </button>
         ))}
       </div>
+
 
       {error && (
         <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800">{error}</div>
