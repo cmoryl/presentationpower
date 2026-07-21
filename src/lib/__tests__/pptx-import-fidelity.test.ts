@@ -14,7 +14,7 @@
 
 import { describe, expect, it } from "vitest";
 import JSZip from "jszip";
-import { parsePptxBuffer } from "@/lib/pptx-import.functions";
+import { parsePptxBuffer } from "@/lib/pptx-import";
 
 // ─── Fixture XML builders ─────────────────────────────────────────────────
 

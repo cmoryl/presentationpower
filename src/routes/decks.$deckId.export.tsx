@@ -97,7 +97,11 @@ function ExportView() {
   async function runPptxExport() {
     setExporting(true);
     try {
-      const blob = (await exportDeckToPptx(deck, brand, { output: "blob" })) as Blob;
+      const { blob, failedSlides } = await exportDeckToPptx(deck, brand, { output: "blob" });
+      if (!blob) throw new Error("Export produced no blob");
+      if (failedSlides.length) {
+        console.warn(`[pptx-export] ${failedSlides.length} slide(s) skipped:`, failedSlides);
+      }
       const fileName = `${deck.title.replace(/[^a-z0-9-_]+/gi, "-")}.pptx`;
       lastBlobRef.current = { blob, fileName };
       // Trigger download for the user.
@@ -157,7 +161,8 @@ function ExportView() {
     try {
       let held = lastBlobRef.current;
       if (!held) {
-        const blob = (await exportDeckToPptx(deck, brand, { output: "blob" })) as Blob;
+        const { blob } = await exportDeckToPptx(deck, brand, { output: "blob" });
+        if (!blob) throw new Error("Export produced no blob");
         held = { blob, fileName: `${deck.title.replace(/[^a-z0-9-_]+/gi, "-")}.pptx` };
         lastBlobRef.current = held;
       }

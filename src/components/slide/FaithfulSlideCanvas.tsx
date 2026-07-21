@@ -20,7 +20,7 @@ import type {
   LayoutRun,
   LayoutPara,
   LayoutSrcRect,
-} from "@/lib/pptx-import.functions";
+} from "@/lib/pptx-import";
 
 
 type SlideLayoutWithUrls = SlideLayout & {

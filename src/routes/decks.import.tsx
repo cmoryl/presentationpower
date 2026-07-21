@@ -4,7 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { useDeckStore } from "@/lib/deck-store";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
-import { importPowerpoint, type ParsedDeck } from "@/lib/pptx-import.functions";
+import { importPowerpoint } from "@/lib/pptx-import.functions";
+import type { ParsedDeck } from "@/lib/pptx-import";
 import { mapParsedSlide, type MappedSlide } from "@/lib/pptx-mapping";
 import {
   MODULE_VARIANTS,
