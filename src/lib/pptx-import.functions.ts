@@ -108,10 +108,11 @@ export type LayoutFrame = {
   flipH?: boolean;
   flipV?: boolean;
 };
+export type LayoutSrcRect = { l: number; t: number; r: number; b: number };
 export type LayoutFill =
-  | { kind: "solid"; color: string }
-  | { kind: "gradient"; stops: Array<{ pos: number; color: string }>; angle: number }
-  | { kind: "image"; embedId?: string; path?: string }
+  | { kind: "solid"; color: string; opacity?: number }
+  | { kind: "gradient"; stops: Array<{ pos: number; color: string; opacity?: number }>; angle: number }
+  | { kind: "image"; embedId?: string; path?: string; srcRect?: LayoutSrcRect; opacity?: number; tile?: boolean }
   | { kind: "none" };
 export type LayoutLine = {
   color?: string;
@@ -138,11 +139,12 @@ export type LayoutPara = {
 export type LayoutTextBody = { paras: LayoutPara[]; anchor?: "t" | "ctr" | "b" };
 export type LayoutShape =
   | { kind: "text"; z: number; frame: LayoutFrame; fill?: LayoutFill; line?: LayoutLine; prst?: string; text: LayoutTextBody; isTitle?: boolean }
-  | { kind: "image"; z: number; frame: LayoutFrame; embedId?: string; path?: string; line?: LayoutLine }
+  | { kind: "image"; z: number; frame: LayoutFrame; embedId?: string; path?: string; line?: LayoutLine; srcRect?: LayoutSrcRect; prst?: string; opacity?: number }
   | { kind: "line"; z: number; frame: LayoutFrame; line?: LayoutLine; prst?: string }
   | { kind: "table"; z: number; frame: LayoutFrame; header: string[]; rows: string[][] }
   | { kind: "chart"; z: number; frame: LayoutFrame }
   | { kind: "diagram"; z: number; frame: LayoutFrame };
+
 
 export type SlideLayout = {
   size: { w: number; h: number };
