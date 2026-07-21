@@ -10,7 +10,7 @@ import { WcagBadge } from "@/components/WcagBadge";
 import { TypeBadge } from "@/components/TypeBadge";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
-import { seedContent, useDeckStore, type Brief, type TemplatePayload } from "@/lib/deck-store";
+import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { byId, MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
