@@ -11,17 +11,26 @@ export const Route = createFileRoute("/admin")({
 });
 
 function AdminGate() {
-  const [state, setState] = useState<"loading" | "authed" | "anon">("loading");
+  const [state, setState] = useState<"loading" | "admin" | "not-admin" | "anon">("loading");
 
   useEffect(() => {
     let mounted = true;
-    supabase.auth.getSession().then(({ data }) => {
+    async function check() {
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData.user;
+      if (!user) {
+        if (mounted) setState("anon");
+        return;
+      }
+      const { data: isAdmin } = await supabase.rpc("has_role", {
+        _user_id: user.id,
+        _role: "admin",
+      });
       if (!mounted) return;
-      setState(data.session ? "authed" : "anon");
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      setState(session ? "authed" : "anon");
-    });
+      setState(isAdmin ? "admin" : "not-admin");
+    }
+    check();
+    const { data: sub } = supabase.auth.onAuthStateChange(() => check());
     return () => {
       mounted = false;
       sub.subscription.unsubscribe();
@@ -36,12 +45,17 @@ function AdminGate() {
     );
   }
   if (state === "anon") {
-    if (typeof window !== "undefined") {
-      window.location.replace("/auth");
-    }
+    if (typeof window !== "undefined") window.location.replace("/auth");
     return (
       <AppShell>
         <AdminForbidden message="Redirecting to sign in…" />
+      </AppShell>
+    );
+  }
+  if (state === "not-admin") {
+    return (
+      <AppShell>
+        <AdminForbidden message="Admin access required. Contact a workspace administrator." />
       </AppShell>
     );
   }
