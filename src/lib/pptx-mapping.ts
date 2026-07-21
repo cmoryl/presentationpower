@@ -487,6 +487,14 @@ function mapTableToVariant(title: string, t: ParsedTable): GraphicMap {
 function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[]): GraphicMap {
   const nodes = d.nodes.filter((n) => n.text.trim().length > 0);
   const n = nodes.length;
+  const palette = nodes.map((node) => node.color).filter((c): c is string => Boolean(c));
+  const source = {
+    kind: d.kind,
+    palette,
+    nodeColors: nodes.map((node) => node.color ?? null),
+  } as Record<string, unknown>;
+  const withSource = <T extends object>(content: T) =>
+    ({ ...content, _source: source } as unknown as SlideContent);
 
   // Journey / process family — sequential steps.
   const journeyRe = /journey|roadmap|process|flow|steps|stages|phases|timeline/i;
@@ -494,15 +502,16 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
     return {
       sectionId: "SF-07",
       variantId: "MV-JOURNEY-MAP",
-      content: {
+      content: withSource({
         title,
         stages: nodes.slice(0, 6).map((node, i) => ({
           label: node.text,
           step: `${i + 1}`,
           body: bullets[i] ?? "",
+          color: node.color,
         })),
-      } as unknown as SlideContent,
-      rationale: `SmartArt · ${n} nodes → journey`,
+      }),
+      rationale: `SmartArt · ${n} nodes → journey · node colors preserved`,
     };
   }
 
@@ -511,11 +520,11 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
     return {
       sectionId: "SF-08",
       variantId: "MV-FUNNEL",
-      content: {
+      content: withSource({
         title,
-        stages: nodes.slice(0, 6).map((node) => ({ label: node.text, value: "" })),
-      } as unknown as SlideContent,
-      rationale: `SmartArt · ${n} nodes → funnel`,
+        stages: nodes.slice(0, 6).map((node) => ({ label: node.text, value: "", color: node.color })),
+      }),
+      rationale: `SmartArt · ${n} nodes → funnel · colors preserved`,
     };
   }
 
@@ -524,11 +533,11 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
     return {
       sectionId: "SF-06",
       variantId: "MV-SOL-PILLARS-4",
-      content: {
+      content: withSource({
         title,
-        items: nodes.slice(0, 4).map((node) => ({ title: node.text, body: "" })),
-      } as unknown as SlideContent,
-      rationale: `SmartArt · ${n} nodes → pillars`,
+        items: nodes.slice(0, 4).map((node) => ({ title: node.text, body: "", color: node.color })),
+      }),
+      rationale: `SmartArt · ${n} nodes → pillars · node colors preserved`,
     };
   }
 
@@ -540,15 +549,17 @@ function mapDiagramToVariant(title: string, d: ParsedDiagram, bullets: string[])
   return {
     sectionId: "SF-06",
     variantId: pillar,
-    content: {
+    content: withSource({
       title,
       items: nodes.slice(0, 5).map((node, i) => ({
         title: node.text.slice(0, 80),
         body: bullets[i] ?? "",
+        color: node.color,
       })),
-    } as unknown as SlideContent,
-    rationale: `${d.kind === "smartart" ? "SmartArt" : "grouped shapes"} · ${n} nodes → pillars`,
+    }),
+    rationale: `${d.kind === "smartart" ? "SmartArt" : "grouped shapes"} · ${n} nodes → pillars · colors preserved`,
   };
 }
+
 
 
