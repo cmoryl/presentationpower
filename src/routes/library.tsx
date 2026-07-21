@@ -1623,6 +1623,8 @@ function VideoExamplesBlock({
   const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
   const navigate = useNavigate();
   const [busy, setBusy] = useState<string | null>(null);
+  const [zoomKey, setZoomKey] = useState<string | null>(null);
+  const [zoomMode, setZoomMode] = useState<"light" | "dark">("dark");
 
   function sectionForVariant(variantId: string): string {
     const variant = byId(MODULE_VARIANTS, variantId);
