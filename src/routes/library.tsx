@@ -150,33 +150,63 @@ function Library() {
     [tagIds],
   );
 
+  // Merged entry list — each variant contributes its canonical card, and,
+  // when a video example exists for that variant, a second entry that
+  // renders the same VariantCard component with the example content plus a
+  // pink ▶ Video badge. Both entries share the variant's family / tag /
+  // scope, so filters and search apply uniformly.
+  type LibraryEntry =
+    | { kind: "variant"; variant: ModuleVariant }
+    | { kind: "video"; variant: ModuleVariant; example: VideoSlideExample };
+
+  const allEntries = useMemo<LibraryEntry[]>(() => {
+    const out: LibraryEntry[] = [];
+    for (const v of moduleVariants) {
+      out.push({ kind: "variant", variant: v });
+      const ex = VIDEO_SLIDE_EXAMPLES.find((e) => e.variantId === v.id);
+      if (ex) out.push({ kind: "video", variant: v, example: ex });
+    }
+    return out;
+  }, [moduleVariants]);
+
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    const matched = moduleVariants.filter((v) => {
+    const matched = allEntries.filter((e) => {
+      const v = e.variant;
       if (pinnedOnly && !pins.has(v.id)) return false;
       if (familyIds.size > 0 && !familyIds.has(v.familyId)) return false;
       if (scopeBrand && restricted.has(v.familyId)) return false;
       if (activeTags.length > 0 && !activeTags.every((t) => t.test(v))) return false;
       if (!needle) return true;
       const familyName = byId(moduleFamilies, v.familyId)?.name.toLowerCase() ?? "";
-      return (
+      const baseMatch =
         v.id.toLowerCase().includes(needle) ||
         v.name.toLowerCase().includes(needle) ||
         v.description.toLowerCase().includes(needle) ||
         v.familyId.toLowerCase().includes(needle) ||
-        familyName.includes(needle)
-      );
+        familyName.includes(needle);
+      if (baseMatch) return true;
+      if (e.kind === "video") {
+        return (
+          e.example.title.toLowerCase().includes(needle) ||
+          e.example.blurb.toLowerCase().includes(needle) ||
+          "video".includes(needle) ||
+          "motion".includes(needle)
+        );
+      }
+      return false;
     });
     const scored = [...matched];
     if (sort === "most-used") {
-      scored.sort((a, b) => (usageByVariant.get(b.id) ?? 0) - (usageByVariant.get(a.id) ?? 0));
+      scored.sort((a, b) => (usageByVariant.get(b.variant.id) ?? 0) - (usageByVariant.get(a.variant.id) ?? 0));
     } else if (sort === "pinned-first") {
-      scored.sort((a, b) => (pins.has(b.id) ? 1 : 0) - (pins.has(a.id) ? 1 : 0));
+      scored.sort((a, b) => (pins.has(b.variant.id) ? 1 : 0) - (pins.has(a.variant.id) ? 1 : 0));
     } else if (scopeBrand) {
-      scored.sort((a, b) => (preferred.has(a.id) ? 0 : 1) - (preferred.has(b.id) ? 0 : 1));
+      scored.sort((a, b) => (preferred.has(a.variant.id) ? 0 : 1) - (preferred.has(b.variant.id) ? 0 : 1));
     }
     return scored;
-  }, [q, familyIds, activeTags, moduleVariants, moduleFamilies, scopeBrand, restricted, preferred, pinnedOnly, pins, sort, usageByVariant]);
+  }, [q, familyIds, activeTags, allEntries, moduleFamilies, scopeBrand, restricted, preferred, pinnedOnly, pins, sort, usageByVariant]);
+
 
   const hasFilters =
     q.trim().length > 0 || familyIds.size > 0 || tagIds.size > 0 || scopeBrandId !== "all" || pinnedOnly || sort !== "default";
