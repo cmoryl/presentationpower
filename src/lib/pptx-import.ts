@@ -195,33 +195,10 @@ export type ParsedDeck = {
 };
 
 
-const InputSchema = z.object({
-  filename: z.string().min(1).max(300),
-  data: z.string().min(1).max(140_000_000),
-});
-
 const MAX_PER_IMAGE_BYTES = 900_000;
 const MAX_TOTAL_IMAGE_BYTES = 10_000_000;
 const MAX_IMAGES_PER_SLIDE = 6;
 
-export const importPowerpoint = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((v) => InputSchema.parse(v))
-  .handler(async ({ data }): Promise<ParsedDeck> => {
-    try {
-      const buf = Buffer.from(data.data, "base64");
-      return await parsePptxBuffer(buf, data.filename);
-    } catch (e) {
-      const msg = (e as Error)?.message ?? "Unknown error";
-      // Surface a friendly, non-leaky message. Detailed traces stay server-side.
-      console.error("[pptx-import] parse failed:", msg);
-      throw new Error(
-        /Not a PowerPoint|too large|too many entries|zip bomb|empty or invalid/i.test(msg)
-          ? msg
-          : "This PowerPoint file could not be parsed. It may be corrupted or use an unsupported format.",
-      );
-    }
-  });
 
 // Zip-bomb / resource-exhaustion caps for untrusted .pptx uploads.
 const MAX_ZIP_ENTRIES = 5000;
