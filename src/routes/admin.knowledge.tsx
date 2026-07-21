@@ -11,6 +11,10 @@ import {
   getImportedDeckSlides,
   deleteImportedDeck,
   embedImportedDecks,
+  sendImportedSlideToLibrary,
+  listLibrarySlideExamples,
+  deleteLibrarySlideExample,
+  type LibrarySlideExample,
 } from "@/lib/imported-decks.functions";
 import {
   listDivisionImagery,
