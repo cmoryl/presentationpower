@@ -211,9 +211,24 @@ export const importPowerpoint = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) => InputSchema.parse(v))
   .handler(async ({ data }): Promise<ParsedDeck> => {
-    const buf = Buffer.from(data.data, "base64");
-    return parsePptxBuffer(buf, data.filename);
+    try {
+      const buf = Buffer.from(data.data, "base64");
+      return await parsePptxBuffer(buf, data.filename);
+    } catch (e) {
+      const msg = (e as Error)?.message ?? "Unknown error";
+      // Surface a friendly, non-leaky message. Detailed traces stay server-side.
+      console.error("[pptx-import] parse failed:", msg);
+      throw new Error(
+        /Not a PowerPoint|too large|too many entries|zip bomb|empty or invalid/i.test(msg)
+          ? msg
+          : "This PowerPoint file could not be parsed. It may be corrupted or use an unsupported format.",
+      );
+    }
   });
+
+// Zip-bomb / resource-exhaustion caps for untrusted .pptx uploads.
+const MAX_ZIP_ENTRIES = 5000;
+const MAX_UNCOMPRESSED_BYTES = 300 * 1024 * 1024; // 300 MB expanded
 
 export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string): Promise<ParsedDeck> {
   if (buf.length < 32) throw new Error("File is empty or invalid.");
@@ -221,12 +236,29 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     throw new Error("Not a PowerPoint file (missing zip signature).");
   }
   const zip = await JSZip.loadAsync(buf);
+  const entries = Object.values(zip.files);
+  if (entries.length > MAX_ZIP_ENTRIES) {
+    throw new Error(`Archive has too many entries (${entries.length}). Aborting to prevent zip bomb.`);
+  }
+  let uncompressedTotal = 0;
+  for (const e of entries) {
+    // JSZip exposes uncompressed size on the internal record; fall back safely.
+    const size = (e as unknown as { _data?: { uncompressedSize?: number } })._data?.uncompressedSize ?? 0;
+    uncompressedTotal += size;
+    if (uncompressedTotal > MAX_UNCOMPRESSED_BYTES) {
+      throw new Error("Archive expands to too large a size. Aborting to prevent zip bomb.");
+    }
+  }
   const parser = new XMLParser({
     ignoreAttributes: false,
     attributeNamePrefix: "@_",
     preserveOrder: false,
     trimValues: true,
+    // XXE hardening: disable entity expansion + DOCTYPE processing.
+    processEntities: false,
+    htmlEntities: false,
   });
+
 
   const theme = await extractTheme(zip, parser);
   const slideSize = await extractSlideSize(zip, parser);
