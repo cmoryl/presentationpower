@@ -595,8 +595,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Grid of representative client / partner logos",
     permittedLayoutIds: ["LF-19"],
     capacity: { items: { min: 6, max: 12 }, titleChars: 60 },
-    editableFields: ["title", "items[].name"],
-    lockedFields: ["items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "items[].name", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
   {
     id: "MV-PROOF-LOGOS-STRIP",
