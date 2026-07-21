@@ -139,11 +139,13 @@ async function fetchAsDataUrl(url: string, label?: string): Promise<string | nul
 
 type Palette = { primary: string; accent: string; surface: string; ink: string };
 
+export type PptxExportResult = { blob?: Blob; failedSlides: string[] };
+
 export async function exportDeckToPptx(
   deck: Deck,
   brand: BrandMode,
   opts?: { strategy?: DeckStrategySnapshot | null; output?: "download" | "blob" },
-): Promise<Blob | void> {
+): Promise<PptxExportResult> {
   const pptx = new PptxGenJS();
   pptx.layout = "LAYOUT_WIDE";
   pptx.title = deck.title;
