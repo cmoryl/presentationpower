@@ -123,7 +123,57 @@ export const getSharedDeck = createServerFn({ method: "POST" })
     });
     const { data: payload, error } = await supabasePublic.rpc("get_shared_deck", { _token: data.token });
     if (error) throw new Error(error.message);
-    return { deck: (payload as unknown) ?? null };
+
+    // Anonymous share viewers can't re-sign private-bucket URLs client-side,
+    // so re-sign any stored videoPath / videoPosterPath server-side (via the
+    // service role) and inject fresh URLs into the payload. Slides with an
+    // external pasted URL (no path) are left untouched.
+    const p = payload as
+      | ({ slides?: Array<{ content?: Record<string, unknown> }> } & Record<string, unknown>)
+      | null;
+    if (p && Array.isArray(p.slides) && p.slides.length > 0) {
+      const videoPaths = new Set<string>();
+      const posterPaths = new Set<string>();
+      for (const s of p.slides) {
+        const c = (s.content ?? {}) as Record<string, unknown>;
+        if (typeof c.videoPath === "string" && c.videoPath) videoPaths.add(c.videoPath);
+        if (typeof c.videoPosterPath === "string" && c.videoPosterPath) posterPaths.add(c.videoPosterPath);
+      }
+      if (videoPaths.size > 0 || posterPaths.size > 0) {
+        try {
+          const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+          const TTL = 60 * 60 * 24; // 24h — refreshed on each share-view load
+          const videoSigned = new Map<string, string>();
+          const posterSigned = new Map<string, string>();
+          if (videoPaths.size > 0) {
+            const { data: signed } = await supabaseAdmin.storage
+              .from("slide-videos")
+              .createSignedUrls([...videoPaths], TTL);
+            for (const r of signed ?? []) {
+              if (r.path && r.signedUrl) videoSigned.set(r.path, r.signedUrl);
+            }
+          }
+          if (posterPaths.size > 0) {
+            const { data: signed } = await supabaseAdmin.storage
+              .from("slide-media")
+              .createSignedUrls([...posterPaths], TTL);
+            for (const r of signed ?? []) {
+              if (r.path && r.signedUrl) posterSigned.set(r.path, r.signedUrl);
+            }
+          }
+          for (const s of p.slides) {
+            const c = (s.content ?? {}) as Record<string, unknown>;
+            const vp = typeof c.videoPath === "string" ? c.videoPath : "";
+            const pp = typeof c.videoPosterPath === "string" ? c.videoPosterPath : "";
+            if (vp && videoSigned.has(vp)) c.videoUrl = videoSigned.get(vp);
+            if (pp && posterSigned.has(pp)) c.videoPosterUrl = posterSigned.get(pp);
+          }
+        } catch {
+          // Best-effort — fall back to whatever URLs were stored.
+        }
+      }
+    }
+    return { deck: p ?? null };
   });
 
 // Public — records/updates a share view. Never throws to the caller.
