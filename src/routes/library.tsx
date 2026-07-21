@@ -1276,15 +1276,18 @@ function ModalABPreview({
     if (typeof window === "undefined") return;
     const targets = [lightRef.current, darkRef.current];
     const t = window.setTimeout(async () => {
-      const { applyAutoFix, revertAutoFix } = await import("@/lib/wcag");
+      const { applyAutoFix, revertAutoFix, auditAndFixTypography, revertTypeFix } = await import("@/lib/wcag");
       for (const el of targets) {
         if (!el) continue;
         revertAutoFix(el);
+        revertTypeFix(el);
+        auditAndFixTypography(el);
         applyAutoFix(el);
       }
     }, 320);
     return () => window.clearTimeout(t);
   }, [variant.id, brand.id, showImagery]);
+
 
   const [zoom, setZoom] = useState<null | "light" | "dark">(null);
 
