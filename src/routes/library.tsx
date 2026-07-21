@@ -619,6 +619,7 @@ function Library() {
               mode={mode}
               showImagery={showImagery}
               autoFixOn={autoFixOn}
+              logoHubPool={logoHubPool}
               onOpen={() =>
                 isVideo ? setVideoZoomKey(entry.example.key) : setOpenId(v.id)
               }
@@ -626,6 +627,7 @@ function Library() {
               onImportExample={isVideo ? () => importVideoExample(entry.example) : undefined}
               importBusy={isVideo && videoBusy === entry.example.key}
             />
+
           );
         })}
       </div>
