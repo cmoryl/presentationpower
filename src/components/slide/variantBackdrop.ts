@@ -2,13 +2,37 @@ import type { ModuleVariant } from "@/lib/taxonomy";
 import type { SlideBackdrop } from "./SlideChrome";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
-
 import portrait1 from "@/assets/portraits/portrait-1.png";
 import portrait2 from "@/assets/portraits/portrait-2.png";
 import portrait3 from "@/assets/portraits/portrait-3.png";
 import portrait4 from "@/assets/portraits/portrait-4.png";
 
+// Master TransPerfect / Corporate dark-mode backdrop set — 10 curated
+// on-brand gradient stills. Applied deterministically per variant id so a
+// given variant always renders with the same backdrop across every surface
+// (library grid, lightbox, editor, present, print, share).
+import corp01 from "@/assets/backdrops/corporate-dark/bg-01.png.asset.json";
+import corp02 from "@/assets/backdrops/corporate-dark/bg-02.png.asset.json";
+import corp03 from "@/assets/backdrops/corporate-dark/bg-03.png.asset.json";
+import corp04 from "@/assets/backdrops/corporate-dark/bg-04.png.asset.json";
+import corp05 from "@/assets/backdrops/corporate-dark/bg-05.png.asset.json";
+import corp06 from "@/assets/backdrops/corporate-dark/bg-06.png.asset.json";
+import corp07 from "@/assets/backdrops/corporate-dark/bg-07.png.asset.json";
+import corp08 from "@/assets/backdrops/corporate-dark/bg-08.png.asset.json";
+import corp09 from "@/assets/backdrops/corporate-dark/bg-09.png.asset.json";
+import corp10 from "@/assets/backdrops/corporate-dark/bg-10.png.asset.json";
+
+export const CORPORATE_DARK_BACKDROPS: string[] = [
+  corp01.url, corp02.url, corp03.url, corp04.url, corp05.url,
+  corp06.url, corp07.url, corp08.url, corp09.url, corp10.url,
+];
+
 const PORTRAITS = [portrait1, portrait2, portrait3, portrait4];
+
+/** Returns the deterministic corporate-dark backdrop URL for a variant id. */
+export function pickCorporateDarkBackdrop(variantId: string): string {
+  return CORPORATE_DARK_BACKDROPS[hashStr(variantId) % CORPORATE_DARK_BACKDROPS.length];
+}
 
 function hashStr(s: string): number {
   let h = 0;
@@ -32,7 +56,7 @@ export function backdropForVariant(
 function _computeBackdrop(
   variant: ModuleVariant,
   brandId: string = "bm-enterprise",
-  _mode: "light" | "dark" = "dark",
+  mode: "light" | "dark" = "dark",
 ): SlideBackdrop | null {
 
   const id = variant.id;
@@ -41,9 +65,18 @@ function _computeBackdrop(
   const photos = set.photos;
   const abstracts = set.abstracts;
 
-  const pickPhoto = (offset = 0) => photos[(seed + offset) % photos.length];
-  const pickAbstract = (offset = 0) => abstracts[(seed + offset) % abstracts.length];
-  const pickPortrait = () => PORTRAITS[seed % PORTRAITS.length];
+  // Master TransPerfect / Corporate brand in dark mode uses the curated
+  // on-brand gradient set. Only affects bm-enterprise + dark — other
+  // divisions (Life Sci, Legal, Media, Digital, Gaming, GlobalLink,
+  // DataForce, Trial Interactive) keep their existing division imagery.
+  const useCorporateDark = mode === "dark" && brandId === "bm-enterprise";
+  const corporateBg = useCorporateDark ? pickCorporateDarkBackdrop(id) : null;
+
+  const pickPhoto = (offset = 0) =>
+    corporateBg ?? photos[(seed + offset) % photos.length];
+  const pickAbstract = (offset = 0) =>
+    corporateBg ?? abstracts[(seed + offset) % abstracts.length];
+  const pickPortrait = () => (corporateBg ?? PORTRAITS[seed % PORTRAITS.length]);
 
   // Full-bleed cover / hero — division photograph, strong side scrim.
   if (/^MV-OP-COVER(-MEDIA)?$/.test(id) || id === "MV-CS-HERO" || id === "MV-CTA-CLOSING-HERO") {
