@@ -796,7 +796,7 @@ const VariantCard = memo(function VariantCard({
         {importBusy ? "Importing…" : "Import as starter deck"}
       </button>
     )}
-    {onTogglePin && (
+    {onTogglePin && !videoExample && (
       <button
         type="button"
         onClick={(e) => { e.stopPropagation(); onTogglePin(); }}
@@ -813,7 +813,7 @@ const VariantCard = memo(function VariantCard({
         <Star size={14} className={pinned ? "fill-current" : ""} />
       </button>
     )}
-    {usageCount > 0 && (
+    {usageCount > 0 && !videoExample && (
       <span
         data-variant-usage-badge=""
         className="pointer-events-none absolute right-3 bottom-3 z-10 rounded-full bg-[#03002C]/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest text-white shadow-sm ring-1 ring-white/10 backdrop-blur"
