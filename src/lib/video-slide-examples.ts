@@ -13,9 +13,18 @@
 // the normal `insertExampleSlide` deck-store action, so
 // normalizeSlideMedia and variant-swap invariants still apply.
 
-// Stable public sample host — Google's HTML5 test bucket. Every clip has a
-// matching poster JPG at .../images/<Name>.jpg.
-const GTV = "https://storage.googleapis.com/gtv-videos-bucket/sample";
+// Stable public sample host — W3C media samples. Google's former
+// `gtv-videos-bucket` public alias now returns 403, so we cycle across a
+// handful of long-lived W3C mp4/poster pairs. Every clip has a matching
+// poster PNG at the same path.
+const W3 = "https://media.w3.org/2010/05";
+const CLIPS = [
+  { v: `${W3}/sintel/trailer.mp4`, p: `${W3}/sintel/poster.png` },
+  { v: `${W3}/bunny/trailer.mp4`, p: `${W3}/bunny/poster.png` },
+  { v: `${W3}/bunny/movie.mp4`, p: `${W3}/bunny/poster.png` },
+  { v: `${W3}/video/movie_300.mp4`, p: `${W3}/video/poster.png` },
+] as const;
+const clip = (i: number) => CLIPS[i % CLIPS.length];
 
 export type VideoSlideExample = {
   key: string;
