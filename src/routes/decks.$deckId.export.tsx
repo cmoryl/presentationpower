@@ -13,6 +13,7 @@ import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight"
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
 import {
   getGlobalLinkShareStatus,
+  getGlobalLinkShareSettings,
   uploadToGlobalLinkShare,
 } from "@/lib/globallink-share.functions";
 
@@ -31,12 +32,14 @@ function ExportView() {
   const [preflightIssues, setPreflightIssues] = useState<PreflightIssue[] | null>(null);
   const [preflightBusy, setPreflightBusy] = useState(false);
   const [glShareConfigured, setGlShareConfigured] = useState(false);
+  const [glAutoShare, setGlAutoShare] = useState(false);
   const [glShareBusy, setGlShareBusy] = useState(false);
   const [glShareUrl, setGlShareUrl] = useState<string | null>(null);
   const [glShareError, setGlShareError] = useState<string | null>(null);
   const [glCopied, setGlCopied] = useState(false);
   const lastBlobRef = useRef<{ blob: Blob; fileName: string } | null>(null);
   const statusFn = useServerFn(getGlobalLinkShareStatus);
+  const settingsFn = useServerFn(getGlobalLinkShareSettings);
   const uploadFn = useServerFn(uploadToGlobalLinkShare);
   if (!deck) throw notFound();
   const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
@@ -54,17 +57,27 @@ function ExportView() {
   // Load status in the background — never block the export UI on it.
   useEffect(() => {
     let cancelled = false;
-    statusFn()
-      .then((s) => {
-        if (!cancelled) setGlShareConfigured(!!s?.configured);
-      })
-      .catch(() => {
+    (async () => {
+      try {
+        const s = await statusFn();
+        if (cancelled) return;
+        setGlShareConfigured(!!s?.configured);
+        if (s?.configured) {
+          try {
+            const cfg = await settingsFn();
+            if (!cancelled) setGlAutoShare(!!cfg?.autoShareOnExport);
+          } catch {
+            /* settings require auth — silent fallback */
+          }
+        }
+      } catch {
         /* silent — default to Tier 1 handoff */
-      });
+      }
+    })();
     return () => {
       cancelled = true;
     };
-  }, [statusFn]);
+  }, [statusFn, settingsFn]);
 
   function openShareHandoff() {
     window.open("https://share.transperfect.com", "_blank", "noopener,noreferrer");
@@ -88,6 +101,10 @@ function ExportView() {
     } finally {
       setExporting(false);
       setPreflightIssues(null);
+    }
+    // Auto-share after the local download succeeds — non-blocking, best-effort.
+    if (glShareConfigured && glAutoShare && !glShareBusy) {
+      void handleShareViaGlobalLink();
     }
   }
 
@@ -144,6 +161,8 @@ function ExportView() {
           contentBase64,
           mimeType:
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+          deckId,
+          deckTitle: deck.title,
         },
       });
       if (result.ok) {
