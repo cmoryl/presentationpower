@@ -142,14 +142,15 @@ function BrandGuidesIndex() {
               <div className="text-sm text-black/60 dark:text-white/60">{g.subtitle} · v{g.version}</div>
               {g.tagline && <div className="mt-4 italic text-black/70 dark:text-white/70">"{g.tagline}"</div>}
               <div className="mt-5 flex items-center gap-2">
-                {g.primaryColors.slice(0, 2).concat(g.secondaryColors.slice(0, 2)).map((c) => (
+                {g.primaryColors.slice(0, 2).concat(g.secondaryColors.slice(0, 2)).map((c, i) => (
                   <span
-                    key={c.hex}
+                    key={`${c.hex}-${i}`}
                     className="h-6 w-6 rounded-full border border-black/10 dark:border-white/20"
                     style={{ background: c.hex }}
                     title={`${c.name} ${c.hex}`}
                   />
                 ))}
+
               </div>
               <div className="mt-6 text-xs text-black/40 group-hover:text-black/70 dark:text-white/40 dark:group-hover:text-white/70">
                 Open guide →
