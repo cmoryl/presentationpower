@@ -606,8 +606,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Minimal single-row strip of six client / partner logos",
     permittedLayoutIds: ["LF-19"],
     capacity: { items: { min: 4, max: 6 }, titleChars: 60 },
-    editableFields: ["title", "kicker", "items[].name"],
-    lockedFields: ["items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "kicker", "items[].name", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
   {
     id: "MV-PROOF-LOGOS-MARQUEE",
