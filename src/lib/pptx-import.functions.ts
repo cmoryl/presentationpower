@@ -604,6 +604,52 @@ function readAxisTitles(plotArea: any): ParsedChart["axis"] {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+function readConnectorStyle(spPr: any, theme: ParsedTheme): ConnectorStyle | undefined {
+  const ln = spPr?.["a:ln"];
+  if (!ln) return undefined;
+  const style: ConnectorStyle = {};
+  const color = readFillColor(ln?.["a:solidFill"], theme)
+    ?? readFillColor(ln?.["a:gradFill"]?.["a:gsLst"]?.["a:gs"]?.[0], theme);
+  if (color) style.color = color;
+  const w = Number(ln?.["@_w"]);
+  if (Number.isFinite(w) && w > 0) style.widthPt = Math.round((w / 12700) * 100) / 100;
+  const dash = ln?.["a:prstDash"]?.["@_val"];
+  if (typeof dash === "string") style.dashStyle = dash;
+  const head = ln?.["a:headEnd"]?.["@_type"];
+  if (typeof head === "string") style.headArrow = head;
+  const tail = ln?.["a:tailEnd"]?.["@_type"];
+  if (typeof tail === "string") style.tailArrow = tail;
+  return Object.keys(style).length ? style : undefined;
+}
+
+function aggregateConnectorStyle(list: ConnectorStyle[]): ConnectorStyle | undefined {
+  if (!list.length) return undefined;
+  const tally = <K extends keyof ConnectorStyle>(k: K): ConnectorStyle[K] | undefined => {
+    const counts = new Map<string, number>();
+    for (const c of list) {
+      const v = c[k];
+      if (v === undefined || v === null) continue;
+      const key = String(v);
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+    let best: string | undefined; let n = 0;
+    for (const [k2, v] of counts) if (v > n) { best = k2; n = v; }
+    if (best === undefined) return undefined;
+    return (k === "widthPt" ? Number(best) : best) as ConnectorStyle[K];
+  };
+  const out: ConnectorStyle = {
+    color: tally("color") as string | undefined,
+    widthPt: tally("widthPt") as number | undefined,
+    dashStyle: tally("dashStyle") as string | undefined,
+    headArrow: tally("headArrow") as string | undefined,
+    tailArrow: tally("tailArrow") as string | undefined,
+  };
+  // Strip undefined
+  for (const k of Object.keys(out) as (keyof ConnectorStyle)[]) if (out[k] === undefined) delete out[k];
+  return Object.keys(out).length ? out : undefined;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function readTxPrFont(txPr: any, theme: ParsedTheme): ParsedChart["font"] | undefined {
   if (!txPr) return undefined;
   const defRPr = txPr?.["a:p"]?.["a:pPr"]?.["a:defRPr"] ?? txPr?.["a:bodyPr"]?.["a:defRPr"];
