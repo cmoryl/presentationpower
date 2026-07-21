@@ -17,8 +17,17 @@ export const Route = createFileRoute("/decks/$deckId/print")({
   head: () => ({ meta: [{ title: "Print · TransPerfect Modular" }] }),
   validateSearch: (raw) =>
     z.object({ lang: z.string().min(2).max(10).optional() }).parse(raw),
-  component: PrintView,
+  component: PrintGate,
 });
+
+function PrintGate() {
+  const { deckId } = Route.useParams();
+  const hydrated = useDeckHydrated();
+  const hasDeck = useDeckStore((s) => Boolean(s.decks[deckId]));
+  if (!hydrated) return <DeckHydratingFallback label="Preparing print view…" />;
+  if (!hasDeck) throw notFound();
+  return <PrintView />;
+}
 
 function PrintView() {
   const { deckId } = Route.useParams();
@@ -26,7 +35,7 @@ function PrintView() {
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
 
-  const hydrated = useDeckHydrated();
+
   const fetchTx = useServerFn(getDeckSlideTranslations);
   const listLangs = useServerFn(listLanguages);
   const [overlay, setOverlay] = useState<Map<number, Record<string, unknown>> | null>(null);
