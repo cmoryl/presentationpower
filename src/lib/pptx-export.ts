@@ -530,15 +530,36 @@ export async function exportDeckToPptx(
       noteText = noteText ? `${noteText}\n\n${line}` : line;
     }
     if (noteText) s.addNotes(noteText);
-
+    } catch (err) {
+      // Per-slide resilience: one bad variant renderer must not fail the
+      // whole export. Log server-side, record the slide id, and drop a
+      // minimal fallback so the slide count still matches the deck.
+      const slideId = slide.id ?? `slide-${i + 1}`;
+      failedSlides.push(slideId);
+      console.error(`[pptx-export] slide ${slideId} (${slide.variantId}) failed to render:`, err);
+      try {
+        s.background = { color: "FFFFFF" };
+        s.addText(
+          [
+            { text: `Slide ${i + 1}`, options: { bold: true, fontSize: 24, color: "0B0B12" } },
+            { text: "\nThis slide could not be rendered in the PPTX export.", options: { fontSize: 14, color: "666666", breakLine: true } },
+          ],
+          { x: 0.75, y: 0.75, w: SLIDE_W - 1.5, h: SLIDE_H - 1.5, valign: "middle", align: "left" },
+        );
+      } catch {
+        /* fallback rendering itself failed — nothing more we can do */
+      }
+    }
   }
 
   const fileName = `${sanitize(deck.title)}.pptx`;
   if (opts?.output === "blob") {
     // pptxgenjs returns a Blob in the browser when outputType is "blob".
-    return (await pptx.write({ outputType: "blob" })) as unknown as Blob;
+    const blob = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
+    return { blob, failedSlides };
   }
   await pptx.writeFile({ fileName });
+  return { failedSlides };
 }
 
 type SlideKind =
