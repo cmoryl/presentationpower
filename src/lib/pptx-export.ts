@@ -819,6 +819,33 @@ function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette)
     case "MV-SOL-ARCHITECTURE": renderSolArchitecture(s, c, p); return true;
     case "MV-SOL-FEATURE-LIST": renderSolFeatureList(s, c, p); return true;
     case "MV-PROC-BEFORE-AFTER": renderProcBeforeAfter(s, c, p); return true;
+    // M2 batch — bespoke cover/agenda/divider/close/quote treatments
+    case "MV-OP-COVER-DOSSIER": renderCoverDossier(s, c, p); return true;
+    case "MV-OP-COVER-EDITORIAL": renderCoverEditorial(s, c, p); return true;
+    case "MV-OP-COVER-GRADIENT": renderCoverGradient(s, c, p); return true;
+    case "MV-OP-COVER-GRID": renderCoverGrid(s, c, p); return true;
+    case "MV-OP-COVER-MEDIA": renderCoverMedia(s, c, p); return true;
+    case "MV-OP-COVER-MINIMAL": renderCoverMinimal(s, c, p); return true;
+    case "MV-OP-COVER-MONOGRAM": renderCoverMonogram(s, c, p); return true;
+    case "MV-OP-COVER-POSTER": renderCoverPoster(s, c, p); return true;
+    case "MV-OP-COVER-SPLIT": renderCoverSplit(s, c, p); return true;
+    case "MV-OP-COVER-STACKED": renderCoverStacked(s, c, p); return true;
+    case "MV-OP-AGENDA-VERTICAL": renderAgendaVertical(s, c, p); return true;
+    case "MV-OP-DIVIDER-NUMBERED": renderDividerNumbered(s, c, p); return true;
+    case "MV-OP-INTRO-TEAM": renderIntroTeam(s, c, p); return true;
+    case "MV-CLOSE-CTA": renderCloseCta(s, c, p); return true;
+    case "MV-CLOSE-DUAL-CTA": renderCloseDualCta(s, c, p); return true;
+    case "MV-CLOSE-CONTACT": renderCloseContact(s, c, p); return true;
+    case "MV-CLOSE-DECISION": renderCloseDecision(s, c, p); return true;
+    case "MV-CLOSE-METRIC-PROMISE": renderCloseMetricPromise(s, c, p); return true;
+    case "MV-CLOSE-QNA": renderCloseQna(s, c, p); return true;
+    case "MV-CLOSE-CALENDAR": renderCloseCalendar(s, c, p); return true;
+    case "MV-CLOSE-SPLIT": renderCloseSplit(s, c, p); return true;
+    case "MV-CLOSE-TIMELINE": renderCloseTimeline(s, c, p); return true;
+    case "MV-QUOTE-PORTRAIT": renderQuotePortrait(s, c, p); return true;
+    case "MV-QUOTE-POSTER": renderQuotePoster(s, c, p); return true;
+    case "MV-QUOTE-METRIC": renderQuoteMetric(s, c, p); return true;
+    case "MV-QUOTE-MULTI": renderQuoteMulti(s, c, p); return true;
     default: return false;
   }
 }
