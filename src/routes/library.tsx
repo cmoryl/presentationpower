@@ -1276,7 +1276,9 @@ function LightboxPortal({
           <div className={`relative h-full w-full overflow-hidden rounded-2xl ring-1 ring-white/10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.7)] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
             <ScaledSlide>
               <SlideBackdropContext.Provider value={isDark ? darkBackdrop : lightBackdrop}>
-                <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
+                <SlideVideoPreviewContext.Provider value={setPlayUrl}>
+                  <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
+                </SlideVideoPreviewContext.Provider>
               </SlideBackdropContext.Provider>
             </ScaledSlide>
           </div>
@@ -1287,7 +1289,35 @@ function LightboxPortal({
       <div className="shrink-0 border-t border-white/10 px-6 py-3 text-center text-[11px] text-white/40" onClick={(e) => e.stopPropagation()}>
         <span className="mx-2"><kbd className="rounded border border-white/20 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-white/70">Esc</kbd> close</span>
         <span className="mx-2"><kbd className="rounded border border-white/20 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-white/70">← →</kbd> toggle theme</span>
+        <span className="mx-2">Click <span className="inline-block rounded-full bg-white/10 px-1.5 py-0.5 text-white/70">▶</span> to play video</span>
       </div>
+
+      {/* Video overlay */}
+      {playUrl && (
+        <div
+          className="absolute inset-0 z-10 flex items-center justify-center bg-black/85 backdrop-blur-sm animate-in fade-in duration-150"
+          onClick={(e) => { e.stopPropagation(); setPlayUrl(null); }}
+        >
+          <video
+            key={playUrl}
+            src={playUrl}
+            autoPlay
+            controls
+            playsInline
+            className="max-h-[88vh] max-w-[94vw] rounded-xl shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setPlayUrl(null); }}
+            aria-label="Close video"
+            className="absolute right-6 top-6 grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-white/10 text-white/90 hover:bg-white/20"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+          </button>
+        </div>
+      )}
+
     </div>,
     document.body
   );
