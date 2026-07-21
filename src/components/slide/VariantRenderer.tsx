@@ -796,13 +796,11 @@ function renderVariantBody({
     // ── Proof & Data ──────────────────────────────────────────────────
     case "MV-PROOF-LOGOS":
     case "MV-CASE-LOGO-GRID": {
-      const tileBg = mode === "dark" ? "rgba(255,255,255,0.06)" : "#fff";
-      const tileBorder = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(10,15,28,0.12)";
       const tileText = mode === "dark" ? "#ffffff" : brand.tokens.primary;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-14 grid grid-cols-4 gap-6">
+          <div className="mt-14 grid grid-cols-4 gap-10">
             {arr(c.items).map((it, i) => {
               const name = s(it.name ?? it.client);
               const logoUrl = pickLogoForMode(it, mode);
@@ -811,15 +809,15 @@ function renderVariantBody({
               return (
                 <div
                   key={i}
-                  className="flex aspect-[3/2] flex-col items-center justify-center gap-3 rounded-xl border p-6 text-center"
-                  style={{ borderColor: tileBorder, backgroundColor: tileBg, color: tileText }}
+                  className="flex aspect-[3/2] flex-col items-center justify-center gap-3 p-4 text-center"
+                  style={{ color: tileText }}
                 >
                   {logoUrl || logoPath ? (
                     <ClientLogoImg
                       path={logoPath}
                       url={logoUrl}
                       alt={name ? `${name} logo` : "Client logo"}
-                      className="max-h-[60%] max-w-[80%] object-contain"
+                      className="max-h-[64%] max-w-[86%] object-contain"
                     />
                   ) : (
                     <div className="text-2xl font-semibold">{name}</div>
@@ -833,20 +831,18 @@ function renderVariantBody({
       );
     }
 
+
     case "MV-PROOF-LOGOS-STRIP": {
       const items = arr(c.items).slice(0, 6);
+      const rule = mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           {s(c.kicker) && <Kicker brand={brand}>{s(c.kicker)}</Kicker>}
           <SlideTitle brand={brand} title={s(c.title)} />
           <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-10" />
           <div
-            className="mt-16 flex items-center justify-between gap-10 rounded-2xl px-12 py-14"
-            style={{
-              backgroundColor: mode === "dark" ? "rgba(255,255,255,0.04)" : "rgba(10,15,28,0.03)",
-              borderTop: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.06)"}`,
-              borderBottom: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.06)"}`,
-            }}
+            className="mt-16 flex items-center justify-between gap-10 px-4 py-14"
+            style={{ borderTop: `1px solid ${rule}`, borderBottom: `1px solid ${rule}` }}
           >
             {items.map((it, i) => {
               const url = pickLogoForMode(it, mode);
@@ -871,22 +867,16 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 10);
       const row1 = items.slice(0, 5);
       const row2 = items.slice(5, 10);
-      const border = mode === "dark" ? "rgba(255,255,255,0.12)" : "rgba(10,15,28,0.08)";
-      const bg = mode === "dark" ? "rgba(255,255,255,0.04)" : "#fff";
       const renderRow = (row: Item[], offset: boolean, key: string) => (
-        <div key={key} className={`grid grid-cols-5 gap-6 ${offset ? "px-16" : ""}`}>
+        <div key={key} className={`grid grid-cols-5 gap-10 ${offset ? "px-16" : ""}`}>
           {row.map((it, i) => {
             const url = pickLogoForMode(it, mode);
             const path = s(it.logoPath);
             const name = s(it.name);
             return (
-              <div
-                key={i}
-                className="flex aspect-[5/2] items-center justify-center rounded-xl border p-6"
-                style={{ borderColor: border, backgroundColor: bg }}
-              >
+              <div key={i} className="flex aspect-[5/2] items-center justify-center p-4">
                 {url || path ? (
-                  <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-14 max-w-[85%] object-contain" />
+                  <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-14 max-w-[88%] object-contain" />
                 ) : (
                   <div className="text-lg font-semibold" style={{ color: mode === "dark" ? "#fff" : brand.tokens.primary }}>{name}</div>
                 )}
@@ -918,18 +908,17 @@ function renderVariantBody({
       const featuredName = s(c.featuredName, "Anchor partner");
       const featuredNote = s(c.featuredNote);
       const supports = arr(c.items).slice(0, 4);
-      const border = mode === "dark" ? "rgba(255,255,255,0.12)" : "rgba(10,15,28,0.08)";
-      const bg = mode === "dark" ? "rgba(255,255,255,0.04)" : "#fff";
+      const divider = mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-14 grid h-[540px] grid-cols-[1.4fr_1fr] gap-10">
-            <div
-              className="flex flex-col items-center justify-center rounded-2xl border p-16 text-center"
-              style={{ borderColor: border, backgroundColor: bg }}
-            >
+          <div
+            className="mt-14 grid h-[540px] grid-cols-[1.4fr_1fr] gap-14"
+            style={{ borderTop: `1px solid ${divider}` }}
+          >
+            <div className="flex flex-col items-center justify-center p-8 text-center" style={{ borderRight: `1px solid ${divider}` }}>
               {featuredUrl ? (
-                <ClientLogoImg url={featuredUrl} alt={`${featuredName} logo`} className="max-h-40 max-w-[70%] object-contain" />
+                <ClientLogoImg url={featuredUrl} alt={`${featuredName} logo`} className="max-h-44 max-w-[72%] object-contain" />
               ) : (
                 <div className="text-4xl font-semibold" style={{ color: mode === "dark" ? "#fff" : brand.tokens.primary }}>{featuredName}</div>
               )}
@@ -939,17 +928,18 @@ function renderVariantBody({
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-2 grid-rows-2 gap-6">
+            <div className="grid grid-cols-2 grid-rows-2">
               {supports.map((it, i) => {
                 const url = pickLogoForMode(it, mode);
                 const path = s(it.logoPath);
                 const name = s(it.name);
+                // Inner hairline grid for structure without card chrome
+                const cellBorders = {
+                  borderRight: i % 2 === 0 ? `1px solid ${divider}` : undefined,
+                  borderBottom: i < 2 ? `1px solid ${divider}` : undefined,
+                };
                 return (
-                  <div
-                    key={i}
-                    className="flex items-center justify-center rounded-xl border p-6"
-                    style={{ borderColor: border, backgroundColor: bg }}
-                  >
+                  <div key={i} className="flex items-center justify-center p-6" style={cellBorders}>
                     {url || path ? (
                       <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-14 max-w-[80%] object-contain" />
                     ) : (
@@ -966,13 +956,11 @@ function renderVariantBody({
 
     case "MV-PROOF-LOGOS-CATEGORIZED": {
       const groups = arr(c.items).slice(0, 2);
-      const border = mode === "dark" ? "rgba(255,255,255,0.12)" : "rgba(10,15,28,0.08)";
-      const bg = mode === "dark" ? "rgba(255,255,255,0.04)" : "#fff";
       const textColor = mode === "dark" ? "#fff" : brand.tokens.primary;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-14 grid grid-cols-2 gap-10">
+          <div className="mt-14 grid grid-cols-2 gap-14">
             {groups.map((g, gi) => {
               const logos = arr(g.logos).slice(0, 4);
               return (
@@ -983,19 +971,15 @@ function renderVariantBody({
                     </div>
                     <div className="text-2xl font-medium" style={{ color: textColor }}>{s(g.label)}</div>
                   </div>
-                  <div className="grid grid-cols-2 gap-5">
+                  <div className="grid grid-cols-2 gap-8">
                     {logos.map((it, i) => {
                       const url = pickLogoForMode(it, mode);
                       const path = s(it.logoPath);
                       const name = s(it.name);
                       return (
-                        <div
-                          key={i}
-                          className="flex aspect-[3/2] items-center justify-center rounded-xl border p-5"
-                          style={{ borderColor: border, backgroundColor: bg }}
-                        >
+                        <div key={i} className="flex aspect-[3/2] items-center justify-center p-3">
                           {url || path ? (
-                            <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-12 max-w-[80%] object-contain" />
+                            <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-12 max-w-[86%] object-contain" />
                           ) : (
                             <div className="text-base font-semibold" style={{ color: textColor }}>{name}</div>
                           )}
@@ -1013,8 +997,6 @@ function renderVariantBody({
 
     case "MV-PROOF-LOGOS-MOSAIC": {
       const items = arr(c.items).slice(0, 7);
-      const border = mode === "dark" ? "rgba(255,255,255,0.12)" : "rgba(10,15,28,0.08)";
-      const bg = mode === "dark" ? "rgba(255,255,255,0.04)" : "#fff";
       const textColor = mode === "dark" ? "#fff" : brand.tokens.primary;
       // Mosaic grid template: 4 cols × 3 rows, asymmetric spans.
       const spans = [
@@ -1030,21 +1012,26 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           {s(c.kicker) && <Kicker brand={brand}>{s(c.kicker)}</Kicker>}
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-14 grid h-[560px] grid-cols-4 grid-rows-3 gap-4">
+          <div className="mt-14 grid h-[560px] grid-cols-4 grid-rows-3 gap-6">
             {items.map((it, i) => {
               const url = pickLogoForMode(it, mode);
               const path = s(it.logoPath);
               const name = s(it.name);
+              const isAnchor = i === 0;
               return (
                 <div
                   key={i}
-                  className={`flex items-center justify-center rounded-xl border p-6 ${spans[i] ?? "col-span-1 row-span-1"}`}
-                  style={{ borderColor: border, backgroundColor: bg }}
+                  className={`flex items-center justify-center p-6 ${spans[i] ?? "col-span-1 row-span-1"}`}
                 >
                   {url || path ? (
-                    <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-[70%] max-w-[80%] object-contain" />
+                    <ClientLogoImg
+                      url={url}
+                      path={path}
+                      alt={`${name} logo`}
+                      className={`object-contain ${isAnchor ? "max-h-[75%] max-w-[85%]" : "max-h-[65%] max-w-[80%]"}`}
+                    />
                   ) : (
-                    <div className="text-xl font-semibold" style={{ color: textColor }}>{name}</div>
+                    <div className={`font-semibold ${isAnchor ? "text-3xl" : "text-xl"}`} style={{ color: textColor }}>{name}</div>
                   )}
                 </div>
               );
@@ -1053,6 +1040,8 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
+
+
 
 
     case "MV-PROOF-TESTIMONIAL":
