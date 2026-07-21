@@ -1187,10 +1187,14 @@ function LightboxPortal({
   lightBackdrop: ReturnType<typeof backdropForVariant>;
   darkBackdrop: ReturnType<typeof backdropForVariant>;
 }) {
+  const [playUrl, setPlayUrl] = useState<string | null>(null);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMode(null);
-      if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === " ") {
+      if (e.key === "Escape") {
+        if (playUrl) { setPlayUrl(null); return; }
+        setMode(null);
+      }
+      if (!playUrl && (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === " ")) {
         e.preventDefault();
         setMode(mode === "light" ? "dark" : "light");
       }
@@ -1202,7 +1206,8 @@ function LightboxPortal({
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
     };
-  }, [mode, setMode]);
+  }, [mode, setMode, playUrl]);
+
 
   const isDark = mode === "dark";
 
