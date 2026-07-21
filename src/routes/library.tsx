@@ -53,19 +53,6 @@ function usePins() {
 
 
 
-const SAMPLE_BRIEF: Brief = {
-  id: "preview",
-  createdAt: "2026-01-01T00:00:00.000Z",
-  prospect: "Acme Corp",
-  industry: "Life sciences",
-  meetingObjective: "Strategic partnership review",
-  audience: "Executive team",
-  brandModeId: "bm-corporate",
-  archetypeId: "arch-problem-solution",
-  lengthTarget: 12,
-  clientFacts: "",
-};
-
 export const Route = createFileRoute("/library")({
   head: () => ({
     meta: [
