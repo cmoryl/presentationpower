@@ -115,7 +115,7 @@ export function SlideImageryPanel({
     try {
       const prepared = RASTERIZE.includes(file.type) ? await rasterizeToPng(file) : file;
       const uploaded = await uploadSlideMedia(prepared);
-      onChange(uploaded.signedUrl);
+      onChange(uploaded.signedUrl, uploaded.path ?? null);
       // Fire-and-forget: record usage so /admin/imagery-analytics reflects it.
       void logImageryEvent({
         data: { imageId: `upload:${uploaded.path ?? uploaded.signedUrl}`, brandId: divisionId ?? null, eventType: "use" },
