@@ -409,8 +409,14 @@ function DeckEditor() {
               key={`vid-${active.id}`}
               videoUrl={(active.content as Record<string, unknown>).videoUrl as string | undefined}
               posterUrl={(active.content as Record<string, unknown>).videoPosterUrl as string | undefined}
+              autoplay={((active.content as Record<string, unknown>).videoAutoplay as boolean | undefined) ?? true}
+              loop={((active.content as Record<string, unknown>).videoLoop as boolean | undefined) ?? true}
+              muted={((active.content as Record<string, unknown>).videoMuted as boolean | undefined) ?? true}
+              controls={((active.content as Record<string, unknown>).videoControls as boolean | undefined) ?? false}
               onChange={(next) => {
-                updateField(deck.id, active.id, "videoUrl", next.videoUrl ?? undefined);
+                if (next.videoUrl !== undefined) {
+                  updateField(deck.id, active.id, "videoUrl", next.videoUrl ?? undefined);
+                }
                 if (next.videoPath !== undefined) {
                   updateField(deck.id, active.id, "videoPath", next.videoPath ?? undefined);
                 }
@@ -419,6 +425,18 @@ function DeckEditor() {
                 }
                 if (next.videoPosterPath !== undefined) {
                   updateField(deck.id, active.id, "videoPosterPath", next.videoPosterPath ?? undefined);
+                }
+                if (next.videoAutoplay !== undefined) {
+                  updateField(deck.id, active.id, "videoAutoplay", next.videoAutoplay);
+                }
+                if (next.videoLoop !== undefined) {
+                  updateField(deck.id, active.id, "videoLoop", next.videoLoop);
+                }
+                if (next.videoMuted !== undefined) {
+                  updateField(deck.id, active.id, "videoMuted", next.videoMuted);
+                }
+                if (next.videoControls !== undefined) {
+                  updateField(deck.id, active.id, "videoControls", next.videoControls);
                 }
               }}
             />
