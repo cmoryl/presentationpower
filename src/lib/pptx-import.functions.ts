@@ -414,15 +414,23 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     tableTotal += tables.length;
     diagramTotal += diagrams.length;
 
+    // ── Faithful layout (positions / z-order / styling) ─────────────────
+    let layout: SlideLayout | undefined;
+    try {
+      layout = extractSlideLayout(xml, slideSize, imageEmbedIds);
+    } catch { /* layout is best-effort; parsed text/images still return */ }
+
     slides.push({
       index: i,
       title: cap(title, 240) || `Slide ${i + 1}`,
       bullets: bodyParas.map((b) => cap(b, 400)).slice(0, 16),
       notes: cap(notes, 2000),
       images,
+      imageEmbedIds,
       charts,
       tables,
       diagrams,
+      layout,
     });
   }
 
