@@ -249,6 +249,7 @@ function DeckSlides({
   approvedKey: Set<string>;
   onPreview: (idx: number) => void;
 }) {
+  const [relinkOpen, setRelinkOpen] = useState(false);
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-black/10 pb-4">
@@ -266,17 +267,34 @@ function DeckSlides({
             {deck.theme?.headingFont && <span>{deck.theme.headingFont}</span>}
           </div>
         </div>
-        {deck.downloadUrl && (
-          <a
-            href={deck.downloadUrl}
-            target="_blank"
-            rel="noreferrer"
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setRelinkOpen(true)}
             className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
           >
-            <ExternalLink size={12} /> Original .pptx
-          </a>
-        )}
+            <Wrench size={12} /> Fix images
+          </button>
+          {deck.downloadUrl && (
+            <a
+              href={deck.downloadUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+            >
+              <ExternalLink size={12} /> Original .pptx
+            </a>
+          )}
+        </div>
       </div>
+      {relinkOpen && (
+        <RelinkDrawer
+          deckId={deck.id}
+          brandModeId={brandModeId}
+          onClose={() => setRelinkOpen(false)}
+        />
+      )}
+
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {deck.slides.map((s) => (
