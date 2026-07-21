@@ -2181,25 +2181,37 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Three engagements")} />
           <div className="mt-10 grid grid-cols-3 gap-12">
-            {arr(c.items).slice(0, 3).map((it, i) => (
-              <div key={i} className="flex flex-col pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                <Kicker brand={brand} color="rgba(10,15,28,0.55)" size={16}>Client</Kicker>
-                <div className="mt-3" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: brand.tokens.primary }}>{s(it.client)}</div>
-                <SoftDivider className="mt-6" />
-                <div className="mt-6">
-                  <Kicker brand={brand} size={16}>Challenge</Kicker>
-                  <SupportingText size="md" opacity={0.82} className="mt-3">{s(it.challenge)}</SupportingText>
+            {arr(c.items).slice(0, 3).map((it, i) => {
+              const logoUrl = s(it.logoUrl);
+              return (
+                <div key={i} className="flex flex-col pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+                  <Kicker brand={brand} color="rgba(10,15,28,0.55)" size={16}>Client</Kicker>
+                  <div className="mt-3 flex items-center gap-4">
+                    {logoUrl && (
+                      <img
+                        src={logoUrl}
+                        alt={s(it.client) ? `${s(it.client)} logo` : "Client logo"}
+                        style={{ maxHeight: 36, maxWidth: 120, objectFit: "contain" }}
+                      />
+                    )}
+                    <div style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: brand.tokens.primary }}>{s(it.client)}</div>
+                  </div>
+                  <SoftDivider className="mt-6" />
+                  <div className="mt-6">
+                    <Kicker brand={brand} size={16}>Challenge</Kicker>
+                    <SupportingText size="md" opacity={0.82} className="mt-3">{s(it.challenge)}</SupportingText>
+                  </div>
+                  <SoftDivider className="mt-6" />
+                  <div className="mt-6 flex-1">
+                    <Kicker brand={brand} size={16}>Outcome</Kicker>
+                    <SupportingText size="md" opacity={0.82} className="mt-3">{s(it.outcome)}</SupportingText>
+                  </div>
+                  <div className="mt-8 pt-6" style={{ borderTop: "1px solid rgba(10,15,28,0.12)" }}>
+                    <StatFigure brand={brand} value={s(it.metric)} size="sm" />
+                  </div>
                 </div>
-                <SoftDivider className="mt-6" />
-                <div className="mt-6 flex-1">
-                  <Kicker brand={brand} size={16}>Outcome</Kicker>
-                  <SupportingText size="md" opacity={0.82} className="mt-3">{s(it.outcome)}</SupportingText>
-                </div>
-                <div className="mt-8 pt-6" style={{ borderTop: "1px solid rgba(10,15,28,0.12)" }}>
-                  <StatFigure brand={brand} value={s(it.metric)} size="sm" />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </SlideFrame>
       );
