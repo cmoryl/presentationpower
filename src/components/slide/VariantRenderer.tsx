@@ -3842,13 +3842,34 @@ function MediaTile({
         className={`relative overflow-hidden rounded-2xl ${className ?? ""}`}
         style={{ background: "#EEF2F8", filter: grayscale }}
       >
-        <img
-          src={url}
-          alt=""
-          aria-hidden
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ filter: "brightness(1.06) saturate(0.92) contrast(1.02)" }}
-        />
+        {hasVideo && autoplay ? (
+          <video
+            key={videoUrl}
+            src={videoUrl}
+            poster={videoPosterUrl || undefined}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            aria-hidden
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ filter: "brightness(1.02) saturate(0.95) contrast(1.02)" }}
+          />
+        ) : (
+          <img
+            src={url}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ filter: "brightness(1.06) saturate(0.92) contrast(1.02)" }}
+          />
+        )}
+        {hasVideo && !autoplay && (
+          <div aria-hidden className="absolute inset-0 flex items-center justify-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-black shadow-lg">▶</div>
+          </div>
+        )}
         {/* Brand accent duotone — subtle multiply so division tokens actually
              tint the photo instead of only floating over it. */}
         <div
