@@ -142,8 +142,8 @@ type Palette = { primary: string; accent: string; surface: string; ink: string }
 export async function exportDeckToPptx(
   deck: Deck,
   brand: BrandMode,
-  opts?: { strategy?: DeckStrategySnapshot | null },
-) {
+  opts?: { strategy?: DeckStrategySnapshot | null; output?: "download" | "blob" },
+): Promise<Blob | void> {
   const pptx = new PptxGenJS();
   pptx.layout = "LAYOUT_WIDE";
   pptx.title = deck.title;
@@ -503,7 +503,12 @@ export async function exportDeckToPptx(
 
   }
 
-  await pptx.writeFile({ fileName: `${sanitize(deck.title)}.pptx` });
+  const fileName = `${sanitize(deck.title)}.pptx`;
+  if (opts?.output === "blob") {
+    // pptxgenjs returns a Blob in the browser when outputType is "blob".
+    return (await pptx.write({ outputType: "blob" })) as unknown as Blob;
+  }
+  await pptx.writeFile({ fileName });
 }
 
 type SlideKind =

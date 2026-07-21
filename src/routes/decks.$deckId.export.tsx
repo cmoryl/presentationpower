@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDeckStore } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -10,6 +11,10 @@ import { exportDeckToPptx } from "@/lib/pptx-export";
 import { runQa, blockingIssues, warningIssues } from "@/lib/qa";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
+import {
+  getGlobalLinkShareStatus,
+  uploadToGlobalLinkShare,
+} from "@/lib/globallink-share.functions";
 
 
 export const Route = createFileRoute("/decks/$deckId/export")({
@@ -25,6 +30,14 @@ function ExportView() {
   const [override, setOverride] = useState(false);
   const [preflightIssues, setPreflightIssues] = useState<PreflightIssue[] | null>(null);
   const [preflightBusy, setPreflightBusy] = useState(false);
+  const [glShareConfigured, setGlShareConfigured] = useState(false);
+  const [glShareBusy, setGlShareBusy] = useState(false);
+  const [glShareUrl, setGlShareUrl] = useState<string | null>(null);
+  const [glShareError, setGlShareError] = useState<string | null>(null);
+  const [glCopied, setGlCopied] = useState(false);
+  const lastBlobRef = useRef<{ blob: Blob; fileName: string } | null>(null);
+  const statusFn = useServerFn(getGlobalLinkShareStatus);
+  const uploadFn = useServerFn(uploadToGlobalLinkShare);
   if (!deck) throw notFound();
   const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
 
@@ -38,10 +51,40 @@ function ExportView() {
     return () => document.body.classList.remove("export-mode");
   }, []);
 
+  // Load status in the background — never block the export UI on it.
+  useEffect(() => {
+    let cancelled = false;
+    statusFn()
+      .then((s) => {
+        if (!cancelled) setGlShareConfigured(!!s?.configured);
+      })
+      .catch(() => {
+        /* silent — default to Tier 1 handoff */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [statusFn]);
+
+  function openShareHandoff() {
+    window.open("https://share.transperfect.com", "_blank", "noopener,noreferrer");
+  }
+
   async function runPptxExport() {
     setExporting(true);
     try {
-      await exportDeckToPptx(deck, brand);
+      const blob = (await exportDeckToPptx(deck, brand, { output: "blob" })) as Blob;
+      const fileName = `${deck.title.replace(/[^a-z0-9-_]+/gi, "-")}.pptx`;
+      lastBlobRef.current = { blob, fileName };
+      // Trigger download for the user.
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
     } finally {
       setExporting(false);
       setPreflightIssues(null);
@@ -62,6 +105,70 @@ function ExportView() {
       setPreflightBusy(false);
     }
   }
+
+  async function blobToBase64(blob: Blob): Promise<string> {
+    const buf = await blob.arrayBuffer();
+    let binary = "";
+    const bytes = new Uint8Array(buf);
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode.apply(
+        null,
+        Array.from(bytes.subarray(i, i + chunk)) as unknown as number[],
+      );
+    }
+    return btoa(binary);
+  }
+
+  async function handleShareViaGlobalLink() {
+    if (blocked || glShareBusy) return;
+    setGlShareBusy(true);
+    setGlShareError(null);
+    setGlShareUrl(null);
+    setGlCopied(false);
+    try {
+      let held = lastBlobRef.current;
+      if (!held) {
+        const blob = (await exportDeckToPptx(deck, brand, { output: "blob" })) as Blob;
+        held = { blob, fileName: `${deck.title.replace(/[^a-z0-9-_]+/gi, "-")}.pptx` };
+        lastBlobRef.current = held;
+      }
+      if (held.blob.size > 90 * 1024 * 1024) {
+        setGlShareError("File exceeds the 90MB GlobalLink Share limit — use the manual handoff.");
+        return;
+      }
+      const contentBase64 = await blobToBase64(held.blob);
+      const result = await uploadFn({
+        data: {
+          fileName: held.fileName,
+          contentBase64,
+          mimeType:
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        },
+      });
+      if (result.ok) {
+        setGlShareUrl(result.shareUrl);
+      } else {
+        setGlShareError(result.message);
+      }
+    } catch (e) {
+      setGlShareError((e as Error).message);
+    } finally {
+      setGlShareBusy(false);
+    }
+  }
+
+  async function copyShareUrl() {
+    if (!glShareUrl) return;
+    try {
+      await navigator.clipboard.writeText(glShareUrl);
+      setGlCopied(true);
+      setTimeout(() => setGlCopied(false), 2000);
+    } catch {
+      /* ignore */
+    }
+  }
+
 
 
   return (
@@ -108,8 +215,62 @@ function ExportView() {
           >
             Print / Save PDF
           </button>
+          {glShareConfigured ? (
+            <button
+              onClick={handleShareViaGlobalLink}
+              disabled={glShareBusy || blocked}
+              title={blocked ? "Resolve blocking QA issues first" : "Upload the .pptx directly to GlobalLink Share"}
+              className="rounded-full bg-[#E11D48] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#be1740] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {glShareBusy ? "Uploading…" : "Share via GlobalLink"}
+            </button>
+          ) : (
+            <button
+              onClick={openShareHandoff}
+              title="Direct upload available once GlobalLink Share API credentials are added in Settings → Secrets."
+              className="rounded-full border border-black/15 bg-white px-5 py-2.5 text-sm font-medium text-black hover:border-black/30"
+            >
+              Send via GlobalLink Share ↗
+            </button>
+          )}
         </div>
       </div>
+
+      {/* GlobalLink Share result / handoff note */}
+      <div className="no-print mx-auto mb-6 max-w-[1200px] px-6">
+        {glShareUrl ? (
+          <div className="flex items-center justify-between gap-4 rounded-2xl border border-emerald-300 bg-emerald-50 p-4">
+            <div className="min-w-0">
+              <div className="text-xs font-semibold uppercase tracking-widest text-emerald-900">
+                Uploaded to GlobalLink Share
+              </div>
+              <a
+                href={glShareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 block truncate text-sm text-emerald-900 underline"
+              >
+                {glShareUrl}
+              </a>
+            </div>
+            <button
+              onClick={copyShareUrl}
+              className="shrink-0 rounded-full border border-emerald-300 bg-white px-4 py-2 text-xs font-medium text-emerald-900 hover:border-emerald-500"
+            >
+              {glCopied ? "Copied ✓" : "Copy link"}
+            </button>
+          </div>
+        ) : glShareError ? (
+          <div className="rounded-2xl border border-red-300 bg-red-50 p-4 text-sm text-red-900">
+            {glShareError}
+          </div>
+        ) : !glShareConfigured ? (
+          <p className="text-xs text-black/50">
+            After downloading, your exported file will be in your Downloads folder — drag it into GlobalLink Share to send it securely (SSO-gated).
+          </p>
+        ) : null}
+      </div>
+
 
       {(blocks.length > 0 || warns.length > 0) && (
         <div className="no-print mx-auto mb-8 max-w-[1200px] px-6">
