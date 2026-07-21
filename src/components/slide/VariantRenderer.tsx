@@ -200,7 +200,7 @@ type Props = {
   clientLogoUrl?: string | null;
   subCompany?: string;
   mode?: SlideMode;
-  logoOrientation?: "horizontal" | "stacked";
+  logoOrientation?: LogoOrientation;
 };
 
 type Item = Record<string, unknown>;
