@@ -11,7 +11,9 @@ import type {
   LayoutFill,
   LayoutRun,
   LayoutPara,
+  LayoutSrcRect,
 } from "@/lib/pptx-import.functions";
+
 
 type SlideLayoutWithUrls = SlideLayout & {
   shapes: (LayoutShape & { url?: string; fill?: LayoutFill & { url?: string } })[];
