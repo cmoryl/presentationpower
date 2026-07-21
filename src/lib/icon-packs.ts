@@ -74,7 +74,23 @@ export interface SearchHit {
 // Packs externalized via lovable-assets (too large for repo). The .asset.json
 // pointer file is committed; at runtime we fetch the CDN URL transparently.
 const EXTERNAL_PACK_URLS: Record<string, string> = {
+  carbon: carbonAsset.url,
+  devicon: deviconAsset.url,
+  flag: flagAsset.url,
   fluent: fluentAsset.url,
+  "game-icons": gameIconsAsset.url,
+  hugeicons: hugeiconsAsset.url,
+  ion: ionAsset.url,
+  "material-symbols": materialSymbolsAsset.url,
+  mdi: mdiAsset.url,
+  meteocons: meteoconsAsset.url,
+  mingcute: mingcuteAsset.url,
+  openmoji: openmojiAsset.url,
+  ph: phAsset.url,
+  ri: riAsset.url,
+  "simple-icons": simpleIconsAsset.url,
+  solar: solarAsset.url,
+  tabler: tablerAsset.url,
   twemoji: twemojiAsset.url,
 };
 
