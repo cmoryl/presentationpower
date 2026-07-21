@@ -21,7 +21,7 @@ import type { Brief, SlideContent } from "@/lib/deck-store";
 import { seedContent } from "@/lib/deck-store";
 import { BRAND_PROFILES } from "@/lib/brand-profiles";
 import { pickCaseStudy, pickProofLogos, CASE_STUDIES } from "@/lib/case-studies";
-import type { BrandMode } from "@/lib/taxonomy";
+import { BRAND_MODES, type BrandMode } from "@/lib/taxonomy";
 
 export function resolveDivisionBrief(brand: BrandMode): Brief {
   const profile = BRAND_PROFILES[brand.id];
