@@ -867,12 +867,21 @@ function extractGroupShapeDiagram(doc: unknown, theme: ParsedTheme): ParsedDiagr
     nodes.push({ text: cap(text, 200), level: 0, color });
   }
   // Detect connector shapes (p:cxnSp) inside the same group — a strong hint
-  // for hierarchies (org charts) and processes.
-  const cxns = bestGroup?.["p:cxnSp"];
-  if (cxns) hasConnector = true;
+  // for hierarchies (org charts) and processes. We also collect each connector's
+  // line style so downstream variants can honor original color/weight/arrowheads.
+  const cxnsRaw = bestGroup?.["p:cxnSp"];
+  const cxnArr = Array.isArray(cxnsRaw) ? cxnsRaw : cxnsRaw ? [cxnsRaw] : [];
+  if (cxnArr.length) hasConnector = true;
+  const connectors: ConnectorStyle[] = [];
+  for (const c of cxnArr) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const st = readConnectorStyle((c as any)?.["p:spPr"], theme);
+    if (st) connectors.push(st);
+  }
   if (nodes.length < 2) return null;
   const layoutHint = inferShapeGroupLayoutHint(prstTally, hasConnector);
-  return { kind: "shape-group", nodes, layoutHint };
+  const connectorStyle = aggregateConnectorStyle(connectors);
+  return { kind: "shape-group", nodes, layoutHint, connectors: connectors.length ? connectors : undefined, connectorStyle };
 }
 
 /**
