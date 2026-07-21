@@ -3924,6 +3924,8 @@ function MediaTile({
             playsInline
             preload="auto"
             aria-hidden={!wantControls}
+            data-media-ready="true"
+            data-media-kind="video"
             className="absolute inset-0 block h-full w-full object-cover"
             style={{ filter: "brightness(1.02) saturate(0.95) contrast(1.02)" }}
           />
@@ -3932,6 +3934,8 @@ function MediaTile({
             src={url}
             alt=""
             aria-hidden
+            data-media-ready={url ? "true" : "false"}
+            data-media-kind={hasVideo ? "video-poster" : "image"}
             className="absolute inset-0 block h-full w-full object-cover"
             style={{ filter: "brightness(1.06) saturate(0.92) contrast(1.02)" }}
           />
@@ -4030,6 +4034,8 @@ function MediaTile({
           playsInline
           preload="auto"
           aria-hidden={!wantControls}
+          data-media-ready="true"
+          data-media-kind="video"
           className="absolute inset-0 block h-full w-full object-cover"
           style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)" }}
         />
@@ -4038,6 +4044,8 @@ function MediaTile({
           src={url}
           alt=""
           aria-hidden
+          data-media-ready={url ? "true" : "false"}
+          data-media-kind={hasVideo ? "video-poster" : "image"}
           className="absolute inset-0 block h-full w-full object-cover"
           style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)" }}
         />
