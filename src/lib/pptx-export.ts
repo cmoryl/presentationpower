@@ -3093,7 +3093,7 @@ function renderDecChecklist(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
 }
 
 // ── MV-PROOF-LOGOS ── logo strip (initials tiles)
-function renderProofLogos(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+function renderProofLogos(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette, itemLogos: Array<string | null> = []) {
   const y0 = drawTitle(s, c, p);
   const items = arr(c.items).slice(0, 8);
   if (!items.length) return;
@@ -3109,7 +3109,16 @@ function renderProofLogos(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     const y = y0 + 0.3 + r * (rowH + gap);
     s.addShape("rect", { x, y, w: colW, h: rowH, fill: { color: "FFFFFF" }, line: { color: LIGHT_GRAY } });
     const name = str(it.name || it.client || it.label);
-    s.addText(initials(name), { x, y, w: colW, h: rowH * 0.65, fontSize: 32, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
+    const logoData = itemLogos[k];
+    if (logoData) {
+      s.addImage({
+        data: logoData,
+        x: x + 0.15, y: y + 0.1, w: colW - 0.3, h: rowH * 0.6,
+        sizing: { type: "contain", w: colW - 0.3, h: rowH * 0.6 },
+      });
+    } else {
+      s.addText(initials(name), { x, y, w: colW, h: rowH * 0.65, fontSize: 32, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
+    }
     s.addText(name.toUpperCase(), { x, y: y + rowH * 0.68, w: colW, h: rowH * 0.3, fontSize: 10, color: DARK_GRAY, fontFace: "Inter", align: "center", charSpacing: 3 });
   });
 }
