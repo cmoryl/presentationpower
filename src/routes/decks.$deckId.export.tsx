@@ -189,5 +189,6 @@ function ExportView() {
         onExportAnyway={runPptxExport}
       />
     </div>
+    </SlideMediaRefreshProvider>
   );
 }
