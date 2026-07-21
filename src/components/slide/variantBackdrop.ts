@@ -56,7 +56,7 @@ export function backdropForVariant(
 function _computeBackdrop(
   variant: ModuleVariant,
   brandId: string = "bm-enterprise",
-  _mode: "light" | "dark" = "dark",
+  mode: "light" | "dark" = "dark",
 ): SlideBackdrop | null {
 
   const id = variant.id;
@@ -64,6 +64,13 @@ function _computeBackdrop(
   const set = getDivisionImagery(brandId);
   const photos = set.photos;
   const abstracts = set.abstracts;
+
+  // Master TransPerfect / Corporate brand in dark mode uses the curated
+  // on-brand gradient set. Only affects bm-enterprise + dark — other
+  // divisions (Life Sci, Legal, Media, Digital, Gaming, GlobalLink,
+  // DataForce, Trial Interactive) keep their existing division imagery.
+  const useCorporateDark = mode === "dark" && brandId === "bm-enterprise";
+  const corporateBg = useCorporateDark ? pickCorporateDarkBackdrop(id) : null;
 
   const pickPhoto = (offset = 0) => photos[(seed + offset) % photos.length];
   const pickAbstract = (offset = 0) => abstracts[(seed + offset) % abstracts.length];
