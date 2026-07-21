@@ -3926,13 +3926,34 @@ function MediaTile({
       className={`relative overflow-hidden rounded-2xl ${className ?? ""}`}
       style={{ background: "#03002C", filter: grayscale }}
     >
-      <img
-        src={url}
-        alt=""
-        aria-hidden
-        className="absolute inset-0 h-full w-full object-cover"
-        style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)" }}
-      />
+      {hasVideo && autoplay ? (
+        <video
+          key={videoUrl}
+          src={videoUrl}
+          poster={videoPosterUrl || undefined}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)" }}
+        />
+      ) : (
+        <img
+          src={url}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)" }}
+        />
+      )}
+      {hasVideo && !autoplay && (
+        <div aria-hidden className="absolute inset-0 flex items-center justify-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-black shadow-lg">▶</div>
+        </div>
+      )}
       {/* Brand accent duotone — tints imagery with the active division's
            accent/primary so a brand switch visibly re-tones tiles. */}
       <div
