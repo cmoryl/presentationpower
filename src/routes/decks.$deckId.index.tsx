@@ -49,7 +49,7 @@ import { resolveBrandMode } from "@/lib/brand-profiles";
 
 
 
-export const Route = createFileRoute("/decks/$deckId")({
+export const Route = createFileRoute("/decks/$deckId/")({
   head: ({ params }) => ({
     meta: [{ title: `Deck ${params.deckId} · TransPerfect Modular` }],
   }),
