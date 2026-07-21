@@ -503,7 +503,12 @@ export async function exportDeckToPptx(
 
   }
 
-  await pptx.writeFile({ fileName: `${sanitize(deck.title)}.pptx` });
+  const fileName = `${sanitize(deck.title)}.pptx`;
+  if (opts?.output === "blob") {
+    // pptxgenjs returns a Blob in the browser when outputType is "blob".
+    return (await pptx.write({ outputType: "blob" })) as unknown as Blob;
+  }
+  await pptx.writeFile({ fileName });
 }
 
 type SlideKind =
