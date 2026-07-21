@@ -86,8 +86,16 @@ function _computeBackdrop(
   // on-brand gradient set. Only affects bm-enterprise + dark — other
   // divisions (Life Sci, Legal, Media, Digital, Gaming, GlobalLink,
   // DataForce, Trial Interactive) keep their existing division imagery.
+  // Master TransPerfect / Corporate brand in dark mode uses the curated
+  // on-brand gradient set. TP Media gets its own dedicated dark gradient set.
+  // Other divisions keep their existing division imagery.
   const useCorporateDark = mode === "dark" && brandId === "bm-enterprise";
-  const corporateBg = useCorporateDark ? pickCorporateDarkBackdrop(id) : null;
+  const useMediaDark = mode === "dark" && brandId === "bm-tp-media";
+  const corporateBg = useCorporateDark
+    ? pickCorporateDarkBackdrop(id)
+    : useMediaDark
+      ? pickTpMediaDarkBackdrop(id)
+      : null;
 
   const pickPhoto = (offset = 0) =>
     corporateBg ?? photos[(seed + offset) % photos.length];
