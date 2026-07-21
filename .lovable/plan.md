@@ -1,53 +1,77 @@
-# Extended Logo Orientations
+# Faithful PowerPoint import
 
-Add two new orientations beyond `horizontal` / `stacked`, and make sure the editor, the on-screen slide, HTML/PDF print, and the PPTX export all agree on what gets drawn where.
+Right now imports only capture text + a flat list of image data URLs. When you open an imported deck in the staging library it looks nothing like the original: no positions, no sizes, no z-order, no colored fills or lines, no per-run typography. The plan below adds a full layout capture and renders it 1:1 so an imported slide looks exactly like it does in PowerPoint.
 
-## New orientations
+## What we capture (per slide)
 
-| Orientation      | Description                                                          | Typical use                             |
-|------------------|----------------------------------------------------------------------|------------------------------------------|
-| `horizontal`     | Existing. Wordmark + mark side-by-side.                              | Default.                                 |
-| `stacked`        | Existing. Mark above wordmark.                                       | Cover / hero.                            |
-| `vertical-left`  | New. Whole lockup rotated -90 (reads bottom→top along a left edge). | Editorial spreads, full-bleed media.     |
-| `vertical-right` | New. Rotated +90 (reads top→bottom along a right edge).             | Portrait feature, framed media.          |
-| `mark-only`      | New. Icon/monogram only, no wordmark.                                | Dense content slides, watermark corner.  |
+Walk `p:cSld/p:spTree` in reading order and emit a typed shape list. Each entry carries:
 
-`auto` (per-slide) continues to mean "follow the deck default"; the deck default stays `horizontal | stacked`.
+- `id`, `zIndex` (spTree order = z-order)
+- `frame`: `{ x, y, w, h, rot, flipH, flipV }` in EMU → inches (slide size read from `presentation.xml`; default 13.333 × 7.5)
+- `kind`: `text` | `image` | `shape` | `line` | `group` | `table` | `chart` | `placeholder`
+- Fill: `solid` / `gradient` (stops + angle) / `blipFill` (image ref) / `none`
+- Line: color, width (EMU→pt), dash, arrowheads
+- Preset geometry (`prstGeom`) so rounded-rect, ellipse, triangle, arrow, etc. can be rendered as SVG/CSS
+- Text body: paragraphs → runs with `{ text, bold, italic, underline, size (hundredths of a point), color, font, align, bullet }`; paragraph-level indent + list level
+- For pictures: rel id → resolves to the storage path we already save into `division-imagery`
+- Groups: nested `children[]` with the group's own transform (so we can honor `p:grpSpPr/a:xfrm/a:chOff/a:chExt`)
+- Tables: cell grid with fills, borders, and per-cell text runs
+- Charts / SmartArt: keep the existing parsed structures but also record the frame so they render in place
 
-## What to build
+The already-embedded image extraction stays; we just cross-reference each `p:pic` rId → saved storage path so the renderer paints the real image at the real coordinates.
 
-1. **Type surface** — extend `LogoOrientation` in `logo-placement.ts` and mirror it in `deck-store.ts` (`Deck.context.logoOrientation`, `DeckSlide.logoOrientation`). Keep the deck-wide default limited to `horizontal | stacked` (rotated/mark-only are per-slide only) so the toolbar toggle stays a two-way switch.
+## Data changes
 
-2. **BrandLockup** — add a `mark-only` render path (returns just the mark tile / official mark asset) and a wrapper that applies `transform: rotate(±90deg)` with a compensating `transformOrigin` for the two vertical orientations. Vertical variants use the horizontal artwork rotated, since divisions don't ship rotated PNGs.
+`imported_decks.slides[i]` gains a new `layout` field:
 
-3. **SlideChrome placement** — when orientation is vertical, override the effective position to `top-left` (for `vertical-left`) or `top-right` (for `vertical-right`) if the caller picked a top/bottom-center slot that would collide, and reserve a narrow band along that edge. Half-size shrink rules from the previous pass still apply to `top-left / top-center / bottom-center / bottom-left`. `mark-only` inherits whatever position is set.
+```ts
+type SlideLayout = {
+  size: { w: number; h: number };            // inches
+  background?: { solid?: string; gradient?: Gradient; blipPath?: string };
+  shapes: Shape[];                           // in z-order
+};
+```
 
-4. **Editor UI** (`decks.$deckId.tsx` "Logo on this slide" panel) — expand the Orientation dropdown to include the three new options. Deck-wide toolbar toggle stays horizontal/stacked. Update the position dropdown help text so it's clear that vertical orientations pin to an edge.
+Written by `uploadImportedDeck` alongside the existing `title/bullets/notes/imagePaths` outline. Old rows without `layout` fall back to the current text-only card — no migration needed.
 
-5. **PPTX export** — extend the block already rewritten in the previous pass:
-   - Read `slide.logoOrientation` and `deck.context.logoOrientation` (rotated/mark-only per-slide only).
-   - For `mark-only`, prefer a mark-only asset if the division provides one, else use the stacked artwork cropped square via `sizing`.
-   - For `vertical-left` / `vertical-right`, pass `pptxgenjs`'s `rotate: -90` / `rotate: 90` on `addImage`, and swap the width/height budget so the rotated image sits in a tall band along the chosen edge. Position math becomes: place a 0.5" × 4.5" band at `x = inset` (left) or `x = SLIDE_W - inset - w` (right), vertically centered.
-   - Logo remains the last thing added to the slide so it stays on top.
+## Renderer
 
-6. **HTML / PDF (print + document routes)** — these render through `SlideChrome` → `BrandLockup`, so once #2 + #3 land the print + PDF paths pick it up for free. Verify by checking `decks.$deckId.print.tsx` and `decks.$deckId.export.tsx` pass `logoOrientation` through unchanged (they already do).
+New component `FaithfulSlideCanvas` (in `src/components/slide/`). Fixed internal canvas of `SLIDE_W_IN × SLIDE_H_IN` inches scaled to the parent via CSS transform (same approach as `ScaledSlide`).
 
-7. **Docs + defaults** — update `LOGO_POSITIONS_META` and `resolveLogoPlacement` rationale strings so `/atlas` and future tooling list the new orientations, and extend the reset button to clear the new values.
+- Absolute-positioned `<div>` per shape, sized in `%` of the slide inches so the canvas scales cleanly
+- Preset geometries rendered as SVG `<path>` when they're not plain rectangles (ellipse, roundRect, triangle, chevron, arrow, callout)
+- Gradients → CSS `linear-gradient` / `radial-gradient` with the captured stops
+- Pictures → signed URL from the existing per-slide `imagePaths[]`
+- Text: each run rendered with its bold/italic/color/font/size; paragraph alignment + bullet from the paragraph properties
+- Groups → nested container with the group transform applied
+- Rotation via `transform: rotate()`; flips via `scaleX/Y(-1)`
+
+Fonts fall back to the deck theme's `headingFont` / `bodyFont`; when a run names a font not loaded on the page we set `font-family: "Name", <fallback>` so it degrades gracefully.
+
+## UI wiring
+
+`/library/imported`:
+
+- Slide card: replace the text-only preview with a small `FaithfulSlideCanvas` thumbnail (aspect-ratio 16/9)
+- Inspect modal: full-size faithful canvas + the existing outline text tab beside it
+- Add a "Fidelity" badge on each card (green when `layout.shapes.length > 0`, amber "Text only" for legacy rows)
+
+Everything else — approve-to-library, `send to library`, download original .pptx — stays.
+
+## Scope of shape features covered
+
+In: text boxes, pictures, tables, groups, connectors/lines, common `prstGeom` (rect, roundRect, ellipse, triangle, rtTriangle, parallelogram, trapezoid, diamond, pentagon, hexagon, chevron, arrow variants, callout), solid + gradient + picture fills, line dash + arrows, rotation/flip, per-run typography, paragraph alignment + bullets.
+
+Deferred (called out in a small tooltip on the fidelity badge when detected): 3-D effects, shadows/glows/reflections, ink annotations, embedded video/audio, animations/transitions, WordArt text effects, math equations. These fall back to a plain rendering (no shadow) rather than being dropped.
 
 ## Files touched
 
-- `src/lib/logo-placement.ts` (types + metadata)
-- `src/lib/deck-store.ts` (Deck + Slide types + reducer)
-- `src/components/BrandLockup.tsx` (mark-only + rotation)
-- `src/components/slide/SlideChrome.tsx` (vertical band, half-size interaction)
-- `src/components/slide/VariantRenderer.tsx` (pass-through only, no logic)
-- `src/routes/decks.$deckId.tsx` (editor dropdown)
-- `src/lib/pptx-export.ts` (rotate + mark-only + band positioning)
+- `src/lib/pptx-import.functions.ts` — new `extractSlideLayout(doc, rels, imagePathsByRel)`; emit `layout` on each `ParsedSlide`. Add typed `Shape` / `Run` / `Paragraph` / `Fill` / `Line` interfaces.
+- `src/lib/imported-decks.functions.ts` — persist `layout` into the `slides` JSON; return it from `getImportedDeckSlides`; wire `imagePaths` → `blipPathByRel` so the renderer gets storage paths.
+- `src/components/slide/FaithfulSlideCanvas.tsx` — new renderer.
+- `src/routes/library.imported.tsx` — thumbnails + inspect modal use the renderer; add fidelity badge.
 
-No migration needed — new orientation values simply weren't valid before, and existing decks stay on `horizontal` / `stacked`.
+## Out of scope for this pass
 
-## Verification
-
-- Add each of the five orientations on a test slide, cycle through all six positions, and confirm the on-screen render matches on both light and dark chrome.
-- Export the same deck to PPTX and to PDF; open both and confirm every slide's logo matches the editor (position, orientation, size, top layer).
-- Run `bunx tsgo --noEmit` and the existing library-coverage vitest.
+- Editing the imported slide (still promote-only; editing lands as a follow-up that converts a captured shape list into our native `DeckSlide` model).
+- PPTX re-export from the captured layout (round-trip). We only need faithful *viewing* right now.
