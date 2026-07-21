@@ -426,7 +426,8 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
       layout = extractSlideLayout(xml, slideSize, imageEmbedIds, parents);
     } catch { /* layout is best-effort; parsed text/images still return */ }
 
-    } catch { /* layout is best-effort; parsed text/images still return */ }
+
+
 
     slides.push({
       index: i,
