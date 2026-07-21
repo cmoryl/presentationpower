@@ -21,8 +21,18 @@ import {
 
 export const Route = createFileRoute("/decks/$deckId/export")({
   head: () => ({ meta: [{ title: "Export · TransPerfect Modular" }] }),
-  component: ExportView,
+  component: ExportGate,
 });
+
+function ExportGate() {
+  const { deckId } = Route.useParams();
+  const hydrated = useDeckHydrated();
+  const hasDeck = useDeckStore((s) => Boolean(s.decks[deckId]));
+  if (!hydrated) return <DeckHydratingFallback label="Loading export…" />;
+  if (!hasDeck) throw notFound();
+  return <ExportView />;
+}
+
 
 function ExportView() {
   const { deckId } = Route.useParams();
