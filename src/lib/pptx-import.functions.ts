@@ -56,9 +56,29 @@ export type ParsedDiagramNode = {
   /** Node fill color (from prSet/style/solidFill or the shape's spPr) when declared. */
   color?: string;
 };
+/**
+ * High-level layout family inferred from either the SmartArt
+ * `layoutDef/@uniqueId` or, for grouped custom shapes, the dominant
+ * `prstGeom` present on the group. Downstream mapping (`pptx-mapping.ts`)
+ * routes onto native process / timeline / hierarchy / cycle / pyramid /
+ * venn / matrix variants.
+ */
+export type DiagramLayoutHint =
+  | "process"
+  | "timeline"
+  | "cycle"
+  | "hierarchy"
+  | "pyramid"
+  | "venn"
+  | "matrix"
+  | "radial"
+  | "funnel"
+  | "list";
 export type ParsedDiagram = {
   kind: "smartart" | "shape-group";
   nodes: ParsedDiagramNode[];
+  /** Layout family inferred from SmartArt layoutDef or shape geometry. */
+  layoutHint?: DiagramLayoutHint;
 };
 
 export type ParsedSlide = {
