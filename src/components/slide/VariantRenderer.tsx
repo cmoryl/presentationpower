@@ -814,6 +814,7 @@ function renderVariantBody({
     case "MV-PROOF-LOGOS":
     case "MV-CASE-LOGO-GRID": {
       const tileText = mode === "dark" ? "#ffffff" : brand.tokens.primary;
+      const accent = brand.tokens.accent;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
@@ -826,7 +827,7 @@ function renderVariantBody({
               return (
                 <div
                   key={i}
-                  className="flex aspect-[3/2] flex-col items-center justify-center gap-3 p-4 text-center"
+                  className="flex aspect-[3/2] flex-col items-center justify-center gap-4 p-4 text-center"
                   style={{ color: tileText }}
                 >
                   {logoUrl || logoPath ? (
@@ -834,12 +835,28 @@ function renderVariantBody({
                       path={logoPath}
                       url={logoUrl}
                       alt={name ? `${name} logo` : "Client logo"}
-                      className="max-h-[64%] max-w-[86%] object-contain"
+                      className="max-h-[62%] max-w-[86%] object-contain"
                     />
                   ) : (
                     <div className="text-2xl font-semibold">{name}</div>
                   )}
-                  {result && <div className="text-sm font-normal opacity-70">{result}</div>}
+                  {result && (
+                    <div className="flex flex-col items-center gap-2">
+                      <div style={{ width: 32, height: 2, background: accent, opacity: 0.9 }} />
+                      <div
+                        className="tabular-nums"
+                        style={{
+                          color: accent,
+                          fontSize: 22,
+                          fontWeight: 600,
+                          letterSpacing: "-0.01em",
+                          lineHeight: 1.15,
+                        }}
+                      >
+                        {result}
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
