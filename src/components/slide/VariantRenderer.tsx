@@ -796,13 +796,11 @@ function renderVariantBody({
     // ── Proof & Data ──────────────────────────────────────────────────
     case "MV-PROOF-LOGOS":
     case "MV-CASE-LOGO-GRID": {
-      const tileBg = mode === "dark" ? "rgba(255,255,255,0.06)" : "#fff";
-      const tileBorder = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(10,15,28,0.12)";
       const tileText = mode === "dark" ? "#ffffff" : brand.tokens.primary;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-14 grid grid-cols-4 gap-6">
+          <div className="mt-14 grid grid-cols-4 gap-10">
             {arr(c.items).map((it, i) => {
               const name = s(it.name ?? it.client);
               const logoUrl = pickLogoForMode(it, mode);
@@ -811,15 +809,15 @@ function renderVariantBody({
               return (
                 <div
                   key={i}
-                  className="flex aspect-[3/2] flex-col items-center justify-center gap-3 rounded-xl border p-6 text-center"
-                  style={{ borderColor: tileBorder, backgroundColor: tileBg, color: tileText }}
+                  className="flex aspect-[3/2] flex-col items-center justify-center gap-3 p-4 text-center"
+                  style={{ color: tileText }}
                 >
                   {logoUrl || logoPath ? (
                     <ClientLogoImg
                       path={logoPath}
                       url={logoUrl}
                       alt={name ? `${name} logo` : "Client logo"}
-                      className="max-h-[60%] max-w-[80%] object-contain"
+                      className="max-h-[64%] max-w-[86%] object-contain"
                     />
                   ) : (
                     <div className="text-2xl font-semibold">{name}</div>
@@ -832,6 +830,7 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
+
 
     case "MV-PROOF-LOGOS-STRIP": {
       const items = arr(c.items).slice(0, 6);
