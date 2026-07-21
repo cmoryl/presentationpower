@@ -382,6 +382,22 @@ function DeckEditor() {
 
           )}
 
+          {/* Slide video (background motion for supported media-forward variants) */}
+          {active && variantSupportsVideo(active.variantId) && (
+            <SlideVideoPanel
+              key={`vid-${active.id}`}
+              videoUrl={(active.content as Record<string, unknown>).videoUrl as string | undefined}
+              posterUrl={(active.content as Record<string, unknown>).videoPosterUrl as string | undefined}
+              onChange={(next) => {
+                updateField(deck.id, active.id, "videoUrl", next.videoUrl ?? undefined);
+                if (next.videoPosterUrl !== undefined) {
+                  updateField(deck.id, active.id, "videoPosterUrl", next.videoPosterUrl ?? undefined);
+                }
+              }}
+            />
+          )}
+
+
           {/* Background & Imagery */}
           {active && (
             <BackgroundImageryPanel
