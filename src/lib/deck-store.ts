@@ -1757,7 +1757,7 @@ export const useDeckStore = create<DeckState>()(
         // Meta fields (imagery override, background, slide-level media seed)
         // are always editable — they're driven by dedicated panels, not the
         // variant's authored field list.
-        const META_FIELDS = new Set(["mediaUrl", "mediaSeed", "background", "videoUrl", "videoPosterUrl", "videoPath", "videoPosterPath"]);
+        const META_FIELDS = new Set(["mediaUrl", "mediaPath", "mediaSeed", "background", "videoUrl", "videoPosterUrl", "videoPath", "videoPosterPath"]);
         const editable = META_FIELDS.has(field) || variant.editableFields.some((f) => matchesField(f, field));
         if (!editable) return;
         const nextContent = setPath({ ...slide.content }, field, value);
@@ -1830,9 +1830,11 @@ export const useDeckStore = create<DeckState>()(
         if (variantSupportsImagery(newVariantId)) {
           if (typeof prev.mediaUrl === "string") merged.mediaUrl = prev.mediaUrl;
           if (typeof prev.mediaSeed === "string") merged.mediaSeed = prev.mediaSeed;
+          if (typeof prev.mediaPath === "string") merged.mediaPath = prev.mediaPath;
         } else {
           delete merged.mediaUrl;
           delete merged.mediaSeed;
+          delete merged.mediaPath;
         }
         // Same treatment for video fields.
         if (variantSupportsVideo(newVariantId)) {

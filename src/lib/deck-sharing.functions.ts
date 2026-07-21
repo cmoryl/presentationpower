@@ -125,48 +125,81 @@ export const getSharedDeck = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     // Anonymous share viewers can't re-sign private-bucket URLs client-side,
-    // so re-sign any stored videoPath / videoPosterPath server-side (via the
-    // service role) and inject fresh URLs into the payload. Slides with an
-    // external pasted URL (no path) are left untouched.
+    // so re-sign any stored videoPath / videoPosterPath / mediaPath (slide-media
+    // + slide-videos) and per-item client logo paths (client-logos) server-side
+    // via the service role and inject fresh URLs into the payload. Slides /
+    // items with only an external pasted URL (no path) are left untouched.
     const p = payload as
       | ({ slides?: Array<{ content?: Record<string, unknown> }> } & Record<string, unknown>)
       | null;
     if (p && Array.isArray(p.slides) && p.slides.length > 0) {
       const videoPaths = new Set<string>();
       const posterPaths = new Set<string>();
+      const imagePaths = new Set<string>();
+      const logoPaths = new Set<string>();
       for (const s of p.slides) {
         const c = (s.content ?? {}) as Record<string, unknown>;
         if (typeof c.videoPath === "string" && c.videoPath) videoPaths.add(c.videoPath);
         if (typeof c.videoPosterPath === "string" && c.videoPosterPath) posterPaths.add(c.videoPosterPath);
+        if (typeof c.mediaPath === "string" && c.mediaPath) imagePaths.add(c.mediaPath);
+        const items = Array.isArray(c.items) ? (c.items as Array<Record<string, unknown>>) : [];
+        for (const it of items) {
+          if (typeof it.logoPath === "string" && it.logoPath) logoPaths.add(it.logoPath);
+          const lp = it.logoPaths;
+          if (lp && typeof lp === "object") {
+            for (const v of Object.values(lp as Record<string, unknown>)) {
+              if (typeof v === "string" && v) logoPaths.add(v);
+            }
+          }
+        }
       }
-      if (videoPaths.size > 0 || posterPaths.size > 0) {
+      const hasAny = videoPaths.size + posterPaths.size + imagePaths.size + logoPaths.size > 0;
+      if (hasAny) {
         try {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const TTL = 60 * 60 * 24; // 24h — refreshed on each share-view load
           const videoSigned = new Map<string, string>();
           const posterSigned = new Map<string, string>();
-          if (videoPaths.size > 0) {
-            const { data: signed } = await supabaseAdmin.storage
-              .from("slide-videos")
-              .createSignedUrls([...videoPaths], TTL);
-            for (const r of signed ?? []) {
-              if (r.path && r.signedUrl) videoSigned.set(r.path, r.signedUrl);
+          const imageSigned = new Map<string, string>();
+          const logoSigned = new Map<string, string>();
+          async function signAll(bucket: string, paths: string[], into: Map<string, string>) {
+            if (paths.length === 0) return;
+            const BATCH = 200;
+            for (let i = 0; i < paths.length; i += BATCH) {
+              const chunk = paths.slice(i, i + BATCH);
+              const { data: signed } = await supabaseAdmin.storage.from(bucket).createSignedUrls(chunk, TTL);
+              for (const r of signed ?? []) {
+                if (r.path && r.signedUrl) into.set(r.path, r.signedUrl);
+              }
             }
           }
-          if (posterPaths.size > 0) {
-            const { data: signed } = await supabaseAdmin.storage
-              .from("slide-media")
-              .createSignedUrls([...posterPaths], TTL);
-            for (const r of signed ?? []) {
-              if (r.path && r.signedUrl) posterSigned.set(r.path, r.signedUrl);
-            }
-          }
+          await signAll("slide-videos", [...videoPaths], videoSigned);
+          await signAll("slide-media", [...posterPaths], posterSigned);
+          await signAll("slide-media", [...imagePaths], imageSigned);
+          await signAll("client-logos", [...logoPaths], logoSigned);
           for (const s of p.slides) {
             const c = (s.content ?? {}) as Record<string, unknown>;
             const vp = typeof c.videoPath === "string" ? c.videoPath : "";
             const pp = typeof c.videoPosterPath === "string" ? c.videoPosterPath : "";
+            const mp = typeof c.mediaPath === "string" ? c.mediaPath : "";
             if (vp && videoSigned.has(vp)) c.videoUrl = videoSigned.get(vp);
             if (pp && posterSigned.has(pp)) c.videoPosterUrl = posterSigned.get(pp);
+            if (mp && imageSigned.has(mp)) c.mediaUrl = imageSigned.get(mp);
+            const items = Array.isArray(c.items) ? (c.items as Array<Record<string, unknown>>) : [];
+            for (const it of items) {
+              const ip = typeof it.logoPath === "string" ? it.logoPath : "";
+              if (ip && logoSigned.has(ip)) it.logoUrl = logoSigned.get(ip);
+              const lp = it.logoPaths;
+              if (lp && typeof lp === "object") {
+                const lv = it.logoVariants && typeof it.logoVariants === "object"
+                  ? { ...(it.logoVariants as Record<string, unknown>) }
+                  : {};
+                for (const [k, v] of Object.entries(lp as Record<string, unknown>)) {
+                  if (typeof v === "string" && v && logoSigned.has(v)) lv[k] = logoSigned.get(v);
+                }
+                it.logoVariants = lv;
+              }
+            }
           }
         } catch {
           // Best-effort — fall back to whatever URLs were stored.

@@ -215,6 +215,30 @@ export async function exportDeckToPptx(
     "MV-CLIENT-DETAIL-3",
     "MV-CLIENT-COMPARE",
   ]);
+  // Pre-resolve logoPath → fresh signed URL for the 1-hour client-logos
+  // bucket, so exports that run more than an hour after picking a logo
+  // still embed real wordmarks (falling back to the stored logoUrl and
+  // then the initials tile).
+  const logoPathSet = new Set<string>();
+  for (const slide of deck.slides) {
+    if (!LOGO_ITEM_VARIANTS.has(slide.variantId)) continue;
+    const items = Array.isArray((slide.content as Record<string, unknown>).items)
+      ? ((slide.content as Record<string, unknown>).items as Array<Record<string, unknown>>)
+      : [];
+    for (const it of items) {
+      if (typeof it.logoPath === "string" && it.logoPath) logoPathSet.add(it.logoPath);
+    }
+  }
+  const logoPathUrls: Record<string, string> = {};
+  if (logoPathSet.size > 0) {
+    try {
+      const { signClientLogoPaths } = await import("@/lib/client-logos.functions");
+      const res = await signClientLogoPaths({ data: { paths: [...logoPathSet] } });
+      Object.assign(logoPathUrls, res?.urls ?? {});
+    } catch {
+      // Best-effort — fall through to whatever URL is stored on the item.
+    }
+  }
   const slideItemLogos: Array<Array<string | null>> = await Promise.all(
     deck.slides.map(async (slide, idx) => {
       if (!LOGO_ITEM_VARIANTS.has(slide.variantId)) return [];
@@ -223,7 +247,9 @@ export async function exportDeckToPptx(
         : [];
       return Promise.all(
         items.map((it, k) => {
-          const url = typeof it.logoUrl === "string" ? it.logoUrl : "";
+          const path = typeof it.logoPath === "string" ? it.logoPath : "";
+          const stored = typeof it.logoUrl === "string" ? it.logoUrl : "";
+          const url = (path && logoPathUrls[path]) || stored;
           if (!url) return Promise.resolve(null);
           return fetchAsDataUrl(url, `slide ${idx + 1} item ${k + 1} logo`);
         }),

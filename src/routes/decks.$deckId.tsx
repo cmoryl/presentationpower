@@ -384,7 +384,12 @@ function DeckEditor() {
               mediaUrl={(active.content as Record<string, unknown>).mediaUrl as string | undefined}
               mediaSeed={(active.content as Record<string, unknown>).mediaSeed as string | undefined}
               divisionId={deck.brandModeId}
-              onChange={(next) => updateField(deck.id, active.id, "mediaUrl", next ?? undefined)}
+              onChange={(next, nextPath) => {
+                updateField(deck.id, active.id, "mediaUrl", next ?? undefined);
+                if (nextPath !== undefined) {
+                  updateField(deck.id, active.id, "mediaPath", nextPath ?? undefined);
+                }
+              }}
             />
 
           )}
@@ -1143,6 +1148,7 @@ function LogoGridItemsPanel({
           const name = typeof it.name === "string" ? it.name : typeof it.client === "string" ? (it.client as string) : "";
           const logoUrl = typeof it.logoUrl === "string" ? it.logoUrl : "";
           const variants = (it.logoVariants && typeof it.logoVariants === "object" ? it.logoVariants : {}) as Record<string, string | null | undefined>;
+          const variantPaths = (it.logoPaths && typeof it.logoPaths === "object" ? it.logoPaths : {}) as Record<string, string | null | undefined>;
           const activeVariant = typeof it.logoVariant === "string" ? it.logoVariant : "primary";
           const VARIANTS: Array<{ key: string; label: string }> = [
             { key: "primary", label: "P" },
@@ -1179,7 +1185,7 @@ function LogoGridItemsPanel({
                 {logoUrl && (
                   <button
                     type="button"
-                    onClick={() => update(i, { logoUrl: "", logoVariant: "primary", logoVariants: {} })}
+                    onClick={() => update(i, { logoUrl: "", logoVariant: "primary", logoVariants: {}, logoPath: "", logoPaths: {} })}
                     className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] text-black/60 hover:border-black/30"
                   >
                     Clear
@@ -1206,7 +1212,7 @@ function LogoGridItemsPanel({
                         key={v.key}
                         type="button"
                         disabled={!has}
-                        onClick={() => update(i, { logoVariant: v.key, logoUrl: url })}
+                        onClick={() => update(i, { logoVariant: v.key, logoUrl: url, logoPath: variantPaths[v.key] ?? "" })}
                         className={
                           "rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-widest transition " +
                           (isActive
@@ -1272,6 +1278,12 @@ function LogoGridItemsPanel({
                         dark: r.darkUrl ?? null,
                         mono: r.monoUrl ?? null,
                       };
+                      const logoPaths = {
+                        primary: r.primary_path ?? null,
+                        light: r.light_path ?? null,
+                        dark: r.dark_path ?? null,
+                        mono: r.mono_path ?? null,
+                      };
                       // Only fill the name field if empty — preserve any existing
                       // client name the author has already customized.
                       const existing = items[pickIdx] ?? {};
@@ -1281,6 +1293,8 @@ function LogoGridItemsPanel({
                         logoUrl: r.primaryUrl,
                         logoVariant: "primary",
                         logoVariants,
+                        logoPath: r.primary_path ?? "",
+                        logoPaths,
                       };
                       if (!currentName.trim()) patch[nameField] = r.client_name;
                       update(pickIdx, patch);
