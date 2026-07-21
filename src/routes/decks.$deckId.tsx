@@ -384,7 +384,12 @@ function DeckEditor() {
               mediaUrl={(active.content as Record<string, unknown>).mediaUrl as string | undefined}
               mediaSeed={(active.content as Record<string, unknown>).mediaSeed as string | undefined}
               divisionId={deck.brandModeId}
-              onChange={(next) => updateField(deck.id, active.id, "mediaUrl", next ?? undefined)}
+              onChange={(next, nextPath) => {
+                updateField(deck.id, active.id, "mediaUrl", next ?? undefined);
+                if (nextPath !== undefined) {
+                  updateField(deck.id, active.id, "mediaPath", nextPath ?? undefined);
+                }
+              }}
             />
 
           )}
