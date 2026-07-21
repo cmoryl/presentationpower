@@ -282,34 +282,12 @@ function DeckEditor() {
           </button>
 
 
-          {/* Editable fields */}
-          {active && mv && (
-            <div className="mt-6 rounded-2xl border border-black/10 bg-white p-6">
-              <div className="text-xs uppercase tracking-widest text-black/50">Editable fields</div>
-              <div className="mt-4 space-y-4">
-                {mv.editableFields.map((path) => (
-                  <FieldEditor
-                    key={path}
-                    path={path}
-                    content={active.content}
-                    onChange={(concretePath, value) => updateField(deck.id, active.id, concretePath, value)}
-                  />
-                ))}
-              </div>
-              {mv.lockedFields.length > 0 && (
-                <div className="mt-6 border-t border-black/10 pt-4 text-xs text-black/50">
-                  <span className="font-medium text-black/70">Locked by the module:</span>{" "}
-                  {mv.lockedFields.join(" · ")}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Per-slide logo placement */}
+          {/* Per-slide logo placement — shown for every slide so the mark
+              location can be adjusted directly from the editor. */}
           {active && (
-            <div className="mt-6 rounded-2xl border border-black/10 bg-white p-6">
+            <div className="mt-6 rounded-2xl border-2 border-[#003FC7]/20 bg-white p-6">
               <div className="flex items-baseline justify-between">
-                <div className="text-xs uppercase tracking-widest text-black/50">Logo on this slide</div>
+                <div className="text-xs uppercase tracking-widest text-[#003FC7]">Logo on this slide</div>
                 <button
                   type="button"
                   onClick={() => setSlideLogo(deck.id, active.id, { position: "auto", orientation: "auto" })}
@@ -339,21 +317,45 @@ function DeckEditor() {
                     className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
                   >
                     <option value="auto">Auto (layout default)</option>
-                    <option value="top-left">Top left</option>
-                    <option value="top-center">Top center</option>
+                    <option value="top-left">Top left · half size</option>
+                    <option value="top-center">Top center · half size</option>
                     <option value="top-right">Top right</option>
-                    <option value="bottom-left">Bottom left</option>
-                    <option value="bottom-center">Bottom center</option>
+                    <option value="bottom-left">Bottom left · half size</option>
+                    <option value="bottom-center">Bottom center · half size</option>
                     <option value="bottom-right">Bottom right</option>
                     <option value="hidden">Hidden</option>
                   </select>
                 </label>
               </div>
               <p className="mt-3 text-[11px] text-black/50">
-                Overrides the deck-wide logo settings for this slide only. "Auto" follows the deck toggle and the layout's approved placement.
+                The logo is always rendered as the top-most visual layer. Top/bottom-center and left-side placements render at half size so the mark stays a quiet signature.
               </p>
             </div>
           )}
+
+          {/* Editable fields */}
+          {active && mv && (
+            <div className="mt-6 rounded-2xl border border-black/10 bg-white p-6">
+              <div className="text-xs uppercase tracking-widest text-black/50">Editable fields</div>
+              <div className="mt-4 space-y-4">
+                {mv.editableFields.map((path) => (
+                  <FieldEditor
+                    key={path}
+                    path={path}
+                    content={active.content}
+                    onChange={(concretePath, value) => updateField(deck.id, active.id, concretePath, value)}
+                  />
+                ))}
+              </div>
+              {mv.lockedFields.length > 0 && (
+                <div className="mt-6 border-t border-black/10 pt-4 text-xs text-black/50">
+                  <span className="font-medium text-black/70">Locked by the module:</span>{" "}
+                  {mv.lockedFields.join(" · ")}
+                </div>
+              )}
+            </div>
+          )}
+
 
 
           {active && (
