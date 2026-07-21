@@ -90,7 +90,8 @@ const CLASSIC_MANIFEST: Record<string, ClassicPresence> = {
   // Stacked variants derived from the horizontal wordmarks (top/bottom split).
   digital:   { color: "png", white: "png", stackedColor: "png", stackedWhite: "png" },
   dataforce: { color: "png", white: "png", stackedColor: "png", stackedWhite: "png" },
-  // globallink: no classic BrandHub logo in seed yet; continue using NEXT.
+  // GlobalLink classic (BrandHub-supplied G-mark wordmark, horizontal only).
+  globallink: { color: "svg", white: "svg" },
 };
 
 function classicSetFor(slug: string): DivisionLogoSet | undefined {
