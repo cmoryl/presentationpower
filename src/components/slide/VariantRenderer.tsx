@@ -3811,6 +3811,10 @@ function MediaTile({
   videoPosterUrl,
   videoPath,
   videoPosterPath,
+  videoAutoplay,
+  videoLoop,
+  videoMuted,
+  videoControls,
 }: {
   brand: BrandMode;
   seed: string;
@@ -3827,6 +3831,10 @@ function MediaTile({
    *  load via SlideMediaRefreshProvider so it survives the 30-day TTL. */
   videoPath?: string;
   videoPosterPath?: string;
+  videoAutoplay?: boolean;
+  videoLoop?: boolean;
+  videoMuted?: boolean;
+  videoControls?: boolean;
 }) {
   const mode = useContext(SlideModeContext);
   const isThumbnail = useContext(SlideThumbnailContext);
