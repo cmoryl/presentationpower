@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, ExternalLink, Send, Image as ImageIcon, FileText, ChevronRight, X, Check } from "lucide-react";
+import { Loader2, ExternalLink, Send, Image as ImageIcon, FileText, ChevronRight, X, Check, Wrench, Upload } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { FaithfulSlideCanvas } from "@/components/slide/FaithfulSlideCanvas";
@@ -13,7 +13,11 @@ import {
   sendImportedSlideToLibrary,
   listLibrarySlideExamples,
   importedDeckSlugForDivision,
+  listBrokenDeckImages,
+  relinkDeckImage,
 } from "@/lib/imported-decks.functions";
+import { listDivisionImagery } from "@/lib/division-imagery.functions";
+
 
 export const Route = createFileRoute("/library/imported")({
   head: () => ({
