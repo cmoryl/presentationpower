@@ -763,8 +763,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Grid of case studies with client + one-line result",
     permittedLayoutIds: ["LF-11"],
     capacity: { items: { min: 4, max: 6 }, titleChars: 60, bodyChars: 100 },
-    editableFields: ["title", "items[].client", "items[].result"],
-    lockedFields: ["items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "items[].client", "items[].result", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
 
   // ── MF-07 Team, Governance & Close ──────────────────────────────────────
