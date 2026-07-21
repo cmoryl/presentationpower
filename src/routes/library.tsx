@@ -572,27 +572,36 @@ function Library() {
         </div>
       ) : (
       <div className="mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3">
-        {filtered.map((v) => (
-          <VariantCard
-            key={v.id}
-            variant={v}
-            familyName={byId(moduleFamilies, v.familyId)?.name}
-            brand={scopeBrand ?? tpMaster}
-            sectionId={sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? ""}
-            preferred={preferred.has(v.id)}
-            pinned={pins.has(v.id)}
-            usageCount={usageByVariant.get(v.id) ?? 0}
-            onTogglePin={() => togglePin(v.id)}
-            mode={mode}
-            showImagery={showImagery}
-            autoFixOn={autoFixOn}
-            onOpen={() => setOpenId(v.id)}
-          />
-        ))}
+        {filtered.map((entry) => {
+          const v = entry.variant;
+          const isVideo = entry.kind === "video";
+          return (
+            <VariantCard
+              key={isVideo ? `video:${entry.example.key}` : v.id}
+              variant={v}
+              familyName={byId(moduleFamilies, v.familyId)?.name}
+              brand={scopeBrand ?? tpMaster}
+              sectionId={sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? ""}
+              preferred={preferred.has(v.id)}
+              pinned={pins.has(v.id)}
+              usageCount={usageByVariant.get(v.id) ?? 0}
+              onTogglePin={() => togglePin(v.id)}
+              mode={mode}
+              showImagery={showImagery}
+              autoFixOn={autoFixOn}
+              onOpen={() =>
+                isVideo ? setVideoZoomKey(entry.example.key) : setOpenId(v.id)
+              }
+              videoExample={isVideo ? entry.example : undefined}
+              onImportExample={isVideo ? () => importVideoExample(entry.example) : undefined}
+              importBusy={isVideo && videoBusy === entry.example.key}
+            />
+          );
+        })}
       </div>
       )}
 
-      <VideoExamplesBlock brand={tpMaster} sectionFrameworks={sectionFrameworks} />
+
 
 
       <div className="mt-10">
