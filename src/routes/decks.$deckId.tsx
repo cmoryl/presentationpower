@@ -1222,12 +1222,18 @@ function LogoGridItemsPanel({
                         dark: r.darkUrl ?? null,
                         mono: r.monoUrl ?? null,
                       };
-                      update(pickIdx, {
-                        name: r.client_name,
+                      // Only fill the name field if empty — preserve any existing
+                      // client name the author has already customized.
+                      const existing = items[pickIdx] ?? {};
+                      const currentName =
+                        typeof existing[nameField] === "string" ? (existing[nameField] as string) : "";
+                      const patch: Record<string, unknown> = {
                         logoUrl: r.primaryUrl,
                         logoVariant: "primary",
                         logoVariants,
-                      });
+                      };
+                      if (!currentName.trim()) patch[nameField] = r.client_name;
+                      update(pickIdx, patch);
                       setPickIdx(null);
                     }}
                     className="group rounded-xl border border-black/10 bg-white p-3 text-left transition hover:border-[#003FC7]/40 hover:shadow"
