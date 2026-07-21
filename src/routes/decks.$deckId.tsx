@@ -1034,9 +1034,11 @@ type LogoItem = Record<string, unknown>;
 function LogoGridItemsPanel({
   items,
   onChange,
+  nameField = "name",
 }: {
   items: LogoItem[];
   onChange: (items: LogoItem[]) => void;
+  nameField?: "name" | "client";
 }) {
   const listFn = useServerFn(listClientLogos);
   const [pickIdx, setPickIdx] = useState<number | null>(null);
@@ -1068,7 +1070,7 @@ function LogoGridItemsPanel({
     const next = items.map((it, k) => (k === i ? { ...it, ...patch } : it));
     onChange(next);
   };
-  const addItem = () => onChange([...items, { name: "New client" }]);
+  const addItem = () => onChange([...items, { [nameField]: "New client" }]);
   const removeItem = (i: number) => onChange(items.filter((_, k) => k !== i));
 
   return (
