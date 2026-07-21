@@ -23,6 +23,7 @@ import {
   deleteDivisionImagery,
   type DivisionImageryEntry,
 } from "@/lib/division-imagery.functions";
+import { DIVISION_IMAGERY } from "@/assets/backdrops/divisions";
 
 
 
