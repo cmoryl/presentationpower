@@ -558,6 +558,9 @@ const VariantCard = memo(function VariantCard({
   showImagery = false,
   autoFixOn = false,
   onOpen,
+  videoExample,
+  onImportExample,
+  importBusy = false,
 }: {
   variant: ModuleVariant;
   familyName?: string;
@@ -571,15 +574,24 @@ const VariantCard = memo(function VariantCard({
   showImagery?: boolean;
   autoFixOn?: boolean;
   onOpen: () => void;
+  /** When set, the card renders as a video demonstration of `variant`:
+   *  swap in the example content, show the pink ▶ Video badge, and expose
+   *  an "Import as starter deck" quick action. Click-to-zoom uses a video-
+   *  aware lightbox in the parent. */
+  videoExample?: VideoSlideExample;
+  onImportExample?: () => void;
+  importBusy?: boolean;
 }) {
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
   const previewSlide = {
-    id: variant.id,
+    id: videoExample ? `${variant.id}:video:${videoExample.key}` : variant.id,
     position: 0,
     sectionId,
     variantId: variant.id,
     layoutId: variant.permittedLayoutIds[0],
-    content: seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<string, unknown>,
+    content: (videoExample
+      ? (videoExample.content as Record<string, unknown>)
+      : (seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<string, unknown>)),
     changes: [],
   };
   const isDark = mode === "dark";
@@ -612,6 +624,7 @@ const VariantCard = memo(function VariantCard({
     }, 320);
     return () => window.clearTimeout(t);
   }, [autoFixOn, isAB, variant.id, brand.id, showImagery, isDark, mountTick]);
+
 
   return (
     <div className="group relative">
