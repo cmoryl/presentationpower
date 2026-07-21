@@ -118,6 +118,22 @@ function Library() {
 
   const { pins, toggle: togglePin } = usePins();
 
+  // LogoHub filler pool — used to replace built-in APPROVED_LOGOS fillers on
+  // every MV-PROOF-LOGOS-* card so previews reflect the real client roster.
+  // Falls back gracefully when the user isn't signed in or LogoHub is empty.
+  const listLogosFn = useServerFn(listClientLogos);
+  const logoHubQuery = useQuery({
+    queryKey: ["logohub", "fillers"],
+    queryFn: () => listLogosFn(),
+    retry: false,
+    staleTime: 5 * 60 * 1000,
+  });
+  const logoHubPool = useMemo<LogoFiller[]>(
+    () => toLogoFillers(logoHubQuery.data),
+    [logoHubQuery.data],
+  );
+
+
   // Usage counts across the local deck store — cheap, client-only.
   const decks = useDeckStore((s) => s.decks);
   const usageByVariant = useMemo(() => {
