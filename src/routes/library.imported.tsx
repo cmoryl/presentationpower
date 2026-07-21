@@ -283,12 +283,14 @@ function DeckSlides({
 function SlideCard({
   slide,
   deckId,
+  deckTheme,
   brandModeId,
   approved,
   onPreview,
 }: {
-  slide: { index: number; title: string; bullets: string[]; notes: string; imageCount: number };
+  slide: ImportedSlide;
   deckId: string;
+  deckTheme?: Record<string, string>;
   brandModeId: string;
   approved: boolean;
   onPreview: () => void;
@@ -304,8 +306,8 @@ function SlideCard({
   });
 
   return (
-    <div className="group flex flex-col rounded-xl border border-black/10 bg-white p-4 transition hover:border-black/25 hover:shadow-sm">
-      <div className="flex items-start justify-between gap-2">
+    <div className="group flex flex-col rounded-xl border border-black/10 bg-white p-3 transition hover:border-black/25 hover:shadow-sm">
+      <div className="mb-2 flex items-center justify-between gap-2">
         <div className="text-[10px] font-mono uppercase tracking-widest text-black/40">
           Slide {slide.index + 1}
         </div>
@@ -319,12 +321,22 @@ function SlideCard({
       <button
         type="button"
         onClick={onPreview}
-        className="mt-2 text-left"
+        className="block overflow-hidden rounded-md border border-black/10 bg-white text-left"
+        aria-label={`Preview slide ${slide.index + 1}`}
       >
-        <div className="line-clamp-2 text-sm font-semibold text-[#03002C] group-hover:text-[#003FC7]">
-          {slide.title || <span className="italic text-black/40">Untitled</span>}
-        </div>
+        {slide.layout ? (
+          <FaithfulSlideCanvas layout={slide.layout} theme={deckTheme} width={320} />
+        ) : (
+          <div className="flex aspect-[16/9] w-full items-center justify-center bg-black/[0.02] text-[10px] text-black/40">
+            No layout captured
+          </div>
+        )}
       </button>
+
+      <div className="mt-2 line-clamp-2 text-xs font-medium text-[#03002C] group-hover:text-[#003FC7]">
+        {slide.title || <span className="italic text-black/40">Untitled</span>}
+      </div>
+
 
       {slide.bullets.length > 0 && (
         <ul className="mt-3 space-y-1 text-xs text-black/60">
