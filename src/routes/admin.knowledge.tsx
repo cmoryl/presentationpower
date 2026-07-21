@@ -634,8 +634,11 @@ function ImportedDecksTab({ slug }: { slug: string }) {
   const getSlidesFn = useServerFn(getImportedDeckSlides);
   const deleteFn = useServerFn(deleteImportedDeck);
   const embedFn = useServerFn(embedImportedDecks);
+  const sendFn = useServerFn(sendImportedSlideToLibrary);
   const [embedding, setEmbedding] = useState<string | null>(null);
   const [embedMsg, setEmbedMsg] = useState<string | null>(null);
+  const [sendingKey, setSendingKey] = useState<string | null>(null);
+  const [sendMsg, setSendMsg] = useState<string | null>(null);
 
   const [openId, setOpenId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
