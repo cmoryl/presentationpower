@@ -628,9 +628,11 @@ function extractGroupShapeDiagram(doc: unknown): ParsedDiagram | null {
 }
 
 // ─── Theme extraction ────────────────────────────────────────────────────
+const EMPTY_THEME: ParsedTheme = { accents: [] };
+
 async function extractTheme(zip: JSZip, parser: XMLParser): Promise<ParsedTheme> {
   const themeFile = Object.keys(zip.files).find((f) => /^ppt\/theme\/theme\d+\.xml$/.test(f));
-  if (!themeFile) return {};
+  if (!themeFile) return { ...EMPTY_THEME };
   try {
     const xml = await zip.files[themeFile].async("string");
     const doc = parser.parse(xml);
@@ -638,17 +640,28 @@ async function extractTheme(zip: JSZip, parser: XMLParser): Promise<ParsedTheme>
     const scheme = (doc as any)?.["a:theme"]?.["a:themeElements"]?.["a:clrScheme"];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const fontScheme = (doc as any)?.["a:theme"]?.["a:themeElements"]?.["a:fontScheme"];
+    const accents = [
+      readSchemeColor(scheme?.["a:accent1"]),
+      readSchemeColor(scheme?.["a:accent2"]),
+      readSchemeColor(scheme?.["a:accent3"]),
+      readSchemeColor(scheme?.["a:accent4"]),
+      readSchemeColor(scheme?.["a:accent5"]),
+      readSchemeColor(scheme?.["a:accent6"]),
+    ].filter((c): c is string => Boolean(c));
     return {
-      accent1: readSchemeColor(scheme?.["a:accent1"]),
-      accent2: readSchemeColor(scheme?.["a:accent2"]),
+      accents,
+      accent1: accents[0],
+      accent2: accents[1],
       dark1: readSchemeColor(scheme?.["a:dk1"]) ?? readSchemeColor(scheme?.["a:dk2"]),
+      light1: readSchemeColor(scheme?.["a:lt1"]) ?? readSchemeColor(scheme?.["a:lt2"]),
       headingFont: fontScheme?.["a:majorFont"]?.["a:latin"]?.["@_typeface"],
       bodyFont: fontScheme?.["a:minorFont"]?.["a:latin"]?.["@_typeface"],
     };
   } catch {
-    return {};
+    return { ...EMPTY_THEME };
   }
 }
+
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function readSchemeColor(node: any): string | undefined {
