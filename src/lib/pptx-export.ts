@@ -935,7 +935,7 @@ function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette,
     case "MV-DEC-MATRIX": renderDecMatrix(s, c, p); return true;
     case "MV-DEC-COMPARE-TABLE": renderDecCompareTable(s, c, p); return true;
     case "MV-DEC-CHECKLIST": renderDecChecklist(s, c, p); return true;
-    case "MV-PROOF-LOGOS": renderProofLogos(s, c, p); return true;
+    case "MV-PROOF-LOGOS": renderProofLogos(s, c, p, itemLogos); return true;
     case "MV-PROOF-TESTIMONIAL": renderProofTestimonial(s, c, p); return true;
     case "MV-RISK-MITIGATION": renderRiskMitigation(s, c, p); return true;
     case "MV-TEAM-BIOS-3": renderTeamBios(s, c, p, 3); return true;
