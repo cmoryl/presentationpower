@@ -1148,6 +1148,7 @@ function LogoGridItemsPanel({
           const name = typeof it.name === "string" ? it.name : typeof it.client === "string" ? (it.client as string) : "";
           const logoUrl = typeof it.logoUrl === "string" ? it.logoUrl : "";
           const variants = (it.logoVariants && typeof it.logoVariants === "object" ? it.logoVariants : {}) as Record<string, string | null | undefined>;
+          const variantPaths = (it.logoPaths && typeof it.logoPaths === "object" ? it.logoPaths : {}) as Record<string, string | null | undefined>;
           const activeVariant = typeof it.logoVariant === "string" ? it.logoVariant : "primary";
           const VARIANTS: Array<{ key: string; label: string }> = [
             { key: "primary", label: "P" },
