@@ -31,7 +31,6 @@ import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
 import { Route as KnowledgeAskRouteImport } from './routes/knowledge.ask'
 import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
-import { Route as DecksDeckIdRouteImport } from './routes/decks.$deckId'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
@@ -50,6 +49,7 @@ import { Route as AdminApprovalsRouteImport } from './routes/admin.approvals'
 import { Route as AdminAiRouteImport } from './routes/admin.ai'
 import { Route as AdminAbRouteImport } from './routes/admin.ab'
 import { Route as KnowledgeBrandGuidesIndexRouteImport } from './routes/knowledge.brand-guides.index'
+import { Route as DecksDeckIdIndexRouteImport } from './routes/decks.$deckId.index'
 import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
 import { Route as DecksDeckIdPrintRouteImport } from './routes/decks.$deckId.print'
 import { Route as DecksDeckIdPresentRouteImport } from './routes/decks.$deckId.present'
@@ -168,11 +168,6 @@ const DecksImportRoute = DecksImportRouteImport.update({
   path: '/decks/import',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DecksDeckIdRoute = DecksDeckIdRouteImport.update({
-  id: '/decks/$deckId',
-  path: '/decks/$deckId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const BriefNewRoute = BriefNewRouteImport.update({
   id: '/brief/new',
   path: '/brief/new',
@@ -264,6 +259,11 @@ const KnowledgeBrandGuidesIndexRoute =
     path: '/brand-guides/',
     getParentRoute: () => KnowledgeRoute,
   } as any)
+const DecksDeckIdIndexRoute = DecksDeckIdIndexRouteImport.update({
+  id: '/decks/$deckId/',
+  path: '/decks/$deckId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KnowledgeBrandGuidesSlugRoute =
   KnowledgeBrandGuidesSlugRouteImport.update({
     id: '/brand-guides/$slug',
@@ -271,24 +271,24 @@ const KnowledgeBrandGuidesSlugRoute =
     getParentRoute: () => KnowledgeRoute,
   } as any)
 const DecksDeckIdPrintRoute = DecksDeckIdPrintRouteImport.update({
-  id: '/print',
-  path: '/print',
-  getParentRoute: () => DecksDeckIdRoute,
+  id: '/decks/$deckId/print',
+  path: '/decks/$deckId/print',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DecksDeckIdPresentRoute = DecksDeckIdPresentRouteImport.update({
-  id: '/present',
-  path: '/present',
-  getParentRoute: () => DecksDeckIdRoute,
+  id: '/decks/$deckId/present',
+  path: '/decks/$deckId/present',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DecksDeckIdExportRoute = DecksDeckIdExportRouteImport.update({
-  id: '/export',
-  path: '/export',
-  getParentRoute: () => DecksDeckIdRoute,
+  id: '/decks/$deckId/export',
+  path: '/decks/$deckId/export',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DecksDeckIdDocumentRoute = DecksDeckIdDocumentRouteImport.update({
-  id: '/document',
-  path: '/document',
-  getParentRoute: () => DecksDeckIdRoute,
+  id: '/decks/$deckId/document',
+  path: '/decks/$deckId/document',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicPdfIndexProxyRoute = ApiPublicPdfIndexProxyRouteImport.update({
   id: '/api/public/pdf-index-proxy',
@@ -333,7 +333,6 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
-  '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
   '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
@@ -350,6 +349,7 @@ export interface FileRoutesByFullPath {
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
   '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
+  '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -381,7 +381,6 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
-  '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
   '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
@@ -398,6 +397,7 @@ export interface FileRoutesByTo {
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
   '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
+  '/decks/$deckId': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
 }
 export interface FileRoutesById {
@@ -432,7 +432,6 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
-  '/decks/$deckId': typeof DecksDeckIdRouteWithChildren
   '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
@@ -449,6 +448,7 @@ export interface FileRoutesById {
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
   '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
+  '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
 }
 export interface FileRouteTypes {
@@ -484,7 +484,6 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/api/chat'
     | '/brief/new'
-    | '/decks/$deckId'
     | '/decks/import'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
@@ -501,6 +500,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/present'
     | '/decks/$deckId/print'
     | '/knowledge/brand-guides/$slug'
+    | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -532,7 +532,6 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/api/chat'
     | '/brief/new'
-    | '/decks/$deckId'
     | '/decks/import'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
@@ -549,6 +548,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/present'
     | '/decks/$deckId/print'
     | '/knowledge/brand-guides/$slug'
+    | '/decks/$deckId'
     | '/knowledge/brand-guides'
   id:
     | '__root__'
@@ -582,7 +582,6 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/api/chat'
     | '/brief/new'
-    | '/decks/$deckId'
     | '/decks/import'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
@@ -599,6 +598,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/present'
     | '/decks/$deckId/print'
     | '/knowledge/brand-guides/$slug'
+    | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
   fileRoutesById: FileRoutesById
 }
@@ -618,12 +618,16 @@ export interface RootRouteChildren {
   TemplatesRoute: typeof TemplatesRoute
   ApiChatRoute: typeof ApiChatRoute
   BriefNewRoute: typeof BriefNewRoute
-  DecksDeckIdRoute: typeof DecksDeckIdRouteWithChildren
   DecksImportRoute: typeof DecksImportRoute
   ShareTokenRoute: typeof ShareTokenRoute
   DecksIndexRoute: typeof DecksIndexRoute
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
   ApiPublicPdfIndexProxyRoute: typeof ApiPublicPdfIndexProxyRoute
+  DecksDeckIdDocumentRoute: typeof DecksDeckIdDocumentRoute
+  DecksDeckIdExportRoute: typeof DecksDeckIdExportRoute
+  DecksDeckIdPresentRoute: typeof DecksDeckIdPresentRoute
+  DecksDeckIdPrintRoute: typeof DecksDeckIdPrintRoute
+  DecksDeckIdIndexRoute: typeof DecksDeckIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -782,13 +786,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DecksImportRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/decks/$deckId': {
-      id: '/decks/$deckId'
-      path: '/decks/$deckId'
-      fullPath: '/decks/$deckId'
-      preLoaderRoute: typeof DecksDeckIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/brief/new': {
       id: '/brief/new'
       path: '/brief/new'
@@ -915,6 +912,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeBrandGuidesIndexRouteImport
       parentRoute: typeof KnowledgeRoute
     }
+    '/decks/$deckId/': {
+      id: '/decks/$deckId/'
+      path: '/decks/$deckId'
+      fullPath: '/decks/$deckId/'
+      preLoaderRoute: typeof DecksDeckIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/knowledge/brand-guides/$slug': {
       id: '/knowledge/brand-guides/$slug'
       path: '/brand-guides/$slug'
@@ -924,31 +928,31 @@ declare module '@tanstack/react-router' {
     }
     '/decks/$deckId/print': {
       id: '/decks/$deckId/print'
-      path: '/print'
+      path: '/decks/$deckId/print'
       fullPath: '/decks/$deckId/print'
       preLoaderRoute: typeof DecksDeckIdPrintRouteImport
-      parentRoute: typeof DecksDeckIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/decks/$deckId/present': {
       id: '/decks/$deckId/present'
-      path: '/present'
+      path: '/decks/$deckId/present'
       fullPath: '/decks/$deckId/present'
       preLoaderRoute: typeof DecksDeckIdPresentRouteImport
-      parentRoute: typeof DecksDeckIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/decks/$deckId/export': {
       id: '/decks/$deckId/export'
-      path: '/export'
+      path: '/decks/$deckId/export'
       fullPath: '/decks/$deckId/export'
       preLoaderRoute: typeof DecksDeckIdExportRouteImport
-      parentRoute: typeof DecksDeckIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/decks/$deckId/document': {
       id: '/decks/$deckId/document'
-      path: '/document'
+      path: '/decks/$deckId/document'
       fullPath: '/decks/$deckId/document'
       preLoaderRoute: typeof DecksDeckIdDocumentRouteImport
-      parentRoute: typeof DecksDeckIdRoute
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/pdf-index-proxy': {
       id: '/api/public/pdf-index-proxy'
@@ -1031,24 +1035,6 @@ const KnowledgeRouteWithChildren = KnowledgeRoute._addFileChildren(
   KnowledgeRouteChildren,
 )
 
-interface DecksDeckIdRouteChildren {
-  DecksDeckIdDocumentRoute: typeof DecksDeckIdDocumentRoute
-  DecksDeckIdExportRoute: typeof DecksDeckIdExportRoute
-  DecksDeckIdPresentRoute: typeof DecksDeckIdPresentRoute
-  DecksDeckIdPrintRoute: typeof DecksDeckIdPrintRoute
-}
-
-const DecksDeckIdRouteChildren: DecksDeckIdRouteChildren = {
-  DecksDeckIdDocumentRoute: DecksDeckIdDocumentRoute,
-  DecksDeckIdExportRoute: DecksDeckIdExportRoute,
-  DecksDeckIdPresentRoute: DecksDeckIdPresentRoute,
-  DecksDeckIdPrintRoute: DecksDeckIdPrintRoute,
-}
-
-const DecksDeckIdRouteWithChildren = DecksDeckIdRoute._addFileChildren(
-  DecksDeckIdRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -1065,12 +1051,16 @@ const rootRouteChildren: RootRouteChildren = {
   TemplatesRoute: TemplatesRoute,
   ApiChatRoute: ApiChatRoute,
   BriefNewRoute: BriefNewRoute,
-  DecksDeckIdRoute: DecksDeckIdRouteWithChildren,
   DecksImportRoute: DecksImportRoute,
   ShareTokenRoute: ShareTokenRoute,
   DecksIndexRoute: DecksIndexRoute,
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
   ApiPublicPdfIndexProxyRoute: ApiPublicPdfIndexProxyRoute,
+  DecksDeckIdDocumentRoute: DecksDeckIdDocumentRoute,
+  DecksDeckIdExportRoute: DecksDeckIdExportRoute,
+  DecksDeckIdPresentRoute: DecksDeckIdPresentRoute,
+  DecksDeckIdPrintRoute: DecksDeckIdPrintRoute,
+  DecksDeckIdIndexRoute: DecksDeckIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
