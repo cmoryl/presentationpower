@@ -268,11 +268,22 @@ export function VariantRenderer(props: Props) {
     <SlideModeContext.Provider value={mode}>
       <SlideBackdropContext.Provider value={backdrop}>
         <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany, logoOrientation: slide.logoOrientation && slide.logoOrientation !== "auto" ? slide.logoOrientation : logoOrientation, logoPosition: slide.logoPosition && slide.logoPosition !== "auto" ? slide.logoPosition : undefined }}>
-          {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c })}
+          {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c, mode })}
         </SlideFrameCtx.Provider>
       </SlideBackdropContext.Provider>
     </SlideModeContext.Provider>
   );
+}
+
+// Given an item that may carry both `logoUrl` (light/color) and
+// `logoUrlDark` (white), plus a storage `logoPath`, return the URL that
+// matches the current slide mode. Falls back gracefully to whichever URL
+// is present.
+function pickLogoForMode(it: Record<string, unknown>, mode: SlideMode): string {
+  const light = s(it.logoUrl ?? it.logo ?? it.primaryUrl);
+  const dark = s(it.logoUrlDark ?? it.logoWhite);
+  if (mode === "dark") return dark || light;
+  return light || dark;
 }
 
 
@@ -282,12 +293,14 @@ function renderVariantBody({
   brand,
   pageNumber,
   c,
+  mode,
 }: {
   slide: DeckSlide;
   variant: ModuleVariant;
   brand: BrandMode;
   pageNumber: number;
   c: Record<string, unknown>;
+  mode: SlideMode;
 }): ReactNode {
 
   switch (variant.id) {
