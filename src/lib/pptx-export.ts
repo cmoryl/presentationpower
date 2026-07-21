@@ -50,6 +50,10 @@ function resolveSlideImageUrl(
   // during export even if `mediaUrl` / `mediaSeed` accidentally leaked
   // through from an older deck record.
   if (!variantSupportsImagery(variantId)) return null;
+  // If the slide has a video, prefer its poster as the static image for
+  // PPTX/PDF fallback — the video itself is linked in speaker notes below.
+  const poster = typeof c.videoPosterUrl === "string" && c.videoPosterUrl.length > 0 ? c.videoPosterUrl : null;
+  if (poster) return poster;
   const url = typeof c.mediaUrl === "string" && c.mediaUrl.length > 0 ? c.mediaUrl : null;
   if (url) return url;
   const seed = typeof c.mediaSeed === "string" && c.mediaSeed.length > 0 ? c.mediaSeed : null;
