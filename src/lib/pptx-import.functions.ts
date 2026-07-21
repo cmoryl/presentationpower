@@ -251,8 +251,16 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     const tables = extractTables(doc);
 
     // ── SmartArt diagrams ───────────────────────────────────────────────
+    // Each SmartArt on the slide is expressed as a diagramData rel (the
+    // text/hierarchy tree) plus a diagramLayout rel (the layout definition
+    // whose `uniqueId` tells us if it's a process/cycle/hierarchy/etc.).
+    // We pair them positionally — a slide rarely has more than one — and
+    // read the layout's `uniqueId` to derive a `layoutHint`.
     const diagrams: ParsedDiagram[] = [];
-    for (const target of Object.values(relTargetsByType.diagramData)) {
+    const layoutTargets = Object.values(relTargetsByType.diagramLayout);
+    const dataTargets = Object.values(relTargetsByType.diagramData);
+    for (let di = 0; di < dataTargets.length; di++) {
+      const target = dataTargets[di];
       const resolved = resolveRelPath(slidePath, target);
       const entry = zip.files[resolved];
       if (!entry) continue;
@@ -260,7 +268,24 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         const dxml = await entry.async("string");
         const ddoc = parser.parse(dxml);
         const nodes = extractDiagramNodes(ddoc, theme);
-        if (nodes.length > 0) diagrams.push({ kind: "smartart", nodes });
+        if (nodes.length === 0) continue;
+        // Resolve paired layout file (if any) and read uniqueId.
+        let layoutHint: DiagramLayoutHint | undefined;
+        const layoutTarget = layoutTargets[di];
+        if (layoutTarget) {
+          const layoutPath = resolveRelPath(slidePath, layoutTarget);
+          const layoutEntry = zip.files[layoutPath];
+          if (layoutEntry) {
+            try {
+              const lxml = await layoutEntry.async("string");
+              const ldoc = parser.parse(lxml);
+              layoutHint = readSmartArtLayoutHint(ldoc);
+            } catch { /* ignore malformed layout */ }
+          }
+        }
+        // Fall back to inferring from node hierarchy if no layout hint.
+        if (!layoutHint && nodes.some((n) => n.level > 0)) layoutHint = "hierarchy";
+        diagrams.push({ kind: "smartart", nodes, layoutHint });
       } catch { /* skip */ }
     }
     // Grouped custom shapes → lightweight diagram fallback (only when there
