@@ -64,6 +64,7 @@ function DeckEditor() {
   const moveSlide = useDeckStore((s) => s.moveSlide);
   const removeSlide = useDeckStore((s) => s.removeSlide);
   const addSlide = useDeckStore((s) => s.addSlide);
+  const insertExampleSlide = useDeckStore((s) => s.insertExampleSlide);
   const duplicateSlide = useDeckStore((s) => s.duplicateSlide);
   const revertAiChange = useDeckStore((s) => s.revertAiChange);
   const updateSlideNotes = useDeckStore((s) => s.updateSlideNotes);
