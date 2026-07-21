@@ -1757,7 +1757,7 @@ export const useDeckStore = create<DeckState>()(
         // Meta fields (imagery override, background, slide-level media seed)
         // are always editable — they're driven by dedicated panels, not the
         // variant's authored field list.
-        const META_FIELDS = new Set(["mediaUrl", "mediaSeed", "background"]);
+        const META_FIELDS = new Set(["mediaUrl", "mediaSeed", "background", "videoUrl", "videoPosterUrl"]);
         const editable = META_FIELDS.has(field) || variant.editableFields.some((f) => matchesField(f, field));
         if (!editable) return;
         const nextContent = setPath({ ...slide.content }, field, value);
