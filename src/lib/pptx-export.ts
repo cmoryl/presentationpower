@@ -1281,7 +1281,7 @@ function renderJourneyMap(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
 }
 
 // 8. MV-LOGO-WALL
-function renderLogoWall(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+function renderLogoWall(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette, itemLogos: Array<string | null> = []) {
   const y0 = drawTitle(s, c, p);
   const items = arr(c.items).slice(0, 12);
   if (!items.length) return;
@@ -1296,11 +1296,22 @@ function renderLogoWall(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
     const x = 0.6 + col * colW;
     const y = y0 + r * rowH;
     s.addShape("rect", { x, y, w: colW - 0.1, h: rowH - 0.1, fill: { color: "FFFFFF" }, line: { color: LIGHT_GRAY, width: 0.5 } });
-    s.addText(initials(str(it.name)), {
-      x, y: y + 0.15, w: colW - 0.1, h: rowH * 0.55,
-      fontSize: 32, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle",
-    });
-    s.addText(str(it.name).toUpperCase(), {
+    const logoData = itemLogos[k];
+    const name = str(it.name);
+    if (logoData) {
+      // Real client wordmark, contained inside the top portion of the tile.
+      s.addImage({
+        data: logoData,
+        x: x + 0.2, y: y + 0.15, w: colW - 0.5, h: rowH * 0.55,
+        sizing: { type: "contain", w: colW - 0.5, h: rowH * 0.55 },
+      });
+    } else {
+      s.addText(initials(name), {
+        x, y: y + 0.15, w: colW - 0.1, h: rowH * 0.55,
+        fontSize: 32, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle",
+      });
+    }
+    s.addText(name.toUpperCase(), {
       x, y: y + rowH - 0.55, w: colW - 0.1, h: 0.4,
       fontSize: 10, color: p.ink, fontFace: "Inter", align: "center", charSpacing: 3,
     });
