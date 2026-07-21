@@ -1115,7 +1115,7 @@ function LogoGridItemsPanel({
                 </div>
                 <input
                   value={name}
-                  onChange={(e) => update(i, { name: e.target.value })}
+                  onChange={(e) => update(i, { [nameField]: e.target.value })}
                   placeholder="Client name"
                   className="min-w-0 flex-1 rounded-md border border-black/10 bg-white px-2 py-1 text-sm"
                 />
