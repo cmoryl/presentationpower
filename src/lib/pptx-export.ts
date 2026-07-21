@@ -142,8 +142,8 @@ type Palette = { primary: string; accent: string; surface: string; ink: string }
 export async function exportDeckToPptx(
   deck: Deck,
   brand: BrandMode,
-  opts?: { strategy?: DeckStrategySnapshot | null },
-) {
+  opts?: { strategy?: DeckStrategySnapshot | null; output?: "download" | "blob" },
+): Promise<Blob | void> {
   const pptx = new PptxGenJS();
   pptx.layout = "LAYOUT_WIDE";
   pptx.title = deck.title;
