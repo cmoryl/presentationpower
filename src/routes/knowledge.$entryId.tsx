@@ -45,7 +45,7 @@ function EntryView() {
     if (!e) return;
     setTitle(e.title);
     setBody(e.body);
-    setKind(e.kind);
+    setKind(e.kind === "source_deck" || e.kind === "source_pdf" ? "note" : e.kind);
     setTags(e.tags.join(", "));
     setSources(e.sources.join("\n"));
     setVisibility(e.visibility);
