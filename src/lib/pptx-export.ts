@@ -312,9 +312,10 @@ export async function exportDeckToPptx(
 
     // Per-slide logo placement — mirrors SlideChrome's contract:
     //  · position honors per-slide override → layout default → chrome default
-    //  · orientation honors per-slide override → deck default
-    //  · top/bottom-center + left-side positions render at half size so the
-    //    mark stays a quiet signature (matches the editor)
+    //  · orientation honors per-slide override → deck default; per-slide
+    //    orientation may extend to vertical-left / vertical-right (rotated
+    //    lockup along the corresponding edge) and mark-only (monogram tile).
+    //  · top/bottom-center + left-side positions render at half size
     //  · logo is added AFTER content so it renders as the top-most layer
     const chrome: ChromeVariant =
       kind === "cover" ? "cover"
@@ -328,51 +329,96 @@ export async function exportDeckToPptx(
     const perSlideOrient = slide.logoOrientation && slide.logoOrientation !== "auto"
       ? slide.logoOrientation
       : deckLogoOrientation;
-    const orient: "horizontal" | "stacked" = perSlideOrient === "stacked" ? "stacked" : "horizontal";
-    const logoData = orient === "stacked"
+    const orient: "horizontal" | "stacked" | "vertical-left" | "vertical-right" | "mark-only" = perSlideOrient;
+    const isVertical = orient === "vertical-left" || orient === "vertical-right";
+    const isMarkOnly = orient === "mark-only";
+    // Vertical orientations reuse the horizontal artwork and get rotated.
+    const sourceOrient: "horizontal" | "stacked" = orient === "stacked" ? "stacked" : "horizontal";
+    const logoData = sourceOrient === "stacked"
       ? (useWhiteLogo ? (logoStackedWhite ?? logoWhite) : (logoStackedColor ?? logoColor))
       : (useWhiteLogo ? logoWhite : logoColor);
 
-    if (logoData && placement.position !== "hidden") {
+    if (placement.position !== "hidden") {
       const isHalf =
         placement.position === "top-center" ||
         placement.position === "bottom-center" ||
         placement.position === "top-left" ||
         placement.position === "bottom-left";
-      // Base size mirrors the editor's per-chrome sizing: cover uses the hero
-      // lockup (xl), close/divider use mid (md), content stays quiet (sm).
-      // Half-size positions drop one size band.
       const base: "sm" | "md" | "xl" = chrome === "content" ? "sm" : chrome === "cover" ? "xl" : "md";
-      const dims = (() => {
-        // Widths in inches; heights preserve the aspect ratio for the two
-        // orientations (~3.4:1 horizontal, ~1.4:1 stacked).
-        const table: Record<string, number> = { sm: 1.4, md: 1.9, xl: 2.8 };
-        const shrunk: Record<string, string> = { xl: "sm", md: "sm", sm: "sm" };
-        const key = isHalf ? shrunk[base] : base;
-        const w = table[key] ?? 1.4;
-        const h = orient === "stacked" ? w / 1.4 : w / 3.4;
-        return { w, h };
-      })();
+      const wTable: Record<string, number> = { sm: 1.4, md: 1.9, xl: 2.8 };
+      const shrunk: Record<string, string> = { xl: "sm", md: "sm", sm: "sm" };
+      const sizeKey = isHalf ? shrunk[base] : base;
       const inset = 0.45;
-      const pos = (() => {
-        switch (placement.position) {
-          case "top-left":      return { x: inset, y: inset };
-          case "top-right":     return { x: SLIDE_W - inset - dims.w, y: inset };
-          case "top-center":    return { x: (SLIDE_W - dims.w) / 2, y: inset };
-          case "bottom-left":   return { x: inset, y: SLIDE_H - inset - dims.h };
-          case "bottom-right":  return { x: SLIDE_W - inset - dims.w, y: SLIDE_H - inset - dims.h };
-          case "bottom-center": return { x: (SLIDE_W - dims.w) / 2, y: SLIDE_H - inset - dims.h };
-          default:              return { x: inset, y: inset };
-        }
-      })();
-      s.addImage({
-        data: logoData,
-        x: pos.x,
-        y: pos.y,
-        w: dims.w,
-        h: dims.h,
-        sizing: { type: "contain", w: dims.w, h: dims.h },
-      });
+
+      if (isMarkOnly) {
+        // Render a rounded-square monogram tile so mark-only works for any
+        // brand, since ship-in artwork always bundles the wordmark.
+        const tile = isHalf ? 0.42 : 0.6;
+        const pos = (() => {
+          switch (placement.position) {
+            case "top-left":      return { x: inset, y: inset };
+            case "top-right":     return { x: SLIDE_W - inset - tile, y: inset };
+            case "top-center":    return { x: (SLIDE_W - tile) / 2, y: inset };
+            case "bottom-left":   return { x: inset, y: SLIDE_H - inset - tile };
+            case "bottom-right":  return { x: SLIDE_W - inset - tile, y: SLIDE_H - inset - tile };
+            case "bottom-center": return { x: (SLIDE_W - tile) / 2, y: SLIDE_H - inset - tile };
+            default:              return { x: inset, y: inset };
+          }
+        })();
+        const strokeColor = useWhiteLogo ? "FFFFFF" : palette.primary;
+        s.addShape("roundRect", {
+          x: pos.x, y: pos.y, w: tile, h: tile,
+          fill: { color: "FFFFFF", transparency: 100 },
+          line: { color: strokeColor, width: 1.75 },
+          rectRadius: 0.08,
+        });
+        const markChar = brand.logo?.mark ?? brand.name.slice(0, 1).toUpperCase();
+        s.addText(markChar, {
+          x: pos.x, y: pos.y, w: tile, h: tile,
+          align: "center", valign: "middle",
+          fontSize: Math.round(tile * 30),
+          bold: true, color: strokeColor, fontFace: "Inter",
+        });
+      } else if (isVertical && logoData) {
+        // Rotated lockup along the corresponding edge. pptxgenjs rotates
+        // the image around its center; we compute the un-rotated bounding
+        // box so the post-rotation rect matches a tall narrow band.
+        const targetW = wTable[sizeKey] ?? 1.4;   // pre-rotation width (becomes rotated height)
+        const targetH = targetW / 3.4;             // pre-rotation height (becomes rotated width)
+        const onLeft = orient === "vertical-left";
+        // Rotated visible width = targetH; visible height = targetW.
+        const visibleW = targetH;
+        const cx = onLeft ? inset + visibleW / 2 : SLIDE_W - inset - visibleW / 2;
+        const cy = SLIDE_H / 2;
+        s.addImage({
+          data: logoData,
+          x: cx - targetW / 2,
+          y: cy - targetH / 2,
+          w: targetW,
+          h: targetH,
+          rotate: onLeft ? -90 : 90,
+          sizing: { type: "contain", w: targetW, h: targetH },
+        });
+      } else if (logoData) {
+        const w = wTable[sizeKey] ?? 1.4;
+        const h = sourceOrient === "stacked" ? w / 1.4 : w / 3.4;
+        const pos = (() => {
+          switch (placement.position) {
+            case "top-left":      return { x: inset, y: inset };
+            case "top-right":     return { x: SLIDE_W - inset - w, y: inset };
+            case "top-center":    return { x: (SLIDE_W - w) / 2, y: inset };
+            case "bottom-left":   return { x: inset, y: SLIDE_H - inset - h };
+            case "bottom-right":  return { x: SLIDE_W - inset - w, y: SLIDE_H - inset - h };
+            case "bottom-center": return { x: (SLIDE_W - w) / 2, y: SLIDE_H - inset - h };
+            default:              return { x: inset, y: inset };
+          }
+        })();
+        s.addImage({
+          data: logoData,
+          x: pos.x, y: pos.y, w, h,
+          sizing: { type: "contain", w, h },
+        });
+      }
     }
 
     if (!hideFooter) {

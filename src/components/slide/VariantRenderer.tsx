@@ -11,9 +11,9 @@ import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, St
 // etc.) automatically pick up the current slide's clientName + layoutId when
 // they wrap themselves in <SlideFrame>. VariantRenderer sets the value once
 // per render.
-import type { LogoPosition } from "@/lib/logo-placement";
+import type { LogoPosition, LogoOrientation } from "@/lib/logo-placement";
 
-const SlideFrameCtx = createContext<{ clientName?: string; layoutId?: string; clientLogoUrl?: string | null; subCompany?: string; logoOrientation?: "horizontal" | "stacked"; logoPosition?: LogoPosition }>({});
+const SlideFrameCtx = createContext<{ clientName?: string; layoutId?: string; clientLogoUrl?: string | null; subCompany?: string; logoOrientation?: LogoOrientation; logoPosition?: LogoPosition }>({});
 
 function SlideFrame(props: ComponentProps<typeof BaseSlideFrame>) {
   const ctx = useContext(SlideFrameCtx);
@@ -200,7 +200,7 @@ type Props = {
   clientLogoUrl?: string | null;
   subCompany?: string;
   mode?: SlideMode;
-  logoOrientation?: "horizontal" | "stacked";
+  logoOrientation?: LogoOrientation;
 };
 
 type Item = Record<string, unknown>;

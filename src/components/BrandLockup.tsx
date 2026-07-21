@@ -1,4 +1,5 @@
 import type { BrandMode } from "@/lib/taxonomy";
+import type { CSSProperties } from "react";
 import { getDivisionLogos } from "@/lib/division-logos";
 
 // Inline SVG of the approved TransPerfect horizontal wordmark. Paths inherit
@@ -54,10 +55,10 @@ export function BrandLockup({
   size?: "2xs" | "xs" | "sm" | "md" | "lg" | "xl";
   showMark?: boolean;
   showDivision?: boolean;
-  clientName?: string; // Substituted into division line when it contains {client}
-  clientLogoUrl?: string | null; // When set, co-brand with the client's logo
-  subCompany?: string; // Overrides the division line for TransPerfect sub-company mode
-  orientation?: "horizontal" | "stacked"; // Layout of wordmark/mark
+  clientName?: string;
+  clientLogoUrl?: string | null;
+  subCompany?: string;
+  orientation?: "horizontal" | "stacked" | "vertical-left" | "vertical-right" | "mark-only";
 }) {
   const dims =
     size === "2xs"
@@ -74,10 +75,38 @@ export function BrandLockup({
   const logo = brand.logo ?? { mark: brand.name.slice(0, 2).toUpperCase(), wordmark: brand.name };
   const divisionLine = (subCompany ?? logo.divisionLine)?.replace("{client}", clientName ?? "Client");
 
-  // Prefer an official PNG logo when we have one for this brand id. On dark
-  // chrome (color === white) use the white variant; otherwise the color one.
-  // In stacked orientation, prefer the stacked artwork; horizontal falls back
-  // to stacked only when no horizontal file exists.
+  const isVertical = orientation === "vertical-left" || orientation === "vertical-right";
+  const isMarkOnly = orientation === "mark-only";
+  // The rotated variants reuse the horizontal artwork; the container applies
+  // the rotation transform. Mark-only hides the wordmark + division line.
+  const innerOrientation: "horizontal" | "stacked" = orientation === "stacked" ? "stacked" : "horizontal";
+
+  // Mark-only mode: render just the letter tile. When a brand ships an
+  // official image, we still fall back to the letter tile because the shipped
+  // artwork always includes the wordmark. Bump the tile size for presence.
+  if (isMarkOnly) {
+    const tilePx = Math.round(dims.markPx * 1.15);
+    return (
+      <div className="inline-flex" style={{ color }} role="img" aria-label={`${logo.wordmark} mark`}>
+        <div
+          className="flex items-center justify-center font-semibold tracking-tight"
+          style={{
+            width: tilePx,
+            height: tilePx,
+            border: `1.75px solid ${color}`,
+            borderRadius: dims.radiusPx,
+            fontSize: tilePx * 0.44,
+            letterSpacing: "-0.02em",
+          }}
+          aria-hidden
+        >
+          {logo.mark}
+        </div>
+      </div>
+    );
+  }
+
+  // Prefer an official PNG logo when we have one for this brand id.
   const isDarkChrome = /^#?fff(fff)?$/i.test(color) || color.toLowerCase() === "white";
   const divisionLogos = getDivisionLogos(brand.id);
   const stackedUrl = divisionLogos
@@ -87,85 +116,95 @@ export function BrandLockup({
     ? (isDarkChrome ? (divisionLogos.white ?? divisionLogos.color) : (divisionLogos.color ?? divisionLogos.white))
     : undefined;
   const officialLogoUrl =
-    orientation === "stacked"
+    innerOrientation === "stacked"
       ? (stackedUrl ?? horizontalUrl)
       : (horizontalUrl ?? stackedUrl);
   const useOfficialImage = !!officialLogoUrl;
   const useOfficialWordmark = !useOfficialImage && TP_BRANDS.has(logo.wordmark);
   const wordmarkHeight = dims.wordmarkPx;
-  // PNG lockups need more vertical presence than the raw wordmark height.
-  // Stacked artwork is squarer, so give it more room.
-  const officialImageHeight = Math.round(dims.wordmarkPx * (orientation === "stacked" ? 3.2 : 1.9));
+  const officialImageHeight = Math.round(dims.wordmarkPx * (innerOrientation === "stacked" ? 3.2 : 1.9));
 
+  const wrapperStyle: React.CSSProperties = isVertical
+    ? {
+        // Rotate around the container's center; parent positions the anchor.
+        transform: orientation === "vertical-left" ? "rotate(-90deg)" : "rotate(90deg)",
+        transformOrigin: "center center",
+        display: "inline-flex",
+        whiteSpace: "nowrap",
+      }
+    : {};
 
   return (
-    <div
-      className={"flex min-w-0 max-w-full " + (orientation === "stacked" ? "flex-col items-start" : "items-center")}
-      style={{ gap: dims.gapPx, color }}
-      role="img"
-      aria-label={`${logo.wordmark}${divisionLine ? " — " + divisionLine : ""}${clientLogoUrl ? " × client" : ""} lockup`}
-    >
-      {showMark && !useOfficialWordmark && !useOfficialImage && (
-        <div
-          className="flex items-center justify-center font-semibold tracking-tight"
-          style={{
-            width: dims.markPx,
-            height: dims.markPx,
-            border: `1.5px solid ${color}`,
-            borderRadius: dims.radiusPx,
-            fontSize: dims.markPx * 0.42,
-            letterSpacing: "-0.02em",
-          }}
-          aria-hidden
-        >
-          {logo.mark}
-        </div>
-      )}
-      <div className="flex min-w-0 max-w-full flex-col leading-none">
-        {useOfficialImage ? (
-          <img
-            src={officialLogoUrl}
-            alt={`${logo.wordmark} logo`}
-            style={{ height: officialImageHeight, width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }}
-          />
-        ) : useOfficialWordmark ? (
-          <TransPerfectWordmark height={wordmarkHeight} />
-        ) : (
-          <div className="min-w-0 max-w-full break-words font-semibold tracking-wide" style={{ fontSize: dims.wordPx, letterSpacing: "0.02em" }}>
-            {logo.wordmark.toUpperCase()}
+    <div style={wrapperStyle}>
+      <div
+        className={"flex min-w-0 max-w-full " + (innerOrientation === "stacked" ? "flex-col items-start" : "items-center")}
+        style={{ gap: dims.gapPx, color }}
+        role="img"
+        aria-label={`${logo.wordmark}${divisionLine ? " — " + divisionLine : ""}${clientLogoUrl ? " × client" : ""} lockup`}
+      >
+        {showMark && !useOfficialWordmark && !useOfficialImage && (
+          <div
+            className="flex items-center justify-center font-semibold tracking-tight"
+            style={{
+              width: dims.markPx,
+              height: dims.markPx,
+              border: `1.5px solid ${color}`,
+              borderRadius: dims.radiusPx,
+              fontSize: dims.markPx * 0.42,
+              letterSpacing: "-0.02em",
+            }}
+            aria-hidden
+          >
+            {logo.mark}
           </div>
         )}
-        {showDivision && divisionLine && (
-          <div
-            className="max-w-full uppercase leading-tight tracking-[0.14em] opacity-70 [overflow-wrap:anywhere]"
-            style={{ fontSize: dims.dividerPx, marginTop: useOfficialWordmark || useOfficialImage ? 6 : 4 }}
-          >
-            {divisionLine}
-          </div>
+        <div className="flex min-w-0 max-w-full flex-col leading-none">
+          {useOfficialImage ? (
+            <img
+              src={officialLogoUrl}
+              alt={`${logo.wordmark} logo`}
+              style={{ height: officialImageHeight, width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }}
+            />
+          ) : useOfficialWordmark ? (
+            <TransPerfectWordmark height={wordmarkHeight} />
+          ) : (
+            <div className="min-w-0 max-w-full break-words font-semibold tracking-wide" style={{ fontSize: dims.wordPx, letterSpacing: "0.02em" }}>
+              {logo.wordmark.toUpperCase()}
+            </div>
+          )}
+          {showDivision && divisionLine && (
+            <div
+              className="max-w-full uppercase leading-tight tracking-[0.14em] opacity-70 [overflow-wrap:anywhere]"
+              style={{ fontSize: dims.dividerPx, marginTop: useOfficialWordmark || useOfficialImage ? 6 : 4 }}
+            >
+              {divisionLine}
+            </div>
+          )}
+        </div>
+        {clientLogoUrl && !isVertical && (
+          <>
+            <div
+              aria-hidden
+              style={{
+                width: 1,
+                height: dims.wordmarkPx * 1.6,
+                backgroundColor: "currentColor",
+                opacity: 0.35,
+                marginLeft: dims.gapPx / 2,
+                marginRight: dims.gapPx / 2,
+              }}
+            />
+            <img
+              src={clientLogoUrl}
+              alt={clientName ? `${clientName} logo` : "Client logo"}
+              style={{ height: dims.wordmarkPx * 1.6, width: "auto", maxWidth: dims.wordmarkPx * 6, objectFit: "contain", display: "block" }}
+            />
+          </>
         )}
       </div>
-      {clientLogoUrl && (
-        <>
-          <div
-            aria-hidden
-            style={{
-              width: 1,
-              height: dims.wordmarkPx * 1.6,
-              backgroundColor: "currentColor",
-              opacity: 0.35,
-              marginLeft: dims.gapPx / 2,
-              marginRight: dims.gapPx / 2,
-            }}
-          />
-          <img
-            src={clientLogoUrl}
-            alt={clientName ? `${clientName} logo` : "Client logo"}
-            style={{ height: dims.wordmarkPx * 1.6, width: "auto", maxWidth: dims.wordmarkPx * 6, objectFit: "contain", display: "block" }}
-          />
-        </>
-      )}
     </div>
   );
 }
+
 
 

@@ -1,5 +1,5 @@
 import type { BrandMode } from "@/lib/taxonomy";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { createContext, useContext } from "react";
 import { BrandLockup } from "@/components/BrandLockup";
 import {
@@ -7,6 +7,7 @@ import {
   logoPositionStyles,
   type ChromeVariant,
   type LogoPosition,
+  type LogoOrientation,
 } from "@/lib/logo-placement";
 import { GRAIN_SVG } from "@/components/slide/grain";
 
@@ -65,7 +66,7 @@ export function SlideFrame({
   subCompany?: string;
   layoutId?: string;
   logoPosition?: LogoPosition;
-  logoOrientation?: "horizontal" | "stacked";
+  logoOrientation?: LogoOrientation;
 }) {
 
   const mode = useSlideMode();
@@ -288,8 +289,9 @@ export function SlideFrame({
           stay quiet at sm so titles carry the composition; cover / divider /
           close slides scale up so the mark reads at hero size. */}
       {showLogo && (() => {
-        // Positions that should render at half size per brand direction:
-        // top-center, bottom-center, and the left-side variants.
+        const isVertical = logoOrientation === "vertical-left" || logoOrientation === "vertical-right";
+        const isMarkOnly = logoOrientation === "mark-only";
+        // Half-size positions per brand direction (top/bottom-center + left side).
         const halfSize = (
           placement.position === "top-center" ||
           placement.position === "bottom-center" ||
@@ -300,10 +302,30 @@ export function SlideFrame({
         const shrink: Record<string, "2xs" | "xs" | "sm" | "md" | "lg" | "xl"> = {
           xl: "sm", lg: "xs", md: "xs", sm: "2xs", xs: "2xs", "2xs": "2xs",
         };
-        const effectiveSize = halfSize ? shrink[baseSize] : (baseSize as "sm" | "md" | "xl");
+        const sizeAfterHalf = halfSize ? shrink[baseSize] : (baseSize as "sm" | "md" | "xl");
+        // Mark-only is a quiet signature — one step smaller than the base.
+        const effectiveSize = isMarkOnly ? (shrink[sizeAfterHalf] ?? sizeAfterHalf) : sizeAfterHalf;
+
+        // Vertical orientations pin to the corresponding edge, vertically
+        // centered. Position dropdown selection is preserved as a soft hint
+        // (top vs bottom biasing) but the anchor snaps to the correct edge.
+        const containerStyle = isVertical
+          ? (() => {
+              const onLeft = logoOrientation === "vertical-left";
+              const style: React.CSSProperties = {
+                position: "absolute",
+                top: "50%",
+                transform: "translateY(-50%)",
+              };
+              if (onLeft) style.left = 32;
+              else style.right = 32;
+              return style;
+            })()
+          : logoPositionStyles(placement.position);
+
         return (
           // Logo is always the top-most visual layer on every slide.
-          <div style={{ ...logoPositionStyles(placement.position), zIndex: 60, pointerEvents: "none" }}>
+          <div style={{ ...containerStyle, zIndex: 60, pointerEvents: "none" }}>
             <BrandLockup
               brand={brand}
               color={logoColor}

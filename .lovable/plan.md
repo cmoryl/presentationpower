@@ -1,58 +1,53 @@
-# Division-Aware Library Previews
+# Extended Logo Orientations
 
-Today every library card renders the same "Acme Corp / Life sciences" placeholder text regardless of brand mode. Only colors and logos change. This plan makes the **text on the preview slides** reflect the selected division (Life Sciences, GlobalLink, DataForce, Trial Interactive, etc.) — headline copy, stats, quotes, case-study story, agenda topics, service lines, industry chips.
+Add two new orientations beyond `horizontal` / `stacked`, and make sure the editor, the on-screen slide, HTML/PDF print, and the PPTX export all agree on what gets drawn where.
 
-## What the user will see
+## New orientations
 
-- Pick "Life Sciences" in the library brand switcher → preview slides talk about regulated content, 28 markets, clinical launches; case cards show the pharma case study; stats show `38%` and `0 regulatory reopenings`.
-- Pick "GlobalLink" → the same layouts now show the SaaS/continuous-localization story, `18 languages`, `0 release delays`.
-- Pick "DataForce" → frontier AI lab story, `3.1M pairs · 42 langs`, annotation stats.
-- Pick "TransPerfect (Enterprise)" → the current neutral corporate content stays.
+| Orientation      | Description                                                          | Typical use                             |
+|------------------|----------------------------------------------------------------------|------------------------------------------|
+| `horizontal`     | Existing. Wordmark + mark side-by-side.                              | Default.                                 |
+| `stacked`        | Existing. Mark above wordmark.                                       | Cover / hero.                            |
+| `vertical-left`  | New. Whole lockup rotated -90 (reads bottom→top along a left edge). | Editorial spreads, full-bleed media.     |
+| `vertical-right` | New. Rotated +90 (reads top→bottom along a right edge).             | Portrait feature, framed media.          |
+| `mark-only`      | New. Icon/monogram only, no wordmark.                                | Dense content slides, watermark corner.  |
 
-Layouts, spacing, and structure are unchanged. Only the words, numbers, and industry tags swap.
+`auto` (per-slide) continues to mean "follow the deck default"; the deck default stays `horizontal | stacked`.
 
-## How it works (technical)
+## What to build
 
-1. **New resolver `seedDivisionContent(variantId, brief, sectionName, brandModeId)`** in `src/lib/deck-store.ts`
-   - Wraps existing `seedContent()` and post-processes the returned object.
-   - Pulls division context: `BRAND_PROFILES[brandModeId]` (industries, serviceLines, tags) + `pickCaseStudy(brandModeId)` from `src/lib/case-studies.ts`.
-   - Overlays per-family fields on the placeholder object:
-     - `MV-CASE-*` → `headline / story / metric / quote / attribution` from the picked case study.
-     - `MV-PROOF-STATS-*` → `items[]` from `caseStudy.stats`.
-     - `MV-PROOF-TESTIMONIAL` → `quote / attribution / role`.
-     - `MV-PROOF-LOGO-*` / `MV-CLIENT-*` → `pickProofLogos(brandModeId)` names.
-     - `MV-CTX-*` (industries/segments) → `profile.contentScope.industries`.
-     - `MV-SOL-PILLARS-*` / `MV-OFFER-*` → `profile.contentScope.serviceLines`.
-     - `MV-COVER-*`, `MV-OP-AGENDA-*`, `MV-OP-INTRO-*` → division name into `subtitle`/`meta`; agenda topics derived from serviceLines.
-     - `MV-QUOTE-*` → case-study quote.
-     - Any variant not in the map → returns `seedContent()` output unchanged.
-   - Pure function, synchronous, no async / no DB call — safe to run per-card in the grid.
+1. **Type surface** — extend `LogoOrientation` in `logo-placement.ts` and mirror it in `deck-store.ts` (`Deck.context.logoOrientation`, `DeckSlide.logoOrientation`). Keep the deck-wide default limited to `horizontal | stacked` (rotated/mark-only are per-slide only) so the toolbar toggle stays a two-way switch.
 
-2. **Update `src/routes/library.tsx`** (two call sites, ~L468 and ~L766)
-   - Replace `seedContent(variant.id, SAMPLE_BRIEF, ...)` with `seedDivisionContent(variant.id, brief, section, brandId)`.
-   - Derive `brief` from the currently-selected brand: keep `SAMPLE_BRIEF` shape but set `brandModeId = scopeBrand?.id ?? tpMaster.id` and `industry = profile.contentScope.industries[0] ?? "Life sciences"`, `prospect` from the case study's `client`.
-   - Compute the resolved brief once per `scopeBrandId` change using `useMemo` — grid cards read the same object.
+2. **BrandLockup** — add a `mark-only` render path (returns just the mark tile / official mark asset) and a wrapper that applies `transform: rotate(±90deg)` with a compensating `transformOrigin` for the two vertical orientations. Vertical variants use the horizontal artwork rotated, since divisions don't ship rotated PNGs.
 
-3. **Case-study coverage check** (`src/lib/case-studies.ts`)
-   - The 6 existing entries cover: Life Sciences, AI/ML, SaaS/Tech, Financial Services, Retail, Client-partnership.
-   - Add 3-4 new entries to fill gaps for divisions that currently fall back to Life Sciences:
-     - `cs-legal-ediscovery` (TP Legal Solutions) — regulated e-discovery, review acceleration.
-     - `cs-media-dubbing` (TP Media) — dubbing/subtitling at scale.
-     - `cs-marketing-transcreation` (TP Global Marketing) — transcreation, campaign velocity.
-     - `cs-trial-interactive-etmf` (Trial Interactive) — eTMF study start-up.
-   - Each follows the existing `CaseStudy` shape (headline, story, quote, stats[3]).
+3. **SlideChrome placement** — when orientation is vertical, override the effective position to `top-left` (for `vertical-left`) or `top-right` (for `vertical-right`) if the caller picked a top/bottom-center slot that would collide, and reserve a narrow band along that edge. Half-size shrink rules from the previous pass still apply to `top-left / top-center / bottom-center / bottom-left`. `mark-only` inherits whatever position is set.
 
-4. **No changes to** `VariantRenderer`, `taxonomy.ts`, `brand-profiles.ts`, or PPTX export — the overlay only injects existing content-shape fields that renderers already read.
+4. **Editor UI** (`decks.$deckId.tsx` "Logo on this slide" panel) — expand the Orientation dropdown to include the three new options. Deck-wide toolbar toggle stays horizontal/stacked. Update the position dropdown help text so it's clear that vertical orientations pin to an edge.
 
-## Out of scope (deliberately)
+5. **PPTX export** — extend the block already rewritten in the previous pass:
+   - Read `slide.logoOrientation` and `deck.context.logoOrientation` (rotated/mark-only per-slide only).
+   - For `mark-only`, prefer a mark-only asset if the division provides one, else use the stacked artwork cropped square via `sizing`.
+   - For `vertical-left` / `vertical-right`, pass `pptxgenjs`'s `rotate: -90` / `rotate: 90` on `addImage`, and swap the width/height budget so the rotated image sits in a tall band along the chosen edge. Position math becomes: place a 0.5" × 4.5" band at `x = inset` (left) or `x = SLIDE_W - inset - w` (right), vertically centered.
+   - Logo remains the last thing added to the slide so it stays on top.
 
-- No async KB / RAG retrieval into library previews. Reason: 50+ cards render at once; per-card `knowledge_entries` lookups would need caching + loading UI. This plan uses the already-in-memory `BRAND_PROFILES` + `CASE_STUDIES` which is instant.
-- No changes to the `/brief/new` flow — that pipeline already has full KB retrieval.
-- No new imagery — imagery kits stay as-is; only text swaps.
+6. **HTML / PDF (print + document routes)** — these render through `SlideChrome` → `BrandLockup`, so once #2 + #3 land the print + PDF paths pick it up for free. Verify by checking `decks.$deckId.print.tsx` and `decks.$deckId.export.tsx` pass `logoOrientation` through unchanged (they already do).
+
+7. **Docs + defaults** — update `LOGO_POSITIONS_META` and `resolveLogoPlacement` rationale strings so `/atlas` and future tooling list the new orientations, and extend the reset button to clear the new values.
+
+## Files touched
+
+- `src/lib/logo-placement.ts` (types + metadata)
+- `src/lib/deck-store.ts` (Deck + Slide types + reducer)
+- `src/components/BrandLockup.tsx` (mark-only + rotation)
+- `src/components/slide/SlideChrome.tsx` (vertical band, half-size interaction)
+- `src/components/slide/VariantRenderer.tsx` (pass-through only, no logic)
+- `src/routes/decks.$deckId.tsx` (editor dropdown)
+- `src/lib/pptx-export.ts` (rotate + mark-only + band positioning)
+
+No migration needed — new orientation values simply weren't valid before, and existing decks stay on `horizontal` / `stacked`.
 
 ## Verification
 
-- Open `/library`, cycle through brand modes: Enterprise → Life Sciences → GlobalLink → DataForce → Trial Interactive → TP Legal → TP Media.
-- Confirm at least these families visibly change text: `MV-CASE-STORY`, `MV-PROOF-STATS-3`, `MV-QUOTE-POSTER`, `MV-CTX-CARDS-3`, `MV-SOL-PILLARS-3`, `MV-OP-AGENDA-*`.
-- Click into the lightbox on 2-3 cards per brand to verify content coherence at full size.
-- Run typecheck; no `VariantRenderer` prop changes so no downstream type churn expected.
+- Add each of the five orientations on a test slide, cycle through all six positions, and confirm the on-screen render matches on both light and dark chrome.
+- Export the same deck to PPTX and to PDF; open both and confirm every slide's logo matches the editor (position, orientation, size, top layer).
+- Run `bunx tsgo --noEmit` and the existing library-coverage vitest.
