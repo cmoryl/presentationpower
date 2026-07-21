@@ -97,6 +97,59 @@ export type ParsedDiagram = {
   connectorStyle?: ConnectorStyle;
 };
 
+// ─── Faithful slide layout (positions / z-order / styling) ─────────────
+// Everything below is what lets us render an imported slide 1:1 the way it
+// looks in PowerPoint. Frames are in inches (EMU / 914400). Coordinates use
+// slide-space (already flattened through any parent group transforms).
+
+export type LayoutFrame = {
+  x: number; y: number; w: number; h: number;
+  rot?: number;
+  flipH?: boolean;
+  flipV?: boolean;
+};
+export type LayoutFill =
+  | { kind: "solid"; color: string }
+  | { kind: "gradient"; stops: Array<{ pos: number; color: string }>; angle: number }
+  | { kind: "image"; embedId?: string; path?: string }
+  | { kind: "none" };
+export type LayoutLine = {
+  color?: string;
+  widthPt?: number;
+  dashStyle?: string;
+  headArrow?: string;
+  tailArrow?: string;
+};
+export type LayoutRun = {
+  text: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  sizePt?: number;
+  color?: string;
+  font?: string;
+};
+export type LayoutPara = {
+  align?: "l" | "ctr" | "r" | "just";
+  level?: number;
+  bullet?: "char" | "auto" | "none";
+  runs: LayoutRun[];
+};
+export type LayoutTextBody = { paras: LayoutPara[]; anchor?: "t" | "ctr" | "b" };
+export type LayoutShape =
+  | { kind: "text"; z: number; frame: LayoutFrame; fill?: LayoutFill; line?: LayoutLine; prst?: string; text: LayoutTextBody; isTitle?: boolean }
+  | { kind: "image"; z: number; frame: LayoutFrame; embedId?: string; path?: string; line?: LayoutLine }
+  | { kind: "line"; z: number; frame: LayoutFrame; line?: LayoutLine; prst?: string }
+  | { kind: "table"; z: number; frame: LayoutFrame; header: string[]; rows: string[][] }
+  | { kind: "chart"; z: number; frame: LayoutFrame }
+  | { kind: "diagram"; z: number; frame: LayoutFrame };
+
+export type SlideLayout = {
+  size: { w: number; h: number };
+  background?: LayoutFill;
+  shapes: LayoutShape[];
+};
+
 export type ParsedSlide = {
   index: number;
   title: string;
@@ -110,6 +163,10 @@ export type ParsedSlide = {
   tables: ParsedTable[];
   /** Extracted diagrams (SmartArt + grouped custom shapes) in reading order. */
   diagrams: ParsedDiagram[];
+  /** r:embed rIds parallel to `images[]` for cross-reference to storage paths. */
+  imageEmbedIds: string[];
+  /** Faithful 1:1 layout capture (positions, styling, z-order). */
+  layout?: SlideLayout;
 };
 
 export type ParsedTheme = {
