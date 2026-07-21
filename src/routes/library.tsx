@@ -11,7 +11,11 @@ import { TypeBadge } from "@/components/TypeBadge";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
-import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
+import {
+  resolveDivisionBrief,
+  seedDivisionContent,
+  validateDivisionContent,
+} from "@/lib/library-preview";
 import { byId, MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { MODULE_PRESET_KITS, validateKit } from "@/lib/module-preset-kits";
@@ -112,6 +116,16 @@ function Library() {
     }
     return m;
   }, [decks]);
+
+  // Validate that every brand mode has division-specific content coverage
+  // before we render the grid. Runs once (cached inside the helper).
+  const coverage = useMemo(() => validateDivisionContent(), []);
+  useEffect(() => {
+    if (!coverage.ok && import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.warn("[library] division content coverage gaps", coverage.failing);
+    }
+  }, [coverage]);
 
   const scopeBrand = scopeBrandId === "all" ? undefined : brandModes.find((b) => b.id === scopeBrandId);
   const tpMaster = brandModes.find((b) => b.id === "bm-enterprise") ?? brandModes[0];
@@ -341,6 +355,37 @@ function Library() {
           })}
         </div>
       </div>
+      {!coverage.ok && (
+        <div
+          role="alert"
+          className="mt-6 rounded-2xl border border-amber-300/70 bg-amber-50 px-5 py-4 text-sm text-amber-900 shadow-sm"
+        >
+          <div className="flex items-start gap-3">
+            <span aria-hidden className="mt-0.5 text-lg">⚠︎</span>
+            <div className="flex-1">
+              <div className="font-semibold">
+                {coverage.failing.length} brand mode
+                {coverage.failing.length === 1 ? "" : "s"} missing division-specific content
+              </div>
+              <ul className="mt-2 space-y-1">
+                {coverage.failing.map((r) => (
+                  <li key={r.brandId}>
+                    <span className="font-medium">{r.brandName}</span>
+                    <span className="text-amber-900/70"> — {r.issues.join(", ")}</span>
+                    {r.notes.length > 0 && (
+                      <span className="text-amber-900/60"> · {r.notes.join("; ")}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-2 text-amber-900/70">
+                Previews still render but may fall back to generic copy for the flagged brands.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
 
 
       {filtered.length === 0 ? (
