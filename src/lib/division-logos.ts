@@ -28,6 +28,7 @@ const NEXT: Record<string, DivisionLogoSet> = {
   },
   globallink: {
     color: `${B}/globallink-color.png`,
+    white: `${B}/globallink-white.png`,
     stackedColor: `${B}/globallink-stacked-color.png`,
   },
   games: {
