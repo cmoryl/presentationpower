@@ -67,17 +67,18 @@ import lgA2 from "./bm-tp-legal/abstract-02.jpg";
 import lgA3 from "./bm-tp-legal/abstract-03.jpg";
 import lgA4 from "./bm-tp-legal/abstract-04.jpg";
 
-// Gaming
-import gmP1 from "./bm-tp-games/photo-01.jpg";
-import gmP2 from "./bm-tp-games/photo-02.jpg";
-import gmP3 from "./bm-tp-games/photo-03.jpg";
-import gmP4 from "./bm-tp-games/photo-04.jpg";
-import gmP5 from "./bm-tp-games/photo-05.jpg";
-import gmP6 from "./bm-tp-games/photo-06.jpg";
-import gmA1 from "./bm-tp-games/abstract-01.jpg";
-import gmA2 from "./bm-tp-games/abstract-02.jpg";
-import gmA3 from "./bm-tp-games/abstract-03.jpg";
-import gmA4 from "./bm-tp-games/abstract-04.jpg";
+// Gaming — uses the curated TP Games dark gradient set as the canonical
+// imagery pool. 6 gradients split 6 "photo" + 4 "abstract" slots.
+import gmP1 from "../tp-games-dark/bg-01.webp";
+import gmP2 from "../tp-games-dark/bg-02.webp";
+import gmP3 from "../tp-games-dark/bg-03.webp";
+import gmP4 from "../tp-games-dark/bg-04.webp";
+import gmP5 from "../tp-games-dark/bg-05.webp";
+import gmP6 from "../tp-games-dark/bg-06.webp";
+import gmA1 from "../tp-games-dark/bg-01.webp";
+import gmA2 from "../tp-games-dark/bg-03.webp";
+import gmA3 from "../tp-games-dark/bg-05.webp";
+import gmA4 from "../tp-games-dark/bg-06.webp";
 
 // Digital (Agencies)
 import dgP1 from "./bm-tp-digital/photo-01.jpg";
