@@ -97,6 +97,59 @@ export type ParsedDiagram = {
   connectorStyle?: ConnectorStyle;
 };
 
+// ─── Faithful slide layout (positions / z-order / styling) ─────────────
+// Everything below is what lets us render an imported slide 1:1 the way it
+// looks in PowerPoint. Frames are in inches (EMU / 914400). Coordinates use
+// slide-space (already flattened through any parent group transforms).
+
+export type LayoutFrame = {
+  x: number; y: number; w: number; h: number;
+  rot?: number;
+  flipH?: boolean;
+  flipV?: boolean;
+};
+export type LayoutFill =
+  | { kind: "solid"; color: string }
+  | { kind: "gradient"; stops: Array<{ pos: number; color: string }>; angle: number }
+  | { kind: "image"; embedId?: string; path?: string }
+  | { kind: "none" };
+export type LayoutLine = {
+  color?: string;
+  widthPt?: number;
+  dashStyle?: string;
+  headArrow?: string;
+  tailArrow?: string;
+};
+export type LayoutRun = {
+  text: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  sizePt?: number;
+  color?: string;
+  font?: string;
+};
+export type LayoutPara = {
+  align?: "l" | "ctr" | "r" | "just";
+  level?: number;
+  bullet?: "char" | "auto" | "none";
+  runs: LayoutRun[];
+};
+export type LayoutTextBody = { paras: LayoutPara[]; anchor?: "t" | "ctr" | "b" };
+export type LayoutShape =
+  | { kind: "text"; z: number; frame: LayoutFrame; fill?: LayoutFill; line?: LayoutLine; prst?: string; text: LayoutTextBody; isTitle?: boolean }
+  | { kind: "image"; z: number; frame: LayoutFrame; embedId?: string; path?: string; line?: LayoutLine }
+  | { kind: "line"; z: number; frame: LayoutFrame; line?: LayoutLine; prst?: string }
+  | { kind: "table"; z: number; frame: LayoutFrame; header: string[]; rows: string[][] }
+  | { kind: "chart"; z: number; frame: LayoutFrame }
+  | { kind: "diagram"; z: number; frame: LayoutFrame };
+
+export type SlideLayout = {
+  size: { w: number; h: number };
+  background?: LayoutFill;
+  shapes: LayoutShape[];
+};
+
 export type ParsedSlide = {
   index: number;
   title: string;
@@ -110,6 +163,10 @@ export type ParsedSlide = {
   tables: ParsedTable[];
   /** Extracted diagrams (SmartArt + grouped custom shapes) in reading order. */
   diagrams: ParsedDiagram[];
+  /** r:embed rIds parallel to `images[]` for cross-reference to storage paths. */
+  imageEmbedIds: string[];
+  /** Faithful 1:1 layout capture (positions, styling, z-order). */
+  layout?: SlideLayout;
 };
 
 export type ParsedTheme = {
@@ -170,6 +227,7 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
   });
 
   const theme = await extractTheme(zip, parser);
+  const slideSize = await extractSlideSize(zip, parser);
 
   const slideFiles = Object.keys(zip.files)
     .filter((f) => /^ppt\/slides\/slide\d+\.xml$/.test(f))
@@ -220,18 +278,25 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     const relTargetsByType = extractRelTargetsByType(relsDoc);
 
     // ── Embedded images ─────────────────────────────────────────────────
+    // We keep two parallel arrays so a downstream faithful renderer can map
+    // a shape's r:embed rId → the base64/data-url (or, later, a signed
+    // storage path).
     const images: string[] = [];
+    const imageEmbedIds: string[] = [];
     if (relsDoc) {
       const imageTargets = relTargetsByType.image;
       const embedIds = extractEmbedIds(doc);
-      const ordered = embedIds
-        .map((id) => imageTargets[id])
-        .filter((t): t is string => Boolean(t));
-      const seen = new Set(ordered);
-      for (const t of Object.values(imageTargets)) if (!seen.has(t)) ordered.push(t);
+      // De-duplicate while preserving reading order + include stragglers.
+      const orderedIds: string[] = [];
+      const seen = new Set<string>();
+      for (const id of embedIds) {
+        if (!seen.has(id) && imageTargets[id]) { orderedIds.push(id); seen.add(id); }
+      }
+      for (const id of Object.keys(imageTargets)) if (!seen.has(id)) { orderedIds.push(id); seen.add(id); }
 
-      for (const target of ordered.slice(0, MAX_IMAGES_PER_SLIDE)) {
+      for (const id of orderedIds.slice(0, MAX_IMAGES_PER_SLIDE)) {
         if (totalImageBytes >= MAX_TOTAL_IMAGE_BYTES) { imagesTruncated = true; break; }
+        const target = imageTargets[id];
         const resolved = resolveRelPath(slidePath, target);
         const entry = zip.files[resolved];
         if (!entry) continue;
@@ -244,6 +309,7 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         if (dataUrl.length > MAX_PER_IMAGE_BYTES) { imagesTruncated = true; continue; }
         if (totalImageBytes + dataUrl.length > MAX_TOTAL_IMAGE_BYTES) { imagesTruncated = true; continue; }
         images.push(dataUrl);
+        imageEmbedIds.push(id);
         totalImageBytes += dataUrl.length;
       }
     }
@@ -348,15 +414,23 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     tableTotal += tables.length;
     diagramTotal += diagrams.length;
 
+    // ── Faithful layout (positions / z-order / styling) ─────────────────
+    let layout: SlideLayout | undefined;
+    try {
+      layout = extractSlideLayout(xml, slideSize, imageEmbedIds);
+    } catch { /* layout is best-effort; parsed text/images still return */ }
+
     slides.push({
       index: i,
       title: cap(title, 240) || `Slide ${i + 1}`,
       bullets: bodyParas.map((b) => cap(b, 400)).slice(0, 16),
       notes: cap(notes, 2000),
       images,
+      imageEmbedIds,
       charts,
       tables,
       diagrams,
+      layout,
     });
   }
 
@@ -1017,4 +1091,361 @@ function readSchemeColor(node: any): string | undefined {
   const sys = node?.["a:sysClr"]?.["@_lastClr"];
   if (typeof sys === "string" && /^[0-9a-fA-F]{6}$/.test(sys)) return `#${sys.toUpperCase()}`;
   return undefined;
+}
+
+// ─── Slide size + faithful layout extraction ────────────────────────────
+const EMU_PER_INCH = 914400;
+const DEFAULT_SLIDE_SIZE = { w: 13.333, h: 7.5 };
+
+async function extractSlideSize(zip: JSZip, parser: XMLParser): Promise<{ w: number; h: number }> {
+  const entry = zip.files["ppt/presentation.xml"];
+  if (!entry) return { ...DEFAULT_SLIDE_SIZE };
+  try {
+    const doc = parser.parse(await entry.async("string"));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sz = (doc as any)?.["p:presentation"]?.["p:sldSz"];
+    const cx = Number(sz?.["@_cx"]);
+    const cy = Number(sz?.["@_cy"]);
+    if (cx > 0 && cy > 0) return { w: cx / EMU_PER_INCH, h: cy / EMU_PER_INCH };
+  } catch { /* fall through */ }
+  return { ...DEFAULT_SLIDE_SIZE };
+}
+
+// preserveOrder:true output shape helpers ------------------------------
+// Each node is `{ tagName: [childNode, ...], ":@"?: {...attrs} }`.
+// Text nodes: `{ "#text": "..." }`.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type PNode = any;
+function pTag(n: PNode): string | undefined {
+  if (!n || typeof n !== "object") return undefined;
+  for (const k of Object.keys(n)) if (k !== ":@") return k;
+  return undefined;
+}
+function pChildren(n: PNode): PNode[] {
+  const t = pTag(n);
+  const c = t ? n[t] : undefined;
+  return Array.isArray(c) ? c : [];
+}
+function pAttrs(n: PNode): Record<string, string> { return n?.[":@"] ?? {}; }
+function pFind(n: PNode, name: string): PNode | undefined {
+  return pChildren(n).find((c) => pTag(c) === name);
+}
+function pFindAll(n: PNode, name: string): PNode[] {
+  return pChildren(n).filter((c) => pTag(c) === name);
+}
+function pDeepFind(nodes: PNode[] | PNode, name: string): PNode | undefined {
+  const arr = Array.isArray(nodes) ? nodes : [nodes];
+  for (const n of arr) {
+    if (pTag(n) === name) return n;
+    const found = pDeepFind(pChildren(n), name);
+    if (found) return found;
+  }
+  return undefined;
+}
+function pText(n: PNode): string {
+  const arr = pChildren(n);
+  let out = "";
+  for (const c of arr) {
+    if (c && typeof c === "object" && "#text" in c) out += String((c as { "#text": unknown })["#text"] ?? "");
+    else out += pText(c);
+  }
+  return out;
+}
+
+function readFrame(spPr: PNode | undefined): LayoutFrame | undefined {
+  if (!spPr) return undefined;
+  const xfrm = pFind(spPr, "a:xfrm");
+  if (!xfrm) return undefined;
+  const a = pAttrs(xfrm);
+  const off = pFind(xfrm, "a:off");
+  const ext = pFind(xfrm, "a:ext");
+  const oa = off ? pAttrs(off) : {};
+  const ea = ext ? pAttrs(ext) : {};
+  const x = Number(oa["@_x"] ?? 0) / EMU_PER_INCH;
+  const y = Number(oa["@_y"] ?? 0) / EMU_PER_INCH;
+  const w = Number(ea["@_cx"] ?? 0) / EMU_PER_INCH;
+  const h = Number(ea["@_cy"] ?? 0) / EMU_PER_INCH;
+  if (!(w > 0 && h > 0)) return undefined;
+  const rot = a["@_rot"] ? Number(a["@_rot"]) / 60000 : undefined;
+  return {
+    x, y, w, h,
+    rot: rot && !Number.isNaN(rot) ? rot : undefined,
+    flipH: a["@_flipH"] === "1" || undefined,
+    flipV: a["@_flipV"] === "1" || undefined,
+  };
+}
+
+function readColorFromNode(n: PNode | undefined): string | undefined {
+  if (!n) return undefined;
+  const srgb = pFind(n, "a:srgbClr");
+  if (srgb) {
+    const v = pAttrs(srgb)["@_val"];
+    if (v && /^[0-9a-fA-F]{6}$/.test(v)) return `#${v.toUpperCase()}`;
+  }
+  const sch = pFind(n, "a:schemeClr");
+  if (sch) {
+    const v = pAttrs(sch)["@_val"];
+    if (v) return `var(--pptx-${v})`;  // renderer maps theme tokens
+  }
+  return undefined;
+}
+
+function readFill(spPr: PNode | undefined, imageEmbedIds: string[]): LayoutFill | undefined {
+  if (!spPr) return undefined;
+  const kids = pChildren(spPr);
+  for (const k of kids) {
+    const t = pTag(k);
+    if (t === "a:solidFill") {
+      const c = readColorFromNode(k);
+      if (c) return { kind: "solid", color: c };
+    }
+    if (t === "a:noFill") return { kind: "none" };
+    if (t === "a:gradFill") {
+      const gsLst = pFind(k, "a:gsLst");
+      const stops: Array<{ pos: number; color: string }> = [];
+      if (gsLst) {
+        for (const g of pFindAll(gsLst, "a:gs")) {
+          const pos = Number(pAttrs(g)["@_pos"] ?? 0) / 100000;
+          const color = readColorFromNode(g);
+          if (color) stops.push({ pos, color });
+        }
+      }
+      const lin = pFind(k, "a:lin");
+      const angle = lin ? (Number(pAttrs(lin)["@_ang"] ?? 0) / 60000) : 0;
+      if (stops.length) return { kind: "gradient", stops, angle };
+    }
+    if (t === "a:blipFill") {
+      const blip = pFind(k, "a:blip");
+      const embed = blip ? pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"] : undefined;
+      if (embed) {
+        // caller resolves embed → data URL via imageEmbedIds (unused here but reserved).
+        void imageEmbedIds;
+        return { kind: "image", embedId: embed };
+      }
+    }
+  }
+  return undefined;
+}
+
+function readLine(spPr: PNode | undefined): LayoutLine | undefined {
+  if (!spPr) return undefined;
+  const ln = pFind(spPr, "a:ln");
+  if (!ln) return undefined;
+  const a = pAttrs(ln);
+  const widthEmu = Number(a["@_w"] ?? 0);
+  const widthPt = widthEmu > 0 ? widthEmu / 12700 : undefined;
+  const solid = pFind(ln, "a:solidFill");
+  const color = solid ? readColorFromNode(solid) : undefined;
+  const dash = pFind(ln, "a:prstDash");
+  const dashStyle = dash ? pAttrs(dash)["@_val"] : undefined;
+  const head = pFind(ln, "a:headEnd");
+  const tail = pFind(ln, "a:tailEnd");
+  return {
+    color,
+    widthPt,
+    dashStyle,
+    headArrow: head ? pAttrs(head)["@_type"] : undefined,
+    tailArrow: tail ? pAttrs(tail)["@_type"] : undefined,
+  };
+}
+
+function readTextBody(txBody: PNode | undefined): LayoutTextBody | undefined {
+  if (!txBody) return undefined;
+  const bodyPr = pFind(txBody, "a:bodyPr");
+  const anchorRaw = bodyPr ? pAttrs(bodyPr)["@_anchor"] : undefined;
+  const anchor = anchorRaw === "t" || anchorRaw === "ctr" || anchorRaw === "b" ? anchorRaw : undefined;
+  const paras: LayoutPara[] = [];
+  for (const p of pFindAll(txBody, "a:p")) {
+    const pPr = pFind(p, "a:pPr");
+    const pAttr = pPr ? pAttrs(pPr) : {};
+    const alignRaw = pAttr["@_algn"];
+    const align = alignRaw === "l" || alignRaw === "ctr" || alignRaw === "r" || alignRaw === "just" ? alignRaw : undefined;
+    const level = pAttr["@_lvl"] ? Number(pAttr["@_lvl"]) : undefined;
+    let bullet: "char" | "auto" | "none" | undefined;
+    if (pPr) {
+      if (pFind(pPr, "a:buChar")) bullet = "char";
+      else if (pFind(pPr, "a:buAutoNum")) bullet = "auto";
+      else if (pFind(pPr, "a:buNone")) bullet = "none";
+    }
+    const runs: LayoutRun[] = [];
+    for (const child of pChildren(p)) {
+      const t = pTag(child);
+      if (t === "a:r") {
+        const rPr = pFind(child, "a:rPr");
+        const ra = rPr ? pAttrs(rPr) : {};
+        const tNode = pFind(child, "a:t");
+        const text = tNode ? pText(tNode) : "";
+        if (!text) continue;
+        const solid = rPr ? pFind(rPr, "a:solidFill") : undefined;
+        const latin = rPr ? pFind(rPr, "a:latin") : undefined;
+        runs.push({
+          text,
+          bold: ra["@_b"] === "1" || undefined,
+          italic: ra["@_i"] === "1" || undefined,
+          underline: ra["@_u"] && ra["@_u"] !== "none" ? true : undefined,
+          sizePt: ra["@_sz"] ? Number(ra["@_sz"]) / 100 : undefined,
+          color: solid ? readColorFromNode(solid) : undefined,
+          font: latin ? pAttrs(latin)["@_typeface"] : undefined,
+        });
+      } else if (t === "a:br") {
+        runs.push({ text: "\n" });
+      }
+    }
+    paras.push({ align, level, bullet, runs });
+  }
+  return { paras, anchor };
+}
+
+function transformFrame(child: LayoutFrame, group: PNode | undefined): LayoutFrame {
+  if (!group) return child;
+  const gxfrm = pFind(group, "a:xfrm");
+  if (!gxfrm) return child;
+  const off = pFind(gxfrm, "a:off");
+  const ext = pFind(gxfrm, "a:ext");
+  const chOff = pFind(gxfrm, "a:chOff");
+  const chExt = pFind(gxfrm, "a:chExt");
+  if (!off || !ext || !chOff || !chExt) return child;
+  const oa = pAttrs(off); const ea = pAttrs(ext);
+  const coa = pAttrs(chOff); const cea = pAttrs(chExt);
+  const gx = Number(oa["@_x"] ?? 0) / EMU_PER_INCH;
+  const gy = Number(oa["@_y"] ?? 0) / EMU_PER_INCH;
+  const gw = Number(ea["@_cx"] ?? 0) / EMU_PER_INCH;
+  const gh = Number(ea["@_cy"] ?? 0) / EMU_PER_INCH;
+  const cx = Number(coa["@_x"] ?? 0) / EMU_PER_INCH;
+  const cy = Number(coa["@_y"] ?? 0) / EMU_PER_INCH;
+  const cw = Number(cea["@_cx"] ?? 0) / EMU_PER_INCH;
+  const ch = Number(cea["@_cy"] ?? 0) / EMU_PER_INCH;
+  if (!(cw > 0 && ch > 0 && gw > 0 && gh > 0)) return child;
+  const sx = gw / cw; const sy = gh / ch;
+  return {
+    x: gx + (child.x - cx) * sx,
+    y: gy + (child.y - cy) * sy,
+    w: child.w * sx,
+    h: child.h * sy,
+    rot: child.rot,
+    flipH: child.flipH,
+    flipV: child.flipV,
+  };
+}
+
+function walkSpTree(nodes: PNode[], zRef: { z: number }, group: PNode | undefined, out: LayoutShape[], imageEmbedIds: string[]) {
+  for (const node of nodes) {
+    const t = pTag(node);
+    if (!t) continue;
+    if (t === "p:sp") {
+      const spPr = pFind(node, "p:spPr");
+      let frame = readFrame(spPr);
+      if (!frame) continue;
+      if (group) frame = transformFrame(frame, group);
+      const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
+      const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
+      const fill = readFill(spPr, imageEmbedIds);
+      const line = readLine(spPr);
+      const txBody = pFind(node, "p:txBody");
+      const text = readTextBody(txBody) ?? { paras: [] };
+      const nvSpPr = pFind(node, "p:nvSpPr");
+      const nvPr = nvSpPr ? pFind(nvSpPr, "p:nvPr") : undefined;
+      const ph = nvPr ? pFind(nvPr, "p:ph") : undefined;
+      const phType = ph ? pAttrs(ph)["@_type"] : undefined;
+      const isTitle = phType === "title" || phType === "ctrTitle" || undefined;
+      out.push({ kind: "text", z: zRef.z++, frame, fill, line, prst, text, isTitle });
+    } else if (t === "p:pic") {
+      const spPr = pFind(node, "p:spPr");
+      let frame = readFrame(spPr);
+      if (!frame) continue;
+      if (group) frame = transformFrame(frame, group);
+      const blipFill = pFind(node, "p:blipFill");
+      const blip = blipFill ? pFind(blipFill, "a:blip") : undefined;
+      const embedId = blip ? (pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"]) : undefined;
+      out.push({ kind: "image", z: zRef.z++, frame, embedId, line: readLine(spPr) });
+    } else if (t === "p:cxnSp") {
+      const spPr = pFind(node, "p:spPr");
+      let frame = readFrame(spPr);
+      if (!frame) continue;
+      if (group) frame = transformFrame(frame, group);
+      const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
+      const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
+      out.push({ kind: "line", z: zRef.z++, frame, line: readLine(spPr), prst });
+    } else if (t === "p:grpSp") {
+      const grpSpPr = pFind(node, "p:grpSpPr");
+      walkSpTree(pChildren(node), zRef, grpSpPr ?? group, out, imageEmbedIds);
+    } else if (t === "p:graphicFrame") {
+      const xfrm = pFind(node, "p:xfrm");
+      // graphicFrame uses p:xfrm (no wrapping spPr). Build a synthetic spPr.
+      const spPrLike = xfrm ? { "p:spPr": [xfrm], ":@": {} } as unknown as PNode : undefined;
+      // Re-read via readFrame after normalizing: readFrame looks for a:xfrm.
+      // p:xfrm and a:xfrm share attribute structure, so read directly:
+      let frame: LayoutFrame | undefined;
+      if (xfrm) {
+        const off = pFind(xfrm, "a:off");
+        const ext = pFind(xfrm, "a:ext");
+        const oa = off ? pAttrs(off) : {}; const ea = ext ? pAttrs(ext) : {};
+        const x = Number(oa["@_x"] ?? 0) / EMU_PER_INCH;
+        const y = Number(oa["@_y"] ?? 0) / EMU_PER_INCH;
+        const w = Number(ea["@_cx"] ?? 0) / EMU_PER_INCH;
+        const h = Number(ea["@_cy"] ?? 0) / EMU_PER_INCH;
+        if (w > 0 && h > 0) frame = { x, y, w, h };
+      }
+      if (!frame) continue;
+      if (group) frame = transformFrame(frame, group);
+      const graphic = pFind(node, "a:graphic");
+      const gData = graphic ? pFind(graphic, "a:graphicData") : undefined;
+      const gKids = gData ? pChildren(gData) : [];
+      const gTag = gKids[0] ? pTag(gKids[0]) : undefined;
+      if (gTag === "a:tbl" || pDeepFind(gKids, "a:tbl")) {
+        // Table: pull rows + header from a:tbl
+        const tbl = pDeepFind(gKids, "a:tbl");
+        const header: string[] = [];
+        const rows: string[][] = [];
+        if (tbl) {
+          const trs = pFindAll(tbl, "a:tr");
+          trs.forEach((tr, idx) => {
+            const cells = pFindAll(tr, "a:tc").map((tc) => {
+              const tx = pFind(tc, "a:txBody");
+              const tb = readTextBody(tx);
+              return (tb?.paras ?? []).map((p) => p.runs.map((r) => r.text).join("")).join(" ").trim();
+            });
+            if (idx === 0) header.push(...cells);
+            else rows.push(cells);
+          });
+        }
+        out.push({ kind: "table", z: zRef.z++, frame, header, rows });
+      } else if (gTag && /chart/i.test(gTag)) {
+        out.push({ kind: "chart", z: zRef.z++, frame });
+      } else if (gTag && /diagram|dgm/i.test(gTag)) {
+        out.push({ kind: "diagram", z: zRef.z++, frame });
+      } else {
+        out.push({ kind: "diagram", z: zRef.z++, frame });
+      }
+      void spPrLike;
+    }
+  }
+}
+
+function extractSlideLayout(xml: string, size: { w: number; h: number }, imageEmbedIds: string[]): SlideLayout {
+  const orderParser = new XMLParser({
+    ignoreAttributes: false,
+    attributeNamePrefix: "@_",
+    preserveOrder: true,
+    trimValues: true,
+  });
+  const root = orderParser.parse(xml) as PNode[];
+  // Find p:sld → p:cSld → p:spTree
+  const sld = pFind({ root } as unknown as PNode, "root") ? undefined : (root.find((n) => pTag(n) === "p:sld"));
+  const sldNode = sld ?? root[0];
+  const cSld = sldNode ? pFind(sldNode, "p:cSld") : undefined;
+  const spTree = cSld ? pFind(cSld, "p:spTree") : undefined;
+  const shapes: LayoutShape[] = [];
+  // Background fill (cSld → p:bg → p:bgPr)
+  let background: LayoutFill | undefined;
+  if (cSld) {
+    const bg = pFind(cSld, "p:bg");
+    const bgPr = bg ? pFind(bg, "p:bgPr") : undefined;
+    if (bgPr) background = readFill(bgPr, imageEmbedIds);
+  }
+  if (spTree) {
+    const zRef = { z: 0 };
+    walkSpTree(pChildren(spTree), zRef, undefined, shapes, imageEmbedIds);
+  }
+  return { size, background, shapes };
 }

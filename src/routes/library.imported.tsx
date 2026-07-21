@@ -5,6 +5,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { Loader2, ExternalLink, Send, Image as ImageIcon, FileText, ChevronRight, X, Check } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
+import { FaithfulSlideCanvas } from "@/components/slide/FaithfulSlideCanvas";
+import type { SlideLayout } from "@/lib/pptx-import.functions";
 import {
   listImportedDecksForDivision,
   getImportedDeckSlides,
@@ -183,11 +185,21 @@ function ImportedLibrary() {
         <SlidePreview
           slide={slidesQ.data.slides.find((s) => s.index === previewSlideIdx)!}
           deckName={slidesQ.data.original_filename}
+          deckTheme={themeToTokens(slidesQ.data.theme)}
           onClose={() => setPreviewSlideIdx(null)}
         />
       )}
     </AppShell>
   );
+}
+
+function themeToTokens(theme?: { accent1?: string; accent2?: string; dark1?: string }): Record<string, string> | undefined {
+  if (!theme) return undefined;
+  const t: Record<string, string> = {};
+  if (theme.accent1) t.accent1 = theme.accent1;
+  if (theme.accent2) t.accent2 = theme.accent2;
+  if (theme.dark1) { t.dk1 = theme.dark1; t.tx1 = theme.dark1; }
+  return Object.keys(t).length ? t : undefined;
 }
 
 function EmptyState() {
@@ -200,12 +212,23 @@ function EmptyState() {
   );
 }
 
+type ImportedSlide = {
+  index: number;
+  title: string;
+  bullets: string[];
+  notes: string;
+  imageCount: number;
+  imagePaths?: string[];
+  imageUrls?: string[];
+  layout?: SlideLayout;
+};
+
 type DeckSlidesData = {
   id: string;
   original_filename: string;
   slide_count: number;
   theme: { accent1?: string; accent2?: string; dark1?: string; headingFont?: string; bodyFont?: string };
-  slides: Array<{ index: number; title: string; bullets: string[]; notes: string; imageCount: number }>;
+  slides: ImportedSlide[];
   status: string;
   error: string | null;
   downloadUrl: string | null;
@@ -257,6 +280,7 @@ function DeckSlides({
             key={s.index}
             slide={s}
             deckId={deck.id}
+            deckTheme={themeToTokens(deck.theme)}
             brandModeId={brandModeId}
             approved={approvedKey.has(`${deck.id}:${s.index}`)}
             onPreview={() => onPreview(s.index)}
@@ -270,12 +294,14 @@ function DeckSlides({
 function SlideCard({
   slide,
   deckId,
+  deckTheme,
   brandModeId,
   approved,
   onPreview,
 }: {
-  slide: { index: number; title: string; bullets: string[]; notes: string; imageCount: number };
+  slide: ImportedSlide;
   deckId: string;
+  deckTheme?: Record<string, string>;
   brandModeId: string;
   approved: boolean;
   onPreview: () => void;
@@ -291,8 +317,8 @@ function SlideCard({
   });
 
   return (
-    <div className="group flex flex-col rounded-xl border border-black/10 bg-white p-4 transition hover:border-black/25 hover:shadow-sm">
-      <div className="flex items-start justify-between gap-2">
+    <div className="group flex flex-col rounded-xl border border-black/10 bg-white p-3 transition hover:border-black/25 hover:shadow-sm">
+      <div className="mb-2 flex items-center justify-between gap-2">
         <div className="text-[10px] font-mono uppercase tracking-widest text-black/40">
           Slide {slide.index + 1}
         </div>
@@ -306,12 +332,22 @@ function SlideCard({
       <button
         type="button"
         onClick={onPreview}
-        className="mt-2 text-left"
+        className="block overflow-hidden rounded-md border border-black/10 bg-white text-left"
+        aria-label={`Preview slide ${slide.index + 1}`}
       >
-        <div className="line-clamp-2 text-sm font-semibold text-[#03002C] group-hover:text-[#003FC7]">
-          {slide.title || <span className="italic text-black/40">Untitled</span>}
-        </div>
+        {slide.layout ? (
+          <FaithfulSlideCanvas layout={slide.layout} theme={deckTheme} width={320} />
+        ) : (
+          <div className="flex aspect-[16/9] w-full items-center justify-center bg-black/[0.02] text-[10px] text-black/40">
+            No layout captured
+          </div>
+        )}
       </button>
+
+      <div className="mt-2 line-clamp-2 text-xs font-medium text-[#03002C] group-hover:text-[#003FC7]">
+        {slide.title || <span className="italic text-black/40">Untitled</span>}
+      </div>
+
 
       {slide.bullets.length > 0 && (
         <ul className="mt-3 space-y-1 text-xs text-black/60">
@@ -362,55 +398,62 @@ function SlideCard({
 function SlidePreview({
   slide,
   deckName,
+  deckTheme,
   onClose,
 }: {
-  slide: { index: number; title: string; bullets: string[]; notes: string; imageCount: number };
+  slide: ImportedSlide;
   deckName: string;
+  deckTheme?: Record<string, string>;
   onClose: () => void;
 }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="relative max-h-[90vh] w-full max-w-3xl overflow-auto rounded-2xl bg-white p-8 shadow-2xl"
+        className="relative w-full max-w-6xl overflow-hidden rounded-2xl bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-full p-2 text-black/40 hover:bg-black/5 hover:text-black"
+          className="absolute right-4 top-4 z-10 rounded-full bg-white/90 p-2 text-black/60 hover:bg-white hover:text-black"
         >
           <X size={16} />
         </button>
-        <div className="text-xs uppercase tracking-widest text-black/40">
-          {deckName} · Slide {slide.index + 1}
-        </div>
-        <h3 className="mt-3 text-2xl font-semibold text-[#03002C]">
-          {slide.title || <span className="italic text-black/40">Untitled</span>}
-        </h3>
-        {slide.bullets.length > 0 && (
-          <ul className="mt-6 space-y-2 text-sm text-black/70">
-            {slide.bullets.map((b, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="text-[#003FC7]">•</span>
-                <span>{b}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-        {slide.notes && (
-          <div className="mt-6 rounded-lg border border-black/10 bg-black/[0.02] p-4">
-            <div className="text-[10px] uppercase tracking-widest text-black/40">Speaker notes</div>
-            <div className="mt-2 whitespace-pre-wrap text-xs text-black/70">{slide.notes}</div>
+        <div className="flex items-center justify-between border-b border-black/10 px-6 py-3">
+          <div className="text-xs uppercase tracking-widest text-black/50">
+            {deckName} · Slide {slide.index + 1}
           </div>
-        )}
-        <div className="mt-6 flex items-center gap-4 border-t border-black/10 pt-4 text-xs text-black/50">
-          {slide.imageCount > 0 && (
-            <span className="inline-flex items-center gap-1"><ImageIcon size={12} />{slide.imageCount} image{slide.imageCount === 1 ? "" : "s"}</span>
+          <div className="text-xs text-black/50">Faithful preview · 1:1 layout</div>
+        </div>
+        <div className="bg-black/[0.03] p-6">
+          {slide.layout ? (
+            <div className="mx-auto" style={{ maxWidth: 1100 }}>
+              <FaithfulSlideCanvas layout={slide.layout} theme={deckTheme} width={1100} className="rounded-lg shadow-lg ring-1 ring-black/10" />
+            </div>
+          ) : (
+            <div className="rounded-lg border border-dashed border-black/20 bg-white p-16 text-center text-sm text-black/50">
+              No layout captured for this slide.
+            </div>
           )}
-          <span>{slide.bullets.length} bullets</span>
+          {(slide.title || slide.notes) && (
+            <div className="mx-auto mt-6 grid max-w-4xl gap-4 sm:grid-cols-2">
+              {slide.title && (
+                <div className="rounded-lg border border-black/10 bg-white p-4">
+                  <div className="text-[10px] uppercase tracking-widest text-black/40">Title</div>
+                  <div className="mt-1 text-sm text-[#03002C]">{slide.title}</div>
+                </div>
+              )}
+              {slide.notes && (
+                <div className="rounded-lg border border-black/10 bg-white p-4">
+                  <div className="text-[10px] uppercase tracking-widest text-black/40">Speaker notes</div>
+                  <div className="mt-1 whitespace-pre-wrap text-xs text-black/70">{slide.notes}</div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
