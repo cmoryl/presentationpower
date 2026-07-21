@@ -2,6 +2,8 @@ import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import { SlideFrame as BaseSlideFrame, SlideModeContext, SlideBackdropContext, type SlideMode, type SlideBackdrop } from "./SlideChrome";
 import { SlideThumbnailContext, SlideVideoPreviewContext, useResolvedVideoUrl, useResolvedPosterUrl, useResolvedImageUrl, useResolvedLogoUrl } from "@/lib/slide-media-refresh";
 import { resolveSlideBackground } from "@/lib/background-library";
+import { backdropForVariant } from "./variantBackdrop";
+
 import { createContext, useContext, useEffect, useRef, useState, Fragment } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
@@ -240,6 +242,10 @@ export function VariantRenderer(props: Props) {
   // so variants that render their own MediaTile / deterministic backdrops are
   // unaffected.
   const resolvedBg = resolveSlideBackground((slide.content as Record<string, unknown>).background);
+  // Fallback: master TransPerfect/Corporate brand in dark mode auto-applies
+  // the curated 10-gradient backdrop set when the slide has no explicit
+  // background configured. Keeps existing decks & new slides on-brand.
+  const fallbackBackdrop = !resolvedBg ? backdropForVariant(variant, brand.id, mode) : null;
   const backdrop: SlideBackdrop | null = resolvedBg
     ? {
         url: resolvedBg.url,
@@ -254,7 +260,8 @@ export function VariantRenderer(props: Props) {
         offsetX: resolvedBg.offsetX,
         offsetY: resolvedBg.offsetY,
       }
-    : null;
+    : fallbackBackdrop;
+
 
   return (
     <SlideModeContext.Provider value={mode}>
