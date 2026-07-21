@@ -303,7 +303,24 @@ function renderVariantBody({
   mode: SlideMode;
 }): ReactNode {
 
+  // Mode-aware ink palette for charts and data viz. Every chart/graph variant
+  // MUST use these tokens (never hardcoded `rgba(10,15,28,X)`) so text stays
+  // readable when a dark backdrop is applied.
+  const isDark = mode === "dark";
+  const ink = {
+    strong:      isDark ? "#ffffff"                 : "rgba(10,15,28,0.92)",
+    body:        isDark ? "rgba(255,255,255,0.86)"  : "rgba(10,15,28,0.82)",
+    muted:       isDark ? "rgba(255,255,255,0.70)"  : "rgba(10,15,28,0.66)",
+    faint:       isDark ? "rgba(255,255,255,0.52)"  : "rgba(10,15,28,0.48)",
+    axis:        isDark ? "rgba(255,255,255,0.22)"  : "rgba(10,15,28,0.18)",
+    divider:     isDark ? "rgba(255,255,255,0.14)"  : "rgba(10,15,28,0.12)",
+    surface:     isDark ? "rgba(255,255,255,0.06)"  : "rgba(10,15,28,0.04)",
+    surfaceRing: isDark ? "rgba(255,255,255,0.12)"  : "rgba(10,15,28,0.10)",
+    ringOnDark:  isDark ? "#0b1024"                 : "#ffffff",
+  };
+
   switch (variant.id) {
+
     // ── Opening ────────────────────────────────────────────────────────
     case "MV-OP-COVER":
       return (
@@ -2164,7 +2181,7 @@ function renderVariantBody({
               return (
                 <div key={i} className="grid grid-cols-[260px_1fr_120px] items-center gap-6">
                   <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
-                  <div className="h-14 w-full rounded-lg" style={{ backgroundColor: "rgba(10,15,28,0.06)" }}>
+                  <div className="h-14 w-full rounded-lg" style={{ backgroundColor: ink.surface }}>
                     <div
                       className="flex h-full items-center rounded-lg px-4 text-white"
                       style={{
@@ -2887,38 +2904,115 @@ function renderVariantBody({
     case "MV-MATURITY-CURVE": {
       const items = arr(c.items);
       const n = Math.max(items.length, 2);
-      const W = 1600, H = 460;
+      // Reserve generous horizontal padding so the leftmost/rightmost labels
+      // never get clipped, and vertical padding for stage-label + note lines.
+      const PAD_X = 200;
+      const PAD_TOP = 90;
+      const PAD_BOT = 110;
+      const W = 1760;
+      const H = 520;
+      const curveId = `mc-fill-${variant.id}`;
+      const glowId = `mc-glow-${variant.id}`;
+      const gradId = `mc-line-${variant.id}`;
+      const primary = brand.tokens.primary;
+      const accent = brand.tokens.accent;
+      // Anchor left/right, sinusoidal ease so the S-curve reads as a real
+      // maturity ramp rather than a straight diagonal.
+      const px = (i: number) => PAD_X + (i / (n - 1)) * (W - PAD_X * 2);
+      const py = (i: number) => {
+        const t = i / (n - 1);
+        const eased = 0.5 - 0.5 * Math.cos(Math.PI * t);
+        return PAD_TOP + (1 - eased) * (H - PAD_TOP - PAD_BOT) * 0.9 + (H - PAD_BOT) * 0.05;
+      };
+      const points = items.map((_, i) => ({ x: px(i), y: py(i) }));
+      const path = points
+        .map((p, i) => {
+          if (i === 0) return `M ${p.x} ${p.y}`;
+          const prev = points[i - 1];
+          const mx = (prev.x + p.x) / 2;
+          return `C ${mx} ${prev.y} ${mx} ${p.y} ${p.x} ${p.y}`;
+        })
+        .join(" ");
+      const areaPath = `${path} L ${points[points.length - 1]?.x ?? W - PAD_X} ${H - PAD_BOT} L ${points[0]?.x ?? PAD_X} ${H - PAD_BOT} Z`;
+      const currentIdx = items.findIndex((it) => Boolean(it.current));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-12">
-            <svg viewBox={`0 0 ${W} ${H + 140}`} className="w-full">
-              <line x1="0" y1={H} x2={W} y2={H} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
-              <path
-                d={`M 40 ${H - 20} Q ${W * 0.35} ${H - 40} ${W * 0.55} ${H * 0.6} T ${W - 40} 40`}
-                fill="none"
-                stroke={brand.tokens.primary}
-                strokeWidth={4}
-              />
+          {s(c.subtitle) && (
+            <div className="mt-4 max-w-[1080px]" style={{ fontSize: 22, lineHeight: 1.4, color: ink.muted }}>
+              {s(c.subtitle)}
+            </div>
+          )}
+          <div className="mt-10">
+            <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ overflow: "visible" }}>
+              <defs>
+                <linearGradient id={gradId} x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="0%" stopColor={primary} stopOpacity={0.55} />
+                  <stop offset="55%" stopColor={primary} />
+                  <stop offset="100%" stopColor={accent} />
+                </linearGradient>
+                <linearGradient id={curveId} x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor={accent} stopOpacity={isDark ? 0.28 : 0.20} />
+                  <stop offset="100%" stopColor={accent} stopOpacity={0} />
+                </linearGradient>
+                <filter id={glowId} x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="6" result="b" />
+                  <feMerge>
+                    <feMergeNode in="b" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              {/* Baseline & tick guides */}
+              {Array.from({ length: 4 }, (_, i) => {
+                const y = PAD_TOP + ((H - PAD_TOP - PAD_BOT) / 3) * i;
+                return <line key={i} x1={PAD_X} y1={y} x2={W - PAD_X} y2={y} stroke={ink.axis} strokeDasharray={i === 3 ? "0" : "2 8"} strokeWidth={1} />;
+              })}
+              {/* Y-axis frame labels */}
+              <text x={PAD_X - 24} y={PAD_TOP + 6} textAnchor="end" fontSize={16} letterSpacing="0.28em" fill={ink.faint} style={{ textTransform: "uppercase", fontWeight: 600 }}>High</text>
+              <text x={PAD_X - 24} y={H - PAD_BOT + 6} textAnchor="end" fontSize={16} letterSpacing="0.28em" fill={ink.faint} style={{ textTransform: "uppercase", fontWeight: 600 }}>Low</text>
+              {/* Curve fill under-glow */}
+              <path d={areaPath} fill={`url(#${curveId})`} />
+              {/* Curve stroke */}
+              <path d={path} fill="none" stroke={`url(#${gradId})`} strokeWidth={5} strokeLinecap="round" filter={`url(#${glowId})`} />
+              {/* Nodes */}
               {items.map((it, i) => {
-                const t = i / (n - 1);
-                const x = 40 + t * (W - 80);
-                const y = H - 20 - t * (H - 60);
-                const current = Boolean(it.current);
+                const current = Boolean(it.current) || i === currentIdx;
+                const p = points[i];
+                const isFirst = i === 0;
+                const isLast = i === n - 1;
+                const anchor: "start" | "middle" | "end" = isFirst ? "start" : isLast ? "end" : "middle";
+                const labelX = isFirst ? p.x - 6 : isLast ? p.x + 6 : p.x;
+                const noteX = labelX;
+                const label = s(it.label);
+                const note = s(it.note);
                 return (
                   <g key={i}>
-                    <circle cx={x} cy={y} r={current ? 16 : 10} fill={current ? brand.tokens.accent : "#fff"} stroke={brand.tokens.primary} strokeWidth={3} />
-                    <text x={x} y={y - 28} textAnchor="middle" fontSize={26} fontWeight={600} fill={brand.tokens.primary} style={{ letterSpacing: "-0.01em" }}>{s(it.label)}</text>
-                    <text x={x} y={H + 40} textAnchor="middle" fontSize={18} fill="rgba(10,15,28,0.65)">{s(it.note)}</text>
-                    {current && <text x={x} y={y + 44} textAnchor="middle" fontSize={16} fontWeight={600} fill={brand.tokens.accent} style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>You are here</text>}
+                    {current && (
+                      <circle cx={p.x} cy={p.y} r={26} fill={accent} opacity={0.18} />
+                    )}
+                    <circle cx={p.x} cy={p.y} r={current ? 14 : 9} fill={current ? accent : ink.ringOnDark} stroke={current ? accent : primary} strokeWidth={current ? 0 : 3} />
+                    {current && <circle cx={p.x} cy={p.y} r={5} fill={ink.ringOnDark} />}
+                    <text x={labelX} y={p.y - 32} textAnchor={anchor} fontSize={28} fontWeight={700} fill={ink.strong} style={{ letterSpacing: "-0.015em" }}>{label}</text>
+                    {note && (
+                      <text x={noteX} y={H - PAD_BOT + 40} textAnchor={anchor} fontSize={18} fill={ink.muted}>
+                        {note}
+                      </text>
+                    )}
+                    {current && (
+                      <text x={p.x} y={p.y + 44} textAnchor="middle" fontSize={13} fontWeight={700} fill={accent} style={{ letterSpacing: "0.32em", textTransform: "uppercase" }}>You are here</text>
+                    )}
                   </g>
                 );
               })}
+              {/* X-axis kicker */}
+              <text x={PAD_X} y={H - 14} fontSize={13} letterSpacing="0.32em" fill={ink.faint} style={{ textTransform: "uppercase", fontWeight: 700 }}>{s(c.axisLabel, "Program maturity")}</text>
             </svg>
           </div>
         </SlideFrame>
       );
     }
+
 
     case "MV-JOURNEY-MAP": {
       const items = arr(c.items);
@@ -2955,8 +3049,8 @@ function renderVariantBody({
                   <text x={p.x} y={p.y - 20} textAnchor="middle" fontSize={18} fontWeight={600} fill={brand.tokens.primary}>{String(p.it.sentiment ?? "")}/5</text>
                 </g>
               ))}
-              <text x={20} y={20} fontSize={14} fill="rgba(10,15,28,0.55)" style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>High</text>
-              <text x={20} y={H} fontSize={14} fill="rgba(10,15,28,0.55)" style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>Low</text>
+              <text x={20} y={20} fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>High</text>
+              <text x={20} y={H} fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>Low</text>
             </svg>
           </div>
         </SlideFrame>
@@ -3006,7 +3100,7 @@ function renderVariantBody({
                   const isTarget = q + 1 === target;
                   return (
                     <div key={q} className="flex items-start justify-start p-6" style={{ border: "1px solid rgba(10,15,28,0.12)", background: isTarget ? `${brand.tokens.accent}14` : "transparent" }}>
-                      <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: isTarget ? brand.tokens.accent : "rgba(10,15,28,0.55)", fontWeight: 600 }}>{quadrants[q] ?? `Q${q + 1}`}</div>
+                      <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: isTarget ? brand.tokens.accent : ink.faint, fontWeight: 600 }}>{quadrants[q] ?? `Q${q + 1}`}</div>
                     </div>
                   );
                 })}
@@ -3026,7 +3120,7 @@ function renderVariantBody({
             </div>
             <div className="flex flex-col justify-center gap-6">
               <Kicker brand={brand}>Reading</Kicker>
-              <div style={{ fontSize: 22, lineHeight: 1.45, color: "rgba(10,15,28,0.78)" }}>
+              <div style={{ fontSize: 22, lineHeight: 1.45, color: ink.body }}>
                 Position on <b>{s(c.axisX)}</b> and <b>{s(c.axisY)}</b>. The tinted quadrant is where the program should live.
               </div>
             </div>
@@ -3050,7 +3144,7 @@ function renderVariantBody({
                     <Kicker brand={brand}>Visible</Kicker>
                   </div>
                   <div className="mt-3" style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
-                  <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(it.body)}</div>
+                  <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.42, color: ink.body }}>{s(it.body)}</div>
                 </div>
               ))}
             </div>
@@ -3061,13 +3155,13 @@ function renderVariantBody({
             </div>
             <div className="grid gap-8" style={{ gridTemplateColumns: `repeat(${Math.max(Math.min(below.length, 3), 2)}, minmax(0, 1fr))` }}>
               {below.map((it, i) => (
-                <div key={i} className="p-6" style={{ background: "rgba(10,15,28,0.04)", border: "1px solid rgba(10,15,28,0.08)" }}>
+                <div key={i} className="p-6" style={{ background: ink.surface, border: "1px solid rgba(10,15,28,0.08)" }}>
                   <div className="flex items-center justify-between gap-3">
-                    <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", color: "rgba(10,15,28,0.55)", fontWeight: 600 }}>Hidden</div>
+                    <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", color: ink.faint, fontWeight: 600 }}>Hidden</div>
                     <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="soft-tile" />
                   </div>
                   <div className="mt-3" style={{ fontSize: 24, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
-                  <div className="mt-2" style={{ fontSize: 18, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(it.body)}</div>
+                  <div className="mt-2" style={{ fontSize: 18, lineHeight: 1.42, color: ink.body }}>{s(it.body)}</div>
                 </div>
               ))}
             </div>
@@ -3142,11 +3236,11 @@ function renderVariantBody({
           <div className="mt-16 grid" style={{ gridTemplateColumns: "1fr 1px 1fr 1px 1fr" }}>
             {items.map((it, i) => (
               <>
-                {i > 0 && <div key={`d-${i}`} style={{ background: "rgba(10,15,28,0.12)" }} />}
+                {i > 0 && <div key={`d-${i}`} style={{ background: ink.divider }} />}
                 <div key={i} className="px-10">
                   <StatFigure brand={brand} value={s(it.value)} unit={s(it.unit)} label={s(it.label)} source={s(it.source) || undefined} size="xl" />
                   {s(it.note) && (
-                    <div className="mt-6" style={{ fontSize: 22, lineHeight: 1.4, color: "rgba(10,15,28,0.72)", maxWidth: 420 }}>{s(it.note)}</div>
+                    <div className="mt-6" style={{ fontSize: 22, lineHeight: 1.4, color: ink.body, maxWidth: 420 }}>{s(it.note)}</div>
                   )}
                 </div>
               </>
@@ -3172,7 +3266,7 @@ function renderVariantBody({
                   </div>
                   <div>
                     <div style={{ fontSize: 30, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.label)}</div>
-                    <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: "rgba(10,15,28,0.72)", maxWidth: 1080 }}>{s(it.body)}</div>
+                    <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: ink.body, maxWidth: 1080 }}>{s(it.body)}</div>
                   </div>
                 </div>
               ))}
@@ -3190,12 +3284,12 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="relative mt-16 grid gap-0" style={{ gridTemplateColumns: "1fr 1fr" }}>
             <div className="pr-16" style={{ opacity: 0.6 }}>
-              <div className="mb-6" style={{ height: 2, background: "rgba(10,15,28,0.15)", width: 96 }} />
-              <Kicker brand={brand} color="rgba(10,15,28,0.6)">{s(before.label, "Before")}</Kicker>
+              <div className="mb-6" style={{ height: 2, background: ink.axis, width: 96 }} />
+              <Kicker brand={brand} color={ink.muted}>{s(before.label, "Before")}</Kicker>
               <div className="mt-8">
                 <StatFigure brand={brand} value={s(before.value)} unit={s(before.unit)} size="lg" valueColor="rgba(10,15,28,0.7)" />
               </div>
-              <div className="mt-6" style={{ fontSize: 22, lineHeight: 1.42, color: "rgba(10,15,28,0.65)" }}>{s(before.body)}</div>
+              <div className="mt-6" style={{ fontSize: 22, lineHeight: 1.42, color: ink.muted }}>{s(before.body)}</div>
             </div>
             <div className="pl-16" style={{ borderLeft: `2px solid ${brand.tokens.accent}` }}>
               <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mb-6" />
@@ -3203,7 +3297,7 @@ function renderVariantBody({
               <div className="mt-8">
                 <StatFigure brand={brand} value={s(after.value)} unit={s(after.unit)} size="xl" />
               </div>
-              <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.42, color: "rgba(10,15,28,0.82)" }}>{s(after.body)}</div>
+              <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.42, color: ink.body }}>{s(after.body)}</div>
             </div>
             <div
               aria-hidden
