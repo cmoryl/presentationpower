@@ -150,33 +150,63 @@ function Library() {
     [tagIds],
   );
 
+  // Merged entry list — each variant contributes its canonical card, and,
+  // when a video example exists for that variant, a second entry that
+  // renders the same VariantCard component with the example content plus a
+  // pink ▶ Video badge. Both entries share the variant's family / tag /
+  // scope, so filters and search apply uniformly.
+  type LibraryEntry =
+    | { kind: "variant"; variant: ModuleVariant }
+    | { kind: "video"; variant: ModuleVariant; example: VideoSlideExample };
+
+  const allEntries = useMemo<LibraryEntry[]>(() => {
+    const out: LibraryEntry[] = [];
+    for (const v of moduleVariants) {
+      out.push({ kind: "variant", variant: v });
+      const ex = VIDEO_SLIDE_EXAMPLES.find((e) => e.variantId === v.id);
+      if (ex) out.push({ kind: "video", variant: v, example: ex });
+    }
+    return out;
+  }, [moduleVariants]);
+
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    const matched = moduleVariants.filter((v) => {
+    const matched = allEntries.filter((e) => {
+      const v = e.variant;
       if (pinnedOnly && !pins.has(v.id)) return false;
       if (familyIds.size > 0 && !familyIds.has(v.familyId)) return false;
       if (scopeBrand && restricted.has(v.familyId)) return false;
       if (activeTags.length > 0 && !activeTags.every((t) => t.test(v))) return false;
       if (!needle) return true;
       const familyName = byId(moduleFamilies, v.familyId)?.name.toLowerCase() ?? "";
-      return (
+      const baseMatch =
         v.id.toLowerCase().includes(needle) ||
         v.name.toLowerCase().includes(needle) ||
         v.description.toLowerCase().includes(needle) ||
         v.familyId.toLowerCase().includes(needle) ||
-        familyName.includes(needle)
-      );
+        familyName.includes(needle);
+      if (baseMatch) return true;
+      if (e.kind === "video") {
+        return (
+          e.example.title.toLowerCase().includes(needle) ||
+          e.example.blurb.toLowerCase().includes(needle) ||
+          "video".includes(needle) ||
+          "motion".includes(needle)
+        );
+      }
+      return false;
     });
     const scored = [...matched];
     if (sort === "most-used") {
-      scored.sort((a, b) => (usageByVariant.get(b.id) ?? 0) - (usageByVariant.get(a.id) ?? 0));
+      scored.sort((a, b) => (usageByVariant.get(b.variant.id) ?? 0) - (usageByVariant.get(a.variant.id) ?? 0));
     } else if (sort === "pinned-first") {
-      scored.sort((a, b) => (pins.has(b.id) ? 1 : 0) - (pins.has(a.id) ? 1 : 0));
+      scored.sort((a, b) => (pins.has(b.variant.id) ? 1 : 0) - (pins.has(a.variant.id) ? 1 : 0));
     } else if (scopeBrand) {
-      scored.sort((a, b) => (preferred.has(a.id) ? 0 : 1) - (preferred.has(b.id) ? 0 : 1));
+      scored.sort((a, b) => (preferred.has(a.variant.id) ? 0 : 1) - (preferred.has(b.variant.id) ? 0 : 1));
     }
     return scored;
-  }, [q, familyIds, activeTags, moduleVariants, moduleFamilies, scopeBrand, restricted, preferred, pinnedOnly, pins, sort, usageByVariant]);
+  }, [q, familyIds, activeTags, allEntries, moduleFamilies, scopeBrand, restricted, preferred, pinnedOnly, pins, sort, usageByVariant]);
+
 
   const hasFilters =
     q.trim().length > 0 || familyIds.size > 0 || tagIds.size > 0 || scopeBrandId !== "all" || pinnedOnly || sort !== "default";
@@ -191,6 +221,59 @@ function Library() {
 
 
   const active = openId ? moduleVariants.find((v) => v.id === openId) : null;
+
+  // Video example zoom (uses the same LightboxPortal as before, so the
+  // ▶ badge inside the enlarged stage still plays the clip in-place).
+  // Video card previews in the grid intentionally do NOT provide
+  // SlideVideoPreviewContext — they're wrapped in the outer zoom <button>,
+  // which forbids a nested <button> from MediaTile's badge.
+  const [videoZoomKey, setVideoZoomKey] = useState<string | null>(null);
+  const [videoZoomMode, setVideoZoomMode] = useState<"light" | "dark">(
+    mode === "dark" ? "dark" : "light",
+  );
+  const [videoBusy, setVideoBusy] = useState<string | null>(null);
+
+  const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
+  const navigate = useNavigate();
+
+  function sectionForVariant(variantId: string): string {
+    const v = byId(MODULE_VARIANTS, variantId);
+    if (!v) return "SF-01";
+    return sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? "SF-01";
+  }
+
+  function importVideoExample(ex: VideoSlideExample) {
+    const variant = byId(MODULE_VARIANTS, ex.variantId);
+    if (!variant) return;
+    setVideoBusy(ex.key);
+    const brand = scopeBrand ?? tpMaster;
+    const payload: TemplatePayload = {
+      title: `${ex.title} · Video starter`,
+      brandModeId: brand.id,
+      archetypeId: "arch-product-pitch",
+      subCompany: null,
+      context: null,
+      brief: {
+        prospect: "Video Example",
+        industry: "Media",
+        audience: "Internal review",
+        meetingObjective: `Demonstrate the ${variant.name} video layout`,
+        lengthTarget: 1,
+        clientFacts: ex.blurb,
+      },
+      slides: [
+        {
+          sectionId: sectionForVariant(ex.variantId),
+          variantId: ex.variantId,
+          layoutId: variant.permittedLayoutIds[0] ?? "",
+          content: structuredClone(ex.content) as Record<string, unknown>,
+        },
+      ],
+    };
+    const { deckId } = createDeckFromTemplate(payload);
+    navigate({ to: "/decks/$deckId", params: { deckId } });
+  }
+
 
   return (
     <AppShell>
@@ -312,7 +395,7 @@ function Library() {
             >
               ▤ Sample imagery {showImagery ? "on" : "off"}
             </button>
-            <span className="text-sm tabular-nums text-black/50">{filtered.length} of {moduleVariants.length}</span>
+            <span className="text-sm tabular-nums text-black/50">{filtered.length} of {allEntries.length}</span>
           </div>
         </div>
 
@@ -489,27 +572,36 @@ function Library() {
         </div>
       ) : (
       <div className="mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3">
-        {filtered.map((v) => (
-          <VariantCard
-            key={v.id}
-            variant={v}
-            familyName={byId(moduleFamilies, v.familyId)?.name}
-            brand={scopeBrand ?? tpMaster}
-            sectionId={sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? ""}
-            preferred={preferred.has(v.id)}
-            pinned={pins.has(v.id)}
-            usageCount={usageByVariant.get(v.id) ?? 0}
-            onTogglePin={() => togglePin(v.id)}
-            mode={mode}
-            showImagery={showImagery}
-            autoFixOn={autoFixOn}
-            onOpen={() => setOpenId(v.id)}
-          />
-        ))}
+        {filtered.map((entry) => {
+          const v = entry.variant;
+          const isVideo = entry.kind === "video";
+          return (
+            <VariantCard
+              key={isVideo ? `video:${entry.example.key}` : v.id}
+              variant={v}
+              familyName={byId(moduleFamilies, v.familyId)?.name}
+              brand={scopeBrand ?? tpMaster}
+              sectionId={sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? ""}
+              preferred={preferred.has(v.id)}
+              pinned={pins.has(v.id)}
+              usageCount={usageByVariant.get(v.id) ?? 0}
+              onTogglePin={() => togglePin(v.id)}
+              mode={mode}
+              showImagery={showImagery}
+              autoFixOn={autoFixOn}
+              onOpen={() =>
+                isVideo ? setVideoZoomKey(entry.example.key) : setOpenId(v.id)
+              }
+              videoExample={isVideo ? entry.example : undefined}
+              onImportExample={isVideo ? () => importVideoExample(entry.example) : undefined}
+              importBusy={isVideo && videoBusy === entry.example.key}
+            />
+          );
+        })}
       </div>
       )}
 
-      <VideoExamplesBlock brand={tpMaster} sectionFrameworks={sectionFrameworks} />
+
 
 
       <div className="mt-10">
@@ -541,6 +633,38 @@ function Library() {
           onClose={() => setOpenId(null)}
         />
       )}
+
+      {(() => {
+        if (!videoZoomKey) return null;
+        const ex = VIDEO_SLIDE_EXAMPLES.find((e) => e.key === videoZoomKey);
+        if (!ex) return null;
+        const variant = byId(MODULE_VARIANTS, ex.variantId);
+        if (!variant) return null;
+        const brand = scopeBrand ?? tpMaster;
+        const previewSlide = {
+          id: ex.key,
+          position: 0,
+          sectionId: sectionForVariant(ex.variantId),
+          variantId: ex.variantId,
+          layoutId: variant.permittedLayoutIds[0] ?? "",
+          content: ex.content as Record<string, unknown>,
+          changes: [],
+        };
+        return (
+          <LightboxPortal
+            mode={videoZoomMode}
+            setMode={(m) => {
+              if (m === null) setVideoZoomKey(null);
+              else setVideoZoomMode(m);
+            }}
+            variant={variant}
+            brand={brand}
+            previewSlide={previewSlide}
+            lightBackdrop={backdropForVariant(variant, brand.id, "light")}
+            darkBackdrop={backdropForVariant(variant, brand.id, "dark")}
+          />
+        );
+      })()}
     </AppShell>
   );
 }
@@ -558,6 +682,9 @@ const VariantCard = memo(function VariantCard({
   showImagery = false,
   autoFixOn = false,
   onOpen,
+  videoExample,
+  onImportExample,
+  importBusy = false,
 }: {
   variant: ModuleVariant;
   familyName?: string;
@@ -571,15 +698,24 @@ const VariantCard = memo(function VariantCard({
   showImagery?: boolean;
   autoFixOn?: boolean;
   onOpen: () => void;
+  /** When set, the card renders as a video demonstration of `variant`:
+   *  swap in the example content, show the pink ▶ Video badge, and expose
+   *  an "Import as starter deck" quick action. Click-to-zoom uses a video-
+   *  aware lightbox in the parent. */
+  videoExample?: VideoSlideExample;
+  onImportExample?: () => void;
+  importBusy?: boolean;
 }) {
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
   const previewSlide = {
-    id: variant.id,
+    id: videoExample ? `${variant.id}:video:${videoExample.key}` : variant.id,
     position: 0,
     sectionId,
     variantId: variant.id,
     layoutId: variant.permittedLayoutIds[0],
-    content: seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<string, unknown>,
+    content: (videoExample
+      ? (videoExample.content as Record<string, unknown>)
+      : (seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<string, unknown>)),
     changes: [],
   };
   const isDark = mode === "dark";
@@ -613,6 +749,7 @@ const VariantCard = memo(function VariantCard({
     return () => window.clearTimeout(t);
   }, [autoFixOn, isAB, variant.id, brand.id, showImagery, isDark, mountTick]);
 
+
   return (
     <div className="group relative">
     <button
@@ -642,7 +779,9 @@ const VariantCard = memo(function VariantCard({
                 >
                   <ScaledSlide>
                     <SlideBackdropContext.Provider value={m === "dark" ? darkBackdrop : lightBackdrop}>
-                      <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={m} />
+                      <SlideThumbnailContext.Provider value={true}>
+                        <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={m} />
+                      </SlideThumbnailContext.Provider>
                     </SlideBackdropContext.Provider>
                   </ScaledSlide>
                 </div>
@@ -654,9 +793,14 @@ const VariantCard = memo(function VariantCard({
               </div>
             </div>
           ))}
-          {preferred && (
+          {preferred && !videoExample && (
             <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-emerald-500/85 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white shadow ring-1 ring-white/30 backdrop-blur-md">
               In scope
+            </div>
+          )}
+          {videoExample && (
+            <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#EC388A]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
+              <Play size={10} className="fill-white" /> Video
             </div>
           )}
         </div>
@@ -669,7 +813,9 @@ const VariantCard = memo(function VariantCard({
       <div ref={singleRef} className="absolute inset-0">
         <ScaledSlide>
           <SlideBackdropContext.Provider value={singleBackdrop}>
-            <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={isDark ? "dark" : "light"} />
+            <SlideThumbnailContext.Provider value={true}>
+              <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={isDark ? "dark" : "light"} />
+            </SlideThumbnailContext.Provider>
           </SlideBackdropContext.Provider>
         </ScaledSlide>
 
@@ -691,9 +837,14 @@ const VariantCard = memo(function VariantCard({
           </span>
         </div>
 
-        {preferred && (
+        {preferred && !videoExample && (
           <div className="absolute left-3 top-3 rounded-full bg-emerald-500/85 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white shadow ring-1 ring-white/30 backdrop-blur-md">
             In scope
+          </div>
+        )}
+        {videoExample && (
+          <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#EC388A]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
+            <Play size={10} className="fill-white" /> Video
           </div>
         )}
       </div>
@@ -705,10 +856,10 @@ const VariantCard = memo(function VariantCard({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 space-y-1">
             <div className="font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-[#003FC7]">
-              {variant.id}
+              {videoExample ? `${variant.id} · Video demo` : variant.id}
             </div>
             <h3 className="truncate text-lg font-semibold tracking-tight text-[#03002C]">
-              {variant.name}
+              {videoExample ? videoExample.title : variant.name}
             </h3>
           </div>
           <span className="shrink-0 rounded-md bg-slate-100 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-500">
@@ -717,7 +868,7 @@ const VariantCard = memo(function VariantCard({
         </div>
 
         <p className="line-clamp-2 text-sm leading-relaxed text-slate-500">
-          {variant.description}
+          {videoExample ? videoExample.blurb : variant.description}
         </p>
 
         <div className="flex items-center justify-between border-t border-slate-100 pt-4">
@@ -728,12 +879,16 @@ const VariantCard = memo(function VariantCard({
             </div>
             <div className="h-6 w-px bg-slate-100" />
             <div className="flex flex-col">
-              <span className="text-[9px] font-bold uppercase tracking-tighter text-slate-400">Layouts</span>
+              <span className="text-[9px] font-bold uppercase tracking-tighter text-slate-400">
+                {videoExample ? "Variant" : "Layouts"}
+              </span>
               <span className="text-xs font-medium text-[#03002C]">
-                {variant.permittedLayoutIds.length} {variant.permittedLayoutIds.length === 1 ? "variant" : "variants"}
+                {videoExample
+                  ? variant.name
+                  : `${variant.permittedLayoutIds.length} ${variant.permittedLayoutIds.length === 1 ? "variant" : "variants"}`}
               </span>
             </div>
-            {variant.capacity.items && (
+            {!videoExample && variant.capacity.items && (
               <>
                 <div className="h-6 w-px bg-slate-100" />
                 <div className="flex flex-col">
@@ -746,7 +901,7 @@ const VariantCard = memo(function VariantCard({
             )}
           </div>
           <div className="flex items-center gap-1 text-xs font-semibold text-[#003FC7]">
-            <span>Details</span>
+            <span>{videoExample ? "Zoom" : "Details"}</span>
             <svg className="h-3 w-3 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
             </svg>
@@ -754,7 +909,18 @@ const VariantCard = memo(function VariantCard({
         </div>
       </div>
     </button>
-    {onTogglePin && (
+    {videoExample && onImportExample && (
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onImportExample(); }}
+        disabled={importBusy}
+        className="absolute inset-x-6 bottom-6 z-10 inline-flex items-center justify-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white opacity-0 shadow-lg transition group-hover:opacity-100 hover:bg-[#003FC7] disabled:opacity-60"
+      >
+        {importBusy ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
+        {importBusy ? "Importing…" : "Import as starter deck"}
+      </button>
+    )}
+    {onTogglePin && !videoExample && (
       <button
         type="button"
         onClick={(e) => { e.stopPropagation(); onTogglePin(); }}
@@ -771,7 +937,7 @@ const VariantCard = memo(function VariantCard({
         <Star size={14} className={pinned ? "fill-current" : ""} />
       </button>
     )}
-    {usageCount > 0 && (
+    {usageCount > 0 && !videoExample && (
       <span
         data-variant-usage-badge=""
         className="pointer-events-none absolute right-3 bottom-3 z-10 rounded-full bg-[#03002C]/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest text-white shadow-sm ring-1 ring-white/10 backdrop-blur"
@@ -1642,183 +1808,6 @@ function UserImportedKitsBlock() {
           );
         })}
       </div>
-    </section>
-  );
-}
-
-// ────────────────────────────────────────────────────────────────────────────
-// Video example slides — one per video-supporting variant. Each renders a
-// live VariantRenderer preview and imports as a single-slide starter deck.
-// ────────────────────────────────────────────────────────────────────────────
-function VideoExamplesBlock({
-  brand,
-  sectionFrameworks,
-}: {
-  brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
-  sectionFrameworks: ReturnType<typeof useTaxonomy>["sectionFrameworks"];
-}) {
-  const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
-  const navigate = useNavigate();
-  const [busy, setBusy] = useState<string | null>(null);
-  const [zoomKey, setZoomKey] = useState<string | null>(null);
-  const [zoomMode, setZoomMode] = useState<"light" | "dark">("dark");
-
-  function sectionForVariant(variantId: string): string {
-    const variant = byId(MODULE_VARIANTS, variantId);
-    if (!variant) return "SF-01";
-    const match = sectionFrameworks.find((s) =>
-      s.permittedFamilyIds.includes(variant.familyId),
-    );
-    return match?.id ?? "SF-01";
-  }
-
-  function importExample(ex: VideoSlideExample) {
-    const variant = byId(MODULE_VARIANTS, ex.variantId);
-    if (!variant) return;
-    setBusy(ex.key);
-    const payload: TemplatePayload = {
-      title: `${ex.title} · Video starter`,
-      brandModeId: brand.id,
-      archetypeId: "arch-product-pitch",
-      subCompany: null,
-      context: null,
-      brief: {
-        prospect: "Video Example",
-        industry: "Media",
-        audience: "Internal review",
-        meetingObjective: `Demonstrate the ${variant.name} video layout`,
-        lengthTarget: 1,
-        clientFacts: ex.blurb,
-      },
-      slides: [
-        {
-          sectionId: sectionForVariant(ex.variantId),
-          variantId: ex.variantId,
-          layoutId: variant.permittedLayoutIds[0] ?? "",
-          content: structuredClone(ex.content) as Record<string, unknown>,
-        },
-      ],
-    };
-    const { deckId } = createDeckFromTemplate(payload);
-    navigate({ to: "/decks/$deckId", params: { deckId } });
-  }
-
-  return (
-    <section className="mt-16">
-      <div className="flex items-end justify-between gap-4 border-b border-black/10 pb-4">
-        <div>
-          <div className="text-xs uppercase tracking-[0.3em] text-black/50">Video examples</div>
-          <h2 className="mt-2 text-2xl font-semibold text-[#03002C]">Motion-ready module variants</h2>
-          <p className="mt-2 max-w-2xl text-sm text-black/60">
-            Pre-built demonstrations of every module variant that supports slide-level video. Import one as a starter deck and swap in your own footage.
-          </p>
-        </div>
-        <span className="shrink-0 rounded-full bg-black/5 px-3 py-1 text-xs text-black/60">
-          {VIDEO_SLIDE_EXAMPLES.length} examples
-        </span>
-      </div>
-
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {VIDEO_SLIDE_EXAMPLES.map((ex) => {
-          const variant = byId(MODULE_VARIANTS, ex.variantId);
-          if (!variant) return null;
-          const previewSlide = {
-            id: ex.key,
-            position: 0,
-            sectionId: sectionForVariant(ex.variantId),
-            variantId: ex.variantId,
-            layoutId: variant.permittedLayoutIds[0] ?? "",
-            content: ex.content as Record<string, unknown>,
-            changes: [],
-          };
-          const backdrop = backdropForVariant(variant, brand.id, "light");
-          return (
-            <div
-              key={ex.key}
-              className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:border-[#003FC7]/20 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)]"
-            >
-              <button
-                type="button"
-                onClick={() => setZoomKey(ex.key)}
-                aria-label={`Zoom ${ex.title}`}
-                className="block w-full text-left focus:outline-none focus:ring-2 focus:ring-[#003FC7]/40"
-              >
-                <LazyMount
-                  className="relative m-2 aspect-[16/10] overflow-hidden rounded-[18px] bg-[#03002C]"
-                  placeholder={<PreviewSkeleton dark label={variant.familyId} />}
-                >
-                  {/* Thumbnail context = true so MediaTile skips <video> autoplay and keeps the ▶ badge non-interactive (SlideVideoPreviewContext is NOT provided here — only inside LightboxPortal — which matters because this preview sits inside the zoom <button> above; a nested <button> would be invalid HTML). */}
-                  <div className="absolute inset-0">
-                    <SlideThumbnailContext.Provider value={true}>
-                      <ScaledSlide>
-                        <SlideBackdropContext.Provider value={backdrop}>
-                          <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode="dark" />
-                        </SlideBackdropContext.Provider>
-                      </ScaledSlide>
-                    </SlideThumbnailContext.Provider>
-                  </div>
-                  <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-[#EC388A]/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow ring-1 ring-white/25 backdrop-blur">
-                    <Play size={10} className="fill-white" /> Video
-                  </div>
-                  <div className="pointer-events-none absolute right-3 top-3 rounded-full bg-white/15 px-2 py-0.5 font-mono text-[10px] text-white ring-1 ring-white/25 backdrop-blur">
-                    {ex.variantId}
-                  </div>
-                  <div className="pointer-events-none absolute inset-x-3 bottom-3 flex items-center justify-end opacity-0 transition group-hover:opacity-100">
-                    <span className="rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white">⤢ Zoom</span>
-                  </div>
-                </LazyMount>
-              </button>
-
-
-              <div className="p-5">
-                <div className="text-[10px] uppercase tracking-widest text-[#003FC7]">{variant.name}</div>
-                <div className="mt-1 text-base font-semibold text-[#03002C]">{ex.title}</div>
-                <p className="mt-2 text-sm text-black/60">{ex.blurb}</p>
-                <button
-                  type="button"
-                  onClick={() => importExample(ex)}
-                  disabled={busy !== null}
-                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#03002C] px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
-                >
-                  {busy === ex.key ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
-                  {busy === ex.key ? "Importing…" : "Import as starter deck"}
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {(() => {
-        if (!zoomKey) return null;
-        const ex = VIDEO_SLIDE_EXAMPLES.find((e) => e.key === zoomKey);
-        if (!ex) return null;
-        const variant = byId(MODULE_VARIANTS, ex.variantId);
-        if (!variant) return null;
-        const previewSlide = {
-          id: ex.key,
-          position: 0,
-          sectionId: sectionForVariant(ex.variantId),
-          variantId: ex.variantId,
-          layoutId: variant.permittedLayoutIds[0] ?? "",
-          content: ex.content as Record<string, unknown>,
-          changes: [],
-        };
-        return (
-          <LightboxPortal
-            mode={zoomMode}
-            setMode={(m) => {
-              if (m === null) setZoomKey(null);
-              else setZoomMode(m);
-            }}
-            variant={variant}
-            brand={brand}
-            previewSlide={previewSlide}
-            lightBackdrop={backdropForVariant(variant, brand.id, "light")}
-            darkBackdrop={backdropForVariant(variant, brand.id, "dark")}
-          />
-        );
-      })()}
     </section>
   );
 }
