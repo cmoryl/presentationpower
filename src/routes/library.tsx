@@ -16,6 +16,8 @@ import {
   seedDivisionContent,
   validateDivisionContent,
   COVERAGE_FIX_HINTS,
+  OVERLAY_SLOT_LABELS,
+  type OverlaySlot,
 } from "@/lib/library-preview";
 import { byId, MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
@@ -383,6 +385,42 @@ function Library() {
                     {r.notes.length > 0 && (
                       <div className="mt-1 text-[12px] text-amber-900/70">
                         {r.notes.join(" · ")}
+                      </div>
+                    )}
+                    {r.brandId !== "__inventory__" && (
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {(Object.keys(OVERLAY_SLOT_LABELS) as OverlaySlot[]).map((slot) => {
+                          const m = r.metrics[slot];
+                          const state = m.skipped
+                            ? "skipped"
+                            : m.ok
+                              ? "ok"
+                              : "fail";
+                          const cls =
+                            state === "ok"
+                              ? "border-emerald-300/70 bg-emerald-50 text-emerald-900"
+                              : state === "skipped"
+                                ? "border-black/10 bg-white/60 text-black/50"
+                                : "border-amber-400/70 bg-amber-100 text-amber-950";
+                          const title = m.note
+                            ? `${OVERLAY_SLOT_LABELS[slot]} — ${m.note}`
+                            : `${OVERLAY_SLOT_LABELS[slot]} ${m.count}/${m.expected}`;
+                          return (
+                            <span
+                              key={slot}
+                              title={title}
+                              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10.5px] font-medium ${cls}`}
+                            >
+                              <span aria-hidden>
+                                {state === "ok" ? "✓" : state === "skipped" ? "–" : "!"}
+                              </span>
+                              {OVERLAY_SLOT_LABELS[slot]}
+                              <span className="opacity-70">
+                                {m.count}/{m.expected}
+                              </span>
+                            </span>
+                          );
+                        })}
                       </div>
                     )}
                     <ul className="mt-2 space-y-1.5">

@@ -303,11 +303,54 @@ export const COVERAGE_FIX_HINTS: Record<
   },
 };
 
+export type OverlaySlot =
+  | "stats"
+  | "quote"
+  | "cover"
+  | "pillars"
+  | "agenda"
+  | "contextCards"
+  | "logos";
+
+export interface SlotMetric {
+  /** Number of populated items the overlay produced (1/0 for scalar slots). */
+  count: number;
+  /** Minimum count expected for this slot to be considered complete. */
+  expected: number;
+  /** count >= expected AND every populated entry is non-empty. */
+  ok: boolean;
+  /** True when the slot is not applicable to this brand (e.g. no service lines). */
+  skipped?: boolean;
+  /** Short reason surfaced in the UI when !ok or skipped. */
+  note?: string;
+}
+
+export const OVERLAY_SLOT_LABELS: Record<OverlaySlot, string> = {
+  stats: "Stats",
+  quote: "Quote",
+  cover: "Cover",
+  pillars: "Pillars",
+  agenda: "Agenda",
+  contextCards: "Context",
+  logos: "Logos",
+};
+
+const SLOT_ISSUE: Record<OverlaySlot, BrandCoverageIssue> = {
+  stats: "empty-stats",
+  quote: "empty-quote",
+  cover: "cover-title-blank",
+  pillars: "pillars-empty",
+  agenda: "agenda-empty",
+  contextCards: "context-cards-empty",
+  logos: "logos-empty",
+};
+
 export interface BrandCoverageReport {
   brandId: string;
   brandName: string;
   issues: BrandCoverageIssue[];
   notes: string[];
+  metrics: Record<OverlaySlot, SlotMetric>;
 }
 
 export interface DivisionCoverageResult {
@@ -336,14 +379,32 @@ function nonEmpty(s: unknown): boolean {
   return typeof s === "string" && s.trim().length > 0;
 }
 
+function emptyMetrics(): Record<OverlaySlot, SlotMetric> {
+  return {
+    stats: { count: 0, expected: 3, ok: false, skipped: true },
+    quote: { count: 0, expected: 1, ok: false, skipped: true },
+    cover: { count: 0, expected: 1, ok: false, skipped: true },
+    pillars: { count: 0, expected: 3, ok: false, skipped: true },
+    agenda: { count: 0, expected: 3, ok: false, skipped: true },
+    contextCards: { count: 0, expected: 3, ok: false, skipped: true },
+    logos: { count: 0, expected: 4, ok: false, skipped: true },
+  };
+}
+
 function auditBrand(brand: BrandMode): BrandCoverageReport {
   const issues: BrandCoverageIssue[] = [];
   const notes: string[] = [];
+  const metrics = emptyMetrics();
   const profile = BRAND_PROFILES[brand.id];
+
+  const pushSlot = (slot: OverlaySlot, m: SlotMetric) => {
+    metrics[slot] = m;
+    if (!m.ok && !m.skipped) issues.push(SLOT_ISSUE[slot]);
+  };
 
   if (!profile) {
     issues.push("missing-profile");
-    return { brandId: brand.id, brandName: brand.name, issues, notes };
+    return { brandId: brand.id, brandName: brand.name, issues, notes, metrics };
   }
 
   const industries = profile.contentScope?.industries ?? [];
@@ -379,30 +440,42 @@ function auditBrand(brand: BrandMode): BrandCoverageReport {
     unknown
   >;
   const statItems = asArr(stats.items) as Array<Record<string, unknown>>;
-  if (
-    statItems.length < 3 ||
-    statItems.some((s) => !nonEmpty(s.value) || !nonEmpty(s.label))
-  ) {
-    issues.push("empty-stats");
-  }
+  const statPopulated = statItems.filter((s) => nonEmpty(s.value) && nonEmpty(s.label)).length;
+  pushSlot("stats", {
+    count: statPopulated,
+    expected: 3,
+    ok: statPopulated >= 3 && statPopulated === statItems.length,
+    note:
+      statItems.length && statPopulated < statItems.length
+        ? `${statItems.length - statPopulated} stat(s) missing value/label`
+        : undefined,
+  });
 
-  // Quote canary.
+  // Quote canary (scalar).
   const q = seedDivisionContent(CANARIES.quote, brief, "Voice", brand) as Record<
     string,
     unknown
   >;
-  if (!nonEmpty(q.quote) || !nonEmpty(q.attribution)) {
-    issues.push("empty-quote");
-  }
+  const quoteOk = nonEmpty(q.quote) && nonEmpty(q.attribution);
+  pushSlot("quote", {
+    count: quoteOk ? 1 : 0,
+    expected: 1,
+    ok: quoteOk,
+    note: quoteOk ? undefined : !nonEmpty(q.quote) ? "quote empty" : "attribution empty",
+  });
 
-  // Cover canary.
+  // Cover canary (scalar).
   const cov = seedDivisionContent(CANARIES.cover, brief, "Cover", brand) as Record<
     string,
     unknown
   >;
-  if (!nonEmpty(cov.title) || !nonEmpty(cov.subtitle)) {
-    issues.push("cover-title-blank");
-  }
+  const coverOk = nonEmpty(cov.title) && nonEmpty(cov.subtitle);
+  pushSlot("cover", {
+    count: coverOk ? 1 : 0,
+    expected: 1,
+    ok: coverOk,
+    note: coverOk ? undefined : !nonEmpty(cov.title) ? "title blank" : "subtitle blank",
+  });
 
   // Pillars canary — requires service lines.
   if (services.length) {
@@ -411,9 +484,24 @@ function auditBrand(brand: BrandMode): BrandCoverageReport {
       unknown
     >;
     const plItems = asArr(pl.items) as Array<Record<string, unknown>>;
-    if (plItems.length === 0 || plItems.some((p) => !nonEmpty(p.title))) {
-      issues.push("pillars-empty");
-    }
+    const plPop = plItems.filter((p) => nonEmpty(p.title)).length;
+    pushSlot("pillars", {
+      count: plPop,
+      expected: 3,
+      ok: plPop >= 3 && plPop === plItems.length,
+      note:
+        plItems.length && plPop < plItems.length
+          ? `${plItems.length - plPop} pillar(s) missing title`
+          : undefined,
+    });
+  } else {
+    metrics.pillars = {
+      count: 0,
+      expected: 3,
+      ok: false,
+      skipped: true,
+      note: "no service lines",
+    };
   }
 
   // Agenda canary — requires service lines to overlay.
@@ -423,9 +511,24 @@ function auditBrand(brand: BrandMode): BrandCoverageReport {
       unknown
     >;
     const agItems = asArr(ag.items) as Array<Record<string, unknown>>;
-    if (agItems.length === 0 || agItems.some((a) => !nonEmpty(a.label))) {
-      issues.push("agenda-empty");
-    }
+    const agPop = agItems.filter((a) => nonEmpty(a.label)).length;
+    pushSlot("agenda", {
+      count: agPop,
+      expected: 3,
+      ok: agPop >= 3 && agPop === agItems.length,
+      note:
+        agItems.length && agPop < agItems.length
+          ? `${agItems.length - agPop} agenda row(s) missing label`
+          : undefined,
+    });
+  } else {
+    metrics.agenda = {
+      count: 0,
+      expected: 3,
+      ok: false,
+      skipped: true,
+      note: "no service lines",
+    };
   }
 
   // Context cards canary — requires industries to overlay.
@@ -435,18 +538,40 @@ function auditBrand(brand: BrandMode): BrandCoverageReport {
       unknown
     >;
     const cxItems = asArr(cx.items) as Array<Record<string, unknown>>;
-    if (cxItems.length === 0 || cxItems.some((c) => !nonEmpty(c.title))) {
-      issues.push("context-cards-empty");
-    }
+    const cxPop = cxItems.filter((c) => nonEmpty(c.title)).length;
+    pushSlot("contextCards", {
+      count: cxPop,
+      expected: 3,
+      ok: cxPop >= 3 && cxPop === cxItems.length,
+      note:
+        cxItems.length && cxPop < cxItems.length
+          ? `${cxItems.length - cxPop} card(s) missing title`
+          : undefined,
+    });
+  } else {
+    metrics.contextCards = {
+      count: 0,
+      expected: 3,
+      ok: false,
+      skipped: true,
+      note: "no industries",
+    };
   }
 
   // Proof logos.
   const logos = pickProofLogos(brand.id);
-  if (logos.length < 4 || logos.some((l) => !nonEmpty(l.name))) {
-    issues.push("logos-empty");
-  }
+  const logoPop = logos.filter((l) => nonEmpty(l.name)).length;
+  pushSlot("logos", {
+    count: logoPop,
+    expected: 4,
+    ok: logoPop >= 4 && logoPop === logos.length,
+    note:
+      logos.length && logoPop < logos.length
+        ? `${logos.length - logoPop} logo(s) missing name`
+        : undefined,
+  });
 
-  return { brandId: brand.id, brandName: brand.name, issues, notes };
+  return { brandId: brand.id, brandName: brand.name, issues, notes, metrics };
 }
 
 // Sanity-check case study inventory is unique — catches copy/paste seeding bugs
@@ -477,6 +602,7 @@ export function validateDivisionContent(): DivisionCoverageResult {
       brandName: "Case-study inventory",
       issues: ["missing-case-study"],
       notes: inventoryNotes,
+      metrics: emptyMetrics(),
     });
   }
   const failing = reports.filter((r) => r.issues.length > 0);
