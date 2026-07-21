@@ -56,6 +56,7 @@ function DocumentView() {
   const dateStr = new Date().toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
 
   return (
+    <SlideMediaRefreshProvider slides={deck.slides}>
     <div className="min-h-screen bg-neutral-100 py-10 print:bg-white print:py-0">
       <style>{`
         @media print {
