@@ -307,15 +307,18 @@ export function SlideFrame({
         const effectiveSize = isMarkOnly ? (shrink[sizeAfterHalf] ?? sizeAfterHalf) : sizeAfterHalf;
 
         // Vertical orientations pin to the corresponding edge, vertically
-        // centered. Position dropdown selection is preserved as a soft hint
-        // (top vs bottom biasing) but the anchor snaps to the correct edge.
+        // centered. We clamp max-height so the rotated lockup can't drift
+        // into the top brand-bar band or the bottom footer band.
         const containerStyle = isVertical
           ? (() => {
               const onLeft = logoOrientation === "vertical-left";
               const style: React.CSSProperties = {
                 position: "absolute",
-                top: "50%",
-                transform: "translateY(-50%)",
+                top: 140,                              // clears brand bar + safe zone
+                bottom: 120,                           // clears footer + safe zone
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               };
               if (onLeft) style.left = 32;
               else style.right = 32;
@@ -338,6 +341,7 @@ export function SlideFrame({
           </div>
         );
       })()}
+
 
       {/* Content — 96px side margin, 128px top / 96px bottom reserve. */}
       <div className="absolute inset-0 pt-32 pb-24 px-24">
