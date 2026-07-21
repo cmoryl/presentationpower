@@ -234,6 +234,75 @@ export type BrandCoverageIssue =
   | "context-cards-empty"
   | "logos-empty";
 
+// Human-readable auto-fix hint for each issue code. Points at the exact file
+// + field the maintainer needs to open. Keep these in sync with the audit
+// branches inside auditBrand().
+export const COVERAGE_FIX_HINTS: Record<
+  BrandCoverageIssue,
+  { file: string; field: string; hint: string }
+> = {
+  "missing-profile": {
+    file: "src/lib/brand-profiles.ts",
+    field: "BRAND_PROFILES[<brandId>]",
+    hint: "Add a full profile entry keyed by this brand id (voice, contentScope, tone).",
+  },
+  "missing-industries": {
+    file: "src/lib/brand-profiles.ts",
+    field: "BRAND_PROFILES[<brandId>].contentScope.industries",
+    hint: "List at least one industry — used to seed context cards and pick case studies.",
+  },
+  "missing-service-lines": {
+    file: "src/lib/brand-profiles.ts",
+    field: "BRAND_PROFILES[<brandId>].contentScope.serviceLines",
+    hint: "Add 3–6 service lines — they seed agenda items and solution pillars.",
+  },
+  "missing-case-study": {
+    file: "src/lib/case-studies.ts",
+    field: "CASE_STUDIES[…].stats",
+    hint: "Selected case study has fewer than 2 stats. Add stats entries or point brand tags at a richer case.",
+  },
+  "case-study-fallback": {
+    file: "src/lib/case-studies.ts + src/lib/brand-profiles.ts",
+    field: "CASE_STUDIES[…].tags  ↔  BRAND_PROFILES[<brandId>].contentScope.caseStudyTags",
+    hint: "No case study matched this brand's tags/industry — added a division-specific case study or add matching tags to an existing one.",
+  },
+  "empty-stats": {
+    file: "src/lib/case-studies.ts",
+    field: "CASE_STUDIES[…].stats[].{value,label}",
+    hint: "The matched case study needs ≥3 stats with non-empty value + label.",
+  },
+  "empty-quote": {
+    file: "src/lib/case-studies.ts",
+    field: "CASE_STUDIES[…].{quote,attribution}",
+    hint: "The matched case study is missing a quote or attribution.",
+  },
+  "cover-title-blank": {
+    file: "src/lib/library-preview.ts",
+    field: "seedDivisionContent() cover branch",
+    hint: "Cover overlay produced no title/subtitle — check pickCaseStudy() returned a client and brand.name is set.",
+  },
+  "pillars-empty": {
+    file: "src/lib/brand-profiles.ts",
+    field: "BRAND_PROFILES[<brandId>].contentScope.serviceLines",
+    hint: "MV-SOL-PILLARS-3 overlay needs service lines. Populate at least 3.",
+  },
+  "agenda-empty": {
+    file: "src/lib/brand-profiles.ts",
+    field: "BRAND_PROFILES[<brandId>].contentScope.serviceLines",
+    hint: "MV-OP-AGENDA overlay needs service lines. Populate at least 3–5.",
+  },
+  "context-cards-empty": {
+    file: "src/lib/brand-profiles.ts",
+    field: "BRAND_PROFILES[<brandId>].contentScope.industries",
+    hint: "MV-CTX-CARDS-3 overlay needs industries. Add at least 3.",
+  },
+  "logos-empty": {
+    file: "src/lib/brand-profiles.ts",
+    field: "BRAND_PROFILES[<brandId>].contentScope.industries",
+    hint: "pickProofLogos() sources names from industries — add more, or expand the fallback list in case-studies.ts → pickProofLogos().",
+  },
+};
+
 export interface BrandCoverageReport {
   brandId: string;
   brandName: string;
