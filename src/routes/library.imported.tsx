@@ -185,11 +185,21 @@ function ImportedLibrary() {
         <SlidePreview
           slide={slidesQ.data.slides.find((s) => s.index === previewSlideIdx)!}
           deckName={slidesQ.data.original_filename}
+          deckTheme={themeToTokens(slidesQ.data.theme)}
           onClose={() => setPreviewSlideIdx(null)}
         />
       )}
     </AppShell>
   );
+}
+
+function themeToTokens(theme?: { accent1?: string; accent2?: string; dark1?: string }): Record<string, string> | undefined {
+  if (!theme) return undefined;
+  const t: Record<string, string> = {};
+  if (theme.accent1) t.accent1 = theme.accent1;
+  if (theme.accent2) t.accent2 = theme.accent2;
+  if (theme.dark1) { t.dk1 = theme.dark1; t.tx1 = theme.dark1; }
+  return Object.keys(t).length ? t : undefined;
 }
 
 function EmptyState() {
