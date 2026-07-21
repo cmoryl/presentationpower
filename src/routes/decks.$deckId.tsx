@@ -598,10 +598,20 @@ function DeckEditor() {
               <div className="mt-1 text-xs text-black/50">{brief.industry} · {brief.audience}</div>
             </Panel>
           )}
-          {active && (mv?.id === "MV-PROOF-LOGOS" || mv?.id === "MV-CASE-LOGO-GRID") && (
+          {active && mv && [
+            "MV-PROOF-LOGOS",
+            "MV-CASE-LOGO-GRID",
+            "MV-LOGO-WALL",
+            "MV-CLIENT-MATRIX",
+            "MV-CLIENT-DETAIL-3",
+            "MV-CLIENT-COMPARE",
+          ].includes(mv.id) && (
             <LogoGridItemsPanel
               items={Array.isArray((active.content as Record<string, unknown>).items) ? ((active.content as Record<string, unknown>).items as Array<Record<string, unknown>>) : []}
               onChange={(items) => updateField(deck.id, active.id, "items", items)}
+              nameField={
+                mv.id === "MV-PROOF-LOGOS" || mv.id === "MV-LOGO-WALL" ? "name" : "client"
+              }
             />
           )}
           <ClientLogoPanel
