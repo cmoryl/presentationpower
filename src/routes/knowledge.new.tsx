@@ -70,10 +70,12 @@ function NewEntryView() {
 
           <div className="grid grid-cols-2 gap-6">
             <Field label="Kind">
-              <select value={kind} onChange={(e) => setKind(e.target.value as KnowledgeKind)} className={inputCls}>
-                {Object.entries(KNOWLEDGE_KIND_META).map(([k, m]) => (
-                  <option key={k} value={k}>{m.label} — {m.description}</option>
-                ))}
+              <select value={kind} onChange={(e) => setKind(e.target.value as EditableKnowledgeKind)} className={inputCls}>
+                {Object.entries(KNOWLEDGE_KIND_META)
+                  .filter(([k]) => k !== "source_deck" && k !== "source_pdf")
+                  .map(([k, m]) => (
+                    <option key={k} value={k}>{m.label} — {m.description}</option>
+                  ))}
               </select>
             </Field>
             <Field label="Expires (optional)">
