@@ -587,7 +587,23 @@ function inferUnitFromFormat(fmt: string | undefined): string | undefined {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function readChartTitle(t: any): string | undefined {
+  if (!t) return undefined;
+  const runs: string[] = [];
+  walk(t, (v, k) => {
+    if (k === "a:t") {
+      if (typeof v === "string") runs.push(v);
+      else if (v && typeof v === "object" && "#text" in v) runs.push(String(v["#text"]));
+    }
+  });
+  const s = runs.join("").trim();
+  return s.length ? s : undefined;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function readNumStrTitle(tx: any): string | undefined {
+
   if (!tx) return undefined;
   // c:tx/c:strRef/c:strCache/c:pt/c:v  OR  c:tx/c:v
 
