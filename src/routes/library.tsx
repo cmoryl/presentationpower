@@ -144,7 +144,6 @@ function Library() {
   useEffect(() => {
     if (!scopeBrand) return;
     const i = brandModes.findIndex((b) => b.id === scopeBrand.id);
-    if (import.meta.env.DEV) console.log("[library] sync brandIdx to scope", { scope: scopeBrand.id, i });
     if (i >= 0) setBrandIdx(i);
   }, [scopeBrand?.id, brandModes]);
 
