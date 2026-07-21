@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { uploadSlideMedia } from "@/lib/slide-media";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { logImageryEvent } from "@/lib/admin.functions";
+import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
 // Formats that render natively in every browser AND embed cleanly in
@@ -277,6 +278,50 @@ export function SlideImageryPanel({
             </button>
           </div>
         </div>
+
+        {/* Built-in imagery — curated division backdrops shipped with the app */}
+        {divisionId && (() => {
+          const set = getDivisionImagery(divisionId);
+          const builtIn = [
+            ...set.photos.map((url, i) => ({ url, label: `Photo ${i + 1}`, kind: "photo" as const })),
+            ...set.abstracts.map((url, i) => ({ url, label: `Abstract ${i + 1}`, kind: "abstract" as const })),
+          ];
+          if (builtIn.length === 0) return null;
+          return (
+            <div>
+              <div className="flex items-center justify-between">
+                <div className="text-[11px] uppercase tracking-widest text-black/50">
+                  Built-in imagery · {builtIn.length}
+                </div>
+                <div className="text-[10px] uppercase tracking-widest text-black/40">
+                  {divisionId}
+                </div>
+              </div>
+              <div className="mt-2 grid max-h-64 grid-cols-4 gap-2 overflow-y-auto pr-1">
+                {builtIn.map((b, idx) => (
+                  <button
+                    key={`${b.kind}-${idx}`}
+                    type="button"
+                    title={`${b.label} · ${b.kind}`}
+                    onClick={() => {
+                      onChange(b.url, null);
+                      void logImageryEvent({
+                        data: { imageId: `builtin:${divisionId}:${b.kind}:${idx}`, brandId: divisionId, eventType: "use" },
+                      }).catch(() => {});
+                    }}
+                    className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-black/10 bg-black/5 transition hover:border-black/40"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={b.url} alt={b.label} className="h-full w-full object-cover" loading="lazy" />
+                    <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/70 to-transparent px-1.5 py-1 text-left text-[9px] text-white opacity-0 group-hover:opacity-100">
+                      {b.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Team library — search and reuse division-scoped shared imagery */}
         {divisionId && signedIn && (
