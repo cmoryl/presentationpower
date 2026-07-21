@@ -311,17 +311,17 @@ function DeckEditor() {
             <div className="relative block w-full overflow-hidden rounded-2xl border border-[#003FC7]/40 shadow-lg ring-1 ring-[#003FC7]/20">
               {active && mv && (
                 <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
-                  <ScaledSlide>
-                    <LiveEditOverlay
-                      enabled={liveEdit}
-                      slideId={active.id}
-                      content={active.content as Record<string, unknown>}
-                      editableFields={mv.editableFields}
-                      onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
-                    >
+                  <LiveEditOverlay
+                    enabled={liveEdit}
+                    slideId={active.id}
+                    content={active.content as Record<string, unknown>}
+                    editableFields={mv.editableFields}
+                    onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
+                  >
+                    <ScaledSlide>
                       <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
-                    </LiveEditOverlay>
-                  </ScaledSlide>
+                    </ScaledSlide>
+                  </LiveEditOverlay>
                 </SlideVideoPreviewContext.Provider>
               )}
             </div>
