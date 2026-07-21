@@ -31,13 +31,21 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
   "bm-subcompany": {
     // Neutral fallback for free-typed subcompany names not in the fixed list.
     // Concrete divisions live in their own `bm-tp-*` entries below.
+    // Populated with TransPerfect-wide defaults so library previews still
+    // resolve division-aware overlays when no specific sub-company is picked.
     role: "subcompany",
     parentId: "bm-enterprise",
     logo: { mark: "TP", wordmark: "TransPerfect" },
     contentScope: {
-      industries: [],
-      serviceLines: [],
-      caseStudyTags: [],
+      industries: ["Financial Services", "Life Sciences", "Retail & E-commerce", "Technology", "Legal"],
+      serviceLines: [
+        "Translation & localization",
+        "Content operations",
+        "Multimedia & studio",
+        "Interpretation",
+        "Language technology",
+      ],
+      caseStudyTags: ["global-rollout", "multilingual-content", "regulated", "speed-to-market", "cost-savings"],
       preferredArchetypes: ["arch-value-story", "arch-decision-drive"],
     },
   },
