@@ -287,19 +287,35 @@ export function SlideFrame({
       {/* Brand lockup (locked) — placed per approved zone. Content slides
           stay quiet at sm so titles carry the composition; cover / divider /
           close slides scale up so the mark reads at hero size. */}
-      {showLogo && (
-        <div style={logoPositionStyles(placement.position)}>
-          <BrandLockup
-            brand={brand}
-            color={logoColor}
-            size={variant === "content" ? "sm" : variant === "cover" ? "xl" : "md"}
-            clientName={clientName}
-            clientLogoUrl={clientLogoUrl ?? null}
-            subCompany={subCompany}
-            orientation={logoOrientation}
-          />
-        </div>
-      )}
+      {showLogo && (() => {
+        // Positions that should render at half size per brand direction:
+        // top-center, bottom-center, and the left-side variants.
+        const halfSize = (
+          placement.position === "top-center" ||
+          placement.position === "bottom-center" ||
+          placement.position === "top-left" ||
+          placement.position === "bottom-left"
+        );
+        const baseSize = variant === "content" ? "sm" : variant === "cover" ? "xl" : "md";
+        const shrink: Record<string, "2xs" | "xs" | "sm" | "md" | "lg" | "xl"> = {
+          xl: "sm", lg: "xs", md: "xs", sm: "2xs", xs: "2xs", "2xs": "2xs",
+        };
+        const effectiveSize = halfSize ? shrink[baseSize] : (baseSize as "sm" | "md" | "xl");
+        return (
+          // Logo is always the top-most visual layer on every slide.
+          <div style={{ ...logoPositionStyles(placement.position), zIndex: 60, pointerEvents: "none" }}>
+            <BrandLockup
+              brand={brand}
+              color={logoColor}
+              size={effectiveSize}
+              clientName={clientName}
+              clientLogoUrl={clientLogoUrl ?? null}
+              subCompany={subCompany}
+              orientation={logoOrientation}
+            />
+          </div>
+        );
+      })()}
 
       {/* Content — 96px side margin, 128px top / 96px bottom reserve. */}
       <div className="absolute inset-0 pt-32 pb-24 px-24">
