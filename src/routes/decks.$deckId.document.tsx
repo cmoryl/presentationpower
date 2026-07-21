@@ -21,8 +21,18 @@ import {
 
 export const Route = createFileRoute("/decks/$deckId/document")({
   head: () => ({ meta: [{ title: "Document · TransPerfect Modular" }] }),
-  component: DocumentView,
+  component: DocumentGate,
 });
+
+function DocumentGate() {
+  const { deckId } = Route.useParams();
+  const hydrated = useDeckHydrated();
+  const hasDeck = useDeckStore((s) => Boolean(s.decks[deckId]));
+  if (!hydrated) return <DeckHydratingFallback label="Loading document…" />;
+  if (!hasDeck) throw notFound();
+  return <DocumentView />;
+}
+
 
 function DocumentView() {
   const { deckId } = Route.useParams();
