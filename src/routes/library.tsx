@@ -1093,9 +1093,11 @@ function LightboxPortal({
 
   const isDark = mode === "dark";
 
-  return (
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex flex-col bg-[#03002C]/95 backdrop-blur-xl animate-in fade-in duration-200"
+      className="fixed inset-0 z-[9999] flex flex-col bg-[#03002C]/95 backdrop-blur-xl animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-label="Enlarged slide preview"
