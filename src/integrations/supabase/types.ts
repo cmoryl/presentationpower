@@ -1120,6 +1120,81 @@ export type Database = {
         }
         Relationships: []
       }
+      globallink_share_activity: {
+        Row: {
+          created_at: string
+          deck_id: string | null
+          deck_title: string | null
+          error_message: string | null
+          file_name: string
+          file_size_bytes: number | null
+          id: string
+          share_url: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deck_id?: string | null
+          deck_title?: string | null
+          error_message?: string | null
+          file_name: string
+          file_size_bytes?: number | null
+          id?: string
+          share_url?: string | null
+          status: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          deck_id?: string | null
+          deck_title?: string | null
+          error_message?: string | null
+          file_name?: string
+          file_size_bytes?: number | null
+          id?: string
+          share_url?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      globallink_share_settings: {
+        Row: {
+          auto_share_on_export: boolean
+          created_at: string
+          default_folder: string | null
+          default_link_expiry_days: number
+          id: boolean
+          notify_recipients: boolean
+          password_protect: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          auto_share_on_export?: boolean
+          created_at?: string
+          default_folder?: string | null
+          default_link_expiry_days?: number
+          id?: boolean
+          notify_recipients?: boolean
+          password_protect?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          auto_share_on_export?: boolean
+          created_at?: string
+          default_folder?: string | null
+          default_link_expiry_days?: number
+          id?: boolean
+          notify_recipients?: boolean
+          password_protect?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       glossary_terms: {
         Row: {
           created_at: string
