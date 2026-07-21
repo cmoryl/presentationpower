@@ -22,6 +22,7 @@ import { MessageSquare } from "lucide-react";
 import { UndoRedoControls } from "@/components/UndoRedoControls";
 import { SwapLayoutButton } from "@/components/SwapLayoutPicker";
 import { useDeckStore, type DeckClientLogo, type DeckSlide } from "@/lib/deck-store";
+import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { VIDEO_SLIDE_EXAMPLES } from "@/lib/video-slide-examples";
 import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.functions";
 
