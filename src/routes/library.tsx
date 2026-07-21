@@ -717,6 +717,7 @@ const VariantCard = memo(function VariantCard({
   videoExample,
   onImportExample,
   importBusy = false,
+  logoHubPool,
 }: {
   variant: ModuleVariant;
   familyName?: string;
@@ -737,17 +738,28 @@ const VariantCard = memo(function VariantCard({
   videoExample?: VideoSlideExample;
   onImportExample?: () => void;
   importBusy?: boolean;
+  /** LogoHub filler pool; when non-empty, MV-PROOF-LOGOS-* variants swap
+   *  their filler logos for real LogoHub rows. */
+  logoHubPool?: LogoFiller[];
 }) {
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
+  const rawContent = videoExample
+    ? (videoExample.content as Record<string, unknown>)
+    : (seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<string, unknown>);
+  const previewContent = useMemo(() => {
+    if (videoExample) return rawContent;
+    if (!logoHubPool || logoHubPool.length === 0) return rawContent;
+    if (!/^MV-(PROOF-LOGOS|CASE-LOGO-GRID)/.test(variant.id)) return rawContent;
+    return overlayLogoHubFillers(rawContent, variant.id, logoHubPool);
+  }, [rawContent, videoExample, logoHubPool, variant.id]);
   const previewSlide = {
     id: videoExample ? `${variant.id}:video:${videoExample.key}` : variant.id,
     position: 0,
     sectionId,
     variantId: variant.id,
     layoutId: variant.permittedLayoutIds[0],
-    content: (videoExample
-      ? (videoExample.content as Record<string, unknown>)
-      : (seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<string, unknown>)),
+    content: previewContent,
+
     changes: [],
   };
   const isDark = mode === "dark";
