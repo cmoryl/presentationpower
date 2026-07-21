@@ -13,6 +13,7 @@ import {
 } from "./taxonomy";
 import { BRAND_PROFILES, getSubCompanyProfile } from "./brand-profiles";
 import { pickCaseStudy, pickProofLogos, CASE_STUDIES } from "./case-studies";
+import { getApprovedLogoItems } from "./approved-logos";
 import { variantSupportsImagery, variantSupportsVideo } from "./variant-media";
 
 export type BrandModeId = string;
