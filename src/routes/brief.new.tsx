@@ -894,10 +894,10 @@ function BriefWizard() {
                 </div>
               </div>
             </form>
-          </div>
         </div>
       </div>
     </AppShell>
+
   );
 }
 
