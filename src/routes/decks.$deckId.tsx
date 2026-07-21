@@ -1212,7 +1212,7 @@ function LogoGridItemsPanel({
                         key={v.key}
                         type="button"
                         disabled={!has}
-                        onClick={() => update(i, { logoVariant: v.key, logoUrl: url })}
+                        onClick={() => update(i, { logoVariant: v.key, logoUrl: url, logoPath: variantPaths[v.key] ?? "" })}
                         className={
                           "rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-widest transition " +
                           (isActive
