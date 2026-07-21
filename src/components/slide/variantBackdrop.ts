@@ -22,9 +22,21 @@ import corp08 from "@/assets/backdrops/corporate-dark/bg-08.webp";
 import corp09 from "@/assets/backdrops/corporate-dark/bg-09.webp";
 import corp10 from "@/assets/backdrops/corporate-dark/bg-10.webp";
 
+// TP Media — 6 curated dark-mode gradient stills (navy + magenta/lavender).
+import media01 from "@/assets/backdrops/tp-media-dark/bg-01.webp";
+import media02 from "@/assets/backdrops/tp-media-dark/bg-02.webp";
+import media03 from "@/assets/backdrops/tp-media-dark/bg-03.webp";
+import media04 from "@/assets/backdrops/tp-media-dark/bg-04.webp";
+import media05 from "@/assets/backdrops/tp-media-dark/bg-05.webp";
+import media06 from "@/assets/backdrops/tp-media-dark/bg-06.webp";
+
 export const CORPORATE_DARK_BACKDROPS: string[] = [
   corp01, corp02, corp03, corp04, corp05,
   corp06, corp07, corp08, corp09, corp10,
+];
+
+export const TP_MEDIA_DARK_BACKDROPS: string[] = [
+  media01, media02, media03, media04, media05, media06,
 ];
 
 const PORTRAITS = [portrait1, portrait2, portrait3, portrait4];
@@ -32,6 +44,11 @@ const PORTRAITS = [portrait1, portrait2, portrait3, portrait4];
 /** Returns the deterministic corporate-dark backdrop URL for a variant id. */
 export function pickCorporateDarkBackdrop(variantId: string): string {
   return CORPORATE_DARK_BACKDROPS[hashStr(variantId) % CORPORATE_DARK_BACKDROPS.length];
+}
+
+/** Returns the deterministic TP Media dark backdrop URL for a variant id. */
+export function pickTpMediaDarkBackdrop(variantId: string): string {
+  return TP_MEDIA_DARK_BACKDROPS[hashStr(variantId) % TP_MEDIA_DARK_BACKDROPS.length];
 }
 
 function hashStr(s: string): number {
@@ -69,8 +86,16 @@ function _computeBackdrop(
   // on-brand gradient set. Only affects bm-enterprise + dark — other
   // divisions (Life Sci, Legal, Media, Digital, Gaming, GlobalLink,
   // DataForce, Trial Interactive) keep their existing division imagery.
+  // Master TransPerfect / Corporate brand in dark mode uses the curated
+  // on-brand gradient set. TP Media gets its own dedicated dark gradient set.
+  // Other divisions keep their existing division imagery.
   const useCorporateDark = mode === "dark" && brandId === "bm-enterprise";
-  const corporateBg = useCorporateDark ? pickCorporateDarkBackdrop(id) : null;
+  const useMediaDark = mode === "dark" && brandId === "bm-tp-media";
+  const corporateBg = useCorporateDark
+    ? pickCorporateDarkBackdrop(id)
+    : useMediaDark
+      ? pickTpMediaDarkBackdrop(id)
+      : null;
 
   const pickPhoto = (offset = 0) =>
     corporateBg ?? photos[(seed + offset) % photos.length];
