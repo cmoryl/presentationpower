@@ -72,9 +72,11 @@ function _computeBackdrop(
   const useCorporateDark = mode === "dark" && brandId === "bm-enterprise";
   const corporateBg = useCorporateDark ? pickCorporateDarkBackdrop(id) : null;
 
-  const pickPhoto = (offset = 0) => photos[(seed + offset) % photos.length];
-  const pickAbstract = (offset = 0) => abstracts[(seed + offset) % abstracts.length];
-  const pickPortrait = () => PORTRAITS[seed % PORTRAITS.length];
+  const pickPhoto = (offset = 0) =>
+    corporateBg ?? photos[(seed + offset) % photos.length];
+  const pickAbstract = (offset = 0) =>
+    corporateBg ?? abstracts[(seed + offset) % abstracts.length];
+  const pickPortrait = () => (corporateBg ?? PORTRAITS[seed % PORTRAITS.length]);
 
   // Full-bleed cover / hero — division photograph, strong side scrim.
   if (/^MV-OP-COVER(-MEDIA)?$/.test(id) || id === "MV-CS-HERO" || id === "MV-CTA-CLOSING-HERO") {
