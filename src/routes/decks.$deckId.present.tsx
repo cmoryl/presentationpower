@@ -22,12 +22,14 @@ function PresenterView() {
   const { deckId } = Route.useParams();
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
+  const hydrated = useDeckHydrated();
   const navigate = useNavigate();
   const [i, setI] = useState(0);
   const [stripOpen, setStripOpen] = useState(true);
   const [notesOpen, setNotesOpen] = useState(false);
   const [focusedThumb, setFocusedThumb] = useState(0);
 
+  if (!hydrated) return <DeckHydratingFallback label="Loading presentation…" />;
   if (!deck) throw notFound();
   const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
   const slide = deck.slides[i];
