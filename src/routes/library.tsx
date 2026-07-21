@@ -16,6 +16,8 @@ import {
   seedDivisionContent,
   validateDivisionContent,
   COVERAGE_FIX_HINTS,
+  OVERLAY_SLOT_LABELS,
+  type OverlaySlot,
 } from "@/lib/library-preview";
 import { byId, MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
