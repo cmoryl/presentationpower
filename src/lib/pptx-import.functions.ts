@@ -1186,6 +1186,16 @@ function readFrame(spPr: PNode | undefined): LayoutFrame | undefined {
   };
 }
 
+function readColorNodeAlpha(colorNode: PNode | undefined): number | undefined {
+  if (!colorNode) return undefined;
+  const alpha = pFind(colorNode, "a:alpha");
+  if (!alpha) return undefined;
+  const v = pAttrs(alpha)["@_val"];
+  if (!v) return undefined;
+  const n = Number(v) / 100000;
+  return isFinite(n) && n >= 0 && n <= 1 ? n : undefined;
+}
+
 function readColorFromNode(n: PNode | undefined): string | undefined {
   if (!n) return undefined;
   const srgb = pFind(n, "a:srgbClr");
@@ -1201,6 +1211,30 @@ function readColorFromNode(n: PNode | undefined): string | undefined {
   return undefined;
 }
 
+// Alpha is stored inside the color node itself (a:srgbClr / a:schemeClr).
+function readAlphaOfSolid(solidFill: PNode | undefined): number | undefined {
+  if (!solidFill) return undefined;
+  const srgb = pFind(solidFill, "a:srgbClr");
+  const sch = pFind(solidFill, "a:schemeClr");
+  return readColorNodeAlpha(srgb) ?? readColorNodeAlpha(sch);
+}
+
+function readSrcRect(blipFill: PNode | undefined): LayoutSrcRect | undefined {
+  if (!blipFill) return undefined;
+  const s = pFind(blipFill, "a:srcRect");
+  if (!s) return undefined;
+  const a = pAttrs(s);
+  const l = a["@_l"] ? Number(a["@_l"]) / 100000 : 0;
+  const t = a["@_t"] ? Number(a["@_t"]) / 100000 : 0;
+  const r = a["@_r"] ? Number(a["@_r"]) / 100000 : 0;
+  const b = a["@_b"] ? Number(a["@_b"]) / 100000 : 0;
+  if (l === 0 && t === 0 && r === 0 && b === 0) return undefined;
+  // Clamp — some producers emit negatives for "outset" edges we can't reproduce
+  // trivially in CSS; treat them as 0 so the visible region stays inside source.
+  const clamp = (n: number) => Math.max(0, Math.min(0.99, n));
+  return { l: clamp(l), t: clamp(t), r: clamp(r), b: clamp(b) };
+}
+
 function readFill(spPr: PNode | undefined, imageEmbedIds: string[]): LayoutFill | undefined {
   if (!spPr) return undefined;
   const kids = pChildren(spPr);
@@ -1208,17 +1242,17 @@ function readFill(spPr: PNode | undefined, imageEmbedIds: string[]): LayoutFill 
     const t = pTag(k);
     if (t === "a:solidFill") {
       const c = readColorFromNode(k);
-      if (c) return { kind: "solid", color: c };
+      if (c) return { kind: "solid", color: c, opacity: readAlphaOfSolid(k) };
     }
     if (t === "a:noFill") return { kind: "none" };
     if (t === "a:gradFill") {
       const gsLst = pFind(k, "a:gsLst");
-      const stops: Array<{ pos: number; color: string }> = [];
+      const stops: Array<{ pos: number; color: string; opacity?: number }> = [];
       if (gsLst) {
         for (const g of pFindAll(gsLst, "a:gs")) {
           const pos = Number(pAttrs(g)["@_pos"] ?? 0) / 100000;
           const color = readColorFromNode(g);
-          if (color) stops.push({ pos, color });
+          if (color) stops.push({ pos, color, opacity: readAlphaOfSolid(g) });
         }
       }
       const lin = pFind(k, "a:lin");
@@ -1229,14 +1263,29 @@ function readFill(spPr: PNode | undefined, imageEmbedIds: string[]): LayoutFill 
       const blip = pFind(k, "a:blip");
       const embed = blip ? pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"] : undefined;
       if (embed) {
-        // caller resolves embed → data URL via imageEmbedIds (unused here but reserved).
         void imageEmbedIds;
-        return { kind: "image", embedId: embed };
+        const srcRect = readSrcRect(k);
+        const tile = !!pFind(k, "a:tile");
+        // Blip-level opacity (rare but valid): <a:blip><a:alphaModFix amt="..."/></a:blip>
+        let opacity: number | undefined;
+        if (blip) {
+          const alphaMod = pFind(blip, "a:alphaModFix");
+          if (alphaMod) {
+            const v = pAttrs(alphaMod)["@_amt"];
+            if (v) {
+              const n = Number(v) / 100000;
+              if (isFinite(n) && n >= 0 && n <= 1) opacity = n;
+            }
+          }
+        }
+        return { kind: "image", embedId: embed, srcRect, opacity, tile: tile || undefined };
       }
     }
   }
   return undefined;
 }
+
+
 
 function readLine(spPr: PNode | undefined): LayoutLine | undefined {
   if (!spPr) return undefined;
