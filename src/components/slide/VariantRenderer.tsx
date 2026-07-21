@@ -240,6 +240,10 @@ export function VariantRenderer(props: Props) {
   // so variants that render their own MediaTile / deterministic backdrops are
   // unaffected.
   const resolvedBg = resolveSlideBackground((slide.content as Record<string, unknown>).background);
+  // Fallback: master TransPerfect/Corporate brand in dark mode auto-applies
+  // the curated 10-gradient backdrop set when the slide has no explicit
+  // background configured. Keeps existing decks & new slides on-brand.
+  const fallbackBackdrop = !resolvedBg ? backdropForVariant(variant, brand.id, mode) : null;
   const backdrop: SlideBackdrop | null = resolvedBg
     ? {
         url: resolvedBg.url,
@@ -254,7 +258,8 @@ export function VariantRenderer(props: Props) {
         offsetX: resolvedBg.offsetX,
         offsetY: resolvedBg.offsetY,
       }
-    : null;
+    : fallbackBackdrop;
+
 
   return (
     <SlideModeContext.Provider value={mode}>
