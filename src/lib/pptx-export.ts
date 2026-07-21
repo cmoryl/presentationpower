@@ -819,6 +819,33 @@ function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette)
     case "MV-SOL-ARCHITECTURE": renderSolArchitecture(s, c, p); return true;
     case "MV-SOL-FEATURE-LIST": renderSolFeatureList(s, c, p); return true;
     case "MV-PROC-BEFORE-AFTER": renderProcBeforeAfter(s, c, p); return true;
+    // M2 batch — bespoke cover/agenda/divider/close/quote treatments
+    case "MV-OP-COVER-DOSSIER": renderCoverDossier(s, c, p); return true;
+    case "MV-OP-COVER-EDITORIAL": renderCoverEditorial(s, c, p); return true;
+    case "MV-OP-COVER-GRADIENT": renderCoverGradient(s, c, p); return true;
+    case "MV-OP-COVER-GRID": renderCoverGrid(s, c, p); return true;
+    case "MV-OP-COVER-MEDIA": renderCoverMedia(s, c, p); return true;
+    case "MV-OP-COVER-MINIMAL": renderCoverMinimal(s, c, p); return true;
+    case "MV-OP-COVER-MONOGRAM": renderCoverMonogram(s, c, p); return true;
+    case "MV-OP-COVER-POSTER": renderCoverPoster(s, c, p); return true;
+    case "MV-OP-COVER-SPLIT": renderCoverSplit(s, c, p); return true;
+    case "MV-OP-COVER-STACKED": renderCoverStacked(s, c, p); return true;
+    case "MV-OP-AGENDA-VERTICAL": renderAgendaVertical(s, c, p); return true;
+    case "MV-OP-DIVIDER-NUMBERED": renderDividerNumbered(s, c, p); return true;
+    case "MV-OP-INTRO-TEAM": renderIntroTeam(s, c, p); return true;
+    case "MV-CLOSE-CTA": renderCloseCta(s, c, p); return true;
+    case "MV-CLOSE-DUAL-CTA": renderCloseDualCta(s, c, p); return true;
+    case "MV-CLOSE-CONTACT": renderCloseContact(s, c, p); return true;
+    case "MV-CLOSE-DECISION": renderCloseDecision(s, c, p); return true;
+    case "MV-CLOSE-METRIC-PROMISE": renderCloseMetricPromise(s, c, p); return true;
+    case "MV-CLOSE-QNA": renderCloseQna(s, c, p); return true;
+    case "MV-CLOSE-CALENDAR": renderCloseCalendar(s, c, p); return true;
+    case "MV-CLOSE-SPLIT": renderCloseSplit(s, c, p); return true;
+    case "MV-CLOSE-TIMELINE": renderCloseTimeline(s, c, p); return true;
+    case "MV-QUOTE-PORTRAIT": renderQuotePortrait(s, c, p); return true;
+    case "MV-QUOTE-POSTER": renderQuotePoster(s, c, p); return true;
+    case "MV-QUOTE-METRIC": renderQuoteMetric(s, c, p); return true;
+    case "MV-QUOTE-MULTI": renderQuoteMulti(s, c, p); return true;
     default: return false;
   }
 }
@@ -3036,4 +3063,439 @@ function renderProcBeforeAfter(s: PptxGenJS.Slide, c: Record<string, unknown>, p
   s.addText("AFTER", { x: ax + 0.25, y: y0 + 0.25, w: colW - 0.5, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 5 });
   s.addText(str(after.title || after.label), { x: ax + 0.25, y: y0 + 0.75, w: colW - 0.5, h: 1.2, fontSize: 22, bold: true, color: "FFFFFF", fontFace: "Inter" });
   s.addText(str(after.body), { x: ax + 0.25, y: y0 + 2.1, w: colW - 0.5, h: h - 2.3, fontSize: 13, color: "FFFFFF", fontFace: "Inter", valign: "top" });
+}
+
+// ═════════════════════════ M2 batch renderers ═════════════════════════
+// Bespoke treatments for 26 covers, agendas, dividers, close, and quote
+// variants that previously fell through to the generic family renderers.
+// Backgrounds (dark for cover/divider, light otherwise) are set upstream
+// by classifyVariant, so these renderers place text against the correct
+// scene without re-establishing the fill.
+
+// ── Covers ─────────────────────────────────────────────────────────────
+
+// MV-OP-COVER-DOSSIER — file-tab / classified dossier
+function renderCoverDossier(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const title = str(c.title) || "Untitled";
+  const subtitle = str(c.subtitle || c.kicker);
+  const client = str(c.client || c.for);
+  const date = str(c.date);
+  // top tab band
+  s.addShape("rect", { x: 0.6, y: 0.55, w: 3.2, h: 0.55, fill: { color: p.accent }, line: { color: p.accent } });
+  s.addText("CONFIDENTIAL · DOSSIER", { x: 0.6, y: 0.55, w: 3.2, h: 0.55, fontSize: 11, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle", charSpacing: 4 });
+  // frame
+  s.addShape("rect", { x: 0.6, y: 1.25, w: SLIDE_W - 1.2, h: 5.4, fill: { color: p.primary, transparency: 100 }, line: { color: "FFFFFF", width: 1 } });
+  s.addText(title, { x: 1.0, y: 2.6, w: SLIDE_W - 2.0, h: 2.6, fontSize: 52, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
+  if (subtitle) s.addText(subtitle, { x: 1.0, y: 5.1, w: SLIDE_W - 2.0, h: 0.7, fontSize: 18, color: "FFFFFF", fontFace: "Inter" });
+  // metadata row
+  const meta: string[] = [];
+  if (client) meta.push(`FOR · ${client.toUpperCase()}`);
+  if (date) meta.push(`DATE · ${date.toUpperCase()}`);
+  if (meta.length) s.addText(meta.join("     "), { x: 1.0, y: 6.15, w: SLIDE_W - 2.0, h: 0.35, fontSize: 10, color: "FFFFFF", fontFace: "Inter", charSpacing: 4 });
+}
+
+// MV-OP-COVER-EDITORIAL — magazine-style serif cover
+function renderCoverEditorial(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const title = str(c.title) || "Untitled";
+  const subtitle = str(c.subtitle || c.kicker);
+  const date = str(c.date);
+  s.addText("VOLUME 01 · EDITION", { x: 0.8, y: 0.9, w: SLIDE_W - 1.6, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 8 });
+  s.addShape("rect", { x: 0.8, y: 1.4, w: SLIDE_W - 1.6, h: 0.02, fill: { color: "FFFFFF" }, line: { color: "FFFFFF" } });
+  s.addText(title, { x: 0.8, y: 1.9, w: SLIDE_W - 1.6, h: 3.8, fontSize: 84, bold: true, color: "FFFFFF", fontFace: "Georgia", valign: "middle" });
+  s.addShape("rect", { x: 0.8, y: 5.9, w: SLIDE_W - 1.6, h: 0.02, fill: { color: "FFFFFF" }, line: { color: "FFFFFF" } });
+  if (subtitle) s.addText(subtitle, { x: 0.8, y: 6.05, w: SLIDE_W - 3, h: 0.5, fontSize: 16, italic: true, color: "FFFFFF", fontFace: "Georgia" });
+  if (date) s.addText(date.toUpperCase(), { x: SLIDE_W - 3.2, y: 6.05, w: 2.4, h: 0.5, fontSize: 11, color: p.accent, fontFace: "Inter", align: "right", charSpacing: 4 });
+}
+
+// MV-OP-COVER-GRADIENT — gradient wash + bold title
+function renderCoverGradient(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  // simulate gradient with layered translucent bars
+  for (let i = 0; i < 8; i++) {
+    s.addShape("rect", { x: 0, y: (i * SLIDE_H) / 8, w: SLIDE_W, h: SLIDE_H / 8 + 0.05, fill: { color: p.accent, transparency: 70 + i * 3 }, line: { color: p.accent, transparency: 100 } });
+  }
+  const title = str(c.title) || "Untitled";
+  const subtitle = str(c.subtitle || c.kicker);
+  s.addText(title, { x: 0.8, y: 2.4, w: SLIDE_W - 1.6, h: 3.0, fontSize: 66, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
+  if (subtitle) s.addText(subtitle, { x: 0.8, y: 5.4, w: SLIDE_W - 1.6, h: 0.6, fontSize: 20, color: "FFFFFF", fontFace: "Inter" });
+}
+
+// MV-OP-COVER-GRID — grid overlay with title in cell
+function renderCoverGrid(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const title = str(c.title) || "Untitled";
+  const subtitle = str(c.subtitle || c.kicker);
+  const cols = 6, rows = 4;
+  const cw = SLIDE_W / cols, rh = SLIDE_H / rows;
+  for (let i = 1; i < cols; i++) s.addShape("rect", { x: i * cw - 0.005, y: 0, w: 0.01, h: SLIDE_H, fill: { color: "FFFFFF", transparency: 82 }, line: { color: "FFFFFF", transparency: 100 } });
+  for (let i = 1; i < rows; i++) s.addShape("rect", { x: 0, y: i * rh - 0.005, w: SLIDE_W, h: 0.01, fill: { color: "FFFFFF", transparency: 82 }, line: { color: "FFFFFF", transparency: 100 } });
+  // highlighted cell
+  s.addShape("rect", { x: cw, y: rh, w: cw * 4, h: rh * 2, fill: { color: p.accent, transparency: 55 }, line: { color: p.accent, transparency: 100 } });
+  s.addText(title, { x: cw + 0.2, y: rh + 0.2, w: cw * 4 - 0.4, h: rh * 2 - 0.4, fontSize: 48, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
+  if (subtitle) s.addText(subtitle, { x: cw, y: rh * 3.2, w: cw * 4, h: 0.5, fontSize: 16, color: "FFFFFF", fontFace: "Inter" });
+}
+
+// MV-OP-COVER-MEDIA — media zone left placeholder + title right
+function renderCoverMedia(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const title = str(c.title) || "Untitled";
+  const subtitle = str(c.subtitle || c.kicker);
+  // left media frame (upstream imagery underlay may already cover this)
+  s.addShape("rect", { x: 0, y: 0, w: SLIDE_W * 0.5, h: SLIDE_H, fill: { color: p.primary }, line: { color: p.primary } });
+  s.addShape("rect", { x: SLIDE_W * 0.5, y: 0, w: SLIDE_W * 0.5, h: SLIDE_H, fill: { color: "FFFFFF" }, line: { color: "FFFFFF" } });
+  s.addShape("rect", { x: SLIDE_W * 0.5 + 0.6, y: 3.1, w: 0.15, h: 1.6, fill: { color: p.accent }, line: { color: p.accent } });
+  s.addText(title, { x: SLIDE_W * 0.5 + 0.9, y: 2.6, w: SLIDE_W * 0.5 - 1.4, h: 2.6, fontSize: 40, bold: true, color: p.primary, fontFace: "Inter", valign: "middle" });
+  if (subtitle) s.addText(subtitle, { x: SLIDE_W * 0.5 + 0.9, y: 5.1, w: SLIDE_W * 0.5 - 1.4, h: 0.7, fontSize: 16, color: p.ink, fontFace: "Inter" });
+}
+
+// MV-OP-COVER-MINIMAL — tiny mark + big title only
+function renderCoverMinimal(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const title = str(c.title) || "Untitled";
+  const subtitle = str(c.subtitle || c.kicker);
+  s.addShape("ellipse", { x: 0.8, y: 0.9, w: 0.3, h: 0.3, fill: { color: p.accent }, line: { color: p.accent } });
+  s.addText(title, { x: 0.8, y: 3.0, w: SLIDE_W - 1.6, h: 2.6, fontSize: 72, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
+  if (subtitle) s.addText(subtitle, { x: 0.8, y: 5.7, w: SLIDE_W - 1.6, h: 0.6, fontSize: 16, color: "FFFFFF", fontFace: "Inter", charSpacing: 3 });
+}
+
+// MV-OP-COVER-MONOGRAM — huge single letter watermark + title
+function renderCoverMonogram(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const title = str(c.title) || "Untitled";
+  const subtitle = str(c.subtitle || c.kicker);
+  const mono = str(c.monogram || title).trim().charAt(0).toUpperCase() || "T";
+  s.addText(mono, { x: -0.5, y: -0.8, w: 10, h: 9, fontSize: 560, bold: true, color: p.accent, fontFace: "Georgia", valign: "middle" });
+  s.addText(title, { x: 0.8, y: 4.6, w: SLIDE_W - 1.6, h: 1.6, fontSize: 46, bold: true, color: "FFFFFF", fontFace: "Inter" });
+  if (subtitle) s.addText(subtitle, { x: 0.8, y: 6.1, w: SLIDE_W - 1.6, h: 0.6, fontSize: 16, color: "FFFFFF", fontFace: "Inter" });
+}
+
+// MV-OP-COVER-POSTER — theatrical, giant caps
+function renderCoverPoster(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const title = (str(c.title) || "Untitled").toUpperCase();
+  const subtitle = str(c.subtitle || c.kicker);
+  const date = str(c.date);
+  s.addShape("rect", { x: 0.6, y: 0.6, w: SLIDE_W - 1.2, h: SLIDE_H - 1.2, fill: { color: p.primary, transparency: 100 }, line: { color: p.accent, width: 3 } });
+  s.addText(title, { x: 0.9, y: 1.4, w: SLIDE_W - 1.8, h: 4.4, fontSize: 96, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle", charSpacing: -2 });
+  if (subtitle) s.addText(subtitle.toUpperCase(), { x: 0.9, y: 5.8, w: SLIDE_W - 1.8, h: 0.5, fontSize: 13, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 8 });
+  if (date) s.addText(date.toUpperCase(), { x: 0.9, y: 6.3, w: SLIDE_W - 1.8, h: 0.4, fontSize: 11, color: "FFFFFF", fontFace: "Inter", charSpacing: 4 });
+}
+
+// MV-OP-COVER-SPLIT — 50/50 accent block + title
+function renderCoverSplit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const title = str(c.title) || "Untitled";
+  const subtitle = str(c.subtitle || c.kicker);
+  s.addShape("rect", { x: 0, y: 0, w: SLIDE_W / 2, h: SLIDE_H, fill: { color: p.accent }, line: { color: p.accent } });
+  s.addText(title, { x: 0.6, y: 2.8, w: SLIDE_W / 2 - 1.0, h: 2.4, fontSize: 48, bold: true, color: p.primary, fontFace: "Inter", valign: "middle" });
+  s.addShape("rect", { x: SLIDE_W / 2 + 0.6, y: 3.2, w: 0.12, h: 1.4, fill: { color: p.accent }, line: { color: p.accent } });
+  if (subtitle) s.addText(subtitle, { x: SLIDE_W / 2 + 0.9, y: 3.2, w: SLIDE_W / 2 - 1.5, h: 1.4, fontSize: 20, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
+}
+
+// MV-OP-COVER-STACKED — kicker/title/subtitle stacked
+function renderCoverStacked(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const title = str(c.title) || "Untitled";
+  const subtitle = str(c.subtitle);
+  const kicker = str(c.kicker || c.eyebrow);
+  const date = str(c.date);
+  let y = 2.0;
+  if (kicker) {
+    s.addText(kicker.toUpperCase(), { x: 0.8, y, w: SLIDE_W - 1.6, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 6 });
+    y += 0.5;
+  }
+  s.addShape("rect", { x: 0.8, y: y + 0.1, w: 1.0, h: 0.06, fill: { color: p.accent }, line: { color: p.accent } });
+  y += 0.35;
+  s.addText(title, { x: 0.8, y, w: SLIDE_W - 1.6, h: 2.6, fontSize: 56, bold: true, color: "FFFFFF", fontFace: "Inter" });
+  y += 2.4;
+  if (subtitle) { s.addText(subtitle, { x: 0.8, y, w: SLIDE_W - 1.6, h: 0.7, fontSize: 20, color: "FFFFFF", fontFace: "Inter" }); y += 0.8; }
+  if (date) s.addText(date, { x: 0.8, y, w: SLIDE_W - 1.6, h: 0.5, fontSize: 12, color: "FFFFFF", fontFace: "Inter", charSpacing: 3 });
+}
+
+// ── Agenda / Divider / Intro ───────────────────────────────────────────
+
+// MV-OP-AGENDA-VERTICAL — vertical list with rules and durations
+function renderAgendaVertical(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items);
+  if (!items.length) return;
+  const n = Math.min(items.length, 7);
+  const rowH = (5.9 - y0) / n;
+  items.slice(0, n).forEach((it, k) => {
+    const y = y0 + k * rowH;
+    // rule
+    s.addShape("rect", { x: 0.6, y, w: SLIDE_W - 1.2, h: 0.02, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
+    s.addText(String(k + 1).padStart(2, "0"), { x: 0.6, y: y + 0.15, w: 0.9, h: rowH - 0.3, fontSize: 26, bold: true, color: p.accent, fontFace: "Inter", valign: "middle" });
+    s.addText(str(it.label || it.title || it.name), { x: 1.6, y: y + 0.15, w: SLIDE_W - 5.0, h: rowH - 0.3, fontSize: 18, bold: true, color: p.primary, fontFace: "Inter", valign: "middle" });
+    const meta = str(it.duration || it.time);
+    if (meta) s.addText(meta.toUpperCase(), { x: SLIDE_W - 3.2, y: y + 0.15, w: 2.6, h: rowH - 0.3, fontSize: 11, color: p.ink, fontFace: "Inter", align: "right", valign: "middle", charSpacing: 4 });
+  });
+  // closing rule
+  s.addShape("rect", { x: 0.6, y: y0 + n * rowH, w: SLIDE_W - 1.2, h: 0.02, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
+}
+
+// MV-OP-DIVIDER-NUMBERED — huge numeral + section title (dark)
+function renderDividerNumbered(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const title = str(c.title || c.headline) || "Section";
+  const num = str(c.number || c.kicker || c.eyebrow || "01");
+  const body = str(c.body || c.narrative);
+  s.addText(num, { x: 0.6, y: 0.6, w: 4.0, h: 5.8, fontSize: 320, bold: true, color: p.accent, fontFace: "Inter", valign: "middle" });
+  s.addShape("rect", { x: 4.9, y: 1.6, w: 0.04, h: 4.2, fill: { color: "FFFFFF", transparency: 60 }, line: { color: "FFFFFF", transparency: 100 } });
+  s.addText(title, { x: 5.2, y: 2.6, w: SLIDE_W - 5.8, h: 2.2, fontSize: 46, bold: true, color: "FFFFFF", fontFace: "Inter" });
+  if (body) s.addText(body, { x: 5.2, y: 4.8, w: SLIDE_W - 5.8, h: 1.8, fontSize: 16, color: "FFFFFF", fontFace: "Inter" });
+}
+
+// MV-OP-INTRO-TEAM — team intro row
+function renderIntroTeam(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items);
+  const n = Math.min(items.length, 5) || 1;
+  const gap = 0.25;
+  const colW = (SLIDE_W - 1.2 - (n - 1) * gap) / n;
+  items.slice(0, n).forEach((it, k) => {
+    const x = 0.6 + k * (colW + gap);
+    const y = y0 + 0.2;
+    const avR = Math.min(1.1, colW * 0.32);
+    const cx = x + colW / 2;
+    s.addShape("ellipse", { x: cx - avR, y, w: avR * 2, h: avR * 2, fill: { color: p.primary }, line: { color: p.primary } });
+    s.addShape("ellipse", { x: cx - avR - 0.1, y: y - 0.1, w: avR * 2 + 0.2, h: avR * 2 + 0.2, fill: { color: p.accent, transparency: 100 }, line: { color: p.accent, width: 2 } });
+    s.addText(initials(str(it.name)), { x: cx - avR, y, w: avR * 2, h: avR * 2, fontSize: 32, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle" });
+    s.addText(str(it.name), { x, y: y + avR * 2 + 0.25, w: colW, h: 0.5, fontSize: 15, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
+    s.addText(str(it.role).toUpperCase(), { x, y: y + avR * 2 + 0.7, w: colW, h: 0.35, fontSize: 10, bold: true, color: p.accent, fontFace: "Inter", align: "center", charSpacing: 3 });
+    s.addText(str(it.bio || it.body), { x, y: y + avR * 2 + 1.1, w: colW, h: 2.0, fontSize: 11, color: p.ink, fontFace: "Inter", align: "center", valign: "top" });
+  });
+}
+
+// ── Close family ───────────────────────────────────────────────────────
+
+// MV-CLOSE-CTA — centered CTA button + supporting line
+function renderCloseCta(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const headline = str(c.title || c.headline || "Let's begin");
+  const cta = str(c.cta || c.action || "Get started");
+  const support = str(c.body || c.narrative || c.subtitle);
+  s.addText(headline, { x: 0.8, y: 1.8, w: SLIDE_W - 1.6, h: 1.8, fontSize: 54, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
+  if (support) s.addText(support, { x: 1.4, y: 3.6, w: SLIDE_W - 2.8, h: 1.2, fontSize: 18, color: p.ink, fontFace: "Inter", align: "center" });
+  // pill button
+  const btnW = 4.6, btnH = 0.9, bx = (SLIDE_W - btnW) / 2, by = 5.0;
+  s.addShape("roundRect", { x: bx, y: by, w: btnW, h: btnH, fill: { color: p.primary }, line: { color: p.primary }, rectRadius: 0.45 });
+  s.addText(cta.toUpperCase(), { x: bx, y: by, w: btnW, h: btnH, fontSize: 16, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle", charSpacing: 6 });
+}
+
+// MV-CLOSE-DUAL-CTA — two side-by-side CTAs
+function renderCloseDualCta(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).slice(0, 2);
+  const cta1 = obj(items[0] || c.primaryCta || c.left || {});
+  const cta2 = obj(items[1] || c.secondaryCta || c.right || {});
+  const gap = 0.4;
+  const colW = (SLIDE_W - 1.2 - gap) / 2;
+  const y = y0 + 0.6, h = 4.5;
+  // primary
+  s.addShape("rect", { x: 0.6, y, w: colW, h, fill: { color: p.primary }, line: { color: p.primary } });
+  s.addText(str(cta1.label || cta1.title || "Primary").toUpperCase(), { x: 0.9, y: y + 0.5, w: colW - 0.6, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 5 });
+  s.addText(str(cta1.headline || cta1.body || ""), { x: 0.9, y: y + 1.0, w: colW - 0.6, h: 2.0, fontSize: 26, bold: true, color: "FFFFFF", fontFace: "Inter" });
+  s.addText(str(cta1.cta || cta1.action || "Start now") + " →", { x: 0.9, y: y + h - 0.9, w: colW - 0.6, h: 0.5, fontSize: 14, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 3 });
+  // secondary
+  const x2 = 0.6 + colW + gap;
+  s.addShape("rect", { x: x2, y, w: colW, h, fill: { color: p.surface }, line: { color: LIGHT_GRAY } });
+  s.addText(str(cta2.label || cta2.title || "Secondary").toUpperCase(), { x: x2 + 0.3, y: y + 0.5, w: colW - 0.6, h: 0.4, fontSize: 11, bold: true, color: p.primary, fontFace: "Inter", charSpacing: 5 });
+  s.addText(str(cta2.headline || cta2.body || ""), { x: x2 + 0.3, y: y + 1.0, w: colW - 0.6, h: 2.0, fontSize: 26, bold: true, color: p.primary, fontFace: "Inter" });
+  s.addText(str(cta2.cta || cta2.action || "Learn more") + " →", { x: x2 + 0.3, y: y + h - 0.9, w: colW - 0.6, h: 0.5, fontSize: 14, bold: true, color: p.primary, fontFace: "Inter", charSpacing: 3 });
+}
+
+// MV-CLOSE-CONTACT — contact block
+function renderCloseContact(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const name = str(c.name || c.contact);
+  const role = str(c.role || c.title2);
+  const email = str(c.email);
+  const phone = str(c.phone);
+  const web = str(c.website || c.web);
+  s.addShape("rect", { x: 0.6, y: y0 + 0.4, w: SLIDE_W - 1.2, h: 4.6, fill: { color: p.surface }, line: { color: LIGHT_GRAY } });
+  s.addShape("rect", { x: 0.6, y: y0 + 0.4, w: 0.15, h: 4.6, fill: { color: p.accent }, line: { color: p.accent } });
+  s.addText("LET'S TALK", { x: 1.2, y: y0 + 0.9, w: 8, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 6 });
+  if (name) s.addText(name, { x: 1.2, y: y0 + 1.4, w: SLIDE_W - 2, h: 1.0, fontSize: 40, bold: true, color: p.primary, fontFace: "Inter" });
+  if (role) s.addText(role, { x: 1.2, y: y0 + 2.5, w: SLIDE_W - 2, h: 0.5, fontSize: 16, color: p.ink, fontFace: "Inter", italic: true });
+  const lines: Array<[string, string]> = [];
+  if (email) lines.push(["EMAIL", email]);
+  if (phone) lines.push(["PHONE", phone]);
+  if (web) lines.push(["WEB", web]);
+  lines.forEach(([lbl, val], k) => {
+    const yy = y0 + 3.3 + k * 0.55;
+    s.addText(lbl, { x: 1.2, y: yy, w: 1.2, h: 0.4, fontSize: 10, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 4 });
+    s.addText(val, { x: 2.5, y: yy, w: SLIDE_W - 3.2, h: 0.4, fontSize: 15, color: p.primary, fontFace: "Inter" });
+  });
+}
+
+// MV-CLOSE-DECISION — two-option decision card
+function renderCloseDecision(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).length ? arr(c.items) : [obj(c.yes || c.left), obj(c.no || c.right)];
+  const opts = items.slice(0, 2);
+  const gap = 0.4;
+  const colW = (SLIDE_W - 1.2 - gap) / 2;
+  const y = y0 + 0.4, h = 4.7;
+  opts.forEach((it, k) => {
+    const x = 0.6 + k * (colW + gap);
+    const isYes = k === 0;
+    s.addShape("rect", { x, y, w: colW, h, fill: { color: isYes ? p.primary : "FFFFFF" }, line: { color: isYes ? p.primary : LIGHT_GRAY, width: 2 } });
+    s.addText(isYes ? "✓" : "✕", { x: x + 0.4, y: y + 0.4, w: 0.9, h: 0.9, fontSize: 44, bold: true, color: isYes ? p.accent : MID_GRAY, fontFace: "Inter" });
+    s.addText(str(it.label || (isYes ? "Yes" : "No")).toUpperCase(), { x: x + 0.4, y: y + 1.5, w: colW - 0.8, h: 0.5, fontSize: 12, bold: true, color: isYes ? p.accent : DARK_GRAY, fontFace: "Inter", charSpacing: 5 });
+    s.addText(str(it.title || it.headline), { x: x + 0.4, y: y + 2.0, w: colW - 0.8, h: 1.4, fontSize: 26, bold: true, color: isYes ? "FFFFFF" : p.primary, fontFace: "Inter" });
+    s.addText(str(it.body || it.description), { x: x + 0.4, y: y + 3.5, w: colW - 0.8, h: h - 3.7, fontSize: 12, color: isYes ? "FFFFFF" : p.ink, fontFace: "Inter", valign: "top" });
+  });
+}
+
+// MV-CLOSE-METRIC-PROMISE — hero metric + promise line
+function renderCloseMetricPromise(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const metric = str(c.stat || c.metric || c.value);
+  const unit = str(c.unit);
+  const label = str(c.label);
+  const promise = str(c.promise || c.narrative || c.body);
+  s.addText("OUR PROMISE", { x: 0.8, y: 1.4, w: SLIDE_W - 1.6, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Inter", align: "center", charSpacing: 6 });
+  s.addText(`${metric}${unit}`, { x: 0.8, y: 1.9, w: SLIDE_W - 1.6, h: 2.8, fontSize: 180, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
+  if (label) s.addText(label, { x: 0.8, y: 4.8, w: SLIDE_W - 1.6, h: 0.5, fontSize: 14, color: p.ink, fontFace: "Inter", align: "center", charSpacing: 3 });
+  s.addShape("rect", { x: (SLIDE_W - 1.2) / 2, y: 5.5, w: 1.2, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
+  if (promise) s.addText(promise, { x: 1.6, y: 5.8, w: SLIDE_W - 3.2, h: 1.2, fontSize: 20, italic: true, color: p.primary, fontFace: "Georgia", align: "center" });
+}
+
+// MV-CLOSE-QNA — big Q&A treatment
+function renderCloseQna(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  s.addText("Q&A", { x: 0.8, y: 1.4, w: SLIDE_W - 1.6, h: 2.6, fontSize: 220, bold: true, color: p.primary, fontFace: "Georgia", align: "center", valign: "middle" });
+  s.addShape("rect", { x: (SLIDE_W - 1.5) / 2, y: 4.4, w: 1.5, h: 0.05, fill: { color: p.accent }, line: { color: p.accent } });
+  const prompt = str(c.title || c.headline || c.body) || "Questions?";
+  s.addText(prompt, { x: 1.4, y: 4.8, w: SLIDE_W - 2.8, h: 1.4, fontSize: 26, color: p.ink, fontFace: "Inter", align: "center", italic: true });
+}
+
+// MV-CLOSE-CALENDAR — calendar date block
+function renderCloseCalendar(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).length ? arr(c.items) : [obj(c)];
+  const cards = items.slice(0, 3);
+  const n = cards.length;
+  const gap = 0.4;
+  const colW = (SLIDE_W - 1.2 - (n - 1) * gap) / n;
+  const y = y0 + 0.4, h = 4.6;
+  cards.forEach((it, k) => {
+    const x = 0.6 + k * (colW + gap);
+    s.addShape("rect", { x, y, w: colW, h, fill: { color: "FFFFFF" }, line: { color: LIGHT_GRAY } });
+    // header band
+    s.addShape("rect", { x, y, w: colW, h: 1.0, fill: { color: p.primary }, line: { color: p.primary } });
+    s.addText(str(it.month || "").toUpperCase(), { x, y: y + 0.2, w: colW, h: 0.5, fontSize: 14, bold: true, color: p.accent, fontFace: "Inter", align: "center", charSpacing: 6 });
+    s.addText(str(it.weekday || ""), { x, y: y + 0.6, w: colW, h: 0.35, fontSize: 10, color: "FFFFFF", fontFace: "Inter", align: "center", charSpacing: 4 });
+    // day
+    s.addText(str(it.day || it.date || ""), { x, y: y + 1.1, w: colW, h: 2.0, fontSize: 96, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
+    s.addText(str(it.title || it.label || ""), { x: x + 0.2, y: y + 3.2, w: colW - 0.4, h: 0.5, fontSize: 14, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
+    s.addText(str(it.body || it.time || ""), { x: x + 0.2, y: y + 3.7, w: colW - 0.4, h: h - 3.8, fontSize: 11, color: p.ink, fontFace: "Inter", align: "center", valign: "top" });
+  });
+}
+
+// MV-CLOSE-SPLIT — now / next split close
+function renderCloseSplit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const now = obj(c.now || c.left || c.before);
+  const next = obj(c.next || c.right || c.after);
+  const gap = 0.0;
+  const colW = (SLIDE_W - 1.2 - gap) / 2;
+  const y = y0 + 0.3, h = 5.4;
+  // now
+  s.addShape("rect", { x: 0.6, y, w: colW, h, fill: { color: p.surface }, line: { color: LIGHT_GRAY } });
+  s.addText("NOW", { x: 0.9, y: y + 0.4, w: colW - 0.6, h: 0.4, fontSize: 12, bold: true, color: p.ink, fontFace: "Inter", charSpacing: 6 });
+  s.addText(str(now.title || now.headline || now.label), { x: 0.9, y: y + 0.9, w: colW - 0.6, h: 1.4, fontSize: 32, bold: true, color: p.primary, fontFace: "Inter" });
+  s.addText(str(now.body || now.description), { x: 0.9, y: y + 2.4, w: colW - 0.6, h: h - 2.6, fontSize: 14, color: p.ink, fontFace: "Inter", valign: "top" });
+  // next
+  const nx = 0.6 + colW;
+  s.addShape("rect", { x: nx, y, w: colW, h, fill: { color: p.primary }, line: { color: p.primary } });
+  s.addText("NEXT", { x: nx + 0.3, y: y + 0.4, w: colW - 0.6, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 6 });
+  s.addText(str(next.title || next.headline || next.label), { x: nx + 0.3, y: y + 0.9, w: colW - 0.6, h: 1.4, fontSize: 32, bold: true, color: "FFFFFF", fontFace: "Inter" });
+  s.addText(str(next.body || next.description), { x: nx + 0.3, y: y + 2.4, w: colW - 0.6, h: h - 2.6, fontSize: 14, color: "FFFFFF", fontFace: "Inter", valign: "top" });
+  // divider arrow
+  s.addShape("ellipse", { x: nx - 0.35, y: y + h / 2 - 0.35, w: 0.7, h: 0.7, fill: { color: p.accent }, line: { color: p.accent } });
+  s.addText("→", { x: nx - 0.35, y: y + h / 2 - 0.35, w: 0.7, h: 0.7, fontSize: 24, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
+}
+
+// MV-CLOSE-TIMELINE — vertical next-steps timeline
+function renderCloseTimeline(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).slice(0, 5);
+  if (!items.length) return;
+  const trackX = 1.6;
+  const startY = y0 + 0.4;
+  const avail = 5.8 - startY;
+  const rowH = avail / items.length;
+  // rail
+  s.addShape("rect", { x: trackX - 0.02, y: startY + 0.3, w: 0.04, h: (items.length - 1) * rowH, fill: { color: p.accent }, line: { color: p.accent } });
+  items.forEach((it, k) => {
+    const y = startY + k * rowH;
+    s.addShape("ellipse", { x: trackX - 0.28, y: y + 0.15, w: 0.56, h: 0.56, fill: { color: p.primary }, line: { color: p.primary } });
+    s.addText(String(k + 1), { x: trackX - 0.28, y: y + 0.15, w: 0.56, h: 0.56, fontSize: 16, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle" });
+    s.addText(str(it.date || it.when || "").toUpperCase(), { x: 2.4, y: y + 0.1, w: 2.2, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 4 });
+    s.addText(str(it.label || it.title || it.name), { x: 4.7, y: y + 0.05, w: SLIDE_W - 5.3, h: 0.5, fontSize: 17, bold: true, color: p.primary, fontFace: "Inter" });
+    s.addText(str(it.body || it.description), { x: 4.7, y: y + 0.55, w: SLIDE_W - 5.3, h: rowH - 0.7, fontSize: 12, color: p.ink, fontFace: "Inter", valign: "top" });
+  });
+}
+
+// ── Quote family ───────────────────────────────────────────────────────
+
+// MV-QUOTE-PORTRAIT — quote left + portrait placeholder right
+function renderQuotePortrait(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const quote = str(c.quote || c.body);
+  const author = str(c.attribution || c.author);
+  const role = str(c.role);
+  const org = str(c.organization || c.org || c.company);
+  // portrait right
+  const px = SLIDE_W - 3.6, py = 1.2, pw = 3.0, ph = 5.1;
+  s.addShape("rect", { x: px, y: py, w: pw, h: ph, fill: { color: p.primary }, line: { color: p.primary } });
+  s.addShape("ellipse", { x: px + pw / 2 - 0.9, y: py + 1.0, w: 1.8, h: 1.8, fill: { color: p.accent }, line: { color: p.accent } });
+  s.addText(initials(author || "A"), { x: px + pw / 2 - 0.9, y: py + 1.0, w: 1.8, h: 1.8, fontSize: 44, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
+  s.addText(author || "", { x: px + 0.2, y: py + 3.1, w: pw - 0.4, h: 0.5, fontSize: 16, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center" });
+  if (role) s.addText(role, { x: px + 0.2, y: py + 3.6, w: pw - 0.4, h: 0.4, fontSize: 12, color: p.accent, fontFace: "Inter", align: "center" });
+  if (org) s.addText(org.toUpperCase(), { x: px + 0.2, y: py + 4.1, w: pw - 0.4, h: 0.4, fontSize: 10, color: "FFFFFF", fontFace: "Inter", align: "center", charSpacing: 4 });
+  // quote left
+  s.addText("\u201C", { x: 0.6, y: 0.8, w: 1.5, h: 1.6, fontSize: 140, bold: true, color: p.accent, fontFace: "Georgia" });
+  s.addText(quote, { x: 0.9, y: 2.2, w: SLIDE_W - 5.0, h: 4.4, fontSize: 24, italic: true, color: p.primary, fontFace: "Georgia", valign: "top" });
+}
+
+// MV-QUOTE-POSTER — poster-style caps quote
+function renderQuotePoster(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const quote = (str(c.quote || c.body) || "").toUpperCase();
+  const author = str(c.attribution || c.author);
+  const role = str(c.role);
+  s.addShape("rect", { x: 0.6, y: 0.6, w: SLIDE_W - 1.2, h: SLIDE_H - 1.2, fill: { color: p.primary, transparency: 100 }, line: { color: p.accent, width: 3 } });
+  s.addText(quote, { x: 1.0, y: 1.2, w: SLIDE_W - 2.0, h: 4.8, fontSize: 60, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle", charSpacing: -1 });
+  s.addShape("rect", { x: (SLIDE_W - 1.0) / 2, y: 6.0, w: 1.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
+  if (author) s.addText(`${author}${role ? "  ·  " + role : ""}`.toUpperCase(), { x: 1.0, y: 6.15, w: SLIDE_W - 2.0, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Inter", align: "center", charSpacing: 6 });
+}
+
+// MV-QUOTE-METRIC — quote + accompanying metric card
+function renderQuoteMetric(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const quote = str(c.quote || c.body);
+  const author = str(c.attribution || c.author);
+  const role = str(c.role);
+  const metric = str(c.stat || c.metric || c.value);
+  const unit = str(c.unit);
+  const label = str(c.label);
+  // quote left
+  s.addText("\u201C", { x: 0.6, y: 0.9, w: 1.2, h: 1.4, fontSize: 120, bold: true, color: p.accent, fontFace: "Georgia" });
+  s.addText(quote, { x: 0.9, y: 2.1, w: 7.5, h: 3.6, fontSize: 24, italic: true, color: p.primary, fontFace: "Georgia", valign: "top" });
+  if (author) s.addText(`${author}${role ? " · " + role : ""}`, { x: 0.9, y: 5.9, w: 7.5, h: 0.5, fontSize: 13, color: p.ink, fontFace: "Inter", charSpacing: 2 });
+  // metric right card
+  const rx = 8.9, rw = SLIDE_W - rx - 0.6;
+  s.addShape("rect", { x: rx, y: 1.4, w: rw, h: 4.8, fill: { color: p.accent }, line: { color: p.accent } });
+  s.addText(`${metric}${unit}`, { x: rx, y: 1.6, w: rw, h: 3.2, fontSize: 88, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
+  s.addShape("rect", { x: rx + 0.6, y: 4.7, w: rw - 1.2, h: 0.03, fill: { color: p.primary }, line: { color: p.primary } });
+  if (label) s.addText(label, { x: rx + 0.3, y: 4.9, w: rw - 0.6, h: 1.2, fontSize: 13, color: p.primary, fontFace: "Inter", align: "center", valign: "top" });
+}
+
+// MV-QUOTE-MULTI — 2 stacked quote cards
+function renderQuoteMulti(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).slice(0, 2);
+  const n = items.length || 1;
+  const gap = 0.3;
+  const availH = 5.9 - y0 - (n - 1) * gap;
+  const rowH = availH / n;
+  items.forEach((it, k) => {
+    const y = y0 + k * (rowH + gap);
+    const isPrimary = k === 0;
+    s.addShape("rect", { x: 0.6, y, w: SLIDE_W - 1.2, h: rowH, fill: { color: isPrimary ? p.primary : p.surface }, line: { color: isPrimary ? p.primary : LIGHT_GRAY } });
+    s.addText("\u201C", { x: 0.8, y: y + 0.1, w: 1.0, h: 1.0, fontSize: 72, bold: true, color: p.accent, fontFace: "Georgia" });
+    s.addText(str(it.quote || it.body), { x: 1.9, y: y + 0.25, w: SLIDE_W - 4.0, h: rowH - 0.9, fontSize: 18, italic: true, color: isPrimary ? "FFFFFF" : p.primary, fontFace: "Georgia", valign: "middle" });
+    const attribution = `${str(it.attribution || it.author)}${it.role ? " · " + str(it.role) : ""}`;
+    s.addText(attribution, { x: 1.9, y: y + rowH - 0.55, w: SLIDE_W - 4.0, h: 0.4, fontSize: 11, color: isPrimary ? p.accent : p.ink, fontFace: "Inter", charSpacing: 3 });
+    // right rail
+    s.addShape("rect", { x: SLIDE_W - 1.9, y: y + 0.5, w: 1.3, h: rowH - 1.0, fill: { color: isPrimary ? p.accent : p.primary, transparency: 80 }, line: { color: isPrimary ? p.accent : p.primary, transparency: 100 } });
+  });
 }
