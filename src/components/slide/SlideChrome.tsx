@@ -1,5 +1,5 @@
 import type { BrandMode } from "@/lib/taxonomy";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { createContext, useContext } from "react";
 import { BrandLockup } from "@/components/BrandLockup";
 import {
