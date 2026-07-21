@@ -663,6 +663,8 @@ function Library() {
           onTogglePin={() => togglePin(active.id)}
           usageCount={usageByVariant.get(active.id) ?? 0}
           onClose={() => setOpenId(null)}
+          logoHubPool={logoHubPool}
+
         />
       )}
 
