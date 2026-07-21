@@ -617,8 +617,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Two-row offset grid of up to ten client logos for scale",
     permittedLayoutIds: ["LF-19"],
     capacity: { items: { min: 8, max: 10 }, titleChars: 60 },
-    editableFields: ["title", "subtitle", "items[].name"],
-    lockedFields: ["items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "subtitle", "items[].name", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
   {
     id: "MV-PROOF-LOGOS-FEATURED",
