@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { uploadSlideMedia } from "@/lib/slide-media";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { logImageryEvent } from "@/lib/admin.functions";
+import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
 // Formats that render natively in every browser AND embed cleanly in
