@@ -1042,50 +1042,133 @@ function ModalABPreview({
       ))}
     </div>
     {zoom && (
+      <LightboxPortal
+        mode={zoom}
+        setMode={setZoom}
+        variant={variant}
+        brand={brand}
+        previewSlide={previewSlide}
+        lightBackdrop={lightBackdrop}
+        darkBackdrop={darkBackdrop}
+      />
+    )}
+    </>
+  );
+}
+
+function LightboxPortal({
+  mode,
+  setMode,
+  variant,
+  brand,
+  previewSlide,
+  lightBackdrop,
+  darkBackdrop,
+}: {
+  mode: "light" | "dark";
+  setMode: (m: null | "light" | "dark") => void;
+  variant: ModuleVariant;
+  brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
+  previewSlide: Parameters<typeof VariantRenderer>[0]["slide"];
+  lightBackdrop: ReturnType<typeof backdropForVariant>;
+  darkBackdrop: ReturnType<typeof backdropForVariant>;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMode(null);
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === " ") {
+        e.preventDefault();
+        setMode(mode === "light" ? "dark" : "light");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [mode, setMode]);
+
+  const isDark = mode === "dark";
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex flex-col bg-[#03002C]/95 backdrop-blur-xl animate-in fade-in duration-200"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Enlarged slide preview"
+      onClick={() => setMode(null)}
+    >
+      {/* Top chrome */}
       <div
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-6 backdrop-blur-sm"
-        onClick={() => setZoom(null)}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Enlarged slide preview"
+        className="flex shrink-0 items-center justify-between gap-4 border-b border-white/10 px-6 py-4"
+        onClick={(e) => e.stopPropagation()}
       >
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); setZoom(null); }}
-          className="absolute right-6 top-6 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm text-white hover:bg-white/20"
-        >
-          Close ✕
-        </button>
-        <div className="absolute left-6 top-6 flex items-center gap-2">
-          {(["light", "dark"] as const).map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={(e) => { e.stopPropagation(); setZoom(m); }}
-              className={`rounded-full border px-3 py-1.5 text-xs ${zoom === m ? "border-white bg-white text-black" : "border-white/30 bg-white/10 text-white hover:bg-white/20"}`}
-            >
-              {m === "light" ? "☀︎ Light" : "☾ Dark"}
-            </button>
-          ))}
+        <div className="flex min-w-0 items-center gap-3">
+          <div
+            className="h-8 w-8 shrink-0 rounded-lg"
+            style={{ background: `linear-gradient(135deg, ${brand.tokens.primary}, ${brand.tokens.accent ?? brand.tokens.primary})` }}
+          />
+          <div className="min-w-0">
+            <div className="truncate text-sm font-semibold text-white">{variant.name}</div>
+            <div className="truncate text-[11px] uppercase tracking-widest text-white/50">
+              {variant.id} · {brand.name}
+            </div>
+          </div>
         </div>
+
+        <div className="flex items-center gap-2">
+          <div className="flex items-center rounded-full border border-white/15 bg-white/5 p-1">
+            {(["light", "dark"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMode(m)}
+                className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition ${
+                  mode === m ? "bg-white text-[#03002C] shadow-sm" : "text-white/70 hover:text-white"
+                }`}
+              >
+                {m === "light" ? "☀ Light" : "☾ Dark"}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setMode(null)}
+            aria-label="Close"
+            className="grid h-9 w-9 place-items-center rounded-full border border-white/15 bg-white/5 text-white/80 transition hover:border-white/40 hover:bg-white/10 hover:text-white"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Stage */}
+      <div className="flex flex-1 items-center justify-center overflow-hidden p-6 md:p-10" onClick={(e) => e.stopPropagation()}>
         <div
-          className="relative w-full max-w-[92vw]"
-          style={{ aspectRatio: "16 / 9", maxHeight: "86vh" }}
-          onClick={(e) => e.stopPropagation()}
+          className="relative w-full"
+          style={{ aspectRatio: "16 / 9", maxWidth: "min(96vw, 168vh)", maxHeight: "100%" }}
         >
-          <div className={`relative h-full w-full overflow-hidden rounded-2xl border border-white/15 shadow-2xl ${zoom === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
+          <div className={`relative h-full w-full overflow-hidden rounded-2xl ring-1 ring-white/10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.7)] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
             <ScaledSlide>
-              <SlideBackdropContext.Provider value={zoom === "dark" ? darkBackdrop : lightBackdrop}>
-                <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={zoom} />
+              <SlideBackdropContext.Provider value={isDark ? darkBackdrop : lightBackdrop}>
+                <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
               </SlideBackdropContext.Provider>
             </ScaledSlide>
           </div>
         </div>
       </div>
-    )}
-    </>
+
+      {/* Bottom hint */}
+      <div className="shrink-0 border-t border-white/10 px-6 py-3 text-center text-[11px] text-white/40" onClick={(e) => e.stopPropagation()}>
+        <span className="mx-2"><kbd className="rounded border border-white/20 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-white/70">Esc</kbd> close</span>
+        <span className="mx-2"><kbd className="rounded border border-white/20 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-white/70">← →</kbd> toggle theme</span>
+      </div>
+    </div>
   );
 }
+
 
 
 function Spec({ label, children }: { label: string; children: React.ReactNode }) {
