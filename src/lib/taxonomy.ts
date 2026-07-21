@@ -1247,8 +1247,9 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Three client cards with portrait, logo, and short story",
     permittedLayoutIds: ["LF-08"],
     capacity: { items: { min: 3, max: 3 }, titleChars: 60, bodyChars: 200 },
-    editableFields: ["title", "items[].client", "items[].sector", "items[].story", "items[].metric", "items[].seed"],
-    lockedFields: ["items[].logoUrl", "footer", "logo"],
+    editableFields: ["title", "items[].client", "items[].sector", "items[].story", "items[].metric", "items[].seed", "items[].logoUrl", "items[].logoPath", "items[].logoVariant", "items[].logoVariants", "items[].logoPaths"],
+    lockedFields: ["footer", "logo"],
+
   },
   {
     id: "MV-IMG-MATRIX-4",
