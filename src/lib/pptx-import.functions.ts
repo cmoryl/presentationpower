@@ -783,18 +783,86 @@ function extractGroupShapeDiagram(doc: unknown, theme: ParsedTheme): ParsedDiagr
   if (!bestGroup || bestCount < 3) return null;
   const sps = Array.isArray(bestGroup["p:sp"]) ? bestGroup["p:sp"] : [bestGroup["p:sp"]];
   const nodes: ParsedDiagramNode[] = [];
+  // Tally shape-preset geometries to infer the diagram family. PowerPoint
+  // authors commonly build custom "process" strips out of chevrons / arrows,
+  // cycles out of circles + curved connectors, hierarchies out of rectangles
+  // joined by straight connectors, pyramids out of triangles, and venn
+  // diagrams out of overlapping ellipses. We use the dominant preset as a
+  // hint when the parent slide isn't a real SmartArt.
+  const prstTally: Record<string, number> = {};
+  let hasConnector = false;
   for (const sp of sps) {
     const info = readShape(sp);
     const text = info.paragraphs.map((p) => p.trim()).filter(Boolean).join(" ").trim();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const prst = (sp as any)?.["p:spPr"]?.["a:prstGeom"]?.["@_prst"] as string | undefined;
+    if (prst) prstTally[prst] = (prstTally[prst] ?? 0) + 1;
     if (!text) continue;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const color = readShapeColor((sp as any)?.["p:spPr"], theme);
     nodes.push({ text: cap(text, 200), level: 0, color });
   }
+  // Detect connector shapes (p:cxnSp) inside the same group — a strong hint
+  // for hierarchies (org charts) and processes.
+  const cxns = bestGroup?.["p:cxnSp"];
+  if (cxns) hasConnector = true;
   if (nodes.length < 2) return null;
-  return { kind: "shape-group", nodes };
-
+  const layoutHint = inferShapeGroupLayoutHint(prstTally, hasConnector);
+  return { kind: "shape-group", nodes, layoutHint };
 }
+
+/**
+ * Read the SmartArt layout definition's `uniqueId` and coarsely classify it.
+ * Microsoft's built-in layouts follow a stable naming convention such as
+ * `urn:microsoft.com/office/officeart/2005/8/layout/orgChart1`,
+ * `.../hierarchy1`, `.../basicProcess`, `.../continuousCycle`,
+ * `.../pyramid1`, `.../linearVenn`, `.../basicMatrix`, `.../basicTimeline`.
+ */
+function readSmartArtLayoutHint(ldoc: unknown): DiagramLayoutHint | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const uid = (ldoc as any)?.["dgm:layoutDef"]?.["@_uniqueId"];
+  if (typeof uid !== "string") return undefined;
+  const last = uid.split("/").pop()?.toLowerCase() ?? "";
+  if (!last) return undefined;
+  if (/timeline/.test(last)) return "timeline";
+  if (/funnel/.test(last)) return "funnel";
+  if (/pyramid/.test(last)) return "pyramid";
+  if (/venn/.test(last)) return "venn";
+  if (/matrix/.test(last)) return "matrix";
+  if (/radial/.test(last)) return "radial";
+  if (/cycle/.test(last)) return "cycle";
+  if (/orgchart|hierarchy|hierlist|hierlabel/.test(last)) return "hierarchy";
+  if (/process|chevron|arrow|step|phase/.test(last)) return "process";
+  if (/list|target|block/.test(last)) return "list";
+  return undefined;
+}
+
+/**
+ * Infer a layout family from the dominant `prstGeom` preset counts in a
+ * grouped shape family. Only fires when a preset is clearly dominant
+ * (accounts for ≥ 50% of shapes) so mixed decorative groups don't get
+ * mis-routed.
+ */
+function inferShapeGroupLayoutHint(
+  prstTally: Record<string, number>,
+  hasConnector: boolean,
+): DiagramLayoutHint | undefined {
+  const entries = Object.entries(prstTally);
+  const total = entries.reduce((s, [, n]) => s + n, 0);
+  if (total === 0) return hasConnector ? "hierarchy" : undefined;
+  entries.sort((a, b) => b[1] - a[1]);
+  const [topName, topCount] = entries[0];
+  const dominant = topCount / total >= 0.5;
+  if (!dominant) return hasConnector ? "hierarchy" : undefined;
+  const n = topName.toLowerCase();
+  if (/chevron|rightarrow|leftarrow|pentagon|arrow/.test(n)) return "process";
+  if (/triangle/.test(n)) return "pyramid";
+  if (/ellipse|oval|circle/.test(n)) return hasConnector ? "cycle" : "venn";
+  if (/rect|round/.test(n)) return hasConnector ? "hierarchy" : "list";
+  if (/star|diamond/.test(n)) return "radial";
+  return undefined;
+}
+
 
 // ─── Theme extraction ────────────────────────────────────────────────────
 const EMPTY_THEME: ParsedTheme = { accents: [] };
