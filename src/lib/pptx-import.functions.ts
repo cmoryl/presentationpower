@@ -275,6 +275,7 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     const diagrams: ParsedDiagram[] = [];
     const layoutTargets = Object.values(relTargetsByType.diagramLayout);
     const dataTargets = Object.values(relTargetsByType.diagramData);
+    const drawingTargets = Object.values(relTargetsByType.diagramDrawing);
     for (let di = 0; di < dataTargets.length; di++) {
       const target = dataTargets[di];
       const resolved = resolveRelPath(slidePath, target);
@@ -301,7 +302,40 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         }
         // Fall back to inferring from node hierarchy if no layout hint.
         if (!layoutHint && nodes.some((n) => n.level > 0)) layoutHint = "hierarchy";
-        diagrams.push({ kind: "smartart", nodes, layoutHint });
+        // Pull connector styles from the paired diagramDrawing (dsp:cxnSp) —
+        // this is where the fully-rendered SmartArt geometry lives (color,
+        // stroke width, dash, arrowheads). Preserve them so downstream
+        // journey/funnel/pillar renderers can honor the original look.
+        let connectors: ConnectorStyle[] = [];
+        const drawingTarget = drawingTargets[di];
+        if (drawingTarget) {
+          const drawingPath = resolveRelPath(slidePath, drawingTarget);
+          const drawingEntry = zip.files[drawingPath];
+          if (drawingEntry) {
+            try {
+              const xml = await drawingEntry.async("string");
+              const drawDoc = parser.parse(xml);
+              walk(drawDoc, (value, key) => {
+                if (key !== "dsp:cxnSp" && key !== "cxnSp") return;
+                const arr = Array.isArray(value) ? value : [value];
+                for (const c of arr) {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const spPr = (c as any)?.["dsp:spPr"] ?? (c as any)?.["spPr"] ?? (c as any)?.["p:spPr"];
+                  const st = readConnectorStyle(spPr, theme);
+                  if (st) connectors.push(st);
+                }
+              });
+            } catch { /* ignore malformed drawing */ }
+          }
+        }
+        const connectorStyle = aggregateConnectorStyle(connectors);
+        diagrams.push({
+          kind: "smartart",
+          nodes,
+          layoutHint,
+          connectors: connectors.length ? connectors : undefined,
+          connectorStyle,
+        });
       } catch { /* skip */ }
     }
     // Grouped custom shapes → lightweight diagram fallback (only when there
