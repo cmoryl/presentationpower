@@ -62,6 +62,20 @@ export function runQa(slides: DeckSlide[], brandModeId?: string): QaIssue[] {
       }
     }
 
+    // Slide video without a poster → warn. Static exports (PDF/PPTX)
+    // fall back to the poster; without one the slide reads as empty.
+    const videoUrl = (slide.content as Record<string, unknown>).videoUrl;
+    const videoPoster = (slide.content as Record<string, unknown>).videoPosterUrl;
+    if (typeof videoUrl === "string" && videoUrl.trim() && (typeof videoPoster !== "string" || !videoPoster.trim())) {
+      issues.push({
+        slideId: slide.id,
+        severity: "warn",
+        code: "video-missing-poster",
+        message: "Video is missing a poster frame — static exports will look empty",
+      });
+    }
+
+
     // Brand-mode consistency gates (only when a brand profile is in scope)
     if (hasScope) {
       // Off-limits family for this brand → block
