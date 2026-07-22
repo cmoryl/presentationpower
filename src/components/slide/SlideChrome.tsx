@@ -586,7 +586,7 @@ export function SlideFrame({
         className="absolute left-24 right-24 flex items-center justify-between uppercase"
         style={{
           bottom: bottomCenterLogo ? 40 : 40,
-          color: darkBackdrop || slideDark ? "rgba(255,255,255,0.78)" : "rgba(10,15,28,0.72)",
+          color: frameInk.muted,
           fontSize: 18,
           letterSpacing: "0.28em",
           // Fade the footer copy under a centered logo so it doesn't compete

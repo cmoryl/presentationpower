@@ -1494,7 +1494,7 @@ function renderVariantBody({
                   className="pt-8"
                   style={{ borderTop: `${featured ? 3 : 1}px solid ${featured ? brand.tokens.accent : "rgba(10,15,28,0.12)"}` }}
                 >
-                  <Kicker brand={brand} color={featured ? brand.tokens.accent : "color-mix(in oklab, currentColor 62%, transparent)"}>
+                  <Kicker brand={brand} color={featured ? "var(--slide-accent-text)" : ink.faint}>
                     {s(tier.name)}
                   </Kicker>
                   <div
@@ -2290,7 +2290,7 @@ function renderVariantBody({
               <div key={i} className="pt-0">
                 <MediaTile brand={brand} seed={s(p.panel.seed, `${p.label}-${s(p.panel.label)}`)} className="aspect-[16/9] w-full rounded-none" muted={i === 0} />
                 <div className="mt-8 pt-6" style={{ borderTop: `${i === 1 ? 2 : 1}px solid ${i === 1 ? brand.tokens.accent : "rgba(10,15,28,0.12)"}` }}>
-                  <Kicker brand={brand} color={i === 1 ? brand.tokens.accent : "color-mix(in oklab, currentColor 62%, transparent)"}>{p.label}</Kicker>
+                  <Kicker brand={brand} color={i === 1 ? "var(--slide-accent-text)" : ink.faint}>{p.label}</Kicker>
                   <div className="mt-4" style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>{s(p.panel.label)}</div>
                   <SupportingText size="md" opacity={0.72} className="mt-3">{s(p.panel.body)}</SupportingText>
                 </div>
@@ -2989,7 +2989,7 @@ function renderVariantBody({
                   className="flex flex-col pt-8"
                   style={{ borderTop: `${highlight ? 3 : 1}px solid ${highlight ? brand.tokens.accent : "rgba(10,15,28,0.12)"}` }}
                 >
-                  <Kicker brand={brand} color={highlight ? brand.tokens.accent : "color-mix(in oklab, currentColor 62%, transparent)"}>
+                  <Kicker brand={brand} color={highlight ? "var(--slide-accent-text)" : ink.faint}>
                     {highlight ? "Recommended" : "Alternative"}
                   </Kicker>
                   <div className="mt-6" style={{ fontSize: 56, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.05, color: ink.strong }}>
@@ -3808,7 +3808,7 @@ function renderVariantBody({
           <div className="mt-10">
             {items.map((it, i) => {
               const ink = i === 0 ? "rgba(10,15,28,0.92)" : i === 1 ? "rgba(10,15,28,0.72)" : "rgba(10,15,28,0.52)";
-              const labelColor = i === 0 ? brand.tokens.accent : "color-mix(in oklab, currentColor 62%, transparent)";
+              const labelColor = i === 0 ? "var(--slide-accent-text)" : ink.faint;
               return (
                 <div key={i} className="grid gap-12 py-10" style={{ gridTemplateColumns: "200px 1fr", borderTop: "1px solid rgba(10,15,28,0.12)", borderBottom: i === items.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
                   <div className="uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: labelColor, fontWeight: 600 }}>{s(it.label)}</div>
@@ -5737,20 +5737,19 @@ function DecadeAreaChart({ brand, series, height = 480, calloutLabel, calloutNot
           <stop offset="100%" stopColor={brand.tokens.primary} stopOpacity="0" />
         </linearGradient>
       </defs>
-      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
+      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
       {areaPath && <path d={areaPath} fill={`url(#${id})`} />}
       <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
       {series.map((p, i) => (
-        <text key={i} x={pts[i]?.[0]} y={h - padB + 34} textAnchor="middle" fontSize={18} fill="color-mix(in oklab, currentColor 62%, transparent)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
+        <text key={i} x={pts[i]?.[0]} y={h - padB + 34} textAnchor="middle" fontSize={18} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
       ))}
       {hi && (
         <g>
           <circle cx={hi[0]} cy={hi[1]} r={9} fill="var(--slide-accent-text)" />
           <circle cx={hi[0]} cy={hi[1]} r={16} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeOpacity={0.35} />
           <line x1={hi[0]} y1={hi[1] - 20} x2={hi[0]} y2={hi[1] - 90} stroke="var(--slide-accent-text)" strokeWidth={1} />
-          <rect x={hi[0] - 240} y={hi[1] - 190} width={480} height={100} fill="#fff" stroke="var(--slide-accent-text)" strokeWidth={2} />
           <text x={hi[0]} y={hi[1] - 148} textAnchor="middle" fontSize={20} fontWeight={600} fill={ink.strong} style={{ letterSpacing: "-0.01em" }}>{calloutLabel}</text>
-          <text x={hi[0]} y={hi[1] - 118} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.7)">{calloutNote}</text>
+          <text x={hi[0]} y={hi[1] - 118} textAnchor="middle" fontSize={16} fill={ink.muted}>{calloutNote}</text>
         </g>
       )}
     </svg>
@@ -5778,8 +5777,8 @@ function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand:
           const val = niceMax * (1 - i / ticks);
           return (
             <g key={i}>
-              <line x1={padL} y1={y} x2={w - padR} y2={y} stroke="rgba(10,15,28,0.08)" strokeWidth={1} />
-              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={16} fill="rgba(10,15,28,0.5)">{Math.round(val)}{unit || ""}</text>
+              <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} />
+              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={16} fill={ink.faint}>{Math.round(val)}{unit || ""}</text>
             </g>
           );
         })}
@@ -5788,19 +5787,19 @@ function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand:
           const d = pts.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(" ");
           return (
             <g key={si}>
-              <path d={d} fill="none" stroke={cols[si] || brand.tokens.primary} strokeWidth={si === 0 ? 3 : 2} strokeLinecap="round" strokeLinejoin="round" opacity={si === 0 ? 1 : 0.85} />
-              {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={si === 0 ? 5 : 4} fill={cols[si] || brand.tokens.primary} />)}
+              <path d={d} fill="none" stroke={cols[si] || ink.strong} strokeWidth={si === 0 ? 3 : 2} strokeLinecap="round" strokeLinejoin="round" opacity={si === 0 ? 1 : 0.85} />
+              {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={si === 0 ? 5 : 4} fill={cols[si] || ink.strong} />)}
             </g>
           );
         })}
         {xLabels.map((lb, i) => (
-          <text key={i} x={padL + i * step} y={h - padB + 34} textAnchor="middle" fontSize={16} fill="color-mix(in oklab, currentColor 62%, transparent)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{lb}</text>
+          <text key={i} x={padL + i * step} y={h - padB + 34} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{lb}</text>
         ))}
       </svg>
       <div className="mt-2 flex flex-wrap gap-6">
         {series.map((sr, i) => (
-          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 70%, transparent)" }}>
-            <span style={{ display: "inline-block", width: 22, height: 3, background: cols[i] || brand.tokens.primary }} />
+          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
+            <span style={{ display: "inline-block", width: 22, height: 3, background: cols[i] || ink.strong }} />
             <span style={{ fontWeight: 600, color: ink.strong }}>{sr.label}</span>
           </div>
         ))}
@@ -5826,7 +5825,7 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
         {Array.from({ length: ticks + 1 }, (_, i) => {
           const y = padT + (chartH / ticks) * i;
-          return <line key={i} x1={padL} y1={y} x2={w - padR} y2={y} stroke="rgba(10,15,28,0.08)" strokeWidth={1} />;
+          return <line key={i} x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} />;
         })}
         {columns.map((col, i) => {
           const x = padL + i * slot + (slot - barW) / 2;
@@ -5836,21 +5835,21 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
               {col.values.map((v, si) => {
                 const bh = (v / niceMax) * chartH;
                 yCursor -= bh;
-                return <rect key={si} x={x} y={yCursor} width={barW} height={bh} fill={cols[si] || brand.tokens.primary} opacity={si === 0 ? 1 : 0.7 - si * 0.15} />;
+                return <rect key={si} x={x} y={yCursor} width={barW} height={bh} fill={cols[si] || ink.strong} opacity={si === 0 ? 1 : 0.7 - si * 0.15} />;
               })}
-              <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{col.label}</text>
+              <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{col.label}</text>
             </g>
           );
         })}
       </svg>
       <div className="mt-3 flex flex-wrap gap-6">
         {segments.map((sg, i) => (
-          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 70%, transparent)" }}>
-            <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || brand.tokens.primary, opacity: i === 0 ? 1 : 0.7 - i * 0.15 }} />
+          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
+            <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || ink.strong, opacity: i === 0 ? 1 : 0.7 - i * 0.15 }} />
             <span style={{ fontWeight: 600, color: ink.strong }}>{sg.label}</span>
           </div>
         ))}
-        {unit && <div style={{ fontSize: 14, color: "color-mix(in oklab, currentColor 50%, transparent)", marginLeft: "auto" }}>Units: {unit}</div>}
+        {unit && <div style={{ fontSize: 14, color: ink.faint, marginLeft: "auto" }}>Units: {unit}</div>}
       </div>
     </div>
   );
@@ -5875,25 +5874,25 @@ function StackedAreaChart({ brand, series, xLabels, unit, height = 480 }: { bran
     const topPts = top.map((v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number]);
     const botPts = bottom.map((v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number]).reverse();
     const d = [...topPts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`), ...botPts.map((p) => `L${p[0]},${p[1]}`), "Z"].join(" ");
-    return { d, color: cols[si] || brand.tokens.primary, si };
+    return { d, color: cols[si] || ink.strong, si };
   });
   return (
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-        <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
+        <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
         {layers.map((l) => <path key={l.si} d={l.d} fill={l.color} opacity={l.si === 0 ? 0.95 : 0.7 - l.si * 0.15} />)}
         {xLabels.map((lb, i) => (
-          <text key={i} x={padL + i * step} y={h - padB + 34} textAnchor="middle" fontSize={16} fill="color-mix(in oklab, currentColor 62%, transparent)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{lb}</text>
+          <text key={i} x={padL + i * step} y={h - padB + 34} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{lb}</text>
         ))}
       </svg>
       <div className="mt-3 flex flex-wrap gap-6">
         {series.map((sr, i) => (
-          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 70%, transparent)" }}>
-            <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || brand.tokens.primary, opacity: i === 0 ? 0.95 : 0.7 - i * 0.15 }} />
+          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
+            <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || ink.strong, opacity: i === 0 ? 0.95 : 0.7 - i * 0.15 }} />
             <span style={{ fontWeight: 600, color: ink.strong }}>{sr.label}</span>
           </div>
         ))}
-        {unit && <div style={{ fontSize: 14, color: "color-mix(in oklab, currentColor 50%, transparent)", marginLeft: "auto" }}>Units: {unit}</div>}
+        {unit && <div style={{ fontSize: 14, color: ink.faint, marginLeft: "auto" }}>Units: {unit}</div>}
       </div>
     </div>
   );
@@ -5921,7 +5920,7 @@ function WaterfallChart({ brand, steps, unit, height = 500 }: { brand: BrandMode
   const scale = (v: number) => padT + chartH * (1 - v / niceMax);
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
+      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
       {bars.map((b, i) => {
         const x = padL + i * slot + (slot - barW) / 2;
         const y = scale(b.top);
@@ -5934,13 +5933,13 @@ function WaterfallChart({ brand, steps, unit, height = 500 }: { brand: BrandMode
         return (
           <g key={i}>
             {prev && (
-              <line x1={x - (slot - barW)} y1={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} x2={x} y2={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} stroke="rgba(10,15,28,0.25)" strokeDasharray="4 4" />
+              <line x1={x - (slot - barW)} y1={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} x2={x} y2={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} stroke={ink.hairlineStrong} strokeDasharray="4 4" />
             )}
             <rect x={x} y={y} width={barW} height={Math.max(2, bh)} fill={fill} opacity={b.kind === "start" || b.kind === "end" ? 1 : 0.92} />
             <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={18} fontWeight={600} fill={ink.strong}>
               {b.kind === "up" ? "+" : b.kind === "down" ? "−" : ""}{Math.abs(b.value).toFixed(1)}{unit || ""}
             </text>
-            <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={15} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.12em", textTransform: "uppercase" }}>{b.label}</text>
+            <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={15} fill={ink.faint} style={{ letterSpacing: "0.12em", textTransform: "uppercase" }}>{b.label}</text>
           </g>
         );
       })}
@@ -5958,13 +5957,13 @@ function BubbleChart({ brand, items, axisX, axisY, height = 560 }: { brand: Bran
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       {[0, 0.25, 0.5, 0.75, 1].map((t, i) => (
-        <line key={i} x1={padL} y1={padT + chartH * t} x2={w - padR} y2={padT + chartH * t} stroke="rgba(10,15,28,0.06)" strokeWidth={1} />
+        <line key={i} x1={padL} y1={padT + chartH * t} x2={w - padR} y2={padT + chartH * t} stroke={ink.hairline} strokeWidth={1} />
       ))}
       {[0, 0.25, 0.5, 0.75, 1].map((t, i) => (
-        <line key={`v${i}`} x1={padL + chartW * t} y1={padT} x2={padL + chartW * t} y2={h - padB} stroke="rgba(10,15,28,0.06)" strokeWidth={1} />
+        <line key={`v${i}`} x1={padL + chartW * t} y1={padT} x2={padL + chartW * t} y2={h - padB} stroke={ink.hairline} strokeWidth={1} />
       ))}
-      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.3)" strokeWidth={1} />
-      <line x1={padL} y1={padT} x2={padL} y2={h - padB} stroke="rgba(10,15,28,0.3)" strokeWidth={1} />
+      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
+      <line x1={padL} y1={padT} x2={padL} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
       {items.map((it, i) => {
         const cx = padL + (it.x / 100) * chartW;
         const cy = padT + (1 - it.y / 100) * chartH;
@@ -5977,8 +5976,8 @@ function BubbleChart({ brand, items, axisX, axisY, height = 560 }: { brand: Bran
           </g>
         );
       })}
-      <text x={w / 2} y={h - 24} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }}>{axisX} →</text>
-      <text x={30} y={h / 2} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }} transform={`rotate(-90 30 ${h / 2})`}>{axisY} →</text>
+      <text x={w / 2} y={h - 24} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }}>{axisX} →</text>
+      <text x={30} y={h / 2} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }} transform={`rotate(-90 30 ${h / 2})`}>{axisY} →</text>
     </svg>
   );
 }
@@ -6001,7 +6000,7 @@ function HeatmapChart({ brand, rows, cols, cells, min, max }: { brand: BrandMode
               const t = Math.max(0, Math.min(1, (v - min) / range));
               return (
                 <div key={ci} style={{ aspectRatio: "2 / 1", background: brand.tokens.accent, opacity: 0.15 + t * 0.85, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <span style={{ fontSize: 22, fontWeight: 700, color: t > 0.55 ? brand.tokens.primary : "rgba(10,15,28,0.75)" }}>{v}</span>
+                  <span style={{ fontSize: 22, fontWeight: 700, color: ink.strong }}>{v}</span>
                 </div>
               );
             })}
@@ -6048,16 +6047,16 @@ function Treemap({ brand, items, height = 560 }: { brand: BrandMode; items: { la
     remainingTotal -= it.value;
     vertical = !vertical;
   }
-  const cols = [brand.tokens.accent, brand.tokens.primary, "color-mix(in oklab, currentColor 62%, transparent)", "rgba(10,15,28,0.35)", "rgba(10,15,28,0.22)"];
+  const cols = [brand.tokens.accent, brand.tokens.primary, ink.muted, ink.faint, ink.hairlineStrong];
   return (
     <svg viewBox={`0 0 ${w} ${height}`} width="100%" height={height} preserveAspectRatio="none" aria-hidden>
       {rects.map((r, i) => (
         <g key={i}>
-          <rect x={r.x + 4} y={r.y + 4} width={Math.max(0, r.w - 8)} height={Math.max(0, r.h - 8)} fill={cols[i] || brand.tokens.primary} opacity={i === 0 ? 1 : 0.9} />
-          <text x={r.x + 24} y={r.y + 46} fontSize={r.w > 380 ? 26 : 18} fontWeight={700} fill={i === 0 ? brand.tokens.primary : "#fff"} style={{ letterSpacing: "-0.01em" }}>{r.label}</text>
-          <text x={r.x + 24} y={r.y + 80} fontSize={r.w > 380 ? 40 : 24} fontWeight={700} fill={i === 0 ? brand.tokens.primary : "#fff"} style={{ letterSpacing: "-0.02em" }}>{r.value}%</text>
+          <rect x={r.x + 4} y={r.y + 4} width={Math.max(0, r.w - 8)} height={Math.max(0, r.h - 8)} fill={cols[i] || ink.strong} opacity={i === 0 ? 1 : 0.9} />
+          <text x={r.x + 24} y={r.y + 46} fontSize={r.w > 380 ? 26 : 18} fontWeight={700} fill={ink.strong} style={{ letterSpacing: "-0.01em" }}>{r.label}</text>
+          <text x={r.x + 24} y={r.y + 80} fontSize={r.w > 380 ? 40 : 24} fontWeight={700} fill={ink.strong} style={{ letterSpacing: "-0.02em" }}>{r.value}%</text>
           {r.meta && r.w > 260 && r.h > 120 && (
-            <text x={r.x + 24} y={r.y + 116} fontSize={16} fill={i === 0 ? "rgba(10,15,28,0.7)" : "rgba(255,255,255,0.85)"}>{r.meta}</text>
+            <text x={r.x + 24} y={r.y + 116} fontSize={16} fill={ink.muted}>{r.meta}</text>
           )}
         </g>
       ))}
@@ -6088,8 +6087,8 @@ function ComboChart({ brand, points, barLabel, barUnit, lineLabel, lineUnit, hei
           const lv = niceLine * (1 - i / ticks);
           return (
             <g key={i}>
-              <line x1={padL} y1={y} x2={w - padR} y2={y} stroke="rgba(10,15,28,0.08)" strokeWidth={1} />
-              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={14} fill="rgba(10,15,28,0.5)">{bv.toFixed(1)}{barUnit || ""}</text>
+              <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} />
+              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={14} fill={ink.faint}>{bv.toFixed(1)}{barUnit || ""}</text>
               <text x={w - padR + 12} y={y + 6} textAnchor="start" fontSize={14} fill="var(--slide-accent-text)">{Math.round(lv)}{lineUnit || ""}</text>
             </g>
           );
@@ -6101,7 +6100,7 @@ function ComboChart({ brand, points, barLabel, barUnit, lineLabel, lineUnit, hei
           return (
             <g key={i}>
               <rect x={x} y={y} width={barW} height={bh} fill={ink.strong} opacity={0.85} />
-              <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
+              <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
             </g>
           );
         })}
