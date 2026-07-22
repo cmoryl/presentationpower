@@ -9,7 +9,7 @@ import { createContext, useContext, useEffect, useId, useRef, useState, Fragment
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
 import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, StatFigure, QuoteMark, Attribution, SoftDivider } from "./primitives";
-import { EditorialTitle, PullQuote, DuotoneImage, GrainOverlay, CinematicScrim, StatRail, GlassTile, IconWell, EDITORIAL_SERIF } from "./flagship";
+import { EditorialTitle, PullQuote, DuotoneImage, GrainOverlay, CinematicScrim, StatRail, GlassTile, IconWell, AuroraOrb, AuroraSidePanel, EDITORIAL_SERIF } from "./flagship";
 import { APPROVED_LOGOS } from "@/lib/approved-logos";
 
 // Example client-logo chip for case study previews. Uses the deck's real
