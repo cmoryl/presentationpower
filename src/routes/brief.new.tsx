@@ -1038,6 +1038,8 @@ function StrategistSection({
           className="space-y-4 rounded-xl border p-5"
           style={{ borderColor: `${brandPrimary}33`, backgroundColor: PALETTE.field }}
         >
+          <ChapterMap plan={strategy} primaryColor={brandPrimary} />
+
           <div className="grid gap-3 md:grid-cols-3">
             <MicroCard label="Opening hook" body={strategy.openingHook} />
             <MicroCard label="Narrative arc" body={strategy.narrativeArc} />
