@@ -1984,6 +1984,10 @@ function readFillRef(style: PNode | undefined, theme?: ParsedTheme): LayoutFill 
   return undefined;
 }
 
+function readMappedFillRef(style: PNode | undefined, theme: ParsedTheme | undefined, clrMap?: PptxClrMap): LayoutFill | undefined {
+  return remapFillScheme(readFillRef(style, theme), clrMap);
+}
+
 function readLineRef(style: PNode | undefined, theme?: ParsedTheme): LayoutLine | undefined {
   const lnRef = style ? pFind(style, "a:lnRef") : undefined;
   if (!lnRef) return undefined;
@@ -1995,6 +1999,10 @@ function readLineRef(style: PNode | undefined, theme?: ParsedTheme): LayoutLine 
   return undefined;
 }
 
+function readMappedLineRef(style: PNode | undefined, theme: ParsedTheme | undefined, clrMap?: PptxClrMap): LayoutLine | undefined {
+  return remapLineScheme(readLineRef(style, theme), clrMap);
+}
+
 function readBgRef(bgRef: PNode | undefined, theme?: ParsedTheme): LayoutFill | undefined {
   if (!bgRef) return undefined;
   const idx = Number(pAttrs(bgRef)["@_idx"] ?? 0);
@@ -2003,6 +2011,10 @@ function readBgRef(bgRef: PNode | undefined, theme?: ParsedTheme): LayoutFill | 
   if (picked) return substitutePhClrInFill(picked, phColor);
   if (phColor) return { kind: "solid", color: phColor };
   return undefined;
+}
+
+function readMappedBgRef(bgRef: PNode | undefined, theme: ParsedTheme | undefined, clrMap?: PptxClrMap): LayoutFill | undefined {
+  return remapFillScheme(readBgRef(bgRef, theme), clrMap);
 }
 
 function readLine(spPr: PNode | undefined): LayoutLine | undefined {
