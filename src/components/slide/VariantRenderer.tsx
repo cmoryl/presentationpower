@@ -4094,7 +4094,7 @@ function renderVariantBody({
                 const delta = s(it.delta);
                 const negative = delta.trim().startsWith("-");
                 return (
-                  <div key={i} className="pt-5" style={{ borderTop: `1px solid ${i === 0 ? brand.tokens.accent : "rgba(122,139,199,0.28)"}` }}>
+                  <div key={i} style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`, paddingLeft: i === 0 ? 0 : 20 }}>
                     <div className="uppercase" style={{ fontSize: 12, letterSpacing: "0.24em", color: ink.muted, fontWeight: 600 }}>{s(it.label)}</div>
                     <div className="tabular-nums mt-2 flex items-baseline gap-3" style={{ fontSize: 34, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em" }}>
                       {s(it.value, `${pct}%`)}
