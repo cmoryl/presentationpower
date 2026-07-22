@@ -3955,7 +3955,7 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-10 grid gap-16" style={{ gridTemplateColumns: "1.6fr 1fr" }}>
             <div>
-              <AreaChart brand={brand} series={series} height={520} />
+              <AreaChart brand={brand} series={series} height={520} airy />
             </div>
             <div className="flex flex-col justify-center pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
               <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
@@ -5543,7 +5543,7 @@ function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; p
 
 
 
-function AreaChart({ brand: _brand, series, height = 480, bare = false }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; bare?: boolean }) {
+function AreaChart({ brand: _brand, series, height = 480, bare = false, airy = false }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; bare?: boolean; airy?: boolean }) {
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
   const w = 1000;
@@ -5561,21 +5561,32 @@ function AreaChart({ brand: _brand, series, height = 480, bare = false }: { bran
   const last = pts[pts.length - 1];
   const svg = (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      <ChartAccentDefs id={id} />
+      {airy ? (
+        <defs>
+          <linearGradient id={`${id}-airy`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"  stopColor="var(--slide-accent-text)" stopOpacity={0.16} />
+            <stop offset="65%" stopColor="var(--slide-accent-text)" stopOpacity={0.05} />
+            <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+      ) : (
+        <ChartAccentDefs id={id} />
+      )}
       <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairline} strokeWidth={1} />
-      {areaPath && <path d={areaPath} fill={`url(#${id}-fill)`} />}
-      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" opacity={0.32} filter={`url(#${id}-glow)`} />
-      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
-      {last && <>
+      {areaPath && <path d={areaPath} fill={airy ? `url(#${id}-airy)` : `url(#${id}-fill)`} />}
+      {!airy && <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" opacity={0.32} filter={`url(#${id}-glow)`} />}
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={airy ? 2 : 2.5} strokeLinecap="round" strokeLinejoin="round" />
+      {last && !airy && <>
         <circle cx={last[0]} cy={last[1]} r={9} fill="var(--slide-accent-text)" opacity={0.35} filter={`url(#${id}-glow)`} />
         <circle cx={last[0]} cy={last[1]} r={5} fill={`url(#${id}-dot)`} />
       </>}
+      {last && airy && <circle cx={last[0]} cy={last[1]} r={4.5} fill="var(--slide-accent-text)" />}
       {series.map((p, i) => (i % showEvery === 0 || i === series.length - 1) ? (
         <text key={i} x={pts[i]?.[0]} y={h - padB + 28} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{p.label}</text>
       ) : null)}
     </svg>
   );
-  if (bare) return svg;
+  if (bare || airy) return svg;
   return <GlassChartPanel padding="px-6 py-6" bloomAnchor="br">{svg}</GlassChartPanel>;
 }
 
