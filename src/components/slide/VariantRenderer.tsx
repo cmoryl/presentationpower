@@ -9,6 +9,58 @@ import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
 import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, StatFigure, QuoteMark, Attribution, SoftDivider } from "./primitives";
 import { EditorialTitle, PullQuote, DuotoneImage, GrainOverlay, CinematicScrim, StatRail, GlassTile, IconWell, EDITORIAL_SERIF } from "./flagship";
+import { APPROVED_LOGOS } from "@/lib/approved-logos";
+
+// Example client-logo chip for case study previews. Uses the deck's real
+// clientLogoUrl when set (via SlideFrameCtx); otherwise deterministically
+// picks an approved filler mark (excluding TransPerfect) so library
+// previews always render with a real logo lockup rather than an empty
+// "Client" chip. Mode-aware — white variant on dark, color on light.
+function ClientLogoChip({
+  mode,
+  clientName,
+  clientLogoUrl,
+  size = 40,
+  label = "Client",
+  accent,
+  faint,
+}: {
+  mode: SlideMode;
+  clientName?: string;
+  clientLogoUrl?: string | null;
+  size?: number;
+  label?: string;
+  accent: string;
+  faint: string;
+}) {
+  const pool = APPROVED_LOGOS.filter((l) => l.id !== "tp");
+  const key = (clientName || "acme").toLowerCase();
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+  const pick = pool[hash % pool.length];
+  const filler = mode === "dark" ? pick.white || pick.color : pick.color;
+  const src = clientLogoUrl || filler;
+  return (
+    <div className="inline-flex items-center gap-3">
+      <span
+        className="uppercase font-semibold"
+        style={{ color: accent, fontSize: 11, letterSpacing: "0.28em" }}
+      >
+        {label}
+      </span>
+      <span
+        aria-hidden
+        className="inline-block h-3 w-px"
+        style={{ background: faint }}
+      />
+      <img
+        src={src}
+        alt={clientName ? `${clientName} logo` : `${pick.name} logo (example)`}
+        style={{ height: size, width: "auto", maxWidth: size * 4, objectFit: "contain" }}
+      />
+    </div>
+  );
+}
 
 
 // Module-scoped context so helper components (CardGrid, StatGrid, NumberedList,
