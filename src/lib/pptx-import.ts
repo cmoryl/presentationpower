@@ -2150,8 +2150,19 @@ function extractSlideLayout(
   if (!background) background = parents?.layout?.background;
   if (!background) background = parents?.master?.background;
 
+  // Prepend master → layout decor so it renders beneath slide-level shapes.
+  // These carry brand furniture (logos, footer bars, dividers, page numbers)
+  // that PowerPoint inherits from the slideMaster / slideLayout onto every
+  // slide. Slide-level shapes then draw on top.
+  const zRef = { z: 0 };
+  const pushDecor = (src?: LayoutShape[]) => {
+    if (!src?.length) return;
+    for (const sh of src) shapes.push({ ...sh, z: zRef.z++ });
+  };
+  pushDecor(parents?.master?.decor);
+  pushDecor(parents?.layout?.decor);
+
   if (spTree) {
-    const zRef = { z: 0 };
     walkSpTree(pChildren(spTree), zRef, undefined, shapes, imageEmbedIds, parents);
   }
   return { size, background, shapes };
