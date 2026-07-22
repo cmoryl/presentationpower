@@ -3857,15 +3857,19 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 3);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14 grid gap-10" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
-            {items.map((it, i) => (
-              <div key={i} className="flex flex-col items-center pt-8 text-center" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                <Donut brand={brand} percent={Number(it.value) || 0} size={280} />
-                <div className="mt-8 uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: brand.tokens.primary, fontWeight: 600 }}>{s(it.label)}</div>
-                <div className="mt-4" style={{ fontSize: 22, lineHeight: 1.4, color: "rgba(10,15,28,0.68)", maxWidth: 380 }}>{s(it.body)}</div>
-              </div>
-            ))}
+          <DotGridBackdrop />
+          <div className="relative z-10">
+            <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+            <div className="mt-14 grid gap-10" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+              {items.map((it, i) => (
+                <div key={i} className="flex flex-col items-center pt-6 text-center" style={{ borderTop: `1px solid ${i === 0 ? brand.tokens.accent : "rgba(122,139,199,0.28)"}` }}>
+                  <Donut brand={brand} percent={Number(it.value) || 0} size={280} />
+                  <div className="mt-8 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: brand.tokens.primary, fontWeight: 700 }}>{s(it.label)}</div>
+                  <div className="mt-4" style={{ fontSize: 20, lineHeight: 1.45, color: "rgba(122,139,199,0.9)", maxWidth: 380 }}>{s(it.body)}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-12"><LiveMetaFooter brand={brand} source={s(c.source, "Program telemetry")} refCode={variant.id} /></div>
           </div>
         </SlideFrame>
       );
@@ -3901,18 +3905,24 @@ function renderVariantBody({
       const cols = items.length || 1;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-16 grid gap-10" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
-            {items.map((it, i) => (
-              <div key={i} className="flex flex-col items-center">
-                <SemiGauge brand={brand} percent={Number(it.value) || 0} size={280} />
-                <div className="mt-6 uppercase text-center" style={{ fontSize: 18, letterSpacing: "0.24em", color: brand.tokens.primary, fontWeight: 600, maxWidth: 260 }}>{s(it.label)}</div>
-              </div>
-            ))}
+          <DotGridBackdrop />
+          <div className="relative z-10">
+            <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+            <div className="mt-16 grid gap-10" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+              {items.map((it, i) => (
+                <div key={i} className="flex flex-col items-center pt-6" style={{ borderTop: `1px solid ${i === 0 ? brand.tokens.accent : "rgba(122,139,199,0.28)"}` }}>
+                  <SemiGauge brand={brand} percent={Number(it.value) || 0} size={280} />
+                  <div className="mt-6 uppercase text-center" style={{ fontSize: 16, letterSpacing: "0.24em", color: brand.tokens.primary, fontWeight: 700, maxWidth: 260 }}>{s(it.label)}</div>
+                  {s(it.body) && <div className="mt-2 text-center" style={{ fontSize: 14, lineHeight: 1.4, color: "rgba(122,139,199,0.9)", maxWidth: 240 }}>{s(it.body)}</div>}
+                </div>
+              ))}
+            </div>
+            <div className="mt-12"><LiveMetaFooter brand={brand} source={s(c.source, "Program telemetry")} refCode={variant.id} /></div>
           </div>
         </SlideFrame>
       );
     }
+
 
     case "MV-DASH-PERFORMANCE": {
       const bars = arr(c.bars).map((b) => ({ label: s(b.label), value: Number(b.value) || 0 }));
