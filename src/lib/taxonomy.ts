@@ -1742,6 +1742,71 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     editableFields: ["title", "bars.unit", "line.unit", "bars.label", "line.label", "points[].label", "points[].bar", "points[].line"],
     lockedFields: ["footer", "logo"],
   },
+
+  // ── Editorial hero tier ─────────────────────────────────────────────────
+  // High-fidelity, low-density variants inspired by flagship briefing decks.
+  // Palette-locked to the brand mode but composition-forward: single message,
+  // generous whitespace, imagery treated as the primary carrier (not chrome).
+  {
+    id: "MV-ED-HERO-BLEED",
+    familyId: "MF-01",
+    name: "Editorial — full-bleed hero",
+    description: "Single message over an edge-to-edge photo. One line. Enormous.",
+    permittedLayoutIds: ["LF-05"],
+    capacity: { titleChars: 90, bodyChars: 120 },
+    editableFields: ["kicker", "title", "subtitle", "mediaSeed", "mediaUrl"],
+    lockedFields: ["footer", "logo"],
+  },
+  {
+    id: "MV-ED-HERO-ORB",
+    familyId: "MF-01",
+    name: "Editorial — orb composition",
+    description: "Two soft aurora orbs behind a minimalist type stack. High air.",
+    permittedLayoutIds: ["LF-01"],
+    capacity: { titleChars: 80, bodyChars: 140 },
+    editableFields: ["kicker", "title", "subtitle"],
+    lockedFields: ["footer", "logo", "orbs"],
+  },
+  {
+    id: "MV-ED-DIVIDER-XL",
+    familyId: "MF-01",
+    name: "Editorial — numbered divider",
+    description: "Chapter break: oversized numeral + kicker + title. Poster energy.",
+    permittedLayoutIds: ["LF-05"],
+    capacity: { titleChars: 60, bodyChars: 90 },
+    editableFields: ["numeral", "kicker", "title", "subtitle"],
+    lockedFields: ["footer", "logo"],
+  },
+  {
+    id: "MV-ED-KICKER-POSTER",
+    familyId: "MF-01",
+    name: "Editorial — kicker poster",
+    description: "Massive tracked kicker over a display headline on solid brand.",
+    permittedLayoutIds: ["LF-28"],
+    capacity: { titleChars: 60, bodyChars: 80 },
+    editableFields: ["kicker", "title", "meta"],
+    lockedFields: ["footer", "logo"],
+  },
+  {
+    id: "MV-ED-STAT-PHOTO",
+    familyId: "MF-05",
+    name: "Editorial — stat over photo",
+    description: "One giant proof stat lockup floating over a full-bleed photo.",
+    permittedLayoutIds: ["LF-05"],
+    capacity: { titleChars: 60, bodyChars: 160 },
+    editableFields: ["stat", "unit", "label", "narrative", "mediaSeed", "mediaUrl"],
+    lockedFields: ["footer", "logo"],
+  },
+  {
+    id: "MV-ED-QUOTE-BLEED",
+    familyId: "MF-05",
+    name: "Editorial — full-bleed quote",
+    description: "Hero quote treated editorially over a portrait or environment shot.",
+    permittedLayoutIds: ["LF-05"],
+    capacity: { titleChars: 240, bodyChars: 120 },
+    editableFields: ["quote", "attribution", "role", "mediaSeed", "mediaUrl"],
+    lockedFields: ["footer", "logo"],
+  },
 ];
 export const NARRATIVE_ARCHETYPES: NarrativeArchetype[] = [
   {
