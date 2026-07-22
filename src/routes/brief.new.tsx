@@ -14,6 +14,7 @@ import { TRANSPERFECT_SUBCOMPANIES } from "@/lib/brand-guides";
 import { brandModeWithSubCompany, getSubCompanyProfile } from "@/lib/brand-profiles";
 import { BrandLockup } from "@/components/BrandLockup";
 import { PaletteLab, type PaletteSelection } from "@/components/PaletteLab";
+import { ChapterMap } from "@/components/ChapterMap";
 
 export const Route = createFileRoute("/brief/new")({
   head: () => ({
