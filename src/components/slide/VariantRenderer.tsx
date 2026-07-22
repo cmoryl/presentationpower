@@ -4017,6 +4017,7 @@ function renderVariantBody({
           <div className="mt-8"><ComboChart brand={brand} points={points} barLabel={s(bars.label, "Volume")} barUnit={s(bars.unit)} lineLabel={s(line.label, "Rate")} lineUnit={s(line.unit, "%")} height={540} /></div>
         </SlideFrame>
       );
+    }
 
     // ── Editorial hero tier ───────────────────────────────────────────────
     case "MV-ED-HERO-BLEED": {
