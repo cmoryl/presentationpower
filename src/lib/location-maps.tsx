@@ -388,6 +388,9 @@ export type WorldMapProps = {
   showSpokes?: boolean;
   /** Aria label for the whole map. */
   ariaLabel?: string;
+  /** Optional metric to visualize — pins are scaled/colored by value and a legend is drawn. */
+  metric?: LocationMetric;
+  metricId?: string;
 };
 
 /**
@@ -406,7 +409,10 @@ export function WorldMap({
   showLabels = true,
   showSpokes = false,
   ariaLabel = "Global locations map",
+  metric,
+  metricId,
 }: WorldMapProps) {
+
   const isDark = mode === "dark";
   const land = isDark ? "rgba(255,255,255,0.055)" : "rgba(3,0,44,0.055)";
   const landStroke = isDark ? "rgba(255,255,255,0.12)" : "rgba(3,0,44,0.16)";
@@ -451,6 +457,27 @@ export function WorldMap({
 
   const glow = `url(#tp-pin-glow)`;
 
+  // ── Metric scale ────────────────────────────────────────────────────────
+  const activeMetricId = metricId ?? metric?.id;
+  const metricStats = React.useMemo(() => {
+    if (!activeMetricId) return null;
+    const vals = visiblePins
+      .map((p) => p.values?.[activeMetricId])
+      .filter((v): v is number => Number.isFinite(v as number));
+    if (vals.length === 0) return null;
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    return { min, max, range: Math.max(1e-9, max - min) };
+  }, [visiblePins, activeMetricId]);
+  const scaleFor = React.useCallback(
+    (v: number | undefined) => {
+      if (!metricStats || !Number.isFinite(v as number)) return null;
+      return Math.max(0, Math.min(1, ((v as number) - metricStats.min) / metricStats.range));
+    },
+    [metricStats],
+  );
+
+
   return (
     <svg
       viewBox={vb}
@@ -466,7 +493,12 @@ export function WorldMap({
           <stop offset="60%" stopColor={accent} stopOpacity={0.14} />
           <stop offset="100%" stopColor={accent} stopOpacity={0} />
         </radialGradient>
+        <linearGradient id="tp-metric-scale" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={accent} stopOpacity={0.25} />
+          <stop offset="100%" stopColor={accent} stopOpacity={1} />
+        </linearGradient>
         <linearGradient id="tp-map-wash" x1="0" y1="0" x2="0" y2="1">
+
           <stop offset="0%" stopColor={accent} stopOpacity={isDark ? 0.08 : 0.05} />
           <stop offset="100%" stopColor={primary ?? accent} stopOpacity={isDark ? 0.02 : 0.02} />
         </linearGradient>
@@ -499,12 +531,14 @@ export function WorldMap({
         </g>
       )}
 
-      {/* Pin glows */}
+      {/* Pin glows — scale radius by metric when active */}
       <g>
         {visiblePins.map((p) => {
           const { x, y } = projectLatLon(p.lat, p.lon);
-          const r = p.role === "HQ" ? 26 : p.role === "hub" ? 20 : 14;
-          return <circle key={`g-${p.id}`} cx={x} cy={y} r={r} fill={glow} />;
+          const baseR = p.role === "HQ" ? 26 : p.role === "hub" ? 20 : 14;
+          const t = activeMetricId ? scaleFor(p.values?.[activeMetricId]) : null;
+          const r = t == null ? baseR : 14 + t * 22;
+          return <circle key={`g-${p.id}`} cx={x} cy={y} r={r} fill={glow} opacity={t == null ? 1 : 0.5 + t * 0.5} />;
         })}
       </g>
 
@@ -514,18 +548,30 @@ export function WorldMap({
           const { x, y } = projectLatLon(p.lat, p.lon);
           const isHq = p.role === "HQ";
           const isHub = p.role === "hub";
-          const core = isHq ? 5.4 : isHub ? 4.4 : 3.2;
+          const t = activeMetricId ? scaleFor(p.values?.[activeMetricId]) : null;
+          const baseCore = isHq ? 5.4 : isHub ? 4.4 : 3.2;
+          const core = t == null ? baseCore : 3.2 + t * 5.8;
+          const fill = t == null ? pinCore : accent;
+          const fillOpacity = t == null ? 1 : 0.35 + t * 0.65;
+          const val = activeMetricId ? p.values?.[activeMetricId] : undefined;
+          const tip = activeMetricId && metric
+            ? `${p.city}${p.country ? `, ${p.country}` : ""} — ${metric.label}: ${formatMetricValue(val, metric)}`
+            : `${p.city}${p.country ? `, ${p.country}` : ""}${p.label ? ` — ${p.label}` : ""}`;
           return (
-            <g key={`pin-${p.id}`}>
+            <g key={`pin-${p.id}`} style={{ cursor: "default" }}>
+              <title>{tip}</title>
               <circle cx={x} cy={y} r={core + 1.6} fill={pinRing} opacity={0.85} />
-              <circle cx={x} cy={y} r={core} fill={pinCore} />
-              {isHq && (
-                <circle cx={x} cy={y} r={core + 4.8} fill="none" stroke={pinCore} strokeWidth={0.8} opacity={0.7} />
+              <circle cx={x} cy={y} r={core} fill={fill} fillOpacity={fillOpacity} />
+              {(isHq || (t != null && t > 0.75)) && (
+                <circle cx={x} cy={y} r={core + 4.8} fill="none" stroke={accent} strokeWidth={0.8} opacity={0.7} />
               )}
+              {/* Invisible larger hit target so browser tooltips fire reliably */}
+              <circle cx={x} cy={y} r={Math.max(10, core + 6)} fill="transparent" pointerEvents="all" />
             </g>
           );
         })}
       </g>
+
 
       {/* Labels — HQ + hub tiers, or all when the pin count is small */}
       {showLabels && (
@@ -553,7 +599,40 @@ export function WorldMap({
             })}
         </g>
       )}
+
+      {/* Metric legend — color scale + min/max labels */}
+      {metricStats && metric && (() => {
+        const vb = regionViewBox(region).split(" ").map(Number);
+        const [vx, vy, vw, vh] = vb;
+        const barW = Math.min(240, vw * 0.28);
+        const barH = 8;
+        const pad = 14;
+        const x = vx + pad;
+        const y = vy + vh - pad - barH - 22;
+        const panelW = barW + 24;
+        const panelH = barH + 42;
+        const panelFill = isDark ? "rgba(3,0,44,0.55)" : "rgba(255,255,255,0.78)";
+        const panelStroke = isDark ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.12)";
+        const textFill = isDark ? "rgba(255,255,255,0.92)" : "rgba(3,0,44,0.86)";
+        const subFill = isDark ? "rgba(255,255,255,0.6)" : "rgba(3,0,44,0.6)";
+        return (
+          <g fontFamily="Geist, system-ui, sans-serif">
+            <rect x={x - 12} y={y - 22} width={panelW} height={panelH} rx={8} fill={panelFill} stroke={panelStroke} />
+            <text x={x} y={y - 8} fontSize={9} fontWeight={600} fill={textFill} style={{ letterSpacing: "0.06em", textTransform: "uppercase" }}>
+              {metric.label}
+            </text>
+            <rect x={x} y={y} width={barW} height={barH} rx={barH / 2} fill="url(#tp-metric-scale)" stroke={panelStroke} />
+            <text x={x} y={y + barH + 12} fontSize={9} fill={subFill}>
+              {formatMetricValue(metricStats.min, metric)}
+            </text>
+            <text x={x + barW} y={y + barH + 12} fontSize={9} fill={subFill} textAnchor="end">
+              {formatMetricValue(metricStats.max, metric)}
+            </text>
+          </g>
+        );
+      })()}
     </svg>
+
   );
 }
 
