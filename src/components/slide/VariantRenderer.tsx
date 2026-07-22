@@ -5510,10 +5510,7 @@ function Donut({ brand: _brand, percent, size = 260 }: { brand: BrandMode; perce
   const dash = (p / 100) * circ;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
-      <ChartAccentDefs id={id} />
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={ink.trackFill} strokeWidth={stroke} />
-      {/* soft accent glow ring */}
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke + 6} opacity={0.28} filter={`url(#${id}-glow)`} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
       <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central" fontSize={size * 0.32} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}>
         {Math.round(p)}
