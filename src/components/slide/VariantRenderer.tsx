@@ -4904,6 +4904,32 @@ function PlayOverlay({
   );
 }
 
+/**
+ * Per-preview video playback registry.
+ *
+ * Isolates state per module preview (keyed by brand + seed + source URL) so
+ * switching variants doesn't cross-contaminate, and reopening the lightbox
+ * for the same module restores where the user left off. Also enforces a
+ * "one video plays at a time" policy: when a video starts, every other
+ * registered video is paused — that's what stops the previous variant from
+ * continuing to play in the background.
+ */
+type VideoPlaybackState = { currentTime: number; userStarted: boolean; paused: boolean };
+const videoPlaybackStore = new Map<string, VideoPlaybackState>();
+const registeredVideos = new Map<HTMLVideoElement, string>();
+
+function pauseAllVideosExcept(active: HTMLVideoElement | null) {
+  registeredVideos.forEach((key, v) => {
+    if (v === active || v.paused) return;
+    try {
+      v.pause();
+      const s = videoPlaybackStore.get(key) ?? { currentTime: 0, userStarted: false, paused: true };
+      videoPlaybackStore.set(key, { ...s, currentTime: v.currentTime, paused: true });
+    } catch { /* noop */ }
+  });
+}
+
+
 function MediaTile({
   brand,
   seed,
