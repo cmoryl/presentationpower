@@ -539,7 +539,10 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
       if (!parent?.images?.length) return;
       for (const img of parent.images) {
         if (imageEmbedIds.includes(img.embedId)) continue;
-        if (images.length >= MAX_IMAGES_PER_SLIDE) { imagesTruncated = true; break; }
+        // Parent/master assets frequently include shared background art and
+        // logo furniture. Always preserve their embedId → payload mapping even
+        // when the slide itself is image-heavy, otherwise layout backgrounds
+        // keep an embedId with no persisted storage path after re-import.
         if (img.dataUrl.length > MAX_PER_IMAGE_BYTES) { imagesTruncated = true; continue; }
         const budgetKey = img.sourcePath ?? img.embedId;
         if (!countedImageBudgetKeys.has(budgetKey)) {
