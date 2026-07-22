@@ -520,7 +520,7 @@ export function AuroraLayer({
         viewBox="0 0 1280 720"
         preserveAspectRatio="xMidYMid slice"
         className="absolute inset-0 h-full w-full"
-        style={{ opacity: mode === "dark" ? intensity : intensity * 0.75 }}
+        style={{ opacity: mode === "dark" ? intensity : intensity * 0.55 }}
       >
         <defs>
           {orbs.map((o, i) => (
