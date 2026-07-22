@@ -812,7 +812,7 @@ function renderVariantBody({
             }}
           />
           <div className="relative flex h-full flex-col justify-center">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 tp-rise">
               <span
                 className="inline-block h-2 w-2 rounded-full"
                 style={{
@@ -822,24 +822,21 @@ function renderVariantBody({
               />
               <Kicker brand={brand}>{s(c.kicker, "The big idea")}</Kicker>
             </div>
-            <div
-              className="mt-8 mb-12 h-[2px] w-[160px] rounded-full"
-              style={{ backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)` }}
-            />
-            <div
-              style={{
-                fontSize: 128,
-                fontWeight: 600,
-                letterSpacing: "-0.035em",
-                lineHeight: 1.02,
-                maxWidth: 1660,
-                color: ink.strong,
-                textShadow: isDark ? `0 2px 40px ${brand.tokens.accent}22` : undefined,
-              }}
-            >
-              {s(c.idea)}
+            <div className="mt-10 flex items-start gap-8 tp-rise tp-rise-delay-1">
+              <StatRail color={brand.tokens.accent} height={220} className="mt-4" />
+              <div className="flex-1">
+                <EditorialTitle
+                  text={s(c.idea)}
+                  emphasize={s(c.ideaEmphasis) || lastWord(s(c.idea))}
+                  color={ink.strong}
+                  accentColor={brand.tokens.accent}
+                  size={124}
+                  maxWidthPx={1580}
+                />
+              </div>
             </div>
           </div>
+
         </SlideFrame>
       );
 
