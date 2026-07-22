@@ -231,6 +231,38 @@ export type SlideLayout = {
   shapes: LayoutShape[];
 };
 
+export type ParsedMedia = {
+  /** video | audio | ole | other — coarse bucket for downstream renderers. */
+  kind: "video" | "audio" | "ole" | "other";
+  /** MIME string (best effort from extension). */
+  mime: string;
+  /** Original archive path (e.g. ppt/media/media1.mp4) for debugging + storage rewriting. */
+  path: string;
+  /** Base64 data URL. Subject to per-file / per-slide byte caps. */
+  dataUrl: string;
+  /** rId that pointed at this asset when linked from the slide XML. */
+  embedId?: string;
+  /** Byte length of the raw asset (pre-base64). */
+  bytes: number;
+};
+
+export type ParsedHyperlink = {
+  /** rId as it appears on r:id inside a:hlinkClick / a:hlinkHover. */
+  rId: string;
+  /** Absolute URL, mailto:, or internal slide reference (ppaction://hlinksldjump). */
+  target: string;
+  /** True when the rel Type ended in /hyperlink — false for internal jumps. */
+  external: boolean;
+};
+
+export type ParsedComment = {
+  authorName?: string;
+  authorInitials?: string;
+  text: string;
+  /** ISO datetime when the comment was authored. */
+  createdAt?: string;
+};
+
 export type ParsedSlide = {
   index: number;
   title: string;
@@ -248,6 +280,18 @@ export type ParsedSlide = {
   imageEmbedIds: string[];
   /** Faithful 1:1 layout capture (positions, styling, z-order). */
   layout?: SlideLayout;
+  /** Video / audio / OLE embeds referenced by the slide. */
+  media: ParsedMedia[];
+  /** Every hyperlink target discovered on the slide, in rel order. */
+  hyperlinks: ParsedHyperlink[];
+  /** Author comments attached to this slide, in file order. */
+  comments: ParsedComment[];
+  /** True when the slide is hidden from presentation (`<p:sld show="0">`). */
+  hidden: boolean;
+  /** Transition preset name (e.g. `fade`, `push`, `wipe`) when declared. */
+  transition?: string;
+  /** True when the slide XML declares a `<p:timing>` (animation) block. */
+  hasAnimation: boolean;
 };
 
 export type ParsedTheme = {
@@ -269,6 +313,32 @@ export type ParsedTheme = {
   effectStyleLst?: LayoutEffect[];
 };
 
+export type ParsedDeckMetadata = {
+  title?: string;
+  subject?: string;
+  creator?: string;
+  lastModifiedBy?: string;
+  keywords?: string;
+  description?: string;
+  category?: string;
+  created?: string;
+  modified?: string;
+  revision?: string;
+  application?: string;
+  appVersion?: string;
+  company?: string;
+  manager?: string;
+  template?: string;
+  presentationFormat?: string;
+};
+
+export type ParsedEmbeddedFont = {
+  /** Font family name from the presentation's font table. */
+  typeface: string;
+  /** Discovered variants (regular/bold/italic/boldItalic) and their asset paths. */
+  variants: Array<{ style: "regular" | "bold" | "italic" | "boldItalic"; path: string; mime: string }>;
+};
+
 export type ParsedDeck = {
   filename: string;
   slideCount: number;
@@ -281,8 +351,19 @@ export type ParsedDeck = {
     charts: number;
     tables: number;
     diagrams: number;
+    media: number;
+    comments: number;
+    hyperlinks: number;
+    hiddenSlides: number;
   };
+  /** docProps/core.xml + docProps/app.xml — author, dates, application, company. */
+  metadata: ParsedDeckMetadata;
+  /** Every embedded font in ppt/fonts/ paired with its typeface. */
+  embeddedFonts: ParsedEmbeddedFont[];
+  /** Custom XML parts (customXml/item*.xml) preserved verbatim for round-tripping. */
+  customXmlParts: Array<{ path: string; xml: string }>;
 };
+
 
 
 const MAX_PER_IMAGE_BYTES = 15_000_000;
