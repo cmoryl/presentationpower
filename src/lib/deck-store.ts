@@ -58,6 +58,22 @@ export type SlideLogoPosition =
   | "bottom-right"
   | "hidden";
 
+export type CanvasBlockKind = "heading" | "body" | "caption";
+
+export type CanvasBlock = {
+  id: string;
+  kind: CanvasBlockKind;
+  // Position + size in stage units (0-1920 x 0-1080).
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  text: string;
+  color?: string;   // Hex or CSS color; defaults to brand ink.
+  align?: "left" | "center" | "right";
+  weight?: 400 | 500 | 600 | 700;
+};
+
 export type DeckSlide = {
   id: string;
   position: number;
@@ -69,6 +85,10 @@ export type DeckSlide = {
   notes?: string;
   logoPosition?: SlideLogoPosition;
   logoOrientation?: "auto" | "horizontal" | "stacked" | "vertical-left" | "vertical-right" | "mark-only";
+  // Free-form canvas overlay — draggable text blocks positioned in stage
+  // coordinates on top of the variant. Persists across sessions and always
+  // renders (in preview, present, share). Empty/undefined = no overlay.
+  canvasBlocks?: CanvasBlock[];
 };
 
 
