@@ -2886,9 +2886,9 @@ function renderVariantBody({
               const logoUrl = s(it.logoUrl);
               const logoPath = s(it.logoPath);
               return (
-                <div key={i} className="flex flex-col pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                  <Kicker brand={brand} color="color-mix(in oklab, currentColor 62%, transparent)" size={16}>Client</Kicker>
-                  <div className="mt-3 flex items-center gap-4">
+                <div key={i} className="flex flex-col">
+                  <Kicker brand={brand} color="var(--slide-accent-text)" size={16}>Client · {String(i + 1).padStart(2, "0")}</Kicker>
+                  <div className="mt-4 flex items-center gap-4">
                     {(logoUrl || logoPath) && (
                       <ClientLogoImg
                         path={logoPath}
@@ -2899,18 +2899,16 @@ function renderVariantBody({
                     )}
                     <div style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>{s(it.client)}</div>
                   </div>
-                  <SoftDivider className="mt-6" />
-                  <div className="mt-6">
+                  <div className="mt-8">
                     <Kicker brand={brand} size={16}>Challenge</Kicker>
                     <SupportingText size="md" opacity={0.82} className="mt-3">{s(it.challenge)}</SupportingText>
                   </div>
-                  <SoftDivider className="mt-6" />
-                  <div className="mt-6 flex-1">
+                  <div className="mt-8 flex-1">
                     <Kicker brand={brand} size={16}>Outcome</Kicker>
                     <SupportingText size="md" opacity={0.82} className="mt-3">{s(it.outcome)}</SupportingText>
                   </div>
-                  <div className="mt-8 pt-6" style={{ borderTop: `1px solid ${ink.hairline}` }}>
-                    <StatFigure brand={brand} value={s(it.metric)} size="sm" />
+                  <div className="mt-10">
+                    <StatFigure brand={brand} value={s(it.metric)} size="md" />
                   </div>
                 </div>
               );
