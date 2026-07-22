@@ -558,8 +558,8 @@ export function AuroraLayer({
           backgroundImage:
             mode === "dark"
               ? `radial-gradient(80% 60% at 50% 60%, transparent 30%, ${base} 130%)`
-              : `radial-gradient(70% 55% at 50% 55%, ${base} 0%, transparent 55%, ${base} 120%)`,
-          opacity: mode === "dark" ? 0.6 : 0.75,
+              : `radial-gradient(85% 68% at 50% 55%, transparent 0%, transparent 55%, ${base} 125%)`,
+          opacity: mode === "dark" ? 0.6 : 0.5,
         }}
       />
     </div>
