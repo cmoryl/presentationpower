@@ -5385,17 +5385,12 @@ function Sparkline({ brand: _brand, values, w = 380, h = 100, filled = true, pea
   const last = pts[pts.length - 1];
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      <ChartAccentDefs id={id} />
-      {filled && <path d={areaPath} fill={`url(#${id}-fill)`} />}
+      <AiryDefs id={id} />
+      {filled && <path d={areaPath} fill={`url(#${id}-airy)`} />}
       <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke={ink.hairline} strokeWidth={1} />
-      {/* soft glow under the line */}
-      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" opacity={0.35} filter={`url(#${id}-glow)`} />
-      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" />
       {last && (
-        <>
-          <circle cx={last[0]} cy={last[1]} r={7} fill="var(--slide-accent-text)" opacity={0.35} filter={`url(#${id}-glow)`} />
-          <circle cx={last[0]} cy={last[1]} r={3.5} fill={`url(#${id}-dot)`} />
-        </>
+        <circle cx={last[0]} cy={last[1]} r={3.5} fill="var(--slide-accent-text)" />
       )}
       {peakPin && peak && (
         <g>
@@ -5404,6 +5399,20 @@ function Sparkline({ brand: _brand, values, w = 380, h = 100, filled = true, pea
         </g>
       )}
     </svg>
+  );
+}
+
+// Shared feathered accent gradient — drawn as a page-integrated free-form
+// fill. No panels, no boxes. Every chart references `url(#<id>-airy)`.
+function AiryDefs({ id }: { id: string }) {
+  return (
+    <defs>
+      <linearGradient id={`${id}-airy`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"  stopColor="var(--slide-accent-text)" stopOpacity={0.18} />
+        <stop offset="65%" stopColor="var(--slide-accent-text)" stopOpacity={0.05} />
+        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+      </linearGradient>
+    </defs>
   );
 }
 
