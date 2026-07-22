@@ -9,7 +9,7 @@ import { createContext, useContext, useEffect, useId, useRef, useState, Fragment
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
 import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, StatFigure, QuoteMark, Attribution, SoftDivider } from "./primitives";
-import { EditorialTitle, PullQuote, DuotoneImage, GrainOverlay, CinematicScrim, StatRail, GlassTile, IconWell, EDITORIAL_SERIF } from "./flagship";
+import { EditorialTitle, PullQuote, DuotoneImage, GrainOverlay, CinematicScrim, StatRail, GlassTile, IconWell, AuroraOrb, AuroraSidePanel, EDITORIAL_SERIF } from "./flagship";
 import { APPROVED_LOGOS } from "@/lib/approved-logos";
 
 // Example client-logo chip for case study previews. Uses the deck's real
@@ -1795,17 +1795,7 @@ function renderVariantBody({
           : [];
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
-          {/* Ambient cinematic glow */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              backgroundImage: `
-                radial-gradient(55% 60% at 15% 90%, ${brand.tokens.accent}38 0%, transparent 65%),
-                radial-gradient(40% 50% at 90% 10%, ${brand.tokens.accent}1F 0%, transparent 70%)
-              `,
-            }}
-          />
+          <AuroraOrb x={88} y={28} size={860} />
           <div className="relative grid h-full grid-cols-[1.1fr_0.9fr] items-center gap-24">
             <div>
               <div className="flex items-center gap-4">
@@ -1830,49 +1820,16 @@ function renderVariantBody({
               )}
             </div>
             {steps.length > 0 && (
-              <div
-                className="relative overflow-hidden rounded-3xl p-10"
-                style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  backgroundImage: `radial-gradient(120% 80% at 0% 0%, ${brand.tokens.accent}22 0%, transparent 60%)`,
-                }}
-              >
-                <div
-                  aria-hidden
-                  className="absolute inset-x-0 top-0 h-[3px]"
-                  style={{ background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 85%)` }}
-                />
-                <div className="uppercase" style={{ fontSize: 15, letterSpacing: "0.24em", fontWeight: 600, color: ink.faint }}>
-                  Next steps
-                </div>
-                <div className="mt-8 space-y-6">
-                  {steps.slice(0, 4).map((it, i) => (
-                    <div key={i} className="grid grid-cols-[56px_1fr] items-baseline gap-5">
-                      <div
-                        className="tabular-nums"
-                        style={{
-                          fontSize: 32,
-                          fontWeight: 600,
-                          letterSpacing: "-0.02em",
-                          color: "var(--slide-accent-text)",
-                          lineHeight: 1,
-                        }}
-                      >
-                        {String(i + 1).padStart(2, "0")}
-                      </div>
-                      <div style={{ fontSize: 26, lineHeight: 1.32, color: ink.strong, fontWeight: 500 }}>
-                        {s(it.label ?? it.title ?? it.body)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <AuroraSidePanel
+                kicker="Next steps"
+                items={steps.slice(0, 4).map((it) => ({ label: s(it.label ?? it.title ?? it.body) }))}
+              />
             )}
           </div>
         </SlideFrame>
       );
     }
+
 
     case "MV-CLOSE-THANKS":
       return (
@@ -1926,34 +1883,52 @@ function renderVariantBody({
         </SlideFrame>
       );
 
-    case "MV-CLOSE-CONTACT":
+    case "MV-CLOSE-CONTACT": {
+      const people = arr(c.items);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
-          <div>
-            <Kicker brand={brand}>Stay in touch</Kicker>
-            <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6" />
-            <DisplayTitle size="section" color={ink.strong} className="mt-8">
-              {s(c.title, "Get in touch")}
-            </DisplayTitle>
-          </div>
-          <div className={`mt-14 grid gap-x-20 gap-y-12 ${arr(c.items).length >= 3 ? "grid-cols-3" : arr(c.items).length === 2 ? "grid-cols-2" : "grid-cols-1"}`}>
-            {arr(c.items).map((p, i) => (
-              <div key={i} className="border-t pt-8" style={{ borderColor: "rgba(255,255,255,0.16)" }}>
-                <div style={{ fontSize: 32, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em" }}>
-                  {s(p.name)}
+          <AuroraOrb x={90} y={30} size={880} />
+          <div className="relative grid h-full grid-cols-[1.05fr_0.95fr] items-center gap-24">
+            <div>
+              <Kicker brand={brand}>Stay in touch</Kicker>
+              <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-6 mb-10" />
+              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>
+                {s(c.title, "Let's keep the conversation going.")}
+              </DisplayTitle>
+              {s(c.subtitle) && (
+                <SupportingText size="lg" opacity={0.78} className="mt-8" maxWidthPx={880}>
+                  {s(c.subtitle)}
+                </SupportingText>
+              )}
+            </div>
+            {people.length > 0 && (
+              <GlassTile radius={28} padding="px-12 py-12">
+                <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", fontWeight: 600, color: ink.faint }}>
+                  Your team
                 </div>
-                <div className="mt-2 uppercase" style={{ color: "var(--slide-accent-text)", fontSize: 18, letterSpacing: "0.28em", fontWeight: 600 }}>
-                  {s(p.role)}
+                <div className="mt-10 space-y-10">
+                  {people.slice(0, 4).map((p, i) => (
+                    <div key={i} className={`tp-rise tp-rise-delay-${Math.min(i + 1, 3) as 1 | 2 | 3}`}>
+                      <div style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>
+                        {s(p.name)}
+                      </div>
+                      <div className="mt-1 uppercase" style={{ color: "var(--slide-accent-text)", fontSize: 15, letterSpacing: "0.28em", fontWeight: 600 }}>
+                        {s(p.role)}
+                      </div>
+                      <div className="mt-4 space-y-1" style={{ fontSize: 20, color: ink.muted }}>
+                        <div>{s(p.email)}</div>
+                        {s(p.phone) && <div style={{ opacity: 0.7 }}>{s(p.phone)}</div>}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="mt-6 space-y-2" style={{ fontSize: 24, color: ink.muted }}>
-                  <div>{s(p.email)}</div>
-                  <div style={{ opacity: 0.65 }}>{s(p.phone)}</div>
-                </div>
-              </div>
-            ))}
+              </GlassTile>
+            )}
           </div>
         </SlideFrame>
       );
+    }
+
 
 
 
@@ -2921,76 +2896,105 @@ function renderVariantBody({
       );
 
     // ── Expanded CTA / close variants ─────────────────────────────────
-    case "MV-CLOSE-TIMELINE":
+    case "MV-CLOSE-TIMELINE": {
+      const items = arr(c.items);
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, "What happens next")} />
-          <div className="relative mt-20">
-            <div className="absolute left-0 right-0 top-10 h-[3px]" style={{ backgroundColor: brand.tokens.accent }} />
-            <div className="grid" style={{ gridTemplateColumns: `repeat(${Math.max(arr(c.items).length, 1)}, minmax(0, 1fr))` }}>
-              {arr(c.items).map((it, i) => (
-                <div key={i} className="pr-8">
-                  <div className="mb-8 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold" style={{ backgroundColor: brand.tokens.accent, color: ink.onSurface(brand.tokens.accent), transform: "translateY(4px)" }}>
-                    {i + 1}
-                  </div>
-                  <div className="text-3xl font-semibold" style={{ color: ink.strong }}>{s(it.label)}</div>
-                  <div className="mt-4 text-xl opacity-80">{s(it.body)}</div>
-                  {s(it.owner) && (
-                    <div className="mt-4 text-sm uppercase tracking-[0.2em] opacity-60">Owner · {s(it.owner)}</div>
-                  )}
-                </div>
-              ))}
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
+          <AuroraOrb x={92} y={72} size={780} />
+          <div className="relative grid h-full grid-cols-[1.05fr_0.95fr] items-center gap-24">
+            <div>
+              <Kicker brand={brand}>Timeline</Kicker>
+              <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-6 mb-10" />
+              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>
+                {s(c.title, "What happens next.")}
+              </DisplayTitle>
+              {s(c.subtitle) && (
+                <SupportingText size="lg" opacity={0.78} className="mt-8" maxWidthPx={880}>
+                  {s(c.subtitle)}
+                </SupportingText>
+              )}
             </div>
+            {items.length > 0 && (
+              <AuroraSidePanel
+                kicker="Milestones"
+                items={items.slice(0, 4).map((it) => ({
+                  label: s(it.label),
+                  body: s(it.body),
+                  meta: s(it.owner) ? `Owner · ${s(it.owner)}` : undefined,
+                }))}
+              />
+            )}
           </div>
         </SlideFrame>
       );
+    }
 
-    case "MV-CLOSE-CHECKLIST":
+
+    case "MV-CLOSE-CHECKLIST": {
+      const items = arr(c.items);
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, "What happens next")} />
-          <div className="mt-12">
-            <div
-              className="grid grid-cols-[60px_1fr_260px_180px] items-center gap-8 pb-4 uppercase"
-              style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.faint, borderBottom: `1px solid ${brand.tokens.accent}` }}
-            >
-              <div></div>
-              <div>Action</div>
-              <div>Owner</div>
-              <div className="text-right">When</div>
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
+          <AuroraOrb x={90} y={30} size={820} />
+          <div className="relative grid h-full grid-cols-[1fr_1fr] items-center gap-24">
+            <div>
+              <Kicker brand={brand}>Action plan</Kicker>
+              <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-6 mb-10" />
+              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>
+                {s(c.title, "What happens next.")}
+              </DisplayTitle>
+              {s(c.subtitle) && (
+                <SupportingText size="lg" opacity={0.78} className="mt-8" maxWidthPx={880}>
+                  {s(c.subtitle)}
+                </SupportingText>
+              )}
             </div>
-            {arr(c.items).map((it, i) => (
-              <div key={i}>
-                {i > 0 && <SoftDivider />}
-                <div className="grid grid-cols-[60px_1fr_260px_180px] items-center gap-8 py-6">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full" style={{ border: `1.5px solid ${brand.tokens.accent}`, color: "var(--slide-accent-text)" }}>
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12l5 5 9-11" /></svg>
-                  </div>
-                  <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(it.label)}</div>
-                  <SupportingText size="md" opacity={0.72}>{s(it.owner)}</SupportingText>
-                  <div className="text-right uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(it.when)}</div>
-                </div>
-              </div>
-            ))}
+            {items.length > 0 && (
+              <AuroraSidePanel
+                kicker="Checklist"
+                items={items.slice(0, 4).map((it) => ({
+                  label: s(it.label),
+                  meta: [s(it.owner), s(it.when)].filter(Boolean).join(" · ") || undefined,
+                }))}
+              />
+            )}
           </div>
         </SlideFrame>
       );
+    }
+
 
     case "MV-CLOSE-DECISION":
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <div className="flex h-full flex-col justify-center">
-            <Kicker brand={brand}>{s(c.kicker, "The ask")}</Kicker>
-            <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-8 mb-10" />
-            <DisplayTitle size="cover" color={ink.strong} maxWidthPx={1600}>{s(c.ask)}</DisplayTitle>
-            <SupportingText size="xl" opacity={0.85} className="mt-10" maxWidthPx={1180}>{s(c.rationale)}</SupportingText>
-            <div className="mt-16 flex items-baseline gap-10">
-              <Kicker brand={brand} color={ink.faint}>Decision by</Kicker>
-              <div style={{ fontSize: 42, fontWeight: 600, letterSpacing: "-0.02em", color: "var(--slide-accent-text)" }}>{s(c.decisionBy)}</div>
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
+          <AuroraOrb x={88} y={30} size={860} />
+          <div className="relative grid h-full grid-cols-[1.15fr_0.85fr] items-center gap-24">
+            <div>
+              <Kicker brand={brand}>{s(c.kicker, "The ask")}</Kicker>
+              <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-8 mb-10" />
+              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>{s(c.ask)}</DisplayTitle>
+              <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={880}>{s(c.rationale)}</SupportingText>
             </div>
+            <GlassTile radius={28} padding="px-12 py-12">
+              <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", fontWeight: 600, color: ink.faint }}>
+                Decision by
+              </div>
+              <div
+                className="mt-8 tabular-nums"
+                style={{ fontSize: 96, lineHeight: 1, fontWeight: 600, letterSpacing: "-0.03em", color: "var(--slide-accent-text)" }}
+              >
+                {s(c.decisionBy, "—")}
+              </div>
+              {s(c.owner) && (
+                <div className="mt-10 pt-8" style={{ borderTop: `1px solid ${ink.hairline}` }}>
+                  <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", fontWeight: 600, color: ink.faint }}>Owner</div>
+                  <div className="mt-2" style={{ fontSize: 24, fontWeight: 600, color: ink.strong }}>{s(c.owner)}</div>
+                </div>
+              )}
+            </GlassTile>
           </div>
         </SlideFrame>
       );
+
 
     case "MV-CLOSE-CALENDAR":
       return (
@@ -3018,14 +3022,34 @@ function renderVariantBody({
 
     case "MV-CLOSE-STATEMENT":
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <div className="relative flex h-full flex-col justify-between py-4 text-white">
-            <Kicker brand={brand}>{s(c.kicker)}</Kicker>
-            <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1700}>{s(c.statement)}</DisplayTitle>
-            <MetaRow><span>{s(c.signoff)}</span></MetaRow>
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
+          <AuroraOrb x={86} y={68} size={900} />
+          <div className="relative grid h-full grid-cols-[1.2fr_0.8fr] items-center gap-24">
+            <div>
+              <Kicker brand={brand}>{s(c.kicker, "A closing note")}</Kicker>
+              <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-8 mb-10" />
+              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1100}>{s(c.statement)}</DisplayTitle>
+              <MetaRow className="mt-14"><span>{s(c.signoff)}</span></MetaRow>
+            </div>
+            {(s(c.attribution) || s(c.role)) && (
+              <GlassTile radius={28} padding="px-12 py-12">
+                <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", fontWeight: 600, color: ink.faint }}>
+                  Signed
+                </div>
+                <div className="mt-8" style={{ fontSize: 36, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong, lineHeight: 1.15 }}>
+                  {s(c.attribution, s(c.signoff))}
+                </div>
+                {s(c.role) && (
+                  <div className="mt-3 uppercase" style={{ color: "var(--slide-accent-text)", fontSize: 15, letterSpacing: "0.28em", fontWeight: 600 }}>
+                    {s(c.role)}
+                  </div>
+                )}
+              </GlassTile>
+            )}
           </div>
         </SlideFrame>
       );
+
 
     case "MV-CLOSE-SPLIT":
       return (

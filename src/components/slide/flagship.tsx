@@ -788,10 +788,136 @@ function hexA(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, alpha))})`;
 }
 
-// GlassChartPanel and ChartAccentDefs retired — charts are now free-form and
-// draw directly on the page-level AuroraLayer atmosphere. No boxes, no glow
-// filters. See AiryDefs inside VariantRenderer.tsx for the feathered accent
-// fill used by every chart primitive.
+
+
+// ── AuroraOrb ─────────────────────────────────────────────────────────────
+// A single, large, feathered radial orb — used to place a soft, defocused
+// bloom of the division accent BEHIND a glass panel so the accent peeks
+// through the frosted surface (Aesop / "liquid glass" motif). Purely
+// decorative, pointer-events: none. Position is % of slide (0..100).
+export function AuroraOrb({
+  accent,
+  x = 82,
+  y = 32,
+  size = 780,
+  intensity = 1,
+  className = "",
+}: {
+  accent?: string;
+  /** Center X in % of slide width. */
+  x?: number;
+  /** Center Y in % of slide height. */
+  y?: number;
+  /** Diameter in px (at 1920×1080 slide space). */
+  size?: number;
+  intensity?: number;
+  className?: string;
+}) {
+  const mode = useSlideMode();
+  const ctxAccent = useSlideAccent();
+  const a = accent ?? ctxAccent ?? "#4F8CFF";
+  const sibling = shiftHue(a, 34, 0.06);
+  const alpha = (mode === "dark" ? 0.85 : 0.55) * intensity;
+  return (
+    <div
+      aria-hidden
+      className={`pointer-events-none absolute ${className}`}
+      style={{
+        left: `${x}%`,
+        top: `${y}%`,
+        width: size,
+        height: size,
+        transform: "translate(-50%, -50%)",
+        borderRadius: "50%",
+        background: `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.9)} 32%, ${hexA(a, 0)} 68%)`,
+        filter: "blur(40px)",
+        mixBlendMode: mode === "dark" ? "screen" : "multiply",
+      }}
+    />
+  );
+}
+
+
+// ── AuroraSidePanel ───────────────────────────────────────────────────────
+// The "right side" glass card the deck uses on close/CTA slides: a frosted
+// panel with an eyebrow kicker and a numbered list of steps. Used together
+// with AuroraOrb for the "orb-peeks-through-glass" hero pattern.
+export function AuroraSidePanel({
+  kicker,
+  items,
+  accent,
+  className = "",
+  numberStart = 1,
+  maxItems = 4,
+}: {
+  kicker?: string;
+  items: Array<{ label?: string; body?: string; meta?: string }>;
+  accent?: string;
+  className?: string;
+  numberStart?: number;
+  maxItems?: number;
+}) {
+  const ctxAccent = useSlideAccent();
+  const a = accent ?? ctxAccent ?? undefined;
+  const ink = useSlideInk(a);
+  const shown = items.slice(0, maxItems);
+  return (
+    <GlassTile radius={28} padding="px-12 py-12" accent={a} className={className}>
+      {kicker && (
+        <div
+          className="uppercase"
+          style={{
+            fontSize: 18,
+            letterSpacing: "0.28em",
+            fontWeight: 600,
+            color: ink.faint,
+          }}
+        >
+          {kicker}
+        </div>
+      )}
+      <div className={`${kicker ? "mt-10" : ""} space-y-8`}>
+        {shown.map((it, i) => (
+          <div
+            key={i}
+            className={`grid grid-cols-[72px_1fr] items-start gap-6 tp-rise tp-rise-delay-${Math.min(i + 1, 3) as 1 | 2 | 3}`}
+          >
+            <div
+              className="tabular-nums"
+              style={{
+                fontSize: 40,
+                fontWeight: 600,
+                letterSpacing: "-0.02em",
+                color: "var(--slide-accent-text)",
+                lineHeight: 1,
+              }}
+            >
+              {String(numberStart + i).padStart(2, "0")}
+            </div>
+            <div>
+              {it.label && (
+                <div style={{ fontSize: 26, lineHeight: 1.28, color: ink.strong, fontWeight: 500 }}>
+                  {it.label}
+                </div>
+              )}
+              {it.body && (
+                <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.4, color: ink.muted }}>
+                  {it.body}
+                </div>
+              )}
+              {it.meta && (
+                <div className="mt-3 uppercase" style={{ fontSize: 14, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}>
+                  {it.meta}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </GlassTile>
+  );
+}
+
 
 
 
