@@ -563,7 +563,10 @@ export function AuroraLayer({
 }
 
 function auroraOrbs(seed: string, brand: BrandMode) {
-  // Simple deterministic hash → three offset orbs in the brand palette.
+  // Deterministic hash → three offset orbs painted purely from the brand's
+  // own tokens. No fixed magenta/cyan fallback — corporate stays blue, Life
+  // Sciences stays teal, Legal stays gold, etc. The third orb is a shifted
+  // sibling of the accent so each division reads distinctly.
   let h = 2166136261;
   for (let i = 0; i < seed.length; i++) {
     h ^= seed.charCodeAt(i);
@@ -573,20 +576,55 @@ function auroraOrbs(seed: string, brand: BrandMode) {
     h ^= h << 13; h ^= h >>> 17; h ^= h << 5;
     return ((h >>> 0) % 10000) / 10000;
   };
-  // Aurora palette: brand accent + brand primary + a shifted purple/cyan.
-  const palette = [brand.tokens.accent, brand.tokens.primary, "#B48CFF", "#5CE1E6", "#FF6EA8"];
-  return Array.from({ length: 3 }).map((_, i) => {
-    const color = palette[Math.floor(rand() * palette.length)] ?? brand.tokens.accent;
-    return {
-      color,
-      x: 200 + rand() * 880,
-      y: 100 + rand() * 520,
-      rx: 380 + rand() * 260,
-      ry: 320 + rand() * 220,
-      alpha: 0.55 + rand() * 0.35,
-    };
-  });
+  const sibling = shiftHue(brand.tokens.accent, 28, 0.06);
+  const palette = [brand.tokens.primary, brand.tokens.accent, sibling];
+  return Array.from({ length: 3 }).map((_, i) => ({
+    color: palette[i] ?? brand.tokens.accent,
+    x: 180 + rand() * 900,
+    y: 90 + rand() * 540,
+    rx: 380 + rand() * 260,
+    ry: 320 + rand() * 220,
+    alpha: 0.55 + rand() * 0.35,
+  }));
 }
+
+// Rotate a hex color's hue by `deg` degrees and nudge lightness by `dl`.
+// Used to derive the sibling aurora orb from the brand accent so we don't
+// have to hand-pick a third color per division.
+function shiftHue(hex: string, deg: number, dl = 0): string {
+  const m = /^#?([a-f\d]{6})$/i.exec(hex);
+  if (!m) return hex;
+  const int = parseInt(m[1], 16);
+  let r = ((int >> 16) & 255) / 255;
+  let g = ((int >> 8) & 255) / 255;
+  let b = (int & 255) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let hh = 0; const l = (max + min) / 2;
+  const d = max - min;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  if (d !== 0) {
+    if (max === r) hh = ((g - b) / d) % 6;
+    else if (max === g) hh = (b - r) / d + 2;
+    else hh = (r - g) / d + 4;
+    hh *= 60;
+    if (hh < 0) hh += 360;
+  }
+  hh = (hh + deg + 360) % 360;
+  const l2 = Math.max(0, Math.min(1, l + dl));
+  const c = (1 - Math.abs(2 * l2 - 1)) * s;
+  const x = c * (1 - Math.abs(((hh / 60) % 2) - 1));
+  const mm = l2 - c / 2;
+  let rr = 0, gg = 0, bb = 0;
+  if (hh < 60) { rr = c; gg = x; }
+  else if (hh < 120) { rr = x; gg = c; }
+  else if (hh < 180) { gg = c; bb = x; }
+  else if (hh < 240) { gg = x; bb = c; }
+  else if (hh < 300) { rr = x; bb = c; }
+  else { rr = c; bb = x; }
+  const to = (v: number) => Math.round((v + mm) * 255).toString(16).padStart(2, "0");
+  return `#${to(rr)}${to(gg)}${to(bb)}`;
+}
+
 
 // ── GlassTile ─────────────────────────────────────────────────────────────
 // Frosted-navy translucent card with hairline border. The Canva "Aesop"
