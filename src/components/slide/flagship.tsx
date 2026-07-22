@@ -29,7 +29,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
-import { useSlideMode, useSlideAccent } from "./SlideChrome";
+import { useSlideMode, useSlideAccent, useSlideInk } from "./SlideChrome";
 
 export type SlideRegister = "corporate" | "product" | "editorial";
 
@@ -408,10 +408,11 @@ export function ChartAnnotation({
   width?: number;
 }) {
   const mode = useSlideMode();
+  const semanticInk = useSlideInk(brand.tokens.accent);
   const cardBg = mode === "dark" ? "rgba(10,10,40,0.82)" : "rgba(255,255,255,0.96)";
   const ring = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(10,15,28,0.08)";
-  const ink = mode === "dark" ? "#ffffff" : brand.tokens.primary;
-  const detailInk = mode === "dark" ? "rgba(255,255,255,0.72)" : "rgba(10,15,28,0.62)";
+  const ink = semanticInk.text;
+  const detailInk = semanticInk.muted;
   const dotSize = 26;
   const offset = 40;
   const cardStyle: CSSProperties = { width };
@@ -431,7 +432,7 @@ export function ChartAnnotation({
           width: dotSize,
           height: dotSize,
           background: brand.tokens.accent,
-          color: mode === "dark" ? brand.tokens.primary : "#ffffff",
+          color: semanticInk.onSurface(mode === "dark" ? brand.tokens.primary : "#ffffff"),
           fontSize: 14,
           boxShadow: `0 0 0 6px ${brand.tokens.accent}22, 0 0 24px ${brand.tokens.accent}55`,
         }}
@@ -451,7 +452,7 @@ export function ChartAnnotation({
       >
         <div
           className="uppercase font-semibold"
-          style={{ color: brand.tokens.accent, fontSize: 11, letterSpacing: "0.24em" }}
+          style={{ color: semanticInk.muted, fontSize: 11, letterSpacing: "0.24em" }}
         >
           Callout {String(index).padStart(2, "0")}
         </div>
@@ -691,6 +692,7 @@ export function GlassTile({
 }) {
   const mode = useSlideMode();
   const ctxAccent = useSlideAccent();
+  const ink = useSlideInk(accent ?? ctxAccent ?? undefined);
   const a = accent ?? ctxAccent ?? undefined;
   // Clearer glass: lower fill alpha, thinner hairline ring, plus an inner
   // top highlight and a soft accent-tinted underglow so the division colour
@@ -761,7 +763,7 @@ export function IconWell({
         borderRadius: radius,
         background: bg,
         border: `1px solid ${ring}`,
-        color: a,
+        color: ink.text,
         backdropFilter: "blur(12px) saturate(140%)",
         boxShadow: a ? `inset 0 0 0 1px ${hexA(a, 0.10)}` : undefined,
       }}
