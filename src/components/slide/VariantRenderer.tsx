@@ -1056,12 +1056,14 @@ function renderVariantBody({
     // ── Proof & Data ──────────────────────────────────────────────────
     case "MV-PROOF-LOGOS":
     case "MV-CASE-LOGO-GRID": {
-      const tileText = mode === "dark" ? "#ffffff" : brand.tokens.primary;
+      const tileText = isDark ? "#ffffff" : brand.tokens.primary;
       const accent = brand.tokens.accent;
+      const tileBg = isDark ? "rgba(255,255,255,0.04)" : "rgba(10,15,28,0.02)";
+      const tileRing = isDark ? "rgba(255,255,255,0.08)" : "rgba(10,15,28,0.06)";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-14 grid grid-cols-4 gap-10">
+          <div className="mt-14 grid grid-cols-4 gap-6">
             {arr(c.items).map((it, i) => {
               const name = s(it.name ?? it.client);
               const logoUrl = pickLogoForMode(it, mode);
@@ -1070,34 +1072,48 @@ function renderVariantBody({
               return (
                 <div
                   key={i}
-                  className="flex aspect-[3/2] flex-col items-center justify-center gap-4 p-4 text-center"
-                  style={{ color: tileText }}
+                  className="relative flex aspect-[3/2] flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl px-6 py-8 text-center"
+                  style={{
+                    color: tileText,
+                    background: tileBg,
+                    border: `1px solid ${tileRing}`,
+                    backgroundImage: `radial-gradient(120% 80% at 50% 0%, ${accent}${isDark ? "18" : "0C"} 0%, transparent 65%)`,
+                  }}
                 >
-                  {logoUrl || logoPath ? (
-                    <ClientLogoImg
-                      path={logoPath}
-                      url={logoUrl}
-                      alt={name ? `${name} logo` : "Client logo"}
-                      className="max-h-[62%] max-w-[86%] object-contain"
-                    />
-                  ) : (
-                    <div className="text-2xl font-semibold">{name}</div>
-                  )}
+                  <div
+                    aria-hidden
+                    className="absolute inset-x-0 top-0 h-[2px]"
+                    style={{ background: `linear-gradient(90deg, ${accent}00, ${accent}, ${accent}00)` }}
+                  />
+                  <div className="flex flex-1 items-center justify-center">
+                    {logoUrl || logoPath ? (
+                      <ClientLogoImg
+                        path={logoPath}
+                        url={logoUrl}
+                        alt={name ? `${name} logo` : "Client logo"}
+                        className="max-h-[110px] max-w-[80%] object-contain"
+                        style={{ filter: isDark ? "brightness(1.05)" : undefined }}
+                      />
+                    ) : (
+                      <div style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.01em" }}>{name}</div>
+                    )}
+                  </div>
                   {result && (
-                    <div className="flex flex-col items-center gap-2">
-                      <div style={{ width: 32, height: 2, background: accent, opacity: 0.9 }} />
-                      <div
-                        className="tabular-nums"
-                        style={{
-                          color: accent,
-                          fontSize: 22,
-                          fontWeight: 600,
-                          letterSpacing: "-0.01em",
-                          lineHeight: 1.15,
-                        }}
-                      >
-                        {result}
-                      </div>
+                    <div
+                      className="tabular-nums"
+                      style={{
+                        color: accent,
+                        fontSize: 22,
+                        fontWeight: 700,
+                        letterSpacing: "-0.01em",
+                        lineHeight: 1.15,
+                        padding: "6px 14px",
+                        borderRadius: 999,
+                        background: `${accent}${isDark ? "1F" : "14"}`,
+                        border: `1px solid ${accent}44`,
+                      }}
+                    >
+                      {result}
                     </div>
                   )}
                 </div>
