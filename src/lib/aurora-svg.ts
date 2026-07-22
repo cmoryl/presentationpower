@@ -16,19 +16,18 @@ export function auroraSvgDataUrl(
   const orbs = auroraOrbs(seed, brand, mode);
   // Mirror AuroraLayer's on-screen opacities so every division's exported
   // slide reads at the same intensity as the live editor preview.
-  const layerOpacity = mode === "dark" ? 0.7 : 0.85;
-  const vignetteAlpha = mode === "dark" ? 0.6 : 0.5;
-  const orbR = mode === "dark" ? "75%" : "85%";
-  const midStop = mode === "dark" ? "35%" : "30%";
-  const outerStop = mode === "dark" ? "65%" : "60%";
-  const blurStd = mode === "dark" ? 55 : 65;
-  // Frosted-glass wash: a subtle full-bleed film that mirrors the
-  // backdrop-blur + translucent surface the on-screen GlassTile system
-  // paints on top of AuroraLayer. Bakes the "glass overlay" into the
-  // exported PNG so PPTX/PDF match the editor's soft-focus feel instead
-  // of showing raw high-contrast orbs.
+  const layerOpacity = mode === "dark" ? 0.72 : 0.85;
+  const vignetteAlpha = mode === "dark" ? 0.55 : 0.5;
+  const orbR = mode === "dark" ? "55%" : "85%";
+  const midStop = mode === "dark" ? "22%" : "30%";
+  const outerStop = mode === "dark" ? "50%" : "60%";
+  const blurStd = mode === "dark" ? 38 : 65;
+  // Frosted-glass wash: kept extremely light in dark mode so orbs stay
+  // defined and visibly peek through instead of washing into a single
+  // color field across the slide. Light mode retains a softer wash for
+  // legibility of dark ink over per-division accent colours.
   const glassColor = mode === "dark" ? "#0B1330" : "#FFFFFF";
-  const glassAlpha = mode === "dark" ? 0.18 : 0.22;
+  const glassAlpha = mode === "dark" ? 0.08 : 0.22;
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
   <defs>
@@ -106,14 +105,14 @@ export function auroraOrbs(
     mode === "dark"
       ? [darkFirst, brand.tokens.accent, sibling]
       : [lightPrimary, brand.tokens.accent, sibling];
-  const alphaBase = 0.75;
-  const alphaRange = mode === "dark" ? 0.22 : 0.18;
+  const alphaBase = mode === "dark" ? 0.62 : 0.75;
+  const alphaRange = mode === "dark" ? 0.18 : 0.18;
   return Array.from({ length: 3 }).map((_, i) => ({
     color: palette[i] ?? brand.tokens.accent,
     x: 120 + rand() * 1040,
     y: 60 + rand() * 600,
-    rx: (mode === "dark" ? 520 : 620) + rand() * (mode === "dark" ? 340 : 420),
-    ry: (mode === "dark" ? 440 : 540) + rand() * (mode === "dark" ? 280 : 360),
+    rx: (mode === "dark" ? 380 : 620) + rand() * (mode === "dark" ? 240 : 420),
+    ry: (mode === "dark" ? 320 : 540) + rand() * (mode === "dark" ? 200 : 360),
     alpha: alphaBase + rand() * alphaRange,
   }));
 }
