@@ -693,6 +693,20 @@ function extractEmbedIds(doc: unknown): string[] {
   return ids;
 }
 
+function extractEmbedIdsFromOrderedNode(node: PNode | undefined): string[] {
+  const ids: string[] = [];
+  const visit = (n: PNode | undefined) => {
+    if (!n) return;
+    if (pTag(n) === "a:blip") {
+      const id = pAttrs(n)["@_r:embed"] ?? pAttrs(n)["@_embed"];
+      if (id) ids.push(id);
+    }
+    for (const child of pChildren(n)) visit(child);
+  };
+  visit(node);
+  return ids;
+}
+
 function resolveRelPath(slidePath: string, target: string): string {
   const dir = slidePath.split("/").slice(0, -1).join("/");
   const segments = [...dir.split("/"), ...target.split("/")];
@@ -2313,7 +2327,7 @@ async function loadParent(
       const relXml = await zip.files[relsPath].async("string");
       const relDoc = _parser.parse(relXml);
       const relBuckets = extractRelTargetsByType(relDoc);
-      parentImageEmbedIds = extractEmbedIds(rootNode);
+      parentImageEmbedIds = extractEmbedIdsFromOrderedNode(rootNode);
       for (const id of parentImageEmbedIds) {
         const target = relBuckets.image[id];
         if (!target) continue;
@@ -2402,10 +2416,9 @@ async function loadParent(
   }
 
   // Decorative (non-placeholder) shapes from the layout/master. These carry
-  // brand furniture like logos, footer bars, page numbers and colored panels
-  // that inherit onto every slide. Walk the full spTree, then filter out ph
-  // shapes (handled via PhProto) and image shapes (embed rIds are parent-scoped
-  // and won't match the slide's imageEmbedIds map).
+  // brand furniture like logos, footer bars, page numbers, colored panels and
+  // master/layout image art. Parent rIds are mapped to synthetic slide-level
+  // embedIds above so image shapes and image fills can be stored/rendered.
   const decor: LayoutShape[] = [];
   if (spTree) {
     const zRef = { z: 0 };
@@ -2413,7 +2426,7 @@ async function loadParent(
     walkSpTree(pChildren(spTree), zRef, undefined, collected, parentImageEmbedIds, undefined, parentEmbedIdMap);
     // Re-walk raw nodes to know which are placeholders — walkSpTree doesn't
     // expose that. Cheaper: build a set of ph frames from `placeholders` and
-    // drop shapes whose frame matches, plus any image shapes.
+    // drop shapes whose frame matches.
     const phFrames = new Set(placeholders
       .filter((p) => p.frame)
       .map((p) => `${p.frame!.x},${p.frame!.y},${p.frame!.w},${p.frame!.h}`));
