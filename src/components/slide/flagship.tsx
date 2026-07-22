@@ -606,14 +606,14 @@ function auroraOrbs(seed: string, brand: BrandMode, mode: "dark" | "light" = "da
     : [lightPrimary, brand.tokens.accent, sibling];
   // Light mode alphas are gentler so the pastel wash never overpowers charts,
   // glass tiles or body copy — dark mode keeps the full-strength orbs.
-  const alphaBase = mode === "dark" ? 0.55 : 0.55;
-  const alphaRange = mode === "dark" ? 0.35 : 0.28;
+  const alphaBase = 0.75;
+  const alphaRange = mode === "dark" ? 0.22 : 0.18;
   return Array.from({ length: 3 }).map((_, i) => ({
     color: palette[i] ?? brand.tokens.accent,
-    x: 180 + rand() * 900,
-    y: 90 + rand() * 540,
-    rx: (mode === "dark" ? 380 : 460) + rand() * (mode === "dark" ? 260 : 320),
-    ry: (mode === "dark" ? 320 : 400) + rand() * (mode === "dark" ? 220 : 280),
+    x: 120 + rand() * 1040,
+    y: 60 + rand() * 600,
+    rx: (mode === "dark" ? 520 : 620) + rand() * (mode === "dark" ? 340 : 420),
+    ry: (mode === "dark" ? 440 : 540) + rand() * (mode === "dark" ? 280 : 360),
     alpha: alphaBase + rand() * alphaRange,
   }));
 }
