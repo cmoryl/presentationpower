@@ -1704,6 +1704,9 @@ function renderVariantBody({
           <Kicker brand={brand}>Case study</Kicker>
           <Hairline color={"var(--slide-accent-text)"} widthPx={88} thicknessPx={2} className="mt-6 mb-8" />
           <DisplayTitle size="section" color={ink.strong}>{s(c.client)}</DisplayTitle>
+          <div className="mt-6">
+            <ClientLogoChip mode={mode} clientName={clientName ?? s(c.client)} clientLogoUrl={clientLogoUrl} accent="var(--slide-accent-text)" faint={ink.faint} size={36} />
+          </div>
           <SupportingText size="lg" opacity={0.72} className="mt-8" maxWidthPx={1180}>{s(c.summary)}</SupportingText>
           <div className="mt-14 grid grid-cols-3 gap-14">
             {arr(c.items).map((it, i) => (
