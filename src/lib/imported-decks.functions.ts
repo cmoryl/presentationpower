@@ -489,6 +489,7 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
       theme: {
         accent1?: string; accent2?: string; accent3?: string; accent4?: string; accent5?: string; accent6?: string;
         dark1?: string; dark2?: string; light1?: string; light2?: string;
+        hlink?: string; folHlink?: string;
         headingFont?: string; bodyFont?: string;
       } | null;
       slides: Array<{
