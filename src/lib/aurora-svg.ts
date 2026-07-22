@@ -22,12 +22,16 @@ export function auroraSvgDataUrl(
   const midStop = mode === "dark" ? "22%" : "30%";
   const outerStop = mode === "dark" ? "50%" : "60%";
   const blurStd = mode === "dark" ? 38 : 65;
-  // Frosted-glass wash: kept extremely light in dark mode so orbs stay
-  // defined and visibly peek through instead of washing into a single
-  // color field across the slide. Light mode retains a softer wash for
-  // legibility of dark ink over per-division accent colours.
-  const glassColor = mode === "dark" ? "#0B1330" : "#FFFFFF";
-  const glassAlpha = mode === "dark" ? 0.08 : 0.22;
+  // Frosted-glass wash: per-brand tuned in dark mode so each division keeps
+  // the "orbs peek through glass" look without flattening into a single
+  // colour field. Darker/heavier accents get a lower alpha (they already
+  // read strongly through the wash); lighter/pastel accents get a slightly
+  // higher alpha to tame brightness. The wash colour itself is a mix of a
+  // neutral navy and the brand's own surface so the film subtly carries
+  // the brand tint instead of washing everything to a single grey.
+  const wash = darkGlassWash(brand);
+  const glassColor = mode === "dark" ? wash.color : "#FFFFFF";
+  const glassAlpha = mode === "dark" ? wash.alpha : 0.22;
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
   <defs>
@@ -125,6 +129,35 @@ export function auroraBaseTint(brand: BrandMode, mode: "dark" | "light"): string
 /** Layer opacity applied to the orb <g> in both renderer and exporter. */
 export function auroraLayerOpacity(mode: "dark" | "light", intensity = 1): number {
   return intensity * (mode === "dark" ? 0.7 : 0.85);
+}
+
+/**
+ * Per-brand dark-mode frosted-glass wash. Tuned so every division keeps the
+ * "orbs peek through glass" character instead of collapsing into a single
+ * color field. Alpha is derived from the brand accent's luminance (brighter
+ * accents get a hair more wash to tame them; deep/saturated accents get
+ * less so they still glow through). Wash colour mixes a neutral navy with
+ * the brand surface to carry a subtle brand tint into the film.
+ */
+export function darkGlassWash(brand: BrandMode): { color: string; alpha: number } {
+  const NEUTRAL = "#0B1330";
+  const surface = brand.tokens.surface ?? NEUTRAL;
+  const color = mixHex(NEUTRAL, surface, 0.35);
+  const lum = relLuminance(brand.tokens.accent);
+  // lum ~0 (deep) → 0.06 alpha; lum ~1 (bright/pastel) → 0.14 alpha.
+  const alpha = Math.max(0.05, Math.min(0.15, 0.06 + lum * 0.09));
+  return { color, alpha };
+}
+
+function relLuminance(hex: string): number {
+  const m = /^#?([a-f\d]{6})$/i.exec(hex);
+  if (!m) return 0.5;
+  const int = parseInt(m[1], 16);
+  const rgb = [(int >> 16) & 255, (int >> 8) & 255, int & 255].map((c) => {
+    const v = c / 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
 }
 
 

@@ -30,7 +30,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import { useSlideMode, useSlideAccent, useSlideInk } from "./SlideChrome";
-import { auroraOrbs } from "@/lib/aurora-svg";
+import { auroraOrbs, darkGlassWash } from "@/lib/aurora-svg";
 
 export type SlideRegister = "corporate" | "product" | "editorial";
 
@@ -559,6 +559,19 @@ export function AuroraLayer({
           ))}
         </g>
       </svg>
+      {/* Per-brand frosted-glass wash — mirrors darkGlassWash() used by the
+          PPTX exporter so each division's orbs peek through with the same
+          tuned tint/alpha in both preview and export. Light mode keeps its
+          neutral wash. */}
+      {mode === "dark" && (() => {
+        const w = darkGlassWash(brand);
+        return (
+          <div
+            className="absolute inset-0"
+            style={{ background: w.color, opacity: w.alpha }}
+          />
+        );
+      })()}
       {/* Vignette to keep glass cards readable. Light mode uses a stronger
           center-clear wash so per-division accent colour stays visible at the
           edges without washing out headings, chips or charts in the middle. */}
@@ -569,7 +582,7 @@ export function AuroraLayer({
             mode === "dark"
               ? `radial-gradient(80% 60% at 50% 60%, transparent 30%, ${base} 130%)`
               : `radial-gradient(85% 68% at 50% 55%, transparent 0%, transparent 55%, ${base} 125%)`,
-          opacity: mode === "dark" ? 0.6 : 0.5,
+          opacity: mode === "dark" ? 0.55 : 0.5,
         }}
       />
     </div>
