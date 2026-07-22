@@ -451,14 +451,28 @@ function DeckEditor() {
 
           {/* Locations pin editor — only for MV-LOC-* variants */}
           {active && mv && mv.id.startsWith("MV-LOC-") && (
-            <div className="mt-6">
+            <div className="mt-6 space-y-6">
               <PinEditorPanel
                 brandId={brand.id}
                 items={(active.content as Record<string, unknown>).items}
                 onChange={(items) => updateField(deck.id, active.id, "items", items)}
               />
+              {mv.id === "MV-LOC-WORLD-STATS" && (
+                <WorldStatsMetricsPanel
+                  brandId={brand.id}
+                  items={(active.content as Record<string, unknown>).items}
+                  metrics={(active.content as Record<string, unknown>).metrics}
+                  activeMetricId={(active.content as Record<string, unknown>).activeMetricId}
+                  onChange={(patch) => {
+                    if (patch.items !== undefined) updateField(deck.id, active.id, "items", patch.items);
+                    if (patch.metrics !== undefined) updateField(deck.id, active.id, "metrics", patch.metrics);
+                    if (patch.activeMetricId !== undefined) updateField(deck.id, active.id, "activeMetricId", patch.activeMetricId);
+                  }}
+                />
+              )}
             </div>
           )}
+
 
           {/* Editable fields */}
           {active && mv && (
