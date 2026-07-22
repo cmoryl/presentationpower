@@ -1597,6 +1597,45 @@ function pText(n: PNode): string {
   return out;
 }
 
+type PptxClrMap = Record<string, string>;
+const DEFAULT_CLR_MAP: PptxClrMap = {
+  bg1: "lt1", tx1: "dk1", bg2: "lt2", tx2: "dk2",
+  accent1: "accent1", accent2: "accent2", accent3: "accent3", accent4: "accent4", accent5: "accent5", accent6: "accent6",
+  hlink: "hlink", folHlink: "folHlink",
+};
+
+function readClrMap(node: PNode | undefined, fallback?: PptxClrMap): PptxClrMap | undefined {
+  if (!node) return fallback;
+  const override = pFind(node, "p:clrMapOvr");
+  const mapNode = override ? (pFind(override, "a:overrideClrMapping") ?? pFind(override, "a:masterClrMapping")) : undefined;
+  if (!mapNode || pTag(mapNode) === "a:masterClrMapping") return fallback;
+  const attrs = pAttrs(mapNode);
+  const next: PptxClrMap = { ...(fallback ?? DEFAULT_CLR_MAP) };
+  for (const [k, v] of Object.entries(attrs)) {
+    const key = k.replace(/^@_/, "");
+    if (v) next[key] = v;
+  }
+  return next;
+}
+
+function remapSchemeColor(color: string | undefined, clrMap?: PptxClrMap): string | undefined {
+  if (!color || !clrMap) return color;
+  return color.replace(/var\(--pptx-([\w]+)\)/g, (_m, key: string) => `var(--pptx-${clrMap[key] ?? key})`);
+}
+
+function remapFillScheme(fill: LayoutFill | undefined, clrMap?: PptxClrMap): LayoutFill | undefined {
+  if (!fill || !clrMap) return fill;
+  if (fill.kind === "solid") return { ...fill, color: remapSchemeColor(fill.color, clrMap) ?? fill.color };
+  if (fill.kind === "gradient") return { ...fill, stops: fill.stops.map((s) => ({ ...s, color: remapSchemeColor(s.color, clrMap) ?? s.color })) };
+  if (fill.kind === "pattern") return { ...fill, fg: remapSchemeColor(fill.fg, clrMap), bg: remapSchemeColor(fill.bg, clrMap) };
+  return fill;
+}
+
+function remapLineScheme(line: LayoutLine | undefined, clrMap?: PptxClrMap): LayoutLine | undefined {
+  if (!line || !clrMap) return line;
+  return { ...line, color: remapSchemeColor(line.color, clrMap) };
+}
+
 function readFrame(spPr: PNode | undefined): LayoutFrame | undefined {
   if (!spPr) return undefined;
   const xfrm = pFind(spPr, "a:xfrm");
