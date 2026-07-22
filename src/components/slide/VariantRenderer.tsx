@@ -5335,7 +5335,7 @@ function Sparkline({ brand, values, w = 380, h = 100, filled = true, peakPin = f
         <g>
           <line x1={peak[0]} y1={peak[1]} x2={peak[0]} y2={Math.max(peak[1] - 22, 6)} stroke="var(--slide-accent-text)" strokeWidth={1} />
           <rect x={peak[0] - 22} y={Math.max(peak[1] - 34, 0)} width={44} height={13} fill="var(--slide-accent-text)" rx={2} />
-          <text x={peak[0]} y={Math.max(peak[1] - 24, 10)} textAnchor="middle" fontSize={8} fontWeight={700} fill="#0A0E1F" style={{ letterSpacing: "0.18em" }}>{peakLabel}</text>
+          <text x={peak[0]} y={Math.max(peak[1] - 24, 10)} textAnchor="middle" fontSize={8} fontWeight={700} fill={ink.strong} style={{ letterSpacing: "0.18em" }}>{peakLabel}</text>
         </g>
       )}
     </svg>
