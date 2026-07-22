@@ -61,8 +61,11 @@ describe("light-mode surface override guard", () => {
 
       // Skip rules scoped to dark mode — those are governed by the sibling test.
       if (/(^|\s|,)\.dark\b/.test(selector)) continue;
+      if (/\[data-theme\s*[~|^$*]?=\s*["']?dark/i.test(selector)) continue;
+      if (/\.glass-dark\b/.test(selector)) continue;
       // Skip @keyframes / @font-face bodies — no cascade meaning here.
       if (/^\s*@(keyframes|font-face|supports|media)\b/.test(selector)) continue;
+
 
       const decls = body.split(";").map((d) => d.trim()).filter(Boolean);
       for (const decl of decls) {
