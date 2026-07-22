@@ -5567,14 +5567,27 @@ function Sparkline({ brand: _brand, values, w = 380, h = 100, filled = true, pea
 function AiryDefs({ id }: { id: string }) {
   return (
     <defs>
+      {/* Highlighted / accented bars: soft accent bloom, top-heavy */}
       <linearGradient id={`${id}-airy`} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"  stopColor="var(--slide-accent-text)" stopOpacity={0.18} />
-        <stop offset="65%" stopColor="var(--slide-accent-text)" stopOpacity={0.05} />
-        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+        <stop offset="0%"  stopColor="var(--slide-accent-text)" stopOpacity={0.55} />
+        <stop offset="55%" stopColor="var(--slide-accent-text)" stopOpacity={0.22} />
+        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0.04} />
+      </linearGradient>
+      {/* Frosted glass fill for baseline/neutral bars — mode-aware via accent */}
+      <linearGradient id={`${id}-glass`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"  stopColor="var(--slide-accent-text)" stopOpacity={0.16} />
+        <stop offset="60%" stopColor="var(--slide-accent-text)" stopOpacity={0.08} />
+        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0.02} />
+      </linearGradient>
+      {/* Muted glass for tertiary segments */}
+      <linearGradient id={`${id}-glass-mute`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"  stopColor="var(--slide-accent-text)" stopOpacity={0.08} />
+        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0.02} />
       </linearGradient>
     </defs>
   );
 }
+
 
 
 // ── Editorial data primitives ─────────────────────────────────────────
