@@ -2481,7 +2481,13 @@ function walkSpTree(
   for (const node of nodes) {
     const t = pTag(node);
     if (!t) continue;
-    if (t === "p:sp") {
+    if (/(:|^)AlternateContent$/i.test(t) || /(:|^)Choice$/i.test(t) || /(:|^)Fallback$/i.test(t)) {
+      // Office often wraps SVGs, imported PDFs, and compatibility artwork in
+      // mc:AlternateContent. Walk into both Choice and Fallback branches so we
+      // preserve the best available vector art plus its raster fallback rather
+      // than dropping the whole layer.
+      walkSpTree(pChildren(node), zRef, group, out, imageEmbedIds, parents, embedIdMap, theme, clrMap);
+    } else if (t === "p:sp") {
       const spPr = pFind(node, "p:spPr");
       const nvSpPr = pFind(node, "p:nvSpPr");
       const nvPr = nvSpPr ? pFind(nvSpPr, "p:nvPr") : undefined;
