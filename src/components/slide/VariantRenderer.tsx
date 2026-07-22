@@ -3428,7 +3428,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           {s(c.subtitle) && (
-            <div className="mt-4 max-w-[1080px]" style={{ fontSize: 22, lineHeight: 1.4, color: ink.muted }}>
+            <div className="mt-10 max-w-[1080px]" style={{ fontSize: 22, lineHeight: 1.4, color: ink.muted }}>
               {s(c.subtitle)}
             </div>
           )}
