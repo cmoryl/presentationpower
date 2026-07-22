@@ -6319,7 +6319,7 @@ function ComboChart({ brand, points, barLabel, barUnit, lineLabel, lineUnit, hei
           const y = h - padB - bh;
           return (
             <g key={i}>
-              <rect x={x} y={y} width={barW} height={bh} fill={ink.strong} opacity={0.85} />
+              <rect x={x} y={y} width={barW} height={bh} rx={3} fill="var(--slide-accent-text)" fillOpacity={0.18} stroke="var(--slide-accent-text)" strokeOpacity={0.45} strokeWidth={1} />
               <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
             </g>
           );
