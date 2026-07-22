@@ -2832,6 +2832,7 @@ async function loadParent(
     txStyles,
     images: parentImages,
     embedIdMap: parentEmbedIdMap,
+    clrMap,
   };
   cache.set(path, data);
   return data;
