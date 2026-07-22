@@ -472,18 +472,22 @@ function SlidePreview({
   slide,
   deckName,
   deckTheme,
+  deckExtras,
   onClose,
 }: {
   slide: ImportedSlide;
   deckName: string;
   deckTheme?: Record<string, string>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  deckExtras?: any;
   onClose: () => void;
 }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-6 backdrop-blur-sm"
       onClick={onClose}
     >
+
       <div
         className="relative w-full max-w-6xl overflow-hidden rounded-2xl bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
