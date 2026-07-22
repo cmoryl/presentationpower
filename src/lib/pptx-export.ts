@@ -492,27 +492,27 @@ export async function exportDeckToPptx(
             renderStats(s, slide, slidePalette);
             break;
           case "quote":
-            renderQuote(s, slide, palette);
+            renderQuote(s, slide, slidePalette);
             break;
           case "callout":
-            renderCallout(s, slide, palette);
+            renderCallout(s, slide, slidePalette);
             break;
           case "cards":
-            renderCards(s, slide, palette);
+            renderCards(s, slide, slidePalette);
             break;
           case "timeline":
-            renderTimeline(s, slide, palette);
+            renderTimeline(s, slide, slidePalette);
             break;
           case "compare":
-            renderCompare(s, slide, palette);
+            renderCompare(s, slide, slidePalette);
             break;
           default:
-            renderContent(s, slide, palette);
+            renderContent(s, slide, slidePalette);
         }
       }
     } catch {
       // Any per-slide renderer bug falls back to the generic mapping.
-      renderContent(s, slide, palette);
+      renderContent(s, slide, slidePalette);
     }
 
     // Per-slide logo placement — mirrors SlideChrome's contract:
