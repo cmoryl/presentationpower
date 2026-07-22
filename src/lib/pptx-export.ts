@@ -173,8 +173,9 @@ export type PptxExportResult = { blob?: Blob; failedSlides: string[] };
 export async function exportDeckToPptx(
   deck: Deck,
   brand: BrandMode,
-  opts?: { strategy?: DeckStrategySnapshot | null; output?: "download" | "blob" },
+  opts?: { strategy?: DeckStrategySnapshot | null; output?: "download" | "blob"; forceMode?: "light" | "dark" },
 ): Promise<PptxExportResult> {
+  const forceMode = opts?.forceMode;
   const pptx = new PptxGenJS();
   pptx.layout = "LAYOUT_WIDE";
   pptx.title = deck.title;
@@ -247,7 +248,7 @@ export async function exportDeckToPptx(
       const slide = deck.slides[i];
       const variant = byId(MODULE_VARIANTS, slide.variantId);
       if (!variant) return;
-      const backdrop = backdropForVariant(variant, deck.brandModeId, "dark");
+      const backdrop = backdropForVariant(variant, deck.brandModeId, forceMode ?? "dark");
       if (!backdrop) return;
 
       // Aurora backdrops have no url — render the AuroraLayer SVG for this
@@ -390,7 +391,7 @@ export async function exportDeckToPptx(
     const bgIsImage = plan.kind === "image";
     // Slide chrome dark/light selection: honor an explicit background choice
     // (color solid, image tint) so text/logos flip to legible palettes.
-    const isDark = advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
+    const isDark = forceMode ? forceMode === "dark" : (advancedDark || kind === "cover" || kind === "divider" || bgIsImage);
     const useWhiteLogo = isDark || slide.variantId === "MV-SPLIT-MANIFESTO";
     const hideFooter = useWhiteLogo;
 
