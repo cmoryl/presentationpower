@@ -5322,16 +5322,24 @@ function SummaryStatCard({ brand, label, value, unit, series }: { brand: BrandMo
 
 
 function Donut({ brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
+  const ink = useSlideInk();
   const p = Math.max(0, Math.min(100, percent));
   const stroke = 14;
   const r = (size - stroke) / 2;
   const circ = 2 * Math.PI * r;
   const dash = (p / 100) * circ;
+  const gradId = `donut-grad-${brand.id}-${size}-${Math.round(p)}`;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={brand.tokens.primary} strokeOpacity={0.1} strokeWidth={stroke} />
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={brand.tokens.accent} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
-      <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central" fontSize={size * 0.24} fontWeight={600} fill={brand.tokens.primary} style={{ letterSpacing: "-0.02em" }}>
+      <defs>
+        <linearGradient id={gradId} x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stopColor={brand.tokens.accent} />
+          <stop offset="100%" stopColor={brand.tokens.primary} />
+        </linearGradient>
+      </defs>
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={ink.trackFill} strokeWidth={stroke} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={`url(#${gradId})`} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+      <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central" fontSize={size * 0.24} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.02em" }}>
         {Math.round(p)}%
       </text>
     </svg>
@@ -5339,6 +5347,7 @@ function Donut({ brand, percent, size = 260 }: { brand: BrandMode; percent: numb
 }
 
 function SemiGauge({ brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
+  const ink = useSlideInk();
   const p = Math.max(0, Math.min(100, percent));
   const stroke = 14;
   const r = (size - stroke) / 2;
@@ -5347,16 +5356,24 @@ function SemiGauge({ brand, percent, size = 260 }: { brand: BrandMode; percent: 
   const dash = (p / 100) * arcC;
   const h = size / 2 + stroke;
   const arc = `M ${stroke / 2} ${cy} A ${r} ${r} 0 0 1 ${size - stroke / 2} ${cy}`;
+  const gradId = `gauge-grad-${brand.id}-${size}-${Math.round(p)}`;
   return (
     <svg width={size} height={h} viewBox={`0 0 ${size} ${h}`} aria-hidden>
-      <path d={arc} fill="none" stroke={brand.tokens.primary} strokeOpacity={0.1} strokeWidth={stroke} strokeLinecap="round" />
-      <path d={arc} fill="none" stroke={brand.tokens.accent} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${arcC}`} />
-      <text x={size / 2} y={cy - 20} textAnchor="middle" fontSize={size * 0.22} fontWeight={600} fill={brand.tokens.primary} style={{ letterSpacing: "-0.02em" }}>
+      <defs>
+        <linearGradient id={gradId} x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0%" stopColor={brand.tokens.primary} />
+          <stop offset="100%" stopColor={brand.tokens.accent} />
+        </linearGradient>
+      </defs>
+      <path d={arc} fill="none" stroke={ink.trackFill} strokeWidth={stroke} strokeLinecap="round" />
+      <path d={arc} fill="none" stroke={`url(#${gradId})`} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${arcC}`} />
+      <text x={size / 2} y={cy - 20} textAnchor="middle" fontSize={size * 0.22} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.02em" }}>
         {Math.round(p)}%
       </text>
     </svg>
   );
 }
+
 
 function AreaChart({ brand, series, height = 480 }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number }) {
   const w = 1000;
