@@ -524,7 +524,7 @@ export function AuroraLayer({
         viewBox="0 0 1280 720"
         preserveAspectRatio="xMidYMid slice"
         className="absolute inset-0 h-full w-full"
-        style={{ opacity: mode === "dark" ? intensity : intensity * 0.72 }}
+        style={{ opacity: intensity * 0.75 }}
       >
         <defs>
           {orbs.map((o, i) => (
@@ -533,15 +533,15 @@ export function AuroraLayer({
               id={`tp-aurora-${seed}-${i}`}
               cx="50%"
               cy="50%"
-              r={mode === "dark" ? "50%" : "75%"}
+              r={mode === "dark" ? "95%" : "110%"}
             >
               <stop offset="0%" stopColor={o.color} stopOpacity={o.alpha} />
-              <stop offset={mode === "dark" ? "55%" : "42%"} stopColor={o.color} stopOpacity={mode === "dark" ? o.alpha * 0.45 : o.alpha * 0.32} />
+              <stop offset={mode === "dark" ? "62%" : "52%"} stopColor={o.color} stopOpacity={mode === "dark" ? o.alpha * 0.45 : o.alpha * 0.32} />
               <stop offset="100%" stopColor={o.color} stopOpacity="0" />
             </radialGradient>
           ))}
-          <filter id={`tp-aurora-${seed}-blur`} x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation={mode === "dark" ? 60 : 85} />
+          <filter id={`tp-aurora-${seed}-blur`} x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation={mode === "dark" ? 90 : 110} />
           </filter>
         </defs>
         <g filter={`url(#tp-aurora-${seed}-blur)`}>
