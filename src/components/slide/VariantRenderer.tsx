@@ -5406,6 +5406,13 @@ function MediaTile({
           />
         )
       )}
+      {hasVideo && shouldPlay && (
+        <VideoHoverControls
+          videoRef={videoRef}
+          initialMuted={wantMuted}
+          onUserPause={() => setUserStarted(false)}
+        />
+      )}
       {/* Brand accent duotone — tints imagery with the active division's
            accent/primary so a brand switch visibly re-tones tiles. */}
       <div
