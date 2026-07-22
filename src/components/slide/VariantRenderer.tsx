@@ -5280,7 +5280,8 @@ function toNums(v: unknown): number[] {
   return v.map((x) => (typeof x === "number" ? x : Number(x))).filter((n) => Number.isFinite(n));
 }
 
-function Sparkline({ brand, values, w = 380, h = 100, filled = true }: { brand: BrandMode; values: number[]; w?: number; h?: number; filled?: boolean }) {
+function Sparkline({ brand, values, w = 380, h = 100, filled = true, peakPin = false, peakLabel = "PEAK" }: { brand: BrandMode; values: number[]; w?: number; h?: number; filled?: boolean; peakPin?: boolean; peakLabel?: string }) {
+  const ink = useSlideInk();
   const vals = values.length ? values : [1, 1];
   const min = Math.min(...vals);
   const max = Math.max(...vals);
@@ -5291,6 +5292,8 @@ function Sparkline({ brand, values, w = 380, h = 100, filled = true }: { brand: 
   const linePath = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
   const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - pad} L${pts[0][0].toFixed(1)},${h - pad} Z` : "";
   const id = `spark-${brand.id}-${vals.length}-${Math.round(min * 10)}-${Math.round(max * 10)}`;
+  const peakIdx = vals.indexOf(max);
+  const peak = pts[peakIdx];
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <defs>
@@ -5300,9 +5303,105 @@ function Sparkline({ brand, values, w = 380, h = 100, filled = true }: { brand: 
         </linearGradient>
       </defs>
       {filled && <path d={areaPath} fill={`url(#${id})`} />}
+      <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke={ink.hairline} strokeWidth={1} />
       <path d={linePath} fill="none" stroke={brand.tokens.accent} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
       {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={5} fill={brand.tokens.accent} />}
+      {peakPin && peak && (
+        <g>
+          <line x1={peak[0]} y1={peak[1]} x2={peak[0]} y2={Math.max(peak[1] - 22, 6)} stroke={brand.tokens.accent} strokeWidth={1} />
+          <rect x={peak[0] - 22} y={Math.max(peak[1] - 34, 0)} width={44} height={13} fill={brand.tokens.accent} rx={2} />
+          <text x={peak[0]} y={Math.max(peak[1] - 24, 10)} textAnchor="middle" fontSize={8} fontWeight={700} fill="#0A0E1F" style={{ letterSpacing: "0.18em" }}>{peakLabel}</text>
+        </g>
+      )}
     </svg>
+  );
+}
+
+// ── Editorial data primitives ─────────────────────────────────────────
+function DotGridBackdrop({ opacity = 0.08 }: { opacity?: number }) {
+  const ink = useSlideInk();
+  return (
+    <div
+      aria-hidden
+      style={{
+        position: "absolute",
+        inset: 0,
+        opacity,
+        pointerEvents: "none",
+        backgroundImage: `radial-gradient(${ink.text} 1px, transparent 1px)`,
+        backgroundSize: "48px 48px",
+        maskImage: "radial-gradient(ellipse at center, black 40%, transparent 90%)",
+        WebkitMaskImage: "radial-gradient(ellipse at center, black 40%, transparent 90%)",
+      }}
+    />
+  );
+}
+
+function LiveMetaFooter({ brand, source, refCode, live = true }: { brand: BrandMode; source?: string; refCode?: string; live?: boolean }) {
+  const ink = useSlideInk();
+  return (
+    <div className="flex items-center justify-between" style={{ borderTop: `1px solid ${ink.hairline}`, paddingTop: 20, fontSize: 12, letterSpacing: "0.22em", color: ink.faint, fontWeight: 500, textTransform: "uppercase" }}>
+      <div className="flex gap-10">
+        {source && <span>Source · {source}</span>}
+        {refCode && <span>Ref · {refCode}</span>}
+      </div>
+      {live && (
+        <div className="flex items-center gap-2">
+          <span style={{ width: 8, height: 8, borderRadius: 99, background: brand.tokens.accent, boxShadow: `0 0 12px ${brand.tokens.accent}` }} />
+          <span>Live signal</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+type SegBar = { label: string; value: number; note?: string };
+function SegmentedBar({ brand, segments, height = 68 }: { brand: BrandMode; segments: SegBar[]; height?: number }) {
+  const ink = useSlideInk();
+  const total = segments.reduce((s, x) => s + x.value, 0) || 1;
+  return (
+    <div className="relative w-full" style={{ marginTop: 96, marginBottom: 96 }}>
+      <div className="flex w-full" style={{ height, gap: 4 }}>
+        {segments.map((seg, i) => {
+          const pct = (seg.value / total) * 100;
+          const emphasis = i === 0;
+          const bg = emphasis ? brand.tokens.accent : i === 1 ? ink.accent(0.22) : ink.trackFill;
+          const above = i % 2 === 0;
+          return (
+            <div key={i} className="relative" style={{ width: `${pct}%`, background: bg, border: emphasis ? "none" : `1px solid ${ink.hairline}` }}>
+              <div
+                className="absolute"
+                style={{
+                  left: 0,
+                  [above ? "bottom" : "top"]: "100%",
+                  [above ? "marginBottom" : "marginTop"]: 20,
+                  paddingLeft: 10,
+                  borderLeft: `1px solid ${ink.hairlineStrong}`,
+                  minWidth: 160,
+                } as React.CSSProperties}
+              >
+                <div className="uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}>{seg.label}</div>
+                <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: ink.text, letterSpacing: "-0.01em", marginTop: 2 }}>
+                  {pct.toFixed(1)}%
+                </div>
+                {seg.note && <div style={{ fontSize: 12, color: ink.muted, marginTop: 2, maxWidth: 220 }}>{seg.note}</div>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function EditorialNote({ title, body, accent }: { title: string; body: string; accent?: string }) {
+  const ink = useSlideInk();
+  return (
+    <div className="relative" style={{ background: ink.panel, border: `1px solid ${ink.hairline}`, padding: 24 }}>
+      <div style={{ position: "absolute", top: -1, left: 24, width: 56, height: 1, background: accent || ink.text, opacity: 0.7 }} />
+      <div className="uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.text, fontWeight: 700 }}>{title}</div>
+      <div style={{ fontSize: 14, color: ink.muted, lineHeight: 1.55, marginTop: 8 }}>{body}</div>
+    </div>
   );
 }
 
