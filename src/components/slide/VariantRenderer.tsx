@@ -773,7 +773,7 @@ function renderVariantBody({
               Trend
             </Kicker>
             <Hairline color={"var(--slide-accent-text)"} widthPx={88} thicknessPx={2} className="mt-6 mb-8" />
-            <DisplayTitle size="section" color={brand.tokens.primary} maxWidthPx={1500}>
+            <DisplayTitle size="section" color={ink.strong} maxWidthPx={1500}>
               {s(c.headline)}
             </DisplayTitle>
             <SupportingText size="lg" opacity={0.8} maxWidthPx={1180} className="mt-10">
@@ -793,7 +793,7 @@ function renderVariantBody({
           <div className="flex h-full flex-col justify-center">
             <Kicker brand={brand}>Insight</Kicker>
             <Hairline color={"var(--slide-accent-text)"} widthPx={88} thicknessPx={2} className="mt-6 mb-10" />
-            <DisplayTitle size="section" color={brand.tokens.primary} maxWidthPx={1520}>
+            <DisplayTitle size="section" color={ink.strong} maxWidthPx={1520}>
               {s(c.insight)}
             </DisplayTitle>
             <SupportingText size="lg" opacity={0.8} maxWidthPx={1180} className="mt-10">
@@ -1062,7 +1062,7 @@ function renderVariantBody({
     // ── Proof & Data ──────────────────────────────────────────────────
     case "MV-PROOF-LOGOS":
     case "MV-CASE-LOGO-GRID": {
-      const tileText = isDark ? "#ffffff" : brand.tokens.primary;
+      const tileText = ink.strong;
       const accent = brand.tokens.accent;
       const tileBg = isDark ? "rgba(255,255,255,0.04)" : "rgba(10,15,28,0.02)";
       const tileRing = isDark ? "rgba(255,255,255,0.08)" : "rgba(10,15,28,0.06)";
@@ -1152,7 +1152,7 @@ function renderVariantBody({
                   {url || path ? (
                     <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-16 max-w-full object-contain" />
                   ) : (
-                    <div className="text-xl font-semibold" style={{ color: mode === "dark" ? "#fff" : brand.tokens.primary }}>{name}</div>
+                    <div className="text-xl font-semibold" style={{ color: ink.strong }}>{name}</div>
                   )}
                 </div>
               );
@@ -1177,7 +1177,7 @@ function renderVariantBody({
                 {url || path ? (
                   <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-14 max-w-[88%] object-contain" />
                 ) : (
-                  <div className="text-lg font-semibold" style={{ color: mode === "dark" ? "#fff" : brand.tokens.primary }}>{name}</div>
+                  <div className="text-lg font-semibold" style={{ color: ink.strong }}>{name}</div>
                 )}
               </div>
             );
@@ -1219,10 +1219,10 @@ function renderVariantBody({
               {featuredUrl ? (
                 <ClientLogoImg url={featuredUrl} alt={`${featuredName} logo`} className="max-h-44 max-w-[72%] object-contain" />
               ) : (
-                <div className="text-4xl font-semibold" style={{ color: mode === "dark" ? "#fff" : brand.tokens.primary }}>{featuredName}</div>
+                <div className="text-4xl font-semibold" style={{ color: ink.strong }}>{featuredName}</div>
               )}
               {featuredNote && (
-                <div className="mt-10 max-w-md text-lg opacity-75" style={{ color: mode === "dark" ? "#fff" : brand.tokens.primary }}>
+                <div className="mt-10 max-w-md text-lg opacity-75" style={{ color: ink.strong }}>
                   {featuredNote}
                 </div>
               )}
@@ -1242,7 +1242,7 @@ function renderVariantBody({
                     {url || path ? (
                       <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-14 max-w-[80%] object-contain" />
                     ) : (
-                      <div className="text-lg font-semibold" style={{ color: mode === "dark" ? "#fff" : brand.tokens.primary }}>{name}</div>
+                      <div className="text-lg font-semibold" style={{ color: ink.strong }}>{name}</div>
                     )}
                   </div>
                 );
@@ -1255,7 +1255,7 @@ function renderVariantBody({
 
     case "MV-PROOF-LOGOS-CATEGORIZED": {
       const groups = arr(c.items).slice(0, 2);
-      const textColor = mode === "dark" ? "#fff" : brand.tokens.primary;
+      const textColor = ink.strong;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
@@ -1296,7 +1296,7 @@ function renderVariantBody({
 
     case "MV-PROOF-LOGOS-MOSAIC": {
       const items = arr(c.items).slice(0, 7);
-      const textColor = mode === "dark" ? "#fff" : brand.tokens.primary;
+      const textColor = ink.strong;
       // Mosaic grid template: 4 cols × 3 rows, asymmetric spans.
       const spans = [
         "col-span-2 row-span-2", // 0 anchor
@@ -1431,7 +1431,7 @@ function renderVariantBody({
                       className="py-5"
                       style={{
                         fontSize: 24,
-                        color: winnerIdx === ci ? brand.tokens.primary : "rgba(10,15,28,0.75)",
+                        color: winnerIdx === ci ? ink.strong : ink.muted,
                         fontWeight: winnerIdx === ci ? 600 : 400,
                         borderBottom: "1px solid rgba(10,15,28,0.10)",
                       }}
@@ -1641,7 +1641,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <Kicker brand={brand}>Case study</Kicker>
           <Hairline color={"var(--slide-accent-text)"} widthPx={88} thicknessPx={2} className="mt-6 mb-8" />
-          <DisplayTitle size="section" color={brand.tokens.primary}>{s(c.client)}</DisplayTitle>
+          <DisplayTitle size="section" color={ink.strong}>{s(c.client)}</DisplayTitle>
           <SupportingText size="lg" opacity={0.72} className="mt-8" maxWidthPx={1180}>{s(c.summary)}</SupportingText>
           <div className="mt-14 grid grid-cols-3 gap-14">
             {arr(c.items).map((it, i) => (
@@ -1660,7 +1660,7 @@ function renderVariantBody({
             <div className="flex flex-col justify-center">
               <Kicker brand={brand}>Case study</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
-              <DisplayTitle size="section" color={brand.tokens.primary}>{s(c.client)}</DisplayTitle>
+              <DisplayTitle size="section" color={ink.strong}>{s(c.client)}</DisplayTitle>
               <div className="mt-8" style={{ fontSize: 42, fontWeight: 600, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
                 {s(c.headline)}
               </div>
@@ -2026,7 +2026,7 @@ function renderVariantBody({
             </div>
             <div>
               <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} />
-              <DisplayTitle size="cover" color={brand.tokens.primary} maxWidthPx={1520} className="mt-10">
+              <DisplayTitle size="cover" color={ink.strong} maxWidthPx={1520} className="mt-10">
                 {s(c.title)}
               </DisplayTitle>
               <SupportingText size="lg" opacity={0.75} maxWidthPx={1180} className="mt-8">
@@ -2244,7 +2244,7 @@ function renderVariantBody({
             <div className="flex flex-col justify-center">
               <Kicker brand={brand}>{s(c.role)}</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
-              <DisplayTitle size="section" color={brand.tokens.primary}>{s(c.name)}</DisplayTitle>
+              <DisplayTitle size="section" color={ink.strong}>{s(c.name)}</DisplayTitle>
               {s(c.quote) && (
                 <div className="relative mt-10 pl-8" style={{ borderLeft: `2px solid ${brand.tokens.accent}` }}>
                   <div style={{ fontSize: 34, fontWeight: 500, lineHeight: 1.3, letterSpacing: "-0.01em", color: ink.strong }}>
@@ -2963,7 +2963,7 @@ function renderVariantBody({
             <div className="flex flex-col justify-center">
               <Kicker brand={brand}>Next step</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
-              <DisplayTitle size="title" color={brand.tokens.primary}>{s(c.title)}</DisplayTitle>
+              <DisplayTitle size="title" color={ink.strong}>{s(c.title)}</DisplayTitle>
               <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={720}>{s(c.body)}</SupportingText>
               <div className="mt-12 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
                 <Kicker brand={brand}>Call to action</Kicker>
@@ -3232,17 +3232,17 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="relative mx-auto mt-10" style={{ width: 820, height: 720 }}>
             <svg viewBox="-400 -360 800 720" className="absolute inset-0 h-full w-full">
-              <circle cx="0" cy="0" r={R} fill="none" stroke={brand.tokens.accent} strokeWidth={2} opacity={0.5} />
+              <circle cx="0" cy="0" r={R} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} opacity={0.5} />
               {items.map((_, i) => {
                 const a1 = (i / n) * Math.PI * 2 - Math.PI / 2;
                 const a2 = ((i + 0.85) / n) * Math.PI * 2 - Math.PI / 2;
                 const x1 = Math.cos(a1) * R, y1 = Math.sin(a1) * R;
                 const x2 = Math.cos(a2) * R, y2 = Math.sin(a2) * R;
-                return <path key={i} d={`M ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2}`} stroke={brand.tokens.primary} strokeWidth={4} fill="none" markerEnd="url(#fw-arrow)" opacity={0.9} />;
+                return <path key={i} d={`M ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2}`} stroke={ink.strong} strokeWidth={4} fill="none" markerEnd="url(#fw-arrow)" opacity={0.9} />;
               })}
               <defs>
                 <marker id="fw-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill={brand.tokens.primary} />
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill={ink.strong} />
                 </marker>
               </defs>
             </svg>
@@ -3412,11 +3412,11 @@ function renderVariantBody({
               ))}
             </div>
             <svg viewBox={`0 0 ${W} ${H + 40}`} className="mt-8 w-full">
-              <path d={path} fill="none" stroke={brand.tokens.primary} strokeWidth={3} />
+              <path d={path} fill="none" stroke={ink.strong} strokeWidth={3} />
               {points.map((p, i) => (
                 <g key={i}>
-                  <circle cx={p.x} cy={p.y} r={11} fill={brand.tokens.accent} stroke="#fff" strokeWidth={3} />
-                  <text x={p.x} y={p.y - 20} textAnchor="middle" fontSize={18} fontWeight={600} fill={brand.tokens.primary}>{String(p.it.sentiment ?? "")}/5</text>
+                  <circle cx={p.x} cy={p.y} r={11} fill="var(--slide-accent-text)" stroke="#fff" strokeWidth={3} />
+                  <text x={p.x} y={p.y - 20} textAnchor="middle" fontSize={18} fontWeight={600} fill={ink.strong}>{String(p.it.sentiment ?? "")}/5</text>
                 </g>
               ))}
               <text x={20} y={20} fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>High</text>
@@ -3554,7 +3554,7 @@ function renderVariantBody({
             </div>
             <div className="flex flex-col">
               <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mb-6" />
-              <DisplayTitle size="section" color={brand.tokens.primary} maxWidthPx={1080}>{s(c.title)}</DisplayTitle>
+              <DisplayTitle size="section" color={ink.strong} maxWidthPx={1080}>{s(c.title)}</DisplayTitle>
               <div className="mt-12 grid gap-12" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
                 <div style={{ fontSize: 22, lineHeight: 1.5, color: "color-mix(in oklab, currentColor 78%, transparent)" }}>{s(c.bodyLeft)}</div>
                 <div style={{ background: "rgba(10,15,28,0.15)" }} />
@@ -3729,7 +3729,7 @@ function renderVariantBody({
           <div className="flex h-full flex-col justify-center" style={{ maxWidth: 1500 }}>
             <Kicker brand={brand}>Definition</Kicker>
             <div className="mt-6">
-              <DisplayTitle size="section" color={brand.tokens.primary}>{s(c.term)}</DisplayTitle>
+              <DisplayTitle size="section" color={ink.strong}>{s(c.term)}</DisplayTitle>
             </div>
             <div className="mt-6 flex flex-wrap items-baseline gap-6">
               <span className="uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 62%, transparent)", fontWeight: 500 }}>{s(c.pronunciation)}</span>
@@ -5209,7 +5209,7 @@ function Card({ brand, title, body, index, icon }: { brand: BrandMode; title: st
   const cardBg = isDark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)";
   const cardRing = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
   const bodyColor = isDark ? "rgba(255,255,255,0.72)" : "rgba(10,15,28,0.68)";
-  const titleColor = isDark ? "#ffffff" : brand.tokens.primary;
+  const titleColor = ink.strong;
   return (
     <div
       className="relative flex flex-col overflow-hidden rounded-3xl p-10"
@@ -5323,12 +5323,12 @@ function Sparkline({ brand, values, w = 380, h = 100, filled = true, peakPin = f
       </defs>
       {filled && <path d={areaPath} fill={`url(#${id})`} />}
       <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke={ink.hairline} strokeWidth={1} />
-      <path d={linePath} fill="none" stroke={brand.tokens.accent} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={5} fill={brand.tokens.accent} />}
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={5} fill="var(--slide-accent-text)" />}
       {peakPin && peak && (
         <g>
-          <line x1={peak[0]} y1={peak[1]} x2={peak[0]} y2={Math.max(peak[1] - 22, 6)} stroke={brand.tokens.accent} strokeWidth={1} />
-          <rect x={peak[0] - 22} y={Math.max(peak[1] - 34, 0)} width={44} height={13} fill={brand.tokens.accent} rx={2} />
+          <line x1={peak[0]} y1={peak[1]} x2={peak[0]} y2={Math.max(peak[1] - 22, 6)} stroke="var(--slide-accent-text)" strokeWidth={1} />
+          <rect x={peak[0] - 22} y={Math.max(peak[1] - 34, 0)} width={44} height={13} fill="var(--slide-accent-text)" rx={2} />
           <text x={peak[0]} y={Math.max(peak[1] - 24, 10)} textAnchor="middle" fontSize={8} fontWeight={700} fill="#0A0E1F" style={{ letterSpacing: "0.18em" }}>{peakLabel}</text>
         </g>
       )}
@@ -5492,7 +5492,7 @@ function SemiGauge({ brand, percent, size = 260 }: { brand: BrandMode; percent: 
       <path d={arc} fill="none" stroke={`url(#${gradId})`} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${arcC}`} />
       <line x1={cx} y1={cy} x2={nx} y2={ny} stroke={ink.text} strokeWidth={1.5} />
       <circle cx={cx} cy={cy} r={3} fill={ink.text} />
-      <circle cx={nx} cy={ny} r={4} fill={brand.tokens.accent} />
+      <circle cx={nx} cy={ny} r={4} fill="var(--slide-accent-text)" />
       <text x={cx} y={cy - 22} textAnchor="middle" fontSize={size * 0.22} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
         {Math.round(p)}%
       </text>
@@ -5532,7 +5532,7 @@ function AreaChart({ brand, series, height = 480 }: { brand: BrandMode; series: 
       <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairline} strokeWidth={1} />
       {areaPath && <path d={areaPath} fill={`url(#${id})`} />}
       <path d={linePath} fill="none" stroke={`url(#${lineId})`} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={7} fill={brand.tokens.accent} />}
+      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={7} fill="var(--slide-accent-text)" />}
       {series.map((p, i) => (
         <text key={i} x={pts[i]?.[0]} y={h - padB + 32} textAnchor="middle" fontSize={20} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
       ))}
@@ -5735,17 +5735,17 @@ function DecadeAreaChart({ brand, series, height = 480, calloutLabel, calloutNot
       </defs>
       <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
       {areaPath && <path d={areaPath} fill={`url(#${id})`} />}
-      <path d={linePath} fill="none" stroke={brand.tokens.accent} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
       {series.map((p, i) => (
         <text key={i} x={pts[i]?.[0]} y={h - padB + 34} textAnchor="middle" fontSize={18} fill="color-mix(in oklab, currentColor 62%, transparent)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
       ))}
       {hi && (
         <g>
-          <circle cx={hi[0]} cy={hi[1]} r={9} fill={brand.tokens.accent} />
-          <circle cx={hi[0]} cy={hi[1]} r={16} fill="none" stroke={brand.tokens.accent} strokeWidth={2} strokeOpacity={0.35} />
-          <line x1={hi[0]} y1={hi[1] - 20} x2={hi[0]} y2={hi[1] - 90} stroke={brand.tokens.accent} strokeWidth={1} />
-          <rect x={hi[0] - 240} y={hi[1] - 190} width={480} height={100} fill="#fff" stroke={brand.tokens.accent} strokeWidth={2} />
-          <text x={hi[0]} y={hi[1] - 148} textAnchor="middle" fontSize={20} fontWeight={600} fill={brand.tokens.primary} style={{ letterSpacing: "-0.01em" }}>{calloutLabel}</text>
+          <circle cx={hi[0]} cy={hi[1]} r={9} fill="var(--slide-accent-text)" />
+          <circle cx={hi[0]} cy={hi[1]} r={16} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeOpacity={0.35} />
+          <line x1={hi[0]} y1={hi[1] - 20} x2={hi[0]} y2={hi[1] - 90} stroke="var(--slide-accent-text)" strokeWidth={1} />
+          <rect x={hi[0] - 240} y={hi[1] - 190} width={480} height={100} fill="#fff" stroke="var(--slide-accent-text)" strokeWidth={2} />
+          <text x={hi[0]} y={hi[1] - 148} textAnchor="middle" fontSize={20} fontWeight={600} fill={ink.strong} style={{ letterSpacing: "-0.01em" }}>{calloutLabel}</text>
           <text x={hi[0]} y={hi[1] - 118} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.7)">{calloutNote}</text>
         </g>
       )}
@@ -5757,7 +5757,7 @@ function DecadeAreaChart({ brand, series, height = 480, calloutLabel, calloutNot
 function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand: BrandMode; series: { label: string; points: number[] }[]; xLabels: string[]; unit?: string; height?: number }) {
   const w = 1720, h = height;
   const padL = 90, padR = 40, padT = 30, padB = 80;
-  const cols = [brand.tokens.accent, brand.tokens.primary, "rgba(10,15,28,0.45)"];
+  const cols = [brand.tokens.accent, brand.tokens.primary, ink.faint];
   const all = series.flatMap((s) => s.points);
   const max = Math.max(1, ...all);
   const niceMax = Math.ceil(max / 10) * 10 || max;
@@ -5813,7 +5813,7 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(columns.length, 1);
   const barW = slot * 0.55;
-  const cols = [brand.tokens.accent, brand.tokens.primary, "rgba(10,15,28,0.4)"];
+  const cols = [brand.tokens.accent, brand.tokens.primary, ink.faint];
   const ticks = 4;
   return (
     <div>
@@ -5859,7 +5859,7 @@ function StackedAreaChart({ brand, series, xLabels, unit, height = 480 }: { bran
   const niceMax = Math.ceil(max * 1.1);
   const chartH = h - padT - padB;
   const step = n > 1 ? (w - padL - padR) / (n - 1) : 0;
-  const cols = [brand.tokens.accent, brand.tokens.primary, "rgba(10,15,28,0.45)", "rgba(10,15,28,0.25)"];
+  const cols = [brand.tokens.accent, brand.tokens.primary, ink.faint, ink.hairlineStrong];
   let stacks = Array(n).fill(0) as number[];
   const layers = series.map((sr, si) => {
     const bottom = stacks.slice();
@@ -5929,7 +5929,7 @@ function WaterfallChart({ brand, steps, unit, height = 500 }: { brand: BrandMode
               <line x1={x - (slot - barW)} y1={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} x2={x} y2={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} stroke="rgba(10,15,28,0.25)" strokeDasharray="4 4" />
             )}
             <rect x={x} y={y} width={barW} height={Math.max(2, bh)} fill={fill} opacity={b.kind === "start" || b.kind === "end" ? 1 : 0.92} />
-            <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={18} fontWeight={600} fill={brand.tokens.primary}>
+            <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={18} fontWeight={600} fill={ink.strong}>
               {b.kind === "up" ? "+" : b.kind === "down" ? "−" : ""}{Math.abs(b.value).toFixed(1)}{unit || ""}
             </text>
             <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={15} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.12em", textTransform: "uppercase" }}>{b.label}</text>
@@ -5962,9 +5962,9 @@ function BubbleChart({ brand, items, axisX, axisY, height = 560 }: { brand: Bran
         const r = 20 + (it.size / maxSize) * 60;
         return (
           <g key={i}>
-            <circle cx={cx} cy={cy} r={r} fill={brand.tokens.accent} opacity={0.28} />
-            <circle cx={cx} cy={cy} r={r} fill="none" stroke={brand.tokens.accent} strokeWidth={2} />
-            <text x={cx} y={cy + 6} textAnchor="middle" fontSize={22} fontWeight={700} fill={brand.tokens.primary}>{it.label}</text>
+            <circle cx={cx} cy={cy} r={r} fill="var(--slide-accent-text)" opacity={0.28} />
+            <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} />
+            <text x={cx} y={cy + 6} textAnchor="middle" fontSize={22} fontWeight={700} fill={ink.strong}>{it.label}</text>
           </g>
         );
       })}
@@ -6078,7 +6078,7 @@ function ComboChart({ brand, points, barLabel, barUnit, lineLabel, lineUnit, hei
             <g key={i}>
               <line x1={padL} y1={y} x2={w - padR} y2={y} stroke="rgba(10,15,28,0.08)" strokeWidth={1} />
               <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={14} fill="rgba(10,15,28,0.5)">{bv.toFixed(1)}{barUnit || ""}</text>
-              <text x={w - padR + 12} y={y + 6} textAnchor="start" fontSize={14} fill={brand.tokens.accent}>{Math.round(lv)}{lineUnit || ""}</text>
+              <text x={w - padR + 12} y={y + 6} textAnchor="start" fontSize={14} fill="var(--slide-accent-text)">{Math.round(lv)}{lineUnit || ""}</text>
             </g>
           );
         })}
@@ -6088,13 +6088,13 @@ function ComboChart({ brand, points, barLabel, barUnit, lineLabel, lineUnit, hei
           const y = h - padB - bh;
           return (
             <g key={i}>
-              <rect x={x} y={y} width={barW} height={bh} fill={brand.tokens.primary} opacity={0.85} />
+              <rect x={x} y={y} width={barW} height={bh} fill={ink.strong} opacity={0.85} />
               <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
             </g>
           );
         })}
-        <path d={d} fill="none" stroke={brand.tokens.accent} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-        {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={6} fill={brand.tokens.accent} />)}
+        <path d={d} fill="none" stroke="var(--slide-accent-text)" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+        {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={6} fill="var(--slide-accent-text)" />)}
       </svg>
       <div className="mt-2 flex flex-wrap gap-6">
         <div className="flex items-center gap-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 70%, transparent)" }}>
