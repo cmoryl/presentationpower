@@ -109,12 +109,16 @@ export function auroraOrbs(
     mode === "dark"
       ? [darkFirst, brand.tokens.accent, sibling]
       : [lightPrimary, brand.tokens.accent, sibling];
-  const alphaBase = mode === "dark" ? 0.62 : 0.75;
-  const alphaRange = mode === "dark" ? 0.18 : 0.18;
+  const alphaBase = mode === "dark" ? 0.62 : 0.45;
+  const alphaRange = mode === "dark" ? 0.18 : 0.12;
+  // Light mode nudges orbs to different anchor points than dark so the
+  // same seed produces a distinct, softer composition on white surfaces.
+  const lightShiftX = [-80, 140, -40];
+  const lightShiftY = [90, -60, 120];
   return Array.from({ length: 3 }).map((_, i) => ({
     color: palette[i] ?? brand.tokens.accent,
-    x: 120 + rand() * 1040,
-    y: 60 + rand() * 600,
+    x: 120 + rand() * 1040 + (mode === "light" ? lightShiftX[i] ?? 0 : 0),
+    y: 60 + rand() * 600 + (mode === "light" ? lightShiftY[i] ?? 0 : 0),
     rx: (mode === "dark" ? 380 : 620) + rand() * (mode === "dark" ? 240 : 420),
     ry: (mode === "dark" ? 320 : 540) + rand() * (mode === "dark" ? 200 : 360),
     alpha: alphaBase + rand() * alphaRange,
