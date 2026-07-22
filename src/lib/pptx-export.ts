@@ -168,6 +168,28 @@ async function fetchAsDataUrl(url: string, label?: string): Promise<string | nul
 
 type Palette = { primary: string; accent: string; surface: string; ink: string };
 
+// Derive a mode-aware palette so dark-mode exports don't render light-surface
+// tiles with dark-navy text (invisible on a dark background). The base palette
+// comes from the brand tokens (light-mode Blue White surface, dark navy ink);
+// in dark mode we flip surface to a slightly-elevated navy tile and text to
+// white/light-ink so cards, numbers and body copy read like the on-screen
+// preview.
+function adaptPaletteForMode(base: Palette, isDark: boolean): Palette {
+  if (!isDark) return base;
+  return {
+    // Big numbers, headings and title text (renderers use p.primary for these)
+    // must be white on a dark backdrop, not brand blue.
+    primary: "FFFFFF",
+    // Accent stays brand accent — used for eyebrows, rules and highlights.
+    accent: base.accent,
+    // Elevated tile surface: a step lighter than the navy primary background
+    // so cards/glass panels are visible without being pure white.
+    surface: "121B3D",
+    // Body/ink text becomes a soft light gray, legible on navy.
+    ink: "D6DEF2",
+  };
+}
+
 export type PptxExportResult = { blob?: Blob; failedSlides: string[] };
 
 export async function exportDeckToPptx(
