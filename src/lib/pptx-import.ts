@@ -213,7 +213,7 @@ export type LayoutShape =
   | { kind: "image"; z: number; frame: LayoutFrame; embedId?: string; path?: string; line?: LayoutLine; srcRect?: LayoutSrcRect; prst?: string; opacity?: number; effect?: LayoutEffect; customPath?: CustomPath; duotone?: [string, string] }
   | { kind: "line"; z: number; frame: LayoutFrame; line?: LayoutLine; prst?: string; effect?: LayoutEffect }
   | { kind: "table"; z: number; frame: LayoutFrame; header: string[]; rows: string[][]; cellGrid?: TableCell[][]; colWidthsIn?: number[]; rowHeightsIn?: number[]; firstRow?: boolean; bandRow?: boolean; firstCol?: boolean; bandCol?: boolean }
-  | { kind: "chart"; z: number; frame: LayoutFrame }
+  | { kind: "chart"; z: number; frame: LayoutFrame; chartRelId?: string; chart?: ParsedChart }
   | { kind: "diagram"; z: number; frame: LayoutFrame };
 
 /** Custom shape path — captured from `<a:custGeom>` as normalized 0-1 coords. */
