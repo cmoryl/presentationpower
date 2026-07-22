@@ -1977,6 +1977,7 @@ function walkSpTree(
   out: LayoutShape[],
   imageEmbedIds: string[],
   parents?: ResolvedParents,
+  embedIdMap?: Record<string, string>,
 ) {
   for (const node of nodes) {
     const t = pTag(node);
@@ -1999,7 +2000,7 @@ function walkSpTree(
 
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       let prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
-      let fill = readFill(spPr, imageEmbedIds);
+      let fill = readFill(spPr, imageEmbedIds, embedIdMap);
       let line = readLine(spPr);
       const effect = readEffects(spPr);
       const customPath = readCustomPath(spPr);
@@ -2023,7 +2024,8 @@ function walkSpTree(
       if (group) frame = transformFrame(frame, group);
       const blipFill = pFind(node, "p:blipFill");
       const blip = blipFill ? pFind(blipFill, "a:blip") : undefined;
-      const embedId = blip ? (pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"]) : undefined;
+      const rawEmbedId = blip ? (pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"]) : undefined;
+      const embedId = rawEmbedId ? (embedIdMap?.[rawEmbedId] ?? rawEmbedId) : undefined;
       const srcRect = readSrcRect(blipFill);
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
@@ -2054,7 +2056,7 @@ function walkSpTree(
       out.push({ kind: "line", z: zRef.z++, frame, line: readLine(spPr), prst, effect });
     } else if (t === "p:grpSp") {
       const grpSpPr = pFind(node, "p:grpSpPr");
-      walkSpTree(pChildren(node), zRef, grpSpPr ?? group, out, imageEmbedIds, parents);
+      walkSpTree(pChildren(node), zRef, grpSpPr ?? group, out, imageEmbedIds, parents, embedIdMap);
     } else if (t === "p:graphicFrame") {
       const xfrm = pFind(node, "p:xfrm");
       let frame: LayoutFrame | undefined;
