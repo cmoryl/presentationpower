@@ -5844,7 +5844,17 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { 
         const isHi = highlight ? b.label === highlight : false;
         return (
           <g key={i}>
-            <rect x={x} y={y} width={barW} height={bh} rx={3} fill={isHi ? `url(#${id}-airy)` : ink.trackFill} />
+            <rect
+              x={x}
+              y={y}
+              width={barW}
+              height={bh}
+              rx={4}
+              fill={isHi ? `url(#${id}-airy)` : `url(#${id}-glass)`}
+              stroke="var(--slide-accent-text)"
+              strokeOpacity={isHi ? 0.55 : 0.22}
+              strokeWidth={1}
+            />
             {isHi && <rect x={x} y={y} width={barW} height={2} fill="var(--slide-accent-text)" />}
             {isHi && hiValue !== undefined && (
               <text x={x + barW / 2} y={y - 16} textAnchor="middle" fontSize={22} fontWeight={600} fill={ink.text} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{b.value}{unit || ""}</text>
@@ -5852,6 +5862,7 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { 
             <text x={x + barW / 2} y={h - padB + 30} textAnchor="middle" fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{b.label}</text>
           </g>
         );
+
       })}
     </svg>
   );
