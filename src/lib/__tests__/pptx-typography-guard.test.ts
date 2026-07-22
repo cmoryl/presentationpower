@@ -53,13 +53,13 @@ describe("PPTX typography parity guard", () => {
   });
 
   it("parity contract locks Geist as the sole typeface", () => {
-    // pptx-parity.ts is the single source of truth for preview↔exporter parity.
-    // Every typography clause it declares must be Geist / hasSerif:false.
-    const clauses = [...PARITY_SRC.matchAll(/typography:\s*\{([^}]*)\}/g)].map((m) => m[1]);
+    // Every runtime typography clause in the parity module must be Geist /
+    // hasSerif:false. We match `fontFace: "..."` (a value, not a type union).
+    const clauses = [...PARITY_SRC.matchAll(/typography:\s*\{\s*fontFace:\s*"([^"]+)",\s*hasSerif:\s*(true|false)\s*\}/g)];
     expect(clauses.length).toBeGreaterThan(0);
-    for (const clause of clauses) {
-      expect(clause).toMatch(/fontFace:\s*"Geist"/);
-      expect(clause).toMatch(/hasSerif:\s*false/);
+    for (const [, face, serif] of clauses) {
+      expect(face).toBe("Geist");
+      expect(serif).toBe("false");
     }
   });
 
