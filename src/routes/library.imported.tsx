@@ -251,6 +251,15 @@ function DeckSlides({
   onPreview: (idx: number) => void;
 }) {
   const [relinkOpen, setRelinkOpen] = useState(false);
+  const qc = useQueryClient();
+  const reparseFn = useServerFn(reparseImportedDeck);
+  const reparse = useMutation({
+    mutationFn: () => reparseFn({ data: { id: deck.id } }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["imported-library-slides", deck.id] });
+    },
+  });
+  const missingLayouts = deck.slides.filter((s) => !s.layout).length;
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-black/10 pb-4">
