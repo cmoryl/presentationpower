@@ -22,12 +22,16 @@ export function auroraSvgDataUrl(
   const midStop = mode === "dark" ? "22%" : "30%";
   const outerStop = mode === "dark" ? "50%" : "60%";
   const blurStd = mode === "dark" ? 38 : 65;
-  // Frosted-glass wash: kept extremely light in dark mode so orbs stay
-  // defined and visibly peek through instead of washing into a single
-  // color field across the slide. Light mode retains a softer wash for
-  // legibility of dark ink over per-division accent colours.
-  const glassColor = mode === "dark" ? "#0B1330" : "#FFFFFF";
-  const glassAlpha = mode === "dark" ? 0.08 : 0.22;
+  // Frosted-glass wash: per-brand tuned in dark mode so each division keeps
+  // the "orbs peek through glass" look without flattening into a single
+  // colour field. Darker/heavier accents get a lower alpha (they already
+  // read strongly through the wash); lighter/pastel accents get a slightly
+  // higher alpha to tame brightness. The wash colour itself is a mix of a
+  // neutral navy and the brand's own surface so the film subtly carries
+  // the brand tint instead of washing everything to a single grey.
+  const wash = darkGlassWash(brand);
+  const glassColor = mode === "dark" ? wash.color : "#FFFFFF";
+  const glassAlpha = mode === "dark" ? wash.alpha : 0.22;
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
   <defs>
