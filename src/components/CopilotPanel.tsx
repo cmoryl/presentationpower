@@ -298,7 +298,7 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
                 send();
               }
             }}
-            placeholder="Edit any slide — e.g. tighten headline on slide 3"
+            placeholder={mode === "guide" ? "Ask how to do anything — I'll walk you through it" : "Edit any slide — e.g. tighten headline on slide 3"}
             rows={1}
             disabled={busy}
             className="max-h-32 flex-1 resize-none bg-transparent text-sm text-white placeholder:text-white/30 focus:outline-none"
