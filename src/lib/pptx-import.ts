@@ -231,6 +231,38 @@ export type SlideLayout = {
   shapes: LayoutShape[];
 };
 
+export type ParsedMedia = {
+  /** video | audio | ole | other — coarse bucket for downstream renderers. */
+  kind: "video" | "audio" | "ole" | "other";
+  /** MIME string (best effort from extension). */
+  mime: string;
+  /** Original archive path (e.g. ppt/media/media1.mp4) for debugging + storage rewriting. */
+  path: string;
+  /** Base64 data URL. Subject to per-file / per-slide byte caps. */
+  dataUrl: string;
+  /** rId that pointed at this asset when linked from the slide XML. */
+  embedId?: string;
+  /** Byte length of the raw asset (pre-base64). */
+  bytes: number;
+};
+
+export type ParsedHyperlink = {
+  /** rId as it appears on r:id inside a:hlinkClick / a:hlinkHover. */
+  rId: string;
+  /** Absolute URL, mailto:, or internal slide reference (ppaction://hlinksldjump). */
+  target: string;
+  /** True when the rel Type ended in /hyperlink — false for internal jumps. */
+  external: boolean;
+};
+
+export type ParsedComment = {
+  authorName?: string;
+  authorInitials?: string;
+  text: string;
+  /** ISO datetime when the comment was authored. */
+  createdAt?: string;
+};
+
 export type ParsedSlide = {
   index: number;
   title: string;
@@ -248,6 +280,18 @@ export type ParsedSlide = {
   imageEmbedIds: string[];
   /** Faithful 1:1 layout capture (positions, styling, z-order). */
   layout?: SlideLayout;
+  /** Video / audio / OLE embeds referenced by the slide. */
+  media: ParsedMedia[];
+  /** Every hyperlink target discovered on the slide, in rel order. */
+  hyperlinks: ParsedHyperlink[];
+  /** Author comments attached to this slide, in file order. */
+  comments: ParsedComment[];
+  /** True when the slide is hidden from presentation (`<p:sld show="0">`). */
+  hidden: boolean;
+  /** Transition preset name (e.g. `fade`, `push`, `wipe`) when declared. */
+  transition?: string;
+  /** True when the slide XML declares a `<p:timing>` (animation) block. */
+  hasAnimation: boolean;
 };
 
 export type ParsedTheme = {
@@ -269,6 +313,32 @@ export type ParsedTheme = {
   effectStyleLst?: LayoutEffect[];
 };
 
+export type ParsedDeckMetadata = {
+  title?: string;
+  subject?: string;
+  creator?: string;
+  lastModifiedBy?: string;
+  keywords?: string;
+  description?: string;
+  category?: string;
+  created?: string;
+  modified?: string;
+  revision?: string;
+  application?: string;
+  appVersion?: string;
+  company?: string;
+  manager?: string;
+  template?: string;
+  presentationFormat?: string;
+};
+
+export type ParsedEmbeddedFont = {
+  /** Font family name from the presentation's font table. */
+  typeface: string;
+  /** Discovered variants (regular/bold/italic/boldItalic) and their asset paths. */
+  variants: Array<{ style: "regular" | "bold" | "italic" | "boldItalic"; path: string; mime: string }>;
+};
+
 export type ParsedDeck = {
   filename: string;
   slideCount: number;
@@ -281,8 +351,19 @@ export type ParsedDeck = {
     charts: number;
     tables: number;
     diagrams: number;
+    media: number;
+    comments: number;
+    hyperlinks: number;
+    hiddenSlides: number;
   };
+  /** docProps/core.xml + docProps/app.xml — author, dates, application, company. */
+  metadata: ParsedDeckMetadata;
+  /** Every embedded font in ppt/fonts/ paired with its typeface. */
+  embeddedFonts: ParsedEmbeddedFont[];
+  /** Custom XML parts (customXml/item*.xml) preserved verbatim for round-tripping. */
+  customXmlParts: Array<{ path: string; xml: string }>;
 };
+
 
 
 const MAX_PER_IMAGE_BYTES = 15_000_000;
@@ -339,6 +420,17 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
   let chartTotal = 0;
   let tableTotal = 0;
   let diagramTotal = 0;
+  let mediaTotal = 0;
+  let hyperlinkTotal = 0;
+  let commentTotal = 0;
+  let hiddenSlidesTotal = 0;
+  let totalMediaBytes = 0;
+  const MAX_TOTAL_MEDIA_BYTES = 200_000_000; // 200 MB media budget across the deck
+  const MAX_PER_MEDIA_BYTES = 60_000_000;    // 60 MB per single asset
+
+  // Deck-level presentation.xml → hidden slide flags + slide id order
+  const presDoc = await readXmlSafe(zip, parser, "ppt/presentation.xml");
+
 
   const parentCache = new Map<string, ParentSlideData>();
 
@@ -559,6 +651,52 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
 
 
 
+    // ── Media (video / audio / OLE embeds) ──────────────────────────────
+    const media: ParsedMedia[] = [];
+    const mediaBucketEntries: Array<[string, string, ParsedMedia["kind"]]> = [
+      ...Object.entries(relTargetsByType.video).map(([id, t]) => [id, t, "video"] as [string, string, ParsedMedia["kind"]]),
+      ...Object.entries(relTargetsByType.audio).map(([id, t]) => [id, t, "audio"] as [string, string, ParsedMedia["kind"]]),
+      ...Object.entries(relTargetsByType.media).map(([id, t]) => [id, t, "other"] as [string, string, ParsedMedia["kind"]]),
+      ...Object.entries(relTargetsByType.oleObject).map(([id, t]) => [id, t, "ole"] as [string, string, ParsedMedia["kind"]]),
+    ];
+    for (const [rId, target, kind] of mediaBucketEntries) {
+      // Skip external links (video pointing at http://...) — no bytes to embed.
+      if (/^https?:\/\//i.test(target)) continue;
+      const resolved = resolveRelPath(slidePath, target);
+      const entry = zip.files[resolved];
+      if (!entry) continue;
+      if (totalMediaBytes >= MAX_TOTAL_MEDIA_BYTES) break;
+      try {
+        const bin = await entry.async("uint8array");
+        if (bin.byteLength === 0 || bin.byteLength > MAX_PER_MEDIA_BYTES) continue;
+        if (totalMediaBytes + bin.byteLength > MAX_TOTAL_MEDIA_BYTES) continue;
+        const mime = guessMime(resolved) ?? "application/octet-stream";
+        const dataUrl = `data:${mime};base64,${uint8ToBase64(bin)}`;
+        media.push({ kind, mime, path: resolved, dataUrl, embedId: rId, bytes: bin.byteLength });
+        totalMediaBytes += bin.byteLength;
+      } catch { /* skip malformed media */ }
+    }
+
+    // ── Hyperlinks (rId → target) ───────────────────────────────────────
+    const hyperlinks: ParsedHyperlink[] = Object.entries(relTargetsByType.hyperlink).map(
+      ([rId, { target, external }]) => ({ rId, target, external }),
+    );
+
+    // ── Comments ────────────────────────────────────────────────────────
+    const comments = await readSlideComments(zip, parser, slideNumber(slidePath));
+
+    // ── Slide-level metadata (hidden, transition, animation) ────────────
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sldRoot = (doc as any)?.["p:sld"] ?? {};
+    const hidden = String(sldRoot?.["@_show"] ?? "1") === "0";
+    if (hidden) hiddenSlidesTotal++;
+    const transition = readTransitionKind(sldRoot?.["p:transition"]);
+    const hasAnimation = Boolean(sldRoot?.["p:timing"]);
+
+    mediaTotal += media.length;
+    hyperlinkTotal += hyperlinks.length;
+    commentTotal += comments.length;
+
     slides.push({
       index: i,
       title: cap(title, 240) || `Slide ${i + 1}`,
@@ -570,8 +708,18 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
       tables,
       diagrams,
       layout,
+      media,
+      hyperlinks,
+      comments,
+      hidden,
+      transition,
+      hasAnimation,
     });
   }
+
+  const metadata = await readDeckMetadata(zip, parser);
+  const embeddedFonts = await readEmbeddedFonts(zip, parser, presDoc);
+  const customXmlParts = await readCustomXmlParts(zip);
 
   return {
     filename,
@@ -580,9 +728,21 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     theme,
     imagePayloadBytes: totalImageBytes,
     imagesTruncated,
-    graphicsSummary: { charts: chartTotal, tables: tableTotal, diagrams: diagramTotal },
+    graphicsSummary: {
+      charts: chartTotal,
+      tables: tableTotal,
+      diagrams: diagramTotal,
+      media: mediaTotal,
+      comments: commentTotal,
+      hyperlinks: hyperlinkTotal,
+      hiddenSlides: hiddenSlidesTotal,
+    },
+    metadata,
+    embeddedFonts,
+    customXmlParts,
   };
 }
+
 
 function slideNumber(path: string): number {
   const m = path.match(/(\d+)\.xml$/);
@@ -658,10 +818,19 @@ type RelBuckets = {
   diagramData: Record<string, string>;
   diagramLayout: Record<string, string>;
   diagramDrawing: Record<string, string>;
+  video: Record<string, string>;
+  audio: Record<string, string>;
+  media: Record<string, string>;
+  oleObject: Record<string, string>;
+  /** hyperlink rels: rId → {target, external}. Attached to a:hlinkClick / a:hlinkHover. */
+  hyperlink: Record<string, { target: string; external: boolean }>;
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function extractRelTargetsByType(relsDoc: any): RelBuckets {
-  const out: RelBuckets = { image: {}, chart: {}, diagramData: {}, diagramLayout: {}, diagramDrawing: {} };
+  const out: RelBuckets = {
+    image: {}, chart: {}, diagramData: {}, diagramLayout: {}, diagramDrawing: {},
+    video: {}, audio: {}, media: {}, oleObject: {}, hyperlink: {},
+  };
   if (!relsDoc) return out;
   const rels = relsDoc?.Relationships?.Relationship;
   const arr = Array.isArray(rels) ? rels : rels ? [rels] : [];
@@ -669,15 +838,22 @@ function extractRelTargetsByType(relsDoc: any): RelBuckets {
     const type = String(r?.["@_Type"] ?? "");
     const id = r?.["@_Id"] as string | undefined;
     const target = r?.["@_Target"] as string | undefined;
+    const mode = String(r?.["@_TargetMode"] ?? "");
     if (!id || !target) continue;
     if (/\/image$/i.test(type) || /\/image\b/i.test(type)) out.image[id] = target;
     else if (/\/chart$/i.test(type)) out.chart[id] = target;
     else if (/\/diagramData$/i.test(type)) out.diagramData[id] = target;
     else if (/\/diagramLayout$/i.test(type)) out.diagramLayout[id] = target;
     else if (/\/diagramDrawing$/i.test(type)) out.diagramDrawing[id] = target;
+    else if (/\/video$/i.test(type)) out.video[id] = target;
+    else if (/\/audio$/i.test(type)) out.audio[id] = target;
+    else if (/\/media$/i.test(type)) out.media[id] = target;
+    else if (/\/oleObject$/i.test(type) || /\/package$/i.test(type)) out.oleObject[id] = target;
+    else if (/\/hyperlink$/i.test(type)) out.hyperlink[id] = { target, external: mode === "External" };
   }
   return out;
 }
+
 
 function extractEmbedIds(doc: unknown): string[] {
   const ids: string[] = [];
@@ -728,9 +904,36 @@ function guessMime(path: string): string | null {
     case "gif": return "image/gif";
     case "webp": return "image/webp";
     case "svg": return "image/svg+xml";
+    case "bmp": return "image/bmp";
+    case "tif":
+    case "tiff": return "image/tiff";
+    case "emf": return "image/x-emf";
+    case "wmf": return "image/x-wmf";
+    case "mp4": return "video/mp4";
+    case "m4v": return "video/mp4";
+    case "mov": return "video/quicktime";
+    case "webm": return "video/webm";
+    case "avi": return "video/x-msvideo";
+    case "wmv": return "video/x-ms-wmv";
+    case "mp3": return "audio/mpeg";
+    case "m4a": return "audio/mp4";
+    case "wav": return "audio/wav";
+    case "ogg": return "audio/ogg";
+    case "aac": return "audio/aac";
+    case "wma": return "audio/x-ms-wma";
+    case "ttf": return "font/ttf";
+    case "otf": return "font/otf";
+    case "woff": return "font/woff";
+    case "woff2": return "font/woff2";
+    case "fntdata": return "application/vnd.ms-fontobject";
+    case "xlsx": return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    case "xls": return "application/vnd.ms-excel";
+    case "docx": return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    case "bin": return "application/octet-stream";
     default: return null;
   }
 }
+
 
 function uint8ToBase64(u8: Uint8Array): string {
   return Buffer.from(u8).toString("base64");
@@ -2578,3 +2781,160 @@ function mergeDefaults(target: RunDefaults, src: RunDefaults) {
   if (target.italic === undefined && src.italic !== undefined) target.italic = src.italic;
 }
 
+
+// ─── Deck-wide extra readers (metadata, comments, fonts, custom xml) ────
+
+async function readXmlSafe(zip: JSZip, parser: XMLParser, path: string): Promise<unknown | null> {
+  const entry = zip.files[path];
+  if (!entry) return null;
+  try {
+    const xml = await entry.async("string");
+    return parser.parse(xml);
+  } catch { return null; }
+}
+
+function textOf(node: unknown): string | undefined {
+  if (node == null) return undefined;
+  if (typeof node === "string") return node.trim() || undefined;
+  if (typeof node === "number") return String(node);
+  if (typeof node === "object" && "#text" in (node as Record<string, unknown>)) {
+    const t = (node as Record<string, unknown>)["#text"];
+    return t == null ? undefined : String(t);
+  }
+  return undefined;
+}
+
+async function readDeckMetadata(zip: JSZip, parser: XMLParser): Promise<ParsedDeckMetadata> {
+  const md: ParsedDeckMetadata = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const core = (await readXmlSafe(zip, parser, "docProps/core.xml")) as any;
+  if (core) {
+    const cp = core["cp:coreProperties"] ?? core["coreProperties"] ?? {};
+    md.title = textOf(cp["dc:title"]);
+    md.subject = textOf(cp["dc:subject"]);
+    md.creator = textOf(cp["dc:creator"]);
+    md.description = textOf(cp["dc:description"]);
+    md.keywords = textOf(cp["cp:keywords"]);
+    md.category = textOf(cp["cp:category"]);
+    md.lastModifiedBy = textOf(cp["cp:lastModifiedBy"]);
+    md.revision = textOf(cp["cp:revision"]);
+    md.created = textOf(cp["dcterms:created"]);
+    md.modified = textOf(cp["dcterms:modified"]);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const app = (await readXmlSafe(zip, parser, "docProps/app.xml")) as any;
+  if (app) {
+    const ap = app["Properties"] ?? {};
+    md.application = textOf(ap["Application"]);
+    md.appVersion = textOf(ap["AppVersion"]);
+    md.company = textOf(ap["Company"]);
+    md.manager = textOf(ap["Manager"]);
+    md.template = textOf(ap["Template"]);
+    md.presentationFormat = textOf(ap["PresentationFormat"]);
+  }
+  return md;
+}
+
+async function readSlideComments(zip: JSZip, parser: XMLParser, slideNum: number): Promise<ParsedComment[]> {
+  const out: ParsedComment[] = [];
+  // Modern (PPT 2007+) comments live at ppt/comments/comment{N}.xml paired with slide index.
+  const candidates = [
+    `ppt/comments/comment${slideNum}.xml`,
+    `ppt/comments/modernComment_${slideNum}.xml`,
+  ];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let commentsDoc: any = null;
+  for (const p of candidates) {
+    commentsDoc = await readXmlSafe(zip, parser, p);
+    if (commentsDoc) break;
+  }
+  if (!commentsDoc) return out;
+  const list = commentsDoc?.["p:cmLst"]?.["p:cm"] ?? commentsDoc?.["cmLst"]?.["cm"];
+  const arr = Array.isArray(list) ? list : list ? [list] : [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const authorsDoc: any = await readXmlSafe(zip, parser, "ppt/commentAuthors.xml");
+  const authors = new Map<string, { name?: string; initials?: string }>();
+  const aRaw = authorsDoc?.["p:cmAuthorLst"]?.["p:cmAuthor"];
+  const aArr = Array.isArray(aRaw) ? aRaw : aRaw ? [aRaw] : [];
+  for (const a of aArr) {
+    const id = String(a?.["@_id"] ?? "");
+    if (id) authors.set(id, { name: a?.["@_name"], initials: a?.["@_initials"] });
+  }
+  for (const c of arr) {
+    const authorId = String(c?.["@_authorId"] ?? "");
+    const author = authors.get(authorId) ?? {};
+    const t = textOf(c?.["p:text"]) ?? "";
+    if (!t) continue;
+    out.push({
+      authorName: author.name,
+      authorInitials: author.initials,
+      text: cap(t, 2000),
+      createdAt: c?.["@_dt"],
+    });
+  }
+  return out;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function readTransitionKind(tr: any): string | undefined {
+  if (!tr || typeof tr !== "object") return undefined;
+  for (const key of Object.keys(tr)) {
+    if (key.startsWith("@_")) continue;
+    // Strip namespace prefix (p:fade → fade).
+    const name = key.includes(":") ? key.split(":").pop()! : key;
+    if (name && name !== "extLst") return name;
+  }
+  return undefined;
+}
+
+async function readEmbeddedFonts(
+  zip: JSZip,
+  parser: XMLParser,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  presDoc: any,
+): Promise<ParsedEmbeddedFont[]> {
+  const out: ParsedEmbeddedFont[] = [];
+  if (!presDoc) return out;
+  const fontLst = presDoc?.["p:presentation"]?.["p:embeddedFontLst"]?.["p:embeddedFont"];
+  const arr = Array.isArray(fontLst) ? fontLst : fontLst ? [fontLst] : [];
+  if (arr.length === 0) return out;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const relsDoc: any = await readXmlSafe(zip, parser, "ppt/_rels/presentation.xml.rels");
+  const relTargets: Record<string, string> = {};
+  const rels = relsDoc?.Relationships?.Relationship;
+  const rArr = Array.isArray(rels) ? rels : rels ? [rels] : [];
+  for (const r of rArr) {
+    const id = r?.["@_Id"];
+    const target = r?.["@_Target"];
+    if (id && target) relTargets[id] = target;
+  }
+  for (const f of arr) {
+    const typeface = String(f?.["p:font"]?.["@_typeface"] ?? f?.["@_typeface"] ?? "").trim();
+    if (!typeface) continue;
+    const variants: ParsedEmbeddedFont["variants"] = [];
+    const styleMap: Array<[string, "regular" | "bold" | "italic" | "boldItalic"]> = [
+      ["p:regular", "regular"], ["p:bold", "bold"], ["p:italic", "italic"], ["p:boldItalic", "boldItalic"],
+    ];
+    for (const [k, style] of styleMap) {
+      const rId = f?.[k]?.["@_r:id"];
+      if (!rId || !relTargets[rId]) continue;
+      const path = resolveRelPath("ppt/presentation.xml", relTargets[rId]);
+      variants.push({ style, path, mime: guessMime(path) ?? "application/octet-stream" });
+    }
+    if (variants.length) out.push({ typeface, variants });
+  }
+  return out;
+}
+
+async function readCustomXmlParts(zip: JSZip): Promise<Array<{ path: string; xml: string }>> {
+  const out: Array<{ path: string; xml: string }> = [];
+  for (const path of Object.keys(zip.files)) {
+    if (!/^customXml\/item\d+\.xml$/i.test(path)) continue;
+    try {
+      const xml = await zip.files[path].async("string");
+      if (xml.length > 500_000) continue; // skip huge custom xml payloads
+      out.push({ path, xml });
+    } catch { /* skip */ }
+  }
+  return out;
+}
