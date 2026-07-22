@@ -132,7 +132,7 @@ export function auroraBaseTint(brand: BrandMode, mode: "dark" | "light"): string
 
 /** Layer opacity applied to the orb <g> in both renderer and exporter. */
 export function auroraLayerOpacity(mode: "dark" | "light", intensity = 1): number {
-  return intensity * (mode === "dark" ? 0.7 : 0.85);
+  return intensity * (mode === "dark" ? 0.7 : 0.55);
 }
 
 /**
