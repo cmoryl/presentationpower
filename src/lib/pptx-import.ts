@@ -307,6 +307,8 @@ export type ParsedTheme = {
   dark2?: string;
   light1?: string;
   light2?: string;
+  hlink?: string;
+  folHlink?: string;
   bodyFont?: string;
   headingFont?: string;
   /** Theme-level background fill styles (bgFillStyleLst) — resolves `p:bgRef@idx`. */
@@ -1497,6 +1499,8 @@ async function extractTheme(zip: JSZip, parser: XMLParser): Promise<ParsedTheme>
     const dark2 = readSchemeColor(scheme?.["a:dk2"]);
     const light1 = readSchemeColor(scheme?.["a:lt1"]);
     const light2 = readSchemeColor(scheme?.["a:lt2"]);
+    const hlink = readSchemeColor(scheme?.["a:hlink"]);
+    const folHlink = readSchemeColor(scheme?.["a:folHlink"]);
 
     return {
       accents,
@@ -1510,6 +1514,8 @@ async function extractTheme(zip: JSZip, parser: XMLParser): Promise<ParsedTheme>
       dark2: dark2 ?? dark1,
       light1: light1 ?? light2,
       light2: light2 ?? light1,
+      hlink,
+      folHlink,
       headingFont: fontScheme?.["a:majorFont"]?.["a:latin"]?.["@_typeface"],
       bodyFont: fontScheme?.["a:minorFont"]?.["a:latin"]?.["@_typeface"],
       bgFillStyleLst,
