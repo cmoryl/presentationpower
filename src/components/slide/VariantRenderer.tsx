@@ -3881,7 +3881,7 @@ function renderVariantBody({
               const itemInk = i === 0 ? ink.strong : i === 1 ? ink.muted : ink.faint;
               const labelColor = i === 0 ? "var(--slide-accent-text)" : ink.faint;
               return (
-                <div key={i} className="grid gap-12 py-10" style={{ gridTemplateColumns: "200px 1fr`, borderTop: `1px solid ${ink.hairline}`, borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : `none" }}>
+                <div key={i} className="grid gap-12 py-10" style={{ gridTemplateColumns: "200px 1fr", borderTop: `1px solid ${ink.hairline}`, borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none" }}>
                   <div className="uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: labelColor, fontWeight: 600 }}>{s(it.label)}</div>
                   <div>
                     <div style={{ fontSize: 44, fontWeight: 600, color: itemInk, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(it.headline)}</div>
@@ -3916,7 +3916,7 @@ function renderVariantBody({
               </div>
               <div className="mt-10">
                 {bItems.map((it, i) => (
-                  <div key={i} className="flex items-baseline justify-between py-5` style={{ borderTop: `1px solid ${ink.hairline}`, borderBottom: i === bItems.length - 1 ? `1px solid ${ink.hairline}" : "none" }}>
+                  <div key={i} className="flex items-baseline justify-between py-5" style={{ borderTop: `1px solid ${ink.hairline}`, borderBottom: i === bItems.length - 1 ? `1px solid ${ink.hairline}` : "none" }}>
                     <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.24em", color: "color-mix(in oklab, currentColor 60%, transparent)", fontWeight: 600 }}>{s(it.label)}</div>
                     <div className="tabular-nums" style={{ fontSize: 32, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em" }}>{s(it.value)}</div>
                   </div>
@@ -4121,7 +4121,7 @@ function renderVariantBody({
                 const delta = s(it.delta);
                 const negative = delta.trim().startsWith("-");
                 return (
-                  <div key={i} className="py-5` style={{ borderTop: `1px solid ${ink.hairline}`, borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : `none" }}>
+                  <div key={i} className="py-5" style={{ borderTop: `1px solid ${ink.hairline}`, borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none" }}>
                     <div className="flex items-baseline justify-between">
                       <div style={{ fontSize: 26, fontWeight: 600, color: ink.strong }}>{s(it.label)}</div>
                       <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.24em", fontWeight: 600, color: negative ? "#B42318" : "var(--slide-accent-text)" }}>{delta}</div>
@@ -4253,7 +4253,7 @@ function renderVariantBody({
                 const color = i === 0 ? brand.tokens.accent : brand.tokens.primary;
                 const opacity = i === 0 ? 1 : 0.35 + (1 - i / items.length) * 0.5;
                 return (
-                  <div key={i} className="py-4 flex items-start gap-5` style={{ borderTop: `1px solid ${ink.hairline}`, borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : `none" }}>
+                  <div key={i} className="py-4 flex items-start gap-5" style={{ borderTop: `1px solid ${ink.hairline}`, borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none" }}>
                     <div style={{ width: 16, height: 16, background: color, opacity, marginTop: 8 }} />
                     <div style={{ flex: 1 }}>
                       <div className="flex items-baseline justify-between">
@@ -5551,7 +5551,7 @@ function DotGridBackdrop(_props: { opacity?: number } = {}) {
 function LiveMetaFooter({ brand: _brand, source, refCode }: { brand: BrandMode; source?: string; refCode?: string; live?: boolean }) {
   const ink = useSlideInk();
   return (
-    <div className="flex items-center justify-between` style={{ borderTop: `1px solid ${ink.hairline}`, paddingTop: 16, fontSize: 11, letterSpacing: `0.24em", color: ink.faint, fontWeight: 500, textTransform: "uppercase" }}>
+    <div className="flex items-center justify-between" style={{ borderTop: `1px solid ${ink.hairline}`, paddingTop: 16, fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 500, textTransform: "uppercase" }}>
       <div className="flex gap-10">
         {source && <span>Source · {source}</span>}
         {refCode && <span>Ref · {refCode}</span>}
