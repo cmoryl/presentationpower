@@ -1610,7 +1610,9 @@ const DEFAULT_CLR_MAP: PptxClrMap = {
 function readClrMap(node: PNode | undefined, fallback?: PptxClrMap): PptxClrMap | undefined {
   if (!node) return fallback;
   const override = pFind(node, "p:clrMapOvr");
-  const mapNode = override ? (pFind(override, "a:overrideClrMapping") ?? pFind(override, "a:masterClrMapping")) : undefined;
+  const mapNode = override
+    ? (pFind(override, "a:overrideClrMapping") ?? pFind(override, "a:masterClrMapping"))
+    : pFind(node, "p:clrMap");
   if (!mapNode || pTag(mapNode) === "a:masterClrMapping") return fallback;
   const attrs = pAttrs(mapNode);
   const next: PptxClrMap = { ...(fallback ?? DEFAULT_CLR_MAP) };
