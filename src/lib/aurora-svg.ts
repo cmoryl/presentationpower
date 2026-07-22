@@ -67,11 +67,20 @@ export function auroraSvgDataUrl(
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
+export interface AuroraOrbSpec {
+  color: string;
+  x: number;
+  y: number;
+  rx: number;
+  ry: number;
+  alpha: number;
+}
+
 export function auroraOrbs(
   seed: string,
   brand: BrandMode,
   mode: "dark" | "light" = "dark",
-) {
+): AuroraOrbSpec[] {
   // Deterministic hash → three offset orbs painted purely from the brand's
   // own tokens. Mirrors auroraOrbs() in src/components/slide/flagship.tsx so
   // PPTX/PDF exports match what the on-screen AuroraLayer renders for the
