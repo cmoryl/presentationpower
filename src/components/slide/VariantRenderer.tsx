@@ -4053,7 +4053,7 @@ function renderVariantBody({
               const v = Number(it.value) || 0;
               const h = Math.max(40, (v / max) * 420);
               const isLast = i === items.length - 1;
-              const color = isLast ? "var(--slide-accent-text)" : ink.trackFill;
+              const color = isLast ? "var(--slide-accent-text)" : ink.surface;
               const opacity = 1;
               return (
                 <div key={i} className="flex flex-col items-center justify-end">
