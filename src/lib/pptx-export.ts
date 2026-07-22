@@ -414,6 +414,7 @@ export async function exportDeckToPptx(
     // Slide chrome dark/light selection: honor an explicit background choice
     // (color solid, image tint) so text/logos flip to legible palettes.
     const isDark = forceMode ? forceMode === "dark" : (advancedDark || kind === "cover" || kind === "divider" || bgIsImage);
+    const slidePalette = adaptPaletteForMode(palette, isDark);
     const useWhiteLogo = isDark || slide.variantId === "MV-SPLIT-MANIFESTO";
     const hideFooter = useWhiteLogo;
 
