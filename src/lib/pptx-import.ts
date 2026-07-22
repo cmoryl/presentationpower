@@ -259,6 +259,14 @@ export type ParsedTheme = {
   light1?: string;
   bodyFont?: string;
   headingFont?: string;
+  /** Theme-level background fill styles (bgFillStyleLst) — resolves `p:bgRef@idx`. */
+  bgFillStyleLst?: LayoutFill[];
+  /** Fill styles (fillStyleLst) — resolves style/fillRef. */
+  fillStyleLst?: LayoutFill[];
+  /** Line styles (lnStyleLst) — resolves style/lnRef. */
+  lineStyleLst?: LayoutLine[];
+  /** Effect styles (effectStyleLst) — resolves style/effectRef. */
+  effectStyleLst?: LayoutEffect[];
 };
 
 export type ParsedDeck = {
