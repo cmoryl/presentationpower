@@ -19,6 +19,33 @@ import {
 } from "./pptx-background";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { MODULE_VARIANTS, byId } from "./taxonomy";
+import { auroraSvgDataUrl } from "./aurora-svg";
+
+// Rasterize an SVG data URL to a PNG data URL via <canvas> so PowerPoint
+// renders our aurora backdrops reliably (some viewers ignore embedded SVG
+// image fills).
+async function svgDataUrlToPng(svgUrl: string, w = 1920, h = 1080): Promise<string | null> {
+  if (typeof document === "undefined") return null;
+  return await new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return resolve(null);
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/png"));
+      } catch {
+        resolve(null);
+      }
+    };
+    img.onerror = () => resolve(null);
+    img.src = svgUrl;
+  });
+}
 
 const SLIDE_W = 13.333;
 const SLIDE_H = 7.5;
