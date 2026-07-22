@@ -30,6 +30,7 @@ import { formatKitValidationError } from "@/lib/kit-validation";
 import { VIDEO_SLIDE_EXAMPLES, type VideoSlideExample } from "@/lib/video-slide-examples";
 import { listClientLogos } from "@/lib/client-logos.functions";
 import { toLogoFillers, overlayLogoHubFillers, type LogoFiller } from "@/lib/logohub-fillers";
+import { SaveModuleDialog } from "@/components/SaveModuleDialog";
 
 
 
@@ -312,12 +313,20 @@ function Library() {
       <div>
         <div className="flex items-center justify-between gap-4">
           <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library</div>
-          <Link
-            to="/library/imported"
-            className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7]"
-          >
-            Imported slides <span aria-hidden>→</span>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/library/my"
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7]"
+            >
+              My Modules <span aria-hidden>★</span>
+            </Link>
+            <Link
+              to="/library/imported"
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7]"
+            >
+              Imported slides <span aria-hidden>→</span>
+            </Link>
+          </div>
         </div>
         <h1 className="mt-3 text-4xl font-semibold">Approved module variants.</h1>
         <p className="mt-3 max-w-2xl text-black/60">
@@ -1078,6 +1087,7 @@ function VariantDetailModal({
   onClose: () => void;
   logoHubPool?: LogoFiller[];
 }) {
+  const [saveOpen, setSaveOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const copyId = async () => {
     try {
@@ -1115,6 +1125,7 @@ function VariantDetailModal({
 
 
   return (
+    <>
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#03002C]/70 p-6 backdrop-blur-md"
       onClick={onClose}
@@ -1165,6 +1176,14 @@ function VariantDetailModal({
             >
               <Star size={12} className={pinned ? "fill-amber-500 text-amber-600" : ""} />
               {pinned ? "Pinned" : "Pin"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setSaveOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#003FC7]/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white"
+              title="Save this variant + content as a reusable module"
+            >
+              <Star size={12} /> Save as module
             </button>
             {usageCount > 0 && (
               <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
@@ -1319,6 +1338,17 @@ function VariantDetailModal({
         </div>
       </div>
     </div>
+    <SaveModuleDialog
+      open={saveOpen}
+      onClose={() => setSaveOpen(false)}
+      variantId={variant.id}
+      variantName={variant.name}
+      content={detailContent}
+      brandMode={brand.id}
+      subCompany={null}
+      divisionId={brand.id}
+    />
+    </>
   );
 }
 

@@ -26,6 +26,7 @@ import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as DecksIndexRouteImport } from './routes/decks.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
+import { Route as LibraryMyRouteImport } from './routes/library.my'
 import { Route as LibraryImportedRouteImport } from './routes/library.imported'
 import { Route as KnowledgeOracleRouteImport } from './routes/knowledge.oracle'
 import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
@@ -142,6 +143,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
   path: '/share/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryMyRoute = LibraryMyRouteImport.update({
+  id: '/library/my',
+  path: '/library/my',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LibraryImportedRoute = LibraryImportedRouteImport.update({
@@ -344,6 +350,7 @@ export interface FileRoutesByFullPath {
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/library/imported': typeof LibraryImportedRoute
+  '/library/my': typeof LibraryMyRoute
   '/share/$token': typeof ShareTokenRoute
   '/admin/': typeof AdminIndexRoute
   '/decks/': typeof DecksIndexRoute
@@ -393,6 +400,7 @@ export interface FileRoutesByTo {
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/library/imported': typeof LibraryImportedRoute
+  '/library/my': typeof LibraryMyRoute
   '/share/$token': typeof ShareTokenRoute
   '/admin': typeof AdminIndexRoute
   '/decks': typeof DecksIndexRoute
@@ -445,6 +453,7 @@ export interface FileRoutesById {
   '/knowledge/new': typeof KnowledgeNewRoute
   '/knowledge/oracle': typeof KnowledgeOracleRoute
   '/library/imported': typeof LibraryImportedRoute
+  '/library/my': typeof LibraryMyRoute
   '/share/$token': typeof ShareTokenRoute
   '/admin/': typeof AdminIndexRoute
   '/decks/': typeof DecksIndexRoute
@@ -498,6 +507,7 @@ export interface FileRouteTypes {
     | '/knowledge/new'
     | '/knowledge/oracle'
     | '/library/imported'
+    | '/library/my'
     | '/share/$token'
     | '/admin/'
     | '/decks/'
@@ -547,6 +557,7 @@ export interface FileRouteTypes {
     | '/knowledge/new'
     | '/knowledge/oracle'
     | '/library/imported'
+    | '/library/my'
     | '/share/$token'
     | '/admin'
     | '/decks'
@@ -598,6 +609,7 @@ export interface FileRouteTypes {
     | '/knowledge/new'
     | '/knowledge/oracle'
     | '/library/imported'
+    | '/library/my'
     | '/share/$token'
     | '/admin/'
     | '/decks/'
@@ -631,6 +643,7 @@ export interface RootRouteChildren {
   BriefNewRoute: typeof BriefNewRoute
   DecksImportRoute: typeof DecksImportRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
+  LibraryMyRoute: typeof LibraryMyRoute
   ShareTokenRoute: typeof ShareTokenRoute
   DecksIndexRoute: typeof DecksIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
@@ -762,6 +775,13 @@ declare module '@tanstack/react-router' {
       path: '/share/$token'
       fullPath: '/share/$token'
       preLoaderRoute: typeof ShareTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/my': {
+      id: '/library/my'
+      path: '/library/my'
+      fullPath: '/library/my'
+      preLoaderRoute: typeof LibraryMyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/library/imported': {
@@ -1072,6 +1092,7 @@ const rootRouteChildren: RootRouteChildren = {
   BriefNewRoute: BriefNewRoute,
   DecksImportRoute: DecksImportRoute,
   LibraryImportedRoute: LibraryImportedRoute,
+  LibraryMyRoute: LibraryMyRoute,
   ShareTokenRoute: ShareTokenRoute,
   DecksIndexRoute: DecksIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
