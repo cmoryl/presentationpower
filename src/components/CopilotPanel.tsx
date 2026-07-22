@@ -35,6 +35,60 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
     const history: Msg[] = [...messages, { role: "user", content: text }];
     setMessages(history);
     setBusy(true);
+
+    // Guide mode: stream a coaching response from /api/chat (no deck edits).
+    if (mode === "guide") {
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            mode: "guide",
+            messages: history.slice(-20),
+            deckContext: {
+              title: deck.title,
+              prospect: brief?.prospect,
+              industry: brief?.industry,
+              audience: brief?.audience,
+              archetype: brief?.archetypeName,
+              slides: deck.slides.slice(0, 40).map((s) => ({
+                position: s.position,
+                section: byId(SECTION_FRAMEWORKS, s.sectionId)?.name ?? s.sectionId,
+                variant: s.variantId,
+                title: (s.content as Record<string, unknown>)?.title as string | undefined,
+              })),
+            },
+          }),
+        });
+        if (!res.ok || !res.body) {
+          const t = await res.text().catch(() => "");
+          setMessages((m) => [...m, { role: "assistant", content: `⚠️ ${res.status}: ${t.slice(0, 200)}` }]);
+        } else {
+          setMessages((m) => [...m, { role: "assistant", content: "" }]);
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            setMessages((m) => {
+              const copy = [...m];
+              copy[copy.length - 1] = {
+                role: "assistant",
+                content: copy[copy.length - 1].content + chunk,
+              };
+              return copy;
+            });
+          }
+        }
+      } catch (e) {
+        setMessages((m) => [...m, { role: "assistant", content: `⚠️ ${(e as Error).message}` }]);
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
+
     try {
       const strategy = deck.context?.strategy
         ? {
