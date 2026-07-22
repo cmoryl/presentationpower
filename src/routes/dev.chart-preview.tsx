@@ -15,6 +15,9 @@ function DevChartPreview() {
     variantId: variant.id,
     sectionId: "sec-proof",
     order: 1,
+    position: 0,
+    layoutId: null,
+    changes: [],
     content: {
       title: "Trial enrollment velocity",
       kicker: "Program telemetry",
@@ -28,7 +31,7 @@ function DevChartPreview() {
       ],
       stat: { value: "+38", unit: "%", label: "vs prior half", delta: "▲ vs H1" },
     },
-  } as Parameters<typeof VariantRenderer>[0]["slide"];
+  } as unknown as Parameters<typeof VariantRenderer>[0]["slide"];
 
   return (
     <div className="min-h-screen bg-neutral-950 p-8 space-y-8">
