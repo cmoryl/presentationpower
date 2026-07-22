@@ -1,4 +1,4 @@
-import type { StrategyPlan, StrategySection } from "./ai-strategist.functions";
+import type { DeckStrategy, StrategySection } from "./ai-strategist.functions";
 
 /**
  * Chapter grouping — takes a flat StrategyPlan and infers narrative chapters
