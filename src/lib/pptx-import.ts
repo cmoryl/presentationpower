@@ -1966,7 +1966,8 @@ function substitutePhClrInLine(line: LayoutLine | undefined, phColor: string | u
 
 function fillStyleSlot(theme: ParsedTheme | undefined, idx: number, background: boolean): LayoutFill | undefined {
   if (!theme || !(idx > 0)) return undefined;
-  const list = idx >= 1001 ? theme.bgFillStyleLst : background ? (theme.bgFillStyleLst ?? theme.fillStyleLst) : theme.fillStyleLst;
+  void background;
+  const list = idx >= 1001 ? theme.bgFillStyleLst : theme.fillStyleLst;
   if (!list?.length) return undefined;
   const slot = idx >= 1001 ? idx - 1001 : Math.max(0, idx - 1);
   if (slot < 0) return undefined;
@@ -2563,7 +2564,7 @@ function extractSlideLayout(
   const root = orderParser.parse(xml) as PNode[];
   const sld = root.find((n) => pTag(n) === "p:sld");
   const sldNode = sld ?? root[0];
-  const clrMap = readClrMap(sldNode, DEFAULT_CLR_MAP);
+  const clrMap = readClrMap(sldNode, parents?.layout?.clrMap ?? parents?.master?.clrMap ?? DEFAULT_CLR_MAP);
   const cSld = sldNode ? pFind(sldNode, "p:cSld") : undefined;
   const spTree = cSld ? pFind(cSld, "p:spTree") : undefined;
   const shapes: LayoutShape[] = [];
