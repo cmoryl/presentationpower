@@ -2965,19 +2965,36 @@ function renderVariantBody({
 
     case "MV-CLOSE-DECISION":
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <div className="flex h-full flex-col justify-center">
-            <Kicker brand={brand}>{s(c.kicker, "The ask")}</Kicker>
-            <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-8 mb-10" />
-            <DisplayTitle size="cover" color={ink.strong} maxWidthPx={1600}>{s(c.ask)}</DisplayTitle>
-            <SupportingText size="xl" opacity={0.85} className="mt-10" maxWidthPx={1180}>{s(c.rationale)}</SupportingText>
-            <div className="mt-16 flex items-baseline gap-10">
-              <Kicker brand={brand} color={ink.faint}>Decision by</Kicker>
-              <div style={{ fontSize: 42, fontWeight: 600, letterSpacing: "-0.02em", color: "var(--slide-accent-text)" }}>{s(c.decisionBy)}</div>
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
+          <AuroraOrb x={88} y={30} size={860} />
+          <div className="relative grid h-full grid-cols-[1.15fr_0.85fr] items-center gap-24">
+            <div>
+              <Kicker brand={brand}>{s(c.kicker, "The ask")}</Kicker>
+              <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-8 mb-10" />
+              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>{s(c.ask)}</DisplayTitle>
+              <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={880}>{s(c.rationale)}</SupportingText>
             </div>
+            <GlassTile radius={28} padding="px-12 py-12">
+              <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", fontWeight: 600, color: ink.faint }}>
+                Decision by
+              </div>
+              <div
+                className="mt-8 tabular-nums"
+                style={{ fontSize: 96, lineHeight: 1, fontWeight: 600, letterSpacing: "-0.03em", color: "var(--slide-accent-text)" }}
+              >
+                {s(c.decisionBy, "—")}
+              </div>
+              {s(c.owner) && (
+                <div className="mt-10 pt-8" style={{ borderTop: `1px solid ${ink.hairline}` }}>
+                  <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", fontWeight: 600, color: ink.faint }}>Owner</div>
+                  <div className="mt-2" style={{ fontSize: 24, fontWeight: 600, color: ink.strong }}>{s(c.owner)}</div>
+                </div>
+              )}
+            </GlassTile>
           </div>
         </SlideFrame>
       );
+
 
     case "MV-CLOSE-CALENDAR":
       return (
