@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, Trash2, Bookmark, Search } from "lucide-react";
+import { Loader2, Trash2, Bookmark, Search, Plus, Check, AlertTriangle } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -11,6 +11,15 @@ import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { listMyModules, deleteSavedModule } from "@/lib/saved-modules.functions";
 import { byId, MODULE_VARIANTS, BRAND_MODES, type ModuleVariant } from "@/lib/taxonomy";
+import { useSurfaceStore } from "@/lib/surface-store";
+import {
+  SURFACE_FORMATS,
+  SURFACE_LABELS,
+  variantSupportsSurface,
+  type ModuleInstance,
+  type SurfaceKind,
+  type SurfaceFormat,
+} from "@/lib/module-instance";
 
 export const Route = createFileRoute("/library/my")({
   head: () => ({
