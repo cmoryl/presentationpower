@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LogohubRouteImport } from './routes/logohub'
-import { Route as LibraryRouteImport } from './routes/library'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as ImageryRouteImport } from './routes/imagery'
 import { Route as FaqRouteImport } from './routes/faq'
@@ -22,6 +21,7 @@ import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as DecksIndexRouteImport } from './routes/decks.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -74,11 +74,6 @@ const LogohubRoute = LogohubRouteImport.update({
   path: '/logohub',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LibraryRoute = LibraryRouteImport.update({
-  id: '/library',
-  path: '/library',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const KnowledgeRoute = KnowledgeRouteImport.update({
   id: '/knowledge',
   path: '/knowledge',
@@ -124,6 +119,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LibraryIndexRoute = LibraryIndexRouteImport.update({
+  id: '/library/',
+  path: '/library/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KnowledgeIndexRoute = KnowledgeIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -145,9 +145,9 @@ const ShareTokenRoute = ShareTokenRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const LibraryImportedRoute = LibraryImportedRouteImport.update({
-  id: '/imported',
-  path: '/imported',
-  getParentRoute: () => LibraryRoute,
+  id: '/library/imported',
+  path: '/library/imported',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const KnowledgeOracleRoute = KnowledgeOracleRouteImport.update({
   id: '/oracle',
@@ -318,7 +318,6 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
-  '/library': typeof LibraryRouteWithChildren
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
   '/templates': typeof TemplatesRoute
@@ -349,6 +348,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/decks/': typeof DecksIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
+  '/library/': typeof LibraryIndexRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
@@ -367,7 +367,6 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
-  '/library': typeof LibraryRouteWithChildren
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
   '/templates': typeof TemplatesRoute
@@ -398,6 +397,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/decks': typeof DecksIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
+  '/library': typeof LibraryIndexRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
@@ -419,7 +419,6 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
-  '/library': typeof LibraryRouteWithChildren
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
   '/templates': typeof TemplatesRoute
@@ -450,6 +449,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/decks/': typeof DecksIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
+  '/library/': typeof LibraryIndexRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
@@ -472,7 +472,6 @@ export interface FileRouteTypes {
     | '/faq'
     | '/imagery'
     | '/knowledge'
-    | '/library'
     | '/logohub'
     | '/reset-password'
     | '/templates'
@@ -503,6 +502,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/decks/'
     | '/knowledge/'
+    | '/library/'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/pdf-index-proxy'
     | '/decks/$deckId/document'
@@ -521,7 +521,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/faq'
     | '/imagery'
-    | '/library'
     | '/logohub'
     | '/reset-password'
     | '/templates'
@@ -552,6 +551,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/decks'
     | '/knowledge'
+    | '/library'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/pdf-index-proxy'
     | '/decks/$deckId/document'
@@ -572,7 +572,6 @@ export interface FileRouteTypes {
     | '/faq'
     | '/imagery'
     | '/knowledge'
-    | '/library'
     | '/logohub'
     | '/reset-password'
     | '/templates'
@@ -603,6 +602,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/decks/'
     | '/knowledge/'
+    | '/library/'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/pdf-index-proxy'
     | '/decks/$deckId/document'
@@ -624,15 +624,16 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   ImageryRoute: typeof ImageryRoute
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
-  LibraryRoute: typeof LibraryRouteWithChildren
   LogohubRoute: typeof LogohubRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TemplatesRoute: typeof TemplatesRoute
   ApiChatRoute: typeof ApiChatRoute
   BriefNewRoute: typeof BriefNewRoute
   DecksImportRoute: typeof DecksImportRoute
+  LibraryImportedRoute: typeof LibraryImportedRoute
   ShareTokenRoute: typeof ShareTokenRoute
   DecksIndexRoute: typeof DecksIndexRoute
+  LibraryIndexRoute: typeof LibraryIndexRoute
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
   ApiPublicPdfIndexProxyRoute: typeof ApiPublicPdfIndexProxyRoute
   DecksDeckIdDocumentRoute: typeof DecksDeckIdDocumentRoute
@@ -663,13 +664,6 @@ declare module '@tanstack/react-router' {
       path: '/logohub'
       fullPath: '/logohub'
       preLoaderRoute: typeof LogohubRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/library': {
-      id: '/library'
-      path: '/library'
-      fullPath: '/library'
-      preLoaderRoute: typeof LibraryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/knowledge': {
@@ -735,6 +729,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/library/': {
+      id: '/library/'
+      path: '/library'
+      fullPath: '/library/'
+      preLoaderRoute: typeof LibraryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/knowledge/': {
       id: '/knowledge/'
       path: '/'
@@ -765,10 +766,10 @@ declare module '@tanstack/react-router' {
     }
     '/library/imported': {
       id: '/library/imported'
-      path: '/imported'
+      path: '/library/imported'
       fullPath: '/library/imported'
       preLoaderRoute: typeof LibraryImportedRouteImport
-      parentRoute: typeof LibraryRoute
+      parentRoute: typeof rootRouteImport
     }
     '/knowledge/oracle': {
       id: '/knowledge/oracle'
@@ -1054,17 +1055,6 @@ const KnowledgeRouteWithChildren = KnowledgeRoute._addFileChildren(
   KnowledgeRouteChildren,
 )
 
-interface LibraryRouteChildren {
-  LibraryImportedRoute: typeof LibraryImportedRoute
-}
-
-const LibraryRouteChildren: LibraryRouteChildren = {
-  LibraryImportedRoute: LibraryImportedRoute,
-}
-
-const LibraryRouteWithChildren =
-  LibraryRoute._addFileChildren(LibraryRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -1075,15 +1065,16 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   ImageryRoute: ImageryRoute,
   KnowledgeRoute: KnowledgeRouteWithChildren,
-  LibraryRoute: LibraryRouteWithChildren,
   LogohubRoute: LogohubRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TemplatesRoute: TemplatesRoute,
   ApiChatRoute: ApiChatRoute,
   BriefNewRoute: BriefNewRoute,
   DecksImportRoute: DecksImportRoute,
+  LibraryImportedRoute: LibraryImportedRoute,
   ShareTokenRoute: ShareTokenRoute,
   DecksIndexRoute: DecksIndexRoute,
+  LibraryIndexRoute: LibraryIndexRoute,
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
   ApiPublicPdfIndexProxyRoute: ApiPublicPdfIndexProxyRoute,
   DecksDeckIdDocumentRoute: DecksDeckIdDocumentRoute,
