@@ -1,5 +1,5 @@
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
-import { SlideFrame as BaseSlideFrame, SlideModeContext, SlideBackdropContext, type SlideMode, type SlideBackdrop } from "./SlideChrome";
+import { SlideFrame as BaseSlideFrame, SlideModeContext, SlideBackdropContext, SlideAccentContext, type SlideMode, type SlideBackdrop } from "./SlideChrome";
 import { SlideThumbnailContext, SlideVideoPreviewContext, useResolvedVideoUrl, useResolvedPosterUrl, useResolvedImageUrl, useResolvedLogoUrl } from "@/lib/slide-media-refresh";
 import { resolveSlideBackground } from "@/lib/background-library";
 import { backdropForVariant } from "./variantBackdrop";
