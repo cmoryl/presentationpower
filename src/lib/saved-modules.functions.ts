@@ -93,7 +93,7 @@ export const updateSavedModule = createServerFn({ method: "POST" })
     if (p.saveKind !== undefined) dbPatch.save_kind = p.saveKind;
     const { data: row, error } = await context.supabase
       .from("saved_modules")
-      .update(dbPatch)
+      .update(dbPatch as never)
       .eq("id", data.id)
       .select("*")
       .single();
