@@ -1087,6 +1087,7 @@ function VariantDetailModal({
   onClose: () => void;
   logoHubPool?: LogoFiller[];
 }) {
+  const [saveOpen, setSaveOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const copyId = async () => {
     try {
