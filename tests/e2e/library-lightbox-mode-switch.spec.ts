@@ -1,0 +1,123 @@
+import { test, expect, type Page } from "@playwright/test";
+
+/**
+ * Verifies persistent, isolated video playback in the library lightbox:
+ *
+ *  1. Open a video-demo card into the lightbox (starts in LIGHT mode).
+ *  2. Let the light preview autoplay and record its currentTime.
+ *  3. Switch to DARK using the in-lightbox theme toggle.
+ *  4. Assert the previous (light) video is no longer playing.
+ *  5. Assert the new (dark) video resumes from the persisted currentTime
+ *     (per videoPlaybackStore in VariantRenderer), not from 0.
+ */
+
+const LIGHTBOX = '[data-preview-role="module-lightbox"]';
+
+async function scrollToLoadAll(page: Page) {
+  await page.evaluate(async () => {
+    const step = Math.floor(window.innerHeight * 0.85);
+    const max = () =>
+      Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    for (let y = 0; y < max(); y += step) {
+      window.scrollTo(0, y);
+      await new Promise((r) => setTimeout(r, 150));
+    }
+    window.scrollTo(0, 0);
+    await new Promise((r) => setTimeout(r, 200));
+  });
+}
+
+async function readActiveVideo(page: Page, mode: "light" | "dark") {
+  return await page.evaluate((m) => {
+    const stage = document.querySelector(
+      `[data-preview-role="module-lightbox"][data-preview-mode="${m}"]`,
+    );
+    if (!stage) return null;
+    const v = stage.querySelector("video") as HTMLVideoElement | null;
+    if (!v) return null;
+    return {
+      src: v.currentSrc || v.src,
+      paused: v.paused,
+      currentTime: v.currentTime,
+      readyState: v.readyState,
+    };
+  }, mode);
+}
+
+async function waitForPlaying(page: Page, mode: "light" | "dark", timeoutMs = 15_000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const snap = await readActiveVideo(page, mode);
+    if (snap && !snap.paused && snap.currentTime > 0.05 && snap.readyState >= 2) {
+      return snap;
+    }
+    await page.waitForTimeout(200);
+  }
+  throw new Error(`No ${mode}-mode video started playing within ${timeoutMs}ms`);
+}
+
+test.describe("Library lightbox mode switch", () => {
+  test("pauses previous-mode video and resumes new-mode video from persisted time", async ({
+    page,
+  }) => {
+    await page.goto("/library", { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("networkidle").catch(() => undefined);
+    await scrollToLoadAll(page);
+
+    // Video-demo cards render a "Zoom" affordance (non-video cards say "Details").
+    const zoomCard = page
+      .locator('button:has(span:has-text("Zoom"))')
+      .first();
+    await expect(zoomCard, "no video-demo card with a Zoom affordance").toBeVisible({
+      timeout: 15_000,
+    });
+    await zoomCard.scrollIntoViewIfNeeded();
+    await zoomCard.click();
+
+    // Lightbox mounts in LIGHT mode.
+    const lightStage = page.locator(`${LIGHTBOX}[data-preview-mode="light"]`);
+    await expect(lightStage).toBeVisible({ timeout: 10_000 });
+
+    // Wait for the light video to autoplay, then let it advance so
+    // videoPlaybackStore captures a non-zero currentTime on unmount.
+    const lightSnap = await waitForPlaying(page, "light");
+    await page.waitForTimeout(1500);
+    const lightBeforeSwitch = await readActiveVideo(page, "light");
+    expect(lightBeforeSwitch).not.toBeNull();
+    const persistedTime = lightBeforeSwitch!.currentTime;
+    expect(persistedTime, "light video did not advance before switch").toBeGreaterThan(
+      0.3,
+    );
+    const lightSrc = lightSnap.src;
+
+    // Flip the in-lightbox toggle to DARK.
+    await page.getByRole("button", { name: /Dark/ }).click();
+
+    // Dark stage takes over; the light stage should no longer exist.
+    const darkStage = page.locator(`${LIGHTBOX}[data-preview-mode="dark"]`);
+    await expect(darkStage).toBeVisible({ timeout: 10_000 });
+    await expect(lightStage).toHaveCount(0);
+
+    // Any video still carrying the previous (light) src must not be playing
+    // — mode switch unmounts the light preview and the store snapshots it.
+    const stalePlaying = await page.evaluate((src) => {
+      return Array.from(document.querySelectorAll("video"))
+        .filter((v) => (v.currentSrc || v.src) === src && !v.paused && v.currentTime > 0.05)
+        .map((v) => ({ src: v.currentSrc || v.src, t: v.currentTime }));
+    }, lightSrc);
+    expect(
+      stalePlaying,
+      `previous-mode video kept playing after switch: ${JSON.stringify(stalePlaying)}`,
+    ).toEqual([]);
+
+    // Dark video must resume — not reset — from the persisted currentTime.
+    const darkSnap = await waitForPlaying(page, "dark");
+    // Same underlying media URL (light + dark previews share the video).
+    expect(darkSnap.src).toBe(lightSrc);
+    // Allow a small tolerance for the brief mount/seek window.
+    expect(
+      darkSnap.currentTime,
+      `dark video started at ${darkSnap.currentTime}s but expected to resume near ${persistedTime}s`,
+    ).toBeGreaterThanOrEqual(Math.max(0.1, persistedTime - 0.75));
+  });
+});
