@@ -5322,7 +5322,9 @@ function AuroraStatCell({
 }
 
 
+function StatGrid({
   brand,
+
   pageNumber,
   title,
   items,
