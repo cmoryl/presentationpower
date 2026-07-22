@@ -477,19 +477,19 @@ export async function exportDeckToPptx(
 
 
     try {
-      if (!renderAdvancedVariant(s, slide, palette, slideItemLogos[i])) {
+      if (!renderAdvancedVariant(s, slide, slidePalette, slideItemLogos[i])) {
         switch (kind) {
           case "cover":
-            renderCover(s, slide, palette);
+            renderCover(s, slide, slidePalette);
             break;
           case "divider":
-            renderDivider(s, slide, palette);
+            renderDivider(s, slide, slidePalette);
             break;
           case "agenda":
-            renderAgenda(s, slide, palette);
+            renderAgenda(s, slide, slidePalette);
             break;
           case "stats":
-            renderStats(s, slide, palette);
+            renderStats(s, slide, slidePalette);
             break;
           case "quote":
             renderQuote(s, slide, palette);
