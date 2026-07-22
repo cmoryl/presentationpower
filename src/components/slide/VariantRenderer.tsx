@@ -4192,7 +4192,7 @@ function renderVariantBody({
     case "MV-ED-QUOTE-BLEED": {
       const quote = s(c.quote, "The best interfaces get out of the way.").replace(/^["'“”]|["'“”]$/g, "");
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber} variant="quote">
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote-bleed"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} className="absolute inset-0 h-full w-full rounded-none" />
           <div
             aria-hidden
@@ -4215,12 +4215,8 @@ function renderVariantBody({
             >
               {quote}
             </div>
-            <div className="mt-12 flex items-center gap-6">
-              <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} />
-              <Attribution>
-                {s(c.attribution, "Attributed source")}
-                {s(c.role) && <span style={{ opacity: 0.75 }}> · {s(c.role)}</span>}
-              </Attribution>
+            <div className="mt-12">
+              <Attribution brand={brand} name={s(c.attribution, "Attributed source")} role={s(c.role) || undefined} />
             </div>
           </div>
         </SlideFrame>
