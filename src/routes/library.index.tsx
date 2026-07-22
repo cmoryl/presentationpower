@@ -11,7 +11,7 @@ import { LazyMount } from "@/components/LazyMount";
 import { WcagBadge } from "@/components/WcagBadge";
 import { TypeBadge } from "@/components/TypeBadge";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
-import { SlideVideoPreviewContext, SlideThumbnailContext } from "@/lib/slide-media-refresh";
+import { SlideVideoPreviewContext, SlideThumbnailContext, SlideForceVideoAutoplayContext } from "@/lib/slide-media-refresh";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 
 import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
@@ -847,7 +847,9 @@ const VariantCard = memo(function VariantCard({
                   <ScaledSlide>
                     <SlideBackdropContext.Provider value={m === "dark" ? darkBackdrop : lightBackdrop}>
                       <SlideThumbnailContext.Provider value={true}>
-                        <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={m} />
+                        <SlideForceVideoAutoplayContext.Provider value={Boolean(videoExample)}>
+                          <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={m} />
+                        </SlideForceVideoAutoplayContext.Provider>
                       </SlideThumbnailContext.Provider>
                     </SlideBackdropContext.Provider>
                   </ScaledSlide>
@@ -881,7 +883,9 @@ const VariantCard = memo(function VariantCard({
         <ScaledSlide>
           <SlideBackdropContext.Provider value={singleBackdrop}>
             <SlideThumbnailContext.Provider value={true}>
-              <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={isDark ? "dark" : "light"} />
+              <SlideForceVideoAutoplayContext.Provider value={Boolean(videoExample)}>
+                <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={isDark ? "dark" : "light"} />
+              </SlideForceVideoAutoplayContext.Provider>
             </SlideThumbnailContext.Provider>
           </SlideBackdropContext.Provider>
         </ScaledSlide>
@@ -1614,7 +1618,9 @@ function LightboxPortal({
             <ScaledSlide>
               <SlideBackdropContext.Provider value={isDark ? darkBackdrop : lightBackdrop}>
                 <SlideVideoPreviewContext.Provider value={setPlayUrl}>
-                  <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
+                  <SlideForceVideoAutoplayContext.Provider value={true}>
+                    <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
+                  </SlideForceVideoAutoplayContext.Provider>
                 </SlideVideoPreviewContext.Provider>
               </SlideBackdropContext.Provider>
             </ScaledSlide>

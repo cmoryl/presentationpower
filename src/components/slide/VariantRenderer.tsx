@@ -1,7 +1,7 @@
 import * as React from "react";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import { SlideFrame as BaseSlideFrame, SlideModeContext, SlideBackdropContext, SlideAccentContext, SlideInkContext, makeSlideInk, useSlideInk, type SlideMode, type SlideBackdrop } from "./SlideChrome";
-import { SlideThumbnailContext, SlideVideoPreviewContext, useResolvedVideoUrl, useResolvedPosterUrl, useResolvedImageUrl, useResolvedLogoUrl } from "@/lib/slide-media-refresh";
+import { SlideThumbnailContext, SlideVideoPreviewContext, SlideForceVideoAutoplayContext, useResolvedVideoUrl, useResolvedPosterUrl, useResolvedImageUrl, useResolvedLogoUrl } from "@/lib/slide-media-refresh";
 import { resolveSlideBackground } from "@/lib/background-library";
 import { backdropForVariant } from "./variantBackdrop";
 
@@ -4884,6 +4884,7 @@ function MediaTile({
 }) {
   const mode = useContext(SlideModeContext);
   const isThumbnail = useContext(SlideThumbnailContext);
+  const forceAutoplay = useContext(SlideForceVideoAutoplayContext);
   const openVideoPreview = useContext(SlideVideoPreviewContext);
   const resolvedVideoUrl = useResolvedVideoUrl(videoPath, videoUrl);
   const resolvedPosterUrl = useResolvedPosterUrl(videoPosterPath, videoPosterUrl);
@@ -4893,19 +4894,21 @@ function MediaTile({
 
   // Detect present/share playback context (client-only) so we autoplay
   // video there but not in the editor's slide grid — a wall of autoplaying
-  // videos is a perf and attention disaster. Thumbnails always suppress.
+  // videos is a perf and attention disaster. Thumbnails always suppress,
+  // UNLESS SlideForceVideoAutoplayContext explicitly opts in (library
+  // "video demo" cards where playback IS the point).
   const [autoplay, setAutoplay] = useState(false);
   useEffect(() => {
     if (typeof document === "undefined") return;
     const check = () => {
       const cls = document.body.classList;
-      setAutoplay(!isThumbnail && (cls.contains("present-mode") || cls.contains("share-mode")));
+      setAutoplay(forceAutoplay || (!isThumbnail && (cls.contains("present-mode") || cls.contains("share-mode"))));
     };
     check();
     const obs = new MutationObserver(check);
     obs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
     return () => obs.disconnect();
-  }, [isThumbnail]);
+  }, [isThumbnail, forceAutoplay]);
 
   // Per-slide playback settings (defaults preserve current behavior).
   const wantAutoplay = videoAutoplay !== false;

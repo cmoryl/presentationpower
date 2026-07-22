@@ -48,6 +48,10 @@ export const SlideThumbnailContext = createContext<boolean>(false);
  *  stay decorative. */
 export const SlideVideoPreviewContext = createContext<null | ((videoUrl: string) => void)>(null);
 
+/** When true, MediaTile SHOULD autoplay video even inside a thumbnail —
+ *  used for the library's "video demo" cards where playback IS the point. */
+export const SlideForceVideoAutoplayContext = createContext<boolean>(false);
+
 export function useResolvedVideoUrl(path?: string, fallback?: string): string | undefined {
   const ctx = useContext(SlideMediaRefreshContext);
   if (path && ctx.videoUrls.has(path)) return ctx.videoUrls.get(path);
