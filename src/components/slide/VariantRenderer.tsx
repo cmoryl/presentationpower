@@ -5547,7 +5547,7 @@ function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; p
 
 
 
-function AreaChart({ brand: _brand, series, height = 480, bare = false, airy = false }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; bare?: boolean; airy?: boolean }) {
+function AreaChart({ brand: _brand, series, height = 480 }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; bare?: boolean; airy?: boolean }) {
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
   const w = 1000;
@@ -5563,38 +5563,21 @@ function AreaChart({ brand: _brand, series, height = 480, bare = false, airy = f
   const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z` : "";
   const showEvery = series.length > 8 ? Math.ceil(series.length / 8) : 1;
   const last = pts[pts.length - 1];
-  const svg = (
+  return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      {airy ? (
-        <defs>
-          <linearGradient id={`${id}-airy`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"  stopColor="var(--slide-accent-text)" stopOpacity={0.16} />
-            <stop offset="65%" stopColor="var(--slide-accent-text)" stopOpacity={0.05} />
-            <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
-          </linearGradient>
-        </defs>
-      ) : (
-        <ChartAccentDefs id={id} />
-      )}
+      <AiryDefs id={id} />
       <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairline} strokeWidth={1} />
-      {areaPath && <path d={areaPath} fill={airy ? `url(#${id}-airy)` : `url(#${id}-fill)`} />}
-      {!airy && <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" opacity={0.32} filter={`url(#${id}-glow)`} />}
-      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={airy ? 2 : 2.5} strokeLinecap="round" strokeLinejoin="round" />
-      {last && !airy && <>
-        <circle cx={last[0]} cy={last[1]} r={9} fill="var(--slide-accent-text)" opacity={0.35} filter={`url(#${id}-glow)`} />
-        <circle cx={last[0]} cy={last[1]} r={5} fill={`url(#${id}-dot)`} />
-      </>}
-      {last && airy && <circle cx={last[0]} cy={last[1]} r={4.5} fill="var(--slide-accent-text)" />}
+      {areaPath && <path d={areaPath} fill={`url(#${id}-airy)`} />}
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      {last && <circle cx={last[0]} cy={last[1]} r={4.5} fill="var(--slide-accent-text)" />}
       {series.map((p, i) => (i % showEvery === 0 || i === series.length - 1) ? (
         <text key={i} x={pts[i]?.[0]} y={h - padB + 28} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{p.label}</text>
       ) : null)}
     </svg>
   );
-  if (bare || airy) return svg;
-  return <GlassChartPanel padding="px-6 py-6" bloomAnchor="br">{svg}</GlassChartPanel>;
 }
 
-function BarChart({ brand: _brand, bars, height = 480, highlight, bare = false }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string; bare?: boolean }) {
+function BarChart({ brand: _brand, bars, height = 480, highlight }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string; bare?: boolean }) {
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
   const w = 900;
@@ -5604,20 +5587,19 @@ function BarChart({ brand: _brand, bars, height = 480, highlight, bare = false }
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(bars.length, 1);
   const barW = slot * 0.5;
-  const svg = (
+  return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      <ChartAccentDefs id={id} />
+      <AiryDefs id={id} />
       <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
       {bars.map((b, i) => {
         const bh = (b.value / max) * chartH;
         const x = padL + i * slot + (slot - barW) / 2;
         const y = h - padB - bh;
         const isHi = highlight ? b.label === highlight : false;
-        const fill = isHi ? `url(#${id}-bar)` : ink.trackFill;
         return (
           <g key={i}>
-            {isHi && <rect x={x - 6} y={y - 6} width={barW + 12} height={bh + 6} fill="var(--slide-accent-text)" opacity={0.22} rx={8} filter={`url(#${id}-glow)`} />}
-            <rect x={x} y={y} width={barW} height={bh} fill={fill} rx={2} />
+            <rect x={x} y={y} width={barW} height={bh} fill={isHi ? `url(#${id}-airy)` : ink.trackFill} rx={2} />
+            {isHi && <rect x={x} y={y} width={barW} height={2} fill="var(--slide-accent-text)" />}
             <text x={x + barW / 2} y={h - padB + 30} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{b.label}</text>
             <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={isHi ? 26 : 18} fontWeight={600} fill={isHi ? ink.text : ink.muted} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{b.value}</text>
           </g>
@@ -5625,8 +5607,6 @@ function BarChart({ brand: _brand, bars, height = 480, highlight, bare = false }
       })}
     </svg>
   );
-  if (bare) return svg;
-  return <GlassChartPanel padding="px-6 py-6" bloomAnchor="tr">{svg}</GlassChartPanel>;
 }
 
 
