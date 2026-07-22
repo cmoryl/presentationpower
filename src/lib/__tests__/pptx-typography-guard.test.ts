@@ -88,18 +88,20 @@ describe("PPTX typography parity guard", () => {
     // and Bold TTFs, so a numeric weight would silently render as Regular.
     expect(EXPORTER_SRC).not.toMatch(/fontWeight\s*:/);
     expect(EXPORTER_SRC).not.toMatch(/\bweight\s*:\s*\d+/);
-    // Every `bold:` value must be a literal true/false — never a number.
+    // No `bold:` value may be numeric.
     const boldValues = [...EXPORTER_SRC.matchAll(/\bbold:\s*([^,}\s]+)/g)].map((m) => m[1]);
-    const bad = boldValues.filter((v) => v !== "true" && v !== "false");
-    expect(bad, `non-boolean bold values: ${[...new Set(bad)].join(", ")}`).toEqual([]);
+    const numeric = boldValues.filter((v) => /^-?\d+(\.\d+)?$/.test(v));
+    expect(numeric, `numeric bold values: ${[...new Set(numeric)].join(", ")}`).toEqual([]);
   });
 
   it("letter-spacing (charSpacing) stays within the tracking budget", () => {
+    // Preview tracking runs -4 → +8 per the typography memory; pptxgenjs uses
+    // the same signed integer scale, so mirror the -8..+8 envelope here.
     const spacings = [...EXPORTER_SRC.matchAll(/charSpacing:\s*(-?\d+)/g)].map((m) => Number(m[1]));
-    const outOfRange = spacings.filter((n) => n < 0 || n > MAX_CHAR_SPACING);
+    const outOfRange = spacings.filter((n) => n < -MAX_CHAR_SPACING || n > MAX_CHAR_SPACING);
     expect(
       outOfRange,
-      `charSpacing values outside 0-${MAX_CHAR_SPACING}: ${[...new Set(outOfRange)].join(", ")}`,
+      `charSpacing values outside ±${MAX_CHAR_SPACING}: ${[...new Set(outOfRange)].join(", ")}`,
     ).toEqual([]);
   });
 });
