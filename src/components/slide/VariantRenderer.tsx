@@ -561,34 +561,116 @@ function renderVariantBody({
 
     case "MV-OP-INTRO-TEAM":
     case "MV-TEAM-BIOS-3":
-    case "MV-TEAM-BIOS-4":
+    case "MV-TEAM-BIOS-4": {
+      const people = arr(c.items);
+      const cols = people.length === 4 ? 4 : people.length === 2 ? 2 : 3;
+      const portraitPx = cols === 4 ? 168 : 200;
+      const roleColor = isDark ? "rgba(255,255,255,0.62)" : "rgba(10,15,28,0.58)";
+      const cardBg = isDark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)";
+      const cardRing = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Team")} />
-          <div className={`mt-14 grid gap-12 ${arr(c.items).length === 4 ? "grid-cols-4" : arr(c.items).length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
-            {arr(c.items).map((p, i) => (
-              <div key={i} className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+          <div className={`mt-14 grid gap-8 ${cols === 4 ? "grid-cols-4" : cols === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
+            {people.map((p, i) => {
+              const name = s(p.name);
+              const initials = name
+                .split(/\s+/)
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((w) => w[0]?.toUpperCase() ?? "")
+                .join("");
+              const photo = s(p.photoUrl ?? p.avatarUrl ?? p.imageUrl);
+              return (
                 <div
-                  className="mb-6 h-24 w-24 rounded-full"
-                  style={{ backgroundColor: brand.tokens.accent, opacity: 0.9 }}
-                  aria-hidden
-                />
-                <div style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: brand.tokens.primary }}>
-                  {s(p.name)}
-                </div>
-                {s(p.role) && (
-                  <div className="mt-2 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "rgba(10,15,28,0.62)", fontWeight: 500 }}>
-                    {s(p.role)}
+                  key={i}
+                  className="relative overflow-hidden rounded-3xl p-10"
+                  style={{
+                    background: cardBg,
+                    border: `1px solid ${cardRing}`,
+                    backgroundImage: `radial-gradient(120% 60% at 50% -20%, ${brand.tokens.accent}${isDark ? "1F" : "14"} 0%, transparent 60%)`,
+                  }}
+                >
+                  <div
+                    aria-hidden
+                    className="absolute inset-x-0 top-0 h-[3px]"
+                    style={{
+                      background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 85%)`,
+                    }}
+                  />
+                  <div className="flex flex-col items-start">
+                    <div
+                      className="relative mb-8 grid place-items-center rounded-full"
+                      style={{
+                        width: portraitPx,
+                        height: portraitPx,
+                        background: photo
+                          ? undefined
+                          : `radial-gradient(circle at 30% 25%, ${brand.tokens.accent}55 0%, ${brand.tokens.primary}CC 70%)`,
+                        boxShadow: `0 0 0 2px ${brand.tokens.accent}55, 0 24px 60px -20px ${brand.tokens.accent}66`,
+                        overflow: "hidden",
+                      }}
+                    >
+                      {photo ? (
+                        <img src={photo} alt={name} className="h-full w-full object-cover" />
+                      ) : (
+                        <span
+                          style={{
+                            color: "#ffffff",
+                            fontSize: portraitPx * 0.36,
+                            fontWeight: 600,
+                            letterSpacing: "-0.02em",
+                          }}
+                        >
+                          {initials || "•"}
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 32,
+                        fontWeight: 600,
+                        letterSpacing: "-0.02em",
+                        color: ink.strong,
+                        lineHeight: 1.1,
+                      }}
+                    >
+                      {name}
+                    </div>
+                    {s(p.role) && (
+                      <div
+                        className="mt-3 uppercase"
+                        style={{
+                          fontSize: 15,
+                          letterSpacing: "0.24em",
+                          color: roleColor,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {s(p.role)}
+                      </div>
+                    )}
+                    {s(p.bio ?? p.note) && (
+                      <div
+                        className="mt-6"
+                        style={{
+                          fontSize: 20,
+                          lineHeight: 1.45,
+                          color: ink.body,
+                          maxWidth: 420,
+                        }}
+                      >
+                        {s(p.bio ?? p.note)}
+                      </div>
+                    )}
                   </div>
-                )}
-                <SupportingText size="md" opacity={0.72} className="mt-5" maxWidthPx={420}>
-                  {s(p.bio ?? p.note)}
-                </SupportingText>
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         </SlideFrame>
       );
+    }
 
     // ── Context & Challenge ───────────────────────────────────────────
     case "MV-CTX-CARDS-3":
