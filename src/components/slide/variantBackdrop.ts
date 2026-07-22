@@ -102,10 +102,13 @@ function _computeBackdrop(
   const abstracts = set.abstracts;
 
   // ── Aurora backdrop (Flagship 2026, "Aesop" spec) ───────────────────────
-  // A curated set of hero variants renders on the procedural AuroraLayer:
-  // navy field + 3 large soft-focus orbs in brand accent/primary + shifted
-  // violet/cyan. Only opts in for the master TransPerfect Corporate brand
-  // in dark mode so division decks keep their photographic identity.
+  // A curated set of hero variants renders on the procedural AuroraLayer.
+  // Dark mode: navy field + 3 soft orbs derived from the brand's own primary,
+  // accent, and a computed sibling hue — so Corporate stays blue, Life Sci
+  // teal, Legal gold, Media magenta, Gaming pink, etc.
+  // Light mode: white field with the same brand-derived orbs at low opacity
+  // (the "light aura" wash), so every division keeps its accent signature
+  // regardless of theme.
   const auroraVariants = new Set<string>([
     "MV-INS-QUOTE",
     "MV-CASE-SPREAD",
@@ -115,9 +118,12 @@ function _computeBackdrop(
     "MV-PROOF-STAT-GRID",
     "MV-INS-BIG-IDEA",
   ]);
-  if (mode === "dark" && brandId === "bm-enterprise" && auroraVariants.has(id)) {
-    return { aurora: true, auroraSeed: id, darkChrome: true, tint: "#03002C" };
+  if (auroraVariants.has(id)) {
+    return mode === "dark"
+      ? { aurora: true, auroraSeed: id, darkChrome: true, tint: "#03002C" }
+      : { aurora: true, auroraSeed: id, darkChrome: false, tint: "#FFFFFF" };
   }
+
 
   // Master TransPerfect / Corporate brand in dark mode uses the curated
   // on-brand gradient set. Only affects bm-enterprise + dark — other
