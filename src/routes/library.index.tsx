@@ -883,7 +883,9 @@ const VariantCard = memo(function VariantCard({
         <ScaledSlide>
           <SlideBackdropContext.Provider value={singleBackdrop}>
             <SlideThumbnailContext.Provider value={true}>
-              <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={isDark ? "dark" : "light"} />
+              <SlideForceVideoAutoplayContext.Provider value={Boolean(videoExample)}>
+                <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={isDark ? "dark" : "light"} />
+              </SlideForceVideoAutoplayContext.Provider>
             </SlideThumbnailContext.Provider>
           </SlideBackdropContext.Provider>
         </ScaledSlide>
