@@ -885,7 +885,7 @@ function extractRelTargetsByType(relsDoc: any): RelBuckets {
 function extractEmbedIds(doc: unknown): string[] {
   const ids: string[] = [];
   walk(doc, (value, key) => {
-    if (key !== "a:blip" && key !== "blip") return;
+    if (key !== "a:blip" && key !== "blip" && !/(^|:)svgBlip$/i.test(key)) return;
     const arr = Array.isArray(value) ? value : [value];
     for (const b of arr) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -902,6 +902,8 @@ function extractEmbedIdsFromOrderedNode(node: PNode | undefined): string[] {
     if (!n) return;
     const tag = pTag(n);
     if (tag === "a:blip" || tag === "blip") {
+      for (const id of readBlipEmbedIds(n)) if (id) ids.push(id);
+    } else if (tag && /(^|:)svgBlip$/i.test(tag)) {
       const id = pAttrs(n)["@_r:embed"] ?? pAttrs(n)["@_embed"];
       if (id) ids.push(id);
     }
