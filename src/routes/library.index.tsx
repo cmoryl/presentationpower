@@ -843,6 +843,8 @@ const VariantCard = memo(function VariantCard({
                 <div
                   ref={m === "dark" ? darkRef : lightRef}
                   className="absolute inset-0"
+                  data-preview-mode={m}
+                  data-preview-role="module-preview"
                 >
                   <ScaledSlide>
                     <SlideBackdropContext.Provider value={m === "dark" ? darkBackdrop : lightBackdrop}>
