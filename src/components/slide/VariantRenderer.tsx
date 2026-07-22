@@ -8,6 +8,7 @@ import { createContext, useContext, useEffect, useRef, useState, Fragment } from
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
 import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, StatFigure, QuoteMark, Attribution, SoftDivider } from "./primitives";
+import { EditorialTitle, PullQuote, DuotoneImage, GrainOverlay, CinematicScrim, StatRail, EDITORIAL_SERIF } from "./flagship";
 
 
 // Module-scoped context so helper components (CardGrid, StatGrid, NumberedList,
