@@ -1,11 +1,11 @@
 import { computeChapters } from "@/lib/chapter-scaffold";
-import type { StrategyPlan } from "@/lib/ai-strategist.functions";
+import type { DeckStrategy } from "@/lib/ai-strategist.functions";
 
 /**
- * Visual chapter scaffold — collapses a StrategyPlan into 3–5 narrative
+ * Visual chapter scaffold — collapses a DeckStrategy into 3–5 narrative
  * chapters so the user can eyeball rhythm and balance before generation.
  */
-export function ChapterMap({ plan, primaryColor = "#003FC7" }: { plan: StrategyPlan; primaryColor?: string }) {
+export function ChapterMap({ plan, primaryColor = "#003FC7" }: { plan: DeckStrategy; primaryColor?: string }) {
   const chapters = computeChapters(plan);
   if (chapters.length === 0) return null;
   const total = plan.recommendedSections.length;

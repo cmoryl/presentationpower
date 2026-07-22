@@ -1,7 +1,7 @@
 import type { DeckStrategy, StrategySection } from "./ai-strategist.functions";
 
 /**
- * Chapter grouping — takes a flat StrategyPlan and infers narrative chapters
+ * Chapter grouping — takes a flat DeckStrategy and infers narrative chapters
  * (Opening / Context / Solution / Proof / Close) from section sequence and
  * framework category. Pure client-side; no LLM roundtrip.
  */
@@ -34,7 +34,7 @@ function classify(section: StrategySection, i: number, n: number): ChapterId {
   return i < n / 2 ? "context" : "solution";
 }
 
-export function computeChapters(plan: StrategyPlan): Chapter[] {
+export function computeChapters(plan: DeckStrategy): Chapter[] {
   const order: ChapterId[] = ["opening", "context", "solution", "proof", "close"];
   const buckets = new Map<ChapterId, StrategySection[]>();
   plan.recommendedSections.forEach((s, i) => {

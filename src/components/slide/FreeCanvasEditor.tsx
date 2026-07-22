@@ -54,7 +54,7 @@ export function FreeCanvasEditor({
     setEditingId(id);
   };
 
-  const ink = brand.tokens.text ?? brand.tokens.primary;
+  const ink = brand.tokens.ink ?? brand.tokens.primary;
 
   return (
     <div ref={wrapRef} className="relative w-full">

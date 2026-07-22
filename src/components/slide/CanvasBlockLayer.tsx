@@ -15,7 +15,7 @@ export function CanvasBlockLayer({
   brand: BrandMode;
 }) {
   if (!blocks || blocks.length === 0) return null;
-  const ink = brand.tokens.text ?? brand.tokens.primary;
+  const ink = brand.tokens.ink ?? brand.tokens.primary;
   return (
     <div className="pointer-events-none absolute inset-0 z-40">
       {blocks.map((b) => {
