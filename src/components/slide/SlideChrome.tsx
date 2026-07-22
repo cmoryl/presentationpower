@@ -41,6 +41,8 @@ export function useSlideAccent(): string | null {
 export type SlideInk = {
   /** Primary text — the strongest reading colour on the current surface. */
   text: string;
+  /** Alias for primary text used by chart/module helpers. */
+  strong: string;
   /** Secondary text — labels, meta, kicker copy. */
   muted: string;
   /** Tertiary text — captions, notes, axis ticks. */
@@ -160,6 +162,7 @@ export function makeSlideInk(
   const base = `${rgb.r},${rgb.g},${rgb.b}`;
   return {
     text: textHex,
+    strong: textHex,
     muted: `rgba(${base},${dark ? 0.72 : 0.68})`,
     faint: `rgba(${base},${dark ? 0.52 : 0.52})`,
     hairline: `rgba(${base},${dark ? 0.14 : 0.12})`,
