@@ -3963,7 +3963,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-10 grid gap-16" style={{ gridTemplateColumns: "1.6fr 1fr" }}>
+          <div className="mt-16 grid gap-16" style={{ gridTemplateColumns: "1.6fr 1fr" }}>
             <div>
               <AreaChart brand={brand} series={series} height={520} airy />
             </div>
@@ -4011,7 +4011,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-10 grid gap-16" style={{ gridTemplateColumns: "1.2fr 1fr" }}>
+          <div className="mt-16 grid gap-16" style={{ gridTemplateColumns: "1.2fr 1fr" }}>
             <div>
               <BarChart brand={brand} bars={bars} height={520} highlight={highlight} />
             </div>
@@ -4188,7 +4188,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-10">
+          <div className="mt-16">
             <AxisBarChart brand={brand} bars={bars} height={520} highlight={highlight} unit={s(c.unit)} />
           </div>
           {s(c.legend) && (
@@ -4319,7 +4319,7 @@ function renderVariantBody({
             <Kicker brand={brand}>{s(c.kicker, "Trajectory")}</Kicker>
             <div className="mt-4" style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
           </div>
-          <div className="mt-4">
+          <div className="mt-12">
             <DecadeAreaChart brand={brand} series={series} height={520} calloutLabel={s(callout.year)} calloutNote={s(callout.note)} />
           </div>
         </SlideFrame>
@@ -4331,7 +4331,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-8">
+          <div className="mt-14">
             {items.map((it, i) => {
               const cur = Math.max(0, Math.min(100, Number(it.current) || 0));
               const bench = Math.max(0, Math.min(100, Number(it.benchmark) || 0));
@@ -4373,7 +4373,7 @@ function renderVariantBody({
             <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
             <div className="mt-4" style={{ fontSize: 42, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
           </div>
-          <div className="mt-4"><LineMultiChart brand={brand} series={series} xLabels={xLabels} unit={s(c.unit, "%")} height={500} /></div>
+          <div className="mt-12"><LineMultiChart brand={brand} series={series} xLabels={xLabels} unit={s(c.unit, "%")} height={500} /></div>
         </SlideFrame>
       );
     }
@@ -4384,7 +4384,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-8"><StackedBarChart brand={brand} segments={segments} columns={columns} unit={s(c.unit)} height={520} /></div>
+          <div className="mt-14"><StackedBarChart brand={brand} segments={segments} columns={columns} unit={s(c.unit)} height={520} /></div>
         </SlideFrame>
       );
     }
@@ -4398,7 +4398,7 @@ function renderVariantBody({
             <Kicker brand={brand}>{s(c.kicker, "Composition")}</Kicker>
             <div className="mt-4" style={{ fontSize: 42, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
           </div>
-          <div className="mt-4"><StackedAreaChart brand={brand} series={series} xLabels={xLabels} unit={s(c.unit)} height={500} /></div>
+          <div className="mt-12"><StackedAreaChart brand={brand} series={series} xLabels={xLabels} unit={s(c.unit)} height={500} /></div>
         </SlideFrame>
       );
     }
@@ -4408,7 +4408,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-8"><WaterfallChart brand={brand} steps={steps} unit={s(c.unit)} height={540} /></div>
+          <div className="mt-14"><WaterfallChart brand={brand} steps={steps} unit={s(c.unit)} height={540} /></div>
         </SlideFrame>
       );
     }
@@ -4419,7 +4419,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-8"><BubbleChart brand={brand} items={items} axisX={s(axis.x, "X")} axisY={s(axis.y, "Y")} height={560} /></div>
+          <div className="mt-14"><BubbleChart brand={brand} items={items} axisX={s(axis.x, "X")} axisY={s(axis.y, "Y")} height={560} /></div>
         </SlideFrame>
       );
     }
@@ -4432,7 +4432,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-8"><HeatmapChart brand={brand} rows={rows} cols={cols} cells={cells} min={Number(scale.min) || 0} max={Number(scale.max) || 100} /></div>
+          <div className="mt-14"><HeatmapChart brand={brand} rows={rows} cols={cols} cells={cells} min={Number(scale.min) || 0} max={Number(scale.max) || 100} /></div>
         </SlideFrame>
       );
     }
@@ -4454,7 +4454,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-8"><ComboChart brand={brand} points={points} barLabel={s(bars.label, "Volume")} barUnit={s(bars.unit)} lineLabel={s(line.label, "Rate")} lineUnit={s(line.unit, "%")} height={540} /></div>
+          <div className="mt-14"><ComboChart brand={brand} points={points} barLabel={s(bars.label, "Volume")} barUnit={s(bars.unit)} lineLabel={s(line.label, "Rate")} lineUnit={s(line.unit, "%")} height={540} /></div>
         </SlideFrame>
       );
     }
@@ -5222,7 +5222,7 @@ function AuroraStatGrid({
     <SlideFrame brand={brand} pageNumber={pageNumber}>
       {title ? <SlideTitle brand={brand} title={title} /> : null}
       <div
-        className={`mt-16 grid gap-y-16`}
+        className={`mt-24 grid gap-y-16`}
         style={{
           gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
           gridTemplateRows: `repeat(${rowCount}, minmax(0, auto))`,
