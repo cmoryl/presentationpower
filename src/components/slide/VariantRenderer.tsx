@@ -5,7 +5,7 @@ import { SlideThumbnailContext, SlideVideoPreviewContext, SlideForceVideoAutopla
 import { resolveSlideBackground } from "@/lib/background-library";
 import { backdropForVariant } from "./variantBackdrop";
 
-import { createContext, useContext, useEffect, useId, useRef, useState, Fragment } from "react";
+import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, Fragment } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
 import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, StatFigure, QuoteMark, Attribution, SoftDivider } from "./primitives";
