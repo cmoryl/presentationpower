@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
-import { useSlideMode } from "./SlideChrome";
+import { useSlideInk, useSlideMode } from "./SlideChrome";
 
 /**
  * Editorial slide primitives — a small, disciplined typographic system used
@@ -36,11 +36,12 @@ export function Kicker({
   tracking?: string;
   className?: string;
 }) {
+  const ink = useSlideInk(brand.tokens.accent);
   return (
     <div
       className={`font-semibold uppercase ${className}`}
       style={{
-        color: color ?? brand.tokens.accent,
+        color: color ?? ink.muted,
         fontSize: size,
         letterSpacing: tracking,
         lineHeight: 1.1,
@@ -128,8 +129,8 @@ export function Hairline({
 
 // A very quiet divider used between rows (border replacement).
 export function SoftDivider({ className = "" }: { className?: string }) {
-  const mode = useSlideMode();
-  const color = mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.10)";
+  const ink = useSlideInk();
+  const color = ink.hairline;
   return <div className={className} style={{ height: 1, width: "100%", backgroundColor: color }} aria-hidden />;
 }
 
@@ -194,9 +195,9 @@ export function TitleBlock({
   size?: DisplaySize;
   align?: "start" | "center";
 }) {
-  const mode = useSlideMode();
-  const titleColor = mode === "dark" ? "#ffffff" : brand.tokens.primary;
-  const dekColor = mode === "dark" ? "rgba(255,255,255,0.72)" : "rgba(10,15,28,0.70)";
+  const ink = useSlideInk(brand.tokens.accent);
+  const titleColor = ink.text;
+  const dekColor = ink.muted;
   return (
     <div className={align === "center" ? "flex flex-col items-center text-center" : ""}>
       {kicker && (
@@ -255,11 +256,11 @@ export function StatFigure({
   unitColor?: string;
   monoLabel?: boolean;
 }) {
-  const mode = useSlideMode();
+  const ink = useSlideInk(brand.tokens.accent);
   const spec = STAT_SPECS[size];
-  const vc = valueColor ?? (mode === "dark" ? "#ffffff" : brand.tokens.primary);
-  const uc = unitColor ?? brand.tokens.accent;
-  const labelColor = mode === "dark" ? "rgba(255,255,255,0.72)" : "rgba(10,15,28,0.65)";
+  const vc = valueColor ?? ink.text;
+  const uc = unitColor ?? ink.muted;
+  const labelColor = ink.muted;
   // Overflow safeguards: wide values (e.g. "$220k", "1,240 pts") sitting in
   // half-width grid columns previously spilled into the neighbor. We now:
   //   • constrain the wrapper with `min-w-0 max-w-full` so it can actually
@@ -417,9 +418,9 @@ export function Attribution({
   org?: string;
   align?: "start" | "center";
 }) {
-  const mode = useSlideMode();
-  const nameColor = mode === "dark" ? "#ffffff" : brand.tokens.primary;
-  const metaColor = mode === "dark" ? "rgba(255,255,255,0.70)" : "rgba(10,15,28,0.62)";
+  const ink = useSlideInk(brand.tokens.accent);
+  const nameColor = ink.text;
+  const metaColor = ink.muted;
   return (
     <div className={align === "center" ? "flex flex-col items-center text-center" : ""}>
       <Hairline color={brand.tokens.accent} widthPx={56} thicknessPx={2} className="mb-5" />
