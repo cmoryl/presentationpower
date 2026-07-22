@@ -926,10 +926,6 @@ function renderVariantBody({
                 </div>
               </div>
 
-                <div className="mt-8">
-                  <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} />
-                </div>
-              </div>
             </div>
           </div>
         </SlideFrame>
