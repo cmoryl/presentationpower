@@ -525,7 +525,16 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     let layout: SlideLayout | undefined;
     try {
       layout = extractSlideLayout(xml, slideSize, imageEmbedIds, parents, theme);
+      // Attach parsed chart data to chart shapes by rel id
+      if (layout) {
+        for (const sh of layout.shapes) {
+          if (sh.kind === "chart" && sh.chartRelId && chartsByRelId[sh.chartRelId]) {
+            sh.chart = chartsByRelId[sh.chartRelId];
+          }
+        }
+      }
     } catch { /* layout is best-effort; parsed text/images still return */ }
+
 
 
 
