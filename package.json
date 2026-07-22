@@ -9,7 +9,8 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test:e2e:video-autoplay": "playwright test tests/e2e/library-video-autoplay.spec.ts --project=chromium --project=firefox --project=webkit"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.9",
