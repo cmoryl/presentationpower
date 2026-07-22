@@ -413,7 +413,7 @@ function SlideCard({
         aria-label={`Preview slide ${slide.index + 1}`}
       >
         {slide.layout ? (
-          <FaithfulSlideCanvas layout={slide.layout} theme={deckTheme} width={320} />
+          <FaithfulSlideCanvas layout={slide.layout} theme={deckTheme} width={320} assets={slide.assets} fonts={deckFonts} />
         ) : (
           <div className="flex aspect-[16/9] w-full items-center justify-center bg-black/[0.02] text-[10px] text-black/40">
             No layout captured
