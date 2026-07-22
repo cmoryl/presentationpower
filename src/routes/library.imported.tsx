@@ -6,7 +6,9 @@ import { Loader2, ExternalLink, Send, Image as ImageIcon, FileText, ChevronRight
 import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { FaithfulSlideCanvas } from "@/components/slide/FaithfulSlideCanvas";
+import { AssetInspectorPanel } from "@/components/AssetInspectorPanel";
 import type { SlideLayout } from "@/lib/pptx-import";
+
 import {
   listImportedDecksForDivision,
   getImportedDeckSlides,
