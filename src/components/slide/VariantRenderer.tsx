@@ -2726,7 +2726,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Where it lives")} />
-          <div className="mt-6 grid grid-cols-[720px_1fr] items-center gap-12">
+          <div className="mt-10 grid grid-cols-[720px_1fr] items-center gap-12">
             <div className="relative h-[600px] w-[720px]">
               {[
                 { left: "20%", top: "18%" },
