@@ -3960,7 +3960,7 @@ function renderVariantBody({
             <div>
               <AreaChart brand={brand} series={series} height={520} airy />
             </div>
-            <div className="flex flex-col justify-center pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+            <div className="flex flex-col justify-center">
               <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
               <div className="mt-6" style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(c.headline)}</div>
               <div className="mt-10">
