@@ -5291,6 +5291,7 @@ function MediaTile({
               hint="Play demo"
             />
           )
+        )}
         {hasVideo && shouldPlay && (
           <VideoHoverControls
             videoRef={videoRef}
