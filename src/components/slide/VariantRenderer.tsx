@@ -5376,6 +5376,7 @@ function SemiGauge({ brand, percent, size = 260 }: { brand: BrandMode; percent: 
 
 
 function AreaChart({ brand, series, height = 480 }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number }) {
+  const ink = useSlideInk();
   const w = 1000;
   const h = height;
   const padL = 20, padR = 20, padT = 20, padB = 60;
@@ -5388,26 +5389,32 @@ function AreaChart({ brand, series, height = 480 }: { brand: BrandMode; series: 
   const linePath = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
   const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z` : "";
   const id = `area-${brand.id}-${series.length}`;
+  const lineId = `area-line-${brand.id}-${series.length}`;
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <defs>
         <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={brand.tokens.primary} stopOpacity="0.22" />
-          <stop offset="100%" stopColor={brand.tokens.primary} stopOpacity="0" />
+          <stop offset="0%" stopColor={brand.tokens.accent} stopOpacity="0.32" />
+          <stop offset="100%" stopColor={brand.tokens.accent} stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id={lineId} x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0%" stopColor={brand.tokens.primary} />
+          <stop offset="100%" stopColor={brand.tokens.accent} />
         </linearGradient>
       </defs>
-      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
+      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairline} strokeWidth={1} />
       {areaPath && <path d={areaPath} fill={`url(#${id})`} />}
-      <path d={linePath} fill="none" stroke={brand.tokens.accent} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={linePath} fill="none" stroke={`url(#${lineId})`} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
       {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={7} fill={brand.tokens.accent} />}
       {series.map((p, i) => (
-        <text key={i} x={pts[i]?.[0]} y={h - padB + 32} textAnchor="middle" fontSize={20} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
+        <text key={i} x={pts[i]?.[0]} y={h - padB + 32} textAnchor="middle" fontSize={20} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
       ))}
     </svg>
   );
 }
 
 function BarChart({ brand, bars, height = 480, highlight }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string }) {
+  const ink = useSlideInk();
   const w = 900;
   const h = height;
   const padL = 20, padR = 20, padT = 30, padB = 60;
@@ -5415,21 +5422,33 @@ function BarChart({ brand, bars, height = 480, highlight }: { brand: BrandMode; 
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(bars.length, 1);
   const barW = slot * 0.55;
+  const gradId = `bar-grad-${brand.id}-${bars.length}`;
+  const hiGradId = `bar-hi-${brand.id}-${bars.length}`;
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
+      <defs>
+        <linearGradient id={gradId} x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor={brand.tokens.primary} stopOpacity="0.9" />
+          <stop offset="100%" stopColor={brand.tokens.primary} stopOpacity="0.35" />
+        </linearGradient>
+        <linearGradient id={hiGradId} x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor={brand.tokens.accent} />
+          <stop offset="100%" stopColor={brand.tokens.primary} />
+        </linearGradient>
+      </defs>
+      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairline} strokeWidth={1} />
       {bars.map((b, i) => {
         const bh = (b.value / max) * chartH;
         const x = padL + i * slot + (slot - barW) / 2;
         const y = h - padB - bh;
         const isHi = highlight ? b.label === highlight : false;
-        const color = isHi ? brand.tokens.accent : brand.tokens.primary;
-        const opacity = isHi ? 1 : 0.35 + (i / Math.max(bars.length - 1, 1)) * 0.45;
+        const fillUrl = isHi ? `url(#${hiGradId})` : `url(#${gradId})`;
+        const opacity = isHi ? 1 : 0.5 + (i / Math.max(bars.length - 1, 1)) * 0.45;
         return (
           <g key={i}>
-            <rect x={x} y={y} width={barW} height={bh} fill={color} opacity={opacity} />
-            <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={20} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{b.label}</text>
-            <text x={x + barW / 2} y={y - 10} textAnchor="middle" fontSize={22} fontWeight={600} fill={brand.tokens.primary}>{b.value}</text>
+            <rect x={x} y={y} width={barW} height={bh} fill={fillUrl} opacity={opacity} rx={4} />
+            <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={20} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{b.label}</text>
+            <text x={x + barW / 2} y={y - 10} textAnchor="middle" fontSize={22} fontWeight={600} fill={ink.text}>{b.value}</text>
           </g>
         );
       })}
@@ -5438,32 +5457,35 @@ function BarChart({ brand, bars, height = 480, highlight }: { brand: BrandMode; 
 }
 
 function ReportCard({ brand, item }: { brand: BrandMode; item: Item }) {
+  const ink = useSlideInk();
   const delta = s(item.delta);
   const negative = delta.trim().startsWith("-");
   return (
-    <div className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+    <div className="pt-8" style={{ borderTop: `1px solid ${ink.accent(0.5)}` }}>
       <Kicker brand={brand} color={negative ? "#E53D2E" : undefined}>{negative ? "Reduction" : "Growth"}</Kicker>
-      <div className="mt-6" style={{ fontSize: 96, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.035em", lineHeight: 0.95 }}>{delta}</div>
-      <div className="mt-6" style={{ fontSize: 26, color: "rgba(10,15,28,0.75)", lineHeight: 1.35, maxWidth: 520 }}>{s(item.label)}</div>
+      <div className="mt-6" style={{ fontSize: 96, fontWeight: 600, color: ink.text, letterSpacing: "-0.035em", lineHeight: 0.95 }}>{delta}</div>
+      <div className="mt-6" style={{ fontSize: 26, color: ink.muted, lineHeight: 1.35, maxWidth: 520 }}>{s(item.label)}</div>
       <div className="mt-8"><Sparkline brand={brand} values={toNums(item.series)} h={80} /></div>
       {s(item.meta) && (
-        <div className="mt-4 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "rgba(10,15,28,0.5)", fontWeight: 600 }}>{s(item.meta)}</div>
+        <div className="mt-4 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: ink.faint, fontWeight: 600 }}>{s(item.meta)}</div>
       )}
     </div>
   );
 }
 
 function ProgressBar({ brand, percent }: { brand: BrandMode; percent: number }) {
+  const ink = useSlideInk();
   const p = Math.max(0, Math.min(100, percent));
   return (
-    <div style={{ position: "relative", height: 10, background: "rgba(10,15,28,0.08)", flex: 1, borderRadius: 0 }}>
-      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${p}%`, background: brand.tokens.accent }} />
+    <div style={{ position: "relative", height: 10, background: ink.trackFill, flex: 1, borderRadius: 999 }}>
+      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${p}%`, background: `linear-gradient(90deg, ${brand.tokens.primary}, ${brand.tokens.accent})`, borderRadius: 999 }} />
     </div>
   );
 }
 
 // ── Graph helpers (Batch 4) ────────────────────────────────────────────
 function AxisBarChart({ brand, bars, height = 480, highlight, unit }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string; unit?: string }) {
+  const ink = useSlideInk();
   const w = 1720;
   const h = height;
   const padL = 90, padR = 40, padT = 30, padB = 60;
@@ -5473,15 +5495,27 @@ function AxisBarChart({ brand, bars, height = 480, highlight, unit }: { brand: B
   const slot = (w - padL - padR) / Math.max(bars.length, 1);
   const barW = slot * 0.5;
   const ticks = 4;
+  const gradId = `axisbar-${brand.id}-${bars.length}`;
+  const hiGradId = `axisbar-hi-${brand.id}-${bars.length}`;
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      <defs>
+        <linearGradient id={gradId} x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor={brand.tokens.primary} stopOpacity="0.7" />
+          <stop offset="100%" stopColor={brand.tokens.primary} stopOpacity="0.3" />
+        </linearGradient>
+        <linearGradient id={hiGradId} x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor={brand.tokens.accent} />
+          <stop offset="100%" stopColor={brand.tokens.primary} />
+        </linearGradient>
+      </defs>
       {Array.from({ length: ticks + 1 }, (_, i) => {
         const y = padT + (chartH / ticks) * i;
         const val = niceMax * (1 - i / ticks);
         return (
           <g key={i}>
-            <line x1={padL} y1={y} x2={w - padR} y2={y} stroke="rgba(10,15,28,0.08)" strokeWidth={1} />
-            <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={16} fill="rgba(10,15,28,0.5)">{val.toFixed(1)}{unit || ""}</text>
+            <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.trackFill} strokeWidth={1} />
+            <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={16} fill={ink.faint}>{val.toFixed(1)}{unit || ""}</text>
           </g>
         );
       })}
@@ -5492,8 +5526,8 @@ function AxisBarChart({ brand, bars, height = 480, highlight, unit }: { brand: B
         const isHi = highlight ? b.label === highlight : false;
         return (
           <g key={i}>
-            <rect x={x} y={y} width={barW} height={bh} fill={isHi ? brand.tokens.accent : brand.tokens.primary} opacity={isHi ? 1 : 0.55} />
-            <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={18} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{b.label}</text>
+            <rect x={x} y={y} width={barW} height={bh} fill={isHi ? `url(#${hiGradId})` : `url(#${gradId})`} rx={4} />
+            <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={18} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{b.label}</text>
           </g>
         );
       })}
@@ -5502,17 +5536,19 @@ function AxisBarChart({ brand, bars, height = 480, highlight, unit }: { brand: B
 }
 
 function DonutBlock({ brand, item }: { brand: BrandMode; item: Item }) {
+  const ink = useSlideInk();
   return (
-    <div className="flex flex-col items-center text-center pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+    <div className="flex flex-col items-center text-center pt-8" style={{ borderTop: `1px solid ${ink.accent(0.5)}` }}>
       <Kicker brand={brand}>{s(item.meta, "Snapshot")}</Kicker>
       <div className="mt-6"><Donut brand={brand} percent={Number(item.value) || 0} size={340} /></div>
-      <div className="mt-8 uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: brand.tokens.primary, fontWeight: 600 }}>{s(item.label)}</div>
-      <div className="mt-4" style={{ fontSize: 20, lineHeight: 1.45, color: "rgba(10,15,28,0.68)", maxWidth: 480 }}>{s(item.body)}</div>
+      <div className="mt-8 uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: ink.text, fontWeight: 600 }}>{s(item.label)}</div>
+      <div className="mt-4" style={{ fontSize: 20, lineHeight: 1.45, color: ink.muted, maxWidth: 480 }}>{s(item.body)}</div>
     </div>
   );
 }
 
 function ConcentricRings({ brand, items, size = 480 }: { brand: BrandMode; items: { label: string; value: number }[]; size?: number }) {
+  const ink = useSlideInk();
   const stroke = 22;
   const gap = 8;
   return (
@@ -5523,10 +5559,10 @@ function ConcentricRings({ brand, items, size = 480 }: { brand: BrandMode; items
         const circ = 2 * Math.PI * r;
         const dash = (Math.max(0, Math.min(100, it.value)) / 100) * circ;
         const color = i === 0 ? brand.tokens.accent : brand.tokens.primary;
-        const opacity = i === 0 ? 1 : 0.35 + (1 - i / items.length) * 0.5;
+        const opacity = i === 0 ? 1 : 0.4 + (1 - i / items.length) * 0.5;
         return (
           <g key={i}>
-            <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={brand.tokens.primary} strokeOpacity={0.08} strokeWidth={stroke} />
+            <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={ink.trackFill} strokeWidth={stroke} />
             <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeOpacity={opacity} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
           </g>
         );
@@ -5534,6 +5570,7 @@ function ConcentricRings({ brand, items, size = 480 }: { brand: BrandMode; items
     </svg>
   );
 }
+
 
 function DecadeAreaChart({ brand, series, height = 480, calloutLabel, calloutNote }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; calloutLabel?: string; calloutNote?: string }) {
   const w = 1720;
