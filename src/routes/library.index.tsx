@@ -313,13 +313,20 @@ function Library() {
       <div>
         <div className="flex items-center justify-between gap-4">
           <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library</div>
-          <Link
-            to="/library/imported"
-            className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7]"
-          >
-            Imported slides <span aria-hidden>→</span>
-          </Link>
-        </div>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/library/my"
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7]"
+            >
+              My Modules <span aria-hidden>★</span>
+            </Link>
+            <Link
+              to="/library/imported"
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7]"
+            >
+              Imported slides <span aria-hidden>→</span>
+            </Link>
+          </div>
         <h1 className="mt-3 text-4xl font-semibold">Approved module variants.</h1>
         <p className="mt-3 max-w-2xl text-black/60">
           Search and preview the modules the assembler pulls from. Scope by brand to hide off-limits families and float the preferred variants for that identity. Staging area for freshly imported PPTX slides lives under <Link to="/library/imported" className="underline hover:text-[#003FC7]">Imported slides</Link>.
