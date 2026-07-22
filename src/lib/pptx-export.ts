@@ -248,7 +248,35 @@ export async function exportDeckToPptx(
       const variant = byId(MODULE_VARIANTS, slide.variantId);
       if (!variant) return;
       const backdrop = backdropForVariant(variant, deck.brandModeId, "dark");
-      if (!backdrop?.url) return;
+      if (!backdrop) return;
+
+      // Aurora backdrops have no url — render the AuroraLayer SVG for this
+      // brand+seed, rasterize to PNG, and embed so PPTX/PDF gets the same
+      // brand-accented atmosphere the editor shows (previously exports for
+      // non-Corporate/Media/Games brands landed on a flat white slide with
+      // zero backdrop, formatting or brand signature).
+      if (backdrop.aurora) {
+        const seed = backdrop.auroraSeed ?? variant.id;
+        const tint = (backdrop.tint ?? (backdrop.darkChrome ? "#03002C" : brand.tokens.surface)).replace(/^#/, "");
+        const svgUrl = auroraSvgDataUrl(seed, brand, backdrop.darkChrome ? "dark" : "light", `#${tint}`);
+        const png = await svgDataUrlToPng(svgUrl);
+        if (!png) {
+          backgroundPlans[i] = { kind: "solid", color: tint };
+          return;
+        }
+        backgroundPlans[i] = {
+          kind: "image",
+          data: png,
+          solidFallback: tint,
+          fit: "cover",
+          zoom: 1,
+          offsetX: 0,
+          offsetY: 0,
+        };
+        return;
+      }
+
+      if (!backdrop.url) return;
       const data = await fetchAsDataUrl(backdrop.url, `slide ${i + 1} variant backdrop`);
       if (!data) return;
       const tint = (backdrop.tint ?? "#03002C").replace("#", "");
