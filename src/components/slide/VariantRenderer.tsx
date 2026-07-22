@@ -5534,9 +5534,7 @@ function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; p
   const cx = size / 2;
   return (
     <svg width={size} height={h} viewBox={`0 0 ${size} ${h}`} aria-hidden>
-      <ChartAccentDefs id={id} />
       <path d={arc} fill="none" stroke={ink.trackFill} strokeWidth={stroke} strokeLinecap="round" />
-      <path d={arc} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke + 5} strokeLinecap="round" opacity={0.28} filter={`url(#${id}-glow)`} strokeDasharray={`${dash} ${arcC}`} />
       <path d={arc} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${arcC}`} />
       <text x={cx} y={cy - 24} textAnchor="middle" fontSize={size * 0.34} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}>
         {Math.round(p)}
