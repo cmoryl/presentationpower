@@ -2311,7 +2311,31 @@ async function loadParent(
     }
   }
 
-  const data: ParentSlideData = { background, placeholders, txStyles };
+  // Decorative (non-placeholder) shapes from the layout/master. These carry
+  // brand furniture like logos, footer bars, page numbers and colored panels
+  // that inherit onto every slide. Walk the full spTree, then filter out ph
+  // shapes (handled via PhProto) and image shapes (embed rIds are parent-scoped
+  // and won't match the slide's imageEmbedIds map).
+  const decor: LayoutShape[] = [];
+  if (spTree) {
+    const zRef = { z: 0 };
+    const collected: LayoutShape[] = [];
+    walkSpTree(pChildren(spTree), zRef, undefined, collected, [], undefined);
+    // Re-walk raw nodes to know which are placeholders — walkSpTree doesn't
+    // expose that. Cheaper: build a set of ph frames from `placeholders` and
+    // drop shapes whose frame matches, plus any image shapes.
+    const phFrames = new Set(placeholders
+      .filter((p) => p.frame)
+      .map((p) => `${p.frame!.x},${p.frame!.y},${p.frame!.w},${p.frame!.h}`));
+    for (const sh of collected) {
+      if (sh.kind === "image") continue;
+      const key = `${sh.frame.x},${sh.frame.y},${sh.frame.w},${sh.frame.h}`;
+      if (phFrames.has(key)) continue;
+      decor.push(sh);
+    }
+  }
+
+  const data: ParentSlideData = { background, placeholders, decor, txStyles };
   cache.set(path, data);
   return data;
 }
