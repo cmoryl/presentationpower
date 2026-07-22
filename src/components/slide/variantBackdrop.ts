@@ -30,13 +30,20 @@ import media04 from "@/assets/backdrops/tp-media-dark/bg-04.webp";
 import media05 from "@/assets/backdrops/tp-media-dark/bg-05.webp";
 import media06 from "@/assets/backdrops/tp-media-dark/bg-06.webp";
 
-// TP Games — 6 curated dark-mode gradient stills (navy + emerald/aqua).
+// TP Games — 10 curated dark-mode aurora stills (navy + emerald/aqua).
+// bg-01..06 are the base uploads; bg-07..10 are same-palette remixes
+// (mirrored/flipped) so we always have enough distinct backdrops across the
+// full ~60-variant module library without repeating.
 import games01 from "@/assets/backdrops/tp-games-dark/bg-01.webp";
 import games02 from "@/assets/backdrops/tp-games-dark/bg-02.webp";
 import games03 from "@/assets/backdrops/tp-games-dark/bg-03.webp";
 import games04 from "@/assets/backdrops/tp-games-dark/bg-04.webp";
 import games05 from "@/assets/backdrops/tp-games-dark/bg-05.webp";
 import games06 from "@/assets/backdrops/tp-games-dark/bg-06.webp";
+import games07 from "@/assets/backdrops/tp-games-dark/bg-07.webp";
+import games08 from "@/assets/backdrops/tp-games-dark/bg-08.webp";
+import games09 from "@/assets/backdrops/tp-games-dark/bg-09.webp";
+import games10 from "@/assets/backdrops/tp-games-dark/bg-10.webp";
 
 export const CORPORATE_DARK_BACKDROPS: string[] = [
   corp01, corp02, corp03, corp04, corp05,
@@ -48,8 +55,10 @@ export const TP_MEDIA_DARK_BACKDROPS: string[] = [
 ];
 
 export const TP_GAMES_DARK_BACKDROPS: string[] = [
-  games01, games02, games03, games04, games05, games06,
+  games01, games02, games03, games04, games05,
+  games06, games07, games08, games09, games10,
 ];
+
 
 
 const PORTRAITS = [portrait1, portrait2, portrait3, portrait4];
