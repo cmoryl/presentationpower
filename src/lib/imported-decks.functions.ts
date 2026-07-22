@@ -391,7 +391,7 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
     const s = context.supabase as unknown as SbClient;
     const { data: row } = await s
       .from("imported_decks")
-      .select("id, original_filename, slide_count, theme, slides, status, error, storage_path")
+      .select("id, original_filename, slide_count, theme, slides, status, error, storage_path, extras")
       .eq("id", data.id)
       .maybeSingle();
     if (!row) throw new Error("Not found");
@@ -403,10 +403,15 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
         imagePaths?: string[];
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         layout?: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        assets?: any;
       }> | null;
       status: string; error: string | null;
       storage_path: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      extras: any;
     };
+
 
     // Signed URL so the owner can re-download the original .pptx.
     const signed = await s.storage.from(BUCKET).createSignedUrl(r.storage_path, 60 * 10).catch(() => ({ data: null }));
