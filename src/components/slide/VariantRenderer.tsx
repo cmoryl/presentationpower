@@ -5368,8 +5368,9 @@ function toNums(v: unknown): number[] {
   return v.map((x) => (typeof x === "number" ? x : Number(x))).filter((n) => Number.isFinite(n));
 }
 
-function Sparkline({ brand, values, w = 380, h = 100, filled = true, peakPin = false, peakLabel = "PEAK" }: { brand: BrandMode; values: number[]; w?: number; h?: number; filled?: boolean; peakPin?: boolean; peakLabel?: string }) {
+function Sparkline({ brand: _brand, values, w = 380, h = 100, filled = true, peakPin = false, peakLabel = "PEAK" }: { brand: BrandMode; values: number[]; w?: number; h?: number; filled?: boolean; peakPin?: boolean; peakLabel?: string }) {
   const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
   const vals = values.length ? values : [1, 1];
   const min = Math.min(...vals);
   const max = Math.max(...vals);
@@ -5381,13 +5382,21 @@ function Sparkline({ brand, values, w = 380, h = 100, filled = true, peakPin = f
   const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - pad} L${pts[0][0].toFixed(1)},${h - pad} Z` : "";
   const peakIdx = vals.indexOf(max);
   const peak = pts[peakIdx];
-  // Editorial: flat accent, hairline baseline, quiet area fill. No gradient defs.
+  const last = pts[pts.length - 1];
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      {filled && <path d={areaPath} fill="var(--slide-accent-text)" fillOpacity={0.08} />}
+      <ChartAccentDefs id={id} />
+      {filled && <path d={areaPath} fill={`url(#${id}-fill)`} />}
       <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke={ink.hairline} strokeWidth={1} />
+      {/* soft glow under the line */}
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" opacity={0.35} filter={`url(#${id}-glow)`} />
       <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={3.5} fill="var(--slide-accent-text)" />}
+      {last && (
+        <>
+          <circle cx={last[0]} cy={last[1]} r={7} fill="var(--slide-accent-text)" opacity={0.35} filter={`url(#${id}-glow)`} />
+          <circle cx={last[0]} cy={last[1]} r={3.5} fill={`url(#${id}-dot)`} />
+        </>
+      )}
       {peakPin && peak && (
         <g>
           <line x1={peak[0]} y1={peak[1]} x2={peak[0]} y2={Math.max(peak[1] - 18, 6)} stroke={ink.hairlineStrong} strokeWidth={1} />
@@ -5397,6 +5406,7 @@ function Sparkline({ brand, values, w = 380, h = 100, filled = true, peakPin = f
     </svg>
   );
 }
+
 
 // ── Editorial data primitives ─────────────────────────────────────────
 // DotGridBackdrop retired as decorative chartjunk. Kept as no-op for callers.
