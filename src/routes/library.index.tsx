@@ -1616,7 +1616,7 @@ function LightboxPortal({
           className="relative w-full"
           style={{ aspectRatio: "16 / 9", maxWidth: "min(96vw, 168vh)", maxHeight: "100%" }}
         >
-          <div ref={stageRef} className={`relative h-full w-full overflow-hidden rounded-2xl ring-1 ring-white/10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.7)] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
+          <div ref={stageRef} data-preview-mode={isDark ? "dark" : "light"} data-preview-role="module-lightbox" className={`relative h-full w-full overflow-hidden rounded-2xl ring-1 ring-white/10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.7)] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
             <ScaledSlide>
               <SlideBackdropContext.Provider value={isDark ? darkBackdrop : lightBackdrop}>
                 <SlideVideoPreviewContext.Provider value={setPlayUrl}>
