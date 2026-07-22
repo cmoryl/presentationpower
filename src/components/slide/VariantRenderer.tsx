@@ -814,15 +814,15 @@ function renderVariantBody({
       return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} />;
 
     case "MV-CTX-STAT-GRID":
-      return <StatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} />;
+      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} />;
 
 
     case "MV-PROOF-STATS-2":
-      return <StatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} />;
+      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} />;
 
     case "MV-PROOF-STATS-3":
     case "MV-INS-OPPORTUNITY-SIZE":
-      return <StatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={3} />;
+      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={3} />;
 
     case "MV-CTX-TREND":
       return (
