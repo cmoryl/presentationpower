@@ -2916,6 +2916,10 @@ async function readEmbeddedFonts(
     const target = r?.["@_Target"];
     if (id && target) relTargets[id] = target;
   }
+  // Budget: keep the inline font payload small so the deck row stays lean.
+  const MAX_FONT_BYTES = 1_500_000;
+  const MAX_TOTAL_FONT_BYTES = 6_000_000;
+  let usedBytes = 0;
   for (const f of arr) {
     const typeface = String(f?.["p:font"]?.["@_typeface"] ?? f?.["@_typeface"] ?? "").trim();
     if (!typeface) continue;
@@ -2927,7 +2931,21 @@ async function readEmbeddedFonts(
       const rId = f?.[k]?.["@_r:id"];
       if (!rId || !relTargets[rId]) continue;
       const path = resolveRelPath("ppt/presentation.xml", relTargets[rId]);
-      variants.push({ style, path, mime: guessMime(path) ?? "application/octet-stream" });
+      const mime = guessMime(path) ?? "application/octet-stream";
+      let dataUrl: string | undefined;
+      let bytes: number | undefined;
+      const entry = zip.files[path];
+      if (entry) {
+        try {
+          const bin = await entry.async("uint8array");
+          bytes = bin.length;
+          if (bin.length <= MAX_FONT_BYTES && usedBytes + bin.length <= MAX_TOTAL_FONT_BYTES) {
+            dataUrl = `data:${mime};base64,${Buffer.from(bin).toString("base64")}`;
+            usedBytes += bin.length;
+          }
+        } catch { /* skip unreadable font */ }
+      }
+      variants.push({ style, path, mime, dataUrl, bytes });
     }
     if (variants.length) out.push({ typeface, variants });
   }
