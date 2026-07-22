@@ -101,6 +101,24 @@ function _computeBackdrop(
   const photos = set.photos;
   const abstracts = set.abstracts;
 
+  // ── Aurora backdrop (Flagship 2026, "Aesop" spec) ───────────────────────
+  // A curated set of hero variants renders on the procedural AuroraLayer:
+  // navy field + 3 large soft-focus orbs in brand accent/primary + shifted
+  // violet/cyan. Only opts in for the master TransPerfect Corporate brand
+  // in dark mode so division decks keep their photographic identity.
+  const auroraVariants = new Set<string>([
+    "MV-INS-QUOTE",
+    "MV-CASE-SPREAD",
+    "MV-CASE-METRICS",
+    "MV-CASE-STORY",
+    "MV-PROOF-KPI",
+    "MV-PROOF-STAT-GRID",
+    "MV-INS-BIG-IDEA",
+  ]);
+  if (mode === "dark" && brandId === "bm-enterprise" && auroraVariants.has(id)) {
+    return { aurora: true, auroraSeed: id, darkChrome: true, tint: "#03002C" };
+  }
+
   // Master TransPerfect / Corporate brand in dark mode uses the curated
   // on-brand gradient set. Only affects bm-enterprise + dark — other
   // divisions (Life Sci, Legal, Media, Digital, Gaming, GlobalLink,
@@ -118,6 +136,7 @@ function _computeBackdrop(
       : useGamesDark
         ? pickTpGamesDarkBackdrop(id)
         : null;
+
 
   const pickPhoto = (offset = 0) =>
     corporateBg ?? photos[(seed + offset) % photos.length];
