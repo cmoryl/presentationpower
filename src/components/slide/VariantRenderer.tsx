@@ -2620,24 +2620,27 @@ function renderVariantBody({
               const pct = Math.max(6, (v / max) * 100);
               const highlight = i === items.length - 1;
               return (
-                <div key={i} className="grid grid-cols-[260px_1fr_120px] items-center gap-6">
-                  <div className="text-2xl font-semibold" style={{ color: ink.strong }}>{s(it.label)}</div>
-                  <div className="h-14 w-full rounded-lg" style={{ backgroundColor: ink.surface }}>
+                <div key={i} className="grid grid-cols-[260px_1fr_140px] items-center gap-6">
+                  <div className="text-2xl font-semibold" style={{ color: ink.strong, letterSpacing: "-0.01em" }}>{s(it.label)}</div>
+                  <div className="relative h-12 w-full">
+                    <div className="absolute inset-y-[22px] left-0 right-0" style={{ height: 2, background: `color-mix(in oklab, ${brand.tokens.accent} 14%, transparent)` }} />
                     <div
-                      className="flex h-full items-center rounded-lg px-4 text-white"
+                      className="absolute inset-y-0 left-0 flex items-center px-4"
                       style={{
                         width: `${pct}%`,
                         background: highlight
-                          ? `linear-gradient(90deg, ${brand.tokens.primary}, ${brand.tokens.accent})`
-                          : brand.tokens.primary,
-                        opacity: highlight ? 1 : 0.55,
+                          ? `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.accent} 45%, transparent), ${brand.tokens.accent})`
+                          : `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.primary} 20%, transparent), color-mix(in oklab, ${brand.tokens.primary} 55%, transparent))`,
+                        color: highlight ? ink.onSurface(brand.tokens.accent) : ink.strong,
+                        clipPath: "polygon(0 40%, 100% 40%, 100% 60%, 0 60%)",
                       }}
-                    >
-                      <span className="text-lg opacity-90">{s(it.note)}</span>
-                    </div>
+                    />
+                    {s(it.note) && (
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2" style={{ fontSize: 15, letterSpacing: "0.18em", textTransform: "uppercase", color: ink.faint, fontWeight: 600 }}>{s(it.note)}</div>
+                    )}
                   </div>
-                  <div className="text-right text-3xl font-semibold" style={{ color: highlight ? "var(--slide-accent-text)" : ink.strong }}>
-                    {s(it.value)}<span className="ml-1 text-lg opacity-70">{s(c.unit)}</span>
+                  <div className="text-right tabular-nums" style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.02em", color: highlight ? "var(--slide-accent-text)" : ink.strong }}>
+                    {s(it.value)}<span className="ml-1" style={{ fontSize: 18, color: ink.faint }}>{s(c.unit)}</span>
                   </div>
                 </div>
               );
