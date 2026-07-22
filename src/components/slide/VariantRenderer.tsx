@@ -763,12 +763,46 @@ function renderVariantBody({
     case "MV-INS-BIG-IDEA":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <div className="flex h-full flex-col justify-center">
-            <Kicker brand={brand}>{s(c.kicker, "The big idea")}</Kicker>
-            <Hairline color={brand.tokens.accent} widthPx={120} thicknessPx={2} className="mt-8 mb-12" />
-            <DisplayTitle size="cover" color={brand.tokens.primary} maxWidthPx={1620}>
+          {/* Ambient spotlight — a large diffuse glow behind the idea makes
+              the hero moment breathe. Second, tighter halo adds focus. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage: `
+                radial-gradient(60% 55% at 22% 55%, ${brand.tokens.accent}${isDark ? "28" : "1A"} 0%, transparent 65%),
+                radial-gradient(28% 26% at 22% 55%, ${brand.tokens.accent}${isDark ? "3A" : "22"} 0%, transparent 70%)
+              `,
+            }}
+          />
+          <div className="relative flex h-full flex-col justify-center">
+            <div className="flex items-center gap-4">
+              <span
+                className="inline-block h-2 w-2 rounded-full"
+                style={{
+                  background: brand.tokens.accent,
+                  boxShadow: `0 0 24px ${brand.tokens.accent}, 0 0 8px ${brand.tokens.accent}`,
+                }}
+              />
+              <Kicker brand={brand}>{s(c.kicker, "The big idea")}</Kicker>
+            </div>
+            <div
+              className="mt-8 mb-12 h-[2px] w-[160px] rounded-full"
+              style={{ backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)` }}
+            />
+            <div
+              style={{
+                fontSize: 128,
+                fontWeight: 600,
+                letterSpacing: "-0.035em",
+                lineHeight: 1.02,
+                maxWidth: 1660,
+                color: ink.strong,
+                textShadow: isDark ? `0 2px 40px ${brand.tokens.accent}22` : undefined,
+              }}
+            >
               {s(c.idea)}
-            </DisplayTitle>
+            </div>
           </div>
         </SlideFrame>
       );
