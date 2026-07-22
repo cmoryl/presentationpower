@@ -5706,27 +5706,32 @@ function DonutBlock({ brand, item }: { brand: BrandMode; item: Item }) {
 
 function ConcentricRings({ brand: _brand, items, size = 480 }: { brand: BrandMode; items: { label: string; value: number }[]; size?: number }) {
   const ink = useSlideInk();
-  const stroke = 10; // hairline rings — subtraction pass
+  const id = useId().replace(/:/g, "");
+  const stroke = 12;
   const gap = 12;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
+      <ChartAccentDefs id={id} />
       {items.map((it, i) => {
         const r = (size - stroke) / 2 - i * (stroke + gap);
         if (r <= 0) return null;
         const circ = 2 * Math.PI * r;
         const dash = (Math.max(0, Math.min(100, it.value)) / 100) * circ;
-        // Only outer ring wears the accent; inner rings use ink at graduated opacity.
         const isPrimary = i === 0;
         return (
           <g key={i}>
             <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={ink.trackFill} strokeWidth={stroke} />
-            <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={isPrimary ? "var(--slide-accent-text)" : ink.strong} strokeOpacity={isPrimary ? 1 : Math.max(0.35, 0.85 - i * 0.15)} strokeWidth={stroke} strokeLinecap="butt" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+            {isPrimary && (
+              <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke + 6} opacity={0.28} filter={`url(#${id}-glow)`} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+            )}
+            <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={isPrimary ? "var(--slide-accent-text)" : ink.strong} strokeOpacity={isPrimary ? 1 : Math.max(0.35, 0.85 - i * 0.15)} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
           </g>
         );
       })}
     </svg>
   );
 }
+
 
 
 function DecadeAreaChart({ brand: _brand, series, height = 480, calloutLabel, calloutNote }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; calloutLabel?: string; calloutNote?: string }) {
