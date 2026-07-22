@@ -6097,7 +6097,7 @@ function StackedAreaChart({ brand, series, xLabels, unit, height = 480 }: { bran
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
         <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
-        {layers.map((l) => <path key={l.si} d={l.d} fill={l.color} opacity={l.si === 0 ? 0.95 : 0.7 - l.si * 0.15} />)}
+        {layers.map((l) => <path key={l.si} d={l.d} fill={l.color} opacity={l.si === 0 ? 0.32 : Math.max(0.08, 0.22 - l.si * 0.05)} stroke={l.color} strokeOpacity={l.si === 0 ? 0.7 : 0.35} strokeWidth={1.5} />)}
         {xLabels.map((lb, i) => (
           <text key={i} x={padL + i * step} y={h - padB + 34} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{lb}</text>
         ))}
