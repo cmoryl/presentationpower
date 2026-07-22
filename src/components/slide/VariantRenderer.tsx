@@ -4331,7 +4331,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-8">
+          <div className="mt-14">
             {items.map((it, i) => {
               const cur = Math.max(0, Math.min(100, Number(it.current) || 0));
               const bench = Math.max(0, Math.min(100, Number(it.benchmark) || 0));
