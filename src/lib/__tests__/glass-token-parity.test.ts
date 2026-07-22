@@ -105,13 +105,14 @@ describe("glass utility token parity (preview ↔ export)", () => {
     expect(drift, `Exporter dark surface drifted from .glass-dark:\n${drift.join("\n")}`).toEqual([]);
   });
 
-  it("TransPerfect corporate brand ink equals GLASS_TOKENS.lightInk", () => {
-    // The .contrast-boost .glass tile's text color IS the corporate brand
+  it("Enterprise (master) brand ink equals GLASS_TOKENS.lightInk", () => {
+    // The .contrast-boost .glass tile's text color IS the master brand
     // ink/primary. If either moves, light-mode glass surfaces desync from
     // exported text color.
-    const tp = BRAND_MODES.find((b) => b.id === "tp");
-    expect(tp, "TransPerfect brand mode missing").toBeTruthy();
-    expect(tp!.tokens.primary.replace("#", "").toUpperCase()).toBe(GLASS_TOKENS.lightInk);
-    expect(tp!.tokens.ink.replace("#", "").toUpperCase()).toBe(GLASS_TOKENS.lightInk);
+    const master = BRAND_MODES.find((b) => b.id === "bm-enterprise");
+    expect(master, "Enterprise brand mode missing").toBeTruthy();
+    expect(master!.tokens.primary.replace("#", "").toUpperCase()).toBe(GLASS_TOKENS.lightInk);
+    expect(master!.tokens.ink.replace("#", "").toUpperCase()).toBe(GLASS_TOKENS.lightInk);
   });
+
 });
