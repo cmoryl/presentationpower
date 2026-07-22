@@ -311,28 +311,42 @@ export function PullQuote({
   size = 96,
   color,
   className = "",
+  closingGlyph = false,
+  glyphOpacity,
 }: {
   quote: string;
   brand: BrandMode;
   size?: number;
   color?: string;
   className?: string;
+  /** When true, renders a matching italic serif closing glyph at bottom-right. */
+  closingGlyph?: boolean;
+  /** Override the default glyph opacity (0..1). */
+  glyphOpacity?: number;
 }) {
+  const mode = useSlideMode();
+  const opacity = glyphOpacity ?? (mode === "dark" ? 0.32 : 0.2);
+  const glyphSize = size * 3.2;
+  const glyphColor = brand.tokens.accent;
+  const glyphStyle: CSSProperties = {
+    fontFamily: EDITORIAL_SERIF,
+    fontSize: glyphSize,
+    lineHeight: 0.72,
+    color: glyphColor,
+    opacity,
+    fontWeight: 500,
+    letterSpacing: "-0.06em",
+    fontStyle: "italic",
+  };
   return (
     <div className={`relative ${className}`}>
       <span
         aria-hidden
-        className="absolute select-none"
+        className="absolute select-none pointer-events-none"
         style={{
           top: -Math.round(size * 0.28),
           left: -Math.round(size * 0.55),
-          fontFamily: EDITORIAL_SERIF,
-          fontSize: size * 3.2,
-          lineHeight: 0.72,
-          color: brand.tokens.accent,
-          opacity: 0.22,
-          fontWeight: 500,
-          letterSpacing: "-0.06em",
+          ...glyphStyle,
         }}
       >
         {"\u201C"}
@@ -352,9 +366,23 @@ export function PullQuote({
       >
         {quote}
       </blockquote>
+      {closingGlyph && (
+        <span
+          aria-hidden
+          className="absolute select-none pointer-events-none"
+          style={{
+            bottom: -Math.round(size * 0.55),
+            right: -Math.round(size * 0.15),
+            ...glyphStyle,
+          }}
+        >
+          {"\u201D"}
+        </span>
+      )}
     </div>
   );
 }
+
 
 // ── ChartAnnotation ───────────────────────────────────────────────────────
 // A callout that overlays a chart region with a numbered dot, a short label
@@ -459,5 +487,187 @@ export function StatRail({
         boxShadow: `0 0 20px ${color}55`,
       }}
     />
+  );
+}
+
+
+// ── AuroraLayer ───────────────────────────────────────────────────────────
+// Procedural aurora backdrop — 3 large blurred radial "orbs" over a deep
+// navy field. Deterministic per seed (variant id), so a given slide always
+// paints the same aurora. Rendered as pure SVG so it thumbnails cleanly and
+// exports to PPTX at any zoom without artefacts.
+export function AuroraLayer({
+  seed = "aurora",
+  brand,
+  intensity = 1,
+  className = "",
+}: {
+  seed?: string;
+  brand: BrandMode;
+  intensity?: number;
+  className?: string;
+}) {
+  const mode = useSlideMode();
+  const base = mode === "dark" ? "#03002C" : "#FFFFFF";
+  const orbs = useMemo(() => auroraOrbs(seed, brand), [seed, brand]);
+  return (
+    <div
+      aria-hidden
+      className={`pointer-events-none absolute inset-0 ${className}`}
+      style={{ background: base }}
+    >
+      <svg
+        viewBox="0 0 1280 720"
+        preserveAspectRatio="xMidYMid slice"
+        className="absolute inset-0 h-full w-full"
+        style={{ opacity: mode === "dark" ? intensity : intensity * 0.75 }}
+      >
+        <defs>
+          {orbs.map((o, i) => (
+            <radialGradient key={i} id={`tp-aurora-${seed}-${i}`} cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor={o.color} stopOpacity={o.alpha} />
+              <stop offset="55%" stopColor={o.color} stopOpacity={o.alpha * 0.45} />
+              <stop offset="100%" stopColor={o.color} stopOpacity="0" />
+            </radialGradient>
+          ))}
+          <filter id={`tp-aurora-${seed}-blur`} x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="60" />
+          </filter>
+        </defs>
+        <g filter={`url(#tp-aurora-${seed}-blur)`}>
+          {orbs.map((o, i) => (
+            <ellipse
+              key={i}
+              cx={o.x}
+              cy={o.y}
+              rx={o.rx}
+              ry={o.ry}
+              fill={`url(#tp-aurora-${seed}-${i})`}
+            />
+          ))}
+        </g>
+      </svg>
+      {/* Vignette to keep glass cards readable */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage:
+            mode === "dark"
+              ? `radial-gradient(80% 60% at 50% 60%, transparent 30%, ${base} 130%)`
+              : `radial-gradient(80% 60% at 50% 60%, transparent 40%, ${base} 130%)`,
+          opacity: 0.6,
+        }}
+      />
+    </div>
+  );
+}
+
+function auroraOrbs(seed: string, brand: BrandMode) {
+  // Simple deterministic hash → three offset orbs in the brand palette.
+  let h = 2166136261;
+  for (let i = 0; i < seed.length; i++) {
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  const rand = () => {
+    h ^= h << 13; h ^= h >>> 17; h ^= h << 5;
+    return ((h >>> 0) % 10000) / 10000;
+  };
+  // Aurora palette: brand accent + brand primary + a shifted purple/cyan.
+  const palette = [brand.tokens.accent, brand.tokens.primary, "#B48CFF", "#5CE1E6", "#FF6EA8"];
+  return Array.from({ length: 3 }).map((_, i) => {
+    const color = palette[Math.floor(rand() * palette.length)] ?? brand.tokens.accent;
+    return {
+      color,
+      x: 200 + rand() * 880,
+      y: 100 + rand() * 520,
+      rx: 380 + rand() * 260,
+      ry: 320 + rand() * 220,
+      alpha: 0.55 + rand() * 0.35,
+    };
+  });
+}
+
+// ── GlassTile ─────────────────────────────────────────────────────────────
+// Frosted-navy translucent card with hairline border. The Canva "Aesop"
+// spec: mid-alpha fill, 1px inner white ring, generous radius, no shadow.
+// Automatically inverts for light-mode surfaces.
+export function GlassTile({
+  children,
+  className = "",
+  radius = 22,
+  padding = "px-8 py-8",
+  intensity = 1,
+  style,
+}: {
+  children: ReactNode;
+  className?: string;
+  radius?: number;
+  padding?: string;
+  /** 0.5..1.5 — scales the tint alpha. */
+  intensity?: number;
+  style?: CSSProperties;
+}) {
+  const mode = useSlideMode();
+  const fillAlpha = Math.min(0.9, (mode === "dark" ? 0.34 : 0.72) * intensity);
+  const ringAlpha = Math.min(0.5, (mode === "dark" ? 0.14 : 0.20) * intensity);
+  const bg = mode === "dark"
+    ? `rgba(10, 8, 48, ${fillAlpha})`
+    : `rgba(255, 255, 255, ${fillAlpha})`;
+  const ring = mode === "dark"
+    ? `rgba(255, 255, 255, ${ringAlpha})`
+    : `rgba(10, 15, 28, ${ringAlpha})`;
+  return (
+    <div
+      className={`relative ${padding} ${className}`}
+      style={{
+        background: bg,
+        border: `1px solid ${ring}`,
+        borderRadius: radius,
+        backdropFilter: "blur(18px) saturate(140%)",
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+// ── IconWell ──────────────────────────────────────────────────────────────
+// Small rounded-square glass well for a mono-line icon. Used in bullet rows
+// and challenge/solution/result stacks — never dominates the label.
+export function IconWell({
+  children,
+  size = 44,
+  radius = 12,
+  accent,
+  className = "",
+}: {
+  children?: ReactNode;
+  size?: number;
+  radius?: number;
+  accent?: string;
+  className?: string;
+}) {
+  const mode = useSlideMode();
+  const bg = mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(10,15,28,0.05)";
+  const ring = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(10,15,28,0.10)";
+  const glow = accent ? `inset 0 0 0 1px ${accent}22` : undefined;
+  return (
+    <div
+      aria-hidden
+      className={`flex items-center justify-center shrink-0 ${className}`}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: radius,
+        background: bg,
+        border: `1px solid ${ring}`,
+        color: accent,
+        boxShadow: glow,
+      }}
+    >
+      {children}
+    </div>
   );
 }

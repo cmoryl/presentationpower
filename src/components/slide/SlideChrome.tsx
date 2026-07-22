@@ -10,6 +10,8 @@ import {
   type LogoOrientation,
 } from "@/lib/logo-placement";
 import { GRAIN_SVG } from "@/components/slide/grain";
+import { AuroraLayer } from "@/components/slide/flagship";
+
 
 // Every slide can render in light or dark mode. VariantRenderer sets this
 // context per slide; SlideFrame and helpers read it to flip content surfaces
@@ -27,6 +29,10 @@ export function useSlideMode(): SlideMode {
 export type SlideBackdrop = {
   url?: string;
   css?: string;
+  /** When true, render the procedural AuroraLayer instead of a photo/css bg. */
+  aurora?: boolean;
+  /** Seed for AuroraLayer determinism (defaults to variant id). */
+  auroraSeed?: string;
   scrim?: "bottom" | "left" | "right" | "top" | "full" | "vignette";
   scrimStrength?: number;
   imageDim?: number;
@@ -38,6 +44,7 @@ export type SlideBackdrop = {
   offsetX?: number; // -100..100 (percent). 0 = center.
   offsetY?: number; // -100..100 (percent). 0 = center.
 };
+
 export const SlideBackdropContext = createContext<SlideBackdrop | null>(null);
 
 // A slide frame that owns the locked chrome — brand bar, footer, logo, page
@@ -79,12 +86,14 @@ export function SlideFrame({
   // theme so hero titles keep their editorial contrast.
   const hasBackdrop = !!backdrop;
   const hasBackdropImage = !!backdrop?.url;
-  const hasBackdropCss = !!(backdrop?.css && !backdrop?.url);
+  const hasBackdropAurora = !!backdrop?.aurora;
+  const hasBackdropCss = !!(backdrop?.css && !backdrop?.url && !backdrop?.aurora);
   // A backdrop is "dark" when the caller flagged darkChrome, or when it's a
-  // photo backdrop on a non-light slide (legacy behavior).
-  const backdropIsDark = hasBackdrop && (backdrop?.darkChrome ?? (hasBackdropImage && !slideDark));
+  // photo/aurora backdrop on a non-light slide (legacy behavior).
+  const backdropIsDark = hasBackdrop && (backdrop?.darkChrome ?? ((hasBackdropImage || hasBackdropAurora) && !slideDark));
   const lightBackdrop = hasBackdrop && !backdropIsDark && !slideDark;
   const darkBackdrop = hasBackdrop && !lightBackdrop;
+
   const bg = slideDark ? "#03002C" : "#ffffff";
   const fg = darkBackdrop || slideDark ? "#ffffff" : brand.tokens.ink;
   const logoColor = darkBackdrop || slideDark ? "#ffffff" : brand.tokens.primary;
@@ -146,8 +155,12 @@ export function SlideFrame({
           style={{ background: backdrop!.css }}
         />
       )}
+      {hasBackdropAurora && (
+        <AuroraLayer seed={backdrop?.auroraSeed ?? "aurora"} brand={brand} />
+      )}
       {hasBackdropImage && (
         <>
+
           <img
             src={backdrop!.url}
             alt=""
