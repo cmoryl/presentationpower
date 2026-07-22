@@ -133,7 +133,7 @@ function expectedPreviewPalette(base: Palette, mode: Mode): Palette {
   return {
     primary: "ffffff",
     accent: base.accent,
-    surface: "121b3d",
+    surface: "141435",
     ink: "d6def2",
   };
 }
