@@ -2179,6 +2179,11 @@ type RunDefaults = { sizePt?: number; color?: string; font?: string; bold?: bool
 type ParentSlideData = {
   background?: LayoutFill;
   placeholders: PhProto[];
+  /** Non-placeholder decorative shapes (logos, page numbers, dividers, footer
+   *  bars) captured from the layout / master spTree. Placeholder shapes are
+   *  handled via PhProto inheritance instead. Image shapes are dropped because
+   *  parent embed rIds don't match the slide's imageEmbedIds mapping. */
+  decor?: LayoutShape[];
   // Master-level fallback text styles: title / body / other, keyed by level.
   txStyles?: {
     title?: Map<number, RunDefaults>;
