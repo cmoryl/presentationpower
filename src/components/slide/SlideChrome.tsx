@@ -32,6 +32,68 @@ export function useSlideAccent(): string | null {
   return useContext(SlideAccentContext);
 }
 
+// ── useSlideInk ────────────────────────────────────────────────────────────
+// Semantic "ink" palette every data / chart primitive should consume instead
+// of hardcoding `rgba(10,15,28,X)` slate. Automatically flips for dark mode
+// and exposes an `accent()` helper so hairlines/underglows can tint toward
+// the active division colour. Keeps all data visuals consistent and cohesive
+// across every brand mode and light/dark surface.
+export type SlideInk = {
+  /** Primary text — the strongest reading colour on the current surface. */
+  text: string;
+  /** Secondary text — labels, meta, kicker copy. */
+  muted: string;
+  /** Tertiary text — captions, notes, axis ticks. */
+  faint: string;
+  /** Thin hairline (borders, chart baselines). */
+  hairline: string;
+  /** Slightly stronger hairline (row dividers, table rules). */
+  hairlineStrong: string;
+  /** Faint fill for empty bars, progress tracks, gridlines behind data. */
+  trackFill: string;
+  /** Airy panel fill for glass tiles when accent tint isn't desired. */
+  panel: string;
+  /** Hex + alpha helper — `accent(0.24)` returns rgba of the division accent
+   *  (falls back to a neutral if no accent is in context). */
+  accent: (alpha: number) => string;
+  /** Same as `accent` but tinted to always read on the current surface — used
+   *  for text overlays on charts (never returns a colour that vanishes into
+   *  the background). */
+  onSurface: (hex: string) => string;
+};
+
+function hexToRgba(hex: string, alpha: number): string {
+  const m = /^#?([a-f\d]{6})$/i.exec(hex);
+  if (!m) return hex;
+  const int = parseInt(m[1], 16);
+  const r = (int >> 16) & 255;
+  const g = (int >> 8) & 255;
+  const b = int & 255;
+  return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, alpha))})`;
+}
+
+export function useSlideInk(accentOverride?: string | null): SlideInk {
+  const mode = useSlideMode();
+  const ctxAccent = useSlideAccent();
+  const accentHex = accentOverride ?? ctxAccent ?? null;
+  const dark = mode === "dark";
+  const base = dark ? "255,255,255" : "10,15,28";
+  return {
+    text: dark ? "#ffffff" : "rgb(10,15,28)",
+    muted: `rgba(${base},${dark ? 0.72 : 0.66})`,
+    faint: `rgba(${base},${dark ? 0.52 : 0.5})`,
+    hairline: `rgba(${base},${dark ? 0.14 : 0.12})`,
+    hairlineStrong: `rgba(${base},${dark ? 0.22 : 0.18})`,
+    trackFill: `rgba(${base},${dark ? 0.08 : 0.07})`,
+    panel: dark ? "rgba(10, 8, 48, 0.34)" : "rgba(255,255,255,0.55)",
+    accent: (a: number) =>
+      accentHex ? hexToRgba(accentHex, a) : `rgba(${base},${a})`,
+    onSurface: (hex: string) => hex,
+  };
+}
+
+
+
 
 // Optional imagery layer rendered BEHIND the slide content. When set, the
 // SlideFrame replaces its opaque token background with either a photo + scrim
