@@ -4497,7 +4497,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-8"><Treemap brand={brand} items={items} height={560} /></div>
+          <div className="mt-10"><Treemap brand={brand} items={items} height={560} /></div>
         </SlideFrame>
       );
     }
