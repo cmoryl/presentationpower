@@ -4845,6 +4845,65 @@ function ClientLogoImg({
   return <img src={resolved} alt={alt} style={style} className={className} />;
 }
 
+/**
+ * PlayOverlay — visible tap target rendered on top of a video/poster when
+ * autoplay is blocked (mobile Safari, low-power mode, saved-data, or user
+ * gesture policy) OR when the tile isn't in an autoplay context. Uses a
+ * div with role="button" instead of a real <button> because library cards
+ * wrap the whole tile in a parent <button> for the zoom action — a nested
+ * <button> triggers a React hydration warning and is invalid HTML.
+ */
+function PlayOverlay({
+  onActivate,
+  label = "Play video",
+  hint,
+}: {
+  onActivate: () => void;
+  label?: string;
+  hint?: string;
+}) {
+  const activate = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onActivate();
+  };
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label={label}
+      onClick={activate}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") activate(e);
+      }}
+      className="group absolute inset-0 z-20 flex cursor-pointer items-center justify-center focus:outline-none"
+      data-media-play-overlay="true"
+    >
+      {/* Radial scrim so the button reads on any imagery */}
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(closest-side at 50% 50%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 45%, rgba(0,0,0,0) 75%)",
+        }}
+      />
+      <div className="relative flex flex-col items-center gap-2">
+        <span
+          className="flex h-16 w-16 items-center justify-center rounded-full bg-white/95 text-[#03002C] shadow-[0_10px_30px_-5px_rgba(0,0,0,0.6)] ring-1 ring-white/60 transition-transform duration-150 group-hover:scale-105 group-focus-visible:scale-105"
+        >
+          <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden fill="currentColor">
+            <path d="M5 3.2v15.6c0 .9 1 1.4 1.7.9l12-7.8c.7-.4.7-1.4 0-1.8l-12-7.8C6 1.8 5 2.3 5 3.2z" />
+          </svg>
+        </span>
+        <span className="rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white shadow-md backdrop-blur-sm">
+          {hint ?? label}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function MediaTile({
   brand,
   seed,
@@ -4991,27 +5050,23 @@ function MediaTile({
         )}
         {hasVideo && !shouldPlay && (
           autoplay ? (
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); setUserStarted(true); }}
-              className="absolute inset-0 flex items-center justify-center"
-              aria-label="Play video"
-            >
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-black shadow-lg transition group-hover:scale-105">▶</span>
-            </button>
-          ) : openVideoPreview ? (
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); if (resolvedVideoUrl) openVideoPreview(resolvedVideoUrl); }}
-              className="absolute inset-0 flex items-center justify-center"
-              aria-label="Preview video"
-            >
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-black shadow-lg transition group-hover:scale-105">▶</span>
-            </button>
+            <PlayOverlay
+              onActivate={() => { setAutoplayBlocked(false); setUserStarted(true); }}
+              label="Play video"
+              hint={autoplayBlocked ? "Autoplay blocked — tap to play" : "Play demo"}
+            />
+          ) : openVideoPreview && resolvedVideoUrl ? (
+            <PlayOverlay
+              onActivate={() => openVideoPreview(resolvedVideoUrl)}
+              label="Preview video"
+              hint="Preview demo"
+            />
           ) : (
-            <div aria-hidden className="absolute inset-0 flex items-center justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-black shadow-lg">▶</div>
-            </div>
+            <PlayOverlay
+              onActivate={() => { setAutoplayBlocked(false); setUserStarted(true); }}
+              label="Play video"
+              hint="Play demo"
+            />
           )
         )}
         {/* Brand accent duotone — subtle multiply so division tokens actually
@@ -5101,27 +5156,23 @@ function MediaTile({
       )}
       {hasVideo && !shouldPlay && (
         autoplay ? (
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); setUserStarted(true); }}
-            className="absolute inset-0 flex items-center justify-center"
-            aria-label="Play video"
-          >
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-black shadow-lg">▶</span>
-          </button>
-        ) : openVideoPreview ? (
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); if (resolvedVideoUrl) openVideoPreview(resolvedVideoUrl); }}
-            className="absolute inset-0 flex items-center justify-center"
-            aria-label="Preview video"
-          >
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-black shadow-lg">▶</span>
-          </button>
+          <PlayOverlay
+            onActivate={() => { setAutoplayBlocked(false); setUserStarted(true); }}
+            label="Play video"
+            hint={autoplayBlocked ? "Autoplay blocked — tap to play" : "Play demo"}
+          />
+        ) : openVideoPreview && resolvedVideoUrl ? (
+          <PlayOverlay
+            onActivate={() => openVideoPreview(resolvedVideoUrl)}
+            label="Preview video"
+            hint="Preview demo"
+          />
         ) : (
-          <div aria-hidden className="absolute inset-0 flex items-center justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-black shadow-lg">▶</div>
-          </div>
+          <PlayOverlay
+            onActivate={() => { setAutoplayBlocked(false); setUserStarted(true); }}
+            label="Play video"
+            hint="Play demo"
+          />
         )
       )}
       {/* Brand accent duotone — tints imagery with the active division's
