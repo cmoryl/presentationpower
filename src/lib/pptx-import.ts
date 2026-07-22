@@ -1175,6 +1175,37 @@ async function extractTheme(zip: JSZip, parser: XMLParser): Promise<ParsedTheme>
       readSchemeColor(scheme?.["a:accent5"]),
       readSchemeColor(scheme?.["a:accent6"]),
     ].filter((c): c is string => Boolean(c));
+
+    // Extract fmtScheme with the ordered parser so we can materialize
+    // bgFillStyleLst / fillStyleLst as LayoutFill[] using the existing readFill().
+    let bgFillStyleLst: LayoutFill[] | undefined;
+    let fillStyleLst: LayoutFill[] | undefined;
+    try {
+      const orderParser = new XMLParser({
+        ignoreAttributes: false, attributeNamePrefix: "@_", preserveOrder: true,
+        trimValues: true, processEntities: false, htmlEntities: false,
+      });
+      const root = orderParser.parse(xml) as PNode[];
+      const themeRoot = root.find((n) => pTag(n) === "a:theme");
+      const els = themeRoot ? pFind(themeRoot, "a:themeElements") : undefined;
+      const fmt = els ? pFind(els, "a:fmtScheme") : undefined;
+      const bgLst = fmt ? pFind(fmt, "a:bgFillStyleLst") : undefined;
+      const fLst = fmt ? pFind(fmt, "a:fillStyleLst") : undefined;
+      const collectFills = (node: PNode | undefined): LayoutFill[] | undefined => {
+        if (!node) return undefined;
+        const out: LayoutFill[] = [];
+        for (const child of pChildren(node)) {
+          // wrap child as if it were an spPr with a single fill kid
+          const wrap = { spPr: [child] } as unknown as PNode;
+          const f = readFill(wrap, []);
+          if (f) out.push(f);
+        }
+        return out.length ? out : undefined;
+      };
+      bgFillStyleLst = collectFills(bgLst);
+      fillStyleLst = collectFills(fLst);
+    } catch { /* fmtScheme is optional; theme still usable without it */ }
+
     return {
       accents,
       accent1: accents[0],
@@ -1183,6 +1214,8 @@ async function extractTheme(zip: JSZip, parser: XMLParser): Promise<ParsedTheme>
       light1: readSchemeColor(scheme?.["a:lt1"]) ?? readSchemeColor(scheme?.["a:lt2"]),
       headingFont: fontScheme?.["a:majorFont"]?.["a:latin"]?.["@_typeface"],
       bodyFont: fontScheme?.["a:minorFont"]?.["a:latin"]?.["@_typeface"],
+      bgFillStyleLst,
+      fillStyleLst,
     };
   } catch {
     return { ...EMPTY_THEME };
