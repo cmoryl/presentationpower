@@ -4454,7 +4454,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-8"><ComboChart brand={brand} points={points} barLabel={s(bars.label, "Volume")} barUnit={s(bars.unit)} lineLabel={s(line.label, "Rate")} lineUnit={s(line.unit, "%")} height={540} /></div>
+          <div className="mt-14"><ComboChart brand={brand} points={points} barLabel={s(bars.label, "Volume")} barUnit={s(bars.unit)} lineLabel={s(line.label, "Rate")} lineUnit={s(line.unit, "%")} height={540} /></div>
         </SlideFrame>
       );
     }
