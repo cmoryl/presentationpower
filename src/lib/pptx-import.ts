@@ -209,7 +209,7 @@ export type TableCell = {
   anchor?: "t" | "ctr" | "b";
 };
 export type LayoutShape =
-  | { kind: "text"; z: number; frame: LayoutFrame; fill?: LayoutFill; line?: LayoutLine; prst?: string; text: LayoutTextBody; isTitle?: boolean; effect?: LayoutEffect; opacity?: number; customPath?: CustomPath }
+  | { kind: "text"; z: number; frame: LayoutFrame; fill?: LayoutFill; line?: LayoutLine; prst?: string; text: LayoutTextBody; isTitle?: boolean; isPlaceholder?: boolean; effect?: LayoutEffect; opacity?: number; customPath?: CustomPath }
   | { kind: "image"; z: number; frame: LayoutFrame; embedId?: string; path?: string; line?: LayoutLine; srcRect?: LayoutSrcRect; prst?: string; opacity?: number; tile?: boolean; effect?: LayoutEffect; customPath?: CustomPath; duotone?: [string, string] }
   | { kind: "line"; z: number; frame: LayoutFrame; line?: LayoutLine; prst?: string; effect?: LayoutEffect }
   | { kind: "table"; z: number; frame: LayoutFrame; header: string[]; rows: string[][]; cellGrid?: TableCell[][]; colWidthsIn?: number[]; rowHeightsIn?: number[]; firstRow?: boolean; bandRow?: boolean; firstCol?: boolean; bandCol?: boolean }
@@ -2522,7 +2522,7 @@ function walkSpTree(
 
       const isTitle = phType === "title" || phType === "ctrTitle" || undefined;
       const opacity = spPr ? readShapeOpacity(spPr) : undefined;
-      out.push({ kind: "text", z: zRef.z++, frame, fill, line, prst, text, isTitle, effect, opacity, customPath });
+      out.push({ kind: "text", z: zRef.z++, frame, fill, line, prst, text, isTitle, isPlaceholder: !!ph || undefined, effect, opacity, customPath });
     } else if (t === "p:pic") {
       const spPr = pFind(node, "p:spPr");
       let frame = readFrame(spPr);
@@ -2903,15 +2903,8 @@ async function loadParent(
     const zRef = { z: 0 };
     const collected: LayoutShape[] = [];
     walkSpTree(pChildren(spTree), zRef, undefined, collected, parentImageEmbedIds, undefined, parentEmbedIdMap, theme, clrMap);
-    // Re-walk raw nodes to know which are placeholders — walkSpTree doesn't
-    // expose that. Cheaper: build a set of ph frames from `placeholders` and
-    // drop shapes whose frame matches.
-    const phFrames = new Set(placeholders
-      .filter((p) => p.frame)
-      .map((p) => `${p.frame!.x},${p.frame!.y},${p.frame!.w},${p.frame!.h}`));
     for (const sh of collected) {
-      const key = `${sh.frame.x},${sh.frame.y},${sh.frame.w},${sh.frame.h}`;
-      if (phFrames.has(key)) continue;
+      if (sh.kind === "text" && sh.isPlaceholder) continue;
       decor.push(sh);
     }
   }
