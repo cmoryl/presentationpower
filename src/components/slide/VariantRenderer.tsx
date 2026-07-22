@@ -814,15 +814,15 @@ function renderVariantBody({
       return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} />;
 
     case "MV-CTX-STAT-GRID":
-      return <StatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} />;
+      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} />;
 
 
     case "MV-PROOF-STATS-2":
-      return <StatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} />;
+      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} />;
 
     case "MV-PROOF-STATS-3":
     case "MV-INS-OPPORTUNITY-SIZE":
-      return <StatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={3} />;
+      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={3} />;
 
     case "MV-CTX-TREND":
       return (
@@ -3909,7 +3909,7 @@ function renderVariantBody({
               <SummaryStatCard brand={brand} label={s(primary.label)} value={s(primary.value)} unit={s(primary.unit)} series={toNums(primary.series)} />
               <SummaryStatCard brand={brand} label={s(secondary.label)} value={s(secondary.value)} unit={s(secondary.unit)} series={toNums(secondary.series)} />
             </div>
-            <div className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+            <div>
               <Kicker brand={brand}>Balance</Kicker>
               <div className="mt-8">
                 <StatFigure brand={brand} value={s(balance.value)} unit={s(balance.unit)} label={s(balance.label)} size="xl" />
@@ -3937,7 +3937,7 @@ function renderVariantBody({
             <SlideTitle brand={brand} title={s(c.title, variant.name)} />
             <div className="mt-14 grid gap-10" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
               {items.map((it, i) => (
-                <div key={i} className="flex flex-col items-center pt-6 text-center" style={{ borderTop: `1px solid ${i === 0 ? brand.tokens.accent : "rgba(122,139,199,0.28)"}` }}>
+                <div key={i} className="flex flex-col items-center text-center" style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`, paddingLeft: i === 0 ? 0 : 24 }}>
                   <Donut brand={brand} percent={Number(it.value) || 0} size={280} />
                   <div className="mt-8 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.strong, fontWeight: 700 }}>{s(it.label)}</div>
                   <div className="mt-4" style={{ fontSize: 20, lineHeight: 1.45, color: ink.muted, maxWidth: 380 }}>{s(it.body)}</div>
@@ -3960,7 +3960,7 @@ function renderVariantBody({
             <div>
               <AreaChart brand={brand} series={series} height={520} airy />
             </div>
-            <div className="flex flex-col justify-center pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+            <div className="flex flex-col justify-center">
               <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
               <div className="mt-6" style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(c.headline)}</div>
               <div className="mt-10">
@@ -3985,7 +3985,7 @@ function renderVariantBody({
             <SlideTitle brand={brand} title={s(c.title, variant.name)} />
             <div className="mt-16 grid gap-10" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
               {items.map((it, i) => (
-                <div key={i} className="flex flex-col items-center pt-6" style={{ borderTop: `1px solid ${i === 0 ? brand.tokens.accent : "rgba(122,139,199,0.28)"}` }}>
+                <div key={i} className="flex flex-col items-center" style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`, paddingLeft: i === 0 ? 0 : 20 }}>
                   <SemiGauge brand={brand} percent={Number(it.value) || 0} size={280} />
                   <div className="mt-6 uppercase text-center" style={{ fontSize: 16, letterSpacing: "0.24em", color: ink.strong, fontWeight: 700, maxWidth: 260 }}>{s(it.label)}</div>
                   {s(it.body) && <div className="mt-2 text-center" style={{ fontSize: 14, lineHeight: 1.4, color: ink.muted, maxWidth: 240 }}>{s(it.body)}</div>}
@@ -4037,7 +4037,7 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-14 grid gap-14" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
             {items[0] && <ReportCard brand={brand} item={items[0]} />}
-            <div style={{ background: "rgba(10,15,28,0.12)" }} />
+            <div style={{ background: ink.hairline }} />
             {items[1] && <ReportCard brand={brand} item={items[1]} />}
           </div>
         </SlideFrame>
@@ -4094,7 +4094,7 @@ function renderVariantBody({
                 const delta = s(it.delta);
                 const negative = delta.trim().startsWith("-");
                 return (
-                  <div key={i} className="pt-5" style={{ borderTop: `1px solid ${i === 0 ? brand.tokens.accent : "rgba(122,139,199,0.28)"}` }}>
+                  <div key={i} style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`, paddingLeft: i === 0 ? 0 : 20 }}>
                     <div className="uppercase" style={{ fontSize: 12, letterSpacing: "0.24em", color: ink.muted, fontWeight: 600 }}>{s(it.label)}</div>
                     <div className="tabular-nums mt-2 flex items-baseline gap-3" style={{ fontSize: 34, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em" }}>
                       {s(it.value, `${pct}%`)}
@@ -4121,7 +4121,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-10 grid gap-16" style={{ gridTemplateColumns: "1fr 1.2fr" }}>
-            <div className="flex min-w-0 flex-col justify-center pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+            <div className="flex min-w-0 flex-col justify-center">
               <StatFigure brand={brand} value={s(stat.value)} unit={s(stat.unit)} label={s(stat.label)} size="xl" />
             </div>
             <div>
@@ -4154,7 +4154,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-8 grid gap-14" style={{ gridTemplateColumns: "1fr 2.4fr" }}>
-            <div className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+            <div>
               <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
               <div className="mt-6" style={{ fontSize: 38, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(c.headline)}</div>
             </div>
@@ -5621,7 +5621,7 @@ function EditorialNote({ title, body, accent }: { title: string; body: string; a
 function SummaryStatCard({ brand, label, value, unit, series }: { brand: BrandMode; label: string; value: string; unit: string; series: number[] }) {
   const ink = useSlideInk();
   return (
-    <div className="pt-8" style={{ borderTop: `1px solid ${ink.accent(0.5)}` }}>
+    <div>
       <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.muted, fontWeight: 600 }}>{label}</div>
       <div className="mt-4 flex items-baseline" style={{ fontSize: 84, fontWeight: 600, color: ink.text, letterSpacing: "-0.03em", lineHeight: 1 }}>
         <span className="tabular-nums">{value || "—"}</span>
@@ -5748,7 +5748,7 @@ function ReportCard({ brand, item }: { brand: BrandMode; item: Item }) {
   const delta = s(item.delta);
   const negative = delta.trim().startsWith("-");
   return (
-    <div className="pt-8" style={{ borderTop: `1px solid ${ink.accent(0.5)}` }}>
+    <div>
       <Kicker brand={brand} color={negative ? "#E53D2E" : undefined}>{negative ? "Reduction" : "Growth"}</Kicker>
       <div className="mt-6" style={{ fontSize: 96, fontWeight: 600, color: ink.text, letterSpacing: "-0.035em", lineHeight: 0.95 }}>{delta}</div>
       <div className="mt-6" style={{ fontSize: 26, color: ink.muted, lineHeight: 1.35, maxWidth: 520 }}>{s(item.label)}</div>
@@ -5821,7 +5821,7 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { 
 function DonutBlock({ brand, item }: { brand: BrandMode; item: Item }) {
   const ink = useSlideInk();
   return (
-    <div className="flex flex-col items-center text-center pt-8" style={{ borderTop: `1px solid ${ink.accent(0.5)}` }}>
+    <div className="flex flex-col items-center text-center">
       <Kicker brand={brand}>{s(item.meta, "Snapshot")}</Kicker>
       <div className="mt-6"><Donut brand={brand} percent={Number(item.value) || 0} size={340} /></div>
       <div className="mt-8 uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: ink.text, fontWeight: 600 }}>{s(item.label)}</div>
