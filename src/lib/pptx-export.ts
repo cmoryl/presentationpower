@@ -17,6 +17,8 @@ import {
   imageBackgroundSizing,
   type PptxBackgroundPlan,
 } from "./pptx-background";
+import { backdropForVariant } from "@/components/slide/variantBackdrop";
+import { MODULE_VARIANTS, byId } from "./taxonomy";
 
 const SLIDE_W = 13.333;
 const SLIDE_H = 7.5;
