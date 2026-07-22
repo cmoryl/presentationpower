@@ -3937,7 +3937,7 @@ function renderVariantBody({
       const bItems = arr(balance.items);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={88} y={28} size={820} opacity={0.55} />
+          <AuroraOrb x={88} y={28} size={820} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-10 grid gap-14" style={{ gridTemplateColumns: "1fr 1fr" }}>
             <div className="flex flex-col gap-10">
@@ -3967,7 +3967,7 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 3);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={12} y={72} size={760} opacity={0.55} />
+          <AuroraOrb x={12} y={72} size={760} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-14 grid gap-10" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
             {items.map((it, i) => (
@@ -3988,7 +3988,7 @@ function renderVariantBody({
       const stat = obj(c.stat);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={86} y={70} size={900} opacity={0.55} />
+          <AuroraOrb x={86} y={70} size={900} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-16 grid gap-16" style={{ gridTemplateColumns: "1.6fr 1fr" }}>
             <div>
@@ -4014,7 +4014,7 @@ function renderVariantBody({
       const cols = items.length || 1;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={14} y={26} size={780} opacity={0.55} />
+          <AuroraOrb x={14} y={26} size={780} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-16 grid gap-10" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
             {items.map((it, i) => (
@@ -4038,7 +4038,7 @@ function renderVariantBody({
       const legend = arr(c.legend);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={90} y={32} size={840} opacity={0.55} />
+          <AuroraOrb x={90} y={32} size={840} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-16 grid gap-16" style={{ gridTemplateColumns: "1.2fr 1fr" }}>
             <div>
@@ -4067,7 +4067,7 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 2);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={10} y={68} size={720} opacity={0.55} />
+          <AuroraOrb x={10} y={68} size={720} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-14 grid gap-14" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
             {items[0] && <ReportCard brand={brand} item={items[0]} />}
@@ -4084,7 +4084,7 @@ function renderVariantBody({
       const max = Math.max(1, ...vals);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={85} y={72} size={880} opacity={0.55} />
+          <AuroraOrb x={85} y={72} size={880} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-14 grid items-end gap-10" style={{ gridTemplateColumns: `repeat(${items.length || 1}, 1fr)`, minHeight: 520 }}>
             {items.map((it, i) => {
@@ -4120,7 +4120,7 @@ function renderVariantBody({
       const total = segments.reduce((s, x) => s + x.value, 0) || 1;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={15} y={30} size={760} opacity={0.55} />
+          <AuroraOrb x={15} y={30} size={760} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <SegmentedBar brand={brand} segments={segments} />
           <div className="grid gap-6 mt-4" style={{ gridTemplateColumns: `repeat(${Math.min(items.length, 4)}, 1fr)` }}>
@@ -4153,7 +4153,7 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 6);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={88} y={68} size={820} opacity={0.55} />
+          <AuroraOrb x={88} y={68} size={820} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-10 grid gap-16" style={{ gridTemplateColumns: "1fr 1.2fr" }}>
             <div className="flex min-w-0 flex-col justify-center">
@@ -4187,7 +4187,7 @@ function renderVariantBody({
       const max = Math.max(1, ...vals);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={12} y={28} size={860} opacity={0.55} />
+          <AuroraOrb x={12} y={28} size={860} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-8 grid gap-14" style={{ gridTemplateColumns: "1fr 2.4fr" }}>
             <div>
@@ -4221,7 +4221,7 @@ function renderVariantBody({
       const highlight = s(c.highlight);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={86} y={26} size={820} opacity={0.55} />
+          <AuroraOrb x={86} y={26} size={820} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-16">
             <AxisBarChart brand={brand} bars={bars} height={520} highlight={highlight} unit={s(c.unit)} />
@@ -4242,7 +4242,7 @@ function renderVariantBody({
       const stat = obj(c.stat);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={14} y={74} size={780} opacity={0.55} />
+          <AuroraOrb x={14} y={74} size={780} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-10 grid gap-16" style={{ gridTemplateColumns: "1.6fr 1fr" }}>
             <div>
@@ -4276,7 +4276,7 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 2);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={90} y={70} size={900} opacity={0.55} />
+          <AuroraOrb x={90} y={70} size={900} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-10 grid gap-16" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
             {items[0] && <DonutBlock brand={brand} item={items[0]} />}
@@ -4291,7 +4291,7 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 4).map((it) => ({ label: s(it.label), value: Number(it.value) || 0, body: s(it.body) }));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={10} y={30} size={720} opacity={0.55} />
+          <AuroraOrb x={10} y={30} size={720} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-10 grid gap-16 items-center" style={{ gridTemplateColumns: "1fr 1fr" }}>
             <div className="flex items-center justify-center">
@@ -4324,7 +4324,7 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 3);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={88} y={32} size={840} opacity={0.55} />
+          <AuroraOrb x={88} y={32} size={840} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-12 grid gap-10" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
             {items.map((it, i) => {
@@ -4354,7 +4354,7 @@ function renderVariantBody({
       const callout = obj(c.callout);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={12} y={68} size={760} opacity={0.55} />
+          <AuroraOrb x={12} y={68} size={760} intensity={0.75} />
           <div className="mb-6 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
             <Kicker brand={brand}>{s(c.kicker, "Trajectory")}</Kicker>
             <div className="mt-4" style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
@@ -4370,7 +4370,7 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 5);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={85} y={74} size={880} opacity={0.55} />
+          <AuroraOrb x={85} y={74} size={880} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-14">
             {items.map((it, i) => {
@@ -4410,7 +4410,7 @@ function renderVariantBody({
       const xLabels = arr(obj(c.axis).x).map((v: unknown) => String(v));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={15} y={26} size={780} opacity={0.55} />
+          <AuroraOrb x={15} y={26} size={780} intensity={0.75} />
           <div className="mb-6 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
             <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
             <div className="mt-4" style={{ fontSize: 42, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
@@ -4425,7 +4425,7 @@ function renderVariantBody({
       const columns = arr(c.columns).map((col) => ({ label: s(col.label), values: arr(col.values).map((v: unknown) => Number(v) || 0) }));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={88} y={72} size={860} opacity={0.55} />
+          <AuroraOrb x={88} y={72} size={860} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-14"><StackedBarChart brand={brand} segments={segments} columns={columns} unit={s(c.unit)} height={520} /></div>
         </SlideFrame>
@@ -4437,7 +4437,7 @@ function renderVariantBody({
       const xLabels = arr(obj(c.axis).x).map((v: unknown) => String(v));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={14} y={32} size={720} opacity={0.55} />
+          <AuroraOrb x={14} y={32} size={720} intensity={0.75} />
           <div className="mb-6 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
             <Kicker brand={brand}>{s(c.kicker, "Composition")}</Kicker>
             <div className="mt-4" style={{ fontSize: 42, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
@@ -4451,7 +4451,7 @@ function renderVariantBody({
       const steps = arr(c.steps).map((st) => ({ label: s(st.label), value: Number(st.value) || 0, kind: s(st.kind, "up") as "start" | "up" | "down" | "end" }));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={86} y={28} size={820} opacity={0.55} />
+          <AuroraOrb x={86} y={28} size={820} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-14"><WaterfallChart brand={brand} steps={steps} unit={s(c.unit)} height={540} /></div>
         </SlideFrame>
@@ -4463,7 +4463,7 @@ function renderVariantBody({
       const items = arr(c.items).map((it) => ({ label: s(it.label), x: Number(it.x) || 0, y: Number(it.y) || 0, size: Number(it.size) || 20 }));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={10} y={70} size={780} opacity={0.55} />
+          <AuroraOrb x={10} y={70} size={780} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-14"><BubbleChart brand={brand} items={items} axisX={s(axis.x, "X")} axisY={s(axis.y, "Y")} height={560} /></div>
         </SlideFrame>
@@ -4477,7 +4477,7 @@ function renderVariantBody({
       const scale = obj(c.scale);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={90} y={26} size={900} opacity={0.55} />
+          <AuroraOrb x={90} y={26} size={900} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-14"><HeatmapChart brand={brand} rows={rows} cols={cols} cells={cells} min={Number(scale.min) || 0} max={Number(scale.max) || 100} /></div>
         </SlideFrame>
@@ -4488,7 +4488,7 @@ function renderVariantBody({
       const items = arr(c.items).map((it) => ({ label: s(it.label), value: Number(it.value) || 0, meta: s(it.meta) }));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={12} y={74} size={760} opacity={0.55} />
+          <AuroraOrb x={12} y={74} size={760} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-8"><Treemap brand={brand} items={items} height={560} /></div>
         </SlideFrame>
@@ -4501,7 +4501,7 @@ function renderVariantBody({
       const points = arr(c.points).map((p) => ({ label: s(p.label), bar: Number(p.bar) || 0, line: Number(p.line) || 0 }));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <AuroraOrb x={85} y={30} size={880} opacity={0.55} />
+          <AuroraOrb x={85} y={30} size={880} intensity={0.75} />
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-14"><ComboChart brand={brand} points={points} barLabel={s(bars.label, "Volume")} barUnit={s(bars.unit)} lineLabel={s(line.label, "Rate")} lineUnit={s(line.unit, "%")} height={540} /></div>
         </SlideFrame>
