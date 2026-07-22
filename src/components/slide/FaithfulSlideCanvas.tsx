@@ -355,8 +355,10 @@ type ResolvedShape = {
     firstRow?: boolean;
     bandRow?: boolean;
   };
+  chart?: ParsedChart;
   placeholderKind?: string;
 };
+
 
 type ResolvedLayout = {
   size: { w: number; h: number };
