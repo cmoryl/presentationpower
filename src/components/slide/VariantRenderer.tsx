@@ -1011,7 +1011,7 @@ function renderVariantBody({
                   <div style={{ fontSize: 30, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>
                     {s(it.label)}
                   </div>
-                  <div className="mt-4" style={{ fontSize: 22, lineHeight: 1.4, color: "rgba(10,15,28,0.72)" }}>
+                  <div className="mt-4" style={{ fontSize: 22, lineHeight: 1.4, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>
                     {s(it.body)}
                   </div>
                 </div>
@@ -1036,7 +1036,7 @@ function renderVariantBody({
               <div className="mt-8" style={{ fontSize: 40, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
                 {s(before.title)}
               </div>
-              <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.4, color: "rgba(10,15,28,0.72)" }}>
+              <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.4, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>
                 {s(before.body)}
               </div>
             </div>
@@ -1045,7 +1045,7 @@ function renderVariantBody({
               <div className="mt-8" style={{ fontSize: 40, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
                 {s(after.title)}
               </div>
-              <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.4, color: "rgba(10,15,28,0.82)" }}>
+              <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.4, color: "color-mix(in oklab, currentColor 82%, transparent)" }}>
                 {s(after.body)}
               </div>
             </div>
@@ -1465,7 +1465,7 @@ function renderVariantBody({
                     {s(it.label)}
                   </div>
                   {s(it.note) && (
-                    <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.4, color: "rgba(10,15,28,0.65)" }}>
+                    <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.4, color: "color-mix(in oklab, currentColor 65%, transparent)" }}>
                       {s(it.note)}
                     </div>
                   )}
@@ -2222,7 +2222,7 @@ function renderVariantBody({
               <div key={i}>
                 <MediaTile brand={brand} seed={s(it.seed, `grid6-${i}`)} className="aspect-[4/3] w-full" />
                 {s(it.caption) && (
-                  <div className="mt-3 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "rgba(10,15,28,0.6)" }}>
+                  <div className="mt-3 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 60%, transparent)" }}>
                     {s(it.caption)}
                   </div>
                 )}
@@ -2927,7 +2927,7 @@ function renderVariantBody({
                 {s(c.date)}
               </div>
               <div className="mt-6" style={{ fontSize: 32, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.primary }}>{s(c.day)}</div>
-              <div className="mt-2 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "rgba(10,15,28,0.6)" }}>{s(c.monthYear)}</div>
+              <div className="mt-2 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 60%, transparent)" }}>{s(c.monthYear)}</div>
             </div>
             <div>
               <Kicker brand={brand}>{s(c.title, "Kickoff")}</Kicker>
@@ -3055,7 +3055,7 @@ function renderVariantBody({
               </div>
               <div className="mt-auto">
                 <div style={{ fontSize: 44, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(anchor.title)}</div>
-                <div className="mt-5" style={{ fontSize: 24, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(anchor.body)}</div>
+                <div className="mt-5" style={{ fontSize: 24, lineHeight: 1.42, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>{s(anchor.body)}</div>
               </div>
             </div>
             {rest.map((it, i) => {
@@ -3082,7 +3082,7 @@ function renderVariantBody({
                       </div>
                       <div className="mt-auto">
                         <div style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.title)}</div>
-                        <div className="mt-3" style={{ fontSize: 20, lineHeight: 1.4, color: "rgba(10,15,28,0.7)" }}>{s(it.body)}</div>
+                        <div className="mt-3" style={{ fontSize: 20, lineHeight: 1.4, color: "color-mix(in oklab, currentColor 70%, transparent)" }}>{s(it.body)}</div>
                       </div>
                     </>
                   )}
@@ -3107,7 +3107,7 @@ function renderVariantBody({
               return (
                 <div key={i} className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
                   <div className="flex items-start justify-between gap-3">
-                    <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "rgba(10,15,28,0.6)", fontWeight: 600 }}>{s(it.label)}</div>
+                    <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 60%, transparent)", fontWeight: 600 }}>{s(it.label)}</div>
                     <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="glyph" />
                   </div>
                   <div className="mt-4 flex items-baseline gap-2">
@@ -3148,7 +3148,7 @@ function renderVariantBody({
                   <>
                     <div key={`l-${i}`} className="py-5 pr-6" style={{ fontSize: 22, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.01em", borderTop: "1px solid rgba(10,15,28,0.08)" }}>
                       {s(it.label)}
-                      {s(it.note) && <div className="mt-1" style={{ fontSize: 16, fontWeight: 400, color: "rgba(10,15,28,0.6)", letterSpacing: 0 }}>{s(it.note)}</div>}
+                      {s(it.note) && <div className="mt-1" style={{ fontSize: 16, fontWeight: 400, color: "color-mix(in oklab, currentColor 60%, transparent)", letterSpacing: 0 }}>{s(it.note)}</div>}
                     </div>
                     {Array.from({ length: quarters.length }).map((_, q) => {
                       const active = q + 1 >= start && q + 1 <= end;
@@ -3258,7 +3258,7 @@ function renderVariantBody({
                     <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="glyph" />
                   </div>
                   <div style={{ fontSize: 24, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
-                  {s(it.note) && <div className="mt-1" style={{ fontSize: 16, color: "rgba(10,15,28,0.66)" }}>{s(it.note)}</div>}
+                  {s(it.note) && <div className="mt-1" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 66%, transparent)" }}>{s(it.note)}</div>}
                 </div>
               );
             })}
@@ -3403,7 +3403,7 @@ function renderVariantBody({
                     <Kicker brand={brand}>Phase {String(i + 1).padStart(2, "0")}</Kicker>
                   </div>
                   <div className="mt-2" style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.phase)}</div>
-                  <div className="mt-2" style={{ fontSize: 18, color: "rgba(10,15,28,0.7)", lineHeight: 1.4 }}>{s(it.touchpoint)}</div>
+                  <div className="mt-2" style={{ fontSize: 18, color: "color-mix(in oklab, currentColor 70%, transparent)", lineHeight: 1.4 }}>{s(it.touchpoint)}</div>
                 </div>
               ))}
             </div>
@@ -3552,9 +3552,9 @@ function renderVariantBody({
               <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mb-6" />
               <DisplayTitle size="section" color={brand.tokens.primary} maxWidthPx={1080}>{s(c.title)}</DisplayTitle>
               <div className="mt-12 grid gap-12" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
-                <div style={{ fontSize: 22, lineHeight: 1.5, color: "rgba(10,15,28,0.78)" }}>{s(c.bodyLeft)}</div>
+                <div style={{ fontSize: 22, lineHeight: 1.5, color: "color-mix(in oklab, currentColor 78%, transparent)" }}>{s(c.bodyLeft)}</div>
                 <div style={{ background: "rgba(10,15,28,0.15)" }} />
-                <div style={{ fontSize: 22, lineHeight: 1.5, color: "rgba(10,15,28,0.78)" }}>{s(c.bodyRight)}</div>
+                <div style={{ fontSize: 22, lineHeight: 1.5, color: "color-mix(in oklab, currentColor 78%, transparent)" }}>{s(c.bodyRight)}</div>
               </div>
             </div>
           </div>
@@ -3583,7 +3583,7 @@ function renderVariantBody({
                     <span className="tabular-nums font-semibold" style={{ fontSize: 26, color: "var(--slide-accent-text)", letterSpacing: "-0.01em" }}>{String(i + 1).padStart(2, "0")}</span>
                     <div className="flex-1">
                       <div style={{ fontSize: 34, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.title)}</div>
-                      <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(it.body)}</div>
+                      <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>{s(it.body)}</div>
                     </div>
                   </div>
                 </div>
@@ -3699,7 +3699,7 @@ function renderVariantBody({
           <div className="mt-16 grid gap-12" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
             {items[0] && (
               <div className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                <div style={{ fontSize: 26, lineHeight: 1.35, color: "rgba(10,15,28,0.82)", fontStyle: "italic" }}>&ldquo;{s(items[0].quote)}&rdquo;</div>
+                <div style={{ fontSize: 26, lineHeight: 1.35, color: "color-mix(in oklab, currentColor 82%, transparent)", fontStyle: "italic" }}>&ldquo;{s(items[0].quote)}&rdquo;</div>
                 <div className="mt-5">
                   <Attribution brand={brand} name={s(items[0].name)} role={s(items[0].role)} org={s(items[0].org)} />
                 </div>
@@ -3708,7 +3708,7 @@ function renderVariantBody({
             <div style={{ background: "rgba(10,15,28,0.12)" }} />
             {items[1] && (
               <div className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                <div style={{ fontSize: 26, lineHeight: 1.35, color: "rgba(10,15,28,0.82)", fontStyle: "italic" }}>&ldquo;{s(items[1].quote)}&rdquo;</div>
+                <div style={{ fontSize: 26, lineHeight: 1.35, color: "color-mix(in oklab, currentColor 82%, transparent)", fontStyle: "italic" }}>&ldquo;{s(items[1].quote)}&rdquo;</div>
                 <div className="mt-5">
                   <Attribution brand={brand} name={s(items[1].name)} role={s(items[1].role)} org={s(items[1].org)} />
                 </div>
@@ -3731,13 +3731,13 @@ function renderVariantBody({
               <span className="uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 62%, transparent)", fontWeight: 500 }}>{s(c.pronunciation)}</span>
               <span style={{ fontSize: 24, color: "var(--slide-accent-text)", fontStyle: "italic", fontWeight: 600 }}>{s(c.partOfSpeech, "n.")}</span>
             </div>
-            <div className="mt-10" style={{ fontSize: 34, lineHeight: 1.35, color: "rgba(10,15,28,0.85)", maxWidth: 1400 }}>
+            <div className="mt-10" style={{ fontSize: 34, lineHeight: 1.35, color: "color-mix(in oklab, currentColor 85%, transparent)", maxWidth: 1400 }}>
               {s(c.definition)}
             </div>
             {s(c.usage) && (
               <div className="mt-12 pt-8" style={{ borderTop: "1px solid rgba(10,15,28,0.15)", maxWidth: 1400 }}>
                 <span className="uppercase mr-4" style={{ fontSize: 14, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>Usage</span>
-                <span style={{ fontSize: 24, lineHeight: 1.45, color: "rgba(10,15,28,0.65)", fontStyle: "italic" }}>{s(c.usage)}</span>
+                <span style={{ fontSize: 24, lineHeight: 1.45, color: "color-mix(in oklab, currentColor 65%, transparent)", fontStyle: "italic" }}>{s(c.usage)}</span>
               </div>
             )}
           </div>
@@ -3758,7 +3758,7 @@ function renderVariantBody({
                 </div>
                 <div>
                   <div style={{ fontSize: 40, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.1 }}>{s(it.statement)}</div>
-                  <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(it.body)}</div>
+                  <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>{s(it.body)}</div>
                 </div>
               </div>
             ))}
@@ -3842,7 +3842,7 @@ function renderVariantBody({
               <div className="mt-10">
                 {bItems.map((it, i) => (
                   <div key={i} className="flex items-baseline justify-between py-5" style={{ borderTop: "1px solid rgba(10,15,28,0.12)", borderBottom: i === bItems.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
-                    <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.24em", color: "rgba(10,15,28,0.6)", fontWeight: 600 }}>{s(it.label)}</div>
+                    <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.24em", color: "color-mix(in oklab, currentColor 60%, transparent)", fontWeight: 600 }}>{s(it.label)}</div>
                     <div className="tabular-nums" style={{ fontSize: 32, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em" }}>{s(it.value)}</div>
                   </div>
                 ))}
@@ -3945,7 +3945,7 @@ function renderVariantBody({
                       <div style={{ width: 14, height: 14, background: i === 0 ? brand.tokens.accent : brand.tokens.primary, opacity: i === 0 ? 1 : Math.max(0.4, 1 - i * 0.2) }} />
                       <div style={{ fontSize: 22, color: brand.tokens.primary, fontWeight: 600 }}>{s(l.label)}</div>
                     </div>
-                    <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 600, color: "rgba(10,15,28,0.72)" }}>{s(l.value)}</div>
+                    <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 600, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>{s(l.value)}</div>
                   </div>
                 ))}
               </div>
@@ -3990,7 +3990,7 @@ function renderVariantBody({
                   </div>
                   <div className="mt-6 w-full" style={{ height: h, background: color, opacity, maxWidth: 220 }} />
                   <div className="mt-6 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: isLast ? brand.tokens.accent : "rgba(10,15,28,0.6)", fontWeight: 600 }}>{s(it.year)}</div>
-                  {s(it.note) && <div className="mt-2 text-center" style={{ fontSize: 16, color: "rgba(10,15,28,0.6)", maxWidth: 220 }}>{s(it.note)}</div>}
+                  {s(it.note) && <div className="mt-2 text-center" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 60%, transparent)", maxWidth: 220 }}>{s(it.note)}</div>}
                 </div>
               );
             })}
@@ -4119,7 +4119,7 @@ function renderVariantBody({
           {s(c.legend) && (
             <div className="mt-6 flex items-center gap-4">
               <div style={{ width: 14, height: 14, background: brand.tokens.accent }} />
-              <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.24em", color: "rgba(10,15,28,0.65)", fontWeight: 600 }}>{s(c.legend)}</div>
+              <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.24em", color: "color-mix(in oklab, currentColor 65%, transparent)", fontWeight: 600 }}>{s(c.legend)}</div>
             </div>
           )}
         </SlideFrame>
@@ -4196,7 +4196,7 @@ function renderVariantBody({
                         <div style={{ fontSize: 22, fontWeight: 600, color: brand.tokens.primary }}>{it.label}</div>
                         <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: "var(--slide-accent-text)" }}>{it.value}%</div>
                       </div>
-                      <div className="mt-2" style={{ fontSize: 16, color: "rgba(10,15,28,0.65)", lineHeight: 1.4 }}>{it.body}</div>
+                      <div className="mt-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 65%, transparent)", lineHeight: 1.4 }}>{it.body}</div>
                     </div>
                   </div>
                 );
@@ -4219,14 +4219,14 @@ function renderVariantBody({
               const pct = Math.min(100, Math.round((done / total) * 100));
               return (
                 <div key={i} className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                  <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "rgba(10,15,28,0.6)", fontWeight: 600 }}>{s(it.label)}</div>
+                  <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 60%, transparent)", fontWeight: 600 }}>{s(it.label)}</div>
                   <div className="mt-6 flex items-baseline gap-3">
                     <div className="tabular-nums" style={{ fontSize: 88, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.03em", lineHeight: 1 }}>{pct}%</div>
-                    <div style={{ fontSize: 20, color: "rgba(10,15,28,0.5)" }}>of 100%</div>
+                    <div style={{ fontSize: 20, color: "color-mix(in oklab, currentColor 50%, transparent)" }}>of 100%</div>
                   </div>
                   <div className="mt-4 tabular-nums" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 62%, transparent)" }}>{done.toLocaleString()} / {total.toLocaleString()}</div>
                   <div className="mt-6"><ProgressBar brand={brand} percent={pct} /></div>
-                  <div className="mt-6" style={{ fontSize: 18, color: "rgba(10,15,28,0.7)", lineHeight: 1.45 }}>{s(it.body)}</div>
+                  <div className="mt-6" style={{ fontSize: 18, color: "color-mix(in oklab, currentColor 70%, transparent)", lineHeight: 1.45 }}>{s(it.body)}</div>
                 </div>
               );
             })}
@@ -4266,7 +4266,7 @@ function renderVariantBody({
                     <div style={{ fontSize: 24, fontWeight: 600, color: brand.tokens.primary }}>{s(it.label)}</div>
                     <div className="flex items-baseline gap-10">
                       <div className="tabular-nums" style={{ fontSize: 40, fontWeight: 600, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}>{cur}%</div>
-                      <div className="tabular-nums" style={{ fontSize: 30, fontWeight: 600, color: "rgba(10,15,28,0.4)" }}>{bench}%</div>
+                      <div className="tabular-nums" style={{ fontSize: 30, fontWeight: 600, color: "color-mix(in oklab, currentColor 40%, transparent)" }}>{bench}%</div>
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
@@ -4278,7 +4278,7 @@ function renderVariantBody({
                     </div>
                   </div>
                   {s(it.range) && (
-                    <div className="mt-3 uppercase" style={{ fontSize: 14, letterSpacing: "0.24em", color: "rgba(10,15,28,0.5)", fontWeight: 600 }}>{s(it.range)}</div>
+                    <div className="mt-3 uppercase" style={{ fontSize: 14, letterSpacing: "0.24em", color: "color-mix(in oklab, currentColor 50%, transparent)", fontWeight: 600 }}>{s(it.range)}</div>
                   )}
                 </div>
               );
@@ -5182,7 +5182,7 @@ function NumberedList({ brand, pageNumber, title, items }: { brand: BrandMode; p
                 <div style={{ fontSize: 32, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>
                   {label}
                 </div>
-                <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.4, color: "rgba(10,15,28,0.72)" }}>
+                <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.4, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>
                   {s(it.body)}
                 </div>
               </div>
@@ -5790,7 +5790,7 @@ function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand:
       </svg>
       <div className="mt-2 flex flex-wrap gap-6">
         {series.map((sr, i) => (
-          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: "rgba(10,15,28,0.7)" }}>
+          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 70%, transparent)" }}>
             <span style={{ display: "inline-block", width: 22, height: 3, background: cols[i] || brand.tokens.primary }} />
             <span style={{ fontWeight: 600, color: brand.tokens.primary }}>{sr.label}</span>
           </div>
@@ -5835,12 +5835,12 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
       </svg>
       <div className="mt-3 flex flex-wrap gap-6">
         {segments.map((sg, i) => (
-          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: "rgba(10,15,28,0.7)" }}>
+          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 70%, transparent)" }}>
             <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || brand.tokens.primary, opacity: i === 0 ? 1 : 0.7 - i * 0.15 }} />
             <span style={{ fontWeight: 600, color: brand.tokens.primary }}>{sg.label}</span>
           </div>
         ))}
-        {unit && <div style={{ fontSize: 14, color: "rgba(10,15,28,0.5)", marginLeft: "auto" }}>Units: {unit}</div>}
+        {unit && <div style={{ fontSize: 14, color: "color-mix(in oklab, currentColor 50%, transparent)", marginLeft: "auto" }}>Units: {unit}</div>}
       </div>
     </div>
   );
@@ -5877,12 +5877,12 @@ function StackedAreaChart({ brand, series, xLabels, unit, height = 480 }: { bran
       </svg>
       <div className="mt-3 flex flex-wrap gap-6">
         {series.map((sr, i) => (
-          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: "rgba(10,15,28,0.7)" }}>
+          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 70%, transparent)" }}>
             <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || brand.tokens.primary, opacity: i === 0 ? 0.95 : 0.7 - i * 0.15 }} />
             <span style={{ fontWeight: 600, color: brand.tokens.primary }}>{sr.label}</span>
           </div>
         ))}
-        {unit && <div style={{ fontSize: 14, color: "rgba(10,15,28,0.5)", marginLeft: "auto" }}>Units: {unit}</div>}
+        {unit && <div style={{ fontSize: 14, color: "color-mix(in oklab, currentColor 50%, transparent)", marginLeft: "auto" }}>Units: {unit}</div>}
       </div>
     </div>
   );
@@ -6093,11 +6093,11 @@ function ComboChart({ brand, points, barLabel, barUnit, lineLabel, lineUnit, hei
         {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={6} fill={brand.tokens.accent} />)}
       </svg>
       <div className="mt-2 flex flex-wrap gap-6">
-        <div className="flex items-center gap-2" style={{ fontSize: 16, color: "rgba(10,15,28,0.7)" }}>
+        <div className="flex items-center gap-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 70%, transparent)" }}>
           <span style={{ display: "inline-block", width: 16, height: 16, background: brand.tokens.primary, opacity: 0.85 }} />
           <span style={{ fontWeight: 600, color: brand.tokens.primary }}>{barLabel}</span>
         </div>
-        <div className="flex items-center gap-2" style={{ fontSize: 16, color: "rgba(10,15,28,0.7)" }}>
+        <div className="flex items-center gap-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 70%, transparent)" }}>
           <span style={{ display: "inline-block", width: 22, height: 3, background: brand.tokens.accent }} />
           <span style={{ fontWeight: 600, color: brand.tokens.primary }}>{lineLabel}</span>
         </div>
