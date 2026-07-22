@@ -524,7 +524,7 @@ export function AuroraLayer({
         viewBox="0 0 1280 720"
         preserveAspectRatio="xMidYMid slice"
         className="absolute inset-0 h-full w-full"
-        style={{ opacity: mode === "dark" ? intensity : intensity * 0.72 }}
+        style={{ opacity: intensity * 0.75 }}
       >
         <defs>
           {orbs.map((o, i) => (
@@ -533,15 +533,15 @@ export function AuroraLayer({
               id={`tp-aurora-${seed}-${i}`}
               cx="50%"
               cy="50%"
-              r={mode === "dark" ? "50%" : "75%"}
+              r={mode === "dark" ? "95%" : "110%"}
             >
               <stop offset="0%" stopColor={o.color} stopOpacity={o.alpha} />
-              <stop offset={mode === "dark" ? "55%" : "42%"} stopColor={o.color} stopOpacity={mode === "dark" ? o.alpha * 0.45 : o.alpha * 0.32} />
+              <stop offset={mode === "dark" ? "62%" : "52%"} stopColor={o.color} stopOpacity={mode === "dark" ? o.alpha * 0.45 : o.alpha * 0.32} />
               <stop offset="100%" stopColor={o.color} stopOpacity="0" />
             </radialGradient>
           ))}
-          <filter id={`tp-aurora-${seed}-blur`} x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation={mode === "dark" ? 60 : 85} />
+          <filter id={`tp-aurora-${seed}-blur`} x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation={mode === "dark" ? 90 : 110} />
           </filter>
         </defs>
         <g filter={`url(#tp-aurora-${seed}-blur)`}>
@@ -606,14 +606,14 @@ function auroraOrbs(seed: string, brand: BrandMode, mode: "dark" | "light" = "da
     : [lightPrimary, brand.tokens.accent, sibling];
   // Light mode alphas are gentler so the pastel wash never overpowers charts,
   // glass tiles or body copy — dark mode keeps the full-strength orbs.
-  const alphaBase = mode === "dark" ? 0.55 : 0.55;
-  const alphaRange = mode === "dark" ? 0.35 : 0.28;
+  const alphaBase = 0.75;
+  const alphaRange = mode === "dark" ? 0.22 : 0.18;
   return Array.from({ length: 3 }).map((_, i) => ({
     color: palette[i] ?? brand.tokens.accent,
-    x: 180 + rand() * 900,
-    y: 90 + rand() * 540,
-    rx: (mode === "dark" ? 380 : 460) + rand() * (mode === "dark" ? 260 : 320),
-    ry: (mode === "dark" ? 320 : 400) + rand() * (mode === "dark" ? 220 : 280),
+    x: 120 + rand() * 1040,
+    y: 60 + rand() * 600,
+    rx: (mode === "dark" ? 520 : 620) + rand() * (mode === "dark" ? 340 : 420),
+    ry: (mode === "dark" ? 440 : 540) + rand() * (mode === "dark" ? 280 : 360),
     alpha: alphaBase + rand() * alphaRange,
   }));
 }
@@ -823,8 +823,9 @@ export function AuroraOrb({
   const ctxAccent = useSlideAccent();
   const a = accent ?? ctxAccent ?? "#4F8CFF";
   const sibling = shiftHue(a, 34, 0.06);
-  const alpha = (mode === "dark" ? 0.85 : 0.5) * intensity;
+  const alpha = 0.75 * intensity;
   const isLight = mode === "light";
+  const scaled = isLight ? size * 1.45 : size * 1.18;
   return (
     <div
       aria-hidden
@@ -832,14 +833,14 @@ export function AuroraOrb({
       style={{
         left: `${x}%`,
         top: `${y}%`,
-        width: isLight ? size * 1.18 : size,
-        height: isLight ? size * 1.18 : size,
+        width: scaled,
+        height: scaled,
         transform: "translate(-50%, -50%)",
         borderRadius: "50%",
         background: isLight
-          ? `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.75)} 26%, ${hexA(a, alpha * 0.25)} 62%, ${hexA(a, 0)} 92%)`
-          : `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.9)} 32%, ${hexA(a, 0)} 68%)`,
-        filter: isLight ? "blur(60px)" : "blur(40px)",
+          ? `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.75)} 22%, ${hexA(a, alpha * 0.25)} 58%, ${hexA(a, 0)} 100%)`
+          : `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.9)} 28%, ${hexA(a, alpha * 0.2)} 72%, ${hexA(a, 0)} 96%)`,
+        filter: isLight ? "blur(80px)" : "blur(56px)",
         mixBlendMode: mode === "dark" ? "screen" : "multiply",
       }}
     />
