@@ -217,6 +217,51 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
         </button>
       </div>
 
+      {/* Region filter */}
+      <div className="mt-5 rounded-xl border border-black/10 bg-black/[0.015] p-3">
+        <div className="flex items-baseline justify-between">
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-black/60">
+            Region filter {allActive ? "· all regions" : `· ${activeRegions.length}/${REGION_KEYS.length}`}
+          </div>
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setPreset(null)} className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-widest ${allActive ? "bg-sky-600 text-white" : "border border-black/15 text-black/60 hover:border-sky-500 hover:text-sky-600"}`}>All</button>
+            <button type="button" onClick={() => setPreset(["AMER", "LATAM"])} className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-sky-500 hover:text-sky-600">Americas</button>
+            <button type="button" onClick={() => setPreset(["EMEA", "MEA"])} className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-sky-500 hover:text-sky-600">EMEA</button>
+            <button type="button" onClick={() => setPreset(["APAC"])} className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-sky-500 hover:text-sky-600">APAC</button>
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {REGION_KEYS.map((k) => {
+            const on = activeRegions.includes(k);
+            const count = regionCounts[k] ?? 0;
+            const disabled = count === 0;
+            return (
+              <button
+                key={k}
+                type="button"
+                disabled={disabled}
+                onClick={() => toggleRegion(k)}
+                className={`flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-medium transition ${
+                  disabled
+                    ? "cursor-not-allowed border-black/10 text-black/25"
+                    : on
+                    ? "border-sky-500 bg-sky-500/10 text-sky-700"
+                    : "border-black/15 text-black/60 hover:border-sky-500 hover:text-sky-600"
+                }`}
+                title={disabled ? "No pins in this region" : on ? "Click to hide" : "Click to show"}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${on && !disabled ? "bg-sky-600" : "bg-black/25"}`} />
+                <span className="tracking-wide">{REGION_LABELS[k]}</span>
+                <span className="tabular-nums text-black/40">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-2 text-[10px] text-black/45">
+          Filters apply to the map, the legend scale, the headline total, and the top-locations list.
+        </div>
+
+
       {/* Metrics list */}
       {metricList.length === 0 ? (
         <div className="mt-5 rounded-xl border border-dashed border-black/15 bg-black/[0.015] p-6 text-center text-sm text-black/50">
