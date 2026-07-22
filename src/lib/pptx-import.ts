@@ -1961,9 +1961,10 @@ function substitutePhClrInLine(line: LayoutLine | undefined, phColor: string | u
 
 function fillStyleSlot(theme: ParsedTheme | undefined, idx: number, background: boolean): LayoutFill | undefined {
   if (!theme || !(idx > 0)) return undefined;
-  const list = background || idx >= 1001 ? theme.bgFillStyleLst : theme.fillStyleLst;
+  const list = idx >= 1001 ? theme.bgFillStyleLst : background ? (theme.bgFillStyleLst ?? theme.fillStyleLst) : theme.fillStyleLst;
   if (!list?.length) return undefined;
   const slot = idx >= 1001 ? idx - 1001 : Math.max(0, idx - 1);
+  if (slot < 0) return undefined;
   return list[Math.min(slot, list.length - 1)];
 }
 
@@ -2006,6 +2007,7 @@ function readMappedLineRef(style: PNode | undefined, theme: ParsedTheme | undefi
 function readBgRef(bgRef: PNode | undefined, theme?: ParsedTheme): LayoutFill | undefined {
   if (!bgRef) return undefined;
   const idx = Number(pAttrs(bgRef)["@_idx"] ?? 0);
+  if (!(idx > 0)) return undefined;
   const phColor = readColorFromNode(bgRef);
   const picked = fillStyleSlot(theme, idx, true);
   if (picked) return substitutePhClrInFill(picked, phColor);
