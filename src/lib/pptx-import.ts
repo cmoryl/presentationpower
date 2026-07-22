@@ -1544,7 +1544,11 @@ function readDuotone(blipFill: PNode | undefined): [string, string] | undefined 
   return undefined;
 }
 
-function readFill(spPr: PNode | undefined, imageEmbedIds: string[]): LayoutFill | undefined {
+function readFill(
+  spPr: PNode | undefined,
+  imageEmbedIds: string[],
+  embedIdMap?: Record<string, string>,
+): LayoutFill | undefined {
   if (!spPr) return undefined;
   const kids = pChildren(spPr);
   for (const k of kids) {
@@ -1583,7 +1587,8 @@ function readFill(spPr: PNode | undefined, imageEmbedIds: string[]): LayoutFill 
     }
     if (t === "a:blipFill") {
       const blip = pFind(k, "a:blip");
-      const embed = blip ? pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"] : undefined;
+      const rawEmbed = blip ? pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"] : undefined;
+      const embed = rawEmbed ? (embedIdMap?.[rawEmbed] ?? rawEmbed) : undefined;
       if (embed) {
         void imageEmbedIds;
         const srcRect = readSrcRect(k);
