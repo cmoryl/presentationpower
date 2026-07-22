@@ -902,30 +902,30 @@ function renderVariantBody({
                 “
               </div>
               <div className="relative">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 tp-rise">
                   <span
                     className="inline-block h-2 w-2 rounded-full"
                     style={{ background: brand.tokens.accent, boxShadow: `0 0 20px ${brand.tokens.accent}` }}
                   />
                   <Kicker brand={brand}>In their words</Kicker>
                 </div>
-                <div
-                  className="mt-10"
-                  style={{
-                    fontSize: 82,
-                    fontWeight: 500,
-                    lineHeight: 1.12,
-                    letterSpacing: "-0.025em",
-                    maxWidth: 1520,
-                    color: ink.strong,
-                  }}
-                >
-                  {s(c.quote)}
+                <div className="mt-10 tp-rise tp-rise-delay-1">
+                  <PullQuote
+                    quote={s(c.quote)}
+                    brand={brand}
+                    size={78}
+                    color={ink.strong}
+                  />
                 </div>
                 <div
-                  className="mt-14 h-[2px] w-[120px] rounded-full"
+                  className="mt-14 h-[2px] w-[120px] rounded-full tp-rise tp-rise-delay-2"
                   style={{ backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)` }}
                 />
+                <div className="mt-8 tp-rise tp-rise-delay-3">
+                  <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} />
+                </div>
+              </div>
+
                 <div className="mt-8">
                   <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} />
                 </div>
