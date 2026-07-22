@@ -38,9 +38,10 @@ const PILOTS = [
 ] as const;
 
 const BRANDS = [
-  { id: "bm-tp-corporate", label: "Corporate (matches reference)" },
+  { id: "bm-enterprise", label: "Enterprise (matches reference)" },
   { id: "bm-tp-lifesci", label: "Life Sciences (division-aware)" },
 ] as const;
+
 
 function DevChartPreview() {
   return (
