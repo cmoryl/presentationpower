@@ -16,7 +16,6 @@ import type {
   LayoutShape,
   LayoutFrame,
   LayoutFill,
-  LayoutLine,
   LayoutRun,
   LayoutPara,
   LayoutTextBody,
@@ -24,8 +23,10 @@ import type {
   LayoutEffect,
   CustomPath,
   TableCell,
+  ParsedChart,
 } from "@/lib/pptx-import";
 import { applyColorMods } from "@/lib/pptx-import";
+
 
 
 type SlideLayoutWithUrls = SlideLayout & {
