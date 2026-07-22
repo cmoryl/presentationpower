@@ -5643,8 +5643,9 @@ function ProgressBar({ brand: _brand, percent }: { brand: BrandMode; percent: nu
 }
 
 // ── Graph helpers (Batch 4) ────────────────────────────────────────────
-function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string; unit?: string }) {
+function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit, bare = false }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string; unit?: string; bare?: boolean }) {
   const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
   const w = 1720;
   const h = height;
   const padL = 90, padR = 40, padT = 40, padB = 60;
@@ -5655,14 +5656,15 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { 
   const barW = slot * 0.44;
   const ticks = 4;
   const hiValue = bars.find((b) => b.label === highlight)?.value;
-  return (
+  const svg = (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      <ChartAccentDefs id={id} />
       {Array.from({ length: ticks + 1 }, (_, i) => {
         const y = padT + (chartH / ticks) * i;
         const val = niceMax * (1 - i / ticks);
         return (
           <g key={i}>
-            <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} opacity={i === ticks ? 1 : 0.6} />
+            <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} opacity={i === ticks ? 1 : 0.55} />
             <text x={padL - 14} y={y + 5} textAnchor="end" fontSize={14} fill={ink.faint} style={{ fontVariantNumeric: "tabular-nums" }}>{val.toFixed(0)}{unit || ""}</text>
           </g>
         );
@@ -5674,9 +5676,10 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { 
         const isHi = highlight ? b.label === highlight : false;
         return (
           <g key={i}>
-            <rect x={x} y={y} width={barW} height={bh} fill={isHi ? "var(--slide-accent-text)" : ink.trackFill} />
+            {isHi && <rect x={x - 8} y={y - 10} width={barW + 16} height={bh + 10} rx={10} fill="var(--slide-accent-text)" opacity={0.22} filter={`url(#${id}-glow)`} />}
+            <rect x={x} y={y} width={barW} height={bh} rx={3} fill={isHi ? `url(#${id}-bar)` : ink.trackFill} />
             {isHi && hiValue !== undefined && (
-              <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={22} fontWeight={600} fill={ink.text} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{b.value}{unit || ""}</text>
+              <text x={x + barW / 2} y={y - 16} textAnchor="middle" fontSize={22} fontWeight={600} fill={ink.text} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{b.value}{unit || ""}</text>
             )}
             <text x={x + barW / 2} y={h - padB + 30} textAnchor="middle" fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{b.label}</text>
           </g>
@@ -5684,7 +5687,10 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { 
       })}
     </svg>
   );
+  if (bare) return svg;
+  return <GlassChartPanel padding="px-6 py-6" bloomAnchor="tr">{svg}</GlassChartPanel>;
 }
+
 
 function DonutBlock({ brand, item }: { brand: BrandMode; item: Item }) {
   const ink = useSlideInk();
