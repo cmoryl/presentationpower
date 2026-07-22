@@ -10,7 +10,7 @@
 // spacing + hanging indent + real bullet chars, run strike/cap/spc/baseline,
 // and richer tables (cell fills, per-side borders).
 
-import { useMemo, useId } from "react";
+import { useMemo, useId, createContext, useContext } from "react";
 import type {
   SlideLayout,
   LayoutShape,
@@ -612,7 +612,23 @@ function CroppedImage({
   );
 }
 
+type SlideMedia = { kind: "video" | "audio" | "ole"; mime?: string; path?: string };
+type SlideAssets = {
+  hyperlinks?: Array<{ rId: string; target: string; external?: boolean }>;
+  media?: SlideMedia[];
+  hidden?: boolean;
+  transition?: string;
+  hasAnimation?: boolean;
+};
+type EmbeddedFontLite = {
+  typeface: string;
+  variants: Array<{ style: "regular" | "bold" | "italic" | "boldItalic"; mime?: string; dataUrl?: string }>;
+};
+
+const HyperlinkCtx = createContext<Record<string, { target: string; external?: boolean }>>({});
+
 function ParaBlock({ para }: { para: ResolvedPara }) {
+  const linkMap = useContext(HyperlinkCtx);
   return (
     <p style={{
       textAlign: para.align,
@@ -625,7 +641,23 @@ function ParaBlock({ para }: { para: ResolvedPara }) {
       {para.bulletChar && <span style={{ marginRight: "0.08in", ...para.bulletStyle }}>{para.bulletChar}</span>}
       {para.runs.map((r, i) => {
         if (r.isBreak) return <br key={i} />;
-        if (r.hlink) return <a key={i} href="#" style={{ ...r.style, textDecoration: "underline" }}>{r.text}</a>;
+        if (r.hlink) {
+          const hit = linkMap[r.hlink];
+          const href = hit?.target && hit.external !== false ? hit.target : undefined;
+          return (
+            <a
+              key={i}
+              href={href ?? "#"}
+              target={href ? "_blank" : undefined}
+              rel={href ? "noopener noreferrer" : undefined}
+              onClick={href ? undefined : (e) => e.preventDefault()}
+              title={hit?.target}
+              style={{ ...r.style, textDecoration: "underline", color: r.style.color ?? "#003FC7" }}
+            >
+              {r.text}
+            </a>
+          );
+        }
         return <span key={i} style={r.style}>{r.text}</span>;
       })}
     </p>
@@ -1059,12 +1091,21 @@ export function FaithfulSlideCanvas({
   width,
   theme,
   className,
+  assets,
+  fonts,
+  showChrome = true,
 }: {
   layout: SlideLayoutWithUrls | undefined;
   /** Rendered width in pixels. Height is derived from the slide aspect ratio. */
   width: number;
   theme?: Record<string, string>;
   className?: string;
+  /** Per-slide extracted assets — hyperlinks, media, transition/hidden/animation flags. */
+  assets?: SlideAssets;
+  /** Deck-level embedded fonts (with inline dataUrls when budget allowed). */
+  fonts?: EmbeddedFontLite[];
+  /** Whether to render the metadata badge overlay (hidden/transition/animation/media chips). */
+  showChrome?: boolean;
 }) {
   const salt = useId().replace(/[^a-zA-Z0-9]/g, "");
   const resolved = useMemo<ResolvedLayout | undefined>(
@@ -1072,47 +1113,142 @@ export function FaithfulSlideCanvas({
     [layout, theme],
   );
 
+  const linkMap = useMemo(() => {
+    const m: Record<string, { target: string; external?: boolean }> = {};
+    for (const h of assets?.hyperlinks ?? []) m[h.rId] = { target: h.target, external: h.external };
+    return m;
+  }, [assets]);
+
+  // Emit @font-face rules for every embedded variant with an inline dataUrl.
+  const fontFaceCss = useMemo(() => {
+    if (!fonts || fonts.length === 0) return "";
+    const styleFor = (v: EmbeddedFontLite["variants"][number]) => ({
+      weight: v.style === "bold" || v.style === "boldItalic" ? 700 : 400,
+      italic: v.style === "italic" || v.style === "boldItalic",
+    });
+    return fonts
+      .flatMap((f) =>
+        f.variants
+          .filter((v) => v.dataUrl)
+          .map((v) => {
+            const { weight, italic } = styleFor(v);
+            return `@font-face{font-family:"${f.typeface.replace(/"/g, "'")}";src:url(${v.dataUrl}) format("${(v.mime === "application/x-font-otf" || v.mime === "font/otf") ? "opentype" : "truetype"}");font-weight:${weight};font-style:${italic ? "italic" : "normal"};font-display:swap;}`;
+          }),
+      )
+      .join("\n");
+  }, [fonts]);
+
   const size = resolved?.size ?? { w: 13.333, h: 7.5 };
   const innerPx = size.w * 96;
   const scale = width / innerPx;
   const height = (size.h * 96) * scale;
 
-  return (
-    <div
-      className={className}
-      style={{ width, height, position: "relative", overflow: "hidden", background: resolved?.bg ?? "#FFFFFF" }}
-    >
-      {resolved?.bgImage?.url && (
-        <CroppedImage
-          url={resolved.bgImage.url}
-          srcRect={resolved.bgImage.srcRect}
-          opacity={resolved.bgImage.opacity}
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-        />
-      )}
+  const badges: Array<{ label: string; tone: "hidden" | "info" | "accent" }> = [];
+  if (assets?.hidden) badges.push({ label: "Hidden", tone: "hidden" });
+  if (assets?.transition) badges.push({ label: `Transition · ${assets.transition}`, tone: "info" });
+  if (assets?.hasAnimation) badges.push({ label: "Animated", tone: "accent" });
 
+  const mediaChips = (assets?.media ?? []).map((m, i) => ({
+    key: i,
+    icon: m.kind === "video" ? "▶︎" : m.kind === "audio" ? "♪" : "▤",
+    label: m.kind.toUpperCase(),
+    hint: m.mime ?? "",
+  }));
+
+  return (
+    <HyperlinkCtx.Provider value={linkMap}>
       <div
-        style={{
-          width: `${size.w}in`,
-          height: `${size.h}in`,
-          position: "absolute",
-          top: 0,
-          left: 0,
-          transformOrigin: "top left",
-          transform: `scale(${scale})`,
-        }}
+        className={className}
+        style={{ width, height, position: "relative", overflow: "hidden", background: resolved?.bg ?? "#FFFFFF" }}
       >
-        <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden>
-          <defs>
-            <marker id="faithful-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
-            </marker>
-          </defs>
-        </svg>
-        {(resolved?.shapes ?? []).map((sh, i) => (
-          <ResolvedShapeNode key={i} shape={sh} salt={salt} theme={theme} />
-        ))}
+        {fontFaceCss && <style dangerouslySetInnerHTML={{ __html: fontFaceCss }} />}
+        {resolved?.bgImage?.url && (
+          <CroppedImage
+            url={resolved.bgImage.url}
+            srcRect={resolved.bgImage.srcRect}
+            opacity={resolved.bgImage.opacity}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+          />
+        )}
+
+        <div
+          style={{
+            width: `${size.w}in`,
+            height: `${size.h}in`,
+            position: "absolute",
+            top: 0,
+            left: 0,
+            transformOrigin: "top left",
+            transform: `scale(${scale})`,
+          }}
+        >
+          <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden>
+            <defs>
+              <marker id="faithful-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+              </marker>
+            </defs>
+          </svg>
+          {(resolved?.shapes ?? []).map((sh, i) => (
+            <ResolvedShapeNode key={i} shape={sh} salt={salt} theme={theme} />
+          ))}
+        </div>
+
+        {showChrome && (badges.length > 0 || mediaChips.length > 0) && (
+          <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+            {badges.length > 0 && (
+              <div style={{ position: "absolute", top: 8, right: 8, display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end", maxWidth: "70%" }}>
+                {badges.map((b, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      fontSize: 10,
+                      lineHeight: 1,
+                      padding: "4px 8px",
+                      borderRadius: 999,
+                      fontWeight: 600,
+                      letterSpacing: "0.04em",
+                      color: b.tone === "hidden" ? "#fff" : b.tone === "accent" ? "#03002C" : "#03002C",
+                      background: b.tone === "hidden" ? "rgba(11,11,18,0.72)" : b.tone === "accent" ? "rgba(255,235,102,0.92)" : "rgba(255,255,255,0.85)",
+                      border: "1px solid rgba(11,11,18,0.12)",
+                      backdropFilter: "blur(6px)",
+                    }}
+                  >
+                    {b.label}
+                  </span>
+                ))}
+              </div>
+            )}
+            {mediaChips.length > 0 && (
+              <div style={{ position: "absolute", bottom: 8, left: 8, display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {mediaChips.map((m) => (
+                  <span
+                    key={m.key}
+                    title={m.hint}
+                    style={{
+                      fontSize: 10,
+                      lineHeight: 1,
+                      padding: "4px 8px",
+                      borderRadius: 6,
+                      fontWeight: 600,
+                      letterSpacing: "0.04em",
+                      color: "#fff",
+                      background: "rgba(0,63,199,0.85)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4,
+                    }}
+                  >
+                    <span aria-hidden>{m.icon}</span>
+                    {m.label}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    </div>
+    </HyperlinkCtx.Provider>
   );
 }

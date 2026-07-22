@@ -90,7 +90,9 @@ function buildDeckExtras(parsed: any) {
     graphicsSummary: parsed.graphicsSummary ?? null,
     embeddedFonts: (parsed.embeddedFonts ?? []).map((f: any) => ({
       typeface: f.typeface,
-      variants: (f.variants ?? []).map((v: any) => ({ style: v.style, path: v.path, mime: v.mime })),
+      variants: (f.variants ?? []).map((v: any) => ({
+        style: v.style, path: v.path, mime: v.mime, dataUrl: v.dataUrl, bytes: v.bytes,
+      })),
     })),
     customXmlParts: (parsed.customXmlParts ?? []).map((p: any) => ({
       path: p.path,

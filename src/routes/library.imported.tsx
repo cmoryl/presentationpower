@@ -354,6 +354,7 @@ function DeckSlides({
             slide={s}
             deckId={deck.id}
             deckTheme={themeToTokens(deck.theme)}
+            deckFonts={deck.extras?.embeddedFonts}
             brandModeId={brandModeId}
             approved={approvedKey.has(`${deck.id}:${s.index}`)}
             onPreview={() => onPreview(s.index)}
@@ -368,6 +369,7 @@ function SlideCard({
   slide,
   deckId,
   deckTheme,
+  deckFonts,
   brandModeId,
   approved,
   onPreview,
@@ -375,6 +377,8 @@ function SlideCard({
   slide: ImportedSlide;
   deckId: string;
   deckTheme?: Record<string, string>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  deckFonts?: any;
   brandModeId: string;
   approved: boolean;
   onPreview: () => void;
@@ -409,7 +413,7 @@ function SlideCard({
         aria-label={`Preview slide ${slide.index + 1}`}
       >
         {slide.layout ? (
-          <FaithfulSlideCanvas layout={slide.layout} theme={deckTheme} width={320} />
+          <FaithfulSlideCanvas layout={slide.layout} theme={deckTheme} width={320} assets={slide.assets} fonts={deckFonts} />
         ) : (
           <div className="flex aspect-[16/9] w-full items-center justify-center bg-black/[0.02] text-[10px] text-black/40">
             No layout captured
@@ -508,7 +512,7 @@ function SlidePreview({
         <div className="bg-black/[0.03] p-6">
           {slide.layout ? (
             <div className="mx-auto" style={{ maxWidth: 1100 }}>
-              <FaithfulSlideCanvas layout={slide.layout} theme={deckTheme} width={1100} className="rounded-lg shadow-lg ring-1 ring-black/10" />
+              <FaithfulSlideCanvas layout={slide.layout} theme={deckTheme} width={1100} assets={slide.assets} fonts={deckExtras?.embeddedFonts} className="rounded-lg shadow-lg ring-1 ring-black/10" />
             </div>
           ) : (
             <div className="rounded-lg border border-dashed border-black/20 bg-white p-16 text-center text-sm text-black/50">
