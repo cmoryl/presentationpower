@@ -4408,7 +4408,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-8"><WaterfallChart brand={brand} steps={steps} unit={s(c.unit)} height={540} /></div>
+          <div className="mt-14"><WaterfallChart brand={brand} steps={steps} unit={s(c.unit)} height={540} /></div>
         </SlideFrame>
       );
     }
