@@ -4078,31 +4078,28 @@ function renderVariantBody({
       const total = segments.reduce((s, x) => s + x.value, 0) || 1;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <DotGridBackdrop />
-          <div className="relative z-10">
-            <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-            <SegmentedBar brand={brand} segments={segments} />
-            <div className="grid gap-6 mt-4" style={{ gridTemplateColumns: `repeat(${Math.min(items.length, 4)}, 1fr)` }}>
-              {items.map((it, i) => {
-                const pct = ((segments[i].value / total) * 100).toFixed(1);
-                const delta = s(it.delta);
-                const negative = delta.trim().startsWith("-");
-                return (
-                  <div key={i} style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`, paddingLeft: i === 0 ? 0 : 20 }}>
-                    <div className="uppercase" style={{ fontSize: 12, letterSpacing: "0.24em", color: ink.muted, fontWeight: 600 }}>{s(it.label)}</div>
-                    <div className="tabular-nums mt-2 flex items-baseline gap-3" style={{ fontSize: 34, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em" }}>
-                      {s(it.value, `${pct}%`)}
-                      <span style={{ fontSize: 18, color: ink.faint }}>{s(it.unit)}</span>
-                    </div>
-                    {delta && (
-                      <div className="uppercase mt-2" style={{ fontSize: 12, letterSpacing: "0.24em", color: negative ? "#B42318" : "var(--slide-accent-text)", fontWeight: 600 }}>{delta}</div>
-                    )}
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <SegmentedBar brand={brand} segments={segments} />
+          <div className="grid gap-6 mt-4" style={{ gridTemplateColumns: `repeat(${Math.min(items.length, 4)}, 1fr)` }}>
+            {items.map((it, i) => {
+              const pct = ((segments[i].value / total) * 100).toFixed(1);
+              const delta = s(it.delta);
+              const negative = delta.trim().startsWith("-");
+              return (
+                <div key={i} style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`, paddingLeft: i === 0 ? 0 : 20 }}>
+                  <div className="uppercase" style={{ fontSize: 12, letterSpacing: "0.24em", color: ink.muted, fontWeight: 600 }}>{s(it.label)}</div>
+                  <div className="tabular-nums mt-2 flex items-baseline gap-3" style={{ fontSize: 34, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em" }}>
+                    {s(it.value, `${pct}%`)}
+                    <span style={{ fontSize: 18, color: ink.faint }}>{s(it.unit)}</span>
                   </div>
-                );
-              })}
-            </div>
-            <div className="mt-12"><LiveMetaFooter brand={brand} source={s(c.source, "Internal telemetry")} refCode={variant.id} /></div>
+                  {delta && (
+                    <div className="uppercase mt-2" style={{ fontSize: 12, letterSpacing: "0.24em", color: negative ? "#B42318" : "var(--slide-accent-text)", fontWeight: 600 }}>{delta}</div>
+                  )}
+                </div>
+              );
+            })}
           </div>
+          <div className="mt-12"><LiveMetaFooter brand={brand} source={s(c.source, "Internal telemetry")} refCode={variant.id} /></div>
         </SlideFrame>
       );
     }
