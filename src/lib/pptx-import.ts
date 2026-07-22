@@ -2384,6 +2384,7 @@ function walkSpTree(
   parents?: ResolvedParents,
   embedIdMap?: Record<string, string>,
   theme?: ParsedTheme,
+  clrMap?: PptxClrMap,
 ) {
   for (const node of nodes) {
     const t = pTag(node);
@@ -2407,8 +2408,8 @@ function walkSpTree(
       const style = pFind(node, "p:style");
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       let prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
-      let fill = readFill(spPr, imageEmbedIds, embedIdMap) ?? readFillRef(style, theme);
-      let line = readLine(spPr) ?? readLineRef(style, theme);
+      let fill = remapFillScheme(readFill(spPr, imageEmbedIds, embedIdMap), clrMap) ?? readMappedFillRef(style, theme, clrMap);
+      let line = remapLineScheme(readLine(spPr), clrMap) ?? readMappedLineRef(style, theme, clrMap);
       const effect = readEffects(spPr);
       const customPath = readCustomPath(spPr);
       for (const proto of phProtos) {
@@ -2452,7 +2453,7 @@ function walkSpTree(
           }
         }
       }
-      out.push({ kind: "image", z: zRef.z++, frame, embedId, line: readLine(spPr) ?? readLineRef(style, theme), srcRect, prst, opacity, tile: tile || undefined, effect, customPath, duotone });
+      out.push({ kind: "image", z: zRef.z++, frame, embedId, line: remapLineScheme(readLine(spPr), clrMap) ?? readMappedLineRef(style, theme, clrMap), srcRect, prst, opacity, tile: tile || undefined, effect, customPath, duotone });
 
     } else if (t === "p:cxnSp") {
       const spPr = pFind(node, "p:spPr");
@@ -2463,10 +2464,10 @@ function walkSpTree(
       const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
       const style = pFind(node, "p:style");
       const effect = readEffects(spPr);
-      out.push({ kind: "line", z: zRef.z++, frame, line: readLine(spPr) ?? readLineRef(style, theme), prst, effect });
+      out.push({ kind: "line", z: zRef.z++, frame, line: remapLineScheme(readLine(spPr), clrMap) ?? readMappedLineRef(style, theme, clrMap), prst, effect });
     } else if (t === "p:grpSp") {
       const grpSpPr = pFind(node, "p:grpSpPr");
-      walkSpTree(pChildren(node), zRef, grpSpPr ?? group, out, imageEmbedIds, parents, embedIdMap, theme);
+      walkSpTree(pChildren(node), zRef, grpSpPr ?? group, out, imageEmbedIds, parents, embedIdMap, theme, clrMap);
     } else if (t === "p:graphicFrame") {
       const xfrm = pFind(node, "p:xfrm");
       let frame: LayoutFrame | undefined;
