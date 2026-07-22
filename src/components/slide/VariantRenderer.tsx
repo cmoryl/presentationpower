@@ -468,25 +468,66 @@ function renderVariantBody({
         </SlideFrame>
       );
 
-    case "MV-OP-AGENDA":
+    case "MV-OP-AGENDA": {
+      const items = arr(c.items);
+      const rule = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, "Agenda")} kicker="Contents" />
-          <div className="mt-16 grid grid-cols-2 gap-x-24 gap-y-8">
-            {arr(c.items).map((it, i) => (
-              <div key={i} className="flex items-baseline gap-8 border-t pt-6" style={{ borderColor: "rgba(10,15,28,0.10)" }}>
+          {/* Ambient glow anchoring the composition */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage: `radial-gradient(38% 42% at 88% 12%, ${brand.tokens.accent}${isDark ? "1F" : "12"} 0%, transparent 70%)`,
+            }}
+          />
+          <div className="relative">
+            <SlideTitle brand={brand} title={s(c.title, "Agenda")} kicker="Contents" />
+            <div className="mt-16 grid grid-cols-2 gap-x-24">
+              {items.map((it, i) => (
                 <div
-                  className="tabular-nums"
-                  style={{ color: brand.tokens.accent, fontSize: 40, fontWeight: 600, letterSpacing: "-0.02em", minWidth: 76 }}
+                  key={i}
+                  className="group grid grid-cols-[96px_1fr_auto] items-center gap-6 py-7"
+                  style={{ borderTop: `1px solid ${rule}` }}
                 >
-                  {String(i + 1).padStart(2, "0")}
+                  <div
+                    className="tabular-nums"
+                    style={{
+                      fontSize: 48,
+                      fontWeight: 600,
+                      letterSpacing: "-0.03em",
+                      lineHeight: 1,
+                      background: `linear-gradient(180deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}88 100%)`,
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 34,
+                      lineHeight: 1.18,
+                      fontWeight: 600,
+                      letterSpacing: "-0.02em",
+                      color: ink.strong,
+                    }}
+                  >
+                    {s(it.label)}
+                  </div>
+                  <div
+                    aria-hidden
+                    className="h-[1px] w-10"
+                    style={{ background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, transparent 100%)` }}
+                  />
                 </div>
-                <div style={{ fontSize: 36, lineHeight: 1.2, fontWeight: 500 }}>{s(it.label)}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </SlideFrame>
       );
+    }
 
     case "MV-OP-AGENDA-VERTICAL":
       return (
