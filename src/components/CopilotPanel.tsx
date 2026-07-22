@@ -16,6 +16,7 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
   const snapshot = useServerFn(snapshotDeckVersion);
 
   const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<"assist" | "guide">("assist");
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
