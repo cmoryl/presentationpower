@@ -3022,14 +3022,34 @@ function renderVariantBody({
 
     case "MV-CLOSE-STATEMENT":
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <div className="relative flex h-full flex-col justify-between py-4 text-white">
-            <Kicker brand={brand}>{s(c.kicker)}</Kicker>
-            <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1700}>{s(c.statement)}</DisplayTitle>
-            <MetaRow><span>{s(c.signoff)}</span></MetaRow>
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
+          <AuroraOrb x={86} y={68} size={900} />
+          <div className="relative grid h-full grid-cols-[1.2fr_0.8fr] items-center gap-24">
+            <div>
+              <Kicker brand={brand}>{s(c.kicker, "A closing note")}</Kicker>
+              <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-8 mb-10" />
+              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1100}>{s(c.statement)}</DisplayTitle>
+              <MetaRow className="mt-14"><span>{s(c.signoff)}</span></MetaRow>
+            </div>
+            {(s(c.attribution) || s(c.role)) && (
+              <GlassTile radius={28} padding="px-12 py-12">
+                <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", fontWeight: 600, color: ink.faint }}>
+                  Signed
+                </div>
+                <div className="mt-8" style={{ fontSize: 36, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong, lineHeight: 1.15 }}>
+                  {s(c.attribution, s(c.signoff))}
+                </div>
+                {s(c.role) && (
+                  <div className="mt-3 uppercase" style={{ color: "var(--slide-accent-text)", fontSize: 15, letterSpacing: "0.28em", fontWeight: 600 }}>
+                    {s(c.role)}
+                  </div>
+                )}
+              </GlassTile>
+            )}
           </div>
         </SlideFrame>
       );
+
 
     case "MV-CLOSE-SPLIT":
       return (
