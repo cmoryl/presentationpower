@@ -190,8 +190,11 @@ export function adaptPaletteForMode(base: Palette, isDark: boolean): Palette {
     // Accent stays brand accent — used for eyebrows, rules and highlights.
     accent: base.accent,
     // Elevated tile surface: a step lighter than the navy primary background
-    // so cards/glass panels are visible without being pure white.
-    surface: "121B3D",
+    // so cards/glass panels are visible without being pure white. Byte-locked
+    // to the `.glass-dark` gradient top stop in `src/styles.css` — the
+    // preview↔export glass-token parity test enforces this equality.
+    surface: "141435",
+
     // Body/ink text becomes a soft light gray, legible on navy.
     ink: "D6DEF2",
   };
