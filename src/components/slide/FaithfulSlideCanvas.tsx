@@ -16,6 +16,7 @@ import type {
   LayoutShape,
   LayoutFrame,
   LayoutFill,
+  LayoutLine,
   LayoutRun,
   LayoutPara,
   LayoutTextBody,
@@ -26,6 +27,7 @@ import type {
   ParsedChart,
 } from "@/lib/pptx-import";
 import { applyColorMods } from "@/lib/pptx-import";
+
 
 
 
