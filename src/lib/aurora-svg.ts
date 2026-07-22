@@ -105,14 +105,14 @@ export function auroraOrbs(
     mode === "dark"
       ? [darkFirst, brand.tokens.accent, sibling]
       : [lightPrimary, brand.tokens.accent, sibling];
-  const alphaBase = 0.75;
-  const alphaRange = mode === "dark" ? 0.22 : 0.18;
+  const alphaBase = mode === "dark" ? 0.62 : 0.75;
+  const alphaRange = mode === "dark" ? 0.18 : 0.18;
   return Array.from({ length: 3 }).map((_, i) => ({
     color: palette[i] ?? brand.tokens.accent,
     x: 120 + rand() * 1040,
     y: 60 + rand() * 600,
-    rx: (mode === "dark" ? 520 : 620) + rand() * (mode === "dark" ? 340 : 420),
-    ry: (mode === "dark" ? 440 : 540) + rand() * (mode === "dark" ? 280 : 360),
+    rx: (mode === "dark" ? 380 : 620) + rand() * (mode === "dark" ? 240 : 420),
+    ry: (mode === "dark" ? 320 : 540) + rand() * (mode === "dark" ? 200 : 360),
     alpha: alphaBase + rand() * alphaRange,
   }));
 }
