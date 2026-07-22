@@ -531,7 +531,9 @@ function SlidePreview({
               )}
             </div>
           )}
+          <AssetInspectorPanel slide={slide} extras={deckExtras} />
         </div>
+
       </div>
     </div>
   );
