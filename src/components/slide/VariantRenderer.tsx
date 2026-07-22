@@ -271,12 +271,15 @@ export function VariantRenderer(props: Props) {
 
   return (
     <SlideModeContext.Provider value={mode}>
-      <SlideBackdropContext.Provider value={backdrop}>
-        <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany, logoOrientation: slide.logoOrientation && slide.logoOrientation !== "auto" ? slide.logoOrientation : logoOrientation, logoPosition: slide.logoPosition && slide.logoPosition !== "auto" ? slide.logoPosition : undefined }}>
-          {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c, mode })}
-        </SlideFrameCtx.Provider>
-      </SlideBackdropContext.Provider>
+      <SlideAccentContext.Provider value={themedBrand?.tokens?.accent ?? null}>
+        <SlideBackdropContext.Provider value={backdrop}>
+          <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany, logoOrientation: slide.logoOrientation && slide.logoOrientation !== "auto" ? slide.logoOrientation : logoOrientation, logoPosition: slide.logoPosition && slide.logoPosition !== "auto" ? slide.logoPosition : undefined }}>
+            {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c, mode })}
+          </SlideFrameCtx.Provider>
+        </SlideBackdropContext.Provider>
+      </SlideAccentContext.Provider>
     </SlideModeContext.Provider>
+
   );
 }
 
