@@ -208,6 +208,43 @@ export async function exportDeckToPptx(
     }),
   );
 
+  // Fallback: when a slide has no explicit Backgrounds & Imagery selection,
+  // honor the variant's deterministic backdrop (curated corporate-dark set,
+  // division photograph, or abstract atmospheric — same asset the editor's
+  // dark-mode preview and Present view render). Without this the exported
+  // PPTX/PDF drops the entire backdrop layer and slides land on a flat
+  // color, which is the "no background/imagery in exports" symptom.
+  await Promise.all(
+    backgroundPlans.map(async (plan, i) => {
+      if (plan.kind !== "none") return;
+      const slide = deck.slides[i];
+      const variant = byId(MODULE_VARIANTS, slide.variantId);
+      if (!variant) return;
+      const backdrop = backdropForVariant(variant, deck.brandModeId, "dark");
+      if (!backdrop?.url) return;
+      const data = await fetchAsDataUrl(backdrop.url, `slide ${i + 1} variant backdrop`);
+      if (!data) return;
+      const tint = (backdrop.tint ?? "#03002C").replace("#", "");
+      const strength = typeof backdrop.scrimStrength === "number" ? backdrop.scrimStrength : 0.6;
+      backgroundPlans[i] = {
+        kind: "image",
+        data,
+        solidFallback: tint,
+        scrim: {
+          color: tint,
+          strengthTop: backdrop.scrim === "top" || backdrop.scrim === "full" ? strength : strength * 0.15,
+          strengthMiddle: strength * 0.55,
+          strengthBottom: backdrop.scrim === "bottom" || backdrop.scrim === "full" ? strength : strength * 0.15,
+          side: backdrop.scrim ?? "bottom",
+        },
+        fit: "cover",
+        zoom: 1,
+        offsetX: 0,
+        offsetY: 0,
+      };
+    }),
+  );
+
   // Prefetch per-item client logos for the six client-listing variants so the
   // export renderers can embed real wordmarks (falling back to the initials
   // tile only when a slot has no logoUrl set).
