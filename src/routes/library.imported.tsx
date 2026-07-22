@@ -354,6 +354,7 @@ function DeckSlides({
             slide={s}
             deckId={deck.id}
             deckTheme={themeToTokens(deck.theme)}
+            deckFonts={deck.extras?.embeddedFonts}
             brandModeId={brandModeId}
             approved={approvedKey.has(`${deck.id}:${s.index}`)}
             onPreview={() => onPreview(s.index)}
