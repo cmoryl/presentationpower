@@ -36,6 +36,22 @@ export type LocationPin = {
   lon: number;
   role?: "HQ" | "hub" | "office" | "delivery" | "partner";
   label?: string; // optional short label shown next to pin
+  /** Per-pin metric values keyed by LocationMetric.id (see world-stats variant). */
+  values?: Record<string, number>;
+};
+
+/**
+ * Metric definition for the MV-LOC-WORLD-STATS variant. A deck can define
+ * multiple metrics (e.g. Revenue $M, Employees, Projects delivered) and pick
+ * one as active — the world-stats renderer aggregates the active metric
+ * across pins by region and headlines the global total.
+ */
+export type LocationMetric = {
+  id: string;
+  label: string;
+  unit?: string; // e.g. "$M", "%", "hrs"
+  format?: "number" | "currency" | "percent";
+  precision?: number;
 };
 
 export type DivisionLocationSet = {
@@ -44,6 +60,28 @@ export type DivisionLocationSet = {
   subhead?: string;
   pins: LocationPin[];
 };
+
+/** Formats a metric value for display in the world-stats variant. */
+export function formatMetricValue(
+  value: number | undefined,
+  metric: LocationMetric | undefined,
+): string {
+  if (!Number.isFinite(value as number)) return "—";
+  const v = value as number;
+  const precision = metric?.precision ?? 0;
+  const abs = Math.abs(v);
+  let numStr: string;
+  if (abs >= 1_000_000_000) numStr = `${(v / 1_000_000_000).toFixed(1)}B`;
+  else if (abs >= 1_000_000) numStr = `${(v / 1_000_000).toFixed(1)}M`;
+  else if (abs >= 10_000) numStr = `${(v / 1_000).toFixed(1)}K`;
+  else numStr = v.toFixed(precision);
+  const unit = metric?.unit;
+  if (!unit) return numStr;
+  const isCurrency = metric?.format === "currency" || /^[$€£¥]/.test(unit);
+  if (isCurrency) return `${unit}${numStr}`;
+  return `${numStr}${unit.startsWith(" ") ? unit : ` ${unit}`}`;
+}
+
 
 // Global TransPerfect network — a curated, real-office subset used as the
 // default seed for the enterprise brand and as fallback for any division
