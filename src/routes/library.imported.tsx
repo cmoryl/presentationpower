@@ -202,12 +202,22 @@ function ImportedLibrary() {
   );
 }
 
-function themeToTokens(theme?: { accent1?: string; accent2?: string; dark1?: string }): Record<string, string> | undefined {
+function themeToTokens(theme?: {
+  accent1?: string; accent2?: string; accent3?: string; accent4?: string; accent5?: string; accent6?: string;
+  dark1?: string; dark2?: string; light1?: string; light2?: string;
+}): Record<string, string> | undefined {
   if (!theme) return undefined;
   const t: Record<string, string> = {};
   if (theme.accent1) t.accent1 = theme.accent1;
   if (theme.accent2) t.accent2 = theme.accent2;
+  if (theme.accent3) t.accent3 = theme.accent3;
+  if (theme.accent4) t.accent4 = theme.accent4;
+  if (theme.accent5) t.accent5 = theme.accent5;
+  if (theme.accent6) t.accent6 = theme.accent6;
   if (theme.dark1) { t.dk1 = theme.dark1; t.tx1 = theme.dark1; }
+  if (theme.dark2) { t.dk2 = theme.dark2; t.tx2 = theme.dark2; }
+  if (theme.light1) { t.lt1 = theme.light1; t.bg1 = theme.light1; }
+  if (theme.light2) { t.lt2 = theme.light2; t.bg2 = theme.light2; }
   return Object.keys(t).length ? t : undefined;
 }
 
@@ -238,7 +248,11 @@ type DeckSlidesData = {
   id: string;
   original_filename: string;
   slide_count: number;
-  theme: { accent1?: string; accent2?: string; dark1?: string; headingFont?: string; bodyFont?: string };
+  theme: {
+    accent1?: string; accent2?: string; accent3?: string; accent4?: string; accent5?: string; accent6?: string;
+    dark1?: string; dark2?: string; light1?: string; light2?: string;
+    headingFont?: string; bodyFont?: string;
+  };
   slides: ImportedSlide[];
   status: string;
   error: string | null;

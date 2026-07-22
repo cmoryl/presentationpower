@@ -318,6 +318,7 @@ type ResolvedShape = {
     fillUrl?: string;
     fillSrcRect?: LayoutSrcRect;
     fillOpacity?: number;
+    fillTile?: boolean;
     insetsCss: string;
     fontScale?: number;
     rotDeg?: number;
@@ -333,6 +334,7 @@ type ResolvedShape = {
     filter?: string;
     srcRect?: LayoutSrcRect;
     opacity?: number;
+    tile?: boolean;
     duotone?: [string, string];
     customPath?: CustomPath;
   };
@@ -364,7 +366,7 @@ type ResolvedLayout = {
   size: { w: number; h: number };
   backgroundIsImage: boolean;
   bg: string;
-  bgImage?: LayoutFill & { url?: string; srcRect?: LayoutSrcRect; opacity?: number };
+  bgImage?: LayoutFill & { url?: string; srcRect?: LayoutSrcRect; opacity?: number; tile?: boolean };
   shapes: ResolvedShape[];
 };
 
@@ -429,7 +431,7 @@ function resolveShape(
     const anchorJustify: "flex-start" | "center" | "flex-end" =
       anchor === "ctr" ? "center" : anchor === "b" ? "flex-end" : "flex-start";
     const fillObj = fillIsImage
-      ? (shape.fill as LayoutFill & { url?: string; srcRect?: LayoutSrcRect; opacity?: number })
+      ? (shape.fill as LayoutFill & { url?: string; srcRect?: LayoutSrcRect; opacity?: number; tile?: boolean })
       : undefined;
     const ins = shape.text.insets ?? { l: 0.1, t: 0.05, r: 0.1, b: 0.05 };
     return {
@@ -446,6 +448,7 @@ function resolveShape(
         fillUrl: fillObj?.url,
         fillSrcRect: fillObj?.srcRect,
         fillOpacity: fillObj?.opacity,
+        fillTile: fillObj?.tile,
         insetsCss: `${ins.t}in ${ins.r}in ${ins.b}in ${ins.l}in`,
         fontScale: shape.text.fontScale,
         rotDeg: shape.text.rotDeg,
@@ -471,6 +474,7 @@ function resolveShape(
         filter: effect.filter,
         srcRect: shape.srcRect,
         opacity: shape.opacity,
+        tile: shape.tile,
         duotone: shape.duotone,
         customPath: shape.customPath,
       },
@@ -561,13 +565,14 @@ function getResolvedLayout(
 // ── Renderers over resolved shapes ─────────────────────────────────────
 
 function CroppedImage({
-  url, srcRect, opacity, style, duotone,
+  url, srcRect, opacity, style, duotone, tile,
 }: {
   url: string;
   srcRect?: LayoutSrcRect;
   opacity?: number;
   style: React.CSSProperties;
   duotone?: [string, string];
+  tile?: boolean;
 }) {
   // Duotone: cheap approximation — mix-blend-mode over a coloured overlay.
   const duoOverlay = duotone ? (
@@ -576,10 +581,27 @@ function CroppedImage({
       <div style={{ position: "absolute", inset: 0, background: duotone[1], mixBlendMode: "screen", pointerEvents: "none" }} />
     </>
   ) : null;
+  if (tile && !srcRect) {
+    return (
+      <div
+        style={{
+          ...style,
+          overflow: "hidden",
+          position: "absolute",
+          backgroundImage: `url(${url})`,
+          backgroundRepeat: "repeat",
+          backgroundSize: "auto",
+          opacity,
+        }}
+      >
+        {duoOverlay}
+      </div>
+    );
+  }
   if (!srcRect) {
     return (
       <div style={{ ...style, overflow: "hidden", position: "absolute" }}>
-        <img src={url} alt="" draggable={false} style={{ width: "100%", height: "100%", objectFit: "cover", opacity, display: "block", filter: duotone ? "grayscale(1) contrast(1.1)" : undefined }} />
+        <img src={url} alt="" draggable={false} style={{ width: "100%", height: "100%", objectFit: "fill", opacity, display: "block", filter: duotone ? "grayscale(1) contrast(1.1)" : undefined }} />
         {duoOverlay}
       </div>
     );
@@ -783,6 +805,7 @@ function ResolvedShapeNode({ shape, salt, theme }: { shape: ResolvedShape; salt:
               url={t.fillUrl}
               srcRect={t.fillSrcRect}
               opacity={t.fillOpacity}
+              tile={t.fillTile}
               style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
             />
           )}
@@ -826,6 +849,7 @@ function ResolvedShapeNode({ shape, salt, theme }: { shape: ResolvedShape; salt:
           url={im.url}
           srcRect={im.srcRect}
           opacity={im.opacity}
+          tile={im.tile}
           duotone={im.duotone}
           style={{
             ...shape.base,
@@ -1167,6 +1191,7 @@ export function FaithfulSlideCanvas({
             url={resolved.bgImage.url}
             srcRect={resolved.bgImage.srcRect}
             opacity={resolved.bgImage.opacity}
+            tile={resolved.bgImage.tile}
             style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
           />
         )}

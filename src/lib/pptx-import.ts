@@ -210,7 +210,7 @@ export type TableCell = {
 };
 export type LayoutShape =
   | { kind: "text"; z: number; frame: LayoutFrame; fill?: LayoutFill; line?: LayoutLine; prst?: string; text: LayoutTextBody; isTitle?: boolean; effect?: LayoutEffect; opacity?: number; customPath?: CustomPath }
-  | { kind: "image"; z: number; frame: LayoutFrame; embedId?: string; path?: string; line?: LayoutLine; srcRect?: LayoutSrcRect; prst?: string; opacity?: number; effect?: LayoutEffect; customPath?: CustomPath; duotone?: [string, string] }
+  | { kind: "image"; z: number; frame: LayoutFrame; embedId?: string; path?: string; line?: LayoutLine; srcRect?: LayoutSrcRect; prst?: string; opacity?: number; tile?: boolean; effect?: LayoutEffect; customPath?: CustomPath; duotone?: [string, string] }
   | { kind: "line"; z: number; frame: LayoutFrame; line?: LayoutLine; prst?: string; effect?: LayoutEffect }
   | { kind: "table"; z: number; frame: LayoutFrame; header: string[]; rows: string[][]; cellGrid?: TableCell[][]; colWidthsIn?: number[]; rowHeightsIn?: number[]; firstRow?: boolean; bandRow?: boolean; firstCol?: boolean; bandCol?: boolean }
   | { kind: "chart"; z: number; frame: LayoutFrame; chartRelId?: string; chart?: ParsedChart }
@@ -299,8 +299,14 @@ export type ParsedTheme = {
   accents: string[];
   accent1?: string;
   accent2?: string;
+  accent3?: string;
+  accent4?: string;
+  accent5?: string;
+  accent6?: string;
   dark1?: string;
+  dark2?: string;
   light1?: string;
+  light2?: string;
   bodyFont?: string;
   headingFont?: string;
   /** Theme-level background fill styles (bgFillStyleLst) — resolves `p:bgRef@idx`. */
@@ -376,7 +382,7 @@ export type ParsedDeck = {
 
 const MAX_PER_IMAGE_BYTES = 15_000_000;
 const MAX_TOTAL_IMAGE_BYTES = 180_000_000;
-const MAX_IMAGES_PER_SLIDE = 60;
+const MAX_IMAGES_PER_SLIDE = 160;
 
 
 // Zip-bomb / resource-exhaustion caps for untrusted .pptx uploads.
@@ -874,7 +880,7 @@ function extractRelTargetsByType(relsDoc: any): RelBuckets {
 function extractEmbedIds(doc: unknown): string[] {
   const ids: string[] = [];
   walk(doc, (value, key) => {
-    if (key !== "a:blip") return;
+    if (key !== "a:blip" && key !== "blip") return;
     const arr = Array.isArray(value) ? value : [value];
     for (const b of arr) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -889,7 +895,8 @@ function extractEmbedIdsFromOrderedNode(node: PNode | undefined): string[] {
   const ids: string[] = [];
   const visit = (n: PNode | undefined) => {
     if (!n) return;
-    if (pTag(n) === "a:blip") {
+    const tag = pTag(n);
+    if (tag === "a:blip" || tag === "blip") {
       const id = pAttrs(n)["@_r:embed"] ?? pAttrs(n)["@_embed"];
       if (id) ids.push(id);
     }
@@ -900,6 +907,8 @@ function extractEmbedIdsFromOrderedNode(node: PNode | undefined): string[] {
 }
 
 function resolveRelPath(slidePath: string, target: string): string {
+  if (/^[a-z][a-z0-9+.-]*:/i.test(target)) return target;
+  if (target.startsWith("/")) return target.replace(/^\/+/, "");
   const dir = slidePath.split("/").slice(0, -1).join("/");
   const segments = [...dir.split("/"), ...target.split("/")];
   const stack: string[] = [];
@@ -1161,8 +1170,10 @@ function readFillColor(fill: any, theme: ParsedTheme): string | undefined {
       const idx = Number(m[1]) - 1;
       return theme.accents[idx];
     }
-    if (scheme === "dk1" || scheme === "dk2" || scheme === "tx1") return theme.dark1;
-    if (scheme === "lt1" || scheme === "lt2" || scheme === "bg1") return theme.light1;
+    if (scheme === "dk1" || scheme === "tx1") return theme.dark1;
+    if (scheme === "dk2" || scheme === "tx2") return theme.dark2 ?? theme.dark1;
+    if (scheme === "lt1" || scheme === "bg1") return theme.light1;
+    if (scheme === "lt2" || scheme === "bg2") return theme.light2 ?? theme.light1;
   }
   const sys = fill?.["a:sysClr"]?.["@_lastClr"];
   if (typeof sys === "string" && /^[0-9a-fA-F]{6}$/.test(sys)) return `#${sys.toUpperCase()}`;
@@ -1445,6 +1456,7 @@ async function extractTheme(zip: JSZip, parser: XMLParser): Promise<ParsedTheme>
     // bgFillStyleLst / fillStyleLst as LayoutFill[] using the existing readFill().
     let bgFillStyleLst: LayoutFill[] | undefined;
     let fillStyleLst: LayoutFill[] | undefined;
+    let lineStyleLst: LayoutLine[] | undefined;
     try {
       const orderParser = new XMLParser({
         ignoreAttributes: false, attributeNamePrefix: "@_", preserveOrder: true,
@@ -1456,6 +1468,7 @@ async function extractTheme(zip: JSZip, parser: XMLParser): Promise<ParsedTheme>
       const fmt = els ? pFind(els, "a:fmtScheme") : undefined;
       const bgLst = fmt ? pFind(fmt, "a:bgFillStyleLst") : undefined;
       const fLst = fmt ? pFind(fmt, "a:fillStyleLst") : undefined;
+      const lnLst = fmt ? pFind(fmt, "a:lnStyleLst") : undefined;
       const collectFills = (node: PNode | undefined): LayoutFill[] | undefined => {
         if (!node) return undefined;
         const out: LayoutFill[] = [];
@@ -1469,18 +1482,39 @@ async function extractTheme(zip: JSZip, parser: XMLParser): Promise<ParsedTheme>
       };
       bgFillStyleLst = collectFills(bgLst);
       fillStyleLst = collectFills(fLst);
+      if (lnLst) {
+        const lines: LayoutLine[] = [];
+        for (const child of pFindAll(lnLst, "a:ln")) {
+          const wrap = { spPr: [child] } as unknown as PNode;
+          const ln = readLine(wrap);
+          if (ln) lines.push(ln);
+        }
+        lineStyleLst = lines.length ? lines : undefined;
+      }
     } catch { /* fmtScheme is optional; theme still usable without it */ }
+
+    const dark1 = readSchemeColor(scheme?.["a:dk1"]);
+    const dark2 = readSchemeColor(scheme?.["a:dk2"]);
+    const light1 = readSchemeColor(scheme?.["a:lt1"]);
+    const light2 = readSchemeColor(scheme?.["a:lt2"]);
 
     return {
       accents,
       accent1: accents[0],
       accent2: accents[1],
-      dark1: readSchemeColor(scheme?.["a:dk1"]) ?? readSchemeColor(scheme?.["a:dk2"]),
-      light1: readSchemeColor(scheme?.["a:lt1"]) ?? readSchemeColor(scheme?.["a:lt2"]),
+      accent3: accents[2],
+      accent4: accents[3],
+      accent5: accents[4],
+      accent6: accents[5],
+      dark1: dark1 ?? dark2,
+      dark2: dark2 ?? dark1,
+      light1: light1 ?? light2,
+      light2: light2 ?? light1,
       headingFont: fontScheme?.["a:majorFont"]?.["a:latin"]?.["@_typeface"],
       bodyFont: fontScheme?.["a:minorFont"]?.["a:latin"]?.["@_typeface"],
       bgFillStyleLst,
       fillStyleLst,
+      lineStyleLst,
     };
   } catch {
     return { ...EMPTY_THEME };
@@ -1842,6 +1876,87 @@ function readFill(
       }
     }
   }
+  return undefined;
+}
+
+function replacePhClr(color: string | undefined, phColor: string | undefined): string | undefined {
+  if (!color || !phColor) return color;
+  const m = /^var\(--pptx-phClr\)(\?.*)?$/.exec(color);
+  if (!m) return color;
+  // If the reference color already carries modifiers, keep it intact rather
+  // than producing two query suffixes. Otherwise preserve modifiers from the
+  // theme style's phClr slot.
+  if (phColor.includes("?")) return phColor;
+  return `${phColor}${m[1] ?? ""}`;
+}
+
+function substitutePhClrInFill(fill: LayoutFill | undefined, phColor: string | undefined): LayoutFill | undefined {
+  if (!fill || !phColor) return fill;
+  if (fill.kind === "solid") return { ...fill, color: replacePhClr(fill.color, phColor) ?? fill.color };
+  if (fill.kind === "gradient") {
+    return {
+      ...fill,
+      stops: fill.stops.map((s) => ({ ...s, color: replacePhClr(s.color, phColor) ?? s.color })),
+    };
+  }
+  if (fill.kind === "pattern") {
+    return {
+      ...fill,
+      fg: replacePhClr(fill.fg, phColor),
+      bg: replacePhClr(fill.bg, phColor),
+    };
+  }
+  return fill;
+}
+
+function substitutePhClrInLine(line: LayoutLine | undefined, phColor: string | undefined): LayoutLine | undefined {
+  if (!line || !phColor) return line;
+  return { ...line, color: replacePhClr(line.color, phColor) };
+}
+
+function fillStyleSlot(theme: ParsedTheme | undefined, idx: number, background: boolean): LayoutFill | undefined {
+  if (!theme || !(idx > 0)) return undefined;
+  const list = background || idx >= 1001 ? theme.bgFillStyleLst : theme.fillStyleLst;
+  if (!list?.length) return undefined;
+  const slot = idx >= 1001 ? idx - 1001 : Math.max(0, idx - 1);
+  return list[Math.min(slot, list.length - 1)];
+}
+
+function lineStyleSlot(theme: ParsedTheme | undefined, idx: number): LayoutLine | undefined {
+  if (!theme?.lineStyleLst?.length || !(idx > 0)) return undefined;
+  const slot = Math.max(0, idx - 1);
+  return theme.lineStyleLst[Math.min(slot, theme.lineStyleLst.length - 1)];
+}
+
+function readFillRef(style: PNode | undefined, theme?: ParsedTheme): LayoutFill | undefined {
+  const fillRef = style ? pFind(style, "a:fillRef") : undefined;
+  if (!fillRef) return undefined;
+  const idx = Number(pAttrs(fillRef)["@_idx"] ?? 0);
+  const phColor = readColorFromNode(fillRef);
+  const picked = fillStyleSlot(theme, idx, false);
+  if (picked) return substitutePhClrInFill(picked, phColor);
+  if (phColor) return { kind: "solid", color: phColor };
+  return undefined;
+}
+
+function readLineRef(style: PNode | undefined, theme?: ParsedTheme): LayoutLine | undefined {
+  const lnRef = style ? pFind(style, "a:lnRef") : undefined;
+  if (!lnRef) return undefined;
+  const idx = Number(pAttrs(lnRef)["@_idx"] ?? 0);
+  const phColor = readColorFromNode(lnRef);
+  const picked = lineStyleSlot(theme, idx);
+  if (picked) return substitutePhClrInLine(picked, phColor);
+  if (phColor) return { color: phColor };
+  return undefined;
+}
+
+function readBgRef(bgRef: PNode | undefined, theme?: ParsedTheme): LayoutFill | undefined {
+  if (!bgRef) return undefined;
+  const idx = Number(pAttrs(bgRef)["@_idx"] ?? 0);
+  const phColor = readColorFromNode(bgRef);
+  const picked = fillStyleSlot(theme, idx, true);
+  if (picked) return substitutePhClrInFill(picked, phColor);
+  if (phColor) return { kind: "solid", color: phColor };
   return undefined;
 }
 
@@ -2211,6 +2326,7 @@ function walkSpTree(
   imageEmbedIds: string[],
   parents?: ResolvedParents,
   embedIdMap?: Record<string, string>,
+  theme?: ParsedTheme,
 ) {
   for (const node of nodes) {
     const t = pTag(node);
@@ -2231,10 +2347,11 @@ function walkSpTree(
       if (!frame) continue;
       if (group) frame = transformFrame(frame, group);
 
+      const style = pFind(node, "p:style");
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       let prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
-      let fill = readFill(spPr, imageEmbedIds, embedIdMap);
-      let line = readLine(spPr);
+      let fill = readFill(spPr, imageEmbedIds, embedIdMap) ?? readFillRef(style, theme);
+      let line = readLine(spPr) ?? readLineRef(style, theme);
       const effect = readEffects(spPr);
       const customPath = readCustomPath(spPr);
       for (const proto of phProtos) {
@@ -2260,8 +2377,10 @@ function walkSpTree(
       const rawEmbedId = blip ? (pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"]) : undefined;
       const embedId = rawEmbedId ? (embedIdMap?.[rawEmbedId] ?? rawEmbedId) : undefined;
       const srcRect = readSrcRect(blipFill);
+      const tile = blipFill ? !!pFind(blipFill, "a:tile") : undefined;
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
+      const style = pFind(node, "p:style");
       const customPath = readCustomPath(spPr);
       const effect = readEffects(spPr);
       const duotone = readDuotone(blipFill);
@@ -2276,7 +2395,7 @@ function walkSpTree(
           }
         }
       }
-      out.push({ kind: "image", z: zRef.z++, frame, embedId, line: readLine(spPr), srcRect, prst, opacity, effect, customPath, duotone });
+      out.push({ kind: "image", z: zRef.z++, frame, embedId, line: readLine(spPr) ?? readLineRef(style, theme), srcRect, prst, opacity, tile: tile || undefined, effect, customPath, duotone });
 
     } else if (t === "p:cxnSp") {
       const spPr = pFind(node, "p:spPr");
@@ -2285,11 +2404,12 @@ function walkSpTree(
       if (group) frame = transformFrame(frame, group);
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
+      const style = pFind(node, "p:style");
       const effect = readEffects(spPr);
-      out.push({ kind: "line", z: zRef.z++, frame, line: readLine(spPr), prst, effect });
+      out.push({ kind: "line", z: zRef.z++, frame, line: readLine(spPr) ?? readLineRef(style, theme), prst, effect });
     } else if (t === "p:grpSp") {
       const grpSpPr = pFind(node, "p:grpSpPr");
-      walkSpTree(pChildren(node), zRef, grpSpPr ?? group, out, imageEmbedIds, parents, embedIdMap);
+      walkSpTree(pChildren(node), zRef, grpSpPr ?? group, out, imageEmbedIds, parents, embedIdMap, theme);
     } else if (t === "p:graphicFrame") {
       const xfrm = pFind(node, "p:xfrm");
       let frame: LayoutFrame | undefined;
@@ -2391,19 +2511,8 @@ function extractSlideLayout(
     if (!bg) return undefined;
     const bgPr = pFind(bg, "p:bgPr");
     if (bgPr) return readFill(bgPr, imageEmbedIds);
-    const bgRef = pFind(bg, "p:bgRef");
-    if (bgRef && theme) {
-      const idx = Number(pAttrs(bgRef)["@_idx"] ?? 0);
-      const list = idx >= 1001 ? theme.bgFillStyleLst : theme.fillStyleLst;
-      if (list && list.length) {
-        const slot = idx >= 1001 ? idx - 1001 : Math.max(0, idx - 1);
-        const picked = list[Math.min(slot, list.length - 1)];
-        if (picked) return picked;
-      }
-      // fallback: use overriding color if scheme color specified
-      const col = readColorFromNode(bgRef);
-      if (col) return { kind: "solid", color: col };
-    }
+    const refFill = readBgRef(pFind(bg, "p:bgRef"), theme);
+    if (refFill) return refFill;
     return undefined;
   };
   let background: LayoutFill | undefined = readBg(cSld);
@@ -2423,7 +2532,7 @@ function extractSlideLayout(
   pushDecor(parents?.layout?.decor);
 
   if (spTree) {
-    walkSpTree(pChildren(spTree), zRef, undefined, shapes, imageEmbedIds, parents);
+    walkSpTree(pChildren(spTree), zRef, undefined, shapes, imageEmbedIds, parents, undefined, theme);
   }
   return { size, background, shapes };
 }
@@ -2572,18 +2681,8 @@ async function loadParent(
     if (!bg) return undefined;
     const bgPr = pFind(bg, "p:bgPr");
     if (bgPr) return readFill(bgPr, parentImageEmbedIds, parentEmbedIdMap);
-    const bgRef = pFind(bg, "p:bgRef");
-    if (bgRef) {
-      const idx = Number(pAttrs(bgRef)["@_idx"] ?? 0);
-      const list = idx >= 1001 ? theme.bgFillStyleLst : theme.fillStyleLst;
-      if (list && list.length) {
-        const slot = idx >= 1001 ? idx - 1001 : Math.max(0, idx - 1);
-        const picked = list[Math.min(slot, list.length - 1)];
-        if (picked) return picked;
-      }
-      const col = readColorFromNode(bgRef);
-      if (col) return { kind: "solid", color: col };
-    }
+    const refFill = readBgRef(pFind(bg, "p:bgRef"), theme);
+    if (refFill) return refFill;
     return undefined;
   };
 
@@ -2602,9 +2701,10 @@ async function loadParent(
       const phType = String(pAttrs(ph)["@_type"] ?? "");
       const phIdx = String(pAttrs(ph)["@_idx"] ?? "");
       const spPr = pFind(node, "p:spPr");
+      const style = pFind(node, "p:style");
       const frame = readFrame(spPr);
-      const fill = readFill(spPr, parentImageEmbedIds, parentEmbedIdMap);
-      const line = readLine(spPr);
+      const fill = readFill(spPr, parentImageEmbedIds, parentEmbedIdMap) ?? readFillRef(style, theme);
+      const line = readLine(spPr) ?? readLineRef(style, theme);
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
       const txBody = pFind(node, "p:txBody");
@@ -2642,7 +2742,7 @@ async function loadParent(
   if (spTree) {
     const zRef = { z: 0 };
     const collected: LayoutShape[] = [];
-    walkSpTree(pChildren(spTree), zRef, undefined, collected, parentImageEmbedIds, undefined, parentEmbedIdMap);
+    walkSpTree(pChildren(spTree), zRef, undefined, collected, parentImageEmbedIds, undefined, parentEmbedIdMap, theme);
     // Re-walk raw nodes to know which are placeholders — walkSpTree doesn't
     // expose that. Cheaper: build a set of ph frames from `placeholders` and
     // drop shapes whose frame matches.
