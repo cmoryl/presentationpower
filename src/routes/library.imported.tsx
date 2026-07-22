@@ -193,9 +193,11 @@ function ImportedLibrary() {
           slide={slidesQ.data.slides.find((s) => s.index === previewSlideIdx)!}
           deckName={slidesQ.data.original_filename}
           deckTheme={themeToTokens(slidesQ.data.theme)}
+          deckExtras={slidesQ.data.extras}
           onClose={() => setPreviewSlideIdx(null)}
         />
       )}
+
     </AppShell>
   );
 }
