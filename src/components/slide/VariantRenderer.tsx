@@ -1713,7 +1713,7 @@ function renderVariantBody({
           <SupportingText size="lg" opacity={0.72} className="mt-8" maxWidthPx={1180}>{s(c.summary)}</SupportingText>
           <div className="mt-14 grid grid-cols-3 gap-14">
             {arr(c.items).map((it, i) => (
-              <div key={i} className={i > 0 ? "pl-10" : ""} style={i > 0 ? { borderLeft: "1px solid rgba(10,15,28,0.10)" } : undefined}>
+              <div key={i} className={i > 0 ? "pl-10" : ""} style={i > 0 ? { borderLeft: `1px solid ${ink.hairline}` } : undefined}>
                 <StatFigure brand={brand} value={s(it.value)} unit={s(it.unit)} label={s(it.label)} size="lg" />
               </div>
             ))}
@@ -2620,24 +2620,26 @@ function renderVariantBody({
               const pct = Math.max(6, (v / max) * 100);
               const highlight = i === items.length - 1;
               return (
-                <div key={i} className="grid grid-cols-[260px_1fr_120px] items-center gap-6">
-                  <div className="text-2xl font-semibold" style={{ color: ink.strong }}>{s(it.label)}</div>
-                  <div className="h-14 w-full rounded-lg" style={{ backgroundColor: ink.surface }}>
+                <div key={i} className="grid grid-cols-[260px_1fr_140px] items-center gap-6">
+                  <div className="text-2xl font-semibold" style={{ color: ink.strong, letterSpacing: "-0.01em" }}>{s(it.label)}</div>
+                  <div className="relative h-10 w-full">
+                    <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2" style={{ height: 2, background: `color-mix(in oklab, ${brand.tokens.accent} 14%, transparent)` }} />
                     <div
-                      className="flex h-full items-center rounded-lg px-4 text-white"
+                      className="absolute top-1/2 left-0 -translate-y-1/2"
                       style={{
                         width: `${pct}%`,
+                        height: highlight ? 10 : 6,
                         background: highlight
-                          ? `linear-gradient(90deg, ${brand.tokens.primary}, ${brand.tokens.accent})`
-                          : brand.tokens.primary,
-                        opacity: highlight ? 1 : 0.55,
+                          ? `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.accent} 40%, transparent), ${brand.tokens.accent})`
+                          : `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.primary} 18%, transparent), color-mix(in oklab, ${brand.tokens.primary} 60%, transparent))`,
                       }}
-                    >
-                      <span className="text-lg opacity-90">{s(it.note)}</span>
-                    </div>
+                    />
+                    {s(it.note) && (
+                      <div className="absolute right-3 top-1/2 -translate-y-[135%] uppercase" style={{ fontSize: 13, letterSpacing: "0.22em", color: ink.faint, fontWeight: 600 }}>{s(it.note)}</div>
+                    )}
                   </div>
-                  <div className="text-right text-3xl font-semibold" style={{ color: highlight ? "var(--slide-accent-text)" : ink.strong }}>
-                    {s(it.value)}<span className="ml-1 text-lg opacity-70">{s(c.unit)}</span>
+                  <div className="text-right tabular-nums" style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.02em", color: highlight ? "var(--slide-accent-text)" : ink.strong }}>
+                    {s(it.value)}<span className="ml-1" style={{ fontSize: 18, color: ink.faint }}>{s(c.unit)}</span>
                   </div>
                 </div>
               );
@@ -2886,9 +2888,9 @@ function renderVariantBody({
               const logoUrl = s(it.logoUrl);
               const logoPath = s(it.logoPath);
               return (
-                <div key={i} className="flex flex-col pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                  <Kicker brand={brand} color="color-mix(in oklab, currentColor 62%, transparent)" size={16}>Client</Kicker>
-                  <div className="mt-3 flex items-center gap-4">
+                <div key={i} className="flex flex-col">
+                  <Kicker brand={brand} color="var(--slide-accent-text)" size={16}>Client · {String(i + 1).padStart(2, "0")}</Kicker>
+                  <div className="mt-4 flex items-center gap-4">
                     {(logoUrl || logoPath) && (
                       <ClientLogoImg
                         path={logoPath}
@@ -2899,18 +2901,16 @@ function renderVariantBody({
                     )}
                     <div style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>{s(it.client)}</div>
                   </div>
-                  <SoftDivider className="mt-6" />
-                  <div className="mt-6">
+                  <div className="mt-8">
                     <Kicker brand={brand} size={16}>Challenge</Kicker>
                     <SupportingText size="md" opacity={0.82} className="mt-3">{s(it.challenge)}</SupportingText>
                   </div>
-                  <SoftDivider className="mt-6" />
-                  <div className="mt-6 flex-1">
+                  <div className="mt-8 flex-1">
                     <Kicker brand={brand} size={16}>Outcome</Kicker>
                     <SupportingText size="md" opacity={0.82} className="mt-3">{s(it.outcome)}</SupportingText>
                   </div>
-                  <div className="mt-8 pt-6" style={{ borderTop: `1px solid ${ink.hairline}` }}>
-                    <StatFigure brand={brand} value={s(it.metric)} size="sm" />
+                  <div className="mt-10">
+                    <StatFigure brand={brand} value={s(it.metric)} size="md" />
                   </div>
                 </div>
               );
@@ -3180,13 +3180,13 @@ function renderVariantBody({
               const trend = s(it.trend);
               const trendColor = trend === "down" ? brand.tokens.accent : brand.tokens.accent;
               return (
-                <div key={i} className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+                <div key={i}>
                   <div className="flex items-start justify-between gap-3">
-                    <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 60%, transparent)", fontWeight: 600 }}>{s(it.label)}</div>
+                    <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(it.label)}</div>
                     <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="glyph" />
                   </div>
-                  <div className="mt-4 flex items-baseline gap-2">
-                    <span className="tabular-nums font-semibold" style={{ fontSize: 88, lineHeight: 0.95, letterSpacing: "-0.025em", color: ink.strong }}>{s(it.value)}</span>
+                  <div className="mt-5 flex items-baseline gap-2">
+                    <span className="tabular-nums font-semibold" style={{ fontSize: 96, lineHeight: 0.9, letterSpacing: "-0.035em", color: ink.strong }}>{s(it.value)}</span>
                     {s(it.unit) && <span className="font-medium" style={{ fontSize: 34, color: "var(--slide-accent-text)", letterSpacing: "-0.015em" }}>{s(it.unit)}</span>}
                   </div>
                   {s(it.delta) && (
@@ -4334,20 +4334,21 @@ function renderVariantBody({
               const cur = Math.max(0, Math.min(100, Number(it.current) || 0));
               const bench = Math.max(0, Math.min(100, Number(it.benchmark) || 0));
               return (
-                <div key={i} className="py-6" style={{ borderTop: `1px solid ${ink.hairline}`, borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none" }}>
+                <div key={i} className="py-7">
                   <div className="flex items-baseline justify-between gap-8 mb-4">
-                    <div style={{ fontSize: 24, fontWeight: 600, color: ink.strong }}>{s(it.label)}</div>
+                    <div style={{ fontSize: 24, fontWeight: 600, color: ink.strong, letterSpacing: "-0.01em" }}>{s(it.label)}</div>
                     <div className="flex items-baseline gap-10">
-                      <div className="tabular-nums" style={{ fontSize: 40, fontWeight: 600, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}>{cur}%</div>
-                      <div className="tabular-nums" style={{ fontSize: 30, fontWeight: 600, color: "color-mix(in oklab, currentColor 40%, transparent)" }}>{bench}%</div>
+                      <div className="tabular-nums" style={{ fontSize: 44, fontWeight: 600, color: "var(--slide-accent-text)", letterSpacing: "-0.025em" }}>{cur}%</div>
+                      <div className="tabular-nums" style={{ fontSize: 26, fontWeight: 500, color: ink.faint }}>{bench}%</div>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <div style={{ position: "relative", height: 8, background: "rgba(10,15,28,0.08)" }}>
-                      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${cur}%`, background: brand.tokens.accent }} />
+                  <div className="flex flex-col gap-2.5">
+                    <div style={{ position: "relative", height: 6 }}>
+                      <div style={{ position: "absolute", inset: 0, background: `color-mix(in oklab, ${brand.tokens.accent} 10%, transparent)` }} />
+                      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${cur}%`, background: `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.accent} 55%, transparent), ${brand.tokens.accent})` }} />
                     </div>
-                    <div style={{ position: "relative", height: 8, background: "rgba(10,15,28,0.08)" }}>
-                      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${bench}%`, background: brand.tokens.primary, opacity: 0.35 }} />
+                    <div style={{ position: "relative", height: 3 }}>
+                      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${bench}%`, background: `color-mix(in oklab, ${brand.tokens.primary} 35%, transparent)` }} />
                     </div>
                   </div>
                   {s(it.range) && (
