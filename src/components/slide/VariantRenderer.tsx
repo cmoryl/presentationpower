@@ -3180,13 +3180,13 @@ function renderVariantBody({
               const trend = s(it.trend);
               const trendColor = trend === "down" ? brand.tokens.accent : brand.tokens.accent;
               return (
-                <div key={i} className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+                <div key={i}>
                   <div className="flex items-start justify-between gap-3">
-                    <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 60%, transparent)", fontWeight: 600 }}>{s(it.label)}</div>
+                    <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(it.label)}</div>
                     <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="glyph" />
                   </div>
-                  <div className="mt-4 flex items-baseline gap-2">
-                    <span className="tabular-nums font-semibold" style={{ fontSize: 88, lineHeight: 0.95, letterSpacing: "-0.025em", color: ink.strong }}>{s(it.value)}</span>
+                  <div className="mt-5 flex items-baseline gap-2">
+                    <span className="tabular-nums font-semibold" style={{ fontSize: 96, lineHeight: 0.9, letterSpacing: "-0.035em", color: ink.strong }}>{s(it.value)}</span>
                     {s(it.unit) && <span className="font-medium" style={{ fontSize: 34, color: "var(--slide-accent-text)", letterSpacing: "-0.015em" }}>{s(it.unit)}</span>}
                   </div>
                   {s(it.delta) && (
