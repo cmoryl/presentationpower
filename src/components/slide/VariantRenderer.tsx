@@ -2726,7 +2726,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Where it lives")} />
-          <div className="mt-6 grid grid-cols-[720px_1fr] items-center gap-12">
+          <div className="mt-10 grid grid-cols-[720px_1fr] items-center gap-12">
             <div className="relative h-[600px] w-[720px]">
               {[
                 { left: "20%", top: "18%" },
@@ -3428,7 +3428,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           {s(c.subtitle) && (
-            <div className="mt-4 max-w-[1080px]" style={{ fontSize: 22, lineHeight: 1.4, color: ink.muted }}>
+            <div className="mt-10 max-w-[1080px]" style={{ fontSize: 22, lineHeight: 1.4, color: ink.muted }}>
               {s(c.subtitle)}
             </div>
           )}
@@ -4210,7 +4210,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-8 grid gap-14" style={{ gridTemplateColumns: "1fr 2.4fr" }}>
+          <div className="mt-10 grid gap-14" style={{ gridTemplateColumns: "1fr 2.4fr" }}>
             <div>
               <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
               <div className="mt-6" style={{ fontSize: 38, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(c.headline)}</div>
@@ -4497,7 +4497,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-8"><Treemap brand={brand} items={items} height={560} /></div>
+          <div className="mt-10"><Treemap brand={brand} items={items} height={560} /></div>
         </SlideFrame>
       );
     }
