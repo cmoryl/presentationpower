@@ -4,11 +4,11 @@ import { SlideThumbnailContext, SlideVideoPreviewContext, useResolvedVideoUrl, u
 import { resolveSlideBackground } from "@/lib/background-library";
 import { backdropForVariant } from "./variantBackdrop";
 
-import { createContext, useContext, useEffect, useRef, useState, Fragment } from "react";
+import { createContext, useContext, useEffect, useId, useRef, useState, Fragment } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
 import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, StatFigure, QuoteMark, Attribution, SoftDivider } from "./primitives";
-import { EditorialTitle, PullQuote, DuotoneImage, GrainOverlay, CinematicScrim, StatRail, GlassTile, IconWell, EDITORIAL_SERIF } from "./flagship";
+import { EditorialTitle, PullQuote, DuotoneImage, GrainOverlay, CinematicScrim, StatRail, GlassTile, IconWell, EDITORIAL_SERIF, GlassChartPanel, ChartAccentDefs } from "./flagship";
 import { APPROVED_LOGOS } from "@/lib/approved-logos";
 
 // Example client-logo chip for case study previews. Uses the deck's real
@@ -5368,8 +5368,9 @@ function toNums(v: unknown): number[] {
   return v.map((x) => (typeof x === "number" ? x : Number(x))).filter((n) => Number.isFinite(n));
 }
 
-function Sparkline({ brand, values, w = 380, h = 100, filled = true, peakPin = false, peakLabel = "PEAK" }: { brand: BrandMode; values: number[]; w?: number; h?: number; filled?: boolean; peakPin?: boolean; peakLabel?: string }) {
+function Sparkline({ brand: _brand, values, w = 380, h = 100, filled = true, peakPin = false, peakLabel = "PEAK" }: { brand: BrandMode; values: number[]; w?: number; h?: number; filled?: boolean; peakPin?: boolean; peakLabel?: string }) {
   const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
   const vals = values.length ? values : [1, 1];
   const min = Math.min(...vals);
   const max = Math.max(...vals);
@@ -5381,13 +5382,21 @@ function Sparkline({ brand, values, w = 380, h = 100, filled = true, peakPin = f
   const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - pad} L${pts[0][0].toFixed(1)},${h - pad} Z` : "";
   const peakIdx = vals.indexOf(max);
   const peak = pts[peakIdx];
-  // Editorial: flat accent, hairline baseline, quiet area fill. No gradient defs.
+  const last = pts[pts.length - 1];
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      {filled && <path d={areaPath} fill="var(--slide-accent-text)" fillOpacity={0.08} />}
+      <ChartAccentDefs id={id} />
+      {filled && <path d={areaPath} fill={`url(#${id}-fill)`} />}
       <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke={ink.hairline} strokeWidth={1} />
+      {/* soft glow under the line */}
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" opacity={0.35} filter={`url(#${id}-glow)`} />
       <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={3.5} fill="var(--slide-accent-text)" />}
+      {last && (
+        <>
+          <circle cx={last[0]} cy={last[1]} r={7} fill="var(--slide-accent-text)" opacity={0.35} filter={`url(#${id}-glow)`} />
+          <circle cx={last[0]} cy={last[1]} r={3.5} fill={`url(#${id}-dot)`} />
+        </>
+      )}
       {peakPin && peak && (
         <g>
           <line x1={peak[0]} y1={peak[1]} x2={peak[0]} y2={Math.max(peak[1] - 18, 6)} stroke={ink.hairlineStrong} strokeWidth={1} />
@@ -5397,6 +5406,7 @@ function Sparkline({ brand, values, w = 380, h = 100, filled = true, peakPin = f
     </svg>
   );
 }
+
 
 // ── Editorial data primitives ─────────────────────────────────────────
 // DotGridBackdrop retired as decorative chartjunk. Kept as no-op for callers.
@@ -5483,15 +5493,19 @@ function SummaryStatCard({ brand, label, value, unit, series }: { brand: BrandMo
 
 function Donut({ brand: _brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
   const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
   const p = Math.max(0, Math.min(100, percent));
-  const stroke = 8; // hairline ring, editorial
+  const stroke = 10;
   const r = (size - stroke) / 2;
   const circ = 2 * Math.PI * r;
   const dash = (p / 100) * circ;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
+      <ChartAccentDefs id={id} />
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={ink.trackFill} strokeWidth={stroke} />
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke} strokeLinecap="butt" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+      {/* soft accent glow ring */}
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke + 6} opacity={0.28} filter={`url(#${id}-glow)`} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
       <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central" fontSize={size * 0.32} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}>
         {Math.round(p)}
       </text>
@@ -5502,8 +5516,9 @@ function Donut({ brand: _brand, percent, size = 260 }: { brand: BrandMode; perce
 
 function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
   const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
   const p = Math.max(0, Math.min(100, percent));
-  const stroke = 6; // hairline arc
+  const stroke = 8;
   const r = (size - stroke) / 2;
   const cy = size / 2 + r / 2;
   const arcC = Math.PI * r;
@@ -5513,8 +5528,10 @@ function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; p
   const cx = size / 2;
   return (
     <svg width={size} height={h} viewBox={`0 0 ${size} ${h}`} aria-hidden>
-      <path d={arc} fill="none" stroke={ink.trackFill} strokeWidth={stroke} strokeLinecap="butt" />
-      <path d={arc} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke} strokeLinecap="butt" strokeDasharray={`${dash} ${arcC}`} />
+      <ChartAccentDefs id={id} />
+      <path d={arc} fill="none" stroke={ink.trackFill} strokeWidth={stroke} strokeLinecap="round" />
+      <path d={arc} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke + 5} strokeLinecap="round" opacity={0.28} filter={`url(#${id}-glow)`} strokeDasharray={`${dash} ${arcC}`} />
+      <path d={arc} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${arcC}`} />
       <text x={cx} y={cy - 24} textAnchor="middle" fontSize={size * 0.34} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}>
         {Math.round(p)}
       </text>
@@ -5525,8 +5542,10 @@ function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; p
 
 
 
-function AreaChart({ brand: _brand, series, height = 480 }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number }) {
+
+function AreaChart({ brand: _brand, series, height = 480, bare = false }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; bare?: boolean }) {
   const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
   const w = 1000;
   const h = height;
   const padL = 20, padR = 20, padT = 20, padB = 60;
@@ -5539,21 +5558,30 @@ function AreaChart({ brand: _brand, series, height = 480 }: { brand: BrandMode; 
   const linePath = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
   const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z` : "";
   const showEvery = series.length > 8 ? Math.ceil(series.length / 8) : 1;
-  return (
+  const last = pts[pts.length - 1];
+  const svg = (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      <ChartAccentDefs id={id} />
       <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairline} strokeWidth={1} />
-      {areaPath && <path d={areaPath} fill="var(--slide-accent-text)" fillOpacity={0.10} />}
-      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={4} fill="var(--slide-accent-text)" />}
+      {areaPath && <path d={areaPath} fill={`url(#${id}-fill)`} />}
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" opacity={0.32} filter={`url(#${id}-glow)`} />
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+      {last && <>
+        <circle cx={last[0]} cy={last[1]} r={9} fill="var(--slide-accent-text)" opacity={0.35} filter={`url(#${id}-glow)`} />
+        <circle cx={last[0]} cy={last[1]} r={5} fill={`url(#${id}-dot)`} />
+      </>}
       {series.map((p, i) => (i % showEvery === 0 || i === series.length - 1) ? (
         <text key={i} x={pts[i]?.[0]} y={h - padB + 28} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{p.label}</text>
       ) : null)}
     </svg>
   );
+  if (bare) return svg;
+  return <GlassChartPanel padding="px-6 py-6" bloomAnchor="br">{svg}</GlassChartPanel>;
 }
 
-function BarChart({ brand: _brand, bars, height = 480, highlight }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string }) {
+function BarChart({ brand: _brand, bars, height = 480, highlight, bare = false }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string; bare?: boolean }) {
   const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
   const w = 900;
   const h = height;
   const padL = 20, padR = 20, padT = 30, padB = 60;
@@ -5561,18 +5589,20 @@ function BarChart({ brand: _brand, bars, height = 480, highlight }: { brand: Bra
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(bars.length, 1);
   const barW = slot * 0.5;
-  return (
+  const svg = (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      <ChartAccentDefs id={id} />
       <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
       {bars.map((b, i) => {
         const bh = (b.value / max) * chartH;
         const x = padL + i * slot + (slot - barW) / 2;
         const y = h - padB - bh;
         const isHi = highlight ? b.label === highlight : false;
-        const fill = isHi ? "var(--slide-accent-text)" : ink.trackFill;
+        const fill = isHi ? `url(#${id}-bar)` : ink.trackFill;
         return (
           <g key={i}>
-            <rect x={x} y={y} width={barW} height={bh} fill={fill} />
+            {isHi && <rect x={x - 6} y={y - 6} width={barW + 12} height={bh + 6} fill="var(--slide-accent-text)" opacity={0.22} rx={8} filter={`url(#${id}-glow)`} />}
+            <rect x={x} y={y} width={barW} height={bh} fill={fill} rx={2} />
             <text x={x + barW / 2} y={h - padB + 30} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{b.label}</text>
             <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={isHi ? 26 : 18} fontWeight={600} fill={isHi ? ink.text : ink.muted} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{b.value}</text>
           </g>
@@ -5580,7 +5610,10 @@ function BarChart({ brand: _brand, bars, height = 480, highlight }: { brand: Bra
       })}
     </svg>
   );
+  if (bare) return svg;
+  return <GlassChartPanel padding="px-6 py-6" bloomAnchor="tr">{svg}</GlassChartPanel>;
 }
+
 
 function ReportCard({ brand, item }: { brand: BrandMode; item: Item }) {
   const ink = useSlideInk();
@@ -5610,8 +5643,9 @@ function ProgressBar({ brand: _brand, percent }: { brand: BrandMode; percent: nu
 }
 
 // ── Graph helpers (Batch 4) ────────────────────────────────────────────
-function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string; unit?: string }) {
+function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit, bare = false }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string; unit?: string; bare?: boolean }) {
   const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
   const w = 1720;
   const h = height;
   const padL = 90, padR = 40, padT = 40, padB = 60;
@@ -5622,14 +5656,15 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { 
   const barW = slot * 0.44;
   const ticks = 4;
   const hiValue = bars.find((b) => b.label === highlight)?.value;
-  return (
+  const svg = (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      <ChartAccentDefs id={id} />
       {Array.from({ length: ticks + 1 }, (_, i) => {
         const y = padT + (chartH / ticks) * i;
         const val = niceMax * (1 - i / ticks);
         return (
           <g key={i}>
-            <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} opacity={i === ticks ? 1 : 0.6} />
+            <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} opacity={i === ticks ? 1 : 0.55} />
             <text x={padL - 14} y={y + 5} textAnchor="end" fontSize={14} fill={ink.faint} style={{ fontVariantNumeric: "tabular-nums" }}>{val.toFixed(0)}{unit || ""}</text>
           </g>
         );
@@ -5641,9 +5676,10 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { 
         const isHi = highlight ? b.label === highlight : false;
         return (
           <g key={i}>
-            <rect x={x} y={y} width={barW} height={bh} fill={isHi ? "var(--slide-accent-text)" : ink.trackFill} />
+            {isHi && <rect x={x - 8} y={y - 10} width={barW + 16} height={bh + 10} rx={10} fill="var(--slide-accent-text)" opacity={0.22} filter={`url(#${id}-glow)`} />}
+            <rect x={x} y={y} width={barW} height={bh} rx={3} fill={isHi ? `url(#${id}-bar)` : ink.trackFill} />
             {isHi && hiValue !== undefined && (
-              <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={22} fontWeight={600} fill={ink.text} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{b.value}{unit || ""}</text>
+              <text x={x + barW / 2} y={y - 16} textAnchor="middle" fontSize={22} fontWeight={600} fill={ink.text} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{b.value}{unit || ""}</text>
             )}
             <text x={x + barW / 2} y={h - padB + 30} textAnchor="middle" fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{b.label}</text>
           </g>
@@ -5651,7 +5687,10 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { 
       })}
     </svg>
   );
+  if (bare) return svg;
+  return <GlassChartPanel padding="px-6 py-6" bloomAnchor="tr">{svg}</GlassChartPanel>;
 }
+
 
 function DonutBlock({ brand, item }: { brand: BrandMode; item: Item }) {
   const ink = useSlideInk();
@@ -5667,21 +5706,25 @@ function DonutBlock({ brand, item }: { brand: BrandMode; item: Item }) {
 
 function ConcentricRings({ brand: _brand, items, size = 480 }: { brand: BrandMode; items: { label: string; value: number }[]; size?: number }) {
   const ink = useSlideInk();
-  const stroke = 10; // hairline rings — subtraction pass
+  const id = useId().replace(/:/g, "");
+  const stroke = 12;
   const gap = 12;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
+      <ChartAccentDefs id={id} />
       {items.map((it, i) => {
         const r = (size - stroke) / 2 - i * (stroke + gap);
         if (r <= 0) return null;
         const circ = 2 * Math.PI * r;
         const dash = (Math.max(0, Math.min(100, it.value)) / 100) * circ;
-        // Only outer ring wears the accent; inner rings use ink at graduated opacity.
         const isPrimary = i === 0;
         return (
           <g key={i}>
             <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={ink.trackFill} strokeWidth={stroke} />
-            <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={isPrimary ? "var(--slide-accent-text)" : ink.strong} strokeOpacity={isPrimary ? 1 : Math.max(0.35, 0.85 - i * 0.15)} strokeWidth={stroke} strokeLinecap="butt" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+            {isPrimary && (
+              <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke + 6} opacity={0.28} filter={`url(#${id}-glow)`} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+            )}
+            <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={isPrimary ? "var(--slide-accent-text)" : ink.strong} strokeOpacity={isPrimary ? 1 : Math.max(0.35, 0.85 - i * 0.15)} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
           </g>
         );
       })}
@@ -5690,8 +5733,10 @@ function ConcentricRings({ brand: _brand, items, size = 480 }: { brand: BrandMod
 }
 
 
-function DecadeAreaChart({ brand: _brand, series, height = 480, calloutLabel, calloutNote }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; calloutLabel?: string; calloutNote?: string }) {
+
+function DecadeAreaChart({ brand: _brand, series, height = 480, calloutLabel, calloutNote, bare = false }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; calloutLabel?: string; calloutNote?: string; bare?: boolean }) {
   const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
   const w = 1720;
   const h = height;
   const padL = 30, padR = 30, padT = 40, padB = 60;
@@ -5717,25 +5762,31 @@ function DecadeAreaChart({ brand: _brand, series, height = 480, calloutLabel, ca
   const highlightIdx = series.findIndex((p) => p.label === calloutLabel);
   const hi = highlightIdx >= 0 ? pts[highlightIdx] : null;
   const showEvery = series.length > 10 ? 2 : 1;
-  return (
+  const svg = (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      <ChartAccentDefs id={id} />
       <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
-      {areaPath && <path d={areaPath} fill="var(--slide-accent-text)" fillOpacity={0.08} />}
-      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      {areaPath && <path d={areaPath} fill={`url(#${id}-fill)`} />}
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" opacity={0.3} filter={`url(#${id}-glow)`} />
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
       {series.map((p, i) => (i % showEvery === 0 || i === series.length - 1) ? (
         <text key={i} x={pts[i]?.[0]} y={h - padB + 30} textAnchor="middle" fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{p.label}</text>
       ) : null)}
       {hi && (
         <g>
-          <circle cx={hi[0]} cy={hi[1]} r={4} fill="var(--slide-accent-text)" />
-          <line x1={hi[0]} y1={hi[1] - 10} x2={hi[0]} y2={Math.max(hi[1] - 96, 12)} stroke={ink.hairlineStrong} strokeWidth={1} />
+          <circle cx={hi[0]} cy={hi[1]} r={11} fill="var(--slide-accent-text)" opacity={0.32} filter={`url(#${id}-glow)`} />
+          <circle cx={hi[0]} cy={hi[1]} r={5} fill={`url(#${id}-dot)`} />
+          <line x1={hi[0]} y1={hi[1] - 12} x2={hi[0]} y2={Math.max(hi[1] - 96, 12)} stroke={ink.hairlineStrong} strokeWidth={1} />
           <text x={hi[0]} y={Math.max(hi[1] - 108, 20)} textAnchor="middle" fontSize={18} fontWeight={600} fill={ink.strong} style={{ letterSpacing: "-0.01em" }}>{calloutLabel}</text>
           <text x={hi[0]} y={Math.max(hi[1] - 84, 44)} textAnchor="middle" fontSize={14} fill={ink.muted}>{calloutNote}</text>
         </g>
       )}
     </svg>
   );
+  if (bare) return svg;
+  return <GlassChartPanel padding="px-6 py-6" bloomAnchor="tr">{svg}</GlassChartPanel>;
 }
+
 
 // ── Extended graph helpers ───────────────────────────────────────────────
 function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand: BrandMode; series: { label: string; points: number[] }[]; xLabels: string[]; unit?: string; height?: number }) {
