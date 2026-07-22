@@ -14,29 +14,30 @@ export function auroraSvgDataUrl(
 ): string {
   const base = baseTint ?? (mode === "dark" ? "#03002C" : brand.tokens.surface ?? "#FFFFFF");
   const orbs = auroraOrbs(seed, brand, mode);
-  const layerOpacity = mode === "dark" ? 1 : 0.72;
-  const vignette =
-    mode === "dark"
-      ? `radial-gradient(80% 60% at 50% 60%, transparent 30%, ${base} 130%)`
-      : `radial-gradient(85% 68% at 50% 55%, transparent 0%, transparent 55%, ${base} 125%)`;
-  // We can't use CSS gradients inside a static SVG for the vignette, so
-  // emulate it with a radial gradient stop set.
+  // Mirror AuroraLayer's on-screen opacities so every division's exported
+  // slide reads at the same intensity as the live editor preview.
+  const layerOpacity = mode === "dark" ? 0.7 : 0.85;
   const vignetteAlpha = mode === "dark" ? 0.6 : 0.5;
+  const orbR = mode === "dark" ? "75%" : "85%";
+  const midStop = mode === "dark" ? "35%" : "30%";
+  const outerStop = mode === "dark" ? "65%" : "60%";
+  const blurStd = mode === "dark" ? 55 : 65;
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
   <defs>
     ${orbs
       .map(
         (o, i) => `
-    <radialGradient id="orb-${i}" cx="50%" cy="50%" r="50%">
+    <radialGradient id="orb-${i}" cx="50%" cy="50%" r="${orbR}">
       <stop offset="0%" stop-color="${o.color}" stop-opacity="${o.alpha}" />
-      <stop offset="55%" stop-color="${o.color}" stop-opacity="${o.alpha * 0.45}" />
+      <stop offset="${midStop}" stop-color="${o.color}" stop-opacity="${o.alpha * 0.6}" />
+      <stop offset="${outerStop}" stop-color="${o.color}" stop-opacity="${o.alpha * 0.2}" />
       <stop offset="100%" stop-color="${o.color}" stop-opacity="0" />
     </radialGradient>`,
       )
       .join("")}
-    <filter id="aurora-blur" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="60" />
+    <filter id="aurora-blur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="${blurStd}" />
     </filter>
     <radialGradient id="vignette" cx="50%" cy="${mode === "dark" ? "60%" : "55%"}" r="${mode === "dark" ? "80%" : "85%"}">
       <stop offset="${mode === "dark" ? "30%" : "55%"}" stop-color="${base}" stop-opacity="0" />
@@ -62,6 +63,10 @@ function auroraOrbs(
   brand: BrandMode,
   mode: "dark" | "light" = "dark",
 ) {
+  // Deterministic hash → three offset orbs painted purely from the brand's
+  // own tokens. Mirrors auroraOrbs() in src/components/slide/flagship.tsx so
+  // PPTX/PDF exports match what the on-screen AuroraLayer renders for the
+  // same seed + brand + mode.
   let h = 2166136261;
   for (let i = 0; i < seed.length; i++) {
     h ^= seed.charCodeAt(i);
@@ -83,17 +88,18 @@ function auroraOrbs(
     mode === "dark"
       ? [darkFirst, brand.tokens.accent, sibling]
       : [lightPrimary, brand.tokens.accent, sibling];
-  const alphaBase = 0.55;
-  const alphaRange = mode === "dark" ? 0.35 : 0.28;
+  const alphaBase = 0.75;
+  const alphaRange = mode === "dark" ? 0.22 : 0.18;
   return Array.from({ length: 3 }).map((_, i) => ({
     color: palette[i] ?? brand.tokens.accent,
-    x: 180 + rand() * 900,
-    y: 90 + rand() * 540,
-    rx: (mode === "dark" ? 380 : 460) + rand() * (mode === "dark" ? 260 : 320),
-    ry: (mode === "dark" ? 320 : 400) + rand() * (mode === "dark" ? 220 : 280),
+    x: 120 + rand() * 1040,
+    y: 60 + rand() * 600,
+    rx: (mode === "dark" ? 520 : 620) + rand() * (mode === "dark" ? 340 : 420),
+    ry: (mode === "dark" ? 440 : 540) + rand() * (mode === "dark" ? 280 : 360),
     alpha: alphaBase + rand() * alphaRange,
   }));
 }
+
 
 function mixHex(a: string, b: string, t: number): string {
   const pa = /^#?([a-f\d]{6})$/i.exec(a);
