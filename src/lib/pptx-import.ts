@@ -108,8 +108,9 @@ export type LayoutFrame = {
 export type LayoutSrcRect = { l: number; t: number; r: number; b: number };
 export type LayoutFill =
   | { kind: "solid"; color: string; opacity?: number }
-  | { kind: "gradient"; stops: Array<{ pos: number; color: string; opacity?: number }>; angle: number }
-  | { kind: "image"; embedId?: string; path?: string; srcRect?: LayoutSrcRect; opacity?: number; tile?: boolean }
+  | { kind: "gradient"; stops: Array<{ pos: number; color: string; opacity?: number }>; angle: number; radial?: boolean }
+  | { kind: "image"; embedId?: string; path?: string; srcRect?: LayoutSrcRect; opacity?: number; tile?: boolean; duotone?: [string, string] }
+  | { kind: "pattern"; preset: string; fg?: string; bg?: string }
   | { kind: "none" };
 export type LayoutLine = {
   color?: string;
@@ -117,30 +118,111 @@ export type LayoutLine = {
   dashStyle?: string;
   headArrow?: string;
   tailArrow?: string;
+  /** butt | rnd | sq. */
+  cap?: "flat" | "rnd" | "sq";
+  /** sng | dbl | thickThin | thinThick | tri. */
+  cmpd?: "sng" | "dbl" | "thickThin" | "thinThick" | "tri";
+  /** round | bevel | miter. */
+  join?: "round" | "bevel" | "miter";
+};
+/** Shape / text / image effects lifted from `<a:effectLst>` or `<a:effectDag>`. */
+export type LayoutEffect = {
+  outerShadow?: { color: string; blurPx?: number; distPx?: number; dirDeg?: number; opacity?: number };
+  innerShadow?: { color: string; blurPx?: number; distPx?: number; dirDeg?: number; opacity?: number };
+  glow?: { color: string; radPx: number };
+  softEdge?: { radPx: number };
+  reflection?: boolean;
+  /** Blur radius in px for `a:blur`. */
+  blur?: number;
 };
 export type LayoutRun = {
   text: string;
   bold?: boolean;
   italic?: boolean;
   underline?: boolean;
+  strike?: boolean;
   sizePt?: number;
   color?: string;
   font?: string;
+  /** Character spacing in 1/100th pt. */
+  spacingPct?: number;
+  /** all | small | none. */
+  cap?: "all" | "small" | "none";
+  /** Baseline offset % (negative → subscript, positive → superscript). */
+  baselinePct?: number;
+  /** URL for `a:hlinkClick`. */
+  hlink?: string;
 };
 export type LayoutPara = {
   align?: "l" | "ctr" | "r" | "just";
   level?: number;
   bullet?: "char" | "auto" | "none";
+  /** Actual bullet character when `bullet === "char"` (e.g. "•" "▪" "●"). */
+  bulletChar?: string;
+  /** Bullet auto-num type (arabicPeriod, romanUcPeriod, etc.). */
+  bulletAutoNum?: string;
+  bulletFont?: string;
+  bulletColor?: string;
+  /** Left margin in inches (paragraph marL). */
+  marLIn?: number;
+  /** First-line indent in inches (positive → indent, negative → hanging). */
+  indentIn?: number;
+  /** Space before / after in points. */
+  spcBeforePt?: number;
+  spcAfterPt?: number;
+  /** Line spacing — either a multiplier (`{ mult: 1.15 }`) or points (`{ pt: 18 }`). */
+  lineSpacing?: { mult: number } | { pt: number };
   runs: LayoutRun[];
 };
-export type LayoutTextBody = { paras: LayoutPara[]; anchor?: "t" | "ctr" | "b" };
+export type LayoutTextBody = {
+  paras: LayoutPara[];
+  anchor?: "t" | "ctr" | "b";
+  /** Body insets in inches (default 0.1 / 0.05 / 0.1 / 0.05). */
+  insets?: { l: number; t: number; r: number; b: number };
+  /** `normAutofit` scale (0-1) applied to run size. */
+  fontScale?: number;
+  /** `normAutofit` line-spacing reduction (0-1). */
+  lnSpcReduction?: number;
+  /** True when body uses `spAutoFit` (shrink shape to text). */
+  spAutoFit?: boolean;
+  /** Text rotation in degrees. */
+  rotDeg?: number;
+  /** Text wrap on/off. */
+  wrap?: boolean;
+  /** vert270 | vert | wordArtVert | eaVert etc — vertical text direction. */
+  vert?: string;
+  /** Number of columns. */
+  numCol?: number;
+};
+export type TableCell = {
+  text: LayoutTextBody;
+  fill?: LayoutFill;
+  borders?: { l?: LayoutLine; t?: LayoutLine; r?: LayoutLine; b?: LayoutLine };
+  /** cell margins in inches. */
+  margins?: { l: number; t: number; r: number; b: number };
+  colSpan?: number;
+  rowSpan?: number;
+  /** True when this cell is spanned/merged over. */
+  hMerge?: boolean;
+  vMerge?: boolean;
+  /** Vertical anchor override for the cell. */
+  anchor?: "t" | "ctr" | "b";
+};
 export type LayoutShape =
-  | { kind: "text"; z: number; frame: LayoutFrame; fill?: LayoutFill; line?: LayoutLine; prst?: string; text: LayoutTextBody; isTitle?: boolean }
-  | { kind: "image"; z: number; frame: LayoutFrame; embedId?: string; path?: string; line?: LayoutLine; srcRect?: LayoutSrcRect; prst?: string; opacity?: number }
-  | { kind: "line"; z: number; frame: LayoutFrame; line?: LayoutLine; prst?: string }
-  | { kind: "table"; z: number; frame: LayoutFrame; header: string[]; rows: string[][] }
+  | { kind: "text"; z: number; frame: LayoutFrame; fill?: LayoutFill; line?: LayoutLine; prst?: string; text: LayoutTextBody; isTitle?: boolean; effect?: LayoutEffect; opacity?: number; customPath?: CustomPath }
+  | { kind: "image"; z: number; frame: LayoutFrame; embedId?: string; path?: string; line?: LayoutLine; srcRect?: LayoutSrcRect; prst?: string; opacity?: number; effect?: LayoutEffect; customPath?: CustomPath; duotone?: [string, string] }
+  | { kind: "line"; z: number; frame: LayoutFrame; line?: LayoutLine; prst?: string; effect?: LayoutEffect }
+  | { kind: "table"; z: number; frame: LayoutFrame; header: string[]; rows: string[][]; cellGrid?: TableCell[][]; colWidthsIn?: number[]; rowHeightsIn?: number[]; firstRow?: boolean; bandRow?: boolean; firstCol?: boolean; bandCol?: boolean }
   | { kind: "chart"; z: number; frame: LayoutFrame }
   | { kind: "diagram"; z: number; frame: LayoutFrame };
+
+/** Custom shape path — captured from `<a:custGeom>` as normalized 0-1 coords. */
+export type CustomPath = {
+  /** Path commands with normalized coords (0-1). */
+  d: string;
+  /** True when `<a:pathFill val="none"/>` — stroke-only. */
+  strokeOnly?: boolean;
+};
 
 
 export type SlideLayout = {
@@ -177,6 +259,14 @@ export type ParsedTheme = {
   light1?: string;
   bodyFont?: string;
   headingFont?: string;
+  /** Theme-level background fill styles (bgFillStyleLst) — resolves `p:bgRef@idx`. */
+  bgFillStyleLst?: LayoutFill[];
+  /** Fill styles (fillStyleLst) — resolves style/fillRef. */
+  fillStyleLst?: LayoutFill[];
+  /** Line styles (lnStyleLst) — resolves style/lnRef. */
+  lineStyleLst?: LayoutLine[];
+  /** Effect styles (effectStyleLst) — resolves style/effectRef. */
+  effectStyleLst?: LayoutEffect[];
 };
 
 export type ParsedDeck = {
@@ -431,7 +521,7 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     // ── Faithful layout (positions / z-order / styling) ─────────────────
     let layout: SlideLayout | undefined;
     try {
-      layout = extractSlideLayout(xml, slideSize, imageEmbedIds, parents);
+      layout = extractSlideLayout(xml, slideSize, imageEmbedIds, parents, theme);
     } catch { /* layout is best-effort; parsed text/images still return */ }
 
 
@@ -1085,6 +1175,37 @@ async function extractTheme(zip: JSZip, parser: XMLParser): Promise<ParsedTheme>
       readSchemeColor(scheme?.["a:accent5"]),
       readSchemeColor(scheme?.["a:accent6"]),
     ].filter((c): c is string => Boolean(c));
+
+    // Extract fmtScheme with the ordered parser so we can materialize
+    // bgFillStyleLst / fillStyleLst as LayoutFill[] using the existing readFill().
+    let bgFillStyleLst: LayoutFill[] | undefined;
+    let fillStyleLst: LayoutFill[] | undefined;
+    try {
+      const orderParser = new XMLParser({
+        ignoreAttributes: false, attributeNamePrefix: "@_", preserveOrder: true,
+        trimValues: true, processEntities: false, htmlEntities: false,
+      });
+      const root = orderParser.parse(xml) as PNode[];
+      const themeRoot = root.find((n) => pTag(n) === "a:theme");
+      const els = themeRoot ? pFind(themeRoot, "a:themeElements") : undefined;
+      const fmt = els ? pFind(els, "a:fmtScheme") : undefined;
+      const bgLst = fmt ? pFind(fmt, "a:bgFillStyleLst") : undefined;
+      const fLst = fmt ? pFind(fmt, "a:fillStyleLst") : undefined;
+      const collectFills = (node: PNode | undefined): LayoutFill[] | undefined => {
+        if (!node) return undefined;
+        const out: LayoutFill[] = [];
+        for (const child of pChildren(node)) {
+          // wrap child as if it were an spPr with a single fill kid
+          const wrap = { spPr: [child] } as unknown as PNode;
+          const f = readFill(wrap, []);
+          if (f) out.push(f);
+        }
+        return out.length ? out : undefined;
+      };
+      bgFillStyleLst = collectFills(bgLst);
+      fillStyleLst = collectFills(fLst);
+    } catch { /* fmtScheme is optional; theme still usable without it */ }
+
     return {
       accents,
       accent1: accents[0],
@@ -1093,6 +1214,8 @@ async function extractTheme(zip: JSZip, parser: XMLParser): Promise<ParsedTheme>
       light1: readSchemeColor(scheme?.["a:lt1"]) ?? readSchemeColor(scheme?.["a:lt2"]),
       headingFont: fontScheme?.["a:majorFont"]?.["a:latin"]?.["@_typeface"],
       bodyFont: fontScheme?.["a:minorFont"]?.["a:latin"]?.["@_typeface"],
+      bgFillStyleLst,
+      fillStyleLst,
     };
   } catch {
     return { ...EMPTY_THEME };
@@ -1202,17 +1325,141 @@ function readColorNodeAlpha(colorNode: PNode | undefined): number | undefined {
   return isFinite(n) && n >= 0 && n <= 1 ? n : undefined;
 }
 
+// ─── Color transforms (lumMod / lumOff / shade / tint / satMod / alpha) ───
+// PPTX color modifiers live as children of the color node. For srgb we can
+// compute the transformed hex inline; for scheme colors (resolved later by
+// the renderer), we encode modifiers as a `?lm=..&lo=..` query suffix on the
+// `var(--pptx-*)` token so `FaithfulSlideCanvas` can apply them at paint.
+
+type ColorMods = {
+  lumMod?: number; // 0..1
+  lumOff?: number; // 0..1
+  shade?: number;  // 0..1
+  tint?: number;   // 0..1
+  satMod?: number; // multiplier
+  alpha?: number;  // 0..1
+};
+
+function readColorMods(colorNode: PNode | undefined): ColorMods | undefined {
+  if (!colorNode) return undefined;
+  const num = (tag: string): number | undefined => {
+    const n = pFind(colorNode, tag);
+    if (!n) return undefined;
+    const v = pAttrs(n)["@_val"];
+    if (!v) return undefined;
+    const parsed = Number(v) / 100000;
+    return isFinite(parsed) ? parsed : undefined;
+  };
+  const mods: ColorMods = {
+    lumMod: num("a:lumMod"),
+    lumOff: num("a:lumOff"),
+    shade: num("a:shade"),
+    tint: num("a:tint"),
+    satMod: num("a:satMod"),
+    alpha: num("a:alpha"),
+  };
+  const any = Object.values(mods).some((v) => v !== undefined);
+  return any ? mods : undefined;
+}
+
+function hexToHsl(hex: string): [number, number, number] {
+  const m = hex.replace("#", "");
+  const r = parseInt(m.slice(0, 2), 16) / 255;
+  const g = parseInt(m.slice(2, 4), 16) / 255;
+  const b = parseInt(m.slice(4, 6), 16) / 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  let h = 0, s = 0;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0));
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h /= 6;
+  }
+  return [h, s, l];
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+  const hue2rgb = (t: number) => {
+    if (t < 0) t += 1; if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  };
+  const r = s === 0 ? l : hue2rgb(h + 1 / 3);
+  const g = s === 0 ? l : hue2rgb(h);
+  const b = s === 0 ? l : hue2rgb(h - 1 / 3);
+  const toHex = (n: number) => Math.round(Math.max(0, Math.min(1, n)) * 255).toString(16).padStart(2, "0").toUpperCase();
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+/** Apply PPTX color modifiers to a hex color. Order: satMod → lumMod/lumOff → shade/tint. */
+export function applyColorMods(hex: string, mods: ColorMods): string {
+  let [h, s, l] = hexToHsl(hex);
+  if (mods.satMod !== undefined) s = Math.max(0, Math.min(1, s * mods.satMod));
+  if (mods.lumMod !== undefined) l = Math.max(0, Math.min(1, l * mods.lumMod));
+  if (mods.lumOff !== undefined) l = Math.max(0, Math.min(1, l + mods.lumOff));
+  let out = hslToHex(h, s, l);
+  // shade: blend toward black; tint: blend toward white
+  if (mods.shade !== undefined) {
+    const m = out.replace("#", "");
+    const r = parseInt(m.slice(0, 2), 16) * mods.shade;
+    const g = parseInt(m.slice(2, 4), 16) * mods.shade;
+    const b = parseInt(m.slice(4, 6), 16) * mods.shade;
+    const to = (n: number) => Math.round(Math.max(0, Math.min(255, n))).toString(16).padStart(2, "0").toUpperCase();
+    out = `#${to(r)}${to(g)}${to(b)}`;
+  }
+  if (mods.tint !== undefined) {
+    const m = out.replace("#", "");
+    const t = mods.tint;
+    const r = parseInt(m.slice(0, 2), 16) * t + 255 * (1 - t);
+    const g = parseInt(m.slice(2, 4), 16) * t + 255 * (1 - t);
+    const b = parseInt(m.slice(4, 6), 16) * t + 255 * (1 - t);
+    const to = (n: number) => Math.round(Math.max(0, Math.min(255, n))).toString(16).padStart(2, "0").toUpperCase();
+    out = `#${to(r)}${to(g)}${to(b)}`;
+  }
+  return out;
+}
+
+function encodeSchemeMods(mods: ColorMods): string {
+  const parts: string[] = [];
+  if (mods.lumMod !== undefined) parts.push(`lm=${Math.round(mods.lumMod * 1000)}`);
+  if (mods.lumOff !== undefined) parts.push(`lo=${Math.round(mods.lumOff * 1000)}`);
+  if (mods.shade !== undefined) parts.push(`sh=${Math.round(mods.shade * 1000)}`);
+  if (mods.tint !== undefined) parts.push(`tn=${Math.round(mods.tint * 1000)}`);
+  if (mods.satMod !== undefined) parts.push(`sm=${Math.round(mods.satMod * 1000)}`);
+  if (mods.alpha !== undefined) parts.push(`al=${Math.round(mods.alpha * 1000)}`);
+  return parts.length ? `?${parts.join("&")}` : "";
+}
+
 function readColorFromNode(n: PNode | undefined): string | undefined {
   if (!n) return undefined;
   const srgb = pFind(n, "a:srgbClr");
   if (srgb) {
     const v = pAttrs(srgb)["@_val"];
-    if (v && /^[0-9a-fA-F]{6}$/.test(v)) return `#${v.toUpperCase()}`;
+    if (v && /^[0-9a-fA-F]{6}$/.test(v)) {
+      const base = `#${v.toUpperCase()}`;
+      const mods = readColorMods(srgb);
+      return mods ? applyColorMods(base, mods) : base;
+    }
   }
   const sch = pFind(n, "a:schemeClr");
   if (sch) {
     const v = pAttrs(sch)["@_val"];
-    if (v) return `var(--pptx-${v})`;  // renderer maps theme tokens
+    if (v) {
+      const mods = readColorMods(sch);
+      return `var(--pptx-${v})${mods ? encodeSchemeMods(mods) : ""}`;
+    }
+  }
+  const sys = pFind(n, "a:sysClr");
+  if (sys) {
+    const last = pAttrs(sys)["@_lastClr"];
+    if (last && /^[0-9a-fA-F]{6}$/.test(last)) return `#${last.toUpperCase()}`;
   }
   return undefined;
 }
@@ -1235,10 +1482,34 @@ function readSrcRect(blipFill: PNode | undefined): LayoutSrcRect | undefined {
   const r = a["@_r"] ? Number(a["@_r"]) / 100000 : 0;
   const b = a["@_b"] ? Number(a["@_b"]) / 100000 : 0;
   if (l === 0 && t === 0 && r === 0 && b === 0) return undefined;
-  // Clamp — some producers emit negatives for "outset" edges we can't reproduce
-  // trivially in CSS; treat them as 0 so the visible region stays inside source.
   const clamp = (n: number) => Math.max(0, Math.min(0.99, n));
   return { l: clamp(l), t: clamp(t), r: clamp(r), b: clamp(b) };
+}
+
+function readDuotone(blipFill: PNode | undefined): [string, string] | undefined {
+  if (!blipFill) return undefined;
+  const blip = pFind(blipFill, "a:blip");
+  if (!blip) return undefined;
+  const duo = pFind(blip, "a:duotone");
+  if (!duo) return undefined;
+  const children = pChildren(duo);
+  const colors: string[] = [];
+  for (const c of children) {
+    const col = readColorFromNode({ [pTag(c) ?? ""]: [c] } as PNode);
+    // simpler — just try direct
+  }
+  // Simpler: scan direct srgb/scheme children
+  const raw: string[] = [];
+  for (const c of children) {
+    const tag = pTag(c);
+    if (tag === "a:srgbClr" || tag === "a:schemeClr" || tag === "a:sysClr") {
+      const wrap = { duo: [c] } as unknown as PNode;
+      const col = readColorFromNode(wrap);
+      if (col) raw.push(col);
+    }
+  }
+  if (raw.length >= 2) return [raw[0], raw[1]];
+  return undefined;
 }
 
 function readFill(spPr: PNode | undefined, imageEmbedIds: string[]): LayoutFill | undefined {
@@ -1262,8 +1533,21 @@ function readFill(spPr: PNode | undefined, imageEmbedIds: string[]): LayoutFill 
         }
       }
       const lin = pFind(k, "a:lin");
+      const path = pFind(k, "a:path");
       const angle = lin ? (Number(pAttrs(lin)["@_ang"] ?? 0) / 60000) : 0;
-      if (stops.length) return { kind: "gradient", stops, angle };
+      const radial = path ? pAttrs(path)["@_path"] === "circle" || pAttrs(path)["@_path"] === "rect" : false;
+      if (stops.length) return { kind: "gradient", stops, angle, radial: radial || undefined };
+    }
+    if (t === "a:pattFill") {
+      const preset = pAttrs(k)["@_prst"] ?? "pct50";
+      const fg = pFind(k, "a:fgClr");
+      const bg = pFind(k, "a:bgClr");
+      return {
+        kind: "pattern",
+        preset,
+        fg: fg ? readColorFromNode(fg) : undefined,
+        bg: bg ? readColorFromNode(bg) : undefined,
+      };
     }
     if (t === "a:blipFill") {
       const blip = pFind(k, "a:blip");
@@ -1272,7 +1556,7 @@ function readFill(spPr: PNode | undefined, imageEmbedIds: string[]): LayoutFill 
         void imageEmbedIds;
         const srcRect = readSrcRect(k);
         const tile = !!pFind(k, "a:tile");
-        // Blip-level opacity (rare but valid): <a:blip><a:alphaModFix amt="..."/></a:blip>
+        const duotone = readDuotone(k);
         let opacity: number | undefined;
         if (blip) {
           const alphaMod = pFind(blip, "a:alphaModFix");
@@ -1284,14 +1568,12 @@ function readFill(spPr: PNode | undefined, imageEmbedIds: string[]): LayoutFill 
             }
           }
         }
-        return { kind: "image", embedId: embed, srcRect, opacity, tile: tile || undefined };
+        return { kind: "image", embedId: embed, srcRect, opacity, tile: tile || undefined, duotone };
       }
     }
   }
   return undefined;
 }
-
-
 
 function readLine(spPr: PNode | undefined): LayoutLine | undefined {
   if (!spPr) return undefined;
@@ -1306,20 +1588,148 @@ function readLine(spPr: PNode | undefined): LayoutLine | undefined {
   const dashStyle = dash ? pAttrs(dash)["@_val"] : undefined;
   const head = pFind(ln, "a:headEnd");
   const tail = pFind(ln, "a:tailEnd");
+  const capRaw = a["@_cap"];
+  const cmpdRaw = a["@_cmpd"];
+  const joinChild = pChildren(ln).find((c) => {
+    const tg = pTag(c);
+    return tg === "a:round" || tg === "a:bevel" || tg === "a:miter";
+  });
+  const joinTag = joinChild ? pTag(joinChild) : undefined;
+  const join =
+    joinTag === "a:round" ? "round" :
+    joinTag === "a:bevel" ? "bevel" :
+    joinTag === "a:miter" ? "miter" : undefined;
   return {
     color,
     widthPt,
     dashStyle,
     headArrow: head ? pAttrs(head)["@_type"] : undefined,
     tailArrow: tail ? pAttrs(tail)["@_type"] : undefined,
+    cap: capRaw === "flat" || capRaw === "rnd" || capRaw === "sq" ? capRaw : undefined,
+    cmpd: cmpdRaw === "sng" || cmpdRaw === "dbl" || cmpdRaw === "thickThin" || cmpdRaw === "thinThick" || cmpdRaw === "tri" ? cmpdRaw : undefined,
+    join,
   };
+}
+
+function readEffects(spPr: PNode | undefined): LayoutEffect | undefined {
+  if (!spPr) return undefined;
+  const effectLst = pFind(spPr, "a:effectLst") ?? pFind(spPr, "a:effectDag");
+  if (!effectLst) return undefined;
+  const out: LayoutEffect = {};
+  const outerShdw = pFind(effectLst, "a:outerShdw");
+  if (outerShdw) {
+    const a = pAttrs(outerShdw);
+    const col = readColorFromNode(outerShdw) ?? "#000000";
+    const alpha = readAlphaOfSolid(outerShdw);
+    out.outerShadow = {
+      color: col,
+      blurPx: a["@_blurRad"] ? Number(a["@_blurRad"]) / 12700 : undefined,
+      distPx: a["@_dist"] ? Number(a["@_dist"]) / 12700 : undefined,
+      dirDeg: a["@_dir"] ? Number(a["@_dir"]) / 60000 : undefined,
+      opacity: alpha,
+    };
+  }
+  const innerShdw = pFind(effectLst, "a:innerShdw");
+  if (innerShdw) {
+    const a = pAttrs(innerShdw);
+    const col = readColorFromNode(innerShdw) ?? "#000000";
+    const alpha = readAlphaOfSolid(innerShdw);
+    out.innerShadow = {
+      color: col,
+      blurPx: a["@_blurRad"] ? Number(a["@_blurRad"]) / 12700 : undefined,
+      distPx: a["@_dist"] ? Number(a["@_dist"]) / 12700 : undefined,
+      dirDeg: a["@_dir"] ? Number(a["@_dir"]) / 60000 : undefined,
+      opacity: alpha,
+    };
+  }
+  const glow = pFind(effectLst, "a:glow");
+  if (glow) {
+    const rad = pAttrs(glow)["@_rad"] ? Number(pAttrs(glow)["@_rad"]) / 12700 : 8;
+    const col = readColorFromNode(glow) ?? "#FFFFFF";
+    out.glow = { color: col, radPx: rad };
+  }
+  const softEdge = pFind(effectLst, "a:softEdge");
+  if (softEdge) {
+    const rad = pAttrs(softEdge)["@_rad"] ? Number(pAttrs(softEdge)["@_rad"]) / 12700 : 0;
+    out.softEdge = { radPx: rad };
+  }
+  if (pFind(effectLst, "a:reflection")) out.reflection = true;
+  const blur = pFind(effectLst, "a:blur");
+  if (blur) {
+    const rad = pAttrs(blur)["@_rad"] ? Number(pAttrs(blur)["@_rad"]) / 12700 : 0;
+    out.blur = rad;
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+
+function readCustomPath(spPr: PNode | undefined): CustomPath | undefined {
+  if (!spPr) return undefined;
+  const cust = pFind(spPr, "a:custGeom");
+  if (!cust) return undefined;
+  const pathLst = pFind(cust, "a:pathLst");
+  if (!pathLst) return undefined;
+  const paths = pFindAll(pathLst, "a:path");
+  if (!paths.length) return undefined;
+  const commands: string[] = [];
+  let strokeOnly = false;
+  for (const path of paths) {
+    const pa = pAttrs(path);
+    const w = Number(pa["@_w"] ?? 100000);
+    const h = Number(pa["@_h"] ?? 100000);
+    const stroke = pa["@_stroke"];
+    const fillAttr = pa["@_fill"];
+    if (stroke === "1" && fillAttr === "none") strokeOnly = true;
+    const norm = (x: number, base: number) => (base > 0 ? x / base : 0).toFixed(4);
+    for (const cmd of pChildren(path)) {
+      const tag = pTag(cmd);
+      const pts = pFindAll(cmd, "a:pt").map((pt) => {
+        const a = pAttrs(pt);
+        return [Number(a["@_x"] ?? 0), Number(a["@_y"] ?? 0)] as [number, number];
+      });
+      if (tag === "a:moveTo" && pts[0]) commands.push(`M${norm(pts[0][0], w)},${norm(pts[0][1], h)}`);
+      else if (tag === "a:lnTo" && pts[0]) commands.push(`L${norm(pts[0][0], w)},${norm(pts[0][1], h)}`);
+      else if (tag === "a:cubicBezTo" && pts.length === 3) {
+        commands.push(
+          `C${norm(pts[0][0], w)},${norm(pts[0][1], h)} ${norm(pts[1][0], w)},${norm(pts[1][1], h)} ${norm(pts[2][0], w)},${norm(pts[2][1], h)}`,
+        );
+      } else if (tag === "a:quadBezTo" && pts.length === 2) {
+        commands.push(`Q${norm(pts[0][0], w)},${norm(pts[0][1], h)} ${norm(pts[1][0], w)},${norm(pts[1][1], h)}`);
+      } else if (tag === "a:close") {
+        commands.push("Z");
+      }
+    }
+  }
+  if (!commands.length) return undefined;
+  return { d: commands.join(" "), strokeOnly: strokeOnly || undefined };
 }
 
 function readTextBody(txBody: PNode | undefined): LayoutTextBody | undefined {
   if (!txBody) return undefined;
   const bodyPr = pFind(txBody, "a:bodyPr");
-  const anchorRaw = bodyPr ? pAttrs(bodyPr)["@_anchor"] : undefined;
+  const bpa = bodyPr ? pAttrs(bodyPr) : {};
+  const anchorRaw = bpa["@_anchor"];
   const anchor = anchorRaw === "t" || anchorRaw === "ctr" || anchorRaw === "b" ? anchorRaw : undefined;
+  const inIn = (v: unknown, fallback: number) => (v !== undefined && v !== null ? Number(v) / EMU_PER_INCH : fallback);
+  const insets = bodyPr ? {
+    l: inIn(bpa["@_lIns"], 0.1),
+    t: inIn(bpa["@_tIns"], 0.05),
+    r: inIn(bpa["@_rIns"], 0.1),
+    b: inIn(bpa["@_bIns"], 0.05),
+  } : undefined;
+  const rot = bpa["@_rot"] ? Number(bpa["@_rot"]) / 60000 : undefined;
+  const wrapRaw = bpa["@_wrap"];
+  const wrap = wrapRaw === "none" ? false : wrapRaw === "square" ? true : undefined;
+  const vert = bpa["@_vert"] ? String(bpa["@_vert"]) : undefined;
+  const numCol = bpa["@_numCol"] ? Number(bpa["@_numCol"]) : undefined;
+  const normAF = bodyPr ? pFind(bodyPr, "a:normAutofit") : undefined;
+  const spAutoFit = bodyPr ? !!pFind(bodyPr, "a:spAutoFit") : undefined;
+  let fontScale: number | undefined;
+  let lnSpcReduction: number | undefined;
+  if (normAF) {
+    const a = pAttrs(normAF);
+    if (a["@_fontScale"]) fontScale = Number(a["@_fontScale"]) / 100000;
+    if (a["@_lnSpcReduction"]) lnSpcReduction = Number(a["@_lnSpcReduction"]) / 100000;
+  }
   const paras: LayoutPara[] = [];
   for (const p of pFindAll(txBody, "a:p")) {
     const pPr = pFind(p, "a:pPr");
@@ -1327,11 +1737,51 @@ function readTextBody(txBody: PNode | undefined): LayoutTextBody | undefined {
     const alignRaw = pAttr["@_algn"];
     const align = alignRaw === "l" || alignRaw === "ctr" || alignRaw === "r" || alignRaw === "just" ? alignRaw : undefined;
     const level = pAttr["@_lvl"] ? Number(pAttr["@_lvl"]) : undefined;
+    const marLIn = pAttr["@_marL"] ? Number(pAttr["@_marL"]) / EMU_PER_INCH : undefined;
+    const indentIn = pAttr["@_indent"] ? Number(pAttr["@_indent"]) / EMU_PER_INCH : undefined;
     let bullet: "char" | "auto" | "none" | undefined;
+    let bulletChar: string | undefined;
+    let bulletAutoNum: string | undefined;
+    let bulletFont: string | undefined;
+    let bulletColor: string | undefined;
     if (pPr) {
-      if (pFind(pPr, "a:buChar")) bullet = "char";
-      else if (pFind(pPr, "a:buAutoNum")) bullet = "auto";
-      else if (pFind(pPr, "a:buNone")) bullet = "none";
+      const buChar = pFind(pPr, "a:buChar");
+      const buAuto = pFind(pPr, "a:buAutoNum");
+      const buFont = pFind(pPr, "a:buFont");
+      const buClr = pFind(pPr, "a:buClr");
+      if (buChar) {
+        bullet = "char";
+        bulletChar = pAttrs(buChar)["@_char"];
+      } else if (buAuto) {
+        bullet = "auto";
+        bulletAutoNum = pAttrs(buAuto)["@_type"];
+      } else if (pFind(pPr, "a:buNone")) {
+        bullet = "none";
+      }
+      if (buFont) bulletFont = pAttrs(buFont)["@_typeface"];
+      if (buClr) bulletColor = readColorFromNode(buClr);
+    }
+    let spcBeforePt: number | undefined;
+    let spcAfterPt: number | undefined;
+    let lineSpacing: LayoutPara["lineSpacing"] | undefined;
+    if (pPr) {
+      const spcBef = pFind(pPr, "a:spcBef");
+      const spcAft = pFind(pPr, "a:spcAft");
+      const lnSpc = pFind(pPr, "a:lnSpc");
+      const readSpcPts = (n: PNode | undefined): number | undefined => {
+        if (!n) return undefined;
+        const pts = pFind(n, "a:spcPts");
+        if (pts) return Number(pAttrs(pts)["@_val"] ?? 0) / 100;
+        return undefined;
+      };
+      spcBeforePt = readSpcPts(spcBef);
+      spcAfterPt = readSpcPts(spcAft);
+      if (lnSpc) {
+        const pct = pFind(lnSpc, "a:spcPct");
+        const pts = pFind(lnSpc, "a:spcPts");
+        if (pct) lineSpacing = { mult: Number(pAttrs(pct)["@_val"] ?? 100000) / 100000 };
+        else if (pts) lineSpacing = { pt: Number(pAttrs(pts)["@_val"] ?? 0) / 100 };
+      }
     }
     const runs: LayoutRun[] = [];
     for (const child of pChildren(p)) {
@@ -1344,22 +1794,38 @@ function readTextBody(txBody: PNode | undefined): LayoutTextBody | undefined {
         if (!text) continue;
         const solid = rPr ? pFind(rPr, "a:solidFill") : undefined;
         const latin = rPr ? pFind(rPr, "a:latin") : undefined;
+        const hlink = rPr ? pFind(rPr, "a:hlinkClick") : undefined;
+        const strike = ra["@_strike"];
+        const cap = ra["@_cap"];
+        const spc = ra["@_spc"] ? Number(ra["@_spc"]) / 100 : undefined; // in points
+        const baseline = ra["@_baseline"] ? Number(ra["@_baseline"]) / 1000 : undefined; // percent
         runs.push({
           text,
           bold: ra["@_b"] === "1" || undefined,
           italic: ra["@_i"] === "1" || undefined,
           underline: ra["@_u"] && ra["@_u"] !== "none" ? true : undefined,
+          strike: strike && strike !== "noStrike" ? true : undefined,
           sizePt: ra["@_sz"] ? Number(ra["@_sz"]) / 100 : undefined,
           color: solid ? readColorFromNode(solid) : undefined,
           font: latin ? pAttrs(latin)["@_typeface"] : undefined,
+          spacingPct: spc,
+          cap: cap === "all" || cap === "small" || cap === "none" ? cap : undefined,
+          baselinePct: baseline,
+          hlink: hlink ? pAttrs(hlink)["@_r:id"] : undefined,
         });
       } else if (t === "a:br") {
         runs.push({ text: "\n" });
       }
     }
-    paras.push({ align, level, bullet, runs });
+    paras.push({
+      align, level,
+      bullet, bulletChar, bulletAutoNum, bulletFont, bulletColor,
+      marLIn, indentIn,
+      spcBeforePt, spcAfterPt, lineSpacing,
+      runs,
+    });
   }
-  return { paras, anchor };
+  return { paras, anchor, insets, fontScale, lnSpcReduction, spAutoFit, rotDeg: rot, wrap, vert, numCol };
 }
 
 function transformFrame(child: LayoutFrame, group: PNode | undefined): LayoutFrame {
@@ -1394,6 +1860,79 @@ function transformFrame(child: LayoutFrame, group: PNode | undefined): LayoutFra
   };
 }
 
+function readTableCells(tbl: PNode): { grid: TableCell[][]; colWidths: number[]; rowHeights: number[]; firstRow?: boolean; bandRow?: boolean; firstCol?: boolean; bandCol?: boolean } {
+  const grid: TableCell[][] = [];
+  const colWidths: number[] = [];
+  const rowHeights: number[] = [];
+  const tblPr = pFind(tbl, "a:tblPr");
+  const tp = tblPr ? pAttrs(tblPr) : {};
+  const firstRow = tp["@_firstRow"] === "1" || undefined;
+  const bandRow = tp["@_bandRow"] === "1" || undefined;
+  const firstCol = tp["@_firstCol"] === "1" || undefined;
+  const bandCol = tp["@_bandCol"] === "1" || undefined;
+  const tblGrid = pFind(tbl, "a:tblGrid");
+  if (tblGrid) {
+    for (const gc of pFindAll(tblGrid, "a:gridCol")) {
+      const w = Number(pAttrs(gc)["@_w"] ?? 0) / EMU_PER_INCH;
+      colWidths.push(w);
+    }
+  }
+  for (const tr of pFindAll(tbl, "a:tr")) {
+    const h = Number(pAttrs(tr)["@_h"] ?? 0) / EMU_PER_INCH;
+    rowHeights.push(h);
+    const row: TableCell[] = [];
+    for (const tc of pFindAll(tr, "a:tc")) {
+      const tcA = pAttrs(tc);
+      const gridSpan = tcA["@_gridSpan"] ? Number(tcA["@_gridSpan"]) : undefined;
+      const rowSpan = tcA["@_rowSpan"] ? Number(tcA["@_rowSpan"]) : undefined;
+      const hMerge = tcA["@_hMerge"] === "1" || undefined;
+      const vMerge = tcA["@_vMerge"] === "1" || undefined;
+      const tcPr = pFind(tc, "a:tcPr");
+      const tcpa = tcPr ? pAttrs(tcPr) : {};
+      const anchorRaw = tcpa["@_anchor"];
+      const anchor = anchorRaw === "t" || anchorRaw === "ctr" || anchorRaw === "b" ? anchorRaw : undefined;
+      let fill: LayoutFill | undefined;
+      let borders: TableCell["borders"] = undefined;
+      let margins: TableCell["margins"] = undefined;
+      if (tcPr) {
+        fill = readFill(tcPr, []);
+        const readSide = (tag: string): LayoutLine | undefined => {
+          const s = pFind(tcPr, tag);
+          if (!s) return undefined;
+          const a = pAttrs(s);
+          const wEmu = Number(a["@_w"] ?? 0);
+          const solid = pFind(s, "a:solidFill");
+          return {
+            widthPt: wEmu > 0 ? wEmu / 12700 : undefined,
+            color: solid ? readColorFromNode(solid) : undefined,
+          };
+        };
+        const l = readSide("a:lnL"); const t = readSide("a:lnT");
+        const r = readSide("a:lnR"); const b = readSide("a:lnB");
+        if (l || t || r || b) borders = { l, t, r, b };
+        const inIn = (v: unknown, fb: number) => v !== undefined ? Number(v) / EMU_PER_INCH : fb;
+        if (tcpa["@_marL"] || tcpa["@_marT"] || tcpa["@_marR"] || tcpa["@_marB"]) {
+          margins = {
+            l: inIn(tcpa["@_marL"], 0.1),
+            t: inIn(tcpa["@_marT"], 0.05),
+            r: inIn(tcpa["@_marR"], 0.1),
+            b: inIn(tcpa["@_marB"], 0.05),
+          };
+        }
+      }
+      const tx = pFind(tc, "a:txBody");
+      const text = readTextBody(tx) ?? { paras: [] };
+      row.push({
+        text, fill, borders, margins,
+        colSpan: gridSpan, rowSpan,
+        hMerge, vMerge, anchor,
+      });
+    }
+    grid.push(row);
+  }
+  return { grid, colWidths, rowHeights, firstRow, bandRow, firstCol, bandCol };
+}
+
 function walkSpTree(
   nodes: PNode[],
   zRef: { z: number },
@@ -1425,6 +1964,8 @@ function walkSpTree(
       let prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
       let fill = readFill(spPr, imageEmbedIds);
       let line = readLine(spPr);
+      const effect = readEffects(spPr);
+      const customPath = readCustomPath(spPr);
       for (const proto of phProtos) {
         if (!prst && proto.prst) prst = proto.prst;
         if (!fill && proto.fill) fill = proto.fill;
@@ -1433,11 +1974,11 @@ function walkSpTree(
 
       const txBody = pFind(node, "p:txBody");
       let text = readTextBody(txBody) ?? { paras: [] };
-      // Inherit paragraph defaults (font/size/color) from layout → master
       if (phProtos.length) text = applyPlaceholderTextInheritance(text, phType, phProtos, parents);
 
       const isTitle = phType === "title" || phType === "ctrTitle" || undefined;
-      out.push({ kind: "text", z: zRef.z++, frame, fill, line, prst, text, isTitle });
+      const opacity = spPr ? readShapeOpacity(spPr) : undefined;
+      out.push({ kind: "text", z: zRef.z++, frame, fill, line, prst, text, isTitle, effect, opacity, customPath });
     } else if (t === "p:pic") {
       const spPr = pFind(node, "p:spPr");
       let frame = readFrame(spPr);
@@ -1447,10 +1988,11 @@ function walkSpTree(
       const blip = blipFill ? pFind(blipFill, "a:blip") : undefined;
       const embedId = blip ? (pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"]) : undefined;
       const srcRect = readSrcRect(blipFill);
-      // Geometry mask (roundRect / ellipse / triangle / hexagon / etc.)
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
-      // Blip-level opacity via a:alphaModFix
+      const customPath = readCustomPath(spPr);
+      const effect = readEffects(spPr);
+      const duotone = readDuotone(blipFill);
       let opacity: number | undefined;
       if (blip) {
         const alphaMod = pFind(blip, "a:alphaModFix");
@@ -1462,7 +2004,7 @@ function walkSpTree(
           }
         }
       }
-      out.push({ kind: "image", z: zRef.z++, frame, embedId, line: readLine(spPr), srcRect, prst, opacity });
+      out.push({ kind: "image", z: zRef.z++, frame, embedId, line: readLine(spPr), srcRect, prst, opacity, effect, customPath, duotone });
 
     } else if (t === "p:cxnSp") {
       const spPr = pFind(node, "p:spPr");
@@ -1471,7 +2013,8 @@ function walkSpTree(
       if (group) frame = transformFrame(frame, group);
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
-      out.push({ kind: "line", z: zRef.z++, frame, line: readLine(spPr), prst });
+      const effect = readEffects(spPr);
+      out.push({ kind: "line", z: zRef.z++, frame, line: readLine(spPr), prst, effect });
     } else if (t === "p:grpSp") {
       const grpSpPr = pFind(node, "p:grpSpPr");
       walkSpTree(pChildren(node), zRef, grpSpPr ?? group, out, imageEmbedIds, parents);
@@ -1498,19 +2041,31 @@ function walkSpTree(
         const tbl = pDeepFind(gKids, "a:tbl");
         const header: string[] = [];
         const rows: string[][] = [];
+        let cellGrid: TableCell[][] | undefined;
+        let colWidthsIn: number[] | undefined;
+        let rowHeightsIn: number[] | undefined;
+        let firstRow: boolean | undefined; let bandRow: boolean | undefined;
+        let firstCol: boolean | undefined; let bandCol: boolean | undefined;
         if (tbl) {
-          const trs = pFindAll(tbl, "a:tr");
-          trs.forEach((tr, idx) => {
-            const cells = pFindAll(tr, "a:tc").map((tc) => {
-              const tx = pFind(tc, "a:txBody");
-              const tb = readTextBody(tx);
-              return (tb?.paras ?? []).map((p) => p.runs.map((r) => r.text).join("")).join(" ").trim();
-            });
-            if (idx === 0) header.push(...cells);
-            else rows.push(cells);
+          const parsed = readTableCells(tbl);
+          cellGrid = parsed.grid;
+          colWidthsIn = parsed.colWidths.length ? parsed.colWidths : undefined;
+          rowHeightsIn = parsed.rowHeights.length ? parsed.rowHeights : undefined;
+          firstRow = parsed.firstRow; bandRow = parsed.bandRow;
+          firstCol = parsed.firstCol; bandCol = parsed.bandCol;
+          parsed.grid.forEach((row, idx) => {
+            const flat = row.map((c) =>
+              (c.text.paras ?? []).map((p) => p.runs.map((r) => r.text).join("")).join(" ").trim(),
+            );
+            if (idx === 0) header.push(...flat);
+            else rows.push(flat);
           });
         }
-        out.push({ kind: "table", z: zRef.z++, frame, header, rows });
+        out.push({
+          kind: "table", z: zRef.z++, frame, header, rows,
+          cellGrid, colWidthsIn, rowHeightsIn,
+          firstRow, bandRow, firstCol, bandCol,
+        });
       } else if (gTag && /chart/i.test(gTag)) {
         out.push({ kind: "chart", z: zRef.z++, frame });
       } else if (gTag && /diagram|dgm/i.test(gTag)) {
@@ -1522,11 +2077,18 @@ function walkSpTree(
   }
 }
 
+/** Shape-level opacity from `<p:spPr>` (some producers emit it on solidFill alpha which is already read). */
+function readShapeOpacity(_spPr: PNode): number | undefined {
+  // Placeholder — actual alpha comes through fill; kept for future extension.
+  return undefined;
+}
+
 function extractSlideLayout(
   xml: string,
   size: { w: number; h: number },
   imageEmbedIds: string[],
   parents?: ResolvedParents,
+  theme?: ParsedTheme,
 ): SlideLayout {
   const orderParser = new XMLParser({
     ignoreAttributes: false,
@@ -1543,13 +2105,31 @@ function extractSlideLayout(
   const spTree = cSld ? pFind(cSld, "p:spTree") : undefined;
   const shapes: LayoutShape[] = [];
 
-  // Background: slide → layout → master
-  let background: LayoutFill | undefined;
-  if (cSld) {
-    const bg = pFind(cSld, "p:bg");
-    const bgPr = bg ? pFind(bg, "p:bgPr") : undefined;
-    if (bgPr) background = readFill(bgPr, imageEmbedIds);
-  }
+  // Background: slide → layout → master.
+  // Both <p:bgPr> (direct fill) and <p:bgRef idx="..."> (theme reference)
+  // are honored; idx>1000 → theme.bgFillStyleLst, else → theme.fillStyleLst.
+  const readBg = (node: PNode | undefined): LayoutFill | undefined => {
+    if (!node) return undefined;
+    const bg = pFind(node, "p:bg");
+    if (!bg) return undefined;
+    const bgPr = pFind(bg, "p:bgPr");
+    if (bgPr) return readFill(bgPr, imageEmbedIds);
+    const bgRef = pFind(bg, "p:bgRef");
+    if (bgRef && theme) {
+      const idx = Number(pAttrs(bgRef)["@_idx"] ?? 0);
+      const list = idx >= 1001 ? theme.bgFillStyleLst : theme.fillStyleLst;
+      if (list && list.length) {
+        const slot = idx >= 1001 ? idx - 1001 : Math.max(0, idx - 1);
+        const picked = list[Math.min(slot, list.length - 1)];
+        if (picked) return picked;
+      }
+      // fallback: use overriding color if scheme color specified
+      const col = readColorFromNode(bgRef);
+      if (col) return { kind: "solid", color: col };
+    }
+    return undefined;
+  };
+  let background: LayoutFill | undefined = readBg(cSld);
   if (!background) background = parents?.layout?.background;
   if (!background) background = parents?.master?.background;
 
