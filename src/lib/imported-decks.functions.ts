@@ -144,7 +144,7 @@ async function persistParsedSlideImages({
     }
     const m = /^data:([^;]+);base64,(.+)$/.exec(dataUrl);
     if (!m || !embedId) continue;
-    const cacheKey = `${embedId}|${contentHash(dataUrl)}`;
+    const cacheKey = contentHash(dataUrl);
     const cachedPath = imageCache.get(cacheKey);
     if (cachedPath) {
       refs.push({ embedId, path: cachedPath });
