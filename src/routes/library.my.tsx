@@ -170,22 +170,36 @@ function MyModules() {
 }
 
 function SavedModuleCard({ row, onDelete, deleting }: { row: SavedRow; onDelete: () => void; deleting: boolean }) {
-  const variant = byId(MODULE_VARIANTS, row.variant_id);
-  const backdrop = backdropForVariant(row.variant_id);
+  const variant: ModuleVariant | undefined = byId(MODULE_VARIANTS, row.variant_id);
+  const brand = BRAND_MODES.find((b) => b.id === (row.brand_mode ?? "bm-enterprise")) ?? BRAND_MODES[0];
+  const backdrop = variant ? backdropForVariant(variant, brand.id, "light") : null;
   const content = row.content && Object.keys(row.content).length > 0 ? row.content : {};
+  const slide = variant
+    ? {
+        id: row.id,
+        position: 0,
+        sectionId: "generic",
+        variantId: variant.id,
+        layoutId: variant.permittedLayoutIds[0],
+        content,
+        changes: [],
+      }
+    : null;
 
   return (
     <div className="glass overflow-hidden rounded-2xl border border-black/10 bg-white">
       <div className="relative aspect-[16/9] bg-[#0a0a1a]">
-        <LazyMount>
+        <LazyMount placeholder={<div className="h-full w-full bg-[#0a0a1a]" />}>
           <SlideBackdropContext.Provider value={backdrop}>
             <ScaledSlide>
-              {variant ? (
+              {variant && slide ? (
                 <VariantRenderer
+                  slide={slide}
                   variant={variant}
-                  content={content}
+                  brand={brand}
+                  pageNumber={1}
+                  subCompany={row.sub_company ?? undefined}
                   mode="light"
-                  layoutId={variant.permittedLayoutIds[0]}
                 />
               ) : (
                 <div className="flex h-full items-center justify-center text-sm text-white/70">
