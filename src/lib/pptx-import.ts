@@ -2781,3 +2781,160 @@ function mergeDefaults(target: RunDefaults, src: RunDefaults) {
   if (target.italic === undefined && src.italic !== undefined) target.italic = src.italic;
 }
 
+
+// ─── Deck-wide extra readers (metadata, comments, fonts, custom xml) ────
+
+async function readXmlSafe(zip: JSZip, parser: XMLParser, path: string): Promise<unknown | null> {
+  const entry = zip.files[path];
+  if (!entry) return null;
+  try {
+    const xml = await entry.async("string");
+    return parser.parse(xml);
+  } catch { return null; }
+}
+
+function textOf(node: unknown): string | undefined {
+  if (node == null) return undefined;
+  if (typeof node === "string") return node.trim() || undefined;
+  if (typeof node === "number") return String(node);
+  if (typeof node === "object" && "#text" in (node as Record<string, unknown>)) {
+    const t = (node as Record<string, unknown>)["#text"];
+    return t == null ? undefined : String(t);
+  }
+  return undefined;
+}
+
+async function readDeckMetadata(zip: JSZip, parser: XMLParser): Promise<ParsedDeckMetadata> {
+  const md: ParsedDeckMetadata = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const core = (await readXmlSafe(zip, parser, "docProps/core.xml")) as any;
+  if (core) {
+    const cp = core["cp:coreProperties"] ?? core["coreProperties"] ?? {};
+    md.title = textOf(cp["dc:title"]);
+    md.subject = textOf(cp["dc:subject"]);
+    md.creator = textOf(cp["dc:creator"]);
+    md.description = textOf(cp["dc:description"]);
+    md.keywords = textOf(cp["cp:keywords"]);
+    md.category = textOf(cp["cp:category"]);
+    md.lastModifiedBy = textOf(cp["cp:lastModifiedBy"]);
+    md.revision = textOf(cp["cp:revision"]);
+    md.created = textOf(cp["dcterms:created"]);
+    md.modified = textOf(cp["dcterms:modified"]);
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const app = (await readXmlSafe(zip, parser, "docProps/app.xml")) as any;
+  if (app) {
+    const ap = app["Properties"] ?? {};
+    md.application = textOf(ap["Application"]);
+    md.appVersion = textOf(ap["AppVersion"]);
+    md.company = textOf(ap["Company"]);
+    md.manager = textOf(ap["Manager"]);
+    md.template = textOf(ap["Template"]);
+    md.presentationFormat = textOf(ap["PresentationFormat"]);
+  }
+  return md;
+}
+
+async function readSlideComments(zip: JSZip, parser: XMLParser, slideNum: number): Promise<ParsedComment[]> {
+  const out: ParsedComment[] = [];
+  // Modern (PPT 2007+) comments live at ppt/comments/comment{N}.xml paired with slide index.
+  const candidates = [
+    `ppt/comments/comment${slideNum}.xml`,
+    `ppt/comments/modernComment_${slideNum}.xml`,
+  ];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let commentsDoc: any = null;
+  for (const p of candidates) {
+    commentsDoc = await readXmlSafe(zip, parser, p);
+    if (commentsDoc) break;
+  }
+  if (!commentsDoc) return out;
+  const list = commentsDoc?.["p:cmLst"]?.["p:cm"] ?? commentsDoc?.["cmLst"]?.["cm"];
+  const arr = Array.isArray(list) ? list : list ? [list] : [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const authorsDoc: any = await readXmlSafe(zip, parser, "ppt/commentAuthors.xml");
+  const authors = new Map<string, { name?: string; initials?: string }>();
+  const aRaw = authorsDoc?.["p:cmAuthorLst"]?.["p:cmAuthor"];
+  const aArr = Array.isArray(aRaw) ? aRaw : aRaw ? [aRaw] : [];
+  for (const a of aArr) {
+    const id = String(a?.["@_id"] ?? "");
+    if (id) authors.set(id, { name: a?.["@_name"], initials: a?.["@_initials"] });
+  }
+  for (const c of arr) {
+    const authorId = String(c?.["@_authorId"] ?? "");
+    const author = authors.get(authorId) ?? {};
+    const t = textOf(c?.["p:text"]) ?? "";
+    if (!t) continue;
+    out.push({
+      authorName: author.name,
+      authorInitials: author.initials,
+      text: cap(t, 2000),
+      createdAt: c?.["@_dt"],
+    });
+  }
+  return out;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function readTransitionKind(tr: any): string | undefined {
+  if (!tr || typeof tr !== "object") return undefined;
+  for (const key of Object.keys(tr)) {
+    if (key.startsWith("@_")) continue;
+    // Strip namespace prefix (p:fade → fade).
+    const name = key.includes(":") ? key.split(":").pop()! : key;
+    if (name && name !== "extLst") return name;
+  }
+  return undefined;
+}
+
+async function readEmbeddedFonts(
+  zip: JSZip,
+  parser: XMLParser,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  presDoc: any,
+): Promise<ParsedEmbeddedFont[]> {
+  const out: ParsedEmbeddedFont[] = [];
+  if (!presDoc) return out;
+  const fontLst = presDoc?.["p:presentation"]?.["p:embeddedFontLst"]?.["p:embeddedFont"];
+  const arr = Array.isArray(fontLst) ? fontLst : fontLst ? [fontLst] : [];
+  if (arr.length === 0) return out;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const relsDoc: any = await readXmlSafe(zip, parser, "ppt/_rels/presentation.xml.rels");
+  const relTargets: Record<string, string> = {};
+  const rels = relsDoc?.Relationships?.Relationship;
+  const rArr = Array.isArray(rels) ? rels : rels ? [rels] : [];
+  for (const r of rArr) {
+    const id = r?.["@_Id"];
+    const target = r?.["@_Target"];
+    if (id && target) relTargets[id] = target;
+  }
+  for (const f of arr) {
+    const typeface = String(f?.["p:font"]?.["@_typeface"] ?? f?.["@_typeface"] ?? "").trim();
+    if (!typeface) continue;
+    const variants: ParsedEmbeddedFont["variants"] = [];
+    const styleMap: Array<[string, "regular" | "bold" | "italic" | "boldItalic"]> = [
+      ["p:regular", "regular"], ["p:bold", "bold"], ["p:italic", "italic"], ["p:boldItalic", "boldItalic"],
+    ];
+    for (const [k, style] of styleMap) {
+      const rId = f?.[k]?.["@_r:id"];
+      if (!rId || !relTargets[rId]) continue;
+      const path = resolveRelPath("ppt/presentation.xml", relTargets[rId]);
+      variants.push({ style, path, mime: guessMime(path) ?? "application/octet-stream" });
+    }
+    if (variants.length) out.push({ typeface, variants });
+  }
+  return out;
+}
+
+async function readCustomXmlParts(zip: JSZip): Promise<Array<{ path: string; xml: string }>> {
+  const out: Array<{ path: string; xml: string }> = [];
+  for (const path of Object.keys(zip.files)) {
+    if (!/^customXml\/item\d+\.xml$/i.test(path)) continue;
+    try {
+      const xml = await zip.files[path].async("string");
+      if (xml.length > 500_000) continue; // skip huge custom xml payloads
+      out.push({ path, xml });
+    } catch { /* skip */ }
+  }
+  return out;
+}
