@@ -108,8 +108,9 @@ export type LayoutFrame = {
 export type LayoutSrcRect = { l: number; t: number; r: number; b: number };
 export type LayoutFill =
   | { kind: "solid"; color: string; opacity?: number }
-  | { kind: "gradient"; stops: Array<{ pos: number; color: string; opacity?: number }>; angle: number }
-  | { kind: "image"; embedId?: string; path?: string; srcRect?: LayoutSrcRect; opacity?: number; tile?: boolean }
+  | { kind: "gradient"; stops: Array<{ pos: number; color: string; opacity?: number }>; angle: number; radial?: boolean }
+  | { kind: "image"; embedId?: string; path?: string; srcRect?: LayoutSrcRect; opacity?: number; tile?: boolean; duotone?: [string, string] }
+  | { kind: "pattern"; preset: string; fg?: string; bg?: string }
   | { kind: "none" };
 export type LayoutLine = {
   color?: string;
@@ -117,30 +118,111 @@ export type LayoutLine = {
   dashStyle?: string;
   headArrow?: string;
   tailArrow?: string;
+  /** butt | rnd | sq. */
+  cap?: "flat" | "rnd" | "sq";
+  /** sng | dbl | thickThin | thinThick | tri. */
+  cmpd?: "sng" | "dbl" | "thickThin" | "thinThick" | "tri";
+  /** round | bevel | miter. */
+  join?: "round" | "bevel" | "miter";
+};
+/** Shape / text / image effects lifted from `<a:effectLst>` or `<a:effectDag>`. */
+export type LayoutEffect = {
+  outerShadow?: { color: string; blurPx?: number; distPx?: number; dirDeg?: number; opacity?: number };
+  innerShadow?: { color: string; blurPx?: number; distPx?: number; dirDeg?: number; opacity?: number };
+  glow?: { color: string; radPx: number };
+  softEdge?: { radPx: number };
+  reflection?: boolean;
+  /** Blur radius in px for `a:blur`. */
+  blur?: number;
 };
 export type LayoutRun = {
   text: string;
   bold?: boolean;
   italic?: boolean;
   underline?: boolean;
+  strike?: boolean;
   sizePt?: number;
   color?: string;
   font?: string;
+  /** Character spacing in 1/100th pt. */
+  spacingPct?: number;
+  /** all | small | none. */
+  cap?: "all" | "small" | "none";
+  /** Baseline offset % (negative → subscript, positive → superscript). */
+  baselinePct?: number;
+  /** URL for `a:hlinkClick`. */
+  hlink?: string;
 };
 export type LayoutPara = {
   align?: "l" | "ctr" | "r" | "just";
   level?: number;
   bullet?: "char" | "auto" | "none";
+  /** Actual bullet character when `bullet === "char"` (e.g. "•" "▪" "●"). */
+  bulletChar?: string;
+  /** Bullet auto-num type (arabicPeriod, romanUcPeriod, etc.). */
+  bulletAutoNum?: string;
+  bulletFont?: string;
+  bulletColor?: string;
+  /** Left margin in inches (paragraph marL). */
+  marLIn?: number;
+  /** First-line indent in inches (positive → indent, negative → hanging). */
+  indentIn?: number;
+  /** Space before / after in points. */
+  spcBeforePt?: number;
+  spcAfterPt?: number;
+  /** Line spacing — either a multiplier (`{ mult: 1.15 }`) or points (`{ pt: 18 }`). */
+  lineSpacing?: { mult: number } | { pt: number };
   runs: LayoutRun[];
 };
-export type LayoutTextBody = { paras: LayoutPara[]; anchor?: "t" | "ctr" | "b" };
+export type LayoutTextBody = {
+  paras: LayoutPara[];
+  anchor?: "t" | "ctr" | "b";
+  /** Body insets in inches (default 0.1 / 0.05 / 0.1 / 0.05). */
+  insets?: { l: number; t: number; r: number; b: number };
+  /** `normAutofit` scale (0-1) applied to run size. */
+  fontScale?: number;
+  /** `normAutofit` line-spacing reduction (0-1). */
+  lnSpcReduction?: number;
+  /** True when body uses `spAutoFit` (shrink shape to text). */
+  spAutoFit?: boolean;
+  /** Text rotation in degrees. */
+  rotDeg?: number;
+  /** Text wrap on/off. */
+  wrap?: boolean;
+  /** vert270 | vert | wordArtVert | eaVert etc — vertical text direction. */
+  vert?: string;
+  /** Number of columns. */
+  numCol?: number;
+};
+export type TableCell = {
+  text: LayoutTextBody;
+  fill?: LayoutFill;
+  borders?: { l?: LayoutLine; t?: LayoutLine; r?: LayoutLine; b?: LayoutLine };
+  /** cell margins in inches. */
+  margins?: { l: number; t: number; r: number; b: number };
+  colSpan?: number;
+  rowSpan?: number;
+  /** True when this cell is spanned/merged over. */
+  hMerge?: boolean;
+  vMerge?: boolean;
+  /** Vertical anchor override for the cell. */
+  anchor?: "t" | "ctr" | "b";
+};
 export type LayoutShape =
-  | { kind: "text"; z: number; frame: LayoutFrame; fill?: LayoutFill; line?: LayoutLine; prst?: string; text: LayoutTextBody; isTitle?: boolean }
-  | { kind: "image"; z: number; frame: LayoutFrame; embedId?: string; path?: string; line?: LayoutLine; srcRect?: LayoutSrcRect; prst?: string; opacity?: number }
-  | { kind: "line"; z: number; frame: LayoutFrame; line?: LayoutLine; prst?: string }
-  | { kind: "table"; z: number; frame: LayoutFrame; header: string[]; rows: string[][] }
+  | { kind: "text"; z: number; frame: LayoutFrame; fill?: LayoutFill; line?: LayoutLine; prst?: string; text: LayoutTextBody; isTitle?: boolean; effect?: LayoutEffect; opacity?: number; customPath?: CustomPath }
+  | { kind: "image"; z: number; frame: LayoutFrame; embedId?: string; path?: string; line?: LayoutLine; srcRect?: LayoutSrcRect; prst?: string; opacity?: number; effect?: LayoutEffect; customPath?: CustomPath; duotone?: [string, string] }
+  | { kind: "line"; z: number; frame: LayoutFrame; line?: LayoutLine; prst?: string; effect?: LayoutEffect }
+  | { kind: "table"; z: number; frame: LayoutFrame; header: string[]; rows: string[][]; cellGrid?: TableCell[][]; colWidthsIn?: number[]; rowHeightsIn?: number[]; firstRow?: boolean; bandRow?: boolean; firstCol?: boolean; bandCol?: boolean }
   | { kind: "chart"; z: number; frame: LayoutFrame }
   | { kind: "diagram"; z: number; frame: LayoutFrame };
+
+/** Custom shape path — captured from `<a:custGeom>` as normalized 0-1 coords. */
+export type CustomPath = {
+  /** Path commands with normalized coords (0-1). */
+  d: string;
+  /** True when `<a:pathFill val="none"/>` — stroke-only. */
+  strokeOnly?: boolean;
+};
 
 
 export type SlideLayout = {
