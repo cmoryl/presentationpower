@@ -182,7 +182,7 @@ export function PinEditorPanel({ brandId, items, onChange }: Props) {
               <div className="flex items-center gap-3">
                 <span
                   className="grid h-8 w-8 place-items-center rounded-full text-[11px] font-semibold text-white"
-                  style={{ background: p.role === "hq" || p.role === "hub" ? "#059669" : "#0B2A4A" }}
+                  style={{ background: p.role === "HQ" || p.role === "hub" ? "#059669" : "#0B2A4A" }}
                   title={p.role}
                 >
                   {i + 1}
