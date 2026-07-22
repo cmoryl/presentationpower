@@ -30,7 +30,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import { useSlideMode, useSlideAccent, useSlideInk } from "./SlideChrome";
-import { auroraOrbs, darkGlassWash } from "@/lib/aurora-svg";
+import { auroraOrbs, auroraLayerOpacity, darkGlassWash } from "@/lib/aurora-svg";
 
 export type SlideRegister = "corporate" | "product" | "editorial";
 
@@ -525,7 +525,7 @@ export function AuroraLayer({
         viewBox="0 0 1280 720"
         preserveAspectRatio="xMidYMid slice"
         className="absolute inset-0 h-full w-full"
-        style={{ opacity: intensity * (mode === "dark" ? 0.72 : 0.85) }}
+        style={{ opacity: auroraLayerOpacity(mode, intensity) }}
       >
         <defs>
           {orbs.map((o, i) => (
