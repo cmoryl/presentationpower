@@ -420,6 +420,17 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
   let chartTotal = 0;
   let tableTotal = 0;
   let diagramTotal = 0;
+  let mediaTotal = 0;
+  let hyperlinkTotal = 0;
+  let commentTotal = 0;
+  let hiddenSlidesTotal = 0;
+  let totalMediaBytes = 0;
+  const MAX_TOTAL_MEDIA_BYTES = 200_000_000; // 200 MB media budget across the deck
+  const MAX_PER_MEDIA_BYTES = 60_000_000;    // 60 MB per single asset
+
+  // Deck-level presentation.xml → hidden slide flags + slide id order
+  const presDoc = await readXmlSafe(zip, parser, "ppt/presentation.xml");
+
 
   const parentCache = new Map<string, ParentSlideData>();
 
