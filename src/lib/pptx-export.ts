@@ -391,7 +391,7 @@ export async function exportDeckToPptx(
     const bgIsImage = plan.kind === "image";
     // Slide chrome dark/light selection: honor an explicit background choice
     // (color solid, image tint) so text/logos flip to legible palettes.
-    const isDark = advancedDark || kind === "cover" || kind === "divider" || bgIsImage;
+    const isDark = forceMode ? forceMode === "dark" : (advancedDark || kind === "cover" || kind === "divider" || bgIsImage);
     const useWhiteLogo = isDark || slide.variantId === "MV-SPLIT-MANIFESTO";
     const hideFooter = useWhiteLogo;
 
