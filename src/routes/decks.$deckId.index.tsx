@@ -299,7 +299,7 @@ function DeckEditor() {
           <div className="mb-2 flex items-center justify-end gap-2">
             <button
               type="button"
-              onClick={() => setLiveEdit((v) => !v)}
+              onClick={() => { setCanvasMode(false); setLiveEdit((v) => !v); }}
               aria-pressed={liveEdit}
               className={`rounded-full border px-3 py-1.5 text-[11px] font-medium uppercase tracking-widest transition ${
                 liveEdit
@@ -310,8 +310,37 @@ function DeckEditor() {
             >
               {liveEdit ? "● Live edit on" : "✎ Live edit"}
             </button>
+            <button
+              type="button"
+              onClick={() => { setLiveEdit(false); setCanvasMode((v) => !v); }}
+              aria-pressed={canvasMode}
+              className={`rounded-full border px-3 py-1.5 text-[11px] font-medium uppercase tracking-widest transition ${
+                canvasMode
+                  ? "border-fuchsia-600 bg-fuchsia-600 text-white shadow"
+                  : "border-black/15 bg-white text-black/70 hover:border-fuchsia-600 hover:text-fuchsia-600"
+              }`}
+              title="Free-form canvas: drag and edit text blocks anywhere on the slide"
+            >
+              {canvasMode ? "◇ Canvas on" : "◇ Free canvas"}
+            </button>
           </div>
-          {liveEdit ? (
+          {canvasMode ? (
+            <div className="relative block w-full overflow-hidden rounded-2xl border border-fuchsia-500/40 shadow-lg ring-1 ring-fuchsia-500/20">
+              {active && mv && (
+                <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
+                  <FreeCanvasEditor
+                    brand={brand}
+                    blocks={active.canvasBlocks}
+                    onChange={(next) => updateCanvasBlocks(deck.id, active.id, next)}
+                  >
+                    <ScaledSlide>
+                      <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
+                    </ScaledSlide>
+                  </FreeCanvasEditor>
+                </SlideVideoPreviewContext.Provider>
+              )}
+            </div>
+          ) : liveEdit ? (
             <div className="relative block w-full overflow-hidden rounded-2xl border border-[#003FC7]/40 shadow-lg ring-1 ring-[#003FC7]/20">
               {active && mv && (
                 <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
@@ -324,6 +353,7 @@ function DeckEditor() {
                   >
                     <ScaledSlide>
                       <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
+                      <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
                     </ScaledSlide>
                   </LiveEditOverlay>
                 </SlideVideoPreviewContext.Provider>
@@ -341,6 +371,7 @@ function DeckEditor() {
                 <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
                   <ScaledSlide>
                     <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
+                    <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
                   </ScaledSlide>
                 </SlideVideoPreviewContext.Provider>
               )}
@@ -352,6 +383,11 @@ function DeckEditor() {
           {liveEdit && (
             <p className="mt-2 text-[11px] text-black/50">
               Click any highlighted text on the slide to edit it. <kbd className="rounded border border-black/15 bg-white px-1 text-[10px]">Enter</kbd> saves · <kbd className="rounded border border-black/15 bg-white px-1 text-[10px]">Esc</kbd> cancels. Fields that appear more than once, or are locked by the module, still edit through the panel below.
+            </p>
+          )}
+          {canvasMode && (
+            <p className="mt-2 text-[11px] text-black/50">
+              Drag any block to reposition. Double-click to edit text. Use the toolbar (top-left of the slide) to add Heading / Body / Caption blocks. Blocks render on top of the variant everywhere — preview, present, and share.
             </p>
           )}
 
