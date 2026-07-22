@@ -420,7 +420,8 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
 
     // ── Charts ──────────────────────────────────────────────────────────
     const charts: ParsedChart[] = [];
-    for (const target of Object.values(relTargetsByType.chart)) {
+    const chartsByRelId: Record<string, ParsedChart> = {};
+    for (const [relId, target] of Object.entries(relTargetsByType.chart)) {
       const resolved = resolveRelPath(slidePath, target);
       const entry = zip.files[resolved];
       if (!entry) continue;
@@ -429,8 +430,10 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         const cdoc = parser.parse(cxml);
         const parsedCharts = extractChartsFromChartXml(cdoc, theme);
         for (const c of parsedCharts) charts.push(c);
+        if (parsedCharts[0]) chartsByRelId[relId] = parsedCharts[0];
       } catch { /* skip malformed chart */ }
     }
+
 
 
     // ── Tables ──────────────────────────────────────────────────────────
