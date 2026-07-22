@@ -202,6 +202,7 @@ type DeckState = {
   revertAiChange: (deckId: string, slideId: string, field: string) => void;
   updateSlideField: (deckId: string, slideId: string, field: string, value: unknown) => void;
   updateSlideNotes: (deckId: string, slideId: string, notes: string) => void;
+  updateSlideCanvasBlocks: (deckId: string, slideId: string, blocks: CanvasBlock[]) => void;
   setSlideLogo: (deckId: string, slideId: string, patch: { position?: SlideLogoPosition; orientation?: "auto" | "horizontal" | "stacked" | "vertical-left" | "vertical-right" | "mark-only" }) => void;
   applySlideBackground: (deckId: string, slideIds: string[], background: unknown) => void;
 
