@@ -4373,7 +4373,7 @@ function renderVariantBody({
             <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
             <div className="mt-4" style={{ fontSize: 42, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
           </div>
-          <div className="mt-4"><LineMultiChart brand={brand} series={series} xLabels={xLabels} unit={s(c.unit, "%")} height={500} /></div>
+          <div className="mt-12"><LineMultiChart brand={brand} series={series} xLabels={xLabels} unit={s(c.unit, "%")} height={500} /></div>
         </SlideFrame>
       );
     }
