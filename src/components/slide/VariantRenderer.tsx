@@ -1883,34 +1883,52 @@ function renderVariantBody({
         </SlideFrame>
       );
 
-    case "MV-CLOSE-CONTACT":
+    case "MV-CLOSE-CONTACT": {
+      const people = arr(c.items);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
-          <div>
-            <Kicker brand={brand}>Stay in touch</Kicker>
-            <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6" />
-            <DisplayTitle size="section" color={ink.strong} className="mt-8">
-              {s(c.title, "Get in touch")}
-            </DisplayTitle>
-          </div>
-          <div className={`mt-14 grid gap-x-20 gap-y-12 ${arr(c.items).length >= 3 ? "grid-cols-3" : arr(c.items).length === 2 ? "grid-cols-2" : "grid-cols-1"}`}>
-            {arr(c.items).map((p, i) => (
-              <div key={i} className="border-t pt-8" style={{ borderColor: "rgba(255,255,255,0.16)" }}>
-                <div style={{ fontSize: 32, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em" }}>
-                  {s(p.name)}
+          <AuroraOrb x={90} y={30} size={880} />
+          <div className="relative grid h-full grid-cols-[1.05fr_0.95fr] items-center gap-24">
+            <div>
+              <Kicker brand={brand}>Stay in touch</Kicker>
+              <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-6 mb-10" />
+              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>
+                {s(c.title, "Let's keep the conversation going.")}
+              </DisplayTitle>
+              {s(c.subtitle) && (
+                <SupportingText size="lg" opacity={0.78} className="mt-8" maxWidthPx={880}>
+                  {s(c.subtitle)}
+                </SupportingText>
+              )}
+            </div>
+            {people.length > 0 && (
+              <GlassTile radius={28} padding="px-12 py-12">
+                <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", fontWeight: 600, color: ink.faint }}>
+                  Your team
                 </div>
-                <div className="mt-2 uppercase" style={{ color: "var(--slide-accent-text)", fontSize: 18, letterSpacing: "0.28em", fontWeight: 600 }}>
-                  {s(p.role)}
+                <div className="mt-10 space-y-10">
+                  {people.slice(0, 4).map((p, i) => (
+                    <div key={i} className={`tp-rise tp-rise-delay-${Math.min(i + 1, 3) as 1 | 2 | 3}`}>
+                      <div style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>
+                        {s(p.name)}
+                      </div>
+                      <div className="mt-1 uppercase" style={{ color: "var(--slide-accent-text)", fontSize: 15, letterSpacing: "0.28em", fontWeight: 600 }}>
+                        {s(p.role)}
+                      </div>
+                      <div className="mt-4 space-y-1" style={{ fontSize: 20, color: ink.muted }}>
+                        <div>{s(p.email)}</div>
+                        {s(p.phone) && <div style={{ opacity: 0.7 }}>{s(p.phone)}</div>}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="mt-6 space-y-2" style={{ fontSize: 24, color: ink.muted }}>
-                  <div>{s(p.email)}</div>
-                  <div style={{ opacity: 0.65 }}>{s(p.phone)}</div>
-                </div>
-              </div>
-            ))}
+              </GlassTile>
+            )}
           </div>
         </SlideFrame>
       );
+    }
+
 
 
 
