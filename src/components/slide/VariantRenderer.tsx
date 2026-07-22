@@ -5307,10 +5307,11 @@ function Sparkline({ brand, values, w = 380, h = 100, filled = true }: { brand: 
 }
 
 function SummaryStatCard({ brand, label, value, unit, series }: { brand: BrandMode; label: string; value: string; unit: string; series: number[] }) {
+  const ink = useSlideInk();
   return (
-    <div className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-      <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "rgba(10,15,28,0.6)", fontWeight: 600 }}>{label}</div>
-      <div className="mt-4 flex items-baseline" style={{ fontSize: 84, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.03em", lineHeight: 1 }}>
+    <div className="pt-8" style={{ borderTop: `1px solid ${ink.accent(0.5)}` }}>
+      <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.muted, fontWeight: 600 }}>{label}</div>
+      <div className="mt-4 flex items-baseline" style={{ fontSize: 84, fontWeight: 600, color: ink.text, letterSpacing: "-0.03em", lineHeight: 1 }}>
         <span className="tabular-nums">{value || "—"}</span>
         {unit && <span style={{ fontSize: 40, marginLeft: 8, color: brand.tokens.accent }}>{unit}</span>}
       </div>
@@ -5318,6 +5319,7 @@ function SummaryStatCard({ brand, label, value, unit, series }: { brand: BrandMo
     </div>
   );
 }
+
 
 function Donut({ brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
   const p = Math.max(0, Math.min(100, percent));
