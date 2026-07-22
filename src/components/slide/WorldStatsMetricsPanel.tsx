@@ -14,21 +14,28 @@ import * as React from "react";
 import {
   getDivisionLocationSet,
   formatMetricValue,
+  REGION_LABELS,
   type LocationPin,
   type LocationMetric,
 } from "@/lib/location-maps";
+
+type RegionKey = LocationPin["region"];
+const REGION_KEYS: RegionKey[] = ["AMER", "EMEA", "APAC", "LATAM", "MEA"];
 
 type Props = {
   brandId: string;
   items: unknown;
   metrics: unknown;
   activeMetricId: unknown;
+  regionFilter: unknown;
   onChange: (patch: {
     items?: LocationPin[];
     metrics?: LocationMetric[];
     activeMetricId?: string | null;
+    regionFilter?: RegionKey[] | null;
   }) => void;
 };
+
 
 const FORMATS: NonNullable<LocationMetric["format"]>[] = ["number", "currency", "percent"];
 
