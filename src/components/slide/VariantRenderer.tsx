@@ -347,7 +347,7 @@ function renderVariantBody({
             }}
           />
           <div className="relative flex h-full flex-col justify-end">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 tp-rise">
               <span
                 className="inline-block h-2 w-2 rounded-full"
                 style={{
@@ -357,25 +357,28 @@ function renderVariantBody({
               />
               <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
             </div>
-            <div
-              className="mt-8 h-[2px] w-[140px] rounded-full"
-              style={{
-                backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)`,
-              }}
-            />
-            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1620} className="mt-10">
-              {s(c.title, "Client")}
-            </DisplayTitle>
+            <div className="mt-8 flex items-end gap-8 tp-rise tp-rise-delay-1">
+              <StatRail color={brand.tokens.accent} height={220} className="mb-6" />
+              <EditorialTitle
+                text={s(c.title, "Client")}
+                emphasize={s(c.titleEmphasis) || lastWord(s(c.title, "Client"))}
+                color="#ffffff"
+                accentColor={brand.tokens.accent}
+                size={132}
+                maxWidthPx={1520}
+              />
+            </div>
             {s(c.subtitle) && (
-              <SupportingText size="xl" opacity={0.86} maxWidthPx={1200} className="mt-10">
+              <SupportingText size="xl" opacity={0.86} maxWidthPx={1200} className="mt-10 tp-rise tp-rise-delay-2">
                 {s(c.subtitle)}
               </SupportingText>
             )}
-            <MetaRow className="mt-16">
+            <MetaRow className="mt-16 tp-rise tp-rise-delay-3">
               {s(c.presenter) && <span>{s(c.presenter)}</span>}
               {s(c.date) && <span>{s(c.date)}</span>}
             </MetaRow>
           </div>
+
         </SlideFrame>
       );
 
