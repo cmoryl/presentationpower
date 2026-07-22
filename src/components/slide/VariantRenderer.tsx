@@ -331,6 +331,7 @@ function renderVariantBody({
     surface: semantic.trackFill,
     surfaceRing: semantic.hairline,
     ringOnDark: isDark ? "#0b1024" : "#ffffff",
+    onSurface: semantic.onSurface,
   };
 
   switch (variant.id) {
