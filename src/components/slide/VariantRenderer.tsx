@@ -5163,6 +5163,7 @@ function StatGrid({
 
 
 function NumberedList({ brand, pageNumber, title, items }: { brand: BrandMode; pageNumber: number; title: string; items: Item[] }) {
+  const ink = useSlideInk();
   return (
     <SlideFrame brand={brand} pageNumber={pageNumber}>
       <SlideTitle brand={brand} title={title} />
@@ -5205,6 +5206,7 @@ function SlideTitle({ brand, title, kicker }: { brand: BrandMode; title: string;
 
 function Card({ brand, title, body, index, icon }: { brand: BrandMode; title: string; body: string; index: number; icon?: string }) {
   const mode = useContext(SlideModeContext);
+  const ink = useSlideInk();
   const isDark = mode === "dark";
   const cardBg = isDark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)";
   const cardRing = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
@@ -5256,6 +5258,7 @@ function Card({ brand, title, body, index, icon }: { brand: BrandMode; title: st
 }
 
 function Quadrant({ brand, label, highlight }: { brand: BrandMode; label: string; highlight?: boolean }) {
+  const ink = useSlideInk();
   return (
     <div
       className="flex items-center justify-center p-8 text-center"
@@ -5700,6 +5703,7 @@ function ConcentricRings({ brand, items, size = 480 }: { brand: BrandMode; items
 
 
 function DecadeAreaChart({ brand, series, height = 480, calloutLabel, calloutNote }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; calloutLabel?: string; calloutNote?: string }) {
+  const ink = useSlideInk();
   const w = 1720;
   const h = height;
   const padL = 30, padR = 30, padT = 40, padB = 60;
@@ -5755,6 +5759,7 @@ function DecadeAreaChart({ brand, series, height = 480, calloutLabel, calloutNot
 
 // ── Extended graph helpers ───────────────────────────────────────────────
 function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand: BrandMode; series: { label: string; points: number[] }[]; xLabels: string[]; unit?: string; height?: number }) {
+  const ink = useSlideInk();
   const w = 1720, h = height;
   const padL = 90, padR = 40, padT = 30, padB = 80;
   const cols = [brand.tokens.accent, brand.tokens.primary, ink.faint];
@@ -5805,6 +5810,7 @@ function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand:
 }
 
 function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { brand: BrandMode; segments: { label: string }[]; columns: { label: string; values: number[] }[]; unit?: string; height?: number }) {
+  const ink = useSlideInk();
   const w = 1720, h = height;
   const padL = 90, padR = 40, padT = 30, padB = 80;
   const totals = columns.map((c) => c.values.reduce((a, b) => a + b, 0));
@@ -5851,6 +5857,7 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
 }
 
 function StackedAreaChart({ brand, series, xLabels, unit, height = 480 }: { brand: BrandMode; series: { label: string; points: number[] }[]; xLabels: string[]; unit?: string; height?: number }) {
+  const ink = useSlideInk();
   const w = 1720, h = height;
   const padL = 60, padR = 40, padT = 30, padB = 80;
   const n = Math.max(...series.map((s) => s.points.length), 1);
@@ -5893,6 +5900,7 @@ function StackedAreaChart({ brand, series, xLabels, unit, height = 480 }: { bran
 }
 
 function WaterfallChart({ brand, steps, unit, height = 500 }: { brand: BrandMode; steps: { label: string; value: number; kind: "start" | "up" | "down" | "end" }[]; unit?: string; height?: number }) {
+  const ink = useSlideInk();
   const w = 1720, h = height;
   const padL = 90, padR = 40, padT = 30, padB = 90;
   const chartH = h - padT - padB;
@@ -5941,6 +5949,7 @@ function WaterfallChart({ brand, steps, unit, height = 500 }: { brand: BrandMode
 }
 
 function BubbleChart({ brand, items, axisX, axisY, height = 560 }: { brand: BrandMode; items: { label: string; x: number; y: number; size: number }[]; axisX: string; axisY: string; height?: number }) {
+  const ink = useSlideInk();
   const w = 1720, h = height;
   const padL = 110, padR = 60, padT = 40, padB = 90;
   const chartW = w - padL - padR;
@@ -5975,6 +5984,7 @@ function BubbleChart({ brand, items, axisX, axisY, height = 560 }: { brand: Bran
 }
 
 function HeatmapChart({ brand, rows, cols, cells, min, max }: { brand: BrandMode; rows: string[]; cols: string[]; cells: number[][]; min: number; max: number }) {
+  const ink = useSlideInk();
   const range = Math.max(1, max - min);
   return (
     <div>
@@ -6009,6 +6019,7 @@ function HeatmapChart({ brand, rows, cols, cells, min, max }: { brand: BrandMode
 }
 
 function Treemap({ brand, items, height = 560 }: { brand: BrandMode; items: { label: string; value: number; meta?: string }[]; height?: number }) {
+  const ink = useSlideInk();
   // Simple squarified layout: sort desc, slice vertically then horizontally alternately.
   const total = items.reduce((a, b) => a + b.value, 0) || 1;
   const w = 1720;
@@ -6055,6 +6066,7 @@ function Treemap({ brand, items, height = 560 }: { brand: BrandMode; items: { la
 }
 
 function ComboChart({ brand, points, barLabel, barUnit, lineLabel, lineUnit, height = 520 }: { brand: BrandMode; points: { label: string; bar: number; line: number }[]; barLabel: string; barUnit?: string; lineLabel: string; lineUnit?: string; height?: number }) {
+  const ink = useSlideInk();
   const w = 1720, h = height;
   const padL = 100, padR = 100, padT = 30, padB = 90;
   const chartH = h - padT - padB;
