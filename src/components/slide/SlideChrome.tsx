@@ -60,7 +60,12 @@ export type SlideInk = {
    *  for text overlays on charts (never returns a colour that vanishes into
    *  the background). */
   onSurface: (hex: string) => string;
+  /** Contrast-tuned hex for using the division accent as TEXT — darkens bright
+   *  accents on white, lightens deep accents on navy. Prefer this over
+   *  `brand.tokens.accent` for accent-coloured labels/numbers/kickers. */
+  accentText: string;
 };
+
 
 function hexToRgba(hex: string, alpha: number): string {
   const m = /^#?([a-f\d]{6})$/i.exec(hex);
@@ -71,6 +76,46 @@ function hexToRgba(hex: string, alpha: number): string {
   const b = int & 255;
   return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, alpha))})`;
 }
+
+// ── readableAccent ─────────────────────────────────────────────────────────
+// Returns a hex tuned so an accent used as TEXT stays legible on the current
+// slide surface — without wrapping the text in a background box. Bright
+// division accents (Gaming green, Aqua, Yellow, Life Sciences green, Peach)
+// darken on white; deep accents (Corporate blue, Berry, Legal teal) lighten
+// on navy. Only luminance is shifted — the hue stays the division's own so
+// the palette identity is preserved.
+export function readableAccent(hex: string, mode: SlideMode): string {
+  const m = /^#?([a-f\d]{6})$/i.exec(hex);
+  if (!m) return hex;
+  const int = parseInt(m[1], 16);
+  let r = ((int >> 16) & 255) / 255;
+  let g = ((int >> 8) & 255) / 255;
+  let b = (int & 255) / 255;
+  // Relative luminance (sRGB, unlinearised — plenty accurate for a text-legibility guard).
+  const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  if (mode === "light") {
+    // Anything brighter than ~0.42 luminance fails on white for body text.
+    if (lum > 0.42) {
+      // Mix toward black by a strength proportional to how bright it is.
+      const t = Math.min(0.72, 0.35 + (lum - 0.42) * 1.4);
+      r = r * (1 - t);
+      g = g * (1 - t);
+      b = b * (1 - t);
+    }
+  } else {
+    // Dark navy surface — anything darker than ~0.38 disappears.
+    if (lum < 0.55) {
+      const t = Math.min(0.78, 0.35 + (0.55 - lum) * 1.4);
+      r = r + (1 - r) * t;
+      g = g + (1 - g) * t;
+      b = b + (1 - b) * t;
+    }
+  }
+  const to255 = (v: number) => Math.max(0, Math.min(255, Math.round(v * 255)));
+  const hx = (v: number) => to255(v).toString(16).padStart(2, "0");
+  return `#${hx(r)}${hx(g)}${hx(b)}`;
+}
+
 
 export function useSlideInk(accentOverride?: string | null): SlideInk {
   const mode = useSlideMode();
@@ -89,8 +134,10 @@ export function useSlideInk(accentOverride?: string | null): SlideInk {
     accent: (a: number) =>
       accentHex ? hexToRgba(accentHex, a) : `rgba(${base},${a})`,
     onSurface: (hex: string) => hex,
+    accentText: accentHex ? readableAccent(accentHex, mode) : (dark ? "#ffffff" : "rgb(10,15,28)"),
   };
 }
+
 
 
 
@@ -219,8 +266,25 @@ export function SlideFrame({
 
   })();
 
+  // A dark chrome (cover/divider/close) or backdrop-dark surface reads as dark
+  // for accent-as-text purposes; content-on-white uses light mode tuning.
+  const inkMode: SlideMode = (slideDark || darkBackdrop) ? "dark" : "light";
+  const accentTextHex = readableAccent(brand.tokens.accent, inkMode);
+
   return (
-    <div className="relative h-full w-full overflow-hidden" style={{ backgroundColor: hasBackdrop ? (lightBackdrop ? "#fff" : "#000") : bg, color: fg }}>
+    <div
+      className="relative h-full w-full overflow-hidden"
+      style={{
+        backgroundColor: hasBackdrop ? (lightBackdrop ? "#fff" : "#000") : bg,
+        color: fg,
+        // Contrast-tuned accent for use as TEXT — variants read this via
+        // `color: "var(--slide-accent-text)"` so accent-coloured labels
+        // stay legible in every division × mode combination without
+        // needing a background box.
+        ["--slide-accent-text" as string]: accentTextHex,
+      }}
+    >
+
       {hasBackdropCss && (
         <div
           aria-hidden
