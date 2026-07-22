@@ -172,7 +172,7 @@ async function fetchAsDataUrl(url: string, label?: string): Promise<string | nul
   }
 }
 
-type Palette = { primary: string; accent: string; surface: string; ink: string };
+export type Palette = { primary: string; accent: string; surface: string; ink: string };
 
 // Derive a mode-aware palette so dark-mode exports don't render light-surface
 // tiles with dark-navy text (invisible on a dark background). The base palette
@@ -180,7 +180,7 @@ type Palette = { primary: string; accent: string; surface: string; ink: string }
 // in dark mode we flip surface to a slightly-elevated navy tile and text to
 // white/light-ink so cards, numbers and body copy read like the on-screen
 // preview.
-function adaptPaletteForMode(base: Palette, isDark: boolean): Palette {
+export function adaptPaletteForMode(base: Palette, isDark: boolean): Palette {
   if (!isDark) return base;
   return {
     // Big numbers, headings and title text (renderers use p.primary for these)
@@ -195,6 +195,7 @@ function adaptPaletteForMode(base: Palette, isDark: boolean): Palette {
     ink: "D6DEF2",
   };
 }
+
 
 export type PptxExportResult = { blob?: Blob; failedSlides: string[] };
 
