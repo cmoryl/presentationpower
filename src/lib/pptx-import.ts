@@ -739,10 +739,19 @@ type RelBuckets = {
   diagramData: Record<string, string>;
   diagramLayout: Record<string, string>;
   diagramDrawing: Record<string, string>;
+  video: Record<string, string>;
+  audio: Record<string, string>;
+  media: Record<string, string>;
+  oleObject: Record<string, string>;
+  /** hyperlink rels: rId → {target, external}. Attached to a:hlinkClick / a:hlinkHover. */
+  hyperlink: Record<string, { target: string; external: boolean }>;
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function extractRelTargetsByType(relsDoc: any): RelBuckets {
-  const out: RelBuckets = { image: {}, chart: {}, diagramData: {}, diagramLayout: {}, diagramDrawing: {} };
+  const out: RelBuckets = {
+    image: {}, chart: {}, diagramData: {}, diagramLayout: {}, diagramDrawing: {},
+    video: {}, audio: {}, media: {}, oleObject: {}, hyperlink: {},
+  };
   if (!relsDoc) return out;
   const rels = relsDoc?.Relationships?.Relationship;
   const arr = Array.isArray(rels) ? rels : rels ? [rels] : [];
@@ -750,15 +759,22 @@ function extractRelTargetsByType(relsDoc: any): RelBuckets {
     const type = String(r?.["@_Type"] ?? "");
     const id = r?.["@_Id"] as string | undefined;
     const target = r?.["@_Target"] as string | undefined;
+    const mode = String(r?.["@_TargetMode"] ?? "");
     if (!id || !target) continue;
     if (/\/image$/i.test(type) || /\/image\b/i.test(type)) out.image[id] = target;
     else if (/\/chart$/i.test(type)) out.chart[id] = target;
     else if (/\/diagramData$/i.test(type)) out.diagramData[id] = target;
     else if (/\/diagramLayout$/i.test(type)) out.diagramLayout[id] = target;
     else if (/\/diagramDrawing$/i.test(type)) out.diagramDrawing[id] = target;
+    else if (/\/video$/i.test(type)) out.video[id] = target;
+    else if (/\/audio$/i.test(type)) out.audio[id] = target;
+    else if (/\/media$/i.test(type)) out.media[id] = target;
+    else if (/\/oleObject$/i.test(type) || /\/package$/i.test(type)) out.oleObject[id] = target;
+    else if (/\/hyperlink$/i.test(type)) out.hyperlink[id] = { target, external: mode === "External" };
   }
   return out;
 }
+
 
 function extractEmbedIds(doc: unknown): string[] {
   const ids: string[] = [];
