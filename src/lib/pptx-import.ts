@@ -1595,12 +1595,10 @@ function pDeepFind(nodes: PNode[] | PNode, name: string): PNode | undefined {
 function pDeepFindAll(nodes: PNode[] | PNode, predicate: string | ((tag: string | undefined, node: PNode) => boolean)): PNode[] {
   const arr = Array.isArray(nodes) ? nodes : [nodes];
   const out: PNode[] = [];
-  const matches = typeof predicate === "string"
-    ? (tag: string | undefined) => tag === predicate
-    : predicate;
   const visit = (n: PNode) => {
     const tag = pTag(n);
-    if (matches(tag, n)) out.push(n);
+    const matched = typeof predicate === "string" ? tag === predicate : predicate(tag, n);
+    if (matched) out.push(n);
     for (const child of pChildren(n)) visit(child);
   };
   for (const n of arr) visit(n);
