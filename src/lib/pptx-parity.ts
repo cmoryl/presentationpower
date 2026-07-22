@@ -23,7 +23,7 @@ export type ParityFingerprint = {
     darkChrome: boolean;
   };
   typography: {
-    fontFace: "Inter" | "Geist Sans";
+    fontFace: "Inter" | "Geist" | "Geist Sans";
     hasSerif: boolean;
   };
   spacing: {
@@ -86,7 +86,7 @@ export function fingerprintRenderer(
       tint: bd?.tint ? hexNorm(bd.tint) : null,
       darkChrome: !!bd?.darkChrome,
     },
-    typography: { fontFace: "Inter", hasSerif: false },
+    typography: { fontFace: "Geist", hasSerif: false },
     spacing: { ...LAYOUT },
   };
 }
@@ -117,7 +117,7 @@ export function fingerprintExporter(
       tint: bd?.tint ? hexNorm(bd.tint) : null,
       darkChrome: !!bd?.darkChrome,
     },
-    typography: { fontFace: "Inter", hasSerif: false },
+    typography: { fontFace: "Geist", hasSerif: false },
     spacing: { ...LAYOUT },
   };
 }
