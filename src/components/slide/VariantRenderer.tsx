@@ -4160,15 +4160,13 @@ function renderVariantBody({
                 const v = Number(it.value) || 0;
                 const h = Math.max(20, (v / max) * 420);
                 const isLast = i === items.length - 1;
-                const color = isLast ? brand.tokens.accent : brand.tokens.primary;
-                const opacity = isLast ? 1 : 0.3 + (i / Math.max(items.length - 1, 1)) * 0.55;
                 return (
                   <div key={i} className="flex flex-col items-center justify-end">
-                    <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: ink.strong }}>
-                      {s(it.value)}<span style={{ fontSize: 14, color: "var(--slide-accent-text)", marginLeft: 2 }}>{s(it.unit)}</span>
+                    <div className="tabular-nums" style={{ fontSize: isLast ? 26 : 18, fontWeight: 600, color: isLast ? ink.strong : ink.muted, letterSpacing: "-0.02em" }}>
+                      {s(it.value)}<span style={{ fontSize: isLast ? 14 : 11, color: ink.faint, marginLeft: 2 }}>{s(it.unit)}</span>
                     </div>
-                    <div className="mt-3 w-full" style={{ height: h, background: color, opacity, maxWidth: 90 }} />
-                    <div className="mt-3 uppercase" style={{ fontSize: 14, letterSpacing: "0.22em", color: isLast ? "var(--slide-accent-text)" : ink.faint, fontWeight: 600 }}>{s(it.year)}</div>
+                    <div className="mt-3 w-full" style={{ height: h, background: isLast ? "var(--slide-accent-text)" : ink.surface, maxWidth: 90 }} />
+                    <div className="mt-3 uppercase tabular-nums" style={{ fontSize: 12, letterSpacing: "0.22em", color: ink.faint, fontWeight: 600 }}>{s(it.year)}</div>
                   </div>
                 );
               })}
@@ -4218,8 +4216,8 @@ function renderVariantBody({
                         {it.value}<span style={{ fontSize: 16, color: "var(--slide-accent-text)", marginLeft: 4 }}>{it.unit}</span>
                       </div>
                     </div>
-                    <div style={{ position: "relative", height: 12, background: "rgba(10,15,28,0.08)" }}>
-                      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${pct}%`, background: isTop ? brand.tokens.accent : brand.tokens.primary, opacity: isTop ? 1 : 0.4 + (1 - i / items.length) * 0.4 }} />
+                    <div style={{ position: "relative", height: 4, background: ink.surface }}>
+                      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${pct}%`, background: isTop ? "var(--slide-accent-text)" : ink.strong, opacity: isTop ? 1 : 0.55 }} />
                     </div>
                   </div>
                 );
