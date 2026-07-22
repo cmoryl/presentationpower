@@ -2629,6 +2629,8 @@ type ParentSlideData = {
   images?: Array<{ embedId: string; dataUrl: string; sourcePath?: string }>;
   /** Map local parent rIds → synthetic slide-level embedIds. */
   embedIdMap?: Record<string, string>;
+  /** Effective color-map aliases for this layout/master. */
+  clrMap?: PptxClrMap;
   /** Non-placeholder decorative shapes (logos, page numbers, dividers, footer
    *  bars) captured from the layout / master spTree. Placeholder shapes are
    *  handled via PhProto inheritance instead. Image shapes are dropped because
@@ -2709,6 +2711,7 @@ async function loadParent(
     return t === "p:sldLayout" || t === "p:sldMaster";
   }) ?? root[0];
   const isMaster = pTag(rootNode) === "p:sldMaster";
+  const clrMap = readClrMap(rootNode, DEFAULT_CLR_MAP);
   const cSld = rootNode ? pFind(rootNode, "p:cSld") : undefined;
   const spTree = cSld ? pFind(cSld, "p:spTree") : undefined;
 
@@ -2746,8 +2749,8 @@ async function loadParent(
     const bg = pFind(node, "p:bg");
     if (!bg) return undefined;
     const bgPr = pFind(bg, "p:bgPr");
-    if (bgPr) return readFill(bgPr, parentImageEmbedIds, parentEmbedIdMap);
-    const refFill = readBgRef(pFind(bg, "p:bgRef"), theme);
+    if (bgPr) return remapFillScheme(readFill(bgPr, parentImageEmbedIds, parentEmbedIdMap), clrMap);
+    const refFill = readMappedBgRef(pFind(bg, "p:bgRef"), theme, clrMap);
     if (refFill) return refFill;
     return undefined;
   };
@@ -2769,8 +2772,8 @@ async function loadParent(
       const spPr = pFind(node, "p:spPr");
       const style = pFind(node, "p:style");
       const frame = readFrame(spPr);
-      const fill = readFill(spPr, parentImageEmbedIds, parentEmbedIdMap) ?? readFillRef(style, theme);
-      const line = readLine(spPr) ?? readLineRef(style, theme);
+      const fill = remapFillScheme(readFill(spPr, parentImageEmbedIds, parentEmbedIdMap), clrMap) ?? readMappedFillRef(style, theme, clrMap);
+      const line = remapLineScheme(readLine(spPr), clrMap) ?? readMappedLineRef(style, theme, clrMap);
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
       const txBody = pFind(node, "p:txBody");
@@ -2808,7 +2811,7 @@ async function loadParent(
   if (spTree) {
     const zRef = { z: 0 };
     const collected: LayoutShape[] = [];
-    walkSpTree(pChildren(spTree), zRef, undefined, collected, parentImageEmbedIds, undefined, parentEmbedIdMap, theme);
+    walkSpTree(pChildren(spTree), zRef, undefined, collected, parentImageEmbedIds, undefined, parentEmbedIdMap, theme, clrMap);
     // Re-walk raw nodes to know which are placeholders — walkSpTree doesn't
     // expose that. Cheaper: build a set of ph frames from `placeholders` and
     // drop shapes whose frame matches.
