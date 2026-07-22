@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, Trash2, Bookmark, Search } from "lucide-react";
+import { Loader2, Trash2, Bookmark, Search, Plus, Check, AlertTriangle } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -11,6 +11,15 @@ import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { listMyModules, deleteSavedModule } from "@/lib/saved-modules.functions";
 import { byId, MODULE_VARIANTS, BRAND_MODES, type ModuleVariant } from "@/lib/taxonomy";
+import { useSurfaceStore } from "@/lib/surface-store";
+import {
+  SURFACE_FORMATS,
+  SURFACE_LABELS,
+  variantSupportsSurface,
+  type ModuleInstance,
+  type SurfaceKind,
+  type SurfaceFormat,
+} from "@/lib/module-instance";
 
 export const Route = createFileRoute("/library/my")({
   head: () => ({
@@ -252,7 +261,175 @@ function SavedModuleCard({ row, onDelete, deleting }: { row: SavedRow; onDelete:
             <span key={t} className="rounded-full bg-black/[0.04] px-2 py-0.5 text-[10px] text-black/60">#{t}</span>
           ))}
         </div>
+        <div className="mt-3">
+          <UseOnSurfaceAction row={row} />
+        </div>
       </div>
+    </div>
+  );
+}
+
+// ==========================================================================
+// Use on surface — adds the saved module to the active surface, or spawns a
+// new surface with a chosen format if none is active.
+// ==========================================================================
+
+function UseOnSurfaceAction({ row }: { row: SavedRow }) {
+  const surfaces = useSurfaceStore((s) => s.surfaces);
+  const activeId = useSurfaceStore((s) => s.activeId);
+  const createSurface = useSurfaceStore((s) => s.createSurface);
+  const setActive = useSurfaceStore((s) => s.setActive);
+  const addModule = useSurfaceStore((s) => s.addModule);
+
+  const [open, setOpen] = useState(false);
+  const [flash, setFlash] = useState<string | null>(null);
+  const active = activeId ? surfaces[activeId] : null;
+  const surfaceList = useMemo(
+    () => Object.values(surfaces).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)),
+    [surfaces],
+  );
+
+  function buildInstance(): ModuleInstance {
+    return {
+      id: `mi-${crypto.randomUUID?.() ?? Math.random().toString(36).slice(2, 10)}`,
+      variantId: row.variant_id,
+      content: (row.content ?? {}) as ModuleInstance["content"],
+      brandMode: row.brand_mode ?? null,
+      subCompany: row.sub_company ?? null,
+      backdrop: (row.backdrop as ModuleInstance["backdrop"]) ?? null,
+      role: (row.role as ModuleInstance["role"]) ?? null,
+      tags: row.tags ?? [],
+      savedModuleId: row.id,
+    };
+  }
+
+  function addTo(surfaceId: string) {
+    addModule(surfaceId, buildInstance());
+    setActive(surfaceId);
+    const s = useSurfaceStore.getState().surfaces[surfaceId];
+    setFlash(`Added to ${s?.title ?? "surface"}`);
+    setOpen(false);
+    window.setTimeout(() => setFlash(null), 1800);
+  }
+
+  function createAndAdd(kind: SurfaceKind, format: SurfaceFormat) {
+    const surface = createSurface({
+      kind,
+      format,
+      brandModeId: row.brand_mode,
+      subCompany: row.sub_company,
+    });
+    addModule(surface.id, buildInstance());
+    setFlash(`Created ${SURFACE_LABELS[kind]} · added`);
+    setOpen(false);
+    window.setTimeout(() => setFlash(null), 1800);
+  }
+
+  const activeSupported = active ? variantSupportsSurface(row.variant_id, active.kind, active.format) : true;
+
+  return (
+    <div className="relative">
+      <div className="flex items-center gap-2">
+        {active ? (
+          <button
+            type="button"
+            onClick={() => activeSupported && addTo(active.id)}
+            disabled={!activeSupported}
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#0030a0] disabled:cursor-not-allowed disabled:bg-black/20"
+            title={activeSupported ? `Add to ${active.title}` : "This variant doesn't fit the active surface format"}
+          >
+            <Plus size={12} />
+            Use on {SURFACE_LABELS[active.kind]}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#0030a0]"
+          >
+            <Plus size={12} /> Use on surface…
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-label="More surface options"
+          className="rounded-full border border-black/10 px-2 py-1.5 text-[11px] text-black/60 transition hover:border-[#003FC7] hover:text-[#003FC7]"
+        >
+          ▾
+        </button>
+      </div>
+
+      {!activeSupported && active && (
+        <div className="mt-1 flex items-center gap-1 text-[10px] text-amber-700">
+          <AlertTriangle size={10} /> Doesn't fit {active.format}. Pick another surface below.
+        </div>
+      )}
+      {flash && (
+        <div className="mt-1 flex items-center gap-1 text-[10px] font-medium text-emerald-700">
+          <Check size={10} /> {flash}
+        </div>
+      )}
+
+      {open && (
+        <div
+          className="absolute right-0 top-full z-30 mt-2 w-72 rounded-xl border border-black/10 bg-white p-3 shadow-xl"
+          onMouseLeave={() => setOpen(false)}
+        >
+          {surfaceList.length > 0 && (
+            <>
+              <div className="mb-1 text-[10px] font-medium uppercase tracking-wider text-black/40">
+                Add to existing
+              </div>
+              <div className="mb-3 max-h-40 space-y-0.5 overflow-y-auto">
+                {surfaceList.map((s) => {
+                  const ok = variantSupportsSurface(row.variant_id, s.kind, s.format);
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      disabled={!ok}
+                      onClick={() => addTo(s.id)}
+                      className="flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-xs hover:bg-[#003FC7]/5 disabled:cursor-not-allowed disabled:opacity-40"
+                      title={ok ? "" : "Variant doesn't fit this format"}
+                    >
+                      <span className="truncate">{s.title}</span>
+                      <span className="shrink-0 text-[10px] text-black/40">{s.format}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+          <div className="mb-1 text-[10px] font-medium uppercase tracking-wider text-black/40">
+            Create new surface
+          </div>
+          <div className="space-y-2">
+            {(Object.keys(SURFACE_FORMATS) as SurfaceKind[]).map((kind) => (
+              <div key={kind}>
+                <div className="mb-0.5 text-[11px] font-medium text-black/70">{SURFACE_LABELS[kind]}</div>
+                <div className="flex flex-wrap gap-1">
+                  {SURFACE_FORMATS[kind].map((fmt) => {
+                    const ok = variantSupportsSurface(row.variant_id, kind, fmt.id);
+                    return (
+                      <button
+                        key={fmt.id}
+                        type="button"
+                        disabled={!ok}
+                        onClick={() => createAndAdd(kind, fmt.id)}
+                        className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:cursor-not-allowed disabled:opacity-30"
+                        title={ok ? `Create ${SURFACE_LABELS[kind]} · ${fmt.label}` : "Not supported for this variant"}
+                      >
+                        {fmt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
