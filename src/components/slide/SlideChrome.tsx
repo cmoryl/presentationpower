@@ -167,7 +167,7 @@ export function SlideFrame({
         />
       )}
       {hasBackdropAurora && (
-        <AuroraLayer seed={backdrop?.auroraSeed ?? "aurora"} brand={brand} />
+        <AuroraLayer seed={backdrop?.auroraSeed ?? "aurora"} brand={brand} baseTint={backdrop?.tint} />
       )}
       {hasBackdropImage && (
         <>

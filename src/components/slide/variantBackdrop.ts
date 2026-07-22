@@ -133,6 +133,13 @@ function _computeBackdrop(
       : { aurora: true, auroraSeed: id, darkChrome: false, tint: "#FFFFFF" };
   }
 
+  // TP Gaming light mode: every slide gets the pale-green aurora wash so the
+  // division's emerald/aqua signature reads across the whole deck (matching
+  // the dark-mode backdrops the user installed). Deterministic per variant.
+  if (mode === "light" && brandId === "bm-tp-games") {
+    return { aurora: true, auroraSeed: id, darkChrome: false, tint: "#E6F7EE" };
+  }
+
 
   // Master TransPerfect / Corporate brand in dark mode uses the curated
   // on-brand gradient set. Only affects bm-enterprise + dark — other
