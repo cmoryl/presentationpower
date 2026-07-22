@@ -24,8 +24,11 @@ import type {
   LayoutEffect,
   CustomPath,
   TableCell,
+  ParsedChart,
 } from "@/lib/pptx-import";
 import { applyColorMods } from "@/lib/pptx-import";
+
+
 
 
 type SlideLayoutWithUrls = SlideLayout & {
@@ -352,8 +355,10 @@ type ResolvedShape = {
     firstRow?: boolean;
     bandRow?: boolean;
   };
+  chart?: ParsedChart;
   placeholderKind?: string;
 };
+
 
 type ResolvedLayout = {
   size: { w: number; h: number };
@@ -511,8 +516,13 @@ function resolveShape(
     };
   }
 
+  if (shape.kind === "chart") {
+    return { kind: "chart", base, chart: shape.chart, placeholderKind: shape.chart ? undefined : "chart" };
+  }
+
   return { kind: shape.kind, base, placeholderKind: shape.kind };
 }
+
 
 function resolveLayout(
   layout: SlideLayoutWithUrls,
@@ -822,12 +832,221 @@ function ResolvedShapeNode({ shape, salt, theme }: { shape: ResolvedShape; salt:
     );
   }
 
+  if (shape.kind === "chart" && shape.chart) {
+    return (
+      <div style={{ ...shape.base, overflow: "hidden" }}>
+        <ChartRender chart={shape.chart} />
+      </div>
+    );
+  }
+
+
+
   return (
     <div style={{ ...shape.base, background: "#F5F5F5", border: "1px dashed #C4C4C4", display: "flex", alignItems: "center", justifyContent: "center", color: "#666", fontSize: "9pt" }}>
       {shape.placeholderKind ?? shape.kind}
     </div>
   );
 }
+
+// ── Chart renderer ─────────────────────────────────────────────────────
+// Renders parsed chart data (from PPTX c:chart XML) as a responsive inline
+// SVG. Supports bar/column, line/area, pie/doughnut. Fonts + colors + title
+// + legend + axis titles + numberFormat unit are honored.
+
+const CHART_PALETTE = ["#003FC7", "#5A6ACF", "#A1FBF9", "#C2A3FF", "#FFEB66", "#A6FA87", "#FF9B70", "#EC388A"];
+
+function formatValue(v: number, unit?: string, fmt?: string): string {
+  if (!isFinite(v)) return "";
+  if (unit === "%") return `${Math.round(v * 100) / 100}%`;
+  if (unit === "$") return `$${v.toLocaleString()}`;
+  if (fmt && /,##0/.test(fmt)) return v.toLocaleString();
+  return String(Math.round(v * 100) / 100);
+}
+
+function ChartRender({ chart }: { chart: ParsedChart }) {
+  const family = chart.font?.family ? `"${chart.font.family}", inherit` : "inherit";
+  const textColor = chart.font?.color ?? "#0B0B12";
+  const gridColor = "rgba(11,11,18,0.12)";
+  const seriesColor = (i: number, override?: string) => override ?? CHART_PALETTE[i % CHART_PALETTE.length];
+
+  return (
+    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", fontFamily: family, color: textColor, padding: "6pt 8pt", boxSizing: "border-box" }}>
+      {chart.title && (
+        <div style={{ fontSize: "12pt", fontWeight: 600, marginBottom: "4pt", textAlign: "center" }}>{chart.title}</div>
+      )}
+      <div style={{ flex: 1, minHeight: 0, position: "relative" }}>
+        <ChartBody chart={chart} textColor={textColor} gridColor={gridColor} seriesColor={seriesColor} />
+      </div>
+      {chart.legend?.visible !== false && chart.series.length > 0 && (
+        <div style={{ display: "flex", gap: "10pt", flexWrap: "wrap", justifyContent: "center", marginTop: "4pt", fontSize: "8pt" }}>
+          {chart.series.map((s, i) => (
+            <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: "4pt" }}>
+              <span style={{ width: "10pt", height: "10pt", background: seriesColor(i, s.color), borderRadius: 2, display: "inline-block" }} />
+              {s.label || `Series ${i + 1}`}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ChartBody({
+  chart, textColor, gridColor, seriesColor,
+}: {
+  chart: ParsedChart;
+  textColor: string;
+  gridColor: string;
+  seriesColor: (i: number, override?: string) => string;
+}) {
+  const W = 400, H = 220;
+  const kind = chart.kind;
+
+  if (kind === "pie" || kind === "doughnut") {
+    const s = chart.series[0];
+    if (!s || s.values.length === 0) return null;
+    const total = s.values.reduce((a, b) => a + Math.max(0, b), 0) || 1;
+    const cx = W / 2, cy = H / 2, r = Math.min(W, H) / 2 - 8;
+    const rInner = kind === "doughnut" ? r * 0.55 : 0;
+    let acc = 0;
+    return (
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style={{ fontFamily: "inherit" }}>
+        {s.values.map((v, i) => {
+          const frac = Math.max(0, v) / total;
+          const a0 = acc * Math.PI * 2 - Math.PI / 2;
+          acc += frac;
+          const a1 = acc * Math.PI * 2 - Math.PI / 2;
+          const large = frac > 0.5 ? 1 : 0;
+          const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0);
+          const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+          const color = s.pointColors?.[i] ?? seriesColor(i);
+          const path = rInner
+            ? `M${cx + rInner * Math.cos(a0)},${cy + rInner * Math.sin(a0)} L${x0},${y0} A${r},${r} 0 ${large} 1 ${x1},${y1} L${cx + rInner * Math.cos(a1)},${cy + rInner * Math.sin(a1)} A${rInner},${rInner} 0 ${large} 0 ${cx + rInner * Math.cos(a0)},${cy + rInner * Math.sin(a0)} Z`
+            : `M${cx},${cy} L${x0},${y0} A${r},${r} 0 ${large} 1 ${x1},${y1} Z`;
+          return <path key={i} d={path} fill={color} stroke="#fff" strokeWidth={1} />;
+        })}
+      </svg>
+    );
+  }
+
+  // Compute value range for bar/column/line/area
+  const allVals = chart.series.flatMap((s) => s.values);
+  const rawMax = Math.max(0, ...allVals);
+  const rawMin = Math.min(0, ...allVals);
+  const stacked = !!chart.stacked;
+  const yMax = stacked ? chart.categories.map((_, ci) => chart.series.reduce((a, s) => a + Math.max(0, s.values[ci] ?? 0), 0)).reduce((a, b) => Math.max(a, b), 0) : rawMax;
+  const yMin = stacked ? 0 : rawMin;
+  const range = yMax - yMin || 1;
+  const catCount = chart.categories.length || Math.max(1, ...chart.series.map((s) => s.values.length));
+
+  const padL = 34, padR = 8, padT = 8, padB = 22;
+  const iw = W - padL - padR, ih = H - padT - padB;
+  const yFor = (v: number) => padT + ih - ((v - yMin) / range) * ih;
+  const gridLines = 4;
+
+  const axisText = { fontSize: 7, fill: textColor, fontFamily: "inherit" as const };
+
+  if (kind === "line" || kind === "area") {
+    return (
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" preserveAspectRatio="none">
+        {Array.from({ length: gridLines + 1 }, (_, g) => {
+          const y = padT + (ih * g) / gridLines;
+          const v = yMax - (range * g) / gridLines;
+          return (
+            <g key={g}>
+              <line x1={padL} y1={y} x2={W - padR} y2={y} stroke={gridColor} strokeWidth={0.5} />
+              <text x={padL - 3} y={y + 2} textAnchor="end" {...axisText}>{formatValue(v, chart.unit, chart.numberFormat)}</text>
+            </g>
+          );
+        })}
+        {chart.series.map((s, si) => {
+          const color = seriesColor(si, s.color);
+          const step = catCount > 1 ? iw / (catCount - 1) : iw;
+          const pts = s.values.map((v, i) => [padL + step * i, yFor(v)] as [number, number]);
+          const linePath = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
+          const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${yFor(0)} L${pts[0][0].toFixed(1)},${yFor(0)} Z` : "";
+          return (
+            <g key={si}>
+              {kind === "area" && <path d={areaPath} fill={color} fillOpacity={0.25} />}
+              <path d={linePath} fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+              {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={2.5} fill={color} />)}
+            </g>
+          );
+        })}
+        {chart.categories.map((c, i) => {
+          const step = catCount > 1 ? iw / (catCount - 1) : iw;
+          return <text key={i} x={padL + step * i} y={H - 8} textAnchor="middle" {...axisText}>{c}</text>;
+        })}
+      </svg>
+    );
+  }
+
+  // bar / column
+  const horizontal = kind === "bar";
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" preserveAspectRatio="none">
+      {Array.from({ length: gridLines + 1 }, (_, g) => {
+        const y = padT + (ih * g) / gridLines;
+        const v = yMax - (range * g) / gridLines;
+        return !horizontal ? (
+          <g key={g}>
+            <line x1={padL} y1={y} x2={W - padR} y2={y} stroke={gridColor} strokeWidth={0.5} />
+            <text x={padL - 3} y={y + 2} textAnchor="end" {...axisText}>{formatValue(v, chart.unit, chart.numberFormat)}</text>
+          </g>
+        ) : null;
+      })}
+      {(() => {
+        if (horizontal) {
+          const groupH = ih / catCount;
+          const barH = stacked ? groupH * 0.7 : (groupH * 0.7) / chart.series.length;
+          return chart.categories.map((cat, ci) => (
+            <g key={ci}>
+              {(() => {
+                let stackAcc = 0;
+                return chart.series.map((s, si) => {
+                  const v = s.values[ci] ?? 0;
+                  const color = seriesColor(si, s.color);
+                  const bw = (Math.abs(v) / range) * iw;
+                  if (stacked) {
+                    const x = padL + (stackAcc / range) * iw;
+                    stackAcc += Math.max(0, v);
+                    return <rect key={si} x={x} y={padT + ci * groupH + groupH * 0.15} width={bw} height={groupH * 0.7} fill={color} />;
+                  }
+                  return <rect key={si} x={padL} y={padT + ci * groupH + groupH * 0.15 + si * barH} width={bw} height={barH * 0.9} fill={color} />;
+                });
+              })()}
+              <text x={padL - 3} y={padT + ci * groupH + groupH / 2 + 2} textAnchor="end" {...axisText}>{cat}</text>
+            </g>
+          ));
+        }
+        const groupW = iw / catCount;
+        const barW = stacked ? groupW * 0.7 : (groupW * 0.7) / chart.series.length;
+        return chart.categories.map((cat, ci) => (
+          <g key={ci}>
+            {(() => {
+              let stackAcc = 0;
+              return chart.series.map((s, si) => {
+                const v = s.values[ci] ?? 0;
+                const color = seriesColor(si, s.color);
+                const bh = (Math.abs(v) / range) * ih;
+                if (stacked) {
+                  const y = yFor(stackAcc + Math.max(0, v));
+                  stackAcc += Math.max(0, v);
+                  return <rect key={si} x={padL + ci * groupW + groupW * 0.15} y={y} width={groupW * 0.7} height={bh} fill={color} />;
+                }
+                return <rect key={si} x={padL + ci * groupW + groupW * 0.15 + si * barW} y={yFor(v)} width={barW * 0.9} height={bh} fill={color} />;
+              });
+            })()}
+            <text x={padL + ci * groupW + groupW / 2} y={H - 8} textAnchor="middle" {...axisText}>{cat}</text>
+          </g>
+        ));
+      })()}
+    </svg>
+  );
+}
+
+
 
 /**
  * Render a captured PPTX slide layout at any target width.

@@ -213,7 +213,7 @@ export type LayoutShape =
   | { kind: "image"; z: number; frame: LayoutFrame; embedId?: string; path?: string; line?: LayoutLine; srcRect?: LayoutSrcRect; prst?: string; opacity?: number; effect?: LayoutEffect; customPath?: CustomPath; duotone?: [string, string] }
   | { kind: "line"; z: number; frame: LayoutFrame; line?: LayoutLine; prst?: string; effect?: LayoutEffect }
   | { kind: "table"; z: number; frame: LayoutFrame; header: string[]; rows: string[][]; cellGrid?: TableCell[][]; colWidthsIn?: number[]; rowHeightsIn?: number[]; firstRow?: boolean; bandRow?: boolean; firstCol?: boolean; bandCol?: boolean }
-  | { kind: "chart"; z: number; frame: LayoutFrame }
+  | { kind: "chart"; z: number; frame: LayoutFrame; chartRelId?: string; chart?: ParsedChart }
   | { kind: "diagram"; z: number; frame: LayoutFrame };
 
 /** Custom shape path — captured from `<a:custGeom>` as normalized 0-1 coords. */
@@ -420,7 +420,8 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
 
     // ── Charts ──────────────────────────────────────────────────────────
     const charts: ParsedChart[] = [];
-    for (const target of Object.values(relTargetsByType.chart)) {
+    const chartsByRelId: Record<string, ParsedChart> = {};
+    for (const [relId, target] of Object.entries(relTargetsByType.chart)) {
       const resolved = resolveRelPath(slidePath, target);
       const entry = zip.files[resolved];
       if (!entry) continue;
@@ -429,8 +430,10 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         const cdoc = parser.parse(cxml);
         const parsedCharts = extractChartsFromChartXml(cdoc, theme);
         for (const c of parsedCharts) charts.push(c);
+        if (parsedCharts[0]) chartsByRelId[relId] = parsedCharts[0];
       } catch { /* skip malformed chart */ }
     }
+
 
 
     // ── Tables ──────────────────────────────────────────────────────────
@@ -522,7 +525,16 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     let layout: SlideLayout | undefined;
     try {
       layout = extractSlideLayout(xml, slideSize, imageEmbedIds, parents, theme);
+      // Attach parsed chart data to chart shapes by rel id
+      if (layout) {
+        for (const sh of layout.shapes) {
+          if (sh.kind === "chart" && sh.chartRelId && chartsByRelId[sh.chartRelId]) {
+            sh.chart = chartsByRelId[sh.chartRelId];
+          }
+        }
+      }
     } catch { /* layout is best-effort; parsed text/images still return */ }
+
 
 
 
@@ -2067,7 +2079,12 @@ function walkSpTree(
           firstRow, bandRow, firstCol, bandCol,
         });
       } else if (gTag && /chart/i.test(gTag)) {
-        out.push({ kind: "chart", z: zRef.z++, frame });
+        // <a:graphicData><c:chart r:id="rIdX"/></a:graphicData>
+        const chartNode = gKids[0] ? pFind(gKids[0], "c:chart") ?? pDeepFind(gKids, "c:chart") : undefined;
+        const chartAttrs = chartNode ? pAttrs(chartNode) : {};
+        const chartRelId = chartAttrs["@_r:id"] ?? chartAttrs["@_id"];
+        out.push({ kind: "chart", z: zRef.z++, frame, chartRelId });
+
       } else if (gTag && /diagram|dgm/i.test(gTag)) {
         out.push({ kind: "diagram", z: zRef.z++, frame });
       } else {
