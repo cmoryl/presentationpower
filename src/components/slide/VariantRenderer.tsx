@@ -328,7 +328,7 @@ export function VariantRenderer(props: Props) {
         <SlideInkContext.Provider value={semanticInk}>
           <SlideBackdropContext.Provider value={backdrop}>
             <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany, logoOrientation: slide.logoOrientation && slide.logoOrientation !== "auto" ? slide.logoOrientation : logoOrientation, logoPosition: slide.logoPosition && slide.logoPosition !== "auto" ? slide.logoPosition : undefined }}>
-              {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c, mode })}
+              {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c, mode, clientName: resolvedClient, clientLogoUrl: clientLogoUrl ?? null })}
             </SlideFrameCtx.Provider>
           </SlideBackdropContext.Provider>
         </SlideInkContext.Provider>
