@@ -16,7 +16,7 @@ export function auroraSvgDataUrl(
   const orbs = auroraOrbs(seed, brand, mode);
   // Mirror AuroraLayer's on-screen opacities so every division's exported
   // slide reads at the same intensity as the live editor preview.
-  const layerOpacity = mode === "dark" ? 0.72 : 0.85;
+  const layerOpacity = auroraLayerOpacity(mode);
   const vignetteAlpha = mode === "dark" ? 0.55 : 0.5;
   const orbR = mode === "dark" ? "55%" : "85%";
   const midStop = mode === "dark" ? "22%" : "30%";
