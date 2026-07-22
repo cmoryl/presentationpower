@@ -103,6 +103,118 @@ function buildDeckExtras(parsed: any) {
   };
 }
 
+type SavedImageRef = { embedId: string; path: string };
+
+function contentHash(dataUrl: string): string {
+  let hash = 5381;
+  for (let i = 0; i < dataUrl.length; i++) hash = ((hash << 5) + hash) ^ dataUrl.charCodeAt(i);
+  return (hash >>> 0).toString(36);
+}
+
+async function persistParsedSlideImages({
+  slide,
+  existingRefs,
+  filename,
+  userId,
+  divisionId,
+  imageryDivision,
+  client,
+  imageCache,
+  tag,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  slide: any;
+  existingRefs?: SavedImageRef[];
+  filename: string;
+  userId: string;
+  divisionId: string;
+  imageryDivision: string;
+  client: SbClient;
+  imageCache: Map<string, string>;
+  tag?: string;
+}): Promise<SavedImageRef[]> {
+  const refs: SavedImageRef[] = [];
+  const existingByEmbed = new Map((existingRefs ?? []).map((r) => [r.embedId, r.path]));
+  for (let j = 0; j < (slide.images ?? []).length; j++) {
+    const dataUrl = slide.images[j];
+    const embedId = slide.imageEmbedIds?.[j] ?? "";
+    if (embedId && existingByEmbed.has(embedId)) {
+      refs.push({ embedId, path: existingByEmbed.get(embedId)! });
+      continue;
+    }
+    const m = /^data:([^;]+);base64,(.+)$/.exec(dataUrl);
+    if (!m || !embedId) continue;
+    const cacheKey = `${embedId}|${contentHash(dataUrl)}`;
+    const cachedPath = imageCache.get(cacheKey);
+    if (cachedPath) {
+      refs.push({ embedId, path: cachedPath });
+      continue;
+    }
+    const contentType = m[1];
+    const bin = Buffer.from(m[2], "base64");
+    if (bin.length === 0) continue;
+    const ext = contentType.split("/")[1]?.split("+")[0] ?? "bin";
+    const imgId = crypto.randomUUID();
+    const baseName = filename.replace(/\.pptx$/i, "");
+    const imgFilename = `${baseName}__slide-${slide.index + 1}-${j + 1}.${ext}`.replace(/[^\w.\-]+/g, "_").slice(-160);
+    const imgPath = `${userId}/${imgId}-${imgFilename}`;
+    const upImg = await client.storage
+      .from("division-imagery")
+      .upload(imgPath, bin, { contentType, upsert: false });
+    if (upImg.error) continue;
+    const { error: rowErr } = await client.from("division_imagery").insert({
+      id: imgId,
+      division_id: imageryDivision,
+      uploaded_by: userId,
+      filename: imgFilename,
+      content_type: contentType,
+      size_bytes: bin.length,
+      storage_path: imgPath,
+      kind: "upload",
+      tags: ["imported_deck", ...(tag ? [tag] : []), `slide-${slide.index + 1}`, divisionId],
+      note: `${tag === "re_extracted" ? "Re-extracted" : "Extracted"} from ${filename} · slide ${slide.index + 1}`,
+    });
+    if (rowErr) {
+      await client.storage.from("division-imagery").remove([imgPath]).catch(() => {});
+      continue;
+    }
+    imageCache.set(cacheKey, imgPath);
+    refs.push({ embedId, path: imgPath });
+  }
+  return refs;
+}
+
+function rewriteLayoutImageRefs(slide: ParsedDeck["slides"][number], imageRefs: SavedImageRef[]) {
+  const embedToPath = new Map(imageRefs.map((r) => [r.embedId, r.path]));
+  const rewriteFill = (fill: unknown): unknown => {
+    if (!fill || typeof fill !== "object") return fill;
+    const f = fill as { kind?: string; embedId?: string; path?: string };
+    if (f.kind === "image" && f.embedId) {
+      const path = embedToPath.get(f.embedId);
+      if (path) return { ...f, path };
+    }
+    return fill;
+  };
+  return slide.layout
+    ? {
+        ...slide.layout,
+        background: rewriteFill(slide.layout.background) as typeof slide.layout.background,
+        shapes: slide.layout.shapes.map((sh) => {
+          let next: typeof sh = sh;
+          if (sh.kind === "image" && sh.embedId) {
+            const path = embedToPath.get(sh.embedId);
+            if (path) next = { ...sh, path };
+          }
+          if ("fill" in next && next.fill) {
+            const rewritten = rewriteFill(next.fill);
+            if (rewritten !== next.fill) next = { ...next, fill: rewritten as typeof next.fill };
+          }
+          return next;
+        }),
+      }
+    : undefined;
+}
+
 
 // ~100MB raw → ~140MB base64. Client validates size; server caps here.
 const UploadInput = z.object({
