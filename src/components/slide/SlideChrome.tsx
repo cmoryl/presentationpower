@@ -134,8 +134,10 @@ export function useSlideInk(accentOverride?: string | null): SlideInk {
     accent: (a: number) =>
       accentHex ? hexToRgba(accentHex, a) : `rgba(${base},${a})`,
     onSurface: (hex: string) => hex,
+    accentText: accentHex ? readableAccent(accentHex, mode) : (dark ? "#ffffff" : "rgb(10,15,28)"),
   };
 }
+
 
 
 
