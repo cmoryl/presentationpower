@@ -10,7 +10,7 @@
 // spacing + hanging indent + real bullet chars, run strike/cap/spc/baseline,
 // and richer tables (cell fills, per-side borders).
 
-import { useMemo, useId } from "react";
+import { useMemo, useId, createContext, useContext } from "react";
 import type {
   SlideLayout,
   LayoutShape,
