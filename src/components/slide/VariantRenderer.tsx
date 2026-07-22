@@ -5239,7 +5239,7 @@ function MediaTile({
   if (mode === "light") {
     return (
       <div
-        className={`relative overflow-hidden rounded-2xl ${className ?? ""}`}
+        className={`group relative overflow-hidden rounded-2xl ${className ?? ""}`}
         style={{ background: "#EEF2F8", filter: grayscale }}
       >
         {hasVideo && shouldPlay ? (
