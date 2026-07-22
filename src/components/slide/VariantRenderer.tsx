@@ -3955,7 +3955,7 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-10 grid gap-16" style={{ gridTemplateColumns: "1.6fr 1fr" }}>
             <div>
-              <AreaChart brand={brand} series={series} height={520} />
+              <AreaChart brand={brand} series={series} height={520} bare />
             </div>
             <div className="flex flex-col justify-center pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
               <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
