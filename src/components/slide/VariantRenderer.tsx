@@ -1665,6 +1665,7 @@ function renderVariantBody({
           <div className="mt-6">
             <ClientLogoChip mode={mode} clientName={clientName ?? s(c.client)} clientLogoUrl={clientLogoUrl} accent="var(--slide-accent-text)" faint={ink.faint} size={36} />
           </div>
+          <div className="mt-10 grid grid-cols-3 gap-8">
             {rows.map((r, i) => (
               <GlassTile key={i} radius={22} padding="px-8 py-8" className={`tp-rise tp-rise-delay-${Math.min(i + 1, 3) as 1 | 2 | 3}`}>
                 <div className="flex items-center gap-4">
