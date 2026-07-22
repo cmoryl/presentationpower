@@ -292,7 +292,7 @@ function Chip({
       className={
         "rounded-full border px-3 py-1 text-xs font-medium transition " +
         (active
-          ? "border-[#03002C] bg-[#03002C] text-white dark:border-[#A1FBF9] dark:bg-[#A1FBF9] dark:text-[#03002C]"
+          ? "border-[#05041A] bg-[#05041A] text-white dark:border-[#A1FBF9] dark:bg-[#A1FBF9] dark:text-[#03002C]"
           : "border-black/10 bg-white text-black/70 hover:bg-black/5 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:bg-white/10") +
         (disabled ? " cursor-not-allowed opacity-40" : "")
       }

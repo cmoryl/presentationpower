@@ -25,7 +25,7 @@ function ImageryView() {
       <div className="flex flex-wrap items-center gap-2">
         {[7, 14, 30, 60, 90].map((d) => (
           <button key={d} onClick={() => setDays(d)}
-            className={`rounded-full border px-3 py-1 text-xs ${days === d ? "border-[#03002C] bg-[#03002C] text-white" : "border-black/20 bg-white"}`}>{d}d</button>
+            className={`rounded-full border px-3 py-1 text-xs ${days === d ? "border-[#05041A] bg-[#05041A] text-white" : "border-black/20 bg-white"}`}>{d}d</button>
         ))}
         <input value={brand} onChange={(e) => setBrand(e.target.value)} placeholder="Filter brand id…"
           className="ml-2 rounded-lg border border-black/15 bg-white px-3 py-1.5 text-xs" />

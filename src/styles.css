@@ -329,10 +329,15 @@
 .dark [class*="text-black/55"] { color: rgba(255,255,255,0.65) !important; }
 .dark [class*="text-black/50"] { color: rgba(255,255,255,0.6) !important; }
 
-/* Solid navy CTAs → brand blue on dark for separation from the page */
-.dark [class*="bg-[#03002C]"] { background-color: #003FC7 !important; }
-.dark [class*="bg-[#0B2A4A]"] { background-color: #003FC7 !important; }
-.dark [class*="border-[#03002C]"] { border-color: #003FC7 !important; }
+/* Solid navy CTAs → brand blue on dark for separation from the page.
+ * Uses :where() to keep specificity low so explicit dark:* utility classes
+ * (e.g. dark:bg-[#A1FBF9]) can override when the component already opted in. */
+.dark :where(button, a, [role="button"]):is([class*="bg-[#03002C]"], [class*="bg-[#0B2A4A]"]) {
+  background-color: #003FC7;
+}
+.dark :where(button, a, [role="button"]):is([class*="border-[#03002C]"], [class*="border-[#0B2A4A]"]) {
+  border-color: #003FC7;
+}
 
 .dark [class*="border-black/5"]  { border-color: rgba(255,255,255,0.08) !important; }
 .dark [class*="border-black/10"] { border-color: rgba(255,255,255,0.12) !important; }

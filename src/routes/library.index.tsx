@@ -409,7 +409,7 @@ function Library() {
               <button
                 type="button"
                 onClick={() => setMode("light")}
-                className={`px-3 py-1.5 ${mode === "light" ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"}`}
+                className={`px-3 py-1.5 ${mode === "light" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
                 aria-pressed={mode === "light"}
               >
                 ☀︎ Light
@@ -417,7 +417,7 @@ function Library() {
               <button
                 type="button"
                 onClick={() => setMode("dark")}
-                className={`px-3 py-1.5 ${mode === "dark" ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"}`}
+                className={`px-3 py-1.5 ${mode === "dark" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
                 aria-pressed={mode === "dark"}
               >
                 ☾ Dark
@@ -425,7 +425,7 @@ function Library() {
               <button
                 type="button"
                 onClick={() => setMode("ab")}
-                className={`px-3 py-1.5 ${mode === "ab" ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"}`}
+                className={`px-3 py-1.5 ${mode === "ab" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
                 aria-pressed={mode === "ab"}
                 title="Compare light vs dark side-by-side"
               >
@@ -439,7 +439,7 @@ function Library() {
               title="Render each module with sample background imagery"
               className={`rounded-full border px-3 py-1.5 text-xs ${
                 showImagery
-                  ? "border-[#03002C] bg-[#03002C] text-white"
+                  ? "border-[#05041A] bg-[#05041A] text-white"
                   : "border-black/15 bg-white text-black/70 hover:text-black"
               }`}
             >
@@ -461,7 +461,7 @@ function Library() {
                 aria-pressed={on}
                 className={`rounded-full border px-3 py-1 text-xs transition ${
                   on
-                    ? "border-[#03002C] bg-[#03002C] text-white shadow-sm"
+                    ? "border-[#05041A] bg-[#05041A] text-white shadow-sm"
                     : "border-black/15 bg-white text-black/70 hover:border-black/30 hover:text-black"
                 }`}
                 title={mf.name}
@@ -1261,14 +1261,14 @@ function VariantDetailModal({
                   <button
                     type="button"
                     onClick={() => setMode("light")}
-                    className={`px-2.5 py-1 ${mode === "light" ? "bg-[#03002C] text-white" : "text-black/60"}`}
+                    className={`px-2.5 py-1 ${mode === "light" ? "bg-[#05041A] text-white" : "text-black/60"}`}
                   >
                     ☀︎
                   </button>
                   <button
                     type="button"
                     onClick={() => setMode("dark")}
-                    className={`px-2.5 py-1 ${mode === "dark" ? "bg-[#03002C] text-white" : "text-black/60"}`}
+                    className={`px-2.5 py-1 ${mode === "dark" ? "bg-[#05041A] text-white" : "text-black/60"}`}
                   >
                     ☾
                   </button>
@@ -1279,7 +1279,7 @@ function VariantDetailModal({
                   aria-pressed={showImagery}
                   className={`rounded-full border px-2.5 py-1 text-[11px] ${
                     showImagery
-                      ? "border-[#03002C] bg-[#03002C] text-white"
+                      ? "border-[#05041A] bg-[#05041A] text-white"
                       : "border-black/15 bg-white text-black/60"
                   }`}
                   title="Toggle background imagery"

@@ -763,14 +763,14 @@ function RelinkRow({
             <button
               type="button"
               onClick={() => setMode("upload")}
-              className={`rounded-full px-2.5 py-1 ${mode === "upload" ? "bg-[#03002C] text-white" : "bg-black/5 text-black/60 hover:bg-black/10"}`}
+              className={`rounded-full px-2.5 py-1 ${mode === "upload" ? "bg-[#05041A] text-white" : "bg-black/5 text-black/60 hover:bg-black/10"}`}
             >
               Upload
             </button>
             <button
               type="button"
               onClick={() => setMode("reuse")}
-              className={`rounded-full px-2.5 py-1 ${mode === "reuse" ? "bg-[#03002C] text-white" : "bg-black/5 text-black/60 hover:bg-black/10"}`}
+              className={`rounded-full px-2.5 py-1 ${mode === "reuse" ? "bg-[#05041A] text-white" : "bg-black/5 text-black/60 hover:bg-black/10"}`}
             >
               Pick from library
             </button>

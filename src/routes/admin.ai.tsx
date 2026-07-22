@@ -27,7 +27,7 @@ function AiView() {
         <label className="text-xs uppercase tracking-widest text-black/50">Window</label>
         {[7, 14, 30, 60, 90].map((d) => (
           <button key={d} onClick={() => setDays(d)}
-            className={`rounded-full border px-3 py-1 text-xs ${days === d ? "border-[#03002C] bg-[#03002C] text-white" : "border-black/20 bg-white"}`}>
+            className={`rounded-full border px-3 py-1 text-xs ${days === d ? "border-[#05041A] bg-[#05041A] text-white" : "border-black/20 bg-white"}`}>
             {d}d
           </button>
         ))}
