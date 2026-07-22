@@ -4017,6 +4017,213 @@ function renderVariantBody({
           <div className="mt-8"><ComboChart brand={brand} points={points} barLabel={s(bars.label, "Volume")} barUnit={s(bars.unit)} lineLabel={s(line.label, "Rate")} lineUnit={s(line.unit, "%")} height={540} /></div>
         </SlideFrame>
       );
+
+    // ── Editorial hero tier ───────────────────────────────────────────────
+    case "MV-ED-HERO-BLEED": {
+      const _len = s(c.title).length;
+      const _size = _len > 70 ? "title" : _len > 40 ? "section" : "cover";
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "editorial-bleed"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} className="absolute inset-0 h-full w-full rounded-none" />
+          <HeroScrim brand={brand} anchor="bottom" />
+          <div className="absolute inset-x-24 top-24 flex items-start">
+            {s(c.kicker) && <Kicker brand={brand} tracking="0.36em">{s(c.kicker)}</Kicker>}
+          </div>
+          <div className="absolute inset-x-24 bottom-24 flex flex-col text-white">
+            <Hairline color={brand.tokens.accent} widthPx={120} thicknessPx={2} className="mb-8" />
+            <DisplayTitle size={_size} color="#ffffff" maxWidthPx={1620}>
+              {s(c.title, "One line. Say it well.")}
+            </DisplayTitle>
+            {s(c.subtitle) && (
+              <SupportingText size="lg" opacity={0.85} maxWidthPx={1240} className="mt-6">
+                {s(c.subtitle)}
+              </SupportingText>
+            )}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-ED-HERO-ORB": {
+      // Two soft aurora orbs behind minimal type. Tokens are palette-locked.
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <div className="absolute inset-0 overflow-hidden" style={{ background: brand.tokens.primary }}>
+            <div
+              aria-hidden
+              className="absolute"
+              style={{
+                width: 1100, height: 1100, left: -220, top: -260, borderRadius: "50%",
+                background: `radial-gradient(circle at 30% 30%, ${brand.tokens.accent}CC 0%, ${brand.tokens.accent}00 60%)`,
+                filter: "blur(60px)", opacity: 0.85,
+              }}
+            />
+            <div
+              aria-hidden
+              className="absolute"
+              style={{
+                width: 900, height: 900, right: -180, bottom: -220, borderRadius: "50%",
+                background: `radial-gradient(circle at 60% 40%, ${brand.tokens.accent}80 0%, ${brand.tokens.accent}00 60%)`,
+                filter: "blur(80px)", opacity: 0.75,
+              }}
+            />
+            <div
+              aria-hidden
+              className="absolute inset-0"
+              style={{ background: `linear-gradient(180deg, ${brand.tokens.primary}00 0%, ${brand.tokens.primary}66 100%)` }}
+            />
+          </div>
+          <div className="relative flex h-full flex-col justify-center">
+            {s(c.kicker) && <Kicker brand={brand} tracking="0.36em">{s(c.kicker)}</Kicker>}
+            <Hairline color={brand.tokens.accent} widthPx={120} thicknessPx={2} className="mt-8" />
+            <DisplayTitle size="hero" color="#ffffff" maxWidthPx={1620} className="mt-10">
+              {s(c.title, "Signal through the noise.")}
+            </DisplayTitle>
+            {s(c.subtitle) && (
+              <SupportingText size="xl" opacity={0.82} maxWidthPx={1180} className="mt-10">
+                {s(c.subtitle)}
+              </SupportingText>
+            )}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-ED-DIVIDER-XL": {
+      const numeral = s(c.numeral, `0${Math.max(1, pageNumber)}`.slice(-2));
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="divider">
+          <div className="grid h-full grid-cols-[auto_1fr] items-center gap-16">
+            <div
+              style={{
+                fontSize: 480,
+                lineHeight: 0.85,
+                fontWeight: 700,
+                letterSpacing: "-0.05em",
+                color: brand.tokens.accent,
+                opacity: 0.9,
+              }}
+            >
+              {numeral}
+            </div>
+            <div className="flex flex-col">
+              {s(c.kicker) && <Kicker brand={brand} tracking="0.36em">{s(c.kicker, "Chapter")}</Kicker>}
+              <Hairline color={brand.tokens.accent} widthPx={120} thicknessPx={2} className="mt-8" />
+              <DisplayTitle size="section" color="#ffffff" maxWidthPx={1080} className="mt-8">
+                {s(c.title, "New chapter")}
+              </DisplayTitle>
+              {s(c.subtitle) && (
+                <SupportingText size="lg" opacity={0.78} maxWidthPx={960} className="mt-8">
+                  {s(c.subtitle)}
+                </SupportingText>
+              )}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-ED-KICKER-POSTER": {
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <div className="flex h-full flex-col justify-between py-4">
+            <div
+              className="uppercase"
+              style={{
+                fontSize: 44,
+                letterSpacing: "0.42em",
+                color: brand.tokens.accent,
+                fontWeight: 600,
+              }}
+            >
+              {s(c.kicker, "A briefing")}
+            </div>
+            <DisplayTitle size="hero" color="#ffffff" maxWidthPx={1720} className="uppercase">
+              {s(c.title, "The Signal")}
+            </DisplayTitle>
+            <div className="flex items-center justify-between">
+              <Hairline color={brand.tokens.accent} widthPx={200} thicknessPx={3} />
+              <MetaRow>
+                <span>{s(c.meta, "Confidential")}</span>
+                <span>№ {String(pageNumber).padStart(2, "0")}</span>
+              </MetaRow>
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-ED-STAT-PHOTO": {
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.label, "stat-photo"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} className="absolute inset-0 h-full w-full rounded-none" />
+          <HeroScrim brand={brand} anchor="bottom" />
+          <div className="absolute inset-x-24 bottom-24 flex items-end justify-between gap-16 text-white">
+            <div className="flex-shrink-0">
+              <div
+                style={{
+                  fontSize: 360,
+                  lineHeight: 0.85,
+                  fontWeight: 700,
+                  letterSpacing: "-0.05em",
+                  color: brand.tokens.accent,
+                }}
+              >
+                {s(c.stat, "97")}
+                <span style={{ fontSize: 180, marginLeft: 8 }}>{s(c.unit, "%")}</span>
+              </div>
+              {s(c.label) && (
+                <div className="mt-4 uppercase" style={{ fontSize: 24, letterSpacing: "0.28em", opacity: 0.85 }}>
+                  {s(c.label)}
+                </div>
+              )}
+            </div>
+            {s(c.narrative) && (
+              <SupportingText size="lg" opacity={0.9} maxWidthPx={720} className="pb-4">
+                {s(c.narrative)}
+              </SupportingText>
+            )}
+          </div>
+        </SlideFrame>
+      );
+    }
+
+    case "MV-ED-QUOTE-BLEED": {
+      const quote = s(c.quote, "The best interfaces get out of the way.").replace(/^["'“”]|["'“”]$/g, "");
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="quote">
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote-bleed"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} className="absolute inset-0 h-full w-full rounded-none" />
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(180deg, ${brand.tokens.primary}CC 0%, ${brand.tokens.primary}99 50%, ${brand.tokens.primary}E6 100%)`,
+            }}
+          />
+          <div className="relative flex h-full flex-col justify-center text-white">
+            <QuoteMark color={brand.tokens.accent} />
+            <div
+              className="mt-6"
+              style={{
+                fontSize: quote.length > 160 ? 64 : quote.length > 100 ? 80 : 104,
+                lineHeight: 1.08,
+                letterSpacing: "-0.02em",
+                fontWeight: 500,
+                maxWidth: 1620,
+              }}
+            >
+              {quote}
+            </div>
+            <div className="mt-12 flex items-center gap-6">
+              <Hairline color={brand.tokens.accent} widthPx={72} thicknessPx={2} />
+              <Attribution>
+                {s(c.attribution, "Attributed source")}
+                {s(c.role) && <span style={{ opacity: 0.75 }}> · {s(c.role)}</span>}
+              </Attribution>
+            </div>
+          </div>
+        </SlideFrame>
+      );
     }
 
     default:
