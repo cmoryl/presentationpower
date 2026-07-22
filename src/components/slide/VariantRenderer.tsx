@@ -4011,7 +4011,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-10 grid gap-16" style={{ gridTemplateColumns: "1.2fr 1fr" }}>
+          <div className="mt-16 grid gap-16" style={{ gridTemplateColumns: "1.2fr 1fr" }}>
             <div>
               <BarChart brand={brand} bars={bars} height={520} highlight={highlight} />
             </div>
