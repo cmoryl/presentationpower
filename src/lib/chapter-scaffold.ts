@@ -37,7 +37,7 @@ function classify(section: StrategySection, i: number, n: number): ChapterId {
 export function computeChapters(plan: DeckStrategy): Chapter[] {
   const order: ChapterId[] = ["opening", "context", "solution", "proof", "close"];
   const buckets = new Map<ChapterId, StrategySection[]>();
-  plan.recommendedSections.forEach((s, i) => {
+  plan.recommendedSections.forEach((s: StrategySection, i: number) => {
     const cid = classify(s, i, plan.recommendedSections.length);
     const arr = buckets.get(cid) ?? [];
     arr.push(s);
