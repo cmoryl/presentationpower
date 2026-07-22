@@ -977,20 +977,24 @@ function renderVariantBody({
       const hero = obj(c.hero);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-12 grid grid-cols-2 gap-10" style={{ gridTemplateRows: "1fr 1fr" }}>
-            <div className="row-span-2 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-              <Kicker brand={brand}>Hero</Kicker>
-              <div className="mt-6" style={{ fontSize: 56, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.05, color: ink.strong }}>
-                {s(hero.title)}
-              </div>
-              <SupportingText size="lg" opacity={0.75} className="mt-6" maxWidthPx={560}>
-                {s(hero.body)}
-              </SupportingText>
+          <AuroraOrb x={92} y={30} size={820} />
+          <div className="relative">
+            <SlideTitle brand={brand} title={s(c.title)} />
+            <div className="mt-12 grid grid-cols-2 gap-10" style={{ gridTemplateRows: "1fr 1fr" }}>
+              <GlassTile radius={26} padding="px-10 py-10" className="row-span-2">
+                <Kicker brand={brand}>Hero</Kicker>
+                <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-4 mb-6" />
+                <div style={{ fontSize: 56, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.05, color: ink.strong }}>
+                  {s(hero.title)}
+                </div>
+                <SupportingText size="lg" opacity={0.78} className="mt-6" maxWidthPx={560}>
+                  {s(hero.body)}
+                </SupportingText>
+              </GlassTile>
+              {arr(c.items).slice(0, 4).map((it, i) => (
+                <Card key={i} brand={brand} title={s(it.title)} body={s(it.body)} index={i + 1} icon={s(it.icon)} />
+              ))}
             </div>
-            {arr(c.items).slice(0, 4).map((it, i) => (
-              <Card key={i} brand={brand} title={s(it.title)} body={s(it.body)} index={i + 1} icon={s(it.icon)} />
-            ))}
           </div>
         </SlideFrame>
       );
@@ -999,25 +1003,28 @@ function renderVariantBody({
     case "MV-SOL-ARCHITECTURE":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-14">
-            {arr(c.items).map((it, i) => (
-              <div key={i}>
-                {i > 0 && <SoftDivider />}
-                <div className="flex items-center gap-10 py-7">
-                  <div
-                    className="w-16 tabular-nums"
-                    style={{ fontSize: 22, fontWeight: 600, letterSpacing: "0.18em", color: "var(--slide-accent-text)" }}
-                  >
-                    {String(i + 1).padStart(2, "0")}
+          <AuroraOrb x={92} y={72} size={820} />
+          <div className="relative">
+            <SlideTitle brand={brand} title={s(c.title)} />
+            <GlassTile radius={26} padding="px-12 py-8" className="mt-12">
+              {arr(c.items).map((it, i) => (
+                <div key={i}>
+                  {i > 0 && <SoftDivider />}
+                  <div className="flex items-center gap-10 py-7">
+                    <div
+                      className="w-16 tabular-nums"
+                      style={{ fontSize: 22, fontWeight: 600, letterSpacing: "0.18em", color: "var(--slide-accent-text)" }}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </div>
+                    <div className="w-72" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: "var(--slide-ink)" }}>
+                      {s(it.label)}
+                    </div>
+                    <SupportingText size="md" opacity={0.75} className="flex-1">{s(it.body)}</SupportingText>
                   </div>
-                  <div className="w-72" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: "var(--slide-ink)" }}>
-                    {s(it.label)}
-                  </div>
-                  <SupportingText size="md" opacity={0.72} className="flex-1">{s(it.body)}</SupportingText>
                 </div>
-              </div>
-            ))}
+              ))}
+            </GlassTile>
           </div>
         </SlideFrame>
       );
@@ -1025,19 +1032,24 @@ function renderVariantBody({
     case "MV-SOL-FEATURE-LIST":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-12 grid grid-cols-2 gap-x-16 gap-y-8">
-            {arr(c.items).map((it, i) => (
-              <div key={i} className="flex items-start gap-5">
-                <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} />
-                <div className="flex-1">
-                  <div className="text-3xl font-semibold" style={{ color: ink.strong }}>
-                    {s(it.label)}
+          <AuroraOrb x={90} y={28} size={860} />
+          <div className="relative">
+            <SlideTitle brand={brand} title={s(c.title)} />
+            <GlassTile radius={26} padding="px-12 py-12" className="mt-12">
+              <div className="grid grid-cols-2 gap-x-16 gap-y-8">
+                {arr(c.items).map((it, i) => (
+                  <div key={i} className="flex items-start gap-5">
+                    <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} />
+                    <div className="flex-1">
+                      <div className="text-3xl font-semibold" style={{ color: ink.strong }}>
+                        {s(it.label)}
+                      </div>
+                      <div className="mt-2 text-2xl opacity-80" style={{ color: ink.muted }}>{s(it.body)}</div>
+                    </div>
                   </div>
-                  <div className="mt-2 text-2xl opacity-80">{s(it.body)}</div>
-                </div>
+                ))}
               </div>
-            ))}
+            </GlassTile>
           </div>
         </SlideFrame>
       );
@@ -1458,53 +1470,56 @@ function renderVariantBody({
       const winnerIdx = typeof (c as { winnerIndex?: number }).winnerIndex === "number" ? (c as { winnerIndex?: number }).winnerIndex : undefined;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-14">
-            <div className="grid gap-x-8" style={{ gridTemplateColumns: `2fr ${columns.map(() => "1fr").join(" ")}` }}>
-              {/* Editorial column headers — small caps + hairline underline */}
-              <div className="pb-4 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.faint, fontWeight: 600, borderBottom: `1px solid ${ink.hairlineStrong}` }}>
-                Criteria
-              </div>
-              {columns.map((col, i) => (
-                <div
-                  key={i}
-                  className="pb-4 uppercase"
-                  style={{
-                    fontSize: 20,
-                    letterSpacing: "0.24em",
-                    fontWeight: 600,
-                    color: winnerIdx === i ? "var(--slide-accent-text)" : ink.strong,
-                    borderBottom: `${winnerIdx === i ? 2 : 1}px solid ${winnerIdx === i ? brand.tokens.accent : "rgba(10,15,28,0.15)"}`,
-                  }}
-                >
-                  {s(col.label)}
+          <AuroraOrb x={92} y={28} size={860} />
+          <div className="relative">
+            <SlideTitle brand={brand} title={s(c.title)} />
+            <GlassTile radius={26} padding="px-12 py-10" className="mt-12">
+              <div className="grid gap-x-8" style={{ gridTemplateColumns: `2fr ${columns.map(() => "1fr").join(" ")}` }}>
+                <div className="pb-4 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.faint, fontWeight: 600, borderBottom: `1px solid ${ink.hairlineStrong}` }}>
+                  Criteria
                 </div>
-              ))}
-              {rows.map((r, ri) => (
-                <div key={ri} className="contents">
+                {columns.map((col, i) => (
                   <div
-                    className="py-5"
-                    style={{ fontSize: 24, letterSpacing: "-0.01em", color: ink.strong, borderBottom: `1px solid ${ink.hairline}` }}
+                    key={i}
+                    className="pb-4 uppercase"
+                    style={{
+                      fontSize: 20,
+                      letterSpacing: "0.24em",
+                      fontWeight: 600,
+                      color: winnerIdx === i ? "var(--slide-accent-text)" : ink.strong,
+                      borderBottom: `${winnerIdx === i ? 2 : 1}px solid ${winnerIdx === i ? brand.tokens.accent : ink.hairlineStrong}`,
+                    }}
                   >
-                    {s(r.criterion)}
+                    {s(col.label)}
                   </div>
-                  {strs(r.values).map((v, ci) => (
+                ))}
+                {rows.map((r, ri) => (
+                  <div key={ri} className="contents">
                     <div
-                      key={ci}
                       className="py-5"
-                      style={{
-                        fontSize: 24,
-                        color: winnerIdx === ci ? ink.strong : ink.muted,
-                        fontWeight: winnerIdx === ci ? 600 : 400,
-                        borderBottom: `1px solid ${ink.hairline}`,
-                      }}
+                      style={{ fontSize: 24, letterSpacing: "-0.01em", color: ink.strong, borderBottom: `1px solid ${ink.hairline}` }}
                     >
-                      {v}
+                      {s(r.criterion)}
                     </div>
-                  ))}
-                </div>
-              ))}
-            </div>
+                    {strs(r.values).map((v, ci) => (
+                      <div
+                        key={ci}
+                        className="py-5"
+                        style={{
+                          fontSize: 24,
+                          color: winnerIdx === ci ? ink.strong : ink.muted,
+                          fontWeight: winnerIdx === ci ? 600 : 400,
+                          borderBottom: `1px solid ${ink.hairline}`,
+                          background: winnerIdx === ci ? `color-mix(in oklab, ${brand.tokens.accent} 8%, transparent)` : undefined,
+                        }}
+                      >
+                        {v}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </GlassTile>
           </div>
         </SlideFrame>
       );
@@ -2589,37 +2604,42 @@ function renderVariantBody({
       const max = Math.max(1, ...values);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, "Comparison")} />
-          <div className="mt-12 space-y-6">
-            {items.map((it, i) => {
-              const v = values[i];
-              const pct = Math.max(6, (v / max) * 100);
-              const highlight = i === items.length - 1;
-              return (
-                <div key={i} className="grid grid-cols-[260px_1fr_140px] items-center gap-6">
-                  <div className="text-2xl font-semibold" style={{ color: ink.strong, letterSpacing: "-0.01em" }}>{s(it.label)}</div>
-                  <div className="relative h-10 w-full">
-                    <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2" style={{ height: 2, background: `color-mix(in oklab, ${brand.tokens.accent} 14%, transparent)` }} />
-                    <div
-                      className="absolute top-1/2 left-0 -translate-y-1/2"
-                      style={{
-                        width: `${pct}%`,
-                        height: highlight ? 10 : 6,
-                        background: highlight
-                          ? `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.accent} 40%, transparent), ${brand.tokens.accent})`
-                          : `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.primary} 18%, transparent), color-mix(in oklab, ${brand.tokens.primary} 60%, transparent))`,
-                      }}
-                    />
-                    {s(it.note) && (
-                      <div className="absolute right-3 top-1/2 -translate-y-[135%] uppercase" style={{ fontSize: 13, letterSpacing: "0.22em", color: ink.faint, fontWeight: 600 }}>{s(it.note)}</div>
-                    )}
-                  </div>
-                  <div className="text-right tabular-nums" style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.02em", color: highlight ? "var(--slide-accent-text)" : ink.strong }}>
-                    {s(it.value)}<span className="ml-1" style={{ fontSize: 18, color: ink.faint }}>{s(c.unit)}</span>
-                  </div>
-                </div>
-              );
-            })}
+          <AuroraOrb x={90} y={30} size={840} />
+          <div className="relative">
+            <SlideTitle brand={brand} title={s(c.title, "Comparison")} />
+            <GlassTile radius={26} padding="px-12 py-10" className="mt-12">
+              <div className="space-y-6">
+                {items.map((it, i) => {
+                  const v = values[i];
+                  const pct = Math.max(6, (v / max) * 100);
+                  const highlight = i === items.length - 1;
+                  return (
+                    <div key={i} className="grid grid-cols-[260px_1fr_140px] items-center gap-6">
+                      <div className="text-2xl font-semibold" style={{ color: ink.strong, letterSpacing: "-0.01em" }}>{s(it.label)}</div>
+                      <div className="relative h-10 w-full">
+                        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2" style={{ height: 2, background: `color-mix(in oklab, ${brand.tokens.accent} 14%, transparent)` }} />
+                        <div
+                          className="absolute top-1/2 left-0 -translate-y-1/2"
+                          style={{
+                            width: `${pct}%`,
+                            height: highlight ? 10 : 6,
+                            background: highlight
+                              ? `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.accent} 40%, transparent), ${brand.tokens.accent})`
+                              : `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.primary} 18%, transparent), color-mix(in oklab, ${brand.tokens.primary} 60%, transparent))`,
+                          }}
+                        />
+                        {s(it.note) && (
+                          <div className="absolute right-3 top-1/2 -translate-y-[135%] uppercase" style={{ fontSize: 13, letterSpacing: "0.22em", color: ink.faint, fontWeight: 600 }}>{s(it.note)}</div>
+                        )}
+                      </div>
+                      <div className="text-right tabular-nums" style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.02em", color: highlight ? "var(--slide-accent-text)" : ink.strong }}>
+                        {s(it.value)}<span className="ml-1" style={{ fontSize: 18, color: ink.faint }}>{s(c.unit)}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </GlassTile>
           </div>
         </SlideFrame>
       );
@@ -2858,39 +2878,42 @@ function renderVariantBody({
     case "MV-CLIENT-COMPARE":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, "Three engagements")} />
-          <div className="mt-10 grid grid-cols-3 gap-12">
-            {arr(c.items).slice(0, 3).map((it, i) => {
-              const logoUrl = s(it.logoUrl);
-              const logoPath = s(it.logoPath);
-              return (
-                <div key={i} className="flex flex-col">
-                  <Kicker brand={brand} color="var(--slide-accent-text)" size={16}>Client · {String(i + 1).padStart(2, "0")}</Kicker>
-                  <div className="mt-4 flex items-center gap-4">
-                    {(logoUrl || logoPath) && (
-                      <ClientLogoImg
-                        path={logoPath}
-                        url={logoUrl}
-                        alt={s(it.client) ? `${s(it.client)} logo` : "Client logo"}
-                        style={{ maxHeight: 36, maxWidth: 120, objectFit: "contain" }}
-                      />
-                    )}
-                    <div style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>{s(it.client)}</div>
-                  </div>
-                  <div className="mt-8">
-                    <Kicker brand={brand} size={16}>Challenge</Kicker>
-                    <SupportingText size="md" opacity={0.82} className="mt-3">{s(it.challenge)}</SupportingText>
-                  </div>
-                  <div className="mt-8 flex-1">
-                    <Kicker brand={brand} size={16}>Outcome</Kicker>
-                    <SupportingText size="md" opacity={0.82} className="mt-3">{s(it.outcome)}</SupportingText>
-                  </div>
-                  <div className="mt-10">
-                    <StatFigure brand={brand} value={s(it.metric)} size="md" />
-                  </div>
-                </div>
-              );
-            })}
+          <AuroraOrb x={90} y={30} size={860} />
+          <div className="relative">
+            <SlideTitle brand={brand} title={s(c.title, "Three engagements")} />
+            <div className="mt-10 grid grid-cols-3 gap-8">
+              {arr(c.items).slice(0, 3).map((it, i) => {
+                const logoUrl = s(it.logoUrl);
+                const logoPath = s(it.logoPath);
+                return (
+                  <GlassTile key={i} radius={24} padding="px-8 py-8" className="flex flex-col">
+                    <Kicker brand={brand} color="var(--slide-accent-text)" size={16}>Client · {String(i + 1).padStart(2, "0")}</Kicker>
+                    <div className="mt-4 flex items-center gap-4">
+                      {(logoUrl || logoPath) && (
+                        <ClientLogoImg
+                          path={logoPath}
+                          url={logoUrl}
+                          alt={s(it.client) ? `${s(it.client)} logo` : "Client logo"}
+                          style={{ maxHeight: 36, maxWidth: 120, objectFit: "contain" }}
+                        />
+                      )}
+                      <div style={{ fontSize: 28, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>{s(it.client)}</div>
+                    </div>
+                    <div className="mt-8">
+                      <Kicker brand={brand} size={16}>Challenge</Kicker>
+                      <SupportingText size="md" opacity={0.82} className="mt-3">{s(it.challenge)}</SupportingText>
+                    </div>
+                    <div className="mt-8 flex-1">
+                      <Kicker brand={brand} size={16}>Outcome</Kicker>
+                      <SupportingText size="md" opacity={0.82} className="mt-3">{s(it.outcome)}</SupportingText>
+                    </div>
+                    <div className="mt-10">
+                      <StatFigure brand={brand} value={s(it.metric)} size="md" />
+                    </div>
+                  </GlassTile>
+                );
+              })}
+            </div>
           </div>
         </SlideFrame>
       );
@@ -3756,31 +3779,36 @@ function renderVariantBody({
       const after = obj(c.after);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="relative mt-16 grid gap-0" style={{ gridTemplateColumns: "1fr 1fr" }}>
-            <div className="pr-16" style={{ opacity: 0.6 }}>
-              <div className="mb-6" style={{ height: 2, background: ink.axis, width: 96 }} />
-              <Kicker brand={brand} color={ink.muted}>{s(before.label, "Before")}</Kicker>
-              <div className="mt-8">
-                <StatFigure brand={brand} value={s(before.value)} unit={s(before.unit)} size="lg" valueColor="rgba(10,15,28,0.7)" />
-              </div>
-              <div className="mt-6" style={{ fontSize: 22, lineHeight: 1.42, color: ink.muted }}>{s(before.body)}</div>
-            </div>
-            <div className="pl-16" style={{ borderLeft: `2px solid ${brand.tokens.accent}` }}>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mb-6" />
-              <Kicker brand={brand}>{s(after.label, "After")}</Kicker>
-              <div className="mt-8">
-                <StatFigure brand={brand} value={s(after.value)} unit={s(after.unit)} size="xl" />
-              </div>
-              <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.42, color: ink.body }}>{s(after.body)}</div>
-            </div>
-            <div
-              aria-hidden
-              className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
-              style={{ left: "50%" }}
-            >
-              <div className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: brand.tokens.accent, color: ink.onSurface(brand.tokens.accent), fontSize: 28, fontWeight: 600 }}>
-                <ArrowRight size={28} strokeWidth={2.4} />
+          <AuroraOrb x={92} y={32} size={880} />
+          <div className="relative">
+            <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+            <div className="relative mt-16 grid items-stretch gap-8" style={{ gridTemplateColumns: "1fr 1fr" }}>
+              <GlassTile radius={26} padding="px-12 py-12" intensity={0.65}>
+                <div style={{ opacity: 0.72 }}>
+                  <div className="mb-6" style={{ height: 2, background: ink.axis, width: 96 }} />
+                  <Kicker brand={brand} color={ink.muted}>{s(before.label, "Before")}</Kicker>
+                  <div className="mt-8">
+                    <StatFigure brand={brand} value={s(before.value)} unit={s(before.unit)} size="lg" valueColor={ink.muted} />
+                  </div>
+                  <div className="mt-6" style={{ fontSize: 22, lineHeight: 1.42, color: ink.muted }}>{s(before.body)}</div>
+                </div>
+              </GlassTile>
+              <GlassTile radius={26} padding="px-12 py-12">
+                <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mb-6" />
+                <Kicker brand={brand}>{s(after.label, "After")}</Kicker>
+                <div className="mt-8">
+                  <StatFigure brand={brand} value={s(after.value)} unit={s(after.unit)} size="xl" />
+                </div>
+                <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.42, color: ink.body }}>{s(after.body)}</div>
+              </GlassTile>
+              <div
+                aria-hidden
+                className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
+                style={{ left: "50%" }}
+              >
+                <div className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: brand.tokens.accent, color: ink.onSurface(brand.tokens.accent), fontSize: 28, fontWeight: 600, boxShadow: `0 8px 32px -6px ${brand.tokens.accent}` }}>
+                  <ArrowRight size={28} strokeWidth={2.4} />
+                </div>
               </div>
             </div>
           </div>
@@ -3880,26 +3908,29 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 3);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
-          <div className="flex h-full flex-col justify-center">
-            <Kicker brand={brand} color={"var(--slide-accent-text)"}>{s(c.kicker, "Three to remember")}</Kicker>
-            <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mt-6 mb-10" />
-            <DisplayTitle size="section" color={ink.strong} maxWidthPx={1600}>{s(c.title)}</DisplayTitle>
-            <div className="mt-12">
+          <AuroraOrb x={92} y={30} size={880} />
+          <div className="relative grid h-full grid-cols-[1fr_1fr] items-center gap-16">
+            <div>
+              <Kicker brand={brand} color={"var(--slide-accent-text)"}>{s(c.kicker, "Three to remember")}</Kicker>
+              <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mt-6 mb-10" />
+              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={880}>{s(c.title)}</DisplayTitle>
+            </div>
+            <GlassTile radius={28} padding="px-10 py-8">
               {items.map((it, i) => {
                 const n = items.length - i;
                 return (
-                  <div key={i} className="grid items-center gap-10 py-8" style={{ gridTemplateColumns: "220px 1fr", borderTop: i === 0 ? "1px solid rgba(255,255,255,0.18)" : "none", borderBottom: "1px solid rgba(255,255,255,0.18)" }}>
-                    <div className="tabular-nums font-semibold" style={{ fontSize: 180, lineHeight: 0.9, letterSpacing: "-0.03em", color: "var(--slide-accent-text)" }}>
+                  <div key={i} className="grid items-center gap-8 py-6" style={{ gridTemplateColumns: "140px 1fr", borderTop: i === 0 ? "none" : `1px solid ${ink.hairline}` }}>
+                    <div className="tabular-nums font-semibold" style={{ fontSize: 132, lineHeight: 0.9, letterSpacing: "-0.03em", color: "var(--slide-accent-text)" }}>
                       {n}
                     </div>
                     <div>
-                      <div style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(it.statement)}</div>
-                      <div className="mt-3" style={{ fontSize: 22, lineHeight: 1.42, color: ink.muted }}>{s(it.body)}</div>
+                      <div style={{ fontSize: 32, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.12 }}>{s(it.statement)}</div>
+                      <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.42, color: ink.muted }}>{s(it.body)}</div>
                     </div>
                   </div>
                 );
               })}
-            </div>
+            </GlassTile>
           </div>
         </SlideFrame>
       );
