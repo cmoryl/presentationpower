@@ -449,9 +449,21 @@ function DeckEditor() {
             </div>
           )}
 
+          {/* Locations pin editor — only for MV-LOC-* variants */}
+          {active && mv && mv.id.startsWith("MV-LOC-") && (
+            <div className="mt-6">
+              <PinEditorPanel
+                brandId={brand.id}
+                items={(active.content as Record<string, unknown>).items}
+                onChange={(items) => updateField(deck.id, active.id, "items", items)}
+              />
+            </div>
+          )}
+
           {/* Editable fields */}
           {active && mv && (
             <div className="mt-6 rounded-2xl border border-black/10 bg-white p-6">
+
               <div className="text-xs uppercase tracking-widest text-black/50">Editable fields</div>
               <div className="mt-4 space-y-4">
                 {mv.editableFields.map((path) => (
