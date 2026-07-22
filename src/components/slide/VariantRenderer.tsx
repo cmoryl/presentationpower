@@ -6142,17 +6142,19 @@ function WaterfallChart({ brand: _brand, steps, unit, height = 500 }: { brand: B
         const x = padL + i * slot + (slot - barW) / 2;
         const y = scale(b.top);
         const bh = scale(b.base) - scale(b.top);
-        // Meaningful encoding: start/end = solid ink; up = accent; down = quiet track.
-        let fill = ink.strong;
-        if (b.kind === "up") fill = "var(--slide-accent-text)";
-        else if (b.kind === "down") fill = ink.trackFill;
+        // Glass encoding: start/end = strong glass; up = accent bloom; down = muted glass.
+        let fillOpacity = 0.22;
+        let strokeOpacity = 0.55;
+        let fill: string = "var(--slide-accent-text)";
+        if (b.kind === "up") { fillOpacity = 0.42; strokeOpacity = 0.7; }
+        else if (b.kind === "down") { fillOpacity = 0.12; strokeOpacity = 0.3; fill = ink.strong; }
         const prev = bars[i - 1];
         return (
           <g key={i}>
             {prev && (
               <line x1={x - (slot - barW)} y1={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} x2={x} y2={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} stroke={ink.hairline} strokeDasharray="3 3" />
             )}
-            <rect x={x} y={y} width={barW} height={Math.max(2, bh)} fill={fill} />
+            <rect x={x} y={y} width={barW} height={Math.max(2, bh)} rx={3} fill={fill} fillOpacity={fillOpacity} stroke="var(--slide-accent-text)" strokeOpacity={strokeOpacity} strokeWidth={1} />
             <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={16} fontWeight={600} fill={b.kind === "down" ? ink.muted : ink.text} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.01em" }}>
               {b.kind === "up" ? "+" : b.kind === "down" ? "−" : ""}{Math.abs(b.value).toFixed(1)}{unit || ""}
             </text>
@@ -6160,6 +6162,7 @@ function WaterfallChart({ brand: _brand, steps, unit, height = 500 }: { brand: B
           </g>
         );
       })}
+
     </svg>
   );
 }
