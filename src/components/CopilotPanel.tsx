@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Sparkles, X, ArrowUp, Loader2 } from "lucide-react";
+import { Sparkles, X, ArrowUp, Loader2, Wand2, BookOpen } from "lucide-react";
 import { copilotTurn, type CopilotResult } from "@/lib/ai-copilot.functions";
 import { snapshotDeckVersion } from "@/lib/deck-versions.functions";
 import { useDeckStore } from "@/lib/deck-store";
-import { byId, MODULE_VARIANTS, SECTION_FRAMEWORKS } from "@/lib/taxonomy";
+import { byId, MODULE_VARIANTS, NARRATIVE_ARCHETYPES, SECTION_FRAMEWORKS } from "@/lib/taxonomy";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -16,6 +16,7 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
   const snapshot = useServerFn(snapshotDeckVersion);
 
   const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState<"assist" | "guide">("assist");
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -34,6 +35,60 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
     const history: Msg[] = [...messages, { role: "user", content: text }];
     setMessages(history);
     setBusy(true);
+
+    // Guide mode: stream a coaching response from /api/chat (no deck edits).
+    if (mode === "guide") {
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            mode: "guide",
+            messages: history.slice(-20),
+            deckContext: {
+              title: deck.title,
+              prospect: brief?.prospect,
+              industry: brief?.industry,
+              audience: brief?.audience,
+              archetype: brief ? byId(NARRATIVE_ARCHETYPES, brief.archetypeId)?.name : undefined,
+              slides: deck.slides.slice(0, 40).map((s) => ({
+                position: s.position,
+                section: byId(SECTION_FRAMEWORKS, s.sectionId)?.name ?? s.sectionId,
+                variant: s.variantId,
+                title: (s.content as Record<string, unknown>)?.title as string | undefined,
+              })),
+            },
+          }),
+        });
+        if (!res.ok || !res.body) {
+          const t = await res.text().catch(() => "");
+          setMessages((m) => [...m, { role: "assistant", content: `⚠️ ${res.status}: ${t.slice(0, 200)}` }]);
+        } else {
+          setMessages((m) => [...m, { role: "assistant", content: "" }]);
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            setMessages((m) => {
+              const copy = [...m];
+              copy[copy.length - 1] = {
+                role: "assistant",
+                content: copy[copy.length - 1].content + chunk,
+              };
+              return copy;
+            });
+          }
+        }
+      } catch (e) {
+        setMessages((m) => [...m, { role: "assistant", content: `⚠️ ${(e as Error).message}` }]);
+      } finally {
+        setBusy(false);
+      }
+      return;
+    }
+
     try {
       const strategy = deck.context?.strategy
         ? {
@@ -108,11 +163,18 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
     }
   }
 
-  const suggestions = [
-    "Make slide 1 more executive",
-    "Tighten every headline",
-    "Swap the icon on slide 2 for something about speed",
-  ];
+  const suggestions = mode === "guide"
+    ? [
+        "How do I import my existing PowerPoint deck?",
+        "Walk me through fixing the opening slide for a CFO audience",
+        "How do I export this back to .pptx without losing formatting?",
+        "What should I fix in PowerPoint after export?",
+      ]
+    : [
+        "Make slide 1 more executive",
+        "Tighten every headline",
+        "Swap the icon on slide 2 for something about speed",
+      ];
 
   if (!open) {
     return (
@@ -149,12 +211,40 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
         </button>
       </div>
 
+      {/* Mode toggle */}
+      <div className="flex gap-1 border-b border-white/10 bg-white/[0.02] px-3 py-2">
+        <button
+          onClick={() => setMode("assist")}
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+            mode === "assist"
+              ? "bg-[#003FC7] text-white"
+              : "text-white/60 hover:bg-white/5 hover:text-white"
+          }`}
+        >
+          <Wand2 className="h-3.5 w-3.5" />
+          Edit for me
+        </button>
+        <button
+          onClick={() => setMode("guide")}
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+            mode === "guide"
+              ? "bg-[#003FC7] text-white"
+              : "text-white/60 hover:bg-white/5 hover:text-white"
+          }`}
+        >
+          <BookOpen className="h-3.5 w-3.5" />
+          Guide me
+        </button>
+      </div>
+
       {/* Transcript */}
       <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-5 py-5 text-sm">
         {messages.length === 0 && (
           <div className="space-y-4">
             <div className="text-white/70">
-              I can edit this deck directly. Tell me what to change and I'll make the smallest edit that gets it right.
+              {mode === "guide"
+                ? "I'll walk you through editing this deck step-by-step — between this app and PowerPoint. Ask me anything about the workflow."
+                : "I can edit this deck directly. Tell me what to change and I'll make the smallest edit that gets it right."}
             </div>
             <div className="space-y-2">
               {suggestions.map((s) => (
@@ -208,7 +298,7 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
                 send();
               }
             }}
-            placeholder="Edit any slide — e.g. tighten headline on slide 3"
+            placeholder={mode === "guide" ? "Ask how to do anything — I'll walk you through it" : "Edit any slide — e.g. tighten headline on slide 3"}
             rows={1}
             disabled={busy}
             className="max-h-32 flex-1 resize-none bg-transparent text-sm text-white placeholder:text-white/30 focus:outline-none"
