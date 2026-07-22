@@ -832,6 +832,16 @@ function ResolvedShapeNode({ shape, salt, theme }: { shape: ResolvedShape; salt:
     );
   }
 
+  if (shape.kind === "chart" && shape.chart) {
+    return (
+      <div style={{ ...shape.base, overflow: "hidden" }}>
+        <ChartRender chart={shape.chart} />
+      </div>
+    );
+  }
+
+
+
   return (
     <div style={{ ...shape.base, background: "#F5F5F5", border: "1px dashed #C4C4C4", display: "flex", alignItems: "center", justifyContent: "center", color: "#666", fontSize: "9pt" }}>
       {shape.placeholderKind ?? shape.kind}
