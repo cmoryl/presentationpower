@@ -5493,15 +5493,19 @@ function SummaryStatCard({ brand, label, value, unit, series }: { brand: BrandMo
 
 function Donut({ brand: _brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
   const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
   const p = Math.max(0, Math.min(100, percent));
-  const stroke = 8; // hairline ring, editorial
+  const stroke = 10;
   const r = (size - stroke) / 2;
   const circ = 2 * Math.PI * r;
   const dash = (p / 100) * circ;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
+      <ChartAccentDefs id={id} />
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={ink.trackFill} strokeWidth={stroke} />
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke} strokeLinecap="butt" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+      {/* soft accent glow ring */}
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke + 6} opacity={0.28} filter={`url(#${id}-glow)`} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
       <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central" fontSize={size * 0.32} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}>
         {Math.round(p)}
       </text>
@@ -5512,8 +5516,9 @@ function Donut({ brand: _brand, percent, size = 260 }: { brand: BrandMode; perce
 
 function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
   const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
   const p = Math.max(0, Math.min(100, percent));
-  const stroke = 6; // hairline arc
+  const stroke = 8;
   const r = (size - stroke) / 2;
   const cy = size / 2 + r / 2;
   const arcC = Math.PI * r;
@@ -5523,8 +5528,10 @@ function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; p
   const cx = size / 2;
   return (
     <svg width={size} height={h} viewBox={`0 0 ${size} ${h}`} aria-hidden>
-      <path d={arc} fill="none" stroke={ink.trackFill} strokeWidth={stroke} strokeLinecap="butt" />
-      <path d={arc} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke} strokeLinecap="butt" strokeDasharray={`${dash} ${arcC}`} />
+      <ChartAccentDefs id={id} />
+      <path d={arc} fill="none" stroke={ink.trackFill} strokeWidth={stroke} strokeLinecap="round" />
+      <path d={arc} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke + 5} strokeLinecap="round" opacity={0.28} filter={`url(#${id}-glow)`} strokeDasharray={`${dash} ${arcC}`} />
+      <path d={arc} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${arcC}`} />
       <text x={cx} y={cy - 24} textAnchor="middle" fontSize={size * 0.34} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}>
         {Math.round(p)}
       </text>
@@ -5532,6 +5539,7 @@ function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; p
     </svg>
   );
 }
+
 
 
 
