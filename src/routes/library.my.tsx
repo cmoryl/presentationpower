@@ -10,7 +10,7 @@ import { LazyMount } from "@/components/LazyMount";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { listMyModules, deleteSavedModule } from "@/lib/saved-modules.functions";
-import { byId, MODULE_VARIANTS } from "@/lib/taxonomy";
+import { byId, MODULE_VARIANTS, BRAND_MODES, type ModuleVariant } from "@/lib/taxonomy";
 
 export const Route = createFileRoute("/library/my")({
   head: () => ({
