@@ -285,9 +285,9 @@ export type ParsedDeck = {
 };
 
 
-const MAX_PER_IMAGE_BYTES = 900_000;
-const MAX_TOTAL_IMAGE_BYTES = 10_000_000;
-const MAX_IMAGES_PER_SLIDE = 6;
+const MAX_PER_IMAGE_BYTES = 15_000_000;
+const MAX_TOTAL_IMAGE_BYTES = 80_000_000;
+const MAX_IMAGES_PER_SLIDE = 60;
 
 
 // Zip-bomb / resource-exhaustion caps for untrusted .pptx uploads.
@@ -378,7 +378,7 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     const relTargetsByType = extractRelTargetsByType(relsDoc);
 
     // ── Resolve slideLayout + slideMaster parent chain ──────────────────
-    const parents = await resolveParents(zip, parser, slidePath, relsDoc, parentCache);
+    const parents = await resolveParents(zip, parser, slidePath, relsDoc, parentCache, theme);
 
 
     // ── Embedded images ─────────────────────────────────────────────────
@@ -417,6 +417,26 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         totalImageBytes += dataUrl.length;
       }
     }
+
+    // Slide layouts and masters carry their own relationship files, so their
+    // rIds are not visible in the slide's image rels. Promote those inherited
+    // images into the slide image payload with synthetic parent-scoped ids so
+    // downstream storage/path rewriting can hydrate master backgrounds, logos,
+    // footer art, and layout-level image fills automatically.
+    const appendParentImages = (parent?: ParentSlideData) => {
+      if (!parent?.images?.length) return;
+      for (const img of parent.images) {
+        if (imageEmbedIds.includes(img.embedId)) continue;
+        if (images.length >= MAX_IMAGES_PER_SLIDE) { imagesTruncated = true; break; }
+        if (img.dataUrl.length > MAX_PER_IMAGE_BYTES) { imagesTruncated = true; continue; }
+        if (totalImageBytes + img.dataUrl.length > MAX_TOTAL_IMAGE_BYTES) { imagesTruncated = true; continue; }
+        images.push(img.dataUrl);
+        imageEmbedIds.push(img.embedId);
+        totalImageBytes += img.dataUrl.length;
+      }
+    };
+    appendParentImages(parents.master);
+    appendParentImages(parents.layout);
 
     // ── Charts ──────────────────────────────────────────────────────────
     const charts: ParsedChart[] = [];
@@ -670,6 +690,20 @@ function extractEmbedIds(doc: unknown): string[] {
       if (typeof id === "string") ids.push(id);
     }
   });
+  return ids;
+}
+
+function extractEmbedIdsFromOrderedNode(node: PNode | undefined): string[] {
+  const ids: string[] = [];
+  const visit = (n: PNode | undefined) => {
+    if (!n) return;
+    if (pTag(n) === "a:blip") {
+      const id = pAttrs(n)["@_r:embed"] ?? pAttrs(n)["@_embed"];
+      if (id) ids.push(id);
+    }
+    for (const child of pChildren(n)) visit(child);
+  };
+  visit(node);
   return ids;
 }
 
@@ -1524,7 +1558,11 @@ function readDuotone(blipFill: PNode | undefined): [string, string] | undefined 
   return undefined;
 }
 
-function readFill(spPr: PNode | undefined, imageEmbedIds: string[]): LayoutFill | undefined {
+function readFill(
+  spPr: PNode | undefined,
+  imageEmbedIds: string[],
+  embedIdMap?: Record<string, string>,
+): LayoutFill | undefined {
   if (!spPr) return undefined;
   const kids = pChildren(spPr);
   for (const k of kids) {
@@ -1563,7 +1601,8 @@ function readFill(spPr: PNode | undefined, imageEmbedIds: string[]): LayoutFill 
     }
     if (t === "a:blipFill") {
       const blip = pFind(k, "a:blip");
-      const embed = blip ? pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"] : undefined;
+      const rawEmbed = blip ? pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"] : undefined;
+      const embed = rawEmbed ? (embedIdMap?.[rawEmbed] ?? rawEmbed) : undefined;
       if (embed) {
         void imageEmbedIds;
         const srcRect = readSrcRect(k);
@@ -1952,6 +1991,7 @@ function walkSpTree(
   out: LayoutShape[],
   imageEmbedIds: string[],
   parents?: ResolvedParents,
+  embedIdMap?: Record<string, string>,
 ) {
   for (const node of nodes) {
     const t = pTag(node);
@@ -1974,7 +2014,7 @@ function walkSpTree(
 
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       let prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
-      let fill = readFill(spPr, imageEmbedIds);
+      let fill = readFill(spPr, imageEmbedIds, embedIdMap);
       let line = readLine(spPr);
       const effect = readEffects(spPr);
       const customPath = readCustomPath(spPr);
@@ -1998,7 +2038,8 @@ function walkSpTree(
       if (group) frame = transformFrame(frame, group);
       const blipFill = pFind(node, "p:blipFill");
       const blip = blipFill ? pFind(blipFill, "a:blip") : undefined;
-      const embedId = blip ? (pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"]) : undefined;
+      const rawEmbedId = blip ? (pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"]) : undefined;
+      const embedId = rawEmbedId ? (embedIdMap?.[rawEmbedId] ?? rawEmbedId) : undefined;
       const srcRect = readSrcRect(blipFill);
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
@@ -2029,7 +2070,7 @@ function walkSpTree(
       out.push({ kind: "line", z: zRef.z++, frame, line: readLine(spPr), prst, effect });
     } else if (t === "p:grpSp") {
       const grpSpPr = pFind(node, "p:grpSpPr");
-      walkSpTree(pChildren(node), zRef, grpSpPr ?? group, out, imageEmbedIds, parents);
+      walkSpTree(pChildren(node), zRef, grpSpPr ?? group, out, imageEmbedIds, parents, embedIdMap);
     } else if (t === "p:graphicFrame") {
       const xfrm = pFind(node, "p:xfrm");
       let frame: LayoutFrame | undefined;
@@ -2190,6 +2231,10 @@ type RunDefaults = { sizePt?: number; color?: string; font?: string; bold?: bool
 type ParentSlideData = {
   background?: LayoutFill;
   placeholders: PhProto[];
+  /** Parent-scoped image payloads (slideLayout/slideMaster relationships). */
+  images?: Array<{ embedId: string; dataUrl: string }>;
+  /** Map local parent rIds → synthetic slide-level embedIds. */
+  embedIdMap?: Record<string, string>;
   /** Non-placeholder decorative shapes (logos, page numbers, dividers, footer
    *  bars) captured from the layout / master spTree. Placeholder shapes are
    *  handled via PhProto inheritance instead. Image shapes are dropped because
@@ -2211,6 +2256,7 @@ async function resolveParents(
   slidePath: string,
   relsDoc: unknown,
   cache: Map<string, ParentSlideData>,
+  theme: ParsedTheme,
 ): Promise<ResolvedParents> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const rels = (relsDoc as any)?.Relationships?.Relationship;
@@ -2218,7 +2264,7 @@ async function resolveParents(
   const layoutRel = arr.find((r) => /\/slideLayout$/i.test(String(r?.["@_Type"] ?? "")));
   if (!layoutRel?.["@_Target"]) return {};
   const layoutPath = resolveRelPath(slidePath, String(layoutRel["@_Target"]));
-  const layoutData = await loadParent(zip, parser, layoutPath, cache);
+  const layoutData = await loadParent(zip, parser, layoutPath, cache, theme);
   if (!layoutData) return {};
 
   // Layout rels → master
@@ -2237,7 +2283,7 @@ async function resolveParents(
     const masterTarget = masterRel ? (masterRel as Record<string, unknown>)["@_Target"] : undefined;
     if (masterTarget) {
       const masterPath = resolveRelPath(layoutPath, String(masterTarget));
-      masterData = await loadParent(zip, parser, masterPath, cache);
+      masterData = await loadParent(zip, parser, masterPath, cache, theme);
     }
   }
   return { layout: layoutData, master: masterData };
@@ -2248,6 +2294,7 @@ async function loadParent(
   _parser: XMLParser,
   path: string,
   cache: Map<string, ParentSlideData>,
+  theme: ParsedTheme,
 ): Promise<ParentSlideData | undefined> {
   const cached = cache.get(path);
   if (cached) return cached;
@@ -2271,13 +2318,59 @@ async function loadParent(
   const cSld = rootNode ? pFind(rootNode, "p:cSld") : undefined;
   const spTree = cSld ? pFind(cSld, "p:spTree") : undefined;
 
+  const relsPath = path.replace(/([^/]+)$/, "_rels/$1.rels");
+  let parentImageEmbedIds: string[] = [];
+  const parentEmbedIdMap: Record<string, string> = {};
+  const parentImages: Array<{ embedId: string; dataUrl: string }> = [];
+  if (zip.files[relsPath]) {
+    try {
+      const relXml = await zip.files[relsPath].async("string");
+      const relDoc = _parser.parse(relXml);
+      const relBuckets = extractRelTargetsByType(relDoc);
+      parentImageEmbedIds = extractEmbedIdsFromOrderedNode(rootNode);
+      for (const id of parentImageEmbedIds) {
+        const target = relBuckets.image[id];
+        if (!target) continue;
+        const resolved = resolveRelPath(path, target);
+        const mediaFile = zip.files[resolved];
+        const mime = guessMime(resolved);
+        if (!mediaFile || !mime) continue;
+        const bytes = await mediaFile.async("uint8array");
+        const dataUrl = `data:${mime};base64,${uint8ToBase64(bytes)}`;
+        const syntheticId = `parent:${path}:${id}`;
+        parentEmbedIdMap[id] = syntheticId;
+        parentImages.push({ embedId: syntheticId, dataUrl });
+      }
+    } catch {
+      // Parent image extraction is best-effort; missing/bad rels should not
+      // block text/chart extraction from the slide itself.
+    }
+  }
+
+  const readParentBg = (node: PNode | undefined): LayoutFill | undefined => {
+    if (!node) return undefined;
+    const bg = pFind(node, "p:bg");
+    if (!bg) return undefined;
+    const bgPr = pFind(bg, "p:bgPr");
+    if (bgPr) return readFill(bgPr, parentImageEmbedIds, parentEmbedIdMap);
+    const bgRef = pFind(bg, "p:bgRef");
+    if (bgRef) {
+      const idx = Number(pAttrs(bgRef)["@_idx"] ?? 0);
+      const list = idx >= 1001 ? theme.bgFillStyleLst : theme.fillStyleLst;
+      if (list && list.length) {
+        const slot = idx >= 1001 ? idx - 1001 : Math.max(0, idx - 1);
+        const picked = list[Math.min(slot, list.length - 1)];
+        if (picked) return picked;
+      }
+      const col = readColorFromNode(bgRef);
+      if (col) return { kind: "solid", color: col };
+    }
+    return undefined;
+  };
+
   // Background
   let background: LayoutFill | undefined;
-  if (cSld) {
-    const bg = pFind(cSld, "p:bg");
-    const bgPr = bg ? pFind(bg, "p:bgPr") : undefined;
-    if (bgPr) background = readFill(bgPr, []);
-  }
+  if (cSld) background = readParentBg(cSld);
 
   const placeholders: PhProto[] = [];
   if (spTree) {
@@ -2291,7 +2384,7 @@ async function loadParent(
       const phIdx = String(pAttrs(ph)["@_idx"] ?? "");
       const spPr = pFind(node, "p:spPr");
       const frame = readFrame(spPr);
-      const fill = readFill(spPr, []);
+      const fill = readFill(spPr, parentImageEmbedIds, parentEmbedIdMap);
       const line = readLine(spPr);
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       const prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
@@ -2323,30 +2416,35 @@ async function loadParent(
   }
 
   // Decorative (non-placeholder) shapes from the layout/master. These carry
-  // brand furniture like logos, footer bars, page numbers and colored panels
-  // that inherit onto every slide. Walk the full spTree, then filter out ph
-  // shapes (handled via PhProto) and image shapes (embed rIds are parent-scoped
-  // and won't match the slide's imageEmbedIds map).
+  // brand furniture like logos, footer bars, page numbers, colored panels and
+  // master/layout image art. Parent rIds are mapped to synthetic slide-level
+  // embedIds above so image shapes and image fills can be stored/rendered.
   const decor: LayoutShape[] = [];
   if (spTree) {
     const zRef = { z: 0 };
     const collected: LayoutShape[] = [];
-    walkSpTree(pChildren(spTree), zRef, undefined, collected, [], undefined);
+    walkSpTree(pChildren(spTree), zRef, undefined, collected, parentImageEmbedIds, undefined, parentEmbedIdMap);
     // Re-walk raw nodes to know which are placeholders — walkSpTree doesn't
     // expose that. Cheaper: build a set of ph frames from `placeholders` and
-    // drop shapes whose frame matches, plus any image shapes.
+    // drop shapes whose frame matches.
     const phFrames = new Set(placeholders
       .filter((p) => p.frame)
       .map((p) => `${p.frame!.x},${p.frame!.y},${p.frame!.w},${p.frame!.h}`));
     for (const sh of collected) {
-      if (sh.kind === "image") continue;
       const key = `${sh.frame.x},${sh.frame.y},${sh.frame.w},${sh.frame.h}`;
       if (phFrames.has(key)) continue;
       decor.push(sh);
     }
   }
 
-  const data: ParentSlideData = { background, placeholders, decor, txStyles };
+  const data: ParentSlideData = {
+    background,
+    placeholders,
+    decor,
+    txStyles,
+    images: parentImages,
+    embedIdMap: parentEmbedIdMap,
+  };
   cache.set(path, data);
   return data;
 }
