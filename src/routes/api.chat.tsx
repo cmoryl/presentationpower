@@ -12,6 +12,7 @@ const Message = z.object({
 
 const Body = z.object({
   messages: z.array(Message).min(1).max(30),
+  mode: z.enum(["assist", "guide"]).optional().default("assist"),
   deckContext: z.object({
     title: z.string(),
     prospect: z.string().optional(),
