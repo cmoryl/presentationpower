@@ -825,9 +825,36 @@ function guessMime(path: string): string | null {
     case "gif": return "image/gif";
     case "webp": return "image/webp";
     case "svg": return "image/svg+xml";
+    case "bmp": return "image/bmp";
+    case "tif":
+    case "tiff": return "image/tiff";
+    case "emf": return "image/x-emf";
+    case "wmf": return "image/x-wmf";
+    case "mp4": return "video/mp4";
+    case "m4v": return "video/mp4";
+    case "mov": return "video/quicktime";
+    case "webm": return "video/webm";
+    case "avi": return "video/x-msvideo";
+    case "wmv": return "video/x-ms-wmv";
+    case "mp3": return "audio/mpeg";
+    case "m4a": return "audio/mp4";
+    case "wav": return "audio/wav";
+    case "ogg": return "audio/ogg";
+    case "aac": return "audio/aac";
+    case "wma": return "audio/x-ms-wma";
+    case "ttf": return "font/ttf";
+    case "otf": return "font/otf";
+    case "woff": return "font/woff";
+    case "woff2": return "font/woff2";
+    case "fntdata": return "application/vnd.ms-fontobject";
+    case "xlsx": return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    case "xls": return "application/vnd.ms-excel";
+    case "docx": return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    case "bin": return "application/octet-stream";
     default: return null;
   }
 }
+
 
 function uint8ToBase64(u8: Uint8Array): string {
   return Buffer.from(u8).toString("base64");
