@@ -225,6 +225,17 @@ function rewriteLayoutImageRefs(slide: ParsedDeck["slides"][number], imageRefs: 
     }
     return fill;
   };
+  const rewriteTableCells = (cellGrid: unknown): unknown => {
+    if (!Array.isArray(cellGrid)) return cellGrid;
+    return cellGrid.map((row) => Array.isArray(row)
+      ? row.map((cell) => {
+          if (!cell || typeof cell !== "object") return cell;
+          const c = cell as { fill?: unknown };
+          const rewritten = rewriteFill(c.fill);
+          return rewritten !== c.fill ? { ...c, fill: rewritten } : cell;
+        })
+      : row);
+  };
   return slide.layout
     ? {
         ...slide.layout,
@@ -238,6 +249,10 @@ function rewriteLayoutImageRefs(slide: ParsedDeck["slides"][number], imageRefs: 
           if ("fill" in next && next.fill) {
             const rewritten = rewriteFill(next.fill);
             if (rewritten !== next.fill) next = { ...next, fill: rewritten as typeof next.fill };
+          }
+          if (next.kind === "table" && next.cellGrid) {
+            const rewrittenCells = rewriteTableCells(next.cellGrid);
+            if (rewrittenCells !== next.cellGrid) next = { ...next, cellGrid: rewrittenCells as typeof next.cellGrid };
           }
           return next;
         }),
@@ -553,6 +568,13 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
       for (const sh of (sl.layout?.shapes ?? []) as any[]) {
         if (sh?.kind === "image" && typeof sh.path === "string") allPaths.add(sh.path);
         if (sh?.fill?.kind === "image" && typeof sh.fill.path === "string") allPaths.add(sh.fill.path);
+        if (sh?.kind === "table") {
+          for (const row of sh.cellGrid ?? []) {
+            for (const cell of row ?? []) {
+              if (cell?.fill?.kind === "image" && typeof cell.fill.path === "string") allPaths.add(cell.fill.path);
+            }
+          }
+        }
       }
     }
     const pathToUrl = new Map<string, string>();
@@ -574,6 +596,16 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
         if (sh?.fill?.kind === "image" && sh.fill.path) {
           const url = pathToUrl.get(sh.fill.path);
           if (url) next = { ...next, fill: { ...sh.fill, url } };
+        }
+        if (sh?.kind === "table" && sh.cellGrid) {
+          const cellGrid = sh.cellGrid.map((row: any[]) => row.map((cell: any) => {
+            if (cell?.fill?.kind === "image" && cell.fill.path) {
+              const url = pathToUrl.get(cell.fill.path);
+              if (url) return { ...cell, fill: { ...cell.fill, url } };
+            }
+            return cell;
+          }));
+          next = { ...next, cellGrid };
         }
         return next;
       });
