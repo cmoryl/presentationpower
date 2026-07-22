@@ -212,6 +212,10 @@ const s = (v: unknown, fb = ""): string => (typeof v === "string" ? v : typeof v
 const arr = (v: unknown): Item[] => (Array.isArray(v) ? (v as Item[]) : []);
 const obj = (v: unknown): Record<string, unknown> => (v && typeof v === "object" ? (v as Record<string, unknown>) : {});
 const strs = (v: unknown): string[] => (Array.isArray(v) ? (v as unknown[]).map((x) => s(x)) : []);
+function lastWord(t: string): string {
+  const words = String(t || "").trim().split(/\s+/).filter(Boolean);
+  return words[words.length - 1] ?? "";
+}
 
 // In dark mode, swap the token surfaces + text so any `brand.tokens.*` usage in
 // module bodies renders correctly on a dark slide. Primary becomes a lighter
