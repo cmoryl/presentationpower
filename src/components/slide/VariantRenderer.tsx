@@ -3909,7 +3909,7 @@ function renderVariantBody({
               <SummaryStatCard brand={brand} label={s(primary.label)} value={s(primary.value)} unit={s(primary.unit)} series={toNums(primary.series)} />
               <SummaryStatCard brand={brand} label={s(secondary.label)} value={s(secondary.value)} unit={s(secondary.unit)} series={toNums(secondary.series)} />
             </div>
-            <div className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+            <div>
               <Kicker brand={brand}>Balance</Kicker>
               <div className="mt-8">
                 <StatFigure brand={brand} value={s(balance.value)} unit={s(balance.unit)} label={s(balance.label)} size="xl" />
