@@ -92,7 +92,7 @@ function UsersView() {
                             key={r}
                             type="button"
                             onClick={() => roleM.mutate({ userId: u.id, role: r, grant: !has })}
-                            className={`rounded-full border px-2.5 py-1 text-xs transition ${has ? "border-[#03002C] bg-[#03002C] text-white" : "border-black/20 bg-white text-black/60 hover:bg-black/5"}`}
+                            className={`rounded-full border px-2.5 py-1 text-xs transition ${has ? "border-[#05041A] bg-[#05041A] text-white" : "border-black/20 bg-white text-black/60 hover:bg-black/5"}`}
                           >
                             {r}
                           </button>

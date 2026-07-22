@@ -524,7 +524,7 @@ export function AuroraLayer({
         viewBox="0 0 1280 720"
         preserveAspectRatio="xMidYMid slice"
         className="absolute inset-0 h-full w-full"
-        style={{ opacity: intensity * 0.75 }}
+        style={{ opacity: intensity * (mode === "dark" ? 0.45 : 0.75) }}
       >
         <defs>
           {orbs.map((o, i) => (
@@ -533,15 +533,15 @@ export function AuroraLayer({
               id={`tp-aurora-${seed}-${i}`}
               cx="50%"
               cy="50%"
-              r={mode === "dark" ? "95%" : "110%"}
+              r={mode === "dark" ? "115%" : "125%"}
             >
               <stop offset="0%" stopColor={o.color} stopOpacity={o.alpha} />
-              <stop offset={mode === "dark" ? "62%" : "52%"} stopColor={o.color} stopOpacity={mode === "dark" ? o.alpha * 0.45 : o.alpha * 0.32} />
+              <stop offset={mode === "dark" ? "72%" : "48%"} stopColor={o.color} stopOpacity={mode === "dark" ? o.alpha * 0.35 : o.alpha * 0.32} />
               <stop offset="100%" stopColor={o.color} stopOpacity="0" />
             </radialGradient>
           ))}
           <filter id={`tp-aurora-${seed}-blur`} x="-40%" y="-40%" width="180%" height="180%">
-            <feGaussianBlur stdDeviation={mode === "dark" ? 90 : 110} />
+            <feGaussianBlur stdDeviation={mode === "dark" ? 105 : 115} />
           </filter>
         </defs>
         <g filter={`url(#tp-aurora-${seed}-blur)`}>
@@ -823,9 +823,9 @@ export function AuroraOrb({
   const ctxAccent = useSlideAccent();
   const a = accent ?? ctxAccent ?? "#4F8CFF";
   const sibling = shiftHue(a, 34, 0.06);
-  const alpha = 0.75 * intensity;
   const isLight = mode === "light";
-  const scaled = isLight ? size * 1.45 : size * 1.18;
+  const alpha = (isLight ? 0.75 : 0.45) * intensity;
+  const scaled = isLight ? size * 1.55 : size * 1.38;
   return (
     <div
       aria-hidden
@@ -839,9 +839,9 @@ export function AuroraOrb({
         borderRadius: "50%",
         background: isLight
           ? `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.75)} 22%, ${hexA(a, alpha * 0.25)} 58%, ${hexA(a, 0)} 100%)`
-          : `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.9)} 28%, ${hexA(a, alpha * 0.2)} 72%, ${hexA(a, 0)} 96%)`,
-        filter: isLight ? "blur(80px)" : "blur(56px)",
-        mixBlendMode: mode === "dark" ? "screen" : "multiply",
+          : `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.6)} 24%, ${hexA(a, alpha * 0.15)} 62%, ${hexA(a, 0)} 100%)`,
+        filter: isLight ? "blur(100px)" : "blur(80px)",
+        mixBlendMode: isLight ? "multiply" : "normal",
       }}
     />
   );

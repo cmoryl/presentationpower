@@ -87,7 +87,7 @@ function BrandGuidesIndex() {
               onClick={() => setBucket(b.id)}
               className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-medium transition ${
                 active
-                  ? "border-transparent bg-[#03002C] text-white dark:bg-white dark:text-[#03002C]"
+                  ? "border-transparent bg-[#05041A] text-white dark:bg-white dark:text-[#03002C]"
                   : "border-black/15 text-black/70 hover:border-black/40 dark:border-white/15 dark:text-white/70 dark:hover:border-white/40"
               }`}
             >

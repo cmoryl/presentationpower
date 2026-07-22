@@ -76,7 +76,7 @@ function IconStudio() {
             onClick={() => setTab(t.id)}
             className={`flex-1 rounded-xl px-4 py-3 text-left transition ${
               tab === t.id
-                ? "bg-[#03002C] text-white shadow-sm"
+                ? "bg-[#05041A] text-white shadow-sm"
                 : "text-black/70 hover:bg-black/[0.04] dark:text-white/70 dark:hover:bg-white/5"
             }`}
           >

@@ -132,7 +132,7 @@ function AdminKnowledgeBrowser() {
               type="button"
               onClick={() => setSlug(g.slug)}
               className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-xs transition ${
-                g.slug === slug ? "bg-[#03002C] text-white" : "text-black/80 hover:bg-black/[0.04]"
+                g.slug === slug ? "bg-[#05041A] text-white" : "text-black/80 hover:bg-black/[0.04]"
               }`}
             >
               <span className="min-w-0 flex-1 truncate">{g.title}</span>
@@ -168,7 +168,7 @@ function AdminKnowledgeBrowser() {
               type="button"
               onClick={() => setTab(t.id)}
               className={`rounded-xl px-3 py-1.5 text-xs transition ${
-                tab === t.id ? "bg-[#03002C] text-white" : "text-black/70 hover:bg-black/5"
+                tab === t.id ? "bg-[#05041A] text-white" : "text-black/70 hover:bg-black/5"
               }`}
             >
               {t.label}
@@ -1141,7 +1141,7 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
                 key={k}
                 type="button"
                 onClick={() => setKind(k)}
-                className={`px-3 py-1.5 ${kind === k ? "bg-[#03002C] text-white" : "text-black/70 hover:bg-black/5"}`}
+                className={`px-3 py-1.5 ${kind === k ? "bg-[#05041A] text-white" : "text-black/70 hover:bg-black/5"}`}
               >
                 {k}
               </button>

@@ -149,7 +149,7 @@ export function AssetInspectorPanel({
               onClick={() => setTab(t.key)}
               className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] transition ${
                 active
-                  ? "bg-[#03002C] text-white"
+                  ? "bg-[#05041A] text-white"
                   : n > 0
                     ? "border border-black/10 bg-white text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
                     : "text-black/30"

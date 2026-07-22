@@ -139,7 +139,7 @@ function EntryView() {
                   key={v}
                   type="button"
                   onClick={() => setVisibility(v)}
-                  className={`rounded-full border px-4 py-1.5 text-sm ${visibility === v ? "border-[#0B2A4A] bg-[#0B2A4A] text-white" : "border-black/15 bg-white text-black/70"}`}
+                  className={`rounded-full border px-4 py-1.5 text-sm ${visibility === v ? "border-[#05041A] bg-[#05041A] text-white" : "border-black/15 bg-white text-black/70"}`}
                 >
                   {v}
                 </button>

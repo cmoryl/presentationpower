@@ -198,7 +198,7 @@ function ImageryPage() {
                   key={k}
                   onClick={() => setKind(k)}
                   className={`rounded-full px-3 py-1 capitalize transition ${
-                    kind === k ? "bg-[#03002C] text-white" : "text-black/60"
+                    kind === k ? "bg-[#05041A] text-white" : "text-black/60"
                   }`}
                 >
                   {k}

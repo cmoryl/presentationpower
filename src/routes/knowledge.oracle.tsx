@@ -126,7 +126,7 @@ function OracleView() {
             onClick={() => setTab(id)}
             className={`rounded-full border px-4 py-2 text-sm transition ${
               tab === id
-                ? "border-[#0B2A4A] bg-[#0B2A4A] text-white"
+                ? "border-[#05041A] bg-[#05041A] text-white"
                 : "border-black/15 bg-white text-black/70 hover:border-black/30"
             }`}
           >
