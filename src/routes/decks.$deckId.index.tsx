@@ -790,6 +790,14 @@ function DeckEditor() {
       )}
 
       <BrandReviewPanel deckId={deckId} onNavigateToSlide={(i) => setActiveIdx(Math.max(0, Math.min(deck.slides.length - 1, i)))} />
+      <ArtDirectorPanel
+        deckId={deckId}
+        onNavigateToSlide={(i) => setActiveIdx(Math.max(0, Math.min(deck.slides.length - 1, i)))}
+        onSwapVariant={(i, vid) => {
+          const target = deck.slides[i];
+          if (target) swapVariant(deck.id, target.id, vid);
+        }}
+      />
 
       {commentsOpen && (
         <>
