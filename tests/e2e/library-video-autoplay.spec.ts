@@ -83,12 +83,10 @@ test.describe("Module preview video-demo autoplay matrix", () => {
     let snapshot: Awaited<ReturnType<typeof readVideoState>> = [];
     while (Date.now() < deadline) {
       snapshot = await readVideoState(page);
-      const playingLight = snapshot.some(
-        (v) => !v.dark && !v.paused && v.currentTime > 0.05 && v.readyState >= 2,
-      );
-      const playingDark = snapshot.some(
-        (v) => v.dark && !v.paused && v.currentTime > 0.05 && v.readyState >= 2,
-      );
+      const isPlaying = (v: (typeof snapshot)[number]) =>
+        !v.paused && v.currentTime > 0.05 && v.readyState >= 2;
+      const playingLight = snapshot.some((v) => v.mode === "light" && isPlaying(v));
+      const playingDark = snapshot.some((v) => v.mode === "dark" && isPlaying(v));
       if (playingLight && playingDark) break;
       await page.waitForTimeout(500);
     }
@@ -103,11 +101,19 @@ test.describe("Module preview video-demo autoplay matrix", () => {
       0,
     );
 
+    const unknownMode = snapshot.filter((v) => v.mode === "unknown");
+    expect(
+      unknownMode.length,
+      `videos rendered outside a [data-preview-mode] container: ${unknownMode
+        .map((v) => v.src)
+        .join(", ")}`,
+    ).toBe(0);
+
     const playing = snapshot.filter(
       (v) => !v.paused && v.currentTime > 0.05 && v.readyState >= 2,
     );
-    const playingLight = playing.filter((v) => !v.dark);
-    const playingDark = playing.filter((v) => v.dark);
+    const playingLight = playing.filter((v) => v.mode === "light");
+    const playingDark = playing.filter((v) => v.mode === "dark");
 
     expect(
       playingLight.length,
@@ -117,6 +123,7 @@ test.describe("Module preview video-demo autoplay matrix", () => {
       playingDark.length,
       `no DARK-mode video demo autoplayed (of ${totalVideos} videos)`,
     ).toBeGreaterThan(0);
+
 
     expect(
       consoleErrors,
