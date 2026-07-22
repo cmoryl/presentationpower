@@ -58,7 +58,7 @@ function extractDarkVisuals(svg: string) {
 // reviewed alongside the snapshot diff below.
 const DARK_BASELINE = {
   blurStd: 38,
-  layerOpacity: 0.72,
+  layerOpacity: 0.7,
   orbR: "55%",
   midStop: "22%",
   outerStop: "50%",
