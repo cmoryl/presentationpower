@@ -92,11 +92,33 @@ function slug(input: string): string {
   return input.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `metric-${Date.now()}`;
 }
 
-export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId, onChange }: Props) {
+export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId, regionFilter, onChange }: Props) {
   const seeded = React.useMemo(() => getDivisionLocationSet(brandId), [brandId]);
   const pins = React.useMemo(() => coercePins(items, seeded.pins), [items, seeded.pins]);
   const metricList = React.useMemo(() => coerceMetrics(metrics), [metrics]);
   const activeId = typeof activeMetricId === "string" && activeMetricId ? activeMetricId : metricList[0]?.id ?? "";
+
+  const activeRegions = React.useMemo<RegionKey[]>(() => {
+    if (!Array.isArray(regionFilter) || regionFilter.length === 0) return REGION_KEYS;
+    const set = new Set(regionFilter.filter((r): r is RegionKey => REGION_KEYS.includes(r as RegionKey)));
+    return set.size ? Array.from(set) : REGION_KEYS;
+  }, [regionFilter]);
+  const allActive = activeRegions.length === REGION_KEYS.length;
+
+  const toggleRegion = (k: RegionKey) => {
+    const set = new Set(activeRegions);
+    if (set.has(k)) set.delete(k); else set.add(k);
+    const next = REGION_KEYS.filter((r) => set.has(r));
+    onChange({ regionFilter: next.length === 0 || next.length === REGION_KEYS.length ? null : next });
+  };
+  const setPreset = (regions: RegionKey[] | null) => onChange({ regionFilter: regions });
+
+  const regionCounts = React.useMemo(() => {
+    const acc: Record<RegionKey, number> = { AMER: 0, EMEA: 0, APAC: 0, LATAM: 0, MEA: 0 };
+    for (const p of pins) acc[p.region] = (acc[p.region] ?? 0) + 1;
+    return acc;
+  }, [pins]);
+
 
   const updateMetric = (id: string, patch: Partial<LocationMetric>) => {
     const next = metricList.map((m) => (m.id === id ? { ...m, ...patch } : m));
