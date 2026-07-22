@@ -15,6 +15,7 @@ import {
   importedDeckSlugForDivision,
   listBrokenDeckImages,
   relinkDeckImage,
+  reparseImportedDeck,
 } from "@/lib/imported-decks.functions";
 import { listDivisionImagery } from "@/lib/division-imagery.functions";
 
