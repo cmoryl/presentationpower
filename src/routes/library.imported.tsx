@@ -320,7 +320,7 @@ function DeckSlides({
           Re-extracted {reparse.data.slidesWithLayout}/{reparse.data.slideCount} slide layouts
           {reparse.data.slidesWithShapes ? ` · ${reparse.data.slidesWithShapes} with shapes` : ""}
           {reparse.data.graphicsSummary
-            ? ` · ${reparse.data.graphicsSummary.charts} charts, ${reparse.data.graphicsSummary.tables} tables, ${reparse.data.graphicsSummary.diagrams} diagrams`
+            ? ` · ${reparse.data.graphicsSummary.charts} charts, ${reparse.data.graphicsSummary.tables} tables, ${reparse.data.graphicsSummary.diagrams} diagrams, ${reparse.data.graphicsSummary.media ?? 0} media, ${reparse.data.graphicsSummary.hyperlinks ?? 0} links, ${reparse.data.graphicsSummary.comments ?? 0} comments${reparse.data.graphicsSummary.hiddenSlides ? `, ${reparse.data.graphicsSummary.hiddenSlides} hidden` : ""}`
             : ""}
         </div>
       )}
