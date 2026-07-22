@@ -135,6 +135,22 @@ const BRIGHT_BRAND_BLUE = "003FC7";
 const MODES: Mode[] = ["light", "dark"];
 
 describe("PPTX theme-color snapshot (all brand modes × modes)", () => {
+  // Silence logo/font-fetch noise. All fetches in this pipeline target
+  // relative asset URLs (/brand-logos/*, /fonts/*) that Node's undici can't
+  // parse. The exporter's try/catch already returns null on failure — we
+  // just stub fetch so the failure is deterministic and quiet.
+  const origFetch = globalThis.fetch;
+  const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+  beforeAll(() => {
+    globalThis.fetch = (async () => {
+      throw new Error("fetch disabled in snapshot test");
+    }) as typeof fetch;
+  });
+  afterAll(() => {
+    globalThis.fetch = origFetch;
+    warnSpy.mockRestore();
+  });
+
   for (const brand of BRAND_MODES) {
     for (const mode of MODES) {
       const label = `${brand.id} / ${mode}`;
