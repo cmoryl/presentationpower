@@ -521,7 +521,7 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     // ── Faithful layout (positions / z-order / styling) ─────────────────
     let layout: SlideLayout | undefined;
     try {
-      layout = extractSlideLayout(xml, slideSize, imageEmbedIds, parents);
+      layout = extractSlideLayout(xml, slideSize, imageEmbedIds, parents, theme);
     } catch { /* layout is best-effort; parsed text/images still return */ }
 
 
