@@ -30,6 +30,8 @@ import { listClientLogos, type ClientLogoRow } from "@/lib/client-logos.function
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
+import { PinEditorPanel } from "@/components/slide/PinEditorPanel";
+
 import { CanvasBlockLayer } from "@/components/slide/CanvasBlockLayer";
 import { FreeCanvasEditor } from "@/components/slide/FreeCanvasEditor";
 import { BackgroundImageryPanel } from "@/components/slide/BackgroundImageryPanel";
