@@ -50,7 +50,7 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
               prospect: brief?.prospect,
               industry: brief?.industry,
               audience: brief?.audience,
-              archetype: brief?.archetypeName,
+              archetype: brief ? byId(NARRATIVE_ARCHETYPES, brief.archetypeId)?.name : undefined,
               slides: deck.slides.slice(0, 40).map((s) => ({
                 position: s.position,
                 section: byId(SECTION_FRAMEWORKS, s.sectionId)?.name ?? s.sectionId,
