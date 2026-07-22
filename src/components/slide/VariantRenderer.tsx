@@ -5748,7 +5748,7 @@ function ReportCard({ brand, item }: { brand: BrandMode; item: Item }) {
   const delta = s(item.delta);
   const negative = delta.trim().startsWith("-");
   return (
-    <div className="pt-8" style={{ borderTop: `1px solid ${ink.accent(0.5)}` }}>
+    <div>
       <Kicker brand={brand} color={negative ? "#E53D2E" : undefined}>{negative ? "Reduction" : "Growth"}</Kicker>
       <div className="mt-6" style={{ fontSize: 96, fontWeight: 600, color: ink.text, letterSpacing: "-0.035em", lineHeight: 0.95 }}>{delta}</div>
       <div className="mt-6" style={{ fontSize: 26, color: ink.muted, lineHeight: 1.35, maxWidth: 520 }}>{s(item.label)}</div>
