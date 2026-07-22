@@ -490,7 +490,7 @@ function renderVariantBody({
                 lineHeight: 0.85,
                 fontWeight: 600,
                 letterSpacing: "-0.05em",
-                color: brand.tokens.accent,
+                color: "var(--slide-accent-text)",
                 opacity: 0.95,
               }}
             >
@@ -577,7 +577,7 @@ function renderVariantBody({
               <div key={i} className="flex items-baseline gap-10 border-t py-7" style={{ borderColor: "rgba(10,15,28,0.10)" }}>
                 <div
                   className="tabular-nums"
-                  style={{ color: brand.tokens.accent, fontSize: 40, fontWeight: 600, letterSpacing: "-0.02em", minWidth: 90 }}
+                  style={{ color: "var(--slide-accent-text)", fontSize: 40, fontWeight: 600, letterSpacing: "-0.02em", minWidth: 90 }}
                 >
                   {String(i + 1).padStart(2, "0")}
                 </div>
@@ -940,7 +940,7 @@ function renderVariantBody({
                 <div className="flex items-center gap-10 py-7">
                   <div
                     className="w-16 tabular-nums"
-                    style={{ fontSize: 22, fontWeight: 600, letterSpacing: "0.18em", color: brand.tokens.accent }}
+                    style={{ fontSize: 22, fontWeight: 600, letterSpacing: "0.18em", color: "var(--slide-accent-text)" }}
                   >
                     {String(i + 1).padStart(2, "0")}
                   </div>
@@ -1004,7 +1004,7 @@ function renderVariantBody({
                   </div>
                   <div
                     className="mb-3 uppercase tabular-nums"
-                    style={{ fontSize: 18, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600 }}
+                    style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}
                   >
                     {String(i + 1).padStart(2, "0")}
                   </div>
@@ -1261,7 +1261,7 @@ function renderVariantBody({
               return (
                 <div key={gi} className="flex flex-col gap-6">
                   <div className="flex items-baseline gap-3">
-                    <div className="text-xl font-semibold uppercase tracking-[0.14em]" style={{ color: brand.tokens.accent }}>
+                    <div className="text-xl font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--slide-accent-text)" }}>
                       {String.fromCharCode(65 + gi)}
                     </div>
                     <div className="text-2xl font-medium" style={{ color: textColor }}>{s(g.label)}</div>
@@ -1456,7 +1456,7 @@ function renderVariantBody({
               >
                 <div
                   className="mt-2 flex h-7 w-7 shrink-0 items-center justify-center"
-                  style={{ border: `2px solid ${brand.tokens.accent}`, color: brand.tokens.accent, fontSize: 18, fontWeight: 700 }}
+                  style={{ border: `2px solid ${brand.tokens.accent}`, color: "var(--slide-accent-text)", fontSize: 18, fontWeight: 700 }}
                 >
                   ✓
                 </div>
@@ -1499,7 +1499,7 @@ function renderVariantBody({
                   >
                     {s(tier.price)}
                     {s(tier.unit) && (
-                      <span className="ml-2 font-medium" style={{ fontSize: 26, color: brand.tokens.accent, letterSpacing: "-0.01em" }}>
+                      <span className="ml-2 font-medium" style={{ fontSize: 26, color: "var(--slide-accent-text)", letterSpacing: "-0.01em" }}>
                         {s(tier.unit)}
                       </span>
                     )}
@@ -1509,7 +1509,7 @@ function renderVariantBody({
                       <div key={k}>
                         {k > 0 && <SoftDivider />}
                         <div className="flex gap-4 py-3" style={{ fontSize: 22, lineHeight: 1.35 }}>
-                          <span style={{ color: brand.tokens.accent, fontWeight: 600 }}>—</span>
+                          <span style={{ color: "var(--slide-accent-text)", fontWeight: 600 }}>—</span>
                           <span style={{ opacity: 0.82 }}>{f}</span>
                         </div>
                       </div>
@@ -1575,7 +1575,7 @@ function renderVariantBody({
               <div key={i}>
                 {i > 0 && <SoftDivider />}
                 <div className="grid grid-cols-[80px_1fr_1fr] items-start gap-10 py-6">
-                  <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, letterSpacing: "0.18em", color: brand.tokens.accent }}>
+                  <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, letterSpacing: "0.18em", color: "var(--slide-accent-text)" }}>
                     {String(i + 1).padStart(2, "0")}
                   </div>
                   <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.primary }}>{s(it.risk)}</div>
@@ -1604,11 +1604,11 @@ function renderVariantBody({
               <GlassTile key={i} radius={22} padding="px-8 py-8" className={`tp-rise tp-rise-delay-${Math.min(i + 1, 3) as 1 | 2 | 3}`}>
                 <div className="flex items-center gap-4">
                   <IconWell accent={brand.tokens.accent}>
-                    <span style={{ fontSize: 20, color: brand.tokens.accent }}>{r.icon}</span>
+                    <span style={{ fontSize: 20, color: "var(--slide-accent-text)" }}>{r.icon}</span>
                   </IconWell>
                   <div
                     className="uppercase font-semibold"
-                    style={{ color: brand.tokens.accent, fontSize: 12, letterSpacing: "0.28em" }}
+                    style={{ color: "var(--slide-accent-text)", fontSize: 12, letterSpacing: "0.28em" }}
                   >
                     {r.label}
                   </div>
@@ -1693,7 +1693,7 @@ function renderVariantBody({
                 {i > 0 && <SoftDivider />}
                 <div className="grid grid-cols-[1.3fr_1fr_2fr] items-start gap-10 py-6">
                   <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.primary }}>{s(it.forum)}</div>
-                  <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600 }}>{s(it.cadence)}</div>
+                  <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(it.cadence)}</div>
                   <SupportingText size="md" opacity={0.72}>{s(it.purpose)}</SupportingText>
                 </div>
               </div>
@@ -1779,7 +1779,7 @@ function renderVariantBody({
                           fontSize: 32,
                           fontWeight: 600,
                           letterSpacing: "-0.02em",
-                          color: brand.tokens.accent,
+                          color: "var(--slide-accent-text)",
                           lineHeight: 1,
                         }}
                       >
@@ -1824,7 +1824,7 @@ function renderVariantBody({
               aria-hidden
               className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
               style={{
-                color: brand.tokens.accent,
+                color: "var(--slide-accent-text)",
                 fontSize: 720,
                 lineHeight: 0.7,
                 fontWeight: 600,
@@ -1866,7 +1866,7 @@ function renderVariantBody({
                 <div style={{ fontSize: 32, fontWeight: 600, color: "#ffffff", letterSpacing: "-0.015em" }}>
                   {s(p.name)}
                 </div>
-                <div className="mt-2 uppercase" style={{ color: brand.tokens.accent, fontSize: 18, letterSpacing: "0.28em", fontWeight: 600 }}>
+                <div className="mt-2 uppercase" style={{ color: "var(--slide-accent-text)", fontSize: 18, letterSpacing: "0.28em", fontWeight: 600 }}>
                   {s(p.role)}
                 </div>
                 <div className="mt-6 space-y-2" style={{ fontSize: 24, color: "rgba(255,255,255,0.88)" }}>
@@ -2011,7 +2011,7 @@ function renderVariantBody({
                 className="px-4 py-2 uppercase"
                 style={{
                   border: `1px solid ${brand.tokens.accent}`,
-                  color: brand.tokens.accent,
+                  color: "var(--slide-accent-text)",
                   fontSize: 18,
                   letterSpacing: "0.32em",
                   fontWeight: 600,
@@ -2086,7 +2086,7 @@ function renderVariantBody({
               <div
                 className="relative"
                 style={{
-                  color: brand.tokens.accent,
+                  color: "var(--slide-accent-text)",
                   fontSize: 520,
                   lineHeight: 0.82,
                   fontWeight: 600,
@@ -2476,7 +2476,7 @@ function renderVariantBody({
               <div className="absolute inset-0 rounded-full" style={{ background: `conic-gradient(${segments})` }} />
               <div className="absolute inset-[18%] flex flex-col items-center justify-center rounded-full text-center" style={{ backgroundColor: brand.tokens.surface }}>
                 <div className="text-8xl font-semibold leading-none" style={{ color: brand.tokens.primary }}>
-                  {s(c.centerValue)}<span className="text-4xl" style={{ color: brand.tokens.accent }}>{s(c.centerUnit)}</span>
+                  {s(c.centerValue)}<span className="text-4xl" style={{ color: "var(--slide-accent-text)" }}>{s(c.centerUnit)}</span>
                 </div>
                 <div className="mt-4 max-w-[80%] text-xl opacity-80">{s(c.centerLabel)}</div>
               </div>
@@ -2488,7 +2488,7 @@ function renderVariantBody({
                   <div className="flex-1">
                     <div className="flex items-baseline justify-between gap-6">
                       <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
-                      <div className="text-2xl font-semibold" style={{ color: brand.tokens.accent }}>{s(it.value)}%</div>
+                      <div className="text-2xl font-semibold" style={{ color: "var(--slide-accent-text)" }}>{s(it.value)}%</div>
                     </div>
                     <div className="mt-1 text-lg opacity-70">{s(it.note)}</div>
                   </div>
@@ -2596,7 +2596,7 @@ function renderVariantBody({
                   className="absolute w-[240px] -translate-x-1/2 -translate-y-1/2 p-2 text-center"
                   style={{ left: `${x}%`, top: `${y}%` }}
                 >
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${brand.tokens.accent}22`, color: brand.tokens.accent }}>
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${brand.tokens.accent}22`, color: "var(--slide-accent-text)" }}>
                     {(() => { const Ic = pickIcon(s(it.label), i, s(it.icon)); return <Ic size={24} strokeWidth={2} />; })()}
                   </div>
                   <div className="mt-4" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.primary }}>{s(it.label)}</div>
@@ -2667,7 +2667,7 @@ function renderVariantBody({
                 />
               ))}
               <div className="absolute left-1/2 top-1/2 z-10 max-w-[260px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/95 p-6 text-center shadow-lg">
-                <div className="text-lg uppercase tracking-[0.25em]" style={{ color: brand.tokens.accent }}>Intersection</div>
+                <div className="text-lg uppercase tracking-[0.25em]" style={{ color: "var(--slide-accent-text)" }}>Intersection</div>
                 <div className="mt-2 text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(c.intersection)}</div>
               </div>
             </div>
@@ -2707,7 +2707,7 @@ function renderVariantBody({
                         style={{ maxHeight: 36, maxWidth: 140, objectFit: "contain" }}
                       />
                     ) : (
-                      <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, letterSpacing: "0.18em", color: brand.tokens.accent }}>
+                      <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, letterSpacing: "0.18em", color: "var(--slide-accent-text)" }}>
                         {s(it.client).split(" ").map((w) => w[0]).join("").slice(0, 3).toUpperCase()}
                       </div>
                     )}
@@ -2754,7 +2754,7 @@ function renderVariantBody({
                     <Kicker brand={brand} color="rgba(10,15,28,0.55)" size={16}>{s(it.sector)}</Kicker>
                     <div className="mt-4" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: brand.tokens.primary }}>{s(it.client)}</div>
                     <SupportingText size="md" opacity={0.78} className="mt-3">{s(it.story)}</SupportingText>
-                    <div className="mt-6" style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.accent }}>
+                    <div className="mt-6" style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-0.01em", color: "var(--slide-accent-text)" }}>
                       {s(it.metric)}
                     </div>
                   </div>
@@ -2774,7 +2774,7 @@ function renderVariantBody({
               <div key={i} className="grid grid-cols-[240px_1fr] items-start gap-8">
                 <MediaTile brand={brand} seed={s(it.seed, `mx-${i}`)} className="aspect-[4/3] w-full" />
                 <div className="pt-2">
-                  <div className="tabular-nums uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600 }}>
+                  <div className="tabular-nums uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>
                     {String(i + 1).padStart(2, "0")}
                   </div>
                   <div className="mt-4" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: brand.tokens.primary }}>{s(it.label)}</div>
@@ -2887,12 +2887,12 @@ function renderVariantBody({
               <div key={i}>
                 {i > 0 && <SoftDivider />}
                 <div className="grid grid-cols-[60px_1fr_260px_180px] items-center gap-8 py-6">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full" style={{ border: `1.5px solid ${brand.tokens.accent}`, color: brand.tokens.accent }}>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full" style={{ border: `1.5px solid ${brand.tokens.accent}`, color: "var(--slide-accent-text)" }}>
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12l5 5 9-11" /></svg>
                   </div>
                   <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.primary }}>{s(it.label)}</div>
                   <SupportingText size="md" opacity={0.72}>{s(it.owner)}</SupportingText>
-                  <div className="text-right uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600 }}>{s(it.when)}</div>
+                  <div className="text-right uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(it.when)}</div>
                 </div>
               </div>
             ))}
@@ -2910,7 +2910,7 @@ function renderVariantBody({
             <SupportingText size="xl" opacity={0.85} className="mt-10" maxWidthPx={1180}>{s(c.rationale)}</SupportingText>
             <div className="mt-16 flex items-baseline gap-10">
               <Kicker brand={brand} color="rgba(255,255,255,0.65)">Decision by</Kicker>
-              <div style={{ fontSize: 42, fontWeight: 600, letterSpacing: "-0.02em", color: brand.tokens.accent }}>{s(c.decisionBy)}</div>
+              <div style={{ fontSize: 42, fontWeight: 600, letterSpacing: "-0.02em", color: "var(--slide-accent-text)" }}>{s(c.decisionBy)}</div>
             </div>
           </div>
         </SlideFrame>
@@ -3112,7 +3112,7 @@ function renderVariantBody({
                   </div>
                   <div className="mt-4 flex items-baseline gap-2">
                     <span className="tabular-nums font-semibold" style={{ fontSize: 88, lineHeight: 0.95, letterSpacing: "-0.025em", color: brand.tokens.primary }}>{s(it.value)}</span>
-                    {s(it.unit) && <span className="font-medium" style={{ fontSize: 34, color: brand.tokens.accent, letterSpacing: "-0.015em" }}>{s(it.unit)}</span>}
+                    {s(it.unit) && <span className="font-medium" style={{ fontSize: 34, color: "var(--slide-accent-text)", letterSpacing: "-0.015em" }}>{s(it.unit)}</span>}
                   </div>
                   {s(it.delta) && (
                     <div className="mt-3 flex items-center gap-2" style={{ fontSize: 18, color: trendColor, letterSpacing: "0.02em" }}>
@@ -3138,7 +3138,7 @@ function renderVariantBody({
             <div className="grid gap-6" style={{ gridTemplateColumns: `240px repeat(${quarters.length}, minmax(0, 1fr))` }}>
               <div />
               {quarters.map((q, i) => (
-                <div key={i} className="pb-4 uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600, borderBottom: `2px solid ${brand.tokens.accent}` }}>{q}</div>
+                <div key={i} className="pb-4 uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600, borderBottom: `2px solid ${brand.tokens.accent}` }}>{q}</div>
               ))}
               {items.map((it, i) => {
                 const start = Math.max(1, Number(it.start ?? 1));
@@ -3481,8 +3481,8 @@ function renderVariantBody({
                   </div>
                 );
               })}
-              <div className="absolute -left-2 top-1/2 -translate-y-1/2 -rotate-90 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600 }}>{s(c.axisY)}</div>
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600 }}>{s(c.axisX)}</div>
+              <div className="absolute -left-2 top-1/2 -translate-y-1/2 -rotate-90 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(c.axisY)}</div>
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(c.axisX)}</div>
             </div>
             <div className="flex flex-col justify-center gap-6">
               <Kicker brand={brand}>Reading</Kicker>
@@ -3516,7 +3516,7 @@ function renderVariantBody({
             </div>
             <div className="my-10 flex items-center gap-6">
               <div className="h-[2px] flex-1" style={{ background: brand.tokens.accent }} />
-              <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600 }}>Waterline — {s(c.waterline, "what leadership sees")}</div>
+              <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>Waterline — {s(c.waterline, "what leadership sees")}</div>
               <div className="h-[2px] flex-1" style={{ background: brand.tokens.accent }} />
             </div>
             <div className="grid gap-8" style={{ gridTemplateColumns: `repeat(${Math.max(Math.min(below.length, 3), 2)}, minmax(0, 1fr))` }}>
@@ -3580,7 +3580,7 @@ function renderVariantBody({
               {items.map((it, i) => (
                 <div key={i} className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
                   <div className="flex items-baseline gap-6">
-                    <span className="tabular-nums font-semibold" style={{ fontSize: 26, color: brand.tokens.accent, letterSpacing: "-0.01em" }}>{String(i + 1).padStart(2, "0")}</span>
+                    <span className="tabular-nums font-semibold" style={{ fontSize: 26, color: "var(--slide-accent-text)", letterSpacing: "-0.01em" }}>{String(i + 1).padStart(2, "0")}</span>
                     <div className="flex-1">
                       <div style={{ fontSize: 34, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.title)}</div>
                       <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>{s(it.body)}</div>
@@ -3627,7 +3627,7 @@ function renderVariantBody({
               {items.map((it, i) => (
                 <div key={i} className="relative">
                   <div className="absolute -left-[38px] top-3 h-4 w-4 rounded-full" style={{ background: "#fff", border: `3px solid ${brand.tokens.accent}` }} />
-                  <div className="absolute -left-32 top-1 w-24 pr-4 text-right tabular-nums uppercase" style={{ fontSize: 18, letterSpacing: "0.24em", color: brand.tokens.accent, fontWeight: 600 }}>
+                  <div className="absolute -left-32 top-1 w-24 pr-4 text-right tabular-nums uppercase" style={{ fontSize: 18, letterSpacing: "0.24em", color: "var(--slide-accent-text)", fontWeight: 600 }}>
                     {s(it.date)}
                   </div>
                   <div>
@@ -3729,14 +3729,14 @@ function renderVariantBody({
             </div>
             <div className="mt-6 flex flex-wrap items-baseline gap-6">
               <span className="uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: "rgba(10,15,28,0.55)", fontWeight: 500 }}>{s(c.pronunciation)}</span>
-              <span style={{ fontSize: 24, color: brand.tokens.accent, fontStyle: "italic", fontWeight: 600 }}>{s(c.partOfSpeech, "n.")}</span>
+              <span style={{ fontSize: 24, color: "var(--slide-accent-text)", fontStyle: "italic", fontWeight: 600 }}>{s(c.partOfSpeech, "n.")}</span>
             </div>
             <div className="mt-10" style={{ fontSize: 34, lineHeight: 1.35, color: "rgba(10,15,28,0.85)", maxWidth: 1400 }}>
               {s(c.definition)}
             </div>
             {s(c.usage) && (
               <div className="mt-12 pt-8" style={{ borderTop: "1px solid rgba(10,15,28,0.15)", maxWidth: 1400 }}>
-                <span className="uppercase mr-4" style={{ fontSize: 14, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600 }}>Usage</span>
+                <span className="uppercase mr-4" style={{ fontSize: 14, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>Usage</span>
                 <span style={{ fontSize: 24, lineHeight: 1.45, color: "rgba(10,15,28,0.65)", fontStyle: "italic" }}>{s(c.usage)}</span>
               </div>
             )}
@@ -3753,7 +3753,7 @@ function renderVariantBody({
           <div className="mt-12">
             {items.map((it, i) => (
               <div key={i} className="relative grid items-center gap-8 py-8" style={{ gridTemplateColumns: "160px 1fr", borderTop: i === 0 ? "1px solid rgba(10,15,28,0.12)" : "none", borderBottom: "1px solid rgba(10,15,28,0.12)" }}>
-                <div className="tabular-nums font-semibold" style={{ fontSize: 120, lineHeight: 1, letterSpacing: "-0.03em", color: brand.tokens.accent, opacity: 0.18 }}>
+                <div className="tabular-nums font-semibold" style={{ fontSize: 120, lineHeight: 1, letterSpacing: "-0.03em", color: "var(--slide-accent-text)", opacity: 0.18 }}>
                   {String(i + 1).padStart(2, "0")}
                 </div>
                 <div>
@@ -3780,7 +3780,7 @@ function renderVariantBody({
                 const n = items.length - i;
                 return (
                   <div key={i} className="grid items-center gap-10 py-8" style={{ gridTemplateColumns: "220px 1fr", borderTop: i === 0 ? "1px solid rgba(255,255,255,0.18)" : "none", borderBottom: "1px solid rgba(255,255,255,0.18)" }}>
-                    <div className="tabular-nums font-semibold" style={{ fontSize: 180, lineHeight: 0.9, letterSpacing: "-0.03em", color: brand.tokens.accent }}>
+                    <div className="tabular-nums font-semibold" style={{ fontSize: 180, lineHeight: 0.9, letterSpacing: "-0.03em", color: "var(--slide-accent-text)" }}>
                       {n}
                     </div>
                     <div>
@@ -3891,7 +3891,7 @@ function renderVariantBody({
               <div className="mt-10">
                 <StatFigure brand={brand} value={s(stat.value)} unit={s(stat.unit)} label={s(stat.label)} size="lg" />
                 {s(stat.delta) && (
-                  <div className="mt-4 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: brand.tokens.accent, fontWeight: 600 }}>{s(stat.delta)}</div>
+                  <div className="mt-4 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(stat.delta)}</div>
                 )}
               </div>
             </div>
@@ -3986,7 +3986,7 @@ function renderVariantBody({
               return (
                 <div key={i} className="flex flex-col items-center justify-end">
                   <div style={{ fontSize: 44, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1 }}>
-                    {s(it.value)}<span style={{ fontSize: 26, color: brand.tokens.accent, marginLeft: 4 }}>{s(it.unit)}</span>
+                    {s(it.value)}<span style={{ fontSize: 26, color: "var(--slide-accent-text)", marginLeft: 4 }}>{s(it.unit)}</span>
                   </div>
                   <div className="mt-6 w-full" style={{ height: h, background: color, opacity, maxWidth: 220 }} />
                   <div className="mt-6 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: isLast ? brand.tokens.accent : "rgba(10,15,28,0.6)", fontWeight: 600 }}>{s(it.year)}</div>
@@ -4093,7 +4093,7 @@ function renderVariantBody({
                 return (
                   <div key={i} className="flex flex-col items-center justify-end">
                     <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: brand.tokens.primary }}>
-                      {s(it.value)}<span style={{ fontSize: 14, color: brand.tokens.accent, marginLeft: 2 }}>{s(it.unit)}</span>
+                      {s(it.value)}<span style={{ fontSize: 14, color: "var(--slide-accent-text)", marginLeft: 2 }}>{s(it.unit)}</span>
                     </div>
                     <div className="mt-3 w-full" style={{ height: h, background: color, opacity, maxWidth: 90 }} />
                     <div className="mt-3 uppercase" style={{ fontSize: 14, letterSpacing: "0.22em", color: isLast ? brand.tokens.accent : "rgba(10,15,28,0.55)", fontWeight: 600 }}>{s(it.year)}</div>
@@ -4143,7 +4143,7 @@ function renderVariantBody({
                     <div className="flex items-baseline justify-between mb-3">
                       <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.24em", color: brand.tokens.primary, fontWeight: 600 }}>{it.label}</div>
                       <div className="tabular-nums" style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary }}>
-                        {it.value}<span style={{ fontSize: 16, color: brand.tokens.accent, marginLeft: 4 }}>{it.unit}</span>
+                        {it.value}<span style={{ fontSize: 16, color: "var(--slide-accent-text)", marginLeft: 4 }}>{it.unit}</span>
                       </div>
                     </div>
                     <div style={{ position: "relative", height: 12, background: "rgba(10,15,28,0.08)" }}>
@@ -4194,7 +4194,7 @@ function renderVariantBody({
                     <div style={{ flex: 1 }}>
                       <div className="flex items-baseline justify-between">
                         <div style={{ fontSize: 22, fontWeight: 600, color: brand.tokens.primary }}>{it.label}</div>
-                        <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: brand.tokens.accent }}>{it.value}%</div>
+                        <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: "var(--slide-accent-text)" }}>{it.value}%</div>
                       </div>
                       <div className="mt-2" style={{ fontSize: 16, color: "rgba(10,15,28,0.65)", lineHeight: 1.4 }}>{it.body}</div>
                     </div>
@@ -4265,7 +4265,7 @@ function renderVariantBody({
                   <div className="flex items-baseline justify-between gap-8 mb-4">
                     <div style={{ fontSize: 24, fontWeight: 600, color: brand.tokens.primary }}>{s(it.label)}</div>
                     <div className="flex items-baseline gap-10">
-                      <div className="tabular-nums" style={{ fontSize: 40, fontWeight: 600, color: brand.tokens.accent, letterSpacing: "-0.02em" }}>{cur}%</div>
+                      <div className="tabular-nums" style={{ fontSize: 40, fontWeight: 600, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}>{cur}%</div>
                       <div className="tabular-nums" style={{ fontSize: 30, fontWeight: 600, color: "rgba(10,15,28,0.4)" }}>{bench}%</div>
                     </div>
                   </div>
@@ -4465,7 +4465,7 @@ function renderVariantBody({
                 lineHeight: 0.85,
                 fontWeight: 700,
                 letterSpacing: "-0.05em",
-                color: brand.tokens.accent,
+                color: "var(--slide-accent-text)",
                 opacity: 0.9,
               }}
             >
@@ -4497,7 +4497,7 @@ function renderVariantBody({
               style={{
                 fontSize: 44,
                 letterSpacing: "0.42em",
-                color: brand.tokens.accent,
+                color: "var(--slide-accent-text)",
                 fontWeight: 600,
               }}
             >
@@ -4531,7 +4531,7 @@ function renderVariantBody({
                   lineHeight: 0.85,
                   fontWeight: 700,
                   letterSpacing: "-0.05em",
-                  color: brand.tokens.accent,
+                  color: "var(--slide-accent-text)",
                 }}
               >
                 {s(c.stat, "97")}
@@ -5173,7 +5173,7 @@ function NumberedList({ brand, pageNumber, title, items }: { brand: BrandMode; p
             >
               <div
                 className="pt-1 font-semibold tabular-nums"
-                style={{ fontSize: 40, color: brand.tokens.accent, letterSpacing: "-0.02em" }}
+                style={{ fontSize: 40, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}
               >
                 {String(i + 1).padStart(2, "0")}
               </div>
@@ -5427,7 +5427,7 @@ function SummaryStatCard({ brand, label, value, unit, series }: { brand: BrandMo
       <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.muted, fontWeight: 600 }}>{label}</div>
       <div className="mt-4 flex items-baseline" style={{ fontSize: 84, fontWeight: 600, color: ink.text, letterSpacing: "-0.03em", lineHeight: 1 }}>
         <span className="tabular-nums">{value || "—"}</span>
-        {unit && <span style={{ fontSize: 40, marginLeft: 8, color: brand.tokens.accent }}>{unit}</span>}
+        {unit && <span style={{ fontSize: 40, marginLeft: 8, color: "var(--slide-accent-text)" }}>{unit}</span>}
       </div>
       <div className="mt-4"><Sparkline brand={brand} values={series} h={70} /></div>
     </div>
