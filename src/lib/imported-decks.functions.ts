@@ -351,7 +351,7 @@ export const reparseImportedDeck = createServerFn({ method: "POST" })
       original_filename: string;
       storage_path: string;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      slides: Array<{ index: number; imagePaths?: string[]; layout?: any }> | null;
+      slides: Array<{ index: number; imagePaths?: string[]; imageRefs?: SavedImageRef[]; layout?: any }> | null;
     };
 
     const signed = await s.storage.from(BUCKET).createSignedUrl(r.storage_path, 60 * 5);
@@ -369,94 +369,50 @@ export const reparseImportedDeck = createServerFn({ method: "POST" })
       throw new Error(e instanceof Error ? e.message : "Re-parse failed");
     }
 
-    // Reconstruct embedId → storage path by positional match against the
-    // previously-saved imagePaths[] for each slide.
-    const existingBySlide = new Map<number, string[]>();
+    // Reconstruct embedId → storage path from the durable imageRefs we now
+    // persist. Older rows only have positional imagePaths[], so use those as
+    // a best-effort seed while the reparse uploads any missing references.
+    const existingBySlide = new Map<number, SavedImageRef[]>();
     for (const sl of r.slides ?? []) {
-      existingBySlide.set(sl.index, sl.imagePaths ?? []);
+      const refs = sl.imageRefs?.length
+        ? sl.imageRefs
+        : (sl.imagePaths ?? []).map((path, idx) => ({ embedId: `__legacy_pos_${idx}`, path }));
+      existingBySlide.set(sl.index, refs);
     }
 
     const imageryDivision = normalizeImportedDeckDivision(r.division_id);
-    const slidesLite = await Promise.all(parsed.slides.map(async (sl) => {
-      const savedPaths = [...(existingBySlide.get(sl.index) ?? [])];
-      for (let j = savedPaths.length; j < sl.images.length; j++) {
-        const dataUrl = sl.images[j];
-        const m = /^data:([^;]+);base64,(.+)$/.exec(dataUrl);
-        if (!m) continue;
-        const contentType = m[1];
-        const bin = Buffer.from(m[2], "base64");
-        if (bin.length === 0) continue;
-        const ext = contentType.split("/")[1]?.split("+")[0] ?? "bin";
-        const imgId = crypto.randomUUID();
-        const baseName = r.original_filename.replace(/\.pptx$/i, "");
-        const imgFilename = `${baseName}__slide-${sl.index + 1}-${j + 1}.${ext}`.replace(/[^\w.\-]+/g, "_").slice(-160);
-        const imgPath = `${context.userId}/${imgId}-${imgFilename}`;
-        const upImg = await s.storage
-          .from("division-imagery")
-          .upload(imgPath, bin, { contentType, upsert: false });
-        if (upImg.error) continue;
-        const { error: rowErr } = await s.from("division_imagery").insert({
-          id: imgId,
-          division_id: imageryDivision,
-          uploaded_by: context.userId,
-          filename: imgFilename,
-          content_type: contentType,
-          size_bytes: bin.length,
-          storage_path: imgPath,
-          kind: "upload",
-          tags: ["imported_deck", "re_extracted", `slide-${sl.index + 1}`, r.division_id],
-          note: `Re-extracted from ${r.original_filename} · slide ${sl.index + 1}`,
-        });
-        if (rowErr) {
-          await s.storage.from("division-imagery").remove([imgPath]).catch(() => {});
-          continue;
-        }
-        savedPaths.push(imgPath);
-      }
-      const embedToPath = new Map<string, string>();
-      sl.imageEmbedIds.forEach((eid, idx) => {
-        const p = savedPaths[idx];
-        if (eid && p) embedToPath.set(eid, p);
+    const imageCache = new Map<string, string>();
+    const slidesLite = [];
+    for (const sl of parsed.slides) {
+      const legacyRefs = existingBySlide.get(sl.index) ?? [];
+      const seededRefs = legacyRefs.some((ref) => ref.embedId.startsWith("__legacy_pos_"))
+        ? legacyRefs.map((ref, idx) => ({ embedId: sl.imageEmbedIds[idx] ?? ref.embedId, path: ref.path })).filter((ref) => !!ref.embedId)
+        : legacyRefs;
+      const imageRefs = await persistParsedSlideImages({
+        slide: sl,
+        existingRefs: seededRefs,
+        filename: r.original_filename,
+        userId: context.userId,
+        divisionId: r.division_id,
+        imageryDivision,
+        client: s,
+        imageCache,
+        tag: "re_extracted",
       });
-      const rewriteFill = (fill: unknown): unknown => {
-        if (!fill || typeof fill !== "object") return fill;
-        const f = fill as { kind?: string; embedId?: string; path?: string };
-        if (f.kind === "image" && f.embedId) {
-          const p = embedToPath.get(f.embedId);
-          if (p) return { ...f, path: p };
-        }
-        return fill;
-      };
-      const layout = sl.layout
-        ? {
-            ...sl.layout,
-            background: rewriteFill(sl.layout.background) as typeof sl.layout.background,
-            shapes: sl.layout.shapes.map((sh) => {
-              let next: typeof sh = sh;
-              if (sh.kind === "image" && sh.embedId) {
-                const p = embedToPath.get(sh.embedId);
-                if (p) next = { ...sh, path: p };
-              }
-              if ("fill" in next && next.fill) {
-                const rewritten = rewriteFill(next.fill);
-                if (rewritten !== next.fill) next = { ...next, fill: rewritten as typeof next.fill };
-              }
-              return next;
-            }),
-          }
-        : undefined;
+      const layout = rewriteLayoutImageRefs(sl, imageRefs);
 
-      return {
+      slidesLite.push({
         index: sl.index,
         title: sl.title,
         bullets: sl.bullets,
         notes: sl.notes,
         imageCount: sl.images.length,
-        imagePaths: savedPaths,
+        imagePaths: imageRefs.map((ref) => ref.path),
+        imageRefs,
         layout,
         assets: buildSlideAssets(sl),
-      };
-    }));
+      });
+    }
 
     const withLayout = slidesLite.filter((sl) => sl.layout).length;
     const withShapes = slidesLite.filter((sl) => (sl.layout?.shapes?.length ?? 0) > 0).length;
