@@ -29,7 +29,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
-import { useSlideMode } from "./SlideChrome";
+import { useSlideMode, useSlideAccent } from "./SlideChrome";
 
 export type SlideRegister = "corporate" | "product" | "editorial";
 
