@@ -1713,7 +1713,7 @@ function renderVariantBody({
           <SupportingText size="lg" opacity={0.72} className="mt-8" maxWidthPx={1180}>{s(c.summary)}</SupportingText>
           <div className="mt-14 grid grid-cols-3 gap-14">
             {arr(c.items).map((it, i) => (
-              <div key={i} className={i > 0 ? "pl-10" : ""} style={i > 0 ? { borderLeft: "1px solid rgba(10,15,28,0.10)" } : undefined}>
+              <div key={i} className={i > 0 ? "pl-10" : ""} style={i > 0 ? { borderLeft: `1px solid ${ink.hairline}` } : undefined}>
                 <StatFigure brand={brand} value={s(it.value)} unit={s(it.unit)} label={s(it.label)} size="lg" />
               </div>
             ))}
