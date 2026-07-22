@@ -2374,36 +2374,24 @@ function readTextBody(txBody: PNode | undefined): LayoutTextBody | undefined {
   return { paras, anchor, insets, fontScale, lnSpcReduction, spAutoFit, rotDeg: rot, wrap, vert, numCol };
 }
 
-function transformFrame(child: LayoutFrame, group: PNode | undefined): LayoutFrame {
+function transformFrame(child: LayoutFrame, group: PNode | GroupTransform | undefined): LayoutFrame {
   if (!group) return child;
-  const gxfrm = pFind(group, "a:xfrm");
-  if (!gxfrm) return child;
-  const off = pFind(gxfrm, "a:off");
-  const ext = pFind(gxfrm, "a:ext");
-  const chOff = pFind(gxfrm, "a:chOff");
-  const chExt = pFind(gxfrm, "a:chExt");
-  if (!off || !ext || !chOff || !chExt) return child;
-  const oa = pAttrs(off); const ea = pAttrs(ext);
-  const coa = pAttrs(chOff); const cea = pAttrs(chExt);
-  const gx = Number(oa["@_x"] ?? 0) / EMU_PER_INCH;
-  const gy = Number(oa["@_y"] ?? 0) / EMU_PER_INCH;
-  const gw = Number(ea["@_cx"] ?? 0) / EMU_PER_INCH;
-  const gh = Number(ea["@_cy"] ?? 0) / EMU_PER_INCH;
-  const cx = Number(coa["@_x"] ?? 0) / EMU_PER_INCH;
-  const cy = Number(coa["@_y"] ?? 0) / EMU_PER_INCH;
-  const cw = Number(cea["@_cx"] ?? 0) / EMU_PER_INCH;
-  const ch = Number(cea["@_cy"] ?? 0) / EMU_PER_INCH;
-  if (!(cw > 0 && ch > 0 && gw > 0 && gh > 0)) return child;
-  const sx = gw / cw; const sy = gh / ch;
-  return {
-    x: gx + (child.x - cx) * sx,
-    y: gy + (child.y - cy) * sy,
+  const g = "chW" in group ? group : readGroupTransform(group);
+  if (!g) return child;
+  const sx = g.w / g.chW;
+  const sy = g.h / g.chH;
+  const next: LayoutFrame = {
+    x: g.x + (child.x - g.chX) * sx,
+    y: g.y + (child.y - g.chY) * sy,
     w: child.w * sx,
     h: child.h * sy,
-    rot: child.rot,
-    flipH: child.flipH,
-    flipV: child.flipV,
+    rot: (child.rot ?? 0) + (g.rot ?? 0) || undefined,
+    flipH: (child.flipH || g.flipH) || undefined,
+    flipV: (child.flipV || g.flipV) || undefined,
   };
+  if (g.flipH) next.x = g.x + g.w - (next.x - g.x) - next.w;
+  if (g.flipV) next.y = g.y + g.h - (next.y - g.y) - next.h;
+  return next;
 }
 
 function readTableCells(tbl: PNode): { grid: TableCell[][]; colWidths: number[]; rowHeights: number[]; firstRow?: boolean; bandRow?: boolean; firstCol?: boolean; bandCol?: boolean } {
@@ -2482,7 +2470,7 @@ function readTableCells(tbl: PNode): { grid: TableCell[][]; colWidths: number[];
 function walkSpTree(
   nodes: PNode[],
   zRef: { z: number },
-  group: PNode | undefined,
+  group: GroupTransform | undefined,
   out: LayoutShape[],
   imageEmbedIds: string[],
   parents?: ResolvedParents,
@@ -2570,7 +2558,8 @@ function walkSpTree(
       out.push({ kind: "line", z: zRef.z++, frame, line: remapLineScheme(readLine(spPr), clrMap) ?? readMappedLineRef(style, theme, clrMap), prst, effect });
     } else if (t === "p:grpSp") {
       const grpSpPr = pFind(node, "p:grpSpPr");
-      walkSpTree(pChildren(node), zRef, grpSpPr ?? group, out, imageEmbedIds, parents, embedIdMap, theme, clrMap);
+      const nextGroup = readGroupTransform(grpSpPr);
+      walkSpTree(pChildren(node), zRef, nextGroup ? composeGroupTransform(group, nextGroup) : group, out, imageEmbedIds, parents, embedIdMap, theme, clrMap);
     } else if (t === "p:graphicFrame") {
       const xfrm = pFind(node, "p:xfrm");
       let frame: LayoutFrame | undefined;
