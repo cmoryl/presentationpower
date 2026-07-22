@@ -3807,14 +3807,14 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-10">
             {items.map((it, i) => {
-              const ink = i === 0 ? "rgba(10,15,28,0.92)" : i === 1 ? "rgba(10,15,28,0.72)" : "rgba(10,15,28,0.52)";
+              const itemInk = i === 0 ? ink.strong : i === 1 ? ink.muted : ink.faint;
               const labelColor = i === 0 ? "var(--slide-accent-text)" : ink.faint;
               return (
                 <div key={i} className="grid gap-12 py-10" style={{ gridTemplateColumns: "200px 1fr", borderTop: "1px solid rgba(10,15,28,0.12)", borderBottom: i === items.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
                   <div className="uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: labelColor, fontWeight: 600 }}>{s(it.label)}</div>
                   <div>
-                    <div style={{ fontSize: 44, fontWeight: 600, color: ink, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(it.headline)}</div>
-                    <div className="mt-3" style={{ fontSize: 22, lineHeight: 1.42, color: ink, opacity: 0.85, maxWidth: 1200 }}>{s(it.body)}</div>
+                    <div style={{ fontSize: 44, fontWeight: 600, color: itemInk, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(it.headline)}</div>
+                    <div className="mt-3" style={{ fontSize: 22, lineHeight: 1.42, color: itemInk, opacity: 0.85, maxWidth: 1200 }}>{s(it.body)}</div>
                   </div>
                 </div>
               );
