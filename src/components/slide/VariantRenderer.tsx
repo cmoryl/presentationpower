@@ -5567,14 +5567,27 @@ function Sparkline({ brand: _brand, values, w = 380, h = 100, filled = true, pea
 function AiryDefs({ id }: { id: string }) {
   return (
     <defs>
+      {/* Highlighted / accented bars: soft accent bloom, top-heavy */}
       <linearGradient id={`${id}-airy`} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"  stopColor="var(--slide-accent-text)" stopOpacity={0.18} />
-        <stop offset="65%" stopColor="var(--slide-accent-text)" stopOpacity={0.05} />
-        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+        <stop offset="0%"  stopColor="var(--slide-accent-text)" stopOpacity={0.55} />
+        <stop offset="55%" stopColor="var(--slide-accent-text)" stopOpacity={0.22} />
+        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0.04} />
+      </linearGradient>
+      {/* Frosted glass fill for baseline/neutral bars — mode-aware via accent */}
+      <linearGradient id={`${id}-glass`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"  stopColor="var(--slide-accent-text)" stopOpacity={0.16} />
+        <stop offset="60%" stopColor="var(--slide-accent-text)" stopOpacity={0.08} />
+        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0.02} />
+      </linearGradient>
+      {/* Muted glass for tertiary segments */}
+      <linearGradient id={`${id}-glass-mute`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"  stopColor="var(--slide-accent-text)" stopOpacity={0.08} />
+        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0.02} />
       </linearGradient>
     </defs>
   );
 }
+
 
 
 // ── Editorial data primitives ─────────────────────────────────────────
@@ -5831,7 +5844,17 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { 
         const isHi = highlight ? b.label === highlight : false;
         return (
           <g key={i}>
-            <rect x={x} y={y} width={barW} height={bh} rx={3} fill={isHi ? `url(#${id}-airy)` : ink.trackFill} />
+            <rect
+              x={x}
+              y={y}
+              width={barW}
+              height={bh}
+              rx={4}
+              fill={isHi ? `url(#${id}-airy)` : `url(#${id}-glass)`}
+              stroke="var(--slide-accent-text)"
+              strokeOpacity={isHi ? 0.55 : 0.22}
+              strokeWidth={1}
+            />
             {isHi && <rect x={x} y={y} width={barW} height={2} fill="var(--slide-accent-text)" />}
             {isHi && hiValue !== undefined && (
               <text x={x + barW / 2} y={y - 16} textAnchor="middle" fontSize={22} fontWeight={600} fill={ink.text} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{b.value}{unit || ""}</text>
@@ -5839,6 +5862,7 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { 
             <text x={x + barW / 2} y={h - padB + 30} textAnchor="middle" fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{b.label}</text>
           </g>
         );
+
       })}
     </svg>
   );
@@ -5986,6 +6010,7 @@ function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand:
 
 function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { brand: BrandMode; segments: { label: string }[]; columns: { label: string; values: number[] }[]; unit?: string; height?: number }) {
   const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
   const w = 1720, h = height;
   const padL = 90, padR = 40, padT = 30, padB = 80;
   const totals = columns.map((c) => c.values.reduce((a, b) => a + b, 0));
@@ -5996,9 +6021,12 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
   const barW = slot * 0.55;
   const cols = [brand.tokens.accent, brand.tokens.primary, ink.faint];
   const ticks = 4;
+  const segFill = (si: number) =>
+    si === 0 ? `url(#${id}-airy)` : si === 1 ? `url(#${id}-glass)` : `url(#${id}-glass-mute)`;
   return (
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+        <AiryDefs id={id} />
         {Array.from({ length: ticks + 1 }, (_, i) => {
           const y = padT + (chartH / ticks) * i;
           return <line key={i} x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} />;
@@ -6011,7 +6039,19 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
               {col.values.map((v, si) => {
                 const bh = (v / niceMax) * chartH;
                 yCursor -= bh;
-                return <rect key={si} x={x} y={yCursor} width={barW} height={bh} fill={cols[si] || ink.strong} opacity={si === 0 ? 1 : 0.7 - si * 0.15} />;
+                return (
+                  <rect
+                    key={si}
+                    x={x}
+                    y={yCursor}
+                    width={barW}
+                    height={bh}
+                    fill={segFill(si)}
+                    stroke="var(--slide-accent-text)"
+                    strokeOpacity={si === 0 ? 0.5 : 0.2}
+                    strokeWidth={1}
+                  />
+                );
               })}
               <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{col.label}</text>
             </g>
@@ -6021,7 +6061,7 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
       <div className="mt-3 flex flex-wrap gap-6">
         {segments.map((sg, i) => (
           <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
-            <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || ink.strong, opacity: i === 0 ? 1 : 0.7 - i * 0.15 }} />
+            <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || ink.strong, opacity: i === 0 ? 0.75 : 0.45 - i * 0.1, border: `1px solid ${ink.hairlineStrong}` }} />
             <span style={{ fontWeight: 600, color: ink.strong }}>{sg.label}</span>
           </div>
         ))}
@@ -6030,6 +6070,7 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
     </div>
   );
 }
+
 
 function StackedAreaChart({ brand, series, xLabels, unit, height = 480 }: { brand: BrandMode; series: { label: string; points: number[] }[]; xLabels: string[]; unit?: string; height?: number }) {
   const ink = useSlideInk();
@@ -6056,7 +6097,7 @@ function StackedAreaChart({ brand, series, xLabels, unit, height = 480 }: { bran
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
         <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
-        {layers.map((l) => <path key={l.si} d={l.d} fill={l.color} opacity={l.si === 0 ? 0.95 : 0.7 - l.si * 0.15} />)}
+        {layers.map((l) => <path key={l.si} d={l.d} fill={l.color} opacity={l.si === 0 ? 0.32 : Math.max(0.08, 0.22 - l.si * 0.05)} stroke={l.color} strokeOpacity={l.si === 0 ? 0.7 : 0.35} strokeWidth={1.5} />)}
         {xLabels.map((lb, i) => (
           <text key={i} x={padL + i * step} y={h - padB + 34} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{lb}</text>
         ))}
@@ -6101,17 +6142,19 @@ function WaterfallChart({ brand: _brand, steps, unit, height = 500 }: { brand: B
         const x = padL + i * slot + (slot - barW) / 2;
         const y = scale(b.top);
         const bh = scale(b.base) - scale(b.top);
-        // Meaningful encoding: start/end = solid ink; up = accent; down = quiet track.
-        let fill = ink.strong;
-        if (b.kind === "up") fill = "var(--slide-accent-text)";
-        else if (b.kind === "down") fill = ink.trackFill;
+        // Glass encoding: start/end = strong glass; up = accent bloom; down = muted glass.
+        let fillOpacity = 0.22;
+        let strokeOpacity = 0.55;
+        let fill: string = "var(--slide-accent-text)";
+        if (b.kind === "up") { fillOpacity = 0.42; strokeOpacity = 0.7; }
+        else if (b.kind === "down") { fillOpacity = 0.12; strokeOpacity = 0.3; fill = ink.strong; }
         const prev = bars[i - 1];
         return (
           <g key={i}>
             {prev && (
               <line x1={x - (slot - barW)} y1={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} x2={x} y2={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} stroke={ink.hairline} strokeDasharray="3 3" />
             )}
-            <rect x={x} y={y} width={barW} height={Math.max(2, bh)} fill={fill} />
+            <rect x={x} y={y} width={barW} height={Math.max(2, bh)} rx={3} fill={fill} fillOpacity={fillOpacity} stroke="var(--slide-accent-text)" strokeOpacity={strokeOpacity} strokeWidth={1} />
             <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={16} fontWeight={600} fill={b.kind === "down" ? ink.muted : ink.text} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.01em" }}>
               {b.kind === "up" ? "+" : b.kind === "down" ? "−" : ""}{Math.abs(b.value).toFixed(1)}{unit || ""}
             </text>
@@ -6119,6 +6162,7 @@ function WaterfallChart({ brand: _brand, steps, unit, height = 500 }: { brand: B
           </g>
         );
       })}
+
     </svg>
   );
 }
@@ -6275,7 +6319,7 @@ function ComboChart({ brand, points, barLabel, barUnit, lineLabel, lineUnit, hei
           const y = h - padB - bh;
           return (
             <g key={i}>
-              <rect x={x} y={y} width={barW} height={bh} fill={ink.strong} opacity={0.85} />
+              <rect x={x} y={y} width={barW} height={bh} rx={3} fill="var(--slide-accent-text)" fillOpacity={0.18} stroke="var(--slide-accent-text)" strokeOpacity={0.45} strokeWidth={1} />
               <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
             </g>
           );
