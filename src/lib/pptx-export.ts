@@ -168,6 +168,28 @@ async function fetchAsDataUrl(url: string, label?: string): Promise<string | nul
 
 type Palette = { primary: string; accent: string; surface: string; ink: string };
 
+// Derive a mode-aware palette so dark-mode exports don't render light-surface
+// tiles with dark-navy text (invisible on a dark background). The base palette
+// comes from the brand tokens (light-mode Blue White surface, dark navy ink);
+// in dark mode we flip surface to a slightly-elevated navy tile and text to
+// white/light-ink so cards, numbers and body copy read like the on-screen
+// preview.
+function adaptPaletteForMode(base: Palette, isDark: boolean): Palette {
+  if (!isDark) return base;
+  return {
+    // Big numbers, headings and title text (renderers use p.primary for these)
+    // must be white on a dark backdrop, not brand blue.
+    primary: "FFFFFF",
+    // Accent stays brand accent — used for eyebrows, rules and highlights.
+    accent: base.accent,
+    // Elevated tile surface: a step lighter than the navy primary background
+    // so cards/glass panels are visible without being pure white.
+    surface: "121B3D",
+    // Body/ink text becomes a soft light gray, legible on navy.
+    ink: "D6DEF2",
+  };
+}
+
 export type PptxExportResult = { blob?: Blob; failedSlides: string[] };
 
 export async function exportDeckToPptx(
@@ -392,6 +414,7 @@ export async function exportDeckToPptx(
     // Slide chrome dark/light selection: honor an explicit background choice
     // (color solid, image tint) so text/logos flip to legible palettes.
     const isDark = forceMode ? forceMode === "dark" : (advancedDark || kind === "cover" || kind === "divider" || bgIsImage);
+    const slidePalette = adaptPaletteForMode(palette, isDark);
     const useWhiteLogo = isDark || slide.variantId === "MV-SPLIT-MANIFESTO";
     const hideFooter = useWhiteLogo;
 
@@ -454,42 +477,42 @@ export async function exportDeckToPptx(
 
 
     try {
-      if (!renderAdvancedVariant(s, slide, palette, slideItemLogos[i])) {
+      if (!renderAdvancedVariant(s, slide, slidePalette, slideItemLogos[i])) {
         switch (kind) {
           case "cover":
-            renderCover(s, slide, palette);
+            renderCover(s, slide, slidePalette);
             break;
           case "divider":
-            renderDivider(s, slide, palette);
+            renderDivider(s, slide, slidePalette);
             break;
           case "agenda":
-            renderAgenda(s, slide, palette);
+            renderAgenda(s, slide, slidePalette);
             break;
           case "stats":
-            renderStats(s, slide, palette);
+            renderStats(s, slide, slidePalette);
             break;
           case "quote":
-            renderQuote(s, slide, palette);
+            renderQuote(s, slide, slidePalette);
             break;
           case "callout":
-            renderCallout(s, slide, palette);
+            renderCallout(s, slide, slidePalette);
             break;
           case "cards":
-            renderCards(s, slide, palette);
+            renderCards(s, slide, slidePalette);
             break;
           case "timeline":
-            renderTimeline(s, slide, palette);
+            renderTimeline(s, slide, slidePalette);
             break;
           case "compare":
-            renderCompare(s, slide, palette);
+            renderCompare(s, slide, slidePalette);
             break;
           default:
-            renderContent(s, slide, palette);
+            renderContent(s, slide, slidePalette);
         }
       }
     } catch {
       // Any per-slide renderer bug falls back to the generic mapping.
-      renderContent(s, slide, palette);
+      renderContent(s, slide, slidePalette);
     }
 
     // Per-slide logo placement — mirrors SlideChrome's contract:
