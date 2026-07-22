@@ -2561,6 +2561,7 @@ function extractSlideLayout(
   const root = orderParser.parse(xml) as PNode[];
   const sld = root.find((n) => pTag(n) === "p:sld");
   const sldNode = sld ?? root[0];
+  const clrMap = readClrMap(sldNode, DEFAULT_CLR_MAP);
   const cSld = sldNode ? pFind(sldNode, "p:cSld") : undefined;
   const spTree = cSld ? pFind(cSld, "p:spTree") : undefined;
   const shapes: LayoutShape[] = [];
@@ -2573,8 +2574,8 @@ function extractSlideLayout(
     const bg = pFind(node, "p:bg");
     if (!bg) return undefined;
     const bgPr = pFind(bg, "p:bgPr");
-    if (bgPr) return readFill(bgPr, imageEmbedIds);
-    const refFill = readBgRef(pFind(bg, "p:bgRef"), theme);
+    if (bgPr) return remapFillScheme(readFill(bgPr, imageEmbedIds), clrMap);
+    const refFill = readMappedBgRef(pFind(bg, "p:bgRef"), theme, clrMap);
     if (refFill) return refFill;
     return undefined;
   };
@@ -2595,7 +2596,7 @@ function extractSlideLayout(
   pushDecor(parents?.layout?.decor);
 
   if (spTree) {
-    walkSpTree(pChildren(spTree), zRef, undefined, shapes, imageEmbedIds, parents, undefined, theme);
+  walkSpTree(pChildren(spTree), zRef, undefined, shapes, imageEmbedIds, parents, undefined, theme, clrMap);
   }
   return { size, background, shapes };
 }
