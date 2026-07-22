@@ -27,6 +27,10 @@ export function useSlideMode(): SlideMode {
 export type SlideBackdrop = {
   url?: string;
   css?: string;
+  /** When true, render the procedural AuroraLayer instead of a photo/css bg. */
+  aurora?: boolean;
+  /** Seed for AuroraLayer determinism (defaults to variant id). */
+  auroraSeed?: string;
   scrim?: "bottom" | "left" | "right" | "top" | "full" | "vignette";
   scrimStrength?: number;
   imageDim?: number;
@@ -38,6 +42,7 @@ export type SlideBackdrop = {
   offsetX?: number; // -100..100 (percent). 0 = center.
   offsetY?: number; // -100..100 (percent). 0 = center.
 };
+
 export const SlideBackdropContext = createContext<SlideBackdrop | null>(null);
 
 // A slide frame that owns the locked chrome — brand bar, footer, logo, page
