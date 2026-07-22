@@ -2556,8 +2556,7 @@ function renderVariantBody({
                   <div className="text-2xl font-semibold" style={{ color: ink.strong }}>{s(it.label)}</div>
                   <div className="h-14 w-full rounded-lg" style={{ backgroundColor: ink.surface }}>
                     <div
-                      className="flex h-full items-center rounded-lg px-4"
-                      // white text is safe: bg is always brand.tokens.primary (dark) or primary→accent gradient anchored at dark primary
+                      className="flex h-full items-center rounded-lg px-4 text-white"
                       style={{
                         width: `${pct}%`,
                         background: highlight
