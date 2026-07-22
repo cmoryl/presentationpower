@@ -4332,20 +4332,21 @@ function renderVariantBody({
               const cur = Math.max(0, Math.min(100, Number(it.current) || 0));
               const bench = Math.max(0, Math.min(100, Number(it.benchmark) || 0));
               return (
-                <div key={i} className="py-6" style={{ borderTop: `1px solid ${ink.hairline}`, borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none" }}>
+                <div key={i} className="py-7">
                   <div className="flex items-baseline justify-between gap-8 mb-4">
-                    <div style={{ fontSize: 24, fontWeight: 600, color: ink.strong }}>{s(it.label)}</div>
+                    <div style={{ fontSize: 24, fontWeight: 600, color: ink.strong, letterSpacing: "-0.01em" }}>{s(it.label)}</div>
                     <div className="flex items-baseline gap-10">
-                      <div className="tabular-nums" style={{ fontSize: 40, fontWeight: 600, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}>{cur}%</div>
-                      <div className="tabular-nums" style={{ fontSize: 30, fontWeight: 600, color: "color-mix(in oklab, currentColor 40%, transparent)" }}>{bench}%</div>
+                      <div className="tabular-nums" style={{ fontSize: 44, fontWeight: 600, color: "var(--slide-accent-text)", letterSpacing: "-0.025em" }}>{cur}%</div>
+                      <div className="tabular-nums" style={{ fontSize: 26, fontWeight: 500, color: ink.faint }}>{bench}%</div>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <div style={{ position: "relative", height: 8, background: "rgba(10,15,28,0.08)" }}>
-                      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${cur}%`, background: brand.tokens.accent }} />
+                  <div className="flex flex-col gap-2.5">
+                    <div style={{ position: "relative", height: 6 }}>
+                      <div style={{ position: "absolute", inset: 0, background: `color-mix(in oklab, ${brand.tokens.accent} 10%, transparent)` }} />
+                      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${cur}%`, background: `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.accent} 55%, transparent), ${brand.tokens.accent})` }} />
                     </div>
-                    <div style={{ position: "relative", height: 8, background: "rgba(10,15,28,0.08)" }}>
-                      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${bench}%`, background: brand.tokens.primary, opacity: 0.35 }} />
+                    <div style={{ position: "relative", height: 3 }}>
+                      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${bench}%`, background: `color-mix(in oklab, ${brand.tokens.primary} 35%, transparent)` }} />
                     </div>
                   </div>
                   {s(it.range) && (
