@@ -24,6 +24,84 @@ type SbClient = {
 
 const BUCKET = "division-pptx";
 
+// ── Asset metadata builders ────────────────────────────────────────────
+// The Asset Inspector panel needs a compact per-slide + per-deck manifest
+// of everything the parser extracted (media, hyperlinks, comments, charts,
+// tables, diagrams, fonts, custom XML). We persist metadata only — never
+// base64 payloads for media/OLE — so slide rows stay small.
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildSlideAssets(sl: any) {
+  const media = (sl.media ?? []).map((m: any) => ({
+    kind: m.kind,
+    mime: m.mime,
+    path: m.path,
+    embedId: m.embedId,
+    bytes: m.bytes,
+  }));
+  const hyperlinks = (sl.hyperlinks ?? []).map((h: any) => ({
+    rId: h.rId,
+    target: h.target,
+    external: h.external,
+  }));
+  const comments = (sl.comments ?? []).map((c: any) => ({
+    authorName: c.authorName,
+    authorInitials: c.authorInitials,
+    text: c.text,
+    createdAt: c.createdAt,
+  }));
+  const tables = (sl.tables ?? []).map((t: any) => ({
+    header: t.header,
+    rowCount: (t.rows ?? []).length,
+    colCount: (t.header ?? []).length,
+  }));
+  const diagrams = (sl.diagrams ?? []).map((d: any) => ({
+    kind: d.kind,
+    layoutHint: d.layoutHint,
+    nodeCount: (d.nodes ?? []).length,
+    sampleNodes: (d.nodes ?? []).slice(0, 6).map((n: any) => ({ text: n.text, level: n.level })),
+  }));
+  const charts = (sl.charts ?? []).map((c: any) => ({
+    kind: c.kind,
+    title: c.title,
+    categoryCount: (c.categories ?? []).length,
+    seriesCount: (c.series ?? []).length,
+    seriesLabels: (c.series ?? []).map((s: any) => s.label).slice(0, 8),
+    unit: c.unit,
+    stacked: c.stacked,
+  }));
+  return {
+    media,
+    hyperlinks,
+    comments,
+    tables,
+    diagrams,
+    charts,
+    hidden: !!sl.hidden,
+    transition: sl.transition,
+    hasAnimation: !!sl.hasAnimation,
+  };
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildDeckExtras(parsed: any) {
+  return {
+    metadata: parsed.metadata ?? {},
+    graphicsSummary: parsed.graphicsSummary ?? null,
+    embeddedFonts: (parsed.embeddedFonts ?? []).map((f: any) => ({
+      typeface: f.typeface,
+      variants: (f.variants ?? []).map((v: any) => ({ style: v.style, path: v.path, mime: v.mime })),
+    })),
+    customXmlParts: (parsed.customXmlParts ?? []).map((p: any) => ({
+      path: p.path,
+      bytes: typeof p.xml === "string" ? p.xml.length : 0,
+    })),
+    imagePayloadBytes: parsed.imagePayloadBytes ?? 0,
+    imagesTruncated: !!parsed.imagesTruncated,
+  };
+}
+
+
 // ~100MB raw → ~140MB base64. Client validates size; server caps here.
 const UploadInput = z.object({
   divisionId: z.string().min(1).max(120),
