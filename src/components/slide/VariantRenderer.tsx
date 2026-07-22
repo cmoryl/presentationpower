@@ -4718,7 +4718,16 @@ function renderVariantBody({
       );
     }
 
+    // ── Locations (MV-LOC-*) ──────────────────────────────────────────────
+    case "MV-LOC-WORLD-PINS":
+    case "MV-LOC-WORLD-STATS":
+    case "MV-LOC-REGION-FOCUS":
+    case "MV-LOC-HUB-SPOKE": {
+      return renderLocationsVariant(variant.id, brand, mode, ink, c, pageNumber);
+    }
+
     default:
+
 
 
 
