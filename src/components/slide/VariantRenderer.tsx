@@ -325,14 +325,48 @@ function renderVariantBody({
     case "MV-OP-COVER":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <div className="flex h-full flex-col justify-end">
-            <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
-            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-8" />
-            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1520} className="mt-10">
+          {/* Ambient depth — a soft spotlight glow drifting up from bottom-left,
+              plus a low-opacity ring signature on the right. Keynote-grade. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage: `
+                radial-gradient(60% 55% at 12% 92%, ${brand.tokens.accent}33 0%, transparent 62%),
+                radial-gradient(45% 40% at 92% 8%, ${brand.tokens.accent}1C 0%, transparent 70%)
+              `,
+            }}
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -right-40 top-1/2 h-[820px] w-[820px] -translate-y-1/2 rounded-full"
+            style={{
+              border: `1px solid ${brand.tokens.accent}22`,
+              boxShadow: `inset 0 0 0 1px ${brand.tokens.accent}11, inset 0 0 220px ${brand.tokens.accent}18`,
+            }}
+          />
+          <div className="relative flex h-full flex-col justify-end">
+            <div className="flex items-center gap-4">
+              <span
+                className="inline-block h-2 w-2 rounded-full"
+                style={{
+                  background: brand.tokens.accent,
+                  boxShadow: `0 0 24px ${brand.tokens.accent}, 0 0 8px ${brand.tokens.accent}`,
+                }}
+              />
+              <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
+            </div>
+            <div
+              className="mt-8 h-[2px] w-[140px] rounded-full"
+              style={{
+                backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)`,
+              }}
+            />
+            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1620} className="mt-10">
               {s(c.title, "Client")}
             </DisplayTitle>
             {s(c.subtitle) && (
-              <SupportingText size="xl" opacity={0.82} maxWidthPx={1180} className="mt-10">
+              <SupportingText size="xl" opacity={0.86} maxWidthPx={1200} className="mt-10">
                 {s(c.subtitle)}
               </SupportingText>
             )}
@@ -434,25 +468,66 @@ function renderVariantBody({
         </SlideFrame>
       );
 
-    case "MV-OP-AGENDA":
+    case "MV-OP-AGENDA": {
+      const items = arr(c.items);
+      const rule = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, "Agenda")} kicker="Contents" />
-          <div className="mt-16 grid grid-cols-2 gap-x-24 gap-y-8">
-            {arr(c.items).map((it, i) => (
-              <div key={i} className="flex items-baseline gap-8 border-t pt-6" style={{ borderColor: "rgba(10,15,28,0.10)" }}>
+          {/* Ambient glow anchoring the composition */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage: `radial-gradient(38% 42% at 88% 12%, ${brand.tokens.accent}${isDark ? "1F" : "12"} 0%, transparent 70%)`,
+            }}
+          />
+          <div className="relative">
+            <SlideTitle brand={brand} title={s(c.title, "Agenda")} kicker="Contents" />
+            <div className="mt-16 grid grid-cols-2 gap-x-24">
+              {items.map((it, i) => (
                 <div
-                  className="tabular-nums"
-                  style={{ color: brand.tokens.accent, fontSize: 40, fontWeight: 600, letterSpacing: "-0.02em", minWidth: 76 }}
+                  key={i}
+                  className="group grid grid-cols-[96px_1fr_auto] items-center gap-6 py-7"
+                  style={{ borderTop: `1px solid ${rule}` }}
                 >
-                  {String(i + 1).padStart(2, "0")}
+                  <div
+                    className="tabular-nums"
+                    style={{
+                      fontSize: 48,
+                      fontWeight: 600,
+                      letterSpacing: "-0.03em",
+                      lineHeight: 1,
+                      background: `linear-gradient(180deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}88 100%)`,
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 34,
+                      lineHeight: 1.18,
+                      fontWeight: 600,
+                      letterSpacing: "-0.02em",
+                      color: ink.strong,
+                    }}
+                  >
+                    {s(it.label)}
+                  </div>
+                  <div
+                    aria-hidden
+                    className="h-[1px] w-10"
+                    style={{ background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, transparent 100%)` }}
+                  />
                 </div>
-                <div style={{ fontSize: 36, lineHeight: 1.2, fontWeight: 500 }}>{s(it.label)}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </SlideFrame>
       );
+    }
 
     case "MV-OP-AGENDA-VERTICAL":
       return (
@@ -486,34 +561,116 @@ function renderVariantBody({
 
     case "MV-OP-INTRO-TEAM":
     case "MV-TEAM-BIOS-3":
-    case "MV-TEAM-BIOS-4":
+    case "MV-TEAM-BIOS-4": {
+      const people = arr(c.items);
+      const cols = people.length === 4 ? 4 : people.length === 2 ? 2 : 3;
+      const portraitPx = cols === 4 ? 168 : 200;
+      const roleColor = isDark ? "rgba(255,255,255,0.62)" : "rgba(10,15,28,0.58)";
+      const cardBg = isDark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)";
+      const cardRing = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Team")} />
-          <div className={`mt-14 grid gap-12 ${arr(c.items).length === 4 ? "grid-cols-4" : arr(c.items).length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
-            {arr(c.items).map((p, i) => (
-              <div key={i} className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+          <div className={`mt-14 grid gap-8 ${cols === 4 ? "grid-cols-4" : cols === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
+            {people.map((p, i) => {
+              const name = s(p.name);
+              const initials = name
+                .split(/\s+/)
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((w) => w[0]?.toUpperCase() ?? "")
+                .join("");
+              const photo = s(p.photoUrl ?? p.avatarUrl ?? p.imageUrl);
+              return (
                 <div
-                  className="mb-6 h-24 w-24 rounded-full"
-                  style={{ backgroundColor: brand.tokens.accent, opacity: 0.9 }}
-                  aria-hidden
-                />
-                <div style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: brand.tokens.primary }}>
-                  {s(p.name)}
-                </div>
-                {s(p.role) && (
-                  <div className="mt-2 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "rgba(10,15,28,0.62)", fontWeight: 500 }}>
-                    {s(p.role)}
+                  key={i}
+                  className="relative overflow-hidden rounded-3xl p-10"
+                  style={{
+                    background: cardBg,
+                    border: `1px solid ${cardRing}`,
+                    backgroundImage: `radial-gradient(120% 60% at 50% -20%, ${brand.tokens.accent}${isDark ? "1F" : "14"} 0%, transparent 60%)`,
+                  }}
+                >
+                  <div
+                    aria-hidden
+                    className="absolute inset-x-0 top-0 h-[3px]"
+                    style={{
+                      background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 85%)`,
+                    }}
+                  />
+                  <div className="flex flex-col items-start">
+                    <div
+                      className="relative mb-8 grid place-items-center rounded-full"
+                      style={{
+                        width: portraitPx,
+                        height: portraitPx,
+                        background: photo
+                          ? undefined
+                          : `radial-gradient(circle at 30% 25%, ${brand.tokens.accent}55 0%, ${brand.tokens.primary}CC 70%)`,
+                        boxShadow: `0 0 0 2px ${brand.tokens.accent}55, 0 24px 60px -20px ${brand.tokens.accent}66`,
+                        overflow: "hidden",
+                      }}
+                    >
+                      {photo ? (
+                        <img src={photo} alt={name} className="h-full w-full object-cover" />
+                      ) : (
+                        <span
+                          style={{
+                            color: "#ffffff",
+                            fontSize: portraitPx * 0.36,
+                            fontWeight: 600,
+                            letterSpacing: "-0.02em",
+                          }}
+                        >
+                          {initials || "•"}
+                        </span>
+                      )}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 32,
+                        fontWeight: 600,
+                        letterSpacing: "-0.02em",
+                        color: ink.strong,
+                        lineHeight: 1.1,
+                      }}
+                    >
+                      {name}
+                    </div>
+                    {s(p.role) && (
+                      <div
+                        className="mt-3 uppercase"
+                        style={{
+                          fontSize: 15,
+                          letterSpacing: "0.24em",
+                          color: roleColor,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {s(p.role)}
+                      </div>
+                    )}
+                    {s(p.bio ?? p.note) && (
+                      <div
+                        className="mt-6"
+                        style={{
+                          fontSize: 20,
+                          lineHeight: 1.45,
+                          color: ink.body,
+                          maxWidth: 420,
+                        }}
+                      >
+                        {s(p.bio ?? p.note)}
+                      </div>
+                    )}
                   </div>
-                )}
-                <SupportingText size="md" opacity={0.72} className="mt-5" maxWidthPx={420}>
-                  {s(p.bio ?? p.note)}
-                </SupportingText>
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         </SlideFrame>
       );
+    }
 
     // ── Context & Challenge ───────────────────────────────────────────
     case "MV-CTX-CARDS-3":
@@ -606,12 +763,46 @@ function renderVariantBody({
     case "MV-INS-BIG-IDEA":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <div className="flex h-full flex-col justify-center">
-            <Kicker brand={brand}>{s(c.kicker, "The big idea")}</Kicker>
-            <Hairline color={brand.tokens.accent} widthPx={120} thicknessPx={2} className="mt-8 mb-12" />
-            <DisplayTitle size="cover" color={brand.tokens.primary} maxWidthPx={1620}>
+          {/* Ambient spotlight — a large diffuse glow behind the idea makes
+              the hero moment breathe. Second, tighter halo adds focus. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage: `
+                radial-gradient(60% 55% at 22% 55%, ${brand.tokens.accent}${isDark ? "28" : "1A"} 0%, transparent 65%),
+                radial-gradient(28% 26% at 22% 55%, ${brand.tokens.accent}${isDark ? "3A" : "22"} 0%, transparent 70%)
+              `,
+            }}
+          />
+          <div className="relative flex h-full flex-col justify-center">
+            <div className="flex items-center gap-4">
+              <span
+                className="inline-block h-2 w-2 rounded-full"
+                style={{
+                  background: brand.tokens.accent,
+                  boxShadow: `0 0 24px ${brand.tokens.accent}, 0 0 8px ${brand.tokens.accent}`,
+                }}
+              />
+              <Kicker brand={brand}>{s(c.kicker, "The big idea")}</Kicker>
+            </div>
+            <div
+              className="mt-8 mb-12 h-[2px] w-[160px] rounded-full"
+              style={{ backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)` }}
+            />
+            <div
+              style={{
+                fontSize: 128,
+                fontWeight: 600,
+                letterSpacing: "-0.035em",
+                lineHeight: 1.02,
+                maxWidth: 1660,
+                color: ink.strong,
+                textShadow: isDark ? `0 2px 40px ${brand.tokens.accent}22` : undefined,
+              }}
+            >
               {s(c.idea)}
-            </DisplayTitle>
+            </div>
           </div>
         </SlideFrame>
       );
@@ -641,24 +832,76 @@ function renderVariantBody({
         </SlideFrame>
       );
 
-    case "MV-INS-QUOTE":
+    case "MV-INS-QUOTE": {
+      const cardBg = isDark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)";
+      const cardRing = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="relative flex h-full flex-col justify-center">
-            <QuoteMark color={brand.tokens.accent} size={620} className="absolute -top-4 -left-4" />
-            <div className="relative">
-              <Kicker brand={brand}>In their words</Kicker>
-              <Hairline color={brand.tokens.accent} widthPx={88} thicknessPx={2} className="mt-6 mb-10" />
-              <div style={{ fontSize: 78, fontWeight: 500, lineHeight: 1.14, letterSpacing: "-0.02em", maxWidth: 1520, color: brand.tokens.primary }}>
-                {s(c.quote)}
+            {/* Ambient accent glow behind the quote card */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                backgroundImage: `radial-gradient(50% 50% at 15% 30%, ${brand.tokens.accent}${isDark ? "24" : "12"} 0%, transparent 70%)`,
+              }}
+            />
+            <div
+              className="relative overflow-hidden rounded-[32px] px-20 py-20"
+              style={{
+                background: cardBg,
+                border: `1px solid ${cardRing}`,
+                backgroundImage: `radial-gradient(80% 60% at 0% 0%, ${brand.tokens.accent}${isDark ? "1A" : "0E"} 0%, transparent 60%)`,
+              }}
+            >
+              <div
+                aria-hidden
+                className="absolute -top-8 -left-4 select-none"
+                style={{
+                  color: brand.tokens.accent,
+                  fontSize: 520,
+                  lineHeight: 0.7,
+                  fontWeight: 700,
+                  opacity: isDark ? 0.22 : 0.14,
+                  letterSpacing: "-0.06em",
+                }}
+              >
+                “
               </div>
-              <div className="mt-14">
-                <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} />
+              <div className="relative">
+                <div className="flex items-center gap-4">
+                  <span
+                    className="inline-block h-2 w-2 rounded-full"
+                    style={{ background: brand.tokens.accent, boxShadow: `0 0 20px ${brand.tokens.accent}` }}
+                  />
+                  <Kicker brand={brand}>In their words</Kicker>
+                </div>
+                <div
+                  className="mt-10"
+                  style={{
+                    fontSize: 82,
+                    fontWeight: 500,
+                    lineHeight: 1.12,
+                    letterSpacing: "-0.025em",
+                    maxWidth: 1520,
+                    color: ink.strong,
+                  }}
+                >
+                  {s(c.quote)}
+                </div>
+                <div
+                  className="mt-14 h-[2px] w-[120px] rounded-full"
+                  style={{ backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)` }}
+                />
+                <div className="mt-8">
+                  <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} />
+                </div>
               </div>
             </div>
           </div>
         </SlideFrame>
       );
+    }
 
     // ── Solution & Process ─────────────────────────────────────────────
     case "MV-SOL-PILLARS-5": {
@@ -813,12 +1056,14 @@ function renderVariantBody({
     // ── Proof & Data ──────────────────────────────────────────────────
     case "MV-PROOF-LOGOS":
     case "MV-CASE-LOGO-GRID": {
-      const tileText = mode === "dark" ? "#ffffff" : brand.tokens.primary;
+      const tileText = isDark ? "#ffffff" : brand.tokens.primary;
       const accent = brand.tokens.accent;
+      const tileBg = isDark ? "rgba(255,255,255,0.04)" : "rgba(10,15,28,0.02)";
+      const tileRing = isDark ? "rgba(255,255,255,0.08)" : "rgba(10,15,28,0.06)";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
-          <div className="mt-14 grid grid-cols-4 gap-10">
+          <div className="mt-14 grid grid-cols-4 gap-6">
             {arr(c.items).map((it, i) => {
               const name = s(it.name ?? it.client);
               const logoUrl = pickLogoForMode(it, mode);
@@ -827,34 +1072,48 @@ function renderVariantBody({
               return (
                 <div
                   key={i}
-                  className="flex aspect-[3/2] flex-col items-center justify-center gap-4 p-4 text-center"
-                  style={{ color: tileText }}
+                  className="relative flex aspect-[3/2] flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl px-6 py-8 text-center"
+                  style={{
+                    color: tileText,
+                    background: tileBg,
+                    border: `1px solid ${tileRing}`,
+                    backgroundImage: `radial-gradient(120% 80% at 50% 0%, ${accent}${isDark ? "18" : "0C"} 0%, transparent 65%)`,
+                  }}
                 >
-                  {logoUrl || logoPath ? (
-                    <ClientLogoImg
-                      path={logoPath}
-                      url={logoUrl}
-                      alt={name ? `${name} logo` : "Client logo"}
-                      className="max-h-[62%] max-w-[86%] object-contain"
-                    />
-                  ) : (
-                    <div className="text-2xl font-semibold">{name}</div>
-                  )}
+                  <div
+                    aria-hidden
+                    className="absolute inset-x-0 top-0 h-[2px]"
+                    style={{ background: `linear-gradient(90deg, ${accent}00, ${accent}, ${accent}00)` }}
+                  />
+                  <div className="flex flex-1 items-center justify-center">
+                    {logoUrl || logoPath ? (
+                      <ClientLogoImg
+                        path={logoPath}
+                        url={logoUrl}
+                        alt={name ? `${name} logo` : "Client logo"}
+                        className="max-h-[110px] max-w-[80%] object-contain"
+                        style={{ filter: isDark ? "brightness(1.05)" : undefined }}
+                      />
+                    ) : (
+                      <div style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.01em" }}>{name}</div>
+                    )}
+                  </div>
                   {result && (
-                    <div className="flex flex-col items-center gap-2">
-                      <div style={{ width: 32, height: 2, background: accent, opacity: 0.9 }} />
-                      <div
-                        className="tabular-nums"
-                        style={{
-                          color: accent,
-                          fontSize: 22,
-                          fontWeight: 600,
-                          letterSpacing: "-0.01em",
-                          lineHeight: 1.15,
-                        }}
-                      >
-                        {result}
-                      </div>
+                    <div
+                      className="tabular-nums"
+                      style={{
+                        color: accent,
+                        fontSize: 22,
+                        fontWeight: 700,
+                        letterSpacing: "-0.01em",
+                        lineHeight: 1.15,
+                        padding: "6px 14px",
+                        borderRadius: 999,
+                        background: `${accent}${isDark ? "1F" : "14"}`,
+                        border: `1px solid ${accent}44`,
+                      }}
+                    >
+                      {result}
                     </div>
                   )}
                 </div>
@@ -1425,29 +1684,92 @@ function renderVariantBody({
         </SlideFrame>
       );
 
-    case "MV-CLOSE-CTA":
+    case "MV-CLOSE-CTA": {
+      const steps: Item[] = arr(c.items).length > 0
+        ? arr(c.items)
+        : s(c.nextSteps)
+          ? s(c.nextSteps).split(/\n+/).filter(Boolean).map((line) => ({ label: line } as Item))
+          : [];
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
-          <div className="flex h-full flex-col justify-center">
-            <Kicker brand={brand}>What happens next</Kicker>
-            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-8" />
-            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1520} className="mt-10">
-              {s(c.message)}
-            </DisplayTitle>
-            {s(c.nextSteps) && (
-              <SupportingText size="xl" opacity={0.85} maxWidthPx={1280} className="mt-10">
-                {s(c.nextSteps)}
-              </SupportingText>
-            )}
-            {(s(c.owner) || s(c.followUp)) && (
-              <MetaRow className="mt-16">
-                {s(c.owner) && <span>{s(c.owner)}</span>}
-                {s(c.followUp) && <span>{s(c.followUp)}</span>}
-              </MetaRow>
+          {/* Ambient cinematic glow */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage: `
+                radial-gradient(55% 60% at 15% 90%, ${brand.tokens.accent}38 0%, transparent 65%),
+                radial-gradient(40% 50% at 90% 10%, ${brand.tokens.accent}1F 0%, transparent 70%)
+              `,
+            }}
+          />
+          <div className="relative grid h-full grid-cols-[1.1fr_0.9fr] items-center gap-24">
+            <div>
+              <div className="flex items-center gap-4">
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ background: brand.tokens.accent, boxShadow: `0 0 24px ${brand.tokens.accent}` }}
+                />
+                <Kicker brand={brand}>What happens next</Kicker>
+              </div>
+              <div
+                className="mt-8 h-[2px] w-[160px] rounded-full"
+                style={{ backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)` }}
+              />
+              <DisplayTitle size="hero" color="#ffffff" maxWidthPx={1080} className="mt-10">
+                {s(c.message, "Let's start.")}
+              </DisplayTitle>
+              {(s(c.owner) || s(c.followUp)) && (
+                <MetaRow className="mt-14">
+                  {s(c.owner) && <span>{s(c.owner)}</span>}
+                  {s(c.followUp) && <span>{s(c.followUp)}</span>}
+                </MetaRow>
+              )}
+            </div>
+            {steps.length > 0 && (
+              <div
+                className="relative overflow-hidden rounded-3xl p-10"
+                style={{
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  backgroundImage: `radial-gradient(120% 80% at 0% 0%, ${brand.tokens.accent}22 0%, transparent 60%)`,
+                }}
+              >
+                <div
+                  aria-hidden
+                  className="absolute inset-x-0 top-0 h-[3px]"
+                  style={{ background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 85%)` }}
+                />
+                <div className="uppercase" style={{ fontSize: 15, letterSpacing: "0.24em", fontWeight: 600, color: "rgba(255,255,255,0.62)" }}>
+                  Next steps
+                </div>
+                <div className="mt-8 space-y-6">
+                  {steps.slice(0, 4).map((it, i) => (
+                    <div key={i} className="grid grid-cols-[56px_1fr] items-baseline gap-5">
+                      <div
+                        className="tabular-nums"
+                        style={{
+                          fontSize: 32,
+                          fontWeight: 600,
+                          letterSpacing: "-0.02em",
+                          color: brand.tokens.accent,
+                          lineHeight: 1,
+                        }}
+                      >
+                        {String(i + 1).padStart(2, "0")}
+                      </div>
+                      <div style={{ fontSize: 26, lineHeight: 1.32, color: "#ffffff", fontWeight: 500 }}>
+                        {s(it.label ?? it.title ?? it.body)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </SlideFrame>
       );
+    }
 
     case "MV-CLOSE-THANKS":
       return (
@@ -4717,19 +5039,31 @@ function CardGrid({
 // baseline because StatFigure is sized by name, not by string length.
 
 function StatTile({ brand, item, index, dense, cols, isLastRow }: { brand: BrandMode; item: Item; index: number; dense: boolean; cols: number; isLastRow: boolean }) {
+  const mode = useContext(SlideModeContext);
+  const isDark = mode === "dark";
   const isFirstInRow = index % cols === 0;
   const size = dense ? "md" : "lg";
+  const rule = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
+  const softRule = isDark ? "rgba(255,255,255,0.06)" : "rgba(10,15,28,0.05)";
   return (
     <div
-      className="relative flex flex-col px-8 py-6"
+      className="relative flex flex-col px-10 py-8"
       style={{
-        borderLeft: isFirstInRow ? "none" : "1px solid rgba(10,15,28,0.10)",
-        borderBottom: isLastRow ? "none" : "1px solid rgba(10,15,28,0.06)",
+        borderLeft: isFirstInRow ? "none" : `1px solid ${rule}`,
+        borderBottom: isLastRow ? "none" : `1px solid ${softRule}`,
       }}
     >
+      {/* Accent gradient rail — reads as a top-lit column, keynote-grade. */}
+      <div
+        aria-hidden
+        className="absolute left-10 right-10 top-0 h-[2px]"
+        style={{
+          background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 70%)`,
+        }}
+      />
       {s(item.title) && (
-        <div className="mb-5">
-          <Kicker brand={brand} size={18}>{s(item.title)}</Kicker>
+        <div className="mb-6">
+          <Kicker brand={brand} size={16}>{s(item.title)}</Kicker>
         </div>
       )}
       <StatFigure
@@ -4824,20 +5158,51 @@ function SlideTitle({ brand, title, kicker }: { brand: BrandMode; title: string;
 
 
 function Card({ brand, title, body, index, icon }: { brand: BrandMode; title: string; body: string; index: number; icon?: string }) {
-  // Hairline-topped column card — borderless surface, single accent rule at
-  // top, small-caps ordinal, bold title with tight tracking, muted body.
+  const mode = useContext(SlideModeContext);
+  const isDark = mode === "dark";
+  const cardBg = isDark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)";
+  const cardRing = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
+  const bodyColor = isDark ? "rgba(255,255,255,0.72)" : "rgba(10,15,28,0.68)";
+  const titleColor = isDark ? "#ffffff" : brand.tokens.primary;
   return (
-    <div className="flex flex-col pt-8" style={{ borderTop: "2px solid currentColor", color: brand.tokens.accent }}>
-      <div className="flex items-center justify-between" style={{ color: "rgba(10,15,28,0.55)" }}>
-        <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", fontWeight: 600, color: brand.tokens.accent }}>
+    <div
+      className="relative flex flex-col overflow-hidden rounded-3xl p-10"
+      style={{
+        background: cardBg,
+        border: `1px solid ${cardRing}`,
+        backgroundImage: `radial-gradient(120% 90% at 0% 0%, ${brand.tokens.accent}${isDark ? "18" : "0C"} 0%, transparent 62%)`,
+      }}
+    >
+      {/* Top accent bar — the signature seam of a keynote card. */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-[3px]"
+        style={{ background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 80%)` }}
+      />
+      <div className="flex items-start justify-between">
+        <div
+          className="tabular-nums"
+          style={{
+            fontSize: 44,
+            fontWeight: 600,
+            letterSpacing: "-0.03em",
+            lineHeight: 1,
+            background: `linear-gradient(180deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}88 100%)`,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
           {String(index).padStart(2, "0")}
         </div>
-        <IconBadge brand={brand} label={title} index={index - 1} size="sm" override={icon} treatment="soft-circle" />
+        <IconBadge brand={brand} label={title} index={index - 1} size="md" override={icon} treatment="soft-circle" />
       </div>
-      <div className="mt-8" style={{ fontSize: 36, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.12 }}>
+      <div
+        className="mt-10"
+        style={{ fontSize: 36, fontWeight: 600, color: titleColor, letterSpacing: "-0.02em", lineHeight: 1.14 }}
+      >
         {title}
       </div>
-      <div className="mt-5" style={{ fontSize: 22, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>
+      <div className="mt-5" style={{ fontSize: 22, lineHeight: 1.44, color: bodyColor }}>
         {body}
       </div>
     </div>
