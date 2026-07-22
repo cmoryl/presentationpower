@@ -31,6 +31,7 @@ import { VIDEO_SLIDE_EXAMPLES, type VideoSlideExample } from "@/lib/video-slide-
 import { listClientLogos } from "@/lib/client-logos.functions";
 import { toLogoFillers, overlayLogoHubFillers, type LogoFiller } from "@/lib/logohub-fillers";
 import { SaveModuleDialog } from "@/components/SaveModuleDialog";
+import { exportDeckToPptx } from "@/lib/pptx-export";
 
 
 
@@ -1089,12 +1090,42 @@ function VariantDetailModal({
 }) {
   const [saveOpen, setSaveOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const copyId = async () => {
     try {
       if (navigator?.clipboard) await navigator.clipboard.writeText(variant.id);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1400);
     } catch { /* ignore */ }
+  };
+  const downloadPptx = async () => {
+    if (downloading) return;
+    setDownloading(true);
+    try {
+      const singleSlideDeck = {
+        id: `library-${variant.id}-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        title: `${variant.name} — ${brand.name}`,
+        briefId: "library-preview",
+        brandModeId: brand.id,
+        archetypeId: "single-module",
+        slides: [{
+          id: `slide-${variant.id}`,
+          position: 0,
+          sectionId: sections[0]?.id ?? "",
+          variantId: variant.id,
+          layoutId: variant.permittedLayoutIds[0],
+          content: detailContent,
+          changes: [],
+        }],
+      } as Parameters<typeof exportDeckToPptx>[0];
+      await exportDeckToPptx(singleSlideDeck, brand);
+    } catch (err) {
+      console.error("[library] module download failed", err);
+      alert("Download failed. Check console for details.");
+    } finally {
+      setDownloading(false);
+    }
   };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -1184,6 +1215,16 @@ function VariantDetailModal({
               title="Save this variant + content as a reusable module"
             >
               <Star size={12} /> Save as module
+            </button>
+            <button
+              type="button"
+              onClick={downloadPptx}
+              disabled={downloading}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C] bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#003FC7] disabled:opacity-60"
+              title="Download this module as a single-slide .pptx"
+            >
+              {downloading ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
+              {downloading ? "Preparing…" : "Download .pptx"}
             </button>
             {usageCount > 0 && (
               <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
