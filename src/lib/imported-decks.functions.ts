@@ -321,6 +321,7 @@ export const reparseImportedDeck = createServerFn({ method: "POST" })
         imageCount: sl.images.length,
         imagePaths: savedPaths,
         layout,
+        assets: buildSlideAssets(sl),
       };
     }));
 
@@ -335,9 +336,11 @@ export const reparseImportedDeck = createServerFn({ method: "POST" })
         slides: slidesLite,
         status: "parsed",
         error: null,
+        extras: buildDeckExtras(parsed),
       })
       .eq("id", data.id);
     if (error) throw new Error((error as { message?: string }).message ?? "Save failed");
+
 
     return {
       id: data.id,
