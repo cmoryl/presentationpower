@@ -1618,7 +1618,9 @@ function LightboxPortal({
             <ScaledSlide>
               <SlideBackdropContext.Provider value={isDark ? darkBackdrop : lightBackdrop}>
                 <SlideVideoPreviewContext.Provider value={setPlayUrl}>
-                  <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
+                  <SlideForceVideoAutoplayContext.Provider value={true}>
+                    <VariantRenderer slide={previewSlide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
+                  </SlideForceVideoAutoplayContext.Provider>
                 </SlideVideoPreviewContext.Provider>
               </SlideBackdropContext.Provider>
             </ScaledSlide>
