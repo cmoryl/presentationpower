@@ -131,6 +131,35 @@ export function auroraLayerOpacity(mode: "dark" | "light", intensity = 1): numbe
   return intensity * (mode === "dark" ? 0.7 : 0.85);
 }
 
+/**
+ * Per-brand dark-mode frosted-glass wash. Tuned so every division keeps the
+ * "orbs peek through glass" character instead of collapsing into a single
+ * color field. Alpha is derived from the brand accent's luminance (brighter
+ * accents get a hair more wash to tame them; deep/saturated accents get
+ * less so they still glow through). Wash colour mixes a neutral navy with
+ * the brand surface to carry a subtle brand tint into the film.
+ */
+export function darkGlassWash(brand: BrandMode): { color: string; alpha: number } {
+  const NEUTRAL = "#0B1330";
+  const surface = brand.tokens.surface ?? NEUTRAL;
+  const color = mixHex(NEUTRAL, surface, 0.35);
+  const lum = relLuminance(brand.tokens.accent);
+  // lum ~0 (deep) → 0.06 alpha; lum ~1 (bright/pastel) → 0.14 alpha.
+  const alpha = Math.max(0.05, Math.min(0.15, 0.06 + lum * 0.09));
+  return { color, alpha };
+}
+
+function relLuminance(hex: string): number {
+  const m = /^#?([a-f\d]{6})$/i.exec(hex);
+  if (!m) return 0.5;
+  const int = parseInt(m[1], 16);
+  const rgb = [(int >> 16) & 255, (int >> 8) & 255, int & 255].map((c) => {
+    const v = c / 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+}
+
 
 
 function mixHex(a: string, b: string, t: number): string {
