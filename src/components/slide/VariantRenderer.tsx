@@ -5222,7 +5222,7 @@ function AuroraStatGrid({
     <SlideFrame brand={brand} pageNumber={pageNumber}>
       {title ? <SlideTitle brand={brand} title={title} /> : null}
       <div
-        className={`mt-16 grid gap-y-16`}
+        className={`mt-24 grid gap-y-16`}
         style={{
           gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
           gridTemplateRows: `repeat(${rowCount}, minmax(0, auto))`,
