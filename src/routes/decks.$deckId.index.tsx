@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { deckCloudId } from "@/lib/deck-uuid";
 import { RebrandMenu } from "@/components/RebrandMenu";
 import { BrandReviewPanel } from "@/components/BrandReviewPanel";
+import { ArtDirectorPanel } from "@/components/ArtDirectorPanel";
 import { CommentsPanel } from "@/components/CommentsPanel";
 import { ReviewStatusControl } from "@/components/ReviewStatusControl";
 import { MessageSquare } from "lucide-react";
@@ -789,6 +790,14 @@ function DeckEditor() {
       )}
 
       <BrandReviewPanel deckId={deckId} onNavigateToSlide={(i) => setActiveIdx(Math.max(0, Math.min(deck.slides.length - 1, i)))} />
+      <ArtDirectorPanel
+        deckId={deckId}
+        onNavigateToSlide={(i) => setActiveIdx(Math.max(0, Math.min(deck.slides.length - 1, i)))}
+        onSwapVariant={(i, vid) => {
+          const target = deck.slides[i];
+          if (target) swapVariant(deck.id, target.id, vid);
+        }}
+      />
 
       {commentsOpen && (
         <>
