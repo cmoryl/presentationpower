@@ -5621,7 +5621,7 @@ function EditorialNote({ title, body, accent }: { title: string; body: string; a
 function SummaryStatCard({ brand, label, value, unit, series }: { brand: BrandMode; label: string; value: string; unit: string; series: number[] }) {
   const ink = useSlideInk();
   return (
-    <div className="pt-8" style={{ borderTop: `1px solid ${ink.accent(0.5)}` }}>
+    <div>
       <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.muted, fontWeight: 600 }}>{label}</div>
       <div className="mt-4 flex items-baseline" style={{ fontSize: 84, fontWeight: 600, color: ink.text, letterSpacing: "-0.03em", lineHeight: 1 }}>
         <span className="tabular-nums">{value || "—"}</span>
