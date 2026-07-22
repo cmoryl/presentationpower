@@ -66,6 +66,8 @@ export type SlideInk = {
   accentText: string;
 };
 
+export const SlideInkContext = createContext<SlideInk | null>(null);
+
 
 function hexToRgba(hex: string, alpha: number): string {
   const m = /^#?([a-f\d]{6})$/i.exec(hex);
@@ -77,6 +79,53 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, alpha))})`;
 }
 
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const m = /^#?([a-f\d]{6})$/i.exec(hex);
+  if (!m) return null;
+  const int = parseInt(m[1], 16);
+  return { r: (int >> 16) & 255, g: (int >> 8) & 255, b: int & 255 };
+}
+
+function rgbToHex({ r, g, b }: { r: number; g: number; b: number }): string {
+  const to = (v: number) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0");
+  return `#${to(r)}${to(g)}${to(b)}`;
+}
+
+function mixRgb(a: { r: number; g: number; b: number }, b: { r: number; g: number; b: number }, t: number) {
+  return { r: a.r + (b.r - a.r) * t, g: a.g + (b.g - a.g) * t, b: a.b + (b.b - a.b) * t };
+}
+
+function relativeLuminance(hex: string): number {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return 0;
+  const channel = (v: number) => {
+    const s = v / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  };
+  return 0.2126 * channel(rgb.r) + 0.7152 * channel(rgb.g) + 0.0722 * channel(rgb.b);
+}
+
+export function contrastRatio(foreground: string, background: string): number {
+  const l1 = relativeLuminance(foreground);
+  const l2 = relativeLuminance(background);
+  const light = Math.max(l1, l2);
+  const dark = Math.min(l1, l2);
+  return (light + 0.05) / (dark + 0.05);
+}
+
+function readableOn(hex: string, backgrounds: string[], prefer: "darken" | "lighten", target = 4.5): string {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return hex;
+  const pole = prefer === "darken" ? { r: 0, g: 0, b: 0 } : { r: 255, g: 255, b: 255 };
+  let best = hex;
+  for (let step = 0; step <= 20; step++) {
+    const candidate = rgbToHex(mixRgb(rgb, pole, step / 20));
+    best = candidate;
+    if (backgrounds.every((bg) => contrastRatio(candidate, bg) >= target)) return candidate;
+  }
+  return best;
+}
+
 // ── readableAccent ─────────────────────────────────────────────────────────
 // Returns a hex tuned so an accent used as TEXT stays legible on the current
 // slide surface — without wrapping the text in a background box. Bright
@@ -84,58 +133,53 @@ function hexToRgba(hex: string, alpha: number): string {
 // darken on white; deep accents (Corporate blue, Berry, Legal teal) lighten
 // on navy. Only luminance is shifted — the hue stays the division's own so
 // the palette identity is preserved.
-export function readableAccent(hex: string, mode: SlideMode): string {
-  const m = /^#?([a-f\d]{6})$/i.exec(hex);
-  if (!m) return hex;
-  const int = parseInt(m[1], 16);
-  let r = ((int >> 16) & 255) / 255;
-  let g = ((int >> 8) & 255) / 255;
-  let b = (int & 255) / 255;
-  // Relative luminance (sRGB, unlinearised — plenty accurate for a text-legibility guard).
-  const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  if (mode === "light") {
-    // Anything brighter than ~0.42 luminance fails on white for body text.
-    if (lum > 0.42) {
-      // Mix toward black by a strength proportional to how bright it is.
-      const t = Math.min(0.72, 0.35 + (lum - 0.42) * 1.4);
-      r = r * (1 - t);
-      g = g * (1 - t);
-      b = b * (1 - t);
-    }
-  } else {
-    // Dark navy surface — anything darker than ~0.38 disappears.
-    if (lum < 0.55) {
-      const t = Math.min(0.78, 0.35 + (0.55 - lum) * 1.4);
-      r = r + (1 - r) * t;
-      g = g + (1 - g) * t;
-      b = b + (1 - b) * t;
-    }
-  }
-  const to255 = (v: number) => Math.max(0, Math.min(255, Math.round(v * 255)));
-  const hx = (v: number) => to255(v).toString(16).padStart(2, "0");
-  return `#${hx(r)}${hx(g)}${hx(b)}`;
+export function readableAccent(hex: string, mode: SlideMode, surfaceHex?: string): string {
+  const backgrounds = mode === "dark"
+    ? ["#03002C", "#0A1230"]
+    : ["#FFFFFF", surfaceHex ?? "#FFFFFF"];
+  return readableOn(hex, backgrounds, mode === "dark" ? "lighten" : "darken", 4.5);
 }
 
 
-export function useSlideInk(accentOverride?: string | null): SlideInk {
-  const mode = useSlideMode();
-  const ctxAccent = useSlideAccent();
-  const accentHex = accentOverride ?? ctxAccent ?? null;
+export function makeSlideInk(
+  mode: SlideMode,
+  accentHex?: string | null,
+  primaryHex?: string | null,
+  surfaceHex?: string | null,
+  baseInkHex?: string | null,
+): SlideInk {
   const dark = mode === "dark";
-  const base = dark ? "255,255,255" : "10,15,28";
+  const textHex = dark
+    ? "#FFFFFF"
+    : readableOn(primaryHex ?? baseInkHex ?? "#03002C", ["#FFFFFF", surfaceHex ?? "#FFFFFF"], "darken", 4.5);
+  const bodyHex = dark
+    ? "#FFFFFF"
+    : readableOn(baseInkHex ?? "#03002C", ["#FFFFFF", surfaceHex ?? "#FFFFFF"], "darken", 4.5);
+  const accentText = accentHex ? readableAccent(accentHex, mode, surfaceHex ?? undefined) : textHex;
+  const rgb = hexToRgb(bodyHex) ?? (dark ? { r: 255, g: 255, b: 255 } : { r: 10, g: 15, b: 28 });
+  const base = `${rgb.r},${rgb.g},${rgb.b}`;
   return {
-    text: dark ? "#ffffff" : "rgb(10,15,28)",
-    muted: `rgba(${base},${dark ? 0.72 : 0.66})`,
-    faint: `rgba(${base},${dark ? 0.52 : 0.5})`,
+    text: textHex,
+    muted: `rgba(${base},${dark ? 0.72 : 0.68})`,
+    faint: `rgba(${base},${dark ? 0.52 : 0.52})`,
     hairline: `rgba(${base},${dark ? 0.14 : 0.12})`,
     hairlineStrong: `rgba(${base},${dark ? 0.22 : 0.18})`,
     trackFill: `rgba(${base},${dark ? 0.08 : 0.07})`,
     panel: dark ? "rgba(10, 8, 48, 0.34)" : "rgba(255,255,255,0.55)",
     accent: (a: number) =>
       accentHex ? hexToRgba(accentHex, a) : `rgba(${base},${a})`,
-    onSurface: (hex: string) => hex,
-    accentText: accentHex ? readableAccent(accentHex, mode) : (dark ? "#ffffff" : "rgb(10,15,28)"),
+    onSurface: (hex: string) => readableOn(hex, dark ? ["#03002C", "#0A1230"] : ["#FFFFFF", surfaceHex ?? "#FFFFFF"], dark ? "lighten" : "darken", 4.5),
+    accentText,
   };
+}
+
+export function useSlideInk(accentOverride?: string | null): SlideInk {
+  const provided = useContext(SlideInkContext);
+  const mode = useSlideMode();
+  const ctxAccent = useSlideAccent();
+  const accentHex = accentOverride ?? ctxAccent ?? null;
+  if (provided && accentOverride === undefined) return provided;
+  return makeSlideInk(mode, accentHex);
 }
 
 
@@ -269,7 +313,8 @@ export function SlideFrame({
   // A dark chrome (cover/divider/close) or backdrop-dark surface reads as dark
   // for accent-as-text purposes; content-on-white uses light mode tuning.
   const inkMode: SlideMode = (slideDark || darkBackdrop) ? "dark" : "light";
-  const accentTextHex = readableAccent(brand.tokens.accent, inkMode);
+  const frameInk = makeSlideInk(inkMode, brand.tokens.accent, brand.tokens.primary, brand.tokens.surface, brand.tokens.ink);
+  const accentTextHex = frameInk.accentText;
 
   return (
     <div
@@ -282,6 +327,11 @@ export function SlideFrame({
         // stay legible in every division × mode combination without
         // needing a background box.
         ["--slide-accent-text" as string]: accentTextHex,
+        ["--slide-ink" as string]: frameInk.text,
+        ["--slide-ink-muted" as string]: frameInk.muted,
+        ["--slide-ink-faint" as string]: frameInk.faint,
+        ["--slide-hairline" as string]: frameInk.hairline,
+        ["--slide-track-fill" as string]: frameInk.trackFill,
       }}
     >
 
