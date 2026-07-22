@@ -1089,6 +1089,7 @@ function VariantDetailModal({
 }) {
   const [saveOpen, setSaveOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const copyId = async () => {
     try {
       if (navigator?.clipboard) await navigator.clipboard.writeText(variant.id);
