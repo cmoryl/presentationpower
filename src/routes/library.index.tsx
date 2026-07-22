@@ -881,7 +881,7 @@ const VariantCard = memo(function VariantCard({
         placeholder={<PreviewSkeleton dark={isDark} label={variant.familyId} />}
         onMount={bumpMount}
       >
-      <div ref={singleRef} className="absolute inset-0">
+      <div ref={singleRef} className="absolute inset-0" data-preview-mode={isDark ? "dark" : "light"} data-preview-role="module-preview">
         <ScaledSlide>
           <SlideBackdropContext.Provider value={singleBackdrop}>
             <SlideThumbnailContext.Provider value={true}>
