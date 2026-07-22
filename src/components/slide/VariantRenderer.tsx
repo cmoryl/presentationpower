@@ -326,6 +326,8 @@ function renderVariantBody({
     faint: semantic.faint,
     axis: semantic.hairlineStrong,
     divider: semantic.hairline,
+    hairline: semantic.hairline,
+    hairlineStrong: semantic.hairlineStrong,
     surface: semantic.trackFill,
     surfaceRing: semantic.hairline,
     ringOnDark: isDark ? "#0b1024" : "#ffffff",
