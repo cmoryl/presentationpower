@@ -71,7 +71,10 @@ type Mode = "light" | "dark";
 const norm = (hex: string) => hex.replace(/^#/, "").toUpperCase();
 
 async function readAllXml(blob: Blob): Promise<{ path: string; body: string }[]> {
-  const zip = await JSZip.loadAsync(blob);
+  // Node's pptxgenjs "blob" output wraps a Buffer in a shape JSZip's
+  // auto-detect can't consume directly — convert via ArrayBuffer first.
+  const buf = new Uint8Array(await blob.arrayBuffer());
+  const zip = await JSZip.loadAsync(buf);
   const out: { path: string; body: string }[] = [];
   await Promise.all(
     Object.keys(zip.files)
