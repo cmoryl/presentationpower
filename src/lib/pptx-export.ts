@@ -20,6 +20,7 @@ import {
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { MODULE_VARIANTS, byId } from "./taxonomy";
 import { auroraSvgDataUrl } from "./aurora-svg";
+import { embedFontsInPptx } from "./pptx-font-embed";
 
 // Rasterize an SVG data URL to a PNG data URL via <canvas> so PowerPoint
 // renders our aurora backdrops reliably (some viewers ignore embedded SVG
@@ -678,12 +679,24 @@ export async function exportDeckToPptx(
   }
 
   const fileName = `${sanitize(deck.title)}.pptx`;
+  // Always embed Geist so PowerPoint renders the exact app typography instead
+  // of substituting Calibri/Arial. Falls back to the raw blob if embedding
+  // fails so exports are never blocked.
+  const rawBlob = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
+  const finalBlob = await embedFontsInPptx(rawBlob);
   if (opts?.output === "blob") {
-    // pptxgenjs returns a Blob in the browser when outputType is "blob".
-    const blob = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
-    return { blob, failedSlides };
+    return { blob: finalBlob, failedSlides };
   }
-  await pptx.writeFile({ fileName });
+  if (typeof document !== "undefined") {
+    const url = URL.createObjectURL(finalBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
   return { failedSlides };
 }
 
