@@ -157,8 +157,10 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
         imageCount: sl.images.length,
         imagePaths: savedPathsBySlide[sl.index],
         layout,
+        assets: buildSlideAssets(sl),
       };
     });
+
 
     const { data: row, error } = await s
       .from("imported_decks")
