@@ -6010,6 +6010,7 @@ function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand:
 
 function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { brand: BrandMode; segments: { label: string }[]; columns: { label: string; values: number[] }[]; unit?: string; height?: number }) {
   const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
   const w = 1720, h = height;
   const padL = 90, padR = 40, padT = 30, padB = 80;
   const totals = columns.map((c) => c.values.reduce((a, b) => a + b, 0));
@@ -6020,9 +6021,12 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
   const barW = slot * 0.55;
   const cols = [brand.tokens.accent, brand.tokens.primary, ink.faint];
   const ticks = 4;
+  const segFill = (si: number) =>
+    si === 0 ? `url(#${id}-airy)` : si === 1 ? `url(#${id}-glass)` : `url(#${id}-glass-mute)`;
   return (
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+        <AiryDefs id={id} />
         {Array.from({ length: ticks + 1 }, (_, i) => {
           const y = padT + (chartH / ticks) * i;
           return <line key={i} x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} />;
@@ -6035,7 +6039,19 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
               {col.values.map((v, si) => {
                 const bh = (v / niceMax) * chartH;
                 yCursor -= bh;
-                return <rect key={si} x={x} y={yCursor} width={barW} height={bh} fill={cols[si] || ink.strong} opacity={si === 0 ? 1 : 0.7 - si * 0.15} />;
+                return (
+                  <rect
+                    key={si}
+                    x={x}
+                    y={yCursor}
+                    width={barW}
+                    height={bh}
+                    fill={segFill(si)}
+                    stroke="var(--slide-accent-text)"
+                    strokeOpacity={si === 0 ? 0.5 : 0.2}
+                    strokeWidth={1}
+                  />
+                );
               })}
               <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{col.label}</text>
             </g>
@@ -6045,7 +6061,7 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
       <div className="mt-3 flex flex-wrap gap-6">
         {segments.map((sg, i) => (
           <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
-            <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || ink.strong, opacity: i === 0 ? 1 : 0.7 - i * 0.15 }} />
+            <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || ink.strong, opacity: i === 0 ? 0.75 : 0.45 - i * 0.1, border: `1px solid ${ink.hairlineStrong}` }} />
             <span style={{ fontWeight: 600, color: ink.strong }}>{sg.label}</span>
           </div>
         ))}
@@ -6054,6 +6070,7 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
     </div>
   );
 }
+
 
 function StackedAreaChart({ brand, series, xLabels, unit, height = 480 }: { brand: BrandMode; series: { label: string; points: number[] }[]; xLabels: string[]; unit?: string; height?: number }) {
   const ink = useSlideInk();
