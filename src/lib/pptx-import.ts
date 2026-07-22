@@ -375,7 +375,7 @@ export type ParsedDeck = {
 
 
 const MAX_PER_IMAGE_BYTES = 15_000_000;
-const MAX_TOTAL_IMAGE_BYTES = 80_000_000;
+const MAX_TOTAL_IMAGE_BYTES = 180_000_000;
 const MAX_IMAGES_PER_SLIDE = 60;
 
 
@@ -425,6 +425,7 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
   const slides: ParsedSlide[] = [];
   let totalImageBytes = 0;
   let imagesTruncated = false;
+  const countedImageBudgetKeys = new Set<string>();
   let chartTotal = 0;
   let tableTotal = 0;
   let diagramTotal = 0;
@@ -511,10 +512,13 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         const b64 = uint8ToBase64(bin);
         const dataUrl = `data:${mime};base64,${b64}`;
         if (dataUrl.length > MAX_PER_IMAGE_BYTES) { imagesTruncated = true; continue; }
-        if (totalImageBytes + dataUrl.length > MAX_TOTAL_IMAGE_BYTES) { imagesTruncated = true; continue; }
+        if (!countedImageBudgetKeys.has(resolved)) {
+          if (totalImageBytes + dataUrl.length > MAX_TOTAL_IMAGE_BYTES) { imagesTruncated = true; continue; }
+          countedImageBudgetKeys.add(resolved);
+          totalImageBytes += dataUrl.length;
+        }
         images.push(dataUrl);
         imageEmbedIds.push(id);
-        totalImageBytes += dataUrl.length;
       }
     }
 
@@ -529,10 +533,14 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         if (imageEmbedIds.includes(img.embedId)) continue;
         if (images.length >= MAX_IMAGES_PER_SLIDE) { imagesTruncated = true; break; }
         if (img.dataUrl.length > MAX_PER_IMAGE_BYTES) { imagesTruncated = true; continue; }
-        if (totalImageBytes + img.dataUrl.length > MAX_TOTAL_IMAGE_BYTES) { imagesTruncated = true; continue; }
+        const budgetKey = img.sourcePath ?? img.embedId;
+        if (!countedImageBudgetKeys.has(budgetKey)) {
+          if (totalImageBytes + img.dataUrl.length > MAX_TOTAL_IMAGE_BYTES) { imagesTruncated = true; continue; }
+          countedImageBudgetKeys.add(budgetKey);
+          totalImageBytes += img.dataUrl.length;
+        }
         images.push(img.dataUrl);
         imageEmbedIds.push(img.embedId);
-        totalImageBytes += img.dataUrl.length;
       }
     };
     appendParentImages(parents.master);
@@ -2443,7 +2451,7 @@ type ParentSlideData = {
   background?: LayoutFill;
   placeholders: PhProto[];
   /** Parent-scoped image payloads (slideLayout/slideMaster relationships). */
-  images?: Array<{ embedId: string; dataUrl: string }>;
+  images?: Array<{ embedId: string; dataUrl: string; sourcePath?: string }>;
   /** Map local parent rIds → synthetic slide-level embedIds. */
   embedIdMap?: Record<string, string>;
   /** Non-placeholder decorative shapes (logos, page numbers, dividers, footer
@@ -2550,7 +2558,7 @@ async function loadParent(
         const dataUrl = `data:${mime};base64,${uint8ToBase64(bytes)}`;
         const syntheticId = `parent:${path}:${id}`;
         parentEmbedIdMap[id] = syntheticId;
-        parentImages.push({ embedId: syntheticId, dataUrl });
+        parentImages.push({ embedId: syntheticId, dataUrl, sourcePath: resolved });
       }
     } catch {
       // Parent image extraction is best-effort; missing/bad rels should not
