@@ -24,11 +24,16 @@ import { auroraSvgDataUrl } from "./aurora-svg";
 // Rasterize an SVG data URL to a PNG data URL via <canvas> so PowerPoint
 // renders our aurora backdrops reliably (some viewers ignore embedded SVG
 // image fills).
-async function svgDataUrlToPng(svgUrl: string, w = 1920, h = 1080): Promise<string | null> {
+async function svgDataUrlToPng(svgUrl: string, w = 2560, h = 1440): Promise<string | null> {
   if (typeof document === "undefined") return null;
   return await new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
+    // Explicit size hint so browsers rasterize the SVG's feGaussianBlur and
+    // fill-opacity layers at target resolution instead of the default 300×150
+    // fallback (which loses the aurora blur + glass wash on export).
+    img.width = w;
+    img.height = h;
     img.onload = () => {
       try {
         const canvas = document.createElement("canvas");
@@ -46,6 +51,7 @@ async function svgDataUrlToPng(svgUrl: string, w = 1920, h = 1080): Promise<stri
     img.src = svgUrl;
   });
 }
+
 
 const SLIDE_W = 13.333;
 const SLIDE_H = 7.5;

@@ -22,8 +22,15 @@ export function auroraSvgDataUrl(
   const midStop = mode === "dark" ? "35%" : "30%";
   const outerStop = mode === "dark" ? "65%" : "60%";
   const blurStd = mode === "dark" ? 55 : 65;
+  // Frosted-glass wash: a subtle full-bleed film that mirrors the
+  // backdrop-blur + translucent surface the on-screen GlassTile system
+  // paints on top of AuroraLayer. Bakes the "glass overlay" into the
+  // exported PNG so PPTX/PDF match the editor's soft-focus feel instead
+  // of showing raw high-contrast orbs.
+  const glassColor = mode === "dark" ? "#0B1330" : "#FFFFFF";
+  const glassAlpha = mode === "dark" ? 0.18 : 0.22;
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
   <defs>
     ${orbs
       .map(
@@ -36,8 +43,8 @@ export function auroraSvgDataUrl(
     </radialGradient>`,
       )
       .join("")}
-    <filter id="aurora-blur" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="${blurStd}" />
+    <filter id="aurora-blur" x="-50%" y="-50%" width="200%" height="200%" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="${blurStd}" edgeMode="duplicate" />
     </filter>
     <radialGradient id="vignette" cx="50%" cy="${mode === "dark" ? "60%" : "55%"}" r="${mode === "dark" ? "80%" : "85%"}">
       <stop offset="${mode === "dark" ? "30%" : "55%"}" stop-color="${base}" stop-opacity="0" />
@@ -52,8 +59,10 @@ export function auroraSvgDataUrl(
       )
       .join("")}
   </g>
+  <rect width="1280" height="720" fill="${glassColor}" fill-opacity="${glassAlpha}" />
   <rect width="1280" height="720" fill="url(#vignette)" />
 </svg>`;
+
   // Use encodeURIComponent to keep the payload safe for data URLs.
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
