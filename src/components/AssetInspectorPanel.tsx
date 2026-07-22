@@ -22,6 +22,13 @@ import {
 } from "lucide-react";
 
 type SlideAssets = {
+  images?: Array<{
+    embedId: string;
+    index: number;
+    occurrences?: Array<{ source: string; kind: string; z: number; frame?: { x: number; y: number; w: number; h: number }; srcRect?: { l: number; t: number; r: number; b: number }; prst?: string }>;
+  }>;
+  layers?: Array<{ z: number; kind: string; frame?: { x: number; y: number; w: number; h: number }; embedId?: string; hasImageFill?: boolean; srcRect?: { l: number; t: number; r: number; b: number }; prst?: string }>;
+  background?: { kind: string; embedId?: string; path?: string; srcRect?: { l: number; t: number; r: number; b: number } };
   media?: Array<{ kind: string; mime: string; path: string; embedId?: string; bytes: number }>;
   hyperlinks?: Array<{ rId: string; target: string; external: boolean }>;
   comments?: Array<{ authorName?: string; authorInitials?: string; text: string; createdAt?: string }>;
@@ -78,7 +85,7 @@ export function AssetInspectorPanel({
   const shapeCount = slide.layout?.shapes?.length ?? 0;
 
   const counts: Record<TabKey, number> = {
-    images: imageUrls.length || imagePaths.length,
+    images: a.images?.length || imageUrls.length || imagePaths.length,
     media: a.media?.length ?? 0,
     charts: a.charts?.length ?? 0,
     tables: a.tables?.length ?? 0,
@@ -157,7 +164,7 @@ export function AssetInspectorPanel({
       </div>
 
       <div className="max-h-[420px] overflow-y-auto p-5">
-        {tab === "images" && <ImagesTab urls={imageUrls} paths={imagePaths} />}
+        {tab === "images" && <ImagesTab urls={imageUrls} paths={imagePaths} assets={a.images ?? []} layers={a.layers ?? []} background={a.background} />}
         {tab === "media" && <MediaTab items={a.media ?? []} />}
         {tab === "charts" && <ChartsTab items={a.charts ?? []} />}
         {tab === "tables" && <TablesTab items={a.tables ?? []} />}
@@ -174,27 +181,87 @@ function Empty({ label }: { label: string }) {
   return <div className="rounded-lg border border-dashed border-black/10 p-6 text-center text-xs text-black/40">{label}</div>;
 }
 
-function ImagesTab({ urls, paths }: { urls: string[]; paths: string[] }) {
+function frameLabel(frame?: { x: number; y: number; w: number; h: number }): string {
+  if (!frame) return "no frame";
+  return `${frame.x.toFixed(2)}, ${frame.y.toFixed(2)} · ${frame.w.toFixed(2)}×${frame.h.toFixed(2)}in`;
+}
+
+function cropLabel(srcRect?: { l: number; t: number; r: number; b: number }): string | null {
+  if (!srcRect) return null;
+  const pct = (n: number) => `${Math.round(n * 100)}%`;
+  return `crop L${pct(srcRect.l)} T${pct(srcRect.t)} R${pct(srcRect.r)} B${pct(srcRect.b)}`;
+}
+
+function ImagesTab({
+  urls,
+  paths,
+  assets,
+  layers,
+  background,
+}: {
+  urls: string[];
+  paths: string[];
+  assets: NonNullable<SlideAssets["images"]>;
+  layers: NonNullable<SlideAssets["layers"]>;
+  background?: SlideAssets["background"];
+}) {
   if (urls.length === 0 && paths.length === 0) return <Empty label="No embedded images on this slide." />;
+  const byEmbed = new Map(assets.map((img) => [img.embedId, img]));
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-      {(urls.length > 0 ? urls : paths).map((u, i) => {
-        const isUrl = urls.length > 0;
-        const path = paths[i];
-        const filename = path?.split("/").pop() ?? `image-${i + 1}`;
-        return (
-          <div key={i} className="overflow-hidden rounded-lg border border-black/10 bg-white">
-            {isUrl ? (
-              <img src={u} alt={filename} className="aspect-video w-full object-cover" />
-            ) : (
-              <div className="flex aspect-video w-full items-center justify-center bg-black/[0.03] text-[10px] text-black/40">
-                <ImageIcon size={16} />
-              </div>
-            )}
-            <div className="truncate px-2 py-1.5 text-[10px] text-black/60" title={path}>{filename}</div>
+    <div className="space-y-4">
+      {background && (
+        <div className="rounded-lg border border-[#003FC7]/15 bg-[#003FC7]/[0.03] p-3 text-[11px] text-black/65">
+          <div className="font-medium text-[#03002C]">Background · {background.kind}</div>
+          <div className="mt-1 flex flex-wrap gap-2 font-mono text-[10px] text-black/45">
+            {background.embedId && <span>{background.embedId}</span>}
+            {cropLabel(background.srcRect) && <span>{cropLabel(background.srcRect)}</span>}
           </div>
-        );
-      })}
+        </div>
+      )}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {(urls.length > 0 ? urls : paths).map((u, i) => {
+          const isUrl = urls.length > 0;
+          const path = paths[i];
+          const filename = path?.split("/").pop() ?? `image-${i + 1}`;
+          const meta = assets[i] ?? Array.from(byEmbed.values())[i];
+          return (
+            <div key={i} className="overflow-hidden rounded-lg border border-black/10 bg-white">
+              {isUrl ? (
+                <img src={u} alt={filename} className="aspect-video w-full object-contain bg-black/[0.03]" />
+              ) : (
+                <div className="flex aspect-video w-full items-center justify-center bg-black/[0.03] text-[10px] text-black/40">
+                  <ImageIcon size={16} />
+                </div>
+              )}
+              <div className="space-y-1 px-2 py-2 text-[10px] text-black/60">
+                <div className="truncate font-medium text-[#03002C]" title={path}>{filename}</div>
+                {meta?.embedId && <div className="truncate font-mono text-black/40">{meta.embedId}</div>}
+                {(meta?.occurrences ?? []).slice(0, 4).map((occ, j) => (
+                  <div key={j} className="rounded bg-black/[0.035] px-1.5 py-1">
+                    <div className="flex justify-between gap-2"><span>{occ.source} · z{occ.z}</span><span>{occ.prst ?? occ.kind}</span></div>
+                    <div className="font-mono text-black/40">{frameLabel(occ.frame)}</div>
+                    {cropLabel(occ.srcRect) && <div className="font-mono text-black/40">{cropLabel(occ.srcRect)}</div>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {layers.length > 0 && (
+        <div>
+          <div className="mb-2 text-[10px] uppercase tracking-widest text-black/50">Captured layer stack</div>
+          <div className="max-h-44 overflow-y-auto rounded-lg border border-black/10">
+            {layers.map((layer) => (
+              <div key={`${layer.z}-${layer.kind}-${layer.embedId ?? ""}`} className="grid grid-cols-[44px_90px_1fr] gap-2 border-b border-black/5 px-2 py-1.5 text-[10px] text-black/55 last:border-b-0">
+                <span className="font-mono">z{layer.z}</span>
+                <span className="font-medium text-black/70">{layer.kind}{layer.hasImageFill ? " fill" : ""}</span>
+                <span className="truncate font-mono" title={layer.embedId}>{layer.embedId ? `${layer.embedId} · ` : ""}{frameLabel(layer.frame)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

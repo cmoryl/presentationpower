@@ -209,7 +209,7 @@ export type TableCell = {
   anchor?: "t" | "ctr" | "b";
 };
 export type LayoutShape =
-  | { kind: "text"; z: number; frame: LayoutFrame; fill?: LayoutFill; line?: LayoutLine; prst?: string; text: LayoutTextBody; isTitle?: boolean; effect?: LayoutEffect; opacity?: number; customPath?: CustomPath }
+  | { kind: "text"; z: number; frame: LayoutFrame; fill?: LayoutFill; line?: LayoutLine; prst?: string; text: LayoutTextBody; isTitle?: boolean; isPlaceholder?: boolean; effect?: LayoutEffect; opacity?: number; customPath?: CustomPath }
   | { kind: "image"; z: number; frame: LayoutFrame; embedId?: string; path?: string; line?: LayoutLine; srcRect?: LayoutSrcRect; prst?: string; opacity?: number; tile?: boolean; effect?: LayoutEffect; customPath?: CustomPath; duotone?: [string, string] }
   | { kind: "line"; z: number; frame: LayoutFrame; line?: LayoutLine; prst?: string; effect?: LayoutEffect }
   | { kind: "table"; z: number; frame: LayoutFrame; header: string[]; rows: string[][]; cellGrid?: TableCell[][]; colWidthsIn?: number[]; rowHeightsIn?: number[]; firstRow?: boolean; bandRow?: boolean; firstCol?: boolean; bandCol?: boolean }
@@ -885,7 +885,7 @@ function extractRelTargetsByType(relsDoc: any): RelBuckets {
 function extractEmbedIds(doc: unknown): string[] {
   const ids: string[] = [];
   walk(doc, (value, key) => {
-    if (key !== "a:blip" && key !== "blip") return;
+    if (key !== "a:blip" && key !== "blip" && !/(^|:)svgBlip$/i.test(key)) return;
     const arr = Array.isArray(value) ? value : [value];
     for (const b of arr) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -902,6 +902,8 @@ function extractEmbedIdsFromOrderedNode(node: PNode | undefined): string[] {
     if (!n) return;
     const tag = pTag(n);
     if (tag === "a:blip" || tag === "blip") {
+      for (const id of readBlipEmbedIds(n)) if (id) ids.push(id);
+    } else if (tag && /(^|:)svgBlip$/i.test(tag)) {
       const id = pAttrs(n)["@_r:embed"] ?? pAttrs(n)["@_embed"];
       if (id) ids.push(id);
     }
@@ -1590,6 +1592,18 @@ function pDeepFind(nodes: PNode[] | PNode, name: string): PNode | undefined {
   }
   return undefined;
 }
+function pDeepFindAll(nodes: PNode[] | PNode, predicate: string | ((tag: string | undefined, node: PNode) => boolean)): PNode[] {
+  const arr = Array.isArray(nodes) ? nodes : [nodes];
+  const out: PNode[] = [];
+  const visit = (n: PNode) => {
+    const tag = pTag(n);
+    const matched = typeof predicate === "string" ? tag === predicate : predicate(tag, n);
+    if (matched) out.push(n);
+    for (const child of pChildren(n)) visit(child);
+  };
+  for (const n of arr) visit(n);
+  return out;
+}
 function pText(n: PNode): string {
   const arr = pChildren(n);
   let out = "";
@@ -1598,6 +1612,30 @@ function pText(n: PNode): string {
     else out += pText(c);
   }
   return out;
+}
+
+function readBlipEmbedIds(blip: PNode | undefined): string[] {
+  if (!blip) return [];
+  const ids: string[] = [];
+  const push = (id: unknown) => {
+    if (typeof id === "string" && id && !ids.includes(id)) ids.push(id);
+  };
+  // PowerPoint stores SVGs as an a:blip fallback (usually PNG/EMF) plus an
+  // asvg:svgBlip extension. Prefer/persist the native SVG id first so previews
+  // retain vector fidelity, while still keeping the fallback id for durability.
+  for (const svg of pDeepFindAll(blip, (tag) => !!tag && /(^|:)svgBlip$/i.test(tag))) {
+    const a = pAttrs(svg);
+    push(a["@_r:embed"] ?? a["@_embed"]);
+  }
+  const a = pAttrs(blip);
+  push(a["@_r:embed"] ?? a["@_embed"]);
+  return ids;
+}
+
+function readPreferredBlipEmbedId(blip: PNode | undefined, embedIdMap?: Record<string, string>): string | undefined {
+  const ids = readBlipEmbedIds(blip);
+  const raw = ids[0];
+  return raw ? (embedIdMap?.[raw] ?? raw) : undefined;
 }
 
 type PptxClrMap = Record<string, string>;
@@ -1661,6 +1699,63 @@ function readFrame(spPr: PNode | undefined): LayoutFrame | undefined {
     rot: rot && !Number.isNaN(rot) ? rot : undefined,
     flipH: a["@_flipH"] === "1" || undefined,
     flipV: a["@_flipV"] === "1" || undefined,
+  };
+}
+
+type GroupTransform = {
+  x: number; y: number; w: number; h: number;
+  chX: number; chY: number; chW: number; chH: number;
+  rot?: number;
+  flipH?: boolean;
+  flipV?: boolean;
+};
+
+function readGroupTransform(grpSpPr: PNode | undefined): GroupTransform | undefined {
+  if (!grpSpPr) return undefined;
+  const xfrm = pFind(grpSpPr, "a:xfrm");
+  if (!xfrm) return undefined;
+  const attrs = pAttrs(xfrm);
+  const off = pFind(xfrm, "a:off");
+  const ext = pFind(xfrm, "a:ext");
+  const chOff = pFind(xfrm, "a:chOff");
+  const chExt = pFind(xfrm, "a:chExt");
+  if (!off || !ext || !chOff || !chExt) return undefined;
+  const oa = pAttrs(off); const ea = pAttrs(ext);
+  const coa = pAttrs(chOff); const cea = pAttrs(chExt);
+  const w = Number(ea["@_cx"] ?? 0) / EMU_PER_INCH;
+  const h = Number(ea["@_cy"] ?? 0) / EMU_PER_INCH;
+  const chW = Number(cea["@_cx"] ?? 0) / EMU_PER_INCH;
+  const chH = Number(cea["@_cy"] ?? 0) / EMU_PER_INCH;
+  if (!(w > 0 && h > 0 && chW > 0 && chH > 0)) return undefined;
+  const rot = attrs["@_rot"] ? Number(attrs["@_rot"]) / 60000 : undefined;
+  return {
+    x: Number(oa["@_x"] ?? 0) / EMU_PER_INCH,
+    y: Number(oa["@_y"] ?? 0) / EMU_PER_INCH,
+    w, h,
+    chX: Number(coa["@_x"] ?? 0) / EMU_PER_INCH,
+    chY: Number(coa["@_y"] ?? 0) / EMU_PER_INCH,
+    chW, chH,
+    rot: rot && !Number.isNaN(rot) ? rot : undefined,
+    flipH: attrs["@_flipH"] === "1" || undefined,
+    flipV: attrs["@_flipV"] === "1" || undefined,
+  };
+}
+
+function composeGroupTransform(parent: GroupTransform | undefined, child: GroupTransform): GroupTransform {
+  if (!parent) return child;
+  const childFrame = transformFrame({ x: child.x, y: child.y, w: child.w, h: child.h, rot: child.rot, flipH: child.flipH, flipV: child.flipV }, parent);
+  return {
+    x: childFrame.x,
+    y: childFrame.y,
+    w: childFrame.w,
+    h: childFrame.h,
+    chX: child.chX,
+    chY: child.chY,
+    chW: child.chW,
+    chH: child.chH,
+    rot: childFrame.rot,
+    flipH: childFrame.flipH,
+    flipV: childFrame.flipV,
   };
 }
 
@@ -1823,7 +1918,8 @@ function readAlphaOfSolid(solidFill: PNode | undefined): number | undefined {
 
 function readSrcRect(blipFill: PNode | undefined): LayoutSrcRect | undefined {
   if (!blipFill) return undefined;
-  const s = pFind(blipFill, "a:srcRect");
+  const stretch = pFind(blipFill, "a:stretch");
+  const s = pFind(blipFill, "a:srcRect") ?? (stretch ? pFind(stretch, "a:fillRect") : undefined);
   if (!s) return undefined;
   const a = pAttrs(s);
   const l = a["@_l"] ? Number(a["@_l"]) / 100000 : 0;
@@ -1904,8 +2000,7 @@ function readFill(
     }
     if (t === "a:blipFill") {
       const blip = pFind(k, "a:blip");
-      const rawEmbed = blip ? pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"] : undefined;
-      const embed = rawEmbed ? (embedIdMap?.[rawEmbed] ?? rawEmbed) : undefined;
+      const embed = readPreferredBlipEmbedId(blip, embedIdMap);
       if (embed) {
         void imageEmbedIds;
         const srcRect = readSrcRect(k);
@@ -2278,39 +2373,40 @@ function readTextBody(txBody: PNode | undefined): LayoutTextBody | undefined {
   return { paras, anchor, insets, fontScale, lnSpcReduction, spAutoFit, rotDeg: rot, wrap, vert, numCol };
 }
 
-function transformFrame(child: LayoutFrame, group: PNode | undefined): LayoutFrame {
+function transformFrame(child: LayoutFrame, group: PNode | GroupTransform | undefined): LayoutFrame {
   if (!group) return child;
-  const gxfrm = pFind(group, "a:xfrm");
-  if (!gxfrm) return child;
-  const off = pFind(gxfrm, "a:off");
-  const ext = pFind(gxfrm, "a:ext");
-  const chOff = pFind(gxfrm, "a:chOff");
-  const chExt = pFind(gxfrm, "a:chExt");
-  if (!off || !ext || !chOff || !chExt) return child;
-  const oa = pAttrs(off); const ea = pAttrs(ext);
-  const coa = pAttrs(chOff); const cea = pAttrs(chExt);
-  const gx = Number(oa["@_x"] ?? 0) / EMU_PER_INCH;
-  const gy = Number(oa["@_y"] ?? 0) / EMU_PER_INCH;
-  const gw = Number(ea["@_cx"] ?? 0) / EMU_PER_INCH;
-  const gh = Number(ea["@_cy"] ?? 0) / EMU_PER_INCH;
-  const cx = Number(coa["@_x"] ?? 0) / EMU_PER_INCH;
-  const cy = Number(coa["@_y"] ?? 0) / EMU_PER_INCH;
-  const cw = Number(cea["@_cx"] ?? 0) / EMU_PER_INCH;
-  const ch = Number(cea["@_cy"] ?? 0) / EMU_PER_INCH;
-  if (!(cw > 0 && ch > 0 && gw > 0 && gh > 0)) return child;
-  const sx = gw / cw; const sy = gh / ch;
-  return {
-    x: gx + (child.x - cx) * sx,
-    y: gy + (child.y - cy) * sy,
-    w: child.w * sx,
-    h: child.h * sy,
-    rot: child.rot,
-    flipH: child.flipH,
-    flipV: child.flipV,
+  const g = "chW" in group ? group : readGroupTransform(group);
+  if (!g) return child;
+  const sx = g.w / g.chW;
+  const sy = g.h / g.chH;
+  const w = child.w * sx;
+  const h = child.h * sy;
+  let cx = g.x + (child.x + child.w / 2 - g.chX) * sx;
+  let cy = g.y + (child.y + child.h / 2 - g.chY) * sy;
+  if (g.flipH) cx = g.x + g.w - (cx - g.x);
+  if (g.flipV) cy = g.y + g.h - (cy - g.y);
+  if (g.rot) {
+    const rad = (g.rot * Math.PI) / 180;
+    const gcx = g.x + g.w / 2;
+    const gcy = g.y + g.h / 2;
+    const dx = cx - gcx;
+    const dy = cy - gcy;
+    cx = gcx + dx * Math.cos(rad) - dy * Math.sin(rad);
+    cy = gcy + dx * Math.sin(rad) + dy * Math.cos(rad);
+  }
+  const next: LayoutFrame = {
+    x: cx - w / 2,
+    y: cy - h / 2,
+    w,
+    h,
+    rot: (child.rot ?? 0) + (g.rot ?? 0) || undefined,
+    flipH: (Boolean(child.flipH) !== Boolean(g.flipH)) || undefined,
+    flipV: (Boolean(child.flipV) !== Boolean(g.flipV)) || undefined,
   };
+  return next;
 }
 
-function readTableCells(tbl: PNode): { grid: TableCell[][]; colWidths: number[]; rowHeights: number[]; firstRow?: boolean; bandRow?: boolean; firstCol?: boolean; bandCol?: boolean } {
+function readTableCells(tbl: PNode, imageEmbedIds: string[] = [], embedIdMap?: Record<string, string>): { grid: TableCell[][]; colWidths: number[]; rowHeights: number[]; firstRow?: boolean; bandRow?: boolean; firstCol?: boolean; bandCol?: boolean } {
   const grid: TableCell[][] = [];
   const colWidths: number[] = [];
   const rowHeights: number[] = [];
@@ -2345,7 +2441,7 @@ function readTableCells(tbl: PNode): { grid: TableCell[][]; colWidths: number[];
       let borders: TableCell["borders"] = undefined;
       let margins: TableCell["margins"] = undefined;
       if (tcPr) {
-        fill = readFill(tcPr, []);
+          fill = readFill(tcPr, imageEmbedIds, embedIdMap);
         const readSide = (tag: string): LayoutLine | undefined => {
           const s = pFind(tcPr, tag);
           if (!s) return undefined;
@@ -2386,7 +2482,7 @@ function readTableCells(tbl: PNode): { grid: TableCell[][]; colWidths: number[];
 function walkSpTree(
   nodes: PNode[],
   zRef: { z: number },
-  group: PNode | undefined,
+  group: GroupTransform | undefined,
   out: LayoutShape[],
   imageEmbedIds: string[],
   parents?: ResolvedParents,
@@ -2397,7 +2493,24 @@ function walkSpTree(
   for (const node of nodes) {
     const t = pTag(node);
     if (!t) continue;
-    if (t === "p:sp") {
+    if (/(:|^)AlternateContent$/i.test(t)) {
+      // Office often wraps SVGs, imported PDFs, and compatibility artwork in
+      // mc:AlternateContent. Render the preferred Choice branch (usually SVG)
+      // and only fall back to raster compatibility art when no Choice exists.
+      // Asset extraction still persists every blip id discovered in both
+      // branches for inspector/round-trip visibility.
+      const branches = pChildren(node).filter((c) => {
+        const tag = pTag(c);
+        return !!tag && /(:|^)Choice$/i.test(tag);
+      });
+      const picked = branches[0] ?? pChildren(node).find((c) => {
+        const tag = pTag(c);
+        return !!tag && /(:|^)Fallback$/i.test(tag);
+      });
+      if (picked) walkSpTree(pChildren(picked), zRef, group, out, imageEmbedIds, parents, embedIdMap, theme, clrMap);
+    } else if (/(:|^)Choice$/i.test(t) || /(:|^)Fallback$/i.test(t)) {
+      walkSpTree(pChildren(node), zRef, group, out, imageEmbedIds, parents, embedIdMap, theme, clrMap);
+    } else if (t === "p:sp") {
       const spPr = pFind(node, "p:spPr");
       const nvSpPr = pFind(node, "p:nvSpPr");
       const nvPr = nvSpPr ? pFind(nvSpPr, "p:nvPr") : undefined;
@@ -2432,16 +2545,24 @@ function walkSpTree(
 
       const isTitle = phType === "title" || phType === "ctrTitle" || undefined;
       const opacity = spPr ? readShapeOpacity(spPr) : undefined;
-      out.push({ kind: "text", z: zRef.z++, frame, fill, line, prst, text, isTitle, effect, opacity, customPath });
+      out.push({ kind: "text", z: zRef.z++, frame, fill, line, prst, text, isTitle, isPlaceholder: !!ph || undefined, effect, opacity, customPath });
     } else if (t === "p:pic") {
       const spPr = pFind(node, "p:spPr");
+      const nvPicPr = pFind(node, "p:nvPicPr");
+      const nvPr = nvPicPr ? pFind(nvPicPr, "p:nvPr") : undefined;
+      const ph = nvPr ? pFind(nvPr, "p:ph") : undefined;
+      const phType = ph ? pAttrs(ph)["@_type"] : undefined;
+      const phIdx = ph ? pAttrs(ph)["@_idx"] : undefined;
+      const phProtos = ph && parents ? lookupPlaceholderChain(parents, phType, phIdx) : [];
       let frame = readFrame(spPr);
+      if (!frame && phProtos.length) {
+        for (const proto of phProtos) { if (proto.frame) { frame = { ...proto.frame }; break; } }
+      }
       if (!frame) continue;
       if (group) frame = transformFrame(frame, group);
       const blipFill = pFind(node, "p:blipFill");
       const blip = blipFill ? pFind(blipFill, "a:blip") : undefined;
-      const rawEmbedId = blip ? (pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"]) : undefined;
-      const embedId = rawEmbedId ? (embedIdMap?.[rawEmbedId] ?? rawEmbedId) : undefined;
+      const embedId = readPreferredBlipEmbedId(blip, embedIdMap);
       const srcRect = readSrcRect(blipFill);
       const tile = blipFill ? !!pFind(blipFill, "a:tile") : undefined;
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
@@ -2465,7 +2586,16 @@ function walkSpTree(
 
     } else if (t === "p:cxnSp") {
       const spPr = pFind(node, "p:spPr");
+      const nvCxnSpPr = pFind(node, "p:nvCxnSpPr");
+      const nvPr = nvCxnSpPr ? pFind(nvCxnSpPr, "p:nvPr") : undefined;
+      const ph = nvPr ? pFind(nvPr, "p:ph") : undefined;
+      const phType = ph ? pAttrs(ph)["@_type"] : undefined;
+      const phIdx = ph ? pAttrs(ph)["@_idx"] : undefined;
+      const phProtos = ph && parents ? lookupPlaceholderChain(parents, phType, phIdx) : [];
       let frame = readFrame(spPr);
+      if (!frame && phProtos.length) {
+        for (const proto of phProtos) { if (proto.frame) { frame = { ...proto.frame }; break; } }
+      }
       if (!frame) continue;
       if (group) frame = transformFrame(frame, group);
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
@@ -2475,7 +2605,8 @@ function walkSpTree(
       out.push({ kind: "line", z: zRef.z++, frame, line: remapLineScheme(readLine(spPr), clrMap) ?? readMappedLineRef(style, theme, clrMap), prst, effect });
     } else if (t === "p:grpSp") {
       const grpSpPr = pFind(node, "p:grpSpPr");
-      walkSpTree(pChildren(node), zRef, grpSpPr ?? group, out, imageEmbedIds, parents, embedIdMap, theme, clrMap);
+      const nextGroup = readGroupTransform(grpSpPr);
+      walkSpTree(pChildren(node), zRef, nextGroup ? composeGroupTransform(group, nextGroup) : group, out, imageEmbedIds, parents, embedIdMap, theme, clrMap);
     } else if (t === "p:graphicFrame") {
       const xfrm = pFind(node, "p:xfrm");
       let frame: LayoutFrame | undefined;
@@ -2505,7 +2636,7 @@ function walkSpTree(
         let firstRow: boolean | undefined; let bandRow: boolean | undefined;
         let firstCol: boolean | undefined; let bandCol: boolean | undefined;
         if (tbl) {
-          const parsed = readTableCells(tbl);
+          const parsed = readTableCells(tbl, imageEmbedIds, embedIdMap);
           cellGrid = parsed.grid;
           colWidthsIn = parsed.colWidths.length ? parsed.colWidths : undefined;
           rowHeightsIn = parsed.rowHeights.length ? parsed.rowHeights : undefined;
@@ -2813,15 +2944,8 @@ async function loadParent(
     const zRef = { z: 0 };
     const collected: LayoutShape[] = [];
     walkSpTree(pChildren(spTree), zRef, undefined, collected, parentImageEmbedIds, undefined, parentEmbedIdMap, theme, clrMap);
-    // Re-walk raw nodes to know which are placeholders — walkSpTree doesn't
-    // expose that. Cheaper: build a set of ph frames from `placeholders` and
-    // drop shapes whose frame matches.
-    const phFrames = new Set(placeholders
-      .filter((p) => p.frame)
-      .map((p) => `${p.frame!.x},${p.frame!.y},${p.frame!.w},${p.frame!.h}`));
     for (const sh of collected) {
-      const key = `${sh.frame.x},${sh.frame.y},${sh.frame.w},${sh.frame.h}`;
-      if (phFrames.has(key)) continue;
+      if (sh.kind === "text" && sh.isPlaceholder) continue;
       decor.push(sh);
     }
   }

@@ -32,6 +32,33 @@ const BUCKET = "division-pptx";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildSlideAssets(sl: any) {
+  const layoutShapes = sl.layout?.shapes ?? [];
+  const images = (sl.imageEmbedIds ?? []).map((embedId: string, idx: number) => {
+    const matches = layoutShapes
+      .map((sh: any, z: number) => {
+        const frame = sh?.frame;
+        if (sh?.kind === "image" && sh.embedId === embedId) return { source: "shape", kind: sh.kind, z, frame, srcRect: sh.srcRect, prst: sh.prst };
+        if (sh?.fill?.kind === "image" && sh.fill.embedId === embedId) return { source: "fill", kind: sh.kind, z, frame, srcRect: sh.fill.srcRect, prst: sh.prst };
+        return null;
+      })
+      .filter(Boolean);
+    const bg = sl.layout?.background;
+    if (bg?.kind === "image" && bg.embedId === embedId) matches.unshift({ source: "background", kind: "background", z: -1, frame: sl.layout?.size ? { x: 0, y: 0, w: sl.layout.size.w, h: sl.layout.size.h } : undefined, srcRect: bg.srcRect, prst: undefined });
+    return {
+      embedId,
+      index: idx,
+      occurrences: matches,
+    };
+  });
+  const layers = layoutShapes.map((sh: any, z: number) => ({
+    z,
+    kind: sh?.kind,
+    frame: sh?.frame,
+    embedId: sh?.embedId ?? sh?.fill?.embedId,
+    hasImageFill: sh?.fill?.kind === "image",
+    srcRect: sh?.srcRect ?? sh?.fill?.srcRect,
+    prst: sh?.prst,
+  }));
   const media = (sl.media ?? []).map((m: any) => ({
     kind: m.kind,
     mime: m.mime,
@@ -71,6 +98,9 @@ function buildSlideAssets(sl: any) {
     stacked: c.stacked,
   }));
   return {
+    images,
+    layers,
+    background: sl.layout?.background ? { kind: sl.layout.background.kind, embedId: sl.layout.background.embedId, path: sl.layout.background.path, srcRect: sl.layout.background.srcRect } : undefined,
     media,
     hyperlinks,
     comments,
@@ -195,6 +225,17 @@ function rewriteLayoutImageRefs(slide: ParsedDeck["slides"][number], imageRefs: 
     }
     return fill;
   };
+  const rewriteTableCells = (cellGrid: unknown): unknown => {
+    if (!Array.isArray(cellGrid)) return cellGrid;
+    return cellGrid.map((row) => Array.isArray(row)
+      ? row.map((cell) => {
+          if (!cell || typeof cell !== "object") return cell;
+          const c = cell as { fill?: unknown };
+          const rewritten = rewriteFill(c.fill);
+          return rewritten !== c.fill ? { ...c, fill: rewritten } : cell;
+        })
+      : row);
+  };
   return slide.layout
     ? {
         ...slide.layout,
@@ -208,6 +249,10 @@ function rewriteLayoutImageRefs(slide: ParsedDeck["slides"][number], imageRefs: 
           if ("fill" in next && next.fill) {
             const rewritten = rewriteFill(next.fill);
             if (rewritten !== next.fill) next = { ...next, fill: rewritten as typeof next.fill };
+          }
+          if (next.kind === "table" && next.cellGrid) {
+            const rewrittenCells = rewriteTableCells(next.cellGrid);
+            if (rewrittenCells !== next.cellGrid) next = { ...next, cellGrid: rewrittenCells as typeof next.cellGrid };
           }
           return next;
         }),
@@ -523,6 +568,13 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
       for (const sh of (sl.layout?.shapes ?? []) as any[]) {
         if (sh?.kind === "image" && typeof sh.path === "string") allPaths.add(sh.path);
         if (sh?.fill?.kind === "image" && typeof sh.fill.path === "string") allPaths.add(sh.fill.path);
+        if (sh?.kind === "table") {
+          for (const row of sh.cellGrid ?? []) {
+            for (const cell of row ?? []) {
+              if (cell?.fill?.kind === "image" && typeof cell.fill.path === "string") allPaths.add(cell.fill.path);
+            }
+          }
+        }
       }
     }
     const pathToUrl = new Map<string, string>();
@@ -544,6 +596,16 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
         if (sh?.fill?.kind === "image" && sh.fill.path) {
           const url = pathToUrl.get(sh.fill.path);
           if (url) next = { ...next, fill: { ...sh.fill, url } };
+        }
+        if (sh?.kind === "table" && sh.cellGrid) {
+          const cellGrid = sh.cellGrid.map((row: any[]) => row.map((cell: any) => {
+            if (cell?.fill?.kind === "image" && cell.fill.path) {
+              const url = pathToUrl.get(cell.fill.path);
+              if (url) return { ...cell, fill: { ...cell.fill, url } };
+            }
+            return cell;
+          }));
+          next = { ...next, cellGrid };
         }
         return next;
       });

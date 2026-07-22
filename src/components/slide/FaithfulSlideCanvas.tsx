@@ -122,6 +122,42 @@ function fillToCss(fill: LayoutFill | undefined, theme?: Record<string, string>)
   return undefined;
 }
 
+function imageFillToCss(fill: LayoutFill | undefined): React.CSSProperties | undefined {
+  if (!fill || fill.kind !== "image" || !("url" in fill) || !fill.url) return undefined;
+  const f = fill as LayoutFill & { url?: string; srcRect?: LayoutSrcRect; opacity?: number; tile?: boolean };
+  if (f.tile && !f.srcRect) {
+    return {
+      backgroundImage: `url(${f.url})`,
+      backgroundRepeat: "repeat",
+      backgroundSize: "auto",
+      opacity: f.opacity,
+    };
+  }
+  const srcRect = f.srcRect;
+  if (!srcRect) {
+    return {
+      backgroundImage: `url(${f.url})`,
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "100% 100%",
+      backgroundPosition: "center",
+      opacity: f.opacity,
+    };
+  }
+  const vw = Math.max(0.01, 1 - srcRect.l - srcRect.r);
+  const vh = Math.max(0.01, 1 - srcRect.t - srcRect.b);
+  const scaleX = 1 / vw;
+  const scaleY = 1 / vh;
+  const offX = srcRect.l / vw;
+  const offY = srcRect.t / vh;
+  return {
+    backgroundImage: `url(${f.url})`,
+    backgroundRepeat: "no-repeat",
+    backgroundSize: `${scaleX * 100}% ${scaleY * 100}%`,
+    backgroundPosition: `${-offX * 100}% ${-offY * 100}%`,
+    opacity: f.opacity,
+  };
+}
+
 function withAlpha(color: string, alpha: number): string {
   const m = /^#([0-9a-fA-F]{6})$/.exec(color);
   if (m) {
@@ -419,7 +455,7 @@ function resolveShape(
   shape: SlideLayoutWithUrls["shapes"][number],
   theme: Record<string, string> | undefined,
 ): ResolvedShape {
-  const base = frameStyle(shape.frame);
+  const base = { ...frameStyle(shape.frame), zIndex: shape.z };
 
   if (shape.kind === "text") {
     const fillIsImage = shape.fill?.kind === "image";
@@ -742,7 +778,8 @@ function TableGrid({ table, theme }: { table: NonNullable<ResolvedShape["table"]
             <tr key={ri} style={{ height: table.rowHeightsIn?.[ri] ? `${table.rowHeightsIn[ri]}in` : undefined }}>
               {row.map((cell, ci) => {
                 if (cell.hMerge || cell.vMerge) return null;
-                const bg = fillToCss(cell.fill, theme) ?? (isHeader ? "#F5F5F5" : bandBg);
+                const bg = cell.fill?.kind === "image" ? undefined : (fillToCss(cell.fill, theme) ?? (isHeader ? "#F5F5F5" : bandBg));
+                const imageBg = imageFillToCss(cell.fill);
                 const bt = borderFromLine(cell.borders?.t, theme);
                 const br = borderFromLine(cell.borders?.r, theme);
                 const bb = borderFromLine(cell.borders?.b, theme) ?? "1px solid #E5E7EB";
@@ -757,6 +794,7 @@ function TableGrid({ table, theme }: { table: NonNullable<ResolvedShape["table"]
                     style={{
                       padding: marginsCss,
                       background: bg,
+                      ...imageBg,
                       borderTop: bt, borderRight: br, borderBottom: bb, borderLeft: bl,
                       verticalAlign: vAlign,
                       fontWeight: isHeader ? 600 : undefined,
