@@ -36,7 +36,7 @@ export function Kicker({
   tracking?: string;
   className?: string;
 }) {
-  const ink = useSlideInk(brand.tokens.accent);
+  const ink = useSlideInk();
   return (
     <div
       className={`font-semibold uppercase ${className}`}
@@ -195,7 +195,7 @@ export function TitleBlock({
   size?: DisplaySize;
   align?: "start" | "center";
 }) {
-  const ink = useSlideInk(brand.tokens.accent);
+  const ink = useSlideInk();
   const titleColor = ink.text;
   const dekColor = ink.muted;
   return (
@@ -256,7 +256,7 @@ export function StatFigure({
   unitColor?: string;
   monoLabel?: boolean;
 }) {
-  const ink = useSlideInk(brand.tokens.accent);
+  const ink = useSlideInk();
   const spec = STAT_SPECS[size];
   const vc = valueColor ?? ink.text;
   const uc = unitColor ?? ink.muted;
