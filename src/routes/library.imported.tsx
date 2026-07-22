@@ -512,7 +512,7 @@ function SlidePreview({
         <div className="bg-black/[0.03] p-6">
           {slide.layout ? (
             <div className="mx-auto" style={{ maxWidth: 1100 }}>
-              <FaithfulSlideCanvas layout={slide.layout} theme={deckTheme} width={1100} className="rounded-lg shadow-lg ring-1 ring-black/10" />
+              <FaithfulSlideCanvas layout={slide.layout} theme={deckTheme} width={1100} assets={slide.assets} fonts={deckExtras?.embeddedFonts} className="rounded-lg shadow-lg ring-1 ring-black/10" />
             </div>
           ) : (
             <div className="rounded-lg border border-dashed border-black/20 bg-white p-16 text-center text-sm text-black/50">
