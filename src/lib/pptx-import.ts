@@ -2067,7 +2067,12 @@ function walkSpTree(
           firstRow, bandRow, firstCol, bandCol,
         });
       } else if (gTag && /chart/i.test(gTag)) {
-        out.push({ kind: "chart", z: zRef.z++, frame });
+        // <a:graphicData><c:chart r:id="rIdX"/></a:graphicData>
+        const chartNode = gKids[0] ? pFind(gKids[0], "c:chart") ?? pDeepFind(gKids, "c:chart") : undefined;
+        const chartAttrs = chartNode ? pAttrs(chartNode) : {};
+        const chartRelId = chartAttrs["@_r:id"] ?? chartAttrs["@_id"];
+        out.push({ kind: "chart", z: zRef.z++, frame, chartRelId });
+
       } else if (gTag && /diagram|dgm/i.test(gTag)) {
         out.push({ kind: "diagram", z: zRef.z++, frame });
       } else {
