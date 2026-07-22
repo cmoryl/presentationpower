@@ -832,24 +832,76 @@ function renderVariantBody({
         </SlideFrame>
       );
 
-    case "MV-INS-QUOTE":
+    case "MV-INS-QUOTE": {
+      const cardBg = isDark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)";
+      const cardRing = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="relative flex h-full flex-col justify-center">
-            <QuoteMark color={brand.tokens.accent} size={620} className="absolute -top-4 -left-4" />
-            <div className="relative">
-              <Kicker brand={brand}>In their words</Kicker>
-              <Hairline color={brand.tokens.accent} widthPx={88} thicknessPx={2} className="mt-6 mb-10" />
-              <div style={{ fontSize: 78, fontWeight: 500, lineHeight: 1.14, letterSpacing: "-0.02em", maxWidth: 1520, color: brand.tokens.primary }}>
-                {s(c.quote)}
+            {/* Ambient accent glow behind the quote card */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                backgroundImage: `radial-gradient(50% 50% at 15% 30%, ${brand.tokens.accent}${isDark ? "24" : "12"} 0%, transparent 70%)`,
+              }}
+            />
+            <div
+              className="relative overflow-hidden rounded-[32px] px-20 py-20"
+              style={{
+                background: cardBg,
+                border: `1px solid ${cardRing}`,
+                backgroundImage: `radial-gradient(80% 60% at 0% 0%, ${brand.tokens.accent}${isDark ? "1A" : "0E"} 0%, transparent 60%)`,
+              }}
+            >
+              <div
+                aria-hidden
+                className="absolute -top-8 -left-4 select-none"
+                style={{
+                  color: brand.tokens.accent,
+                  fontSize: 520,
+                  lineHeight: 0.7,
+                  fontWeight: 700,
+                  opacity: isDark ? 0.22 : 0.14,
+                  letterSpacing: "-0.06em",
+                }}
+              >
+                “
               </div>
-              <div className="mt-14">
-                <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} />
+              <div className="relative">
+                <div className="flex items-center gap-4">
+                  <span
+                    className="inline-block h-2 w-2 rounded-full"
+                    style={{ background: brand.tokens.accent, boxShadow: `0 0 20px ${brand.tokens.accent}` }}
+                  />
+                  <Kicker brand={brand}>In their words</Kicker>
+                </div>
+                <div
+                  className="mt-10"
+                  style={{
+                    fontSize: 82,
+                    fontWeight: 500,
+                    lineHeight: 1.12,
+                    letterSpacing: "-0.025em",
+                    maxWidth: 1520,
+                    color: ink.strong,
+                  }}
+                >
+                  {s(c.quote)}
+                </div>
+                <div
+                  className="mt-14 h-[2px] w-[120px] rounded-full"
+                  style={{ backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)` }}
+                />
+                <div className="mt-8">
+                  <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} />
+                </div>
               </div>
             </div>
           </div>
         </SlideFrame>
       );
+    }
 
     // ── Solution & Process ─────────────────────────────────────────────
     case "MV-SOL-PILLARS-5": {
