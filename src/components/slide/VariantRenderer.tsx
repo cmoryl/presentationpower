@@ -5638,7 +5638,7 @@ function ProgressBar({ brand: _brand, percent }: { brand: BrandMode; percent: nu
 }
 
 // ── Graph helpers (Batch 4) ────────────────────────────────────────────
-function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit, bare = false }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string; unit?: string; bare?: boolean }) {
+function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string; unit?: string; bare?: boolean }) {
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
   const w = 1720;
@@ -5651,9 +5651,9 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit, bare
   const barW = slot * 0.44;
   const ticks = 4;
   const hiValue = bars.find((b) => b.label === highlight)?.value;
-  const svg = (
+  return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      <ChartAccentDefs id={id} />
+      <AiryDefs id={id} />
       {Array.from({ length: ticks + 1 }, (_, i) => {
         const y = padT + (chartH / ticks) * i;
         const val = niceMax * (1 - i / ticks);
@@ -5671,8 +5671,8 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit, bare
         const isHi = highlight ? b.label === highlight : false;
         return (
           <g key={i}>
-            {isHi && <rect x={x - 8} y={y - 10} width={barW + 16} height={bh + 10} rx={10} fill="var(--slide-accent-text)" opacity={0.22} filter={`url(#${id}-glow)`} />}
-            <rect x={x} y={y} width={barW} height={bh} rx={3} fill={isHi ? `url(#${id}-bar)` : ink.trackFill} />
+            <rect x={x} y={y} width={barW} height={bh} rx={3} fill={isHi ? `url(#${id}-airy)` : ink.trackFill} />
+            {isHi && <rect x={x} y={y} width={barW} height={2} fill="var(--slide-accent-text)" />}
             {isHi && hiValue !== undefined && (
               <text x={x + barW / 2} y={y - 16} textAnchor="middle" fontSize={22} fontWeight={600} fill={ink.text} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{b.value}{unit || ""}</text>
             )}
@@ -5682,8 +5682,6 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit, bare
       })}
     </svg>
   );
-  if (bare) return svg;
-  return <GlassChartPanel padding="px-6 py-6" bloomAnchor="tr">{svg}</GlassChartPanel>;
 }
 
 
