@@ -5471,6 +5471,11 @@ function SemiGauge({ brand, percent, size = 260 }: { brand: BrandMode; percent: 
   const h = size / 2 + stroke;
   const arc = `M ${stroke / 2} ${cy} A ${r} ${r} 0 0 1 ${size - stroke / 2} ${cy}`;
   const gradId = `gauge-grad-${brand.id}-${size}-${Math.round(p)}`;
+  // Needle pointer end — thin editorial line from center to arc tip
+  const angle = Math.PI * (1 - p / 100); // 0=right, pi=left
+  const cx = size / 2;
+  const nx = cx + Math.cos(angle) * (r - 4);
+  const ny = cy - Math.sin(angle) * (r - 4);
   return (
     <svg width={size} height={h} viewBox={`0 0 ${size} ${h}`} aria-hidden>
       <defs>
@@ -5481,12 +5486,16 @@ function SemiGauge({ brand, percent, size = 260 }: { brand: BrandMode; percent: 
       </defs>
       <path d={arc} fill="none" stroke={ink.trackFill} strokeWidth={stroke} strokeLinecap="round" />
       <path d={arc} fill="none" stroke={`url(#${gradId})`} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${arcC}`} />
-      <text x={size / 2} y={cy - 20} textAnchor="middle" fontSize={size * 0.22} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.02em" }}>
+      <line x1={cx} y1={cy} x2={nx} y2={ny} stroke={ink.text} strokeWidth={1.5} />
+      <circle cx={cx} cy={cy} r={3} fill={ink.text} />
+      <circle cx={nx} cy={ny} r={4} fill={brand.tokens.accent} />
+      <text x={cx} y={cy - 22} textAnchor="middle" fontSize={size * 0.22} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
         {Math.round(p)}%
       </text>
     </svg>
   );
 }
+
 
 
 function AreaChart({ brand, series, height = 480 }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number }) {
