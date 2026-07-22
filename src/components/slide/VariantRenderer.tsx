@@ -948,7 +948,7 @@ function renderVariantBody({
                   >
                     {String(i + 1).padStart(2, "0")}
                   </div>
-                  <div className="w-72" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: i === 0 ? brand.tokens.primary : brand.tokens.ink }}>
+                  <div className="w-72" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: "var(--slide-ink)" }}>
                     {s(it.label)}
                   </div>
                   <SupportingText size="md" opacity={0.72} className="flex-1">{s(it.body)}</SupportingText>
