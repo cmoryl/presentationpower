@@ -8,7 +8,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX) > snapsh
     "brand": "bm-enterprise",
     "glassAlpha": 0.0669,
     "glassFill": "#5A6176",
-    "layerOpacity": 0.72,
+    "layerOpacity": 0.7,
     "midStop": "22%",
     "orbR": "55%",
     "orbs": [
@@ -45,7 +45,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX) > snapsh
     "brand": "bm-subcompany",
     "glassAlpha": 0.1351,
     "glassFill": "#566175",
-    "layerOpacity": 0.72,
+    "layerOpacity": 0.7,
     "midStop": "22%",
     "orbR": "55%",
     "orbs": [
@@ -82,7 +82,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX) > snapsh
     "brand": "bm-division",
     "glassAlpha": 0.0953,
     "glassFill": "#596077",
-    "layerOpacity": 0.72,
+    "layerOpacity": 0.7,
     "midStop": "22%",
     "orbR": "55%",
     "orbs": [
@@ -119,7 +119,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX) > snapsh
     "brand": "bm-product",
     "glassAlpha": 0.1157,
     "glassFill": "#576276",
-    "layerOpacity": 0.72,
+    "layerOpacity": 0.7,
     "midStop": "22%",
     "orbR": "55%",
     "orbs": [
@@ -156,7 +156,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX) > snapsh
     "brand": "bm-tp-media",
     "glassAlpha": 0.0802,
     "glassFill": "#5F5D73",
-    "layerOpacity": 0.72,
+    "layerOpacity": 0.7,
     "midStop": "22%",
     "orbR": "55%",
     "orbs": [
@@ -193,7 +193,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX) > snapsh
     "brand": "bm-tp-legal",
     "glassAlpha": 0.097,
     "glassFill": "#576274",
-    "layerOpacity": 0.72,
+    "layerOpacity": 0.7,
     "midStop": "22%",
     "orbR": "55%",
     "orbs": [
@@ -230,7 +230,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX) > snapsh
     "brand": "bm-tp-games",
     "glassAlpha": 0.1097,
     "glassFill": "#586373",
-    "layerOpacity": 0.72,
+    "layerOpacity": 0.7,
     "midStop": "22%",
     "orbR": "55%",
     "orbs": [
@@ -267,7 +267,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX) > snapsh
     "brand": "bm-tp-digital",
     "glassAlpha": 0.1004,
     "glassFill": "#5B5E77",
-    "layerOpacity": 0.72,
+    "layerOpacity": 0.7,
     "midStop": "22%",
     "orbR": "55%",
     "orbs": [
@@ -304,7 +304,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX) > snapsh
     "brand": "bm-tp-lifesci",
     "glassAlpha": 0.1165,
     "glassFill": "#59646D",
-    "layerOpacity": 0.72,
+    "layerOpacity": 0.7,
     "midStop": "22%",
     "orbR": "55%",
     "orbs": [
@@ -341,7 +341,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX) > snapsh
     "brand": "bm-trial-interactive",
     "glassAlpha": 0.1157,
     "glassFill": "#566276",
-    "layerOpacity": 0.72,
+    "layerOpacity": 0.7,
     "midStop": "22%",
     "orbR": "55%",
     "orbs": [
@@ -378,7 +378,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX) > snapsh
     "brand": "bm-cobrand",
     "glassAlpha": 0.1013,
     "glassFill": "#5F5F6E",
-    "layerOpacity": 0.72,
+    "layerOpacity": 0.7,
     "midStop": "22%",
     "orbR": "55%",
     "orbs": [
