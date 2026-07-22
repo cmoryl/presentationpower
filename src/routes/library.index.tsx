@@ -843,6 +843,8 @@ const VariantCard = memo(function VariantCard({
                 <div
                   ref={m === "dark" ? darkRef : lightRef}
                   className="absolute inset-0"
+                  data-preview-mode={m}
+                  data-preview-role="module-preview"
                 >
                   <ScaledSlide>
                     <SlideBackdropContext.Provider value={m === "dark" ? darkBackdrop : lightBackdrop}>
@@ -879,7 +881,7 @@ const VariantCard = memo(function VariantCard({
         placeholder={<PreviewSkeleton dark={isDark} label={variant.familyId} />}
         onMount={bumpMount}
       >
-      <div ref={singleRef} className="absolute inset-0">
+      <div ref={singleRef} className="absolute inset-0" data-preview-mode={isDark ? "dark" : "light"} data-preview-role="module-preview">
         <ScaledSlide>
           <SlideBackdropContext.Provider value={singleBackdrop}>
             <SlideThumbnailContext.Provider value={true}>
@@ -1614,7 +1616,7 @@ function LightboxPortal({
           className="relative w-full"
           style={{ aspectRatio: "16 / 9", maxWidth: "min(96vw, 168vh)", maxHeight: "100%" }}
         >
-          <div ref={stageRef} className={`relative h-full w-full overflow-hidden rounded-2xl ring-1 ring-white/10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.7)] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
+          <div ref={stageRef} data-preview-mode={isDark ? "dark" : "light"} data-preview-role="module-lightbox" className={`relative h-full w-full overflow-hidden rounded-2xl ring-1 ring-white/10 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.7)] ${isDark ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}>
             <ScaledSlide>
               <SlideBackdropContext.Provider value={isDark ? darkBackdrop : lightBackdrop}>
                 <SlideVideoPreviewContext.Provider value={setPlayUrl}>

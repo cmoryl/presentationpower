@@ -34,28 +34,18 @@ async function scrollToLoadAll(page: Page) {
 
 /**
  * Snapshot each <video> on the page and classify it as light- or
- * dark-mode by walking up the ancestor chain looking for the
- * SlideChrome background token (dark tiles use #03002C / a `.dark`
- * ancestor, light tiles use #F2F2F2 / white surfaces).
+ * dark-mode using the explicit `[data-preview-mode]` marker set by the
+ * library preview container. This is the source of truth for which
+ * mode a preview is rendering in — no ancestor luminance heuristics.
+ * A video without such an ancestor is reported as `mode: "unknown"` so
+ * the test can surface unexpected renders instead of silently miscounting.
  */
 async function readVideoState(page: Page) {
   return await page.evaluate(() => {
-    const isDarkAncestor = (el: Element | null): boolean => {
-      let node: Element | null = el;
-      while (node) {
-        const bg = getComputedStyle(node).backgroundColor;
-        // Very dark surfaces → dark mode preview
-        const m = bg.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-        if (m) {
-          const [r, g, b] = [+m[1], +m[2], +m[3]];
-          const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-          if (lum < 0.15) return true;
-          if (lum > 0.85) return false;
-        }
-        if (node.classList?.contains("dark")) return true;
-        node = node.parentElement;
-      }
-      return false;
+    const modeOf = (el: Element | null): "light" | "dark" | "unknown" => {
+      const host = el?.closest("[data-preview-mode]") as HTMLElement | null;
+      const v = host?.dataset.previewMode;
+      return v === "light" || v === "dark" ? v : "unknown";
     };
 
     return Array.from(document.querySelectorAll("video")).map((v) => ({
@@ -65,10 +55,11 @@ async function readVideoState(page: Page) {
       readyState: v.readyState,
       muted: v.muted,
       autoplay: v.autoplay,
-      dark: isDarkAncestor(v),
+      mode: modeOf(v),
     }));
   });
 }
+
 
 test.describe("Module preview video-demo autoplay matrix", () => {
   test("autoplays in light + dark previews on /library", async ({
@@ -92,12 +83,10 @@ test.describe("Module preview video-demo autoplay matrix", () => {
     let snapshot: Awaited<ReturnType<typeof readVideoState>> = [];
     while (Date.now() < deadline) {
       snapshot = await readVideoState(page);
-      const playingLight = snapshot.some(
-        (v) => !v.dark && !v.paused && v.currentTime > 0.05 && v.readyState >= 2,
-      );
-      const playingDark = snapshot.some(
-        (v) => v.dark && !v.paused && v.currentTime > 0.05 && v.readyState >= 2,
-      );
+      const isPlaying = (v: (typeof snapshot)[number]) =>
+        !v.paused && v.currentTime > 0.05 && v.readyState >= 2;
+      const playingLight = snapshot.some((v) => v.mode === "light" && isPlaying(v));
+      const playingDark = snapshot.some((v) => v.mode === "dark" && isPlaying(v));
       if (playingLight && playingDark) break;
       await page.waitForTimeout(500);
     }
@@ -112,11 +101,19 @@ test.describe("Module preview video-demo autoplay matrix", () => {
       0,
     );
 
+    const unknownMode = snapshot.filter((v) => v.mode === "unknown");
+    expect(
+      unknownMode.length,
+      `videos rendered outside a [data-preview-mode] container: ${unknownMode
+        .map((v) => v.src)
+        .join(", ")}`,
+    ).toBe(0);
+
     const playing = snapshot.filter(
       (v) => !v.paused && v.currentTime > 0.05 && v.readyState >= 2,
     );
-    const playingLight = playing.filter((v) => !v.dark);
-    const playingDark = playing.filter((v) => v.dark);
+    const playingLight = playing.filter((v) => v.mode === "light");
+    const playingDark = playing.filter((v) => v.mode === "dark");
 
     expect(
       playingLight.length,
@@ -126,6 +123,7 @@ test.describe("Module preview video-demo autoplay matrix", () => {
       playingDark.length,
       `no DARK-mode video demo autoplayed (of ${totalVideos} videos)`,
     ).toBeGreaterThan(0);
+
 
     expect(
       consoleErrors,
