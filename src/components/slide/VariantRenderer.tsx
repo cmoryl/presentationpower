@@ -1726,6 +1726,9 @@ function renderVariantBody({
               <Kicker brand={brand}>Case study</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
               <DisplayTitle size="section" color={ink.strong}>{s(c.client)}</DisplayTitle>
+              <div className="mt-6">
+                <ClientLogoChip mode={mode} clientName={clientName ?? s(c.client)} clientLogoUrl={clientLogoUrl} accent="var(--slide-accent-text)" faint={ink.faint} size={36} />
+              </div>
               <div className="mt-8" style={{ fontSize: 42, fontWeight: 600, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
                 {s(c.headline)}
               </div>
