@@ -5291,7 +5291,14 @@ function MediaTile({
               hint="Play demo"
             />
           )
+        {hasVideo && shouldPlay && (
+          <VideoHoverControls
+            videoRef={videoRef}
+            initialMuted={wantMuted}
+            onUserPause={() => setUserStarted(false)}
+          />
         )}
+
         {/* Brand accent duotone — subtle multiply so division tokens actually
              tint the photo instead of only floating over it. */}
         <div
