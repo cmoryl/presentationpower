@@ -810,9 +810,12 @@ function renderVariantBody({
       );
     }
 
-    case "MV-CTX-STAT-GRID":
     case "MV-PROOF-STATS-4":
+      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} />;
+
+    case "MV-CTX-STAT-GRID":
       return <StatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} />;
+
 
     case "MV-PROOF-STATS-2":
       return <StatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} />;
