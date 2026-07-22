@@ -2622,21 +2622,20 @@ function renderVariantBody({
               return (
                 <div key={i} className="grid grid-cols-[260px_1fr_140px] items-center gap-6">
                   <div className="text-2xl font-semibold" style={{ color: ink.strong, letterSpacing: "-0.01em" }}>{s(it.label)}</div>
-                  <div className="relative h-12 w-full">
-                    <div className="absolute inset-y-[22px] left-0 right-0" style={{ height: 2, background: `color-mix(in oklab, ${brand.tokens.accent} 14%, transparent)` }} />
+                  <div className="relative h-10 w-full">
+                    <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2" style={{ height: 2, background: `color-mix(in oklab, ${brand.tokens.accent} 14%, transparent)` }} />
                     <div
-                      className="absolute inset-y-0 left-0 flex items-center px-4"
+                      className="absolute top-1/2 left-0 -translate-y-1/2"
                       style={{
                         width: `${pct}%`,
+                        height: highlight ? 10 : 6,
                         background: highlight
-                          ? `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.accent} 45%, transparent), ${brand.tokens.accent})`
-                          : `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.primary} 20%, transparent), color-mix(in oklab, ${brand.tokens.primary} 55%, transparent))`,
-                        color: highlight ? ink.onSurface(brand.tokens.accent) : ink.strong,
-                        clipPath: "polygon(0 40%, 100% 40%, 100% 60%, 0 60%)",
+                          ? `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.accent} 40%, transparent), ${brand.tokens.accent})`
+                          : `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.primary} 18%, transparent), color-mix(in oklab, ${brand.tokens.primary} 60%, transparent))`,
                       }}
                     />
                     {s(it.note) && (
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2" style={{ fontSize: 15, letterSpacing: "0.18em", textTransform: "uppercase", color: ink.faint, fontWeight: 600 }}>{s(it.note)}</div>
+                      <div className="absolute right-3 top-1/2 -translate-y-[135%] uppercase" style={{ fontSize: 13, letterSpacing: "0.22em", color: ink.faint, fontWeight: 600 }}>{s(it.note)}</div>
                     )}
                   </div>
                   <div className="text-right tabular-nums" style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.02em", color: highlight ? "var(--slide-accent-text)" : ink.strong }}>
