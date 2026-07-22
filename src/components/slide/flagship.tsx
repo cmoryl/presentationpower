@@ -824,8 +824,8 @@ export function AuroraOrb({
   const a = accent ?? ctxAccent ?? "#4F8CFF";
   const sibling = shiftHue(a, 34, 0.06);
   const isLight = mode === "light";
-  const alpha = (isLight ? 0.75 : 0.45) * intensity;
-  const scaled = isLight ? size * 1.55 : size * 1.38;
+  const alpha = (isLight ? 0.9 : 0.72) * intensity;
+  const scaled = isLight ? size * 1.35 : size * 1.2;
   return (
     <div
       aria-hidden
@@ -838,10 +838,10 @@ export function AuroraOrb({
         transform: "translate(-50%, -50%)",
         borderRadius: "50%",
         background: isLight
-          ? `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.75)} 22%, ${hexA(a, alpha * 0.25)} 58%, ${hexA(a, 0)} 100%)`
-          : `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.6)} 24%, ${hexA(a, alpha * 0.15)} 62%, ${hexA(a, 0)} 100%)`,
-        filter: isLight ? "blur(100px)" : "blur(80px)",
-        mixBlendMode: isLight ? "multiply" : "normal",
+          ? `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.85)} 12%, ${hexA(a, alpha * 0.5)} 34%, ${hexA(a, alpha * 0.18)} 62%, ${hexA(a, 0)} 100%)`
+          : `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.8)} 14%, ${hexA(a, alpha * 0.42)} 36%, ${hexA(a, alpha * 0.14)} 66%, ${hexA(a, 0)} 100%)`,
+        filter: isLight ? "blur(48px)" : "blur(40px)",
+        mixBlendMode: isLight ? "multiply" : "screen",
       }}
     />
   );
