@@ -1125,6 +1125,7 @@ function VariantDetailModal({
 
 
   return (
+    <>
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#03002C]/70 p-6 backdrop-blur-md"
       onClick={onClose}
