@@ -1,5 +1,5 @@
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
-import { SlideFrame as BaseSlideFrame, SlideModeContext, SlideBackdropContext, SlideAccentContext, useSlideInk, type SlideMode, type SlideBackdrop } from "./SlideChrome";
+import { SlideFrame as BaseSlideFrame, SlideModeContext, SlideBackdropContext, SlideAccentContext, SlideInkContext, makeSlideInk, useSlideInk, type SlideMode, type SlideBackdrop } from "./SlideChrome";
 import { SlideThumbnailContext, SlideVideoPreviewContext, useResolvedVideoUrl, useResolvedPosterUrl, useResolvedImageUrl, useResolvedLogoUrl } from "@/lib/slide-media-refresh";
 import { resolveSlideBackground } from "@/lib/background-library";
 import { backdropForVariant } from "./variantBackdrop";
@@ -242,6 +242,7 @@ export function VariantRenderer(props: Props) {
   const contentClientName = s((slide.content as Record<string, unknown>).clientName) || undefined;
   const resolvedClient = clientName || contentClientName;
   const themedBrand = themeBrandForMode(brand, mode);
+  const semanticInk = makeSlideInk(mode, brand.tokens.accent, brand.tokens.primary, brand.tokens.surface, brand.tokens.ink);
 
   // Custom background per slide (from content.background). Falls back to null
   // so variants that render their own MediaTile / deterministic backdrops are
@@ -272,11 +273,13 @@ export function VariantRenderer(props: Props) {
   return (
     <SlideModeContext.Provider value={mode}>
       <SlideAccentContext.Provider value={themedBrand?.tokens?.accent ?? null}>
-        <SlideBackdropContext.Provider value={backdrop}>
-          <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany, logoOrientation: slide.logoOrientation && slide.logoOrientation !== "auto" ? slide.logoOrientation : logoOrientation, logoPosition: slide.logoPosition && slide.logoPosition !== "auto" ? slide.logoPosition : undefined }}>
-            {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c, mode })}
-          </SlideFrameCtx.Provider>
-        </SlideBackdropContext.Provider>
+        <SlideInkContext.Provider value={semanticInk}>
+          <SlideBackdropContext.Provider value={backdrop}>
+            <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany, logoOrientation: slide.logoOrientation && slide.logoOrientation !== "auto" ? slide.logoOrientation : logoOrientation, logoPosition: slide.logoPosition && slide.logoPosition !== "auto" ? slide.logoPosition : undefined }}>
+              {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c, mode })}
+            </SlideFrameCtx.Provider>
+          </SlideBackdropContext.Provider>
+        </SlideInkContext.Provider>
       </SlideAccentContext.Provider>
     </SlideModeContext.Provider>
 
@@ -315,16 +318,20 @@ function renderVariantBody({
   // MUST use these tokens (never hardcoded `rgba(10,15,28,X)`) so text stays
   // readable when a dark backdrop is applied.
   const isDark = mode === "dark";
+  const semantic = makeSlideInk(mode, brand.tokens.accent, brand.tokens.primary, brand.tokens.surface, brand.tokens.ink);
   const ink = {
-    strong:      isDark ? "#ffffff"                 : "rgba(10,15,28,0.92)",
-    body:        isDark ? "rgba(255,255,255,0.86)"  : "rgba(10,15,28,0.82)",
-    muted:       isDark ? "rgba(255,255,255,0.70)"  : "rgba(10,15,28,0.66)",
-    faint:       isDark ? "rgba(255,255,255,0.52)"  : "rgba(10,15,28,0.48)",
-    axis:        isDark ? "rgba(255,255,255,0.22)"  : "rgba(10,15,28,0.18)",
-    divider:     isDark ? "rgba(255,255,255,0.14)"  : "rgba(10,15,28,0.12)",
-    surface:     isDark ? "rgba(255,255,255,0.06)"  : "rgba(10,15,28,0.04)",
-    surfaceRing: isDark ? "rgba(255,255,255,0.12)"  : "rgba(10,15,28,0.10)",
-    ringOnDark:  isDark ? "#0b1024"                 : "#ffffff",
+    strong: semantic.text,
+    body: semantic.muted,
+    muted: semantic.muted,
+    faint: semantic.faint,
+    axis: semantic.hairlineStrong,
+    divider: semantic.hairline,
+    hairline: semantic.hairline,
+    hairlineStrong: semantic.hairlineStrong,
+    surface: semantic.trackFill,
+    surfaceRing: semantic.hairline,
+    ringOnDark: isDark ? "#0b1024" : "#ffffff",
+    onSurface: semantic.onSurface,
   };
 
   switch (variant.id) {
@@ -369,7 +376,7 @@ function renderVariantBody({
               <EditorialTitle
                 text={s(c.title, "Client")}
                 emphasize={s(c.titleEmphasis) || lastWord(s(c.title, "Client"))}
-                color="#ffffff"
+                color={ink.strong}
                 accentColor={brand.tokens.accent}
                 size={132}
                 maxWidthPx={1520}
@@ -409,7 +416,7 @@ function renderVariantBody({
               <EditorialTitle
                 text={s(c.title)}
                 emphasize={s(c.titleEmphasis) || lastWord(s(c.title))}
-                color="#ffffff"
+                color={ink.strong}
                 accentColor={brand.tokens.accent}
                 size={_titleSize === "cover" ? 128 : _titleSize === "section" ? 96 : 72}
                 maxWidthPx={1420}
@@ -438,7 +445,7 @@ function renderVariantBody({
               <EditorialTitle
                 text={s(c.title)}
                 emphasize={s(c.titleEmphasis) || lastWord(s(c.title))}
-                color="#ffffff"
+                color={ink.strong}
                 accentColor={brand.tokens.accent}
                 size={132}
                 maxWidthPx={1520}
@@ -468,7 +475,7 @@ function renderVariantBody({
               <EditorialTitle
                 text={s(c.title)}
                 emphasize={s(c.titleEmphasis) || lastWord(s(c.title))}
-                color="#ffffff"
+                color={ink.strong}
                 accentColor={brand.tokens.accent}
                 size={116}
                 maxWidthPx={1600}
@@ -497,9 +504,9 @@ function renderVariantBody({
               {s(c.chapterNumber, "01")}
             </div>
             <div className="flex-1">
-              <Kicker brand={brand} color="rgba(255,255,255,0.7)">{s(c.kicker, "Chapter")}</Kicker>
+              <Kicker brand={brand} color={ink.muted}>{s(c.kicker, "Chapter")}</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={64} thicknessPx={2} className="mt-6" />
-              <DisplayTitle size="section" color="#ffffff" maxWidthPx={1100} className="mt-8">
+              <DisplayTitle size="section" color={ink.strong} maxWidthPx={1100} className="mt-8">
                 {s(c.title)}
               </DisplayTitle>
             </div>
@@ -655,7 +662,7 @@ function renderVariantBody({
                       ) : (
                         <span
                           style={{
-                            color: "#ffffff",
+                            color: ink.strong,
                             fontSize: portraitPx * 0.36,
                             fontWeight: 600,
                             letterSpacing: "-0.02em",
@@ -769,7 +776,7 @@ function renderVariantBody({
               Trend
             </Kicker>
             <Hairline color={"var(--slide-accent-text)"} widthPx={88} thicknessPx={2} className="mt-6 mb-8" />
-            <DisplayTitle size="section" color={brand.tokens.primary} maxWidthPx={1500}>
+            <DisplayTitle size="section" color={ink.strong} maxWidthPx={1500}>
               {s(c.headline)}
             </DisplayTitle>
             <SupportingText size="lg" opacity={0.8} maxWidthPx={1180} className="mt-10">
@@ -789,7 +796,7 @@ function renderVariantBody({
           <div className="flex h-full flex-col justify-center">
             <Kicker brand={brand}>Insight</Kicker>
             <Hairline color={"var(--slide-accent-text)"} widthPx={88} thicknessPx={2} className="mt-6 mb-10" />
-            <DisplayTitle size="section" color={brand.tokens.primary} maxWidthPx={1520}>
+            <DisplayTitle size="section" color={ink.strong} maxWidthPx={1520}>
               {s(c.insight)}
             </DisplayTitle>
             <SupportingText size="lg" opacity={0.8} maxWidthPx={1180} className="mt-10">
@@ -858,7 +865,7 @@ function renderVariantBody({
                 }}>
                   <Hairline color={"var(--slide-accent-text)"} widthPx={44} thicknessPx={2} className="mb-6" />
                   <Kicker brand={brand}>{b.label}</Kicker>
-                  <div className="mt-6" style={{ fontSize: 34, lineHeight: 1.28, letterSpacing: "-0.01em", color: brand.tokens.primary }}>
+                  <div className="mt-6" style={{ fontSize: 34, lineHeight: 1.28, letterSpacing: "-0.01em", color: ink.strong }}>
                     {b.body}
                   </div>
                 </div>
@@ -914,7 +921,7 @@ function renderVariantBody({
           <div className="mt-12 grid grid-cols-2 gap-10" style={{ gridTemplateRows: "1fr 1fr" }}>
             <div className="row-span-2 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
               <Kicker brand={brand}>Hero</Kicker>
-              <div className="mt-6" style={{ fontSize: 56, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.05, color: brand.tokens.primary }}>
+              <div className="mt-6" style={{ fontSize: 56, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.05, color: ink.strong }}>
                 {s(hero.title)}
               </div>
               <SupportingText size="lg" opacity={0.75} className="mt-6" maxWidthPx={560}>
@@ -944,7 +951,7 @@ function renderVariantBody({
                   >
                     {String(i + 1).padStart(2, "0")}
                   </div>
-                  <div className="w-72" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: i === 0 ? brand.tokens.primary : brand.tokens.ink }}>
+                  <div className="w-72" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: "var(--slide-ink)" }}>
                     {s(it.label)}
                   </div>
                   <SupportingText size="md" opacity={0.72} className="flex-1">{s(it.body)}</SupportingText>
@@ -964,7 +971,7 @@ function renderVariantBody({
               <div key={i} className="flex items-start gap-5">
                 <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} />
                 <div className="flex-1">
-                  <div className="text-3xl font-semibold" style={{ color: brand.tokens.primary }}>
+                  <div className="text-3xl font-semibold" style={{ color: ink.strong }}>
                     {s(it.label)}
                   </div>
                   <div className="mt-2 text-2xl opacity-80">{s(it.body)}</div>
@@ -1008,7 +1015,7 @@ function renderVariantBody({
                   >
                     {String(i + 1).padStart(2, "0")}
                   </div>
-                  <div style={{ fontSize: 30, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>
+                  <div style={{ fontSize: 30, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em", lineHeight: 1.15 }}>
                     {s(it.label)}
                   </div>
                   <div className="mt-4" style={{ fontSize: 22, lineHeight: 1.4, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>
@@ -1033,7 +1040,7 @@ function renderVariantBody({
           <div className="mt-14 grid grid-cols-2 gap-16">
             <div className="flex flex-col pt-8" style={{ borderTop: "1px solid rgba(10,15,28,0.15)" }}>
               <Kicker brand={brand} color="color-mix(in oklab, currentColor 62%, transparent)">Before</Kicker>
-              <div className="mt-8" style={{ fontSize: 40, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
+              <div className="mt-8" style={{ fontSize: 40, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
                 {s(before.title)}
               </div>
               <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.4, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>
@@ -1042,7 +1049,7 @@ function renderVariantBody({
             </div>
             <div className="flex flex-col pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
               <Kicker brand={brand}>After</Kicker>
-              <div className="mt-8" style={{ fontSize: 40, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
+              <div className="mt-8" style={{ fontSize: 40, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
                 {s(after.title)}
               </div>
               <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.4, color: "color-mix(in oklab, currentColor 82%, transparent)" }}>
@@ -1058,7 +1065,7 @@ function renderVariantBody({
     // ── Proof & Data ──────────────────────────────────────────────────
     case "MV-PROOF-LOGOS":
     case "MV-CASE-LOGO-GRID": {
-      const tileText = isDark ? "#ffffff" : brand.tokens.primary;
+      const tileText = ink.strong;
       const accent = brand.tokens.accent;
       const tileBg = isDark ? "rgba(255,255,255,0.04)" : "rgba(10,15,28,0.02)";
       const tileRing = isDark ? "rgba(255,255,255,0.08)" : "rgba(10,15,28,0.06)";
@@ -1148,7 +1155,7 @@ function renderVariantBody({
                   {url || path ? (
                     <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-16 max-w-full object-contain" />
                   ) : (
-                    <div className="text-xl font-semibold" style={{ color: mode === "dark" ? "#fff" : brand.tokens.primary }}>{name}</div>
+                    <div className="text-xl font-semibold" style={{ color: ink.strong }}>{name}</div>
                   )}
                 </div>
               );
@@ -1173,7 +1180,7 @@ function renderVariantBody({
                 {url || path ? (
                   <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-14 max-w-[88%] object-contain" />
                 ) : (
-                  <div className="text-lg font-semibold" style={{ color: mode === "dark" ? "#fff" : brand.tokens.primary }}>{name}</div>
+                  <div className="text-lg font-semibold" style={{ color: ink.strong }}>{name}</div>
                 )}
               </div>
             );
@@ -1215,10 +1222,10 @@ function renderVariantBody({
               {featuredUrl ? (
                 <ClientLogoImg url={featuredUrl} alt={`${featuredName} logo`} className="max-h-44 max-w-[72%] object-contain" />
               ) : (
-                <div className="text-4xl font-semibold" style={{ color: mode === "dark" ? "#fff" : brand.tokens.primary }}>{featuredName}</div>
+                <div className="text-4xl font-semibold" style={{ color: ink.strong }}>{featuredName}</div>
               )}
               {featuredNote && (
-                <div className="mt-10 max-w-md text-lg opacity-75" style={{ color: mode === "dark" ? "#fff" : brand.tokens.primary }}>
+                <div className="mt-10 max-w-md text-lg opacity-75" style={{ color: ink.strong }}>
                   {featuredNote}
                 </div>
               )}
@@ -1238,7 +1245,7 @@ function renderVariantBody({
                     {url || path ? (
                       <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-14 max-w-[80%] object-contain" />
                     ) : (
-                      <div className="text-lg font-semibold" style={{ color: mode === "dark" ? "#fff" : brand.tokens.primary }}>{name}</div>
+                      <div className="text-lg font-semibold" style={{ color: ink.strong }}>{name}</div>
                     )}
                   </div>
                 );
@@ -1251,7 +1258,7 @@ function renderVariantBody({
 
     case "MV-PROOF-LOGOS-CATEGORIZED": {
       const groups = arr(c.items).slice(0, 2);
-      const textColor = mode === "dark" ? "#fff" : brand.tokens.primary;
+      const textColor = ink.strong;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
@@ -1292,7 +1299,7 @@ function renderVariantBody({
 
     case "MV-PROOF-LOGOS-MOSAIC": {
       const items = arr(c.items).slice(0, 7);
-      const textColor = mode === "dark" ? "#fff" : brand.tokens.primary;
+      const textColor = ink.strong;
       // Mosaic grid template: 4 cols × 3 rows, asymmetric spans.
       const spans = [
         "col-span-2 row-span-2", // 0 anchor
@@ -1347,7 +1354,7 @@ function renderVariantBody({
             <div className="relative">
               <Kicker brand={brand}>Testimonial</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
-              <div style={{ fontSize: 60, fontWeight: 500, lineHeight: 1.2, letterSpacing: "-0.015em", color: brand.tokens.primary, maxWidth: 980 }}>
+              <div style={{ fontSize: 60, fontWeight: 500, lineHeight: 1.2, letterSpacing: "-0.015em", color: ink.strong, maxWidth: 980 }}>
                 {s(c.quote)}
               </div>
               <div className="mt-12">
@@ -1395,7 +1402,7 @@ function renderVariantBody({
           <div className="mt-14">
             <div className="grid gap-x-8" style={{ gridTemplateColumns: `2fr ${columns.map(() => "1fr").join(" ")}` }}>
               {/* Editorial column headers — small caps + hairline underline */}
-              <div className="pb-4 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 62%, transparent)", fontWeight: 600, borderBottom: "1px solid rgba(10,15,28,0.15)" }}>
+              <div className="pb-4 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.faint, fontWeight: 600, borderBottom: `1px solid ${ink.hairlineStrong}` }}>
                 Criteria
               </div>
               {columns.map((col, i) => (
@@ -1406,7 +1413,7 @@ function renderVariantBody({
                     fontSize: 20,
                     letterSpacing: "0.24em",
                     fontWeight: 600,
-                    color: winnerIdx === i ? brand.tokens.accent : brand.tokens.primary,
+                    color: winnerIdx === i ? "var(--slide-accent-text)" : ink.strong,
                     borderBottom: `${winnerIdx === i ? 2 : 1}px solid ${winnerIdx === i ? brand.tokens.accent : "rgba(10,15,28,0.15)"}`,
                   }}
                 >
@@ -1417,7 +1424,7 @@ function renderVariantBody({
                 <div key={ri} className="contents">
                   <div
                     className="py-5"
-                    style={{ fontSize: 24, letterSpacing: "-0.01em", color: brand.tokens.primary, borderBottom: "1px solid rgba(10,15,28,0.10)" }}
+                    style={{ fontSize: 24, letterSpacing: "-0.01em", color: ink.strong, borderBottom: `1px solid ${ink.hairline}` }}
                   >
                     {s(r.criterion)}
                   </div>
@@ -1427,9 +1434,9 @@ function renderVariantBody({
                       className="py-5"
                       style={{
                         fontSize: 24,
-                        color: winnerIdx === ci ? brand.tokens.primary : "rgba(10,15,28,0.75)",
+                        color: winnerIdx === ci ? ink.strong : ink.muted,
                         fontWeight: winnerIdx === ci ? 600 : 400,
-                        borderBottom: "1px solid rgba(10,15,28,0.10)",
+                        borderBottom: `1px solid ${ink.hairline}`,
                       }}
                     >
                       {v}
@@ -1452,7 +1459,7 @@ function renderVariantBody({
               <div
                 key={i}
                 className="flex items-start gap-6 py-6"
-                style={{ borderBottom: "1px solid rgba(10,15,28,0.10)" }}
+                style={{ borderBottom: `1px solid ${ink.hairline}` }}
               >
                 <div
                   className="mt-2 flex h-7 w-7 shrink-0 items-center justify-center"
@@ -1461,7 +1468,7 @@ function renderVariantBody({
                   ✓
                 </div>
                 <div>
-                  <div style={{ fontSize: 26, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.01em", lineHeight: 1.25 }}>
+                  <div style={{ fontSize: 26, fontWeight: 600, color: ink.strong, letterSpacing: "-0.01em", lineHeight: 1.25 }}>
                     {s(it.label)}
                   </div>
                   {s(it.note) && (
@@ -1490,12 +1497,12 @@ function renderVariantBody({
                   className="pt-8"
                   style={{ borderTop: `${featured ? 3 : 1}px solid ${featured ? brand.tokens.accent : "rgba(10,15,28,0.12)"}` }}
                 >
-                  <Kicker brand={brand} color={featured ? brand.tokens.accent : "color-mix(in oklab, currentColor 62%, transparent)"}>
+                  <Kicker brand={brand} color={featured ? "var(--slide-accent-text)" : ink.faint}>
                     {s(tier.name)}
                   </Kicker>
                   <div
                     className="mt-6 font-semibold tabular-nums"
-                    style={{ fontSize: 88, lineHeight: 0.95, letterSpacing: "-0.03em", color: brand.tokens.primary }}
+                    style={{ fontSize: 88, lineHeight: 0.95, letterSpacing: "-0.03em", color: ink.strong }}
                   >
                     {s(tier.price)}
                     {s(tier.unit) && (
@@ -1547,7 +1554,7 @@ function renderVariantBody({
                     style={{ borderTop: i === 0 ? "none" : "1px solid rgba(10,15,28,0.10)" }}
                   >
                     <span className="mt-3 h-2 w-8 shrink-0" style={{ backgroundColor: brand.tokens.accent }} />
-                    <span style={{ fontSize: 26, lineHeight: 1.3, letterSpacing: "-0.01em", color: brand.tokens.primary }}>
+                    <span style={{ fontSize: 26, lineHeight: 1.3, letterSpacing: "-0.01em", color: ink.strong }}>
                       {s(it.label)}
                     </span>
                   </div>
@@ -1565,7 +1572,7 @@ function renderVariantBody({
           <div className="mt-12">
             <div
               className="grid grid-cols-[80px_1fr_1fr] gap-10 pb-4 uppercase"
-              style={{ fontSize: 18, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 62%, transparent)", borderBottom: `1px solid ${brand.tokens.accent}` }}
+              style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.faint, borderBottom: `1px solid ${brand.tokens.accent}` }}
             >
               <div className="tabular-nums">№</div>
               <div>Risk</div>
@@ -1578,7 +1585,7 @@ function renderVariantBody({
                   <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, letterSpacing: "0.18em", color: "var(--slide-accent-text)" }}>
                     {String(i + 1).padStart(2, "0")}
                   </div>
-                  <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.primary }}>{s(it.risk)}</div>
+                  <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(it.risk)}</div>
                   <SupportingText size="md" opacity={0.72}>{s(it.mitigation)}</SupportingText>
                 </div>
               </div>
@@ -1637,7 +1644,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <Kicker brand={brand}>Case study</Kicker>
           <Hairline color={"var(--slide-accent-text)"} widthPx={88} thicknessPx={2} className="mt-6 mb-8" />
-          <DisplayTitle size="section" color={brand.tokens.primary}>{s(c.client)}</DisplayTitle>
+          <DisplayTitle size="section" color={ink.strong}>{s(c.client)}</DisplayTitle>
           <SupportingText size="lg" opacity={0.72} className="mt-8" maxWidthPx={1180}>{s(c.summary)}</SupportingText>
           <div className="mt-14 grid grid-cols-3 gap-14">
             {arr(c.items).map((it, i) => (
@@ -1656,7 +1663,7 @@ function renderVariantBody({
             <div className="flex flex-col justify-center">
               <Kicker brand={brand}>Case study</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
-              <DisplayTitle size="section" color={brand.tokens.primary}>{s(c.client)}</DisplayTitle>
+              <DisplayTitle size="section" color={ink.strong}>{s(c.client)}</DisplayTitle>
               <div className="mt-8" style={{ fontSize: 42, fontWeight: 600, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
                 {s(c.headline)}
               </div>
@@ -1665,7 +1672,7 @@ function renderVariantBody({
               <SupportingText size="lg" opacity={0.82}>{s(c.story)}</SupportingText>
               <div className="mt-10 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
                 <Kicker brand={brand}>Result</Kicker>
-                <div className="mt-4" style={{ fontSize: 40, fontWeight: 600, letterSpacing: "-0.02em", color: brand.tokens.primary }}>
+                <div className="mt-4" style={{ fontSize: 40, fontWeight: 600, letterSpacing: "-0.02em", color: ink.strong }}>
                   {s(c.result)}
                 </div>
               </div>
@@ -1682,7 +1689,7 @@ function renderVariantBody({
           <div className="mt-12">
             <div
               className="grid grid-cols-[1.3fr_1fr_2fr] gap-10 pb-4 uppercase"
-              style={{ fontSize: 18, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 62%, transparent)", borderBottom: `1px solid ${brand.tokens.accent}` }}
+              style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.faint, borderBottom: `1px solid ${brand.tokens.accent}` }}
             >
               <div>Forum</div>
               <div>Cadence</div>
@@ -1692,7 +1699,7 @@ function renderVariantBody({
               <div key={i}>
                 {i > 0 && <SoftDivider />}
                 <div className="grid grid-cols-[1.3fr_1fr_2fr] items-start gap-10 py-6">
-                  <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.primary }}>{s(it.forum)}</div>
+                  <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(it.forum)}</div>
                   <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(it.cadence)}</div>
                   <SupportingText size="md" opacity={0.72}>{s(it.purpose)}</SupportingText>
                 </div>
@@ -1743,7 +1750,7 @@ function renderVariantBody({
                 className="mt-8 h-[2px] w-[160px] rounded-full"
                 style={{ backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)` }}
               />
-              <DisplayTitle size="hero" color="#ffffff" maxWidthPx={1080} className="mt-10">
+              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080} className="mt-10">
                 {s(c.message, "Let's start.")}
               </DisplayTitle>
               {(s(c.owner) || s(c.followUp)) && (
@@ -1767,7 +1774,7 @@ function renderVariantBody({
                   className="absolute inset-x-0 top-0 h-[3px]"
                   style={{ background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 85%)` }}
                 />
-                <div className="uppercase" style={{ fontSize: 15, letterSpacing: "0.24em", fontWeight: 600, color: "rgba(255,255,255,0.62)" }}>
+                <div className="uppercase" style={{ fontSize: 15, letterSpacing: "0.24em", fontWeight: 600, color: ink.faint }}>
                   Next steps
                 </div>
                 <div className="mt-8 space-y-6">
@@ -1785,7 +1792,7 @@ function renderVariantBody({
                       >
                         {String(i + 1).padStart(2, "0")}
                       </div>
-                      <div style={{ fontSize: 26, lineHeight: 1.32, color: "#ffffff", fontWeight: 500 }}>
+                      <div style={{ fontSize: 26, lineHeight: 1.32, color: ink.strong, fontWeight: 500 }}>
                         {s(it.label ?? it.title ?? it.body)}
                       </div>
                     </div>
@@ -1803,7 +1810,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
           <div className="flex h-full flex-col justify-center">
             <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} />
-            <DisplayTitle size="hero" color="#ffffff" maxWidthPx={1600} className="mt-10">
+            <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1600} className="mt-10">
               {s(c.message, "Thank you.")}
             </DisplayTitle>
             {s(c.signoff) && (
@@ -1837,7 +1844,7 @@ function renderVariantBody({
             <div className="relative flex flex-col items-center">
               <Kicker brand={brand}>The floor is yours</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6" />
-              <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1400} className="mt-10">
+              <DisplayTitle size="cover" color={ink.strong} maxWidthPx={1400} className="mt-10">
                 {s(c.title, "Questions")}
               </DisplayTitle>
               {s(c.prompt) && (
@@ -1856,20 +1863,20 @@ function renderVariantBody({
           <div>
             <Kicker brand={brand}>Stay in touch</Kicker>
             <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6" />
-            <DisplayTitle size="section" color="#ffffff" className="mt-8">
+            <DisplayTitle size="section" color={ink.strong} className="mt-8">
               {s(c.title, "Get in touch")}
             </DisplayTitle>
           </div>
           <div className={`mt-14 grid gap-x-20 gap-y-12 ${arr(c.items).length >= 3 ? "grid-cols-3" : arr(c.items).length === 2 ? "grid-cols-2" : "grid-cols-1"}`}>
             {arr(c.items).map((p, i) => (
               <div key={i} className="border-t pt-8" style={{ borderColor: "rgba(255,255,255,0.16)" }}>
-                <div style={{ fontSize: 32, fontWeight: 600, color: "#ffffff", letterSpacing: "-0.015em" }}>
+                <div style={{ fontSize: 32, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em" }}>
                   {s(p.name)}
                 </div>
                 <div className="mt-2 uppercase" style={{ color: "var(--slide-accent-text)", fontSize: 18, letterSpacing: "0.28em", fontWeight: 600 }}>
                   {s(p.role)}
                 </div>
-                <div className="mt-6 space-y-2" style={{ fontSize: 24, color: "rgba(255,255,255,0.88)" }}>
+                <div className="mt-6 space-y-2" style={{ fontSize: 24, color: ink.muted }}>
                   <div>{s(p.email)}</div>
                   <div style={{ opacity: 0.65 }}>{s(p.phone)}</div>
                 </div>
@@ -1890,7 +1897,7 @@ function renderVariantBody({
               <Kicker brand={brand} tracking="0.32em">{s(c.kicker, "Vol. 01")}</Kicker>
               <div>
                 <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mb-8" />
-                <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1080}>
+                <DisplayTitle size="cover" color={ink.strong} maxWidthPx={1080}>
                   {s(c.title)}
                 </DisplayTitle>
                 {s(c.subtitle) && (
@@ -1928,7 +1935,7 @@ function renderVariantBody({
               <div className="relative">
                 <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
                 <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6" />
-                <DisplayTitle size="section" color="#ffffff" maxWidthPx={720} className="mt-8">
+                <DisplayTitle size="section" color={ink.strong} maxWidthPx={720} className="mt-8">
                   {s(c.title)}
                 </DisplayTitle>
                 {s(c.subtitle) && (
@@ -1952,7 +1959,7 @@ function renderVariantBody({
             <Kicker brand={brand} tracking="0.42em">{s(c.kicker, "A briefing")}</Kicker>
             <DisplayTitle
               size="hero"
-              color="#ffffff"
+              color={ink.strong}
               className="uppercase"
             >
               {s(c.title, "Signal")}
@@ -1986,7 +1993,7 @@ function renderVariantBody({
           <div className="relative flex h-full flex-col justify-end text-white">
             <Kicker brand={brand}>{s(c.date, "Briefing")}</Kicker>
             <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-8" />
-            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1520} className="mt-10">
+            <DisplayTitle size="cover" color={ink.strong} maxWidthPx={1520} className="mt-10">
               {s(c.title)}
             </DisplayTitle>
             {s(c.subtitle) && (
@@ -2002,7 +2009,7 @@ function renderVariantBody({
     case "MV-OP-COVER-DOSSIER":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <div className="flex h-full flex-col justify-between" style={{ color: brand.tokens.ink }}>
+          <div className="flex h-full flex-col justify-between" style={{ color: ink.strong }}>
             <div className="flex items-start justify-between">
               <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.32em", opacity: 0.65 }}>
                 Dossier · Ref {s(c.reference, "TP-0001")}
@@ -2022,7 +2029,7 @@ function renderVariantBody({
             </div>
             <div>
               <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} />
-              <DisplayTitle size="cover" color={brand.tokens.primary} maxWidthPx={1520} className="mt-10">
+              <DisplayTitle size="cover" color={ink.strong} maxWidthPx={1520} className="mt-10">
                 {s(c.title)}
               </DisplayTitle>
               <SupportingText size="lg" opacity={0.75} maxWidthPx={1180} className="mt-8">
@@ -2055,7 +2062,7 @@ function renderVariantBody({
           <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand} tracking="0.32em">Prepared for {s(c.clientName)}</Kicker>
             <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-6" />
-            <DisplayTitle size={_titleSize} color="#ffffff" maxWidthPx={1520} className="mt-6">
+            <DisplayTitle size={_titleSize} color={ink.strong} maxWidthPx={1520} className="mt-6">
               {s(c.title)}
             </DisplayTitle>
             {s(c.subtitle) && (
@@ -2080,7 +2087,7 @@ function renderVariantBody({
               className="relative flex items-center justify-center overflow-hidden"
               style={{
                 backgroundImage: `radial-gradient(120% 90% at 20% 15%, ${brand.tokens.primary} 0%, ${brand.tokens.primary}DD 55%, ${brand.tokens.primary}66 100%)`,
-                color: "#fff",
+                color: ink.strong,
               }}
             >
               <div
@@ -2099,7 +2106,7 @@ function renderVariantBody({
             </div>
             <div className="flex flex-col justify-center">
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} />
-              <DisplayTitle size="section" color="#ffffff" maxWidthPx={720} className="mt-8">
+              <DisplayTitle size="section" color={ink.strong} maxWidthPx={720} className="mt-8">
                 {s(c.title)}
               </DisplayTitle>
               {s(c.subtitle) && (
@@ -2124,7 +2131,7 @@ function renderVariantBody({
               <MediaTile brand={brand} seed={s(c.mediaSeed, "stacked")} className="aspect-[4/5] w-full" />
               <div>
                 <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mb-8" />
-                <DisplayTitle size="section" color="#ffffff" maxWidthPx={1000}>
+                <DisplayTitle size="section" color={ink.strong} maxWidthPx={1000}>
                   {s(c.title)}
                 </DisplayTitle>
                 {s(c.subtitle) && (
@@ -2154,7 +2161,7 @@ function renderVariantBody({
           <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand}>{s(c.kicker, "In focus")}</Kicker>
             <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-6 mb-6" />
-            <DisplayTitle size={_titleSize} color="#ffffff" maxWidthPx={1600}>{s(c.title)}</DisplayTitle>
+            <DisplayTitle size={_titleSize} color={ink.strong} maxWidthPx={1600}>{s(c.title)}</DisplayTitle>
             <SupportingText size="lg" opacity={0.9} maxWidthPx={1180} className="mt-6 line-clamp-2">{s(c.body)}</SupportingText>
           </div>
         </SlideFrame>
@@ -2205,7 +2212,7 @@ function renderVariantBody({
             {arr(c.items).map((it, i) => (
               <div key={i}>
                 <MediaTile brand={brand} seed={s(it.seed, `grid3-${i}`)} className="aspect-[4/3] w-full" />
-                <div className="mt-5" style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.primary }}>{s(it.label)}</div>
+                <div className="mt-5" style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(it.label)}</div>
                 <SupportingText size="md" opacity={0.72} className="mt-2">{s(it.caption)}</SupportingText>
               </div>
             ))}
@@ -2240,10 +2247,10 @@ function renderVariantBody({
             <div className="flex flex-col justify-center">
               <Kicker brand={brand}>{s(c.role)}</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
-              <DisplayTitle size="section" color={brand.tokens.primary}>{s(c.name)}</DisplayTitle>
+              <DisplayTitle size="section" color={ink.strong}>{s(c.name)}</DisplayTitle>
               {s(c.quote) && (
                 <div className="relative mt-10 pl-8" style={{ borderLeft: `2px solid ${brand.tokens.accent}` }}>
-                  <div style={{ fontSize: 34, fontWeight: 500, lineHeight: 1.3, letterSpacing: "-0.01em", color: brand.tokens.primary }}>
+                  <div style={{ fontSize: 34, fontWeight: 500, lineHeight: 1.3, letterSpacing: "-0.01em", color: ink.strong }}>
                     “{s(c.quote)}”
                   </div>
                 </div>
@@ -2264,7 +2271,7 @@ function renderVariantBody({
             <div className="relative max-w-[1500px]">
               <Kicker brand={brand} color={"var(--slide-accent-text)"}>In their words</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
-              <div style={{ fontSize: 72, fontWeight: 500, lineHeight: 1.18, letterSpacing: "-0.02em", color: "#ffffff" }}>
+              <div style={{ fontSize: 72, fontWeight: 500, lineHeight: 1.18, letterSpacing: "-0.02em", color: ink.strong }}>
                 {s(c.quote)}
               </div>
               <div className="mt-14">
@@ -2286,8 +2293,8 @@ function renderVariantBody({
               <div key={i} className="pt-0">
                 <MediaTile brand={brand} seed={s(p.panel.seed, `${p.label}-${s(p.panel.label)}`)} className="aspect-[16/9] w-full rounded-none" muted={i === 0} />
                 <div className="mt-8 pt-6" style={{ borderTop: `${i === 1 ? 2 : 1}px solid ${i === 1 ? brand.tokens.accent : "rgba(10,15,28,0.12)"}` }}>
-                  <Kicker brand={brand} color={i === 1 ? brand.tokens.accent : "color-mix(in oklab, currentColor 62%, transparent)"}>{p.label}</Kicker>
-                  <div className="mt-4" style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.015em", color: brand.tokens.primary }}>{s(p.panel.label)}</div>
+                  <Kicker brand={brand} color={i === 1 ? "var(--slide-accent-text)" : ink.faint}>{p.label}</Kicker>
+                  <div className="mt-4" style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>{s(p.panel.label)}</div>
                   <SupportingText size="md" opacity={0.72} className="mt-3">{s(p.panel.body)}</SupportingText>
                 </div>
               </div>
@@ -2352,7 +2359,7 @@ function renderVariantBody({
                 style={{ borderTop: i === 0 ? "none" : "1px solid rgba(10,15,28,0.10)" }}
               >
                 <QuoteMark color={"var(--slide-accent-text)"} size={110} opacity={0.9} className="-mt-4" />
-                <div style={{ fontSize: 30, lineHeight: 1.32, letterSpacing: "-0.01em", color: brand.tokens.primary }}>
+                <div style={{ fontSize: 30, lineHeight: 1.32, letterSpacing: "-0.01em", color: ink.strong }}>
                   {s(it.quote)}
                 </div>
                 <div className="text-right">
@@ -2374,7 +2381,7 @@ function renderVariantBody({
               <div className="relative">
                 <Kicker brand={brand}>In their words</Kicker>
                 <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
-                <div style={{ fontSize: 60, fontWeight: 500, lineHeight: 1.2, letterSpacing: "-0.015em", color: brand.tokens.primary, maxWidth: 1080 }}>
+                <div style={{ fontSize: 60, fontWeight: 500, lineHeight: 1.2, letterSpacing: "-0.015em", color: ink.strong, maxWidth: 1080 }}>
                   {s(c.quote)}
                 </div>
                 <div className="mt-14">
@@ -2395,7 +2402,7 @@ function renderVariantBody({
               <div className="relative">
                 <Kicker brand={brand}>Testimonial</Kicker>
                 <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
-                <div style={{ fontSize: 56, fontWeight: 500, lineHeight: 1.22, letterSpacing: "-0.015em", color: brand.tokens.primary }}>
+                <div style={{ fontSize: 56, fontWeight: 500, lineHeight: 1.22, letterSpacing: "-0.015em", color: ink.strong }}>
                   {s(c.quote)}
                 </div>
                 <div className="mt-14 flex items-end justify-between gap-10">
@@ -2420,7 +2427,7 @@ function renderVariantBody({
             <div className="relative">
               <Kicker brand={brand}>In their words</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
-              <div style={{ fontSize: 58, fontWeight: 500, lineHeight: 1.2, letterSpacing: "-0.015em", color: brand.tokens.primary }}>
+              <div style={{ fontSize: 58, fontWeight: 500, lineHeight: 1.2, letterSpacing: "-0.015em", color: ink.strong }}>
                 {s(c.quote)}
               </div>
               <div className="mt-12">
@@ -2446,7 +2453,7 @@ function renderVariantBody({
             <div className="relative">
               <Kicker brand={brand} color={"var(--slide-accent-text)"}>Testimonial</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mt-8 mb-12" />
-              <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1620}>
+              <DisplayTitle size="cover" color={ink.strong} maxWidthPx={1620}>
                 {s(c.quote)}
               </DisplayTitle>
               <div className="mt-16">
@@ -2475,7 +2482,7 @@ function renderVariantBody({
             <div className="relative aspect-square w-[560px]">
               <div className="absolute inset-0 rounded-full" style={{ background: `conic-gradient(${segments})` }} />
               <div className="absolute inset-[18%] flex flex-col items-center justify-center rounded-full text-center" style={{ backgroundColor: brand.tokens.surface }}>
-                <div className="text-8xl font-semibold leading-none" style={{ color: brand.tokens.primary }}>
+                <div className="text-8xl font-semibold leading-none" style={{ color: ink.strong }}>
                   {s(c.centerValue)}<span className="text-4xl" style={{ color: "var(--slide-accent-text)" }}>{s(c.centerUnit)}</span>
                 </div>
                 <div className="mt-4 max-w-[80%] text-xl opacity-80">{s(c.centerLabel)}</div>
@@ -2487,7 +2494,7 @@ function renderVariantBody({
                   <div className="mt-3 h-5 w-5 shrink-0 rounded" style={{ backgroundColor: palette[i % palette.length] }} />
                   <div className="flex-1">
                     <div className="flex items-baseline justify-between gap-6">
-                      <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
+                      <div className="text-2xl font-semibold" style={{ color: ink.strong }}>{s(it.label)}</div>
                       <div className="text-2xl font-semibold" style={{ color: "var(--slide-accent-text)" }}>{s(it.value)}%</div>
                     </div>
                     <div className="mt-1 text-lg opacity-70">{s(it.note)}</div>
@@ -2546,7 +2553,7 @@ function renderVariantBody({
               const highlight = i === items.length - 1;
               return (
                 <div key={i} className="grid grid-cols-[260px_1fr_120px] items-center gap-6">
-                  <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
+                  <div className="text-2xl font-semibold" style={{ color: ink.strong }}>{s(it.label)}</div>
                   <div className="h-14 w-full rounded-lg" style={{ backgroundColor: ink.surface }}>
                     <div
                       className="flex h-full items-center rounded-lg px-4 text-white"
@@ -2561,7 +2568,7 @@ function renderVariantBody({
                       <span className="text-lg opacity-90">{s(it.note)}</span>
                     </div>
                   </div>
-                  <div className="text-right text-3xl font-semibold" style={{ color: highlight ? brand.tokens.accent : brand.tokens.primary }}>
+                  <div className="text-right text-3xl font-semibold" style={{ color: highlight ? "var(--slide-accent-text)" : ink.strong }}>
                     {s(it.value)}<span className="ml-1 text-lg opacity-70">{s(c.unit)}</span>
                   </div>
                 </div>
@@ -2599,7 +2606,7 @@ function renderVariantBody({
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${brand.tokens.accent}22`, color: "var(--slide-accent-text)" }}>
                     {(() => { const Ic = pickIcon(s(it.label), i, s(it.icon)); return <Ic size={24} strokeWidth={2} />; })()}
                   </div>
-                  <div className="mt-4" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.primary }}>{s(it.label)}</div>
+                  <div className="mt-4" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(it.label)}</div>
                   <SupportingText size="sm" opacity={0.72} className="mt-2">{s(it.body)}</SupportingText>
                 </div>
               );
@@ -2637,7 +2644,7 @@ function renderVariantBody({
             <div className="space-y-6">
               {items.map((it, i) => (
                 <div key={i} className="border-l-4 pl-6" style={{ borderColor: brand.tokens.accent }}>
-                  <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
+                  <div className="text-2xl font-semibold" style={{ color: ink.strong }}>{s(it.label)}</div>
                   <div className="mt-2 text-xl opacity-80">{s(it.body)}</div>
                 </div>
               ))}
@@ -2668,7 +2675,7 @@ function renderVariantBody({
               ))}
               <div className="absolute left-1/2 top-1/2 z-10 max-w-[260px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/95 p-6 text-center shadow-lg">
                 <div className="text-lg uppercase tracking-[0.25em]" style={{ color: "var(--slide-accent-text)" }}>Intersection</div>
-                <div className="mt-2 text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(c.intersection)}</div>
+                <div className="mt-2 text-2xl font-semibold" style={{ color: ink.strong }}>{s(c.intersection)}</div>
               </div>
             </div>
             <div className="space-y-6">
@@ -2676,7 +2683,7 @@ function renderVariantBody({
                 <div key={i} className="flex items-start gap-5">
                   <div className="mt-2 h-6 w-6 shrink-0 rounded-full" style={{ backgroundColor: colors[i] }} />
                   <div>
-                    <div className="text-2xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
+                    <div className="text-2xl font-semibold" style={{ color: ink.strong }}>{s(it.label)}</div>
                     <div className="mt-2 text-xl opacity-80">{s(it.body)}</div>
                   </div>
                 </div>
@@ -2713,9 +2720,9 @@ function renderVariantBody({
                     )}
                     <Kicker brand={brand} color="color-mix(in oklab, currentColor 62%, transparent)" size={16}>{s(it.sector)}</Kicker>
                   </div>
-                  <div className="mt-6" style={{ fontSize: 28, fontWeight: 600, letterSpacing: "-0.015em", color: brand.tokens.primary }}>{s(it.client)}</div>
+                  <div className="mt-6" style={{ fontSize: 28, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>{s(it.client)}</div>
                   <SupportingText size="md" opacity={0.75} className="mt-3">{s(it.result)}</SupportingText>
-                  <div className="mt-6 pt-5" style={{ borderTop: "1px solid rgba(10,15,28,0.08)" }}>
+                  <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${ink.hairline}` }}>
                     <StatFigure brand={brand} value={s(it.metric)} unit={s(it.unit)} size="sm" />
                   </div>
                 </div>
@@ -2752,7 +2759,7 @@ function renderVariantBody({
                   )}
                   <div className="mt-6 pt-5" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
                     <Kicker brand={brand} color="color-mix(in oklab, currentColor 62%, transparent)" size={16}>{s(it.sector)}</Kicker>
-                    <div className="mt-4" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: brand.tokens.primary }}>{s(it.client)}</div>
+                    <div className="mt-4" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>{s(it.client)}</div>
                     <SupportingText size="md" opacity={0.78} className="mt-3">{s(it.story)}</SupportingText>
                     <div className="mt-6" style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-0.01em", color: "var(--slide-accent-text)" }}>
                       {s(it.metric)}
@@ -2777,7 +2784,7 @@ function renderVariantBody({
                   <div className="tabular-nums uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>
                     {String(i + 1).padStart(2, "0")}
                   </div>
-                  <div className="mt-4" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: brand.tokens.primary }}>{s(it.label)}</div>
+                  <div className="mt-4" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>{s(it.label)}</div>
                   <SupportingText size="md" opacity={0.75} className="mt-3">{s(it.body)}</SupportingText>
                 </div>
               </div>
@@ -2794,7 +2801,7 @@ function renderVariantBody({
             {arr(c.items).slice(0, 6).map((it, i) => (
               <div key={i}>
                 <MediaTile brand={brand} seed={s(it.seed, `mx6-${i}`)} className="aspect-[16/9] w-full" />
-                <div className="mt-4" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.primary }}>{s(it.label)}</div>
+                <div className="mt-4" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(it.label)}</div>
                 <SupportingText size="sm" opacity={0.72} className="mt-2 line-clamp-2">{s(it.body)}</SupportingText>
               </div>
             ))}
@@ -2822,7 +2829,7 @@ function renderVariantBody({
                         style={{ maxHeight: 36, maxWidth: 120, objectFit: "contain" }}
                       />
                     )}
-                    <div style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: brand.tokens.primary }}>{s(it.client)}</div>
+                    <div style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>{s(it.client)}</div>
                   </div>
                   <SoftDivider className="mt-6" />
                   <div className="mt-6">
@@ -2834,7 +2841,7 @@ function renderVariantBody({
                     <Kicker brand={brand} size={16}>Outcome</Kicker>
                     <SupportingText size="md" opacity={0.82} className="mt-3">{s(it.outcome)}</SupportingText>
                   </div>
-                  <div className="mt-8 pt-6" style={{ borderTop: "1px solid rgba(10,15,28,0.12)" }}>
+                  <div className="mt-8 pt-6" style={{ borderTop: `1px solid ${ink.hairline}` }}>
                     <StatFigure brand={brand} value={s(it.metric)} size="sm" />
                   </div>
                 </div>
@@ -2857,7 +2864,7 @@ function renderVariantBody({
                   <div className="mb-8 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold text-white" style={{ backgroundColor: brand.tokens.accent, transform: "translateY(4px)" }}>
                     {i + 1}
                   </div>
-                  <div className="text-3xl font-semibold" style={{ color: brand.tokens.primary }}>{s(it.label)}</div>
+                  <div className="text-3xl font-semibold" style={{ color: ink.strong }}>{s(it.label)}</div>
                   <div className="mt-4 text-xl opacity-80">{s(it.body)}</div>
                   {s(it.owner) && (
                     <div className="mt-4 text-sm uppercase tracking-[0.2em] opacity-60">Owner · {s(it.owner)}</div>
@@ -2876,7 +2883,7 @@ function renderVariantBody({
           <div className="mt-12">
             <div
               className="grid grid-cols-[60px_1fr_260px_180px] items-center gap-8 pb-4 uppercase"
-              style={{ fontSize: 18, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 62%, transparent)", borderBottom: `1px solid ${brand.tokens.accent}` }}
+              style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.faint, borderBottom: `1px solid ${brand.tokens.accent}` }}
             >
               <div></div>
               <div>Action</div>
@@ -2890,7 +2897,7 @@ function renderVariantBody({
                   <div className="flex h-10 w-10 items-center justify-center rounded-full" style={{ border: `1.5px solid ${brand.tokens.accent}`, color: "var(--slide-accent-text)" }}>
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12l5 5 9-11" /></svg>
                   </div>
-                  <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.primary }}>{s(it.label)}</div>
+                  <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(it.label)}</div>
                   <SupportingText size="md" opacity={0.72}>{s(it.owner)}</SupportingText>
                   <div className="text-right uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(it.when)}</div>
                 </div>
@@ -2906,10 +2913,10 @@ function renderVariantBody({
           <div className="flex h-full flex-col justify-center">
             <Kicker brand={brand}>{s(c.kicker, "The ask")}</Kicker>
             <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-8 mb-10" />
-            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1600}>{s(c.ask)}</DisplayTitle>
+            <DisplayTitle size="cover" color={ink.strong} maxWidthPx={1600}>{s(c.ask)}</DisplayTitle>
             <SupportingText size="xl" opacity={0.85} className="mt-10" maxWidthPx={1180}>{s(c.rationale)}</SupportingText>
             <div className="mt-16 flex items-baseline gap-10">
-              <Kicker brand={brand} color="rgba(255,255,255,0.65)">Decision by</Kicker>
+              <Kicker brand={brand} color={ink.faint}>Decision by</Kicker>
               <div style={{ fontSize: 42, fontWeight: 600, letterSpacing: "-0.02em", color: "var(--slide-accent-text)" }}>{s(c.decisionBy)}</div>
             </div>
           </div>
@@ -2923,16 +2930,16 @@ function renderVariantBody({
             <div className="flex flex-col items-center text-center">
               <Kicker brand={brand}>Kickoff</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
-              <div className="tabular-nums" style={{ fontSize: 260, lineHeight: 0.9, fontWeight: 600, letterSpacing: "-0.04em", color: brand.tokens.primary }}>
+              <div className="tabular-nums" style={{ fontSize: 260, lineHeight: 0.9, fontWeight: 600, letterSpacing: "-0.04em", color: ink.strong }}>
                 {s(c.date)}
               </div>
-              <div className="mt-6" style={{ fontSize: 32, fontWeight: 600, letterSpacing: "-0.01em", color: brand.tokens.primary }}>{s(c.day)}</div>
+              <div className="mt-6" style={{ fontSize: 32, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(c.day)}</div>
               <div className="mt-2 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 60%, transparent)" }}>{s(c.monthYear)}</div>
             </div>
             <div>
               <Kicker brand={brand}>{s(c.title, "Kickoff")}</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
-              <div style={{ fontSize: 48, fontWeight: 600, lineHeight: 1.15, letterSpacing: "-0.02em", color: brand.tokens.primary }}>{s(c.body)}</div>
+              <div style={{ fontSize: 48, fontWeight: 600, lineHeight: 1.15, letterSpacing: "-0.02em", color: ink.strong }}>{s(c.body)}</div>
               <SoftDivider className="mt-10 mb-6" />
               <MetaRow><span>{s(c.owner)}</span></MetaRow>
             </div>
@@ -2945,7 +2952,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div className="relative flex h-full flex-col justify-between py-4 text-white">
             <Kicker brand={brand}>{s(c.kicker)}</Kicker>
-            <DisplayTitle size="hero" color="#ffffff" maxWidthPx={1700}>{s(c.statement)}</DisplayTitle>
+            <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1700}>{s(c.statement)}</DisplayTitle>
             <MetaRow><span>{s(c.signoff)}</span></MetaRow>
           </div>
         </SlideFrame>
@@ -2959,11 +2966,11 @@ function renderVariantBody({
             <div className="flex flex-col justify-center">
               <Kicker brand={brand}>Next step</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
-              <DisplayTitle size="title" color={brand.tokens.primary}>{s(c.title)}</DisplayTitle>
+              <DisplayTitle size="title" color={ink.strong}>{s(c.title)}</DisplayTitle>
               <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={720}>{s(c.body)}</SupportingText>
               <div className="mt-12 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
                 <Kicker brand={brand}>Call to action</Kicker>
-                <div className="mt-4" style={{ fontSize: 44, fontWeight: 600, letterSpacing: "-0.02em", color: brand.tokens.primary }}>{s(c.ctaLabel)}</div>
+                <div className="mt-4" style={{ fontSize: 44, fontWeight: 600, letterSpacing: "-0.02em", color: ink.strong }}>{s(c.ctaLabel)}</div>
                 <SupportingText size="md" opacity={0.75} className="mt-3">{s(c.ctaDetail)}</SupportingText>
               </div>
               <MetaRow className="mt-10"><span>{s(c.owner)}</span></MetaRow>
@@ -2985,14 +2992,14 @@ function renderVariantBody({
                   className="flex flex-col pt-8"
                   style={{ borderTop: `${highlight ? 3 : 1}px solid ${highlight ? brand.tokens.accent : "rgba(10,15,28,0.12)"}` }}
                 >
-                  <Kicker brand={brand} color={highlight ? brand.tokens.accent : "color-mix(in oklab, currentColor 62%, transparent)"}>
+                  <Kicker brand={brand} color={highlight ? "var(--slide-accent-text)" : ink.faint}>
                     {highlight ? "Recommended" : "Alternative"}
                   </Kicker>
-                  <div className="mt-6" style={{ fontSize: 56, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.05, color: brand.tokens.primary }}>
+                  <div className="mt-6" style={{ fontSize: 56, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.05, color: ink.strong }}>
                     {s(it.label)}
                   </div>
                   <SupportingText size="lg" opacity={0.78} className="mt-6 flex-1" maxWidthPx={620}>{s(it.body)}</SupportingText>
-                  <div className="mt-10 flex items-center gap-4" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.005em", color: highlight ? brand.tokens.accent : brand.tokens.primary }}>
+                  <div className="mt-10 flex items-center gap-4" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.005em", color: highlight ? "var(--slide-accent-text)" : ink.strong }}>
                     <span>{s(it.ctaLabel)}</span>
                     <ArrowRight size={22} strokeWidth={2.5} />
                   </div>
@@ -3023,7 +3030,7 @@ function renderVariantBody({
               valueColor="#ffffff"
             />
             <div className="mt-14 max-w-[1500px]">
-              <DisplayTitle size="section" color="#ffffff">
+              <DisplayTitle size="section" color={ink.strong}>
                 {s(c.promise)}
               </DisplayTitle>
             </div>
@@ -3054,7 +3061,7 @@ function renderVariantBody({
                 <Kicker brand={brand}>Anchor</Kicker>
               </div>
               <div className="mt-auto">
-                <div style={{ fontSize: 44, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(anchor.title)}</div>
+                <div style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(anchor.title)}</div>
                 <div className="mt-5" style={{ fontSize: 24, lineHeight: 1.42, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>{s(anchor.body)}</div>
               </div>
             </div>
@@ -3072,7 +3079,7 @@ function renderVariantBody({
                   ) : kind === "media" ? (
                     <div className="relative -m-10 h-full overflow-hidden">
                       <MediaTile brand={brand} seed={s(it.mediaSeed, s(it.title, `bento-${i}`))} className="absolute inset-0 h-full w-full rounded-none" />
-                      <div className="absolute inset-x-6 bottom-6 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "#fff" }}>{s(it.title)}</div>
+                      <div className="absolute inset-x-6 bottom-6 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.strong }}>{s(it.title)}</div>
                     </div>
                   ) : (
                     <>
@@ -3081,8 +3088,8 @@ function renderVariantBody({
                         <Kicker brand={brand}>{String(i + 2).padStart(2, "0")}</Kicker>
                       </div>
                       <div className="mt-auto">
-                        <div style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.title)}</div>
-                        <div className="mt-3" style={{ fontSize: 20, lineHeight: 1.4, color: "color-mix(in oklab, currentColor 70%, transparent)" }}>{s(it.body)}</div>
+                        <div style={{ fontSize: 28, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.title)}</div>
+                        <div className="mt-3" style={{ fontSize: 20, lineHeight: 1.4, color: ink.muted }}>{s(it.body)}</div>
                       </div>
                     </>
                   )}
@@ -3111,13 +3118,13 @@ function renderVariantBody({
                     <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="glyph" />
                   </div>
                   <div className="mt-4 flex items-baseline gap-2">
-                    <span className="tabular-nums font-semibold" style={{ fontSize: 88, lineHeight: 0.95, letterSpacing: "-0.025em", color: brand.tokens.primary }}>{s(it.value)}</span>
+                    <span className="tabular-nums font-semibold" style={{ fontSize: 88, lineHeight: 0.95, letterSpacing: "-0.025em", color: ink.strong }}>{s(it.value)}</span>
                     {s(it.unit) && <span className="font-medium" style={{ fontSize: 34, color: "var(--slide-accent-text)", letterSpacing: "-0.015em" }}>{s(it.unit)}</span>}
                   </div>
                   {s(it.delta) && (
                     <div className="mt-3 flex items-center gap-2" style={{ fontSize: 18, color: trendColor, letterSpacing: "0.02em" }}>
                       {trend === "down" ? "▼" : "▲"} <span className="tabular-nums font-semibold">{s(it.delta)}</span>
-                      <span style={{ color: "color-mix(in oklab, currentColor 62%, transparent)" }}>vs. baseline</span>
+                      <span style={{ color: ink.faint }}>vs. baseline</span>
                     </div>
                   )}
                 </div>
@@ -3146,7 +3153,7 @@ function renderVariantBody({
                 const span = end - start + 1;
                 return (
                   <>
-                    <div key={`l-${i}`} className="py-5 pr-6" style={{ fontSize: 22, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.01em", borderTop: "1px solid rgba(10,15,28,0.08)" }}>
+                    <div key={`l-${i}`} className="py-5 pr-6" style={{ fontSize: 22, fontWeight: 600, color: ink.strong, letterSpacing: "-0.01em", borderTop: `1px solid ${ink.hairline}` }}>
                       {s(it.label)}
                       {s(it.note) && <div className="mt-1" style={{ fontSize: 16, fontWeight: 400, color: "color-mix(in oklab, currentColor 60%, transparent)", letterSpacing: 0 }}>{s(it.note)}</div>}
                     </div>
@@ -3154,7 +3161,7 @@ function renderVariantBody({
                       const active = q + 1 >= start && q + 1 <= end;
                       const isStart = q + 1 === start;
                       return (
-                        <div key={`c-${i}-${q}`} className="py-5" style={{ borderTop: "1px solid rgba(10,15,28,0.08)" }}>
+                        <div key={`c-${i}-${q}`} className="py-5" style={{ borderTop: `1px solid ${ink.hairline}` }}>
                           {isStart && (
                             <div
                               style={{
@@ -3196,7 +3203,7 @@ function renderVariantBody({
                       width: `${width}%`,
                       background: `linear-gradient(90deg, ${brand.tokens.primary}${i === 0 ? "" : ""}, ${brand.tokens.accent})`,
                       opacity: 0.92 - i * 0.08,
-                      color: "#fff",
+                      color: ink.strong,
                     }}
                   >
                     <div className="flex items-center gap-5">
@@ -3228,24 +3235,24 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="relative mx-auto mt-10" style={{ width: 820, height: 720 }}>
             <svg viewBox="-400 -360 800 720" className="absolute inset-0 h-full w-full">
-              <circle cx="0" cy="0" r={R} fill="none" stroke={brand.tokens.accent} strokeWidth={2} opacity={0.5} />
+              <circle cx="0" cy="0" r={R} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} opacity={0.5} />
               {items.map((_, i) => {
                 const a1 = (i / n) * Math.PI * 2 - Math.PI / 2;
                 const a2 = ((i + 0.85) / n) * Math.PI * 2 - Math.PI / 2;
                 const x1 = Math.cos(a1) * R, y1 = Math.sin(a1) * R;
                 const x2 = Math.cos(a2) * R, y2 = Math.sin(a2) * R;
-                return <path key={i} d={`M ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2}`} stroke={brand.tokens.primary} strokeWidth={4} fill="none" markerEnd="url(#fw-arrow)" opacity={0.9} />;
+                return <path key={i} d={`M ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2}`} stroke={ink.strong} strokeWidth={4} fill="none" markerEnd="url(#fw-arrow)" opacity={0.9} />;
               })}
               <defs>
                 <marker id="fw-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill={brand.tokens.primary} />
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill={ink.strong} />
                 </marker>
               </defs>
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center" style={{ width: 260 }}>
                 <Kicker brand={brand}>Hub</Kicker>
-                <div className="mt-3" style={{ fontSize: 30, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(c.hub, "Program")}</div>
+                <div className="mt-3" style={{ fontSize: 30, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(c.hub, "Program")}</div>
               </div>
             </div>
             {items.map((it, i) => {
@@ -3257,7 +3264,7 @@ function renderVariantBody({
                   <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full" style={{ background: "#fff", border: `2px solid ${brand.tokens.accent}` }}>
                     <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="glyph" />
                   </div>
-                  <div style={{ fontSize: 24, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
+                  <div style={{ fontSize: 24, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
                   {s(it.note) && <div className="mt-1" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 66%, transparent)" }}>{s(it.note)}</div>}
                 </div>
               );
@@ -3402,17 +3409,17 @@ function renderVariantBody({
                     <IconBadge brand={brand} label={s(it.phase)} index={i} size="sm" override={s(it.icon)} treatment="soft-circle" />
                     <Kicker brand={brand}>Phase {String(i + 1).padStart(2, "0")}</Kicker>
                   </div>
-                  <div className="mt-2" style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.phase)}</div>
-                  <div className="mt-2" style={{ fontSize: 18, color: "color-mix(in oklab, currentColor 70%, transparent)", lineHeight: 1.4 }}>{s(it.touchpoint)}</div>
+                  <div className="mt-2" style={{ fontSize: 28, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em" }}>{s(it.phase)}</div>
+                  <div className="mt-2" style={{ fontSize: 18, color: ink.muted, lineHeight: 1.4 }}>{s(it.touchpoint)}</div>
                 </div>
               ))}
             </div>
             <svg viewBox={`0 0 ${W} ${H + 40}`} className="mt-8 w-full">
-              <path d={path} fill="none" stroke={brand.tokens.primary} strokeWidth={3} />
+              <path d={path} fill="none" stroke={ink.strong} strokeWidth={3} />
               {points.map((p, i) => (
                 <g key={i}>
-                  <circle cx={p.x} cy={p.y} r={11} fill={brand.tokens.accent} stroke="#fff" strokeWidth={3} />
-                  <text x={p.x} y={p.y - 20} textAnchor="middle" fontSize={18} fontWeight={600} fill={brand.tokens.primary}>{String(p.it.sentiment ?? "")}/5</text>
+                  <circle cx={p.x} cy={p.y} r={11} fill="var(--slide-accent-text)" stroke="#fff" strokeWidth={3} />
+                  <text x={p.x} y={p.y - 20} textAnchor="middle" fontSize={18} fontWeight={600} fill={ink.strong}>{String(p.it.sentiment ?? "")}/5</text>
                 </g>
               ))}
               <text x={20} y={20} fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>High</text>
@@ -3439,7 +3446,7 @@ function renderVariantBody({
                     <ClientLogoImg path={s(it.logoPath)} url={pickLogoForMode(it, mode)} alt={name} className="max-h-16 max-w-[70%] object-contain" style={{ opacity: 0.9 }} />
                   ) : (
                     <div className="flex flex-col items-center gap-2">
-                      <div style={{ fontSize: 44, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em" }}>{initials || "—"}</div>
+                      <div style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em" }}>{initials || "—"}</div>
                       <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", color: ink.faint }}>{name}</div>
                     </div>
                   )}
@@ -3466,7 +3473,7 @@ function renderVariantBody({
                   const isTarget = q + 1 === target;
                   return (
                     <div key={q} className="flex items-start justify-start p-6" style={{ border: "1px solid rgba(10,15,28,0.12)", background: isTarget ? `${brand.tokens.accent}14` : "transparent" }}>
-                      <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: isTarget ? brand.tokens.accent : ink.faint, fontWeight: 600 }}>{quadrants[q] ?? `Q${q + 1}`}</div>
+                      <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: isTarget ? "var(--slide-accent-text)" : ink.faint, fontWeight: 600 }}>{quadrants[q] ?? `Q${q + 1}`}</div>
                     </div>
                   );
                 })}
@@ -3477,7 +3484,7 @@ function renderVariantBody({
                 return (
                   <div key={i} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: x, top: y }}>
                     <div className="h-4 w-4 rounded-full" style={{ background: brand.tokens.primary, boxShadow: `0 0 0 4px ${brand.tokens.primary}22` }} />
-                    <div className="mt-2 whitespace-nowrap" style={{ fontSize: 18, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.01em" }}>{s(it.label)}</div>
+                    <div className="mt-2 whitespace-nowrap" style={{ fontSize: 18, fontWeight: 600, color: ink.strong, letterSpacing: "-0.01em" }}>{s(it.label)}</div>
                   </div>
                 );
               })}
@@ -3509,7 +3516,7 @@ function renderVariantBody({
                     <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="glyph" />
                     <Kicker brand={brand}>Visible</Kicker>
                   </div>
-                  <div className="mt-3" style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
+                  <div className="mt-3" style={{ fontSize: 28, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
                   <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.42, color: ink.body }}>{s(it.body)}</div>
                 </div>
               ))}
@@ -3526,7 +3533,7 @@ function renderVariantBody({
                     <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", color: ink.faint, fontWeight: 600 }}>Hidden</div>
                     <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="soft-tile" />
                   </div>
-                  <div className="mt-3" style={{ fontSize: 24, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
+                  <div className="mt-3" style={{ fontSize: 24, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
                   <div className="mt-2" style={{ fontSize: 18, lineHeight: 1.42, color: ink.body }}>{s(it.body)}</div>
                 </div>
               ))}
@@ -3550,7 +3557,7 @@ function renderVariantBody({
             </div>
             <div className="flex flex-col">
               <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mb-6" />
-              <DisplayTitle size="section" color={brand.tokens.primary} maxWidthPx={1080}>{s(c.title)}</DisplayTitle>
+              <DisplayTitle size="section" color={ink.strong} maxWidthPx={1080}>{s(c.title)}</DisplayTitle>
               <div className="mt-12 grid gap-12" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
                 <div style={{ fontSize: 22, lineHeight: 1.5, color: "color-mix(in oklab, currentColor 78%, transparent)" }}>{s(c.bodyLeft)}</div>
                 <div style={{ background: "rgba(10,15,28,0.15)" }} />
@@ -3567,12 +3574,12 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full gap-0" style={{ gridTemplateColumns: "40% 1fr", margin: "-64px", minHeight: "calc(100% + 128px)" }}>
-            <div className="relative flex flex-col justify-between overflow-hidden p-16" style={{ background: brand.tokens.primary, color: "#fff" }}>
+            <div className="relative flex flex-col justify-between overflow-hidden p-16" style={{ background: brand.tokens.primary, color: ink.onSurface(brand.tokens.primary) }}>
               <div aria-hidden className="pointer-events-none absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full" style={{ background: `radial-gradient(circle, ${brand.tokens.accent}55, transparent 70%)` }} />
-              <Kicker brand={brand} color="#ffffff">{s(c.kicker, "Our belief")}</Kicker>
+              <Kicker brand={brand} color={ink.strong}>{s(c.kicker, "Our belief")}</Kicker>
               <div className="relative">
                 <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mb-8" />
-                <DisplayTitle size="section" color="#ffffff">{s(c.statement)}</DisplayTitle>
+                <DisplayTitle size="section" color={ink.strong}>{s(c.statement)}</DisplayTitle>
               </div>
               <MetaRow><span>{s(c.signoff, "TransPerfect")}</span></MetaRow>
             </div>
@@ -3582,7 +3589,7 @@ function renderVariantBody({
                   <div className="flex items-baseline gap-6">
                     <span className="tabular-nums font-semibold" style={{ fontSize: 26, color: "var(--slide-accent-text)", letterSpacing: "-0.01em" }}>{String(i + 1).padStart(2, "0")}</span>
                     <div className="flex-1">
-                      <div style={{ fontSize: 34, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.title)}</div>
+                      <div style={{ fontSize: 34, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.title)}</div>
                       <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>{s(it.body)}</div>
                     </div>
                   </div>
@@ -3631,7 +3638,7 @@ function renderVariantBody({
                     {s(it.date)}
                   </div>
                   <div>
-                    <div style={{ fontSize: 30, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.label)}</div>
+                    <div style={{ fontSize: 30, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.label)}</div>
                     <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: ink.body, maxWidth: 1080 }}>{s(it.body)}</div>
                   </div>
                 </div>
@@ -3670,7 +3677,7 @@ function renderVariantBody({
               className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
               style={{ left: "50%" }}
             >
-              <div className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: brand.tokens.accent, color: "#fff", fontSize: 28, fontWeight: 600 }}>
+              <div className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: brand.tokens.accent, color: ink.onSurface(brand.tokens.accent), fontSize: 28, fontWeight: 600 }}>
                 <ArrowRight size={28} strokeWidth={2.4} />
               </div>
             </div>
@@ -3688,7 +3695,7 @@ function renderVariantBody({
             <QuoteMark color={"var(--slide-accent-text)"} size={520} className="absolute -left-6 -top-24" />
             <div className="relative">
               <Kicker brand={brand}>Voices</Kicker>
-              <div className="mt-8 max-w-[1500px]" style={{ fontSize: 60, lineHeight: 1.1, letterSpacing: "-0.02em", fontWeight: 600, color: brand.tokens.primary }}>
+              <div className="mt-8 max-w-[1500px]" style={{ fontSize: 60, lineHeight: 1.1, letterSpacing: "-0.02em", fontWeight: 600, color: ink.strong }}>
                 &ldquo;{s(hero.quote)}&rdquo;
               </div>
               <div className="mt-10">
@@ -3725,10 +3732,10 @@ function renderVariantBody({
           <div className="flex h-full flex-col justify-center" style={{ maxWidth: 1500 }}>
             <Kicker brand={brand}>Definition</Kicker>
             <div className="mt-6">
-              <DisplayTitle size="section" color={brand.tokens.primary}>{s(c.term)}</DisplayTitle>
+              <DisplayTitle size="section" color={ink.strong}>{s(c.term)}</DisplayTitle>
             </div>
             <div className="mt-6 flex flex-wrap items-baseline gap-6">
-              <span className="uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 62%, transparent)", fontWeight: 500 }}>{s(c.pronunciation)}</span>
+              <span className="uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: ink.faint, fontWeight: 500 }}>{s(c.pronunciation)}</span>
               <span style={{ fontSize: 24, color: "var(--slide-accent-text)", fontStyle: "italic", fontWeight: 600 }}>{s(c.partOfSpeech, "n.")}</span>
             </div>
             <div className="mt-10" style={{ fontSize: 34, lineHeight: 1.35, color: "color-mix(in oklab, currentColor 85%, transparent)", maxWidth: 1400 }}>
@@ -3757,7 +3764,7 @@ function renderVariantBody({
                   {String(i + 1).padStart(2, "0")}
                 </div>
                 <div>
-                  <div style={{ fontSize: 40, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.1 }}>{s(it.statement)}</div>
+                  <div style={{ fontSize: 40, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em", lineHeight: 1.1 }}>{s(it.statement)}</div>
                   <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>{s(it.body)}</div>
                 </div>
               </div>
@@ -3774,7 +3781,7 @@ function renderVariantBody({
           <div className="flex h-full flex-col justify-center">
             <Kicker brand={brand} color={"var(--slide-accent-text)"}>{s(c.kicker, "Three to remember")}</Kicker>
             <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mt-6 mb-10" />
-            <DisplayTitle size="section" color="#ffffff" maxWidthPx={1600}>{s(c.title)}</DisplayTitle>
+            <DisplayTitle size="section" color={ink.strong} maxWidthPx={1600}>{s(c.title)}</DisplayTitle>
             <div className="mt-12">
               {items.map((it, i) => {
                 const n = items.length - i;
@@ -3784,8 +3791,8 @@ function renderVariantBody({
                       {n}
                     </div>
                     <div>
-                      <div style={{ fontSize: 44, fontWeight: 600, color: "#ffffff", letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(it.statement)}</div>
-                      <div className="mt-3" style={{ fontSize: 22, lineHeight: 1.42, color: "rgba(255,255,255,0.72)" }}>{s(it.body)}</div>
+                      <div style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(it.statement)}</div>
+                      <div className="mt-3" style={{ fontSize: 22, lineHeight: 1.42, color: ink.muted }}>{s(it.body)}</div>
                     </div>
                   </div>
                 );
@@ -3803,14 +3810,14 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-10">
             {items.map((it, i) => {
-              const ink = i === 0 ? "rgba(10,15,28,0.92)" : i === 1 ? "rgba(10,15,28,0.72)" : "rgba(10,15,28,0.52)";
-              const labelColor = i === 0 ? brand.tokens.accent : "color-mix(in oklab, currentColor 62%, transparent)";
+              const itemInk = i === 0 ? ink.strong : i === 1 ? ink.muted : ink.faint;
+              const labelColor = i === 0 ? "var(--slide-accent-text)" : ink.faint;
               return (
-                <div key={i} className="grid gap-12 py-10" style={{ gridTemplateColumns: "200px 1fr", borderTop: "1px solid rgba(10,15,28,0.12)", borderBottom: i === items.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
+                <div key={i} className="grid gap-12 py-10" style={{ gridTemplateColumns: "200px 1fr", borderTop: `1px solid ${ink.hairline}`, borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none" }}>
                   <div className="uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: labelColor, fontWeight: 600 }}>{s(it.label)}</div>
                   <div>
-                    <div style={{ fontSize: 44, fontWeight: 600, color: ink, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(it.headline)}</div>
-                    <div className="mt-3" style={{ fontSize: 22, lineHeight: 1.42, color: ink, opacity: 0.85, maxWidth: 1200 }}>{s(it.body)}</div>
+                    <div style={{ fontSize: 44, fontWeight: 600, color: itemInk, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(it.headline)}</div>
+                    <div className="mt-3" style={{ fontSize: 22, lineHeight: 1.42, color: itemInk, opacity: 0.85, maxWidth: 1200 }}>{s(it.body)}</div>
                   </div>
                 </div>
               );
@@ -3841,9 +3848,9 @@ function renderVariantBody({
               </div>
               <div className="mt-10">
                 {bItems.map((it, i) => (
-                  <div key={i} className="flex items-baseline justify-between py-5" style={{ borderTop: "1px solid rgba(10,15,28,0.12)", borderBottom: i === bItems.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
+                  <div key={i} className="flex items-baseline justify-between py-5" style={{ borderTop: `1px solid ${ink.hairline}`, borderBottom: i === bItems.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
                     <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.24em", color: "color-mix(in oklab, currentColor 60%, transparent)", fontWeight: 600 }}>{s(it.label)}</div>
-                    <div className="tabular-nums" style={{ fontSize: 32, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em" }}>{s(it.value)}</div>
+                    <div className="tabular-nums" style={{ fontSize: 32, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em" }}>{s(it.value)}</div>
                   </div>
                 ))}
               </div>
@@ -3864,8 +3871,8 @@ function renderVariantBody({
               {items.map((it, i) => (
                 <div key={i} className="flex flex-col items-center pt-6 text-center" style={{ borderTop: `1px solid ${i === 0 ? brand.tokens.accent : "rgba(122,139,199,0.28)"}` }}>
                   <Donut brand={brand} percent={Number(it.value) || 0} size={280} />
-                  <div className="mt-8 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: brand.tokens.primary, fontWeight: 700 }}>{s(it.label)}</div>
-                  <div className="mt-4" style={{ fontSize: 20, lineHeight: 1.45, color: "rgba(122,139,199,0.9)", maxWidth: 380 }}>{s(it.body)}</div>
+                  <div className="mt-8 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.strong, fontWeight: 700 }}>{s(it.label)}</div>
+                  <div className="mt-4" style={{ fontSize: 20, lineHeight: 1.45, color: ink.muted, maxWidth: 380 }}>{s(it.body)}</div>
                 </div>
               ))}
             </div>
@@ -3887,7 +3894,7 @@ function renderVariantBody({
             </div>
             <div className="flex flex-col justify-center pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
               <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
-              <div className="mt-6" style={{ fontSize: 44, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(c.headline)}</div>
+              <div className="mt-6" style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(c.headline)}</div>
               <div className="mt-10">
                 <StatFigure brand={brand} value={s(stat.value)} unit={s(stat.unit)} label={s(stat.label)} size="lg" />
                 {s(stat.delta) && (
@@ -3912,8 +3919,8 @@ function renderVariantBody({
               {items.map((it, i) => (
                 <div key={i} className="flex flex-col items-center pt-6" style={{ borderTop: `1px solid ${i === 0 ? brand.tokens.accent : "rgba(122,139,199,0.28)"}` }}>
                   <SemiGauge brand={brand} percent={Number(it.value) || 0} size={280} />
-                  <div className="mt-6 uppercase text-center" style={{ fontSize: 16, letterSpacing: "0.24em", color: brand.tokens.primary, fontWeight: 700, maxWidth: 260 }}>{s(it.label)}</div>
-                  {s(it.body) && <div className="mt-2 text-center" style={{ fontSize: 14, lineHeight: 1.4, color: "rgba(122,139,199,0.9)", maxWidth: 240 }}>{s(it.body)}</div>}
+                  <div className="mt-6 uppercase text-center" style={{ fontSize: 16, letterSpacing: "0.24em", color: ink.strong, fontWeight: 700, maxWidth: 260 }}>{s(it.label)}</div>
+                  {s(it.body) && <div className="mt-2 text-center" style={{ fontSize: 14, lineHeight: 1.4, color: ink.muted, maxWidth: 240 }}>{s(it.body)}</div>}
                 </div>
               ))}
             </div>
@@ -3943,7 +3950,7 @@ function renderVariantBody({
                   <div key={i} className="flex items-center justify-between py-4" style={{ borderTop: i === 0 ? "1px solid rgba(10,15,28,0.12)" : "none", borderBottom: "1px solid rgba(10,15,28,0.12)" }}>
                     <div className="flex items-center gap-4">
                       <div style={{ width: 14, height: 14, background: i === 0 ? brand.tokens.accent : brand.tokens.primary, opacity: i === 0 ? 1 : Math.max(0.4, 1 - i * 0.2) }} />
-                      <div style={{ fontSize: 22, color: brand.tokens.primary, fontWeight: 600 }}>{s(l.label)}</div>
+                      <div style={{ fontSize: 22, color: ink.strong, fontWeight: 600 }}>{s(l.label)}</div>
                     </div>
                     <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 600, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>{s(l.value)}</div>
                   </div>
@@ -3985,11 +3992,11 @@ function renderVariantBody({
               const opacity = isLast ? 1 : 0.35 + (i / Math.max(items.length - 1, 1)) * 0.5;
               return (
                 <div key={i} className="flex flex-col items-center justify-end">
-                  <div style={{ fontSize: 44, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1 }}>
+                  <div style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1 }}>
                     {s(it.value)}<span style={{ fontSize: 26, color: "var(--slide-accent-text)", marginLeft: 4 }}>{s(it.unit)}</span>
                   </div>
                   <div className="mt-6 w-full" style={{ height: h, background: color, opacity, maxWidth: 220 }} />
-                  <div className="mt-6 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: isLast ? brand.tokens.accent : "rgba(10,15,28,0.6)", fontWeight: 600 }}>{s(it.year)}</div>
+                  <div className="mt-6 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: isLast ? "var(--slide-accent-text)" : ink.faint, fontWeight: 600 }}>{s(it.year)}</div>
                   {s(it.note) && <div className="mt-2 text-center" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 60%, transparent)", maxWidth: 220 }}>{s(it.note)}</div>}
                 </div>
               );
@@ -4020,13 +4027,13 @@ function renderVariantBody({
                 const negative = delta.trim().startsWith("-");
                 return (
                   <div key={i} className="pt-5" style={{ borderTop: `1px solid ${i === 0 ? brand.tokens.accent : "rgba(122,139,199,0.28)"}` }}>
-                    <div className="uppercase" style={{ fontSize: 12, letterSpacing: "0.24em", color: "rgba(122,139,199,0.9)", fontWeight: 600 }}>{s(it.label)}</div>
-                    <div className="tabular-nums mt-2 flex items-baseline gap-3" style={{ fontSize: 34, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em" }}>
+                    <div className="uppercase" style={{ fontSize: 12, letterSpacing: "0.24em", color: ink.muted, fontWeight: 600 }}>{s(it.label)}</div>
+                    <div className="tabular-nums mt-2 flex items-baseline gap-3" style={{ fontSize: 34, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em" }}>
                       {s(it.value, `${pct}%`)}
-                      <span style={{ fontSize: 18, color: "rgba(122,139,199,0.8)" }}>{s(it.unit)}</span>
+                      <span style={{ fontSize: 18, color: ink.faint }}>{s(it.unit)}</span>
                     </div>
                     {delta && (
-                      <div className="uppercase mt-2" style={{ fontSize: 12, letterSpacing: "0.24em", color: negative ? "#E53D2E" : brand.tokens.accent, fontWeight: 600 }}>{delta}</div>
+                      <div className="uppercase mt-2" style={{ fontSize: 12, letterSpacing: "0.24em", color: negative ? "#B42318" : "var(--slide-accent-text)", fontWeight: 600 }}>{delta}</div>
                     )}
                   </div>
                 );
@@ -4055,10 +4062,10 @@ function renderVariantBody({
                 const delta = s(it.delta);
                 const negative = delta.trim().startsWith("-");
                 return (
-                  <div key={i} className="py-5" style={{ borderTop: "1px solid rgba(10,15,28,0.12)", borderBottom: i === items.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
+                  <div key={i} className="py-5" style={{ borderTop: `1px solid ${ink.hairline}`, borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none" }}>
                     <div className="flex items-baseline justify-between">
-                      <div style={{ fontSize: 26, fontWeight: 600, color: brand.tokens.primary }}>{s(it.label)}</div>
-                      <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.24em", fontWeight: 600, color: negative ? "#E53D2E" : brand.tokens.accent }}>{delta}</div>
+                      <div style={{ fontSize: 26, fontWeight: 600, color: ink.strong }}>{s(it.label)}</div>
+                      <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.24em", fontWeight: 600, color: negative ? "#B42318" : "var(--slide-accent-text)" }}>{delta}</div>
                     </div>
                     <div className="mt-3"><ProgressBar brand={brand} percent={pct} /></div>
                   </div>
@@ -4081,7 +4088,7 @@ function renderVariantBody({
           <div className="mt-8 grid gap-14" style={{ gridTemplateColumns: "1fr 2.4fr" }}>
             <div className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
               <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
-              <div className="mt-6" style={{ fontSize: 38, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(c.headline)}</div>
+              <div className="mt-6" style={{ fontSize: 38, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(c.headline)}</div>
             </div>
             <div className="grid items-end gap-4" style={{ gridTemplateColumns: `repeat(${items.length || 1}, 1fr)`, minHeight: 520 }}>
               {items.map((it, i) => {
@@ -4092,11 +4099,11 @@ function renderVariantBody({
                 const opacity = isLast ? 1 : 0.3 + (i / Math.max(items.length - 1, 1)) * 0.55;
                 return (
                   <div key={i} className="flex flex-col items-center justify-end">
-                    <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: brand.tokens.primary }}>
+                    <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: ink.strong }}>
                       {s(it.value)}<span style={{ fontSize: 14, color: "var(--slide-accent-text)", marginLeft: 2 }}>{s(it.unit)}</span>
                     </div>
                     <div className="mt-3 w-full" style={{ height: h, background: color, opacity, maxWidth: 90 }} />
-                    <div className="mt-3 uppercase" style={{ fontSize: 14, letterSpacing: "0.22em", color: isLast ? brand.tokens.accent : "color-mix(in oklab, currentColor 62%, transparent)", fontWeight: 600 }}>{s(it.year)}</div>
+                    <div className="mt-3 uppercase" style={{ fontSize: 14, letterSpacing: "0.22em", color: isLast ? "var(--slide-accent-text)" : ink.faint, fontWeight: 600 }}>{s(it.year)}</div>
                   </div>
                 );
               })}
@@ -4139,10 +4146,10 @@ function renderVariantBody({
                 const pct = (it.value / max) * 100;
                 const isTop = i === 0;
                 return (
-                  <div key={i} className="py-5" style={{ borderTop: i === 0 ? `2px solid ${brand.tokens.accent}` : "1px solid rgba(10,15,28,0.12)", borderBottom: i === items.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
+                  <div key={i} className="py-5" style={{ borderTop: i === 0 ? `2px solid ${brand.tokens.accent}` : "1px solid rgba(10,15,28,0.12)", borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none" }}>
                     <div className="flex items-baseline justify-between mb-3">
-                      <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.24em", color: brand.tokens.primary, fontWeight: 600 }}>{it.label}</div>
-                      <div className="tabular-nums" style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary }}>
+                      <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.24em", color: ink.strong, fontWeight: 600 }}>{it.label}</div>
+                      <div className="tabular-nums" style={{ fontSize: 28, fontWeight: 600, color: ink.strong }}>
                         {it.value}<span style={{ fontSize: 16, color: "var(--slide-accent-text)", marginLeft: 4 }}>{it.unit}</span>
                       </div>
                     </div>
@@ -4189,11 +4196,11 @@ function renderVariantBody({
                 const color = i === 0 ? brand.tokens.accent : brand.tokens.primary;
                 const opacity = i === 0 ? 1 : 0.35 + (1 - i / items.length) * 0.5;
                 return (
-                  <div key={i} className="py-4 flex items-start gap-5" style={{ borderTop: "1px solid rgba(10,15,28,0.12)", borderBottom: i === items.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
+                  <div key={i} className="py-4 flex items-start gap-5" style={{ borderTop: `1px solid ${ink.hairline}`, borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none" }}>
                     <div style={{ width: 16, height: 16, background: color, opacity, marginTop: 8 }} />
                     <div style={{ flex: 1 }}>
                       <div className="flex items-baseline justify-between">
-                        <div style={{ fontSize: 22, fontWeight: 600, color: brand.tokens.primary }}>{it.label}</div>
+                        <div style={{ fontSize: 22, fontWeight: 600, color: ink.strong }}>{it.label}</div>
                         <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: "var(--slide-accent-text)" }}>{it.value}%</div>
                       </div>
                       <div className="mt-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 65%, transparent)", lineHeight: 1.4 }}>{it.body}</div>
@@ -4221,12 +4228,12 @@ function renderVariantBody({
                 <div key={i} className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
                   <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 60%, transparent)", fontWeight: 600 }}>{s(it.label)}</div>
                   <div className="mt-6 flex items-baseline gap-3">
-                    <div className="tabular-nums" style={{ fontSize: 88, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.03em", lineHeight: 1 }}>{pct}%</div>
-                    <div style={{ fontSize: 20, color: "color-mix(in oklab, currentColor 50%, transparent)" }}>of 100%</div>
+                    <div className="tabular-nums" style={{ fontSize: 88, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1 }}>{pct}%</div>
+                    <div style={{ fontSize: 20, color: ink.faint }}>of 100%</div>
                   </div>
-                  <div className="mt-4 tabular-nums" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 62%, transparent)" }}>{done.toLocaleString()} / {total.toLocaleString()}</div>
+                  <div className="mt-4 tabular-nums" style={{ fontSize: 16, color: ink.faint }}>{done.toLocaleString()} / {total.toLocaleString()}</div>
                   <div className="mt-6"><ProgressBar brand={brand} percent={pct} /></div>
-                  <div className="mt-6" style={{ fontSize: 18, color: "color-mix(in oklab, currentColor 70%, transparent)", lineHeight: 1.45 }}>{s(it.body)}</div>
+                  <div className="mt-6" style={{ fontSize: 18, color: ink.muted, lineHeight: 1.45 }}>{s(it.body)}</div>
                 </div>
               );
             })}
@@ -4242,7 +4249,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="mb-6 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
             <Kicker brand={brand}>{s(c.kicker, "Trajectory")}</Kicker>
-            <div className="mt-4" style={{ fontSize: 44, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
+            <div className="mt-4" style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
           </div>
           <div className="mt-4">
             <DecadeAreaChart brand={brand} series={series} height={520} calloutLabel={s(callout.year)} calloutNote={s(callout.note)} />
@@ -4261,9 +4268,9 @@ function renderVariantBody({
               const cur = Math.max(0, Math.min(100, Number(it.current) || 0));
               const bench = Math.max(0, Math.min(100, Number(it.benchmark) || 0));
               return (
-                <div key={i} className="py-6" style={{ borderTop: "1px solid rgba(10,15,28,0.12)", borderBottom: i === items.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
+                <div key={i} className="py-6" style={{ borderTop: `1px solid ${ink.hairline}`, borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none" }}>
                   <div className="flex items-baseline justify-between gap-8 mb-4">
-                    <div style={{ fontSize: 24, fontWeight: 600, color: brand.tokens.primary }}>{s(it.label)}</div>
+                    <div style={{ fontSize: 24, fontWeight: 600, color: ink.strong }}>{s(it.label)}</div>
                     <div className="flex items-baseline gap-10">
                       <div className="tabular-nums" style={{ fontSize: 40, fontWeight: 600, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}>{cur}%</div>
                       <div className="tabular-nums" style={{ fontSize: 30, fontWeight: 600, color: "color-mix(in oklab, currentColor 40%, transparent)" }}>{bench}%</div>
@@ -4278,7 +4285,7 @@ function renderVariantBody({
                     </div>
                   </div>
                   {s(it.range) && (
-                    <div className="mt-3 uppercase" style={{ fontSize: 14, letterSpacing: "0.24em", color: "color-mix(in oklab, currentColor 50%, transparent)", fontWeight: 600 }}>{s(it.range)}</div>
+                    <div className="mt-3 uppercase" style={{ fontSize: 14, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}>{s(it.range)}</div>
                   )}
                 </div>
               );
@@ -4295,7 +4302,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="mb-6 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
             <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
-            <div className="mt-4" style={{ fontSize: 42, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
+            <div className="mt-4" style={{ fontSize: 42, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
           </div>
           <div className="mt-4"><LineMultiChart brand={brand} series={series} xLabels={xLabels} unit={s(c.unit, "%")} height={500} /></div>
         </SlideFrame>
@@ -4320,7 +4327,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="mb-6 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
             <Kicker brand={brand}>{s(c.kicker, "Composition")}</Kicker>
-            <div className="mt-4" style={{ fontSize: 42, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
+            <div className="mt-4" style={{ fontSize: 42, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
           </div>
           <div className="mt-4"><StackedAreaChart brand={brand} series={series} xLabels={xLabels} unit={s(c.unit)} height={500} /></div>
         </SlideFrame>
@@ -4396,7 +4403,7 @@ function renderVariantBody({
           </div>
           <div className="absolute inset-x-24 bottom-24 flex flex-col text-white">
             <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mb-8" />
-            <DisplayTitle size={_size} color="#ffffff" maxWidthPx={1620}>
+            <DisplayTitle size={_size} color={ink.strong} maxWidthPx={1620}>
               {s(c.title, "One line. Say it well.")}
             </DisplayTitle>
             {s(c.subtitle) && (
@@ -4441,7 +4448,7 @@ function renderVariantBody({
           <div className="relative flex h-full flex-col justify-center">
             {s(c.kicker) && <Kicker brand={brand} tracking="0.36em">{s(c.kicker)}</Kicker>}
             <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mt-8" />
-            <DisplayTitle size="hero" color="#ffffff" maxWidthPx={1620} className="mt-10">
+            <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1620} className="mt-10">
               {s(c.title, "Signal through the noise.")}
             </DisplayTitle>
             {s(c.subtitle) && (
@@ -4474,7 +4481,7 @@ function renderVariantBody({
             <div className="flex flex-col">
               {s(c.kicker) && <Kicker brand={brand} tracking="0.36em">{s(c.kicker, "Chapter")}</Kicker>}
               <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mt-8" />
-              <DisplayTitle size="section" color="#ffffff" maxWidthPx={1080} className="mt-8">
+              <DisplayTitle size="section" color={ink.strong} maxWidthPx={1080} className="mt-8">
                 {s(c.title, "New chapter")}
               </DisplayTitle>
               {s(c.subtitle) && (
@@ -4503,7 +4510,7 @@ function renderVariantBody({
             >
               {s(c.kicker, "A briefing")}
             </div>
-            <DisplayTitle size="hero" color="#ffffff" maxWidthPx={1720} className="uppercase">
+            <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1720} className="uppercase">
               {s(c.title, "The Signal")}
             </DisplayTitle>
             <div className="flex items-center justify-between">
@@ -5159,6 +5166,7 @@ function StatGrid({
 
 
 function NumberedList({ brand, pageNumber, title, items }: { brand: BrandMode; pageNumber: number; title: string; items: Item[] }) {
+  const ink = useSlideInk();
   return (
     <SlideFrame brand={brand} pageNumber={pageNumber}>
       <SlideTitle brand={brand} title={title} />
@@ -5169,7 +5177,7 @@ function NumberedList({ brand, pageNumber, title, items }: { brand: BrandMode; p
             <div
               key={i}
               className="grid grid-cols-[80px_88px_1fr] items-start gap-10 py-7"
-              style={{ borderTop: i === 0 ? "1px solid rgba(10,15,28,0.10)" : "none", borderBottom: "1px solid rgba(10,15,28,0.10)" }}
+              style={{ borderTop: i === 0 ? "1px solid rgba(10,15,28,0.10)" : "none", borderBottom: `1px solid ${ink.hairline}` }}
             >
               <div
                 className="pt-1 font-semibold tabular-nums"
@@ -5179,7 +5187,7 @@ function NumberedList({ brand, pageNumber, title, items }: { brand: BrandMode; p
               </div>
               <IconBadge brand={brand} label={label} index={i} size="md" override={s(it.icon)} />
               <div>
-                <div style={{ fontSize: 32, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em" }}>
+                <div style={{ fontSize: 32, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em" }}>
                   {label}
                 </div>
                 <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.4, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>
@@ -5201,11 +5209,12 @@ function SlideTitle({ brand, title, kicker }: { brand: BrandMode; title: string;
 
 function Card({ brand, title, body, index, icon }: { brand: BrandMode; title: string; body: string; index: number; icon?: string }) {
   const mode = useContext(SlideModeContext);
+  const ink = useSlideInk();
   const isDark = mode === "dark";
   const cardBg = isDark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)";
   const cardRing = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
   const bodyColor = isDark ? "rgba(255,255,255,0.72)" : "rgba(10,15,28,0.68)";
-  const titleColor = isDark ? "#ffffff" : brand.tokens.primary;
+  const titleColor = ink.strong;
   return (
     <div
       className="relative flex flex-col overflow-hidden rounded-3xl p-10"
@@ -5252,13 +5261,14 @@ function Card({ brand, title, body, index, icon }: { brand: BrandMode; title: st
 }
 
 function Quadrant({ brand, label, highlight }: { brand: BrandMode; label: string; highlight?: boolean }) {
+  const ink = useSlideInk();
   return (
     <div
       className="flex items-center justify-center p-8 text-center"
       style={{
         border: `1px solid ${highlight ? brand.tokens.accent : "rgba(10,15,28,0.10)"}`,
         backgroundColor: highlight ? `${brand.tokens.accent}18` : "transparent",
-        color: brand.tokens.primary,
+        color: ink.strong,
         fontSize: 30,
         fontWeight: 600,
         letterSpacing: "-0.015em",
@@ -5319,13 +5329,13 @@ function Sparkline({ brand, values, w = 380, h = 100, filled = true, peakPin = f
       </defs>
       {filled && <path d={areaPath} fill={`url(#${id})`} />}
       <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke={ink.hairline} strokeWidth={1} />
-      <path d={linePath} fill="none" stroke={brand.tokens.accent} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={5} fill={brand.tokens.accent} />}
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={5} fill="var(--slide-accent-text)" />}
       {peakPin && peak && (
         <g>
-          <line x1={peak[0]} y1={peak[1]} x2={peak[0]} y2={Math.max(peak[1] - 22, 6)} stroke={brand.tokens.accent} strokeWidth={1} />
-          <rect x={peak[0] - 22} y={Math.max(peak[1] - 34, 0)} width={44} height={13} fill={brand.tokens.accent} rx={2} />
-          <text x={peak[0]} y={Math.max(peak[1] - 24, 10)} textAnchor="middle" fontSize={8} fontWeight={700} fill="#0A0E1F" style={{ letterSpacing: "0.18em" }}>{peakLabel}</text>
+          <line x1={peak[0]} y1={peak[1]} x2={peak[0]} y2={Math.max(peak[1] - 22, 6)} stroke="var(--slide-accent-text)" strokeWidth={1} />
+          <rect x={peak[0] - 22} y={Math.max(peak[1] - 34, 0)} width={44} height={13} fill="var(--slide-accent-text)" rx={2} />
+          <text x={peak[0]} y={Math.max(peak[1] - 24, 10)} textAnchor="middle" fontSize={8} fontWeight={700} fill={ink.strong} style={{ letterSpacing: "0.18em" }}>{peakLabel}</text>
         </g>
       )}
     </svg>
@@ -5488,7 +5498,7 @@ function SemiGauge({ brand, percent, size = 260 }: { brand: BrandMode; percent: 
       <path d={arc} fill="none" stroke={`url(#${gradId})`} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${arcC}`} />
       <line x1={cx} y1={cy} x2={nx} y2={ny} stroke={ink.text} strokeWidth={1.5} />
       <circle cx={cx} cy={cy} r={3} fill={ink.text} />
-      <circle cx={nx} cy={ny} r={4} fill={brand.tokens.accent} />
+      <circle cx={nx} cy={ny} r={4} fill="var(--slide-accent-text)" />
       <text x={cx} y={cy - 22} textAnchor="middle" fontSize={size * 0.22} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
         {Math.round(p)}%
       </text>
@@ -5528,7 +5538,7 @@ function AreaChart({ brand, series, height = 480 }: { brand: BrandMode; series: 
       <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairline} strokeWidth={1} />
       {areaPath && <path d={areaPath} fill={`url(#${id})`} />}
       <path d={linePath} fill="none" stroke={`url(#${lineId})`} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={7} fill={brand.tokens.accent} />}
+      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={7} fill="var(--slide-accent-text)" />}
       {series.map((p, i) => (
         <text key={i} x={pts[i]?.[0]} y={h - padB + 32} textAnchor="middle" fontSize={20} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
       ))}
@@ -5696,6 +5706,7 @@ function ConcentricRings({ brand, items, size = 480 }: { brand: BrandMode; items
 
 
 function DecadeAreaChart({ brand, series, height = 480, calloutLabel, calloutNote }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; calloutLabel?: string; calloutNote?: string }) {
+  const ink = useSlideInk();
   const w = 1720;
   const h = height;
   const padL = 30, padR = 30, padT = 40, padB = 60;
@@ -5729,20 +5740,19 @@ function DecadeAreaChart({ brand, series, height = 480, calloutLabel, calloutNot
           <stop offset="100%" stopColor={brand.tokens.primary} stopOpacity="0" />
         </linearGradient>
       </defs>
-      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
+      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
       {areaPath && <path d={areaPath} fill={`url(#${id})`} />}
-      <path d={linePath} fill="none" stroke={brand.tokens.accent} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
       {series.map((p, i) => (
-        <text key={i} x={pts[i]?.[0]} y={h - padB + 34} textAnchor="middle" fontSize={18} fill="color-mix(in oklab, currentColor 62%, transparent)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
+        <text key={i} x={pts[i]?.[0]} y={h - padB + 34} textAnchor="middle" fontSize={18} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
       ))}
       {hi && (
         <g>
-          <circle cx={hi[0]} cy={hi[1]} r={9} fill={brand.tokens.accent} />
-          <circle cx={hi[0]} cy={hi[1]} r={16} fill="none" stroke={brand.tokens.accent} strokeWidth={2} strokeOpacity={0.35} />
-          <line x1={hi[0]} y1={hi[1] - 20} x2={hi[0]} y2={hi[1] - 90} stroke={brand.tokens.accent} strokeWidth={1} />
-          <rect x={hi[0] - 240} y={hi[1] - 190} width={480} height={100} fill="#fff" stroke={brand.tokens.accent} strokeWidth={2} />
-          <text x={hi[0]} y={hi[1] - 148} textAnchor="middle" fontSize={20} fontWeight={600} fill={brand.tokens.primary} style={{ letterSpacing: "-0.01em" }}>{calloutLabel}</text>
-          <text x={hi[0]} y={hi[1] - 118} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.7)">{calloutNote}</text>
+          <circle cx={hi[0]} cy={hi[1]} r={9} fill="var(--slide-accent-text)" />
+          <circle cx={hi[0]} cy={hi[1]} r={16} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeOpacity={0.35} />
+          <line x1={hi[0]} y1={hi[1] - 20} x2={hi[0]} y2={hi[1] - 90} stroke="var(--slide-accent-text)" strokeWidth={1} />
+          <text x={hi[0]} y={hi[1] - 148} textAnchor="middle" fontSize={20} fontWeight={600} fill={ink.strong} style={{ letterSpacing: "-0.01em" }}>{calloutLabel}</text>
+          <text x={hi[0]} y={hi[1] - 118} textAnchor="middle" fontSize={16} fill={ink.muted}>{calloutNote}</text>
         </g>
       )}
     </svg>
@@ -5751,9 +5761,10 @@ function DecadeAreaChart({ brand, series, height = 480, calloutLabel, calloutNot
 
 // ── Extended graph helpers ───────────────────────────────────────────────
 function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand: BrandMode; series: { label: string; points: number[] }[]; xLabels: string[]; unit?: string; height?: number }) {
+  const ink = useSlideInk();
   const w = 1720, h = height;
   const padL = 90, padR = 40, padT = 30, padB = 80;
-  const cols = [brand.tokens.accent, brand.tokens.primary, "rgba(10,15,28,0.45)"];
+  const cols = [brand.tokens.accent, brand.tokens.primary, ink.faint];
   const all = series.flatMap((s) => s.points);
   const max = Math.max(1, ...all);
   const niceMax = Math.ceil(max / 10) * 10 || max;
@@ -5769,8 +5780,8 @@ function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand:
           const val = niceMax * (1 - i / ticks);
           return (
             <g key={i}>
-              <line x1={padL} y1={y} x2={w - padR} y2={y} stroke="rgba(10,15,28,0.08)" strokeWidth={1} />
-              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={16} fill="rgba(10,15,28,0.5)">{Math.round(val)}{unit || ""}</text>
+              <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} />
+              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={16} fill={ink.faint}>{Math.round(val)}{unit || ""}</text>
             </g>
           );
         })}
@@ -5779,20 +5790,20 @@ function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand:
           const d = pts.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(" ");
           return (
             <g key={si}>
-              <path d={d} fill="none" stroke={cols[si] || brand.tokens.primary} strokeWidth={si === 0 ? 3 : 2} strokeLinecap="round" strokeLinejoin="round" opacity={si === 0 ? 1 : 0.85} />
-              {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={si === 0 ? 5 : 4} fill={cols[si] || brand.tokens.primary} />)}
+              <path d={d} fill="none" stroke={cols[si] || ink.strong} strokeWidth={si === 0 ? 3 : 2} strokeLinecap="round" strokeLinejoin="round" opacity={si === 0 ? 1 : 0.85} />
+              {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={si === 0 ? 5 : 4} fill={cols[si] || ink.strong} />)}
             </g>
           );
         })}
         {xLabels.map((lb, i) => (
-          <text key={i} x={padL + i * step} y={h - padB + 34} textAnchor="middle" fontSize={16} fill="color-mix(in oklab, currentColor 62%, transparent)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{lb}</text>
+          <text key={i} x={padL + i * step} y={h - padB + 34} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{lb}</text>
         ))}
       </svg>
       <div className="mt-2 flex flex-wrap gap-6">
         {series.map((sr, i) => (
-          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 70%, transparent)" }}>
-            <span style={{ display: "inline-block", width: 22, height: 3, background: cols[i] || brand.tokens.primary }} />
-            <span style={{ fontWeight: 600, color: brand.tokens.primary }}>{sr.label}</span>
+          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
+            <span style={{ display: "inline-block", width: 22, height: 3, background: cols[i] || ink.strong }} />
+            <span style={{ fontWeight: 600, color: ink.strong }}>{sr.label}</span>
           </div>
         ))}
       </div>
@@ -5801,6 +5812,7 @@ function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand:
 }
 
 function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { brand: BrandMode; segments: { label: string }[]; columns: { label: string; values: number[] }[]; unit?: string; height?: number }) {
+  const ink = useSlideInk();
   const w = 1720, h = height;
   const padL = 90, padR = 40, padT = 30, padB = 80;
   const totals = columns.map((c) => c.values.reduce((a, b) => a + b, 0));
@@ -5809,14 +5821,14 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(columns.length, 1);
   const barW = slot * 0.55;
-  const cols = [brand.tokens.accent, brand.tokens.primary, "rgba(10,15,28,0.4)"];
+  const cols = [brand.tokens.accent, brand.tokens.primary, ink.faint];
   const ticks = 4;
   return (
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
         {Array.from({ length: ticks + 1 }, (_, i) => {
           const y = padT + (chartH / ticks) * i;
-          return <line key={i} x1={padL} y1={y} x2={w - padR} y2={y} stroke="rgba(10,15,28,0.08)" strokeWidth={1} />;
+          return <line key={i} x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} />;
         })}
         {columns.map((col, i) => {
           const x = padL + i * slot + (slot - barW) / 2;
@@ -5826,27 +5838,28 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
               {col.values.map((v, si) => {
                 const bh = (v / niceMax) * chartH;
                 yCursor -= bh;
-                return <rect key={si} x={x} y={yCursor} width={barW} height={bh} fill={cols[si] || brand.tokens.primary} opacity={si === 0 ? 1 : 0.7 - si * 0.15} />;
+                return <rect key={si} x={x} y={yCursor} width={barW} height={bh} fill={cols[si] || ink.strong} opacity={si === 0 ? 1 : 0.7 - si * 0.15} />;
               })}
-              <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{col.label}</text>
+              <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{col.label}</text>
             </g>
           );
         })}
       </svg>
       <div className="mt-3 flex flex-wrap gap-6">
         {segments.map((sg, i) => (
-          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 70%, transparent)" }}>
-            <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || brand.tokens.primary, opacity: i === 0 ? 1 : 0.7 - i * 0.15 }} />
-            <span style={{ fontWeight: 600, color: brand.tokens.primary }}>{sg.label}</span>
+          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
+            <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || ink.strong, opacity: i === 0 ? 1 : 0.7 - i * 0.15 }} />
+            <span style={{ fontWeight: 600, color: ink.strong }}>{sg.label}</span>
           </div>
         ))}
-        {unit && <div style={{ fontSize: 14, color: "color-mix(in oklab, currentColor 50%, transparent)", marginLeft: "auto" }}>Units: {unit}</div>}
+        {unit && <div style={{ fontSize: 14, color: ink.faint, marginLeft: "auto" }}>Units: {unit}</div>}
       </div>
     </div>
   );
 }
 
 function StackedAreaChart({ brand, series, xLabels, unit, height = 480 }: { brand: BrandMode; series: { label: string; points: number[] }[]; xLabels: string[]; unit?: string; height?: number }) {
+  const ink = useSlideInk();
   const w = 1720, h = height;
   const padL = 60, padR = 40, padT = 30, padB = 80;
   const n = Math.max(...series.map((s) => s.points.length), 1);
@@ -5855,7 +5868,7 @@ function StackedAreaChart({ brand, series, xLabels, unit, height = 480 }: { bran
   const niceMax = Math.ceil(max * 1.1);
   const chartH = h - padT - padB;
   const step = n > 1 ? (w - padL - padR) / (n - 1) : 0;
-  const cols = [brand.tokens.accent, brand.tokens.primary, "rgba(10,15,28,0.45)", "rgba(10,15,28,0.25)"];
+  const cols = [brand.tokens.accent, brand.tokens.primary, ink.faint, ink.hairlineStrong];
   let stacks = Array(n).fill(0) as number[];
   const layers = series.map((sr, si) => {
     const bottom = stacks.slice();
@@ -5864,31 +5877,32 @@ function StackedAreaChart({ brand, series, xLabels, unit, height = 480 }: { bran
     const topPts = top.map((v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number]);
     const botPts = bottom.map((v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number]).reverse();
     const d = [...topPts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`), ...botPts.map((p) => `L${p[0]},${p[1]}`), "Z"].join(" ");
-    return { d, color: cols[si] || brand.tokens.primary, si };
+    return { d, color: cols[si] || ink.strong, si };
   });
   return (
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-        <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
+        <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
         {layers.map((l) => <path key={l.si} d={l.d} fill={l.color} opacity={l.si === 0 ? 0.95 : 0.7 - l.si * 0.15} />)}
         {xLabels.map((lb, i) => (
-          <text key={i} x={padL + i * step} y={h - padB + 34} textAnchor="middle" fontSize={16} fill="color-mix(in oklab, currentColor 62%, transparent)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{lb}</text>
+          <text key={i} x={padL + i * step} y={h - padB + 34} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{lb}</text>
         ))}
       </svg>
       <div className="mt-3 flex flex-wrap gap-6">
         {series.map((sr, i) => (
-          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 70%, transparent)" }}>
-            <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || brand.tokens.primary, opacity: i === 0 ? 0.95 : 0.7 - i * 0.15 }} />
-            <span style={{ fontWeight: 600, color: brand.tokens.primary }}>{sr.label}</span>
+          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
+            <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || ink.strong, opacity: i === 0 ? 0.95 : 0.7 - i * 0.15 }} />
+            <span style={{ fontWeight: 600, color: ink.strong }}>{sr.label}</span>
           </div>
         ))}
-        {unit && <div style={{ fontSize: 14, color: "color-mix(in oklab, currentColor 50%, transparent)", marginLeft: "auto" }}>Units: {unit}</div>}
+        {unit && <div style={{ fontSize: 14, color: ink.faint, marginLeft: "auto" }}>Units: {unit}</div>}
       </div>
     </div>
   );
 }
 
 function WaterfallChart({ brand, steps, unit, height = 500 }: { brand: BrandMode; steps: { label: string; value: number; kind: "start" | "up" | "down" | "end" }[]; unit?: string; height?: number }) {
+  const ink = useSlideInk();
   const w = 1720, h = height;
   const padL = 90, padR = 40, padT = 30, padB = 90;
   const chartH = h - padT - padB;
@@ -5909,7 +5923,7 @@ function WaterfallChart({ brand, steps, unit, height = 500 }: { brand: BrandMode
   const scale = (v: number) => padT + chartH * (1 - v / niceMax);
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.15)" strokeWidth={1} />
+      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
       {bars.map((b, i) => {
         const x = padL + i * slot + (slot - barW) / 2;
         const y = scale(b.top);
@@ -5922,13 +5936,13 @@ function WaterfallChart({ brand, steps, unit, height = 500 }: { brand: BrandMode
         return (
           <g key={i}>
             {prev && (
-              <line x1={x - (slot - barW)} y1={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} x2={x} y2={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} stroke="rgba(10,15,28,0.25)" strokeDasharray="4 4" />
+              <line x1={x - (slot - barW)} y1={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} x2={x} y2={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} stroke={ink.hairlineStrong} strokeDasharray="4 4" />
             )}
             <rect x={x} y={y} width={barW} height={Math.max(2, bh)} fill={fill} opacity={b.kind === "start" || b.kind === "end" ? 1 : 0.92} />
-            <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={18} fontWeight={600} fill={brand.tokens.primary}>
+            <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={18} fontWeight={600} fill={ink.strong}>
               {b.kind === "up" ? "+" : b.kind === "down" ? "−" : ""}{Math.abs(b.value).toFixed(1)}{unit || ""}
             </text>
-            <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={15} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.12em", textTransform: "uppercase" }}>{b.label}</text>
+            <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={15} fill={ink.faint} style={{ letterSpacing: "0.12em", textTransform: "uppercase" }}>{b.label}</text>
           </g>
         );
       })}
@@ -5937,6 +5951,7 @@ function WaterfallChart({ brand, steps, unit, height = 500 }: { brand: BrandMode
 }
 
 function BubbleChart({ brand, items, axisX, axisY, height = 560 }: { brand: BrandMode; items: { label: string; x: number; y: number; size: number }[]; axisX: string; axisY: string; height?: number }) {
+  const ink = useSlideInk();
   const w = 1720, h = height;
   const padL = 110, padR = 60, padT = 40, padB = 90;
   const chartW = w - padL - padR;
@@ -5945,49 +5960,50 @@ function BubbleChart({ brand, items, axisX, axisY, height = 560 }: { brand: Bran
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       {[0, 0.25, 0.5, 0.75, 1].map((t, i) => (
-        <line key={i} x1={padL} y1={padT + chartH * t} x2={w - padR} y2={padT + chartH * t} stroke="rgba(10,15,28,0.06)" strokeWidth={1} />
+        <line key={i} x1={padL} y1={padT + chartH * t} x2={w - padR} y2={padT + chartH * t} stroke={ink.hairline} strokeWidth={1} />
       ))}
       {[0, 0.25, 0.5, 0.75, 1].map((t, i) => (
-        <line key={`v${i}`} x1={padL + chartW * t} y1={padT} x2={padL + chartW * t} y2={h - padB} stroke="rgba(10,15,28,0.06)" strokeWidth={1} />
+        <line key={`v${i}`} x1={padL + chartW * t} y1={padT} x2={padL + chartW * t} y2={h - padB} stroke={ink.hairline} strokeWidth={1} />
       ))}
-      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke="rgba(10,15,28,0.3)" strokeWidth={1} />
-      <line x1={padL} y1={padT} x2={padL} y2={h - padB} stroke="rgba(10,15,28,0.3)" strokeWidth={1} />
+      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
+      <line x1={padL} y1={padT} x2={padL} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
       {items.map((it, i) => {
         const cx = padL + (it.x / 100) * chartW;
         const cy = padT + (1 - it.y / 100) * chartH;
         const r = 20 + (it.size / maxSize) * 60;
         return (
           <g key={i}>
-            <circle cx={cx} cy={cy} r={r} fill={brand.tokens.accent} opacity={0.28} />
-            <circle cx={cx} cy={cy} r={r} fill="none" stroke={brand.tokens.accent} strokeWidth={2} />
-            <text x={cx} y={cy + 6} textAnchor="middle" fontSize={22} fontWeight={700} fill={brand.tokens.primary}>{it.label}</text>
+            <circle cx={cx} cy={cy} r={r} fill="var(--slide-accent-text)" opacity={0.28} />
+            <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} />
+            <text x={cx} y={cy + 6} textAnchor="middle" fontSize={22} fontWeight={700} fill={ink.strong}>{it.label}</text>
           </g>
         );
       })}
-      <text x={w / 2} y={h - 24} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }}>{axisX} →</text>
-      <text x={30} y={h / 2} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }} transform={`rotate(-90 30 ${h / 2})`}>{axisY} →</text>
+      <text x={w / 2} y={h - 24} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }}>{axisX} →</text>
+      <text x={30} y={h / 2} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }} transform={`rotate(-90 30 ${h / 2})`}>{axisY} →</text>
     </svg>
   );
 }
 
 function HeatmapChart({ brand, rows, cols, cells, min, max }: { brand: BrandMode; rows: string[]; cols: string[]; cells: number[][]; min: number; max: number }) {
+  const ink = useSlideInk();
   const range = Math.max(1, max - min);
   return (
     <div>
       <div className="grid" style={{ gridTemplateColumns: `160px repeat(${cols.length}, minmax(0, 1fr))`, gap: 4 }}>
         <div />
         {cols.map((c, i) => (
-          <div key={i} className="text-center uppercase" style={{ fontSize: 14, letterSpacing: "0.24em", color: "color-mix(in oklab, currentColor 62%, transparent)", fontWeight: 600, paddingBottom: 8 }}>{c}</div>
+          <div key={i} className="text-center uppercase" style={{ fontSize: 14, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600, paddingBottom: 8 }}>{c}</div>
         ))}
         {rows.map((r, ri) => (
           <Fragment key={ri}>
-            <div className="pr-4 flex items-center justify-end uppercase" style={{ fontSize: 14, letterSpacing: "0.2em", color: brand.tokens.primary, fontWeight: 600 }}>{r}</div>
+            <div className="pr-4 flex items-center justify-end uppercase" style={{ fontSize: 14, letterSpacing: "0.2em", color: ink.strong, fontWeight: 600 }}>{r}</div>
             {cols.map((_, ci) => {
               const v = cells[ri]?.[ci] ?? 0;
               const t = Math.max(0, Math.min(1, (v - min) / range));
               return (
                 <div key={ci} style={{ aspectRatio: "2 / 1", background: brand.tokens.accent, opacity: 0.15 + t * 0.85, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <span style={{ fontSize: 22, fontWeight: 700, color: t > 0.55 ? brand.tokens.primary : "rgba(10,15,28,0.75)" }}>{v}</span>
+                  <span style={{ fontSize: 22, fontWeight: 700, color: ink.strong }}>{v}</span>
                 </div>
               );
             })}
@@ -5995,16 +6011,17 @@ function HeatmapChart({ brand, rows, cols, cells, min, max }: { brand: BrandMode
         ))}
       </div>
       <div className="mt-3 flex items-center gap-3">
-        <span className="uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: "color-mix(in oklab, currentColor 62%, transparent)", fontWeight: 600 }}>Low</span>
+        <span className="uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}>Low</span>
         <div style={{ flex: 1, height: 6, background: `linear-gradient(90deg, ${brand.tokens.accent}22, ${brand.tokens.accent})` }} />
-        <span className="uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: "color-mix(in oklab, currentColor 62%, transparent)", fontWeight: 600 }}>High</span>
-        <span style={{ fontSize: 12, color: "color-mix(in oklab, currentColor 62%, transparent)" }}>{min}–{max}</span>
+        <span className="uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}>High</span>
+        <span style={{ fontSize: 12, color: ink.faint }}>{min}–{max}</span>
       </div>
     </div>
   );
 }
 
 function Treemap({ brand, items, height = 560 }: { brand: BrandMode; items: { label: string; value: number; meta?: string }[]; height?: number }) {
+  const ink = useSlideInk();
   // Simple squarified layout: sort desc, slice vertically then horizontally alternately.
   const total = items.reduce((a, b) => a + b.value, 0) || 1;
   const w = 1720;
@@ -6033,16 +6050,16 @@ function Treemap({ brand, items, height = 560 }: { brand: BrandMode; items: { la
     remainingTotal -= it.value;
     vertical = !vertical;
   }
-  const cols = [brand.tokens.accent, brand.tokens.primary, "color-mix(in oklab, currentColor 62%, transparent)", "rgba(10,15,28,0.35)", "rgba(10,15,28,0.22)"];
+  const cols = [brand.tokens.accent, brand.tokens.primary, ink.muted, ink.faint, ink.hairlineStrong];
   return (
     <svg viewBox={`0 0 ${w} ${height}`} width="100%" height={height} preserveAspectRatio="none" aria-hidden>
       {rects.map((r, i) => (
         <g key={i}>
-          <rect x={r.x + 4} y={r.y + 4} width={Math.max(0, r.w - 8)} height={Math.max(0, r.h - 8)} fill={cols[i] || brand.tokens.primary} opacity={i === 0 ? 1 : 0.9} />
-          <text x={r.x + 24} y={r.y + 46} fontSize={r.w > 380 ? 26 : 18} fontWeight={700} fill={i === 0 ? brand.tokens.primary : "#fff"} style={{ letterSpacing: "-0.01em" }}>{r.label}</text>
-          <text x={r.x + 24} y={r.y + 80} fontSize={r.w > 380 ? 40 : 24} fontWeight={700} fill={i === 0 ? brand.tokens.primary : "#fff"} style={{ letterSpacing: "-0.02em" }}>{r.value}%</text>
+          <rect x={r.x + 4} y={r.y + 4} width={Math.max(0, r.w - 8)} height={Math.max(0, r.h - 8)} fill={cols[i] || ink.strong} opacity={i === 0 ? 1 : 0.9} />
+          <text x={r.x + 24} y={r.y + 46} fontSize={r.w > 380 ? 26 : 18} fontWeight={700} fill={ink.strong} style={{ letterSpacing: "-0.01em" }}>{r.label}</text>
+          <text x={r.x + 24} y={r.y + 80} fontSize={r.w > 380 ? 40 : 24} fontWeight={700} fill={ink.strong} style={{ letterSpacing: "-0.02em" }}>{r.value}%</text>
           {r.meta && r.w > 260 && r.h > 120 && (
-            <text x={r.x + 24} y={r.y + 116} fontSize={16} fill={i === 0 ? "rgba(10,15,28,0.7)" : "rgba(255,255,255,0.85)"}>{r.meta}</text>
+            <text x={r.x + 24} y={r.y + 116} fontSize={16} fill={ink.muted}>{r.meta}</text>
           )}
         </g>
       ))}
@@ -6051,6 +6068,7 @@ function Treemap({ brand, items, height = 560 }: { brand: BrandMode; items: { la
 }
 
 function ComboChart({ brand, points, barLabel, barUnit, lineLabel, lineUnit, height = 520 }: { brand: BrandMode; points: { label: string; bar: number; line: number }[]; barLabel: string; barUnit?: string; lineLabel: string; lineUnit?: string; height?: number }) {
+  const ink = useSlideInk();
   const w = 1720, h = height;
   const padL = 100, padR = 100, padT = 30, padB = 90;
   const chartH = h - padT - padB;
@@ -6072,9 +6090,9 @@ function ComboChart({ brand, points, barLabel, barUnit, lineLabel, lineUnit, hei
           const lv = niceLine * (1 - i / ticks);
           return (
             <g key={i}>
-              <line x1={padL} y1={y} x2={w - padR} y2={y} stroke="rgba(10,15,28,0.08)" strokeWidth={1} />
-              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={14} fill="rgba(10,15,28,0.5)">{bv.toFixed(1)}{barUnit || ""}</text>
-              <text x={w - padR + 12} y={y + 6} textAnchor="start" fontSize={14} fill={brand.tokens.accent}>{Math.round(lv)}{lineUnit || ""}</text>
+              <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} />
+              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={14} fill={ink.faint}>{bv.toFixed(1)}{barUnit || ""}</text>
+              <text x={w - padR + 12} y={y + 6} textAnchor="start" fontSize={14} fill="var(--slide-accent-text)">{Math.round(lv)}{lineUnit || ""}</text>
             </g>
           );
         })}
@@ -6084,22 +6102,22 @@ function ComboChart({ brand, points, barLabel, barUnit, lineLabel, lineUnit, hei
           const y = h - padB - bh;
           return (
             <g key={i}>
-              <rect x={x} y={y} width={barW} height={bh} fill={brand.tokens.primary} opacity={0.85} />
-              <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill="rgba(10,15,28,0.6)" style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
+              <rect x={x} y={y} width={barW} height={bh} fill={ink.strong} opacity={0.85} />
+              <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
             </g>
           );
         })}
-        <path d={d} fill="none" stroke={brand.tokens.accent} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-        {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={6} fill={brand.tokens.accent} />)}
+        <path d={d} fill="none" stroke="var(--slide-accent-text)" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+        {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={6} fill="var(--slide-accent-text)" />)}
       </svg>
       <div className="mt-2 flex flex-wrap gap-6">
-        <div className="flex items-center gap-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 70%, transparent)" }}>
+        <div className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
           <span style={{ display: "inline-block", width: 16, height: 16, background: brand.tokens.primary, opacity: 0.85 }} />
-          <span style={{ fontWeight: 600, color: brand.tokens.primary }}>{barLabel}</span>
+          <span style={{ fontWeight: 600, color: ink.strong }}>{barLabel}</span>
         </div>
-        <div className="flex items-center gap-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 70%, transparent)" }}>
+        <div className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
           <span style={{ display: "inline-block", width: 22, height: 3, background: brand.tokens.accent }} />
-          <span style={{ fontWeight: 600, color: brand.tokens.primary }}>{lineLabel}</span>
+          <span style={{ fontWeight: 600, color: ink.strong }}>{lineLabel}</span>
         </div>
       </div>
     </div>
