@@ -2896,29 +2896,39 @@ function renderVariantBody({
       );
 
     // ── Expanded CTA / close variants ─────────────────────────────────
-    case "MV-CLOSE-TIMELINE":
+    case "MV-CLOSE-TIMELINE": {
+      const items = arr(c.items);
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, "What happens next")} />
-          <div className="relative mt-20">
-            <div className="absolute left-0 right-0 top-10 h-[3px]" style={{ backgroundColor: brand.tokens.accent }} />
-            <div className="grid" style={{ gridTemplateColumns: `repeat(${Math.max(arr(c.items).length, 1)}, minmax(0, 1fr))` }}>
-              {arr(c.items).map((it, i) => (
-                <div key={i} className="pr-8">
-                  <div className="mb-8 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold" style={{ backgroundColor: brand.tokens.accent, color: ink.onSurface(brand.tokens.accent), transform: "translateY(4px)" }}>
-                    {i + 1}
-                  </div>
-                  <div className="text-3xl font-semibold" style={{ color: ink.strong }}>{s(it.label)}</div>
-                  <div className="mt-4 text-xl opacity-80">{s(it.body)}</div>
-                  {s(it.owner) && (
-                    <div className="mt-4 text-sm uppercase tracking-[0.2em] opacity-60">Owner · {s(it.owner)}</div>
-                  )}
-                </div>
-              ))}
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
+          <AuroraOrb x={92} y={72} size={780} />
+          <div className="relative grid h-full grid-cols-[1.05fr_0.95fr] items-center gap-24">
+            <div>
+              <Kicker brand={brand}>Timeline</Kicker>
+              <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-6 mb-10" />
+              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>
+                {s(c.title, "What happens next.")}
+              </DisplayTitle>
+              {s(c.subtitle) && (
+                <SupportingText size="lg" opacity={0.78} className="mt-8" maxWidthPx={880}>
+                  {s(c.subtitle)}
+                </SupportingText>
+              )}
             </div>
+            {items.length > 0 && (
+              <AuroraSidePanel
+                kicker="Milestones"
+                items={items.slice(0, 4).map((it) => ({
+                  label: s(it.label),
+                  body: s(it.body),
+                  meta: s(it.owner) ? `Owner · ${s(it.owner)}` : undefined,
+                }))}
+              />
+            )}
           </div>
         </SlideFrame>
       );
+    }
+
 
     case "MV-CLOSE-CHECKLIST":
       return (
