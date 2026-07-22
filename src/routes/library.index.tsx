@@ -1098,14 +1098,14 @@ function VariantDetailModal({
       window.setTimeout(() => setCopied(false), 1400);
     } catch { /* ignore */ }
   };
-  const downloadPptx = async () => {
+  const downloadPptx = async (exportMode: "light" | "dark") => {
     if (downloading) return;
     setDownloading(true);
     try {
       const singleSlideDeck = {
         id: `library-${variant.id}-${Date.now()}`,
         createdAt: new Date().toISOString(),
-        title: `${variant.name} — ${brand.name}`,
+        title: `${variant.name} — ${brand.name} (${exportMode})`,
         briefId: "library-preview",
         brandModeId: brand.id,
         archetypeId: "single-module",
@@ -1119,7 +1119,8 @@ function VariantDetailModal({
           changes: [],
         }],
       } as Parameters<typeof exportDeckToPptx>[0];
-      await exportDeckToPptx(singleSlideDeck, brand);
+      console.info(`[library] downloading module ${variant.id} · division=${brand.id} · mode=${exportMode}`);
+      await exportDeckToPptx(singleSlideDeck, brand, { forceMode: exportMode });
     } catch (err) {
       console.error("[library] module download failed", err);
       alert("Download failed. Check console for details.");
