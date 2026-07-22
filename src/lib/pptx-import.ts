@@ -1918,7 +1918,8 @@ function readAlphaOfSolid(solidFill: PNode | undefined): number | undefined {
 
 function readSrcRect(blipFill: PNode | undefined): LayoutSrcRect | undefined {
   if (!blipFill) return undefined;
-  const s = pFind(blipFill, "a:srcRect");
+  const stretch = pFind(blipFill, "a:stretch");
+  const s = pFind(blipFill, "a:srcRect") ?? (stretch ? pFind(stretch, "a:fillRect") : undefined);
   if (!s) return undefined;
   const a = pAttrs(s);
   const l = a["@_l"] ? Number(a["@_l"]) / 100000 : 0;
@@ -2378,21 +2379,34 @@ function transformFrame(child: LayoutFrame, group: PNode | GroupTransform | unde
   if (!g) return child;
   const sx = g.w / g.chW;
   const sy = g.h / g.chH;
+  const w = child.w * sx;
+  const h = child.h * sy;
+  let cx = g.x + (child.x + child.w / 2 - g.chX) * sx;
+  let cy = g.y + (child.y + child.h / 2 - g.chY) * sy;
+  if (g.flipH) cx = g.x + g.w - (cx - g.x);
+  if (g.flipV) cy = g.y + g.h - (cy - g.y);
+  if (g.rot) {
+    const rad = (g.rot * Math.PI) / 180;
+    const gcx = g.x + g.w / 2;
+    const gcy = g.y + g.h / 2;
+    const dx = cx - gcx;
+    const dy = cy - gcy;
+    cx = gcx + dx * Math.cos(rad) - dy * Math.sin(rad);
+    cy = gcy + dx * Math.sin(rad) + dy * Math.cos(rad);
+  }
   const next: LayoutFrame = {
-    x: g.x + (child.x - g.chX) * sx,
-    y: g.y + (child.y - g.chY) * sy,
-    w: child.w * sx,
-    h: child.h * sy,
+    x: cx - w / 2,
+    y: cy - h / 2,
+    w,
+    h,
     rot: (child.rot ?? 0) + (g.rot ?? 0) || undefined,
-    flipH: (child.flipH || g.flipH) || undefined,
-    flipV: (child.flipV || g.flipV) || undefined,
+    flipH: (Boolean(child.flipH) !== Boolean(g.flipH)) || undefined,
+    flipV: (Boolean(child.flipV) !== Boolean(g.flipV)) || undefined,
   };
-  if (g.flipH) next.x = g.x + g.w - (next.x - g.x) - next.w;
-  if (g.flipV) next.y = g.y + g.h - (next.y - g.y) - next.h;
   return next;
 }
 
-function readTableCells(tbl: PNode): { grid: TableCell[][]; colWidths: number[]; rowHeights: number[]; firstRow?: boolean; bandRow?: boolean; firstCol?: boolean; bandCol?: boolean } {
+function readTableCells(tbl: PNode, imageEmbedIds: string[] = [], embedIdMap?: Record<string, string>): { grid: TableCell[][]; colWidths: number[]; rowHeights: number[]; firstRow?: boolean; bandRow?: boolean; firstCol?: boolean; bandCol?: boolean } {
   const grid: TableCell[][] = [];
   const colWidths: number[] = [];
   const rowHeights: number[] = [];
@@ -2427,7 +2441,7 @@ function readTableCells(tbl: PNode): { grid: TableCell[][]; colWidths: number[];
       let borders: TableCell["borders"] = undefined;
       let margins: TableCell["margins"] = undefined;
       if (tcPr) {
-        fill = readFill(tcPr, []);
+          fill = readFill(tcPr, imageEmbedIds, embedIdMap);
         const readSide = (tag: string): LayoutLine | undefined => {
           const s = pFind(tcPr, tag);
           if (!s) return undefined;
@@ -2534,7 +2548,16 @@ function walkSpTree(
       out.push({ kind: "text", z: zRef.z++, frame, fill, line, prst, text, isTitle, isPlaceholder: !!ph || undefined, effect, opacity, customPath });
     } else if (t === "p:pic") {
       const spPr = pFind(node, "p:spPr");
+      const nvPicPr = pFind(node, "p:nvPicPr");
+      const nvPr = nvPicPr ? pFind(nvPicPr, "p:nvPr") : undefined;
+      const ph = nvPr ? pFind(nvPr, "p:ph") : undefined;
+      const phType = ph ? pAttrs(ph)["@_type"] : undefined;
+      const phIdx = ph ? pAttrs(ph)["@_idx"] : undefined;
+      const phProtos = ph && parents ? lookupPlaceholderChain(parents, phType, phIdx) : [];
       let frame = readFrame(spPr);
+      if (!frame && phProtos.length) {
+        for (const proto of phProtos) { if (proto.frame) { frame = { ...proto.frame }; break; } }
+      }
       if (!frame) continue;
       if (group) frame = transformFrame(frame, group);
       const blipFill = pFind(node, "p:blipFill");
@@ -2563,7 +2586,16 @@ function walkSpTree(
 
     } else if (t === "p:cxnSp") {
       const spPr = pFind(node, "p:spPr");
+      const nvCxnSpPr = pFind(node, "p:nvCxnSpPr");
+      const nvPr = nvCxnSpPr ? pFind(nvCxnSpPr, "p:nvPr") : undefined;
+      const ph = nvPr ? pFind(nvPr, "p:ph") : undefined;
+      const phType = ph ? pAttrs(ph)["@_type"] : undefined;
+      const phIdx = ph ? pAttrs(ph)["@_idx"] : undefined;
+      const phProtos = ph && parents ? lookupPlaceholderChain(parents, phType, phIdx) : [];
       let frame = readFrame(spPr);
+      if (!frame && phProtos.length) {
+        for (const proto of phProtos) { if (proto.frame) { frame = { ...proto.frame }; break; } }
+      }
       if (!frame) continue;
       if (group) frame = transformFrame(frame, group);
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
@@ -2604,7 +2636,7 @@ function walkSpTree(
         let firstRow: boolean | undefined; let bandRow: boolean | undefined;
         let firstCol: boolean | undefined; let bandCol: boolean | undefined;
         if (tbl) {
-          const parsed = readTableCells(tbl);
+          const parsed = readTableCells(tbl, imageEmbedIds, embedIdMap);
           cellGrid = parsed.grid;
           colWidthsIn = parsed.colWidths.length ? parsed.colWidths : undefined;
           rowHeightsIn = parsed.rowHeights.length ? parsed.rowHeights : undefined;
