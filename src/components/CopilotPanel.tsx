@@ -211,12 +211,40 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
         </button>
       </div>
 
+      {/* Mode toggle */}
+      <div className="flex gap-1 border-b border-white/10 bg-white/[0.02] px-3 py-2">
+        <button
+          onClick={() => setMode("assist")}
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+            mode === "assist"
+              ? "bg-[#003FC7] text-white"
+              : "text-white/60 hover:bg-white/5 hover:text-white"
+          }`}
+        >
+          <Wand2 className="h-3.5 w-3.5" />
+          Edit for me
+        </button>
+        <button
+          onClick={() => setMode("guide")}
+          className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+            mode === "guide"
+              ? "bg-[#003FC7] text-white"
+              : "text-white/60 hover:bg-white/5 hover:text-white"
+          }`}
+        >
+          <BookOpen className="h-3.5 w-3.5" />
+          Guide me
+        </button>
+      </div>
+
       {/* Transcript */}
       <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-5 py-5 text-sm">
         {messages.length === 0 && (
           <div className="space-y-4">
             <div className="text-white/70">
-              I can edit this deck directly. Tell me what to change and I'll make the smallest edit that gets it right.
+              {mode === "guide"
+                ? "I'll walk you through editing this deck step-by-step — between this app and PowerPoint. Ask me anything about the workflow."
+                : "I can edit this deck directly. Tell me what to change and I'll make the smallest edit that gets it right."}
             </div>
             <div className="space-y-2">
               {suggestions.map((s) => (
