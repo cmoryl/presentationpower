@@ -204,12 +204,13 @@ export const reparseImportedDeck = createServerFn({ method: "POST" })
 
     const { data: row } = await s
       .from("imported_decks")
-      .select("id, original_filename, storage_path, slides")
+      .select("id, division_id, original_filename, storage_path, slides")
       .eq("id", data.id)
       .maybeSingle();
     if (!row) throw new Error("Deck not found");
     const r = row as {
       id: string;
+      division_id: string;
       original_filename: string;
       storage_path: string;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -238,8 +239,43 @@ export const reparseImportedDeck = createServerFn({ method: "POST" })
       existingBySlide.set(sl.index, sl.imagePaths ?? []);
     }
 
-    const slidesLite = parsed.slides.map((sl) => {
-      const savedPaths = existingBySlide.get(sl.index) ?? [];
+    const imageryDivision = normalizeImportedDeckDivision(r.division_id);
+    const slidesLite = await Promise.all(parsed.slides.map(async (sl) => {
+      const savedPaths = [...(existingBySlide.get(sl.index) ?? [])];
+      for (let j = savedPaths.length; j < sl.images.length; j++) {
+        const dataUrl = sl.images[j];
+        const m = /^data:([^;]+);base64,(.+)$/.exec(dataUrl);
+        if (!m) continue;
+        const contentType = m[1];
+        const bin = Buffer.from(m[2], "base64");
+        if (bin.length === 0) continue;
+        const ext = contentType.split("/")[1]?.split("+")[0] ?? "bin";
+        const imgId = crypto.randomUUID();
+        const baseName = r.original_filename.replace(/\.pptx$/i, "");
+        const imgFilename = `${baseName}__slide-${sl.index + 1}-${j + 1}.${ext}`.replace(/[^\w.\-]+/g, "_").slice(-160);
+        const imgPath = `${context.userId}/${imgId}-${imgFilename}`;
+        const upImg = await s.storage
+          .from("division-imagery")
+          .upload(imgPath, bin, { contentType, upsert: false });
+        if (upImg.error) continue;
+        const { error: rowErr } = await s.from("division_imagery").insert({
+          id: imgId,
+          division_id: imageryDivision,
+          uploaded_by: context.userId,
+          filename: imgFilename,
+          content_type: contentType,
+          size_bytes: bin.length,
+          storage_path: imgPath,
+          kind: "upload",
+          tags: ["imported_deck", "re_extracted", `slide-${sl.index + 1}`, r.division_id],
+          note: `Re-extracted from ${r.original_filename} · slide ${sl.index + 1}`,
+        });
+        if (rowErr) {
+          await s.storage.from("division-imagery").remove([imgPath]).catch(() => {});
+          continue;
+        }
+        savedPaths.push(imgPath);
+      }
       const embedToPath = new Map<string, string>();
       sl.imageEmbedIds.forEach((eid, idx) => {
         const p = savedPaths[idx];
@@ -282,7 +318,7 @@ export const reparseImportedDeck = createServerFn({ method: "POST" })
         imagePaths: savedPaths,
         layout,
       };
-    });
+    }));
 
     const withLayout = slidesLite.filter((sl) => sl.layout).length;
     const withShapes = slidesLite.filter((sl) => (sl.layout?.shapes?.length ?? 0) > 0).length;
