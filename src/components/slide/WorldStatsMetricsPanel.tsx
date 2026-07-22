@@ -260,6 +260,9 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
         <div className="mt-2 text-[10px] text-black/45">
           Filters apply to the map, the legend scale, the headline total, and the top-locations list.
         </div>
+      </div>
+
+
 
 
       {/* Metrics list */}
