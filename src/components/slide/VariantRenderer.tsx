@@ -4053,8 +4053,8 @@ function renderVariantBody({
               const v = Number(it.value) || 0;
               const h = Math.max(40, (v / max) * 420);
               const isLast = i === items.length - 1;
-              const color = isLast ? brand.tokens.accent : brand.tokens.primary;
-              const opacity = isLast ? 1 : 0.35 + (i / Math.max(items.length - 1, 1)) * 0.5;
+              const color = isLast ? "var(--slide-accent-text)" : ink.trackFill;
+              const opacity = 1;
               return (
                 <div key={i} className="flex flex-col items-center justify-end">
                   <div style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1 }}>
@@ -5381,26 +5381,19 @@ function Sparkline({ brand, values, w = 380, h = 100, filled = true, peakPin = f
   const pts = vals.map((v, i) => [pad + i * step, h - pad - ((v - min) / range) * (h - pad * 2)] as [number, number]);
   const linePath = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
   const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - pad} L${pts[0][0].toFixed(1)},${h - pad} Z` : "";
-  const id = `spark-${brand.id}-${vals.length}-${Math.round(min * 10)}-${Math.round(max * 10)}`;
   const peakIdx = vals.indexOf(max);
   const peak = pts[peakIdx];
+  // Editorial: flat accent, hairline baseline, quiet area fill. No gradient defs.
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      <defs>
-        <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={brand.tokens.accent} stopOpacity="0.35" />
-          <stop offset="100%" stopColor={brand.tokens.accent} stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      {filled && <path d={areaPath} fill={`url(#${id})`} />}
+      {filled && <path d={areaPath} fill="var(--slide-accent-text)" fillOpacity={0.08} />}
       <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke={ink.hairline} strokeWidth={1} />
-      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={5} fill="var(--slide-accent-text)" />}
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={3.5} fill="var(--slide-accent-text)" />}
       {peakPin && peak && (
         <g>
-          <line x1={peak[0]} y1={peak[1]} x2={peak[0]} y2={Math.max(peak[1] - 22, 6)} stroke="var(--slide-accent-text)" strokeWidth={1} />
-          <rect x={peak[0] - 22} y={Math.max(peak[1] - 34, 0)} width={44} height={13} fill="var(--slide-accent-text)" rx={2} />
-          <text x={peak[0]} y={Math.max(peak[1] - 24, 10)} textAnchor="middle" fontSize={8} fontWeight={700} fill={ink.strong} style={{ letterSpacing: "0.18em" }}>{peakLabel}</text>
+          <line x1={peak[0]} y1={peak[1]} x2={peak[0]} y2={Math.max(peak[1] - 18, 6)} stroke={ink.hairlineStrong} strokeWidth={1} />
+          <text x={peak[0]} y={Math.max(peak[1] - 22, 10)} textAnchor="middle" fontSize={9} fontWeight={600} fill={ink.muted} style={{ letterSpacing: "0.22em" }}>{peakLabel}</text>
         </g>
       )}
     </svg>
@@ -5408,39 +5401,19 @@ function Sparkline({ brand, values, w = 380, h = 100, filled = true, peakPin = f
 }
 
 // ── Editorial data primitives ─────────────────────────────────────────
-function DotGridBackdrop({ opacity = 0.08 }: { opacity?: number }) {
-  const ink = useSlideInk();
-  return (
-    <div
-      aria-hidden
-      style={{
-        position: "absolute",
-        inset: 0,
-        opacity,
-        pointerEvents: "none",
-        backgroundImage: `radial-gradient(${ink.text} 1px, transparent 1px)`,
-        backgroundSize: "48px 48px",
-        maskImage: "radial-gradient(ellipse at center, black 40%, transparent 90%)",
-        WebkitMaskImage: "radial-gradient(ellipse at center, black 40%, transparent 90%)",
-      }}
-    />
-  );
+// DotGridBackdrop retired as decorative chartjunk. Kept as no-op for callers.
+function DotGridBackdrop(_props: { opacity?: number } = {}) {
+  return null;
 }
 
-function LiveMetaFooter({ brand, source, refCode, live = true }: { brand: BrandMode; source?: string; refCode?: string; live?: boolean }) {
+function LiveMetaFooter({ brand: _brand, source, refCode }: { brand: BrandMode; source?: string; refCode?: string; live?: boolean }) {
   const ink = useSlideInk();
   return (
-    <div className="flex items-center justify-between" style={{ borderTop: `1px solid ${ink.hairline}`, paddingTop: 20, fontSize: 12, letterSpacing: "0.22em", color: ink.faint, fontWeight: 500, textTransform: "uppercase" }}>
+    <div className="flex items-center justify-between" style={{ borderTop: `1px solid ${ink.hairline}`, paddingTop: 16, fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 500, textTransform: "uppercase" }}>
       <div className="flex gap-10">
         {source && <span>Source · {source}</span>}
         {refCode && <span>Ref · {refCode}</span>}
       </div>
-      {live && (
-        <div className="flex items-center gap-2">
-          <span style={{ width: 8, height: 8, borderRadius: 99, background: brand.tokens.accent, boxShadow: `0 0 12px ${brand.tokens.accent}` }} />
-          <span>Live signal</span>
-        </div>
-      )}
     </div>
   );
 }
@@ -5510,70 +5483,51 @@ function SummaryStatCard({ brand, label, value, unit, series }: { brand: BrandMo
 }
 
 
-function Donut({ brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
+function Donut({ brand: _brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
   const ink = useSlideInk();
   const p = Math.max(0, Math.min(100, percent));
-  const stroke = 14;
+  const stroke = 8; // hairline ring, editorial
   const r = (size - stroke) / 2;
   const circ = 2 * Math.PI * r;
   const dash = (p / 100) * circ;
-  const gradId = `donut-grad-${brand.id}-${size}-${Math.round(p)}`;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
-      <defs>
-        <linearGradient id={gradId} x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0%" stopColor={brand.tokens.accent} />
-          <stop offset="100%" stopColor={brand.tokens.primary} />
-        </linearGradient>
-      </defs>
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={ink.trackFill} strokeWidth={stroke} />
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={`url(#${gradId})`} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
-      <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central" fontSize={size * 0.24} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.02em" }}>
-        {Math.round(p)}%
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke} strokeLinecap="butt" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+      <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central" fontSize={size * 0.32} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}>
+        {Math.round(p)}
       </text>
+      <text x={size / 2} y={size / 2 + size * 0.19} textAnchor="middle" fontSize={size * 0.075} fontWeight={500} fill={ink.faint} style={{ letterSpacing: "0.22em" }}>%</text>
     </svg>
   );
 }
 
-function SemiGauge({ brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
+function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
   const ink = useSlideInk();
   const p = Math.max(0, Math.min(100, percent));
-  const stroke = 14;
+  const stroke = 6; // hairline arc
   const r = (size - stroke) / 2;
   const cy = size / 2 + r / 2;
   const arcC = Math.PI * r;
   const dash = (p / 100) * arcC;
-  const h = size / 2 + stroke;
+  const h = size / 2 + stroke + 8;
   const arc = `M ${stroke / 2} ${cy} A ${r} ${r} 0 0 1 ${size - stroke / 2} ${cy}`;
-  const gradId = `gauge-grad-${brand.id}-${size}-${Math.round(p)}`;
-  // Needle pointer end — thin editorial line from center to arc tip
-  const angle = Math.PI * (1 - p / 100); // 0=right, pi=left
   const cx = size / 2;
-  const nx = cx + Math.cos(angle) * (r - 4);
-  const ny = cy - Math.sin(angle) * (r - 4);
   return (
     <svg width={size} height={h} viewBox={`0 0 ${size} ${h}`} aria-hidden>
-      <defs>
-        <linearGradient id={gradId} x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0%" stopColor={brand.tokens.primary} />
-          <stop offset="100%" stopColor={brand.tokens.accent} />
-        </linearGradient>
-      </defs>
-      <path d={arc} fill="none" stroke={ink.trackFill} strokeWidth={stroke} strokeLinecap="round" />
-      <path d={arc} fill="none" stroke={`url(#${gradId})`} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${arcC}`} />
-      <line x1={cx} y1={cy} x2={nx} y2={ny} stroke={ink.text} strokeWidth={1.5} />
-      <circle cx={cx} cy={cy} r={3} fill={ink.text} />
-      <circle cx={nx} cy={ny} r={4} fill="var(--slide-accent-text)" />
-      <text x={cx} y={cy - 22} textAnchor="middle" fontSize={size * 0.22} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
-        {Math.round(p)}%
+      <path d={arc} fill="none" stroke={ink.trackFill} strokeWidth={stroke} strokeLinecap="butt" />
+      <path d={arc} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke} strokeLinecap="butt" strokeDasharray={`${dash} ${arcC}`} />
+      <text x={cx} y={cy - 24} textAnchor="middle" fontSize={size * 0.34} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}>
+        {Math.round(p)}
       </text>
+      <text x={cx} y={cy - 6} textAnchor="middle" fontSize={size * 0.075} fontWeight={500} fill={ink.faint} style={{ letterSpacing: "0.22em" }}>%</text>
     </svg>
   );
 }
 
 
 
-function AreaChart({ brand, series, height = 480 }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number }) {
+function AreaChart({ brand: _brand, series, height = 480 }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number }) {
   const ink = useSlideInk();
   const w = 1000;
   const h = height;
@@ -5586,32 +5540,21 @@ function AreaChart({ brand, series, height = 480 }: { brand: BrandMode; series: 
   const pts = series.map((p, i) => [padL + i * step, padT + (h - padT - padB) * (1 - (p.value - min) / range)] as [number, number]);
   const linePath = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
   const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z` : "";
-  const id = `area-${brand.id}-${series.length}`;
-  const lineId = `area-line-${brand.id}-${series.length}`;
+  const showEvery = series.length > 8 ? Math.ceil(series.length / 8) : 1;
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      <defs>
-        <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={brand.tokens.accent} stopOpacity="0.32" />
-          <stop offset="100%" stopColor={brand.tokens.accent} stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id={lineId} x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0%" stopColor={brand.tokens.primary} />
-          <stop offset="100%" stopColor={brand.tokens.accent} />
-        </linearGradient>
-      </defs>
       <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairline} strokeWidth={1} />
-      {areaPath && <path d={areaPath} fill={`url(#${id})`} />}
-      <path d={linePath} fill="none" stroke={`url(#${lineId})`} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={7} fill="var(--slide-accent-text)" />}
-      {series.map((p, i) => (
-        <text key={i} x={pts[i]?.[0]} y={h - padB + 32} textAnchor="middle" fontSize={20} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
-      ))}
+      {areaPath && <path d={areaPath} fill="var(--slide-accent-text)" fillOpacity={0.10} />}
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={4} fill="var(--slide-accent-text)" />}
+      {series.map((p, i) => (i % showEvery === 0 || i === series.length - 1) ? (
+        <text key={i} x={pts[i]?.[0]} y={h - padB + 28} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{p.label}</text>
+      ) : null)}
     </svg>
   );
 }
 
-function BarChart({ brand, bars, height = 480, highlight }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string }) {
+function BarChart({ brand: _brand, bars, height = 480, highlight }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string }) {
   const ink = useSlideInk();
   const w = 900;
   const h = height;
@@ -5619,34 +5562,21 @@ function BarChart({ brand, bars, height = 480, highlight }: { brand: BrandMode; 
   const max = Math.max(1, ...bars.map((b) => b.value));
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(bars.length, 1);
-  const barW = slot * 0.55;
-  const gradId = `bar-grad-${brand.id}-${bars.length}`;
-  const hiGradId = `bar-hi-${brand.id}-${bars.length}`;
+  const barW = slot * 0.5;
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      <defs>
-        <linearGradient id={gradId} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={brand.tokens.primary} stopOpacity="0.9" />
-          <stop offset="100%" stopColor={brand.tokens.primary} stopOpacity="0.35" />
-        </linearGradient>
-        <linearGradient id={hiGradId} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={brand.tokens.accent} />
-          <stop offset="100%" stopColor={brand.tokens.primary} />
-        </linearGradient>
-      </defs>
-      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairline} strokeWidth={1} />
+      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
       {bars.map((b, i) => {
         const bh = (b.value / max) * chartH;
         const x = padL + i * slot + (slot - barW) / 2;
         const y = h - padB - bh;
         const isHi = highlight ? b.label === highlight : false;
-        const fillUrl = isHi ? `url(#${hiGradId})` : `url(#${gradId})`;
-        const opacity = isHi ? 1 : 0.5 + (i / Math.max(bars.length - 1, 1)) * 0.45;
+        const fill = isHi ? "var(--slide-accent-text)" : ink.trackFill;
         return (
           <g key={i}>
-            <rect x={x} y={y} width={barW} height={bh} fill={fillUrl} opacity={opacity} rx={4} />
-            <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={20} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{b.label}</text>
-            <text x={x + barW / 2} y={y - 10} textAnchor="middle" fontSize={22} fontWeight={600} fill={ink.text}>{b.value}</text>
+            <rect x={x} y={y} width={barW} height={bh} fill={fill} />
+            <text x={x + barW / 2} y={h - padB + 30} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{b.label}</text>
+            <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={isHi ? 26 : 18} fontWeight={600} fill={isHi ? ink.text : ink.muted} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{b.value}</text>
           </g>
         );
       })}
@@ -5671,49 +5601,38 @@ function ReportCard({ brand, item }: { brand: BrandMode; item: Item }) {
   );
 }
 
-function ProgressBar({ brand, percent }: { brand: BrandMode; percent: number }) {
+function ProgressBar({ brand: _brand, percent }: { brand: BrandMode; percent: number }) {
   const ink = useSlideInk();
   const p = Math.max(0, Math.min(100, percent));
   return (
-    <div style={{ position: "relative", height: 10, background: ink.trackFill, flex: 1, borderRadius: 999 }}>
-      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${p}%`, background: `linear-gradient(90deg, ${brand.tokens.primary}, ${brand.tokens.accent})`, borderRadius: 999 }} />
+    <div style={{ position: "relative", height: 4, background: ink.trackFill, flex: 1 }}>
+      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${p}%`, background: "var(--slide-accent-text)" }} />
     </div>
   );
 }
 
 // ── Graph helpers (Batch 4) ────────────────────────────────────────────
-function AxisBarChart({ brand, bars, height = 480, highlight, unit }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string; unit?: string }) {
+function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string; unit?: string }) {
   const ink = useSlideInk();
   const w = 1720;
   const h = height;
-  const padL = 90, padR = 40, padT = 30, padB = 60;
+  const padL = 90, padR = 40, padT = 40, padB = 60;
   const max = Math.max(1, ...bars.map((b) => b.value));
   const niceMax = Math.ceil(max * 1.1);
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(bars.length, 1);
-  const barW = slot * 0.5;
+  const barW = slot * 0.44;
   const ticks = 4;
-  const gradId = `axisbar-${brand.id}-${bars.length}`;
-  const hiGradId = `axisbar-hi-${brand.id}-${bars.length}`;
+  const hiValue = bars.find((b) => b.label === highlight)?.value;
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      <defs>
-        <linearGradient id={gradId} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={brand.tokens.primary} stopOpacity="0.7" />
-          <stop offset="100%" stopColor={brand.tokens.primary} stopOpacity="0.3" />
-        </linearGradient>
-        <linearGradient id={hiGradId} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={brand.tokens.accent} />
-          <stop offset="100%" stopColor={brand.tokens.primary} />
-        </linearGradient>
-      </defs>
       {Array.from({ length: ticks + 1 }, (_, i) => {
         const y = padT + (chartH / ticks) * i;
         const val = niceMax * (1 - i / ticks);
         return (
           <g key={i}>
-            <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.trackFill} strokeWidth={1} />
-            <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={16} fill={ink.faint}>{val.toFixed(1)}{unit || ""}</text>
+            <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} opacity={i === ticks ? 1 : 0.6} />
+            <text x={padL - 14} y={y + 5} textAnchor="end" fontSize={14} fill={ink.faint} style={{ fontVariantNumeric: "tabular-nums" }}>{val.toFixed(0)}{unit || ""}</text>
           </g>
         );
       })}
@@ -5724,8 +5643,11 @@ function AxisBarChart({ brand, bars, height = 480, highlight, unit }: { brand: B
         const isHi = highlight ? b.label === highlight : false;
         return (
           <g key={i}>
-            <rect x={x} y={y} width={barW} height={bh} fill={isHi ? `url(#${hiGradId})` : `url(#${gradId})`} rx={4} />
-            <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={18} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{b.label}</text>
+            <rect x={x} y={y} width={barW} height={bh} fill={isHi ? "var(--slide-accent-text)" : ink.trackFill} />
+            {isHi && hiValue !== undefined && (
+              <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={22} fontWeight={600} fill={ink.text} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{b.value}{unit || ""}</text>
+            )}
+            <text x={x + barW / 2} y={h - padB + 30} textAnchor="middle" fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{b.label}</text>
           </g>
         );
       })}
@@ -5745,10 +5667,10 @@ function DonutBlock({ brand, item }: { brand: BrandMode; item: Item }) {
   );
 }
 
-function ConcentricRings({ brand, items, size = 480 }: { brand: BrandMode; items: { label: string; value: number }[]; size?: number }) {
+function ConcentricRings({ brand: _brand, items, size = 480 }: { brand: BrandMode; items: { label: string; value: number }[]; size?: number }) {
   const ink = useSlideInk();
-  const stroke = 22;
-  const gap = 8;
+  const stroke = 10; // hairline rings — subtraction pass
+  const gap = 12;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
       {items.map((it, i) => {
@@ -5756,12 +5678,12 @@ function ConcentricRings({ brand, items, size = 480 }: { brand: BrandMode; items
         if (r <= 0) return null;
         const circ = 2 * Math.PI * r;
         const dash = (Math.max(0, Math.min(100, it.value)) / 100) * circ;
-        const color = i === 0 ? brand.tokens.accent : brand.tokens.primary;
-        const opacity = i === 0 ? 1 : 0.4 + (1 - i / items.length) * 0.5;
+        // Only outer ring wears the accent; inner rings use ink at graduated opacity.
+        const isPrimary = i === 0;
         return (
           <g key={i}>
             <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={ink.trackFill} strokeWidth={stroke} />
-            <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeOpacity={opacity} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+            <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={isPrimary ? "var(--slide-accent-text)" : ink.strong} strokeOpacity={isPrimary ? 1 : Math.max(0.35, 0.85 - i * 0.15)} strokeWidth={stroke} strokeLinecap="butt" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
           </g>
         );
       })}
@@ -5770,7 +5692,7 @@ function ConcentricRings({ brand, items, size = 480 }: { brand: BrandMode; items
 }
 
 
-function DecadeAreaChart({ brand, series, height = 480, calloutLabel, calloutNote }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; calloutLabel?: string; calloutNote?: string }) {
+function DecadeAreaChart({ brand: _brand, series, height = 480, calloutLabel, calloutNote }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; calloutLabel?: string; calloutNote?: string }) {
   const ink = useSlideInk();
   const w = 1720;
   const h = height;
@@ -5794,30 +5716,23 @@ function DecadeAreaChart({ brand, series, height = 480, calloutLabel, calloutNot
   };
   const linePath = smooth(pts);
   const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z` : "";
-  const id = `dec-${brand.id}`;
   const highlightIdx = series.findIndex((p) => p.label === calloutLabel);
   const hi = highlightIdx >= 0 ? pts[highlightIdx] : null;
+  const showEvery = series.length > 10 ? 2 : 1;
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      <defs>
-        <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={brand.tokens.primary} stopOpacity="0.28" />
-          <stop offset="100%" stopColor={brand.tokens.primary} stopOpacity="0" />
-        </linearGradient>
-      </defs>
       <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
-      {areaPath && <path d={areaPath} fill={`url(#${id})`} />}
-      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
-      {series.map((p, i) => (
-        <text key={i} x={pts[i]?.[0]} y={h - padB + 34} textAnchor="middle" fontSize={18} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
-      ))}
+      {areaPath && <path d={areaPath} fill="var(--slide-accent-text)" fillOpacity={0.08} />}
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      {series.map((p, i) => (i % showEvery === 0 || i === series.length - 1) ? (
+        <text key={i} x={pts[i]?.[0]} y={h - padB + 30} textAnchor="middle" fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{p.label}</text>
+      ) : null)}
       {hi && (
         <g>
-          <circle cx={hi[0]} cy={hi[1]} r={9} fill="var(--slide-accent-text)" />
-          <circle cx={hi[0]} cy={hi[1]} r={16} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeOpacity={0.35} />
-          <line x1={hi[0]} y1={hi[1] - 20} x2={hi[0]} y2={hi[1] - 90} stroke="var(--slide-accent-text)" strokeWidth={1} />
-          <text x={hi[0]} y={hi[1] - 148} textAnchor="middle" fontSize={20} fontWeight={600} fill={ink.strong} style={{ letterSpacing: "-0.01em" }}>{calloutLabel}</text>
-          <text x={hi[0]} y={hi[1] - 118} textAnchor="middle" fontSize={16} fill={ink.muted}>{calloutNote}</text>
+          <circle cx={hi[0]} cy={hi[1]} r={4} fill="var(--slide-accent-text)" />
+          <line x1={hi[0]} y1={hi[1] - 10} x2={hi[0]} y2={Math.max(hi[1] - 96, 12)} stroke={ink.hairlineStrong} strokeWidth={1} />
+          <text x={hi[0]} y={Math.max(hi[1] - 108, 20)} textAnchor="middle" fontSize={18} fontWeight={600} fill={ink.strong} style={{ letterSpacing: "-0.01em" }}>{calloutLabel}</text>
+          <text x={hi[0]} y={Math.max(hi[1] - 84, 44)} textAnchor="middle" fontSize={14} fill={ink.muted}>{calloutNote}</text>
         </g>
       )}
     </svg>
@@ -5966,13 +5881,13 @@ function StackedAreaChart({ brand, series, xLabels, unit, height = 480 }: { bran
   );
 }
 
-function WaterfallChart({ brand, steps, unit, height = 500 }: { brand: BrandMode; steps: { label: string; value: number; kind: "start" | "up" | "down" | "end" }[]; unit?: string; height?: number }) {
+function WaterfallChart({ brand: _brand, steps, unit, height = 500 }: { brand: BrandMode; steps: { label: string; value: number; kind: "start" | "up" | "down" | "end" }[]; unit?: string; height?: number }) {
   const ink = useSlideInk();
   const w = 1720, h = height;
-  const padL = 90, padR = 40, padT = 30, padB = 90;
+  const padL = 90, padR = 40, padT = 40, padB = 90;
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(steps.length, 1);
-  const barW = slot * 0.55;
+  const barW = slot * 0.5;
   let running = 0;
   const bars = steps.map((st) => {
     if (st.kind === "start" || st.kind === "end") {
@@ -5993,21 +5908,21 @@ function WaterfallChart({ brand, steps, unit, height = 500 }: { brand: BrandMode
         const x = padL + i * slot + (slot - barW) / 2;
         const y = scale(b.top);
         const bh = scale(b.base) - scale(b.top);
-        let fill = brand.tokens.primary;
-        if (b.kind === "up") fill = brand.tokens.accent;
-        else if (b.kind === "down") fill = "color-mix(in oklab, currentColor 62%, transparent)";
-        else if (b.kind === "start" || b.kind === "end") fill = brand.tokens.primary;
+        // Meaningful encoding: start/end = solid ink; up = accent; down = quiet track.
+        let fill = ink.strong;
+        if (b.kind === "up") fill = "var(--slide-accent-text)";
+        else if (b.kind === "down") fill = ink.trackFill;
         const prev = bars[i - 1];
         return (
           <g key={i}>
             {prev && (
-              <line x1={x - (slot - barW)} y1={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} x2={x} y2={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} stroke={ink.hairlineStrong} strokeDasharray="4 4" />
+              <line x1={x - (slot - barW)} y1={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} x2={x} y2={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} stroke={ink.hairline} strokeDasharray="3 3" />
             )}
-            <rect x={x} y={y} width={barW} height={Math.max(2, bh)} fill={fill} opacity={b.kind === "start" || b.kind === "end" ? 1 : 0.92} />
-            <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={18} fontWeight={600} fill={ink.strong}>
+            <rect x={x} y={y} width={barW} height={Math.max(2, bh)} fill={fill} />
+            <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={16} fontWeight={600} fill={b.kind === "down" ? ink.muted : ink.text} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.01em" }}>
               {b.kind === "up" ? "+" : b.kind === "down" ? "−" : ""}{Math.abs(b.value).toFixed(1)}{unit || ""}
             </text>
-            <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={15} fill={ink.faint} style={{ letterSpacing: "0.12em", textTransform: "uppercase" }}>{b.label}</text>
+            <text x={x + barW / 2} y={h - padB + 30} textAnchor="middle" fontSize={13} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{b.label}</text>
           </g>
         );
       })}
