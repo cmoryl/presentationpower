@@ -3674,17 +3674,26 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-16 grid" style={{ gridTemplateColumns: "1fr 1px 1fr 1px 1fr" }}>
+          <div className="mt-20 grid" style={{ gridTemplateColumns: "1fr 1px 1fr 1px 1fr" }}>
             {items.map((it, i) => (
-              <>
-                {i > 0 && <div key={`d-${i}`} style={{ background: ink.divider }} />}
-                <div key={i} className="px-10">
-                  <StatFigure brand={brand} value={s(it.value)} unit={s(it.unit)} label={s(it.label)} source={s(it.source) || undefined} size="xl" />
+              <React.Fragment key={i}>
+                {i > 0 && <div style={{ background: ink.hairline }} />}
+                <div className="px-10">
+                  <div className="uppercase" style={{ fontSize: 13, letterSpacing: "0.28em", fontWeight: 700, color: "var(--slide-accent-text)" }}>
+                    {s(it.label) || `0${i + 1}`}
+                  </div>
+                  <div className="mt-6 tabular-nums flex items-baseline gap-2" style={{ fontSize: 108, fontWeight: 600, lineHeight: 0.95, letterSpacing: "-0.04em", color: ink.strong }}>
+                    <span>{s(it.value) || "—"}</span>
+                    {s(it.unit) && <span style={{ fontSize: 52, fontWeight: 500, letterSpacing: "-0.02em" }}>{s(it.unit)}</span>}
+                  </div>
                   {s(it.note) && (
-                    <div className="mt-6" style={{ fontSize: 22, lineHeight: 1.4, color: ink.body, maxWidth: 420 }}>{s(it.note)}</div>
+                    <div className="mt-8" style={{ fontSize: 20, lineHeight: 1.5, color: ink.body, maxWidth: 460 }}>{s(it.note)}</div>
+                  )}
+                  {s(it.source) && (
+                    <div className="mt-6 uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}>{s(it.source)}</div>
                   )}
                 </div>
-              </>
+              </React.Fragment>
             ))}
           </div>
         </SlideFrame>
