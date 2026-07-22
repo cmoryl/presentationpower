@@ -1795,17 +1795,7 @@ function renderVariantBody({
           : [];
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
-          {/* Ambient cinematic glow */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              backgroundImage: `
-                radial-gradient(55% 60% at 15% 90%, ${brand.tokens.accent}38 0%, transparent 65%),
-                radial-gradient(40% 50% at 90% 10%, ${brand.tokens.accent}1F 0%, transparent 70%)
-              `,
-            }}
-          />
+          <AuroraOrb x={88} y={28} size={860} />
           <div className="relative grid h-full grid-cols-[1.1fr_0.9fr] items-center gap-24">
             <div>
               <div className="flex items-center gap-4">
@@ -1830,49 +1820,16 @@ function renderVariantBody({
               )}
             </div>
             {steps.length > 0 && (
-              <div
-                className="relative overflow-hidden rounded-3xl p-10"
-                style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  backgroundImage: `radial-gradient(120% 80% at 0% 0%, ${brand.tokens.accent}22 0%, transparent 60%)`,
-                }}
-              >
-                <div
-                  aria-hidden
-                  className="absolute inset-x-0 top-0 h-[3px]"
-                  style={{ background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 85%)` }}
-                />
-                <div className="uppercase" style={{ fontSize: 15, letterSpacing: "0.24em", fontWeight: 600, color: ink.faint }}>
-                  Next steps
-                </div>
-                <div className="mt-8 space-y-6">
-                  {steps.slice(0, 4).map((it, i) => (
-                    <div key={i} className="grid grid-cols-[56px_1fr] items-baseline gap-5">
-                      <div
-                        className="tabular-nums"
-                        style={{
-                          fontSize: 32,
-                          fontWeight: 600,
-                          letterSpacing: "-0.02em",
-                          color: "var(--slide-accent-text)",
-                          lineHeight: 1,
-                        }}
-                      >
-                        {String(i + 1).padStart(2, "0")}
-                      </div>
-                      <div style={{ fontSize: 26, lineHeight: 1.32, color: ink.strong, fontWeight: 500 }}>
-                        {s(it.label ?? it.title ?? it.body)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <AuroraSidePanel
+                kicker="Next steps"
+                items={steps.slice(0, 4).map((it) => ({ label: s(it.label ?? it.title ?? it.body) }))}
+              />
             )}
           </div>
         </SlideFrame>
       );
     }
+
 
     case "MV-CLOSE-THANKS":
       return (
