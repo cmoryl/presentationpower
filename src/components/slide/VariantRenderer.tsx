@@ -5722,7 +5722,7 @@ function ConcentricRings({ brand: _brand, items, size = 480 }: { brand: BrandMod
 
 
 
-function DecadeAreaChart({ brand: _brand, series, height = 480, calloutLabel, calloutNote, bare = false }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; calloutLabel?: string; calloutNote?: string; bare?: boolean }) {
+function DecadeAreaChart({ brand: _brand, series, height = 480, calloutLabel, calloutNote }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; calloutLabel?: string; calloutNote?: string; bare?: boolean }) {
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
   const w = 1720;
@@ -5750,20 +5750,18 @@ function DecadeAreaChart({ brand: _brand, series, height = 480, calloutLabel, ca
   const highlightIdx = series.findIndex((p) => p.label === calloutLabel);
   const hi = highlightIdx >= 0 ? pts[highlightIdx] : null;
   const showEvery = series.length > 10 ? 2 : 1;
-  const svg = (
+  return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      <ChartAccentDefs id={id} />
+      <AiryDefs id={id} />
       <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
-      {areaPath && <path d={areaPath} fill={`url(#${id}-fill)`} />}
-      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" opacity={0.3} filter={`url(#${id}-glow)`} />
-      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+      {areaPath && <path d={areaPath} fill={`url(#${id}-airy)`} />}
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
       {series.map((p, i) => (i % showEvery === 0 || i === series.length - 1) ? (
         <text key={i} x={pts[i]?.[0]} y={h - padB + 30} textAnchor="middle" fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{p.label}</text>
       ) : null)}
       {hi && (
         <g>
-          <circle cx={hi[0]} cy={hi[1]} r={11} fill="var(--slide-accent-text)" opacity={0.32} filter={`url(#${id}-glow)`} />
-          <circle cx={hi[0]} cy={hi[1]} r={5} fill={`url(#${id}-dot)`} />
+          <circle cx={hi[0]} cy={hi[1]} r={4.5} fill="var(--slide-accent-text)" />
           <line x1={hi[0]} y1={hi[1] - 12} x2={hi[0]} y2={Math.max(hi[1] - 96, 12)} stroke={ink.hairlineStrong} strokeWidth={1} />
           <text x={hi[0]} y={Math.max(hi[1] - 108, 20)} textAnchor="middle" fontSize={18} fontWeight={600} fill={ink.strong} style={{ letterSpacing: "-0.01em" }}>{calloutLabel}</text>
           <text x={hi[0]} y={Math.max(hi[1] - 84, 44)} textAnchor="middle" fontSize={14} fill={ink.muted}>{calloutNote}</text>
@@ -5771,8 +5769,6 @@ function DecadeAreaChart({ brand: _brand, series, height = 480, calloutLabel, ca
       )}
     </svg>
   );
-  if (bare) return svg;
-  return <GlassChartPanel padding="px-6 py-6" bloomAnchor="tr">{svg}</GlassChartPanel>;
 }
 
 
