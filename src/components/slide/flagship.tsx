@@ -501,14 +501,16 @@ export function AuroraLayer({
   brand,
   intensity = 1,
   className = "",
+  baseTint,
 }: {
   seed?: string;
   brand: BrandMode;
   intensity?: number;
   className?: string;
+  baseTint?: string;
 }) {
   const mode = useSlideMode();
-  const base = mode === "dark" ? "#03002C" : "#FFFFFF";
+  const base = baseTint ?? (mode === "dark" ? "#03002C" : "#FFFFFF");
   const orbs = useMemo(() => auroraOrbs(seed, brand, mode), [seed, brand, mode]);
   return (
     <div
