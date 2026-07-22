@@ -509,7 +509,7 @@ export function AuroraLayer({
 }) {
   const mode = useSlideMode();
   const base = mode === "dark" ? "#03002C" : "#FFFFFF";
-  const orbs = useMemo(() => auroraOrbs(seed, brand), [seed, brand]);
+  const orbs = useMemo(() => auroraOrbs(seed, brand, mode), [seed, brand, mode]);
   return (
     <div
       aria-hidden
@@ -520,7 +520,7 @@ export function AuroraLayer({
         viewBox="0 0 1280 720"
         preserveAspectRatio="xMidYMid slice"
         className="absolute inset-0 h-full w-full"
-        style={{ opacity: mode === "dark" ? intensity : intensity * 0.55 }}
+        style={{ opacity: mode === "dark" ? intensity : intensity * 0.38 }}
       >
         <defs>
           {orbs.map((o, i) => (
@@ -547,22 +547,24 @@ export function AuroraLayer({
           ))}
         </g>
       </svg>
-      {/* Vignette to keep glass cards readable */}
+      {/* Vignette to keep glass cards readable. Light mode uses a stronger
+          center-clear wash so per-division accent colour stays visible at the
+          edges without washing out headings, chips or charts in the middle. */}
       <div
         className="absolute inset-0"
         style={{
           backgroundImage:
             mode === "dark"
               ? `radial-gradient(80% 60% at 50% 60%, transparent 30%, ${base} 130%)`
-              : `radial-gradient(80% 60% at 50% 60%, transparent 40%, ${base} 130%)`,
-          opacity: 0.6,
+              : `radial-gradient(70% 55% at 50% 55%, ${base} 0%, transparent 55%, ${base} 120%)`,
+          opacity: mode === "dark" ? 0.6 : 0.75,
         }}
       />
     </div>
   );
 }
 
-function auroraOrbs(seed: string, brand: BrandMode) {
+function auroraOrbs(seed: string, brand: BrandMode, mode: "dark" | "light" = "dark") {
   // Deterministic hash → three offset orbs painted purely from the brand's
   // own tokens. No fixed magenta/cyan fallback — corporate stays blue, Life
   // Sciences stays teal, Legal stays gold, etc. The third orb is a shifted
@@ -577,16 +579,26 @@ function auroraOrbs(seed: string, brand: BrandMode) {
     return ((h >>> 0) % 10000) / 10000;
   };
   const sibling = shiftHue(brand.tokens.accent, 28, 0.06);
-  const palette = [brand.tokens.primary, brand.tokens.accent, sibling];
+  // Light mode: swap the deep navy primary for a lightened accent tint so the
+  // wash stays airy while still keyed to the division's own accent hue.
+  const lightPrimary = shiftHue(brand.tokens.accent, -18, 0.18);
+  const palette = mode === "dark"
+    ? [brand.tokens.primary, brand.tokens.accent, sibling]
+    : [lightPrimary, brand.tokens.accent, sibling];
+  // Light mode alphas are gentler so the pastel wash never overpowers charts,
+  // glass tiles or body copy — dark mode keeps the full-strength orbs.
+  const alphaBase = mode === "dark" ? 0.55 : 0.32;
+  const alphaRange = mode === "dark" ? 0.35 : 0.18;
   return Array.from({ length: 3 }).map((_, i) => ({
     color: palette[i] ?? brand.tokens.accent,
     x: 180 + rand() * 900,
     y: 90 + rand() * 540,
     rx: 380 + rand() * 260,
     ry: 320 + rand() * 220,
-    alpha: 0.55 + rand() * 0.35,
+    alpha: alphaBase + rand() * alphaRange,
   }));
 }
+
 
 // Rotate a hex color's hue by `deg` degrees and nudge lightness by `dl`.
 // Used to derive the sibling aurora orb from the brand accent so we don't
