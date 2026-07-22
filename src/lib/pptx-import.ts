@@ -336,7 +336,15 @@ export type ParsedEmbeddedFont = {
   /** Font family name from the presentation's font table. */
   typeface: string;
   /** Discovered variants (regular/bold/italic/boldItalic) and their asset paths. */
-  variants: Array<{ style: "regular" | "bold" | "italic" | "boldItalic"; path: string; mime: string }>;
+  variants: Array<{
+    style: "regular" | "bold" | "italic" | "boldItalic";
+    path: string;
+    mime: string;
+    /** Inline data URL (present when the font fit the per-file + per-deck budget). */
+    dataUrl?: string;
+    /** Byte length of the raw font asset. */
+    bytes?: number;
+  }>;
 };
 
 export type ParsedDeck = {
