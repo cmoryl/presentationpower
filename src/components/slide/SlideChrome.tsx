@@ -263,7 +263,7 @@ export function SlideFrame({
 
   const bg = slideDark ? "#03002C" : "#ffffff";
   const fg = darkBackdrop || slideDark ? "#ffffff" : brand.tokens.ink;
-  const logoColor = darkBackdrop || slideDark ? "#ffffff" : brand.tokens.primary;
+  const logoColor = darkBackdrop || slideDark ? "#ffffff" : "#03002C";
 
   const placement = resolveLogoPlacement(variant, layoutId, logoPosition);
   const showLogo = placement.position !== "hidden";
