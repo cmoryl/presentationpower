@@ -6,8 +6,7 @@
 
 import type { SlideContent, DeckSlide, CanvasBlock } from "./deck-store";
 import type { ModuleVariant } from "./taxonomy";
-import { MODULE_VARIANTS } from "./taxonomy";
-import { byId } from "./util";
+import { MODULE_VARIANTS, byId } from "./taxonomy";
 
 export type ModuleRole =
   | "hero"
