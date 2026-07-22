@@ -5158,20 +5158,51 @@ function SlideTitle({ brand, title, kicker }: { brand: BrandMode; title: string;
 
 
 function Card({ brand, title, body, index, icon }: { brand: BrandMode; title: string; body: string; index: number; icon?: string }) {
-  // Hairline-topped column card — borderless surface, single accent rule at
-  // top, small-caps ordinal, bold title with tight tracking, muted body.
+  const mode = useContext(SlideModeContext);
+  const isDark = mode === "dark";
+  const cardBg = isDark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)";
+  const cardRing = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
+  const bodyColor = isDark ? "rgba(255,255,255,0.72)" : "rgba(10,15,28,0.68)";
+  const titleColor = isDark ? "#ffffff" : brand.tokens.primary;
   return (
-    <div className="flex flex-col pt-8" style={{ borderTop: "2px solid currentColor", color: brand.tokens.accent }}>
-      <div className="flex items-center justify-between" style={{ color: "rgba(10,15,28,0.55)" }}>
-        <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", fontWeight: 600, color: brand.tokens.accent }}>
+    <div
+      className="relative flex flex-col overflow-hidden rounded-3xl p-10"
+      style={{
+        background: cardBg,
+        border: `1px solid ${cardRing}`,
+        backgroundImage: `radial-gradient(120% 90% at 0% 0%, ${brand.tokens.accent}${isDark ? "18" : "0C"} 0%, transparent 62%)`,
+      }}
+    >
+      {/* Top accent bar — the signature seam of a keynote card. */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 top-0 h-[3px]"
+        style={{ background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 80%)` }}
+      />
+      <div className="flex items-start justify-between">
+        <div
+          className="tabular-nums"
+          style={{
+            fontSize: 44,
+            fontWeight: 600,
+            letterSpacing: "-0.03em",
+            lineHeight: 1,
+            background: `linear-gradient(180deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}88 100%)`,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
           {String(index).padStart(2, "0")}
         </div>
-        <IconBadge brand={brand} label={title} index={index - 1} size="sm" override={icon} treatment="soft-circle" />
+        <IconBadge brand={brand} label={title} index={index - 1} size="md" override={icon} treatment="soft-circle" />
       </div>
-      <div className="mt-8" style={{ fontSize: 36, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.015em", lineHeight: 1.12 }}>
+      <div
+        className="mt-10"
+        style={{ fontSize: 36, fontWeight: 600, color: titleColor, letterSpacing: "-0.02em", lineHeight: 1.14 }}
+      >
         {title}
       </div>
-      <div className="mt-5" style={{ fontSize: 22, lineHeight: 1.42, color: "rgba(10,15,28,0.72)" }}>
+      <div className="mt-5" style={{ fontSize: 22, lineHeight: 1.44, color: bodyColor }}>
         {body}
       </div>
     </div>
