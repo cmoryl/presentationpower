@@ -474,7 +474,9 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
       error: r.error,
       storage_path: r.storage_path,
       downloadUrl: signed.data?.signedUrl ?? null,
+      extras: r.extras ?? null,
     };
+
   });
 
 
