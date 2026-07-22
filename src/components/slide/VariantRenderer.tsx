@@ -325,14 +325,48 @@ function renderVariantBody({
     case "MV-OP-COVER":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <div className="flex h-full flex-col justify-end">
-            <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
-            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-8" />
-            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1520} className="mt-10">
+          {/* Ambient depth — a soft spotlight glow drifting up from bottom-left,
+              plus a low-opacity ring signature on the right. Keynote-grade. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage: `
+                radial-gradient(60% 55% at 12% 92%, ${brand.tokens.accent}33 0%, transparent 62%),
+                radial-gradient(45% 40% at 92% 8%, ${brand.tokens.accent}1C 0%, transparent 70%)
+              `,
+            }}
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -right-40 top-1/2 h-[820px] w-[820px] -translate-y-1/2 rounded-full"
+            style={{
+              border: `1px solid ${brand.tokens.accent}22`,
+              boxShadow: `inset 0 0 0 1px ${brand.tokens.accent}11, inset 0 0 220px ${brand.tokens.accent}18`,
+            }}
+          />
+          <div className="relative flex h-full flex-col justify-end">
+            <div className="flex items-center gap-4">
+              <span
+                className="inline-block h-2 w-2 rounded-full"
+                style={{
+                  background: brand.tokens.accent,
+                  boxShadow: `0 0 24px ${brand.tokens.accent}, 0 0 8px ${brand.tokens.accent}`,
+                }}
+              />
+              <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
+            </div>
+            <div
+              className="mt-8 h-[2px] w-[140px] rounded-full"
+              style={{
+                backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)`,
+              }}
+            />
+            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1620} className="mt-10">
               {s(c.title, "Client")}
             </DisplayTitle>
             {s(c.subtitle) && (
-              <SupportingText size="xl" opacity={0.82} maxWidthPx={1180} className="mt-10">
+              <SupportingText size="xl" opacity={0.86} maxWidthPx={1200} className="mt-10">
                 {s(c.subtitle)}
               </SupportingText>
             )}
