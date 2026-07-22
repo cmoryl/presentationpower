@@ -205,6 +205,7 @@ function ImportedLibrary() {
 function themeToTokens(theme?: {
   accent1?: string; accent2?: string; accent3?: string; accent4?: string; accent5?: string; accent6?: string;
   dark1?: string; dark2?: string; light1?: string; light2?: string;
+  hlink?: string; folHlink?: string;
 }): Record<string, string> | undefined {
   if (!theme) return undefined;
   const t: Record<string, string> = {};
@@ -218,6 +219,8 @@ function themeToTokens(theme?: {
   if (theme.dark2) { t.dk2 = theme.dark2; t.tx2 = theme.dark2; }
   if (theme.light1) { t.lt1 = theme.light1; t.bg1 = theme.light1; }
   if (theme.light2) { t.lt2 = theme.light2; t.bg2 = theme.light2; }
+  if (theme.hlink) t.hlink = theme.hlink;
+  if (theme.folHlink) t.folHlink = theme.folHlink;
   return Object.keys(t).length ? t : undefined;
 }
 
@@ -251,6 +254,7 @@ type DeckSlidesData = {
   theme: {
     accent1?: string; accent2?: string; accent3?: string; accent4?: string; accent5?: string; accent6?: string;
     dark1?: string; dark2?: string; light1?: string; light2?: string;
+    hlink?: string; folHlink?: string;
     headingFont?: string; bodyFont?: string;
   };
   slides: ImportedSlide[];
