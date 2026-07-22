@@ -4188,7 +4188,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-10">
+          <div className="mt-16">
             <AxisBarChart brand={brand} bars={bars} height={520} highlight={highlight} unit={s(c.unit)} />
           </div>
           {s(c.legend) && (
