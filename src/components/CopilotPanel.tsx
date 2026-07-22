@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Sparkles, X, ArrowUp, Loader2 } from "lucide-react";
+import { Sparkles, X, ArrowUp, Loader2, Wand2, BookOpen } from "lucide-react";
 import { copilotTurn, type CopilotResult } from "@/lib/ai-copilot.functions";
 import { snapshotDeckVersion } from "@/lib/deck-versions.functions";
 import { useDeckStore } from "@/lib/deck-store";
