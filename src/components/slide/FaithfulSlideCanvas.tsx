@@ -612,7 +612,23 @@ function CroppedImage({
   );
 }
 
+type SlideMedia = { kind: "video" | "audio" | "ole"; mime?: string; path?: string };
+type SlideAssets = {
+  hyperlinks?: Array<{ rId: string; target: string; external?: boolean }>;
+  media?: SlideMedia[];
+  hidden?: boolean;
+  transition?: string;
+  hasAnimation?: boolean;
+};
+type EmbeddedFontLite = {
+  typeface: string;
+  variants: Array<{ style: "regular" | "bold" | "italic" | "boldItalic"; mime?: string; dataUrl?: string }>;
+};
+
+const HyperlinkCtx = createContext<Record<string, { target: string; external?: boolean }>>({});
+
 function ParaBlock({ para }: { para: ResolvedPara }) {
+  const linkMap = useContext(HyperlinkCtx);
   return (
     <p style={{
       textAlign: para.align,
@@ -625,7 +641,23 @@ function ParaBlock({ para }: { para: ResolvedPara }) {
       {para.bulletChar && <span style={{ marginRight: "0.08in", ...para.bulletStyle }}>{para.bulletChar}</span>}
       {para.runs.map((r, i) => {
         if (r.isBreak) return <br key={i} />;
-        if (r.hlink) return <a key={i} href="#" style={{ ...r.style, textDecoration: "underline" }}>{r.text}</a>;
+        if (r.hlink) {
+          const hit = linkMap[r.hlink];
+          const href = hit?.target && hit.external !== false ? hit.target : undefined;
+          return (
+            <a
+              key={i}
+              href={href ?? "#"}
+              target={href ? "_blank" : undefined}
+              rel={href ? "noopener noreferrer" : undefined}
+              onClick={href ? undefined : (e) => e.preventDefault()}
+              title={hit?.target}
+              style={{ ...r.style, textDecoration: "underline", color: r.style.color ?? "#003FC7" }}
+            >
+              {r.text}
+            </a>
+          );
+        }
         return <span key={i} style={r.style}>{r.text}</span>;
       })}
     </p>
