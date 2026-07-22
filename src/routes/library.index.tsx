@@ -327,6 +327,7 @@ function Library() {
               Imported slides <span aria-hidden>→</span>
             </Link>
           </div>
+        </div>
         <h1 className="mt-3 text-4xl font-semibold">Approved module variants.</h1>
         <p className="mt-3 max-w-2xl text-black/60">
           Search and preview the modules the assembler pulls from. Scope by brand to hide off-limits families and float the preferred variants for that identity. Staging area for freshly imported PPTX slides lives under <Link to="/library/imported" className="underline hover:text-[#003FC7]">Imported slides</Link>.
