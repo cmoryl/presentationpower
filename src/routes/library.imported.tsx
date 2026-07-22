@@ -280,6 +280,24 @@ function DeckSlides({
         <div className="flex items-center gap-2">
           <button
             type="button"
+            onClick={() => reparse.mutate()}
+            disabled={reparse.isPending}
+            title={missingLayouts > 0 ? `${missingLayouts} slides missing layout — re-extract from original .pptx` : "Re-extract layouts, shapes and charts from the original .pptx"}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs disabled:opacity-60 ${
+              missingLayouts > 0
+                ? "border-[#003FC7] bg-[#003FC7] text-white hover:opacity-90"
+                : "border-black/15 bg-white text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+            }`}
+          >
+            {reparse.isPending ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
+            {reparse.isPending
+              ? "Re-extracting…"
+              : missingLayouts > 0
+                ? `Re-extract layouts (${missingLayouts})`
+                : "Re-extract layouts"}
+          </button>
+          <button
+            type="button"
             onClick={() => setRelinkOpen(true)}
             className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
           >
@@ -297,6 +315,20 @@ function DeckSlides({
           )}
         </div>
       </div>
+      {reparse.data && (
+        <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
+          Re-extracted {reparse.data.slidesWithLayout}/{reparse.data.slideCount} slide layouts
+          {reparse.data.slidesWithShapes ? ` · ${reparse.data.slidesWithShapes} with shapes` : ""}
+          {reparse.data.graphicsSummary
+            ? ` · ${reparse.data.graphicsSummary.charts} charts, ${reparse.data.graphicsSummary.tables} tables, ${reparse.data.graphicsSummary.diagrams} diagrams`
+            : ""}
+        </div>
+      )}
+      {reparse.error && (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+          {(reparse.error as Error).message}
+        </div>
+      )}
       {relinkOpen && (
         <RelinkDrawer
           deckId={deck.id}
