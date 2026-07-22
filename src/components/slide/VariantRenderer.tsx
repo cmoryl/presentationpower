@@ -5050,27 +5050,23 @@ function MediaTile({
         )}
         {hasVideo && !shouldPlay && (
           autoplay ? (
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); setUserStarted(true); }}
-              className="absolute inset-0 flex items-center justify-center"
-              aria-label="Play video"
-            >
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-black shadow-lg transition group-hover:scale-105">▶</span>
-            </button>
-          ) : openVideoPreview ? (
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); if (resolvedVideoUrl) openVideoPreview(resolvedVideoUrl); }}
-              className="absolute inset-0 flex items-center justify-center"
-              aria-label="Preview video"
-            >
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-black shadow-lg transition group-hover:scale-105">▶</span>
-            </button>
+            <PlayOverlay
+              onActivate={() => { setAutoplayBlocked(false); setUserStarted(true); }}
+              label="Play video"
+              hint={autoplayBlocked ? "Autoplay blocked — tap to play" : "Play demo"}
+            />
+          ) : openVideoPreview && resolvedVideoUrl ? (
+            <PlayOverlay
+              onActivate={() => openVideoPreview(resolvedVideoUrl)}
+              label="Preview video"
+              hint="Preview demo"
+            />
           ) : (
-            <div aria-hidden className="absolute inset-0 flex items-center justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-black shadow-lg">▶</div>
-            </div>
+            <PlayOverlay
+              onActivate={() => { setAutoplayBlocked(false); setUserStarted(true); }}
+              label="Play video"
+              hint="Play demo"
+            />
           )
         )}
         {/* Brand accent duotone — subtle multiply so division tokens actually
