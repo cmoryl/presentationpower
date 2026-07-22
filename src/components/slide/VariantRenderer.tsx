@@ -503,7 +503,7 @@ function renderVariantBody({
               {s(c.chapterNumber, "01")}
             </div>
             <div className="flex-1">
-              <Kicker brand={brand} color="rgba(255,255,255,0.7)">{s(c.kicker, "Chapter")}</Kicker>
+              <Kicker brand={brand} color={ink.muted}>{s(c.kicker, "Chapter")}</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={64} thicknessPx={2} className="mt-6" />
               <DisplayTitle size="section" color={ink.strong} maxWidthPx={1100} className="mt-8">
                 {s(c.title)}
@@ -3573,7 +3573,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full gap-0" style={{ gridTemplateColumns: "40% 1fr", margin: "-64px", minHeight: "calc(100% + 128px)" }}>
-            <div className="relative flex flex-col justify-between overflow-hidden p-16" style={{ background: brand.tokens.primary, color: ink.strong }}>
+            <div className="relative flex flex-col justify-between overflow-hidden p-16" style={{ background: brand.tokens.primary, color: ink.onSurface(brand.tokens.primary) }}>
               <div aria-hidden className="pointer-events-none absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full" style={{ background: `radial-gradient(circle, ${brand.tokens.accent}55, transparent 70%)` }} />
               <Kicker brand={brand} color={ink.strong}>{s(c.kicker, "Our belief")}</Kicker>
               <div className="relative">
@@ -3676,7 +3676,7 @@ function renderVariantBody({
               className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
               style={{ left: "50%" }}
             >
-              <div className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: brand.tokens.accent, color: ink.strong, fontSize: 28, fontWeight: 600 }}>
+              <div className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: brand.tokens.accent, color: ink.onSurface(brand.tokens.accent), fontSize: 28, fontWeight: 600 }}>
                 <ArrowRight size={28} strokeWidth={2.4} />
               </div>
             </div>
