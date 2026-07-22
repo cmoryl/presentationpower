@@ -84,12 +84,14 @@ export function SlideFrame({
   // theme so hero titles keep their editorial contrast.
   const hasBackdrop = !!backdrop;
   const hasBackdropImage = !!backdrop?.url;
-  const hasBackdropCss = !!(backdrop?.css && !backdrop?.url);
+  const hasBackdropAurora = !!backdrop?.aurora;
+  const hasBackdropCss = !!(backdrop?.css && !backdrop?.url && !backdrop?.aurora);
   // A backdrop is "dark" when the caller flagged darkChrome, or when it's a
-  // photo backdrop on a non-light slide (legacy behavior).
-  const backdropIsDark = hasBackdrop && (backdrop?.darkChrome ?? (hasBackdropImage && !slideDark));
+  // photo/aurora backdrop on a non-light slide (legacy behavior).
+  const backdropIsDark = hasBackdrop && (backdrop?.darkChrome ?? ((hasBackdropImage || hasBackdropAurora) && !slideDark));
   const lightBackdrop = hasBackdrop && !backdropIsDark && !slideDark;
   const darkBackdrop = hasBackdrop && !lightBackdrop;
+
   const bg = slideDark ? "#03002C" : "#ffffff";
   const fg = darkBackdrop || slideDark ? "#ffffff" : brand.tokens.ink;
   const logoColor = darkBackdrop || slideDark ? "#ffffff" : brand.tokens.primary;
