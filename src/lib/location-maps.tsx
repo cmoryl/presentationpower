@@ -457,6 +457,27 @@ export function WorldMap({
 
   const glow = `url(#tp-pin-glow)`;
 
+  // ── Metric scale ────────────────────────────────────────────────────────
+  const activeMetricId = metricId ?? metric?.id;
+  const metricStats = React.useMemo(() => {
+    if (!activeMetricId) return null;
+    const vals = visiblePins
+      .map((p) => p.values?.[activeMetricId])
+      .filter((v): v is number => Number.isFinite(v as number));
+    if (vals.length === 0) return null;
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    return { min, max, range: Math.max(1e-9, max - min) };
+  }, [visiblePins, activeMetricId]);
+  const scaleFor = React.useCallback(
+    (v: number | undefined) => {
+      if (!metricStats || !Number.isFinite(v as number)) return null;
+      return Math.max(0, Math.min(1, ((v as number) - metricStats.min) / metricStats.range));
+    },
+    [metricStats],
+  );
+
+
   return (
     <svg
       viewBox={vb}
