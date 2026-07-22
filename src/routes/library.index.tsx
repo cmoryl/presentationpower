@@ -30,6 +30,7 @@ import { formatKitValidationError } from "@/lib/kit-validation";
 import { VIDEO_SLIDE_EXAMPLES, type VideoSlideExample } from "@/lib/video-slide-examples";
 import { listClientLogos } from "@/lib/client-logos.functions";
 import { toLogoFillers, overlayLogoHubFillers, type LogoFiller } from "@/lib/logohub-fillers";
+import { SaveModuleDialog } from "@/components/SaveModuleDialog";
 
 
 
