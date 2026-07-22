@@ -2930,36 +2930,38 @@ function renderVariantBody({
     }
 
 
-    case "MV-CLOSE-CHECKLIST":
+    case "MV-CLOSE-CHECKLIST": {
+      const items = arr(c.items);
       return (
-        <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, "What happens next")} />
-          <div className="mt-12">
-            <div
-              className="grid grid-cols-[60px_1fr_260px_180px] items-center gap-8 pb-4 uppercase"
-              style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.faint, borderBottom: `1px solid ${brand.tokens.accent}` }}
-            >
-              <div></div>
-              <div>Action</div>
-              <div>Owner</div>
-              <div className="text-right">When</div>
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
+          <AuroraOrb x={90} y={30} size={820} />
+          <div className="relative grid h-full grid-cols-[1fr_1fr] items-center gap-24">
+            <div>
+              <Kicker brand={brand}>Action plan</Kicker>
+              <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-6 mb-10" />
+              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>
+                {s(c.title, "What happens next.")}
+              </DisplayTitle>
+              {s(c.subtitle) && (
+                <SupportingText size="lg" opacity={0.78} className="mt-8" maxWidthPx={880}>
+                  {s(c.subtitle)}
+                </SupportingText>
+              )}
             </div>
-            {arr(c.items).map((it, i) => (
-              <div key={i}>
-                {i > 0 && <SoftDivider />}
-                <div className="grid grid-cols-[60px_1fr_260px_180px] items-center gap-8 py-6">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full" style={{ border: `1.5px solid ${brand.tokens.accent}`, color: "var(--slide-accent-text)" }}>
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12l5 5 9-11" /></svg>
-                  </div>
-                  <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(it.label)}</div>
-                  <SupportingText size="md" opacity={0.72}>{s(it.owner)}</SupportingText>
-                  <div className="text-right uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(it.when)}</div>
-                </div>
-              </div>
-            ))}
+            {items.length > 0 && (
+              <AuroraSidePanel
+                kicker="Checklist"
+                items={items.slice(0, 4).map((it) => ({
+                  label: s(it.label),
+                  meta: [s(it.owner), s(it.when)].filter(Boolean).join(" · ") || undefined,
+                }))}
+              />
+            )}
           </div>
         </SlideFrame>
       );
+    }
+
 
     case "MV-CLOSE-DECISION":
       return (
