@@ -199,7 +199,7 @@ export function TitleBlock({
   const titleColor = ink.text;
   const dekColor = ink.muted;
   return (
-    <div className={align === "center" ? "flex flex-col items-center text-center" : ""}>
+    <div className={(align === "center" ? "flex flex-col items-center text-center" : "") + " mb-10"}>
       {kicker && (
         <div className="mb-6">
           <Kicker brand={brand}>{kicker}</Kicker>
@@ -219,6 +219,7 @@ export function TitleBlock({
     </div>
   );
 }
+
 
 // ── StatFigure ────────────────────────────────────────────────────────────
 // A single stat, sized like a display headline: huge tabular numeral in

@@ -5644,7 +5644,7 @@ function SegmentedBar({ brand, segments, height = 68 }: { brand: BrandMode; segm
   const ink = useSlideInk();
   const total = segments.reduce((s, x) => s + x.value, 0) || 1;
   return (
-    <div className="relative w-full" style={{ marginTop: 96, marginBottom: 96 }}>
+    <div className="relative w-full" style={{ marginTop: 160, marginBottom: 140 }}>
       <div className="flex w-full" style={{ height, gap: 4 }}>
         {segments.map((seg, i) => {
           const pct = (seg.value / total) * 100;
