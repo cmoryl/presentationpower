@@ -4904,6 +4904,32 @@ function PlayOverlay({
   );
 }
 
+/**
+ * Per-preview video playback registry.
+ *
+ * Isolates state per module preview (keyed by brand + seed + source URL) so
+ * switching variants doesn't cross-contaminate, and reopening the lightbox
+ * for the same module restores where the user left off. Also enforces a
+ * "one video plays at a time" policy: when a video starts, every other
+ * registered video is paused — that's what stops the previous variant from
+ * continuing to play in the background.
+ */
+type VideoPlaybackState = { currentTime: number; userStarted: boolean; paused: boolean };
+const videoPlaybackStore = new Map<string, VideoPlaybackState>();
+const registeredVideos = new Map<HTMLVideoElement, string>();
+
+function pauseAllVideosExcept(active: HTMLVideoElement | null) {
+  registeredVideos.forEach((key, v) => {
+    if (v === active || v.paused) return;
+    try {
+      v.pause();
+      const s = videoPlaybackStore.get(key) ?? { currentTime: 0, userStarted: false, paused: true };
+      videoPlaybackStore.set(key, { ...s, currentTime: v.currentTime, paused: true });
+    } catch { /* noop */ }
+  });
+}
+
+
 function MediaTile({
   brand,
   seed,
@@ -4974,13 +5000,71 @@ function MediaTile({
   const wantLoop = videoLoop !== false;
   const wantMuted = videoMuted !== false;
   const wantControls = videoControls === true;
-  const [userStarted, setUserStarted] = useState(false);
+  // Stable per-preview identity: variants, brand modes, and source URLs
+  // each get their own bucket so switching variants or reopening the
+  // lightbox restores THAT preview's state instead of leaking playhead
+  // and userStarted from an unrelated tile.
+  const previewKey = `${brand.id}::${seed || "_"}::${resolvedVideoUrl || ""}`;
+  const restored = videoPlaybackStore.get(previewKey);
+  const [userStarted, setUserStarted] = useState<boolean>(Boolean(restored?.userStarted));
   const [autoplayBlocked, setAutoplayBlocked] = useState(false);
   const shouldPlay = (autoplay && wantAutoplay && !autoplayBlocked) || userStarted;
   const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  // Register this video in the module-scoped map and, on unmount, snapshot
+  // its current position + paused state and hard-pause it so it doesn't
+  // keep playing after the tile leaves the DOM (variant switch, lightbox
+  // close). Re-mounting the same previewKey restores the snapshot.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v || !resolvedVideoUrl) return;
+    registeredVideos.set(v, previewKey);
+    const snap = videoPlaybackStore.get(previewKey);
+    if (snap && snap.currentTime > 0) {
+      try { v.currentTime = snap.currentTime; } catch { /* seek before ready */ }
+    }
+    const onPlay = () => pauseAllVideosExcept(v);
+    const onPause = () => {
+      const s = videoPlaybackStore.get(previewKey) ?? { currentTime: 0, userStarted: false, paused: true };
+      videoPlaybackStore.set(previewKey, { ...s, currentTime: v.currentTime, paused: true });
+    };
+    const onTime = () => {
+      const s = videoPlaybackStore.get(previewKey) ?? { currentTime: 0, userStarted: false, paused: !shouldPlay };
+      // Coalesce writes: only persist ~4× per second worth of drift.
+      if (Math.abs(v.currentTime - s.currentTime) > 0.25) {
+        videoPlaybackStore.set(previewKey, { ...s, currentTime: v.currentTime });
+      }
+    };
+    v.addEventListener("play", onPlay);
+    v.addEventListener("pause", onPause);
+    v.addEventListener("timeupdate", onTime);
+    return () => {
+      try {
+        videoPlaybackStore.set(previewKey, {
+          currentTime: v.currentTime,
+          userStarted,
+          paused: true,
+        });
+        v.pause();
+      } catch { /* noop */ }
+      v.removeEventListener("play", onPlay);
+      v.removeEventListener("pause", onPause);
+      v.removeEventListener("timeupdate", onTime);
+      registeredVideos.delete(v);
+    };
+  }, [previewKey, resolvedVideoUrl, userStarted, shouldPlay]);
+
+  // Persist userStarted so reopening the same preview key resumes.
+  useEffect(() => {
+    if (!resolvedVideoUrl) return;
+    const s = videoPlaybackStore.get(previewKey) ?? { currentTime: 0, userStarted: false, paused: true };
+    videoPlaybackStore.set(previewKey, { ...s, userStarted });
+  }, [previewKey, userStarted, resolvedVideoUrl]);
+
   useEffect(() => {
     const v = videoRef.current;
     if (!v || !shouldPlay) return;
+    pauseAllVideosExcept(v);
     const p = v.play();
     if (p && typeof (p as Promise<void>).catch === "function") {
       (p as Promise<void>).catch(() => {
