@@ -22,7 +22,7 @@
  * which is exactly the deterministic surface we want to snapshot.
  */
 
-import { describe, expect, it } from "vitest";
+import { beforeAll, afterAll, describe, expect, it, vi } from "vitest";
 import JSZip from "jszip";
 import { BRAND_MODES, MODULE_VARIANTS } from "@/lib/taxonomy";
 import { exportDeckToPptx, adaptPaletteForMode, type Palette } from "@/lib/pptx-export";
