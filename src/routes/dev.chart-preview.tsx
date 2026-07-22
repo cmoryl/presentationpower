@@ -7,50 +7,25 @@ export const Route = createFileRoute("/dev/chart-preview")({
   component: DevChartPreview,
 });
 
-const SAMPLES: { variantId: string; content: Record<string, unknown> }[] = [
+// Pilot samples for the aurora free-form treatment. Matches the reference
+// images exactly: 2×2 stats (100 / 48 / 98 / 35+) and a donut trio.
+const PILOTS = [
   {
-    variantId: "MV-DASH-SALES-CHART",
+    variantId: "MV-PROOF-STATS-4",
+    label: "AuroraStatGrid pilot (2×2)",
     content: {
-      title: "Trial enrollment velocity",
-      kicker: "Program telemetry",
-      headline: "Sites activated faster with GlobalLink orchestration.",
-      series: [
-        { label: "Jan", value: 32 }, { label: "Feb", value: 41 },
-        { label: "Mar", value: 38 }, { label: "Apr", value: 55 },
-        { label: "May", value: 62 }, { label: "Jun", value: 70 },
-        { label: "Jul", value: 74 }, { label: "Aug", value: 88 },
+      title: "Aēsop · outcomes",
+      items: [
+        { value: "100", unit: "%", label: "Global teams empowered", icon: "handshake" },
+        { value: "48", unit: "%", label: "Reduction in localization costs", icon: "trending-down" },
+        { value: "98", unit: "%", label: "Translation quality score", icon: "check-circle" },
+        { value: "35", unit: "+", label: "Markets supported", icon: "globe" },
       ],
-      stat: { value: "+38", unit: "%", label: "vs prior half", delta: "▲ vs H1" },
-    },
-  },
-  {
-    variantId: "MV-GRAPH-AXIS-BARS",
-    content: {
-      title: "Regional throughput",
-      kicker: "Volume · FY26",
-      highlight: "APAC",
-      unit: "M",
-      bars: [
-        { label: "NA", value: 42 }, { label: "EMEA", value: 58 },
-        { label: "APAC", value: 74 }, { label: "LATAM", value: 31 },
-      ],
-    },
-  },
-  {
-    variantId: "MV-GRAPH-DECADE-AREA",
-    content: {
-      title: "Ten-year trajectory",
-      kicker: "Growth curve",
-      calloutLabel: "2024",
-      calloutNote: "Inflection point",
-      series: Array.from({ length: 11 }, (_, i) => ({
-        label: String(2016 + i),
-        value: 20 + Math.round(Math.sin(i * 0.7) * 8) + i * 6,
-      })),
     },
   },
   {
     variantId: "MV-DASH-DONUT-TRIO",
+    label: "Donut trio (airy chart — verify no box)",
     content: {
       title: "Portfolio distribution",
       items: [
@@ -60,48 +35,52 @@ const SAMPLES: { variantId: string; content: Record<string, unknown> }[] = [
       ],
     },
   },
-  {
-    variantId: "MV-GRAPH-RINGS",
-    content: {
-      title: "Program readiness",
-      items: [
-        { label: "Sites live", value: 88 },
-        { label: "Regulatory ready", value: 64 },
-        { label: "Data migrated", value: 46 },
-      ],
-    },
-  },
-];
+] as const;
+
+const BRANDS = [
+  { id: "bm-tp-corporate", label: "Corporate (matches reference)" },
+  { id: "bm-tp-lifesci", label: "Life Sciences (division-aware)" },
+] as const;
 
 function DevChartPreview() {
   return (
-    <div className="min-h-screen bg-neutral-950 p-6 space-y-10">
-      {SAMPLES.map((sample) => {
+    <div className="min-h-screen bg-neutral-950 p-6 space-y-12">
+      {PILOTS.map((sample) => {
         const variant = byId(MODULE_VARIANTS, sample.variantId)!;
-        const brand = BRAND_MODES.find((b) => b.id === "bm-tp-lifesci")!;
-        const slide = {
-          id: `prev-${sample.variantId}`,
-          variantId: variant.id,
-          sectionId: "sec-proof",
-          order: 1,
-          position: 0,
-          layoutId: null,
-          changes: [],
-          content: sample.content,
-        } as unknown as Parameters<typeof VariantRenderer>[0]["slide"];
         return (
           <div key={sample.variantId} className="space-y-4">
-            <div className="text-xs uppercase tracking-widest text-white/60">{sample.variantId}</div>
-            {(["dark", "light"] as const).map((mode) => (
-              <div key={mode}>
-                <div className="text-[10px] uppercase tracking-widest text-white/40 mb-1">{mode}</div>
-                <div className="aspect-[16/9] w-full max-w-[1400px]">
-                  <ScaledSlide>
-                    <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
-                  </ScaledSlide>
+            <div className="text-sm font-semibold text-white">{sample.label}</div>
+            <div className="text-xs uppercase tracking-widest text-white/50">{sample.variantId}</div>
+            {BRANDS.map((b) => {
+              const brand = BRAND_MODES.find((x) => x.id === b.id)!;
+              return (
+                <div key={b.id} className="space-y-2">
+                  <div className="text-[11px] uppercase tracking-widest text-white/50 mt-4">{b.label}</div>
+                  {(["dark", "light"] as const).map((mode) => {
+                    const slide = {
+                      id: `prev-${sample.variantId}-${b.id}-${mode}`,
+                      variantId: variant.id,
+                      sectionId: "sec-proof",
+                      order: 1,
+                      position: 0,
+                      layoutId: null,
+                      changes: [],
+                      content: sample.content,
+                    } as unknown as Parameters<typeof VariantRenderer>[0]["slide"];
+                    return (
+                      <div key={mode}>
+                        <div className="text-[10px] uppercase tracking-widest text-white/40 mb-1">{mode}</div>
+                        <div className="aspect-[16/9] w-full max-w-[1400px]">
+                          <ScaledSlide>
+                            <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
+                          </ScaledSlide>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         );
       })}
