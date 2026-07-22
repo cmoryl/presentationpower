@@ -155,8 +155,12 @@ export function SlideFrame({
           style={{ background: backdrop!.css }}
         />
       )}
+      {hasBackdropAurora && (
+        <AuroraLayer seed={backdrop?.auroraSeed ?? "aurora"} brand={brand} />
+      )}
       {hasBackdropImage && (
         <>
+
           <img
             src={backdrop!.url}
             alt=""
