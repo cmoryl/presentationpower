@@ -1098,6 +1098,35 @@ function VariantDetailModal({
       window.setTimeout(() => setCopied(false), 1400);
     } catch { /* ignore */ }
   };
+  const downloadPptx = async () => {
+    if (downloading) return;
+    setDownloading(true);
+    try {
+      const singleSlideDeck = {
+        id: `library-${variant.id}-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        title: `${variant.name} — ${brand.name}`,
+        briefId: "library-preview",
+        brandModeId: brand.id,
+        archetypeId: "single-module",
+        slides: [{
+          id: `slide-${variant.id}`,
+          position: 0,
+          sectionId: sections[0]?.id ?? "",
+          variantId: variant.id,
+          layoutId: variant.permittedLayoutIds[0],
+          content: detailContent,
+          changes: [],
+        }],
+      } as Parameters<typeof exportDeckToPptx>[0];
+      await exportDeckToPptx(singleSlideDeck, brand);
+    } catch (err) {
+      console.error("[library] module download failed", err);
+      alert("Download failed. Check console for details.");
+    } finally {
+      setDownloading(false);
+    }
+  };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
