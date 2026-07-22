@@ -5039,19 +5039,31 @@ function CardGrid({
 // baseline because StatFigure is sized by name, not by string length.
 
 function StatTile({ brand, item, index, dense, cols, isLastRow }: { brand: BrandMode; item: Item; index: number; dense: boolean; cols: number; isLastRow: boolean }) {
+  const mode = useContext(SlideModeContext);
+  const isDark = mode === "dark";
   const isFirstInRow = index % cols === 0;
   const size = dense ? "md" : "lg";
+  const rule = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
+  const softRule = isDark ? "rgba(255,255,255,0.06)" : "rgba(10,15,28,0.05)";
   return (
     <div
-      className="relative flex flex-col px-8 py-6"
+      className="relative flex flex-col px-10 py-8"
       style={{
-        borderLeft: isFirstInRow ? "none" : "1px solid rgba(10,15,28,0.10)",
-        borderBottom: isLastRow ? "none" : "1px solid rgba(10,15,28,0.06)",
+        borderLeft: isFirstInRow ? "none" : `1px solid ${rule}`,
+        borderBottom: isLastRow ? "none" : `1px solid ${softRule}`,
       }}
     >
+      {/* Accent gradient rail — reads as a top-lit column, keynote-grade. */}
+      <div
+        aria-hidden
+        className="absolute left-10 right-10 top-0 h-[2px]"
+        style={{
+          background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 70%)`,
+        }}
+      />
       {s(item.title) && (
-        <div className="mb-5">
-          <Kicker brand={brand} size={18}>{s(item.title)}</Kicker>
+        <div className="mb-6">
+          <Kicker brand={brand} size={16}>{s(item.title)}</Kicker>
         </div>
       )}
       <StatFigure
