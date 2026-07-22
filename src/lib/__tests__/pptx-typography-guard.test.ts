@@ -27,6 +27,8 @@ import { join } from "node:path";
 const ROOT = join(__dirname, "..", "..", "..");
 const read = (p: string) => readFileSync(join(ROOT, p), "utf8");
 
+const PARITY_SRC = read("src/lib/pptx-parity.ts");
+
 const EXPORTER_SRC = read("src/lib/pptx-export.ts");
 const EMBED_SRC = read("src/lib/pptx-font-embed.ts");
 const STYLES_SRC = read("src/styles.css");
