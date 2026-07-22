@@ -2540,7 +2540,7 @@ async function loadParent(
   const relsPath = path.replace(/([^/]+)$/, "_rels/$1.rels");
   let parentImageEmbedIds: string[] = [];
   const parentEmbedIdMap: Record<string, string> = {};
-  const parentImages: Array<{ embedId: string; dataUrl: string }> = [];
+  const parentImages: Array<{ embedId: string; dataUrl: string; sourcePath?: string }> = [];
   if (zip.files[relsPath]) {
     try {
       const relXml = await zip.files[relsPath].async("string");
