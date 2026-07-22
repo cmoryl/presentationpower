@@ -5,7 +5,7 @@ import { SlideThumbnailContext, SlideVideoPreviewContext, SlideForceVideoAutopla
 import { resolveSlideBackground } from "@/lib/background-library";
 import { backdropForVariant } from "./variantBackdrop";
 
-import { createContext, useContext, useEffect, useId, useRef, useState, Fragment } from "react";
+import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, Fragment } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
 import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, StatFigure, QuoteMark, Attribution, SoftDivider } from "./primitives";
@@ -4921,6 +4921,15 @@ function VideoHoverControls({
 }) {
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(initialMuted);
+  const [status, setStatus] = useState<string>("");
+  const [hovered, setHovered] = useState(false);
+  const statusTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const announce = useCallback((msg: string) => {
+    setStatus(msg);
+    if (statusTimer.current) clearTimeout(statusTimer.current);
+    statusTimer.current = setTimeout(() => setStatus(""), 1200);
+  }, []);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -4935,35 +4944,116 @@ function VideoHoverControls({
     return () => events.forEach((e) => v.removeEventListener(e, sync));
   }, [videoRef]);
 
-  const act = (fn: () => void) => (e: React.SyntheticEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    fn();
-  };
-
-  const togglePlay = () => {
+  const togglePlay = useCallback(() => {
     const v = videoRef.current;
     if (!v) return;
     if (v.paused) {
       v.play().catch(() => undefined);
+      announce("Playing");
     } else {
       v.pause();
       onUserPause?.();
+      announce("Paused");
     }
-  };
-  const seek = (delta: number) => {
+  }, [videoRef, onUserPause, announce]);
+
+  const seek = useCallback((delta: number) => {
     const v = videoRef.current;
     if (!v) return;
     const dur = Number.isFinite(v.duration) ? v.duration : 0;
     const next = Math.max(0, dur > 0 ? Math.min(dur, v.currentTime + delta) : v.currentTime + delta);
     try { v.currentTime = next; } catch { /* seek before ready */ }
-  };
-  const toggleMute = () => {
+    announce(delta < 0 ? `Rewound ${Math.abs(delta)} seconds` : `Forwarded ${delta} seconds`);
+  }, [videoRef, announce]);
+
+  const toggleMute = useCallback(() => {
     const v = videoRef.current;
     if (!v) return;
     v.muted = !v.muted;
-    // Unmute implies the user wants sound → make sure volume isn't at zero.
     if (!v.muted && v.volume === 0) v.volume = 1;
+    announce(v.muted ? "Muted" : "Unmuted");
+  }, [videoRef, announce]);
+
+  // Hover tracking on the parent .group so keyboard shortcuts work while
+  // hovering (without requiring focus in the controls).
+  useEffect(() => {
+    const v = videoRef.current;
+    const parent = v?.parentElement;
+    if (!parent) return;
+    const enter = () => setHovered(true);
+    const leave = () => setHovered(false);
+    parent.addEventListener("mouseenter", enter);
+    parent.addEventListener("mouseleave", leave);
+    return () => {
+      parent.removeEventListener("mouseenter", enter);
+      parent.removeEventListener("mouseleave", leave);
+    };
+  }, [videoRef]);
+
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  // Global keyboard shortcuts. Active only when the user is either hovering
+  // the video or has focus inside the controls — never steals keys from
+  // inputs/textareas or other videos on the page.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const root = rootRef.current;
+      if (!root) return;
+      const focusInside = root.contains(document.activeElement);
+      if (!hovered && !focusInside) return;
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      switch (e.key) {
+        case " ":
+        case "Spacebar":
+        case "k":
+        case "K":
+          e.preventDefault();
+          e.stopPropagation();
+          togglePlay();
+          break;
+        case "ArrowLeft":
+          e.preventDefault();
+          e.stopPropagation();
+          seek(-5);
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          e.stopPropagation();
+          seek(5);
+          break;
+        case "j":
+        case "J":
+          e.preventDefault();
+          e.stopPropagation();
+          seek(-10);
+          break;
+        case "l":
+        case "L":
+          e.preventDefault();
+          e.stopPropagation();
+          seek(10);
+          break;
+        case "m":
+        case "M":
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMute();
+          break;
+        default:
+          break;
+      }
+    };
+    window.addEventListener("keydown", onKey, true);
+    return () => window.removeEventListener("keydown", onKey, true);
+  }, [hovered, togglePlay, seek, toggleMute]);
+
+  const act = (fn: () => void) => (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    fn();
   };
 
   const Btn = ({
@@ -4971,19 +5061,24 @@ function VideoHoverControls({
     onClick,
     children,
     wide,
+    pressed,
+    shortcut,
   }: {
     label: string;
     onClick: () => void;
     children: React.ReactNode;
     wide?: boolean;
+    pressed?: boolean;
+    shortcut?: string;
   }) => (
     <div
       role="button"
       tabIndex={0}
-      aria-label={label}
-      title={label}
+      aria-label={shortcut ? `${label} (${shortcut})` : label}
+      aria-pressed={pressed === undefined ? undefined : pressed}
+      title={shortcut ? `${label} — ${shortcut}` : label}
       onClick={act(onClick)}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") act(onClick)(e); }}
+      onKeyDown={(e) => { if (e.key === "Enter") { act(onClick)(e); } }}
       className={`flex ${wide ? "h-10 w-11" : "h-10 w-10"} cursor-pointer items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/25 backdrop-blur-md transition hover:bg-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70`}
       data-media-hover-control={label}
     >
@@ -4993,19 +5088,21 @@ function VideoHoverControls({
 
   return (
     <div
+      ref={rootRef}
       role="group"
-      aria-label="Video controls"
+      aria-label="Video controls. Shortcuts: Space to play or pause, arrow keys to seek, M to mute."
       onClick={(e) => e.stopPropagation()}
       className="pointer-events-auto absolute inset-x-0 bottom-0 z-30 flex items-center justify-center gap-2 bg-gradient-to-t from-black/55 via-black/20 to-transparent px-3 pb-3 pt-8 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100"
       data-media-controls="hover"
     >
-      <Btn label="Rewind 10 seconds" onClick={() => seek(-10)}>
+      <span className="sr-only" role="status" aria-live="polite">{status}</span>
+      <Btn label="Rewind 10 seconds" shortcut="J" onClick={() => seek(-10)}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M11 17l-5-5 5-5" />
           <path d="M18 17l-5-5 5-5" />
         </svg>
       </Btn>
-      <Btn label={playing ? "Pause" : "Play"} onClick={togglePlay} wide>
+      <Btn label={playing ? "Pause" : "Play"} shortcut="Space" onClick={togglePlay} wide pressed={playing}>
         {playing ? (
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
             <rect x="6" y="5" width="4" height="14" rx="1" />
@@ -5017,13 +5114,13 @@ function VideoHoverControls({
           </svg>
         )}
       </Btn>
-      <Btn label="Forward 10 seconds" onClick={() => seek(10)}>
+      <Btn label="Forward 10 seconds" shortcut="L" onClick={() => seek(10)}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M13 17l5-5-5-5" />
           <path d="M6 17l5-5-5-5" />
         </svg>
       </Btn>
-      <Btn label={muted ? "Unmute" : "Mute"} onClick={toggleMute}>
+      <Btn label={muted ? "Unmute" : "Mute"} shortcut="M" onClick={toggleMute} pressed={muted}>
         {muted ? (
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <path d="M11 5L6 9H3v6h3l5 4V5z" />
@@ -5041,6 +5138,7 @@ function VideoHoverControls({
     </div>
   );
 }
+
 
 
 /**
