@@ -1,77 +1,165 @@
-# Faithful PowerPoint import
+## Modules Everywhere — modules as the atom, surfaces as consumers
 
-Right now imports only capture text + a flat list of image data URLs. When you open an imported deck in the staging library it looks nothing like the original: no positions, no sizes, no z-order, no colored fills or lines, no per-run typography. The plan below adds a full layout capture and renders it 1:1 so an imported slide looks exactly like it does in PowerPoint.
+Pivot: **modules are the source of truth.** Decks are just one surface; brochures, one-pagers, social kits, and emails are peers. Existing decks are untouched — the new surface system runs in parallel and consumes the same module DNA.
 
-## What we capture (per slide)
+---
 
-Walk `p:cSld/p:spTree` in reading order and emit a typed shape list. Each entry carries:
+### Core mental model
 
-- `id`, `zIndex` (spTree order = z-order)
-- `frame`: `{ x, y, w, h, rot, flipH, flipV }` in EMU → inches (slide size read from `presentation.xml`; default 13.333 × 7.5)
-- `kind`: `text` | `image` | `shape` | `line` | `group` | `table` | `chart` | `placeholder`
-- Fill: `solid` / `gradient` (stops + angle) / `blipFill` (image ref) / `none`
-- Line: color, width (EMU→pt), dash, arrowheads
-- Preset geometry (`prstGeom`) so rounded-rect, ellipse, triangle, arrow, etc. can be rendered as SVG/CSS
-- Text body: paragraphs → runs with `{ text, bold, italic, underline, size (hundredths of a point), color, font, align, bullet }`; paragraph-level indent + list level
-- For pictures: rel id → resolves to the storage path we already save into `division-imagery`
-- Groups: nested `children[]` with the group's own transform (so we can honor `p:grpSpPr/a:xfrm/a:chOff/a:chExt`)
-- Tables: cell grid with fills, borders, and per-cell text runs
-- Charts / SmartArt: keep the existing parsed structures but also record the frame so they render in place
-
-The already-embedded image extraction stays; we just cross-reference each `p:pic` rId → saved storage path so the renderer paints the real image at the real coordinates.
-
-## Data changes
-
-`imported_decks.slides[i]` gains a new `layout` field:
-
-```ts
-type SlideLayout = {
-  size: { w: number; h: number };            // inches
-  background?: { solid?: string; gradient?: Gradient; blipPath?: string };
-  shapes: Shape[];                           // in z-order
-};
+```text
+                    ┌─────────────────────┐
+                    │   MODULE LIBRARY    │   (existing MODULE_VARIANTS + new "My Modules")
+                    │   variant + tokens  │
+                    └──────────┬──────────┘
+                               │
+        ┌──────────┬───────────┼───────────┬──────────┐
+        ▼          ▼           ▼           ▼          ▼
+      DECK     BROCHURE    ONE-PAGER    SOCIAL      EMAIL
+     16:9      bi/tri/4pp  8.5×11      1:1/4:5/9:16 responsive
+   (untouched)  (new)       (new)       (new)        (new)
 ```
 
-Written by `uploadImportedDeck` alongside the existing `title/bullets/notes/imagePaths` outline. Old rows without `layout` fall back to the current text-only card — no migration needed.
+Every surface is a thin container: an ordered list of **Module Instances**, each with surface-specific hints (crop, safe zone, page break).
 
-## Renderer
+---
 
-New component `FaithfulSlideCanvas` (in `src/components/slide/`). Fixed internal canvas of `SLIDE_W_IN × SLIDE_H_IN` inches scaled to the parent via CSS transform (same approach as `ScaledSlide`).
+### 1. Module Instance model (`src/lib/module-instance.ts`)
 
-- Absolute-positioned `<div>` per shape, sized in `%` of the slide inches so the canvas scales cleanly
-- Preset geometries rendered as SVG `<path>` when they're not plain rectangles (ellipse, roundRect, triangle, chevron, arrow, callout)
-- Gradients → CSS `linear-gradient` / `radial-gradient` with the captured stops
-- Pictures → signed URL from the existing per-slide `imagePaths[]`
-- Text: each run rendered with its bold/italic/color/font/size; paragraph alignment + bullet from the paragraph properties
-- Groups → nested container with the group transform applied
-- Rotation via `transform: rotate()`; flips via `scaleX/Y(-1)`
+```text
+ModuleInstance
+ ├─ id
+ ├─ variantId          → MODULE_VARIANTS entry
+ ├─ content            → SlideContent (the filled fields)
+ ├─ brandMode          → division token override
+ ├─ backdrop           → optional deterministic/custom
+ ├─ role               → hero | proof | stat | quote | cta | close | logo | data
+ ├─ tags               → free-form (division, tone, campaign)
+ └─ savedAs            → 'populated' | 'template' | null   ← user's choice
+```
 
-Fonts fall back to the deck theme's `headingFont` / `bodyFont`; when a run names a font not loaded on the page we set `font-family: "Name", <fallback>` so it degrades gracefully.
+New table `saved_modules` (owner FK, `variant_id`, `content` jsonb, `brand_mode`, `backdrop`, `save_kind` enum('populated','template'), `tags text[]`, `title`, `description`, timestamps). Full RLS + GRANT block.
 
-## UI wiring
+Save flow: any slide/module in any surface → **"Save to My Modules"** dialog offers:
+- **Save with content** (populated) — reusable "Acme case-study hero"
+- **Save as template** (variant + brand tokens only) — reusable "Aurora orb hero"
 
-`/library/imported`:
+---
 
-- Slide card: replace the text-only preview with a small `FaithfulSlideCanvas` thumbnail (aspect-ratio 16/9)
-- Inspect modal: full-size faithful canvas + the existing outline text tab beside it
-- Add a "Fidelity" badge on each card (green when `layout.shapes.length > 0`, amber "Text only" for legacy rows)
+### 2. Surface store (`src/lib/surface-store.ts`)
 
-Everything else — approve-to-library, `send to library`, download original .pptx — stays.
+Parallel to `deck-store`. Handles Brochure / OnePager / Social / Email.
 
-## Scope of shape features covered
+```text
+Surface
+ ├─ id, kind ('brochure' | 'onepager' | 'social' | 'email')
+ ├─ format  (bi-fold | tri-fold | 4pp | 8pp | letter | linkedin | ig-1x1 | ig-4x5 | ig-9x16 | email-single-column)
+ ├─ brandMode, subCompany, clientLogoUrl
+ ├─ modules: ModuleInstance[]     ← the atoms
+ └─ meta: { title, subject?, preheader?, cta? }
+```
 
-In: text boxes, pictures, tables, groups, connectors/lines, common `prstGeom` (rect, roundRect, ellipse, triangle, rtTriangle, parallelogram, trapezoid, diamond, pentagon, hexagon, chevron, arrow variants, callout), solid + gradient + picture fills, line dash + arrows, rotation/flip, per-run typography, paragraph alignment + bullets.
+New table `surfaces` (owner FK, `kind`, `format`, `brand_mode_id`, `context jsonb`, `modules jsonb`, `meta jsonb`, timestamps). Companion `surface_versions` for undo/history parity with decks.
 
-Deferred (called out in a small tooltip on the fidelity badge when detected): 3-D effects, shadows/glows/reflections, ink annotations, embedded video/audio, animations/transitions, WordArt text effects, math equations. These fall back to a plain rendering (no shadow) rather than being dropped.
+Existing `deck-store` continues untouched. A small bridge helper `moduleFromSlide()` and `slideFromModule()` lets users pull any deck slide into "My Modules" and vice versa without coupling the stores.
 
-## Files touched
+---
 
-- `src/lib/pptx-import.functions.ts` — new `extractSlideLayout(doc, rels, imagePathsByRel)`; emit `layout` on each `ParsedSlide`. Add typed `Shape` / `Run` / `Paragraph` / `Fill` / `Line` interfaces.
-- `src/lib/imported-decks.functions.ts` — persist `layout` into the `slides` JSON; return it from `getImportedDeckSlides`; wire `imagePaths` → `blipPathByRel` so the renderer gets storage paths.
-- `src/components/slide/FaithfulSlideCanvas.tsx` — new renderer.
-- `src/routes/library.imported.tsx` — thumbnails + inspect modal use the renderer; add fidelity badge.
+### 3. Surface adapters (`src/lib/surface-adapters/`)
 
-## Out of scope for this pass
+Each adapter takes a `ModuleInstance` + surface context and returns render metadata (crop, safe zone, layout hints):
 
-- Editing the imported slide (still promote-only; editing lands as a follow-up that converts a captured shape list into our native `DeckSlide` model).
-- PPTX re-export from the captured layout (round-trip). We only need faithful *viewing* right now.
+```text
+surface-adapters/
+ ├─ deck.ts       (identity — proves the abstraction; deck-store stays canonical)
+ ├─ brochure.ts   → page + bleed + fold safe zones
+ ├─ onepager.ts   → composition zones (hero / body / cta strip)
+ ├─ social.ts     → 1:1 / 4:5 / 9:16 / 16:9 crops + safe zones
+ └─ email.ts      → responsive HTML block (React Email)
+```
+
+Every existing `MODULE_VARIANTS` entry gains a lightweight `surfaces` capability tag:
+
+```ts
+surfaces: {
+  deck: true, brochure: true, onepager: true,
+  social: { '1:1': true, '4:5': true, '9:16': false, '16:9': true },
+  email: true,
+}
+```
+
+Defaults are inferred per family (hero/quote/stat/logo → all surfaces; charts/dashboards → deck+brochure+onepager only; marquee → social+email as scroll strip). No new variants required.
+
+---
+
+### 4. Module Library UX — "My Modules"
+
+Extend `/library` (Atlas):
+- New tab **"My Modules"** listing saved instances with thumbnail, kind badge (populated vs template), tags, and division chip.
+- Filter by role / division / surface support.
+- Drag any module → active surface.
+- "Use in…" menu on any module: **New Deck · New Brochure · New One-pager · New Social · New Email**.
+
+---
+
+### 5. Surface Composer (`src/routes/surfaces.$surfaceId.tsx`)
+
+One route, four surface renderers via `kind`:
+- **Brochure Composer** — spread view, fold guides, drop zones per page.
+- **One-pager Composer** — single canvas with composition guides.
+- **Social Composer** — carousel of crops, drag same module across ratios.
+- **Email Composer** — vertical block stack, live inbox preview (light/dark).
+
+Left rail = Module Library + My Modules. Right rail = surface inspector (format, brand mode, bleed/safe zones, page numbers). Reuses `SlideChrome`, `VariantRenderer`, ink palette.
+
+---
+
+### 6. Auto-compose (optional AI accelerator)
+
+Server fn `composeSurface({ kind, format, brief? | deckId?, modules? })`:
+- Pulls candidate modules (from My Modules first, then MODULE_VARIANTS with content synthesized via existing Narrative Strategist).
+- Uses Claude to sequence modules to fit the surface's role pattern.
+- Returns a draft surface ready for review.
+
+---
+
+### 7. Exports (`src/lib/surface-export/`)
+
+- `brochure-pdf.ts` — @react-pdf/renderer with bleed + fold marks.
+- `onepager-pdf.ts` — single-page @react-pdf.
+- `social-png.ts` — html-to-image at target dimensions → zip.
+- `email-html.ts` — React Email inline-CSS HTML (and MJML preview).
+- Existing PPTX/PDF export in `deck-store` is untouched.
+
+---
+
+### 8. Entry points
+
+- Home Command Center: new **"Create surface"** dropdown (Deck / Brochure / One-pager / Social / Email).
+- Deck editor: **"Save slide to My Modules"** on any slide + **"Reuse this deck as…"** menu (opens a surface pre-populated with the deck's modules).
+- Library: **"Use in…"** menu on every module.
+
+---
+
+### Technical notes
+
+- **Zero regressions.** `deck-store`, deck routes, deck exports, deck share, Copilot, Art Director, Brand Reviewer — all untouched.
+- **Bridge helpers only**: `moduleFromSlide()` (deck → module) and `slideFromModule()` (module → deck). No store coupling.
+- **Variant capability tags** are additive metadata; unknown surfaces default to `deck: true` only, so nothing breaks.
+- **RLS**: `saved_modules` and `surfaces` scoped to owner; `has_role('admin')` bypass for admin surfaces (matches existing pattern).
+- **Storage reuse**: brochure/one-pager/social/email inherit `client_logos`, `division_imagery`, `slide-videos` buckets.
+- **PDF fonts**: reuse Geist already embedded for PPTX export.
+- **Email**: scaffold Lovable email templates so an email surface can also be *sent* if a domain is configured (optional — email surfaces are always exportable as HTML regardless).
+
+---
+
+### Ship order
+
+1. `saved_modules` + `surfaces` + `surface_versions` migrations (+ GRANT + RLS).
+2. `module-instance.ts` + variant capability tags + bridge helpers.
+3. "My Modules" tab + Save dialog in Library.
+4. `surface-store.ts` + Surface Composer shell (empty, all four kinds).
+5. Adapters + renderers per surface (Brochure → OnePager → Social → Email).
+6. Exports per surface (PDF → PNG zip → HTML).
+7. Auto-compose server fn.
+8. Entry points in Home + Deck editor + Library.
+9. E2E: save a hero module from the Acme demo deck → drop into a brochure + a social kit + an email → export all three → visual QA.

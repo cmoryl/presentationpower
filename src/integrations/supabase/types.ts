@@ -1784,6 +1784,69 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_modules: {
+        Row: {
+          backdrop: Json | null
+          brand_mode: string | null
+          content: Json
+          created_at: string
+          description: string | null
+          division_id: string | null
+          id: string
+          owner_id: string
+          role: string | null
+          save_kind: Database["public"]["Enums"]["module_save_kind"]
+          source_deck_id: string | null
+          source_slide_id: string | null
+          sub_company: string | null
+          tags: string[]
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          variant_id: string
+        }
+        Insert: {
+          backdrop?: Json | null
+          brand_mode?: string | null
+          content?: Json
+          created_at?: string
+          description?: string | null
+          division_id?: string | null
+          id?: string
+          owner_id: string
+          role?: string | null
+          save_kind?: Database["public"]["Enums"]["module_save_kind"]
+          source_deck_id?: string | null
+          source_slide_id?: string | null
+          sub_company?: string | null
+          tags?: string[]
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          variant_id: string
+        }
+        Update: {
+          backdrop?: Json | null
+          brand_mode?: string | null
+          content?: Json
+          created_at?: string
+          description?: string | null
+          division_id?: string | null
+          id?: string
+          owner_id?: string
+          role?: string | null
+          save_kind?: Database["public"]["Enums"]["module_save_kind"]
+          source_deck_id?: string | null
+          source_slide_id?: string | null
+          sub_company?: string | null
+          tags?: string[]
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          variant_id?: string
+        }
+        Relationships: []
+      }
       section_frameworks: {
         Row: {
           id: string
@@ -1950,6 +2013,98 @@ export type Database = {
           },
         ]
       }
+      surface_versions: {
+        Row: {
+          created_at: string
+          id: string
+          label: string | null
+          owner_id: string
+          snapshot: Json
+          surface_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label?: string | null
+          owner_id: string
+          snapshot: Json
+          surface_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string | null
+          owner_id?: string
+          snapshot?: Json
+          surface_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "surface_versions_surface_id_fkey"
+            columns: ["surface_id"]
+            isOneToOne: false
+            referencedRelation: "surfaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      surfaces: {
+        Row: {
+          archetype_id: string | null
+          brand_mode_id: string | null
+          context: Json
+          created_at: string
+          format: string
+          id: string
+          is_template: boolean
+          kind: Database["public"]["Enums"]["surface_kind"]
+          meta: Json
+          modules: Json
+          owner_id: string
+          source_deck_id: string | null
+          sub_company: string | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          archetype_id?: string | null
+          brand_mode_id?: string | null
+          context?: Json
+          created_at?: string
+          format: string
+          id?: string
+          is_template?: boolean
+          kind: Database["public"]["Enums"]["surface_kind"]
+          meta?: Json
+          modules?: Json
+          owner_id: string
+          source_deck_id?: string | null
+          sub_company?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          archetype_id?: string | null
+          brand_mode_id?: string | null
+          context?: Json
+          created_at?: string
+          format?: string
+          id?: string
+          is_template?: boolean
+          kind?: Database["public"]["Enums"]["surface_kind"]
+          meta?: Json
+          modules?: Json
+          owner_id?: string
+          source_deck_id?: string | null
+          sub_company?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -2036,6 +2191,8 @@ export type Database = {
         | "terminology"
         | "note"
       knowledge_visibility: "private" | "shared" | "global"
+      module_save_kind: "populated" | "template"
+      surface_kind: "brochure" | "onepager" | "social" | "email"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2181,6 +2338,8 @@ export const Constants = {
         "note",
       ],
       knowledge_visibility: ["private", "shared", "global"],
+      module_save_kind: ["populated", "template"],
+      surface_kind: ["brochure", "onepager", "social", "email"],
     },
   },
 } as const
