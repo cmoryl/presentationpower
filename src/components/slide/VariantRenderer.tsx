@@ -4897,12 +4897,25 @@ function renderLocationsVariant(
     const activeMetric = metrics.find((m) => m.id === activeMetricId);
     const usingMetric = !!activeMetric;
 
-    // Aggregate active metric per region + global.
+    // Optional region filter — array of region keys. Empty/missing = all.
+    const REGION_KEY_SET: LocPin["region"][] = ["AMER", "EMEA", "APAC", "LATAM", "MEA"];
+    const rawFilter = Array.isArray(c.regionFilter) ? (c.regionFilter as unknown[]) : [];
+    const filterSet = new Set(
+      rawFilter.filter((r): r is LocPin["region"] => typeof r === "string" && REGION_KEY_SET.includes(r as LocPin["region"])),
+    );
+    const filteredPins = filterSet.size > 0 && filterSet.size < REGION_KEY_SET.length
+      ? pins.filter((p) => filterSet.has(p.region))
+      : pins;
+    const filteredCities = filteredPins.length;
+    const filteredRegions = (Object.keys(LOC_REGION_LABELS) as LocPin["region"][]).filter((k) => filteredPins.some((p) => p.region === k)).length;
+    const filterActive = filteredPins.length !== pins.length;
+
+    // Aggregate active metric per region + global (over filtered pins).
     const metricByRegion: Partial<Record<LocPin["region"], number>> = {};
     let metricTotal = 0;
     let metricCoverage = 0; // pins with a value
     if (usingMetric) {
-      for (const p of pins) {
+      for (const p of filteredPins) {
         const v = p.values?.[activeMetric!.id];
         if (Number.isFinite(v)) {
           metricByRegion[p.region] = (metricByRegion[p.region] ?? 0) + (v as number);
@@ -4911,6 +4924,7 @@ function renderLocationsVariant(
         }
       }
     }
+
 
     const topPins = usingMetric
       ? [...pins]
