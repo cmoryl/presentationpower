@@ -4050,16 +4050,17 @@ function renderVariantBody({
               const v = Number(it.value) || 0;
               const h = Math.max(40, (v / max) * 420);
               const isLast = i === items.length - 1;
-              const color = isLast ? "var(--slide-accent-text)" : ink.surface;
-              const opacity = 1;
+              const fill = isLast
+                ? `linear-gradient(180deg, color-mix(in oklab, var(--slide-accent-text) 78%, transparent) 0%, color-mix(in oklab, var(--slide-accent-text) 18%, transparent) 100%)`
+                : `linear-gradient(180deg, color-mix(in oklab, var(--slide-accent-text) 22%, transparent) 0%, color-mix(in oklab, var(--slide-accent-text) 4%, transparent) 100%)`;
               return (
                 <div key={i} className="flex flex-col items-center justify-end">
-                  <div style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1 }}>
-                    {s(it.value)}<span style={{ fontSize: 26, color: "var(--slide-accent-text)", marginLeft: 4 }}>{s(it.unit)}</span>
+                  <div className="tabular-nums" style={{ fontSize: 56, fontWeight: 600, color: ink.strong, letterSpacing: "-0.025em", lineHeight: 1 }}>
+                    {s(it.value)}<span style={{ fontSize: 28, color: "var(--slide-accent-text)", marginLeft: 4 }}>{s(it.unit)}</span>
                   </div>
-                  <div className="mt-6 w-full" style={{ height: h, background: color, opacity, maxWidth: 220 }} />
-                  <div className="mt-6 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: isLast ? "var(--slide-accent-text)" : ink.faint, fontWeight: 600 }}>{s(it.year)}</div>
-                  {s(it.note) && <div className="mt-2 text-center" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 60%, transparent)", maxWidth: 220 }}>{s(it.note)}</div>}
+                  <div className="mt-6 w-full" style={{ height: h, background: fill, maxWidth: 200, borderRadius: 2 }} />
+                  <div className="mt-6 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: isLast ? "var(--slide-accent-text)" : ink.faint, fontWeight: 700 }}>{s(it.year)}</div>
+                  {s(it.note) && <div className="mt-2 text-center" style={{ fontSize: 15, lineHeight: 1.4, color: ink.muted, maxWidth: 220 }}>{s(it.note)}</div>}
                 </div>
               );
             })}
