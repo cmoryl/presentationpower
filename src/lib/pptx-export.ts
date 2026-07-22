@@ -20,6 +20,7 @@ import {
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { MODULE_VARIANTS, byId } from "./taxonomy";
 import { auroraSvgDataUrl } from "./aurora-svg";
+import { embedFontsInPptx } from "./pptx-font-embed";
 
 // Rasterize an SVG data URL to a PNG data URL via <canvas> so PowerPoint
 // renders our aurora backdrops reliably (some viewers ignore embedded SVG
@@ -589,7 +590,7 @@ export async function exportDeckToPptx(
           x: pos.x, y: pos.y, w: tile, h: tile,
           align: "center", valign: "middle",
           fontSize: Math.round(tile * 30),
-          bold: true, color: strokeColor, fontFace: "Inter",
+          bold: true, color: strokeColor, fontFace: "Geist",
         });
       } else if (isVertical && logoData) {
         // Rotated lockup along the corresponding edge. pptxgenjs rotates
@@ -635,11 +636,11 @@ export async function exportDeckToPptx(
 
     if (!hideFooter) {
       s.addText("TransPerfect", {
-        x: 0.5, y: 7.05, w: 4, h: 0.3, fontSize: 9, color: "666666", fontFace: "Inter",
+        x: 0.5, y: 7.05, w: 4, h: 0.3, fontSize: 9, color: "666666", fontFace: "Geist",
       });
       s.addText(String(i + 1).padStart(2, "0"), {
         x: SLIDE_W - 1.0, y: 7.05, w: 0.5, h: 0.3,
-        fontSize: 9, color: "666666", align: "right", fontFace: "Inter",
+        fontSize: 9, color: "666666", align: "right", fontFace: "Geist",
       });
     }
 
@@ -678,12 +679,24 @@ export async function exportDeckToPptx(
   }
 
   const fileName = `${sanitize(deck.title)}.pptx`;
+  // Always embed Geist so PowerPoint renders the exact app typography instead
+  // of substituting Calibri/Arial. Falls back to the raw blob if embedding
+  // fails so exports are never blocked.
+  const rawBlob = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
+  const finalBlob = await embedFontsInPptx(rawBlob);
   if (opts?.output === "blob") {
-    // pptxgenjs returns a Blob in the browser when outputType is "blob".
-    const blob = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
-    return { blob, failedSlides };
+    return { blob: finalBlob, failedSlides };
   }
-  await pptx.writeFile({ fileName });
+  if (typeof document !== "undefined") {
+    const url = URL.createObjectURL(finalBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
   return { failedSlides };
 }
 
@@ -768,15 +781,15 @@ function renderCover(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   s.addShape("rect", { x: 0.6, y: 3.2, w: 0.15, h: 1.6, fill: { color: p.accent }, line: { color: p.accent } });
   s.addText(title || "Untitled", {
     x: 1.0, y: 2.8, w: SLIDE_W - 2, h: 2.4,
-    fontSize: 54, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle",
+    fontSize: 54, bold: true, color: "FFFFFF", fontFace: "Geist", valign: "middle",
   });
   if (subtitle) {
     s.addText(subtitle, {
       x: 1.0, y: 5.0, w: SLIDE_W - 2, h: 0.8,
-      fontSize: 22, color: "FFFFFF", fontFace: "Inter",
+      fontSize: 22, color: "FFFFFF", fontFace: "Geist",
     });
   }
-  if (date) s.addText(date, { x: 1.0, y: 6.6, w: 4, h: 0.4, fontSize: 12, color: "FFFFFF", fontFace: "Inter" });
+  if (date) s.addText(date, { x: 1.0, y: 6.6, w: 4, h: 0.4, fontSize: 12, color: "FFFFFF", fontFace: "Geist" });
 }
 
 function renderDivider(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
@@ -786,12 +799,12 @@ function renderDivider(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   if (eyebrow) {
     s.addText(eyebrow.toUpperCase(), {
       x: 0.8, y: 3.0, w: SLIDE_W - 1.6, h: 0.5,
-      fontSize: 14, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 6,
+      fontSize: 14, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 6,
     });
   }
   s.addText(title || "Section", {
     x: 0.8, y: 3.5, w: SLIDE_W - 1.6, h: 1.8,
-    fontSize: 48, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle",
+    fontSize: 48, bold: true, color: "FFFFFF", fontFace: "Geist", valign: "middle",
   });
 }
 
@@ -806,11 +819,11 @@ function renderAgenda(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
     const y = startY + k * rowH;
     s.addText(String(k + 1).padStart(2, "0"), {
       x: 0.6, y, w: 1.0, h: rowH,
-      fontSize: 22, bold: true, color: p.accent, fontFace: "Inter", valign: "middle",
+      fontSize: 22, bold: true, color: p.accent, fontFace: "Geist", valign: "middle",
     });
     s.addText(str(it.label || it.title || it.name), {
       x: 1.5, y, w: SLIDE_W - 2.5, h: rowH,
-      fontSize: 20, bold: true, color: p.primary, fontFace: "Inter", valign: "middle",
+      fontSize: 20, bold: true, color: p.primary, fontFace: "Geist", valign: "middle",
     });
   });
 }
@@ -831,11 +844,11 @@ function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
     const x = 0.6 + k * (colW + 0.3);
     s.addText(`${str(it.value ?? it.stat ?? it.amount)}${str(it.unit ?? "")}`, {
       x, y, w: colW, h: 2.0,
-      fontSize: 56, bold: true, color: p.accent, fontFace: "Inter",
+      fontSize: 56, bold: true, color: p.accent, fontFace: "Geist",
     });
     s.addText(str(it.label ?? it.narrative ?? ""), {
       x, y: y + 2.1, w: colW, h: 1.8,
-      fontSize: 14, color: p.ink, fontFace: "Inter", valign: "top",
+      fontSize: 14, color: p.ink, fontFace: "Geist", valign: "top",
     });
   });
 }
@@ -847,16 +860,16 @@ function renderQuote(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   const role = str(c.role || c.title);
   s.addText("\u201C", {
     x: 0.8, y: 1.2, w: 1.5, h: 1.5,
-    fontSize: 120, bold: true, color: p.accent, fontFace: "Inter",
+    fontSize: 120, bold: true, color: p.accent, fontFace: "Geist",
   });
   s.addText(quote || "", {
     x: 1.5, y: 2.2, w: SLIDE_W - 3.0, h: 3.4,
-    fontSize: 28, italic: true, color: p.primary, fontFace: "Inter", valign: "middle",
+    fontSize: 28, italic: true, color: p.primary, fontFace: "Geist", valign: "middle",
   });
   if (attribution) {
     s.addText(`${attribution}${role ? ` \u00b7 ${role}` : ""}`, {
       x: 1.5, y: 5.7, w: SLIDE_W - 3.0, h: 0.5,
-      fontSize: 14, color: p.ink, fontFace: "Inter", charSpacing: 2,
+      fontSize: 14, color: p.ink, fontFace: "Geist", charSpacing: 2,
     });
   }
 }
@@ -869,17 +882,17 @@ function renderCallout(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   if (kicker) {
     s.addText(kicker.toUpperCase(), {
       x: 0.8, y: 2.2, w: SLIDE_W - 1.6, h: 0.4,
-      fontSize: 12, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 4,
+      fontSize: 12, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 4,
     });
   }
   s.addText(headline || "", {
     x: 0.8, y: 2.7, w: SLIDE_W - 1.6, h: 2.4,
-    fontSize: 44, bold: true, color: p.primary, fontFace: "Inter", valign: "middle",
+    fontSize: 44, bold: true, color: p.primary, fontFace: "Geist", valign: "middle",
   });
   if (body) {
     s.addText(body, {
       x: 0.8, y: 5.3, w: SLIDE_W - 1.6, h: 1.4,
-      fontSize: 16, color: p.ink, fontFace: "Inter",
+      fontSize: 16, color: p.ink, fontFace: "Geist",
     });
   }
 }
@@ -907,11 +920,11 @@ function renderCards(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
     s.addShape("rect", { x, y, w: 0.08, h: rowH, fill: { color: p.accent }, line: { color: p.accent } });
     s.addText(str(it.title || it.label || it.name), {
       x: x + 0.3, y: y + 0.2, w: colW - 0.5, h: 0.6,
-      fontSize: 16, bold: true, color: p.primary, fontFace: "Inter",
+      fontSize: 16, bold: true, color: p.primary, fontFace: "Geist",
     });
     s.addText(str(it.body || it.description || it.detail), {
       x: x + 0.3, y: y + 0.85, w: colW - 0.5, h: rowH - 1.0,
-      fontSize: 12, color: p.ink, fontFace: "Inter", valign: "top",
+      fontSize: 12, color: p.ink, fontFace: "Geist", valign: "top",
     });
   });
 }
@@ -942,16 +955,16 @@ function renderTimeline(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
     });
     s.addText(String(k + 1), {
       x: cx, y: trackY, w: dot, h: dot,
-      fontSize: 20, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle",
+      fontSize: 20, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center", valign: "middle",
     });
     const boxX = cx + dot / 2 - 1.3;
     s.addText(str(it.label || it.title || it.name), {
       x: boxX, y: trackY + dot + 0.15, w: 2.6, h: 0.5,
-      fontSize: 14, bold: true, color: p.primary, fontFace: "Inter", align: "center",
+      fontSize: 14, bold: true, color: p.primary, fontFace: "Geist", align: "center",
     });
     s.addText(str(it.body || it.description || it.detail), {
       x: boxX, y: trackY + dot + 0.7, w: 2.6, h: 2.0,
-      fontSize: 11, color: p.ink, fontFace: "Inter", align: "center", valign: "top",
+      fontSize: 11, color: p.ink, fontFace: "Geist", align: "center", valign: "top",
     });
   });
 }
@@ -982,25 +995,25 @@ function renderCompare(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
     const label = str(it.label || it.title || it.name || (k === 0 ? "Today" : "Tomorrow"));
     s.addText(label.toUpperCase(), {
       x, y, w: colW, h: 0.4,
-      fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 4,
+      fontSize: 11, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 4,
     });
     s.addText(str(it.headline || it.title2 || ""), {
       x, y: y + 0.5, w: colW, h: 1.0,
-      fontSize: 22, bold: true, color: p.primary, fontFace: "Inter",
+      fontSize: 22, bold: true, color: p.primary, fontFace: "Geist",
     });
     const bullets = arr(it.items);
     if (bullets.length) {
       s.addText(
         bullets.map((b) => ({
           text: str(b.label || b.body || b.name),
-          options: { bullet: { code: "25CF" }, fontFace: "Inter", fontSize: 13, color: p.ink },
+          options: { bullet: { code: "25CF" }, fontFace: "Geist", fontSize: 13, color: p.ink },
         })),
         { x, y: y + 1.6, w: colW, h: h - 1.8, fontSize: 13, color: p.ink, paraSpaceAfter: 6 },
       );
     } else {
       s.addText(str(it.body || it.description || ""), {
         x, y: y + 1.6, w: colW, h: h - 1.8,
-        fontSize: 14, color: p.ink, fontFace: "Inter", valign: "top",
+        fontSize: 14, color: p.ink, fontFace: "Geist", valign: "top",
       });
     }
   });
@@ -1014,14 +1027,14 @@ function renderTitleZone(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pale
   if (kicker) {
     s.addText(kicker.toUpperCase(), {
       x: 0.6, y, w: SLIDE_W - 1.2, h: 0.3,
-      fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 3,
+      fontSize: 11, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 3,
     });
     y += 0.35;
   }
   if (title) {
     s.addText(title, {
       x: 0.6, y, w: SLIDE_W - 1.2, h: 1.0,
-      fontSize: 30, bold: true, color: p.primary, fontFace: "Inter",
+      fontSize: 30, bold: true, color: p.primary, fontFace: "Geist",
     });
     y += 1.1;
   }
@@ -1042,9 +1055,9 @@ function renderContent(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
     const label = str(content.label || content.narrative);
     s.addText(`${stat}${unit}`, {
       x: 0.6, y: cursorY + 0.3, w: SLIDE_W - 1.2, h: 3.0,
-      fontSize: 140, bold: true, color: p.primary, fontFace: "Inter",
+      fontSize: 140, bold: true, color: p.primary, fontFace: "Geist",
     });
-    if (label) s.addText(label, { x: 0.6, y: cursorY + 3.6, w: SLIDE_W - 1.2, h: 1.5, fontSize: 18, color: p.ink, fontFace: "Inter" });
+    if (label) s.addText(label, { x: 0.6, y: cursorY + 3.6, w: SLIDE_W - 1.2, h: 1.5, fontSize: 18, color: p.ink, fontFace: "Geist" });
     return;
   }
 
@@ -1053,11 +1066,11 @@ function renderContent(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   if (items && items.length > 0) {
     const bullets = items.map((it) => ({
       text: `${str(it.label ?? it.name ?? it.title)}${it.body ? ` \u2014 ${str(it.body)}` : ""}`,
-      options: { bullet: { code: "25CF" }, fontFace: "Inter", fontSize: 14, color: p.ink },
+      options: { bullet: { code: "25CF" }, fontFace: "Geist", fontSize: 14, color: p.ink },
     }));
     s.addText(bullets, {
       x: 0.6, y: cursorY + 0.3, w: SLIDE_W - 1.2, h: 5.5 - cursorY,
-      fontSize: 14, color: p.ink, fontFace: "Inter", paraSpaceAfter: 8,
+      fontSize: 14, color: p.ink, fontFace: "Geist", paraSpaceAfter: 8,
     });
     return;
   }
@@ -1066,7 +1079,7 @@ function renderContent(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   if (narrative) {
     s.addText(narrative, {
       x: 0.6, y: cursorY + 0.3, w: SLIDE_W - 1.2, h: 4.5,
-      fontSize: 18, color: p.ink, fontFace: "Inter", valign: "top",
+      fontSize: 18, color: p.ink, fontFace: "Geist", valign: "top",
     });
   }
 }
@@ -1226,17 +1239,17 @@ function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
       s.addShape("rect", { x: cell.x, y: cell.y, w: cell.w, h: cell.h, fill: { color: "FFFFFF" }, line: { color: LIGHT_GRAY, width: 1 } });
       s.addText(`${str(it.value)}${str(it.unit)}`, {
         x: cell.x + 0.3, y: cell.y + 0.2, w: cell.w - 0.6, h: cell.h * 0.6,
-        fontSize: 64, bold: true, color: p.accent, fontFace: "Inter",
+        fontSize: 64, bold: true, color: p.accent, fontFace: "Geist",
       });
       s.addText(str(it.label), {
         x: cell.x + 0.3, y: cell.y + cell.h - 0.9, w: cell.w - 0.6, h: 0.7,
-        fontSize: 12, color: p.ink, fontFace: "Inter", charSpacing: 3, bold: true,
+        fontSize: 12, color: p.ink, fontFace: "Geist", charSpacing: 3, bold: true,
       });
     } else if (kind === "media") {
       s.addShape("rect", { x: cell.x, y: cell.y, w: cell.w, h: cell.h, fill: { color: p.primary, transparency: 90 }, line: { color: LIGHT_GRAY, width: 1 } });
       s.addText(str(it.title), {
         x: cell.x + 0.25, y: cell.y + cell.h - 0.55, w: cell.w - 0.5, h: 0.4,
-        fontSize: 11, bold: true, color: p.primary, fontFace: "Inter", charSpacing: 2,
+        fontSize: 11, bold: true, color: p.primary, fontFace: "Geist", charSpacing: 2,
       });
     } else {
       s.addShape("rect", { x: cell.x, y: cell.y, w: cell.w, h: cell.h, fill: { color: "FFFFFF" }, line: { color: LIGHT_GRAY, width: 1 } });
@@ -1244,11 +1257,11 @@ function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
       const isLarge = k === 0;
       s.addText(str(it.title), {
         x: cell.x + 0.3, y: cell.y + 0.25, w: cell.w - 0.5, h: isLarge ? 0.7 : 0.5,
-        fontSize: isLarge ? 20 : 14, bold: true, color: p.primary, fontFace: "Inter",
+        fontSize: isLarge ? 20 : 14, bold: true, color: p.primary, fontFace: "Geist",
       });
       s.addText(str(it.body), {
         x: cell.x + 0.3, y: cell.y + (isLarge ? 1.0 : 0.75), w: cell.w - 0.5, h: cell.h - (isLarge ? 1.2 : 0.9),
-        fontSize: isLarge ? 14 : 11, color: p.ink, fontFace: "Inter", valign: "top",
+        fontSize: isLarge ? 14 : 11, color: p.ink, fontFace: "Geist", valign: "top",
       });
     }
   });
@@ -1274,11 +1287,11 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     s.addShape("rect", { x, y, w: colW, h: 0.03, fill: { color: p.accent }, line: { color: p.accent } });
     s.addText(str(it.label).toUpperCase(), {
       x, y: y + 0.15, w: colW, h: 0.35,
-      fontSize: 10, bold: true, color: p.ink, fontFace: "Inter", charSpacing: 4,
+      fontSize: 10, bold: true, color: p.ink, fontFace: "Geist", charSpacing: 4,
     });
     s.addText(`${str(it.value)}${str(it.unit)}`, {
       x, y: y + 0.55, w: colW, h: rowH * 0.55,
-      fontSize: 44, bold: true, color: p.accent, fontFace: "Inter",
+      fontSize: 44, bold: true, color: p.accent, fontFace: "Geist",
     });
     const trend = str(it.trend);
     const arrow = trend === "down" ? "▼" : trend === "up" ? "▲" : "•";
@@ -1287,7 +1300,7 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     if (delta) {
       s.addText(`${arrow} ${delta}`, {
         x, y: y + rowH - 0.5, w: colW, h: 0.4,
-        fontSize: 12, bold: true, color: deltaColor, fontFace: "Inter",
+        fontSize: 12, bold: true, color: deltaColor, fontFace: "Geist",
       });
     }
   });
@@ -1308,7 +1321,7 @@ function renderRoadmapQuarters(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     const x = gridX + k * colW;
     s.addText(q, {
       x, y: y0, w: colW, h: 0.4,
-      fontSize: 12, bold: true, color: p.primary, fontFace: "Inter", charSpacing: 3, align: "left",
+      fontSize: 12, bold: true, color: p.primary, fontFace: "Geist", charSpacing: 3, align: "left",
     });
     s.addShape("rect", { x, y: y0 + 0.42, w: colW - 0.1, h: 0.02, fill: { color: p.accent }, line: { color: p.accent } });
   });
@@ -1319,7 +1332,7 @@ function renderRoadmapQuarters(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     const y = rowY + k * rowH;
     s.addText(str(it.label), {
       x: marginX, y, w: labelW - 0.15, h: rowH,
-      fontSize: 12, bold: true, color: p.ink, fontFace: "Inter", valign: "middle",
+      fontSize: 12, bold: true, color: p.ink, fontFace: "Geist", valign: "middle",
     });
     const start = Math.max(1, Number(it.start) || 1);
     const end = Math.min(quarters.length, Number(it.end) || start);
@@ -1332,7 +1345,7 @@ function renderRoadmapQuarters(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     if (it.note) {
       s.addText(str(it.note), {
         x: barX + 0.15, y: y + rowH * 0.25, w: Math.max(0.4, barW) - 0.3, h: rowH * 0.5,
-        fontSize: 9, color: "FFFFFF", fontFace: "Inter", valign: "middle",
+        fontSize: 9, color: "FFFFFF", fontFace: "Geist", valign: "middle",
       });
     }
   });
@@ -1359,16 +1372,16 @@ function renderFunnel(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
     });
     s.addText(str(it.label), {
       x: x + 0.25, y, w: w * 0.65, h: barH,
-      fontSize: 14, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle",
+      fontSize: 14, bold: true, color: "FFFFFF", fontFace: "Geist", valign: "middle",
     });
     s.addText(`${str(it.value)}${str(it.unit)}`, {
       x: x + w * 0.6, y, w: w * 0.35 - 0.2, h: barH,
-      fontSize: 18, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle", align: "right",
+      fontSize: 18, bold: true, color: "FFFFFF", fontFace: "Geist", valign: "middle", align: "right",
     });
     if (it.note) {
       s.addText(str(it.note), {
         x: SLIDE_W - 3.6, y: y + barH * 0.25, w: (SLIDE_W - x - w) - 0.2, h: barH * 0.7,
-        fontSize: 9, color: p.ink, fontFace: "Inter", valign: "middle",
+        fontSize: 9, color: p.ink, fontFace: "Geist", valign: "middle",
       });
     }
   });
@@ -1390,7 +1403,7 @@ function renderFlywheel(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
   if (hub) {
     s.addText(hub, {
       x: cx - 1.5, y: cy - 0.4, w: 3.0, h: 0.8,
-      fontSize: 14, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle",
+      fontSize: 14, bold: true, color: p.primary, fontFace: "Geist", align: "center", valign: "middle",
     });
   }
   const n = items.length;
@@ -1409,11 +1422,11 @@ function renderFlywheel(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
     const boxX = align === "left" ? lx + 0.05 : align === "right" ? lx - boxW - 0.05 : lx - boxW / 2;
     s.addText(str(it.label), {
       x: boxX, y: ly - 0.35, w: boxW, h: 0.4,
-      fontSize: 13, bold: true, color: p.primary, fontFace: "Inter", align,
+      fontSize: 13, bold: true, color: p.primary, fontFace: "Geist", align,
     });
     s.addText(str(it.note), {
       x: boxX, y: ly, w: boxW, h: 0.7,
-      fontSize: 10, color: p.ink, fontFace: "Inter", align,
+      fontSize: 10, color: p.ink, fontFace: "Geist", align,
     });
   });
 }
@@ -1450,16 +1463,16 @@ function renderMaturityCurve(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
     });
     s.addText(str(it.label), {
       x: pt.x - 1.3, y: pt.y - 0.85, w: 2.6, h: 0.4,
-      fontSize: 12, bold: true, color: p.primary, fontFace: "Inter", align: "center",
+      fontSize: 12, bold: true, color: p.primary, fontFace: "Geist", align: "center",
     });
     s.addText(str(it.note), {
       x: pt.x - 1.3, y: pt.y - 0.5, w: 2.6, h: 0.4,
-      fontSize: 9, color: p.ink, fontFace: "Inter", align: "center",
+      fontSize: 9, color: p.ink, fontFace: "Geist", align: "center",
     });
     if (isCurrent) {
       s.addText("YOU ARE HERE", {
         x: pt.x - 1.3, y: pt.y + 0.2, w: 2.6, h: 0.3,
-        fontSize: 9, bold: true, color: p.accent, fontFace: "Inter", align: "center", charSpacing: 4,
+        fontSize: 9, bold: true, color: p.accent, fontFace: "Geist", align: "center", charSpacing: 4,
       });
     }
   });
@@ -1478,12 +1491,12 @@ function renderJourneyMap(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     const x = marginX + k * colW;
     s.addText(str(it.phase).toUpperCase(), {
       x, y: phaseY, w: colW - 0.1, h: 0.4,
-      fontSize: 11, bold: true, color: p.primary, fontFace: "Inter", charSpacing: 4,
+      fontSize: 11, bold: true, color: p.primary, fontFace: "Geist", charSpacing: 4,
     });
     s.addShape("rect", { x, y: phaseY + 0.42, w: colW - 0.2, h: 0.02, fill: { color: p.accent }, line: { color: p.accent } });
     s.addText(str(it.touchpoint), {
       x, y: phaseY + 0.55, w: colW - 0.15, h: 1.2,
-      fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top",
+      fontSize: 11, color: p.ink, fontFace: "Geist", valign: "top",
     });
   });
   // sentiment polyline in bottom half
@@ -1533,12 +1546,12 @@ function renderLogoWall(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
     } else {
       s.addText(initials(name), {
         x, y: y + 0.15, w: colW - 0.1, h: rowH * 0.55,
-        fontSize: 32, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle",
+        fontSize: 32, bold: true, color: p.primary, fontFace: "Geist", align: "center", valign: "middle",
       });
     }
     s.addText(name.toUpperCase(), {
       x, y: y + rowH - 0.55, w: colW - 0.1, h: 0.4,
-      fontSize: 10, color: p.ink, fontFace: "Inter", align: "center", charSpacing: 3,
+      fontSize: 10, color: p.ink, fontFace: "Geist", align: "center", charSpacing: 3,
     });
   });
 }
@@ -1571,18 +1584,18 @@ function renderMatrix2x2(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pale
     if (label) {
       s.addText(label.toUpperCase(), {
         x: q.x + 0.15, y: q.y + 0.12, w: half - 0.3, h: 0.4,
-        fontSize: 10, bold: true, color: p.primary, fontFace: "Inter", charSpacing: 3,
+        fontSize: 10, bold: true, color: p.primary, fontFace: "Geist", charSpacing: 3,
       });
     }
   });
   // Axis labels
   s.addText(str(c.axisX).toUpperCase(), {
     x: gridX, y: gridY + size + 0.1, w: size, h: 0.3,
-    fontSize: 9, bold: true, color: p.ink, fontFace: "Inter", charSpacing: 3, align: "center",
+    fontSize: 9, bold: true, color: p.ink, fontFace: "Geist", charSpacing: 3, align: "center",
   });
   s.addText(str(c.axisY).toUpperCase(), {
     x: gridX - 0.5, y: gridY, w: 0.4, h: size,
-    fontSize: 9, bold: true, color: p.ink, fontFace: "Inter", charSpacing: 3, align: "center", valign: "middle", rotate: 270,
+    fontSize: 9, bold: true, color: p.ink, fontFace: "Geist", charSpacing: 3, align: "center", valign: "middle", rotate: 270,
   });
   // Plotted items
   items.forEach((it) => {
@@ -1593,7 +1606,7 @@ function renderMatrix2x2(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pale
     s.addShape("ellipse", { x: px - 0.08, y: py - 0.08, w: 0.16, h: 0.16, fill: { color: p.primary }, line: { color: p.primary } });
     s.addText(str(it.label), {
       x: px + 0.12, y: py - 0.15, w: 2.0, h: 0.3,
-      fontSize: 10, bold: true, color: p.ink, fontFace: "Inter",
+      fontSize: 10, bold: true, color: p.ink, fontFace: "Geist",
     });
   });
 }
@@ -1613,11 +1626,11 @@ function renderIceberg(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palett
     const x = 0.6 + k * rowW;
     s.addText(str(it.label), {
       x, y: y0 + 0.1, w: rowW - 0.2, h: 0.5,
-      fontSize: 14, bold: true, color: p.primary, fontFace: "Inter",
+      fontSize: 14, bold: true, color: p.primary, fontFace: "Geist",
     });
     s.addText(str(it.body), {
       x, y: y0 + 0.65, w: rowW - 0.2, h: aboveH - 0.7,
-      fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top",
+      fontSize: 11, color: p.ink, fontFace: "Geist", valign: "top",
     });
   });
   // Waterline
@@ -1627,7 +1640,7 @@ function renderIceberg(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palett
     s.addShape("rect", { x: SLIDE_W / 2 - 1.7, y: wlY - 0.15, w: 3.4, h: 0.3, fill: { color: "FFFFFF" }, line: { color: "FFFFFF" } });
     s.addText(waterline.toUpperCase(), {
       x: SLIDE_W / 2 - 1.7, y: wlY - 0.15, w: 3.4, h: 0.3,
-      fontSize: 10, bold: true, color: p.accent, fontFace: "Inter", align: "center", charSpacing: 5,
+      fontSize: 10, bold: true, color: p.accent, fontFace: "Geist", align: "center", charSpacing: 5,
     });
   }
   // Below band tinted
@@ -1639,11 +1652,11 @@ function renderIceberg(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palett
     const x = 0.6 + k * bColW;
     s.addText(str(it.label), {
       x, y: belowY + 0.2, w: bColW - 0.2, h: 0.5,
-      fontSize: 13, bold: true, color: p.primary, fontFace: "Inter",
+      fontSize: 13, bold: true, color: p.primary, fontFace: "Geist",
     });
     s.addText(str(it.body), {
       x, y: belowY + 0.75, w: bColW - 0.2, h: belowH - 0.9,
-      fontSize: 10, color: p.ink, fontFace: "Inter", valign: "top",
+      fontSize: 10, color: p.ink, fontFace: "Geist", valign: "top",
     });
   });
 }
@@ -1662,37 +1675,37 @@ function renderEditorialSpread(s: PptxGenJS.Slide, c: Record<string, unknown>, p
   if (kicker) {
     s.addText(kicker.toUpperCase(), {
       x: 0.6, y: 0.6, w: SLIDE_W - 1.2, h: 0.4,
-      fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 5,
+      fontSize: 11, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 5,
     });
   }
   s.addText(`${pullValue}${pullUnit}`, {
     x: 0.6, y: 1.3, w: leftW, h: 3.2,
-    fontSize: 180, bold: true, color: p.accent, fontFace: "Inter",
+    fontSize: 180, bold: true, color: p.accent, fontFace: "Geist",
   });
   s.addText(pullLabel, {
     x: 0.6, y: 4.6, w: leftW, h: 1.0,
-    fontSize: 13, bold: true, color: p.ink, fontFace: "Inter", charSpacing: 3,
+    fontSize: 13, bold: true, color: p.ink, fontFace: "Geist", charSpacing: 3,
   });
   s.addText(title, {
     x: leftW + 0.9, y: 1.3, w: SLIDE_W - leftW - 1.5, h: 1.4,
-    fontSize: 26, bold: true, color: p.primary, fontFace: "Inter",
+    fontSize: 26, bold: true, color: p.primary, fontFace: "Geist",
   });
   // hairline column rule
   const colGap = (SLIDE_W - leftW - 1.5) / 2;
   s.addShape("rect", { x: leftW + 0.9 + colGap - 0.02, y: 2.9, w: 0.01, h: 3.5, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
   s.addText(bodyLeft, {
     x: leftW + 0.9, y: 2.9, w: colGap - 0.15, h: 3.5,
-    fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top",
+    fontSize: 11, color: p.ink, fontFace: "Geist", valign: "top",
   });
   s.addText(bodyRight, {
     x: leftW + 0.9 + colGap + 0.15, y: 2.9, w: colGap - 0.15, h: 3.5,
-    fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top",
+    fontSize: 11, color: p.ink, fontFace: "Geist", valign: "top",
   });
   if (folio) {
     s.addShape("rect", { x: 0.6, y: 6.7, w: SLIDE_W - 1.2, h: 0.01, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
     s.addText(folio.toUpperCase(), {
       x: 0.6, y: 6.75, w: SLIDE_W - 1.2, h: 0.3,
-      fontSize: 9, color: p.ink, fontFace: "Inter", charSpacing: 4,
+      fontSize: 9, color: p.ink, fontFace: "Geist", charSpacing: 4,
     });
   }
 }
@@ -1709,17 +1722,17 @@ function renderSplitManifesto(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
   if (kicker) {
     s.addText(kicker.toUpperCase(), {
       x: 0.6, y: 0.8, w: leftW - 1.0, h: 0.4,
-      fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 5,
+      fontSize: 11, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 5,
     });
   }
   s.addText(statement, {
     x: 0.6, y: 1.4, w: leftW - 1.0, h: SLIDE_H - 2.6,
-    fontSize: 30, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle",
+    fontSize: 30, bold: true, color: "FFFFFF", fontFace: "Geist", valign: "middle",
   });
   if (signoff) {
     s.addText(`— ${signoff}`, {
       x: 0.6, y: SLIDE_H - 1.0, w: leftW - 1.0, h: 0.4,
-      fontSize: 12, color: "FFFFFF", fontFace: "Inter", charSpacing: 3,
+      fontSize: 12, color: "FFFFFF", fontFace: "Geist", charSpacing: 3,
     });
   }
   // Right proof points
@@ -1733,11 +1746,11 @@ function renderSplitManifesto(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
     s.addShape("rect", { x: rightX, y, w: rightW, h: 0.03, fill: { color: p.accent }, line: { color: p.accent } });
     s.addText(str(it.title), {
       x: rightX, y: y + 0.2, w: rightW, h: 0.5,
-      fontSize: 16, bold: true, color: p.primary, fontFace: "Inter",
+      fontSize: 16, bold: true, color: p.primary, fontFace: "Geist",
     });
     s.addText(str(it.body), {
       x: rightX, y: y + 0.8, w: rightW, h: rowH - 1.0,
-      fontSize: 12, color: p.ink, fontFace: "Inter", valign: "top",
+      fontSize: 12, color: p.ink, fontFace: "Geist", valign: "top",
     });
   });
 }
@@ -1762,20 +1775,20 @@ function renderNumbersTriptych(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       { text: str(it.unit), options: { bold: true, color: p.accent } },
     ], {
       x: x + 0.2, y: cellY, w: colW - 0.4, h: cellH * 0.45,
-      fontSize: 96, fontFace: "Inter",
+      fontSize: 96, fontFace: "Geist",
     });
     s.addText(str(it.label).toUpperCase(), {
       x: x + 0.2, y: cellY + cellH * 0.5, w: colW - 0.4, h: 0.5,
-      fontSize: 12, bold: true, color: p.ink, fontFace: "Inter", charSpacing: 4,
+      fontSize: 12, bold: true, color: p.ink, fontFace: "Geist", charSpacing: 4,
     });
     s.addText(str(it.note), {
       x: x + 0.2, y: cellY + cellH * 0.62, w: colW - 0.4, h: 1.4,
-      fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top",
+      fontSize: 11, color: p.ink, fontFace: "Geist", valign: "top",
     });
     if (it.source) {
       s.addText(str(it.source), {
         x: x + 0.2, y: cellY + cellH - 0.4, w: colW - 0.4, h: 0.3,
-        fontSize: 8, italic: true, color: MID_GRAY, fontFace: "Inter",
+        fontSize: 8, italic: true, color: MID_GRAY, fontFace: "Geist",
       });
     }
   });
@@ -1796,15 +1809,15 @@ function renderTimelineVertical(s: PptxGenJS.Slide, c: Record<string, unknown>, 
     s.addShape("ellipse", { x: spineX - 0.09, y: y + 0.15, w: 0.21, h: 0.21, fill: { color: p.primary }, line: { color: p.primary } });
     s.addText(str(it.date).toUpperCase(), {
       x: 0.4, y: y + 0.05, w: 0.95, h: 0.4,
-      fontSize: 10, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 3, align: "right",
+      fontSize: 10, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 3, align: "right",
     });
     s.addText(str(it.label), {
       x: spineX + 0.35, y: y + 0.05, w: SLIDE_W - spineX - 1.0, h: 0.4,
-      fontSize: 15, bold: true, color: p.primary, fontFace: "Inter",
+      fontSize: 15, bold: true, color: p.primary, fontFace: "Geist",
     });
     s.addText(str(it.body), {
       x: spineX + 0.35, y: y + 0.5, w: SLIDE_W - spineX - 1.0, h: rowH - 0.55,
-      fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top",
+      fontSize: 11, color: p.ink, fontFace: "Geist", valign: "top",
     });
   });
 }
@@ -1820,15 +1833,15 @@ function renderCompareSlider(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
   // Before (left) - muted
   s.addText(str(before.label).toUpperCase(), {
     x: 0.6, y: cellY, w: midX - 0.9, h: 0.4,
-    fontSize: 11, bold: true, color: MID_GRAY, fontFace: "Inter", charSpacing: 4,
+    fontSize: 11, bold: true, color: MID_GRAY, fontFace: "Geist", charSpacing: 4,
   });
   s.addText(`${str(before.value)}${str(before.unit)}`, {
     x: 0.6, y: cellY + 0.5, w: midX - 0.9, h: 2.4,
-    fontSize: 84, bold: true, color: DARK_GRAY, fontFace: "Inter",
+    fontSize: 84, bold: true, color: DARK_GRAY, fontFace: "Geist",
   });
   s.addText(str(before.body), {
     x: 0.6, y: cellY + 3.2, w: midX - 0.9, h: cellH - 3.4,
-    fontSize: 12, color: MID_GRAY, fontFace: "Inter", valign: "top",
+    fontSize: 12, color: MID_GRAY, fontFace: "Geist", valign: "top",
   });
   // Divider line
   s.addShape("rect", { x: midX - 0.01, y: cellY + 0.2, w: 0.02, h: cellH - 0.4, fill: { color: p.accent }, line: { color: p.accent } });
@@ -1837,21 +1850,21 @@ function renderCompareSlider(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
   s.addShape("ellipse", { x: midX - 0.25, y: arrowY - 0.25, w: 0.5, h: 0.5, fill: { color: p.accent }, line: { color: p.accent } });
   s.addText("→", {
     x: midX - 0.25, y: arrowY - 0.25, w: 0.5, h: 0.5,
-    fontSize: 20, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle",
+    fontSize: 20, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center", valign: "middle",
   });
   // After (right) - full color, accent top rule
   s.addShape("rect", { x: midX + 0.3, y: cellY, w: SLIDE_W - midX - 0.9, h: 0.03, fill: { color: p.accent }, line: { color: p.accent } });
   s.addText(str(after.label).toUpperCase(), {
     x: midX + 0.3, y: cellY + 0.1, w: SLIDE_W - midX - 0.9, h: 0.4,
-    fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 4,
+    fontSize: 11, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 4,
   });
   s.addText(`${str(after.value)}${str(after.unit)}`, {
     x: midX + 0.3, y: cellY + 0.55, w: SLIDE_W - midX - 0.9, h: 2.7,
-    fontSize: 110, bold: true, color: p.primary, fontFace: "Inter",
+    fontSize: 110, bold: true, color: p.primary, fontFace: "Geist",
   });
   s.addText(str(after.body), {
     x: midX + 0.3, y: cellY + 3.4, w: SLIDE_W - midX - 0.9, h: cellH - 3.6,
-    fontSize: 13, color: p.ink, fontFace: "Inter", valign: "top",
+    fontSize: 13, color: p.ink, fontFace: "Geist", valign: "top",
   });
 }
 
@@ -1862,16 +1875,16 @@ function renderPullQuoteStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
   // Decorative quote mark
   s.addText("\u201C", {
     x: 0.4, y: 0.2, w: 2.5, h: 2.5,
-    fontSize: 240, bold: true, color: p.accent, fontFace: "Inter", transparency: 70,
+    fontSize: 240, bold: true, color: p.accent, fontFace: "Geist", transparency: 70,
   } as unknown as PptxGenJS.TextPropsOptions);
   s.addText(str(hero.quote), {
     x: 0.8, y: 1.0, w: SLIDE_W - 1.6, h: 3.4,
-    fontSize: 32, italic: true, color: p.primary, fontFace: "Inter", valign: "middle",
+    fontSize: 32, italic: true, color: p.primary, fontFace: "Geist", valign: "middle",
   });
   const attrParts = [str(hero.name), str(hero.role), str(hero.org)].filter(Boolean);
   s.addText(attrParts.join(" · ").toUpperCase(), {
     x: 0.8, y: 4.4, w: SLIDE_W - 1.6, h: 0.4,
-    fontSize: 11, bold: true, color: p.ink, fontFace: "Inter", charSpacing: 4,
+    fontSize: 11, bold: true, color: p.ink, fontFace: "Geist", charSpacing: 4,
   });
   // Divider
   s.addShape("rect", { x: 0.8, y: 5.0, w: SLIDE_W - 1.6, h: 0.01, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
@@ -1881,12 +1894,12 @@ function renderPullQuoteStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
     const x = 0.8 + k * (smallW + 0.4);
     s.addText(`"${str(it.quote)}"`, {
       x, y: 5.2, w: smallW, h: 1.2,
-      fontSize: 14, italic: true, color: p.primary, fontFace: "Inter", valign: "top",
+      fontSize: 14, italic: true, color: p.primary, fontFace: "Geist", valign: "top",
     });
     const parts = [str(it.name), str(it.role), str(it.org)].filter(Boolean);
     s.addText(parts.join(" · ").toUpperCase(), {
       x, y: 6.5, w: smallW, h: 0.3,
-      fontSize: 9, bold: true, color: p.ink, fontFace: "Inter", charSpacing: 3,
+      fontSize: 9, bold: true, color: p.ink, fontFace: "Geist", charSpacing: 3,
     });
     if (k === 0 && items.length > 1) {
       s.addShape("rect", { x: x + smallW + 0.19, y: 5.2, w: 0.01, h: 1.5, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
@@ -1903,23 +1916,23 @@ function renderDefinition(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   const usage = str(c.usage);
   s.addText(term, {
     x: 0.8, y: 1.2, w: SLIDE_W - 1.6, h: 1.6,
-    fontSize: 48, bold: true, color: p.primary, fontFace: "Inter",
+    fontSize: 48, bold: true, color: p.primary, fontFace: "Geist",
   });
   s.addText([
     { text: pronunciation, options: { color: MID_GRAY, charSpacing: 3 } },
     { text: pos ? `   ${pos}` : "", options: { italic: true, color: p.accent, bold: true } },
   ], {
     x: 0.8, y: 2.9, w: SLIDE_W - 1.6, h: 0.4,
-    fontSize: 14, fontFace: "Inter",
+    fontSize: 14, fontFace: "Geist",
   });
   s.addText(definition, {
     x: 0.8, y: 3.6, w: SLIDE_W - 1.6, h: 2.0,
-    fontSize: 22, color: p.ink, fontFace: "Inter", valign: "top",
+    fontSize: 22, color: p.ink, fontFace: "Geist", valign: "top",
   });
   s.addShape("rect", { x: 0.8, y: 5.9, w: 3.0, h: 0.01, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
   s.addText(usage, {
     x: 0.8, y: 6.0, w: SLIDE_W - 1.6, h: 0.8,
-    fontSize: 14, italic: true, color: MID_GRAY, fontFace: "Inter",
+    fontSize: 14, italic: true, color: MID_GRAY, fontFace: "Geist",
   });
 }
 
@@ -1937,15 +1950,15 @@ function renderPrinciples(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     // Oversized numeral behind
     s.addText(String(k + 1).padStart(2, "0"), {
       x: 0.6, y: y + 0.05, w: 2.4, h: rowH - 0.1,
-      fontSize: 96, bold: true, color: p.accent, fontFace: "Inter", transparency: 82,
+      fontSize: 96, bold: true, color: p.accent, fontFace: "Geist", transparency: 82,
     } as unknown as PptxGenJS.TextPropsOptions);
     s.addText(str(it.statement), {
       x: 3.0, y: y + 0.15, w: SLIDE_W - 3.6, h: 0.7,
-      fontSize: 26, bold: true, color: p.primary, fontFace: "Inter",
+      fontSize: 26, bold: true, color: p.primary, fontFace: "Geist",
     });
     s.addText(str(it.body), {
       x: 3.0, y: y + 0.95, w: SLIDE_W - 3.6, h: rowH - 1.05,
-      fontSize: 13, color: p.ink, fontFace: "Inter", valign: "top",
+      fontSize: 13, color: p.ink, fontFace: "Geist", valign: "top",
     });
   });
 }
@@ -1958,13 +1971,13 @@ function renderCountdown(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pale
   if (kicker) {
     s.addText(kicker.toUpperCase(), {
       x: 0.8, y: 0.7, w: SLIDE_W - 1.6, h: 0.4,
-      fontSize: 12, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 5,
+      fontSize: 12, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 5,
     });
   }
   if (title) {
     s.addText(title, {
       x: 0.8, y: 1.15, w: SLIDE_W - 1.6, h: 1.0,
-      fontSize: 30, bold: true, color: "FFFFFF", fontFace: "Inter",
+      fontSize: 30, bold: true, color: "FFFFFF", fontFace: "Geist",
     });
   }
   const startY = 2.5;
@@ -1977,15 +1990,15 @@ function renderCountdown(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pale
     }
     s.addText(numeral, {
       x: 0.8, y: y + 0.1, w: 2.0, h: rowH - 0.2,
-      fontSize: 110, bold: true, color: p.accent, fontFace: "Inter",
+      fontSize: 110, bold: true, color: p.accent, fontFace: "Geist",
     });
     s.addText(str(it.statement), {
       x: 3.0, y: y + 0.2, w: SLIDE_W - 3.6, h: 0.8,
-      fontSize: 24, bold: true, color: "FFFFFF", fontFace: "Inter",
+      fontSize: 24, bold: true, color: "FFFFFF", fontFace: "Geist",
     });
     s.addText(str(it.body), {
       x: 3.0, y: y + 1.05, w: SLIDE_W - 3.6, h: rowH - 1.15,
-      fontSize: 13, color: "FFFFFF", fontFace: "Inter", valign: "top", transparency: 20,
+      fontSize: 13, color: "FFFFFF", fontFace: "Geist", valign: "top", transparency: 20,
     } as unknown as PptxGenJS.TextPropsOptions);
   });
 }
@@ -2005,15 +2018,15 @@ function renderHorizon(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palett
     }
     s.addText(str(it.label).toUpperCase(), {
       x: 0.6, y: y + 0.2, w: 2.0, h: 0.5,
-      fontSize: 14, bold: true, color: labelColors[k] ?? p.ink, fontFace: "Inter", charSpacing: 5,
+      fontSize: 14, bold: true, color: labelColors[k] ?? p.ink, fontFace: "Geist", charSpacing: 5,
     });
     s.addText(str(it.headline), {
       x: 2.8, y: y + 0.15, w: SLIDE_W - 3.4, h: 0.7,
-      fontSize: 22, bold: true, color: headlineColors[k] ?? p.ink, fontFace: "Inter",
+      fontSize: 22, bold: true, color: headlineColors[k] ?? p.ink, fontFace: "Geist",
     });
     s.addText(str(it.body), {
       x: 2.8, y: y + 0.9, w: SLIDE_W - 3.4, h: bandH - 1.05,
-      fontSize: 12, color: p.ink, fontFace: "Inter", valign: "top",
+      fontSize: 12, color: p.ink, fontFace: "Geist", valign: "top",
     });
   });
 }
@@ -2045,8 +2058,8 @@ function renderDashSummary(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
   [primary, secondary].forEach((card, i) => {
     const cy = y0 + i * 2.6;
     s.addShape("rect", { x: 0.6, y: cy, w: 2.2, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText(str(card.label).toUpperCase(), { x: 0.6, y: cy + 0.15, w: colW, h: 0.3, fontSize: 11, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Inter" });
-    s.addText(`${str(card.value)}${str(card.unit) ? ` ${str(card.unit)}` : ""}`, { x: 0.6, y: cy + 0.5, w: colW, h: 1.1, fontSize: 60, bold: true, color: p.primary, fontFace: "Inter" });
+    s.addText(str(card.label).toUpperCase(), { x: 0.6, y: cy + 0.15, w: colW, h: 0.3, fontSize: 11, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Geist" });
+    s.addText(`${str(card.value)}${str(card.unit) ? ` ${str(card.unit)}` : ""}`, { x: 0.6, y: cy + 0.5, w: colW, h: 1.1, fontSize: 60, bold: true, color: p.primary, fontFace: "Geist" });
     // Sparkline via native line chart
     const series = numArr(card.series);
     if (series.length >= 2) {
@@ -2061,14 +2074,14 @@ function renderDashSummary(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
   });
   // Right: balance panel
   s.addShape("rect", { x: rightX, y: y0, w: 2.2, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-  s.addText("BALANCE", { x: rightX, y: y0 + 0.15, w: colW, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
-  s.addText(`${str(balance.value)}${str(balance.unit) ? ` ${str(balance.unit)}` : ""}`, { x: rightX, y: y0 + 0.55, w: colW, h: 1.6, fontSize: 96, bold: true, color: p.primary, fontFace: "Inter" });
-  s.addText(str(balance.label), { x: rightX, y: y0 + 2.2, w: colW, h: 0.4, fontSize: 14, color: DARK_GRAY, fontFace: "Inter" });
+  s.addText("BALANCE", { x: rightX, y: y0 + 0.15, w: colW, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Geist" });
+  s.addText(`${str(balance.value)}${str(balance.unit) ? ` ${str(balance.unit)}` : ""}`, { x: rightX, y: y0 + 0.55, w: colW, h: 1.6, fontSize: 96, bold: true, color: p.primary, fontFace: "Geist" });
+  s.addText(str(balance.label), { x: rightX, y: y0 + 2.2, w: colW, h: 0.4, fontSize: 14, color: DARK_GRAY, fontFace: "Geist" });
   bItems.slice(0, 4).forEach((it, i) => {
     const ry = y0 + 2.9 + i * 0.55;
     s.addShape("line", { x: rightX, y: ry, w: colW, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
-    s.addText(str(it.label).toUpperCase(), { x: rightX, y: ry + 0.08, w: colW - 1.5, h: 0.4, fontSize: 11, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Inter" });
-    s.addText(str(it.value), { x: rightX + colW - 1.5, y: ry + 0.05, w: 1.5, h: 0.4, fontSize: 18, bold: true, color: p.primary, fontFace: "Inter", align: "right" });
+    s.addText(str(it.label).toUpperCase(), { x: rightX, y: ry + 0.08, w: colW - 1.5, h: 0.4, fontSize: 11, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Geist" });
+    s.addText(str(it.value), { x: rightX + colW - 1.5, y: ry + 0.05, w: 1.5, h: 0.4, fontSize: 18, bold: true, color: p.primary, fontFace: "Geist", align: "right" });
   });
 }
 
@@ -2088,9 +2101,9 @@ function renderDashDonutTrio(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
         { x: cx + (colW - 3) / 2, y: y0 + 0.3, w: 3, h: 3, chartColors: [p.accent, LIGHT_GRAY], showLegend: false, showTitle: false, dataLabelPosition: "outEnd", showValue: false, holeSize: 70 },
       );
     } catch { /* no-op */ }
-    s.addText(`${Math.round(pct)}%`, { x: cx, y: y0 + 1.4, w: colW - 0.4, h: 0.8, fontSize: 36, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
-    s.addText(str(it.label).toUpperCase(), { x: cx, y: y0 + 3.5, w: colW - 0.4, h: 0.35, fontSize: 12, bold: true, color: p.primary, charSpacing: 3, fontFace: "Inter", align: "center" });
-    s.addText(str(it.body), { x: cx + 0.2, y: y0 + 3.9, w: colW - 0.8, h: 1.2, fontSize: 12, color: DARK_GRAY, fontFace: "Inter", align: "center" });
+    s.addText(`${Math.round(pct)}%`, { x: cx, y: y0 + 1.4, w: colW - 0.4, h: 0.8, fontSize: 36, bold: true, color: p.primary, fontFace: "Geist", align: "center" });
+    s.addText(str(it.label).toUpperCase(), { x: cx, y: y0 + 3.5, w: colW - 0.4, h: 0.35, fontSize: 12, bold: true, color: p.primary, charSpacing: 3, fontFace: "Geist", align: "center" });
+    s.addText(str(it.body), { x: cx + 0.2, y: y0 + 3.9, w: colW - 0.8, h: 1.2, fontSize: 12, color: DARK_GRAY, fontFace: "Geist", align: "center" });
   });
 }
 
@@ -2109,12 +2122,12 @@ function renderDashSalesChart(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
   } catch { /* no-op */ }
   const rx = 9.0;
   s.addShape("rect", { x: rx, y: y0, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-  s.addText(str(c.kicker).toUpperCase(), { x: rx, y: y0 + 0.15, w: 3.5, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
-  s.addText(str(c.headline), { x: rx, y: y0 + 0.5, w: 3.7, h: 1.8, fontSize: 22, bold: true, color: p.primary, fontFace: "Inter" });
-  s.addText(`${str(stat.value)}${str(stat.unit) ? ` ${str(stat.unit)}` : ""}`, { x: rx, y: y0 + 2.5, w: 3.7, h: 1.0, fontSize: 44, bold: true, color: p.primary, fontFace: "Inter" });
-  s.addText(str(stat.label), { x: rx, y: y0 + 3.4, w: 3.7, h: 0.4, fontSize: 12, color: DARK_GRAY, fontFace: "Inter" });
+  s.addText(str(c.kicker).toUpperCase(), { x: rx, y: y0 + 0.15, w: 3.5, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Geist" });
+  s.addText(str(c.headline), { x: rx, y: y0 + 0.5, w: 3.7, h: 1.8, fontSize: 22, bold: true, color: p.primary, fontFace: "Geist" });
+  s.addText(`${str(stat.value)}${str(stat.unit) ? ` ${str(stat.unit)}` : ""}`, { x: rx, y: y0 + 2.5, w: 3.7, h: 1.0, fontSize: 44, bold: true, color: p.primary, fontFace: "Geist" });
+  s.addText(str(stat.label), { x: rx, y: y0 + 3.4, w: 3.7, h: 0.4, fontSize: 12, color: DARK_GRAY, fontFace: "Geist" });
   if (str(stat.delta)) {
-    s.addText(str(stat.delta).toUpperCase(), { x: rx, y: y0 + 3.9, w: 3.7, h: 0.4, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
+    s.addText(str(stat.delta).toUpperCase(), { x: rx, y: y0 + 3.9, w: 3.7, h: 0.4, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Geist" });
   }
 }
 
@@ -2136,8 +2149,8 @@ function renderDashGaugeRow(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
         { x: cx + (colW - gaugeSize) / 2, y: y0 + 0.3, w: gaugeSize, h: gaugeSize, chartColors: [p.accent, LIGHT_GRAY, "FFFFFF"], chartColorsOpacity: 100, showLegend: false, showTitle: false, holeSize: 65, firstSliceAng: 270 },
       );
     } catch { /* no-op */ }
-    s.addText(`${Math.round(pct)}%`, { x: cx, y: y0 + gaugeSize * 0.55, w: colW, h: 0.7, fontSize: 32, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
-    s.addText(str(it.label).toUpperCase(), { x: cx + 0.1, y: y0 + gaugeSize + 0.5, w: colW - 0.2, h: 0.5, fontSize: 11, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Inter", align: "center" });
+    s.addText(`${Math.round(pct)}%`, { x: cx, y: y0 + gaugeSize * 0.55, w: colW, h: 0.7, fontSize: 32, bold: true, color: p.primary, fontFace: "Geist", align: "center" });
+    s.addText(str(it.label).toUpperCase(), { x: cx + 0.1, y: y0 + gaugeSize + 0.5, w: colW - 0.2, h: 0.5, fontSize: 11, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Geist", align: "center" });
   });
 }
 
@@ -2155,14 +2168,14 @@ function renderDashPerformance(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     );
   } catch { /* no-op */ }
   const rx = 7.6;
-  s.addText(`${str(stat.value)}${str(stat.unit) ? ` ${str(stat.unit)}` : ""}`, { x: rx, y: y0 + 0.3, w: 5.0, h: 1.6, fontSize: 72, bold: true, color: p.primary, fontFace: "Inter" });
-  s.addText(str(stat.label), { x: rx, y: y0 + 1.9, w: 5.0, h: 0.5, fontSize: 13, color: DARK_GRAY, fontFace: "Inter" });
+  s.addText(`${str(stat.value)}${str(stat.unit) ? ` ${str(stat.unit)}` : ""}`, { x: rx, y: y0 + 0.3, w: 5.0, h: 1.6, fontSize: 72, bold: true, color: p.primary, fontFace: "Geist" });
+  s.addText(str(stat.label), { x: rx, y: y0 + 1.9, w: 5.0, h: 0.5, fontSize: 13, color: DARK_GRAY, fontFace: "Geist" });
   legend.slice(0, 4).forEach((l, i) => {
     const ry = y0 + 2.7 + i * 0.55;
     s.addShape("line", { x: rx, y: ry, w: 5.0, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
     s.addShape("rect", { x: rx, y: ry + 0.18, w: 0.2, h: 0.2, fill: { color: i === 0 ? p.accent : p.primary }, line: { color: i === 0 ? p.accent : p.primary } });
-    s.addText(str(l.label), { x: rx + 0.35, y: ry + 0.1, w: 3.0, h: 0.4, fontSize: 14, bold: true, color: p.primary, fontFace: "Inter" });
-    s.addText(str(l.value), { x: rx + 3.4, y: ry + 0.1, w: 1.6, h: 0.4, fontSize: 14, bold: true, color: DARK_GRAY, fontFace: "Inter", align: "right" });
+    s.addText(str(l.label), { x: rx + 0.35, y: ry + 0.1, w: 3.0, h: 0.4, fontSize: 14, bold: true, color: p.primary, fontFace: "Geist" });
+    s.addText(str(l.value), { x: rx + 3.4, y: ry + 0.1, w: 1.6, h: 0.4, fontSize: 14, bold: true, color: DARK_GRAY, fontFace: "Geist", align: "right" });
   });
 }
 
@@ -2176,9 +2189,9 @@ function renderDashReportCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     const delta = str(it.delta);
     const negative = delta.trim().startsWith("-");
     s.addShape("rect", { x: cx, y: y0, w: 2.2, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText((negative ? "REDUCTION" : "GROWTH"), { x: cx, y: y0 + 0.15, w: cardW, h: 0.3, fontSize: 11, bold: true, color: negative ? "E53D2E" : p.accent, charSpacing: 3, fontFace: "Inter" });
-    s.addText(delta, { x: cx, y: y0 + 0.55, w: cardW, h: 1.6, fontSize: 66, bold: true, color: p.primary, fontFace: "Inter" });
-    s.addText(str(it.label), { x: cx, y: y0 + 2.2, w: cardW, h: 0.9, fontSize: 15, color: DARK_GRAY, fontFace: "Inter" });
+    s.addText((negative ? "REDUCTION" : "GROWTH"), { x: cx, y: y0 + 0.15, w: cardW, h: 0.3, fontSize: 11, bold: true, color: negative ? "E53D2E" : p.accent, charSpacing: 3, fontFace: "Geist" });
+    s.addText(delta, { x: cx, y: y0 + 0.55, w: cardW, h: 1.6, fontSize: 66, bold: true, color: p.primary, fontFace: "Geist" });
+    s.addText(str(it.label), { x: cx, y: y0 + 2.2, w: cardW, h: 0.9, fontSize: 15, color: DARK_GRAY, fontFace: "Geist" });
     const series = numArr(it.series);
     if (series.length >= 2) {
       try {
@@ -2189,7 +2202,7 @@ function renderDashReportCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p
         );
       } catch { /* no-op */ }
     }
-    s.addText(str(it.meta).toUpperCase(), { x: cx, y: y0 + 4.5, w: cardW, h: 0.35, fontSize: 10, bold: true, color: MID_GRAY, charSpacing: 3, fontFace: "Inter" });
+    s.addText(str(it.meta).toUpperCase(), { x: cx, y: y0 + 4.5, w: cardW, h: 0.35, fontSize: 10, bold: true, color: MID_GRAY, charSpacing: 3, fontFace: "Geist" });
   });
   // vertical hairline divider
   s.addShape("line", { x: 6.55, y: y0, w: 0, h: 4.8, line: { color: LIGHT_GRAY, width: 1 } });
@@ -2211,7 +2224,7 @@ function renderDashGrowthColumns(s: PptxGenJS.Slide, c: Record<string, unknown>,
     const last = items[items.length - 1];
     const cellW = (SLIDE_W - 1.2) / items.length;
     const cx = 0.6 + (items.length - 1) * cellW + cellW * 0.5 - 1;
-    s.addText(`${str(last.value)}${str(last.unit) ? ` ${str(last.unit)}` : ""}`, { x: cx, y: y0 + 0.05, w: 2, h: 0.5, fontSize: 20, bold: true, color: p.accent, fontFace: "Inter", align: "center" });
+    s.addText(`${str(last.value)}${str(last.unit) ? ` ${str(last.unit)}` : ""}`, { x: cx, y: y0 + 0.05, w: 2, h: 0.5, fontSize: 20, bold: true, color: p.accent, fontFace: "Geist", align: "center" });
   }
 }
 
@@ -2226,15 +2239,15 @@ function renderDashBreakdown(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
     const negative = delta.trim().startsWith("-");
     const pct = Math.max(0, Math.min(100, num(it.percent)));
     s.addShape("line", { x: 0.6, y: ry, w: SLIDE_W - 1.2, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
-    s.addText(str(it.label), { x: 0.6, y: ry + 0.15, w: 5.0, h: 0.5, fontSize: 20, bold: true, color: p.primary, fontFace: "Inter" });
-    if (delta) s.addText(delta.toUpperCase(), { x: 5.6, y: ry + 0.2, w: 1.6, h: 0.4, fontSize: 11, bold: true, color: negative ? "E53D2E" : p.accent, charSpacing: 3, fontFace: "Inter" });
-    s.addText(`${str(it.value)}${str(it.unit) ? ` ${str(it.unit)}` : ""}`, { x: 8.5, y: ry + 0.05, w: 4.2, h: 0.6, fontSize: 28, bold: true, color: p.primary, fontFace: "Inter", align: "right" });
+    s.addText(str(it.label), { x: 0.6, y: ry + 0.15, w: 5.0, h: 0.5, fontSize: 20, bold: true, color: p.primary, fontFace: "Geist" });
+    if (delta) s.addText(delta.toUpperCase(), { x: 5.6, y: ry + 0.2, w: 1.6, h: 0.4, fontSize: 11, bold: true, color: negative ? "E53D2E" : p.accent, charSpacing: 3, fontFace: "Geist" });
+    s.addText(`${str(it.value)}${str(it.unit) ? ` ${str(it.unit)}` : ""}`, { x: 8.5, y: ry + 0.05, w: 4.2, h: 0.6, fontSize: 28, bold: true, color: p.primary, fontFace: "Geist", align: "right" });
     // progress bar
     const barY = ry + rowH - 0.35;
     const barW = SLIDE_W - 1.2 - 0.8;
     s.addShape("rect", { x: 0.6, y: barY, w: barW, h: 0.12, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
     s.addShape("rect", { x: 0.6, y: barY, w: (barW * pct) / 100, h: 0.12, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText(`${pct}%`, { x: SLIDE_W - 1.2 - 0.6, y: barY - 0.08, w: 0.6, h: 0.3, fontSize: 12, bold: true, color: p.accent, fontFace: "Inter", align: "right" });
+    s.addText(`${pct}%`, { x: SLIDE_W - 1.2 - 0.6, y: barY - 0.08, w: 0.6, h: 0.3, fontSize: 12, bold: true, color: p.accent, fontFace: "Geist", align: "right" });
   });
 }
 
@@ -2244,8 +2257,8 @@ function renderDashRegionStats(s: PptxGenJS.Slide, c: Record<string, unknown>, p
   const stat = obj(c.stat);
   const items = arr(c.items).slice(0, 6);
   s.addShape("rect", { x: 0.6, y: y0, w: 2.2, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-  s.addText(`${str(stat.value)}${str(stat.unit) ? ` ${str(stat.unit)}` : ""}`, { x: 0.6, y: y0 + 0.4, w: 5.5, h: 2.6, fontSize: 120, bold: true, color: p.primary, fontFace: "Inter" });
-  s.addText(str(stat.label).toUpperCase(), { x: 0.6, y: y0 + 3.2, w: 5.5, h: 0.5, fontSize: 12, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Inter" });
+  s.addText(`${str(stat.value)}${str(stat.unit) ? ` ${str(stat.unit)}` : ""}`, { x: 0.6, y: y0 + 0.4, w: 5.5, h: 2.6, fontSize: 120, bold: true, color: p.primary, fontFace: "Geist" });
+  s.addText(str(stat.label).toUpperCase(), { x: 0.6, y: y0 + 3.2, w: 5.5, h: 0.5, fontSize: 12, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Geist" });
   const rx = 6.8;
   const rowH = Math.min(0.85, (5.5 - y0) / Math.max(items.length, 1));
   items.forEach((it, i) => {
@@ -2254,8 +2267,8 @@ function renderDashRegionStats(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     const negative = delta.trim().startsWith("-");
     const pct = Math.max(0, Math.min(100, num(it.percent)));
     s.addShape("line", { x: rx, y: ry, w: SLIDE_W - rx - 0.6, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
-    s.addText(str(it.label), { x: rx, y: ry + 0.1, w: 4.0, h: 0.4, fontSize: 15, bold: true, color: p.primary, fontFace: "Inter" });
-    if (delta) s.addText(delta.toUpperCase(), { x: SLIDE_W - 2.0, y: ry + 0.13, w: 1.4, h: 0.35, fontSize: 11, bold: true, color: negative ? "E53D2E" : p.accent, charSpacing: 3, fontFace: "Inter", align: "right" });
+    s.addText(str(it.label), { x: rx, y: ry + 0.1, w: 4.0, h: 0.4, fontSize: 15, bold: true, color: p.primary, fontFace: "Geist" });
+    if (delta) s.addText(delta.toUpperCase(), { x: SLIDE_W - 2.0, y: ry + 0.13, w: 1.4, h: 0.35, fontSize: 11, bold: true, color: negative ? "E53D2E" : p.accent, charSpacing: 3, fontFace: "Geist", align: "right" });
     const barW = SLIDE_W - rx - 0.6;
     s.addShape("rect", { x: rx, y: ry + rowH - 0.22, w: barW, h: 0.08, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
     s.addShape("rect", { x: rx, y: ry + rowH - 0.22, w: (barW * pct) / 100, h: 0.08, fill: { color: p.accent }, line: { color: p.accent } });
@@ -2270,8 +2283,8 @@ function renderGraphYearSeries(s: PptxGenJS.Slide, c: Record<string, unknown>, p
   const items = arr(c.items);
   // left rail
   s.addShape("rect", { x: 0.6, y: y0, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-  s.addText(str(c.kicker || "Trend").toUpperCase(), { x: 0.6, y: y0 + 0.15, w: 3.4, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
-  s.addText(str(c.headline), { x: 0.6, y: y0 + 0.55, w: 3.4, h: 3.6, fontSize: 22, bold: true, color: p.primary, fontFace: "Inter", valign: "top" });
+  s.addText(str(c.kicker || "Trend").toUpperCase(), { x: 0.6, y: y0 + 0.15, w: 3.4, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Geist" });
+  s.addText(str(c.headline), { x: 0.6, y: y0 + 0.55, w: 3.4, h: 3.6, fontSize: 22, bold: true, color: p.primary, fontFace: "Geist", valign: "top" });
   // bars via native chart
   try {
     s.addChart(
@@ -2285,7 +2298,7 @@ function renderGraphYearSeries(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     const cellW = (SLIDE_W - 4.8) / items.length;
     const cx = 4.2 + (items.length - 1) * cellW + cellW / 2 - 1;
     const last = items[items.length - 1];
-    s.addText(`${str(last.value)}${str(last.unit) ? ` ${str(last.unit)}` : ""}`, { x: cx, y: y0 - 0.05, w: 2, h: 0.5, fontSize: 20, bold: true, color: p.accent, fontFace: "Inter", align: "center" });
+    s.addText(`${str(last.value)}${str(last.unit) ? ` ${str(last.unit)}` : ""}`, { x: cx, y: y0 - 0.05, w: 2, h: 0.5, fontSize: 20, bold: true, color: p.accent, fontFace: "Geist", align: "center" });
   }
 }
 
@@ -2302,7 +2315,7 @@ function renderGraphAxisBars(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
   } catch { /* no-op */ }
   if (str(c.legend)) {
     s.addShape("rect", { x: 0.6, y: y0 + 4.7, w: 0.2, h: 0.2, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText(str(c.legend).toUpperCase(), { x: 0.9, y: y0 + 4.65, w: SLIDE_W - 1.5, h: 0.35, fontSize: 11, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Inter" });
+    s.addText(str(c.legend).toUpperCase(), { x: 0.9, y: y0 + 4.65, w: SLIDE_W - 1.5, h: 0.35, fontSize: 11, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Geist" });
   }
 }
 
@@ -2320,8 +2333,8 @@ function renderGraphCategoryBars(s: PptxGenJS.Slide, c: Record<string, unknown>,
   } catch { /* no-op */ }
   const rx = 9.0;
   s.addShape("rect", { x: rx, y: y0, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-  s.addText(`${str(stat.value)}${str(stat.unit) ? ` ${str(stat.unit)}` : ""}`, { x: rx, y: y0 + 0.4, w: 3.7, h: 2.4, fontSize: 96, bold: true, color: p.primary, fontFace: "Inter" });
-  s.addText(str(stat.label).toUpperCase(), { x: rx, y: y0 + 3.0, w: 3.7, h: 0.5, fontSize: 12, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Inter" });
+  s.addText(`${str(stat.value)}${str(stat.unit) ? ` ${str(stat.unit)}` : ""}`, { x: rx, y: y0 + 0.4, w: 3.7, h: 2.4, fontSize: 96, bold: true, color: p.primary, fontFace: "Geist" });
+  s.addText(str(stat.label).toUpperCase(), { x: rx, y: y0 + 3.0, w: 3.7, h: 0.5, fontSize: 12, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Geist" });
 }
 
 // ── MV-GRAPH-DUAL-DONUT ──
@@ -2333,7 +2346,7 @@ function renderGraphDualDonut(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
     const cardW = 5.9;
     const pct = Math.max(0, Math.min(100, num(it.value)));
     s.addShape("rect", { x: cx, y: y0, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText(str(it.meta).toUpperCase(), { x: cx, y: y0 + 0.15, w: cardW, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
+    s.addText(str(it.meta).toUpperCase(), { x: cx, y: y0 + 0.15, w: cardW, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Geist" });
     try {
       s.addChart(
         "doughnut" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
@@ -2341,9 +2354,9 @@ function renderGraphDualDonut(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
         { x: cx + (cardW - 3) / 2, y: y0 + 0.5, w: 3, h: 3, chartColors: [p.accent, LIGHT_GRAY], showLegend: false, showTitle: false, holeSize: 70 },
       );
     } catch { /* no-op */ }
-    s.addText(`${Math.round(pct)}%`, { x: cx, y: y0 + 1.7, w: cardW, h: 0.8, fontSize: 44, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
-    s.addText(str(it.label).toUpperCase(), { x: cx, y: y0 + 3.7, w: cardW, h: 0.4, fontSize: 12, bold: true, color: p.primary, charSpacing: 3, fontFace: "Inter", align: "center" });
-    s.addText(str(it.body), { x: cx + 0.2, y: y0 + 4.15, w: cardW - 0.4, h: 1.0, fontSize: 13, color: DARK_GRAY, fontFace: "Inter", align: "center" });
+    s.addText(`${Math.round(pct)}%`, { x: cx, y: y0 + 1.7, w: cardW, h: 0.8, fontSize: 44, bold: true, color: p.primary, fontFace: "Geist", align: "center" });
+    s.addText(str(it.label).toUpperCase(), { x: cx, y: y0 + 3.7, w: cardW, h: 0.4, fontSize: 12, bold: true, color: p.primary, charSpacing: 3, fontFace: "Geist", align: "center" });
+    s.addText(str(it.body), { x: cx + 0.2, y: y0 + 4.15, w: cardW - 0.4, h: 1.0, fontSize: 13, color: DARK_GRAY, fontFace: "Geist", align: "center" });
   });
   s.addShape("line", { x: 6.55, y: y0, w: 0, h: 5.0, line: { color: LIGHT_GRAY, width: 1 } });
 }
@@ -2366,20 +2379,20 @@ function renderGraphRings(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
         { x: cx, y: y0 + 0.5, w: each - 0.2, h: each - 0.2, chartColors: [color, LIGHT_GRAY], showLegend: false, showTitle: false, holeSize: 65 },
       );
     } catch { /* no-op */ }
-    s.addText(`${pct}%`, { x: cx, y: y0 + each * 0.4, w: each - 0.2, h: 0.5, fontSize: 20, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
+    s.addText(`${pct}%`, { x: cx, y: y0 + each * 0.4, w: each - 0.2, h: 0.5, fontSize: 20, bold: true, color: p.primary, fontFace: "Geist", align: "center" });
   });
   // Legend right side
   const lx = 8.0;
   s.addShape("rect", { x: lx, y: y0, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-  s.addText("BREAKDOWN", { x: lx, y: y0 + 0.15, w: 4.7, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
+  s.addText("BREAKDOWN", { x: lx, y: y0 + 0.15, w: 4.7, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Geist" });
   items.forEach((it, i) => {
     const ry = y0 + 0.7 + i * 0.9;
     const color = i === 0 ? p.accent : p.primary;
     s.addShape("line", { x: lx, y: ry, w: 4.7, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
     s.addShape("rect", { x: lx, y: ry + 0.18, w: 0.2, h: 0.2, fill: { color }, line: { color } });
-    s.addText(str(it.label), { x: lx + 0.35, y: ry + 0.1, w: 3.0, h: 0.4, fontSize: 14, bold: true, color: p.primary, fontFace: "Inter" });
-    s.addText(`${num(it.value)}%`, { x: lx + 3.4, y: ry + 0.1, w: 1.3, h: 0.4, fontSize: 14, bold: true, color: p.accent, fontFace: "Inter", align: "right" });
-    s.addText(str(it.body), { x: lx + 0.35, y: ry + 0.45, w: 4.3, h: 0.35, fontSize: 11, color: DARK_GRAY, fontFace: "Inter" });
+    s.addText(str(it.label), { x: lx + 0.35, y: ry + 0.1, w: 3.0, h: 0.4, fontSize: 14, bold: true, color: p.primary, fontFace: "Geist" });
+    s.addText(`${num(it.value)}%`, { x: lx + 3.4, y: ry + 0.1, w: 1.3, h: 0.4, fontSize: 14, bold: true, color: p.accent, fontFace: "Geist", align: "right" });
+    s.addText(str(it.body), { x: lx + 0.35, y: ry + 0.45, w: 4.3, h: 0.35, fontSize: 11, color: DARK_GRAY, fontFace: "Geist" });
   });
 }
 
@@ -2394,14 +2407,14 @@ function renderGraphTaskCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
     const total = Math.max(1, num(it.total, 100));
     const pct = Math.min(100, Math.round((done / total) * 100));
     s.addShape("rect", { x: cx, y: y0, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText(str(it.label).toUpperCase(), { x: cx, y: y0 + 0.15, w: cardW, h: 0.3, fontSize: 11, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Inter" });
-    s.addText(`${pct}%`, { x: cx, y: y0 + 0.55, w: cardW, h: 1.5, fontSize: 64, bold: true, color: p.primary, fontFace: "Inter" });
-    s.addText("of 100%", { x: cx + 2.4, y: y0 + 1.4, w: 2, h: 0.4, fontSize: 12, color: MID_GRAY, fontFace: "Inter" });
-    s.addText(`${done.toLocaleString()} / ${total.toLocaleString()}`, { x: cx, y: y0 + 2.1, w: cardW, h: 0.35, fontSize: 11, color: MID_GRAY, fontFace: "Inter" });
+    s.addText(str(it.label).toUpperCase(), { x: cx, y: y0 + 0.15, w: cardW, h: 0.3, fontSize: 11, bold: true, color: DARK_GRAY, charSpacing: 3, fontFace: "Geist" });
+    s.addText(`${pct}%`, { x: cx, y: y0 + 0.55, w: cardW, h: 1.5, fontSize: 64, bold: true, color: p.primary, fontFace: "Geist" });
+    s.addText("of 100%", { x: cx + 2.4, y: y0 + 1.4, w: 2, h: 0.4, fontSize: 12, color: MID_GRAY, fontFace: "Geist" });
+    s.addText(`${done.toLocaleString()} / ${total.toLocaleString()}`, { x: cx, y: y0 + 2.1, w: cardW, h: 0.35, fontSize: 11, color: MID_GRAY, fontFace: "Geist" });
     const barW = cardW - 0.1;
     s.addShape("rect", { x: cx, y: y0 + 2.6, w: barW, h: 0.12, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
     s.addShape("rect", { x: cx, y: y0 + 2.6, w: (barW * pct) / 100, h: 0.12, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText(str(it.body), { x: cx, y: y0 + 2.95, w: cardW, h: 1.4, fontSize: 13, color: DARK_GRAY, fontFace: "Inter" });
+    s.addText(str(it.body), { x: cx, y: y0 + 2.95, w: cardW, h: 1.4, fontSize: 13, color: DARK_GRAY, fontFace: "Geist" });
   });
 }
 
@@ -2409,8 +2422,8 @@ function renderGraphTaskCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
 function renderGraphDecadeArea(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   // Custom title zone with kicker + headline
   s.addShape("rect", { x: 0.6, y: 0.55, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-  s.addText(str(c.kicker || "Trajectory").toUpperCase(), { x: 0.6, y: 0.7, w: SLIDE_W - 1.2, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
-  s.addText(str(c.headline || c.title), { x: 0.6, y: 1.05, w: SLIDE_W - 1.2, h: 1.1, fontSize: 28, bold: true, color: p.primary, fontFace: "Inter" });
+  s.addText(str(c.kicker || "Trajectory").toUpperCase(), { x: 0.6, y: 0.7, w: SLIDE_W - 1.2, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Geist" });
+  s.addText(str(c.headline || c.title), { x: 0.6, y: 1.05, w: SLIDE_W - 1.2, h: 1.1, fontSize: 28, bold: true, color: p.primary, fontFace: "Geist" });
   const y0 = 2.2;
   const series = arr(c.series);
   const callout = obj(c.callout);
@@ -2428,8 +2441,8 @@ function renderGraphDecadeArea(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     const cx = chartL + (idx / (series.length - 1)) * chartW;
     const boxX = Math.max(0.6, Math.min(SLIDE_W - 3.6, cx - 1.5));
     s.addShape("rect", { x: boxX, y: y0 + 0.3, w: 3.0, h: 0.9, fill: { color: "FFFFFF" }, line: { color: p.accent, width: 2 } });
-    s.addText(str(callout.year), { x: boxX + 0.1, y: y0 + 0.35, w: 2.8, h: 0.35, fontSize: 14, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
-    s.addText(str(callout.note), { x: boxX + 0.1, y: y0 + 0.68, w: 2.8, h: 0.5, fontSize: 11, color: DARK_GRAY, fontFace: "Inter", align: "center" });
+    s.addText(str(callout.year), { x: boxX + 0.1, y: y0 + 0.35, w: 2.8, h: 0.35, fontSize: 14, bold: true, color: p.primary, fontFace: "Geist", align: "center" });
+    s.addText(str(callout.note), { x: boxX + 0.1, y: y0 + 0.68, w: 2.8, h: 0.5, fontSize: 11, color: DARK_GRAY, fontFace: "Geist", align: "center" });
   }
 }
 
@@ -2443,16 +2456,16 @@ function renderGraphPercentCompare(s: PptxGenJS.Slide, c: Record<string, unknown
     const cur = Math.max(0, Math.min(100, num(it.current)));
     const bench = Math.max(0, Math.min(100, num(it.benchmark)));
     s.addShape("line", { x: 0.6, y: ry, w: SLIDE_W - 1.2, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
-    s.addText(str(it.label), { x: 0.6, y: ry + 0.15, w: 5.0, h: 0.5, fontSize: 18, bold: true, color: p.primary, fontFace: "Inter" });
-    s.addText(`${cur}%`, { x: 8.0, y: ry + 0.1, w: 2.0, h: 0.6, fontSize: 32, bold: true, color: p.accent, fontFace: "Inter", align: "right" });
-    s.addText(`${bench}%`, { x: 10.4, y: ry + 0.2, w: 2.0, h: 0.5, fontSize: 22, bold: true, color: MID_GRAY, fontFace: "Inter", align: "right" });
+    s.addText(str(it.label), { x: 0.6, y: ry + 0.15, w: 5.0, h: 0.5, fontSize: 18, bold: true, color: p.primary, fontFace: "Geist" });
+    s.addText(`${cur}%`, { x: 8.0, y: ry + 0.1, w: 2.0, h: 0.6, fontSize: 32, bold: true, color: p.accent, fontFace: "Geist", align: "right" });
+    s.addText(`${bench}%`, { x: 10.4, y: ry + 0.2, w: 2.0, h: 0.5, fontSize: 22, bold: true, color: MID_GRAY, fontFace: "Geist", align: "right" });
     const barW = SLIDE_W - 1.2;
     const barY = ry + 0.8;
     s.addShape("rect", { x: 0.6, y: barY, w: barW, h: 0.08, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
     s.addShape("rect", { x: 0.6, y: barY, w: (barW * cur) / 100, h: 0.08, fill: { color: p.accent }, line: { color: p.accent } });
     s.addShape("rect", { x: 0.6, y: barY + 0.14, w: barW, h: 0.08, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
     s.addShape("rect", { x: 0.6, y: barY + 0.14, w: (barW * bench) / 100, h: 0.08, fill: { color: p.primary }, line: { color: p.primary } });
-    if (str(it.range)) s.addText(str(it.range).toUpperCase(), { x: 0.6, y: ry + rowH - 0.32, w: SLIDE_W - 1.2, h: 0.3, fontSize: 10, bold: true, color: MID_GRAY, charSpacing: 3, fontFace: "Inter" });
+    if (str(it.range)) s.addText(str(it.range).toUpperCase(), { x: 0.6, y: ry + rowH - 0.32, w: SLIDE_W - 1.2, h: 0.3, fontSize: 10, bold: true, color: MID_GRAY, charSpacing: 3, fontFace: "Geist" });
   });
 }
 
@@ -2476,7 +2489,7 @@ function renderGraphLineMulti(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
   }));
   if (str(c.kicker)) {
     s.addShape("rect", { x: 0.6, y: y0, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText(str(c.kicker).toUpperCase(), { x: 0.6, y: y0 + 0.15, w: SLIDE_W - 1.2, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
+    s.addText(str(c.kicker).toUpperCase(), { x: 0.6, y: y0 + 0.15, w: SLIDE_W - 1.2, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Geist" });
   }
   const chartY = y0 + (str(c.kicker) ? 0.55 : 0.1);
   try {
@@ -2507,7 +2520,7 @@ function renderGraphStackedBar(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     );
   } catch { /* no-op */ }
   if (str(c.unit)) {
-    s.addText(`Values in ${str(c.unit)}`, { x: 0.6, y: 5.35, w: SLIDE_W - 1.2, h: 0.3, fontSize: 10, italic: true, color: MID_GRAY, fontFace: "Inter" });
+    s.addText(`Values in ${str(c.unit)}`, { x: 0.6, y: 5.35, w: SLIDE_W - 1.2, h: 0.3, fontSize: 10, italic: true, color: MID_GRAY, fontFace: "Geist" });
   }
 }
 
@@ -2524,7 +2537,7 @@ function renderGraphAreaStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
   }));
   if (str(c.kicker)) {
     s.addShape("rect", { x: 0.6, y: y0, w: 2.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText(str(c.kicker).toUpperCase(), { x: 0.6, y: y0 + 0.15, w: SLIDE_W - 1.2, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Inter" });
+    s.addText(str(c.kicker).toUpperCase(), { x: 0.6, y: y0 + 0.15, w: SLIDE_W - 1.2, h: 0.3, fontSize: 11, bold: true, color: p.accent, charSpacing: 3, fontFace: "Geist" });
   }
   const chartY = y0 + (str(c.kicker) ? 0.55 : 0.1);
   try {
@@ -2574,9 +2587,9 @@ function renderGraphWaterfall(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
     }
     // value label
     const sign = b.kind === "down" ? "-" : b.kind === "up" ? "+" : "";
-    s.addText(`${sign}${b.delta}${str(c.unit) ? ` ${str(c.unit)}` : ""}`, { x: bx - 0.3, y: by - 0.35, w: barW + 0.6, h: 0.3, fontSize: 10, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
+    s.addText(`${sign}${b.delta}${str(c.unit) ? ` ${str(c.unit)}` : ""}`, { x: bx - 0.3, y: by - 0.35, w: barW + 0.6, h: 0.3, fontSize: 10, bold: true, color: p.primary, fontFace: "Geist", align: "center" });
     // x label
-    s.addText(str(b.label), { x: chartX + 0.1 + i * gap, y: chartY + chartH + 0.1, w: gap, h: 0.5, fontSize: 10, color: DARK_GRAY, fontFace: "Inter", align: "center" });
+    s.addText(str(b.label), { x: chartX + 0.1 + i * gap, y: chartY + chartH + 0.1, w: gap, h: 0.5, fontSize: 10, color: DARK_GRAY, fontFace: "Geist", align: "center" });
   });
   // baseline
   s.addShape("line", { x: chartX, y: chartY + chartH, w: chartW, h: 0, line: { color: LIGHT_GRAY, width: 1 } });
@@ -2618,22 +2631,22 @@ function renderGraphHeatmap(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
   const cellH = gridH / Math.max(rows.length, 1);
   // column headers
   cols.forEach((cl, i) => {
-    s.addText(cl, { x: gridX + i * cellW, y: gridY - 0.35, w: cellW, h: 0.3, fontSize: 10, bold: true, color: DARK_GRAY, fontFace: "Inter", align: "center" });
+    s.addText(cl, { x: gridX + i * cellW, y: gridY - 0.35, w: cellW, h: 0.3, fontSize: 10, bold: true, color: DARK_GRAY, fontFace: "Geist", align: "center" });
   });
   // row labels + cells
   rows.forEach((rl, ri) => {
-    s.addText(rl, { x: 0.6, y: gridY + ri * cellH + cellH / 2 - 0.15, w: gridX - 0.7, h: 0.3, fontSize: 11, bold: true, color: p.primary, fontFace: "Inter" });
+    s.addText(rl, { x: 0.6, y: gridY + ri * cellH + cellH / 2 - 0.15, w: gridX - 0.7, h: 0.3, fontSize: 11, bold: true, color: p.primary, fontFace: "Geist" });
     (cells[ri] ?? []).forEach((val, ci) => {
       const t = smax === smin ? 0.5 : Math.max(0, Math.min(1, (val - smin) / (smax - smin)));
       // interpolate accent (hot) with LIGHT_GRAY (cold)
       const fill = mixHex(LIGHT_GRAY, p.accent, t);
       const textColor = t > 0.55 ? "FFFFFF" : p.primary;
       s.addShape("rect", { x: gridX + ci * cellW + 0.02, y: gridY + ri * cellH + 0.02, w: cellW - 0.04, h: cellH - 0.04, fill: { color: fill }, line: { color: "FFFFFF", width: 1 } });
-      s.addText(`${val}`, { x: gridX + ci * cellW, y: gridY + ri * cellH + cellH / 2 - 0.15, w: cellW, h: 0.3, fontSize: 11, bold: true, color: textColor, fontFace: "Inter", align: "center" });
+      s.addText(`${val}`, { x: gridX + ci * cellW, y: gridY + ri * cellH + cellH / 2 - 0.15, w: cellW, h: 0.3, fontSize: 11, bold: true, color: textColor, fontFace: "Geist", align: "center" });
     });
   });
   // scale legend
-  s.addText(`Scale: ${smin} — ${smax}`, { x: gridX, y: gridY + gridH + 0.1, w: gridW, h: 0.3, fontSize: 10, italic: true, color: MID_GRAY, fontFace: "Inter" });
+  s.addText(`Scale: ${smin} — ${smax}`, { x: gridX, y: gridY + gridH + 0.1, w: gridW, h: 0.3, fontSize: 10, italic: true, color: MID_GRAY, fontFace: "Geist" });
 }
 
 function mixHex(a: string, b: string, t: number): string {
@@ -2657,9 +2670,9 @@ function renderGraphTreemap(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
   const first = items[0];
   const firstW = gw * (first.value / total);
   s.addShape("rect", { x: gx, y: gy, w: firstW - 0.05, h: gh, fill: { color: colors[0] }, line: { color: "FFFFFF", width: 2 } });
-  s.addText(first.label, { x: gx + 0.2, y: gy + 0.3, w: firstW - 0.5, h: 0.5, fontSize: 20, bold: true, color: "FFFFFF", fontFace: "Inter" });
-  s.addText(`${first.value}%`, { x: gx + 0.2, y: gy + 0.9, w: firstW - 0.5, h: 0.6, fontSize: 40, bold: true, color: "FFFFFF", fontFace: "Inter" });
-  if (first.meta) s.addText(first.meta, { x: gx + 0.2, y: gy + 1.7, w: firstW - 0.5, h: 0.5, fontSize: 11, color: "FFFFFF", fontFace: "Inter" });
+  s.addText(first.label, { x: gx + 0.2, y: gy + 0.3, w: firstW - 0.5, h: 0.5, fontSize: 20, bold: true, color: "FFFFFF", fontFace: "Geist" });
+  s.addText(`${first.value}%`, { x: gx + 0.2, y: gy + 0.9, w: firstW - 0.5, h: 0.6, fontSize: 40, bold: true, color: "FFFFFF", fontFace: "Geist" });
+  if (first.meta) s.addText(first.meta, { x: gx + 0.2, y: gy + 1.7, w: firstW - 0.5, h: 0.5, fontSize: 11, color: "FFFFFF", fontFace: "Geist" });
   // stack remaining vertically in right column
   const rest = items.slice(1);
   const restTotal = rest.reduce((sum, it) => sum + it.value, 0) || 1;
@@ -2671,9 +2684,9 @@ function renderGraphTreemap(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     const color = colors[(i + 1) % colors.length];
     s.addShape("rect", { x: rx, y: cy, w: rw, h: rh - 0.05, fill: { color }, line: { color: "FFFFFF", width: 2 } });
     const textColor = color === LIGHT_GRAY ? p.primary : "FFFFFF";
-    s.addText(it.label, { x: rx + 0.2, y: cy + 0.15, w: rw - 0.4, h: 0.35, fontSize: 13, bold: true, color: textColor, fontFace: "Inter" });
-    s.addText(`${it.value}%`, { x: rx + 0.2, y: cy + rh / 2 - 0.25, w: rw - 0.4, h: 0.5, fontSize: 22, bold: true, color: textColor, fontFace: "Inter" });
-    if (it.meta && rh > 0.9) s.addText(it.meta, { x: rx + 0.2, y: cy + rh - 0.4, w: rw - 0.4, h: 0.3, fontSize: 10, color: textColor, fontFace: "Inter" });
+    s.addText(it.label, { x: rx + 0.2, y: cy + 0.15, w: rw - 0.4, h: 0.35, fontSize: 13, bold: true, color: textColor, fontFace: "Geist" });
+    s.addText(`${it.value}%`, { x: rx + 0.2, y: cy + rh / 2 - 0.25, w: rw - 0.4, h: 0.5, fontSize: 22, bold: true, color: textColor, fontFace: "Geist" });
+    if (it.meta && rh > 0.9) s.addText(it.meta, { x: rx + 0.2, y: cy + rh - 0.4, w: rw - 0.4, h: 0.3, fontSize: 10, color: textColor, fontFace: "Geist" });
     cy += rh;
   });
 }
@@ -2737,11 +2750,11 @@ function renderInfoDonut(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pale
   if (centerValue) {
     s.addText(`${centerValue}${centerUnit}`, {
       x: 1.4, y: y0 + 1.8, w: 5.0, h: 1.4,
-      fontSize: 60, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle",
+      fontSize: 60, bold: true, color: p.primary, fontFace: "Geist", align: "center", valign: "middle",
     });
     if (centerLabel) s.addText(centerLabel, {
       x: 1.4, y: y0 + 3.1, w: 5.0, h: 0.6,
-      fontSize: 11, color: p.ink, fontFace: "Inter", align: "center",
+      fontSize: 11, color: p.ink, fontFace: "Geist", align: "center",
     });
   }
   // legend on the right
@@ -2750,8 +2763,8 @@ function renderInfoDonut(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pale
   items.forEach((it, k) => {
     const y = y0 + 0.2 + k * rowH;
     s.addShape("rect", { x: legX, y: y + 0.12, w: 0.22, h: 0.22, fill: { color: colors[k % colors.length] }, line: { color: colors[k % colors.length] } });
-    s.addText(`${it.label} — ${it.value}%`, { x: legX + 0.35, y, w: SLIDE_W - legX - 0.4, h: 0.35, fontSize: 13, bold: true, color: p.primary, fontFace: "Inter" });
-    if (it.note) s.addText(it.note, { x: legX + 0.35, y: y + 0.32, w: SLIDE_W - legX - 0.4, h: 0.32, fontSize: 10, color: p.ink, fontFace: "Inter" });
+    s.addText(`${it.label} — ${it.value}%`, { x: legX + 0.35, y, w: SLIDE_W - legX - 0.4, h: 0.35, fontSize: 13, bold: true, color: p.primary, fontFace: "Geist" });
+    if (it.note) s.addText(it.note, { x: legX + 0.35, y: y + 0.32, w: SLIDE_W - legX - 0.4, h: 0.32, fontSize: 10, color: p.ink, fontFace: "Geist" });
   });
 }
 
@@ -2774,9 +2787,9 @@ function renderInfoFunnelStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     // trapezoid via 4-point pentagon-ish shape (use rect for simplicity, adjacent widths still communicate the taper)
     const color = k === 0 ? p.primary : k === items.length - 1 ? p.accent : mixHex(p.primary.replace("#", ""), p.accent.replace("#", ""), t);
     s.addShape("rect", { x, y: y + 0.05, w, h: rowH - 0.1, fill: { color }, line: { color: "FFFFFF", width: 2 } });
-    s.addText(str(it.label), { x: x + 0.25, y: y + 0.05, w: w * 0.55, h: rowH - 0.1, fontSize: 15, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
-    s.addText(`${str(it.value)} ${str(it.unit)}`.trim(), { x: x + w * 0.5, y: y + 0.05, w: w * 0.48 - 0.25, h: rowH - 0.1, fontSize: 20, bold: true, color: "FFFFFF", fontFace: "Inter", align: "right", valign: "middle" });
-    if (it.note) s.addText(str(it.note), { x: x + w + 0.2, y: y + rowH / 2 - 0.2, w: SLIDE_W - (x + w) - 0.5, h: 0.6, fontSize: 10, color: p.ink, fontFace: "Inter", valign: "middle" });
+    s.addText(str(it.label), { x: x + 0.25, y: y + 0.05, w: w * 0.55, h: rowH - 0.1, fontSize: 15, bold: true, color: "FFFFFF", fontFace: "Geist", valign: "middle" });
+    s.addText(`${str(it.value)} ${str(it.unit)}`.trim(), { x: x + w * 0.5, y: y + 0.05, w: w * 0.48 - 0.25, h: rowH - 0.1, fontSize: 20, bold: true, color: "FFFFFF", fontFace: "Geist", align: "right", valign: "middle" });
+    if (it.note) s.addText(str(it.note), { x: x + w + 0.2, y: y + rowH / 2 - 0.2, w: SLIDE_W - (x + w) - 0.5, h: 0.6, fontSize: 10, color: p.ink, fontFace: "Geist", valign: "middle" });
     void wNext;
   });
 }
@@ -2799,9 +2812,9 @@ function renderInfoPyramid(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
     const color = k === items.length - 1 ? p.accent : p.primary;
     const transparency = k === items.length - 1 ? 0 : Math.min(60, (items.length - 1 - k) * 15);
     s.addShape("rect", { x, y: y + 0.04, w, h: rowH - 0.08, fill: { color, transparency }, line: { color: "FFFFFF", width: 2 } });
-    s.addText(str(it.label), { x: x + 0.1, y: y + 0.04, w: w - 0.2, h: rowH - 0.08, fontSize: 14, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle" });
+    s.addText(str(it.label), { x: x + 0.1, y: y + 0.04, w: w - 0.2, h: rowH - 0.08, fontSize: 14, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center", valign: "middle" });
     // right-side description
-    if (it.body) s.addText(str(it.body), { x: cxSlide + maxW / 2 + 0.3, y: y + 0.1, w: SLIDE_W - (cxSlide + maxW / 2) - 0.8, h: rowH - 0.15, fontSize: 11, color: p.ink, fontFace: "Inter", valign: "middle" });
+    if (it.body) s.addText(str(it.body), { x: cxSlide + maxW / 2 + 0.3, y: y + 0.1, w: SLIDE_W - (cxSlide + maxW / 2) - 0.8, h: rowH - 0.15, fontSize: 11, color: p.ink, fontFace: "Geist", valign: "middle" });
   });
 }
 
@@ -2825,11 +2838,11 @@ function renderInfoVenn(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
     const pos = positions[k];
     const boxW = 2.4;
     const labelY = k < 2 ? pos.y - r - 0.6 : pos.y + r + 0.15;
-    s.addText(str(it.label), { x: pos.x - boxW / 2, y: labelY, w: boxW, h: 0.4, fontSize: 14, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
-    if (it.body) s.addText(str(it.body), { x: pos.x - boxW / 2, y: labelY + 0.4, w: boxW, h: 0.6, fontSize: 10, color: p.ink, fontFace: "Inter", align: "center" });
+    s.addText(str(it.label), { x: pos.x - boxW / 2, y: labelY, w: boxW, h: 0.4, fontSize: 14, bold: true, color: p.primary, fontFace: "Geist", align: "center" });
+    if (it.body) s.addText(str(it.body), { x: pos.x - boxW / 2, y: labelY + 0.4, w: boxW, h: 0.6, fontSize: 10, color: p.ink, fontFace: "Geist", align: "center" });
   });
   if (inter) {
-    s.addText(inter, { x: cxSlide - 1.5, y: cy - 0.25, w: 3.0, h: 0.5, fontSize: 13, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle" });
+    s.addText(inter, { x: cxSlide - 1.5, y: cy - 0.25, w: 3.0, h: 0.5, fontSize: 13, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center", valign: "middle" });
   }
 }
 
@@ -2845,21 +2858,21 @@ function renderInfoCircularFlow(s: PptxGenJS.Slide, c: Record<string, unknown>, 
   s.addShape("ellipse", { x: cxSlide - r, y: cy - r, w: r * 2, h: r * 2, fill: { color: "FFFFFF", transparency: 100 } as unknown as { color: string }, line: { color: p.accent, width: 2 } });
   // hub
   s.addShape("ellipse", { x: cxSlide - 0.9, y: cy - 0.9, w: 1.8, h: 1.8, fill: { color: p.primary }, line: { color: p.primary } });
-  if (hub) s.addText(hub, { x: cxSlide - 0.9, y: cy - 0.4, w: 1.8, h: 0.8, fontSize: 12, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle" });
+  if (hub) s.addText(hub, { x: cxSlide - 0.9, y: cy - 0.4, w: 1.8, h: 0.8, fontSize: 12, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center", valign: "middle" });
   const n = Math.max(items.length, 1);
   items.forEach((it, k) => {
     const angle = -Math.PI / 2 + (2 * Math.PI * k) / n;
     const nx = cxSlide + Math.cos(angle) * r;
     const ny = cy + Math.sin(angle) * r;
     s.addShape("ellipse", { x: nx - 0.32, y: ny - 0.32, w: 0.64, h: 0.64, fill: { color: p.accent }, line: { color: "FFFFFF", width: 2 } });
-    s.addText(String(k + 1), { x: nx - 0.32, y: ny - 0.32, w: 0.64, h: 0.64, fontSize: 16, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle" });
+    s.addText(String(k + 1), { x: nx - 0.32, y: ny - 0.32, w: 0.64, h: 0.64, fontSize: 16, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center", valign: "middle" });
     const boxW = 2.4;
     const dir = Math.cos(angle);
     const boxX = dir > 0.2 ? nx + 0.5 : dir < -0.2 ? nx - 0.5 - boxW : nx - boxW / 2;
     const align: "left" | "right" | "center" = dir > 0.2 ? "left" : dir < -0.2 ? "right" : "center";
     const boxY = ny - 0.35;
-    s.addText(str(it.label), { x: boxX, y: boxY, w: boxW, h: 0.35, fontSize: 13, bold: true, color: p.primary, fontFace: "Inter", align });
-    if (it.body) s.addText(str(it.body), { x: boxX, y: boxY + 0.35, w: boxW, h: 0.6, fontSize: 10, color: p.ink, fontFace: "Inter", align });
+    s.addText(str(it.label), { x: boxX, y: boxY, w: boxW, h: 0.35, fontSize: 13, bold: true, color: p.primary, fontFace: "Geist", align });
+    if (it.body) s.addText(str(it.body), { x: boxX, y: boxY + 0.35, w: boxW, h: 0.6, fontSize: 10, color: p.ink, fontFace: "Geist", align });
   });
 }
 
@@ -2878,10 +2891,10 @@ function renderInfoBarCompare(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
     const y = y0 + k * rowH;
     const isHero = k === items.length - 1;
     const w = (it.value / maxV) * barMaxW;
-    s.addText(it.label, { x: 0.6, y, w: labelW, h: rowH, fontSize: 13, bold: isHero, color: isHero ? p.primary : DARK_GRAY, fontFace: "Inter", valign: "middle" });
+    s.addText(it.label, { x: 0.6, y, w: labelW, h: rowH, fontSize: 13, bold: isHero, color: isHero ? p.primary : DARK_GRAY, fontFace: "Geist", valign: "middle" });
     s.addShape("rect", { x: barX, y: y + rowH * 0.2, w, h: rowH * 0.6, fill: { color: isHero ? p.accent : p.primary, transparency: isHero ? 0 : 40 }, line: { color: isHero ? p.accent : p.primary, transparency: isHero ? 0 : 40 } });
-    s.addText(`${it.value} ${unit}`.trim(), { x: barX + w + 0.15, y, w: 1.8, h: rowH, fontSize: 14, bold: isHero, color: p.primary, fontFace: "Inter", valign: "middle" });
-    if (it.note) s.addText(it.note, { x: barX, y: y + rowH * 0.78, w: barMaxW, h: 0.28, fontSize: 9, italic: true, color: MID_GRAY, fontFace: "Inter" });
+    s.addText(`${it.value} ${unit}`.trim(), { x: barX + w + 0.15, y, w: 1.8, h: rowH, fontSize: 14, bold: isHero, color: p.primary, fontFace: "Geist", valign: "middle" });
+    if (it.note) s.addText(it.note, { x: barX, y: y + rowH * 0.78, w: barMaxW, h: 0.28, fontSize: 9, italic: true, color: MID_GRAY, fontFace: "Geist" });
   });
 }
 
@@ -2903,11 +2916,11 @@ function renderImgGrid(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palett
     const y = y0 + r * (rowH + gap);
     // photo placeholder
     s.addShape("rect", { x, y, w: colW, h: rowH * 0.72, fill: { color: p.primary, transparency: 30 }, line: { color: p.primary, transparency: 30 } });
-    s.addText(str(it.label || it.caption).slice(0, 2).toUpperCase(), { x, y, w: colW, h: rowH * 0.72, fontSize: 42, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle", charSpacing: 4 });
+    s.addText(str(it.label || it.caption).slice(0, 2).toUpperCase(), { x, y, w: colW, h: rowH * 0.72, fontSize: 42, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center", valign: "middle", charSpacing: 4 });
     // caption band
     s.addShape("rect", { x, y: y + rowH * 0.72, w: colW, h: rowH * 0.28, fill: { color: "FFFFFF" }, line: { color: LIGHT_GRAY, width: 0.5 } });
-    if (it.label) s.addText(str(it.label), { x: x + 0.15, y: y + rowH * 0.74, w: colW - 0.3, h: rowH * 0.13, fontSize: 12, bold: true, color: p.primary, fontFace: "Inter" });
-    s.addText(str(it.caption), { x: x + 0.15, y: y + rowH * 0.87, w: colW - 0.3, h: rowH * 0.13, fontSize: 10, color: p.ink, fontFace: "Inter" });
+    if (it.label) s.addText(str(it.label), { x: x + 0.15, y: y + rowH * 0.74, w: colW - 0.3, h: rowH * 0.13, fontSize: 12, bold: true, color: p.primary, fontFace: "Geist" });
+    s.addText(str(it.caption), { x: x + 0.15, y: y + rowH * 0.87, w: colW - 0.3, h: rowH * 0.13, fontSize: 10, color: p.ink, fontFace: "Geist" });
   });
 }
 
@@ -2928,11 +2941,11 @@ function renderImgMatrix(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pale
     const imgW = colW * 0.42;
     // image side
     s.addShape("rect", { x, y, w: imgW, h: rowH, fill: { color: p.primary }, line: { color: p.primary } });
-    s.addText(str(it.label).slice(0, 2).toUpperCase(), { x, y, w: imgW, h: rowH, fontSize: 32, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle" });
+    s.addText(str(it.label).slice(0, 2).toUpperCase(), { x, y, w: imgW, h: rowH, fontSize: 32, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center", valign: "middle" });
     // content side
     s.addShape("rect", { x: x + imgW, y, w: colW - imgW, h: rowH, fill: { color: p.surface }, line: { color: LIGHT_GRAY } });
-    s.addText(str(it.label), { x: x + imgW + 0.2, y: y + 0.15, w: colW - imgW - 0.4, h: 0.4, fontSize: 14, bold: true, color: p.primary, fontFace: "Inter" });
-    s.addText(str(it.body), { x: x + imgW + 0.2, y: y + 0.6, w: colW - imgW - 0.4, h: rowH - 0.7, fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top" });
+    s.addText(str(it.label), { x: x + imgW + 0.2, y: y + 0.15, w: colW - imgW - 0.4, h: 0.4, fontSize: 14, bold: true, color: p.primary, fontFace: "Geist" });
+    s.addText(str(it.body), { x: x + imgW + 0.2, y: y + 0.6, w: colW - imgW - 0.4, h: rowH - 0.7, fontSize: 11, color: p.ink, fontFace: "Geist", valign: "top" });
   });
 }
 
@@ -2950,8 +2963,8 @@ function renderImgStrip(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
     // panel with gradient tint
     const transparency = 20 + k * 8;
     s.addShape("rect", { x, y: stripY, w: colW, h: stripH, fill: { color: p.primary, transparency }, line: { color: p.primary, transparency } });
-    s.addText(String(k + 1).padStart(2, "0"), { x: x + 0.2, y: stripY + 0.2, w: colW - 0.4, h: 0.5, fontSize: 22, bold: true, color: "FFFFFF", fontFace: "Inter" });
-    s.addText(str(it.caption), { x: x + 0.2, y: stripY + stripH - 0.7, w: colW - 0.4, h: 0.5, fontSize: 12, bold: true, color: "FFFFFF", fontFace: "Inter" });
+    s.addText(String(k + 1).padStart(2, "0"), { x: x + 0.2, y: stripY + 0.2, w: colW - 0.4, h: 0.5, fontSize: 22, bold: true, color: "FFFFFF", fontFace: "Geist" });
+    s.addText(str(it.caption), { x: x + 0.2, y: stripY + stripH - 0.7, w: colW - 0.4, h: 0.5, fontSize: 12, bold: true, color: "FFFFFF", fontFace: "Geist" });
   });
   // arrow row below
   const arrowY = stripY + stripH + 0.35;
@@ -2977,9 +2990,9 @@ function renderImgBeforeAfter(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
   sides.forEach((side) => {
     s.addShape("rect", { x: side.x, y: y0, w: colW, h: panelH * 0.62, fill: { color: side.tone, transparency: 25 }, line: { color: side.tone, transparency: 25 } });
     s.addShape("rect", { x: side.x + 0.15, y: y0 + 0.15, w: 1.0, h: 0.32, fill: { color: side.tone }, line: { color: side.tone } });
-    s.addText(side.badge, { x: side.x + 0.15, y: y0 + 0.15, w: 1.0, h: 0.32, fontSize: 10, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle", charSpacing: 3 });
-    s.addText(str(side.data.label), { x: side.x + 0.2, y: y0 + panelH * 0.68, w: colW - 0.4, h: 0.5, fontSize: 16, bold: true, color: p.primary, fontFace: "Inter" });
-    s.addText(str(side.data.body), { x: side.x + 0.2, y: y0 + panelH * 0.68 + 0.5, w: colW - 0.4, h: panelH * 0.32 - 0.5, fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top" });
+    s.addText(side.badge, { x: side.x + 0.15, y: y0 + 0.15, w: 1.0, h: 0.32, fontSize: 10, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center", valign: "middle", charSpacing: 3 });
+    s.addText(str(side.data.label), { x: side.x + 0.2, y: y0 + panelH * 0.68, w: colW - 0.4, h: 0.5, fontSize: 16, bold: true, color: p.primary, fontFace: "Geist" });
+    s.addText(str(side.data.body), { x: side.x + 0.2, y: y0 + panelH * 0.68 + 0.5, w: colW - 0.4, h: panelH * 0.32 - 0.5, fontSize: 11, color: p.ink, fontFace: "Geist", valign: "top" });
   });
 }
 
@@ -2992,11 +3005,11 @@ function renderCaseSpread(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   const metric = str(c.metric);
   // Left banner
   s.addShape("rect", { x: 0, y: 0, w: 4.2, h: SLIDE_H, fill: { color: p.primary }, line: { color: p.primary } });
-  s.addText("CASE STUDY", { x: 0.5, y: 0.9, w: 3.5, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 5 });
-  s.addText(client || "Client", { x: 0.5, y: 1.4, w: 3.5, h: 2.6, fontSize: 34, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "top" });
+  s.addText("CASE STUDY", { x: 0.5, y: 0.9, w: 3.5, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 5 });
+  s.addText(client || "Client", { x: 0.5, y: 1.4, w: 3.5, h: 2.6, fontSize: 34, bold: true, color: "FFFFFF", fontFace: "Geist", valign: "top" });
   if (metric) {
     s.addShape("rect", { x: 0.5, y: 4.6, w: 0.12, h: 1.2, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText(metric, { x: 0.7, y: 4.55, w: 3.3, h: 1.3, fontSize: 30, bold: true, color: p.accent, fontFace: "Inter", valign: "middle" });
+    s.addText(metric, { x: 0.7, y: 4.55, w: 3.3, h: 1.3, fontSize: 30, bold: true, color: p.accent, fontFace: "Geist", valign: "middle" });
   }
   // right columns
   const cols = [
@@ -3008,9 +3021,9 @@ function renderCaseSpread(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   const colW = (SLIDE_W - colX - 0.5) / 3;
   cols.forEach((col, k) => {
     const x = colX + k * colW;
-    s.addText(col.label, { x, y: 0.9, w: colW - 0.3, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 4 });
+    s.addText(col.label, { x, y: 0.9, w: colW - 0.3, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 4 });
     s.addShape("rect", { x, y: 1.35, w: 0.5, h: 0.03, fill: { color: p.primary }, line: { color: p.primary } });
-    s.addText(col.body, { x, y: 1.55, w: colW - 0.3, h: 5.0, fontSize: 13, color: p.ink, fontFace: "Inter", valign: "top" });
+    s.addText(col.body, { x, y: 1.55, w: colW - 0.3, h: 5.0, fontSize: 13, color: p.ink, fontFace: "Geist", valign: "top" });
   });
 }
 
@@ -3018,9 +3031,9 @@ function renderCaseSpread(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
 function renderCaseMetrics(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const client = str(c.client);
   const summary = str(c.summary);
-  s.addText("CASE", { x: 0.6, y: 0.6, w: 2, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 5 });
-  s.addText(client, { x: 0.6, y: 1.05, w: SLIDE_W - 1.2, h: 0.9, fontSize: 34, bold: true, color: p.primary, fontFace: "Inter" });
-  s.addText(summary, { x: 0.6, y: 2.05, w: SLIDE_W - 1.2, h: 1.5, fontSize: 15, color: p.ink, fontFace: "Inter", valign: "top" });
+  s.addText("CASE", { x: 0.6, y: 0.6, w: 2, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 5 });
+  s.addText(client, { x: 0.6, y: 1.05, w: SLIDE_W - 1.2, h: 0.9, fontSize: 34, bold: true, color: p.primary, fontFace: "Geist" });
+  s.addText(summary, { x: 0.6, y: 2.05, w: SLIDE_W - 1.2, h: 1.5, fontSize: 15, color: p.ink, fontFace: "Geist", valign: "top" });
   const items = arr(c.items).slice(0, 3);
   const colW = (SLIDE_W - 1.2 - 0.4) / 3;
   const y = 3.9;
@@ -3028,24 +3041,24 @@ function renderCaseMetrics(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
     const x = 0.6 + k * (colW + 0.2);
     s.addShape("rect", { x, y, w: colW, h: 2.5, fill: { color: p.surface }, line: { color: LIGHT_GRAY } });
     s.addShape("rect", { x, y, w: colW, h: 0.08, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText(`${str(it.value)}${str(it.unit)}`, { x: x + 0.2, y: y + 0.4, w: colW - 0.4, h: 1.3, fontSize: 54, bold: true, color: p.primary, fontFace: "Inter" });
-    s.addText(str(it.label), { x: x + 0.2, y: y + 1.75, w: colW - 0.4, h: 0.7, fontSize: 12, color: p.ink, fontFace: "Inter", valign: "top" });
+    s.addText(`${str(it.value)}${str(it.unit)}`, { x: x + 0.2, y: y + 0.4, w: colW - 0.4, h: 1.3, fontSize: 54, bold: true, color: p.primary, fontFace: "Geist" });
+    s.addText(str(it.label), { x: x + 0.2, y: y + 1.75, w: colW - 0.4, h: 0.7, fontSize: 12, color: p.ink, fontFace: "Geist", valign: "top" });
   });
 }
 
 // ── MV-CASE-STORY ── narrative long-form
 function renderCaseStory(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
-  s.addText("CASE STUDY", { x: 0.6, y: 0.6, w: 4, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 5 });
-  s.addText(str(c.client), { x: 0.6, y: 1.0, w: SLIDE_W - 1.2, h: 0.6, fontSize: 16, color: MID_GRAY, fontFace: "Inter" });
-  s.addText(str(c.headline), { x: 0.6, y: 1.6, w: SLIDE_W - 1.2, h: 1.4, fontSize: 34, bold: true, color: p.primary, fontFace: "Inter" });
+  s.addText("CASE STUDY", { x: 0.6, y: 0.6, w: 4, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 5 });
+  s.addText(str(c.client), { x: 0.6, y: 1.0, w: SLIDE_W - 1.2, h: 0.6, fontSize: 16, color: MID_GRAY, fontFace: "Geist" });
+  s.addText(str(c.headline), { x: 0.6, y: 1.6, w: SLIDE_W - 1.2, h: 1.4, fontSize: 34, bold: true, color: p.primary, fontFace: "Geist" });
   s.addShape("rect", { x: 0.6, y: 3.1, w: 0.6, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-  s.addText(str(c.story), { x: 0.6, y: 3.3, w: (SLIDE_W - 1.6) * 0.65, h: 3.4, fontSize: 14, color: p.ink, fontFace: "Inter", valign: "top" });
+  s.addText(str(c.story), { x: 0.6, y: 3.3, w: (SLIDE_W - 1.6) * 0.65, h: 3.4, fontSize: 14, color: p.ink, fontFace: "Geist", valign: "top" });
   // result callout right
   const resX = 0.6 + (SLIDE_W - 1.2) * 0.68;
   const resW = SLIDE_W - resX - 0.6;
   s.addShape("rect", { x: resX, y: 3.3, w: resW, h: 3.3, fill: { color: p.primary }, line: { color: p.primary } });
-  s.addText("RESULT", { x: resX + 0.25, y: 3.5, w: resW - 0.5, h: 0.4, fontSize: 10, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 4 });
-  s.addText(str(c.result), { x: resX + 0.25, y: 3.95, w: resW - 0.5, h: 2.5, fontSize: 15, color: "FFFFFF", fontFace: "Inter", valign: "top" });
+  s.addText("RESULT", { x: resX + 0.25, y: 3.5, w: resW - 0.5, h: 0.4, fontSize: 10, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 4 });
+  s.addText(str(c.result), { x: resX + 0.25, y: 3.95, w: resW - 0.5, h: 2.5, fontSize: 15, color: "FFFFFF", fontFace: "Geist", valign: "top" });
 }
 
 // ── MV-CASE-LOGO-GRID ── 6 client wordmark tiles with metric
@@ -3070,11 +3083,11 @@ function renderCaseLogoGrid(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
         sizing: { type: "contain", w: colW - 0.4, h: rowH * 0.5 },
       });
     } else {
-      s.addText(initials(str(it.client)), { x, y: y + 0.2, w: colW, h: rowH * 0.5, fontSize: 34, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
+      s.addText(initials(str(it.client)), { x, y: y + 0.2, w: colW, h: rowH * 0.5, fontSize: 34, bold: true, color: p.primary, fontFace: "Geist", align: "center", valign: "middle" });
     }
-    s.addText(str(it.client).toUpperCase(), { x, y: y + rowH * 0.55, w: colW, h: 0.35, fontSize: 10, bold: true, color: DARK_GRAY, fontFace: "Inter", align: "center", charSpacing: 3 });
+    s.addText(str(it.client).toUpperCase(), { x, y: y + rowH * 0.55, w: colW, h: 0.35, fontSize: 10, bold: true, color: DARK_GRAY, fontFace: "Geist", align: "center", charSpacing: 3 });
     s.addShape("rect", { x: x + colW / 2 - 0.3, y: y + rowH * 0.75, w: 0.6, h: 0.03, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText(str(it.result), { x: x + 0.2, y: y + rowH * 0.8, w: colW - 0.4, h: rowH * 0.2, fontSize: 11, italic: true, color: p.accent, fontFace: "Inter", align: "center" });
+    s.addText(str(it.result), { x: x + 0.2, y: y + rowH * 0.8, w: colW - 0.4, h: rowH * 0.2, fontSize: 11, italic: true, color: p.accent, fontFace: "Geist", align: "center" });
   });
 }
 
@@ -3092,7 +3105,7 @@ function renderClientMatrix(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     const x = 0.6 + col * (colW + gap);
     const y = y0 + r * (rowH + gap);
     s.addShape("rect", { x, y, w: colW, h: rowH, fill: { color: p.surface }, line: { color: LIGHT_GRAY } });
-    s.addText(str(it.sector).toUpperCase(), { x: x + 0.2, y: y + 0.2, w: colW - 0.4, h: 0.3, fontSize: 9, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 3 });
+    s.addText(str(it.sector).toUpperCase(), { x: x + 0.2, y: y + 0.2, w: colW - 0.4, h: 0.3, fontSize: 9, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 3 });
     const logoData = itemLogos[k];
     if (logoData) {
       s.addImage({
@@ -3100,13 +3113,13 @@ function renderClientMatrix(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
         x: x + 0.2, y: y + 0.48, w: colW - 0.4, h: 0.45,
         sizing: { type: "contain", w: colW - 0.4, h: 0.45 },
       });
-      s.addText(str(it.client), { x: x + 0.2, y: y + 0.98, w: colW - 0.4, h: 0.3, fontSize: 10, color: DARK_GRAY, fontFace: "Inter", charSpacing: 2 });
+      s.addText(str(it.client), { x: x + 0.2, y: y + 0.98, w: colW - 0.4, h: 0.3, fontSize: 10, color: DARK_GRAY, fontFace: "Geist", charSpacing: 2 });
     } else {
-      s.addText(str(it.client), { x: x + 0.2, y: y + 0.5, w: colW - 0.4, h: 0.5, fontSize: 15, bold: true, color: p.primary, fontFace: "Inter" });
+      s.addText(str(it.client), { x: x + 0.2, y: y + 0.5, w: colW - 0.4, h: 0.5, fontSize: 15, bold: true, color: p.primary, fontFace: "Geist" });
     }
-    s.addText(str(it.result), { x: x + 0.2, y: y + 1.35, w: colW - 0.4, h: 0.9, fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top" });
+    s.addText(str(it.result), { x: x + 0.2, y: y + 1.35, w: colW - 0.4, h: 0.9, fontSize: 11, color: p.ink, fontFace: "Geist", valign: "top" });
     s.addShape("rect", { x: x + 0.2, y: y + rowH - 0.7, w: colW - 0.4, h: 0.02, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText(`${str(it.metric)} ${str(it.unit)}`.trim(), { x: x + 0.2, y: y + rowH - 0.6, w: colW - 0.4, h: 0.5, fontSize: 22, bold: true, color: p.accent, fontFace: "Inter" });
+    s.addText(`${str(it.metric)} ${str(it.unit)}`.trim(), { x: x + 0.2, y: y + rowH - 0.6, w: colW - 0.4, h: 0.5, fontSize: 22, bold: true, color: p.accent, fontFace: "Geist" });
   });
 }
 
@@ -3130,15 +3143,15 @@ function renderClientDetail3(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
       });
     } else {
       s.addShape("rect", { x, y, w: colW, h: h * 0.35, fill: { color: p.primary }, line: { color: p.primary } });
-      s.addText(str(it.client).slice(0, 2).toUpperCase(), { x, y, w: colW, h: h * 0.35, fontSize: 44, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle" });
+      s.addText(str(it.client).slice(0, 2).toUpperCase(), { x, y, w: colW, h: h * 0.35, fontSize: 44, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center", valign: "middle" });
     }
     // body
     s.addShape("rect", { x, y: y + h * 0.35, w: colW, h: h * 0.65, fill: { color: "FFFFFF" }, line: { color: LIGHT_GRAY } });
-    s.addText(str(it.sector).toUpperCase(), { x: x + 0.25, y: y + h * 0.37, w: colW - 0.5, h: 0.35, fontSize: 10, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 3 });
-    s.addText(str(it.client), { x: x + 0.25, y: y + h * 0.42, w: colW - 0.5, h: 0.6, fontSize: 17, bold: true, color: p.primary, fontFace: "Inter" });
-    s.addText(str(it.story), { x: x + 0.25, y: y + h * 0.55, w: colW - 0.5, h: h * 0.28, fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top" });
+    s.addText(str(it.sector).toUpperCase(), { x: x + 0.25, y: y + h * 0.37, w: colW - 0.5, h: 0.35, fontSize: 10, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 3 });
+    s.addText(str(it.client), { x: x + 0.25, y: y + h * 0.42, w: colW - 0.5, h: 0.6, fontSize: 17, bold: true, color: p.primary, fontFace: "Geist" });
+    s.addText(str(it.story), { x: x + 0.25, y: y + h * 0.55, w: colW - 0.5, h: h * 0.28, fontSize: 11, color: p.ink, fontFace: "Geist", valign: "top" });
     s.addShape("rect", { x: x + 0.25, y: y + h * 0.88, w: 0.4, h: 0.03, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText(str(it.metric), { x: x + 0.25, y: y + h * 0.9, w: colW - 0.5, h: 0.4, fontSize: 13, bold: true, color: p.accent, fontFace: "Inter" });
+    s.addText(str(it.metric), { x: x + 0.25, y: y + h * 0.9, w: colW - 0.5, h: 0.4, fontSize: 13, bold: true, color: p.accent, fontFace: "Geist" });
   });
 }
 
@@ -3150,7 +3163,7 @@ function renderClientCompare(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
   const cols = [0.6, 3.0, 6.0, 10.8];
   const colWs = [2.3, 2.9, 4.7, SLIDE_W - 0.6 - 10.8];
   headers.forEach((h, k) => {
-    s.addText(h, { x: cols[k], y: y0, w: colWs[k] - 0.2, h: 0.4, fontSize: 10, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 3 });
+    s.addText(h, { x: cols[k], y: y0, w: colWs[k] - 0.2, h: 0.4, fontSize: 10, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 3 });
   });
   s.addShape("rect", { x: 0.6, y: y0 + 0.42, w: SLIDE_W - 1.2, h: 0.02, fill: { color: p.primary }, line: { color: p.primary } });
   const rowH = (5.8 - y0 - 0.5) / Math.max(items.length, 1);
@@ -3165,13 +3178,13 @@ function renderClientCompare(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
         x: cols[0], y: y + 0.05, w: 0.9, h: 0.45,
         sizing: { type: "contain", w: 0.9, h: 0.45 },
       });
-      s.addText(str(it.client), { x: cols[0], y: y + 0.55, w: colWs[0] - 0.2, h: rowH - 0.6, fontSize: 12, bold: true, color: p.primary, fontFace: "Inter", valign: "top" });
+      s.addText(str(it.client), { x: cols[0], y: y + 0.55, w: colWs[0] - 0.2, h: rowH - 0.6, fontSize: 12, bold: true, color: p.primary, fontFace: "Geist", valign: "top" });
     } else {
-      s.addText(str(it.client), { x: cols[0], y, w: colWs[0] - 0.2, h: rowH - 0.1, fontSize: 14, bold: true, color: p.primary, fontFace: "Inter", valign: "top" });
+      s.addText(str(it.client), { x: cols[0], y, w: colWs[0] - 0.2, h: rowH - 0.1, fontSize: 14, bold: true, color: p.primary, fontFace: "Geist", valign: "top" });
     }
-    s.addText(str(it.challenge), { x: cols[1], y, w: colWs[1] - 0.2, h: rowH - 0.1, fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top" });
-    s.addText(str(it.outcome), { x: cols[2], y, w: colWs[2] - 0.2, h: rowH - 0.1, fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top" });
-    s.addText(str(it.metric), { x: cols[3], y, w: colWs[3] - 0.2, h: rowH - 0.1, fontSize: 15, bold: true, color: p.accent, fontFace: "Inter", valign: "top" });
+    s.addText(str(it.challenge), { x: cols[1], y, w: colWs[1] - 0.2, h: rowH - 0.1, fontSize: 11, color: p.ink, fontFace: "Geist", valign: "top" });
+    s.addText(str(it.outcome), { x: cols[2], y, w: colWs[2] - 0.2, h: rowH - 0.1, fontSize: 11, color: p.ink, fontFace: "Geist", valign: "top" });
+    s.addText(str(it.metric), { x: cols[3], y, w: colWs[3] - 0.2, h: rowH - 0.1, fontSize: 15, bold: true, color: p.accent, fontFace: "Geist", valign: "top" });
   });
 }
 
@@ -3182,15 +3195,15 @@ function renderGovRaci(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palett
   const headers = ["FORUM", "CADENCE", "PURPOSE"];
   const cols = [0.6, 4.4, 7.6];
   const colWs = [3.6, 3.0, SLIDE_W - 0.6 - 7.6];
-  headers.forEach((h, k) => s.addText(h, { x: cols[k], y: y0, w: colWs[k] - 0.2, h: 0.4, fontSize: 10, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 3 }));
+  headers.forEach((h, k) => s.addText(h, { x: cols[k], y: y0, w: colWs[k] - 0.2, h: 0.4, fontSize: 10, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 3 }));
   s.addShape("rect", { x: 0.6, y: y0 + 0.42, w: SLIDE_W - 1.2, h: 0.02, fill: { color: p.primary }, line: { color: p.primary } });
   const rowH = Math.min(1.4, (5.8 - y0 - 0.55) / Math.max(items.length, 1));
   items.forEach((it, k) => {
     const y = y0 + 0.55 + k * rowH;
     if (k % 2 === 0) s.addShape("rect", { x: 0.6, y, w: SLIDE_W - 1.2, h: rowH, fill: { color: p.surface }, line: { color: p.surface } });
-    s.addText(str(it.forum), { x: cols[0], y, w: colWs[0] - 0.2, h: rowH, fontSize: 15, bold: true, color: p.primary, fontFace: "Inter", valign: "middle" });
-    s.addText(str(it.cadence), { x: cols[1], y, w: colWs[1] - 0.2, h: rowH, fontSize: 12, color: p.accent, fontFace: "Inter", valign: "middle" });
-    s.addText(str(it.purpose), { x: cols[2], y, w: colWs[2] - 0.2, h: rowH, fontSize: 12, color: p.ink, fontFace: "Inter", valign: "middle" });
+    s.addText(str(it.forum), { x: cols[0], y, w: colWs[0] - 0.2, h: rowH, fontSize: 15, bold: true, color: p.primary, fontFace: "Geist", valign: "middle" });
+    s.addText(str(it.cadence), { x: cols[1], y, w: colWs[1] - 0.2, h: rowH, fontSize: 12, color: p.accent, fontFace: "Geist", valign: "middle" });
+    s.addText(str(it.purpose), { x: cols[2], y, w: colWs[2] - 0.2, h: rowH, fontSize: 12, color: p.ink, fontFace: "Geist", valign: "middle" });
   });
 }
 
@@ -3209,12 +3222,12 @@ function renderCommPricing(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
     s.addShape("rect", { x, y: y0, w: colW, h, fill: { color: isHero ? p.primary : "FFFFFF" }, line: { color: stroke, width: isHero ? 2 : 1 } });
     const inkOn = isHero ? "FFFFFF" : p.primary;
     const bodyOn = isHero ? "FFFFFF" : p.ink;
-    s.addText(str(it.name).toUpperCase(), { x: x + 0.3, y: y0 + 0.3, w: colW - 0.6, h: 0.4, fontSize: 12, bold: true, color: isHero ? p.accent : p.accent, fontFace: "Inter", charSpacing: 4 });
-    s.addText(str(it.price), { x: x + 0.3, y: y0 + 0.7, w: colW - 0.6, h: 1.1, fontSize: 40, bold: true, color: inkOn, fontFace: "Inter" });
-    s.addText(str(it.unit), { x: x + 0.3, y: y0 + 1.75, w: colW - 0.6, h: 0.4, fontSize: 11, italic: true, color: bodyOn, fontFace: "Inter" });
+    s.addText(str(it.name).toUpperCase(), { x: x + 0.3, y: y0 + 0.3, w: colW - 0.6, h: 0.4, fontSize: 12, bold: true, color: isHero ? p.accent : p.accent, fontFace: "Geist", charSpacing: 4 });
+    s.addText(str(it.price), { x: x + 0.3, y: y0 + 0.7, w: colW - 0.6, h: 1.1, fontSize: 40, bold: true, color: inkOn, fontFace: "Geist" });
+    s.addText(str(it.unit), { x: x + 0.3, y: y0 + 1.75, w: colW - 0.6, h: 0.4, fontSize: 11, italic: true, color: bodyOn, fontFace: "Geist" });
     s.addShape("rect", { x: x + 0.3, y: y0 + 2.2, w: colW - 0.6, h: 0.02, fill: { color: isHero ? p.accent : LIGHT_GRAY }, line: { color: isHero ? p.accent : LIGHT_GRAY } });
     const feats = Array.isArray(it.features) ? (it.features as unknown[]).map(String) : [];
-    s.addText(feats.map((f) => ({ text: f, options: { bullet: { code: "25CF" }, fontFace: "Inter", fontSize: 11, color: bodyOn } })), {
+    s.addText(feats.map((f) => ({ text: f, options: { bullet: { code: "25CF" }, fontFace: "Geist", fontSize: 11, color: bodyOn } })), {
       x: x + 0.3, y: y0 + 2.35, w: colW - 0.6, h: h - 2.6, fontSize: 11, color: bodyOn, paraSpaceAfter: 4,
     });
   });
@@ -3227,18 +3240,18 @@ function renderCommInvestment(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
   const unit = str(c.unit);
   const items = arr(c.items);
   const leftW = 6.0;
-  s.addText("INVESTMENT", { x: 0.6, y: y0 + 0.2, w: leftW, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 5 });
-  s.addText(amount, { x: 0.6, y: y0 + 0.65, w: leftW, h: 2.6, fontSize: 96, bold: true, color: p.primary, fontFace: "Inter" });
-  s.addText(unit, { x: 0.6, y: y0 + 3.3, w: leftW, h: 0.6, fontSize: 15, italic: true, color: p.ink, fontFace: "Inter" });
+  s.addText("INVESTMENT", { x: 0.6, y: y0 + 0.2, w: leftW, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 5 });
+  s.addText(amount, { x: 0.6, y: y0 + 0.65, w: leftW, h: 2.6, fontSize: 96, bold: true, color: p.primary, fontFace: "Geist" });
+  s.addText(unit, { x: 0.6, y: y0 + 3.3, w: leftW, h: 0.6, fontSize: 15, italic: true, color: p.ink, fontFace: "Geist" });
   // right list
   const rx = leftW + 0.9;
   const rw = SLIDE_W - rx - 0.6;
-  s.addText("INCLUDES", { x: rx, y: y0 + 0.2, w: rw, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 4 });
+  s.addText("INCLUDES", { x: rx, y: y0 + 0.2, w: rw, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 4 });
   s.addShape("rect", { x: rx, y: y0 + 0.62, w: 0.5, h: 0.03, fill: { color: p.primary }, line: { color: p.primary } });
   items.forEach((it, k) => {
     const y = y0 + 0.9 + k * 0.65;
     s.addShape("ellipse", { x: rx, y: y + 0.15, w: 0.15, h: 0.15, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText(str(it.label), { x: rx + 0.3, y, w: rw - 0.3, h: 0.55, fontSize: 14, color: p.primary, fontFace: "Inter", valign: "middle" });
+    s.addText(str(it.label), { x: rx + 0.3, y, w: rw - 0.3, h: 0.55, fontSize: 14, color: p.primary, fontFace: "Geist", valign: "middle" });
   });
 }
 
@@ -3261,13 +3274,13 @@ function renderDecMatrix(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pale
   ];
   cells.forEach((cell) => {
     s.addShape("rect", { x: cell.x, y: cell.y, w: cellW, h: cellH, fill: { color: cell.color }, line: { color: LIGHT_GRAY } });
-    s.addText(cell.label, { x: cell.x + 0.25, y: cell.y + 0.25, w: cellW - 0.5, h: cellH - 0.5, fontSize: 16, bold: true, color: cell.tone, fontFace: "Inter", valign: "middle", align: "center" });
+    s.addText(cell.label, { x: cell.x + 0.25, y: cell.y + 0.25, w: cellW - 0.5, h: cellH - 0.5, fontSize: 16, bold: true, color: cell.tone, fontFace: "Geist", valign: "middle", align: "center" });
   });
   // axes
   s.addShape("line", { x: gx, y: midY, w: gw, h: 0, line: { color: p.primary, width: 2 } });
   s.addShape("line", { x: midX, y: gy, w: 0, h: gh, line: { color: p.primary, width: 2 } });
-  s.addText(axisX.toUpperCase(), { x: gx, y: gy + gh + 0.1, w: gw, h: 0.4, fontSize: 11, bold: true, color: p.primary, fontFace: "Inter", align: "center", charSpacing: 4 });
-  s.addText(axisY.toUpperCase(), { x: 0.4, y: gy + gh / 2 - 0.2, w: 1.3, h: 0.4, fontSize: 11, bold: true, color: p.primary, fontFace: "Inter", align: "right", charSpacing: 4 });
+  s.addText(axisX.toUpperCase(), { x: gx, y: gy + gh + 0.1, w: gw, h: 0.4, fontSize: 11, bold: true, color: p.primary, fontFace: "Geist", align: "center", charSpacing: 4 });
+  s.addText(axisY.toUpperCase(), { x: 0.4, y: gy + gh / 2 - 0.2, w: 1.3, h: 0.4, fontSize: 11, bold: true, color: p.primary, fontFace: "Geist", align: "right", charSpacing: 4 });
 }
 
 // ── MV-DEC-COMPARE-TABLE ── real 3-column comparison table with winner column
@@ -3281,23 +3294,23 @@ function renderDecCompareTable(s: PptxGenJS.Slide, c: Record<string, unknown>, p
   const colW = availW / Math.max(nCols, 1);
   const headY = y0;
   // criterion header
-  s.addText("CRITERION", { x: 0.6, y: headY, w: critW - 0.2, h: 0.5, fontSize: 10, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 3 });
+  s.addText("CRITERION", { x: 0.6, y: headY, w: critW - 0.2, h: 0.5, fontSize: 10, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 3 });
   columns.forEach((col, k) => {
     const x = 0.6 + critW + k * colW;
     const isHero = k === nCols - 1;
     if (isHero) s.addShape("rect", { x, y: headY, w: colW - 0.1, h: 0.55, fill: { color: p.primary }, line: { color: p.primary } });
-    s.addText(str(col.label).toUpperCase(), { x, y: headY, w: colW - 0.1, h: 0.55, fontSize: 11, bold: true, color: isHero ? "FFFFFF" : p.primary, fontFace: "Inter", align: "center", valign: "middle", charSpacing: 3 });
+    s.addText(str(col.label).toUpperCase(), { x, y: headY, w: colW - 0.1, h: 0.55, fontSize: 11, bold: true, color: isHero ? "FFFFFF" : p.primary, fontFace: "Geist", align: "center", valign: "middle", charSpacing: 3 });
   });
   const rowH = Math.min(0.9, (5.8 - y0 - 0.7) / Math.max(rows.length, 1));
   rows.forEach((row, r) => {
     const y = y0 + 0.65 + r * rowH;
     if (r % 2 === 1) s.addShape("rect", { x: 0.6, y, w: SLIDE_W - 1.2, h: rowH, fill: { color: p.surface }, line: { color: p.surface } });
-    s.addText(str(row.criterion), { x: 0.6, y, w: critW - 0.2, h: rowH, fontSize: 12, bold: true, color: p.primary, fontFace: "Inter", valign: "middle" });
+    s.addText(str(row.criterion), { x: 0.6, y, w: critW - 0.2, h: rowH, fontSize: 12, bold: true, color: p.primary, fontFace: "Geist", valign: "middle" });
     const values = Array.isArray(row.values) ? (row.values as unknown[]).map(String) : [];
     values.slice(0, nCols).forEach((v, k) => {
       const x = 0.6 + critW + k * colW;
       const isHero = k === nCols - 1;
-      s.addText(v, { x, y, w: colW - 0.1, h: rowH, fontSize: 12, bold: isHero, color: isHero ? p.accent : p.ink, fontFace: "Inter", align: "center", valign: "middle" });
+      s.addText(v, { x, y, w: colW - 0.1, h: rowH, fontSize: 12, bold: isHero, color: isHero ? p.accent : p.ink, fontFace: "Geist", align: "center", valign: "middle" });
     });
   });
 }
@@ -3311,9 +3324,9 @@ function renderDecChecklist(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     const y = y0 + k * rowH;
     // check mark badge
     s.addShape("ellipse", { x: 0.7, y: y + rowH / 2 - 0.28, w: 0.56, h: 0.56, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText("\u2713", { x: 0.7, y: y + rowH / 2 - 0.32, w: 0.56, h: 0.6, fontSize: 26, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle" });
-    s.addText(str(it.label), { x: 1.5, y: y + 0.05, w: SLIDE_W - 2.1, h: 0.5, fontSize: 15, bold: true, color: p.primary, fontFace: "Inter" });
-    s.addText(str(it.note), { x: 1.5, y: y + 0.55, w: SLIDE_W - 2.1, h: rowH - 0.55, fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top" });
+    s.addText("\u2713", { x: 0.7, y: y + rowH / 2 - 0.32, w: 0.56, h: 0.6, fontSize: 26, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center", valign: "middle" });
+    s.addText(str(it.label), { x: 1.5, y: y + 0.05, w: SLIDE_W - 2.1, h: 0.5, fontSize: 15, bold: true, color: p.primary, fontFace: "Geist" });
+    s.addText(str(it.note), { x: 1.5, y: y + 0.55, w: SLIDE_W - 2.1, h: rowH - 0.55, fontSize: 11, color: p.ink, fontFace: "Geist", valign: "top" });
   });
 }
 
@@ -3342,9 +3355,9 @@ function renderProofLogos(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
         sizing: { type: "contain", w: colW - 0.3, h: rowH * 0.6 },
       });
     } else {
-      s.addText(initials(name), { x, y, w: colW, h: rowH * 0.65, fontSize: 32, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
+      s.addText(initials(name), { x, y, w: colW, h: rowH * 0.65, fontSize: 32, bold: true, color: p.primary, fontFace: "Geist", align: "center", valign: "middle" });
     }
-    s.addText(name.toUpperCase(), { x, y: y + rowH * 0.68, w: colW, h: rowH * 0.3, fontSize: 10, color: DARK_GRAY, fontFace: "Inter", align: "center", charSpacing: 3 });
+    s.addText(name.toUpperCase(), { x, y: y + rowH * 0.68, w: colW, h: rowH * 0.3, fontSize: 10, color: DARK_GRAY, fontFace: "Geist", align: "center", charSpacing: 3 });
   });
 }
 
@@ -3355,16 +3368,16 @@ function renderProofTestimonial(s: PptxGenJS.Slide, c: Record<string, unknown>, 
   const role = str(c.role);
   const metric = str(c.metric);
   // Left: quote
-  s.addText("\u201C", { x: 0.6, y: 0.7, w: 1.5, h: 1.5, fontSize: 140, bold: true, color: p.accent, fontFace: "Inter" });
-  s.addText(quote, { x: 0.9, y: 2.1, w: 8.2, h: 3.4, fontSize: 26, italic: true, color: p.primary, fontFace: "Inter", valign: "top" });
-  if (attribution) s.addText(`${attribution}${role ? ` · ${role}` : ""}`, { x: 0.9, y: 5.8, w: 8.2, h: 0.5, fontSize: 13, color: p.ink, fontFace: "Inter", charSpacing: 2 });
+  s.addText("\u201C", { x: 0.6, y: 0.7, w: 1.5, h: 1.5, fontSize: 140, bold: true, color: p.accent, fontFace: "Geist" });
+  s.addText(quote, { x: 0.9, y: 2.1, w: 8.2, h: 3.4, fontSize: 26, italic: true, color: p.primary, fontFace: "Geist", valign: "top" });
+  if (attribution) s.addText(`${attribution}${role ? ` · ${role}` : ""}`, { x: 0.9, y: 5.8, w: 8.2, h: 0.5, fontSize: 13, color: p.ink, fontFace: "Geist", charSpacing: 2 });
   // Right: metric card
   if (metric) {
     const rx = 9.6;
     const rw = SLIDE_W - rx - 0.6;
     s.addShape("rect", { x: rx, y: 1.2, w: rw, h: 5.0, fill: { color: p.primary }, line: { color: p.primary } });
-    s.addText("RESULT", { x: rx + 0.3, y: 1.5, w: rw - 0.6, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 4 });
-    s.addText(metric, { x: rx + 0.3, y: 2.4, w: rw - 0.6, h: 3.0, fontSize: 46, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
+    s.addText("RESULT", { x: rx + 0.3, y: 1.5, w: rw - 0.6, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 4 });
+    s.addText(metric, { x: rx + 0.3, y: 2.4, w: rw - 0.6, h: 3.0, fontSize: 46, bold: true, color: "FFFFFF", fontFace: "Geist", valign: "middle" });
   }
 }
 
@@ -3378,14 +3391,14 @@ function renderRiskMitigation(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
     // risk pill (left)
     s.addShape("rect", { x: 0.6, y, w: 5.8, h: rowH - 0.15, fill: { color: p.surface }, line: { color: LIGHT_GRAY } });
     s.addShape("rect", { x: 0.6, y, w: 0.1, h: rowH - 0.15, fill: { color: "E53D2E" }, line: { color: "E53D2E" } });
-    s.addText("RISK", { x: 0.85, y: y + 0.15, w: 1.2, h: 0.3, fontSize: 9, bold: true, color: "E53D2E", fontFace: "Inter", charSpacing: 4 });
-    s.addText(str(it.risk), { x: 0.85, y: y + 0.45, w: 5.35, h: rowH - 0.6, fontSize: 13, color: p.primary, fontFace: "Inter", valign: "top" });
+    s.addText("RISK", { x: 0.85, y: y + 0.15, w: 1.2, h: 0.3, fontSize: 9, bold: true, color: "E53D2E", fontFace: "Geist", charSpacing: 4 });
+    s.addText(str(it.risk), { x: 0.85, y: y + 0.45, w: 5.35, h: rowH - 0.6, fontSize: 13, color: p.primary, fontFace: "Geist", valign: "top" });
     // arrow
-    s.addText("→", { x: 6.5, y: y + rowH / 2 - 0.3, w: 0.6, h: 0.6, fontSize: 24, bold: true, color: p.accent, fontFace: "Inter", align: "center" });
+    s.addText("→", { x: 6.5, y: y + rowH / 2 - 0.3, w: 0.6, h: 0.6, fontSize: 24, bold: true, color: p.accent, fontFace: "Geist", align: "center" });
     // mitigation (right)
     s.addShape("rect", { x: 7.15, y, w: SLIDE_W - 7.15 - 0.6, h: rowH - 0.15, fill: { color: p.primary }, line: { color: p.primary } });
-    s.addText("MITIGATION", { x: 7.4, y: y + 0.15, w: 2, h: 0.3, fontSize: 9, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 4 });
-    s.addText(str(it.mitigation), { x: 7.4, y: y + 0.45, w: SLIDE_W - 7.4 - 0.75, h: rowH - 0.6, fontSize: 13, color: "FFFFFF", fontFace: "Inter", valign: "top" });
+    s.addText("MITIGATION", { x: 7.4, y: y + 0.15, w: 2, h: 0.3, fontSize: 9, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 4 });
+    s.addText(str(it.mitigation), { x: 7.4, y: y + 0.45, w: SLIDE_W - 7.4 - 0.75, h: rowH - 0.6, fontSize: 13, color: "FFFFFF", fontFace: "Geist", valign: "top" });
   });
 }
 
@@ -3401,11 +3414,11 @@ function renderTeamBios(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
     const cxAv = x + colW / 2;
     const avR = Math.min(1.1, colW * 0.28);
     s.addShape("ellipse", { x: cxAv - avR, y, w: avR * 2, h: avR * 2, fill: { color: p.primary }, line: { color: p.primary } });
-    s.addText(initials(str(it.name)), { x: cxAv - avR, y, w: avR * 2, h: avR * 2, fontSize: 32, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle" });
-    s.addText(str(it.name), { x, y: y + avR * 2 + 0.2, w: colW, h: 0.5, fontSize: 16, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
-    s.addText(str(it.role).toUpperCase(), { x, y: y + avR * 2 + 0.65, w: colW, h: 0.35, fontSize: 10, bold: true, color: p.accent, fontFace: "Inter", align: "center", charSpacing: 3 });
+    s.addText(initials(str(it.name)), { x: cxAv - avR, y, w: avR * 2, h: avR * 2, fontSize: 32, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center", valign: "middle" });
+    s.addText(str(it.name), { x, y: y + avR * 2 + 0.2, w: colW, h: 0.5, fontSize: 16, bold: true, color: p.primary, fontFace: "Geist", align: "center" });
+    s.addText(str(it.role).toUpperCase(), { x, y: y + avR * 2 + 0.65, w: colW, h: 0.35, fontSize: 10, bold: true, color: p.accent, fontFace: "Geist", align: "center", charSpacing: 3 });
     s.addShape("rect", { x: cxAv - 0.25, y: y + avR * 2 + 1.05, w: 0.5, h: 0.02, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText(str(it.bio), { x, y: y + avR * 2 + 1.2, w: colW, h: 5.5 - (y + avR * 2 + 1.2), fontSize: 11, color: p.ink, fontFace: "Inter", align: "center", valign: "top" });
+    s.addText(str(it.bio), { x, y: y + avR * 2 + 1.2, w: colW, h: 5.5 - (y + avR * 2 + 1.2), fontSize: 11, color: p.ink, fontFace: "Geist", align: "center", valign: "top" });
   });
 }
 
@@ -3421,9 +3434,9 @@ function renderSolArchitecture(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     s.addShape("rect", { x: 0.6, y, w: SLIDE_W - 1.2, h: layerH - 0.1, fill: { color: p.primary, transparency }, line: { color: "FFFFFF", width: 2 } });
     // left accent block
     s.addShape("rect", { x: 0.6, y, w: 0.12, h: layerH - 0.1, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText(String(items.length - k).padStart(2, "0"), { x: 1.0, y: y + 0.15, w: 1.0, h: layerH - 0.3, fontSize: 32, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
-    s.addText(str(it.label), { x: 2.1, y: y + 0.2, w: 4.0, h: layerH - 0.3, fontSize: 17, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
-    s.addText(str(it.body), { x: 6.3, y: y + 0.2, w: SLIDE_W - 7.0, h: layerH - 0.3, fontSize: 12, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
+    s.addText(String(items.length - k).padStart(2, "0"), { x: 1.0, y: y + 0.15, w: 1.0, h: layerH - 0.3, fontSize: 32, bold: true, color: "FFFFFF", fontFace: "Geist", valign: "middle" });
+    s.addText(str(it.label), { x: 2.1, y: y + 0.2, w: 4.0, h: layerH - 0.3, fontSize: 17, bold: true, color: "FFFFFF", fontFace: "Geist", valign: "middle" });
+    s.addText(str(it.body), { x: 6.3, y: y + 0.2, w: SLIDE_W - 7.0, h: layerH - 0.3, fontSize: 12, color: "FFFFFF", fontFace: "Geist", valign: "middle" });
   });
 }
 
@@ -3442,9 +3455,9 @@ function renderSolFeatureList(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
     const x = 0.6 + col * (colW + gap);
     const y = y0 + row * rowH;
     s.addShape("ellipse", { x, y: y + 0.1, w: 0.4, h: 0.4, fill: { color: p.accent }, line: { color: p.accent } });
-    s.addText("\u2713", { x, y: y + 0.05, w: 0.4, h: 0.4, fontSize: 18, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle" });
-    s.addText(str(it.label), { x: x + 0.55, y, w: colW - 0.55, h: 0.4, fontSize: 14, bold: true, color: p.primary, fontFace: "Inter" });
-    s.addText(str(it.body), { x: x + 0.55, y: y + 0.45, w: colW - 0.55, h: rowH - 0.5, fontSize: 11, color: p.ink, fontFace: "Inter", valign: "top" });
+    s.addText("\u2713", { x, y: y + 0.05, w: 0.4, h: 0.4, fontSize: 18, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center", valign: "middle" });
+    s.addText(str(it.label), { x: x + 0.55, y, w: colW - 0.55, h: 0.4, fontSize: 14, bold: true, color: p.primary, fontFace: "Geist" });
+    s.addText(str(it.body), { x: x + 0.55, y: y + 0.45, w: colW - 0.55, h: rowH - 0.5, fontSize: 11, color: p.ink, fontFace: "Geist", valign: "top" });
   });
 }
 
@@ -3458,18 +3471,18 @@ function renderProcBeforeAfter(s: PptxGenJS.Slide, c: Record<string, unknown>, p
   const h = 5.6 - y0;
   // before
   s.addShape("rect", { x: 0.6, y: y0, w: colW, h, fill: { color: p.surface }, line: { color: LIGHT_GRAY } });
-  s.addText("BEFORE", { x: 0.85, y: y0 + 0.25, w: colW - 0.5, h: 0.4, fontSize: 11, bold: true, color: MID_GRAY, fontFace: "Inter", charSpacing: 5 });
-  s.addText(str(before.title || before.label), { x: 0.85, y: y0 + 0.75, w: colW - 0.5, h: 1.2, fontSize: 22, bold: true, color: DARK_GRAY, fontFace: "Inter" });
-  s.addText(str(before.body), { x: 0.85, y: y0 + 2.1, w: colW - 0.5, h: h - 2.3, fontSize: 13, color: p.ink, fontFace: "Inter", valign: "top" });
+  s.addText("BEFORE", { x: 0.85, y: y0 + 0.25, w: colW - 0.5, h: 0.4, fontSize: 11, bold: true, color: MID_GRAY, fontFace: "Geist", charSpacing: 5 });
+  s.addText(str(before.title || before.label), { x: 0.85, y: y0 + 0.75, w: colW - 0.5, h: 1.2, fontSize: 22, bold: true, color: DARK_GRAY, fontFace: "Geist" });
+  s.addText(str(before.body), { x: 0.85, y: y0 + 2.1, w: colW - 0.5, h: h - 2.3, fontSize: 13, color: p.ink, fontFace: "Geist", valign: "top" });
   // divider arrow
   const arrowX = 0.6 + colW + gap / 2;
-  s.addText("→", { x: arrowX - 0.4, y: y0 + h / 2 - 0.4, w: 0.8, h: 0.8, fontSize: 44, bold: true, color: p.accent, fontFace: "Inter", align: "center", valign: "middle" });
+  s.addText("→", { x: arrowX - 0.4, y: y0 + h / 2 - 0.4, w: 0.8, h: 0.8, fontSize: 44, bold: true, color: p.accent, fontFace: "Geist", align: "center", valign: "middle" });
   // after
   const ax = 0.6 + colW + gap;
   s.addShape("rect", { x: ax, y: y0, w: colW, h, fill: { color: p.primary }, line: { color: p.primary } });
-  s.addText("AFTER", { x: ax + 0.25, y: y0 + 0.25, w: colW - 0.5, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 5 });
-  s.addText(str(after.title || after.label), { x: ax + 0.25, y: y0 + 0.75, w: colW - 0.5, h: 1.2, fontSize: 22, bold: true, color: "FFFFFF", fontFace: "Inter" });
-  s.addText(str(after.body), { x: ax + 0.25, y: y0 + 2.1, w: colW - 0.5, h: h - 2.3, fontSize: 13, color: "FFFFFF", fontFace: "Inter", valign: "top" });
+  s.addText("AFTER", { x: ax + 0.25, y: y0 + 0.25, w: colW - 0.5, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 5 });
+  s.addText(str(after.title || after.label), { x: ax + 0.25, y: y0 + 0.75, w: colW - 0.5, h: 1.2, fontSize: 22, bold: true, color: "FFFFFF", fontFace: "Geist" });
+  s.addText(str(after.body), { x: ax + 0.25, y: y0 + 2.1, w: colW - 0.5, h: h - 2.3, fontSize: 13, color: "FFFFFF", fontFace: "Geist", valign: "top" });
 }
 
 // ═════════════════════════ M2 batch renderers ═════════════════════════
@@ -3489,16 +3502,16 @@ function renderCoverDossier(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
   const date = str(c.date);
   // top tab band
   s.addShape("rect", { x: 0.6, y: 0.55, w: 3.2, h: 0.55, fill: { color: p.accent }, line: { color: p.accent } });
-  s.addText("CONFIDENTIAL · DOSSIER", { x: 0.6, y: 0.55, w: 3.2, h: 0.55, fontSize: 11, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle", charSpacing: 4 });
+  s.addText("CONFIDENTIAL · DOSSIER", { x: 0.6, y: 0.55, w: 3.2, h: 0.55, fontSize: 11, bold: true, color: p.primary, fontFace: "Geist", align: "center", valign: "middle", charSpacing: 4 });
   // frame
   s.addShape("rect", { x: 0.6, y: 1.25, w: SLIDE_W - 1.2, h: 5.4, fill: { color: p.primary, transparency: 100 }, line: { color: "FFFFFF", width: 1 } });
-  s.addText(title, { x: 1.0, y: 2.6, w: SLIDE_W - 2.0, h: 2.6, fontSize: 52, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
-  if (subtitle) s.addText(subtitle, { x: 1.0, y: 5.1, w: SLIDE_W - 2.0, h: 0.7, fontSize: 18, color: "FFFFFF", fontFace: "Inter" });
+  s.addText(title, { x: 1.0, y: 2.6, w: SLIDE_W - 2.0, h: 2.6, fontSize: 52, bold: true, color: "FFFFFF", fontFace: "Geist", valign: "middle" });
+  if (subtitle) s.addText(subtitle, { x: 1.0, y: 5.1, w: SLIDE_W - 2.0, h: 0.7, fontSize: 18, color: "FFFFFF", fontFace: "Geist" });
   // metadata row
   const meta: string[] = [];
   if (client) meta.push(`FOR · ${client.toUpperCase()}`);
   if (date) meta.push(`DATE · ${date.toUpperCase()}`);
-  if (meta.length) s.addText(meta.join("     "), { x: 1.0, y: 6.15, w: SLIDE_W - 2.0, h: 0.35, fontSize: 10, color: "FFFFFF", fontFace: "Inter", charSpacing: 4 });
+  if (meta.length) s.addText(meta.join("     "), { x: 1.0, y: 6.15, w: SLIDE_W - 2.0, h: 0.35, fontSize: 10, color: "FFFFFF", fontFace: "Geist", charSpacing: 4 });
 }
 
 // MV-OP-COVER-EDITORIAL — magazine-style serif cover
@@ -3506,12 +3519,12 @@ function renderCoverEditorial(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
   const title = str(c.title) || "Untitled";
   const subtitle = str(c.subtitle || c.kicker);
   const date = str(c.date);
-  s.addText("VOLUME 01 · EDITION", { x: 0.8, y: 0.9, w: SLIDE_W - 1.6, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 8 });
+  s.addText("VOLUME 01 · EDITION", { x: 0.8, y: 0.9, w: SLIDE_W - 1.6, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 8 });
   s.addShape("rect", { x: 0.8, y: 1.4, w: SLIDE_W - 1.6, h: 0.02, fill: { color: "FFFFFF" }, line: { color: "FFFFFF" } });
-  s.addText(title, { x: 0.8, y: 1.9, w: SLIDE_W - 1.6, h: 3.8, fontSize: 84, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
+  s.addText(title, { x: 0.8, y: 1.9, w: SLIDE_W - 1.6, h: 3.8, fontSize: 84, bold: true, color: "FFFFFF", fontFace: "Geist", valign: "middle" });
   s.addShape("rect", { x: 0.8, y: 5.9, w: SLIDE_W - 1.6, h: 0.02, fill: { color: "FFFFFF" }, line: { color: "FFFFFF" } });
-  if (subtitle) s.addText(subtitle, { x: 0.8, y: 6.05, w: SLIDE_W - 3, h: 0.5, fontSize: 16, italic: true, color: "FFFFFF", fontFace: "Inter" });
-  if (date) s.addText(date.toUpperCase(), { x: SLIDE_W - 3.2, y: 6.05, w: 2.4, h: 0.5, fontSize: 11, color: p.accent, fontFace: "Inter", align: "right", charSpacing: 4 });
+  if (subtitle) s.addText(subtitle, { x: 0.8, y: 6.05, w: SLIDE_W - 3, h: 0.5, fontSize: 16, italic: true, color: "FFFFFF", fontFace: "Geist" });
+  if (date) s.addText(date.toUpperCase(), { x: SLIDE_W - 3.2, y: 6.05, w: 2.4, h: 0.5, fontSize: 11, color: p.accent, fontFace: "Geist", align: "right", charSpacing: 4 });
 }
 
 // MV-OP-COVER-GRADIENT — gradient wash + bold title
@@ -3522,8 +3535,8 @@ function renderCoverGradient(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
   }
   const title = str(c.title) || "Untitled";
   const subtitle = str(c.subtitle || c.kicker);
-  s.addText(title, { x: 0.8, y: 2.4, w: SLIDE_W - 1.6, h: 3.0, fontSize: 66, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
-  if (subtitle) s.addText(subtitle, { x: 0.8, y: 5.4, w: SLIDE_W - 1.6, h: 0.6, fontSize: 20, color: "FFFFFF", fontFace: "Inter" });
+  s.addText(title, { x: 0.8, y: 2.4, w: SLIDE_W - 1.6, h: 3.0, fontSize: 66, bold: true, color: "FFFFFF", fontFace: "Geist", valign: "middle" });
+  if (subtitle) s.addText(subtitle, { x: 0.8, y: 5.4, w: SLIDE_W - 1.6, h: 0.6, fontSize: 20, color: "FFFFFF", fontFace: "Geist" });
 }
 
 // MV-OP-COVER-GRID — grid overlay with title in cell
@@ -3536,8 +3549,8 @@ function renderCoverGrid(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pale
   for (let i = 1; i < rows; i++) s.addShape("rect", { x: 0, y: i * rh - 0.005, w: SLIDE_W, h: 0.01, fill: { color: "FFFFFF", transparency: 82 }, line: { color: "FFFFFF", transparency: 100 } });
   // highlighted cell
   s.addShape("rect", { x: cw, y: rh, w: cw * 4, h: rh * 2, fill: { color: p.accent, transparency: 55 }, line: { color: p.accent, transparency: 100 } });
-  s.addText(title, { x: cw + 0.2, y: rh + 0.2, w: cw * 4 - 0.4, h: rh * 2 - 0.4, fontSize: 48, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
-  if (subtitle) s.addText(subtitle, { x: cw, y: rh * 3.2, w: cw * 4, h: 0.5, fontSize: 16, color: "FFFFFF", fontFace: "Inter" });
+  s.addText(title, { x: cw + 0.2, y: rh + 0.2, w: cw * 4 - 0.4, h: rh * 2 - 0.4, fontSize: 48, bold: true, color: "FFFFFF", fontFace: "Geist", valign: "middle" });
+  if (subtitle) s.addText(subtitle, { x: cw, y: rh * 3.2, w: cw * 4, h: 0.5, fontSize: 16, color: "FFFFFF", fontFace: "Geist" });
 }
 
 // MV-OP-COVER-MEDIA — media zone left placeholder + title right
@@ -3548,8 +3561,8 @@ function renderCoverMedia(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   s.addShape("rect", { x: 0, y: 0, w: SLIDE_W * 0.5, h: SLIDE_H, fill: { color: p.primary }, line: { color: p.primary } });
   s.addShape("rect", { x: SLIDE_W * 0.5, y: 0, w: SLIDE_W * 0.5, h: SLIDE_H, fill: { color: "FFFFFF" }, line: { color: "FFFFFF" } });
   s.addShape("rect", { x: SLIDE_W * 0.5 + 0.6, y: 3.1, w: 0.15, h: 1.6, fill: { color: p.accent }, line: { color: p.accent } });
-  s.addText(title, { x: SLIDE_W * 0.5 + 0.9, y: 2.6, w: SLIDE_W * 0.5 - 1.4, h: 2.6, fontSize: 40, bold: true, color: p.primary, fontFace: "Inter", valign: "middle" });
-  if (subtitle) s.addText(subtitle, { x: SLIDE_W * 0.5 + 0.9, y: 5.1, w: SLIDE_W * 0.5 - 1.4, h: 0.7, fontSize: 16, color: p.ink, fontFace: "Inter" });
+  s.addText(title, { x: SLIDE_W * 0.5 + 0.9, y: 2.6, w: SLIDE_W * 0.5 - 1.4, h: 2.6, fontSize: 40, bold: true, color: p.primary, fontFace: "Geist", valign: "middle" });
+  if (subtitle) s.addText(subtitle, { x: SLIDE_W * 0.5 + 0.9, y: 5.1, w: SLIDE_W * 0.5 - 1.4, h: 0.7, fontSize: 16, color: p.ink, fontFace: "Geist" });
 }
 
 // MV-OP-COVER-MINIMAL — tiny mark + big title only
@@ -3557,8 +3570,8 @@ function renderCoverMinimal(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
   const title = str(c.title) || "Untitled";
   const subtitle = str(c.subtitle || c.kicker);
   s.addShape("ellipse", { x: 0.8, y: 0.9, w: 0.3, h: 0.3, fill: { color: p.accent }, line: { color: p.accent } });
-  s.addText(title, { x: 0.8, y: 3.0, w: SLIDE_W - 1.6, h: 2.6, fontSize: 72, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
-  if (subtitle) s.addText(subtitle, { x: 0.8, y: 5.7, w: SLIDE_W - 1.6, h: 0.6, fontSize: 16, color: "FFFFFF", fontFace: "Inter", charSpacing: 3 });
+  s.addText(title, { x: 0.8, y: 3.0, w: SLIDE_W - 1.6, h: 2.6, fontSize: 72, bold: true, color: "FFFFFF", fontFace: "Geist", valign: "middle" });
+  if (subtitle) s.addText(subtitle, { x: 0.8, y: 5.7, w: SLIDE_W - 1.6, h: 0.6, fontSize: 16, color: "FFFFFF", fontFace: "Geist", charSpacing: 3 });
 }
 
 // MV-OP-COVER-MONOGRAM — huge single letter watermark + title
@@ -3566,9 +3579,9 @@ function renderCoverMonogram(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
   const title = str(c.title) || "Untitled";
   const subtitle = str(c.subtitle || c.kicker);
   const mono = str(c.monogram || title).trim().charAt(0).toUpperCase() || "T";
-  s.addText(mono, { x: -0.5, y: -0.8, w: 10, h: 9, fontSize: 560, bold: true, color: p.accent, fontFace: "Inter", valign: "middle" });
-  s.addText(title, { x: 0.8, y: 4.6, w: SLIDE_W - 1.6, h: 1.6, fontSize: 46, bold: true, color: "FFFFFF", fontFace: "Inter" });
-  if (subtitle) s.addText(subtitle, { x: 0.8, y: 6.1, w: SLIDE_W - 1.6, h: 0.6, fontSize: 16, color: "FFFFFF", fontFace: "Inter" });
+  s.addText(mono, { x: -0.5, y: -0.8, w: 10, h: 9, fontSize: 560, bold: true, color: p.accent, fontFace: "Geist", valign: "middle" });
+  s.addText(title, { x: 0.8, y: 4.6, w: SLIDE_W - 1.6, h: 1.6, fontSize: 46, bold: true, color: "FFFFFF", fontFace: "Geist" });
+  if (subtitle) s.addText(subtitle, { x: 0.8, y: 6.1, w: SLIDE_W - 1.6, h: 0.6, fontSize: 16, color: "FFFFFF", fontFace: "Geist" });
 }
 
 // MV-OP-COVER-POSTER — theatrical, giant caps
@@ -3577,9 +3590,9 @@ function renderCoverPoster(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
   const subtitle = str(c.subtitle || c.kicker);
   const date = str(c.date);
   s.addShape("rect", { x: 0.6, y: 0.6, w: SLIDE_W - 1.2, h: SLIDE_H - 1.2, fill: { color: p.primary, transparency: 100 }, line: { color: p.accent, width: 3 } });
-  s.addText(title, { x: 0.9, y: 1.4, w: SLIDE_W - 1.8, h: 4.4, fontSize: 96, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle", charSpacing: -2 });
-  if (subtitle) s.addText(subtitle.toUpperCase(), { x: 0.9, y: 5.8, w: SLIDE_W - 1.8, h: 0.5, fontSize: 13, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 8 });
-  if (date) s.addText(date.toUpperCase(), { x: 0.9, y: 6.3, w: SLIDE_W - 1.8, h: 0.4, fontSize: 11, color: "FFFFFF", fontFace: "Inter", charSpacing: 4 });
+  s.addText(title, { x: 0.9, y: 1.4, w: SLIDE_W - 1.8, h: 4.4, fontSize: 96, bold: true, color: "FFFFFF", fontFace: "Geist", valign: "middle", charSpacing: -2 });
+  if (subtitle) s.addText(subtitle.toUpperCase(), { x: 0.9, y: 5.8, w: SLIDE_W - 1.8, h: 0.5, fontSize: 13, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 8 });
+  if (date) s.addText(date.toUpperCase(), { x: 0.9, y: 6.3, w: SLIDE_W - 1.8, h: 0.4, fontSize: 11, color: "FFFFFF", fontFace: "Geist", charSpacing: 4 });
 }
 
 // MV-OP-COVER-SPLIT — 50/50 accent block + title
@@ -3587,9 +3600,9 @@ function renderCoverSplit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   const title = str(c.title) || "Untitled";
   const subtitle = str(c.subtitle || c.kicker);
   s.addShape("rect", { x: 0, y: 0, w: SLIDE_W / 2, h: SLIDE_H, fill: { color: p.accent }, line: { color: p.accent } });
-  s.addText(title, { x: 0.6, y: 2.8, w: SLIDE_W / 2 - 1.0, h: 2.4, fontSize: 48, bold: true, color: p.primary, fontFace: "Inter", valign: "middle" });
+  s.addText(title, { x: 0.6, y: 2.8, w: SLIDE_W / 2 - 1.0, h: 2.4, fontSize: 48, bold: true, color: p.primary, fontFace: "Geist", valign: "middle" });
   s.addShape("rect", { x: SLIDE_W / 2 + 0.6, y: 3.2, w: 0.12, h: 1.4, fill: { color: p.accent }, line: { color: p.accent } });
-  if (subtitle) s.addText(subtitle, { x: SLIDE_W / 2 + 0.9, y: 3.2, w: SLIDE_W / 2 - 1.5, h: 1.4, fontSize: 20, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
+  if (subtitle) s.addText(subtitle, { x: SLIDE_W / 2 + 0.9, y: 3.2, w: SLIDE_W / 2 - 1.5, h: 1.4, fontSize: 20, color: "FFFFFF", fontFace: "Geist", valign: "middle" });
 }
 
 // MV-OP-COVER-STACKED — kicker/title/subtitle stacked
@@ -3600,15 +3613,15 @@ function renderCoverStacked(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
   const date = str(c.date);
   let y = 2.0;
   if (kicker) {
-    s.addText(kicker.toUpperCase(), { x: 0.8, y, w: SLIDE_W - 1.6, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 6 });
+    s.addText(kicker.toUpperCase(), { x: 0.8, y, w: SLIDE_W - 1.6, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 6 });
     y += 0.5;
   }
   s.addShape("rect", { x: 0.8, y: y + 0.1, w: 1.0, h: 0.06, fill: { color: p.accent }, line: { color: p.accent } });
   y += 0.35;
-  s.addText(title, { x: 0.8, y, w: SLIDE_W - 1.6, h: 2.6, fontSize: 56, bold: true, color: "FFFFFF", fontFace: "Inter" });
+  s.addText(title, { x: 0.8, y, w: SLIDE_W - 1.6, h: 2.6, fontSize: 56, bold: true, color: "FFFFFF", fontFace: "Geist" });
   y += 2.4;
-  if (subtitle) { s.addText(subtitle, { x: 0.8, y, w: SLIDE_W - 1.6, h: 0.7, fontSize: 20, color: "FFFFFF", fontFace: "Inter" }); y += 0.8; }
-  if (date) s.addText(date, { x: 0.8, y, w: SLIDE_W - 1.6, h: 0.5, fontSize: 12, color: "FFFFFF", fontFace: "Inter", charSpacing: 3 });
+  if (subtitle) { s.addText(subtitle, { x: 0.8, y, w: SLIDE_W - 1.6, h: 0.7, fontSize: 20, color: "FFFFFF", fontFace: "Geist" }); y += 0.8; }
+  if (date) s.addText(date, { x: 0.8, y, w: SLIDE_W - 1.6, h: 0.5, fontSize: 12, color: "FFFFFF", fontFace: "Geist", charSpacing: 3 });
 }
 
 // ── Agenda / Divider / Intro ───────────────────────────────────────────
@@ -3624,10 +3637,10 @@ function renderAgendaVertical(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
     const y = y0 + k * rowH;
     // rule
     s.addShape("rect", { x: 0.6, y, w: SLIDE_W - 1.2, h: 0.02, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
-    s.addText(String(k + 1).padStart(2, "0"), { x: 0.6, y: y + 0.15, w: 0.9, h: rowH - 0.3, fontSize: 26, bold: true, color: p.accent, fontFace: "Inter", valign: "middle" });
-    s.addText(str(it.label || it.title || it.name), { x: 1.6, y: y + 0.15, w: SLIDE_W - 5.0, h: rowH - 0.3, fontSize: 18, bold: true, color: p.primary, fontFace: "Inter", valign: "middle" });
+    s.addText(String(k + 1).padStart(2, "0"), { x: 0.6, y: y + 0.15, w: 0.9, h: rowH - 0.3, fontSize: 26, bold: true, color: p.accent, fontFace: "Geist", valign: "middle" });
+    s.addText(str(it.label || it.title || it.name), { x: 1.6, y: y + 0.15, w: SLIDE_W - 5.0, h: rowH - 0.3, fontSize: 18, bold: true, color: p.primary, fontFace: "Geist", valign: "middle" });
     const meta = str(it.duration || it.time);
-    if (meta) s.addText(meta.toUpperCase(), { x: SLIDE_W - 3.2, y: y + 0.15, w: 2.6, h: rowH - 0.3, fontSize: 11, color: p.ink, fontFace: "Inter", align: "right", valign: "middle", charSpacing: 4 });
+    if (meta) s.addText(meta.toUpperCase(), { x: SLIDE_W - 3.2, y: y + 0.15, w: 2.6, h: rowH - 0.3, fontSize: 11, color: p.ink, fontFace: "Geist", align: "right", valign: "middle", charSpacing: 4 });
   });
   // closing rule
   s.addShape("rect", { x: 0.6, y: y0 + n * rowH, w: SLIDE_W - 1.2, h: 0.02, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
@@ -3638,10 +3651,10 @@ function renderDividerNumbered(s: PptxGenJS.Slide, c: Record<string, unknown>, p
   const title = str(c.title || c.headline) || "Section";
   const num = str(c.number || c.kicker || c.eyebrow || "01");
   const body = str(c.body || c.narrative);
-  s.addText(num, { x: 0.6, y: 0.6, w: 4.0, h: 5.8, fontSize: 320, bold: true, color: p.accent, fontFace: "Inter", valign: "middle" });
+  s.addText(num, { x: 0.6, y: 0.6, w: 4.0, h: 5.8, fontSize: 320, bold: true, color: p.accent, fontFace: "Geist", valign: "middle" });
   s.addShape("rect", { x: 4.9, y: 1.6, w: 0.04, h: 4.2, fill: { color: "FFFFFF", transparency: 60 }, line: { color: "FFFFFF", transparency: 100 } });
-  s.addText(title, { x: 5.2, y: 2.6, w: SLIDE_W - 5.8, h: 2.2, fontSize: 46, bold: true, color: "FFFFFF", fontFace: "Inter" });
-  if (body) s.addText(body, { x: 5.2, y: 4.8, w: SLIDE_W - 5.8, h: 1.8, fontSize: 16, color: "FFFFFF", fontFace: "Inter" });
+  s.addText(title, { x: 5.2, y: 2.6, w: SLIDE_W - 5.8, h: 2.2, fontSize: 46, bold: true, color: "FFFFFF", fontFace: "Geist" });
+  if (body) s.addText(body, { x: 5.2, y: 4.8, w: SLIDE_W - 5.8, h: 1.8, fontSize: 16, color: "FFFFFF", fontFace: "Geist" });
 }
 
 // MV-OP-INTRO-TEAM — team intro row
@@ -3658,10 +3671,10 @@ function renderIntroTeam(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pale
     const cx = x + colW / 2;
     s.addShape("ellipse", { x: cx - avR, y, w: avR * 2, h: avR * 2, fill: { color: p.primary }, line: { color: p.primary } });
     s.addShape("ellipse", { x: cx - avR - 0.1, y: y - 0.1, w: avR * 2 + 0.2, h: avR * 2 + 0.2, fill: { color: p.accent, transparency: 100 }, line: { color: p.accent, width: 2 } });
-    s.addText(initials(str(it.name)), { x: cx - avR, y, w: avR * 2, h: avR * 2, fontSize: 32, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle" });
-    s.addText(str(it.name), { x, y: y + avR * 2 + 0.25, w: colW, h: 0.5, fontSize: 15, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
-    s.addText(str(it.role).toUpperCase(), { x, y: y + avR * 2 + 0.7, w: colW, h: 0.35, fontSize: 10, bold: true, color: p.accent, fontFace: "Inter", align: "center", charSpacing: 3 });
-    s.addText(str(it.bio || it.body), { x, y: y + avR * 2 + 1.1, w: colW, h: 2.0, fontSize: 11, color: p.ink, fontFace: "Inter", align: "center", valign: "top" });
+    s.addText(initials(str(it.name)), { x: cx - avR, y, w: avR * 2, h: avR * 2, fontSize: 32, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center", valign: "middle" });
+    s.addText(str(it.name), { x, y: y + avR * 2 + 0.25, w: colW, h: 0.5, fontSize: 15, bold: true, color: p.primary, fontFace: "Geist", align: "center" });
+    s.addText(str(it.role).toUpperCase(), { x, y: y + avR * 2 + 0.7, w: colW, h: 0.35, fontSize: 10, bold: true, color: p.accent, fontFace: "Geist", align: "center", charSpacing: 3 });
+    s.addText(str(it.bio || it.body), { x, y: y + avR * 2 + 1.1, w: colW, h: 2.0, fontSize: 11, color: p.ink, fontFace: "Geist", align: "center", valign: "top" });
   });
 }
 
@@ -3672,12 +3685,12 @@ function renderCloseCta(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
   const headline = str(c.title || c.headline || "Let's begin");
   const cta = str(c.cta || c.action || "Get started");
   const support = str(c.body || c.narrative || c.subtitle);
-  s.addText(headline, { x: 0.8, y: 1.8, w: SLIDE_W - 1.6, h: 1.8, fontSize: 54, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
-  if (support) s.addText(support, { x: 1.4, y: 3.6, w: SLIDE_W - 2.8, h: 1.2, fontSize: 18, color: p.ink, fontFace: "Inter", align: "center" });
+  s.addText(headline, { x: 0.8, y: 1.8, w: SLIDE_W - 1.6, h: 1.8, fontSize: 54, bold: true, color: p.primary, fontFace: "Geist", align: "center", valign: "middle" });
+  if (support) s.addText(support, { x: 1.4, y: 3.6, w: SLIDE_W - 2.8, h: 1.2, fontSize: 18, color: p.ink, fontFace: "Geist", align: "center" });
   // pill button
   const btnW = 4.6, btnH = 0.9, bx = (SLIDE_W - btnW) / 2, by = 5.0;
   s.addShape("roundRect", { x: bx, y: by, w: btnW, h: btnH, fill: { color: p.primary }, line: { color: p.primary }, rectRadius: 0.45 });
-  s.addText(cta.toUpperCase(), { x: bx, y: by, w: btnW, h: btnH, fontSize: 16, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle", charSpacing: 6 });
+  s.addText(cta.toUpperCase(), { x: bx, y: by, w: btnW, h: btnH, fontSize: 16, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center", valign: "middle", charSpacing: 6 });
 }
 
 // MV-CLOSE-DUAL-CTA — two side-by-side CTAs
@@ -3691,15 +3704,15 @@ function renderCloseDualCta(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
   const y = y0 + 0.6, h = 4.5;
   // primary
   s.addShape("rect", { x: 0.6, y, w: colW, h, fill: { color: p.primary }, line: { color: p.primary } });
-  s.addText(str(cta1.label || cta1.title || "Primary").toUpperCase(), { x: 0.9, y: y + 0.5, w: colW - 0.6, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 5 });
-  s.addText(str(cta1.headline || cta1.body || ""), { x: 0.9, y: y + 1.0, w: colW - 0.6, h: 2.0, fontSize: 26, bold: true, color: "FFFFFF", fontFace: "Inter" });
-  s.addText(str(cta1.cta || cta1.action || "Start now") + " →", { x: 0.9, y: y + h - 0.9, w: colW - 0.6, h: 0.5, fontSize: 14, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 3 });
+  s.addText(str(cta1.label || cta1.title || "Primary").toUpperCase(), { x: 0.9, y: y + 0.5, w: colW - 0.6, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 5 });
+  s.addText(str(cta1.headline || cta1.body || ""), { x: 0.9, y: y + 1.0, w: colW - 0.6, h: 2.0, fontSize: 26, bold: true, color: "FFFFFF", fontFace: "Geist" });
+  s.addText(str(cta1.cta || cta1.action || "Start now") + " →", { x: 0.9, y: y + h - 0.9, w: colW - 0.6, h: 0.5, fontSize: 14, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 3 });
   // secondary
   const x2 = 0.6 + colW + gap;
   s.addShape("rect", { x: x2, y, w: colW, h, fill: { color: p.surface }, line: { color: LIGHT_GRAY } });
-  s.addText(str(cta2.label || cta2.title || "Secondary").toUpperCase(), { x: x2 + 0.3, y: y + 0.5, w: colW - 0.6, h: 0.4, fontSize: 11, bold: true, color: p.primary, fontFace: "Inter", charSpacing: 5 });
-  s.addText(str(cta2.headline || cta2.body || ""), { x: x2 + 0.3, y: y + 1.0, w: colW - 0.6, h: 2.0, fontSize: 26, bold: true, color: p.primary, fontFace: "Inter" });
-  s.addText(str(cta2.cta || cta2.action || "Learn more") + " →", { x: x2 + 0.3, y: y + h - 0.9, w: colW - 0.6, h: 0.5, fontSize: 14, bold: true, color: p.primary, fontFace: "Inter", charSpacing: 3 });
+  s.addText(str(cta2.label || cta2.title || "Secondary").toUpperCase(), { x: x2 + 0.3, y: y + 0.5, w: colW - 0.6, h: 0.4, fontSize: 11, bold: true, color: p.primary, fontFace: "Geist", charSpacing: 5 });
+  s.addText(str(cta2.headline || cta2.body || ""), { x: x2 + 0.3, y: y + 1.0, w: colW - 0.6, h: 2.0, fontSize: 26, bold: true, color: p.primary, fontFace: "Geist" });
+  s.addText(str(cta2.cta || cta2.action || "Learn more") + " →", { x: x2 + 0.3, y: y + h - 0.9, w: colW - 0.6, h: 0.5, fontSize: 14, bold: true, color: p.primary, fontFace: "Geist", charSpacing: 3 });
 }
 
 // MV-CLOSE-CONTACT — contact block
@@ -3712,17 +3725,17 @@ function renderCloseContact(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
   const web = str(c.website || c.web);
   s.addShape("rect", { x: 0.6, y: y0 + 0.4, w: SLIDE_W - 1.2, h: 4.6, fill: { color: p.surface }, line: { color: LIGHT_GRAY } });
   s.addShape("rect", { x: 0.6, y: y0 + 0.4, w: 0.15, h: 4.6, fill: { color: p.accent }, line: { color: p.accent } });
-  s.addText("LET'S TALK", { x: 1.2, y: y0 + 0.9, w: 8, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 6 });
-  if (name) s.addText(name, { x: 1.2, y: y0 + 1.4, w: SLIDE_W - 2, h: 1.0, fontSize: 40, bold: true, color: p.primary, fontFace: "Inter" });
-  if (role) s.addText(role, { x: 1.2, y: y0 + 2.5, w: SLIDE_W - 2, h: 0.5, fontSize: 16, color: p.ink, fontFace: "Inter", italic: true });
+  s.addText("LET'S TALK", { x: 1.2, y: y0 + 0.9, w: 8, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 6 });
+  if (name) s.addText(name, { x: 1.2, y: y0 + 1.4, w: SLIDE_W - 2, h: 1.0, fontSize: 40, bold: true, color: p.primary, fontFace: "Geist" });
+  if (role) s.addText(role, { x: 1.2, y: y0 + 2.5, w: SLIDE_W - 2, h: 0.5, fontSize: 16, color: p.ink, fontFace: "Geist", italic: true });
   const lines: Array<[string, string]> = [];
   if (email) lines.push(["EMAIL", email]);
   if (phone) lines.push(["PHONE", phone]);
   if (web) lines.push(["WEB", web]);
   lines.forEach(([lbl, val], k) => {
     const yy = y0 + 3.3 + k * 0.55;
-    s.addText(lbl, { x: 1.2, y: yy, w: 1.2, h: 0.4, fontSize: 10, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 4 });
-    s.addText(val, { x: 2.5, y: yy, w: SLIDE_W - 3.2, h: 0.4, fontSize: 15, color: p.primary, fontFace: "Inter" });
+    s.addText(lbl, { x: 1.2, y: yy, w: 1.2, h: 0.4, fontSize: 10, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 4 });
+    s.addText(val, { x: 2.5, y: yy, w: SLIDE_W - 3.2, h: 0.4, fontSize: 15, color: p.primary, fontFace: "Geist" });
   });
 }
 
@@ -3738,10 +3751,10 @@ function renderCloseDecision(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
     const x = 0.6 + k * (colW + gap);
     const isYes = k === 0;
     s.addShape("rect", { x, y, w: colW, h, fill: { color: isYes ? p.primary : "FFFFFF" }, line: { color: isYes ? p.primary : LIGHT_GRAY, width: 2 } });
-    s.addText(isYes ? "✓" : "✕", { x: x + 0.4, y: y + 0.4, w: 0.9, h: 0.9, fontSize: 44, bold: true, color: isYes ? p.accent : MID_GRAY, fontFace: "Inter" });
-    s.addText(str(it.label || (isYes ? "Yes" : "No")).toUpperCase(), { x: x + 0.4, y: y + 1.5, w: colW - 0.8, h: 0.5, fontSize: 12, bold: true, color: isYes ? p.accent : DARK_GRAY, fontFace: "Inter", charSpacing: 5 });
-    s.addText(str(it.title || it.headline), { x: x + 0.4, y: y + 2.0, w: colW - 0.8, h: 1.4, fontSize: 26, bold: true, color: isYes ? "FFFFFF" : p.primary, fontFace: "Inter" });
-    s.addText(str(it.body || it.description), { x: x + 0.4, y: y + 3.5, w: colW - 0.8, h: h - 3.7, fontSize: 12, color: isYes ? "FFFFFF" : p.ink, fontFace: "Inter", valign: "top" });
+    s.addText(isYes ? "✓" : "✕", { x: x + 0.4, y: y + 0.4, w: 0.9, h: 0.9, fontSize: 44, bold: true, color: isYes ? p.accent : MID_GRAY, fontFace: "Geist" });
+    s.addText(str(it.label || (isYes ? "Yes" : "No")).toUpperCase(), { x: x + 0.4, y: y + 1.5, w: colW - 0.8, h: 0.5, fontSize: 12, bold: true, color: isYes ? p.accent : DARK_GRAY, fontFace: "Geist", charSpacing: 5 });
+    s.addText(str(it.title || it.headline), { x: x + 0.4, y: y + 2.0, w: colW - 0.8, h: 1.4, fontSize: 26, bold: true, color: isYes ? "FFFFFF" : p.primary, fontFace: "Geist" });
+    s.addText(str(it.body || it.description), { x: x + 0.4, y: y + 3.5, w: colW - 0.8, h: h - 3.7, fontSize: 12, color: isYes ? "FFFFFF" : p.ink, fontFace: "Geist", valign: "top" });
   });
 }
 
@@ -3751,19 +3764,19 @@ function renderCloseMetricPromise(s: PptxGenJS.Slide, c: Record<string, unknown>
   const unit = str(c.unit);
   const label = str(c.label);
   const promise = str(c.promise || c.narrative || c.body);
-  s.addText("OUR PROMISE", { x: 0.8, y: 1.4, w: SLIDE_W - 1.6, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Inter", align: "center", charSpacing: 6 });
-  s.addText(`${metric}${unit}`, { x: 0.8, y: 1.9, w: SLIDE_W - 1.6, h: 2.8, fontSize: 180, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
-  if (label) s.addText(label, { x: 0.8, y: 4.8, w: SLIDE_W - 1.6, h: 0.5, fontSize: 14, color: p.ink, fontFace: "Inter", align: "center", charSpacing: 3 });
+  s.addText("OUR PROMISE", { x: 0.8, y: 1.4, w: SLIDE_W - 1.6, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Geist", align: "center", charSpacing: 6 });
+  s.addText(`${metric}${unit}`, { x: 0.8, y: 1.9, w: SLIDE_W - 1.6, h: 2.8, fontSize: 180, bold: true, color: p.primary, fontFace: "Geist", align: "center", valign: "middle" });
+  if (label) s.addText(label, { x: 0.8, y: 4.8, w: SLIDE_W - 1.6, h: 0.5, fontSize: 14, color: p.ink, fontFace: "Geist", align: "center", charSpacing: 3 });
   s.addShape("rect", { x: (SLIDE_W - 1.2) / 2, y: 5.5, w: 1.2, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-  if (promise) s.addText(promise, { x: 1.6, y: 5.8, w: SLIDE_W - 3.2, h: 1.2, fontSize: 20, italic: true, color: p.primary, fontFace: "Inter", align: "center" });
+  if (promise) s.addText(promise, { x: 1.6, y: 5.8, w: SLIDE_W - 3.2, h: 1.2, fontSize: 20, italic: true, color: p.primary, fontFace: "Geist", align: "center" });
 }
 
 // MV-CLOSE-QNA — big Q&A treatment
 function renderCloseQna(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
-  s.addText("Q&A", { x: 0.8, y: 1.4, w: SLIDE_W - 1.6, h: 2.6, fontSize: 220, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
+  s.addText("Q&A", { x: 0.8, y: 1.4, w: SLIDE_W - 1.6, h: 2.6, fontSize: 220, bold: true, color: p.primary, fontFace: "Geist", align: "center", valign: "middle" });
   s.addShape("rect", { x: (SLIDE_W - 1.5) / 2, y: 4.4, w: 1.5, h: 0.05, fill: { color: p.accent }, line: { color: p.accent } });
   const prompt = str(c.title || c.headline || c.body) || "Questions?";
-  s.addText(prompt, { x: 1.4, y: 4.8, w: SLIDE_W - 2.8, h: 1.4, fontSize: 26, color: p.ink, fontFace: "Inter", align: "center", italic: true });
+  s.addText(prompt, { x: 1.4, y: 4.8, w: SLIDE_W - 2.8, h: 1.4, fontSize: 26, color: p.ink, fontFace: "Geist", align: "center", italic: true });
 }
 
 // MV-CLOSE-CALENDAR — calendar date block
@@ -3780,12 +3793,12 @@ function renderCloseCalendar(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
     s.addShape("rect", { x, y, w: colW, h, fill: { color: "FFFFFF" }, line: { color: LIGHT_GRAY } });
     // header band
     s.addShape("rect", { x, y, w: colW, h: 1.0, fill: { color: p.primary }, line: { color: p.primary } });
-    s.addText(str(it.month || "").toUpperCase(), { x, y: y + 0.2, w: colW, h: 0.5, fontSize: 14, bold: true, color: p.accent, fontFace: "Inter", align: "center", charSpacing: 6 });
-    s.addText(str(it.weekday || ""), { x, y: y + 0.6, w: colW, h: 0.35, fontSize: 10, color: "FFFFFF", fontFace: "Inter", align: "center", charSpacing: 4 });
+    s.addText(str(it.month || "").toUpperCase(), { x, y: y + 0.2, w: colW, h: 0.5, fontSize: 14, bold: true, color: p.accent, fontFace: "Geist", align: "center", charSpacing: 6 });
+    s.addText(str(it.weekday || ""), { x, y: y + 0.6, w: colW, h: 0.35, fontSize: 10, color: "FFFFFF", fontFace: "Geist", align: "center", charSpacing: 4 });
     // day
-    s.addText(str(it.day || it.date || ""), { x, y: y + 1.1, w: colW, h: 2.0, fontSize: 96, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
-    s.addText(str(it.title || it.label || ""), { x: x + 0.2, y: y + 3.2, w: colW - 0.4, h: 0.5, fontSize: 14, bold: true, color: p.primary, fontFace: "Inter", align: "center" });
-    s.addText(str(it.body || it.time || ""), { x: x + 0.2, y: y + 3.7, w: colW - 0.4, h: h - 3.8, fontSize: 11, color: p.ink, fontFace: "Inter", align: "center", valign: "top" });
+    s.addText(str(it.day || it.date || ""), { x, y: y + 1.1, w: colW, h: 2.0, fontSize: 96, bold: true, color: p.primary, fontFace: "Geist", align: "center", valign: "middle" });
+    s.addText(str(it.title || it.label || ""), { x: x + 0.2, y: y + 3.2, w: colW - 0.4, h: 0.5, fontSize: 14, bold: true, color: p.primary, fontFace: "Geist", align: "center" });
+    s.addText(str(it.body || it.time || ""), { x: x + 0.2, y: y + 3.7, w: colW - 0.4, h: h - 3.8, fontSize: 11, color: p.ink, fontFace: "Geist", align: "center", valign: "top" });
   });
 }
 
@@ -3799,18 +3812,18 @@ function renderCloseSplit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   const y = y0 + 0.3, h = 5.4;
   // now
   s.addShape("rect", { x: 0.6, y, w: colW, h, fill: { color: p.surface }, line: { color: LIGHT_GRAY } });
-  s.addText("NOW", { x: 0.9, y: y + 0.4, w: colW - 0.6, h: 0.4, fontSize: 12, bold: true, color: p.ink, fontFace: "Inter", charSpacing: 6 });
-  s.addText(str(now.title || now.headline || now.label), { x: 0.9, y: y + 0.9, w: colW - 0.6, h: 1.4, fontSize: 32, bold: true, color: p.primary, fontFace: "Inter" });
-  s.addText(str(now.body || now.description), { x: 0.9, y: y + 2.4, w: colW - 0.6, h: h - 2.6, fontSize: 14, color: p.ink, fontFace: "Inter", valign: "top" });
+  s.addText("NOW", { x: 0.9, y: y + 0.4, w: colW - 0.6, h: 0.4, fontSize: 12, bold: true, color: p.ink, fontFace: "Geist", charSpacing: 6 });
+  s.addText(str(now.title || now.headline || now.label), { x: 0.9, y: y + 0.9, w: colW - 0.6, h: 1.4, fontSize: 32, bold: true, color: p.primary, fontFace: "Geist" });
+  s.addText(str(now.body || now.description), { x: 0.9, y: y + 2.4, w: colW - 0.6, h: h - 2.6, fontSize: 14, color: p.ink, fontFace: "Geist", valign: "top" });
   // next
   const nx = 0.6 + colW;
   s.addShape("rect", { x: nx, y, w: colW, h, fill: { color: p.primary }, line: { color: p.primary } });
-  s.addText("NEXT", { x: nx + 0.3, y: y + 0.4, w: colW - 0.6, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 6 });
-  s.addText(str(next.title || next.headline || next.label), { x: nx + 0.3, y: y + 0.9, w: colW - 0.6, h: 1.4, fontSize: 32, bold: true, color: "FFFFFF", fontFace: "Inter" });
-  s.addText(str(next.body || next.description), { x: nx + 0.3, y: y + 2.4, w: colW - 0.6, h: h - 2.6, fontSize: 14, color: "FFFFFF", fontFace: "Inter", valign: "top" });
+  s.addText("NEXT", { x: nx + 0.3, y: y + 0.4, w: colW - 0.6, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 6 });
+  s.addText(str(next.title || next.headline || next.label), { x: nx + 0.3, y: y + 0.9, w: colW - 0.6, h: 1.4, fontSize: 32, bold: true, color: "FFFFFF", fontFace: "Geist" });
+  s.addText(str(next.body || next.description), { x: nx + 0.3, y: y + 2.4, w: colW - 0.6, h: h - 2.6, fontSize: 14, color: "FFFFFF", fontFace: "Geist", valign: "top" });
   // divider arrow
   s.addShape("ellipse", { x: nx - 0.35, y: y + h / 2 - 0.35, w: 0.7, h: 0.7, fill: { color: p.accent }, line: { color: p.accent } });
-  s.addText("→", { x: nx - 0.35, y: y + h / 2 - 0.35, w: 0.7, h: 0.7, fontSize: 24, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
+  s.addText("→", { x: nx - 0.35, y: y + h / 2 - 0.35, w: 0.7, h: 0.7, fontSize: 24, bold: true, color: p.primary, fontFace: "Geist", align: "center", valign: "middle" });
 }
 
 // MV-CLOSE-TIMELINE — vertical next-steps timeline
@@ -3827,10 +3840,10 @@ function renderCloseTimeline(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
   items.forEach((it, k) => {
     const y = startY + k * rowH;
     s.addShape("ellipse", { x: trackX - 0.28, y: y + 0.15, w: 0.56, h: 0.56, fill: { color: p.primary }, line: { color: p.primary } });
-    s.addText(String(k + 1), { x: trackX - 0.28, y: y + 0.15, w: 0.56, h: 0.56, fontSize: 16, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center", valign: "middle" });
-    s.addText(str(it.date || it.when || "").toUpperCase(), { x: 2.4, y: y + 0.1, w: 2.2, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 4 });
-    s.addText(str(it.label || it.title || it.name), { x: 4.7, y: y + 0.05, w: SLIDE_W - 5.3, h: 0.5, fontSize: 17, bold: true, color: p.primary, fontFace: "Inter" });
-    s.addText(str(it.body || it.description), { x: 4.7, y: y + 0.55, w: SLIDE_W - 5.3, h: rowH - 0.7, fontSize: 12, color: p.ink, fontFace: "Inter", valign: "top" });
+    s.addText(String(k + 1), { x: trackX - 0.28, y: y + 0.15, w: 0.56, h: 0.56, fontSize: 16, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center", valign: "middle" });
+    s.addText(str(it.date || it.when || "").toUpperCase(), { x: 2.4, y: y + 0.1, w: 2.2, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Geist", charSpacing: 4 });
+    s.addText(str(it.label || it.title || it.name), { x: 4.7, y: y + 0.05, w: SLIDE_W - 5.3, h: 0.5, fontSize: 17, bold: true, color: p.primary, fontFace: "Geist" });
+    s.addText(str(it.body || it.description), { x: 4.7, y: y + 0.55, w: SLIDE_W - 5.3, h: rowH - 0.7, fontSize: 12, color: p.ink, fontFace: "Geist", valign: "top" });
   });
 }
 
@@ -3846,13 +3859,13 @@ function renderQuotePortrait(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
   const px = SLIDE_W - 3.6, py = 1.2, pw = 3.0, ph = 5.1;
   s.addShape("rect", { x: px, y: py, w: pw, h: ph, fill: { color: p.primary }, line: { color: p.primary } });
   s.addShape("ellipse", { x: px + pw / 2 - 0.9, y: py + 1.0, w: 1.8, h: 1.8, fill: { color: p.accent }, line: { color: p.accent } });
-  s.addText(initials(author || "A"), { x: px + pw / 2 - 0.9, y: py + 1.0, w: 1.8, h: 1.8, fontSize: 44, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
-  s.addText(author || "", { x: px + 0.2, y: py + 3.1, w: pw - 0.4, h: 0.5, fontSize: 16, bold: true, color: "FFFFFF", fontFace: "Inter", align: "center" });
-  if (role) s.addText(role, { x: px + 0.2, y: py + 3.6, w: pw - 0.4, h: 0.4, fontSize: 12, color: p.accent, fontFace: "Inter", align: "center" });
-  if (org) s.addText(org.toUpperCase(), { x: px + 0.2, y: py + 4.1, w: pw - 0.4, h: 0.4, fontSize: 10, color: "FFFFFF", fontFace: "Inter", align: "center", charSpacing: 4 });
+  s.addText(initials(author || "A"), { x: px + pw / 2 - 0.9, y: py + 1.0, w: 1.8, h: 1.8, fontSize: 44, bold: true, color: p.primary, fontFace: "Geist", align: "center", valign: "middle" });
+  s.addText(author || "", { x: px + 0.2, y: py + 3.1, w: pw - 0.4, h: 0.5, fontSize: 16, bold: true, color: "FFFFFF", fontFace: "Geist", align: "center" });
+  if (role) s.addText(role, { x: px + 0.2, y: py + 3.6, w: pw - 0.4, h: 0.4, fontSize: 12, color: p.accent, fontFace: "Geist", align: "center" });
+  if (org) s.addText(org.toUpperCase(), { x: px + 0.2, y: py + 4.1, w: pw - 0.4, h: 0.4, fontSize: 10, color: "FFFFFF", fontFace: "Geist", align: "center", charSpacing: 4 });
   // quote left
-  s.addText("\u201C", { x: 0.6, y: 0.8, w: 1.5, h: 1.6, fontSize: 140, bold: true, color: p.accent, fontFace: "Inter" });
-  s.addText(quote, { x: 0.9, y: 2.2, w: SLIDE_W - 5.0, h: 4.4, fontSize: 24, italic: true, color: p.primary, fontFace: "Inter", valign: "top" });
+  s.addText("\u201C", { x: 0.6, y: 0.8, w: 1.5, h: 1.6, fontSize: 140, bold: true, color: p.accent, fontFace: "Geist" });
+  s.addText(quote, { x: 0.9, y: 2.2, w: SLIDE_W - 5.0, h: 4.4, fontSize: 24, italic: true, color: p.primary, fontFace: "Geist", valign: "top" });
 }
 
 // MV-QUOTE-POSTER — poster-style caps quote
@@ -3861,9 +3874,9 @@ function renderQuotePoster(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
   const author = str(c.attribution || c.author);
   const role = str(c.role);
   s.addShape("rect", { x: 0.6, y: 0.6, w: SLIDE_W - 1.2, h: SLIDE_H - 1.2, fill: { color: p.primary, transparency: 100 }, line: { color: p.accent, width: 3 } });
-  s.addText(quote, { x: 1.0, y: 1.2, w: SLIDE_W - 2.0, h: 4.8, fontSize: 60, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle", charSpacing: -1 });
+  s.addText(quote, { x: 1.0, y: 1.2, w: SLIDE_W - 2.0, h: 4.8, fontSize: 60, bold: true, color: p.primary, fontFace: "Geist", align: "center", valign: "middle", charSpacing: -1 });
   s.addShape("rect", { x: (SLIDE_W - 1.0) / 2, y: 6.0, w: 1.0, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-  if (author) s.addText(`${author}${role ? "  ·  " + role : ""}`.toUpperCase(), { x: 1.0, y: 6.15, w: SLIDE_W - 2.0, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Inter", align: "center", charSpacing: 6 });
+  if (author) s.addText(`${author}${role ? "  ·  " + role : ""}`.toUpperCase(), { x: 1.0, y: 6.15, w: SLIDE_W - 2.0, h: 0.4, fontSize: 12, bold: true, color: p.accent, fontFace: "Geist", align: "center", charSpacing: 6 });
 }
 
 // MV-QUOTE-METRIC — quote + accompanying metric card
@@ -3875,15 +3888,15 @@ function renderQuoteMetric(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
   const unit = str(c.unit);
   const label = str(c.label);
   // quote left
-  s.addText("\u201C", { x: 0.6, y: 0.9, w: 1.2, h: 1.4, fontSize: 120, bold: true, color: p.accent, fontFace: "Inter" });
-  s.addText(quote, { x: 0.9, y: 2.1, w: 7.5, h: 3.6, fontSize: 24, italic: true, color: p.primary, fontFace: "Inter", valign: "top" });
-  if (author) s.addText(`${author}${role ? " · " + role : ""}`, { x: 0.9, y: 5.9, w: 7.5, h: 0.5, fontSize: 13, color: p.ink, fontFace: "Inter", charSpacing: 2 });
+  s.addText("\u201C", { x: 0.6, y: 0.9, w: 1.2, h: 1.4, fontSize: 120, bold: true, color: p.accent, fontFace: "Geist" });
+  s.addText(quote, { x: 0.9, y: 2.1, w: 7.5, h: 3.6, fontSize: 24, italic: true, color: p.primary, fontFace: "Geist", valign: "top" });
+  if (author) s.addText(`${author}${role ? " · " + role : ""}`, { x: 0.9, y: 5.9, w: 7.5, h: 0.5, fontSize: 13, color: p.ink, fontFace: "Geist", charSpacing: 2 });
   // metric right card
   const rx = 8.9, rw = SLIDE_W - rx - 0.6;
   s.addShape("rect", { x: rx, y: 1.4, w: rw, h: 4.8, fill: { color: p.accent }, line: { color: p.accent } });
-  s.addText(`${metric}${unit}`, { x: rx, y: 1.6, w: rw, h: 3.2, fontSize: 88, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
+  s.addText(`${metric}${unit}`, { x: rx, y: 1.6, w: rw, h: 3.2, fontSize: 88, bold: true, color: p.primary, fontFace: "Geist", align: "center", valign: "middle" });
   s.addShape("rect", { x: rx + 0.6, y: 4.7, w: rw - 1.2, h: 0.03, fill: { color: p.primary }, line: { color: p.primary } });
-  if (label) s.addText(label, { x: rx + 0.3, y: 4.9, w: rw - 0.6, h: 1.2, fontSize: 13, color: p.primary, fontFace: "Inter", align: "center", valign: "top" });
+  if (label) s.addText(label, { x: rx + 0.3, y: 4.9, w: rw - 0.6, h: 1.2, fontSize: 13, color: p.primary, fontFace: "Geist", align: "center", valign: "top" });
 }
 
 // MV-QUOTE-MULTI — 2 stacked quote cards
@@ -3898,10 +3911,10 @@ function renderQuoteMulti(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     const y = y0 + k * (rowH + gap);
     const isPrimary = k === 0;
     s.addShape("rect", { x: 0.6, y, w: SLIDE_W - 1.2, h: rowH, fill: { color: isPrimary ? p.primary : p.surface }, line: { color: isPrimary ? p.primary : LIGHT_GRAY } });
-    s.addText("\u201C", { x: 0.8, y: y + 0.1, w: 1.0, h: 1.0, fontSize: 72, bold: true, color: p.accent, fontFace: "Inter" });
-    s.addText(str(it.quote || it.body), { x: 1.9, y: y + 0.25, w: SLIDE_W - 4.0, h: rowH - 0.9, fontSize: 18, italic: true, color: isPrimary ? "FFFFFF" : p.primary, fontFace: "Inter", valign: "middle" });
+    s.addText("\u201C", { x: 0.8, y: y + 0.1, w: 1.0, h: 1.0, fontSize: 72, bold: true, color: p.accent, fontFace: "Geist" });
+    s.addText(str(it.quote || it.body), { x: 1.9, y: y + 0.25, w: SLIDE_W - 4.0, h: rowH - 0.9, fontSize: 18, italic: true, color: isPrimary ? "FFFFFF" : p.primary, fontFace: "Geist", valign: "middle" });
     const attribution = `${str(it.attribution || it.author)}${it.role ? " · " + str(it.role) : ""}`;
-    s.addText(attribution, { x: 1.9, y: y + rowH - 0.55, w: SLIDE_W - 4.0, h: 0.4, fontSize: 11, color: isPrimary ? p.accent : p.ink, fontFace: "Inter", charSpacing: 3 });
+    s.addText(attribution, { x: 1.9, y: y + rowH - 0.55, w: SLIDE_W - 4.0, h: 0.4, fontSize: 11, color: isPrimary ? p.accent : p.ink, fontFace: "Geist", charSpacing: 3 });
     // right rail
     s.addShape("rect", { x: SLIDE_W - 1.9, y: y + 0.5, w: 1.3, h: rowH - 1.0, fill: { color: isPrimary ? p.accent : p.primary, transparency: 80 }, line: { color: isPrimary ? p.accent : p.primary, transparency: 100 } });
   });
