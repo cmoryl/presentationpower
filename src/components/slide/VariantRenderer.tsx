@@ -9,6 +9,58 @@ import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
 import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, StatFigure, QuoteMark, Attribution, SoftDivider } from "./primitives";
 import { EditorialTitle, PullQuote, DuotoneImage, GrainOverlay, CinematicScrim, StatRail, GlassTile, IconWell, EDITORIAL_SERIF } from "./flagship";
+import { APPROVED_LOGOS } from "@/lib/approved-logos";
+
+// Example client-logo chip for case study previews. Uses the deck's real
+// clientLogoUrl when set (via SlideFrameCtx); otherwise deterministically
+// picks an approved filler mark (excluding TransPerfect) so library
+// previews always render with a real logo lockup rather than an empty
+// "Client" chip. Mode-aware — white variant on dark, color on light.
+function ClientLogoChip({
+  mode,
+  clientName,
+  clientLogoUrl,
+  size = 40,
+  label = "Client",
+  accent,
+  faint,
+}: {
+  mode: SlideMode;
+  clientName?: string;
+  clientLogoUrl?: string | null;
+  size?: number;
+  label?: string;
+  accent: string;
+  faint: string;
+}) {
+  const pool = APPROVED_LOGOS.filter((l) => l.id !== "tp");
+  const key = (clientName || "acme").toLowerCase();
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+  const pick = pool[hash % pool.length];
+  const filler = mode === "dark" ? pick.white || pick.color : pick.color;
+  const src = clientLogoUrl || filler;
+  return (
+    <div className="inline-flex items-center gap-3">
+      <span
+        className="uppercase font-semibold"
+        style={{ color: accent, fontSize: 11, letterSpacing: "0.28em" }}
+      >
+        {label}
+      </span>
+      <span
+        aria-hidden
+        className="inline-block h-3 w-px"
+        style={{ background: faint }}
+      />
+      <img
+        src={src}
+        alt={clientName ? `${clientName} logo` : `${pick.name} logo (example)`}
+        style={{ height: size, width: "auto", maxWidth: size * 4, objectFit: "contain" }}
+      />
+    </div>
+  );
+}
 
 
 // Module-scoped context so helper components (CardGrid, StatGrid, NumberedList,
@@ -276,7 +328,7 @@ export function VariantRenderer(props: Props) {
         <SlideInkContext.Provider value={semanticInk}>
           <SlideBackdropContext.Provider value={backdrop}>
             <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany, logoOrientation: slide.logoOrientation && slide.logoOrientation !== "auto" ? slide.logoOrientation : logoOrientation, logoPosition: slide.logoPosition && slide.logoPosition !== "auto" ? slide.logoPosition : undefined }}>
-              {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c, mode })}
+              {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c, mode, clientName: resolvedClient, clientLogoUrl: clientLogoUrl ?? null })}
             </SlideFrameCtx.Provider>
           </SlideBackdropContext.Provider>
         </SlideInkContext.Provider>
@@ -305,6 +357,8 @@ function renderVariantBody({
   pageNumber,
   c,
   mode,
+  clientName,
+  clientLogoUrl,
 }: {
   slide: DeckSlide;
   variant: ModuleVariant;
@@ -312,6 +366,8 @@ function renderVariantBody({
   pageNumber: number;
   c: Record<string, unknown>;
   mode: SlideMode;
+  clientName?: string;
+  clientLogoUrl?: string | null;
 }): ReactNode {
 
   // Mode-aware ink palette for charts and data viz. Every chart/graph variant
@@ -1606,7 +1662,10 @@ function renderVariantBody({
           <Kicker brand={brand}>Case study</Kicker>
           <Hairline color={"var(--slide-accent-text)"} widthPx={88} thicknessPx={2} className="mt-6 mb-8" />
           <DisplayTitle size="section" color={ink.strong}>{s(c.client)}</DisplayTitle>
-          <div className="mt-12 grid grid-cols-3 gap-8">
+          <div className="mt-6">
+            <ClientLogoChip mode={mode} clientName={clientName ?? s(c.client)} clientLogoUrl={clientLogoUrl} accent="var(--slide-accent-text)" faint={ink.faint} size={36} />
+          </div>
+          <div className="mt-10 grid grid-cols-3 gap-8">
             {rows.map((r, i) => (
               <GlassTile key={i} radius={22} padding="px-8 py-8" className={`tp-rise tp-rise-delay-${Math.min(i + 1, 3) as 1 | 2 | 3}`}>
                 <div className="flex items-center gap-4">
@@ -1645,6 +1704,9 @@ function renderVariantBody({
           <Kicker brand={brand}>Case study</Kicker>
           <Hairline color={"var(--slide-accent-text)"} widthPx={88} thicknessPx={2} className="mt-6 mb-8" />
           <DisplayTitle size="section" color={ink.strong}>{s(c.client)}</DisplayTitle>
+          <div className="mt-6">
+            <ClientLogoChip mode={mode} clientName={clientName ?? s(c.client)} clientLogoUrl={clientLogoUrl} accent="var(--slide-accent-text)" faint={ink.faint} size={36} />
+          </div>
           <SupportingText size="lg" opacity={0.72} className="mt-8" maxWidthPx={1180}>{s(c.summary)}</SupportingText>
           <div className="mt-14 grid grid-cols-3 gap-14">
             {arr(c.items).map((it, i) => (
@@ -1664,6 +1726,9 @@ function renderVariantBody({
               <Kicker brand={brand}>Case study</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
               <DisplayTitle size="section" color={ink.strong}>{s(c.client)}</DisplayTitle>
+              <div className="mt-6">
+                <ClientLogoChip mode={mode} clientName={clientName ?? s(c.client)} clientLogoUrl={clientLogoUrl} accent="var(--slide-accent-text)" faint={ink.faint} size={36} />
+              </div>
               <div className="mt-8" style={{ fontSize: 42, fontWeight: 600, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
                 {s(c.headline)}
               </div>
