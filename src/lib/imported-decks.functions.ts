@@ -486,7 +486,12 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
     if (!row) throw new Error("Not found");
     const r = row as {
       id: string; original_filename: string; slide_count: number;
-      theme: { accent1?: string; accent2?: string; dark1?: string; headingFont?: string; bodyFont?: string } | null;
+      theme: {
+        accent1?: string; accent2?: string; accent3?: string; accent4?: string; accent5?: string; accent6?: string;
+        dark1?: string; dark2?: string; light1?: string; light2?: string;
+        hlink?: string; folHlink?: string;
+        headingFont?: string; bodyFont?: string;
+      } | null;
       slides: Array<{
         index: number; title: string; bullets: string[]; notes: string; imageCount: number;
         imagePaths?: string[];
