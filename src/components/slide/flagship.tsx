@@ -311,28 +311,42 @@ export function PullQuote({
   size = 96,
   color,
   className = "",
+  closingGlyph = false,
+  glyphOpacity,
 }: {
   quote: string;
   brand: BrandMode;
   size?: number;
   color?: string;
   className?: string;
+  /** When true, renders a matching italic serif closing glyph at bottom-right. */
+  closingGlyph?: boolean;
+  /** Override the default glyph opacity (0..1). */
+  glyphOpacity?: number;
 }) {
+  const mode = useSlideMode();
+  const opacity = glyphOpacity ?? (mode === "dark" ? 0.32 : 0.2);
+  const glyphSize = size * 3.2;
+  const glyphColor = brand.tokens.accent;
+  const glyphStyle: CSSProperties = {
+    fontFamily: EDITORIAL_SERIF,
+    fontSize: glyphSize,
+    lineHeight: 0.72,
+    color: glyphColor,
+    opacity,
+    fontWeight: 500,
+    letterSpacing: "-0.06em",
+    fontStyle: "italic",
+  };
   return (
     <div className={`relative ${className}`}>
       <span
         aria-hidden
-        className="absolute select-none"
+        className="absolute select-none pointer-events-none"
         style={{
           top: -Math.round(size * 0.28),
           left: -Math.round(size * 0.55),
-          fontFamily: EDITORIAL_SERIF,
-          fontSize: size * 3.2,
-          lineHeight: 0.72,
-          color: brand.tokens.accent,
-          opacity: 0.22,
-          fontWeight: 500,
-          letterSpacing: "-0.06em",
+          ...glyphStyle,
         }}
       >
         {"\u201C"}
@@ -352,9 +366,23 @@ export function PullQuote({
       >
         {quote}
       </blockquote>
+      {closingGlyph && (
+        <span
+          aria-hidden
+          className="absolute select-none pointer-events-none"
+          style={{
+            bottom: -Math.round(size * 0.55),
+            right: -Math.round(size * 0.15),
+            ...glyphStyle,
+          }}
+        >
+          {"\u201D"}
+        </span>
+      )}
     </div>
   );
 }
+
 
 // ── ChartAnnotation ───────────────────────────────────────────────────────
 // A callout that overlays a chart region with a numbered dot, a short label
