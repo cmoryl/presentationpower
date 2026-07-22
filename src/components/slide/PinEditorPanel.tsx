@@ -8,7 +8,7 @@ import * as React from "react";
 import { getDivisionLocationSet, type LocationPin } from "@/lib/location-maps";
 
 const REGIONS: LocationPin["region"][] = ["AMER", "EMEA", "APAC", "LATAM", "MEA"];
-const ROLES: NonNullable<LocationPin["role"]>[] = ["hq", "hub", "office", "delivery", "partner"];
+const ROLES: NonNullable<LocationPin["role"]>[] = ["HQ", "hub", "office", "delivery", "partner"];
 
 type Props = {
   brandId: string;
@@ -159,7 +159,7 @@ export function PinEditorPanel({ brandId, items, onChange }: Props) {
             onClick={() => push(seeded.pins)}
             className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-[11px] uppercase tracking-widest text-black/60 hover:border-black/40 hover:text-black"
           >
-            Reset to {seeded.brandLabel} defaults
+            Reset to defaults
           </button>
           <button
             type="button"
