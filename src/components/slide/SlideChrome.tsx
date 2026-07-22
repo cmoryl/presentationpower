@@ -22,6 +22,17 @@ export function useSlideMode(): SlideMode {
   return useContext(SlideModeContext);
 }
 
+// Division accent (hex) for the current slide — set by VariantRenderer from
+// the active brand mode. Consumed by glass primitives so hairline rings, icon
+// wells and inner glows automatically pick up the division's accent colour
+// (Gaming emerald, Legal gold, Media magenta, etc.) without every call site
+// having to thread `accent` explicitly.
+export const SlideAccentContext = createContext<string | null>(null);
+export function useSlideAccent(): string | null {
+  return useContext(SlideAccentContext);
+}
+
+
 // Optional imagery layer rendered BEHIND the slide content. When set, the
 // SlideFrame replaces its opaque token background with either a photo + scrim
 // (`url`) or a CSS background layer (`css` — used by the curated background

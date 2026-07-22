@@ -29,7 +29,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
-import { useSlideMode } from "./SlideChrome";
+import { useSlideMode, useSlideAccent } from "./SlideChrome";
 
 export type SlideRegister = "corporate" | "product" | "editorial";
 
@@ -648,6 +648,7 @@ export function GlassTile({
   radius = 22,
   padding = "px-8 py-8",
   intensity = 1,
+  accent,
   style,
 }: {
   children: ReactNode;
@@ -656,17 +657,31 @@ export function GlassTile({
   padding?: string;
   /** 0.5..1.5 — scales the tint alpha. */
   intensity?: number;
+  /** Override the division accent (hex). Defaults to the slide's active
+   *  division accent from SlideAccentContext. */
+  accent?: string;
   style?: CSSProperties;
 }) {
   const mode = useSlideMode();
-  const fillAlpha = Math.min(0.9, (mode === "dark" ? 0.34 : 0.72) * intensity);
-  const ringAlpha = Math.min(0.5, (mode === "dark" ? 0.14 : 0.20) * intensity);
+  const ctxAccent = useSlideAccent();
+  const a = accent ?? ctxAccent ?? undefined;
+  // Clearer glass: lower fill alpha, thinner hairline ring, plus an inner
+  // top highlight and a soft accent-tinted underglow so the division colour
+  // reads through the tile edge without tinting the whole surface.
+  const fillAlpha = Math.min(0.7, (mode === "dark" ? 0.22 : 0.55) * intensity);
+  const ringAlpha = Math.min(0.4, (mode === "dark" ? 0.16 : 0.16) * intensity);
   const bg = mode === "dark"
     ? `rgba(10, 8, 48, ${fillAlpha})`
     : `rgba(255, 255, 255, ${fillAlpha})`;
-  const ring = mode === "dark"
-    ? `rgba(255, 255, 255, ${ringAlpha})`
-    : `rgba(10, 15, 28, ${ringAlpha})`;
+  const ring = a
+    ? hexA(a, mode === "dark" ? 0.32 : 0.28)
+    : mode === "dark"
+      ? `rgba(255, 255, 255, ${ringAlpha})`
+      : `rgba(10, 15, 28, ${ringAlpha})`;
+  const highlight = mode === "dark"
+    ? "inset 0 1px 0 0 rgba(255,255,255,0.08)"
+    : "inset 0 1px 0 0 rgba(255,255,255,0.75)";
+  const accentGlow = a ? `, 0 12px 40px -18px ${hexA(a, 0.35)}` : "";
   return (
     <div
       className={`relative ${padding} ${className}`}
@@ -674,7 +689,8 @@ export function GlassTile({
         background: bg,
         border: `1px solid ${ring}`,
         borderRadius: radius,
-        backdropFilter: "blur(18px) saturate(140%)",
+        backdropFilter: "blur(20px) saturate(150%)",
+        boxShadow: `${highlight}${accentGlow}`,
         ...style,
       }}
     >
@@ -700,9 +716,14 @@ export function IconWell({
   className?: string;
 }) {
   const mode = useSlideMode();
-  const bg = mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(10,15,28,0.05)";
-  const ring = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(10,15,28,0.10)";
-  const glow = accent ? `inset 0 0 0 1px ${accent}22` : undefined;
+  const ctxAccent = useSlideAccent();
+  const a = accent ?? ctxAccent ?? undefined;
+  const bg = a
+    ? hexA(a, mode === "dark" ? 0.14 : 0.10)
+    : mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(10,15,28,0.05)";
+  const ring = a
+    ? hexA(a, mode === "dark" ? 0.45 : 0.35)
+    : mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(10,15,28,0.10)";
   return (
     <div
       aria-hidden
@@ -713,11 +734,26 @@ export function IconWell({
         borderRadius: radius,
         background: bg,
         border: `1px solid ${ring}`,
-        color: accent,
-        boxShadow: glow,
+        color: a,
+        backdropFilter: "blur(12px) saturate(140%)",
+        boxShadow: a ? `inset 0 0 0 1px ${hexA(a, 0.10)}` : undefined,
       }}
     >
       {children}
     </div>
   );
 }
+
+// Convert a "#RRGGBB" hex + alpha (0..1) to an rgba() string. Silently
+// returns the original hex if it can't parse — glass primitives fall back
+// to neutral rings in that case.
+function hexA(hex: string, alpha: number): string {
+  const m = /^#?([a-f\d]{6})$/i.exec(hex);
+  if (!m) return hex;
+  const int = parseInt(m[1], 16);
+  const r = (int >> 16) & 255;
+  const g = (int >> 8) & 255;
+  const b = int & 255;
+  return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, alpha))})`;
+}
+
