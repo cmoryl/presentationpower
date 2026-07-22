@@ -3991,38 +3991,43 @@ function renderVariantBody({
 
     case "MV-DASH-BREAKDOWN": {
       const items = arr(c.items).slice(0, 4);
+      const segments: SegBar[] = items.map((it) => ({
+        label: s(it.label, "—"),
+        value: Math.max(0, Number(it.percent) || Number(it.value) || 1),
+        note: s(it.delta),
+      }));
+      const total = segments.reduce((s, x) => s + x.value, 0) || 1;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-10">
-            {items.map((it, i) => {
-              const pct = Math.max(0, Math.min(100, Number(it.percent) || 0));
-              const delta = s(it.delta);
-              const negative = delta.trim().startsWith("-");
-              return (
-                <div key={i} className="py-8" style={{ borderTop: "1px solid rgba(10,15,28,0.12)", borderBottom: i === items.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
-                  <div className="flex items-baseline justify-between gap-6">
-                    <div className="flex items-baseline gap-8">
-                      <div style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.01em" }}>{s(it.label)}</div>
-                      {delta && (
-                        <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.24em", fontWeight: 600, color: negative ? "#E53D2E" : brand.tokens.accent }}>{delta}</div>
-                      )}
+          <DotGridBackdrop />
+          <div className="relative z-10">
+            <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+            <SegmentedBar brand={brand} segments={segments} />
+            <div className="grid gap-6 mt-4" style={{ gridTemplateColumns: `repeat(${Math.min(items.length, 4)}, 1fr)` }}>
+              {items.map((it, i) => {
+                const pct = ((segments[i].value / total) * 100).toFixed(1);
+                const delta = s(it.delta);
+                const negative = delta.trim().startsWith("-");
+                return (
+                  <div key={i} className="pt-5" style={{ borderTop: `1px solid ${i === 0 ? brand.tokens.accent : "rgba(122,139,199,0.28)"}` }}>
+                    <div className="uppercase" style={{ fontSize: 12, letterSpacing: "0.24em", color: "rgba(122,139,199,0.9)", fontWeight: 600 }}>{s(it.label)}</div>
+                    <div className="tabular-nums mt-2 flex items-baseline gap-3" style={{ fontSize: 34, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em" }}>
+                      {s(it.value, `${pct}%`)}
+                      <span style={{ fontSize: 18, color: "rgba(122,139,199,0.8)" }}>{s(it.unit)}</span>
                     </div>
-                    <div className="tabular-nums" style={{ fontSize: 40, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em" }}>
-                      {s(it.value)}<span style={{ fontSize: 22, marginLeft: 6, color: "rgba(10,15,28,0.55)" }}>{s(it.unit)}</span>
-                    </div>
+                    {delta && (
+                      <div className="uppercase mt-2" style={{ fontSize: 12, letterSpacing: "0.24em", color: negative ? "#E53D2E" : brand.tokens.accent, fontWeight: 600 }}>{delta}</div>
+                    )}
                   </div>
-                  <div className="mt-6 flex items-center gap-6">
-                    <ProgressBar brand={brand} percent={pct} />
-                    <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: brand.tokens.accent, minWidth: 70, textAlign: "right" }}>{pct}%</div>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+            <div className="mt-12"><LiveMetaFooter brand={brand} source={s(c.source, "Internal telemetry")} refCode={variant.id} /></div>
           </div>
         </SlideFrame>
       );
     }
+
 
     case "MV-DASH-REGION-STATS": {
       const stat = obj(c.stat);
