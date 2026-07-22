@@ -4154,7 +4154,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-8 grid gap-14" style={{ gridTemplateColumns: "1fr 2.4fr" }}>
-            <div className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+            <div>
               <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
               <div className="mt-6" style={{ fontSize: 38, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(c.headline)}</div>
             </div>
