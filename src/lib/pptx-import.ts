@@ -287,7 +287,7 @@ export type ParsedDeck = {
 
 const MAX_PER_IMAGE_BYTES = 15_000_000;
 const MAX_TOTAL_IMAGE_BYTES = 80_000_000;
-const MAX_IMAGES_PER_SLIDE = 24;
+const MAX_IMAGES_PER_SLIDE = 60;
 
 
 // Zip-bomb / resource-exhaustion caps for untrusted .pptx uploads.
