@@ -40,6 +40,15 @@ function coerceItems(raw: unknown, fallback: LocationPin[]): LocationPin[] {
       const region = REGIONS.includes(r?.region as LocationPin["region"])
         ? (r.region as LocationPin["region"])
         : inferRegion(lat, lon);
+      let values: Record<string, number> | undefined;
+      if (r?.values && typeof r.values === "object") {
+        values = {};
+        for (const [k, v] of Object.entries(r.values as Record<string, unknown>)) {
+          const n = Number(v);
+          if (Number.isFinite(n)) values[k] = n;
+        }
+        if (Object.keys(values).length === 0) values = undefined;
+      }
       return {
         id: String(r?.id ?? `pin-${i}-${Date.now()}`),
         city: String(r?.city ?? "Location"),
@@ -49,10 +58,12 @@ function coerceItems(raw: unknown, fallback: LocationPin[]): LocationPin[] {
         lon,
         role: (r?.role as LocationPin["role"]) || "office",
         label: (r?.label as string) || undefined,
+        values,
       };
     })
     .filter((x): x is LocationPin => !!x);
 }
+
 
 export function PinEditorPanel({ brandId, items, onChange }: Props) {
   const seeded = React.useMemo(() => getDivisionLocationSet(brandId), [brandId]);

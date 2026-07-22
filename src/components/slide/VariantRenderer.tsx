@@ -4749,7 +4749,9 @@ import {
   getDivisionLocationSet as locGetDivisionSet,
   regionCounts as locRegionCounts,
   REGION_LABELS as LOC_REGION_LABELS,
+  formatMetricValue as locFormatMetric,
   type LocationPin as LocPin,
+  type LocationMetric as LocMetric,
   type RegionKey as LocRegionKey,
 } from "@/lib/location-maps";
 
@@ -4766,6 +4768,15 @@ function coercePin(raw: Record<string, unknown>, i: number): LocPin | null {
         ? (lat < 12 ? "MEA" : "EMEA")
         : "APAC";
   const role = (raw.role as string) as LocPin["role"] | undefined;
+  let values: Record<string, number> | undefined;
+  if (raw.values && typeof raw.values === "object") {
+    values = {};
+    for (const [k, v] of Object.entries(raw.values as Record<string, unknown>)) {
+      const n = Number(v);
+      if (Number.isFinite(n)) values[k] = n;
+    }
+    if (Object.keys(values).length === 0) values = undefined;
+  }
   return {
     id: String(raw.id ?? `pin-${i}`),
     city: String(raw.city ?? "Location"),
@@ -4775,8 +4786,29 @@ function coercePin(raw: Record<string, unknown>, i: number): LocPin | null {
     lon,
     role: role || "office",
     label: (raw.label as string) || undefined,
+    values,
   };
 }
+
+function coerceMetrics(raw: unknown): LocMetric[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((m: Record<string, unknown>): LocMetric | null => {
+      if (!m || typeof m !== "object") return null;
+      const id = String(m.id ?? "").trim();
+      const label = String(m.label ?? "").trim();
+      if (!id || !label) return null;
+      return {
+        id,
+        label,
+        unit: m.unit ? String(m.unit) : undefined,
+        format: (m.format as LocMetric["format"]) || "number",
+        precision: Number.isFinite(Number(m.precision)) ? Number(m.precision) : 0,
+      };
+    })
+    .filter((x): x is LocMetric => !!x);
+}
+
 
 function renderLocationsVariant(
   variantId: string,
@@ -4860,6 +4892,33 @@ function renderLocationsVariant(
   }
 
   if (variantId === "MV-LOC-WORLD-STATS") {
+    const metrics = coerceMetrics(c.metrics);
+    const activeMetricId = (c.activeMetricId as string) || metrics[0]?.id;
+    const activeMetric = metrics.find((m) => m.id === activeMetricId);
+    const usingMetric = !!activeMetric;
+
+    // Aggregate active metric per region + global.
+    const metricByRegion: Partial<Record<LocPin["region"], number>> = {};
+    let metricTotal = 0;
+    let metricCoverage = 0; // pins with a value
+    if (usingMetric) {
+      for (const p of pins) {
+        const v = p.values?.[activeMetric!.id];
+        if (Number.isFinite(v)) {
+          metricByRegion[p.region] = (metricByRegion[p.region] ?? 0) + (v as number);
+          metricTotal += v as number;
+          metricCoverage += 1;
+        }
+      }
+    }
+
+    const topPins = usingMetric
+      ? [...pins]
+          .filter((p) => Number.isFinite(p.values?.[activeMetric!.id]))
+          .sort((a, b) => (b.values![activeMetric!.id] as number) - (a.values![activeMetric!.id] as number))
+          .slice(0, 4)
+      : [];
+
     return (
       <SlideFrame brand={brand as never} pageNumber={pageNumber}>
         <AuroraOrb accent={accent} x={8} y={80} size={860} intensity={0.45} />
@@ -4872,25 +4931,89 @@ function renderLocationsVariant(
           </div>
           <div className="flex w-[520px] flex-col justify-end">
             <div className="rounded-3xl p-8 backdrop-blur-md" style={{ background: isDark ? "rgba(255,255,255,0.05)" : "rgba(3,0,44,0.035)", border: `1px solid ${ink.hairline}` }}>
-              <div style={{ color: accent, fontSize: 11, letterSpacing: "0.28em", fontWeight: 600, textTransform: "uppercase" }}>Global footprint</div>
-              <div className="mt-4 grid grid-cols-2 gap-y-6">
-                <div>
-                  <div style={{ color: ink.strong, fontSize: 56, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1 }}>{totalCities}</div>
-                  <div style={{ color: ink.muted, fontSize: 13, marginTop: 6 }}>Cities</div>
+              <div className="flex items-baseline justify-between">
+                <div style={{ color: accent, fontSize: 11, letterSpacing: "0.28em", fontWeight: 600, textTransform: "uppercase" }}>
+                  {usingMetric ? activeMetric!.label : "Global footprint"}
                 </div>
-                <div>
-                  <div style={{ color: ink.strong, fontSize: 56, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1 }}>{totalRegions}</div>
-                  <div style={{ color: ink.muted, fontSize: 13, marginTop: 6 }}>Regions</div>
-                </div>
-                {(Object.keys(LOC_REGION_LABELS) as LocPin["region"][])
-                  .filter((k) => counts[k] > 0)
-                  .map((k) => (
-                    <div key={k}>
-                      <div style={{ color: ink.strong, fontSize: 32, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1 }}>{counts[k]}</div>
-                      <div style={{ color: ink.muted, fontSize: 12, marginTop: 4, textTransform: "uppercase", letterSpacing: "0.18em" }}>{LOC_REGION_LABELS[k]}</div>
-                    </div>
-                  ))}
+                {usingMetric && metricCoverage < pins.length && (
+                  <div style={{ color: ink.muted, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+                    {metricCoverage}/{pins.length} pins
+                  </div>
+                )}
               </div>
+
+              {usingMetric ? (
+                <>
+                  <div className="mt-4">
+                    <div style={{ color: ink.strong, fontSize: 68, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1 }}>
+                      {locFormatMetric(metricTotal, activeMetric)}
+                    </div>
+                    <div style={{ color: ink.muted, fontSize: 13, marginTop: 6 }}>
+                      {activeMetric!.label} · {totalCities} cities across {totalRegions} regions
+                    </div>
+                  </div>
+                  <div className="mt-6 space-y-2">
+                    {(Object.keys(LOC_REGION_LABELS) as LocPin["region"][])
+                      .filter((k) => counts[k] > 0)
+                      .map((k) => {
+                        const val = metricByRegion[k] ?? 0;
+                        const pct = metricTotal > 0 ? Math.round((val / metricTotal) * 100) : 0;
+                        return (
+                          <div key={k}>
+                            <div className="flex items-baseline justify-between">
+                              <div style={{ color: ink.strong, fontSize: 13, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase" }}>
+                                {LOC_REGION_LABELS[k]}
+                              </div>
+                              <div style={{ color: ink.muted, fontSize: 12 }}>
+                                {locFormatMetric(val, activeMetric)} · {pct}%
+                              </div>
+                            </div>
+                            <div className="mt-1 h-1.5 overflow-hidden rounded-full" style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.08)" }}>
+                              <div style={{ width: `${pct}%`, height: "100%", background: accent, opacity: 0.8 }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                  {topPins.length > 0 && (
+                    <div className="mt-6 border-t pt-4" style={{ borderColor: ink.hairline }}>
+                      <div style={{ color: ink.muted, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600 }}>
+                        Top locations
+                      </div>
+                      <div className="mt-3 space-y-1.5">
+                        {topPins.map((p) => (
+                          <div key={p.id} className="flex items-baseline justify-between">
+                            <div style={{ color: ink.strong, fontSize: 14 }}>{p.label || p.city}</div>
+                            <div style={{ color: accent, fontSize: 14, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
+                              {locFormatMetric(p.values![activeMetric!.id], activeMetric)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="mt-4 grid grid-cols-2 gap-y-6">
+                  <div>
+                    <div style={{ color: ink.strong, fontSize: 56, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1 }}>{totalCities}</div>
+                    <div style={{ color: ink.muted, fontSize: 13, marginTop: 6 }}>Cities</div>
+                  </div>
+                  <div>
+                    <div style={{ color: ink.strong, fontSize: 56, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1 }}>{totalRegions}</div>
+                    <div style={{ color: ink.muted, fontSize: 13, marginTop: 6 }}>Regions</div>
+                  </div>
+                  {(Object.keys(LOC_REGION_LABELS) as LocPin["region"][])
+                    .filter((k) => counts[k] > 0)
+                    .map((k) => (
+                      <div key={k}>
+                        <div style={{ color: ink.strong, fontSize: 32, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1 }}>{counts[k]}</div>
+                        <div style={{ color: ink.muted, fontSize: 12, marginTop: 4, textTransform: "uppercase", letterSpacing: "0.18em" }}>{LOC_REGION_LABELS[k]}</div>
+                      </div>
+                    ))}
+                </div>
+              )}
+
               {narrative && (
                 <div className="mt-6 border-t pt-4" style={{ borderColor: ink.hairline, color: ink.muted, fontSize: 15, lineHeight: 1.45 }}>
                   {narrative}
@@ -4902,6 +5025,7 @@ function renderLocationsVariant(
       </SlideFrame>
     );
   }
+
 
   if (variantId === "MV-LOC-REGION-FOCUS") {
     const regionCount = pins.filter((p) => region === "world" || p.region === region || (region === "MEA" && p.region === "MEA")).length;
