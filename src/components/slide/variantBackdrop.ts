@@ -111,15 +111,26 @@ function _computeBackdrop(
   const photos = set.photos;
   const abstracts = set.abstracts;
 
+  // Resolve brand tokens so we can honor each division's own surface color
+  // as the aurora base tint in light mode (instead of forcing white).
+  const brand = BRAND_MODES.find((b) => b.id === brandId);
+  const surface = brand?.tokens.surface ?? "#FFFFFF";
+
+  // Curated PNG backdrop sets — Corporate, TP Media, TP Gaming (dark only).
+  const useCorporateDark = mode === "dark" && brandId === "bm-enterprise";
+  const useMediaDark = mode === "dark" && brandId === "bm-tp-media";
+  const useGamesDark = mode === "dark" && brandId === "bm-tp-games";
+  const hasCuratedDarkSet = useCorporateDark || useMediaDark || useGamesDark;
+
   // ── Aurora backdrop (Flagship 2026, "Aesop" spec) ───────────────────────
   // A curated set of hero variants renders on the procedural AuroraLayer.
   // Dark mode: navy field + 3 soft orbs derived from the brand's own primary,
   // accent, and a computed sibling hue — so Corporate stays blue, Life Sci
-  // teal, Legal gold, Media magenta, Gaming pink, etc.
-  // Light mode: white field with the same brand-derived orbs at low opacity
-  // (the "light aura" wash), so every division keeps its accent signature
-  // regardless of theme.
-  const auroraVariants = new Set<string>([
+  // teal, Legal gold, Media magenta, Gaming emerald+aqua, etc.
+  // Light mode: brand-surface field with the same brand-derived orbs at low
+  // opacity (the "light aura" wash), so every division keeps its accent
+  // signature regardless of theme.
+  const auroraHeroes = new Set<string>([
     "MV-INS-QUOTE",
     "MV-CASE-SPREAD",
     "MV-CASE-METRICS",
@@ -128,30 +139,27 @@ function _computeBackdrop(
     "MV-PROOF-STAT-GRID",
     "MV-INS-BIG-IDEA",
   ]);
-  if (auroraVariants.has(id)) {
+  if (auroraHeroes.has(id)) {
+    // Hero variants always aurora — honor the brand's own surface color as
+    // the light-mode base so the hero doesn't break the deck's surface tint.
     return mode === "dark"
       ? { aurora: true, auroraSeed: id, darkChrome: true, tint: "#03002C" }
-      : { aurora: true, auroraSeed: id, darkChrome: false, tint: "#FFFFFF" };
+      : { aurora: true, auroraSeed: id, darkChrome: false, tint: surface };
   }
 
-  // TP Gaming light mode: every slide gets the pale-green aurora wash so the
-  // division's emerald/aqua signature reads across the whole deck (matching
-  // the dark-mode backdrops the user installed). Deterministic per variant.
-  if (mode === "light" && brandId === "bm-tp-games") {
-    return { aurora: true, auroraSeed: id, darkChrome: false, tint: "#E6F7EE" };
+  // Default aurora wash — extends the per-division accent signature to every
+  // slide when the brand+mode has no curated PNG set. Applies to:
+  //   • All divisions in light mode (except curated ones, currently none)
+  //   • Non-Corporate/Media/Gaming divisions in dark mode
+  if (!hasCuratedDarkSet) {
+    return mode === "dark"
+      ? { aurora: true, auroraSeed: id, darkChrome: true, tint: "#03002C" }
+      : { aurora: true, auroraSeed: id, darkChrome: false, tint: surface };
   }
 
-
-  // Master TransPerfect / Corporate brand in dark mode uses the curated
-  // on-brand gradient set. Only affects bm-enterprise + dark — other
-  // divisions (Life Sci, Legal, Media, Digital, Gaming, GlobalLink,
-  // DataForce, Trial Interactive) keep their existing division imagery.
-  // Master TransPerfect / Corporate brand in dark mode uses the curated
-  // on-brand gradient set. TP Media gets its own dedicated dark gradient set.
-  // Other divisions keep their existing division imagery.
-  const useCorporateDark = mode === "dark" && brandId === "bm-enterprise";
-  const useMediaDark = mode === "dark" && brandId === "bm-tp-media";
-  const useGamesDark = mode === "dark" && brandId === "bm-tp-games";
+  // Curated PNG-backdrop path — Corporate, TP Media (magenta/lavender), and
+  // TP Gaming (emerald/aqua aurora stills) each ship a hand-picked set of
+  // dark-mode gradients. Deterministic per variant id.
   const corporateBg = useCorporateDark
     ? pickCorporateDarkBackdrop(id)
     : useMediaDark
@@ -159,6 +167,7 @@ function _computeBackdrop(
       : useGamesDark
         ? pickTpGamesDarkBackdrop(id)
         : null;
+
 
 
   const pickPhoto = (offset = 0) =>
