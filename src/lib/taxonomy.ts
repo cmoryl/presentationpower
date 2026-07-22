@@ -1808,7 +1808,49 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     editableFields: ["quote", "attribution", "role", "mediaSeed", "mediaUrl"],
     lockedFields: ["footer", "logo"],
   },
+  // ── Locations (MV-LOC-*) — global/regional maps ──────────────────────────
+  {
+    id: "MV-LOC-WORLD-PINS",
+    familyId: "MF-05",
+    name: "Locations — world map with pins",
+    description: "Full-bleed stylized world map with brand-tinted pins for every office. Pre-seeded per division, fully editable.",
+    permittedLayoutIds: ["LF-05", "LF-06"],
+    capacity: { titleChars: 80, bodyChars: 140, items: { min: 3, max: 60 } },
+    editableFields: ["title", "subtitle", "items[].city", "items[].country", "items[].region", "items[].lat", "items[].lon", "items[].role", "items[].label"],
+    lockedFields: ["footer", "logo"],
+  },
+  {
+    id: "MV-LOC-WORLD-STATS",
+    familyId: "MF-05",
+    name: "Locations — world map + region stats",
+    description: "World map on one side, region-by-region counts + KPI stack on the other.",
+    permittedLayoutIds: ["LF-03"],
+    capacity: { titleChars: 80, bodyChars: 200, items: { min: 3, max: 60 } },
+    editableFields: ["title", "subtitle", "narrative", "items[].city", "items[].country", "items[].region", "items[].lat", "items[].lon", "items[].role", "items[].label"],
+    lockedFields: ["footer", "logo"],
+  },
+  {
+    id: "MV-LOC-REGION-FOCUS",
+    familyId: "MF-05",
+    name: "Locations — regional focus",
+    description: "Zoomed regional map (Americas, EMEA, APAC, LATAM, or MEA) with labeled pins and a supporting caption.",
+    permittedLayoutIds: ["LF-03", "LF-06"],
+    capacity: { titleChars: 80, bodyChars: 200, items: { min: 3, max: 40 } },
+    editableFields: ["title", "subtitle", "region", "narrative", "items[].city", "items[].country", "items[].region", "items[].lat", "items[].lon", "items[].role", "items[].label"],
+    lockedFields: ["footer", "logo"],
+  },
+  {
+    id: "MV-LOC-HUB-SPOKE",
+    familyId: "MF-05",
+    name: "Locations — hub & spoke network",
+    description: "Primary HQ pin with curved arcs to every satellite office, over the stylized world map.",
+    permittedLayoutIds: ["LF-05"],
+    capacity: { titleChars: 80, bodyChars: 140, items: { min: 3, max: 60 } },
+    editableFields: ["title", "subtitle", "items[].city", "items[].country", "items[].region", "items[].lat", "items[].lon", "items[].role", "items[].label"],
+    lockedFields: ["footer", "logo"],
+  },
 ];
+
 export const NARRATIVE_ARCHETYPES: NarrativeArchetype[] = [
   {
     id: "arch-problem-solution",
