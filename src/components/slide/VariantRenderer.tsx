@@ -5821,7 +5821,7 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { 
 function DonutBlock({ brand, item }: { brand: BrandMode; item: Item }) {
   const ink = useSlideInk();
   return (
-    <div className="flex flex-col items-center text-center pt-8" style={{ borderTop: `1px solid ${ink.accent(0.5)}` }}>
+    <div className="flex flex-col items-center text-center">
       <Kicker brand={brand}>{s(item.meta, "Snapshot")}</Kicker>
       <div className="mt-6"><Donut brand={brand} percent={Number(item.value) || 0} size={340} /></div>
       <div className="mt-8 uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: ink.text, fontWeight: 600 }}>{s(item.label)}</div>
