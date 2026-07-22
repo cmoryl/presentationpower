@@ -747,6 +747,7 @@ export function IconWell({
   const mode = useSlideMode();
   const ctxAccent = useSlideAccent();
   const a = accent ?? ctxAccent ?? undefined;
+  const ink = useSlideInk(a);
   const bg = a
     ? hexA(a, mode === "dark" ? 0.14 : 0.10)
     : mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(10,15,28,0.05)";
