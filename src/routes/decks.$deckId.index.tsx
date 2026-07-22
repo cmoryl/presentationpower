@@ -31,6 +31,7 @@ import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { PinEditorPanel } from "@/components/slide/PinEditorPanel";
+import { WorldStatsMetricsPanel } from "@/components/slide/WorldStatsMetricsPanel";
 
 import { CanvasBlockLayer } from "@/components/slide/CanvasBlockLayer";
 import { FreeCanvasEditor } from "@/components/slide/FreeCanvasEditor";
