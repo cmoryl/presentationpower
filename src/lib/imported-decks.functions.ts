@@ -175,9 +175,11 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
         status: "parsed",
         theme: parsed.theme,
         slides: slidesLite,
+        extras: buildDeckExtras(parsed),
       })
       .select()
       .single();
+
     if (error) {
       // Roll back the .pptx AND any imagery we created.
       await s.storage.from(BUCKET).remove([storagePath]).catch(() => {});
