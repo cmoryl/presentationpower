@@ -228,6 +228,8 @@ type ImportedSlide = {
   imagePaths?: string[];
   imageUrls?: string[];
   layout?: SlideLayout;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  assets?: any;
 };
 
 type DeckSlidesData = {
@@ -239,7 +241,10 @@ type DeckSlidesData = {
   status: string;
   error: string | null;
   downloadUrl: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  extras?: any;
 };
+
 
 function DeckSlides({
   deck,
