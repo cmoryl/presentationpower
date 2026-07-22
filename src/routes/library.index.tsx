@@ -1176,6 +1176,14 @@ function VariantDetailModal({
               <Star size={12} className={pinned ? "fill-amber-500 text-amber-600" : ""} />
               {pinned ? "Pinned" : "Pin"}
             </button>
+            <button
+              type="button"
+              onClick={() => setSaveOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#003FC7]/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white"
+              title="Save this variant + content as a reusable module"
+            >
+              <Star size={12} /> Save as module
+            </button>
             {usageCount > 0 && (
               <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
                 Used · {usageCount}
