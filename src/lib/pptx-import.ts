@@ -285,9 +285,9 @@ export type ParsedDeck = {
 };
 
 
-const MAX_PER_IMAGE_BYTES = 900_000;
-const MAX_TOTAL_IMAGE_BYTES = 10_000_000;
-const MAX_IMAGES_PER_SLIDE = 6;
+const MAX_PER_IMAGE_BYTES = 15_000_000;
+const MAX_TOTAL_IMAGE_BYTES = 80_000_000;
+const MAX_IMAGES_PER_SLIDE = 24;
 
 
 // Zip-bomb / resource-exhaustion caps for untrusted .pptx uploads.
@@ -378,7 +378,7 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     const relTargetsByType = extractRelTargetsByType(relsDoc);
 
     // ── Resolve slideLayout + slideMaster parent chain ──────────────────
-    const parents = await resolveParents(zip, parser, slidePath, relsDoc, parentCache);
+    const parents = await resolveParents(zip, parser, slidePath, relsDoc, parentCache, theme);
 
 
     // ── Embedded images ─────────────────────────────────────────────────
@@ -417,6 +417,26 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
         totalImageBytes += dataUrl.length;
       }
     }
+
+    // Slide layouts and masters carry their own relationship files, so their
+    // rIds are not visible in the slide's image rels. Promote those inherited
+    // images into the slide image payload with synthetic parent-scoped ids so
+    // downstream storage/path rewriting can hydrate master backgrounds, logos,
+    // footer art, and layout-level image fills automatically.
+    const appendParentImages = (parent?: ParentSlideData) => {
+      if (!parent?.images?.length) return;
+      for (const img of parent.images) {
+        if (imageEmbedIds.includes(img.embedId)) continue;
+        if (images.length >= MAX_IMAGES_PER_SLIDE) { imagesTruncated = true; break; }
+        if (img.dataUrl.length > MAX_PER_IMAGE_BYTES) { imagesTruncated = true; continue; }
+        if (totalImageBytes + img.dataUrl.length > MAX_TOTAL_IMAGE_BYTES) { imagesTruncated = true; continue; }
+        images.push(img.dataUrl);
+        imageEmbedIds.push(img.embedId);
+        totalImageBytes += img.dataUrl.length;
+      }
+    };
+    appendParentImages(parents.master);
+    appendParentImages(parents.layout);
 
     // ── Charts ──────────────────────────────────────────────────────────
     const charts: ParsedChart[] = [];
