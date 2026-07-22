@@ -52,10 +52,14 @@ describe("PPTX typography parity guard", () => {
     expect(bad, `disallowed fontFace values found: ${[...new Set(bad)].join(", ")}`).toEqual([]);
   });
 
-  it("every brand-parity lock declares Geist", () => {
-    for (const [key, lock] of Object.entries(BRAND_LOCKS)) {
-      expect(lock.typography.fontFace, `${key} must lock Geist`).toBe("Geist");
-      expect(lock.typography.hasSerif, `${key} must not opt into serifs`).toBe(false);
+  it("parity contract locks Geist as the sole typeface", () => {
+    // pptx-parity.ts is the single source of truth for preview↔exporter parity.
+    // Every typography clause it declares must be Geist / hasSerif:false.
+    const clauses = [...PARITY_SRC.matchAll(/typography:\s*\{([^}]*)\}/g)].map((m) => m[1]);
+    expect(clauses.length).toBeGreaterThan(0);
+    for (const clause of clauses) {
+      expect(clause).toMatch(/fontFace:\s*"Geist"/);
+      expect(clause).toMatch(/hasSerif:\s*false/);
     }
   });
 
