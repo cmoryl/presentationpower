@@ -4749,7 +4749,9 @@ import {
   getDivisionLocationSet as locGetDivisionSet,
   regionCounts as locRegionCounts,
   REGION_LABELS as LOC_REGION_LABELS,
+  formatMetricValue as locFormatMetric,
   type LocationPin as LocPin,
+  type LocationMetric as LocMetric,
   type RegionKey as LocRegionKey,
 } from "@/lib/location-maps";
 
@@ -4766,6 +4768,15 @@ function coercePin(raw: Record<string, unknown>, i: number): LocPin | null {
         ? (lat < 12 ? "MEA" : "EMEA")
         : "APAC";
   const role = (raw.role as string) as LocPin["role"] | undefined;
+  let values: Record<string, number> | undefined;
+  if (raw.values && typeof raw.values === "object") {
+    values = {};
+    for (const [k, v] of Object.entries(raw.values as Record<string, unknown>)) {
+      const n = Number(v);
+      if (Number.isFinite(n)) values[k] = n;
+    }
+    if (Object.keys(values).length === 0) values = undefined;
+  }
   return {
     id: String(raw.id ?? `pin-${i}`),
     city: String(raw.city ?? "Location"),
@@ -4775,8 +4786,29 @@ function coercePin(raw: Record<string, unknown>, i: number): LocPin | null {
     lon,
     role: role || "office",
     label: (raw.label as string) || undefined,
+    values,
   };
 }
+
+function coerceMetrics(raw: unknown): LocMetric[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((m: Record<string, unknown>): LocMetric | null => {
+      if (!m || typeof m !== "object") return null;
+      const id = String(m.id ?? "").trim();
+      const label = String(m.label ?? "").trim();
+      if (!id || !label) return null;
+      return {
+        id,
+        label,
+        unit: m.unit ? String(m.unit) : undefined,
+        format: (m.format as LocMetric["format"]) || "number",
+        precision: Number.isFinite(Number(m.precision)) ? Number(m.precision) : 0,
+      };
+    })
+    .filter((x): x is LocMetric => !!x);
+}
+
 
 function renderLocationsVariant(
   variantId: string,
