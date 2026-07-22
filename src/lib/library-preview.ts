@@ -204,7 +204,177 @@ export function seedDivisionContent(
   if (variantId === "MV-INS-BIG-IDEA") {
     return {
       ...base,
-      title: cs.headline,
+      kicker: `The ${divisionName} idea`,
+      idea: cs.headline,
+    } as SlideContent;
+  }
+  if (variantId === "MV-INS-CALLOUT") {
+    return {
+      ...base,
+      insight: cs.headline,
+      narrative: `${client} partnered with ${divisionName} to ${cs.solution.toLowerCase().replace(/\.$/, "")}.`,
+    } as SlideContent;
+  }
+  if (variantId === "MV-INS-SO-WHAT") {
+    return {
+      ...base,
+      insight: cs.challenge,
+      soWhat: cs.result,
+      nowWhat: `${divisionName} scales this playbook across ${industries.slice(0, 2).join(" and ") || brief.industry}.`,
+    } as SlideContent;
+  }
+
+  // ── Solution architecture / feature list — anchor on service lines ──────
+  if (variantId === "MV-SOL-ARCHITECTURE" && services.length) {
+    const baseItems = (base.items as Obj[] | undefined) ?? [];
+    const items = services.slice(0, Math.max(4, baseItems.length || 4)).map((s, i) => ({
+      label: s,
+      body: (baseItems[i]?.body as string) ?? `${s} delivered as part of the ${divisionName} operating model.`,
+    }));
+    return { ...base, title: `How ${divisionName} is built`, items } as SlideContent;
+  }
+  if (variantId === "MV-SOL-FEATURE-LIST" && services.length) {
+    const baseItems = (base.items as Obj[] | undefined) ?? [];
+    const items = services.slice(0, Math.max(5, baseItems.length || 6)).map((s, i) => ({
+      label: s,
+      body: (baseItems[i]?.body as string) ?? `Included in every ${divisionName} engagement.`,
+    }));
+    return { ...base, title: `What ${divisionName} includes`, items } as SlideContent;
+  }
+
+  // ── Process (timeline / phases / before-after) ──────────────────────────
+  if (variantId === "MV-PROC-PHASES") {
+    return {
+      ...base,
+      title: `How ${divisionName} rolls out for ${client}`,
+    } as SlideContent;
+  }
+  if (variantId === "MV-PROC-TIMELINE") {
+    return {
+      ...base,
+      title: `${divisionName} · ${client} rollout`,
+    } as SlideContent;
+  }
+  if (variantId === "MV-PROC-BEFORE-AFTER") {
+    return {
+      ...base,
+      title: `What changes for ${client}`,
+      after: {
+        title: `${divisionName} operating model`,
+        body: cs.solution,
+      },
+    } as SlideContent;
+  }
+
+  // ── Context slides (challenge stack / cost / trend / stat grid) ─────────
+  if (variantId === "MV-CTX-CHALLENGE-STACK") {
+    return {
+      ...base,
+      title: `What we heard from ${client}`,
+    } as SlideContent;
+  }
+  if (variantId === "MV-CTX-COST") {
+    return {
+      ...base,
+      narrative: `In ${brief.industry || industries[0] || "your sector"}, every quarter of delay compounds — ${divisionName} closes that gap.`,
+    } as SlideContent;
+  }
+  if (variantId === "MV-CTX-TREND") {
+    return {
+      ...base,
+      headline: `${brief.industry || industries[0] || "The market"} is outpacing programs built before ${divisionName} existed at scale.`,
+    } as SlideContent;
+  }
+  if (variantId === "MV-CTX-STAT-GRID") {
+    return {
+      ...base,
+      title: `Market context for ${brief.industry || industries[0] || divisionName}`,
+    } as SlideContent;
+  }
+
+  // ── Decision / compare tables ───────────────────────────────────────────
+  if (variantId === "MV-DEC-COMPARE-TABLE") {
+    const cols = (base.columns as Obj[] | undefined) ?? [];
+    const nextCols = cols.map((c, i) =>
+      i === cols.length - 1 ? { ...c, label: divisionName } : c,
+    );
+    return {
+      ...base,
+      title: `Where ${divisionName} wins`,
+      columns: nextCols,
+    } as SlideContent;
+  }
+  if (variantId === "MV-DEC-CHECKLIST") {
+    return {
+      ...base,
+      title: `What a good ${divisionName} decision looks like`,
+    } as SlideContent;
+  }
+  if (variantId === "MV-DEC-MATRIX") {
+    return {
+      ...base,
+      title: `Where each option lands for ${client}`,
+      q1: `${divisionName} managed program`,
+    } as SlideContent;
+  }
+
+  // ── Commercial (pricing / investment) ───────────────────────────────────
+  if (variantId === "MV-COMM-INVESTMENT") {
+    const items = (base.items as Obj[] | undefined) ?? [];
+    const nextItems = items.map((it, i) =>
+      i === 0 ? { ...it, label: `Managed ${divisionName} program with dedicated delivery lead` } : it,
+    );
+    return { ...base, title: `${divisionName} investment`, items: nextItems } as SlideContent;
+  }
+  if (variantId === "MV-COMM-PRICING") {
+    return { ...base, title: `${divisionName} program options` } as SlideContent;
+  }
+
+  // ── Risk & mitigation ───────────────────────────────────────────────────
+  if (variantId === "MV-RISK-MITIGATION") {
+    return {
+      ...base,
+      title: `${divisionName} · risk & mitigation for ${client}`,
+    } as SlideContent;
+  }
+
+  // ── Team / governance ───────────────────────────────────────────────────
+  if (/^MV-TEAM-BIOS-/.test(variantId)) {
+    return {
+      ...base,
+      title: `Your ${divisionName} core team`,
+    } as SlideContent;
+  }
+  if (variantId === "MV-GOV-RACI") {
+    return {
+      ...base,
+      title: `How ${divisionName} runs the program`,
+    } as SlideContent;
+  }
+
+  // ── Recommendation / close ──────────────────────────────────────────────
+  if (variantId === "MV-REC-NEXT") {
+    return {
+      ...base,
+      recommendation: `We recommend ${client} start with a focused ${divisionName} pilot in ${industries[0] || brief.industry || "the highest-priority market"}.`,
+    } as SlideContent;
+  }
+  if (variantId === "MV-CLOSE-CTA") {
+    return {
+      ...base,
+      owner: `${divisionName} account team`,
+    } as SlideContent;
+  }
+  if (variantId === "MV-CLOSE-THANKS") {
+    return {
+      ...base,
+      signoff: `${divisionName} — ${scope?.tagline ?? "Global content, local precision"}`,
+    } as SlideContent;
+  }
+  if (variantId === "MV-CLOSE-QNA") {
+    return {
+      ...base,
+      prompt: `Open discussion — what would you pressure-test with ${divisionName} first?`,
     } as SlideContent;
   }
 
