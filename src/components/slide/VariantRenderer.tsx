@@ -5543,8 +5543,9 @@ function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; p
 
 
 
-function AreaChart({ brand: _brand, series, height = 480 }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number }) {
+function AreaChart({ brand: _brand, series, height = 480, bare = false }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; bare?: boolean }) {
   const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
   const w = 1000;
   const h = height;
   const padL = 20, padR = 20, padT = 20, padB = 60;
@@ -5557,21 +5558,30 @@ function AreaChart({ brand: _brand, series, height = 480 }: { brand: BrandMode; 
   const linePath = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
   const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z` : "";
   const showEvery = series.length > 8 ? Math.ceil(series.length / 8) : 1;
-  return (
+  const last = pts[pts.length - 1];
+  const svg = (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      <ChartAccentDefs id={id} />
       <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairline} strokeWidth={1} />
-      {areaPath && <path d={areaPath} fill="var(--slide-accent-text)" fillOpacity={0.10} />}
-      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-      {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={4} fill="var(--slide-accent-text)" />}
+      {areaPath && <path d={areaPath} fill={`url(#${id}-fill)`} />}
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" opacity={0.32} filter={`url(#${id}-glow)`} />
+      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+      {last && <>
+        <circle cx={last[0]} cy={last[1]} r={9} fill="var(--slide-accent-text)" opacity={0.35} filter={`url(#${id}-glow)`} />
+        <circle cx={last[0]} cy={last[1]} r={5} fill={`url(#${id}-dot)`} />
+      </>}
       {series.map((p, i) => (i % showEvery === 0 || i === series.length - 1) ? (
         <text key={i} x={pts[i]?.[0]} y={h - padB + 28} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{p.label}</text>
       ) : null)}
     </svg>
   );
+  if (bare) return svg;
+  return <GlassChartPanel padding="px-6 py-6" bloomAnchor="br">{svg}</GlassChartPanel>;
 }
 
-function BarChart({ brand: _brand, bars, height = 480, highlight }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string }) {
+function BarChart({ brand: _brand, bars, height = 480, highlight, bare = false }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string; bare?: boolean }) {
   const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
   const w = 900;
   const h = height;
   const padL = 20, padR = 20, padT = 30, padB = 60;
@@ -5579,18 +5589,20 @@ function BarChart({ brand: _brand, bars, height = 480, highlight }: { brand: Bra
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(bars.length, 1);
   const barW = slot * 0.5;
-  return (
+  const svg = (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      <ChartAccentDefs id={id} />
       <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
       {bars.map((b, i) => {
         const bh = (b.value / max) * chartH;
         const x = padL + i * slot + (slot - barW) / 2;
         const y = h - padB - bh;
         const isHi = highlight ? b.label === highlight : false;
-        const fill = isHi ? "var(--slide-accent-text)" : ink.trackFill;
+        const fill = isHi ? `url(#${id}-bar)` : ink.trackFill;
         return (
           <g key={i}>
-            <rect x={x} y={y} width={barW} height={bh} fill={fill} />
+            {isHi && <rect x={x - 6} y={y - 6} width={barW + 12} height={bh + 6} fill="var(--slide-accent-text)" opacity={0.22} rx={8} filter={`url(#${id}-glow)`} />}
+            <rect x={x} y={y} width={barW} height={bh} fill={fill} rx={2} />
             <text x={x + barW / 2} y={h - padB + 30} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{b.label}</text>
             <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={isHi ? 26 : 18} fontWeight={600} fill={isHi ? ink.text : ink.muted} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{b.value}</text>
           </g>
@@ -5598,7 +5610,10 @@ function BarChart({ brand: _brand, bars, height = 480, highlight }: { brand: Bra
       })}
     </svg>
   );
+  if (bare) return svg;
+  return <GlassChartPanel padding="px-6 py-6" bloomAnchor="tr">{svg}</GlassChartPanel>;
 }
+
 
 function ReportCard({ brand, item }: { brand: BrandMode; item: Item }) {
   const ink = useSlideInk();
