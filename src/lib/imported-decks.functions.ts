@@ -188,6 +188,130 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
   });
 
 
+// ── REPARSE (backfill layouts, charts, tables into legacy rows) ───────
+// Older imports were parsed before the faithful layout extractor landed,
+// so their `slides[].layout` is null and previews render "No layout
+// captured". This re-downloads the original .pptx from storage, runs the
+// current parser, and rewrites `theme` + `slides` in-place — preserving
+// each slide's existing `imagePaths` and re-mapping saved image
+// storage paths onto the newly-parsed layout shapes by embed id.
+
+export const reparseImportedDeck = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
+  .handler(async ({ data, context }) => {
+    const s = context.supabase as unknown as SbClient;
+
+    const { data: row } = await s
+      .from("imported_decks")
+      .select("id, original_filename, storage_path, slides")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!row) throw new Error("Deck not found");
+    const r = row as {
+      id: string;
+      original_filename: string;
+      storage_path: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      slides: Array<{ index: number; imagePaths?: string[]; layout?: any }> | null;
+    };
+
+    const signed = await s.storage.from(BUCKET).createSignedUrl(r.storage_path, 60 * 5);
+    const url = signed.data?.signedUrl;
+    if (!url) throw new Error("Could not access original .pptx");
+
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Download failed: ${res.status}`);
+    const buf = Buffer.from(await res.arrayBuffer());
+
+    let parsed: ParsedDeck;
+    try {
+      parsed = await parsePptxBuffer(buf, r.original_filename);
+    } catch (e) {
+      throw new Error(e instanceof Error ? e.message : "Re-parse failed");
+    }
+
+    // Reconstruct embedId → storage path by positional match against the
+    // previously-saved imagePaths[] for each slide.
+    const existingBySlide = new Map<number, string[]>();
+    for (const sl of r.slides ?? []) {
+      existingBySlide.set(sl.index, sl.imagePaths ?? []);
+    }
+
+    const slidesLite = parsed.slides.map((sl) => {
+      const savedPaths = existingBySlide.get(sl.index) ?? [];
+      const embedToPath = new Map<string, string>();
+      sl.imageEmbedIds.forEach((eid, idx) => {
+        const p = savedPaths[idx];
+        if (eid && p) embedToPath.set(eid, p);
+      });
+      const rewriteFill = (fill: unknown): unknown => {
+        if (!fill || typeof fill !== "object") return fill;
+        const f = fill as { kind?: string; embedId?: string; path?: string };
+        if (f.kind === "image" && f.embedId) {
+          const p = embedToPath.get(f.embedId);
+          if (p) return { ...f, path: p };
+        }
+        return fill;
+      };
+      const layout = sl.layout
+        ? {
+            ...sl.layout,
+            background: rewriteFill(sl.layout.background) as typeof sl.layout.background,
+            shapes: sl.layout.shapes.map((sh) => {
+              let next: typeof sh = sh;
+              if (sh.kind === "image" && sh.embedId) {
+                const p = embedToPath.get(sh.embedId);
+                if (p) next = { ...sh, path: p };
+              }
+              if ("fill" in next && next.fill) {
+                const rewritten = rewriteFill(next.fill);
+                if (rewritten !== next.fill) next = { ...next, fill: rewritten as typeof next.fill };
+              }
+              return next;
+            }),
+          }
+        : undefined;
+
+      return {
+        index: sl.index,
+        title: sl.title,
+        bullets: sl.bullets,
+        notes: sl.notes,
+        imageCount: sl.images.length,
+        imagePaths: savedPaths,
+        layout,
+      };
+    });
+
+    const withLayout = slidesLite.filter((sl) => sl.layout).length;
+    const withShapes = slidesLite.filter((sl) => (sl.layout?.shapes?.length ?? 0) > 0).length;
+
+    const { error } = await s
+      .from("imported_decks")
+      .update({
+        theme: parsed.theme,
+        slide_count: parsed.slideCount,
+        slides: slidesLite,
+        status: "parsed",
+        error: null,
+      })
+      .eq("id", data.id);
+    if (error) throw new Error((error as { message?: string }).message ?? "Save failed");
+
+    return {
+      id: data.id,
+      slideCount: parsed.slideCount,
+      slidesWithLayout: withLayout,
+      slidesWithShapes: withShapes,
+      graphicsSummary: parsed.graphicsSummary,
+    };
+  });
+
+
+
+
+
 
 
 export const listImportedDecksForDivision = createServerFn({ method: "GET" })
