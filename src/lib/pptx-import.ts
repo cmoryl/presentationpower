@@ -2479,11 +2479,22 @@ function walkSpTree(
   for (const node of nodes) {
     const t = pTag(node);
     if (!t) continue;
-    if (/(:|^)AlternateContent$/i.test(t) || /(:|^)Choice$/i.test(t) || /(:|^)Fallback$/i.test(t)) {
+    if (/(:|^)AlternateContent$/i.test(t)) {
       // Office often wraps SVGs, imported PDFs, and compatibility artwork in
-      // mc:AlternateContent. Walk into both Choice and Fallback branches so we
-      // preserve the best available vector art plus its raster fallback rather
-      // than dropping the whole layer.
+      // mc:AlternateContent. Render the preferred Choice branch (usually SVG)
+      // and only fall back to raster compatibility art when no Choice exists.
+      // Asset extraction still persists every blip id discovered in both
+      // branches for inspector/round-trip visibility.
+      const branches = pChildren(node).filter((c) => {
+        const tag = pTag(c);
+        return !!tag && /(:|^)Choice$/i.test(tag);
+      });
+      const picked = branches[0] ?? pChildren(node).find((c) => {
+        const tag = pTag(c);
+        return !!tag && /(:|^)Fallback$/i.test(tag);
+      });
+      if (picked) walkSpTree(pChildren(picked), zRef, group, out, imageEmbedIds, parents, embedIdMap, theme, clrMap);
+    } else if (/(:|^)Choice$/i.test(t) || /(:|^)Fallback$/i.test(t)) {
       walkSpTree(pChildren(node), zRef, group, out, imageEmbedIds, parents, embedIdMap, theme, clrMap);
     } else if (t === "p:sp") {
       const spPr = pFind(node, "p:spPr");
