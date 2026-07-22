@@ -651,6 +651,52 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
 
 
 
+    // ── Media (video / audio / OLE embeds) ──────────────────────────────
+    const media: ParsedMedia[] = [];
+    const mediaBucketEntries: Array<[string, string, ParsedMedia["kind"]]> = [
+      ...Object.entries(relTargetsByType.video).map(([id, t]) => [id, t, "video"] as [string, string, ParsedMedia["kind"]]),
+      ...Object.entries(relTargetsByType.audio).map(([id, t]) => [id, t, "audio"] as [string, string, ParsedMedia["kind"]]),
+      ...Object.entries(relTargetsByType.media).map(([id, t]) => [id, t, "other"] as [string, string, ParsedMedia["kind"]]),
+      ...Object.entries(relTargetsByType.oleObject).map(([id, t]) => [id, t, "ole"] as [string, string, ParsedMedia["kind"]]),
+    ];
+    for (const [rId, target, kind] of mediaBucketEntries) {
+      // Skip external links (video pointing at http://...) — no bytes to embed.
+      if (/^https?:\/\//i.test(target)) continue;
+      const resolved = resolveRelPath(slidePath, target);
+      const entry = zip.files[resolved];
+      if (!entry) continue;
+      if (totalMediaBytes >= MAX_TOTAL_MEDIA_BYTES) break;
+      try {
+        const bin = await entry.async("uint8array");
+        if (bin.byteLength === 0 || bin.byteLength > MAX_PER_MEDIA_BYTES) continue;
+        if (totalMediaBytes + bin.byteLength > MAX_TOTAL_MEDIA_BYTES) continue;
+        const mime = guessMime(resolved) ?? "application/octet-stream";
+        const dataUrl = `data:${mime};base64,${uint8ToBase64(bin)}`;
+        media.push({ kind, mime, path: resolved, dataUrl, embedId: rId, bytes: bin.byteLength });
+        totalMediaBytes += bin.byteLength;
+      } catch { /* skip malformed media */ }
+    }
+
+    // ── Hyperlinks (rId → target) ───────────────────────────────────────
+    const hyperlinks: ParsedHyperlink[] = Object.entries(relTargetsByType.hyperlink).map(
+      ([rId, { target, external }]) => ({ rId, target, external }),
+    );
+
+    // ── Comments ────────────────────────────────────────────────────────
+    const comments = await readSlideComments(zip, parser, slideNumber(slidePath));
+
+    // ── Slide-level metadata (hidden, transition, animation) ────────────
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const sldRoot = (doc as any)?.["p:sld"] ?? {};
+    const hidden = String(sldRoot?.["@_show"] ?? "1") === "0";
+    if (hidden) hiddenSlidesTotal++;
+    const transition = readTransitionKind(sldRoot?.["p:transition"]);
+    const hasAnimation = Boolean(sldRoot?.["p:timing"]);
+
+    mediaTotal += media.length;
+    hyperlinkTotal += hyperlinks.length;
+    commentTotal += comments.length;
+
     slides.push({
       index: i,
       title: cap(title, 240) || `Slide ${i + 1}`,
@@ -662,8 +708,18 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
       tables,
       diagrams,
       layout,
+      media,
+      hyperlinks,
+      comments,
+      hidden,
+      transition,
+      hasAnimation,
     });
   }
+
+  const metadata = await readDeckMetadata(zip, parser);
+  const embeddedFonts = await readEmbeddedFonts(zip, parser, presDoc);
+  const customXmlParts = await readCustomXmlParts(zip);
 
   return {
     filename,
@@ -672,9 +728,21 @@ export async function parsePptxBuffer(buf: Buffer | Uint8Array, filename: string
     theme,
     imagePayloadBytes: totalImageBytes,
     imagesTruncated,
-    graphicsSummary: { charts: chartTotal, tables: tableTotal, diagrams: diagramTotal },
+    graphicsSummary: {
+      charts: chartTotal,
+      tables: tableTotal,
+      diagrams: diagramTotal,
+      media: mediaTotal,
+      comments: commentTotal,
+      hyperlinks: hyperlinkTotal,
+      hiddenSlides: hiddenSlidesTotal,
+    },
+    metadata,
+    embeddedFonts,
+    customXmlParts,
   };
 }
+
 
 function slideNumber(path: string): number {
   const m = path.match(/(\d+)\.xml$/);
