@@ -32,6 +32,33 @@ const BUCKET = "division-pptx";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildSlideAssets(sl: any) {
+  const layoutShapes = sl.layout?.shapes ?? [];
+  const images = (sl.imageEmbedIds ?? []).map((embedId: string, idx: number) => {
+    const matches = layoutShapes
+      .map((sh: any, z: number) => {
+        const frame = sh?.frame;
+        if (sh?.kind === "image" && sh.embedId === embedId) return { source: "shape", kind: sh.kind, z, frame, srcRect: sh.srcRect, prst: sh.prst };
+        if (sh?.fill?.kind === "image" && sh.fill.embedId === embedId) return { source: "fill", kind: sh.kind, z, frame, srcRect: sh.fill.srcRect, prst: sh.prst };
+        return null;
+      })
+      .filter(Boolean);
+    const bg = sl.layout?.background;
+    if (bg?.kind === "image" && bg.embedId === embedId) matches.unshift({ source: "background", kind: "background", z: -1, frame: sl.layout?.size ? { x: 0, y: 0, w: sl.layout.size.w, h: sl.layout.size.h } : undefined, srcRect: bg.srcRect, prst: undefined });
+    return {
+      embedId,
+      index: idx,
+      occurrences: matches,
+    };
+  });
+  const layers = layoutShapes.map((sh: any, z: number) => ({
+    z,
+    kind: sh?.kind,
+    frame: sh?.frame,
+    embedId: sh?.embedId ?? sh?.fill?.embedId,
+    hasImageFill: sh?.fill?.kind === "image",
+    srcRect: sh?.srcRect ?? sh?.fill?.srcRect,
+    prst: sh?.prst,
+  }));
   const media = (sl.media ?? []).map((m: any) => ({
     kind: m.kind,
     mime: m.mime,
@@ -71,6 +98,9 @@ function buildSlideAssets(sl: any) {
     stacked: c.stacked,
   }));
   return {
+    images,
+    layers,
+    background: sl.layout?.background ? { kind: sl.layout.background.kind, embedId: sl.layout.background.embedId, path: sl.layout.background.path, srcRect: sl.layout.background.srcRect } : undefined,
     media,
     hyperlinks,
     comments,
