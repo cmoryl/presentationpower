@@ -1337,6 +1337,17 @@ function VariantDetailModal({
         </div>
       </div>
     </div>
+    <SaveModuleDialog
+      open={saveOpen}
+      onClose={() => setSaveOpen(false)}
+      variantId={variant.id}
+      variantName={variant.name}
+      content={detailContent}
+      brandMode={brand.id}
+      subCompany={null}
+      divisionId={brand.id}
+    />
+    </>
   );
 }
 
