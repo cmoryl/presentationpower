@@ -1277,6 +1277,7 @@ export type Database = {
           division_id: string
           embedded_at: string | null
           error: string | null
+          extras: Json | null
           file_size: number
           id: string
           original_filename: string
@@ -1294,6 +1295,7 @@ export type Database = {
           division_id: string
           embedded_at?: string | null
           error?: string | null
+          extras?: Json | null
           file_size?: number
           id?: string
           original_filename: string
@@ -1311,6 +1313,7 @@ export type Database = {
           division_id?: string
           embedded_at?: string | null
           error?: string | null
+          extras?: Json | null
           file_size?: number
           id?: string
           original_filename?: string

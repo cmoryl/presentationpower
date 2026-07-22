@@ -1,0 +1,1 @@
+ALTER TABLE public.imported_decks ADD COLUMN IF NOT EXISTS extras jsonb;

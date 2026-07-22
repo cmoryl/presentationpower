@@ -6,7 +6,9 @@ import { Loader2, ExternalLink, Send, Image as ImageIcon, FileText, ChevronRight
 import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { FaithfulSlideCanvas } from "@/components/slide/FaithfulSlideCanvas";
+import { AssetInspectorPanel } from "@/components/AssetInspectorPanel";
 import type { SlideLayout } from "@/lib/pptx-import";
+
 import {
   listImportedDecksForDivision,
   getImportedDeckSlides,
@@ -191,9 +193,11 @@ function ImportedLibrary() {
           slide={slidesQ.data.slides.find((s) => s.index === previewSlideIdx)!}
           deckName={slidesQ.data.original_filename}
           deckTheme={themeToTokens(slidesQ.data.theme)}
+          deckExtras={slidesQ.data.extras}
           onClose={() => setPreviewSlideIdx(null)}
         />
       )}
+
     </AppShell>
   );
 }
@@ -226,6 +230,8 @@ type ImportedSlide = {
   imagePaths?: string[];
   imageUrls?: string[];
   layout?: SlideLayout;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  assets?: any;
 };
 
 type DeckSlidesData = {
@@ -237,7 +243,10 @@ type DeckSlidesData = {
   status: string;
   error: string | null;
   downloadUrl: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  extras?: any;
 };
+
 
 function DeckSlides({
   deck,
@@ -463,18 +472,22 @@ function SlidePreview({
   slide,
   deckName,
   deckTheme,
+  deckExtras,
   onClose,
 }: {
   slide: ImportedSlide;
   deckName: string;
   deckTheme?: Record<string, string>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  deckExtras?: any;
   onClose: () => void;
 }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-6 backdrop-blur-sm"
       onClick={onClose}
     >
+
       <div
         className="relative w-full max-w-6xl overflow-hidden rounded-2xl bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
@@ -518,7 +531,9 @@ function SlidePreview({
               )}
             </div>
           )}
+          <AssetInspectorPanel slide={slide} extras={deckExtras} />
         </div>
+
       </div>
     </div>
   );
