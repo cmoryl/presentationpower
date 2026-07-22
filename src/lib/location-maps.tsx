@@ -599,7 +599,40 @@ export function WorldMap({
             })}
         </g>
       )}
+
+      {/* Metric legend — color scale + min/max labels */}
+      {metricStats && metric && (() => {
+        const vb = regionViewBox(region).split(" ").map(Number);
+        const [vx, vy, vw, vh] = vb;
+        const barW = Math.min(240, vw * 0.28);
+        const barH = 8;
+        const pad = 14;
+        const x = vx + pad;
+        const y = vy + vh - pad - barH - 22;
+        const panelW = barW + 24;
+        const panelH = barH + 42;
+        const panelFill = isDark ? "rgba(3,0,44,0.55)" : "rgba(255,255,255,0.78)";
+        const panelStroke = isDark ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.12)";
+        const textFill = isDark ? "rgba(255,255,255,0.92)" : "rgba(3,0,44,0.86)";
+        const subFill = isDark ? "rgba(255,255,255,0.6)" : "rgba(3,0,44,0.6)";
+        return (
+          <g fontFamily="Geist, system-ui, sans-serif">
+            <rect x={x - 12} y={y - 22} width={panelW} height={panelH} rx={8} fill={panelFill} stroke={panelStroke} />
+            <text x={x} y={y - 8} fontSize={9} fontWeight={600} fill={textFill} style={{ letterSpacing: "0.06em", textTransform: "uppercase" }}>
+              {metric.label}
+            </text>
+            <rect x={x} y={y} width={barW} height={barH} rx={barH / 2} fill="url(#tp-metric-scale)" stroke={panelStroke} />
+            <text x={x} y={y + barH + 12} fontSize={9} fill={subFill}>
+              {formatMetricValue(metricStats.min, metric)}
+            </text>
+            <text x={x + barW} y={y + barH + 12} fontSize={9} fill={subFill} textAnchor="end">
+              {formatMetricValue(metricStats.max, metric)}
+            </text>
+          </g>
+        );
+      })()}
     </svg>
+
   );
 }
 
