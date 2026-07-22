@@ -173,8 +173,9 @@ export type PptxExportResult = { blob?: Blob; failedSlides: string[] };
 export async function exportDeckToPptx(
   deck: Deck,
   brand: BrandMode,
-  opts?: { strategy?: DeckStrategySnapshot | null; output?: "download" | "blob" },
+  opts?: { strategy?: DeckStrategySnapshot | null; output?: "download" | "blob"; forceMode?: "light" | "dark" },
 ): Promise<PptxExportResult> {
+  const forceMode = opts?.forceMode;
   const pptx = new PptxGenJS();
   pptx.layout = "LAYOUT_WIDE";
   pptx.title = deck.title;
