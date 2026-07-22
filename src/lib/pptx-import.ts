@@ -2088,6 +2088,7 @@ function extractSlideLayout(
   size: { w: number; h: number },
   imageEmbedIds: string[],
   parents?: ResolvedParents,
+  theme?: ParsedTheme,
 ): SlideLayout {
   const orderParser = new XMLParser({
     ignoreAttributes: false,
@@ -2104,13 +2105,31 @@ function extractSlideLayout(
   const spTree = cSld ? pFind(cSld, "p:spTree") : undefined;
   const shapes: LayoutShape[] = [];
 
-  // Background: slide → layout → master
-  let background: LayoutFill | undefined;
-  if (cSld) {
-    const bg = pFind(cSld, "p:bg");
-    const bgPr = bg ? pFind(bg, "p:bgPr") : undefined;
-    if (bgPr) background = readFill(bgPr, imageEmbedIds);
-  }
+  // Background: slide → layout → master.
+  // Both <p:bgPr> (direct fill) and <p:bgRef idx="..."> (theme reference)
+  // are honored; idx>1000 → theme.bgFillStyleLst, else → theme.fillStyleLst.
+  const readBg = (node: PNode | undefined): LayoutFill | undefined => {
+    if (!node) return undefined;
+    const bg = pFind(node, "p:bg");
+    if (!bg) return undefined;
+    const bgPr = pFind(bg, "p:bgPr");
+    if (bgPr) return readFill(bgPr, imageEmbedIds);
+    const bgRef = pFind(bg, "p:bgRef");
+    if (bgRef && theme) {
+      const idx = Number(pAttrs(bgRef)["@_idx"] ?? 0);
+      const list = idx >= 1001 ? theme.bgFillStyleLst : theme.fillStyleLst;
+      if (list && list.length) {
+        const slot = idx >= 1001 ? idx - 1001 : Math.max(0, idx - 1);
+        const picked = list[Math.min(slot, list.length - 1)];
+        if (picked) return picked;
+      }
+      // fallback: use overriding color if scheme color specified
+      const col = readColorFromNode(bgRef);
+      if (col) return { kind: "solid", color: col };
+    }
+    return undefined;
+  };
+  let background: LayoutFill | undefined = readBg(cSld);
   if (!background) background = parents?.layout?.background;
   if (!background) background = parents?.master?.background;
 
