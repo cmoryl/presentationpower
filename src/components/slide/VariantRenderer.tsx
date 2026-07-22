@@ -4037,7 +4037,7 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-14 grid gap-14" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
             {items[0] && <ReportCard brand={brand} item={items[0]} />}
-            <div style={{ background: "rgba(10,15,28,0.12)" }} />
+            <div style={{ background: ink.hairline }} />
             {items[1] && <ReportCard brand={brand} item={items[1]} />}
           </div>
         </SlideFrame>
