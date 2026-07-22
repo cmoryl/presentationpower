@@ -8,7 +8,7 @@ import { createContext, useContext, useEffect, useRef, useState, Fragment } from
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
 import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, StatFigure, QuoteMark, Attribution, SoftDivider } from "./primitives";
-import { EditorialTitle, PullQuote, DuotoneImage, GrainOverlay, CinematicScrim, StatRail, EDITORIAL_SERIF } from "./flagship";
+import { EditorialTitle, PullQuote, DuotoneImage, GrainOverlay, CinematicScrim, StatRail, GlassTile, IconWell, EDITORIAL_SERIF } from "./flagship";
 
 
 // Module-scoped context so helper components (CardGrid, StatGrid, NumberedList,
@@ -866,41 +866,10 @@ function renderVariantBody({
       );
 
     case "MV-INS-QUOTE": {
-      const cardBg = isDark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)";
-      const cardRing = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="relative flex h-full flex-col justify-center">
-            {/* Ambient accent glow behind the quote card */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{
-                backgroundImage: `radial-gradient(50% 50% at 15% 30%, ${brand.tokens.accent}${isDark ? "24" : "12"} 0%, transparent 70%)`,
-              }}
-            />
-            <div
-              className="relative overflow-hidden rounded-[32px] px-20 py-20"
-              style={{
-                background: cardBg,
-                border: `1px solid ${cardRing}`,
-                backgroundImage: `radial-gradient(80% 60% at 0% 0%, ${brand.tokens.accent}${isDark ? "1A" : "0E"} 0%, transparent 60%)`,
-              }}
-            >
-              <div
-                aria-hidden
-                className="absolute -top-8 -left-4 select-none"
-                style={{
-                  color: brand.tokens.accent,
-                  fontSize: 520,
-                  lineHeight: 0.7,
-                  fontWeight: 700,
-                  opacity: isDark ? 0.22 : 0.14,
-                  letterSpacing: "-0.06em",
-                }}
-              >
-                “
-              </div>
+            <GlassTile radius={28} padding="px-24 py-24" className="relative overflow-visible">
               <div className="relative">
                 <div className="flex items-center gap-4 tp-rise">
                   <span
@@ -909,28 +878,29 @@ function renderVariantBody({
                   />
                   <Kicker brand={brand}>In their words</Kicker>
                 </div>
-                <div className="mt-10 tp-rise tp-rise-delay-1">
+                <div className="mt-16 mb-16 tp-rise tp-rise-delay-1">
                   <PullQuote
                     quote={s(c.quote)}
                     brand={brand}
                     size={78}
                     color={ink.strong}
+                    closingGlyph
                   />
                 </div>
                 <div
-                  className="mt-14 h-[2px] w-[120px] rounded-full tp-rise tp-rise-delay-2"
+                  className="mt-10 h-[2px] w-[120px] rounded-full tp-rise tp-rise-delay-2"
                   style={{ backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)` }}
                 />
                 <div className="mt-8 tp-rise tp-rise-delay-3">
                   <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} />
                 </div>
               </div>
-
-            </div>
+            </GlassTile>
           </div>
         </SlideFrame>
       );
     }
+
 
     // ── Solution & Process ─────────────────────────────────────────────
     case "MV-SOL-PILLARS-5": {
@@ -1615,24 +1585,49 @@ function renderVariantBody({
       );
 
     // ── Case Study ─────────────────────────────────────────────────────
-    case "MV-CASE-SPREAD":
+    case "MV-CASE-SPREAD": {
+      const rows: Array<{ label: string; body: string; icon: string }> = [
+        { label: "Challenge", body: s(c.challenge), icon: "◇" },
+        { label: "Solution",  body: s(c.solution),  icon: "◆" },
+        { label: "Result",    body: s(c.result),    icon: "★" },
+      ];
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <Kicker brand={brand}>Case study</Kicker>
           <Hairline color={brand.tokens.accent} widthPx={88} thicknessPx={2} className="mt-6 mb-8" />
-          <DisplayTitle size="section" color={brand.tokens.primary}>{s(c.client)}</DisplayTitle>
-          <div className="mt-14 grid grid-cols-3 gap-14">
-            <LabelBlock brand={brand} label="Challenge" body={s(c.challenge)} />
-            <LabelBlock brand={brand} label="Solution" body={s(c.solution)} />
-            <LabelBlock brand={brand} label="Result" body={s(c.result)} />
+          <DisplayTitle size="section" color={ink.strong}>{s(c.client)}</DisplayTitle>
+          <div className="mt-12 grid grid-cols-3 gap-8">
+            {rows.map((r, i) => (
+              <GlassTile key={i} radius={22} padding="px-8 py-8" className={`tp-rise tp-rise-delay-${Math.min(i + 1, 3) as 1 | 2 | 3}`}>
+                <div className="flex items-center gap-4">
+                  <IconWell accent={brand.tokens.accent}>
+                    <span style={{ fontSize: 20, color: brand.tokens.accent }}>{r.icon}</span>
+                  </IconWell>
+                  <div
+                    className="uppercase font-semibold"
+                    style={{ color: brand.tokens.accent, fontSize: 12, letterSpacing: "0.28em" }}
+                  >
+                    {r.label}
+                  </div>
+                </div>
+                <div
+                  className="mt-6"
+                  style={{ fontSize: 22, lineHeight: 1.35, color: ink.strong, letterSpacing: "-0.005em" }}
+                >
+                  {r.body}
+                </div>
+              </GlassTile>
+            ))}
           </div>
           {s(c.metric) && (
-            <div className="mt-12">
+            <div className="mt-10">
               <StatFigure brand={brand} value={s(c.metric)} label="Outcome" size="md" />
             </div>
           )}
         </SlideFrame>
       );
+    }
+
 
     case "MV-CASE-METRICS":
       return (
