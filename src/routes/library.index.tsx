@@ -69,7 +69,7 @@ function usePins() {
 
 
 
-export const Route = createFileRoute("/library")({
+export const Route = createFileRoute("/library/")({
   head: () => ({
     meta: [
       { title: "Library · TransPerfect Modular" },
