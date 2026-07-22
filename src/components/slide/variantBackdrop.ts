@@ -1,4 +1,5 @@
 import type { ModuleVariant } from "@/lib/taxonomy";
+import { BRAND_MODES } from "@/lib/taxonomy";
 import type { SlideBackdrop } from "./SlideChrome";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
