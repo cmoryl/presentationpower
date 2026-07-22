@@ -1219,13 +1219,23 @@ function VariantDetailModal({
             </button>
             <button
               type="button"
-              onClick={downloadPptx}
+              onClick={() => downloadPptx("light")}
               disabled={downloading}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C] bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#003FC7] disabled:opacity-60"
-              title="Download this module as a single-slide .pptx"
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/20 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
+              title="Download this module as a light-mode single-slide .pptx (matches the light preview exactly, includes division backdrop + logo)"
             >
               {downloading ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
-              {downloading ? "Preparing…" : "Download .pptx"}
+              Light .pptx
+            </button>
+            <button
+              type="button"
+              onClick={() => downloadPptx("dark")}
+              disabled={downloading}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C] bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#003FC7] disabled:opacity-60"
+              title="Download this module as a dark-mode single-slide .pptx (matches the dark preview exactly, includes division backdrop + white logo)"
+            >
+              {downloading ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
+              Dark .pptx
             </button>
             {usageCount > 0 && (
               <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
