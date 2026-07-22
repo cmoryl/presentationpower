@@ -5193,7 +5193,135 @@ function StatTile({ brand, item, index, dense, cols, isLastRow }: { brand: Brand
   );
 }
 
-function StatGrid({
+// ── AuroraStatGrid ─────────────────────────────────────────────────────────
+// Free-form stat grid drawn directly onto the page-level aurora atmosphere
+// (see AuroraLayer). No cards, no fills, no top rails — just a soft
+// translucent icon circle, a big hero number, a quiet label, and hairline
+// vertical dividers between siblings in the same row. Matches the reference
+// 2×2 and 5-across stat layouts exactly.
+function AuroraStatGrid({
+  brand,
+  pageNumber,
+  title,
+  items,
+  cols,
+  rows,
+}: {
+  brand: BrandMode;
+  pageNumber: number;
+  title: string;
+  items: Item[];
+  cols: number;
+  rows?: number;
+}) {
+  const rowCount = rows ?? Math.ceil(items.length / cols);
+  return (
+    <SlideFrame brand={brand} pageNumber={pageNumber}>
+      {title ? <SlideTitle brand={brand} title={title} /> : null}
+      <div
+        className={`mt-16 grid gap-y-16`}
+        style={{
+          gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+          gridTemplateRows: `repeat(${rowCount}, minmax(0, auto))`,
+        }}
+      >
+        {items.map((it, i) => {
+          const isFirstInRow = i % cols === 0;
+          return (
+            <AuroraStatCell
+              key={i}
+              brand={brand}
+              item={it}
+              index={i}
+              showLeftRule={!isFirstInRow}
+            />
+          );
+        })}
+      </div>
+    </SlideFrame>
+  );
+}
+
+function AuroraStatCell({
+  brand,
+  item,
+  index,
+  showLeftRule,
+}: {
+  brand: BrandMode;
+  item: Item;
+  index: number;
+  showLeftRule: boolean;
+}) {
+  const ink = useSlideInk();
+  const value = s(item.value);
+  const unit = s(item.unit);
+  const label = s(item.label);
+  return (
+    <div
+      className="relative flex items-start gap-6 pl-10 pr-8"
+      style={{
+        borderLeft: showLeftRule ? `1px solid ${ink.hairline}` : "none",
+      }}
+    >
+      {/* Soft translucent icon circle — 1px hairline stroke, subtle fill,
+          line icon in accent-text ink. Free on the aurora, no shadow. */}
+      <div
+        aria-hidden
+        className="flex shrink-0 items-center justify-center rounded-full"
+        style={{
+          width: 76,
+          height: 76,
+          background: "color-mix(in oklab, var(--slide-accent-text) 12%, transparent)",
+          border: `1px solid color-mix(in oklab, var(--slide-accent-text) 32%, transparent)`,
+          color: "var(--slide-accent-text)",
+          marginTop: 8,
+        }}
+      >
+        {(() => {
+          const Icon = pickIcon(label || s(item.title) || "stat", index, s(item.icon));
+          return <Icon size={34} strokeWidth={1.4} aria-hidden />;
+        })()}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div
+          className="flex items-baseline gap-2 tabular-nums"
+          style={{
+            fontSize: 84,
+            fontWeight: 600,
+            lineHeight: 0.95,
+            letterSpacing: "-0.035em",
+            color: ink.strong,
+          }}
+        >
+          <span>{value || "—"}</span>
+          {unit ? (
+            <span style={{ fontSize: 48, fontWeight: 500, letterSpacing: "-0.02em", color: ink.strong }}>
+              {unit}
+            </span>
+          ) : null}
+        </div>
+        {label ? (
+          <div
+            className="mt-4"
+            style={{
+              fontSize: 22,
+              lineHeight: 1.35,
+              fontWeight: 400,
+              color: ink.muted,
+              letterSpacing: "-0.005em",
+              maxWidth: 320,
+            }}
+          >
+            {label}
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+
   brand,
   pageNumber,
   title,
