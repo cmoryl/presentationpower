@@ -787,3 +787,129 @@ function hexA(hex: string, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, alpha))})`;
 }
 
+// ── GlassChartPanel ───────────────────────────────────────────────────────
+// Frosted-glass frame with a soft, defocused DIVISION-ACCENT bloom BEHIND it
+// that peeks through — the liquid-glass recipe from GlassTile ported to
+// data-viz surfaces so charts stop feeling like flat SVG pasted on top.
+export function GlassChartPanel({
+  children,
+  className = "",
+  radius = 24,
+  padding = "px-8 py-8",
+  accent,
+  intensity = 1,
+  bloomStrength = 1,
+  bloomAnchor = "br",
+}: {
+  children: ReactNode;
+  className?: string;
+  radius?: number;
+  padding?: string;
+  accent?: string;
+  intensity?: number;
+  bloomStrength?: number;
+  bloomAnchor?: "tl" | "tr" | "bl" | "br" | "c";
+}) {
+  const mode = useSlideMode();
+  const ctxAccent = useSlideAccent();
+  const a = accent ?? ctxAccent ?? undefined;
+  const fillAlpha = Math.min(0.7, (mode === "dark" ? 0.20 : 0.52) * intensity);
+  const ringAlpha = mode === "dark" ? 0.28 : 0.24;
+  const bg = mode === "dark"
+    ? `rgba(10, 8, 48, ${fillAlpha})`
+    : `rgba(255, 255, 255, ${fillAlpha})`;
+  const ring = a
+    ? hexA(a, mode === "dark" ? 0.32 : 0.26)
+    : mode === "dark"
+      ? `rgba(255, 255, 255, ${ringAlpha})`
+      : `rgba(10, 15, 28, ${ringAlpha})`;
+  const highlight = mode === "dark"
+    ? "inset 0 1px 0 0 rgba(255,255,255,0.08)"
+    : "inset 0 1px 0 0 rgba(255,255,255,0.7)";
+  const accentGlow = a ? `, 0 24px 60px -22px ${hexA(a, mode === "dark" ? 0.55 : 0.35)}` : "";
+  const anchorStyle: CSSProperties = (() => {
+    switch (bloomAnchor) {
+      case "tl": return { top: "-25%", left: "-15%" };
+      case "tr": return { top: "-25%", right: "-15%" };
+      case "bl": return { bottom: "-25%", left: "-15%" };
+      case "c":  return { top: "10%", left: "20%", right: "20%", bottom: "10%" };
+      case "br":
+      default:   return { bottom: "-25%", right: "-15%" };
+    }
+  })();
+  const bloomColor = a ?? (mode === "dark" ? "#4D88FF" : "#003FC7");
+  const bloomA1 = Math.min(1, (mode === "dark" ? 0.55 : 0.42) * bloomStrength);
+  const bloomA2 = Math.min(1, (mode === "dark" ? 0.28 : 0.22) * bloomStrength);
+  return (
+    <div className={`relative ${className}`} style={{ borderRadius: radius, isolation: "isolate" }}>
+      <div aria-hidden className="absolute inset-0 overflow-hidden pointer-events-none" style={{ borderRadius: radius, zIndex: 0 }}>
+        <div
+          style={{
+            position: "absolute",
+            width: "70%",
+            aspectRatio: "1 / 1",
+            borderRadius: "50%",
+            background: `radial-gradient(circle at 50% 50%, ${hexA(bloomColor, bloomA1)} 0%, ${hexA(bloomColor, bloomA2)} 35%, transparent 70%)`,
+            filter: "blur(48px)",
+            ...anchorStyle,
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: "-30%",
+            left: bloomAnchor === "br" || bloomAnchor === "tr" ? "-20%" : "50%",
+            width: "55%",
+            aspectRatio: "1 / 1",
+            borderRadius: "50%",
+            background: `radial-gradient(circle at 50% 50%, ${hexA(bloomColor, bloomA2)} 0%, transparent 65%)`,
+            filter: "blur(56px)",
+          }}
+        />
+      </div>
+      <div
+        className={`relative ${padding}`}
+        style={{
+          background: bg,
+          border: `1px solid ${ring}`,
+          borderRadius: radius,
+          backdropFilter: "blur(24px) saturate(160%)",
+          WebkitBackdropFilter: "blur(24px) saturate(160%)",
+          boxShadow: `${highlight}${accentGlow}`,
+          zIndex: 1,
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ── ChartAccentDefs ───────────────────────────────────────────────────────
+// Shared SVG <defs>: a feathered vertical accent gradient (bloom-in-fill), a
+// soft bar gradient, and a Gaussian blur glow filter for the primary data
+// mark so it feels lit, not flat. IDs are namespaced per call site.
+export function ChartAccentDefs({ id }: { id: string }) {
+  return (
+    <defs>
+      <linearGradient id={`${id}-fill`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"  stopColor="var(--slide-accent-text)" stopOpacity={0.55} />
+        <stop offset="55%" stopColor="var(--slide-accent-text)" stopOpacity={0.22} />
+        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0.02} />
+      </linearGradient>
+      <linearGradient id={`${id}-bar`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"  stopColor="var(--slide-accent-text)" stopOpacity={0.95} />
+        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0.5} />
+      </linearGradient>
+      <radialGradient id={`${id}-dot`} cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={1} />
+        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0.4} />
+      </radialGradient>
+      <filter id={`${id}-glow`} x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="4" />
+      </filter>
+    </defs>
+  );
+}
+
+
