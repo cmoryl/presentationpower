@@ -3932,20 +3932,17 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 3);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <DotGridBackdrop />
-          <div className="relative z-10">
-            <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-            <div className="mt-14 grid gap-10" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
-              {items.map((it, i) => (
-                <div key={i} className="flex flex-col items-center text-center" style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`, paddingLeft: i === 0 ? 0 : 24 }}>
-                  <Donut brand={brand} percent={Number(it.value) || 0} size={280} />
-                  <div className="mt-8 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.strong, fontWeight: 700 }}>{s(it.label)}</div>
-                  <div className="mt-4" style={{ fontSize: 20, lineHeight: 1.45, color: ink.muted, maxWidth: 380 }}>{s(it.body)}</div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-12"><LiveMetaFooter brand={brand} source={s(c.source, "Program telemetry")} refCode={variant.id} /></div>
+          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+          <div className="mt-14 grid gap-10" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+            {items.map((it, i) => (
+              <div key={i} className="flex flex-col items-center text-center" style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`, paddingLeft: i === 0 ? 0 : 24 }}>
+                <Donut brand={brand} percent={Number(it.value) || 0} size={280} />
+                <div className="mt-8 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.strong, fontWeight: 700 }}>{s(it.label)}</div>
+                <div className="mt-4" style={{ fontSize: 20, lineHeight: 1.45, color: ink.muted, maxWidth: 380 }}>{s(it.body)}</div>
+              </div>
+            ))}
           </div>
+          <div className="mt-12"><LiveMetaFooter brand={brand} source={s(c.source, "Program telemetry")} refCode={variant.id} /></div>
         </SlideFrame>
       );
     }
