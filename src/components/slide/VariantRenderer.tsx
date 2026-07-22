@@ -4419,7 +4419,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-8"><BubbleChart brand={brand} items={items} axisX={s(axis.x, "X")} axisY={s(axis.y, "Y")} height={560} /></div>
+          <div className="mt-14"><BubbleChart brand={brand} items={items} axisX={s(axis.x, "X")} axisY={s(axis.y, "Y")} height={560} /></div>
         </SlideFrame>
       );
     }
