@@ -369,6 +369,7 @@ function SlideCard({
   slide,
   deckId,
   deckTheme,
+  deckFonts,
   brandModeId,
   approved,
   onPreview,
@@ -376,6 +377,8 @@ function SlideCard({
   slide: ImportedSlide;
   deckId: string;
   deckTheme?: Record<string, string>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  deckFonts?: any;
   brandModeId: string;
   approved: boolean;
   onPreview: () => void;
