@@ -1757,6 +1757,21 @@ export const useDeckStore = create<DeckState>()(
         }));
       },
 
+      updateSlideCanvasBlocks: (deckId, slideId, blocks) => {
+        pushHistory(`canvas:${deckId}:${slideId}`);
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) => (sl.id === slideId ? { ...sl, canvasBlocks: blocks } : sl)),
+            },
+          },
+        }));
+      },
+
       setSlideLogo: (deckId, slideId, patch) => {
         pushHistory(`slide-logo:${deckId}:${slideId}`);
         const deck = get().decks[deckId];
