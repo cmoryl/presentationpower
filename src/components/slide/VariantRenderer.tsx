@@ -1,7 +1,7 @@
 import * as React from "react";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import { SlideFrame as BaseSlideFrame, SlideModeContext, SlideBackdropContext, SlideAccentContext, SlideInkContext, makeSlideInk, useSlideInk, type SlideMode, type SlideBackdrop } from "./SlideChrome";
-import { SlideThumbnailContext, SlideVideoPreviewContext, useResolvedVideoUrl, useResolvedPosterUrl, useResolvedImageUrl, useResolvedLogoUrl } from "@/lib/slide-media-refresh";
+import { SlideThumbnailContext, SlideVideoPreviewContext, SlideForceVideoAutoplayContext, useResolvedVideoUrl, useResolvedPosterUrl, useResolvedImageUrl, useResolvedLogoUrl } from "@/lib/slide-media-refresh";
 import { resolveSlideBackground } from "@/lib/background-library";
 import { backdropForVariant } from "./variantBackdrop";
 
