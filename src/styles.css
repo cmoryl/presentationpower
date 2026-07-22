@@ -432,3 +432,30 @@
   outline-offset: 3px;
   background-color: rgba(0, 63, 199, 0.09);
 }
+
+/* Flagship 2026 — hero motion. Ken-burns drift on duotone hero images; a
+   slow, subtle scale/pan that adds cinematic life without distracting. */
+@keyframes tp-kenburns {
+  0%   { transform: scale(1.05) translate3d(0,0,0); }
+  50%  { transform: scale(1.12) translate3d(-1.2%, -0.8%, 0); }
+  100% { transform: scale(1.05) translate3d(0,0,0); }
+}
+.tp-kenburns { animation: tp-kenburns 22s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .tp-kenburns { animation: none; transform: scale(1.06); }
+}
+
+/* Editorial rise — headline fades up as the slide enters view. */
+@keyframes tp-rise {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+.tp-rise { animation: tp-rise 700ms cubic-bezier(.2,.7,.2,1) both; }
+.tp-rise-delay-1 { animation-delay: 120ms; }
+.tp-rise-delay-2 { animation-delay: 240ms; }
+.tp-rise-delay-3 { animation-delay: 360ms; }
+@media (prefers-reduced-motion: reduce) {
+  .tp-rise, .tp-rise-delay-1, .tp-rise-delay-2, .tp-rise-delay-3 {
+    animation: none; opacity: 1; transform: none;
+  }
+}
