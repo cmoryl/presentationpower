@@ -34,11 +34,14 @@ const PRIMITIVES = readFileSync(
 );
 
 // Minimum Tailwind mt-* / mb-* number required as breathing room.
-const MIN_TITLE_BOTTOM = 10;   // mb-10 ≈ 40px
-const MIN_BODY_TOP     = 10;   // mt-10 ≈ 40px
-const MIN_CHART_TOP    = 12;   // mt-12 ≈ 48px
+// TitleBlock itself carries mb-10 (~40px), so these thresholds gate the
+// *additional* clearance on the first body sibling.
+const MIN_TITLE_BOTTOM = 10;   // mb-10 ≈ 40px on TitleBlock
+const MIN_BODY_TOP     = 8;    // + mt-8  ≈ 72px total
+const MIN_CHART_TOP    = 10;   // + mt-10 ≈ 80px total for data-viz
 const MIN_SEG_TOP_PX   = 140;  // marginTop reserve for above-labels
 const MIN_SEG_BOT_PX   = 120;  // marginBottom reserve for below-labels
+
 
 // Chart / data-viz families whose first body sibling needs extra clearance.
 const CHART_VARIANT_HINTS = [
