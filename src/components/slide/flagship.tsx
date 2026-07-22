@@ -581,11 +581,20 @@ function auroraOrbs(seed: string, brand: BrandMode, mode: "dark" | "light" = "da
     return ((h >>> 0) % 10000) / 10000;
   };
   const sibling = shiftHue(brand.tokens.accent, 28, 0.06);
-  // Light mode: swap the deep navy primary for a lightened accent tint so the
-  // wash stays airy while still keyed to the division's own accent hue.
-  const lightPrimary = shiftHue(brand.tokens.accent, -18, 0.18);
+  // Dark-mode first orb: Corporate uses its blue primary directly (reads well
+  // against the navy field). Every other division's primary is a deep navy
+  // that disappears against #03002C, so we substitute a lightened accent
+  // variant — the aurora then reads as accent + sibling, both clearly on-brand.
+  const isCorporate = brand.tokens.primary.toLowerCase() === "#003fc7";
+  const darkFirst = isCorporate
+    ? brand.tokens.primary
+    : shiftHue(brand.tokens.accent, -14, 0.04);
+  // Light-mode first orb: mix the accent toward the brand's own surface so it
+  // stays in the accent's hue family (Enterprise stays blue, Life Sci stays
+  // green) instead of hue-shifting into purple/yellow.
+  const lightPrimary = mixHex(brand.tokens.accent, brand.tokens.surface, 0.45);
   const palette = mode === "dark"
-    ? [brand.tokens.primary, brand.tokens.accent, sibling]
+    ? [darkFirst, brand.tokens.accent, sibling]
     : [lightPrimary, brand.tokens.accent, sibling];
   // Light mode alphas are gentler so the pastel wash never overpowers charts,
   // glass tiles or body copy — dark mode keeps the full-strength orbs.
@@ -599,6 +608,22 @@ function auroraOrbs(seed: string, brand: BrandMode, mode: "dark" | "light" = "da
     ry: 320 + rand() * 220,
     alpha: alphaBase + rand() * alphaRange,
   }));
+}
+
+// Linearly blend two hex colors. t=0 returns a, t=1 returns b.
+function mixHex(a: string, b: string, t: number): string {
+  const pa = /^#?([a-f\d]{6})$/i.exec(a);
+  const pb = /^#?([a-f\d]{6})$/i.exec(b);
+  if (!pa || !pb) return a;
+  const ia = parseInt(pa[1], 16);
+  const ib = parseInt(pb[1], 16);
+  const ar = (ia >> 16) & 255, ag = (ia >> 8) & 255, ab_ = ia & 255;
+  const br = (ib >> 16) & 255, bg = (ib >> 8) & 255, bb_ = ib & 255;
+  const r = Math.round(ar + (br - ar) * t);
+  const g = Math.round(ag + (bg - ag) * t);
+  const bl = Math.round(ab_ + (bb_ - ab_) * t);
+  const to = (v: number) => v.toString(16).padStart(2, "0");
+  return `#${to(r)}${to(g)}${to(bl)}`;
 }
 
 
