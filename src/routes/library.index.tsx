@@ -1216,6 +1216,16 @@ function VariantDetailModal({
             >
               <Star size={12} /> Save as module
             </button>
+            <button
+              type="button"
+              onClick={downloadPptx}
+              disabled={downloading}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C] bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#003FC7] disabled:opacity-60"
+              title="Download this module as a single-slide .pptx"
+            >
+              {downloading ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
+              {downloading ? "Preparing…" : "Download .pptx"}
+            </button>
             {usageCount > 0 && (
               <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
                 Used · {usageCount}
