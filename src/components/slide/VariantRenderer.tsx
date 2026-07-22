@@ -1,5 +1,5 @@
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
-import { SlideFrame as BaseSlideFrame, SlideModeContext, SlideBackdropContext, SlideAccentContext, useSlideInk, type SlideMode, type SlideBackdrop } from "./SlideChrome";
+import { SlideFrame as BaseSlideFrame, SlideModeContext, SlideBackdropContext, SlideAccentContext, SlideInkContext, makeSlideInk, useSlideInk, type SlideMode, type SlideBackdrop } from "./SlideChrome";
 import { SlideThumbnailContext, SlideVideoPreviewContext, useResolvedVideoUrl, useResolvedPosterUrl, useResolvedImageUrl, useResolvedLogoUrl } from "@/lib/slide-media-refresh";
 import { resolveSlideBackground } from "@/lib/background-library";
 import { backdropForVariant } from "./variantBackdrop";
@@ -242,6 +242,7 @@ export function VariantRenderer(props: Props) {
   const contentClientName = s((slide.content as Record<string, unknown>).clientName) || undefined;
   const resolvedClient = clientName || contentClientName;
   const themedBrand = themeBrandForMode(brand, mode);
+  const semanticInk = makeSlideInk(mode, brand.tokens.accent, brand.tokens.primary, brand.tokens.surface, brand.tokens.ink);
 
   // Custom background per slide (from content.background). Falls back to null
   // so variants that render their own MediaTile / deterministic backdrops are
@@ -272,11 +273,13 @@ export function VariantRenderer(props: Props) {
   return (
     <SlideModeContext.Provider value={mode}>
       <SlideAccentContext.Provider value={themedBrand?.tokens?.accent ?? null}>
-        <SlideBackdropContext.Provider value={backdrop}>
-          <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany, logoOrientation: slide.logoOrientation && slide.logoOrientation !== "auto" ? slide.logoOrientation : logoOrientation, logoPosition: slide.logoPosition && slide.logoPosition !== "auto" ? slide.logoPosition : undefined }}>
-            {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c, mode })}
-          </SlideFrameCtx.Provider>
-        </SlideBackdropContext.Provider>
+        <SlideInkContext.Provider value={semanticInk}>
+          <SlideBackdropContext.Provider value={backdrop}>
+            <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany, logoOrientation: slide.logoOrientation && slide.logoOrientation !== "auto" ? slide.logoOrientation : logoOrientation, logoPosition: slide.logoPosition && slide.logoPosition !== "auto" ? slide.logoPosition : undefined }}>
+              {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c, mode })}
+            </SlideFrameCtx.Provider>
+          </SlideBackdropContext.Provider>
+        </SlideInkContext.Provider>
       </SlideAccentContext.Provider>
     </SlideModeContext.Provider>
 
@@ -315,16 +318,17 @@ function renderVariantBody({
   // MUST use these tokens (never hardcoded `rgba(10,15,28,X)`) so text stays
   // readable when a dark backdrop is applied.
   const isDark = mode === "dark";
+  const semantic = makeSlideInk(mode, brand.tokens.accent, brand.tokens.primary, brand.tokens.surface, brand.tokens.ink);
   const ink = {
-    strong:      isDark ? "#ffffff"                 : "rgba(10,15,28,0.92)",
-    body:        isDark ? "rgba(255,255,255,0.86)"  : "rgba(10,15,28,0.82)",
-    muted:       isDark ? "rgba(255,255,255,0.70)"  : "rgba(10,15,28,0.66)",
-    faint:       isDark ? "rgba(255,255,255,0.52)"  : "rgba(10,15,28,0.48)",
-    axis:        isDark ? "rgba(255,255,255,0.22)"  : "rgba(10,15,28,0.18)",
-    divider:     isDark ? "rgba(255,255,255,0.14)"  : "rgba(10,15,28,0.12)",
-    surface:     isDark ? "rgba(255,255,255,0.06)"  : "rgba(10,15,28,0.04)",
-    surfaceRing: isDark ? "rgba(255,255,255,0.12)"  : "rgba(10,15,28,0.10)",
-    ringOnDark:  isDark ? "#0b1024"                 : "#ffffff",
+    strong: semantic.text,
+    body: semantic.muted,
+    muted: semantic.muted,
+    faint: semantic.faint,
+    axis: semantic.hairlineStrong,
+    divider: semantic.hairline,
+    surface: semantic.trackFill,
+    surfaceRing: semantic.hairline,
+    ringOnDark: isDark ? "#0b1024" : "#ffffff",
   };
 
   switch (variant.id) {
