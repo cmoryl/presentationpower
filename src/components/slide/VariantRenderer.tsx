@@ -1662,7 +1662,9 @@ function renderVariantBody({
           <Kicker brand={brand}>Case study</Kicker>
           <Hairline color={"var(--slide-accent-text)"} widthPx={88} thicknessPx={2} className="mt-6 mb-8" />
           <DisplayTitle size="section" color={ink.strong}>{s(c.client)}</DisplayTitle>
-          <div className="mt-12 grid grid-cols-3 gap-8">
+          <div className="mt-6">
+            <ClientLogoChip mode={mode} clientName={clientName ?? s(c.client)} clientLogoUrl={clientLogoUrl} accent="var(--slide-accent-text)" faint={ink.faint} size={36} />
+          </div>
             {rows.map((r, i) => (
               <GlassTile key={i} radius={22} padding="px-8 py-8" className={`tp-rise tp-rise-delay-${Math.min(i + 1, 3) as 1 | 2 | 3}`}>
                 <div className="flex items-center gap-4">
