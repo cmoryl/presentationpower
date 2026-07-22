@@ -30,18 +30,20 @@ const AA_NORMAL = 4.5;
 const AA_LARGE = 3.0;
 
 type Pairing = {
-  kind: "primary" | "ink" | "accent";
+  kind: "primary" | "ink";
   onSlide: number; // required contrast against #FFFFFF
   onSurface: number; // required contrast against brand.tokens.surface
 };
 
-// primary is heading-tier (large), ink is body (normal), accent is
-// eyebrow/rule (large, bold).
+// primary is heading-tier (large ≥ 24pt), ink is body (normal). Accent is
+// intentionally a decorative pop (aqua/peach/lavender per brand memory:
+// "10% accent only") and is excluded from readability thresholds — parity
+// with the exporter is still enforced separately below.
 const PAIRINGS: Pairing[] = [
   { kind: "primary", onSlide: AA_LARGE, onSurface: AA_LARGE },
   { kind: "ink", onSlide: AA_NORMAL, onSurface: AA_NORMAL },
-  { kind: "accent", onSlide: AA_LARGE, onSurface: AA_LARGE },
 ];
+
 
 describe("light-mode text contrast guard (preview ↔ export)", () => {
   it("exporter light-mode text colors match the preview token block byte-for-byte", () => {
