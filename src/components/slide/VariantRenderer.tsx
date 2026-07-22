@@ -357,6 +357,8 @@ function renderVariantBody({
   pageNumber,
   c,
   mode,
+  clientName,
+  clientLogoUrl,
 }: {
   slide: DeckSlide;
   variant: ModuleVariant;
@@ -364,6 +366,8 @@ function renderVariantBody({
   pageNumber: number;
   c: Record<string, unknown>;
   mode: SlideMode;
+  clientName?: string;
+  clientLogoUrl?: string | null;
 }): ReactNode {
 
   // Mode-aware ink palette for charts and data viz. Every chart/graph variant
