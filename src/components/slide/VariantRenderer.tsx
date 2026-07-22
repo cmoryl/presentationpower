@@ -1773,7 +1773,7 @@ function renderVariantBody({
                   className="absolute inset-x-0 top-0 h-[3px]"
                   style={{ background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 85%)` }}
                 />
-                <div className="uppercase" style={{ fontSize: 15, letterSpacing: "0.24em", fontWeight: 600, color: "rgba(255,255,255,0.62)" }}>
+                <div className="uppercase" style={{ fontSize: 15, letterSpacing: "0.24em", fontWeight: 600, color: ink.faint }}>
                   Next steps
                 </div>
                 <div className="mt-8 space-y-6">
@@ -1875,7 +1875,7 @@ function renderVariantBody({
                 <div className="mt-2 uppercase" style={{ color: "var(--slide-accent-text)", fontSize: 18, letterSpacing: "0.28em", fontWeight: 600 }}>
                   {s(p.role)}
                 </div>
-                <div className="mt-6 space-y-2" style={{ fontSize: 24, color: "rgba(255,255,255,0.88)" }}>
+                <div className="mt-6 space-y-2" style={{ fontSize: 24, color: ink.muted }}>
                   <div>{s(p.email)}</div>
                   <div style={{ opacity: 0.65 }}>{s(p.phone)}</div>
                 </div>
@@ -2915,7 +2915,7 @@ function renderVariantBody({
             <DisplayTitle size="cover" color={ink.strong} maxWidthPx={1600}>{s(c.ask)}</DisplayTitle>
             <SupportingText size="xl" opacity={0.85} className="mt-10" maxWidthPx={1180}>{s(c.rationale)}</SupportingText>
             <div className="mt-16 flex items-baseline gap-10">
-              <Kicker brand={brand} color="rgba(255,255,255,0.65)">Decision by</Kicker>
+              <Kicker brand={brand} color={ink.faint}>Decision by</Kicker>
               <div style={{ fontSize: 42, fontWeight: 600, letterSpacing: "-0.02em", color: "var(--slide-accent-text)" }}>{s(c.decisionBy)}</div>
             </div>
           </div>
