@@ -90,10 +90,11 @@ export const critiqueDeckRhythm = createServerFn({ method: "POST" })
     // suggest concrete swaps without hallucinating variant IDs.
     const catalog = MODULE_VARIANTS.map((v) => ({
       id: v.id,
-      category: v.category,
-      intent: v.intent,
-      density: v.density,
+      family: v.familyId,
+      name: v.name,
+      description: v.description,
     }));
+
 
     const stableSystem = [
       "You are the TransPerfect Art Director — a senior editorial/presentation designer.",
