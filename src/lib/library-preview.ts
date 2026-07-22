@@ -368,7 +368,7 @@ export function seedDivisionContent(
   if (variantId === "MV-CLOSE-THANKS") {
     return {
       ...base,
-      signoff: `${divisionName} — ${scope?.tagline ?? "Global content, local precision"}`,
+      signoff: `${divisionName} — Global content, local precision`,
     } as SlideContent;
   }
   if (variantId === "MV-CLOSE-QNA") {
