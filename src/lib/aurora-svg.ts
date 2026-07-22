@@ -31,7 +31,7 @@ export function auroraSvgDataUrl(
   // the brand tint instead of washing everything to a single grey.
   const wash = darkGlassWash(brand);
   const glassColor = mode === "dark" ? wash.color : "#FFFFFF";
-  const glassAlpha = mode === "dark" ? wash.alpha : 0.42;
+  const glassAlpha = mode === "dark" ? wash.alpha : 0.32;
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
   <defs>
