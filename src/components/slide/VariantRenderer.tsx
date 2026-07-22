@@ -4905,6 +4905,145 @@ function PlayOverlay({
 }
 
 /**
+ * VideoHoverControls — floating control bar that appears on hover/focus over
+ * a mounted <video>. Play/pause, rewind 10s, forward 10s, mute/unmute.
+ * Rendered as role="group" with <div role="button"> children (never a nested
+ * <button>) so it stays valid HTML inside library cards' outer <button>.
+ */
+function VideoHoverControls({
+  videoRef,
+  initialMuted,
+  onUserPause,
+}: {
+  videoRef: React.RefObject<HTMLVideoElement | null>;
+  initialMuted: boolean;
+  onUserPause?: () => void;
+}) {
+  const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(initialMuted);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const sync = () => {
+      setPlaying(!v.paused && !v.ended);
+      setMuted(v.muted);
+    };
+    sync();
+    const events = ["play", "pause", "ended", "volumechange", "loadedmetadata"] as const;
+    events.forEach((e) => v.addEventListener(e, sync));
+    return () => events.forEach((e) => v.removeEventListener(e, sync));
+  }, [videoRef]);
+
+  const act = (fn: () => void) => (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    fn();
+  };
+
+  const togglePlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) {
+      v.play().catch(() => undefined);
+    } else {
+      v.pause();
+      onUserPause?.();
+    }
+  };
+  const seek = (delta: number) => {
+    const v = videoRef.current;
+    if (!v) return;
+    const dur = Number.isFinite(v.duration) ? v.duration : 0;
+    const next = Math.max(0, dur > 0 ? Math.min(dur, v.currentTime + delta) : v.currentTime + delta);
+    try { v.currentTime = next; } catch { /* seek before ready */ }
+  };
+  const toggleMute = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    // Unmute implies the user wants sound → make sure volume isn't at zero.
+    if (!v.muted && v.volume === 0) v.volume = 1;
+  };
+
+  const Btn = ({
+    label,
+    onClick,
+    children,
+    wide,
+  }: {
+    label: string;
+    onClick: () => void;
+    children: React.ReactNode;
+    wide?: boolean;
+  }) => (
+    <div
+      role="button"
+      tabIndex={0}
+      aria-label={label}
+      title={label}
+      onClick={act(onClick)}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") act(onClick)(e); }}
+      className={`flex ${wide ? "h-10 w-11" : "h-10 w-10"} cursor-pointer items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/25 backdrop-blur-md transition hover:bg-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70`}
+      data-media-hover-control={label}
+    >
+      {children}
+    </div>
+  );
+
+  return (
+    <div
+      role="group"
+      aria-label="Video controls"
+      onClick={(e) => e.stopPropagation()}
+      className="pointer-events-auto absolute inset-x-0 bottom-0 z-30 flex items-center justify-center gap-2 bg-gradient-to-t from-black/55 via-black/20 to-transparent px-3 pb-3 pt-8 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100"
+      data-media-controls="hover"
+    >
+      <Btn label="Rewind 10 seconds" onClick={() => seek(-10)}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M11 17l-5-5 5-5" />
+          <path d="M18 17l-5-5 5-5" />
+        </svg>
+      </Btn>
+      <Btn label={playing ? "Pause" : "Play"} onClick={togglePlay} wide>
+        {playing ? (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+            <rect x="6" y="5" width="4" height="14" rx="1" />
+            <rect x="14" y="5" width="4" height="14" rx="1" />
+          </svg>
+        ) : (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+            <path d="M6 4.2v15.6c0 .9 1 1.4 1.7.9l12-7.8c.7-.4.7-1.4 0-1.8l-12-7.8C7 2.8 6 3.3 6 4.2z" />
+          </svg>
+        )}
+      </Btn>
+      <Btn label="Forward 10 seconds" onClick={() => seek(10)}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M13 17l5-5-5-5" />
+          <path d="M6 17l5-5-5-5" />
+        </svg>
+      </Btn>
+      <Btn label={muted ? "Unmute" : "Mute"} onClick={toggleMute}>
+        {muted ? (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M11 5L6 9H3v6h3l5 4V5z" />
+            <path d="M22 9l-6 6" />
+            <path d="M16 9l6 6" />
+          </svg>
+        ) : (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M11 5L6 9H3v6h3l5 4V5z" />
+            <path d="M15.5 8.5a5 5 0 010 7" />
+            <path d="M18.5 5.5a9 9 0 010 13" />
+          </svg>
+        )}
+      </Btn>
+    </div>
+  );
+}
+
+
+/**
  * Per-preview video playback registry.
  *
  * Isolates state per module preview (keyed by brand + seed + source URL) so
@@ -5100,7 +5239,7 @@ function MediaTile({
   if (mode === "light") {
     return (
       <div
-        className={`relative overflow-hidden rounded-2xl ${className ?? ""}`}
+        className={`group relative overflow-hidden rounded-2xl ${className ?? ""}`}
         style={{ background: "#EEF2F8", filter: grayscale }}
       >
         {hasVideo && shouldPlay ? (
@@ -5153,6 +5292,14 @@ function MediaTile({
             />
           )
         )}
+        {hasVideo && shouldPlay && (
+          <VideoHoverControls
+            videoRef={videoRef}
+            initialMuted={wantMuted}
+            onUserPause={() => setUserStarted(false)}
+          />
+        )}
+
         {/* Brand accent duotone — subtle multiply so division tokens actually
              tint the photo instead of only floating over it. */}
         <div
@@ -5206,7 +5353,7 @@ function MediaTile({
   // Slightly less crush than before (0.85 → 0.92) so imagery keeps depth.
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl ${className ?? ""}`}
+      className={`group relative overflow-hidden rounded-2xl ${className ?? ""}`}
       style={{ background: "#03002C", filter: grayscale }}
     >
       {hasVideo && shouldPlay ? (
@@ -5258,6 +5405,13 @@ function MediaTile({
             hint="Play demo"
           />
         )
+      )}
+      {hasVideo && shouldPlay && (
+        <VideoHoverControls
+          videoRef={videoRef}
+          initialMuted={wantMuted}
+          onUserPause={() => setUserStarted(false)}
+        />
       )}
       {/* Brand accent duotone — tints imagery with the active division's
            accent/primary so a brand switch visibly re-tones tiles. */}
