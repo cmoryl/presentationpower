@@ -2001,8 +2001,7 @@ function readFill(
     }
     if (t === "a:blipFill") {
       const blip = pFind(k, "a:blip");
-      const rawEmbed = blip ? pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"] : undefined;
-      const embed = rawEmbed ? (embedIdMap?.[rawEmbed] ?? rawEmbed) : undefined;
+      const embed = readPreferredBlipEmbedId(blip, embedIdMap);
       if (embed) {
         void imageEmbedIds;
         const srcRect = readSrcRect(k);
@@ -2537,8 +2536,7 @@ function walkSpTree(
       if (group) frame = transformFrame(frame, group);
       const blipFill = pFind(node, "p:blipFill");
       const blip = blipFill ? pFind(blipFill, "a:blip") : undefined;
-      const rawEmbedId = blip ? (pAttrs(blip)["@_r:embed"] ?? pAttrs(blip)["@_embed"]) : undefined;
-      const embedId = rawEmbedId ? (embedIdMap?.[rawEmbedId] ?? rawEmbedId) : undefined;
+      const embedId = readPreferredBlipEmbedId(blip, embedIdMap);
       const srcRect = readSrcRect(blipFill);
       const tile = blipFill ? !!pFind(blipFill, "a:tile") : undefined;
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
