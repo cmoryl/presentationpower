@@ -33,10 +33,11 @@ import { useSlideMode, useSlideAccent, useSlideInk } from "./SlideChrome";
 
 export type SlideRegister = "corporate" | "product" | "editorial";
 
-// The editorial serif stack — kept system-friendly so it renders offline in
-// PPTX exports and in reduced-JS previews.
+// Editorial display stack — sans-only per brand direction (no serifs anywhere
+// in the deck system). Kept as a named export so downstream callers upgrade
+// automatically without touching every component.
 export const EDITORIAL_SERIF =
-  '"Instrument Serif","Cormorant Garamond","EB Garamond","Palatino","Georgia",serif';
+  '"Geist Variable","Geist","Inter","SF Pro Display",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif';
 export const EDITORIAL_MONO =
   '"JetBrains Mono","Geist Mono","IBM Plex Mono","SFMono-Regular",ui-monospace,monospace';
 

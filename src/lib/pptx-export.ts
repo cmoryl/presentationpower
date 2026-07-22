@@ -816,11 +816,11 @@ function renderQuote(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   const role = str(c.role || c.title);
   s.addText("\u201C", {
     x: 0.8, y: 1.2, w: 1.5, h: 1.5,
-    fontSize: 120, bold: true, color: p.accent, fontFace: "Georgia",
+    fontSize: 120, bold: true, color: p.accent, fontFace: "Inter",
   });
   s.addText(quote || "", {
     x: 1.5, y: 2.2, w: SLIDE_W - 3.0, h: 3.4,
-    fontSize: 28, italic: true, color: p.primary, fontFace: "Georgia", valign: "middle",
+    fontSize: 28, italic: true, color: p.primary, fontFace: "Inter", valign: "middle",
   });
   if (attribution) {
     s.addText(`${attribution}${role ? ` \u00b7 ${role}` : ""}`, {
@@ -1831,11 +1831,11 @@ function renderPullQuoteStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
   // Decorative quote mark
   s.addText("\u201C", {
     x: 0.4, y: 0.2, w: 2.5, h: 2.5,
-    fontSize: 240, bold: true, color: p.accent, fontFace: "Georgia", transparency: 70,
+    fontSize: 240, bold: true, color: p.accent, fontFace: "Inter", transparency: 70,
   } as unknown as PptxGenJS.TextPropsOptions);
   s.addText(str(hero.quote), {
     x: 0.8, y: 1.0, w: SLIDE_W - 1.6, h: 3.4,
-    fontSize: 32, italic: true, color: p.primary, fontFace: "Georgia", valign: "middle",
+    fontSize: 32, italic: true, color: p.primary, fontFace: "Inter", valign: "middle",
   });
   const attrParts = [str(hero.name), str(hero.role), str(hero.org)].filter(Boolean);
   s.addText(attrParts.join(" · ").toUpperCase(), {
@@ -1850,7 +1850,7 @@ function renderPullQuoteStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
     const x = 0.8 + k * (smallW + 0.4);
     s.addText(`"${str(it.quote)}"`, {
       x, y: 5.2, w: smallW, h: 1.2,
-      fontSize: 14, italic: true, color: p.primary, fontFace: "Georgia", valign: "top",
+      fontSize: 14, italic: true, color: p.primary, fontFace: "Inter", valign: "top",
     });
     const parts = [str(it.name), str(it.role), str(it.org)].filter(Boolean);
     s.addText(parts.join(" · ").toUpperCase(), {
@@ -1888,7 +1888,7 @@ function renderDefinition(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
   s.addShape("rect", { x: 0.8, y: 5.9, w: 3.0, h: 0.01, fill: { color: LIGHT_GRAY }, line: { color: LIGHT_GRAY } });
   s.addText(usage, {
     x: 0.8, y: 6.0, w: SLIDE_W - 1.6, h: 0.8,
-    fontSize: 14, italic: true, color: MID_GRAY, fontFace: "Georgia",
+    fontSize: 14, italic: true, color: MID_GRAY, fontFace: "Inter",
   });
 }
 
@@ -3324,8 +3324,8 @@ function renderProofTestimonial(s: PptxGenJS.Slide, c: Record<string, unknown>, 
   const role = str(c.role);
   const metric = str(c.metric);
   // Left: quote
-  s.addText("\u201C", { x: 0.6, y: 0.7, w: 1.5, h: 1.5, fontSize: 140, bold: true, color: p.accent, fontFace: "Georgia" });
-  s.addText(quote, { x: 0.9, y: 2.1, w: 8.2, h: 3.4, fontSize: 26, italic: true, color: p.primary, fontFace: "Georgia", valign: "top" });
+  s.addText("\u201C", { x: 0.6, y: 0.7, w: 1.5, h: 1.5, fontSize: 140, bold: true, color: p.accent, fontFace: "Inter" });
+  s.addText(quote, { x: 0.9, y: 2.1, w: 8.2, h: 3.4, fontSize: 26, italic: true, color: p.primary, fontFace: "Inter", valign: "top" });
   if (attribution) s.addText(`${attribution}${role ? ` · ${role}` : ""}`, { x: 0.9, y: 5.8, w: 8.2, h: 0.5, fontSize: 13, color: p.ink, fontFace: "Inter", charSpacing: 2 });
   // Right: metric card
   if (metric) {
@@ -3477,9 +3477,9 @@ function renderCoverEditorial(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
   const date = str(c.date);
   s.addText("VOLUME 01 · EDITION", { x: 0.8, y: 0.9, w: SLIDE_W - 1.6, h: 0.4, fontSize: 11, bold: true, color: p.accent, fontFace: "Inter", charSpacing: 8 });
   s.addShape("rect", { x: 0.8, y: 1.4, w: SLIDE_W - 1.6, h: 0.02, fill: { color: "FFFFFF" }, line: { color: "FFFFFF" } });
-  s.addText(title, { x: 0.8, y: 1.9, w: SLIDE_W - 1.6, h: 3.8, fontSize: 84, bold: true, color: "FFFFFF", fontFace: "Georgia", valign: "middle" });
+  s.addText(title, { x: 0.8, y: 1.9, w: SLIDE_W - 1.6, h: 3.8, fontSize: 84, bold: true, color: "FFFFFF", fontFace: "Inter", valign: "middle" });
   s.addShape("rect", { x: 0.8, y: 5.9, w: SLIDE_W - 1.6, h: 0.02, fill: { color: "FFFFFF" }, line: { color: "FFFFFF" } });
-  if (subtitle) s.addText(subtitle, { x: 0.8, y: 6.05, w: SLIDE_W - 3, h: 0.5, fontSize: 16, italic: true, color: "FFFFFF", fontFace: "Georgia" });
+  if (subtitle) s.addText(subtitle, { x: 0.8, y: 6.05, w: SLIDE_W - 3, h: 0.5, fontSize: 16, italic: true, color: "FFFFFF", fontFace: "Inter" });
   if (date) s.addText(date.toUpperCase(), { x: SLIDE_W - 3.2, y: 6.05, w: 2.4, h: 0.5, fontSize: 11, color: p.accent, fontFace: "Inter", align: "right", charSpacing: 4 });
 }
 
@@ -3535,7 +3535,7 @@ function renderCoverMonogram(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
   const title = str(c.title) || "Untitled";
   const subtitle = str(c.subtitle || c.kicker);
   const mono = str(c.monogram || title).trim().charAt(0).toUpperCase() || "T";
-  s.addText(mono, { x: -0.5, y: -0.8, w: 10, h: 9, fontSize: 560, bold: true, color: p.accent, fontFace: "Georgia", valign: "middle" });
+  s.addText(mono, { x: -0.5, y: -0.8, w: 10, h: 9, fontSize: 560, bold: true, color: p.accent, fontFace: "Inter", valign: "middle" });
   s.addText(title, { x: 0.8, y: 4.6, w: SLIDE_W - 1.6, h: 1.6, fontSize: 46, bold: true, color: "FFFFFF", fontFace: "Inter" });
   if (subtitle) s.addText(subtitle, { x: 0.8, y: 6.1, w: SLIDE_W - 1.6, h: 0.6, fontSize: 16, color: "FFFFFF", fontFace: "Inter" });
 }
@@ -3724,12 +3724,12 @@ function renderCloseMetricPromise(s: PptxGenJS.Slide, c: Record<string, unknown>
   s.addText(`${metric}${unit}`, { x: 0.8, y: 1.9, w: SLIDE_W - 1.6, h: 2.8, fontSize: 180, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
   if (label) s.addText(label, { x: 0.8, y: 4.8, w: SLIDE_W - 1.6, h: 0.5, fontSize: 14, color: p.ink, fontFace: "Inter", align: "center", charSpacing: 3 });
   s.addShape("rect", { x: (SLIDE_W - 1.2) / 2, y: 5.5, w: 1.2, h: 0.04, fill: { color: p.accent }, line: { color: p.accent } });
-  if (promise) s.addText(promise, { x: 1.6, y: 5.8, w: SLIDE_W - 3.2, h: 1.2, fontSize: 20, italic: true, color: p.primary, fontFace: "Georgia", align: "center" });
+  if (promise) s.addText(promise, { x: 1.6, y: 5.8, w: SLIDE_W - 3.2, h: 1.2, fontSize: 20, italic: true, color: p.primary, fontFace: "Inter", align: "center" });
 }
 
 // MV-CLOSE-QNA — big Q&A treatment
 function renderCloseQna(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
-  s.addText("Q&A", { x: 0.8, y: 1.4, w: SLIDE_W - 1.6, h: 2.6, fontSize: 220, bold: true, color: p.primary, fontFace: "Georgia", align: "center", valign: "middle" });
+  s.addText("Q&A", { x: 0.8, y: 1.4, w: SLIDE_W - 1.6, h: 2.6, fontSize: 220, bold: true, color: p.primary, fontFace: "Inter", align: "center", valign: "middle" });
   s.addShape("rect", { x: (SLIDE_W - 1.5) / 2, y: 4.4, w: 1.5, h: 0.05, fill: { color: p.accent }, line: { color: p.accent } });
   const prompt = str(c.title || c.headline || c.body) || "Questions?";
   s.addText(prompt, { x: 1.4, y: 4.8, w: SLIDE_W - 2.8, h: 1.4, fontSize: 26, color: p.ink, fontFace: "Inter", align: "center", italic: true });
@@ -3820,8 +3820,8 @@ function renderQuotePortrait(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
   if (role) s.addText(role, { x: px + 0.2, y: py + 3.6, w: pw - 0.4, h: 0.4, fontSize: 12, color: p.accent, fontFace: "Inter", align: "center" });
   if (org) s.addText(org.toUpperCase(), { x: px + 0.2, y: py + 4.1, w: pw - 0.4, h: 0.4, fontSize: 10, color: "FFFFFF", fontFace: "Inter", align: "center", charSpacing: 4 });
   // quote left
-  s.addText("\u201C", { x: 0.6, y: 0.8, w: 1.5, h: 1.6, fontSize: 140, bold: true, color: p.accent, fontFace: "Georgia" });
-  s.addText(quote, { x: 0.9, y: 2.2, w: SLIDE_W - 5.0, h: 4.4, fontSize: 24, italic: true, color: p.primary, fontFace: "Georgia", valign: "top" });
+  s.addText("\u201C", { x: 0.6, y: 0.8, w: 1.5, h: 1.6, fontSize: 140, bold: true, color: p.accent, fontFace: "Inter" });
+  s.addText(quote, { x: 0.9, y: 2.2, w: SLIDE_W - 5.0, h: 4.4, fontSize: 24, italic: true, color: p.primary, fontFace: "Inter", valign: "top" });
 }
 
 // MV-QUOTE-POSTER — poster-style caps quote
@@ -3844,8 +3844,8 @@ function renderQuoteMetric(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
   const unit = str(c.unit);
   const label = str(c.label);
   // quote left
-  s.addText("\u201C", { x: 0.6, y: 0.9, w: 1.2, h: 1.4, fontSize: 120, bold: true, color: p.accent, fontFace: "Georgia" });
-  s.addText(quote, { x: 0.9, y: 2.1, w: 7.5, h: 3.6, fontSize: 24, italic: true, color: p.primary, fontFace: "Georgia", valign: "top" });
+  s.addText("\u201C", { x: 0.6, y: 0.9, w: 1.2, h: 1.4, fontSize: 120, bold: true, color: p.accent, fontFace: "Inter" });
+  s.addText(quote, { x: 0.9, y: 2.1, w: 7.5, h: 3.6, fontSize: 24, italic: true, color: p.primary, fontFace: "Inter", valign: "top" });
   if (author) s.addText(`${author}${role ? " · " + role : ""}`, { x: 0.9, y: 5.9, w: 7.5, h: 0.5, fontSize: 13, color: p.ink, fontFace: "Inter", charSpacing: 2 });
   // metric right card
   const rx = 8.9, rw = SLIDE_W - rx - 0.6;
@@ -3867,8 +3867,8 @@ function renderQuoteMulti(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     const y = y0 + k * (rowH + gap);
     const isPrimary = k === 0;
     s.addShape("rect", { x: 0.6, y, w: SLIDE_W - 1.2, h: rowH, fill: { color: isPrimary ? p.primary : p.surface }, line: { color: isPrimary ? p.primary : LIGHT_GRAY } });
-    s.addText("\u201C", { x: 0.8, y: y + 0.1, w: 1.0, h: 1.0, fontSize: 72, bold: true, color: p.accent, fontFace: "Georgia" });
-    s.addText(str(it.quote || it.body), { x: 1.9, y: y + 0.25, w: SLIDE_W - 4.0, h: rowH - 0.9, fontSize: 18, italic: true, color: isPrimary ? "FFFFFF" : p.primary, fontFace: "Georgia", valign: "middle" });
+    s.addText("\u201C", { x: 0.8, y: y + 0.1, w: 1.0, h: 1.0, fontSize: 72, bold: true, color: p.accent, fontFace: "Inter" });
+    s.addText(str(it.quote || it.body), { x: 1.9, y: y + 0.25, w: SLIDE_W - 4.0, h: rowH - 0.9, fontSize: 18, italic: true, color: isPrimary ? "FFFFFF" : p.primary, fontFace: "Inter", valign: "middle" });
     const attribution = `${str(it.attribution || it.author)}${it.role ? " · " + str(it.role) : ""}`;
     s.addText(attribution, { x: 1.9, y: y + rowH - 0.55, w: SLIDE_W - 4.0, h: 0.4, fontSize: 11, color: isPrimary ? p.accent : p.ink, fontFace: "Inter", charSpacing: 3 });
     // right rail
