@@ -391,20 +391,33 @@ function renderVariantBody({
       const _titleSize = _titleLen > 60 ? "title" : _titleLen > 30 ? "section" : "cover";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} videoAutoplay={c.videoAutoplay as boolean | undefined} videoLoop={c.videoLoop as boolean | undefined} videoMuted={c.videoMuted as boolean | undefined} videoControls={c.videoControls as boolean | undefined} className="absolute inset-0 h-full w-full rounded-none" />
-          <HeroScrim brand={brand} anchor="bottom" />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} videoAutoplay={c.videoAutoplay as boolean | undefined} videoLoop={c.videoLoop as boolean | undefined} videoMuted={c.videoMuted as boolean | undefined} videoControls={c.videoControls as boolean | undefined} className="absolute inset-0 h-full w-full rounded-none tp-kenburns" />
+          {/* Duotone-style color wash tinted to the brand accent, plus grain */}
+          <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: brand.tokens.accent, mixBlendMode: "color", opacity: 0.28 }} />
+          <GrainOverlay opacity={0.09} />
+          <CinematicScrim anchor="bottom" strength={0.9} tint="#050418" vignette={0.28} />
           <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
-            <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
-            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-6" />
-            <DisplayTitle size={_titleSize} color="#ffffff" maxWidthPx={1520} className="mt-6">
-              {s(c.title)}
-            </DisplayTitle>
+            <div className="flex items-center gap-4 tp-rise">
+              <span className="inline-block h-2 w-2 rounded-full" style={{ background: brand.tokens.accent, boxShadow: `0 0 24px ${brand.tokens.accent}` }} />
+              <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
+            </div>
+            <div className="mt-6 flex items-end gap-6 tp-rise tp-rise-delay-1">
+              <StatRail color={brand.tokens.accent} height={180} className="mb-4" />
+              <EditorialTitle
+                text={s(c.title)}
+                emphasize={s(c.titleEmphasis) || lastWord(s(c.title))}
+                color="#ffffff"
+                accentColor={brand.tokens.accent}
+                size={_titleSize === "cover" ? 128 : _titleSize === "section" ? 96 : 72}
+                maxWidthPx={1420}
+              />
+            </div>
             {s(c.subtitle) && (
-              <SupportingText size="lg" opacity={0.88} maxWidthPx={1180} className="mt-6 line-clamp-2">
+              <SupportingText size="lg" opacity={0.88} maxWidthPx={1180} className="mt-6 line-clamp-2 tp-rise tp-rise-delay-2">
                 {s(c.subtitle)}
               </SupportingText>
             )}
-            <MetaRow className="mt-10">
+            <MetaRow className="mt-10 tp-rise tp-rise-delay-3">
               {s(c.date) && <span>{s(c.date)}</span>}
             </MetaRow>
           </div>
@@ -417,17 +430,24 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div className="flex h-full flex-col justify-center">
-            <Hairline color={brand.tokens.accent} widthPx={120} thicknessPx={2} />
-            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1520} className="mt-12">
-              {s(c.title)}
-            </DisplayTitle>
+            <StatRail color={brand.tokens.accent} height={120} className="tp-rise" />
+            <div className="mt-12 tp-rise tp-rise-delay-1">
+              <EditorialTitle
+                text={s(c.title)}
+                emphasize={s(c.titleEmphasis) || lastWord(s(c.title))}
+                color="#ffffff"
+                accentColor={brand.tokens.accent}
+                size={132}
+                maxWidthPx={1520}
+              />
+            </div>
             {s(c.subtitle) && (
-              <SupportingText size="xl" opacity={0.72} maxWidthPx={1080} className="mt-8">
+              <SupportingText size="xl" opacity={0.72} maxWidthPx={1080} className="mt-8 tp-rise tp-rise-delay-2">
                 {s(c.subtitle)}
               </SupportingText>
             )}
             {s(c.date) && (
-              <MetaRow className="mt-16">
+              <MetaRow className="mt-16 tp-rise tp-rise-delay-3">
                 <span>{s(c.date)}</span>
               </MetaRow>
             )}
@@ -439,14 +459,22 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="divider">
           <div className="flex h-full flex-col justify-center">
-            <Kicker brand={brand}>{s(c.kicker, "Section")}</Kicker>
-            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-8" />
-            <DisplayTitle size="divider" color="#ffffff" maxWidthPx={1600} className="mt-10">
-              {s(c.title)}
-            </DisplayTitle>
+            <div className="tp-rise"><Kicker brand={brand}>{s(c.kicker, "Section")}</Kicker></div>
+            <div className="mt-8 tp-rise tp-rise-delay-1"><StatRail color={brand.tokens.accent} height={96} /></div>
+            <div className="mt-10 tp-rise tp-rise-delay-2">
+              <EditorialTitle
+                text={s(c.title)}
+                emphasize={s(c.titleEmphasis) || lastWord(s(c.title))}
+                color="#ffffff"
+                accentColor={brand.tokens.accent}
+                size={116}
+                maxWidthPx={1600}
+              />
+            </div>
           </div>
         </SlideFrame>
       );
+
 
     case "MV-OP-DIVIDER-NUMBERED":
       return (
