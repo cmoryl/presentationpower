@@ -163,11 +163,18 @@ export function CopilotPanel({ deckId, onHighlight }: { deckId: string; onHighli
     }
   }
 
-  const suggestions = [
-    "Make slide 1 more executive",
-    "Tighten every headline",
-    "Swap the icon on slide 2 for something about speed",
-  ];
+  const suggestions = mode === "guide"
+    ? [
+        "How do I import my existing PowerPoint deck?",
+        "Walk me through fixing the opening slide for a CFO audience",
+        "How do I export this back to .pptx without losing formatting?",
+        "What should I fix in PowerPoint after export?",
+      ]
+    : [
+        "Make slide 1 more executive",
+        "Tighten every headline",
+        "Swap the icon on slide 2 for something about speed",
+      ];
 
   if (!open) {
     return (
