@@ -4742,6 +4742,223 @@ function renderVariantBody({
 }
 
 // ────────────────────────────────────────────────────────────────────────────
+// Locations family — MV-LOC-* renderer
+// ────────────────────────────────────────────────────────────────────────────
+import {
+  WorldMap as LocWorldMap,
+  getDivisionLocationSet as locGetDivisionSet,
+  regionCounts as locRegionCounts,
+  REGION_LABELS as LOC_REGION_LABELS,
+  type LocationPin as LocPin,
+  type RegionKey as LocRegionKey,
+} from "@/lib/location-maps";
+
+function coercePin(raw: Record<string, unknown>, i: number): LocPin | null {
+  const lat = Number(raw.lat);
+  const lon = Number(raw.lon);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  const region = (raw.region as string)?.toUpperCase();
+  const validRegion = ["AMER", "EMEA", "APAC", "LATAM", "MEA"].includes(region)
+    ? (region as LocPin["region"])
+    : lon < -30
+      ? (lat > 15 ? "AMER" : "LATAM")
+      : lon < 60
+        ? (lat < 12 ? "MEA" : "EMEA")
+        : "APAC";
+  const role = (raw.role as string) as LocPin["role"] | undefined;
+  return {
+    id: String(raw.id ?? `pin-${i}`),
+    city: String(raw.city ?? "Location"),
+    country: (raw.country as string) || undefined,
+    region: validRegion,
+    lat,
+    lon,
+    role: role || "office",
+    label: (raw.label as string) || undefined,
+  };
+}
+
+function renderLocationsVariant(
+  variantId: string,
+  brand: { id: string; tokens: { accent: string; primary: string } } & Record<string, unknown>,
+  mode: SlideMode,
+  ink: ReturnType<typeof makeSlideInk>,
+  c: Record<string, unknown>,
+  pageNumber?: number,
+): JSX.Element {
+  const seeded = locGetDivisionSet(brand.id);
+  const rawItems = Array.isArray(c.items) ? (c.items as Record<string, unknown>[]) : [];
+  const pins: LocPin[] = rawItems.length > 0
+    ? rawItems.map(coercePin).filter((x): x is LocPin => !!x)
+    : seeded.pins;
+
+  const title = (c.title as string) || seeded.headline;
+  const subtitle = (c.subtitle as string) || seeded.subhead || "";
+  const narrative = (c.narrative as string) || "";
+  const region = ((c.region as string) || "world") as LocRegionKey;
+  const accent = brand.tokens.accent;
+  const primary = brand.tokens.primary;
+  const isDark = mode === "dark";
+  const counts = locRegionCounts(pins);
+  const totalCities = pins.length;
+  const totalRegions = (Object.keys(counts) as LocPin["region"][]).filter((k) => counts[k] > 0).length;
+
+  const RegionStrip = () => (
+    <div className="mt-6 grid grid-cols-5 gap-3">
+      {(Object.keys(LOC_REGION_LABELS) as LocPin["region"][]).map((k) => {
+        const n = counts[k] ?? 0;
+        const active = n > 0;
+        return (
+          <div
+            key={k}
+            className="rounded-2xl px-4 py-3 backdrop-blur-md"
+            style={{
+              background: isDark ? "rgba(255,255,255,0.04)" : "rgba(3,0,44,0.03)",
+              border: `1px solid ${active ? accent + "55" : ink.hairline}`,
+              opacity: active ? 1 : 0.5,
+            }}
+          >
+            <div style={{ color: accent, fontSize: 11, letterSpacing: "0.24em", fontWeight: 600, textTransform: "uppercase" }}>{k}</div>
+            <div className="mt-1 flex items-baseline gap-2">
+              <div style={{ color: ink.strong, fontSize: 34, fontWeight: 600, letterSpacing: "-0.02em" }}>{n}</div>
+              <div style={{ color: ink.muted, fontSize: 13 }}>{LOC_REGION_LABELS[k]}</div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  // Shared header block
+  const Header = () => (
+    <div>
+      <Kicker brand={brand as never}>{`${totalCities} cities · ${totalRegions} regions`}</Kicker>
+      <div className="mt-3" style={{ color: ink.strong, fontSize: 60, fontWeight: 600, lineHeight: 1.05, letterSpacing: "-0.03em", maxWidth: 1400 }}>
+        {title}
+      </div>
+      {subtitle && (
+        <div className="mt-4" style={{ color: ink.muted, fontSize: 22, lineHeight: 1.35, maxWidth: 1200 }}>
+          {subtitle}
+        </div>
+      )}
+    </div>
+  );
+
+  if (variantId === "MV-LOC-WORLD-PINS") {
+    return (
+      <SlideFrame brand={brand as never} pageNumber={pageNumber} variant="standard">
+        <AuroraOrb color={accent} intensity={0.5} placement="top-right" />
+        <div className="relative flex h-full flex-col px-2 pt-2">
+          <Header />
+          <div className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
+            <LocWorldMap pins={pins} region="world" mode={mode} accent={accent} primary={primary} showLabels ariaLabel={`${title} — world map`} />
+          </div>
+          <RegionStrip />
+        </div>
+      </SlideFrame>
+    );
+  }
+
+  if (variantId === "MV-LOC-WORLD-STATS") {
+    return (
+      <SlideFrame brand={brand as never} pageNumber={pageNumber} variant="standard">
+        <AuroraOrb color={accent} intensity={0.45} placement="bottom-left" />
+        <div className="relative flex h-full gap-10">
+          <div className="flex flex-1 flex-col">
+            <Header />
+            <div className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
+              <LocWorldMap pins={pins} region="world" mode={mode} accent={accent} primary={primary} showLabels={false} ariaLabel={`${title} — world map`} />
+            </div>
+          </div>
+          <div className="flex w-[520px] flex-col justify-end">
+            <div className="rounded-3xl p-8 backdrop-blur-md" style={{ background: isDark ? "rgba(255,255,255,0.05)" : "rgba(3,0,44,0.035)", border: `1px solid ${ink.hairline}` }}>
+              <div style={{ color: accent, fontSize: 11, letterSpacing: "0.28em", fontWeight: 600, textTransform: "uppercase" }}>Global footprint</div>
+              <div className="mt-4 grid grid-cols-2 gap-y-6">
+                <div>
+                  <div style={{ color: ink.strong, fontSize: 56, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1 }}>{totalCities}</div>
+                  <div style={{ color: ink.muted, fontSize: 13, marginTop: 6 }}>Cities</div>
+                </div>
+                <div>
+                  <div style={{ color: ink.strong, fontSize: 56, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1 }}>{totalRegions}</div>
+                  <div style={{ color: ink.muted, fontSize: 13, marginTop: 6 }}>Regions</div>
+                </div>
+                {(Object.keys(LOC_REGION_LABELS) as LocPin["region"][])
+                  .filter((k) => counts[k] > 0)
+                  .map((k) => (
+                    <div key={k}>
+                      <div style={{ color: ink.strong, fontSize: 32, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1 }}>{counts[k]}</div>
+                      <div style={{ color: ink.muted, fontSize: 12, marginTop: 4, textTransform: "uppercase", letterSpacing: "0.18em" }}>{LOC_REGION_LABELS[k]}</div>
+                    </div>
+                  ))}
+              </div>
+              {narrative && (
+                <div className="mt-6 border-t pt-4" style={{ borderColor: ink.hairline, color: ink.body, fontSize: 15, lineHeight: 1.45 }}>
+                  {narrative}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </SlideFrame>
+    );
+  }
+
+  if (variantId === "MV-LOC-REGION-FOCUS") {
+    const regionCount = pins.filter((p) => region === "world" || p.region === region || (region === "MEA" && p.region === "MEA")).length;
+    return (
+      <SlideFrame brand={brand as never} pageNumber={pageNumber} variant="standard">
+        <AuroraOrb color={accent} intensity={0.5} placement="top-left" />
+        <div className="relative flex h-full flex-col">
+          <div className="flex items-start justify-between gap-8">
+            <Header />
+            <div className="rounded-full px-5 py-2 backdrop-blur-md" style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.06)", border: `1px solid ${accent}66`, color: ink.strong, fontSize: 14, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+              {region === "world" ? "Worldwide" : LOC_REGION_LABELS[region as LocPin["region"]]} · {regionCount}
+            </div>
+          </div>
+          <div className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
+            <LocWorldMap pins={pins} region={region} mode={mode} accent={accent} primary={primary} showLabels ariaLabel={`${title} — ${region === "world" ? "world" : LOC_REGION_LABELS[region as LocPin["region"]]} map`} />
+          </div>
+          {narrative && (
+            <div className="mt-6" style={{ color: ink.body, fontSize: 18, lineHeight: 1.45, maxWidth: 1400 }}>
+              {narrative}
+            </div>
+          )}
+        </div>
+      </SlideFrame>
+    );
+  }
+
+  // MV-LOC-HUB-SPOKE
+  return (
+    <SlideFrame brand={brand as never} pageNumber={pageNumber} variant="standard">
+      <AuroraOrb color={accent} intensity={0.55} placement="center-right" />
+      <div className="relative flex h-full flex-col">
+        <Header />
+        <div className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
+          <LocWorldMap pins={pins} region="world" mode={mode} accent={accent} primary={primary} showLabels showSpokes ariaLabel={`${title} — hub and spoke network map`} />
+        </div>
+        <div className="mt-5 flex items-center gap-6" style={{ color: ink.muted, fontSize: 14 }}>
+          <span className="inline-flex items-center gap-2">
+            <span style={{ display: "inline-block", width: 12, height: 12, borderRadius: 999, background: accent, boxShadow: `0 0 12px ${accent}` }} />
+            HQ / hub
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: 999, background: accent, opacity: 0.75 }} />
+            Delivery office
+          </span>
+          <span className="inline-flex items-center gap-2">
+            <span style={{ display: "inline-block", width: 22, height: 2, background: accent, opacity: 0.6, borderRadius: 2 }} />
+            Follow-the-sun route
+          </span>
+        </div>
+      </div>
+    </SlideFrame>
+  );
+}
+
+
+
+// ────────────────────────────────────────────────────────────────────────────
 // HeroScrim — the single overlay stack that sits on top of a full-bleed
 // MediaTile for hero-scale variants (covers, full-bleed, quote-bg). MediaTile
 // already applies photo exposure, brand duotone, and grain, so this layer's
