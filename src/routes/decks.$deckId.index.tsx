@@ -464,12 +464,15 @@ function DeckEditor() {
                   items={(active.content as Record<string, unknown>).items}
                   metrics={(active.content as Record<string, unknown>).metrics}
                   activeMetricId={(active.content as Record<string, unknown>).activeMetricId}
-                  onChange={(patch: { items?: unknown; metrics?: unknown; activeMetricId?: unknown }) => {
+                  regionFilter={(active.content as Record<string, unknown>).regionFilter}
+                  onChange={(patch: { items?: unknown; metrics?: unknown; activeMetricId?: unknown; regionFilter?: unknown }) => {
                     if (patch.items !== undefined) updateField(deck.id, active.id, "items", patch.items);
                     if (patch.metrics !== undefined) updateField(deck.id, active.id, "metrics", patch.metrics);
                     if (patch.activeMetricId !== undefined) updateField(deck.id, active.id, "activeMetricId", patch.activeMetricId);
+                    if (patch.regionFilter !== undefined) updateField(deck.id, active.id, "regionFilter", patch.regionFilter);
                   }}
                 />
+
               )}
             </div>
           )}
