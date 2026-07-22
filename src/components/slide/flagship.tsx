@@ -575,49 +575,10 @@ export function AuroraLayer({
   );
 }
 
-function auroraOrbs(seed: string, brand: BrandMode, mode: "dark" | "light" = "dark") {
-  // Deterministic hash → three offset orbs painted purely from the brand's
-  // own tokens. No fixed magenta/cyan fallback — corporate stays blue, Life
-  // Sciences stays teal, Legal stays gold, etc. The third orb is a shifted
-  // sibling of the accent so each division reads distinctly.
-  let h = 2166136261;
-  for (let i = 0; i < seed.length; i++) {
-    h ^= seed.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  const rand = () => {
-    h ^= h << 13; h ^= h >>> 17; h ^= h << 5;
-    return ((h >>> 0) % 10000) / 10000;
-  };
-  const sibling = shiftHue(brand.tokens.accent, 28, 0.06);
-  // Dark-mode first orb: Corporate uses its blue primary directly (reads well
-  // against the navy field). Every other division's primary is a deep navy
-  // that disappears against #03002C, so we substitute a lightened accent
-  // variant — the aurora then reads as accent + sibling, both clearly on-brand.
-  const isCorporate = brand.tokens.primary.toLowerCase() === "#003fc7";
-  const darkFirst = isCorporate
-    ? brand.tokens.primary
-    : shiftHue(brand.tokens.accent, -14, 0.04);
-  // Light-mode first orb: mix the accent toward the brand's own surface so it
-  // stays in the accent's hue family (Enterprise stays blue, Life Sci stays
-  // green) instead of hue-shifting into purple/yellow.
-  const lightPrimary = mixHex(brand.tokens.accent, brand.tokens.surface, 0.45);
-  const palette = mode === "dark"
-    ? [darkFirst, brand.tokens.accent, sibling]
-    : [lightPrimary, brand.tokens.accent, sibling];
-  // Light mode alphas are gentler so the pastel wash never overpowers charts,
-  // glass tiles or body copy — dark mode keeps the full-strength orbs.
-  const alphaBase = 0.75;
-  const alphaRange = mode === "dark" ? 0.22 : 0.18;
-  return Array.from({ length: 3 }).map((_, i) => ({
-    color: palette[i] ?? brand.tokens.accent,
-    x: 120 + rand() * 1040,
-    y: 60 + rand() * 600,
-    rx: (mode === "dark" ? 520 : 620) + rand() * (mode === "dark" ? 340 : 420),
-    ry: (mode === "dark" ? 440 : 540) + rand() * (mode === "dark" ? 280 : 360),
-    alpha: alphaBase + rand() * alphaRange,
-  }));
-}
+// auroraOrbs is now defined in src/lib/aurora-svg.ts as the single source of
+// truth shared by the on-screen renderer and the PPTX/PDF exporter. The
+// parity test in src/lib/__tests__/aurora-parity.test.ts locks them together.
+
 
 // Linearly blend two hex colors. t=0 returns a, t=1 returns b.
 function mixHex(a: string, b: string, t: number): string {

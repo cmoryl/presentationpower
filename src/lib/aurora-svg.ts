@@ -67,7 +67,7 @@ export function auroraSvgDataUrl(
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
-function auroraOrbs(
+export function auroraOrbs(
   seed: string,
   brand: BrandMode,
   mode: "dark" | "light" = "dark",
@@ -108,6 +108,17 @@ function auroraOrbs(
     alpha: alphaBase + rand() * alphaRange,
   }));
 }
+
+/** Canonical surface tint used behind AuroraLayer for a given mode. */
+export function auroraBaseTint(brand: BrandMode, mode: "dark" | "light"): string {
+  return mode === "dark" ? "#03002C" : brand.tokens.surface ?? "#FFFFFF";
+}
+
+/** Layer opacity applied to the orb <g> in both renderer and exporter. */
+export function auroraLayerOpacity(mode: "dark" | "light", intensity = 1): number {
+  return intensity * (mode === "dark" ? 0.7 : 0.85);
+}
+
 
 
 function mixHex(a: string, b: string, t: number): string {
