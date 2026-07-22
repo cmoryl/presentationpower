@@ -4384,7 +4384,7 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-8"><StackedBarChart brand={brand} segments={segments} columns={columns} unit={s(c.unit)} height={520} /></div>
+          <div className="mt-14"><StackedBarChart brand={brand} segments={segments} columns={columns} unit={s(c.unit)} height={520} /></div>
         </SlideFrame>
       );
     }
