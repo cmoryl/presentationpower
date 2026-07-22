@@ -464,7 +464,7 @@ function DeckEditor() {
                   items={(active.content as Record<string, unknown>).items}
                   metrics={(active.content as Record<string, unknown>).metrics}
                   activeMetricId={(active.content as Record<string, unknown>).activeMetricId}
-                  onChange={(patch) => {
+                  onChange={(patch: { items?: unknown; metrics?: unknown; activeMetricId?: unknown }) => {
                     if (patch.items !== undefined) updateField(deck.id, active.id, "items", patch.items);
                     if (patch.metrics !== undefined) updateField(deck.id, active.id, "metrics", patch.metrics);
                     if (patch.activeMetricId !== undefined) updateField(deck.id, active.id, "activeMetricId", patch.activeMetricId);
