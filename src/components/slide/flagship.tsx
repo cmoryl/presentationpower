@@ -528,14 +528,20 @@ export function AuroraLayer({
       >
         <defs>
           {orbs.map((o, i) => (
-            <radialGradient key={i} id={`tp-aurora-${seed}-${i}`} cx="50%" cy="50%" r="50%">
+            <radialGradient
+              key={i}
+              id={`tp-aurora-${seed}-${i}`}
+              cx="50%"
+              cy="50%"
+              r={mode === "dark" ? "50%" : "75%"}
+            >
               <stop offset="0%" stopColor={o.color} stopOpacity={o.alpha} />
-              <stop offset="55%" stopColor={o.color} stopOpacity={o.alpha * 0.45} />
+              <stop offset={mode === "dark" ? "55%" : "42%"} stopColor={o.color} stopOpacity={mode === "dark" ? o.alpha * 0.45 : o.alpha * 0.32} />
               <stop offset="100%" stopColor={o.color} stopOpacity="0" />
             </radialGradient>
           ))}
           <filter id={`tp-aurora-${seed}-blur`} x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="60" />
+            <feGaussianBlur stdDeviation={mode === "dark" ? 60 : 85} />
           </filter>
         </defs>
         <g filter={`url(#tp-aurora-${seed}-blur)`}>
