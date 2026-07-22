@@ -1590,6 +1590,20 @@ function pDeepFind(nodes: PNode[] | PNode, name: string): PNode | undefined {
   }
   return undefined;
 }
+function pDeepFindAll(nodes: PNode[] | PNode, predicate: string | ((tag: string | undefined, node: PNode) => boolean)): PNode[] {
+  const arr = Array.isArray(nodes) ? nodes : [nodes];
+  const out: PNode[] = [];
+  const matches = typeof predicate === "string"
+    ? (tag: string | undefined) => tag === predicate
+    : predicate;
+  const visit = (n: PNode) => {
+    const tag = pTag(n);
+    if (matches(tag, n)) out.push(n);
+    for (const child of pChildren(n)) visit(child);
+  };
+  for (const n of arr) visit(n);
+  return out;
+}
 function pText(n: PNode): string {
   const arr = pChildren(n);
   let out = "";
@@ -1598,6 +1612,30 @@ function pText(n: PNode): string {
     else out += pText(c);
   }
   return out;
+}
+
+function readBlipEmbedIds(blip: PNode | undefined): string[] {
+  if (!blip) return [];
+  const ids: string[] = [];
+  const push = (id: unknown) => {
+    if (typeof id === "string" && id && !ids.includes(id)) ids.push(id);
+  };
+  // PowerPoint stores SVGs as an a:blip fallback (usually PNG/EMF) plus an
+  // asvg:svgBlip extension. Prefer/persist the native SVG id first so previews
+  // retain vector fidelity, while still keeping the fallback id for durability.
+  for (const svg of pDeepFindAll(blip, (tag) => !!tag && /(^|:)svgBlip$/i.test(tag))) {
+    const a = pAttrs(svg);
+    push(a["@_r:embed"] ?? a["@_embed"]);
+  }
+  const a = pAttrs(blip);
+  push(a["@_r:embed"] ?? a["@_embed"]);
+  return ids;
+}
+
+function readPreferredBlipEmbedId(blip: PNode | undefined, embedIdMap?: Record<string, string>): string | undefined {
+  const ids = readBlipEmbedIds(blip);
+  const raw = ids[0];
+  return raw ? (embedIdMap?.[raw] ?? raw) : undefined;
 }
 
 type PptxClrMap = Record<string, string>;
@@ -1661,6 +1699,63 @@ function readFrame(spPr: PNode | undefined): LayoutFrame | undefined {
     rot: rot && !Number.isNaN(rot) ? rot : undefined,
     flipH: a["@_flipH"] === "1" || undefined,
     flipV: a["@_flipV"] === "1" || undefined,
+  };
+}
+
+type GroupTransform = {
+  x: number; y: number; w: number; h: number;
+  chX: number; chY: number; chW: number; chH: number;
+  rot?: number;
+  flipH?: boolean;
+  flipV?: boolean;
+};
+
+function readGroupTransform(grpSpPr: PNode | undefined): GroupTransform | undefined {
+  if (!grpSpPr) return undefined;
+  const xfrm = pFind(grpSpPr, "a:xfrm");
+  if (!xfrm) return undefined;
+  const attrs = pAttrs(xfrm);
+  const off = pFind(xfrm, "a:off");
+  const ext = pFind(xfrm, "a:ext");
+  const chOff = pFind(xfrm, "a:chOff");
+  const chExt = pFind(xfrm, "a:chExt");
+  if (!off || !ext || !chOff || !chExt) return undefined;
+  const oa = pAttrs(off); const ea = pAttrs(ext);
+  const coa = pAttrs(chOff); const cea = pAttrs(chExt);
+  const w = Number(ea["@_cx"] ?? 0) / EMU_PER_INCH;
+  const h = Number(ea["@_cy"] ?? 0) / EMU_PER_INCH;
+  const chW = Number(cea["@_cx"] ?? 0) / EMU_PER_INCH;
+  const chH = Number(cea["@_cy"] ?? 0) / EMU_PER_INCH;
+  if (!(w > 0 && h > 0 && chW > 0 && chH > 0)) return undefined;
+  const rot = attrs["@_rot"] ? Number(attrs["@_rot"]) / 60000 : undefined;
+  return {
+    x: Number(oa["@_x"] ?? 0) / EMU_PER_INCH,
+    y: Number(oa["@_y"] ?? 0) / EMU_PER_INCH,
+    w, h,
+    chX: Number(coa["@_x"] ?? 0) / EMU_PER_INCH,
+    chY: Number(coa["@_y"] ?? 0) / EMU_PER_INCH,
+    chW, chH,
+    rot: rot && !Number.isNaN(rot) ? rot : undefined,
+    flipH: attrs["@_flipH"] === "1" || undefined,
+    flipV: attrs["@_flipV"] === "1" || undefined,
+  };
+}
+
+function composeGroupTransform(parent: GroupTransform | undefined, child: GroupTransform): GroupTransform {
+  if (!parent) return child;
+  const childFrame = transformFrame({ x: child.x, y: child.y, w: child.w, h: child.h, rot: child.rot, flipH: child.flipH, flipV: child.flipV }, parent);
+  return {
+    x: childFrame.x,
+    y: childFrame.y,
+    w: childFrame.w,
+    h: childFrame.h,
+    chX: child.chX,
+    chY: child.chY,
+    chW: child.chW,
+    chH: child.chH,
+    rot: childFrame.rot,
+    flipH: childFrame.flipH,
+    flipV: childFrame.flipV,
   };
 }
 
