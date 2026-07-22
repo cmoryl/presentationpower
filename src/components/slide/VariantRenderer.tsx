@@ -8,6 +8,7 @@ import { createContext, useContext, useEffect, useRef, useState, Fragment } from
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
 import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, StatFigure, QuoteMark, Attribution, SoftDivider } from "./primitives";
+import { EditorialTitle, PullQuote, DuotoneImage, GrainOverlay, CinematicScrim, StatRail, EDITORIAL_SERIF } from "./flagship";
 
 
 // Module-scoped context so helper components (CardGrid, StatGrid, NumberedList,
@@ -211,6 +212,10 @@ const s = (v: unknown, fb = ""): string => (typeof v === "string" ? v : typeof v
 const arr = (v: unknown): Item[] => (Array.isArray(v) ? (v as Item[]) : []);
 const obj = (v: unknown): Record<string, unknown> => (v && typeof v === "object" ? (v as Record<string, unknown>) : {});
 const strs = (v: unknown): string[] => (Array.isArray(v) ? (v as unknown[]).map((x) => s(x)) : []);
+function lastWord(t: string): string {
+  const words = String(t || "").trim().split(/\s+/).filter(Boolean);
+  return words[words.length - 1] ?? "";
+}
 
 // In dark mode, swap the token surfaces + text so any `brand.tokens.*` usage in
 // module bodies renders correctly on a dark slide. Primary becomes a lighter
@@ -346,7 +351,7 @@ function renderVariantBody({
             }}
           />
           <div className="relative flex h-full flex-col justify-end">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 tp-rise">
               <span
                 className="inline-block h-2 w-2 rounded-full"
                 style={{
@@ -356,25 +361,28 @@ function renderVariantBody({
               />
               <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
             </div>
-            <div
-              className="mt-8 h-[2px] w-[140px] rounded-full"
-              style={{
-                backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)`,
-              }}
-            />
-            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1620} className="mt-10">
-              {s(c.title, "Client")}
-            </DisplayTitle>
+            <div className="mt-8 flex items-end gap-8 tp-rise tp-rise-delay-1">
+              <StatRail color={brand.tokens.accent} height={220} className="mb-6" />
+              <EditorialTitle
+                text={s(c.title, "Client")}
+                emphasize={s(c.titleEmphasis) || lastWord(s(c.title, "Client"))}
+                color="#ffffff"
+                accentColor={brand.tokens.accent}
+                size={132}
+                maxWidthPx={1520}
+              />
+            </div>
             {s(c.subtitle) && (
-              <SupportingText size="xl" opacity={0.86} maxWidthPx={1200} className="mt-10">
+              <SupportingText size="xl" opacity={0.86} maxWidthPx={1200} className="mt-10 tp-rise tp-rise-delay-2">
                 {s(c.subtitle)}
               </SupportingText>
             )}
-            <MetaRow className="mt-16">
+            <MetaRow className="mt-16 tp-rise tp-rise-delay-3">
               {s(c.presenter) && <span>{s(c.presenter)}</span>}
               {s(c.date) && <span>{s(c.date)}</span>}
             </MetaRow>
           </div>
+
         </SlideFrame>
       );
 
@@ -383,20 +391,33 @@ function renderVariantBody({
       const _titleSize = _titleLen > 60 ? "title" : _titleLen > 30 ? "section" : "cover";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} videoAutoplay={c.videoAutoplay as boolean | undefined} videoLoop={c.videoLoop as boolean | undefined} videoMuted={c.videoMuted as boolean | undefined} videoControls={c.videoControls as boolean | undefined} className="absolute inset-0 h-full w-full rounded-none" />
-          <HeroScrim brand={brand} anchor="bottom" />
+          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} videoAutoplay={c.videoAutoplay as boolean | undefined} videoLoop={c.videoLoop as boolean | undefined} videoMuted={c.videoMuted as boolean | undefined} videoControls={c.videoControls as boolean | undefined} className="absolute inset-0 h-full w-full rounded-none tp-kenburns" />
+          {/* Duotone-style color wash tinted to the brand accent, plus grain */}
+          <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: brand.tokens.accent, mixBlendMode: "color", opacity: 0.28 }} />
+          <GrainOverlay opacity={0.09} />
+          <CinematicScrim anchor="bottom" strength={0.9} tint="#050418" vignette={0.28} />
           <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
-            <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
-            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-6" />
-            <DisplayTitle size={_titleSize} color="#ffffff" maxWidthPx={1520} className="mt-6">
-              {s(c.title)}
-            </DisplayTitle>
+            <div className="flex items-center gap-4 tp-rise">
+              <span className="inline-block h-2 w-2 rounded-full" style={{ background: brand.tokens.accent, boxShadow: `0 0 24px ${brand.tokens.accent}` }} />
+              <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
+            </div>
+            <div className="mt-6 flex items-end gap-6 tp-rise tp-rise-delay-1">
+              <StatRail color={brand.tokens.accent} height={180} className="mb-4" />
+              <EditorialTitle
+                text={s(c.title)}
+                emphasize={s(c.titleEmphasis) || lastWord(s(c.title))}
+                color="#ffffff"
+                accentColor={brand.tokens.accent}
+                size={_titleSize === "cover" ? 128 : _titleSize === "section" ? 96 : 72}
+                maxWidthPx={1420}
+              />
+            </div>
             {s(c.subtitle) && (
-              <SupportingText size="lg" opacity={0.88} maxWidthPx={1180} className="mt-6 line-clamp-2">
+              <SupportingText size="lg" opacity={0.88} maxWidthPx={1180} className="mt-6 line-clamp-2 tp-rise tp-rise-delay-2">
                 {s(c.subtitle)}
               </SupportingText>
             )}
-            <MetaRow className="mt-10">
+            <MetaRow className="mt-10 tp-rise tp-rise-delay-3">
               {s(c.date) && <span>{s(c.date)}</span>}
             </MetaRow>
           </div>
@@ -409,17 +430,24 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div className="flex h-full flex-col justify-center">
-            <Hairline color={brand.tokens.accent} widthPx={120} thicknessPx={2} />
-            <DisplayTitle size="cover" color="#ffffff" maxWidthPx={1520} className="mt-12">
-              {s(c.title)}
-            </DisplayTitle>
+            <StatRail color={brand.tokens.accent} height={120} className="tp-rise" />
+            <div className="mt-12 tp-rise tp-rise-delay-1">
+              <EditorialTitle
+                text={s(c.title)}
+                emphasize={s(c.titleEmphasis) || lastWord(s(c.title))}
+                color="#ffffff"
+                accentColor={brand.tokens.accent}
+                size={132}
+                maxWidthPx={1520}
+              />
+            </div>
             {s(c.subtitle) && (
-              <SupportingText size="xl" opacity={0.72} maxWidthPx={1080} className="mt-8">
+              <SupportingText size="xl" opacity={0.72} maxWidthPx={1080} className="mt-8 tp-rise tp-rise-delay-2">
                 {s(c.subtitle)}
               </SupportingText>
             )}
             {s(c.date) && (
-              <MetaRow className="mt-16">
+              <MetaRow className="mt-16 tp-rise tp-rise-delay-3">
                 <span>{s(c.date)}</span>
               </MetaRow>
             )}
@@ -431,14 +459,22 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="divider">
           <div className="flex h-full flex-col justify-center">
-            <Kicker brand={brand}>{s(c.kicker, "Section")}</Kicker>
-            <Hairline color={brand.tokens.accent} widthPx={96} thicknessPx={2} className="mt-8" />
-            <DisplayTitle size="divider" color="#ffffff" maxWidthPx={1600} className="mt-10">
-              {s(c.title)}
-            </DisplayTitle>
+            <div className="tp-rise"><Kicker brand={brand}>{s(c.kicker, "Section")}</Kicker></div>
+            <div className="mt-8 tp-rise tp-rise-delay-1"><StatRail color={brand.tokens.accent} height={96} /></div>
+            <div className="mt-10 tp-rise tp-rise-delay-2">
+              <EditorialTitle
+                text={s(c.title)}
+                emphasize={s(c.titleEmphasis) || lastWord(s(c.title))}
+                color="#ffffff"
+                accentColor={brand.tokens.accent}
+                size={116}
+                maxWidthPx={1600}
+              />
+            </div>
           </div>
         </SlideFrame>
       );
+
 
     case "MV-OP-DIVIDER-NUMBERED":
       return (
@@ -776,7 +812,7 @@ function renderVariantBody({
             }}
           />
           <div className="relative flex h-full flex-col justify-center">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 tp-rise">
               <span
                 className="inline-block h-2 w-2 rounded-full"
                 style={{
@@ -786,24 +822,21 @@ function renderVariantBody({
               />
               <Kicker brand={brand}>{s(c.kicker, "The big idea")}</Kicker>
             </div>
-            <div
-              className="mt-8 mb-12 h-[2px] w-[160px] rounded-full"
-              style={{ backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)` }}
-            />
-            <div
-              style={{
-                fontSize: 128,
-                fontWeight: 600,
-                letterSpacing: "-0.035em",
-                lineHeight: 1.02,
-                maxWidth: 1660,
-                color: ink.strong,
-                textShadow: isDark ? `0 2px 40px ${brand.tokens.accent}22` : undefined,
-              }}
-            >
-              {s(c.idea)}
+            <div className="mt-10 flex items-start gap-8 tp-rise tp-rise-delay-1">
+              <StatRail color={brand.tokens.accent} height={220} className="mt-4" />
+              <div className="flex-1">
+                <EditorialTitle
+                  text={s(c.idea)}
+                  emphasize={s(c.ideaEmphasis) || lastWord(s(c.idea))}
+                  color={ink.strong}
+                  accentColor={brand.tokens.accent}
+                  size={124}
+                  maxWidthPx={1580}
+                />
+              </div>
             </div>
           </div>
+
         </SlideFrame>
       );
 
@@ -869,34 +902,30 @@ function renderVariantBody({
                 “
               </div>
               <div className="relative">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 tp-rise">
                   <span
                     className="inline-block h-2 w-2 rounded-full"
                     style={{ background: brand.tokens.accent, boxShadow: `0 0 20px ${brand.tokens.accent}` }}
                   />
                   <Kicker brand={brand}>In their words</Kicker>
                 </div>
-                <div
-                  className="mt-10"
-                  style={{
-                    fontSize: 82,
-                    fontWeight: 500,
-                    lineHeight: 1.12,
-                    letterSpacing: "-0.025em",
-                    maxWidth: 1520,
-                    color: ink.strong,
-                  }}
-                >
-                  {s(c.quote)}
+                <div className="mt-10 tp-rise tp-rise-delay-1">
+                  <PullQuote
+                    quote={s(c.quote)}
+                    brand={brand}
+                    size={78}
+                    color={ink.strong}
+                  />
                 </div>
                 <div
-                  className="mt-14 h-[2px] w-[120px] rounded-full"
+                  className="mt-14 h-[2px] w-[120px] rounded-full tp-rise tp-rise-delay-2"
                   style={{ backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)` }}
                 />
-                <div className="mt-8">
+                <div className="mt-8 tp-rise tp-rise-delay-3">
                   <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} />
                 </div>
               </div>
+
             </div>
           </div>
         </SlideFrame>
