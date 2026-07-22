@@ -60,7 +60,12 @@ export type SlideInk = {
    *  for text overlays on charts (never returns a colour that vanishes into
    *  the background). */
   onSurface: (hex: string) => string;
+  /** Contrast-tuned hex for using the division accent as TEXT — darkens bright
+   *  accents on white, lightens deep accents on navy. Prefer this over
+   *  `brand.tokens.accent` for accent-coloured labels/numbers/kickers. */
+  accentText: string;
 };
+
 
 function hexToRgba(hex: string, alpha: number): string {
   const m = /^#?([a-f\d]{6})$/i.exec(hex);
