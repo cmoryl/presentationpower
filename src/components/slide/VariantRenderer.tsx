@@ -4319,7 +4319,7 @@ function renderVariantBody({
             <Kicker brand={brand}>{s(c.kicker, "Trajectory")}</Kicker>
             <div className="mt-4" style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
           </div>
-          <div className="mt-4">
+          <div className="mt-12">
             <DecadeAreaChart brand={brand} series={series} height={520} calloutLabel={s(callout.year)} calloutNote={s(callout.note)} />
           </div>
         </SlideFrame>
