@@ -2861,7 +2861,7 @@ function renderVariantBody({
             <div className="grid" style={{ gridTemplateColumns: `repeat(${Math.max(arr(c.items).length, 1)}, minmax(0, 1fr))` }}>
               {arr(c.items).map((it, i) => (
                 <div key={i} className="pr-8">
-                  <div className="mb-8 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold text-white" style={{ backgroundColor: brand.tokens.accent, transform: "translateY(4px)" }}>
+                  <div className="mb-8 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold" style={{ backgroundColor: brand.tokens.accent, color: ink.onSurface(brand.tokens.accent), transform: "translateY(4px)" }}>
                     {i + 1}
                   </div>
                   <div className="text-3xl font-semibold" style={{ color: ink.strong }}>{s(it.label)}</div>
@@ -3027,7 +3027,7 @@ function renderVariantBody({
               value={s(c.metric)}
               unit={s(c.unit)}
               size="monumental"
-              valueColor="#ffffff"
+              valueColor={ink.strong}
             />
             <div className="mt-14 max-w-[1500px]">
               <DisplayTitle size="section" color={ink.strong}>
