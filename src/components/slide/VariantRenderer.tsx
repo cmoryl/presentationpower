@@ -759,7 +759,7 @@ function renderVariantBody({
                         style={{
                           fontSize: 20,
                           lineHeight: 1.45,
-                          color: ink.body,
+                          color: ink.muted,
                           maxWidth: 420,
                         }}
                       >
@@ -3735,7 +3735,7 @@ function renderVariantBody({
                     {s(it.unit) && <span style={{ fontSize: 52, fontWeight: 500, letterSpacing: "-0.02em" }}>{s(it.unit)}</span>}
                   </div>
                   {s(it.note) && (
-                    <div className="mt-8" style={{ fontSize: 20, lineHeight: 1.5, color: ink.body, maxWidth: 460 }}>{s(it.note)}</div>
+                    <div className="mt-8" style={{ fontSize: 20, lineHeight: 1.5, color: ink.muted, maxWidth: 460 }}>{s(it.note)}</div>
                   )}
                   {s(it.source) && (
                     <div className="mt-6 uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}>{s(it.source)}</div>
@@ -3764,7 +3764,7 @@ function renderVariantBody({
                   </div>
                   <div>
                     <div style={{ fontSize: 30, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.label)}</div>
-                    <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: ink.body, maxWidth: 1080 }}>{s(it.body)}</div>
+                    <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: ink.muted, maxWidth: 1080 }}>{s(it.body)}</div>
                   </div>
                 </div>
               ))}
@@ -4782,10 +4782,10 @@ function renderLocationsVariant(
   variantId: string,
   brand: { id: string; tokens: { accent: string; primary: string } } & Record<string, unknown>,
   mode: SlideMode,
-  ink: ReturnType<typeof makeSlideInk>,
+  ink: any,
   c: Record<string, unknown>,
   pageNumber?: number,
-): JSX.Element {
+): React.ReactElement {
   const seeded = locGetDivisionSet(brand.id);
   const rawItems = Array.isArray(c.items) ? (c.items as Record<string, unknown>[]) : [];
   const pins: LocPin[] = rawItems.length > 0
@@ -4846,8 +4846,8 @@ function renderLocationsVariant(
 
   if (variantId === "MV-LOC-WORLD-PINS") {
     return (
-      <SlideFrame brand={brand as never} pageNumber={pageNumber} variant="standard">
-        <AuroraOrb color={accent} intensity={0.5} placement="top-right" />
+      <SlideFrame brand={brand as never} pageNumber={pageNumber}>
+        <AuroraOrb accent={accent} x={92} y={20} size={860} intensity={0.5} />
         <div className="relative flex h-full flex-col px-2 pt-2">
           <Header />
           <div className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
@@ -4861,8 +4861,8 @@ function renderLocationsVariant(
 
   if (variantId === "MV-LOC-WORLD-STATS") {
     return (
-      <SlideFrame brand={brand as never} pageNumber={pageNumber} variant="standard">
-        <AuroraOrb color={accent} intensity={0.45} placement="bottom-left" />
+      <SlideFrame brand={brand as never} pageNumber={pageNumber}>
+        <AuroraOrb accent={accent} x={8} y={80} size={860} intensity={0.45} />
         <div className="relative flex h-full gap-10">
           <div className="flex flex-1 flex-col">
             <Header />
@@ -4892,7 +4892,7 @@ function renderLocationsVariant(
                   ))}
               </div>
               {narrative && (
-                <div className="mt-6 border-t pt-4" style={{ borderColor: ink.hairline, color: ink.body, fontSize: 15, lineHeight: 1.45 }}>
+                <div className="mt-6 border-t pt-4" style={{ borderColor: ink.hairline, color: ink.muted, fontSize: 15, lineHeight: 1.45 }}>
                   {narrative}
                 </div>
               )}
@@ -4906,8 +4906,8 @@ function renderLocationsVariant(
   if (variantId === "MV-LOC-REGION-FOCUS") {
     const regionCount = pins.filter((p) => region === "world" || p.region === region || (region === "MEA" && p.region === "MEA")).length;
     return (
-      <SlideFrame brand={brand as never} pageNumber={pageNumber} variant="standard">
-        <AuroraOrb color={accent} intensity={0.5} placement="top-left" />
+      <SlideFrame brand={brand as never} pageNumber={pageNumber}>
+        <AuroraOrb accent={accent} x={8} y={20} size={860} intensity={0.5} />
         <div className="relative flex h-full flex-col">
           <div className="flex items-start justify-between gap-8">
             <Header />
@@ -4919,7 +4919,7 @@ function renderLocationsVariant(
             <LocWorldMap pins={pins} region={region} mode={mode} accent={accent} primary={primary} showLabels ariaLabel={`${title} — ${region === "world" ? "world" : LOC_REGION_LABELS[region as LocPin["region"]]} map`} />
           </div>
           {narrative && (
-            <div className="mt-6" style={{ color: ink.body, fontSize: 18, lineHeight: 1.45, maxWidth: 1400 }}>
+            <div className="mt-6" style={{ color: ink.muted, fontSize: 18, lineHeight: 1.45, maxWidth: 1400 }}>
               {narrative}
             </div>
           )}
@@ -4930,8 +4930,8 @@ function renderLocationsVariant(
 
   // MV-LOC-HUB-SPOKE
   return (
-    <SlideFrame brand={brand as never} pageNumber={pageNumber} variant="standard">
-      <AuroraOrb color={accent} intensity={0.55} placement="center-right" />
+    <SlideFrame brand={brand as never} pageNumber={pageNumber}>
+      <AuroraOrb accent={accent} x={92} y={50} size={900} intensity={0.55} />
       <div className="relative flex h-full flex-col">
         <Header />
         <div className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
