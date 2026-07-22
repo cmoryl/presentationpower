@@ -3857,15 +3857,19 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 3);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14 grid gap-10" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
-            {items.map((it, i) => (
-              <div key={i} className="flex flex-col items-center pt-8 text-center" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                <Donut brand={brand} percent={Number(it.value) || 0} size={280} />
-                <div className="mt-8 uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: brand.tokens.primary, fontWeight: 600 }}>{s(it.label)}</div>
-                <div className="mt-4" style={{ fontSize: 22, lineHeight: 1.4, color: "rgba(10,15,28,0.68)", maxWidth: 380 }}>{s(it.body)}</div>
-              </div>
-            ))}
+          <DotGridBackdrop />
+          <div className="relative z-10">
+            <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+            <div className="mt-14 grid gap-10" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+              {items.map((it, i) => (
+                <div key={i} className="flex flex-col items-center pt-6 text-center" style={{ borderTop: `1px solid ${i === 0 ? brand.tokens.accent : "rgba(122,139,199,0.28)"}` }}>
+                  <Donut brand={brand} percent={Number(it.value) || 0} size={280} />
+                  <div className="mt-8 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: brand.tokens.primary, fontWeight: 700 }}>{s(it.label)}</div>
+                  <div className="mt-4" style={{ fontSize: 20, lineHeight: 1.45, color: "rgba(122,139,199,0.9)", maxWidth: 380 }}>{s(it.body)}</div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-12"><LiveMetaFooter brand={brand} source={s(c.source, "Program telemetry")} refCode={variant.id} /></div>
           </div>
         </SlideFrame>
       );
@@ -3901,18 +3905,24 @@ function renderVariantBody({
       const cols = items.length || 1;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-16 grid gap-10" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
-            {items.map((it, i) => (
-              <div key={i} className="flex flex-col items-center">
-                <SemiGauge brand={brand} percent={Number(it.value) || 0} size={280} />
-                <div className="mt-6 uppercase text-center" style={{ fontSize: 18, letterSpacing: "0.24em", color: brand.tokens.primary, fontWeight: 600, maxWidth: 260 }}>{s(it.label)}</div>
-              </div>
-            ))}
+          <DotGridBackdrop />
+          <div className="relative z-10">
+            <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+            <div className="mt-16 grid gap-10" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+              {items.map((it, i) => (
+                <div key={i} className="flex flex-col items-center pt-6" style={{ borderTop: `1px solid ${i === 0 ? brand.tokens.accent : "rgba(122,139,199,0.28)"}` }}>
+                  <SemiGauge brand={brand} percent={Number(it.value) || 0} size={280} />
+                  <div className="mt-6 uppercase text-center" style={{ fontSize: 16, letterSpacing: "0.24em", color: brand.tokens.primary, fontWeight: 700, maxWidth: 260 }}>{s(it.label)}</div>
+                  {s(it.body) && <div className="mt-2 text-center" style={{ fontSize: 14, lineHeight: 1.4, color: "rgba(122,139,199,0.9)", maxWidth: 240 }}>{s(it.body)}</div>}
+                </div>
+              ))}
+            </div>
+            <div className="mt-12"><LiveMetaFooter brand={brand} source={s(c.source, "Program telemetry")} refCode={variant.id} /></div>
           </div>
         </SlideFrame>
       );
     }
+
 
     case "MV-DASH-PERFORMANCE": {
       const bars = arr(c.bars).map((b) => ({ label: s(b.label), value: Number(b.value) || 0 }));
@@ -3991,38 +4001,43 @@ function renderVariantBody({
 
     case "MV-DASH-BREAKDOWN": {
       const items = arr(c.items).slice(0, 4);
+      const segments: SegBar[] = items.map((it) => ({
+        label: s(it.label, "—"),
+        value: Math.max(0, Number(it.percent) || Number(it.value) || 1),
+        note: s(it.delta),
+      }));
+      const total = segments.reduce((s, x) => s + x.value, 0) || 1;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-10">
-            {items.map((it, i) => {
-              const pct = Math.max(0, Math.min(100, Number(it.percent) || 0));
-              const delta = s(it.delta);
-              const negative = delta.trim().startsWith("-");
-              return (
-                <div key={i} className="py-8" style={{ borderTop: "1px solid rgba(10,15,28,0.12)", borderBottom: i === items.length - 1 ? "1px solid rgba(10,15,28,0.12)" : "none" }}>
-                  <div className="flex items-baseline justify-between gap-6">
-                    <div className="flex items-baseline gap-8">
-                      <div style={{ fontSize: 28, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.01em" }}>{s(it.label)}</div>
-                      {delta && (
-                        <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.24em", fontWeight: 600, color: negative ? "#E53D2E" : brand.tokens.accent }}>{delta}</div>
-                      )}
+          <DotGridBackdrop />
+          <div className="relative z-10">
+            <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+            <SegmentedBar brand={brand} segments={segments} />
+            <div className="grid gap-6 mt-4" style={{ gridTemplateColumns: `repeat(${Math.min(items.length, 4)}, 1fr)` }}>
+              {items.map((it, i) => {
+                const pct = ((segments[i].value / total) * 100).toFixed(1);
+                const delta = s(it.delta);
+                const negative = delta.trim().startsWith("-");
+                return (
+                  <div key={i} className="pt-5" style={{ borderTop: `1px solid ${i === 0 ? brand.tokens.accent : "rgba(122,139,199,0.28)"}` }}>
+                    <div className="uppercase" style={{ fontSize: 12, letterSpacing: "0.24em", color: "rgba(122,139,199,0.9)", fontWeight: 600 }}>{s(it.label)}</div>
+                    <div className="tabular-nums mt-2 flex items-baseline gap-3" style={{ fontSize: 34, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em" }}>
+                      {s(it.value, `${pct}%`)}
+                      <span style={{ fontSize: 18, color: "rgba(122,139,199,0.8)" }}>{s(it.unit)}</span>
                     </div>
-                    <div className="tabular-nums" style={{ fontSize: 40, fontWeight: 600, color: brand.tokens.primary, letterSpacing: "-0.02em" }}>
-                      {s(it.value)}<span style={{ fontSize: 22, marginLeft: 6, color: "rgba(10,15,28,0.55)" }}>{s(it.unit)}</span>
-                    </div>
+                    {delta && (
+                      <div className="uppercase mt-2" style={{ fontSize: 12, letterSpacing: "0.24em", color: negative ? "#E53D2E" : brand.tokens.accent, fontWeight: 600 }}>{delta}</div>
+                    )}
                   </div>
-                  <div className="mt-6 flex items-center gap-6">
-                    <ProgressBar brand={brand} percent={pct} />
-                    <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: brand.tokens.accent, minWidth: 70, textAlign: "right" }}>{pct}%</div>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+            <div className="mt-12"><LiveMetaFooter brand={brand} source={s(c.source, "Internal telemetry")} refCode={variant.id} /></div>
           </div>
         </SlideFrame>
       );
     }
+
 
     case "MV-DASH-REGION-STATS": {
       const stat = obj(c.stat);
@@ -5280,7 +5295,8 @@ function toNums(v: unknown): number[] {
   return v.map((x) => (typeof x === "number" ? x : Number(x))).filter((n) => Number.isFinite(n));
 }
 
-function Sparkline({ brand, values, w = 380, h = 100, filled = true }: { brand: BrandMode; values: number[]; w?: number; h?: number; filled?: boolean }) {
+function Sparkline({ brand, values, w = 380, h = 100, filled = true, peakPin = false, peakLabel = "PEAK" }: { brand: BrandMode; values: number[]; w?: number; h?: number; filled?: boolean; peakPin?: boolean; peakLabel?: string }) {
+  const ink = useSlideInk();
   const vals = values.length ? values : [1, 1];
   const min = Math.min(...vals);
   const max = Math.max(...vals);
@@ -5291,6 +5307,8 @@ function Sparkline({ brand, values, w = 380, h = 100, filled = true }: { brand: 
   const linePath = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
   const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - pad} L${pts[0][0].toFixed(1)},${h - pad} Z` : "";
   const id = `spark-${brand.id}-${vals.length}-${Math.round(min * 10)}-${Math.round(max * 10)}`;
+  const peakIdx = vals.indexOf(max);
+  const peak = pts[peakIdx];
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <defs>
@@ -5300,9 +5318,105 @@ function Sparkline({ brand, values, w = 380, h = 100, filled = true }: { brand: 
         </linearGradient>
       </defs>
       {filled && <path d={areaPath} fill={`url(#${id})`} />}
+      <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke={ink.hairline} strokeWidth={1} />
       <path d={linePath} fill="none" stroke={brand.tokens.accent} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
       {pts.length > 0 && <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r={5} fill={brand.tokens.accent} />}
+      {peakPin && peak && (
+        <g>
+          <line x1={peak[0]} y1={peak[1]} x2={peak[0]} y2={Math.max(peak[1] - 22, 6)} stroke={brand.tokens.accent} strokeWidth={1} />
+          <rect x={peak[0] - 22} y={Math.max(peak[1] - 34, 0)} width={44} height={13} fill={brand.tokens.accent} rx={2} />
+          <text x={peak[0]} y={Math.max(peak[1] - 24, 10)} textAnchor="middle" fontSize={8} fontWeight={700} fill="#0A0E1F" style={{ letterSpacing: "0.18em" }}>{peakLabel}</text>
+        </g>
+      )}
     </svg>
+  );
+}
+
+// ── Editorial data primitives ─────────────────────────────────────────
+function DotGridBackdrop({ opacity = 0.08 }: { opacity?: number }) {
+  const ink = useSlideInk();
+  return (
+    <div
+      aria-hidden
+      style={{
+        position: "absolute",
+        inset: 0,
+        opacity,
+        pointerEvents: "none",
+        backgroundImage: `radial-gradient(${ink.text} 1px, transparent 1px)`,
+        backgroundSize: "48px 48px",
+        maskImage: "radial-gradient(ellipse at center, black 40%, transparent 90%)",
+        WebkitMaskImage: "radial-gradient(ellipse at center, black 40%, transparent 90%)",
+      }}
+    />
+  );
+}
+
+function LiveMetaFooter({ brand, source, refCode, live = true }: { brand: BrandMode; source?: string; refCode?: string; live?: boolean }) {
+  const ink = useSlideInk();
+  return (
+    <div className="flex items-center justify-between" style={{ borderTop: `1px solid ${ink.hairline}`, paddingTop: 20, fontSize: 12, letterSpacing: "0.22em", color: ink.faint, fontWeight: 500, textTransform: "uppercase" }}>
+      <div className="flex gap-10">
+        {source && <span>Source · {source}</span>}
+        {refCode && <span>Ref · {refCode}</span>}
+      </div>
+      {live && (
+        <div className="flex items-center gap-2">
+          <span style={{ width: 8, height: 8, borderRadius: 99, background: brand.tokens.accent, boxShadow: `0 0 12px ${brand.tokens.accent}` }} />
+          <span>Live signal</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+type SegBar = { label: string; value: number; note?: string };
+function SegmentedBar({ brand, segments, height = 68 }: { brand: BrandMode; segments: SegBar[]; height?: number }) {
+  const ink = useSlideInk();
+  const total = segments.reduce((s, x) => s + x.value, 0) || 1;
+  return (
+    <div className="relative w-full" style={{ marginTop: 96, marginBottom: 96 }}>
+      <div className="flex w-full" style={{ height, gap: 4 }}>
+        {segments.map((seg, i) => {
+          const pct = (seg.value / total) * 100;
+          const emphasis = i === 0;
+          const bg = emphasis ? brand.tokens.accent : i === 1 ? ink.accent(0.22) : ink.trackFill;
+          const above = i % 2 === 0;
+          return (
+            <div key={i} className="relative" style={{ width: `${pct}%`, background: bg, border: emphasis ? "none" : `1px solid ${ink.hairline}` }}>
+              <div
+                className="absolute"
+                style={{
+                  left: 0,
+                  [above ? "bottom" : "top"]: "100%",
+                  [above ? "marginBottom" : "marginTop"]: 20,
+                  paddingLeft: 10,
+                  borderLeft: `1px solid ${ink.hairlineStrong}`,
+                  minWidth: 160,
+                } as React.CSSProperties}
+              >
+                <div className="uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}>{seg.label}</div>
+                <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: ink.text, letterSpacing: "-0.01em", marginTop: 2 }}>
+                  {pct.toFixed(1)}%
+                </div>
+                {seg.note && <div style={{ fontSize: 12, color: ink.muted, marginTop: 2, maxWidth: 220 }}>{seg.note}</div>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function EditorialNote({ title, body, accent }: { title: string; body: string; accent?: string }) {
+  const ink = useSlideInk();
+  return (
+    <div className="relative" style={{ background: ink.panel, border: `1px solid ${ink.hairline}`, padding: 24 }}>
+      <div style={{ position: "absolute", top: -1, left: 24, width: 56, height: 1, background: accent || ink.text, opacity: 0.7 }} />
+      <div className="uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.text, fontWeight: 700 }}>{title}</div>
+      <div style={{ fontSize: 14, color: ink.muted, lineHeight: 1.55, marginTop: 8 }}>{body}</div>
+    </div>
   );
 }
 
@@ -5357,6 +5471,11 @@ function SemiGauge({ brand, percent, size = 260 }: { brand: BrandMode; percent: 
   const h = size / 2 + stroke;
   const arc = `M ${stroke / 2} ${cy} A ${r} ${r} 0 0 1 ${size - stroke / 2} ${cy}`;
   const gradId = `gauge-grad-${brand.id}-${size}-${Math.round(p)}`;
+  // Needle pointer end — thin editorial line from center to arc tip
+  const angle = Math.PI * (1 - p / 100); // 0=right, pi=left
+  const cx = size / 2;
+  const nx = cx + Math.cos(angle) * (r - 4);
+  const ny = cy - Math.sin(angle) * (r - 4);
   return (
     <svg width={size} height={h} viewBox={`0 0 ${size} ${h}`} aria-hidden>
       <defs>
@@ -5367,12 +5486,16 @@ function SemiGauge({ brand, percent, size = 260 }: { brand: BrandMode; percent: 
       </defs>
       <path d={arc} fill="none" stroke={ink.trackFill} strokeWidth={stroke} strokeLinecap="round" />
       <path d={arc} fill="none" stroke={`url(#${gradId})`} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${arcC}`} />
-      <text x={size / 2} y={cy - 20} textAnchor="middle" fontSize={size * 0.22} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.02em" }}>
+      <line x1={cx} y1={cy} x2={nx} y2={ny} stroke={ink.text} strokeWidth={1.5} />
+      <circle cx={cx} cy={cy} r={3} fill={ink.text} />
+      <circle cx={nx} cy={ny} r={4} fill={brand.tokens.accent} />
+      <text x={cx} y={cy - 22} textAnchor="middle" fontSize={size * 0.22} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums" }}>
         {Math.round(p)}%
       </text>
     </svg>
   );
 }
+
 
 
 function AreaChart({ brand, series, height = 480 }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number }) {
