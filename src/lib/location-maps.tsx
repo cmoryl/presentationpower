@@ -493,7 +493,12 @@ export function WorldMap({
           <stop offset="60%" stopColor={accent} stopOpacity={0.14} />
           <stop offset="100%" stopColor={accent} stopOpacity={0} />
         </radialGradient>
+        <linearGradient id="tp-metric-scale" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={accent} stopOpacity={0.25} />
+          <stop offset="100%" stopColor={accent} stopOpacity={1} />
+        </linearGradient>
         <linearGradient id="tp-map-wash" x1="0" y1="0" x2="0" y2="1">
+
           <stop offset="0%" stopColor={accent} stopOpacity={isDark ? 0.08 : 0.05} />
           <stop offset="100%" stopColor={primary ?? accent} stopOpacity={isDark ? 0.02 : 0.02} />
         </linearGradient>
