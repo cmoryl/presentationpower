@@ -526,12 +526,14 @@ export function WorldMap({
         </g>
       )}
 
-      {/* Pin glows */}
+      {/* Pin glows — scale radius by metric when active */}
       <g>
         {visiblePins.map((p) => {
           const { x, y } = projectLatLon(p.lat, p.lon);
-          const r = p.role === "HQ" ? 26 : p.role === "hub" ? 20 : 14;
-          return <circle key={`g-${p.id}`} cx={x} cy={y} r={r} fill={glow} />;
+          const baseR = p.role === "HQ" ? 26 : p.role === "hub" ? 20 : 14;
+          const t = activeMetricId ? scaleFor(p.values?.[activeMetricId]) : null;
+          const r = t == null ? baseR : 14 + t * 22;
+          return <circle key={`g-${p.id}`} cx={x} cy={y} r={r} fill={glow} opacity={t == null ? 1 : 0.5 + t * 0.5} />;
         })}
       </g>
 
@@ -541,18 +543,30 @@ export function WorldMap({
           const { x, y } = projectLatLon(p.lat, p.lon);
           const isHq = p.role === "HQ";
           const isHub = p.role === "hub";
-          const core = isHq ? 5.4 : isHub ? 4.4 : 3.2;
+          const t = activeMetricId ? scaleFor(p.values?.[activeMetricId]) : null;
+          const baseCore = isHq ? 5.4 : isHub ? 4.4 : 3.2;
+          const core = t == null ? baseCore : 3.2 + t * 5.8;
+          const fill = t == null ? pinCore : accent;
+          const fillOpacity = t == null ? 1 : 0.35 + t * 0.65;
+          const val = activeMetricId ? p.values?.[activeMetricId] : undefined;
+          const tip = activeMetricId && metric
+            ? `${p.city}${p.country ? `, ${p.country}` : ""} — ${metric.label}: ${formatMetricValue(val, metric)}`
+            : `${p.city}${p.country ? `, ${p.country}` : ""}${p.label ? ` — ${p.label}` : ""}`;
           return (
-            <g key={`pin-${p.id}`}>
+            <g key={`pin-${p.id}`} style={{ cursor: "default" }}>
+              <title>{tip}</title>
               <circle cx={x} cy={y} r={core + 1.6} fill={pinRing} opacity={0.85} />
-              <circle cx={x} cy={y} r={core} fill={pinCore} />
-              {isHq && (
-                <circle cx={x} cy={y} r={core + 4.8} fill="none" stroke={pinCore} strokeWidth={0.8} opacity={0.7} />
+              <circle cx={x} cy={y} r={core} fill={fill} fillOpacity={fillOpacity} />
+              {(isHq || (t != null && t > 0.75)) && (
+                <circle cx={x} cy={y} r={core + 4.8} fill="none" stroke={accent} strokeWidth={0.8} opacity={0.7} />
               )}
+              {/* Invisible larger hit target so browser tooltips fire reliably */}
+              <circle cx={x} cy={y} r={Math.max(10, core + 6)} fill="transparent" pointerEvents="all" />
             </g>
           );
         })}
       </g>
+
 
       {/* Labels — HQ + hub tiers, or all when the pin count is small */}
       {showLabels && (
