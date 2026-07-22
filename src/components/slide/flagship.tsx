@@ -823,7 +823,8 @@ export function AuroraOrb({
   const ctxAccent = useSlideAccent();
   const a = accent ?? ctxAccent ?? "#4F8CFF";
   const sibling = shiftHue(a, 34, 0.06);
-  const alpha = (mode === "dark" ? 0.85 : 0.55) * intensity;
+  const alpha = (mode === "dark" ? 0.85 : 0.5) * intensity;
+  const isLight = mode === "light";
   return (
     <div
       aria-hidden
@@ -831,12 +832,14 @@ export function AuroraOrb({
       style={{
         left: `${x}%`,
         top: `${y}%`,
-        width: size,
-        height: size,
+        width: isLight ? size * 1.18 : size,
+        height: isLight ? size * 1.18 : size,
         transform: "translate(-50%, -50%)",
         borderRadius: "50%",
-        background: `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.9)} 32%, ${hexA(a, 0)} 68%)`,
-        filter: "blur(40px)",
+        background: isLight
+          ? `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.75)} 26%, ${hexA(a, alpha * 0.25)} 62%, ${hexA(a, 0)} 92%)`
+          : `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.9)} 32%, ${hexA(a, 0)} 68%)`,
+        filter: isLight ? "blur(60px)" : "blur(40px)",
         mixBlendMode: mode === "dark" ? "screen" : "multiply",
       }}
     />
