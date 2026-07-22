@@ -1685,10 +1685,10 @@ function renderVariantBody({
       );
 
     case "MV-CLOSE-CTA": {
-      const steps = arr(c.items).length > 0
+      const steps: Item[] = arr(c.items).length > 0
         ? arr(c.items)
         : s(c.nextSteps)
-          ? s(c.nextSteps).split(/\n+/).filter(Boolean).map((line) => ({ label: line }))
+          ? s(c.nextSteps).split(/\n+/).filter(Boolean).map((line) => ({ label: line } as Item))
           : [];
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
