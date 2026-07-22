@@ -388,6 +388,9 @@ export type WorldMapProps = {
   showSpokes?: boolean;
   /** Aria label for the whole map. */
   ariaLabel?: string;
+  /** Optional metric to visualize — pins are scaled/colored by value and a legend is drawn. */
+  metric?: LocationMetric;
+  metricId?: string;
 };
 
 /**
@@ -406,7 +409,10 @@ export function WorldMap({
   showLabels = true,
   showSpokes = false,
   ariaLabel = "Global locations map",
+  metric,
+  metricId,
 }: WorldMapProps) {
+
   const isDark = mode === "dark";
   const land = isDark ? "rgba(255,255,255,0.055)" : "rgba(3,0,44,0.055)";
   const landStroke = isDark ? "rgba(255,255,255,0.12)" : "rgba(3,0,44,0.16)";
