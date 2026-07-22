@@ -516,8 +516,13 @@ function resolveShape(
     };
   }
 
+  if (shape.kind === "chart") {
+    return { kind: "chart", base, chart: shape.chart, placeholderKind: shape.chart ? undefined : "chart" };
+  }
+
   return { kind: shape.kind, base, placeholderKind: shape.kind };
 }
+
 
 function resolveLayout(
   layout: SlideLayoutWithUrls,
