@@ -266,8 +266,25 @@ export function SlideFrame({
 
   })();
 
+  // A dark chrome (cover/divider/close) or backdrop-dark surface reads as dark
+  // for accent-as-text purposes; content-on-white uses light mode tuning.
+  const inkMode: SlideMode = (slideDark || darkBackdrop) ? "dark" : "light";
+  const accentTextHex = readableAccent(brand.tokens.accent, inkMode);
+
   return (
-    <div className="relative h-full w-full overflow-hidden" style={{ backgroundColor: hasBackdrop ? (lightBackdrop ? "#fff" : "#000") : bg, color: fg }}>
+    <div
+      className="relative h-full w-full overflow-hidden"
+      style={{
+        backgroundColor: hasBackdrop ? (lightBackdrop ? "#fff" : "#000") : bg,
+        color: fg,
+        // Contrast-tuned accent for use as TEXT — variants read this via
+        // `color: "var(--slide-accent-text)"` so accent-coloured labels
+        // stay legible in every division × mode combination without
+        // needing a background box.
+        ["--slide-accent-text" as string]: accentTextHex,
+      }}
+    >
+
       {hasBackdropCss && (
         <div
           aria-hidden
