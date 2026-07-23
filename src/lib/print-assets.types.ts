@@ -118,6 +118,8 @@ export type CaseStudyContent = {
   // in the footer lockup below the CTA band.
   footer?: { links: string[] };
   heroMedia?: PrintHeroMedia;
+  /** Reusable shared-module blocks inserted between body content and CTA. */
+  modules?: PrintSection[];
 };
 
 
