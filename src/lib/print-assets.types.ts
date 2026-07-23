@@ -1,6 +1,28 @@
 // Typed content payloads for print assets. Shared between server functions and
 // the editor UI so the shape stays honest end-to-end.
 
+// Per-template override for the header brand lockup color. `auto` (default)
+// lets the layout pick a color based on the hero's luminance; `black` and
+// `white` force a single-color mark from the template content.
+export type PrintLogoColor = "auto" | "black" | "white";
+
+export const PRINT_LOGO_INK: Record<Exclude<PrintLogoColor, "auto">, string> = {
+  black: "#03002C",
+  white: "#FFFFFF",
+};
+
+/** Resolve a `PrintLogoColor` override against the auto ink the layout would
+ *  otherwise use. Layouts pass in the color they'd default to (white for
+ *  dark heroes, navy for light heroes); an explicit override wins. */
+export function resolvePrintLogoInk(
+  override: PrintLogoColor | undefined,
+  autoInk: string,
+): string {
+  if (!override || override === "auto") return autoInk;
+  return PRINT_LOGO_INK[override];
+}
+
+
 export type CaseStudyStat = {
   label: string;
   value: string;
