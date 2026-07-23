@@ -53,6 +53,15 @@ function AdminImageryPage() {
     queryFn: () => listFn({ data: { divisionId } }),
   });
 
+  const statsFn = useServerFn(getDivisionImageryStats);
+  const statsQ = useQuery({
+    queryKey: ["admin-division-imagery-stats", divisionId],
+    queryFn: () => statsFn({ data: { divisionId, days: 90 } }),
+    staleTime: 60_000,
+  });
+  const statsByImage = statsQ.data?.byImage ?? {};
+  const statsTotals = statsQ.data?.totals;
+
   const invalidate = () =>
     qc.invalidateQueries({ queryKey: ["admin-division-imagery", divisionId] });
 
