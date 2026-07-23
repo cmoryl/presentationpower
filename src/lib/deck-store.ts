@@ -1569,14 +1569,139 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         ],
       };
 
+    // ── MV-VIZ-* · Spec-driven infographic seeds ──────────────────────────
+    case "MV-VIZ-SANKEY":
+      return {
+        title: "Where every hour goes",
+        kicker: "Program flow",
+        subtitle: "Hours booked into managed services · Q1 FY26",
+        rows: [
+          { source: "Intake", target: "Localization", value: 420 },
+          { source: "Intake", target: "Content Ops", value: 260 },
+          { source: "Localization", target: "QA", value: 300 },
+          { source: "Localization", target: "In-country review", value: 140 },
+          { source: "Content Ops", target: "QA", value: 180 },
+          { source: "QA", target: "Release", value: 460 },
+          { source: "In-country review", target: "Release", value: 120 },
+        ],
+        encoding: { source: "source", target: "target", value: "value" },
+        source: "Program telemetry · 2026",
+      };
+    case "MV-VIZ-CHORD":
+      return {
+        title: "How the regions collaborate",
+        kicker: "Cross-region volume",
+        subtitle: "Weekly file handoffs between regional hubs",
+        rows: [
+          { source: "NYC", target: "LON", value: 42 },
+          { source: "NYC", target: "TOK", value: 18 },
+          { source: "LON", target: "BER", value: 51 },
+          { source: "LON", target: "PAR", value: 47 },
+          { source: "BER", target: "PAR", value: 28 },
+          { source: "TOK", target: "SEO", value: 22 },
+          { source: "SEO", target: "NYC", value: 14 },
+        ],
+        encoding: { source: "source", target: "target", value: "value" },
+        source: "Regional routing dashboard, 2026",
+      };
+    case "MV-VIZ-BEESWARM":
+      return {
+        title: "Reviewer turnaround, in hours",
+        kicker: "Cycle time distribution",
+        subtitle: "Every reviewer, past 90 days",
+        rows: Array.from({ length: 80 }, (_, i) => ({
+          label: `R-${100 + i}`,
+          category: ["Legal", "Life Sciences", "Marketing", "Tech"][i % 4],
+          value: Math.round(6 + Math.sin(i * 1.7) * 5 + (i % 9) * 1.2),
+        })),
+        encoding: { value: "value", category: "category", label: "label" },
+        source: "Reviewer telemetry, rolling 90d",
+      };
+    case "MV-VIZ-BUMP":
+      return {
+        title: "Language rank by volume",
+        kicker: "Rank shifts",
+        subtitle: "Top languages · quarterly rank movement",
+        rows: [
+          { period: "Q1", series: "Spanish", rank: 1 },
+          { period: "Q1", series: "French", rank: 2 },
+          { period: "Q1", series: "German", rank: 3 },
+          { period: "Q1", series: "Japanese", rank: 4 },
+          { period: "Q2", series: "Spanish", rank: 1 },
+          { period: "Q2", series: "German", rank: 2 },
+          { period: "Q2", series: "French", rank: 3 },
+          { period: "Q2", series: "Japanese", rank: 4 },
+          { period: "Q3", series: "German", rank: 1 },
+          { period: "Q3", series: "Spanish", rank: 2 },
+          { period: "Q3", series: "Japanese", rank: 3 },
+          { period: "Q3", series: "French", rank: 4 },
+          { period: "Q4", series: "German", rank: 1 },
+          { period: "Q4", series: "Japanese", rank: 2 },
+          { period: "Q4", series: "Spanish", rank: 3 },
+          { period: "Q4", series: "French", rank: 4 },
+        ],
+        encoding: { x: "period", series: "series", value: "rank" },
+        source: "Volume ledger, FY26",
+      };
+    case "MV-VIZ-MARKET-MAP":
+      return {
+        title: "Opportunity vs. effort",
+        kicker: "Portfolio review",
+        subtitle: "Bubble size · projected annual value",
+        rows: [
+          { label: "AI content ops", x: 82, y: 34, value: 240, category: "Grow" },
+          { label: "Regulated launch", x: 74, y: 58, value: 320, category: "Grow" },
+          { label: "Retail rollout", x: 61, y: 48, value: 180, category: "Sustain" },
+          { label: "Legal review", x: 55, y: 74, value: 140, category: "Sustain" },
+          { label: "MT-only pilot", x: 44, y: 22, value: 60, category: "Evaluate" },
+          { label: "Voice dubbing", x: 68, y: 68, value: 210, category: "Grow" },
+          { label: "eLearning", x: 39, y: 52, value: 95, category: "Evaluate" },
+        ],
+        encoding: { x: "x", y: "y", value: "value", label: "label", category: "category" },
+        source: "Portfolio review · 2026",
+      };
+    case "MV-VIZ-TREEMAP":
+      return {
+        title: "Revenue mix by service line",
+        kicker: "Where growth compounds",
+        subtitle: "Trailing twelve months · normalized",
+        rows: [
+          { label: "Localization", value: 4200, category: "Core" },
+          { label: "Content Ops", value: 2100, category: "Core" },
+          { label: "AI Data (DataForce)", value: 1800, category: "Growth" },
+          { label: "Media & Studio", value: 1300, category: "Growth" },
+          { label: "Interpretation", value: 900, category: "Core" },
+          { label: "Legal Tech", value: 780, category: "Specialist" },
+          { label: "Life Sciences", value: 1450, category: "Specialist" },
+        ],
+        encoding: { label: "label", value: "value", category: "category" },
+        source: "Finance · TTM 2026",
+      };
+    case "MV-VIZ-CALENDAR-HEATMAP": {
+      const rows: Array<{ date: string; value: number }> = [];
+      const start = new Date(Date.UTC(2026, 0, 1));
+      for (let i = 0; i < 340; i++) {
+        const d = new Date(start.getTime() + i * 86_400_000);
+        const iso = d.toISOString().slice(0, 10);
+        const base = Math.sin(i / 8) * 40 + Math.cos(i / 3.4) * 15 + 60;
+        const spike = i % 47 === 0 ? 80 : 0;
+        rows.push({ date: iso, value: Math.max(0, Math.round(base + spike + (i % 5))) });
+      }
+      return {
+        title: "Reviewer activity · 2026",
+        kicker: "Daily cadence",
+        subtitle: "Files reviewed per calendar day",
+        rows,
+        encoding: { x: "date", value: "value" },
+        source: "Reviewer log, 2026",
+      };
+    }
+
     default:
-
-
-
-
       return { title: sectionName };
   }
 }
+
 
 export const useDeckStore = create<DeckState>()(
   persist(
