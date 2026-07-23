@@ -71,7 +71,9 @@ export type CaseStudyContent = {
   // Optional footer link row (site URL, email, etc). Rendered right-aligned
   // in the footer lockup below the CTA band.
   footer?: { links: string[] };
+  heroMedia?: PrintHeroMedia;
 };
+
 
 // ---------------------------------------------------------------------------
 // SPOTLIGHT — single-page product / service highlight
