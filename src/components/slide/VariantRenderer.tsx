@@ -7255,14 +7255,13 @@ function FreeformSemiGauge({
   const cx = size / 2;
   const arcC = Math.PI * r;
   const dash = (p / 100) * arcC;
-  const h = size / 2 + stroke + 12;
+  const h = cy + 24;
   const arc = `M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`;
-  // Terminus point on the arc
-  const angle = Math.PI * (1 - p / 100);
-  const tx = cx + Math.cos(angle) * r * -1 + r * 2 * (p / 100);
-  const termX = cx - Math.cos(Math.PI - Math.PI * (p / 100)) * r;
-  const termY = cy - Math.sin(Math.PI - Math.PI * (p / 100)) * r;
-  void tx;
+  // Terminus: angle from left endpoint, sweeping CCW over the top.
+  // At p=0 → (cx-r, cy); at p=100 → (cx+r, cy); at p=50 → (cx, cy-r).
+  const theta = (Math.PI * p) / 100;
+  const termX = cx - Math.cos(theta) * r;
+  const termY = cy - Math.sin(theta) * r;
   return (
     <svg width={size} height={h} viewBox={`0 0 ${size} ${h}`} aria-hidden>
       <FreeformSvgDefs id={id} />
@@ -7270,9 +7269,9 @@ function FreeformSemiGauge({
       <circle
         cx={termX}
         cy={termY}
-        r={size * (bloom ? 0.32 : 0.22)}
+        r={size * (bloom ? 0.34 : 0.24)}
         fill={`url(#${id}-halo)`}
-        opacity={bloom ? 1 : 0.6}
+        opacity={bloom ? 1 : 0.7}
       />
       {/* Hairline track */}
       <path d={arc} fill="none" stroke={ink.hairline} strokeWidth={1} />
@@ -7288,31 +7287,23 @@ function FreeformSemiGauge({
       />
       {/* Solid core at terminus */}
       <circle cx={termX} cy={termY} r={4} fill="var(--slide-accent-text)" />
+      {/* Value floats inside the cup — sized to sit comfortably under the arc apex */}
       <text
         x={cx}
-        y={cy - 22}
+        y={cy - 14}
         textAnchor="middle"
-        fontSize={size * 0.36}
+        fontSize={size * 0.22}
         fontWeight={600}
         fill={ink.strong}
         style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}
       >
         {Math.round(p)}
-      </text>
-      <text
-        x={cx}
-        y={cy - 2}
-        textAnchor="middle"
-        fontSize={size * 0.08}
-        fontWeight={600}
-        fill={ink.faint}
-        style={{ letterSpacing: "0.22em" }}
-      >
-        %
+        <tspan fontSize={size * 0.09} fill={ink.faint} dx={4} style={{ letterSpacing: "0.18em" }}>%</tspan>
       </text>
     </svg>
   );
 }
+
 
 // Free-form breakdown row. Left-to-right feathered accent gradient, no
 // pill/track. When bloom=true, adds a radial halo + accent stroke tip at
