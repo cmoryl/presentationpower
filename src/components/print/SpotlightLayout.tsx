@@ -670,6 +670,9 @@ export function SpotlightLayout({
               </div>
             )}
 
+            {/* SHARED MODULES */}
+            <PrintSectionsStack sections={content.modules} mode={mode} accent={accent} />
+
             {/* ============================================================ */}
             {/* CTA BAND — division-tokenized gradient                        */}
             {/* ============================================================ */}
