@@ -4031,23 +4031,42 @@ function renderVariantBody({
     }
 
     case "MV-DASH-DONUT-TRIO": {
+      // Free-form Aurora v2. Each donut is a hairline track ring + accent
+      // arc with soft glow. A feathered radial halo blooms BEHIND the donut
+      // so it reads as a floating bloom rather than a puck. Center numeral
+      // floats with no plate; label/body sit as free text on the aurora.
       const items = arr(c.items).slice(0, 3);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14 grid gap-10" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+          <div style={{ maxWidth: 900 }}>
+            <Kicker brand={brand}>{s(c.kicker, "Portfolio")}</Kicker>
+            <div
+              className="mt-4"
+              style={{ fontSize: 52, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+            >
+              {s(c.title, variant.name)}
+            </div>
+          </div>
+          <div className="mt-14 grid gap-16" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
             {items.map((it, i) => (
-              <div key={i} className="flex flex-col items-center text-center" style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`, paddingLeft: i === 0 ? 0 : 24 }}>
-                <Donut brand={brand} percent={Number(it.value) || 0} size={280} />
-                <div className="mt-8 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.strong, fontWeight: 700 }}>{s(it.label)}</div>
-                <div className="mt-4" style={{ fontSize: 20, lineHeight: 1.45, color: ink.muted, maxWidth: 380 }}>{s(it.body)}</div>
+              <div key={i} className="flex flex-col items-center text-center">
+                <FreeformDonut brand={brand} percent={Number(it.value) || 0} size={280} bloom={i === 0} />
+                <div
+                  className="mt-8 uppercase"
+                  style={{ fontSize: 15, letterSpacing: "0.28em", color: ink.strong, fontWeight: 700 }}
+                >
+                  {s(it.label)}
+                </div>
+                <div className="mt-3" style={{ fontSize: 17, lineHeight: 1.45, color: ink.muted, maxWidth: 320 }}>
+                  {s(it.body)}
+                </div>
               </div>
             ))}
           </div>
-          <div className="mt-12"><LiveMetaFooter brand={brand} source={s(c.source, "Program telemetry")} refCode={variant.id} /></div>
         </SlideFrame>
       );
     }
+
 
     case "MV-DASH-SALES-CHART": {
       // Free-form aurora rebuild — no panel, no card, no border around the
