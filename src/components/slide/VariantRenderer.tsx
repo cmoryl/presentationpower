@@ -4141,24 +4141,48 @@ function renderVariantBody({
     }
 
     case "MV-DASH-GAUGE-ROW": {
+      // Free-form Aurora v2. Each gauge = hairline semicircular track +
+      // accent-glowing stroke arc. A feathered halo blooms behind the arc
+      // terminus so it reads as an accent bloom, not a puck. Central value
+      // and label sit as free text — no plates, no dividers between gauges.
       const items = arr(c.items).slice(0, 5);
       const cols = items.length || 1;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-16 grid gap-10" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+          <div style={{ maxWidth: 900 }}>
+            <Kicker brand={brand}>{s(c.kicker, "Signals")}</Kicker>
+            <div
+              className="mt-4"
+              style={{ fontSize: 52, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+            >
+              {s(c.title, variant.name)}
+            </div>
+          </div>
+          <div className="mt-14 grid gap-8" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
             {items.map((it, i) => (
-              <div key={i} className="flex flex-col items-center" style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`, paddingLeft: i === 0 ? 0 : 20 }}>
-                <SemiGauge brand={brand} percent={Number(it.value) || 0} size={280} />
-                <div className="mt-6 uppercase text-center" style={{ fontSize: 16, letterSpacing: "0.24em", color: ink.strong, fontWeight: 700, maxWidth: 260 }}>{s(it.label)}</div>
-                {s(it.body) && <div className="mt-2 text-center" style={{ fontSize: 14, lineHeight: 1.4, color: ink.muted, maxWidth: 240 }}>{s(it.body)}</div>}
+              <div key={i} className="flex flex-col items-center">
+                <FreeformSemiGauge brand={brand} percent={Number(it.value) || 0} size={240} bloom={i === 0} />
+                <div
+                  className="mt-4 uppercase text-center"
+                  style={{ fontSize: 14, letterSpacing: "0.26em", color: ink.strong, fontWeight: 700, maxWidth: 220 }}
+                >
+                  {s(it.label)}
+                </div>
+                {s(it.body) && (
+                  <div
+                    className="mt-2 text-center"
+                    style={{ fontSize: 14, lineHeight: 1.4, color: ink.muted, maxWidth: 220 }}
+                  >
+                    {s(it.body)}
+                  </div>
+                )}
               </div>
             ))}
           </div>
-          <div className="mt-12"><LiveMetaFooter brand={brand} source={s(c.source, "Program telemetry")} refCode={variant.id} /></div>
         </SlideFrame>
       );
     }
+
 
 
     case "MV-DASH-PERFORMANCE": {
