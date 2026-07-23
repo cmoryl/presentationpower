@@ -3921,7 +3921,7 @@ function renderVariantBody({
                 const n = items.length - i;
                 return (
                   <div key={i} className="grid items-center gap-8 py-6" style={{ gridTemplateColumns: "140px 1fr", borderTop: i === 0 ? "none" : `1px solid ${ink.hairline}` }}>
-                    <div className="tabular-nums font-semibold" style={{ fontSize: 132, lineHeight: 0.9, letterSpacing: "-0.03em", color: "var(--slide-accent-text)" }}>
+                    <div className="tabular-nums font-semibold" style={{ fontSize: 96, lineHeight: 0.95, letterSpacing: "-0.025em", color: "var(--slide-accent-text)" }}>
                       {n}
                     </div>
                     <div>
