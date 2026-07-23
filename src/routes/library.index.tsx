@@ -1105,6 +1105,8 @@ function VariantDetailModal({
     } catch { /* ignore */ }
   };
   const [pdfBusy, setPdfBusy] = useState<null | "light" | "dark">(null);
+  const [pdfStage, setPdfStage] = useState<string | null>(null);
+
   const downloadPptx = async (exportMode: "light" | "dark") => {
     if (downloading) return;
     setDownloading(true);
