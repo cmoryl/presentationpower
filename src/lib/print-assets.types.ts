@@ -22,6 +22,22 @@ export function resolvePrintLogoInk(
   return PRINT_LOGO_INK[override];
 }
 
+// Optional hero photography for a print template. When present, layouts
+// render an image band with an accent-color wash and legibility scrim under
+// the hero copy. Structural type — the visual layer lives in
+// `src/components/print/PrintHeroMedia.tsx`.
+export type PrintHeroMedia = {
+  imageUrl: string;
+  focalPoint?: string;            // CSS object-position
+  overlayColor?: string;          // hex; falls back to division accent
+  overlayOpacity?: number;        // 0..1
+  scrim?: "top" | "bottom" | "both" | "radial" | "none";
+  blendMode?: "normal" | "multiply" | "overlay" | "soft-light" | "screen";
+  heightPct?: number;             // share of page height, default 46
+};
+
+
+
 
 export type CaseStudyStat = {
   label: string;
