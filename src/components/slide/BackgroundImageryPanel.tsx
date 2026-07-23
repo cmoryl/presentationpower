@@ -306,9 +306,29 @@ export function BackgroundImageryPanel({
   return (
     <div className="mt-6 rounded-2xl border border-black/10 bg-white p-6">
       <div className="flex items-center justify-between gap-2">
-        <div className="text-xs uppercase tracking-widest text-black/50">Background & Imagery</div>
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          className="group flex flex-1 items-center gap-2 text-left"
+        >
+          <span
+            aria-hidden
+            className={`inline-block text-black/50 transition-transform ${open ? "rotate-90" : ""}`}
+          >
+            ▸
+          </span>
+          <span className="text-xs uppercase tracking-widest text-black/50 group-hover:text-black">
+            Background & Imagery
+          </span>
+          {!open && current && (
+            <span className="ml-2 rounded-full bg-black/[0.06] px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60">
+              {current.kind}
+            </span>
+          )}
+        </button>
         <div className="flex items-center gap-2">
-          {canApplyMany && (
+          {open && canApplyMany && (
             <button
               type="button"
               onClick={() => setApplyOpen((v) => !v)}
@@ -318,7 +338,7 @@ export function BackgroundImageryPanel({
               Apply to…
             </button>
           )}
-          {current && (
+          {open && current && (
             <button
               type="button"
               onClick={() => onChange(null)}
@@ -329,6 +349,9 @@ export function BackgroundImageryPanel({
           )}
         </div>
       </div>
+
+      {open && (<>
+
 
       {applyFlash && (
         <div className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-900">
