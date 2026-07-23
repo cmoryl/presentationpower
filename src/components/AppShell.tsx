@@ -21,15 +21,57 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/library", label: "Library" },
     { to: "/admin", label: "Admin" },
   ] as const;
-  const adminSubnav: ReadonlyArray<{ to: string; label: string }> = [
-    { to: "/admin", label: "Overview" },
-    { to: "/admin/analytics", label: "Analytics" },
-    { to: "/admin/knowledge-hub", label: "Knowledge" },
-    { to: "/admin/brand-assets", label: "Brand assets" },
-    { to: "/admin/logohub", label: "LogoHub" },
-    { to: "/admin/icon-studio", label: "Icon Studio" },
-    { to: "/admin/translation", label: "Translation" },
-    { to: "/admin/users", label: "Users & roles" },
+  const adminGroups: ReadonlyArray<{ label: string; items: ReadonlyArray<{ to: string; label: string }> }> = [
+    {
+      label: "Overview",
+      items: [
+        { to: "/admin", label: "Command center" },
+        { to: "/admin/audit", label: "Audit log" },
+      ],
+    },
+    {
+      label: "Analytics",
+      items: [
+        { to: "/admin/analytics", label: "Master analytics" },
+        { to: "/analytics", label: "Deck engagement" },
+        { to: "/admin/ai", label: "AI usage & cost" },
+        { to: "/admin/imagery-analytics", label: "Imagery analytics" },
+        { to: "/admin/ab", label: "A/B color testing" },
+      ],
+    },
+    {
+      label: "Knowledge",
+      items: [
+        { to: "/admin/knowledge-hub", label: "Knowledge hub" },
+        { to: "/knowledge", label: "Browse entries" },
+        { to: "/knowledge/ask", label: "Ask Oracle" },
+        { to: "/admin/oracle", label: "Oracle KB" },
+        { to: "/admin/knowledge", label: "KB manager" },
+        { to: "/admin/approvals", label: "Approvals" },
+      ],
+    },
+    {
+      label: "Brand assets",
+      items: [
+        { to: "/admin/brand-assets", label: "Brand assets" },
+        { to: "/knowledge/brand-guides", label: "Brand guides" },
+        { to: "/admin/logohub", label: "LogoHub" },
+        { to: "/admin/icon-studio", label: "Icon Studio" },
+        { to: "/admin/pdf-ingest", label: "PDF ingestion" },
+      ],
+    },
+    {
+      label: "Translation",
+      items: [
+        { to: "/admin/translation", label: "Translation" },
+        { to: "/admin/globallink", label: "GlobalLink · Translate" },
+        { to: "/admin/globallink-share", label: "GlobalLink · Share" },
+      ],
+    },
+    {
+      label: "Governance",
+      items: [{ to: "/admin/users", label: "Users & roles" }],
+    },
   ];
   const footerNav = [
     { to: "/about", label: "About" },
