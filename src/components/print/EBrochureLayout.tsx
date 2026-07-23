@@ -205,9 +205,11 @@ export function EBrochureLayout({
               />
             </div>
           )}
-          {content.heroMedia && (
+          {content.heroMedia ? (
             <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
-          )}
+          ) : mode === "light" ? (
+            <PrintHeroAura brand={brand} mode="light" accent={accent} primary={primary} seed={seed ?? `ebrochure-${brand.id}-${mode}`} aspect={auroraAspect(pageSize)} cq={cq} />
+          ) : null}
 
           <div
             className="relative flex h-full flex-col"
