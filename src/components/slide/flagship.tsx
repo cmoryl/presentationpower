@@ -559,6 +559,15 @@ export function AuroraLayer({
           ))}
         </g>
       </svg>
+      {mode === "light" && (
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `linear-gradient(to left, ${hexA(brand.tokens.accent, 0.10)} 0%, ${hexA(brand.tokens.accent, 0.045)} 35%, rgba(255,255,255,0) 70%)`,
+          }}
+        />
+      )}
       {/* Free-form aurora v2 — no frosted-glass wash, no vignette. Content
           sits directly on the accent blooms, matching the reference
           backdrops. Both the on-screen renderer and the PPTX exporter in
