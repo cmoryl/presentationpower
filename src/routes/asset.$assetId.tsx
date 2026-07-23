@@ -33,7 +33,7 @@ import { emptyCaseStudy, emptySpotlight, emptyEBrochure, emptyAdaptorBrief } fro
 import type { PrintSection, PrintStatsSection, PrintStatsVariant } from "@/lib/print-assets.types";
 import type { SpotlightContent, EBrochureContent, AdaptorBriefContent } from "@/lib/print-assets.types";
 import { PRINT_STATS_VARIANTS, PrintSectionRenderer } from "@/components/print/sections/PrintSectionRenderer";
-import { PrintSectionPicker } from "@/components/print/sections/PrintSectionPicker";
+import { PrintSectionPicker, PRINT_SECTION_DND_MIME } from "@/components/print/sections/PrintSectionPicker";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
@@ -878,6 +878,7 @@ function AssetEditor() {
         onInsert={(section) => {
           const next = [...(content.modules ?? []), section];
           patchContent({ modules: next });
+          // Keep drawer open so the user can insert multiple modules.
         }}
         brand={brand}
         mode="light"
@@ -924,6 +925,27 @@ function ModulesPanel({
   const lightestWeight = 1.6;
   const gate = canAddModule(kind, modules, lightestWeight);
 
+  // Parse a dragged section payload from the drawer. Returns null for
+  // reorder drags (which carry a numeric text/plain index instead).
+  function readInsertPayload(e: React.DragEvent): PrintSection | null {
+    const raw = e.dataTransfer.getData(PRINT_SECTION_DND_MIME);
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw) as PrintSection;
+      if (!parsed || typeof parsed !== "object" || !("kind" in parsed)) return null;
+      // Re-issue an id so pasting the same drawer card twice yields unique keys.
+      return { ...parsed, id: `sec-${Math.random().toString(36).slice(2, 10)}` } as PrintSection;
+    } catch {
+      return null;
+    }
+  }
+  function insertAt(index: number, section: PrintSection) {
+    const clamped = Math.max(0, Math.min(index, modules.length));
+    const next = [...modules];
+    next.splice(clamped, 0, section);
+    onChange(next);
+  }
+
   return (
     <>
       <button
@@ -964,6 +986,13 @@ function ModulesPanel({
             onDrop={(e) => {
               e.preventDefault();
               (e.currentTarget as HTMLDivElement).classList.remove("ring-2", "ring-[#003FC7]");
+              // New-module insert from drawer takes priority.
+              const inserted = readInsertPayload(e);
+              if (inserted) {
+                if (!gate.ok) return;
+                insertAt(i, inserted);
+                return;
+              }
               const from = Number(e.dataTransfer.getData("text/plain"));
               if (Number.isNaN(from) || from === i) return;
               const next = [...modules];
@@ -1027,6 +1056,30 @@ function ModulesPanel({
         ))}
       </div>
 
+      {/* Trailing drop zone — accepts new-module inserts from the drawer. */}
+      <div
+        data-testid="modules-drop-zone"
+        onDragOver={(e) => {
+          if (!e.dataTransfer.types.includes(PRINT_SECTION_DND_MIME)) return;
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "copy";
+          (e.currentTarget as HTMLDivElement).classList.add("border-[#003FC7]", "bg-[#003FC7]/5", "text-[#003FC7]");
+        }}
+        onDragLeave={(e) => {
+          (e.currentTarget as HTMLDivElement).classList.remove("border-[#003FC7]", "bg-[#003FC7]/5", "text-[#003FC7]");
+        }}
+        onDrop={(e) => {
+          const inserted = readInsertPayload(e);
+          (e.currentTarget as HTMLDivElement).classList.remove("border-[#003FC7]", "bg-[#003FC7]/5", "text-[#003FC7]");
+          if (!inserted) return;
+          e.preventDefault();
+          if (!gate.ok) return;
+          insertAt(modules.length, inserted);
+        }}
+        className="mt-3 flex items-center justify-center rounded-md border border-dashed border-black/15 px-2 py-3 text-[11px] uppercase tracking-widest text-black/40 transition dark:border-white/15 dark:text-white/40"
+      >
+        Drop module here
+      </div>
     </>
   );
 }
