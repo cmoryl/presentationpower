@@ -312,9 +312,11 @@ export function SpotlightLayout({
               />
             </div>
           )}
-          {content.heroMedia && (
+          {content.heroMedia ? (
             <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
-          )}
+          ) : mode === "light" ? (
+            <PrintHeroAura brand={brand} mode="light" accent={accent} primary={primary} seed={auroraSeed} aspect={auroraAspect(pageSize)} cq={cq} />
+          ) : null}
 
           <div
             className="relative flex h-full flex-col"
