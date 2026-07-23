@@ -245,12 +245,18 @@ export function SlideFrame({
 
   const mode = useSlideMode();
   const backdrop = useContext(SlideBackdropContext);
-  const isChromeDark = variant === "cover" || variant === "divider" || variant === "close";
-  const slideDark = mode === "dark" || isChromeDark;
-  // Baseline variants are simple and readable: white slides with ink text in
-  // light mode, dark navy slides with white text in dark mode. Cover / divider
-  // / close chrome always renders on the dark navy surface regardless of
-  // theme so hero titles keep their editorial contrast.
+  // Cover / divider / close chrome historically forced a dark navy surface so
+  // hero titles kept dramatic contrast even when the deck ran in default light
+  // mode. That override predates mode-aware ink tokens and breaks light-mode
+  // aurora: it forces the inner SlideModeContext to "dark", so titles resolve
+  // to `#FFFFFF` and vanish on the pale aurora surface. Now: honor the mode
+  // authority. When the caller renders with `mode="light"` (VariantRenderer
+  // sets this via SlideModeContext.Provider), chrome stays light and titles
+  // resolve to a dark ink via `makeSlideInk`. Legacy dark covers still work —
+  // callers just pass `mode="dark"`.
+  const isChromeDark = (variant === "cover" || variant === "divider" || variant === "close") && mode === "dark";
+  const slideDark = mode === "dark";
+
   const hasBackdrop = !!backdrop;
   const hasBackdropImage = !!backdrop?.url;
   const hasBackdropAurora = !!backdrop?.aurora;
@@ -572,12 +578,9 @@ export function SlideFrame({
           paddingBottom: bottomLogo ? 208 : 96,
         }}
       >
-        {isChromeDark && mode !== "dark" ? (
-          <SlideModeContext.Provider value="dark">{children}</SlideModeContext.Provider>
-        ) : (
-          children
-        )}
+        {children}
       </div>
+
       {/* Footer (locked) — micro uppercase, hairline aligned to page number.
           When a bottom-center lockup is present, the centered footer text
           would collide with it; we tuck each half further out and up so the
