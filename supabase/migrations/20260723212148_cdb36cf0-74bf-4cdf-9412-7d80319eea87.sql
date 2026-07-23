@@ -1,0 +1,1 @@
+ALTER TABLE public.division_imagery ADD COLUMN IF NOT EXISTS variants jsonb NOT NULL DEFAULT '{}'::jsonb;
