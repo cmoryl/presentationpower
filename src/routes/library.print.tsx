@@ -209,6 +209,7 @@ const CASE_STUDY_SEED: CaseStudyContent = emptyCaseStudy({
   cta: {
     label: "See GlobalLink in Action",
     subhead: "Explore how GlobalLink AI can transform your content operations.",
+    buttonLabel: "Book a Demo »",
   },
   engagement: {
     title: "Engagement Snapshot",
@@ -218,6 +219,7 @@ const CASE_STUDY_SEED: CaseStudyContent = emptyCaseStudy({
       "Hands-on, human partnership",
     ],
   },
+  footer: { links: ["transperfect.com/globallink", "globallink@transperfect.com"] },
 });
 
 // ---------------------------------------------------------------------------
