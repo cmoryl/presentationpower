@@ -278,6 +278,14 @@ function Uploader({
     data: string;
     kind: Kind;
     tags: string[];
+    variants?: Array<{
+      preset: "thumb" | "square" | "portrait" | "landscape";
+      filename: string;
+      contentType: "image/jpeg";
+      data: string;
+      width: number;
+      height: number;
+    }>;
   }) => void;
   isUploading: boolean;
 }) {
