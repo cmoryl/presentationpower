@@ -171,7 +171,7 @@ export function CaseStudyLayout({
               <div style={{ fontSize: cq(9.5), fontWeight: 600, letterSpacing: "0.14em", color: "#FFFFFF" }}>
                 {(content.eyebrow ?? "CLIENT CASE STUDY").toUpperCase()}
               </div>
-              <BrandLockup brand={brand} color="#FFFFFF" size="xs" orientation="horizontal" monochrome />
+              <BrandLockup brand={brand} color="#FFFFFF" size="xs" orientation="horizontal" />
             </div>
             <h1
               ref={heroRef}
