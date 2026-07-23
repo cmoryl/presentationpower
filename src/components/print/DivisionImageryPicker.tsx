@@ -102,7 +102,17 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
             <option value="generated">Generated</option>
             <option value="upload">Upload</option>
           </select>
+          <label className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-2 text-xs text-white/80 hover:text-white">
+            <input
+              type="checkbox"
+              checked={approvedOnly}
+              onChange={(e) => setApprovedOnly(e.target.checked)}
+              className="h-3 w-3 accent-emerald-400"
+            />
+            Approved only
+          </label>
         </div>
+
 
         <div className="flex-1 overflow-y-auto p-5">
           {!divisionId ? (
