@@ -6732,6 +6732,7 @@ function FreeformAreaChart({
             {p.label}
           </text>
         ) : null,
+      )}
     </svg>
   );
 }
