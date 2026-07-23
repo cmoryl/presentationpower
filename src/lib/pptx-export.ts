@@ -423,6 +423,67 @@ export async function exportDeckToPptx(
     }),
   );
 
+  // Pre-render MV-VIZ-* infographic specs to vector SVG (browser-only,
+  // via ECharts). Ships as an image on the slide — pptxgenjs accepts SVG
+  // data URLs and PowerPoint preserves them as vectors.
+  const slideVizSvg: Record<string, string> = {};
+  const vizSlides = deck.slides.filter((sl) => typeof sl.variantId === "string" && sl.variantId.startsWith("MV-VIZ-"));
+  if (vizSlides.length > 0 && typeof window !== "undefined") {
+    try {
+      const [{ renderSpecToSvg, svgToDataUrl }, { ensureA11y }] = await Promise.all([
+        import("@/lib/infographics/svg"),
+        import("@/lib/infographics/a11y"),
+      ]);
+      const kindByVariant: Record<string, string> = {
+        "MV-VIZ-SANKEY": "sankey",
+        "MV-VIZ-CHORD": "chord",
+        "MV-VIZ-BEESWARM": "beeswarm",
+        "MV-VIZ-BUMP": "bump",
+        "MV-VIZ-MARKET-MAP": "market-map",
+        "MV-VIZ-TREEMAP": "treemap",
+        "MV-VIZ-CALENDAR-HEATMAP": "calendar-heatmap",
+      };
+      await Promise.all(
+        vizSlides.map(async (sl) => {
+          try {
+            const content = (sl.content ?? {}) as Record<string, unknown>;
+            const declared = content.spec as Record<string, unknown> | undefined;
+            const kind = (declared?.kind as string) ?? kindByVariant[sl.variantId] ?? "custom";
+            const rows = ((declared?.data as Record<string, unknown> | undefined)?.rows as unknown[]) ?? (content.rows as unknown[]) ?? [];
+            const encoding = (declared?.encoding as Record<string, unknown>) ?? (content.encoding as Record<string, unknown>) ?? {};
+            const spec = ensureA11y({
+              id: `${sl.id}-viz`,
+              kind: kind as never,
+              title: typeof content.title === "string" ? content.title : "",
+              data: {
+                rows: rows as never,
+                source: typeof content.source === "string" ? content.source : undefined,
+              },
+              encoding: encoding as never,
+              theme: {
+                divisionId: undefined,
+                mode: "dark",
+                accent: `#${palette.accent}`,
+                primary: `#${palette.primary}`,
+                ink: `#${palette.ink}`,
+                surface: `#${palette.surface}`,
+              },
+              accessibility: { shortAlt: "", longDesc: "" },
+              export: { preferredFormat: "svg", rasterFallback: true },
+            });
+            const svg = await renderSpecToSvg(spec, { width: 1600, height: 900 });
+            if (svg) slideVizSvg[sl.id] = svgToDataUrl(svg);
+          } catch {
+            /* per-slide failure — falls back to title-only */
+          }
+        }),
+      );
+    } catch {
+      /* module load failure — leave slideVizSvg empty */
+    }
+  }
+
+
   const failedSlides: string[] = [];
   for (let i = 0; i < deck.slides.length; i++) {
     const slide = deck.slides[i];
@@ -498,7 +559,7 @@ export async function exportDeckToPptx(
 
 
     try {
-      if (!renderAdvancedVariant(s, slide, slidePalette, slideItemLogos[i])) {
+      if (!renderAdvancedVariant(s, slide, slidePalette, slideItemLogos[i], slideVizSvg[slide.id])) {
         switch (kind) {
           case "cover":
             renderCover(s, slide, slidePalette);
@@ -1107,8 +1168,13 @@ const LIGHT_GRAY = "E5E1DA";
 const MID_GRAY = "9CA3AF";
 const DARK_GRAY = "4B5563";
 
-function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette, itemLogos: Array<string | null> = []): boolean {
+function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette, itemLogos: Array<string | null> = [], vizSvg?: string): boolean {
   const c = (slide.content ?? {}) as Record<string, unknown>;
+  // MV-VIZ-* spec-driven infographics — embed pre-rendered vector SVG.
+  if (typeof slide.variantId === "string" && slide.variantId.startsWith("MV-VIZ-")) {
+    renderVizSpec(s, c, p, vizSvg);
+    return true;
+  }
   switch (slide.variantId) {
     case "MV-BENTO-5": renderBento5(s, c, p); return true;
     case "MV-KPI-DASHBOARD": renderKpiDashboard(s, c, p); return true;
@@ -1232,6 +1298,25 @@ function drawTitle(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette): 
 function initials(name: string): string {
   return name.split(/\s+/).map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
 }
+
+// MV-VIZ-* — render a pre-rasterized/vector SVG under the shared title zone.
+function renderVizSpec(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette, vizSvg?: string) {
+  const y0 = drawTitle(s, c, p);
+  const y = Math.max(y0, 1.6);
+  const h = 6.0 - y;
+  if (vizSvg) {
+    s.addImage({ data: vizSvg, x: 0.6, y, w: 12.13, h, sizing: { type: "contain", w: 12.13, h } });
+  } else {
+    // Fallback: subtitle so the slide isn't blank when SVG capture fails.
+    const subtitle = typeof c.subtitle === "string" ? c.subtitle : "Chart preview unavailable in this export.";
+    s.addText(subtitle, { x: 0.6, y: y + 0.3, w: 12.13, h: 0.6, fontFace: "Geist", fontSize: 14, color: p.ink });
+  }
+  const source = typeof c.source === "string" ? c.source : "";
+  if (source) {
+    s.addText(`Source · ${source}`, { x: 0.6, y: 6.4, w: 12.13, h: 0.35, fontFace: "Geist", fontSize: 10, color: p.ink });
+  }
+}
+
 
 // 1. MV-BENTO-5 — asymmetric 5-cell grid
 function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
