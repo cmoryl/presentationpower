@@ -297,6 +297,51 @@ async function waitForImages(node: HTMLElement, timeoutMs: number): Promise<void
 }
 
 /**
+ * Minimal reusable capture helper. Awaits `document.fonts.ready`, then
+ * `img.decode()` on every descendant <img> (falling back to load events for
+ * browsers without decode), and rasterizes the node to a PNG data URL at
+ * `pixelRatio` 2. Use this when you just need a snapshot and don't need the
+ * full progress/backdrop/CORS pipeline of `captureSlideAsDataUrl`.
+ */
+export async function captureSlide(
+  node: HTMLElement,
+  opts: { pixelRatio?: number; backgroundColor?: string } = {},
+): Promise<string> {
+  if (!node) throw new Error("captureSlide: node is required");
+
+  if (typeof document !== "undefined" && document.fonts?.ready) {
+    try { await document.fonts.ready; } catch { /* best effort */ }
+  }
+
+  const images = Array.from(node.querySelectorAll("img"));
+  await Promise.all(
+    images.map(async (img) => {
+      if (typeof img.decode === "function") {
+        try { await img.decode(); return; } catch { /* fall through to load event */ }
+      }
+      if (img.complete && img.naturalWidth > 0) return;
+      await new Promise<void>((resolve) => {
+        const done = () => resolve();
+        img.addEventListener("load", done, { once: true });
+        img.addEventListener("error", done, { once: true });
+      });
+    }),
+  );
+
+  // Let layout settle after fonts/images finish resolving.
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+  return toPng(node, {
+    pixelRatio: opts.pixelRatio ?? 2,
+    cacheBust: true,
+    backgroundColor: opts.backgroundColor,
+    filter: (el) =>
+      !(el instanceof HTMLElement) || el.dataset?.exportIgnore !== "true",
+  });
+}
+
+
+/**
  * Rasterize a slide DOM node to a PNG data URL. The node must be attached
  * to the document (visible) so styles resolve.
  */
