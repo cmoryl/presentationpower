@@ -13,6 +13,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+// Recursive JSON type — TanStack's server-fn serializer validates return shapes
+// and rejects bare `unknown` / `Record<string, unknown>`.
+export type Json = string | number | boolean | null | { [k: string]: Json } | Json[];
+
 export type DivisionStat = {
   id: string;
   label: string;
@@ -58,7 +62,7 @@ export type DivisionBrandMode = {
   id: string;
   name: string;
   description: string;
-  tokens: unknown;
+  tokens: Json;
 };
 
 export type DivisionCaseStudy = {
