@@ -13,6 +13,17 @@ import type { PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
 // layout scales identically at any preview or export DPI.
 export const PAGE_W = 816;
 
+/** CSS line-clamp — graceful truncation for slots that fill with AI copy. */
+export function clampLines(lines: number): CSSProperties {
+  return {
+    display: "-webkit-box",
+    WebkitLineClamp: lines,
+    WebkitBoxOrient: "vertical",
+    overflow: "hidden",
+  };
+}
+
+
 /** Template-px → container-relative unit (cqw against PAGE_W). */
 export const cq = (px: number) => `${((px * 100) / PAGE_W).toFixed(3)}cqw`;
 
