@@ -181,13 +181,13 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
         />
       )}
       {/* Legibility scrim into the body background — scaled by washStrength */}
-      {scrim !== "none" && scrimOpacity > 0 && (
+      {effectiveScrim !== "none" && effectiveScrimOpacity > 0 && (
         <div
           style={{
             position: "absolute",
             inset: 0,
             background: scrimGradient,
-            opacity: scrimOpacity,
+            opacity: effectiveScrimOpacity,
           }}
         />
       )}
