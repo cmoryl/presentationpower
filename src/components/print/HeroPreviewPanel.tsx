@@ -17,8 +17,8 @@ export function HeroPreviewPanel({ media, brand, mode }: Props) {
   const [view, setView] = useState<"media" | "aura">(hasMedia ? "media" : "aura");
   const active = view === "media" && !hasMedia ? "aura" : view;
 
-  const accent = brand?.accent ?? "#003FC7";
-  const primary = brand?.primary ?? accent;
+  const accent = brand?.tokens?.accent ?? "#003FC7";
+  const primary = brand?.tokens?.primary ?? accent;
   const isDark = mode === "dark";
   const pageBg = isDark ? "#111114" : "#FFFFFF";
 
