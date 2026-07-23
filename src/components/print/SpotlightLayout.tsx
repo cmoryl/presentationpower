@@ -442,7 +442,7 @@ export function SpotlightLayout({
                           style={{ gap: cq(6), marginTop: i === 0 ? cq(10) : cq(6) }}
                         >
                           <Icon name="check" size={cq(11)} color={accentInk} strokeWidth={2.5} />
-                          <div style={{ fontSize: cq(9), color: inkSoft, lineHeight: 1.3 }}>
+                          <div style={{ fontSize: cq(9), color: inkSoft, lineHeight: 1.3, ...clampLines(2) }}>
                             {b}
                           </div>
                         </div>
