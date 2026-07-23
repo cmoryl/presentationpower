@@ -551,7 +551,7 @@ function renderVariantBody({
             <div
               className="tabular-nums"
               style={{
-                fontSize: 340,
+                fontSize: 260,
                 lineHeight: 0.85,
                 fontWeight: 600,
                 letterSpacing: "-0.05em",
