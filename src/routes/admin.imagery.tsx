@@ -93,6 +93,16 @@ function AdminImageryPage() {
     onSuccess: () => invalidate(),
   });
 
+  const targetingMut = useMutation({
+    mutationFn: (input: {
+      id: string;
+      collection?: string | null;
+      template_kinds?: TemplateKind[];
+      is_default_for?: TemplateKind[];
+    }) => updateFn({ data: input }),
+    onSuccess: () => invalidate(),
+  });
+
   const delMut = useMutation({
     mutationFn: (id: string) => deleteFn({ data: { id } }),
     onSuccess: () => {
@@ -102,15 +112,33 @@ function AdminImageryPage() {
   });
 
   const rows = q.data ?? [];
+  const collections = useMemo(() => {
+    const set = new Set<string>();
+    rows.forEach((r) => {
+      if (r.collection) set.add(r.collection);
+    });
+    return Array.from(set).sort();
+  }, [rows]);
+
   const filtered = useMemo(() => {
     const tag = tagQuery.trim().toLowerCase();
     return rows.filter((r) => {
       if (statusFilter === "approved" && !r.approved) return false;
       if (statusFilter === "pending" && r.approved) return false;
       if (tag && !r.tags.some((t) => t.toLowerCase().includes(tag))) return false;
+      if (templateFilter !== "all") {
+        const t = r.template_kinds ?? [];
+        const d = r.is_default_for ?? [];
+        const universal = t.length === 0;
+        if (!universal && !t.includes(templateFilter) && !d.includes(templateFilter)) return false;
+      }
+      if (collectionFilter !== "all") {
+        if (collectionFilter === "__none" && r.collection) return false;
+        if (collectionFilter !== "__none" && r.collection !== collectionFilter) return false;
+      }
       return true;
     });
-  }, [rows, statusFilter, tagQuery]);
+  }, [rows, statusFilter, tagQuery, templateFilter, collectionFilter]);
 
   if (q.error && isForbidden(q.error)) return <AdminForbidden />;
 
