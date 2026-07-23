@@ -239,10 +239,25 @@ function PrintCenterPage() {
 
   const listFn = useServerFn(listMyPrintAssets);
   const delFn = useServerFn(deletePrintAsset);
+  const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
+  useEffect(() => {
+    let mounted = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (mounted) setIsAuthed(!!data.session);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setIsAuthed(!!session);
+    });
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
   const assetsQuery = useQuery({
     queryKey: ["print-assets", "mine"],
     queryFn: () => listFn(),
     staleTime: 30_000,
+    enabled: isAuthed === true,
   });
 
   const onDelete = async (id: string) => {
