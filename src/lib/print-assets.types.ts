@@ -272,7 +272,7 @@ export function emptyCaseStudy(seed?: Partial<CaseStudyContent>): CaseStudyConte
     ],
     quote:
       seed?.quote ??
-      { body: "They didn't just translate our content — they rebuilt how we ship it. We're moving at a pace we couldn't have imagined last year.", attribution: "VP of Global Marketing" },
+      { text: "They didn't just translate our content — they rebuilt how we ship it. We're moving at a pace we couldn't have imagined last year.", author: "VP of Global Marketing" },
     expert: seed?.expert,
     cta: seed?.cta ?? { label: "Start a conversation" },
   };
@@ -299,7 +299,7 @@ export function emptySpotlight(seed?: Partial<SpotlightContent>): SpotlightConte
     ],
     quote:
       seed?.quote ??
-      { body: "We onboarded three new regions in the time it used to take us to launch one.", attribution: "Director of Digital Experience" },
+      { text: "We onboarded three new regions in the time it used to take us to launch one.", author: "Director of Digital Experience" },
     expert: seed?.expert,
     cta: seed?.cta ?? { label: "Talk to us" },
   };
@@ -336,7 +336,7 @@ export function emptyEBrochure(seed?: Partial<EBrochureContent>): EBrochureConte
     ],
     quote:
       seed?.quote ??
-      { body: "It's the first localization program our compliance team has ever signed off on without changes.", attribution: "Head of Regulatory Content" },
+      { text: "It's the first localization program our compliance team has ever signed off on without changes.", author: "Head of Regulatory Content" },
     discover: seed?.discover ?? {
       body: "Discover how we can help your organization streamline operations and deliver measurable results across every market.",
       bullets: ["Trusted global partner", "Deep division expertise", "Hands-on, human collaboration"],
@@ -369,7 +369,7 @@ export function emptyAdaptorBrief(seed?: Partial<AdaptorBriefContent>): AdaptorB
     ],
     quote:
       seed?.quote ??
-      { body: "The connector shipped in a sprint. Two months in, our marketing team has stopped filing localization tickets entirely.", attribution: "Principal Engineer, Platform" },
+      { text: "The connector shipped in a sprint. Two months in, our marketing team has stopped filing localization tickets entirely.", author: "Principal Engineer, Platform" },
     cta: seed?.cta ?? { label: "Talk to an expert" },
   };
 }
