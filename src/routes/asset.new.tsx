@@ -78,7 +78,8 @@ function NewAssetPage() {
     [brandModes, brandModeId],
   );
 
-  const canGenerate = (kind === "case-study" || kind === "spotlight") && title.trim().length > 0 && prospect.trim().length > 0;
+  const requiresProspect = kind === "case-study" || kind === "spotlight";
+  const canGenerate = title.trim().length > 0 && (!requiresProspect || prospect.trim().length > 0);
 
   async function handleGenerate() {
     setBusy(true);
