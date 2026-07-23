@@ -309,9 +309,10 @@ export function CaseStudyLayout({
                     <div style={{ fontFamily: "Georgia, serif", fontSize: cq(40), lineHeight: 0.6, color: accentInk, fontWeight: 700 }} aria-hidden>
                       &ldquo;
                     </div>
-                    <p style={{ margin: `${cq(10)} 0 0`, fontSize: cq(12.5), lineHeight: 1.6, color: ink }}>
+                    <p style={{ margin: `${cq(10)} 0 0`, fontSize: cq(12.5), lineHeight: 1.6, color: ink, ...clampLines(5) }}>
                       {content.quote.text}
                     </p>
+
                     <div style={{ marginTop: cq(10), fontSize: cq(11), fontWeight: 700, color: accentInk }}>
                       — {content.quote.author}{content.quote.company ? ` · ${content.quote.company}` : ""}
                     </div>
