@@ -48,17 +48,46 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
   }, [open, divisionId, list, approvedOnly]);
 
 
+  // Top ~20 tags across the loaded pool, ranked by frequency, so users can
+  // one-click narrow the grid without typing the exact tag string.
+  const tagOptions = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const r of items) for (const t of r.tags ?? []) {
+      const k = t.trim();
+      if (!k) continue;
+      counts.set(k, (counts.get(k) ?? 0) + 1);
+    }
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .slice(0, 20)
+      .map(([tag, count]) => ({ tag, count }));
+  }, [items]);
+
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return items.filter((r) => {
       if (kind !== "all" && r.kind !== kind) return false;
+      if (activeTags.length > 0) {
+        const rowTags = new Set((r.tags ?? []).map((t) => t.toLowerCase()));
+        for (const t of activeTags) if (!rowTags.has(t.toLowerCase())) return false;
+      }
       if (!needle) return true;
       const hay = [r.filename, r.note ?? "", r.prompt ?? "", (r.tags ?? []).join(" ")]
         .join(" ")
         .toLowerCase();
       return hay.includes(needle);
     });
-  }, [items, q, kind]);
+  }, [items, q, kind, activeTags]);
+
+  const hasFilters = q.trim().length > 0 || kind !== "all" || activeTags.length > 0;
+  function toggleTag(t: string) {
+    setActiveTags((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
+  }
+  function clearAll() {
+    setQ("");
+    setKind("all");
+    setActiveTags([]);
+  }
 
   if (!open) return null;
 
