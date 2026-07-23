@@ -597,29 +597,10 @@ function TemplateDetailOverlay({
           </div>
         </div>
 
-        {kind === "spotlight" || kind === "ebrochure" || kind === "adaptor-brief" ? (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <PreviewFrame label="Light"><PrintPreview kind={kind} brand={brand} mode="light" /></PreviewFrame>
-            <PreviewFrame label="Dark"><PrintPreview kind={kind} brand={brand} mode="dark" /></PreviewFrame>
-          </div>
-        ) : (
-          <div className="rounded-xl border border-dashed border-black/20 bg-white p-10 text-center">
-            <div className="mx-auto max-w-md">
-              <div className="text-xs uppercase tracking-[0.24em] text-black/50">In production</div>
-              <h3 className="mt-2 text-lg font-semibold text-[#03002C]">{tpl.label} preview is coming soon.</h3>
-              <p className="mt-2 text-sm text-black/60">
-                Case Study assets are already draftable from the wizard — the layout port is queued behind the other three.
-              </p>
-              <Link
-                to="/asset/new"
-                search={{ kind: "case-study", brandModeId: brand.id }}
-                className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:bg-[#003FC7]/85"
-              >
-                Draft a case study <ArrowRight size={12} />
-              </Link>
-            </div>
-          </div>
-        )}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <PreviewFrame label="Light"><PrintPreview kind={kind} brand={brand} mode="light" /></PreviewFrame>
+          <PreviewFrame label="Dark"><PrintPreview kind={kind} brand={brand} mode="dark" /></PreviewFrame>
+        </div>
       </div>
     </div>
   );
