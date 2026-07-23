@@ -737,6 +737,7 @@ function Library() {
               showImagery={showImagery}
               autoFixOn={autoFixOn}
               logoHubPool={logoHubPool}
+              compact={density === "thumb"}
               onOpen={() =>
                 isVideo ? setVideoZoomKey(entry.example.key) : setOpenId(v.id)
               }
