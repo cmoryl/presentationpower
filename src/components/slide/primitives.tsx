@@ -227,11 +227,11 @@ export function TitleBlock({
 // so a stat row baseline-aligns and a single-stat slide can go monumental.
 type StatSize = "sm" | "md" | "lg" | "xl" | "monumental";
 const STAT_SPECS: Record<StatSize, { valuePx: number; unitPx: number; labelPx: number }> = {
-  sm:          { valuePx: 108, unitPx: 40, labelPx: 20 },
-  md:          { valuePx: 148, unitPx: 52, labelPx: 22 },
-  lg:          { valuePx: 200, unitPx: 68, labelPx: 24 },
-  xl:          { valuePx: 260, unitPx: 84, labelPx: 26 },
-  monumental:  { valuePx: 360, unitPx: 108, labelPx: 28 },
+  sm:          { valuePx: 84,  unitPx: 32, labelPx: 20 },
+  md:          { valuePx: 116, unitPx: 42, labelPx: 22 },
+  lg:          { valuePx: 156, unitPx: 54, labelPx: 24 },
+  xl:          { valuePx: 200, unitPx: 66, labelPx: 26 },
+  monumental:  { valuePx: 280, unitPx: 84, labelPx: 28 },
 };
 
 export function StatFigure({
