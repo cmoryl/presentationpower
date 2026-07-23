@@ -34,6 +34,7 @@ import { Route as KnowledgeAskRouteImport } from './routes/knowledge.ask'
 import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
+import { Route as AssetSpotlightPreviewRouteImport } from './routes/asset.spotlight-preview'
 import { Route as AssetNewRouteImport } from './routes/asset.new'
 import { Route as AssetAssetIdRouteImport } from './routes/asset.$assetId'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
@@ -187,6 +188,11 @@ const DecksImportRoute = DecksImportRouteImport.update({
 const BriefNewRoute = BriefNewRouteImport.update({
   id: '/brief/new',
   path: '/brief/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssetSpotlightPreviewRoute = AssetSpotlightPreviewRouteImport.update({
+  id: '/asset/spotlight-preview',
+  path: '/asset/spotlight-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AssetNewRoute = AssetNewRouteImport.update({
@@ -371,6 +377,7 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
+  '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
@@ -425,6 +432,7 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
+  '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
@@ -482,6 +490,7 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
+  '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
@@ -540,6 +549,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/asset/$assetId'
     | '/asset/new'
+    | '/asset/spotlight-preview'
     | '/brief/new'
     | '/decks/import'
     | '/knowledge/$entryId'
@@ -594,6 +604,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/asset/$assetId'
     | '/asset/new'
+    | '/asset/spotlight-preview'
     | '/brief/new'
     | '/decks/import'
     | '/knowledge/$entryId'
@@ -650,6 +661,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/asset/$assetId'
     | '/asset/new'
+    | '/asset/spotlight-preview'
     | '/brief/new'
     | '/decks/import'
     | '/knowledge/$entryId'
@@ -690,6 +702,7 @@ export interface RootRouteChildren {
   ApiChatRoute: typeof ApiChatRoute
   AssetAssetIdRoute: typeof AssetAssetIdRoute
   AssetNewRoute: typeof AssetNewRoute
+  AssetSpotlightPreviewRoute: typeof AssetSpotlightPreviewRoute
   BriefNewRoute: typeof BriefNewRoute
   DecksImportRoute: typeof DecksImportRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
@@ -881,6 +894,13 @@ declare module '@tanstack/react-router' {
       path: '/brief/new'
       fullPath: '/brief/new'
       preLoaderRoute: typeof BriefNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/asset/spotlight-preview': {
+      id: '/asset/spotlight-preview'
+      path: '/asset/spotlight-preview'
+      fullPath: '/asset/spotlight-preview'
+      preLoaderRoute: typeof AssetSpotlightPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/asset/new': {
@@ -1173,6 +1193,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiChatRoute: ApiChatRoute,
   AssetAssetIdRoute: AssetAssetIdRoute,
   AssetNewRoute: AssetNewRoute,
+  AssetSpotlightPreviewRoute: AssetSpotlightPreviewRoute,
   BriefNewRoute: BriefNewRoute,
   DecksImportRoute: DecksImportRoute,
   LibraryImportedRoute: LibraryImportedRoute,

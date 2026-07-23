@@ -28,6 +28,33 @@ export type CaseStudyContent = {
   cta?: { label: string; url?: string };
 };
 
+// ---------------------------------------------------------------------------
+// SPOTLIGHT — single-page product / service highlight
+// ---------------------------------------------------------------------------
+// Deliberate reuse of the case-study primitives where the shape matches:
+//   • `capabilities` items are structurally identical to `CaseStudyBlock`
+//     (heading + body) — reuse the type rather than create a parallel one.
+//   • `stats` reuses `CaseStudyStat` — same {label, value, unit?, caption?}
+//     contract, same inspector controls, same export path.
+//   • `quote`, `expert`, `cta` reuse the exact inline shapes from
+//     `CaseStudyContent` so the shared UI panels work unchanged.
+// New concepts unique to a spotlight:
+//   • `productName` (hero — this is the subject, not a client)
+//   • `tagline` (short positioning line, ~6–10 words)
+// A spotlight has no challenge/solution/result arc; the narrative is
+// value-prop → capabilities → proof.
+export type SpotlightContent = {
+  eyebrow?: string;                     // e.g. "Product spotlight"
+  productName: string;                  // hero name of the product / service
+  tagline: string;                      // one-line positioning
+  summary?: string;                     // 1–2 sentence value proposition
+  capabilities: CaseStudyBlock[];       // 3–5 feature blocks
+  stats: CaseStudyStat[];               // 2–4 proof points
+  quote?: { text: string; author: string; role?: string; company?: string };
+  expert?: { name: string; role?: string; email?: string };
+  cta?: { label: string; url?: string };
+};
+
 export type PrintPageSize = "A4" | "Letter" | "Square";
 export type PrintDensity = "compact" | "standard" | "airy";
 export type PrintDistribution = "sales-enablement" | "web-download" | "print";
@@ -82,5 +109,27 @@ export function emptyCaseStudy(seed?: Partial<CaseStudyContent>): CaseStudyConte
     quote: seed?.quote,
     expert: seed?.expert,
     cta: seed?.cta ?? { label: "Start a conversation" },
+  };
+}
+
+export function emptySpotlight(seed?: Partial<SpotlightContent>): SpotlightContent {
+  return {
+    eyebrow: seed?.eyebrow ?? "Product spotlight",
+    productName: seed?.productName ?? "",
+    tagline: seed?.tagline ?? "",
+    summary: seed?.summary ?? "",
+    capabilities: seed?.capabilities ?? [
+      { heading: "Capability", body: "" },
+      { heading: "Capability", body: "" },
+      { heading: "Capability", body: "" },
+    ],
+    stats: seed?.stats ?? [
+      { label: "Proof point", value: "0", unit: "" },
+      { label: "Proof point", value: "0", unit: "" },
+      { label: "Proof point", value: "0", unit: "" },
+    ],
+    quote: seed?.quote,
+    expert: seed?.expert,
+    cta: seed?.cta ?? { label: "Talk to us" },
   };
 }
