@@ -142,12 +142,14 @@ export function CaseStudyLayout({
             ...style,
           }}
         >
-          <AuroraLayer
-            seed={seed ?? `casestudy-${brand.id}-${mode}`}
-            brand={brand}
-            intensity={0.85}
-            aspect={auroraAspect(pageSize)}
-          />
+          {mode === "dark" && (
+            <AuroraLayer
+              seed={seed ?? `casestudy-${brand.id}-${mode}`}
+              brand={brand}
+              intensity={0.85}
+              aspect={auroraAspect(pageSize)}
+            />
+          )}
           {content.heroMedia && (
             <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
           )}
