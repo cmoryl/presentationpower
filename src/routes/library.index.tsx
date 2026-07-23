@@ -1664,6 +1664,71 @@ function VariantDetailModal({
       subCompany={null}
       divisionId={brand.id}
     />
+    {previewUrls && (
+      <div
+        className="fixed inset-0 z-[60] flex items-center justify-center bg-[#03002C]/85 p-6 backdrop-blur-md"
+        onClick={closePdfPreview}
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="flex h-[92vh] w-full max-w-[1600px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0A0821] text-white shadow-2xl"
+        >
+          <div className="flex items-center justify-between gap-4 border-b border-white/10 px-6 py-4">
+            <div className="min-w-0">
+              <div className="text-xs uppercase tracking-widest text-white/60">PDF preview · {pixelRatio}×</div>
+              <div className="mt-1 truncate text-lg font-semibold">{variant.name} — {brand.name}</div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => downloadPreviewBlob("light")}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:bg-white/90"
+              >
+                <Download size={12} /> Download Light
+              </button>
+              <button
+                type="button"
+                onClick={() => downloadPreviewBlob("dark")}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#0050ff]"
+              >
+                <Download size={12} /> Download Dark
+              </button>
+              <button
+                type="button"
+                onClick={closePdfPreview}
+                className="rounded-full border border-white/20 px-3 py-1.5 text-sm text-white/80 hover:bg-white/10"
+              >
+                Close ✕
+              </button>
+            </div>
+          </div>
+          <div className="grid flex-1 grid-cols-1 gap-4 overflow-hidden bg-[#050416] p-4 md:grid-cols-2">
+            <div className="flex flex-col overflow-hidden rounded-xl border border-white/10 bg-white">
+              <div className="flex items-center justify-between border-b border-black/10 px-3 py-2 text-xs font-medium text-black/70">
+                <span>☀︎ Light</span>
+                <span className="font-mono text-[10px] text-black/40">{previewUrls.filenameLight}</span>
+              </div>
+              <iframe
+                title="Light PDF preview"
+                src={previewUrls.light}
+                className="h-full w-full flex-1 bg-neutral-100"
+              />
+            </div>
+            <div className="flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[#03002C]">
+              <div className="flex items-center justify-between border-b border-white/10 px-3 py-2 text-xs font-medium text-white/70">
+                <span>☾ Dark</span>
+                <span className="font-mono text-[10px] text-white/40">{previewUrls.filenameDark}</span>
+              </div>
+              <iframe
+                title="Dark PDF preview"
+                src={previewUrls.dark}
+                className="h-full w-full flex-1 bg-[#03002C]"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
     </>
   );
 }
