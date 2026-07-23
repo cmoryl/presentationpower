@@ -11,7 +11,8 @@ export type PrintHeroMedia = {
   imageUrl: string;
   focalPoint?: string;           // CSS object-position, e.g. "50% 35%"
   overlayColor?: string;         // hex; defaults to page accent supplied by layout
-  overlayOpacity?: number;       // 0..1, default 0.55
+  overlayOpacity?: number;       // 0..1, default 0.55 — accent wash strength
+  washStrength?: number;         // 0..1, default 1 — legibility scrim + feather multiplier
   scrim?: PrintHeroScrim;        // legibility gradient, default "bottom"
   blendMode?: CSSProperties["mixBlendMode"]; // default "multiply"
   heightPct?: number;            // 0..100, share of page height, default 46
