@@ -1230,6 +1230,21 @@ function VariantDetailModal({
   const [previewUrls, setPreviewUrls] = useState<{ light: string; dark: string; filenameLight: string; filenameDark: string; ratio: 1 | 2 } | null>(null);
   const [zipBusy, setZipBusy] = useState(false);
   const [zipStage, setZipStage] = useState<string | null>(null);
+  type ZipItemKey = "pptxLight" | "pptxDark" | "pdfLight" | "pdfDark" | "pngLight" | "pngDark";
+  const ZIP_STORAGE_KEY = "library:zip-selection";
+  const [zipSelection, setZipSelection] = useState<Record<ZipItemKey, boolean>>(() => {
+    if (typeof window === "undefined") return { pptxLight: true, pptxDark: true, pdfLight: true, pdfDark: true, pngLight: true, pngDark: true };
+    try {
+      const raw = window.localStorage.getItem(ZIP_STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return { pptxLight: true, pptxDark: true, pdfLight: true, pdfDark: true, pngLight: true, pngDark: true };
+  });
+  useEffect(() => {
+    if (typeof window !== "undefined") window.localStorage.setItem(ZIP_STORAGE_KEY, JSON.stringify(zipSelection));
+  }, [zipSelection]);
+  const [zipMenuOpen, setZipMenuOpen] = useState(false);
+  const zipSelectedCount = Object.values(zipSelection).filter(Boolean).length;
 
   useEffect(() => {
     return () => {
@@ -1400,15 +1415,22 @@ function VariantDetailModal({
 
   const downloadModuleZip = async () => {
     if (zipBusy || pdfBusy || bothBusy || previewBusy || downloading) return;
+    if (zipSelectedCount === 0) {
+      toast.error("Select at least one export to include in the ZIP");
+      return;
+    }
     setZipBusy(true);
     setZipStage("Starting…");
     try {
       const findNode = (m: "light" | "dark") => document.querySelector<HTMLElement>(
         `[data-modal-preview="${m}"][data-variant-id="${variant.id}"]`,
       );
-      const lightNode = findNode("light");
-      const darkNode = findNode("dark");
-      if (!lightNode || !darkNode) throw new Error("Preview nodes not found");
+      const needsLightNode = zipSelection.pdfLight || zipSelection.pngLight;
+      const needsDarkNode = zipSelection.pdfDark || zipSelection.pngDark;
+      const lightNode = needsLightNode ? findNode("light") : null;
+      const darkNode = needsDarkNode ? findNode("dark") : null;
+      if (needsLightNode && !lightNode) throw new Error("Light preview node not found");
+      if (needsDarkNode && !darkNode) throw new Error("Dark preview node not found");
 
       const buildDeck = (exportMode: "light" | "dark") => ({
         id: `library-${variant.id}-${Date.now()}-${exportMode}`,
@@ -1428,26 +1450,44 @@ function VariantDetailModal({
         }],
       }) as Parameters<typeof exportDeckToPptx>[0];
 
-      setZipStage("Building light PPTX…");
-      const lightPptx = await exportDeckToPptx(buildDeck("light"), brand, { forceMode: "light", output: "blob" });
-      setZipStage("Building dark PPTX…");
-      const darkPptx = await exportDeckToPptx(buildDeck("dark"), brand, { forceMode: "dark", output: "blob" });
+      let lightPptx: Awaited<ReturnType<typeof exportDeckToPptx>> | null = null;
+      let darkPptx: Awaited<ReturnType<typeof exportDeckToPptx>> | null = null;
+      if (zipSelection.pptxLight) {
+        setZipStage("Building light PPTX…");
+        lightPptx = await exportDeckToPptx(buildDeck("light"), brand, { forceMode: "light", output: "blob" });
+      }
+      if (zipSelection.pptxDark) {
+        setZipStage("Building dark PPTX…");
+        darkPptx = await exportDeckToPptx(buildDeck("dark"), brand, { forceMode: "dark", output: "blob" });
+      }
 
       const imgMod = await import("@/lib/slide-image-export");
-      setZipStage("Rendering light PDF…");
-      const lightPdf = await imgMod.exportSlidesAsImagePdf(
-        [{ node: lightNode, mode: "light" }],
-        { filename: "light.pdf", pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Light PDF · ${p.message ?? p.stage}`) },
-      );
-      setZipStage("Rendering dark PDF…");
-      const darkPdf = await imgMod.exportSlidesAsImagePdf(
-        [{ node: darkNode, mode: "dark" }],
-        { filename: "dark.pdf", pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Dark PDF · ${p.message ?? p.stage}`) },
-      );
-      setZipStage("Rendering light PNG…");
-      const lightPng = await imgMod.captureSlide(lightNode, { pixelRatio });
-      setZipStage("Rendering dark PNG…");
-      const darkPng = await imgMod.captureSlide(darkNode, { pixelRatio });
+      let lightPdf: Blob | null = null;
+      let darkPdf: Blob | null = null;
+      let lightPng: string | null = null;
+      let darkPng: string | null = null;
+      if (zipSelection.pdfLight && lightNode) {
+        setZipStage("Rendering light PDF…");
+        lightPdf = (await imgMod.exportSlidesAsImagePdf(
+          [{ node: lightNode, mode: "light" }],
+          { filename: "light.pdf", pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Light PDF · ${p.message ?? p.stage}`) },
+        )) as Blob;
+      }
+      if (zipSelection.pdfDark && darkNode) {
+        setZipStage("Rendering dark PDF…");
+        darkPdf = (await imgMod.exportSlidesAsImagePdf(
+          [{ node: darkNode, mode: "dark" }],
+          { filename: "dark.pdf", pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Dark PDF · ${p.message ?? p.stage}`) },
+        )) as Blob;
+      }
+      if (zipSelection.pngLight && lightNode) {
+        setZipStage("Rendering light PNG…");
+        lightPng = await imgMod.captureSlide(lightNode, { pixelRatio });
+      }
+      if (zipSelection.pngDark && darkNode) {
+        setZipStage("Rendering dark PNG…");
+        darkPng = await imgMod.captureSlide(darkNode, { pixelRatio });
+      }
 
       const dataUrlToBlob = async (u: string) => (await fetch(u)).blob();
 
@@ -1455,15 +1495,16 @@ function VariantDetailModal({
       const { default: JSZip } = await import("jszip");
       const zip = new JSZip();
       const base = `${variant.id}-${brand.id}`;
-      if (lightPptx.blob) zip.file(`pptx/${lightPptx.fileName ?? `${base}-light.pptx`}`, lightPptx.blob);
-      if (darkPptx.blob) zip.file(`pptx/${darkPptx.fileName ?? `${base}-dark.pptx`}`, darkPptx.blob);
-      if (lightPdf) zip.file(`pdf/${base}-light-${pixelRatio}x.pdf`, lightPdf);
-      if (darkPdf) zip.file(`pdf/${base}-dark-${pixelRatio}x.pdf`, darkPdf);
-      zip.file(`png/${base}-light-${pixelRatio}x.png`, await dataUrlToBlob(lightPng));
-      zip.file(`png/${base}-dark-${pixelRatio}x.png`, await dataUrlToBlob(darkPng));
+      const included: string[] = [];
+      if (lightPptx?.blob) { zip.file(`pptx/${lightPptx.fileName ?? `${base}-light.pptx`}`, lightPptx.blob); included.push("pptx/light"); }
+      if (darkPptx?.blob) { zip.file(`pptx/${darkPptx.fileName ?? `${base}-dark.pptx`}`, darkPptx.blob); included.push("pptx/dark"); }
+      if (lightPdf) { zip.file(`pdf/${base}-light-${pixelRatio}x.pdf`, lightPdf); included.push("pdf/light"); }
+      if (darkPdf) { zip.file(`pdf/${base}-dark-${pixelRatio}x.pdf`, darkPdf); included.push("pdf/dark"); }
+      if (lightPng) { zip.file(`png/${base}-light-${pixelRatio}x.png`, await dataUrlToBlob(lightPng)); included.push("png/light"); }
+      if (darkPng) { zip.file(`png/${base}-dark-${pixelRatio}x.png`, await dataUrlToBlob(darkPng)); included.push("png/dark"); }
       zip.file(
         "README.txt",
-        `${variant.name} — ${brand.name}\nModule: ${variant.id}\nDivision: ${brand.id}\nResolution: ${pixelRatio}×\nExported: ${new Date().toISOString()}\n\nContents:\n  pptx/  — editable PowerPoint (Light + Dark)\n  pdf/   — image PDFs (Light + Dark)\n  png/   — rasterized slide PNGs (Light + Dark)\n`,
+        `${variant.name} — ${brand.name}\nModule: ${variant.id}\nDivision: ${brand.id}\nResolution: ${pixelRatio}×\nExported: ${new Date().toISOString()}\n\nIncluded:\n  ${included.join("\n  ")}\n`,
       );
 
       const zipBlob = await zip.generateAsync({ type: "blob" });
@@ -1476,7 +1517,7 @@ function VariantDetailModal({
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      toast.success("Module ZIP exported", { description: `${filename} · PPTX + PDF + PNG (Light & Dark) at ${pixelRatio}×` });
+      toast.success("Module ZIP exported", { description: `${filename} · ${included.length} file${included.length === 1 ? "" : "s"} at ${pixelRatio}×` });
     } catch (err) {
       console.error("[library] module ZIP export failed", err);
       toast.error("ZIP export failed", { description: "Check console for details." });
@@ -1643,16 +1684,81 @@ function VariantDetailModal({
               {previewBusy ? <Loader2 size={12} className="animate-spin" /> : <Eye size={12} />}
               {previewBusy ? (previewStage ?? "Rendering…") : "Preview PDFs"}
             </button>
-            <button
-              type="button"
-              onClick={downloadModuleZip}
-              disabled={zipBusy || previewBusy || pdfBusy !== null || bothBusy || downloading}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C] bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#003FC7] disabled:opacity-60"
-              title="Download a single ZIP containing PPTX, PDF, and PNG for both Light and Dark themes"
-            >
-              {zipBusy ? <Loader2 size={12} className="animate-spin" /> : <Package size={12} />}
-              {zipBusy ? (zipStage ?? "Bundling…") : "Download ZIP"}
-            </button>
+            <div className="relative inline-flex items-stretch overflow-visible rounded-full border border-[#03002C] bg-[#03002C] text-xs font-medium text-white">
+              <button
+                type="button"
+                onClick={downloadModuleZip}
+                disabled={zipBusy || previewBusy || pdfBusy !== null || bothBusy || downloading || zipSelectedCount === 0}
+                className="inline-flex items-center gap-1.5 rounded-l-full px-3 py-1.5 transition hover:bg-[#003FC7] disabled:opacity-60"
+                title={zipSelectedCount === 0 ? "Select at least one export in the menu" : `Download ZIP with ${zipSelectedCount} file${zipSelectedCount === 1 ? "" : "s"}`}
+              >
+                {zipBusy ? <Loader2 size={12} className="animate-spin" /> : <Package size={12} />}
+                {zipBusy ? (zipStage ?? "Bundling…") : `Download ZIP (${zipSelectedCount})`}
+              </button>
+              <button
+                type="button"
+                onClick={() => setZipMenuOpen((v) => !v)}
+                disabled={zipBusy}
+                aria-haspopup="menu"
+                aria-expanded={zipMenuOpen}
+                aria-label="Choose files to include in ZIP"
+                title="Choose files to include"
+                className="inline-flex items-center border-l border-white/20 rounded-r-full px-2 transition hover:bg-[#003FC7] disabled:opacity-60"
+              >
+                <svg className={`h-3 w-3 transition-transform ${zipMenuOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 9l6 6 6-6"/></svg>
+              </button>
+              {zipMenuOpen && (
+                <>
+                  <button
+                    type="button"
+                    aria-label="Close menu"
+                    className="fixed inset-0 z-40 cursor-default bg-transparent"
+                    onClick={() => setZipMenuOpen(false)}
+                  />
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-black/10 bg-white p-3 text-[#03002C] shadow-xl ring-1 ring-black/5"
+                  >
+                    <div className="flex items-center justify-between pb-2">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">Include in ZIP</span>
+                      <div className="flex gap-1">
+                        <button
+                          type="button"
+                          onClick={() => setZipSelection({ pptxLight: true, pptxDark: true, pdfLight: true, pdfDark: true, pngLight: true, pngDark: true })}
+                          className="rounded-full px-2 py-0.5 text-[10px] font-medium text-[#003FC7] hover:bg-[#003FC7]/10"
+                        >All</button>
+                        <button
+                          type="button"
+                          onClick={() => setZipSelection({ pptxLight: false, pptxDark: false, pdfLight: false, pdfDark: false, pngLight: false, pngDark: false })}
+                          className="rounded-full px-2 py-0.5 text-[10px] font-medium text-black/60 hover:bg-black/5"
+                        >None</button>
+                      </div>
+                    </div>
+                    {([
+                      { key: "pptxLight", label: "PPTX · Light" },
+                      { key: "pptxDark", label: "PPTX · Dark" },
+                      { key: "pdfLight", label: "PDF · Light" },
+                      { key: "pdfDark", label: "PDF · Dark" },
+                      { key: "pngLight", label: "PNG · Light" },
+                      { key: "pngDark", label: "PNG · Dark" },
+                    ] as { key: ZipItemKey; label: string }[]).map((item) => (
+                      <label key={item.key} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium hover:bg-black/5">
+                        <input
+                          type="checkbox"
+                          checked={zipSelection[item.key]}
+                          onChange={(e) => setZipSelection((s) => ({ ...s, [item.key]: e.target.checked }))}
+                          className="h-3.5 w-3.5 accent-[#003FC7]"
+                        />
+                        {item.label}
+                      </label>
+                    ))}
+                    <p className="mt-2 border-t border-black/5 pt-2 text-[10px] text-black/50">
+                      Selection is saved for next time · {pixelRatio}× resolution
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
             {usageCount > 0 && (
               <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
                 Used · {usageCount}
