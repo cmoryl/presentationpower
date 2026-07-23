@@ -157,6 +157,10 @@ export function EBrochureLayout({
             intensity={0.85}
             aspect={auroraAspect(pageSize)}
           />
+          {content.heroMedia && (
+            <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
+          )}
+
 
           {/* Template's centered top halo — retuned to accent so every division reads. */}
           <div
