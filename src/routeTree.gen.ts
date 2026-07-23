@@ -34,6 +34,8 @@ import { Route as KnowledgeAskRouteImport } from './routes/knowledge.ask'
 import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
+import { Route as AssetNewRouteImport } from './routes/asset.new'
+import { Route as AssetAssetIdRouteImport } from './routes/asset.$assetId'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTranslationRouteImport } from './routes/admin.translation'
@@ -185,6 +187,16 @@ const DecksImportRoute = DecksImportRouteImport.update({
 const BriefNewRoute = BriefNewRouteImport.update({
   id: '/brief/new',
   path: '/brief/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssetNewRoute = AssetNewRouteImport.update({
+  id: '/asset/new',
+  path: '/asset/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssetAssetIdRoute = AssetAssetIdRouteImport.update({
+  id: '/asset/$assetId',
+  path: '/asset/$assetId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -357,6 +369,8 @@ export interface FileRoutesByFullPath {
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
+  '/asset/$assetId': typeof AssetAssetIdRoute
+  '/asset/new': typeof AssetNewRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
@@ -409,6 +423,8 @@ export interface FileRoutesByTo {
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
+  '/asset/$assetId': typeof AssetAssetIdRoute
+  '/asset/new': typeof AssetNewRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
@@ -464,6 +480,8 @@ export interface FileRoutesById {
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
+  '/asset/$assetId': typeof AssetAssetIdRoute
+  '/asset/new': typeof AssetNewRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
@@ -520,6 +538,8 @@ export interface FileRouteTypes {
     | '/admin/translation'
     | '/admin/users'
     | '/api/chat'
+    | '/asset/$assetId'
+    | '/asset/new'
     | '/brief/new'
     | '/decks/import'
     | '/knowledge/$entryId'
@@ -572,6 +592,8 @@ export interface FileRouteTypes {
     | '/admin/translation'
     | '/admin/users'
     | '/api/chat'
+    | '/asset/$assetId'
+    | '/asset/new'
     | '/brief/new'
     | '/decks/import'
     | '/knowledge/$entryId'
@@ -626,6 +648,8 @@ export interface FileRouteTypes {
     | '/admin/translation'
     | '/admin/users'
     | '/api/chat'
+    | '/asset/$assetId'
+    | '/asset/new'
     | '/brief/new'
     | '/decks/import'
     | '/knowledge/$entryId'
@@ -664,6 +688,8 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   TemplatesRoute: typeof TemplatesRoute
   ApiChatRoute: typeof ApiChatRoute
+  AssetAssetIdRoute: typeof AssetAssetIdRoute
+  AssetNewRoute: typeof AssetNewRoute
   BriefNewRoute: typeof BriefNewRoute
   DecksImportRoute: typeof DecksImportRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
@@ -855,6 +881,20 @@ declare module '@tanstack/react-router' {
       path: '/brief/new'
       fullPath: '/brief/new'
       preLoaderRoute: typeof BriefNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/asset/new': {
+      id: '/asset/new'
+      path: '/asset/new'
+      fullPath: '/asset/new'
+      preLoaderRoute: typeof AssetNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/asset/$assetId': {
+      id: '/asset/$assetId'
+      path: '/asset/$assetId'
+      fullPath: '/asset/$assetId'
+      preLoaderRoute: typeof AssetAssetIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -1131,6 +1171,8 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   TemplatesRoute: TemplatesRoute,
   ApiChatRoute: ApiChatRoute,
+  AssetAssetIdRoute: AssetAssetIdRoute,
+  AssetNewRoute: AssetNewRoute,
   BriefNewRoute: BriefNewRoute,
   DecksImportRoute: DecksImportRoute,
   LibraryImportedRoute: LibraryImportedRoute,

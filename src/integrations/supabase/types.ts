@@ -1066,6 +1066,84 @@ export type Database = {
         }
         Relationships: []
       }
+      division_quotes: {
+        Row: {
+          author: string | null
+          company: string | null
+          created_at: string
+          division_id: string
+          id: string
+          quote: string
+          role: string | null
+          sort_order: number
+          source: string | null
+          updated_at: string
+        }
+        Insert: {
+          author?: string | null
+          company?: string | null
+          created_at?: string
+          division_id: string
+          id?: string
+          quote: string
+          role?: string | null
+          sort_order?: number
+          source?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author?: string | null
+          company?: string | null
+          created_at?: string
+          division_id?: string
+          id?: string
+          quote?: string
+          role?: string | null
+          sort_order?: number
+          source?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      division_stats: {
+        Row: {
+          caption: string | null
+          created_at: string
+          division_id: string
+          id: string
+          label: string
+          sort_order: number
+          source: string | null
+          unit: string | null
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          division_id: string
+          id?: string
+          label: string
+          sort_order?: number
+          source?: string | null
+          unit?: string | null
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          division_id?: string
+          id?: string
+          label?: string
+          sort_order?: number
+          source?: string | null
+          unit?: string | null
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       globallink_config: {
         Row: {
           batch_size: number
@@ -1766,6 +1844,88 @@ export type Database = {
         }
         Relationships: []
       }
+      print_assets: {
+        Row: {
+          brand_mode_id: string | null
+          brief_id: string | null
+          content: Json
+          context: Json
+          created_at: string
+          id: string
+          kind: string
+          owner_id: string
+          share_expires_at: string | null
+          share_token: string | null
+          shared_at: string | null
+          source_deck_id: string | null
+          source_module_ids: string[]
+          source_slide_ids: string[]
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          brand_mode_id?: string | null
+          brief_id?: string | null
+          content?: Json
+          context?: Json
+          created_at?: string
+          id?: string
+          kind?: string
+          owner_id: string
+          share_expires_at?: string | null
+          share_token?: string | null
+          shared_at?: string | null
+          source_deck_id?: string | null
+          source_module_ids?: string[]
+          source_slide_ids?: string[]
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          brand_mode_id?: string | null
+          brief_id?: string | null
+          content?: Json
+          context?: Json
+          created_at?: string
+          id?: string
+          kind?: string
+          owner_id?: string
+          share_expires_at?: string | null
+          share_token?: string | null
+          shared_at?: string | null
+          source_deck_id?: string | null
+          source_module_ids?: string[]
+          source_slide_ids?: string[]
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "print_assets_brand_mode_id_fkey"
+            columns: ["brand_mode_id"]
+            isOneToOne: false
+            referencedRelation: "brand_modes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "print_assets_brief_id_fkey"
+            columns: ["brief_id"]
+            isOneToOne: false
+            referencedRelation: "briefs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "print_assets_source_deck_id_fkey"
+            columns: ["source_deck_id"]
+            isOneToOne: false
+            referencedRelation: "decks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -2144,6 +2304,7 @@ export type Database = {
         Args: { _lang: string; _token: string }
         Returns: Json
       }
+      get_shared_print_asset: { Args: { _token: string }; Returns: Json }
       get_template_deck: { Args: { _deck_id: string }; Returns: Json }
       has_role: {
         Args: {
