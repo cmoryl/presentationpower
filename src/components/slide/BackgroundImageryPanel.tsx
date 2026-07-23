@@ -853,6 +853,8 @@ export function BackgroundImageryPanel({
           </div>
         </div>
       )}
+      </>)}
     </div>
+
   );
 }
