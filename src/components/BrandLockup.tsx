@@ -172,10 +172,10 @@ export function BrandLockup({
               {logo.wordmark.toUpperCase()}
             </div>
           )}
-          {showDivision && divisionLine && (
+          {showDivision && divisionLine && !useOfficialImage && (
             <div
               className="max-w-full uppercase leading-tight tracking-[0.14em] opacity-70 [overflow-wrap:anywhere]"
-              style={{ fontSize: dims.dividerPx, marginTop: useOfficialWordmark || useOfficialImage ? 6 : 4 }}
+              style={{ fontSize: dims.dividerPx, marginTop: useOfficialWordmark ? 6 : 4 }}
             >
               {divisionLine}
             </div>
