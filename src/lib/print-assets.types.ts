@@ -26,15 +26,20 @@ export function resolvePrintLogoInk(
 // render an image band with an accent-color wash and legibility scrim under
 // the hero copy. Structural type — the visual layer lives in
 // `src/components/print/PrintHeroMedia.tsx`.
+export type PrintHeroAspect = "fill" | "21:9" | "16:9" | "3:2" | "4:3" | "1:1";
+
 export type PrintHeroMedia = {
   imageUrl: string;
-  focalPoint?: string;            // CSS object-position
+  focalPoint?: string;            // legacy CSS object-position
+  focalX?: number;                // 0..100 — horizontal focal %, wins over focalPoint
+  focalY?: number;                // 0..100 — vertical focal %, wins over focalPoint
+  aspect?: PrintHeroAspect;       // "fill" uses heightPct; others letterbox to ratio
   overlayColor?: string;          // hex; falls back to division accent
   overlayOpacity?: number;        // 0..1 — accent color wash opacity, default 0.55
   washStrength?: number;          // 0..1 — legibility scrim + feather intensity, default 1
   scrim?: "top" | "bottom" | "both" | "radial" | "none";
   blendMode?: "normal" | "multiply" | "overlay" | "soft-light" | "screen";
-  heightPct?: number;             // share of page height, default 46
+  heightPct?: number;             // share of page height, default 46 (used when aspect="fill")
 };
 
 
