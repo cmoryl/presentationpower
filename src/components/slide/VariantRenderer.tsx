@@ -4257,28 +4257,141 @@ function renderVariantBody({
     }
 
     case "MV-DASH-GROWTH-COLUMNS": {
+      // Free-form Aurora v2. Columns sit on a single hairline baseline that
+      // spans the whole slide — no plate, no per-column border, no rounded
+      // pill. Feathered multi-stop bloom on every column; the last column
+      // gets a radial halo behind it + full-strength bloom + soft glow so
+      // the "now" reading carries without any label.
       const items = arr(c.items).slice(0, 5);
       const vals = items.map((it) => Number(it.value) || 0);
       const max = Math.max(1, ...vals);
+      const CHART_H = 460;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14 grid items-end gap-10" style={{ gridTemplateColumns: `repeat(${items.length || 1}, 1fr)`, minHeight: 520 }}>
+          <div className="flex items-start justify-between gap-16">
+            <div style={{ maxWidth: 780 }}>
+              <Kicker brand={brand}>{s(c.kicker, "Trajectory")}</Kicker>
+              <div
+                className="mt-4"
+                style={{ fontSize: 60, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+              >
+                {s(c.title, variant.name)}
+              </div>
+              {s(c.headline) && (
+                <div
+                  className="mt-5"
+                  style={{ fontSize: 22, color: ink.muted, letterSpacing: "-0.005em", lineHeight: 1.45, maxWidth: 680 }}
+                >
+                  {s(c.headline)}
+                </div>
+              )}
+            </div>
+          </div>
+          <div
+            className="mt-12 grid items-end gap-10"
+            style={{
+              gridTemplateColumns: `repeat(${items.length || 1}, 1fr)`,
+              minHeight: CHART_H + 80,
+              borderBottom: `1px solid ${ink.hairline}`,
+              paddingBottom: 0,
+            }}
+          >
             {items.map((it, i) => {
               const v = Number(it.value) || 0;
-              const h = Math.max(40, (v / max) * 420);
+              const h = Math.max(48, (v / max) * CHART_H);
               const isLast = i === items.length - 1;
-              const fill = isLast
-                ? `linear-gradient(180deg, color-mix(in oklab, var(--slide-accent-text) 78%, transparent) 0%, color-mix(in oklab, var(--slide-accent-text) 18%, transparent) 100%)`
-                : `linear-gradient(180deg, color-mix(in oklab, var(--slide-accent-text) 22%, transparent) 0%, color-mix(in oklab, var(--slide-accent-text) 4%, transparent) 100%)`;
+              const bloom = isLast
+                ? `linear-gradient(180deg,
+                    color-mix(in oklab, var(--slide-accent-text) 72%, transparent) 0%,
+                    color-mix(in oklab, var(--slide-accent-text) 38%, transparent) 35%,
+                    color-mix(in oklab, var(--slide-accent-text) 12%, transparent) 70%,
+                    color-mix(in oklab, var(--slide-accent-text) 0%, transparent) 100%)`
+                : `linear-gradient(180deg,
+                    color-mix(in oklab, var(--slide-accent-text) 30%, transparent) 0%,
+                    color-mix(in oklab, var(--slide-accent-text) 14%, transparent) 45%,
+                    color-mix(in oklab, var(--slide-accent-text) 4%, transparent) 80%,
+                    color-mix(in oklab, var(--slide-accent-text) 0%, transparent) 100%)`;
               return (
-                <div key={i} className="flex flex-col items-center justify-end">
-                  <div className="tabular-nums" style={{ fontSize: 56, fontWeight: 600, color: ink.strong, letterSpacing: "-0.025em", lineHeight: 1 }}>
-                    {s(it.value)}<span style={{ fontSize: 28, color: "var(--slide-accent-text)", marginLeft: 4 }}>{s(it.unit)}</span>
+                <div key={i} className="flex flex-col items-center justify-end" style={{ position: "relative" }}>
+                  <div
+                    className="tabular-nums"
+                    style={{ fontSize: 56, fontWeight: 600, color: ink.strong, letterSpacing: "-0.025em", lineHeight: 1 }}
+                  >
+                    {s(it.value)}
+                    <span style={{ fontSize: 28, color: "var(--slide-accent-text)", marginLeft: 4 }}>
+                      {s(it.unit)}
+                    </span>
                   </div>
-                  <div className="mt-6 w-full" style={{ height: h, background: fill, maxWidth: 200, borderRadius: 2 }} />
-                  <div className="mt-6 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: isLast ? "var(--slide-accent-text)" : ink.faint, fontWeight: 700 }}>{s(it.year)}</div>
-                  {s(it.note) && <div className="mt-2 text-center" style={{ fontSize: 15, lineHeight: 1.4, color: ink.muted, maxWidth: 220 }}>{s(it.note)}</div>}
+                  <div
+                    className="mt-6 w-full"
+                    style={{
+                      position: "relative",
+                      height: h,
+                      maxWidth: 220,
+                    }}
+                  >
+                    {/* Feathered column bloom */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: bloom,
+                        filter: isLast ? "blur(0.5px)" : "none",
+                      }}
+                    />
+                    {/* Radial halo bloom behind the last column */}
+                    {isLast && (
+                      <div
+                        aria-hidden
+                        style={{
+                          position: "absolute",
+                          left: "50%",
+                          top: -40,
+                          width: 260,
+                          height: 260,
+                          transform: "translateX(-50%)",
+                          background:
+                            "radial-gradient(circle, color-mix(in oklab, var(--slide-accent-text) 40%, transparent) 0%, color-mix(in oklab, var(--slide-accent-text) 12%, transparent) 45%, transparent 75%)",
+                          pointerEvents: "none",
+                          zIndex: -1,
+                        }}
+                      />
+                    )}
+                    {/* Thin accent stroke on the top edge of the last column */}
+                    {isLast && (
+                      <div
+                        aria-hidden
+                        style={{
+                          position: "absolute",
+                          left: 0,
+                          right: 0,
+                          top: 0,
+                          height: 2,
+                          background: "var(--slide-accent-text)",
+                          boxShadow: "0 0 14px 2px color-mix(in oklab, var(--slide-accent-text) 55%, transparent)",
+                        }}
+                      />
+                    )}
+                  </div>
+                  <div
+                    className="mt-6 uppercase"
+                    style={{
+                      fontSize: 16,
+                      letterSpacing: "0.28em",
+                      color: isLast ? "var(--slide-accent-text)" : ink.faint,
+                      fontWeight: 700,
+                    }}
+                  >
+                    {s(it.year)}
+                  </div>
+                  {s(it.note) && (
+                    <div
+                      className="mt-2 text-center"
+                      style={{ fontSize: 15, lineHeight: 1.4, color: ink.muted, maxWidth: 220 }}
+                    >
+                      {s(it.note)}
+                    </div>
+                  )}
                 </div>
               );
             })}
