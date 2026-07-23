@@ -181,6 +181,10 @@ function AssetEditor() {
     setDirty(true);
     setHistoryTick((t) => t + 1);
   }
+  undoRef.current = undo;
+  redoRef.current = redo;
+
+
 
   function updateStat(i: number, patch: Partial<CaseStudyStat>) {
     const next = [...content.stats];
