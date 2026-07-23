@@ -3903,7 +3903,7 @@ function renderVariantBody({
             </div>
             <div className="mt-6 flex flex-wrap items-baseline gap-6">
               <span className="uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: ink.faint, fontWeight: 500 }}>{s(c.pronunciation)}</span>
-              <span style={{ fontSize: 24, color: "var(--slide-accent-text)", fontStyle: "italic", fontWeight: 600 }}>{s(c.partOfSpeech, "n.")}</span>
+              <span style={{ fontSize: 24, color: "var(--slide-accent-text)",  fontWeight: 600 }}>{s(c.partOfSpeech, "n.")}</span>
             </div>
             <div className="mt-10" style={{ fontSize: 34, lineHeight: 1.35, color: "color-mix(in oklab, currentColor 85%, transparent)", maxWidth: 1400 }}>
               {s(c.definition)}

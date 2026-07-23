@@ -287,7 +287,7 @@ export function EditorialTitle({
             key={i}
             style={{
               fontFamily: EDITORIAL_SERIF,
-              fontStyle: "italic",
+              
               fontWeight: 400,
               color: accentColor ?? color,
               letterSpacing: "-0.02em",
@@ -338,7 +338,7 @@ export function PullQuote({
     opacity,
     fontWeight: 500,
     letterSpacing: "-0.06em",
-    fontStyle: "italic",
+    
   };
   return (
     <div className={`relative ${className}`}>
@@ -359,7 +359,7 @@ export function PullQuote({
           fontFamily: EDITORIAL_SERIF,
           fontSize: size,
           fontWeight: 400,
-          fontStyle: "italic",
+          
           lineHeight: 1.08,
           letterSpacing: "-0.02em",
           color,
