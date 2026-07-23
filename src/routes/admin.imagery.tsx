@@ -242,6 +242,21 @@ function AdminImageryPage() {
         isUploading={uploadMut.isPending}
       />
 
+      {/* Analytics totals for the selected division (last 90 days) */}
+      {statsTotals ? (
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-xs text-black/70">
+          <BarChart3 size={13} className="text-[#003FC7]" />
+          <span className="font-medium uppercase tracking-wider text-black/50">
+            Last 90d ·
+          </span>
+          <span>{statsTotals.view} views</span>
+          <span className="text-black/25">·</span>
+          <span>{statsTotals.select} selects</span>
+          <span className="text-black/25">·</span>
+          <span>{statsTotals.download} downloads</span>
+        </div>
+      ) : null}
+
       {/* Grid */}
       {q.isLoading ? (
         <div className="flex items-center gap-2 text-sm text-black/50">
