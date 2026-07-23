@@ -77,8 +77,11 @@ const MODE_BG: Record<SlideExportMode, string> = {
 
 /** Absolute-minimum pixel ratio the exporter will honor. */
 const MIN_PIXEL_RATIO = 1;
-/** Practical cap — beyond this the browser tends to OOM on complex slides. */
-const MAX_PIXEL_RATIO = 8;
+// Modal preview nodes can be as narrow as ~300px, so hitting 4K (3840px)
+// requires ratios of ~13×. Keep a generous ceiling so the exporter never
+// silently downsamples the user's chosen target.
+const MAX_PIXEL_RATIO = 16;
+
 
 function resolvePixelRatio(
   node: HTMLElement,
