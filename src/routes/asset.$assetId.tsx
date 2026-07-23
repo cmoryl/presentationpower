@@ -3,8 +3,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   exportPrintAssetAsPdf,
   type PrintPageSizeKey,
+  type PrintExportQuality,
 } from "@/lib/print-asset-export";
 import { useServerFn } from "@tanstack/react-start";
+
 import { AppShell } from "@/components/AppShell";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { BrandLockup } from "@/components/BrandLockup";
