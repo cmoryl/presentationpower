@@ -622,7 +622,7 @@ export async function exportDeckToPptx(
       perSlideOrient === "stacked" ? "stacked"
       : perSlideOrient === "mark-only" ? "mark-only"
       : "horizontal";
-    const isVertical = false;
+    
     const isMarkOnly = orient === "mark-only";
     const sourceOrient: "horizontal" | "stacked" = orient === "stacked" ? "stacked" : "horizontal";
     const logoData = sourceOrient === "stacked"

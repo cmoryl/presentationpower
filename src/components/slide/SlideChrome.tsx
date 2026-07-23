@@ -515,7 +515,7 @@ export function SlideFrame({
           logoOrientation === "stacked" ? "stacked"
           : logoOrientation === "mark-only" ? "mark-only"
           : "horizontal";
-        const isVertical = false;
+        
         const isMarkOnly = normalizedOrient === "mark-only";
         // Half-size positions per brand direction (top/bottom-center + left side).
         const halfSize = (
