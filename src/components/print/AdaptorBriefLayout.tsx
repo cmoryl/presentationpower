@@ -151,6 +151,20 @@ export function AdaptorBriefLayout({
               style={{ background: "#FFFFFF", zIndex: 0 }}
             />
           )}
+          {/* Light mode still carries a subtle top wash (Canva ref pages 3-6). */}
+          {mode === "light" && (
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0"
+              aria-hidden
+              style={{
+                height: "40%",
+                zIndex: 1,
+                background: `linear-gradient(165deg, color-mix(in srgb, ${primary} 16%, transparent) 0%, color-mix(in srgb, ${accent} 9%, transparent) 45%, transparent 80%)`,
+                WebkitMaskImage: "linear-gradient(180deg, black 0%, black 55%, transparent 100%)",
+                maskImage: "linear-gradient(180deg, black 0%, black 55%, transparent 100%)",
+              }}
+            />
+          )}
           {/* Aurora + accent blooms — dark mode only, clipped to top region.
               Lower half of the document stays clean (no aura). */}
           {mode === "dark" && (
@@ -208,28 +222,30 @@ export function AdaptorBriefLayout({
               )}
             </div>
 
-            {/* 6 FEATURE CARDS */}
-            <div className="grid" style={{
-              gridTemplateColumns: "1fr 1fr 1fr", gap: cq(14), paddingTop: cq(28),
-            }}>
-              {features.map((f, i) => {
-                const glyph = VERB_ICONS[f.verb.toLowerCase()] ?? VERB_ICONS.default;
-                return (
-                  <div key={i} style={{ borderRadius: cq(12), padding: `${cq(18)} ${cq(16)}`, ...glassCard(mode, accent) }}>
-                    <div className="flex items-center justify-center" style={{
-                      width: cq(38), height: cq(38), borderRadius: cq(10), ...chipStyle(mode, accent),
-                    }}>
-                      <Icon d={glyph!} size={cq(18)} color={accentInk} />
-                    </div>
-                    <div style={{ fontWeight: 700, fontSize: cq(15), color: accentInk, marginTop: cq(10) }}>
-                      {f.verb}
-                    </div>
-                    <div style={{ fontSize: cq(10.5), lineHeight: 1.5, color: inkSoft, marginTop: cq(4) }}>
-                      {f.body}
-                    </div>
-                  </div>
-                );
-              })}
+            {/* 6 FEATURE CARDS — grouped in one rounded panel (Canva ref). */}
+            <div style={{ paddingTop: cq(28) }}>
+              <div style={{ borderRadius: cq(16), padding: cq(18), ...glassCard(mode, accent) }}>
+                <div className="grid" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: cq(14) }}>
+                  {features.map((f, i) => {
+                    const glyph = VERB_ICONS[f.verb.toLowerCase()] ?? VERB_ICONS.default;
+                    return (
+                      <div key={i} style={{ borderRadius: cq(12), padding: `${cq(14)} ${cq(12)}`, background: "transparent" }}>
+                        <div className="flex items-center justify-center" style={{
+                          width: cq(38), height: cq(38), borderRadius: cq(10), ...chipStyle(mode, accent),
+                        }}>
+                          <Icon d={glyph!} size={cq(18)} color={accentInk} />
+                        </div>
+                        <div style={{ fontWeight: 700, fontSize: cq(15), color: accentInk, marginTop: cq(10) }}>
+                          {f.verb}
+                        </div>
+                        <div style={{ fontSize: cq(10.5), lineHeight: 1.5, color: inkSoft, marginTop: cq(4) }}>
+                          {f.body}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
 
             {/* WE KNOW HOW strip */}

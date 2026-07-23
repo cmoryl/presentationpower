@@ -159,6 +159,20 @@ export function EBrochureLayout({
               style={{ background: "#FFFFFF", zIndex: 0 }}
             />
           )}
+          {/* Light mode top wash per Canva reference pages 3-6. */}
+          {mode === "light" && (
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0"
+              aria-hidden
+              style={{
+                height: "40%",
+                zIndex: 1,
+                background: `linear-gradient(165deg, color-mix(in srgb, ${primary} 16%, transparent) 0%, color-mix(in srgb, ${accent} 9%, transparent) 45%, transparent 80%)`,
+                WebkitMaskImage: "linear-gradient(180deg, black 0%, black 55%, transparent 100%)",
+                maskImage: "linear-gradient(180deg, black 0%, black 55%, transparent 100%)",
+              }}
+            />
+          )}
           {/* Aurora + halo clipped to the top of the page. Lower body stays clean. */}
           {mode === "dark" && (
             <div
@@ -225,39 +239,38 @@ export function EBrochureLayout({
               )}
             </div>
 
-            {/* 3 SUMMARY CARDS — Challenge / Approach / Impact
-                (pulled up to overlap the hero fade seam) */}
-            <div className="grid" style={{
-              gridTemplateColumns: "1fr 1fr 1fr", gap: cq(14),
-              paddingTop: cq(38), marginTop: cq(-6),
-            }}>
-
-              {sections.map((s, i) => (
-                <div key={i} style={{ borderRadius: cq(12), padding: `${cq(18)} ${cq(16)}`, ...glass(mode, accent) }}>
-                  <div className="flex items-center" style={{ gap: cq(8) }}>
-                    <div className="flex items-center justify-center" style={{
-                      width: cq(30), height: cq(30), borderRadius: cq(8),
-                      ...chipStyle(mode, accent, SECTION_WARM[i]!),
-                    }}>
-                      <Icon d={SECTION_ICONS[i]!} size={cq(16)} color={accentInk} />
+            {/* 3 SUMMARY CARDS — Challenge / Approach / Impact in one panel (Canva ref). */}
+            <div style={{ paddingTop: cq(38), marginTop: cq(-6) }}>
+              <div style={{ borderRadius: cq(16), padding: cq(16), ...glass(mode, accent) }}>
+                <div className="grid" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: cq(14) }}>
+                  {sections.map((s, i) => (
+                    <div key={i} style={{ borderRadius: cq(12), padding: `${cq(10)} ${cq(8)}`, background: "transparent" }}>
+                      <div className="flex items-center" style={{ gap: cq(8) }}>
+                        <div className="flex items-center justify-center" style={{
+                          width: cq(30), height: cq(30), borderRadius: cq(8),
+                          ...chipStyle(mode, accent, SECTION_WARM[i]!),
+                        }}>
+                          <Icon d={SECTION_ICONS[i]!} size={cq(16)} color={accentInk} />
+                        </div>
+                        <div style={{ fontWeight: 700, fontSize: cq(12.5), color: ink }}>{s.heading}</div>
+                      </div>
+                      {s.body && (
+                        <p style={{ margin: `${cq(9)} 0 0`, fontSize: cq(9.5), lineHeight: 1.55, color: inkSoft }}>
+                          {s.body}
+                        </p>
+                      )}
+                      {s.bullets.length > 0 && (
+                        <ul style={{
+                          margin: `${cq(8)} 0 0`, paddingLeft: cq(14),
+                          fontSize: cq(9), lineHeight: 1.6, color: inkFaint,
+                        }}>
+                          {s.bullets.slice(0, 4).map((b, k) => <li key={k}>{b}</li>)}
+                        </ul>
+                      )}
                     </div>
-                    <div style={{ fontWeight: 700, fontSize: cq(12.5), color: ink }}>{s.heading}</div>
-                  </div>
-                  {s.body && (
-                    <p style={{ margin: `${cq(9)} 0 0`, fontSize: cq(9.5), lineHeight: 1.55, color: inkSoft }}>
-                      {s.body}
-                    </p>
-                  )}
-                  {s.bullets.length > 0 && (
-                    <ul style={{
-                      margin: `${cq(8)} 0 0`, paddingLeft: cq(14),
-                      fontSize: cq(9), lineHeight: 1.6, color: inkFaint,
-                    }}>
-                      {s.bullets.slice(0, 4).map((b, k) => <li key={k}>{b}</li>)}
-                    </ul>
-                  )}
+                  ))}
                 </div>
-              ))}
+              </div>
             </div>
 
             {/* STAT ROW — icon + big number × 5 */}
