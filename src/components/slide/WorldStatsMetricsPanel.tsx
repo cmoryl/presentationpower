@@ -168,6 +168,11 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
     : 5;
   const setTopN = (n: TopN) => onChange({ topN: n });
 
+  const currentScaleMode: ScaleMode = SCALE_MODES.includes(scaleMode as ScaleMode)
+    ? (scaleMode as ScaleMode)
+    : "absolute";
+  const setScaleMode = (m: ScaleMode) => onChange({ scaleMode: m });
+
 
   const updateMetric = (id: string, patch: Partial<LocationMetric>) => {
     const next = metricList.map((m) => (m.id === id ? { ...m, ...patch } : m));
