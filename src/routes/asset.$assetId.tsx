@@ -212,9 +212,23 @@ function AssetEditor() {
     pageSize === "A4" ? "1 / 1.414"
     : pageSize === "Letter" ? "8.5 / 11"
     : "1 / 1";
+  // Aurora orb frame in the shared 1280×720 native space. Portrait / square
+  // page sizes re-project the aurora composition onto a taller / square
+  // frame so orbs bleed in from the correct edges (issue: with default
+  // slice-preserved 16:9 aurora, a portrait page cropped out the horizontal
+  // spread and looked flat). Landscape stays at native 1280×720.
+  const auroraAspect: { w: number; h: number } | undefined =
+    pageSize === "A4"
+      ? { w: Math.round((1280 * 8.2677) / 11.6929), h: 1280 }
+      : pageSize === "Letter"
+        ? { w: Math.round((1280 * 8.5) / 11), h: 1280 }
+        : pageSize === "Square"
+          ? { w: 1280, h: 1280 }
+          : undefined;
 
   const densityPad = density === "compact" ? "p-8" : density === "airy" ? "p-16" : "p-12";
   const densityGap = density === "compact" ? "gap-4" : density === "airy" ? "gap-10" : "gap-6";
+
 
   return (
     <AppShell>
