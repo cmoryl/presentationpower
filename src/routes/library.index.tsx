@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
-import { Download, Loader2, Star, Copy, Check, Plus, Play } from "lucide-react";
+import { Download, Loader2, Star, Copy, Check, Plus, Play, Eye } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
@@ -1176,6 +1176,79 @@ function VariantDetailModal({
   const [pdfStage, setPdfStage] = useState<string | null>(null);
   const [bothBusy, setBothBusy] = useState(false);
   const [pixelRatio, setPixelRatio] = useExportPixelRatio();
+  const [previewBusy, setPreviewBusy] = useState(false);
+  const [previewStage, setPreviewStage] = useState<string | null>(null);
+  const [previewUrls, setPreviewUrls] = useState<{ light: string; dark: string; filenameLight: string; filenameDark: string } | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrls) {
+        URL.revokeObjectURL(previewUrls.light);
+        URL.revokeObjectURL(previewUrls.dark);
+      }
+    };
+  }, [previewUrls]);
+
+  const openPdfPreview = async () => {
+    if (previewBusy || pdfBusy || bothBusy) return;
+    setPreviewBusy(true);
+    setPreviewStage(null);
+    try {
+      const findNode = (m: "light" | "dark") => document.querySelector<HTMLElement>(
+        `[data-modal-preview="${m}"][data-variant-id="${variant.id}"]`,
+      );
+      const lightNode = findNode("light");
+      const darkNode = findNode("dark");
+      if (!lightNode || !darkNode) throw new Error("Preview nodes not found");
+      const mod = await import("@/lib/slide-image-export");
+      const filenameLight = `${variant.id}-${brand.id}-light-${pixelRatio}x-review.pdf`;
+      const filenameDark = `${variant.id}-${brand.id}-dark-${pixelRatio}x-review.pdf`;
+      setPreviewStage("Rendering light…");
+      const lightBlob = await mod.exportSlidesAsImagePdf(
+        [{ node: lightNode, mode: "light" }],
+        { filename: filenameLight, pixelRatio, returnBlob: true, onProgress: (p) => setPreviewStage(`Light · ${p.message ?? p.stage}`) },
+      );
+      setPreviewStage("Rendering dark…");
+      const darkBlob = await mod.exportSlidesAsImagePdf(
+        [{ node: darkNode, mode: "dark" }],
+        { filename: filenameDark, pixelRatio, returnBlob: true, onProgress: (p) => setPreviewStage(`Dark · ${p.message ?? p.stage}`) },
+      );
+      if (!lightBlob || !darkBlob) throw new Error("Failed to build preview PDFs");
+      setPreviewUrls({
+        light: URL.createObjectURL(lightBlob),
+        dark: URL.createObjectURL(darkBlob),
+        filenameLight,
+        filenameDark,
+      });
+    } catch (err) {
+      console.error("[library] PDF preview failed", err);
+      toast.error("PDF preview failed", { description: "Check console for details." });
+    } finally {
+      setPreviewBusy(false);
+      setPreviewStage(null);
+    }
+  };
+
+  const closePdfPreview = () => {
+    if (previewUrls) {
+      URL.revokeObjectURL(previewUrls.light);
+      URL.revokeObjectURL(previewUrls.dark);
+    }
+    setPreviewUrls(null);
+  };
+
+  const downloadPreviewBlob = (which: "light" | "dark") => {
+    if (!previewUrls) return;
+    const url = which === "light" ? previewUrls.light : previewUrls.dark;
+    const filename = which === "light" ? previewUrls.filenameLight : previewUrls.filenameDark;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    toast.success(`${which === "light" ? "Light" : "Dark"} PDF downloaded`, { description: filename });
+  };
 
 
 
@@ -1418,6 +1491,16 @@ function VariantDetailModal({
               {bothBusy ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
               {bothBusy ? (pdfStage ?? "Both themes") : "Both themes PDF"}
             </button>
+            <button
+              type="button"
+              onClick={openPdfPreview}
+              disabled={previewBusy || pdfBusy !== null || bothBusy}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/40 bg-[#003FC7]/10 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white disabled:opacity-60"
+              title="Render Light and Dark PDFs and preview them side-by-side before downloading"
+            >
+              {previewBusy ? <Loader2 size={12} className="animate-spin" /> : <Eye size={12} />}
+              {previewBusy ? (previewStage ?? "Rendering…") : "Preview PDFs"}
+            </button>
             {usageCount > 0 && (
               <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
                 Used · {usageCount}
@@ -1581,6 +1664,71 @@ function VariantDetailModal({
       subCompany={null}
       divisionId={brand.id}
     />
+    {previewUrls && (
+      <div
+        className="fixed inset-0 z-[60] flex items-center justify-center bg-[#03002C]/85 p-6 backdrop-blur-md"
+        onClick={closePdfPreview}
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="flex h-[92vh] w-full max-w-[1600px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0A0821] text-white shadow-2xl"
+        >
+          <div className="flex items-center justify-between gap-4 border-b border-white/10 px-6 py-4">
+            <div className="min-w-0">
+              <div className="text-xs uppercase tracking-widest text-white/60">PDF preview · {pixelRatio}×</div>
+              <div className="mt-1 truncate text-lg font-semibold">{variant.name} — {brand.name}</div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => downloadPreviewBlob("light")}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:bg-white/90"
+              >
+                <Download size={12} /> Download Light
+              </button>
+              <button
+                type="button"
+                onClick={() => downloadPreviewBlob("dark")}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#0050ff]"
+              >
+                <Download size={12} /> Download Dark
+              </button>
+              <button
+                type="button"
+                onClick={closePdfPreview}
+                className="rounded-full border border-white/20 px-3 py-1.5 text-sm text-white/80 hover:bg-white/10"
+              >
+                Close ✕
+              </button>
+            </div>
+          </div>
+          <div className="grid flex-1 grid-cols-1 gap-4 overflow-hidden bg-[#050416] p-4 md:grid-cols-2">
+            <div className="flex flex-col overflow-hidden rounded-xl border border-white/10 bg-white">
+              <div className="flex items-center justify-between border-b border-black/10 px-3 py-2 text-xs font-medium text-black/70">
+                <span>☀︎ Light</span>
+                <span className="font-mono text-[10px] text-black/40">{previewUrls.filenameLight}</span>
+              </div>
+              <iframe
+                title="Light PDF preview"
+                src={previewUrls.light}
+                className="h-full w-full flex-1 bg-neutral-100"
+              />
+            </div>
+            <div className="flex flex-col overflow-hidden rounded-xl border border-white/10 bg-[#03002C]">
+              <div className="flex items-center justify-between border-b border-white/10 px-3 py-2 text-xs font-medium text-white/70">
+                <span>☾ Dark</span>
+                <span className="font-mono text-[10px] text-white/40">{previewUrls.filenameDark}</span>
+              </div>
+              <iframe
+                title="Dark PDF preview"
+                src={previewUrls.dark}
+                className="h-full w-full flex-1 bg-[#03002C]"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
     </>
   );
 }
