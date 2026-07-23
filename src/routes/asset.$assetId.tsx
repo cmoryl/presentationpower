@@ -925,6 +925,12 @@ function ModulesPanel({
   const lightestWeight = 1.6;
   const gate = canAddModule(kind, modules, lightestWeight);
 
+  // Insertion index (0..modules.length) where a dragged item would land, plus
+  // the source of the drag so we can style the indicator differently for
+  // reorder vs. new-module inserts.
+  const [dropIdx, setDropIdx] = useState<number | null>(null);
+  const [dropKind, setDropKind] = useState<"insert" | "reorder" | null>(null);
+
   // Parse a dragged section payload from the drawer. Returns null for
   // reorder drags (which carry a numeric text/plain index instead).
   function readInsertPayload(e: React.DragEvent): PrintSection | null {
@@ -944,6 +950,33 @@ function ModulesPanel({
     const next = [...modules];
     next.splice(clamped, 0, section);
     onChange(next);
+  }
+
+  // Renders a bright horizontal bar that tells the user exactly where the
+  // dragged module will land. Shown between items and at the ends.
+  function DropIndicator({ active }: { active: boolean }) {
+    return (
+      <div
+        aria-hidden
+        className={
+          "pointer-events-none relative my-0.5 h-0 transition-all duration-100 " +
+          (active ? "h-[10px] opacity-100" : "opacity-0")
+        }
+      >
+        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2">
+          <div className="relative h-[3px] rounded-full bg-[#003FC7] shadow-[0_0_0_3px_rgba(0,63,199,0.18)]">
+            <span className="absolute -left-1 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-[#003FC7]" />
+            <span className="absolute -right-1 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-[#003FC7]" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function computeInsertIndex(e: React.DragEvent, i: number): number {
+    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    return e.clientY < midY ? i : i + 1;
   }
 
   return (
@@ -966,94 +999,117 @@ function ModulesPanel({
       {gate.ok && modules.length === 0 && (
         <div className="pt-1 text-[11px] text-black/50 dark:text-white/50">No shared modules yet. Insert stats blocks to enrich the document.</div>
       )}
-      <div className="space-y-3">
+      <div
+        className="space-y-1"
+        onDragLeave={(e) => {
+          // Clear the indicator only when leaving the whole list wrapper,
+          // not when moving between child items.
+          const related = e.relatedTarget as Node | null;
+          if (!related || !(e.currentTarget as HTMLDivElement).contains(related)) {
+            setDropIdx(null);
+            setDropKind(null);
+          }
+        }}
+      >
         {modules.map((m, i) => (
-          <div
-            key={m.id}
-            draggable
-            onDragStart={(e) => {
-              e.dataTransfer.effectAllowed = "move";
-              e.dataTransfer.setData("text/plain", String(i));
-            }}
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.dataTransfer.dropEffect = "move";
-              (e.currentTarget as HTMLDivElement).classList.add("ring-2", "ring-[#003FC7]");
-            }}
-            onDragLeave={(e) => {
-              (e.currentTarget as HTMLDivElement).classList.remove("ring-2", "ring-[#003FC7]");
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              (e.currentTarget as HTMLDivElement).classList.remove("ring-2", "ring-[#003FC7]");
-              // New-module insert from drawer takes priority.
-              const inserted = readInsertPayload(e);
-              if (inserted) {
-                if (!gate.ok) return;
-                insertAt(i, inserted);
-                return;
-              }
-              const from = Number(e.dataTransfer.getData("text/plain"));
-              if (Number.isNaN(from) || from === i) return;
-              const next = [...modules];
-              const [moved] = next.splice(from, 1);
-              if (!moved) return;
-              next.splice(i, 0, moved);
-              onChange(next);
-            }}
-            className="rounded-md border border-black/10 p-2 transition dark:border-white/10"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
-                <GripVertical size={14} className="cursor-grab text-black/40 dark:text-white/40" aria-hidden />
-                {m.kind === "stats" ? "Stats" : "Module"}
+          <div key={m.id}>
+            <DropIndicator active={dropIdx === i} />
+            <div
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.effectAllowed = "move";
+                e.dataTransfer.setData("text/plain", String(i));
+              }}
+              onDragEnd={() => {
+                setDropIdx(null);
+                setDropKind(null);
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                const isInsert = e.dataTransfer.types.includes(PRINT_SECTION_DND_MIME);
+                e.dataTransfer.dropEffect = isInsert ? "copy" : "move";
+                setDropKind(isInsert ? "insert" : "reorder");
+                setDropIdx(computeInsertIndex(e, i));
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                const targetIdx = computeInsertIndex(e, i);
+                setDropIdx(null);
+                setDropKind(null);
+                // New-module insert from drawer takes priority.
+                const inserted = readInsertPayload(e);
+                if (inserted) {
+                  if (!gate.ok) return;
+                  insertAt(targetIdx, inserted);
+                  return;
+                }
+                const from = Number(e.dataTransfer.getData("text/plain"));
+                if (Number.isNaN(from)) return;
+                // Adjust for the removal of the source item ahead of target.
+                const to = from < targetIdx ? targetIdx - 1 : targetIdx;
+                if (to === from) return;
+                const next = [...modules];
+                const [moved] = next.splice(from, 1);
+                if (!moved) return;
+                next.splice(to, 0, moved);
+                onChange(next);
+              }}
+              className="rounded-md border border-black/10 p-2 transition dark:border-white/10"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
+                  <GripVertical size={14} className="cursor-grab text-black/40 dark:text-white/40" aria-hidden />
+                  {m.kind === "stats" ? "Stats" : "Module"}
+                </div>
+                <div className="flex items-center gap-1">
+                  <button className="rounded p-1 text-black/50 hover:bg-black/5" onClick={() => move(i, -1)} aria-label="Move up"><ArrowUp size={14} /></button>
+                  <button className="rounded p-1 text-black/50 hover:bg-black/5" onClick={() => move(i, 1)} aria-label="Move down"><ArrowDown size={14} /></button>
+                  <button className="rounded p-1 text-red-500 hover:bg-red-500/10" onClick={() => remove(i)} aria-label="Delete"><Trash2 size={14} /></button>
+                </div>
               </div>
-              <div className="flex items-center gap-1">
-                <button className="rounded p-1 text-black/50 hover:bg-black/5" onClick={() => move(i, -1)} aria-label="Move up"><ArrowUp size={14} /></button>
-                <button className="rounded p-1 text-black/50 hover:bg-black/5" onClick={() => move(i, 1)} aria-label="Move down"><ArrowDown size={14} /></button>
-                <button className="rounded p-1 text-red-500 hover:bg-red-500/10" onClick={() => remove(i)} aria-label="Delete"><Trash2 size={14} /></button>
-              </div>
-            </div>
 
-            {m.kind === "stats" && (
-              <div className="mt-2 space-y-2">
-                <select
-                  className={inspectorInput}
-                  value={m.variantId}
-                  onChange={(e) => patch(i, { variantId: e.target.value as PrintStatsVariant } as Partial<PrintStatsSection>)}
-                >
-                  {PRINT_STATS_VARIANTS.map((v) => (
-                    <option key={v.id} value={v.id}>{v.label}</option>
-                  ))}
-                </select>
-                <input
-                  className={inspectorInput}
-                  placeholder="Eyebrow"
-                  value={m.eyebrow ?? ""}
-                  onChange={(e) => patch(i, { eyebrow: e.target.value } as Partial<PrintStatsSection>)}
-                />
-                <input
-                  className={inspectorInput}
-                  placeholder="Title"
-                  value={m.title ?? ""}
-                  onChange={(e) => patch(i, { title: e.target.value } as Partial<PrintStatsSection>)}
-                />
-                <div className="space-y-1">
-                  {m.items.map((it, idx) => (
-                    <div key={idx} className="grid grid-cols-[1fr_60px_50px] gap-1">
-                      <input className={inspectorInput} placeholder="Label" value={it.label} onChange={(e) => patchStatsItem(i, idx, { label: e.target.value })} />
-                      <input className={inspectorInput} placeholder="Value" value={it.value} onChange={(e) => patchStatsItem(i, idx, { value: e.target.value })} />
-                      <input className={inspectorInput} placeholder="Unit" value={it.unit ?? ""} onChange={(e) => patchStatsItem(i, idx, { unit: e.target.value })} />
-                    </div>
-                  ))}
+              {m.kind === "stats" && (
+                <div className="mt-2 space-y-2">
+                  <select
+                    className={inspectorInput}
+                    value={m.variantId}
+                    onChange={(e) => patch(i, { variantId: e.target.value as PrintStatsVariant } as Partial<PrintStatsSection>)}
+                  >
+                    {PRINT_STATS_VARIANTS.map((v) => (
+                      <option key={v.id} value={v.id}>{v.label}</option>
+                    ))}
+                  </select>
+                  <input
+                    className={inspectorInput}
+                    placeholder="Eyebrow"
+                    value={m.eyebrow ?? ""}
+                    onChange={(e) => patch(i, { eyebrow: e.target.value } as Partial<PrintStatsSection>)}
+                  />
+                  <input
+                    className={inspectorInput}
+                    placeholder="Title"
+                    value={m.title ?? ""}
+                    onChange={(e) => patch(i, { title: e.target.value } as Partial<PrintStatsSection>)}
+                  />
+                  <div className="space-y-1">
+                    {m.items.map((it, idx) => (
+                      <div key={idx} className="grid grid-cols-[1fr_60px_50px] gap-1">
+                        <input className={inspectorInput} placeholder="Label" value={it.label} onChange={(e) => patchStatsItem(i, idx, { label: e.target.value })} />
+                        <input className={inspectorInput} placeholder="Value" value={it.value} onChange={(e) => patchStatsItem(i, idx, { value: e.target.value })} />
+                        <input className={inspectorInput} placeholder="Unit" value={it.unit ?? ""} onChange={(e) => patchStatsItem(i, idx, { unit: e.target.value })} />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="pt-1">
+                    <PrintSectionRenderer section={m} mode="light" accent="#003FC7" />
+                  </div>
                 </div>
-                <div className="pt-1">
-                  <PrintSectionRenderer section={m} mode="light" accent="#003FC7" />
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         ))}
+        {/* Tail indicator — shown when a drag lands after the last item. */}
+        <DropIndicator active={dropIdx === modules.length && modules.length > 0} />
       </div>
 
       {/* Trailing drop zone — accepts new-module inserts from the drawer. */}
@@ -1063,6 +1119,8 @@ function ModulesPanel({
           if (!e.dataTransfer.types.includes(PRINT_SECTION_DND_MIME)) return;
           e.preventDefault();
           e.dataTransfer.dropEffect = "copy";
+          setDropKind("insert");
+          setDropIdx(modules.length);
           (e.currentTarget as HTMLDivElement).classList.add("border-[#003FC7]", "bg-[#003FC7]/5", "text-[#003FC7]");
         }}
         onDragLeave={(e) => {
@@ -1071,6 +1129,8 @@ function ModulesPanel({
         onDrop={(e) => {
           const inserted = readInsertPayload(e);
           (e.currentTarget as HTMLDivElement).classList.remove("border-[#003FC7]", "bg-[#003FC7]/5", "text-[#003FC7]");
+          setDropIdx(null);
+          setDropKind(null);
           if (!inserted) return;
           e.preventDefault();
           if (!gate.ok) return;
@@ -1078,7 +1138,7 @@ function ModulesPanel({
         }}
         className="mt-3 flex items-center justify-center rounded-md border border-dashed border-black/15 px-2 py-3 text-[11px] uppercase tracking-widest text-black/40 transition dark:border-white/15 dark:text-white/40"
       >
-        Drop module here
+        {dropKind === "insert" ? "Release to drop at end" : "Drop module here"}
       </div>
     </>
   );
