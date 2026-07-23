@@ -1243,7 +1243,7 @@ function VariantDetailModal({
   useEffect(() => {
     if (typeof window !== "undefined") window.localStorage.setItem(ZIP_STORAGE_KEY, JSON.stringify(zipSelection));
   }, [zipSelection]);
-  const [zipMenuOpen, setZipMenuOpen] = useState(false);
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const zipSelectedCount = Object.values(zipSelection).filter(Boolean).length;
 
   useEffect(() => {
