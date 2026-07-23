@@ -4593,7 +4593,7 @@ function renderVariantBody({
           <div className="grid h-full grid-cols-[auto_1fr] items-center gap-16">
             <div
               style={{
-                fontSize: 480,
+                fontSize: 360,
                 lineHeight: 0.85,
                 fontWeight: 700,
                 letterSpacing: "-0.05em",
