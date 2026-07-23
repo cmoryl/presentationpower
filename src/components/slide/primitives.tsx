@@ -57,11 +57,11 @@ export function Kicker({
 // so covers stay cinematic and titles stay quiet.
 type DisplaySize = "hero" | "cover" | "divider" | "section" | "title";
 const DISPLAY_SPECS: Record<DisplaySize, { fontSize: number; lineHeight: number; letterSpacing: string; weight: number }> = {
-  hero:    { fontSize: 168, lineHeight: 0.92, letterSpacing: "-0.045em", weight: 600 },
-  cover:   { fontSize: 132, lineHeight: 0.96, letterSpacing: "-0.035em", weight: 600 },
-  divider: { fontSize: 116, lineHeight: 1.0,  letterSpacing: "-0.03em",  weight: 600 },
-  section: { fontSize: 88,  lineHeight: 1.02, letterSpacing: "-0.025em", weight: 600 },
-  title:   { fontSize: 68,  lineHeight: 1.05, letterSpacing: "-0.02em",  weight: 600 },
+  hero:    { fontSize: 124, lineHeight: 0.94, letterSpacing: "-0.04em",  weight: 600 },
+  cover:   { fontSize: 100, lineHeight: 0.98, letterSpacing: "-0.03em",  weight: 600 },
+  divider: { fontSize: 88,  lineHeight: 1.02, letterSpacing: "-0.025em", weight: 600 },
+  section: { fontSize: 72,  lineHeight: 1.04, letterSpacing: "-0.02em",  weight: 600 },
+  title:   { fontSize: 56,  lineHeight: 1.08, letterSpacing: "-0.015em", weight: 600 },
 };
 
 export function DisplayTitle({
