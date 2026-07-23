@@ -1,7 +1,7 @@
 // Compact hero preview shown in the print asset inspector. Lets the user
 // flip between the current `heroMedia` and the division aurora fallback
 // (what the page renders when heroMedia is empty) before exporting.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { PrintHeroMedia } from "@/lib/print-assets.types";
 import type { BrandMode } from "@/lib/taxonomy";
 import { Image as ImageIcon, Sparkles } from "lucide-react";
@@ -15,6 +15,12 @@ export function HeroPreviewPanel({ media, brand }: Props) {
   const hasMedia = !!media?.imageUrl;
   const [view, setView] = useState<"media" | "aura">(hasMedia ? "media" : "aura");
   const [mode, setMode] = useState<"light" | "dark">("light");
+  // Auto-follow: when the user picks or clears imagery in the panel above,
+  // snap the preview to the matching view so changes are visible instantly
+  // without needing to toggle Photo/Aura by hand.
+  useEffect(() => {
+    setView(hasMedia ? "media" : "aura");
+  }, [hasMedia]);
   const active = view === "media" && !hasMedia ? "aura" : view;
 
   const accent = brand?.tokens?.accent ?? "#003FC7";
@@ -112,9 +118,11 @@ function PhotoBand({
   const heightPct = media.heightPct ?? 46;
   const focalX = typeof media.focalX === "number" ? media.focalX : 50;
   const focalY = typeof media.focalY === "number" ? media.focalY : 40;
-  const overlayOpacity = media.overlayOpacity ?? 0.55;
+  const washStrength = media.washStrength ?? 1;
+  const overlayOpacity = (media.overlayOpacity ?? 0.55) * washStrength;
+  const overlayColor = media.overlayColor ?? accent;
   const scrim = media.scrim ?? "bottom";
-  const scrimOpacity = media.scrimOpacity ?? media.washStrength ?? 1;
+  const scrimOpacity = media.scrimOpacity ?? washStrength;
   const pageBg = mode === "dark" ? "#111114" : "#FFFFFF";
 
   const scrimGradient =
@@ -139,7 +147,7 @@ function PhotoBand({
       <div
         className="absolute inset-0"
         style={{
-          background: accent,
+          background: overlayColor,
           opacity: overlayOpacity,
           mixBlendMode: (media.blendMode ?? "multiply") as React.CSSProperties["mixBlendMode"],
         }}
