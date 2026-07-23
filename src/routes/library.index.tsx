@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { toast } from "sonner";
 import { Download, Loader2, Star, Copy, Check, Plus, Play } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -1200,10 +1201,13 @@ function VariantDetailModal({
         }],
       } as Parameters<typeof exportDeckToPptx>[0];
       console.info(`[library] downloading module ${variant.id} · division=${brand.id} · mode=${exportMode}`);
-      await exportDeckToPptx(singleSlideDeck, brand, { forceMode: exportMode });
+      const { fileName } = await exportDeckToPptx(singleSlideDeck, brand, { forceMode: exportMode });
+      toast.success("Module PPTX exported", {
+        description: `${fileName ?? `${variant.name} — ${brand.name} (${exportMode}).pptx`} (${exportMode})`,
+      });
     } catch (err) {
       console.error("[library] module download failed", err);
-      alert("Download failed. Check console for details.");
+      toast.error("PPTX export failed", { description: "Check console for details." });
     } finally {
       setDownloading(false);
     }
@@ -1218,18 +1222,21 @@ function VariantDetailModal({
       );
       if (!node) throw new Error(`Preview node not found for ${exportMode} mode`);
       const mod = await import("@/lib/slide-image-export");
+      const filename = `${variant.id}-${brand.id}-${exportMode}-${pixelRatio}x-review.pdf`;
       await mod.exportSlidesAsImagePdf(
         [{ node, mode: exportMode }],
         {
-          filename: `${variant.id}-${brand.id}-${exportMode}-${pixelRatio}x-review.pdf`,
+          filename,
           pixelRatio,
           onProgress: (p) => setPdfStage(p.message ?? p.stage),
         },
       );
-
+      toast.success(`${exportMode === "light" ? "Light" : "Dark"} PDF exported at ${pixelRatio}×`, {
+        description: filename,
+      });
     } catch (err) {
       console.error("[library] image PDF export failed", err);
-      alert("PDF export failed. Check console for details.");
+      toast.error("PDF export failed", { description: "Check console for details." });
     } finally {
       setPdfBusy(null);
       setPdfStage(null);
@@ -1247,17 +1254,19 @@ function VariantDetailModal({
       const darkNode = findNode("dark");
       if (!lightNode || !darkNode) throw new Error("Preview nodes not found for both modes");
       const mod = await import("@/lib/slide-image-export");
+      const filename = `${variant.id}-${brand.id}-both-${pixelRatio}x-review.pdf`;
       await mod.exportSlidesAsImagePdf(
         [{ node: lightNode, mode: "light" }, { node: darkNode, mode: "dark" }],
         {
-          filename: `${variant.id}-${brand.id}-both-${pixelRatio}x-review.pdf`,
+          filename,
           pixelRatio,
           onProgress: (p) => setPdfStage(p.message ?? p.stage),
         },
       );
+      toast.success(`Both themes PDF exported at ${pixelRatio}×`, { description: filename });
     } catch (err) {
       console.error("[library] both-theme PDF export failed", err);
-      alert("Combined PDF export failed. Check console for details.");
+      toast.error("Combined PDF export failed", { description: "Check console for details." });
     } finally {
       setBothBusy(false);
       setPdfStage(null);
@@ -1621,17 +1630,21 @@ function ModalABPreview({
     setImageStage(null);
     try {
       const base = `${variant.id}-${brand.id}-${m}-${pixelRatio}x`;
+      const filename = `${base}.${kind}`;
       const mod = await import("@/lib/slide-image-export");
       const onProgress = (p: { stage: string; message?: string }) =>
         setImageStage(p.message ?? p.stage);
       if (kind === "png") {
-        await mod.exportSlideAsPng(node, { mode: m, filename: `${base}.png`, pixelRatio, onProgress });
+        await mod.exportSlideAsPng(node, { mode: m, filename, pixelRatio, onProgress });
       } else {
-        await mod.exportSlidesAsImagePdf([{ node, mode: m }], { filename: `${base}.pdf`, pixelRatio, onProgress });
+        await mod.exportSlidesAsImagePdf([{ node, mode: m }], { filename, pixelRatio, onProgress });
       }
+      toast.success(`${m === "light" ? "Light" : "Dark"} ${kind.toUpperCase()} exported at ${pixelRatio}×`, {
+        description: filename,
+      });
     } catch (err) {
       console.error("[library] image export failed", err);
-      alert("Image export failed. See console for details.");
+      toast.error("Image export failed", { description: "See console for details." });
     } finally {
       setImageBusy(null);
       setImageStage(null);

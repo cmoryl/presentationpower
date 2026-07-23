@@ -201,7 +201,7 @@ export function adaptPaletteForMode(base: Palette, isDark: boolean): Palette {
 }
 
 
-export type PptxExportResult = { blob?: Blob; failedSlides: string[] };
+export type PptxExportResult = { blob?: Blob; failedSlides: string[]; fileName?: string };
 
 export async function exportDeckToPptx(
   deck: Deck,
@@ -688,7 +688,7 @@ export async function exportDeckToPptx(
   const rawBlob = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
   const finalBlob = await embedFontsInPptx(rawBlob);
   if (opts?.output === "blob") {
-    return { blob: finalBlob, failedSlides };
+    return { blob: finalBlob, failedSlides, fileName };
   }
   if (typeof document !== "undefined") {
     const url = URL.createObjectURL(finalBlob);
@@ -700,7 +700,7 @@ export async function exportDeckToPptx(
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-  return { failedSlides };
+  return { failedSlides, fileName };
 }
 
 type SlideKind =
