@@ -1491,6 +1491,15 @@ function VariantDetailModal({
               {bothBusy ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
               {bothBusy ? (pdfStage ?? "Both themes") : "Both themes PDF"}
             </button>
+            <button
+              type="button"
+              onClick={openPdfPreview}
+              disabled={previewBusy || pdfBusy !== null || bothBusy}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/40 bg-[#003FC7]/10 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white disabled:opacity-60"
+              title="Render Light and Dark PDFs and preview them side-by-side before downloading"
+            >
+              {previewBusy ? <Loader2 size={12} className="animate-spin" /> : <Eye size={12} />}
+              {previewBusy ? (previewStage ?? "Rendering…") : "Preview PDFs"}
             {usageCount > 0 && (
               <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
                 Used · {usageCount}
