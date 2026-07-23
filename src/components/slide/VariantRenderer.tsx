@@ -1874,7 +1874,7 @@ function renderVariantBody({
               className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
               style={{
                 color: "var(--slide-accent-text)",
-                fontSize: 720,
+                fontSize: 520,
                 lineHeight: 0.7,
                 fontWeight: 600,
                 opacity: 0.12,
