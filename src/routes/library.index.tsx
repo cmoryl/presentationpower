@@ -183,6 +183,13 @@ function Library() {
   const [sort, setSort] = useState<"default" | "most-used" | "pinned-first">("default");
 
   const [showImagery, setShowImagery] = useState(false);
+  const [density, setDensity] = useState<"comfortable" | "thumb">(() => {
+    if (typeof window === "undefined") return "comfortable";
+    return (window.localStorage.getItem("library:density") as "comfortable" | "thumb") ?? "comfortable";
+  });
+  useEffect(() => {
+    if (typeof window !== "undefined") window.localStorage.setItem("library:density", density);
+  }, [density]);
   const autoFixOn = true;
   const tpMasterIdx = Math.max(0, brandModes.findIndex((b) => b.id === "bm-enterprise"));
   const [brandIdx, setBrandIdx] = useState(tpMasterIdx);
@@ -513,6 +520,26 @@ function Library() {
             >
               ▤ Sample imagery {showImagery ? "on" : "off"}
             </button>
+            <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs" role="group" aria-label="Card density">
+              <button
+                type="button"
+                onClick={() => setDensity("comfortable")}
+                className={`px-3 py-1.5 ${density === "comfortable" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                aria-pressed={density === "comfortable"}
+                title="Comfortable cards with full metadata"
+              >
+                ▦ Cards
+              </button>
+              <button
+                type="button"
+                onClick={() => setDensity("thumb")}
+                className={`px-3 py-1.5 ${density === "thumb" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                aria-pressed={density === "thumb"}
+                title="Compact thumbnails — pick modules faster"
+              >
+                ▨ Thumbs
+              </button>
+            </div>
             <span className="text-sm tabular-nums text-black/50">{filtered.length} of {allEntries.length}</span>
           </div>
         </div>
@@ -689,7 +716,9 @@ function Library() {
           )}
         </div>
       ) : (
-      <div className="mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3">
+      <div className={density === "thumb"
+        ? "mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+        : "mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3"}>
         {filtered.map((entry) => {
           const v = entry.variant;
           const isVideo = entry.kind === "video";
@@ -708,6 +737,7 @@ function Library() {
               showImagery={showImagery}
               autoFixOn={autoFixOn}
               logoHubPool={logoHubPool}
+              compact={density === "thumb"}
               onOpen={() =>
                 isVideo ? setVideoZoomKey(entry.example.key) : setOpenId(v.id)
               }
@@ -809,6 +839,7 @@ const VariantCard = memo(function VariantCard({
   onImportExample,
   importBusy = false,
   logoHubPool,
+  compact = false,
 }: {
   variant: ModuleVariant;
   familyName?: string;
@@ -832,6 +863,8 @@ const VariantCard = memo(function VariantCard({
   /** LogoHub filler pool; when non-empty, MV-PROOF-LOGOS-* variants swap
    *  their filler logos for real LogoHub rows. */
   logoHubPool?: LogoFiller[];
+  /** Compact thumbnail layout: smaller preview + condensed metadata. */
+  compact?: boolean;
 }) {
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
   const rawContent = videoExample
@@ -993,6 +1026,21 @@ const VariantCard = memo(function VariantCard({
       )}
 
       {/* Metadata footer */}
+      {compact ? (
+        <div className="space-y-1 px-3 pb-3 pt-2">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="truncate text-sm font-semibold tracking-tight text-[#03002C]" title={videoExample ? videoExample.title : variant.name}>
+              {videoExample ? videoExample.title : variant.name}
+            </h3>
+            <span className="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-slate-500">
+              {variant.familyId}
+            </span>
+          </div>
+          <div className="truncate font-mono text-[9px] uppercase tracking-[0.1em] text-[#003FC7]/80" title={variant.id}>
+            {variant.id}
+          </div>
+        </div>
+      ) : (
       <div className="space-y-4 p-6 pt-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 space-y-1">
@@ -1049,6 +1097,7 @@ const VariantCard = memo(function VariantCard({
           </div>
         </div>
       </div>
+      )}
     </button>
     {videoExample && onImportExample && (
       <button
