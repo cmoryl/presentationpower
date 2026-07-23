@@ -310,6 +310,29 @@ function Uploader({
         fr.onerror = () => reject(fr.error);
         fr.readAsDataURL(file);
       });
+      // Generate standardized crop variants client-side (thumb / square /
+      // portrait / landscape). Non-raster or oversized sources return [].
+      let variants: Array<{
+        preset: "thumb" | "square" | "portrait" | "landscape";
+        filename: string;
+        contentType: "image/jpeg";
+        data: string;
+        width: number;
+        height: number;
+      }> = [];
+      try {
+        const generated = await generateImageVariants(file);
+        variants = generated.map((v) => ({
+          preset: v.preset,
+          filename: v.filename,
+          contentType: v.contentType,
+          data: v.data,
+          width: v.width,
+          height: v.height,
+        }));
+      } catch {
+        // fall back to original-only upload
+      }
       onUpload({
         divisionId,
         filename: file.name,
@@ -317,6 +340,7 @@ function Uploader({
         data: dataUrl,
         kind,
         tags: parseTags(),
+        variants,
       });
     }
   };
