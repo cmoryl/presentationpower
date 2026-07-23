@@ -9,12 +9,12 @@ import { Image as ImageIcon, Sparkles } from "lucide-react";
 type Props = {
   media: PrintHeroMedia | undefined;
   brand: BrandMode | undefined;
-  mode: "light" | "dark";
 };
 
-export function HeroPreviewPanel({ media, brand, mode }: Props) {
+export function HeroPreviewPanel({ media, brand }: Props) {
   const hasMedia = !!media?.imageUrl;
   const [view, setView] = useState<"media" | "aura">(hasMedia ? "media" : "aura");
+  const [mode, setMode] = useState<"light" | "dark">("light");
   const active = view === "media" && !hasMedia ? "aura" : view;
 
   const accent = brand?.tokens?.accent ?? "#003FC7";
