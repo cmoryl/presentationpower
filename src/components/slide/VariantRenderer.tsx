@@ -4927,7 +4927,7 @@ function renderLocationsVariant(
 
 
     const topPins = usingMetric
-      ? [...pins]
+      ? [...filteredPins]
           .filter((p) => Number.isFinite(p.values?.[activeMetric!.id]))
           .sort((a, b) => (b.values![activeMetric!.id] as number) - (a.values![activeMetric!.id] as number))
           .slice(0, 4)
@@ -4939,8 +4939,20 @@ function renderLocationsVariant(
         <div className="relative flex h-full gap-10">
           <div className="flex flex-1 flex-col">
             <Header />
+            {filterActive && (
+              <div className="mt-3 flex flex-wrap items-center gap-2" style={{ color: ink.muted, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+                <span style={{ fontWeight: 600, color: accent }}>Region filter</span>
+                {(Object.keys(LOC_REGION_LABELS) as LocPin["region"][])
+                  .filter((k) => filterSet.has(k))
+                  .map((k) => (
+                    <span key={k} className="rounded-full px-2 py-0.5" style={{ background: isDark ? "rgba(255,255,255,0.06)" : "rgba(3,0,44,0.05)", border: `1px solid ${ink.hairline}` }}>
+                      {LOC_REGION_LABELS[k]}
+                    </span>
+                  ))}
+              </div>
+            )}
             <div className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
-              <LocWorldMap pins={pins} region="world" mode={mode} accent={accent} primary={primary} showLabels={false} metric={activeMetric} metricId={activeMetric?.id} ariaLabel={`${title} — world map${activeMetric ? ` visualizing ${activeMetric.label}` : ""}`} />
+              <LocWorldMap pins={filteredPins} region="world" mode={mode} accent={accent} primary={primary} showLabels={false} metric={activeMetric} metricId={activeMetric?.id} ariaLabel={`${title} — world map${activeMetric ? ` visualizing ${activeMetric.label}` : ""}${filterActive ? ` filtered to ${filteredRegions} regions` : ""}`} />
             </div>
           </div>
           <div className="flex w-[520px] flex-col justify-end">
@@ -4949,9 +4961,9 @@ function renderLocationsVariant(
                 <div style={{ color: accent, fontSize: 11, letterSpacing: "0.28em", fontWeight: 600, textTransform: "uppercase" }}>
                   {usingMetric ? activeMetric!.label : "Global footprint"}
                 </div>
-                {usingMetric && metricCoverage < pins.length && (
+                {usingMetric && metricCoverage < filteredPins.length && (
                   <div style={{ color: ink.muted, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-                    {metricCoverage}/{pins.length} pins
+                    {metricCoverage}/{filteredPins.length} pins
                   </div>
                 )}
               </div>
@@ -4963,12 +4975,12 @@ function renderLocationsVariant(
                       {locFormatMetric(metricTotal, activeMetric)}
                     </div>
                     <div style={{ color: ink.muted, fontSize: 13, marginTop: 6 }}>
-                      {activeMetric!.label} · {totalCities} cities across {totalRegions} regions
+                      {activeMetric!.label} · {filteredCities} cities across {filteredRegions} regions{filterActive ? ` (of ${totalCities}/${totalRegions})` : ""}
                     </div>
                   </div>
                   <div className="mt-6 space-y-2">
                     {(Object.keys(LOC_REGION_LABELS) as LocPin["region"][])
-                      .filter((k) => counts[k] > 0)
+                      .filter((k) => filteredPins.some((p) => p.region === k))
                       .map((k) => {
                         const val = metricByRegion[k] ?? 0;
                         const pct = metricTotal > 0 ? Math.round((val / metricTotal) * 100) : 0;
@@ -4989,6 +5001,7 @@ function renderLocationsVariant(
                         );
                       })}
                   </div>
+
                   {topPins.length > 0 && (
                     <div className="mt-6 border-t pt-4" style={{ borderColor: ink.hairline }}>
                       <div style={{ color: ink.muted, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600 }}>
