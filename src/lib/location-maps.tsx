@@ -591,14 +591,16 @@ export function WorldMap({
           const { x, y } = projectLatLon(p.lat, p.lon);
           const isHq = p.role === "HQ";
           const isHub = p.role === "hub";
-          const t = activeMetricId ? scaleFor(p.values?.[activeMetricId]) : null;
+          const t = activeMetricId ? scaleFor(p.id) : null;
           const baseCore = isHq ? 5.4 : isHub ? 4.4 : 3.2;
           const core = t == null ? baseCore : 3.2 + t * 5.8;
           const fill = t == null ? pinCore : accent;
           const fillOpacity = t == null ? 1 : 0.35 + t * 0.65;
-          const val = activeMetricId ? p.values?.[activeMetricId] : undefined;
+          const rawVal = activeMetricId ? p.values?.[activeMetricId] : undefined;
+          const displayVal = activeMetricId ? displayValueFor(p.id) : undefined;
           const tip = activeMetricId && metric
-            ? `${p.city}${p.country ? `, ${p.country}` : ""} — ${metric.label}: ${formatMetricValue(val, metric)}`
+            ? `${p.city}${p.country ? `, ${p.country}` : ""} — ${metric.label}: ${formatMetricValue(rawVal, metric)}${isPercentMode && Number.isFinite(displayVal) ? ` (${(displayVal as number).toFixed(1)}%)` : ""}`
+            : `${p.city}${p.country ? `, ${p.country}` : ""}${p.label ? ` — ${p.label}` : ""}`;
             : `${p.city}${p.country ? `, ${p.country}` : ""}${p.label ? ` — ${p.label}` : ""}`;
           return (
             <g key={`pin-${p.id}`} style={{ cursor: "default" }}>
