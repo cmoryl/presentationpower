@@ -1,7 +1,6 @@
-// Modal picker for inserting shared modules into a print asset. Phase 1
-// exposes the Stats family only; the picker is designed to grow families
-// (Quotes, Logo Grids, Timelines, Maps, Comparisons, Charts) without any
-// caller changes — just add cases in PRINT_STATS_VARIANTS + renderer.
+// Right-side drawer for inserting shared modules into a print asset.
+// Supports both click-to-insert and drag-and-drop from the drawer onto
+// the Shared modules panel drop zones.
 
 import { useState } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
@@ -10,9 +9,11 @@ import type {
   PrintStatsVariant,
 } from "@/lib/print-assets.types";
 import { PRINT_STATS_VARIANTS, PrintSectionRenderer } from "./PrintSectionRenderer";
-import { X } from "lucide-react";
+import { X, GripVertical } from "lucide-react";
 
-function makeStatsSection(variantId: PrintStatsVariant): PrintSection {
+export const PRINT_SECTION_DND_MIME = "application/x-print-section";
+
+export function makePrintStatsSection(variantId: PrintStatsVariant): PrintSection {
   const base = {
     id: `sec-${Math.random().toString(36).slice(2, 10)}`,
     kind: "stats" as const,
@@ -65,38 +66,54 @@ export function PrintSectionPicker({
   const accent = brand.tokens.accent || brand.tokens.primary;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6" role="dialog" aria-modal="true">
-      <div className="w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-black/10 px-6 py-4">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-widest text-black/50">Add module</div>
-            <h2 className="text-lg font-semibold text-black">Shared module library</h2>
-          </div>
-          <button onClick={onClose} className="rounded-full p-2 text-black/60 hover:bg-black/5" aria-label="Close">
-            <X size={18} />
-          </button>
+    <div
+      className="fixed inset-y-0 right-0 z-40 flex w-full max-w-[520px] flex-col border-l border-black/10 bg-white shadow-2xl"
+      role="dialog"
+      aria-modal="false"
+      aria-label="Shared module library"
+    >
+      <div className="flex items-center justify-between border-b border-black/10 px-5 py-3">
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">Add module</div>
+          <h2 className="text-base font-semibold text-black">Shared module library</h2>
+          <div className="mt-0.5 text-[11px] text-black/50">Click to insert, or drag onto the Shared modules list.</div>
         </div>
+        <button onClick={onClose} className="rounded-full p-2 text-black/60 hover:bg-black/5" aria-label="Close">
+          <X size={18} />
+        </button>
+      </div>
 
-        <div className="flex gap-4 border-b border-black/10 px-6 py-3 text-sm">
-          <button
-            className={`rounded-full px-3 py-1 font-medium ${family === "stats" ? "bg-black text-white" : "text-black/60"}`}
-          >
-            Stats
-          </button>
-          <span className="rounded-full px-3 py-1 text-black/30">Quotes · soon</span>
-          <span className="rounded-full px-3 py-1 text-black/30">Logo grids · soon</span>
-          <span className="rounded-full px-3 py-1 text-black/30">Timelines · soon</span>
-          <span className="rounded-full px-3 py-1 text-black/30">Maps · soon</span>
-        </div>
+      <div className="flex gap-2 border-b border-black/10 px-5 py-2 text-xs">
+        <button
+          className={`rounded-full px-2.5 py-1 font-medium ${family === "stats" ? "bg-black text-white" : "text-black/60"}`}
+        >
+          Stats
+        </button>
+        <span className="rounded-full px-2.5 py-1 text-black/30">Quotes · soon</span>
+        <span className="rounded-full px-2.5 py-1 text-black/30">Logo grids · soon</span>
+      </div>
 
-        <div className="grid max-h-[70vh] gap-6 overflow-auto p-6 md:grid-cols-3">
-          {PRINT_STATS_VARIANTS.map((v) => {
-            const preview = makeStatsSection(v.id);
-            return (
+      <div className="grid flex-1 gap-4 overflow-auto p-5">
+        {PRINT_STATS_VARIANTS.map((v) => {
+          const preview = makePrintStatsSection(v.id);
+          return (
+            <div
+              key={v.id}
+              draggable
+              onDragStart={(e) => {
+                // Rebuild fresh each drag so ids stay unique per insert.
+                const payload = makePrintStatsSection(v.id);
+                e.dataTransfer.effectAllowed = "copy";
+                e.dataTransfer.setData(PRINT_SECTION_DND_MIME, JSON.stringify(payload));
+                // Fallback so browsers that ignore custom MIME still recognize a drag.
+                e.dataTransfer.setData("text/plain", `print-section:${v.id}`);
+              }}
+              className="group flex cursor-grab flex-col overflow-hidden rounded-xl border border-black/10 bg-white text-left transition hover:border-black hover:shadow-lg active:cursor-grabbing"
+            >
               <button
-                key={v.id}
-                onClick={() => { onInsert(preview); onClose(); }}
-                className="group flex flex-col overflow-hidden rounded-xl border border-black/10 bg-white text-left transition hover:border-black hover:shadow-lg"
+                type="button"
+                onClick={() => { onInsert(makePrintStatsSection(v.id)); }}
+                className="flex flex-col text-left"
               >
                 <div
                   className="relative overflow-hidden [container-type:inline-size]"
@@ -108,14 +125,17 @@ export function PrintSectionPicker({
                 >
                   <PrintSectionRenderer section={preview} mode={mode} accent={accent} />
                 </div>
-                <div className="border-t border-black/5 p-4">
-                  <div className="text-sm font-semibold text-black">{v.label}</div>
-                  <div className="mt-1 text-xs text-black/60">{v.description}</div>
+                <div className="flex items-start gap-2 border-t border-black/5 p-3">
+                  <GripVertical size={14} className="mt-0.5 shrink-0 text-black/30" aria-hidden />
+                  <div>
+                    <div className="text-sm font-semibold text-black">{v.label}</div>
+                    <div className="mt-0.5 text-[11px] text-black/60">{v.description}</div>
+                  </div>
                 </div>
               </button>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
