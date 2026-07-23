@@ -19,6 +19,8 @@ export type PrintHeroMedia = {
   washStrength?: number;         // 0..1, default 1 — feather-into-page intensity
   scrimOpacity?: number;         // 0..1 — scrim gradient opacity; falls back to washStrength
   scrim?: PrintHeroScrim;        // legibility gradient, default "bottom"
+  autoScrim?: boolean;           // when true, sample image luminance and boost scrim on bright photos
+  autoScrimThreshold?: number;   // 0..1 luminance above which the boost kicks in (default 0.6)
   blendMode?: CSSProperties["mixBlendMode"]; // default "multiply"
   heightPct?: number;            // 0..100, share of page height, default 46 (used when aspect="fill")
 };
@@ -78,8 +80,62 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
       : "none";
 
   const [failed, setFailed] = useState(false);
-  useEffect(() => { setFailed(false); }, [media.imageUrl]);
+  const [autoBoost, setAutoBoost] = useState(0); // extra scrim opacity added when auto detects bright imagery
+  useEffect(() => { setFailed(false); setAutoBoost(0); }, [media.imageUrl]);
+
+  // Auto legibility: sample the image band where hero text sits and, if too
+  // bright, boost the scrim opacity so light copy still reads. CORS-tainted
+  // canvases just no-op — we degrade gracefully to the manual scrim setting.
+  useEffect(() => {
+    if (!media.autoScrim || !media.imageUrl) { setAutoBoost(0); return; }
+    let cancelled = false;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      if (cancelled) return;
+      try {
+        const w = 32, h = 32;
+        const canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        ctx.drawImage(img, 0, 0, w, h);
+        // Sample the region where hero text sits based on scrim position.
+        const region = scrim === "top" ? { y0: 0, y1: h * 0.5 }
+                     : scrim === "both" || scrim === "radial" ? { y0: 0, y1: h }
+                     : { y0: h * 0.5, y1: h }; // "bottom" | "none"
+        const data = ctx.getImageData(0, Math.floor(region.y0), w, Math.floor(region.y1 - region.y0)).data;
+        let sum = 0, count = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          // Rec. 709 luma, 0..1
+          sum += (0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]) / 255;
+          count += 1;
+        }
+        const lum = count ? sum / count : 0;
+        const threshold = clamp01(media.autoScrimThreshold ?? 0.6);
+        if (lum > threshold) {
+          // Ramp: at threshold → +0.15, at pure white → +0.55.
+          const boost = 0.15 + ((lum - threshold) / Math.max(0.001, 1 - threshold)) * 0.4;
+          setAutoBoost(clamp01(boost));
+        } else {
+          setAutoBoost(0);
+        }
+      } catch {
+        // Tainted canvas / cross-origin — keep manual scrim.
+        setAutoBoost(0);
+      }
+    };
+    img.onerror = () => { if (!cancelled) setAutoBoost(0); };
+    img.src = media.imageUrl;
+    return () => { cancelled = true; };
+  }, [media.imageUrl, media.autoScrim, media.autoScrimThreshold, scrim]);
+
   const showFallback = !media.imageUrl || failed;
+  // When auto-scrim boosts on a "none" scrim, promote to "bottom" so we
+  // actually have a gradient to intensify.
+  const effectiveScrim: PrintHeroScrim =
+    scrim === "none" && autoBoost > 0 ? "bottom" : scrim;
+  const effectiveScrimOpacity = clamp01(scrimOpacity + autoBoost);
 
   // Fallback: page-bg base (white / off-black) with a soft accent wash so the
   // hero band still reads as intentional even when photography is absent.
