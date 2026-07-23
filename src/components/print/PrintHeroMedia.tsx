@@ -240,6 +240,11 @@ function clamp01(n: number): number {
   return Math.max(0, Math.min(1, n));
 }
 
+function clampRange(n: number, lo: number, hi: number): number {
+  if (Number.isNaN(n)) return (lo + hi) / 2;
+  return Math.max(lo, Math.min(hi, n));
+}
+
 function clampPct(n: number): number {
   if (Number.isNaN(n)) return 50;
   return Math.max(0, Math.min(100, n));
