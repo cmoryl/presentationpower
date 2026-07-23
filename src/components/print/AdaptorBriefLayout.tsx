@@ -298,6 +298,9 @@ export function AdaptorBriefLayout({
               </div>
             )}
 
+            {/* SHARED MODULES */}
+            <PrintSectionsStack sections={content.modules} mode={mode} accent={accent} />
+
             {/* CTA BAND */}
             {content.cta && (
               <PrintCTABand brand={brand} mode={mode} label={content.cta.label} cq={cq} />
