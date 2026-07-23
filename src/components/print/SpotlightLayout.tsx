@@ -9,7 +9,9 @@ import { resolvePrintLogoInk } from "@/lib/print-assets.types";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
+import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
 import { useTextFit } from "@/lib/text-fit";
+
 
 // -----------------------------------------------------------------------
 // PORT — TransPerfect ClientSpotlight.dc.html → SpotlightLayout
@@ -275,6 +277,10 @@ export function SpotlightLayout({
             intensity={0.9}
             aspect={auroraAspect(pageSize)}
           />
+          {content.heroMedia && (
+            <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
+          )}
+
 
           {/* Corner accent bloom (template's top-right lavender radial) —
               retuned to the active accent so every division reads through. */}

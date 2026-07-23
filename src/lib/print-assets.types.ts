@@ -22,6 +22,22 @@ export function resolvePrintLogoInk(
   return PRINT_LOGO_INK[override];
 }
 
+// Optional hero photography for a print template. When present, layouts
+// render an image band with an accent-color wash and legibility scrim under
+// the hero copy. Structural type — the visual layer lives in
+// `src/components/print/PrintHeroMedia.tsx`.
+export type PrintHeroMedia = {
+  imageUrl: string;
+  focalPoint?: string;            // CSS object-position
+  overlayColor?: string;          // hex; falls back to division accent
+  overlayOpacity?: number;        // 0..1
+  scrim?: "top" | "bottom" | "both" | "radial" | "none";
+  blendMode?: "normal" | "multiply" | "overlay" | "soft-light" | "screen";
+  heightPct?: number;             // share of page height, default 46
+};
+
+
+
 
 export type CaseStudyStat = {
   label: string;
@@ -55,7 +71,9 @@ export type CaseStudyContent = {
   // Optional footer link row (site URL, email, etc). Rendered right-aligned
   // in the footer lockup below the CTA band.
   footer?: { links: string[] };
+  heroMedia?: PrintHeroMedia;
 };
+
 
 // ---------------------------------------------------------------------------
 // SPOTLIGHT — single-page product / service highlight
@@ -83,7 +101,9 @@ export type SpotlightContent = {
   quote?: { text: string; author: string; role?: string; company?: string };
   expert?: { name: string; role?: string; email?: string };
   cta?: { label: string; url?: string };
+  heroMedia?: PrintHeroMedia;
 };
+
 
 // ---------------------------------------------------------------------------
 // E-BROCHURE — single-page marketing PDF (Challenge / Approach / Impact +
@@ -107,7 +127,9 @@ export type EBrochureContent = {
   quote?: { text: string; author: string; role?: string; company?: string };
   discover?: { body: string; bullets: string[] }; // right-hand "Discover" panel
   cta?: { label: string; url?: string; subhead?: string };
+  heroMedia?: PrintHeroMedia;
 };
+
 
 // ---------------------------------------------------------------------------
 // ADAPTOR / APPLICATION BRIEF — single-page portrait brief with a dark
@@ -128,7 +150,9 @@ export type AdaptorBriefContent = {
   knowHow: string[];           // 5 "We Know How" one-liners
   quote?: { text: string; author: string; role?: string; company?: string };
   cta?: { label: string; url?: string };
+  heroMedia?: PrintHeroMedia;
 };
+
 
 export type PrintPageSize = "A4" | "Letter" | "Square";
 export type PrintDensity = "compact" | "standard" | "airy";

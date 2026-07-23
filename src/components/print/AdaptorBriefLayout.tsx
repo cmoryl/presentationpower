@@ -9,7 +9,9 @@ import { resolvePrintLogoInk } from "@/lib/print-assets.types";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
+import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
 import { useTextFit } from "@/lib/text-fit";
+
 
 // -----------------------------------------------------------------------
 // PORT — TransPerfect ApplicationBrief.dc.html → AdaptorBriefLayout
@@ -151,6 +153,10 @@ export function AdaptorBriefLayout({
               aspect={auroraAspect(pageSize)}
             />
           </div>
+          {content.heroMedia && (
+            <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
+          )}
+
 
           {/* Corner accent blooms — template's top-right lavender + left-mid teal. */}
           <div className="pointer-events-none absolute" aria-hidden style={{

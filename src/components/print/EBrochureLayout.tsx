@@ -9,7 +9,9 @@ import { resolvePrintLogoInk } from "@/lib/print-assets.types";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
+import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
 import { useTextFit } from "@/lib/text-fit";
+
 
 // -----------------------------------------------------------------------
 // PORT — TransPerfect EBrochure.dc.html → EBrochureLayout
@@ -155,6 +157,10 @@ export function EBrochureLayout({
             intensity={0.85}
             aspect={auroraAspect(pageSize)}
           />
+          {content.heroMedia && (
+            <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
+          )}
+
 
           {/* Template's centered top halo — retuned to accent so every division reads. */}
           <div
