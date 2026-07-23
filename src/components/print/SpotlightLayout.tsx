@@ -117,8 +117,8 @@ export function SpotlightLayout({
       ? proofBullets
       : ["Trusted global partner", "Deep division expertise", "Hands-on, human collaboration"];
 
-  const padX = pagePadX(density);
-  const padTop = pagePadTop(density);
+  const padX = padXFn(density);
+  const padTop = padTopFn(density);
   const padXcq = cq(padX);
   const padTopCq = cq(padTop);
 
