@@ -46,12 +46,19 @@ export function autoHeroMedia(
     imageUrl: pickDivisionHeroPhoto(brandId, seedStr),
     aspect: "fill",
     heightPct: 46,
-    overlayOpacity: mode === "dark" ? 0.6 : 0.42,
+    // Bump light-mode wash so the accent color owns the photo instead of the
+    // photo owning the accent — critical for divisions whose photo pool skews
+    // warm (Legal, Digital), where dark hero copy was fighting the image.
+    overlayOpacity: mode === "dark" ? 0.6 : 0.58,
     washStrength: 1,
-    scrim: "bottom",
-    scrimOpacity: mode === "dark" ? 0.55 : 0.35,
+    // Light mode uses "both" so the eyebrow (top-left) and the CTA seam
+    // (bottom) both sit on a pageBg-anchored gradient; dark mode keeps a
+    // single bottom scrim to preserve the editorial photo above the copy.
+    scrim: mode === "dark" ? "bottom" : "both",
+    scrimOpacity: mode === "dark" ? 0.55 : 0.62,
     autoScrim: true,
-    autoScrimThreshold: 0.6,
+    autoScrimThreshold: 0.55,
     blendMode: "normal",
   };
 }
+
