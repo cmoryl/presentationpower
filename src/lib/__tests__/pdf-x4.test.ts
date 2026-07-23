@@ -109,7 +109,7 @@ describe("wrapPdfAsX4", () => {
     const iccStream = doc.context.lookup(destProfileRaw as PDFRef) as PDFStream;
     expect(iccStream).toBeInstanceOf(PDFStream);
     const iccDict = iccStream.dict;
-    expect((iccDict.get(PDFName.of("N")) as { asNumber(): number }).asNumber()).toBe(3);
+    expect((iccDict.get(PDFName.of("N")) as unknown as { asNumber(): number }).asNumber()).toBe(3);
     expect((iccDict.get(PDFName.of("Alternate")) as PDFName).toString()).toBe("/DeviceRGB");
     // Verify the ICC "acsp" signature survived round-trip.
     const iccContents = (iccStream as PDFRawStream).contents;
