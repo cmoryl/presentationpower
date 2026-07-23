@@ -670,71 +670,25 @@ export function SpotlightLayout({
             {/* CTA BAND — division-tokenized gradient                        */}
             {/* ============================================================ */}
             {content.cta && (
-              <div
-                className="flex items-center justify-between"
-                style={{
-                  marginTop: cq(24),
-                  borderRadius: cq(12),
-                  padding: `${cq(16)} ${cq(20)}`,
-                  background: `linear-gradient(90deg, ${primary} 0%, color-mix(in srgb, ${primary} 55%, ${accent}) 70%, ${accent} 100%)`,
-                  color: "#FFFFFF",
-                }}
-              >
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: cq(15), color: "#FFFFFF" }}>
-                    {content.cta.label}
-                  </div>
-                  {content.summary && (
-                    <div
-                      style={{
-                        fontSize: cq(10),
-                        color: "rgba(255,255,255,0.8)",
-                        marginTop: cq(3),
-                      }}
-                    >
-                      Explore how {brand.name} can transform your operations.
-                    </div>
-                  )}
-                </div>
-                <div
-                  style={{
-                    border: "1.5px solid #FFFFFF",
-                    borderRadius: 999,
-                    padding: `${cq(8)} ${cq(18)}`,
-                    fontSize: cq(11),
-                    fontWeight: 700,
-                    color: "#FFFFFF",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  Book a demo »
-                </div>
-              </div>
+              <PrintCTABand
+                brand={brand}
+                mode={mode}
+                label={content.cta.label}
+                subhead={content.summary ? `Explore how ${brand.name} can transform your operations.` : undefined}
+                cq={cq}
+              />
             )}
 
             {/* ============================================================ */}
             {/* FOOTER — TP + division lockup + contact strip                 */}
             {/* ============================================================ */}
-            <div
-              className="flex items-center justify-between"
-              style={{
-                borderTop: `1px solid ${dividerCol}`,
-                marginTop: cq(20),
-                paddingTop: cq(16),
-              }}
-            >
-              <BrandLockup brand={brand} color={ink} size="2xs" orientation="horizontal" />
-              <div className="flex items-center" style={{ gap: cq(18) }}>
-                {content.expert?.email && (
-                  <span style={{ fontSize: cq(9.5), color: accentInk }}>
-                    {content.expert.email}
-                  </span>
-                )}
-                <span style={{ fontSize: cq(9.5), color: accentInk }}>
-                  transperfect.com
-                </span>
-              </div>
-            </div>
+            <PrintFooterLockup
+              brand={brand}
+              mode={mode}
+              cq={cq}
+              links={["transperfect.com"]}
+              email={content.expert?.email}
+            />
 
             {showSafeArea && (
               <div
