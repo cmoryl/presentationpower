@@ -17,9 +17,29 @@ import {
   type ExportProgressCallback,
   type SlideExportMode,
 } from "./slide-image-export";
+import { fetchIccProfile, wrapPdfAsX4, type IccProfileKey } from "./pdf-x4";
 
 export type PrintPageSizeKey = "A4" | "Letter" | "Square" | "Custom";
 export type PrintExportQuality = "300dpi" | "600dpi";
+
+/**
+ * Two distinct output artifacts:
+ *   • "digital"  — 150 DPI JPEG, no bleed, no crop marks, no X-4 metadata.
+ *                  Suitable for email / on-screen. Small file.
+ *   • "press-x4" — 300/600 DPI PNG, bleed + crop marks, TrimBox/BleedBox,
+ *                  OutputIntent, XMP. Conformant PDF/X-4. Large file.
+ *   • "press"    — legacy raw jsPDF output (no X-4 wrap). Retained so the
+ *                  existing default behavior is not disturbed.
+ */
+export type PrintExportFormat = "digital" | "press" | "press-x4";
+
+/** Digital output uses one fixed DPI — 150 is standard for on-screen
+ *  legibility on both retina (~144 CSS DPI) and standard displays, and it
+ *  keeps a 10-page Letter export in the low single-digit MB range. */
+export const DIGITAL_EXPORT_DPI = 150;
+/** Digital JPEG quality (0..1). 0.85 hides all artefacts on aurora blooms
+ *  while still shrinking a page by ~10× vs. PNG. */
+export const DIGITAL_JPEG_QUALITY = 0.85;
 
 /** Trim size in inches (page area before bleed). */
 export interface PrintPageDimensions {
@@ -34,7 +54,7 @@ export const PRINT_PAGE_PRESETS: Record<Exclude<PrintPageSizeKey, "Custom">, Pri
   Square: { widthIn: 8.5, heightIn: 8.5 },
 };
 
-/** Numeric DPI for each quality preset. */
+/** Numeric DPI for each press quality preset. */
 export const PRINT_EXPORT_DPI: Record<PrintExportQuality, number> = {
   "300dpi": 300,
   "600dpi": 600,
