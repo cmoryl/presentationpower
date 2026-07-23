@@ -222,28 +222,30 @@ export function AdaptorBriefLayout({
               )}
             </div>
 
-            {/* 6 FEATURE CARDS */}
-            <div className="grid" style={{
-              gridTemplateColumns: "1fr 1fr 1fr", gap: cq(14), paddingTop: cq(28),
-            }}>
-              {features.map((f, i) => {
-                const glyph = VERB_ICONS[f.verb.toLowerCase()] ?? VERB_ICONS.default;
-                return (
-                  <div key={i} style={{ borderRadius: cq(12), padding: `${cq(18)} ${cq(16)}`, ...glassCard(mode, accent) }}>
-                    <div className="flex items-center justify-center" style={{
-                      width: cq(38), height: cq(38), borderRadius: cq(10), ...chipStyle(mode, accent),
-                    }}>
-                      <Icon d={glyph!} size={cq(18)} color={accentInk} />
-                    </div>
-                    <div style={{ fontWeight: 700, fontSize: cq(15), color: accentInk, marginTop: cq(10) }}>
-                      {f.verb}
-                    </div>
-                    <div style={{ fontSize: cq(10.5), lineHeight: 1.5, color: inkSoft, marginTop: cq(4) }}>
-                      {f.body}
-                    </div>
-                  </div>
-                );
-              })}
+            {/* 6 FEATURE CARDS — grouped in one rounded panel (Canva ref). */}
+            <div style={{ paddingTop: cq(28) }}>
+              <div style={{ borderRadius: cq(16), padding: cq(18), ...glassCard(mode, accent) }}>
+                <div className="grid" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: cq(14) }}>
+                  {features.map((f, i) => {
+                    const glyph = VERB_ICONS[f.verb.toLowerCase()] ?? VERB_ICONS.default;
+                    return (
+                      <div key={i} style={{ borderRadius: cq(12), padding: `${cq(14)} ${cq(12)}`, background: "transparent" }}>
+                        <div className="flex items-center justify-center" style={{
+                          width: cq(38), height: cq(38), borderRadius: cq(10), ...chipStyle(mode, accent),
+                        }}>
+                          <Icon d={glyph!} size={cq(18)} color={accentInk} />
+                        </div>
+                        <div style={{ fontWeight: 700, fontSize: cq(15), color: accentInk, marginTop: cq(10) }}>
+                          {f.verb}
+                        </div>
+                        <div style={{ fontSize: cq(10.5), lineHeight: 1.5, color: inkSoft, marginTop: cq(4) }}>
+                          {f.body}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
 
             {/* WE KNOW HOW strip */}
