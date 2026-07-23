@@ -45,7 +45,7 @@ const KINDS: Array<{
   icon: React.ReactNode;
 }> = [
   { id: "case-study",   label: "Case Study",     desc: "Challenge · Approach · Outcome, print-ready.",  live: true,  icon: <FileText size={16} /> },
-  { id: "spotlight",    label: "Client Spotlight", desc: "Project stats + Need/Approach/Impact.",      live: false, icon: <Layers size={16} /> },
+  { id: "spotlight",    label: "Client Spotlight", desc: "Product/service hero + stats + capabilities.", live: true,  icon: <Layers size={16} /> },
   { id: "ebrochure",    label: "E-Brochure",     desc: "GlobalLink-style clean marketing PDF.",         live: false, icon: <PenSquare size={16} /> },
   { id: "adaptor-brief",label: "Adaptor Brief",  desc: "Dark aurora hero + capability grid.",           live: false, icon: <Rocket size={16} /> },
 ];
