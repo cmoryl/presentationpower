@@ -35,7 +35,7 @@ import { PRINT_STATS_VARIANTS, PrintSectionRenderer } from "@/components/print/s
 import { PrintSectionPicker } from "@/components/print/sections/PrintSectionPicker";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
-import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images } from "lucide-react";
+import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical } from "lucide-react";
 
 export const Route = createFileRoute("/asset/$assetId")({
   head: ({ params }) => ({
@@ -736,9 +736,37 @@ function ModulesPanel({
       )}
       <div className="space-y-3">
         {modules.map((m, i) => (
-          <div key={m.id} className="rounded-md border border-black/10 p-2 dark:border-white/10">
+          <div
+            key={m.id}
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.effectAllowed = "move";
+              e.dataTransfer.setData("text/plain", String(i));
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = "move";
+              (e.currentTarget as HTMLDivElement).classList.add("ring-2", "ring-[#003FC7]");
+            }}
+            onDragLeave={(e) => {
+              (e.currentTarget as HTMLDivElement).classList.remove("ring-2", "ring-[#003FC7]");
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              (e.currentTarget as HTMLDivElement).classList.remove("ring-2", "ring-[#003FC7]");
+              const from = Number(e.dataTransfer.getData("text/plain"));
+              if (Number.isNaN(from) || from === i) return;
+              const next = [...modules];
+              const [moved] = next.splice(from, 1);
+              if (!moved) return;
+              next.splice(i, 0, moved);
+              onChange(next);
+            }}
+            className="rounded-md border border-black/10 p-2 transition dark:border-white/10"
+          >
             <div className="flex items-center justify-between">
-              <div className="text-[11px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
+              <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
+                <GripVertical size={14} className="cursor-grab text-black/40 dark:text-white/40" aria-hidden />
                 {m.kind === "stats" ? "Stats" : "Module"}
               </div>
               <div className="flex items-center gap-1">
@@ -780,11 +808,15 @@ function ModulesPanel({
                     </div>
                   ))}
                 </div>
+                <div className="pt-1">
+                  <PrintSectionRenderer section={m} mode="light" accent="#003FC7" />
+                </div>
               </div>
             )}
           </div>
         ))}
       </div>
+
     </>
   );
 }
