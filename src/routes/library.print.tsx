@@ -610,6 +610,7 @@ function PrintPreview({ kind, brand, mode }: { kind: PrintAssetKind; brand: Bran
   if (kind === "spotlight") return <SpotlightLayout content={SPOTLIGHT_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
   if (kind === "ebrochure") return <EBrochureLayout content={EBROCHURE_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
   if (kind === "adaptor-brief") return <AdaptorBriefLayout content={ADAPTOR_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+  if (kind === "case-study") return <CaseStudyLayout content={CASE_STUDY_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
   return null;
 }
 
