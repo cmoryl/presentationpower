@@ -153,6 +153,10 @@ export function AdaptorBriefLayout({
               aspect={auroraAspect(pageSize)}
             />
           </div>
+          {content.heroMedia && (
+            <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
+          )}
+
 
           {/* Corner accent blooms — template's top-right lavender + left-mid teal. */}
           <div className="pointer-events-none absolute" aria-hidden style={{
