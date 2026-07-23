@@ -881,12 +881,9 @@ function HeroMediaPanel({
         divisionId={divisionId}
         onPick={(entry) => {
           if (!entry.signedUrl) return;
-          const nextTags = Array.from(new Set([...(media.tags ?? []), ...(entry.tags ?? [])])).slice(0, 12);
           onChange({
             ...media,
             imageUrl: entry.signedUrl,
-            imageAlt: entry.note ?? media.imageAlt ?? entry.filename,
-            tags: nextTags,
           });
         }}
       />
