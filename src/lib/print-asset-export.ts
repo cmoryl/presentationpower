@@ -95,6 +95,10 @@ export interface PrintExportOptions {
    * selected DPI over the full (trim + bleed) area.
    */
   quality?: PrintExportQuality;
+  /** Output family. Defaults to "press" for back-compat with prior calls. */
+  format?: PrintExportFormat;
+  /** ICC output-intent profile — required when `format === "press-x4"`. */
+  iccProfile?: IccProfileKey;
   filename?: string;
   onProgress?: ExportProgressCallback;
   /** Fires when the requested DPI cannot be honored (canvas ceiling reached). */
