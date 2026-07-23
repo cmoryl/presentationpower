@@ -334,7 +334,7 @@ export function CaseStudyLayout({
                         >
                           <Icon d={ICON_PATHS.check} size={cq(12)} color={accentInk} strokeWidth={2} />
                         </div>
-                        <div style={{ fontSize: cq(10), color: inkSoft }}>{b}</div>
+                        <div style={{ fontSize: cq(10), color: inkSoft, ...clampLines(2) }}>{b}</div>
                       </div>
                     ))}
                   </div>
