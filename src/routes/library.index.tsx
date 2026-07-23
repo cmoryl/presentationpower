@@ -1478,7 +1478,7 @@ function VariantDetailModal({
         darkPdf = (await imgMod.exportSlidesAsImagePdf(
           [{ node: darkNode, mode: "dark" }],
           { filename: "dark.pdf", pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Dark PDF · ${p.message ?? p.stage}`) },
-        );
+        )) as Blob;
       }
       if (zipSelection.pngLight && lightNode) {
         setZipStage("Rendering light PNG…");
