@@ -220,7 +220,7 @@ export function SpotlightLayout({
   // Accent used for tint marks (chip inner glyph, quote glyph, section headings).
   const accentInk = mode === "dark" ? accent : primary;
 
-  const bg = mode === "dark" ? "#0B0A2A" : "#FFFFFF";
+  const bg = mode === "dark" ? "#111114" : "#FFFFFF";
   const auroraSeed = seed ?? `spotlight-${brand.id}-${mode}`;
 
   // Refs for text-fit — reproduce the template's data-fit ranges exactly.

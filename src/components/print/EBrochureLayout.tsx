@@ -126,7 +126,7 @@ export function EBrochureLayout({
   const inkFaint = mode === "dark" ? "rgba(245,244,255,0.55)" : "rgba(102,102,102,0.92)";
   const dividerCol = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.14)";
   const accentInk = mode === "dark" ? accent : primary;
-  const bg = mode === "dark" ? "#0B0A2A" : "#FFFFFF";
+  const bg = mode === "dark" ? "#111114" : "#FFFFFF";
 
   const heroRef = useRef<HTMLHeadingElement | null>(null);
   const introRef = useRef<HTMLParagraphElement | null>(null);
@@ -171,25 +171,9 @@ export function EBrochureLayout({
             }}
           />
 
-          {/* HERO BAND — pastel accent wash with a soft fade-out to bg
-              so the seam reads clearly and cards overlap the transition. */}
-          <div
-            className="pointer-events-none absolute inset-x-0 top-0"
-            aria-hidden
-            style={{
-              height: cq(360),
-              background: mode === "dark"
-                ? `linear-gradient(180deg,
-                    color-mix(in srgb, ${accent} 22%, rgba(6,4,32,0.9)) 0%,
-                    color-mix(in srgb, ${accent} 12%, rgba(6,4,32,0.65)) 55%,
-                    ${bg} 100%)`
-                : `linear-gradient(180deg,
-                    color-mix(in srgb, ${accent} 18%, #FFFFFF) 0%,
-                    color-mix(in srgb, ${accent} 10%, #FFFFFF) 45%,
-                    color-mix(in srgb, ${accent} 4%, #FFFFFF) 78%,
-                    ${bg} 100%)`,
-            }}
-          />
+          {/* No colored hero band — background stays white / offset black
+              per print guidelines. The centered halo above provides the only
+              accent tint over the hero region. */}
 
           <div
             className="relative flex h-full flex-col"
