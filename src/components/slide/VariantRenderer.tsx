@@ -2154,7 +2154,7 @@ function renderVariantBody({
                 className="relative"
                 style={{
                   color: "var(--slide-accent-text)",
-                  fontSize: 520,
+                  fontSize: 400,
                   lineHeight: 0.82,
                   fontWeight: 600,
                   letterSpacing: "-0.06em",
