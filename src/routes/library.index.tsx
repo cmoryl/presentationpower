@@ -716,7 +716,9 @@ function Library() {
           )}
         </div>
       ) : (
-      <div className="mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3">
+      <div className={density === "thumb"
+        ? "mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+        : "mt-6 grid grid-cols-2 gap-6 xl:grid-cols-3"}>
         {filtered.map((entry) => {
           const v = entry.variant;
           const isVideo = entry.kind === "video";
