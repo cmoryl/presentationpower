@@ -154,6 +154,7 @@ export function BackgroundImageryPanel({
   const [error, setError] = useState<string | null>(null);
   const [aiPrompt, setAiPrompt] = useState("");
   const [applyOpen, setApplyOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [applyMode, setApplyMode] = useState<"section" | "custom">("section");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [applyFlash, setApplyFlash] = useState<string | null>(null);
