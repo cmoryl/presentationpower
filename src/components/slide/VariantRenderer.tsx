@@ -6919,6 +6919,142 @@ function FreeformAreaChart({
   );
 }
 
+// Free-form bar chart. Shares the FreeformAreaChart gradient vocabulary:
+// feathered accent bloom, baseline hairline only, soft glow + radial halo
+// on the highlighted bar. No axis frame, no gridlines, no per-bar border.
+function FreeformBarChart({
+  brand: _brand,
+  bars,
+  height = 520,
+  highlight,
+}: {
+  brand: BrandMode;
+  bars: { label: string; value: number }[];
+  height?: number;
+  highlight?: string;
+}) {
+  const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
+  const w = 1720;
+  const h = height;
+  const padL = 16;
+  const padR = 16;
+  const padT = 60;
+  const padB = 72;
+  if (!bars.length) return null;
+  const max = Math.max(1, ...bars.map((b) => b.value));
+  const chartH = h - padT - padB;
+  const slot = (w - padL - padR) / bars.length;
+  const barW = Math.min(slot * 0.44, 140);
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      <defs>
+        <linearGradient id={`${id}-bloom-hi`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.68} />
+          <stop offset="40%" stopColor="var(--slide-accent-text)" stopOpacity={0.32} />
+          <stop offset="75%" stopColor="var(--slide-accent-text)" stopOpacity={0.08} />
+          <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient id={`${id}-bloom-mute`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.24} />
+          <stop offset="55%" stopColor="var(--slide-accent-text)" stopOpacity={0.09} />
+          <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+        </linearGradient>
+        <radialGradient id={`${id}-halo`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.5} />
+          <stop offset="55%" stopColor="var(--slide-accent-text)" stopOpacity={0.14} />
+          <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+        </radialGradient>
+        <filter id={`${id}-glow`} x="-20%" y="-30%" width="140%" height="160%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="b" />
+          <feMerge>
+            <feMergeNode in="b" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      {/* Baseline hairline only */}
+      <line
+        x1={padL}
+        y1={h - padB}
+        x2={w - padR}
+        y2={h - padB}
+        stroke={ink.hairline}
+        strokeWidth={1}
+      />
+      {bars.map((b, i) => {
+        const bh = (b.value / max) * chartH;
+        const x = padL + i * slot + (slot - barW) / 2;
+        const y = h - padB - bh;
+        const isHi = highlight ? b.label === highlight : false;
+        return (
+          <g key={i}>
+            {/* Radial halo behind highlight bar */}
+            {isHi && (
+              <circle
+                cx={x + barW / 2}
+                cy={y}
+                r={Math.max(90, barW * 1.4)}
+                fill={`url(#${id}-halo)`}
+              />
+            )}
+            <rect
+              x={x}
+              y={y}
+              width={barW}
+              height={bh}
+              fill={isHi ? `url(#${id}-bloom-hi)` : `url(#${id}-bloom-mute)`}
+              filter={isHi ? `url(#${id}-glow)` : undefined}
+            />
+            {/* Thin confident accent stroke on top edge of highlight */}
+            {isHi && (
+              <line
+                x1={x}
+                y1={y}
+                x2={x + barW}
+                y2={y}
+                stroke="var(--slide-accent-text)"
+                strokeWidth={2.25}
+                strokeLinecap="round"
+              />
+            )}
+            {/* Value label above bar */}
+            <text
+              x={x + barW / 2}
+              y={y - 18}
+              textAnchor="middle"
+              fontSize={isHi ? 28 : 20}
+              fontWeight={600}
+              fill={isHi ? ink.strong : ink.muted}
+              style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}
+            >
+              {b.value}
+            </text>
+            {/* Category label below baseline */}
+            <text
+              x={x + barW / 2}
+              y={h - padB + 34}
+              textAnchor="middle"
+              fontSize={14}
+              fill={isHi ? "var(--slide-accent-text)" : ink.faint}
+              style={{
+                letterSpacing: "0.24em",
+                textTransform: "uppercase",
+                fontVariantNumeric: "tabular-nums",
+                fontWeight: 700,
+              }}
+            >
+              {b.label}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+
+
 
 
 function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
