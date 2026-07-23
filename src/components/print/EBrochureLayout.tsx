@@ -170,6 +170,26 @@ export function EBrochureLayout({
             }}
           />
 
+          {/* HERO BAND — pastel accent wash with a soft fade-out to bg
+              so the seam reads clearly and cards overlap the transition. */}
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0"
+            aria-hidden
+            style={{
+              height: cq(360),
+              background: mode === "dark"
+                ? `linear-gradient(180deg,
+                    color-mix(in srgb, ${accent} 22%, rgba(6,4,32,0.9)) 0%,
+                    color-mix(in srgb, ${accent} 12%, rgba(6,4,32,0.65)) 55%,
+                    ${bg} 100%)`
+                : `linear-gradient(180deg,
+                    color-mix(in srgb, ${accent} 18%, #FFFFFF) 0%,
+                    color-mix(in srgb, ${accent} 10%, #FFFFFF) 45%,
+                    color-mix(in srgb, ${accent} 4%, #FFFFFF) 78%,
+                    ${bg} 100%)`,
+            }}
+          />
+
           <div
             className="relative flex h-full flex-col"
             style={{
@@ -202,10 +222,13 @@ export function EBrochureLayout({
               )}
             </div>
 
-            {/* 3 SUMMARY CARDS — Challenge / Approach / Impact */}
+            {/* 3 SUMMARY CARDS — Challenge / Approach / Impact
+                (pulled up to overlap the hero fade seam) */}
             <div className="grid" style={{
-              gridTemplateColumns: "1fr 1fr 1fr", gap: cq(14), paddingTop: cq(26),
+              gridTemplateColumns: "1fr 1fr 1fr", gap: cq(14),
+              paddingTop: cq(38), marginTop: cq(-6),
             }}>
+
               {sections.map((s, i) => (
                 <div key={i} style={{ borderRadius: cq(12), padding: `${cq(18)} ${cq(16)}`, ...glass(mode, accent) }}>
                   <div className="flex items-center" style={{ gap: cq(8) }}>
