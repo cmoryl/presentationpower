@@ -39,24 +39,30 @@ import { exportDeckToPptx } from "@/lib/pptx-export";
 // ─── Pinned variants (per-user, local) ──────────────────────────────────────
 const PINS_KEY = "library.pinnedVariants.v1";
 
-const EXPORT_PIXEL_RATIO_KEY = "library.exportPixelRatio.v1";
-type ExportPixelRatio = 1 | 2;
-function useExportPixelRatio(): [ExportPixelRatio, (v: ExportPixelRatio) => void] {
-  const [value, setValue] = useState<ExportPixelRatio>(() => {
-    if (typeof window === "undefined") return 2;
-    const raw = window.localStorage.getItem(EXPORT_PIXEL_RATIO_KEY);
-    return raw === "1" ? 1 : 2;
+// Export resolution is stored as an ABSOLUTE OUTPUT WIDTH in pixels so
+// results are consistent regardless of on-screen preview size. The old
+// key stored a 1×/2× multiplier of the preview DOM (~500-700px), which
+// silently produced sub-HD exports. This key is bumped to v2 to discard
+// stale legacy values.
+const EXPORT_TARGET_WIDTH_KEY = "library.exportTargetWidth.v2";
+export type ExportTargetWidth = 1920 | 3840;
+const DEFAULT_TARGET_WIDTH: ExportTargetWidth = 1920;
+
+function useExportPixelRatio(): [ExportTargetWidth, (v: ExportTargetWidth) => void] {
+  const [value, setValue] = useState<ExportTargetWidth>(() => {
+    if (typeof window === "undefined") return DEFAULT_TARGET_WIDTH;
+    const raw = window.localStorage.getItem(EXPORT_TARGET_WIDTH_KEY);
+    return raw === "3840" ? 3840 : DEFAULT_TARGET_WIDTH;
   });
-  const update = (v: ExportPixelRatio) => {
+  const update = (v: ExportTargetWidth) => {
     setValue(v);
-    try { window.localStorage.setItem(EXPORT_PIXEL_RATIO_KEY, String(v)); } catch { /* ignore */ }
-    // Broadcast so sibling components (modal header + AB preview) stay in sync.
+    try { window.localStorage.setItem(EXPORT_TARGET_WIDTH_KEY, String(v)); } catch { /* ignore */ }
     try { window.dispatchEvent(new CustomEvent("library:pixel-ratio", { detail: v })); } catch { /* ignore */ }
   };
   useEffect(() => {
     const handler = (e: Event) => {
-      const detail = (e as CustomEvent<ExportPixelRatio>).detail;
-      if (detail === 1 || detail === 2) setValue(detail);
+      const detail = (e as CustomEvent<ExportTargetWidth>).detail;
+      if (detail === 1920 || detail === 3840) setValue(detail);
     };
     window.addEventListener("library:pixel-ratio", handler);
     return () => window.removeEventListener("library:pixel-ratio", handler);
@@ -70,8 +76,8 @@ function ResolutionToggle({
   disabled,
   tone = "light",
 }: {
-  value: ExportPixelRatio;
-  onChange: (v: ExportPixelRatio) => void;
+  value: ExportTargetWidth;
+  onChange: (v: ExportTargetWidth) => void;
   disabled?: boolean;
   tone?: "light" | "compact";
 }) {
@@ -84,25 +90,26 @@ function ResolutionToggle({
     <div className={base} role="group" aria-label="Export resolution">
       <button
         type="button"
-        onClick={() => onChange(1)}
+        onClick={() => onChange(1920)}
         disabled={disabled}
-        className={pill(value === 1)}
-        title="1× — smaller file, faster export"
+        className={pill(value === 1920)}
+        title="HD · 1920×1080 · smaller file, faster export"
       >
-        1×
+        HD
       </button>
       <button
         type="button"
-        onClick={() => onChange(2)}
+        onClick={() => onChange(3840)}
         disabled={disabled}
-        className={pill(value === 2)}
-        title="2× — retina, sharper text and edges"
+        className={pill(value === 3840)}
+        title="4K · 3840×2160 · sharpest text and hairlines, larger file"
       >
-        2×
+        4K
       </button>
     </div>
   );
 }
+
 
 
 function readPins(): Set<string> {
@@ -1227,7 +1234,7 @@ function VariantDetailModal({
   const [pixelRatio, setPixelRatio] = useExportPixelRatio();
   const [previewBusy, setPreviewBusy] = useState(false);
   const [previewStage, setPreviewStage] = useState<string | null>(null);
-  const [previewUrls, setPreviewUrls] = useState<{ light: string; dark: string; filenameLight: string; filenameDark: string; ratio: 1 | 2 } | null>(null);
+  const [previewUrls, setPreviewUrls] = useState<{ light: string; dark: string; filenameLight: string; filenameDark: string; ratio: ExportTargetWidth } | null>(null);
   const [zipBusy, setZipBusy] = useState(false);
   const [zipStage, setZipStage] = useState<string | null>(null);
   type ZipItemKey = "pptxLight" | "pptxDark" | "pdfLight" | "pdfDark" | "pngLight" | "pngDark";
@@ -1267,18 +1274,20 @@ function VariantDetailModal({
       const darkNode = findNode("dark");
       if (!lightNode || !darkNode) throw new Error("Preview nodes not found");
       const mod = await import("@/lib/slide-image-export");
-      const filenameLight = `${variant.id}-${brand.id}-light-${pixelRatio}x-review.pdf`;
-      const filenameDark = `${variant.id}-${brand.id}-dark-${pixelRatio}x-review.pdf`;
+      const resLabel = pixelRatio === 3840 ? "4k" : "hd";
+      const filenameLight = `${variant.id}-${brand.id}-light-${resLabel}-review.pdf`;
+      const filenameDark = `${variant.id}-${brand.id}-dark-${resLabel}-review.pdf`;
       setPreviewStage("Rendering light…");
       const lightBlob = await mod.exportSlidesAsImagePdf(
         [{ node: lightNode, mode: "light" }],
-        { filename: filenameLight, pixelRatio, returnBlob: true, onProgress: (p) => setPreviewStage(`Light · ${p.message ?? p.stage}`) },
+        { filename: filenameLight, targetWidth: pixelRatio, returnBlob: true, onProgress: (p) => setPreviewStage(`Light · ${p.message ?? p.stage}`) },
       );
       setPreviewStage("Rendering dark…");
       const darkBlob = await mod.exportSlidesAsImagePdf(
         [{ node: darkNode, mode: "dark" }],
-        { filename: filenameDark, pixelRatio, returnBlob: true, onProgress: (p) => setPreviewStage(`Dark · ${p.message ?? p.stage}`) },
+        { filename: filenameDark, targetWidth: pixelRatio, returnBlob: true, onProgress: (p) => setPreviewStage(`Dark · ${p.message ?? p.stage}`) },
       );
+
       if (!lightBlob || !darkBlob) throw new Error("Failed to build preview PDFs");
       setPreviewUrls({
         light: URL.createObjectURL(lightBlob),
@@ -1314,7 +1323,7 @@ function VariantDetailModal({
     document.body.appendChild(a);
     a.click();
     a.remove();
-    toast.success(`${which === "light" ? "Light" : "Dark"} PDF downloaded at ${previewUrls.ratio}×`, { description: filename });
+    toast.success(`${which === "light" ? "Light" : "Dark"} PDF downloaded at ${previewUrls.ratio === 3840 ? "4K" : "HD"} (${previewUrls.ratio}×${Math.round(previewUrls.ratio * 9 / 16)})`, { description: filename });
   };
 
 
@@ -1362,18 +1371,20 @@ function VariantDetailModal({
       );
       if (!node) throw new Error(`Preview node not found for ${exportMode} mode`);
       const mod = await import("@/lib/slide-image-export");
-      const filename = `${variant.id}-${brand.id}-${exportMode}-${pixelRatio}x-review.pdf`;
+      const resLabel = pixelRatio === 3840 ? "4k" : "hd";
+      const filename = `${variant.id}-${brand.id}-${exportMode}-${resLabel}-review.pdf`;
       await mod.exportSlidesAsImagePdf(
         [{ node, mode: exportMode }],
         {
           filename,
-          pixelRatio,
+          targetWidth: pixelRatio,
           onProgress: (p) => setPdfStage(p.message ?? p.stage),
         },
       );
-      toast.success(`${exportMode === "light" ? "Light" : "Dark"} PDF exported at ${pixelRatio}×`, {
+      toast.success(`${exportMode === "light" ? "Light" : "Dark"} PDF exported at ${resLabel.toUpperCase()} (${pixelRatio}×${Math.round(pixelRatio * 9 / 16)})`, {
         description: filename,
       });
+
     } catch (err) {
       console.error("[library] image PDF export failed", err);
       toast.error("PDF export failed", { description: "Check console for details." });
@@ -1394,16 +1405,18 @@ function VariantDetailModal({
       const darkNode = findNode("dark");
       if (!lightNode || !darkNode) throw new Error("Preview nodes not found for both modes");
       const mod = await import("@/lib/slide-image-export");
-      const filename = `${variant.id}-${brand.id}-both-${pixelRatio}x-review.pdf`;
+      const resLabel = pixelRatio === 3840 ? "4k" : "hd";
+      const filename = `${variant.id}-${brand.id}-both-${resLabel}-review.pdf`;
       await mod.exportSlidesAsImagePdf(
         [{ node: lightNode, mode: "light" }, { node: darkNode, mode: "dark" }],
         {
           filename,
-          pixelRatio,
+          targetWidth: pixelRatio,
           onProgress: (p) => setPdfStage(p.message ?? p.stage),
         },
       );
-      toast.success(`Both themes PDF exported at ${pixelRatio}×`, { description: filename });
+      toast.success(`Both themes PDF exported at ${resLabel.toUpperCase()} (${pixelRatio}×${Math.round(pixelRatio * 9 / 16)})`, { description: filename });
+
     } catch (err) {
       console.error("[library] both-theme PDF export failed", err);
       toast.error("Combined PDF export failed", { description: "Check console for details." });
@@ -1470,23 +1483,23 @@ function VariantDetailModal({
         setZipStage("Rendering light PDF…");
         lightPdf = (await imgMod.exportSlidesAsImagePdf(
           [{ node: lightNode, mode: "light" }],
-          { filename: "light.pdf", pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Light PDF · ${p.message ?? p.stage}`) },
+          { filename: "light.pdf", targetWidth: pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Light PDF · ${p.message ?? p.stage}`) },
         )) as Blob;
       }
       if (zipSelection.pdfDark && darkNode) {
         setZipStage("Rendering dark PDF…");
         darkPdf = (await imgMod.exportSlidesAsImagePdf(
           [{ node: darkNode, mode: "dark" }],
-          { filename: "dark.pdf", pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Dark PDF · ${p.message ?? p.stage}`) },
+          { filename: "dark.pdf", targetWidth: pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Dark PDF · ${p.message ?? p.stage}`) },
         )) as Blob;
       }
       if (zipSelection.pngLight && lightNode) {
         setZipStage("Rendering light PNG…");
-        lightPng = await imgMod.captureSlide(lightNode, { pixelRatio });
+        lightPng = await imgMod.captureSlide(lightNode, { targetWidth: pixelRatio });
       }
       if (zipSelection.pngDark && darkNode) {
         setZipStage("Rendering dark PNG…");
-        darkPng = await imgMod.captureSlide(darkNode, { pixelRatio });
+        darkPng = await imgMod.captureSlide(darkNode, { targetWidth: pixelRatio });
       }
 
       const dataUrlToBlob = async (u: string) => (await fetch(u)).blob();
@@ -1495,20 +1508,22 @@ function VariantDetailModal({
       const { default: JSZip } = await import("jszip");
       const zip = new JSZip();
       const base = `${variant.id}-${brand.id}`;
+      const resLabel = pixelRatio === 3840 ? "4k" : "hd";
+      const resDisplay = pixelRatio === 3840 ? "4K" : "HD";
       const included: string[] = [];
       if (lightPptx?.blob) { zip.file(`pptx/${lightPptx.fileName ?? `${base}-light.pptx`}`, lightPptx.blob); included.push("pptx/light"); }
       if (darkPptx?.blob) { zip.file(`pptx/${darkPptx.fileName ?? `${base}-dark.pptx`}`, darkPptx.blob); included.push("pptx/dark"); }
-      if (lightPdf) { zip.file(`pdf/${base}-light-${pixelRatio}x.pdf`, lightPdf); included.push("pdf/light"); }
-      if (darkPdf) { zip.file(`pdf/${base}-dark-${pixelRatio}x.pdf`, darkPdf); included.push("pdf/dark"); }
-      if (lightPng) { zip.file(`png/${base}-light-${pixelRatio}x.png`, await dataUrlToBlob(lightPng)); included.push("png/light"); }
-      if (darkPng) { zip.file(`png/${base}-dark-${pixelRatio}x.png`, await dataUrlToBlob(darkPng)); included.push("png/dark"); }
+      if (lightPdf) { zip.file(`pdf/${base}-light-${resLabel}.pdf`, lightPdf); included.push("pdf/light"); }
+      if (darkPdf) { zip.file(`pdf/${base}-dark-${resLabel}.pdf`, darkPdf); included.push("pdf/dark"); }
+      if (lightPng) { zip.file(`png/${base}-light-${resLabel}.png`, await dataUrlToBlob(lightPng)); included.push("png/light"); }
+      if (darkPng) { zip.file(`png/${base}-dark-${resLabel}.png`, await dataUrlToBlob(darkPng)); included.push("png/dark"); }
       zip.file(
         "README.txt",
-        `${variant.name} — ${brand.name}\nModule: ${variant.id}\nDivision: ${brand.id}\nResolution: ${pixelRatio}×\nExported: ${new Date().toISOString()}\n\nIncluded:\n  ${included.join("\n  ")}\n`,
+        `${variant.name} — ${brand.name}\nModule: ${variant.id}\nDivision: ${brand.id}\nResolution: ${resDisplay} (${pixelRatio}×${Math.round(pixelRatio * 9 / 16)})\nExported: ${new Date().toISOString()}\n\nIncluded:\n  ${included.join("\n  ")}\n`,
       );
 
       const zipBlob = await zip.generateAsync({ type: "blob" });
-      const filename = `${base}-bundle-${pixelRatio}x.zip`;
+      const filename = `${base}-bundle-${resLabel}.zip`;
       const url = URL.createObjectURL(zipBlob);
       const a = document.createElement("a");
       a.href = url;
@@ -1517,7 +1532,8 @@ function VariantDetailModal({
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      toast.success("Module ZIP exported", { description: `${filename} · ${included.length} file${included.length === 1 ? "" : "s"} at ${pixelRatio}×` });
+      toast.success("Module ZIP exported", { description: `${filename} · ${included.length} file${included.length === 1 ? "" : "s"} at ${resDisplay}` });
+
     } catch (err) {
       console.error("[library] module ZIP export failed", err);
       toast.error("ZIP export failed", { description: "Check console for details." });
@@ -1769,7 +1785,7 @@ function VariantDetailModal({
                         ))}
                       </div>
                       <p className="mt-2 border-t border-black/5 pt-2 text-[10px] text-black/50">
-                        Saved for next time · rendered at {pixelRatio}× · {zipSelectedCount} file{zipSelectedCount === 1 ? "" : "s"} selected
+                        Saved for next time · rendered at {pixelRatio === 3840 ? "4K" : "HD"} · {zipSelectedCount} file{zipSelectedCount === 1 ? "" : "s"} selected
                       </p>
                     </div>
                   </div>
@@ -1953,7 +1969,7 @@ function VariantDetailModal({
         >
           <div className="flex items-center justify-between gap-4 border-b border-white/10 px-6 py-4">
             <div className="min-w-0">
-              <div className="text-xs uppercase tracking-widest text-white/60">PDF preview · {previewUrls.ratio}×{previewUrls.ratio !== pixelRatio ? ` (current selection: ${pixelRatio}× — re-render to update)` : ""}</div>
+              <div className="text-xs uppercase tracking-widest text-white/60">PDF preview · {previewUrls.ratio === 3840 ? "4K" : "HD"} · {previewUrls.ratio}×{Math.round(previewUrls.ratio * 9 / 16)}{previewUrls.ratio !== pixelRatio ? ` (current selection: ${pixelRatio === 3840 ? "4K" : "HD"} — re-render to update)` : ""}</div>
               <div className="mt-1 truncate text-lg font-semibold">{variant.name} — {brand.name}</div>
             </div>
             <div className="flex items-center gap-2">
@@ -1963,7 +1979,7 @@ function VariantDetailModal({
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:bg-white/90"
                 title={previewUrls.filenameLight}
               >
-                <Download size={12} /> Download Light ({previewUrls.ratio}×)
+                <Download size={12} /> Download Light ({previewUrls.ratio === 3840 ? "4K" : "HD"})
               </button>
               <button
                 type="button"
@@ -1971,7 +1987,7 @@ function VariantDetailModal({
                 className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#0050ff]"
                 title={previewUrls.filenameDark}
               >
-                <Download size={12} /> Download Dark ({previewUrls.ratio}×)
+                <Download size={12} /> Download Dark ({previewUrls.ratio === 3840 ? "4K" : "HD"})
               </button>
               <button
                 type="button"
@@ -2057,19 +2073,21 @@ function ModalABPreview({
     setImageBusy(`${kind}-${m}`);
     setImageStage(null);
     try {
-      const base = `${variant.id}-${brand.id}-${m}-${pixelRatio}x`;
+      const resLabel = pixelRatio === 3840 ? "4k" : "hd";
+      const base = `${variant.id}-${brand.id}-${m}-${resLabel}`;
       const filename = `${base}.${kind}`;
       const mod = await import("@/lib/slide-image-export");
       const onProgress = (p: { stage: string; message?: string }) =>
         setImageStage(p.message ?? p.stage);
       if (kind === "png") {
-        await mod.exportSlideAsPng(node, { mode: m, filename, pixelRatio, onProgress });
+        await mod.exportSlideAsPng(node, { mode: m, filename, targetWidth: pixelRatio, onProgress });
       } else {
-        await mod.exportSlidesAsImagePdf([{ node, mode: m }], { filename, pixelRatio, onProgress });
+        await mod.exportSlidesAsImagePdf([{ node, mode: m }], { filename, targetWidth: pixelRatio, onProgress });
       }
-      toast.success(`${m === "light" ? "Light" : "Dark"} ${kind.toUpperCase()} exported at ${pixelRatio}×`, {
+      toast.success(`${m === "light" ? "Light" : "Dark"} ${kind.toUpperCase()} exported at ${resLabel.toUpperCase()} (${pixelRatio}×${Math.round(pixelRatio * 9 / 16)})`, {
         description: filename,
       });
+
     } catch (err) {
       console.error("[library] image export failed", err);
       toast.error("Image export failed", { description: "See console for details." });
