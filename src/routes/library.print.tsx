@@ -136,6 +136,48 @@ const SPOTLIGHT_SEED: SpotlightContent = emptySpotlight({
   cta: { label: "Book a walkthrough", url: "https://transperfect.com" },
 });
 
+const EBROCHURE_SEED: EBrochureContent = emptyEBrochure({
+  title: "Helping Global Teams Move Faster with GlobalLink",
+  summary: "See how a leading technology company streamlined content operations, reduced turnaround times, and improved quality across 35+ markets with GlobalLink AI.",
+  sections: [
+    { heading: "The Challenge", body: "Fragmented tools, inconsistent terminology, and slow localization made rapid market expansion hard.",
+      bullets: ["Disconnected systems and manual processes", "Inconsistent brand and terminology", "Long turnaround times across markets", "Limited visibility into content progress"] },
+    { heading: "Our Approach", body: "GlobalLink AI to unify content operations, automate workflows, and embed governance — on-brand content faster, everywhere.",
+      bullets: ["Unified content orchestration", "AI-powered translation + workflow automation", "Centralized terminology and governance", "Real-time dashboards and reporting"] },
+    { heading: "The Impact", body: "Measurable improvements in speed, quality, and efficiency — teams scale global content with confidence.",
+      bullets: ["3.4× faster time-to-market", "48% reduction in localization costs", "98% translation quality score", "Consistent brand across 35+ markets"] },
+  ],
+  stats: [
+    { label: "Global teams empowered", value: "100", unit: "%" },
+    { label: "Reduction in localization costs", value: "48", unit: "%" },
+    { label: "Translation quality score", value: "98", unit: "%" },
+    { label: "Markets supported", value: "35", unit: "+" },
+    { label: "Faster time-to-market", value: "3.4", unit: "×" },
+  ],
+  quote: {
+    text: "TransPerfect helped us simplify a complex localization process and free our internal team to focus on higher-value work.",
+    author: "Global Content Lead", company: "Fortune 100 client",
+  },
+  cta: { label: "See GlobalLink in Action", subhead: "Explore how GlobalLink AI can transform your content operations." },
+});
+
+const ADAPTOR_SEED: AdaptorBriefContent = emptyAdaptorBrief({
+  title: "GlobalLink for Adobe Experience Manager Plus",
+  summary: "TransPerfect GlobalLink brings people, content, and technology together to help global teams translate, adapt, and deliver with speed and clarity.",
+  features: [
+    { verb: "Supports", body: "Adobe AEM 6.5 LTS SP packages with cross-environment compatibility" },
+    { verb: "Adapts", body: "To any AEM content tree, out-of-the-box or custom" },
+    { verb: "Enables", body: "Custom localization for URLs and internal and external links" },
+    { verb: "Automates", body: "Translation submission through AEM publishing workflow triggers" },
+    { verb: "Triggers", body: "AEM workflows with AI and human oversight" },
+    { verb: "Learns", body: "Adaptive forms with dictionaries stored under new path locations" },
+  ],
+  quote: {
+    text: "TransPerfect helped us simplify a complex localization process and free our internal team to focus on higher-value work.",
+    author: "Aesop",
+  },
+});
+
 // ---------------------------------------------------------------------------
 // Page
 // ---------------------------------------------------------------------------
