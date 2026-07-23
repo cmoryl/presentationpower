@@ -282,10 +282,11 @@ export function CaseStudyLayout({
                 <div>
                   <div style={{ fontWeight: 700, fontSize: cq(13.5), color: accentInk }}>{b.label}</div>
                   {b.block.body && (
-                    <p style={{ margin: `${cq(5)} 0 0`, fontSize: cq(10.5), lineHeight: 1.6, color: inkSoft }}>
+                    <p style={{ margin: `${cq(5)} 0 0`, fontSize: cq(10.5), lineHeight: 1.6, color: inkSoft, ...clampLines(3) }}>
                       {b.block.body}
                     </p>
                   )}
+
                 </div>
               </div>
             ))}
