@@ -157,12 +157,17 @@ async function fetchAsDataUrl(url: string, label?: string): Promise<string | nul
       r.onerror = () => reject(r.error);
       r.readAsDataURL(blob);
     });
-    // PowerPoint can't reliably embed SVG via addImage — rasterize on the fly.
+    // PowerPoint 2019+/M365 render SVG via addImage; older PPT and Google
+    // Slides flatten inconsistently. Respect the vector-first preference:
+    // when on, pass SVG through untouched (crisp + tiny); when off, fall
+    // back to canvas rasterization for maximum compatibility.
     const isSvg =
       blob.type === "image/svg+xml" ||
       /^data:image\/svg\+xml/i.test(dataUrl) ||
       /\.svg(\?|#|$)/i.test(url);
     if (isSvg) {
+      const { getPreferVector } = await import("./pptx-vector-pref");
+      if (getPreferVector()) return dataUrl;
       const png = await rasterizeSvgToPngDataUrl(dataUrl);
       if (png) return png;
       console.warn(`[pptx-export] ${label ?? "image"} SVG rasterization failed, skipping: ${url}`);

@@ -110,6 +110,42 @@ function ResolutionToggle({
   );
 }
 
+function VectorToggle() {
+  const [on, setOn] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    try {
+      const raw = window.localStorage.getItem("pptx.preferVector.v1");
+      if (raw === "true") return true;
+      if (raw === "false") return false;
+    } catch { /* ignore */ }
+    return true;
+  });
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<boolean>).detail;
+      if (typeof detail === "boolean") setOn(detail);
+    };
+    window.addEventListener("pptx:prefer-vector", handler);
+    return () => window.removeEventListener("pptx:prefer-vector", handler);
+  }, []);
+  const set = (v: boolean) => {
+    setOn(v);
+    import("@/lib/pptx-vector-pref").then((m) => m.setPreferVector(v));
+  };
+  const pill = (active: boolean) =>
+    `rounded-full px-2 py-0.5 transition ${active ? "bg-[#03002C] text-white" : "text-black/60 hover:text-[#003FC7]"}`;
+  return (
+    <div
+      className="inline-flex items-center rounded-full border border-black/15 bg-white p-0.5 text-[10px] font-medium uppercase tracking-widest"
+      role="group"
+      aria-label="PPTX embed mode"
+    >
+      <button type="button" onClick={() => set(true)} className={pill(on)} title="Vector · SVG passthrough for icons/logos/maps · smaller file, sharp at any zoom (PowerPoint 2019+/M365)">Vector</button>
+      <button type="button" onClick={() => set(false)} className={pill(!on)} title="Raster · flatten SVG to PNG · maximum compatibility (older PowerPoint, Google Slides)">Raster</button>
+    </div>
+  );
+}
+
 
 
 function readPins(): Set<string> {
@@ -1677,6 +1713,14 @@ function VariantDetailModal({
                     <div className="flex items-center justify-between pb-3">
                       <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">Resolution</span>
                       <ResolutionToggle value={pixelRatio} onChange={setPixelRatio} disabled={pdfBusy !== null || bothBusy || zipBusy} />
+                    </div>
+                    {/* Vector-first PPTX row */}
+                    <div className="flex items-center justify-between border-t border-black/5 pt-3 pb-3">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">PPTX embeds</span>
+                        <span className="text-[10px] text-black/45">Vector = crisp + smaller · Raster = max compat</span>
+                      </div>
+                      <VectorToggle />
                     </div>
 
                     {/* Quick single-shot exports */}
