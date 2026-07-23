@@ -17,7 +17,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/", label: "Dashboard" },
     { to: "/brief/new", label: "New brief" },
     { to: "/atlas", label: "Atlas" },
-    { to: "/templates", label: "Templates" },
+    
     { to: "/library", label: "Library" },
     { to: "/admin", label: "Admin" },
   ] as const;
@@ -26,6 +26,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       label: "Overview",
       items: [
         { to: "/admin", label: "Command center" },
+        { to: "/templates", label: "Templates" },
         { to: "/admin/audit", label: "Audit log" },
       ],
     },
