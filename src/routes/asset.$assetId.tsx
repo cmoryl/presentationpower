@@ -70,6 +70,8 @@ function AssetEditor() {
   const [bleedIn, setBleedIn] = useState(0.125);
   const [cropMarks, setCropMarks] = useState(true);
   const [exportMode, setExportMode] = useState<"light" | "dark">("light");
+  const [exportQuality, setExportQuality] = useState<PrintExportQuality>("300dpi");
+
 
   useEffect(() => {
     load({ data: { assetId } })
