@@ -255,7 +255,7 @@ export function EBrochureLayout({
                     </p>
                     {content.discover.bullets.slice(0, 4).map((b, k) => (
                       <div key={k} className="flex items-center" style={{ gap: cq(8), marginTop: k === 0 ? cq(12) : cq(8) }}>
-                        <Icon d={ICONS.check} size={cq(11)} color={accentInk} sw={2.5} />
+                        <Icon d={ICONS.check} size={cq(11)} color={accentInk} strokeWidth={2.5} />
                         <div style={{ fontSize: cq(10), color: inkSoft }}>{b}</div>
                       </div>
                     ))}
