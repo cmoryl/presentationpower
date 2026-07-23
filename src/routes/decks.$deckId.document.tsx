@@ -38,7 +38,7 @@ function DocumentView() {
   const { deckId } = Route.useParams();
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
-  const [familyId, setFamilyId] = useState<DocumentFamilyId>("ebrochure");
+  const [familyId, setFamilyId] = useState<DocumentFamilyId>("deck-brochure");
   const family = documentFamily(familyId);
   const [size, setSize] = useState<PageSize>(family.defaultSize);
   const [orientation, setOrientation] = useState<PageOrientation>(family.defaultOrientation);
