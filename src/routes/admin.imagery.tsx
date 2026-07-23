@@ -510,6 +510,23 @@ function ImageCard({
           {(row.size_bytes / 1024).toFixed(0)} KB · {new Date(row.created_at).toLocaleDateString()}
         </div>
 
+        <div
+          className="mt-2 flex items-center gap-2 rounded-md bg-black/[0.04] px-2 py-1.5 text-[10px] font-medium text-black/70"
+          title="Last 90 days of user activity"
+        >
+          <BarChart3 size={11} className="text-[#003FC7]" />
+          <span>{stats?.view ?? 0} views</span>
+          <span className="text-black/25">·</span>
+          <span>{stats?.select ?? 0} selects</span>
+          <span className="text-black/25">·</span>
+          <span>{stats?.download ?? 0} downloads</span>
+          {stats?.last ? (
+            <span className="ml-auto text-black/40">
+              {new Date(stats.last).toLocaleDateString()}
+            </span>
+          ) : null}
+        </div>
+
         {editing ? (
           <div className="mt-2 flex items-center gap-1">
             <input
