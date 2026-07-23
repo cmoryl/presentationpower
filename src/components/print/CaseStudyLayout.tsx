@@ -165,17 +165,19 @@ export function CaseStudyLayout({
               color: ink,
             }}
           >
-            <div
-              className="pointer-events-none absolute"
-              aria-hidden
-              style={{
-                top: cq(-60), right: cq(-80),
-                width: cq(300), height: cq(300), borderRadius: "50%",
-                background: `radial-gradient(circle at 40% 40%, color-mix(in srgb, ${accent} 45%, transparent) 0%, color-mix(in srgb, ${accent} 15%, transparent) 50%, transparent 72%)`,
-                filter: `blur(${cq(6)})`,
-                opacity: mode === "dark" ? 0.85 : 0.55,
-              }}
-            />
+            {mode === "dark" && (
+              <div
+                className="pointer-events-none absolute"
+                aria-hidden
+                style={{
+                  top: cq(-60), right: cq(-80),
+                  width: cq(300), height: cq(300), borderRadius: "50%",
+                  background: `radial-gradient(circle at 40% 40%, color-mix(in srgb, ${accent} 45%, transparent) 0%, color-mix(in srgb, ${accent} 15%, transparent) 50%, transparent 72%)`,
+                  filter: `blur(${cq(6)})`,
+                  opacity: 0.85,
+                }}
+              />
+            )}
             <div className="relative flex items-center justify-between" style={{ gap: cq(10) }}>
               <div style={{ fontSize: cq(9.5), fontWeight: 600, letterSpacing: "0.14em", color: accentInk }}>
                 {(content.eyebrow ?? "CLIENT CASE STUDY").toUpperCase()}
