@@ -1233,6 +1233,35 @@ function VariantDetailModal({
       setPdfStage(null);
     }
   };
+  const downloadBothPdfs = async () => {
+    if (pdfBusy || bothBusy) return;
+    setBothBusy(true);
+    setPdfStage(null);
+    try {
+      const findNode = (m: "light" | "dark") => document.querySelector<HTMLElement>(
+        `[data-modal-preview="${m}"][data-variant-id="${variant.id}"]`,
+      );
+      const lightNode = findNode("light");
+      const darkNode = findNode("dark");
+      if (!lightNode || !darkNode) throw new Error("Preview nodes not found for both modes");
+      const mod = await import("@/lib/slide-image-export");
+      await mod.exportSlidesAsImagePdf(
+        [{ node: lightNode, mode: "light" }, { node: darkNode, mode: "dark" }],
+        {
+          filename: `${variant.id}-${brand.id}-both-${pixelRatio}x-review.pdf`,
+          pixelRatio,
+          onProgress: (p) => setPdfStage(p.message ?? p.stage),
+        },
+      );
+    } catch (err) {
+      console.error("[library] both-theme PDF export failed", err);
+      alert("Combined PDF export failed. Check console for details.");
+    } finally {
+      setBothBusy(false);
+      setPdfStage(null);
+    }
+  };
+
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
