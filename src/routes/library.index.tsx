@@ -1571,6 +1571,7 @@ function ModalABPreview({
   const [zoom, setZoom] = useState<null | "light" | "dark">(null);
   const [imageBusy, setImageBusy] = useState<null | `${"png" | "pdf"}-${"light" | "dark"}`>(null);
   const [imageStage, setImageStage] = useState<string | null>(null);
+  const [pixelRatio, setPixelRatio] = useExportPixelRatio();
 
   const runImageExport = async (m: "light" | "dark", kind: "png" | "pdf") => {
     const node = (m === "dark" ? darkRef.current : lightRef.current);
@@ -1578,14 +1579,14 @@ function ModalABPreview({
     setImageBusy(`${kind}-${m}`);
     setImageStage(null);
     try {
-      const base = `${variant.id}-${brand.id}-${m}`;
+      const base = `${variant.id}-${brand.id}-${m}-${pixelRatio}x`;
       const mod = await import("@/lib/slide-image-export");
       const onProgress = (p: { stage: string; message?: string }) =>
         setImageStage(p.message ?? p.stage);
       if (kind === "png") {
-        await mod.exportSlideAsPng(node, { mode: m, filename: `${base}.png`, onProgress });
+        await mod.exportSlideAsPng(node, { mode: m, filename: `${base}.png`, pixelRatio, onProgress });
       } else {
-        await mod.exportSlidesAsImagePdf([{ node, mode: m }], { filename: `${base}.pdf`, onProgress });
+        await mod.exportSlidesAsImagePdf([{ node, mode: m }], { filename: `${base}.pdf`, pixelRatio, onProgress });
       }
     } catch (err) {
       console.error("[library] image export failed", err);
@@ -1595,6 +1596,7 @@ function ModalABPreview({
       setImageStage(null);
     }
   };
+
 
 
   return (
