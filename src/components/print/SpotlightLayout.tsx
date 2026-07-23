@@ -26,6 +26,7 @@ import {
   chipStyle,
   Icon,
   clampLines,
+  PrintEyebrow,
   type IconName,
 } from "@/components/print/print-primitives";
 
