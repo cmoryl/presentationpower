@@ -925,6 +925,27 @@ function ModulesPanel({
   const lightestWeight = 1.6;
   const gate = canAddModule(kind, modules, lightestWeight);
 
+  // Parse a dragged section payload from the drawer. Returns null for
+  // reorder drags (which carry a numeric text/plain index instead).
+  function readInsertPayload(e: React.DragEvent): PrintSection | null {
+    const raw = e.dataTransfer.getData(PRINT_SECTION_DND_MIME);
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw) as PrintSection;
+      if (!parsed || typeof parsed !== "object" || !("kind" in parsed)) return null;
+      // Re-issue an id so pasting the same drawer card twice yields unique keys.
+      return { ...parsed, id: `sec-${Math.random().toString(36).slice(2, 10)}` } as PrintSection;
+    } catch {
+      return null;
+    }
+  }
+  function insertAt(index: number, section: PrintSection) {
+    const clamped = Math.max(0, Math.min(index, modules.length));
+    const next = [...modules];
+    next.splice(clamped, 0, section);
+    onChange(next);
+  }
+
   return (
     <>
       <button
