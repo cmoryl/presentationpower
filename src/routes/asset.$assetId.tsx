@@ -581,6 +581,10 @@ function AssetEditor() {
               divisionId={row?.brand_mode_id ?? null}
             />
 
+            <HeroPreviewPanel media={content.heroMedia} brand={brand} />
+
+
+
 
 
             <Panel title="Stats">
