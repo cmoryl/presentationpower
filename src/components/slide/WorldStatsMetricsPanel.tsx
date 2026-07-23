@@ -21,6 +21,17 @@ import {
 
 type RegionKey = LocationPin["region"];
 const REGION_KEYS: RegionKey[] = ["AMER", "EMEA", "APAC", "LATAM", "MEA"];
+type RoleKey = NonNullable<LocationPin["role"]>;
+const ROLE_KEYS: RoleKey[] = ["HQ", "hub", "office", "delivery", "partner"];
+const ROLE_LABELS: Record<RoleKey, string> = {
+  HQ: "HQ",
+  hub: "Hub",
+  office: "Office",
+  delivery: "Delivery",
+  partner: "Partner",
+};
+const TOP_N_OPTIONS = [5, 10, 25] as const;
+type TopN = (typeof TOP_N_OPTIONS)[number];
 
 type Props = {
   brandId: string;
@@ -28,11 +39,15 @@ type Props = {
   metrics: unknown;
   activeMetricId: unknown;
   regionFilter: unknown;
+  excludeRoles: unknown;
+  topN: unknown;
   onChange: (patch: {
     items?: LocationPin[];
     metrics?: LocationMetric[];
     activeMetricId?: string | null;
     regionFilter?: RegionKey[] | null;
+    excludeRoles?: RoleKey[] | null;
+    topN?: TopN;
   }) => void;
 };
 
