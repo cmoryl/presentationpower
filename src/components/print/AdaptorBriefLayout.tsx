@@ -230,7 +230,7 @@ export function AdaptorBriefLayout({
                       }}>
                         <Icon d={KNOW_ICONS[i % KNOW_ICONS.length]!} size={cq(17)} color={accentInk} />
                       </div>
-                      <div style={{ fontSize: cq(9.5), lineHeight: 1.45, color: inkSoft }}>{k}</div>
+                      <div style={{ fontSize: cq(9.5), lineHeight: 1.45, color: inkSoft, ...clampLines(3) }}>{k}</div>
                     </div>
                   ))}
                 </div>
