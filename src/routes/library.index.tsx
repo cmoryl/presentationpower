@@ -1264,6 +1264,26 @@ function VariantDetailModal({
               {downloading ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
               Dark .pptx
             </button>
+            <span className="mx-0.5 h-5 w-px bg-black/10" aria-hidden />
+            <button
+              type="button"
+              onClick={() => downloadImagePdf("light")}
+              disabled={pdfBusy !== null}
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/20 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
+              title="Export a pixel-perfect image PDF of the light preview — best for client review copies (not editable in PowerPoint)"
+            >
+              {pdfBusy === "light" ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
+              Light PDF
+            </button>
+            <button
+              type="button"
+              onClick={() => downloadImagePdf("dark")}
+              disabled={pdfBusy !== null}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C] bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#003FC7] disabled:opacity-60"
+              title="Export a pixel-perfect image PDF of the dark preview — best for client review copies (not editable in PowerPoint)"
+            >
+              {pdfBusy === "dark" ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
+              Dark PDF
             {usageCount > 0 && (
               <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
                 Used · {usageCount}
