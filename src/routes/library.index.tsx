@@ -1344,6 +1344,8 @@ function VariantDetailModal({
               Dark .pptx
             </button>
             <span className="mx-0.5 h-5 w-px bg-black/10" aria-hidden />
+            <ResolutionToggle value={pixelRatio} onChange={setPixelRatio} disabled={pdfBusy !== null} />
+
             <button
               type="button"
               onClick={() => downloadImagePdf("light")}
