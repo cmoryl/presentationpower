@@ -161,6 +161,12 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
                     <span className="absolute left-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] text-white/80">
                       {r.kind}
                     </span>
+                    {r.approved && (
+                      <span className="absolute right-2 top-2 rounded-full bg-emerald-500/90 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-white shadow">
+                        Approved
+                      </span>
+                    )}
+
                   </div>
                   <div className="space-y-1 p-2.5">
                     <div className="truncate text-[11px] font-medium text-white">{r.filename}</div>
