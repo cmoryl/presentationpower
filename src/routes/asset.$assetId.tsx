@@ -33,7 +33,8 @@ import { emptyCaseStudy } from "@/lib/print-assets.types";
 import type { PrintSection, PrintStatsSection, PrintStatsVariant } from "@/lib/print-assets.types";
 import { PRINT_STATS_VARIANTS, PrintSectionRenderer } from "@/components/print/sections/PrintSectionRenderer";
 import { PrintSectionPicker } from "@/components/print/sections/PrintSectionPicker";
-import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown } from "lucide-react";
+import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
+import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images } from "lucide-react";
 
 export const Route = createFileRoute("/asset/$assetId")({
   head: ({ params }) => ({
