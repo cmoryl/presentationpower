@@ -3027,7 +3027,7 @@ function renderVariantBody({
             <div className="flex flex-col items-center text-center">
               <Kicker brand={brand}>Kickoff</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
-              <div className="tabular-nums" style={{ fontSize: 260, lineHeight: 0.9, fontWeight: 600, letterSpacing: "-0.04em", color: ink.strong }}>
+              <div className="tabular-nums" style={{ fontSize: 200, lineHeight: 0.92, fontWeight: 600, letterSpacing: "-0.035em", color: ink.strong }}>
                 {s(c.date)}
               </div>
               <div className="mt-6" style={{ fontSize: 32, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(c.day)}</div>
