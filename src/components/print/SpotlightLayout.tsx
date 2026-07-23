@@ -26,6 +26,7 @@ import {
   chipStyle,
   Icon,
   clampLines,
+  PrintEyebrow,
   type IconName,
 } from "@/components/print/print-primitives";
 
@@ -190,16 +191,12 @@ export function SpotlightLayout({
             {/* HEADER — brand lockup + CLIENT SPOTLIGHT eyebrow              */}
             {/* ============================================================ */}
             <div className="flex items-center justify-between" style={{ gap: cq(10) }}>
-              <div
-                style={{
-                  fontSize: cq(9.5),
-                  fontWeight: 600,
-                  letterSpacing: "0.14em",
-                  color: inkFaint,
-                }}
-              >
-                {(content.eyebrow ?? "Client spotlight").toUpperCase()}
-              </div>
+              <PrintEyebrow
+                label={content.eyebrow ?? "Client spotlight"}
+                mode={mode}
+                accent={accent}
+                cq={cq}
+              />
               <BrandLockup brand={brand} color={mode === "dark" ? "#FFFFFF" : resolvePrintLogoInk(content.logoColor, ink)} size="2xs" orientation="horizontal" />
             </div>
 
@@ -479,7 +476,6 @@ export function SpotlightLayout({
                 style={{
                   gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))`,
                   paddingTop: cq(26),
-                  flex: 1,
                 }}
               >
                 {columns.map((c, i) => {
@@ -537,6 +533,12 @@ export function SpotlightLayout({
 
             {/* SHARED MODULES */}
             <PrintSectionsStack sections={content.modules} mode={mode} accent={accent} />
+
+            {/* Rhythm spacer — takes leftover column height as ONE uniform gap
+                above the CTA instead of inflating the top-aligned capability
+                row. Fixes the dead-space band that appeared when capability
+                bodies were short and shared-modules were empty. */}
+            <div style={{ flex: 1, minHeight: cq(12) }} aria-hidden />
 
             {/* ============================================================ */}
             {/* CTA BAND — division-tokenized gradient                        */}

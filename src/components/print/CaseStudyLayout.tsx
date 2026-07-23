@@ -25,6 +25,7 @@ import {
   IconPath as Icon,
   ICON_PATHS,
   clampLines,
+  PrintEyebrow,
 } from "@/components/print/print-primitives";
 
 
@@ -182,9 +183,13 @@ export function CaseStudyLayout({
               />
             )}
             <div className="relative flex items-center justify-between" style={{ gap: cq(10) }}>
-              <div style={{ fontSize: cq(9.5), fontWeight: 600, letterSpacing: "0.14em", color: accentInk }}>
-                {(content.eyebrow ?? "CLIENT CASE STUDY").toUpperCase()}
-              </div>
+              <PrintEyebrow
+                label={content.eyebrow ?? "CLIENT CASE STUDY"}
+                mode={mode}
+                accent={accent}
+                cq={cq}
+                onDark
+              />
               <BrandLockup brand={brand} color={mode === "dark" ? "#FFFFFF" : resolvePrintLogoInk(content.logoColor, ink)} size="2xs" orientation="horizontal" />
             </div>
             <h1

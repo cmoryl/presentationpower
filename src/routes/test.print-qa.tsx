@@ -22,6 +22,11 @@ import {
   type AdaptorBriefContent,
 } from "@/lib/print-assets.types";
 
+// PRODUCTION GATE — this route renders internal QA fixtures and must never
+// ship on the published site. `import.meta.env.DEV` is inlined by Vite at
+// build time: true for `bun run dev`, false for every production build.
+const DEV = import.meta.env.DEV;
+
 export const Route = createFileRoute("/test/print-qa")({
   head: () => ({
     meta: [
@@ -29,8 +34,13 @@ export const Route = createFileRoute("/test/print-qa")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(taxonomyQueryOptions),
-  component: PrintQAMatrix,
+  loader: ({ context }) => {
+    if (!DEV) {
+      throw new Response("Not Found", { status: 404 });
+    }
+    return context.queryClient.ensureQueryData(taxonomyQueryOptions);
+  },
+  component: DEV ? PrintQAMatrix : () => null,
 });
 
 // -----------------------------------------------------------------------

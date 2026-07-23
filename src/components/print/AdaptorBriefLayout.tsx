@@ -26,6 +26,8 @@ import {
   chipStyle,
   IconPath as Icon,
   clampLines,
+  PrintEyebrow,
+  heroCopyScrimStyle,
 } from "@/components/print/print-primitives";
 
 
@@ -161,15 +163,23 @@ export function AdaptorBriefLayout({
             paddingLeft: cq(padX(density)), paddingRight: cq(padX(density)),
             paddingTop: cq(padTop(density)), paddingBottom: cq(28),
           }}>
-            {/* HERO */}
-            <div>
-              <div className="flex items-center justify-between" style={{ gap: cq(10) }}>
-                <div style={{ fontSize: cq(10), fontWeight: 600, letterSpacing: "0.14em", color: accent }}>
-                  {(content.eyebrow ?? "ADAPTOR BRIEF").toUpperCase()}
-                </div>
+            {/* HERO — wrapped in a relative container so a localized text-backing
+                scrim travels with the copy block rather than the photo. This is
+                what keeps title + tagline legible on mid-band photos where a
+                global scrim goes transparent (e.g. Adaptor Legal light). */}
+            <div style={{ position: "relative" }}>
+              <div style={heroCopyScrimStyle(mode)} aria-hidden />
+              <div className="relative flex items-center justify-between" style={{ gap: cq(10) }}>
+                <PrintEyebrow
+                  label={content.eyebrow ?? "ADAPTOR BRIEF"}
+                  mode={mode}
+                  accent={accent}
+                  cq={cq}
+                />
                 <BrandLockup brand={brand} color={mode === "dark" ? "#FFFFFF" : resolvePrintLogoInk(content.logoColor, heroInk)} size="2xs" orientation="horizontal" />
               </div>
               <h1 ref={heroRef} style={{
+                position: "relative",
                 margin: `${cq(12)} 0 0`, fontWeight: 700, fontSize: cq(37),
                 lineHeight: 1.12, letterSpacing: "-0.015em", color: heroInk, maxWidth: cq(480),
               }}>
@@ -177,6 +187,7 @@ export function AdaptorBriefLayout({
               </h1>
               {content.summary && (
                 <p ref={introRef} style={{
+                  position: "relative",
                   margin: `${cq(14)} 0 0`, fontSize: cq(12.5), lineHeight: 1.6,
                   color: heroSubInk, maxWidth: cq(380),
                 }}>{content.summary}</p>
