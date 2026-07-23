@@ -181,12 +181,11 @@ export function AdaptorBriefLayout({
           }}>
             {/* HERO */}
             <div>
-              <div className="flex items-center" style={{ gap: cq(10) }}>
-                <BrandLockup brand={brand} color={heroInk} size="sm" orientation="horizontal" />
-                <div style={{ width: 1, height: cq(14), background: "rgba(255,255,255,0.28)" }} />
+              <div className="flex items-center justify-between" style={{ gap: cq(10) }}>
                 <div style={{ fontSize: cq(10), fontWeight: 600, letterSpacing: "0.14em", color: accent }}>
                   {(content.eyebrow ?? "ADAPTOR BRIEF").toUpperCase()}
                 </div>
+                <BrandLockup brand={brand} color={heroInk} size="xs" orientation="horizontal" />
               </div>
               <h1 ref={heroRef} style={{
                 margin: `${cq(12)} 0 0`, fontWeight: 700, fontSize: cq(37),
