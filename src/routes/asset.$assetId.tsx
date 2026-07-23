@@ -241,13 +241,112 @@ function AssetEditor() {
             >
               <Save size={12} /> {saving ? "Saving…" : "Save"}
             </button>
-            <button
-              type="button"
-              onClick={() => alert("Export coming online next — the print pipeline reuses the deck exporter under the hood.")}
-              className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-black/70 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/70"
-            >
-              <FileDown size={12} /> Export
-            </button>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setExportOpen((v) => !v)}
+                className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs font-medium text-black/70 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/70"
+              >
+                <FileDown size={12} /> Export PDF
+              </button>
+              {exportOpen && (
+                <div className="absolute right-0 top-10 z-50 w-80 rounded-2xl border border-black/10 bg-white p-4 text-xs shadow-xl dark:border-white/10 dark:bg-[#0B0A2A]">
+                  <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-black/60 dark:text-white/60">PDF export</div>
+                  <div className="space-y-2">
+                    <label className="flex items-center justify-between gap-3">
+                      <span className="text-black/60 dark:text-white/60">Page size</span>
+                      <select
+                        value={exportSize}
+                        onChange={(e) => setExportSize(e.target.value as PrintPageSizeKey)}
+                        className={inspectorInput}
+                      >
+                        <option value="A4">A4 (210 × 297 mm)</option>
+                        <option value="Letter">US Letter (8.5 × 11 in)</option>
+                        <option value="Square">Square (8.5 × 8.5 in)</option>
+                        <option value="Custom">Custom…</option>
+                      </select>
+                    </label>
+                    {exportSize === "Custom" && (
+                      <div className="grid grid-cols-2 gap-2">
+                        <label className="flex flex-col gap-1">
+                          <span className="text-black/50 dark:text-white/50">Width (in)</span>
+                          <input
+                            type="number"
+                            step="0.1"
+                            min="1"
+                            max="60"
+                            value={customW}
+                            onChange={(e) => setCustomW(parseFloat(e.target.value) || 0)}
+                            className={inspectorInput}
+                          />
+                        </label>
+                        <label className="flex flex-col gap-1">
+                          <span className="text-black/50 dark:text-white/50">Height (in)</span>
+                          <input
+                            type="number"
+                            step="0.1"
+                            min="1"
+                            max="60"
+                            value={customH}
+                            onChange={(e) => setCustomH(parseFloat(e.target.value) || 0)}
+                            className={inspectorInput}
+                          />
+                        </label>
+                      </div>
+                    )}
+                    <label className="flex items-center justify-between gap-3">
+                      <span className="text-black/60 dark:text-white/60">Bleed</span>
+                      <select
+                        value={bleedIn}
+                        onChange={(e) => setBleedIn(parseFloat(e.target.value))}
+                        className={inspectorInput}
+                      >
+                        <option value={0}>None</option>
+                        <option value={0.125}>0.125 in (3 mm)</option>
+                        <option value={0.25}>0.25 in (6 mm)</option>
+                      </select>
+                    </label>
+                    <label className="flex items-center justify-between gap-3">
+                      <span className="text-black/60 dark:text-white/60">Crop marks</span>
+                      <input
+                        type="checkbox"
+                        checked={cropMarks}
+                        onChange={(e) => setCropMarks(e.target.checked)}
+                        disabled={bleedIn === 0}
+                      />
+                    </label>
+                    <label className="flex items-center justify-between gap-3">
+                      <span className="text-black/60 dark:text-white/60">Mode</span>
+                      <select
+                        value={exportMode}
+                        onChange={(e) => setExportMode(e.target.value as "light" | "dark")}
+                        className={inspectorInput}
+                      >
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div className="mt-3 flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setExportOpen(false)}
+                      className="rounded-full px-3 py-1 text-[11px] text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleExportPdf}
+                      disabled={exportBusy}
+                      className="rounded-full bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-[#03002C]"
+                    >
+                      {exportBusy ? "Rendering…" : "Download PDF"}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
             <button
               type="button"
               onClick={handleDelete}
