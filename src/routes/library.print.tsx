@@ -43,6 +43,7 @@ import {
   listDivisionImagery,
   type DivisionImageryEntry,
 } from "@/lib/division-imagery.functions";
+import { logImageryEvent } from "@/lib/admin.functions";
 import type { BrandMode } from "@/lib/taxonomy";
 import { Download, Copy, Sparkle, Star, Image as ImageIcon, ExternalLink } from "lucide-react";
 
