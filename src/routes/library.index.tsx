@@ -1399,6 +1399,16 @@ function VariantDetailModal({
               {pdfBusy === "dark" && pdfStage ? pdfStage : "Dark PDF"}
 
             </button>
+            <button
+              type="button"
+              onClick={downloadBothPdfs}
+              disabled={pdfBusy !== null || bothBusy}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] transition hover:bg-[#E0E8F5] disabled:opacity-60"
+              title="Export a combined image PDF with both Light and Dark theme pages"
+            >
+              {bothBusy ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
+              {bothBusy ? (pdfStage ?? "Both themes") : "Both themes PDF"}
+            </button>
             {usageCount > 0 && (
               <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
                 Used · {usageCount}
