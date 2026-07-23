@@ -378,6 +378,7 @@ export function SpotlightLayout({
                               lineHeight: 1.4,
                               color: inkFaint,
                               marginTop: cq(3),
+                              ...clampLines(2),
                             }}
                           >
                             {s.label}
