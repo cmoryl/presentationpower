@@ -1309,11 +1309,11 @@ function renderVizSpec(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palett
   } else {
     // Fallback: subtitle so the slide isn't blank when SVG capture fails.
     const subtitle = typeof c.subtitle === "string" ? c.subtitle : "Chart preview unavailable in this export.";
-    s.addText(subtitle, { x: 0.6, y: y + 0.3, w: 12.13, h: 0.6, fontFace: "Geist", fontSize: 14, color: p.mutedInk });
+    s.addText(subtitle, { x: 0.6, y: y + 0.3, w: 12.13, h: 0.6, fontFace: "Geist", fontSize: 14, color: p.ink });
   }
   const source = typeof c.source === "string" ? c.source : "";
   if (source) {
-    s.addText(`Source · ${source}`, { x: 0.6, y: 6.4, w: 12.13, h: 0.35, fontFace: "Geist", fontSize: 10, color: p.mutedInk });
+    s.addText(`Source · ${source}`, { x: 0.6, y: 6.4, w: 12.13, h: 0.35, fontFace: "Geist", fontSize: 10, color: p.ink });
   }
 }
 
