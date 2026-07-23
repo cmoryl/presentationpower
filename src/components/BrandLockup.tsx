@@ -81,7 +81,7 @@ export function BrandLockup({
     orientationRaw === "stacked" ? "stacked"
     : orientationRaw === "mark-only" ? "mark-only"
     : "horizontal";
-  const isVertical = false;
+  
   const isMarkOnly = orientation === "mark-only";
   const innerOrientation: "horizontal" | "stacked" = orientation === "stacked" ? "stacked" : "horizontal";
 
