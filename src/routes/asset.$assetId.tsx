@@ -130,6 +130,56 @@ function AssetEditor() {
       .catch(() => setLoading(false));
   }, [assetId, load]);
 
+  // Debounced autosave. Persists title, content (modules included), and
+  // context whenever the editor becomes dirty so an accidental refresh or
+  // tab close doesn't lose reorders/inserts.
+  const rowRef = useRef<PrintAssetRow | null>(null);
+  rowRef.current = row;
+  const savingRef = useRef(false);
+  useEffect(() => {
+    if (!dirty || !row) return;
+    const t = window.setTimeout(async () => {
+      const current = rowRef.current;
+      if (!current || savingRef.current) return;
+      savingRef.current = true;
+      setSaving(true);
+      try {
+        const updated = await save({
+          data: {
+            assetId: current.id,
+            title: current.title,
+            content: current.content as unknown as Record<string, unknown>,
+            context: current.context as unknown as Record<string, unknown>,
+          },
+        });
+        // Preserve any keystrokes that landed while the request was in
+        // flight — only clear dirty when nothing changed under us.
+        if (rowRef.current === current) {
+          setRow(updated);
+          setDirty(false);
+        }
+      } catch {
+        // Leave dirty=true so the next tick retries.
+      } finally {
+        savingRef.current = false;
+        setSaving(false);
+      }
+    }, 900);
+    return () => window.clearTimeout(t);
+  }, [dirty, row, save]);
+
+  // Warn before leaving with unsaved changes.
+  useEffect(() => {
+    if (!dirty) return;
+    function onBeforeUnload(e: BeforeUnloadEvent) {
+      e.preventDefault();
+      e.returnValue = "";
+    }
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [dirty]);
+
+
   useEffect(() => {
     if (!row?.brand_mode_id) return;
     fetchDivisionCtx({ data: { divisionId: row.brand_mode_id, knowledgeLimit: 12 } })
