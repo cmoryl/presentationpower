@@ -277,6 +277,10 @@ export function SpotlightLayout({
             intensity={0.9}
             aspect={auroraAspect(pageSize)}
           />
+          {content.heroMedia && (
+            <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
+          )}
+
 
           {/* Corner accent bloom (template's top-right lavender radial) —
               retuned to the active accent so every division reads through. */}
