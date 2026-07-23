@@ -118,9 +118,11 @@ function PhotoBand({
   const heightPct = media.heightPct ?? 46;
   const focalX = typeof media.focalX === "number" ? media.focalX : 50;
   const focalY = typeof media.focalY === "number" ? media.focalY : 40;
-  const overlayOpacity = media.overlayOpacity ?? 0.55;
+  const washStrength = media.washStrength ?? 1;
+  const overlayOpacity = (media.overlayOpacity ?? 0.55) * washStrength;
+  const overlayColor = media.overlayColor ?? accent;
   const scrim = media.scrim ?? "bottom";
-  const scrimOpacity = media.scrimOpacity ?? media.washStrength ?? 1;
+  const scrimOpacity = media.scrimOpacity ?? washStrength;
   const pageBg = mode === "dark" ? "#111114" : "#FFFFFF";
 
   const scrimGradient =
