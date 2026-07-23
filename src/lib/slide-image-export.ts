@@ -48,8 +48,20 @@ export type ExportProgressCallback = (p: ExportProgress) => void;
 export interface SlideCaptureOptions {
   mode: SlideExportMode;
   filename?: string;
-  /** Device pixel ratio multiplier (default 2 → retina). */
+  /**
+   * Device pixel ratio multiplier. If `targetWidth` is also supplied, the
+   * effective pixel ratio is derived from `targetWidth / node.offsetWidth`
+   * and this option is ignored.
+   */
   pixelRatio?: number;
+  /**
+   * Absolute output width in pixels (e.g. 1920 for HD, 3840 for 4K). This
+   * is the preferred API — it makes the exporter render at a fixed pixel
+   * size regardless of how large the on-screen preview happens to be, so
+   * results are consistent across zoom levels and modal widths. Height is
+   * driven by the node's aspect ratio.
+   */
+  targetWidth?: number;
   /** Optional CORS-safe cache buster for cross-origin images. */
   cacheBust?: boolean;
   /** Progress callback fired between phases. */
@@ -63,7 +75,30 @@ const MODE_BG: Record<SlideExportMode, string> = {
   dark: "#03002C",
 };
 
+/** Absolute-minimum pixel ratio the exporter will honor. */
+const MIN_PIXEL_RATIO = 1;
+// Modal preview nodes can be as narrow as ~300px, so hitting 4K (3840px)
+// requires ratios of ~13×. Keep a generous ceiling so the exporter never
+// silently downsamples the user's chosen target.
+const MAX_PIXEL_RATIO = 16;
+
+
+function resolvePixelRatio(
+  node: HTMLElement,
+  opts: { pixelRatio?: number; targetWidth?: number },
+): number {
+  if (opts.targetWidth && opts.targetWidth > 0) {
+    const nodeWidth = node.offsetWidth || node.getBoundingClientRect().width;
+    if (nodeWidth > 0) {
+      const ratio = opts.targetWidth / nodeWidth;
+      return Math.min(MAX_PIXEL_RATIO, Math.max(MIN_PIXEL_RATIO, ratio));
+    }
+  }
+  return Math.min(MAX_PIXEL_RATIO, Math.max(MIN_PIXEL_RATIO, opts.pixelRatio ?? 2));
+}
+
 const DEFAULT_READY_TIMEOUT = 6000;
+
 
 function report(cb: ExportProgressCallback | undefined, p: ExportProgress): void {
   if (cb) {
@@ -297,11 +332,18 @@ async function waitForImages(node: HTMLElement, timeoutMs: number): Promise<void
 }
 
 export interface CaptureSlideOptions {
-  /** Device pixel ratio multiplier (1× = faster, 2× = retina). Defaults to 2. */
+  /**
+   * Device pixel ratio multiplier. If `targetWidth` is also supplied, the
+   * effective pixel ratio is derived from `targetWidth / node.offsetWidth`
+   * and this option is ignored.
+   */
   pixelRatio?: number;
+  /** Absolute output width in pixels; overrides `pixelRatio` when set. */
+  targetWidth?: number;
   backgroundColor?: string;
   onProgress?: ExportProgressCallback;
 }
+
 
 /**
  * Minimal reusable capture helper. Awaits `document.fonts.ready`, then
@@ -354,13 +396,15 @@ export async function captureSlide(
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
   report(onProgress, { stage: "render", progress: 0.1, message: "Rasterizing…" });
+  const effectiveRatio = resolvePixelRatio(node, opts);
   const dataUrl = await toPng(node, {
-    pixelRatio: opts.pixelRatio ?? 2,
+    pixelRatio: effectiveRatio,
     cacheBust: true,
     backgroundColor: opts.backgroundColor,
     filter: (el) =>
       !(el instanceof HTMLElement) || el.dataset?.exportIgnore !== "true",
   });
+
   report(onProgress, { stage: "encode", progress: 1, message: "Encoded" });
   return dataUrl;
 }
@@ -395,9 +439,10 @@ export async function captureSlideAsDataUrl(
   try {
     report(onProgress, { stage: "render", progress: 0.1, message: "Rasterizing…" });
     let dataUrl: string;
+    const effectiveRatio = resolvePixelRatio(node, opts);
     try {
       dataUrl = await toPng(node, {
-        pixelRatio: opts.pixelRatio ?? 2,
+        pixelRatio: effectiveRatio,
         cacheBust: opts.cacheBust ?? true,
         backgroundColor: MODE_BG[opts.mode],
         // filter external stylesheets/nodes that break serialization
@@ -408,16 +453,22 @@ export async function captureSlideAsDataUrl(
         },
       });
     } catch (err) {
-      // Retry once at 1x — a browser occasionally OOMs on very tall panels at 2x.
-      console.warn("[slide-image-export] first pass failed, retrying at pixelRatio=1", err);
+      // Retry once at a lower ratio — a browser occasionally OOMs on
+      // complex slides above ~3× density.
+      const fallbackRatio = Math.max(1, Math.min(2, effectiveRatio / 2));
+      console.warn(
+        `[slide-image-export] first pass failed at pixelRatio=${effectiveRatio.toFixed(2)}, retrying at ${fallbackRatio.toFixed(2)}`,
+        err,
+      );
       report(onProgress, { stage: "render", progress: 0.5, message: "Retrying at lower resolution…" });
       dataUrl = await toPng(node, {
-        pixelRatio: 1,
+        pixelRatio: fallbackRatio,
         cacheBust: true,
         backgroundColor: MODE_BG[opts.mode],
         filter: (el) => !(el instanceof HTMLElement) || el.dataset?.exportIgnore !== "true",
       });
     }
+
     report(onProgress, { stage: "encode", progress: 1, message: "Encoding…" });
     return dataUrl;
   } finally {
@@ -455,7 +506,14 @@ export async function exportSlideAsPng(
  */
 export async function exportSlidesAsImagePdf(
   nodes: Array<{ node: HTMLElement; mode: SlideExportMode }>,
-  opts: { filename?: string; pixelRatio?: number; onProgress?: ExportProgressCallback; returnBlob?: boolean } = {},
+  opts: {
+    filename?: string;
+    pixelRatio?: number;
+    /** Absolute output width in pixels; overrides `pixelRatio` when set. */
+    targetWidth?: number;
+    onProgress?: ExportProgressCallback;
+    returnBlob?: boolean;
+  } = {},
 ): Promise<Blob | void> {
   if (nodes.length === 0) return;
   const pdf = new jsPDF({
@@ -475,12 +533,16 @@ export async function exportSlidesAsImagePdf(
       : undefined;
     const dataUrl = await captureSlideAsDataUrl(node, {
       mode,
-      pixelRatio: opts.pixelRatio ?? 2,
+      pixelRatio: opts.pixelRatio,
+      targetWidth: opts.targetWidth,
       onProgress: perSlide,
     });
     if (i > 0) pdf.addPage([13.333, 7.5], "landscape");
-    pdf.addImage(dataUrl, "PNG", 0, 0, 13.333, 7.5, undefined, "FAST");
+    // Use "SLOW" (loss-less DEFLATE) so the embedded PNG keeps every pixel
+    // of the true high-res raster — "FAST" re-encodes as lossy JPEG.
+    pdf.addImage(dataUrl, "PNG", 0, 0, 13.333, 7.5, undefined, "SLOW");
   }
+
   report(opts.onProgress, { stage: "encode", progress: 1, message: "Assembling PDF…" });
   const filename = opts.filename ?? `slides-${Date.now()}.pdf`;
   if (opts.returnBlob) {
