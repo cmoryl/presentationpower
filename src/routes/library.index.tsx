@@ -1250,7 +1250,7 @@ function VariantDetailModal({
     document.body.appendChild(a);
     a.click();
     a.remove();
-    toast.success(`${which === "light" ? "Light" : "Dark"} PDF downloaded`, { description: filename });
+    toast.success(`${which === "light" ? "Light" : "Dark"} PDF downloaded at ${previewUrls.ratio}×`, { description: filename });
   };
 
 
