@@ -90,6 +90,8 @@ export const uploadDivisionImagery = createServerFn({ method: "POST" })
     return row as { id: string };
   });
 
+export type PrintTemplateKind = "spotlight" | "ebrochure" | "case-study" | "adaptor-brief";
+
 export type DivisionImageryEntry = {
   id: string;
   division_id: string;
@@ -105,6 +107,9 @@ export type DivisionImageryEntry = {
   approved: boolean;
   approved_by: string | null;
   approved_at: string | null;
+  collection: string | null;
+  template_kinds: PrintTemplateKind[];
+  is_default_for: PrintTemplateKind[];
   created_at: string;
   updated_at: string;
   signedUrl: string | null;
