@@ -15,174 +15,35 @@ import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome"
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
 import { autoHeroMedia } from "@/components/print/printHeroFallback";
 import { useTextFit } from "@/lib/text-fit";
+import {
+  PAGE_W,
+  cq,
+  pageAspect,
+  auroraAspect,
+  pagePadX,
+  pagePadTop,
+  glass,
+  chipStyle,
+  Icon,
+  type IconName,
+} from "@/components/print/print-primitives";
 
 
-// -----------------------------------------------------------------------
-// PORT — TransPerfect ClientSpotlight.dc.html → SpotlightLayout
-//
-// Layout, grid, spacing, and hierarchy come directly from the template.
-// Every hardcoded brand color (#003FC7, #E8EEFB, #03002C, the gradient CTA
-// band) resolves from the active brand mode's tokens. Solid white cards
-// become GLASS PANELS floating over the division-accent AURORA — the
-// synthesis called for in the port brief.
-//
-// Sizing: the template was authored at a fixed 816px page width. Every px
-// value from the source is translated to `cqw` against that base so the
-// layout scales cleanly at any preview or export DPI.
-// -----------------------------------------------------------------------
-
-const PAGE_W = 816; // px — template canvas width
-
-/** Template-px → container-relative unit. */
-const cq = (px: number) => `${((px * 100) / PAGE_W).toFixed(3)}cqw`;
-
-function pageAspect(size: PrintPageSize): string {
-  switch (size) {
-    case "A4":
-      return "8.2677 / 11.6929";
-    case "Letter":
-      return "8.5 / 11";
-    case "Square":
-      return "1 / 1";
-  }
-}
-
-// Aurora is authored 1280×720 landscape; re-project for portrait so orbs
-// bleed from the correct edges instead of being cropped.
-function auroraAspect(size: PrintPageSize): { w: number; h: number } {
-  switch (size) {
-    case "A4":
-      return { w: Math.round((1280 * 8.2677) / 11.6929), h: 1280 };
-    case "Letter":
-      return { w: Math.round((1280 * 8.5) / 11), h: 1280 };
-    case "Square":
-      return { w: 1280, h: 1280 };
-  }
-}
+// PORT — TransPerfect ClientSpotlight.dc.html → SpotlightLayout.
+// Layout / grid / hierarchy stay verbatim from the template. Every shared
+// helper (page geometry, glass, chips, icons) lives in ./print-primitives so
+// the three print layouts read as one family.
 
 // Density → the template's outer 44px page inset gets nudged up/down.
-function pagePadX(d: PrintDensity): number {
-  return d === "compact" ? 36 : d === "airy" ? 52 : 44;
+function padXFn(d: import("@/lib/print-assets.types").PrintDensity): number {
+  return pagePadX(d);
 }
-function pagePadTop(d: PrintDensity): number {
-  return d === "compact" ? 22 : d === "airy" ? 32 : 26;
-}
-
-// ---------------------------------------------------------------------------
-// Glass tokens — derived from the active accent + mode. The synthesis rule:
-// the template's solid white cards become frosted panels with the division
-// accent glowing softly behind. Contrast risk mitigation lives here — we
-// tune panel opacity to keep 9–11px template type legible.
-// ---------------------------------------------------------------------------
-function glass(mode: "light" | "dark", accent: string): CSSProperties {
-  if (mode === "dark") {
-    return {
-      background: `linear-gradient(180deg, color-mix(in srgb, ${accent} 6%, rgba(10,8,36,0.62)), rgba(6,4,32,0.55))`,
-      border: `1px solid color-mix(in srgb, ${accent} 22%, rgba(255,255,255,0.08))`,
-      backdropFilter: "blur(14px) saturate(140%)",
-      boxShadow: `0 ${cq(10)} ${cq(28)} rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.04)`,
-    };
-  }
-  // Light mode — a heavier white wash keeps 9px captions legible against
-  // the (75%-opacity) portrait-projected aurora.
-  return {
-    background: `linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.72))`,
-    border: `1px solid color-mix(in srgb, ${accent} 18%, rgba(255,255,255,0.75))`,
-    backdropFilter: "blur(14px) saturate(140%)",
-    boxShadow: `0 ${cq(10)} ${cq(28)} rgba(3,0,44,0.10), inset 0 0 0 1px rgba(255,255,255,0.55)`,
-  };
+function padTopFn(d: import("@/lib/print-assets.types").PrintDensity): number {
+  // Spotlight opens tight — base 26, ±4.
+  return pagePadTop(d, 26, 4);
 }
 
-// Icon chip (soft accent circle behind an outline glyph) — the template
-// uses #E8EEFB against the primary. We resolve both from tokens.
-function chipStyle(mode: "light" | "dark", accent: string): CSSProperties {
-  return {
-    background:
-      mode === "dark"
-        ? `color-mix(in srgb, ${accent} 26%, rgba(6,4,32,0.7))`
-        : `color-mix(in srgb, ${accent} 22%, #ffffff)`,
-    border:
-      mode === "dark"
-        ? `1px solid color-mix(in srgb, ${accent} 32%, rgba(255,255,255,0.08))`
-        : `1px solid color-mix(in srgb, ${accent} 26%, rgba(255,255,255,0.9))`,
-  };
-}
-
-// ---------------------------------------------------------------------------
-// Icons — Heroicons-outline paths, ported verbatim from icon-library.js for
-// the specific glyphs this template uses. Stroke=currentColor so callers
-// tint via the surrounding container.
-// ---------------------------------------------------------------------------
-type IconName =
-  | "sparkles"
-  | "users"
-  | "globe-alt"
-  | "language"
-  | "squares-2x2"
-  | "arrow-trending-up"
-  | "chat"
-  | "check"
-  | "target"
-  | "globe-flat"
-  | "trending"
-  | "star";
-
-const ICON_PATHS: Record<IconName, string> = {
-  sparkles:
-    "M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z",
-  users:
-    "M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72M18 18.72c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719M18 18.72a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z",
-  "globe-alt":
-    "M12 21a9 9 0 0 0 0-18m0 18a9 9 0 0 1 0-18m0 18c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3M3.6 9h16.8M3.6 15h16.8",
-  language:
-    "m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0V3m0 2.25c2.223 5.298 5.707 9.716 10.334 12.253M9 5.25c1.12 0 2.233.038 3.334.114",
-  "squares-2x2":
-    "M3.75 6a2.25 2.25 0 0 1 2.25-2.25h1.5A2.25 2.25 0 0 1 9.75 6v1.5A2.25 2.25 0 0 1 7.5 9.75H6A2.25 2.25 0 0 1 3.75 7.5V6ZM3.75 16.5A2.25 2.25 0 0 1 6 14.25h1.5a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 7.5 20.25H6A2.25 2.25 0 0 1 3.75 18v-1.5ZM14.25 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v1.5A2.25 2.25 0 0 1 18 9.75h-1.5a2.25 2.25 0 0 1-2.25-2.25V6ZM14.25 16.5A2.25 2.25 0 0 1 16.5 14.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-1.5A2.25 2.25 0 0 1 14.25 18v-1.5Z",
-  "arrow-trending-up":
-    "M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941",
-  chat:
-    "M21 11.5a8.38 8.38 0 0 1-9 8.4 8.5 8.5 0 0 1-3.9-.9L3 20l1-4.9A8.38 8.38 0 0 1 3.5 11a8.5 8.5 0 0 1 8.4-8.5 8.38 8.38 0 0 1 9.1 9z",
-  check: "M4 12l5 5L20 6",
-  target:
-    "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-4.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0-3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z",
-  "globe-flat":
-    "M12 3a9 9 0 1 0 0 18M3 12h18M12 3c2.5 3 2.5 15 0 18M12 3c-2.5 3-2.5 15 0 18",
-  trending: "M3 17l6-6 4 4 8-8M15 7h6v6",
-  star:
-    "M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z",
-};
-
-function Icon({
-  name,
-  size,
-  color,
-  strokeWidth = 1.5,
-}: {
-  name: IconName;
-  size: number | string;
-  color: string;
-  strokeWidth?: number;
-}) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={color}
-      strokeWidth={strokeWidth}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-      style={{ display: "block" }}
-    >
-      <path d={ICON_PATHS[name]} />
-    </svg>
-  );
-}
-
-// Deterministic stat-icon heuristic. If capabilities/stats grow icon fields
-// later, plug them in here.
+// Deterministic stat-icon heuristic.
 function pickStatIcon(label: string, index: number): IconName {
   const l = label.toLowerCase();
   if (/lang|locale|market/.test(l)) return "language";
