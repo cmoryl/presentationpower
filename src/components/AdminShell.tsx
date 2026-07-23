@@ -52,153 +52,156 @@ function SessionRoleBanner() {
 
   const signedIn = !!info?.userId;
   const isAdmin = info?.roles.includes("admin") ?? false;
-  const quickActions: QuickAction[] = isAdmin ? adminQuickActions : memberQuickActions;
 
   return (
-    <div className="sticky top-0 z-40 -mx-4 mb-6 border-b border-black/10 bg-white/85 px-4 py-3 backdrop-blur-md md:-mx-8 md:px-8">
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <span className="flex items-center gap-2 text-sm">
-          <span
-            className={`relative inline-flex h-2.5 w-2.5 items-center justify-center`}
-            aria-hidden
-          >
-            <span
-              className={`absolute inline-flex h-full w-full rounded-full opacity-70 ${
-                signedIn ? "animate-ping bg-emerald-400" : ""
-              }`}
-            />
-            <span
-              className={`relative inline-flex h-2.5 w-2.5 rounded-full ${
-                loading ? "bg-black/30" : signedIn ? "bg-emerald-500" : "bg-red-500"
-              }`}
-            />
-          </span>
-          <span className="font-semibold text-black/85">
-            {loading ? "Checking session…" : signedIn ? "Signed in" : "Signed out"}
-          </span>
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-2xl border border-black/10 bg-white/70 px-4 py-2.5 text-sm backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">
+      <span className="flex items-center gap-2">
+        <span
+          className={`inline-block h-2 w-2 rounded-full ${
+            loading ? "bg-black/30" : signedIn ? "bg-emerald-500" : "bg-red-500"
+          }`}
+          aria-hidden
+        />
+        <span className="font-semibold text-black/85 dark:text-white/85">
+          {loading ? "Checking…" : signedIn ? "Signed in" : "Signed out"}
         </span>
-        {signedIn && (
-          <>
-            <span className="hidden text-black/20 sm:inline">·</span>
-            <span className="max-w-[220px] truncate text-sm text-black/70" title={info?.email ?? undefined}>
-              {info?.email}
+      </span>
+      {signedIn && (
+        <>
+          <span className="hidden text-black/20 sm:inline">·</span>
+          <span className="max-w-[220px] truncate text-black/70 dark:text-white/70" title={info?.email ?? undefined}>
+            {info?.email}
+          </span>
+          {isAdmin && (
+            <span className="rounded-full bg-[#003FC7] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+              Admin · Master
             </span>
-            <span className="flex flex-wrap gap-1">
-              {(info?.roles.length ? info.roles : ["no role"]).map((r) => (
-                <span
-                  key={r}
-                  className={`rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${
-                    r === "admin"
-                      ? "bg-[#003FC7] text-white"
-                      : r === "no role"
-                        ? "bg-amber-100 text-amber-900"
-                        : "bg-black/10 text-black/70"
-                  }`}
-                >
-                  {r}
-                </span>
-              ))}
-              {isAdmin && (
-                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-900">
-                  Master
-                </span>
-              )}
-            </span>
-            <div className="ml-auto flex flex-wrap items-center gap-1.5">
-              {quickActions.map((a) => (
-                <Link
-                  key={a.to}
-                  to={a.to}
-                  className="rounded-lg border border-black/10 bg-white px-2.5 py-1 text-xs font-medium text-black/75 shadow-sm transition hover:border-[#003FC7]/40 hover:bg-[#003FC7]/5 hover:text-[#003FC7]"
-                  title={a.hint}
-                >
-                  {a.label}
-                </Link>
-              ))}
-              <button
-                onClick={handleSignOut}
-                className="rounded-lg border border-black/10 bg-white px-2.5 py-1 text-xs font-medium text-black/70 shadow-sm hover:border-red-300 hover:bg-red-50 hover:text-red-700"
-              >
-                Sign out
-              </button>
-            </div>
-          </>
-        )}
-        {!signedIn && !loading && (
-          <a
-            href="/auth"
-            className="ml-auto rounded-lg bg-[#003FC7] px-3 py-1 text-xs font-semibold text-white hover:bg-[#0033a3]"
+          )}
+          <button
+            onClick={handleSignOut}
+            className="ml-auto rounded-lg border border-black/10 bg-white px-2.5 py-1 text-xs font-medium text-black/70 hover:border-red-300 hover:bg-red-50 hover:text-red-700"
           >
-            Sign in
-          </a>
-        )}
-      </div>
+            Sign out
+          </button>
+        </>
+      )}
+      {!signedIn && !loading && (
+        <a href="/auth" className="ml-auto rounded-lg bg-[#003FC7] px-3 py-1 text-xs font-semibold text-white hover:bg-[#0033a3]">
+          Sign in
+        </a>
+      )}
     </div>
   );
 }
 
-type QuickAction = { to: string; label: string; hint: string };
+type NavItem = { to: string; label: string; exact?: boolean };
+type NavGroup = { label: string; items: NavItem[] };
 
-const adminQuickActions: QuickAction[] = [
-  { to: "/admin/users", label: "Manage users", hint: "Grant or revoke roles" },
-  { to: "/admin/approvals", label: "Approvals", hint: "Review knowledgebase submissions" },
-  { to: "/admin/audit", label: "Audit log", hint: "Recent admin activity" },
+const navGroups: NavGroup[] = [
+  {
+    label: "Overview",
+    items: [
+      { to: "/admin", label: "Command center", exact: true },
+      { to: "/admin/audit", label: "Audit log" },
+    ],
+  },
+  {
+    label: "Analytics",
+    items: [
+      { to: "/admin/analytics", label: "Master analytics" },
+      { to: "/analytics", label: "Deck engagement" },
+      { to: "/admin/ai", label: "AI usage & cost" },
+      { to: "/admin/imagery-analytics", label: "Imagery analytics" },
+      { to: "/admin/ab", label: "A/B color testing" },
+    ],
+  },
+  {
+    label: "Knowledge",
+    items: [
+      { to: "/admin/knowledge-hub", label: "Knowledge hub" },
+      { to: "/knowledge", label: "Browse entries" },
+      { to: "/knowledge/ask", label: "Ask Oracle" },
+      { to: "/admin/oracle", label: "Oracle KB" },
+      { to: "/admin/knowledge", label: "KB manager" },
+      { to: "/admin/approvals", label: "Approvals" },
+    ],
+  },
+  {
+    label: "Brand assets",
+    items: [
+      { to: "/admin/brand-assets", label: "Brand assets" },
+      { to: "/admin/logohub", label: "LogoHub" },
+      { to: "/admin/icon-studio", label: "Icon Studio" },
+      { to: "/admin/pdf-ingest", label: "PDF ingestion" },
+    ],
+  },
+  {
+    label: "Translation",
+    items: [
+      { to: "/admin/translation", label: "Translation" },
+      { to: "/admin/globallink", label: "GlobalLink · Translate" },
+      { to: "/admin/globallink-share", label: "GlobalLink · Share" },
+    ],
+  },
+  {
+    label: "Governance",
+    items: [{ to: "/admin/users", label: "Users & roles" }],
+  },
 ];
 
-const memberQuickActions: QuickAction[] = [
-  { to: "/", label: "Back to app", hint: "Return to the main workspace" },
-];
-
-const items: Array<{ to: string; label: string; exact?: boolean }> = [
-  { to: "/admin", label: "Overview", exact: true },
-  { to: "/admin/users", label: "Users & roles" },
-  { to: "/admin/ai", label: "AI analytics" },
-  { to: "/admin/imagery-analytics", label: "Imagery analytics" },
-  { to: "/admin/ab", label: "A/B color testing" },
-  { to: "/admin/approvals", label: "Approvals" },
-  { to: "/admin/knowledge", label: "Knowledge browser" },
-  { to: "/admin/oracle", label: "Oracle KB" },
-  { to: "/admin/translation", label: "Translation" },
-  { to: "/admin/globallink", label: "GlobalLink · Translation" },
-  { to: "/admin/globallink-share", label: "GlobalLink · Share" },
-  { to: "/admin/brand-assets", label: "Brand assets" },
-  { to: "/admin/pdf-ingest", label: "PDF ingestion" },
-  { to: "/admin/logohub", label: "LogoHub" },
-  { to: "/admin/icon-studio", label: "Icon Studio" },
-  { to: "/admin/audit", label: "Audit log" },
-];
-
-
-export function AdminShell() {
+function AdminSidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <AppShell>
-      <SessionRoleBanner />
-      <div>
-        <div className="text-xs uppercase tracking-[0.3em] text-black/50">Enterprise console</div>
-        <h1 className="mt-3 text-4xl font-semibold">Admin</h1>
-        <p className="mt-2 max-w-2xl text-sm text-black/60">
-          Governance, analytics, and experimentation for the TransPerfect Modular system. Admin role required.
-        </p>
+    <aside className="w-full shrink-0 md:w-64">
+      <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto rounded-2xl border border-black/10 bg-white/70 p-3 backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">
+        <div className="px-2 pb-2 pt-1 text-[10px] uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
+          Enterprise console
+        </div>
+        <nav className="space-y-4">
+          {navGroups.map((g) => (
+            <div key={g.label}>
+              <div className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-black/40 dark:text-white/45">
+                {g.label}
+              </div>
+              <div className="space-y-0.5">
+                {g.items.map((it) => {
+                  const active = it.exact
+                    ? pathname === it.to
+                    : pathname === it.to || pathname.startsWith(it.to + "/");
+                  return (
+                    <Link
+                      key={it.to}
+                      to={it.to as never}
+                      className={`block rounded-lg px-2.5 py-1.5 text-sm transition ${
+                        active
+                          ? "bg-[#03002C] text-white shadow-sm dark:bg-white/15"
+                          : "text-black/75 hover:bg-black/5 dark:text-white/75 dark:hover:bg-white/[0.06]"
+                      }`}
+                    >
+                      {it.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
       </div>
-      <nav className="mt-6 flex flex-wrap gap-1 rounded-2xl border border-black/10 bg-white/60 p-1 backdrop-blur">
-        {items.map((it) => {
-          const active = it.exact ? pathname === it.to : pathname === it.to || pathname.startsWith(it.to + "/");
-          return (
-            <Link
-              key={it.to}
-              to={it.to}
-              className={`rounded-xl px-3.5 py-2 text-sm transition ${
-                active ? "bg-[#03002C] text-white shadow" : "text-black/70 hover:bg-black/5"
-              }`}
-            >
-              {it.label}
-            </Link>
-          );
-        })}
-      </nav>
-      <div className="mt-8">
-        <Outlet />
+    </aside>
+  );
+}
+
+export function AdminShell() {
+  return (
+    <AppShell>
+      <div className="mb-4">
+        <SessionRoleBanner />
+      </div>
+      <div className="flex flex-col gap-6 md:flex-row">
+        <AdminSidebar />
+        <div className="min-w-0 flex-1">
+          <Outlet />
+        </div>
       </div>
     </AppShell>
   );

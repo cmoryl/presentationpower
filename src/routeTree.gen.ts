@@ -40,6 +40,7 @@ import { Route as AdminTranslationRouteImport } from './routes/admin.translation
 import { Route as AdminPdfIngestRouteImport } from './routes/admin.pdf-ingest'
 import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
 import { Route as AdminLogohubRouteImport } from './routes/admin.logohub'
+import { Route as AdminKnowledgeHubRouteImport } from './routes/admin.knowledge-hub'
 import { Route as AdminKnowledgeRouteImport } from './routes/admin.knowledge'
 import { Route as AdminImageryAnalyticsRouteImport } from './routes/admin.imagery-analytics'
 import { Route as AdminIconStudioRouteImport } from './routes/admin.icon-studio'
@@ -48,6 +49,7 @@ import { Route as AdminGloballinkRouteImport } from './routes/admin.globallink'
 import { Route as AdminBrandAssetsRouteImport } from './routes/admin.brand-assets'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminApprovalsRouteImport } from './routes/admin.approvals'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAiRouteImport } from './routes/admin.ai'
 import { Route as AdminAbRouteImport } from './routes/admin.ab'
 import { Route as KnowledgeBrandGuidesIndexRouteImport } from './routes/knowledge.brand-guides.index'
@@ -215,6 +217,11 @@ const AdminLogohubRoute = AdminLogohubRouteImport.update({
   path: '/logohub',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminKnowledgeHubRoute = AdminKnowledgeHubRouteImport.update({
+  id: '/knowledge-hub',
+  path: '/knowledge-hub',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminKnowledgeRoute = AdminKnowledgeRouteImport.update({
   id: '/knowledge',
   path: '/knowledge',
@@ -253,6 +260,11 @@ const AdminAuditRoute = AdminAuditRouteImport.update({
 const AdminApprovalsRoute = AdminApprovalsRouteImport.update({
   id: '/approvals',
   path: '/approvals',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminAiRoute = AdminAiRouteImport.update({
@@ -329,6 +341,7 @@ export interface FileRoutesByFullPath {
   '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
@@ -337,6 +350,7 @@ export interface FileRoutesByFullPath {
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery-analytics': typeof AdminImageryAnalyticsRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
+  '/admin/knowledge-hub': typeof AdminKnowledgeHubRoute
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
@@ -379,6 +393,7 @@ export interface FileRoutesByTo {
   '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
@@ -387,6 +402,7 @@ export interface FileRoutesByTo {
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery-analytics': typeof AdminImageryAnalyticsRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
+  '/admin/knowledge-hub': typeof AdminKnowledgeHubRoute
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
@@ -432,6 +448,7 @@ export interface FileRoutesById {
   '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
@@ -440,6 +457,7 @@ export interface FileRoutesById {
   '/admin/icon-studio': typeof AdminIconStudioRoute
   '/admin/imagery-analytics': typeof AdminImageryAnalyticsRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
+  '/admin/knowledge-hub': typeof AdminKnowledgeHubRoute
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
@@ -486,6 +504,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/admin/ab'
     | '/admin/ai'
+    | '/admin/analytics'
     | '/admin/approvals'
     | '/admin/audit'
     | '/admin/brand-assets'
@@ -494,6 +513,7 @@ export interface FileRouteTypes {
     | '/admin/icon-studio'
     | '/admin/imagery-analytics'
     | '/admin/knowledge'
+    | '/admin/knowledge-hub'
     | '/admin/logohub'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
@@ -536,6 +556,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/admin/ab'
     | '/admin/ai'
+    | '/admin/analytics'
     | '/admin/approvals'
     | '/admin/audit'
     | '/admin/brand-assets'
@@ -544,6 +565,7 @@ export interface FileRouteTypes {
     | '/admin/icon-studio'
     | '/admin/imagery-analytics'
     | '/admin/knowledge'
+    | '/admin/knowledge-hub'
     | '/admin/logohub'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
@@ -588,6 +610,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/admin/ab'
     | '/admin/ai'
+    | '/admin/analytics'
     | '/admin/approvals'
     | '/admin/audit'
     | '/admin/brand-assets'
@@ -596,6 +619,7 @@ export interface FileRouteTypes {
     | '/admin/icon-studio'
     | '/admin/imagery-analytics'
     | '/admin/knowledge'
+    | '/admin/knowledge-hub'
     | '/admin/logohub'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
@@ -875,6 +899,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLogohubRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/knowledge-hub': {
+      id: '/admin/knowledge-hub'
+      path: '/knowledge-hub'
+      fullPath: '/admin/knowledge-hub'
+      preLoaderRoute: typeof AdminKnowledgeHubRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/knowledge': {
       id: '/admin/knowledge'
       path: '/knowledge'
@@ -929,6 +960,13 @@ declare module '@tanstack/react-router' {
       path: '/approvals'
       fullPath: '/admin/approvals'
       preLoaderRoute: typeof AdminApprovalsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/ai': {
@@ -1014,6 +1052,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAbRoute: typeof AdminAbRoute
   AdminAiRoute: typeof AdminAiRoute
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminApprovalsRoute: typeof AdminApprovalsRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBrandAssetsRoute: typeof AdminBrandAssetsRoute
@@ -1022,6 +1061,7 @@ interface AdminRouteChildren {
   AdminIconStudioRoute: typeof AdminIconStudioRoute
   AdminImageryAnalyticsRoute: typeof AdminImageryAnalyticsRoute
   AdminKnowledgeRoute: typeof AdminKnowledgeRoute
+  AdminKnowledgeHubRoute: typeof AdminKnowledgeHubRoute
   AdminLogohubRoute: typeof AdminLogohubRoute
   AdminOracleRoute: typeof AdminOracleRoute
   AdminPdfIngestRoute: typeof AdminPdfIngestRoute
@@ -1033,6 +1073,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAbRoute: AdminAbRoute,
   AdminAiRoute: AdminAiRoute,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminApprovalsRoute: AdminApprovalsRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminBrandAssetsRoute: AdminBrandAssetsRoute,
@@ -1041,6 +1082,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminIconStudioRoute: AdminIconStudioRoute,
   AdminImageryAnalyticsRoute: AdminImageryAnalyticsRoute,
   AdminKnowledgeRoute: AdminKnowledgeRoute,
+  AdminKnowledgeHubRoute: AdminKnowledgeHubRoute,
   AdminLogohubRoute: AdminLogohubRoute,
   AdminOracleRoute: AdminOracleRoute,
   AdminPdfIngestRoute: AdminPdfIngestRoute,
