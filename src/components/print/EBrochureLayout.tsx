@@ -190,7 +190,7 @@ export function EBrochureLayout({
                         <div style={{ fontWeight: 700, fontSize: cq(12.5), color: ink }}>{s.heading}</div>
                       </div>
                       {s.body && (
-                        <p style={{ margin: `${cq(9)} 0 0`, fontSize: cq(9.5), lineHeight: 1.55, color: inkSoft }}>
+                        <p style={{ margin: `${cq(9)} 0 0`, fontSize: cq(9.5), lineHeight: 1.55, color: inkSoft, ...clampLines(5) }}>
                           {s.body}
                         </p>
                       )}
@@ -199,7 +199,9 @@ export function EBrochureLayout({
                           margin: `${cq(8)} 0 0`, paddingLeft: cq(14),
                           fontSize: cq(9), lineHeight: 1.6, color: inkFaint,
                         }}>
-                          {s.bullets.slice(0, 4).map((b, k) => <li key={k}>{b}</li>)}
+                          {s.bullets.slice(0, 4).map((b, k) => (
+                            <li key={k} style={clampLines(2)}>{b}</li>
+                          ))}
                         </ul>
                       )}
                     </div>
