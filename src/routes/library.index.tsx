@@ -1281,7 +1281,8 @@ function VariantDetailModal({
               title="Export a pixel-perfect image PDF of the light preview — best for client review copies (not editable in PowerPoint)"
             >
               {pdfBusy === "light" ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
-              Light PDF
+              {pdfBusy === "light" && pdfStage ? pdfStage : "Light PDF"}
+
             </button>
             <button
               type="button"
