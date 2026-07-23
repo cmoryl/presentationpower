@@ -4325,7 +4325,7 @@ function renderVariantBody({
                     </span>
                   </div>
                   <div
-                    className="mt-6 w-full"
+                    className="mt-4 w-full"
                     style={{
                       position: "relative",
                       height: h,
