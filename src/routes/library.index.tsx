@@ -1138,6 +1138,7 @@ function VariantDetailModal({
   const downloadImagePdf = async (exportMode: "light" | "dark") => {
     if (pdfBusy) return;
     setPdfBusy(exportMode);
+    setPdfStage(null);
     try {
       const node = document.querySelector<HTMLElement>(
         `[data-modal-preview="${exportMode}"][data-variant-id="${variant.id}"]`,
@@ -1146,15 +1147,20 @@ function VariantDetailModal({
       const mod = await import("@/lib/slide-image-export");
       await mod.exportSlidesAsImagePdf(
         [{ node, mode: exportMode }],
-        { filename: `${variant.id}-${brand.id}-${exportMode}-review.pdf` },
+        {
+          filename: `${variant.id}-${brand.id}-${exportMode}-review.pdf`,
+          onProgress: (p) => setPdfStage(p.message ?? p.stage),
+        },
       );
     } catch (err) {
       console.error("[library] image PDF export failed", err);
       alert("PDF export failed. Check console for details.");
     } finally {
       setPdfBusy(null);
+      setPdfStage(null);
     }
   };
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
