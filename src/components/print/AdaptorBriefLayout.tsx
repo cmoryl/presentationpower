@@ -126,9 +126,18 @@ export function AdaptorBriefLayout({
   const features = content.features.slice(0, 6);
   const knowHow = content.knowHow.slice(0, 5);
 
-  // Vertical gradient hero — matches template exactly, resolved to brand accent.
+  // Vertical gradient hero — dark navy top holds the title/lockup, transitions
+  // through primary/accent, then feathers into the body bg. The 40→58% band
+  // is where feature cards sit over the seam.
   const heroGradient =
-    `linear-gradient(180deg, #03002C 0%, ${primary} 22%, color-mix(in srgb, ${primary} 40%, ${accent}) 38%, ${bg} 72%, ${bg} 100%)`;
+    `linear-gradient(180deg,
+      #03002C 0%,
+      ${primary} 20%,
+      color-mix(in srgb, ${primary} 55%, ${accent}) 34%,
+      color-mix(in srgb, ${primary} 25%, ${bg}) 52%,
+      ${bg} 66%,
+      ${bg} 100%)`;
+
 
   return (
     <SlideModeContext.Provider value={mode}>
