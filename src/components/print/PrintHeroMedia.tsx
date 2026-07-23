@@ -129,6 +129,17 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
     scrim === "none" && autoBoost > 0 ? "bottom" : scrim;
   const effectiveScrimOpacity = clamp01(scrimOpacity + autoBoost);
 
+  const scrimGradient =
+    effectiveScrim === "top"
+      ? `linear-gradient(180deg, ${pageBg} 0%, transparent 55%)`
+      : effectiveScrim === "bottom"
+      ? `linear-gradient(180deg, transparent 40%, ${pageBg} 100%)`
+      : effectiveScrim === "both"
+      ? `linear-gradient(180deg, ${pageBg} 0%, transparent 35%, transparent 65%, ${pageBg} 100%)`
+      : effectiveScrim === "radial"
+      ? `radial-gradient(ellipse at ${fx ?? 30}% ${fy ?? 45}%, transparent 0%, transparent 40%, ${pageBg} 85%)`
+      : "none";
+
   // Fallback: page-bg base (white / off-black) with a soft accent wash so the
   // hero band still reads as intentional even when photography is absent.
   const fallbackBg = `linear-gradient(160deg, ${pageBg} 0%, ${pageBg} 55%, ${withAlpha(overlayColor, 0.18)} 100%), radial-gradient(120% 90% at ${fx ?? 30}% ${fy ?? 40}%, ${withAlpha(overlayColor, 0.28)} 0%, transparent 70%), ${pageBg}`;
