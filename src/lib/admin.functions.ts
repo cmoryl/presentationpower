@@ -370,6 +370,49 @@ export const logImageryEvent = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// Aggregate imagery event counts scoped to a division. Used by the admin
+// imagery curator to annotate each hero card with view/select/download
+// signal so curators can spot which assets are actually earning use.
+export const getDivisionImageryStats = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({
+      divisionId: z.string().min(1).max(120),
+      days: z.number().int().min(1).max(365).optional().default(90),
+    }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const s = context.supabase as unknown as SbClient;
+    const from = new Date(Date.now() - data.days * 24 * 60 * 60 * 1000).toISOString();
+    const { data: rows, error } = await s
+      .from("imagery_events")
+      .select("image_id, event_type, created_at")
+      .eq("brand_id", data.divisionId)
+      .gte("created_at", from)
+      .limit(20000);
+    if (error) throw new Error((error as { message?: string }).message ?? "Query failed");
+    const list = (rows ?? []) as Array<{ image_id: string; event_type: string; created_at: string }>;
+    const byImage = new Map<string, { view: number; select: number; download: number; total: number; last: string | null }>();
+    for (const r of list) {
+      const cur = byImage.get(r.image_id) ?? { view: 0, select: 0, download: 0, total: 0, last: null };
+      if (r.event_type === "view") cur.view += 1;
+      else if (r.event_type === "use" || r.event_type === "select") cur.select += 1;
+      else if (r.event_type === "download") cur.download += 1;
+      cur.total += 1;
+      if (!cur.last || r.created_at > cur.last) cur.last = r.created_at;
+      byImage.set(r.image_id, cur);
+    }
+    return {
+      windowDays: data.days,
+      totals: {
+        view: list.filter((r) => r.event_type === "view").length,
+        select: list.filter((r) => r.event_type === "use" || r.event_type === "select").length,
+        download: list.filter((r) => r.event_type === "download").length,
+      },
+      byImage: Object.fromEntries(byImage),
+    };
+  });
+
 // ═════════════════════════════════════════════════════════════════════════
 // A/B COLOR TESTING
 // ═════════════════════════════════════════════════════════════════════════
