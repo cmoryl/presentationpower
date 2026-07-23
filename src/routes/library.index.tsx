@@ -1468,14 +1468,14 @@ function VariantDetailModal({
       let darkPng: string | null = null;
       if (zipSelection.pdfLight && lightNode) {
         setZipStage("Rendering light PDF…");
-        lightPdf = await imgMod.exportSlidesAsImagePdf(
+        lightPdf = (await imgMod.exportSlidesAsImagePdf(
           [{ node: lightNode, mode: "light" }],
           { filename: "light.pdf", pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Light PDF · ${p.message ?? p.stage}`) },
         );
       }
       if (zipSelection.pdfDark && darkNode) {
         setZipStage("Rendering dark PDF…");
-        darkPdf = await imgMod.exportSlidesAsImagePdf(
+        darkPdf = (await imgMod.exportSlidesAsImagePdf(
           [{ node: darkNode, mode: "dark" }],
           { filename: "dark.pdf", pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Dark PDF · ${p.message ?? p.stage}`) },
         );
