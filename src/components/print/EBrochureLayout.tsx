@@ -1,0 +1,330 @@
+import { useRef, type CSSProperties } from "react";
+import type { BrandMode } from "@/lib/taxonomy";
+import type {
+  EBrochureContent,
+  PrintDensity,
+  PrintPageSize,
+} from "@/lib/print-assets.types";
+import { AuroraLayer } from "@/components/slide/flagship";
+import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
+import { BrandLockup } from "@/components/BrandLockup";
+import { useTextFit } from "@/lib/text-fit";
+
+// -----------------------------------------------------------------------
+// PORT — TransPerfect EBrochure.dc.html → EBrochureLayout
+//
+// Grid, spacing, hierarchy come straight from the template. Hardcoded
+// #003FC7 / #E8EEFB / #03002C tokens resolve from the active brand mode's
+// tokens. The template's solid white cards become GLASS PANELS floating
+// over the division-accent aurora (same synthesis as SpotlightLayout).
+// Every px is converted to `cqw` against the 816px template canvas so
+// the layout scales cleanly at any preview or export DPI.
+// -----------------------------------------------------------------------
+
+const PAGE_W = 816;
+const cq = (px: number) => `${((px * 100) / PAGE_W).toFixed(3)}cqw`;
+
+function pageAspect(size: PrintPageSize): string {
+  switch (size) {
+    case "A4": return "8.2677 / 11.6929";
+    case "Letter": return "8.5 / 11";
+    case "Square": return "1 / 1";
+  }
+}
+
+function auroraAspect(size: PrintPageSize): { w: number; h: number } {
+  switch (size) {
+    case "A4": return { w: Math.round((1280 * 8.2677) / 11.6929), h: 1280 };
+    case "Letter": return { w: Math.round((1280 * 8.5) / 11), h: 1280 };
+    case "Square": return { w: 1280, h: 1280 };
+  }
+}
+
+function padX(d: PrintDensity): number { return d === "compact" ? 36 : d === "airy" ? 52 : 44; }
+function padTop(d: PrintDensity): number { return d === "compact" ? 32 : d === "airy" ? 46 : 40; }
+
+function glass(mode: "light" | "dark", accent: string): CSSProperties {
+  if (mode === "dark") {
+    return {
+      background: `linear-gradient(180deg, color-mix(in srgb, ${accent} 6%, rgba(10,8,36,0.62)), rgba(6,4,32,0.55))`,
+      border: `1px solid color-mix(in srgb, ${accent} 22%, rgba(255,255,255,0.08))`,
+      backdropFilter: "blur(14px) saturate(140%)",
+      boxShadow: `0 ${cq(10)} ${cq(28)} rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.04)`,
+    };
+  }
+  return {
+    background: `linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.72))`,
+    border: `1px solid color-mix(in srgb, ${accent} 18%, rgba(255,255,255,0.75))`,
+    backdropFilter: "blur(14px) saturate(140%)",
+    boxShadow: `0 ${cq(10)} ${cq(28)} rgba(3,0,44,0.10), inset 0 0 0 1px rgba(255,255,255,0.55)`,
+  };
+}
+
+function chipStyle(mode: "light" | "dark", accent: string, warm: boolean): CSSProperties {
+  // The template uses two tint families for the three cards:
+  //   • Challenge / Impact — warm chips (#FBEFE8, #FDF8E2)
+  //   • Approach          — cool accent chip
+  // We resolve both from the division accent so every division reads through.
+  if (warm) {
+    return {
+      background: mode === "dark"
+        ? `color-mix(in srgb, ${accent} 14%, rgba(60,42,20,0.55))`
+        : `color-mix(in srgb, #F6D9B6 45%, #ffffff)`,
+      border: mode === "dark"
+        ? `1px solid color-mix(in srgb, ${accent} 22%, rgba(255,255,255,0.05))`
+        : `1px solid color-mix(in srgb, #F6D9B6 40%, rgba(255,255,255,0.9))`,
+    };
+  }
+  return {
+    background: mode === "dark"
+      ? `color-mix(in srgb, ${accent} 26%, rgba(6,4,32,0.7))`
+      : `color-mix(in srgb, ${accent} 22%, #ffffff)`,
+    border: mode === "dark"
+      ? `1px solid color-mix(in srgb, ${accent} 32%, rgba(255,255,255,0.08))`
+      : `1px solid color-mix(in srgb, ${accent} 26%, rgba(255,255,255,0.9))`,
+  };
+}
+
+// Heroicons-outline paths. Stroke = currentColor via the `color` prop.
+const ICONS = {
+  target: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-4.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0-3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z",
+  bolt: "M13 3L4 14h6l-1 7 9-11h-6l1-7z",
+  trending: "M3 17l6-6 4 4 8-8M15 7h6v6",
+  globe: "M12 21a9 9 0 0 0 0-18m0 18a9 9 0 0 1 0-18m0 18c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3M3.6 9h16.8M3.6 15h16.8",
+  star: "M11.48 3.5a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z",
+  check: "M4 12l5 5L20 6",
+} as const;
+
+function Icon({ d, size, color, sw = 1.5 }: { d: string; size: number | string; color: string; sw?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}
+      strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }} aria-hidden>
+      <path d={d} />
+    </svg>
+  );
+}
+
+const SECTION_ICONS = [ICONS.target, ICONS.bolt, ICONS.trending];
+const SECTION_WARM = [true, false, true]; // matches template: warm / cool / warm
+
+export function EBrochureLayout({
+  content, brand, mode, pageSize = "Letter", density = "standard", seed, style,
+}: {
+  content: EBrochureContent;
+  brand: BrandMode;
+  mode: "light" | "dark";
+  pageSize?: PrintPageSize;
+  density?: PrintDensity;
+  seed?: string;
+  style?: CSSProperties;
+}) {
+  const accent = brand.tokens.accent || brand.tokens.primary;
+  const primary = brand.tokens.primary;
+  const ink = mode === "dark" ? "#F5F4FF" : "#03002C";
+  const inkSoft = mode === "dark" ? "rgba(245,244,255,0.72)" : "rgba(85,85,85,0.92)";
+  const inkFaint = mode === "dark" ? "rgba(245,244,255,0.55)" : "rgba(102,102,102,0.92)";
+  const dividerCol = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.14)";
+  const accentInk = mode === "dark" ? accent : primary;
+  const bg = mode === "dark" ? "#0B0A2A" : "#FFFFFF";
+
+  const heroRef = useRef<HTMLHeadingElement | null>(null);
+  const introRef = useRef<HTMLParagraphElement | null>(null);
+  useTextFit(heroRef, content.title, { min: 24, max: 30, base: 50, cap: 95, containerWidth: PAGE_W });
+  useTextFit(introRef, content.summary ?? "", { min: 10, max: 11.5, base: 160, cap: 260, containerWidth: PAGE_W });
+
+  const sections = content.sections.slice(0, 3);
+  const stats = content.stats.slice(0, 5);
+
+  return (
+    <SlideModeContext.Provider value={mode}>
+      <SlideAccentContext.Provider value={accent}>
+        <div
+          className="relative w-full overflow-hidden [container-type:inline-size]"
+          style={{
+            aspectRatio: pageAspect(pageSize),
+            backgroundColor: bg,
+            color: ink,
+            fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
+            ...style,
+          }}
+        >
+          <AuroraLayer
+            seed={seed ?? `ebrochure-${brand.id}-${mode}`}
+            brand={brand}
+            intensity={0.85}
+            aspect={auroraAspect(pageSize)}
+          />
+
+          {/* Template's centered top halo — retuned to accent so every division reads. */}
+          <div
+            className="pointer-events-none absolute"
+            aria-hidden
+            style={{
+              top: cq(-160), left: "50%", transform: "translateX(-50%)",
+              width: cq(900), height: cq(480),
+              background:
+                `radial-gradient(ellipse at 30% 30%, ${accent}66 0%, transparent 55%),` +
+                `radial-gradient(ellipse at 75% 20%, ${accent}55 0%, transparent 55%)`,
+              filter: `blur(${cq(8)})`,
+              opacity: mode === "dark" ? 0.85 : 0.55,
+            }}
+          />
+
+          <div
+            className="relative flex h-full flex-col"
+            style={{
+              paddingLeft: cq(padX(density)), paddingRight: cq(padX(density)),
+              paddingTop: cq(padTop(density)), paddingBottom: cq(26),
+            }}
+          >
+            {/* HEADER */}
+            <div className="flex items-center" style={{ gap: cq(10) }}>
+              <BrandLockup brand={brand} color={ink} size="sm" orientation="horizontal" />
+              <div style={{ width: 1, height: cq(14), background: dividerCol }} />
+              <div style={{ fontSize: cq(9.5), fontWeight: 600, letterSpacing: "0.14em", color: accentInk }}>
+                {(content.eyebrow ?? "EBROCHURE").toUpperCase()}
+              </div>
+            </div>
+
+            {/* HERO — title + summary */}
+            <div style={{ paddingTop: cq(22) }}>
+              <h1 ref={heroRef} style={{
+                margin: 0, fontWeight: 700, fontSize: cq(30), lineHeight: 1.16,
+                letterSpacing: "-0.015em", color: ink, maxWidth: cq(440),
+              }}>
+                {content.title || "Untitled brochure"}
+              </h1>
+              {content.summary && (
+                <p ref={introRef} style={{
+                  margin: `${cq(12)} 0 0`, fontSize: cq(11.5), lineHeight: 1.65,
+                  color: inkSoft, maxWidth: cq(430),
+                }}>{content.summary}</p>
+              )}
+            </div>
+
+            {/* 3 SUMMARY CARDS — Challenge / Approach / Impact */}
+            <div className="grid" style={{
+              gridTemplateColumns: "1fr 1fr 1fr", gap: cq(14), paddingTop: cq(26),
+            }}>
+              {sections.map((s, i) => (
+                <div key={i} style={{ borderRadius: cq(12), padding: `${cq(18)} ${cq(16)}`, ...glass(mode, accent) }}>
+                  <div className="flex items-center" style={{ gap: cq(8) }}>
+                    <div className="flex items-center justify-center" style={{
+                      width: cq(30), height: cq(30), borderRadius: cq(8),
+                      ...chipStyle(mode, accent, SECTION_WARM[i]!),
+                    }}>
+                      <Icon d={SECTION_ICONS[i]!} size={cq(16)} color={accentInk} />
+                    </div>
+                    <div style={{ fontWeight: 700, fontSize: cq(12.5), color: ink }}>{s.heading}</div>
+                  </div>
+                  {s.body && (
+                    <p style={{ margin: `${cq(9)} 0 0`, fontSize: cq(9.5), lineHeight: 1.55, color: inkSoft }}>
+                      {s.body}
+                    </p>
+                  )}
+                  {s.bullets.length > 0 && (
+                    <ul style={{
+                      margin: `${cq(8)} 0 0`, paddingLeft: cq(14),
+                      fontSize: cq(9), lineHeight: 1.6, color: inkFaint,
+                    }}>
+                      {s.bullets.slice(0, 4).map((b, k) => <li key={k}>{b}</li>)}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* STAT ROW — icon + big number × 5 */}
+            {stats.length > 0 && (
+              <div className="grid" style={{
+                gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))`,
+                gap: cq(12), paddingTop: cq(28), textAlign: "center",
+              }}>
+                {stats.map((s, i) => (
+                  <div key={i}>
+                    <div className="flex items-center justify-center" style={{ gap: cq(6) }}>
+                      <Icon d={[ICONS.globe, ICONS.trending, ICONS.star, ICONS.bolt, ICONS.target][i % 5]!} size={cq(15)} color={accentInk} />
+                      <span style={{ fontWeight: 700, fontSize: cq(19), color: accentInk, letterSpacing: "-0.02em" }}>
+                        {s.value}{s.unit ?? ""}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: cq(9), color: inkFaint, marginTop: cq(4) }}>{s.label}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* QUOTE + DISCOVER PANEL */}
+            {(content.quote || content.discover) && (
+              <div className="flex" style={{ gap: cq(16), paddingTop: cq(26), flex: 1 }}>
+                {content.quote && (
+                  <div style={{
+                    flex: "1.3 1 0", borderRadius: cq(14),
+                    padding: `${cq(20)} ${cq(22)}`, ...glass(mode, accent),
+                  }}>
+                    <div style={{
+                      fontFamily: "Georgia, serif", fontSize: cq(40),
+                      lineHeight: 0.6, color: accentInk, fontWeight: 700,
+                    }} aria-hidden>&ldquo;</div>
+                    <p style={{ margin: `${cq(10)} 0 0`, fontSize: cq(12.5), lineHeight: 1.6, color: ink }}>
+                      {content.quote.text}
+                    </p>
+                    <div style={{ marginTop: cq(10), fontSize: cq(11), fontWeight: 700, color: accentInk }}>
+                      — {content.quote.author}{content.quote.company ? ` · ${content.quote.company}` : ""}
+                    </div>
+                  </div>
+                )}
+                {content.discover && (
+                  <div style={{ flex: "1 1 0", padding: `${cq(6)} 0` }}>
+                    <p style={{ margin: 0, fontSize: cq(10), lineHeight: 1.6, color: inkSoft }}>
+                      {content.discover.body}
+                    </p>
+                    {content.discover.bullets.slice(0, 4).map((b, k) => (
+                      <div key={k} className="flex items-center" style={{ gap: cq(8), marginTop: k === 0 ? cq(12) : cq(8) }}>
+                        <Icon d={ICONS.check} size={cq(11)} color={accentInk} sw={2.5} />
+                        <div style={{ fontSize: cq(10), color: inkSoft }}>{b}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* CTA BAND */}
+            {content.cta && (
+              <div className="flex items-center justify-between" style={{
+                marginTop: cq(22), borderRadius: cq(12), padding: `${cq(16)} ${cq(20)}`,
+                background: `linear-gradient(90deg, ${primary} 0%, color-mix(in srgb, ${primary} 55%, ${accent}) 70%, ${accent} 100%)`,
+                color: "#FFFFFF",
+              }}>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: cq(15), color: "#FFFFFF" }}>
+                    {content.cta.label}
+                  </div>
+                  {content.cta.subhead && (
+                    <div style={{ fontSize: cq(10), color: "rgba(255,255,255,0.8)", marginTop: cq(3) }}>
+                      {content.cta.subhead}
+                    </div>
+                  )}
+                </div>
+                <div style={{
+                  border: "1.5px solid #FFFFFF", borderRadius: 999,
+                  padding: `${cq(8)} ${cq(18)}`, fontSize: cq(11),
+                  fontWeight: 700, color: "#FFFFFF", whiteSpace: "nowrap",
+                }}>Book a demo »</div>
+              </div>
+            )}
+
+            {/* FOOTER */}
+            <div className="flex items-center justify-between" style={{
+              borderTop: `1px solid ${dividerCol}`, marginTop: cq(20), paddingTop: cq(16),
+            }}>
+              <BrandLockup brand={brand} color={ink} size="2xs" orientation="horizontal" />
+              <div style={{ fontSize: cq(9.5), color: accentInk }}>transperfect.com</div>
+            </div>
+          </div>
+        </div>
+      </SlideAccentContext.Provider>
+    </SlideModeContext.Provider>
+  );
+}
