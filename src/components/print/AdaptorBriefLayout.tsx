@@ -5,6 +5,7 @@ import type {
   PrintDensity,
   PrintPageSize,
 } from "@/lib/print-assets.types";
+import { resolvePrintLogoInk } from "@/lib/print-assets.types";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
