@@ -3,7 +3,7 @@
 // optional accent-color wash and gradient scrim so hero copy stays legible.
 // Opt-in per asset via `content.heroMedia` — layouts without a value keep the
 // existing accent-halo hero and read exactly as before.
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 
 export type PrintHeroScrim = "top" | "bottom" | "both" | "radial" | "none";
 export type PrintHeroAspect = "fill" | "21:9" | "16:9" | "3:2" | "4:3" | "1:1";
@@ -77,36 +77,50 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
       ? `radial-gradient(ellipse at ${fx ?? 30}% ${fy ?? 45}%, transparent 0%, transparent 40%, ${pageBg} 85%)`
       : "none";
 
+  const [failed, setFailed] = useState(false);
+  useEffect(() => { setFailed(false); }, [media.imageUrl]);
+  const showFallback = !media.imageUrl || failed;
+
+  // Fallback: page-bg base (white / off-black) with a soft accent wash so the
+  // hero band still reads as intentional even when photography is absent.
+  const fallbackBg = `linear-gradient(160deg, ${pageBg} 0%, ${pageBg} 55%, ${withAlpha(overlayColor, 0.18)} 100%), radial-gradient(120% 90% at ${fx ?? 30}% ${fy ?? 40}%, ${withAlpha(overlayColor, 0.28)} 0%, transparent 70%), ${pageBg}`;
+
   return (
     <div
       className="pointer-events-none absolute inset-x-0 top-0"
       aria-hidden
       style={bandStyle}
     >
-      {/* Photograph */}
-      <img
-        src={media.imageUrl}
-        alt=""
-        style={{
-          position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          objectPosition,
-        }}
-      />
+      {showFallback ? (
+        <div style={{ position: "absolute", inset: 0, background: fallbackBg }} />
+      ) : (
+        <img
+          src={media.imageUrl}
+          alt=""
+          onError={() => setFailed(true)}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition,
+          }}
+        />
+      )}
 
-      {/* Accent color wash */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundColor: overlayColor,
-          opacity: overlayOpacity,
-          mixBlendMode: blendMode,
-        }}
-      />
+      {/* Accent color wash — skip on fallback so we don't double-tint the gradient */}
+      {!showFallback && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundColor: overlayColor,
+            opacity: overlayOpacity,
+            mixBlendMode: blendMode,
+          }}
+        />
+      )}
       {/* Legibility scrim into the body background — scaled by washStrength */}
       {scrim !== "none" && scrimOpacity > 0 && (
         <div
@@ -142,4 +156,15 @@ function clamp01(n: number): number {
 function clampPct(n: number): number {
   if (Number.isNaN(n)) return 50;
   return Math.max(0, Math.min(100, n));
+}
+
+function withAlpha(hex: string, alpha: number): string {
+  const a = Math.round(clamp01(alpha) * 255).toString(16).padStart(2, "0");
+  const h = hex.replace("#", "").trim();
+  if (h.length === 3) {
+    const r = h[0], g = h[1], b = h[2];
+    return `#${r}${r}${g}${g}${b}${b}${a}`;
+  }
+  if (h.length === 6 || h.length === 8) return `#${h.slice(0, 6)}${a}`;
+  return hex;
 }
