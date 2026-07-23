@@ -250,7 +250,7 @@ export function CaseStudyLayout({
 
           {/* CSR ROWS — Challenge / Solution / Result */}
           <div
-            className="flex flex-col"
+            className="relative flex flex-col"
             style={{ padding: `${cq(28)} ${cq(padX(density))} 0`, flex: 1 }}
           >
             {blocks.map((b, i) => (
