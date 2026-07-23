@@ -45,7 +45,24 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
   const scrim = media.scrim ?? "bottom";
   const blendMode = media.blendMode ?? "multiply";
   const heightPct = media.heightPct ?? 46;
+  const aspect = media.aspect ?? "fill";
   const pageBg = mode === "dark" ? "#111114" : "#FFFFFF";
+
+  // Focal point: prefer explicit x/y, then legacy focalPoint, else 50%/40%.
+  const fx = typeof media.focalX === "number" ? clampPct(media.focalX) : null;
+  const fy = typeof media.focalY === "number" ? clampPct(media.focalY) : null;
+  const objectPosition =
+    fx !== null || fy !== null
+      ? `${fx ?? 50}% ${fy ?? 40}%`
+      : media.focalPoint ?? "50% 40%";
+
+  // Band sizing: "fill" uses heightPct; ratios use aspectRatio and let the
+  // browser derive height from page width so photos stay properly proportioned
+  // across A4 / Letter / Square.
+  const bandStyle: CSSProperties =
+    aspect === "fill"
+      ? { height: `${heightPct}%`, overflow: "hidden" }
+      : { aspectRatio: String(ASPECT_RATIOS[aspect]), width: "100%", overflow: "hidden" };
 
   const scrimGradient =
     scrim === "top"
@@ -55,14 +72,14 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
       : scrim === "both"
       ? `linear-gradient(180deg, ${pageBg} 0%, transparent 35%, transparent 65%, ${pageBg} 100%)`
       : scrim === "radial"
-      ? `radial-gradient(ellipse at 30% 45%, transparent 0%, transparent 40%, ${pageBg} 85%)`
+      ? `radial-gradient(ellipse at ${fx ?? 30}% ${fy ?? 45}%, transparent 0%, transparent 40%, ${pageBg} 85%)`
       : "none";
 
   return (
     <div
       className="pointer-events-none absolute inset-x-0 top-0"
       aria-hidden
-      style={{ height: `${heightPct}%`, overflow: "hidden" }}
+      style={bandStyle}
     >
       {/* Photograph */}
       <img
@@ -74,9 +91,10 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          objectPosition: media.focalPoint ?? "50% 40%",
+          objectPosition,
         }}
       />
+
       {/* Accent color wash */}
       <div
         style={{
