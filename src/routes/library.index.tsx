@@ -1415,15 +1415,22 @@ function VariantDetailModal({
 
   const downloadModuleZip = async () => {
     if (zipBusy || pdfBusy || bothBusy || previewBusy || downloading) return;
+    if (zipSelectedCount === 0) {
+      toast.error("Select at least one export to include in the ZIP");
+      return;
+    }
     setZipBusy(true);
     setZipStage("Starting…");
     try {
       const findNode = (m: "light" | "dark") => document.querySelector<HTMLElement>(
         `[data-modal-preview="${m}"][data-variant-id="${variant.id}"]`,
       );
-      const lightNode = findNode("light");
-      const darkNode = findNode("dark");
-      if (!lightNode || !darkNode) throw new Error("Preview nodes not found");
+      const needsLightNode = zipSelection.pdfLight || zipSelection.pngLight;
+      const needsDarkNode = zipSelection.pdfDark || zipSelection.pngDark;
+      const lightNode = needsLightNode ? findNode("light") : null;
+      const darkNode = needsDarkNode ? findNode("dark") : null;
+      if (needsLightNode && !lightNode) throw new Error("Light preview node not found");
+      if (needsDarkNode && !darkNode) throw new Error("Dark preview node not found");
 
       const buildDeck = (exportMode: "light" | "dark") => ({
         id: `library-${variant.id}-${Date.now()}-${exportMode}`,
@@ -1443,26 +1450,44 @@ function VariantDetailModal({
         }],
       }) as Parameters<typeof exportDeckToPptx>[0];
 
-      setZipStage("Building light PPTX…");
-      const lightPptx = await exportDeckToPptx(buildDeck("light"), brand, { forceMode: "light", output: "blob" });
-      setZipStage("Building dark PPTX…");
-      const darkPptx = await exportDeckToPptx(buildDeck("dark"), brand, { forceMode: "dark", output: "blob" });
+      let lightPptx: Awaited<ReturnType<typeof exportDeckToPptx>> | null = null;
+      let darkPptx: Awaited<ReturnType<typeof exportDeckToPptx>> | null = null;
+      if (zipSelection.pptxLight) {
+        setZipStage("Building light PPTX…");
+        lightPptx = await exportDeckToPptx(buildDeck("light"), brand, { forceMode: "light", output: "blob" });
+      }
+      if (zipSelection.pptxDark) {
+        setZipStage("Building dark PPTX…");
+        darkPptx = await exportDeckToPptx(buildDeck("dark"), brand, { forceMode: "dark", output: "blob" });
+      }
 
       const imgMod = await import("@/lib/slide-image-export");
-      setZipStage("Rendering light PDF…");
-      const lightPdf = await imgMod.exportSlidesAsImagePdf(
-        [{ node: lightNode, mode: "light" }],
-        { filename: "light.pdf", pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Light PDF · ${p.message ?? p.stage}`) },
-      );
-      setZipStage("Rendering dark PDF…");
-      const darkPdf = await imgMod.exportSlidesAsImagePdf(
-        [{ node: darkNode, mode: "dark" }],
-        { filename: "dark.pdf", pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Dark PDF · ${p.message ?? p.stage}`) },
-      );
-      setZipStage("Rendering light PNG…");
-      const lightPng = await imgMod.captureSlide(lightNode, { pixelRatio });
-      setZipStage("Rendering dark PNG…");
-      const darkPng = await imgMod.captureSlide(darkNode, { pixelRatio });
+      let lightPdf: Blob | null = null;
+      let darkPdf: Blob | null = null;
+      let lightPng: string | null = null;
+      let darkPng: string | null = null;
+      if (zipSelection.pdfLight && lightNode) {
+        setZipStage("Rendering light PDF…");
+        lightPdf = await imgMod.exportSlidesAsImagePdf(
+          [{ node: lightNode, mode: "light" }],
+          { filename: "light.pdf", pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Light PDF · ${p.message ?? p.stage}`) },
+        );
+      }
+      if (zipSelection.pdfDark && darkNode) {
+        setZipStage("Rendering dark PDF…");
+        darkPdf = await imgMod.exportSlidesAsImagePdf(
+          [{ node: darkNode, mode: "dark" }],
+          { filename: "dark.pdf", pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Dark PDF · ${p.message ?? p.stage}`) },
+        );
+      }
+      if (zipSelection.pngLight && lightNode) {
+        setZipStage("Rendering light PNG…");
+        lightPng = await imgMod.captureSlide(lightNode, { pixelRatio });
+      }
+      if (zipSelection.pngDark && darkNode) {
+        setZipStage("Rendering dark PNG…");
+        darkPng = await imgMod.captureSlide(darkNode, { pixelRatio });
+      }
 
       const dataUrlToBlob = async (u: string) => (await fetch(u)).blob();
 
@@ -1470,15 +1495,16 @@ function VariantDetailModal({
       const { default: JSZip } = await import("jszip");
       const zip = new JSZip();
       const base = `${variant.id}-${brand.id}`;
-      if (lightPptx.blob) zip.file(`pptx/${lightPptx.fileName ?? `${base}-light.pptx`}`, lightPptx.blob);
-      if (darkPptx.blob) zip.file(`pptx/${darkPptx.fileName ?? `${base}-dark.pptx`}`, darkPptx.blob);
-      if (lightPdf) zip.file(`pdf/${base}-light-${pixelRatio}x.pdf`, lightPdf);
-      if (darkPdf) zip.file(`pdf/${base}-dark-${pixelRatio}x.pdf`, darkPdf);
-      zip.file(`png/${base}-light-${pixelRatio}x.png`, await dataUrlToBlob(lightPng));
-      zip.file(`png/${base}-dark-${pixelRatio}x.png`, await dataUrlToBlob(darkPng));
+      const included: string[] = [];
+      if (lightPptx?.blob) { zip.file(`pptx/${lightPptx.fileName ?? `${base}-light.pptx`}`, lightPptx.blob); included.push("pptx/light"); }
+      if (darkPptx?.blob) { zip.file(`pptx/${darkPptx.fileName ?? `${base}-dark.pptx`}`, darkPptx.blob); included.push("pptx/dark"); }
+      if (lightPdf) { zip.file(`pdf/${base}-light-${pixelRatio}x.pdf`, lightPdf); included.push("pdf/light"); }
+      if (darkPdf) { zip.file(`pdf/${base}-dark-${pixelRatio}x.pdf`, darkPdf); included.push("pdf/dark"); }
+      if (lightPng) { zip.file(`png/${base}-light-${pixelRatio}x.png`, await dataUrlToBlob(lightPng)); included.push("png/light"); }
+      if (darkPng) { zip.file(`png/${base}-dark-${pixelRatio}x.png`, await dataUrlToBlob(darkPng)); included.push("png/dark"); }
       zip.file(
         "README.txt",
-        `${variant.name} — ${brand.name}\nModule: ${variant.id}\nDivision: ${brand.id}\nResolution: ${pixelRatio}×\nExported: ${new Date().toISOString()}\n\nContents:\n  pptx/  — editable PowerPoint (Light + Dark)\n  pdf/   — image PDFs (Light + Dark)\n  png/   — rasterized slide PNGs (Light + Dark)\n`,
+        `${variant.name} — ${brand.name}\nModule: ${variant.id}\nDivision: ${brand.id}\nResolution: ${pixelRatio}×\nExported: ${new Date().toISOString()}\n\nIncluded:\n  ${included.join("\n  ")}\n`,
       );
 
       const zipBlob = await zip.generateAsync({ type: "blob" });
@@ -1491,7 +1517,7 @@ function VariantDetailModal({
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      toast.success("Module ZIP exported", { description: `${filename} · PPTX + PDF + PNG (Light & Dark) at ${pixelRatio}×` });
+      toast.success("Module ZIP exported", { description: `${filename} · ${included.length} file${included.length === 1 ? "" : "s"} at ${pixelRatio}×` });
     } catch (err) {
       console.error("[library] module ZIP export failed", err);
       toast.error("ZIP export failed", { description: "Check console for details." });
