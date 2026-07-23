@@ -4459,40 +4459,52 @@ function renderVariantBody({
     }
 
     case "MV-DASH-BREAKDOWN": {
-      const items = arr(c.items).slice(0, 4);
-      const segments: SegBar[] = items.map((it) => ({
-        label: s(it.label, "—"),
-        value: Math.max(0, Number(it.percent) || Number(it.value) || 1),
-        note: s(it.delta),
-      }));
-      const total = segments.reduce((s, x) => s + x.value, 0) || 1;
+      // Free-form Aurora v2. Horizontal rows stacked on a single vertical
+      // hairline rail on the left. Each row = feathered left-to-right
+      // multi-stop accent gradient (no track plate, no rounded pill). Top
+      // row is the highlight: halo + accent stroke tip at the value edge.
+      const items = arr(c.items).slice(0, 5);
+      const rowVals = items.map((it) => Math.max(0, Number(it.percent) || Number(it.value) || 1));
+      const max = Math.max(1, ...rowVals);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <SegmentedBar brand={brand} segments={segments} />
-          <div className="grid gap-6 mt-4" style={{ gridTemplateColumns: `repeat(${Math.min(items.length, 4)}, 1fr)` }}>
+          <div style={{ maxWidth: 900 }}>
+            <Kicker brand={brand}>{s(c.kicker, "Breakdown")}</Kicker>
+            <div
+              className="mt-4"
+              style={{ fontSize: 52, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+            >
+              {s(c.title, variant.name)}
+            </div>
+          </div>
+          <div
+            className="mt-14"
+            style={{ borderLeft: `1px solid ${ink.hairline}`, paddingLeft: 32 }}
+          >
             {items.map((it, i) => {
-              const pct = ((segments[i].value / total) * 100).toFixed(1);
+              const v = rowVals[i];
+              const widthPct = (v / max) * 100;
+              const isTop = i === 0;
               const delta = s(it.delta);
               const negative = delta.trim().startsWith("-");
               return (
-                <div key={i} style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`, paddingLeft: i === 0 ? 0 : 20 }}>
-                  <div className="uppercase" style={{ fontSize: 12, letterSpacing: "0.24em", color: ink.muted, fontWeight: 600 }}>{s(it.label)}</div>
-                  <div className="tabular-nums mt-2 flex items-baseline gap-3" style={{ fontSize: 34, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em" }}>
-                    {s(it.value, `${pct}%`)}
-                    <span style={{ fontSize: 18, color: ink.faint }}>{s(it.unit)}</span>
-                  </div>
-                  {delta && (
-                    <div className="uppercase mt-2" style={{ fontSize: 12, letterSpacing: "0.24em", color: negative ? "#B42318" : "var(--slide-accent-text)", fontWeight: 600 }}>{delta}</div>
-                  )}
-                </div>
+                <FreeformBreakdownRow
+                  key={i}
+                  label={s(it.label, "—")}
+                  value={s(it.value, `${v.toFixed(1)}%`)}
+                  unit={s(it.unit)}
+                  delta={delta}
+                  negative={negative}
+                  widthPct={widthPct}
+                  bloom={isTop}
+                />
               );
             })}
           </div>
-          <div className="mt-12"><LiveMetaFooter brand={brand} source={s(c.source, "Internal telemetry")} refCode={variant.id} /></div>
         </SlideFrame>
       );
     }
+
 
 
     case "MV-DASH-REGION-STATS": {
