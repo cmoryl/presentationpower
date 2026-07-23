@@ -148,6 +148,10 @@ export function CaseStudyLayout({
             intensity={0.85}
             aspect={auroraAspect(pageSize)}
           />
+          {content.heroMedia && (
+            <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
+          )}
+
 
           {/* HERO — no full-color band; background inherits page bg (white / offset black).
               A soft accent halo bleeds from the top-right so the division still reads. */}
