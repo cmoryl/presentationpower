@@ -147,7 +147,7 @@ function PhotoBand({
       <div
         className="absolute inset-0"
         style={{
-          background: accent,
+          background: overlayColor,
           opacity: overlayOpacity,
           mixBlendMode: (media.blendMode ?? "multiply") as React.CSSProperties["mixBlendMode"],
         }}
