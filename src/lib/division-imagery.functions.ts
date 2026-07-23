@@ -360,3 +360,75 @@ export const pickHeroForTemplate = createServerFn({ method: "GET" })
     ]);
     return { ...pick, signedUrl: signed.data?.signedUrl ?? null, variantUrls };
   });
+
+// Backfill: attach pre-rendered crop variants to an already-uploaded image.
+// Client renders variants via <canvas> (see lib/image-variants.ts) and posts
+// them here; server writes them under `{uploaded_by}/{id}/{preset}-*` and
+// merges the metadata into the row's `variants` JSONB. Only the uploader or
+// an admin may attach variants. Existing variant paths for the same preset
+// are overwritten (upsert) so this is safe to re-run.
+export const attachDivisionImageryVariants = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        variants: z.array(VariantInput).min(1).max(8),
+      })
+      .parse(v),
+  )
+  .handler(async ({ data, context }) => {
+    const s = context.supabase as unknown as SbClient;
+    const { data: row, error: qErr } = await s
+      .from("division_imagery")
+      .select("id, uploaded_by, variants")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (qErr) throw new Error((qErr as { message?: string }).message ?? "Lookup failed");
+    const r = row as { id: string; uploaded_by: string; variants: Record<string, unknown> | null } | null;
+    if (!r) throw new Error("Image not found");
+
+    if (r.uploaded_by !== context.userId) {
+      const { data: isAdmin } = await (s as any).rpc("has_role", {
+        _user_id: context.userId,
+        _role: "admin",
+      });
+      if (!isAdmin) throw new Error("Forbidden");
+    }
+
+    const merged: Record<string, ImageVariantMeta> = {
+      ...((r.variants as Record<string, ImageVariantMeta>) ?? {}),
+    };
+    const uploaded: string[] = [];
+    try {
+      for (const v of data.variants) {
+        const vBuf = decodeBase64Payload(v.data);
+        if (vBuf.length === 0 || vBuf.length > MAX_BYTES) continue;
+        const vSafe = v.filename.replace(/[^\w.\-]+/g, "_").slice(-180);
+        const vPath = `${r.uploaded_by}/${r.id}/${v.preset}-${vSafe}`;
+        const vUp = await s.storage.from(BUCKET).upload(vPath, vBuf, {
+          contentType: v.contentType,
+          upsert: true,
+        });
+        if (vUp.error) throw new Error(vUp.error.message ?? "variant upload failed");
+        uploaded.push(vPath);
+        merged[v.preset] = {
+          path: vPath,
+          width: v.width ?? null,
+          height: v.height ?? null,
+          bytes: vBuf.length,
+          contentType: v.contentType,
+        };
+      }
+      const { error: uErr } = await s
+        .from("division_imagery")
+        .update({ variants: merged })
+        .eq("id", r.id);
+      if (uErr) throw new Error((uErr as { message?: string }).message ?? "Update failed");
+      return { ok: true, presets: Object.keys(merged) };
+    } catch (e) {
+      // Clean up any files we uploaded this call so we don't leak on failure.
+      if (uploaded.length) await s.storage.from(BUCKET).remove(uploaded).catch(() => {});
+      throw e;
+    }
+  });
