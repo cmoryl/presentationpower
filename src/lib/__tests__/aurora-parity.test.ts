@@ -64,15 +64,20 @@ describe("aurora parity: on-screen renderer ↔ PPTX export", () => {
     }
   });
 
-  it("uses the mode-specific blur radius, orb radius and vignette that AuroraLayer paints", () => {
+  it("uses the mode-specific blur radius and orb radius that AuroraLayer paints (free-form v2 — no vignette, no wash)", () => {
     const dark = decodeSvg(auroraSvgDataUrl("x", brands[0] as any, "dark"));
     const light = decodeSvg(auroraSvgDataUrl("x", brands[0] as any, "light"));
-    expect(dark).toContain('stdDeviation="38"');
-    expect(dark).toContain('r="55%"'); // orb radial gradient reach
-    expect(dark).toContain('cy="60%"'); // vignette centre offset
-    expect(light).toContain('stdDeviation="65"');
-    expect(light).toContain('r="85%"');
-    expect(light).toContain('cy="55%"');
+    expect(dark).toContain('stdDeviation="55"');
+    expect(dark).toContain('r="90%"'); // orb radial gradient reach
+    expect(light).toContain('stdDeviation="80"');
+    expect(light).toContain('r="95%"');
+    // v2 rebuild drops both the frosted-glass wash and the edge vignette so
+    // content sits directly on the accent blooms (matches reference decks).
+    expect(dark).not.toContain('id="vignette"');
+    expect(light).not.toContain('id="vignette"');
+    // Only one full-bleed rect (the base tint) — no wash rect on top.
+    expect(dark.match(/<rect width="1280" height="720"/g)?.length ?? 0).toBe(1);
+    expect(light.match(/<rect width="1280" height="720"/g)?.length ?? 0).toBe(1);
   });
 
   it("is deterministic: identical (seed, brand, mode) → identical SVG payload", () => {
