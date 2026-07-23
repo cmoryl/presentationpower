@@ -41,7 +41,11 @@ function AdminImageryPage() {
   const updateFn = useServerFn(updateDivisionImagery);
   const approveFn = useServerFn(approveDivisionImagery);
   const deleteFn = useServerFn(deleteDivisionImagery);
+  const attachVariantsFn = useServerFn(attachDivisionImageryVariants);
   const qc = useQueryClient();
+  const [backfill, setBackfill] = useState<{ running: boolean; done: number; total: number; failed: number }>(
+    { running: false, done: 0, total: 0, failed: 0 },
+  );
 
   const [divisionId, setDivisionId] = useState<string>(BRAND_MODES[0]?.id ?? "bm-enterprise");
   const [statusFilter, setStatusFilter] = useState<"all" | "approved" | "pending">("all");
