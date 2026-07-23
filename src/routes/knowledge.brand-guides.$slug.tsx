@@ -10,6 +10,14 @@ import {
   targetAudienceText,
   type BrandhubIntel,
 } from "@/lib/brandhub-intel";
+import {
+  ShieldCheck, Sparkles, Users, HeartHandshake, Compass, Lightbulb,
+  Rocket, Target, Zap, Globe, Layers, Award, Scale, Leaf, Star,
+  Flag, TrendingUp, Handshake, Eye, MessageCircle, Cog, Gem,
+  type LucideIcon,
+} from "lucide-react";
+import { Download } from "lucide-react";
+
 
 export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
   loader: ({ params }) => {
