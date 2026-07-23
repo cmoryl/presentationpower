@@ -31,6 +31,15 @@ const SIGNED_TTL = 60 * 60 * 24 * 7; // 7 days
 const MAX_BYTES = 20 * 1024 * 1024;
 
 // data URL or plain base64 of an image, capped to ~27MB base64 (~20MB binary).
+const VariantInput = z.object({
+  preset: z.enum(["thumb", "square", "portrait", "landscape"]),
+  filename: z.string().min(1).max(300),
+  contentType: z.string().min(1).max(120),
+  data: z.string().min(1).max(28_000_000),
+  width: z.number().int().positive().max(8000).optional(),
+  height: z.number().int().positive().max(8000).optional(),
+});
+
 const UploadInput = z.object({
   divisionId: z.string().min(1).max(120),
   filename: z.string().min(1).max(300),
@@ -40,6 +49,7 @@ const UploadInput = z.object({
   tags: z.array(z.string().max(60)).max(24).default([]),
   note: z.string().max(1200).optional(),
   prompt: z.string().max(4000).optional(),
+  variants: z.array(VariantInput).max(8).optional(),
 });
 
 function decodeBase64Payload(payload: string): Buffer {
