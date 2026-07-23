@@ -77,19 +77,16 @@ const EBROCHURE_SEED: EBrochureContent = emptyEBrochure({
     "A partnership overview for global teams shipping regulated products across 40+ markets, with continuous translation wired into the same pipelines that ship code.",
   sections: [
     {
-      id: "s1",
       heading: "The challenge",
       body: "Global content velocity outpaces manual localization. Teams end up cutting scope, missing markets, or degrading quality under pressure.",
       bullets: ["Fragmented tooling", "Manual review handoffs", "Opaque cost + quality"],
     },
     {
-      id: "s2",
       heading: "Our approach",
       body: "Continuous localization that treats content the way engineering treats code — versioned, reviewed, observable, and shipped on demand.",
       bullets: ["Model + linguist routing", "In-context visual QA", "Signed audit trail"],
     },
     {
-      id: "s3",
       heading: "The impact",
       body: "Enterprises ship weekly across 30+ locales at a fraction of the historical cost, with QA data flowing back into the model rooms.",
       bullets: ["62% faster to market", "40% cost reduction", "99.4% terminology fidelity"],
@@ -107,7 +104,6 @@ const EBROCHURE_SEED: EBrochureContent = emptyEBrochure({
     company: "Global medtech",
   },
   discover: {
-    heading: "What you'll discover",
     body: "How leading teams operationalize continuous localization without giving up review, control, or auditability.",
     bullets: [
       "Reference architecture for CMS + code content pipelines",
