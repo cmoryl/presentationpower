@@ -238,9 +238,38 @@ function AdminImageryPage() {
       {/* Uploader */}
       <Uploader
         divisionId={divisionId}
-        onUpload={(input) => uploadMut.mutate(input)}
-        isUploading={uploadMut.isPending}
+        onDone={invalidate}
       />
+
+      {/* Bulk approve of currently-filtered pending rows */}
+      {filtered.some((r) => !r.approved) ? (
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-black/10 bg-[#003FC7]/5 px-4 py-3 text-xs text-black/70">
+          <CheckCircle2 size={14} className="text-[#003FC7]" />
+          <span>
+            {filtered.filter((r) => !r.approved).length} pending in the current view
+          </span>
+          <button
+            type="button"
+            onClick={async () => {
+              const pending = filtered.filter((r) => !r.approved);
+              if (pending.length === 0) return;
+              if (
+                !window.confirm(
+                  `Approve ${pending.length} image${pending.length === 1 ? "" : "s"}?`,
+                )
+              )
+                return;
+              // Sequential to keep RLS + toast noise sane; small batches expected.
+              for (const r of pending) {
+                await approveMut.mutateAsync({ id: r.id, approved: true }).catch(() => {});
+              }
+            }}
+            className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-white hover:bg-[#003FC7]/85"
+          >
+            <CheckCircle2 size={12} /> Approve all pending
+          </button>
+        </div>
+      ) : null}
 
       {/* Analytics totals for the selected division (last 90 days) */}
       {statsTotals ? (
@@ -289,46 +318,144 @@ function AdminImageryPage() {
 }
 
 // ---------------------------------------------------------------------------
-// Uploader (drag-drop + file picker) — encodes to base64 and posts to server
+// Bulk Uploader
+// - Queues N files, uploads with limited concurrency
+// - Optional CSV tagging: per-filename tags / kind / approve
+// - Optional auto-approve after upload
+// - Owns its own uploadFn/approveFn so it can chain reliably
 // ---------------------------------------------------------------------------
+type CsvRule = { tags?: string[]; kind?: Kind; approve?: boolean };
+type CsvMap = Record<string, CsvRule>; // key = normalized filename (lowercased)
+
+type QueueItem = {
+  id: string;
+  file: File;
+  status: "queued" | "reading" | "uploading" | "approving" | "done" | "error";
+  message?: string;
+  rowId?: string;
+};
+
+function normalizeName(s: string): string {
+  return s.trim().toLowerCase();
+}
+
+// Very small CSV parser tolerant of quoted fields and Windows line endings.
+// Header row required. Recognized columns: filename, tags, kind, approve.
+function parseCsvTagging(text: string): { map: CsvMap; rowCount: number } {
+  const rows: string[][] = [];
+  let cur: string[] = [];
+  let cell = "";
+  let quoted = false;
+  const src = text.replace(/\r\n?/g, "\n");
+  for (let i = 0; i < src.length; i++) {
+    const ch = src[i];
+    if (quoted) {
+      if (ch === '"' && src[i + 1] === '"') {
+        cell += '"';
+        i++;
+      } else if (ch === '"') {
+        quoted = false;
+      } else {
+        cell += ch;
+      }
+    } else if (ch === '"' && cell.length === 0) {
+      quoted = true;
+    } else if (ch === ",") {
+      cur.push(cell);
+      cell = "";
+    } else if (ch === "\n") {
+      cur.push(cell);
+      rows.push(cur);
+      cur = [];
+      cell = "";
+    } else {
+      cell += ch;
+    }
+  }
+  if (cell.length > 0 || cur.length > 0) {
+    cur.push(cell);
+    rows.push(cur);
+  }
+  if (rows.length === 0) return { map: {}, rowCount: 0 };
+  const header = rows[0].map((h) => h.trim().toLowerCase());
+  const idx = {
+    filename: header.indexOf("filename"),
+    tags: header.indexOf("tags"),
+    kind: header.indexOf("kind"),
+    approve: header.indexOf("approve"),
+  };
+  if (idx.filename < 0) throw new Error('CSV needs a "filename" column');
+  const map: CsvMap = {};
+  let count = 0;
+  for (let r = 1; r < rows.length; r++) {
+    const row = rows[r];
+    const fn = (row[idx.filename] ?? "").trim();
+    if (!fn) continue;
+    const rule: CsvRule = {};
+    if (idx.tags >= 0) {
+      const raw = row[idx.tags] ?? "";
+      rule.tags = raw
+        .split(/[|;,]/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .slice(0, 24);
+    }
+    if (idx.kind >= 0) {
+      const k = (row[idx.kind] ?? "").trim().toLowerCase();
+      if ((KINDS as readonly string[]).includes(k)) rule.kind = k as Kind;
+    }
+    if (idx.approve >= 0) {
+      const v = (row[idx.approve] ?? "").trim().toLowerCase();
+      rule.approve = ["1", "true", "yes", "y", "approve", "approved"].includes(v);
+    }
+    map[normalizeName(fn)] = rule;
+    count++;
+  }
+  return { map, rowCount: count };
+}
+
 function Uploader({
   divisionId,
-  onUpload,
-  isUploading,
+  onDone,
 }: {
   divisionId: string;
-  onUpload: (input: {
-    divisionId: string;
-    filename: string;
-    contentType: string;
-    data: string;
-    kind: Kind;
-    tags: string[];
-    variants?: Array<{
-      preset: "thumb" | "square" | "portrait" | "landscape";
-      filename: string;
-      contentType: "image/jpeg";
-      data: string;
-      width: number;
-      height: number;
-    }>;
-  }) => void;
-  isUploading: boolean;
+  onDone: () => void;
 }) {
+  const uploadFn = useServerFn(uploadDivisionImagery);
+  const approveFn = useServerFn(approveDivisionImagery);
+
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const csvInputRef = useRef<HTMLInputElement | null>(null);
+
   const [kind, setKind] = useState<Kind>("photo");
   const [tagsRaw, setTagsRaw] = useState("");
+  const [autoApprove, setAutoApprove] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [csv, setCsv] = useState<{ name: string; map: CsvMap; count: number } | null>(null);
+  const [queue, setQueue] = useState<QueueItem[]>([]);
+  const [running, setRunning] = useState(false);
 
-  const parseTags = () =>
+  const defaultTags = () =>
     tagsRaw
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean)
       .slice(0, 24);
 
-  const handleFiles = async (files: FileList | File[]) => {
+  const readCsv = async (file: File) => {
+    try {
+      const text = await file.text();
+      const { map, rowCount } = parseCsvTagging(text);
+      setCsv({ name: file.name, map, count: rowCount });
+      toast.success(`Loaded ${rowCount} CSV rule${rowCount === 1 ? "" : "s"}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not read CSV");
+    }
+  };
+
+  const enqueue = (files: FileList | File[]) => {
     const list = Array.from(files);
+    const additions: QueueItem[] = [];
     for (const file of list) {
       if (!file.type.startsWith("image/")) {
         toast.error(`Skipped ${file.name}: not an image`);
@@ -338,46 +465,108 @@ function Uploader({
         toast.error(`Skipped ${file.name}: exceeds 20MB`);
         continue;
       }
+      additions.push({
+        id: `${file.name}-${file.size}-${Math.random().toString(36).slice(2, 8)}`,
+        file,
+        status: "queued",
+      });
+    }
+    if (additions.length) setQueue((q) => [...q, ...additions]);
+  };
+
+  const patch = (id: string, next: Partial<QueueItem>) =>
+    setQueue((q) => q.map((it) => (it.id === id ? { ...it, ...next } : it)));
+
+  const uploadOne = async (item: QueueItem) => {
+    const rule = csv?.map[normalizeName(item.file.name)] ?? {};
+    const finalKind: Kind = rule.kind ?? kind;
+    const finalTags = rule.tags ?? defaultTags();
+
+    try {
+      patch(item.id, { status: "reading" });
       const dataUrl = await new Promise<string>((resolve, reject) => {
         const fr = new FileReader();
         fr.onload = () => resolve(String(fr.result));
         fr.onerror = () => reject(fr.error);
-        fr.readAsDataURL(file);
+        fr.readAsDataURL(item.file);
       });
-      // Generate standardized crop variants client-side (thumb / square /
-      // portrait / landscape). Non-raster or oversized sources return [].
-      let variants: Array<{
-        preset: "thumb" | "square" | "portrait" | "landscape";
-        filename: string;
-        contentType: "image/jpeg";
-        data: string;
-        width: number;
-        height: number;
-      }> = [];
+
+      let variants: Awaited<ReturnType<typeof generateImageVariants>> = [];
       try {
-        const generated = await generateImageVariants(file);
-        variants = generated.map((v) => ({
-          preset: v.preset,
-          filename: v.filename,
-          contentType: v.contentType,
-          data: v.data,
-          width: v.width,
-          height: v.height,
-        }));
+        variants = await generateImageVariants(item.file);
       } catch {
-        // fall back to original-only upload
+        // fallback: original only
       }
-      onUpload({
-        divisionId,
-        filename: file.name,
-        contentType: file.type || "image/png",
-        data: dataUrl,
-        kind,
-        tags: parseTags(),
-        variants,
+
+      patch(item.id, { status: "uploading" });
+      const row = await uploadFn({
+        data: {
+          divisionId,
+          filename: item.file.name,
+          contentType: item.file.type || "image/png",
+          data: dataUrl,
+          kind: finalKind,
+          tags: finalTags,
+          variants: variants.map((v) => ({
+            preset: v.preset,
+            filename: v.filename,
+            contentType: v.contentType,
+            data: v.data,
+            width: v.width,
+            height: v.height,
+          })),
+        },
+      });
+
+      const shouldApprove = rule.approve ?? autoApprove;
+      if (shouldApprove && row?.id) {
+        patch(item.id, { status: "approving", rowId: row.id });
+        await approveFn({ data: { id: row.id, approved: true } });
+      }
+      patch(item.id, { status: "done", rowId: row?.id });
+    } catch (err) {
+      patch(item.id, {
+        status: "error",
+        message: err instanceof Error ? err.message : "Failed",
       });
     }
   };
+
+  const runQueue = async () => {
+    if (running) return;
+    setRunning(true);
+    const CONCURRENCY = 3;
+    // Snapshot current queued items; re-reads state each pass so late adds pick up too.
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const snapshot = await new Promise<QueueItem[]>((r) => {
+        setQueue((q) => {
+          r(q);
+          return q;
+        });
+      });
+      const pending = snapshot.filter((it) => it.status === "queued");
+      if (pending.length === 0) break;
+      const batch = pending.slice(0, CONCURRENCY);
+      await Promise.all(batch.map(uploadOne));
+    }
+    setRunning(false);
+    onDone();
+  };
+
+  const clearFinished = () =>
+    setQueue((q) => q.filter((it) => it.status !== "done" && it.status !== "error"));
+
+  const stats = useMemo(() => {
+    const s = { queued: 0, active: 0, done: 0, error: 0 };
+    for (const it of queue) {
+      if (it.status === "queued") s.queued++;
+      else if (it.status === "done") s.done++;
+      else if (it.status === "error") s.error++;
+      else s.active++;
+    }
+    return s;
+  }, [queue]);
 
   return (
     <section
@@ -389,22 +578,24 @@ function Uploader({
       onDrop={(e) => {
         e.preventDefault();
         setDragging(false);
-        if (e.dataTransfer.files.length) void handleFiles(e.dataTransfer.files);
+        if (e.dataTransfer.files.length) enqueue(e.dataTransfer.files);
       }}
       className={
-        "rounded-2xl border-2 border-dashed p-6 transition " +
+        "space-y-4 rounded-2xl border-2 border-dashed p-6 transition " +
         (dragging ? "border-[#003FC7] bg-[#003FC7]/5" : "border-black/15 bg-white")
       }
     >
       <div className="flex flex-wrap items-end gap-3">
-        <div className="flex-1">
+        <div className="flex-1 min-w-[220px]">
           <div className="flex items-center gap-2 text-sm font-semibold text-[#03002C]">
-            <UploadCloud size={16} /> Upload imagery
+            <UploadCloud size={16} /> Bulk upload imagery
           </div>
-          <p className="mt-1 text-xs text-black/55">Drop images here or click to pick. Max 20MB each.</p>
+          <p className="mt-1 text-xs text-black/55">
+            Drop or pick many images. Max 20MB each. Optionally load a CSV to tag / approve per filename.
+          </p>
         </div>
         <label className="text-xs">
-          <div className="mb-1 uppercase tracking-wider text-black/50">Kind</div>
+          <div className="mb-1 uppercase tracking-wider text-black/50">Default kind</div>
           <select
             value={kind}
             onChange={(e) => setKind(e.target.value as Kind)}
@@ -418,7 +609,7 @@ function Uploader({
           </select>
         </label>
         <label className="text-xs">
-          <div className="mb-1 uppercase tracking-wider text-black/50">Tags (comma-separated)</div>
+          <div className="mb-1 uppercase tracking-wider text-black/50">Default tags</div>
           <input
             value={tagsRaw}
             onChange={(e) => setTagsRaw(e.target.value)}
@@ -426,15 +617,73 @@ function Uploader({
             className="w-64 rounded-md border border-black/15 bg-white p-2 text-sm"
           />
         </label>
+        <label className="inline-flex items-center gap-2 text-xs text-black/70">
+          <input
+            type="checkbox"
+            checked={autoApprove}
+            onChange={(e) => setAutoApprove(e.target.checked)}
+            className="h-4 w-4 accent-[#003FC7]"
+          />
+          Auto-approve after upload
+        </label>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          disabled={isUploading}
-          className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white disabled:opacity-60"
+          className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:bg-[#003FC7]/85"
         >
-          {isUploading ? <Loader2 size={12} className="animate-spin" /> : <UploadCloud size={12} />}
-          {isUploading ? "Uploading…" : "Choose files"}
+          <UploadCloud size={12} /> Add files
         </button>
+        <button
+          type="button"
+          onClick={() => csvInputRef.current?.click()}
+          className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-2 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+        >
+          <Tag size={12} /> {csv ? `CSV: ${csv.name} (${csv.count})` : "Load tagging CSV"}
+        </button>
+        {csv ? (
+          <button
+            type="button"
+            onClick={() => setCsv(null)}
+            className="text-[11px] text-black/50 underline underline-offset-2 hover:text-black/70"
+          >
+            clear
+          </button>
+        ) : null}
+        <div className="ml-auto flex items-center gap-2 text-[11px] text-black/55">
+          <span>{stats.queued} queued</span>
+          <span>·</span>
+          <span>{stats.active} in-flight</span>
+          <span>·</span>
+          <span className="text-emerald-700">{stats.done} done</span>
+          {stats.error ? (
+            <>
+              <span>·</span>
+              <span className="text-rose-700">{stats.error} failed</span>
+            </>
+          ) : null}
+        </div>
+        <button
+          type="button"
+          onClick={() => void runQueue()}
+          disabled={running || stats.queued === 0}
+          className="inline-flex items-center gap-1.5 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white disabled:opacity-60"
+        >
+          {running ? <Loader2 size={12} className="animate-spin" /> : <UploadCloud size={12} />}
+          {running ? "Uploading…" : `Start (${stats.queued})`}
+        </button>
+        {queue.length > 0 ? (
+          <button
+            type="button"
+            onClick={clearFinished}
+            disabled={running}
+            className="rounded-full border border-black/15 bg-white px-3 py-2 text-[11px] text-black/60 hover:text-black/85 disabled:opacity-50"
+          >
+            Clear done
+          </button>
+        ) : null}
         <input
           ref={inputRef}
           type="file"
@@ -442,11 +691,78 @@ function Uploader({
           multiple
           className="hidden"
           onChange={(e) => {
-            if (e.target.files?.length) void handleFiles(e.target.files);
+            if (e.target.files?.length) enqueue(e.target.files);
             if (inputRef.current) inputRef.current.value = "";
           }}
         />
+        <input
+          ref={csvInputRef}
+          type="file"
+          accept=".csv,text/csv"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void readCsv(f);
+            if (csvInputRef.current) csvInputRef.current.value = "";
+          }}
+        />
       </div>
+
+      {csv ? (
+        <p className="text-[11px] text-black/55">
+          CSV columns supported: <code>filename</code>, <code>tags</code> (use{" "}
+          <code>|</code> to separate), <code>kind</code>, <code>approve</code>. Matched by exact
+          filename (case-insensitive). Unmatched files use the defaults above.
+        </p>
+      ) : null}
+
+      {queue.length > 0 ? (
+        <ul className="max-h-72 divide-y divide-black/5 overflow-auto rounded-xl border border-black/10 bg-white">
+          {queue.map((it) => {
+            const rule = csv?.map[normalizeName(it.file.name)];
+            return (
+              <li key={it.id} className="flex items-center gap-3 px-3 py-2 text-xs">
+                <span
+                  className={
+                    "inline-flex h-2 w-2 shrink-0 rounded-full " +
+                    (it.status === "done"
+                      ? "bg-emerald-500"
+                      : it.status === "error"
+                        ? "bg-rose-500"
+                        : it.status === "queued"
+                          ? "bg-black/20"
+                          : "bg-[#003FC7] animate-pulse")
+                  }
+                />
+                <span className="line-clamp-1 flex-1 font-medium text-[#03002C]">
+                  {it.file.name}
+                </span>
+                <span className="text-[10px] text-black/45">
+                  {(it.file.size / 1024).toFixed(0)} KB
+                </span>
+                {rule ? (
+                  <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] text-[#003FC7]">
+                    CSV
+                  </span>
+                ) : null}
+                <span className="w-24 text-right text-[10px] uppercase tracking-wider text-black/50">
+                  {it.status === "error" && it.message ? it.message : it.status}
+                </span>
+                {it.status === "queued" && !running ? (
+                  <button
+                    type="button"
+                    onClick={() => setQueue((q) => q.filter((x) => x.id !== it.id))}
+                    className="rounded-full p-1 text-black/40 hover:bg-black/5 hover:text-rose-600"
+                    aria-label="Remove from queue"
+                  >
+                    <Trash2 size={11} />
+                  </button>
+                ) : null}
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
     </section>
   );
 }
