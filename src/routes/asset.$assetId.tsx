@@ -1056,6 +1056,30 @@ function ModulesPanel({
         ))}
       </div>
 
+      {/* Trailing drop zone — accepts new-module inserts from the drawer. */}
+      <div
+        data-testid="modules-drop-zone"
+        onDragOver={(e) => {
+          if (!e.dataTransfer.types.includes(PRINT_SECTION_DND_MIME)) return;
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "copy";
+          (e.currentTarget as HTMLDivElement).classList.add("border-[#003FC7]", "bg-[#003FC7]/5", "text-[#003FC7]");
+        }}
+        onDragLeave={(e) => {
+          (e.currentTarget as HTMLDivElement).classList.remove("border-[#003FC7]", "bg-[#003FC7]/5", "text-[#003FC7]");
+        }}
+        onDrop={(e) => {
+          const inserted = readInsertPayload(e);
+          (e.currentTarget as HTMLDivElement).classList.remove("border-[#003FC7]", "bg-[#003FC7]/5", "text-[#003FC7]");
+          if (!inserted) return;
+          e.preventDefault();
+          if (!gate.ok) return;
+          insertAt(modules.length, inserted);
+        }}
+        className="mt-3 flex items-center justify-center rounded-md border border-dashed border-black/15 px-2 py-3 text-[11px] uppercase tracking-widest text-black/40 transition dark:border-white/15 dark:text-white/40"
+      >
+        Drop module here
+      </div>
     </>
   );
 }
