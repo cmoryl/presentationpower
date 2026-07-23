@@ -38,8 +38,9 @@ const ROUTES: RouteCheck[] = [
 
 async function gotoAndSettle(page: Page, path: string) {
   const response = await page.goto(path, { waitUntil: "domcontentloaded" });
-  // Give React a tick to hydrate client-side content.
+  // Allow client-side auth guards to redirect before we sample the URL.
   await page.waitForLoadState("networkidle").catch(() => {});
+  await page.waitForTimeout(500);
   return response;
 }
 
