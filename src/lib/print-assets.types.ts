@@ -36,7 +36,8 @@ export type PrintHeroMedia = {
   aspect?: PrintHeroAspect;       // "fill" uses heightPct; others letterbox to ratio
   overlayColor?: string;          // hex; falls back to division accent
   overlayOpacity?: number;        // 0..1 — accent color wash opacity, default 0.55
-  washStrength?: number;          // 0..1 — legibility scrim + feather intensity, default 1
+  washStrength?: number;          // 0..1 — feather-into-page intensity, default 1
+  scrimOpacity?: number;          // 0..1 — scrim gradient opacity; falls back to washStrength
   scrim?: "top" | "bottom" | "both" | "radial" | "none";
   blendMode?: "normal" | "multiply" | "overlay" | "soft-light" | "screen";
   heightPct?: number;             // share of page height, default 46 (used when aspect="fill")

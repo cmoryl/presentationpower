@@ -16,7 +16,8 @@ export type PrintHeroMedia = {
   aspect?: PrintHeroAspect;      // band shape; "fill" uses heightPct, others letterbox to ratio
   overlayColor?: string;         // hex; defaults to page accent supplied by layout
   overlayOpacity?: number;       // 0..1, default 0.55 — accent wash strength
-  washStrength?: number;         // 0..1, default 1 — legibility scrim + feather multiplier
+  washStrength?: number;         // 0..1, default 1 — feather-into-page intensity
+  scrimOpacity?: number;         // 0..1 — scrim gradient opacity; falls back to washStrength
   scrim?: PrintHeroScrim;        // legibility gradient, default "bottom"
   blendMode?: CSSProperties["mixBlendMode"]; // default "multiply"
   heightPct?: number;            // 0..100, share of page height, default 46 (used when aspect="fill")
@@ -42,6 +43,7 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
   const overlayColor = media.overlayColor ?? accent;
   const overlayOpacity = clamp01(media.overlayOpacity ?? 0.55);
   const washStrength = clamp01(media.washStrength ?? 1);
+  const scrimOpacity = clamp01(media.scrimOpacity ?? media.washStrength ?? 1);
   const scrim = media.scrim ?? "bottom";
   const blendMode = media.blendMode ?? "multiply";
   const heightPct = media.heightPct ?? 46;
@@ -106,13 +108,13 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
         }}
       />
       {/* Legibility scrim into the body background — scaled by washStrength */}
-      {scrim !== "none" && washStrength > 0 && (
+      {scrim !== "none" && scrimOpacity > 0 && (
         <div
           style={{
             position: "absolute",
             inset: 0,
             background: scrimGradient,
-            opacity: washStrength,
+            opacity: scrimOpacity,
           }}
         />
       )}
