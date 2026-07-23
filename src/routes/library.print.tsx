@@ -438,18 +438,21 @@ function TemplateCard({
   );
 }
 
-// A scaled-down live Spotlight render. Uses container-relative units already,
-// so we can just wrap it in a full-width container and it fills the thumb.
-function ThumbSpotlight({ brand }: { brand: BrandMode }) {
+// Dispatch a scaled-down live layout for the given kind. Uses container-relative
+// units, so a full-width wrapper fills the thumbnail.
+function ThumbLive({ kind, brand }: { kind: PrintAssetKind; brand: BrandMode }) {
   return (
     <div className="pointer-events-none absolute inset-0">
-      <SpotlightLayout
-        content={SPOTLIGHT_SEED}
-        brand={brand}
-        mode="light"
-        pageSize="Letter"
-        density="standard"
-      />
+      {kind === "spotlight" && (
+        <SpotlightLayout content={SPOTLIGHT_SEED} brand={brand} mode="light" pageSize="Letter" density="standard" />
+      )}
+      {kind === "ebrochure" && (
+        <EBrochureLayout content={EBROCHURE_SEED} brand={brand} mode="light" pageSize="Letter" density="standard" />
+      )}
+      {kind === "adaptor-brief" && (
+        <AdaptorBriefLayout content={ADAPTOR_SEED} brand={brand} mode="dark" pageSize="Letter" density="standard" />
+      )}
+      {kind === "case-study" && <ThumbPlaceholder brand={brand} kind="case-study" />}
     </div>
   );
 }
