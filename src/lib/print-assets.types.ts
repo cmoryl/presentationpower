@@ -127,7 +127,9 @@ export type EBrochureContent = {
   quote?: { text: string; author: string; role?: string; company?: string };
   discover?: { body: string; bullets: string[] }; // right-hand "Discover" panel
   cta?: { label: string; url?: string; subhead?: string };
+  heroMedia?: PrintHeroMedia;
 };
+
 
 // ---------------------------------------------------------------------------
 // ADAPTOR / APPLICATION BRIEF — single-page portrait brief with a dark
