@@ -455,8 +455,8 @@ export async function exportSlideAsPng(
  */
 export async function exportSlidesAsImagePdf(
   nodes: Array<{ node: HTMLElement; mode: SlideExportMode }>,
-  opts: { filename?: string; pixelRatio?: number; onProgress?: ExportProgressCallback } = {},
-): Promise<void> {
+  opts: { filename?: string; pixelRatio?: number; onProgress?: ExportProgressCallback; returnBlob?: boolean } = {},
+): Promise<Blob | void> {
   if (nodes.length === 0) return;
   const pdf = new jsPDF({
     orientation: "landscape",
@@ -483,6 +483,11 @@ export async function exportSlidesAsImagePdf(
   }
   report(opts.onProgress, { stage: "encode", progress: 1, message: "Assembling PDF…" });
   const filename = opts.filename ?? `slides-${Date.now()}.pdf`;
+  if (opts.returnBlob) {
+    const blob = pdf.output("blob");
+    report(opts.onProgress, { stage: "done", progress: 1, message: "Ready" });
+    return blob;
+  }
   pdf.save(filename);
   report(opts.onProgress, { stage: "done", progress: 1, message: "Saved" });
 }
