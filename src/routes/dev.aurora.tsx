@@ -45,19 +45,19 @@ const SAMPLE_CONTENT: Record<string, Record<string, unknown>> = {
     presenter: "TransPerfect · Enterprise",
     date: "2026",
   },
-  "MV-TEXT-TWO-COL": {
-    title: "Why this approach works",
-    left: {
-      heading: "The challenge",
-      body:
-        "Content operations were fragmented across 42 markets, each with its own vendor, tooling, and QA cycle. The cost of coordination outweighed the cost of translation itself, and every product launch pushed against a wall of unresolved regional variants.",
-    },
-    right: {
-      heading: "The response",
-      body:
-        "We consolidated onto a single content stack, moved review into an in-context editor for every language, and instrumented every step so leadership could see where a launch actually was — not where the last status meeting said it was. Within a quarter, the fragmentation problem was gone.",
-    },
+  "MV-ED-QUOTE-BLEED": {
+    quote: "The moment we stopped translating decks and started translating the story, our sales cycles in EMEA collapsed by a quarter. That is what unification actually looks like from the inside.",
+    attribution: { name: "Amelia Ortega", role: "VP, Global Marketing", org: "Northwind" },
   },
+  "MV-CTX-CARDS-3": {
+    title: "What's actually broken",
+    items: [
+      { heading: "Vendor sprawl", body: "Each region negotiated its own tools, its own QA, and its own definition of done. Every launch paid the coordination tax twice." },
+      { heading: "Invisible pipeline", body: "Leadership had no live view of where a launch was. Status meetings were the only signal, and the signal was always a week stale." },
+      { heading: "Silent quality drift", body: "Quality scores looked fine in aggregate — but drifted sharply in specific markets where no one owned the review loop end-to-end." },
+    ],
+  },
+
   "MV-CASE-STORY": {
     kicker: "Case study",
     title: "A single content stack, 42 markets",
