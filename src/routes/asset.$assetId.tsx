@@ -35,6 +35,7 @@ import type { SpotlightContent, EBrochureContent, AdaptorBriefContent } from "@/
 import { PRINT_STATS_VARIANTS, PrintSectionRenderer } from "@/components/print/sections/PrintSectionRenderer";
 import { PrintSectionPicker } from "@/components/print/sections/PrintSectionPicker";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
+import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
 import { analyzePrintAsset, canAddModule } from "@/lib/print-capacity";
