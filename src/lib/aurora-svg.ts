@@ -79,12 +79,19 @@ export function auroraOrbs(
   seed: string,
   brand: BrandMode,
   mode: "dark" | "light" = "dark",
+  aspect?: { w: number; h: number },
 ): AuroraOrbSpec[] {
   // FREE-FORM AURORA v2 — deterministic hash → 3 huge accent blooms
   // anchored to edges/corners of the frame, mostly overhanging the crop
-  // so only the soft-focus falloff bleeds in (matches user reference
-  // backdrops 1.png..10.png). Radii are large enough to be firmly
-  // out-of-focus at 1280×720.
+  // so only the soft-focus falloff bleeds in.
+  //
+  // Aspect re-projection: anchors + jitter + orb radii are authored in the
+  // native 1280×720 landscape space. When a caller passes a non-default
+  // `aspect`, we scale coords by (sx=w/1280, sy=h/720) so a portrait or
+  // square frame gets a proportional edge-overhang layout instead of a
+  // cropped slice of a landscape composition. When `aspect` is omitted or
+  // matches the native landscape frame, sx=sy=1 → every returned number is
+  // byte-identical to the pre-aspect implementation.
   let h = 2166136261;
   for (let i = 0; i < seed.length; i++) {
     h ^= seed.charCodeAt(i);
@@ -108,10 +115,14 @@ export function auroraOrbs(
       : [lightPrimary, brand.tokens.accent, sibling];
   const alphaBase = mode === "dark" ? 0.82 : 0.55;
   const alphaRange = mode === "dark" ? 0.15 : 0.15;
-  // Anchor palette: 8 positions clinging to the frame edges/corners so orbs
-  // read as "peeking in from off-screen" rather than floating in the middle.
-  // Values are in the 1280×720 export viewbox; renderer preserves them.
-  const anchors = [
+
+  const useAspect =
+    aspect &&
+    (aspect.w !== AURORA_NATIVE_ASPECT.w || aspect.h !== AURORA_NATIVE_ASPECT.h);
+  const sx = useAspect ? aspect!.w / AURORA_NATIVE_ASPECT.w : 1;
+  const sy = useAspect ? aspect!.h / AURORA_NATIVE_ASPECT.h : 1;
+
+  const nativeAnchors = [
     { x: -80, y: -60 },    // top-left overhang
     { x: 640, y: -140 },   // top center overhang
     { x: 1360, y: -60 },   // top-right overhang
@@ -121,7 +132,9 @@ export function auroraOrbs(
     { x: 640, y: 860 },    // bottom center overhang
     { x: 1340, y: 780 },   // bottom-right overhang
   ];
-  // Pick 3 distinct anchors deterministically.
+  const anchors = useAspect
+    ? nativeAnchors.map((a) => ({ x: a.x * sx, y: a.y * sy }))
+    : nativeAnchors;
   const chosen: number[] = [];
   while (chosen.length < 3) {
     const idx = Math.floor(rand() * anchors.length);
@@ -129,10 +142,10 @@ export function auroraOrbs(
   }
   return chosen.map((idx, i) => {
     const a = anchors[idx]!;
-    const jitterX = (rand() - 0.5) * 160;
-    const jitterY = (rand() - 0.5) * 120;
-    const rx = 540 + rand() * 320; // 540..860
-    const ry = 460 + rand() * 280; // 460..740
+    const jitterX = (rand() - 0.5) * 160 * sx;
+    const jitterY = (rand() - 0.5) * 120 * sy;
+    const rx = (540 + rand() * 320) * sx; // native 540..860
+    const ry = (460 + rand() * 280) * sy; // native 460..740
     return {
       color: palette[i] ?? brand.tokens.accent,
       x: a.x + jitterX,
