@@ -823,15 +823,17 @@ function HeroMediaPanel({
         onChange={(v) => patch({ washStrength: v })}
         display={`${Math.round(washStrength * 100)}%`}
       />
-      <Slider
-        label="Band height"
-        value={heightPct}
-        min={20}
-        max={80}
-        step={1}
-        onChange={(v) => patch({ heightPct: v })}
-        display={`${Math.round(heightPct)}%`}
-      />
+      {aspect === "fill" && (
+        <Slider
+          label="Band height"
+          value={heightPct}
+          min={20}
+          max={80}
+          step={1}
+          onChange={(v) => patch({ heightPct: v })}
+          display={`${Math.round(heightPct)}%`}
+        />
+      )}
       <Row label="Scrim">
         <select
           className={inspectorInput}
