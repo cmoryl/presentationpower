@@ -4143,32 +4143,101 @@ function renderVariantBody({
 
 
     case "MV-DASH-PERFORMANCE": {
+      // Free-form Aurora v2 rebuild. Bars sit directly on the aurora — no
+      // panel, no axis cage, no gridlines. Feathered accent gradient fill
+      // (matches FreeformAreaChart bloom), soft glow + halo on the highlight
+      // bar, legend as inline swatch pills on a shared hairline.
       const bars = arr(c.bars).map((b) => ({ label: s(b.label), value: Number(b.value) || 0 }));
       const highlight = s(c.highlight);
       const stat = obj(c.stat);
       const legend = arr(c.legend);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-16 grid gap-16" style={{ gridTemplateColumns: "1.2fr 1fr" }}>
-            <div>
-              <BarChart brand={brand} bars={bars} height={520} highlight={highlight} />
-            </div>
-            <div className="flex flex-col justify-center">
-              <StatFigure brand={brand} value={s(stat.value)} unit={s(stat.unit)} label={s(stat.label)} size="xl" />
-              <div className="mt-12">
-                {legend.map((l, i) => (
-                  <div key={i} className="flex items-center justify-between py-4" style={{ borderTop: i === 0 ? `1px solid ${ink.hairline}` : "none", borderBottom: `1px solid ${ink.hairline}` }}>
-                    <div className="flex items-center gap-4">
-                      <div style={{ width: 14, height: 14, background: i === 0 ? brand.tokens.accent : brand.tokens.primary, opacity: i === 0 ? 1 : Math.max(0.4, 1 - i * 0.2) }} />
-                      <div style={{ fontSize: 22, color: ink.strong, fontWeight: 600 }}>{s(l.label)}</div>
-                    </div>
-                    <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 600, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>{s(l.value)}</div>
-                  </div>
-                ))}
+          <div className="flex items-start justify-between gap-16">
+            <div style={{ maxWidth: 780 }}>
+              <Kicker brand={brand}>{s(c.kicker, "Performance")}</Kicker>
+              <div
+                className="mt-4"
+                style={{ fontSize: 60, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+              >
+                {s(c.title, variant.name)}
               </div>
+              {s(c.headline) && (
+                <div
+                  className="mt-5"
+                  style={{ fontSize: 22, color: ink.muted, letterSpacing: "-0.005em", lineHeight: 1.45, maxWidth: 680 }}
+                >
+                  {s(c.headline)}
+                </div>
+              )}
             </div>
+            {s(stat.value) && (
+              <div className="flex flex-col items-end text-right" style={{ minWidth: 220 }}>
+                <div className="flex items-baseline gap-2">
+                  <span
+                    className="tabular-nums font-semibold"
+                    style={{ fontSize: 104, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}
+                  >
+                    {s(stat.value)}
+                  </span>
+                  {s(stat.unit) && (
+                    <span
+                      className="font-medium"
+                      style={{ fontSize: 36, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}
+                    >
+                      {s(stat.unit)}
+                    </span>
+                  )}
+                </div>
+                {s(stat.label) && (
+                  <div
+                    className="mt-3 uppercase"
+                    style={{ fontSize: 13, letterSpacing: "0.3em", color: ink.muted, fontWeight: 600, maxWidth: 260 }}
+                  >
+                    {s(stat.label)}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
+          <div className="mt-12">
+            <FreeformBarChart brand={brand} bars={bars} height={520} highlight={highlight} />
+          </div>
+          {legend.length > 0 && (
+            <div className="mt-8 flex flex-wrap items-center gap-x-10 gap-y-3">
+              {legend.map((l, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <span
+                    aria-hidden
+                    style={{
+                      width: 12,
+                      height: 12,
+                      borderRadius: 999,
+                      background:
+                        i === 0
+                          ? "var(--slide-accent-text)"
+                          : `color-mix(in oklab, var(--slide-accent-text) ${Math.max(20, 55 - i * 12)}%, transparent)`,
+                      boxShadow:
+                        i === 0
+                          ? "0 0 12px 2px color-mix(in oklab, var(--slide-accent-text) 55%, transparent)"
+                          : "none",
+                    }}
+                  />
+                  <span style={{ fontSize: 18, color: ink.strong, fontWeight: 600, letterSpacing: "-0.005em" }}>
+                    {s(l.label)}
+                  </span>
+                  {s(l.value) && (
+                    <span
+                      className="tabular-nums"
+                      style={{ fontSize: 18, color: ink.faint, fontWeight: 500, letterSpacing: "-0.005em" }}
+                    >
+                      {s(l.value)}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </SlideFrame>
       );
     }
