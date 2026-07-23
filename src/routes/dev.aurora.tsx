@@ -103,7 +103,7 @@ function AuroraDevPreview() {
       data-preview-mode={mode}
       style={{ width: 1920, height: 1080, position: "relative", overflow: "hidden" }}
     >
-      <ScaledSlide width={1920} height={1080}>
+      <ScaledSlide>
         <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={1} mode={mode} />
       </ScaledSlide>
     </div>
