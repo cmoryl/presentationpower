@@ -177,3 +177,52 @@ export function emptySpotlight(seed?: Partial<SpotlightContent>): SpotlightConte
     cta: seed?.cta ?? { label: "Talk to us" },
   };
 }
+
+export function emptyEBrochure(seed?: Partial<EBrochureContent>): EBrochureContent {
+  return {
+    eyebrow: seed?.eyebrow ?? "eBrochure",
+    title: seed?.title ?? "",
+    summary: seed?.summary ?? "",
+    sections: seed?.sections ?? [
+      { heading: "The challenge", body: "", bullets: [] },
+      { heading: "Our approach", body: "", bullets: [] },
+      { heading: "The impact", body: "", bullets: [] },
+    ],
+    stats: seed?.stats ?? [
+      { label: "Proof point", value: "0", unit: "" },
+      { label: "Proof point", value: "0", unit: "" },
+      { label: "Proof point", value: "0", unit: "" },
+    ],
+    quote: seed?.quote,
+    discover: seed?.discover ?? {
+      body: "Discover how we can help your organization streamline operations and deliver measurable results across every market.",
+      bullets: ["Trusted global partner", "Deep division expertise", "Hands-on, human collaboration"],
+    },
+    cta: seed?.cta ?? { label: "See it in action" },
+  };
+}
+
+export function emptyAdaptorBrief(seed?: Partial<AdaptorBriefContent>): AdaptorBriefContent {
+  return {
+    eyebrow: seed?.eyebrow ?? "Adaptor brief",
+    title: seed?.title ?? "",
+    summary: seed?.summary ?? "",
+    features: seed?.features ?? [
+      { verb: "Supports", body: "" },
+      { verb: "Adapts", body: "" },
+      { verb: "Enables", body: "" },
+      { verb: "Automates", body: "" },
+      { verb: "Triggers", body: "" },
+      { verb: "Learns", body: "" },
+    ],
+    knowHow: seed?.knowHow ?? [
+      "Supports 600+ global enterprises",
+      "Enables workflows with AI and human oversight",
+      "Combines in-house teams and external vendors",
+      "Integrates with 100+ platforms seamlessly",
+      "Reduces costs and accelerates time-to-market",
+    ],
+    quote: seed?.quote,
+    cta: seed?.cta ?? { label: "Talk to an expert" },
+  };
+}
