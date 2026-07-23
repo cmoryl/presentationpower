@@ -217,7 +217,7 @@ export function EBrochureLayout({
                 {stats.map((s, i) => (
                   <div key={i}>
                     <div className="flex items-center justify-center" style={{ gap: cq(6) }}>
-                      <Icon d={[ICONS.globe, ICONS.trending, ICONS.star, ICONS.bolt, ICONS.target][i % 5]!} size={cq(15)} color={accentInk} />
+                      <Icon d={[ICONS["globe-alt"], ICONS.trending, ICONS.star, ICONS.bolt, ICONS.target][i % 5]!} size={cq(15)} color={accentInk} />
                       <span style={{ fontWeight: 700, fontSize: cq(19), color: accentInk, letterSpacing: "-0.02em" }}>
                         {s.value}{s.unit ?? ""}
                       </span>
