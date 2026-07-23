@@ -16,6 +16,7 @@ const searchSchema = z.object({
   prospect: z.string().optional(),
   industry: z.string().optional(),
   brandModeId: z.string().optional(),
+  kind: z.enum(["case-study", "spotlight", "ebrochure", "adaptor-brief"]).optional(),
 });
 
 export const Route = createFileRoute("/asset/new")({
