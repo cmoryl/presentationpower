@@ -19,27 +19,23 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/atlas", label: "Atlas" },
     { to: "/templates", label: "Templates" },
     { to: "/library", label: "Library" },
-    { to: "/analytics", label: "Analytics" },
     { to: "/admin", label: "Admin" },
   ] as const;
-  const adminSubnav = [
+  const adminSubnav: ReadonlyArray<{ to: string; label: string }> = [
     { to: "/admin", label: "Overview" },
-    { to: "/admin/imagery-analytics", label: "Imagery" },
-    { to: "/admin/users", label: "Users" },
-    { to: "/admin/approvals", label: "Knowledgebase" },
-    { to: "/admin/oracle", label: "Oracle KB" },
+    { to: "/admin/analytics", label: "Analytics" },
+    { to: "/admin/knowledge-hub", label: "Knowledge" },
     { to: "/admin/brand-assets", label: "Brand assets" },
     { to: "/admin/logohub", label: "LogoHub" },
     { to: "/admin/icon-studio", label: "Icon Studio" },
     { to: "/admin/translation", label: "Translation" },
-    { to: "/admin/globallink", label: "GlobalLink" },
-  ] as const;
+    { to: "/admin/users", label: "Users & roles" },
+  ];
   const footerNav = [
-    { to: "/knowledge", label: "Knowledge" },
-    { to: "/knowledge/ask", label: "Ask Oracle" },
     { to: "/about", label: "About" },
     { to: "/faq", label: "FAQ" },
   ] as const;
+
 
   // Sleek liquid-glass pills — hairline rings, gradient wash on active, no drop-shadow stacks.
   const pillIdle =
