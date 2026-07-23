@@ -128,15 +128,7 @@ export function BrandLockup({
   const wordmarkHeight = dims.wordmarkPx;
   const officialImageHeight = Math.round(dims.wordmarkPx * (innerOrientation === "stacked" ? 3.2 : 1.9));
 
-  const wrapperStyle: React.CSSProperties = isVertical
-    ? {
-        // Rotate around the container's center; parent positions the anchor.
-        transform: orientation === "vertical-left" ? "rotate(-90deg)" : "rotate(90deg)",
-        transformOrigin: "center center",
-        display: "inline-flex",
-        whiteSpace: "nowrap",
-      }
-    : {};
+  const wrapperStyle: React.CSSProperties = {};
 
   return (
     <div style={wrapperStyle}>
