@@ -277,6 +277,125 @@ export type Database = {
         }
         Relationships: []
       }
+      approved_print_suggestions: {
+        Row: {
+          asset_id: string
+          created_at: string
+          id: string
+          note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          suggested_by: string
+          updated_at: string
+        }
+        Insert: {
+          asset_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          suggested_by: string
+          updated_at?: string
+        }
+        Update: {
+          asset_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          suggested_by?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approved_print_suggestions_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "print_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      approved_print_variants: {
+        Row: {
+          content: Json
+          context: Json
+          created_at: string
+          description: string | null
+          division_id: string | null
+          download_count: number
+          duplicate_count: number
+          id: string
+          order_index: number
+          published_at: string | null
+          published_by: string | null
+          source_asset_id: string | null
+          status: string
+          template_kind: string
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: Json
+          context?: Json
+          created_at?: string
+          description?: string | null
+          division_id?: string | null
+          download_count?: number
+          duplicate_count?: number
+          id?: string
+          order_index?: number
+          published_at?: string | null
+          published_by?: string | null
+          source_asset_id?: string | null
+          status?: string
+          template_kind: string
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: Json
+          context?: Json
+          created_at?: string
+          description?: string | null
+          division_id?: string | null
+          download_count?: number
+          duplicate_count?: number
+          id?: string
+          order_index?: number
+          published_at?: string | null
+          published_by?: string | null
+          source_asset_id?: string | null
+          status?: string
+          template_kind?: string
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approved_print_variants_division_id_fkey"
+            columns: ["division_id"]
+            isOneToOne: false
+            referencedRelation: "brand_modes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "approved_print_variants_source_asset_id_fkey"
+            columns: ["source_asset_id"]
+            isOneToOne: false
+            referencedRelation: "print_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       brand_asset_chunks: {
         Row: {
           asset_id: string
