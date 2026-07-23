@@ -980,6 +980,7 @@ function ModulesPanel({
   // reorder vs. new-module inserts.
   const [dropIdx, setDropIdx] = useState<number | null>(null);
   const [dropKind, setDropKind] = useState<"insert" | "reorder" | null>(null);
+  const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
 
   // Parse a dragged section payload from the drawer. Returns null for
   // reorder drags (which carry a numeric text/plain index instead).
@@ -1067,12 +1068,22 @@ function ModulesPanel({
             <div
               draggable
               onDragStart={(e) => {
+                // Only start a reorder when the drag originates from the
+                // header/grip — inputs and buttons inside the card must
+                // stay interactive without accidentally lifting the card.
+                const src = e.target as HTMLElement | null;
+                if (!src?.closest("[data-drag-handle]")) {
+                  e.preventDefault();
+                  return;
+                }
                 e.dataTransfer.effectAllowed = "move";
                 e.dataTransfer.setData("text/plain", String(i));
+                setDraggingIdx(i);
               }}
               onDragEnd={() => {
                 setDropIdx(null);
                 setDropKind(null);
+                setDraggingIdx(null);
               }}
               onDragOver={(e) => {
                 e.preventDefault();
@@ -1086,6 +1097,7 @@ function ModulesPanel({
                 const targetIdx = computeInsertIndex(e, i);
                 setDropIdx(null);
                 setDropKind(null);
+                setDraggingIdx(null);
                 // New-module insert from drawer takes priority.
                 const inserted = readInsertPayload(e);
                 if (inserted) {
@@ -1104,13 +1116,23 @@ function ModulesPanel({
                 next.splice(to, 0, moved);
                 onChange(next);
               }}
-              className="rounded-md border border-black/10 p-2 transition dark:border-white/10"
+              className={
+                "rounded-md border p-2 transition " +
+                (draggingIdx === i
+                  ? "border-[#003FC7]/60 bg-[#003FC7]/[0.04] opacity-50 shadow-sm dark:border-[#003FC7]/60"
+                  : "border-black/10 dark:border-white/10")
+              }
             >
-              <div className="flex items-center justify-between">
+              <div
+                data-drag-handle
+                className="flex cursor-grab items-center justify-between active:cursor-grabbing"
+                title="Drag to reorder"
+              >
                 <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
-                  <GripVertical size={14} className="cursor-grab text-black/40 dark:text-white/40" aria-hidden />
+                  <GripVertical size={14} className="text-black/40 dark:text-white/40" aria-hidden />
                   {m.kind === "stats" ? "Stats" : "Module"}
                 </div>
+
                 <div className="flex items-center gap-1">
                   <button className="rounded p-1 text-black/50 hover:bg-black/5" onClick={() => move(i, -1)} aria-label="Move up"><ArrowUp size={14} /></button>
                   <button className="rounded p-1 text-black/50 hover:bg-black/5" onClick={() => move(i, 1)} aria-label="Move down"><ArrowDown size={14} /></button>
