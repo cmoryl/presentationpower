@@ -652,3 +652,125 @@ function PreviewFrame({ label, children }: { label: string; children: React.Reac
     </div>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Admin-approved shelf — division-scoped, filtered client-side per template
+// ---------------------------------------------------------------------------
+function ApprovedShelf({ brand }: { brand: BrandMode }) {
+  const listFn = useServerFn(listApprovedPrintVariants);
+  const dupFn = useServerFn(duplicateApprovedPrintVariant);
+  const dlFn = useServerFn(recordApprovedVariantDownload);
+  const q = useQuery({
+    queryKey: ["approved-print-variants", brand.id],
+    queryFn: () => listFn({ data: { divisionId: brand.id } }),
+    staleTime: 30_000,
+  });
+
+  const rows = q.data ?? [];
+  if (q.isLoading) return null;
+  if (rows.length === 0) return null;
+
+  const byKind = new Map<PrintAssetKind, ApprovedPrintVariant[]>();
+  for (const r of rows) {
+    const k = r.template_kind as PrintAssetKind;
+    const arr = byKind.get(k) ?? [];
+    arr.push(r);
+    byKind.set(k, arr);
+  }
+
+  const onDuplicate = async (v: ApprovedPrintVariant) => {
+    try {
+      const row = await dupFn({ data: { id: v.id } });
+      toast.success("Duplicated into your drafts");
+      window.location.assign(`/asset/${(row as { id: string }).id}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Duplicate failed");
+    }
+  };
+
+  const onDownload = async (v: ApprovedPrintVariant) => {
+    try {
+      await dlFn({ data: { id: v.id } });
+    } catch { /* silent */ }
+    if (v.thumbnail_url) window.open(v.thumbnail_url, "_blank");
+    else toast.info("No downloadable file attached — open the variant to export.");
+  };
+
+  return (
+    <section className="mt-14">
+      <div className="mb-4 flex items-end justify-between gap-4">
+        <div>
+          <div className="text-xs uppercase tracking-[0.24em] text-black/50">Approved by {brand.name}</div>
+          <h2 className="mt-1 text-xl font-semibold text-[#03002C]">Curated variants ready to use.</h2>
+        </div>
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7]/10 px-3 py-1 text-[11px] font-medium text-[#003FC7]">
+          <Sparkle size={11} /> Admin-approved
+        </div>
+      </div>
+
+      <div className="space-y-8">
+        {Array.from(byKind.entries()).map(([kind, list]) => {
+          const tpl = TEMPLATES.find((t) => t.id === kind);
+          return (
+            <div key={kind}>
+              <div className="mb-3 flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-black/50">
+                {tpl?.icon} {tpl?.label ?? kind}
+                <span className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] normal-case tracking-normal text-black/60">
+                  {list.length}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {list.map((v) => (
+                  <div
+                    key={v.id}
+                    className="group flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white transition hover:border-[#003FC7]/50 hover:shadow-md"
+                  >
+                    <div
+                      className="relative aspect-[8.5/11] w-full overflow-hidden bg-[#0b0a2a]"
+                      style={
+                        v.thumbnail_url
+                          ? { backgroundImage: `url(${v.thumbnail_url})`, backgroundSize: "cover", backgroundPosition: "center" }
+                          : {
+                              background:
+                                `radial-gradient(circle at 20% 15%, ${brand.tokens.accent}88 0%, transparent 45%),` +
+                                `radial-gradient(circle at 85% 80%, ${brand.tokens.accent}55 0%, transparent 55%),` +
+                                `linear-gradient(135deg, ${brand.tokens.primary} 0%, #0b0a2a 100%)`,
+                            }
+                      }
+                    >
+                      <div className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/85 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#03002C]">
+                        <Sparkle size={10} /> Approved
+                      </div>
+                    </div>
+                    <div className="flex flex-1 flex-col p-4">
+                      <div className="line-clamp-2 text-sm font-medium text-[#03002C]">{v.title}</div>
+                      {v.description ? (
+                        <div className="mt-1 line-clamp-2 text-[11px] text-black/55">{v.description}</div>
+                      ) : null}
+                      <div className="mt-auto flex items-center justify-between gap-2 pt-4">
+                        <button
+                          type="button"
+                          onClick={() => onDuplicate(v)}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
+                        >
+                          <Copy size={11} /> Use as draft
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onDownload(v)}
+                          className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1.5 text-xs text-black/60 hover:border-[#003FC7] hover:text-[#003FC7]"
+                        >
+                          <Download size={11} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
