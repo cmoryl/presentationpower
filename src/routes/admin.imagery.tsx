@@ -13,7 +13,8 @@ import {
   approveDivisionImagery,
   type DivisionImageryEntry,
 } from "@/lib/division-imagery.functions";
-import { UploadCloud, Trash2, CheckCircle2, Circle, Tag, Loader2, Star, Layers } from "lucide-react";
+import { getDivisionImageryStats } from "@/lib/admin.functions";
+import { UploadCloud, Trash2, CheckCircle2, Circle, Tag, Loader2, Star, Layers, BarChart3 } from "lucide-react";
 import { generateImageVariants } from "@/lib/image-variants";
 
 const TEMPLATE_KINDS = ["spotlight", "ebrochure", "case-study", "adaptor-brief"] as const;
