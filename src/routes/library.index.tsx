@@ -1444,17 +1444,59 @@ function ModalABPreview({
 
 
   const [zoom, setZoom] = useState<null | "light" | "dark">(null);
+  const [imageBusy, setImageBusy] = useState<null | `${"png" | "pdf"}-${"light" | "dark"}`>(null);
+
+  const runImageExport = async (m: "light" | "dark", kind: "png" | "pdf") => {
+    const node = (m === "dark" ? darkRef.current : lightRef.current);
+    if (!node) return;
+    setImageBusy(`${kind}-${m}`);
+    try {
+      const base = `${variant.id}-${brand.id}-${m}`;
+      const mod = await import("@/lib/slide-image-export");
+      if (kind === "png") {
+        await mod.exportSlideAsPng(node, { mode: m, filename: `${base}.png` });
+      } else {
+        await mod.exportSlidesAsImagePdf([{ node, mode: m }], { filename: `${base}.pdf` });
+      }
+    } catch (err) {
+      console.error("[library] image export failed", err);
+      alert("Image export failed. See console for details.");
+    } finally {
+      setImageBusy(null);
+    }
+  };
 
   return (
     <>
     <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
       {(["light", "dark"] as const).map((m) => (
         <div key={m} className="relative">
-          <div className="mb-1.5 flex items-center justify-between">
+          <div className="mb-1.5 flex items-center justify-between gap-2">
             <span className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
               {m === "light" ? "☀︎ A · Light" : "☾ B · Dark"}
             </span>
-            <span className="text-[10px] text-black/40">Click to zoom</span>
+            <div className="flex items-center gap-1.5 text-[10px]">
+              <button
+                type="button"
+                onClick={() => runImageExport(m, "png")}
+                disabled={imageBusy !== null}
+                className="rounded-full border border-black/15 bg-white px-2 py-0.5 font-medium uppercase tracking-widest text-black/60 hover:border-[#003FC7]/50 hover:text-[#003FC7] disabled:opacity-50"
+                title={`Export exact ${m} preview as high-res PNG (pixel-perfect, not editable)`}
+              >
+                {imageBusy === `png-${m}` ? "…" : "PNG"}
+              </button>
+              <button
+                type="button"
+                onClick={() => runImageExport(m, "pdf")}
+                disabled={imageBusy !== null}
+                className="rounded-full border border-black/15 bg-white px-2 py-0.5 font-medium uppercase tracking-widest text-black/60 hover:border-[#003FC7]/50 hover:text-[#003FC7] disabled:opacity-50"
+                title={`Export exact ${m} preview as image PDF (16:9, review copy — not editable)`}
+              >
+                {imageBusy === `pdf-${m}` ? "…" : "PDF"}
+              </button>
+              <span className="text-black/30">·</span>
+              <span className="text-black/40">Click to zoom</span>
+            </div>
           </div>
           <button
             type="button"
