@@ -184,9 +184,11 @@ export function CaseStudyLayout({
               />
             </div>
           )}
-          {content.heroMedia && (
+          {content.heroMedia ? (
             <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
-          )}
+          ) : mode === "light" ? (
+            <PrintHeroAura brand={brand} mode="light" accent={accent} primary={primary} seed={seed ?? `casestudy-${brand.id}-${mode}`} aspect={auroraAspect(pageSize)} cq={cq} />
+          ) : null}
 
 
           {/* HERO — no full-color band; background inherits page bg (white / offset black).
