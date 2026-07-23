@@ -23,7 +23,13 @@ export type PrintHeroMedia = {
   autoScrimThreshold?: number;   // 0..1 luminance above which the boost kicks in (default 0.6)
   blendMode?: CSSProperties["mixBlendMode"]; // default "multiply"
   heightPct?: number;            // 0..100, share of page height, default 46 (used when aspect="fill")
+  // Responsive safe-area guards. Focal point is clamped so the subject can't
+  // slide out of the crop as the band re-flows across breakpoints, and the
+  // legibility scrim reserves this strip for hero copy.
+  safeAreaX?: number;            // 0..40 — horizontal safe inset %, default 8
+  safeAreaY?: number;            // 0..40 — vertical safe inset %, default 10
 };
+
 
 const ASPECT_RATIOS: Record<Exclude<PrintHeroAspect, "fill">, number> = {
   "21:9": 21 / 9,
