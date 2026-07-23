@@ -6,28 +6,37 @@
 
 import type { BrandMode } from "@/lib/taxonomy";
 
+/** Native landscape aurora frame in the shared 1280×720 viewbox. */
+export const AURORA_NATIVE_ASPECT = { w: 1280, h: 720 } as const;
+
 export function auroraSvgDataUrl(
   seed: string,
   brand: BrandMode,
   mode: "dark" | "light" = "dark",
   baseTint?: string,
+  aspect?: { w: number; h: number },
 ): string {
   const base = baseTint ?? (mode === "dark" ? "#03002C" : brand.tokens.surface ?? "#FFFFFF");
-  const orbs = auroraOrbs(seed, brand, mode);
-  // Mirror AuroraLayer's on-screen opacities so every division's exported
-  // slide reads at the same intensity as the live editor preview.
+  const orbs = auroraOrbs(seed, brand, mode, aspect);
   const layerOpacity = auroraLayerOpacity(mode);
-  // FREE-FORM AURORA v2 — 2026-07 rebuild.
-  // Reference: user-uploaded plain backdrops (1.png..10.png) showing deep
-  // navy with large, out-of-focus accent blooms bleeding in from
-  // edges/corners. No frosted-glass film. No edge vignette. The orbs ARE
-  // the atmosphere; content sits free-form directly on top.
   const orbR = mode === "dark" ? "90%" : "95%";
   const midStop = mode === "dark" ? "38%" : "42%";
   const outerStop = mode === "dark" ? "78%" : "80%";
   const blurStd = mode === "dark" ? 55 : 80;
+  const vw = aspect?.w ?? AURORA_NATIVE_ASPECT.w;
+  const vh = aspect?.h ?? AURORA_NATIVE_ASPECT.h;
+  // Preserve pixel dimensions for the native 1280×720 landscape frame (byte
+  // identical to previous exports). Non-default aspects scale proportionally
+  // to keep the longer side at ~1920px.
+  let outW = 1920;
+  let outH = 1080;
+  if (aspect && (aspect.w !== AURORA_NATIVE_ASPECT.w || aspect.h !== AURORA_NATIVE_ASPECT.h)) {
+    const longer = 1920;
+    if (vw >= vh) { outW = longer; outH = Math.round(longer * vh / vw); }
+    else { outH = longer; outW = Math.round(longer * vw / vh); }
+  }
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
+<svg xmlns="http://www.w3.org/2000/svg" width="${outW}" height="${outH}" viewBox="0 0 ${vw} ${vh}" preserveAspectRatio="xMidYMid slice">
   <defs>
     ${orbs
       .map(
@@ -44,7 +53,7 @@ export function auroraSvgDataUrl(
       <feGaussianBlur stdDeviation="${blurStd}" edgeMode="duplicate" />
     </filter>
   </defs>
-  <rect width="1280" height="720" fill="${base}" />
+  <rect width="${vw}" height="${vh}" fill="${base}" />
   <g filter="url(#aurora-blur)" opacity="${layerOpacity}">
     ${orbs
       .map(
@@ -54,7 +63,6 @@ export function auroraSvgDataUrl(
   </g>
 </svg>`;
 
-  // Use encodeURIComponent to keep the payload safe for data URLs.
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
