@@ -30,7 +30,8 @@ export type PrintHeroMedia = {
   imageUrl: string;
   focalPoint?: string;            // CSS object-position
   overlayColor?: string;          // hex; falls back to division accent
-  overlayOpacity?: number;        // 0..1
+  overlayOpacity?: number;        // 0..1 — accent color wash opacity, default 0.55
+  washStrength?: number;          // 0..1 — legibility scrim + feather intensity, default 1
   scrim?: "top" | "bottom" | "both" | "radial" | "none";
   blendMode?: "normal" | "multiply" | "overlay" | "soft-light" | "screen";
   heightPct?: number;             // share of page height, default 46

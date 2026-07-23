@@ -26,6 +26,7 @@ import type {
   PrintAssetContext,
   PrintAssetRow,
   PrintDensity,
+  PrintHeroMedia,
   PrintPageSize,
 } from "@/lib/print-assets.types";
 import { emptyCaseStudy } from "@/lib/print-assets.types";
@@ -568,6 +569,13 @@ function AssetEditor() {
               </Row>
             </Panel>
 
+            <HeroMediaPanel
+              value={content.heroMedia}
+              onChange={(next) => patchContent({ heroMedia: next })}
+            />
+
+
+
             <Panel title="Stats">
               {content.stats.map((s, i) => (
                 <div key={i} className="grid grid-cols-[1fr_60px] gap-2">
@@ -682,6 +690,150 @@ function Block({ label, body, onChange }: { label: string; body: string; onChang
         rows={4}
         placeholder="Add the story here…"
         className="mt-1 w-full resize-none rounded-md bg-transparent text-[13px] leading-snug focus:outline-none"
+      />
+    </div>
+  );
+}
+
+function HeroMediaPanel({
+  value,
+  onChange,
+}: {
+  value: PrintHeroMedia | undefined;
+  onChange: (next: PrintHeroMedia | undefined) => void;
+}) {
+  const enabled = !!value?.imageUrl;
+  const media: PrintHeroMedia = value ?? { imageUrl: "" };
+  const overlayOpacity = media.overlayOpacity ?? 0.55;
+  const washStrength = media.washStrength ?? 1;
+  const heightPct = media.heightPct ?? 46;
+
+  function patch(p: Partial<PrintHeroMedia>) {
+    onChange({ ...media, ...p });
+  }
+
+  return (
+    <Panel title="Hero media">
+      <Row label="Enabled">
+        <input
+          type="checkbox"
+          checked={enabled}
+          onChange={(e) =>
+            e.target.checked
+              ? onChange({ imageUrl: media.imageUrl || "", overlayOpacity: 0.55, washStrength: 1, scrim: "bottom", blendMode: "multiply", heightPct: 46 })
+              : onChange(undefined)
+          }
+        />
+      </Row>
+      <input
+        className={inspectorInput}
+        placeholder="Image URL (https://…)"
+        value={media.imageUrl}
+        onChange={(e) => patch({ imageUrl: e.target.value })}
+      />
+      <input
+        className={inspectorInput}
+        placeholder='Focal point, e.g. "50% 35%"'
+        value={media.focalPoint ?? ""}
+        onChange={(e) => patch({ focalPoint: e.target.value || undefined })}
+      />
+      <div className="grid grid-cols-[80px_1fr] items-center gap-2">
+        <span className="text-[11px] text-black/60 dark:text-white/60">Wash color</span>
+        <input
+          type="color"
+          className="h-7 w-full rounded-md border border-black/10 bg-white dark:border-white/10 dark:bg-white/[0.03]"
+          value={media.overlayColor ?? "#003FC7"}
+          onChange={(e) => patch({ overlayColor: e.target.value })}
+        />
+      </div>
+      <Slider
+        label="Overlay opacity"
+        value={overlayOpacity}
+        min={0}
+        max={1}
+        step={0.05}
+        onChange={(v) => patch({ overlayOpacity: v })}
+        display={`${Math.round(overlayOpacity * 100)}%`}
+      />
+      <Slider
+        label="Wash strength"
+        value={washStrength}
+        min={0}
+        max={1}
+        step={0.05}
+        onChange={(v) => patch({ washStrength: v })}
+        display={`${Math.round(washStrength * 100)}%`}
+      />
+      <Slider
+        label="Band height"
+        value={heightPct}
+        min={20}
+        max={80}
+        step={1}
+        onChange={(v) => patch({ heightPct: v })}
+        display={`${Math.round(heightPct)}%`}
+      />
+      <Row label="Scrim">
+        <select
+          className={inspectorInput}
+          value={media.scrim ?? "bottom"}
+          onChange={(e) => patch({ scrim: e.target.value as PrintHeroMedia["scrim"] })}
+        >
+          <option value="none">None</option>
+          <option value="top">Top</option>
+          <option value="bottom">Bottom</option>
+          <option value="both">Both</option>
+          <option value="radial">Radial</option>
+        </select>
+      </Row>
+      <Row label="Blend mode">
+        <select
+          className={inspectorInput}
+          value={media.blendMode ?? "multiply"}
+          onChange={(e) => patch({ blendMode: e.target.value as PrintHeroMedia["blendMode"] })}
+        >
+          <option value="normal">Normal</option>
+          <option value="multiply">Multiply</option>
+          <option value="overlay">Overlay</option>
+          <option value="soft-light">Soft light</option>
+          <option value="screen">Screen</option>
+        </select>
+      </Row>
+    </Panel>
+  );
+}
+
+function Slider({
+  label,
+  value,
+  min,
+  max,
+  step,
+  onChange,
+  display,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  onChange: (v: number) => void;
+  display: string;
+}) {
+  return (
+    <div>
+      <div className="flex items-center justify-between text-[11px] text-black/60 dark:text-white/60">
+        <span>{label}</span>
+        <span className="tabular-nums text-black/80 dark:text-white/80">{display}</span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="mt-1 w-full accent-[#003FC7]"
       />
     </div>
   );
