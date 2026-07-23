@@ -400,12 +400,18 @@ function ImageCard({
   onApprove,
   onTags,
   onKind,
+  onTargeting,
   onDelete,
 }: {
   row: DivisionImageryEntry;
   onApprove: (next: boolean) => void;
   onTags: (tags: string[]) => void;
   onKind: (k: Kind) => void;
+  onTargeting: (patch: {
+    collection?: string | null;
+    template_kinds?: TemplateKind[];
+    is_default_for?: TemplateKind[];
+  }) => void;
   onDelete: () => void;
 }) {
   const [editing, setEditing] = useState(false);
