@@ -376,6 +376,7 @@ function AssetEditor() {
 
           {/* CANVAS */}
           <div
+            ref={canvasRef}
             className="relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
             style={{ aspectRatio: canvasAspect }}
           >
