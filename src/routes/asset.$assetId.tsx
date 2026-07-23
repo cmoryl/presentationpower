@@ -568,6 +568,13 @@ function AssetEditor() {
               </Row>
             </Panel>
 
+            <HeroMediaPanel
+              value={content.heroMedia}
+              onChange={(next) => patchContent({ heroMedia: next })}
+            />
+
+
+
             <Panel title="Stats">
               {content.stats.map((s, i) => (
                 <div key={i} className="grid grid-cols-[1fr_60px] gap-2">
