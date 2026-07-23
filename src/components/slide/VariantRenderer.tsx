@@ -4143,32 +4143,101 @@ function renderVariantBody({
 
 
     case "MV-DASH-PERFORMANCE": {
+      // Free-form Aurora v2 rebuild. Bars sit directly on the aurora — no
+      // panel, no axis cage, no gridlines. Feathered accent gradient fill
+      // (matches FreeformAreaChart bloom), soft glow + halo on the highlight
+      // bar, legend as inline swatch pills on a shared hairline.
       const bars = arr(c.bars).map((b) => ({ label: s(b.label), value: Number(b.value) || 0 }));
       const highlight = s(c.highlight);
       const stat = obj(c.stat);
       const legend = arr(c.legend);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-16 grid gap-16" style={{ gridTemplateColumns: "1.2fr 1fr" }}>
-            <div>
-              <BarChart brand={brand} bars={bars} height={520} highlight={highlight} />
-            </div>
-            <div className="flex flex-col justify-center">
-              <StatFigure brand={brand} value={s(stat.value)} unit={s(stat.unit)} label={s(stat.label)} size="xl" />
-              <div className="mt-12">
-                {legend.map((l, i) => (
-                  <div key={i} className="flex items-center justify-between py-4" style={{ borderTop: i === 0 ? `1px solid ${ink.hairline}` : "none", borderBottom: `1px solid ${ink.hairline}` }}>
-                    <div className="flex items-center gap-4">
-                      <div style={{ width: 14, height: 14, background: i === 0 ? brand.tokens.accent : brand.tokens.primary, opacity: i === 0 ? 1 : Math.max(0.4, 1 - i * 0.2) }} />
-                      <div style={{ fontSize: 22, color: ink.strong, fontWeight: 600 }}>{s(l.label)}</div>
-                    </div>
-                    <div className="tabular-nums" style={{ fontSize: 24, fontWeight: 600, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>{s(l.value)}</div>
-                  </div>
-                ))}
+          <div className="flex items-start justify-between gap-16">
+            <div style={{ maxWidth: 780 }}>
+              <Kicker brand={brand}>{s(c.kicker, "Performance")}</Kicker>
+              <div
+                className="mt-4"
+                style={{ fontSize: 60, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+              >
+                {s(c.title, variant.name)}
               </div>
+              {s(c.headline) && (
+                <div
+                  className="mt-5"
+                  style={{ fontSize: 22, color: ink.muted, letterSpacing: "-0.005em", lineHeight: 1.45, maxWidth: 680 }}
+                >
+                  {s(c.headline)}
+                </div>
+              )}
             </div>
+            {s(stat.value) && (
+              <div className="flex flex-col items-end text-right" style={{ minWidth: 220 }}>
+                <div className="flex items-baseline gap-2">
+                  <span
+                    className="tabular-nums font-semibold"
+                    style={{ fontSize: 104, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}
+                  >
+                    {s(stat.value)}
+                  </span>
+                  {s(stat.unit) && (
+                    <span
+                      className="font-medium"
+                      style={{ fontSize: 36, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}
+                    >
+                      {s(stat.unit)}
+                    </span>
+                  )}
+                </div>
+                {s(stat.label) && (
+                  <div
+                    className="mt-3 uppercase"
+                    style={{ fontSize: 13, letterSpacing: "0.3em", color: ink.muted, fontWeight: 600, maxWidth: 260 }}
+                  >
+                    {s(stat.label)}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
+          <div className="mt-12">
+            <FreeformBarChart brand={brand} bars={bars} height={520} highlight={highlight} />
+          </div>
+          {legend.length > 0 && (
+            <div className="mt-8 flex flex-wrap items-center gap-x-10 gap-y-3">
+              {legend.map((l, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <span
+                    aria-hidden
+                    style={{
+                      width: 12,
+                      height: 12,
+                      borderRadius: 999,
+                      background:
+                        i === 0
+                          ? "var(--slide-accent-text)"
+                          : `color-mix(in oklab, var(--slide-accent-text) ${Math.max(20, 55 - i * 12)}%, transparent)`,
+                      boxShadow:
+                        i === 0
+                          ? "0 0 12px 2px color-mix(in oklab, var(--slide-accent-text) 55%, transparent)"
+                          : "none",
+                    }}
+                  />
+                  <span style={{ fontSize: 18, color: ink.strong, fontWeight: 600, letterSpacing: "-0.005em" }}>
+                    {s(l.label)}
+                  </span>
+                  {s(l.value) && (
+                    <span
+                      className="tabular-nums"
+                      style={{ fontSize: 18, color: ink.faint, fontWeight: 500, letterSpacing: "-0.005em" }}
+                    >
+                      {s(l.value)}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </SlideFrame>
       );
     }
@@ -4188,28 +4257,141 @@ function renderVariantBody({
     }
 
     case "MV-DASH-GROWTH-COLUMNS": {
+      // Free-form Aurora v2. Columns sit on a single hairline baseline that
+      // spans the whole slide — no plate, no per-column border, no rounded
+      // pill. Feathered multi-stop bloom on every column; the last column
+      // gets a radial halo behind it + full-strength bloom + soft glow so
+      // the "now" reading carries without any label.
       const items = arr(c.items).slice(0, 5);
       const vals = items.map((it) => Number(it.value) || 0);
       const max = Math.max(1, ...vals);
+      const CHART_H = 460;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14 grid items-end gap-10" style={{ gridTemplateColumns: `repeat(${items.length || 1}, 1fr)`, minHeight: 520 }}>
+          <div className="flex items-start justify-between gap-16">
+            <div style={{ maxWidth: 780 }}>
+              <Kicker brand={brand}>{s(c.kicker, "Trajectory")}</Kicker>
+              <div
+                className="mt-4"
+                style={{ fontSize: 60, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+              >
+                {s(c.title, variant.name)}
+              </div>
+              {s(c.headline) && (
+                <div
+                  className="mt-5"
+                  style={{ fontSize: 22, color: ink.muted, letterSpacing: "-0.005em", lineHeight: 1.45, maxWidth: 680 }}
+                >
+                  {s(c.headline)}
+                </div>
+              )}
+            </div>
+          </div>
+          <div
+            className="mt-12 grid items-end gap-10"
+            style={{
+              gridTemplateColumns: `repeat(${items.length || 1}, 1fr)`,
+              minHeight: CHART_H + 80,
+              borderBottom: `1px solid ${ink.hairline}`,
+              paddingBottom: 0,
+            }}
+          >
             {items.map((it, i) => {
               const v = Number(it.value) || 0;
-              const h = Math.max(40, (v / max) * 420);
+              const h = Math.max(48, (v / max) * CHART_H);
               const isLast = i === items.length - 1;
-              const fill = isLast
-                ? `linear-gradient(180deg, color-mix(in oklab, var(--slide-accent-text) 78%, transparent) 0%, color-mix(in oklab, var(--slide-accent-text) 18%, transparent) 100%)`
-                : `linear-gradient(180deg, color-mix(in oklab, var(--slide-accent-text) 22%, transparent) 0%, color-mix(in oklab, var(--slide-accent-text) 4%, transparent) 100%)`;
+              const bloom = isLast
+                ? `linear-gradient(180deg,
+                    color-mix(in oklab, var(--slide-accent-text) 72%, transparent) 0%,
+                    color-mix(in oklab, var(--slide-accent-text) 38%, transparent) 35%,
+                    color-mix(in oklab, var(--slide-accent-text) 12%, transparent) 70%,
+                    color-mix(in oklab, var(--slide-accent-text) 0%, transparent) 100%)`
+                : `linear-gradient(180deg,
+                    color-mix(in oklab, var(--slide-accent-text) 30%, transparent) 0%,
+                    color-mix(in oklab, var(--slide-accent-text) 14%, transparent) 45%,
+                    color-mix(in oklab, var(--slide-accent-text) 4%, transparent) 80%,
+                    color-mix(in oklab, var(--slide-accent-text) 0%, transparent) 100%)`;
               return (
-                <div key={i} className="flex flex-col items-center justify-end">
-                  <div className="tabular-nums" style={{ fontSize: 56, fontWeight: 600, color: ink.strong, letterSpacing: "-0.025em", lineHeight: 1 }}>
-                    {s(it.value)}<span style={{ fontSize: 28, color: "var(--slide-accent-text)", marginLeft: 4 }}>{s(it.unit)}</span>
+                <div key={i} className="flex flex-col items-center justify-end" style={{ position: "relative" }}>
+                  <div
+                    className="tabular-nums"
+                    style={{ fontSize: 56, fontWeight: 600, color: ink.strong, letterSpacing: "-0.025em", lineHeight: 1 }}
+                  >
+                    {s(it.value)}
+                    <span style={{ fontSize: 28, color: "var(--slide-accent-text)", marginLeft: 4 }}>
+                      {s(it.unit)}
+                    </span>
                   </div>
-                  <div className="mt-6 w-full" style={{ height: h, background: fill, maxWidth: 200, borderRadius: 2 }} />
-                  <div className="mt-6 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: isLast ? "var(--slide-accent-text)" : ink.faint, fontWeight: 700 }}>{s(it.year)}</div>
-                  {s(it.note) && <div className="mt-2 text-center" style={{ fontSize: 15, lineHeight: 1.4, color: ink.muted, maxWidth: 220 }}>{s(it.note)}</div>}
+                  <div
+                    className="mt-6 w-full"
+                    style={{
+                      position: "relative",
+                      height: h,
+                      maxWidth: 220,
+                    }}
+                  >
+                    {/* Feathered column bloom */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: bloom,
+                        filter: isLast ? "blur(0.5px)" : "none",
+                      }}
+                    />
+                    {/* Radial halo bloom behind the last column */}
+                    {isLast && (
+                      <div
+                        aria-hidden
+                        style={{
+                          position: "absolute",
+                          left: "50%",
+                          top: -40,
+                          width: 260,
+                          height: 260,
+                          transform: "translateX(-50%)",
+                          background:
+                            "radial-gradient(circle, color-mix(in oklab, var(--slide-accent-text) 40%, transparent) 0%, color-mix(in oklab, var(--slide-accent-text) 12%, transparent) 45%, transparent 75%)",
+                          pointerEvents: "none",
+                          zIndex: -1,
+                        }}
+                      />
+                    )}
+                    {/* Thin accent stroke on the top edge of the last column */}
+                    {isLast && (
+                      <div
+                        aria-hidden
+                        style={{
+                          position: "absolute",
+                          left: 0,
+                          right: 0,
+                          top: 0,
+                          height: 2,
+                          background: "var(--slide-accent-text)",
+                          boxShadow: "0 0 14px 2px color-mix(in oklab, var(--slide-accent-text) 55%, transparent)",
+                        }}
+                      />
+                    )}
+                  </div>
+                  <div
+                    className="mt-6 uppercase"
+                    style={{
+                      fontSize: 16,
+                      letterSpacing: "0.28em",
+                      color: isLast ? "var(--slide-accent-text)" : ink.faint,
+                      fontWeight: 700,
+                    }}
+                  >
+                    {s(it.year)}
+                  </div>
+                  {s(it.note) && (
+                    <div
+                      className="mt-2 text-center"
+                      style={{ fontSize: 15, lineHeight: 1.4, color: ink.muted, maxWidth: 220 }}
+                    >
+                      {s(it.note)}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -6736,6 +6918,142 @@ function FreeformAreaChart({
     </svg>
   );
 }
+
+// Free-form bar chart. Shares the FreeformAreaChart gradient vocabulary:
+// feathered accent bloom, baseline hairline only, soft glow + radial halo
+// on the highlighted bar. No axis frame, no gridlines, no per-bar border.
+function FreeformBarChart({
+  brand: _brand,
+  bars,
+  height = 520,
+  highlight,
+}: {
+  brand: BrandMode;
+  bars: { label: string; value: number }[];
+  height?: number;
+  highlight?: string;
+}) {
+  const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
+  const w = 1720;
+  const h = height;
+  const padL = 16;
+  const padR = 16;
+  const padT = 60;
+  const padB = 72;
+  if (!bars.length) return null;
+  const max = Math.max(1, ...bars.map((b) => b.value));
+  const chartH = h - padT - padB;
+  const slot = (w - padL - padR) / bars.length;
+  const barW = Math.min(slot * 0.44, 140);
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      <defs>
+        <linearGradient id={`${id}-bloom-hi`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.68} />
+          <stop offset="40%" stopColor="var(--slide-accent-text)" stopOpacity={0.32} />
+          <stop offset="75%" stopColor="var(--slide-accent-text)" stopOpacity={0.08} />
+          <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient id={`${id}-bloom-mute`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.24} />
+          <stop offset="55%" stopColor="var(--slide-accent-text)" stopOpacity={0.09} />
+          <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+        </linearGradient>
+        <radialGradient id={`${id}-halo`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.5} />
+          <stop offset="55%" stopColor="var(--slide-accent-text)" stopOpacity={0.14} />
+          <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+        </radialGradient>
+        <filter id={`${id}-glow`} x="-20%" y="-30%" width="140%" height="160%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="b" />
+          <feMerge>
+            <feMergeNode in="b" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      {/* Baseline hairline only */}
+      <line
+        x1={padL}
+        y1={h - padB}
+        x2={w - padR}
+        y2={h - padB}
+        stroke={ink.hairline}
+        strokeWidth={1}
+      />
+      {bars.map((b, i) => {
+        const bh = (b.value / max) * chartH;
+        const x = padL + i * slot + (slot - barW) / 2;
+        const y = h - padB - bh;
+        const isHi = highlight ? b.label === highlight : false;
+        return (
+          <g key={i}>
+            {/* Radial halo behind highlight bar */}
+            {isHi && (
+              <circle
+                cx={x + barW / 2}
+                cy={y}
+                r={Math.max(90, barW * 1.4)}
+                fill={`url(#${id}-halo)`}
+              />
+            )}
+            <rect
+              x={x}
+              y={y}
+              width={barW}
+              height={bh}
+              fill={isHi ? `url(#${id}-bloom-hi)` : `url(#${id}-bloom-mute)`}
+              filter={isHi ? `url(#${id}-glow)` : undefined}
+            />
+            {/* Thin confident accent stroke on top edge of highlight */}
+            {isHi && (
+              <line
+                x1={x}
+                y1={y}
+                x2={x + barW}
+                y2={y}
+                stroke="var(--slide-accent-text)"
+                strokeWidth={2.25}
+                strokeLinecap="round"
+              />
+            )}
+            {/* Value label above bar */}
+            <text
+              x={x + barW / 2}
+              y={y - 18}
+              textAnchor="middle"
+              fontSize={isHi ? 28 : 20}
+              fontWeight={600}
+              fill={isHi ? ink.strong : ink.muted}
+              style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}
+            >
+              {b.value}
+            </text>
+            {/* Category label below baseline */}
+            <text
+              x={x + barW / 2}
+              y={h - padB + 34}
+              textAnchor="middle"
+              fontSize={14}
+              fill={isHi ? "var(--slide-accent-text)" : ink.faint}
+              style={{
+                letterSpacing: "0.24em",
+                textTransform: "uppercase",
+                fontVariantNumeric: "tabular-nums",
+                fontWeight: 700,
+              }}
+            >
+              {b.label}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+
 
 
 
