@@ -43,6 +43,8 @@ function AdminImageryPage() {
   const [divisionId, setDivisionId] = useState<string>(BRAND_MODES[0]?.id ?? "bm-enterprise");
   const [statusFilter, setStatusFilter] = useState<"all" | "approved" | "pending">("all");
   const [tagQuery, setTagQuery] = useState("");
+  const [templateFilter, setTemplateFilter] = useState<TemplateKind | "all">("all");
+  const [collectionFilter, setCollectionFilter] = useState<string>("all");
 
   const q = useQuery({
     queryKey: ["admin-division-imagery", divisionId],
