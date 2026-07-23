@@ -616,10 +616,14 @@ export async function exportDeckToPptx(
     const perSlideOrient = slide.logoOrientation && slide.logoOrientation !== "auto"
       ? slide.logoOrientation
       : deckLogoOrientation;
-    const orient: "horizontal" | "stacked" | "vertical-left" | "vertical-right" | "mark-only" = perSlideOrient;
-    const isVertical = orient === "vertical-left" || orient === "vertical-right";
+    // Legacy vertical-* values fall back to horizontal — the lockup is
+    // never rotated in export either.
+    const orient: "horizontal" | "stacked" | "mark-only" =
+      perSlideOrient === "stacked" ? "stacked"
+      : perSlideOrient === "mark-only" ? "mark-only"
+      : "horizontal";
+    const isVertical = false;
     const isMarkOnly = orient === "mark-only";
-    // Vertical orientations reuse the horizontal artwork and get rotated.
     const sourceOrient: "horizontal" | "stacked" = orient === "stacked" ? "stacked" : "horizontal";
     const logoData = sourceOrient === "stacked"
       ? (useWhiteLogo ? (logoStackedWhite ?? logoWhite) : (logoStackedColor ?? logoColor))
