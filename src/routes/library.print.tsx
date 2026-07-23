@@ -179,6 +179,47 @@ const ADAPTOR_SEED: AdaptorBriefContent = emptyAdaptorBrief({
   },
 });
 
+const CASE_STUDY_SEED: CaseStudyContent = emptyCaseStudy({
+  eyebrow: "Client case study",
+  client: "Aēsop",
+  industry: "Beauty & personal care",
+  audience: "Global product knowledge teams",
+  summary: "Aēsop's success story in rapid product knowledge localization",
+  challenge: {
+    heading: "The Challenge",
+    body: "Aēsop needed to localize hundreds of product knowledge modules — combining technical content, regulatory updates, and training materials — across multiple markets. Their internal team was overloaded with disconnected processes, inconsistent terminology, and manual handoffs that slowed delivery and increased costs.",
+  },
+  solution: {
+    heading: "The Solution",
+    body: "TransPerfect's GlobalLink for Adobe Experience Manager Plus unified content, automation, and workflows in one centralized ecosystem. We integrated directly with AEM, automated translation submissions, enforced terminology consistency, and delivered localized modules through a one-click workflow with full visibility and control.",
+  },
+  result: {
+    heading: "The Result",
+    body: "Aēsop cut project management time by more than 70% and reduced engineering localization costs by 33%. With automated workflows and centralized governance, their team scaled content delivery across 7 markets — on time, on budget, and with consistent quality.",
+  },
+  stats: [
+    { label: "Project management time reduced", value: "3 mo → 10 days", unit: "" },
+    { label: "Reduction in engineering localization costs", value: "33", unit: "%" },
+    { label: "Modules rolled out within budget", value: "On Time", unit: "" },
+  ],
+  quote: {
+    text: "TransPerfect helped us simplify a complex localization process and free our internal team to focus on higher-value work.",
+    author: "Aēsop",
+  },
+  cta: {
+    label: "See GlobalLink in Action",
+    subhead: "Explore how GlobalLink AI can transform your content operations.",
+  },
+  engagement: {
+    title: "Engagement Snapshot",
+    bullets: [
+      "Trusted Adobe Gold Partner",
+      "Deep global content expertise",
+      "Hands-on, human partnership",
+    ],
+  },
+});
+
 // ---------------------------------------------------------------------------
 // Page
 // ---------------------------------------------------------------------------
