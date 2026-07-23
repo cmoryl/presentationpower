@@ -388,11 +388,7 @@ function TemplateCard({
     <div className="group flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white transition hover:border-[#003FC7]/50 hover:shadow-md">
       {/* Thumbnail */}
       <div className="relative aspect-[8.5/11] w-full overflow-hidden bg-[#0b0a2a]">
-        {tpl.id === "spotlight" && brand ? (
-          <ThumbSpotlight brand={brand} />
-        ) : (
-          <ThumbPlaceholder brand={brand} kind={tpl.id} />
-        )}
+        {brand ? <ThumbLive kind={tpl.id} brand={brand} /> : <ThumbPlaceholder brand={brand} kind={tpl.id} />}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/40 to-transparent" />
         <div className="absolute left-3 top-3 flex items-center gap-1.5">
           <span
