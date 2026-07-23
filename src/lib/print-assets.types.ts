@@ -201,6 +201,7 @@ export type AdaptorBriefContent = {
   quote?: { text: string; author: string; role?: string; company?: string };
   cta?: { label: string; url?: string };
   heroMedia?: PrintHeroMedia;
+  modules?: PrintSection[];
 };
 
 
