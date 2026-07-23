@@ -112,17 +112,24 @@ export type DivisionImageryEntry = {
 
 export const listDivisionImagery = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => z.object({ divisionId: z.string().min(1).max(120) }).parse(v))
+  .inputValidator((v) =>
+    z.object({
+      divisionId: z.string().min(1).max(120),
+      onlyApproved: z.boolean().optional(),
+    }).parse(v),
+  )
   .handler(async ({ data, context }): Promise<DivisionImageryEntry[]> => {
     const s = context.supabase as unknown as SbClient;
-    const { data: rows, error } = await s
+    let q = s
       .from("division_imagery")
       .select(
-        "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, prompt, uploaded_by, created_at, updated_at",
+        "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, prompt, uploaded_by, approved, approved_by, approved_at, created_at, updated_at",
       )
       .eq("division_id", data.divisionId)
       .order("created_at", { ascending: false })
       .limit(400);
+    if (data.onlyApproved) q = q.eq("approved", true);
+    const { data: rows, error } = await q;
     if (error) throw new Error((error as { message?: string }).message ?? "Query failed");
     const list = (rows ?? []) as Array<Omit<DivisionImageryEntry, "signedUrl">>;
     const signed = await Promise.all(
