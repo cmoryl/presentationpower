@@ -134,7 +134,7 @@ export function CaseStudyLayout({
           className="relative w-full overflow-hidden [container-type:inline-size]"
           style={{
             aspectRatio: pageAspect(pageSize),
-            backgroundColor: bg,
+            backgroundColor: mode === "light" ? "#FFFFFF" : bg,
             color: ink,
             fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
             display: "flex",
@@ -142,13 +142,31 @@ export function CaseStudyLayout({
             ...style,
           }}
         >
-          {mode === "dark" && (
-            <AuroraLayer
-              seed={seed ?? `casestudy-${brand.id}-${mode}`}
-              brand={brand}
-              intensity={brand.id === "bm-enterprise" ? 0.35 : 0.85}
-              aspect={auroraAspect(pageSize)}
+          {mode === "light" && (
+            <div
+              className="pointer-events-none absolute inset-0"
+              aria-hidden
+              style={{ background: "#FFFFFF", zIndex: 0 }}
             />
+          )}
+          {/* Aurora clipped to top region — no aura in the lower body. */}
+          {mode === "dark" && (
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 overflow-hidden"
+              aria-hidden
+              style={{
+                height: "55%",
+                WebkitMaskImage: "linear-gradient(180deg, black 0%, black 62%, transparent 100%)",
+                maskImage: "linear-gradient(180deg, black 0%, black 62%, transparent 100%)",
+              }}
+            >
+              <AuroraLayer
+                seed={seed ?? `casestudy-${brand.id}-${mode}`}
+                brand={brand}
+                intensity={brand.id === "bm-enterprise" ? 0.35 : 0.85}
+                aspect={auroraAspect(pageSize)}
+              />
+            </div>
           )}
           {content.heroMedia && (
             <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
