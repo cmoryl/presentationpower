@@ -4967,7 +4967,7 @@ function renderLocationsVariant(
               </div>
             )}
             <div className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
-              <LocWorldMap pins={filteredPins} region="world" mode={mode} accent={accent} primary={primary} showLabels={false} metric={activeMetric} metricId={activeMetric?.id} ariaLabel={`${title} — world map${activeMetric ? ` visualizing ${activeMetric.label}` : ""}${filterActive ? ` filtered to ${filteredRegions} regions` : ""}`} />
+              <LocWorldMap pins={filteredPins} region="world" mode={mode} accent={accent} primary={primary} showLabels={false} metric={activeMetric} metricId={activeMetric?.id} scaleMode={scaleMode} ariaLabel={`${title} — world map${activeMetric ? ` visualizing ${activeMetric.label}${scaleMode === "region-percent" ? " (% of region)" : scaleMode === "global-percent" ? " (% of global)" : ""}` : ""}${filterActive ? ` filtered to ${filteredRegions} regions` : ""}`} />
             </div>
           </div>
           <div className="flex w-[520px] flex-col justify-end">
