@@ -351,6 +351,11 @@ function PrintCenterPage() {
         <ApprovedShelf brand={previewBrand} />
       ) : null}
 
+      {/* Approved division hero imagery */}
+      {isAuthed === true && previewBrand ? (
+        <DivisionHeroShelf brand={previewBrand} />
+      ) : null}
+
       {/* My print assets */}
       <section className="mt-14">
         <div className="mb-4 flex items-end justify-between gap-4">
