@@ -150,7 +150,9 @@ export type AdaptorBriefContent = {
   knowHow: string[];           // 5 "We Know How" one-liners
   quote?: { text: string; author: string; role?: string; company?: string };
   cta?: { label: string; url?: string };
+  heroMedia?: PrintHeroMedia;
 };
+
 
 export type PrintPageSize = "A4" | "Letter" | "Square";
 export type PrintDensity = "compact" | "standard" | "airy";
