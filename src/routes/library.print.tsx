@@ -20,7 +20,13 @@ import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
-import { emptySpotlight, type SpotlightContent, type PrintAssetKind } from "@/lib/print-assets.types";
+import { EBrochureLayout } from "@/components/print/EBrochureLayout";
+import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
+import {
+  emptySpotlight, emptyEBrochure, emptyAdaptorBrief,
+  type SpotlightContent, type EBrochureContent, type AdaptorBriefContent,
+  type PrintAssetKind,
+} from "@/lib/print-assets.types";
 import {
   listMyPrintAssets,
   deletePrintAsset,
@@ -90,17 +96,17 @@ const TEMPLATES: Template[] = [
   {
     id: "ebrochure",
     label: "E-Brochure",
-    tagline: "GlobalLink-style marketing PDF",
-    desc: "Multi-page e-brochure kit — coming next. The port from EBrochure.dc.html is queued behind Spotlight.",
-    live: false,
+    tagline: "Challenge · Approach · Impact",
+    desc: "Single-page marketing PDF — pastel aurora hero, three summary cards, stat row, quote + Discover panel, and a division-tokenized CTA band.",
+    live: true,
     icon: <PenSquare size={16} />,
   },
   {
     id: "adaptor-brief",
     label: "Adaptor Brief",
-    tagline: "Dark aurora hero + capability grid",
-    desc: "Application/adaptor brief for enterprise integrations. Port from ApplicationBrief.dc.html — coming next.",
-    live: false,
+    tagline: "Dark aurora hero + 6 capability cards",
+    desc: "Application / adaptor brief for enterprise integrations. Dark→light gradient hero, six verb cards, a 'We Know How' strip, and a pull-quote.",
+    live: true,
     icon: <Rocket size={16} />,
   },
 ];
@@ -128,6 +134,48 @@ const SPOTLIGHT_SEED: SpotlightContent = emptySpotlight({
   },
   expert: { name: "Jordan Reyes", role: "Solutions architect · GlobalLink", email: "jreyes@transperfect.com" },
   cta: { label: "Book a walkthrough", url: "https://transperfect.com" },
+});
+
+const EBROCHURE_SEED: EBrochureContent = emptyEBrochure({
+  title: "Helping Global Teams Move Faster with GlobalLink",
+  summary: "See how a leading technology company streamlined content operations, reduced turnaround times, and improved quality across 35+ markets with GlobalLink AI.",
+  sections: [
+    { heading: "The Challenge", body: "Fragmented tools, inconsistent terminology, and slow localization made rapid market expansion hard.",
+      bullets: ["Disconnected systems and manual processes", "Inconsistent brand and terminology", "Long turnaround times across markets", "Limited visibility into content progress"] },
+    { heading: "Our Approach", body: "GlobalLink AI to unify content operations, automate workflows, and embed governance — on-brand content faster, everywhere.",
+      bullets: ["Unified content orchestration", "AI-powered translation + workflow automation", "Centralized terminology and governance", "Real-time dashboards and reporting"] },
+    { heading: "The Impact", body: "Measurable improvements in speed, quality, and efficiency — teams scale global content with confidence.",
+      bullets: ["3.4× faster time-to-market", "48% reduction in localization costs", "98% translation quality score", "Consistent brand across 35+ markets"] },
+  ],
+  stats: [
+    { label: "Global teams empowered", value: "100", unit: "%" },
+    { label: "Reduction in localization costs", value: "48", unit: "%" },
+    { label: "Translation quality score", value: "98", unit: "%" },
+    { label: "Markets supported", value: "35", unit: "+" },
+    { label: "Faster time-to-market", value: "3.4", unit: "×" },
+  ],
+  quote: {
+    text: "TransPerfect helped us simplify a complex localization process and free our internal team to focus on higher-value work.",
+    author: "Global Content Lead", company: "Fortune 100 client",
+  },
+  cta: { label: "See GlobalLink in Action", subhead: "Explore how GlobalLink AI can transform your content operations." },
+});
+
+const ADAPTOR_SEED: AdaptorBriefContent = emptyAdaptorBrief({
+  title: "GlobalLink for Adobe Experience Manager Plus",
+  summary: "TransPerfect GlobalLink brings people, content, and technology together to help global teams translate, adapt, and deliver with speed and clarity.",
+  features: [
+    { verb: "Supports", body: "Adobe AEM 6.5 LTS SP packages with cross-environment compatibility" },
+    { verb: "Adapts", body: "To any AEM content tree, out-of-the-box or custom" },
+    { verb: "Enables", body: "Custom localization for URLs and internal and external links" },
+    { verb: "Automates", body: "Translation submission through AEM publishing workflow triggers" },
+    { verb: "Triggers", body: "AEM workflows with AI and human oversight" },
+    { verb: "Learns", body: "Adaptive forms with dictionaries stored under new path locations" },
+  ],
+  quote: {
+    text: "TransPerfect helped us simplify a complex localization process and free our internal team to focus on higher-value work.",
+    author: "Aesop",
+  },
 });
 
 // ---------------------------------------------------------------------------
@@ -340,11 +388,7 @@ function TemplateCard({
     <div className="group flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white transition hover:border-[#003FC7]/50 hover:shadow-md">
       {/* Thumbnail */}
       <div className="relative aspect-[8.5/11] w-full overflow-hidden bg-[#0b0a2a]">
-        {tpl.id === "spotlight" && brand ? (
-          <ThumbSpotlight brand={brand} />
-        ) : (
-          <ThumbPlaceholder brand={brand} kind={tpl.id} />
-        )}
+        {brand ? <ThumbLive kind={tpl.id} brand={brand} /> : <ThumbPlaceholder brand={brand} kind={tpl.id} />}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/40 to-transparent" />
         <div className="absolute left-3 top-3 flex items-center gap-1.5">
           <span
@@ -394,18 +438,21 @@ function TemplateCard({
   );
 }
 
-// A scaled-down live Spotlight render. Uses container-relative units already,
-// so we can just wrap it in a full-width container and it fills the thumb.
-function ThumbSpotlight({ brand }: { brand: BrandMode }) {
+// Dispatch a scaled-down live layout for the given kind. Uses container-relative
+// units, so a full-width wrapper fills the thumbnail.
+function ThumbLive({ kind, brand }: { kind: PrintAssetKind; brand: BrandMode }) {
   return (
     <div className="pointer-events-none absolute inset-0">
-      <SpotlightLayout
-        content={SPOTLIGHT_SEED}
-        brand={brand}
-        mode="light"
-        pageSize="Letter"
-        density="standard"
-      />
+      {kind === "spotlight" && (
+        <SpotlightLayout content={SPOTLIGHT_SEED} brand={brand} mode="light" pageSize="Letter" density="standard" />
+      )}
+      {kind === "ebrochure" && (
+        <EBrochureLayout content={EBROCHURE_SEED} brand={brand} mode="light" pageSize="Letter" density="standard" />
+      )}
+      {kind === "adaptor-brief" && (
+        <AdaptorBriefLayout content={ADAPTOR_SEED} brand={brand} mode="dark" pageSize="Letter" density="standard" />
+      )}
+      {kind === "case-study" && <ThumbPlaceholder brand={brand} kind="case-study" />}
     </div>
   );
 }
@@ -506,14 +553,10 @@ function TemplateDetailOverlay({
           </div>
         </div>
 
-        {kind === "spotlight" ? (
+        {kind === "spotlight" || kind === "ebrochure" || kind === "adaptor-brief" ? (
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <PreviewFrame label="Light">
-              <SpotlightLayout content={SPOTLIGHT_SEED} brand={brand} mode="light" pageSize="Letter" density="standard" />
-            </PreviewFrame>
-            <PreviewFrame label="Dark">
-              <SpotlightLayout content={SPOTLIGHT_SEED} brand={brand} mode="dark" pageSize="Letter" density="standard" />
-            </PreviewFrame>
+            <PreviewFrame label="Light"><PrintPreview kind={kind} brand={brand} mode="light" /></PreviewFrame>
+            <PreviewFrame label="Dark"><PrintPreview kind={kind} brand={brand} mode="dark" /></PreviewFrame>
           </div>
         ) : (
           <div className="rounded-xl border border-dashed border-black/20 bg-white p-10 text-center">
@@ -521,25 +564,28 @@ function TemplateDetailOverlay({
               <div className="text-xs uppercase tracking-[0.24em] text-black/50">In production</div>
               <h3 className="mt-2 text-lg font-semibold text-[#03002C]">{tpl.label} preview is coming soon.</h3>
               <p className="mt-2 text-sm text-black/60">
-                {kind === "case-study"
-                  ? "Case Study assets are already draftable from the wizard — the compact preview thumbnail is next in line."
-                  : "The layout port is queued behind Spotlight. In the meantime, use Case Study or Client Spotlight."}
+                Case Study assets are already draftable from the wizard — the layout port is queued behind the other three.
               </p>
-              {kind === "case-study" ? (
-                <Link
-                  to="/asset/new"
-                  search={{ kind: "case-study", brandModeId: brand.id }}
-                  className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:bg-[#003FC7]/85"
-                >
-                  Draft a case study <ArrowRight size={12} />
-                </Link>
-              ) : null}
+              <Link
+                to="/asset/new"
+                search={{ kind: "case-study", brandModeId: brand.id }}
+                className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:bg-[#003FC7]/85"
+              >
+                Draft a case study <ArrowRight size={12} />
+              </Link>
             </div>
           </div>
         )}
       </div>
     </div>
   );
+}
+
+function PrintPreview({ kind, brand, mode }: { kind: PrintAssetKind; brand: BrandMode; mode: "light" | "dark" }) {
+  if (kind === "spotlight") return <SpotlightLayout content={SPOTLIGHT_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+  if (kind === "ebrochure") return <EBrochureLayout content={EBROCHURE_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+  if (kind === "adaptor-brief") return <AdaptorBriefLayout content={ADAPTOR_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+  return null;
 }
 
 function PreviewFrame({ label, children }: { label: string; children: React.ReactNode }) {

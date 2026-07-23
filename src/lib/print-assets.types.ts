@@ -55,6 +55,49 @@ export type SpotlightContent = {
   cta?: { label: string; url?: string };
 };
 
+// ---------------------------------------------------------------------------
+// E-BROCHURE — single-page marketing PDF (Challenge / Approach / Impact +
+// stat row + quote/discover panel + CTA band). Ported from EBrochure.dc.html.
+// ---------------------------------------------------------------------------
+// Deliberate reuse of the shared primitives:
+//   • Each summary card is a `CaseStudyBlock` (heading + body) with an extra
+//     `bullets` list. We model that via `EBrochureSection = CaseStudyBlock &
+//     { bullets: string[] }` rather than a parallel shape.
+//   • `stats` reuses `CaseStudyStat`.
+//   • `quote`, `cta` reuse the inline shapes from `CaseStudyContent`.
+export type EBrochureSection = CaseStudyBlock & { bullets: string[] };
+
+export type EBrochureContent = {
+  eyebrow?: string;            // e.g. "eBrochure"
+  title: string;               // hero H1
+  summary?: string;            // 1–2 sentence subhead
+  sections: EBrochureSection[]; // exactly 3 — Challenge / Approach / Impact
+  stats: CaseStudyStat[];      // 3–5 proof points
+  quote?: { text: string; author: string; role?: string; company?: string };
+  discover?: { body: string; bullets: string[] }; // right-hand "Discover" panel
+  cta?: { label: string; url?: string; subhead?: string };
+};
+
+// ---------------------------------------------------------------------------
+// ADAPTOR / APPLICATION BRIEF — single-page portrait brief with a dark
+// gradient hero, 6 feature cards, a "We Know How" strip, and a quote row.
+// Ported from ApplicationBrief.dc.html.
+// ---------------------------------------------------------------------------
+export type AdaptorFeature = {
+  verb: string;   // "Supports", "Adapts", "Enables", "Automates", "Triggers", "Learns"
+  body: string;   // one-liner under the verb
+};
+
+export type AdaptorBriefContent = {
+  eyebrow?: string;            // e.g. "Adaptor brief"
+  title: string;               // hero H1
+  summary?: string;            // hero subhead
+  features: AdaptorFeature[];  // exactly 6
+  knowHow: string[];           // 5 "We Know How" one-liners
+  quote?: { text: string; author: string; role?: string; company?: string };
+  cta?: { label: string; url?: string };
+};
+
 export type PrintPageSize = "A4" | "Letter" | "Square";
 export type PrintDensity = "compact" | "standard" | "airy";
 export type PrintDistribution = "sales-enablement" | "web-download" | "print";
@@ -70,6 +113,7 @@ export type PrintAssetContext = {
 };
 
 export type PrintAssetKind = "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
+
 
 export type PrintAssetRow = {
   id: string;
@@ -131,5 +175,54 @@ export function emptySpotlight(seed?: Partial<SpotlightContent>): SpotlightConte
     quote: seed?.quote,
     expert: seed?.expert,
     cta: seed?.cta ?? { label: "Talk to us" },
+  };
+}
+
+export function emptyEBrochure(seed?: Partial<EBrochureContent>): EBrochureContent {
+  return {
+    eyebrow: seed?.eyebrow ?? "eBrochure",
+    title: seed?.title ?? "",
+    summary: seed?.summary ?? "",
+    sections: seed?.sections ?? [
+      { heading: "The challenge", body: "", bullets: [] },
+      { heading: "Our approach", body: "", bullets: [] },
+      { heading: "The impact", body: "", bullets: [] },
+    ],
+    stats: seed?.stats ?? [
+      { label: "Proof point", value: "0", unit: "" },
+      { label: "Proof point", value: "0", unit: "" },
+      { label: "Proof point", value: "0", unit: "" },
+    ],
+    quote: seed?.quote,
+    discover: seed?.discover ?? {
+      body: "Discover how we can help your organization streamline operations and deliver measurable results across every market.",
+      bullets: ["Trusted global partner", "Deep division expertise", "Hands-on, human collaboration"],
+    },
+    cta: seed?.cta ?? { label: "See it in action" },
+  };
+}
+
+export function emptyAdaptorBrief(seed?: Partial<AdaptorBriefContent>): AdaptorBriefContent {
+  return {
+    eyebrow: seed?.eyebrow ?? "Adaptor brief",
+    title: seed?.title ?? "",
+    summary: seed?.summary ?? "",
+    features: seed?.features ?? [
+      { verb: "Supports", body: "" },
+      { verb: "Adapts", body: "" },
+      { verb: "Enables", body: "" },
+      { verb: "Automates", body: "" },
+      { verb: "Triggers", body: "" },
+      { verb: "Learns", body: "" },
+    ],
+    knowHow: seed?.knowHow ?? [
+      "Supports 600+ global enterprises",
+      "Enables workflows with AI and human oversight",
+      "Combines in-house teams and external vendors",
+      "Integrates with 100+ platforms seamlessly",
+      "Reduces costs and accelerates time-to-market",
+    ],
+    quote: seed?.quote,
+    cta: seed?.cta ?? { label: "Talk to an expert" },
   };
 }
