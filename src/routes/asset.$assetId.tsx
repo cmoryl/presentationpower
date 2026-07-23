@@ -83,6 +83,16 @@ function AssetEditor() {
   const [iccProfile, setIccProfile] = useState<IccProfileKey>("GRACoL2013_CRPC6");
   const [pickerOpen, setPickerOpen] = useState(false);
 
+  // Undo/redo history for content + context snapshots.
+  const historyRef = useRef<{
+    undo: Array<{ content: unknown; context: unknown }>;
+    redo: Array<{ content: unknown; context: unknown }>;
+  }>({ undo: [], redo: [] });
+  const [, setHistoryTick] = useState(0);
+  const canUndo = historyRef.current.undo.length > 0;
+  const canRedo = historyRef.current.redo.length > 0;
+
+
 
   useEffect(() => {
     load({ data: { assetId } })
