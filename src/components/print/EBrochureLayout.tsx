@@ -126,7 +126,7 @@ export function EBrochureLayout({
   const inkFaint = mode === "dark" ? "rgba(245,244,255,0.55)" : "rgba(102,102,102,0.92)";
   const dividerCol = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.14)";
   const accentInk = mode === "dark" ? accent : primary;
-  const bg = mode === "dark" ? "#0B0A2A" : "#FFFFFF";
+  const bg = mode === "dark" ? "#111114" : "#FFFFFF";
 
   const heroRef = useRef<HTMLHeadingElement | null>(null);
   const introRef = useRef<HTMLParagraphElement | null>(null);
