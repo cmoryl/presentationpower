@@ -509,8 +509,14 @@ export function SlideFrame({
           stay quiet at sm so titles carry the composition; cover / divider /
           close slides scale up so the mark reads at hero size. */}
       {showLogo && (() => {
-        const isVertical = logoOrientation === "vertical-left" || logoOrientation === "vertical-right";
-        const isMarkOnly = logoOrientation === "mark-only";
+        // Vertical orientations are retired — coerce legacy vertical-* to
+        // horizontal so persisted decks never render rotated lockups.
+        const normalizedOrient: "horizontal" | "stacked" | "mark-only" =
+          logoOrientation === "stacked" ? "stacked"
+          : logoOrientation === "mark-only" ? "mark-only"
+          : "horizontal";
+        const isVertical = false;
+        const isMarkOnly = normalizedOrient === "mark-only";
         // Half-size positions per brand direction (top/bottom-center + left side).
         const halfSize = (
           placement.position === "top-center" ||
@@ -523,28 +529,9 @@ export function SlideFrame({
           xl: "sm", lg: "xs", md: "xs", sm: "2xs", xs: "2xs", "2xs": "2xs",
         };
         const sizeAfterHalf = halfSize ? shrink[baseSize] : (baseSize as "sm" | "md" | "xl");
-        // Mark-only is a quiet signature — one step smaller than the base.
         const effectiveSize = isMarkOnly ? (shrink[sizeAfterHalf] ?? sizeAfterHalf) : sizeAfterHalf;
 
-        // Vertical orientations pin to the corresponding edge, vertically
-        // centered. We clamp max-height so the rotated lockup can't drift
-        // into the top brand-bar band or the bottom footer band.
-        const containerStyle = isVertical
-          ? (() => {
-              const onLeft = logoOrientation === "vertical-left";
-              const style: React.CSSProperties = {
-                position: "absolute",
-                top: 140,                              // clears brand bar + safe zone
-                bottom: 120,                           // clears footer + safe zone
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              };
-              if (onLeft) style.left = 32;
-              else style.right = 32;
-              return style;
-            })()
-          : logoPositionStyles(placement.position);
+        const containerStyle = logoPositionStyles(placement.position);
 
         return (
           // Logo is always the top-most visual layer on every slide.
