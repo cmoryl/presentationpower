@@ -1593,6 +1593,16 @@ function VariantDetailModal({
               {previewBusy ? <Loader2 size={12} className="animate-spin" /> : <Eye size={12} />}
               {previewBusy ? (previewStage ?? "Rendering…") : "Preview PDFs"}
             </button>
+            <button
+              type="button"
+              onClick={downloadModuleZip}
+              disabled={zipBusy || previewBusy || pdfBusy !== null || bothBusy || downloading}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C] bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#003FC7] disabled:opacity-60"
+              title="Download a single ZIP containing PPTX, PDF, and PNG for both Light and Dark themes"
+            >
+              {zipBusy ? <Loader2 size={12} className="animate-spin" /> : <Package size={12} />}
+              {zipBusy ? (zipStage ?? "Bundling…") : "Download ZIP"}
+            </button>
             {usageCount > 0 && (
               <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
                 Used · {usageCount}
