@@ -26,27 +26,49 @@ export function HeroPreviewPanel({ media, brand }: Props) {
     <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
       <div className="flex items-center justify-between pb-2">
         <div className="text-[10px] uppercase tracking-[0.28em] text-white/50">Hero preview</div>
-        <div className="inline-flex rounded-full border border-white/10 bg-white/[0.04] p-0.5 text-[10px] uppercase tracking-[0.2em]">
-          <button
-            type="button"
-            onClick={() => setView("media")}
-            disabled={!hasMedia}
-            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 transition ${
-              active === "media" ? "bg-white text-[#0b0d18]" : "text-white/70 hover:text-white"
-            } disabled:cursor-not-allowed disabled:opacity-40`}
-            title={hasMedia ? "Show heroMedia" : "No heroMedia set"}
-          >
-            <ImageIcon className="h-3 w-3" /> Photo
-          </button>
-          <button
-            type="button"
-            onClick={() => setView("aura")}
-            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 transition ${
-              active === "aura" ? "bg-white text-[#0b0d18]" : "text-white/70 hover:text-white"
-            }`}
-          >
-            <Sparkles className="h-3 w-3" /> Aura
-          </button>
+        <div className="flex items-center gap-1.5">
+          <div className="inline-flex rounded-full border border-white/10 bg-white/[0.04] p-0.5 text-[10px] uppercase tracking-[0.2em]">
+            <button
+              type="button"
+              onClick={() => setMode("light")}
+              className={`rounded-full px-2 py-0.5 transition ${
+                mode === "light" ? "bg-white text-[#0b0d18]" : "text-white/70 hover:text-white"
+              }`}
+            >
+              Light
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("dark")}
+              className={`rounded-full px-2 py-0.5 transition ${
+                mode === "dark" ? "bg-white text-[#0b0d18]" : "text-white/70 hover:text-white"
+              }`}
+            >
+              Dark
+            </button>
+          </div>
+          <div className="inline-flex rounded-full border border-white/10 bg-white/[0.04] p-0.5 text-[10px] uppercase tracking-[0.2em]">
+            <button
+              type="button"
+              onClick={() => setView("media")}
+              disabled={!hasMedia}
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 transition ${
+                active === "media" ? "bg-white text-[#0b0d18]" : "text-white/70 hover:text-white"
+              } disabled:cursor-not-allowed disabled:opacity-40`}
+              title={hasMedia ? "Show heroMedia" : "No heroMedia set"}
+            >
+              <ImageIcon className="h-3 w-3" /> Photo
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("aura")}
+              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 transition ${
+                active === "aura" ? "bg-white text-[#0b0d18]" : "text-white/70 hover:text-white"
+              }`}
+            >
+              <Sparkles className="h-3 w-3" /> Aura
+            </button>
+          </div>
         </div>
       </div>
 
