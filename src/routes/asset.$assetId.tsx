@@ -26,6 +26,7 @@ import type {
   PrintAssetContext,
   PrintAssetRow,
   PrintDensity,
+  PrintHeroMedia,
   PrintPageSize,
 } from "@/lib/print-assets.types";
 import { emptyCaseStudy } from "@/lib/print-assets.types";
