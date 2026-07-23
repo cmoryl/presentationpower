@@ -688,7 +688,7 @@ export async function exportDeckToPptx(
   const rawBlob = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
   const finalBlob = await embedFontsInPptx(rawBlob);
   if (opts?.output === "blob") {
-    return { blob: finalBlob, failedSlides };
+    return { blob: finalBlob, failedSlides, fileName };
   }
   if (typeof document !== "undefined") {
     const url = URL.createObjectURL(finalBlob);
