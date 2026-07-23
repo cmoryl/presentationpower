@@ -1104,6 +1104,7 @@ function VariantDetailModal({
       window.setTimeout(() => setCopied(false), 1400);
     } catch { /* ignore */ }
   };
+  const [pdfBusy, setPdfBusy] = useState<null | "light" | "dark">(null);
   const downloadPptx = async (exportMode: "light" | "dark") => {
     if (downloading) return;
     setDownloading(true);
@@ -1132,6 +1133,26 @@ function VariantDetailModal({
       alert("Download failed. Check console for details.");
     } finally {
       setDownloading(false);
+    }
+  };
+  const downloadImagePdf = async (exportMode: "light" | "dark") => {
+    if (pdfBusy) return;
+    setPdfBusy(exportMode);
+    try {
+      const node = document.querySelector<HTMLElement>(
+        `[data-modal-preview="${exportMode}"][data-variant-id="${variant.id}"]`,
+      );
+      if (!node) throw new Error(`Preview node not found for ${exportMode} mode`);
+      const mod = await import("@/lib/slide-image-export");
+      await mod.exportSlidesAsImagePdf(
+        [{ node, mode: exportMode }],
+        { filename: `${variant.id}-${brand.id}-${exportMode}-review.pdf` },
+      );
+    } catch (err) {
+      console.error("[library] image PDF export failed", err);
+      alert("PDF export failed. Check console for details.");
+    } finally {
+      setPdfBusy(null);
     }
   };
   useEffect(() => {
