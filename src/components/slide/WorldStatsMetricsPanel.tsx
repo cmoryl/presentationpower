@@ -116,7 +116,7 @@ function slug(input: string): string {
   return input.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `metric-${Date.now()}`;
 }
 
-export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId, regionFilter, excludeRoles, topN, onChange }: Props) {
+export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId, regionFilter, excludeRoles, topN, scaleMode, onChange }: Props) {
   const seeded = React.useMemo(() => getDivisionLocationSet(brandId), [brandId]);
   const pins = React.useMemo(() => coercePins(items, seeded.pins), [items, seeded.pins]);
   const metricList = React.useMemo(() => coerceMetrics(metrics), [metrics]);
