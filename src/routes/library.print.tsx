@@ -44,7 +44,7 @@ import {
   type DivisionImageryEntry,
 } from "@/lib/division-imagery.functions";
 import type { BrandMode } from "@/lib/taxonomy";
-import { Download, Copy, Sparkle } from "lucide-react";
+import { Download, Copy, Sparkle, Star, Image as ImageIcon, ExternalLink } from "lucide-react";
 
 export const Route = createFileRoute("/library/print")({
   head: () => ({
