@@ -783,3 +783,258 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
     </section>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Approved hero imagery shelf — per division, grouped by template kind
+// ---------------------------------------------------------------------------
+type HeroTplKind = "spotlight" | "ebrochure" | "case-study" | "adaptor-brief";
+
+const HERO_TPLS: Array<{ id: HeroTplKind; label: string }> = [
+  { id: "spotlight", label: "Client Spotlight" },
+  { id: "ebrochure", label: "eBrochure" },
+  { id: "case-study", label: "Case Study" },
+  { id: "adaptor-brief", label: "Adaptor Brief" },
+];
+
+function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
+  const listFn = useServerFn(listDivisionImagery);
+  const [activeTpl, setActiveTpl] = useState<HeroTplKind | "all">("all");
+  const [lightbox, setLightbox] = useState<DivisionImageryEntry | null>(null);
+
+  const q = useQuery({
+    queryKey: ["division-imagery", brand.id, "approved"],
+    queryFn: () => listFn({ data: { divisionId: brand.id, onlyApproved: true } }),
+    staleTime: 60_000,
+  });
+
+  const rows = (q.data ?? []).filter((r) => !!r.signedUrl);
+  if (q.isLoading) return null;
+  if (rows.length === 0) return null;
+
+  const filtered = rows.filter((r) => {
+    if (activeTpl === "all") return true;
+    const allow = r.template_kinds ?? [];
+    // universal (empty allow-list) always shows; otherwise must include tpl
+    return allow.length === 0 || allow.includes(activeTpl);
+  });
+
+  // rank: default-for tpl first, then targeted, then universal
+  const ranked = [...filtered].sort((a, b) => {
+    const rank = (r: DivisionImageryEntry) => {
+      if (activeTpl !== "all" && (r.is_default_for ?? []).includes(activeTpl)) return 0;
+      if (activeTpl !== "all" && (r.template_kinds ?? []).includes(activeTpl)) return 1;
+      if ((r.template_kinds ?? []).length === 0) return 2;
+      return 3;
+    };
+    return rank(a) - rank(b);
+  });
+
+  const copyUrl = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Image URL copied");
+    } catch {
+      toast.error("Copy failed");
+    }
+  };
+
+  return (
+    <section className="mt-14">
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <div className="text-xs uppercase tracking-[0.24em] text-black/50">
+            Approved hero imagery · {brand.name}
+          </div>
+          <h2 className="mt-1 text-xl font-semibold text-[#03002C]">
+            Pick a hero photo for your next asset.
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm text-black/55">
+            Admin-approved imagery for this division. Filter by template to see what fits — starred
+            picks are the auto-defaults.
+          </p>
+        </div>
+        <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-[11px] font-medium text-emerald-700">
+          <Sparkle size={11} /> {rows.length} approved
+        </div>
+      </div>
+
+      {/* Template filter */}
+      <div className="mb-5 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => setActiveTpl("all")}
+          className={
+            "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition " +
+            (activeTpl === "all"
+              ? "border-[#003FC7] bg-[#003FC7] text-white"
+              : "border-black/15 bg-white text-black/65 hover:border-[#003FC7]")
+          }
+        >
+          <ImageIcon size={11} /> All templates
+        </button>
+        {HERO_TPLS.map((t) => {
+          const count = rows.filter(
+            (r) => (r.template_kinds ?? []).length === 0 || (r.template_kinds ?? []).includes(t.id),
+          ).length;
+          const active = activeTpl === t.id;
+          return (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setActiveTpl(t.id)}
+              className={
+                "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition " +
+                (active
+                  ? "border-[#003FC7] bg-[#003FC7] text-white"
+                  : "border-black/15 bg-white text-black/65 hover:border-[#003FC7]")
+              }
+            >
+              {t.label}
+              <span
+                className={
+                  "rounded-full px-1.5 py-0.5 text-[9px] " +
+                  (active ? "bg-white/25 text-white" : "bg-black/5 text-black/60")
+                }
+              >
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {ranked.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-black/15 bg-white p-8 text-center text-sm text-black/55">
+          No approved imagery targeted at this template yet.
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
+          {ranked.map((r) => {
+            const isDefault =
+              activeTpl !== "all" && (r.is_default_for ?? []).includes(activeTpl);
+            const isTargeted =
+              activeTpl !== "all" && (r.template_kinds ?? []).includes(activeTpl);
+            const isUniversal = (r.template_kinds ?? []).length === 0;
+            return (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => setLightbox(r)}
+                className="group relative overflow-hidden rounded-xl border border-black/10 bg-[#0b0a2a] text-left transition hover:border-[#003FC7]/60 hover:shadow-md"
+              >
+                <div
+                  className="aspect-[4/5] w-full bg-cover bg-center"
+                  style={{ backgroundImage: `url(${r.signedUrl})` }}
+                />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/70 to-transparent p-2.5">
+                  <div className="text-[10px] font-medium uppercase tracking-wide text-white/90 line-clamp-1">
+                    {r.collection ?? r.filename}
+                  </div>
+                  {isDefault ? (
+                    <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-400/95 px-1.5 py-0.5 text-[9px] font-semibold text-amber-950">
+                      <Star size={9} fill="currentColor" /> Default
+                    </span>
+                  ) : isTargeted ? (
+                    <span className="rounded-full bg-white/85 px-1.5 py-0.5 text-[9px] font-semibold text-[#03002C]">
+                      Targeted
+                    </span>
+                  ) : isUniversal ? (
+                    <span className="rounded-full bg-white/70 px-1.5 py-0.5 text-[9px] text-[#03002C]">
+                      Universal
+                    </span>
+                  ) : null}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {lightbox && lightbox.signedUrl ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6"
+          onClick={() => setLightbox(null)}
+        >
+          <div
+            className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-black/10 px-4 py-3">
+              <div className="min-w-0">
+                <div className="text-xs uppercase tracking-[0.2em] text-black/50">
+                  {brand.name} · {lightbox.collection ?? "Approved imagery"}
+                </div>
+                <div className="mt-0.5 truncate text-sm font-medium text-[#03002C]">
+                  {lightbox.filename}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setLightbox(null)}
+                className="rounded-full p-1 text-black/60 hover:bg-black/5"
+                aria-label="Close"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-auto bg-[#0b0a2a]">
+              <img
+                src={lightbox.signedUrl}
+                alt={lightbox.filename}
+                className="mx-auto max-h-[70vh] w-auto object-contain"
+              />
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-black/10 bg-white px-4 py-3">
+              <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-black/60">
+                {(lightbox.template_kinds ?? []).length === 0 ? (
+                  <span className="rounded-full bg-black/5 px-2 py-0.5">Universal</span>
+                ) : (
+                  (lightbox.template_kinds ?? []).map((k) => (
+                    <span key={k} className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[#003FC7]">
+                      {HERO_TPLS.find((t) => t.id === k)?.label ?? k}
+                    </span>
+                  ))
+                )}
+                {(lightbox.is_default_for ?? []).map((k) => (
+                  <span
+                    key={"d-" + k}
+                    className="inline-flex items-center gap-0.5 rounded-full bg-amber-400/90 px-2 py-0.5 text-[10px] font-semibold text-amber-950"
+                  >
+                    <Star size={9} fill="currentColor" />
+                    Default · {HERO_TPLS.find((t) => t.id === k)?.label ?? k}
+                  </span>
+                ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => copyUrl(lightbox.signedUrl!)}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-black/15 px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+                >
+                  <Copy size={11} /> Copy URL
+                </button>
+                <a
+                  href={lightbox.signedUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-black/15 px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+                >
+                  <ExternalLink size={11} /> Open
+                </a>
+                <Link
+                  to="/asset/new"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
+                >
+                  <ArrowRight size={11} /> Use in new asset
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </section>
+  );
+}
