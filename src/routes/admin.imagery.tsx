@@ -13,7 +13,16 @@ import {
   approveDivisionImagery,
   type DivisionImageryEntry,
 } from "@/lib/division-imagery.functions";
-import { UploadCloud, Trash2, CheckCircle2, Circle, Tag, Loader2 } from "lucide-react";
+import { UploadCloud, Trash2, CheckCircle2, Circle, Tag, Loader2, Star, Layers } from "lucide-react";
+
+const TEMPLATE_KINDS = ["spotlight", "ebrochure", "case-study", "adaptor-brief"] as const;
+type TemplateKind = (typeof TEMPLATE_KINDS)[number];
+const TEMPLATE_LABEL: Record<TemplateKind, string> = {
+  spotlight: "Spotlight",
+  ebrochure: "eBrochure",
+  "case-study": "Case Study",
+  "adaptor-brief": "Adaptor Brief",
+};
 
 export const Route = createFileRoute("/admin/imagery")({
   head: () => ({ meta: [{ title: "Division imagery · Admin" }] }),
@@ -34,6 +43,8 @@ function AdminImageryPage() {
   const [divisionId, setDivisionId] = useState<string>(BRAND_MODES[0]?.id ?? "bm-enterprise");
   const [statusFilter, setStatusFilter] = useState<"all" | "approved" | "pending">("all");
   const [tagQuery, setTagQuery] = useState("");
+  const [templateFilter, setTemplateFilter] = useState<TemplateKind | "all">("all");
+  const [collectionFilter, setCollectionFilter] = useState<string>("all");
 
   const q = useQuery({
     queryKey: ["admin-division-imagery", divisionId],
@@ -82,6 +93,16 @@ function AdminImageryPage() {
     onSuccess: () => invalidate(),
   });
 
+  const targetingMut = useMutation({
+    mutationFn: (input: {
+      id: string;
+      collection?: string | null;
+      template_kinds?: TemplateKind[];
+      is_default_for?: TemplateKind[];
+    }) => updateFn({ data: input }),
+    onSuccess: () => invalidate(),
+  });
+
   const delMut = useMutation({
     mutationFn: (id: string) => deleteFn({ data: { id } }),
     onSuccess: () => {
@@ -91,15 +112,33 @@ function AdminImageryPage() {
   });
 
   const rows = q.data ?? [];
+  const collections = useMemo(() => {
+    const set = new Set<string>();
+    rows.forEach((r) => {
+      if (r.collection) set.add(r.collection);
+    });
+    return Array.from(set).sort();
+  }, [rows]);
+
   const filtered = useMemo(() => {
     const tag = tagQuery.trim().toLowerCase();
     return rows.filter((r) => {
       if (statusFilter === "approved" && !r.approved) return false;
       if (statusFilter === "pending" && r.approved) return false;
       if (tag && !r.tags.some((t) => t.toLowerCase().includes(tag))) return false;
+      if (templateFilter !== "all") {
+        const t = r.template_kinds ?? [];
+        const d = r.is_default_for ?? [];
+        const universal = t.length === 0;
+        if (!universal && !t.includes(templateFilter) && !d.includes(templateFilter)) return false;
+      }
+      if (collectionFilter !== "all") {
+        if (collectionFilter === "__none" && r.collection) return false;
+        if (collectionFilter !== "__none" && r.collection !== collectionFilter) return false;
+      }
       return true;
     });
-  }, [rows, statusFilter, tagQuery]);
+  }, [rows, statusFilter, tagQuery, templateFilter, collectionFilter]);
 
   if (q.error && isForbidden(q.error)) return <AdminForbidden />;
 
@@ -145,6 +184,33 @@ function AdminImageryPage() {
           </select>
         </label>
         <label className="text-xs">
+          <div className="mb-1 uppercase tracking-wider text-black/50">Template</div>
+          <select
+            value={templateFilter}
+            onChange={(e) => setTemplateFilter(e.target.value as TemplateKind | "all")}
+            className="rounded-md border border-black/15 bg-white p-2 text-sm"
+          >
+            <option value="all">Any</option>
+            {TEMPLATE_KINDS.map((t) => (
+              <option key={t} value={t}>{TEMPLATE_LABEL[t]}</option>
+            ))}
+          </select>
+        </label>
+        <label className="text-xs">
+          <div className="mb-1 uppercase tracking-wider text-black/50">Collection</div>
+          <select
+            value={collectionFilter}
+            onChange={(e) => setCollectionFilter(e.target.value)}
+            className="rounded-md border border-black/15 bg-white p-2 text-sm"
+          >
+            <option value="all">All</option>
+            <option value="__none">Uncategorized</option>
+            {collections.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </label>
+        <label className="text-xs">
           <div className="mb-1 uppercase tracking-wider text-black/50">Filter by tag</div>
           <input
             value={tagQuery}
@@ -183,6 +249,7 @@ function AdminImageryPage() {
               onApprove={(next) => approveMut.mutate({ id: r.id, approved: next })}
               onTags={(tags) => tagsMut.mutate({ id: r.id, tags })}
               onKind={(kind) => kindMut.mutate({ id: r.id, kind })}
+              onTargeting={(patch) => targetingMut.mutate({ id: r.id, ...patch })}
               onDelete={() => {
                 if (window.confirm("Delete this image permanently?")) delMut.mutate(r.id);
               }}
@@ -333,12 +400,18 @@ function ImageCard({
   onApprove,
   onTags,
   onKind,
+  onTargeting,
   onDelete,
 }: {
   row: DivisionImageryEntry;
   onApprove: (next: boolean) => void;
   onTags: (tags: string[]) => void;
   onKind: (k: Kind) => void;
+  onTargeting: (patch: {
+    collection?: string | null;
+    template_kinds?: TemplateKind[];
+    is_default_for?: TemplateKind[];
+  }) => void;
   onDelete: () => void;
 }) {
   const [editing, setEditing] = useState(false);
@@ -455,7 +528,132 @@ function ImageCard({
             <Trash2 size={11} />
           </button>
         </div>
+
+        <TargetingPanel row={row} onTargeting={onTargeting} />
       </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Targeting panel — collection label, allow-listed templates, default picks.
+// Empty allow-list = universal fallback (any template can use this image).
+// ---------------------------------------------------------------------------
+function TargetingPanel({
+  row,
+  onTargeting,
+}: {
+  row: DivisionImageryEntry;
+  onTargeting: (patch: {
+    collection?: string | null;
+    template_kinds?: TemplateKind[];
+    is_default_for?: TemplateKind[];
+  }) => void;
+}) {
+  const [collectionDraft, setCollectionDraft] = useState(row.collection ?? "");
+  const allowed = new Set<TemplateKind>((row.template_kinds ?? []) as TemplateKind[]);
+  const defaults = new Set<TemplateKind>((row.is_default_for ?? []) as TemplateKind[]);
+
+  const toggleAllowed = (t: TemplateKind) => {
+    const next = new Set(allowed);
+    if (next.has(t)) {
+      next.delete(t);
+      // clearing the allow-list also clears default-for that template
+      const nextDefaults = new Set(defaults);
+      nextDefaults.delete(t);
+      onTargeting({
+        template_kinds: Array.from(next),
+        is_default_for: Array.from(nextDefaults),
+      });
+    } else {
+      next.add(t);
+      onTargeting({ template_kinds: Array.from(next) });
+    }
+  };
+
+  const toggleDefault = (t: TemplateKind) => {
+    const next = new Set(defaults);
+    if (next.has(t)) {
+      next.delete(t);
+    } else {
+      next.add(t);
+      // being a default implies allow-listed
+      if (!allowed.has(t)) {
+        const nextAllowed = new Set(allowed);
+        nextAllowed.add(t);
+        onTargeting({
+          is_default_for: Array.from(next),
+          template_kinds: Array.from(nextAllowed),
+        });
+        return;
+      }
+    }
+    onTargeting({ is_default_for: Array.from(next) });
+  };
+
+  const saveCollection = () => {
+    const trimmed = collectionDraft.trim();
+    onTargeting({ collection: trimmed ? trimmed : null });
+  };
+
+  return (
+    <div className="mt-3 rounded-lg border border-black/10 bg-black/[0.02] p-2">
+      <div className="mb-1.5 flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-black/50">
+        <Layers size={10} /> Template targeting
+      </div>
+      <div className="mb-2 flex items-center gap-1">
+        <input
+          value={collectionDraft}
+          onChange={(e) => setCollectionDraft(e.target.value)}
+          onBlur={saveCollection}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+          }}
+          placeholder="Collection (e.g. spring-2026)"
+          className="flex-1 rounded-md border border-black/15 bg-white p-1 text-[11px]"
+        />
+      </div>
+      <div className="space-y-1">
+        {TEMPLATE_KINDS.map((t) => {
+          const isAllowed = allowed.has(t);
+          const isDefault = defaults.has(t);
+          const universal = allowed.size === 0;
+          return (
+            <div
+              key={t}
+              className="flex items-center justify-between gap-1 rounded-md px-1 py-0.5 hover:bg-black/[0.03]"
+            >
+              <label className="flex flex-1 items-center gap-1.5 text-[11px] text-black/70">
+                <input
+                  type="checkbox"
+                  checked={isAllowed || universal}
+                  disabled={universal && !isAllowed}
+                  onChange={() => toggleAllowed(t)}
+                  className="h-3 w-3"
+                />
+                {TEMPLATE_LABEL[t]}
+                {universal && (
+                  <span className="text-[9px] uppercase tracking-wide text-black/35">any</span>
+                )}
+              </label>
+              <button
+                type="button"
+                onClick={() => toggleDefault(t)}
+                title={isDefault ? "Auto-picked default" : "Set as default"}
+                className={
+                  "inline-flex items-center rounded p-0.5 " +
+                  (isDefault ? "text-amber-500" : "text-black/25 hover:text-amber-400")
+                }
+              >
+                <Star size={12} fill={isDefault ? "currentColor" : "none"} />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      <p className="mt-1.5 text-[10px] leading-snug text-black/40">
+        No boxes checked = universal fallback. Star marks the auto-pick for that template.
+      </p>
     </div>
   );
 }
