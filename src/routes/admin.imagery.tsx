@@ -276,6 +276,78 @@ function AdminImageryPage() {
         </div>
       ) : null}
 
+      {/* Backfill: generate thumb/crop variants for rows uploaded before variant
+          generation was wired in. Runs entirely client-side (canvas) and posts
+          the rendered variants back to the server for storage + row merge. */}
+      {(() => {
+        const missing = rows.filter(
+          (r) => !r.variants || Object.keys(r.variants).length === 0,
+        );
+        if (missing.length === 0 && !backfill.running) return null;
+        return (
+          <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-amber-400/40 bg-amber-50/60 px-4 py-3 text-xs text-amber-900">
+            <Wand2 size={14} />
+            <span>
+              {backfill.running
+                ? `Generating variants… ${backfill.done}/${backfill.total}${backfill.failed ? ` · ${backfill.failed} failed` : ""}`
+                : `${missing.length} image${missing.length === 1 ? "" : "s"} missing thumb/crop variants`}
+            </span>
+            <button
+              type="button"
+              disabled={backfill.running || missing.length === 0}
+              onClick={async () => {
+                setBackfill({ running: true, done: 0, total: missing.length, failed: 0 });
+                let done = 0;
+                let failed = 0;
+                for (const row of missing) {
+                  try {
+                    if (!row.signedUrl) throw new Error("no signed url");
+                    const res = await fetch(row.signedUrl);
+                    if (!res.ok) throw new Error(`fetch ${res.status}`);
+                    const blob = await res.blob();
+                    const file = new File(
+                      [blob],
+                      row.filename || `${row.id}.jpg`,
+                      { type: row.content_type || blob.type || "image/jpeg" },
+                    );
+                    const variants = await generateImageVariants(file);
+                    if (variants.length === 0) throw new Error("no variants (SVG or decode fail)");
+                    await attachVariantsFn({
+                      data: {
+                        id: row.id,
+                        variants: variants.map((v) => ({
+                          preset: v.preset,
+                          filename: v.filename,
+                          contentType: v.contentType,
+                          data: v.data,
+                          width: v.width,
+                          height: v.height,
+                        })),
+                      },
+                    });
+                    done += 1;
+                  } catch (e) {
+                    failed += 1;
+                    console.warn("[backfill]", row.id, e);
+                  }
+                  setBackfill({ running: true, done: done + failed, total: missing.length, failed });
+                }
+                setBackfill({ running: false, done, total: missing.length, failed });
+                toast[failed ? "warning" : "success"](
+                  `Backfill done · ${done} generated${failed ? ` · ${failed} failed` : ""}`,
+                );
+                invalidate();
+              }}
+              className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-amber-600 px-3 py-1.5 text-white hover:bg-amber-700 disabled:opacity-50"
+            >
+              {backfill.running ? <Loader2 size={12} className="animate-spin" /> : <Wand2 size={12} />}
+              {backfill.running ? "Working…" : `Backfill ${missing.length}`}
+            </button>
+          </div>
+        );
+      })()}
+
+
       {/* Analytics totals for the selected division (last 90 days) */}
       {statsTotals ? (
         <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-xs text-black/70">
