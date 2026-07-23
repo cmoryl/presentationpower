@@ -839,6 +839,7 @@ const VariantCard = memo(function VariantCard({
   onImportExample,
   importBusy = false,
   logoHubPool,
+  compact = false,
 }: {
   variant: ModuleVariant;
   familyName?: string;
