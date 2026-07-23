@@ -1219,10 +1219,12 @@ function VariantDetailModal({
       await mod.exportSlidesAsImagePdf(
         [{ node, mode: exportMode }],
         {
-          filename: `${variant.id}-${brand.id}-${exportMode}-review.pdf`,
+          filename: `${variant.id}-${brand.id}-${exportMode}-${pixelRatio}x-review.pdf`,
+          pixelRatio,
           onProgress: (p) => setPdfStage(p.message ?? p.stage),
         },
       );
+
     } catch (err) {
       console.error("[library] image PDF export failed", err);
       alert("PDF export failed. Check console for details.");
