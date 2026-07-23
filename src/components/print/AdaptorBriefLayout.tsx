@@ -199,7 +199,7 @@ export function AdaptorBriefLayout({
                         <div style={{ fontWeight: 700, fontSize: cq(15), color: accentInk, marginTop: cq(10) }}>
                           {f.verb}
                         </div>
-                        <div style={{ fontSize: cq(10.5), lineHeight: 1.5, color: inkSoft, marginTop: cq(4) }}>
+                        <div style={{ fontSize: cq(10.5), lineHeight: 1.5, color: inkSoft, marginTop: cq(4), ...clampLines(4) }}>
                           {f.body}
                         </div>
                       </div>
