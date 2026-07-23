@@ -441,6 +441,7 @@ function Uploader({
 // ---------------------------------------------------------------------------
 function ImageCard({
   row,
+  stats,
   onApprove,
   onTags,
   onKind,
@@ -448,6 +449,7 @@ function ImageCard({
   onDelete,
 }: {
   row: DivisionImageryEntry;
+  stats?: { view: number; select: number; download: number; total: number; last: string | null };
   onApprove: (next: boolean) => void;
   onTags: (tags: string[]) => void;
   onKind: (k: Kind) => void;
