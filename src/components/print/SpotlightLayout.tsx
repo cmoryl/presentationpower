@@ -264,42 +264,55 @@ export function SpotlightLayout({
           className="relative w-full overflow-hidden [container-type:inline-size]"
           style={{
             aspectRatio: pageAspect(pageSize),
-            backgroundColor: bg,
+            backgroundColor: mode === "light" ? "#FFFFFF" : bg,
             color: ink,
             fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
             ...style,
           }}
         >
-          {/* AURORA GROUND — division accent behind everything (dark only) */}
-          {mode === "dark" && (
-            <AuroraLayer
-              seed={auroraSeed}
-              brand={brand}
-              intensity={brand.id === "bm-enterprise" ? 0.35 : 0.9}
-              aspect={auroraAspect(pageSize)}
+          {/* Light mode: hard white base under everything (belt-and-suspenders). */}
+          {mode === "light" && (
+            <div
+              className="pointer-events-none absolute inset-0"
+              aria-hidden
+              style={{ background: "#FFFFFF", zIndex: 0 }}
             />
+          )}
+          {/* Decorative aurora + halo are clipped to the top region only —
+              lower half of the page stays clean (no aura in the body). */}
+          {mode === "dark" && (
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 overflow-hidden"
+              aria-hidden
+              style={{
+                height: "55%",
+                WebkitMaskImage: "linear-gradient(180deg, black 0%, black 62%, transparent 100%)",
+                maskImage: "linear-gradient(180deg, black 0%, black 62%, transparent 100%)",
+              }}
+            >
+              <AuroraLayer
+                seed={auroraSeed}
+                brand={brand}
+                intensity={brand.id === "bm-enterprise" ? 0.35 : 0.9}
+                aspect={auroraAspect(pageSize)}
+              />
+              <div
+                className="pointer-events-none absolute"
+                style={{
+                  top: cq(-140),
+                  right: cq(-140),
+                  width: cq(460),
+                  height: cq(460),
+                  borderRadius: "50%",
+                  background: `radial-gradient(circle at 45% 45%, ${accent}59 0%, ${accent}22 45%, transparent 72%)`,
+                  filter: `blur(${cq(10)})`,
+                  opacity: 0.9,
+                }}
+              />
+            </div>
           )}
           {content.heroMedia && (
             <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
-          )}
-
-
-          {/* Corner accent bloom — dark mode only to preserve true white pages. */}
-          {mode === "dark" && (
-            <div
-              className="pointer-events-none absolute"
-              aria-hidden
-              style={{
-                top: cq(-140),
-                right: cq(-140),
-                width: cq(460),
-                height: cq(460),
-                borderRadius: "50%",
-                background: `radial-gradient(circle at 45% 45%, ${accent}59 0%, ${accent}22 45%, transparent 72%)`,
-                filter: `blur(${cq(10)})`,
-                opacity: 0.9,
-              }}
-            />
           )}
 
           <div

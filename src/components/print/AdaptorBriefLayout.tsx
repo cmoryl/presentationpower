@@ -137,16 +137,31 @@ export function AdaptorBriefLayout({
           className="relative w-full overflow-hidden [container-type:inline-size]"
           style={{
             aspectRatio: pageAspect(pageSize),
-            backgroundColor: bg,
+            backgroundColor: mode === "light" ? "#FFFFFF" : bg,
             color: ink,
             fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
             ...style,
           }}
         >
-
-          {/* Aurora + accent blooms — dark mode only; light stays true white. */}
+          {mode === "light" && (
+            <div
+              className="pointer-events-none absolute inset-0"
+              aria-hidden
+              style={{ background: "#FFFFFF", zIndex: 0 }}
+            />
+          )}
+          {/* Aurora + accent blooms — dark mode only, clipped to top region.
+              Lower half of the document stays clean (no aura). */}
           {mode === "dark" && (
-            <>
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 overflow-hidden"
+              aria-hidden
+              style={{
+                height: "55%",
+                WebkitMaskImage: "linear-gradient(180deg, black 0%, black 62%, transparent 100%)",
+                maskImage: "linear-gradient(180deg, black 0%, black 62%, transparent 100%)",
+              }}
+            >
               <div className="pointer-events-none absolute inset-0" style={{ opacity: 0.9 }}>
                 <AuroraLayer
                   seed={seed ?? `adaptor-${brand.id}-${mode}`}
@@ -160,12 +175,7 @@ export function AdaptorBriefLayout({
                 background: `radial-gradient(circle at 45% 45%, ${accent}66 0%, ${accent}22 45%, transparent 72%)`,
                 filter: `blur(${cq(10)})`,
               }} />
-              <div className="pointer-events-none absolute" aria-hidden style={{
-                top: cq(340), left: cq(-140), width: cq(360), height: cq(360), borderRadius: "50%",
-                background: `radial-gradient(circle at 60% 40%, ${accent}44 0%, transparent 70%)`,
-                filter: `blur(${cq(10)})`,
-              }} />
-            </>
+            </div>
           )}
           {content.heroMedia && (
             <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
