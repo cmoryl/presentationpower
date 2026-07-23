@@ -705,7 +705,9 @@ function AssetEditor() {
             </Panel>
 
             <Panel title="Shared modules">
+              <LayoutHealthBanner report={analyzePrintAsset("case-study", content)} />
               <ModulesPanel
+                kind="case-study"
                 modules={content.modules ?? []}
                 onAdd={() => setPickerOpen(true)}
                 onChange={(next) => patchContent({ modules: next })}
