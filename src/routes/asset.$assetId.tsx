@@ -126,16 +126,43 @@ function AssetEditor() {
   const content: CaseStudyContent = { ...emptyCaseStudy(), ...(row.content as CaseStudyContent) };
   const ctx: PrintAssetContext = (row.context as PrintAssetContext) ?? {};
 
+  function pushHistory() {
+    if (!row) return;
+    historyRef.current.undo.push({ content: row.content, context: row.context });
+    if (historyRef.current.undo.length > 100) historyRef.current.undo.shift();
+    historyRef.current.redo = [];
+  }
   function patchContent(patch: Partial<CaseStudyContent>) {
     if (!row) return;
+    pushHistory();
     setRow({ ...row, content: { ...content, ...patch } as unknown as CaseStudyContent });
     setDirty(true);
+    setHistoryTick((t) => t + 1);
   }
   function patchCtx(patch: Partial<PrintAssetContext>) {
     if (!row) return;
+    pushHistory();
     setRow({ ...row, context: { ...ctx, ...patch } as unknown as PrintAssetContext });
     setDirty(true);
+    setHistoryTick((t) => t + 1);
   }
+  function undo() {
+    if (!row || historyRef.current.undo.length === 0) return;
+    const prev = historyRef.current.undo.pop()!;
+    historyRef.current.redo.push({ content: row.content, context: row.context });
+    setRow({ ...row, content: prev.content as CaseStudyContent, context: prev.context as PrintAssetContext });
+    setDirty(true);
+    setHistoryTick((t) => t + 1);
+  }
+  function redo() {
+    if (!row || historyRef.current.redo.length === 0) return;
+    const nxt = historyRef.current.redo.pop()!;
+    historyRef.current.undo.push({ content: row.content, context: row.context });
+    setRow({ ...row, content: nxt.content as CaseStudyContent, context: nxt.context as PrintAssetContext });
+    setDirty(true);
+    setHistoryTick((t) => t + 1);
+  }
+
   function updateStat(i: number, patch: Partial<CaseStudyStat>) {
     const next = [...content.stats];
     next[i] = { ...next[i], ...patch };
