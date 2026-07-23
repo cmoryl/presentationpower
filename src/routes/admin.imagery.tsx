@@ -43,9 +43,16 @@ function AdminImageryPage() {
   const invalidate = () =>
     qc.invalidateQueries({ queryKey: ["admin-division-imagery", divisionId] });
 
+  type UploadInput = {
+    divisionId: string;
+    filename: string;
+    contentType: string;
+    data: string;
+    kind: Kind;
+    tags: string[];
+  };
   const uploadMut = useMutation({
-    mutationFn: (input: Parameters<typeof uploadFn>[0] extends { data: infer D } ? D : never) =>
-      uploadFn({ data: input as never }),
+    mutationFn: (input: UploadInput) => uploadFn({ data: input }),
     onSuccess: () => {
       toast.success("Uploaded");
       invalidate();
