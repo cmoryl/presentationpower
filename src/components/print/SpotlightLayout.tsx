@@ -275,7 +275,7 @@ export function SpotlightLayout({
             <AuroraLayer
               seed={auroraSeed}
               brand={brand}
-              intensity={0.9}
+              intensity={brand.id === "bm-enterprise" ? 0.35 : 0.9}
               aspect={auroraAspect(pageSize)}
             />
           )}

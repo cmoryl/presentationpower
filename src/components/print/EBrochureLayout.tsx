@@ -155,7 +155,7 @@ export function EBrochureLayout({
             <AuroraLayer
               seed={seed ?? `ebrochure-${brand.id}-${mode}`}
               brand={brand}
-              intensity={0.85}
+              intensity={brand.id === "bm-enterprise" ? 0.35 : 0.85}
               aspect={auroraAspect(pageSize)}
             />
           )}

@@ -146,7 +146,7 @@ export function CaseStudyLayout({
             <AuroraLayer
               seed={seed ?? `casestudy-${brand.id}-${mode}`}
               brand={brand}
-              intensity={0.85}
+              intensity={brand.id === "bm-enterprise" ? 0.35 : 0.85}
               aspect={auroraAspect(pageSize)}
             />
           )}
