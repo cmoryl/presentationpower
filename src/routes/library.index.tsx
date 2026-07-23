@@ -1684,16 +1684,81 @@ function VariantDetailModal({
               {previewBusy ? <Loader2 size={12} className="animate-spin" /> : <Eye size={12} />}
               {previewBusy ? (previewStage ?? "Rendering…") : "Preview PDFs"}
             </button>
-            <button
-              type="button"
-              onClick={downloadModuleZip}
-              disabled={zipBusy || previewBusy || pdfBusy !== null || bothBusy || downloading}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C] bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#003FC7] disabled:opacity-60"
-              title="Download a single ZIP containing PPTX, PDF, and PNG for both Light and Dark themes"
-            >
-              {zipBusy ? <Loader2 size={12} className="animate-spin" /> : <Package size={12} />}
-              {zipBusy ? (zipStage ?? "Bundling…") : "Download ZIP"}
-            </button>
+            <div className="relative inline-flex items-stretch overflow-visible rounded-full border border-[#03002C] bg-[#03002C] text-xs font-medium text-white">
+              <button
+                type="button"
+                onClick={downloadModuleZip}
+                disabled={zipBusy || previewBusy || pdfBusy !== null || bothBusy || downloading || zipSelectedCount === 0}
+                className="inline-flex items-center gap-1.5 rounded-l-full px-3 py-1.5 transition hover:bg-[#003FC7] disabled:opacity-60"
+                title={zipSelectedCount === 0 ? "Select at least one export in the menu" : `Download ZIP with ${zipSelectedCount} file${zipSelectedCount === 1 ? "" : "s"}`}
+              >
+                {zipBusy ? <Loader2 size={12} className="animate-spin" /> : <Package size={12} />}
+                {zipBusy ? (zipStage ?? "Bundling…") : `Download ZIP (${zipSelectedCount})`}
+              </button>
+              <button
+                type="button"
+                onClick={() => setZipMenuOpen((v) => !v)}
+                disabled={zipBusy}
+                aria-haspopup="menu"
+                aria-expanded={zipMenuOpen}
+                aria-label="Choose files to include in ZIP"
+                title="Choose files to include"
+                className="inline-flex items-center border-l border-white/20 rounded-r-full px-2 transition hover:bg-[#003FC7] disabled:opacity-60"
+              >
+                <svg className={`h-3 w-3 transition-transform ${zipMenuOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 9l6 6 6-6"/></svg>
+              </button>
+              {zipMenuOpen && (
+                <>
+                  <button
+                    type="button"
+                    aria-label="Close menu"
+                    className="fixed inset-0 z-40 cursor-default bg-transparent"
+                    onClick={() => setZipMenuOpen(false)}
+                  />
+                  <div
+                    role="menu"
+                    className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-black/10 bg-white p-3 text-[#03002C] shadow-xl ring-1 ring-black/5"
+                  >
+                    <div className="flex items-center justify-between pb-2">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">Include in ZIP</span>
+                      <div className="flex gap-1">
+                        <button
+                          type="button"
+                          onClick={() => setZipSelection({ pptxLight: true, pptxDark: true, pdfLight: true, pdfDark: true, pngLight: true, pngDark: true })}
+                          className="rounded-full px-2 py-0.5 text-[10px] font-medium text-[#003FC7] hover:bg-[#003FC7]/10"
+                        >All</button>
+                        <button
+                          type="button"
+                          onClick={() => setZipSelection({ pptxLight: false, pptxDark: false, pdfLight: false, pdfDark: false, pngLight: false, pngDark: false })}
+                          className="rounded-full px-2 py-0.5 text-[10px] font-medium text-black/60 hover:bg-black/5"
+                        >None</button>
+                      </div>
+                    </div>
+                    {([
+                      { key: "pptxLight", label: "PPTX · Light" },
+                      { key: "pptxDark", label: "PPTX · Dark" },
+                      { key: "pdfLight", label: "PDF · Light" },
+                      { key: "pdfDark", label: "PDF · Dark" },
+                      { key: "pngLight", label: "PNG · Light" },
+                      { key: "pngDark", label: "PNG · Dark" },
+                    ] as { key: ZipItemKey; label: string }[]).map((item) => (
+                      <label key={item.key} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium hover:bg-black/5">
+                        <input
+                          type="checkbox"
+                          checked={zipSelection[item.key]}
+                          onChange={(e) => setZipSelection((s) => ({ ...s, [item.key]: e.target.checked }))}
+                          className="h-3.5 w-3.5 accent-[#003FC7]"
+                        />
+                        {item.label}
+                      </label>
+                    ))}
+                    <p className="mt-2 border-t border-black/5 pt-2 text-[10px] text-black/50">
+                      Selection is saved for next time · {pixelRatio}× resolution
+                    </p>
+                  </div>
+                </>
+              )}
+            </div>
             {usageCount > 0 && (
               <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
                 Used · {usageCount}
