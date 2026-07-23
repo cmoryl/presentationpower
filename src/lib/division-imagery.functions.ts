@@ -268,14 +268,19 @@ export const deleteDivisionImagery = createServerFn({ method: "POST" })
     const s = context.supabase as unknown as SbClient;
     const { data: row, error: qErr } = await s
       .from("division_imagery")
-      .select("storage_path")
+      .select("storage_path, variants")
       .eq("id", data.id)
       .maybeSingle();
     if (qErr) throw new Error((qErr as { message?: string }).message ?? "Lookup failed");
     const path = (row as { storage_path?: string } | null)?.storage_path;
+    const variants = (row as { variants?: Record<string, { path?: string }> } | null)?.variants ?? {};
+    const variantPaths = Object.values(variants)
+      .map((v) => v?.path)
+      .filter((p): p is string => !!p);
     const { error } = await s.from("division_imagery").delete().eq("id", data.id);
     if (error) throw new Error((error as { message?: string }).message ?? "Delete failed");
-    if (path) await s.storage.from(BUCKET).remove([path]).catch(() => {});
+    const toRemove = [path, ...variantPaths].filter((p): p is string => !!p);
+    if (toRemove.length) await s.storage.from(BUCKET).remove(toRemove).catch(() => {});
     return { ok: true };
   });
 
