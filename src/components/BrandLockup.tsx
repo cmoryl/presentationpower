@@ -177,7 +177,7 @@ export function BrandLockup({
             </div>
           )}
         </div>
-        {clientLogoUrl && !isVertical && (
+        {clientLogoUrl && (
           <>
             <div
               aria-hidden
