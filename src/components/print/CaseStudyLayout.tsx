@@ -146,7 +146,7 @@ export function CaseStudyLayout({
             <AuroraLayer
               seed={seed ?? `casestudy-${brand.id}-${mode}`}
               brand={brand}
-              intensity={0.85}
+              intensity={brand.id === "bm-enterprise" ? 0.35 : 0.85}
               aspect={auroraAspect(pageSize)}
             />
           )}
@@ -182,7 +182,7 @@ export function CaseStudyLayout({
               <div style={{ fontSize: cq(9.5), fontWeight: 600, letterSpacing: "0.14em", color: accentInk }}>
                 {(content.eyebrow ?? "CLIENT CASE STUDY").toUpperCase()}
               </div>
-              <BrandLockup brand={brand} color={resolvePrintLogoInk(content.logoColor, ink)} size="xs" orientation="horizontal" />
+              <BrandLockup brand={brand} color={resolvePrintLogoInk(content.logoColor, ink)} size="2xs" orientation="horizontal" />
             </div>
             <h1
               ref={heroRef}

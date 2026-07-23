@@ -275,7 +275,7 @@ export function SpotlightLayout({
             <AuroraLayer
               seed={auroraSeed}
               brand={brand}
-              intensity={0.9}
+              intensity={brand.id === "bm-enterprise" ? 0.35 : 0.9}
               aspect={auroraAspect(pageSize)}
             />
           )}
@@ -320,7 +320,7 @@ export function SpotlightLayout({
               >
                 {(content.eyebrow ?? "Client spotlight").toUpperCase()}
               </div>
-              <BrandLockup brand={brand} color={resolvePrintLogoInk(content.logoColor, ink)} size="xs" orientation="horizontal" />
+              <BrandLockup brand={brand} color={resolvePrintLogoInk(content.logoColor, ink)} size="2xs" orientation="horizontal" />
             </div>
 
             {/* ============================================================ */}
