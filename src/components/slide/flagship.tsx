@@ -287,7 +287,7 @@ export function EditorialTitle({
             key={i}
             style={{
               fontFamily: EDITORIAL_SERIF,
-              fontStyle: "italic",
+              
               fontWeight: 400,
               color: accentColor ?? color,
               letterSpacing: "-0.02em",
@@ -338,7 +338,7 @@ export function PullQuote({
     opacity,
     fontWeight: 500,
     letterSpacing: "-0.06em",
-    fontStyle: "italic",
+    
   };
   return (
     <div className={`relative ${className}`}>
@@ -359,7 +359,7 @@ export function PullQuote({
           fontFamily: EDITORIAL_SERIF,
           fontSize: size,
           fontWeight: 400,
-          fontStyle: "italic",
+          
           lineHeight: 1.08,
           letterSpacing: "-0.02em",
           color,
@@ -559,6 +559,15 @@ export function AuroraLayer({
           ))}
         </g>
       </svg>
+      {mode === "light" && (
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `linear-gradient(to left, ${hexA(brand.tokens.accent, 0.10)} 0%, ${hexA(brand.tokens.accent, 0.045)} 35%, rgba(255,255,255,0) 70%)`,
+          }}
+        />
+      )}
       {/* Free-form aurora v2 — no frosted-glass wash, no vignette. Content
           sits directly on the accent blooms, matching the reference
           backdrops. Both the on-screen renderer and the PPTX exporter in

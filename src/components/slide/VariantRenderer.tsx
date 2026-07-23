@@ -3873,7 +3873,7 @@ function renderVariantBody({
           <div className="mt-16 grid gap-12" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
             {items[0] && (
               <div className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                <div style={{ fontSize: 26, lineHeight: 1.35, color: "color-mix(in oklab, currentColor 82%, transparent)", fontStyle: "italic" }}>&ldquo;{s(items[0].quote)}&rdquo;</div>
+                <div style={{ fontSize: 26, lineHeight: 1.35, color: "color-mix(in oklab, currentColor 82%, transparent)" }}>&ldquo;{s(items[0].quote)}&rdquo;</div>
                 <div className="mt-5">
                   <Attribution brand={brand} name={s(items[0].name)} role={s(items[0].role)} org={s(items[0].org)} />
                 </div>
@@ -3882,7 +3882,7 @@ function renderVariantBody({
             <div style={{ background: `${ink.hairline}` }} />
             {items[1] && (
               <div className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                <div style={{ fontSize: 26, lineHeight: 1.35, color: "color-mix(in oklab, currentColor 82%, transparent)", fontStyle: "italic" }}>&ldquo;{s(items[1].quote)}&rdquo;</div>
+                <div style={{ fontSize: 26, lineHeight: 1.35, color: "color-mix(in oklab, currentColor 82%, transparent)" }}>&ldquo;{s(items[1].quote)}&rdquo;</div>
                 <div className="mt-5">
                   <Attribution brand={brand} name={s(items[1].name)} role={s(items[1].role)} org={s(items[1].org)} />
                 </div>
@@ -3903,7 +3903,7 @@ function renderVariantBody({
             </div>
             <div className="mt-6 flex flex-wrap items-baseline gap-6">
               <span className="uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: ink.faint, fontWeight: 500 }}>{s(c.pronunciation)}</span>
-              <span style={{ fontSize: 24, color: "var(--slide-accent-text)", fontStyle: "italic", fontWeight: 600 }}>{s(c.partOfSpeech, "n.")}</span>
+              <span style={{ fontSize: 24, color: "var(--slide-accent-text)",  fontWeight: 600 }}>{s(c.partOfSpeech, "n.")}</span>
             </div>
             <div className="mt-10" style={{ fontSize: 34, lineHeight: 1.35, color: "color-mix(in oklab, currentColor 85%, transparent)", maxWidth: 1400 }}>
               {s(c.definition)}
@@ -3911,7 +3911,7 @@ function renderVariantBody({
             {s(c.usage) && (
               <div className="mt-12 pt-8" style={{ borderTop: "1px solid rgba(10,15,28,0.15)", maxWidth: 1400 }}>
                 <span className="uppercase mr-4" style={{ fontSize: 14, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>Usage</span>
-                <span style={{ fontSize: 24, lineHeight: 1.45, color: "color-mix(in oklab, currentColor 65%, transparent)", fontStyle: "italic" }}>{s(c.usage)}</span>
+                <span style={{ fontSize: 24, lineHeight: 1.45, color: "color-mix(in oklab, currentColor 65%, transparent)" }}>{s(c.usage)}</span>
               </div>
             )}
           </div>
