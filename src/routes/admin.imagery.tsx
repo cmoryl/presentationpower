@@ -184,6 +184,33 @@ function AdminImageryPage() {
           </select>
         </label>
         <label className="text-xs">
+          <div className="mb-1 uppercase tracking-wider text-black/50">Template</div>
+          <select
+            value={templateFilter}
+            onChange={(e) => setTemplateFilter(e.target.value as TemplateKind | "all")}
+            className="rounded-md border border-black/15 bg-white p-2 text-sm"
+          >
+            <option value="all">Any</option>
+            {TEMPLATE_KINDS.map((t) => (
+              <option key={t} value={t}>{TEMPLATE_LABEL[t]}</option>
+            ))}
+          </select>
+        </label>
+        <label className="text-xs">
+          <div className="mb-1 uppercase tracking-wider text-black/50">Collection</div>
+          <select
+            value={collectionFilter}
+            onChange={(e) => setCollectionFilter(e.target.value)}
+            className="rounded-md border border-black/15 bg-white p-2 text-sm"
+          >
+            <option value="all">All</option>
+            <option value="__none">Uncategorized</option>
+            {collections.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </label>
+        <label className="text-xs">
           <div className="mb-1 uppercase tracking-wider text-black/50">Filter by tag</div>
           <input
             value={tagQuery}
