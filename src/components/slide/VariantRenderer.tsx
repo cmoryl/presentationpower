@@ -4376,10 +4376,10 @@ function renderVariantBody({
                     )}
                   </div>
                   <div
-                    className="mt-6 uppercase"
+                    className="mt-4 uppercase"
                     style={{
-                      fontSize: 16,
-                      letterSpacing: "0.28em",
+                      fontSize: 13,
+                      letterSpacing: "0.26em",
                       color: isLast ? "var(--slide-accent-text)" : ink.faint,
                       fontWeight: 700,
                     }}
@@ -4388,8 +4388,8 @@ function renderVariantBody({
                   </div>
                   {s(it.note) && (
                     <div
-                      className="mt-2 text-center"
-                      style={{ fontSize: 15, lineHeight: 1.4, color: ink.muted, maxWidth: 220 }}
+                      className="mt-1 text-center"
+                      style={{ fontSize: 13, lineHeight: 1.35, color: ink.muted, maxWidth: 200 }}
                     >
                       {s(it.note)}
                     </div>
