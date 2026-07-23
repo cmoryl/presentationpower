@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "test:e2e:video-autoplay": "playwright test tests/e2e/library-video-autoplay.spec.ts --project=chromium --project=firefox --project=webkit"
+    "test:e2e:video-autoplay": "playwright test tests/e2e/library-video-autoplay.spec.ts --project=chromium --project=firefox --project=webkit",
+    "test:e2e:smoke": "playwright test tests/e2e/smoke-routes.spec.ts --project=chromium"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.9",
