@@ -32,6 +32,13 @@ const ROLE_LABELS: Record<RoleKey, string> = {
 };
 const TOP_N_OPTIONS = [5, 10, 25] as const;
 type TopN = (typeof TOP_N_OPTIONS)[number];
+const SCALE_MODES = ["absolute", "region-percent", "global-percent"] as const;
+type ScaleMode = (typeof SCALE_MODES)[number];
+const SCALE_MODE_LABELS: Record<ScaleMode, string> = {
+  absolute: "Absolute",
+  "region-percent": "% of region",
+  "global-percent": "% of global",
+};
 
 type Props = {
   brandId: string;
@@ -41,6 +48,7 @@ type Props = {
   regionFilter: unknown;
   excludeRoles: unknown;
   topN: unknown;
+  scaleMode: unknown;
   onChange: (patch: {
     items?: LocationPin[];
     metrics?: LocationMetric[];
@@ -48,6 +56,7 @@ type Props = {
     regionFilter?: RegionKey[] | null;
     excludeRoles?: RoleKey[] | null;
     topN?: TopN;
+    scaleMode?: ScaleMode;
   }) => void;
 };
 
