@@ -243,7 +243,7 @@ export function EBrochureLayout({
                       fontFamily: "Georgia, serif", fontSize: cq(40),
                       lineHeight: 0.6, color: accentInk, fontWeight: 700,
                     }} aria-hidden>&ldquo;</div>
-                    <p style={{ margin: `${cq(10)} 0 0`, fontSize: cq(12.5), lineHeight: 1.6, color: ink }}>
+                    <p style={{ margin: `${cq(10)} 0 0`, fontSize: cq(12.5), lineHeight: 1.6, color: ink, ...clampLines(6) }}>
                       {content.quote.text}
                     </p>
                     <div style={{ marginTop: cq(10), fontSize: cq(11), fontWeight: 700, color: accentInk }}>
@@ -253,13 +253,13 @@ export function EBrochureLayout({
                 )}
                 {content.discover && (
                   <div style={{ flex: "1 1 0", padding: `${cq(6)} 0` }}>
-                    <p style={{ margin: 0, fontSize: cq(10), lineHeight: 1.6, color: inkSoft }}>
+                    <p style={{ margin: 0, fontSize: cq(10), lineHeight: 1.6, color: inkSoft, ...clampLines(6) }}>
                       {content.discover.body}
                     </p>
                     {content.discover.bullets.slice(0, 4).map((b, k) => (
                       <div key={k} className="flex items-center" style={{ gap: cq(8), marginTop: k === 0 ? cq(12) : cq(8) }}>
                         <Icon d={ICONS.check} size={cq(11)} color={accentInk} strokeWidth={2.5} />
-                        <div style={{ fontSize: cq(10), color: inkSoft }}>{b}</div>
+                        <div style={{ fontSize: cq(10), color: inkSoft, ...clampLines(2) }}>{b}</div>
                       </div>
                     ))}
                   </div>
