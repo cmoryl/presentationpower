@@ -1230,6 +1230,21 @@ function VariantDetailModal({
   const [previewUrls, setPreviewUrls] = useState<{ light: string; dark: string; filenameLight: string; filenameDark: string; ratio: 1 | 2 } | null>(null);
   const [zipBusy, setZipBusy] = useState(false);
   const [zipStage, setZipStage] = useState<string | null>(null);
+  type ZipItemKey = "pptxLight" | "pptxDark" | "pdfLight" | "pdfDark" | "pngLight" | "pngDark";
+  const ZIP_STORAGE_KEY = "library:zip-selection";
+  const [zipSelection, setZipSelection] = useState<Record<ZipItemKey, boolean>>(() => {
+    if (typeof window === "undefined") return { pptxLight: true, pptxDark: true, pdfLight: true, pdfDark: true, pngLight: true, pngDark: true };
+    try {
+      const raw = window.localStorage.getItem(ZIP_STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return { pptxLight: true, pptxDark: true, pdfLight: true, pdfDark: true, pngLight: true, pngDark: true };
+  });
+  useEffect(() => {
+    if (typeof window !== "undefined") window.localStorage.setItem(ZIP_STORAGE_KEY, JSON.stringify(zipSelection));
+  }, [zipSelection]);
+  const [zipMenuOpen, setZipMenuOpen] = useState(false);
+  const zipSelectedCount = Object.values(zipSelection).filter(Boolean).length;
 
   useEffect(() => {
     return () => {
