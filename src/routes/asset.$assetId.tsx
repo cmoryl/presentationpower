@@ -33,7 +33,8 @@ import { emptyCaseStudy } from "@/lib/print-assets.types";
 import type { PrintSection, PrintStatsSection, PrintStatsVariant } from "@/lib/print-assets.types";
 import { PRINT_STATS_VARIANTS, PrintSectionRenderer } from "@/components/print/sections/PrintSectionRenderer";
 import { PrintSectionPicker } from "@/components/print/sections/PrintSectionPicker";
-import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown } from "lucide-react";
+import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
+import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images } from "lucide-react";
 
 export const Route = createFileRoute("/asset/$assetId")({
   head: ({ params }) => ({
@@ -576,6 +577,7 @@ function AssetEditor() {
             <HeroMediaPanel
               value={content.heroMedia}
               onChange={(next) => patchContent({ heroMedia: next })}
+              divisionId={row?.brand_mode_id ?? null}
             />
 
 
@@ -822,9 +824,11 @@ function Block({ label, body, onChange }: { label: string; body: string; onChang
 function HeroMediaPanel({
   value,
   onChange,
+  divisionId,
 }: {
   value: PrintHeroMedia | undefined;
   onChange: (next: PrintHeroMedia | undefined) => void;
+  divisionId: string | null;
 }) {
   const enabled = !!value?.imageUrl;
   const media: PrintHeroMedia = value ?? { imageUrl: "" };
@@ -834,6 +838,7 @@ function HeroMediaPanel({
   const focalX = media.focalX ?? 50;
   const focalY = media.focalY ?? 40;
   const aspect = media.aspect ?? "fill";
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   function patch(p: Partial<PrintHeroMedia>) {
     onChange({ ...media, ...p });
@@ -852,11 +857,35 @@ function HeroMediaPanel({
           }
         />
       </Row>
-      <input
-        className={inspectorInput}
-        placeholder="Image URL (https://…)"
-        value={media.imageUrl}
-        onChange={(e) => patch({ imageUrl: e.target.value })}
+      <div className="flex gap-2">
+        <input
+          className={`${inspectorInput} flex-1`}
+          placeholder="Image URL (https://…)"
+          value={media.imageUrl}
+          onChange={(e) => patch({ imageUrl: e.target.value })}
+        />
+        <button
+          type="button"
+          onClick={() => setPickerOpen(true)}
+          disabled={!divisionId}
+          className="inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/[0.05] px-2 py-1.5 text-[10px] uppercase tracking-[0.22em] text-white/80 transition hover:border-white/30 hover:bg-white/[0.1] disabled:cursor-not-allowed disabled:opacity-40"
+          title={divisionId ? "Browse division imagery library" : "Select a division first"}
+        >
+          <Images className="h-3 w-3" />
+          Library
+        </button>
+      </div>
+      <DivisionImageryPicker
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        divisionId={divisionId}
+        onPick={(entry) => {
+          if (!entry.signedUrl) return;
+          onChange({
+            ...media,
+            imageUrl: entry.signedUrl,
+          });
+        }}
       />
       <Row label="Aspect">
         <select
