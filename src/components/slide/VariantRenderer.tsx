@@ -4659,15 +4659,15 @@ function renderVariantBody({
             <div className="flex-shrink-0">
               <div
                 style={{
-                  fontSize: 360,
-                  lineHeight: 0.85,
+                  fontSize: 260,
+                  lineHeight: 0.88,
                   fontWeight: 700,
-                  letterSpacing: "-0.05em",
+                  letterSpacing: "-0.04em",
                   color: "var(--slide-accent-text)",
                 }}
               >
                 {s(c.stat, "97")}
-                <span style={{ fontSize: 180, marginLeft: 8 }}>{s(c.unit, "%")}</span>
+                <span style={{ fontSize: 130, marginLeft: 8 }}>{s(c.unit, "%")}</span>
               </div>
               {s(c.label) && (
                 <div className="mt-4 uppercase" style={{ fontSize: 24, letterSpacing: "0.28em", opacity: 0.85 }}>
