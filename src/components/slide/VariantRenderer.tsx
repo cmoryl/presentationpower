@@ -551,7 +551,7 @@ function renderVariantBody({
             <div
               className="tabular-nums"
               style={{
-                fontSize: 340,
+                fontSize: 260,
                 lineHeight: 0.85,
                 fontWeight: 600,
                 letterSpacing: "-0.05em",
@@ -1874,7 +1874,7 @@ function renderVariantBody({
               className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
               style={{
                 color: "var(--slide-accent-text)",
-                fontSize: 720,
+                fontSize: 520,
                 lineHeight: 0.7,
                 fontWeight: 600,
                 opacity: 0.12,
@@ -2154,7 +2154,7 @@ function renderVariantBody({
                 className="relative"
                 style={{
                   color: "var(--slide-accent-text)",
-                  fontSize: 520,
+                  fontSize: 400,
                   lineHeight: 0.82,
                   fontWeight: 600,
                   letterSpacing: "-0.06em",
@@ -3027,7 +3027,7 @@ function renderVariantBody({
             <div className="flex flex-col items-center text-center">
               <Kicker brand={brand}>Kickoff</Kicker>
               <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
-              <div className="tabular-nums" style={{ fontSize: 260, lineHeight: 0.9, fontWeight: 600, letterSpacing: "-0.04em", color: ink.strong }}>
+              <div className="tabular-nums" style={{ fontSize: 200, lineHeight: 0.92, fontWeight: 600, letterSpacing: "-0.035em", color: ink.strong }}>
                 {s(c.date)}
               </div>
               <div className="mt-6" style={{ fontSize: 32, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(c.day)}</div>
@@ -3921,7 +3921,7 @@ function renderVariantBody({
                 const n = items.length - i;
                 return (
                   <div key={i} className="grid items-center gap-8 py-6" style={{ gridTemplateColumns: "140px 1fr", borderTop: i === 0 ? "none" : `1px solid ${ink.hairline}` }}>
-                    <div className="tabular-nums font-semibold" style={{ fontSize: 132, lineHeight: 0.9, letterSpacing: "-0.03em", color: "var(--slide-accent-text)" }}>
+                    <div className="tabular-nums font-semibold" style={{ fontSize: 96, lineHeight: 0.95, letterSpacing: "-0.025em", color: "var(--slide-accent-text)" }}>
                       {n}
                     </div>
                     <div>
@@ -4593,7 +4593,7 @@ function renderVariantBody({
           <div className="grid h-full grid-cols-[auto_1fr] items-center gap-16">
             <div
               style={{
-                fontSize: 480,
+                fontSize: 360,
                 lineHeight: 0.85,
                 fontWeight: 700,
                 letterSpacing: "-0.05em",
@@ -4659,15 +4659,15 @@ function renderVariantBody({
             <div className="flex-shrink-0">
               <div
                 style={{
-                  fontSize: 360,
-                  lineHeight: 0.85,
+                  fontSize: 260,
+                  lineHeight: 0.88,
                   fontWeight: 700,
-                  letterSpacing: "-0.05em",
+                  letterSpacing: "-0.04em",
                   color: "var(--slide-accent-text)",
                 }}
               >
                 {s(c.stat, "97")}
-                <span style={{ fontSize: 180, marginLeft: 8 }}>{s(c.unit, "%")}</span>
+                <span style={{ fontSize: 130, marginLeft: 8 }}>{s(c.unit, "%")}</span>
               </div>
               {s(c.label) && (
                 <div className="mt-4 uppercase" style={{ fontSize: 24, letterSpacing: "0.28em", opacity: 0.85 }}>
