@@ -29,14 +29,19 @@ import type {
   PrintHeroMedia,
   PrintPageSize,
 } from "@/lib/print-assets.types";
-import { emptyCaseStudy } from "@/lib/print-assets.types";
+import { emptyCaseStudy, emptySpotlight, emptyEBrochure, emptyAdaptorBrief } from "@/lib/print-assets.types";
 import type { PrintSection, PrintStatsSection, PrintStatsVariant } from "@/lib/print-assets.types";
+import type { SpotlightContent, EBrochureContent, AdaptorBriefContent } from "@/lib/print-assets.types";
 import { PRINT_STATS_VARIANTS, PrintSectionRenderer } from "@/components/print/sections/PrintSectionRenderer";
 import { PrintSectionPicker } from "@/components/print/sections/PrintSectionPicker";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
 import { analyzePrintAsset, canAddModule } from "@/lib/print-capacity";
+import { SpotlightLayout } from "@/components/print/SpotlightLayout";
+import { EBrochureLayout } from "@/components/print/EBrochureLayout";
+import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
+import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2 } from "lucide-react";
 
 export const Route = createFileRoute("/asset/$assetId")({
