@@ -700,7 +700,7 @@ export async function exportDeckToPptx(
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-  return { failedSlides };
+  return { failedSlides, fileName };
 }
 
 type SlideKind =
