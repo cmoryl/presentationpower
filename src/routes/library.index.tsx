@@ -862,6 +862,8 @@ const VariantCard = memo(function VariantCard({
   /** LogoHub filler pool; when non-empty, MV-PROOF-LOGOS-* variants swap
    *  their filler logos for real LogoHub rows. */
   logoHubPool?: LogoFiller[];
+  /** Compact thumbnail layout: smaller preview + condensed metadata. */
+  compact?: boolean;
 }) {
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
   const rawContent = videoExample
