@@ -35,7 +35,7 @@ import { PRINT_STATS_VARIANTS, PrintSectionRenderer } from "@/components/print/s
 import { PrintSectionPicker } from "@/components/print/sections/PrintSectionPicker";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
-import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images } from "lucide-react";
+import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical } from "lucide-react";
 
 export const Route = createFileRoute("/asset/$assetId")({
   head: ({ params }) => ({
