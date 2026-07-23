@@ -1541,7 +1541,7 @@ function ModalABPreview({
                 className="rounded-full border border-black/15 bg-white px-2 py-0.5 font-medium uppercase tracking-widest text-black/60 hover:border-[#003FC7]/50 hover:text-[#003FC7] disabled:opacity-50"
                 title={`Export exact ${m} preview as high-res PNG (pixel-perfect, not editable)`}
               >
-                {imageBusy === `png-${m}` ? "…" : "PNG"}
+                {imageBusy === `png-${m}` ? (imageStage ?? "…") : "PNG"}
               </button>
               <button
                 type="button"
@@ -1550,10 +1550,11 @@ function ModalABPreview({
                 className="rounded-full border border-black/15 bg-white px-2 py-0.5 font-medium uppercase tracking-widest text-black/60 hover:border-[#003FC7]/50 hover:text-[#003FC7] disabled:opacity-50"
                 title={`Export exact ${m} preview as image PDF (16:9, review copy — not editable)`}
               >
-                {imageBusy === `pdf-${m}` ? "…" : "PDF"}
+                {imageBusy === `pdf-${m}` ? (imageStage ?? "…") : "PDF"}
               </button>
               <span className="text-black/30">·</span>
               <span className="text-black/40">Click to zoom</span>
+
             </div>
           </div>
           <button
