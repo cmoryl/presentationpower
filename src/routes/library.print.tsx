@@ -553,14 +553,10 @@ function TemplateDetailOverlay({
           </div>
         </div>
 
-        {kind === "spotlight" ? (
+        {kind === "spotlight" || kind === "ebrochure" || kind === "adaptor-brief" ? (
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <PreviewFrame label="Light">
-              <SpotlightLayout content={SPOTLIGHT_SEED} brand={brand} mode="light" pageSize="Letter" density="standard" />
-            </PreviewFrame>
-            <PreviewFrame label="Dark">
-              <SpotlightLayout content={SPOTLIGHT_SEED} brand={brand} mode="dark" pageSize="Letter" density="standard" />
-            </PreviewFrame>
+            <PreviewFrame label="Light"><PrintPreview kind={kind} brand={brand} mode="light" /></PreviewFrame>
+            <PreviewFrame label="Dark"><PrintPreview kind={kind} brand={brand} mode="dark" /></PreviewFrame>
           </div>
         ) : (
           <div className="rounded-xl border border-dashed border-black/20 bg-white p-10 text-center">
@@ -568,25 +564,28 @@ function TemplateDetailOverlay({
               <div className="text-xs uppercase tracking-[0.24em] text-black/50">In production</div>
               <h3 className="mt-2 text-lg font-semibold text-[#03002C]">{tpl.label} preview is coming soon.</h3>
               <p className="mt-2 text-sm text-black/60">
-                {kind === "case-study"
-                  ? "Case Study assets are already draftable from the wizard — the compact preview thumbnail is next in line."
-                  : "The layout port is queued behind Spotlight. In the meantime, use Case Study or Client Spotlight."}
+                Case Study assets are already draftable from the wizard — the layout port is queued behind the other three.
               </p>
-              {kind === "case-study" ? (
-                <Link
-                  to="/asset/new"
-                  search={{ kind: "case-study", brandModeId: brand.id }}
-                  className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:bg-[#003FC7]/85"
-                >
-                  Draft a case study <ArrowRight size={12} />
-                </Link>
-              ) : null}
+              <Link
+                to="/asset/new"
+                search={{ kind: "case-study", brandModeId: brand.id }}
+                className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:bg-[#003FC7]/85"
+              >
+                Draft a case study <ArrowRight size={12} />
+              </Link>
             </div>
           </div>
         )}
       </div>
     </div>
   );
+}
+
+function PrintPreview({ kind, brand, mode }: { kind: PrintAssetKind; brand: BrandMode; mode: "light" | "dark" }) {
+  if (kind === "spotlight") return <SpotlightLayout content={SPOTLIGHT_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+  if (kind === "ebrochure") return <EBrochureLayout content={EBROCHURE_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+  if (kind === "adaptor-brief") return <AdaptorBriefLayout content={ADAPTOR_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+  return null;
 }
 
 function PreviewFrame({ label, children }: { label: string; children: React.ReactNode }) {
