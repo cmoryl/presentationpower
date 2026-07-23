@@ -330,6 +330,29 @@ function AssetEditor() {
             {dirty && <span className="text-xs text-amber-600">Unsaved changes</span>}
           </div>
           <div className="flex items-center gap-2">
+            <div className="mr-1 flex items-center gap-0.5 rounded-full border border-black/10 bg-white p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
+              <button
+                type="button"
+                onClick={undo}
+                disabled={!canUndo}
+                title="Undo (⌘/Ctrl+Z)"
+                aria-label="Undo"
+                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium text-[#03002C] hover:bg-black/5 disabled:opacity-30 dark:text-white dark:hover:bg-white/5"
+              >
+                <Undo2 size={12} /> Undo
+              </button>
+              <button
+                type="button"
+                onClick={redo}
+                disabled={!canRedo}
+                title="Redo (⌘/Ctrl+Shift+Z)"
+                aria-label="Redo"
+                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium text-[#03002C] hover:bg-black/5 disabled:opacity-30 dark:text-white dark:hover:bg-white/5"
+              >
+                <Redo2 size={12} /> Redo
+              </button>
+            </div>
+
             <button
               type="button"
               onClick={handleSynthesize}
