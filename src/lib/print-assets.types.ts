@@ -101,7 +101,9 @@ export type SpotlightContent = {
   quote?: { text: string; author: string; role?: string; company?: string };
   expert?: { name: string; role?: string; email?: string };
   cta?: { label: string; url?: string };
+  heroMedia?: PrintHeroMedia;
 };
+
 
 // ---------------------------------------------------------------------------
 // E-BROCHURE — single-page marketing PDF (Challenge / Approach / Impact +
