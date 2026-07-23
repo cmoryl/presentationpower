@@ -20,7 +20,13 @@ import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
-import { emptySpotlight, type SpotlightContent, type PrintAssetKind } from "@/lib/print-assets.types";
+import { EBrochureLayout } from "@/components/print/EBrochureLayout";
+import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
+import {
+  emptySpotlight, emptyEBrochure, emptyAdaptorBrief,
+  type SpotlightContent, type EBrochureContent, type AdaptorBriefContent,
+  type PrintAssetKind,
+} from "@/lib/print-assets.types";
 import {
   listMyPrintAssets,
   deletePrintAsset,
