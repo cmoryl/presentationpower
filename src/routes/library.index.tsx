@@ -1179,6 +1179,8 @@ function VariantDetailModal({
   const [previewBusy, setPreviewBusy] = useState(false);
   const [previewStage, setPreviewStage] = useState<string | null>(null);
   const [previewUrls, setPreviewUrls] = useState<{ light: string; dark: string; filenameLight: string; filenameDark: string } | null>(null);
+  const [zipBusy, setZipBusy] = useState(false);
+  const [zipStage, setZipStage] = useState<string | null>(null);
 
   useEffect(() => {
     return () => {
