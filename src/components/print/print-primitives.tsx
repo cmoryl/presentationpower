@@ -13,6 +13,91 @@ import type { PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
 // layout scales identically at any preview or export DPI.
 export const PAGE_W = 816;
 
+// ---------------------------------------------------------------------------
+// EyebrowChip — small uppercase label with an integrated legibility scrim.
+// Guarantees contrast regardless of hero photo / accent underneath. Used
+// systemically across all print templates so eyebrows can't drift.
+// ---------------------------------------------------------------------------
+export function PrintEyebrow({
+  label,
+  mode,
+  accent,
+  cq: cqFn,
+  onDark = false,
+}: {
+  label: string;
+  mode: "light" | "dark";
+  accent: string;
+  cq: (v: number) => string;
+  /** Force the on-photo variant (used inside hero photo bands regardless of page mode). */
+  onDark?: boolean;
+}) {
+  const dark = mode === "dark" || onDark;
+  return (
+    <div
+      className="inline-flex items-center"
+      style={{
+        gap: cqFn(6),
+        padding: `${cqFn(4)} ${cqFn(9)}`,
+        borderRadius: 999,
+        // Small backing chip so the eyebrow always has its own local contrast.
+        background: dark
+          ? `linear-gradient(180deg, color-mix(in srgb, ${accent} 20%, rgba(6,4,32,0.72)), rgba(6,4,32,0.72))`
+          : `linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.82))`,
+        border: dark
+          ? `1px solid color-mix(in srgb, ${accent} 34%, rgba(255,255,255,0.14))`
+          : `1px solid color-mix(in srgb, ${accent} 22%, rgba(3,0,44,0.10))`,
+        boxShadow: dark
+          ? "0 1px 0 rgba(0,0,0,0.15)"
+          : "0 1px 0 rgba(3,0,44,0.05)",
+        backdropFilter: "blur(6px) saturate(140%)",
+      }}
+    >
+      <span
+        aria-hidden
+        style={{
+          width: cqFn(6),
+          height: cqFn(6),
+          borderRadius: 999,
+          background: accent,
+          boxShadow: `0 0 ${cqFn(6)} ${accent}`,
+          flexShrink: 0,
+        }}
+      />
+      <span
+        style={{
+          fontSize: cqFn(8.5),
+          fontWeight: 700,
+          letterSpacing: "0.16em",
+          color: dark ? "#F5F4FF" : "#03002C",
+          lineHeight: 1,
+        }}
+      >
+        {label.toUpperCase()}
+      </span>
+    </div>
+  );
+}
+
+/**
+ * Localized text-backing scrim that travels with the hero copy block rather
+ * than the photo. Renders as a soft vertical gradient panel behind title +
+ * tagline so bright/low-contrast photos can't wash the type out.
+ * Position the parent relatively and put this as the first child.
+ */
+export function heroCopyScrimStyle(mode: "light" | "dark"): CSSProperties {
+  const anchor = mode === "dark" ? "6,4,32" : "255,255,255";
+  return {
+    position: "absolute",
+    inset: `-4% -6% -8% -6%`,
+    background: `linear-gradient(180deg, rgba(${anchor},0.82) 0%, rgba(${anchor},0.66) 55%, rgba(${anchor},0) 100%)`,
+    filter: "blur(2px)",
+    borderRadius: "10%",
+    pointerEvents: "none",
+    zIndex: 0,
+  };
+}
+
 /** CSS line-clamp — graceful truncation for slots that fill with AI copy. */
 export function clampLines(lines: number): CSSProperties {
   return {
