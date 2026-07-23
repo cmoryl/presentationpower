@@ -3221,10 +3221,19 @@ function renderVariantBody({
     case "MV-KPI-DASHBOARD": {
       const items = arr(c.items).slice(0, 8);
       const cols = items.length <= 6 ? Math.min(items.length, 5) : 4;
+      // Icon de-duplication: pickIcon returns the first regex match, so
+      // several distinct labels (e.g. "Localization cost", "Translation
+      // quality", "Markets supported") can all resolve to Globe2. Track which
+      // components have been used on this slide and fall back to a rotating
+      // pool of neutral defaults for repeats — distinct KPIs get distinct
+      // glyphs without giving up the semantic mapping when it's specific.
+      const usedIcons = new Set<IconType>();
+      const dedupPool: IconType[] = [LineChart, TrendingUp, Target, Zap, Trophy, Rocket, Sparkles, BarChart3];
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-20 grid gap-y-14" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+
             {items.map((it, i) => {
               const trend = s(it.trend);
               const trendColor = trend === "down" ? brand.tokens.accent : brand.tokens.accent;
@@ -3249,9 +3258,15 @@ function renderVariantBody({
                     }}
                   >
                     {(() => {
-                      const Icon = pickIcon(s(it.label) || "kpi", i, s(it.icon));
+                      let Icon = pickIcon(s(it.label) || "kpi", i, s(it.icon));
+                      if (usedIcons.has(Icon)) {
+                        const alt = dedupPool.find((c) => !usedIcons.has(c));
+                        if (alt) Icon = alt;
+                      }
+                      usedIcons.add(Icon);
                       return <Icon size={30} strokeWidth={1.4} aria-hidden />;
                     })()}
+
                   </div>
                   <div className="mt-8 flex items-baseline gap-2">
                     <span className="tabular-nums font-semibold" style={{ fontSize: 116, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}>{s(it.value)}</span>
@@ -5778,7 +5793,8 @@ function MediaTile({
   if (mode === "light") {
     return (
       <div
-        className={`group relative overflow-hidden rounded-2xl ${className ?? ""}`}
+        className={`group ${/\b(absolute|fixed)\b/.test(className ?? "") ? "" : "relative"} overflow-hidden rounded-2xl ${className ?? ""}`}
+
         style={{ background: "#EEF2F8", filter: grayscale }}
       >
         {hasVideo && shouldPlay ? (
@@ -5892,7 +5908,7 @@ function MediaTile({
   // Slightly less crush than before (0.85 → 0.92) so imagery keeps depth.
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl ${className ?? ""}`}
+      className={`group ${/\b(absolute|fixed)\b/.test(className ?? "") ? "" : "relative"} overflow-hidden rounded-2xl ${className ?? ""}`}
       style={{ background: "#03002C", filter: grayscale }}
     >
       {hasVideo && shouldPlay ? (
