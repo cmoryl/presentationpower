@@ -41,6 +41,7 @@ import { Route as AssetAssetIdRouteImport } from './routes/asset.$assetId'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTranslationRouteImport } from './routes/admin.translation'
+import { Route as AdminPrintLibraryRouteImport } from './routes/admin.print-library'
 import { Route as AdminPdfIngestRouteImport } from './routes/admin.pdf-ingest'
 import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
 import { Route as AdminLogohubRouteImport } from './routes/admin.logohub'
@@ -226,6 +227,11 @@ const AdminTranslationRoute = AdminTranslationRouteImport.update({
   path: '/translation',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPrintLibraryRoute = AdminPrintLibraryRouteImport.update({
+  id: '/print-library',
+  path: '/print-library',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPdfIngestRoute = AdminPdfIngestRouteImport.update({
   id: '/pdf-ingest',
   path: '/pdf-ingest',
@@ -378,6 +384,7 @@ export interface FileRoutesByFullPath {
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
+  '/admin/print-library': typeof AdminPrintLibraryRoute
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
@@ -434,6 +441,7 @@ export interface FileRoutesByTo {
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
+  '/admin/print-library': typeof AdminPrintLibraryRoute
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
@@ -493,6 +501,7 @@ export interface FileRoutesById {
   '/admin/logohub': typeof AdminLogohubRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
+  '/admin/print-library': typeof AdminPrintLibraryRoute
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/chat': typeof ApiChatRoute
@@ -553,6 +562,7 @@ export interface FileRouteTypes {
     | '/admin/logohub'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
+    | '/admin/print-library'
     | '/admin/translation'
     | '/admin/users'
     | '/api/chat'
@@ -609,6 +619,7 @@ export interface FileRouteTypes {
     | '/admin/logohub'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
+    | '/admin/print-library'
     | '/admin/translation'
     | '/admin/users'
     | '/api/chat'
@@ -667,6 +678,7 @@ export interface FileRouteTypes {
     | '/admin/logohub'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
+    | '/admin/print-library'
     | '/admin/translation'
     | '/admin/users'
     | '/api/chat'
@@ -958,6 +970,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTranslationRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/print-library': {
+      id: '/admin/print-library'
+      path: '/print-library'
+      fullPath: '/admin/print-library'
+      preLoaderRoute: typeof AdminPrintLibraryRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/pdf-ingest': {
       id: '/admin/pdf-ingest'
       path: '/pdf-ingest'
@@ -1145,6 +1164,7 @@ interface AdminRouteChildren {
   AdminLogohubRoute: typeof AdminLogohubRoute
   AdminOracleRoute: typeof AdminOracleRoute
   AdminPdfIngestRoute: typeof AdminPdfIngestRoute
+  AdminPrintLibraryRoute: typeof AdminPrintLibraryRoute
   AdminTranslationRoute: typeof AdminTranslationRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1166,6 +1186,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLogohubRoute: AdminLogohubRoute,
   AdminOracleRoute: AdminOracleRoute,
   AdminPdfIngestRoute: AdminPdfIngestRoute,
+  AdminPrintLibraryRoute: AdminPrintLibraryRoute,
   AdminTranslationRoute: AdminTranslationRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
