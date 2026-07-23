@@ -73,6 +73,8 @@ function AssetEditor() {
   const [cropMarks, setCropMarks] = useState(true);
   const [exportMode, setExportMode] = useState<"light" | "dark">("light");
   const [exportQuality, setExportQuality] = useState<PrintExportQuality>("300dpi");
+  const [exportFormat, setExportFormat] = useState<PrintExportFormat>("digital");
+  const [iccProfile, setIccProfile] = useState<IccProfileKey>("GRACoL2013_CRPC6");
 
 
   useEffect(() => {
