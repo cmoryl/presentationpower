@@ -139,6 +139,16 @@ export const uploadDivisionImagery = createServerFn({ method: "POST" })
 
 export type PrintTemplateKind = "spotlight" | "ebrochure" | "case-study" | "adaptor-brief";
 
+export type VariantPreset = "thumb" | "square" | "portrait" | "landscape";
+
+export type ImageVariantMeta = {
+  path: string;
+  width: number | null;
+  height: number | null;
+  bytes: number;
+  contentType: string;
+};
+
 export type DivisionImageryEntry = {
   id: string;
   division_id: string;
@@ -157,10 +167,29 @@ export type DivisionImageryEntry = {
   collection: string | null;
   template_kinds: PrintTemplateKind[];
   is_default_for: PrintTemplateKind[];
+  variants: Partial<Record<VariantPreset, ImageVariantMeta>>;
+  variantUrls: Partial<Record<VariantPreset, string | null>>;
   created_at: string;
   updated_at: string;
   signedUrl: string | null;
 };
+
+async function signVariantUrls(
+  s: SbClient,
+  variants: Partial<Record<VariantPreset, ImageVariantMeta>> | null | undefined,
+): Promise<Partial<Record<VariantPreset, string | null>>> {
+  const out: Partial<Record<VariantPreset, string | null>> = {};
+  if (!variants) return out;
+  const entries = Object.entries(variants) as Array<[VariantPreset, ImageVariantMeta]>;
+  await Promise.all(
+    entries.map(async ([preset, meta]) => {
+      if (!meta?.path) return;
+      const res = await s.storage.from(BUCKET).createSignedUrl(meta.path, SIGNED_TTL);
+      out[preset] = res.data?.signedUrl ?? null;
+    }),
+  );
+  return out;
+}
 
 export const listDivisionImagery = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -175,7 +204,7 @@ export const listDivisionImagery = createServerFn({ method: "GET" })
     let q = s
       .from("division_imagery")
       .select(
-        "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, prompt, uploaded_by, approved, approved_by, approved_at, collection, template_kinds, is_default_for, created_at, updated_at",
+        "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, prompt, uploaded_by, approved, approved_by, approved_at, collection, template_kinds, is_default_for, variants, created_at, updated_at",
       )
       .eq("division_id", data.divisionId)
       .order("created_at", { ascending: false })
@@ -183,11 +212,14 @@ export const listDivisionImagery = createServerFn({ method: "GET" })
     if (data.onlyApproved) q = q.eq("approved", true);
     const { data: rows, error } = await q;
     if (error) throw new Error((error as { message?: string }).message ?? "Query failed");
-    const list = (rows ?? []) as Array<Omit<DivisionImageryEntry, "signedUrl">>;
+    const list = (rows ?? []) as Array<Omit<DivisionImageryEntry, "signedUrl" | "variantUrls">>;
     const signed = await Promise.all(
       list.map(async (r) => {
-        const res = await s.storage.from(BUCKET).createSignedUrl(r.storage_path, SIGNED_TTL);
-        return { ...r, signedUrl: res.data?.signedUrl ?? null };
+        const [main, variantUrls] = await Promise.all([
+          s.storage.from(BUCKET).createSignedUrl(r.storage_path, SIGNED_TTL),
+          signVariantUrls(s, r.variants ?? {}),
+        ]);
+        return { ...r, signedUrl: main.data?.signedUrl ?? null, variantUrls };
       }),
     );
     return signed;
