@@ -423,6 +423,67 @@ export async function exportDeckToPptx(
     }),
   );
 
+  // Pre-render MV-VIZ-* infographic specs to vector SVG (browser-only,
+  // via ECharts). Ships as an image on the slide — pptxgenjs accepts SVG
+  // data URLs and PowerPoint preserves them as vectors.
+  const slideVizSvg: Record<string, string> = {};
+  const vizSlides = deck.slides.filter((sl) => typeof sl.variantId === "string" && sl.variantId.startsWith("MV-VIZ-"));
+  if (vizSlides.length > 0 && typeof window !== "undefined") {
+    try {
+      const [{ renderSpecToSvg, svgToDataUrl }, { ensureA11y }] = await Promise.all([
+        import("@/lib/infographics/svg"),
+        import("@/lib/infographics/a11y"),
+      ]);
+      const kindByVariant: Record<string, string> = {
+        "MV-VIZ-SANKEY": "sankey",
+        "MV-VIZ-CHORD": "chord",
+        "MV-VIZ-BEESWARM": "beeswarm",
+        "MV-VIZ-BUMP": "bump",
+        "MV-VIZ-MARKET-MAP": "market-map",
+        "MV-VIZ-TREEMAP": "treemap",
+        "MV-VIZ-CALENDAR-HEATMAP": "calendar-heatmap",
+      };
+      await Promise.all(
+        vizSlides.map(async (sl) => {
+          try {
+            const content = (sl.content ?? {}) as Record<string, unknown>;
+            const declared = content.spec as Record<string, unknown> | undefined;
+            const kind = (declared?.kind as string) ?? kindByVariant[sl.variantId] ?? "custom";
+            const rows = ((declared?.data as Record<string, unknown> | undefined)?.rows as unknown[]) ?? (content.rows as unknown[]) ?? [];
+            const encoding = (declared?.encoding as Record<string, unknown>) ?? (content.encoding as Record<string, unknown>) ?? {};
+            const spec = ensureA11y({
+              id: `${sl.id}-viz`,
+              kind: kind as never,
+              title: typeof content.title === "string" ? content.title : "",
+              data: {
+                rows: rows as never,
+                source: typeof content.source === "string" ? content.source : undefined,
+              },
+              encoding: encoding as never,
+              theme: {
+                divisionId: palette.divisionId,
+                mode: "dark",
+                accent: `#${palette.accent}`,
+                primary: `#${palette.primary}`,
+                ink: `#${palette.ink}`,
+                surface: `#${palette.surface}`,
+              },
+              accessibility: { shortAlt: "", longDesc: "" },
+              export: { preferredFormat: "svg", rasterFallback: true },
+            });
+            const svg = await renderSpecToSvg(spec, { width: 1600, height: 900 });
+            if (svg) slideVizSvg[sl.id] = svgToDataUrl(svg);
+          } catch {
+            /* per-slide failure — falls back to title-only */
+          }
+        }),
+      );
+    } catch {
+      /* module load failure — leave slideVizSvg empty */
+    }
+  }
+
+
   const failedSlides: string[] = [];
   for (let i = 0; i < deck.slides.length; i++) {
     const slide = deck.slides[i];
