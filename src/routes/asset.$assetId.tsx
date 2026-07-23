@@ -42,6 +42,8 @@ import { analyzePrintAsset, canAddModule } from "@/lib/print-capacity";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
+import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
+
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2 } from "lucide-react";
 
