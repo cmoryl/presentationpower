@@ -186,6 +186,12 @@ function AssetEditor() {
     setExportBusy(true);
     try {
       const safeTitle = (row?.title ?? "print-asset").replace(/[^a-z0-9-_]+/gi, "-").toLowerCase();
+      const suffix =
+        exportFormat === "digital"
+          ? "digital"
+          : exportFormat === "press-x4"
+            ? `pressX4-${exportQuality}`
+            : `press-${exportQuality}`;
       await exportPrintAssetAsPdf(canvasRef.current, {
         pageSize: exportSize,
         custom: exportSize === "Custom" ? { widthIn: customW, heightIn: customH } : undefined,
@@ -193,7 +199,9 @@ function AssetEditor() {
         cropMarks,
         mode: exportMode,
         quality: exportQuality,
-        filename: `${safeTitle}-${exportSize.toLowerCase()}-${exportQuality}.pdf`,
+        format: exportFormat,
+        iccProfile: exportFormat === "press-x4" ? iccProfile : undefined,
+        filename: `${safeTitle}-${exportSize.toLowerCase()}-${suffix}.pdf`,
         onQualityClamp: (info) => {
           alert(
             `Requested ${info.requestedDpi} DPI exceeded the browser canvas ceiling ` +
@@ -202,6 +210,7 @@ function AssetEditor() {
         },
       });
       setExportOpen(false);
+
 
     } catch (e) {
       alert(`Export failed: ${(e as Error).message}`);
