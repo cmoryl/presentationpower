@@ -197,7 +197,7 @@ export function EBrochureLayout({
               <div style={{ fontSize: cq(9.5), fontWeight: 600, letterSpacing: "0.14em", color: accentInk }}>
                 {(content.eyebrow ?? "EBROCHURE").toUpperCase()}
               </div>
-              <BrandLockup brand={brand} color={resolvePrintLogoInk(content.logoColor, ink)} size="xs" orientation="horizontal" />
+              <BrandLockup brand={brand} color={resolvePrintLogoInk(content.logoColor, ink)} size="2xs" orientation="horizontal" />
             </div>
 
             {/* HERO — title + summary */}
