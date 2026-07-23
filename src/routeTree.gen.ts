@@ -28,6 +28,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as TestPrintQaRouteImport } from './routes/test.print-qa'
 import { Route as TestPrintHeroRouteImport } from './routes/test.print-hero'
 import { Route as TestPrintDndRouteImport } from './routes/test.print-dnd'
+import { Route as TestCasestudyQaRouteImport } from './routes/test.casestudy-qa'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as LibraryPrintRouteImport } from './routes/library.print'
 import { Route as LibraryMyRouteImport } from './routes/library.my'
@@ -164,6 +165,11 @@ const TestPrintHeroRoute = TestPrintHeroRouteImport.update({
 const TestPrintDndRoute = TestPrintDndRouteImport.update({
   id: '/test/print-dnd',
   path: '/test/print-dnd',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TestCasestudyQaRoute = TestCasestudyQaRouteImport.update({
+  id: '/test/casestudy-qa',
+  path: '/test/casestudy-qa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShareTokenRoute = ShareTokenRouteImport.update({
@@ -426,6 +432,7 @@ export interface FileRoutesByFullPath {
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
   '/share/$token': typeof ShareTokenRoute
+  '/test/casestudy-qa': typeof TestCasestudyQaRoute
   '/test/print-dnd': typeof TestPrintDndRoute
   '/test/print-hero': typeof TestPrintHeroRoute
   '/test/print-qa': typeof TestPrintQaRoute
@@ -487,6 +494,7 @@ export interface FileRoutesByTo {
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
   '/share/$token': typeof ShareTokenRoute
+  '/test/casestudy-qa': typeof TestCasestudyQaRoute
   '/test/print-dnd': typeof TestPrintDndRoute
   '/test/print-hero': typeof TestPrintHeroRoute
   '/test/print-qa': typeof TestPrintQaRoute
@@ -551,6 +559,7 @@ export interface FileRoutesById {
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
   '/share/$token': typeof ShareTokenRoute
+  '/test/casestudy-qa': typeof TestCasestudyQaRoute
   '/test/print-dnd': typeof TestPrintDndRoute
   '/test/print-hero': typeof TestPrintHeroRoute
   '/test/print-qa': typeof TestPrintQaRoute
@@ -616,6 +625,7 @@ export interface FileRouteTypes {
     | '/library/my'
     | '/library/print'
     | '/share/$token'
+    | '/test/casestudy-qa'
     | '/test/print-dnd'
     | '/test/print-hero'
     | '/test/print-qa'
@@ -677,6 +687,7 @@ export interface FileRouteTypes {
     | '/library/my'
     | '/library/print'
     | '/share/$token'
+    | '/test/casestudy-qa'
     | '/test/print-dnd'
     | '/test/print-hero'
     | '/test/print-qa'
@@ -740,6 +751,7 @@ export interface FileRouteTypes {
     | '/library/my'
     | '/library/print'
     | '/share/$token'
+    | '/test/casestudy-qa'
     | '/test/print-dnd'
     | '/test/print-hero'
     | '/test/print-qa'
@@ -781,6 +793,7 @@ export interface RootRouteChildren {
   LibraryMyRoute: typeof LibraryMyRoute
   LibraryPrintRoute: typeof LibraryPrintRoute
   ShareTokenRoute: typeof ShareTokenRoute
+  TestCasestudyQaRoute: typeof TestCasestudyQaRoute
   TestPrintDndRoute: typeof TestPrintDndRoute
   TestPrintHeroRoute: typeof TestPrintHeroRoute
   TestPrintQaRoute: typeof TestPrintQaRoute
@@ -928,6 +941,13 @@ declare module '@tanstack/react-router' {
       path: '/test/print-dnd'
       fullPath: '/test/print-dnd'
       preLoaderRoute: typeof TestPrintDndRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/test/casestudy-qa': {
+      id: '/test/casestudy-qa'
+      path: '/test/casestudy-qa'
+      fullPath: '/test/casestudy-qa'
+      preLoaderRoute: typeof TestCasestudyQaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/share/$token': {
@@ -1322,6 +1342,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryMyRoute: LibraryMyRoute,
   LibraryPrintRoute: LibraryPrintRoute,
   ShareTokenRoute: ShareTokenRoute,
+  TestCasestudyQaRoute: TestCasestudyQaRoute,
   TestPrintDndRoute: TestPrintDndRoute,
   TestPrintHeroRoute: TestPrintHeroRoute,
   TestPrintQaRoute: TestPrintQaRoute,
