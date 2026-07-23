@@ -17,21 +17,15 @@ export function auroraSvgDataUrl(
   // Mirror AuroraLayer's on-screen opacities so every division's exported
   // slide reads at the same intensity as the live editor preview.
   const layerOpacity = auroraLayerOpacity(mode);
-  const vignetteAlpha = mode === "dark" ? 0.55 : 0.5;
-  const orbR = mode === "dark" ? "55%" : "85%";
-  const midStop = mode === "dark" ? "22%" : "30%";
-  const outerStop = mode === "dark" ? "50%" : "60%";
-  const blurStd = mode === "dark" ? 38 : 65;
-  // Frosted-glass wash: per-brand tuned in dark mode so each division keeps
-  // the "orbs peek through glass" look without flattening into a single
-  // colour field. Darker/heavier accents get a lower alpha (they already
-  // read strongly through the wash); lighter/pastel accents get a slightly
-  // higher alpha to tame brightness. The wash colour itself is a mix of a
-  // neutral navy and the brand's own surface so the film subtly carries
-  // the brand tint instead of washing everything to a single grey.
-  const wash = darkGlassWash(brand);
-  const glassColor = mode === "dark" ? wash.color : "#FFFFFF";
-  const glassAlpha = mode === "dark" ? wash.alpha : 0.32;
+  // FREE-FORM AURORA v2 — 2026-07 rebuild.
+  // Reference: user-uploaded plain backdrops (1.png..10.png) showing deep
+  // navy with large, out-of-focus accent blooms bleeding in from
+  // edges/corners. No frosted-glass film. No edge vignette. The orbs ARE
+  // the atmosphere; content sits free-form directly on top.
+  const orbR = mode === "dark" ? "90%" : "95%";
+  const midStop = mode === "dark" ? "38%" : "42%";
+  const outerStop = mode === "dark" ? "78%" : "80%";
+  const blurStd = mode === "dark" ? 55 : 80;
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
   <defs>
@@ -40,8 +34,8 @@ export function auroraSvgDataUrl(
         (o, i) => `
     <radialGradient id="orb-${i}" cx="50%" cy="50%" r="${orbR}">
       <stop offset="0%" stop-color="${o.color}" stop-opacity="${o.alpha}" />
-      <stop offset="${midStop}" stop-color="${o.color}" stop-opacity="${o.alpha * 0.6}" />
-      <stop offset="${outerStop}" stop-color="${o.color}" stop-opacity="${o.alpha * 0.2}" />
+      <stop offset="${midStop}" stop-color="${o.color}" stop-opacity="${o.alpha * 0.55}" />
+      <stop offset="${outerStop}" stop-color="${o.color}" stop-opacity="${o.alpha * 0.15}" />
       <stop offset="100%" stop-color="${o.color}" stop-opacity="0" />
     </radialGradient>`,
       )
@@ -49,10 +43,6 @@ export function auroraSvgDataUrl(
     <filter id="aurora-blur" x="-50%" y="-50%" width="200%" height="200%" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse">
       <feGaussianBlur stdDeviation="${blurStd}" edgeMode="duplicate" />
     </filter>
-    <radialGradient id="vignette" cx="50%" cy="${mode === "dark" ? "60%" : "55%"}" r="${mode === "dark" ? "80%" : "85%"}">
-      <stop offset="${mode === "dark" ? "30%" : "55%"}" stop-color="${base}" stop-opacity="0" />
-      <stop offset="${mode === "dark" ? "130%" : "125%"}" stop-color="${base}" stop-opacity="${vignetteAlpha}" />
-    </radialGradient>
   </defs>
   <rect width="1280" height="720" fill="${base}" />
   <g filter="url(#aurora-blur)" opacity="${layerOpacity}">
@@ -62,8 +52,6 @@ export function auroraSvgDataUrl(
       )
       .join("")}
   </g>
-  <rect width="1280" height="720" fill="${glassColor}" fill-opacity="${glassAlpha}" />
-  <rect width="1280" height="720" fill="url(#vignette)" />
 </svg>`;
 
   // Use encodeURIComponent to keep the payload safe for data URLs.
