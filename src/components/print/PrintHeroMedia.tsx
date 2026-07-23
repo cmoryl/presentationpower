@@ -226,7 +226,7 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
           left: 0,
           right: 0,
           bottom: 0,
-          height: cq(80),
+          height: `max(${cq(80)}, ${safeY * 0.9}%)`,
           background: `linear-gradient(180deg, transparent 0%, ${pageBg} 100%)`,
           opacity: washStrength,
         }}
