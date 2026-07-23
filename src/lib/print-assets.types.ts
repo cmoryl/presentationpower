@@ -246,7 +246,8 @@ export function emptyCaseStudy(seed?: Partial<CaseStudyContent>): CaseStudyConte
   const client = seed?.client || "Acme Global";
   const industry = seed?.industry || "life sciences";
   return {
-    eyebrow: "Case study",
+    eyebrow: seed?.eyebrow ?? "Case study",
+    logoColor: seed?.logoColor,
     client: seed?.client ?? "",
     industry: seed?.industry ?? "",
     audience: seed?.audience ?? "",
@@ -275,6 +276,18 @@ export function emptyCaseStudy(seed?: Partial<CaseStudyContent>): CaseStudyConte
       { text: "They didn't just translate our content — they rebuilt how we ship it. We're moving at a pace we couldn't have imagined last year.", author: "VP of Global Marketing" },
     expert: seed?.expert,
     cta: seed?.cta ?? { label: "Start a conversation" },
+    engagement: seed?.engagement ?? {
+      title: "Engagement snapshot",
+      bullets: [
+        "36 markets live in a single rollout",
+        "Compliance sign-off wired into every release",
+        "Human review preserved on regulated content",
+        "Analytics loop feeding routing decisions",
+      ],
+    },
+    footer: seed?.footer,
+    heroMedia: seed?.heroMedia,
+    modules: seed?.modules,
   };
 }
 
@@ -282,6 +295,7 @@ export function emptySpotlight(seed?: Partial<SpotlightContent>): SpotlightConte
   const product = seed?.productName || "GlobalLink Connect";
   return {
     eyebrow: seed?.eyebrow ?? "Product spotlight",
+    logoColor: seed?.logoColor,
     productName: seed?.productName ?? "",
     tagline: seed?.tagline ?? "Enterprise localization, without the enterprise drag.",
     summary:
@@ -302,12 +316,15 @@ export function emptySpotlight(seed?: Partial<SpotlightContent>): SpotlightConte
       { text: "We onboarded three new regions in the time it used to take us to launch one.", author: "Director of Digital Experience" },
     expert: seed?.expert,
     cta: seed?.cta ?? { label: "Talk to us" },
+    heroMedia: seed?.heroMedia,
+    modules: seed?.modules,
   };
 }
 
 export function emptyEBrochure(seed?: Partial<EBrochureContent>): EBrochureContent {
   return {
     eyebrow: seed?.eyebrow ?? "eBrochure",
+    logoColor: seed?.logoColor,
     title: seed?.title ?? "",
     summary:
       seed?.summary ??
@@ -342,12 +359,15 @@ export function emptyEBrochure(seed?: Partial<EBrochureContent>): EBrochureConte
       bullets: ["Trusted global partner", "Deep division expertise", "Hands-on, human collaboration"],
     },
     cta: seed?.cta ?? { label: "See it in action" },
+    heroMedia: seed?.heroMedia,
+    modules: seed?.modules,
   };
 }
 
 export function emptyAdaptorBrief(seed?: Partial<AdaptorBriefContent>): AdaptorBriefContent {
   return {
     eyebrow: seed?.eyebrow ?? "Adaptor brief",
+    logoColor: seed?.logoColor,
     title: seed?.title ?? "",
     summary:
       seed?.summary ??
@@ -371,5 +391,7 @@ export function emptyAdaptorBrief(seed?: Partial<AdaptorBriefContent>): AdaptorB
       seed?.quote ??
       { text: "The connector shipped in a sprint. Two months in, our marketing team has stopped filing localization tickets entirely.", author: "Principal Engineer, Platform" },
     cta: seed?.cta ?? { label: "Talk to an expert" },
+    heroMedia: seed?.heroMedia,
+    modules: seed?.modules,
   };
 }
