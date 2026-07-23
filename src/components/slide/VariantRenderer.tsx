@@ -4941,6 +4941,11 @@ function renderLocationsVariant(
     const TOP_N_OPTIONS = [5, 10, 25] as const;
     const rawTopN = Number(c.topN);
     const topN = (TOP_N_OPTIONS as readonly number[]).includes(rawTopN) ? rawTopN : 5;
+    const SCALE_MODES = ["absolute", "region-percent", "global-percent"] as const;
+    const rawScaleMode = typeof c.scaleMode === "string" ? c.scaleMode : "absolute";
+    const scaleMode: (typeof SCALE_MODES)[number] = (SCALE_MODES as readonly string[]).includes(rawScaleMode)
+      ? (rawScaleMode as (typeof SCALE_MODES)[number])
+      : "absolute";
     const topPins = usingMetric
       ? [...filteredPins]
           .filter((p) => Number.isFinite(p.values?.[activeMetric!.id]))
