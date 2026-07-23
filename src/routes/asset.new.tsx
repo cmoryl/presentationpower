@@ -56,7 +56,7 @@ function NewAssetPage() {
   const { brandModes } = useTaxonomy();
   const create = useServerFn(createPrintAssetWithBrief);
 
-  const [kind, setKind] = useState<"case-study" | "spotlight" | "ebrochure" | "adaptor-brief">("case-study");
+  const [kind, setKind] = useState<"case-study" | "spotlight" | "ebrochure" | "adaptor-brief">(search.kind ?? "case-study");
   const [title, setTitle] = useState(search.prospect ? `${search.prospect} — Case Study` : "");
   const [brandModeId, setBrandModeId] = useState(
     search.brandModeId ?? (brandModes.find((b) => b.id === "bm-tp-lifesci")?.id ?? brandModes[0]?.id ?? "bm-enterprise"),
