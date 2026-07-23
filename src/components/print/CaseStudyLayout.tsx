@@ -349,7 +349,7 @@ export function CaseStudyLayout({
                   border: "1.5px solid #FFFFFF", borderRadius: 999,
                   padding: `${cq(8)} ${cq(18)}`, fontSize: cq(11),
                   fontWeight: 700, color: "#FFFFFF", whiteSpace: "nowrap",
-                }}>Book a demo »</div>
+                }}>{content.cta.buttonLabel ?? "Book a Demo »"}</div>
               </div>
             )}
 
@@ -359,10 +359,15 @@ export function CaseStudyLayout({
               style={{
                 borderTop: `1px solid ${dividerCol}`,
                 marginTop: cq(20), paddingTop: cq(16), paddingBottom: cq(6),
+                gap: cq(16),
               }}
             >
               <BrandLockup brand={brand} color={ink} size="2xs" orientation="horizontal" />
-              <div style={{ fontSize: cq(9.5), color: accentInk }}>transperfect.com</div>
+              <div className="flex items-center" style={{ gap: cq(18), fontSize: cq(9.5), color: accentInk }}>
+                {(content.footer?.links ?? ["transperfect.com"]).map((l, i) => (
+                  <span key={i}>{l}</span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
