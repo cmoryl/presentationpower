@@ -797,19 +797,75 @@ function VoiceCard({
 }
 
 function LogoTile({ label, src, bg, border }: { label: string; src: string; bg: string; border?: boolean }) {
+  const onDark = bg !== "#ffffff";
+  const filename = src.split("/").pop() ?? "logo";
   return (
     <div
-      className={`flex flex-col items-center justify-center gap-3 rounded-2xl p-6 ${border ? "border border-border" : ""}`}
+      className={`group relative flex flex-col items-center justify-center gap-3 rounded-2xl p-6 ${border ? "border border-border" : ""}`}
       style={{ background: bg, minHeight: 160 }}
     >
       <img src={src} alt={label} className="max-h-20 w-auto max-w-full object-contain" loading="lazy" />
       <div
         className="text-[10px] uppercase tracking-[0.25em]"
-        style={{ color: bg === "#ffffff" ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.7)" }}
+        style={{ color: onDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)" }}
       >
         {label}
       </div>
+      <a
+        href={src}
+        download={filename}
+        className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.2em] opacity-0 ring-1 transition group-hover:opacity-100"
+        style={{
+          background: onDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.06)",
+          color: onDark ? "#fff" : "#03002C",
+          borderColor: onDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.12)",
+        }}
+        aria-label={`Download ${label} logo`}
+      >
+        <Download className="h-3 w-3" />
+        Save
+      </a>
     </div>
   );
 }
+
+// Deterministic lucide-react icon for a value label. Falls back to Sparkles.
+const VALUE_ICON_MAP: Record<string, LucideIcon> = {
+  integrity: ShieldCheck,
+  quality: Award,
+  respect: HeartHandshake,
+  service: Handshake,
+  innovation: Lightbulb,
+  excellence: Star,
+  trust: ShieldCheck,
+  precision: Target,
+  clarity: Eye,
+  collaboration: Users,
+  partnership: Handshake,
+  performance: TrendingUp,
+  speed: Zap,
+  agility: Zap,
+  global: Globe,
+  world: Globe,
+  vision: Compass,
+  leadership: Flag,
+  craft: Gem,
+  care: HeartHandshake,
+  sustainability: Leaf,
+  people: Users,
+  voice: MessageCircle,
+  systems: Cog,
+  scale: Scale,
+  layered: Layers,
+  growth: Rocket,
+};
+
+function pickValueIcon(label: string): LucideIcon {
+  const key = label.toLowerCase();
+  for (const k of Object.keys(VALUE_ICON_MAP)) {
+    if (key.includes(k)) return VALUE_ICON_MAP[k];
+  }
+  return Sparkles;
+}
+
 
