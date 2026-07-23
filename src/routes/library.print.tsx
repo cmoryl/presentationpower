@@ -22,9 +22,10 @@ import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
+import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
 import {
-  emptySpotlight, emptyEBrochure, emptyAdaptorBrief,
-  type SpotlightContent, type EBrochureContent, type AdaptorBriefContent,
+  emptySpotlight, emptyEBrochure, emptyAdaptorBrief, emptyCaseStudy,
+  type SpotlightContent, type EBrochureContent, type AdaptorBriefContent, type CaseStudyContent,
   type PrintAssetKind,
 } from "@/lib/print-assets.types";
 import {
