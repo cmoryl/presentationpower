@@ -1168,8 +1168,13 @@ const LIGHT_GRAY = "E5E1DA";
 const MID_GRAY = "9CA3AF";
 const DARK_GRAY = "4B5563";
 
-function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette, itemLogos: Array<string | null> = []): boolean {
+function renderAdvancedVariant(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette, itemLogos: Array<string | null> = [], vizSvg?: string): boolean {
   const c = (slide.content ?? {}) as Record<string, unknown>;
+  // MV-VIZ-* spec-driven infographics — embed pre-rendered vector SVG.
+  if (typeof slide.variantId === "string" && slide.variantId.startsWith("MV-VIZ-")) {
+    renderVizSpec(s, c, p, vizSvg);
+    return true;
+  }
   switch (slide.variantId) {
     case "MV-BENTO-5": renderBento5(s, c, p); return true;
     case "MV-KPI-DASHBOARD": renderKpiDashboard(s, c, p); return true;
