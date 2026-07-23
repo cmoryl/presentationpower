@@ -43,6 +43,7 @@ import {
   listDivisionImagery,
   type DivisionImageryEntry,
 } from "@/lib/division-imagery.functions";
+import { logImageryEvent } from "@/lib/admin.functions";
 import type { BrandMode } from "@/lib/taxonomy";
 import { Download, Copy, Sparkle, Star, Image as ImageIcon, ExternalLink } from "lucide-react";
 
@@ -798,6 +799,7 @@ const HERO_TPLS: Array<{ id: HeroTplKind; label: string }> = [
 
 function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
   const listFn = useServerFn(listDivisionImagery);
+  const logFn = useServerFn(logImageryEvent);
   const [activeTpl, setActiveTpl] = useState<HeroTplKind | "all">("all");
   const [lightbox, setLightbox] = useState<DivisionImageryEntry | null>(null);
 
@@ -829,10 +831,22 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
     return rank(a) - rank(b);
   });
 
-  const copyUrl = async (url: string) => {
+  // Fire-and-forget analytics ping. Errors are silenced so a logging blip
+  // never blocks the user's actual action (open / copy / download).
+  const track = (r: DivisionImageryEntry, eventType: "view" | "use" | "download") => {
+    void logFn({ data: { imageId: r.id, brandId: brand.id, eventType } }).catch(() => {});
+  };
+
+  const openLightbox = (r: DivisionImageryEntry) => {
+    setLightbox(r);
+    track(r, "view");
+  };
+
+  const copyUrl = async (url: string, r: DivisionImageryEntry) => {
     try {
       await navigator.clipboard.writeText(url);
       toast.success("Image URL copied");
+      track(r, "use");
     } catch {
       toast.error("Copy failed");
     }
@@ -919,7 +933,7 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
               <button
                 key={r.id}
                 type="button"
-                onClick={() => setLightbox(r)}
+                onClick={() => openLightbox(r)}
                 className="group relative overflow-hidden rounded-xl border border-black/10 bg-[#0b0a2a] text-left transition hover:border-[#003FC7]/60 hover:shadow-md"
               >
                 <div
@@ -1014,7 +1028,7 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => copyUrl(lightbox.signedUrl!)}
+                  onClick={() => copyUrl(lightbox.signedUrl!, lightbox)}
                   className="inline-flex items-center gap-1.5 rounded-full border border-black/15 px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
                 >
                   <Copy size={11} /> Copy URL
@@ -1023,12 +1037,14 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
                   href={lightbox.signedUrl}
                   target="_blank"
                   rel="noreferrer"
+                  onClick={() => track(lightbox, "download")}
                   className="inline-flex items-center gap-1.5 rounded-full border border-black/15 px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
                 >
                   <ExternalLink size={11} /> Open
                 </a>
                 <Link
                   to="/asset/new"
+                  onClick={() => track(lightbox, "use")}
                   className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
                 >
                   <ArrowRight size={11} /> Use in new asset

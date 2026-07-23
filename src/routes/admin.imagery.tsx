@@ -13,7 +13,8 @@ import {
   approveDivisionImagery,
   type DivisionImageryEntry,
 } from "@/lib/division-imagery.functions";
-import { UploadCloud, Trash2, CheckCircle2, Circle, Tag, Loader2, Star, Layers } from "lucide-react";
+import { getDivisionImageryStats } from "@/lib/admin.functions";
+import { UploadCloud, Trash2, CheckCircle2, Circle, Tag, Loader2, Star, Layers, BarChart3 } from "lucide-react";
 import { generateImageVariants } from "@/lib/image-variants";
 
 const TEMPLATE_KINDS = ["spotlight", "ebrochure", "case-study", "adaptor-brief"] as const;
@@ -51,6 +52,15 @@ function AdminImageryPage() {
     queryKey: ["admin-division-imagery", divisionId],
     queryFn: () => listFn({ data: { divisionId } }),
   });
+
+  const statsFn = useServerFn(getDivisionImageryStats);
+  const statsQ = useQuery({
+    queryKey: ["admin-division-imagery-stats", divisionId],
+    queryFn: () => statsFn({ data: { divisionId, days: 90 } }),
+    staleTime: 60_000,
+  });
+  const statsByImage = statsQ.data?.byImage ?? {};
+  const statsTotals = statsQ.data?.totals;
 
   const invalidate = () =>
     qc.invalidateQueries({ queryKey: ["admin-division-imagery", divisionId] });
@@ -232,6 +242,21 @@ function AdminImageryPage() {
         isUploading={uploadMut.isPending}
       />
 
+      {/* Analytics totals for the selected division (last 90 days) */}
+      {statsTotals ? (
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-xs text-black/70">
+          <BarChart3 size={13} className="text-[#003FC7]" />
+          <span className="font-medium uppercase tracking-wider text-black/50">
+            Last 90d ·
+          </span>
+          <span>{statsTotals.view} views</span>
+          <span className="text-black/25">·</span>
+          <span>{statsTotals.select} selects</span>
+          <span className="text-black/25">·</span>
+          <span>{statsTotals.download} downloads</span>
+        </div>
+      ) : null}
+
       {/* Grid */}
       {q.isLoading ? (
         <div className="flex items-center gap-2 text-sm text-black/50">
@@ -247,6 +272,7 @@ function AdminImageryPage() {
             <ImageCard
               key={r.id}
               row={r}
+              stats={statsByImage[r.id]}
               onApprove={(next) => approveMut.mutate({ id: r.id, approved: next })}
               onTags={(tags) => tagsMut.mutate({ id: r.id, tags })}
               onKind={(kind) => kindMut.mutate({ id: r.id, kind })}
@@ -430,6 +456,7 @@ function Uploader({
 // ---------------------------------------------------------------------------
 function ImageCard({
   row,
+  stats,
   onApprove,
   onTags,
   onKind,
@@ -437,6 +464,7 @@ function ImageCard({
   onDelete,
 }: {
   row: DivisionImageryEntry;
+  stats?: { view: number; select: number; download: number; total: number; last: string | null };
   onApprove: (next: boolean) => void;
   onTags: (tags: string[]) => void;
   onKind: (k: Kind) => void;
@@ -495,6 +523,23 @@ function ImageCard({
         <div className="line-clamp-1 text-sm font-medium text-[#03002C]">{row.filename}</div>
         <div className="mt-1 text-[11px] text-black/45">
           {(row.size_bytes / 1024).toFixed(0)} KB · {new Date(row.created_at).toLocaleDateString()}
+        </div>
+
+        <div
+          className="mt-2 flex items-center gap-2 rounded-md bg-black/[0.04] px-2 py-1.5 text-[10px] font-medium text-black/70"
+          title="Last 90 days of user activity"
+        >
+          <BarChart3 size={11} className="text-[#003FC7]" />
+          <span>{stats?.view ?? 0} views</span>
+          <span className="text-black/25">·</span>
+          <span>{stats?.select ?? 0} selects</span>
+          <span className="text-black/25">·</span>
+          <span>{stats?.download ?? 0} downloads</span>
+          {stats?.last ? (
+            <span className="ml-auto text-black/40">
+              {new Date(stats.last).toLocaleDateString()}
+            </span>
+          ) : null}
         </div>
 
         {editing ? (
