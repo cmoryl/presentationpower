@@ -27,6 +27,7 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
   const [q, setQ] = useState("");
   const [kind, setKind] = useState<"all" | "photo" | "abstract" | "generated" | "upload">("all");
   const [approvedOnly, setApprovedOnly] = useState(true);
+  const [activeTags, setActiveTags] = useState<string[]>([]);
 
   useEffect(() => {
     if (!open || !divisionId) return;
