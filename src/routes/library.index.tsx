@@ -1506,6 +1506,8 @@ function ModalABPreview({
           >
             <div
               ref={m === "dark" ? darkRef : lightRef}
+              data-modal-preview={m}
+              data-variant-id={variant.id}
               className={`relative aspect-[16/9] overflow-hidden ${m === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"}`}
             >
               <ScaledSlide>
