@@ -68,16 +68,8 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
       ? { height: `${heightPct}%`, overflow: "hidden" }
       : { aspectRatio: String(ASPECT_RATIOS[aspect]), width: "100%", overflow: "hidden" };
 
-  const scrimGradient =
-    scrim === "top"
-      ? `linear-gradient(180deg, ${pageBg} 0%, transparent 55%)`
-      : scrim === "bottom"
-      ? `linear-gradient(180deg, transparent 40%, ${pageBg} 100%)`
-      : scrim === "both"
-      ? `linear-gradient(180deg, ${pageBg} 0%, transparent 35%, transparent 65%, ${pageBg} 100%)`
-      : scrim === "radial"
-      ? `radial-gradient(ellipse at ${fx ?? 30}% ${fy ?? 45}%, transparent 0%, transparent 40%, ${pageBg} 85%)`
-      : "none";
+  // scrimGradient is derived below from `effectiveScrim` so auto-scrim can
+  // upgrade a "none" scrim when bright imagery is detected.
 
   const [failed, setFailed] = useState(false);
   const [autoBoost, setAutoBoost] = useState(0); // extra scrim opacity added when auto detects bright imagery
