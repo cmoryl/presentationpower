@@ -182,3 +182,25 @@ export const deleteDivisionImagery = createServerFn({ method: "POST" })
     if (path) await s.storage.from(BUCKET).remove([path]).catch(() => {});
     return { ok: true };
   });
+
+// Admin-only approval toggle. Approved imagery is what surfaces in the
+// division library shelf and print template picker by default.
+export const approveDivisionImagery = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) =>
+    z.object({ id: z.string().uuid(), approved: z.boolean() }).parse(v),
+  )
+  .handler(async ({ data, context }) => {
+    const s = context.supabase as unknown as SbClient;
+    const { data: isAdmin } = await (s as any).rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden: admin role required");
+    const patch = data.approved
+      ? { approved: true, approved_by: context.userId, approved_at: new Date().toISOString() }
+      : { approved: false, approved_by: null, approved_at: null };
+    const { error } = await s.from("division_imagery").update(patch).eq("id", data.id);
+    if (error) throw new Error((error as { message?: string }).message ?? "Update failed");
+    return { ok: true };
+  });
