@@ -393,6 +393,42 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
         </div>
       </div>
 
+      {/* Color scaling mode */}
+      <div className="mt-3 flex items-center justify-between rounded-xl border border-black/10 bg-black/[0.015] p-3">
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-black/60">
+            Value scaling
+          </div>
+          <div className="mt-1 text-[10px] text-black/45">
+            Choose whether pin color, size, and legend use raw values or normalized shares.
+          </div>
+        </div>
+        <div className="flex overflow-hidden rounded-full border border-black/15">
+          {SCALE_MODES.map((m) => {
+            const active = currentScaleMode === m;
+            return (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setScaleMode(m)}
+                className={`px-3 py-1 text-[11px] font-semibold uppercase tracking-widest transition ${
+                  active ? "bg-sky-600 text-white" : "bg-white text-black/60 hover:text-sky-600"
+                }`}
+                title={
+                  m === "absolute"
+                    ? "Color scale spans the raw min/max of the active metric."
+                    : m === "region-percent"
+                    ? "Each pin is normalized to its own region's total."
+                    : "Each pin is normalized to the global (filtered) total."
+                }
+              >
+                {SCALE_MODE_LABELS[m]}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
 
 
 
