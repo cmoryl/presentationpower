@@ -391,6 +391,13 @@ export type WorldMapProps = {
   /** Optional metric to visualize — pins are scaled/colored by value and a legend is drawn. */
   metric?: LocationMetric;
   metricId?: string;
+  /**
+   * How to normalize pin coloring/sizing against the active metric.
+   *  - "absolute" (default): raw min→max scale.
+   *  - "region-percent": each pin as % of its region's total.
+   *  - "global-percent": each pin as % of the global (visible) total.
+   */
+  scaleMode?: "absolute" | "region-percent" | "global-percent";
 };
 
 /**
