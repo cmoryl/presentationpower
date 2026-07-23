@@ -1201,10 +1201,13 @@ function VariantDetailModal({
         }],
       } as Parameters<typeof exportDeckToPptx>[0];
       console.info(`[library] downloading module ${variant.id} · division=${brand.id} · mode=${exportMode}`);
-      await exportDeckToPptx(singleSlideDeck, brand, { forceMode: exportMode });
+      const { fileName } = await exportDeckToPptx(singleSlideDeck, brand, { forceMode: exportMode });
+      toast.success("Module PPTX exported", {
+        description: `${fileName ?? `${variant.name} — ${brand.name} (${exportMode}).pptx`} (${exportMode})`,
+      });
     } catch (err) {
       console.error("[library] module download failed", err);
-      alert("Download failed. Check console for details.");
+      toast.error("PPTX export failed", { description: "Check console for details." });
     } finally {
       setDownloading(false);
     }
