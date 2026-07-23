@@ -612,6 +612,16 @@ function AssetEditor() {
               )}
             </Panel>
 
+            <Panel title="Shared modules">
+              <ModulesPanel
+                modules={content.modules ?? []}
+                onAdd={() => setPickerOpen(true)}
+                onChange={(next) => patchContent({ modules: next })}
+              />
+            </Panel>
+
+
+
             <Panel title="Quote">
               <textarea
                 rows={3}
