@@ -227,7 +227,7 @@ function PrintQAMatrix() {
             <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
               {tpl.label}
             </h2>
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+            <div className="flex flex-wrap gap-8">
               {stress.map((brand) =>
                 (["light", "dark"] as const).map((mode) => {
                   const label = `${tpl.key}-${brand.id}-${mode}`;
@@ -254,7 +254,7 @@ function PrintQAMatrix() {
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
             Long-content stress (~1.5–2× seed length)
           </h2>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+          <div className="flex flex-wrap gap-8">
             {stress[0] && (
               <Cell label="spotlight-long" brand={stress[0]} mode="light">
                 <SpotlightLayout content={SPOT_LONG} brand={stress[0]} mode="light" />
