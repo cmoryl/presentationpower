@@ -1609,7 +1609,10 @@ function ModalABPreview({
               {m === "light" ? "☀︎ A · Light" : "☾ B · Dark"}
             </span>
             <div className="flex items-center gap-1.5 text-[10px]">
-              <button
+              {m === "light" && (
+                <ResolutionToggle value={pixelRatio} onChange={setPixelRatio} disabled={imageBusy !== null} tone="compact" />
+              )}
+
                 type="button"
                 onClick={() => runImageExport(m, "png")}
                 disabled={imageBusy !== null}
