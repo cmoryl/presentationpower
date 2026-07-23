@@ -43,6 +43,7 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
   const overlayColor = media.overlayColor ?? accent;
   const overlayOpacity = clamp01(media.overlayOpacity ?? 0.55);
   const washStrength = clamp01(media.washStrength ?? 1);
+  const scrimOpacity = clamp01(media.scrimOpacity ?? media.washStrength ?? 1);
   const scrim = media.scrim ?? "bottom";
   const blendMode = media.blendMode ?? "multiply";
   const heightPct = media.heightPct ?? 46;
@@ -107,13 +108,13 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
         }}
       />
       {/* Legibility scrim into the body background — scaled by washStrength */}
-      {scrim !== "none" && washStrength > 0 && (
+      {scrim !== "none" && scrimOpacity > 0 && (
         <div
           style={{
             position: "absolute",
             inset: 0,
             background: scrimGradient,
-            opacity: washStrength,
+            opacity: scrimOpacity,
           }}
         />
       )}

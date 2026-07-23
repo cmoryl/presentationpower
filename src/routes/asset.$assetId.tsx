@@ -823,6 +823,15 @@ function HeroMediaPanel({
         onChange={(v) => patch({ washStrength: v })}
         display={`${Math.round(washStrength * 100)}%`}
       />
+      <Slider
+        label="Scrim opacity"
+        value={media.scrimOpacity ?? washStrength}
+        min={0}
+        max={1}
+        step={0.05}
+        onChange={(v) => patch({ scrimOpacity: v })}
+        display={`${Math.round((media.scrimOpacity ?? washStrength) * 100)}%`}
+      />
       {aspect === "fill" && (
         <Slider
           label="Band height"
