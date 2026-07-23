@@ -924,8 +924,11 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
               >
                 <div
                   className="aspect-[4/5] w-full bg-cover bg-center"
-                  style={{ backgroundImage: `url(${r.signedUrl})` }}
+                  style={{
+                    backgroundImage: `url(${r.variantUrls?.portrait ?? r.variantUrls?.thumb ?? r.signedUrl})`,
+                  }}
                 />
+
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/70 to-transparent p-2.5">
                   <div className="text-[10px] font-medium uppercase tracking-wide text-white/90 line-clamp-1">
                     {r.collection ?? r.filename}
