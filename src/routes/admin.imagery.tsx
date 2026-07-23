@@ -14,6 +14,7 @@ import {
   type DivisionImageryEntry,
 } from "@/lib/division-imagery.functions";
 import { UploadCloud, Trash2, CheckCircle2, Circle, Tag, Loader2, Star, Layers } from "lucide-react";
+import { generateImageVariants } from "@/lib/image-variants";
 
 const TEMPLATE_KINDS = ["spotlight", "ebrochure", "case-study", "adaptor-brief"] as const;
 type TemplateKind = (typeof TEMPLATE_KINDS)[number];
