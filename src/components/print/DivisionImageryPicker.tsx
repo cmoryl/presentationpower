@@ -204,14 +204,22 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
           ) : (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
               {filtered.map((r) => (
-                <button
+                <div
                   key={r.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => {
                     onPick(r);
                     onClose();
                   }}
-                  className="group flex flex-col overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] text-left transition hover:border-white/30 hover:bg-white/[0.06]"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onPick(r);
+                      onClose();
+                    }
+                  }}
+                  className="group flex cursor-pointer flex-col overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] text-left transition hover:border-white/30 hover:bg-white/[0.06] focus:border-white/40 focus:outline-none"
                 >
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-black/40">
                     {r.signedUrl ? (
@@ -234,24 +242,36 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
                         Approved
                       </span>
                     )}
-
                   </div>
                   <div className="space-y-1 p-2.5">
                     <div className="truncate text-[11px] font-medium text-white">{r.filename}</div>
                     {(r.tags?.length ?? 0) > 0 ? (
                       <div className="flex flex-wrap gap-1">
-                        {r.tags!.slice(0, 3).map((t) => (
-                          <span
-                            key={t}
-                            className="rounded-full bg-white/10 px-1.5 py-0.5 text-[9px] text-white/70"
-                          >
-                            {t}
-                          </span>
-                        ))}
+                        {r.tags!.slice(0, 4).map((t) => {
+                          const on = activeTags.includes(t);
+                          return (
+                            <button
+                              key={t}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleTag(t);
+                              }}
+                              className={`rounded-full px-1.5 py-0.5 text-[9px] transition ${
+                                on
+                                  ? "bg-white text-[#0b0d18]"
+                                  : "bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
+                              }`}
+                              title={on ? `Remove "${t}" filter` : `Filter by "${t}"`}
+                            >
+                              {t}
+                            </button>
+                          );
+                        })}
                       </div>
                     ) : null}
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           )}
