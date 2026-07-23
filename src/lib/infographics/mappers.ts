@@ -1,3 +1,4 @@
+import type { InfographicRow } from "./spec";
 // Adapters from the existing MV-* variant content shape into a canonical
 // InfographicSpec. These let the ChartDataDrawer + a11y helpers work on
 // legacy variants without touching pixels — the visual is still the
