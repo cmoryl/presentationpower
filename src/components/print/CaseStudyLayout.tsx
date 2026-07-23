@@ -25,6 +25,7 @@ import {
   IconPath as Icon,
   ICON_PATHS,
   clampLines,
+  PrintEyebrow,
 } from "@/components/print/print-primitives";
 
 
