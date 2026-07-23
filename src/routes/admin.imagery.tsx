@@ -11,10 +11,11 @@ import {
   updateDivisionImagery,
   deleteDivisionImagery,
   approveDivisionImagery,
+  attachDivisionImageryVariants,
   type DivisionImageryEntry,
 } from "@/lib/division-imagery.functions";
 import { getDivisionImageryStats } from "@/lib/admin.functions";
-import { UploadCloud, Trash2, CheckCircle2, Circle, Tag, Loader2, Star, Layers, BarChart3 } from "lucide-react";
+import { UploadCloud, Trash2, CheckCircle2, Circle, Tag, Loader2, Star, Layers, BarChart3, Wand2 } from "lucide-react";
 import { generateImageVariants } from "@/lib/image-variants";
 
 const TEMPLATE_KINDS = ["spotlight", "ebrochure", "case-study", "adaptor-brief"] as const;
