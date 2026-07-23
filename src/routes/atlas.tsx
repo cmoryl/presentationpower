@@ -1,13 +1,7 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { byId, MODULE_VARIANTS } from "@/lib/taxonomy";
-import { MODULE_PRESET_KITS, validateKit } from "@/lib/module-preset-kits";
-import { formatKitValidationError } from "@/lib/kit-validation";
-
-import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
-import { Download, Loader2 } from "lucide-react";
 import {
   ICON_SIZES,
   ICON_PLACEMENTS_META,
@@ -170,7 +164,7 @@ function Atlas() {
         </div>
       </Section>
 
-      <ModulePresetKitsSection />
+
 
       <Section title="Layout frameworks" count={LAYOUT_FRAMEWORKS.length}>
         <div className="grid grid-cols-4 gap-4">
@@ -638,100 +632,3 @@ function TypographySection() {
   );
 }
 
-
-// ────────────────────────────────────────────────────────────────────────────
-// Module preset kits — curated slide libraries mapped onto module variants.
-// Lives inside the module library (Atlas), not the team templates page.
-// ────────────────────────────────────────────────────────────────────────────
-function ModulePresetKitsSection() {
-  const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
-  const navigate = useNavigate();
-  const [busy, setBusy] = useState<string | null>(null);
-
-  function importKit(kit: (typeof MODULE_PRESET_KITS)[number]) {
-    const result = validateKit(kit);
-    if (!result.valid) {
-      alert(formatKitValidationError(kit.title, result));
-      return;
-    }
-    setBusy(kit.key);
-    // layoutId fallback is enforced inside createDeckFromTemplate.
-    const { deckId } = createDeckFromTemplate(kit.payload);
-    navigate({ to: "/decks/$deckId", params: { deckId } });
-  }
-
-
-  return (
-    <Section title="Module preset kits" count={MODULE_PRESET_KITS.length}>
-      <p className="-mt-2 mb-6 max-w-3xl text-sm text-black/60">
-        Curated slide libraries pre-mapped onto the module variants above. Browse the composition,
-        then import a whole kit into a new deck as an editable starting point.
-      </p>
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        {MODULE_PRESET_KITS.map((kit) => {
-          const familyCounts = kit.payload.slides.reduce<Record<string, number>>((acc, s) => {
-            const mv = byId(MODULE_VARIANTS, s.variantId);
-            const fam = mv?.familyId ?? "unknown";
-            acc[fam] = (acc[fam] ?? 0) + 1;
-            return acc;
-          }, {});
-          return (
-            <div key={kit.key} className="rounded-2xl border border-black/10 bg-white p-5">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="text-[10px] uppercase tracking-widest text-black/50">{kit.tag}</div>
-                  <div className="mt-1 text-lg font-semibold">{kit.title}</div>
-                </div>
-                <span className="shrink-0 rounded-full bg-black/5 px-2 py-0.5 text-xs">
-                  {kit.payload.slides.length} slides
-                </span>
-              </div>
-              <p className="mt-2 text-sm text-black/60">{kit.blurb}</p>
-
-              <div className="mt-4 border-t border-black/10 pt-3">
-                <div className="text-xs uppercase tracking-widest text-black/50">Variant mix</div>
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {Object.entries(familyCounts).map(([fam, n]) => (
-                    <span key={fam} className="rounded-full bg-[#0B2A4A]/10 px-2 py-0.5 font-mono text-[10px] text-[#0B2A4A]">
-                      {fam} · {n}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-4 border-t border-black/10 pt-3">
-                <div className="text-xs uppercase tracking-widest text-black/50">Slides</div>
-                <ul className="mt-2 grid grid-cols-1 gap-1 text-sm md:grid-cols-2">
-                  {kit.payload.slides.slice(0, 10).map((s, i) => {
-                    const mv = byId(MODULE_VARIANTS, s.variantId);
-                    return (
-                      <li key={i} className="flex items-center justify-between gap-2">
-                        <span className="truncate text-black/70">
-                          {String(i + 1).padStart(2, "0")} · {mv?.name ?? s.variantId}
-                        </span>
-                        <span className="shrink-0 font-mono text-[10px] text-black/40">{s.variantId}</span>
-                      </li>
-                    );
-                  })}
-                  {kit.payload.slides.length > 10 && (
-                    <li className="text-xs text-black/40">+ {kit.payload.slides.length - 10} more…</li>
-                  )}
-                </ul>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => importKit(kit)}
-                disabled={busy !== null}
-                className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
-              >
-                {busy === kit.key ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
-                {busy === kit.key ? "Importing…" : "Import kit into new deck"}
-              </button>
-            </div>
-          );
-        })}
-      </div>
-    </Section>
-  );
-}
