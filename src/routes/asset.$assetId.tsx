@@ -1086,8 +1086,31 @@ function HeroMediaPanel({
   const aspect = media.aspect ?? "fill";
   const [pickerOpen, setPickerOpen] = useState(false);
 
+  // Inline curated strip — first N approved images for this division.
+  const list = useServerFn(listDivisionImagery);
+  const [curated, setCurated] = useState<DivisionImageryEntry[]>([]);
+  const [curatedLoading, setCuratedLoading] = useState(false);
+  useEffect(() => {
+    if (!divisionId) { setCurated([]); return; }
+    let cancelled = false;
+    setCuratedLoading(true);
+    list({ data: { divisionId, onlyApproved: true } })
+      .then((rows) => { if (!cancelled) setCurated(rows.slice(0, 12)); })
+      .catch(() => { if (!cancelled) setCurated([]); })
+      .finally(() => { if (!cancelled) setCuratedLoading(false); });
+    return () => { cancelled = true; };
+  }, [divisionId, list]);
+
   function patch(p: Partial<PrintHeroMedia>) {
     onChange({ ...media, ...p });
+  }
+  function selectFromCurated(entry: DivisionImageryEntry) {
+    if (!entry.signedUrl) return;
+    // Preserve current tuning if the user was mid-edit; otherwise seed sane defaults.
+    const base: PrintHeroMedia = enabled
+      ? media
+      : { imageUrl: "", overlayOpacity: 0.55, washStrength: 1, scrim: "bottom", blendMode: "multiply", heightPct: 46 };
+    onChange({ ...base, imageUrl: entry.signedUrl });
   }
 
   return (
@@ -1103,6 +1126,55 @@ function HeroMediaPanel({
           }
         />
       </Row>
+      {/* Curated pool strip */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
+          <span>Curated pool{divisionId ? "" : " · pick a division"}</span>
+          <button
+            type="button"
+            onClick={() => onChange(undefined)}
+            disabled={!enabled}
+            className="rounded border border-black/10 px-1.5 py-0.5 text-[9px] uppercase tracking-[0.2em] text-black/60 transition hover:bg-black/[0.04] disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/15 dark:text-white/60 dark:hover:bg-white/[0.05]"
+            title="Clear hero media — pages will render the deterministic division fallback"
+          >
+            Reset to default
+          </button>
+        </div>
+        <div className="grid grid-cols-4 gap-1.5">
+          {curatedLoading && curated.length === 0 ? (
+            <div className="col-span-4 flex items-center justify-center rounded border border-dashed border-black/10 py-3 text-[10px] text-black/50 dark:border-white/10 dark:text-white/40">
+              Loading curated imagery…
+            </div>
+          ) : curated.length === 0 ? (
+            <div className="col-span-4 rounded border border-dashed border-black/10 px-2 py-3 text-center text-[10px] text-black/50 dark:border-white/10 dark:text-white/40">
+              {divisionId ? "No approved imagery yet for this division." : "Select a division to see curated imagery."}
+            </div>
+          ) : (
+            curated.map((entry) => {
+              const url = entry.variantUrls?.thumb ?? entry.signedUrl ?? "";
+              const active = enabled && (entry.signedUrl === media.imageUrl);
+              return (
+                <button
+                  key={entry.id}
+                  type="button"
+                  onClick={() => selectFromCurated(entry)}
+                  className={`relative aspect-video overflow-hidden rounded border transition ${
+                    active
+                      ? "border-[#003FC7] ring-2 ring-[#003FC7]/40"
+                      : "border-black/10 hover:border-black/30 dark:border-white/10 dark:hover:border-white/30"
+                  }`}
+                  title={entry.filename || "Curated hero"}
+                  style={url ? { backgroundImage: `url(${url})`, backgroundSize: "cover", backgroundPosition: "center" } : {}}
+                >
+                  {!url && (
+                    <span className="absolute inset-0 grid place-items-center text-[9px] text-black/50 dark:text-white/40">no preview</span>
+                  )}
+                </button>
+              );
+            })
+          )}
+        </div>
+      </div>
       <div className="flex gap-2">
         <input
           className={`${inspectorInput} flex-1`}
@@ -1115,7 +1187,7 @@ function HeroMediaPanel({
           onClick={() => setPickerOpen(true)}
           disabled={!divisionId}
           className="inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/[0.05] px-2 py-1.5 text-[10px] uppercase tracking-[0.22em] text-white/80 transition hover:border-white/30 hover:bg-white/[0.1] disabled:cursor-not-allowed disabled:opacity-40"
-          title={divisionId ? "Browse division imagery library" : "Select a division first"}
+          title={divisionId ? "Browse full division imagery library" : "Select a division first"}
         >
           <Images className="h-3 w-3" />
           Library
@@ -1133,6 +1205,7 @@ function HeroMediaPanel({
           });
         }}
       />
+
       <Row label="Aspect">
         <select
           className={inspectorInput}
