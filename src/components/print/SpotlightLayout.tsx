@@ -299,9 +299,7 @@ export function SpotlightLayout({
             {/* ============================================================ */}
             {/* HEADER — brand lockup + CLIENT SPOTLIGHT eyebrow              */}
             {/* ============================================================ */}
-            <div className="flex items-center" style={{ gap: cq(10) }}>
-              <BrandLockup brand={brand} color={ink} size="sm" orientation="horizontal" />
-              <div style={{ width: 1, height: cq(14), background: dividerCol }} />
+            <div className="flex items-center justify-between" style={{ gap: cq(10) }}>
               <div
                 style={{
                   fontSize: cq(9.5),
@@ -312,6 +310,7 @@ export function SpotlightLayout({
               >
                 {(content.eyebrow ?? "Client spotlight").toUpperCase()}
               </div>
+              <BrandLockup brand={brand} color={ink} size="xs" orientation="horizontal" />
             </div>
 
             {/* ============================================================ */}
