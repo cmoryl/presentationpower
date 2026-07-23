@@ -96,17 +96,17 @@ const TEMPLATES: Template[] = [
   {
     id: "ebrochure",
     label: "E-Brochure",
-    tagline: "GlobalLink-style marketing PDF",
-    desc: "Multi-page e-brochure kit — coming next. The port from EBrochure.dc.html is queued behind Spotlight.",
-    live: false,
+    tagline: "Challenge · Approach · Impact",
+    desc: "Single-page marketing PDF — pastel aurora hero, three summary cards, stat row, quote + Discover panel, and a division-tokenized CTA band.",
+    live: true,
     icon: <PenSquare size={16} />,
   },
   {
     id: "adaptor-brief",
     label: "Adaptor Brief",
-    tagline: "Dark aurora hero + capability grid",
-    desc: "Application/adaptor brief for enterprise integrations. Port from ApplicationBrief.dc.html — coming next.",
-    live: false,
+    tagline: "Dark aurora hero + 6 capability cards",
+    desc: "Application / adaptor brief for enterprise integrations. Dark→light gradient hero, six verb cards, a 'We Know How' strip, and a pull-quote.",
+    live: true,
     icon: <Rocket size={16} />,
   },
 ];
