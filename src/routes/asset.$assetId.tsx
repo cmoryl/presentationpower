@@ -878,6 +878,7 @@ function AssetEditor() {
         onInsert={(section) => {
           const next = [...(content.modules ?? []), section];
           patchContent({ modules: next });
+          // Keep drawer open so the user can insert multiple modules.
         }}
         brand={brand}
         mode="light"
