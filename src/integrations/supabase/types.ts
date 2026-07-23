@@ -1142,17 +1142,20 @@ export type Database = {
           approved: boolean
           approved_at: string | null
           approved_by: string | null
+          collection: string | null
           content_type: string | null
           created_at: string
           division_id: string
           filename: string
           id: string
+          is_default_for: string[]
           kind: string
           note: string | null
           prompt: string | null
           size_bytes: number
           storage_path: string
           tags: string[]
+          template_kinds: string[]
           updated_at: string
           uploaded_by: string
         }
@@ -1160,17 +1163,20 @@ export type Database = {
           approved?: boolean
           approved_at?: string | null
           approved_by?: string | null
+          collection?: string | null
           content_type?: string | null
           created_at?: string
           division_id: string
           filename: string
           id?: string
+          is_default_for?: string[]
           kind?: string
           note?: string | null
           prompt?: string | null
           size_bytes?: number
           storage_path: string
           tags?: string[]
+          template_kinds?: string[]
           updated_at?: string
           uploaded_by: string
         }
@@ -1178,17 +1184,20 @@ export type Database = {
           approved?: boolean
           approved_at?: string | null
           approved_by?: string | null
+          collection?: string | null
           content_type?: string | null
           created_at?: string
           division_id?: string
           filename?: string
           id?: string
+          is_default_for?: string[]
           kind?: string
           note?: string | null
           prompt?: string | null
           size_bytes?: number
           storage_path?: string
           tags?: string[]
+          template_kinds?: string[]
           updated_at?: string
           uploaded_by?: string
         }
