@@ -58,7 +58,7 @@ export type DivisionBrandMode = {
   id: string;
   name: string;
   description: string;
-  tokens: Record<string, unknown>;
+  tokens: unknown;
 };
 
 export type DivisionCaseStudy = {
@@ -126,25 +126,29 @@ export const getDivisionContext = createServerFn({ method: "POST" })
         : Promise.resolve({ data: [], error: null } as { data: unknown[]; error: null }),
       supabase
         .from("client_logos")
-        .select("id, name, url, role")
+        .select("id, client_name, primary_path, industry")
         .eq("division_id", divisionId)
+        .eq("is_active", true)
         .limit(60),
-      supabase
-        .from("library_slide_examples")
-        .select("id, title, variant_id, tags")
-        .contains("tags", ["case-study"])
-        .limit(20),
+      Promise.resolve({ data: [], error: null } as { data: unknown[]; error: null }),
     ]);
+
+    const logos: DivisionLogoRef[] = ((logosQ.data ?? []) as Array<Record<string, unknown>>).map((r) => ({
+      id: r.id as string,
+      name: (r.client_name as string) ?? "",
+      url: (r.primary_path as string) ?? "",
+      role: (r.industry as string | null) ?? null,
+    }));
 
     const result: DivisionContext = {
       divisionId,
       mode: (modeQ.data as DivisionBrandMode | null) ?? null,
       stats: ((statsQ.data ?? []) as DivisionStat[]),
       quotes: ((quotesQ.data ?? []) as DivisionQuote[]),
-      knowledge: ((knowledgeQ.data ?? []) as DivisionKnowledgeEntry[]),
+      knowledge: ((knowledgeQ.data ?? []) as unknown as DivisionKnowledgeEntry[]),
       imagery: ((imageryQ.data ?? []) as DivisionImageryRef[]),
-      logos: ((logosQ.data ?? []) as DivisionLogoRef[]),
-      caseStudies: ((casesQ.data ?? []) as DivisionCaseStudy[]),
+      logos,
+      caseStudies: [],
     };
     return result;
   });
