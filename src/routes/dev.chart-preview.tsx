@@ -60,6 +60,46 @@ const PILOTS = [
       ],
     },
   },
+  {
+    variantId: "MV-DASH-PERFORMANCE",
+    label: "Free-form bar chart (Aurora v2)",
+    content: {
+      kicker: "Region · Q3 performance",
+      title: "APAC pulls ahead on program conversion.",
+      headline:
+        "Highlighted bar carries the bloom, halo, and glow. Non-highlight bars sit as quiet feathered forms on the same baseline hairline.",
+      stat: { value: "72", unit: "%", label: "APAC conversion rate" },
+      highlight: "APAC",
+      bars: [
+        { label: "NA", value: 48 },
+        { label: "EMEA", value: 54 },
+        { label: "LATAM", value: 39 },
+        { label: "APAC", value: 72 },
+        { label: "MEA", value: 31 },
+      ],
+      legend: [
+        { label: "APAC (highlight)", value: "72%" },
+        { label: "Regional peers", value: "avg 43%" },
+      ],
+    },
+  },
+  {
+    variantId: "MV-DASH-GROWTH-COLUMNS",
+    label: "Free-form growth columns (Aurora v2)",
+    content: {
+      kicker: "Trajectory · Life Sciences",
+      title: "Five years of compounding revenue.",
+      headline:
+        "Columns sit on a single hairline baseline. The last column blooms with a radial halo and thin accent top-edge so the current year reads without a label.",
+      items: [
+        { year: "2022", value: "18", unit: "M", note: "Foundation" },
+        { year: "2023", value: "27", unit: "M", note: "First expansion" },
+        { year: "2024", value: "44", unit: "M", note: "Product-market fit" },
+        { year: "2025", value: "68", unit: "M", note: "Scale phase" },
+        { year: "2026", value: "96", unit: "M", note: "Projected" },
+      ],
+    },
+  },
 ] as const;
 
 const BRANDS = [
