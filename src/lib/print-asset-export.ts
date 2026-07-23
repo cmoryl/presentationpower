@@ -200,13 +200,19 @@ export async function exportPrintAssetAsPdf(
   const pages = Array.isArray(nodes) ? nodes : [nodes];
   if (pages.length === 0) throw new Error("exportPrintAssetAsPdf: no pages provided.");
 
+  const format: PrintExportFormat = opts.format ?? "press";
+  const isDigital = format === "digital";
+
   const trim = resolveTrim(opts);
-  const bleed = Math.max(0, opts.bleedIn ?? 0);
+  // Digital output has no bleed and no crop marks by definition.
+  const bleed = isDigital ? 0 : Math.max(0, opts.bleedIn ?? 0);
+  const cropMarks = isDigital ? false : !!opts.cropMarks;
   const pageWidth = trim.widthIn + bleed * 2;
   const pageHeight = trim.heightIn + bleed * 2;
 
+  // Digital uses a fixed 150 DPI + JPEG. Press uses the caller's quality.
   const quality: PrintExportQuality = opts.quality ?? "300dpi";
-  const requestedDpi = PRINT_EXPORT_DPI[quality];
+  const requestedDpi = isDigital ? DIGITAL_EXPORT_DPI : PRINT_EXPORT_DPI[quality];
   const requestedWidthPx = Math.ceil(pageWidth * requestedDpi);
   const resolved = resolvePrintPixelWidth(pageWidth, pageHeight, requestedDpi);
   if (resolved.clamped) {
@@ -234,19 +240,82 @@ export async function exportPrintAssetAsPdf(
 
   for (let i = 0; i < pages.length; i++) {
     if (i > 0) pdf.addPage([pageWidth, pageHeight], orientation);
-    const dataUrl = await captureSlideAsDataUrl(pages[i]!, {
+    const pngDataUrl = await captureSlideAsDataUrl(pages[i]!, {
       mode: opts.mode ?? "light",
       targetWidth: resolved.widthPx,
       onProgress: opts.onProgress,
     });
-    pdf.addImage(dataUrl, "PNG", 0, 0, pageWidth, pageHeight, undefined, "SLOW");
-    if (opts.cropMarks && bleed > 0) {
+    if (isDigital) {
+      // Convert PNG → JPEG for a ~10× file-size reduction on aurora pages.
+      const jpegDataUrl = await pngDataUrlToJpeg(
+        pngDataUrl,
+        opts.mode ?? "light",
+        DIGITAL_JPEG_QUALITY,
+      );
+      pdf.addImage(jpegDataUrl, "JPEG", 0, 0, pageWidth, pageHeight, undefined, "FAST");
+    } else {
+      pdf.addImage(pngDataUrl, "PNG", 0, 0, pageWidth, pageHeight, undefined, "SLOW");
+    }
+    if (cropMarks && bleed > 0) {
       drawCropMarks(pdf, pageWidth, pageHeight, bleed);
     }
   }
 
   const filename =
     opts.filename ??
-    `print-asset-${opts.pageSize.toLowerCase()}-${Date.now()}.pdf`;
-  pdf.save(filename);
+    `print-asset-${opts.pageSize.toLowerCase()}-${format}-${Date.now()}.pdf`;
+
+  if (format === "press-x4") {
+    if (!opts.iccProfile) {
+      throw new Error("press-x4 export requires an `iccProfile` option.");
+    }
+    const rawBytes = pdf.output("arraybuffer");
+    const iccBytes = await fetchIccProfile(opts.iccProfile);
+    const x4Bytes = await wrapPdfAsX4(new Uint8Array(rawBytes), {
+      trimSize: { widthIn: trim.widthIn, heightIn: trim.heightIn },
+      bleedIn: bleed,
+      iccProfileBytes: iccBytes,
+      iccProfileName: opts.iccProfile,
+      title: opts.filename,
+    });
+    triggerBlobDownload(x4Bytes, filename, "application/pdf");
+  } else {
+    pdf.save(filename);
+  }
+}
+
+/** Convert a PNG data URL to a JPEG data URL with a mode-appropriate flat
+ *  background so transparent pixels don't come out black. Runs in-browser. */
+async function pngDataUrlToJpeg(
+  pngDataUrl: string,
+  mode: SlideExportMode,
+  quality: number,
+): Promise<string> {
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const el = new Image();
+    el.onload = () => resolve(el);
+    el.onerror = reject;
+    el.src = pngDataUrl;
+  });
+  const canvas = document.createElement("canvas");
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("2D canvas unavailable for JPEG conversion.");
+  ctx.fillStyle = mode === "dark" ? "#03002C" : "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(img, 0, 0);
+  return canvas.toDataURL("image/jpeg", quality);
+}
+
+function triggerBlobDownload(bytes: Uint8Array, filename: string, mime: string): void {
+  const blob = new Blob([bytes.buffer as ArrayBuffer], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
