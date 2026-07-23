@@ -151,31 +151,35 @@ export function EBrochureLayout({
             ...style,
           }}
         >
-          <AuroraLayer
-            seed={seed ?? `ebrochure-${brand.id}-${mode}`}
-            brand={brand}
-            intensity={0.85}
-            aspect={auroraAspect(pageSize)}
-          />
+          {mode === "dark" && (
+            <AuroraLayer
+              seed={seed ?? `ebrochure-${brand.id}-${mode}`}
+              brand={brand}
+              intensity={0.85}
+              aspect={auroraAspect(pageSize)}
+            />
+          )}
           {content.heroMedia && (
             <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
           )}
 
 
-          {/* Template's centered top halo — retuned to accent so every division reads. */}
-          <div
-            className="pointer-events-none absolute"
-            aria-hidden
-            style={{
-              top: cq(-160), left: "50%", transform: "translateX(-50%)",
-              width: cq(900), height: cq(480),
-              background:
-                `radial-gradient(ellipse at 30% 30%, ${accent}66 0%, transparent 55%),` +
-                `radial-gradient(ellipse at 75% 20%, ${accent}55 0%, transparent 55%)`,
-              filter: `blur(${cq(8)})`,
-              opacity: mode === "dark" ? 0.85 : 0.55,
-            }}
-          />
+          {/* Centered top halo — dark mode only to preserve true white pages. */}
+          {mode === "dark" && (
+            <div
+              className="pointer-events-none absolute"
+              aria-hidden
+              style={{
+                top: cq(-160), left: "50%", transform: "translateX(-50%)",
+                width: cq(900), height: cq(480),
+                background:
+                  `radial-gradient(ellipse at 30% 30%, ${accent}66 0%, transparent 55%),` +
+                  `radial-gradient(ellipse at 75% 20%, ${accent}55 0%, transparent 55%)`,
+                filter: `blur(${cq(8)})`,
+                opacity: 0.85,
+              }}
+            />
+          )}
 
           {/* No colored hero band — background stays white / offset black
               per print guidelines. The centered halo above provides the only

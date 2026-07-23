@@ -144,31 +144,32 @@ export function AdaptorBriefLayout({
           }}
         >
 
-          {/* Aurora sits UNDER the hero gradient for the lower two-thirds. */}
-          <div className="pointer-events-none absolute inset-0" style={{ opacity: mode === "dark" ? 0.9 : 0.75 }}>
-            <AuroraLayer
-              seed={seed ?? `adaptor-${brand.id}-${mode}`}
-              brand={brand}
-              intensity={0.85}
-              aspect={auroraAspect(pageSize)}
-            />
-          </div>
+          {/* Aurora + accent blooms — dark mode only; light stays true white. */}
+          {mode === "dark" && (
+            <>
+              <div className="pointer-events-none absolute inset-0" style={{ opacity: 0.9 }}>
+                <AuroraLayer
+                  seed={seed ?? `adaptor-${brand.id}-${mode}`}
+                  brand={brand}
+                  intensity={0.85}
+                  aspect={auroraAspect(pageSize)}
+                />
+              </div>
+              <div className="pointer-events-none absolute" aria-hidden style={{
+                top: cq(-100), right: cq(-120), width: cq(430), height: cq(430), borderRadius: "50%",
+                background: `radial-gradient(circle at 45% 45%, ${accent}66 0%, ${accent}22 45%, transparent 72%)`,
+                filter: `blur(${cq(10)})`,
+              }} />
+              <div className="pointer-events-none absolute" aria-hidden style={{
+                top: cq(340), left: cq(-140), width: cq(360), height: cq(360), borderRadius: "50%",
+                background: `radial-gradient(circle at 60% 40%, ${accent}44 0%, transparent 70%)`,
+                filter: `blur(${cq(10)})`,
+              }} />
+            </>
+          )}
           {content.heroMedia && (
             <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
           )}
-
-
-          {/* Corner accent blooms — template's top-right lavender + left-mid teal. */}
-          <div className="pointer-events-none absolute" aria-hidden style={{
-            top: cq(-100), right: cq(-120), width: cq(430), height: cq(430), borderRadius: "50%",
-            background: `radial-gradient(circle at 45% 45%, ${accent}66 0%, ${accent}22 45%, transparent 72%)`,
-            filter: `blur(${cq(10)})`,
-          }} />
-          <div className="pointer-events-none absolute" aria-hidden style={{
-            top: cq(340), left: cq(-140), width: cq(360), height: cq(360), borderRadius: "50%",
-            background: `radial-gradient(circle at 60% 40%, ${accent}44 0%, transparent 70%)`,
-            filter: `blur(${cq(10)})`,
-          }} />
 
           <div className="relative flex h-full flex-col" style={{
             paddingLeft: cq(padX(density)), paddingRight: cq(padX(density)),

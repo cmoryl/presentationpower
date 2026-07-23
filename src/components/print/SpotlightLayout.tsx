@@ -270,34 +270,37 @@ export function SpotlightLayout({
             ...style,
           }}
         >
-          {/* AURORA GROUND — division accent behind everything */}
-          <AuroraLayer
-            seed={auroraSeed}
-            brand={brand}
-            intensity={0.9}
-            aspect={auroraAspect(pageSize)}
-          />
+          {/* AURORA GROUND — division accent behind everything (dark only) */}
+          {mode === "dark" && (
+            <AuroraLayer
+              seed={auroraSeed}
+              brand={brand}
+              intensity={0.9}
+              aspect={auroraAspect(pageSize)}
+            />
+          )}
           {content.heroMedia && (
             <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
           )}
 
 
-          {/* Corner accent bloom (template's top-right lavender radial) —
-              retuned to the active accent so every division reads through. */}
-          <div
-            className="pointer-events-none absolute"
-            aria-hidden
-            style={{
-              top: cq(-140),
-              right: cq(-140),
-              width: cq(460),
-              height: cq(460),
-              borderRadius: "50%",
-              background: `radial-gradient(circle at 45% 45%, ${accent}59 0%, ${accent}22 45%, transparent 72%)`,
-              filter: `blur(${cq(10)})`,
-              opacity: mode === "dark" ? 0.9 : 0.7,
-            }}
-          />
+          {/* Corner accent bloom — dark mode only to preserve true white pages. */}
+          {mode === "dark" && (
+            <div
+              className="pointer-events-none absolute"
+              aria-hidden
+              style={{
+                top: cq(-140),
+                right: cq(-140),
+                width: cq(460),
+                height: cq(460),
+                borderRadius: "50%",
+                background: `radial-gradient(circle at 45% 45%, ${accent}59 0%, ${accent}22 45%, transparent 72%)`,
+                filter: `blur(${cq(10)})`,
+                opacity: 0.9,
+              }}
+            />
+          )}
 
           <div
             className="relative flex h-full flex-col"
