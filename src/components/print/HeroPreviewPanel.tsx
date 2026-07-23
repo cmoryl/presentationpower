@@ -15,6 +15,12 @@ export function HeroPreviewPanel({ media, brand }: Props) {
   const hasMedia = !!media?.imageUrl;
   const [view, setView] = useState<"media" | "aura">(hasMedia ? "media" : "aura");
   const [mode, setMode] = useState<"light" | "dark">("light");
+  // Auto-follow: when the user picks or clears imagery in the panel above,
+  // snap the preview to the matching view so changes are visible instantly
+  // without needing to toggle Photo/Aura by hand.
+  useEffect(() => {
+    setView(hasMedia ? "media" : "aura");
+  }, [hasMedia]);
   const active = view === "media" && !hasMedia ? "aura" : view;
 
   const accent = brand?.tokens?.accent ?? "#003FC7";
