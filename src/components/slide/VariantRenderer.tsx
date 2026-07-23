@@ -4050,25 +4050,72 @@ function renderVariantBody({
     }
 
     case "MV-DASH-SALES-CHART": {
+      // Free-form aurora rebuild — no panel, no card, no border around the
+      // chart. Feathered accent gradient fill, gently glowing line, thin
+      // confident strokes, generous whitespace. Content (kicker, headline,
+      // stat) sits directly on the aurora above and below the chart, on
+      // the same left-aligned rail so it reads as one composition.
       const series = arr(c.series).map((p) => ({ label: s(p.label), value: Number(p.value) || 0 }));
       const stat = obj(c.stat);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-16 grid gap-16" style={{ gridTemplateColumns: "1.6fr 1fr" }}>
-            <div>
-              <AreaChart brand={brand} series={series} height={520} airy />
-            </div>
-            <div className="flex flex-col justify-center">
+          <div className="flex items-start justify-between gap-16">
+            <div style={{ maxWidth: 780 }}>
               <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
-              <div className="mt-6" style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(c.headline)}</div>
-              <div className="mt-10">
-                <StatFigure brand={brand} value={s(stat.value)} unit={s(stat.unit)} label={s(stat.label)} size="lg" />
+              <div
+                className="mt-4"
+                style={{ fontSize: 60, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+              >
+                {s(c.title, variant.name)}
+              </div>
+              {s(c.headline) && (
+                <div
+                  className="mt-5"
+                  style={{ fontSize: 22, color: ink.muted, letterSpacing: "-0.005em", lineHeight: 1.45, maxWidth: 680 }}
+                >
+                  {s(c.headline)}
+                </div>
+              )}
+            </div>
+            {s(stat.value) && (
+              <div className="flex flex-col items-end text-right" style={{ minWidth: 220 }}>
+                <div className="flex items-baseline gap-2">
+                  <span
+                    className="tabular-nums font-semibold"
+                    style={{ fontSize: 104, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}
+                  >
+                    {s(stat.value)}
+                  </span>
+                  {s(stat.unit) && (
+                    <span
+                      className="font-medium"
+                      style={{ fontSize: 36, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}
+                    >
+                      {s(stat.unit)}
+                    </span>
+                  )}
+                </div>
+                {s(stat.label) && (
+                  <div
+                    className="mt-3 uppercase"
+                    style={{ fontSize: 13, letterSpacing: "0.3em", color: ink.muted, fontWeight: 600, maxWidth: 260 }}
+                  >
+                    {s(stat.label)}
+                  </div>
+                )}
                 {s(stat.delta) && (
-                  <div className="mt-4 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(stat.delta)}</div>
+                  <div
+                    className="mt-2 uppercase tabular-nums"
+                    style={{ fontSize: 14, letterSpacing: "0.24em", color: "var(--slide-accent-text)", fontWeight: 700 }}
+                  >
+                    ▲ {s(stat.delta)}
+                  </div>
                 )}
               </div>
-            </div>
+            )}
+          </div>
+          <div className="mt-14">
+            <FreeformAreaChart brand={brand} series={series} height={560} />
           </div>
         </SlideFrame>
       );
