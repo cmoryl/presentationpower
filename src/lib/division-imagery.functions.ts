@@ -102,6 +102,9 @@ export type DivisionImageryEntry = {
   note: string | null;
   prompt: string | null;
   uploaded_by: string;
+  approved: boolean;
+  approved_by: string | null;
+  approved_at: string | null;
   created_at: string;
   updated_at: string;
   signedUrl: string | null;
@@ -109,17 +112,24 @@ export type DivisionImageryEntry = {
 
 export const listDivisionImagery = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => z.object({ divisionId: z.string().min(1).max(120) }).parse(v))
+  .inputValidator((v) =>
+    z.object({
+      divisionId: z.string().min(1).max(120),
+      onlyApproved: z.boolean().optional(),
+    }).parse(v),
+  )
   .handler(async ({ data, context }): Promise<DivisionImageryEntry[]> => {
     const s = context.supabase as unknown as SbClient;
-    const { data: rows, error } = await s
+    let q = s
       .from("division_imagery")
       .select(
-        "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, prompt, uploaded_by, created_at, updated_at",
+        "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, prompt, uploaded_by, approved, approved_by, approved_at, created_at, updated_at",
       )
       .eq("division_id", data.divisionId)
       .order("created_at", { ascending: false })
       .limit(400);
+    if (data.onlyApproved) q = q.eq("approved", true);
+    const { data: rows, error } = await q;
     if (error) throw new Error((error as { message?: string }).message ?? "Query failed");
     const list = (rows ?? []) as Array<Omit<DivisionImageryEntry, "signedUrl">>;
     const signed = await Promise.all(
@@ -170,5 +180,27 @@ export const deleteDivisionImagery = createServerFn({ method: "POST" })
     const { error } = await s.from("division_imagery").delete().eq("id", data.id);
     if (error) throw new Error((error as { message?: string }).message ?? "Delete failed");
     if (path) await s.storage.from(BUCKET).remove([path]).catch(() => {});
+    return { ok: true };
+  });
+
+// Admin-only approval toggle. Approved imagery is what surfaces in the
+// division library shelf and print template picker by default.
+export const approveDivisionImagery = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((v) =>
+    z.object({ id: z.string().uuid(), approved: z.boolean() }).parse(v),
+  )
+  .handler(async ({ data, context }) => {
+    const s = context.supabase as unknown as SbClient;
+    const { data: isAdmin } = await (s as any).rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("Forbidden: admin role required");
+    const patch = data.approved
+      ? { approved: true, approved_by: context.userId, approved_at: new Date().toISOString() }
+      : { approved: false, approved_by: null, approved_at: null };
+    const { error } = await s.from("division_imagery").update(patch).eq("id", data.id);
+    if (error) throw new Error((error as { message?: string }).message ?? "Update failed");
     return { ok: true };
   });

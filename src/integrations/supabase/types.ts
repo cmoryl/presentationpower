@@ -1139,6 +1139,9 @@ export type Database = {
       }
       division_imagery: {
         Row: {
+          approved: boolean
+          approved_at: string | null
+          approved_by: string | null
           content_type: string | null
           created_at: string
           division_id: string
@@ -1154,6 +1157,9 @@ export type Database = {
           uploaded_by: string
         }
         Insert: {
+          approved?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
           content_type?: string | null
           created_at?: string
           division_id: string
@@ -1169,6 +1175,9 @@ export type Database = {
           uploaded_by: string
         }
         Update: {
+          approved?: boolean
+          approved_at?: string | null
+          approved_by?: string | null
           content_type?: string | null
           created_at?: string
           division_id?: string
