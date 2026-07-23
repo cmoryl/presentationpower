@@ -37,6 +37,73 @@ import { exportDeckToPptx } from "@/lib/pptx-export";
 
 // ─── Pinned variants (per-user, local) ──────────────────────────────────────
 const PINS_KEY = "library.pinnedVariants.v1";
+
+const EXPORT_PIXEL_RATIO_KEY = "library.exportPixelRatio.v1";
+type ExportPixelRatio = 1 | 2;
+function useExportPixelRatio(): [ExportPixelRatio, (v: ExportPixelRatio) => void] {
+  const [value, setValue] = useState<ExportPixelRatio>(() => {
+    if (typeof window === "undefined") return 2;
+    const raw = window.localStorage.getItem(EXPORT_PIXEL_RATIO_KEY);
+    return raw === "1" ? 1 : 2;
+  });
+  const update = (v: ExportPixelRatio) => {
+    setValue(v);
+    try { window.localStorage.setItem(EXPORT_PIXEL_RATIO_KEY, String(v)); } catch { /* ignore */ }
+    // Broadcast so sibling components (modal header + AB preview) stay in sync.
+    try { window.dispatchEvent(new CustomEvent("library:pixel-ratio", { detail: v })); } catch { /* ignore */ }
+  };
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<ExportPixelRatio>).detail;
+      if (detail === 1 || detail === 2) setValue(detail);
+    };
+    window.addEventListener("library:pixel-ratio", handler);
+    return () => window.removeEventListener("library:pixel-ratio", handler);
+  }, []);
+  return [value, update];
+}
+
+function ResolutionToggle({
+  value,
+  onChange,
+  disabled,
+  tone = "light",
+}: {
+  value: ExportPixelRatio;
+  onChange: (v: ExportPixelRatio) => void;
+  disabled?: boolean;
+  tone?: "light" | "compact";
+}) {
+  const base = tone === "compact"
+    ? "inline-flex items-center rounded-full border border-black/15 bg-white p-0.5 text-[10px] font-medium uppercase tracking-widest"
+    : "inline-flex items-center rounded-full border border-black/20 bg-white p-0.5 text-[11px] font-medium";
+  const pill = (active: boolean) =>
+    `rounded-full px-2 py-0.5 transition ${active ? "bg-[#03002C] text-white" : "text-black/60 hover:text-[#003FC7]"}`;
+  return (
+    <div className={base} role="group" aria-label="Export resolution">
+      <button
+        type="button"
+        onClick={() => onChange(1)}
+        disabled={disabled}
+        className={pill(value === 1)}
+        title="1× — smaller file, faster export"
+      >
+        1×
+      </button>
+      <button
+        type="button"
+        onClick={() => onChange(2)}
+        disabled={disabled}
+        className={pill(value === 2)}
+        title="2× — retina, sharper text and edges"
+      >
+        2×
+      </button>
+    </div>
+  );
+}
+
+
 function readPins(): Set<string> {
   if (typeof window === "undefined") return new Set();
   try {
