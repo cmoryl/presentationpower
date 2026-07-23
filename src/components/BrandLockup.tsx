@@ -75,10 +75,14 @@ export function BrandLockup({
   const logo = brand.logo ?? { mark: brand.name.slice(0, 2).toUpperCase(), wordmark: brand.name };
   const divisionLine = (subCompany ?? logo.divisionLine)?.replace("{client}", clientName ?? "Client");
 
-  const isVertical = orientation === "vertical-left" || orientation === "vertical-right";
+  // Vertical orientations are deprecated (never rotate the lockup). Any
+  // persisted vertical-* value from legacy decks falls back to horizontal.
+  const orientation: "horizontal" | "stacked" | "mark-only" =
+    orientationRaw === "stacked" ? "stacked"
+    : orientationRaw === "mark-only" ? "mark-only"
+    : "horizontal";
+  const isVertical = false;
   const isMarkOnly = orientation === "mark-only";
-  // The rotated variants reuse the horizontal artwork; the container applies
-  // the rotation transform. Mark-only hides the wordmark + division line.
   const innerOrientation: "horizontal" | "stacked" = orientation === "stacked" ? "stacked" : "horizontal";
 
   // Mark-only mode: render just the letter tile. When a brand ships an
