@@ -1,7 +1,7 @@
 // Compact hero preview shown in the print asset inspector. Lets the user
 // flip between the current `heroMedia` and the division aurora fallback
 // (what the page renders when heroMedia is empty) before exporting.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { PrintHeroMedia } from "@/lib/print-assets.types";
 import type { BrandMode } from "@/lib/taxonomy";
 import { Image as ImageIcon, Sparkles } from "lucide-react";
