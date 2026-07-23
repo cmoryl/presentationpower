@@ -145,45 +145,53 @@ export function EBrochureLayout({
           className="relative w-full overflow-hidden [container-type:inline-size]"
           style={{
             aspectRatio: pageAspect(pageSize),
-            backgroundColor: bg,
+            backgroundColor: mode === "light" ? "#FFFFFF" : bg,
             color: ink,
             fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
             ...style,
           }}
         >
-          {mode === "dark" && (
-            <AuroraLayer
-              seed={seed ?? `ebrochure-${brand.id}-${mode}`}
-              brand={brand}
-              intensity={brand.id === "bm-enterprise" ? 0.35 : 0.85}
-              aspect={auroraAspect(pageSize)}
+          {mode === "light" && (
+            <div
+              className="pointer-events-none absolute inset-0"
+              aria-hidden
+              style={{ background: "#FFFFFF", zIndex: 0 }}
             />
+          )}
+          {/* Aurora + halo clipped to the top of the page. Lower body stays clean. */}
+          {mode === "dark" && (
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 overflow-hidden"
+              aria-hidden
+              style={{
+                height: "55%",
+                WebkitMaskImage: "linear-gradient(180deg, black 0%, black 62%, transparent 100%)",
+                maskImage: "linear-gradient(180deg, black 0%, black 62%, transparent 100%)",
+              }}
+            >
+              <AuroraLayer
+                seed={seed ?? `ebrochure-${brand.id}-${mode}`}
+                brand={brand}
+                intensity={brand.id === "bm-enterprise" ? 0.35 : 0.85}
+                aspect={auroraAspect(pageSize)}
+              />
+              <div
+                className="pointer-events-none absolute"
+                style={{
+                  top: cq(-160), left: "50%", transform: "translateX(-50%)",
+                  width: cq(900), height: cq(480),
+                  background:
+                    `radial-gradient(ellipse at 30% 30%, ${accent}66 0%, transparent 55%),` +
+                    `radial-gradient(ellipse at 75% 20%, ${accent}55 0%, transparent 55%)`,
+                  filter: `blur(${cq(8)})`,
+                  opacity: 0.85,
+                }}
+              />
+            </div>
           )}
           {content.heroMedia && (
             <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
           )}
-
-
-          {/* Centered top halo — dark mode only to preserve true white pages. */}
-          {mode === "dark" && (
-            <div
-              className="pointer-events-none absolute"
-              aria-hidden
-              style={{
-                top: cq(-160), left: "50%", transform: "translateX(-50%)",
-                width: cq(900), height: cq(480),
-                background:
-                  `radial-gradient(ellipse at 30% 30%, ${accent}66 0%, transparent 55%),` +
-                  `radial-gradient(ellipse at 75% 20%, ${accent}55 0%, transparent 55%)`,
-                filter: `blur(${cq(8)})`,
-                opacity: 0.85,
-              }}
-            />
-          )}
-
-          {/* No colored hero band — background stays white / offset black
-              per print guidelines. The centered halo above provides the only
-              accent tint over the hero region. */}
 
           <div
             className="relative flex h-full flex-col"
