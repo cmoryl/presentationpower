@@ -39,6 +39,10 @@ import {
   recordApprovedVariantDownload,
   type ApprovedPrintVariant,
 } from "@/lib/approved-print-variants.functions";
+import {
+  listDivisionImagery,
+  type DivisionImageryEntry,
+} from "@/lib/division-imagery.functions";
 import type { BrandMode } from "@/lib/taxonomy";
 import { Download, Copy, Sparkle } from "lucide-react";
 
