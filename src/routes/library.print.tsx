@@ -33,7 +33,14 @@ import {
   listMyPrintAssets,
   deletePrintAsset,
 } from "@/lib/print-assets.functions";
+import {
+  listApprovedPrintVariants,
+  duplicateApprovedPrintVariant,
+  recordApprovedVariantDownload,
+  type ApprovedPrintVariant,
+} from "@/lib/approved-print-variants.functions";
 import type { BrandMode } from "@/lib/taxonomy";
+import { Download, Copy, Sparkle } from "lucide-react";
 
 export const Route = createFileRoute("/library/print")({
   head: () => ({
