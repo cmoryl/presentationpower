@@ -3220,26 +3220,46 @@ function renderVariantBody({
 
     case "MV-KPI-DASHBOARD": {
       const items = arr(c.items).slice(0, 8);
-      const cols = items.length <= 6 ? 3 : 4;
+      const cols = items.length <= 6 ? Math.min(items.length, 5) : 4;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14 grid gap-x-12 gap-y-14" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+          <div className="mt-20 grid gap-y-14" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
             {items.map((it, i) => {
               const trend = s(it.trend);
               const trendColor = trend === "down" ? brand.tokens.accent : brand.tokens.accent;
+              const isFirstInRow = i % cols === 0;
               return (
-                <div key={i}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(it.label)}</div>
-                    <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="glyph" />
+                <div
+                  key={i}
+                  className="px-8"
+                  style={{
+                    borderLeft: isFirstInRow ? "none" : `1px solid ${ink.hairline}`,
+                  }}
+                >
+                  <div
+                    aria-hidden
+                    className="flex shrink-0 items-center justify-center rounded-full"
+                    style={{
+                      width: 68,
+                      height: 68,
+                      background: "color-mix(in oklab, var(--slide-accent-text) 10%, transparent)",
+                      border: `1px solid color-mix(in oklab, var(--slide-accent-text) 28%, transparent)`,
+                      color: "var(--slide-accent-text)",
+                    }}
+                  >
+                    {(() => {
+                      const Icon = pickIcon(s(it.label) || "kpi", i, s(it.icon));
+                      return <Icon size={30} strokeWidth={1.4} aria-hidden />;
+                    })()}
                   </div>
-                  <div className="mt-5 flex items-baseline gap-2">
-                    <span className="tabular-nums font-semibold" style={{ fontSize: 96, lineHeight: 0.9, letterSpacing: "-0.035em", color: ink.strong }}>{s(it.value)}</span>
-                    {s(it.unit) && <span className="font-medium" style={{ fontSize: 34, color: "var(--slide-accent-text)", letterSpacing: "-0.015em" }}>{s(it.unit)}</span>}
+                  <div className="mt-8 flex items-baseline gap-2">
+                    <span className="tabular-nums font-semibold" style={{ fontSize: 116, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}>{s(it.value)}</span>
+                    {s(it.unit) && <span className="font-medium" style={{ fontSize: 40, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}>{s(it.unit)}</span>}
                   </div>
+                  <div className="mt-4" style={{ fontSize: 20, lineHeight: 1.35, color: ink.muted, letterSpacing: "-0.005em", maxWidth: 260 }}>{s(it.label)}</div>
                   {s(it.delta) && (
-                    <div className="mt-3 flex items-center gap-2" style={{ fontSize: 18, color: trendColor, letterSpacing: "0.02em" }}>
+                    <div className="mt-3 flex items-center gap-2" style={{ fontSize: 16, color: trendColor, letterSpacing: "0.02em" }}>
                       {trend === "down" ? "▼" : "▲"} <span className="tabular-nums font-semibold">{s(it.delta)}</span>
                       <span style={{ color: ink.faint }}>vs. baseline</span>
                     </div>
@@ -3251,6 +3271,7 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
+
 
     case "MV-ROADMAP-QUARTERS": {
       const quarters = strs(c.quarters).length ? strs(c.quarters) : ["Q1", "Q2", "Q3", "Q4"];

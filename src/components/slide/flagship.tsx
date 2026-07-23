@@ -30,7 +30,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import { useSlideMode, useSlideAccent, useSlideInk } from "./SlideChrome";
-import { auroraOrbs, auroraLayerOpacity, darkGlassWash } from "@/lib/aurora-svg";
+import { auroraOrbs, auroraLayerOpacity } from "@/lib/aurora-svg";
 
 export type SlideRegister = "corporate" | "product" | "editorial";
 
@@ -534,16 +534,16 @@ export function AuroraLayer({
               id={`tp-aurora-${seed}-${i}`}
               cx="50%"
               cy="50%"
-              r={mode === "dark" ? "55%" : "85%"}
+              r={mode === "dark" ? "90%" : "95%"}
             >
               <stop offset="0%" stopColor={o.color} stopOpacity={o.alpha} />
-              <stop offset={mode === "dark" ? "22%" : "30%"} stopColor={o.color} stopOpacity={o.alpha * 0.6} />
-              <stop offset={mode === "dark" ? "50%" : "60%"} stopColor={o.color} stopOpacity={o.alpha * 0.2} />
+              <stop offset={mode === "dark" ? "38%" : "42%"} stopColor={o.color} stopOpacity={o.alpha * 0.55} />
+              <stop offset={mode === "dark" ? "78%" : "80%"} stopColor={o.color} stopOpacity={o.alpha * 0.15} />
               <stop offset="100%" stopColor={o.color} stopOpacity="0" />
             </radialGradient>
           ))}
           <filter id={`tp-aurora-${seed}-blur`} x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation={mode === "dark" ? 38 : 65} />
+            <feGaussianBlur stdDeviation={mode === "dark" ? 55 : 80} />
           </filter>
         </defs>
         <g filter={`url(#tp-aurora-${seed}-blur)`}>
@@ -559,32 +559,10 @@ export function AuroraLayer({
           ))}
         </g>
       </svg>
-      {/* Per-brand frosted-glass wash — mirrors darkGlassWash() used by the
-          PPTX exporter so each division's orbs peek through with the same
-          tuned tint/alpha in both preview and export. Light mode keeps its
-          neutral wash. */}
-      {mode === "dark" && (() => {
-        const w = darkGlassWash(brand);
-        return (
-          <div
-            className="absolute inset-0"
-            style={{ background: w.color, opacity: w.alpha }}
-          />
-        );
-      })()}
-      {/* Vignette to keep glass cards readable. Light mode uses a stronger
-          center-clear wash so per-division accent colour stays visible at the
-          edges without washing out headings, chips or charts in the middle. */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage:
-            mode === "dark"
-              ? `radial-gradient(80% 60% at 50% 60%, transparent 30%, ${base} 130%)`
-              : `radial-gradient(85% 68% at 50% 55%, transparent 0%, transparent 55%, ${base} 125%)`,
-          opacity: mode === "dark" ? 0.55 : 0.4,
-        }}
-      />
+      {/* Free-form aurora v2 — no frosted-glass wash, no vignette. Content
+          sits directly on the accent blooms, matching the reference
+          backdrops. Both the on-screen renderer and the PPTX exporter in
+          src/lib/aurora-svg.ts drop these overlays together. */}
     </div>
   );
 }
