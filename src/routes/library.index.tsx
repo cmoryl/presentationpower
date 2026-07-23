@@ -520,6 +520,26 @@ function Library() {
             >
               ▤ Sample imagery {showImagery ? "on" : "off"}
             </button>
+            <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs" role="group" aria-label="Card density">
+              <button
+                type="button"
+                onClick={() => setDensity("comfortable")}
+                className={`px-3 py-1.5 ${density === "comfortable" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                aria-pressed={density === "comfortable"}
+                title="Comfortable cards with full metadata"
+              >
+                ▦ Cards
+              </button>
+              <button
+                type="button"
+                onClick={() => setDensity("thumb")}
+                className={`px-3 py-1.5 ${density === "thumb" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                aria-pressed={density === "thumb"}
+                title="Compact thumbnails — pick modules faster"
+              >
+                ▨ Thumbs
+              </button>
+            </div>
             <span className="text-sm tabular-nums text-black/50">{filtered.length} of {allEntries.length}</span>
           </div>
         </div>
