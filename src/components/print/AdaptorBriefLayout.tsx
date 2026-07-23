@@ -15,67 +15,31 @@ import { PrintHeroAura } from "@/components/print/PrintHeroAura";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
 import { useTextFit } from "@/lib/text-fit";
+import {
+  PAGE_W,
+  cq,
+  pageAspect,
+  auroraAspect,
+  pagePadX as padX,
+  pagePadTop,
+  glass as glassCard,
+  chipStyle,
+  IconPath as Icon,
+} from "@/components/print/print-primitives";
 
 
 // -----------------------------------------------------------------------
 // PORT — TransPerfect ApplicationBrief.dc.html → AdaptorBriefLayout
-//
-// The template opens with a dark→light vertical gradient hero, drops six
-// feature cards over the fold, then adds a "WE KNOW HOW" divider strip
-// with 5 icon-tile bullets, a pull-quote, and a footer. Our synthesis
-// keeps that hierarchy verbatim; solid white cards become glass panels
-// floating on the division accent aurora, and the hardcoded #003FC7 /
-// #A1FBF9 / #C2A3FF tokens resolve from the active brand mode.
+// Shared page/aurora geometry, glass, chip, and icon primitives live in
+// ./print-primitives so the three print layouts read as one family.
 // -----------------------------------------------------------------------
 
-const PAGE_W = 816;
-const cq = (px: number) => `${((px * 100) / PAGE_W).toFixed(3)}cqw`;
-
-function pageAspect(size: PrintPageSize): string {
-  switch (size) {
-    case "A4": return "8.2677 / 11.6929";
-    case "Letter": return "8.5 / 11";
-    case "Square": return "1 / 1";
-  }
-}
-function auroraAspect(size: PrintPageSize): { w: number; h: number } {
-  switch (size) {
-    case "A4": return { w: Math.round((1280 * 8.2677) / 11.6929), h: 1280 };
-    case "Letter": return { w: Math.round((1280 * 8.5) / 11), h: 1280 };
-    case "Square": return { w: 1280, h: 1280 };
-  }
-}
-function padX(d: PrintDensity): number { return d === "compact" ? 36 : d === "airy" ? 52 : 44; }
-function padTop(d: PrintDensity): number { return d === "compact" ? 34 : d === "airy" ? 52 : 44; }
-
-function glassCard(mode: "light" | "dark", accent: string): CSSProperties {
-  if (mode === "dark") {
-    return {
-      background: `linear-gradient(180deg, color-mix(in srgb, ${accent} 8%, rgba(10,8,36,0.72)), rgba(6,4,32,0.62))`,
-      border: `1px solid color-mix(in srgb, ${accent} 24%, rgba(255,255,255,0.08))`,
-      backdropFilter: "blur(14px) saturate(140%)",
-      boxShadow: `0 ${cq(10)} ${cq(28)} rgba(0,0,0,0.35)`,
-    };
-  }
-  return {
-    background: "rgba(255,255,255,0.92)",
-    border: `1px solid color-mix(in srgb, ${accent} 18%, rgba(255,255,255,0.75))`,
-    boxShadow: `0 ${cq(6)} ${cq(18)} rgba(3,0,44,0.10)`,
-  };
+function padTop(d: import("@/lib/print-assets.types").PrintDensity): number {
+  return pagePadTop(d, 44, 10);
 }
 
-function chipStyle(mode: "light" | "dark", accent: string): CSSProperties {
-  return {
-    background: mode === "dark"
-      ? `color-mix(in srgb, ${accent} 26%, rgba(6,4,32,0.7))`
-      : `color-mix(in srgb, ${accent} 22%, #ffffff)`,
-    border: mode === "dark"
-      ? `1px solid color-mix(in srgb, ${accent} 32%, rgba(255,255,255,0.08))`
-      : `1px solid color-mix(in srgb, ${accent} 26%, rgba(255,255,255,0.9))`,
-  };
-}
-
-// Feature-verb → icon glyph. Falls back to a sparkle for unknown verbs.
+// Feature-verb → icon glyph. Local because this maps content vocabulary,
+// not a design token.
 const VERB_ICONS: Record<string, string> = {
   supports: "M12 6v6l4 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z",
   adapts: "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
@@ -92,15 +56,6 @@ const KNOW_ICONS = [
   "M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z",
   "M3 17l6-6 4 4 8-8M15 7h6v6",
 ];
-
-function Icon({ d, size, color, sw = 1.5 }: { d: string; size: number | string; color: string; sw?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}
-      strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }} aria-hidden>
-      <path d={d} />
-    </svg>
-  );
-}
 
 export function AdaptorBriefLayout({
   content, brand, mode, pageSize = "Letter", density = "standard", seed, style,
