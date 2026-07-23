@@ -107,7 +107,7 @@ function slug(input: string): string {
   return input.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `metric-${Date.now()}`;
 }
 
-export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId, regionFilter, onChange }: Props) {
+export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId, regionFilter, excludeRoles, topN, onChange }: Props) {
   const seeded = React.useMemo(() => getDivisionLocationSet(brandId), [brandId]);
   const pins = React.useMemo(() => coercePins(items, seeded.pins), [items, seeded.pins]);
   const metricList = React.useMemo(() => coerceMetrics(metrics), [metrics]);
@@ -133,6 +133,31 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
     for (const p of pins) acc[p.region] = (acc[p.region] ?? 0) + 1;
     return acc;
   }, [pins]);
+
+  const excludedRoles = React.useMemo<RoleKey[]>(() => {
+    if (!Array.isArray(excludeRoles)) return [];
+    const set = new Set(excludeRoles.filter((r): r is RoleKey => ROLE_KEYS.includes(r as RoleKey)));
+    return Array.from(set);
+  }, [excludeRoles]);
+  const roleCounts = React.useMemo(() => {
+    const acc: Record<RoleKey, number> = { HQ: 0, hub: 0, office: 0, delivery: 0, partner: 0 };
+    for (const p of pins) {
+      const r = (p.role ?? "office") as RoleKey;
+      acc[r] = (acc[r] ?? 0) + 1;
+    }
+    return acc;
+  }, [pins]);
+  const toggleRole = (k: RoleKey) => {
+    const set = new Set(excludedRoles);
+    if (set.has(k)) set.delete(k); else set.add(k);
+    const next = ROLE_KEYS.filter((r) => set.has(r));
+    onChange({ excludeRoles: next.length === 0 ? null : next });
+  };
+
+  const currentTopN: TopN = TOP_N_OPTIONS.includes(Number(topN) as TopN)
+    ? (Number(topN) as TopN)
+    : 5;
+  const setTopN = (n: TopN) => onChange({ topN: n });
 
 
   const updateMetric = (id: string, patch: Partial<LocationMetric>) => {
