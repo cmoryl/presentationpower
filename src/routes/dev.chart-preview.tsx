@@ -35,6 +35,31 @@ const PILOTS = [
       ],
     },
   },
+  {
+    variantId: "MV-DASH-SALES-CHART",
+    label: "Free-form area chart (Aurora v2)",
+    content: {
+      kicker: "Fiscal 2026 · Life Sciences trial revenue",
+      title: "Trial revenue compounds through the second half.",
+      headline:
+        "Feathered accent bloom sits directly on the aurora — no plate, no panel. The last point halos so the current reading remains legible.",
+      stat: { value: "42", unit: "%", label: "YoY revenue growth", delta: "+12 pts vs plan" },
+      series: [
+        { label: "Jan", value: 42 },
+        { label: "Feb", value: 48 },
+        { label: "Mar", value: 46 },
+        { label: "Apr", value: 55 },
+        { label: "May", value: 61 },
+        { label: "Jun", value: 58 },
+        { label: "Jul", value: 68 },
+        { label: "Aug", value: 74 },
+        { label: "Sep", value: 79 },
+        { label: "Oct", value: 82 },
+        { label: "Nov", value: 90 },
+        { label: "Dec", value: 96 },
+      ],
+    },
+  },
 ] as const;
 
 const BRANDS = [

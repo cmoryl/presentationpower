@@ -4050,25 +4050,72 @@ function renderVariantBody({
     }
 
     case "MV-DASH-SALES-CHART": {
+      // Free-form aurora rebuild — no panel, no card, no border around the
+      // chart. Feathered accent gradient fill, gently glowing line, thin
+      // confident strokes, generous whitespace. Content (kicker, headline,
+      // stat) sits directly on the aurora above and below the chart, on
+      // the same left-aligned rail so it reads as one composition.
       const series = arr(c.series).map((p) => ({ label: s(p.label), value: Number(p.value) || 0 }));
       const stat = obj(c.stat);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-16 grid gap-16" style={{ gridTemplateColumns: "1.6fr 1fr" }}>
-            <div>
-              <AreaChart brand={brand} series={series} height={520} airy />
-            </div>
-            <div className="flex flex-col justify-center">
+          <div className="flex items-start justify-between gap-16">
+            <div style={{ maxWidth: 780 }}>
               <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
-              <div className="mt-6" style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(c.headline)}</div>
-              <div className="mt-10">
-                <StatFigure brand={brand} value={s(stat.value)} unit={s(stat.unit)} label={s(stat.label)} size="lg" />
+              <div
+                className="mt-4"
+                style={{ fontSize: 60, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+              >
+                {s(c.title, variant.name)}
+              </div>
+              {s(c.headline) && (
+                <div
+                  className="mt-5"
+                  style={{ fontSize: 22, color: ink.muted, letterSpacing: "-0.005em", lineHeight: 1.45, maxWidth: 680 }}
+                >
+                  {s(c.headline)}
+                </div>
+              )}
+            </div>
+            {s(stat.value) && (
+              <div className="flex flex-col items-end text-right" style={{ minWidth: 220 }}>
+                <div className="flex items-baseline gap-2">
+                  <span
+                    className="tabular-nums font-semibold"
+                    style={{ fontSize: 104, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}
+                  >
+                    {s(stat.value)}
+                  </span>
+                  {s(stat.unit) && (
+                    <span
+                      className="font-medium"
+                      style={{ fontSize: 36, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}
+                    >
+                      {s(stat.unit)}
+                    </span>
+                  )}
+                </div>
+                {s(stat.label) && (
+                  <div
+                    className="mt-3 uppercase"
+                    style={{ fontSize: 13, letterSpacing: "0.3em", color: ink.muted, fontWeight: 600, maxWidth: 260 }}
+                  >
+                    {s(stat.label)}
+                  </div>
+                )}
                 {s(stat.delta) && (
-                  <div className="mt-4 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(stat.delta)}</div>
+                  <div
+                    className="mt-2 uppercase tabular-nums"
+                    style={{ fontSize: 14, letterSpacing: "0.24em", color: "var(--slide-accent-text)", fontWeight: 700 }}
+                  >
+                    ▲ {s(stat.delta)}
+                  </div>
                 )}
               </div>
-            </div>
+            )}
+          </div>
+          <div className="mt-14">
+            <FreeformAreaChart brand={brand} series={series} height={560} />
           </div>
         </SlideFrame>
       );
@@ -6570,6 +6617,127 @@ function Donut({ brand: _brand, percent, size = 260 }: { brand: BrandMode; perce
     </svg>
   );
 }
+
+// Free-form area chart for Aurora v2 rebuild. No axes, no ticks, no plate.
+// Feathered accent gradient sits directly on the aurora backdrop. The line
+// carries a soft accent glow; the final point blooms with a radial halo so
+// the "now" reading is legible without decoration.
+function FreeformAreaChart({
+  brand: _brand,
+  series,
+  height = 560,
+}: {
+  brand: BrandMode;
+  series: { label: string; value: number }[];
+  height?: number;
+}) {
+  const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
+  const w = 1720;
+  const h = height;
+  const padL = 16;
+  const padR = 16;
+  const padT = 40;
+  const padB = 72;
+  if (!series.length) return null;
+  const vals = series.map((p) => p.value);
+  const max = Math.max(1, ...vals);
+  const min = Math.min(0, ...vals);
+  const range = max - min || 1;
+  const step = series.length > 1 ? (w - padL - padR) / (series.length - 1) : 0;
+  const pts = series.map(
+    (p, i) =>
+      [padL + i * step, padT + (h - padT - padB) * (1 - (p.value - min) / range)] as [number, number],
+  );
+  const linePath = pts
+    .map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`)
+    .join(" ");
+  const areaPath =
+    pts.length > 1
+      ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z`
+      : "";
+  const showEvery = series.length > 8 ? Math.ceil(series.length / 8) : 1;
+  const last = pts[pts.length - 1];
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
+      <defs>
+        {/* Feathered accent bloom — top-loaded, dissolves before touching baseline */}
+        <linearGradient id={`${id}-bloom`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.42} />
+          <stop offset="35%" stopColor="var(--slide-accent-text)" stopOpacity={0.18} />
+          <stop offset="70%" stopColor="var(--slide-accent-text)" stopOpacity={0.05} />
+          <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+        </linearGradient>
+        {/* Radial halo behind the final data point */}
+        <radialGradient id={`${id}-halo`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.55} />
+          <stop offset="60%" stopColor="var(--slide-accent-text)" stopOpacity={0.12} />
+          <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+        </radialGradient>
+        {/* Soft glow on the line */}
+        <filter id={`${id}-glow`} x="-10%" y="-40%" width="120%" height="180%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b" />
+          <feMerge>
+            <feMergeNode in="b" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      {/* Baseline hairline only — no vertical axes, no gridlines */}
+      <line
+        x1={padL}
+        y1={h - padB}
+        x2={w - padR}
+        y2={h - padB}
+        stroke={ink.hairline}
+        strokeWidth={1}
+      />
+      {areaPath && <path d={areaPath} fill={`url(#${id}-bloom)`} />}
+      <path
+        d={linePath}
+        fill="none"
+        stroke="var(--slide-accent-text)"
+        strokeWidth={2.25}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        filter={`url(#${id}-glow)`}
+      />
+      {/* Subtle inner dots on every point */}
+      {pts.map((p, i) => (
+        <circle key={i} cx={p[0]} cy={p[1]} r={2.5} fill="var(--slide-accent-text)" opacity={0.55} />
+      ))}
+      {/* Final point: radial halo + solid core */}
+      {last && (
+        <g>
+          <circle cx={last[0]} cy={last[1]} r={54} fill={`url(#${id}-halo)`} />
+          <circle cx={last[0]} cy={last[1]} r={6.5} fill="var(--slide-accent-text)" />
+        </g>
+      )}
+      {series.map((p, i) =>
+        i % showEvery === 0 || i === series.length - 1 ? (
+          <text
+            key={i}
+            x={pts[i]?.[0]}
+            y={h - padB + 34}
+            textAnchor={i === 0 ? "start" : i === series.length - 1 ? "end" : "middle"}
+            fontSize={14}
+            fill={ink.faint}
+            style={{
+              letterSpacing: "0.24em",
+              textTransform: "uppercase",
+              fontVariantNumeric: "tabular-nums",
+              fontWeight: 600,
+            }}
+          >
+            {p.label}
+          </text>
+        ) : null,
+      )}
+    </svg>
+  );
+}
+
+
 
 function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
   const ink = useSlideInk();

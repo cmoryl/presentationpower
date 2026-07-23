@@ -32,6 +32,7 @@ import { Route as KnowledgeOracleRouteImport } from './routes/knowledge.oracle'
 import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
 import { Route as KnowledgeAskRouteImport } from './routes/knowledge.ask'
 import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
+import { Route as DevMediatileAuditRouteImport } from './routes/dev.mediatile-audit'
 import { Route as DevChartPreviewRouteImport } from './routes/dev.chart-preview'
 import { Route as DevAuroraRouteImport } from './routes/dev.aurora'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
@@ -176,6 +177,11 @@ const KnowledgeEntryIdRoute = KnowledgeEntryIdRouteImport.update({
   id: '/$entryId',
   path: '/$entryId',
   getParentRoute: () => KnowledgeRoute,
+} as any)
+const DevMediatileAuditRoute = DevMediatileAuditRouteImport.update({
+  id: '/dev/mediatile-audit',
+  path: '/dev/mediatile-audit',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DevChartPreviewRoute = DevChartPreviewRouteImport.update({
   id: '/dev/chart-preview',
@@ -359,6 +365,7 @@ export interface FileRoutesByFullPath {
   '/decks/import': typeof DecksImportRoute
   '/dev/aurora': typeof DevAuroraRoute
   '/dev/chart-preview': typeof DevChartPreviewRoute
+  '/dev/mediatile-audit': typeof DevMediatileAuditRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/new': typeof KnowledgeNewRoute
@@ -411,6 +418,7 @@ export interface FileRoutesByTo {
   '/decks/import': typeof DecksImportRoute
   '/dev/aurora': typeof DevAuroraRoute
   '/dev/chart-preview': typeof DevChartPreviewRoute
+  '/dev/mediatile-audit': typeof DevMediatileAuditRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/new': typeof KnowledgeNewRoute
@@ -466,6 +474,7 @@ export interface FileRoutesById {
   '/decks/import': typeof DecksImportRoute
   '/dev/aurora': typeof DevAuroraRoute
   '/dev/chart-preview': typeof DevChartPreviewRoute
+  '/dev/mediatile-audit': typeof DevMediatileAuditRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/new': typeof KnowledgeNewRoute
@@ -522,6 +531,7 @@ export interface FileRouteTypes {
     | '/decks/import'
     | '/dev/aurora'
     | '/dev/chart-preview'
+    | '/dev/mediatile-audit'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
     | '/knowledge/new'
@@ -574,6 +584,7 @@ export interface FileRouteTypes {
     | '/decks/import'
     | '/dev/aurora'
     | '/dev/chart-preview'
+    | '/dev/mediatile-audit'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
     | '/knowledge/new'
@@ -628,6 +639,7 @@ export interface FileRouteTypes {
     | '/decks/import'
     | '/dev/aurora'
     | '/dev/chart-preview'
+    | '/dev/mediatile-audit'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
     | '/knowledge/new'
@@ -668,6 +680,7 @@ export interface RootRouteChildren {
   DecksImportRoute: typeof DecksImportRoute
   DevAuroraRoute: typeof DevAuroraRoute
   DevChartPreviewRoute: typeof DevChartPreviewRoute
+  DevMediatileAuditRoute: typeof DevMediatileAuditRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
   LibraryMyRoute: typeof LibraryMyRoute
   ShareTokenRoute: typeof ShareTokenRoute
@@ -844,6 +857,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/knowledge/$entryId'
       preLoaderRoute: typeof KnowledgeEntryIdRouteImport
       parentRoute: typeof KnowledgeRoute
+    }
+    '/dev/mediatile-audit': {
+      id: '/dev/mediatile-audit'
+      path: '/dev/mediatile-audit'
+      fullPath: '/dev/mediatile-audit'
+      preLoaderRoute: typeof DevMediatileAuditRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/dev/chart-preview': {
       id: '/dev/chart-preview'
@@ -1133,6 +1153,7 @@ const rootRouteChildren: RootRouteChildren = {
   DecksImportRoute: DecksImportRoute,
   DevAuroraRoute: DevAuroraRoute,
   DevChartPreviewRoute: DevChartPreviewRoute,
+  DevMediatileAuditRoute: DevMediatileAuditRoute,
   LibraryImportedRoute: LibraryImportedRoute,
   LibraryMyRoute: LibraryMyRoute,
   ShareTokenRoute: ShareTokenRoute,
