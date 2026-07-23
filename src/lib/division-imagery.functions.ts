@@ -76,6 +76,42 @@ export const uploadDivisionImagery = createServerFn({ method: "POST" })
     });
     if (up.error) throw new Error(`Upload failed: ${up.error.message ?? "unknown"}`);
 
+    // Upload any pre-rendered crop variants. We do this before the row insert
+    // so a failure mid-batch is cleaned up along with the original.
+    const variantPaths: string[] = [];
+    const variantsMeta: Record<
+      string,
+      { path: string; width: number | null; height: number | null; bytes: number; contentType: string }
+    > = {};
+    if (data.variants?.length) {
+      for (const v of data.variants) {
+        const vBuf = decodeBase64Payload(v.data);
+        if (vBuf.length === 0 || vBuf.length > MAX_BYTES) continue;
+        const vSafe = v.filename.replace(/[^\w.\-]+/g, "_").slice(-180);
+        const vPath = `${context.userId}/${id}/${v.preset}-${vSafe}`;
+        const vUp = await s.storage.from(BUCKET).upload(vPath, vBuf, {
+          contentType: v.contentType,
+          upsert: false,
+        });
+        if (vUp.error) {
+          // Roll back everything on any variant failure.
+          await s.storage
+            .from(BUCKET)
+            .remove([path, ...variantPaths])
+            .catch(() => {});
+          throw new Error(`Variant upload failed: ${vUp.error.message ?? "unknown"}`);
+        }
+        variantPaths.push(vPath);
+        variantsMeta[v.preset] = {
+          path: vPath,
+          width: v.width ?? null,
+          height: v.height ?? null,
+          bytes: vBuf.length,
+          contentType: v.contentType,
+        };
+      }
+    }
+
     const { data: row, error } = await s
       .from("division_imagery")
       .insert({
@@ -90,11 +126,12 @@ export const uploadDivisionImagery = createServerFn({ method: "POST" })
         tags: data.tags,
         note: data.note ?? null,
         prompt: data.prompt ?? null,
+        variants: variantsMeta,
       })
       .select()
       .single();
     if (error) {
-      await s.storage.from(BUCKET).remove([path]).catch(() => {});
+      await s.storage.from(BUCKET).remove([path, ...variantPaths]).catch(() => {});
       throw new Error(`Save failed: ${(error as { message?: string }).message ?? "unknown"}`);
     }
     return row as { id: string };
