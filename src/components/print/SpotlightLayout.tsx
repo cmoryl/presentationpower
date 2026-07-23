@@ -12,6 +12,7 @@ import { BrandLockup } from "@/components/BrandLockup";
 import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
 import { PrintHeroAura } from "@/components/print/PrintHeroAura";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
+import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
 import { useTextFit } from "@/lib/text-fit";
 
 
@@ -668,6 +669,9 @@ export function SpotlightLayout({
                 })}
               </div>
             )}
+
+            {/* SHARED MODULES */}
+            <PrintSectionsStack sections={content.modules} mode={mode} accent={accent} />
 
             {/* ============================================================ */}
             {/* CTA BAND — division-tokenized gradient                        */}

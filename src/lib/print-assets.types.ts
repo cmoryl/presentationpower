@@ -46,6 +46,43 @@ export type PrintHeroMedia = {
 };
 
 
+// ---------------------------------------------------------------------------
+// SHARED MODULES → PRINT SECTIONS
+// Reusable content blocks (Stats, Quotes, Logo Grids, …) that any print
+// template can host in `content.sections[]`. Phase 1 ships the Stats family
+// with portrait-native renderers under `src/components/print/sections/`.
+// ---------------------------------------------------------------------------
+
+export type PrintStatItem = {
+  label: string;
+  value: string;
+  unit?: string;
+  delta?: string;                 // e.g. "+12%" — optional trend chip
+  trend?: "up" | "down" | "flat";
+  caption?: string;               // small line below label
+  icon?: string;                  // lucide name — layout may map or ignore
+};
+
+/** Portrait-native variant IDs for the Stats family. */
+export type PrintStatsVariant =
+  | "kpi-dashboard-portrait"
+  | "stat-callout-row-portrait"
+  | "stat-bento-portrait";
+
+export type PrintStatsSection = {
+  id: string;
+  kind: "stats";
+  variantId: PrintStatsVariant;
+  title?: string;
+  eyebrow?: string;
+  items: PrintStatItem[];
+};
+
+/** Discriminated union — future families add cases here. */
+export type PrintSection = PrintStatsSection;
+
+
+
 
 
 export type CaseStudyStat = {
@@ -81,6 +118,8 @@ export type CaseStudyContent = {
   // in the footer lockup below the CTA band.
   footer?: { links: string[] };
   heroMedia?: PrintHeroMedia;
+  /** Reusable shared-module blocks inserted between body content and CTA. */
+  modules?: PrintSection[];
 };
 
 
@@ -111,6 +150,7 @@ export type SpotlightContent = {
   expert?: { name: string; role?: string; email?: string };
   cta?: { label: string; url?: string };
   heroMedia?: PrintHeroMedia;
+  modules?: PrintSection[];
 };
 
 
@@ -137,6 +177,7 @@ export type EBrochureContent = {
   discover?: { body: string; bullets: string[] }; // right-hand "Discover" panel
   cta?: { label: string; url?: string; subhead?: string };
   heroMedia?: PrintHeroMedia;
+  modules?: PrintSection[];
 };
 
 
@@ -160,6 +201,7 @@ export type AdaptorBriefContent = {
   quote?: { text: string; author: string; role?: string; company?: string };
   cta?: { label: string; url?: string };
   heroMedia?: PrintHeroMedia;
+  modules?: PrintSection[];
 };
 
 
