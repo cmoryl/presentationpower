@@ -669,9 +669,119 @@ function AssetEditor() {
           </div>
         </div>
       </div>
+      <PrintSectionPicker
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        onInsert={(section) => {
+          const next = [...(content.modules ?? []), section];
+          patchContent({ modules: next });
+        }}
+        brand={brand}
+        mode="light"
+      />
     </AppShell>
   );
 }
+
+function ModulesPanel({
+  modules, onAdd, onChange,
+}: {
+  modules: PrintSection[];
+  onAdd: () => void;
+  onChange: (next: PrintSection[]) => void;
+}) {
+  function move(i: number, dir: -1 | 1) {
+    const j = i + dir;
+    if (j < 0 || j >= modules.length) return;
+    const next = [...modules];
+    [next[i], next[j]] = [next[j]!, next[i]!];
+    onChange(next);
+  }
+  function remove(i: number) {
+    onChange(modules.filter((_, k) => k !== i));
+  }
+  function patch(i: number, p: Partial<PrintSection>) {
+    const cur = modules[i];
+    if (!cur) return;
+    const next = [...modules];
+    next[i] = { ...cur, ...p } as PrintSection;
+    onChange(next);
+  }
+  function patchStatsItem(i: number, itemIdx: number, p: Partial<PrintStatsSection["items"][number]>) {
+    const cur = modules[i];
+    if (!cur || cur.kind !== "stats") return;
+    const items = [...cur.items];
+    items[itemIdx] = { ...items[itemIdx]!, ...p };
+    patch(i, { items } as Partial<PrintStatsSection>);
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={onAdd}
+        className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-black/25 bg-transparent px-2 py-2 text-[11px] font-semibold uppercase tracking-widest text-black/70 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/25 dark:text-white/70"
+      >
+        <Plus size={14} /> Add module
+      </button>
+      {modules.length === 0 && (
+        <div className="pt-1 text-[11px] text-black/50 dark:text-white/50">No shared modules yet. Insert stats blocks to enrich the document.</div>
+      )}
+      <div className="space-y-3">
+        {modules.map((m, i) => (
+          <div key={m.id} className="rounded-md border border-black/10 p-2 dark:border-white/10">
+            <div className="flex items-center justify-between">
+              <div className="text-[11px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
+                {m.kind === "stats" ? "Stats" : "Module"}
+              </div>
+              <div className="flex items-center gap-1">
+                <button className="rounded p-1 text-black/50 hover:bg-black/5" onClick={() => move(i, -1)} aria-label="Move up"><ArrowUp size={14} /></button>
+                <button className="rounded p-1 text-black/50 hover:bg-black/5" onClick={() => move(i, 1)} aria-label="Move down"><ArrowDown size={14} /></button>
+                <button className="rounded p-1 text-red-500 hover:bg-red-500/10" onClick={() => remove(i)} aria-label="Delete"><Trash2 size={14} /></button>
+              </div>
+            </div>
+
+            {m.kind === "stats" && (
+              <div className="mt-2 space-y-2">
+                <select
+                  className={inspectorInput}
+                  value={m.variantId}
+                  onChange={(e) => patch(i, { variantId: e.target.value as PrintStatsVariant } as Partial<PrintStatsSection>)}
+                >
+                  {PRINT_STATS_VARIANTS.map((v) => (
+                    <option key={v.id} value={v.id}>{v.label}</option>
+                  ))}
+                </select>
+                <input
+                  className={inspectorInput}
+                  placeholder="Eyebrow"
+                  value={m.eyebrow ?? ""}
+                  onChange={(e) => patch(i, { eyebrow: e.target.value } as Partial<PrintStatsSection>)}
+                />
+                <input
+                  className={inspectorInput}
+                  placeholder="Title"
+                  value={m.title ?? ""}
+                  onChange={(e) => patch(i, { title: e.target.value } as Partial<PrintStatsSection>)}
+                />
+                <div className="space-y-1">
+                  {m.items.map((it, idx) => (
+                    <div key={idx} className="grid grid-cols-[1fr_60px_50px] gap-1">
+                      <input className={inspectorInput} placeholder="Label" value={it.label} onChange={(e) => patchStatsItem(i, idx, { label: e.target.value })} />
+                      <input className={inspectorInput} placeholder="Value" value={it.value} onChange={(e) => patchStatsItem(i, idx, { value: e.target.value })} />
+                      <input className={inspectorInput} placeholder="Unit" value={it.unit ?? ""} onChange={(e) => patchStatsItem(i, idx, { unit: e.target.value })} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
 
 const inspectorInput =
   "w-full rounded-md border border-black/10 bg-white px-2 py-1.5 text-xs text-[#03002C] focus:border-[#003FC7] focus:outline-none dark:border-white/10 dark:bg-white/[0.03] dark:text-white";
