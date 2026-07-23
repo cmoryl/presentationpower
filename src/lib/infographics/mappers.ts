@@ -87,13 +87,13 @@ export function specFromDashChart(
   const rows: InfographicRow[] =
     series.length > 0
       ? series.map((row) => {
-          const flat: Record<string, unknown> = { period: s(row.period ?? row.label ?? row.name) };
+          const flat: InfographicRow = { period: s(row.period ?? row.label ?? row.name) };
           for (const [k, v] of Object.entries(row)) {
             if (k !== "period" && k !== "label" && k !== "name") flat[k] = n(v) ?? s(v);
           }
           return flat;
         })
-      : items.map((it) => ({
+      : items.map((it): InfographicRow => ({
           label: s(it.label ?? it.category ?? it.name),
           value: n(it.value) ?? s(it.value),
           note: s(it.note),
