@@ -26,13 +26,14 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
   const [error, setError] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [kind, setKind] = useState<"all" | "photo" | "abstract" | "generated" | "upload">("all");
+  const [approvedOnly, setApprovedOnly] = useState(true);
 
   useEffect(() => {
     if (!open || !divisionId) return;
     let cancelled = false;
     setLoading(true);
     setError(null);
-    list({ data: { divisionId } })
+    list({ data: { divisionId, onlyApproved: approvedOnly } })
       .then((rows) => {
         if (!cancelled) setItems(rows);
       })
@@ -43,7 +44,8 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
     return () => {
       cancelled = true;
     };
-  }, [open, divisionId, list]);
+  }, [open, divisionId, list, approvedOnly]);
+
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
