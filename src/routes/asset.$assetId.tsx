@@ -249,7 +249,7 @@ function AssetEditor() {
             <div className={`relative flex h-full flex-col justify-between ${densityPad} text-[#03002C] dark:text-white`}>
               {/* TOP */}
               <div className="flex items-start justify-between">
-                {brand && <BrandLockup brand={brand} height={28} />}
+                {brand && <BrandLockup brand={brand} color="currentColor" size="sm" />}
                 <div className="text-right text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
                   {content.eyebrow ?? "Case study"} · {pageSize}
                 </div>

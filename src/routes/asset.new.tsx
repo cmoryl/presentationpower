@@ -83,7 +83,7 @@ function NewAssetPage() {
     setBusy(true);
     setErr(null);
     try {
-      const slideIds = (search.slideIds ?? "").split(",").filter((s) => /^[0-9a-f-]{36}$/i.test(s));
+      const slideIds = (search.slideIds ?? "").split(",").filter((s: string) => /^[0-9a-f-]{36}$/i.test(s));
       const asset = await create({
         data: {
           kind,
@@ -193,7 +193,7 @@ function NewAssetPage() {
             </select>
             {brand && (
               <div className="mt-2 inline-flex items-center gap-3 rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
-                <BrandLockup brand={brand} height={22} />
+                <BrandLockup brand={brand} color="#03002C" size="sm" />
               </div>
             )}
           </Field>

@@ -44,8 +44,8 @@ export const createPrintAsset = createServerFn({ method: "POST" })
         source_deck_id: data.sourceDeckId ?? null,
         source_slide_ids: data.sourceSlideIds ?? [],
         source_module_ids: data.sourceModuleIds ?? [],
-        content: content as unknown as Record<string, unknown>,
-        context: (data.context ?? {}) as PrintAssetContext,
+        content: content as never,
+        context: (data.context ?? {}) as never,
       })
       .select("*")
       .single();
@@ -110,7 +110,7 @@ export const updatePrintAsset = createServerFn({ method: "POST" })
 
     const { data: row, error } = await supabase
       .from("print_assets")
-      .update(patch)
+      .update(patch as never)
       .eq("id", data.assetId)
       .eq("owner_id", userId)
       .select("*")
@@ -198,8 +198,8 @@ export const createPrintAssetWithBrief = createServerFn({ method: "POST" })
         source_deck_id: data.sourceDeckId ?? null,
         source_slide_ids: data.sourceSlideIds ?? [],
         source_module_ids: data.sourceModuleIds ?? [],
-        content: initialContent as unknown as Record<string, unknown>,
-        context: (data.context ?? {}) as PrintAssetContext,
+        content: initialContent as never,
+        context: (data.context ?? {}) as never,
       })
       .select("*")
       .single();
