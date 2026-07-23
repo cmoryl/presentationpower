@@ -11,6 +11,7 @@ import type { DeckSlide } from "@/lib/deck-store";
 import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, StatFigure, QuoteMark, Attribution, SoftDivider } from "./primitives";
 import { EditorialTitle, PullQuote, DuotoneImage, GrainOverlay, CinematicScrim, StatRail, GlassTile, IconWell, AuroraOrb, AuroraSidePanel, EDITORIAL_SERIF } from "./flagship";
 import { APPROVED_LOGOS } from "@/lib/approved-logos";
+import { InfographicSlideModule } from "./InfographicSlideModule";
 
 // Example client-logo chip for case study previews. Uses the deck's real
 // clientLogoUrl when set (via SlideFrameCtx); otherwise deterministically
@@ -392,7 +393,21 @@ function renderVariantBody({
     onSurface: semantic.onSurface,
   };
 
+  // Spec-driven MV-VIZ-* family renders through the InfographicSpec pipeline.
+  if (variant.id.startsWith("MV-VIZ-")) {
+    return (
+      <InfographicSlideModule
+        slide={slide}
+        variant={variant}
+        brand={brand}
+        pageNumber={pageNumber}
+        mode={mode}
+      />
+    );
+  }
+
   switch (variant.id) {
+
 
     // ── Opening ────────────────────────────────────────────────────────
     case "MV-OP-COVER":

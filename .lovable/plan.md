@@ -1,81 +1,105 @@
+# Infographic Platform — Phase 1
 
-## Goal
+Turn our layout-first module system into a **spec-driven infographic platform**: one canonical schema, adapter-based renderers, machine-readable a11y, and a "view/download data" affordance on every chart. Existing bespoke React variants stay — they're wrapped by the new spec, not replaced.
 
-Consolidate scattered admin surfaces behind a proper sidebar-driven Admin console. Analytics disappears from the top nav and becomes one Admin section that unifies usage / AI / imagery. Knowledge disappears from the footer and becomes one Admin section that unifies browse / ask / KB / approvals.
+## 1. Canonical `InfographicSpec` schema
 
-## What changes
+New file: `src/lib/infographics/spec.ts`
 
-### 1. Top-level nav cleanup (`src/components/AppShell.tsx`)
-
-- Remove `Analytics` from the header nav row.
-- Remove `Knowledge` and `Ask Oracle` from the footer nav (footer keeps About + FAQ only).
-- Trim the Admin hover menu to the new sidebar's top-level groups so it hints at structure without duplicating it.
-
-### 2. New AdminShell — left sidebar layout (`src/components/AdminShell.tsx`)
-
-Replace the horizontal tab strip with a collapsible left sidebar (shadcn `Sidebar` with `collapsible="icon"`, active-route highlight via `useRouterState`). Groups:
-
-```text
-Overview       → /admin
-Analytics      → /admin/analytics          (master)
-Knowledge      → /admin/knowledge          (master, replaces /admin/knowledge browser)
-Assets         → Brand assets · LogoHub · Icon Studio · PDF ingest
-Translation    → Translation · GlobalLink · GlobalLink Share
-Governance     → Users · Approvals · Audit log
-Experiments    → A/B color testing
+```ts
+type InfographicSpec = {
+  id: string;
+  kind: "bar" | "line" | "column" | "donut" | "gauge" | "heatmap"
+      | "sankey" | "chord" | "beeswarm" | "bump" | "treemap"
+      | "waterfall" | "funnel" | "market-map" | "kpi" | "custom";
+  data: { rows: Record<string, unknown>[]; source?: string };
+  encoding: { x?: string; y?: string; series?: string; value?: string; category?: string };
+  annotations?: { callouts?: {target: string; text: string}[]; headline?: string; summary?: string };
+  theme: { division?: DivisionId; mode: "light" | "dark"; accent?: string };
+  accessibility: { shortAlt: string; longDesc: string; tabOrder?: string[] };
+  export: { preferredFormat: "svg" | "png"; rasterFallback?: boolean };
+};
 ```
 
-Session/role banner stays but slides to the top of the content pane instead of hovering above the strip. Sidebar remembers collapsed state via the existing sidebar cookie.
+Ship a `renderInfographic(spec, adapter)` dispatcher and adapter interface:
 
-### 3. Master Analytics — `/admin/analytics`
+```ts
+interface InfographicAdapter {
+  supports(kind: InfographicSpec["kind"]): boolean;
+  render(spec: InfographicSpec, ctx: RenderContext): ReactNode;
+  toSvg(spec: InfographicSpec): Promise<string>;   // for PPTX/PDF export
+  toCsv(spec: InfographicSpec): string;            // for data drawer
+  toA11y(spec: InfographicSpec): { shortAlt: string; longDesc: string };
+}
+```
 
-New route file. In-page tab switcher (Usage · AI · Imagery). Each tab renders a panel component extracted from the existing route body:
+Three adapters registered:
+- **`BespokeReactAdapter`** — wraps existing hero variants (KPI dashboard, stat grids, cover charts). No visual regressions.
+- **`EChartsAdapter`** (new) — data-dense/uncommon charts.
+- **`CustomD3Adapter`** — reserved for the maturity curve / journey visuals we hand-tuned.
 
-- Usage panel: extracted from `src/routes/analytics.tsx` (hero trimmed, AppShell removed — it's already inside AdminShell).
-- AI panel: current body of `src/routes/admin.ai.tsx`.
-- Imagery panel: current body of `src/routes/admin.imagery-analytics.tsx`.
+Migrate 5 existing variants as proof: `MV-KPI-DASHBOARD`, `MV-DASH-SALES-CHART`, `MV-DASH-PERFORMANCE`, `MV-DASH-DONUT-TRIO`, `MV-DASH-BREAKDOWN`. Same look, now spec-backed.
 
-Existing routes become thin redirects:
+## 2. ECharts uncommon-chart pack
 
-- `/analytics` → `/admin/analytics?tab=usage`
-- `/admin/ai` → `/admin/analytics?tab=ai`
-- `/admin/imagery-analytics` → `/admin/analytics?tab=imagery`
+Install `echarts` + `echarts-for-react`. New module family `MV-INFO-*`:
 
-### 4. Master Knowledge — `/admin/knowledge`
+- `MV-INFO-SANKEY` — flow / attribution
+- `MV-INFO-CHORD` — relationship matrix
+- `MV-INFO-BEESWARM` — distribution / benchmark
+- `MV-INFO-BUMP` — ranking over time
+- `MV-INFO-MARKET-MAP` — 2×2 strategic positioning w/ bubbles
+- `MV-INFO-TREEMAP-PRO` — hierarchical breakdown
+- `MV-INFO-HEATMAP-CAL` — calendar / cohort heatmap
 
-Rebuild the existing `admin.knowledge.tsx` shell into a hub with tabs (Browse · Ask Oracle · Oracle KB · Approvals). Each tab renders a panel:
+Each seeded to library with light + dark aurora backdrops, division-locked accents piped through ECharts theme, and free-form v2 treatment (no card containers). SVG-first rendering (`renderer: "svg"`) so PPTX export stays vector.
 
-- Browse panel: extracted from `src/routes/knowledge.index.tsx` body (drop AppShell).
-- Ask Oracle panel: extracted from `src/routes/knowledge.ask.tsx` body.
-- Oracle KB panel: current `admin.oracle.tsx` body.
-- Approvals panel: current `admin.approvals.tsx` body.
+## 3. Accessibility layer
 
-The current `/admin/knowledge` browser view moves into the KB-management tab so nothing is lost.
+- Auto-generate `shortAlt` (≤120 chars) and `longDesc` from spec (kind + top-N insights + trend direction).
+- Wire into DOM: `<figure role="img" aria-label={shortAlt}>` + `<figcaption class="sr-only">{longDesc}</figcaption>`.
+- Wire into PPTX export: `slide.addImage({ altText: shortAlt, ... })` via pptxgenjs alt-text field.
+- Wire into PDF export: tagged PDF `/Alt` entry via jsPDF.
+- Manual override field in the module editor (Governance tab) so authors can rewrite the auto-alt.
 
-Redirects:
+## 4. Data-table drawer
 
-- `/knowledge` → `/admin/knowledge?tab=browse`
-- `/knowledge/ask` → `/admin/knowledge?tab=ask`
-- `/admin/oracle` → `/admin/knowledge?tab=oracle`
-- `/admin/approvals` → `/admin/knowledge?tab=approvals`
+New component `<ChartDataDrawer />`: small "◱ Data" pill in slide chrome corner (visible in edit mode always, in present mode only when the deck flag `showDataAffordance` is on).
 
-Deep-link routes that show individual knowledge items (`/knowledge/$entryId`, `/knowledge/brand-guides/*`, `/knowledge/new`) stay put — they're detail pages, not nav destinations.
+- Opens a right-side sheet with a sortable table of `spec.data.rows`.
+- "Download CSV" button → uses `adapter.toCsv(spec)`.
+- "Copy as markdown table" secondary action.
+- No live data bindings in phase 1 — data is still authored in the module.
 
-### 5. Locations & cleanup pass
+## 5. Housekeeping & tests
 
-- Remove dead links to `/analytics` and `/knowledge` in `src/routes/index.tsx`, `src/routes/decks.$deckId.index.tsx`, `src/routes/faq.tsx`, `src/routes/library.imported.tsx`, `src/routes/logohub.tsx`, `src/routes/admin.index.tsx`, `src/routes/admin.icon-studio.tsx` — repoint each to the new master hubs.
-- Delete now-unused files: none; keep `analytics.tsx`, `admin.ai.tsx`, `admin.imagery-analytics.tsx`, `admin.approvals.tsx`, `admin.oracle.tsx`, `knowledge.index.tsx`, `knowledge.ask.tsx` as thin redirect shells so existing bookmarks and internal links don't 404.
+- Register new `MV-INFO-*` variants in the DB seed (Atlas library) with `case-studies.ts` division previews.
+- Extend `pptx-export.ts` to route `kind` values through `adapter.toSvg()` before falling back to raster.
+- Vitest: schema validation, adapter dispatch, alt-text generation, CSV shape.
+- Playwright: one visual snapshot per new `MV-INFO-*` variant in both light and dark for GlobalLink + Corporate.
+
+## Explicitly out of scope (deferred)
+
+- Vega-Lite as a runtime (using it only as design inspiration for the schema).
+- Live data connectors / streaming.
+- Office.js PowerPoint add-in refresh hooks.
+- Google Slides API insertion.
+- Yjs/Liveblocks realtime co-editing.
+- Highcharts/amCharts enterprise fallback runtimes.
 
 ## Technical notes
 
-- Tabs use URL search param `?tab=` (deep-linkable, back-button friendly). Panels lazy-mount only when their tab is active so heavy queries (imagery, oracle) don't fire on load.
-- Sidebar is `collapsible="icon"` — mini strip on collapse per shadcn-sidebar guidance. Trigger sits in the AdminShell header row so it's always visible.
-- Extracted panel components live next to their route file as named exports (`export function AnalyticsUsagePanel()` etc.) — no new folder.
-- No DB changes.
-- No changes to individual detail routes under `/knowledge/*` or admin asset/translation/governance leaves.
+- ECharts SSR-safe: import dynamically behind `<ClientOnly>` — the module is browser-only, so any static import from an SSR route would break the build.
+- Bundle: ECharts tree-shaken via `echarts/core` + explicit chart/component registration, kept off the initial route bundles via `React.lazy`.
+- Division theme: single `buildEchartsTheme(division, mode)` helper in `src/lib/infographics/echarts-theme.ts` reads existing division tokens so all charts inherit brand automatically.
+- No changes to `client.ts`, `client.server.ts`, `auth-middleware.ts`, `types.ts`, `.env`.
 
-## Out of scope
+## Deliverables checklist
 
-- No visual redesign of individual panels (their internals stay identical).
-- No renaming of asset/translation/governance sub-routes.
-- No changes to `/atlas`, `/library`, `/templates`, `/brief`.
+- [ ] `src/lib/infographics/{spec,registry,adapters/*}.ts`
+- [ ] ECharts adapter + theme builder
+- [ ] 7 new `MV-INFO-*` variants seeded + rendered
+- [ ] 5 existing variants migrated onto spec (visual parity)
+- [ ] Auto alt-text + long-desc, wired into DOM + PPTX + PDF export
+- [ ] `<ChartDataDrawer />` with CSV export
+- [ ] Vitest + Playwright coverage for the above
