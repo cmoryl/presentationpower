@@ -201,7 +201,7 @@ export function adaptPaletteForMode(base: Palette, isDark: boolean): Palette {
 }
 
 
-export type PptxExportResult = { blob?: Blob; failedSlides: string[] };
+export type PptxExportResult = { blob?: Blob; failedSlides: string[]; fileName?: string };
 
 export async function exportDeckToPptx(
   deck: Deck,
