@@ -183,6 +183,13 @@ function Library() {
   const [sort, setSort] = useState<"default" | "most-used" | "pinned-first">("default");
 
   const [showImagery, setShowImagery] = useState(false);
+  const [density, setDensity] = useState<"comfortable" | "thumb">(() => {
+    if (typeof window === "undefined") return "comfortable";
+    return (window.localStorage.getItem("library:density") as "comfortable" | "thumb") ?? "comfortable";
+  });
+  useEffect(() => {
+    if (typeof window !== "undefined") window.localStorage.setItem("library:density", density);
+  }, [density]);
   const autoFixOn = true;
   const tpMasterIdx = Math.max(0, brandModes.findIndex((b) => b.id === "bm-enterprise"));
   const [brandIdx, setBrandIdx] = useState(tpMasterIdx);
