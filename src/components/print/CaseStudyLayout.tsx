@@ -374,6 +374,9 @@ export function CaseStudyLayout({
               </div>
             )}
 
+            {/* SHARED MODULES — user-inserted reusable blocks */}
+            <PrintSectionsStack sections={content.modules} mode={mode} accent={accent} />
+
             {/* CTA BAND */}
             {content.cta && (
               <PrintCTABand
