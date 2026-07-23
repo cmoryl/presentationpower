@@ -243,43 +243,63 @@ export type PrintAssetRow = {
 };
 
 export function emptyCaseStudy(seed?: Partial<CaseStudyContent>): CaseStudyContent {
+  const client = seed?.client || "Acme Global";
+  const industry = seed?.industry || "life sciences";
   return {
     eyebrow: "Case study",
     client: seed?.client ?? "",
     industry: seed?.industry ?? "",
     audience: seed?.audience ?? "",
-    summary: seed?.summary ?? "",
-    challenge: seed?.challenge ?? { heading: "The challenge", body: "" },
-    solution: seed?.solution ?? { heading: "Our approach", body: "" },
-    result: seed?.result ?? { heading: "The outcome", body: "" },
+    summary:
+      seed?.summary ??
+      `How ${client} unified content operations across ${industry} to launch faster in every market.`,
+    challenge: seed?.challenge ?? {
+      heading: "The challenge",
+      body: `${client} was scaling into new markets faster than their content pipeline could keep up — fragmented tooling, duplicated review, and a 3-week turnaround on every campaign refresh.`,
+    },
+    solution: seed?.solution ?? {
+      heading: "Our approach",
+      body: `We consolidated linguistic review, creative adaptation, and regulatory sign-off onto a single connected workflow — with human experts in-loop where it matters and AI acceleration everywhere else.`,
+    },
+    result: seed?.result ?? {
+      heading: "The outcome",
+      body: `Time-to-market dropped from three weeks to under 48 hours, review cycles fell by 62%, and ${client} unlocked $1.2M in annualized savings while going live in 36 markets.`,
+    },
     stats: seed?.stats ?? [
-      { label: "Impact metric", value: "0", unit: "" },
-      { label: "Impact metric", value: "0", unit: "" },
-      { label: "Impact metric", value: "0", unit: "" },
+      { label: "Faster time-to-market", value: "3.4", unit: "x" },
+      { label: "Fewer review cycles", value: "62", unit: "%" },
+      { label: "Annualized cost saved", value: "$1.2", unit: "M" },
     ],
-    quote: seed?.quote,
+    quote:
+      seed?.quote ??
+      { text: "They didn't just translate our content — they rebuilt how we ship it. We're moving at a pace we couldn't have imagined last year.", author: "VP of Global Marketing" },
     expert: seed?.expert,
     cta: seed?.cta ?? { label: "Start a conversation" },
   };
 }
 
 export function emptySpotlight(seed?: Partial<SpotlightContent>): SpotlightContent {
+  const product = seed?.productName || "GlobalLink Connect";
   return {
     eyebrow: seed?.eyebrow ?? "Product spotlight",
     productName: seed?.productName ?? "",
-    tagline: seed?.tagline ?? "",
-    summary: seed?.summary ?? "",
+    tagline: seed?.tagline ?? "Enterprise localization, without the enterprise drag.",
+    summary:
+      seed?.summary ??
+      `${product} plugs directly into the systems your teams already use — CMS, DAM, PIM, code — so every market ships from the same source of truth.`,
     capabilities: seed?.capabilities ?? [
-      { heading: "Capability", body: "" },
-      { heading: "Capability", body: "" },
-      { heading: "Capability", body: "" },
+      { heading: "Connected everywhere", body: "40+ pre-built connectors keep content in sync with your CMS, DAM, PIM, and code — no more manual exports." },
+      { heading: "AI + human, in one loop", body: "Machine translation accelerates first drafts; certified linguists and reviewers refine anything customer-facing." },
+      { heading: "Governance built in", body: "Regulated-industry workflows, audit trails, and role-based approvals are on by default, not bolted on." },
     ],
     stats: seed?.stats ?? [
-      { label: "Proof point", value: "0", unit: "" },
-      { label: "Proof point", value: "0", unit: "" },
-      { label: "Proof point", value: "0", unit: "" },
+      { label: "Markets supported live", value: "200", unit: "+" },
+      { label: "Faster to launch", value: "3.4", unit: "x" },
+      { label: "Reduction in review cycles", value: "62", unit: "%" },
     ],
-    quote: seed?.quote,
+    quote:
+      seed?.quote ??
+      { text: "We onboarded three new regions in the time it used to take us to launch one.", author: "Director of Digital Experience" },
     expert: seed?.expert,
     cta: seed?.cta ?? { label: "Talk to us" },
   };
@@ -289,18 +309,34 @@ export function emptyEBrochure(seed?: Partial<EBrochureContent>): EBrochureConte
   return {
     eyebrow: seed?.eyebrow ?? "eBrochure",
     title: seed?.title ?? "",
-    summary: seed?.summary ?? "",
+    summary:
+      seed?.summary ??
+      "A single connected workflow for every market, every channel, every audience — engineered for regulated industries and built for global scale.",
     sections: seed?.sections ?? [
-      { heading: "The challenge", body: "", bullets: [] },
-      { heading: "Our approach", body: "", bullets: [] },
-      { heading: "The impact", body: "", bullets: [] },
+      {
+        heading: "The challenge",
+        body: "Global brands are shipping more content into more markets than ever — but legacy workflows still treat every new language as a fresh project.",
+        bullets: ["Fragmented vendor rosters", "Duplicated linguistic review", "Weeks lost to manual handoffs"],
+      },
+      {
+        heading: "Our approach",
+        body: "We connect the systems you already run, layer certified human expertise onto AI-accelerated first drafts, and give governance teams real audit trails.",
+        bullets: ["40+ pre-built platform connectors", "Human-in-loop review at every stage", "Enterprise-grade security and audit"],
+      },
+      {
+        heading: "The impact",
+        body: "Customers cut review cycles by more than half, ship into new markets in days instead of weeks, and unlock seven-figure annualized savings.",
+        bullets: ["3.4× faster time-to-market", "62% fewer review cycles", "$1.2M average annualized savings"],
+      },
     ],
     stats: seed?.stats ?? [
-      { label: "Proof point", value: "0", unit: "" },
-      { label: "Proof point", value: "0", unit: "" },
-      { label: "Proof point", value: "0", unit: "" },
+      { label: "Global markets supported", value: "200", unit: "+" },
+      { label: "Enterprise customers", value: "600", unit: "+" },
+      { label: "Content refresh SLA", value: "48", unit: "hr" },
     ],
-    quote: seed?.quote,
+    quote:
+      seed?.quote ??
+      { text: "It's the first localization program our compliance team has ever signed off on without changes.", author: "Head of Regulatory Content" },
     discover: seed?.discover ?? {
       body: "Discover how we can help your organization streamline operations and deliver measurable results across every market.",
       bullets: ["Trusted global partner", "Deep division expertise", "Hands-on, human collaboration"],
@@ -313,14 +349,16 @@ export function emptyAdaptorBrief(seed?: Partial<AdaptorBriefContent>): AdaptorB
   return {
     eyebrow: seed?.eyebrow ?? "Adaptor brief",
     title: seed?.title ?? "",
-    summary: seed?.summary ?? "",
+    summary:
+      seed?.summary ??
+      "Drop-in connectors that keep your CMS, DAM, PIM, and code repositories in sync with every language, every market, every release.",
     features: seed?.features ?? [
-      { verb: "Supports", body: "" },
-      { verb: "Adapts", body: "" },
-      { verb: "Enables", body: "" },
-      { verb: "Automates", body: "" },
-      { verb: "Triggers", body: "" },
-      { verb: "Learns", body: "" },
+      { verb: "Supports", body: "40+ enterprise platforms out of the box — Adobe, Sitecore, Contentful, Salesforce, GitHub." },
+      { verb: "Adapts", body: "Configurable workflows shape to your review, approval, and regulatory requirements." },
+      { verb: "Enables", body: "Human-in-loop review and certified linguists for anything customer-facing or regulated." },
+      { verb: "Automates", body: "First-draft translation, TM leverage, and file preparation with zero manual handoffs." },
+      { verb: "Triggers", body: "Content changes push into localization instantly via webhook or scheduled sync." },
+      { verb: "Learns", body: "Every project sharpens your TM, glossary, and style — quality compounds over time." },
     ],
     knowHow: seed?.knowHow ?? [
       "Supports 600+ global enterprises",
@@ -329,7 +367,9 @@ export function emptyAdaptorBrief(seed?: Partial<AdaptorBriefContent>): AdaptorB
       "Integrates with 100+ platforms seamlessly",
       "Reduces costs and accelerates time-to-market",
     ],
-    quote: seed?.quote,
+    quote:
+      seed?.quote ??
+      { text: "The connector shipped in a sprint. Two months in, our marketing team has stopped filing localization tickets entirely.", author: "Principal Engineer, Platform" },
     cta: seed?.cta ?? { label: "Talk to an expert" },
   };
 }
