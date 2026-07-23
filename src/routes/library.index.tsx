@@ -1500,6 +1500,7 @@ function VariantDetailModal({
             >
               {previewBusy ? <Loader2 size={12} className="animate-spin" /> : <Eye size={12} />}
               {previewBusy ? (previewStage ?? "Rendering…") : "Preview PDFs"}
+            </button>
             {usageCount > 0 && (
               <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
                 Used · {usageCount}
