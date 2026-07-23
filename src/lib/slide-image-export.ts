@@ -305,40 +305,62 @@ async function waitForImages(node: HTMLElement, timeoutMs: number): Promise<void
  */
 export async function captureSlide(
   node: HTMLElement,
-  opts: { pixelRatio?: number; backgroundColor?: string } = {},
+  opts: {
+    pixelRatio?: number;
+    backgroundColor?: string;
+    onProgress?: ExportProgressCallback;
+  } = {},
 ): Promise<string> {
   if (!node) throw new Error("captureSlide: node is required");
+  const { onProgress } = opts;
 
+  report(onProgress, { stage: "fonts", progress: 0, message: "Waiting for fonts…" });
   if (typeof document !== "undefined" && document.fonts?.ready) {
     try { await document.fonts.ready; } catch { /* best effort */ }
   }
+  report(onProgress, { stage: "fonts", progress: 1, message: "Fonts ready" });
 
   const images = Array.from(node.querySelectorAll("img"));
+  const total = images.length;
+  report(onProgress, {
+    stage: "images",
+    progress: total === 0 ? 1 : 0,
+    message: total === 0 ? "No images" : `Decoding ${total} image${total === 1 ? "" : "s"}…`,
+  });
+  let decoded = 0;
   await Promise.all(
     images.map(async (img) => {
       if (typeof img.decode === "function") {
-        try { await img.decode(); return; } catch { /* fall through to load event */ }
+        try { await img.decode(); } catch { /* fall through to load event */ }
       }
-      if (img.complete && img.naturalWidth > 0) return;
-      await new Promise<void>((resolve) => {
-        const done = () => resolve();
-        img.addEventListener("load", done, { once: true });
-        img.addEventListener("error", done, { once: true });
-      });
+      if (!(img.complete && img.naturalWidth > 0)) {
+        await new Promise<void>((resolve) => {
+          const done = () => resolve();
+          img.addEventListener("load", done, { once: true });
+          img.addEventListener("error", done, { once: true });
+        });
+      }
+      decoded += 1;
+      if (total > 0) {
+        report(onProgress, { stage: "images", progress: decoded / total });
+      }
     }),
   );
 
-  // Let layout settle after fonts/images finish resolving.
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-  return toPng(node, {
+  report(onProgress, { stage: "render", progress: 0.1, message: "Rasterizing…" });
+  const dataUrl = await toPng(node, {
     pixelRatio: opts.pixelRatio ?? 2,
     cacheBust: true,
     backgroundColor: opts.backgroundColor,
     filter: (el) =>
       !(el instanceof HTMLElement) || el.dataset?.exportIgnore !== "true",
   });
+  report(onProgress, { stage: "encode", progress: 1, message: "Encoded" });
+  return dataUrl;
 }
+
 
 
 /**
