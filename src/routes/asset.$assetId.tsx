@@ -35,6 +35,8 @@ import { PRINT_STATS_VARIANTS, PrintSectionRenderer } from "@/components/print/s
 import { PrintSectionPicker } from "@/components/print/sections/PrintSectionPicker";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
+import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
+import { analyzePrintAsset, canAddModule } from "@/lib/print-capacity";
 import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2 } from "lucide-react";
 
 export const Route = createFileRoute("/asset/$assetId")({
@@ -703,7 +705,9 @@ function AssetEditor() {
             </Panel>
 
             <Panel title="Shared modules">
+              <LayoutHealthBanner report={analyzePrintAsset("case-study", content)} />
               <ModulesPanel
+                kind="case-study"
                 modules={content.modules ?? []}
                 onAdd={() => setPickerOpen(true)}
                 onChange={(next) => patchContent({ modules: next })}
@@ -774,8 +778,9 @@ function AssetEditor() {
 }
 
 function ModulesPanel({
-  modules, onAdd, onChange,
+  kind, modules, onAdd, onChange,
 }: {
+  kind: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
   modules: PrintSection[];
   onAdd: () => void;
   onChange: (next: PrintSection[]) => void;
@@ -805,16 +810,29 @@ function ModulesPanel({
     patch(i, { items } as Partial<PrintStatsSection>);
   }
 
+  // Weight the lightest known variant so a "no room" verdict really means no
+  // room even for the smallest module.
+  const lightestWeight = 1.6;
+  const gate = canAddModule(kind, modules, lightestWeight);
+
   return (
     <>
       <button
         type="button"
         onClick={onAdd}
-        className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-black/25 bg-transparent px-2 py-2 text-[11px] font-semibold uppercase tracking-widest text-black/70 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/25 dark:text-white/70"
+        disabled={!gate.ok}
+        data-testid="add-module-btn"
+        title={gate.ok ? "Insert a shared module" : gate.reason}
+        className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-black/25 bg-transparent px-2 py-2 text-[11px] font-semibold uppercase tracking-widest text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-black/25 disabled:hover:text-black/70 dark:border-white/25 dark:text-white/70"
       >
-        <Plus size={14} /> Add module
+        <Plus size={14} /> {gate.ok ? "Add module" : "Page full"}
       </button>
-      {modules.length === 0 && (
+      {!gate.ok && (
+        <div className="pt-1 text-[11px] leading-snug text-red-600 dark:text-red-300">
+          {gate.reason}
+        </div>
+      )}
+      {gate.ok && modules.length === 0 && (
         <div className="pt-1 text-[11px] text-black/50 dark:text-white/50">No shared modules yet. Insert stats blocks to enrich the document.</div>
       )}
       <div className="space-y-3">
