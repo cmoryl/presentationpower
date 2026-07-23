@@ -494,7 +494,9 @@ function ThumbLive({ kind, brand }: { kind: PrintAssetKind; brand: BrandMode }) 
       {kind === "adaptor-brief" && (
         <AdaptorBriefLayout content={ADAPTOR_SEED} brand={brand} mode="dark" pageSize="Letter" density="standard" />
       )}
-      {kind === "case-study" && <ThumbPlaceholder brand={brand} kind="case-study" />}
+      {kind === "case-study" && (
+        <CaseStudyLayout content={CASE_STUDY_SEED} brand={brand} mode="light" pageSize="Letter" density="standard" />
+      )}
     </div>
   );
 }
