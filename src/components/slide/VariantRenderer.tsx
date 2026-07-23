@@ -4265,7 +4265,9 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 5);
       const vals = items.map((it) => Number(it.value) || 0);
       const max = Math.max(1, ...vals);
-      const CHART_H = 460;
+      // Collision fix: cap chart height and add generous bottom padding so
+      // the year row + note text clear the SlideFrame footer with margin.
+      const CHART_H = 300;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex items-start justify-between gap-16">
@@ -4273,14 +4275,14 @@ function renderVariantBody({
               <Kicker brand={brand}>{s(c.kicker, "Trajectory")}</Kicker>
               <div
                 className="mt-4"
-                style={{ fontSize: 60, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+                style={{ fontSize: 52, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
               >
                 {s(c.title, variant.name)}
               </div>
               {s(c.headline) && (
                 <div
                   className="mt-5"
-                  style={{ fontSize: 22, color: ink.muted, letterSpacing: "-0.005em", lineHeight: 1.45, maxWidth: 680 }}
+                  style={{ fontSize: 20, color: ink.muted, letterSpacing: "-0.005em", lineHeight: 1.45, maxWidth: 680 }}
                 >
                   {s(c.headline)}
                 </div>
@@ -4288,12 +4290,12 @@ function renderVariantBody({
             </div>
           </div>
           <div
-            className="mt-12 grid items-end gap-10"
+            className="mt-10 grid items-end gap-10"
             style={{
               gridTemplateColumns: `repeat(${items.length || 1}, 1fr)`,
-              minHeight: CHART_H + 80,
               borderBottom: `1px solid ${ink.hairline}`,
               paddingBottom: 0,
+              marginBottom: 96,
             }}
           >
             {items.map((it, i) => {
