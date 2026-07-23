@@ -1778,7 +1778,7 @@ function VariantDetailModal({
         >
           <div className="flex items-center justify-between gap-4 border-b border-white/10 px-6 py-4">
             <div className="min-w-0">
-              <div className="text-xs uppercase tracking-widest text-white/60">PDF preview · {pixelRatio}×</div>
+              <div className="text-xs uppercase tracking-widest text-white/60">PDF preview · {previewUrls.ratio}×{previewUrls.ratio !== pixelRatio ? ` (current selection: ${pixelRatio}× — re-render to update)` : ""}</div>
               <div className="mt-1 truncate text-lg font-semibold">{variant.name} — {brand.name}</div>
             </div>
             <div className="flex items-center gap-2">
@@ -1786,15 +1786,17 @@ function VariantDetailModal({
                 type="button"
                 onClick={() => downloadPreviewBlob("light")}
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:bg-white/90"
+                title={previewUrls.filenameLight}
               >
-                <Download size={12} /> Download Light
+                <Download size={12} /> Download Light ({previewUrls.ratio}×)
               </button>
               <button
                 type="button"
                 onClick={() => downloadPreviewBlob("dark")}
                 className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#0050ff]"
+                title={previewUrls.filenameDark}
               >
-                <Download size={12} /> Download Dark
+                <Download size={12} /> Download Dark ({previewUrls.ratio}×)
               </button>
               <button
                 type="button"
