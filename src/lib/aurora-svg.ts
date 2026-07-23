@@ -72,10 +72,11 @@ export function auroraOrbs(
   brand: BrandMode,
   mode: "dark" | "light" = "dark",
 ): AuroraOrbSpec[] {
-  // Deterministic hash → three offset orbs painted purely from the brand's
-  // own tokens. Mirrors auroraOrbs() in src/components/slide/flagship.tsx so
-  // PPTX/PDF exports match what the on-screen AuroraLayer renders for the
-  // same seed + brand + mode.
+  // FREE-FORM AURORA v2 — deterministic hash → 3 huge accent blooms
+  // anchored to edges/corners of the frame, mostly overhanging the crop
+  // so only the soft-focus falloff bleeds in (matches user reference
+  // backdrops 1.png..10.png). Radii are large enough to be firmly
+  // out-of-focus at 1280×720.
   let h = 2166136261;
   for (let i = 0; i < seed.length; i++) {
     h ^= seed.charCodeAt(i);
@@ -87,30 +88,52 @@ export function auroraOrbs(
     h ^= h << 5;
     return ((h >>> 0) % 10000) / 10000;
   };
-  const sibling = shiftHue(brand.tokens.accent, 28, 0.06);
+  const sibling = shiftHue(brand.tokens.accent, 28, 0.08);
   const isCorporate = brand.tokens.primary.toLowerCase() === "#003fc7";
   const darkFirst = isCorporate
     ? brand.tokens.primary
     : shiftHue(brand.tokens.accent, -14, 0.04);
-  const lightPrimary = mixHex(brand.tokens.accent, brand.tokens.surface, 0.45);
+  const lightPrimary = mixHex(brand.tokens.accent, brand.tokens.surface, 0.35);
   const palette =
     mode === "dark"
       ? [darkFirst, brand.tokens.accent, sibling]
       : [lightPrimary, brand.tokens.accent, sibling];
-  const alphaBase = mode === "dark" ? 0.62 : 0.45;
-  const alphaRange = mode === "dark" ? 0.18 : 0.12;
-  // Light mode nudges orbs to different anchor points than dark so the
-  // same seed produces a distinct, softer composition on white surfaces.
-  const lightShiftX = [-80, 140, -40];
-  const lightShiftY = [90, -60, 120];
-  return Array.from({ length: 3 }).map((_, i) => ({
-    color: palette[i] ?? brand.tokens.accent,
-    x: 120 + rand() * 1040 + (mode === "light" ? lightShiftX[i] ?? 0 : 0),
-    y: 60 + rand() * 600 + (mode === "light" ? lightShiftY[i] ?? 0 : 0),
-    rx: (mode === "dark" ? 380 : 620) + rand() * (mode === "dark" ? 240 : 420),
-    ry: (mode === "dark" ? 320 : 540) + rand() * (mode === "dark" ? 200 : 360),
-    alpha: alphaBase + rand() * alphaRange,
-  }));
+  const alphaBase = mode === "dark" ? 0.82 : 0.55;
+  const alphaRange = mode === "dark" ? 0.15 : 0.15;
+  // Anchor palette: 8 positions clinging to the frame edges/corners so orbs
+  // read as "peeking in from off-screen" rather than floating in the middle.
+  // Values are in the 1280×720 export viewbox; renderer preserves them.
+  const anchors = [
+    { x: -80, y: -60 },    // top-left overhang
+    { x: 640, y: -140 },   // top center overhang
+    { x: 1360, y: -60 },   // top-right overhang
+    { x: -120, y: 360 },   // left mid overhang
+    { x: 1400, y: 380 },   // right mid overhang
+    { x: -60, y: 780 },    // bottom-left overhang
+    { x: 640, y: 860 },    // bottom center overhang
+    { x: 1340, y: 780 },   // bottom-right overhang
+  ];
+  // Pick 3 distinct anchors deterministically.
+  const chosen: number[] = [];
+  while (chosen.length < 3) {
+    const idx = Math.floor(rand() * anchors.length);
+    if (!chosen.includes(idx)) chosen.push(idx);
+  }
+  return chosen.map((idx, i) => {
+    const a = anchors[idx]!;
+    const jitterX = (rand() - 0.5) * 160;
+    const jitterY = (rand() - 0.5) * 120;
+    const rx = 540 + rand() * 320; // 540..860
+    const ry = 460 + rand() * 280; // 460..740
+    return {
+      color: palette[i] ?? brand.tokens.accent,
+      x: a.x + jitterX,
+      y: a.y + jitterY,
+      rx,
+      ry,
+      alpha: alphaBase + rand() * alphaRange,
+    };
+  });
 }
 
 /** Canonical surface tint used behind AuroraLayer for a given mode. */
@@ -118,39 +141,28 @@ export function auroraBaseTint(brand: BrandMode, mode: "dark" | "light"): string
   return mode === "dark" ? "#03002C" : brand.tokens.surface ?? "#FFFFFF";
 }
 
-/** Layer opacity applied to the orb <g> in both renderer and exporter. */
+/** Layer opacity applied to the orb <g> in both renderer and exporter.
+ *  v2 rebuild: dark mode is now 0.95 (was 0.7) so accent blooms carry full
+ *  chroma the way the reference backdrops do. Light stays quieter. */
 export function auroraLayerOpacity(mode: "dark" | "light", intensity = 1): number {
-  return intensity * (mode === "dark" ? 0.7 : 0.55);
+  return intensity * (mode === "dark" ? 0.95 : 0.6);
 }
 
 /**
- * Per-brand dark-mode frosted-glass wash. Tuned so every division keeps the
- * "orbs peek through glass" character instead of collapsing into a single
- * color field. Alpha is derived from the brand accent's luminance (brighter
- * accents get a hair more wash to tame them; deep/saturated accents get
- * less so they still glow through). Wash colour mixes a neutral navy with
- * the brand surface to carry a subtle brand tint into the film.
+ * Retained for backwards compatibility with earlier "orbs peek through
+ * frosted glass" treatment. The v2 free-form aurora rebuild no longer
+ * paints this wash — content sits directly on the aurora — so both the
+ * renderer and the exporter ignore this return value. Left in place so
+ * downstream callers importing the symbol keep compiling; alpha is 0 to
+ * document the visual contract.
  */
 export function darkGlassWash(brand: BrandMode): { color: string; alpha: number } {
   const NEUTRAL = "#0B1330";
   const surface = brand.tokens.surface ?? NEUTRAL;
   const color = mixHex(NEUTRAL, surface, 0.35);
-  const lum = relLuminance(brand.tokens.accent);
-  // lum ~0 (deep) → 0.06 alpha; lum ~1 (bright/pastel) → 0.14 alpha.
-  const alpha = Math.max(0.05, Math.min(0.15, 0.06 + lum * 0.09));
-  return { color, alpha };
+  return { color, alpha: 0 };
 }
 
-function relLuminance(hex: string): number {
-  const m = /^#?([a-f\d]{6})$/i.exec(hex);
-  if (!m) return 0.5;
-  const int = parseInt(m[1], 16);
-  const rgb = [(int >> 16) & 255, (int >> 8) & 255, int & 255].map((c) => {
-    const v = c / 255;
-    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-  });
-  return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
-}
 
 
 
