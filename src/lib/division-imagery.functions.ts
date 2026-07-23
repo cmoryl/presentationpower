@@ -155,6 +155,15 @@ export const updateDivisionImagery = createServerFn({ method: "POST" })
         tags: z.array(z.string().max(60)).max(24).optional(),
         note: z.string().max(1200).nullable().optional(),
         kind: z.enum(["photo", "abstract", "generated", "upload"]).optional(),
+        collection: z.string().max(120).nullable().optional(),
+        template_kinds: z
+          .array(z.enum(["spotlight", "ebrochure", "case-study", "adaptor-brief"]))
+          .max(4)
+          .optional(),
+        is_default_for: z
+          .array(z.enum(["spotlight", "ebrochure", "case-study", "adaptor-brief"]))
+          .max(4)
+          .optional(),
       })
       .parse(v),
   )
@@ -164,6 +173,9 @@ export const updateDivisionImagery = createServerFn({ method: "POST" })
     if (data.tags !== undefined) patch.tags = data.tags;
     if (data.note !== undefined) patch.note = data.note;
     if (data.kind !== undefined) patch.kind = data.kind;
+    if (data.collection !== undefined) patch.collection = data.collection;
+    if (data.template_kinds !== undefined) patch.template_kinds = data.template_kinds;
+    if (data.is_default_for !== undefined) patch.is_default_for = data.is_default_for;
     if (Object.keys(patch).length === 0) return { ok: true };
     const { error } = await s.from("division_imagery").update(patch).eq("id", data.id);
     if (error) throw new Error((error as { message?: string }).message ?? "Update failed");
