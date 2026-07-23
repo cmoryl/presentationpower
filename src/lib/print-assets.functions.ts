@@ -6,7 +6,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { CaseStudyContent, PrintAssetContext, PrintAssetKind, PrintAssetRow } from "./print-assets.types";
-import { emptyCaseStudy } from "./print-assets.types";
+import { emptyCaseStudy, emptySpotlight, emptyEBrochure, emptyAdaptorBrief } from "./print-assets.types";
 
 const KindEnum = z.enum(["case-study", "spotlight", "ebrochure", "adaptor-brief"]);
 
@@ -177,15 +177,36 @@ export const createPrintAssetWithBrief = createServerFn({ method: "POST" })
       .single();
     if (bErr) throw new Error(bErr.message);
 
-    const seedContent: Partial<CaseStudyContent> = {
-      client: data.prospect || "",
-      industry: data.industry || "",
-      audience: data.audience || "",
-      summary: data.meetingObjective || "",
-      ...(data.content as Partial<CaseStudyContent> | undefined),
-    };
-
-    const initialContent = emptyCaseStudy(seedContent);
+    let initialContent: Record<string, unknown>;
+    if (data.kind === "spotlight") {
+      initialContent = emptySpotlight({
+        productName: data.prospect || data.title,
+        tagline: data.audience || "",
+        summary: data.meetingObjective || "",
+        ...(data.content as Record<string, unknown> | undefined),
+      }) as unknown as Record<string, unknown>;
+    } else if (data.kind === "ebrochure") {
+      initialContent = emptyEBrochure({
+        title: data.title,
+        summary: data.meetingObjective || "",
+        ...(data.content as Record<string, unknown> | undefined),
+      }) as unknown as Record<string, unknown>;
+    } else if (data.kind === "adaptor-brief") {
+      initialContent = emptyAdaptorBrief({
+        title: data.title,
+        summary: data.meetingObjective || "",
+        ...(data.content as Record<string, unknown> | undefined),
+      }) as unknown as Record<string, unknown>;
+    } else {
+      const seedContent: Partial<CaseStudyContent> = {
+        client: data.prospect || "",
+        industry: data.industry || "",
+        audience: data.audience || "",
+        summary: data.meetingObjective || "",
+        ...(data.content as Partial<CaseStudyContent> | undefined),
+      };
+      initialContent = emptyCaseStudy(seedContent) as unknown as Record<string, unknown>;
+    }
 
     const { data: row, error } = await supabase
       .from("print_assets")

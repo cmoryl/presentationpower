@@ -29,14 +29,19 @@ import type {
   PrintHeroMedia,
   PrintPageSize,
 } from "@/lib/print-assets.types";
-import { emptyCaseStudy } from "@/lib/print-assets.types";
+import { emptyCaseStudy, emptySpotlight, emptyEBrochure, emptyAdaptorBrief } from "@/lib/print-assets.types";
 import type { PrintSection, PrintStatsSection, PrintStatsVariant } from "@/lib/print-assets.types";
+import type { SpotlightContent, EBrochureContent, AdaptorBriefContent } from "@/lib/print-assets.types";
 import { PRINT_STATS_VARIANTS, PrintSectionRenderer } from "@/components/print/sections/PrintSectionRenderer";
 import { PrintSectionPicker } from "@/components/print/sections/PrintSectionPicker";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
 import { analyzePrintAsset, canAddModule } from "@/lib/print-capacity";
+import { SpotlightLayout } from "@/components/print/SpotlightLayout";
+import { EBrochureLayout } from "@/components/print/EBrochureLayout";
+import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
+import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2 } from "lucide-react";
 
 export const Route = createFileRoute("/asset/$assetId")({
@@ -144,7 +149,15 @@ function AssetEditor() {
   if (loading) return <AppShell><div className="p-10 text-sm text-black/60">Loading…</div></AppShell>;
   if (!row) return <AppShell><div className="p-10 text-sm text-red-600">Print asset not found.</div></AppShell>;
 
-  const content: CaseStudyContent = { ...emptyCaseStudy(), ...(row.content as CaseStudyContent) };
+  const kind = (row.kind ?? "case-study") as "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
+  const rawContent: Record<string, unknown> = (() => {
+    const c = (row.content as Record<string, unknown>) ?? {};
+    if (kind === "spotlight") return { ...(emptySpotlight() as unknown as Record<string, unknown>), ...c };
+    if (kind === "ebrochure") return { ...(emptyEBrochure() as unknown as Record<string, unknown>), ...c };
+    if (kind === "adaptor-brief") return { ...(emptyAdaptorBrief() as unknown as Record<string, unknown>), ...c };
+    return { ...(emptyCaseStudy() as unknown as Record<string, unknown>), ...c };
+  })();
+  const content: CaseStudyContent = rawContent as unknown as CaseStudyContent;
   const ctx: PrintAssetContext = (row.context as PrintAssetContext) ?? {};
 
   function pushHistory() {
@@ -186,7 +199,58 @@ function AssetEditor() {
   undoRef.current = undo;
   redoRef.current = redo;
 
+  // Generic path-based writer for click-in-preview live editing on the
+  // non-case-study kinds. Path syntax matches @/lib/qa readPath:
+  // "a.b", "a[0].b".
+  function writePath(obj: Record<string, unknown>, path: string, value: unknown): Record<string, unknown> {
+    const parts: (string | number)[] = path.split(".").flatMap((p) => {
+      const m = /^([^\[]+)(\[(\d+)\])?$/.exec(p);
+      if (!m) return [p];
+      return m[3] !== undefined ? [m[1]!, Number(m[3])] : [m[1]!];
+    });
+    const clone = Array.isArray(obj) ? [...obj] : { ...obj };
+    let cur: any = clone;
+    for (let i = 0; i < parts.length - 1; i++) {
+      const k = parts[i]!;
+      const nextK = parts[i + 1]!;
+      const child = cur[k];
+      const nextChild = Array.isArray(child) ? [...child] : { ...(child ?? (typeof nextK === "number" ? [] : {})) };
+      cur[k] = nextChild;
+      cur = nextChild;
+    }
+    cur[parts[parts.length - 1]!] = value;
+    return clone as Record<string, unknown>;
+  }
 
+  function patchByPath(path: string, value: unknown) {
+    if (!row) return;
+    pushHistory();
+    const nextContent = writePath(rawContent, path, value);
+    setRow({ ...row, content: nextContent as unknown as CaseStudyContent });
+    setDirty(true);
+    setHistoryTick((t) => t + 1);
+  }
+
+  // Collect all non-empty string paths in the content object so LiveEditOverlay
+  // can bind DOM text nodes back to structured content.
+  function collectStringPaths(v: unknown, prefix = ""): string[] {
+    if (typeof v === "string") return v.trim() ? [prefix] : [];
+    if (Array.isArray(v)) {
+      const out: string[] = [];
+      v.forEach((item, i) => out.push(...collectStringPaths(item, `${prefix}[${i}]`)));
+      return out;
+    }
+    if (v && typeof v === "object") {
+      const out: string[] = [];
+      for (const [k, val] of Object.entries(v as Record<string, unknown>)) {
+        const p = prefix ? `${prefix}.${k}` : k;
+        out.push(...collectStringPaths(val, p));
+      }
+      return out;
+    }
+    return [];
+  }
+  const editableFieldPaths = collectStringPaths(rawContent);
 
   function updateStat(i: number, patch: Partial<CaseStudyStat>) {
     const next = [...content.stats];
@@ -576,55 +640,99 @@ function AssetEditor() {
             className="relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
             style={{ aspectRatio: canvasAspect }}
           >
-            {brand && <AuroraLayer seed={`asset-${row.id}`} brand={brand} intensity={0.9} aspect={auroraAspect} />}
-            <div className={`relative flex h-full flex-col justify-between ${densityPad} text-[#03002C] dark:text-white`}>
-              {/* TOP */}
-              <div className="flex items-start justify-between">
-                {brand && <BrandLockup brand={brand} color="currentColor" size="sm" />}
-                <div className="text-right text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
-                  {content.eyebrow ?? "Case study"} · {pageSize}
-                </div>
-              </div>
-              {/* CENTER */}
-              <div className={`flex flex-col ${densityGap}`}>
-                <input
-                  value={content.client}
-                  onChange={(e) => patchContent({ client: e.target.value })}
-                  placeholder="Client name"
-                  className="w-full bg-transparent text-4xl font-semibold leading-tight tracking-tight focus:outline-none"
-                />
-                <div className="max-w-2xl">
-                  <textarea
-                    value={content.summary ?? ""}
-                    onChange={(e) => patchContent({ summary: e.target.value })}
-                    rows={2}
-                    placeholder="One-line engagement summary"
-                    className="w-full resize-none bg-transparent text-lg leading-snug text-black/70 focus:outline-none dark:text-white/70"
-                  />
-                </div>
-                <div className="mt-4 grid grid-cols-3 gap-4">
-                  {content.stats.slice(0, 3).map((s, i) => (
-                    <div key={i} className="rounded-xl bg-white/60 p-3 backdrop-blur dark:bg-white/[0.06]">
-                      <div className="text-3xl font-semibold tracking-tight">
-                        {s.value}
-                        {s.unit && <span className="ml-0.5 text-lg text-black/60 dark:text-white/60">{s.unit}</span>}
-                      </div>
-                      <div className="mt-1 text-[11px] uppercase tracking-wider text-black/60 dark:text-white/60">{s.label}</div>
+            {kind === "case-study" ? (
+              <>
+                {brand && <AuroraLayer seed={`asset-${row.id}`} brand={brand} intensity={0.9} aspect={auroraAspect} />}
+                <div className={`relative flex h-full flex-col justify-between ${densityPad} text-[#03002C] dark:text-white`}>
+                  {/* TOP */}
+                  <div className="flex items-start justify-between">
+                    {brand && <BrandLockup brand={brand} color="currentColor" size="sm" />}
+                    <div className="text-right text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
+                      {content.eyebrow ?? "Case study"} · {pageSize}
                     </div>
-                  ))}
+                  </div>
+                  {/* CENTER */}
+                  <div className={`flex flex-col ${densityGap}`}>
+                    <input
+                      value={content.client}
+                      onChange={(e) => patchContent({ client: e.target.value })}
+                      placeholder="Client name"
+                      className="w-full bg-transparent text-4xl font-semibold leading-tight tracking-tight focus:outline-none"
+                    />
+                    <div className="max-w-2xl">
+                      <textarea
+                        value={content.summary ?? ""}
+                        onChange={(e) => patchContent({ summary: e.target.value })}
+                        rows={2}
+                        placeholder="One-line engagement summary"
+                        className="w-full resize-none bg-transparent text-lg leading-snug text-black/70 focus:outline-none dark:text-white/70"
+                      />
+                    </div>
+                    <div className="mt-4 grid grid-cols-3 gap-4">
+                      {content.stats.slice(0, 3).map((s, i) => (
+                        <div key={i} className="rounded-xl bg-white/60 p-3 backdrop-blur dark:bg-white/[0.06]">
+                          <div className="text-3xl font-semibold tracking-tight">
+                            {s.value}
+                            {s.unit && <span className="ml-0.5 text-lg text-black/60 dark:text-white/60">{s.unit}</span>}
+                          </div>
+                          <div className="mt-1 text-[11px] uppercase tracking-wider text-black/60 dark:text-white/60">{s.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {/* BOTTOM */}
+                  <div className="grid grid-cols-3 gap-4 text-xs">
+                    <Block label={content.challenge.heading} body={content.challenge.body} onChange={(b) => patchContent({ challenge: { ...content.challenge, body: b } })} />
+                    <Block label={content.solution.heading} body={content.solution.body} onChange={(b) => patchContent({ solution: { ...content.solution, body: b } })} />
+                    <Block label={content.result.heading} body={content.result.body} onChange={(b) => patchContent({ result: { ...content.result, body: b } })} />
+                  </div>
+                  {ctx.printSafeArea && (
+                    <div className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25" />
+                  )}
                 </div>
-              </div>
-              {/* BOTTOM */}
-              <div className="grid grid-cols-3 gap-4 text-xs">
-                <Block label={content.challenge.heading} body={content.challenge.body} onChange={(b) => patchContent({ challenge: { ...content.challenge, body: b } })} />
-                <Block label={content.solution.heading} body={content.solution.body} onChange={(b) => patchContent({ solution: { ...content.solution, body: b } })} />
-                <Block label={content.result.heading} body={content.result.body} onChange={(b) => patchContent({ result: { ...content.result, body: b } })} />
-              </div>
-              {ctx.printSafeArea && (
-                <div className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25" />
-              )}
-            </div>
+              </>
+            ) : (
+              <LiveEditOverlay
+                enabled={true}
+                slideId={`asset-${row.id}-${kind}`}
+                content={rawContent}
+                editableFields={editableFieldPaths}
+                onChange={(path, value) => patchByPath(path, value)}
+              >
+                {brand && kind === "spotlight" && (
+                  <SpotlightLayout
+                    content={rawContent as unknown as SpotlightContent}
+                    brand={brand}
+                    mode="light"
+                    pageSize={pageSize}
+                    density={density}
+                    seed={`asset-${row.id}`}
+                  />
+                )}
+                {brand && kind === "ebrochure" && (
+                  <EBrochureLayout
+                    content={rawContent as unknown as EBrochureContent}
+                    brand={brand}
+                    mode="light"
+                    pageSize={pageSize}
+                    density={density}
+                    seed={`asset-${row.id}`}
+                  />
+                )}
+                {brand && kind === "adaptor-brief" && (
+                  <AdaptorBriefLayout
+                    content={rawContent as unknown as AdaptorBriefContent}
+                    brand={brand}
+                    mode="light"
+                    pageSize={pageSize}
+                    density={density}
+                    seed={`asset-${row.id}`}
+                  />
+                )}
+              </LiveEditOverlay>
+            )}
           </div>
+
 
           {/* INSPECTOR */}
           <div className="space-y-4">

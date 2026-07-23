@@ -44,10 +44,10 @@ const KINDS: Array<{
   live: boolean;
   icon: React.ReactNode;
 }> = [
-  { id: "case-study",   label: "Case Study",     desc: "Challenge · Approach · Outcome, print-ready.",  live: true,  icon: <FileText size={16} /> },
-  { id: "spotlight",    label: "Client Spotlight", desc: "Product/service hero + stats + capabilities.", live: true,  icon: <Layers size={16} /> },
-  { id: "ebrochure",    label: "E-Brochure",     desc: "GlobalLink-style clean marketing PDF.",         live: false, icon: <PenSquare size={16} /> },
-  { id: "adaptor-brief",label: "Adaptor Brief",  desc: "Dark aurora hero + capability grid.",           live: false, icon: <Rocket size={16} /> },
+  { id: "case-study",   label: "Case Study",     desc: "Challenge · Approach · Outcome, print-ready.",  live: true, icon: <FileText size={16} /> },
+  { id: "spotlight",    label: "Client Spotlight", desc: "Product/service hero + stats + capabilities.", live: true, icon: <Layers size={16} /> },
+  { id: "ebrochure",    label: "E-Brochure",     desc: "GlobalLink-style clean marketing PDF.",         live: true, icon: <PenSquare size={16} /> },
+  { id: "adaptor-brief",label: "Adaptor Brief",  desc: "Dark aurora hero + capability grid.",           live: true, icon: <Rocket size={16} /> },
 ];
 
 function NewAssetPage() {
@@ -78,7 +78,8 @@ function NewAssetPage() {
     [brandModes, brandModeId],
   );
 
-  const canGenerate = (kind === "case-study" || kind === "spotlight") && title.trim().length > 0 && prospect.trim().length > 0;
+  const requiresProspect = kind === "case-study" || kind === "spotlight";
+  const canGenerate = title.trim().length > 0 && (!requiresProspect || prospect.trim().length > 0);
 
   async function handleGenerate() {
     setBusy(true);
