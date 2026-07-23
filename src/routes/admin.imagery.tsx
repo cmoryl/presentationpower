@@ -528,7 +528,132 @@ function ImageCard({
             <Trash2 size={11} />
           </button>
         </div>
+
+        <TargetingPanel row={row} onTargeting={onTargeting} />
       </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Targeting panel — collection label, allow-listed templates, default picks.
+// Empty allow-list = universal fallback (any template can use this image).
+// ---------------------------------------------------------------------------
+function TargetingPanel({
+  row,
+  onTargeting,
+}: {
+  row: DivisionImageryEntry;
+  onTargeting: (patch: {
+    collection?: string | null;
+    template_kinds?: TemplateKind[];
+    is_default_for?: TemplateKind[];
+  }) => void;
+}) {
+  const [collectionDraft, setCollectionDraft] = useState(row.collection ?? "");
+  const allowed = new Set<TemplateKind>((row.template_kinds ?? []) as TemplateKind[]);
+  const defaults = new Set<TemplateKind>((row.is_default_for ?? []) as TemplateKind[]);
+
+  const toggleAllowed = (t: TemplateKind) => {
+    const next = new Set(allowed);
+    if (next.has(t)) {
+      next.delete(t);
+      // clearing the allow-list also clears default-for that template
+      const nextDefaults = new Set(defaults);
+      nextDefaults.delete(t);
+      onTargeting({
+        template_kinds: Array.from(next),
+        is_default_for: Array.from(nextDefaults),
+      });
+    } else {
+      next.add(t);
+      onTargeting({ template_kinds: Array.from(next) });
+    }
+  };
+
+  const toggleDefault = (t: TemplateKind) => {
+    const next = new Set(defaults);
+    if (next.has(t)) {
+      next.delete(t);
+    } else {
+      next.add(t);
+      // being a default implies allow-listed
+      if (!allowed.has(t)) {
+        const nextAllowed = new Set(allowed);
+        nextAllowed.add(t);
+        onTargeting({
+          is_default_for: Array.from(next),
+          template_kinds: Array.from(nextAllowed),
+        });
+        return;
+      }
+    }
+    onTargeting({ is_default_for: Array.from(next) });
+  };
+
+  const saveCollection = () => {
+    const trimmed = collectionDraft.trim();
+    onTargeting({ collection: trimmed ? trimmed : null });
+  };
+
+  return (
+    <div className="mt-3 rounded-lg border border-black/10 bg-black/[0.02] p-2">
+      <div className="mb-1.5 flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-black/50">
+        <Layers size={10} /> Template targeting
+      </div>
+      <div className="mb-2 flex items-center gap-1">
+        <input
+          value={collectionDraft}
+          onChange={(e) => setCollectionDraft(e.target.value)}
+          onBlur={saveCollection}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+          }}
+          placeholder="Collection (e.g. spring-2026)"
+          className="flex-1 rounded-md border border-black/15 bg-white p-1 text-[11px]"
+        />
+      </div>
+      <div className="space-y-1">
+        {TEMPLATE_KINDS.map((t) => {
+          const isAllowed = allowed.has(t);
+          const isDefault = defaults.has(t);
+          const universal = allowed.size === 0;
+          return (
+            <div
+              key={t}
+              className="flex items-center justify-between gap-1 rounded-md px-1 py-0.5 hover:bg-black/[0.03]"
+            >
+              <label className="flex flex-1 items-center gap-1.5 text-[11px] text-black/70">
+                <input
+                  type="checkbox"
+                  checked={isAllowed || universal}
+                  disabled={universal && !isAllowed}
+                  onChange={() => toggleAllowed(t)}
+                  className="h-3 w-3"
+                />
+                {TEMPLATE_LABEL[t]}
+                {universal && (
+                  <span className="text-[9px] uppercase tracking-wide text-black/35">any</span>
+                )}
+              </label>
+              <button
+                type="button"
+                onClick={() => toggleDefault(t)}
+                title={isDefault ? "Auto-picked default" : "Set as default"}
+                className={
+                  "inline-flex items-center rounded p-0.5 " +
+                  (isDefault ? "text-amber-500" : "text-black/25 hover:text-amber-400")
+                }
+              >
+                <Star size={12} fill={isDefault ? "currentColor" : "none"} />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      <p className="mt-1.5 text-[10px] leading-snug text-black/40">
+        No boxes checked = universal fallback. Star marks the auto-pick for that template.
+      </p>
     </div>
   );
 }
