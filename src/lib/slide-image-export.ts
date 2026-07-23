@@ -134,7 +134,7 @@ async function inlineCrossOriginImages(
     remote.map(async (img) => {
       const original = img.getAttribute("src");
       try {
-        const res = await fetch(img.src, { mode: "cors", credentials: "omit" });
+        const res = await fetch(img.src, { mode: "cors" });
         if (!res.ok) throw new Error(`status ${res.status}`);
         const blob = await res.blob();
         const dataUrl = await new Promise<string>((resolve, reject) => {

@@ -140,7 +140,12 @@ async function fetchAsDataUrl(url: string, label?: string): Promise<string | nul
     // explicitly makes the failure mode obvious in devtools when a pasted
     // image URL lacks CORS headers. Supabase signed URLs and most CDNs
     // (Unsplash, Cloudinary, etc.) send `access-control-allow-origin: *`.
-    const res = await fetch(url, { mode: "cors", credentials: "omit" });
+    // NOTE: do NOT pass `credentials: "omit"` — the Lovable preview proxy
+    // rejects same-origin fetches without credentials (they fail as
+    // `TypeError: Failed to fetch`), which was silently dropping every
+    // logo/backdrop/imagery embed. Default `same-origin` credentials work
+    // for /brand-logos, /public assets, and cross-origin CDNs alike.
+    const res = await fetch(url, { mode: "cors" });
     if (!res.ok) {
       console.warn(`[pptx-export] ${label ?? "image"} fetch ${res.status}: ${url}`);
       return null;

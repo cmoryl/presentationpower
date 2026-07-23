@@ -37,7 +37,7 @@ function isTrustedImageHost(url: string): boolean {
 
 async function probeCors(url: string, signal: AbortSignal): Promise<boolean> {
   try {
-    const res = await fetch(url, { mode: "cors", credentials: "omit", signal });
+    const res = await fetch(url, { mode: "cors", signal });
     return res.ok;
   } catch {
     return false;
