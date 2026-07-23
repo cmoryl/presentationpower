@@ -109,15 +109,15 @@ export function AdaptorBriefLayout({
 }) {
   const accent = brand.tokens.accent || brand.tokens.primary;
   const primary = brand.tokens.primary;
-  // Print guideline: no full-color hero band. Text over the hero uses the
-  // mode's default ink; background stays white / offset black.
-  const heroInk = ink;
-  const heroSubInk = inkSoft;
   const ink = mode === "dark" ? "#F5F4FF" : "#03002C";
   const inkSoft = mode === "dark" ? "rgba(245,244,255,0.72)" : "rgba(85,85,85,0.92)";
   const dividerCol = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.14)";
   const accentInk = mode === "dark" ? accent : primary;
   const bg = mode === "dark" ? "#111114" : "#FFFFFF";
+  // Print guideline: no full-color hero band. Text over the hero uses the
+  // mode's default ink; background stays white / offset black.
+  const heroInk = ink;
+  const heroSubInk = inkSoft;
 
   const heroRef = useRef<HTMLHeadingElement | null>(null);
   const introRef = useRef<HTMLParagraphElement | null>(null);
