@@ -351,6 +351,17 @@ function AssetEditor() {
                         <option value="dark">Dark</option>
                       </select>
                     </label>
+                    <label className="flex items-center justify-between gap-3">
+                      <span className="text-black/60 dark:text-white/60">Quality</span>
+                      <select
+                        value={exportQuality}
+                        onChange={(e) => setExportQuality(e.target.value as PrintExportQuality)}
+                        className={inspectorInput}
+                      >
+                        <option value="300dpi">300 DPI · print standard</option>
+                        <option value="600dpi">600 DPI · archival</option>
+                      </select>
+                    </label>
                   </div>
                   <div className="mt-3 flex items-center justify-end gap-2">
                     <button
