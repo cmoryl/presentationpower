@@ -7123,11 +7123,383 @@ function FreeformBarChart({
   );
 }
 
+// ── Free-form Aurora v2 helpers (Batch 2) ─────────────────────────────
+// Shared <defs> — accent bloom, radial halo, soft glow. Every free-form
+// primitive uses the same vocabulary so charts read as one composition.
+function FreeformSvgDefs({ id }: { id: string }) {
+  return (
+    <defs>
+      <linearGradient id={`${id}-bloom-h`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.48} />
+        <stop offset="55%" stopColor="var(--slide-accent-text)" stopOpacity={0.22} />
+        <stop offset="90%" stopColor="var(--slide-accent-text)" stopOpacity={0.06} />
+        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+      </linearGradient>
+      <linearGradient id={`${id}-bloom-h-mute`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.20} />
+        <stop offset="70%" stopColor="var(--slide-accent-text)" stopOpacity={0.06} />
+        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+      </linearGradient>
+      <radialGradient id={`${id}-halo`} cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.55} />
+        <stop offset="55%" stopColor="var(--slide-accent-text)" stopOpacity={0.14} />
+        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+      </radialGradient>
+      <filter id={`${id}-glow`} x="-20%" y="-30%" width="140%" height="160%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="b" />
+        <feMerge>
+          <feMergeNode in="b" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
+  );
+}
 
+// Free-form donut. Hairline track ring + accent-glowing stroke arc, backed
+// by a feathered radial halo so the ring reads as a bloom rather than a
+// puck. Center numeral floats with no plate.
+function FreeformDonut({
+  brand: _brand,
+  percent,
+  size = 280,
+  bloom = false,
+}: {
+  brand: BrandMode;
+  percent: number;
+  size?: number;
+  bloom?: boolean;
+}) {
+  const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
+  const p = Math.max(0, Math.min(100, percent));
+  const stroke = 6;
+  const r = (size - stroke) / 2 - 8;
+  const circ = 2 * Math.PI * r;
+  const dash = (p / 100) * circ;
+  const cx = size / 2;
+  const cy = size / 2;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
+      <FreeformSvgDefs id={id} />
+      {/* Feathered halo behind — bigger + softer for the highlight */}
+      <circle
+        cx={cx}
+        cy={cy}
+        r={size * (bloom ? 0.62 : 0.48)}
+        fill={`url(#${id}-halo)`}
+        opacity={bloom ? 1 : 0.55}
+      />
+      {/* Hairline track ring */}
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke={ink.hairline} strokeWidth={1} />
+      {/* Accent stroke arc with soft glow */}
+      <circle
+        cx={cx}
+        cy={cy}
+        r={r}
+        fill="none"
+        stroke="var(--slide-accent-text)"
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeDasharray={`${dash} ${circ - dash}`}
+        transform={`rotate(-90 ${cx} ${cy})`}
+        filter={`url(#${id}-glow)`}
+      />
+      <text
+        x={cx}
+        y={cy}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize={size * 0.34}
+        fontWeight={600}
+        fill={ink.strong}
+        style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}
+      >
+        {Math.round(p)}
+      </text>
+      <text
+        x={cx}
+        y={cy + size * 0.19}
+        textAnchor="middle"
+        fontSize={size * 0.07}
+        fontWeight={600}
+        fill={ink.faint}
+        style={{ letterSpacing: "0.22em" }}
+      >
+        %
+      </text>
+    </svg>
+  );
+}
 
+// Free-form semicircular gauge. Hairline track + accent stroke arc with
+// glow + feathered halo behind the arc terminus. Value floats above the
+// arc with no plate.
+function FreeformSemiGauge({
+  brand: _brand,
+  percent,
+  size = 240,
+  bloom = false,
+}: {
+  brand: BrandMode;
+  percent: number;
+  size?: number;
+  bloom?: boolean;
+}) {
+  const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
+  const p = Math.max(0, Math.min(100, percent));
+  const stroke = 5;
+  const r = (size - stroke) / 2 - 6;
+  const cy = size / 2 + r / 2;
+  const cx = size / 2;
+  const arcC = Math.PI * r;
+  const dash = (p / 100) * arcC;
+  const h = size / 2 + stroke + 12;
+  const arc = `M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`;
+  // Terminus point on the arc
+  const angle = Math.PI * (1 - p / 100);
+  const tx = cx + Math.cos(angle) * r * -1 + r * 2 * (p / 100);
+  const termX = cx - Math.cos(Math.PI - Math.PI * (p / 100)) * r;
+  const termY = cy - Math.sin(Math.PI - Math.PI * (p / 100)) * r;
+  void tx;
+  return (
+    <svg width={size} height={h} viewBox={`0 0 ${size} ${h}`} aria-hidden>
+      <FreeformSvgDefs id={id} />
+      {/* Feathered halo behind the terminus */}
+      <circle
+        cx={termX}
+        cy={termY}
+        r={size * (bloom ? 0.32 : 0.22)}
+        fill={`url(#${id}-halo)`}
+        opacity={bloom ? 1 : 0.6}
+      />
+      {/* Hairline track */}
+      <path d={arc} fill="none" stroke={ink.hairline} strokeWidth={1} />
+      {/* Accent stroke arc with glow */}
+      <path
+        d={arc}
+        fill="none"
+        stroke="var(--slide-accent-text)"
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeDasharray={`${dash} ${arcC}`}
+        filter={`url(#${id}-glow)`}
+      />
+      {/* Solid core at terminus */}
+      <circle cx={termX} cy={termY} r={4} fill="var(--slide-accent-text)" />
+      <text
+        x={cx}
+        y={cy - 22}
+        textAnchor="middle"
+        fontSize={size * 0.36}
+        fontWeight={600}
+        fill={ink.strong}
+        style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}
+      >
+        {Math.round(p)}
+      </text>
+      <text
+        x={cx}
+        y={cy - 2}
+        textAnchor="middle"
+        fontSize={size * 0.08}
+        fontWeight={600}
+        fill={ink.faint}
+        style={{ letterSpacing: "0.22em" }}
+      >
+        %
+      </text>
+    </svg>
+  );
+}
 
+// Free-form breakdown row. Left-to-right feathered accent gradient, no
+// pill/track. When bloom=true, adds a radial halo + accent stroke tip at
+// the value edge so the top row reads as the primary reading.
+function FreeformBreakdownRow({
+  label,
+  value,
+  unit,
+  delta,
+  negative,
+  widthPct,
+  bloom,
+}: {
+  label: string;
+  value: string;
+  unit: string;
+  delta: string;
+  negative: boolean;
+  widthPct: number;
+  bloom?: boolean;
+}) {
+  const ink = useSlideInk();
+  const height = bloom ? 68 : 52;
+  return (
+    <div className="relative py-6" style={{ borderBottom: `1px solid ${ink.hairline}` }}>
+      <div className="flex items-baseline justify-between mb-3">
+        <div
+          className="uppercase"
+          style={{
+            fontSize: bloom ? 15 : 13,
+            letterSpacing: "0.26em",
+            color: bloom ? "var(--slide-accent-text)" : ink.strong,
+            fontWeight: 700,
+          }}
+        >
+          {label}
+        </div>
+        <div className="flex items-baseline gap-3">
+          <span
+            className="tabular-nums"
+            style={{
+              fontSize: bloom ? 44 : 32,
+              fontWeight: 600,
+              color: ink.strong,
+              letterSpacing: "-0.025em",
+              lineHeight: 1,
+            }}
+          >
+            {value}
+          </span>
+          {unit && (
+            <span style={{ fontSize: bloom ? 22 : 16, color: "var(--slide-accent-text)", fontWeight: 500 }}>
+              {unit}
+            </span>
+          )}
+          {delta && (
+            <span
+              className="uppercase tabular-nums ml-2"
+              style={{
+                fontSize: 12,
+                letterSpacing: "0.24em",
+                color: negative ? "#E53D2E" : "var(--slide-accent-text)",
+                fontWeight: 700,
+              }}
+            >
+              {delta}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="relative w-full" style={{ height }}>
+        {/* Feathered gradient row — the accent bloom itself */}
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 0,
+            height: "100%",
+            width: `${Math.max(4, Math.min(100, widthPct))}%`,
+            background: bloom
+              ? "linear-gradient(90deg, color-mix(in oklab, var(--slide-accent-text) 55%, transparent) 0%, color-mix(in oklab, var(--slide-accent-text) 30%, transparent) 55%, color-mix(in oklab, var(--slide-accent-text) 8%, transparent) 90%, transparent 100%)"
+              : "linear-gradient(90deg, color-mix(in oklab, var(--slide-accent-text) 24%, transparent) 0%, color-mix(in oklab, var(--slide-accent-text) 10%, transparent) 65%, transparent 100%)",
+            filter: bloom ? "blur(0.4px)" : "none",
+          }}
+        />
+        {/* Radial halo + accent stroke tip on the highlight row */}
+        {bloom && (
+          <>
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                left: `calc(${Math.max(4, Math.min(100, widthPct))}% - 90px)`,
+                top: "50%",
+                width: 220,
+                height: 220,
+                transform: "translateY(-50%)",
+                background:
+                  "radial-gradient(circle, color-mix(in oklab, var(--slide-accent-text) 40%, transparent) 0%, color-mix(in oklab, var(--slide-accent-text) 12%, transparent) 45%, transparent 75%)",
+                pointerEvents: "none",
+                zIndex: 0,
+              }}
+            />
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                left: `calc(${Math.max(4, Math.min(100, widthPct))}% - 1px)`,
+                top: 0,
+                width: 2,
+                height: "100%",
+                background: "var(--slide-accent-text)",
+                boxShadow: "0 0 14px 2px color-mix(in oklab, var(--slide-accent-text) 55%, transparent)",
+                zIndex: 1,
+              }}
+            />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Free-form report item. Reuses the MV-KPI-DASHBOARD language: kicker,
+// hero numeral, delta line, no plate/border. Bloom variant adds a radial
+// halo behind the numeral to establish primary reading.
+function FreeformReportItem({
+  brand,
+  item,
+  bloom,
+}: {
+  brand: BrandMode;
+  item: Item;
+  bloom?: boolean;
+}) {
+  const ink = useSlideInk();
+  const delta = s(item.delta);
+  const negative = delta.trim().startsWith("-");
+  const meta = s(item.meta, negative ? "Reduction" : "Growth");
+  return (
+    <div className="relative">
+      {bloom && (
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            left: -60,
+            top: -20,
+            width: 360,
+            height: 360,
+            background:
+              "radial-gradient(circle, color-mix(in oklab, var(--slide-accent-text) 32%, transparent) 0%, color-mix(in oklab, var(--slide-accent-text) 10%, transparent) 45%, transparent 75%)",
+            pointerEvents: "none",
+            zIndex: 0,
+          }}
+        />
+      )}
+      <div className="relative" style={{ zIndex: 1 }}>
+        <Kicker brand={brand} color={negative ? "#E53D2E" : undefined}>{meta}</Kicker>
+        <div
+          className="mt-6 tabular-nums"
+          style={{
+            fontSize: bloom ? 132 : 108,
+            fontWeight: 600,
+            color: ink.strong,
+            letterSpacing: "-0.04em",
+            lineHeight: 0.9,
+          }}
+        >
+          {delta || s(item.value)}
+        </div>
+        <div
+          className="mt-6"
+          style={{ fontSize: 22, color: ink.muted, lineHeight: 1.4, letterSpacing: "-0.005em", maxWidth: 520 }}
+        >
+          {s(item.label)}
+        </div>
+        {toNums(item.series).length > 0 && (
+          <div className="mt-8"><Sparkline brand={brand} values={toNums(item.series)} h={72} /></div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
+
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
   const p = Math.max(0, Math.min(100, percent));
