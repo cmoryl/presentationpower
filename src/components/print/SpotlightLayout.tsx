@@ -278,6 +278,7 @@ export function SpotlightLayout({
                       fontSize: cq(12.5),
                       lineHeight: 1.6,
                       color: ink,
+                      ...clampLines(6),
                     }}
                   >
                     {content.quote.text}
