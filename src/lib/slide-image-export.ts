@@ -296,20 +296,24 @@ async function waitForImages(node: HTMLElement, timeoutMs: number): Promise<void
   );
 }
 
+export interface CaptureSlideOptions {
+  /** Device pixel ratio multiplier (1× = faster, 2× = retina). Defaults to 2. */
+  pixelRatio?: number;
+  backgroundColor?: string;
+  onProgress?: ExportProgressCallback;
+}
+
 /**
  * Minimal reusable capture helper. Awaits `document.fonts.ready`, then
  * `img.decode()` on every descendant <img> (falling back to load events for
- * browsers without decode), and rasterizes the node to a PNG data URL at
- * `pixelRatio` 2. Use this when you just need a snapshot and don't need the
- * full progress/backdrop/CORS pipeline of `captureSlideAsDataUrl`.
+ * browsers without decode), and rasterizes the node to a PNG data URL at the
+ * requested `pixelRatio` (default 2×). Use this when you just need a snapshot
+ * and don't need the full progress/backdrop/CORS pipeline of
+ * `captureSlideAsDataUrl`.
  */
 export async function captureSlide(
   node: HTMLElement,
-  opts: {
-    pixelRatio?: number;
-    backgroundColor?: string;
-    onProgress?: ExportProgressCallback;
-  } = {},
+  opts: CaptureSlideOptions = {},
 ): Promise<string> {
   if (!node) throw new Error("captureSlide: node is required");
   const { onProgress } = opts;
