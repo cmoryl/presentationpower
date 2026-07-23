@@ -418,6 +418,7 @@ export function WorldMap({
   ariaLabel = "Global locations map",
   metric,
   metricId,
+  scaleMode = "absolute",
 }: WorldMapProps) {
 
   const isDark = mode === "dark";
