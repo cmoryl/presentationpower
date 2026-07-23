@@ -149,7 +149,15 @@ function AssetEditor() {
   if (loading) return <AppShell><div className="p-10 text-sm text-black/60">Loading…</div></AppShell>;
   if (!row) return <AppShell><div className="p-10 text-sm text-red-600">Print asset not found.</div></AppShell>;
 
-  const content: CaseStudyContent = { ...emptyCaseStudy(), ...(row.content as CaseStudyContent) };
+  const kind = (row.kind ?? "case-study") as "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
+  const rawContent: Record<string, unknown> = (() => {
+    const c = (row.content as Record<string, unknown>) ?? {};
+    if (kind === "spotlight") return { ...(emptySpotlight() as unknown as Record<string, unknown>), ...c };
+    if (kind === "ebrochure") return { ...(emptyEBrochure() as unknown as Record<string, unknown>), ...c };
+    if (kind === "adaptor-brief") return { ...(emptyAdaptorBrief() as unknown as Record<string, unknown>), ...c };
+    return { ...(emptyCaseStudy() as unknown as Record<string, unknown>), ...c };
+  })();
+  const content: CaseStudyContent = rawContent as unknown as CaseStudyContent;
   const ctx: PrintAssetContext = (row.context as PrintAssetContext) ?? {};
 
   function pushHistory() {
