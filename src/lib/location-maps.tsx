@@ -579,7 +579,7 @@ export function WorldMap({
         {visiblePins.map((p) => {
           const { x, y } = projectLatLon(p.lat, p.lon);
           const baseR = p.role === "HQ" ? 26 : p.role === "hub" ? 20 : 14;
-          const t = activeMetricId ? scaleFor(p.values?.[activeMetricId]) : null;
+          const t = activeMetricId ? scaleFor(p.id) : null;
           const r = t == null ? baseR : 14 + t * 22;
           return <circle key={`g-${p.id}`} cx={x} cy={y} r={r} fill={glow} opacity={t == null ? 1 : 0.5 + t * 0.5} />;
         })}
