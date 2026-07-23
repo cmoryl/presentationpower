@@ -33,6 +33,7 @@ import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
 import { Route as KnowledgeAskRouteImport } from './routes/knowledge.ask'
 import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
 import { Route as DevChartPreviewRouteImport } from './routes/dev.chart-preview'
+import { Route as DevAuroraRouteImport } from './routes/dev.aurora'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
@@ -179,6 +180,11 @@ const KnowledgeEntryIdRoute = KnowledgeEntryIdRouteImport.update({
 const DevChartPreviewRoute = DevChartPreviewRouteImport.update({
   id: '/dev/chart-preview',
   path: '/dev/chart-preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevAuroraRoute = DevAuroraRouteImport.update({
+  id: '/dev/aurora',
+  path: '/dev/aurora',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DecksImportRoute = DecksImportRouteImport.update({
@@ -351,6 +357,7 @@ export interface FileRoutesByFullPath {
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
+  '/dev/aurora': typeof DevAuroraRoute
   '/dev/chart-preview': typeof DevChartPreviewRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
@@ -402,6 +409,7 @@ export interface FileRoutesByTo {
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
+  '/dev/aurora': typeof DevAuroraRoute
   '/dev/chart-preview': typeof DevChartPreviewRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
@@ -456,6 +464,7 @@ export interface FileRoutesById {
   '/api/chat': typeof ApiChatRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
+  '/dev/aurora': typeof DevAuroraRoute
   '/dev/chart-preview': typeof DevChartPreviewRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
@@ -511,6 +520,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/brief/new'
     | '/decks/import'
+    | '/dev/aurora'
     | '/dev/chart-preview'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
@@ -562,6 +572,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/brief/new'
     | '/decks/import'
+    | '/dev/aurora'
     | '/dev/chart-preview'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
@@ -615,6 +626,7 @@ export interface FileRouteTypes {
     | '/api/chat'
     | '/brief/new'
     | '/decks/import'
+    | '/dev/aurora'
     | '/dev/chart-preview'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
@@ -654,6 +666,7 @@ export interface RootRouteChildren {
   ApiChatRoute: typeof ApiChatRoute
   BriefNewRoute: typeof BriefNewRoute
   DecksImportRoute: typeof DecksImportRoute
+  DevAuroraRoute: typeof DevAuroraRoute
   DevChartPreviewRoute: typeof DevChartPreviewRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
   LibraryMyRoute: typeof LibraryMyRoute
@@ -837,6 +850,13 @@ declare module '@tanstack/react-router' {
       path: '/dev/chart-preview'
       fullPath: '/dev/chart-preview'
       preLoaderRoute: typeof DevChartPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/aurora': {
+      id: '/dev/aurora'
+      path: '/dev/aurora'
+      fullPath: '/dev/aurora'
+      preLoaderRoute: typeof DevAuroraRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/decks/import': {
@@ -1111,6 +1131,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiChatRoute: ApiChatRoute,
   BriefNewRoute: BriefNewRoute,
   DecksImportRoute: DecksImportRoute,
+  DevAuroraRoute: DevAuroraRoute,
   DevChartPreviewRoute: DevChartPreviewRoute,
   LibraryImportedRoute: LibraryImportedRoute,
   LibraryMyRoute: LibraryMyRoute,
