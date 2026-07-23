@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, ExternalLink, Send, Image as ImageIcon, FileText, ChevronRight, X, Check, Wrench, Upload, RefreshCw } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { FaithfulSlideCanvas } from "@/components/slide/FaithfulSlideCanvas";
 import { AssetInspectorPanel } from "@/components/AssetInspectorPanel";
