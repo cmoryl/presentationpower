@@ -37,6 +37,7 @@ export type CaseStudyBlock = {
 
 export type CaseStudyContent = {
   eyebrow?: string;                     // e.g. "Case study"
+  logoColor?: PrintLogoColor;           // header lockup override (auto|black|white)
   client: string;                       // prospect / customer name
   industry?: string;
   audience?: string;
@@ -73,6 +74,7 @@ export type CaseStudyContent = {
 // value-prop → capabilities → proof.
 export type SpotlightContent = {
   eyebrow?: string;                     // e.g. "Product spotlight"
+  logoColor?: PrintLogoColor;           // header lockup override (auto|black|white)
   productName: string;                  // hero name of the product / service
   tagline: string;                      // one-line positioning
   summary?: string;                     // 1–2 sentence value proposition
@@ -97,6 +99,7 @@ export type EBrochureSection = CaseStudyBlock & { bullets: string[] };
 
 export type EBrochureContent = {
   eyebrow?: string;            // e.g. "eBrochure"
+  logoColor?: PrintLogoColor;  // header lockup override (auto|black|white)
   title: string;               // hero H1
   summary?: string;            // 1–2 sentence subhead
   sections: EBrochureSection[]; // exactly 3 — Challenge / Approach / Impact
@@ -118,6 +121,7 @@ export type AdaptorFeature = {
 
 export type AdaptorBriefContent = {
   eyebrow?: string;            // e.g. "Adaptor brief"
+  logoColor?: PrintLogoColor;  // header lockup override (auto|black|white)
   title: string;               // hero H1
   summary?: string;            // hero subhead
   features: AdaptorFeature[];  // exactly 6
