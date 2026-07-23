@@ -128,7 +128,7 @@ export const listDivisionImagery = createServerFn({ method: "GET" })
     let q = s
       .from("division_imagery")
       .select(
-        "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, prompt, uploaded_by, approved, approved_by, approved_at, created_at, updated_at",
+        "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, prompt, uploaded_by, approved, approved_by, approved_at, collection, template_kinds, is_default_for, created_at, updated_at",
       )
       .eq("division_id", data.divisionId)
       .order("created_at", { ascending: false })
