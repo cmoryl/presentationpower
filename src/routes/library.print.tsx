@@ -342,6 +342,11 @@ function PrintCenterPage() {
         </div>
       </section>
 
+      {/* Approved shelf */}
+      {isAuthed === true && previewBrand ? (
+        <ApprovedShelf brand={previewBrand} />
+      ) : null}
+
       {/* My print assets */}
       <section className="mt-14">
         <div className="mb-4 flex items-end justify-between gap-4">
