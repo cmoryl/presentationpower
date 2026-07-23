@@ -60,33 +60,30 @@ describe("print capacity model — viewport invariance", () => {
   const fixtures: { name: string; content: CaseStudyContent; expected: "ok" | "warn" | "block" }[] = [
     { name: "empty",       content: emptyCaseStudy(), expected: "ok" },
     {
-      name: "single-stats-3",
-      content: withModules(emptyCaseStudy(), [stats("stats-row-3", 3)]),
+      name: "single-kpi-dashboard",
+      content: withModules(emptyCaseStudy(), [stats("kpi-dashboard-portrait", 3)]),
       expected: "ok",
     },
     {
-      name: "two-stats-rows",
+      name: "two-kpi-modules",
       content: withModules(emptyCaseStudy(), [
-        stats("stats-row-3", 3),
-        stats("stats-row-3", 3),
+        stats("kpi-dashboard-portrait", 3),
+        stats("stat-callout-row-portrait", 3),
       ]),
       expected: "ok",
     },
     {
       name: "over-budget",
       content: withModules(emptyCaseStudy(), [
-        stats("stats-row-3", 3),
-        stats("stats-row-3", 3),
-        stats("stats-row-3", 3),
-        stats("stats-row-3", 3),
-        stats("stats-row-3", 3),
-        stats("stats-row-3", 3),
+        stats("kpi-dashboard-portrait", 3),
+        stats("kpi-dashboard-portrait", 3),
+        stats("stat-bento-portrait", 3),
       ]),
       expected: "block",
     },
     {
       name: "over-item-cap",
-      content: withModules(emptyCaseStudy(), [stats("stats-row-3", 8)]),
+      content: withModules(emptyCaseStudy(), [stats("kpi-dashboard-portrait", 8)]),
       expected: "block",
     },
   ];
@@ -94,7 +91,6 @@ describe("print capacity model — viewport invariance", () => {
   for (const fx of fixtures) {
     it(`${fx.name} reports "${fx.expected}" at every breakpoint`, () => {
       const reports = BREAKPOINTS.map((w) => analyzeAtViewport(w, fx.content));
-      // Every report is byte-identical to the first.
       const first = JSON.stringify(reports[0]);
       for (const r of reports) {
         expect(JSON.stringify(r)).toBe(first);
@@ -104,30 +100,25 @@ describe("print capacity model — viewport invariance", () => {
   }
 
   it("canAddModule gate is stable across viewports for a near-full asset", () => {
-    // Fill to just under budget for case-study (5.5 pu).
     const near = withModules(emptyCaseStudy(), [
-      stats("stats-row-3", 3),
-      stats("stats-row-3", 3),
-      stats("stats-row-3", 3),
-      stats("stats-row-3", 3),
+      stats("kpi-dashboard-portrait", 3),
+      stats("stat-callout-row-portrait", 3),
     ]);
     const decisions = BREAKPOINTS.map((w) => {
       void w;
       return canAddModule("case-study", near, "stats");
     });
-    // All decisions identical.
     const first = decisions[0];
     for (const d of decisions) {
-      expect(d.allow).toBe(first.allow);
+      expect(d.ok).toBe(first.ok);
+      expect(d.remaining).toBeCloseTo(first.remaining, 5);
     }
   });
 
   it("text truncation limits are viewport-agnostic (long summary triggers warn/block regardless of width)", () => {
     const longSummary = "x".repeat(400);
-    const content: CaseStudyContent = {
-      ...emptyCaseStudy(),
-      summary: longSummary,
-    };
+    const base = emptyCaseStudy();
+    const content: CaseStudyContent = { ...base, summary: longSummary };
     const levels = BREAKPOINTS.map((w) => analyzeAtViewport(w, content).level);
     // Same verdict everywhere.
     expect(new Set(levels).size).toBe(1);
