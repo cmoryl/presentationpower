@@ -144,6 +144,7 @@ function VectorToggle() {
       <button type="button" onClick={() => set(false)} className={pill(!on)} title="Raster · flatten SVG to PNG · maximum compatibility (older PowerPoint, Google Slides)">Raster</button>
     </div>
   );
+}
 
 
 
