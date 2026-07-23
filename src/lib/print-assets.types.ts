@@ -1,6 +1,28 @@
 // Typed content payloads for print assets. Shared between server functions and
 // the editor UI so the shape stays honest end-to-end.
 
+// Per-template override for the header brand lockup color. `auto` (default)
+// lets the layout pick a color based on the hero's luminance; `black` and
+// `white` force a single-color mark from the template content.
+export type PrintLogoColor = "auto" | "black" | "white";
+
+export const PRINT_LOGO_INK: Record<Exclude<PrintLogoColor, "auto">, string> = {
+  black: "#03002C",
+  white: "#FFFFFF",
+};
+
+/** Resolve a `PrintLogoColor` override against the auto ink the layout would
+ *  otherwise use. Layouts pass in the color they'd default to (white for
+ *  dark heroes, navy for light heroes); an explicit override wins. */
+export function resolvePrintLogoInk(
+  override: PrintLogoColor | undefined,
+  autoInk: string,
+): string {
+  if (!override || override === "auto") return autoInk;
+  return PRINT_LOGO_INK[override];
+}
+
+
 export type CaseStudyStat = {
   label: string;
   value: string;
@@ -15,6 +37,7 @@ export type CaseStudyBlock = {
 
 export type CaseStudyContent = {
   eyebrow?: string;                     // e.g. "Case study"
+  logoColor?: PrintLogoColor;           // header lockup override (auto|black|white)
   client: string;                       // prospect / customer name
   industry?: string;
   audience?: string;
@@ -51,6 +74,7 @@ export type CaseStudyContent = {
 // value-prop → capabilities → proof.
 export type SpotlightContent = {
   eyebrow?: string;                     // e.g. "Product spotlight"
+  logoColor?: PrintLogoColor;           // header lockup override (auto|black|white)
   productName: string;                  // hero name of the product / service
   tagline: string;                      // one-line positioning
   summary?: string;                     // 1–2 sentence value proposition
@@ -75,6 +99,7 @@ export type EBrochureSection = CaseStudyBlock & { bullets: string[] };
 
 export type EBrochureContent = {
   eyebrow?: string;            // e.g. "eBrochure"
+  logoColor?: PrintLogoColor;  // header lockup override (auto|black|white)
   title: string;               // hero H1
   summary?: string;            // 1–2 sentence subhead
   sections: EBrochureSection[]; // exactly 3 — Challenge / Approach / Impact
@@ -96,6 +121,7 @@ export type AdaptorFeature = {
 
 export type AdaptorBriefContent = {
   eyebrow?: string;            // e.g. "Adaptor brief"
+  logoColor?: PrintLogoColor;  // header lockup override (auto|black|white)
   title: string;               // hero H1
   summary?: string;            // hero subhead
   features: AdaptorFeature[];  // exactly 6

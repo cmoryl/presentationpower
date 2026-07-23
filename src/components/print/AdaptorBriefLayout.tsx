@@ -5,6 +5,7 @@ import type {
   PrintDensity,
   PrintPageSize,
 } from "@/lib/print-assets.types";
+import { resolvePrintLogoInk } from "@/lib/print-assets.types";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
@@ -185,7 +186,7 @@ export function AdaptorBriefLayout({
                 <div style={{ fontSize: cq(10), fontWeight: 600, letterSpacing: "0.14em", color: accent }}>
                   {(content.eyebrow ?? "ADAPTOR BRIEF").toUpperCase()}
                 </div>
-                <BrandLockup brand={brand} color={heroInk} size="xs" orientation="horizontal" />
+                <BrandLockup brand={brand} color={resolvePrintLogoInk(content.logoColor, heroInk)} size="xs" orientation="horizontal" />
               </div>
               <h1 ref={heroRef} style={{
                 margin: `${cq(12)} 0 0`, fontWeight: 700, fontSize: cq(37),

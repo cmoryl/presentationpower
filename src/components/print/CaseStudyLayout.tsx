@@ -5,6 +5,7 @@ import type {
   PrintDensity,
   PrintPageSize,
 } from "@/lib/print-assets.types";
+import { resolvePrintLogoInk } from "@/lib/print-assets.types";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
@@ -171,7 +172,7 @@ export function CaseStudyLayout({
               <div style={{ fontSize: cq(9.5), fontWeight: 600, letterSpacing: "0.14em", color: "#FFFFFF" }}>
                 {(content.eyebrow ?? "CLIENT CASE STUDY").toUpperCase()}
               </div>
-              <BrandLockup brand={brand} color="#FFFFFF" size="xs" orientation="horizontal" />
+              <BrandLockup brand={brand} color={resolvePrintLogoInk(content.logoColor, "#FFFFFF")} size="xs" orientation="horizontal" />
             </div>
             <h1
               ref={heroRef}

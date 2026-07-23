@@ -5,6 +5,7 @@ import type {
   PrintDensity,
   PrintPageSize,
 } from "@/lib/print-assets.types";
+import { resolvePrintLogoInk } from "@/lib/print-assets.types";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
@@ -202,7 +203,7 @@ export function EBrochureLayout({
               <div style={{ fontSize: cq(9.5), fontWeight: 600, letterSpacing: "0.14em", color: accentInk }}>
                 {(content.eyebrow ?? "EBROCHURE").toUpperCase()}
               </div>
-              <BrandLockup brand={brand} color={ink} size="xs" orientation="horizontal" />
+              <BrandLockup brand={brand} color={resolvePrintLogoInk(content.logoColor, ink)} size="xs" orientation="horizontal" />
             </div>
 
             {/* HERO — title + summary */}

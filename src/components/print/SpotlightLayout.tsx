@@ -5,6 +5,7 @@ import type {
   PrintDensity,
   PrintPageSize,
 } from "@/lib/print-assets.types";
+import { resolvePrintLogoInk } from "@/lib/print-assets.types";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
@@ -310,7 +311,7 @@ export function SpotlightLayout({
               >
                 {(content.eyebrow ?? "Client spotlight").toUpperCase()}
               </div>
-              <BrandLockup brand={brand} color={ink} size="xs" orientation="horizontal" />
+              <BrandLockup brand={brand} color={resolvePrintLogoInk(content.logoColor, ink)} size="xs" orientation="horizontal" />
             </div>
 
             {/* ============================================================ */}
