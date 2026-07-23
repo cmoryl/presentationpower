@@ -4,7 +4,9 @@ import {
   exportPrintAssetAsPdf,
   type PrintPageSizeKey,
   type PrintExportQuality,
+  type PrintExportFormat,
 } from "@/lib/print-asset-export";
+import { X4_ICC_PROFILES, type IccProfileKey } from "@/lib/pdf-x4";
 import { useServerFn } from "@tanstack/react-start";
 
 import { AppShell } from "@/components/AppShell";
@@ -71,6 +73,8 @@ function AssetEditor() {
   const [cropMarks, setCropMarks] = useState(true);
   const [exportMode, setExportMode] = useState<"light" | "dark">("light");
   const [exportQuality, setExportQuality] = useState<PrintExportQuality>("300dpi");
+  const [exportFormat, setExportFormat] = useState<PrintExportFormat>("digital");
+  const [iccProfile, setIccProfile] = useState<IccProfileKey>("GRACoL2013_CRPC6");
 
 
   useEffect(() => {
@@ -182,6 +186,12 @@ function AssetEditor() {
     setExportBusy(true);
     try {
       const safeTitle = (row?.title ?? "print-asset").replace(/[^a-z0-9-_]+/gi, "-").toLowerCase();
+      const suffix =
+        exportFormat === "digital"
+          ? "digital"
+          : exportFormat === "press-x4"
+            ? `pressX4-${exportQuality}`
+            : `press-${exportQuality}`;
       await exportPrintAssetAsPdf(canvasRef.current, {
         pageSize: exportSize,
         custom: exportSize === "Custom" ? { widthIn: customW, heightIn: customH } : undefined,
@@ -189,7 +199,9 @@ function AssetEditor() {
         cropMarks,
         mode: exportMode,
         quality: exportQuality,
-        filename: `${safeTitle}-${exportSize.toLowerCase()}-${exportQuality}.pdf`,
+        format: exportFormat,
+        iccProfile: exportFormat === "press-x4" ? iccProfile : undefined,
+        filename: `${safeTitle}-${exportSize.toLowerCase()}-${suffix}.pdf`,
         onQualityClamp: (info) => {
           alert(
             `Requested ${info.requestedDpi} DPI exceeded the browser canvas ceiling ` +
@@ -198,6 +210,7 @@ function AssetEditor() {
         },
       });
       setExportOpen(false);
+
 
     } catch (e) {
       alert(`Export failed: ${(e as Error).message}`);
@@ -275,8 +288,43 @@ function AssetEditor() {
                 <FileDown size={12} /> Export PDF
               </button>
               {exportOpen && (
-                <div className="absolute right-0 top-10 z-50 w-80 rounded-2xl border border-black/10 bg-white p-4 text-xs shadow-xl dark:border-white/10 dark:bg-[#0B0A2A]">
-                  <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-black/60 dark:text-white/60">PDF export</div>
+                <div className="absolute right-0 top-10 z-50 w-[22rem] rounded-2xl border border-black/10 bg-white p-4 text-xs shadow-xl dark:border-white/10 dark:bg-[#0B0A2A]">
+                  <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-black/60 dark:text-white/60">PDF export</div>
+
+                  {/* Format — the top-level distinction. Digital vs Press must
+                      be an explicit choice; a user should never accidentally
+                      email a 100 MB press file or send a 150 DPI file to a
+                      printer. */}
+                  <div className="mb-3 rounded-xl border border-black/10 p-2 dark:border-white/10">
+                    <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50 dark:text-white/50">Output for</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setExportFormat("digital")}
+                        className={`rounded-lg border px-2 py-2 text-left text-[11px] transition ${
+                          exportFormat === "digital"
+                            ? "border-[#003FC7] bg-[#003FC7]/5 text-[#03002C] dark:border-[#A1FBF9] dark:bg-[#A1FBF9]/10 dark:text-white"
+                            : "border-black/10 text-black/60 hover:border-black/30 dark:border-white/10 dark:text-white/60"
+                        }`}
+                      >
+                        <div className="font-semibold">Digital PDF</div>
+                        <div className="mt-0.5 leading-snug text-[10px] opacity-75">Screen / email · 150 DPI · small file</div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setExportFormat("press-x4")}
+                        className={`rounded-lg border px-2 py-2 text-left text-[11px] transition ${
+                          exportFormat === "press-x4"
+                            ? "border-[#003FC7] bg-[#003FC7]/5 text-[#03002C] dark:border-[#A1FBF9] dark:bg-[#A1FBF9]/10 dark:text-white"
+                            : "border-black/10 text-black/60 hover:border-black/30 dark:border-white/10 dark:text-white/60"
+                        }`}
+                      >
+                        <div className="font-semibold">Press PDF · X-4</div>
+                        <div className="mt-0.5 leading-snug text-[10px] opacity-75">Printer-ready · bleed · large file</div>
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
                     <label className="flex items-center justify-between gap-3">
                       <span className="text-black/60 dark:text-white/60">Page size</span>
@@ -320,27 +368,6 @@ function AssetEditor() {
                       </div>
                     )}
                     <label className="flex items-center justify-between gap-3">
-                      <span className="text-black/60 dark:text-white/60">Bleed</span>
-                      <select
-                        value={bleedIn}
-                        onChange={(e) => setBleedIn(parseFloat(e.target.value))}
-                        className={inspectorInput}
-                      >
-                        <option value={0}>None</option>
-                        <option value={0.125}>0.125 in (3 mm)</option>
-                        <option value={0.25}>0.25 in (6 mm)</option>
-                      </select>
-                    </label>
-                    <label className="flex items-center justify-between gap-3">
-                      <span className="text-black/60 dark:text-white/60">Crop marks</span>
-                      <input
-                        type="checkbox"
-                        checked={cropMarks}
-                        onChange={(e) => setCropMarks(e.target.checked)}
-                        disabled={bleedIn === 0}
-                      />
-                    </label>
-                    <label className="flex items-center justify-between gap-3">
                       <span className="text-black/60 dark:text-white/60">Mode</span>
                       <select
                         value={exportMode}
@@ -351,18 +378,59 @@ function AssetEditor() {
                         <option value="dark">Dark</option>
                       </select>
                     </label>
-                    <label className="flex items-center justify-between gap-3">
-                      <span className="text-black/60 dark:text-white/60">Quality</span>
-                      <select
-                        value={exportQuality}
-                        onChange={(e) => setExportQuality(e.target.value as PrintExportQuality)}
-                        className={inspectorInput}
-                      >
-                        <option value="300dpi">300 DPI · print standard</option>
-                        <option value="600dpi">600 DPI · archival</option>
-                      </select>
-                    </label>
+
+                    {/* Press-only options. Digital enforces no-bleed / no-marks
+                        / 150 DPI / no ICC by construction. */}
+                    {exportFormat === "press-x4" && (
+                      <>
+                        <label className="flex items-center justify-between gap-3">
+                          <span className="text-black/60 dark:text-white/60">Bleed</span>
+                          <select
+                            value={bleedIn}
+                            onChange={(e) => setBleedIn(parseFloat(e.target.value))}
+                            className={inspectorInput}
+                          >
+                            <option value={0}>None</option>
+                            <option value={0.125}>0.125 in (3 mm)</option>
+                            <option value={0.25}>0.25 in (6 mm)</option>
+                          </select>
+                        </label>
+                        <label className="flex items-center justify-between gap-3">
+                          <span className="text-black/60 dark:text-white/60">Crop marks</span>
+                          <input
+                            type="checkbox"
+                            checked={cropMarks}
+                            onChange={(e) => setCropMarks(e.target.checked)}
+                            disabled={bleedIn === 0}
+                          />
+                        </label>
+                        <label className="flex items-center justify-between gap-3">
+                          <span className="text-black/60 dark:text-white/60">Quality</span>
+                          <select
+                            value={exportQuality}
+                            onChange={(e) => setExportQuality(e.target.value as PrintExportQuality)}
+                            className={inspectorInput}
+                          >
+                            <option value="300dpi">300 DPI · print standard</option>
+                            <option value="600dpi">600 DPI · premium</option>
+                          </select>
+                        </label>
+                        <label className="flex items-center justify-between gap-3">
+                          <span className="text-black/60 dark:text-white/60">ICC profile</span>
+                          <select
+                            value={iccProfile}
+                            onChange={(e) => setIccProfile(e.target.value as IccProfileKey)}
+                            className={inspectorInput}
+                          >
+                            {(Object.keys(X4_ICC_PROFILES) as IccProfileKey[]).map((k) => (
+                              <option key={k} value={k}>{X4_ICC_PROFILES[k].label}</option>
+                            ))}
+                          </select>
+                        </label>
+                      </>
+                    )}
                   </div>
+
                   <div className="mt-3 flex items-center justify-end gap-2">
                     <button
                       type="button"
