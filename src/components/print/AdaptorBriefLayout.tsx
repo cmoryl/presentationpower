@@ -246,7 +246,7 @@ export function AdaptorBriefLayout({
                 <div style={{ flex: 1 }}>
                   <p style={{
                     margin: `${cq(4)} 0 0`, fontSize: cq(16), lineHeight: 1.6,
-                    color: ink, fontWeight: 500,
+                    color: ink, fontWeight: 500, ...clampLines(5),
                   }}>{content.quote.text}</p>
                   <div style={{ marginTop: cq(8), fontSize: cq(11), fontWeight: 700, color: accentInk }}>
                     — {content.quote.author}{content.quote.company ? ` · ${content.quote.company}` : ""}
