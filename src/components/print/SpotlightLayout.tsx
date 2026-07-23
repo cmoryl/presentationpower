@@ -13,6 +13,7 @@ import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
 import { PrintHeroAura } from "@/components/print/PrintHeroAura";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
+import { autoHeroMedia } from "@/components/print/printHeroFallback";
 import { useTextFit } from "@/lib/text-fit";
 
 
@@ -314,11 +315,10 @@ export function SpotlightLayout({
               />
             </div>
           )}
-          {content.heroMedia ? (
-            <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
-          ) : mode === "light" ? (
-            <PrintHeroAura brand={brand} mode="light" accent={accent} primary={primary} seed={auroraSeed} aspect={auroraAspect(pageSize)} cq={cq} />
-          ) : null}
+          {(() => {
+            const media = content.heroMedia ?? autoHeroMedia(brand.id, auroraSeed, mode);
+            return <PrintHeroMediaLayer media={media} accent={accent} mode={mode} cq={cq} />;
+          })()}
 
           <div
             className="relative flex h-full flex-col"
