@@ -257,6 +257,7 @@ function AdminImageryPage() {
             <ImageCard
               key={r.id}
               row={r}
+              stats={statsByImage[r.id]}
               onApprove={(next) => approveMut.mutate({ id: r.id, approved: next })}
               onTags={(tags) => tagsMut.mutate({ id: r.id, tags })}
               onKind={(kind) => kindMut.mutate({ id: r.id, kind })}
