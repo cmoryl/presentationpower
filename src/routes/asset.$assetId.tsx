@@ -707,6 +707,9 @@ function HeroMediaPanel({
   const overlayOpacity = media.overlayOpacity ?? 0.55;
   const washStrength = media.washStrength ?? 1;
   const heightPct = media.heightPct ?? 46;
+  const focalX = media.focalX ?? 50;
+  const focalY = media.focalY ?? 40;
+  const aspect = media.aspect ?? "fill";
 
   function patch(p: Partial<PrintHeroMedia>) {
     onChange({ ...media, ...p });
