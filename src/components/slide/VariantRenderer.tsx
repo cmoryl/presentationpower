@@ -4317,10 +4317,10 @@ function renderVariantBody({
                 <div key={i} className="flex flex-col items-center justify-end" style={{ position: "relative" }}>
                   <div
                     className="tabular-nums"
-                    style={{ fontSize: 56, fontWeight: 600, color: ink.strong, letterSpacing: "-0.025em", lineHeight: 1 }}
+                    style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.025em", lineHeight: 1 }}
                   >
                     {s(it.value)}
-                    <span style={{ fontSize: 28, color: "var(--slide-accent-text)", marginLeft: 4 }}>
+                    <span style={{ fontSize: 22, color: "var(--slide-accent-text)", marginLeft: 4 }}>
                       {s(it.unit)}
                     </span>
                   </div>
