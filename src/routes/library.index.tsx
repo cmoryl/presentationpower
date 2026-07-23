@@ -1617,148 +1617,166 @@ function VariantDetailModal({
               className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#003FC7]/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white"
               title="Save this variant + content as a reusable module"
             >
-              <Star size={12} /> Save as module
+              <Star size={12} /> Save
             </button>
-            <button
-              type="button"
-              onClick={() => downloadPptx("light")}
-              disabled={downloading}
-              className="inline-flex items-center gap-1.5 rounded-full border border-black/20 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
-              title="Download this module as a light-mode single-slide .pptx (matches the light preview exactly, includes division backdrop + logo)"
-            >
-              {downloading ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
-              Light .pptx
-            </button>
-            <button
-              type="button"
-              onClick={() => downloadPptx("dark")}
-              disabled={downloading}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C] bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#003FC7] disabled:opacity-60"
-              title="Download this module as a dark-mode single-slide .pptx (matches the dark preview exactly, includes division backdrop + white logo)"
-            >
-              {downloading ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
-              Dark .pptx
-            </button>
-            <span className="mx-0.5 h-5 w-px bg-black/10" aria-hidden />
-            <ResolutionToggle value={pixelRatio} onChange={setPixelRatio} disabled={pdfBusy !== null} />
 
-            <button
-              type="button"
-              onClick={() => downloadImagePdf("light")}
-              disabled={pdfBusy !== null}
-              className="inline-flex items-center gap-1.5 rounded-full border border-black/20 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
-              title="Export a pixel-perfect image PDF of the light preview — best for client review copies (not editable in PowerPoint)"
-            >
-              {pdfBusy === "light" ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
-              {pdfBusy === "light" && pdfStage ? pdfStage : "Light PDF"}
-
-            </button>
-            <button
-              type="button"
-              onClick={() => downloadImagePdf("dark")}
-              disabled={pdfBusy !== null}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C] bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#003FC7] disabled:opacity-60"
-              title="Export a pixel-perfect image PDF of the dark preview — best for client review copies (not editable in PowerPoint)"
-            >
-              {pdfBusy === "dark" ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
-              {pdfBusy === "dark" && pdfStage ? pdfStage : "Dark PDF"}
-
-            </button>
-            <button
-              type="button"
-              onClick={downloadBothPdfs}
-              disabled={pdfBusy !== null || bothBusy}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] transition hover:bg-[#E0E8F5] disabled:opacity-60"
-              title="Export a combined image PDF with both Light and Dark theme pages"
-            >
-              {bothBusy ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
-              {bothBusy ? (pdfStage ?? "Both themes") : "Both themes PDF"}
-            </button>
-            <button
-              type="button"
-              onClick={openPdfPreview}
-              disabled={previewBusy || pdfBusy !== null || bothBusy}
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/40 bg-[#003FC7]/10 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white disabled:opacity-60"
-              title="Render Light and Dark PDFs and preview them side-by-side before downloading"
-            >
-              {previewBusy ? <Loader2 size={12} className="animate-spin" /> : <Eye size={12} />}
-              {previewBusy ? (previewStage ?? "Rendering…") : "Preview PDFs"}
-            </button>
-            <div className="relative inline-flex items-stretch overflow-visible rounded-full border border-[#03002C] bg-[#03002C] text-xs font-medium text-white">
+            {/* Unified Export menu — collapses PPTX / PDF / PNG / ZIP into one control */}
+            <div className="relative inline-flex items-stretch rounded-full border border-[#03002C] bg-[#03002C] text-xs font-medium text-white shadow-sm">
               <button
                 type="button"
                 onClick={downloadModuleZip}
                 disabled={zipBusy || previewBusy || pdfBusy !== null || bothBusy || downloading || zipSelectedCount === 0}
-                className="inline-flex items-center gap-1.5 rounded-l-full px-3 py-1.5 transition hover:bg-[#003FC7] disabled:opacity-60"
-                title={zipSelectedCount === 0 ? "Select at least one export in the menu" : `Download ZIP with ${zipSelectedCount} file${zipSelectedCount === 1 ? "" : "s"}`}
+                className="inline-flex items-center gap-1.5 rounded-l-full px-3.5 py-1.5 transition hover:bg-[#003FC7] disabled:opacity-60"
+                title={zipSelectedCount === 0 ? "Open the menu and pick at least one file to bundle" : `Download a ZIP with ${zipSelectedCount} file${zipSelectedCount === 1 ? "" : "s"}`}
               >
-                {zipBusy ? <Loader2 size={12} className="animate-spin" /> : <Package size={12} />}
-                {zipBusy ? (zipStage ?? "Bundling…") : `Download ZIP (${zipSelectedCount})`}
+                {zipBusy
+                  ? <Loader2 size={12} className="animate-spin" />
+                  : <Package size={12} />}
+                {zipBusy ? (zipStage ?? "Bundling…") : `Export ZIP · ${zipSelectedCount}`}
               </button>
               <button
                 type="button"
-                onClick={() => setZipMenuOpen((v) => !v)}
-                disabled={zipBusy}
+                onClick={() => setExportMenuOpen((v) => !v)}
                 aria-haspopup="menu"
-                aria-expanded={zipMenuOpen}
-                aria-label="Choose files to include in ZIP"
-                title="Choose files to include"
-                className="inline-flex items-center border-l border-white/20 rounded-r-full px-2 transition hover:bg-[#003FC7] disabled:opacity-60"
+                aria-expanded={exportMenuOpen}
+                aria-label="Open export options"
+                className="inline-flex items-center border-l border-white/25 rounded-r-full px-2 transition hover:bg-[#003FC7]"
               >
-                <svg className={`h-3 w-3 transition-transform ${zipMenuOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 9l6 6 6-6"/></svg>
+                <svg className={`h-3 w-3 transition-transform ${exportMenuOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 9l6 6 6-6"/></svg>
               </button>
-              {zipMenuOpen && (
+
+              {exportMenuOpen && (
                 <>
                   <button
                     type="button"
-                    aria-label="Close menu"
+                    aria-label="Close export menu"
                     className="fixed inset-0 z-40 cursor-default bg-transparent"
-                    onClick={() => setZipMenuOpen(false)}
+                    onClick={() => setExportMenuOpen(false)}
                   />
                   <div
                     role="menu"
-                    className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-black/10 bg-white p-3 text-[#03002C] shadow-xl ring-1 ring-black/5"
+                    className="absolute right-0 top-full z-50 mt-2 w-[22rem] rounded-2xl border border-black/10 bg-white p-4 text-[#03002C] shadow-2xl ring-1 ring-black/5"
                   >
-                    <div className="flex items-center justify-between pb-2">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">Include in ZIP</span>
-                      <div className="flex gap-1">
-                        <button
-                          type="button"
-                          onClick={() => setZipSelection({ pptxLight: true, pptxDark: true, pdfLight: true, pdfDark: true, pngLight: true, pngDark: true })}
-                          className="rounded-full px-2 py-0.5 text-[10px] font-medium text-[#003FC7] hover:bg-[#003FC7]/10"
-                        >All</button>
-                        <button
-                          type="button"
-                          onClick={() => setZipSelection({ pptxLight: false, pptxDark: false, pdfLight: false, pdfDark: false, pngLight: false, pngDark: false })}
-                          className="rounded-full px-2 py-0.5 text-[10px] font-medium text-black/60 hover:bg-black/5"
-                        >None</button>
-                      </div>
+                    {/* Resolution row */}
+                    <div className="flex items-center justify-between pb-3">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">Resolution</span>
+                      <ResolutionToggle value={pixelRatio} onChange={setPixelRatio} disabled={pdfBusy !== null || bothBusy || zipBusy} />
                     </div>
-                    {([
-                      { key: "pptxLight", label: "PPTX · Light" },
-                      { key: "pptxDark", label: "PPTX · Dark" },
-                      { key: "pdfLight", label: "PDF · Light" },
-                      { key: "pdfDark", label: "PDF · Dark" },
-                      { key: "pngLight", label: "PNG · Light" },
-                      { key: "pngDark", label: "PNG · Dark" },
-                    ] as { key: ZipItemKey; label: string }[]).map((item) => (
-                      <label key={item.key} className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium hover:bg-black/5">
-                        <input
-                          type="checkbox"
-                          checked={zipSelection[item.key]}
-                          onChange={(e) => setZipSelection((s) => ({ ...s, [item.key]: e.target.checked }))}
-                          className="h-3.5 w-3.5 accent-[#003FC7]"
-                        />
-                        {item.label}
-                      </label>
-                    ))}
-                    <p className="mt-2 border-t border-black/5 pt-2 text-[10px] text-black/50">
-                      Selection is saved for next time · {pixelRatio}× resolution
-                    </p>
+
+                    {/* Quick single-shot exports */}
+                    <div className="space-y-3 border-t border-black/5 pt-3">
+                      <div>
+                        <div className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-black/50">Editable · PPTX</div>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => downloadPptx("light")}
+                            disabled={downloading}
+                            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-black/15 bg-white px-2.5 py-1.5 text-xs font-medium hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
+                          >
+                            {downloading ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />} Light
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => downloadPptx("dark")}
+                            disabled={downloading}
+                            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#03002C] bg-[#03002C] px-2.5 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7] disabled:opacity-60"
+                          >
+                            {downloading ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />} Dark
+                          </button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-black/50">Pixel-perfect · PDF</div>
+                        <div className="grid grid-cols-3 gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => downloadImagePdf("light")}
+                            disabled={pdfBusy !== null}
+                            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-black/15 bg-white px-2 py-1.5 text-xs font-medium hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
+                          >
+                            {pdfBusy === "light" ? <Loader2 size={12} className="animate-spin" /> : null}
+                            {pdfBusy === "light" && pdfStage ? pdfStage : "Light"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => downloadImagePdf("dark")}
+                            disabled={pdfBusy !== null}
+                            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#03002C] bg-[#03002C] px-2 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7] disabled:opacity-60"
+                          >
+                            {pdfBusy === "dark" ? <Loader2 size={12} className="animate-spin" /> : null}
+                            {pdfBusy === "dark" && pdfStage ? pdfStage : "Dark"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={downloadBothPdfs}
+                            disabled={pdfBusy !== null || bothBusy}
+                            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#003FC7] bg-[#003FC7]/5 px-2 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#003FC7] hover:text-white disabled:opacity-60"
+                          >
+                            {bothBusy ? <Loader2 size={12} className="animate-spin" /> : null}
+                            {bothBusy ? "…" : "Both"}
+                          </button>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={openPdfPreview}
+                        disabled={previewBusy || pdfBusy !== null || bothBusy}
+                        className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-[#003FC7]/30 bg-[#003FC7]/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white disabled:opacity-60"
+                      >
+                        {previewBusy ? <Loader2 size={12} className="animate-spin" /> : <Eye size={12} />}
+                        {previewBusy ? (previewStage ?? "Rendering…") : "Preview Light & Dark PDFs"}
+                      </button>
+                    </div>
+
+                    {/* ZIP bundle selection */}
+                    <div className="mt-4 border-t border-black/5 pt-3">
+                      <div className="flex items-center justify-between pb-1.5">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">ZIP bundle</span>
+                        <div className="flex gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setZipSelection({ pptxLight: true, pptxDark: true, pdfLight: true, pdfDark: true, pngLight: true, pngDark: true })}
+                            className="rounded-full px-2 py-0.5 text-[10px] font-medium text-[#003FC7] hover:bg-[#003FC7]/10"
+                          >All</button>
+                          <button
+                            type="button"
+                            onClick={() => setZipSelection({ pptxLight: false, pptxDark: false, pdfLight: false, pdfDark: false, pngLight: false, pngDark: false })}
+                            className="rounded-full px-2 py-0.5 text-[10px] font-medium text-black/60 hover:bg-black/5"
+                          >None</button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-3">
+                        {([
+                          { key: "pptxLight", label: "PPTX · Light" },
+                          { key: "pptxDark", label: "PPTX · Dark" },
+                          { key: "pdfLight", label: "PDF · Light" },
+                          { key: "pdfDark", label: "PDF · Dark" },
+                          { key: "pngLight", label: "PNG · Light" },
+                          { key: "pngDark", label: "PNG · Dark" },
+                        ] as { key: ZipItemKey; label: string }[]).map((item) => (
+                          <label key={item.key} className="flex cursor-pointer items-center gap-2 rounded-lg px-1.5 py-1 text-xs font-medium hover:bg-black/5">
+                            <input
+                              type="checkbox"
+                              checked={zipSelection[item.key]}
+                              onChange={(e) => setZipSelection((s) => ({ ...s, [item.key]: e.target.checked }))}
+                              className="h-3.5 w-3.5 accent-[#003FC7]"
+                            />
+                            {item.label}
+                          </label>
+                        ))}
+                      </div>
+                      <p className="mt-2 border-t border-black/5 pt-2 text-[10px] text-black/50">
+                        Saved for next time · rendered at {pixelRatio}× · {zipSelectedCount} file{zipSelectedCount === 1 ? "" : "s"} selected
+                      </p>
+                    </div>
                   </div>
                 </>
               )}
             </div>
+
             {usageCount > 0 && (
               <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
                 Used · {usageCount}
@@ -1767,10 +1785,12 @@ function VariantDetailModal({
             <button
               onClick={onClose}
               className="rounded-full border border-black/15 px-3 py-1.5 text-sm hover:bg-black/5"
+              aria-label="Close"
             >
-              Close ✕
+              ✕
             </button>
           </div>
+
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
