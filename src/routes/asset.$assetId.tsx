@@ -60,6 +60,15 @@ function AssetEditor() {
   const [synthBusy, setSynthBusy] = useState(false);
   const [divisionStats, setDivisionStats] = useState<Array<{ label: string; value: string; unit: string | null }>>([]);
   const [divisionQuotes, setDivisionQuotes] = useState<Array<{ quote: string; author: string | null; role: string | null }>>([]);
+  const canvasRef = useRef<HTMLDivElement | null>(null);
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportBusy, setExportBusy] = useState(false);
+  const [exportSize, setExportSize] = useState<PrintPageSizeKey>("A4");
+  const [customW, setCustomW] = useState(8.5);
+  const [customH, setCustomH] = useState(11);
+  const [bleedIn, setBleedIn] = useState(0.125);
+  const [cropMarks, setCropMarks] = useState(true);
+  const [exportMode, setExportMode] = useState<"light" | "dark">("light");
 
   useEffect(() => {
     load({ data: { assetId } })
