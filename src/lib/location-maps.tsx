@@ -467,22 +467,57 @@ export function WorldMap({
 
   // ── Metric scale ────────────────────────────────────────────────────────
   const activeMetricId = metricId ?? metric?.id;
-  const metricStats = React.useMemo(() => {
+  const metricScale = React.useMemo(() => {
     if (!activeMetricId) return null;
-    const vals = visiblePins
-      .map((p) => p.values?.[activeMetricId])
-      .filter((v): v is number => Number.isFinite(v as number));
-    if (vals.length === 0) return null;
-    const min = Math.min(...vals);
-    const max = Math.max(...vals);
-    return { min, max, range: Math.max(1e-9, max - min) };
-  }, [visiblePins, activeMetricId]);
+    const entries = visiblePins
+      .map((p) => ({ pin: p, v: p.values?.[activeMetricId] }))
+      .filter((e): e is { pin: LocationPin; v: number } => Number.isFinite(e.v as number));
+    if (entries.length === 0) return null;
+
+    // Derive a per-pin "value" in the units the caller wants to display.
+    let displayed: { id: string; value: number }[];
+    if (scaleMode === "global-percent") {
+      const total = entries.reduce((s, e) => s + e.v, 0) || 1;
+      displayed = entries.map((e) => ({ id: e.pin.id, value: (e.v / total) * 100 }));
+    } else if (scaleMode === "region-percent") {
+      const regionTotals: Partial<Record<LocationPin["region"], number>> = {};
+      for (const e of entries) regionTotals[e.pin.region] = (regionTotals[e.pin.region] ?? 0) + e.v;
+      displayed = entries.map((e) => ({
+        id: e.pin.id,
+        value: (e.v / (regionTotals[e.pin.region] || 1)) * 100,
+      }));
+    } else {
+      displayed = entries.map((e) => ({ id: e.pin.id, value: e.v }));
+    }
+
+    const values = displayed.map((d) => d.value);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const byId = new Map(displayed.map((d) => [d.id, d.value]));
+    return { min, max, range: Math.max(1e-9, max - min), byId };
+  }, [visiblePins, activeMetricId, scaleMode]);
+
   const scaleFor = React.useCallback(
-    (v: number | undefined) => {
-      if (!metricStats || !Number.isFinite(v as number)) return null;
-      return Math.max(0, Math.min(1, ((v as number) - metricStats.min) / metricStats.range));
+    (pinId: string) => {
+      if (!metricScale) return null;
+      const v = metricScale.byId.get(pinId);
+      if (!Number.isFinite(v)) return null;
+      return Math.max(0, Math.min(1, ((v as number) - metricScale.min) / metricScale.range));
     },
-    [metricStats],
+    [metricScale],
+  );
+  const displayValueFor = React.useCallback(
+    (pinId: string) => metricScale?.byId.get(pinId),
+    [metricScale],
+  );
+  const isPercentMode = scaleMode !== "absolute";
+  const formatDisplay = React.useCallback(
+    (value: number | undefined) => {
+      if (!Number.isFinite(value as number)) return "—";
+      if (isPercentMode) return `${(value as number).toFixed(1)}%`;
+      return formatMetricValue(value, metric);
+    },
+    [isPercentMode, metric],
   );
 
 
