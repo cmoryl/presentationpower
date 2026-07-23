@@ -799,6 +799,7 @@ const HERO_TPLS: Array<{ id: HeroTplKind; label: string }> = [
 
 function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
   const listFn = useServerFn(listDivisionImagery);
+  const logFn = useServerFn(logImageryEvent);
   const [activeTpl, setActiveTpl] = useState<HeroTplKind | "all">("all");
   const [lightbox, setLightbox] = useState<DivisionImageryEntry | null>(null);
 
@@ -830,10 +831,22 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
     return rank(a) - rank(b);
   });
 
-  const copyUrl = async (url: string) => {
+  // Fire-and-forget analytics ping. Errors are silenced so a logging blip
+  // never blocks the user's actual action (open / copy / download).
+  const track = (r: DivisionImageryEntry, eventType: "view" | "use" | "download") => {
+    void logFn({ data: { imageId: r.id, brandId: brand.id, eventType } }).catch(() => {});
+  };
+
+  const openLightbox = (r: DivisionImageryEntry) => {
+    setLightbox(r);
+    track(r, "view");
+  };
+
+  const copyUrl = async (url: string, r: DivisionImageryEntry) => {
     try {
       await navigator.clipboard.writeText(url);
       toast.success("Image URL copied");
+      track(r, "use");
     } catch {
       toast.error("Copy failed");
     }
