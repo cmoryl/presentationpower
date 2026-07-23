@@ -35,7 +35,7 @@ import { PRINT_STATS_VARIANTS, PrintSectionRenderer } from "@/components/print/s
 import { PrintSectionPicker } from "@/components/print/sections/PrintSectionPicker";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
-import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical } from "lucide-react";
+import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2 } from "lucide-react";
 
 export const Route = createFileRoute("/asset/$assetId")({
   head: ({ params }) => ({
@@ -83,6 +83,35 @@ function AssetEditor() {
   const [iccProfile, setIccProfile] = useState<IccProfileKey>("GRACoL2013_CRPC6");
   const [pickerOpen, setPickerOpen] = useState(false);
 
+  // Undo/redo history for content + context snapshots.
+  const historyRef = useRef<{
+    undo: Array<{ content: unknown; context: unknown }>;
+    redo: Array<{ content: unknown; context: unknown }>;
+  }>({ undo: [], redo: [] });
+  const [, setHistoryTick] = useState(0);
+  const canUndo = historyRef.current.undo.length > 0;
+  const canRedo = historyRef.current.redo.length > 0;
+  const undoRef = useRef<() => void>(() => {});
+  const redoRef = useRef<() => void>(() => {});
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const meta = e.metaKey || e.ctrlKey;
+      if (!meta) return;
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) return;
+      const k = e.key.toLowerCase();
+      if (k === "z" && !e.shiftKey) { e.preventDefault(); undoRef.current(); }
+      else if ((k === "z" && e.shiftKey) || k === "y") { e.preventDefault(); redoRef.current(); }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+
+
+
 
   useEffect(() => {
     load({ data: { assetId } })
@@ -116,16 +145,47 @@ function AssetEditor() {
   const content: CaseStudyContent = { ...emptyCaseStudy(), ...(row.content as CaseStudyContent) };
   const ctx: PrintAssetContext = (row.context as PrintAssetContext) ?? {};
 
+  function pushHistory() {
+    if (!row) return;
+    historyRef.current.undo.push({ content: row.content, context: row.context });
+    if (historyRef.current.undo.length > 100) historyRef.current.undo.shift();
+    historyRef.current.redo = [];
+  }
   function patchContent(patch: Partial<CaseStudyContent>) {
     if (!row) return;
+    pushHistory();
     setRow({ ...row, content: { ...content, ...patch } as unknown as CaseStudyContent });
     setDirty(true);
+    setHistoryTick((t) => t + 1);
   }
   function patchCtx(patch: Partial<PrintAssetContext>) {
     if (!row) return;
+    pushHistory();
     setRow({ ...row, context: { ...ctx, ...patch } as unknown as PrintAssetContext });
     setDirty(true);
+    setHistoryTick((t) => t + 1);
   }
+  function undo() {
+    if (!row || historyRef.current.undo.length === 0) return;
+    const prev = historyRef.current.undo.pop()!;
+    historyRef.current.redo.push({ content: row.content, context: row.context });
+    setRow({ ...row, content: prev.content as CaseStudyContent, context: prev.context as PrintAssetContext });
+    setDirty(true);
+    setHistoryTick((t) => t + 1);
+  }
+  function redo() {
+    if (!row || historyRef.current.redo.length === 0) return;
+    const nxt = historyRef.current.redo.pop()!;
+    historyRef.current.undo.push({ content: row.content, context: row.context });
+    setRow({ ...row, content: nxt.content as CaseStudyContent, context: nxt.context as PrintAssetContext });
+    setDirty(true);
+    setHistoryTick((t) => t + 1);
+  }
+  undoRef.current = undo;
+  redoRef.current = redo;
+
+
+
   function updateStat(i: number, patch: Partial<CaseStudyStat>) {
     const next = [...content.stats];
     next[i] = { ...next[i], ...patch };
@@ -270,6 +330,29 @@ function AssetEditor() {
             {dirty && <span className="text-xs text-amber-600">Unsaved changes</span>}
           </div>
           <div className="flex items-center gap-2">
+            <div className="mr-1 flex items-center gap-0.5 rounded-full border border-black/10 bg-white p-0.5 dark:border-white/10 dark:bg-white/[0.03]">
+              <button
+                type="button"
+                onClick={undo}
+                disabled={!canUndo}
+                title="Undo (⌘/Ctrl+Z)"
+                aria-label="Undo"
+                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium text-[#03002C] hover:bg-black/5 disabled:opacity-30 dark:text-white dark:hover:bg-white/5"
+              >
+                <Undo2 size={12} /> Undo
+              </button>
+              <button
+                type="button"
+                onClick={redo}
+                disabled={!canRedo}
+                title="Redo (⌘/Ctrl+Shift+Z)"
+                aria-label="Redo"
+                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium text-[#03002C] hover:bg-black/5 disabled:opacity-30 dark:text-white dark:hover:bg-white/5"
+              >
+                <Redo2 size={12} /> Redo
+              </button>
+            </div>
+
             <button
               type="button"
               onClick={handleSynthesize}
