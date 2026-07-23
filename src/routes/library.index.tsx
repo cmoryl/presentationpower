@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
-import { Download, Loader2, Star, Copy, Check, Plus, Play, Eye } from "lucide-react";
+import { Download, Loader2, Star, Copy, Check, Plus, Play, Eye, Package } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
@@ -1179,6 +1179,8 @@ function VariantDetailModal({
   const [previewBusy, setPreviewBusy] = useState(false);
   const [previewStage, setPreviewStage] = useState<string | null>(null);
   const [previewUrls, setPreviewUrls] = useState<{ light: string; dark: string; filenameLight: string; filenameDark: string } | null>(null);
+  const [zipBusy, setZipBusy] = useState(false);
+  const [zipStage, setZipStage] = useState<string | null>(null);
 
   useEffect(() => {
     return () => {
@@ -1346,6 +1348,96 @@ function VariantDetailModal({
     }
   };
 
+  const downloadModuleZip = async () => {
+    if (zipBusy || pdfBusy || bothBusy || previewBusy || downloading) return;
+    setZipBusy(true);
+    setZipStage("Starting…");
+    try {
+      const findNode = (m: "light" | "dark") => document.querySelector<HTMLElement>(
+        `[data-modal-preview="${m}"][data-variant-id="${variant.id}"]`,
+      );
+      const lightNode = findNode("light");
+      const darkNode = findNode("dark");
+      if (!lightNode || !darkNode) throw new Error("Preview nodes not found");
+
+      const buildDeck = (exportMode: "light" | "dark") => ({
+        id: `library-${variant.id}-${Date.now()}-${exportMode}`,
+        createdAt: new Date().toISOString(),
+        title: `${variant.name} — ${brand.name} (${exportMode})`,
+        briefId: "library-preview",
+        brandModeId: brand.id,
+        archetypeId: "single-module",
+        slides: [{
+          id: `slide-${variant.id}`,
+          position: 0,
+          sectionId: sections[0]?.id ?? "",
+          variantId: variant.id,
+          layoutId: variant.permittedLayoutIds[0],
+          content: detailContent,
+          changes: [],
+        }],
+      }) as Parameters<typeof exportDeckToPptx>[0];
+
+      setZipStage("Building light PPTX…");
+      const lightPptx = await exportDeckToPptx(buildDeck("light"), brand, { forceMode: "light", output: "blob" });
+      setZipStage("Building dark PPTX…");
+      const darkPptx = await exportDeckToPptx(buildDeck("dark"), brand, { forceMode: "dark", output: "blob" });
+
+      const imgMod = await import("@/lib/slide-image-export");
+      setZipStage("Rendering light PDF…");
+      const lightPdf = await imgMod.exportSlidesAsImagePdf(
+        [{ node: lightNode, mode: "light" }],
+        { filename: "light.pdf", pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Light PDF · ${p.message ?? p.stage}`) },
+      );
+      setZipStage("Rendering dark PDF…");
+      const darkPdf = await imgMod.exportSlidesAsImagePdf(
+        [{ node: darkNode, mode: "dark" }],
+        { filename: "dark.pdf", pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Dark PDF · ${p.message ?? p.stage}`) },
+      );
+      setZipStage("Rendering light PNG…");
+      const lightPng = await imgMod.captureSlide(lightNode, { pixelRatio });
+      setZipStage("Rendering dark PNG…");
+      const darkPng = await imgMod.captureSlide(darkNode, { pixelRatio });
+
+      const dataUrlToBlob = async (u: string) => (await fetch(u)).blob();
+
+      setZipStage("Zipping…");
+      const { default: JSZip } = await import("jszip");
+      const zip = new JSZip();
+      const base = `${variant.id}-${brand.id}`;
+      if (lightPptx.blob) zip.file(`pptx/${lightPptx.fileName ?? `${base}-light.pptx`}`, lightPptx.blob);
+      if (darkPptx.blob) zip.file(`pptx/${darkPptx.fileName ?? `${base}-dark.pptx`}`, darkPptx.blob);
+      if (lightPdf) zip.file(`pdf/${base}-light-${pixelRatio}x.pdf`, lightPdf);
+      if (darkPdf) zip.file(`pdf/${base}-dark-${pixelRatio}x.pdf`, darkPdf);
+      zip.file(`png/${base}-light-${pixelRatio}x.png`, await dataUrlToBlob(lightPng));
+      zip.file(`png/${base}-dark-${pixelRatio}x.png`, await dataUrlToBlob(darkPng));
+      zip.file(
+        "README.txt",
+        `${variant.name} — ${brand.name}\nModule: ${variant.id}\nDivision: ${brand.id}\nResolution: ${pixelRatio}×\nExported: ${new Date().toISOString()}\n\nContents:\n  pptx/  — editable PowerPoint (Light + Dark)\n  pdf/   — image PDFs (Light + Dark)\n  png/   — rasterized slide PNGs (Light + Dark)\n`,
+      );
+
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      const filename = `${base}-bundle-${pixelRatio}x.zip`;
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success("Module ZIP exported", { description: `${filename} · PPTX + PDF + PNG (Light & Dark) at ${pixelRatio}×` });
+    } catch (err) {
+      console.error("[library] module ZIP export failed", err);
+      toast.error("ZIP export failed", { description: "Check console for details." });
+    } finally {
+      setZipBusy(false);
+      setZipStage(null);
+    }
+  };
+
+
+
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -1500,6 +1592,16 @@ function VariantDetailModal({
             >
               {previewBusy ? <Loader2 size={12} className="animate-spin" /> : <Eye size={12} />}
               {previewBusy ? (previewStage ?? "Rendering…") : "Preview PDFs"}
+            </button>
+            <button
+              type="button"
+              onClick={downloadModuleZip}
+              disabled={zipBusy || previewBusy || pdfBusy !== null || bothBusy || downloading}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#03002C] bg-[#03002C] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#003FC7] disabled:opacity-60"
+              title="Download a single ZIP containing PPTX, PDF, and PNG for both Light and Dark themes"
+            >
+              {zipBusy ? <Loader2 size={12} className="animate-spin" /> : <Package size={12} />}
+              {zipBusy ? (zipStage ?? "Bundling…") : "Download ZIP"}
             </button>
             {usageCount > 0 && (
               <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
