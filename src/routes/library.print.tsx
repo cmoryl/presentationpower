@@ -933,7 +933,7 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
               <button
                 key={r.id}
                 type="button"
-                onClick={() => setLightbox(r)}
+                onClick={() => openLightbox(r)}
                 className="group relative overflow-hidden rounded-xl border border-black/10 bg-[#0b0a2a] text-left transition hover:border-[#003FC7]/60 hover:shadow-md"
               >
                 <div
