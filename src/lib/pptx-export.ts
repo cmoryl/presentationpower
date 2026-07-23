@@ -461,7 +461,7 @@ export async function exportDeckToPptx(
               },
               encoding: encoding as never,
               theme: {
-                divisionId: palette.divisionId,
+                divisionId: undefined,
                 mode: "dark",
                 accent: `#${palette.accent}`,
                 primary: `#${palette.primary}`,
