@@ -3,8 +3,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   exportPrintAssetAsPdf,
   type PrintPageSizeKey,
+  type PrintExportQuality,
 } from "@/lib/print-asset-export";
 import { useServerFn } from "@tanstack/react-start";
+
 import { AppShell } from "@/components/AppShell";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { BrandLockup } from "@/components/BrandLockup";
@@ -68,6 +70,8 @@ function AssetEditor() {
   const [bleedIn, setBleedIn] = useState(0.125);
   const [cropMarks, setCropMarks] = useState(true);
   const [exportMode, setExportMode] = useState<"light" | "dark">("light");
+  const [exportQuality, setExportQuality] = useState<PrintExportQuality>("300dpi");
+
 
   useEffect(() => {
     load({ data: { assetId } })
@@ -184,9 +188,17 @@ function AssetEditor() {
         bleedIn,
         cropMarks,
         mode: exportMode,
-        filename: `${safeTitle}-${exportSize.toLowerCase()}.pdf`,
+        quality: exportQuality,
+        filename: `${safeTitle}-${exportSize.toLowerCase()}-${exportQuality}.pdf`,
+        onQualityClamp: (info) => {
+          alert(
+            `Requested ${info.requestedDpi} DPI exceeded the browser canvas ceiling ` +
+              `(${info.reason}). Exporting at ~${info.effectiveDpi} DPI instead.`,
+          );
+        },
       });
       setExportOpen(false);
+
     } catch (e) {
       alert(`Export failed: ${(e as Error).message}`);
     } finally {
@@ -200,9 +212,23 @@ function AssetEditor() {
     pageSize === "A4" ? "1 / 1.414"
     : pageSize === "Letter" ? "8.5 / 11"
     : "1 / 1";
+  // Aurora orb frame in the shared 1280×720 native space. Portrait / square
+  // page sizes re-project the aurora composition onto a taller / square
+  // frame so orbs bleed in from the correct edges (issue: with default
+  // slice-preserved 16:9 aurora, a portrait page cropped out the horizontal
+  // spread and looked flat). Landscape stays at native 1280×720.
+  const auroraAspect: { w: number; h: number } | undefined =
+    pageSize === "A4"
+      ? { w: Math.round((1280 * 8.2677) / 11.6929), h: 1280 }
+      : pageSize === "Letter"
+        ? { w: Math.round((1280 * 8.5) / 11), h: 1280 }
+        : pageSize === "Square"
+          ? { w: 1280, h: 1280 }
+          : undefined;
 
   const densityPad = density === "compact" ? "p-8" : density === "airy" ? "p-16" : "p-12";
   const densityGap = density === "compact" ? "gap-4" : density === "airy" ? "gap-10" : "gap-6";
+
 
   return (
     <AppShell>
@@ -325,6 +351,17 @@ function AssetEditor() {
                         <option value="dark">Dark</option>
                       </select>
                     </label>
+                    <label className="flex items-center justify-between gap-3">
+                      <span className="text-black/60 dark:text-white/60">Quality</span>
+                      <select
+                        value={exportQuality}
+                        onChange={(e) => setExportQuality(e.target.value as PrintExportQuality)}
+                        className={inspectorInput}
+                      >
+                        <option value="300dpi">300 DPI · print standard</option>
+                        <option value="600dpi">600 DPI · archival</option>
+                      </select>
+                    </label>
                   </div>
                   <div className="mt-3 flex items-center justify-end gap-2">
                     <button
@@ -379,7 +416,7 @@ function AssetEditor() {
             className="relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
             style={{ aspectRatio: canvasAspect }}
           >
-            {brand && <AuroraLayer seed={`asset-${row.id}`} brand={brand} intensity={0.9} />}
+            {brand && <AuroraLayer seed={`asset-${row.id}`} brand={brand} intensity={0.9} aspect={auroraAspect} />}
             <div className={`relative flex h-full flex-col justify-between ${densityPad} text-[#03002C] dark:text-white`}>
               {/* TOP */}
               <div className="flex items-start justify-between">

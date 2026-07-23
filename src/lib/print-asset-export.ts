@@ -1,10 +1,14 @@
 /**
  * Print asset PDF export.
  *
- * Rasterizes a print-asset canvas node into a PDF at a chosen page size
- * (A4 / Letter / Square / Custom) with optional bleed and crop marks.
- * Uses the same `captureSlideAsDataUrl` engine as slide export so aurora
- * layers, glass, and fonts render consistently.
+ * Rasterizes one or more print-asset canvas nodes into a PDF at a chosen
+ * page size (A4 / Letter / Square / Custom) with optional bleed and crop
+ * marks. Uses the same `captureSlideAsDataUrl` engine as slide export so
+ * aurora layers, glass, and fonts render consistently.
+ *
+ * Quality is expressed as an effective DPI over the full page area
+ * (trim + bleed). We derive the raster width from `(trim + bleed) * dpi`
+ * so the bleed area is captured at the same resolution as the trim.
  */
 
 import { jsPDF } from "jspdf";
@@ -15,6 +19,7 @@ import {
 } from "./slide-image-export";
 
 export type PrintPageSizeKey = "A4" | "Letter" | "Square" | "Custom";
+export type PrintExportQuality = "300dpi" | "600dpi";
 
 /** Trim size in inches (page area before bleed). */
 export interface PrintPageDimensions {
@@ -29,6 +34,30 @@ export const PRINT_PAGE_PRESETS: Record<Exclude<PrintPageSizeKey, "Custom">, Pri
   Square: { widthIn: 8.5, heightIn: 8.5 },
 };
 
+/** Numeric DPI for each quality preset. */
+export const PRINT_EXPORT_DPI: Record<PrintExportQuality, number> = {
+  "300dpi": 300,
+  "600dpi": 600,
+};
+
+/**
+ * Browser canvas ceilings. Chrome/Firefox cap a single canvas at ~16384
+ * pixels per side; total pixel budgets vary but stay comfortably above
+ * 200 megapixels on modern hardware. We clamp against both so a large
+ * custom trim at 600 DPI degrades gracefully instead of producing a blank
+ * export.
+ */
+const MAX_CANVAS_SIDE_PX = 16384;
+const MAX_CANVAS_PIXELS = 200_000_000;
+
+export interface PrintExportQualityClampInfo {
+  requestedDpi: number;
+  effectiveDpi: number;
+  requestedWidthPx: number;
+  effectiveWidthPx: number;
+  reason: string;
+}
+
 export interface PrintExportOptions {
   /** Page size preset or "Custom" to use `custom`. */
   pageSize: PrintPageSizeKey;
@@ -40,10 +69,16 @@ export interface PrintExportOptions {
   cropMarks?: boolean;
   /** Light or dark background handling when neutralizing glass. */
   mode?: SlideExportMode;
-  /** Rendered raster width in pixels (drives fidelity). Default 2400. */
-  targetPixelWidth?: number;
+  /**
+   * Output quality. Default "300dpi" (print standard). "600dpi" targets
+   * archival / large-format output. Raster width is derived from the
+   * selected DPI over the full (trim + bleed) area.
+   */
+  quality?: PrintExportQuality;
   filename?: string;
   onProgress?: ExportProgressCallback;
+  /** Fires when the requested DPI cannot be honored (canvas ceiling reached). */
+  onQualityClamp?: (info: PrintExportQualityClampInfo) => void;
 }
 
 function resolveTrim(opts: PrintExportOptions): PrintPageDimensions {
@@ -86,26 +121,86 @@ function drawCropMarks(
 }
 
 /**
- * Rasterize a print-asset canvas node into a single-page PDF at the chosen
- * trim size + bleed. The rendered artwork fills the entire page (trim + bleed)
- * so any full-bleed aurora/photo extends into the bleed area.
+ * Resolve the effective raster width for a page, clamping against browser
+ * canvas ceilings. Returns the effective width and (if clamped) the
+ * effective DPI it produced.
+ */
+export function resolvePrintPixelWidth(
+  pageWidthIn: number,
+  pageHeightIn: number,
+  requestedDpi: number,
+): { widthPx: number; dpi: number; clamped: boolean; reason: string } {
+  const requestedWidthPx = Math.ceil(pageWidthIn * requestedDpi);
+  const requestedHeightPx = Math.ceil(pageHeightIn * requestedDpi);
+  let widthPx = requestedWidthPx;
+  let clamped = false;
+  let reason = "";
+
+  // Per-side cap.
+  const longestSide = Math.max(requestedWidthPx, requestedHeightPx);
+  if (longestSide > MAX_CANVAS_SIDE_PX) {
+    const scale = MAX_CANVAS_SIDE_PX / longestSide;
+    widthPx = Math.floor(requestedWidthPx * scale);
+    clamped = true;
+    reason = `Canvas side ceiling (${MAX_CANVAS_SIDE_PX}px)`;
+  }
+
+  // Total pixel budget.
+  const projectedHeight = Math.ceil((widthPx / pageWidthIn) * pageHeightIn);
+  const totalPx = widthPx * projectedHeight;
+  if (totalPx > MAX_CANVAS_PIXELS) {
+    const scale = Math.sqrt(MAX_CANVAS_PIXELS / totalPx);
+    widthPx = Math.floor(widthPx * scale);
+    clamped = true;
+    reason = reason
+      ? `${reason} + pixel budget (${MAX_CANVAS_PIXELS.toLocaleString()}px²)`
+      : `Canvas pixel budget (${MAX_CANVAS_PIXELS.toLocaleString()}px²)`;
+  }
+
+  const dpi = widthPx / pageWidthIn;
+  return { widthPx, dpi, clamped, reason };
+}
+
+/**
+ * Rasterize one or more print-asset canvas nodes into a PDF at the chosen
+ * trim size + bleed. Every page uses the same page geometry and receives
+ * its own capture; bleed and crop marks are applied per-page.
+ *
+ * Accepts a single node (single-page export — identical behavior to the
+ * previous one-shot API) or an ordered array for multi-page documents.
  */
 export async function exportPrintAssetAsPdf(
-  node: HTMLElement,
+  nodes: HTMLElement | HTMLElement[],
   opts: PrintExportOptions,
 ): Promise<void> {
+  const pages = Array.isArray(nodes) ? nodes : [nodes];
+  if (pages.length === 0) throw new Error("exportPrintAssetAsPdf: no pages provided.");
+
   const trim = resolveTrim(opts);
   const bleed = Math.max(0, opts.bleedIn ?? 0);
   const pageWidth = trim.widthIn + bleed * 2;
   const pageHeight = trim.heightIn + bleed * 2;
 
-  const dataUrl = await captureSlideAsDataUrl(node, {
-    mode: opts.mode ?? "light",
-    targetWidth: opts.targetPixelWidth ?? 2400,
-    onProgress: opts.onProgress,
-  });
+  const quality: PrintExportQuality = opts.quality ?? "300dpi";
+  const requestedDpi = PRINT_EXPORT_DPI[quality];
+  const requestedWidthPx = Math.ceil(pageWidth * requestedDpi);
+  const resolved = resolvePrintPixelWidth(pageWidth, pageHeight, requestedDpi);
+  if (resolved.clamped) {
+    const info: PrintExportQualityClampInfo = {
+      requestedDpi,
+      effectiveDpi: Math.round(resolved.dpi),
+      requestedWidthPx,
+      effectiveWidthPx: resolved.widthPx,
+      reason: resolved.reason,
+    };
+    console.warn(
+      `[print-asset-export] Requested ${requestedDpi} DPI would exceed browser canvas limits ` +
+        `(${resolved.reason}). Clamped to ~${info.effectiveDpi} DPI (${resolved.widthPx}px wide).`,
+    );
+    opts.onQualityClamp?.(info);
+  }
 
-  const orientation = pageWidth >= pageHeight ? "landscape" : "portrait";
+  const orientation: "landscape" | "portrait" = pageWidth >= pageHeight ? "landscape" : "portrait";
   const pdf = new jsPDF({
     orientation,
     unit: "in",
@@ -113,11 +208,17 @@ export async function exportPrintAssetAsPdf(
     compress: true,
   });
 
-  // Fill the entire page (including bleed) with the raster.
-  pdf.addImage(dataUrl, "PNG", 0, 0, pageWidth, pageHeight, undefined, "SLOW");
-
-  if (opts.cropMarks && bleed > 0) {
-    drawCropMarks(pdf, pageWidth, pageHeight, bleed);
+  for (let i = 0; i < pages.length; i++) {
+    if (i > 0) pdf.addPage([pageWidth, pageHeight], orientation);
+    const dataUrl = await captureSlideAsDataUrl(pages[i]!, {
+      mode: opts.mode ?? "light",
+      targetWidth: resolved.widthPx,
+      onProgress: opts.onProgress,
+    });
+    pdf.addImage(dataUrl, "PNG", 0, 0, pageWidth, pageHeight, undefined, "SLOW");
+    if (opts.cropMarks && bleed > 0) {
+      drawCropMarks(pdf, pageWidth, pageHeight, bleed);
+    }
   }
 
   const filename =
