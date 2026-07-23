@@ -6,16 +6,28 @@
 import type { CSSProperties } from "react";
 
 export type PrintHeroScrim = "top" | "bottom" | "both" | "radial" | "none";
+export type PrintHeroAspect = "fill" | "21:9" | "16:9" | "3:2" | "4:3" | "1:1";
 
 export type PrintHeroMedia = {
   imageUrl: string;
-  focalPoint?: string;           // CSS object-position, e.g. "50% 35%"
+  focalPoint?: string;           // legacy CSS object-position, e.g. "50% 35%"
+  focalX?: number;               // 0..100 — horizontal focal point %, wins over focalPoint
+  focalY?: number;               // 0..100 — vertical focal point %, wins over focalPoint
+  aspect?: PrintHeroAspect;      // band shape; "fill" uses heightPct, others letterbox to ratio
   overlayColor?: string;         // hex; defaults to page accent supplied by layout
   overlayOpacity?: number;       // 0..1, default 0.55 — accent wash strength
   washStrength?: number;         // 0..1, default 1 — legibility scrim + feather multiplier
   scrim?: PrintHeroScrim;        // legibility gradient, default "bottom"
   blendMode?: CSSProperties["mixBlendMode"]; // default "multiply"
-  heightPct?: number;            // 0..100, share of page height, default 46
+  heightPct?: number;            // 0..100, share of page height, default 46 (used when aspect="fill")
+};
+
+const ASPECT_RATIOS: Record<Exclude<PrintHeroAspect, "fill">, number> = {
+  "21:9": 21 / 9,
+  "16:9": 16 / 9,
+  "3:2": 3 / 2,
+  "4:3": 4 / 3,
+  "1:1": 1,
 };
 
 type Props = {
