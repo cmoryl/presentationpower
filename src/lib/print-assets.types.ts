@@ -25,7 +25,10 @@ export type CaseStudyContent = {
   stats: CaseStudyStat[];               // up to 5
   quote?: { text: string; author: string; role?: string; company?: string };
   expert?: { name: string; role?: string; email?: string };
-  cta?: { label: string; url?: string };
+  cta?: { label: string; url?: string; subhead?: string };
+  // Right-hand "Engagement Snapshot" bullets shown next to the pull quote.
+  // Optional — omit to hide the panel. Mirrors EBrochure's discover.bullets.
+  engagement?: { title?: string; bullets: string[] };
 };
 
 // ---------------------------------------------------------------------------

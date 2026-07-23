@@ -22,9 +22,10 @@ import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
+import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
 import {
-  emptySpotlight, emptyEBrochure, emptyAdaptorBrief,
-  type SpotlightContent, type EBrochureContent, type AdaptorBriefContent,
+  emptySpotlight, emptyEBrochure, emptyAdaptorBrief, emptyCaseStudy,
+  type SpotlightContent, type EBrochureContent, type AdaptorBriefContent, type CaseStudyContent,
   type PrintAssetKind,
 } from "@/lib/print-assets.types";
 import {
@@ -175,6 +176,47 @@ const ADAPTOR_SEED: AdaptorBriefContent = emptyAdaptorBrief({
   quote: {
     text: "TransPerfect helped us simplify a complex localization process and free our internal team to focus on higher-value work.",
     author: "Aesop",
+  },
+});
+
+const CASE_STUDY_SEED: CaseStudyContent = emptyCaseStudy({
+  eyebrow: "Client case study",
+  client: "Aēsop",
+  industry: "Beauty & personal care",
+  audience: "Global product knowledge teams",
+  summary: "Aēsop's success story in rapid product knowledge localization",
+  challenge: {
+    heading: "The Challenge",
+    body: "Aēsop needed to localize hundreds of product knowledge modules — combining technical content, regulatory updates, and training materials — across multiple markets. Their internal team was overloaded with disconnected processes, inconsistent terminology, and manual handoffs that slowed delivery and increased costs.",
+  },
+  solution: {
+    heading: "The Solution",
+    body: "TransPerfect's GlobalLink for Adobe Experience Manager Plus unified content, automation, and workflows in one centralized ecosystem. We integrated directly with AEM, automated translation submissions, enforced terminology consistency, and delivered localized modules through a one-click workflow with full visibility and control.",
+  },
+  result: {
+    heading: "The Result",
+    body: "Aēsop cut project management time by more than 70% and reduced engineering localization costs by 33%. With automated workflows and centralized governance, their team scaled content delivery across 7 markets — on time, on budget, and with consistent quality.",
+  },
+  stats: [
+    { label: "Project management time reduced", value: "3 mo → 10 days", unit: "" },
+    { label: "Reduction in engineering localization costs", value: "33", unit: "%" },
+    { label: "Modules rolled out within budget", value: "On Time", unit: "" },
+  ],
+  quote: {
+    text: "TransPerfect helped us simplify a complex localization process and free our internal team to focus on higher-value work.",
+    author: "Aēsop",
+  },
+  cta: {
+    label: "See GlobalLink in Action",
+    subhead: "Explore how GlobalLink AI can transform your content operations.",
+  },
+  engagement: {
+    title: "Engagement Snapshot",
+    bullets: [
+      "Trusted Adobe Gold Partner",
+      "Deep global content expertise",
+      "Hands-on, human partnership",
+    ],
   },
 });
 
@@ -452,7 +494,9 @@ function ThumbLive({ kind, brand }: { kind: PrintAssetKind; brand: BrandMode }) 
       {kind === "adaptor-brief" && (
         <AdaptorBriefLayout content={ADAPTOR_SEED} brand={brand} mode="dark" pageSize="Letter" density="standard" />
       )}
-      {kind === "case-study" && <ThumbPlaceholder brand={brand} kind="case-study" />}
+      {kind === "case-study" && (
+        <CaseStudyLayout content={CASE_STUDY_SEED} brand={brand} mode="light" pageSize="Letter" density="standard" />
+      )}
     </div>
   );
 }
@@ -553,29 +597,10 @@ function TemplateDetailOverlay({
           </div>
         </div>
 
-        {kind === "spotlight" || kind === "ebrochure" || kind === "adaptor-brief" ? (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <PreviewFrame label="Light"><PrintPreview kind={kind} brand={brand} mode="light" /></PreviewFrame>
-            <PreviewFrame label="Dark"><PrintPreview kind={kind} brand={brand} mode="dark" /></PreviewFrame>
-          </div>
-        ) : (
-          <div className="rounded-xl border border-dashed border-black/20 bg-white p-10 text-center">
-            <div className="mx-auto max-w-md">
-              <div className="text-xs uppercase tracking-[0.24em] text-black/50">In production</div>
-              <h3 className="mt-2 text-lg font-semibold text-[#03002C]">{tpl.label} preview is coming soon.</h3>
-              <p className="mt-2 text-sm text-black/60">
-                Case Study assets are already draftable from the wizard — the layout port is queued behind the other three.
-              </p>
-              <Link
-                to="/asset/new"
-                search={{ kind: "case-study", brandModeId: brand.id }}
-                className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:bg-[#003FC7]/85"
-              >
-                Draft a case study <ArrowRight size={12} />
-              </Link>
-            </div>
-          </div>
-        )}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <PreviewFrame label="Light"><PrintPreview kind={kind} brand={brand} mode="light" /></PreviewFrame>
+          <PreviewFrame label="Dark"><PrintPreview kind={kind} brand={brand} mode="dark" /></PreviewFrame>
+        </div>
       </div>
     </div>
   );
@@ -585,6 +610,7 @@ function PrintPreview({ kind, brand, mode }: { kind: PrintAssetKind; brand: Bran
   if (kind === "spotlight") return <SpotlightLayout content={SPOTLIGHT_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
   if (kind === "ebrochure") return <EBrochureLayout content={EBROCHURE_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
   if (kind === "adaptor-brief") return <AdaptorBriefLayout content={ADAPTOR_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+  if (kind === "case-study") return <CaseStudyLayout content={CASE_STUDY_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
   return null;
 }
 
