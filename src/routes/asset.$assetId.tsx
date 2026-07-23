@@ -33,7 +33,7 @@ import { emptyCaseStudy, emptySpotlight, emptyEBrochure, emptyAdaptorBrief } fro
 import type { PrintSection, PrintStatsSection, PrintStatsVariant } from "@/lib/print-assets.types";
 import type { SpotlightContent, EBrochureContent, AdaptorBriefContent } from "@/lib/print-assets.types";
 import { PRINT_STATS_VARIANTS, PrintSectionRenderer } from "@/components/print/sections/PrintSectionRenderer";
-import { PrintSectionPicker } from "@/components/print/sections/PrintSectionPicker";
+import { PrintSectionPicker, PRINT_SECTION_DND_MIME } from "@/components/print/sections/PrintSectionPicker";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
