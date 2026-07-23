@@ -83,10 +83,11 @@ export function CaseStudyLayout({
 
   const stats = content.stats.slice(0, 3);
   const blocks: Array<{ label: string; block: typeof content.challenge; icon: string }> = [
-    { label: content.challenge.heading || "The Challenge", block: content.challenge, icon: ICONS.globe },
-    { label: content.solution.heading || "The Solution", block: content.solution, icon: ICONS.spark },
-    { label: content.result.heading || "The Result", block: content.result, icon: ICONS.trending },
+    { label: content.challenge.heading || "The Challenge", block: content.challenge, icon: ICON_PATHS["globe-alt"] },
+    { label: content.solution.heading || "The Solution", block: content.solution, icon: ICON_PATHS.sparkles },
+    { label: content.result.heading || "The Result", block: content.result, icon: ICON_PATHS.trending },
   ];
+
 
   const engagement = content.engagement ?? {
     title: "Engagement Snapshot",
