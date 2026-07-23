@@ -391,6 +391,13 @@ export type WorldMapProps = {
   /** Optional metric to visualize — pins are scaled/colored by value and a legend is drawn. */
   metric?: LocationMetric;
   metricId?: string;
+  /**
+   * How to normalize pin coloring/sizing against the active metric.
+   *  - "absolute" (default): raw min→max scale.
+   *  - "region-percent": each pin as % of its region's total.
+   *  - "global-percent": each pin as % of the global (visible) total.
+   */
+  scaleMode?: "absolute" | "region-percent" | "global-percent";
 };
 
 /**
@@ -411,6 +418,7 @@ export function WorldMap({
   ariaLabel = "Global locations map",
   metric,
   metricId,
+  scaleMode = "absolute",
 }: WorldMapProps) {
 
   const isDark = mode === "dark";
@@ -459,22 +467,57 @@ export function WorldMap({
 
   // ── Metric scale ────────────────────────────────────────────────────────
   const activeMetricId = metricId ?? metric?.id;
-  const metricStats = React.useMemo(() => {
+  const metricScale = React.useMemo(() => {
     if (!activeMetricId) return null;
-    const vals = visiblePins
-      .map((p) => p.values?.[activeMetricId])
-      .filter((v): v is number => Number.isFinite(v as number));
-    if (vals.length === 0) return null;
-    const min = Math.min(...vals);
-    const max = Math.max(...vals);
-    return { min, max, range: Math.max(1e-9, max - min) };
-  }, [visiblePins, activeMetricId]);
+    const entries = visiblePins
+      .map((p) => ({ pin: p, v: p.values?.[activeMetricId] }))
+      .filter((e): e is { pin: LocationPin; v: number } => Number.isFinite(e.v as number));
+    if (entries.length === 0) return null;
+
+    // Derive a per-pin "value" in the units the caller wants to display.
+    let displayed: { id: string; value: number }[];
+    if (scaleMode === "global-percent") {
+      const total = entries.reduce((s, e) => s + e.v, 0) || 1;
+      displayed = entries.map((e) => ({ id: e.pin.id, value: (e.v / total) * 100 }));
+    } else if (scaleMode === "region-percent") {
+      const regionTotals: Partial<Record<LocationPin["region"], number>> = {};
+      for (const e of entries) regionTotals[e.pin.region] = (regionTotals[e.pin.region] ?? 0) + e.v;
+      displayed = entries.map((e) => ({
+        id: e.pin.id,
+        value: (e.v / (regionTotals[e.pin.region] || 1)) * 100,
+      }));
+    } else {
+      displayed = entries.map((e) => ({ id: e.pin.id, value: e.v }));
+    }
+
+    const values = displayed.map((d) => d.value);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const byId = new Map(displayed.map((d) => [d.id, d.value]));
+    return { min, max, range: Math.max(1e-9, max - min), byId };
+  }, [visiblePins, activeMetricId, scaleMode]);
+
   const scaleFor = React.useCallback(
-    (v: number | undefined) => {
-      if (!metricStats || !Number.isFinite(v as number)) return null;
-      return Math.max(0, Math.min(1, ((v as number) - metricStats.min) / metricStats.range));
+    (pinId: string) => {
+      if (!metricScale) return null;
+      const v = metricScale.byId.get(pinId);
+      if (!Number.isFinite(v)) return null;
+      return Math.max(0, Math.min(1, ((v as number) - metricScale.min) / metricScale.range));
     },
-    [metricStats],
+    [metricScale],
+  );
+  const displayValueFor = React.useCallback(
+    (pinId: string) => metricScale?.byId.get(pinId),
+    [metricScale],
+  );
+  const isPercentMode = scaleMode !== "absolute";
+  const formatDisplay = React.useCallback(
+    (value: number | undefined) => {
+      if (!Number.isFinite(value as number)) return "—";
+      if (isPercentMode) return `${(value as number).toFixed(1)}%`;
+      return formatMetricValue(value, metric);
+    },
+    [isPercentMode, metric],
   );
 
 
@@ -536,7 +579,7 @@ export function WorldMap({
         {visiblePins.map((p) => {
           const { x, y } = projectLatLon(p.lat, p.lon);
           const baseR = p.role === "HQ" ? 26 : p.role === "hub" ? 20 : 14;
-          const t = activeMetricId ? scaleFor(p.values?.[activeMetricId]) : null;
+          const t = activeMetricId ? scaleFor(p.id) : null;
           const r = t == null ? baseR : 14 + t * 22;
           return <circle key={`g-${p.id}`} cx={x} cy={y} r={r} fill={glow} opacity={t == null ? 1 : 0.5 + t * 0.5} />;
         })}
@@ -548,14 +591,15 @@ export function WorldMap({
           const { x, y } = projectLatLon(p.lat, p.lon);
           const isHq = p.role === "HQ";
           const isHub = p.role === "hub";
-          const t = activeMetricId ? scaleFor(p.values?.[activeMetricId]) : null;
+          const t = activeMetricId ? scaleFor(p.id) : null;
           const baseCore = isHq ? 5.4 : isHub ? 4.4 : 3.2;
           const core = t == null ? baseCore : 3.2 + t * 5.8;
           const fill = t == null ? pinCore : accent;
           const fillOpacity = t == null ? 1 : 0.35 + t * 0.65;
-          const val = activeMetricId ? p.values?.[activeMetricId] : undefined;
+          const rawVal = activeMetricId ? p.values?.[activeMetricId] : undefined;
+          const displayVal = activeMetricId ? displayValueFor(p.id) : undefined;
           const tip = activeMetricId && metric
-            ? `${p.city}${p.country ? `, ${p.country}` : ""} — ${metric.label}: ${formatMetricValue(val, metric)}`
+            ? `${p.city}${p.country ? `, ${p.country}` : ""} — ${metric.label}: ${formatMetricValue(rawVal, metric)}${isPercentMode && Number.isFinite(displayVal) ? ` (${(displayVal as number).toFixed(1)}%)` : ""}`
             : `${p.city}${p.country ? `, ${p.country}` : ""}${p.label ? ` — ${p.label}` : ""}`;
           return (
             <g key={`pin-${p.id}`} style={{ cursor: "default" }}>
@@ -601,7 +645,7 @@ export function WorldMap({
       )}
 
       {/* Metric legend — color scale + min/max labels */}
-      {metricStats && metric && (() => {
+      {metricScale && metric && (() => {
         const vb = regionViewBox(region).split(" ").map(Number);
         const [vx, vy, vw, vh] = vb;
         const barW = Math.min(240, vw * 0.28);
@@ -615,18 +659,19 @@ export function WorldMap({
         const panelStroke = isDark ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.12)";
         const textFill = isDark ? "rgba(255,255,255,0.92)" : "rgba(3,0,44,0.86)";
         const subFill = isDark ? "rgba(255,255,255,0.6)" : "rgba(3,0,44,0.6)";
+        const modeSuffix = scaleMode === "global-percent" ? " · % of global" : scaleMode === "region-percent" ? " · % of region" : "";
         return (
           <g fontFamily="Geist, system-ui, sans-serif">
             <rect x={x - 12} y={y - 22} width={panelW} height={panelH} rx={8} fill={panelFill} stroke={panelStroke} />
             <text x={x} y={y - 8} fontSize={9} fontWeight={600} fill={textFill} style={{ letterSpacing: "0.06em", textTransform: "uppercase" }}>
-              {metric.label}
+              {metric.label}{modeSuffix}
             </text>
             <rect x={x} y={y} width={barW} height={barH} rx={barH / 2} fill="url(#tp-metric-scale)" stroke={panelStroke} />
             <text x={x} y={y + barH + 12} fontSize={9} fill={subFill}>
-              {formatMetricValue(metricStats.min, metric)}
+              {formatDisplay(metricScale.min)}
             </text>
             <text x={x + barW} y={y + barH + 12} fontSize={9} fill={subFill} textAnchor="end">
-              {formatMetricValue(metricStats.max, metric)}
+              {formatDisplay(metricScale.max)}
             </text>
           </g>
         );

@@ -4941,6 +4941,11 @@ function renderLocationsVariant(
     const TOP_N_OPTIONS = [5, 10, 25] as const;
     const rawTopN = Number(c.topN);
     const topN = (TOP_N_OPTIONS as readonly number[]).includes(rawTopN) ? rawTopN : 5;
+    const SCALE_MODES = ["absolute", "region-percent", "global-percent"] as const;
+    const rawScaleMode = typeof c.scaleMode === "string" ? c.scaleMode : "absolute";
+    const scaleMode: (typeof SCALE_MODES)[number] = (SCALE_MODES as readonly string[]).includes(rawScaleMode)
+      ? (rawScaleMode as (typeof SCALE_MODES)[number])
+      : "absolute";
     const topPins = usingMetric
       ? [...filteredPins]
           .filter((p) => Number.isFinite(p.values?.[activeMetric!.id]))
@@ -4967,7 +4972,7 @@ function renderLocationsVariant(
               </div>
             )}
             <div className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
-              <LocWorldMap pins={filteredPins} region="world" mode={mode} accent={accent} primary={primary} showLabels={false} metric={activeMetric} metricId={activeMetric?.id} ariaLabel={`${title} — world map${activeMetric ? ` visualizing ${activeMetric.label}` : ""}${filterActive ? ` filtered to ${filteredRegions} regions` : ""}`} />
+              <LocWorldMap pins={filteredPins} region="world" mode={mode} accent={accent} primary={primary} showLabels={false} metric={activeMetric} metricId={activeMetric?.id} scaleMode={scaleMode} ariaLabel={`${title} — world map${activeMetric ? ` visualizing ${activeMetric.label}${scaleMode === "region-percent" ? " (% of region)" : scaleMode === "global-percent" ? " (% of global)" : ""}` : ""}${filterActive ? ` filtered to ${filteredRegions} regions` : ""}`} />
             </div>
           </div>
           <div className="flex w-[520px] flex-col justify-end">
@@ -5023,14 +5028,24 @@ function renderLocationsVariant(
                         Top {topN} locations{roleFilterActive ? ` · excl. ${Array.from(excludeRoleSet).join(", ")}` : ""}
                       </div>
                       <div className="mt-3 space-y-1.5">
-                        {topPins.map((p) => (
-                          <div key={p.id} className="flex items-baseline justify-between">
-                            <div style={{ color: ink.strong, fontSize: 14 }}>{p.label || p.city}</div>
-                            <div style={{ color: accent, fontSize: 14, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
-                              {locFormatMetric(p.values![activeMetric!.id], activeMetric)}
+                        {topPins.map((p) => {
+                          const raw = p.values![activeMetric!.id];
+                          let pctForPin: number | null = null;
+                          if (scaleMode === "global-percent" && metricTotal > 0) {
+                            pctForPin = (raw / metricTotal) * 100;
+                          } else if (scaleMode === "region-percent") {
+                            const regionSum = metricByRegion[p.region] ?? 0;
+                            if (regionSum > 0) pctForPin = (raw / regionSum) * 100;
+                          }
+                          return (
+                            <div key={p.id} className="flex items-baseline justify-between">
+                              <div style={{ color: ink.strong, fontSize: 14 }}>{p.label || p.city}</div>
+                              <div style={{ color: accent, fontSize: 14, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
+                                {pctForPin != null ? `${pctForPin.toFixed(1)}%` : locFormatMetric(raw, activeMetric)}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}

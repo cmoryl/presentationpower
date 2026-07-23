@@ -467,13 +467,15 @@ function DeckEditor() {
                   regionFilter={(active.content as Record<string, unknown>).regionFilter}
                   excludeRoles={(active.content as Record<string, unknown>).excludeRoles}
                   topN={(active.content as Record<string, unknown>).topN}
-                  onChange={(patch: { items?: unknown; metrics?: unknown; activeMetricId?: unknown; regionFilter?: unknown; excludeRoles?: unknown; topN?: unknown }) => {
+                  scaleMode={(active.content as Record<string, unknown>).scaleMode}
+                  onChange={(patch: { items?: unknown; metrics?: unknown; activeMetricId?: unknown; regionFilter?: unknown; excludeRoles?: unknown; topN?: unknown; scaleMode?: unknown }) => {
                     if (patch.items !== undefined) updateField(deck.id, active.id, "items", patch.items);
                     if (patch.metrics !== undefined) updateField(deck.id, active.id, "metrics", patch.metrics);
                     if (patch.activeMetricId !== undefined) updateField(deck.id, active.id, "activeMetricId", patch.activeMetricId);
                     if (patch.regionFilter !== undefined) updateField(deck.id, active.id, "regionFilter", patch.regionFilter);
                     if (patch.excludeRoles !== undefined) updateField(deck.id, active.id, "excludeRoles", patch.excludeRoles);
                     if (patch.topN !== undefined) updateField(deck.id, active.id, "topN", patch.topN);
+                    if (patch.scaleMode !== undefined) updateField(deck.id, active.id, "scaleMode", patch.scaleMode);
                   }}
                 />
 

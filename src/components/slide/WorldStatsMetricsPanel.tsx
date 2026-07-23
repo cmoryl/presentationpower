@@ -32,6 +32,13 @@ const ROLE_LABELS: Record<RoleKey, string> = {
 };
 const TOP_N_OPTIONS = [5, 10, 25] as const;
 type TopN = (typeof TOP_N_OPTIONS)[number];
+const SCALE_MODES = ["absolute", "region-percent", "global-percent"] as const;
+type ScaleMode = (typeof SCALE_MODES)[number];
+const SCALE_MODE_LABELS: Record<ScaleMode, string> = {
+  absolute: "Absolute",
+  "region-percent": "% of region",
+  "global-percent": "% of global",
+};
 
 type Props = {
   brandId: string;
@@ -41,6 +48,7 @@ type Props = {
   regionFilter: unknown;
   excludeRoles: unknown;
   topN: unknown;
+  scaleMode: unknown;
   onChange: (patch: {
     items?: LocationPin[];
     metrics?: LocationMetric[];
@@ -48,6 +56,7 @@ type Props = {
     regionFilter?: RegionKey[] | null;
     excludeRoles?: RoleKey[] | null;
     topN?: TopN;
+    scaleMode?: ScaleMode;
   }) => void;
 };
 
@@ -107,7 +116,7 @@ function slug(input: string): string {
   return input.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `metric-${Date.now()}`;
 }
 
-export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId, regionFilter, excludeRoles, topN, onChange }: Props) {
+export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId, regionFilter, excludeRoles, topN, scaleMode, onChange }: Props) {
   const seeded = React.useMemo(() => getDivisionLocationSet(brandId), [brandId]);
   const pins = React.useMemo(() => coercePins(items, seeded.pins), [items, seeded.pins]);
   const metricList = React.useMemo(() => coerceMetrics(metrics), [metrics]);
@@ -158,6 +167,11 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
     ? (Number(topN) as TopN)
     : 5;
   const setTopN = (n: TopN) => onChange({ topN: n });
+
+  const currentScaleMode: ScaleMode = SCALE_MODES.includes(scaleMode as ScaleMode)
+    ? (scaleMode as ScaleMode)
+    : "absolute";
+  const setScaleMode = (m: ScaleMode) => onChange({ scaleMode: m });
 
 
   const updateMetric = (id: string, patch: Partial<LocationMetric>) => {
@@ -373,6 +387,42 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
                 }`}
               >
                 Top {n}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Color scaling mode */}
+      <div className="mt-3 flex items-center justify-between rounded-xl border border-black/10 bg-black/[0.015] p-3">
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-black/60">
+            Value scaling
+          </div>
+          <div className="mt-1 text-[10px] text-black/45">
+            Choose whether pin color, size, and legend use raw values or normalized shares.
+          </div>
+        </div>
+        <div className="flex overflow-hidden rounded-full border border-black/15">
+          {SCALE_MODES.map((m) => {
+            const active = currentScaleMode === m;
+            return (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setScaleMode(m)}
+                className={`px-3 py-1 text-[11px] font-semibold uppercase tracking-widest transition ${
+                  active ? "bg-sky-600 text-white" : "bg-white text-black/60 hover:text-sky-600"
+                }`}
+                title={
+                  m === "absolute"
+                    ? "Color scale spans the raw min/max of the active metric."
+                    : m === "region-percent"
+                    ? "Each pin is normalized to its own region's total."
+                    : "Each pin is normalized to the global (filtered) total."
+                }
+              >
+                {SCALE_MODE_LABELS[m]}
               </button>
             );
           })}
