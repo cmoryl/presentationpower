@@ -856,6 +856,24 @@ function HeroMediaPanel({
           <option value="radial">Radial</option>
         </select>
       </Row>
+      <Row label="Auto scrim">
+        <input
+          type="checkbox"
+          checked={media.autoScrim ?? false}
+          onChange={(e) => patch({ autoScrim: e.target.checked })}
+        />
+      </Row>
+      {media.autoScrim && (
+        <Slider
+          label="Auto threshold"
+          value={media.autoScrimThreshold ?? 0.6}
+          min={0.3}
+          max={0.9}
+          step={0.05}
+          onChange={(v) => patch({ autoScrimThreshold: v })}
+          display={`${Math.round((media.autoScrimThreshold ?? 0.6) * 100)}%`}
+        />
+      )}
       <Row label="Blend mode">
         <select
           className={inspectorInput}
