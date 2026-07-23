@@ -75,12 +75,6 @@ function KnowledgeView() {
           >
             Oracle intelligence
           </Link>
-          <Link
-            to={"/knowledge/brand-guides" as never}
-            className="rounded-full border border-black/15 px-4 py-2.5 text-sm text-black/70 hover:border-black/40"
-          >
-            Brand guides
-          </Link>
           <button
             onClick={() => navigate({ to: "/knowledge/new" as never })}
             className="rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#03002C]/90"
