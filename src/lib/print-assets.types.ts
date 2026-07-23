@@ -55,6 +55,49 @@ export type SpotlightContent = {
   cta?: { label: string; url?: string };
 };
 
+// ---------------------------------------------------------------------------
+// E-BROCHURE — single-page marketing PDF (Challenge / Approach / Impact +
+// stat row + quote/discover panel + CTA band). Ported from EBrochure.dc.html.
+// ---------------------------------------------------------------------------
+// Deliberate reuse of the shared primitives:
+//   • Each summary card is a `CaseStudyBlock` (heading + body) with an extra
+//     `bullets` list. We model that via `EBrochureSection = CaseStudyBlock &
+//     { bullets: string[] }` rather than a parallel shape.
+//   • `stats` reuses `CaseStudyStat`.
+//   • `quote`, `cta` reuse the inline shapes from `CaseStudyContent`.
+export type EBrochureSection = CaseStudyBlock & { bullets: string[] };
+
+export type EBrochureContent = {
+  eyebrow?: string;            // e.g. "eBrochure"
+  title: string;               // hero H1
+  summary?: string;            // 1–2 sentence subhead
+  sections: EBrochureSection[]; // exactly 3 — Challenge / Approach / Impact
+  stats: CaseStudyStat[];      // 3–5 proof points
+  quote?: { text: string; author: string; role?: string; company?: string };
+  discover?: { body: string; bullets: string[] }; // right-hand "Discover" panel
+  cta?: { label: string; url?: string; subhead?: string };
+};
+
+// ---------------------------------------------------------------------------
+// ADAPTOR / APPLICATION BRIEF — single-page portrait brief with a dark
+// gradient hero, 6 feature cards, a "We Know How" strip, and a quote row.
+// Ported from ApplicationBrief.dc.html.
+// ---------------------------------------------------------------------------
+export type AdaptorFeature = {
+  verb: string;   // "Supports", "Adapts", "Enables", "Automates", "Triggers", "Learns"
+  body: string;   // one-liner under the verb
+};
+
+export type AdaptorBriefContent = {
+  eyebrow?: string;            // e.g. "Adaptor brief"
+  title: string;               // hero H1
+  summary?: string;            // hero subhead
+  features: AdaptorFeature[];  // exactly 6
+  knowHow: string[];           // 5 "We Know How" one-liners
+  quote?: { text: string; author: string; role?: string; company?: string };
+  cta?: { label: string; url?: string };
+};
+
 export type PrintPageSize = "A4" | "Letter" | "Square";
 export type PrintDensity = "compact" | "standard" | "airy";
 export type PrintDistribution = "sales-enablement" | "web-download" | "print";
@@ -70,6 +113,7 @@ export type PrintAssetContext = {
 };
 
 export type PrintAssetKind = "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
+
 
 export type PrintAssetRow = {
   id: string;
