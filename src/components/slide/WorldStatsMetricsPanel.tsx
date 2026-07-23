@@ -302,6 +302,85 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
         </div>
       </div>
 
+      {/* Role filter */}
+      <div className="mt-3 rounded-xl border border-black/10 bg-black/[0.015] p-3">
+        <div className="flex items-baseline justify-between">
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-black/60">
+            Role filter {excludedRoles.length === 0 ? "· all roles" : `· hiding ${excludedRoles.length}`}
+          </div>
+          {excludedRoles.length > 0 && (
+            <button
+              type="button"
+              onClick={() => onChange({ excludeRoles: null })}
+              className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-sky-500 hover:text-sky-600"
+            >
+              Reset
+            </button>
+          )}
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {ROLE_KEYS.map((k) => {
+            const excluded = excludedRoles.includes(k);
+            const count = roleCounts[k] ?? 0;
+            const disabled = count === 0;
+            return (
+              <button
+                key={k}
+                type="button"
+                disabled={disabled}
+                onClick={() => toggleRole(k)}
+                className={`flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-medium transition ${
+                  disabled
+                    ? "cursor-not-allowed border-black/10 text-black/25"
+                    : excluded
+                    ? "border-black/20 bg-black/5 text-black/40 line-through"
+                    : "border-sky-500/60 bg-sky-500/10 text-sky-700 hover:border-sky-500"
+                }`}
+                title={disabled ? "No pins with this role" : excluded ? "Click to include" : "Click to exclude"}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${excluded ? "bg-black/25" : "bg-sky-600"}`} />
+                <span className="tracking-wide">{ROLE_LABELS[k]}</span>
+                <span className="tabular-nums text-black/40">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-2 text-[10px] text-black/45">
+          Excluded roles are hidden from the map, the totals, and the top-locations list.
+        </div>
+      </div>
+
+      {/* Top N control */}
+      <div className="mt-3 flex items-center justify-between rounded-xl border border-black/10 bg-black/[0.015] p-3">
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-black/60">
+            Top locations
+          </div>
+          <div className="mt-1 text-[10px] text-black/45">
+            How many entries to show in the ranked list.
+          </div>
+        </div>
+        <div className="flex overflow-hidden rounded-full border border-black/15">
+          {TOP_N_OPTIONS.map((n) => {
+            const active = currentTopN === n;
+            return (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setTopN(n)}
+                className={`px-3 py-1 text-[11px] font-semibold uppercase tracking-widest transition ${
+                  active ? "bg-sky-600 text-white" : "bg-white text-black/60 hover:text-sky-600"
+                }`}
+              >
+                Top {n}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+
+
 
 
 
