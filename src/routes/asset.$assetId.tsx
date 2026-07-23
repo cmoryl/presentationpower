@@ -199,7 +199,58 @@ function AssetEditor() {
   undoRef.current = undo;
   redoRef.current = redo;
 
+  // Generic path-based writer for click-in-preview live editing on the
+  // non-case-study kinds. Path syntax matches @/lib/qa readPath:
+  // "a.b", "a[0].b".
+  function writePath(obj: Record<string, unknown>, path: string, value: unknown): Record<string, unknown> {
+    const parts: (string | number)[] = path.split(".").flatMap((p) => {
+      const m = /^([^\[]+)(\[(\d+)\])?$/.exec(p);
+      if (!m) return [p];
+      return m[3] !== undefined ? [m[1]!, Number(m[3])] : [m[1]!];
+    });
+    const clone = Array.isArray(obj) ? [...obj] : { ...obj };
+    let cur: any = clone;
+    for (let i = 0; i < parts.length - 1; i++) {
+      const k = parts[i]!;
+      const nextK = parts[i + 1]!;
+      const child = cur[k];
+      const nextChild = Array.isArray(child) ? [...child] : { ...(child ?? (typeof nextK === "number" ? [] : {})) };
+      cur[k] = nextChild;
+      cur = nextChild;
+    }
+    cur[parts[parts.length - 1]!] = value;
+    return clone as Record<string, unknown>;
+  }
 
+  function patchByPath(path: string, value: unknown) {
+    if (!row) return;
+    pushHistory();
+    const nextContent = writePath(rawContent, path, value);
+    setRow({ ...row, content: nextContent as unknown as CaseStudyContent });
+    setDirty(true);
+    setHistoryTick((t) => t + 1);
+  }
+
+  // Collect all non-empty string paths in the content object so LiveEditOverlay
+  // can bind DOM text nodes back to structured content.
+  function collectStringPaths(v: unknown, prefix = ""): string[] {
+    if (typeof v === "string") return v.trim() ? [prefix] : [];
+    if (Array.isArray(v)) {
+      const out: string[] = [];
+      v.forEach((item, i) => out.push(...collectStringPaths(item, `${prefix}[${i}]`)));
+      return out;
+    }
+    if (v && typeof v === "object") {
+      const out: string[] = [];
+      for (const [k, val] of Object.entries(v as Record<string, unknown>)) {
+        const p = prefix ? `${prefix}.${k}` : k;
+        out.push(...collectStringPaths(val, p));
+      }
+      return out;
+    }
+    return [];
+  }
+  const editableFieldPaths = collectStringPaths(rawContent);
 
   function updateStat(i: number, patch: Partial<CaseStudyStat>) {
     const next = [...content.stats];
