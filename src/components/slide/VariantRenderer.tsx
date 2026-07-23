@@ -4031,23 +4031,42 @@ function renderVariantBody({
     }
 
     case "MV-DASH-DONUT-TRIO": {
+      // Free-form Aurora v2. Each donut is a hairline track ring + accent
+      // arc with soft glow. A feathered radial halo blooms BEHIND the donut
+      // so it reads as a floating bloom rather than a puck. Center numeral
+      // floats with no plate; label/body sit as free text on the aurora.
       const items = arr(c.items).slice(0, 3);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14 grid gap-10" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+          <div style={{ maxWidth: 900 }}>
+            <Kicker brand={brand}>{s(c.kicker, "Portfolio")}</Kicker>
+            <div
+              className="mt-4"
+              style={{ fontSize: 52, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+            >
+              {s(c.title, variant.name)}
+            </div>
+          </div>
+          <div className="mt-14 grid gap-16" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
             {items.map((it, i) => (
-              <div key={i} className="flex flex-col items-center text-center" style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`, paddingLeft: i === 0 ? 0 : 24 }}>
-                <Donut brand={brand} percent={Number(it.value) || 0} size={280} />
-                <div className="mt-8 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.strong, fontWeight: 700 }}>{s(it.label)}</div>
-                <div className="mt-4" style={{ fontSize: 20, lineHeight: 1.45, color: ink.muted, maxWidth: 380 }}>{s(it.body)}</div>
+              <div key={i} className="flex flex-col items-center text-center">
+                <FreeformDonut brand={brand} percent={Number(it.value) || 0} size={280} bloom={i === 0} />
+                <div
+                  className="mt-8 uppercase"
+                  style={{ fontSize: 15, letterSpacing: "0.28em", color: ink.strong, fontWeight: 700 }}
+                >
+                  {s(it.label)}
+                </div>
+                <div className="mt-3" style={{ fontSize: 17, lineHeight: 1.45, color: ink.muted, maxWidth: 320 }}>
+                  {s(it.body)}
+                </div>
               </div>
             ))}
           </div>
-          <div className="mt-12"><LiveMetaFooter brand={brand} source={s(c.source, "Program telemetry")} refCode={variant.id} /></div>
         </SlideFrame>
       );
     }
+
 
     case "MV-DASH-SALES-CHART": {
       // Free-form aurora rebuild — no panel, no card, no border around the
@@ -4122,24 +4141,48 @@ function renderVariantBody({
     }
 
     case "MV-DASH-GAUGE-ROW": {
+      // Free-form Aurora v2. Each gauge = hairline semicircular track +
+      // accent-glowing stroke arc. A feathered halo blooms behind the arc
+      // terminus so it reads as an accent bloom, not a puck. Central value
+      // and label sit as free text — no plates, no dividers between gauges.
       const items = arr(c.items).slice(0, 5);
       const cols = items.length || 1;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-16 grid gap-10" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+          <div style={{ maxWidth: 900 }}>
+            <Kicker brand={brand}>{s(c.kicker, "Signals")}</Kicker>
+            <div
+              className="mt-4"
+              style={{ fontSize: 52, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+            >
+              {s(c.title, variant.name)}
+            </div>
+          </div>
+          <div className="mt-14 grid gap-8" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
             {items.map((it, i) => (
-              <div key={i} className="flex flex-col items-center" style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`, paddingLeft: i === 0 ? 0 : 20 }}>
-                <SemiGauge brand={brand} percent={Number(it.value) || 0} size={280} />
-                <div className="mt-6 uppercase text-center" style={{ fontSize: 16, letterSpacing: "0.24em", color: ink.strong, fontWeight: 700, maxWidth: 260 }}>{s(it.label)}</div>
-                {s(it.body) && <div className="mt-2 text-center" style={{ fontSize: 14, lineHeight: 1.4, color: ink.muted, maxWidth: 240 }}>{s(it.body)}</div>}
+              <div key={i} className="flex flex-col items-center">
+                <FreeformSemiGauge brand={brand} percent={Number(it.value) || 0} size={240} bloom={i === 0} />
+                <div
+                  className="mt-4 uppercase text-center"
+                  style={{ fontSize: 14, letterSpacing: "0.26em", color: ink.strong, fontWeight: 700, maxWidth: 220 }}
+                >
+                  {s(it.label)}
+                </div>
+                {s(it.body) && (
+                  <div
+                    className="mt-2 text-center"
+                    style={{ fontSize: 14, lineHeight: 1.4, color: ink.muted, maxWidth: 220 }}
+                  >
+                    {s(it.body)}
+                  </div>
+                )}
               </div>
             ))}
           </div>
-          <div className="mt-12"><LiveMetaFooter brand={brand} source={s(c.source, "Program telemetry")} refCode={variant.id} /></div>
         </SlideFrame>
       );
     }
+
 
 
     case "MV-DASH-PERFORMANCE": {
@@ -4243,18 +4286,31 @@ function renderVariantBody({
     }
 
     case "MV-DASH-REPORT-CARDS": {
+      // Free-form Aurora v2. No card plate, no border. Two items sit as free
+      // typography on the aurora, separated by a single vertical hairline.
+      // The first item halos (its numeral carries a radial bloom) so the
+      // primary reading dominates. Reuses the MV-KPI-DASHBOARD language.
       const items = arr(c.items).slice(0, 2);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14 grid gap-14" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
-            {items[0] && <ReportCard brand={brand} item={items[0]} />}
+          <div style={{ maxWidth: 900 }}>
+            <Kicker brand={brand}>{s(c.kicker, "Report")}</Kicker>
+            <div
+              className="mt-4"
+              style={{ fontSize: 52, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+            >
+              {s(c.title, variant.name)}
+            </div>
+          </div>
+          <div className="mt-16 grid gap-20" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
+            {items[0] && <FreeformReportItem brand={brand} item={items[0]} bloom />}
             <div style={{ background: ink.hairline }} />
-            {items[1] && <ReportCard brand={brand} item={items[1]} />}
+            {items[1] && <FreeformReportItem brand={brand} item={items[1]} />}
           </div>
         </SlideFrame>
       );
     }
+
 
     case "MV-DASH-GROWTH-COLUMNS": {
       // Free-form Aurora v2. Columns sit on a single hairline baseline that
@@ -4265,7 +4321,9 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 5);
       const vals = items.map((it) => Number(it.value) || 0);
       const max = Math.max(1, ...vals);
-      const CHART_H = 460;
+      // Collision fix: cap chart height and add generous bottom padding so
+      // the year row + note text clear the SlideFrame footer with margin.
+      const CHART_H = 300;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex items-start justify-between gap-16">
@@ -4273,14 +4331,14 @@ function renderVariantBody({
               <Kicker brand={brand}>{s(c.kicker, "Trajectory")}</Kicker>
               <div
                 className="mt-4"
-                style={{ fontSize: 60, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+                style={{ fontSize: 52, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
               >
                 {s(c.title, variant.name)}
               </div>
               {s(c.headline) && (
                 <div
                   className="mt-5"
-                  style={{ fontSize: 22, color: ink.muted, letterSpacing: "-0.005em", lineHeight: 1.45, maxWidth: 680 }}
+                  style={{ fontSize: 20, color: ink.muted, letterSpacing: "-0.005em", lineHeight: 1.45, maxWidth: 680 }}
                 >
                   {s(c.headline)}
                 </div>
@@ -4288,12 +4346,12 @@ function renderVariantBody({
             </div>
           </div>
           <div
-            className="mt-12 grid items-end gap-10"
+            className="mt-10 grid items-end gap-10"
             style={{
               gridTemplateColumns: `repeat(${items.length || 1}, 1fr)`,
-              minHeight: CHART_H + 80,
               borderBottom: `1px solid ${ink.hairline}`,
               paddingBottom: 0,
+              marginBottom: 96,
             }}
           >
             {items.map((it, i) => {
@@ -4315,15 +4373,15 @@ function renderVariantBody({
                 <div key={i} className="flex flex-col items-center justify-end" style={{ position: "relative" }}>
                   <div
                     className="tabular-nums"
-                    style={{ fontSize: 56, fontWeight: 600, color: ink.strong, letterSpacing: "-0.025em", lineHeight: 1 }}
+                    style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.025em", lineHeight: 1 }}
                   >
                     {s(it.value)}
-                    <span style={{ fontSize: 28, color: "var(--slide-accent-text)", marginLeft: 4 }}>
+                    <span style={{ fontSize: 22, color: "var(--slide-accent-text)", marginLeft: 4 }}>
                       {s(it.unit)}
                     </span>
                   </div>
                   <div
-                    className="mt-6 w-full"
+                    className="mt-4 w-full"
                     style={{
                       position: "relative",
                       height: h,
@@ -4374,10 +4432,10 @@ function renderVariantBody({
                     )}
                   </div>
                   <div
-                    className="mt-6 uppercase"
+                    className="mt-4 uppercase"
                     style={{
-                      fontSize: 16,
-                      letterSpacing: "0.28em",
+                      fontSize: 13,
+                      letterSpacing: "0.26em",
                       color: isLast ? "var(--slide-accent-text)" : ink.faint,
                       fontWeight: 700,
                     }}
@@ -4386,8 +4444,8 @@ function renderVariantBody({
                   </div>
                   {s(it.note) && (
                     <div
-                      className="mt-2 text-center"
-                      style={{ fontSize: 15, lineHeight: 1.4, color: ink.muted, maxWidth: 220 }}
+                      className="mt-1 text-center"
+                      style={{ fontSize: 13, lineHeight: 1.35, color: ink.muted, maxWidth: 200 }}
                     >
                       {s(it.note)}
                     </div>
@@ -4401,40 +4459,52 @@ function renderVariantBody({
     }
 
     case "MV-DASH-BREAKDOWN": {
-      const items = arr(c.items).slice(0, 4);
-      const segments: SegBar[] = items.map((it) => ({
-        label: s(it.label, "—"),
-        value: Math.max(0, Number(it.percent) || Number(it.value) || 1),
-        note: s(it.delta),
-      }));
-      const total = segments.reduce((s, x) => s + x.value, 0) || 1;
+      // Free-form Aurora v2. Horizontal rows stacked on a single vertical
+      // hairline rail on the left. Each row = feathered left-to-right
+      // multi-stop accent gradient (no track plate, no rounded pill). Top
+      // row is the highlight: halo + accent stroke tip at the value edge.
+      const items = arr(c.items).slice(0, 5);
+      const rowVals = items.map((it) => Math.max(0, Number(it.percent) || Number(it.value) || 1));
+      const max = Math.max(1, ...rowVals);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <SegmentedBar brand={brand} segments={segments} />
-          <div className="grid gap-6 mt-4" style={{ gridTemplateColumns: `repeat(${Math.min(items.length, 4)}, 1fr)` }}>
+          <div style={{ maxWidth: 900 }}>
+            <Kicker brand={brand}>{s(c.kicker, "Breakdown")}</Kicker>
+            <div
+              className="mt-4"
+              style={{ fontSize: 52, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+            >
+              {s(c.title, variant.name)}
+            </div>
+          </div>
+          <div
+            className="mt-14"
+            style={{ borderLeft: `1px solid ${ink.hairline}`, paddingLeft: 32 }}
+          >
             {items.map((it, i) => {
-              const pct = ((segments[i].value / total) * 100).toFixed(1);
+              const v = rowVals[i];
+              const widthPct = (v / max) * 100;
+              const isTop = i === 0;
               const delta = s(it.delta);
               const negative = delta.trim().startsWith("-");
               return (
-                <div key={i} style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`, paddingLeft: i === 0 ? 0 : 20 }}>
-                  <div className="uppercase" style={{ fontSize: 12, letterSpacing: "0.24em", color: ink.muted, fontWeight: 600 }}>{s(it.label)}</div>
-                  <div className="tabular-nums mt-2 flex items-baseline gap-3" style={{ fontSize: 34, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em" }}>
-                    {s(it.value, `${pct}%`)}
-                    <span style={{ fontSize: 18, color: ink.faint }}>{s(it.unit)}</span>
-                  </div>
-                  {delta && (
-                    <div className="uppercase mt-2" style={{ fontSize: 12, letterSpacing: "0.24em", color: negative ? "#B42318" : "var(--slide-accent-text)", fontWeight: 600 }}>{delta}</div>
-                  )}
-                </div>
+                <FreeformBreakdownRow
+                  key={i}
+                  label={s(it.label, "—")}
+                  value={s(it.value, `${v.toFixed(1)}%`)}
+                  unit={s(it.unit)}
+                  delta={delta}
+                  negative={negative}
+                  widthPct={widthPct}
+                  bloom={isTop}
+                />
               );
             })}
           </div>
-          <div className="mt-12"><LiveMetaFooter brand={brand} source={s(c.source, "Internal telemetry")} refCode={variant.id} /></div>
         </SlideFrame>
       );
     }
+
 
 
     case "MV-DASH-REGION-STATS": {
@@ -7053,11 +7123,374 @@ function FreeformBarChart({
   );
 }
 
+// ── Free-form Aurora v2 helpers (Batch 2) ─────────────────────────────
+// Shared <defs> — accent bloom, radial halo, soft glow. Every free-form
+// primitive uses the same vocabulary so charts read as one composition.
+function FreeformSvgDefs({ id }: { id: string }) {
+  return (
+    <defs>
+      <linearGradient id={`${id}-bloom-h`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.48} />
+        <stop offset="55%" stopColor="var(--slide-accent-text)" stopOpacity={0.22} />
+        <stop offset="90%" stopColor="var(--slide-accent-text)" stopOpacity={0.06} />
+        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+      </linearGradient>
+      <linearGradient id={`${id}-bloom-h-mute`} x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.20} />
+        <stop offset="70%" stopColor="var(--slide-accent-text)" stopOpacity={0.06} />
+        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+      </linearGradient>
+      <radialGradient id={`${id}-halo`} cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.55} />
+        <stop offset="55%" stopColor="var(--slide-accent-text)" stopOpacity={0.14} />
+        <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
+      </radialGradient>
+      <filter id={`${id}-glow`} x="-20%" y="-30%" width="140%" height="160%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="b" />
+        <feMerge>
+          <feMergeNode in="b" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
+  );
+}
+
+// Free-form donut. Hairline track ring + accent-glowing stroke arc, backed
+// by a feathered radial halo so the ring reads as a bloom rather than a
+// puck. Center numeral floats with no plate.
+function FreeformDonut({
+  brand: _brand,
+  percent,
+  size = 280,
+  bloom = false,
+}: {
+  brand: BrandMode;
+  percent: number;
+  size?: number;
+  bloom?: boolean;
+}) {
+  const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
+  const p = Math.max(0, Math.min(100, percent));
+  const stroke = 6;
+  const r = (size - stroke) / 2 - 8;
+  const circ = 2 * Math.PI * r;
+  const dash = (p / 100) * circ;
+  const cx = size / 2;
+  const cy = size / 2;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
+      <FreeformSvgDefs id={id} />
+      {/* Feathered halo behind — bigger + softer for the highlight */}
+      <circle
+        cx={cx}
+        cy={cy}
+        r={size * (bloom ? 0.62 : 0.48)}
+        fill={`url(#${id}-halo)`}
+        opacity={bloom ? 1 : 0.55}
+      />
+      {/* Hairline track ring */}
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke={ink.hairline} strokeWidth={1} />
+      {/* Accent stroke arc with soft glow */}
+      <circle
+        cx={cx}
+        cy={cy}
+        r={r}
+        fill="none"
+        stroke="var(--slide-accent-text)"
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeDasharray={`${dash} ${circ - dash}`}
+        transform={`rotate(-90 ${cx} ${cy})`}
+        filter={`url(#${id}-glow)`}
+      />
+      <text
+        x={cx}
+        y={cy}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize={size * 0.34}
+        fontWeight={600}
+        fill={ink.strong}
+        style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}
+      >
+        {Math.round(p)}
+      </text>
+      <text
+        x={cx}
+        y={cy + size * 0.19}
+        textAnchor="middle"
+        fontSize={size * 0.07}
+        fontWeight={600}
+        fill={ink.faint}
+        style={{ letterSpacing: "0.22em" }}
+      >
+        %
+      </text>
+    </svg>
+  );
+}
+
+// Free-form semicircular gauge. Hairline track + accent stroke arc with
+// glow + feathered halo behind the arc terminus. Value floats above the
+// arc with no plate.
+function FreeformSemiGauge({
+  brand: _brand,
+  percent,
+  size = 240,
+  bloom = false,
+}: {
+  brand: BrandMode;
+  percent: number;
+  size?: number;
+  bloom?: boolean;
+}) {
+  const ink = useSlideInk();
+  const id = useId().replace(/:/g, "");
+  const p = Math.max(0, Math.min(100, percent));
+  const stroke = 5;
+  const r = (size - stroke) / 2 - 6;
+  const cy = size / 2 + r / 2;
+  const cx = size / 2;
+  const arcC = Math.PI * r;
+  const dash = (p / 100) * arcC;
+  const h = cy + 24;
+  const arc = `M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`;
+  // Terminus: angle from left endpoint, sweeping CCW over the top.
+  // At p=0 → (cx-r, cy); at p=100 → (cx+r, cy); at p=50 → (cx, cy-r).
+  const theta = (Math.PI * p) / 100;
+  const termX = cx - Math.cos(theta) * r;
+  const termY = cy - Math.sin(theta) * r;
+  return (
+    <svg width={size} height={h} viewBox={`0 0 ${size} ${h}`} aria-hidden>
+      <FreeformSvgDefs id={id} />
+      {/* Feathered halo behind the terminus */}
+      <circle
+        cx={termX}
+        cy={termY}
+        r={size * (bloom ? 0.34 : 0.24)}
+        fill={`url(#${id}-halo)`}
+        opacity={bloom ? 1 : 0.7}
+      />
+      {/* Hairline track */}
+      <path d={arc} fill="none" stroke={ink.hairline} strokeWidth={1} />
+      {/* Accent stroke arc with glow */}
+      <path
+        d={arc}
+        fill="none"
+        stroke="var(--slide-accent-text)"
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeDasharray={`${dash} ${arcC}`}
+        filter={`url(#${id}-glow)`}
+      />
+      {/* Solid core at terminus */}
+      <circle cx={termX} cy={termY} r={4} fill="var(--slide-accent-text)" />
+      {/* Value floats inside the cup — sized to sit comfortably under the arc apex */}
+      <text
+        x={cx}
+        y={cy - 14}
+        textAnchor="middle"
+        fontSize={size * 0.22}
+        fontWeight={600}
+        fill={ink.strong}
+        style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}
+      >
+        {Math.round(p)}
+        <tspan fontSize={size * 0.09} fill={ink.faint} dx={4} style={{ letterSpacing: "0.18em" }}>%</tspan>
+      </text>
+    </svg>
+  );
+}
 
 
+// Free-form breakdown row. Left-to-right feathered accent gradient, no
+// pill/track. When bloom=true, adds a radial halo + accent stroke tip at
+// the value edge so the top row reads as the primary reading.
+function FreeformBreakdownRow({
+  label,
+  value,
+  unit,
+  delta,
+  negative,
+  widthPct,
+  bloom,
+}: {
+  label: string;
+  value: string;
+  unit: string;
+  delta: string;
+  negative: boolean;
+  widthPct: number;
+  bloom?: boolean;
+}) {
+  const ink = useSlideInk();
+  const height = bloom ? 68 : 52;
+  return (
+    <div className="relative py-6" style={{ borderBottom: `1px solid ${ink.hairline}` }}>
+      <div className="flex items-baseline justify-between mb-3">
+        <div
+          className="uppercase"
+          style={{
+            fontSize: bloom ? 15 : 13,
+            letterSpacing: "0.26em",
+            color: bloom ? "var(--slide-accent-text)" : ink.strong,
+            fontWeight: 700,
+          }}
+        >
+          {label}
+        </div>
+        <div className="flex items-baseline gap-3">
+          <span
+            className="tabular-nums"
+            style={{
+              fontSize: bloom ? 44 : 32,
+              fontWeight: 600,
+              color: ink.strong,
+              letterSpacing: "-0.025em",
+              lineHeight: 1,
+            }}
+          >
+            {value}
+          </span>
+          {unit && (
+            <span style={{ fontSize: bloom ? 22 : 16, color: "var(--slide-accent-text)", fontWeight: 500 }}>
+              {unit}
+            </span>
+          )}
+          {delta && (
+            <span
+              className="uppercase tabular-nums ml-2"
+              style={{
+                fontSize: 12,
+                letterSpacing: "0.24em",
+                color: negative ? "#E53D2E" : "var(--slide-accent-text)",
+                fontWeight: 700,
+              }}
+            >
+              {delta}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="relative w-full" style={{ height }}>
+        {/* Feathered gradient row — the accent bloom itself */}
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 0,
+            height: "100%",
+            width: `${Math.max(4, Math.min(100, widthPct))}%`,
+            background: bloom
+              ? "linear-gradient(90deg, color-mix(in oklab, var(--slide-accent-text) 55%, transparent) 0%, color-mix(in oklab, var(--slide-accent-text) 30%, transparent) 55%, color-mix(in oklab, var(--slide-accent-text) 8%, transparent) 90%, transparent 100%)"
+              : "linear-gradient(90deg, color-mix(in oklab, var(--slide-accent-text) 24%, transparent) 0%, color-mix(in oklab, var(--slide-accent-text) 10%, transparent) 65%, transparent 100%)",
+            filter: bloom ? "blur(0.4px)" : "none",
+          }}
+        />
+        {/* Radial halo + accent stroke tip on the highlight row */}
+        {bloom && (
+          <>
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                left: `calc(${Math.max(4, Math.min(100, widthPct))}% - 90px)`,
+                top: "50%",
+                width: 220,
+                height: 220,
+                transform: "translateY(-50%)",
+                background:
+                  "radial-gradient(circle, color-mix(in oklab, var(--slide-accent-text) 40%, transparent) 0%, color-mix(in oklab, var(--slide-accent-text) 12%, transparent) 45%, transparent 75%)",
+                pointerEvents: "none",
+                zIndex: 0,
+              }}
+            />
+            <div
+              aria-hidden
+              style={{
+                position: "absolute",
+                left: `calc(${Math.max(4, Math.min(100, widthPct))}% - 1px)`,
+                top: 0,
+                width: 2,
+                height: "100%",
+                background: "var(--slide-accent-text)",
+                boxShadow: "0 0 14px 2px color-mix(in oklab, var(--slide-accent-text) 55%, transparent)",
+                zIndex: 1,
+              }}
+            />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
 
+// Free-form report item. Reuses the MV-KPI-DASHBOARD language: kicker,
+// hero numeral, delta line, no plate/border. Bloom variant adds a radial
+// halo behind the numeral to establish primary reading.
+function FreeformReportItem({
+  brand,
+  item,
+  bloom,
+}: {
+  brand: BrandMode;
+  item: Item;
+  bloom?: boolean;
+}) {
+  const ink = useSlideInk();
+  const delta = s(item.delta);
+  const negative = delta.trim().startsWith("-");
+  const meta = s(item.meta, negative ? "Reduction" : "Growth");
+  return (
+    <div className="relative">
+      {bloom && (
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            left: -60,
+            top: -20,
+            width: 360,
+            height: 360,
+            background:
+              "radial-gradient(circle, color-mix(in oklab, var(--slide-accent-text) 32%, transparent) 0%, color-mix(in oklab, var(--slide-accent-text) 10%, transparent) 45%, transparent 75%)",
+            pointerEvents: "none",
+            zIndex: 0,
+          }}
+        />
+      )}
+      <div className="relative" style={{ zIndex: 1 }}>
+        <Kicker brand={brand} color={negative ? "#E53D2E" : undefined}>{meta}</Kicker>
+        <div
+          className="mt-6 tabular-nums"
+          style={{
+            fontSize: bloom ? 132 : 108,
+            fontWeight: 600,
+            color: ink.strong,
+            letterSpacing: "-0.04em",
+            lineHeight: 0.9,
+          }}
+        >
+          {delta || s(item.value)}
+        </div>
+        <div
+          className="mt-6"
+          style={{ fontSize: 22, color: ink.muted, lineHeight: 1.4, letterSpacing: "-0.005em", maxWidth: 520 }}
+        >
+          {s(item.label)}
+        </div>
+        {toNums(item.series).length > 0 && (
+          <div className="mt-8"><Sparkline brand={brand} values={toNums(item.series)} h={72} /></div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
+
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
   const p = Math.max(0, Math.min(100, percent));

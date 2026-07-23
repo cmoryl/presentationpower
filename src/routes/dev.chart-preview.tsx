@@ -100,7 +100,62 @@ const PILOTS = [
       ],
     },
   },
+  {
+    variantId: "MV-DASH-GAUGE-ROW",
+    label: "Free-form semi-gauges (Aurora v2)",
+    content: {
+      kicker: "Signals · Q3",
+      title: "Program health across the portfolio.",
+      items: [
+        { label: "On-track", body: "vs plan", value: 82 },
+        { label: "Utilization", body: "resourcing", value: 68 },
+        { label: "Quality", body: "audit score", value: 94 },
+        { label: "Adoption", body: "of rollouts", value: 57 },
+        { label: "Retention", body: "renewals", value: 76 },
+      ],
+    },
+  },
+  {
+    variantId: "MV-DASH-DONUT-TRIO",
+    label: "Free-form donut trio (Aurora v2)",
+    content: {
+      kicker: "Portfolio · Q3",
+      title: "Portfolio distribution.",
+      items: [
+        { label: "Trials on-track", body: "of the current portfolio", value: 74 },
+        { label: "Faster turnaround", body: "vs previous vendor", value: 52 },
+        { label: "Sites onboarded", body: "across three regions", value: 88 },
+      ],
+    },
+  },
+  {
+    variantId: "MV-DASH-BREAKDOWN",
+    label: "Free-form breakdown rows (Aurora v2)",
+    content: {
+      kicker: "Revenue mix",
+      title: "Where the top line comes from.",
+      items: [
+        { label: "Enterprise deals", percent: 46, value: "46", unit: "%", delta: "+8pt YoY" },
+        { label: "Renewals", percent: 28, value: "28", unit: "%", delta: "+3pt YoY" },
+        { label: "New logos", percent: 18, value: "18", unit: "%", delta: "+2pt YoY" },
+        { label: "Services", percent: 8, value: "8", unit: "%", delta: "-1pt YoY" },
+      ],
+    },
+  },
+  {
+    variantId: "MV-DASH-REPORT-CARDS",
+    label: "Free-form report cards (Aurora v2)",
+    content: {
+      kicker: "Half-year report",
+      title: "Two headline movements.",
+      items: [
+        { meta: "Growth", label: "Revenue lift from expanded footprint across APAC and EMEA.", value: "+62%", delta: "+62%", series: [12, 18, 22, 30, 44, 62] },
+        { meta: "Reduction", label: "Localization spend as a share of program budget.", value: "-38%", delta: "-38%", series: [78, 70, 66, 58, 46, 40] },
+      ],
+    },
+  },
 ] as const;
+
 
 const BRANDS = [
   { id: "bm-enterprise", label: "Enterprise (matches reference)" },
