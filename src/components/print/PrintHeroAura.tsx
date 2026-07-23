@@ -6,7 +6,7 @@ import type { CSSProperties } from "react";
 import { AuroraLayer } from "@/components/slide/flagship";
 import type { BrandMode } from "@/lib/taxonomy";
 
-type Aspect = "portrait" | "landscape" | "square";
+type Aspect = { w: number; h: number };
 
 type Props = {
   brand: BrandMode;
