@@ -109,10 +109,10 @@ export function AdaptorBriefLayout({
 }) {
   const accent = brand.tokens.accent || brand.tokens.primary;
   const primary = brand.tokens.primary;
-  // The template's hero is dark→light vertical; text over the hero must
-  // read on the dark portion regardless of the caller-selected mode.
-  const heroInk = "#FFFFFF";
-  const heroSubInk = "rgba(255,255,255,0.92)";
+  // Print guideline: no full-color hero band. Text over the hero uses the
+  // mode's default ink; background stays white / offset black.
+  const heroInk = ink;
+  const heroSubInk = inkSoft;
   const ink = mode === "dark" ? "#F5F4FF" : "#03002C";
   const inkSoft = mode === "dark" ? "rgba(245,244,255,0.72)" : "rgba(85,85,85,0.92)";
   const dividerCol = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.14)";
@@ -127,18 +127,6 @@ export function AdaptorBriefLayout({
   const features = content.features.slice(0, 6);
   const knowHow = content.knowHow.slice(0, 5);
 
-  // Vertical gradient hero — dark navy top holds the title/lockup, transitions
-  // through primary/accent, then feathers into the body bg. The 40→58% band
-  // is where feature cards sit over the seam.
-  const heroGradient =
-    `linear-gradient(180deg,
-      #03002C 0%,
-      ${primary} 20%,
-      color-mix(in srgb, ${primary} 55%, ${accent}) 34%,
-      color-mix(in srgb, ${primary} 25%, ${bg}) 52%,
-      ${bg} 66%,
-      ${bg} 100%)`;
-
 
   return (
     <SlideModeContext.Provider value={mode}>
@@ -150,10 +138,10 @@ export function AdaptorBriefLayout({
             backgroundColor: bg,
             color: ink,
             fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
-            backgroundImage: heroGradient,
             ...style,
           }}
         >
+
           {/* Aurora sits UNDER the hero gradient for the lower two-thirds. */}
           <div className="pointer-events-none absolute inset-0" style={{ opacity: mode === "dark" ? 0.9 : 0.75 }}>
             <AuroraLayer

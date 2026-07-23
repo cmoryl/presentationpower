@@ -147,32 +147,32 @@ export function CaseStudyLayout({
             aspect={auroraAspect(pageSize)}
           />
 
-          {/* HERO — dark division gradient band */}
+          {/* HERO — no full-color band; background inherits page bg (white / offset black).
+              A soft accent halo bleeds from the top-right so the division still reads. */}
           <div
             className="relative"
             style={{
               padding: `${cq(padTop(density))} ${cq(padX(density))} ${cq(96)}`,
-              background: `linear-gradient(120deg, #03002C 0%, ${primary} 45%, color-mix(in srgb, ${primary} 55%, ${accent}) 80%, ${accent} 100%)`,
               overflow: "hidden",
-              color: "#FFFFFF",
+              color: ink,
             }}
           >
-            {/* Feathered halo bloom over the hero, top-right */}
             <div
               className="pointer-events-none absolute"
               aria-hidden
               style={{
                 top: cq(-60), right: cq(-80),
                 width: cq(300), height: cq(300), borderRadius: "50%",
-                background: `radial-gradient(circle at 40% 40%, color-mix(in srgb, ${accent} 55%, transparent) 0%, color-mix(in srgb, ${accent} 20%, transparent) 50%, transparent 72%)`,
+                background: `radial-gradient(circle at 40% 40%, color-mix(in srgb, ${accent} 45%, transparent) 0%, color-mix(in srgb, ${accent} 15%, transparent) 50%, transparent 72%)`,
                 filter: `blur(${cq(6)})`,
+                opacity: mode === "dark" ? 0.85 : 0.55,
               }}
             />
             <div className="relative flex items-center justify-between" style={{ gap: cq(10) }}>
-              <div style={{ fontSize: cq(9.5), fontWeight: 600, letterSpacing: "0.14em", color: "#FFFFFF" }}>
+              <div style={{ fontSize: cq(9.5), fontWeight: 600, letterSpacing: "0.14em", color: accentInk }}>
                 {(content.eyebrow ?? "CLIENT CASE STUDY").toUpperCase()}
               </div>
-              <BrandLockup brand={brand} color={resolvePrintLogoInk(content.logoColor, "#FFFFFF")} size="xs" orientation="horizontal" />
+              <BrandLockup brand={brand} color={resolvePrintLogoInk(content.logoColor, ink)} size="xs" orientation="horizontal" />
             </div>
             <h1
               ref={heroRef}
@@ -180,7 +180,7 @@ export function CaseStudyLayout({
                 position: "relative",
                 margin: `${cq(14)} 0 0`,
                 fontWeight: 700, fontSize: cq(32), lineHeight: 1.15,
-                letterSpacing: "-0.015em", color: "#FFFFFF", maxWidth: cq(460),
+                letterSpacing: "-0.015em", color: ink, maxWidth: cq(460),
               }}
             >
               {heroTitle || "Untitled case study"}
@@ -191,13 +191,14 @@ export function CaseStudyLayout({
                 style={{
                   position: "relative", margin: `${cq(12)} 0 0`,
                   fontSize: cq(12), lineHeight: 1.6,
-                  color: "rgba(255,255,255,0.9)", maxWidth: cq(420),
+                  color: inkSoft, maxWidth: cq(420),
                 }}
               >
                 {[content.industry, content.audience].filter(Boolean).join(" · ")}
               </p>
             )}
           </div>
+
 
           {/* STAT PILLS — tucked over the hero/body seam */}
           {stats.length > 0 && (
