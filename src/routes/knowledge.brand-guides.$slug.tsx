@@ -56,6 +56,11 @@ function BrandGuideView() {
   const accent = guide.secondaryColors[0]?.hex ?? "#A1FBF9";
   const intel = getBrandhubIntel(guide.slug);
   const logos = getDivisionLogos(guide.divisionId) ?? getDivisionLogos(guide.slug);
+  const heroImagery = getDivisionImagery(guide.divisionId);
+  // Pick a deterministic approved backdrop: prefer abstracts (photography
+  // stays for content sections), fall back to the first photograph.
+  const heroBackdrop =
+    heroImagery?.abstracts?.[0] ?? heroImagery?.photos?.[0] ?? null;
 
   return (
     <AppShell>
@@ -68,43 +73,84 @@ function BrandGuideView() {
 
       {/* Hero */}
       <section
-        className="mt-4 overflow-hidden rounded-3xl p-10 md:p-14"
+        className="relative mt-4 overflow-hidden rounded-3xl p-10 md:p-16"
         style={{ background: hero, color: "#fff" }}
       >
-        <div className="text-[11px] uppercase tracking-[0.4em] opacity-70">
-          {guide.divisionId === "master" ? "Master brand" : division?.name ?? "Division"} · v{guide.version}
-        </div>
-        <h1 className="mt-4 text-5xl font-medium leading-[100%] tracking-[-0.04em] md:text-6xl">
-          {guide.title}
-        </h1>
-        <div className="mt-3 text-lg opacity-80">{guide.subtitle}</div>
-        {guide.tagline && (
-          <div className="mt-8 max-w-2xl text-2xl leading-[110%] tracking-[-0.02em]">
-            {guide.tagline}
-          </div>
-        )}
-        <p className="mt-6 max-w-2xl text-sm leading-[140%] opacity-80">{guide.intro}</p>
-
-        {logos?.white || logos?.color ? (
-          <div className="mt-8 inline-flex items-center rounded-2xl bg-card/10 px-5 py-4 ring-1 ring-white/20 backdrop-blur">
+        {/* Approved backdrop layer */}
+        {heroBackdrop && (
+          <>
             <img
-              src={logos.white ?? logos.color!}
-              alt={`${guide.title} logo`}
-              className="h-12 w-auto md:h-14"
+              src={heroBackdrop}
+              alt=""
+              aria-hidden
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-55 mix-blend-screen"
               loading="lazy"
             />
-          </div>
-        ) : null}
-
-        <div className="mt-10 flex items-center gap-2">
-          {[...guide.primaryColors, ...guide.secondaryColors].map((c) => (
-            <span
-              key={c.hex}
-              className="h-8 w-8 rounded-full ring-2 ring-white/30"
-              style={{ background: c.hex }}
-              title={`${c.name} ${c.hex}`}
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background: `linear-gradient(115deg, ${hero} 20%, ${hero}CC 55%, transparent 100%)`,
+              }}
             />
-          ))}
+          </>
+        )}
+        {/* Accent orb — brand secondary color pushed behind glass */}
+        <div
+          className="pointer-events-none absolute -right-24 -top-24 h-[420px] w-[420px] rounded-full opacity-40 blur-3xl"
+          style={{ background: accent }}
+          aria-hidden
+        />
+
+        <div className="relative">
+          <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.3em] ring-1 ring-white/25 backdrop-blur">
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: accent }} />
+            {guide.divisionId === "master" ? "Master brand" : division?.name ?? "Division"}
+            <span className="opacity-60">·</span>
+            <span className="opacity-70">v{guide.version}</span>
+          </div>
+
+          <h1 className="mt-6 text-6xl font-medium leading-[95%] tracking-[-0.045em] md:text-7xl">
+            {guide.title}
+          </h1>
+          <div className="mt-2 h-[2px] w-24 rounded-full" style={{ background: accent }} />
+          <div className="mt-5 text-lg font-light opacity-85 md:text-xl">{guide.subtitle}</div>
+          {guide.tagline && (
+            <div className="mt-8 max-w-2xl text-2xl leading-[115%] tracking-[-0.02em] md:text-[28px]">
+              {guide.tagline}
+            </div>
+          )}
+          <p className="mt-6 max-w-2xl text-sm leading-[150%] opacity-80">{guide.intro}</p>
+
+          {logos?.white || logos?.color ? (
+            <div className="mt-8 inline-flex items-center gap-4 rounded-2xl bg-white/10 px-5 py-4 ring-1 ring-white/20 backdrop-blur">
+              <img
+                src={logos.white ?? logos.color!}
+                alt={`${guide.title} logo`}
+                className="h-12 w-auto md:h-14"
+                loading="lazy"
+              />
+              <div className="hidden h-8 w-px bg-white/25 md:block" />
+              <a
+                href={logos.white ?? logos.color!}
+                download
+                className="hidden items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.25em] opacity-80 transition hover:opacity-100 md:inline-flex"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Download
+              </a>
+            </div>
+          ) : null}
+
+          <div className="mt-10 flex items-center gap-2">
+            {[...guide.primaryColors, ...guide.secondaryColors].map((c) => (
+              <span
+                key={c.hex}
+                className="h-8 w-8 rounded-full ring-2 ring-white/30"
+                style={{ background: c.hex }}
+                title={`${c.name} ${c.hex}`}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -112,15 +158,25 @@ function BrandGuideView() {
       {guide.values && guide.values.length > 0 && (
         <Section title="Core values" eyebrow="01">
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-            {guide.values.map((v) => (
-              <div key={v.label} className="rounded-xl border border-border bg-card p-4">
-                <div className="text-sm font-semibold" style={{ color: hero }}>{v.label}</div>
-                <div className="mt-1 text-xs text-muted-foreground">{v.description}</div>
-              </div>
-            ))}
+            {guide.values.map((v) => {
+              const Icon = pickValueIcon(v.label);
+              return (
+                <div key={v.label} className="group rounded-xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:shadow-lg">
+                  <div
+                    className="flex h-10 w-10 items-center justify-center rounded-lg"
+                    style={{ background: `${hero}14`, color: hero }}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="mt-3 text-sm font-semibold" style={{ color: hero }}>{v.label}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">{v.description}</div>
+                </div>
+              );
+            })}
           </div>
         </Section>
       )}
+
 
       {/* Logo */}
       <Section title="Logo system" eyebrow="02">
