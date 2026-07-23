@@ -330,7 +330,7 @@ export function CaseStudyLayout({
                             background: chipBg, flexShrink: 0,
                           }}
                         >
-                          <Icon d={ICONS.check} size={cq(12)} color={accentInk} sw={2} />
+                          <Icon d={ICON_PATHS.check} size={cq(12)} color={accentInk} strokeWidth={2} />
                         </div>
                         <div style={{ fontSize: cq(10), color: inkSoft }}>{b}</div>
                       </div>
