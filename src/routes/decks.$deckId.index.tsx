@@ -415,14 +415,12 @@ function DeckEditor() {
                   <span className="mb-1 block font-medium text-black/70">Orientation</span>
                   <select
                     value={active.logoOrientation ?? "auto"}
-                    onChange={(e) => setSlideLogo(deck.id, active.id, { orientation: e.target.value as "auto" | "horizontal" | "stacked" | "vertical-left" | "vertical-right" | "mark-only" })}
+                    onChange={(e) => setSlideLogo(deck.id, active.id, { orientation: e.target.value as "auto" | "horizontal" | "stacked" | "mark-only" })}
                     className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
                   >
                     <option value="auto">Auto (deck default · {logoOrientation})</option>
                     <option value="horizontal">Horizontal (side-by-side)</option>
                     <option value="stacked">Stacked</option>
-                    <option value="vertical-left">Vertical · left edge (rotated −90°)</option>
-                    <option value="vertical-right">Vertical · right edge (rotated +90°)</option>
                     <option value="mark-only">Mark only (monogram)</option>
                   </select>
                 </label>
@@ -445,7 +443,7 @@ function DeckEditor() {
                 </label>
               </div>
               <p className="mt-3 text-[11px] text-black/50">
-                Always rendered as the top-most visual layer. Half-size positions keep the mark quiet; vertical orientations pin the lockup to the left or right edge regardless of Position; mark-only shows only the monogram.
+                Always rendered as the top-most visual layer. Half-size positions keep the mark quiet; mark-only shows only the monogram.
               </p>
             </div>
           )}
