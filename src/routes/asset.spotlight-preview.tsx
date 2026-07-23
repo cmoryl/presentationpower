@@ -69,13 +69,20 @@ const SEEDED_CONTENT: SpotlightContent = emptySpotlight({
 
 function SpotlightPreview() {
   const { brandModes } = useTaxonomy();
-  const brand = useMemo(
-    () =>
-      brandModes.find((b) => b.id === "globallink") ??
-      brandModes.find((b) => b.name.toLowerCase().includes("globallink")) ??
-      brandModes[0],
-    [brandModes],
-  );
+  const brandParam =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("brand")
+      : null;
+  const brand = useMemo(() => {
+    if (brandParam) {
+      const hit = brandModes.find((b) => b.id === brandParam || b.id === `bm-${brandParam}`);
+      if (hit) return hit;
+    }
+    return (
+      brandModes.find((b) => b.id === "bm-tp-lifesci") ??
+      brandModes[0]
+    );
+  }, [brandModes, brandParam]);
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
   const [busy, setBusy] = useState<null | "light" | "dark">(null);
