@@ -1026,6 +1026,21 @@ const VariantCard = memo(function VariantCard({
       )}
 
       {/* Metadata footer */}
+      {compact ? (
+        <div className="space-y-1 px-3 pb-3 pt-2">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="truncate text-sm font-semibold tracking-tight text-[#03002C]" title={videoExample ? videoExample.title : variant.name}>
+              {videoExample ? videoExample.title : variant.name}
+            </h3>
+            <span className="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-slate-500">
+              {variant.familyId}
+            </span>
+          </div>
+          <div className="truncate font-mono text-[9px] uppercase tracking-[0.1em] text-[#003FC7]/80" title={variant.id}>
+            {variant.id}
+          </div>
+        </div>
+      ) : (
       <div className="space-y-4 p-6 pt-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 space-y-1">
@@ -1082,6 +1097,7 @@ const VariantCard = memo(function VariantCard({
           </div>
         </div>
       </div>
+      )}
     </button>
     {videoExample && onImportExample && (
       <button
