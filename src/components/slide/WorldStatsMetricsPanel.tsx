@@ -21,6 +21,17 @@ import {
 
 type RegionKey = LocationPin["region"];
 const REGION_KEYS: RegionKey[] = ["AMER", "EMEA", "APAC", "LATAM", "MEA"];
+type RoleKey = NonNullable<LocationPin["role"]>;
+const ROLE_KEYS: RoleKey[] = ["HQ", "hub", "office", "delivery", "partner"];
+const ROLE_LABELS: Record<RoleKey, string> = {
+  HQ: "HQ",
+  hub: "Hub",
+  office: "Office",
+  delivery: "Delivery",
+  partner: "Partner",
+};
+const TOP_N_OPTIONS = [5, 10, 25] as const;
+type TopN = (typeof TOP_N_OPTIONS)[number];
 
 type Props = {
   brandId: string;
@@ -28,11 +39,15 @@ type Props = {
   metrics: unknown;
   activeMetricId: unknown;
   regionFilter: unknown;
+  excludeRoles: unknown;
+  topN: unknown;
   onChange: (patch: {
     items?: LocationPin[];
     metrics?: LocationMetric[];
     activeMetricId?: string | null;
     regionFilter?: RegionKey[] | null;
+    excludeRoles?: RoleKey[] | null;
+    topN?: TopN;
   }) => void;
 };
 
@@ -92,7 +107,7 @@ function slug(input: string): string {
   return input.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `metric-${Date.now()}`;
 }
 
-export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId, regionFilter, onChange }: Props) {
+export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId, regionFilter, excludeRoles, topN, onChange }: Props) {
   const seeded = React.useMemo(() => getDivisionLocationSet(brandId), [brandId]);
   const pins = React.useMemo(() => coercePins(items, seeded.pins), [items, seeded.pins]);
   const metricList = React.useMemo(() => coerceMetrics(metrics), [metrics]);
@@ -118,6 +133,31 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
     for (const p of pins) acc[p.region] = (acc[p.region] ?? 0) + 1;
     return acc;
   }, [pins]);
+
+  const excludedRoles = React.useMemo<RoleKey[]>(() => {
+    if (!Array.isArray(excludeRoles)) return [];
+    const set = new Set(excludeRoles.filter((r): r is RoleKey => ROLE_KEYS.includes(r as RoleKey)));
+    return Array.from(set);
+  }, [excludeRoles]);
+  const roleCounts = React.useMemo(() => {
+    const acc: Record<RoleKey, number> = { HQ: 0, hub: 0, office: 0, delivery: 0, partner: 0 };
+    for (const p of pins) {
+      const r = (p.role ?? "office") as RoleKey;
+      acc[r] = (acc[r] ?? 0) + 1;
+    }
+    return acc;
+  }, [pins]);
+  const toggleRole = (k: RoleKey) => {
+    const set = new Set(excludedRoles);
+    if (set.has(k)) set.delete(k); else set.add(k);
+    const next = ROLE_KEYS.filter((r) => set.has(r));
+    onChange({ excludeRoles: next.length === 0 ? null : next });
+  };
+
+  const currentTopN: TopN = TOP_N_OPTIONS.includes(Number(topN) as TopN)
+    ? (Number(topN) as TopN)
+    : 5;
+  const setTopN = (n: TopN) => onChange({ topN: n });
 
 
   const updateMetric = (id: string, patch: Partial<LocationMetric>) => {
@@ -261,6 +301,85 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
           Filters apply to the map, the legend scale, the headline total, and the top-locations list.
         </div>
       </div>
+
+      {/* Role filter */}
+      <div className="mt-3 rounded-xl border border-black/10 bg-black/[0.015] p-3">
+        <div className="flex items-baseline justify-between">
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-black/60">
+            Role filter {excludedRoles.length === 0 ? "· all roles" : `· hiding ${excludedRoles.length}`}
+          </div>
+          {excludedRoles.length > 0 && (
+            <button
+              type="button"
+              onClick={() => onChange({ excludeRoles: null })}
+              className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-sky-500 hover:text-sky-600"
+            >
+              Reset
+            </button>
+          )}
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {ROLE_KEYS.map((k) => {
+            const excluded = excludedRoles.includes(k);
+            const count = roleCounts[k] ?? 0;
+            const disabled = count === 0;
+            return (
+              <button
+                key={k}
+                type="button"
+                disabled={disabled}
+                onClick={() => toggleRole(k)}
+                className={`flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-medium transition ${
+                  disabled
+                    ? "cursor-not-allowed border-black/10 text-black/25"
+                    : excluded
+                    ? "border-black/20 bg-black/5 text-black/40 line-through"
+                    : "border-sky-500/60 bg-sky-500/10 text-sky-700 hover:border-sky-500"
+                }`}
+                title={disabled ? "No pins with this role" : excluded ? "Click to include" : "Click to exclude"}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${excluded ? "bg-black/25" : "bg-sky-600"}`} />
+                <span className="tracking-wide">{ROLE_LABELS[k]}</span>
+                <span className="tabular-nums text-black/40">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-2 text-[10px] text-black/45">
+          Excluded roles are hidden from the map, the totals, and the top-locations list.
+        </div>
+      </div>
+
+      {/* Top N control */}
+      <div className="mt-3 flex items-center justify-between rounded-xl border border-black/10 bg-black/[0.015] p-3">
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-black/60">
+            Top locations
+          </div>
+          <div className="mt-1 text-[10px] text-black/45">
+            How many entries to show in the ranked list.
+          </div>
+        </div>
+        <div className="flex overflow-hidden rounded-full border border-black/15">
+          {TOP_N_OPTIONS.map((n) => {
+            const active = currentTopN === n;
+            return (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setTopN(n)}
+                className={`px-3 py-1 text-[11px] font-semibold uppercase tracking-widest transition ${
+                  active ? "bg-sky-600 text-white" : "bg-white text-black/60 hover:text-sky-600"
+                }`}
+              >
+                Top {n}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+
 
 
 

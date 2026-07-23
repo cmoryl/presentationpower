@@ -4903,9 +4903,21 @@ function renderLocationsVariant(
     const filterSet = new Set(
       rawFilter.filter((r): r is LocPin["region"] => typeof r === "string" && REGION_KEY_SET.includes(r as LocPin["region"])),
     );
-    const filteredPins = filterSet.size > 0 && filterSet.size < REGION_KEY_SET.length
+    // Optional role exclusions — hide pins whose role is in this list.
+    const ROLE_KEY_SET: NonNullable<LocPin["role"]>[] = ["HQ", "hub", "office", "delivery", "partner"];
+    const rawExcludeRoles = Array.isArray(c.excludeRoles) ? (c.excludeRoles as unknown[]) : [];
+    const excludeRoleSet = new Set(
+      rawExcludeRoles.filter((r): r is NonNullable<LocPin["role"]> =>
+        typeof r === "string" && ROLE_KEY_SET.includes(r as NonNullable<LocPin["role"]>),
+      ),
+    );
+    const roleFilterActive = excludeRoleSet.size > 0;
+    const regionFilteredPins = filterSet.size > 0 && filterSet.size < REGION_KEY_SET.length
       ? pins.filter((p) => filterSet.has(p.region))
       : pins;
+    const filteredPins = roleFilterActive
+      ? regionFilteredPins.filter((p) => !excludeRoleSet.has((p.role ?? "office") as NonNullable<LocPin["role"]>))
+      : regionFilteredPins;
     const filteredCities = filteredPins.length;
     const filteredRegions = (Object.keys(LOC_REGION_LABELS) as LocPin["region"][]).filter((k) => filteredPins.some((p) => p.region === k)).length;
     const filterActive = filteredPins.length !== pins.length;
@@ -4926,11 +4938,14 @@ function renderLocationsVariant(
     }
 
 
+    const TOP_N_OPTIONS = [5, 10, 25] as const;
+    const rawTopN = Number(c.topN);
+    const topN = (TOP_N_OPTIONS as readonly number[]).includes(rawTopN) ? rawTopN : 5;
     const topPins = usingMetric
       ? [...filteredPins]
           .filter((p) => Number.isFinite(p.values?.[activeMetric!.id]))
           .sort((a, b) => (b.values![activeMetric!.id] as number) - (a.values![activeMetric!.id] as number))
-          .slice(0, 4)
+          .slice(0, topN)
       : [];
 
     return (
@@ -5005,7 +5020,7 @@ function renderLocationsVariant(
                   {topPins.length > 0 && (
                     <div className="mt-6 border-t pt-4" style={{ borderColor: ink.hairline }}>
                       <div style={{ color: ink.muted, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600 }}>
-                        Top locations
+                        Top {topN} locations{roleFilterActive ? ` · excl. ${Array.from(excludeRoleSet).join(", ")}` : ""}
                       </div>
                       <div className="mt-3 space-y-1.5">
                         {topPins.map((p) => (
