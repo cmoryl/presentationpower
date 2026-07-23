@@ -6,7 +6,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { CaseStudyContent, PrintAssetContext, PrintAssetKind, PrintAssetRow } from "./print-assets.types";
-import { emptyCaseStudy } from "./print-assets.types";
+import { emptyCaseStudy, emptySpotlight, emptyEBrochure, emptyAdaptorBrief } from "./print-assets.types";
 
 const KindEnum = z.enum(["case-study", "spotlight", "ebrochure", "adaptor-brief"]);
 
