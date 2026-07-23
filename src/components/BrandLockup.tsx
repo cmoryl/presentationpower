@@ -48,7 +48,7 @@ export function BrandLockup({
   clientName,
   clientLogoUrl,
   subCompany,
-  orientation = "horizontal",
+  orientation: orientationRaw = "horizontal",
 }: {
   brand: BrandMode;
   color: string;
