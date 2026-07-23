@@ -23,7 +23,13 @@ export type PrintHeroMedia = {
   autoScrimThreshold?: number;   // 0..1 luminance above which the boost kicks in (default 0.6)
   blendMode?: CSSProperties["mixBlendMode"]; // default "multiply"
   heightPct?: number;            // 0..100, share of page height, default 46 (used when aspect="fill")
+  // Responsive safe-area guards. Focal point is clamped so the subject can't
+  // slide out of the crop as the band re-flows across breakpoints, and the
+  // legibility scrim reserves this strip for hero copy.
+  safeAreaX?: number;            // 0..40 — horizontal safe inset %, default 8
+  safeAreaY?: number;            // 0..40 — vertical safe inset %, default 10
 };
+
 
 const ASPECT_RATIOS: Record<Exclude<PrintHeroAspect, "fill">, number> = {
   "21:9": 21 / 9,
@@ -52,21 +58,43 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
   const aspect = media.aspect ?? "fill";
   const pageBg = mode === "dark" ? "#111114" : "#FFFFFF";
 
+  // Safe-area guards keep the subject inside the crop as the band reflows
+  // across breakpoints. Clamp so users can't zero-out the buffer.
+  const safeX = Math.min(40, Math.max(0, media.safeAreaX ?? 8));
+  const safeY = Math.min(40, Math.max(0, media.safeAreaY ?? 10));
+
   // Focal point: prefer explicit x/y, then legacy focalPoint, else 50%/40%.
-  const fx = typeof media.focalX === "number" ? clampPct(media.focalX) : null;
-  const fy = typeof media.focalY === "number" ? clampPct(media.focalY) : null;
+  // Then clamp within [safeArea, 100 - safeArea] so the point of interest
+  // can never slide out of the visible band at any breakpoint.
+  const rawFx = typeof media.focalX === "number" ? clampPct(media.focalX) : null;
+  const rawFy = typeof media.focalY === "number" ? clampPct(media.focalY) : null;
+  const fx = rawFx !== null ? clampRange(rawFx, safeX, 100 - safeX) : null;
+  const fy = rawFy !== null ? clampRange(rawFy, safeY, 100 - safeY) : null;
   const objectPosition =
     fx !== null || fy !== null
       ? `${fx ?? 50}% ${fy ?? 40}%`
       : media.focalPoint ?? "50% 40%";
 
-  // Band sizing: "fill" uses heightPct; ratios use aspectRatio and let the
-  // browser derive height from page width so photos stay properly proportioned
-  // across A4 / Letter / Square.
+  // Band sizing. Container-query units (cqw) keep the band proportional to
+  // the page width across every preview breakpoint. For "fill" we also
+  // clamp the height into a sensible min/max in cqw so the band never
+  // collapses on very tall previews or overwhelms very short ones.
+  const minBandCqw = cq(280); // ≈ 34% of page width, floor for readable hero
+  const maxBandCqw = cq(720); // upper ceiling on very short containers
   const bandStyle: CSSProperties =
     aspect === "fill"
-      ? { height: `${heightPct}%`, overflow: "hidden" }
-      : { aspectRatio: String(ASPECT_RATIOS[aspect]), width: "100%", overflow: "hidden" };
+      ? {
+          height: `clamp(${minBandCqw}, ${heightPct}%, ${maxBandCqw})`,
+          overflow: "hidden",
+        }
+      : {
+          aspectRatio: String(ASPECT_RATIOS[aspect]),
+          width: "100%",
+          minHeight: minBandCqw,
+          maxHeight: maxBandCqw,
+          overflow: "hidden",
+        };
+
 
   // scrimGradient is derived below from `effectiveScrim` so auto-scrim can
   // upgrade a "none" scrim when bright imagery is detected.
@@ -198,7 +226,7 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
           left: 0,
           right: 0,
           bottom: 0,
-          height: cq(80),
+          height: `max(${cq(80)}, ${safeY * 0.9}%)`,
           background: `linear-gradient(180deg, transparent 0%, ${pageBg} 100%)`,
           opacity: washStrength,
         }}
@@ -210,6 +238,11 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
 function clamp01(n: number): number {
   if (Number.isNaN(n)) return 0;
   return Math.max(0, Math.min(1, n));
+}
+
+function clampRange(n: number, lo: number, hi: number): number {
+  if (Number.isNaN(n)) return (lo + hi) / 2;
+  return Math.max(lo, Math.min(hi, n));
 }
 
 function clampPct(n: number): number {
