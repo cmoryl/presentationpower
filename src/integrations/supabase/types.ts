@@ -1158,6 +1158,7 @@ export type Database = {
           template_kinds: string[]
           updated_at: string
           uploaded_by: string
+          variants: Json
         }
         Insert: {
           approved?: boolean
@@ -1179,6 +1180,7 @@ export type Database = {
           template_kinds?: string[]
           updated_at?: string
           uploaded_by: string
+          variants?: Json
         }
         Update: {
           approved?: boolean
@@ -1200,6 +1202,7 @@ export type Database = {
           template_kinds?: string[]
           updated_at?: string
           uploaded_by?: string
+          variants?: Json
         }
         Relationships: []
       }

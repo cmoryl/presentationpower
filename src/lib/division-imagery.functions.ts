@@ -31,6 +31,15 @@ const SIGNED_TTL = 60 * 60 * 24 * 7; // 7 days
 const MAX_BYTES = 20 * 1024 * 1024;
 
 // data URL or plain base64 of an image, capped to ~27MB base64 (~20MB binary).
+const VariantInput = z.object({
+  preset: z.enum(["thumb", "square", "portrait", "landscape"]),
+  filename: z.string().min(1).max(300),
+  contentType: z.string().min(1).max(120),
+  data: z.string().min(1).max(28_000_000),
+  width: z.number().int().positive().max(8000).optional(),
+  height: z.number().int().positive().max(8000).optional(),
+});
+
 const UploadInput = z.object({
   divisionId: z.string().min(1).max(120),
   filename: z.string().min(1).max(300),
@@ -40,6 +49,7 @@ const UploadInput = z.object({
   tags: z.array(z.string().max(60)).max(24).default([]),
   note: z.string().max(1200).optional(),
   prompt: z.string().max(4000).optional(),
+  variants: z.array(VariantInput).max(8).optional(),
 });
 
 function decodeBase64Payload(payload: string): Buffer {
@@ -66,6 +76,42 @@ export const uploadDivisionImagery = createServerFn({ method: "POST" })
     });
     if (up.error) throw new Error(`Upload failed: ${up.error.message ?? "unknown"}`);
 
+    // Upload any pre-rendered crop variants. We do this before the row insert
+    // so a failure mid-batch is cleaned up along with the original.
+    const variantPaths: string[] = [];
+    const variantsMeta: Record<
+      string,
+      { path: string; width: number | null; height: number | null; bytes: number; contentType: string }
+    > = {};
+    if (data.variants?.length) {
+      for (const v of data.variants) {
+        const vBuf = decodeBase64Payload(v.data);
+        if (vBuf.length === 0 || vBuf.length > MAX_BYTES) continue;
+        const vSafe = v.filename.replace(/[^\w.\-]+/g, "_").slice(-180);
+        const vPath = `${context.userId}/${id}/${v.preset}-${vSafe}`;
+        const vUp = await s.storage.from(BUCKET).upload(vPath, vBuf, {
+          contentType: v.contentType,
+          upsert: false,
+        });
+        if (vUp.error) {
+          // Roll back everything on any variant failure.
+          await s.storage
+            .from(BUCKET)
+            .remove([path, ...variantPaths])
+            .catch(() => {});
+          throw new Error(`Variant upload failed: ${vUp.error.message ?? "unknown"}`);
+        }
+        variantPaths.push(vPath);
+        variantsMeta[v.preset] = {
+          path: vPath,
+          width: v.width ?? null,
+          height: v.height ?? null,
+          bytes: vBuf.length,
+          contentType: v.contentType,
+        };
+      }
+    }
+
     const { data: row, error } = await s
       .from("division_imagery")
       .insert({
@@ -80,17 +126,28 @@ export const uploadDivisionImagery = createServerFn({ method: "POST" })
         tags: data.tags,
         note: data.note ?? null,
         prompt: data.prompt ?? null,
+        variants: variantsMeta,
       })
       .select()
       .single();
     if (error) {
-      await s.storage.from(BUCKET).remove([path]).catch(() => {});
+      await s.storage.from(BUCKET).remove([path, ...variantPaths]).catch(() => {});
       throw new Error(`Save failed: ${(error as { message?: string }).message ?? "unknown"}`);
     }
     return row as { id: string };
   });
 
 export type PrintTemplateKind = "spotlight" | "ebrochure" | "case-study" | "adaptor-brief";
+
+export type VariantPreset = "thumb" | "square" | "portrait" | "landscape";
+
+export type ImageVariantMeta = {
+  path: string;
+  width: number | null;
+  height: number | null;
+  bytes: number;
+  contentType: string;
+};
 
 export type DivisionImageryEntry = {
   id: string;
@@ -110,10 +167,29 @@ export type DivisionImageryEntry = {
   collection: string | null;
   template_kinds: PrintTemplateKind[];
   is_default_for: PrintTemplateKind[];
+  variants: Partial<Record<VariantPreset, ImageVariantMeta>>;
+  variantUrls: Partial<Record<VariantPreset, string | null>>;
   created_at: string;
   updated_at: string;
   signedUrl: string | null;
 };
+
+async function signVariantUrls(
+  s: SbClient,
+  variants: Partial<Record<VariantPreset, ImageVariantMeta>> | null | undefined,
+): Promise<Partial<Record<VariantPreset, string | null>>> {
+  const out: Partial<Record<VariantPreset, string | null>> = {};
+  if (!variants) return out;
+  const entries = Object.entries(variants) as Array<[VariantPreset, ImageVariantMeta]>;
+  await Promise.all(
+    entries.map(async ([preset, meta]) => {
+      if (!meta?.path) return;
+      const res = await s.storage.from(BUCKET).createSignedUrl(meta.path, SIGNED_TTL);
+      out[preset] = res.data?.signedUrl ?? null;
+    }),
+  );
+  return out;
+}
 
 export const listDivisionImagery = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -128,7 +204,7 @@ export const listDivisionImagery = createServerFn({ method: "GET" })
     let q = s
       .from("division_imagery")
       .select(
-        "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, prompt, uploaded_by, approved, approved_by, approved_at, collection, template_kinds, is_default_for, created_at, updated_at",
+        "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, prompt, uploaded_by, approved, approved_by, approved_at, collection, template_kinds, is_default_for, variants, created_at, updated_at",
       )
       .eq("division_id", data.divisionId)
       .order("created_at", { ascending: false })
@@ -136,11 +212,14 @@ export const listDivisionImagery = createServerFn({ method: "GET" })
     if (data.onlyApproved) q = q.eq("approved", true);
     const { data: rows, error } = await q;
     if (error) throw new Error((error as { message?: string }).message ?? "Query failed");
-    const list = (rows ?? []) as Array<Omit<DivisionImageryEntry, "signedUrl">>;
+    const list = (rows ?? []) as Array<Omit<DivisionImageryEntry, "signedUrl" | "variantUrls">>;
     const signed = await Promise.all(
       list.map(async (r) => {
-        const res = await s.storage.from(BUCKET).createSignedUrl(r.storage_path, SIGNED_TTL);
-        return { ...r, signedUrl: res.data?.signedUrl ?? null };
+        const [main, variantUrls] = await Promise.all([
+          s.storage.from(BUCKET).createSignedUrl(r.storage_path, SIGNED_TTL),
+          signVariantUrls(s, r.variants ?? {}),
+        ]);
+        return { ...r, signedUrl: main.data?.signedUrl ?? null, variantUrls };
       }),
     );
     return signed;
@@ -189,14 +268,19 @@ export const deleteDivisionImagery = createServerFn({ method: "POST" })
     const s = context.supabase as unknown as SbClient;
     const { data: row, error: qErr } = await s
       .from("division_imagery")
-      .select("storage_path")
+      .select("storage_path, variants")
       .eq("id", data.id)
       .maybeSingle();
     if (qErr) throw new Error((qErr as { message?: string }).message ?? "Lookup failed");
     const path = (row as { storage_path?: string } | null)?.storage_path;
+    const variants = (row as { variants?: Record<string, { path?: string }> } | null)?.variants ?? {};
+    const variantPaths = Object.values(variants)
+      .map((v) => v?.path)
+      .filter((p): p is string => !!p);
     const { error } = await s.from("division_imagery").delete().eq("id", data.id);
     if (error) throw new Error((error as { message?: string }).message ?? "Delete failed");
-    if (path) await s.storage.from(BUCKET).remove([path]).catch(() => {});
+    const toRemove = [path, ...variantPaths].filter((p): p is string => !!p);
+    if (toRemove.length) await s.storage.from(BUCKET).remove(toRemove).catch(() => {});
     return { ok: true };
   });
 
@@ -245,14 +329,14 @@ export const pickHeroForTemplate = createServerFn({ method: "GET" })
     const { data: rows, error } = await s
       .from("division_imagery")
       .select(
-        "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, prompt, uploaded_by, approved, approved_by, approved_at, collection, template_kinds, is_default_for, created_at, updated_at",
+        "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, prompt, uploaded_by, approved, approved_by, approved_at, collection, template_kinds, is_default_for, variants, created_at, updated_at",
       )
       .eq("division_id", data.divisionId)
       .eq("approved", true)
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) throw new Error((error as { message?: string }).message ?? "Query failed");
-    const list = (rows ?? []) as Array<Omit<DivisionImageryEntry, "signedUrl">>;
+    const list = (rows ?? []) as Array<Omit<DivisionImageryEntry, "signedUrl" | "variantUrls">>;
     if (list.length === 0) return null;
 
     const scored = list
@@ -270,6 +354,9 @@ export const pickHeroForTemplate = createServerFn({ method: "GET" })
 
     const pick = scored[0]?.r;
     if (!pick) return null;
-    const signed = await s.storage.from(BUCKET).createSignedUrl(pick.storage_path, SIGNED_TTL);
-    return { ...pick, signedUrl: signed.data?.signedUrl ?? null };
+    const [signed, variantUrls] = await Promise.all([
+      s.storage.from(BUCKET).createSignedUrl(pick.storage_path, SIGNED_TTL),
+      signVariantUrls(s, pick.variants ?? {}),
+    ]);
+    return { ...pick, signedUrl: signed.data?.signedUrl ?? null, variantUrls };
   });
