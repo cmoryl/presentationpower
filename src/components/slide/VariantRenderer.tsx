@@ -5028,14 +5028,24 @@ function renderLocationsVariant(
                         Top {topN} locations{roleFilterActive ? ` · excl. ${Array.from(excludeRoleSet).join(", ")}` : ""}
                       </div>
                       <div className="mt-3 space-y-1.5">
-                        {topPins.map((p) => (
-                          <div key={p.id} className="flex items-baseline justify-between">
-                            <div style={{ color: ink.strong, fontSize: 14 }}>{p.label || p.city}</div>
-                            <div style={{ color: accent, fontSize: 14, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
-                              {locFormatMetric(p.values![activeMetric!.id], activeMetric)}
+                        {topPins.map((p) => {
+                          const raw = p.values![activeMetric!.id];
+                          let pctForPin: number | null = null;
+                          if (scaleMode === "global-percent" && metricTotal > 0) {
+                            pctForPin = (raw / metricTotal) * 100;
+                          } else if (scaleMode === "region-percent") {
+                            const regionSum = metricByRegion[p.region] ?? 0;
+                            if (regionSum > 0) pctForPin = (raw / regionSum) * 100;
+                          }
+                          return (
+                            <div key={p.id} className="flex items-baseline justify-between">
+                              <div style={{ color: ink.strong, fontSize: 14 }}>{p.label || p.city}</div>
+                              <div style={{ color: accent, fontSize: 14, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
+                                {pctForPin != null ? `${pctForPin.toFixed(1)}%` : locFormatMetric(raw, activeMetric)}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}
