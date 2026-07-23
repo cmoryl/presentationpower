@@ -182,7 +182,7 @@ function Dashboard() {
       </section>
 
       {/* end print spotlight */}
-      <section style={{ display: 'none' }}>
+
 
 
       {/* AI banner (only when key missing) */}
