@@ -26,13 +26,14 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
   const [error, setError] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [kind, setKind] = useState<"all" | "photo" | "abstract" | "generated" | "upload">("all");
+  const [approvedOnly, setApprovedOnly] = useState(true);
 
   useEffect(() => {
     if (!open || !divisionId) return;
     let cancelled = false;
     setLoading(true);
     setError(null);
-    list({ data: { divisionId } })
+    list({ data: { divisionId, onlyApproved: approvedOnly } })
       .then((rows) => {
         if (!cancelled) setItems(rows);
       })
@@ -43,7 +44,8 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
     return () => {
       cancelled = true;
     };
-  }, [open, divisionId, list]);
+  }, [open, divisionId, list, approvedOnly]);
+
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -100,7 +102,17 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
             <option value="generated">Generated</option>
             <option value="upload">Upload</option>
           </select>
+          <label className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-2 text-xs text-white/80 hover:text-white">
+            <input
+              type="checkbox"
+              checked={approvedOnly}
+              onChange={(e) => setApprovedOnly(e.target.checked)}
+              className="h-3 w-3 accent-emerald-400"
+            />
+            Approved only
+          </label>
         </div>
+
 
         <div className="flex-1 overflow-y-auto p-5">
           {!divisionId ? (
@@ -149,6 +161,12 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
                     <span className="absolute left-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-[9px] uppercase tracking-[0.2em] text-white/80">
                       {r.kind}
                     </span>
+                    {r.approved && (
+                      <span className="absolute right-2 top-2 rounded-full bg-emerald-500/90 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.2em] text-white shadow">
+                        Approved
+                      </span>
+                    )}
+
                   </div>
                   <div className="space-y-1 p-2.5">
                     <div className="truncate text-[11px] font-medium text-white">{r.filename}</div>
