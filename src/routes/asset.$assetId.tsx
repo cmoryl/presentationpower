@@ -79,6 +79,7 @@ function AssetEditor() {
   const [exportQuality, setExportQuality] = useState<PrintExportQuality>("300dpi");
   const [exportFormat, setExportFormat] = useState<PrintExportFormat>("digital");
   const [iccProfile, setIccProfile] = useState<IccProfileKey>("GRACoL2013_CRPC6");
+  const [pickerOpen, setPickerOpen] = useState(false);
 
 
   useEffect(() => {
