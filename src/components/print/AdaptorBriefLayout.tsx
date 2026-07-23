@@ -278,13 +278,13 @@ export function AdaptorBriefLayout({
               </div>
             )}
 
+            {/* CTA BAND */}
+            {content.cta && (
+              <PrintCTABand brand={brand} mode={mode} label={content.cta.label} cq={cq} />
+            )}
+
             {/* FOOTER */}
-            <div className="flex items-center justify-between" style={{
-              borderTop: `1px solid ${dividerCol}`, marginTop: cq(24), paddingTop: cq(16),
-            }}>
-              <BrandLockup brand={brand} color={ink} size="2xs" orientation="horizontal" />
-              <div style={{ fontSize: cq(9.5), color: accentInk }}>transperfect.com</div>
-            </div>
+            <PrintFooterLockup brand={brand} mode={mode} cq={cq} links={["transperfect.com"]} />
           </div>
         </div>
       </SlideAccentContext.Provider>
