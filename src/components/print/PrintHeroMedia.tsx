@@ -16,7 +16,8 @@ export type PrintHeroMedia = {
   aspect?: PrintHeroAspect;      // band shape; "fill" uses heightPct, others letterbox to ratio
   overlayColor?: string;         // hex; defaults to page accent supplied by layout
   overlayOpacity?: number;       // 0..1, default 0.55 — accent wash strength
-  washStrength?: number;         // 0..1, default 1 — legibility scrim + feather multiplier
+  washStrength?: number;         // 0..1, default 1 — feather-into-page intensity
+  scrimOpacity?: number;         // 0..1 — scrim gradient opacity; falls back to washStrength
   scrim?: PrintHeroScrim;        // legibility gradient, default "bottom"
   blendMode?: CSSProperties["mixBlendMode"]; // default "multiply"
   heightPct?: number;            // 0..100, share of page height, default 46 (used when aspect="fill")
