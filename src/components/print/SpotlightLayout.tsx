@@ -476,7 +476,6 @@ export function SpotlightLayout({
                 style={{
                   gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))`,
                   paddingTop: cq(26),
-                  flex: 1,
                 }}
               >
                 {columns.map((c, i) => {
@@ -534,6 +533,12 @@ export function SpotlightLayout({
 
             {/* SHARED MODULES */}
             <PrintSectionsStack sections={content.modules} mode={mode} accent={accent} />
+
+            {/* Rhythm spacer — takes leftover column height as ONE uniform gap
+                above the CTA instead of inflating the top-aligned capability
+                row. Fixes the dead-space band that appeared when capability
+                bodies were short and shared-modules were empty. */}
+            <div style={{ flex: 1, minHeight: cq(12) }} aria-hidden />
 
             {/* ============================================================ */}
             {/* CTA BAND — division-tokenized gradient                        */}
