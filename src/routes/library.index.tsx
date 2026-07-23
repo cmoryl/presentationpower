@@ -1176,6 +1176,79 @@ function VariantDetailModal({
   const [pdfStage, setPdfStage] = useState<string | null>(null);
   const [bothBusy, setBothBusy] = useState(false);
   const [pixelRatio, setPixelRatio] = useExportPixelRatio();
+  const [previewBusy, setPreviewBusy] = useState(false);
+  const [previewStage, setPreviewStage] = useState<string | null>(null);
+  const [previewUrls, setPreviewUrls] = useState<{ light: string; dark: string; filenameLight: string; filenameDark: string } | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrls) {
+        URL.revokeObjectURL(previewUrls.light);
+        URL.revokeObjectURL(previewUrls.dark);
+      }
+    };
+  }, [previewUrls]);
+
+  const openPdfPreview = async () => {
+    if (previewBusy || pdfBusy || bothBusy) return;
+    setPreviewBusy(true);
+    setPreviewStage(null);
+    try {
+      const findNode = (m: "light" | "dark") => document.querySelector<HTMLElement>(
+        `[data-modal-preview="${m}"][data-variant-id="${variant.id}"]`,
+      );
+      const lightNode = findNode("light");
+      const darkNode = findNode("dark");
+      if (!lightNode || !darkNode) throw new Error("Preview nodes not found");
+      const mod = await import("@/lib/slide-image-export");
+      const filenameLight = `${variant.id}-${brand.id}-light-${pixelRatio}x-review.pdf`;
+      const filenameDark = `${variant.id}-${brand.id}-dark-${pixelRatio}x-review.pdf`;
+      setPreviewStage("Rendering light…");
+      const lightBlob = await mod.exportSlidesAsImagePdf(
+        [{ node: lightNode, mode: "light" }],
+        { filename: filenameLight, pixelRatio, returnBlob: true, onProgress: (p) => setPreviewStage(`Light · ${p.message ?? p.stage}`) },
+      );
+      setPreviewStage("Rendering dark…");
+      const darkBlob = await mod.exportSlidesAsImagePdf(
+        [{ node: darkNode, mode: "dark" }],
+        { filename: filenameDark, pixelRatio, returnBlob: true, onProgress: (p) => setPreviewStage(`Dark · ${p.message ?? p.stage}`) },
+      );
+      if (!lightBlob || !darkBlob) throw new Error("Failed to build preview PDFs");
+      setPreviewUrls({
+        light: URL.createObjectURL(lightBlob),
+        dark: URL.createObjectURL(darkBlob),
+        filenameLight,
+        filenameDark,
+      });
+    } catch (err) {
+      console.error("[library] PDF preview failed", err);
+      toast.error("PDF preview failed", { description: "Check console for details." });
+    } finally {
+      setPreviewBusy(false);
+      setPreviewStage(null);
+    }
+  };
+
+  const closePdfPreview = () => {
+    if (previewUrls) {
+      URL.revokeObjectURL(previewUrls.light);
+      URL.revokeObjectURL(previewUrls.dark);
+    }
+    setPreviewUrls(null);
+  };
+
+  const downloadPreviewBlob = (which: "light" | "dark") => {
+    if (!previewUrls) return;
+    const url = which === "light" ? previewUrls.light : previewUrls.dark;
+    const filename = which === "light" ? previewUrls.filenameLight : previewUrls.filenameDark;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    toast.success(`${which === "light" ? "Light" : "Dark"} PDF downloaded`, { description: filename });
+  };
 
 
 
