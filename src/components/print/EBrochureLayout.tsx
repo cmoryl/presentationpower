@@ -162,9 +162,12 @@ export function EBrochureLayout({
           >
             {/* HEADER */}
             <div className="flex items-center justify-between" style={{ gap: cq(10) }}>
-              <div style={{ fontSize: cq(9.5), fontWeight: 600, letterSpacing: "0.14em", color: accentInk }}>
-                {(content.eyebrow ?? "EBROCHURE").toUpperCase()}
-              </div>
+              <PrintEyebrow
+                label={content.eyebrow ?? "EBROCHURE"}
+                mode={mode}
+                accent={accent}
+                cq={cq}
+              />
               <BrandLockup brand={brand} color={mode === "dark" ? "#FFFFFF" : resolvePrintLogoInk(content.logoColor, ink)} size="2xs" orientation="horizontal" />
             </div>
 
