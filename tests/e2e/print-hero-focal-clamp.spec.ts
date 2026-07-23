@@ -97,12 +97,14 @@ test.describe("PrintHeroMedia — focal clamp & safe-area behavior", () => {
   });
 
   test("safeArea > 40 is capped at 40 (hard upper limit)", async ({ page }) => {
-    // safeAreaX=80 must clamp to 40, so a right-edge focal (95) collapses to 60.
+    // safeAreaX=80 / Y=80 must clamp to 40, so the valid focal range is
+    // [40, 60] on both axes. Push focals well outside that band to prove
+    // the cap is active: 95 → 60, 5 → 40.
     await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto(url({ focalX: 95, focalY: 50, safeAreaX: 80, safeAreaY: 80 }));
+    await page.goto(url({ focalX: 95, focalY: 5, safeAreaX: 80, safeAreaY: 80 }));
     const { x, y } = parseObjectPosition(await readObjectPosition(page));
     expect(x).toBe(60);
-    expect(y).toBe(60);
+    expect(y).toBe(40);
   });
 
   test("safeArea < 0 clamps to 0 (no negative buffer)", async ({ page }) => {
