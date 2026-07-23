@@ -84,7 +84,7 @@ export function specFromDashChart(
 ): InfographicSpec {
   const items = arr(c.content.items);
   const series = arr(c.content.series);
-  const rows: Record<string, unknown>[] =
+  const rows: InfographicRow[] =
     series.length > 0
       ? series.map((row) => {
           const flat: Record<string, unknown> = { period: s(row.period ?? row.label ?? row.name) };
