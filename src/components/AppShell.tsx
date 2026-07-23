@@ -28,6 +28,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       items: [
         { to: "/admin", label: "Command center" },
         { to: "/templates", label: "Templates" },
+        { to: "/library/print", label: "Print Studio" },
         { to: "/admin/audit", label: "Audit log" },
       ],
     },
