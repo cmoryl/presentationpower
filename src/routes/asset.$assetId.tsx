@@ -986,6 +986,13 @@ function ModulesPanel({
             onDrop={(e) => {
               e.preventDefault();
               (e.currentTarget as HTMLDivElement).classList.remove("ring-2", "ring-[#003FC7]");
+              // New-module insert from drawer takes priority.
+              const inserted = readInsertPayload(e);
+              if (inserted) {
+                if (!gate.ok) return;
+                insertAt(i, inserted);
+                return;
+              }
               const from = Number(e.dataTransfer.getData("text/plain"));
               if (Number.isNaN(from) || from === i) return;
               const next = [...modules];
