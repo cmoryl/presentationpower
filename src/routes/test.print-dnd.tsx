@@ -72,7 +72,13 @@ function emptyContent(kind: PrintTemplateKind) {
   return emptyAdaptorBrief();
 }
 
+import { notFound } from "@tanstack/react-router";
+
 export const Route = createFileRoute("/test/print-dnd")({
+  beforeLoad: () => {
+    // Playwright fixture only. Does not resolve in production builds.
+    if (!import.meta.env.DEV) throw notFound();
+  },
   head: () => ({
     meta: [
       { title: "Print DnD Harness" },
