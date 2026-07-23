@@ -25,11 +25,19 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        launchOptions: {
-          executablePath:
-            process.env.PLAYWRIGHT_CHROMIUM_PATH ??
-            "/chromium-1194/chrome-linux/chrome",
-        },
+        launchOptions: (() => {
+          // Use bundled sandbox chromium locally; fall back to Playwright's
+          // own install in CI (env var unset or empty).
+          const custom = process.env.PLAYWRIGHT_CHROMIUM_PATH;
+          const sandbox = "/chromium-1194/chrome-linux/chrome";
+          const executablePath =
+            custom && custom.length > 0
+              ? custom
+              : process.env.CI
+                ? undefined
+                : sandbox;
+          return executablePath ? { executablePath } : {};
+        })(),
       },
     },
     { name: "firefox", use: { ...devices["Desktop Firefox"] } },
