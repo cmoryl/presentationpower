@@ -188,9 +188,17 @@ function AssetEditor() {
         bleedIn,
         cropMarks,
         mode: exportMode,
-        filename: `${safeTitle}-${exportSize.toLowerCase()}.pdf`,
+        quality: exportQuality,
+        filename: `${safeTitle}-${exportSize.toLowerCase()}-${exportQuality}.pdf`,
+        onQualityClamp: (info) => {
+          alert(
+            `Requested ${info.requestedDpi} DPI exceeded the browser canvas ceiling ` +
+              `(${info.reason}). Exporting at ~${info.effectiveDpi} DPI instead.`,
+          );
+        },
       });
       setExportOpen(false);
+
     } catch (e) {
       alert(`Export failed: ${(e as Error).message}`);
     } finally {
