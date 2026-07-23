@@ -150,6 +150,7 @@ export type SpotlightContent = {
   expert?: { name: string; role?: string; email?: string };
   cta?: { label: string; url?: string };
   heroMedia?: PrintHeroMedia;
+  modules?: PrintSection[];
 };
 
 
