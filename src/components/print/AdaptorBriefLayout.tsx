@@ -10,6 +10,7 @@ import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
 import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
+import { autoHeroMedia } from "@/components/print/printHeroFallback";
 import { PrintHeroAura } from "@/components/print/PrintHeroAura";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
@@ -194,11 +195,11 @@ export function AdaptorBriefLayout({
               }} />
             </div>
           )}
-          {content.heroMedia ? (
-            <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
-          ) : mode === "light" ? (
-            <PrintHeroAura brand={brand} mode="light" accent={accent} primary={primary} seed={seed ?? `adaptor-${brand.id}-${mode}`} aspect={auroraAspect(pageSize)} cq={cq} />
-          ) : null}
+          {(() => {
+            const heroSeed = seed ?? `adaptor-${brand.id}-${mode}`;
+            const media = content.heroMedia ?? autoHeroMedia(brand.id, heroSeed, mode);
+            return <PrintHeroMediaLayer media={media} accent={accent} mode={mode} cq={cq} />;
+          })()}
 
           <div className="relative flex h-full flex-col" style={{
             paddingLeft: cq(padX(density)), paddingRight: cq(padX(density)),
