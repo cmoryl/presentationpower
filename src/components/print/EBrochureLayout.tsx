@@ -333,6 +333,9 @@ export function EBrochureLayout({
               </div>
             )}
 
+            {/* SHARED MODULES */}
+            <PrintSectionsStack sections={content.modules} mode={mode} accent={accent} />
+
             {/* CTA BAND */}
             {content.cta && (
               <PrintCTABand
