@@ -505,16 +505,23 @@ export function AuroraLayer({
   intensity = 1,
   className = "",
   baseTint,
+  aspect,
 }: {
   seed?: string;
   brand: BrandMode;
   intensity?: number;
   className?: string;
   baseTint?: string;
+  /** Override the native 1280×720 landscape frame — pass e.g. `{ w: 850, h: 1100 }`
+   *  for portrait Letter so orbs re-project onto the taller frame instead of
+   *  cropping a slice of a landscape composition. Omit for 16:9 slides. */
+  aspect?: { w: number; h: number };
 }) {
   const mode = useSlideMode();
   const base = baseTint ?? (mode === "dark" ? "#03002C" : "#FFFFFF");
-  const orbs = useMemo(() => auroraOrbs(seed, brand, mode), [seed, brand, mode]);
+  const orbs = useMemo(() => auroraOrbs(seed, brand, mode, aspect), [seed, brand, mode, aspect?.w, aspect?.h]);
+  const vw = aspect?.w ?? 1280;
+  const vh = aspect?.h ?? 720;
   return (
     <div
       aria-hidden
@@ -522,7 +529,7 @@ export function AuroraLayer({
       style={{ background: base }}
     >
       <svg
-        viewBox="0 0 1280 720"
+        viewBox={`0 0 ${vw} ${vh}`}
         preserveAspectRatio="xMidYMid slice"
         className="absolute inset-0 h-full w-full"
         style={{ opacity: auroraLayerOpacity(mode, intensity) }}
@@ -559,6 +566,7 @@ export function AuroraLayer({
           ))}
         </g>
       </svg>
+
       {mode === "light" && (
         <div
           aria-hidden
