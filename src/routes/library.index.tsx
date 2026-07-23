@@ -1105,6 +1105,8 @@ function VariantDetailModal({
     } catch { /* ignore */ }
   };
   const [pdfBusy, setPdfBusy] = useState<null | "light" | "dark">(null);
+  const [pdfStage, setPdfStage] = useState<string | null>(null);
+
   const downloadPptx = async (exportMode: "light" | "dark") => {
     if (downloading) return;
     setDownloading(true);
@@ -1138,6 +1140,7 @@ function VariantDetailModal({
   const downloadImagePdf = async (exportMode: "light" | "dark") => {
     if (pdfBusy) return;
     setPdfBusy(exportMode);
+    setPdfStage(null);
     try {
       const node = document.querySelector<HTMLElement>(
         `[data-modal-preview="${exportMode}"][data-variant-id="${variant.id}"]`,
@@ -1146,15 +1149,20 @@ function VariantDetailModal({
       const mod = await import("@/lib/slide-image-export");
       await mod.exportSlidesAsImagePdf(
         [{ node, mode: exportMode }],
-        { filename: `${variant.id}-${brand.id}-${exportMode}-review.pdf` },
+        {
+          filename: `${variant.id}-${brand.id}-${exportMode}-review.pdf`,
+          onProgress: (p) => setPdfStage(p.message ?? p.stage),
+        },
       );
     } catch (err) {
       console.error("[library] image PDF export failed", err);
       alert("PDF export failed. Check console for details.");
     } finally {
       setPdfBusy(null);
+      setPdfStage(null);
     }
   };
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
@@ -1273,7 +1281,8 @@ function VariantDetailModal({
               title="Export a pixel-perfect image PDF of the light preview — best for client review copies (not editable in PowerPoint)"
             >
               {pdfBusy === "light" ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
-              Light PDF
+              {pdfBusy === "light" && pdfStage ? pdfStage : "Light PDF"}
+
             </button>
             <button
               type="button"
@@ -1283,7 +1292,8 @@ function VariantDetailModal({
               title="Export a pixel-perfect image PDF of the dark preview — best for client review copies (not editable in PowerPoint)"
             >
               {pdfBusy === "dark" ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
-              Dark PDF
+              {pdfBusy === "dark" && pdfStage ? pdfStage : "Dark PDF"}
+
             </button>
             {usageCount > 0 && (
               <span className="rounded-full bg-[#03002C]/90 px-2.5 py-1 text-[11px] font-medium text-white" title={`Used in ${usageCount} of your slides`}>
@@ -1487,26 +1497,32 @@ function ModalABPreview({
 
   const [zoom, setZoom] = useState<null | "light" | "dark">(null);
   const [imageBusy, setImageBusy] = useState<null | `${"png" | "pdf"}-${"light" | "dark"}`>(null);
+  const [imageStage, setImageStage] = useState<string | null>(null);
 
   const runImageExport = async (m: "light" | "dark", kind: "png" | "pdf") => {
     const node = (m === "dark" ? darkRef.current : lightRef.current);
     if (!node) return;
     setImageBusy(`${kind}-${m}`);
+    setImageStage(null);
     try {
       const base = `${variant.id}-${brand.id}-${m}`;
       const mod = await import("@/lib/slide-image-export");
+      const onProgress = (p: { stage: string; message?: string }) =>
+        setImageStage(p.message ?? p.stage);
       if (kind === "png") {
-        await mod.exportSlideAsPng(node, { mode: m, filename: `${base}.png` });
+        await mod.exportSlideAsPng(node, { mode: m, filename: `${base}.png`, onProgress });
       } else {
-        await mod.exportSlidesAsImagePdf([{ node, mode: m }], { filename: `${base}.pdf` });
+        await mod.exportSlidesAsImagePdf([{ node, mode: m }], { filename: `${base}.pdf`, onProgress });
       }
     } catch (err) {
       console.error("[library] image export failed", err);
       alert("Image export failed. See console for details.");
     } finally {
       setImageBusy(null);
+      setImageStage(null);
     }
   };
+
 
   return (
     <>
@@ -1525,7 +1541,7 @@ function ModalABPreview({
                 className="rounded-full border border-black/15 bg-white px-2 py-0.5 font-medium uppercase tracking-widest text-black/60 hover:border-[#003FC7]/50 hover:text-[#003FC7] disabled:opacity-50"
                 title={`Export exact ${m} preview as high-res PNG (pixel-perfect, not editable)`}
               >
-                {imageBusy === `png-${m}` ? "…" : "PNG"}
+                {imageBusy === `png-${m}` ? (imageStage ?? "…") : "PNG"}
               </button>
               <button
                 type="button"
@@ -1534,10 +1550,11 @@ function ModalABPreview({
                 className="rounded-full border border-black/15 bg-white px-2 py-0.5 font-medium uppercase tracking-widest text-black/60 hover:border-[#003FC7]/50 hover:text-[#003FC7] disabled:opacity-50"
                 title={`Export exact ${m} preview as image PDF (16:9, review copy — not editable)`}
               >
-                {imageBusy === `pdf-${m}` ? "…" : "PDF"}
+                {imageBusy === `pdf-${m}` ? (imageStage ?? "…") : "PDF"}
               </button>
               <span className="text-black/30">·</span>
               <span className="text-black/40">Click to zoom</span>
+
             </div>
           </div>
           <button

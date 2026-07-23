@@ -3,11 +3,47 @@
  * using html-to-image. Companion to `pptx-export.ts`; use this when fidelity
  * matters more than editability (client review copies, share cards, single
  * module snapshots straight from the Library).
+ *
+ * Resilience layers:
+ *  1. CORS images: pre-inline any cross-origin <img> as a data URL (fetch
+ *     + FileReader) so html-to-image's internal fetch fallback can't taint
+ *     the offscreen canvas.
+ *  2. Web fonts: wait for `document.fonts.ready`, then explicitly probe the
+ *     fonts actually declared on the node before giving up (with a hard
+ *     timeout so we never hang the UI).
+ *  3. backdrop-filter: html-to-image serializes DOM into an SVG
+ *     <foreignObject>, and most browsers refuse to rasterize
+ *     `backdrop-filter` inside foreignObject — you get a clear rectangle
+ *     where the frosted-glass tile should sit. During capture we swap the
+ *     backdrop-filter surface for a computed frosted approximation
+ *     (semi-opaque background + subtle blur via box-shadow inset) and
+ *     restore the original inline styles afterwards.
+ *  4. Progress: every phase reports through an optional callback so the UI
+ *     can show meaningful status ("Fonts…", "Images…", "Rendering…").
  */
 import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
 
 export type SlideExportMode = "light" | "dark";
+
+export type ExportStage =
+  | "prepare"
+  | "fonts"
+  | "images"
+  | "backdrop"
+  | "render"
+  | "encode"
+  | "done";
+
+export interface ExportProgress {
+  stage: ExportStage;
+  /** 0..1 within the current phase (best effort). */
+  progress?: number;
+  /** Optional human-readable status. */
+  message?: string;
+}
+
+export type ExportProgressCallback = (p: ExportProgress) => void;
 
 export interface SlideCaptureOptions {
   mode: SlideExportMode;
@@ -16,6 +52,10 @@ export interface SlideCaptureOptions {
   pixelRatio?: number;
   /** Optional CORS-safe cache buster for cross-origin images. */
   cacheBust?: boolean;
+  /** Progress callback fired between phases. */
+  onProgress?: ExportProgressCallback;
+  /** Hard timeout (ms) for font/image readiness before we proceed anyway. */
+  readyTimeoutMs?: number;
 }
 
 const MODE_BG: Record<SlideExportMode, string> = {
@@ -23,31 +63,237 @@ const MODE_BG: Record<SlideExportMode, string> = {
   dark: "#03002C",
 };
 
-/**
- * Waits for web fonts + all <img> descendants so the raster snapshot doesn't
- * flash unstyled text or missing hero imagery.
- */
-async function waitForNodeReady(node: HTMLElement): Promise<void> {
-  try {
-    if (typeof document !== "undefined" && document.fonts?.ready) {
-      await document.fonts.ready;
+const DEFAULT_READY_TIMEOUT = 6000;
+
+function report(cb: ExportProgressCallback | undefined, p: ExportProgress): void {
+  if (cb) {
+    try {
+      cb(p);
+    } catch {
+      /* progress reporters must never break capture */
     }
-  } catch {
-    /* font loading is best-effort */
   }
-  const images = Array.from(node.querySelectorAll("img"));
-  await Promise.all(
-    images.map((img) => {
-      if (img.complete && img.naturalWidth > 0) return Promise.resolve();
-      return new Promise<void>((resolve) => {
-        const done = () => resolve();
-        img.addEventListener("load", done, { once: true });
-        img.addEventListener("error", done, { once: true });
+}
+
+function withTimeout<T>(promise: Promise<T>, ms: number, tag: string): Promise<T | null> {
+  return new Promise((resolve) => {
+    let done = false;
+    const timer = window.setTimeout(() => {
+      if (done) return;
+      done = true;
+      console.warn(`[slide-image-export] ${tag} readiness timed out after ${ms}ms — proceeding`);
+      resolve(null);
+    }, ms);
+    promise
+      .then((v) => {
+        if (done) return;
+        done = true;
+        window.clearTimeout(timer);
+        resolve(v);
+      })
+      .catch(() => {
+        if (done) return;
+        done = true;
+        window.clearTimeout(timer);
+        resolve(null);
       });
+  });
+}
+
+/**
+ * Fetch a cross-origin image and inline it as a data URL. We keep the
+ * original `src` so we can restore it after capture — otherwise a second
+ * export from the same DOM would reuse the (now stale) data URL.
+ */
+async function inlineCrossOriginImages(
+  node: HTMLElement,
+  onProgress?: ExportProgressCallback,
+): Promise<() => void> {
+  const imgs = Array.from(node.querySelectorAll("img"));
+  const restorers: Array<() => void> = [];
+  const remote = imgs.filter((img) => {
+    const src = img.currentSrc || img.src;
+    if (!src) return false;
+    if (src.startsWith("data:")) return false;
+    if (src.startsWith("blob:")) return false;
+    try {
+      const u = new URL(src, window.location.href);
+      return u.origin !== window.location.origin;
+    } catch {
+      return false;
+    }
+  });
+
+  if (remote.length === 0) {
+    report(onProgress, { stage: "images", progress: 1, message: "No remote images" });
+    return () => {};
+  }
+
+  let done = 0;
+  await Promise.all(
+    remote.map(async (img) => {
+      const original = img.getAttribute("src");
+      try {
+        const res = await fetch(img.src, { mode: "cors", credentials: "omit" });
+        if (!res.ok) throw new Error(`status ${res.status}`);
+        const blob = await res.blob();
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = () => reject(reader.error);
+          reader.readAsDataURL(blob);
+        });
+        img.setAttribute("src", dataUrl);
+        // ensure decoded before capture
+        if (typeof img.decode === "function") {
+          try { await img.decode(); } catch { /* non-fatal */ }
+        }
+        restorers.push(() => {
+          if (original === null) img.removeAttribute("src");
+          else img.setAttribute("src", original);
+        });
+      } catch (err) {
+        // Fall back to hiding the tainted image so the canvas doesn't fail
+        // wholesale — a missing hero is better than an aborted export.
+        console.warn("[slide-image-export] failed to inline image", img.src, err);
+        const originalVisibility = img.style.visibility;
+        img.style.visibility = "hidden";
+        restorers.push(() => { img.style.visibility = originalVisibility; });
+      } finally {
+        done += 1;
+        report(onProgress, {
+          stage: "images",
+          progress: done / remote.length,
+          message: `Inlined ${done}/${remote.length} image${remote.length === 1 ? "" : "s"}`,
+        });
+      }
     }),
   );
-  // Give any late layout/aurora blur a paint to settle.
-  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+  return () => { for (const r of restorers) r(); };
+}
+
+/**
+ * Wait for web fonts. Uses `document.fonts.ready` for the coarse signal,
+ * then probes each font-family declared on the node with `document.fonts.check`.
+ */
+async function ensureFontsReady(
+  node: HTMLElement,
+  timeoutMs: number,
+  onProgress?: ExportProgressCallback,
+): Promise<void> {
+  report(onProgress, { stage: "fonts", progress: 0, message: "Waiting for fonts…" });
+  if (typeof document === "undefined" || !document.fonts) {
+    report(onProgress, { stage: "fonts", progress: 1 });
+    return;
+  }
+  await withTimeout(document.fonts.ready, timeoutMs, "document.fonts.ready");
+
+  const families = new Set<string>();
+  const walker = document.createTreeWalker(node, NodeFilter.SHOW_ELEMENT);
+  let el: Element | null = walker.currentNode as Element;
+  while (el) {
+    if (el instanceof HTMLElement) {
+      const cs = window.getComputedStyle(el);
+      cs.fontFamily
+        .split(",")
+        .map((f) => f.trim().replace(/^["']|["']$/g, ""))
+        .filter(Boolean)
+        .slice(0, 2) // primary + first fallback is enough
+        .forEach((f) => families.add(f));
+    }
+    el = walker.nextNode() as Element | null;
+  }
+
+  const start = performance.now();
+  for (const family of families) {
+    if (performance.now() - start > timeoutMs) break;
+    try {
+      // Probe two common weights at body size.
+      const ok400 = document.fonts.check(`400 16px "${family}"`);
+      const ok700 = document.fonts.check(`700 16px "${family}"`);
+      if (!ok400 || !ok700) {
+        await withTimeout(
+          Promise.all([
+            document.fonts.load(`400 16px "${family}"`),
+            document.fonts.load(`700 16px "${family}"`),
+          ]).then(() => undefined as unknown as void),
+          Math.max(400, timeoutMs - (performance.now() - start)),
+          `font ${family}`,
+        );
+      }
+    } catch {
+      /* opportunistic */
+    }
+  }
+  report(onProgress, { stage: "fonts", progress: 1, message: "Fonts ready" });
+}
+
+/**
+ * Swap `backdrop-filter` surfaces for a rasterization-safe approximation
+ * so foreignObject-based capture doesn't render them as clear rectangles.
+ * Returns a restore function.
+ */
+function neutralizeBackdropFilters(root: HTMLElement, mode: SlideExportMode): () => void {
+  const affected: Array<{ el: HTMLElement; prev: string; prevBg: string; prevBoxShadow: string }> = [];
+  const nodes = root.querySelectorAll<HTMLElement>("*");
+  const glassTint = mode === "dark" ? "rgba(20, 24, 60, 0.55)" : "rgba(255, 255, 255, 0.62)";
+  const glassEdge = mode === "dark" ? "0 0 0 1px rgba(255,255,255,0.06)" : "0 0 0 1px rgba(0,0,0,0.04)";
+  nodes.forEach((el) => {
+    const cs = window.getComputedStyle(el);
+    const bf = cs.backdropFilter || (cs as unknown as { webkitBackdropFilter?: string }).webkitBackdropFilter || "";
+    if (!bf || bf === "none") return;
+    affected.push({
+      el,
+      prev: el.style.backdropFilter,
+      prevBg: el.style.backgroundColor,
+      prevBoxShadow: el.style.boxShadow,
+    });
+    // Kill the property in both prefixed forms so foreignObject stops trying to honor it.
+    el.style.backdropFilter = "none";
+    (el.style as CSSStyleDeclaration & { webkitBackdropFilter?: string }).webkitBackdropFilter = "none";
+    // If the element has no meaningful background, apply the tint so the
+    // glass panel remains legible in the raster.
+    const bgAlpha = /rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(?:,\s*0(?:\.0+)?)?\s*\)/.test(cs.backgroundColor);
+    if (!cs.backgroundColor || cs.backgroundColor === "rgba(0, 0, 0, 0)" || bgAlpha) {
+      el.style.backgroundColor = glassTint;
+    }
+    if (!cs.boxShadow || cs.boxShadow === "none") {
+      el.style.boxShadow = glassEdge;
+    }
+  });
+  return () => {
+    for (const { el, prev, prevBg, prevBoxShadow } of affected) {
+      el.style.backdropFilter = prev;
+      (el.style as CSSStyleDeclaration & { webkitBackdropFilter?: string }).webkitBackdropFilter = prev;
+      el.style.backgroundColor = prevBg;
+      el.style.boxShadow = prevBoxShadow;
+    }
+  };
+}
+
+/**
+ * Wait for all <img> descendants to finish loading (or error). Runs after
+ * inlining so we're really waiting on decode of the swapped data URLs.
+ */
+async function waitForImages(node: HTMLElement, timeoutMs: number): Promise<void> {
+  const images = Array.from(node.querySelectorAll("img"));
+  const pending = images.filter((img) => !(img.complete && img.naturalWidth > 0));
+  if (pending.length === 0) return;
+  await withTimeout(
+    Promise.all(
+      pending.map(
+        (img) =>
+          new Promise<void>((resolve) => {
+            const done = () => resolve();
+            img.addEventListener("load", done, { once: true });
+            img.addEventListener("error", done, { once: true });
+          }),
+      ),
+    ).then(() => undefined as unknown as void),
+    timeoutMs,
+    "images",
+  );
 }
 
 /**
@@ -58,19 +304,55 @@ export async function captureSlideAsDataUrl(
   node: HTMLElement,
   opts: SlideCaptureOptions,
 ): Promise<string> {
-  await waitForNodeReady(node);
-  const dataUrl = await toPng(node, {
-    pixelRatio: opts.pixelRatio ?? 2,
-    cacheBust: opts.cacheBust ?? true,
-    backgroundColor: MODE_BG[opts.mode],
-    // filter external stylesheets/nodes that break serialization
-    filter: (el) => {
-      if (!(el instanceof HTMLElement)) return true;
-      if (el.dataset?.exportIgnore === "true") return false;
-      return true;
-    },
-  });
-  return dataUrl;
+  const { onProgress } = opts;
+  const timeoutMs = opts.readyTimeoutMs ?? DEFAULT_READY_TIMEOUT;
+
+  report(onProgress, { stage: "prepare", progress: 0, message: "Preparing capture…" });
+
+  await ensureFontsReady(node, timeoutMs, onProgress);
+
+  report(onProgress, { stage: "images", progress: 0, message: "Inlining images…" });
+  const restoreImages = await inlineCrossOriginImages(node, onProgress);
+  await waitForImages(node, timeoutMs);
+
+  report(onProgress, { stage: "backdrop", progress: 0.4, message: "Flattening glass surfaces…" });
+  const restoreBackdrop = neutralizeBackdropFilters(node, opts.mode);
+
+  // Give the browser one paint cycle so the neutralized styles settle.
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+  try {
+    report(onProgress, { stage: "render", progress: 0.1, message: "Rasterizing…" });
+    let dataUrl: string;
+    try {
+      dataUrl = await toPng(node, {
+        pixelRatio: opts.pixelRatio ?? 2,
+        cacheBust: opts.cacheBust ?? true,
+        backgroundColor: MODE_BG[opts.mode],
+        // filter external stylesheets/nodes that break serialization
+        filter: (el) => {
+          if (!(el instanceof HTMLElement)) return true;
+          if (el.dataset?.exportIgnore === "true") return false;
+          return true;
+        },
+      });
+    } catch (err) {
+      // Retry once at 1x — a browser occasionally OOMs on very tall panels at 2x.
+      console.warn("[slide-image-export] first pass failed, retrying at pixelRatio=1", err);
+      report(onProgress, { stage: "render", progress: 0.5, message: "Retrying at lower resolution…" });
+      dataUrl = await toPng(node, {
+        pixelRatio: 1,
+        cacheBust: true,
+        backgroundColor: MODE_BG[opts.mode],
+        filter: (el) => !(el instanceof HTMLElement) || el.dataset?.exportIgnore !== "true",
+      });
+    }
+    report(onProgress, { stage: "encode", progress: 1, message: "Encoding…" });
+    return dataUrl;
+  } finally {
+    restoreBackdrop();
+    restoreImages();
+  }
 }
 
 function triggerDownload(dataUrl: string, filename: string): void {
@@ -92,6 +374,7 @@ export async function exportSlideAsPng(
   const dataUrl = await captureSlideAsDataUrl(node, opts);
   const filename = opts.filename ?? `slide-${opts.mode}.png`;
   triggerDownload(dataUrl, filename);
+  report(opts.onProgress, { stage: "done", progress: 1, message: "Saved" });
 }
 
 /**
@@ -101,7 +384,7 @@ export async function exportSlideAsPng(
  */
 export async function exportSlidesAsImagePdf(
   nodes: Array<{ node: HTMLElement; mode: SlideExportMode }>,
-  opts: { filename?: string; pixelRatio?: number } = {},
+  opts: { filename?: string; pixelRatio?: number; onProgress?: ExportProgressCallback } = {},
 ): Promise<void> {
   if (nodes.length === 0) return;
   const pdf = new jsPDF({
@@ -112,13 +395,23 @@ export async function exportSlidesAsImagePdf(
   });
   for (let i = 0; i < nodes.length; i++) {
     const { node, mode } = nodes[i];
+    const perSlide: ExportProgressCallback | undefined = opts.onProgress
+      ? (p) =>
+          opts.onProgress!({
+            ...p,
+            message: `Slide ${i + 1}/${nodes.length} · ${p.message ?? p.stage}`,
+          })
+      : undefined;
     const dataUrl = await captureSlideAsDataUrl(node, {
       mode,
       pixelRatio: opts.pixelRatio ?? 2,
+      onProgress: perSlide,
     });
     if (i > 0) pdf.addPage([13.333, 7.5], "landscape");
     pdf.addImage(dataUrl, "PNG", 0, 0, 13.333, 7.5, undefined, "FAST");
   }
+  report(opts.onProgress, { stage: "encode", progress: 1, message: "Assembling PDF…" });
   const filename = opts.filename ?? `slides-${Date.now()}.pdf`;
   pdf.save(filename);
+  report(opts.onProgress, { stage: "done", progress: 1, message: "Saved" });
 }
