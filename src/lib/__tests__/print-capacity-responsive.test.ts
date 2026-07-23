@@ -106,7 +106,7 @@ describe("print capacity model — viewport invariance", () => {
     ]);
     const decisions = BREAKPOINTS.map((w) => {
       void w;
-      return canAddModule("case-study", near, "stats");
+      return canAddModule("case-study", near.modules, 2);
     });
     const first = decisions[0];
     for (const d of decisions) {
