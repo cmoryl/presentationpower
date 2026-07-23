@@ -177,6 +177,7 @@ export type EBrochureContent = {
   discover?: { body: string; bullets: string[] }; // right-hand "Discover" panel
   cta?: { label: string; url?: string; subhead?: string };
   heroMedia?: PrintHeroMedia;
+  modules?: PrintSection[];
 };
 
 
