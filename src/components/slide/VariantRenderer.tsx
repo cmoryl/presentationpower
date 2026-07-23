@@ -159,6 +159,7 @@ const DEFAULT_ICONS: IconType[] = [Target, Layers3, Workflow, LineChart, Users, 
 
 import { iconByName, parseIconRef } from "@/lib/icon-library";
 import { IconRenderer } from "@/components/IconRenderer";
+import { exportMapNodeAsPng } from "@/lib/map-png-export";
 
 // Cache synthesized Lucide-shaped components per pack:name ref so React sees
 // stable component identity across renders.
@@ -4971,8 +4972,20 @@ function renderLocationsVariant(
                   ))}
               </div>
             )}
-            <div className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
+            <div data-map-export-root="world-stats" className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
               <LocWorldMap pins={filteredPins} region="world" mode={mode} accent={accent} primary={primary} showLabels={false} metric={activeMetric} metricId={activeMetric?.id} scaleMode={scaleMode} ariaLabel={`${title} — world map${activeMetric ? ` visualizing ${activeMetric.label}${scaleMode === "region-percent" ? " (% of region)" : scaleMode === "global-percent" ? " (% of global)" : ""}` : ""}${filterActive ? ` filtered to ${filteredRegions} regions` : ""}`} />
+              <button
+                type="button"
+                onClick={(e) => {
+                  const root = (e.currentTarget.closest('[data-map-export-root="world-stats"]') as HTMLElement | null);
+                  if (root) void exportMapNodeAsPng(root, `${(title || "world-stats").toString().toLowerCase().replace(/\s+/g, "-")}.png`, isDark ? "#03002C" : "#ffffff");
+                }}
+                aria-label="Export map as PNG"
+                className="absolute right-3 top-3 rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest transition hover:scale-[1.03]"
+                style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.06)", color: ink.strong, border: `1px solid ${ink.hairline}`, backdropFilter: "blur(6px)" }}
+              >
+                Export PNG
+              </button>
             </div>
           </div>
           <div className="flex w-[520px] flex-col justify-end">
