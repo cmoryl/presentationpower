@@ -249,6 +249,7 @@ function AdminImageryPage() {
               onApprove={(next) => approveMut.mutate({ id: r.id, approved: next })}
               onTags={(tags) => tagsMut.mutate({ id: r.id, tags })}
               onKind={(kind) => kindMut.mutate({ id: r.id, kind })}
+              onTargeting={(patch) => targetingMut.mutate({ id: r.id, ...patch })}
               onDelete={() => {
                 if (window.confirm("Delete this image permanently?")) delMut.mutate(r.id);
               }}
