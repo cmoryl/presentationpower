@@ -24,6 +24,7 @@ import {
   glass,
   chipStyle,
   IconPath as Icon,
+  clampLines,
   ICON_PATHS,
 } from "@/components/print/print-primitives";
 

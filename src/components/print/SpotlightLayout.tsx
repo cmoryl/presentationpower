@@ -25,6 +25,7 @@ import {
   glass,
   chipStyle,
   Icon,
+  clampLines,
   type IconName,
 } from "@/components/print/print-primitives";
 
