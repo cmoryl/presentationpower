@@ -645,7 +645,7 @@ export function WorldMap({
       )}
 
       {/* Metric legend — color scale + min/max labels */}
-      {metricStats && metric && (() => {
+      {metricScale && metric && (() => {
         const vb = regionViewBox(region).split(" ").map(Number);
         const [vx, vy, vw, vh] = vb;
         const barW = Math.min(240, vw * 0.28);
@@ -659,18 +659,19 @@ export function WorldMap({
         const panelStroke = isDark ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.12)";
         const textFill = isDark ? "rgba(255,255,255,0.92)" : "rgba(3,0,44,0.86)";
         const subFill = isDark ? "rgba(255,255,255,0.6)" : "rgba(3,0,44,0.6)";
+        const modeSuffix = scaleMode === "global-percent" ? " · % of global" : scaleMode === "region-percent" ? " · % of region" : "";
         return (
           <g fontFamily="Geist, system-ui, sans-serif">
             <rect x={x - 12} y={y - 22} width={panelW} height={panelH} rx={8} fill={panelFill} stroke={panelStroke} />
             <text x={x} y={y - 8} fontSize={9} fontWeight={600} fill={textFill} style={{ letterSpacing: "0.06em", textTransform: "uppercase" }}>
-              {metric.label}
+              {metric.label}{modeSuffix}
             </text>
             <rect x={x} y={y} width={barW} height={barH} rx={barH / 2} fill="url(#tp-metric-scale)" stroke={panelStroke} />
             <text x={x} y={y + barH + 12} fontSize={9} fill={subFill}>
-              {formatMetricValue(metricStats.min, metric)}
+              {formatDisplay(metricScale.min)}
             </text>
             <text x={x + barW} y={y + barH + 12} fontSize={9} fill={subFill} textAnchor="end">
-              {formatMetricValue(metricStats.max, metric)}
+              {formatDisplay(metricScale.max)}
             </text>
           </g>
         );
