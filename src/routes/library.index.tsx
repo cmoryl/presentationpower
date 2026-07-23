@@ -1173,7 +1173,9 @@ function VariantDetailModal({
   };
   const [pdfBusy, setPdfBusy] = useState<null | "light" | "dark">(null);
   const [pdfStage, setPdfStage] = useState<string | null>(null);
+  const [bothBusy, setBothBusy] = useState(false);
   const [pixelRatio, setPixelRatio] = useExportPixelRatio();
+
 
 
   const downloadPptx = async (exportMode: "light" | "dark") => {
