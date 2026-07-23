@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Trash2, Bookmark, Search, Plus, Check, AlertTriangle } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LazyMount } from "@/components/LazyMount";
@@ -94,15 +95,9 @@ function MyModules() {
   return (
     <AppShell>
       <div>
-        <div className="flex items-center justify-between gap-4">
-          <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library · My Modules</div>
-          <Link
-            to="/library"
-            className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7]"
-          >
-            ← All modules
-          </Link>
-        </div>
+        <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library · My Modules</div>
+        <div className="mt-3"><LibrarySubnav active="/library/my" /></div>
+
         <h1 className="mt-3 text-4xl font-semibold">Your saved modules.</h1>
         <p className="mt-3 max-w-2xl text-black/60">
           Reusable module instances you saved from previews or from live decks. Drop them into any deck, brochure, one-pager, or social surface.

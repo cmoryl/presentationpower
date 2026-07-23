@@ -16,6 +16,7 @@ const searchSchema = z.object({
   prospect: z.string().optional(),
   industry: z.string().optional(),
   brandModeId: z.string().optional(),
+  kind: z.enum(["case-study", "spotlight", "ebrochure", "adaptor-brief"]).optional(),
 });
 
 export const Route = createFileRoute("/asset/new")({
@@ -44,7 +45,7 @@ const KINDS: Array<{
   icon: React.ReactNode;
 }> = [
   { id: "case-study",   label: "Case Study",     desc: "Challenge · Approach · Outcome, print-ready.",  live: true,  icon: <FileText size={16} /> },
-  { id: "spotlight",    label: "Client Spotlight", desc: "Project stats + Need/Approach/Impact.",      live: false, icon: <Layers size={16} /> },
+  { id: "spotlight",    label: "Client Spotlight", desc: "Product/service hero + stats + capabilities.", live: true,  icon: <Layers size={16} /> },
   { id: "ebrochure",    label: "E-Brochure",     desc: "GlobalLink-style clean marketing PDF.",         live: false, icon: <PenSquare size={16} /> },
   { id: "adaptor-brief",label: "Adaptor Brief",  desc: "Dark aurora hero + capability grid.",           live: false, icon: <Rocket size={16} /> },
 ];
@@ -55,7 +56,7 @@ function NewAssetPage() {
   const { brandModes } = useTaxonomy();
   const create = useServerFn(createPrintAssetWithBrief);
 
-  const [kind, setKind] = useState<"case-study" | "spotlight" | "ebrochure" | "adaptor-brief">("case-study");
+  const [kind, setKind] = useState<"case-study" | "spotlight" | "ebrochure" | "adaptor-brief">(search.kind ?? "case-study");
   const [title, setTitle] = useState(search.prospect ? `${search.prospect} — Case Study` : "");
   const [brandModeId, setBrandModeId] = useState(
     search.brandModeId ?? (brandModes.find((b) => b.id === "bm-tp-lifesci")?.id ?? brandModes[0]?.id ?? "bm-enterprise"),
@@ -77,7 +78,7 @@ function NewAssetPage() {
     [brandModes, brandModeId],
   );
 
-  const canGenerate = kind === "case-study" && title.trim().length > 0 && prospect.trim().length > 0;
+  const canGenerate = (kind === "case-study" || kind === "spotlight") && title.trim().length > 0 && prospect.trim().length > 0;
 
   async function handleGenerate() {
     setBusy(true);

@@ -6,6 +6,7 @@ import { Download, Loader2, Star, Copy, Check, Plus, Play, Eye, Package } from "
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
+import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LazyMount } from "@/components/LazyMount";
@@ -430,28 +431,14 @@ function Library() {
   return (
     <AppShell>
       <div>
-        <div className="flex items-center justify-between gap-4">
-          <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library</div>
-          <div className="flex items-center gap-2">
-            <Link
-              to="/library/my"
-              className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7]"
-            >
-              My Modules <span aria-hidden>★</span>
-            </Link>
-            <Link
-              to="/library/imported"
-              className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7]"
-            >
-              Imported slides <span aria-hidden>→</span>
-            </Link>
-          </div>
-        </div>
-        <h1 className="mt-3 text-4xl font-semibold">Approved module variants.</h1>
+        <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library</div>
+        <div className="mt-3"><LibrarySubnav active="/library" /></div>
+        <h1 className="mt-4 text-4xl font-semibold">Approved module variants.</h1>
         <p className="mt-3 max-w-2xl text-black/60">
           Search and preview the modules the assembler pulls from. Scope by brand to hide off-limits families and float the preferred variants for that identity. Staging area for freshly imported PPTX slides lives under <Link to="/library/imported" className="underline hover:text-[#003FC7]">Imported slides</Link>.
         </p>
       </div>
+
 
       <div className="mt-8 space-y-4">
         <div className="flex flex-wrap items-center gap-3">

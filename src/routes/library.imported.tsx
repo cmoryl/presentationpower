@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, ExternalLink, Send, Image as ImageIcon, FileText, ChevronRight, X, Check, Wrench, Upload, RefreshCw } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { FaithfulSlideCanvas } from "@/components/slide/FaithfulSlideCanvas";
 import { AssetInspectorPanel } from "@/components/AssetInspectorPanel";
@@ -85,12 +86,10 @@ function ImportedLibrary() {
   return (
     <AppShell>
       <div>
-        <div className="flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-black/50">
-          <Link to="/library" className="hover:text-[#003FC7]">Library</Link>
-          <ChevronRight size={12} className="opacity-40" />
-          <span className="text-black">Imported</span>
-        </div>
-        <h1 className="mt-3 text-4xl font-semibold text-[#03002C]">Imported slide staging.</h1>
+        <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library · Imported</div>
+        <div className="mt-3"><LibrarySubnav active="/library/imported" /></div>
+        <h1 className="mt-4 text-4xl font-semibold text-[#03002C]">Imported slide staging.</h1>
+
         <p className="mt-3 max-w-2xl text-black/60">
           Every PPTX you upload lands here first. Inspect layout, hierarchy and imagery, then promote the strongest slides into the approved module library so the assembler can reuse them.
         </p>
