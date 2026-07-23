@@ -6732,7 +6732,11 @@ function FreeformAreaChart({
             {p.label}
           </text>
         ) : null,
-      )}
+    </svg>
+  );
+}
+
+
 
 function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
   const ink = useSlideInk();
