@@ -14,21 +14,28 @@ import * as React from "react";
 import {
   getDivisionLocationSet,
   formatMetricValue,
+  REGION_LABELS,
   type LocationPin,
   type LocationMetric,
 } from "@/lib/location-maps";
+
+type RegionKey = LocationPin["region"];
+const REGION_KEYS: RegionKey[] = ["AMER", "EMEA", "APAC", "LATAM", "MEA"];
 
 type Props = {
   brandId: string;
   items: unknown;
   metrics: unknown;
   activeMetricId: unknown;
+  regionFilter: unknown;
   onChange: (patch: {
     items?: LocationPin[];
     metrics?: LocationMetric[];
     activeMetricId?: string | null;
+    regionFilter?: RegionKey[] | null;
   }) => void;
 };
+
 
 const FORMATS: NonNullable<LocationMetric["format"]>[] = ["number", "currency", "percent"];
 
@@ -85,11 +92,33 @@ function slug(input: string): string {
   return input.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `metric-${Date.now()}`;
 }
 
-export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId, onChange }: Props) {
+export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId, regionFilter, onChange }: Props) {
   const seeded = React.useMemo(() => getDivisionLocationSet(brandId), [brandId]);
   const pins = React.useMemo(() => coercePins(items, seeded.pins), [items, seeded.pins]);
   const metricList = React.useMemo(() => coerceMetrics(metrics), [metrics]);
   const activeId = typeof activeMetricId === "string" && activeMetricId ? activeMetricId : metricList[0]?.id ?? "";
+
+  const activeRegions = React.useMemo<RegionKey[]>(() => {
+    if (!Array.isArray(regionFilter) || regionFilter.length === 0) return REGION_KEYS;
+    const set = new Set(regionFilter.filter((r): r is RegionKey => REGION_KEYS.includes(r as RegionKey)));
+    return set.size ? Array.from(set) : REGION_KEYS;
+  }, [regionFilter]);
+  const allActive = activeRegions.length === REGION_KEYS.length;
+
+  const toggleRegion = (k: RegionKey) => {
+    const set = new Set(activeRegions);
+    if (set.has(k)) set.delete(k); else set.add(k);
+    const next = REGION_KEYS.filter((r) => set.has(r));
+    onChange({ regionFilter: next.length === 0 || next.length === REGION_KEYS.length ? null : next });
+  };
+  const setPreset = (regions: RegionKey[] | null) => onChange({ regionFilter: regions });
+
+  const regionCounts = React.useMemo(() => {
+    const acc: Record<RegionKey, number> = { AMER: 0, EMEA: 0, APAC: 0, LATAM: 0, MEA: 0 };
+    for (const p of pins) acc[p.region] = (acc[p.region] ?? 0) + 1;
+    return acc;
+  }, [pins]);
+
 
   const updateMetric = (id: string, patch: Partial<LocationMetric>) => {
     const next = metricList.map((m) => (m.id === id ? { ...m, ...patch } : m));
@@ -187,6 +216,54 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
           + Add metric
         </button>
       </div>
+
+      {/* Region filter */}
+      <div className="mt-5 rounded-xl border border-black/10 bg-black/[0.015] p-3">
+        <div className="flex items-baseline justify-between">
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-black/60">
+            Region filter {allActive ? "· all regions" : `· ${activeRegions.length}/${REGION_KEYS.length}`}
+          </div>
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setPreset(null)} className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-widest ${allActive ? "bg-sky-600 text-white" : "border border-black/15 text-black/60 hover:border-sky-500 hover:text-sky-600"}`}>All</button>
+            <button type="button" onClick={() => setPreset(["AMER", "LATAM"])} className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-sky-500 hover:text-sky-600">Americas</button>
+            <button type="button" onClick={() => setPreset(["EMEA", "MEA"])} className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-sky-500 hover:text-sky-600">EMEA</button>
+            <button type="button" onClick={() => setPreset(["APAC"])} className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-sky-500 hover:text-sky-600">APAC</button>
+          </div>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {REGION_KEYS.map((k) => {
+            const on = activeRegions.includes(k);
+            const count = regionCounts[k] ?? 0;
+            const disabled = count === 0;
+            return (
+              <button
+                key={k}
+                type="button"
+                disabled={disabled}
+                onClick={() => toggleRegion(k)}
+                className={`flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-medium transition ${
+                  disabled
+                    ? "cursor-not-allowed border-black/10 text-black/25"
+                    : on
+                    ? "border-sky-500 bg-sky-500/10 text-sky-700"
+                    : "border-black/15 text-black/60 hover:border-sky-500 hover:text-sky-600"
+                }`}
+                title={disabled ? "No pins in this region" : on ? "Click to hide" : "Click to show"}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${on && !disabled ? "bg-sky-600" : "bg-black/25"}`} />
+                <span className="tracking-wide">{REGION_LABELS[k]}</span>
+                <span className="tabular-nums text-black/40">{count}</span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-2 text-[10px] text-black/45">
+          Filters apply to the map, the legend scale, the headline total, and the top-locations list.
+        </div>
+      </div>
+
+
+
 
       {/* Metrics list */}
       {metricList.length === 0 ? (
