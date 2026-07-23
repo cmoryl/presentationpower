@@ -32,9 +32,17 @@ import {
 // -----------------------------------------------------------------------
 // PORT — TransPerfect EBrochure.dc.html → EBrochureLayout
 //
+// SINGLE PAGE by design. This is the standalone print-asset E-Brochure —
+// authored content on the portrait canvas, faithful to EBrochure.dc.html.
+// Do NOT convert it to multi-page. Deck-derived multi-page brochures are
+// the separate `deck-brochure` document-family (see src/lib/document-families.ts),
+// which reflows deck slides onto multiple pages. The two live side by side
+// with different names precisely so nobody "fixes" this later.
+//
 // Shared page/aurora geometry, glass, chip, and icon primitives live in
-// ./print-primitives so the three print layouts read as one family.
+// ./print-primitives so the four print layouts read as one family.
 // -----------------------------------------------------------------------
+
 
 function padTop(d: import("@/lib/print-assets.types").PrintDensity): number {
   return pagePadTop(d, 40, 8);

@@ -14,6 +14,19 @@ import { PrintHeroAura } from "@/components/print/PrintHeroAura";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
 import { useTextFit } from "@/lib/text-fit";
+import {
+  PAGE_W,
+  cq,
+  pageAspect,
+  auroraAspect,
+  pagePadX as padX,
+  pagePadTop,
+  glass,
+  IconPath as Icon,
+  ICON_PATHS,
+  clampLines,
+} from "@/components/print/print-primitives";
+
 
 
 // -----------------------------------------------------------------------
@@ -21,68 +34,20 @@ import { useTextFit } from "@/lib/text-fit";
 //
 // Dark gradient hero, three stat pills tucked over the seam, Challenge /
 // Solution / Result rows, pull-quote + Engagement Snapshot, CTA band,
-// footer lockup. Same synthesis as Spotlight/EBrochure: the hero gradient
-// is division-tokenized, the white cards become glass over the aurora,
-// pixels are converted to `cqw` against the 816px canvas.
+// footer lockup. Same synthesis as Spotlight/EBrochure/AdaptorBrief: the
+// hero gradient is division-tokenized, the white cards become glass over
+// the aurora, pixels convert to `cqw` against the 816px canvas.
+//
+// Shared page/aurora geometry, glass, chip, and icon primitives live in
+// ./print-primitives — do NOT duplicate helpers here.
 // -----------------------------------------------------------------------
 
-const PAGE_W = 816;
-const cq = (px: number) => `${((px * 100) / PAGE_W).toFixed(3)}cqw`;
-
-function pageAspect(size: PrintPageSize): string {
-  switch (size) {
-    case "A4": return "8.2677 / 11.6929";
-    case "Letter": return "8.5 / 11";
-    case "Square": return "1 / 1";
-  }
+function padTop(d: PrintDensity): number {
+  return pagePadTop(d, 40, 8);
 }
 
-function auroraAspect(size: PrintPageSize): { w: number; h: number } {
-  switch (size) {
-    case "A4": return { w: Math.round((1280 * 8.2677) / 11.6929), h: 1280 };
-    case "Letter": return { w: Math.round((1280 * 8.5) / 11), h: 1280 };
-    case "Square": return { w: 1280, h: 1280 };
-  }
-}
+const STAT_ICONS = [ICON_PATHS["globe-alt"], ICON_PATHS.sparkles, ICON_PATHS.trending];
 
-function padX(d: PrintDensity): number { return d === "compact" ? 36 : d === "airy" ? 52 : 44; }
-function padTop(d: PrintDensity): number { return d === "compact" ? 32 : d === "airy" ? 46 : 40; }
-
-function glass(mode: "light" | "dark", accent: string): CSSProperties {
-  if (mode === "dark") {
-    return {
-      background: `linear-gradient(180deg, color-mix(in srgb, ${accent} 6%, rgba(10,8,36,0.62)), rgba(6,4,32,0.55))`,
-      border: `1px solid color-mix(in srgb, ${accent} 22%, rgba(255,255,255,0.08))`,
-      backdropFilter: "blur(14px) saturate(140%)",
-      boxShadow: `0 ${cq(10)} ${cq(28)} rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.04)`,
-    };
-  }
-  return {
-    background: `linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.74))`,
-    border: `1px solid color-mix(in srgb, ${accent} 18%, rgba(255,255,255,0.75))`,
-    backdropFilter: "blur(14px) saturate(140%)",
-    boxShadow: `0 ${cq(6)} ${cq(18)} rgba(3,0,44,0.12), inset 0 0 0 1px rgba(255,255,255,0.55)`,
-  };
-}
-
-// Heroicons-style outline paths.
-const ICONS = {
-  globe: "M12 21a9 9 0 0 0 0-18m0 18a9 9 0 0 1 0-18m0 18c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3M3.6 9h16.8M3.6 15h16.8",
-  spark: "M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2",
-  trending: "M3 17l6-6 4 4 8-8M15 7h6v6",
-  check: "M4 12l5 5L20 6",
-} as const;
-
-function Icon({ d, size, color, sw = 1.5 }: { d: string; size: number | string; color: string; sw?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color}
-      strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }} aria-hidden>
-      <path d={d} />
-    </svg>
-  );
-}
-
-const STAT_ICONS = [ICONS.globe, ICONS.spark, ICONS.trending];
 
 export function CaseStudyLayout({
   content, brand, mode, pageSize = "Letter", density = "standard", seed, style,
@@ -118,10 +83,11 @@ export function CaseStudyLayout({
 
   const stats = content.stats.slice(0, 3);
   const blocks: Array<{ label: string; block: typeof content.challenge; icon: string }> = [
-    { label: content.challenge.heading || "The Challenge", block: content.challenge, icon: ICONS.globe },
-    { label: content.solution.heading || "The Solution", block: content.solution, icon: ICONS.spark },
-    { label: content.result.heading || "The Result", block: content.result, icon: ICONS.trending },
+    { label: content.challenge.heading || "The Challenge", block: content.challenge, icon: ICON_PATHS["globe-alt"] },
+    { label: content.solution.heading || "The Solution", block: content.solution, icon: ICON_PATHS.sparkles },
+    { label: content.result.heading || "The Result", block: content.result, icon: ICON_PATHS.trending },
   ];
+
 
   const engagement = content.engagement ?? {
     title: "Engagement Snapshot",
@@ -316,10 +282,11 @@ export function CaseStudyLayout({
                 <div>
                   <div style={{ fontWeight: 700, fontSize: cq(13.5), color: accentInk }}>{b.label}</div>
                   {b.block.body && (
-                    <p style={{ margin: `${cq(5)} 0 0`, fontSize: cq(10.5), lineHeight: 1.6, color: inkSoft }}>
+                    <p style={{ margin: `${cq(5)} 0 0`, fontSize: cq(10.5), lineHeight: 1.6, color: inkSoft, ...clampLines(3) }}>
                       {b.block.body}
                     </p>
                   )}
+
                 </div>
               </div>
             ))}
@@ -342,9 +309,10 @@ export function CaseStudyLayout({
                     <div style={{ fontFamily: "Georgia, serif", fontSize: cq(40), lineHeight: 0.6, color: accentInk, fontWeight: 700 }} aria-hidden>
                       &ldquo;
                     </div>
-                    <p style={{ margin: `${cq(10)} 0 0`, fontSize: cq(12.5), lineHeight: 1.6, color: ink }}>
+                    <p style={{ margin: `${cq(10)} 0 0`, fontSize: cq(12.5), lineHeight: 1.6, color: ink, ...clampLines(5) }}>
                       {content.quote.text}
                     </p>
+
                     <div style={{ marginTop: cq(10), fontSize: cq(11), fontWeight: 700, color: accentInk }}>
                       — {content.quote.author}{content.quote.company ? ` · ${content.quote.company}` : ""}
                     </div>
@@ -364,9 +332,9 @@ export function CaseStudyLayout({
                             background: chipBg, flexShrink: 0,
                           }}
                         >
-                          <Icon d={ICONS.check} size={cq(12)} color={accentInk} sw={2} />
+                          <Icon d={ICON_PATHS.check} size={cq(12)} color={accentInk} strokeWidth={2} />
                         </div>
-                        <div style={{ fontSize: cq(10), color: inkSoft }}>{b}</div>
+                        <div style={{ fontSize: cq(10), color: inkSoft, ...clampLines(2) }}>{b}</div>
                       </div>
                     ))}
                   </div>
