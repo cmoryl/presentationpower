@@ -405,7 +405,7 @@ function AssetEditor() {
             className="relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
             style={{ aspectRatio: canvasAspect }}
           >
-            {brand && <AuroraLayer seed={`asset-${row.id}`} brand={brand} intensity={0.9} />}
+            {brand && <AuroraLayer seed={`asset-${row.id}`} brand={brand} intensity={0.9} aspect={auroraAspect} />}
             <div className={`relative flex h-full flex-col justify-between ${densityPad} text-[#03002C] dark:text-white`}>
               {/* TOP */}
               <div className="flex items-start justify-between">
