@@ -36,7 +36,7 @@ import { PrintSectionPicker } from "@/components/print/sections/PrintSectionPick
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
-import { analyzePrintAsset, canAddModule, weightForSection } from "@/lib/print-capacity";
+import { analyzePrintAsset, canAddModule } from "@/lib/print-capacity";
 import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2 } from "lucide-react";
 
 export const Route = createFileRoute("/asset/$assetId")({
