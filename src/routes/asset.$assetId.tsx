@@ -980,6 +980,7 @@ function ModulesPanel({
   // reorder vs. new-module inserts.
   const [dropIdx, setDropIdx] = useState<number | null>(null);
   const [dropKind, setDropKind] = useState<"insert" | "reorder" | null>(null);
+  const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
 
   // Parse a dragged section payload from the drawer. Returns null for
   // reorder drags (which carry a numeric text/plain index instead).
