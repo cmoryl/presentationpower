@@ -102,6 +102,9 @@ export type DivisionImageryEntry = {
   note: string | null;
   prompt: string | null;
   uploaded_by: string;
+  approved: boolean;
+  approved_by: string | null;
+  approved_at: string | null;
   created_at: string;
   updated_at: string;
   signedUrl: string | null;
