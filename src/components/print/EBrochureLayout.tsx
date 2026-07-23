@@ -159,6 +159,20 @@ export function EBrochureLayout({
               style={{ background: "#FFFFFF", zIndex: 0 }}
             />
           )}
+          {/* Light mode top wash per Canva reference pages 3-6. */}
+          {mode === "light" && (
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0"
+              aria-hidden
+              style={{
+                height: "40%",
+                zIndex: 1,
+                background: `linear-gradient(165deg, color-mix(in srgb, ${primary} 16%, transparent) 0%, color-mix(in srgb, ${accent} 9%, transparent) 45%, transparent 80%)`,
+                WebkitMaskImage: "linear-gradient(180deg, black 0%, black 55%, transparent 100%)",
+                maskImage: "linear-gradient(180deg, black 0%, black 55%, transparent 100%)",
+              }}
+            />
+          )}
           {/* Aurora + halo clipped to the top of the page. Lower body stays clean. */}
           {mode === "dark" && (
             <div
