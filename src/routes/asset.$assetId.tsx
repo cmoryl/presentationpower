@@ -734,12 +734,68 @@ function HeroMediaPanel({
         value={media.imageUrl}
         onChange={(e) => patch({ imageUrl: e.target.value })}
       />
-      <input
-        className={inspectorInput}
-        placeholder='Focal point, e.g. "50% 35%"'
-        value={media.focalPoint ?? ""}
-        onChange={(e) => patch({ focalPoint: e.target.value || undefined })}
+      <Row label="Aspect">
+        <select
+          className={inspectorInput}
+          value={aspect}
+          onChange={(e) => patch({ aspect: e.target.value as PrintHeroMedia["aspect"] })}
+        >
+          <option value="fill">Fill (band height)</option>
+          <option value="21:9">21:9 Cinemascope</option>
+          <option value="16:9">16:9 Widescreen</option>
+          <option value="3:2">3:2 Photo</option>
+          <option value="4:3">4:3 Classic</option>
+          <option value="1:1">1:1 Square</option>
+        </select>
+      </Row>
+      <Slider
+        label="Focus X"
+        value={focalX}
+        min={0}
+        max={100}
+        step={1}
+        onChange={(v) => patch({ focalX: v, focalPoint: undefined })}
+        display={`${Math.round(focalX)}%`}
       />
+      <Slider
+        label="Focus Y"
+        value={focalY}
+        min={0}
+        max={100}
+        step={1}
+        onChange={(v) => patch({ focalY: v, focalPoint: undefined })}
+        display={`${Math.round(focalY)}%`}
+      />
+      {/* Interactive focal picker: click the preview to set X/Y */}
+      {media.imageUrl && (
+        <button
+          type="button"
+          onClick={(e) => {
+            const el = e.currentTarget;
+            const rect = el.getBoundingClientRect();
+            // no-op — actual clicks are handled by the inner div below
+            void rect;
+          }}
+          className="relative block h-24 w-full overflow-hidden rounded-md border border-black/10 dark:border-white/10"
+          style={{
+            backgroundImage: `url(${media.imageUrl})`,
+            backgroundSize: "cover",
+            backgroundPosition: `${focalX}% ${focalY}%`,
+          }}
+          onPointerDown={(e) => {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            patch({ focalX: Math.round(x), focalY: Math.round(y), focalPoint: undefined });
+          }}
+          aria-label="Set focal point"
+        >
+          <span
+            className="pointer-events-none absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow"
+            style={{ left: `${focalX}%`, top: `${focalY}%`, background: "#003FC7" }}
+          />
+        </button>
+      )}
       <div className="grid grid-cols-[80px_1fr] items-center gap-2">
         <span className="text-[11px] text-black/60 dark:text-white/60">Wash color</span>
         <input
