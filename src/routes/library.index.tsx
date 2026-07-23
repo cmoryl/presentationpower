@@ -1612,8 +1612,9 @@ function ModalABPreview({
               {m === "light" && (
                 <ResolutionToggle value={pixelRatio} onChange={setPixelRatio} disabled={imageBusy !== null} tone="compact" />
               )}
-
+              <button
                 type="button"
+
                 onClick={() => runImageExport(m, "png")}
                 disabled={imageBusy !== null}
                 className="rounded-full border border-black/15 bg-white px-2 py-0.5 font-medium uppercase tracking-widest text-black/60 hover:border-[#003FC7]/50 hover:text-[#003FC7] disabled:opacity-50"
