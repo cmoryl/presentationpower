@@ -4286,18 +4286,31 @@ function renderVariantBody({
     }
 
     case "MV-DASH-REPORT-CARDS": {
+      // Free-form Aurora v2. No card plate, no border. Two items sit as free
+      // typography on the aurora, separated by a single vertical hairline.
+      // The first item halos (its numeral carries a radial bloom) so the
+      // primary reading dominates. Reuses the MV-KPI-DASHBOARD language.
       const items = arr(c.items).slice(0, 2);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14 grid gap-14" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
-            {items[0] && <ReportCard brand={brand} item={items[0]} />}
+          <div style={{ maxWidth: 900 }}>
+            <Kicker brand={brand}>{s(c.kicker, "Report")}</Kicker>
+            <div
+              className="mt-4"
+              style={{ fontSize: 52, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+            >
+              {s(c.title, variant.name)}
+            </div>
+          </div>
+          <div className="mt-16 grid gap-20" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
+            {items[0] && <FreeformReportItem brand={brand} item={items[0]} bloom />}
             <div style={{ background: ink.hairline }} />
-            {items[1] && <ReportCard brand={brand} item={items[1]} />}
+            {items[1] && <FreeformReportItem brand={brand} item={items[1]} />}
           </div>
         </SlideFrame>
       );
     }
+
 
     case "MV-DASH-GROWTH-COLUMNS": {
       // Free-form Aurora v2. Columns sit on a single hairline baseline that
