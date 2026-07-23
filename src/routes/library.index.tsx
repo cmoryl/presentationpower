@@ -1221,6 +1221,7 @@ function VariantDetailModal({
         dark: URL.createObjectURL(darkBlob),
         filenameLight,
         filenameDark,
+        ratio: pixelRatio,
       });
     } catch (err) {
       console.error("[library] PDF preview failed", err);
