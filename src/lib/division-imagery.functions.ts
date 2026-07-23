@@ -329,14 +329,14 @@ export const pickHeroForTemplate = createServerFn({ method: "GET" })
     const { data: rows, error } = await s
       .from("division_imagery")
       .select(
-        "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, prompt, uploaded_by, approved, approved_by, approved_at, collection, template_kinds, is_default_for, created_at, updated_at",
+        "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, prompt, uploaded_by, approved, approved_by, approved_at, collection, template_kinds, is_default_for, variants, created_at, updated_at",
       )
       .eq("division_id", data.divisionId)
       .eq("approved", true)
       .order("created_at", { ascending: false })
       .limit(200);
     if (error) throw new Error((error as { message?: string }).message ?? "Query failed");
-    const list = (rows ?? []) as Array<Omit<DivisionImageryEntry, "signedUrl">>;
+    const list = (rows ?? []) as Array<Omit<DivisionImageryEntry, "signedUrl" | "variantUrls">>;
     if (list.length === 0) return null;
 
     const scored = list
@@ -354,6 +354,9 @@ export const pickHeroForTemplate = createServerFn({ method: "GET" })
 
     const pick = scored[0]?.r;
     if (!pick) return null;
-    const signed = await s.storage.from(BUCKET).createSignedUrl(pick.storage_path, SIGNED_TTL);
-    return { ...pick, signedUrl: signed.data?.signedUrl ?? null };
+    const [signed, variantUrls] = await Promise.all([
+      s.storage.from(BUCKET).createSignedUrl(pick.storage_path, SIGNED_TTL),
+      signVariantUrls(s, pick.variants ?? {}),
+    ]);
+    return { ...pick, signedUrl: signed.data?.signedUrl ?? null, variantUrls };
   });
