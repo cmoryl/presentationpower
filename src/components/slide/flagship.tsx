@@ -30,7 +30,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import { useSlideMode, useSlideAccent, useSlideInk } from "./SlideChrome";
-import { auroraOrbs, auroraLayerOpacity, darkGlassWash } from "@/lib/aurora-svg";
+import { auroraOrbs, auroraLayerOpacity } from "@/lib/aurora-svg";
 
 export type SlideRegister = "corporate" | "product" | "editorial";
 
