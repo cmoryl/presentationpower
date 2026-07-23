@@ -46,6 +46,43 @@ export type PrintHeroMedia = {
 };
 
 
+// ---------------------------------------------------------------------------
+// SHARED MODULES → PRINT SECTIONS
+// Reusable content blocks (Stats, Quotes, Logo Grids, …) that any print
+// template can host in `content.sections[]`. Phase 1 ships the Stats family
+// with portrait-native renderers under `src/components/print/sections/`.
+// ---------------------------------------------------------------------------
+
+export type PrintStatItem = {
+  label: string;
+  value: string;
+  unit?: string;
+  delta?: string;                 // e.g. "+12%" — optional trend chip
+  trend?: "up" | "down" | "flat";
+  caption?: string;               // small line below label
+  icon?: string;                  // lucide name — layout may map or ignore
+};
+
+/** Portrait-native variant IDs for the Stats family. */
+export type PrintStatsVariant =
+  | "kpi-dashboard-portrait"
+  | "stat-callout-row-portrait"
+  | "stat-bento-portrait";
+
+export type PrintStatsSection = {
+  id: string;
+  kind: "stats";
+  variantId: PrintStatsVariant;
+  title?: string;
+  eyebrow?: string;
+  items: PrintStatItem[];
+};
+
+/** Discriminated union — future families add cases here. */
+export type PrintSection = PrintStatsSection;
+
+
+
 
 
 export type CaseStudyStat = {
