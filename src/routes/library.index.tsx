@@ -1678,6 +1678,14 @@ function VariantDetailModal({
                       <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">Resolution</span>
                       <ResolutionToggle value={pixelRatio} onChange={setPixelRatio} disabled={pdfBusy !== null || bothBusy || zipBusy} />
                     </div>
+                    {/* Vector-first PPTX row */}
+                    <div className="flex items-center justify-between border-t border-black/5 pt-3 pb-3">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">PPTX embeds</span>
+                        <span className="text-[10px] text-black/45">Vector = crisp + smaller · Raster = max compat</span>
+                      </div>
+                      <VectorToggle />
+                    </div>
 
                     {/* Quick single-shot exports */}
                     <div className="space-y-3 border-t border-black/5 pt-3">
