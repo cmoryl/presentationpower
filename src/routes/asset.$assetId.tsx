@@ -1,5 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  exportPrintAssetAsPdf,
+  PRINT_PAGE_PRESETS,
+  type PrintPageSizeKey,
+} from "@/lib/print-asset-export";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
