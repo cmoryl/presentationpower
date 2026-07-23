@@ -174,6 +174,27 @@ function AssetEditor() {
     }
   }
 
+  async function handleExportPdf() {
+    if (!canvasRef.current) return;
+    setExportBusy(true);
+    try {
+      const safeTitle = (row?.title ?? "print-asset").replace(/[^a-z0-9-_]+/gi, "-").toLowerCase();
+      await exportPrintAssetAsPdf(canvasRef.current, {
+        pageSize: exportSize,
+        custom: exportSize === "Custom" ? { widthIn: customW, heightIn: customH } : undefined,
+        bleedIn,
+        cropMarks,
+        mode: exportMode,
+        filename: `${safeTitle}-${exportSize.toLowerCase()}.pdf`,
+      });
+      setExportOpen(false);
+    } catch (e) {
+      alert(`Export failed: ${(e as Error).message}`);
+    } finally {
+      setExportBusy(false);
+    }
+  }
+
   const pageSize: PrintPageSize = ctx.pageSize ?? "A4";
   const density: PrintDensity = ctx.density ?? "standard";
   const canvasAspect =
