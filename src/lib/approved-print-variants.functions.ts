@@ -17,8 +17,8 @@ export type ApprovedPrintVariant = {
   title: string;
   description: string | null;
   thumbnail_url: string | null;
-  content: Record<string, unknown>;
-  context: Record<string, unknown>;
+  content: any;
+  context: any;
   source_asset_id: string | null;
   status: "draft" | "published" | "archived";
   order_index: number;
@@ -59,8 +59,8 @@ const CreateInput = z.object({
   title: z.string().min(1).max(200),
   description: z.string().max(1000).optional(),
   thumbnailUrl: z.string().url().optional(),
-  content: z.record(z.string(), z.unknown()),
-  context: z.record(z.string(), z.unknown()).optional(),
+  content: z.any(),
+  context: z.any().optional(),
   sourceAssetId: z.string().uuid().nullable().optional(),
   status: StatusEnum.optional(),
 });
@@ -164,7 +164,7 @@ export const updateApprovedPrintVariant = createServerFn({ method: "POST" })
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
     if (!isAdmin) throw new Error("Forbidden: admin role required");
 
-    const patch: Record<string, unknown> = {};
+    const patch: any = {};
     if (data.patch.title !== undefined) patch.title = data.patch.title;
     if (data.patch.description !== undefined) patch.description = data.patch.description;
     if (data.patch.thumbnailUrl !== undefined) patch.thumbnail_url = data.patch.thumbnailUrl;
