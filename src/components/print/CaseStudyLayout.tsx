@@ -10,6 +10,7 @@ import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
 import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
+import { PrintHeroAura } from "@/components/print/PrintHeroAura";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
 import { useTextFit } from "@/lib/text-fit";
 
@@ -183,9 +184,11 @@ export function CaseStudyLayout({
               />
             </div>
           )}
-          {content.heroMedia && (
+          {content.heroMedia ? (
             <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
-          )}
+          ) : mode === "light" ? (
+            <PrintHeroAura brand={brand} mode="light" accent={accent} primary={primary} seed={seed ?? `casestudy-${brand.id}-${mode}`} aspect={auroraAspect(pageSize)} cq={cq} />
+          ) : null}
 
 
           {/* HERO — no full-color band; background inherits page bg (white / offset black).
