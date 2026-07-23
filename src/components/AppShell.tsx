@@ -167,25 +167,35 @@ export function AppShell({ children }: { children: ReactNode }) {
                       <span aria-hidden className="text-[10px]">▾</span>
                     </Link>
                     {adminOpen && (
-                      <div className="absolute left-1/2 top-full z-50 w-52 -translate-x-1/2 pt-2">
-                        <div className="overflow-hidden rounded-2xl border border-white/50 bg-white/70 p-1.5 [backdrop-filter:blur(28px)_saturate(180%)] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_20px_60px_-15px_rgba(11,42,74,0.35)] dark:!border-white/10 dark:!bg-[#0B0A2A]/70 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_20px_60px_-15px_rgba(0,0,0,0.8)]">
-                          {adminSubnav.map((s) => {
-                            const active = pathname === s.to || pathname.startsWith(s.to + "/");
-                            return (
-                              <Link
-                                key={s.to}
-                                to={s.to}
-                                className={`block rounded-xl px-3.5 py-2 text-sm transition ${
-                                  active
-                                    ? "bg-white/80 text-[#03002C] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_4px_12px_-4px_rgba(11,42,74,0.3)] dark:!bg-gradient-to-b dark:!from-white/15 dark:!to-white/[0.04] dark:!text-white dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.2)]"
-                                    : "text-black/70 hover:bg-white/50 hover:text-black dark:text-white/75 dark:hover:!bg-white/[0.06] dark:hover:text-white"
-                                }`}
-                                onClick={() => setAdminOpen(false)}
-                              >
-                                {s.label}
-                              </Link>
-                            );
-                          })}
+                      <div className="absolute left-1/2 top-full z-50 w-[720px] max-w-[92vw] -translate-x-1/2 pt-2">
+                        <div className="grid grid-cols-3 gap-1 overflow-hidden rounded-2xl border border-white/50 bg-white/70 p-3 [backdrop-filter:blur(28px)_saturate(180%)] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_20px_60px_-15px_rgba(11,42,74,0.35)] dark:!border-white/10 dark:!bg-[#0B0A2A]/80 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_20px_60px_-15px_rgba(0,0,0,0.8)]">
+                          {adminGroups.map((g) => (
+                            <div key={g.label} className="min-w-0">
+                              <div className="px-2 pb-1.5 pt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
+                                {g.label}
+                              </div>
+                              <div className="flex flex-col gap-0.5">
+                                {g.items.map((s) => {
+                                  const active =
+                                    pathname === s.to || pathname.startsWith(s.to + "/");
+                                  return (
+                                    <Link
+                                      key={s.to}
+                                      to={s.to}
+                                      className={`block rounded-lg px-2.5 py-1.5 text-[13px] leading-tight transition ${
+                                        active
+                                          ? "bg-white/80 text-[#03002C] shadow-[inset_0_1px_0_0_rgba(255,255,255,1)] dark:!bg-white/10 dark:!text-white"
+                                          : "text-black/70 hover:bg-white/50 hover:text-black dark:text-white/75 dark:hover:!bg-white/[0.06] dark:hover:text-white"
+                                      }`}
+                                      onClick={() => setAdminOpen(false)}
+                                    >
+                                      {s.label}
+                                    </Link>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}
