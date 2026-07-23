@@ -238,9 +238,38 @@ function AdminImageryPage() {
       {/* Uploader */}
       <Uploader
         divisionId={divisionId}
-        onUpload={(input) => uploadMut.mutate(input)}
-        isUploading={uploadMut.isPending}
+        onDone={invalidate}
       />
+
+      {/* Bulk approve of currently-filtered pending rows */}
+      {filtered.some((r) => !r.approved) ? (
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-black/10 bg-[#003FC7]/5 px-4 py-3 text-xs text-black/70">
+          <CheckCircle2 size={14} className="text-[#003FC7]" />
+          <span>
+            {filtered.filter((r) => !r.approved).length} pending in the current view
+          </span>
+          <button
+            type="button"
+            onClick={async () => {
+              const pending = filtered.filter((r) => !r.approved);
+              if (pending.length === 0) return;
+              if (
+                !window.confirm(
+                  `Approve ${pending.length} image${pending.length === 1 ? "" : "s"}?`,
+                )
+              )
+                return;
+              // Sequential to keep RLS + toast noise sane; small batches expected.
+              for (const r of pending) {
+                await approveMut.mutateAsync({ id: r.id, approved: true }).catch(() => {});
+              }
+            }}
+            className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-white hover:bg-[#003FC7]/85"
+          >
+            <CheckCircle2 size={12} /> Approve all pending
+          </button>
+        </div>
+      ) : null}
 
       {/* Analytics totals for the selected division (last 90 days) */}
       {statsTotals ? (
