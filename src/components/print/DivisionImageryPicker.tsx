@@ -141,7 +141,45 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
             />
             Approved only
           </label>
+          <button
+            type="button"
+            onClick={clearAll}
+            disabled={!hasFilters}
+            className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-2 text-[10px] uppercase tracking-[0.22em] text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+            title="Clear search, kind, and tag filters"
+          >
+            Clear
+          </button>
         </div>
+
+        {tagOptions.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-1.5 border-b border-white/10 px-5 py-2.5">
+            <span className="text-[10px] uppercase tracking-[0.22em] text-white/40">Tags</span>
+            {tagOptions.map(({ tag, count }) => {
+              const on = activeTags.includes(tag);
+              return (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => toggleTag(tag)}
+                  className={`rounded-full px-2 py-0.5 text-[10px] transition ${
+                    on
+                      ? "border border-white bg-white text-[#0b0d18]"
+                      : "border border-white/10 bg-white/[0.04] text-white/70 hover:border-white/30 hover:text-white"
+                  }`}
+                >
+                  {tag}
+                  <span className={`ml-1 text-[9px] ${on ? "text-[#0b0d18]/60" : "text-white/40"}`}>{count}</span>
+                </button>
+              );
+            })}
+            <span className="ml-auto text-[10px] uppercase tracking-[0.22em] text-white/40">
+              {filtered.length} / {items.length}
+            </span>
+          </div>
+        ) : null}
+
+
 
 
         <div className="flex-1 overflow-y-auto p-5">
