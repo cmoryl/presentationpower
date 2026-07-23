@@ -1028,7 +1028,7 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => copyUrl(lightbox.signedUrl!)}
+                  onClick={() => copyUrl(lightbox.signedUrl!, lightbox)}
                   className="inline-flex items-center gap-1.5 rounded-full border border-black/15 px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
                 >
                   <Copy size={11} /> Copy URL
@@ -1037,12 +1037,14 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
                   href={lightbox.signedUrl}
                   target="_blank"
                   rel="noreferrer"
+                  onClick={() => track(lightbox, "download")}
                   className="inline-flex items-center gap-1.5 rounded-full border border-black/15 px-3 py-1.5 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
                 >
                   <ExternalLink size={11} /> Open
                 </a>
                 <Link
                   to="/asset/new"
+                  onClick={() => track(lightbox, "use")}
                   className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
                 >
                   <ArrowRight size={11} /> Use in new asset
