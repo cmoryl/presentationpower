@@ -523,6 +523,7 @@ export function SpotlightLayout({
                           fontSize: cq(10),
                           lineHeight: 1.6,
                           color: inkSoft,
+                          ...clampLines(6),
                         }}
                       >
                         {c.body}
