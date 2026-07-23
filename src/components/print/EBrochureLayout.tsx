@@ -13,6 +13,7 @@ import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
 import { PrintHeroAura } from "@/components/print/PrintHeroAura";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
+import { useTextFit } from "@/lib/text-fit";
 import {
   PAGE_W,
   cq,
