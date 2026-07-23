@@ -27,6 +27,7 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
   const [q, setQ] = useState("");
   const [kind, setKind] = useState<"all" | "photo" | "abstract" | "generated" | "upload">("all");
   const [approvedOnly, setApprovedOnly] = useState(true);
+  const [activeTags, setActiveTags] = useState<string[]>([]);
 
   useEffect(() => {
     if (!open || !divisionId) return;
@@ -47,17 +48,46 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
   }, [open, divisionId, list, approvedOnly]);
 
 
+  // Top ~20 tags across the loaded pool, ranked by frequency, so users can
+  // one-click narrow the grid without typing the exact tag string.
+  const tagOptions = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const r of items) for (const t of r.tags ?? []) {
+      const k = t.trim();
+      if (!k) continue;
+      counts.set(k, (counts.get(k) ?? 0) + 1);
+    }
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+      .slice(0, 20)
+      .map(([tag, count]) => ({ tag, count }));
+  }, [items]);
+
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return items.filter((r) => {
       if (kind !== "all" && r.kind !== kind) return false;
+      if (activeTags.length > 0) {
+        const rowTags = new Set((r.tags ?? []).map((t) => t.toLowerCase()));
+        for (const t of activeTags) if (!rowTags.has(t.toLowerCase())) return false;
+      }
       if (!needle) return true;
       const hay = [r.filename, r.note ?? "", r.prompt ?? "", (r.tags ?? []).join(" ")]
         .join(" ")
         .toLowerCase();
       return hay.includes(needle);
     });
-  }, [items, q, kind]);
+  }, [items, q, kind, activeTags]);
+
+  const hasFilters = q.trim().length > 0 || kind !== "all" || activeTags.length > 0;
+  function toggleTag(t: string) {
+    setActiveTags((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
+  }
+  function clearAll() {
+    setQ("");
+    setKind("all");
+    setActiveTags([]);
+  }
 
   if (!open) return null;
 
@@ -111,7 +141,45 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
             />
             Approved only
           </label>
+          <button
+            type="button"
+            onClick={clearAll}
+            disabled={!hasFilters}
+            className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-2 text-[10px] uppercase tracking-[0.22em] text-white/70 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+            title="Clear search, kind, and tag filters"
+          >
+            Clear
+          </button>
         </div>
+
+        {tagOptions.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-1.5 border-b border-white/10 px-5 py-2.5">
+            <span className="text-[10px] uppercase tracking-[0.22em] text-white/40">Tags</span>
+            {tagOptions.map(({ tag, count }) => {
+              const on = activeTags.includes(tag);
+              return (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => toggleTag(tag)}
+                  className={`rounded-full px-2 py-0.5 text-[10px] transition ${
+                    on
+                      ? "border border-white bg-white text-[#0b0d18]"
+                      : "border border-white/10 bg-white/[0.04] text-white/70 hover:border-white/30 hover:text-white"
+                  }`}
+                >
+                  {tag}
+                  <span className={`ml-1 text-[9px] ${on ? "text-[#0b0d18]/60" : "text-white/40"}`}>{count}</span>
+                </button>
+              );
+            })}
+            <span className="ml-auto text-[10px] uppercase tracking-[0.22em] text-white/40">
+              {filtered.length} / {items.length}
+            </span>
+          </div>
+        ) : null}
+
+
 
 
         <div className="flex-1 overflow-y-auto p-5">
@@ -136,14 +204,22 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
           ) : (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
               {filtered.map((r) => (
-                <button
+                <div
                   key={r.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => {
                     onPick(r);
                     onClose();
                   }}
-                  className="group flex flex-col overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] text-left transition hover:border-white/30 hover:bg-white/[0.06]"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onPick(r);
+                      onClose();
+                    }
+                  }}
+                  className="group flex cursor-pointer flex-col overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] text-left transition hover:border-white/30 hover:bg-white/[0.06] focus:border-white/40 focus:outline-none"
                 >
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-black/40">
                     {r.signedUrl ? (
@@ -166,24 +242,36 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
                         Approved
                       </span>
                     )}
-
                   </div>
                   <div className="space-y-1 p-2.5">
                     <div className="truncate text-[11px] font-medium text-white">{r.filename}</div>
                     {(r.tags?.length ?? 0) > 0 ? (
                       <div className="flex flex-wrap gap-1">
-                        {r.tags!.slice(0, 3).map((t) => (
-                          <span
-                            key={t}
-                            className="rounded-full bg-white/10 px-1.5 py-0.5 text-[9px] text-white/70"
-                          >
-                            {t}
-                          </span>
-                        ))}
+                        {r.tags!.slice(0, 4).map((t) => {
+                          const on = activeTags.includes(t);
+                          return (
+                            <button
+                              key={t}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleTag(t);
+                              }}
+                              className={`rounded-full px-1.5 py-0.5 text-[9px] transition ${
+                                on
+                                  ? "bg-white text-[#0b0d18]"
+                                  : "bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
+                              }`}
+                              title={on ? `Remove "${t}" filter` : `Filter by "${t}"`}
+                            >
+                              {t}
+                            </button>
+                          );
+                        })}
                       </div>
                     ) : null}
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           )}
