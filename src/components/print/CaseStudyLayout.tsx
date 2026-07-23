@@ -167,12 +167,11 @@ export function CaseStudyLayout({
                 filter: `blur(${cq(6)})`,
               }}
             />
-            <div className="relative flex items-center" style={{ gap: cq(10) }}>
-              <BrandLockup brand={brand} color="#FFFFFF" size="sm" orientation="horizontal" />
-              <div style={{ width: 1, height: cq(14), background: "rgba(255,255,255,0.28)" }} />
+            <div className="relative flex items-center justify-between" style={{ gap: cq(10) }}>
               <div style={{ fontSize: cq(9.5), fontWeight: 600, letterSpacing: "0.14em", color: "#FFFFFF" }}>
                 {(content.eyebrow ?? "CLIENT CASE STUDY").toUpperCase()}
               </div>
+              <BrandLockup brand={brand} color="#FFFFFF" size="xs" orientation="horizontal" monochrome />
             </div>
             <h1
               ref={heroRef}
