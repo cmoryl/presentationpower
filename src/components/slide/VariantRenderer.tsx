@@ -5020,7 +5020,7 @@ function renderLocationsVariant(
                   {topPins.length > 0 && (
                     <div className="mt-6 border-t pt-4" style={{ borderColor: ink.hairline }}>
                       <div style={{ color: ink.muted, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600 }}>
-                        Top locations
+                        Top {topN} locations{roleFilterActive ? ` · excl. ${Array.from(excludeRoleSet).join(", ")}` : ""}
                       </div>
                       <div className="mt-3 space-y-1.5">
                         {topPins.map((p) => (
