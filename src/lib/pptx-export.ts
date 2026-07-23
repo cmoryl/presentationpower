@@ -670,26 +670,6 @@ export async function exportDeckToPptx(
           fontSize: Math.round(tile * 30),
           bold: true, color: strokeColor, fontFace: "Geist",
         });
-      } else if (isVertical && logoData) {
-        // Rotated lockup along the corresponding edge. pptxgenjs rotates
-        // the image around its center; we compute the un-rotated bounding
-        // box so the post-rotation rect matches a tall narrow band.
-        const targetW = wTable[sizeKey] ?? 1.4;   // pre-rotation width (becomes rotated height)
-        const targetH = targetW / 3.4;             // pre-rotation height (becomes rotated width)
-        const onLeft = orient === "vertical-left";
-        // Rotated visible width = targetH; visible height = targetW.
-        const visibleW = targetH;
-        const cx = onLeft ? inset + visibleW / 2 : SLIDE_W - inset - visibleW / 2;
-        const cy = SLIDE_H / 2;
-        s.addImage({
-          data: logoData,
-          x: cx - targetW / 2,
-          y: cy - targetH / 2,
-          w: targetW,
-          h: targetH,
-          rotate: onLeft ? -90 : 90,
-          sizing: { type: "contain", w: targetW, h: targetH },
-        });
       } else if (logoData) {
         const w = wTable[sizeKey] ?? 1.4;
         const h = sourceOrient === "stacked" ? w / 1.4 : w / 3.4;
