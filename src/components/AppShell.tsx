@@ -19,6 +19,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/atlas", label: "Atlas" },
     
     { to: "/library", label: "Library" },
+    { to: "/library/print", label: "Print" },
     { to: "/admin", label: "Admin" },
   ] as const;
   const adminGroups: ReadonlyArray<{ label: string; items: ReadonlyArray<{ to: string; label: string }> }> = [
@@ -27,6 +28,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       items: [
         { to: "/admin", label: "Command center" },
         { to: "/templates", label: "Templates" },
+        { to: "/library/print", label: "Print Studio" },
         { to: "/admin/audit", label: "Audit log" },
       ],
     },

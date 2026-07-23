@@ -124,6 +124,67 @@ function Dashboard() {
         </div>
       </section>
 
+      {/* PRINT STUDIO SPOTLIGHT */}
+      <section className="relative mt-8 overflow-hidden rounded-3xl border border-black/10 bg-gradient-to-br from-white via-[#F5F1EA] to-white p-8 dark:border-white/10 dark:from-[#0B0A2A] dark:via-[#07061F] dark:to-[#0B0A2A]">
+        <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#A1FBF9]/40 blur-3xl dark:bg-[#A1FBF9]/20" />
+        <div aria-hidden className="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-[#C2A3FF]/30 blur-3xl dark:bg-[#7A5CFF]/20" />
+        <div className="relative grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#03002C] dark:border-white/15 dark:bg-white/[0.06] dark:text-white/80">
+              <Palette size={12} /> New · Print Studio
+            </div>
+            <h2 className="mt-3 text-3xl font-semibold leading-[1.1] tracking-tight text-[#03002C] dark:text-white">
+              Press-ready print, on the same brand engine.
+            </h2>
+            <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-black/70 dark:text-white/70">
+              Case studies, eBrochures, adaptor briefs, and client spotlights — generated with the same
+              aurora + liquid-glass system, fitted to 816px portrait canvases and exported as true 300 DPI
+              PDF/X-4 for print production.
+            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-2">
+              <Link
+                to="/library/print"
+                className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0B2A4A] dark:bg-white dark:text-[#03002C] dark:hover:bg-[#A1FBF9]"
+              >
+                <ArrowRight size={14} /> Open Print Studio
+              </Link>
+              <Link
+                to="/asset/new"
+                className="rounded-full border border-black/15 bg-white/60 px-5 py-2.5 text-sm font-medium text-[#03002C] backdrop-blur transition hover:bg-white dark:border-white/20 dark:bg-white/[0.05] dark:text-white dark:hover:bg-white/[0.1]"
+              >
+                Generate a print asset
+              </Link>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: "Case Study", tint: "#A1FBF9" },
+              { label: "eBrochure", tint: "#C2A3FF" },
+              { label: "Adaptor Brief", tint: "#FFEB66" },
+              { label: "Client Spotlight", tint: "#FF9B70" },
+            ].map((t) => (
+              <div
+                key={t.label}
+                className="relative overflow-hidden rounded-2xl border border-black/10 bg-white/70 p-4 text-[#03002C] backdrop-blur dark:border-white/10 dark:bg-white/[0.04] dark:text-white"
+              >
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute -right-6 -top-6 h-16 w-16 rounded-full blur-2xl"
+                  style={{ background: t.tint, opacity: 0.5 }}
+                />
+                <div className="relative text-[10px] font-semibold uppercase tracking-[0.22em] opacity-60">Template</div>
+                <div className="relative mt-1 text-sm font-semibold">{t.label}</div>
+                <div className="relative mt-1 text-[11px] opacity-60">300 DPI · PDF/X-4</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* end print spotlight */}
+
+
+
       {/* AI banner (only when key missing) */}
       {aiConfigured === false && (
         <div className="mt-6 flex items-center gap-3 rounded-2xl border border-amber-300/40 bg-amber-50/70 px-5 py-3 text-sm text-amber-900 dark:border-amber-300/20 dark:bg-amber-500/[0.06] dark:text-amber-100">
