@@ -601,7 +601,6 @@ export function WorldMap({
           const tip = activeMetricId && metric
             ? `${p.city}${p.country ? `, ${p.country}` : ""} — ${metric.label}: ${formatMetricValue(rawVal, metric)}${isPercentMode && Number.isFinite(displayVal) ? ` (${(displayVal as number).toFixed(1)}%)` : ""}`
             : `${p.city}${p.country ? `, ${p.country}` : ""}${p.label ? ` — ${p.label}` : ""}`;
-            : `${p.city}${p.country ? `, ${p.country}` : ""}${p.label ? ` — ${p.label}` : ""}`;
           return (
             <g key={`pin-${p.id}`} style={{ cursor: "default" }}>
               <title>{tip}</title>
