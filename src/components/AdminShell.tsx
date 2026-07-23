@@ -130,6 +130,7 @@ const navGroups: NavGroup[] = [
     label: "Brand assets",
     items: [
       { to: "/admin/brand-assets", label: "Brand assets" },
+      { to: "/knowledge/brand-guides", label: "Brand guides" },
       { to: "/admin/logohub", label: "LogoHub" },
       { to: "/admin/icon-studio", label: "Icon Studio" },
       { to: "/admin/pdf-ingest", label: "PDF ingestion" },
