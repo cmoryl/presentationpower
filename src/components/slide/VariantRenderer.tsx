@@ -5903,33 +5903,37 @@ function renderLocationsVariant(
   }
 
 
-  // MV-LOC-HUB-SPOKE
+  // MV-LOC-HUB-SPOKE — free-form Aurora v2. Map bleeds onto the aurora, the
+  // legend sits on a shared hairline as tiny inline swatch pills.
   return (
     <SlideFrame brand={brand as never} pageNumber={pageNumber}>
-      <AuroraOrb accent={accent} x={92} y={50} size={900} intensity={0.55} />
       <div className="relative flex h-full flex-col">
         <Header />
-        <div className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
+        <div className="relative mt-10 flex-1 overflow-hidden">
           <LocWorldMap pins={pins} region="world" mode={mode} accent={accent} primary={primary} showLabels showSpokes ariaLabel={`${title} — hub and spoke network map`} />
         </div>
-        <div className="mt-5 flex items-center gap-6" style={{ color: ink.muted, fontSize: 14 }}>
-          <span className="inline-flex items-center gap-2">
-            <span style={{ display: "inline-block", width: 12, height: 12, borderRadius: 999, background: accent, boxShadow: `0 0 12px ${accent}` }} />
-            HQ / hub
+        <div
+          className="mt-8 flex items-center gap-10 pt-5"
+          style={{ borderTop: `1px solid ${ink.hairline}`, color: ink.muted, fontSize: 14, letterSpacing: "0.02em" }}
+        >
+          <span className="inline-flex items-center gap-3">
+            <span style={{ display: "inline-block", width: 14, height: 14, borderRadius: 999, background: accent, boxShadow: `0 0 18px ${accent}` }} />
+            <span style={{ color: ink.strong, fontWeight: 600, letterSpacing: "0.22em", textTransform: "uppercase", fontSize: 12 }}>HQ / Hub</span>
           </span>
-          <span className="inline-flex items-center gap-2">
-            <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: 999, background: accent, opacity: 0.75 }} />
-            Delivery office
+          <span className="inline-flex items-center gap-3">
+            <span style={{ display: "inline-block", width: 9, height: 9, borderRadius: 999, background: accent, opacity: 0.75 }} />
+            <span style={{ color: ink.strong, fontWeight: 600, letterSpacing: "0.22em", textTransform: "uppercase", fontSize: 12 }}>Delivery office</span>
           </span>
-          <span className="inline-flex items-center gap-2">
-            <span style={{ display: "inline-block", width: 22, height: 2, background: accent, opacity: 0.6, borderRadius: 2 }} />
-            Follow-the-sun route
+          <span className="inline-flex items-center gap-3">
+            <span style={{ display: "inline-block", width: 28, height: 2, background: accent, opacity: 0.55, borderRadius: 2 }} />
+            <span style={{ color: ink.strong, fontWeight: 600, letterSpacing: "0.22em", textTransform: "uppercase", fontSize: 12 }}>Follow-the-sun route</span>
           </span>
         </div>
       </div>
     </SlideFrame>
   );
 }
+
 
 
 
