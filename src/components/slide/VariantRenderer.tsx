@@ -5554,6 +5554,58 @@ function coerceMetrics(raw: unknown): LocMetric[] {
     .filter((x): x is LocMetric => !!x);
 }
 
+// Region-metric row — same shape the KPI/graph modules read from `c.items`
+// (MV-DASH-REGION-STATS et al.): { label, value, unit, percent, delta }.
+// For location slides we allow an optional `region` code so a row can bind
+// to a specific pin region, and we source them from `c.regionMetrics` so we
+// don't collide with `c.items` (which is the pin array on MV-LOC-*).
+type RegionMetricRow = {
+  region?: LocPin["region"];
+  label: string;
+  value?: string;
+  unit?: string;
+  percent?: number;
+  delta?: string;
+};
+
+function readRegionMetrics(c: Record<string, unknown>): RegionMetricRow[] {
+  const raw = Array.isArray(c.regionMetrics) ? (c.regionMetrics as unknown[]) : [];
+  const REGION_KEYS: LocPin["region"][] = ["AMER", "EMEA", "APAC", "LATAM", "MEA"];
+  const out: RegionMetricRow[] = [];
+  for (const r of raw) {
+    if (!r || typeof r !== "object") continue;
+    const rec = r as Record<string, unknown>;
+    const label = typeof rec.label === "string" ? rec.label.trim() : "";
+    if (!label) continue;
+    const regionRaw = typeof rec.region === "string" ? rec.region.toUpperCase() : "";
+    const region = (REGION_KEYS as string[]).includes(regionRaw)
+      ? (regionRaw as LocPin["region"])
+      : undefined;
+    const percentNum = Number(rec.percent);
+    out.push({
+      region,
+      label,
+      value: rec.value != null && rec.value !== "" ? String(rec.value) : undefined,
+      unit: typeof rec.unit === "string" && rec.unit ? rec.unit : undefined,
+      percent: Number.isFinite(percentNum) ? Math.max(0, Math.min(100, percentNum)) : undefined,
+      delta: typeof rec.delta === "string" && rec.delta ? rec.delta : undefined,
+    });
+  }
+  return out;
+}
+
+function readHeroStat(c: Record<string, unknown>): { value: string; unit?: string; label?: string } | null {
+  const stat = c.stat;
+  if (!stat || typeof stat !== "object") return null;
+  const rec = stat as Record<string, unknown>;
+  const value = rec.value != null && rec.value !== "" ? String(rec.value) : "";
+  if (!value) return null;
+  return {
+    value,
+    unit: typeof rec.unit === "string" && rec.unit ? rec.unit : undefined,
+    label: typeof rec.label === "string" && rec.label ? rec.label : undefined,
+  };
+}
 
 function renderLocationsVariant(
   variantId: string,
@@ -5579,6 +5631,75 @@ function renderLocationsVariant(
   const counts = locRegionCounts(pins);
   const totalCities = pins.length;
   const totalRegions = (Object.keys(counts) as LocPin["region"][]).filter((k) => counts[k] > 0).length;
+
+  // KPI/graph-style region metric fields — same shape MV-DASH-REGION-STATS
+  // reads from `c.items` and `c.stat`. We keep MV-LOC-* `c.items` as the pin
+  // array and expose the metrics via `c.regionMetrics` + `c.stat`.
+  const regionMetrics = readRegionMetrics(c);
+  const heroStat = readHeroStat(c);
+  const hasRegionMetrics = regionMetrics.length > 0;
+
+  // Compact metric list — mirrors the MV-DASH-REGION-STATS visual grammar
+  // (label · delta on top, progress bar below). Renders inside any panel.
+  const RegionMetricList = ({ rows, maxRows = 6 }: { rows: RegionMetricRow[]; maxRows?: number }) => {
+    const shown = rows.slice(0, maxRows);
+    return (
+      <div>
+        {shown.map((it, i) => {
+          const pct = typeof it.percent === "number" ? it.percent : 0;
+          const delta = it.delta ?? "";
+          const negative = delta.trim().startsWith("-");
+          return (
+            <div
+              key={`${it.label}-${i}`}
+              className="py-4"
+              style={{
+                borderTop: `1px solid ${ink.hairline}`,
+                borderBottom: i === shown.length - 1 ? `1px solid ${ink.hairline}` : "none",
+              }}
+            >
+              <div className="flex items-baseline justify-between gap-4">
+                <div style={{ fontSize: 18, fontWeight: 600, color: ink.strong, letterSpacing: "-0.005em" }}>
+                  {it.label}
+                </div>
+                <div className="flex items-baseline gap-3">
+                  {it.value && (
+                    <div className="tabular-nums" style={{ fontSize: 18, fontWeight: 600, color: ink.strong }}>
+                      {it.value}
+                      {it.unit && (
+                        <span style={{ fontSize: 12, color: ink.muted, marginLeft: 3 }}>{it.unit}</span>
+                      )}
+                    </div>
+                  )}
+                  {delta && (
+                    <div
+                      className="uppercase tabular-nums"
+                      style={{
+                        fontSize: 12,
+                        letterSpacing: "0.24em",
+                        fontWeight: 700,
+                        color: negative ? "#B42318" : "var(--slide-accent-text)",
+                      }}
+                    >
+                      {delta}
+                    </div>
+                  )}
+                </div>
+              </div>
+              {typeof it.percent === "number" && (
+                <div
+                  className="mt-2 h-1.5 overflow-hidden rounded-full"
+                  style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.08)" }}
+                >
+                  <div style={{ width: `${pct}%`, height: "100%", background: accent, opacity: 0.8 }} />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   // Free-form region rail — a bare hairline row of region ticks, no cards,
   // no plate, no per-cell borders. Matches the KPI/chart Aurora v2 grammar.
@@ -5635,11 +5756,16 @@ function renderLocationsVariant(
       <div className="flex flex-col items-end text-right" style={{ minWidth: 220 }}>
         <div className="flex items-baseline gap-2">
           <span className="tabular-nums font-semibold" style={{ fontSize: 104, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}>
-            {totalCities}
+            {heroStat?.value ?? totalCities}
           </span>
+          {heroStat?.unit && (
+            <span className="tabular-nums" style={{ fontSize: 28, color: ink.muted, fontWeight: 600 }}>
+              {heroStat.unit}
+            </span>
+          )}
         </div>
         <div className="mt-3 uppercase" style={{ fontSize: 13, letterSpacing: "0.3em", color: ink.muted, fontWeight: 600 }}>
-          Cities live
+          {heroStat?.label ?? "Cities live"}
         </div>
         <div className="mt-2 uppercase tabular-nums" style={{ fontSize: 14, letterSpacing: "0.24em", color: "var(--slide-accent-text)", fontWeight: 700 }}>
           ● {totalRegions} regions
@@ -5841,6 +5967,10 @@ function renderLocationsVariant(
                     </div>
                   )}
                 </>
+              ) : hasRegionMetrics ? (
+                <div className="mt-4">
+                  <RegionMetricList rows={regionMetrics} maxRows={6} />
+                </div>
               ) : (
                 <div className="mt-4 grid grid-cols-2 gap-y-6">
                   <div>
@@ -5889,9 +6019,25 @@ function renderLocationsVariant(
               </div>
             </div>
           </div>
-          <div className="relative mt-10 flex-1 overflow-hidden">
-            <LocWorldMap pins={pins} region={region} mode={mode} accent={accent} primary={primary} showLabels ariaLabel={`${title} — ${region === "world" ? "world" : LOC_REGION_LABELS[region as LocPin["region"]]} map`} />
-          </div>
+          {hasRegionMetrics ? (
+            <div className="mt-10 grid flex-1 gap-12" style={{ gridTemplateColumns: "1.55fr 1fr" }}>
+              <div className="relative overflow-hidden">
+                <LocWorldMap pins={pins} region={region} mode={mode} accent={accent} primary={primary} showLabels ariaLabel={`${title} — ${region === "world" ? "world" : LOC_REGION_LABELS[region as LocPin["region"]]} map`} />
+              </div>
+              <div className="pl-8" style={{ borderLeft: `1px solid ${ink.hairline}` }}>
+                <div style={{ color: "var(--slide-accent-text)", fontSize: 12, letterSpacing: "0.3em", fontWeight: 700, textTransform: "uppercase" }}>
+                  Region metrics
+                </div>
+                <div className="mt-4">
+                  <RegionMetricList rows={regionMetrics} maxRows={6} />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="relative mt-10 flex-1 overflow-hidden">
+              <LocWorldMap pins={pins} region={region} mode={mode} accent={accent} primary={primary} showLabels ariaLabel={`${title} — ${region === "world" ? "world" : LOC_REGION_LABELS[region as LocPin["region"]]} map`} />
+            </div>
+          )}
           {narrative && (
             <div className="mt-8 pt-6" style={{ borderTop: `1px solid ${ink.hairline}`, color: ink.muted, fontSize: 18, lineHeight: 1.45, maxWidth: 1400 }}>
               {narrative}
@@ -5912,6 +6058,43 @@ function renderLocationsVariant(
         <div className="relative mt-10 flex-1 overflow-hidden">
           <LocWorldMap pins={pins} region="world" mode={mode} accent={accent} primary={primary} showLabels showSpokes ariaLabel={`${title} — hub and spoke network map`} />
         </div>
+        {hasRegionMetrics && (
+          <div
+            className="mt-8 grid gap-8 pt-5"
+            style={{
+              borderTop: `1px solid ${ink.hairline}`,
+              gridTemplateColumns: `repeat(${Math.min(regionMetrics.length, 5)}, minmax(0, 1fr))`,
+            }}
+          >
+            {regionMetrics.slice(0, 5).map((it, i) => {
+              const delta = it.delta ?? "";
+              const negative = delta.trim().startsWith("-");
+              return (
+                <div key={`${it.label}-${i}`}>
+                  <div className="uppercase" style={{ fontSize: 11, letterSpacing: "0.28em", fontWeight: 700, color: "var(--slide-accent-text)" }}>
+                    {it.region ?? it.label}
+                  </div>
+                  <div className="mt-2 flex items-baseline gap-2">
+                    <div className="tabular-nums" style={{ color: ink.strong, fontSize: 36, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 0.95 }}>
+                      {it.value ?? (typeof it.percent === "number" ? `${it.percent}%` : "")}
+                    </div>
+                    {it.unit && (
+                      <div style={{ color: ink.muted, fontSize: 13 }}>{it.unit}</div>
+                    )}
+                  </div>
+                  <div className="mt-1 flex items-baseline gap-2">
+                    <div style={{ color: ink.muted, fontSize: 13 }}>{it.label}</div>
+                    {delta && (
+                      <div className="uppercase tabular-nums" style={{ fontSize: 11, letterSpacing: "0.22em", fontWeight: 700, color: negative ? "#B42318" : "var(--slide-accent-text)" }}>
+                        {delta}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
         <div
           className="mt-8 flex items-center gap-10 pt-5"
           style={{ borderTop: `1px solid ${ink.hairline}`, color: ink.muted, fontSize: 14, letterSpacing: "0.02em" }}
