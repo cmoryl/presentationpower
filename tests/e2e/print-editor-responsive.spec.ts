@@ -54,7 +54,7 @@ test.describe("Print library — responsive layout", () => {
 
       // Each visible template thumbnail must maintain the 8.5:11 portrait aspect
       // (allowing a 3% tolerance for subpixel rounding on narrow viewports).
-      const thumbs = page.locator('div.aspect-\\[8\\.5\\/11\\]');
+      const thumbs = page.locator('.aspect-\\[8\\.5\\/11\\]');
       const thumbCount = await thumbs.count();
       expect(thumbCount).toBeGreaterThan(0);
       for (let i = 0; i < Math.min(thumbCount, 4); i++) {
