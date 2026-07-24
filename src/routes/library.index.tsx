@@ -842,6 +842,9 @@ function Library() {
               videoExample={isVideo ? entry.example : undefined}
               onImportExample={isVideo ? () => importVideoExample(entry.example) : undefined}
               importBusy={isVideo && videoBusy === entry.example.key}
+              selectable={selectMode && !isVideo}
+              selected={selectedSet.has(v.id)}
+              onToggleSelect={() => toggleSelected(v.id)}
             />
 
           );
