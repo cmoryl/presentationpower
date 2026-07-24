@@ -576,7 +576,7 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
 
 
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div ref={rootRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
       {/* Always-mounted per-mode layers — each holds its own two blobs at its
           own positions/colors and cross-fades in/out. No remounts, no pop. */}
       {MODES.map((m) => {
@@ -592,7 +592,7 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
             <div
               className="absolute inset-0"
               style={{
-                background: `radial-gradient(60% 55% at 20% 30%, ${m.accent}22 0%, transparent 60%), radial-gradient(55% 50% at 85% 75%, ${m.glow}1c 0%, transparent 65%)`,
+                background: `radial-gradient(60% 55% at ${20 + washX}% ${30 + washY}%, ${m.accent}22 0%, transparent 60%), radial-gradient(55% 50% at ${85 + washX}% ${75 + washY}%, ${m.glow}1c 0%, transparent 65%)`,
               }}
             />
             <div
@@ -602,7 +602,7 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
                 opacity: 0.42,
                 top: p.aTop,
                 left: p.aLeft,
-                transform: `translate3d(${y * 0.08}px, ${y * -0.35}px, 0) scale(${active ? 1 : 0.94})`,
+                transform: `translate3d(${y * 0.08 + pxA}px, ${y * -0.35 + pyA}px, 0) scale(${active ? 1 : 0.94})`,
                 transition: "transform 1600ms cubic-bezier(.4,0,.2,1)",
               }}
             />
@@ -613,7 +613,7 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
                 opacity: 0.32,
                 bottom: p.bBottom,
                 right: p.bRight,
-                transform: `translate3d(${y * -0.1}px, ${y * 0.22}px, 0) scale(${active ? 1 : 0.94})`,
+                transform: `translate3d(${y * -0.1 + pxB}px, ${y * 0.22 + pyB}px, 0) scale(${active ? 1 : 0.94})`,
                 transition: "transform 1600ms cubic-bezier(.4,0,.2,1)",
               }}
             />
