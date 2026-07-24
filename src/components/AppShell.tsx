@@ -24,6 +24,16 @@ export function AppShell({ children }: { children: ReactNode }) {
   const isAdminLinked = matchesAdminLinked(pathname);
   const [adminCtx, setAdminCtx] = useState(false);
 
+  // One-time cleanup: the legacy "Readable" (contrast-boost) toggle was
+  // removed from the nav. Purge any stored preference and strip the lingering
+  // `.contrast-boost` class from <html> so existing sessions fall back to
+  // the default styles without requiring a hard refresh.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try { window.localStorage.removeItem("tp:contrast-boost"); } catch { /* ignore */ }
+    document.documentElement.classList.remove("contrast-boost");
+  }, []);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (inAdmin) {
