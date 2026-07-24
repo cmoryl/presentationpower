@@ -5967,6 +5967,10 @@ function renderLocationsVariant(
                     </div>
                   )}
                 </>
+              ) : hasRegionMetrics ? (
+                <div className="mt-4">
+                  <RegionMetricList rows={regionMetrics} maxRows={6} />
+                </div>
               ) : (
                 <div className="mt-4 grid grid-cols-2 gap-y-6">
                   <div>
