@@ -1203,95 +1203,63 @@ function ModulesPanel({
         }}
       >
         {modules.map((m, i) => (
-          <div key={m.id}>
-            <DropIndicator active={dropIdx === i} />
-            <div
-              draggable
-              onDragStart={(e) => {
-                // Only start a reorder when the drag originates from the
-                // header/grip — inputs and buttons inside the card must
-                // stay interactive without accidentally lifting the card.
-                const src = e.target as HTMLElement | null;
-                if (!src?.closest("[data-drag-handle]")) {
-                  e.preventDefault();
-                  return;
-                }
-                e.dataTransfer.effectAllowed = "move";
-                e.dataTransfer.setData("text/plain", String(i));
-                setDraggingIdx(i);
-              }}
-              onDragEnd={() => {
-                setDropIdx(null);
-                setDropKind(null);
-                setDraggingIdx(null);
-              }}
-              onDragOver={(e) => {
+          <ModuleCard
+            key={m.id}
+            index={i}
+            section={m}
+            editorMode={editorMode}
+            draggingIdx={draggingIdx}
+            dropIdx={dropIdx}
+            DropIndicator={DropIndicator}
+            onDragStart={(e) => {
+              const src = e.target as HTMLElement | null;
+              if (!src?.closest("[data-drag-handle]")) {
                 e.preventDefault();
-                const isInsert = e.dataTransfer.types.includes(PRINT_SECTION_DND_MIME);
-                e.dataTransfer.dropEffect = isInsert ? "copy" : "move";
-                setDropKind(isInsert ? "insert" : "reorder");
-                setDropIdx(computeInsertIndex(e, i));
-              }}
-              onDrop={(e) => {
-                e.preventDefault();
-                const targetIdx = computeInsertIndex(e, i);
-                setDropIdx(null);
-                setDropKind(null);
-                setDraggingIdx(null);
-                // New-module insert from drawer takes priority.
-                const inserted = readInsertPayload(e);
-                if (inserted) {
-                  if (!gate.ok) return;
-                  insertAt(targetIdx, inserted);
-                  return;
-                }
-                const from = Number(e.dataTransfer.getData("text/plain"));
-                if (Number.isNaN(from)) return;
-                // Adjust for the removal of the source item ahead of target.
-                const to = from < targetIdx ? targetIdx - 1 : targetIdx;
-                if (to === from) return;
-                const next = [...modules];
-                const [moved] = next.splice(from, 1);
-                if (!moved) return;
-                next.splice(to, 0, moved);
-                onChange(next);
-              }}
-              className={
-                "rounded-md border p-2 transition " +
-                (draggingIdx === i
-                  ? "border-[#003FC7]/60 bg-[#003FC7]/[0.04] opacity-50 shadow-sm dark:border-[#003FC7]/60"
-                  : "border-black/10 dark:border-white/10")
+                return;
               }
-            >
-              <div
-                data-drag-handle
-                className="flex cursor-grab items-center justify-between active:cursor-grabbing"
-                title="Drag to reorder"
-              >
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
-                  <GripVertical size={14} className="text-black/40 dark:text-white/40" aria-hidden />
-                  {sectionKindLabel(m.kind)}
-                </div>
-
-                <div className="flex items-center gap-1">
-                  <button className="rounded p-1 text-black/50 hover:bg-black/5" onClick={() => move(i, -1)} aria-label="Move up"><ArrowUp size={14} /></button>
-                  <button className="rounded p-1 text-black/50 hover:bg-black/5" onClick={() => move(i, 1)} aria-label="Move down"><ArrowDown size={14} /></button>
-                  <button className="rounded p-1 text-red-500 hover:bg-red-500/10" onClick={() => remove(i)} aria-label="Delete"><Trash2 size={14} /></button>
-                </div>
-              </div>
-
-              <div className="mt-2 space-y-2">
-                <SectionInlineEditor
-                  section={m}
-                  onPatch={(p) => patch(i, p)}
-                />
-                <div className="pt-1">
-                  <PrintSectionRenderer section={m} mode={editorMode} accent="#003FC7" />
-                </div>
-              </div>
-
-            </div>
-          </div>
+              e.dataTransfer.effectAllowed = "move";
+              e.dataTransfer.setData("text/plain", String(i));
+              setDraggingIdx(i);
+            }}
+            onDragEnd={() => {
+              setDropIdx(null);
+              setDropKind(null);
+              setDraggingIdx(null);
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              const isInsert = e.dataTransfer.types.includes(PRINT_SECTION_DND_MIME);
+              e.dataTransfer.dropEffect = isInsert ? "copy" : "move";
+              setDropKind(isInsert ? "insert" : "reorder");
+              setDropIdx(computeInsertIndex(e, i));
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              const targetIdx = computeInsertIndex(e, i);
+              setDropIdx(null);
+              setDropKind(null);
+              setDraggingIdx(null);
+              const inserted = readInsertPayload(e);
+              if (inserted) {
+                if (!gate.ok) return;
+                insertAt(targetIdx, inserted);
+                return;
+              }
+              const from = Number(e.dataTransfer.getData("text/plain"));
+              if (Number.isNaN(from)) return;
+              const to = from < targetIdx ? targetIdx - 1 : targetIdx;
+              if (to === from) return;
+              const next = [...modules];
+              const [moved] = next.splice(from, 1);
+              if (!moved) return;
+              next.splice(to, 0, moved);
+              onChange(next);
+            }}
+            onMoveUp={() => move(i, -1)}
+            onMoveDown={() => move(i, 1)}
+            onRemove={() => remove(i)}
+            onPatch={(p) => patch(i, p)}
+          />
         ))}
         {/* Tail indicator — shown when a drag lands after the last item. */}
         <DropIndicator active={dropIdx === modules.length && modules.length > 0} />
