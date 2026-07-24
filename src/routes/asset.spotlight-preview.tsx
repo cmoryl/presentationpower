@@ -92,18 +92,26 @@ function SpotlightPreview() {
     if (!node) return;
     setBusy(mode);
     try {
+      const params = new URLSearchParams(window.location.search);
+      const format = (params.get("format") ?? "digital") as
+        | "digital"
+        | "press"
+        | "press-x4";
       await exportPrintAssetAsPdf(node, {
         pageSize: "Letter",
         bleedIn: 0.125,
-        cropMarks: true,
+        cropMarks: format !== "digital",
         mode,
         quality: "300dpi",
-        filename: `spotlight-globallink-${mode}.pdf`,
+        format,
+        iccProfile: format === "press-x4" ? "GRACoL2013_CRPC6" : undefined,
+        filename: `spotlight-globallink-${mode}-${format}.pdf`,
       });
     } finally {
       setBusy(null);
     }
   };
+
 
   if (!brand) {
     return (
