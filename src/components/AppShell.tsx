@@ -1,14 +1,45 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useContrastBoost } from "@/hooks/use-contrast-boost";
 import { useTheme, type ThemeMode } from "@/hooks/use-theme";
+import { AdminSidebar } from "@/components/AdminShell";
+
+// Pages that live outside /admin/* but are linked from the admin console.
+// When the user reaches them from an admin context, keep the admin sidebar visible.
+const ADMIN_LINKED_PATTERNS = [
+  /^\/analytics(\/|$)/,
+  /^\/templates(\/|$)/,
+  /^\/knowledge(\/|$)/,
+];
+
+function matchesAdminLinked(pathname: string): boolean {
+  return ADMIN_LINKED_PATTERNS.some((re) => re.test(pathname));
+}
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [boost, setBoost] = useContrastBoost();
   const [theme, setTheme] = useTheme();
   const [adminOpen, setAdminOpen] = useState(false);
+  const inAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
+  const isAdminLinked = matchesAdminLinked(pathname);
+  const [adminCtx, setAdminCtx] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (inAdmin) {
+      sessionStorage.setItem("tpm.adminCtx", "1");
+      setAdminCtx(true);
+    } else if (isAdminLinked) {
+      setAdminCtx(sessionStorage.getItem("tpm.adminCtx") === "1");
+    } else {
+      sessionStorage.removeItem("tpm.adminCtx");
+      setAdminCtx(false);
+    }
+  }, [pathname, inAdmin, isAdminLinked]);
+
+  const showAdminChrome = !inAdmin && isAdminLinked && adminCtx;
   const themes: { id: ThemeMode; label: string }[] = [
     { id: "light", label: "Light" },
     { id: "dark",  label: "Dark" },
