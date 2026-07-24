@@ -12,7 +12,7 @@
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { z } from "zod";
-import { Sparkles, X, RefreshCw, Star } from "lucide-react";
+import { Sparkles, X, RefreshCw, Star, ArrowRight, ArrowLeft, Check } from "lucide-react";
 import { useFavorites } from "@/lib/favorites";
 import { byId, MODULE_VARIANTS, BRAND_MODES } from "@/lib/taxonomy";
 import {
