@@ -287,7 +287,7 @@ export function emptyCaseStudy(seed?: Partial<CaseStudyContent>): CaseStudyConte
     },
     footer: seed?.footer,
     heroMedia: seed?.heroMedia,
-    modules: seed?.modules,
+    modules: seed?.modules ?? [],
   };
 }
 
@@ -317,7 +317,7 @@ export function emptySpotlight(seed?: Partial<SpotlightContent>): SpotlightConte
     expert: seed?.expert,
     cta: seed?.cta ?? { label: "Talk to us" },
     heroMedia: seed?.heroMedia,
-    modules: seed?.modules,
+    modules: seed?.modules ?? [],
   };
 }
 
@@ -360,7 +360,7 @@ export function emptyEBrochure(seed?: Partial<EBrochureContent>): EBrochureConte
     },
     cta: seed?.cta ?? { label: "See it in action" },
     heroMedia: seed?.heroMedia,
-    modules: seed?.modules,
+    modules: seed?.modules ?? [],
   };
 }
 
@@ -392,6 +392,6 @@ export function emptyAdaptorBrief(seed?: Partial<AdaptorBriefContent>): AdaptorB
       { text: "The connector shipped in a sprint. Two months in, our marketing team has stopped filing localization tickets entirely.", author: "Principal Engineer, Platform" },
     cta: seed?.cta ?? { label: "Talk to an expert" },
     heroMedia: seed?.heroMedia,
-    modules: seed?.modules,
+    modules: seed?.modules ?? [],
   };
 }
