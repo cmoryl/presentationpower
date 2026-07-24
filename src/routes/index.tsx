@@ -185,24 +185,12 @@ function Dashboard() {
       <section
         className="full-bleed relative -mt-6 overflow-hidden border-b border-white/10 bg-[#03002C] py-8 text-white sm:-mt-10 sm:py-14 lg:py-20"
       >
-        {/* animated aurora blobs — reactive to selected mode */}
+        {/* animated aurora blobs — reactive to selected mode + scroll parallax */}
         <AuroraHero mode={mode} />
 
         {/* Oversized MODULAR watermark — brand signature behind the hero */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 -bottom-6 select-none text-center font-semibold leading-none tracking-[-0.04em]"
-          style={{
-            fontSize: "clamp(120px, 22vw, 320px)",
-            background: `linear-gradient(180deg, ${mode.accent}22 0%, transparent 70%)`,
-            WebkitBackgroundClip: "text",
-            backgroundClip: "text",
-            color: "transparent",
-            mixBlendMode: "screen",
-          }}
-        >
-          MODULAR
-        </div>
+        <ParallaxWatermark accent={mode.accent} />
+
 
         <div className="relative">
           <div className="flex flex-wrap items-center gap-2">
