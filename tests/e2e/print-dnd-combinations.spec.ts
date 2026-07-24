@@ -122,10 +122,13 @@ for (const kind of Object.keys(COMBOS) as Kind[]) {
         for (let i = 0; i < combo.length; i++) {
           const variant = combo[i]!;
           const priorLevel = expectedLevel(kind, combo.slice(0, i));
-          if (priorLevel === "block") {
-            // Budget already exhausted — add button for this weight must be gated.
-            // We still try (harness lets overflow through only for a dedicated
-            // overflow button); skip real "add" once page is blocking.
+          const prospectiveUsed = combo
+            .slice(0, i + 1)
+            .reduce((n, v) => n + WEIGHT[v], 0);
+          if (priorLevel === "block" || prospectiveUsed > BUDGETS[kind]) {
+            // Harness gates the add button when the next add would exceed
+            // the page budget. Stop the walk — the "gates" test proves the
+            // button is disabled in this state.
             break;
           }
           await addVariant(page, variant);
