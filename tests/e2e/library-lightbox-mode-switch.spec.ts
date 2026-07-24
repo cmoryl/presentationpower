@@ -60,8 +60,16 @@ test.describe("Library lightbox mode switch", () => {
   test("pauses previous-mode video and resumes new-mode video from persisted time", async ({
     page,
   }) => {
-    await page.goto("/library", { waitUntil: "domcontentloaded" });
+    await page.goto("/library?eager=1", { waitUntil: "domcontentloaded" });
     await page.waitForLoadState("networkidle").catch(() => undefined);
+
+    // Sample video fixtures are H.264 mp4; Playwright's bundled Chromium
+    // OSS build lacks that codec. Skip cleanly — not a product regression.
+    const canPlayH264 = await page.evaluate(() => {
+      const v = document.createElement("video");
+      return Boolean(v.canPlayType('video/mp4; codecs="avc1.42E01E"'));
+    });
+    test.skip(!canPlayH264, "browser lacks H.264 support for sample media");
 
     // Imagery is off by default on /library — toggle it on so video-demo
     // Zoom affordances render (they gate on imagery being visible).
