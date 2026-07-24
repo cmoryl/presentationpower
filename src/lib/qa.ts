@@ -97,8 +97,15 @@ export function runQa(slides: DeckSlide[], brandModeId?: string): QaIssue[] {
         });
       }
 
-      // In-scope but non-preferred variant → soft warn (only if brand declares preferences)
-      if (preferred.size > 0 && !preferred.has(variant.id) && !restricted.has(variant.familyId)) {
+      // In-scope but non-preferred variant → soft warn, but ONLY when the
+      // brand has curated variants inside this variant's family. Cover /
+      // context / other families with no preferred entries stay silent.
+      if (
+        preferred.size > 0 &&
+        preferredFamilies.has(variant.familyId) &&
+        !preferred.has(variant.id) &&
+        !restricted.has(variant.familyId)
+      ) {
         issues.push({
           slideId: slide.id,
           severity: "warn",
