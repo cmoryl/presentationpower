@@ -119,7 +119,7 @@ function EventsView() {
             </a>
             <Link
               to="/admin/campaigns/kit"
-              search={{ profile: "event-kit" }}
+              search={{ profile: "event-kit", blank: 1 }}
               className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 px-5 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/50"
             >
               Start from a blank kit <ArrowRight size={14} />
