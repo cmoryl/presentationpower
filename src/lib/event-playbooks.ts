@@ -31,10 +31,26 @@ export type PlaybookPhase = {
   formats: string[];
 };
 
+export type CollateralCategory =
+  | "Sponsorship"
+  | "Wearables & Badges"
+  | "Signage & Environment"
+  | "Print & Collateral"
+  | "Video & Motion"
+  | "Digital & Web"
+  | "Email & Direct"
+  | "Merch & Swag";
+
 export type PlaybookDeliverable = {
-  surface: "digital" | "signage" | "print" | "video" | "email";
+  surface: "digital" | "signage" | "print" | "video" | "email" | "wearable" | "merch";
   label: string;
   detail: string;
+  /** Grouping for the collateral grid. Falls back to surface bucket. */
+  category?: CollateralCategory;
+  /** Production spec — dimensions, page count, print method. */
+  spec?: string;
+  /** Whether this piece is rendered live by the kit today. Absent = live. */
+  status?: "live" | "coming-soon";
 };
 
 export type PlaybookKpi = {
@@ -42,6 +58,7 @@ export type PlaybookKpi = {
   target: string;
   detail?: string;
 };
+
 
 export type EventPlaybook = {
   id: string;
