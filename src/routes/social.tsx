@@ -113,9 +113,11 @@ function SocialView() {
           <Stat label="Playbooks" value={String(SOCIAL_PLAYBOOKS.length)} />
           <Stat label="Divisions" value={String(new Set(SOCIAL_PLAYBOOKS.map((p) => p.subBrand)).size)} />
           <Stat label="Angles" value={String(SOCIAL_ANGLES.length)} />
-          <Stat label="Kit profiles" value={String(KIT_PROFILES.length)} />
         </dl>
       </header>
+
+      {/* Your saved kits (signed-in, non-empty only) */}
+      <SavedKitsSection surface="social" />
 
       {/* Angle filter */}
       <section id="playbooks" className="space-y-5">
