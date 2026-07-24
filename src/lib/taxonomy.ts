@@ -1897,7 +1897,7 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "World map on one side, region-by-region counts + KPI stack on the other.",
     permittedLayoutIds: ["LF-03"],
     capacity: { titleChars: 80, bodyChars: 200, items: { min: 3, max: 60 } },
-    editableFields: ["title", "subtitle", "narrative", "items[].city", "items[].country", "items[].region", "items[].lat", "items[].lon", "items[].role", "items[].label"],
+    editableFields: ["title", "subtitle", "narrative", "stat.value", "stat.unit", "stat.label", "regionMetrics[].region", "regionMetrics[].label", "regionMetrics[].value", "regionMetrics[].unit", "regionMetrics[].percent", "regionMetrics[].delta", "items[].city", "items[].country", "items[].region", "items[].lat", "items[].lon", "items[].role", "items[].label"],
     lockedFields: ["footer", "logo"],
   },
   {
