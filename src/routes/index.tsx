@@ -468,13 +468,16 @@ function ParallaxWatermark({ accent }: { accent: string }) {
       className="pointer-events-none absolute inset-x-0 -bottom-6 select-none text-center font-semibold leading-none tracking-[-0.04em] will-change-transform"
       style={{
         fontSize: "clamp(120px, 22vw, 320px)",
-        background: `linear-gradient(180deg, ${accent}22 0%, ${accent}08 40%, transparent 100%)`,
+        // Softer 4-stop fade — no visible edge where the letter tops begin.
+        background: `linear-gradient(180deg, ${accent}00 0%, ${accent}14 35%, ${accent}05 75%, transparent 100%)`,
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
         color: "transparent",
         mixBlendMode: "screen",
         transform: `translate3d(0, ${y * 0.45}px, 0)`,
         opacity: Math.max(0, 1 - y / 700),
+        WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 25%, black 100%)",
+        maskImage: "linear-gradient(180deg, transparent 0%, black 25%, black 100%)",
       }}
     >
       MODULAR
@@ -511,26 +514,38 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
 
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      {/* Base wash — always present, keeps hero from feeling flat between transitions. */}
       <div
-        className="absolute h-[420px] w-[420px] rounded-full opacity-40 blur-[110px] transition-[background-color,top,left,right,bottom] duration-[900ms] ease-out will-change-transform"
+        className="absolute inset-0 opacity-70 transition-[background] duration-[1200ms] ease-out"
         style={{
-          backgroundColor: mode.accent,
-          top: mode.id === "presentation" ? "-140px" : mode.id === "print" ? "40%" : mode.id === "event" ? "-40px" : "50%",
-          left: mode.id === "presentation" ? "-100px" : mode.id === "print" ? "60%" : mode.id === "event" ? "40%" : "-80px",
-          transform: `translate3d(${y * 0.08}px, ${y * -0.35}px, 0)`,
+          background: `radial-gradient(60% 55% at 20% 30%, ${mode.accent}22 0%, transparent 60%), radial-gradient(55% 50% at 85% 75%, ${mode.glow}1c 0%, transparent 65%)`,
         }}
       />
-      <div
-        className="absolute h-[380px] w-[380px] rounded-full opacity-30 blur-[130px] transition-[background-color,top,left,right,bottom] duration-[900ms] ease-out will-change-transform"
-        style={{
-          backgroundColor: mode.glow,
-          bottom: mode.id === "presentation" ? "-80px" : mode.id === "print" ? "-40px" : mode.id === "event" ? "40%" : "-140px",
-          right: mode.id === "presentation" ? "-60px" : mode.id === "print" ? "-100px" : mode.id === "event" ? "-80px" : "50%",
-          transform: `translate3d(${y * -0.1}px, ${y * 0.22}px, 0)`,
-        }}
-      />
-      {/* Smooth radial vignette — no hard 60% cutoff that reads as a band. */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.035),rgba(255,255,255,0)_85%)]" />
+      {/* Keyed layer re-mounts per mode → each rotation gets a full fade+scale entrance. */}
+      <div key={mode.id} className="absolute inset-0 animate-hero-mode-in">
+        <div
+          className="absolute h-[520px] w-[520px] rounded-full blur-[120px] will-change-transform"
+          style={{
+            backgroundColor: mode.accent,
+            opacity: 0.42,
+            top: mode.id === "presentation" ? "-160px" : mode.id === "print" ? "38%" : mode.id === "event" ? "-40px" : "48%",
+            left: mode.id === "presentation" ? "-120px" : mode.id === "print" ? "58%" : mode.id === "event" ? "38%" : "-100px",
+            transform: `translate3d(${y * 0.08}px, ${y * -0.35}px, 0)`,
+          }}
+        />
+        <div
+          className="absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
+          style={{
+            backgroundColor: mode.glow,
+            opacity: 0.32,
+            bottom: mode.id === "presentation" ? "-100px" : mode.id === "print" ? "-40px" : mode.id === "event" ? "38%" : "-160px",
+            right: mode.id === "presentation" ? "-80px" : mode.id === "print" ? "-120px" : mode.id === "event" ? "-80px" : "48%",
+            transform: `translate3d(${y * -0.1}px, ${y * 0.22}px, 0)`,
+          }}
+        />
+      </div>
+      {/* Soft top-to-bottom vignette — no hard cutoff, no visible band. */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.04),rgba(255,255,255,0)_90%)]" />
     </div>
   );
 }

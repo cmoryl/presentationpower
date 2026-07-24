@@ -491,3 +491,16 @@
     animation: none; opacity: 1; transform: none;
   }
 }
+
+/* Homepage hero — per-mode entrance for the aurora blob layer. Each mode
+   rotation re-mounts this layer so the accent orbs bloom in with a fade +
+   subtle scale, giving each carousel step visible life. */
+@keyframes hero-mode-in {
+  0%   { opacity: 0; transform: scale(0.92); filter: blur(4px); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+.animate-hero-mode-in { animation: hero-mode-in 1100ms cubic-bezier(.2,.7,.2,1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-mode-in { animation: none; }
+}
