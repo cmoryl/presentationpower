@@ -943,7 +943,20 @@ function AssetEditor() {
                 modules={content.modules ?? []}
                 onAdd={() => setPickerOpen(true)}
                 onChange={(next) => patchContent({ modules: next })}
+                mode={editorMode}
               />
+
+              {/* Schema-driven Content inspector — the guaranteed safety net.
+                  Every content field in the active kind is reachable here,
+                  including fields already bound to the canvas overlay. */}
+              <div className="mt-4 pt-4 border-t border-black/10 dark:border-white/10">
+                <ContentInspector
+                  kind={kind}
+                  content={rawContent}
+                  canvasEditablePaths={editableFieldPaths}
+                  onChange={(path, value) => patchByPath(path, value)}
+                />
+              </div>
             </Panel>
 
 
