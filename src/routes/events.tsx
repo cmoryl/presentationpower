@@ -134,13 +134,6 @@ function EventsView() {
           </div>
         </div>
 
-        {/* Stats bar */}
-        <dl className="mt-10 grid max-w-3xl grid-cols-2 gap-6 sm:grid-cols-4">
-          <Stat label="Playbooks" value={String(EVENT_PLAYBOOKS.length)} />
-          <Stat label="Formats" value={String(SOCIAL_FORMATS.length)} />
-          <Stat label="Rendered demo assets" value={String(totalAssets)} />
-          <Stat label="Kit profiles" value={String(KIT_PROFILES.length)} />
-        </dl>
         </div>
       </header>
 
