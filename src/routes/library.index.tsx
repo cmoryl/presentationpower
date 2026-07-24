@@ -1432,6 +1432,12 @@ function VariantDetailModal({
     if (pdfBusy || bothBusy) return;
     setBothBusy(true);
     setPdfStage(null);
+    const resLabel = pixelRatio === 3840 ? "4k" : "hd";
+    const filename = `${variant.id}-${brand.id}-both-${resLabel}-review.pdf`;
+    const toastId = `export-pdf-both-${variant.id}`;
+    toast.loading(`Preparing combined PDF · ${resLabel.toUpperCase()}`, {
+      id: toastId, description: `${filename} — starting…`, duration: Infinity,
+    });
     try {
       const findNode = (m: "light" | "dark") => document.querySelector<HTMLElement>(
         `[data-modal-preview="${m}"][data-variant-id="${variant.id}"]`,
@@ -1440,21 +1446,27 @@ function VariantDetailModal({
       const darkNode = findNode("dark");
       if (!lightNode || !darkNode) throw new Error("Preview nodes not found for both modes");
       const mod = await import("@/lib/slide-image-export");
-      const resLabel = pixelRatio === 3840 ? "4k" : "hd";
-      const filename = `${variant.id}-${brand.id}-both-${resLabel}-review.pdf`;
       await mod.exportSlidesAsImagePdf(
         [{ node: lightNode, mode: "light" }, { node: darkNode, mode: "dark" }],
         {
           filename,
           targetWidth: pixelRatio,
-          onProgress: (p) => setPdfStage(p.message ?? p.stage),
+          onProgress: (p) => {
+            const msg = p.message ?? p.stage;
+            setPdfStage(msg);
+            toast.loading(`Exporting combined PDF · ${resLabel.toUpperCase()}`, {
+              id: toastId, description: `${filename} — ${msg}`, duration: Infinity,
+            });
+          },
         },
       );
-      toast.success(`Both themes PDF exported at ${resLabel.toUpperCase()} (${pixelRatio}×${Math.round(pixelRatio * 9 / 16)})`, { description: filename });
+      toast.success(`Combined PDF downloaded · ${resLabel.toUpperCase()} (${pixelRatio}×${Math.round(pixelRatio * 9 / 16)})`, {
+        id: toastId, description: filename, duration: 5000,
+      });
 
     } catch (err) {
       console.error("[library] both-theme PDF export failed", err);
-      toast.error("Combined PDF export failed", { description: "Check console for details." });
+      toast.error("Combined PDF export failed", { id: toastId, description: "Check console for details.", duration: 6000 });
     } finally {
       setBothBusy(false);
       setPdfStage(null);
