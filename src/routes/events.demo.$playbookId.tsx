@@ -24,6 +24,7 @@ import { KIT_PROFILES_BY_ID, SOCIAL_FORMATS_BY_ID } from "@/lib/social-formats";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { buildCampaignAssets, sourceFromVariant } from "@/lib/campaigns";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
+import { ForkPresetButton } from "@/components/campaigns/ForkPresetButton";
 
 
 export const Route = createFileRoute("/events/demo/$playbookId")({
@@ -114,6 +115,7 @@ function PlaybookDemoView() {
               >
                 <Sparkles size={14} /> Configure this kit →
               </Link>
+              <ForkPresetButton kind="event" playbook={playbook} />
               <a
                 href="#assets"
                 className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 px-5 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/50"
