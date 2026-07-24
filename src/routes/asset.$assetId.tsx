@@ -1482,6 +1482,35 @@ function HeroMediaPanel({
   const focalY = media.focalY ?? 40;
   const aspect = media.aspect ?? "fill";
   const [pickerOpen, setPickerOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function handleFileUpload(file: File) {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image file (PNG, JPG, WebP).");
+      return;
+    }
+    if (file.size > 20 * 1024 * 1024) {
+      toast.error("Image is larger than 20 MB. Try compressing it first.");
+      return;
+    }
+    const tid = toast.loading(`Uploading ${file.name}…`);
+    setUploading(true);
+    try {
+      const { signedUrl } = await uploadSlideMedia(file, file.name);
+      const base: PrintHeroMedia = enabled
+        ? media
+        : { imageUrl: "", overlayOpacity: 0.55, washStrength: 1, scrim: "bottom", blendMode: "multiply", heightPct: 46 };
+      onChange({ ...base, imageUrl: signedUrl });
+      toast.success("Hero image uploaded.", { id: tid });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Upload failed.";
+      toast.error(msg, { id: tid });
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
 
   // Inline curated strip — first N approved images for this division.
   const list = useServerFn(listDivisionImagery);
