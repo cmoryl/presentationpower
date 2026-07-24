@@ -65,6 +65,7 @@ import { Route as AdminAiRouteImport } from './routes/admin.ai'
 import { Route as AdminAbRouteImport } from './routes/admin.ab'
 import { Route as KnowledgeBrandGuidesIndexRouteImport } from './routes/knowledge.brand-guides.index'
 import { Route as DecksDeckIdIndexRouteImport } from './routes/decks.$deckId.index'
+import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$playbookId'
 import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
 import { Route as EventsDemoPlaybookIdRouteImport } from './routes/events.demo.$playbookId'
 import { Route as DecksDeckIdPrintRouteImport } from './routes/decks.$deckId.print'
@@ -356,6 +357,11 @@ const DecksDeckIdIndexRoute = DecksDeckIdIndexRouteImport.update({
   path: '/decks/$deckId/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SocialDemoPlaybookIdRoute = SocialDemoPlaybookIdRouteImport.update({
+  id: '/demo/$playbookId',
+  path: '/demo/$playbookId',
+  getParentRoute: () => SocialRoute,
+} as any)
 const KnowledgeBrandGuidesSlugRoute =
   KnowledgeBrandGuidesSlugRouteImport.update({
     id: '/brand-guides/$slug',
@@ -417,7 +423,7 @@ export interface FileRoutesByFullPath {
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/social': typeof SocialRoute
+  '/social': typeof SocialRouteWithChildren
   '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
@@ -468,6 +474,7 @@ export interface FileRoutesByFullPath {
   '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
+  '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
 }
@@ -482,7 +489,7 @@ export interface FileRoutesByTo {
   '/imagery': typeof ImageryRoute
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/social': typeof SocialRoute
+  '/social': typeof SocialRouteWithChildren
   '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
@@ -533,6 +540,7 @@ export interface FileRoutesByTo {
   '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
+  '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
 }
@@ -550,7 +558,7 @@ export interface FileRoutesById {
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/social': typeof SocialRoute
+  '/social': typeof SocialRouteWithChildren
   '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
@@ -601,6 +609,7 @@ export interface FileRoutesById {
   '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
+  '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
 }
@@ -670,6 +679,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/print'
     | '/events/demo/$playbookId'
     | '/knowledge/brand-guides/$slug'
+    | '/social/demo/$playbookId'
     | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
   fileRoutesByTo: FileRoutesByTo
@@ -735,6 +745,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/print'
     | '/events/demo/$playbookId'
     | '/knowledge/brand-guides/$slug'
+    | '/social/demo/$playbookId'
     | '/decks/$deckId'
     | '/knowledge/brand-guides'
   id:
@@ -802,6 +813,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/print'
     | '/events/demo/$playbookId'
     | '/knowledge/brand-guides/$slug'
+    | '/social/demo/$playbookId'
     | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
   fileRoutesById: FileRoutesById
@@ -819,7 +831,7 @@ export interface RootRouteChildren {
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
   LogohubRoute: typeof LogohubRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
-  SocialRoute: typeof SocialRoute
+  SocialRoute: typeof SocialRouteWithChildren
   TemplatesRoute: typeof TemplatesRoute
   ApiChatRoute: typeof ApiChatRoute
   AssetAssetIdRoute: typeof AssetAssetIdRoute
@@ -1238,6 +1250,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DecksDeckIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/social/demo/$playbookId': {
+      id: '/social/demo/$playbookId'
+      path: '/demo/$playbookId'
+      fullPath: '/social/demo/$playbookId'
+      preLoaderRoute: typeof SocialDemoPlaybookIdRouteImport
+      parentRoute: typeof SocialRoute
+    }
     '/knowledge/brand-guides/$slug': {
       id: '/knowledge/brand-guides/$slug'
       path: '/brand-guides/$slug'
@@ -1401,6 +1420,17 @@ const KnowledgeRouteWithChildren = KnowledgeRoute._addFileChildren(
   KnowledgeRouteChildren,
 )
 
+interface SocialRouteChildren {
+  SocialDemoPlaybookIdRoute: typeof SocialDemoPlaybookIdRoute
+}
+
+const SocialRouteChildren: SocialRouteChildren = {
+  SocialDemoPlaybookIdRoute: SocialDemoPlaybookIdRoute,
+}
+
+const SocialRouteWithChildren =
+  SocialRoute._addFileChildren(SocialRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -1414,7 +1444,7 @@ const rootRouteChildren: RootRouteChildren = {
   KnowledgeRoute: KnowledgeRouteWithChildren,
   LogohubRoute: LogohubRoute,
   ResetPasswordRoute: ResetPasswordRoute,
-  SocialRoute: SocialRoute,
+  SocialRoute: SocialRouteWithChildren,
   TemplatesRoute: TemplatesRoute,
   ApiChatRoute: ApiChatRoute,
   AssetAssetIdRoute: AssetAssetIdRoute,
