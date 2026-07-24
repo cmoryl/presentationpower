@@ -953,8 +953,8 @@ function AssetEditor() {
                 <ContentInspector
                   kind={kind}
                   content={rawContent}
-                  canvasEditablePaths={editableFieldPaths}
-                  onChange={(path, value) => patchByPath(path, value)}
+                  canvasEditablePaths={new Set(editableFieldPaths)}
+                  onChange={(path: string, value: unknown) => patchByPath(path, value)}
                 />
               </div>
             </Panel>
