@@ -7,11 +7,12 @@
 
 import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, RefreshCw, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, RefreshCw, Sparkles, Wand2 } from "lucide-react";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import {
   SOCIAL_FORMATS_BY_ID,
   KIT_PROFILES,
+  getFormat,
 } from "@/lib/social-formats";
 import {
   buildCampaignAssets,
@@ -19,7 +20,21 @@ import {
   type CampaignSource,
   type CampaignAsset,
 } from "@/lib/campaigns";
+import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
+
+/** First playbook copy for a given brand — the canonical division voice. */
+function exampleCopyForBrand(brandId: string) {
+  const pb = SOCIAL_PLAYBOOKS.find((p) => p.subBrand === brandId);
+  return (
+    pb?.copy ?? {
+      title: "Every language. Every content type. One partner.",
+      summary:
+        "TransPerfect powers global content across 200+ languages, from clinical trials to gaming to enterprise ops.",
+      cta: "See how we work",
+    }
+  );
+}
 
 const WIZARD_STEPS = [
   { key: "brand", label: "Brand" },
