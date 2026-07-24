@@ -92,6 +92,11 @@ export type DeckSlide = {
   // coordinates on top of the variant. Persists across sessions and always
   // renders (in preview, present, share). Empty/undefined = no overlay.
   canvasBlocks?: CanvasBlock[];
+  // Per-field text color overrides — keyed by concrete content path
+  // (e.g. "content.title" or "content.stats[0].label"). Hex colors (#rrggbb)
+  // or "" to clear. Applied via a scoped stylesheet in LiveEditOverlay and
+  // preserved across previews/exports.
+  inkOverrides?: Record<string, string>;
 };
 
 
@@ -209,6 +214,8 @@ type DeckState = {
   setSlideLogo: (deckId: string, slideId: string, patch: { position?: SlideLogoPosition; orientation?: "auto" | "horizontal" | "stacked" | "vertical-left" | "vertical-right" | "mark-only" }) => void;
   applySlideBackground: (deckId: string, slideIds: string[], background: unknown) => void;
   setSlideMode: (deckId: string, slideId: string, mode: "light" | "dark") => void;
+  setSlideInkOverride: (deckId: string, slideId: string, path: string, color: string | null) => void;
+  clearSlideInkOverrides: (deckId: string, slideId: string) => void;
 
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
@@ -2050,6 +2057,47 @@ export const useDeckStore = create<DeckState>()(
               ...deck,
               slides: deck.slides.map((sl) =>
                 sl.id === slideId ? { ...sl, mode } : sl,
+              ),
+            },
+          },
+        }));
+      },
+
+      setSlideInkOverride: (deckId, slideId, path, color) => {
+        pushHistory();
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const hex = typeof color === "string" ? color.trim() : "";
+        const valid = /^#[0-9a-fA-F]{6}$/.test(hex);
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) => {
+                if (sl.id !== slideId) return sl;
+                const prev = sl.inkOverrides ?? {};
+                const next: Record<string, string> = { ...prev };
+                if (!color || !valid) delete next[path];
+                else next[path] = hex.toLowerCase();
+                return { ...sl, inkOverrides: Object.keys(next).length ? next : undefined };
+              }),
+            },
+          },
+        }));
+      },
+
+      clearSlideInkOverrides: (deckId, slideId) => {
+        pushHistory();
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) =>
+                sl.id === slideId ? { ...sl, inkOverrides: undefined } : sl,
               ),
             },
           },

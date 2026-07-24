@@ -92,6 +92,8 @@ function DeckEditor() {
   const setDeckContext = useDeckStore((s) => s.setDeckContext);
   const applySlideBackground = useDeckStore((s) => s.applySlideBackground);
   const setSlideMode = useDeckStore((s) => s.setSlideMode);
+  const setSlideInkOverride = useDeckStore((s) => s.setSlideInkOverride);
+  const clearSlideInkOverrides = useDeckStore((s) => s.clearSlideInkOverrides);
 
 
   const [activeIdx, setActiveIdx] = useState(0);
@@ -335,6 +337,16 @@ function DeckEditor() {
                 </button>
               </div>
             )}
+            {active && active.inkOverrides && Object.keys(active.inkOverrides).length > 0 && (
+              <button
+                type="button"
+                onClick={() => clearSlideInkOverrides(deck.id, active.id)}
+                className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-[10px] font-medium uppercase tracking-widest text-black/70 transition hover:border-red-500 hover:text-red-600"
+                title={`Clear ${Object.keys(active.inkOverrides).length} text color override(s) on this slide`}
+              >
+                ⟲ Reset colors ({Object.keys(active.inkOverrides).length})
+              </button>
+            )}
             <button
               type="button"
               onClick={() => { setCanvasMode(false); setLiveEdit((v) => !v); }}
@@ -387,7 +399,10 @@ function DeckEditor() {
                     slideId={active.id}
                     content={active.content as Record<string, unknown>}
                     editableFields={mv.editableFields}
+                    inkOverrides={active.inkOverrides}
                     onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
+                    onSetInkColor={(cp, color) => setSlideInkOverride(deck.id, active.id, cp, color)}
+                    onClearInkColor={(cp) => setSlideInkOverride(deck.id, active.id, cp, null)}
                   >
                     <ScaledSlide>
                       <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
@@ -407,10 +422,19 @@ function DeckEditor() {
             >
               {active && mv && (
                 <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
-                  <ScaledSlide>
-                    <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
-                    <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
-                  </ScaledSlide>
+                  <LiveEditOverlay
+                    enabled={false}
+                    slideId={active.id}
+                    content={active.content as Record<string, unknown>}
+                    editableFields={mv.editableFields}
+                    inkOverrides={active.inkOverrides}
+                    onChange={() => {}}
+                  >
+                    <ScaledSlide>
+                      <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
+                      <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
+                    </ScaledSlide>
+                  </LiveEditOverlay>
                 </SlideVideoPreviewContext.Provider>
               )}
               <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100">
