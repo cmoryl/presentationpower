@@ -1,7 +1,6 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { useContrastBoost } from "@/hooks/use-contrast-boost";
 import { useTheme, type ThemeMode } from "@/hooks/use-theme";
 import { AdminSidebar } from "@/components/AdminShell";
 
@@ -19,7 +18,6 @@ function matchesAdminLinked(pathname: string): boolean {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const [boost, setBoost] = useContrastBoost();
   const [theme, setTheme] = useTheme();
   const [adminOpen, setAdminOpen] = useState(false);
   const inAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
@@ -272,21 +270,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                 );
               })}
             </div>
-            <button
-              type="button"
-              onClick={() => setBoost(!boost)}
-              aria-pressed={boost}
-              aria-label={boost ? "Disable high contrast mode" : "Enable high contrast mode"}
-              title="Auto-adjust text contrast on glass surfaces (WCAG AA)"
-              className={`ml-1 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition ${
-                boost
-                  ? "border-[#0057FF]/25 bg-white/70 text-[#03002C] dark:!border-[#A1FBF9]/40 dark:!bg-[#A1FBF9]/[0.08] dark:!text-[#A1FBF9]"
-                  : "border-white/40 bg-white/25 text-black/65 hover:bg-white/50 dark:!border-white/10 dark:!bg-white/[0.03] dark:text-white/65 dark:hover:!bg-white/[0.06]"
-              }`}
-            >
-              <span aria-hidden="true">◐</span>
-              <span>Readable</span>
-            </button>
 
           </nav>
         </div>
