@@ -287,22 +287,35 @@ export function EditorialTitle({
     >
       {parts.map((p, i) =>
         p.italic ? (
-          <em
-            key={i}
-            style={{
-              fontFamily: EDITORIAL_SERIF,
-              
-              fontWeight: 400,
-              color: accentColor ?? color,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            {p.t}
-          </em>
+          emphasisStyle === "bold" ? (
+            <strong
+              key={i}
+              style={{
+                fontWeight: 800,
+                color: accentColor ?? color,
+                letterSpacing: "-0.035em",
+              }}
+            >
+              {p.t}
+            </strong>
+          ) : (
+            <em
+              key={i}
+              style={{
+                fontFamily: EDITORIAL_SERIF,
+                fontWeight: 400,
+                color: accentColor ?? color,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {p.t}
+            </em>
+          )
         ) : (
           <span key={i}>{p.t}</span>
         ),
       )}
+
     </h1>
   );
 }
