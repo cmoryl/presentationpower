@@ -143,7 +143,20 @@ function Dashboard() {
   const [aiConfigured, setAiConfigured] = useState<boolean | null>(null);
   const [cloudCount, setCloudCount] = useState<number | null>(null);
   const [modeId, setModeId] = useState<ModeId>("presentation");
+  const [autoRotate, setAutoRotate] = useState(true);
   const mode = MODES.find((m) => m.id === modeId) ?? MODES[0];
+
+  // Auto-rotate through modes every 5s until the user picks one or hovers the picker.
+  useEffect(() => {
+    if (!autoRotate) return;
+    const id = window.setInterval(() => {
+      setModeId((cur) => {
+        const idx = MODES.findIndex((m) => m.id === cur);
+        return MODES[(idx + 1) % MODES.length].id;
+      });
+    }, 5000);
+    return () => window.clearInterval(id);
+  }, [autoRotate]);
 
   useEffect(() => {
     checkAi().then((r) => setAiConfigured(r.configured)).catch(() => setAiConfigured(true));
