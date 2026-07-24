@@ -695,6 +695,7 @@ export function KitWizard({
                         displayShortEdge={260}
                       />
                     </div>
+                  </div>
                 ))}
               </div>
             )}
