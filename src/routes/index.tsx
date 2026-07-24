@@ -77,8 +77,8 @@ const MODES: ModeDef[] = [
     icon: Printer,
     accent: "#EC388A",
     glow: "#FFEB66",
-    eyebrow: "Press-ready · PDF/X-4",
-    headline: "Case studies, eBrochures, spotlights — press-ready.",
+    eyebrow: "Modular print · PDF/X-4",
+    headline: "Modular case studies, eBrochures, spotlights — press-ready.",
     copy: "The same aurora + liquid-glass engine, fitted to 816×1056 portrait canvases and exported as true 300 DPI PDF/X-4 for print production.",
     actions: [
       { label: "Open Print Studio", to: "/library/print", primary: true },
