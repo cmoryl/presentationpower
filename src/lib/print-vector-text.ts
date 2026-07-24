@@ -436,10 +436,12 @@ export async function overlayVectorText(
         baselineYPt,
         color: rgb(r, g, b),
         opacity: line.opacity,
+        charSpacingPt: line.letterSpacing * scaleX,
       });
 
       linesDrawn += 1;
-      if (line.glyphLefts) glyphOnly += 1;
+      if (Math.abs(line.letterSpacing) >= 0.3) glyphOnly += 1;
+
     }
   }
 
