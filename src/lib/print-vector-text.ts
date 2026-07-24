@@ -459,32 +459,34 @@ interface DrawCtx {
   baselineYPt: number;
   color: ReturnType<typeof rgb>;
   opacity: number;
+  /** Letter-spacing in PDF points (Tc value). 0 for normal. */
+  charSpacingPt: number;
 }
 
+/**
+ * Draw one visual line with pdf-lib.
+ *
+ * Uses `page.drawText` (a single Tj) so extracted text stays word-preserving
+ * and searchable. Letter-spacing is applied via the PDF `Tc` text-state
+ * operator (`setCharacterSpacing`) which persists until reset — we always
+ * reset to 0 after each tracked line so we don't leak into the next.
+ */
 function drawVectorLine(page: PDFPage, line: VectorTextLine, font: PDFFont, ctx: DrawCtx): void {
-  const opts = {
+  if (ctx.charSpacingPt !== 0) {
+    page.pushOperators(setCharacterSpacing(ctx.charSpacingPt));
+  }
+  page.drawText(line.text, {
     x: line.leftCss * ctx.scaleX,
     y: ctx.baselineYPt,
     size: ctx.sizePt,
     font,
     color: ctx.color,
     opacity: ctx.opacity,
-  } as const;
-
-  if (!line.glyphLefts || line.glyphLefts.length !== line.text.length) {
-    // Fast path — draw the whole visual line at its computed left edge.
-    page.drawText(line.text, opts);
-    return;
+  });
+  if (ctx.charSpacingPt !== 0) {
+    page.pushOperators(setCharacterSpacing(0));
   }
-
-  // Per-glyph path — preserves letter-spacing (tracked eyebrows) exactly by
-  // placing each character at its measured CSS x.
-  for (let i = 0; i < line.text.length; i++) {
-    const ch = line.text[i]!;
-    if (ch === " ") continue;
-    page.drawText(ch, {
-      ...opts,
-      x: line.glyphLefts[i]! * ctx.scaleX,
-    });
-  }
+  // Reference to line kept alive for possible future per-glyph fallback.
+  void line.glyphLefts;
 }
+
