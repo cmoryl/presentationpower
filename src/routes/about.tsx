@@ -340,12 +340,13 @@ function AboutPage() {
           <div>
             <div className="text-xs uppercase tracking-[0.3em] text-black/50">About</div>
             <h1 className="mt-3 text-5xl font-semibold leading-[1.05] tracking-[-0.02em]">
-              A modular sales-deck system, built on TransPerfect brand.
+              A modular brand production system — Presentation, Print, Event, Social.
             </h1>
             <p className="mt-4 max-w-3xl text-lg text-black/65">
-              This page grows as the build grows. It documents the systems underneath — briefs,
-              modules, brand governance, imports, exports, and the AI layer — so anyone new to
-              the platform can orient in one read.
+              One brief fans out into every surface. This page documents the systems underneath —
+              master briefs, modules, brand governance, print studio, event & social kits, translation,
+              knowledge, live editing, Copilot, and analytics — so anyone new to the platform can
+              orient in one read.
             </p>
           </div>
           <Link
