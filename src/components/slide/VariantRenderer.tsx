@@ -5580,61 +5580,92 @@ function renderLocationsVariant(
   const totalCities = pins.length;
   const totalRegions = (Object.keys(counts) as LocPin["region"][]).filter((k) => counts[k] > 0).length;
 
-  const RegionStrip = () => (
-    <div className="mt-6 grid grid-cols-5 gap-3">
-      {(Object.keys(LOC_REGION_LABELS) as LocPin["region"][]).map((k) => {
-        const n = counts[k] ?? 0;
-        const active = n > 0;
-        return (
-          <div
-            key={k}
-            className="rounded-2xl px-4 py-3 backdrop-blur-md"
-            style={{
-              background: isDark ? "rgba(255,255,255,0.04)" : "rgba(3,0,44,0.03)",
-              border: `1px solid ${active ? accent + "55" : ink.hairline}`,
-              opacity: active ? 1 : 0.5,
-            }}
-          >
-            <div style={{ color: accent, fontSize: 11, letterSpacing: "0.24em", fontWeight: 600, textTransform: "uppercase" }}>{k}</div>
-            <div className="mt-1 flex items-baseline gap-2">
-              <div style={{ color: ink.strong, fontSize: 34, fontWeight: 600, letterSpacing: "-0.02em" }}>{n}</div>
-              <div style={{ color: ink.muted, fontSize: 13 }}>{LOC_REGION_LABELS[k]}</div>
+  // Free-form region rail — a bare hairline row of region ticks, no cards,
+  // no plate, no per-cell borders. Matches the KPI/chart Aurora v2 grammar.
+  const RegionRail = () => {
+    const keys = (Object.keys(LOC_REGION_LABELS) as LocPin["region"][]);
+    const activeKeys = keys.filter((k) => (counts[k] ?? 0) > 0);
+    return (
+      <div className="mt-10 flex items-stretch" style={{ borderTop: `1px solid ${ink.hairline}` }}>
+        {keys.map((k) => {
+          const n = counts[k] ?? 0;
+          const active = n > 0;
+          return (
+            <div
+              key={k}
+              className="flex-1 pr-6 pt-5"
+              style={{ opacity: active ? 1 : 0.35 }}
+            >
+              <div style={{ color: active ? "var(--slide-accent-text)" : ink.muted, fontSize: 11, letterSpacing: "0.28em", fontWeight: 700, textTransform: "uppercase" }}>{k}</div>
+              <div className="mt-2 flex items-baseline gap-2">
+                <div className="tabular-nums" style={{ color: ink.strong, fontSize: 44, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 0.95 }}>{n}</div>
+                <div style={{ color: ink.muted, fontSize: 13, letterSpacing: "-0.005em" }}>{LOC_REGION_LABELS[k]}</div>
+              </div>
             </div>
+          );
+        })}
+        {activeKeys.length === 0 && (
+          <div className="pt-5" style={{ color: ink.muted, fontSize: 13 }}>No regional coverage yet.</div>
+        )}
+      </div>
+    );
+  };
+
+  // Shared header — free-form Aurora v2. Left rail: kicker + 60px title +
+  // muted headline. Right rail: hero stat (total cities) + delta-style meta.
+  const Header = ({ compact = false }: { compact?: boolean } = {}) => (
+    <div className="flex items-start justify-between gap-16">
+      <div style={{ maxWidth: 900 }}>
+        <Kicker brand={brand as never}>{s(c.kicker) || `${totalRegions} regions · global footprint`}</Kicker>
+        <div
+          className="mt-4"
+          style={{ fontSize: compact ? 52 : 60, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02, maxWidth: 900 }}
+        >
+          {title}
+        </div>
+        {subtitle && (
+          <div
+            className="mt-5"
+            style={{ fontSize: 22, color: ink.muted, letterSpacing: "-0.005em", lineHeight: 1.45, maxWidth: 780 }}
+          >
+            {subtitle}
           </div>
-        );
-      })}
+        )}
+      </div>
+      <div className="flex flex-col items-end text-right" style={{ minWidth: 220 }}>
+        <div className="flex items-baseline gap-2">
+          <span className="tabular-nums font-semibold" style={{ fontSize: 104, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}>
+            {totalCities}
+          </span>
+        </div>
+        <div className="mt-3 uppercase" style={{ fontSize: 13, letterSpacing: "0.3em", color: ink.muted, fontWeight: 600 }}>
+          Cities live
+        </div>
+        <div className="mt-2 uppercase tabular-nums" style={{ fontSize: 14, letterSpacing: "0.24em", color: "var(--slide-accent-text)", fontWeight: 700 }}>
+          ● {totalRegions} regions
+        </div>
+      </div>
     </div>
   );
 
-  // Shared header block
-  const Header = () => (
-    <div>
-      <Kicker brand={brand as never}>{`${totalCities} cities · ${totalRegions} regions`}</Kicker>
-      <div className="mt-3" style={{ color: ink.strong, fontSize: 60, fontWeight: 600, lineHeight: 1.05, letterSpacing: "-0.03em", maxWidth: 1400 }}>
-        {title}
-      </div>
-      {subtitle && (
-        <div className="mt-4" style={{ color: ink.muted, fontSize: 22, lineHeight: 1.35, maxWidth: 1200 }}>
-          {subtitle}
-        </div>
-      )}
-    </div>
-  );
+
 
   if (variantId === "MV-LOC-WORLD-PINS") {
+    // Free-form Aurora v2 — map bleeds directly onto the aurora, no plate,
+    // no border, no tint. RegionRail sits below on a single hairline.
     return (
       <SlideFrame brand={brand as never} pageNumber={pageNumber}>
-        <AuroraOrb accent={accent} x={92} y={20} size={860} intensity={0.5} />
-        <div className="relative flex h-full flex-col px-2 pt-2">
+        <div className="relative flex h-full flex-col">
           <Header />
-          <div className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
+          <div className="relative mt-10 flex-1 overflow-hidden">
             <LocWorldMap pins={pins} region="world" mode={mode} accent={accent} primary={primary} showLabels ariaLabel={`${title} — world map`} />
           </div>
-          <RegionStrip />
+          <RegionRail />
         </div>
       </SlideFrame>
     );
   }
+
 
   if (variantId === "MV-LOC-WORLD-STATS") {
     const metrics = coerceMetrics(c.metrics);
@@ -5700,23 +5731,25 @@ function renderLocationsVariant(
 
     return (
       <SlideFrame brand={brand as never} pageNumber={pageNumber}>
-        <AuroraOrb accent={accent} x={8} y={80} size={860} intensity={0.45} />
-        <div className="relative flex h-full gap-10">
+        <div className="relative flex h-full gap-12">
           <div className="flex flex-1 flex-col">
-            <Header />
+            <Header compact />
             {filterActive && (
-              <div className="mt-3 flex flex-wrap items-center gap-2" style={{ color: ink.muted, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-                <span style={{ fontWeight: 600, color: accent }}>Region filter</span>
+              <div className="mt-4 flex flex-wrap items-center gap-2" style={{ color: ink.muted, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase" }}>
+                <span style={{ fontWeight: 700, color: "var(--slide-accent-text)" }}>Region filter</span>
                 {(Object.keys(LOC_REGION_LABELS) as LocPin["region"][])
                   .filter((k) => filterSet.has(k))
                   .map((k) => (
-                    <span key={k} className="rounded-full px-2 py-0.5" style={{ background: isDark ? "rgba(255,255,255,0.06)" : "rgba(3,0,44,0.05)", border: `1px solid ${ink.hairline}` }}>
-                      {LOC_REGION_LABELS[k]}
-                    </span>
-                  ))}
+                    <span key={k}>{LOC_REGION_LABELS[k]}</span>
+                  ))
+                  .reduce<React.ReactNode[]>((acc, node, i, arr) => {
+                    acc.push(node);
+                    if (i < arr.length - 1) acc.push(<span key={`sep-${i}`} style={{ opacity: 0.4 }}>·</span>);
+                    return acc;
+                  }, [])}
               </div>
             )}
-            <div data-map-export-root="world-stats" className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
+            <div data-map-export-root="world-stats" className="relative mt-8 flex-1 overflow-hidden">
               <LocWorldMap pins={filteredPins} region="world" mode={mode} accent={accent} primary={primary} showLabels={false} metric={activeMetric} metricId={activeMetric?.id} scaleMode={scaleMode} ariaLabel={`${title} — world map${activeMetric ? ` visualizing ${activeMetric.label}${scaleMode === "region-percent" ? " (% of region)" : scaleMode === "global-percent" ? " (% of global)" : ""}` : ""}${filterActive ? ` filtered to ${filteredRegions} regions` : ""}`} />
               <button
                 type="button"
@@ -5725,23 +5758,24 @@ function renderLocationsVariant(
                   if (root) void exportMapNodeAsPng(root, `${(title || "world-stats").toString().toLowerCase().replace(/\s+/g, "-")}.png`, isDark ? "#03002C" : "#ffffff");
                 }}
                 aria-label="Export map as PNG"
-                className="absolute right-3 top-3 rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest transition hover:scale-[1.03]"
-                style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.06)", color: ink.strong, border: `1px solid ${ink.hairline}`, backdropFilter: "blur(6px)" }}
+                className="absolute right-0 top-0 rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest transition hover:scale-[1.03]"
+                style={{ color: ink.muted, letterSpacing: "0.24em" }}
               >
-                Export PNG
+                Export PNG ↗
               </button>
             </div>
           </div>
           <div className="flex w-[520px] flex-col justify-end">
-            <div className="rounded-3xl p-8 backdrop-blur-md" style={{ background: isDark ? "rgba(255,255,255,0.05)" : "rgba(3,0,44,0.035)", border: `1px solid ${ink.hairline}` }}>
+            <div className="pl-8" style={{ borderLeft: `1px solid ${ink.hairline}` }}>
               <div className="flex items-baseline justify-between">
-                <div style={{ color: accent, fontSize: 11, letterSpacing: "0.28em", fontWeight: 600, textTransform: "uppercase" }}>
+                <div style={{ color: "var(--slide-accent-text)", fontSize: 12, letterSpacing: "0.3em", fontWeight: 700, textTransform: "uppercase" }}>
                   {usingMetric ? activeMetric!.label : "Global footprint"}
                 </div>
                 {usingMetric && metricCoverage < filteredPins.length && (
-                  <div style={{ color: ink.muted, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+                  <div style={{ color: ink.muted, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }}>
                     {metricCoverage}/{filteredPins.length} pins
                   </div>
+
                 )}
               </div>
 
@@ -5845,19 +5879,21 @@ function renderLocationsVariant(
     const regionCount = pins.filter((p) => region === "world" || p.region === region || (region === "MEA" && p.region === "MEA")).length;
     return (
       <SlideFrame brand={brand as never} pageNumber={pageNumber}>
-        <AuroraOrb accent={accent} x={8} y={20} size={860} intensity={0.5} />
         <div className="relative flex h-full flex-col">
-          <div className="flex items-start justify-between gap-8">
-            <Header />
-            <div className="rounded-full px-5 py-2 backdrop-blur-md" style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.06)", border: `1px solid ${accent}66`, color: ink.strong, fontSize: 14, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-              {region === "world" ? "Worldwide" : LOC_REGION_LABELS[region as LocPin["region"]]} · {regionCount}
+          <div className="flex items-start justify-between gap-12">
+            <Header compact />
+            <div className="flex flex-col items-end text-right" style={{ minWidth: 180 }}>
+              <span className="tabular-nums font-semibold" style={{ fontSize: 88, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}>{regionCount}</span>
+              <div className="mt-3 uppercase" style={{ fontSize: 12, letterSpacing: "0.3em", color: "var(--slide-accent-text)", fontWeight: 700 }}>
+                {region === "world" ? "Worldwide" : LOC_REGION_LABELS[region as LocPin["region"]]}
+              </div>
             </div>
           </div>
-          <div className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
+          <div className="relative mt-10 flex-1 overflow-hidden">
             <LocWorldMap pins={pins} region={region} mode={mode} accent={accent} primary={primary} showLabels ariaLabel={`${title} — ${region === "world" ? "world" : LOC_REGION_LABELS[region as LocPin["region"]]} map`} />
           </div>
           {narrative && (
-            <div className="mt-6" style={{ color: ink.muted, fontSize: 18, lineHeight: 1.45, maxWidth: 1400 }}>
+            <div className="mt-8 pt-6" style={{ borderTop: `1px solid ${ink.hairline}`, color: ink.muted, fontSize: 18, lineHeight: 1.45, maxWidth: 1400 }}>
               {narrative}
             </div>
           )}
@@ -5866,33 +5902,38 @@ function renderLocationsVariant(
     );
   }
 
-  // MV-LOC-HUB-SPOKE
+
+  // MV-LOC-HUB-SPOKE — free-form Aurora v2. Map bleeds onto the aurora, the
+  // legend sits on a shared hairline as tiny inline swatch pills.
   return (
     <SlideFrame brand={brand as never} pageNumber={pageNumber}>
-      <AuroraOrb accent={accent} x={92} y={50} size={900} intensity={0.55} />
       <div className="relative flex h-full flex-col">
         <Header />
-        <div className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
+        <div className="relative mt-10 flex-1 overflow-hidden">
           <LocWorldMap pins={pins} region="world" mode={mode} accent={accent} primary={primary} showLabels showSpokes ariaLabel={`${title} — hub and spoke network map`} />
         </div>
-        <div className="mt-5 flex items-center gap-6" style={{ color: ink.muted, fontSize: 14 }}>
-          <span className="inline-flex items-center gap-2">
-            <span style={{ display: "inline-block", width: 12, height: 12, borderRadius: 999, background: accent, boxShadow: `0 0 12px ${accent}` }} />
-            HQ / hub
+        <div
+          className="mt-8 flex items-center gap-10 pt-5"
+          style={{ borderTop: `1px solid ${ink.hairline}`, color: ink.muted, fontSize: 14, letterSpacing: "0.02em" }}
+        >
+          <span className="inline-flex items-center gap-3">
+            <span style={{ display: "inline-block", width: 14, height: 14, borderRadius: 999, background: accent, boxShadow: `0 0 18px ${accent}` }} />
+            <span style={{ color: ink.strong, fontWeight: 600, letterSpacing: "0.22em", textTransform: "uppercase", fontSize: 12 }}>HQ / Hub</span>
           </span>
-          <span className="inline-flex items-center gap-2">
-            <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: 999, background: accent, opacity: 0.75 }} />
-            Delivery office
+          <span className="inline-flex items-center gap-3">
+            <span style={{ display: "inline-block", width: 9, height: 9, borderRadius: 999, background: accent, opacity: 0.75 }} />
+            <span style={{ color: ink.strong, fontWeight: 600, letterSpacing: "0.22em", textTransform: "uppercase", fontSize: 12 }}>Delivery office</span>
           </span>
-          <span className="inline-flex items-center gap-2">
-            <span style={{ display: "inline-block", width: 22, height: 2, background: accent, opacity: 0.6, borderRadius: 2 }} />
-            Follow-the-sun route
+          <span className="inline-flex items-center gap-3">
+            <span style={{ display: "inline-block", width: 28, height: 2, background: accent, opacity: 0.55, borderRadius: 2 }} />
+            <span style={{ color: ink.strong, fontWeight: 600, letterSpacing: "0.22em", textTransform: "uppercase", fontSize: 12 }}>Follow-the-sun route</span>
           </span>
         </div>
       </div>
     </SlideFrame>
   );
 }
+
 
 
 
