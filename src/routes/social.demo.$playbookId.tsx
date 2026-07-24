@@ -179,46 +179,39 @@ function SocialDemoView() {
         </ol>
       </section>
 
-      {/* Deliverables + KPIs */}
-      <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-        <div>
-          <SectionHead
-            eyebrow="Ships in kit"
-            title="Deliverables"
-            desc="What comes off the line when this campaign is generated."
-          />
-          <ul className="mt-4 divide-y divide-black/10 rounded-2xl border border-black/10 bg-white/80">
-            {playbook.deliverables.map((d) => (
-              <li key={d.label} className="flex items-start gap-3 p-4">
-                <SurfacePill surface={d.surface} />
-                <div className="flex-1">
-                  <div className="text-sm font-semibold text-[#03002C]">{d.label}</div>
-                  <div className="text-xs text-black/55">{d.detail}</div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <SectionHead eyebrow="Success" title="KPI targets" desc="Benchmark rules of thumb from prior runs." />
-          <ul className="mt-4 space-y-2">
-            {playbook.kpis.map((k) => (
-              <li
-                key={k.label}
-                className="flex items-baseline justify-between gap-4 rounded-2xl border border-black/10 bg-white/85 p-4"
-              >
-                <div>
-                  <div className="text-xs uppercase tracking-widest text-black/50">
-                    <Target size={11} className="mr-1 inline" /> {k.label}
-                  </div>
-                  {k.detail ? <div className="mt-0.5 text-xs text-black/60">{k.detail}</div> : null}
-                </div>
-                <div className="text-2xl font-semibold tracking-tight text-[#03002C]">{k.target}</div>
-              </li>
-            ))}
-          </ul>
+      {/* Marketing collateral — full kit scope, grouped, with status ribbons */}
+      <section>
+        <SectionHead
+          eyebrow="Ships in kit"
+          title="Marketing collateral"
+          desc="The full production scope for this campaign — feed, story, reels, ad variants, PR headers, newsletter, employee advocacy and more. Pieces flagged live render right now; the rest are on the roadmap."
+        />
+        <div className="mt-6">
+          <CollateralGrid items={getExpandedSocialCollateral(playbook)} />
         </div>
       </section>
+
+      {/* KPI targets */}
+      <section>
+        <SectionHead eyebrow="Success" title="KPI targets" desc="Benchmark rules of thumb from prior runs." />
+        <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {playbook.kpis.map((k) => (
+            <li
+              key={k.label}
+              className="flex items-baseline justify-between gap-4 rounded-2xl border border-black/10 bg-white/85 p-4"
+            >
+              <div>
+                <div className="text-xs uppercase tracking-widest text-black/50">
+                  <Target size={11} className="mr-1 inline" /> {k.label}
+                </div>
+                {k.detail ? <div className="mt-0.5 text-xs text-black/60">{k.detail}</div> : null}
+              </div>
+              <div className="text-2xl font-semibold tracking-tight text-[#03002C]">{k.target}</div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
 
       {/* Live asset gallery */}
       <section id="assets">
