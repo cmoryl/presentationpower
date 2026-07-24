@@ -227,7 +227,11 @@ export function KitWizard({
       {/* Step body */}
       <div className="min-h-[320px]">
         {step === 0 && (
-          <StepCard eyebrow="Step 1 of 5" title="Which brand is this kit for?">
+          <StepCard
+            eyebrow="Step 1 of 5"
+            title="Which brand is this kit for?"
+            description="Pick a division — accent, ink, surface, and logo lockup flow through every asset. You can override any of them later."
+          >
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {BRAND_MODES.map((b) => {
                 const selected = b.id === brandId;
@@ -236,20 +240,40 @@ export function KitWizard({
                     key={b.id}
                     type="button"
                     onClick={() => setBrandId(b.id)}
-                    className={`rounded-2xl border p-3 text-left text-sm transition ${
+                    className={`group flex items-center gap-3 rounded-2xl border p-3 text-left text-sm transition ${
                       selected
                         ? "border-[#003FC7] bg-[#003FC7]/[0.06] ring-1 ring-[#003FC7]/40"
                         : "border-black/10 bg-white/70 hover:border-[#003FC7]/40"
                     }`}
                   >
-                    <div className="font-medium text-black/85">{b.name}</div>
-                    <div className="text-[10px] uppercase tracking-widest text-black/45">
-                      {b.id}
-                    </div>
+                    <span
+                      className="grid h-11 w-11 shrink-0 place-items-center rounded-xl ring-1 ring-black/10"
+                      style={{ background: b.tokens.primary }}
+                      aria-hidden
+                    >
+                      <span
+                        className="h-4 w-4 rounded-full ring-2 ring-white/80"
+                        style={{ background: b.tokens.accent }}
+                      />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-medium text-black/85">{b.name}</span>
+                      <span className="mt-0.5 flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-black/45">
+                        <span className="font-mono normal-case tracking-normal">
+                          {b.tokens.accent}
+                        </span>
+                        <span>·</span>
+                        <span>accent</span>
+                      </span>
+                    </span>
                   </button>
                 );
               })}
             </div>
+
+            {/* Live preview — reflects the accent + logo of the current brand. */}
+            <BrandPreview brandId={brandId} manualCopy={manualCopy} />
+
             <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-3">
               <div className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-black/50">
                 Render mode
@@ -271,6 +295,7 @@ export function KitWizard({
             </div>
           </StepCard>
         )}
+
 
         {step === 1 && (
           <StepCard eyebrow="Step 2 of 5" title="What's the message?">
