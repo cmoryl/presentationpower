@@ -1139,7 +1139,9 @@ function BriefWizard() {
                         setAiStatus("error");
                         return; // stay on brief so user sees the error banner
                       }
-                      navigate({ to: "/decks/$deckId", params: { deckId }, hash: "brand-review" });
+                      await expandMasterSet(deckId, submission);
+                      const hasExtras = masterSet.print.enabled || masterSet.event.enabled || masterSet.social.enabled;
+                      if (!hasExtras) navigate({ to: "/decks/$deckId", params: { deckId }, hash: "brand-review" });
                     }}
                   >
                     <svg aria-hidden viewBox="0 0 24 24" width="16" height="16" fill="currentColor" className="relative -ml-1 opacity-90"><path d="M12 2l1.7 5.3L19 9l-5.3 1.7L12 16l-1.7-5.3L5 9l5.3-1.7L12 2zm7 11l.9 2.6L22 16.5l-2.1.9L19 20l-.9-2.6L16 16.5l2.1-.9L19 13z"/></svg>
