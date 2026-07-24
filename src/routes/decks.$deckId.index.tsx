@@ -574,89 +574,101 @@ function DeckEditor() {
             />
           )}
 
-          {/* Slide imagery (photograph override for image-forward variants) */}
-          {active && variantSupportsImagery(active.variantId) && (
-            <SlideImageryPanel
-              key={`img-${active.id}`}
-              mediaUrl={(active.content as Record<string, unknown>).mediaUrl as string | undefined}
-              mediaSeed={(active.content as Record<string, unknown>).mediaSeed as string | undefined}
-              divisionId={deck.brandModeId}
-              onChange={(next, nextPath) => {
-                updateField(deck.id, active.id, "mediaUrl", next ?? undefined);
-                if (nextPath !== undefined) {
-                  updateField(deck.id, active.id, "mediaPath", nextPath ?? undefined);
-                }
-              }}
-            />
-
-          )}
-
-          {/* Slide video (background motion for supported media-forward variants) */}
-          {active && variantSupportsVideo(active.variantId) && (
-            <SlideVideoPanel
-              key={`vid-${active.id}`}
-              videoUrl={(active.content as Record<string, unknown>).videoUrl as string | undefined}
-              posterUrl={(active.content as Record<string, unknown>).videoPosterUrl as string | undefined}
-              autoplay={((active.content as Record<string, unknown>).videoAutoplay as boolean | undefined) ?? true}
-              loop={((active.content as Record<string, unknown>).videoLoop as boolean | undefined) ?? true}
-              muted={((active.content as Record<string, unknown>).videoMuted as boolean | undefined) ?? true}
-              controls={((active.content as Record<string, unknown>).videoControls as boolean | undefined) ?? false}
-              onChange={(next) => {
-                if (next.videoUrl !== undefined) {
-                  updateField(deck.id, active.id, "videoUrl", next.videoUrl ?? undefined);
-                }
-                if (next.videoPath !== undefined) {
-                  updateField(deck.id, active.id, "videoPath", next.videoPath ?? undefined);
-                }
-                if (next.videoPosterUrl !== undefined) {
-                  updateField(deck.id, active.id, "videoPosterUrl", next.videoPosterUrl ?? undefined);
-                }
-                if (next.videoPosterPath !== undefined) {
-                  updateField(deck.id, active.id, "videoPosterPath", next.videoPosterPath ?? undefined);
-                }
-                if (next.videoAutoplay !== undefined) {
-                  updateField(deck.id, active.id, "videoAutoplay", next.videoAutoplay);
-                }
-                if (next.videoLoop !== undefined) {
-                  updateField(deck.id, active.id, "videoLoop", next.videoLoop);
-                }
-                if (next.videoMuted !== undefined) {
-                  updateField(deck.id, active.id, "videoMuted", next.videoMuted);
-                }
-                if (next.videoControls !== undefined) {
-                  updateField(deck.id, active.id, "videoControls", next.videoControls);
-                }
-              }}
-            />
-          )}
-
-
-          {/* Background & Imagery */}
+          {/* Unified media & background panel — Image / Video / Background tabs */}
           {active && (
-            <BackgroundImageryPanel
-              key={`bg-${active.id}`}
-              value={(active.content as Record<string, unknown>).background}
-              onChange={(next) => updateField(deck.id, active.id, "background", next)}
-              activeSlideId={active.id}
-              divisionId={deck.brandModeId}
-              slides={deck.slides.map((sl) => {
-                const section = byId(SECTION_FRAMEWORKS, sl.sectionId);
-                const c = sl.content as Record<string, unknown>;
-                const title =
-                  (typeof c.title === "string" && c.title) ||
-                  (typeof c.headline === "string" && (c.headline as string)) ||
-                  (typeof c.kicker === "string" && (c.kicker as string)) ||
-                  section?.name ||
-                  "Slide";
-                return {
-                  id: sl.id,
-                  position: sl.position,
-                  sectionId: sl.sectionId,
-                  sectionName: section?.name ?? sl.sectionId,
-                  title: title as string,
-                };
-              })}
-              onApplyToSlides={(ids, next) => applySlideBackground(deck.id, ids, next)}
+            <SlideMediaPanel
+              key={`media-${active.id}`}
+              imagery={
+                variantSupportsImagery(active.variantId)
+                  ? {
+                      available: true,
+                      render: () => (
+                        <SlideImageryPanel
+                          mediaUrl={(active.content as Record<string, unknown>).mediaUrl as string | undefined}
+                          mediaSeed={(active.content as Record<string, unknown>).mediaSeed as string | undefined}
+                          divisionId={deck.brandModeId}
+                          onChange={(next, nextPath) => {
+                            updateField(deck.id, active.id, "mediaUrl", next ?? undefined);
+                            if (nextPath !== undefined) {
+                              updateField(deck.id, active.id, "mediaPath", nextPath ?? undefined);
+                            }
+                          }}
+                        />
+                      ),
+                    }
+                  : undefined
+              }
+              video={
+                variantSupportsVideo(active.variantId)
+                  ? {
+                      available: true,
+                      render: () => (
+                        <SlideVideoPanel
+                          videoUrl={(active.content as Record<string, unknown>).videoUrl as string | undefined}
+                          posterUrl={(active.content as Record<string, unknown>).videoPosterUrl as string | undefined}
+                          autoplay={((active.content as Record<string, unknown>).videoAutoplay as boolean | undefined) ?? true}
+                          loop={((active.content as Record<string, unknown>).videoLoop as boolean | undefined) ?? true}
+                          muted={((active.content as Record<string, unknown>).videoMuted as boolean | undefined) ?? true}
+                          controls={((active.content as Record<string, unknown>).videoControls as boolean | undefined) ?? false}
+                          onChange={(next) => {
+                            if (next.videoUrl !== undefined) {
+                              updateField(deck.id, active.id, "videoUrl", next.videoUrl ?? undefined);
+                            }
+                            if (next.videoPath !== undefined) {
+                              updateField(deck.id, active.id, "videoPath", next.videoPath ?? undefined);
+                            }
+                            if (next.videoPosterUrl !== undefined) {
+                              updateField(deck.id, active.id, "videoPosterUrl", next.videoPosterUrl ?? undefined);
+                            }
+                            if (next.videoPosterPath !== undefined) {
+                              updateField(deck.id, active.id, "videoPosterPath", next.videoPosterPath ?? undefined);
+                            }
+                            if (next.videoAutoplay !== undefined) {
+                              updateField(deck.id, active.id, "videoAutoplay", next.videoAutoplay);
+                            }
+                            if (next.videoLoop !== undefined) {
+                              updateField(deck.id, active.id, "videoLoop", next.videoLoop);
+                            }
+                            if (next.videoMuted !== undefined) {
+                              updateField(deck.id, active.id, "videoMuted", next.videoMuted);
+                            }
+                            if (next.videoControls !== undefined) {
+                              updateField(deck.id, active.id, "videoControls", next.videoControls);
+                            }
+                          }}
+                        />
+                      ),
+                    }
+                  : undefined
+              }
+              background={{
+                render: () => (
+                  <BackgroundImageryPanel
+                    value={(active.content as Record<string, unknown>).background}
+                    onChange={(next) => updateField(deck.id, active.id, "background", next)}
+                    activeSlideId={active.id}
+                    divisionId={deck.brandModeId}
+                    slides={deck.slides.map((sl) => {
+                      const section = byId(SECTION_FRAMEWORKS, sl.sectionId);
+                      const c = sl.content as Record<string, unknown>;
+                      const title =
+                        (typeof c.title === "string" && c.title) ||
+                        (typeof c.headline === "string" && (c.headline as string)) ||
+                        (typeof c.kicker === "string" && (c.kicker as string)) ||
+                        section?.name ||
+                        "Slide";
+                      return {
+                        id: sl.id,
+                        position: sl.position,
+                        sectionId: sl.sectionId,
+                        sectionName: section?.name ?? sl.sectionId,
+                        title: title as string,
+                      };
+                    })}
+                    onApplyToSlides={(ids, next) => applySlideBackground(deck.id, ids, next)}
+                  />
+                ),
+              }}
             />
           )}
 
