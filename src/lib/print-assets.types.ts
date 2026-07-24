@@ -208,6 +208,21 @@ export type AdaptorBriefContent = {
 export type PrintPageSize = "A4" | "Letter" | "Square";
 export type PrintDensity = "compact" | "standard" | "airy";
 export type PrintDistribution = "sales-enablement" | "web-download" | "print";
+export type PrintMode = "light" | "dark";
+
+/** Persisted export panel state — every field a user can tune in the export
+ *  dropdown, so their preset survives reload and can be duplicated. */
+export type PrintExportPrefs = {
+  size?: "A4" | "Letter" | "Square" | "Custom";
+  customW?: number;                       // inches, when size=Custom
+  customH?: number;                       // inches, when size=Custom
+  bleedIn?: number;                       // 0 | 0.125 | 0.25
+  cropMarks?: boolean;
+  mode?: PrintMode;                       // "" means "follow editorMode"
+  quality?: "150dpi" | "300dpi" | "600dpi";
+  format?: "digital" | "press-x4" | "press";
+  iccProfile?: string;                    // IccProfileKey — kept as string to avoid a circular import
+};
 
 export type PrintAssetContext = {
   clientLogoUrl?: string;
@@ -217,6 +232,13 @@ export type PrintAssetContext = {
   density?: PrintDensity;
   contactCard?: boolean;
   printSafeArea?: boolean;
+  /** The mode the editor canvas renders in. Also the default for the export
+   *  panel — WYSIWYG unless the user explicitly overrides it before export. */
+  editorMode?: PrintMode;
+  /** Toggle for the bleed / trim marker overlay on the editor canvas. */
+  showBleedGuides?: boolean;
+  /** Persisted export panel settings. Optional — falls back to defaults. */
+  exportPrefs?: PrintExportPrefs;
 };
 
 export type PrintAssetKind = "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
