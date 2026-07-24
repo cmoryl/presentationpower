@@ -206,7 +206,49 @@ function AssetEditor() {
     }
     window.addEventListener("beforeunload", onBeforeUnload);
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
-  }, [dirty]);
+
+  // Mirror export panel state into ctx.exportPrefs so the user's preset
+  // survives reload — no more re-tuning bleed/quality/ICC on every export.
+  // Skipped until initial hydration completes to avoid overwriting stored
+  // prefs with the useState defaults on first render.
+  const rowIdRef = useRef<string | null>(null);
+  rowIdRef.current = row?.id ?? null;
+  useEffect(() => {
+    if (!exportHydratedRef.current) return;
+    const r = rowRef.current;
+    if (!r) return;
+    const next: PrintExportPrefs = {
+      size: exportSize,
+      customW,
+      customH,
+      bleedIn,
+      cropMarks,
+      mode: exportMode,
+      quality: exportQuality,
+      format: exportFormat,
+      iccProfile,
+    };
+    const ctxNow = (r.context as PrintAssetContext | null) ?? {};
+    const prev = ctxNow.exportPrefs;
+    if (
+      prev &&
+      prev.size === next.size &&
+      prev.customW === next.customW &&
+      prev.customH === next.customH &&
+      prev.bleedIn === next.bleedIn &&
+      prev.cropMarks === next.cropMarks &&
+      prev.mode === next.mode &&
+      prev.quality === next.quality &&
+      prev.format === next.format &&
+      prev.iccProfile === next.iccProfile
+    ) {
+      return;
+    }
+    setRow({ ...r, context: { ...ctxNow, exportPrefs: next } as PrintAssetContext });
+    setDirty(true);
+    // Intentionally do NOT push history for export-panel churn.
+  }, [exportSize, customW, customH, bleedIn, cropMarks, exportMode, exportQuality, exportFormat, iccProfile]);
+
 
 
   useEffect(() => {
