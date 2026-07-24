@@ -247,6 +247,7 @@ function clampPct(n: number): number {
   return Math.max(0, Math.min(100, n));
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function withAlpha(hex: string, alpha: number): string {
   const a = Math.round(clamp01(alpha) * 255).toString(16).padStart(2, "0");
   const h = hex.replace("#", "").trim();
