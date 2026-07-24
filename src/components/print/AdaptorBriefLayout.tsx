@@ -112,47 +112,8 @@ export function AdaptorBriefLayout({
               style={{ background: "#FFFFFF", zIndex: 0 }}
             />
           )}
-          {/* Light mode still carries a subtle top wash (Canva ref pages 3-6). */}
-          {mode === "light" && (
-            <div
-              className="pointer-events-none absolute inset-x-0 top-0"
-              aria-hidden
-              style={{
-                height: "40%",
-                zIndex: 1,
-                background: `linear-gradient(165deg, color-mix(in srgb, ${primary} 16%, transparent) 0%, color-mix(in srgb, ${accent} 9%, transparent) 45%, transparent 80%)`,
-                WebkitMaskImage: "linear-gradient(180deg, black 0%, black 55%, transparent 100%)",
-                maskImage: "linear-gradient(180deg, black 0%, black 55%, transparent 100%)",
-              }}
-            />
-          )}
-          {/* Aurora + accent blooms — dark mode only, clipped to top region.
-              Lower half of the document stays clean (no aura). */}
-          {mode === "dark" && (
-            <div
-              className="pointer-events-none absolute inset-x-0 top-0 overflow-hidden"
-              aria-hidden
-              style={{
-                height: "55%",
-                WebkitMaskImage: "linear-gradient(180deg, black 0%, black 62%, transparent 100%)",
-                maskImage: "linear-gradient(180deg, black 0%, black 62%, transparent 100%)",
-              }}
-            >
-              <div className="pointer-events-none absolute inset-0" style={{ opacity: 0.9 }}>
-                <AuroraLayer
-                  seed={seed ?? `adaptor-${brand.id}-${mode}`}
-                  brand={brand}
-                  intensity={brand.id === "bm-enterprise" ? 0.35 : 0.85}
-                  aspect={auroraAspect(pageSize)}
-                />
-              </div>
-              <div className="pointer-events-none absolute" aria-hidden style={{
-                top: cq(-100), right: cq(-120), width: cq(430), height: cq(430), borderRadius: "50%",
-                background: `radial-gradient(circle at 45% 45%, ${accent}66 0%, ${accent}22 45%, transparent 72%)`,
-                filter: `blur(${cq(10)})`,
-              }} />
-            </div>
-          )}
+          {/* Top color wash removed per design direction — hero reads on the
+              page base color (or the optional hero media band). */}
           {(() => {
             const heroSeed = seed ?? `adaptor-${brand.id}-${mode}`;
             const media = content.heroMedia ?? autoHeroMedia(brand.id, heroSeed, mode);

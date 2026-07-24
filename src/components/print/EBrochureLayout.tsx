@@ -102,51 +102,8 @@ export function EBrochureLayout({
               style={{ background: "#FFFFFF", zIndex: 0 }}
             />
           )}
-          {/* Light mode top wash per Canva reference pages 3-6. */}
-          {mode === "light" && (
-            <div
-              className="pointer-events-none absolute inset-x-0 top-0"
-              aria-hidden
-              style={{
-                height: "40%",
-                zIndex: 1,
-                background: `linear-gradient(165deg, color-mix(in srgb, ${primary} 16%, transparent) 0%, color-mix(in srgb, ${accent} 9%, transparent) 45%, transparent 80%)`,
-                WebkitMaskImage: "linear-gradient(180deg, black 0%, black 55%, transparent 100%)",
-                maskImage: "linear-gradient(180deg, black 0%, black 55%, transparent 100%)",
-              }}
-            />
-          )}
-          {/* Aurora + halo clipped to the top of the page. Lower body stays clean. */}
-          {mode === "dark" && (
-            <div
-              className="pointer-events-none absolute inset-x-0 top-0 overflow-hidden"
-              aria-hidden
-              style={{
-                height: "55%",
-                WebkitMaskImage: "linear-gradient(180deg, black 0%, black 62%, transparent 100%)",
-                maskImage: "linear-gradient(180deg, black 0%, black 62%, transparent 100%)",
-              }}
-            >
-              <AuroraLayer
-                seed={seed ?? `ebrochure-${brand.id}-${mode}`}
-                brand={brand}
-                intensity={brand.id === "bm-enterprise" ? 0.35 : 0.85}
-                aspect={auroraAspect(pageSize)}
-              />
-              <div
-                className="pointer-events-none absolute"
-                style={{
-                  top: cq(-160), left: "50%", transform: "translateX(-50%)",
-                  width: cq(900), height: cq(480),
-                  background:
-                    `radial-gradient(ellipse at 30% 30%, ${accent}66 0%, transparent 55%),` +
-                    `radial-gradient(ellipse at 75% 20%, ${accent}55 0%, transparent 55%)`,
-                  filter: `blur(${cq(8)})`,
-                  opacity: 0.85,
-                }}
-              />
-            </div>
-          )}
+          {/* Top color wash removed per design direction — hero reads on the
+              page base color (or the optional hero media band). */}
           {content.heroMedia ? (
             <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
           ) : mode === "light" ? (
