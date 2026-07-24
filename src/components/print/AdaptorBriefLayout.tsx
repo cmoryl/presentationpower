@@ -119,7 +119,7 @@ export function AdaptorBriefLayout({
             {/* HERO — wrapped in a relative container so a localized text-backing
                 scrim travels with the copy block rather than introducing a
                 full-width top wash. */}
-            <div style={{ position: "relative" }}>
+            <div data-section="hero" data-section-label="Hero" style={{ position: "relative" }}>
               <div style={heroCopyScrimStyle(mode)} aria-hidden />
               <div className="relative flex items-center justify-between" style={{ gap: cq(10) }}>
                 <PrintEyebrow
