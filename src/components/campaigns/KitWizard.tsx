@@ -589,6 +589,43 @@ export function KitWizard({
               </button>
             }
           >
+            {/* Save this kit — name + save button, always visible on review. */}
+            <div className="mb-5 rounded-2xl border border-[#003FC7]/25 bg-[#003FC7]/[0.04] p-4">
+              <div className="flex flex-wrap items-end gap-3">
+                <label className="flex-1 min-w-[240px] text-sm">
+                  <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-[#003FC7]">
+                    {savedKitId ? "Saved kit name" : "Name this kit to save it"}
+                  </div>
+                  <input
+                    type="text"
+                    value={kitName}
+                    onChange={(e) => setKitName(e.target.value)}
+                    placeholder={
+                      surface === "event"
+                        ? "e.g. TP Next · Berlin launch kit"
+                        : "e.g. Life Sciences · Q3 anthem"
+                    }
+                    className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                    maxLength={120}
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={saving || hydrating}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:bg-[#03002C] disabled:opacity-50"
+                >
+                  <Save size={12} />
+                  {saving ? "Saving…" : savedKitId ? "Update saved kit" : "Save to my kits"}
+                </button>
+              </div>
+              <p className="mt-2 text-[11px] text-black/55">
+                {savedKitId
+                  ? "This kit lives in your kits list — updates overwrite the saved copy."
+                  : `Saved kits appear on ${surface === "event" ? "/events" : "/social"} under "Your saved kits" so you can reopen or duplicate them any time.`}
+              </p>
+            </div>
+
             {source == null ? (
               <EmptyState
                 title="Add a headline to see your kit."
