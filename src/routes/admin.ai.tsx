@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { getAiAnalytics } from "@/lib/admin.functions";
+import { hasAiKey } from "@/lib/ai-status.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 
 export const Route = createFileRoute("/admin/ai")({
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/admin/ai")({
 
 function AiView() {
   const fn = useServerFn(getAiAnalytics);
+  const statusFn = useServerFn(hasAiKey);
   const [days, setDays] = useState(30);
   const [brand, setBrand] = useState("");
   const q = useQuery({
@@ -18,11 +20,45 @@ function AiView() {
     queryFn: () => fn({ data: { days, brandId: brand || undefined } }),
     retry: false,
   });
+  const status = useQuery({
+    queryKey: ["admin", "ai-provider"],
+    queryFn: () => statusFn(),
+    retry: false,
+    staleTime: 60_000,
+  });
 
   if (q.error && isForbidden(q.error)) return <AdminForbidden />;
 
+
+
   return (
     <div className="space-y-8">
+      {status.data && (
+        <div
+          className={`flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-sm ${
+            status.data.provider === "none"
+              ? "border-amber-300 bg-amber-50 text-amber-900"
+              : status.data.provider === "anthropic"
+                ? "border-emerald-300 bg-emerald-50 text-emerald-900"
+                : "border-sky-300 bg-sky-50 text-sky-900"
+          }`}
+        >
+          <div>
+            <div className="text-xs uppercase tracking-widest opacity-70">Active AI provider</div>
+            <div className="font-semibold">{status.data.label}</div>
+            {status.data.model && <div className="text-xs opacity-70">Model: {status.data.model}</div>}
+          </div>
+          <div className="text-xs opacity-80">
+            {status.data.provider === "anthropic" &&
+              "Direct Anthropic Messages API. Preferred when ANTHROPIC_API_KEY is set."}
+            {status.data.provider === "lovable-gateway" &&
+              "Fallback via LOVABLE_API_KEY. Add ANTHROPIC_API_KEY in Project Settings → Secrets to switch."}
+            {status.data.provider === "none" &&
+              "No provider configured. Copilot, Strategist, Reviewer, and Oracle are disabled."}
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center gap-2">
         <label className="text-xs uppercase tracking-widest text-black/50">Window</label>
         {[7, 14, 30, 60, 90].map((d) => (
