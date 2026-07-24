@@ -81,7 +81,7 @@ function SocialView() {
   return (
     <>
       {/* Hero */}
-      <header className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/60 to-[#EC388a15] px-6 py-14 sm:-mt-10 sm:px-12 lg:px-24 lg:py-20">
+      <header className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/60 to-[#EC388a15] py-14 sm:-mt-10 lg:py-20">
         <div className="mx-auto max-w-7xl">
         <div className="max-w-3xl space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">

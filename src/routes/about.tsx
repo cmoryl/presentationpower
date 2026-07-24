@@ -335,7 +335,7 @@ function AboutPage() {
 
   return (
     <AppShell>
-      <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] px-6 py-14 sm:-mt-10 sm:px-12 lg:px-24 lg:py-20">
+      <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-14 sm:-mt-10 lg:py-20">
         <div className="mx-auto max-w-6xl">
           <div className="flex items-baseline justify-between gap-6">
             <div>
@@ -468,7 +468,7 @@ function AboutPage() {
         </section>
 
         {/* Stack */}
-        <section className="mt-16 mb-8 rounded-2xl border border-black/10 bg-[#03002C] p-8 text-white">
+        <section className="mt-16 mb-8 rounded-2xl border border-black/10 bg-[#03002C] py-8 text-white">
           <div className="grid gap-8 md:grid-cols-[1fr_1fr]">
             <div>
               <div className="text-[10px] uppercase tracking-[0.3em] text-white/50">

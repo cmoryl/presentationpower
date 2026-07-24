@@ -285,7 +285,7 @@ function PrintCenterPage() {
 
   return (
     <AppShell>
-      <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#FF9B7022] px-6 py-14 sm:-mt-10 sm:px-12 lg:px-24 lg:py-20">
+      <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#FF9B7022] py-14 sm:-mt-10 lg:py-20">
         <div className="mx-auto max-w-[1400px]">
           <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library · Print</div>
           <div className="mt-3"><LibrarySubnav active="/library/print" /></div>
@@ -377,9 +377,9 @@ function PrintCenterPage() {
         </div>
 
         {assetsQuery.isLoading ? (
-          <div className="rounded-2xl border border-black/10 bg-white p-8 text-sm text-black/60">Loading…</div>
+          <div className="rounded-2xl border border-black/10 bg-white py-8 text-sm text-black/60">Loading…</div>
         ) : assetsQuery.error ? (
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-sm text-red-700">
+          <div className="rounded-2xl border border-red-200 bg-red-50 py-8 text-sm text-red-700">
             Couldn't load your print assets: {(assetsQuery.error as Error).message}
           </div>
         ) : (assetsQuery.data?.length ?? 0) === 0 ? (
@@ -1021,7 +1021,7 @@ function DivisionHeroShelf({ brand }: { brand: BrandMode }) {
       </div>
 
       {ranked.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-black/15 bg-white p-8 text-center text-sm text-black/55">
+        <div className="rounded-2xl border border-dashed border-black/15 bg-white py-8 text-center text-sm text-black/55">
           No approved imagery targeted at this template yet.
         </div>
       ) : (

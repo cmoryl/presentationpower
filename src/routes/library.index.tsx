@@ -479,7 +479,7 @@ function Library() {
 
   return (
     <AppShell>
-      <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] px-6 py-14 sm:-mt-10 sm:px-12 lg:px-24 lg:py-20 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
+      <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-14 sm:-mt-10 lg:py-20 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
         <div className="mx-auto max-w-[1400px]">
           <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">Library</div>
           <div className="mt-3"><LibrarySubnav active="/library" /></div>
@@ -1759,7 +1759,7 @@ function VariantDetailModal({
       >
 
         {/* Header */}
-        <div className="flex items-center justify-between gap-4 border-b border-black/10 px-6 py-4">
+        <div className="flex items-center justify-between gap-4 border-b border-black/10 py-4">
           <div className="min-w-0">
             <div className="flex items-center gap-2 font-mono text-xs text-black/50">
               <span>{variant.id}</span>
@@ -2158,7 +2158,7 @@ function VariantDetailModal({
           onClick={(e) => e.stopPropagation()}
           className="flex h-[92vh] w-full max-w-[1600px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0A0821] text-white shadow-2xl"
         >
-          <div className="flex items-center justify-between gap-4 border-b border-white/10 px-6 py-4">
+          <div className="flex items-center justify-between gap-4 border-b border-white/10 py-4">
             <div className="min-w-0">
               <div className="text-xs uppercase tracking-widest text-white/60">PDF preview · {previewUrls.ratio === 3840 ? "4K" : "HD"} · {previewUrls.ratio}×{Math.round(previewUrls.ratio * 9 / 16)}{previewUrls.ratio !== pixelRatio ? ` (current selection: ${pixelRatio === 3840 ? "4K" : "HD"} — re-render to update)` : ""}</div>
               <div className="mt-1 truncate text-lg font-semibold">{variant.name} — {brand.name}</div>
@@ -2458,7 +2458,7 @@ function LightboxPortal({
     >
       {/* Top chrome */}
       <div
-        className="flex shrink-0 items-center justify-between gap-4 border-b border-white/10 px-6 py-4"
+        className="flex shrink-0 items-center justify-between gap-4 border-b border-white/10 py-4"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex min-w-0 items-center gap-3">
@@ -2522,7 +2522,7 @@ function LightboxPortal({
       </div>
 
       {/* Bottom hint */}
-      <div className="shrink-0 border-t border-white/10 px-6 py-3 text-center text-[11px] text-white/40" onClick={(e) => e.stopPropagation()}>
+      <div className="shrink-0 border-t border-white/10 py-3 text-center text-[11px] text-white/40" onClick={(e) => e.stopPropagation()}>
         <span className="mx-2"><kbd className="rounded border border-white/20 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-white/70">Esc</kbd> close</span>
         <span className="mx-2"><kbd className="rounded border border-white/20 bg-white/5 px-1.5 py-0.5 font-mono text-[10px] text-white/70">← →</kbd> toggle theme</span>
         <span className="mx-2">Click <span className="inline-block rounded-full bg-white/10 px-1.5 py-0.5 text-white/70">▶</span> to play video</span>

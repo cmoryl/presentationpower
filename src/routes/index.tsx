@@ -183,7 +183,7 @@ function Dashboard() {
     <AppShell>
       {/* ================= HERO ================= */}
       <section
-        className="full-bleed relative -mt-6 overflow-hidden border-b border-white/10 bg-[#03002C] p-8 text-white sm:-mt-10 sm:p-14 lg:px-24 lg:py-20"
+        className="full-bleed relative -mt-6 overflow-hidden border-b border-white/10 bg-[#03002C] py-8 text-white sm:-mt-10 sm:py-14 lg:py-20"
       >
         {/* animated aurora blobs — reactive to selected mode */}
         <AuroraHero mode={mode} />
