@@ -550,7 +550,7 @@ export function AuroraLayer({
             </radialGradient>
           ))}
           <filter id={`tp-aurora-${seed}-blur`} x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation={mode === "dark" ? 55 : 80} />
+            <feGaussianBlur stdDeviation={mode === "dark" ? 55 : 110} />
           </filter>
         </defs>
         <g filter={`url(#tp-aurora-${seed}-blur)`}>
@@ -572,7 +572,9 @@ export function AuroraLayer({
           aria-hidden
           className="absolute inset-0"
           style={{
-            backgroundImage: `linear-gradient(to left, ${hexA(brand.tokens.accent, 0.10)} 0%, ${hexA(brand.tokens.accent, 0.045)} 35%, rgba(255,255,255,0) 70%)`,
+            // Extra white scrim to guarantee logos/content are never
+            // fighting the aurora on light slides. Fades from right to left.
+            backgroundImage: `linear-gradient(to left, ${hexA(brand.tokens.accent, 0.05)} 0%, ${hexA(brand.tokens.accent, 0.02)} 35%, rgba(255,255,255,0) 70%), linear-gradient(to bottom, rgba(255,255,255,0.35), rgba(255,255,255,0.15))`,
           }}
         />
       )}
