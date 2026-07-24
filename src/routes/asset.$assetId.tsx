@@ -1845,23 +1845,39 @@ function StatsInlineEditor({
   };
   return (
     <>
-      <select className={inspectorInput} value={section.variantId} onChange={(e) => onPatch({ variantId: e.target.value as PrintStatsVariant })}>
-        {PRINT_STATS_VARIANTS.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
-      </select>
-      <input className={inspectorInput} placeholder="Eyebrow" value={section.eyebrow ?? ""} onChange={(e) => onPatch({ eyebrow: e.target.value })} />
-      <input className={inspectorInput} placeholder="Title" value={section.title ?? ""} onChange={(e) => onPatch({ title: e.target.value })} />
-      <ArrayEditor
-        items={section.items}
-        onChange={(items) => onPatch({ items })}
-        add={() => ({ label: "", value: "", unit: "" }) as PrintStatsSection["items"][number]}
-        row={(it, idx) => (
-          <div className="grid grid-cols-[1fr_60px_50px] gap-1">
-            <input className={inspectorInput} placeholder="Label" value={it.label} onChange={(e) => patchItem(idx, { label: e.target.value })} />
-            <input className={inspectorInput} placeholder="Value" value={it.value} onChange={(e) => patchItem(idx, { value: e.target.value })} />
-            <input className={inspectorInput} placeholder="Unit" value={it.unit ?? ""} onChange={(e) => patchItem(idx, { unit: e.target.value })} />
-          </div>
-        )}
-      />
+      <LabeledField label="Layout style">
+        <select className={inspectorInput} value={section.variantId} onChange={(e) => onPatch({ variantId: e.target.value as PrintStatsVariant })}>
+          {PRINT_STATS_VARIANTS.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
+        </select>
+      </LabeledField>
+      <div className="grid grid-cols-2 gap-2">
+        <LabeledField label="Eyebrow">
+          <input className={inspectorInput} placeholder="e.g. Impact at a glance" value={section.eyebrow ?? ""} onChange={(e) => onPatch({ eyebrow: e.target.value })} />
+        </LabeledField>
+        <LabeledField label="Title">
+          <input className={inspectorInput} placeholder="e.g. By the numbers" value={section.title ?? ""} onChange={(e) => onPatch({ title: e.target.value })} />
+        </LabeledField>
+      </div>
+      <div className="pt-1">
+        <div className="mb-1 flex items-center justify-between">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/55 dark:text-white/55">Stat items</span>
+          <span className="text-[10px] text-black/40 dark:text-white/40">{section.items.length} · label / value / unit</span>
+        </div>
+        <ArrayEditor
+          items={section.items}
+          onChange={(items) => onPatch({ items })}
+          add={() => ({ label: "", value: "", unit: "" }) as PrintStatsSection["items"][number]}
+          row={(it, idx) => (
+            <div className="space-y-1">
+              <input className={inspectorInput} placeholder="Label (what it measures)" value={it.label} onChange={(e) => patchItem(idx, { label: e.target.value })} />
+              <div className="grid grid-cols-[1fr_1fr] gap-1">
+                <input className={inspectorInput} placeholder="Value (e.g. 48)" value={it.value} onChange={(e) => patchItem(idx, { value: e.target.value })} />
+                <input className={inspectorInput} placeholder="Unit (e.g. hr, %, M)" value={it.unit ?? ""} onChange={(e) => patchItem(idx, { unit: e.target.value })} />
+              </div>
+            </div>
+          )}
+        />
+      </div>
     </>
   );
 }
