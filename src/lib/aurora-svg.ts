@@ -113,8 +113,10 @@ export function auroraOrbs(
     mode === "dark"
       ? [darkFirst, brand.tokens.accent, sibling]
       : [lightPrimary, brand.tokens.accent, sibling];
-  const alphaBase = mode === "dark" ? 0.82 : 0.55;
-  const alphaRange = mode === "dark" ? 0.15 : 0.15;
+  // Light mode toned down further (0.55 → 0.32) so aurora orbs never
+  // overpower logos, text, or module chrome on white slides.
+  const alphaBase = mode === "dark" ? 0.82 : 0.32;
+  const alphaRange = mode === "dark" ? 0.15 : 0.08;
 
   const useAspect =
     aspect &&
