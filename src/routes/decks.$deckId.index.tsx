@@ -39,6 +39,7 @@ import { BackgroundImageryPanel } from "@/components/slide/BackgroundImageryPane
 import { PptxPreviewModal } from "@/components/slide/PptxPreviewModal";
 import { SlideImageryPanel } from "@/components/slide/SlideImageryPanel";
 import { SlideVideoPanel } from "@/components/slide/SlideVideoPanel";
+import { SlideMediaPanel } from "@/components/slide/SlideMediaPanel";
 import { variantSupportsImagery, variantSupportsVideo } from "@/lib/variant-media";
 import { SlideMediaRefreshProvider, SlideThumbnailContext, SlideVideoPreviewContext } from "@/lib/slide-media-refresh";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
