@@ -2063,6 +2063,47 @@ export const useDeckStore = create<DeckState>()(
         }));
       },
 
+      setSlideInkOverride: (deckId, slideId, path, color) => {
+        pushHistory();
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const hex = typeof color === "string" ? color.trim() : "";
+        const valid = /^#[0-9a-fA-F]{6}$/.test(hex);
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) => {
+                if (sl.id !== slideId) return sl;
+                const prev = sl.inkOverrides ?? {};
+                const next: Record<string, string> = { ...prev };
+                if (!color || !valid) delete next[path];
+                else next[path] = hex.toLowerCase();
+                return { ...sl, inkOverrides: Object.keys(next).length ? next : undefined };
+              }),
+            },
+          },
+        }));
+      },
+
+      clearSlideInkOverrides: (deckId, slideId) => {
+        pushHistory();
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) =>
+                sl.id === slideId ? { ...sl, inkOverrides: undefined } : sl,
+              ),
+            },
+          },
+        }));
+      },
+
 
       swapVariant: (deckId, slideId, newVariantId) => {
         const deck = get().decks[deckId];
