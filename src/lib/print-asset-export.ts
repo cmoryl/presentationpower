@@ -110,7 +110,29 @@ export interface PrintExportOptions {
   onProgress?: ExportProgressCallback;
   /** Fires when the requested DPI cannot be honored (canvas ceiling reached). */
   onQualityClamp?: (info: PrintExportQualityClampInfo) => void;
+  /**
+   * Enable vector-text overlay (two-pass render): hide DOM text during
+   * raster capture, then draw the same visual lines with embedded Geist
+   * on top. Text becomes selectable, searchable, and press-sharp.
+   *
+   * Defaults to ON for `press` and `press-x4` (print-asset routes only),
+   * OFF for `digital`. Pass `false` to force raster-only.
+   */
+  vectorText?: boolean;
+  /** Fires once the vector-text overlay has been drawn (diagnostics). */
+  onVectorTextReport?: (report: VectorTextReport) => void;
 }
+
+export interface VectorTextReport {
+  enabled: boolean;
+  linesDrawn: number;
+  glyphOnlyLines: number;
+  fontResources: string[];
+  rasterBytes: number;
+  finalBytes: number;
+  skippedClamped: number;
+}
+
 
 function resolveTrim(opts: PrintExportOptions): PrintPageDimensions {
   if (opts.pageSize === "Custom") {
