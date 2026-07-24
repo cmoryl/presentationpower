@@ -1389,29 +1389,40 @@ function VariantDetailModal({
     if (pdfBusy) return;
     setPdfBusy(exportMode);
     setPdfStage(null);
+    const resLabel = pixelRatio === 3840 ? "4k" : "hd";
+    const filename = `${variant.id}-${brand.id}-${exportMode}-${resLabel}-review.pdf`;
+    const toastId = `export-pdf-${variant.id}-${exportMode}`;
+    const modeLabel = exportMode === "light" ? "Light" : "Dark";
+    toast.loading(`Preparing ${modeLabel} PDF · ${resLabel.toUpperCase()}`, {
+      id: toastId, description: `${filename} — starting…`, duration: Infinity,
+    });
     try {
       const node = document.querySelector<HTMLElement>(
         `[data-modal-preview="${exportMode}"][data-variant-id="${variant.id}"]`,
       );
       if (!node) throw new Error(`Preview node not found for ${exportMode} mode`);
       const mod = await import("@/lib/slide-image-export");
-      const resLabel = pixelRatio === 3840 ? "4k" : "hd";
-      const filename = `${variant.id}-${brand.id}-${exportMode}-${resLabel}-review.pdf`;
       await mod.exportSlidesAsImagePdf(
         [{ node, mode: exportMode }],
         {
           filename,
           targetWidth: pixelRatio,
-          onProgress: (p) => setPdfStage(p.message ?? p.stage),
+          onProgress: (p) => {
+            const msg = p.message ?? p.stage;
+            setPdfStage(msg);
+            toast.loading(`Exporting ${modeLabel} PDF · ${resLabel.toUpperCase()}`, {
+              id: toastId, description: `${filename} — ${msg}`, duration: Infinity,
+            });
+          },
         },
       );
-      toast.success(`${exportMode === "light" ? "Light" : "Dark"} PDF exported at ${resLabel.toUpperCase()} (${pixelRatio}×${Math.round(pixelRatio * 9 / 16)})`, {
-        description: filename,
+      toast.success(`${modeLabel} PDF downloaded · ${resLabel.toUpperCase()} (${pixelRatio}×${Math.round(pixelRatio * 9 / 16)})`, {
+        id: toastId, description: filename, duration: 5000,
       });
 
     } catch (err) {
       console.error("[library] image PDF export failed", err);
-      toast.error("PDF export failed", { description: "Check console for details." });
+      toast.error("PDF export failed", { id: toastId, description: "Check console for details.", duration: 6000 });
     } finally {
       setPdfBusy(null);
       setPdfStage(null);
@@ -1421,6 +1432,12 @@ function VariantDetailModal({
     if (pdfBusy || bothBusy) return;
     setBothBusy(true);
     setPdfStage(null);
+    const resLabel = pixelRatio === 3840 ? "4k" : "hd";
+    const filename = `${variant.id}-${brand.id}-both-${resLabel}-review.pdf`;
+    const toastId = `export-pdf-both-${variant.id}`;
+    toast.loading(`Preparing combined PDF · ${resLabel.toUpperCase()}`, {
+      id: toastId, description: `${filename} — starting…`, duration: Infinity,
+    });
     try {
       const findNode = (m: "light" | "dark") => document.querySelector<HTMLElement>(
         `[data-modal-preview="${m}"][data-variant-id="${variant.id}"]`,
@@ -1429,21 +1446,27 @@ function VariantDetailModal({
       const darkNode = findNode("dark");
       if (!lightNode || !darkNode) throw new Error("Preview nodes not found for both modes");
       const mod = await import("@/lib/slide-image-export");
-      const resLabel = pixelRatio === 3840 ? "4k" : "hd";
-      const filename = `${variant.id}-${brand.id}-both-${resLabel}-review.pdf`;
       await mod.exportSlidesAsImagePdf(
         [{ node: lightNode, mode: "light" }, { node: darkNode, mode: "dark" }],
         {
           filename,
           targetWidth: pixelRatio,
-          onProgress: (p) => setPdfStage(p.message ?? p.stage),
+          onProgress: (p) => {
+            const msg = p.message ?? p.stage;
+            setPdfStage(msg);
+            toast.loading(`Exporting combined PDF · ${resLabel.toUpperCase()}`, {
+              id: toastId, description: `${filename} — ${msg}`, duration: Infinity,
+            });
+          },
         },
       );
-      toast.success(`Both themes PDF exported at ${resLabel.toUpperCase()} (${pixelRatio}×${Math.round(pixelRatio * 9 / 16)})`, { description: filename });
+      toast.success(`Combined PDF downloaded · ${resLabel.toUpperCase()} (${pixelRatio}×${Math.round(pixelRatio * 9 / 16)})`, {
+        id: toastId, description: filename, duration: 5000,
+      });
 
     } catch (err) {
       console.error("[library] both-theme PDF export failed", err);
-      toast.error("Combined PDF export failed", { description: "Check console for details." });
+      toast.error("Combined PDF export failed", { id: toastId, description: "Check console for details.", duration: 6000 });
     } finally {
       setBothBusy(false);
       setPdfStage(null);
@@ -1457,7 +1480,12 @@ function VariantDetailModal({
       return;
     }
     setZipBusy(true);
-    setZipStage("Starting…");
+    const zipToastId = `export-zip-${variant.id}`;
+    const updateStage = (msg: string) => {
+      setZipStage(msg);
+      toast.loading("Building module bundle", { id: zipToastId, description: msg, duration: Infinity });
+    };
+    updateStage("Starting…");
     try {
       const findNode = (m: "light" | "dark") => document.querySelector<HTMLElement>(
         `[data-modal-preview="${m}"][data-variant-id="${variant.id}"]`,
@@ -1490,11 +1518,11 @@ function VariantDetailModal({
       let lightPptx: Awaited<ReturnType<typeof exportDeckToPptx>> | null = null;
       let darkPptx: Awaited<ReturnType<typeof exportDeckToPptx>> | null = null;
       if (zipSelection.pptxLight) {
-        setZipStage("Building light PPTX…");
+        updateStage("Building light PPTX…");
         lightPptx = await exportDeckToPptx(buildDeck("light"), brand, { forceMode: "light", output: "blob" });
       }
       if (zipSelection.pptxDark) {
-        setZipStage("Building dark PPTX…");
+        updateStage("Building dark PPTX…");
         darkPptx = await exportDeckToPptx(buildDeck("dark"), brand, { forceMode: "dark", output: "blob" });
       }
 
@@ -1504,31 +1532,31 @@ function VariantDetailModal({
       let lightPng: string | null = null;
       let darkPng: string | null = null;
       if (zipSelection.pdfLight && lightNode) {
-        setZipStage("Rendering light PDF…");
+        updateStage("Rendering light PDF…");
         lightPdf = (await imgMod.exportSlidesAsImagePdf(
           [{ node: lightNode, mode: "light" }],
-          { filename: "light.pdf", targetWidth: pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Light PDF · ${p.message ?? p.stage}`) },
+          { filename: "light.pdf", targetWidth: pixelRatio, returnBlob: true, onProgress: (p) => updateStage(`Light PDF · ${p.message ?? p.stage}`) },
         )) as Blob;
       }
       if (zipSelection.pdfDark && darkNode) {
-        setZipStage("Rendering dark PDF…");
+        updateStage("Rendering dark PDF…");
         darkPdf = (await imgMod.exportSlidesAsImagePdf(
           [{ node: darkNode, mode: "dark" }],
-          { filename: "dark.pdf", targetWidth: pixelRatio, returnBlob: true, onProgress: (p) => setZipStage(`Dark PDF · ${p.message ?? p.stage}`) },
+          { filename: "dark.pdf", targetWidth: pixelRatio, returnBlob: true, onProgress: (p) => updateStage(`Dark PDF · ${p.message ?? p.stage}`) },
         )) as Blob;
       }
       if (zipSelection.pngLight && lightNode) {
-        setZipStage("Rendering light PNG…");
+        updateStage("Rendering light PNG…");
         lightPng = await imgMod.captureSlide(lightNode, { targetWidth: pixelRatio });
       }
       if (zipSelection.pngDark && darkNode) {
-        setZipStage("Rendering dark PNG…");
+        updateStage("Rendering dark PNG…");
         darkPng = await imgMod.captureSlide(darkNode, { targetWidth: pixelRatio });
       }
 
       const dataUrlToBlob = async (u: string) => (await fetch(u)).blob();
 
-      setZipStage("Zipping…");
+      updateStage("Zipping…");
       const { default: JSZip } = await import("jszip");
       const zip = new JSZip();
       const base = `${variant.id}-${brand.id}`;
@@ -1556,11 +1584,11 @@ function VariantDetailModal({
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      toast.success("Module ZIP exported", { description: `${filename} · ${included.length} file${included.length === 1 ? "" : "s"} at ${resDisplay}` });
+      toast.success("Module ZIP downloaded", { id: zipToastId, description: `${filename} · ${included.length} file${included.length === 1 ? "" : "s"} at ${resDisplay}`, duration: 5000 });
 
     } catch (err) {
       console.error("[library] module ZIP export failed", err);
-      toast.error("ZIP export failed", { description: "Check console for details." });
+      toast.error("ZIP export failed", { id: zipToastId, description: "Check console for details.", duration: 6000 });
     } finally {
       setZipBusy(false);
       setZipStage(null);
@@ -2104,25 +2132,42 @@ function ModalABPreview({
     if (!node) return;
     setImageBusy(`${kind}-${m}`);
     setImageStage(null);
+    const resLabel = pixelRatio === 3840 ? "4k" : "hd";
+    const base = `${variant.id}-${brand.id}-${m}-${resLabel}`;
+    const filename = `${base}.${kind}`;
+    const toastId = `export-${variant.id}-${m}-${kind}`;
+    const kindLabel = kind.toUpperCase();
+    const modeLabel = m === "light" ? "Light" : "Dark";
+    toast.loading(`Preparing ${modeLabel} ${kindLabel} · ${resLabel.toUpperCase()}`, {
+      id: toastId,
+      description: `${filename} — starting…`,
+      duration: Infinity,
+    });
     try {
-      const resLabel = pixelRatio === 3840 ? "4k" : "hd";
-      const base = `${variant.id}-${brand.id}-${m}-${resLabel}`;
-      const filename = `${base}.${kind}`;
       const mod = await import("@/lib/slide-image-export");
-      const onProgress = (p: { stage: string; message?: string }) =>
-        setImageStage(p.message ?? p.stage);
+      const onProgress = (p: { stage: string; message?: string }) => {
+        const msg = p.message ?? p.stage;
+        setImageStage(msg);
+        toast.loading(`Exporting ${modeLabel} ${kindLabel} · ${resLabel.toUpperCase()}`, {
+          id: toastId,
+          description: `${filename} — ${msg}`,
+          duration: Infinity,
+        });
+      };
       if (kind === "png") {
         await mod.exportSlideAsPng(node, { mode: m, filename, targetWidth: pixelRatio, onProgress });
       } else {
         await mod.exportSlidesAsImagePdf([{ node, mode: m }], { filename, targetWidth: pixelRatio, onProgress });
       }
-      toast.success(`${m === "light" ? "Light" : "Dark"} ${kind.toUpperCase()} exported at ${resLabel.toUpperCase()} (${pixelRatio}×${Math.round(pixelRatio * 9 / 16)})`, {
+      toast.success(`${modeLabel} ${kindLabel} downloaded · ${resLabel.toUpperCase()} (${pixelRatio}×${Math.round(pixelRatio * 9 / 16)})`, {
+        id: toastId,
         description: filename,
+        duration: 5000,
       });
 
     } catch (err) {
       console.error("[library] image export failed", err);
-      toast.error("Image export failed", { description: "See console for details." });
+      toast.error(`${kindLabel} export failed`, { id: toastId, description: "See console for details.", duration: 6000 });
     } finally {
       setImageBusy(null);
       setImageStage(null);
