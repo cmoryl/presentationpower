@@ -275,6 +275,19 @@ function AssetEditor() {
     [brandModes, row?.brand_mode_id],
   );
 
+  const kindForAudit = (row?.kind ?? "case-study") as "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    if (!row) return;
+    import("@/lib/print-content-schema").then(({ schemaFor: sf, unreachablePaths, fullyPopulatedSample }) => {
+      const dead = unreachablePaths(sf(kindForAudit), fullyPopulatedSample(kindForAudit));
+      if (dead.length > 0) {
+        // eslint-disable-next-line no-console
+        console.warn(`[print-content-schema] Unreachable fields for kind="${kindForAudit}":`, dead);
+      }
+    });
+  }, [kindForAudit, row]);
+
   if (loading) return <AppShell><div className="p-10 text-sm text-black/60">Loading…</div></AppShell>;
   if (!row) return <AppShell><div className="p-10 text-sm text-red-600">Print asset not found.</div></AppShell>;
 
@@ -381,23 +394,7 @@ function AssetEditor() {
   }
   const editableFieldPaths = collectStringPaths(rawContent);
 
-  // Dev-time safety net: if a content field slips into the schema without a
-  // matching editor path, warn loudly rather than let it silently disappear
-  // from the UI (the exact class of bug that stranded `client`, `eyebrow`,
-  // etc. before the Content inspector existed).
-  useEffect(() => {
-    if (!import.meta.env.DEV) return;
-    import("@/lib/print-content-schema").then(({ schemaFor: sf, unreachablePaths, fullyPopulatedSample }) => {
-      const dead = unreachablePaths(sf(kind), fullyPopulatedSample(kind));
-      if (dead.length > 0) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          `[print-content-schema] Unreachable fields for kind="${kind}":`,
-          dead,
-        );
-      }
-    });
-  }, [kind]);
+  // Dev-time schema audit moved above early returns to preserve hook order.
 
 
   function updateStat(i: number, patch: Partial<CaseStudyStat>) {
