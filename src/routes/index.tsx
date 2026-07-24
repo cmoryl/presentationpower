@@ -96,8 +96,8 @@ const MODES: ModeDef[] = [
     icon: CalendarDays,
     accent: "#A6FA87",
     glow: "#C2A3FF",
-    eyebrow: "Playbooks · phased",
-    headline: "Every event kit, pre-mapped by phase.",
+    eyebrow: "Modular playbooks · phased",
+    headline: "Every event kit, modular and pre-mapped by phase.",
     copy: "Product launches, flagship conferences, webinars, exec briefings — each with cadenced deliverables, KPI benchmarks, and rendered live demos.",
     actions: [
       { label: "Open Events hub", to: "/events", primary: true },
