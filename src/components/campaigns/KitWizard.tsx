@@ -7,11 +7,12 @@
 
 import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, RefreshCw, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, RefreshCw, Sparkles, Wand2 } from "lucide-react";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import {
   SOCIAL_FORMATS_BY_ID,
   KIT_PROFILES,
+  getFormat,
 } from "@/lib/social-formats";
 import {
   buildCampaignAssets,
@@ -19,7 +20,21 @@ import {
   type CampaignSource,
   type CampaignAsset,
 } from "@/lib/campaigns";
+import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
+
+/** First playbook copy for a given brand — the canonical division voice. */
+function exampleCopyForBrand(brandId: string) {
+  const pb = SOCIAL_PLAYBOOKS.find((p) => p.subBrand === brandId);
+  return (
+    pb?.copy ?? {
+      title: "Every language. Every content type. One partner.",
+      summary:
+        "TransPerfect powers global content across 200+ languages, from clinical trials to gaming to enterprise ops.",
+      cta: "See how we work",
+    }
+  );
+}
 
 const WIZARD_STEPS = [
   { key: "brand", label: "Brand" },
@@ -212,7 +227,11 @@ export function KitWizard({
       {/* Step body */}
       <div className="min-h-[320px]">
         {step === 0 && (
-          <StepCard eyebrow="Step 1 of 5" title="Which brand is this kit for?">
+          <StepCard
+            eyebrow="Step 1 of 5"
+            title="Which brand is this kit for?"
+            description="Pick a division — accent, ink, surface, and logo lockup flow through every asset. You can override any of them later."
+          >
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {BRAND_MODES.map((b) => {
                 const selected = b.id === brandId;
@@ -221,20 +240,40 @@ export function KitWizard({
                     key={b.id}
                     type="button"
                     onClick={() => setBrandId(b.id)}
-                    className={`rounded-2xl border p-3 text-left text-sm transition ${
+                    className={`group flex items-center gap-3 rounded-2xl border p-3 text-left text-sm transition ${
                       selected
                         ? "border-[#003FC7] bg-[#003FC7]/[0.06] ring-1 ring-[#003FC7]/40"
                         : "border-black/10 bg-white/70 hover:border-[#003FC7]/40"
                     }`}
                   >
-                    <div className="font-medium text-black/85">{b.name}</div>
-                    <div className="text-[10px] uppercase tracking-widest text-black/45">
-                      {b.id}
-                    </div>
+                    <span
+                      className="grid h-11 w-11 shrink-0 place-items-center rounded-xl ring-1 ring-black/10"
+                      style={{ background: b.tokens.primary }}
+                      aria-hidden
+                    >
+                      <span
+                        className="h-4 w-4 rounded-full ring-2 ring-white/80"
+                        style={{ background: b.tokens.accent }}
+                      />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-medium text-black/85">{b.name}</span>
+                      <span className="mt-0.5 flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-black/45">
+                        <span className="font-mono normal-case tracking-normal">
+                          {b.tokens.accent}
+                        </span>
+                        <span>·</span>
+                        <span>accent</span>
+                      </span>
+                    </span>
                   </button>
                 );
               })}
             </div>
+
+            {/* Live preview — reflects the accent + logo of the current brand. */}
+            <BrandPreview brandId={brandId} manualCopy={manualCopy} />
+
             <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-3">
               <div className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-black/50">
                 Render mode
@@ -257,8 +296,29 @@ export function KitWizard({
           </StepCard>
         )}
 
+
         {step === 1 && (
-          <StepCard eyebrow="Step 2 of 5" title="What's the message?">
+          <StepCard
+            eyebrow="Step 2 of 5"
+            title="What's the message?"
+            actions={
+              <button
+                type="button"
+                onClick={() => {
+                  const ex = exampleCopyForBrand(brandId);
+                  setManualCopy((prev) => ({
+                    ...prev,
+                    title: ex.title,
+                    summary: ex.summary ?? prev.summary,
+                    cta: ex.cta ?? prev.cta,
+                  }));
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#003FC7]/[0.06] px-3 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#003FC7]/10"
+              >
+                <Wand2 size={12} /> Fill with brand example
+              </button>
+            }
+          >
             <div className="grid gap-3 rounded-2xl border border-black/10 bg-white/60 p-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <TextField
@@ -304,6 +364,7 @@ export function KitWizard({
               </Link>
             </p>
           </StepCard>
+
         )}
 
         {step === 2 && (
@@ -502,11 +563,13 @@ export function KitWizard({
 function StepCard({
   eyebrow,
   title,
+  description,
   actions,
   children,
 }: {
   eyebrow: string;
   title: string;
+  description?: string;
   actions?: React.ReactNode;
   children: React.ReactNode;
 }) {
@@ -518,6 +581,9 @@ function StepCard({
             {eyebrow}
           </div>
           <h2 className="mt-1 text-xl font-bold tracking-tight text-[#03002C]">{title}</h2>
+          {description && (
+            <p className="mt-1.5 max-w-2xl text-xs text-black/55">{description}</p>
+          )}
         </div>
         {actions ? <div className="shrink-0">{actions}</div> : null}
       </header>
@@ -525,6 +591,79 @@ function StepCard({
     </section>
   );
 }
+
+/**
+ * Live preview strip shown under the brand grid on Step 1.
+ * Renders three canonical formats (square, portrait, story) using whatever
+ * headline/summary/CTA the user has typed so far — or the division's
+ * canonical example copy as a fallback. Accent color + logo lockup come
+ * straight from the BrandMode, so switching divisions instantly re-skins
+ * the preview.
+ */
+function BrandPreview({
+  brandId,
+  manualCopy,
+}: {
+  brandId: string;
+  manualCopy: { title: string; summary: string; cta: string };
+}) {
+  const brand = useMemo(
+    () => BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES[0],
+    [brandId],
+  );
+  const fallback = useMemo(() => exampleCopyForBrand(brandId), [brandId]);
+  const copy = {
+    title: manualCopy.title.trim() || fallback.title,
+    summary: (manualCopy.summary.trim() || fallback.summary) ?? undefined,
+    cta: (manualCopy.cta.trim() || fallback.cta) ?? undefined,
+  };
+  const previewFormats = ["square-1080", "portrait-1080x1350", "story-1080x1920"]
+    .map((id) => getFormat(id))
+    .filter((f): f is NonNullable<ReturnType<typeof getFormat>> => !!f);
+  const usingExample = !manualCopy.title.trim();
+
+  return (
+    <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-4">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
+            Live preview · {brand.name}
+          </div>
+          <div className="text-[11px] text-black/55">
+            Accent{" "}
+            <span
+              className="ml-1 inline-block h-2.5 w-2.5 translate-y-[1px] rounded-full ring-1 ring-black/10"
+              style={{ background: brand.tokens.accent }}
+            />{" "}
+            <span className="font-mono">{brand.tokens.accent}</span> · ink{" "}
+            <span className="font-mono">{brand.tokens.primary}</span>
+          </div>
+        </div>
+        {usingExample && (
+          <span className="rounded-full bg-black/[0.04] px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/50">
+            Showing example
+          </span>
+        )}
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {previewFormats.map((f) => (
+          <div key={f.id} className="space-y-1.5">
+            <SocialRenderer
+              format={f}
+              brandId={brand.id}
+              mode="dark"
+              copy={copy}
+              facts={{}}
+              displayShortEdge={140}
+            />
+            <div className="text-[10px] uppercase tracking-widest text-black/50">{f.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 
 function EmptyState({
   title,
