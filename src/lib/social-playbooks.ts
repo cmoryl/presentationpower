@@ -8,7 +8,8 @@
 // Adding a new division playbook here surfaces automatically on /social.
 
 import type { CampaignSource, EventFacts } from "./campaigns";
-import type { PlaybookPhase, PlaybookDeliverable, PlaybookKpi } from "./event-playbooks";
+import type { PlaybookPhase, PlaybookDeliverable, PlaybookKpi, CollateralCategory } from "./event-playbooks";
+
 
 export type SocialAngle =
   | "announcement"
