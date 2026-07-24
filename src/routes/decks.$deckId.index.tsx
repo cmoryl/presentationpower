@@ -227,7 +227,7 @@ function DeckEditor() {
                   <div className="aspect-[16/9] bg-white">
                     <SlideThumbnailContext.Provider value={true}>
                       <ScaledSlide>
-                        {variant && <VariantRenderer slide={applyOverlay(slide)} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />}
+                        {variant && <VariantRenderer slide={applyOverlay(slide)} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={slide.mode ?? "light"} />}
                       </ScaledSlide>
                     </SlideThumbnailContext.Provider>
                   </div>
@@ -372,7 +372,7 @@ function DeckEditor() {
                     onChange={(next) => updateCanvasBlocks(deck.id, active.id, next)}
                   >
                     <ScaledSlide>
-                      <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
+                      <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
                     </ScaledSlide>
                   </FreeCanvasEditor>
                 </SlideVideoPreviewContext.Provider>
@@ -390,7 +390,7 @@ function DeckEditor() {
                     onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
                   >
                     <ScaledSlide>
-                      <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
+                      <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
                       <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
                     </ScaledSlide>
                   </LiveEditOverlay>
@@ -408,7 +408,7 @@ function DeckEditor() {
               {active && mv && (
                 <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
                   <ScaledSlide>
-                    <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
+                    <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
                     <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
                   </ScaledSlide>
                 </SlideVideoPreviewContext.Provider>
@@ -855,7 +855,7 @@ function DeckEditor() {
           onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
           onNext={clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined}
         >
-          <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
+          <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
         </SlideLightbox>
       )}
 
