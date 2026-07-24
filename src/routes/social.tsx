@@ -117,11 +117,6 @@ function SocialView() {
           </div>
         </div>
 
-        <dl className="mt-10 grid max-w-3xl grid-cols-2 gap-6 sm:grid-cols-4">
-          <Stat label="Playbooks" value={String(SOCIAL_PLAYBOOKS.length)} />
-          <Stat label="Divisions" value={String(new Set(SOCIAL_PLAYBOOKS.map((p) => p.subBrand)).size)} />
-          <Stat label="Angles" value={String(SOCIAL_ANGLES.length)} />
-        </dl>
         </div>
       </header>
 
