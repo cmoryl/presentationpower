@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { getAiAnalytics } from "@/lib/admin.functions";
+import { hasAiKey } from "@/lib/ai-status.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 
 export const Route = createFileRoute("/admin/ai")({
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/admin/ai")({
 
 function AiView() {
   const fn = useServerFn(getAiAnalytics);
+  const statusFn = useServerFn(hasAiKey);
   const [days, setDays] = useState(30);
   const [brand, setBrand] = useState("");
   const q = useQuery({
@@ -18,8 +20,16 @@ function AiView() {
     queryFn: () => fn({ data: { days, brandId: brand || undefined } }),
     retry: false,
   });
+  const status = useQuery({
+    queryKey: ["admin", "ai-provider"],
+    queryFn: () => statusFn(),
+    retry: false,
+    staleTime: 60_000,
+  });
 
   if (q.error && isForbidden(q.error)) return <AdminForbidden />;
+
+
 
   return (
     <div className="space-y-8">
