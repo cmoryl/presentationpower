@@ -479,31 +479,33 @@ function renderVariantBody({
           <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: brand.tokens.accent, mixBlendMode: "color", opacity: 0.28 }} />
           <GrainOverlay opacity={0.09} />
           <CinematicScrim anchor="bottom" strength={0.9} tint="#050418" vignette={0.28} />
-          <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
+          <div className="absolute inset-x-24 top-32 bottom-40 flex flex-col justify-end overflow-hidden text-white">
             <div className="flex items-center gap-4 tp-rise">
               <span className="inline-block h-2 w-2 rounded-full" style={{ background: brand.tokens.accent, boxShadow: `0 0 24px ${brand.tokens.accent}` }} />
-              <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
+              <Kicker brand={brand} color="#ffffff">Prepared for {s(c.clientName)}</Kicker>
             </div>
             <div className="mt-6 flex items-end gap-6 tp-rise tp-rise-delay-1">
-              <StatRail color={"var(--slide-accent-text)"} height={180} className="mb-4" />
+              <StatRail color={"#ffffff"} height={180} className="mb-4" />
               <EditorialTitle
                 text={s(c.title)}
                 emphasize={s(c.titleEmphasis) || lastWord(s(c.title))}
-                color={ink.strong}
-                accentColor={brand.tokens.accent}
+                color="#ffffff"
+                accentColor="#ffffff"
+                emphasisStyle="bold"
                 size={_titleSize === "cover" ? 128 : _titleSize === "section" ? 96 : 72}
                 maxWidthPx={1420}
               />
             </div>
             {s(c.subtitle) && (
-              <SupportingText size="lg" opacity={0.88} maxWidthPx={1180} className="mt-6 line-clamp-2 tp-rise tp-rise-delay-2">
+              <SupportingText size="lg" opacity={0.92} maxWidthPx={1180} className="mt-6 line-clamp-2 tp-rise tp-rise-delay-2" color="#ffffff">
                 {s(c.subtitle)}
               </SupportingText>
             )}
-            <MetaRow className="mt-10 tp-rise tp-rise-delay-3">
+            <MetaRow className="mt-10 tp-rise tp-rise-delay-3" color="#ffffff">
               {s(c.date) && <span>{s(c.date)}</span>}
             </MetaRow>
           </div>
+
         </SlideFrame>
       );
     }
