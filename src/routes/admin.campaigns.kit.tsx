@@ -34,6 +34,7 @@ import { AdminPageHeader, AdminSection, AdminEmpty } from "@/components/admin/Ad
 const searchSchema = z.object({
   source: z.string().optional(),
   profile: z.string().optional(),
+  blank: z.union([z.literal(1), z.literal("1"), z.boolean()]).optional(),
 });
 
 export const Route = createFileRoute("/admin/campaigns/kit")({
