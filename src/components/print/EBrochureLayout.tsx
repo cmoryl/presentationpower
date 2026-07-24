@@ -118,7 +118,7 @@ export function EBrochureLayout({
                 accent={accent}
                 cq={cq}
               />
-              <BrandLockup brand={brand} color={mode === "dark" ? "#FFFFFF" : resolvePrintLogoInk(content.logoColor, ink)} size="2xs" orientation="horizontal" />
+              <BrandLockup brand={brand} color={brand.id === "bm-enterprise" ? (mode === "dark" ? "#FFFFFF" : "#000000") : (mode === "dark" ? "#FFFFFF" : resolvePrintLogoInk(content.logoColor, ink))} size="2xs" orientation="horizontal" />
             </div>
 
             {/* HERO — title + summary */}
