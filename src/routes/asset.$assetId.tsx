@@ -32,9 +32,16 @@ import type {
   PrintPageSize,
 } from "@/lib/print-assets.types";
 import { emptyCaseStudy, emptySpotlight, emptyEBrochure, emptyAdaptorBrief } from "@/lib/print-assets.types";
-import type { PrintSection, PrintStatsSection, PrintStatsVariant } from "@/lib/print-assets.types";
+import type { PrintSection, PrintStatsSection, PrintStatsVariant, PrintQuoteSection, PrintQuoteVariant, PrintLogoGridSection, PrintLogoGridVariant, PrintExpertiseSection, PrintExpertiseVariant, PrintFeatureListSection, PrintFeatureVariant } from "@/lib/print-assets.types";
 import type { SpotlightContent, EBrochureContent, AdaptorBriefContent } from "@/lib/print-assets.types";
-import { PRINT_STATS_VARIANTS, PrintSectionRenderer } from "@/components/print/sections/PrintSectionRenderer";
+import {
+  PRINT_STATS_VARIANTS,
+  PRINT_QUOTE_VARIANTS,
+  PRINT_LOGO_VARIANTS,
+  PRINT_EXPERTISE_VARIANTS,
+  PRINT_FEATURE_VARIANTS,
+  PrintSectionRenderer,
+} from "@/components/print/sections/PrintSectionRenderer";
 import { PrintSectionPicker, PRINT_SECTION_DND_MIME } from "@/components/print/sections/PrintSectionPicker";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
@@ -1268,7 +1275,7 @@ function ModulesPanel({
               >
                 <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
                   <GripVertical size={14} className="text-black/40 dark:text-white/40" aria-hidden />
-                  {m.kind === "stats" ? "Stats" : "Module"}
+                  {sectionKindLabel(m.kind)}
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -1278,43 +1285,16 @@ function ModulesPanel({
                 </div>
               </div>
 
-              {m.kind === "stats" && (
-                <div className="mt-2 space-y-2">
-                  <select
-                    className={inspectorInput}
-                    value={m.variantId}
-                    onChange={(e) => patch(i, { variantId: e.target.value as PrintStatsVariant } as Partial<PrintStatsSection>)}
-                  >
-                    {PRINT_STATS_VARIANTS.map((v) => (
-                      <option key={v.id} value={v.id}>{v.label}</option>
-                    ))}
-                  </select>
-                  <input
-                    className={inspectorInput}
-                    placeholder="Eyebrow"
-                    value={m.eyebrow ?? ""}
-                    onChange={(e) => patch(i, { eyebrow: e.target.value } as Partial<PrintStatsSection>)}
-                  />
-                  <input
-                    className={inspectorInput}
-                    placeholder="Title"
-                    value={m.title ?? ""}
-                    onChange={(e) => patch(i, { title: e.target.value } as Partial<PrintStatsSection>)}
-                  />
-                  <div className="space-y-1">
-                    {m.items.map((it, idx) => (
-                      <div key={idx} className="grid grid-cols-[1fr_60px_50px] gap-1">
-                        <input className={inspectorInput} placeholder="Label" value={it.label} onChange={(e) => patchStatsItem(i, idx, { label: e.target.value })} />
-                        <input className={inspectorInput} placeholder="Value" value={it.value} onChange={(e) => patchStatsItem(i, idx, { value: e.target.value })} />
-                        <input className={inspectorInput} placeholder="Unit" value={it.unit ?? ""} onChange={(e) => patchStatsItem(i, idx, { unit: e.target.value })} />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="pt-1">
-                    <PrintSectionRenderer section={m} mode={editorMode} accent="#003FC7" />
-                  </div>
+              <div className="mt-2 space-y-2">
+                <SectionInlineEditor
+                  section={m}
+                  onPatch={(p) => patch(i, p)}
+                />
+                <div className="pt-1">
+                  <PrintSectionRenderer section={m} mode={editorMode} accent="#003FC7" />
                 </div>
-              )}
+              </div>
+
             </div>
           </div>
         ))}
@@ -1719,6 +1699,226 @@ function Slider({
         onChange={(e) => onChange(Number(e.target.value))}
         className="mt-1 w-full accent-[#003FC7]"
       />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Shared-module inline editors. One per PrintSection kind. Kept next to
+// ModulesPanel so the drawer + inline editing stay in sync as new variants
+// are added.
+// ---------------------------------------------------------------------------
+
+function sectionKindLabel(kind: PrintSection["kind"]): string {
+  switch (kind) {
+    case "stats": return "Stats";
+    case "quote": return "Quote";
+    case "logo-grid": return "Logo grid";
+    case "expertise": return "Expertise";
+    case "feature-list": return "Features";
+    default: return "Module";
+  }
+}
+
+function SectionInlineEditor({
+  section, onPatch,
+}: {
+  section: PrintSection;
+  onPatch: (p: Partial<PrintSection>) => void;
+}) {
+  switch (section.kind) {
+    case "stats":
+      return <StatsInlineEditor section={section} onPatch={(p) => onPatch(p as Partial<PrintSection>)} />;
+    case "quote":
+      return <QuoteInlineEditor section={section} onPatch={(p) => onPatch(p as Partial<PrintSection>)} />;
+    case "logo-grid":
+      return <LogoGridInlineEditor section={section} onPatch={(p) => onPatch(p as Partial<PrintSection>)} />;
+    case "expertise":
+      return <ExpertiseInlineEditor section={section} onPatch={(p) => onPatch(p as Partial<PrintSection>)} />;
+    case "feature-list":
+      return <FeatureListInlineEditor section={section} onPatch={(p) => onPatch(p as Partial<PrintSection>)} />;
+    default:
+      return null;
+  }
+}
+
+function StatsInlineEditor({
+  section, onPatch,
+}: {
+  section: PrintStatsSection;
+  onPatch: (p: Partial<PrintStatsSection>) => void;
+}) {
+  const patchItem = (idx: number, p: Partial<PrintStatsSection["items"][number]>) => {
+    const items = section.items.map((it, k) => (k === idx ? { ...it, ...p } : it));
+    onPatch({ items });
+  };
+  return (
+    <>
+      <select className={inspectorInput} value={section.variantId} onChange={(e) => onPatch({ variantId: e.target.value as PrintStatsVariant })}>
+        {PRINT_STATS_VARIANTS.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
+      </select>
+      <input className={inspectorInput} placeholder="Eyebrow" value={section.eyebrow ?? ""} onChange={(e) => onPatch({ eyebrow: e.target.value })} />
+      <input className={inspectorInput} placeholder="Title" value={section.title ?? ""} onChange={(e) => onPatch({ title: e.target.value })} />
+      <ArrayEditor
+        items={section.items}
+        onChange={(items) => onPatch({ items })}
+        add={() => ({ label: "", value: "", unit: "" }) as PrintStatsSection["items"][number]}
+        row={(it, idx) => (
+          <div className="grid grid-cols-[1fr_60px_50px] gap-1">
+            <input className={inspectorInput} placeholder="Label" value={it.label} onChange={(e) => patchItem(idx, { label: e.target.value })} />
+            <input className={inspectorInput} placeholder="Value" value={it.value} onChange={(e) => patchItem(idx, { value: e.target.value })} />
+            <input className={inspectorInput} placeholder="Unit" value={it.unit ?? ""} onChange={(e) => patchItem(idx, { unit: e.target.value })} />
+          </div>
+        )}
+      />
+    </>
+  );
+}
+
+function QuoteInlineEditor({
+  section, onPatch,
+}: {
+  section: PrintQuoteSection;
+  onPatch: (p: Partial<PrintQuoteSection>) => void;
+}) {
+  return (
+    <>
+      <select className={inspectorInput} value={section.variantId} onChange={(e) => onPatch({ variantId: e.target.value as PrintQuoteVariant })}>
+        {PRINT_QUOTE_VARIANTS.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
+      </select>
+      <input className={inspectorInput} placeholder="Eyebrow" value={section.eyebrow ?? ""} onChange={(e) => onPatch({ eyebrow: e.target.value })} />
+      <textarea className={inspectorInput} placeholder="Quote text" rows={3} value={section.text} onChange={(e) => onPatch({ text: e.target.value })} />
+      <div className="grid grid-cols-2 gap-1">
+        <input className={inspectorInput} placeholder="Author" value={section.author ?? ""} onChange={(e) => onPatch({ author: e.target.value })} />
+        <input className={inspectorInput} placeholder="Role" value={section.role ?? ""} onChange={(e) => onPatch({ role: e.target.value })} />
+      </div>
+      <input className={inspectorInput} placeholder="Company" value={section.company ?? ""} onChange={(e) => onPatch({ company: e.target.value })} />
+    </>
+  );
+}
+
+function LogoGridInlineEditor({
+  section, onPatch,
+}: {
+  section: PrintLogoGridSection;
+  onPatch: (p: Partial<PrintLogoGridSection>) => void;
+}) {
+  return (
+    <>
+      <select className={inspectorInput} value={section.variantId} onChange={(e) => onPatch({ variantId: e.target.value as PrintLogoGridVariant })}>
+        {PRINT_LOGO_VARIANTS.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
+      </select>
+      <input className={inspectorInput} placeholder="Eyebrow" value={section.eyebrow ?? ""} onChange={(e) => onPatch({ eyebrow: e.target.value })} />
+      <input className={inspectorInput} placeholder="Title" value={section.title ?? ""} onChange={(e) => onPatch({ title: e.target.value })} />
+      <ArrayEditor
+        items={section.items}
+        onChange={(items) => onPatch({ items })}
+        add={() => ({ name: "Client", url: "", path: "" })}
+        row={(it, idx) => (
+          <div className="grid grid-cols-[1fr_1fr] gap-1">
+            <input className={inspectorInput} placeholder="Name" value={it.name} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, name: e.target.value } : x) })} />
+            <input className={inspectorInput} placeholder="Logo URL or /path" value={it.url ?? it.path ?? ""} onChange={(e) => {
+              const v = e.target.value;
+              const isPath = v.startsWith("/");
+              onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, url: isPath ? undefined : v, path: isPath ? v : undefined } : x) });
+            }} />
+          </div>
+        )}
+      />
+    </>
+  );
+}
+
+function ExpertiseInlineEditor({
+  section, onPatch,
+}: {
+  section: PrintExpertiseSection;
+  onPatch: (p: Partial<PrintExpertiseSection>) => void;
+}) {
+  return (
+    <>
+      <select className={inspectorInput} value={section.variantId} onChange={(e) => onPatch({ variantId: e.target.value as PrintExpertiseVariant })}>
+        {PRINT_EXPERTISE_VARIANTS.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
+      </select>
+      <input className={inspectorInput} placeholder="Eyebrow" value={section.eyebrow ?? ""} onChange={(e) => onPatch({ eyebrow: e.target.value })} />
+      <input className={inspectorInput} placeholder="Title" value={section.title ?? ""} onChange={(e) => onPatch({ title: e.target.value })} />
+      <ArrayEditor
+        items={section.items}
+        onChange={(items) => onPatch({ items })}
+        add={() => ({ label: "", icon: "" })}
+        row={(it, idx) => (
+          <div className="grid grid-cols-[1fr_90px] gap-1">
+            <input className={inspectorInput} placeholder="Label" value={it.label} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, label: e.target.value } : x) })} />
+            <input className={inspectorInput} placeholder="Icon" value={it.icon ?? ""} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, icon: e.target.value } : x) })} />
+          </div>
+        )}
+      />
+    </>
+  );
+}
+
+function FeatureListInlineEditor({
+  section, onPatch,
+}: {
+  section: PrintFeatureListSection;
+  onPatch: (p: Partial<PrintFeatureListSection>) => void;
+}) {
+  return (
+    <>
+      <select className={inspectorInput} value={section.variantId} onChange={(e) => onPatch({ variantId: e.target.value as PrintFeatureVariant })}>
+        {PRINT_FEATURE_VARIANTS.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
+      </select>
+      <input className={inspectorInput} placeholder="Eyebrow" value={section.eyebrow ?? ""} onChange={(e) => onPatch({ eyebrow: e.target.value })} />
+      <input className={inspectorInput} placeholder="Title" value={section.title ?? ""} onChange={(e) => onPatch({ title: e.target.value })} />
+      <ArrayEditor
+        items={section.items}
+        onChange={(items) => onPatch({ items })}
+        add={() => ({ verb: "", body: "", icon: "" })}
+        row={(it, idx) => (
+          <div className="space-y-1">
+            <div className="grid grid-cols-[1fr_90px] gap-1">
+              <input className={inspectorInput} placeholder="Verb" value={it.verb} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, verb: e.target.value } : x) })} />
+              <input className={inspectorInput} placeholder="Icon" value={it.icon ?? ""} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, icon: e.target.value } : x) })} />
+            </div>
+            <input className={inspectorInput} placeholder="Body" value={it.body ?? ""} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, body: e.target.value } : x) })} />
+          </div>
+        )}
+      />
+    </>
+  );
+}
+
+function ArrayEditor<T>({
+  items, onChange, add, row,
+}: {
+  items: T[];
+  onChange: (next: T[]) => void;
+  add: () => T;
+  row: (it: T, idx: number) => React.ReactNode;
+}) {
+  const move = (i: number, dir: -1 | 1) => {
+    const j = i + dir;
+    if (j < 0 || j >= items.length) return;
+    const next = [...items];
+    [next[i], next[j]] = [next[j]!, next[i]!];
+    onChange(next);
+  };
+  const remove = (i: number) => onChange(items.filter((_, k) => k !== i));
+  return (
+    <div className="space-y-1">
+      {items.map((it, idx) => (
+        <div key={idx} className="rounded border border-black/5 bg-black/[0.02] p-1.5 dark:border-white/10 dark:bg-white/5">
+          {row(it, idx)}
+          <div className="mt-1 flex items-center justify-end gap-1">
+            <button type="button" className="rounded p-0.5 text-black/40 hover:bg-black/5" onClick={() => move(idx, -1)} aria-label="Move up"><ArrowUp size={12} /></button>
+            <button type="button" className="rounded p-0.5 text-black/40 hover:bg-black/5" onClick={() => move(idx, 1)} aria-label="Move down"><ArrowDown size={12} /></button>
+            <button type="button" className="rounded p-0.5 text-red-500 hover:bg-red-500/10" onClick={() => remove(idx)} aria-label="Remove"><Trash2 size={12} /></button>
+          </div>
+        </div>
+      ))}
+      <button type="button" onClick={() => onChange([...items, add()])} className="flex w-full items-center justify-center gap-1 rounded border border-dashed border-black/20 py-1 text-[10px] font-semibold uppercase tracking-widest text-black/60 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/20 dark:text-white/60">
+        <Plus size={12} /> Add item
+      </button>
     </div>
   );
 }

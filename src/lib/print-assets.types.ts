@@ -78,8 +78,95 @@ export type PrintStatsSection = {
   items: PrintStatItem[];
 };
 
+// ---- Quote family ---------------------------------------------------------
+export type PrintQuoteVariant =
+  | "pull-quote-hero"
+  | "quote-attribution-card"
+  | "quote-inline-compact";
+
+export type PrintQuoteSection = {
+  id: string;
+  kind: "quote";
+  variantId: PrintQuoteVariant;
+  eyebrow?: string;
+  text: string;
+  author?: string;
+  role?: string;
+  company?: string;
+};
+
+// ---- Logo grid family -----------------------------------------------------
+export type PrintLogoItem = {
+  name: string;
+  /** Absolute or relative logo URL. */
+  url?: string;
+  /** Storage path resolved via useResolvedLogoUrl (LogoHub). */
+  path?: string;
+};
+
+export type PrintLogoGridVariant =
+  | "logo-grid-portrait"
+  | "logo-row-portrait"
+  | "logo-wall-portrait";
+
+export type PrintLogoGridSection = {
+  id: string;
+  kind: "logo-grid";
+  variantId: PrintLogoGridVariant;
+  eyebrow?: string;
+  title?: string;
+  items: PrintLogoItem[];
+};
+
+// ---- Expertise family -----------------------------------------------------
+export type PrintExpertiseItem = {
+  label: string;
+  /** Icon name from print-primitives IconName set. */
+  icon?: string;
+};
+
+export type PrintExpertiseVariant =
+  | "expertise-icon-strip"
+  | "expertise-checklist"
+  | "expertise-credential-pills";
+
+export type PrintExpertiseSection = {
+  id: string;
+  kind: "expertise";
+  variantId: PrintExpertiseVariant;
+  eyebrow?: string;
+  title?: string;
+  items: PrintExpertiseItem[];
+};
+
+// ---- Feature-list family --------------------------------------------------
+export type PrintFeatureItem = {
+  verb: string;
+  body?: string;
+  icon?: string;
+};
+
+export type PrintFeatureVariant =
+  | "feature-cards-3col"
+  | "feature-cards-2col"
+  | "feature-list-1col";
+
+export type PrintFeatureListSection = {
+  id: string;
+  kind: "feature-list";
+  variantId: PrintFeatureVariant;
+  eyebrow?: string;
+  title?: string;
+  items: PrintFeatureItem[];
+};
+
 /** Discriminated union — future families add cases here. */
-export type PrintSection = PrintStatsSection;
+export type PrintSection =
+  | PrintStatsSection
+  | PrintQuoteSection
+  | PrintLogoGridSection
+  | PrintExpertiseSection
+  | PrintFeatureListSection;
 
 
 
