@@ -302,6 +302,39 @@ function DeckEditor() {
         {/* Stage */}
         <div>
           <div className="mb-2 flex items-center justify-end gap-2">
+            {active && (
+              <div
+                role="group"
+                aria-label="Slide appearance mode"
+                className="inline-flex items-center rounded-full border border-black/15 bg-white p-0.5 text-[11px] font-medium uppercase tracking-widest shadow-sm"
+                title="Toggle this slide between light and dark mode"
+              >
+                <button
+                  type="button"
+                  onClick={() => setSlideMode(deck.id, active.id, "light")}
+                  aria-pressed={(active.mode ?? "light") === "light"}
+                  className={`rounded-full px-3 py-1 transition ${
+                    (active.mode ?? "light") === "light"
+                      ? "bg-[#F5F7FB] text-black shadow-inner"
+                      : "text-black/50 hover:text-black"
+                  }`}
+                >
+                  ☀ Light
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSlideMode(deck.id, active.id, "dark")}
+                  aria-pressed={(active.mode ?? "light") === "dark"}
+                  className={`rounded-full px-3 py-1 transition ${
+                    (active.mode ?? "light") === "dark"
+                      ? "bg-[#03002C] text-white shadow-inner"
+                      : "text-black/50 hover:text-black"
+                  }`}
+                >
+                  ☾ Dark
+                </button>
+              </div>
+            )}
             <button
               type="button"
               onClick={() => { setCanvasMode(false); setLiveEdit((v) => !v); }}
