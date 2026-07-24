@@ -937,7 +937,7 @@ function BriefWizard() {
                     disabled={busy}
                     className="rounded-lg border-2 bg-white px-6 py-3 font-['Geist'] text-sm font-bold tracking-tight text-[#03002C] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#F7F9FC] hover:shadow-sm disabled:opacity-50"
                     style={{ borderColor: PALETTE.hairline }}
-                    onClick={() => {
+                    onClick={async () => {
                       const submission = {
                         ...form,
                         archetypeId: effectiveArchetypeId,
@@ -946,10 +946,12 @@ function BriefWizard() {
                         abPaletteOverride: paletteSel.paletteOverride,
                       };
                       const { deckId } = create(submission, strategy ? { strategy } : undefined);
-                      navigate({ to: "/decks/$deckId", params: { deckId } });
+                      await expandMasterSet(deckId, submission);
+                      const hasExtras = masterSet.print.enabled || masterSet.event.enabled || masterSet.social.enabled;
+                      if (!hasExtras) navigate({ to: "/decks/$deckId", params: { deckId } });
                     }}
                   >
-                    Assemble no AI
+                    {expanding ? "Producing…" : "Generate master set (no AI)"}
                   </button>
                   <button
                     type="button"
