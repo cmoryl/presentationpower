@@ -1389,29 +1389,40 @@ function VariantDetailModal({
     if (pdfBusy) return;
     setPdfBusy(exportMode);
     setPdfStage(null);
+    const resLabel = pixelRatio === 3840 ? "4k" : "hd";
+    const filename = `${variant.id}-${brand.id}-${exportMode}-${resLabel}-review.pdf`;
+    const toastId = `export-pdf-${variant.id}-${exportMode}`;
+    const modeLabel = exportMode === "light" ? "Light" : "Dark";
+    toast.loading(`Preparing ${modeLabel} PDF · ${resLabel.toUpperCase()}`, {
+      id: toastId, description: `${filename} — starting…`, duration: Infinity,
+    });
     try {
       const node = document.querySelector<HTMLElement>(
         `[data-modal-preview="${exportMode}"][data-variant-id="${variant.id}"]`,
       );
       if (!node) throw new Error(`Preview node not found for ${exportMode} mode`);
       const mod = await import("@/lib/slide-image-export");
-      const resLabel = pixelRatio === 3840 ? "4k" : "hd";
-      const filename = `${variant.id}-${brand.id}-${exportMode}-${resLabel}-review.pdf`;
       await mod.exportSlidesAsImagePdf(
         [{ node, mode: exportMode }],
         {
           filename,
           targetWidth: pixelRatio,
-          onProgress: (p) => setPdfStage(p.message ?? p.stage),
+          onProgress: (p) => {
+            const msg = p.message ?? p.stage;
+            setPdfStage(msg);
+            toast.loading(`Exporting ${modeLabel} PDF · ${resLabel.toUpperCase()}`, {
+              id: toastId, description: `${filename} — ${msg}`, duration: Infinity,
+            });
+          },
         },
       );
-      toast.success(`${exportMode === "light" ? "Light" : "Dark"} PDF exported at ${resLabel.toUpperCase()} (${pixelRatio}×${Math.round(pixelRatio * 9 / 16)})`, {
-        description: filename,
+      toast.success(`${modeLabel} PDF downloaded · ${resLabel.toUpperCase()} (${pixelRatio}×${Math.round(pixelRatio * 9 / 16)})`, {
+        id: toastId, description: filename, duration: 5000,
       });
 
     } catch (err) {
       console.error("[library] image PDF export failed", err);
-      toast.error("PDF export failed", { description: "Check console for details." });
+      toast.error("PDF export failed", { id: toastId, description: "Check console for details.", duration: 6000 });
     } finally {
       setPdfBusy(null);
       setPdfStage(null);
