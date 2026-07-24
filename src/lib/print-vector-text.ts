@@ -381,7 +381,7 @@ export interface VectorOverlayResult {
   /** Font resources actually written into the PDF. */
   fontResources: string[];
   /** Diagnostics. */
-  stats: { linesDrawn: number; glyphOnly: number; pages: number };
+  stats: { linesDrawn: number; trackedLines: number; pages: number };
 }
 
 const IN_TO_PT = 72;
