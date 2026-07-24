@@ -249,6 +249,7 @@ export function EditorialTitle({
   size = 148,
   align = "start",
   maxWidthPx = 1620,
+  emphasisStyle = "italic-serif",
 }: {
   text: string;
   emphasize?: string;
@@ -257,7 +258,10 @@ export function EditorialTitle({
   size?: number;
   align?: "start" | "center";
   maxWidthPx?: number;
+  /** How the emphasized word renders. "italic-serif" (default) or "bold" (heavier sans, no italic). */
+  emphasisStyle?: "italic-serif" | "bold";
 }) {
+
   const parts: Array<{ t: string; italic: boolean }> = [];
   if (emphasize && text.toLowerCase().includes(emphasize.toLowerCase())) {
     const idx = text.toLowerCase().indexOf(emphasize.toLowerCase());
