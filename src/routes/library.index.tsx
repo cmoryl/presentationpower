@@ -2104,25 +2104,42 @@ function ModalABPreview({
     if (!node) return;
     setImageBusy(`${kind}-${m}`);
     setImageStage(null);
+    const resLabel = pixelRatio === 3840 ? "4k" : "hd";
+    const base = `${variant.id}-${brand.id}-${m}-${resLabel}`;
+    const filename = `${base}.${kind}`;
+    const toastId = `export-${variant.id}-${m}-${kind}`;
+    const kindLabel = kind.toUpperCase();
+    const modeLabel = m === "light" ? "Light" : "Dark";
+    toast.loading(`Preparing ${modeLabel} ${kindLabel} · ${resLabel.toUpperCase()}`, {
+      id: toastId,
+      description: `${filename} — starting…`,
+      duration: Infinity,
+    });
     try {
-      const resLabel = pixelRatio === 3840 ? "4k" : "hd";
-      const base = `${variant.id}-${brand.id}-${m}-${resLabel}`;
-      const filename = `${base}.${kind}`;
       const mod = await import("@/lib/slide-image-export");
-      const onProgress = (p: { stage: string; message?: string }) =>
-        setImageStage(p.message ?? p.stage);
+      const onProgress = (p: { stage: string; message?: string }) => {
+        const msg = p.message ?? p.stage;
+        setImageStage(msg);
+        toast.loading(`Exporting ${modeLabel} ${kindLabel} · ${resLabel.toUpperCase()}`, {
+          id: toastId,
+          description: `${filename} — ${msg}`,
+          duration: Infinity,
+        });
+      };
       if (kind === "png") {
         await mod.exportSlideAsPng(node, { mode: m, filename, targetWidth: pixelRatio, onProgress });
       } else {
         await mod.exportSlidesAsImagePdf([{ node, mode: m }], { filename, targetWidth: pixelRatio, onProgress });
       }
-      toast.success(`${m === "light" ? "Light" : "Dark"} ${kind.toUpperCase()} exported at ${resLabel.toUpperCase()} (${pixelRatio}×${Math.round(pixelRatio * 9 / 16)})`, {
+      toast.success(`${modeLabel} ${kindLabel} downloaded · ${resLabel.toUpperCase()} (${pixelRatio}×${Math.round(pixelRatio * 9 / 16)})`, {
+        id: toastId,
         description: filename,
+        duration: 5000,
       });
 
     } catch (err) {
       console.error("[library] image export failed", err);
-      toast.error("Image export failed", { description: "See console for details." });
+      toast.error(`${kindLabel} export failed`, { id: toastId, description: "See console for details.", duration: 6000 });
     } finally {
       setImageBusy(null);
       setImageStage(null);
