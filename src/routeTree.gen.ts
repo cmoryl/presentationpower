@@ -66,6 +66,7 @@ import { Route as AdminAbRouteImport } from './routes/admin.ab'
 import { Route as KnowledgeBrandGuidesIndexRouteImport } from './routes/knowledge.brand-guides.index'
 import { Route as DecksDeckIdIndexRouteImport } from './routes/decks.$deckId.index'
 import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
+import { Route as EventsDemoPlaybookIdRouteImport } from './routes/events.demo.$playbookId'
 import { Route as DecksDeckIdPrintRouteImport } from './routes/decks.$deckId.print'
 import { Route as DecksDeckIdPresentRouteImport } from './routes/decks.$deckId.present'
 import { Route as DecksDeckIdExportRouteImport } from './routes/decks.$deckId.export'
@@ -361,6 +362,11 @@ const KnowledgeBrandGuidesSlugRoute =
     path: '/brand-guides/$slug',
     getParentRoute: () => KnowledgeRoute,
   } as any)
+const EventsDemoPlaybookIdRoute = EventsDemoPlaybookIdRouteImport.update({
+  id: '/demo/$playbookId',
+  path: '/demo/$playbookId',
+  getParentRoute: () => EventsRoute,
+} as any)
 const DecksDeckIdPrintRoute = DecksDeckIdPrintRouteImport.update({
   id: '/decks/$deckId/print',
   path: '/decks/$deckId/print',
@@ -405,7 +411,7 @@ export interface FileRoutesByFullPath {
   '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
-  '/events': typeof EventsRoute
+  '/events': typeof EventsRouteWithChildren
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
@@ -460,6 +466,7 @@ export interface FileRoutesByFullPath {
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
   '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
+  '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
@@ -470,7 +477,7 @@ export interface FileRoutesByTo {
   '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
-  '/events': typeof EventsRoute
+  '/events': typeof EventsRouteWithChildren
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/logohub': typeof LogohubRoute
@@ -524,6 +531,7 @@ export interface FileRoutesByTo {
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
   '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
+  '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/decks/$deckId': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
@@ -536,7 +544,7 @@ export interface FileRoutesById {
   '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
-  '/events': typeof EventsRoute
+  '/events': typeof EventsRouteWithChildren
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
@@ -591,6 +599,7 @@ export interface FileRoutesById {
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
   '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
+  '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
@@ -659,6 +668,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
     | '/decks/$deckId/print'
+    | '/events/demo/$playbookId'
     | '/knowledge/brand-guides/$slug'
     | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
@@ -723,6 +733,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
     | '/decks/$deckId/print'
+    | '/events/demo/$playbookId'
     | '/knowledge/brand-guides/$slug'
     | '/decks/$deckId'
     | '/knowledge/brand-guides'
@@ -789,6 +800,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
     | '/decks/$deckId/print'
+    | '/events/demo/$playbookId'
     | '/knowledge/brand-guides/$slug'
     | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
@@ -801,7 +813,7 @@ export interface RootRouteChildren {
   AnalyticsRoute: typeof AnalyticsRoute
   AtlasRoute: typeof AtlasRoute
   AuthRoute: typeof AuthRoute
-  EventsRoute: typeof EventsRoute
+  EventsRoute: typeof EventsRouteWithChildren
   FaqRoute: typeof FaqRoute
   ImageryRoute: typeof ImageryRoute
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
@@ -1233,6 +1245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KnowledgeBrandGuidesSlugRouteImport
       parentRoute: typeof KnowledgeRoute
     }
+    '/events/demo/$playbookId': {
+      id: '/events/demo/$playbookId'
+      path: '/demo/$playbookId'
+      fullPath: '/events/demo/$playbookId'
+      preLoaderRoute: typeof EventsDemoPlaybookIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/decks/$deckId/print': {
       id: '/decks/$deckId/print'
       path: '/decks/$deckId/print'
@@ -1347,6 +1366,17 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface EventsRouteChildren {
+  EventsDemoPlaybookIdRoute: typeof EventsDemoPlaybookIdRoute
+}
+
+const EventsRouteChildren: EventsRouteChildren = {
+  EventsDemoPlaybookIdRoute: EventsDemoPlaybookIdRoute,
+}
+
+const EventsRouteWithChildren =
+  EventsRoute._addFileChildren(EventsRouteChildren)
+
 interface KnowledgeRouteChildren {
   KnowledgeEntryIdRoute: typeof KnowledgeEntryIdRoute
   KnowledgeAskRoute: typeof KnowledgeAskRoute
@@ -1378,7 +1408,7 @@ const rootRouteChildren: RootRouteChildren = {
   AnalyticsRoute: AnalyticsRoute,
   AtlasRoute: AtlasRoute,
   AuthRoute: AuthRoute,
-  EventsRoute: EventsRoute,
+  EventsRoute: EventsRouteWithChildren,
   FaqRoute: FaqRoute,
   ImageryRoute: ImageryRoute,
   KnowledgeRoute: KnowledgeRouteWithChildren,
