@@ -1297,8 +1297,136 @@ function ModulesPanel({
   );
 }
 
+function ModuleCard({
+  index,
+  section,
+  editorMode,
+  draggingIdx,
+  dropIdx,
+  DropIndicator,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDrop,
+  onMoveUp,
+  onMoveDown,
+  onRemove,
+  onPatch,
+}: {
+  index: number;
+  section: PrintSection;
+  editorMode: PrintMode;
+  draggingIdx: number | null;
+  dropIdx: number | null;
+  DropIndicator: (props: { active: boolean }) => React.ReactElement;
+  onDragStart: (e: React.DragEvent) => void;
+  onDragEnd: () => void;
+  onDragOver: (e: React.DragEvent) => void;
+  onDrop: (e: React.DragEvent) => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onRemove: () => void;
+  onPatch: (p: Partial<PrintSection>) => void;
+}) {
+  const [open, setOpen] = useState(true);
+  const [showPreview, setShowPreview] = useState(false);
+  const i = index;
+  const m = section;
+  const summary = getSectionSummary(m);
+  return (
+    <div>
+      <DropIndicator active={dropIdx === i} />
+      <div
+        draggable
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
+        className={
+          "rounded-lg border bg-white/60 p-2 transition dark:bg-white/[0.02] " +
+          (draggingIdx === i
+            ? "border-[#003FC7]/60 bg-[#003FC7]/[0.04] opacity-50 shadow-sm"
+            : "border-black/10 dark:border-white/10")
+        }
+      >
+        <div
+          data-drag-handle
+          className="flex cursor-grab items-center justify-between gap-2 active:cursor-grabbing"
+          title="Drag to reorder"
+        >
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
+            className="flex min-w-0 flex-1 items-center gap-1.5 text-left"
+            aria-expanded={open}
+          >
+            <GripVertical size={14} className="shrink-0 text-black/30 dark:text-white/30" aria-hidden />
+            {open ? <ChevronDown size={14} className="shrink-0 text-black/50 dark:text-white/50" /> : <ChevronRight size={14} className="shrink-0 text-black/50 dark:text-white/50" />}
+            <span className="truncate text-[11px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
+              {sectionKindLabel(m.kind)}
+            </span>
+            {!open && summary && (
+              <span className="truncate text-[11px] text-black/45 dark:text-white/45">· {summary}</span>
+            )}
+          </button>
+          <div className="flex items-center gap-0.5">
+            <button className="rounded p-1 text-black/50 hover:bg-black/5 dark:text-white/50" onClick={onMoveUp} aria-label="Move up"><ArrowUp size={13} /></button>
+            <button className="rounded p-1 text-black/50 hover:bg-black/5 dark:text-white/50" onClick={onMoveDown} aria-label="Move down"><ArrowDown size={13} /></button>
+            <button className="rounded p-1 text-red-500 hover:bg-red-500/10" onClick={onRemove} aria-label="Delete"><Trash2 size={13} /></button>
+          </div>
+        </div>
+
+        {open && (
+          <div className="mt-2 space-y-2">
+            <SectionInlineEditor section={m} onPatch={onPatch} />
+            <button
+              type="button"
+              onClick={() => setShowPreview((v) => !v)}
+              className="flex w-full items-center justify-center gap-1 rounded border border-dashed border-black/15 py-1 text-[10px] font-semibold uppercase tracking-widest text-black/50 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:text-white/50"
+              title="Preview appears on the canvas — toggle a compact preview here"
+            >
+              {showPreview ? <><EyeOff size={11} /> Hide preview</> : <><Eye size={11} /> Show preview</>}
+            </button>
+            {showPreview && (
+              <div className="overflow-hidden rounded border border-black/10 dark:border-white/10">
+                <div
+                  className="origin-top-left"
+                  style={{ transform: "scale(0.42)", width: "238%", pointerEvents: "none" }}
+                >
+                  <PrintSectionRenderer section={m} mode={editorMode} accent="#003FC7" />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function getSectionSummary(s: PrintSection): string {
+  const anyS = s as unknown as { title?: string; eyebrow?: string; text?: string; items?: Array<unknown> };
+  if (anyS.title) return anyS.title;
+  if (anyS.text) return String(anyS.text).slice(0, 40);
+  if (anyS.eyebrow) return anyS.eyebrow;
+  if (anyS.items?.length) return `${anyS.items.length} item${anyS.items.length === 1 ? "" : "s"}`;
+  return "";
+}
+
 
 const inspectorInput =
+  "w-full rounded-md border border-black/10 bg-white px-2 py-1.5 text-xs text-[#03002C] focus:border-[#003FC7] focus:outline-none dark:border-white/10 dark:bg-white/[0.03] dark:text-white";
+
+function LabeledField({ label, children, hint }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <label className="block space-y-1">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/55 dark:text-white/55">{label}</span>
+      {children}
+      {hint && <span className="block text-[10px] text-black/40 dark:text-white/40">{hint}</span>}
+    </label>
+  );
+}
+
   "w-full rounded-md border border-black/10 bg-white px-2 py-1.5 text-xs text-[#03002C] focus:border-[#003FC7] focus:outline-none dark:border-white/10 dark:bg-white/[0.03] dark:text-white";
 
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
