@@ -951,10 +951,10 @@ function AssetEditor() {
                   including fields already bound to the canvas overlay. */}
               <div className="mt-4 pt-4 border-t border-black/10 dark:border-white/10">
                 <ContentInspector
-                  kind={kind}
+                  schema={schemaFor(kind)}
                   content={rawContent}
                   canvasEditablePaths={new Set(editableFieldPaths)}
-                  onChange={(path: string, value: unknown) => patchByPath(path, value)}
+                  onWritePath={(path: string, value: unknown) => patchByPath(path, value)}
                 />
               </div>
             </Panel>
