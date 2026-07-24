@@ -4133,8 +4133,8 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full gap-0" style={{ gridTemplateColumns: "40% 1fr", margin: "-64px", minHeight: "calc(100% + 128px)" }}>
-            <div className="relative flex flex-col justify-between overflow-hidden p-16" style={{ background: brand.tokens.primary, color: ink.onSurface(brand.tokens.primary) }}>
-              <div aria-hidden className="pointer-events-none absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full" style={{ background: `radial-gradient(circle, ${brand.tokens.accent}55, transparent 70%)` }} />
+            <div className="relative flex flex-col justify-between overflow-hidden p-16" style={{ background: "#03002C", color: "#FFFFFF" }}>
+              <div aria-hidden className="pointer-events-none absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full" style={{ background: `radial-gradient(circle, ${brand.tokens.accent}33, transparent 70%)` }} />
               <Kicker brand={brand} color={ink.strong}>{s(c.kicker, "Our belief")}</Kicker>
               <div className="relative">
                 <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mb-8" />
