@@ -25,6 +25,8 @@ import {
 import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
+import { exportKitZip } from "@/lib/kit-export";
+import { Download } from "lucide-react";
 
 /** First playbook copy for a given brand — the canonical division voice. */
 function exampleCopyForBrand(brandId: string) {
