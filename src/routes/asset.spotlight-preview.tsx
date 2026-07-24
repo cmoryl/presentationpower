@@ -105,6 +105,8 @@ function SpotlightPreview() {
     }
   };
 
+
+
   if (!brand) {
     return (
       <AppShell>

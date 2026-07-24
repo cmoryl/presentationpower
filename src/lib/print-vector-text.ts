@@ -381,7 +381,7 @@ export interface VectorOverlayResult {
   /** Font resources actually written into the PDF. */
   fontResources: string[];
   /** Diagnostics. */
-  stats: { linesDrawn: number; glyphOnly: number; pages: number };
+  stats: { linesDrawn: number; trackedLines: number; pages: number };
 }
 
 const IN_TO_PT = 72;
@@ -406,7 +406,8 @@ export async function overlayVectorText(
 
   const pages = pdfDoc.getPages();
   let linesDrawn = 0;
-  let glyphOnly = 0;
+  let trackedLines = 0;
+
 
   for (let i = 0; i < pages.length && i < opts.captures.length; i++) {
     const page = pages[i]!;
@@ -440,7 +441,7 @@ export async function overlayVectorText(
       });
 
       linesDrawn += 1;
-      if (Math.abs(line.letterSpacing) >= 0.3) glyphOnly += 1;
+      if (Math.abs(line.letterSpacing) >= 0.3) trackedLines += 1;
 
     }
   }
@@ -451,7 +452,7 @@ export async function overlayVectorText(
   return {
     bytes,
     fontResources,
-    stats: { linesDrawn, glyphOnly, pages: pages.length },
+    stats: { linesDrawn, trackedLines, pages: pages.length },
   };
 }
 

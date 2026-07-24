@@ -126,7 +126,7 @@ export interface PrintExportOptions {
 export interface VectorTextReport {
   enabled: boolean;
   linesDrawn: number;
-  glyphOnlyLines: number;
+  trackedLinesLines: number;
   fontResources: string[];
   rasterBytes: number;
   finalBytes: number;
@@ -326,7 +326,7 @@ export async function exportPrintAssetAsPdf(
   const vectorReport: VectorTextReport = {
     enabled: vectorText,
     linesDrawn: 0,
-    glyphOnlyLines: 0,
+    trackedLinesLines: 0,
     fontResources: [],
     rasterBytes: rasterBytesArr.byteLength,
     finalBytes: rasterBytesArr.byteLength,
@@ -342,12 +342,12 @@ export async function exportPrintAssetAsPdf(
       });
       workingBytes = overlay.bytes;
       vectorReport.linesDrawn = overlay.stats.linesDrawn;
-      vectorReport.glyphOnlyLines = overlay.stats.glyphOnly;
+      vectorReport.trackedLinesLines = overlay.stats.trackedLines;
       vectorReport.fontResources = overlay.fontResources;
       vectorReport.finalBytes = workingBytes.byteLength;
       console.info(
         `[print-asset-export] Vector-text overlay: ${overlay.stats.linesDrawn} lines ` +
-          `(${overlay.stats.glyphOnly} per-glyph for tracking), fonts=[${overlay.fontResources.join(", ")}], ` +
+          `(${overlay.stats.trackedLines} tracked), fonts=[${overlay.fontResources.join(", ")}], ` +
           `rasterBytes=${rasterBytesArr.byteLength}, finalBytes=${workingBytes.byteLength}`,
       );
     } catch (err) {
