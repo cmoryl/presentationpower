@@ -26,7 +26,9 @@ import type {
   PrintAssetContext,
   PrintAssetRow,
   PrintDensity,
+  PrintExportPrefs,
   PrintHeroMedia,
+  PrintMode,
   PrintPageSize,
 } from "@/lib/print-assets.types";
 import { emptyCaseStudy, emptySpotlight, emptyEBrochure, emptyAdaptorBrief } from "@/lib/print-assets.types";
@@ -43,9 +45,11 @@ import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
 import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
+import { ContentInspector } from "@/components/print/ContentInspector";
+import { CONTENT_SCHEMAS, unreachablePaths } from "@/lib/print-content-schema";
 
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
-import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2 } from "lucide-react";
+import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2, Sun, Moon } from "lucide-react";
 
 export const Route = createFileRoute("/asset/$assetId")({
   head: ({ params }) => ({
