@@ -623,6 +623,8 @@ function TemplateDetailOverlay({
             <p className="mt-1 max-w-2xl text-sm text-black/60">{tpl.desc}</p>
           </div>
           <div className="flex items-center gap-2">
+            <PrintTemplateHtmlButton kind={kind} brand={brand} label={tpl.label} mode="light" />
+            <PrintTemplateHtmlButton kind={kind} brand={brand} label={tpl.label} mode="dark" />
             {tpl.live ? (
               <Link
                 to="/asset/new"
@@ -653,12 +655,26 @@ function TemplateDetailOverlay({
 }
 
 function PrintPreview({ kind, brand, mode }: { kind: PrintAssetKind; brand: BrandMode; mode: "light" | "dark" }) {
-  if (kind === "spotlight") return <SpotlightLayout content={SPOTLIGHT_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
-  if (kind === "ebrochure") return <EBrochureLayout content={EBROCHURE_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
-  if (kind === "adaptor-brief") return <AdaptorBriefLayout content={ADAPTOR_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
-  if (kind === "case-study") return <CaseStudyLayout content={CASE_STUDY_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+  return renderPrintByKind(kind, brand, mode);
+}
+
+function renderPrintByKind(
+  kind: PrintAssetKind,
+  brand: BrandMode,
+  mode: "light" | "dark",
+  content?: unknown,
+): React.ReactElement | null {
+  if (kind === "spotlight")
+    return <SpotlightLayout content={(content as SpotlightContent) ?? SPOTLIGHT_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+  if (kind === "ebrochure")
+    return <EBrochureLayout content={(content as EBrochureContent) ?? EBROCHURE_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+  if (kind === "adaptor-brief")
+    return <AdaptorBriefLayout content={(content as AdaptorBriefContent) ?? ADAPTOR_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+  if (kind === "case-study")
+    return <CaseStudyLayout content={(content as CaseStudyContent) ?? CASE_STUDY_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
   return null;
 }
+
 
 function PreviewFrame({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -666,6 +682,47 @@ function PreviewFrame({ label, children }: { label: string; children: React.Reac
       <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.24em] text-black/50">{label}</div>
       <div className="overflow-hidden rounded-2xl border border-black/10 shadow-xl">{children}</div>
     </div>
+  );
+}
+
+function PrintTemplateHtmlButton({
+  kind, brand, label, mode,
+}: { kind: PrintAssetKind; brand: BrandMode; label: string; mode: "light" | "dark" }) {
+  const [busy, setBusy] = useState(false);
+  const onClick = async () => {
+    if (busy) return;
+    const element = renderPrintByKind(kind, brand, mode);
+    if (!element) return;
+    const slug = `${kind}-${brand.id}-${mode}`;
+    const filename = `${slug}.html`;
+    const toastId = `print-tpl-html-${slug}`;
+    setBusy(true);
+    toast.loading(`Preparing ${mode} HTML…`, { id: toastId, description: `${filename} — starting…`, duration: Infinity });
+    try {
+      const mod = await import("@/lib/print-html-export");
+      await mod.exportElementAsStandaloneHtml(element, {
+        filename,
+        title: `${label} — ${brand.name} (${mode})`,
+        onProgress: (msg) => toast.loading(`Building ${mode} HTML`, { id: toastId, description: `${filename} — ${msg}`, duration: Infinity }),
+      });
+      toast.success(`${mode === "light" ? "Light" : "Dark"} HTML downloaded`, { id: toastId, description: filename, duration: 5000 });
+    } catch (err) {
+      console.error("[library/print] template HTML export failed", err);
+      toast.error("HTML export failed", { id: toastId, description: "Check console for details.", duration: 6000 });
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={busy}
+      className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
+      title={`Download self-contained ${mode} HTML`}
+    >
+      <Download size={12} /> {mode === "light" ? "Light" : "Dark"} HTML
+    </button>
   );
 }
 
@@ -710,6 +767,33 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
     } catch { /* silent */ }
     if (v.thumbnail_url) window.open(v.thumbnail_url, "_blank");
     else toast.info("No downloadable file attached — open the variant to export.");
+  };
+
+  const onDownloadHtml = async (v: ApprovedPrintVariant) => {
+    const kind = v.template_kind as PrintAssetKind;
+    const modeGuess = (v.context && typeof v.context === "object" && (v.context as { editorMode?: "light" | "dark" }).editorMode) ?? "light";
+    const element = renderPrintByKind(kind, brand, modeGuess, v.content);
+    if (!element) {
+      toast.error("Cannot render this template");
+      return;
+    }
+    const toastId = `approved-html-${v.id}`;
+    const slug = v.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || v.id;
+    const filename = `${slug}-${brand.id}-${modeGuess}.html`;
+    toast.loading("Preparing self-contained HTML…", { id: toastId, description: `${filename} — starting…`, duration: Infinity });
+    try {
+      const mod = await import("@/lib/print-html-export");
+      await mod.exportElementAsStandaloneHtml(element, {
+        filename,
+        title: `${v.title} — ${brand.name}`,
+        onProgress: (msg) => toast.loading("Building self-contained HTML", { id: toastId, description: `${filename} — ${msg}`, duration: Infinity }),
+      });
+      try { await dlFn({ data: { id: v.id } }); } catch { /* silent */ }
+      toast.success("HTML downloaded", { id: toastId, description: filename, duration: 5000 });
+    } catch (err) {
+      console.error("[library/print] HTML export failed", err);
+      toast.error("HTML export failed", { id: toastId, description: "Check console for details.", duration: 6000 });
+    }
   };
 
   return (
@@ -771,13 +855,24 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
                         >
                           <Copy size={11} /> Use as draft
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => onDownload(v)}
-                          className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1.5 text-xs text-black/60 hover:border-[#003FC7] hover:text-[#003FC7]"
-                        >
-                          <Download size={11} />
-                        </button>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => onDownloadHtml(v)}
+                            title="Download self-contained HTML"
+                            className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1.5 text-[11px] font-medium text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+                          >
+                            <Download size={11} /> HTML
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onDownload(v)}
+                            title="Open thumbnail"
+                            className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1.5 text-xs text-black/60 hover:border-[#003FC7] hover:text-[#003FC7]"
+                          >
+                            <ImageIcon size={11} />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
