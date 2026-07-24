@@ -174,7 +174,7 @@ export function AdaptorBriefLayout({
 
             {/* WE KNOW HOW strip */}
             {knowHow.length > 0 && (
-              <>
+              <div data-section="knowHow" data-section-label="We know how">
                 <div className="flex items-center" style={{ gap: cq(14), paddingTop: cq(28) }}>
                   <div style={{ flex: 1, height: 1, background: dividerCol }} />
                   <div style={{ fontSize: cq(10), fontWeight: 700, letterSpacing: "0.14em", color: ink }}>
