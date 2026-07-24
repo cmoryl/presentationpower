@@ -5,9 +5,11 @@
 // admin sidebar). Owns all its own state; parent only supplies surface
 // defaults (which profile to seed, where to go on cancel/finish).
 
-import { Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, RefreshCw, Sparkles, Wand2 } from "lucide-react";
+import { Link, useNavigate, useRouter } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { ArrowLeft, ArrowRight, Check, RefreshCw, Save, Sparkles, Wand2 } from "lucide-react";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import {
   SOCIAL_FORMATS_BY_ID,
@@ -22,6 +24,7 @@ import {
 } from "@/lib/campaigns";
 import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
+import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
 
 /** First playbook copy for a given brand — the canonical division voice. */
 function exampleCopyForBrand(brandId: string) {
