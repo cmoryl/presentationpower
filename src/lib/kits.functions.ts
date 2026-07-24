@@ -32,7 +32,8 @@ export type SavedKit = {
     statValue?: string;
     statLabel?: string;
   };
-  eventFacts: Record<string, unknown>;
+  // JSON-safe. Wizard uses string fields plus speakers/sponsors arrays.
+  eventFacts: Record<string, any>;
   attachEvent: boolean;
   createdAt: string;
   updatedAt: string;
