@@ -1145,7 +1145,7 @@ function BriefWizard() {
                     }}
                   >
                     <svg aria-hidden viewBox="0 0 24 24" width="16" height="16" fill="currentColor" className="relative -ml-1 opacity-90"><path d="M12 2l1.7 5.3L19 9l-5.3 1.7L12 16l-1.7-5.3L5 9l5.3-1.7L12 2zm7 11l.9 2.6L22 16.5l-2.1.9L19 20l-.9-2.6L16 16.5l2.1-.9L19 13z"/></svg>
-                    <span className="relative">Assemble with {brand?.name ?? "brand"}</span>
+                    <span className="relative">{expanding ? "Producing master set…" : `Generate master set with ${brand?.name ?? "brand"}`}</span>
                     <span aria-hidden className="relative transition-transform duration-200 group-hover:translate-x-0.5">→</span>
                   </button>
                 </div>
