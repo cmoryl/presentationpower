@@ -1207,10 +1207,6 @@ function renderVariantBody({
                         fontWeight: 700,
                         letterSpacing: "-0.01em",
                         lineHeight: 1.15,
-                        padding: "6px 14px",
-                        borderRadius: 999,
-                        background: `${accent}${isDark ? "1F" : "14"}`,
-                        border: `1px solid ${accent}44`,
                       }}
                     >
                       {result}
