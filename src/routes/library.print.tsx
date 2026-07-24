@@ -831,14 +831,6 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
                           </button>
                         </div>
                       </div>
-                        <button
-                          type="button"
-                          onClick={() => onDownload(v)}
-                          className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1.5 text-xs text-black/60 hover:border-[#003FC7] hover:text-[#003FC7]"
-                        >
-                          <Download size={11} />
-                        </button>
-                      </div>
                     </div>
                   </div>
                 ))}
