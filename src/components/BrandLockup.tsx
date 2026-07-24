@@ -49,6 +49,7 @@ export function BrandLockup({
   clientLogoUrl,
   subCompany,
   orientation: orientationRaw = "horizontal",
+  monochromeOfficialLogo = false,
 }: {
   brand: BrandMode;
   color: string;
@@ -59,6 +60,7 @@ export function BrandLockup({
   clientLogoUrl?: string | null;
   subCompany?: string;
   orientation?: "horizontal" | "stacked" | "vertical-left" | "vertical-right" | "mark-only";
+  monochromeOfficialLogo?: boolean;
 }) {
   const dims =
     size === "2xs"
@@ -159,7 +161,16 @@ export function BrandLockup({
             <img
               src={officialLogoUrl}
               alt={`${logo.wordmark} logo`}
-              style={{ height: officialImageHeight, width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }}
+              style={{
+                height: officialImageHeight,
+                width: "auto",
+                maxWidth: "100%",
+                objectFit: "contain",
+                display: "block",
+                filter: monochromeOfficialLogo
+                  ? (isDarkChrome ? "brightness(0) invert(1)" : "brightness(0) saturate(100%)")
+                  : undefined,
+              }}
             />
           ) : useOfficialWordmark ? (
             <TransPerfectWordmark height={wordmarkHeight} />

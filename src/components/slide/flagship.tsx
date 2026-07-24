@@ -549,8 +549,8 @@ export function AuroraLayer({
               <stop offset="100%" stopColor={o.color} stopOpacity="0" />
             </radialGradient>
           ))}
-          <filter id={`tp-aurora-${seed}-blur`} x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation={mode === "dark" ? 55 : 110} />
+          <filter id={`tp-aurora-${seed}-blur`} x="-45%" y="-45%" width="190%" height="190%">
+            <feGaussianBlur stdDeviation={mode === "dark" ? 55 : 125} />
           </filter>
         </defs>
         <g filter={`url(#tp-aurora-${seed}-blur)`}>
@@ -574,7 +574,7 @@ export function AuroraLayer({
           style={{
             // Extra white scrim to guarantee logos/content are never
             // fighting the aurora on light slides. Fades from right to left.
-            backgroundImage: `linear-gradient(to left, ${hexA(brand.tokens.accent, 0.05)} 0%, ${hexA(brand.tokens.accent, 0.02)} 35%, rgba(255,255,255,0) 70%), linear-gradient(to bottom, rgba(255,255,255,0.35), rgba(255,255,255,0.15))`,
+            backgroundImage: `linear-gradient(to left, ${hexA(brand.tokens.accent, 0.025)} 0%, ${hexA(brand.tokens.accent, 0.01)} 35%, rgba(255,255,255,0) 70%), linear-gradient(to bottom, rgba(255,255,255,0.58), rgba(255,255,255,0.38))`,
           }}
         />
       )}
@@ -797,15 +797,17 @@ export function AuroraOrb({
   const a = accent ?? ctxAccent ?? "#4F8CFF";
   const sibling = shiftHue(a, 34, 0.06);
   const isLight = mode === "light";
-  const alpha = (isLight ? 0.9 : 0.72) * intensity;
-  const scaled = isLight ? size * 1.35 : size * 1.2;
+  const alpha = (isLight ? 0.28 : 0.72) * intensity;
+  const scaled = isLight ? size * 1.55 : size * 1.2;
+  const lightX = isLight ? (x >= 50 ? x + 10 : x - 10) : x;
+  const lightY = isLight ? (y >= 50 ? y + 12 : y - 12) : y;
   return (
     <div
       aria-hidden
       className={`pointer-events-none absolute ${className}`}
       style={{
-        left: `${x}%`,
-        top: `${y}%`,
+        left: `${lightX}%`,
+        top: `${lightY}%`,
         width: scaled,
         height: scaled,
         transform: "translate(-50%, -50%)",
@@ -813,7 +815,7 @@ export function AuroraOrb({
         background: isLight
           ? `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.85)} 12%, ${hexA(a, alpha * 0.5)} 34%, ${hexA(a, alpha * 0.18)} 62%, ${hexA(a, 0)} 100%)`
           : `radial-gradient(circle at 38% 40%, ${hexA(sibling, alpha)} 0%, ${hexA(a, alpha * 0.8)} 14%, ${hexA(a, alpha * 0.42)} 36%, ${hexA(a, alpha * 0.14)} 66%, ${hexA(a, 0)} 100%)`,
-        filter: isLight ? "blur(48px)" : "blur(40px)",
+        filter: isLight ? "blur(78px)" : "blur(40px)",
         mixBlendMode: isLight ? "multiply" : "screen",
       }}
     />
