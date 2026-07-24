@@ -441,7 +441,7 @@ export async function overlayVectorText(
       });
 
       linesDrawn += 1;
-      if (Math.abs(line.letterSpacing) >= 0.3) glyphOnly += 1;
+      if (Math.abs(line.letterSpacing) >= 0.3) trackedLines += 1;
 
     }
   }
@@ -452,7 +452,7 @@ export async function overlayVectorText(
   return {
     bytes,
     fontResources,
-    stats: { linesDrawn, glyphOnly, pages: pages.length },
+    stats: { linesDrawn, trackedLines, pages: pages.length },
   };
 }
 
