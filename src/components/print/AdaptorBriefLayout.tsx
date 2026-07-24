@@ -119,7 +119,7 @@ export function AdaptorBriefLayout({
             {/* HERO — wrapped in a relative container so a localized text-backing
                 scrim travels with the copy block rather than introducing a
                 full-width top wash. */}
-            <div style={{ position: "relative" }}>
+            <div data-section="hero" data-section-label="Hero" style={{ position: "relative" }}>
               <div style={heroCopyScrimStyle(mode)} aria-hidden />
               <div className="relative flex items-center justify-between" style={{ gap: cq(10) }}>
                 <PrintEyebrow
@@ -147,7 +147,7 @@ export function AdaptorBriefLayout({
             </div>
 
             {/* 6 FEATURE CARDS — grouped in one rounded panel (Canva ref). */}
-            <div style={{ paddingTop: cq(28) }}>
+            <div data-section="features" data-section-label="Feature grid" style={{ paddingTop: cq(28) }}>
               <div style={{ borderRadius: cq(16), padding: cq(18), ...glassCard(mode, accent) }}>
                 <div className="grid" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: cq(14) }}>
                   {features.map((f, i) => {
@@ -174,7 +174,7 @@ export function AdaptorBriefLayout({
 
             {/* WE KNOW HOW strip */}
             {knowHow.length > 0 && (
-              <>
+              <div data-section="knowHow" data-section-label="We know how">
                 <div className="flex items-center" style={{ gap: cq(14), paddingTop: cq(28) }}>
                   <div style={{ flex: 1, height: 1, background: dividerCol }} />
                   <div style={{ fontSize: cq(10), fontWeight: 700, letterSpacing: "0.14em", color: ink }}>
@@ -197,12 +197,12 @@ export function AdaptorBriefLayout({
                     </div>
                   ))}
                 </div>
-              </>
+              </div>
             )}
 
             {/* QUOTE */}
             {content.quote && (
-              <div className="flex items-start" style={{ gap: cq(16), paddingTop: cq(30), flex: 1 }}>
+              <div data-section="quote" data-section-label="Quote" className="flex items-start" style={{ gap: cq(16), paddingTop: cq(30), flex: 1 }}>
                 <div style={{ fontFamily: "Georgia, serif", fontSize: cq(54), lineHeight: 0.8, color: accentInk, fontWeight: 700 }} aria-hidden>
                   &ldquo;
                 </div>
@@ -223,7 +223,9 @@ export function AdaptorBriefLayout({
 
             {/* CTA BAND */}
             {content.cta && (
-              <PrintCTABand brand={brand} mode={mode} label={content.cta.label} cq={cq} />
+              <div data-section="cta" data-section-label="Call to action">
+                <PrintCTABand brand={brand} mode={mode} label={content.cta.label} cq={cq} />
+              </div>
             )}
 
             {/* FOOTER */}

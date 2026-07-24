@@ -59,6 +59,7 @@ import { schemaFor } from "@/lib/print-content-schema";
 import { CONTENT_SCHEMAS, unreachablePaths } from "@/lib/print-content-schema";
 
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
+import { SectionSelectOverlay } from "@/components/print/SectionSelectOverlay";
 import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2, Sun, Moon, ChevronDown, ChevronRight, Eye, EyeOff, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { uploadSlideMedia } from "@/lib/slide-media";
@@ -908,8 +909,24 @@ function AssetEditor() {
                 </>
               )}
             </LiveEditOverlay>
+            <SectionSelectOverlay
+              canvasRef={canvasRef}
+              scanKey={rawContent}
+              onDelete={(key) => {
+                if (key === "features") patchContent({ features: [] } as never);
+                else if (key === "knowHow") patchContent({ knowHow: [] } as never);
+                else if (key === "quote") patchContent({ quote: undefined } as never);
+                else if (key === "cta") patchContent({ cta: undefined } as never);
+                else if (key === "hero") patchContent({ heroMedia: undefined } as never);
+                toast.success(`${key} section removed`);
+              }}
+              onReplace={(key) => {
+                toast.info(`Edit "${key}" in the inspector panel →`);
+              }}
+            />
 
           </div>
+
 
 
           {/* INSPECTOR */}
