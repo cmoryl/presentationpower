@@ -5,9 +5,11 @@
 // admin sidebar). Owns all its own state; parent only supplies surface
 // defaults (which profile to seed, where to go on cancel/finish).
 
-import { Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, RefreshCw, Sparkles, Wand2 } from "lucide-react";
+import { Link, useNavigate, useRouter } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { ArrowLeft, ArrowRight, Check, RefreshCw, Save, Sparkles, Wand2 } from "lucide-react";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import {
   SOCIAL_FORMATS_BY_ID,
@@ -22,6 +24,7 @@ import {
 } from "@/lib/campaigns";
 import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
+import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
 
 /** First playbook copy for a given brand — the canonical division voice. */
 function exampleCopyForBrand(brandId: string) {
@@ -67,6 +70,8 @@ export type KitWizardProps = {
   backLabel?: string;
   /** Where the final "Finish" CTA sends the user. */
   finishHref: string;
+  /** If provided, load this saved kit and hydrate all steps from it. */
+  kitId?: string;
 };
 
 export function KitWizard({
@@ -75,6 +80,7 @@ export function KitWizard({
   backHref,
   backLabel = "Cancel",
   finishHref,
+  kitId,
 }: KitWizardProps) {
   const seededProfileId =
     defaultProfileId && KIT_PROFILES.some((p) => p.id === defaultProfileId)
@@ -101,6 +107,109 @@ export function KitWizard({
   const [event, setEvent] = useState<EventFacts>(EMPTY_EVENT);
   const [regenTick, setRegenTick] = useState(0);
   const [removed, setRemoved] = useState<Set<string>>(new Set());
+
+  // ─── Save state ────────────────────────────────────────────────────────
+  const [savedKitId, setSavedKitId] = useState<string | undefined>(kitId);
+  const [kitName, setKitName] = useState<string>("");
+  const [saving, setSaving] = useState(false);
+  const [hydrating, setHydrating] = useState<boolean>(!!kitId);
+
+  const getKitFn = useServerFn(getKit);
+  const saveKitFn = useServerFn(saveKit);
+  const router = useRouter();
+  const navigate = useNavigate();
+
+  // Hydrate all fields from a saved kit when kitId is provided.
+  useEffect(() => {
+    if (!kitId) return;
+    let cancelled = false;
+    setHydrating(true);
+    getKitFn({ data: { id: kitId } })
+      .then((row: SavedKit | null) => {
+        if (cancelled || !row) return;
+        setSavedKitId(row.id);
+        setKitName(row.name);
+        setBrandId(row.brandId);
+        setMode(row.mode);
+        setProfileId(row.profileId);
+        setFormatIds(row.formatIds);
+        setManualCopy({
+          title: row.copy.title ?? "",
+          summary: row.copy.summary ?? "",
+          cta: row.copy.cta ?? "",
+          statValue: row.copy.statValue ?? "",
+          statLabel: row.copy.statLabel ?? "",
+        });
+        setEvent({ ...EMPTY_EVENT, ...(row.eventFacts as Partial<EventFacts>), subBrand: row.brandId });
+        setAttachEvent(row.attachEvent);
+        setStep(4); // jump to review
+      })
+      .catch((err) => {
+        toast.error(err instanceof Error ? err.message : "Failed to load saved kit");
+      })
+      .finally(() => {
+        if (!cancelled) setHydrating(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // Only re-hydrate when kitId itself changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kitId]);
+
+  async function handleSave() {
+    const name = kitName.trim();
+    if (!name) {
+      toast.error("Give your kit a name first.");
+      return;
+    }
+    if (!manualCopy.title.trim()) {
+      toast.error("Add a headline (Step 2) before saving.");
+      return;
+    }
+    if (formatIds.length === 0) {
+      toast.error("Pick at least one format before saving.");
+      return;
+    }
+    setSaving(true);
+    try {
+      const row = await saveKitFn({
+        data: {
+          id: savedKitId,
+          name,
+          surface,
+          brandId,
+          mode,
+          profileId,
+          formatIds,
+          copy: {
+            title: manualCopy.title.trim() || undefined,
+            summary: manualCopy.summary.trim() || undefined,
+            cta: manualCopy.cta.trim() || undefined,
+            statValue: manualCopy.statValue.trim() || undefined,
+            statLabel: manualCopy.statLabel.trim() || undefined,
+          },
+          eventFacts: attachEvent ? (event as unknown as Record<string, any>) : {},
+          attachEvent,
+        },
+      });
+      setSavedKitId(row.id);
+      toast.success(savedKitId ? `Updated "${row.name}"` : `Saved "${row.name}" to your kits`);
+      // Reflect the id in the URL so refresh keeps us editing the same row.
+      if (!savedKitId) {
+        navigate({
+          to: surface === "event" ? "/events/new" : "/social/new",
+          search: { kit: row.id } as any,
+          replace: true,
+        }).catch(() => void 0);
+      }
+      router.invalidate();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to save kit");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   const source: CampaignSource | null = useMemo(() => {
     if (!manualCopy.title.trim()) return null;
@@ -480,6 +589,43 @@ export function KitWizard({
               </button>
             }
           >
+            {/* Save this kit — name + save button, always visible on review. */}
+            <div className="mb-5 rounded-2xl border border-[#003FC7]/25 bg-[#003FC7]/[0.04] p-4">
+              <div className="flex flex-wrap items-end gap-3">
+                <label className="flex-1 min-w-[240px] text-sm">
+                  <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-[#003FC7]">
+                    {savedKitId ? "Saved kit name" : "Name this kit to save it"}
+                  </div>
+                  <input
+                    type="text"
+                    value={kitName}
+                    onChange={(e) => setKitName(e.target.value)}
+                    placeholder={
+                      surface === "event"
+                        ? "e.g. TP Next · Berlin launch kit"
+                        : "e.g. Life Sciences · Q3 anthem"
+                    }
+                    className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                    maxLength={120}
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={saving || hydrating}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:bg-[#03002C] disabled:opacity-50"
+                >
+                  <Save size={12} />
+                  {saving ? "Saving…" : savedKitId ? "Update saved kit" : "Save to my kits"}
+                </button>
+              </div>
+              <p className="mt-2 text-[11px] text-black/55">
+                {savedKitId
+                  ? "This kit lives in your kits list — updates overwrite the saved copy."
+                  : `Saved kits appear on ${surface === "event" ? "/events" : "/social"} under "Your saved kits" so you can reopen or duplicate them any time.`}
+              </p>
+            </div>
+
             {source == null ? (
               <EmptyState
                 title="Add a headline to see your kit."

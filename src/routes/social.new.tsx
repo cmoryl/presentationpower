@@ -1,13 +1,17 @@
 // /social/new — public blank-kit wizard.
 //
 // Lives outside /admin so the "Start from a blank kit" flow from /social
-// stays in the main app shell (no admin sidebar). Delegates to KitWizard.
+// stays in the main app shell. Accepts ?kit=<uuid> to reopen a saved kit.
 
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
 import { KitWizard } from "@/components/campaigns/KitWizard";
 
+const SearchSchema = z.object({ kit: z.string().uuid().optional() });
+
 export const Route = createFileRoute("/social/new")({
+  validateSearch: (raw) => SearchSchema.parse(raw ?? {}),
   head: () => ({
     meta: [
       { title: "New social kit · TransPerfect Modular" },
@@ -29,6 +33,7 @@ export const Route = createFileRoute("/social/new")({
 });
 
 function SocialNewPage() {
+  const { kit } = Route.useSearch();
   return (
     <AppShell>
       <KitWizard
@@ -37,6 +42,7 @@ function SocialNewPage() {
         backHref="/social"
         backLabel="Back to social"
         finishHref="/social"
+        kitId={kit}
       />
     </AppShell>
   );

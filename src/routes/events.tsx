@@ -32,6 +32,7 @@ import {
 import { EVENT_PLAYBOOKS, type EventPlaybook } from "@/lib/event-playbooks";
 import { SOCIAL_FORMATS, KIT_PROFILES } from "@/lib/social-formats";
 import { useFavorites } from "@/lib/favorites";
+import { SavedKitsSection } from "@/components/campaigns/SavedKitsSection";
 
 export const Route = createFileRoute("/events")({
   head: () => ({
@@ -134,6 +135,9 @@ function EventsView() {
           <Stat label="Kit profiles" value={String(KIT_PROFILES.length)} />
         </dl>
       </header>
+
+      {/* Your saved kits (signed-in, non-empty only) */}
+      <SavedKitsSection surface="event" />
 
       {/* Playbook grid */}
       <section id="playbooks" className="space-y-5">
