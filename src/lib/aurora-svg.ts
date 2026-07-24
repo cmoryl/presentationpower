@@ -168,9 +168,9 @@ export function auroraBaseTint(brand: BrandMode, mode: "dark" | "light"): string
  *  v2 rebuild: dark mode is now 0.95 (was 0.7) so accent blooms carry full
  *  chroma the way the reference backdrops do. Light stays quieter. */
 export function auroraLayerOpacity(mode: "dark" | "light", intensity = 1): number {
-  // Light-mode aurora reduced ~20% (0.6 → 0.48) per brand direction so the
-  // white surface stays airy and text stays legible without a scrim.
-  return intensity * (mode === "dark" ? 0.95 : 0.48);
+  // Light-mode aurora reduced further (0.48 → 0.30) so accent blooms sit
+  // quietly behind content and never fight the logo or copy on white slides.
+  return intensity * (mode === "dark" ? 0.95 : 0.30);
 }
 
 /**
