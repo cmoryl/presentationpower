@@ -192,41 +192,7 @@ function PlaybookDemoView() {
         </ol>
       </section>
 
-      {/* Marketing collateral — full kit scope, grouped, with status ribbons */}
-      <section>
-        <SectionHead
-          eyebrow="Ships in kit"
-          title="Marketing collateral"
-          desc="The full production scope for this playbook — sponsorship, badges, signage, print, video, digital, email and merch. Pieces flagged live render right now; the rest are on the roadmap."
-        />
-        <div className="mt-6">
-          <CollateralGrid items={getExpandedCollateral(playbook)} />
-        </div>
-      </section>
-
-      {/* KPI targets */}
-      <section>
-        <SectionHead eyebrow="Success" title="KPI targets" desc="Benchmark rules of thumb from prior runs." />
-        <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {playbook.kpis.map((k) => (
-            <li
-              key={k.label}
-              className="flex items-baseline justify-between gap-4 rounded-2xl border border-black/10 bg-white/85 p-4"
-            >
-              <div>
-                <div className="text-xs uppercase tracking-widest text-black/50">
-                  <Target size={11} className="mr-1 inline" /> {k.label}
-                </div>
-                {k.detail ? <div className="mt-0.5 text-xs text-black/60">{k.detail}</div> : null}
-              </div>
-              <div className="text-2xl font-semibold tracking-tight text-[#03002C]">{k.target}</div>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-
-      {/* Live asset gallery */}
+      {/* Live asset gallery — rendered assets first */}
       <section id="assets">
         <SectionHead
           eyebrow="Live preview"
@@ -262,6 +228,40 @@ function PlaybookDemoView() {
           ))}
         </div>
       </section>
+
+      {/* Marketing collateral — full kit scope, grouped, with status ribbons */}
+      <section>
+        <SectionHead
+          eyebrow="Ships in kit"
+          title="Marketing collateral"
+          desc="The full production scope for this playbook — sponsorship, badges, signage, print, video, digital, email and merch. Pieces flagged live render right now; the rest are on the roadmap."
+        />
+        <div className="mt-6">
+          <CollateralGrid items={getExpandedCollateral(playbook)} />
+        </div>
+      </section>
+
+      {/* KPI targets */}
+      <section>
+        <SectionHead eyebrow="Success" title="KPI targets" desc="Benchmark rules of thumb from prior runs." />
+        <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {playbook.kpis.map((k) => (
+            <li
+              key={k.label}
+              className="flex items-baseline justify-between gap-4 rounded-2xl border border-black/10 bg-white/85 p-4"
+            >
+              <div>
+                <div className="text-xs uppercase tracking-widest text-black/50">
+                  <Target size={11} className="mr-1 inline" /> {k.label}
+                </div>
+                {k.detail ? <div className="mt-0.5 text-xs text-black/60">{k.detail}</div> : null}
+              </div>
+              <div className="text-2xl font-semibold tracking-tight text-[#03002C]">{k.target}</div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
 
       {/* Related playbooks */}
       <section>
