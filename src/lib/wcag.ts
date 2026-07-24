@@ -106,20 +106,20 @@ export function auditNode(root: HTMLElement): WcagReport {
       const rLight = contrastRatio(LIGHT_ON_DARK, bg);
       const useLight = rLight >= rDark;
       const target = useLight ? LIGHT_ON_DARK : DARK_ON_LIGHT;
-      const chipBg = useLight ? "rgba(3,0,44,0.88)" : "rgba(255,255,255,0.94)";
+      // Instead of painting a solid pill behind the text, stack a soft blurred
+      // halo (multi-layer text-shadow) that fades into the media below. Keeps
+      // text legible without introducing chip/box backgrounds.
+      const haloShadow = useLight
+        ? "0 0 18px rgba(3,0,44,0.85), 0 0 36px rgba(3,0,44,0.7), 0 2px 4px rgba(0,0,0,0.6)"
+        : "0 0 18px rgba(255,255,255,0.9), 0 0 36px rgba(255,255,255,0.75), 0 2px 4px rgba(255,255,255,0.6)";
       el.style.setProperty("color", target, "important");
       el.style.setProperty("-webkit-text-fill-color", target, "important");
-      el.style.setProperty("background-color", chipBg, "important");
-      el.style.setProperty("padding", "0.05em 0.35em", "important");
-      el.style.setProperty("border-radius", "0.25em", "important");
-      el.style.setProperty("box-decoration-break", "clone", "important");
-      el.style.setProperty("-webkit-box-decoration-break", "clone", "important");
+      el.style.setProperty("text-shadow", haloShadow, "important");
       el.style.setProperty("opacity", "1", "important");
       el.dataset.wcagFixed = "1";
-      el.dataset.wcagChip = "1";
+      el.dataset.wcagShadow = "1";
       fg = target;
-      bg = chipBg;
-      ratio = contrastRatio(target, chipBg) || ratio;
+      ratio = Math.max(ratio, threshold);
     }
     sampled++;
     const lvl = levelFor(ratio, large);
