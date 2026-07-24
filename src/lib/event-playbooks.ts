@@ -31,10 +31,26 @@ export type PlaybookPhase = {
   formats: string[];
 };
 
+export type CollateralCategory =
+  | "Sponsorship"
+  | "Wearables & Badges"
+  | "Signage & Environment"
+  | "Print & Collateral"
+  | "Video & Motion"
+  | "Digital & Web"
+  | "Email & Direct"
+  | "Merch & Swag";
+
 export type PlaybookDeliverable = {
-  surface: "digital" | "signage" | "print" | "video" | "email";
+  surface: "digital" | "signage" | "print" | "video" | "email" | "wearable" | "merch";
   label: string;
   detail: string;
+  /** Grouping for the collateral grid. Falls back to surface bucket. */
+  category?: CollateralCategory;
+  /** Production spec — dimensions, page count, print method. */
+  spec?: string;
+  /** Whether this piece is rendered live by the kit today. Absent = live. */
+  status?: "live" | "coming-soon";
 };
 
 export type PlaybookKpi = {
@@ -42,6 +58,7 @@ export type PlaybookKpi = {
   target: string;
   detail?: string;
 };
+
 
 export type EventPlaybook = {
   id: string;
@@ -699,3 +716,112 @@ export const EVENT_PLAYBOOKS_BY_ID: Record<string, EventPlaybook> = Object.fromE
 export function getPlaybook(id: string): EventPlaybook | undefined {
   return EVENT_PLAYBOOKS_BY_ID[id];
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// Marketing-collateral catalog. Combines the playbook's live deliverables with
+// a rich standard set of production pieces every enterprise event needs.
+// Anything not currently rendered by the kit is flagged `coming-soon`, so the
+// demo page can preview the full scope without pretending each piece renders.
+// ────────────────────────────────────────────────────────────────────────────
+
+const BASE_COLLATERAL: PlaybookDeliverable[] = [
+  { surface: "print",    category: "Sponsorship",         label: "Sponsorship prospectus",      detail: "Tiered packet — audience, benchmarks, package inclusions.", spec: "8.5×11in · 12pp PDF",  status: "coming-soon" },
+  { surface: "print",    category: "Sponsorship",         label: "Sponsor rate card",           detail: "One-page tier ladder with investment + placement matrix.",  spec: "8.5×11in",             status: "coming-soon" },
+  { surface: "print",    category: "Sponsorship",         label: "Sponsor thank-you certificate", detail: "Post-event partner acknowledgement · gold foil.",         spec: "8.5×11in",             status: "coming-soon" },
+  { surface: "wearable", category: "Wearables & Badges",  label: "Attendee badge",              detail: "Name, role, session tracks with colored track dot.",        spec: "3.5×4.5in · CR80",     status: "coming-soon" },
+  { surface: "wearable", category: "Wearables & Badges",  label: "Speaker badge",               detail: "Elevated speaker treatment + sponsor logo strip.",          spec: "3.5×4.5in · CR80",     status: "coming-soon" },
+  { surface: "wearable", category: "Wearables & Badges",  label: "Sponsor / staff badge",       detail: "Distinct pattern for expo staff and sponsor reps.",         spec: "3.5×4.5in · CR80",     status: "coming-soon" },
+  { surface: "wearable", category: "Wearables & Badges",  label: "Lanyard artwork",             detail: "Repeat print — wordmark + hashtag every 6in.",              spec: "36in loop · 3/4in wide", status: "coming-soon" },
+  { surface: "wearable", category: "Wearables & Badges",  label: "Wristband set (VIP · press · staff)", detail: "Tyvek wristband color set with QR access.",         spec: "10×1in",               status: "coming-soon" },
+  { surface: "print",    category: "Print & Collateral",  label: "Program guide",               detail: "Multi-page agenda · sessions · speakers · sponsors.",       spec: "5.5×8.5in · saddle-stitch", status: "coming-soon" },
+  { surface: "print",    category: "Print & Collateral",  label: "Tri-fold brochure",           detail: "Handout with tracks, sessions, and CTA panels.",            spec: "8.5×11in · tri-fold",  status: "coming-soon" },
+  { surface: "print",    category: "Print & Collateral",  label: "Post-event thank-you card",   detail: "A6 card with QR to replay + NPS survey.",                   spec: "5.8×4.1in",            status: "coming-soon" },
+  { surface: "print",    category: "Print & Collateral",  label: "Business card template",      detail: "Event-branded cards for on-site staff.",                    spec: "3.5×2in",              status: "coming-soon" },
+  { surface: "print",    category: "Print & Collateral",  label: "Session tent card",           detail: "Numbered A5 folded tent for room signage.",                 spec: "5.8×8.3in folded",     status: "coming-soon" },
+  { surface: "email",    category: "Email & Direct",      label: "Save-the-date HTML",          detail: "Modular HTML email · light + dark.",                        spec: "600px column",         status: "coming-soon" },
+  { surface: "email",    category: "Email & Direct",      label: "Speaker-confirmation email",  detail: "Ops email with logistics, AV, arrival window.",             spec: "600px column",         status: "coming-soon" },
+  { surface: "email",    category: "Email & Direct",      label: "Sponsor-outreach template",   detail: "Cold-outreach with prospectus attached.",                   spec: "Plain-text + HTML",    status: "coming-soon" },
+  { surface: "digital",  category: "Digital & Web",       label: "Zoom / Teams background pack", detail: "Three color variants for speakers and sales.",              spec: "1920×1080",            status: "coming-soon" },
+  { surface: "digital",  category: "Digital & Web",       label: "LinkedIn header set",         detail: "Speaker + team personal-header templates.",                 spec: "1584×396",             status: "coming-soon" },
+  { surface: "digital",  category: "Digital & Web",       label: "Website hero + countdown",    detail: "Homepage hero module with live countdown.",                 spec: "1920×720",             status: "coming-soon" },
+];
+
+const SIGNAGE_ADDONS: PlaybookDeliverable[] = [
+  { surface: "signage", category: "Signage & Environment", label: "Retractable banner",       detail: "Free-standing entrance banner with hashtag lockup.", spec: "33×80in retractable",  status: "coming-soon" },
+  { surface: "signage", category: "Signage & Environment", label: "Large-format hall banner", detail: "Corridor / façade banner for entrance drama.",       spec: "10×3ft vinyl",         status: "coming-soon" },
+  { surface: "signage", category: "Signage & Environment", label: "Stage backdrop",           detail: "Main-stage backdrop with sponsor rail.",              spec: "16×9ft SEG fabric",    status: "coming-soon" },
+  { surface: "signage", category: "Signage & Environment", label: "Wayfinding tower",         detail: "Freestanding directional tower per hall.",            spec: "24×72in double-sided", status: "coming-soon" },
+  { surface: "signage", category: "Signage & Environment", label: "Floor decals",             detail: "Numbered directional decals to session rooms.",       spec: "24×24in vinyl",        status: "coming-soon" },
+  { surface: "signage", category: "Signage & Environment", label: "Registration desk runner", detail: "Reception counter wrap with hashtag lockup.",         spec: "72×36in",              status: "coming-soon" },
+  { surface: "signage", category: "Signage & Environment", label: "Gobo projection",          detail: "Logo gobo template for cocktail hour rooms.",         spec: "Vector · single color", status: "coming-soon" },
+];
+
+const MERCH_ADDONS: PlaybookDeliverable[] = [
+  { surface: "merch", category: "Merch & Swag", label: "T-shirt design",       detail: "Front-logo, back-hashtag, unisex heavyweight.",  spec: "12×16in print area", status: "coming-soon" },
+  { surface: "merch", category: "Merch & Swag", label: "Tote bag artwork",     detail: "Canvas tote with wordmark + venue city.",         spec: "15×16in",            status: "coming-soon" },
+  { surface: "merch", category: "Merch & Swag", label: "Notebook cover",       detail: "A5 lay-flat notebook — logo + date block.",       spec: "5.8×8.3in",          status: "coming-soon" },
+  { surface: "merch", category: "Merch & Swag", label: "Water bottle wrap",    detail: "Aluminum bottle wrap · 750ml.",                   spec: "8.6×2.7in",          status: "coming-soon" },
+  { surface: "merch", category: "Merch & Swag", label: "Sticker sheet",        detail: "Die-cut sticker set with hashtag + division marks.", spec: "8.5×11in sheet",  status: "coming-soon" },
+];
+
+const VIDEO_ADDONS: PlaybookDeliverable[] = [
+  { surface: "video", category: "Video & Motion", label: "Sponsor loop reel", detail: "Rotating sponsor rail for house monitors.", spec: "1920×1080 · 60s loop", status: "coming-soon" },
+  { surface: "video", category: "Video & Motion", label: "Countdown video",   detail: "9:16 stage countdown before doors open.",   spec: "1080×1920 · 5-min",    status: "coming-soon" },
+  { surface: "video", category: "Video & Motion", label: "Session sizzle",    detail: "15-second track opener animation.",         spec: "1920×1080",            status: "coming-soon" },
+];
+
+const HEAVY_PHYSICAL_KINDS: PlaybookKind[] = [
+  "conference", "summit", "launch", "trade-show", "awards", "roadshow", "field-day",
+];
+
+/**
+ * Rich collateral catalog for a playbook — combines existing live deliverables
+ * (auto-flagged `status: "live"`) with a curated set of standard marketing
+ * collateral marked `coming-soon`. Deduped against the playbook's own labels.
+ */
+export function getExpandedCollateral(pb: EventPlaybook): PlaybookDeliverable[] {
+  const live: PlaybookDeliverable[] = pb.deliverables.map((d) => ({
+    ...d,
+    status: d.status ?? "live",
+    category: d.category ?? inferCategoryFromSurface(d.surface),
+  }));
+
+  let extras: PlaybookDeliverable[] = [...BASE_COLLATERAL];
+  if (HEAVY_PHYSICAL_KINDS.includes(pb.kind)) {
+    extras = extras.concat(SIGNAGE_ADDONS, MERCH_ADDONS);
+  }
+  // Webinars and briefings drop the video sizzle set — they're not motion-heavy.
+  if (pb.kind !== "webinar" && pb.kind !== "briefing") {
+    extras = extras.concat(VIDEO_ADDONS);
+  }
+
+  // Dedup coming-soon items whose label already ships live.
+  const liveKey = new Set(live.map((d) => d.label.toLowerCase()));
+  const filtered = extras.filter((d) => !liveKey.has(d.label.toLowerCase()));
+
+  return [...live, ...filtered];
+}
+
+function inferCategoryFromSurface(s: PlaybookDeliverable["surface"]): CollateralCategory {
+  switch (s) {
+    case "signage":  return "Signage & Environment";
+    case "print":    return "Print & Collateral";
+    case "video":    return "Video & Motion";
+    case "email":    return "Email & Direct";
+    case "wearable": return "Wearables & Badges";
+    case "merch":    return "Merch & Swag";
+    default:         return "Digital & Web";
+  }
+}
+
+export const COLLATERAL_CATEGORY_ORDER: CollateralCategory[] = [
+  "Sponsorship",
+  "Wearables & Badges",
+  "Signage & Environment",
+  "Print & Collateral",
+  "Video & Motion",
+  "Digital & Web",
+  "Email & Direct",
+  "Merch & Swag",
+];
+
