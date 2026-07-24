@@ -475,6 +475,9 @@ function AssetEditor() {
 
   const pageSize: PrintPageSize = ctx.pageSize ?? "A4";
   const density: PrintDensity = ctx.density ?? "standard";
+  const editorMode: PrintMode = ctx.editorMode ?? "light";
+  const showBleedGuides: boolean = !!ctx.showBleedGuides;
+  const bleedFraction = Math.max(0, Math.min(0.06, bleedIn / (pageSize === "A4" ? 8.27 : pageSize === "Letter" ? 8.5 : 8.5)));
   const canvasAspect =
     pageSize === "A4" ? "1 / 1.414"
     : pageSize === "Letter" ? "8.5 / 11"
@@ -495,6 +498,8 @@ function AssetEditor() {
 
   const densityPad = density === "compact" ? "p-8" : density === "airy" ? "p-16" : "p-12";
   const densityGap = density === "compact" ? "gap-4" : density === "airy" ? "gap-10" : "gap-6";
+
+
 
 
   return (
