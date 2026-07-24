@@ -22,7 +22,7 @@ export function auroraSvgDataUrl(
   const orbR = mode === "dark" ? "90%" : "95%";
   const midStop = mode === "dark" ? "38%" : "42%";
   const outerStop = mode === "dark" ? "78%" : "80%";
-  const blurStd = mode === "dark" ? 55 : 80;
+  const blurStd = mode === "dark" ? 55 : 125;
   const vw = aspect?.w ?? AURORA_NATIVE_ASPECT.w;
   const vh = aspect?.h ?? AURORA_NATIVE_ASPECT.h;
   // Preserve pixel dimensions for the native 1280×720 landscape frame (byte
@@ -108,15 +108,17 @@ export function auroraOrbs(
   const darkFirst = isCorporate
     ? brand.tokens.primary
     : shiftHue(brand.tokens.accent, -14, 0.04);
-  const lightPrimary = mixHex(brand.tokens.accent, brand.tokens.surface, 0.35);
+  const lightPrimary = mixHex(brand.tokens.accent, brand.tokens.surface, 0.78);
+  const lightAccent = mixHex(brand.tokens.accent, brand.tokens.surface, 0.62);
+  const lightSibling = mixHex(sibling, brand.tokens.surface, 0.68);
   const palette =
     mode === "dark"
       ? [darkFirst, brand.tokens.accent, sibling]
-      : [lightPrimary, brand.tokens.accent, sibling];
-  // Light mode toned down further (0.55 → 0.32) so aurora orbs never
+      : [lightPrimary, lightAccent, lightSibling];
+  // Light mode toned down further so aurora orbs never
   // overpower logos, text, or module chrome on white slides.
-  const alphaBase = mode === "dark" ? 0.82 : 0.32;
-  const alphaRange = mode === "dark" ? 0.15 : 0.08;
+  const alphaBase = mode === "dark" ? 0.82 : 0.18;
+  const alphaRange = mode === "dark" ? 0.15 : 0.04;
 
   const useAspect =
     aspect &&
@@ -183,9 +185,9 @@ export function auroraBaseTint(brand: BrandMode, mode: "dark" | "light"): string
  *  v2 rebuild: dark mode is now 0.95 (was 0.7) so accent blooms carry full
  *  chroma the way the reference backdrops do. Light stays quieter. */
 export function auroraLayerOpacity(mode: "dark" | "light", intensity = 1): number {
-  // Light-mode aurora reduced further (0.48 → 0.30) so accent blooms sit
+  // Light-mode aurora reduced further so accent blooms sit
   // quietly behind content and never fight the logo or copy on white slides.
-  return intensity * (mode === "dark" ? 0.95 : 0.30);
+  return intensity * (mode === "dark" ? 0.95 : 0.18);
 }
 
 /**

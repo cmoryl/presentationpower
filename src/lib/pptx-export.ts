@@ -183,6 +183,33 @@ async function fetchAsDataUrl(url: string, label?: string): Promise<string | nul
   }
 }
 
+async function tintImageDataUrl(dataUrl: string | null, color: string): Promise<string | null> {
+  if (!dataUrl || typeof document === "undefined") return dataUrl;
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.crossOrigin = "anonymous";
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error("logo decode failed"));
+      el.src = dataUrl;
+    });
+    const w = img.naturalWidth || img.width || 600;
+    const h = img.naturalHeight || img.height || 160;
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return dataUrl;
+    ctx.drawImage(img, 0, 0, w, h);
+    ctx.globalCompositeOperation = "source-in";
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, w, h);
+    return canvas.toDataURL("image/png");
+  } catch {
+    return dataUrl;
+  }
+}
+
 export type Palette = { primary: string; accent: string; surface: string; ink: string };
 
 // Derive a mode-aware palette so dark-mode exports don't render light-surface
@@ -238,7 +265,7 @@ export async function exportDeckToPptx(
   });
 
   const logos = getDivisionLogos(deck.brandModeId) ?? getDivisionLogos("tp");
-  const [logoColor, logoWhite, logoStackedColor, logoStackedWhite] = await Promise.all([
+  const [rawLogoColor, rawLogoWhite, rawLogoStackedColor, rawLogoStackedWhite] = await Promise.all([
     logos?.color ? fetchAsDataUrl(logos.color) : Promise.resolve(null),
     logos?.white
       ? fetchAsDataUrl(logos.white)
@@ -251,6 +278,12 @@ export async function exportDeckToPptx(
       : logos?.stackedColor
       ? fetchAsDataUrl(logos.stackedColor)
       : Promise.resolve(null),
+  ]);
+  const [logoColor, logoWhite, logoStackedColor, logoStackedWhite] = await Promise.all([
+    tintImageDataUrl(rawLogoColor, "#000000"),
+    tintImageDataUrl(rawLogoWhite ?? rawLogoColor, "#FFFFFF"),
+    tintImageDataUrl(rawLogoStackedColor, "#000000"),
+    tintImageDataUrl(rawLogoStackedWhite ?? rawLogoStackedColor, "#FFFFFF"),
   ]);
   const deckLogoOrientation: "horizontal" | "stacked" =
     deck.context?.logoOrientation === "stacked" ? "stacked" : "horizontal";

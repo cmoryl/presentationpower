@@ -292,7 +292,7 @@ export function SlideFrame({
   // Light mode: force the backdrop tint to pure white and push the scrim
   // near-opaque so imagery reads as a subtle wash on a white page.
   const tint = lightBackdrop ? "#FFFFFF" : (backdrop?.tint ?? defaultTint);
-  const scrimStrength = lightBackdrop ? 0.92 : (backdrop?.scrimStrength ?? 0.55);
+  const scrimStrength = lightBackdrop ? 0.97 : (backdrop?.scrimStrength ?? 0.55);
 
 
   const scrimGradient = (() => {
@@ -301,8 +301,8 @@ export function SlideFrame({
     const t = tint;
     // Light mode: keep the whole frame near-white and only let the image
     // peek through as a faint tinted wash on the opposite edge.
-    const minA = lightBackdrop ? Math.min(1, a * 0.78) : 0;
-    const midA = lightBackdrop ? Math.min(1, a * 0.9) : a * 0.55;
+    const minA = lightBackdrop ? Math.min(1, a * 0.88) : 0;
+    const midA = lightBackdrop ? Math.min(1, a * 0.96) : a * 0.55;
     const to = (dir: string) =>
       `linear-gradient(${dir}, ${hexA(t, a)} 0%, ${hexA(t, midA)} 45%, ${hexA(t, minA)} 100%)`;
     switch (backdrop.scrim ?? "bottom") {
@@ -368,7 +368,7 @@ export function SlideFrame({
               transform: backdrop!.zoom && backdrop!.zoom !== 1 ? `scale(${backdrop!.zoom})` : undefined,
               transformOrigin: "center center",
               filter: lightBackdrop
-                ? `brightness(${1.08 + (backdrop!.imageDim ?? 0) * 0.2}) saturate(0.85) contrast(0.95)`
+                ? `brightness(${1.16 + (backdrop!.imageDim ?? 0) * 0.16}) saturate(0.62) contrast(0.82)`
                 : backdrop!.imageDim
                   ? `brightness(${1 - backdrop!.imageDim}) saturate(0.95)`
                   : undefined,
@@ -381,8 +381,8 @@ export function SlideFrame({
             aria-hidden
             className="pointer-events-none absolute -left-[12%] top-[4%] h-[48%] w-[54%] rounded-full"
             style={{
-              backgroundColor: hexA(brand.tokens.accent, lightBackdrop ? 0.28 : 0.18),
-              filter: "blur(58px)",
+              backgroundColor: hexA(brand.tokens.accent, lightBackdrop ? 0.06 : 0.18),
+              filter: lightBackdrop ? "blur(118px)" : "blur(58px)",
               mixBlendMode: lightBackdrop ? "multiply" : "screen",
             }}
           />
@@ -390,11 +390,18 @@ export function SlideFrame({
             aria-hidden
             className="pointer-events-none absolute -bottom-[12%] right-[-10%] h-[56%] w-[56%] rounded-full"
             style={{
-              backgroundColor: hexA(brand.tokens.primary, lightBackdrop ? 0.14 : 0.22),
-              filter: "blur(64px)",
+              backgroundColor: hexA(brand.tokens.primary, lightBackdrop ? 0.035 : 0.22),
+              filter: lightBackdrop ? "blur(132px)" : "blur(64px)",
               mixBlendMode: lightBackdrop ? "multiply" : "screen",
             }}
           />
+          {lightBackdrop && (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.74), rgba(255,255,255,0.62))" }}
+            />
+          )}
           <div className="absolute inset-0" style={{ backgroundImage: scrimGradient }} />
         </>
       )}
@@ -471,7 +478,7 @@ export function SlideFrame({
               aria-hidden
               className="pointer-events-none absolute inset-0"
               style={{
-                backgroundImage: `linear-gradient(118deg, ${hexA(primary, 0.05)} 0%, ${hexA(primary, 0.02)} 45%, rgba(255,255,255,0) 80%), linear-gradient(180deg, rgba(255,255,255,1) 0%, ${hexA(brand.tokens.surface, 0.55)} 100%)`,
+                backgroundImage: `linear-gradient(118deg, ${hexA(primary, 0.02)} 0%, ${hexA(primary, 0.008)} 45%, rgba(255,255,255,0) 80%), linear-gradient(180deg, rgba(255,255,255,1) 0%, ${hexA(brand.tokens.surface, 0.38)} 100%)`,
               }}
             />
             {/* Accent corner glow — division re-tone as a faint tint. */}
@@ -479,7 +486,7 @@ export function SlideFrame({
               aria-hidden
               className="pointer-events-none absolute inset-0"
               style={{
-                backgroundImage: `radial-gradient(50% 38% at 96% 96%, ${hexA(accent, 0.12)} 0%, ${hexA(accent, 0)} 70%), radial-gradient(36% 26% at 4% 8%, ${hexA(primary, 0.06)} 0%, ${hexA(primary, 0)} 72%)`,
+                backgroundImage: `radial-gradient(50% 38% at 104% 104%, ${hexA(accent, 0.045)} 0%, ${hexA(accent, 0)} 72%), radial-gradient(36% 26% at -4% -4%, ${hexA(primary, 0.02)} 0%, ${hexA(primary, 0)} 74%)`,
                 mixBlendMode: "multiply",
               }}
             />
@@ -487,13 +494,13 @@ export function SlideFrame({
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0"
-              style={{ backgroundImage: "radial-gradient(120% 100% at 50% 50%, rgba(0,0,0,0) 60%, rgba(3,0,44,0.05) 100%)" }}
+              style={{ backgroundImage: "radial-gradient(120% 100% at 50% 50%, rgba(0,0,0,0) 62%, rgba(3,0,44,0.018) 100%)" }}
             />
             {/* Grain — barely-there tactile finish. */}
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0"
-              style={{ backgroundImage: GRAIN_SVG, backgroundSize: "160px 160px", opacity: 0.05, mixBlendMode: "multiply" }}
+              style={{ backgroundImage: GRAIN_SVG, backgroundSize: "160px 160px", opacity: 0.03, mixBlendMode: "multiply" }}
             />
           </>
         );
@@ -544,6 +551,7 @@ export function SlideFrame({
               clientLogoUrl={clientLogoUrl ?? null}
               subCompany={subCompany}
               orientation={normalizedOrient}
+              monochromeOfficialLogo
             />
           </div>
         );
