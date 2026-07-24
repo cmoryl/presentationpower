@@ -69,7 +69,9 @@ describe("aurora parity: on-screen renderer ↔ PPTX export", () => {
     const light = decodeSvg(auroraSvgDataUrl("x", brands[0] as any, "light"));
     expect(dark).toContain('stdDeviation="55"');
     expect(dark).toContain('r="90%"'); // orb radial gradient reach
-    expect(light).toContain('stdDeviation="80"');
+    // Light-mode blur was raised to 125px so accent orbs feather into the
+    // background without competing with content ink.
+    expect(light).toContain('stdDeviation="125"');
     expect(light).toContain('r="95%"');
     // v2 rebuild drops both the frosted-glass wash and the edge vignette so
     // content sits directly on the accent blooms (matches reference decks).
