@@ -135,6 +135,9 @@ function EventsView() {
         </dl>
       </header>
 
+      {/* Your saved kits (signed-in, non-empty only) */}
+      <SavedKitsSection surface="event" />
+
       {/* Playbook grid */}
       <section id="playbooks" className="space-y-5">
         <SectionHead
