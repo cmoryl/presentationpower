@@ -95,7 +95,7 @@ const TEMPLATES: Template[] = [
     id: "spotlight",
     label: "Client Spotlight",
     tagline: "Product · service · single-page hero",
-    desc: "One-page product spotlight — hero, quote card, project stats, and capability columns on the portrait aurora.",
+    desc: "One-page product spotlight — clean hero, quote card, project stats, and capability columns with modular print sections.",
     live: true,
     icon: <Layers size={16} />,
   },
@@ -111,15 +111,15 @@ const TEMPLATES: Template[] = [
     id: "ebrochure",
     label: "E-Brochure",
     tagline: "Challenge · Approach · Impact",
-    desc: "Single-page marketing PDF — pastel aurora hero, three summary cards, stat row, quote + Discover panel, and a division-tokenized CTA band.",
+    desc: "Single-page marketing PDF — clean hero, three summary cards, stat row, quote + Discover panel, and a division-tokenized CTA band.",
     live: true,
     icon: <PenSquare size={16} />,
   },
   {
     id: "adaptor-brief",
     label: "Adaptor Brief",
-    tagline: "Dark aurora hero + 6 capability cards",
-    desc: "Application / adaptor brief for enterprise integrations. Dark→light gradient hero, six verb cards, a 'We Know How' strip, and a pull-quote.",
+    tagline: "Clean hero + 6 capability cards",
+    desc: "Application / adaptor brief for enterprise integrations. Clean hero, six verb cards, a 'We Know How' strip, and a pull-quote.",
     live: true,
     icon: <Rocket size={16} />,
   },
@@ -290,7 +290,7 @@ function PrintCenterPage() {
         <div className="mt-3"><LibrarySubnav active="/library/print" /></div>
         <h1 className="mt-4 text-4xl font-semibold text-[#03002C]">Print design templates.</h1>
         <p className="mt-3 max-w-2xl text-black/60">
-          One-pagers, brochures, and briefs rendered on the same aurora + glass brand engine as your decks.
+          One-pagers, brochures, and briefs rendered on the same modular brand engine as your decks.
           Pick a template, preview it in the division that fits, then spin up an editable asset.
         </p>
       </div>

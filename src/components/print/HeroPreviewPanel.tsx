@@ -1,6 +1,6 @@
 // Compact hero preview shown in the print asset inspector. Lets the user
-// flip between the current `heroMedia` and the division aurora fallback
-// (what the page renders when heroMedia is empty) before exporting.
+// preview the current `heroMedia` or the plain page-base hero state that
+// renders when heroMedia is empty.
 import { useEffect, useState } from "react";
 import type { PrintHeroMedia } from "@/lib/print-assets.types";
 import type { BrandMode } from "@/lib/taxonomy";
@@ -13,15 +13,15 @@ type Props = {
 
 export function HeroPreviewPanel({ media, brand }: Props) {
   const hasMedia = !!media?.imageUrl;
-  const [view, setView] = useState<"media" | "aura">(hasMedia ? "media" : "aura");
+  const [view, setView] = useState<"media" | "base">(hasMedia ? "media" : "base");
   const [mode, setMode] = useState<"light" | "dark">("light");
   // Auto-follow: when the user picks or clears imagery in the panel above,
   // snap the preview to the matching view so changes are visible instantly
   // without needing to toggle Photo/Aura by hand.
   useEffect(() => {
-    setView(hasMedia ? "media" : "aura");
+    setView(hasMedia ? "media" : "base");
   }, [hasMedia]);
-  const active = view === "media" && !hasMedia ? "aura" : view;
+  const active = view === "media" && !hasMedia ? "base" : view;
 
   const accent = brand?.tokens?.accent ?? "#003FC7";
   const primary = brand?.tokens?.primary ?? accent;
@@ -67,12 +67,12 @@ export function HeroPreviewPanel({ media, brand }: Props) {
             </button>
             <button
               type="button"
-              onClick={() => setView("aura")}
+              onClick={() => setView("base")}
               className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 transition ${
-                active === "aura" ? "bg-white text-[#0b0d18]" : "text-white/70 hover:text-white"
+                active === "base" ? "bg-white text-[#0b0d18]" : "text-white/70 hover:text-white"
               }`}
             >
-              <Sparkles className="h-3 w-3" /> Aura
+              <Sparkles className="h-3 w-3" /> Base
             </button>
           </div>
         </div>
@@ -85,7 +85,7 @@ export function HeroPreviewPanel({ media, brand }: Props) {
         {active === "media" && hasMedia ? (
           <PhotoBand media={media!} accent={accent} mode={mode} />
         ) : (
-          <AuraBand accent={accent} primary={primary} mode={mode} />
+          <BaseHeroPreview mode={mode} />
         )}
         {/* Page body placeholder lines */}
         <div className="absolute inset-x-4 bottom-4 space-y-1.5">
@@ -99,8 +99,8 @@ export function HeroPreviewPanel({ media, brand }: Props) {
         {active === "media"
           ? "Renders when heroMedia is set. Aspect, focal, and scrim controls above."
           : hasMedia
-            ? "Fallback: shown only when the image URL is empty or fails to load."
-            : "No heroMedia set — pages will render this division aurora fallback."}
+            ? "Plain page-base hero shown when the image URL is empty or fails to load."
+            : "No heroMedia set — pages render the hero directly on the page base."}
       </div>
     </div>
   );
@@ -159,33 +159,15 @@ function PhotoBand({
   );
 }
 
-function AuraBand({
-  accent,
-  primary,
-  mode,
-}: {
-  accent: string;
-  primary: string;
-  mode: "light" | "dark";
-}) {
+function BaseHeroPreview({ mode }: { mode: "light" | "dark" }) {
   const isDark = mode === "dark";
   const pageBg = isDark ? "#111114" : "#FFFFFF";
-  const bloom = isDark
-    ? `radial-gradient(ellipse at 30% 25%, ${accent}88 0%, transparent 55%),` +
-      `radial-gradient(ellipse at 78% 30%, ${primary}66 0%, transparent 60%)`
-    : `radial-gradient(ellipse at 30% 25%, ${accent}55 0%, transparent 60%),` +
-      `radial-gradient(ellipse at 78% 30%, ${primary}33 0%, transparent 65%)`;
-  const mask = `linear-gradient(180deg, black 0%, black 62%, transparent 100%)`;
   return (
     <div
       className="absolute inset-x-0 top-0"
       style={{
         height: "55%",
-        background: `${bloom}, ${pageBg}`,
-        WebkitMaskImage: mask,
-        maskImage: mask,
-        opacity: isDark ? 1 : 0.85,
-        filter: "blur(0.4px)",
+        background: pageBg,
       }}
     />
   );

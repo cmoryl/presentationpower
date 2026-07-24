@@ -269,8 +269,8 @@ export type EBrochureContent = {
 
 
 // ---------------------------------------------------------------------------
-// ADAPTOR / APPLICATION BRIEF — single-page portrait brief with a dark
-// gradient hero, 6 feature cards, a "We Know How" strip, and a quote row.
+// ADAPTOR / APPLICATION BRIEF — single-page portrait brief with a clean
+// page-base hero, 6 feature cards, a "We Know How" strip, and a quote row.
 // Ported from ApplicationBrief.dc.html.
 // ---------------------------------------------------------------------------
 export type AdaptorFeature = {
