@@ -24,8 +24,8 @@ import { ChapterMap } from "@/components/ChapterMap";
 export const Route = createFileRoute("/brief/new")({
   head: () => ({
     meta: [
-      { title: "New brief · TransPerfect Modular" },
-      { name: "description", content: "Guided brief that resolves into an assembled deck." },
+      { title: "New master brief · TransPerfect Modular" },
+      { name: "description", content: "One brief · full brand set. Generate a presentation, print assets, an event kit, and a social kit in one pass." },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(taxonomyQueryOptions),
