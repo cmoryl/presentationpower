@@ -10,21 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TemplatesRouteImport } from './routes/templates'
-import { Route as SocialRouteImport } from './routes/social'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LogohubRouteImport } from './routes/logohub'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as ImageryRouteImport } from './routes/imagery'
 import { Route as FaqRouteImport } from './routes/faq'
-import { Route as EventsRouteImport } from './routes/events'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AtlasRouteImport } from './routes/atlas'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SocialIndexRouteImport } from './routes/social.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
+import { Route as EventsIndexRouteImport } from './routes/events.index'
 import { Route as DecksIndexRouteImport } from './routes/decks.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as TestPrintHeroRouteImport } from './routes/test.print-hero'
@@ -85,11 +85,6 @@ const TemplatesRoute = TemplatesRouteImport.update({
   path: '/templates',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SocialRoute = SocialRouteImport.update({
-  id: '/social',
-  path: '/social',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -113,11 +108,6 @@ const ImageryRoute = ImageryRouteImport.update({
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EventsRoute = EventsRouteImport.update({
-  id: '/events',
-  path: '/events',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -150,6 +140,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SocialIndexRoute = SocialIndexRouteImport.update({
+  id: '/social/',
+  path: '/social/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LibraryIndexRoute = LibraryIndexRouteImport.update({
   id: '/library/',
   path: '/library/',
@@ -159,6 +154,11 @@ const KnowledgeIndexRoute = KnowledgeIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => KnowledgeRoute,
+} as any)
+const EventsIndexRoute = EventsIndexRouteImport.update({
+  id: '/events/',
+  path: '/events/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DecksIndexRoute = DecksIndexRouteImport.update({
   id: '/decks/',
@@ -181,14 +181,14 @@ const TestPrintDndRoute = TestPrintDndRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const SocialPresetsRoute = SocialPresetsRouteImport.update({
-  id: '/presets',
-  path: '/presets',
-  getParentRoute: () => SocialRoute,
+  id: '/social/presets',
+  path: '/social/presets',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SocialNewRoute = SocialNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => SocialRoute,
+  id: '/social/new',
+  path: '/social/new',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
@@ -231,14 +231,14 @@ const KnowledgeEntryIdRoute = KnowledgeEntryIdRouteImport.update({
   getParentRoute: () => KnowledgeRoute,
 } as any)
 const EventsPresetsRoute = EventsPresetsRouteImport.update({
-  id: '/presets',
-  path: '/presets',
-  getParentRoute: () => EventsRoute,
+  id: '/events/presets',
+  path: '/events/presets',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const EventsNewRoute = EventsNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => EventsRoute,
+  id: '/events/new',
+  path: '/events/new',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DecksImportRoute = DecksImportRouteImport.update({
   id: '/decks/import',
@@ -382,9 +382,9 @@ const DecksDeckIdIndexRoute = DecksDeckIdIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const SocialDemoPlaybookIdRoute = SocialDemoPlaybookIdRouteImport.update({
-  id: '/demo/$playbookId',
-  path: '/demo/$playbookId',
-  getParentRoute: () => SocialRoute,
+  id: '/social/demo/$playbookId',
+  path: '/social/demo/$playbookId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const KnowledgeBrandGuidesSlugRoute =
   KnowledgeBrandGuidesSlugRouteImport.update({
@@ -393,9 +393,9 @@ const KnowledgeBrandGuidesSlugRoute =
     getParentRoute: () => KnowledgeRoute,
   } as any)
 const EventsDemoPlaybookIdRoute = EventsDemoPlaybookIdRouteImport.update({
-  id: '/demo/$playbookId',
-  path: '/demo/$playbookId',
-  getParentRoute: () => EventsRoute,
+  id: '/events/demo/$playbookId',
+  path: '/events/demo/$playbookId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DecksDeckIdPrintRoute = DecksDeckIdPrintRouteImport.update({
   id: '/decks/$deckId/print',
@@ -441,13 +441,11 @@ export interface FileRoutesByFullPath {
   '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
-  '/events': typeof EventsRouteWithChildren
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/social': typeof SocialRouteWithChildren
   '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
@@ -491,8 +489,10 @@ export interface FileRoutesByFullPath {
   '/test/print-hero': typeof TestPrintHeroRoute
   '/admin/': typeof AdminIndexRoute
   '/decks/': typeof DecksIndexRoute
+  '/events/': typeof EventsIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
+  '/social/': typeof SocialIndexRoute
   '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
@@ -512,12 +512,10 @@ export interface FileRoutesByTo {
   '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
-  '/events': typeof EventsRouteWithChildren
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/social': typeof SocialRouteWithChildren
   '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
@@ -561,8 +559,10 @@ export interface FileRoutesByTo {
   '/test/print-hero': typeof TestPrintHeroRoute
   '/admin': typeof AdminIndexRoute
   '/decks': typeof DecksIndexRoute
+  '/events': typeof EventsIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
   '/library': typeof LibraryIndexRoute
+  '/social': typeof SocialIndexRoute
   '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
@@ -584,13 +584,11 @@ export interface FileRoutesById {
   '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
-  '/events': typeof EventsRouteWithChildren
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/social': typeof SocialRouteWithChildren
   '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
@@ -634,8 +632,10 @@ export interface FileRoutesById {
   '/test/print-hero': typeof TestPrintHeroRoute
   '/admin/': typeof AdminIndexRoute
   '/decks/': typeof DecksIndexRoute
+  '/events/': typeof EventsIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
+  '/social/': typeof SocialIndexRoute
   '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
@@ -658,13 +658,11 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/atlas'
     | '/auth'
-    | '/events'
     | '/faq'
     | '/imagery'
     | '/knowledge'
     | '/logohub'
     | '/reset-password'
-    | '/social'
     | '/templates'
     | '/admin/ab'
     | '/admin/ai'
@@ -708,8 +706,10 @@ export interface FileRouteTypes {
     | '/test/print-hero'
     | '/admin/'
     | '/decks/'
+    | '/events/'
     | '/knowledge/'
     | '/library/'
+    | '/social/'
     | '/admin/campaigns/kit'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/pdf-index-proxy'
@@ -729,12 +729,10 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/atlas'
     | '/auth'
-    | '/events'
     | '/faq'
     | '/imagery'
     | '/logohub'
     | '/reset-password'
-    | '/social'
     | '/templates'
     | '/admin/ab'
     | '/admin/ai'
@@ -778,8 +776,10 @@ export interface FileRouteTypes {
     | '/test/print-hero'
     | '/admin'
     | '/decks'
+    | '/events'
     | '/knowledge'
     | '/library'
+    | '/social'
     | '/admin/campaigns/kit'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/pdf-index-proxy'
@@ -800,13 +800,11 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/atlas'
     | '/auth'
-    | '/events'
     | '/faq'
     | '/imagery'
     | '/knowledge'
     | '/logohub'
     | '/reset-password'
-    | '/social'
     | '/templates'
     | '/admin/ab'
     | '/admin/ai'
@@ -850,8 +848,10 @@ export interface FileRouteTypes {
     | '/test/print-hero'
     | '/admin/'
     | '/decks/'
+    | '/events/'
     | '/knowledge/'
     | '/library/'
+    | '/social/'
     | '/admin/campaigns/kit'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/pdf-index-proxy'
@@ -873,13 +873,11 @@ export interface RootRouteChildren {
   AnalyticsRoute: typeof AnalyticsRoute
   AtlasRoute: typeof AtlasRoute
   AuthRoute: typeof AuthRoute
-  EventsRoute: typeof EventsRouteWithChildren
   FaqRoute: typeof FaqRoute
   ImageryRoute: typeof ImageryRoute
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
   LogohubRoute: typeof LogohubRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
-  SocialRoute: typeof SocialRouteWithChildren
   TemplatesRoute: typeof TemplatesRoute
   ApiChatRoute: typeof ApiChatRoute
   AssetAssetIdRoute: typeof AssetAssetIdRoute
@@ -887,20 +885,28 @@ export interface RootRouteChildren {
   AssetSpotlightPreviewRoute: typeof AssetSpotlightPreviewRoute
   BriefNewRoute: typeof BriefNewRoute
   DecksImportRoute: typeof DecksImportRoute
+  EventsNewRoute: typeof EventsNewRoute
+  EventsPresetsRoute: typeof EventsPresetsRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
   LibraryMyRoute: typeof LibraryMyRoute
   LibraryPrintRoute: typeof LibraryPrintRoute
   ShareTokenRoute: typeof ShareTokenRoute
+  SocialNewRoute: typeof SocialNewRoute
+  SocialPresetsRoute: typeof SocialPresetsRoute
   TestPrintDndRoute: typeof TestPrintDndRoute
   TestPrintHeroRoute: typeof TestPrintHeroRoute
   DecksIndexRoute: typeof DecksIndexRoute
+  EventsIndexRoute: typeof EventsIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
+  SocialIndexRoute: typeof SocialIndexRoute
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
   ApiPublicPdfIndexProxyRoute: typeof ApiPublicPdfIndexProxyRoute
   DecksDeckIdDocumentRoute: typeof DecksDeckIdDocumentRoute
   DecksDeckIdExportRoute: typeof DecksDeckIdExportRoute
   DecksDeckIdPresentRoute: typeof DecksDeckIdPresentRoute
   DecksDeckIdPrintRoute: typeof DecksDeckIdPrintRoute
+  EventsDemoPlaybookIdRoute: typeof EventsDemoPlaybookIdRoute
+  SocialDemoPlaybookIdRoute: typeof SocialDemoPlaybookIdRoute
   DecksDeckIdIndexRoute: typeof DecksDeckIdIndexRoute
 }
 
@@ -911,13 +917,6 @@ declare module '@tanstack/react-router' {
       path: '/templates'
       fullPath: '/templates'
       preLoaderRoute: typeof TemplatesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/social': {
-      id: '/social'
-      path: '/social'
-      fullPath: '/social'
-      preLoaderRoute: typeof SocialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -953,13 +952,6 @@ declare module '@tanstack/react-router' {
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof FaqRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/events': {
-      id: '/events'
-      path: '/events'
-      fullPath: '/events'
-      preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -1004,6 +996,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/social/': {
+      id: '/social/'
+      path: '/social'
+      fullPath: '/social/'
+      preLoaderRoute: typeof SocialIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/library/': {
       id: '/library/'
       path: '/library'
@@ -1017,6 +1016,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/knowledge/'
       preLoaderRoute: typeof KnowledgeIndexRouteImport
       parentRoute: typeof KnowledgeRoute
+    }
+    '/events/': {
+      id: '/events/'
+      path: '/events'
+      fullPath: '/events/'
+      preLoaderRoute: typeof EventsIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/decks/': {
       id: '/decks/'
@@ -1048,17 +1054,17 @@ declare module '@tanstack/react-router' {
     }
     '/social/presets': {
       id: '/social/presets'
-      path: '/presets'
+      path: '/social/presets'
       fullPath: '/social/presets'
       preLoaderRoute: typeof SocialPresetsRouteImport
-      parentRoute: typeof SocialRoute
+      parentRoute: typeof rootRouteImport
     }
     '/social/new': {
       id: '/social/new'
-      path: '/new'
+      path: '/social/new'
       fullPath: '/social/new'
       preLoaderRoute: typeof SocialNewRouteImport
-      parentRoute: typeof SocialRoute
+      parentRoute: typeof rootRouteImport
     }
     '/share/$token': {
       id: '/share/$token'
@@ -1118,17 +1124,17 @@ declare module '@tanstack/react-router' {
     }
     '/events/presets': {
       id: '/events/presets'
-      path: '/presets'
+      path: '/events/presets'
       fullPath: '/events/presets'
       preLoaderRoute: typeof EventsPresetsRouteImport
-      parentRoute: typeof EventsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/events/new': {
       id: '/events/new'
-      path: '/new'
+      path: '/events/new'
       fullPath: '/events/new'
       preLoaderRoute: typeof EventsNewRouteImport
-      parentRoute: typeof EventsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/decks/import': {
       id: '/decks/import'
@@ -1328,10 +1334,10 @@ declare module '@tanstack/react-router' {
     }
     '/social/demo/$playbookId': {
       id: '/social/demo/$playbookId'
-      path: '/demo/$playbookId'
+      path: '/social/demo/$playbookId'
       fullPath: '/social/demo/$playbookId'
       preLoaderRoute: typeof SocialDemoPlaybookIdRouteImport
-      parentRoute: typeof SocialRoute
+      parentRoute: typeof rootRouteImport
     }
     '/knowledge/brand-guides/$slug': {
       id: '/knowledge/brand-guides/$slug'
@@ -1342,10 +1348,10 @@ declare module '@tanstack/react-router' {
     }
     '/events/demo/$playbookId': {
       id: '/events/demo/$playbookId'
-      path: '/demo/$playbookId'
+      path: '/events/demo/$playbookId'
       fullPath: '/events/demo/$playbookId'
       preLoaderRoute: typeof EventsDemoPlaybookIdRouteImport
-      parentRoute: typeof EventsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/decks/$deckId/print': {
       id: '/decks/$deckId/print'
@@ -1461,21 +1467,6 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
-interface EventsRouteChildren {
-  EventsNewRoute: typeof EventsNewRoute
-  EventsPresetsRoute: typeof EventsPresetsRoute
-  EventsDemoPlaybookIdRoute: typeof EventsDemoPlaybookIdRoute
-}
-
-const EventsRouteChildren: EventsRouteChildren = {
-  EventsNewRoute: EventsNewRoute,
-  EventsPresetsRoute: EventsPresetsRoute,
-  EventsDemoPlaybookIdRoute: EventsDemoPlaybookIdRoute,
-}
-
-const EventsRouteWithChildren =
-  EventsRoute._addFileChildren(EventsRouteChildren)
-
 interface KnowledgeRouteChildren {
   KnowledgeEntryIdRoute: typeof KnowledgeEntryIdRoute
   KnowledgeAskRoute: typeof KnowledgeAskRoute
@@ -1500,21 +1491,6 @@ const KnowledgeRouteWithChildren = KnowledgeRoute._addFileChildren(
   KnowledgeRouteChildren,
 )
 
-interface SocialRouteChildren {
-  SocialNewRoute: typeof SocialNewRoute
-  SocialPresetsRoute: typeof SocialPresetsRoute
-  SocialDemoPlaybookIdRoute: typeof SocialDemoPlaybookIdRoute
-}
-
-const SocialRouteChildren: SocialRouteChildren = {
-  SocialNewRoute: SocialNewRoute,
-  SocialPresetsRoute: SocialPresetsRoute,
-  SocialDemoPlaybookIdRoute: SocialDemoPlaybookIdRoute,
-}
-
-const SocialRouteWithChildren =
-  SocialRoute._addFileChildren(SocialRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -1522,13 +1498,11 @@ const rootRouteChildren: RootRouteChildren = {
   AnalyticsRoute: AnalyticsRoute,
   AtlasRoute: AtlasRoute,
   AuthRoute: AuthRoute,
-  EventsRoute: EventsRouteWithChildren,
   FaqRoute: FaqRoute,
   ImageryRoute: ImageryRoute,
   KnowledgeRoute: KnowledgeRouteWithChildren,
   LogohubRoute: LogohubRoute,
   ResetPasswordRoute: ResetPasswordRoute,
-  SocialRoute: SocialRouteWithChildren,
   TemplatesRoute: TemplatesRoute,
   ApiChatRoute: ApiChatRoute,
   AssetAssetIdRoute: AssetAssetIdRoute,
@@ -1536,20 +1510,28 @@ const rootRouteChildren: RootRouteChildren = {
   AssetSpotlightPreviewRoute: AssetSpotlightPreviewRoute,
   BriefNewRoute: BriefNewRoute,
   DecksImportRoute: DecksImportRoute,
+  EventsNewRoute: EventsNewRoute,
+  EventsPresetsRoute: EventsPresetsRoute,
   LibraryImportedRoute: LibraryImportedRoute,
   LibraryMyRoute: LibraryMyRoute,
   LibraryPrintRoute: LibraryPrintRoute,
   ShareTokenRoute: ShareTokenRoute,
+  SocialNewRoute: SocialNewRoute,
+  SocialPresetsRoute: SocialPresetsRoute,
   TestPrintDndRoute: TestPrintDndRoute,
   TestPrintHeroRoute: TestPrintHeroRoute,
   DecksIndexRoute: DecksIndexRoute,
+  EventsIndexRoute: EventsIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
+  SocialIndexRoute: SocialIndexRoute,
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
   ApiPublicPdfIndexProxyRoute: ApiPublicPdfIndexProxyRoute,
   DecksDeckIdDocumentRoute: DecksDeckIdDocumentRoute,
   DecksDeckIdExportRoute: DecksDeckIdExportRoute,
   DecksDeckIdPresentRoute: DecksDeckIdPresentRoute,
   DecksDeckIdPrintRoute: DecksDeckIdPrintRoute,
+  EventsDemoPlaybookIdRoute: EventsDemoPlaybookIdRoute,
+  SocialDemoPlaybookIdRoute: SocialDemoPlaybookIdRoute,
   DecksDeckIdIndexRoute: DecksDeckIdIndexRoute,
 }
 export const routeTree = rootRouteImport

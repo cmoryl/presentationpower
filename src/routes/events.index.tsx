@@ -34,7 +34,7 @@ import { SOCIAL_FORMATS, KIT_PROFILES } from "@/lib/social-formats";
 import { useFavorites } from "@/lib/favorites";
 import { SavedKitsSection } from "@/components/campaigns/SavedKitsSection";
 
-export const Route = createFileRoute("/events")({
+export const Route = createFileRoute("/events/")({
   head: () => ({
     meta: [
       { title: "Events · TransPerfect Modular" },
