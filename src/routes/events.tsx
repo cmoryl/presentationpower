@@ -96,9 +96,10 @@ function EventsView() {
   );
 
   return (
-    <div className="mx-auto max-w-7xl space-y-14 px-4 py-10 sm:px-6 lg:px-8">
+    <>
       {/* Hero */}
-      <header className="relative overflow-hidden rounded-3xl border border-black/10 bg-gradient-to-br from-[#003FC70a] via-white/60 to-[#A1FBF922] p-8 sm:p-12">
+      <header className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/60 to-[#A1FBF922] px-6 py-14 sm:-mt-10 sm:px-12 lg:px-24 lg:py-20">
+        <div className="mx-auto max-w-7xl">
         <div className="max-w-3xl space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
             <CalendarDays size={12} /> Events command center
