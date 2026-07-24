@@ -25,7 +25,6 @@ import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as DecksIndexRouteImport } from './routes/decks.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as TestPrintMatrixRouteImport } from './routes/test.print-matrix'
 import { Route as TestPrintHeroRouteImport } from './routes/test.print-hero'
 import { Route as TestPrintDndRouteImport } from './routes/test.print-dnd'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
@@ -150,11 +149,6 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
-} as any)
-const TestPrintMatrixRoute = TestPrintMatrixRouteImport.update({
-  id: '/test/print-matrix',
-  path: '/test/print-matrix',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const TestPrintHeroRoute = TestPrintHeroRouteImport.update({
   id: '/test/print-hero',
@@ -428,7 +422,6 @@ export interface FileRoutesByFullPath {
   '/share/$token': typeof ShareTokenRoute
   '/test/print-dnd': typeof TestPrintDndRoute
   '/test/print-hero': typeof TestPrintHeroRoute
-  '/test/print-matrix': typeof TestPrintMatrixRoute
   '/admin/': typeof AdminIndexRoute
   '/decks/': typeof DecksIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
@@ -489,7 +482,6 @@ export interface FileRoutesByTo {
   '/share/$token': typeof ShareTokenRoute
   '/test/print-dnd': typeof TestPrintDndRoute
   '/test/print-hero': typeof TestPrintHeroRoute
-  '/test/print-matrix': typeof TestPrintMatrixRoute
   '/admin': typeof AdminIndexRoute
   '/decks': typeof DecksIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
@@ -553,7 +545,6 @@ export interface FileRoutesById {
   '/share/$token': typeof ShareTokenRoute
   '/test/print-dnd': typeof TestPrintDndRoute
   '/test/print-hero': typeof TestPrintHeroRoute
-  '/test/print-matrix': typeof TestPrintMatrixRoute
   '/admin/': typeof AdminIndexRoute
   '/decks/': typeof DecksIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
@@ -618,7 +609,6 @@ export interface FileRouteTypes {
     | '/share/$token'
     | '/test/print-dnd'
     | '/test/print-hero'
-    | '/test/print-matrix'
     | '/admin/'
     | '/decks/'
     | '/knowledge/'
@@ -679,7 +669,6 @@ export interface FileRouteTypes {
     | '/share/$token'
     | '/test/print-dnd'
     | '/test/print-hero'
-    | '/test/print-matrix'
     | '/admin'
     | '/decks'
     | '/knowledge'
@@ -742,7 +731,6 @@ export interface FileRouteTypes {
     | '/share/$token'
     | '/test/print-dnd'
     | '/test/print-hero'
-    | '/test/print-matrix'
     | '/admin/'
     | '/decks/'
     | '/knowledge/'
@@ -783,7 +771,6 @@ export interface RootRouteChildren {
   ShareTokenRoute: typeof ShareTokenRoute
   TestPrintDndRoute: typeof TestPrintDndRoute
   TestPrintHeroRoute: typeof TestPrintHeroRoute
-  TestPrintMatrixRoute: typeof TestPrintMatrixRoute
   DecksIndexRoute: typeof DecksIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
@@ -908,13 +895,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
-    }
-    '/test/print-matrix': {
-      id: '/test/print-matrix'
-      path: '/test/print-matrix'
-      fullPath: '/test/print-matrix'
-      preLoaderRoute: typeof TestPrintMatrixRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/test/print-hero': {
       id: '/test/print-hero'
@@ -1324,7 +1304,6 @@ const rootRouteChildren: RootRouteChildren = {
   ShareTokenRoute: ShareTokenRoute,
   TestPrintDndRoute: TestPrintDndRoute,
   TestPrintHeroRoute: TestPrintHeroRoute,
-  TestPrintMatrixRoute: TestPrintMatrixRoute,
   DecksIndexRoute: DecksIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
