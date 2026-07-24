@@ -153,7 +153,7 @@ const navGroups: NavGroup[] = [
   },
 ];
 
-function AdminSidebar() {
+export function AdminSidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <aside className="w-full shrink-0 md:w-64">
