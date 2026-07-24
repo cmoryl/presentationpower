@@ -22,10 +22,12 @@
 import {
   PDFDocument,
   rgb,
+  setCharacterSpacing,
   StandardFonts as _Standard,
   type PDFFont,
   type PDFPage,
 } from "pdf-lib";
+
 import fontkit from "@pdf-lib/fontkit";
 
 // Silence unused import (kept for symbol table sanity).
