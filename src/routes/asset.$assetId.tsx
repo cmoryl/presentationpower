@@ -854,6 +854,26 @@ function AssetEditor() {
               {ctx.printSafeArea && (
                 <div className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25" />
               )}
+              {showBleedGuides && (
+                <>
+                  {/* Bleed edge (outer) — where the printed art bleeds off. */}
+                  <div
+                    className="pointer-events-none absolute rounded-none border border-dashed border-[#E53D2E]/70"
+                    style={{
+                      top: `${-bleedFraction * 100}%`,
+                      left: `${-bleedFraction * 100}%`,
+                      right: `${-bleedFraction * 100}%`,
+                      bottom: `${-bleedFraction * 100}%`,
+                    }}
+                    data-testid="bleed-guide-outer"
+                  />
+                  {/* Trim edge — the finished cut line. */}
+                  <div
+                    className="pointer-events-none absolute inset-0 border border-dashed border-[#003FC7]/70"
+                    data-testid="bleed-guide-trim"
+                  />
+                </>
+              )}
             </LiveEditOverlay>
 
           </div>
