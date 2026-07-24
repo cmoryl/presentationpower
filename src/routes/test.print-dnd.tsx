@@ -18,7 +18,7 @@
  *   - window.__printDnd = { add, move, remove, get, setTemplate }
  */
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   analyzePrintAsset,
