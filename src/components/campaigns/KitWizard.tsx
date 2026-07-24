@@ -70,6 +70,8 @@ export type KitWizardProps = {
   backLabel?: string;
   /** Where the final "Finish" CTA sends the user. */
   finishHref: string;
+  /** If provided, load this saved kit and hydrate all steps from it. */
+  kitId?: string;
 };
 
 export function KitWizard({
@@ -78,6 +80,7 @@ export function KitWizard({
   backHref,
   backLabel = "Cancel",
   finishHref,
+  kitId,
 }: KitWizardProps) {
   const seededProfileId =
     defaultProfileId && KIT_PROFILES.some((p) => p.id === defaultProfileId)
