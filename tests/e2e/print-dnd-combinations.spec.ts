@@ -46,6 +46,13 @@ function expectedLevel(kind: Kind, variants: Variant[]): Level {
 
 async function openHarness(page: Page, kind: Kind) {
   await page.goto(`/test/print-dnd?template=${kind}`, { waitUntil: "domcontentloaded" });
+  // Wait for React hydration: the harness registers window.__printDnd in a
+  // useEffect that runs post-hydration. Asserting DOM attributes alone matches
+  // the SSR paint before event handlers are bound and causes clicks to no-op.
+  await page.waitForFunction(
+    () => Boolean((window as unknown as { __printDnd?: unknown }).__printDnd),
+    { timeout: 15_000 },
+  );
   await expect(page.getByTestId("print-dnd-root")).toHaveAttribute("data-template", kind);
   await expect(page.getByTestId("layout-health")).toHaveAttribute("data-level", "ok");
 }
@@ -115,10 +122,13 @@ for (const kind of Object.keys(COMBOS) as Kind[]) {
         for (let i = 0; i < combo.length; i++) {
           const variant = combo[i]!;
           const priorLevel = expectedLevel(kind, combo.slice(0, i));
-          if (priorLevel === "block") {
-            // Budget already exhausted — add button for this weight must be gated.
-            // We still try (harness lets overflow through only for a dedicated
-            // overflow button); skip real "add" once page is blocking.
+          const prospectiveUsed = combo
+            .slice(0, i + 1)
+            .reduce((n, v) => n + WEIGHT[v], 0);
+          if (priorLevel === "block" || prospectiveUsed > BUDGETS[kind]) {
+            // Harness gates the add button when the next add would exceed
+            // the page budget. Stop the walk — the "gates" test proves the
+            // button is disabled in this state.
             break;
           }
           await addVariant(page, variant);

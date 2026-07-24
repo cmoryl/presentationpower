@@ -226,7 +226,7 @@ function Library() {
   const [pinnedOnly, setPinnedOnly] = useState(false);
   const [sort, setSort] = useState<"default" | "most-used" | "pinned-first">("default");
 
-  const [showImagery, setShowImagery] = useState(false);
+  const [showImagery, setShowImagery] = useState(true);
   const [density, setDensity] = useState<"comfortable" | "thumb">(() => {
     if (typeof window === "undefined") return "comfortable";
     return (window.localStorage.getItem("library:density") as "comfortable" | "thumb") ?? "comfortable";

@@ -1,62 +1,57 @@
+# DnD Craft Pass — Staged Execution
 
-# Shared Modules → Print Sections (Phase 1: Stats family)
+You asked me to be honest about what I can and can't reach in one pass. This ticket is roughly 3 dev-days of careful craft work compressed into a chat. Delivering all seven streams in one turn would force me to compress the two things you explicitly said not to compress: the WAI-ARIA keyboard path and the FLIP + insertion indicator craft. Splitting into three turns is the only way to hit the quality bar you set.
 
-Prove the pattern with the **Stats** family before rolling out to every variant. Once approved, subsequent phases (Quotes, Logo Grids, Timelines, Maps, Comparisons, Charts) reuse the same plumbing.
+## Turn 1 — Triage, prereqs, foundation (executing now on approval)
 
-## What ships in this phase
+**A. Triage 14 Playwright failures**
+- Read each failing spec + `error-context.md`, identify the failing assertion, correlate to recent commits in `asset.$assetId.tsx` and `ContentInspector.tsx`.
+- Confirm/refute the two prime suspects from #1891: the global `sed 's|mode="light"|mode={editorMode}|g'` and the `patchByPath` wiring.
+- Fix root causes at the source, not by loosening assertions.
+- Report per failure: root cause, introducing pass, fix.
 
-1. **A print block model** — a new content type `PrintSection` that any of the four print layouts (Case Study, Spotlight, eBrochure, Adaptor Brief) can host in a `sections[]` array.
-2. **Portrait-native renderers for 3 Stats variants** — `MV-KPI-DASHBOARD`, `MV-STAT-CALLOUT-ROW`, `MV-STAT-BENTO` — hand-tuned for portrait canvas and light/dark modes, not just container-scaled.
-3. **"Add Section" picker in the print editor** — inserts a Stats block anywhere in the document; each block is orderable, editable, deletable.
-4. **Default template slot integration** — the existing `stats[]` fields on Case Study / Spotlight / eBrochure become drivable by a chosen stats variant (default keeps current look; power users can swap the visualization without leaving the template).
-5. **Export path** — sections render inside the same page container so PDF and PPTX exports pick them up with no extra work.
+**B. Prereq screenshots from #1894**
+- ContentInspector for all 4 kinds (Case-Study, Spotlight, eBrochure, One-Pager) with an expanded array and a Canvas badge visible.
+- Mode toggle in both states with the canvas actually re-rendering.
+- Bleed + trim guides overlay.
 
-## Architecture
+**C. Foundation for the rewrite**
+- `bun add @dnd-kit/core @dnd-kit/sortable @dnd-kit/accessibility` inside a lazy-loaded chunk co-located with the print editor route only.
+- Move the shared-modules panel out of the right inspector column into a horizontal tray directly under the document canvas. This is the placement work from #1898 that this ticket depends on but does not itself deliver — has to land before the DnD engine goes on top.
+- Wire `delete` and `replace` (variant + family swap with lossy-swap confirmation) on tray entries — still using the existing HTML5 DnD for now, so behavior is complete before mechanics change.
 
-```text
-src/lib/print-assets.types.ts
-  + PrintSection = { id, kind: "stats", variantId, data }
-  + CaseStudyContent.sections?: PrintSection[]      (and same on the other 3)
+**Turn 1 gate:** `tsgo`, full `vitest`, full Playwright (must be back to green), production build. Actual counts reported.
 
-src/components/print/sections/
-  PrintSectionRenderer.tsx     switch on section.kind → variant
-  PrintSectionPicker.tsx       drawer: preview + insert
-  stats/
-    KpiDashboardPortrait.tsx   portrait-native MV-KPI-DASHBOARD
-    StatCalloutRowPortrait.tsx
-    StatBentoPortrait.tsx
-    shared.ts                  glass + ink helpers, matches CaseStudyLayout tokens
+## Turn 2 — dnd-kit engine + the 12 quality-bar items
 
-src/components/print/*Layout.tsx
-  render <PrintSectionRenderer /> for each section between hero and CTA
-  new "statsVariantId" slot for the existing stats row
-```
+- Replace HTML5 DnD with `@dnd-kit/core` + `sortable`. `PointerSensor` with 5px activation constraint. `KeyboardSensor` with the coordinate getter.
+- `DragOverlay` with `translate3d`-only movement, ~1.02 scale, elevated shadow, source-slot opacity dim.
+- Geometry cache on drag start (`onDragStart` snapshot of sibling rects), rAF-throttled `onDragMove`.
+- **FLIP layer** — first/last/invert/play on the sortable siblings when the insertion target changes. 200ms ease-out. Gated on `prefers-reduced-motion`.
+- **Insertion indicator** — 2px accent line between slots at the projected drop position. No live-reorder under the cursor; commit on drop.
+- **Drop settle** — animate the lifted item into its resolved slot; invalid drop animates back to origin.
+- **Auto-scroll** — proximity-proportional velocity when the pointer enters the top/bottom 60px of the scroll container.
+- **Touch** — `touch-action: none` on drag handles only (never the tray itself). Pointer capture via `PointerSensor` defaults.
+- **Keyboard + SR** — Space/Enter lift, Arrow move, Space/Enter drop, Escape cancel. `aria-live="polite"` region with position announcements ("Grabbed, position 2 of 4", "Moved to position 3", "Dropped", "Cancelled, returned to position 2").
 
-Portrait renderers share the same `glass()`, `cq()`, and ink logic already used in `CaseStudyLayout.tsx`, so blocks feel native to the document — not landscape slides shrunk down.
+## Turn 3 — Picker cross-container drop, tests, performance verification
 
-## Editor UX
+- Extend the same `DndContext` to include the picker drawer as a draggable source. Cross-container drops land in the tray with the same insertion indicator drawing across tray/canvas boundary.
+- Playwright specs: pointer reorder, picker-to-canvas insert, keyboard reorder (arrow + Space + Escape), delete via keyboard, capacity meter update mid-drag.
+- Performance trace via `page.tracing.start({ screenshots: true, categories: [...] })` around a real drag; parse the trace, report actual frame durations and any long tasks >16ms. Attach the trace file.
+- Record a frame sequence of a full drag (start → move → drop) as GIF or numbered PNGs.
+- Full gate again with real counts.
 
-- New "Sections" strip under the existing content inspector in `asset.$assetId.tsx`.
-- "Add section" button opens `PrintSectionPicker` with live thumbnails of each Stats variant in the current brand/mode.
-- Reorder via up/down buttons; delete with an icon button; edit fields inline (label / value / unit / delta) — same shape the slide variants already consume.
-- Each section carries its own `data`, so the inspector reuses existing stat-editing UI patterns.
+## Why not one turn
 
-## Export
+- Foundation (Turn 1) has to be right or the DnD rewrite lands on a broken base. The `sed` regression is exactly the kind of thing that will re-surface as "why does keyboard drop end up in the wrong slot" three days later if the root cause isn't understood first.
+- FLIP + insertion indicator is where the "craft" lives — it's ~400 lines of geometry math and animation code that has to be written slowly with the reduced-motion branch tested. Rushed FLIP looks worse than no FLIP.
+- Keyboard path needs its own attention: sensor + coordinate getter + announcement copy + focus management on delete/replace. If I fold it in with everything else it will silently become "arrows kind of work" instead of the real WAI-ARIA pattern.
 
-- Sections render inside the print page's `content-box`; the existing PDF export (`exportPrintAssetAsPdf`) captures them without changes.
-- PPTX export for print assets is out of scope for this phase (print assets are PDF-first).
+## What you get if you say "just do it all in one turn anyway"
 
-## Out of scope for Phase 1
+I will still do it, but the honest expected outcome is: engine swap works, mouse feels roughly right, keyboard is partial (probably lift + move but no announcement region or Escape polish), FLIP is a plain CSS transition rather than true FLIP, and performance is asserted not measured. That's the compression this ticket exists to prevent.
 
-- Other variant families (Quotes, Logo Grids, Timelines, Maps, Charts, Comparisons) — deferred to phases 2+.
-- Free-form drag reordering (up/down buttons only for now).
-- Cross-linking a section to a specific deck slide's data.
+## Confirm
 
-## Success criteria
-
-- All three portrait Stats renderers look production-ready in both light and dark modes across all four print templates.
-- Editor can add, reorder, edit, and delete a stats section.
-- Default template stat row optionally uses one of the three variants without breaking existing assets (backward compatible).
-- PDF export renders sections cleanly with no clipping or aurora bleed.
-
-Approve to build.
+Reply "go" to start Turn 1 immediately. Reply "one turn anyway" to accept the compression trade-off above. Reply with edits to reshape the split.
