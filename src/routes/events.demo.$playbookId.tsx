@@ -19,12 +19,13 @@ import {
   Users,
   BadgeCheck,
 } from "lucide-react";
-import { getPlaybook, EVENT_PLAYBOOKS, type EventPlaybook } from "@/lib/event-playbooks";
+import { getPlaybook, EVENT_PLAYBOOKS, getExpandedCollateral, type EventPlaybook } from "@/lib/event-playbooks";
 import { KIT_PROFILES_BY_ID, SOCIAL_FORMATS_BY_ID } from "@/lib/social-formats";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { buildCampaignAssets, sourceFromVariant } from "@/lib/campaigns";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { ForkPresetButton } from "@/components/campaigns/ForkPresetButton";
+import { CollateralGrid } from "@/components/campaigns/CollateralGrid";
 
 
 export const Route = createFileRoute("/events/demo/$playbookId")({
