@@ -65,6 +65,41 @@ const SEEDED_CONTENT: SpotlightContent = emptySpotlight({
     email: "jreyes@transperfect.com",
   },
   cta: { label: "Book a walkthrough", url: "https://transperfect.com" },
+  modules: [
+    {
+      id: "sec-preview-features",
+      kind: "feature-list",
+      variantId: "feature-cards-3col",
+      eyebrow: "What you get",
+      title: "Built for how modern teams ship",
+      items: [
+        { verb: "Translate", body: "Human-in-the-loop translation across 200+ language pairs.", icon: "language" },
+        { verb: "Adapt", body: "Transcreate and culturally tune every asset for each market.", icon: "sparkles" },
+        { verb: "Automate", body: "Connect CMS, PIM, DAM — content flows without tickets.", icon: "bolt" },
+        { verb: "Measure", body: "Live dashboards on quality, cost, and time-to-market.", icon: "trending" },
+        { verb: "Comply", body: "Enterprise security, ISO/SOC certified programs.", icon: "check" },
+        { verb: "Scale", body: "Launch new markets in days without adding headcount.", icon: "target" },
+      ],
+    },
+    {
+      id: "sec-preview-expertise",
+      kind: "expertise",
+      variantId: "expertise-credential-pills",
+      title: "Certifications",
+      items: [
+        { label: "ISO 17100" }, { label: "ISO 27001" }, { label: "ISO 9001" },
+        { label: "SOC 2 Type II" }, { label: "HIPAA" }, { label: "GDPR" },
+      ],
+    },
+    {
+      id: "sec-preview-logos",
+      kind: "logo-grid",
+      variantId: "logo-row-portrait",
+      eyebrow: "Trusted by",
+      title: "Selected clients",
+      items: Array.from({ length: 5 }, (_, i) => ({ name: `Client ${i + 1}` })),
+    },
+  ],
 });
 
 function SpotlightPreview() {
