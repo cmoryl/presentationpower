@@ -79,9 +79,10 @@ function SocialView() {
   );
 
   return (
-    <div className="mx-auto max-w-7xl space-y-14 px-4 py-10 sm:px-6 lg:px-8">
+    <>
       {/* Hero */}
-      <header className="relative overflow-hidden rounded-3xl border border-black/10 bg-gradient-to-br from-[#003FC70a] via-white/60 to-[#EC388a15] p-8 sm:p-12">
+      <header className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/60 to-[#EC388a15] px-6 py-14 sm:-mt-10 sm:px-12 lg:px-24 lg:py-20">
+        <div className="mx-auto max-w-7xl">
         <div className="max-w-3xl space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
             <Share2 size={12} /> Social command center
@@ -115,10 +116,13 @@ function SocialView() {
           <Stat label="Divisions" value={String(new Set(SOCIAL_PLAYBOOKS.map((p) => p.subBrand)).size)} />
           <Stat label="Angles" value={String(SOCIAL_ANGLES.length)} />
         </dl>
+        </div>
       </header>
 
+      <div className="mx-auto max-w-7xl space-y-14 px-4 py-10 sm:px-6 lg:px-8">
       {/* Your saved kits (signed-in, non-empty only) */}
       <SavedKitsSection surface="social" />
+
 
       {/* Angle filter */}
       <section id="playbooks" className="space-y-5">
@@ -265,7 +269,8 @@ function SocialView() {
           </div>
         ) : null}
       </section>
-    </div>
+      </div>
+    </>
   );
 }
 

@@ -96,9 +96,10 @@ function EventsView() {
   );
 
   return (
-    <div className="mx-auto max-w-7xl space-y-14 px-4 py-10 sm:px-6 lg:px-8">
+    <>
       {/* Hero */}
-      <header className="relative overflow-hidden rounded-3xl border border-black/10 bg-gradient-to-br from-[#003FC70a] via-white/60 to-[#A1FBF922] p-8 sm:p-12">
+      <header className="full-bleed relative -mt-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/60 to-[#A1FBF922] px-6 py-14 sm:-mt-10 sm:px-12 lg:px-24 lg:py-20">
+        <div className="mx-auto max-w-7xl">
         <div className="max-w-3xl space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
             <CalendarDays size={12} /> Events command center
@@ -134,10 +135,13 @@ function EventsView() {
           <Stat label="Rendered demo assets" value={String(totalAssets)} />
           <Stat label="Kit profiles" value={String(KIT_PROFILES.length)} />
         </dl>
+        </div>
       </header>
 
+      <div className="mx-auto max-w-7xl space-y-14 px-4 py-10 sm:px-6 lg:px-8">
       {/* Your saved kits (signed-in, non-empty only) */}
       <SavedKitsSection surface="event" />
+
 
       {/* Playbook grid */}
       <section id="playbooks" className="space-y-5">
@@ -309,7 +313,8 @@ function EventsView() {
           {favorites.size === 0 ? "Browse presentations →" : "Choose favorites →"}
         </Link>
       </section>
-    </div>
+      </div>
+    </>
   );
 }
 

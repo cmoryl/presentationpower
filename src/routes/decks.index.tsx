@@ -139,31 +139,36 @@ function DecksIndex() {
   return (
     <AppShell>
       {/* Header */}
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#003FC7] dark:text-[#A1FBF9]">
-            Workspace
+      <header className="full-bleed relative -mt-6 mb-8 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#C2A3FF22] px-6 py-14 sm:-mt-10 sm:px-12 lg:px-24 lg:py-20 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
+        <div className="mx-auto max-w-[1400px]">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#003FC7] dark:text-[#A1FBF9]">
+                Workspace
+              </div>
+              <h1 className="mt-2 text-4xl font-semibold tracking-tight sm:text-5xl">All decks</h1>
+              <p className="mt-2 max-w-xl text-sm text-black/60 dark:text-white/60">
+                Every deck and template in your workspace — search by title, client, or industry.
+              </p>
+            </div>
+            <Link
+              to="/brief/new"
+              className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white hover:opacity-90 dark:bg-[#A1FBF9] dark:text-[#03002C]"
+            >
+              <Rocket size={14} /> New deck
+            </Link>
           </div>
-          <h1 className="mt-2 text-4xl font-semibold tracking-tight">All decks</h1>
-          <p className="mt-2 max-w-xl text-sm text-black/60 dark:text-white/60">
-            Every deck and template in your workspace — search by title, client, or industry.
-          </p>
-        </div>
-        <Link
-          to="/brief/new"
-          className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-medium text-white hover:opacity-90 dark:bg-[#A1FBF9] dark:text-[#03002C]"
-        >
-          <Rocket size={14} /> New deck
-        </Link>
-      </div>
 
-      {/* Stats strip */}
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatChip label="Decks" value={totalDecks} accent="#003FC7" />
-        <StatChip label="Templates" value={totalTemplates} accent="#C2A3FF" />
-        <StatChip label="Shared" value={totalShared} accent="#A6FA87" icon={<Share2 size={12} />} />
-        <StatChip label="Never viewed" value={totalUnseen} accent="#FFEB66" icon={<Eye size={12} />} />
-      </div>
+          {/* Stats strip */}
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <StatChip label="Decks" value={totalDecks} accent="#003FC7" />
+            <StatChip label="Templates" value={totalTemplates} accent="#C2A3FF" />
+            <StatChip label="Shared" value={totalShared} accent="#A6FA87" icon={<Share2 size={12} />} />
+            <StatChip label="Never viewed" value={totalUnseen} accent="#FFEB66" icon={<Eye size={12} />} />
+          </div>
+        </div>
+      </header>
+
 
       {/* Filter bar */}
       <div className="mt-8 rounded-3xl border border-black/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">

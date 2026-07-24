@@ -335,27 +335,32 @@ function AboutPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-6xl">
-        <div className="flex items-baseline justify-between gap-6">
-          <div>
-            <div className="text-xs uppercase tracking-[0.3em] text-black/50">About</div>
-            <h1 className="mt-3 text-5xl font-semibold leading-[1.05] tracking-[-0.02em]">
-              A modular brand production system — Presentation, Print, Event, Social.
-            </h1>
-            <p className="mt-4 max-w-3xl text-lg text-black/65">
-              One brief fans out into every surface. This page documents the systems underneath —
-              master briefs, modules, brand governance, print studio, event & social kits, translation,
-              knowledge, live editing, Copilot, and analytics — so anyone new to the platform can
-              orient in one read.
-            </p>
+      <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] px-6 py-14 sm:-mt-10 sm:px-12 lg:px-24 lg:py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="flex items-baseline justify-between gap-6">
+            <div>
+              <div className="text-xs uppercase tracking-[0.3em] text-black/50">About</div>
+              <h1 className="mt-3 text-5xl font-semibold leading-[1.05] tracking-[-0.02em] sm:text-6xl">
+                A modular brand production system — Presentation, Print, Event, Social.
+              </h1>
+              <p className="mt-4 max-w-3xl text-lg text-black/65">
+                One brief fans out into every surface. This page documents the systems underneath —
+                master briefs, modules, brand governance, print studio, event & social kits, translation,
+                knowledge, live editing, Copilot, and analytics — so anyone new to the platform can
+                orient in one read.
+              </p>
+            </div>
+            <Link
+              to="/faq"
+              className="shrink-0 rounded-full border border-black/15 bg-white px-4 py-2 text-sm text-black/70 hover:border-black/30"
+            >
+              Step-by-step basics →
+            </Link>
           </div>
-          <Link
-            to="/faq"
-            className="shrink-0 rounded-full border border-black/15 bg-white px-4 py-2 text-sm text-black/70 hover:border-black/30"
-          >
-            Step-by-step basics →
-          </Link>
         </div>
+      </header>
+
+      <div className="mx-auto max-w-6xl">
 
         {/* Live stats */}
         <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4">
