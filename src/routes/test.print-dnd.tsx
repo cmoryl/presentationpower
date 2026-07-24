@@ -188,7 +188,7 @@ function PrintDnDHarness() {
       </section>
 
       <section className="mb-4 flex flex-wrap gap-2">
-        {(() => null)()}
+        
         <button
           type="button"
           data-testid="add-kpi"
