@@ -188,10 +188,26 @@ function Dashboard() {
         {/* animated aurora blobs — reactive to selected mode */}
         <AuroraHero mode={mode} />
 
+        {/* Oversized MODULAR watermark — brand signature behind the hero */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 -bottom-6 select-none text-center font-semibold leading-none tracking-[-0.04em]"
+          style={{
+            fontSize: "clamp(120px, 22vw, 320px)",
+            background: `linear-gradient(180deg, ${mode.accent}22 0%, transparent 70%)`,
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent",
+            mixBlendMode: "screen",
+          }}
+        >
+          MODULAR
+        </div>
+
         <div className="relative">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/75 backdrop-blur">
-              <Sparkles size={11} className="text-[#A1FBF9]" /> Command Center
+              <Sparkles size={11} className="text-[#A1FBF9]" /> Modular · Command Center
             </span>
             <span className="hidden text-[11px] text-white/50 sm:inline">
               {allDecks.length} decks · {totalSlides} slides · {MODULE_VARIANTS.length} modules
