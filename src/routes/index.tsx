@@ -185,24 +185,12 @@ function Dashboard() {
       <section
         className="full-bleed relative -mt-6 overflow-hidden border-b border-white/10 bg-[#03002C] py-8 text-white sm:-mt-10 sm:py-14 lg:py-20"
       >
-        {/* animated aurora blobs — reactive to selected mode */}
+        {/* animated aurora blobs — reactive to selected mode + scroll parallax */}
         <AuroraHero mode={mode} />
 
         {/* Oversized MODULAR watermark — brand signature behind the hero */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 -bottom-6 select-none text-center font-semibold leading-none tracking-[-0.04em]"
-          style={{
-            fontSize: "clamp(120px, 22vw, 320px)",
-            background: `linear-gradient(180deg, ${mode.accent}22 0%, transparent 70%)`,
-            WebkitBackgroundClip: "text",
-            backgroundClip: "text",
-            color: "transparent",
-            mixBlendMode: "screen",
-          }}
-        >
-          MODULAR
-        </div>
+        <ParallaxWatermark accent={mode.accent} />
+
 
         <div className="relative">
           <div className="flex flex-wrap items-center gap-2">
@@ -449,26 +437,85 @@ function Dashboard() {
 
 /* ---------- aurora hero backdrop ---------- */
 
+function ParallaxWatermark({ accent }: { accent: string }) {
+  const [scrollY, setScrollY] = useState(0);
+  useEffect(() => {
+    let raf = 0;
+    const update = () => { raf = 0; setScrollY(window.scrollY); };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => { window.removeEventListener("scroll", onScroll); if (raf) cancelAnimationFrame(raf); };
+  }, []);
+  const y = Math.min(scrollY, 800);
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-x-0 -bottom-6 select-none text-center font-semibold leading-none tracking-[-0.04em] will-change-transform"
+      style={{
+        fontSize: "clamp(120px, 22vw, 320px)",
+        background: `linear-gradient(180deg, ${accent}22 0%, ${accent}08 40%, transparent 100%)`,
+        WebkitBackgroundClip: "text",
+        backgroundClip: "text",
+        color: "transparent",
+        mixBlendMode: "screen",
+        transform: `translate3d(0, ${y * 0.45}px, 0)`,
+        opacity: Math.max(0, 1 - y / 700),
+      }}
+    >
+      MODULAR
+    </div>
+  );
+}
+
 function AuroraHero({ mode }: { mode: ModeDef }) {
+
+
+
+  // Scroll-driven parallax: blobs and vignette drift at different rates as the
+  // hero scrolls out of view. rAF-throttled to stay smooth and cheap.
+  const [scrollY, setScrollY] = useState(0);
+  useEffect(() => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      setScrollY(window.scrollY);
+    };
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // Cap the effective scroll so blobs don't fly off screen once past hero.
+  const y = Math.min(scrollY, 800);
+
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
       <div
-        className="absolute h-[420px] w-[420px] rounded-full opacity-40 blur-[110px] transition-all duration-[900ms] ease-out"
+        className="absolute h-[420px] w-[420px] rounded-full opacity-40 blur-[110px] transition-[background-color,top,left,right,bottom] duration-[900ms] ease-out will-change-transform"
         style={{
           backgroundColor: mode.accent,
           top: mode.id === "presentation" ? "-140px" : mode.id === "print" ? "40%" : mode.id === "event" ? "-40px" : "50%",
           left: mode.id === "presentation" ? "-100px" : mode.id === "print" ? "60%" : mode.id === "event" ? "40%" : "-80px",
+          transform: `translate3d(${y * 0.08}px, ${y * -0.35}px, 0)`,
         }}
       />
       <div
-        className="absolute h-[380px] w-[380px] rounded-full opacity-30 blur-[130px] transition-all duration-[900ms] ease-out"
+        className="absolute h-[380px] w-[380px] rounded-full opacity-30 blur-[130px] transition-[background-color,top,left,right,bottom] duration-[900ms] ease-out will-change-transform"
         style={{
           backgroundColor: mode.glow,
           bottom: mode.id === "presentation" ? "-80px" : mode.id === "print" ? "-40px" : mode.id === "event" ? "40%" : "-140px",
           right: mode.id === "presentation" ? "-60px" : mode.id === "print" ? "-100px" : mode.id === "event" ? "-80px" : "50%",
+          transform: `translate3d(${y * -0.1}px, ${y * 0.22}px, 0)`,
         }}
       />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.04),transparent_60%)]" />
+      {/* Smooth radial vignette — no hard 60% cutoff that reads as a band. */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.035),rgba(255,255,255,0)_85%)]" />
     </div>
   );
 }
