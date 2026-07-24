@@ -139,7 +139,7 @@ function DecksIndex() {
   return (
     <AppShell>
       {/* Header */}
-      <header className="full-bleed relative -mt-6 mb-8 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#C2A3FF22] px-6 py-14 sm:-mt-10 sm:px-12 lg:px-24 lg:py-20 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
+      <header className="full-bleed relative -mt-6 mb-8 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#C2A3FF22] py-14 sm:-mt-10 lg:py-20 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
         <div className="mx-auto max-w-[1400px]">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>

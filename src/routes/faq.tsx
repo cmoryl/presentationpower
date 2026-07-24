@@ -489,7 +489,7 @@ export const Route = createFileRoute("/faq")({
 function FAQPage() {
   return (
     <AppShell>
-      <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#C2A3FF22] px-6 py-14 sm:-mt-10 sm:px-12 lg:px-24 lg:py-20">
+      <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#C2A3FF22] py-14 sm:-mt-10 lg:py-20">
         <div className="mx-auto max-w-[1400px]">
           <div className="flex items-baseline justify-between gap-6">
             <div>
