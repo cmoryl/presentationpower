@@ -558,6 +558,24 @@ function Library() {
               Clear filters
             </button>
           )}
+          <button
+            type="button"
+            onClick={() => {
+              setSelectMode((v) => {
+                if (v) setSelected([]);
+                return !v;
+              });
+            }}
+            aria-pressed={selectMode}
+            title="Pick multiple modules, then build a deck from the selection"
+            className={`rounded-full border px-3 py-1.5 text-xs transition ${
+              selectMode
+                ? "border-[#003FC7] bg-[#003FC7] text-white"
+                : "border-black/15 bg-white text-black/70 hover:border-black/30 hover:text-black"
+            }`}
+          >
+            {selectMode ? "✓ Selecting" : "☐ Select modules"}
+          </button>
           <div className="ml-auto flex items-center gap-3">
             <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs">
               <button
