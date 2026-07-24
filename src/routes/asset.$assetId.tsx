@@ -32,9 +32,16 @@ import type {
   PrintPageSize,
 } from "@/lib/print-assets.types";
 import { emptyCaseStudy, emptySpotlight, emptyEBrochure, emptyAdaptorBrief } from "@/lib/print-assets.types";
-import type { PrintSection, PrintStatsSection, PrintStatsVariant } from "@/lib/print-assets.types";
+import type { PrintSection, PrintStatsSection, PrintStatsVariant, PrintQuoteSection, PrintQuoteVariant, PrintLogoGridSection, PrintLogoGridVariant, PrintExpertiseSection, PrintExpertiseVariant, PrintFeatureListSection, PrintFeatureVariant } from "@/lib/print-assets.types";
 import type { SpotlightContent, EBrochureContent, AdaptorBriefContent } from "@/lib/print-assets.types";
-import { PRINT_STATS_VARIANTS, PrintSectionRenderer } from "@/components/print/sections/PrintSectionRenderer";
+import {
+  PRINT_STATS_VARIANTS,
+  PRINT_QUOTE_VARIANTS,
+  PRINT_LOGO_VARIANTS,
+  PRINT_EXPERTISE_VARIANTS,
+  PRINT_FEATURE_VARIANTS,
+  PrintSectionRenderer,
+} from "@/components/print/sections/PrintSectionRenderer";
 import { PrintSectionPicker, PRINT_SECTION_DND_MIME } from "@/components/print/sections/PrintSectionPicker";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
