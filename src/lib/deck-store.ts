@@ -86,6 +86,8 @@ export type DeckSlide = {
   notes?: string;
   logoPosition?: SlideLogoPosition;
   logoOrientation?: "auto" | "horizontal" | "stacked" | "vertical-left" | "vertical-right" | "mark-only";
+  // Per-slide light/dark mode override. Undefined = default ("light").
+  mode?: "light" | "dark";
   // Free-form canvas overlay — draggable text blocks positioned in stage
   // coordinates on top of the variant. Persists across sessions and always
   // renders (in preview, present, share). Empty/undefined = no overlay.
@@ -206,6 +208,7 @@ type DeckState = {
   updateSlideCanvasBlocks: (deckId: string, slideId: string, blocks: CanvasBlock[]) => void;
   setSlideLogo: (deckId: string, slideId: string, patch: { position?: SlideLogoPosition; orientation?: "auto" | "horizontal" | "stacked" | "vertical-left" | "vertical-right" | "mark-only" }) => void;
   applySlideBackground: (deckId: string, slideIds: string[], background: unknown) => void;
+  setSlideMode: (deckId: string, slideId: string, mode: "light" | "dark") => void;
 
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
@@ -2030,6 +2033,23 @@ export const useDeckStore = create<DeckState>()(
                         : ({ ...(sl.content as Record<string, unknown>), background } as SlideContent)),
                     }
                   : sl,
+              ),
+            },
+          },
+        }));
+      },
+
+      setSlideMode: (deckId, slideId, mode) => {
+        pushHistory();
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) =>
+                sl.id === slideId ? { ...sl, mode } : sl,
               ),
             },
           },

@@ -91,6 +91,7 @@ function DeckEditor() {
   const setDeckClientLogo = useDeckStore((s) => s.setDeckClientLogo);
   const setDeckContext = useDeckStore((s) => s.setDeckContext);
   const applySlideBackground = useDeckStore((s) => s.applySlideBackground);
+  const setSlideMode = useDeckStore((s) => s.setSlideMode);
 
 
   const [activeIdx, setActiveIdx] = useState(0);
@@ -226,7 +227,7 @@ function DeckEditor() {
                   <div className="aspect-[16/9] bg-white">
                     <SlideThumbnailContext.Provider value={true}>
                       <ScaledSlide>
-                        {variant && <VariantRenderer slide={applyOverlay(slide)} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />}
+                        {variant && <VariantRenderer slide={applyOverlay(slide)} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={slide.mode ?? "light"} />}
                       </ScaledSlide>
                     </SlideThumbnailContext.Provider>
                   </div>
@@ -301,6 +302,39 @@ function DeckEditor() {
         {/* Stage */}
         <div>
           <div className="mb-2 flex items-center justify-end gap-2">
+            {active && (
+              <div
+                role="group"
+                aria-label="Slide appearance mode"
+                className="inline-flex items-center rounded-full border border-black/15 bg-white p-0.5 text-[11px] font-medium uppercase tracking-widest shadow-sm"
+                title="Toggle this slide between light and dark mode"
+              >
+                <button
+                  type="button"
+                  onClick={() => setSlideMode(deck.id, active.id, "light")}
+                  aria-pressed={(active.mode ?? "light") === "light"}
+                  className={`rounded-full px-3 py-1 transition ${
+                    (active.mode ?? "light") === "light"
+                      ? "bg-[#F5F7FB] text-black shadow-inner"
+                      : "text-black/50 hover:text-black"
+                  }`}
+                >
+                  ☀ Light
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSlideMode(deck.id, active.id, "dark")}
+                  aria-pressed={(active.mode ?? "light") === "dark"}
+                  className={`rounded-full px-3 py-1 transition ${
+                    (active.mode ?? "light") === "dark"
+                      ? "bg-[#03002C] text-white shadow-inner"
+                      : "text-black/50 hover:text-black"
+                  }`}
+                >
+                  ☾ Dark
+                </button>
+              </div>
+            )}
             <button
               type="button"
               onClick={() => { setCanvasMode(false); setLiveEdit((v) => !v); }}
@@ -338,7 +372,7 @@ function DeckEditor() {
                     onChange={(next) => updateCanvasBlocks(deck.id, active.id, next)}
                   >
                     <ScaledSlide>
-                      <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
+                      <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
                     </ScaledSlide>
                   </FreeCanvasEditor>
                 </SlideVideoPreviewContext.Provider>
@@ -356,7 +390,7 @@ function DeckEditor() {
                     onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
                   >
                     <ScaledSlide>
-                      <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
+                      <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
                       <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
                     </ScaledSlide>
                   </LiveEditOverlay>
@@ -374,7 +408,7 @@ function DeckEditor() {
               {active && mv && (
                 <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
                   <ScaledSlide>
-                    <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
+                    <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
                     <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
                   </ScaledSlide>
                 </SlideVideoPreviewContext.Provider>
@@ -821,7 +855,7 @@ function DeckEditor() {
           onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
           onNext={clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined}
         >
-          <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} />
+          <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
         </SlideLightbox>
       )}
 
