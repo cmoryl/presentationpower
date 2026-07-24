@@ -72,7 +72,6 @@ function KitBuilderView() {
     return null;
   }
 
-  const search = useSearch({ from: Route.id });
   const { favorites } = useFavorites();
   const favoriteVariants = useMemo(
     () => MODULE_VARIANTS.filter((v) => favorites.has(v.id)),
