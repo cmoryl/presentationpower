@@ -206,13 +206,12 @@ function AssetEditor() {
     }
     window.addEventListener("beforeunload", onBeforeUnload);
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [dirty]);
 
   // Mirror export panel state into ctx.exportPrefs so the user's preset
   // survives reload — no more re-tuning bleed/quality/ICC on every export.
   // Skipped until initial hydration completes to avoid overwriting stored
   // prefs with the useState defaults on first render.
-  const rowIdRef = useRef<string | null>(null);
-  rowIdRef.current = row?.id ?? null;
   useEffect(() => {
     if (!exportHydratedRef.current) return;
     const r = rowRef.current;
