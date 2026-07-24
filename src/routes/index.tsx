@@ -57,8 +57,8 @@ const MODES: ModeDef[] = [
     icon: Presentation,
     accent: "#003FC7",
     glow: "#A1FBF9",
-    eyebrow: "Decks · governed",
-    headline: "Assemble a deck the brand already approves.",
+    eyebrow: "Modular decks · governed",
+    headline: "Snap together a deck the brand already approves.",
     copy: "Brief the system. It picks the archetype, sections, and approved modules from the full TransPerfect brand library — you review, personalize, and ship.",
     actions: [
       { label: "New deck from brief", to: "/brief/new", primary: true, hint: "≈ 60s" },
