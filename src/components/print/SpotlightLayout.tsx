@@ -6,20 +6,16 @@ import type {
   PrintPageSize,
 } from "@/lib/print-assets.types";
 import { resolvePrintLogoInk } from "@/lib/print-assets.types";
-import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
 import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
-import { PrintHeroAura } from "@/components/print/PrintHeroAura";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
-import { autoHeroMedia } from "@/components/print/printHeroFallback";
 import { useTextFit } from "@/lib/text-fit";
 import {
   PAGE_W,
   cq,
   pageAspect,
-  auroraAspect,
   pagePadX,
   pagePadTop,
   glass,
@@ -145,12 +141,9 @@ export function SpotlightLayout({
               style={{ background: "#FFFFFF", zIndex: 0 }}
             />
           )}
-          {/* Top color wash removed per design direction — hero reads on the
-              page base color (or the optional hero media band). */}
-          {(() => {
-            const media = content.heroMedia ?? autoHeroMedia(brand.id, auroraSeed, mode);
-            return <PrintHeroMediaLayer media={media} accent={accent} mode={mode} cq={cq} />;
-          })()}
+          {content.heroMedia ? (
+            <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
+          ) : null}
 
           <div
             className="relative flex h-full flex-col"

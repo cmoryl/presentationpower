@@ -6,11 +6,9 @@ import type {
   PrintPageSize,
 } from "@/lib/print-assets.types";
 import { resolvePrintLogoInk } from "@/lib/print-assets.types";
-import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
 import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
-import { PrintHeroAura } from "@/components/print/PrintHeroAura";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
 import { useTextFit } from "@/lib/text-fit";
@@ -18,7 +16,6 @@ import {
   PAGE_W,
   cq,
   pageAspect,
-  auroraAspect,
   pagePadX as padX,
   pagePadTop,
   glass,
@@ -33,11 +30,11 @@ import {
 // -----------------------------------------------------------------------
 // PORT — TransPerfect CaseStudy.dc.html → CaseStudyLayout
 //
-// Dark gradient hero, three stat pills tucked over the seam, Challenge /
+// Clean page-base hero, three stat pills tucked under it, Challenge /
 // Solution / Result rows, pull-quote + Engagement Snapshot, CTA band,
 // footer lockup. Same synthesis as Spotlight/EBrochure/AdaptorBrief: the
-// hero gradient is division-tokenized, the white cards become glass over
-// the aurora, pixels convert to `cqw` against the 816px canvas.
+// cards use division-tokenized glass, pixels convert to `cqw` against the
+// 816px canvas.
 //
 // Shared page/aurora geometry, glass, chip, and icon primitives live in
 // ./print-primitives — do NOT duplicate helpers here.
@@ -119,17 +116,12 @@ export function CaseStudyLayout({
               style={{ background: "#FFFFFF", zIndex: 0 }}
             />
           )}
-          {/* Top color wash removed per design direction — hero reads on the
-              page base color (or the optional hero media band). */}
           {content.heroMedia ? (
             <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
-          ) : mode === "light" ? (
-            <PrintHeroAura brand={brand} mode="light" accent={accent} primary={primary} seed={seed ?? `casestudy-${brand.id}-${mode}`} aspect={auroraAspect(pageSize)} cq={cq} />
           ) : null}
 
 
-          {/* HERO — no full-color band; background inherits page bg (white / offset black).
-              A soft accent halo bleeds from the top-right so the division still reads. */}
+          {/* HERO — no full-color band; background inherits page bg (white / offset black). */}
           <div
             className="relative"
             style={{
@@ -138,19 +130,6 @@ export function CaseStudyLayout({
               color: ink,
             }}
           >
-            {mode === "dark" && (
-              <div
-                className="pointer-events-none absolute"
-                aria-hidden
-                style={{
-                  top: cq(-60), right: cq(-80),
-                  width: cq(300), height: cq(300), borderRadius: "50%",
-                  background: `radial-gradient(circle at 40% 40%, color-mix(in srgb, ${accent} 45%, transparent) 0%, color-mix(in srgb, ${accent} 15%, transparent) 50%, transparent 72%)`,
-                  filter: `blur(${cq(6)})`,
-                  opacity: 0.85,
-                }}
-              />
-            )}
             <div className="relative flex items-center justify-between" style={{ gap: cq(10) }}>
               <PrintEyebrow
                 label={content.eyebrow ?? "CLIENT CASE STUDY"}

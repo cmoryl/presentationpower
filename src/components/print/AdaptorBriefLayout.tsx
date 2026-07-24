@@ -6,12 +6,9 @@ import type {
   PrintPageSize,
 } from "@/lib/print-assets.types";
 import { resolvePrintLogoInk } from "@/lib/print-assets.types";
-import { AuroraLayer } from "@/components/slide/flagship";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
 import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
-import { autoHeroMedia } from "@/components/print/printHeroFallback";
-import { PrintHeroAura } from "@/components/print/PrintHeroAura";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
 import { useTextFit } from "@/lib/text-fit";
@@ -19,7 +16,6 @@ import {
   PAGE_W,
   cq,
   pageAspect,
-  auroraAspect,
   pagePadX as padX,
   pagePadTop,
   glass as glassCard,
@@ -112,22 +108,17 @@ export function AdaptorBriefLayout({
               style={{ background: "#FFFFFF", zIndex: 0 }}
             />
           )}
-          {/* Top color wash removed per design direction — hero reads on the
-              page base color (or the optional hero media band). */}
-          {(() => {
-            const heroSeed = seed ?? `adaptor-${brand.id}-${mode}`;
-            const media = content.heroMedia ?? autoHeroMedia(brand.id, heroSeed, mode);
-            return <PrintHeroMediaLayer media={media} accent={accent} mode={mode} cq={cq} />;
-          })()}
+          {content.heroMedia ? (
+            <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
+          ) : null}
 
           <div className="relative flex h-full flex-col" style={{
             paddingLeft: cq(padX(density)), paddingRight: cq(padX(density)),
             paddingTop: cq(padTop(density)), paddingBottom: cq(28),
           }}>
             {/* HERO — wrapped in a relative container so a localized text-backing
-                scrim travels with the copy block rather than the photo. This is
-                what keeps title + tagline legible on mid-band photos where a
-                global scrim goes transparent (e.g. Adaptor Legal light). */}
+                scrim travels with the copy block rather than introducing a
+                full-width top wash. */}
             <div style={{ position: "relative" }}>
               <div style={heroCopyScrimStyle(mode)} aria-hidden />
               <div className="relative flex items-center justify-between" style={{ gap: cq(10) }}>
