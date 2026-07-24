@@ -2039,6 +2039,23 @@ export const useDeckStore = create<DeckState>()(
         }));
       },
 
+      setSlideMode: (deckId, slideId, mode) => {
+        pushHistory();
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) =>
+                sl.id === slideId ? { ...sl, mode } : sl,
+              ),
+            },
+          },
+        }));
+      },
+
 
       swapVariant: (deckId, slideId, newVariantId) => {
         const deck = get().decks[deckId];
