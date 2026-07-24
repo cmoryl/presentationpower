@@ -468,13 +468,16 @@ function ParallaxWatermark({ accent }: { accent: string }) {
       className="pointer-events-none absolute inset-x-0 -bottom-6 select-none text-center font-semibold leading-none tracking-[-0.04em] will-change-transform"
       style={{
         fontSize: "clamp(120px, 22vw, 320px)",
-        background: `linear-gradient(180deg, ${accent}22 0%, ${accent}08 40%, transparent 100%)`,
+        // Softer 4-stop fade — no visible edge where the letter tops begin.
+        background: `linear-gradient(180deg, ${accent}00 0%, ${accent}14 35%, ${accent}05 75%, transparent 100%)`,
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
         color: "transparent",
         mixBlendMode: "screen",
         transform: `translate3d(0, ${y * 0.45}px, 0)`,
         opacity: Math.max(0, 1 - y / 700),
+        WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 25%, black 100%)",
+        maskImage: "linear-gradient(180deg, transparent 0%, black 25%, black 100%)",
       }}
     >
       MODULAR
