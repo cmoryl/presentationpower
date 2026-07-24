@@ -182,19 +182,33 @@ function BriefWizard() {
   return (
     <AppShell>
       <div className="font-['Geist']" style={{ color: PALETTE.ink }}>
-        {/* HERO — matches homepage command-center language */}
+        {/* HERO — master creation flow */}
         <section className="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-[#03002C] via-[#0B2A4A] to-[#003FC7] p-8 text-white sm:p-10">
           <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#A1FBF9]/20 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-[#C2A3FF]/20 blur-3xl" />
           <div className="relative max-w-3xl">
-            <div className="text-xs uppercase tracking-[0.35em] text-[#A1FBF9]">Briefing engine</div>
+            <div className="text-xs uppercase tracking-[0.35em] text-[#A1FBF9]">Master creation · one brief, full set</div>
             <h1 className="mt-4 text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl">
-              New pitch deck brief
+              New master brief
             </h1>
             <p className="mt-4 max-w-xl text-base text-white/70 sm:text-lg">
-              Configure the AI narrative engine. Brief the system and it picks the archetype,
-              sections, and approved modules for your next presentation.
+              Brief the system once. Pick which surfaces to produce — presentation, print, event kit, social kit — and every artifact assembles from the same brand, narrative, and knowledge context.
             </p>
+            {/* Step index */}
+            <ol className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] font-mono uppercase tracking-[0.18em] text-white/70">
+              {[
+                "01 · Brand",
+                "02 · Prospect",
+                "03 · Context (opt.)",
+                "04 · Master set",
+                "05 · Generate",
+              ].map((s) => (
+                <li key={s} className="flex items-center gap-2">
+                  <span className="inline-block h-1 w-1 rounded-full bg-[#A1FBF9]" />
+                  {s}
+                </li>
+              ))}
+            </ol>
             <div className="mt-6 flex flex-wrap items-center gap-2">
               <Link
                 to="/decks/import"
