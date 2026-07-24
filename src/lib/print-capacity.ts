@@ -228,6 +228,26 @@ export function analyzeSection(
     });
     pushLen(issues, "Stats title", s.title, 60, moduleIndex);
     pushLen(issues, "Stats eyebrow", s.eyebrow, 48, moduleIndex);
+  } else if (section.kind === "quote") {
+    pushLen(issues, "Quote text", section.text, section.variantId === "quote-inline-compact" ? 180 : 340, moduleIndex);
+    pushLen(issues, "Quote author", section.author, 60, moduleIndex);
+  } else if (section.kind === "logo-grid") {
+    const cfg = PRINT_LOGO_VARIANT_LIMITS[section.variantId];
+    if (cfg && section.items.length > cfg.maxItems) {
+      issues.push({ level: "block", code: "logos-overflow", message: `${section.variantId} supports up to ${cfg.maxItems} logos — ${section.items.length} will clip.`, moduleIndex });
+    }
+  } else if (section.kind === "expertise") {
+    const cfg = PRINT_EXPERTISE_VARIANT_LIMITS[section.variantId];
+    if (cfg && section.items.length > cfg.maxItems) {
+      issues.push({ level: "block", code: "expertise-overflow", message: `${section.variantId} supports up to ${cfg.maxItems} items — ${section.items.length} will clip.`, moduleIndex });
+    }
+    if (cfg) section.items.forEach((it, i) => pushLen(issues, `Item ${i + 1} label`, it.label, cfg.labelMax, moduleIndex));
+  } else if (section.kind === "feature-list") {
+    const cfg = PRINT_FEATURE_VARIANT_LIMITS[section.variantId];
+    if (cfg && section.items.length > cfg.maxItems) {
+      issues.push({ level: "block", code: "features-overflow", message: `${section.variantId} supports up to ${cfg.maxItems} features — ${section.items.length} will clip.`, moduleIndex });
+    }
+    if (cfg) section.items.forEach((it, i) => pushLen(issues, `Feature ${i + 1} body`, it.body, cfg.bodyMax, moduleIndex));
   }
   return issues;
 }
