@@ -16,27 +16,54 @@ import { getBrandhubIntel } from "@/lib/brandhub-intel";
 export const ANTHROPIC_MODEL = "claude-sonnet-4-6";
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 
+// Lovable AI Gateway fallback (OpenAI-compatible). Enabled automatically when
+// ANTHROPIC_API_KEY is absent but LOVABLE_API_KEY is present. Gemini 3.6-flash
+// supports tool/function calling, which the Copilot depends on.
+const LOVABLE_GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+export const LOVABLE_GATEWAY_MODEL = "google/gemini-3.6-flash";
+
+export type AiProvider = "anthropic" | "lovable-gateway" | "none";
+
 export type AnthropicResult =
   | { ok: true; text: string }
   | { ok: false; status: number; body: string };
 
-/** True when ANTHROPIC_API_KEY is configured. Read inside handlers only. */
-export function hasAnthropicKey(): boolean {
+export function hasAnthropicApiKey(): boolean {
   return !!process.env.ANTHROPIC_API_KEY;
 }
 
-/** Canonical setup message shown when the key is missing. */
-export const ANTHROPIC_SETUP_MESSAGE =
-  "This feature needs an ANTHROPIC_API_KEY. Add it in Project Settings → Secrets, then try again.";
+function hasLovableGateway(): boolean {
+  return !!process.env.LOVABLE_API_KEY;
+}
 
-export async function callAnthropic(
+/** The provider that will actually serve an AI call right now. */
+export function getActiveAiProvider(): AiProvider {
+  if (hasAnthropicApiKey()) return "anthropic";
+  if (hasLovableGateway()) return "lovable-gateway";
+  return "none";
+}
+
+/**
+ * True when ANY AI provider is available. Named `hasAnthropicKey` for
+ * backward-compat with callers; semantics now = "AI is ready to serve".
+ */
+export function hasAnthropicKey(): boolean {
+  return getActiveAiProvider() !== "none";
+}
+
+export const ANTHROPIC_SETUP_MESSAGE =
+  "AI is not configured. Add ANTHROPIC_API_KEY or ensure LOVABLE_API_KEY is provisioned in Project Settings → Secrets, then try again.";
+
+// ---------------------------------------------------------------------------
+// Anthropic path
+// ---------------------------------------------------------------------------
+
+async function callAnthropicDirect(
   systemBlocks: string[],
   userMessage: string,
   opts?: { maxTokens?: number; temperature?: number },
 ): Promise<AnthropicResult> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) throw new Error("ANTHROPIC_API_KEY missing");
-
+  const apiKey = process.env.ANTHROPIC_API_KEY!;
   const res = await fetch(ANTHROPIC_URL, {
     method: "POST",
     headers: {
@@ -51,7 +78,6 @@ export async function callAnthropic(
       system: systemBlocks.map((text, i) => ({
         type: "text" as const,
         text,
-        // Cache the first (largest / most stable) block.
         ...(i === 0 ? { cache_control: { type: "ephemeral" as const } } : {}),
       })),
       messages: [{ role: "user", content: userMessage }],
@@ -68,6 +94,54 @@ export async function callAnthropic(
     .join("")
     .trim();
   return { ok: true, text };
+}
+
+// ---------------------------------------------------------------------------
+// Lovable Gateway path (OpenAI-compatible /chat/completions)
+// ---------------------------------------------------------------------------
+
+async function callLovableGateway(
+  systemBlocks: string[],
+  userMessage: string,
+  opts?: { maxTokens?: number; temperature?: number },
+): Promise<AnthropicResult> {
+  const apiKey = process.env.LOVABLE_API_KEY!;
+  const res = await fetch(LOVABLE_GATEWAY_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: LOVABLE_GATEWAY_MODEL,
+      max_tokens: opts?.maxTokens ?? 4096,
+      temperature: opts?.temperature ?? 0.2,
+      messages: [
+        { role: "system", content: systemBlocks.join("\n\n") },
+        { role: "user", content: userMessage },
+      ],
+    }),
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    return { ok: false, status: res.status, body: body.slice(0, 500) };
+  }
+  const json = (await res.json()) as {
+    choices?: Array<{ message?: { content?: string } }>;
+  };
+  const text = (json.choices?.[0]?.message?.content ?? "").trim();
+  return { ok: true, text };
+}
+
+export async function callAnthropic(
+  systemBlocks: string[],
+  userMessage: string,
+  opts?: { maxTokens?: number; temperature?: number },
+): Promise<AnthropicResult> {
+  const provider = getActiveAiProvider();
+  if (provider === "anthropic") return callAnthropicDirect(systemBlocks, userMessage, opts);
+  if (provider === "lovable-gateway") return callLovableGateway(systemBlocks, userMessage, opts);
+  throw new Error("No AI provider configured");
 }
 
 // ---------------------------------------------------------------------------
