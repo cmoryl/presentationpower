@@ -5731,23 +5731,25 @@ function renderLocationsVariant(
 
     return (
       <SlideFrame brand={brand as never} pageNumber={pageNumber}>
-        <AuroraOrb accent={accent} x={8} y={80} size={860} intensity={0.45} />
-        <div className="relative flex h-full gap-10">
+        <div className="relative flex h-full gap-12">
           <div className="flex flex-1 flex-col">
-            <Header />
+            <Header compact />
             {filterActive && (
-              <div className="mt-3 flex flex-wrap items-center gap-2" style={{ color: ink.muted, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-                <span style={{ fontWeight: 600, color: accent }}>Region filter</span>
+              <div className="mt-4 flex flex-wrap items-center gap-2" style={{ color: ink.muted, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase" }}>
+                <span style={{ fontWeight: 700, color: "var(--slide-accent-text)" }}>Region filter</span>
                 {(Object.keys(LOC_REGION_LABELS) as LocPin["region"][])
                   .filter((k) => filterSet.has(k))
                   .map((k) => (
-                    <span key={k} className="rounded-full px-2 py-0.5" style={{ background: isDark ? "rgba(255,255,255,0.06)" : "rgba(3,0,44,0.05)", border: `1px solid ${ink.hairline}` }}>
-                      {LOC_REGION_LABELS[k]}
-                    </span>
-                  ))}
+                    <span key={k}>{LOC_REGION_LABELS[k]}</span>
+                  ))
+                  .reduce<React.ReactNode[]>((acc, node, i, arr) => {
+                    acc.push(node);
+                    if (i < arr.length - 1) acc.push(<span key={`sep-${i}`} style={{ opacity: 0.4 }}>·</span>);
+                    return acc;
+                  }, [])}
               </div>
             )}
-            <div data-map-export-root="world-stats" className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
+            <div data-map-export-root="world-stats" className="relative mt-8 flex-1 overflow-hidden">
               <LocWorldMap pins={filteredPins} region="world" mode={mode} accent={accent} primary={primary} showLabels={false} metric={activeMetric} metricId={activeMetric?.id} scaleMode={scaleMode} ariaLabel={`${title} — world map${activeMetric ? ` visualizing ${activeMetric.label}${scaleMode === "region-percent" ? " (% of region)" : scaleMode === "global-percent" ? " (% of global)" : ""}` : ""}${filterActive ? ` filtered to ${filteredRegions} regions` : ""}`} />
               <button
                 type="button"
@@ -5756,23 +5758,24 @@ function renderLocationsVariant(
                   if (root) void exportMapNodeAsPng(root, `${(title || "world-stats").toString().toLowerCase().replace(/\s+/g, "-")}.png`, isDark ? "#03002C" : "#ffffff");
                 }}
                 aria-label="Export map as PNG"
-                className="absolute right-3 top-3 rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest transition hover:scale-[1.03]"
-                style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.06)", color: ink.strong, border: `1px solid ${ink.hairline}`, backdropFilter: "blur(6px)" }}
+                className="absolute right-0 top-0 rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest transition hover:scale-[1.03]"
+                style={{ color: ink.muted, letterSpacing: "0.24em" }}
               >
-                Export PNG
+                Export PNG ↗
               </button>
             </div>
           </div>
           <div className="flex w-[520px] flex-col justify-end">
-            <div className="rounded-3xl p-8 backdrop-blur-md" style={{ background: isDark ? "rgba(255,255,255,0.05)" : "rgba(3,0,44,0.035)", border: `1px solid ${ink.hairline}` }}>
+            <div className="pl-8" style={{ borderLeft: `1px solid ${ink.hairline}` }}>
               <div className="flex items-baseline justify-between">
-                <div style={{ color: accent, fontSize: 11, letterSpacing: "0.28em", fontWeight: 600, textTransform: "uppercase" }}>
+                <div style={{ color: "var(--slide-accent-text)", fontSize: 12, letterSpacing: "0.3em", fontWeight: 700, textTransform: "uppercase" }}>
                   {usingMetric ? activeMetric!.label : "Global footprint"}
                 </div>
                 {usingMetric && metricCoverage < filteredPins.length && (
-                  <div style={{ color: ink.muted, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase" }}>
+                  <div style={{ color: ink.muted, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }}>
                     {metricCoverage}/{filteredPins.length} pins
                   </div>
+
                 )}
               </div>
 
