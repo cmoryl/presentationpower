@@ -57,8 +57,8 @@ const MODES: ModeDef[] = [
     icon: Presentation,
     accent: "#003FC7",
     glow: "#A1FBF9",
-    eyebrow: "Decks · governed",
-    headline: "Assemble a deck the brand already approves.",
+    eyebrow: "Modular decks · governed",
+    headline: "Snap together a deck the brand already approves.",
     copy: "Brief the system. It picks the archetype, sections, and approved modules from the full TransPerfect brand library — you review, personalize, and ship.",
     actions: [
       { label: "New deck from brief", to: "/brief/new", primary: true, hint: "≈ 60s" },
@@ -77,8 +77,8 @@ const MODES: ModeDef[] = [
     icon: Printer,
     accent: "#EC388A",
     glow: "#FFEB66",
-    eyebrow: "Press-ready · PDF/X-4",
-    headline: "Case studies, eBrochures, spotlights — press-ready.",
+    eyebrow: "Modular print · PDF/X-4",
+    headline: "Modular case studies, eBrochures, spotlights — press-ready.",
     copy: "The same aurora + liquid-glass engine, fitted to 816×1056 portrait canvases and exported as true 300 DPI PDF/X-4 for print production.",
     actions: [
       { label: "Open Print Studio", to: "/library/print", primary: true },
@@ -96,8 +96,8 @@ const MODES: ModeDef[] = [
     icon: CalendarDays,
     accent: "#A6FA87",
     glow: "#C2A3FF",
-    eyebrow: "Playbooks · phased",
-    headline: "Every event kit, pre-mapped by phase.",
+    eyebrow: "Modular playbooks · phased",
+    headline: "Every event kit, modular and pre-mapped by phase.",
     copy: "Product launches, flagship conferences, webinars, exec briefings — each with cadenced deliverables, KPI benchmarks, and rendered live demos.",
     actions: [
       { label: "Open Events hub", to: "/events", primary: true },
@@ -115,8 +115,8 @@ const MODES: ModeDef[] = [
     icon: Share2,
     accent: "#FF9B70",
     glow: "#EC388A",
-    eyebrow: "Campaigns · division-scoped",
-    headline: "Turn any moment into a full social kit.",
+    eyebrow: "Modular campaigns · division-scoped",
+    headline: "Turn one module into a full social kit.",
     copy: "Division-scoped playbooks — brand anthems, product teases, milestones, case spotlights — each seeded from a real module and rendered live in your palette.",
     actions: [
       { label: "Open Social hub", to: "/social", primary: true },
@@ -188,10 +188,26 @@ function Dashboard() {
         {/* animated aurora blobs — reactive to selected mode */}
         <AuroraHero mode={mode} />
 
+        {/* Oversized MODULAR watermark — brand signature behind the hero */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 -bottom-6 select-none text-center font-semibold leading-none tracking-[-0.04em]"
+          style={{
+            fontSize: "clamp(120px, 22vw, 320px)",
+            background: `linear-gradient(180deg, ${mode.accent}22 0%, transparent 70%)`,
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent",
+            mixBlendMode: "screen",
+          }}
+        >
+          MODULAR
+        </div>
+
         <div className="relative">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/75 backdrop-blur">
-              <Sparkles size={11} className="text-[#A1FBF9]" /> Command Center
+              <Sparkles size={11} className="text-[#A1FBF9]" /> Modular · Command Center
             </span>
             <span className="hidden text-[11px] text-white/50 sm:inline">
               {allDecks.length} decks · {totalSlides} slides · {MODULE_VARIANTS.length} modules
