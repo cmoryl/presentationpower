@@ -84,11 +84,47 @@ export const PRINT_STATS_VARIANT_LIMITS: Record<
   "stat-bento-portrait":      { weight: 2.0, minItems: 3, maxItems: 5, labelMax: 44, valueMax: 8 },
 };
 
+// Weights for non-stats families. Tuned against portrait renderers so the
+// capacity meter and gating stay honest.
+export const PRINT_QUOTE_VARIANT_WEIGHTS = {
+  "pull-quote-hero": 1.8,
+  "quote-attribution-card": 1.4,
+  "quote-inline-compact": 0.9,
+} as const;
+
+export const PRINT_LOGO_VARIANT_LIMITS = {
+  "logo-grid-portrait":  { weight: 1.8, maxItems: 9 },
+  "logo-row-portrait":   { weight: 1.0, maxItems: 6 },
+  "logo-wall-portrait":  { weight: 2.4, maxItems: 12 },
+} as const;
+
+export const PRINT_EXPERTISE_VARIANT_LIMITS = {
+  "expertise-icon-strip":       { weight: 1.2, maxItems: 6, labelMax: 24 },
+  "expertise-checklist":        { weight: 1.8, maxItems: 6, labelMax: 90 },
+  "expertise-credential-pills": { weight: 0.9, maxItems: 8, labelMax: 32 },
+} as const;
+
+export const PRINT_FEATURE_VARIANT_LIMITS = {
+  "feature-cards-3col": { weight: 2.4, maxItems: 6, bodyMax: 140 },
+  "feature-cards-2col": { weight: 2.0, maxItems: 4, bodyMax: 180 },
+  "feature-list-1col":  { weight: 2.6, maxItems: 5, bodyMax: 200 },
+} as const;
+
 export function weightForSection(section: PrintSection): number {
-  if (section.kind === "stats") {
-    return PRINT_STATS_VARIANT_LIMITS[section.variantId]?.weight ?? 2;
+  switch (section.kind) {
+    case "stats":
+      return PRINT_STATS_VARIANT_LIMITS[section.variantId]?.weight ?? 2;
+    case "quote":
+      return PRINT_QUOTE_VARIANT_WEIGHTS[section.variantId] ?? 1.4;
+    case "logo-grid":
+      return PRINT_LOGO_VARIANT_LIMITS[section.variantId]?.weight ?? 1.8;
+    case "expertise":
+      return PRINT_EXPERTISE_VARIANT_LIMITS[section.variantId]?.weight ?? 1.2;
+    case "feature-list":
+      return PRINT_FEATURE_VARIANT_LIMITS[section.variantId]?.weight ?? 2.2;
+    default:
+      return 2;
   }
-  return 2;
 }
 
 /* ------------------------------------------------------------------
