@@ -161,8 +161,49 @@ function KitBuilderView() {
     });
   };
 
+  if (isWizard) {
+    return (
+      <WizardFlow
+        step={step}
+        setStep={setStep}
+        brandId={brandId}
+        setBrandId={setBrandId}
+        mode={mode}
+        setMode={setMode}
+        manualCopy={manualCopy}
+        setManualCopy={setManualCopy}
+        profileId={profileId}
+        applyProfile={applyProfile}
+        formatIds={formatIds}
+        toggleFormat={toggleFormat}
+        attachEvent={attachEvent}
+        setAttachEvent={setAttachEvent}
+        event={event}
+        setEvent={setEvent}
+        eventFacts={eventFacts}
+        assets={assets}
+        source={source}
+        setRegenTick={setRegenTick}
+        setRemoved={setRemoved}
+      />
+    );
+  }
+
   return (
     <div className="space-y-8">
+      <AdminPageHeader
+        eyebrow="Campaigns · Kit builder"
+        title="Build a social kit from a favorited module"
+        description="Pick a favorited module, choose a kit profile, and generate on-brand assets across every format in one pass. Deterministic mapping now — AI adaptation slot lives at TODO(ai) in campaigns.ts."
+        actions={
+          <Link
+            to="/admin/campaigns"
+            className="rounded-full border border-black/15 bg-white px-3.5 py-1.5 text-xs font-medium text-black/70 hover:bg-black/5"
+          >
+            ← Back to campaigns
+          </Link>
+        }
+      />
       <AdminPageHeader
         eyebrow="Campaigns · Kit builder"
         title="Build a social kit from a favorited module"
