@@ -5651,19 +5651,21 @@ function renderLocationsVariant(
 
 
   if (variantId === "MV-LOC-WORLD-PINS") {
+    // Free-form Aurora v2 — map bleeds directly onto the aurora, no plate,
+    // no border, no tint. RegionRail sits below on a single hairline.
     return (
       <SlideFrame brand={brand as never} pageNumber={pageNumber}>
-        <AuroraOrb accent={accent} x={92} y={20} size={860} intensity={0.5} />
-        <div className="relative flex h-full flex-col px-2 pt-2">
+        <div className="relative flex h-full flex-col">
           <Header />
-          <div className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
+          <div className="relative mt-10 flex-1 overflow-hidden">
             <LocWorldMap pins={pins} region="world" mode={mode} accent={accent} primary={primary} showLabels ariaLabel={`${title} — world map`} />
           </div>
-          <RegionStrip />
+          <RegionRail />
         </div>
       </SlideFrame>
     );
   }
+
 
   if (variantId === "MV-LOC-WORLD-STATS") {
     const metrics = coerceMetrics(c.metrics);
