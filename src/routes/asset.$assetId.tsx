@@ -86,16 +86,20 @@ function AssetEditor() {
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const [exportOpen, setExportOpen] = useState(false);
   const [exportBusy, setExportBusy] = useState(false);
+  // Export panel state — hydrated from ctx.exportPrefs on load, then mirrored
+  // back to ctx on every change via updateExportPref so a user's preset
+  // survives reload and can be duplicated with the asset.
   const [exportSize, setExportSize] = useState<PrintPageSizeKey>("A4");
   const [customW, setCustomW] = useState(8.5);
   const [customH, setCustomH] = useState(11);
   const [bleedIn, setBleedIn] = useState(0.125);
   const [cropMarks, setCropMarks] = useState(true);
-  const [exportMode, setExportMode] = useState<"light" | "dark">("light");
+  const [exportMode, setExportMode] = useState<PrintMode>("light");
   const [exportQuality, setExportQuality] = useState<PrintExportQuality>("300dpi");
   const [exportFormat, setExportFormat] = useState<PrintExportFormat>("digital");
   const [iccProfile, setIccProfile] = useState<IccProfileKey>("GRACoL2013_CRPC6");
   const [pickerOpen, setPickerOpen] = useState(false);
+  const exportHydratedRef = useRef(false);
 
   // Undo/redo history for content + context snapshots.
   const historyRef = useRef<{
