@@ -2408,6 +2408,63 @@ export type Database = {
         }
         Relationships: []
       }
+      usage_events: {
+        Row: {
+          created_at: string
+          deck_id: string | null
+          division_id: string | null
+          duration_ms: number | null
+          event_category: string
+          event_type: string
+          id: string
+          module_family: string | null
+          props: Json
+          session_id: string | null
+          slide_id: string | null
+          surface: string | null
+          user_agent: string | null
+          user_id: string | null
+          value: number | null
+          variant_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          deck_id?: string | null
+          division_id?: string | null
+          duration_ms?: number | null
+          event_category: string
+          event_type: string
+          id?: string
+          module_family?: string | null
+          props?: Json
+          session_id?: string | null
+          slide_id?: string | null
+          surface?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          value?: number | null
+          variant_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          deck_id?: string | null
+          division_id?: string | null
+          duration_ms?: number | null
+          event_category?: string
+          event_type?: string
+          id?: string
+          module_family?: string | null
+          props?: Json
+          session_id?: string | null
+          slide_id?: string | null
+          surface?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          value?: number | null
+          variant_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

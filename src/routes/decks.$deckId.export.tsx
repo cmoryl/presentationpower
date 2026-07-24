@@ -17,6 +17,7 @@ import {
   getGlobalLinkShareSettings,
   uploadToGlobalLinkShare,
 } from "@/lib/globallink-share.functions";
+import { trackNow } from "@/lib/analytics-track";
 
 
 export const Route = createFileRoute("/decks/$deckId/export")({
@@ -113,6 +114,10 @@ function ExportView() {
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 5000);
+      trackNow({
+        event: "deck.export", category: "export", divisionId: deck.brandModeId, deckId: deck.id,
+        value: deck.slides.length, props: { format: "pptx", failedSlides: failedSlides.length },
+      });
     } finally {
       setExporting(false);
       setPreflightIssues(null);
