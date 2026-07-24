@@ -151,6 +151,13 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
   }, [media.imageUrl, media.autoScrim, media.autoScrimThreshold, scrim]);
 
   const showFallback = !media.imageUrl || failed;
+  // When no image is present (or it failed to load) we render NOTHING — no
+  // fallback wash / accent gradient band. Users repeatedly reported that
+  // empty-hero blocks produce a "weird gradient band" over their page.
+  // Layouts already ship their own deterministic hero when heroMedia is
+  // absent, so returning null here keeps the canvas clean.
+  if (showFallback) return null;
+
   // When auto-scrim boosts on a "none" scrim, promote to "bottom" so we
   // actually have a gradient to intensify.
   const effectiveScrim: PrintHeroScrim =
@@ -167,10 +174,6 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
       : effectiveScrim === "radial"
       ? `radial-gradient(ellipse at ${fx ?? 30}% ${fy ?? 45}%, transparent 0%, transparent 40%, ${pageBg} 85%)`
       : "none";
-
-  // Fallback: page-bg base (white / off-black) with a soft accent wash so the
-  // hero band still reads as intentional even when photography is absent.
-  const fallbackBg = `linear-gradient(160deg, ${pageBg} 0%, ${pageBg} 55%, ${withAlpha(overlayColor, 0.18)} 100%), radial-gradient(120% 90% at ${fx ?? 30}% ${fy ?? 40}%, ${withAlpha(overlayColor, 0.28)} 0%, transparent 70%), ${pageBg}`;
 
   return (
     <div
