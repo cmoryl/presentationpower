@@ -92,6 +92,11 @@ export type DeckSlide = {
   // coordinates on top of the variant. Persists across sessions and always
   // renders (in preview, present, share). Empty/undefined = no overlay.
   canvasBlocks?: CanvasBlock[];
+  // Per-field text color overrides — keyed by concrete content path
+  // (e.g. "content.title" or "content.stats[0].label"). Hex colors (#rrggbb)
+  // or "" to clear. Applied via a scoped stylesheet in LiveEditOverlay and
+  // preserved across previews/exports.
+  inkOverrides?: Record<string, string>;
 };
 
 
