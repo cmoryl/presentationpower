@@ -672,7 +672,7 @@ function renderPrintByKind(
     return <CaseStudyLayout content={(content as CaseStudyContent) ?? CASE_STUDY_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
   return null;
 }
-}
+
 
 function PreviewFrame({ label, children }: { label: string; children: React.ReactNode }) {
   return (
