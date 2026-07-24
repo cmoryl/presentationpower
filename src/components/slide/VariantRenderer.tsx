@@ -497,13 +497,14 @@ function renderVariantBody({
               />
             </div>
             {s(c.subtitle) && (
-              <SupportingText size="lg" opacity={0.92} maxWidthPx={1180} className="mt-6 line-clamp-2 tp-rise tp-rise-delay-2" color="#ffffff">
+              <SupportingText size="lg" opacity={0.92} maxWidthPx={1180} className="mt-6 line-clamp-2 tp-rise tp-rise-delay-2">
                 {s(c.subtitle)}
               </SupportingText>
             )}
-            <MetaRow className="mt-10 tp-rise tp-rise-delay-3" color="#ffffff">
+            <MetaRow className="mt-10 tp-rise tp-rise-delay-3">
               {s(c.date) && <span>{s(c.date)}</span>}
             </MetaRow>
+
           </div>
 
         </SlideFrame>
