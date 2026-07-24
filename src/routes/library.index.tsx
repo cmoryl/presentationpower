@@ -225,6 +225,14 @@ function Library() {
   const [mode, setMode] = useState<"light" | "dark" | "ab">("light");
   const [pinnedOnly, setPinnedOnly] = useState(false);
   const [sort, setSort] = useState<"default" | "most-used" | "pinned-first">("default");
+  // Multi-select mode → build a deck from N chosen variants in one shot.
+  const [selectMode, setSelectMode] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
+  const selectedSet = useMemo(() => new Set(selected), [selected]);
+  const toggleSelected = useCallback((id: string) => {
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  }, []);
+  const clearSelection = useCallback(() => setSelected([]), []);
 
   const [showImagery, setShowImagery] = useState(false);
   const [density, setDensity] = useState<"comfortable" | "thumb">(() => {
