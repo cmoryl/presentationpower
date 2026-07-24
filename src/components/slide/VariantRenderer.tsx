@@ -6019,9 +6019,25 @@ function renderLocationsVariant(
               </div>
             </div>
           </div>
-          <div className="relative mt-10 flex-1 overflow-hidden">
-            <LocWorldMap pins={pins} region={region} mode={mode} accent={accent} primary={primary} showLabels ariaLabel={`${title} — ${region === "world" ? "world" : LOC_REGION_LABELS[region as LocPin["region"]]} map`} />
-          </div>
+          {hasRegionMetrics ? (
+            <div className="mt-10 grid flex-1 gap-12" style={{ gridTemplateColumns: "1.55fr 1fr" }}>
+              <div className="relative overflow-hidden">
+                <LocWorldMap pins={pins} region={region} mode={mode} accent={accent} primary={primary} showLabels ariaLabel={`${title} — ${region === "world" ? "world" : LOC_REGION_LABELS[region as LocPin["region"]]} map`} />
+              </div>
+              <div className="pl-8" style={{ borderLeft: `1px solid ${ink.hairline}` }}>
+                <div style={{ color: "var(--slide-accent-text)", fontSize: 12, letterSpacing: "0.3em", fontWeight: 700, textTransform: "uppercase" }}>
+                  Region metrics
+                </div>
+                <div className="mt-4">
+                  <RegionMetricList rows={regionMetrics} maxRows={6} />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="relative mt-10 flex-1 overflow-hidden">
+              <LocWorldMap pins={pins} region={region} mode={mode} accent={accent} primary={primary} showLabels ariaLabel={`${title} — ${region === "world" ? "world" : LOC_REGION_LABELS[region as LocPin["region"]]} map`} />
+            </div>
+          )}
           {narrative && (
             <div className="mt-8 pt-6" style={{ borderTop: `1px solid ${ink.hairline}`, color: ink.muted, fontSize: 18, lineHeight: 1.45, maxWidth: 1400 }}>
               {narrative}
