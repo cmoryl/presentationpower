@@ -165,153 +165,171 @@ function AboutPage() {
       toLabel: "Start a brief →",
     },
     {
-      kicker: "02 · Assemble",
+      kicker: "02 · Master set",
+      title: "One brief, every surface.",
+      body:
+        "Toggle Presentation, Print, Event kit, and Social kit in section 04 of the brief and fan out the whole brand set in one pass — every artifact links back to the same brief and knowledge context.",
+      bullets: [
+        "Deck + Case study + Spotlight + EBrochure + Adaptor brief",
+        "Event playbook attachment",
+        "Social kit generation with copy slot mapping",
+      ],
+      to: "/brief/new",
+      toLabel: "Run a master brief →",
+    },
+    {
+      kicker: "03 · Assemble",
       title: "Modular decks from a governed library.",
       body:
         "Assemble picks module variants across section frameworks — Opening, Context, Solution, Process, Proof, Decision, Close — and each variant declares which layouts, tokens, and icons it permits.",
       bullets: [
         `${MODULE_VARIANTS.length} variants across ${SECTION_FRAMEWORKS.length} sections`,
         "Layout & token constraints enforced at render",
-        "Swap variants without losing content",
+        "Multi-select → new deck from the library",
       ],
       to: "/atlas",
       toLabel: "Browse the atlas →",
     },
     {
-      kicker: "03 · Personalize",
-      title: "Edit copy inline, keep the brand locked.",
+      kicker: "04 · Live edit",
+      title: "Edit directly on the preview.",
       body:
-        "The deck editor exposes only the fields a module allows. Locked chrome — logos, footers, section markers — stays consistent, while narrative fields, stats, and icons remain fully editable.",
+        "Click any text on the slide to edit in place. Toggle a single slide to light or dark, override ink color, and manage image / video / background from one unified Media panel per slide.",
       bullets: [
-        "Per-item icon picker (auto or curated Lucide)",
-        "Editable field paths declared per variant",
-        "AI change log with per-field revert",
+        "Per-slide light/dark toggle + ink override",
+        "Unified Media panel (image · video · background)",
+        "Session Undo/Redo + autosave version snapshots",
       ],
     },
     {
-      kicker: "04 · Import",
-      title: "Reformat existing PowerPoints.",
+      kicker: "05 · Copilot",
+      title: "Natural-language deck editing.",
       body:
-        "Drop a .pptx. We extract titles, bullets and notes, map each slide to the closest module variant, and let you override before assembly. Original layout & fonts are discarded — content only.",
+        "A glass drawer in the editor accepts prompts and executes tool-use actions — add / edit / reorder slides, swap variants, rewrite copy. Every change flows through the same store as manual edits.",
       bullets: [
-        "Heuristic slide → variant mapping",
-        "Row-level override before creation",
-        "25MB limit, .pptx only",
+        "Runs on the Lovable AI gateway",
+        "Per-field change log with revert",
+        "Grounded on brief + RAG knowledge",
+      ],
+    },
+    {
+      kicker: "06 · Print Studio",
+      title: "Long-form print, same brand system.",
+      body:
+        "Case studies, spotlights, ebrochures, and adaptor briefs with dnd-kit editing, drag-to-resize hero (20–80%), and a Content inspector that guarantees every schema field has an editing path.",
+      bullets: [
+        "Vector text via pdf-lib + Geist TTF embedding",
+        "PPTX · PDF · self-contained HTML export",
+        "Persisted editor mode + export settings",
+      ],
+      to: "/library/print",
+      toLabel: "Open Print →",
+    },
+    {
+      kicker: "07 · Events & Social",
+      title: "Playbooks, not blank pages.",
+      body:
+        "8+ industry-standard event playbooks with full kit previews, and 9 division-scoped social playbooks filterable by launch / thought leadership / campaign / event angle.",
+      bullets: [
+        "Event kits: signage, invites, session decks",
+        "Social kits reference existing modules",
+        "Favorites → named social bundles",
+      ],
+      to: "/events",
+      toLabel: "Open Events →",
+    },
+    {
+      kicker: "08 · Import & export",
+      title: "Faithful PPTX import, honest exports.",
+      body:
+        "Import up to 100 MB .pptx — master/layout inheritance and z-order are resolved, images are extracted, slides auto-map to variants. Exports render deterministic Aurora backdrops so files match previews.",
+      bullets: [
+        "PPTX vector text + Geist TTF embedding",
+        "PDF, self-contained HTML, PNG (HD/4K)",
+        "Preflight scan for CORS & asset risks",
       ],
       to: "/decks/import",
       toLabel: "Import a deck →",
     },
     {
-      kicker: "05 · Export & present",
-      title: "Ship to PowerPoint or present live.",
+      kicker: "09 · Knowledge & Oracle",
+      title: "Grounded on the owned corpus.",
       body:
-        "Export renders each slide to a governed pptx using brand tokens. Present mode runs the deck fullscreen with keyboard navigation and speaker context.",
+        "Division PDFs and imported PPTX are chunked and embedded with gemini-embedding-001 (3072-dim). Oracle chat and Deep RAG synthesis run hybrid retrieval over the full corpus — no external BrandHub call at runtime.",
       bullets: [
-        "Client-side pptxgenjs export",
-        "Fullscreen present with arrow keys",
-        "Per-deck export history",
-      ],
-    },
-    {
-      kicker: "06 · Knowledge & brand",
-      title: "One source of truth for the brand.",
-      body:
-        "Knowledge holds the Oracle KB, case studies, glossary and long-form guides. Brand Guides mirror the TransPerfect BrandHub — logo, color, type, iconography, layout and voice.",
-      bullets: [
-        "Oracle KB → Knowledge sync",
-        "Master TransPerfect guide (26.06 / 3.0)",
-        "Sub-brand & division rules",
+        "Per-division PDF & PPTX embeddings",
+        "Oracle knowledge chat with citations",
+        "Semantic icon + logo suggestions",
       ],
       to: "/knowledge",
       toLabel: "Open knowledge →",
     },
     {
-      kicker: "07 · Governance",
-      title: "Admin controls, audit, and QA.",
+      kicker: "10 · Locations & data",
+      title: "Maps, KPIs, and charts on one data model.",
       body:
-        "Admins manage users, approvals, A/B experiments, imagery library, Oracle KB, and the Icon Studio. Every high-impact action is logged and the QA panel surfaces blocking issues per slide.",
+        "Region Focus, Hub & Spoke, and World Stats share the same regional metric fields as the KPI dashboard and chart batches. Pin editor for placements and metrics; HD/4K PNG export.",
       bullets: [
-        "User roles stored in user_roles (RLS-safe)",
-        "Blocking vs warning QA gates",
-        "Icon Studio for iconography tokens",
-      ],
-      to: "/admin",
-      toLabel: "Open admin →",
-    },
-    {
-      kicker: "08 · AI layer",
-      title: "Suggest, review, and rewrite in-place.",
-      body:
-        "The deck chat drafts copy, tightens tone, and rewrites individual fields against the brief. Every AI change is recorded and can be reverted per field from the editor.",
-      bullets: [
-        "Runs on the Lovable AI gateway",
-        "Per-field change log with revert",
-        "Grounded on brief + knowledge",
+        "Free-form Aurora v2 across data modules",
+        "Bento KPI dashboard mosaic",
+        "Deterministic per-slide backdrops",
       ],
     },
     {
-      kicker: "09 · Collaboration",
-      title: "Comments, reviews, versions.",
+      kicker: "11 · Translate & rebrand",
+      title: "Localize and retone non-destructively.",
       body:
-        "Reviewers leave threaded comments on any slide, move decks through review states, and roll back to any snapshot. Autosave and version history are enforced at the RLS layer.",
+        "AI/GlobalLink overlays translate a deck per-slide with retryable jobs. Rebrand re-applies any brand mode across every slide with a live preview and auto-snapshot rollback.",
       bullets: [
-        "deck_comments with CommentsPanel",
-        "ReviewStatusControl transitions",
-        "Non-destructive version restore",
-      ],
-    },
-    {
-      kicker: "10 · Share & analyze",
-      title: "View-only links with analytics.",
-      body:
-        "Generate a share token with expiry, revoke or regenerate anytime, and see views over time per link in /analytics.",
-      bullets: [
-        "/share/$token viewer route",
-        "Expiry + revocation controls",
-        "Per-link engagement analytics",
-      ],
-      to: "/analytics",
-      toLabel: "Open analytics →",
-    },
-    {
-      kicker: "11 · Translate",
-      title: "Multi-language decks, non-destructive.",
-      body:
-        "Overlay translations per slide via the AI/GlobalLink engine. Switch languages live, retry failed jobs, and export localized PPTX/PDF.",
-      bullets: [
-        "TranslateDrawer + LanguageSwitcher",
-        "Per-slide language status badges",
+        "Per-slide language status + localized exports",
         "GlobalLink connector at /admin/globallink",
+        "Auto version snapshot on rebrand",
       ],
       to: "/admin/globallink",
       toLabel: "Configure GlobalLink →",
     },
     {
-      kicker: "12 · Rebrand",
-      title: "Retone an entire deck in one click.",
+      kicker: "12 · Collaboration & share",
+      title: "Comments, reviews, share links.",
       body:
-        "The Rebrand action re-applies any brand mode across every slide with a live preview and an auto-snapshot for safe rollback.",
+        "Threaded comments per slide, ReviewStatusControl for Draft → In review → Approved, and view-only /share/$token URLs with expiry, revocation, and per-link analytics.",
       bullets: [
-        "Live preview before commit",
-        "Auto version snapshot",
-        "Works with client co-brand via LogoHub",
+        "deck_comments with CommentsPanel",
+        "Non-destructive version restore",
+        "Share tokens tracked in Master Analytics",
       ],
+    },
+    {
+      kicker: "13 · Governance & Analytics",
+      title: "Admin sidebar, master hubs, deep analytics.",
+      body:
+        "Left-sidebar admin shell with Overview, Analytics, Knowledge, Brand assets, Translation, Governance. Master Analytics tracks per-module usage, per-division activity, power users, hot modules, and trends over the usage_events pipeline.",
+      bullets: [
+        "User roles in user_roles (RLS-safe)",
+        "Icon Studio + LogoHub + Brand guides",
+        "Deck engagement + AI usage + A/B",
+      ],
+      to: "/admin",
+      toLabel: "Open admin →",
     },
   ];
 
   const surfaces: Array<{ to: string; label: string; blurb: string }> = [
-    { to: "/", label: "Dashboard", blurb: "Recent decks, briefs, and quick actions." },
-    { to: "/brief/new", label: "New brief", blurb: "Capture prospect, objective and archetype." },
+    { to: "/", label: "Home", blurb: "Modular command center with mode hero and Oracle prompt." },
+    { to: "/brief/new", label: "New brief", blurb: "Master brief — fan out into every surface." },
+    { to: "/library", label: "Presentation", blurb: "Module library, decks, multi-select assembly." },
     { to: "/atlas", label: "Atlas", blurb: "Every module variant grouped by family & section." },
-    { to: "/library", label: "Library", blurb: "Reusable slide fragments and starters." },
-    { to: "/imagery", label: "Imagery", blurb: "Approved photography, backdrops and lockups." },
-    { to: "/knowledge", label: "Knowledge", blurb: "Oracle KB, brand guides, glossary, videos." },
-    { to: "/admin", label: "Admin", blurb: "Users, approvals, A/B, imagery, Oracle, icons." },
-    { to: "/admin/globallink", label: "GlobalLink", blurb: "Translation connector config & status." },
-    { to: "/analytics", label: "Analytics", blurb: "Share-link views and deck engagement." },
+    { to: "/library/print", label: "Print", blurb: "Case study, spotlight, ebrochure, adaptor brief." },
+    { to: "/events", label: "Event", blurb: "Event playbooks and full kit previews." },
+    { to: "/social", label: "Social", blurb: "Division-scoped social playbooks and kits." },
     { to: "/templates", label: "Templates", blurb: "Team template gallery from duplicated decks." },
+    { to: "/knowledge", label: "Knowledge", blurb: "Oracle KB, brand guides, glossary, ask Oracle." },
+    { to: "/admin", label: "Admin", blurb: "Sidebar hubs — analytics, knowledge, brand, translation, governance." },
+    { to: "/admin/analytics", label: "Master analytics", blurb: "Usage, trends, power users, hot modules." },
+    { to: "/admin/globallink", label: "GlobalLink", blurb: "Translation connector config & status." },
     { to: "/faq", label: "FAQ", blurb: "Step-by-step basics and common questions." },
   ];
+
 
 
 
