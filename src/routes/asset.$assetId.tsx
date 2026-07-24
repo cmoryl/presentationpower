@@ -909,8 +909,24 @@ function AssetEditor() {
                 </>
               )}
             </LiveEditOverlay>
+            <SectionSelectOverlay
+              canvasRef={canvasRef}
+              scanKey={rawContent}
+              onDelete={(key) => {
+                if (key === "features") patchContent({ features: [] } as never);
+                else if (key === "knowHow") patchContent({ knowHow: [] } as never);
+                else if (key === "quote") patchContent({ quote: undefined } as never);
+                else if (key === "cta") patchContent({ cta: undefined } as never);
+                else if (key === "hero") patchContent({ heroMedia: undefined } as never);
+                toast.success(`${key} section removed`);
+              }}
+              onReplace={(key) => {
+                toast.info(`Edit "${key}" in the inspector panel →`);
+              }}
+            />
 
           </div>
+
 
 
           {/* INSPECTOR */}
