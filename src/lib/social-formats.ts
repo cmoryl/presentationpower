@@ -176,3 +176,55 @@ export function aspectClass(f: SocialFormat): AspectClass {
   if (a >= 0.65) return "portrait";
   return "portrait-tall"; // stories, 1080×1920
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// Kit profiles — named bundles of formats so users don't tick 20 checkboxes.
+// Each profile is a starting set; the builder lets users add/remove after.
+// ────────────────────────────────────────────────────────────────────────────
+export type KitProfile = {
+  id: string;
+  label: string;
+  description: string;
+  formatIds: string[];
+};
+
+export const KIT_PROFILES: KitProfile[] = [
+  {
+    id: "social-essentials",
+    label: "Social essentials",
+    description: "Feed-ready core: square, portrait, story, LinkedIn link.",
+    formatIds: ["square-1080", "portrait-1080x1350", "story-1080x1920", "linkedin-link-1200x627"],
+  },
+  {
+    id: "full-launch",
+    label: "Full social launch",
+    description: "Every social geometry, both feed and story surfaces.",
+    formatIds: [
+      "square-1080",
+      "portrait-1080x1350",
+      "story-1080x1920",
+      "linkedin-link-1200x627",
+      "linkedin-post-1200x1200",
+      "x-1600x900",
+      "youtube-1280x720",
+      "pinterest-1000x1500",
+    ],
+  },
+  {
+    id: "email-set",
+    label: "Email set",
+    description: "Wide banner + link previews for email + landing pages.",
+    formatIds: ["email-header-1200x400", "linkedin-link-1200x627", "callout-1200x628"],
+  },
+  {
+    id: "event-kit",
+    label: "Event kit",
+    description: "Kit-numbered callouts + LinkedIn + story for an event push.",
+    formatIds: ["callout-1200x628", "linkedin-post-1200x1200", "story-1080x1920", "square-1080"],
+  },
+];
+
+export const KIT_PROFILES_BY_ID: Record<string, KitProfile> = Object.fromEntries(
+  KIT_PROFILES.map((k) => [k.id, k]),
+);
+

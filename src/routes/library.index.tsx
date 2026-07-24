@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
-import { Download, Loader2, Star, Copy, Check, Plus, Play, Eye, Package } from "lucide-react";
+import { Download, Loader2, Star, Copy, Check, Plus, Play, Eye, Package, Sparkles } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
@@ -1798,6 +1798,16 @@ function VariantDetailModal({
               <Star size={12} className={pinned ? "fill-amber-500 text-amber-600" : ""} />
               {pinned ? "Pinned" : "Pin"}
             </button>
+            {pinned ? (
+              <a
+                href={`/admin/campaigns/kit?source=${encodeURIComponent(variant.id)}`}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#003FC7]/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white"
+                title="Generate a social kit from this favorited module"
+              >
+                <Sparkles size={12} /> Create social kit
+              </a>
+            ) : null}
+
             <button
               type="button"
               onClick={() => setSaveOpen(true)}

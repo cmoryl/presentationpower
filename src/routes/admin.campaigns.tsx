@@ -1,14 +1,15 @@
-// Placeholder /admin/campaigns route — demo grid for the social/event
-// scaffold. No persistence, no AI. Proves:
-//   1. One SocialRenderer handles every format in social-formats.ts
-//   2. buildCampaignAssets() pipeline shape (source → per-format copy)
-//   3. Aurora + BrandLockup carry into a non-deck surface cleanly
+// /admin/campaigns — campaign hub.
 //
-// Explicitly gated under /admin — no public test route.
+// Two surfaces live here:
+//   1. Format registry — the typed geometries every renderer agrees on.
+//   2. Demo grid — one renderer × N formats × N divisions, proving the
+//      pipeline shape.
+// The actual builder flow lives at /admin/campaigns/kit (favorites → kit).
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { SOCIAL_FORMATS, aspectClass } from "@/lib/social-formats";
+import { Sparkles, Star } from "lucide-react";
+import { SOCIAL_FORMATS, aspectClass, KIT_PROFILES } from "@/lib/social-formats";
 import type { SocialFormat } from "@/lib/social-formats";
 import {
   buildCampaignAssets,
@@ -17,6 +18,8 @@ import {
 } from "@/lib/campaigns";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { BRAND_MODES } from "@/lib/taxonomy";
+import { useFavorites } from "@/lib/favorites";
+import { AdminPageHeader, AdminSection } from "@/components/admin/AdminPage";
 
 export const Route = createFileRoute("/admin/campaigns")({
   head: () => ({
@@ -69,6 +72,7 @@ const GRID_FORMAT_IDS = [
 
 function CampaignsView() {
   const [mode, setMode] = useState<"light" | "dark" | "both">("dark");
+  const { favorites } = useFavorites();
   const assets = useMemo(
     () =>
       DEMO_DIVISIONS.flatMap((brandId) =>
@@ -83,60 +87,101 @@ function CampaignsView() {
 
   return (
     <div className="space-y-10">
-      <header className="space-y-2">
-        <div className="text-[11px] uppercase tracking-[0.18em] text-black/50">
-          Campaigns · Scaffold
+      <AdminPageHeader
+        eyebrow="Campaigns"
+        title="Social & event asset scaffold"
+        description="Typed geometry registry + one geometry-agnostic renderer + a stubbed source→copy→asset pipeline. AI copy adaptation lands next pass; today the flow is deterministic end-to-end."
+        actions={
+          <>
+            <span className="rounded-full border border-black/10 bg-white px-3 py-1 text-[11px] text-black/60">
+              {favorites.size} favorited
+            </span>
+            <Link
+              to="/admin/campaigns/kit"
+              className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#03002C]"
+            >
+              <Sparkles size={12} /> Build a kit →
+            </Link>
+          </>
+        }
+      />
+
+      {/* Kit profiles overview */}
+      <AdminSection eyebrow="Kit profiles" title="Named bundles">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          {KIT_PROFILES.map((p) => (
+            <Link
+              key={p.id}
+              to="/admin/campaigns/kit"
+              search={{ profile: p.id }}
+              className="block rounded-2xl border border-black/10 bg-white/70 p-4 text-sm transition hover:border-[#003FC7]/40"
+            >
+              <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
+                {p.formatIds.length} formats
+              </div>
+              <div className="mt-1 font-medium text-black/85">{p.label}</div>
+              <div className="mt-1 text-xs text-black/55">{p.description}</div>
+            </Link>
+          ))}
         </div>
-        <h1 className="text-3xl font-semibold text-black/90">Social & event asset scaffold</h1>
-        <p className="max-w-3xl text-sm text-black/60">
-          Placeholder pipeline for event campaigns. One geometry-agnostic renderer + a
-          typed format registry + a stubbed source→copy→asset pipeline. No AI copy
-          adaptation, no persistence, no production assets in this pass.
-        </p>
-      </header>
+      </AdminSection>
+
+      {/* Favorites → kit entry point */}
+      <AdminSection eyebrow="From favorites" title="Start from a favorited module">
+        <div className="flex items-center gap-3 rounded-2xl border border-dashed border-black/15 bg-white/50 p-4 text-sm text-black/70">
+          <Star size={16} className="fill-amber-400 text-amber-500" />
+          <div className="flex-1">
+            <span className="font-medium">
+              {favorites.size === 0
+                ? "No favorited modules yet."
+                : `${favorites.size} favorited module${favorites.size === 1 ? "" : "s"} available.`}
+            </span>{" "}
+            <span className="text-black/55">
+              Star modules in the library, then convert them into full kits.
+            </span>
+          </div>
+          <Link
+            to={favorites.size === 0 ? "/library" : "/admin/campaigns/kit"}
+            className="rounded-full bg-[#03002C] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]"
+          >
+            {favorites.size === 0 ? "Browse library →" : "Choose from favorites →"}
+          </Link>
+        </div>
+      </AdminSection>
 
       {/* Format registry table */}
-      <section className="rounded-3xl border border-black/10 bg-white/70 p-5 backdrop-blur">
-        <h2 className="text-[11px] uppercase tracking-[0.18em] text-black/60">
-          Format registry · {SOCIAL_FORMATS.length}
-        </h2>
-        <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
-          {SOCIAL_FORMATS.map((f) => (
-            <FormatRow key={f.id} format={f} />
-          ))}
+      <AdminSection eyebrow="Registry" title={`Formats · ${SOCIAL_FORMATS.length}`}>
+        <div className="rounded-2xl border border-black/10 bg-white/70 p-4 backdrop-blur">
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
+            {SOCIAL_FORMATS.map((f) => (
+              <FormatRow key={f.id} format={f} />
+            ))}
+          </div>
         </div>
-      </section>
+      </AdminSection>
 
       {/* Mode toggle */}
-      <section className="flex items-center gap-3">
-        <div className="text-[11px] uppercase tracking-widest text-black/50">Mode</div>
-        <div className="inline-flex rounded-full border border-black/10 bg-black/[0.03] p-1 text-[11px] uppercase tracking-widest">
-          {(["dark", "light", "both"] as const).map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => setMode(m)}
-              className={
-                "rounded-full px-4 py-1.5 transition " +
-                (mode === m
-                  ? "bg-[#03002C] text-white"
-                  : "text-black/60 hover:text-black")
-              }
-            >
-              {m}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Demo grid — one renderer × N formats × N divisions × mode(s) */}
-      <section>
-        <h2 className="text-[11px] uppercase tracking-[0.18em] text-black/60">Demo grid</h2>
-        <p className="mt-1 text-sm text-black/55">
-          {DEMO_DIVISIONS.length} divisions × {GRID_FORMAT_IDS.length} formats × {mode === "both" ? 2 : 1} mode(s) ={" "}
-          {assets.length} assets.
-        </p>
-        <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <AdminSection
+        eyebrow="Demo grid"
+        title={`${DEMO_DIVISIONS.length} divisions × ${GRID_FORMAT_IDS.length} formats × ${mode === "both" ? 2 : 1} mode(s) = ${assets.length} assets`}
+        actions={
+          <div className="inline-flex rounded-full border border-black/10 bg-black/[0.03] p-1 text-[11px] uppercase tracking-widest">
+            {(["dark", "light", "both"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setMode(m)}
+                className={`rounded-full px-3 py-1 transition ${
+                  mode === m ? "bg-[#03002C] text-white" : "text-black/60 hover:text-black"
+                }`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+        }
+      >
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {assets.map((asset) => {
             const brand = BRAND_MODES.find((b) => b.id === asset.brandId);
             return (
@@ -163,7 +208,8 @@ function CampaignsView() {
             );
           })}
         </div>
-      </section>
+      </AdminSection>
+
 
       {/* Pipeline stub CTA */}
       <section className="rounded-3xl border border-dashed border-black/15 bg-black/[0.02] p-5">
