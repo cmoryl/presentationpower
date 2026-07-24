@@ -389,7 +389,10 @@ function DeckEditor() {
                     slideId={active.id}
                     content={active.content as Record<string, unknown>}
                     editableFields={mv.editableFields}
+                    inkOverrides={active.inkOverrides}
                     onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
+                    onSetInkColor={(cp, color) => setSlideInkOverride(deck.id, active.id, cp, color)}
+                    onClearInkColor={(cp) => setSlideInkOverride(deck.id, active.id, cp, null)}
                   >
                     <ScaledSlide>
                       <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
