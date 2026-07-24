@@ -695,9 +695,160 @@ function BriefWizard() {
                 </div>
               </div>
 
+              {/* SECTION — MASTER SET */}
+              <section className="rounded-2xl border bg-white p-6 shadow-[0_2px_20px_-8px_rgba(3,0,44,0.08)] md:p-8" style={{ borderColor: PALETTE.hairline }}>
+                <div className="mb-5 flex items-baseline gap-3">
+                  <span className="font-mono text-xs uppercase tracking-[0.18em] text-[#003FC7]">04 · Master set</span>
+                  <span className="text-xs text-[#03002C]/45">Pick everything you want produced from this one brief.</span>
+                </div>
+                <div className="grid gap-3 md:grid-cols-2">
+                  {/* Presentation */}
+                  <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition ${masterSet.presentation ? "border-[#003FC7] bg-[#F0F5FF]" : "border-[#E4E9F2] bg-white hover:border-[#B7C4E0]"}`}>
+                    <input
+                      type="checkbox"
+                      className="mt-1 h-4 w-4 accent-[#003FC7]"
+                      checked={masterSet.presentation}
+                      onChange={(e) => setMasterSet((m) => ({ ...m, presentation: e.target.checked }))}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-semibold text-[#03002C]">Presentation deck</div>
+                      <div className="mt-1 text-xs text-[#03002C]/60">Full assembled deck with Oracle context, brand modules, and archetype narrative.</div>
+                    </div>
+                  </label>
 
+                  {/* Print */}
+                  <div className={`rounded-xl border p-4 transition ${masterSet.print.enabled ? "border-[#003FC7] bg-[#F0F5FF]" : "border-[#E4E9F2] bg-white"}`}>
+                    <label className="flex cursor-pointer items-start gap-3">
+                      <input
+                        type="checkbox"
+                        className="mt-1 h-4 w-4 accent-[#003FC7]"
+                        checked={masterSet.print.enabled}
+                        disabled={!signedIn}
+                        onChange={(e) => setMasterSet((m) => ({ ...m, print: { ...m.print, enabled: e.target.checked } }))}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-semibold text-[#03002C]">Print asset{masterSet.print.kinds.length > 1 ? "s" : ""}</div>
+                        <div className="mt-1 text-xs text-[#03002C]/60">
+                          {signedIn ? "Seed a case study, spotlight, ebrochure, or adaptor brief pre-filled from this brief." : "Sign in required to create print assets — deck will still generate."}
+                        </div>
+                      </div>
+                    </label>
+                    {masterSet.print.enabled && signedIn && (
+                      <div className="mt-3 flex flex-wrap gap-1.5 pl-7">
+                        {(["case-study","spotlight","ebrochure","adaptor-brief"] as const).map((k) => {
+                          const on = masterSet.print.kinds.includes(k);
+                          return (
+                            <button
+                              key={k}
+                              type="button"
+                              onClick={() => setMasterSet((m) => ({
+                                ...m,
+                                print: {
+                                  ...m.print,
+                                  kinds: on ? m.print.kinds.filter((x) => x !== k) : [...m.print.kinds, k],
+                                },
+                              }))}
+                              className={`rounded-full border px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide transition ${on ? "border-[#003FC7] bg-[#003FC7] text-white" : "border-[#E4E9F2] bg-white text-[#03002C]/70 hover:border-[#B7C4E0]"}`}
+                            >
+                              {k.replace("-", " ")}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
 
+                  {/* Event kit */}
+                  <div className={`rounded-xl border p-4 transition ${masterSet.event.enabled ? "border-[#003FC7] bg-[#F0F5FF]" : "border-[#E4E9F2] bg-white"}`}>
+                    <label className="flex cursor-pointer items-start gap-3">
+                      <input
+                        type="checkbox"
+                        className="mt-1 h-4 w-4 accent-[#003FC7]"
+                        checked={masterSet.event.enabled}
+                        onChange={(e) => setMasterSet((m) => ({ ...m, event: { ...m.event, enabled: e.target.checked } }))}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-semibold text-[#03002C]">Event kit</div>
+                        <div className="mt-1 text-xs text-[#03002C]/60">Attach an event playbook — signage, invites, session decks — linked to the deck brief.</div>
+                      </div>
+                    </label>
+                    {masterSet.event.enabled && (
+                      <select
+                        className="mt-3 ml-7 w-[calc(100%-1.75rem)] rounded-md border border-[#E4E9F2] bg-white px-3 py-2 text-sm text-[#03002C] focus:border-[#003FC7] focus:outline-none"
+                        value={masterSet.event.playbookId ?? ""}
+                        onChange={(e) => setMasterSet((m) => ({ ...m, event: { ...m.event, playbookId: e.target.value || null } }))}
+                      >
+                        {EVENT_PLAYBOOKS.map((p) => (
+                          <option key={p.id} value={p.id}>{p.name}</option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
 
+                  {/* Social kit */}
+                  <div className={`rounded-xl border p-4 transition ${masterSet.social.enabled ? "border-[#003FC7] bg-[#F0F5FF]" : "border-[#E4E9F2] bg-white"}`}>
+                    <label className="flex cursor-pointer items-start gap-3">
+                      <input
+                        type="checkbox"
+                        className="mt-1 h-4 w-4 accent-[#003FC7]"
+                        checked={masterSet.social.enabled}
+                        onChange={(e) => setMasterSet((m) => ({ ...m, social: { ...m.social, enabled: e.target.checked } }))}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-semibold text-[#03002C]">Social kit</div>
+                        <div className="mt-1 text-xs text-[#03002C]/60">Attach a social playbook — LinkedIn, IG, launch cadence — tied to the brief context.</div>
+                      </div>
+                    </label>
+                    {masterSet.social.enabled && (
+                      <select
+                        className="mt-3 ml-7 w-[calc(100%-1.75rem)] rounded-md border border-[#E4E9F2] bg-white px-3 py-2 text-sm text-[#03002C] focus:border-[#003FC7] focus:outline-none"
+                        value={masterSet.social.playbookId ?? ""}
+                        onChange={(e) => setMasterSet((m) => ({ ...m, social: { ...m.social, playbookId: e.target.value || null } }))}
+                      >
+                        {SOCIAL_PLAYBOOKS.map((p) => (
+                          <option key={p.id} value={p.id}>{p.name}</option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                </div>
+
+                {produced && (
+                  <div className="mt-6 rounded-xl border border-[#003FC7]/25 bg-gradient-to-br from-[#F0F5FF] to-white p-5">
+                    <div className="text-xs font-mono uppercase tracking-[0.18em] text-[#003FC7]">Master set produced</div>
+                    <ul className="mt-3 space-y-2 text-sm text-[#03002C]">
+                      {produced.deckId && (
+                        <li>
+                          <Link to="/decks/$deckId" params={{ deckId: produced.deckId }} className="font-semibold text-[#003FC7] hover:underline">
+                            → Open presentation deck
+                          </Link>
+                        </li>
+                      )}
+                      {produced.prints.map((p) => (
+                        <li key={p.id}>
+                          <Link to="/asset/$assetId" params={{ assetId: p.id }} className="font-semibold text-[#003FC7] hover:underline">
+                            → {p.title} <span className="text-[11px] font-mono uppercase text-[#03002C]/50">({p.kind})</span>
+                          </Link>
+                        </li>
+                      ))}
+                      {produced.eventPlaybookId && (
+                        <li>
+                          <Link to="/events/demo/$playbookId" params={{ playbookId: produced.eventPlaybookId }} className="font-semibold text-[#003FC7] hover:underline">
+                            → Event kit preview
+                          </Link>
+                        </li>
+                      )}
+                      {produced.socialPlaybookId && (
+                        <li>
+                          <Link to="/social/demo/$playbookId" params={{ playbookId: produced.socialPlaybookId }} className="font-semibold text-[#003FC7] hover:underline">
+                            → Social kit preview
+                          </Link>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                )}
+              </section>
 
 
               <div
