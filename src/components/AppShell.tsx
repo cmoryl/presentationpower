@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useTheme, type ThemeMode } from "@/hooks/use-theme";
 import { AdminSidebar } from "@/components/AdminShell";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 // Pages that live outside /admin/* but are linked from the admin console.
 // When the user reaches them from an admin context, keep the admin sidebar visible.
@@ -292,10 +293,16 @@ export function AppShell({ children }: { children: ReactNode }) {
         {showAdminChrome ? (
           <div className="flex flex-col gap-6 md:flex-row">
             <AdminSidebar />
-            <div className="min-w-0 flex-1">{children ?? <Outlet />}</div>
+            <div className="min-w-0 flex-1">
+              <Breadcrumbs />
+              {children ?? <Outlet />}
+            </div>
           </div>
         ) : (
-          children ?? <Outlet />
+          <>
+            <Breadcrumbs />
+            {children ?? <Outlet />}
+          </>
         )}
       </main>
       <footer className="border-t border-black/10 bg-[#E8E4DC]/60 dark:!border-white/[0.06] dark:!bg-[#07061F]/70">
