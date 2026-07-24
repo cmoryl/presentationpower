@@ -20,7 +20,7 @@
  *   - window.__printHero.getBandRect()      → DOMRect
  */
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import { PrintHeroMediaLayer, type PrintHeroAspect, type PrintHeroMedia, type PrintHeroScrim } from "@/components/print/PrintHeroMedia";
 
