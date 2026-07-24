@@ -18,11 +18,12 @@ import {
   Users,
   BadgeCheck,
 } from "lucide-react";
-import { getPlaybook, EVENT_PLAYBOOKS } from "@/lib/event-playbooks";
+import { getPlaybook, EVENT_PLAYBOOKS, type EventPlaybook } from "@/lib/event-playbooks";
 import { KIT_PROFILES_BY_ID, SOCIAL_FORMATS_BY_ID } from "@/lib/social-formats";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { buildCampaignAssets, sourceFromVariant } from "@/lib/campaigns";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
+
 
 export const Route = createFileRoute("/events/demo/$playbookId")({
   loader: ({ params }) => {
@@ -48,7 +49,7 @@ export const Route = createFileRoute("/events/demo/$playbookId")({
 });
 
 function PlaybookDemoView() {
-  const { playbook } = Route.useLoaderData();
+  const { playbook } = Route.useLoaderData() as { playbook: EventPlaybook };
   const brand = useMemo(
     () => BRAND_MODES.find((b) => b.id === playbook.subBrand) ?? BRAND_MODES[0],
     [playbook.subBrand],
@@ -139,7 +140,7 @@ function PlaybookDemoView() {
               {playbook.facts.hashtag || "—"}
             </FactRow>
             <FactRow icon={<BadgeCheck size={12} />} label="Brand">
-              {brand.label}
+              {brand.name}
             </FactRow>
             <FactRow icon={<Users size={12} />} label="Speakers">
               {playbook.facts.speakers.length
