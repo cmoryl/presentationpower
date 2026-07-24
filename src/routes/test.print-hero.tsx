@@ -38,7 +38,7 @@ function parseEnum<T extends string>(v: string | null, allowed: readonly T[]): T
   return (allowed as readonly string[]).includes(v) ? (v as T) : undefined;
 }
 
-import { notFound } from "@tanstack/react-router";
+
 
 export const Route = createFileRoute("/test/print-hero")({
   beforeLoad: () => {
