@@ -118,7 +118,7 @@ const TEMPLATES: Template[] = [
   {
     id: "adaptor-brief",
     label: "Adaptor Brief",
-    tagline: "Dark aurora hero + 6 capability cards",
+    tagline: "Clean hero + 6 capability cards",
     desc: "Application / adaptor brief for enterprise integrations. Clean hero, six verb cards, a 'We Know How' strip, and a pull-quote.",
     live: true,
     icon: <Rocket size={16} />,
