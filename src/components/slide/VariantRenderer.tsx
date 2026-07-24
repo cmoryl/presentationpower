@@ -3234,66 +3234,455 @@ function renderVariantBody({
     }
 
     case "MV-KPI-DASHBOARD": {
-      const items = arr(c.items).slice(0, 8);
-      const cols = items.length <= 6 ? Math.min(items.length, 5) : 4;
-      // Icon de-duplication: pickIcon returns the first regex match, so
-      // several distinct labels (e.g. "Localization cost", "Translation
-      // quality", "Markets supported") can all resolve to Globe2. Track which
-      // components have been used on this slide and fall back to a rotating
-      // pool of neutral defaults for repeats — distinct KPIs get distinct
-      // glyphs without giving up the semantic mapping when it's specific.
+      const items = arr(c.items).slice(0, 6);
+      // Deterministic pseudo-random per slide so sparklines stay stable but
+      // differ per tile. Mulberry32-style.
+      const rng = (seed: number) => {
+        let a = (seed * 2654435761) >>> 0;
+        return () => {
+          a = (a + 0x6D2B79F5) >>> 0;
+          let t = a;
+          t = Math.imul(t ^ (t >>> 15), t | 1);
+          t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      };
+      const numeric = (v: string) => {
+        const m = String(v).replace(/[^0-9.\-]/g, "");
+        const n = parseFloat(m);
+        return Number.isFinite(n) ? n : 60;
+      };
+      const seriesFor = (label: string, trend: string, base: number) => {
+        const seed = Array.from(label).reduce((a, ch) => a + ch.charCodeAt(0), 7) + Math.round(base * 13);
+        const r = rng(seed);
+        const dir = trend === "down" ? -1 : 1;
+        const arr: number[] = [];
+        for (let i = 0; i < 14; i++) {
+          const t = i / 13;
+          const noise = (r() - 0.5) * 0.18;
+          arr.push(0.55 + dir * t * 0.42 + noise);
+        }
+        return arr;
+      };
+      const ringPct = (v: string, unit: string) => {
+        const n = numeric(v);
+        if (unit === "%") return Math.max(4, Math.min(99, n));
+        if (unit === "/5") return Math.max(4, Math.min(99, (n / 5) * 100));
+        // fallback: normalize small numbers to a sane arc
+        if (n <= 10) return 40 + n * 5;
+        if (n <= 100) return Math.max(20, n);
+        return 78;
+      };
       const usedIcons = new Set<IconType>();
       const dedupPool: IconType[] = [LineChart, TrendingUp, Target, Zap, Trophy, Rocket, Sparkles, BarChart3];
+      const pickTileIcon = (label: string, override: string, i: number) => {
+        let Icon = pickIcon(label || "kpi", i, override);
+        if (usedIcons.has(Icon)) {
+          const alt = dedupPool.find((c) => !usedIcons.has(c));
+          if (alt) Icon = alt;
+        }
+        usedIcons.add(Icon);
+        return Icon;
+      };
+
+      // Bento assignment: index -> {colSpan, rowSpan, kind}
+      // Layout (12-col × 4-row grid, ~180px rows):
+      //   [ HERO (6×2)         ][ RING (3×2) ][ SPARK (3×2) ]
+      //   [ BAR (4×1) ][ TILE (4×1) ][ BAR (4×1) ]           (rows 3)
+      //   [ TILE (4×1) ][ SPARK (4×1) ][ TILE (4×1) ]        (row 4)
+      // For <6 items we truncate gracefully.
+      type TileKind = "hero" | "ring" | "spark" | "bar" | "tile";
+      const layout: { col: number; row: number; kind: TileKind }[] = [
+        { col: 6, row: 2, kind: "hero" },
+        { col: 3, row: 2, kind: "ring" },
+        { col: 3, row: 2, kind: "spark" },
+        { col: 4, row: 1, kind: "bar" },
+        { col: 4, row: 1, kind: "tile" },
+        { col: 4, row: 1, kind: "bar" },
+      ];
+
+      // Trend accent — up uses the brand accent, down uses TransPerfect Red so
+      // the mosaic reads as a real infographic (green/red visual grammar) while
+      // still respecting the brand palette.
+      const upInk = "var(--slide-accent-text)";
+      const downInk = "#E53D2E";
+      const trendInk = (t: string) => (t === "down" ? downInk : upInk);
+
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-20 grid gap-y-14" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
-
+          <div
+            className="mt-12 grid gap-5"
+            style={{
+              gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
+              gridAutoRows: "182px",
+            }}
+          >
             {items.map((it, i) => {
-              const trend = s(it.trend);
-              const trendColor = trend === "down" ? brand.tokens.accent : brand.tokens.accent;
-              const isFirstInRow = i % cols === 0;
-              return (
+              const cfg = layout[i] ?? { col: 4, row: 1, kind: "tile" as TileKind };
+              const label = s(it.label);
+              const value = s(it.value);
+              const unit = s(it.unit);
+              const delta = s(it.delta);
+              const trend = s(it.trend) || (delta.startsWith("-") ? "down" : "up");
+              const Icon = pickTileIcon(label, s(it.icon), i);
+              const tInk = trendInk(trend);
+              const arrow = trend === "down" ? "▼" : "▲";
+
+              const tileStyle: React.CSSProperties = {
+                gridColumn: `span ${cfg.col}`,
+                gridRow: `span ${cfg.row}`,
+                position: "relative",
+                borderRadius: 22,
+                border: `1px solid ${ink.hairline}`,
+                background: "color-mix(in oklab, var(--slide-accent-text) 3%, transparent)",
+                backdropFilter: "blur(6px)",
+                overflow: "hidden",
+                padding: cfg.kind === "hero" ? 40 : 26,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              };
+
+              // Numbered corner label — infographic wayfinding.
+              const cornerNum = (
                 <div
-                  key={i}
-                  className="px-8"
+                  className="absolute font-mono"
                   style={{
-                    borderLeft: isFirstInRow ? "none" : `1px solid ${ink.hairline}`,
+                    top: 18,
+                    right: 22,
+                    fontSize: 13,
+                    letterSpacing: "0.28em",
+                    color: ink.faint,
                   }}
                 >
-                  <div
-                    aria-hidden
-                    className="flex shrink-0 items-center justify-center rounded-full"
-                    style={{
-                      width: 68,
-                      height: 68,
-                      background: "color-mix(in oklab, var(--slide-accent-text) 10%, transparent)",
-                      border: `1px solid color-mix(in oklab, var(--slide-accent-text) 28%, transparent)`,
-                      color: "var(--slide-accent-text)",
-                    }}
-                  >
-                    {(() => {
-                      let Icon = pickIcon(s(it.label) || "kpi", i, s(it.icon));
-                      if (usedIcons.has(Icon)) {
-                        const alt = dedupPool.find((c) => !usedIcons.has(c));
-                        if (alt) Icon = alt;
-                      }
-                      usedIcons.add(Icon);
-                      return <Icon size={30} strokeWidth={1.4} aria-hidden />;
-                    })()}
+                  {String(i + 1).padStart(2, "0")}
+                </div>
+              );
 
-                  </div>
-                  <div className="mt-8 flex items-baseline gap-2">
-                    <span className="tabular-nums font-semibold" style={{ fontSize: 116, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}>{s(it.value)}</span>
-                    {s(it.unit) && <span className="font-medium" style={{ fontSize: 40, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}>{s(it.unit)}</span>}
-                  </div>
-                  <div className="mt-4" style={{ fontSize: 20, lineHeight: 1.35, color: ink.muted, letterSpacing: "-0.005em", maxWidth: 260 }}>{s(it.label)}</div>
-                  {s(it.delta) && (
-                    <div className="mt-3 flex items-center gap-2" style={{ fontSize: 16, color: trendColor, letterSpacing: "0.02em" }}>
-                      {trend === "down" ? "▼" : "▲"} <span className="tabular-nums font-semibold">{s(it.delta)}</span>
-                      <span style={{ color: ink.faint }}>vs. baseline</span>
+              if (cfg.kind === "hero") {
+                const series = seriesFor(label, trend, numeric(value));
+                return (
+                  <div key={i} style={tileStyle}>
+                    {cornerNum}
+                    {/* Diagonal accent stripe — pure infographic detailing */}
+                    <div
+                      aria-hidden
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: `radial-gradient(120% 90% at 0% 100%, color-mix(in oklab, var(--slide-accent-text) 14%, transparent), transparent 60%)`,
+                        pointerEvents: "none",
+                      }}
+                    />
+                    <div className="relative flex items-start justify-between">
+                      <div
+                        aria-hidden
+                        className="flex items-center justify-center rounded-2xl"
+                        style={{
+                          width: 74,
+                          height: 74,
+                          background: "color-mix(in oklab, var(--slide-accent-text) 12%, transparent)",
+                          border: `1px solid color-mix(in oklab, var(--slide-accent-text) 32%, transparent)`,
+                          color: "var(--slide-accent-text)",
+                        }}
+                      >
+                        <Icon size={34} strokeWidth={1.4} aria-hidden />
+                      </div>
+                      <div className="text-right">
+                        <div
+                          className="uppercase font-mono"
+                          style={{ fontSize: 13, letterSpacing: "0.3em", color: ink.faint }}
+                        >
+                          Headline metric
+                        </div>
+                        {delta && (
+                          <div
+                            className="mt-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1"
+                            style={{
+                              background: `color-mix(in oklab, ${tInk} 14%, transparent)`,
+                              color: tInk,
+                              fontSize: 15,
+                              fontWeight: 600,
+                              letterSpacing: "0.02em",
+                            }}
+                          >
+                            <span>{arrow}</span>
+                            <span className="tabular-nums">{delta}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
+                    <div className="relative">
+                      <div className="flex items-baseline gap-3">
+                        <span
+                          className="tabular-nums font-semibold"
+                          style={{
+                            fontSize: 168,
+                            lineHeight: 0.86,
+                            letterSpacing: "-0.055em",
+                            color: ink.strong,
+                          }}
+                        >
+                          {value}
+                        </span>
+                        {unit && (
+                          <span
+                            className="font-medium"
+                            style={{
+                              fontSize: 56,
+                              color: "var(--slide-accent-text)",
+                              letterSpacing: "-0.02em",
+                            }}
+                          >
+                            {unit}
+                          </span>
+                        )}
+                      </div>
+                      <div
+                        className="mt-3"
+                        style={{ fontSize: 26, color: ink.muted, letterSpacing: "-0.01em" }}
+                      >
+                        {label}
+                      </div>
+                      <div className="mt-5" style={{ opacity: 0.9 }}>
+                        <Sparkline brand={brand} values={series} h={72} peakPin />
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              if (cfg.kind === "ring") {
+                const pct = ringPct(value, unit);
+                const R = 96;
+                const C = 2 * Math.PI * R;
+                const dash = (pct / 100) * C;
+                return (
+                  <div key={i} style={tileStyle}>
+                    {cornerNum}
+                    <div className="relative flex items-center gap-6">
+                      <svg width={220} height={220} viewBox="-110 -110 220 220" aria-hidden>
+                        <circle
+                          r={R}
+                          fill="none"
+                          stroke={ink.hairline}
+                          strokeWidth={10}
+                        />
+                        <circle
+                          r={R}
+                          fill="none"
+                          stroke="var(--slide-accent-text)"
+                          strokeWidth={10}
+                          strokeLinecap="round"
+                          strokeDasharray={`${dash} ${C - dash}`}
+                          transform="rotate(-90)"
+                          opacity={0.95}
+                        />
+                        <circle
+                          r={R - 22}
+                          fill="none"
+                          stroke="color-mix(in oklab, var(--slide-accent-text) 22%, transparent)"
+                          strokeWidth={1}
+                        />
+                        <foreignObject x={-90} y={-40} width={180} height={80}>
+                          <div
+                            style={{
+                              width: "100%",
+                              textAlign: "center",
+                              fontSize: 54,
+                              fontWeight: 700,
+                              letterSpacing: "-0.035em",
+                              lineHeight: 1,
+                              color: ink.strong,
+                              fontVariantNumeric: "tabular-nums",
+                            }}
+                          >
+                            {value}
+                            <span style={{ fontSize: 24, color: "var(--slide-accent-text)", marginLeft: 4 }}>{unit}</span>
+                          </div>
+                        </foreignObject>
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2.5">
+                        <Icon size={20} strokeWidth={1.5} style={{ color: "var(--slide-accent-text)" }} aria-hidden />
+                        <div style={{ fontSize: 22, fontWeight: 600, color: ink.strong, letterSpacing: "-0.01em" }}>
+                          {label}
+                        </div>
+                      </div>
+                      {delta && (
+                        <div className="mt-2 flex items-center gap-2" style={{ fontSize: 16, color: tInk }}>
+                          <span>{arrow}</span>
+                          <span className="tabular-nums font-semibold">{delta}</span>
+                          <span style={{ color: ink.faint }}>vs. baseline</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              }
+
+              if (cfg.kind === "spark") {
+                const series = seriesFor(label, trend, numeric(value));
+                return (
+                  <div key={i} style={tileStyle}>
+                    {cornerNum}
+                    <div className="flex items-start gap-3">
+                      <div
+                        aria-hidden
+                        className="flex items-center justify-center rounded-xl"
+                        style={{
+                          width: 48,
+                          height: 48,
+                          background: "color-mix(in oklab, var(--slide-accent-text) 10%, transparent)",
+                          border: `1px solid color-mix(in oklab, var(--slide-accent-text) 28%, transparent)`,
+                          color: "var(--slide-accent-text)",
+                        }}
+                      >
+                        <Icon size={22} strokeWidth={1.5} aria-hidden />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-baseline gap-1.5">
+                        <span
+                          className="tabular-nums font-semibold"
+                          style={{ fontSize: 72, lineHeight: 0.9, letterSpacing: "-0.045em", color: ink.strong }}
+                        >
+                          {value}
+                        </span>
+                        {unit && (
+                          <span style={{ fontSize: 26, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}>
+                            {unit}
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1" style={{ fontSize: 18, color: ink.muted, letterSpacing: "-0.005em" }}>
+                        {label}
+                      </div>
+                    </div>
+                    <div style={{ opacity: 0.9 }}>
+                      <Sparkline brand={brand} values={series} h={52} />
+                      {delta && (
+                        <div className="mt-2 flex items-center gap-1.5" style={{ fontSize: 15, color: tInk }}>
+                          <span>{arrow}</span>
+                          <span className="tabular-nums font-semibold">{delta}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              }
+
+              if (cfg.kind === "bar") {
+                const pct = ringPct(value, unit);
+                return (
+                  <div key={i} style={tileStyle}>
+                    {cornerNum}
+                    <div className="flex items-center gap-4">
+                      <div
+                        aria-hidden
+                        className="flex items-center justify-center rounded-xl"
+                        style={{
+                          width: 52,
+                          height: 52,
+                          background: "color-mix(in oklab, var(--slide-accent-text) 10%, transparent)",
+                          border: `1px solid color-mix(in oklab, var(--slide-accent-text) 28%, transparent)`,
+                          color: "var(--slide-accent-text)",
+                        }}
+                      >
+                        <Icon size={24} strokeWidth={1.5} aria-hidden />
+                      </div>
+                      <div className="flex-1">
+                        <div style={{ fontSize: 18, color: ink.muted, letterSpacing: "-0.005em" }}>{label}</div>
+                        <div className="mt-0.5 flex items-baseline gap-1.5">
+                          <span
+                            className="tabular-nums font-semibold"
+                            style={{ fontSize: 46, lineHeight: 0.95, letterSpacing: "-0.035em", color: ink.strong }}
+                          >
+                            {value}
+                          </span>
+                          {unit && (
+                            <span style={{ fontSize: 20, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}>
+                              {unit}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {delta && (
+                        <div className="text-right" style={{ fontSize: 15, color: tInk }}>
+                          <div className="flex items-center justify-end gap-1">
+                            <span>{arrow}</span>
+                            <span className="tabular-nums font-semibold">{delta}</span>
+                          </div>
+                          <div style={{ color: ink.faint, fontSize: 12, letterSpacing: "0.02em" }}>vs. baseline</div>
+                        </div>
+                      )}
+                    </div>
+                    <div
+                      style={{
+                        height: 8,
+                        borderRadius: 4,
+                        background: ink.hairline,
+                        overflow: "hidden",
+                        position: "relative",
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          width: `${pct}%`,
+                          background: `linear-gradient(90deg, color-mix(in oklab, var(--slide-accent-text) 55%, transparent), var(--slide-accent-text))`,
+                          borderRadius: 4,
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              }
+
+              // default tile
+              return (
+                <div key={i} style={tileStyle}>
+                  {cornerNum}
+                  <div className="flex items-center gap-3">
+                    <div
+                      aria-hidden
+                      className="flex items-center justify-center rounded-xl"
+                      style={{
+                        width: 48,
+                        height: 48,
+                        background: "color-mix(in oklab, var(--slide-accent-text) 10%, transparent)",
+                        border: `1px solid color-mix(in oklab, var(--slide-accent-text) 28%, transparent)`,
+                        color: "var(--slide-accent-text)",
+                      }}
+                    >
+                      <Icon size={22} strokeWidth={1.5} aria-hidden />
+                    </div>
+                    <div style={{ fontSize: 18, color: ink.muted, letterSpacing: "-0.005em" }}>{label}</div>
+                  </div>
+                  <div className="flex items-end justify-between">
+                    <div className="flex items-baseline gap-1.5">
+                      <span
+                        className="tabular-nums font-semibold"
+                        style={{ fontSize: 78, lineHeight: 0.9, letterSpacing: "-0.045em", color: ink.strong }}
+                      >
+                        {value}
+                      </span>
+                      {unit && (
+                        <span style={{ fontSize: 26, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}>
+                          {unit}
+                        </span>
+                      )}
+                    </div>
+                    {delta && (
+                      <div className="flex items-center gap-1.5" style={{ fontSize: 15, color: tInk }}>
+                        <span>{arrow}</span>
+                        <span className="tabular-nums font-semibold">{delta}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}
@@ -3301,6 +3690,8 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
+
+
 
 
     case "MV-ROADMAP-QUARTERS": {
