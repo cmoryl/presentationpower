@@ -91,6 +91,7 @@ function DeckEditor() {
   const setDeckClientLogo = useDeckStore((s) => s.setDeckClientLogo);
   const setDeckContext = useDeckStore((s) => s.setDeckContext);
   const applySlideBackground = useDeckStore((s) => s.applySlideBackground);
+  const setSlideMode = useDeckStore((s) => s.setSlideMode);
 
 
   const [activeIdx, setActiveIdx] = useState(0);
