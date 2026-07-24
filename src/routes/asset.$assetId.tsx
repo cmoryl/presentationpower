@@ -545,6 +545,43 @@ function AssetEditor() {
               </button>
             </div>
 
+            {/* Editor mode toggle. Persisted to ctx so it survives reload,
+                and defaults the export panel so downloads are WYSIWYG. */}
+            <div className="mr-1 inline-flex items-center gap-0 rounded-full border border-black/10 bg-white p-0.5 dark:border-white/10 dark:bg-white/[0.03]" role="group" aria-label="Editor mode">
+              <button
+                type="button"
+                data-testid="editor-mode-light"
+                aria-pressed={editorMode === "light"}
+                onClick={() => {
+                  patchCtx({ editorMode: "light" });
+                  if (exportHydratedRef.current) setExportMode("light");
+                }}
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition ${
+                  editorMode === "light"
+                    ? "bg-[#03002C] text-white dark:bg-white dark:text-[#03002C]"
+                    : "text-[#03002C] hover:bg-black/5 dark:text-white dark:hover:bg-white/5"
+                }`}
+              >
+                <Sun size={12} /> Light
+              </button>
+              <button
+                type="button"
+                data-testid="editor-mode-dark"
+                aria-pressed={editorMode === "dark"}
+                onClick={() => {
+                  patchCtx({ editorMode: "dark" });
+                  if (exportHydratedRef.current) setExportMode("dark");
+                }}
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition ${
+                  editorMode === "dark"
+                    ? "bg-[#03002C] text-white dark:bg-white dark:text-[#03002C]"
+                    : "text-[#03002C] hover:bg-black/5 dark:text-white dark:hover:bg-white/5"
+                }`}
+              >
+                <Moon size={12} /> Dark
+              </button>
+            </div>
+
             <button
               type="button"
               onClick={handleSynthesize}
