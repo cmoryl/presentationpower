@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { useDeckStore } from "@/lib/deck-store";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
@@ -8,6 +9,10 @@ import { personalizeSlides } from "@/lib/personalize.functions";
 import { retrieveKnowledgeForBrief, abAssign, abLogEvent } from "@/lib/admin.functions";
 import { synthesizeKnowledgeForBrief, type SynthesizedSnippet } from "@/lib/ai-rag.functions";
 import { planDeckStrategy, type DeckStrategy, type StrategySection } from "@/lib/ai-strategist.functions";
+import { createPrintAssetWithBrief } from "@/lib/print-assets.functions";
+import { EVENT_PLAYBOOKS } from "@/lib/event-playbooks";
+import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
+import { useSignedIn } from "@/components/CloudDeckControls";
 
 import { byId, SECTION_FRAMEWORKS, NARRATIVE_ARCHETYPES, type BrandMode } from "@/lib/taxonomy";
 import { TRANSPERFECT_SUBCOMPANIES } from "@/lib/brand-guides";
