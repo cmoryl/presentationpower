@@ -814,7 +814,7 @@ function AssetEditor() {
                 <CaseStudyLayout
                   content={rawContent as unknown as CaseStudyContent}
                   brand={brand}
-                  mode="light"
+                  mode={editorMode}
                   pageSize={pageSize}
                   density={density}
                   seed={`asset-${row.id}`}
@@ -824,7 +824,7 @@ function AssetEditor() {
                 <SpotlightLayout
                   content={rawContent as unknown as SpotlightContent}
                   brand={brand}
-                  mode="light"
+                  mode={editorMode}
                   pageSize={pageSize}
                   density={density}
                   seed={`asset-${row.id}`}
@@ -834,7 +834,7 @@ function AssetEditor() {
                 <EBrochureLayout
                   content={rawContent as unknown as EBrochureContent}
                   brand={brand}
-                  mode="light"
+                  mode={editorMode}
                   pageSize={pageSize}
                   density={density}
                   seed={`asset-${row.id}`}
@@ -844,7 +844,7 @@ function AssetEditor() {
                 <AdaptorBriefLayout
                   content={rawContent as unknown as AdaptorBriefContent}
                   brand={brand}
-                  mode="light"
+                  mode={editorMode}
                   pageSize={pageSize}
                   density={density}
                   seed={`asset-${row.id}`}
@@ -1004,7 +1004,7 @@ function AssetEditor() {
           // Keep drawer open so the user can insert multiple modules.
         }}
         brand={brand}
-        mode="light"
+        mode={editorMode}
       />
     </AppShell>
   );
@@ -1246,7 +1246,7 @@ function ModulesPanel({
                     ))}
                   </div>
                   <div className="pt-1">
-                    <PrintSectionRenderer section={m} mode="light" accent="#003FC7" />
+                    <PrintSectionRenderer section={m} mode={editorMode} accent="#003FC7" />
                   </div>
                 </div>
               )}
