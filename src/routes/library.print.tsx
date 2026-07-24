@@ -285,15 +285,17 @@ function PrintCenterPage() {
 
   return (
     <AppShell>
-      <div>
-        <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library · Print</div>
-        <div className="mt-3"><LibrarySubnav active="/library/print" /></div>
-        <h1 className="mt-4 text-4xl font-semibold text-[#03002C]">Print design templates.</h1>
-        <p className="mt-3 max-w-2xl text-black/60">
-          One-pagers, brochures, and briefs rendered on the same modular brand engine as your decks.
-          Pick a template, preview it in the division that fits, then spin up an editable asset.
-        </p>
-      </div>
+      <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#FF9B7022] px-6 py-14 sm:-mt-10 sm:px-12 lg:px-24 lg:py-20">
+        <div className="mx-auto max-w-[1400px]">
+          <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library · Print</div>
+          <div className="mt-3"><LibrarySubnav active="/library/print" /></div>
+          <h1 className="mt-4 text-4xl font-semibold text-[#03002C] sm:text-5xl">Print design templates.</h1>
+          <p className="mt-3 max-w-2xl text-black/60">
+            One-pagers, brochures, and briefs rendered on the same modular brand engine as your decks.
+            Pick a template, preview it in the division that fits, then spin up an editable asset.
+          </p>
+        </div>
+      </header>
 
       {/* Brand switcher for previews */}
       <div className="mt-8 flex flex-wrap items-center gap-2 border-b border-black/10 pb-6">
