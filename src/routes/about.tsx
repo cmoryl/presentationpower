@@ -17,13 +17,13 @@ export const Route = createFileRoute("/about")({
       {
         name: "description",
         content:
-          "How TransPerfect Modular works — the systems behind briefs, decks, brand governance, and the AI assistants that run underneath.",
+          "How TransPerfect Modular works — master briefs that fan out into Presentation, Print, Event, and Social; live editing, Copilot, translation, knowledge and analytics.",
       },
       { property: "og:title", content: "About · TransPerfect Modular" },
       {
         property: "og:description",
         content:
-          "A living overview of the platform: modules, brand governance, imports, exports, and the AI layer.",
+          "A living overview of the platform: master briefs, modules, print studio, event & social kits, translation, knowledge, and the AI layer.",
       },
     ],
   }),
