@@ -223,7 +223,9 @@ export function AdaptorBriefLayout({
 
             {/* CTA BAND */}
             {content.cta && (
-              <PrintCTABand brand={brand} mode={mode} label={content.cta.label} cq={cq} />
+              <div data-section="cta" data-section-label="Call to action">
+                <PrintCTABand brand={brand} mode={mode} label={content.cta.label} cq={cq} />
+              </div>
             )}
 
             {/* FOOTER */}
