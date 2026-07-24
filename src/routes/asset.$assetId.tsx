@@ -911,6 +911,14 @@ function AssetEditor() {
                   onChange={(e) => patchCtx({ printSafeArea: e.target.checked })}
                 />
               </Row>
+              <Row label="Bleed + trim guides">
+                <input
+                  type="checkbox"
+                  data-testid="toggle-bleed-guides"
+                  checked={showBleedGuides}
+                  onChange={(e) => patchCtx({ showBleedGuides: e.target.checked })}
+                />
+              </Row>
             </Panel>
 
             <HeroMediaPanel
