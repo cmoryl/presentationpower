@@ -90,6 +90,31 @@ function BriefWizard() {
   const [strategyStatus, setStrategyStatus] = useState<"idle" | "planning" | "ready" | "error">("idle");
   const [strategyError, setStrategyError] = useState<string | null>(null);
   const [strategySetupNeeded, setStrategySetupNeeded] = useState(false);
+
+  // Master Set — which surfaces to produce from this one brief.
+  const signedIn = useSignedIn();
+  const createPrintAssetFn = useServerFn(createPrintAssetWithBrief);
+  type PrintKind = "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
+  type MasterSet = {
+    presentation: boolean;
+    print: { enabled: boolean; kinds: PrintKind[] };
+    event: { enabled: boolean; playbookId: string | null };
+    social: { enabled: boolean; playbookId: string | null };
+  };
+  const [masterSet, setMasterSet] = useState<MasterSet>({
+    presentation: true,
+    print: { enabled: false, kinds: ["case-study"] },
+    event: { enabled: false, playbookId: EVENT_PLAYBOOKS[0]?.id ?? null },
+    social: { enabled: false, playbookId: SOCIAL_PLAYBOOKS[0]?.id ?? null },
+  });
+  type Produced = {
+    deckId?: string;
+    prints: Array<{ id: string; kind: PrintKind; title: string }>;
+    eventPlaybookId: string | null;
+    socialPlaybookId: string | null;
+  };
+  const [produced, setProduced] = useState<Produced | null>(null);
+  const [expanding, setExpanding] = useState(false);
   const [form, setForm] = useState({
     prospect: "Acme Global",
     industry: "Life sciences",
