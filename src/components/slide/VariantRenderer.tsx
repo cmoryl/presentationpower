@@ -6691,15 +6691,13 @@ function MediaTile({
   useEffect(() => {
     const v = videoRef.current;
     if (!v || !shouldPlay) return;
-    pauseAllVideosExcept(v);
+    if (!forceAutoplay) pauseAllVideosExcept(v);
     const p = v.play();
     if (p && typeof (p as Promise<void>).catch === "function") {
-      (p as Promise<void>).catch((err) => {
-        // eslint-disable-next-line no-console
-        console.log("[MediaTile.play.err]", seed, String(err));
+      (p as Promise<void>).catch(() => {
         if (!wantMuted) {
           v.muted = true;
-          v.play().catch((err2) => { console.log("[MediaTile.play.err2]", seed, String(err2)); setAutoplayBlocked(true); });
+          v.play().catch(() => setAutoplayBlocked(true));
         } else {
           setAutoplayBlocked(true);
         }
