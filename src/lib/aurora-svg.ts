@@ -124,7 +124,11 @@ export function auroraOrbs(
   const sx = useAspect ? aspect!.w / AURORA_NATIVE_ASPECT.w : 1;
   const sy = useAspect ? aspect!.h / AURORA_NATIVE_ASPECT.h : 1;
 
-  const nativeAnchors = [
+  // Anchor coordinates in the native 1280×720 space. Light mode pushes the
+  // orb centers much further off-frame (top-corner biased) so only the
+  // soft-focus falloff bleeds in and the solid bloom core stays outside
+  // the crop — keeps white slides quiet under logos + content.
+  const nativeAnchorsDark = [
     { x: -80, y: -60 },    // top-left overhang
     { x: 640, y: -140 },   // top center overhang
     { x: 1360, y: -60 },   // top-right overhang
@@ -134,6 +138,17 @@ export function auroraOrbs(
     { x: 640, y: 860 },    // bottom center overhang
     { x: 1340, y: 780 },   // bottom-right overhang
   ];
+  const nativeAnchorsLight = [
+    { x: -360, y: -320 },  // top-left, deep overhang
+    { x: 640, y: -520 },   // top center, pushed high above frame
+    { x: 1640, y: -320 },  // top-right, deep overhang
+    { x: -480, y: 280 },   // left mid, further out
+    { x: 1760, y: 300 },   // right mid, further out
+    { x: -360, y: 1040 },  // bottom-left, deep overhang
+    { x: 640, y: 1220 },   // bottom center, pushed low
+    { x: 1620, y: 1040 },  // bottom-right, deep overhang
+  ];
+  const nativeAnchors = mode === "light" ? nativeAnchorsLight : nativeAnchorsDark;
   const anchors = useAspect
     ? nativeAnchors.map((a) => ({ x: a.x * sx, y: a.y * sy }))
     : nativeAnchors;
