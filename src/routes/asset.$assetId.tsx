@@ -381,23 +381,7 @@ function AssetEditor() {
   }
   const editableFieldPaths = collectStringPaths(rawContent);
 
-  // Dev-time safety net: if a content field slips into the schema without a
-  // matching editor path, warn loudly rather than let it silently disappear
-  // from the UI (the exact class of bug that stranded `client`, `eyebrow`,
-  // etc. before the Content inspector existed).
-  useEffect(() => {
-    if (!import.meta.env.DEV) return;
-    import("@/lib/print-content-schema").then(({ schemaFor: sf, unreachablePaths, fullyPopulatedSample }) => {
-      const dead = unreachablePaths(sf(kind), fullyPopulatedSample(kind));
-      if (dead.length > 0) {
-        // eslint-disable-next-line no-console
-        console.warn(
-          `[print-content-schema] Unreachable fields for kind="${kind}":`,
-          dead,
-        );
-      }
-    });
-  }, [kind]);
+  // Dev-time schema audit moved above early returns to preserve hook order.
 
 
   function updateStat(i: number, patch: Partial<CaseStudyStat>) {
