@@ -563,11 +563,13 @@ export function KitWizard({
 function StepCard({
   eyebrow,
   title,
+  description,
   actions,
   children,
 }: {
   eyebrow: string;
   title: string;
+  description?: string;
   actions?: React.ReactNode;
   children: React.ReactNode;
 }) {
@@ -579,6 +581,9 @@ function StepCard({
             {eyebrow}
           </div>
           <h2 className="mt-1 text-xl font-bold tracking-tight text-[#03002C]">{title}</h2>
+          {description && (
+            <p className="mt-1.5 max-w-2xl text-xs text-black/55">{description}</p>
+          )}
         </div>
         {actions ? <div className="shrink-0">{actions}</div> : null}
       </header>
@@ -586,6 +591,79 @@ function StepCard({
     </section>
   );
 }
+
+/**
+ * Live preview strip shown under the brand grid on Step 1.
+ * Renders three canonical formats (square, portrait, story) using whatever
+ * headline/summary/CTA the user has typed so far — or the division's
+ * canonical example copy as a fallback. Accent color + logo lockup come
+ * straight from the BrandMode, so switching divisions instantly re-skins
+ * the preview.
+ */
+function BrandPreview({
+  brandId,
+  manualCopy,
+}: {
+  brandId: string;
+  manualCopy: { title: string; summary: string; cta: string };
+}) {
+  const brand = useMemo(
+    () => BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES[0],
+    [brandId],
+  );
+  const fallback = useMemo(() => exampleCopyForBrand(brandId), [brandId]);
+  const copy = {
+    title: manualCopy.title.trim() || fallback.title,
+    summary: (manualCopy.summary.trim() || fallback.summary) ?? undefined,
+    cta: (manualCopy.cta.trim() || fallback.cta) ?? undefined,
+  };
+  const previewFormats = ["square-1080", "portrait-1080x1350", "story-1080x1920"]
+    .map((id) => getFormat(id))
+    .filter((f): f is NonNullable<ReturnType<typeof getFormat>> => !!f);
+  const usingExample = !manualCopy.title.trim();
+
+  return (
+    <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-4">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
+            Live preview · {brand.name}
+          </div>
+          <div className="text-[11px] text-black/55">
+            Accent{" "}
+            <span
+              className="ml-1 inline-block h-2.5 w-2.5 translate-y-[1px] rounded-full ring-1 ring-black/10"
+              style={{ background: brand.tokens.accent }}
+            />{" "}
+            <span className="font-mono">{brand.tokens.accent}</span> · ink{" "}
+            <span className="font-mono">{brand.tokens.primary}</span>
+          </div>
+        </div>
+        {usingExample && (
+          <span className="rounded-full bg-black/[0.04] px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/50">
+            Showing example
+          </span>
+        )}
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {previewFormats.map((f) => (
+          <div key={f.id} className="space-y-1.5">
+            <SocialRenderer
+              format={f}
+              brandId={brand.id}
+              mode="dark"
+              copy={copy}
+              facts={{}}
+              displayShortEdge={140}
+            />
+            <div className="text-[10px] uppercase tracking-widest text-black/50">{f.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 
 function EmptyState({
   title,
