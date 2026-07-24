@@ -313,7 +313,8 @@ function EventsView() {
           {favorites.size === 0 ? "Browse presentations →" : "Choose favorites →"}
         </Link>
       </section>
-    </div>
+      </div>
+    </>
   );
 }
 
