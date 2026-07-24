@@ -7661,21 +7661,34 @@ function FreeformSemiGauge({
   const cx = size / 2;
   const arcC = Math.PI * r;
   const dash = (p / 100) * arcC;
-  const h = cy + 24;
-  const arc = `M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`;
   // Terminus: angle from left endpoint, sweeping CCW over the top.
   // At p=0 → (cx-r, cy); at p=100 → (cx+r, cy); at p=50 → (cx, cy-r).
   const theta = (Math.PI * p) / 100;
   const termX = cx - Math.cos(theta) * r;
   const termY = cy - Math.sin(theta) * r;
+  // Halo radius drives viewBox padding so the soft alpha fade never gets
+  // clipped against the SVG edge (would read as a hard fade-to-white line).
+  const haloR = size * (bloom ? 0.34 : 0.24);
+  const pad = Math.ceil(haloR + 8);
+  const vbX = -pad;
+  const vbY = -pad;
+  const vbW = size + pad * 2;
+  const vbH = cy + 24 + pad * 2;
+  const arc = `M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`;
   return (
-    <svg width={size} height={h} viewBox={`0 0 ${size} ${h}`} aria-hidden>
+    <svg
+      width={vbW}
+      height={vbH}
+      viewBox={`${vbX} ${vbY} ${vbW} ${vbH}`}
+      style={{ overflow: "visible", marginLeft: -pad, marginRight: -pad, marginTop: -pad, marginBottom: -pad }}
+      aria-hidden
+    >
       <FreeformSvgDefs id={id} />
       {/* Feathered halo behind the terminus */}
       <circle
         cx={termX}
         cy={termY}
-        r={size * (bloom ? 0.34 : 0.24)}
+        r={haloR}
         fill={`url(#${id}-halo)`}
         opacity={bloom ? 1 : 0.7}
       />
