@@ -218,7 +218,7 @@ function BriefWizard() {
         printAssetIds: prints.map((p) => p.id),
         brandDivisionId: brandForCall?.id ?? null,
       },
-    } as never);
+    });
 
     setProduced({
       deckId,
