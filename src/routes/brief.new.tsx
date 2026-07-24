@@ -179,6 +179,63 @@ function BriefWizard() {
     setShowAllArchetypes(false);
   };
 
+  // Fan out a completed brief into the full master set (print / event / social).
+  async function expandMasterSet(deckId: string, submission: { prospect: string; industry: string; audience: string; meetingObjective: string; clientFacts: string }) {
+    setExpanding(true);
+    const brandForCall = byId(brandModes, form.brandModeId);
+    const prints: Array<{ id: string; kind: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief"; title: string }> = [];
+
+    if (masterSet.print.enabled && signedIn) {
+      for (const kind of masterSet.print.kinds) {
+        try {
+          const res = await createPrintAssetFn({
+            data: {
+              kind,
+              title: `${submission.prospect} · ${kind.replace("-", " ")}`,
+              brandModeId: form.brandModeId,
+              subCompany: form.subCompany || null,
+              brief: {
+                prospect: submission.prospect,
+                industry: submission.industry,
+                audience: submission.audience,
+                meetingObjective: submission.meetingObjective,
+                clientFacts: submission.clientFacts,
+              },
+            },
+          });
+          if (res?.id) prints.push({ id: res.id, kind, title: res.title ?? `${submission.prospect} · ${kind}` });
+        } catch (e) {
+          toast.error(`Print (${kind}) failed: ${(e as Error).message}`);
+        }
+      }
+    }
+
+    // Persist master-set choices onto the deck context so downstream views can surface them.
+    setDeckContext(deckId, {
+      masterSet: {
+        eventPlaybookId: masterSet.event.enabled ? masterSet.event.playbookId : null,
+        socialPlaybookId: masterSet.social.enabled ? masterSet.social.playbookId : null,
+        printAssetIds: prints.map((p) => p.id),
+        brandDivisionId: brandForCall?.id ?? null,
+      },
+    } as never);
+
+    setProduced({
+      deckId,
+      prints,
+      eventPlaybookId: masterSet.event.enabled ? masterSet.event.playbookId : null,
+      socialPlaybookId: masterSet.social.enabled ? masterSet.social.playbookId : null,
+    });
+    setExpanding(false);
+
+    const parts: string[] = ["Deck"];
+    if (prints.length) parts.push(`${prints.length} print asset${prints.length > 1 ? "s" : ""}`);
+    if (masterSet.event.enabled && masterSet.event.playbookId) parts.push("event kit");
+    if (masterSet.social.enabled && masterSet.social.playbookId) parts.push("social kit");
+    toast.success(`Master set ready · ${parts.join(" · ")}`);
+  }
+
+
   return (
     <AppShell>
       <div className="font-['Geist']" style={{ color: PALETTE.ink }}>
