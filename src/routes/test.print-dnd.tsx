@@ -72,7 +72,7 @@ function emptyContent(kind: PrintTemplateKind) {
   return emptyAdaptorBrief();
 }
 
-import { notFound } from "@tanstack/react-router";
+
 
 export const Route = createFileRoute("/test/print-dnd")({
   beforeLoad: () => {
