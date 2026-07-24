@@ -10,11 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TemplatesRouteImport } from './routes/templates'
+import { Route as SocialRouteImport } from './routes/social'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LogohubRouteImport } from './routes/logohub'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as ImageryRouteImport } from './routes/imagery'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as EventsRouteImport } from './routes/events'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AtlasRouteImport } from './routes/atlas'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
@@ -77,6 +79,11 @@ const TemplatesRoute = TemplatesRouteImport.update({
   path: '/templates',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SocialRoute = SocialRouteImport.update({
+  id: '/social',
+  path: '/social',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -100,6 +107,11 @@ const ImageryRoute = ImageryRouteImport.update({
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -393,11 +405,13 @@ export interface FileRoutesByFullPath {
   '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
+  '/events': typeof EventsRoute
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/social': typeof SocialRoute
   '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
@@ -456,10 +470,12 @@ export interface FileRoutesByTo {
   '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
+  '/events': typeof EventsRoute
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/social': typeof SocialRoute
   '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
@@ -520,11 +536,13 @@ export interface FileRoutesById {
   '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
+  '/events': typeof EventsRoute
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/social': typeof SocialRoute
   '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
@@ -586,11 +604,13 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/atlas'
     | '/auth'
+    | '/events'
     | '/faq'
     | '/imagery'
     | '/knowledge'
     | '/logohub'
     | '/reset-password'
+    | '/social'
     | '/templates'
     | '/admin/ab'
     | '/admin/ai'
@@ -649,10 +669,12 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/atlas'
     | '/auth'
+    | '/events'
     | '/faq'
     | '/imagery'
     | '/logohub'
     | '/reset-password'
+    | '/social'
     | '/templates'
     | '/admin/ab'
     | '/admin/ai'
@@ -712,11 +734,13 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/atlas'
     | '/auth'
+    | '/events'
     | '/faq'
     | '/imagery'
     | '/knowledge'
     | '/logohub'
     | '/reset-password'
+    | '/social'
     | '/templates'
     | '/admin/ab'
     | '/admin/ai'
@@ -777,11 +801,13 @@ export interface RootRouteChildren {
   AnalyticsRoute: typeof AnalyticsRoute
   AtlasRoute: typeof AtlasRoute
   AuthRoute: typeof AuthRoute
+  EventsRoute: typeof EventsRoute
   FaqRoute: typeof FaqRoute
   ImageryRoute: typeof ImageryRoute
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
   LogohubRoute: typeof LogohubRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SocialRoute: typeof SocialRoute
   TemplatesRoute: typeof TemplatesRoute
   ApiChatRoute: typeof ApiChatRoute
   AssetAssetIdRoute: typeof AssetAssetIdRoute
@@ -813,6 +839,13 @@ declare module '@tanstack/react-router' {
       path: '/templates'
       fullPath: '/templates'
       preLoaderRoute: typeof TemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/social': {
+      id: '/social'
+      path: '/social'
+      fullPath: '/social'
+      preLoaderRoute: typeof SocialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -848,6 +881,13 @@ declare module '@tanstack/react-router' {
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -1338,11 +1378,13 @@ const rootRouteChildren: RootRouteChildren = {
   AnalyticsRoute: AnalyticsRoute,
   AtlasRoute: AtlasRoute,
   AuthRoute: AuthRoute,
+  EventsRoute: EventsRoute,
   FaqRoute: FaqRoute,
   ImageryRoute: ImageryRoute,
   KnowledgeRoute: KnowledgeRouteWithChildren,
   LogohubRoute: LogohubRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SocialRoute: SocialRoute,
   TemplatesRoute: TemplatesRoute,
   ApiChatRoute: ApiChatRoute,
   AssetAssetIdRoute: AssetAssetIdRoute,
