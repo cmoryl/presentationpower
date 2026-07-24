@@ -225,6 +225,14 @@ function Library() {
   const [mode, setMode] = useState<"light" | "dark" | "ab">("light");
   const [pinnedOnly, setPinnedOnly] = useState(false);
   const [sort, setSort] = useState<"default" | "most-used" | "pinned-first">("default");
+  // Multi-select mode → build a deck from N chosen variants in one shot.
+  const [selectMode, setSelectMode] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
+  const selectedSet = useMemo(() => new Set(selected), [selected]);
+  const toggleSelected = useCallback((id: string) => {
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  }, []);
+  const clearSelection = useCallback(() => setSelected([]), []);
 
   const [showImagery, setShowImagery] = useState(false);
   const [density, setDensity] = useState<"comfortable" | "thumb">(() => {
@@ -426,6 +434,47 @@ function Library() {
     const { deckId } = createDeckFromTemplate(payload);
     navigate({ to: "/decks/$deckId", params: { deckId } });
   }
+  function createDeckFromSelection() {
+    const ids = selected;
+    if (ids.length === 0) return;
+    const brand = scopeBrand ?? tpMaster;
+    const brief = resolveDivisionBrief(brand);
+    const slides: TemplatePayload["slides"] = [];
+    for (const vid of ids) {
+      const variant = byId(MODULE_VARIANTS, vid);
+      if (!variant) continue;
+      const content = seedDivisionContent(vid, brief, "Selected module", brand) as Record<string, unknown>;
+      slides.push({
+        sectionId: sectionForVariant(vid),
+        variantId: vid,
+        layoutId: variant.permittedLayoutIds[0] ?? "",
+        content: content as unknown as TemplatePayload["slides"][number]["content"],
+      });
+    }
+    if (slides.length === 0) return;
+    const payload: TemplatePayload = {
+      title: `Custom deck · ${slides.length} module${slides.length === 1 ? "" : "s"}`,
+      brandModeId: brand.id,
+      archetypeId: "arch-product-pitch",
+      subCompany: null,
+      context: null,
+      brief: {
+        prospect: brief.prospect,
+        industry: brief.industry,
+        audience: brief.audience,
+        meetingObjective: `Custom deck built from ${slides.length} library module${slides.length === 1 ? "" : "s"}`,
+        lengthTarget: slides.length,
+        clientFacts: brief.clientFacts,
+      },
+      slides,
+    };
+    const { deckId } = createDeckFromTemplate(payload);
+    toast.success(`Deck created from ${slides.length} module${slides.length === 1 ? "" : "s"}`);
+    setSelected([]);
+    setSelectMode(false);
+    navigate({ to: "/decks/$deckId", params: { deckId } });
+  }
+
 
 
   return (
@@ -509,6 +558,24 @@ function Library() {
               Clear filters
             </button>
           )}
+          <button
+            type="button"
+            onClick={() => {
+              setSelectMode((v) => {
+                if (v) setSelected([]);
+                return !v;
+              });
+            }}
+            aria-pressed={selectMode}
+            title="Pick multiple modules, then build a deck from the selection"
+            className={`rounded-full border px-3 py-1.5 text-xs transition ${
+              selectMode
+                ? "border-[#003FC7] bg-[#003FC7] text-white"
+                : "border-black/15 bg-white text-black/70 hover:border-black/30 hover:text-black"
+            }`}
+          >
+            {selectMode ? "✓ Selecting" : "☐ Select modules"}
+          </button>
           <div className="ml-auto flex items-center gap-3">
             <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs">
               <button
@@ -775,6 +842,9 @@ function Library() {
               videoExample={isVideo ? entry.example : undefined}
               onImportExample={isVideo ? () => importVideoExample(entry.example) : undefined}
               importBusy={isVideo && videoBusy === entry.example.key}
+              selectable={selectMode && !isVideo}
+              selected={selectedSet.has(v.id)}
+              onToggleSelect={() => toggleSelected(v.id)}
             />
 
           );
@@ -790,6 +860,32 @@ function Library() {
           Start a brief →
         </Link>
       </div>
+
+      {selectMode && selected.length > 0 && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-6 z-40 flex justify-center px-4">
+          <div className="pointer-events-auto flex items-center gap-3 rounded-full border border-white/10 bg-[#03002C] px-4 py-2 text-sm text-white shadow-2xl">
+            <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-medium">
+              {selected.length} selected
+            </span>
+            <button
+              type="button"
+              onClick={clearSelection}
+              className="text-xs text-white/70 hover:text-white"
+            >
+              Clear
+            </button>
+            <div className="h-4 w-px bg-white/20" />
+            <button
+              type="button"
+              onClick={createDeckFromSelection}
+              className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-medium hover:bg-[#0053ff]"
+            >
+              <Plus size={14} /> Create deck from selection →
+            </button>
+          </div>
+        </div>
+      )}
+
 
       {active && (
         <VariantDetailModal
@@ -871,6 +967,9 @@ const VariantCard = memo(function VariantCard({
   importBusy = false,
   logoHubPool,
   compact = false,
+  selectable = false,
+  selected = false,
+  onToggleSelect,
 }: {
   variant: ModuleVariant;
   familyName?: string;
@@ -896,6 +995,11 @@ const VariantCard = memo(function VariantCard({
   logoHubPool?: LogoFiller[];
   /** Compact thumbnail layout: smaller preview + condensed metadata. */
   compact?: boolean;
+  /** When true, clicking the card toggles selection instead of opening the
+   *  detail modal — used by the library's multi-select → build deck flow. */
+  selectable?: boolean;
+  selected?: boolean;
+  onToggleSelect?: () => void;
 }) {
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
   const rawContent = videoExample
@@ -955,18 +1059,28 @@ const VariantCard = memo(function VariantCard({
 
 
   return (
-    <div className="group relative">
+    <div className={`group relative ${selectable && selected ? "rounded-[24px] ring-2 ring-[#003FC7] ring-offset-2 ring-offset-white" : ""}`}>
+    {selectable && (
+      <div
+        className="absolute left-3 top-3 z-20 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-[13px] shadow-md ring-1 ring-black/10 backdrop-blur"
+        aria-hidden
+        title={selected ? "Selected — click card to deselect" : "Click card to select"}
+      >
+        {selected ? <Check size={16} className="text-[#003FC7]" /> : <span className="h-4 w-4 rounded-sm border border-black/30" />}
+      </div>
+    )}
     <button
       type="button"
-      onClick={onOpen}
+      onClick={selectable ? onToggleSelect : onOpen}
       data-variant-card=""
       data-variant-id={variant.id}
       data-variant-family={variant.familyId}
       data-variant-layout={variant.permittedLayoutIds[0] ?? ""}
       data-variant-mode={mode}
       data-variant-pinned={pinned ? "1" : "0"}
+      data-variant-selected={selected ? "1" : "0"}
       data-variant-usage={usageCount}
-      className="block w-full overflow-hidden rounded-[24px] border border-slate-200 bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:border-[#003FC7]/20 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)]"
+      className={`block w-full overflow-hidden rounded-[24px] border bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)] ${selectable && selected ? "border-[#003FC7]" : "border-slate-200 hover:border-[#003FC7]/20"}`}
     >
       {isAB ? (
         <div className="m-2 grid grid-cols-2 gap-2">
