@@ -249,6 +249,7 @@ export function EditorialTitle({
   size = 148,
   align = "start",
   maxWidthPx = 1620,
+  emphasisStyle = "italic-serif",
 }: {
   text: string;
   emphasize?: string;
@@ -257,7 +258,10 @@ export function EditorialTitle({
   size?: number;
   align?: "start" | "center";
   maxWidthPx?: number;
+  /** How the emphasized word renders. "italic-serif" (default) or "bold" (heavier sans, no italic). */
+  emphasisStyle?: "italic-serif" | "bold";
 }) {
+
   const parts: Array<{ t: string; italic: boolean }> = [];
   if (emphasize && text.toLowerCase().includes(emphasize.toLowerCase())) {
     const idx = text.toLowerCase().indexOf(emphasize.toLowerCase());
@@ -283,22 +287,35 @@ export function EditorialTitle({
     >
       {parts.map((p, i) =>
         p.italic ? (
-          <em
-            key={i}
-            style={{
-              fontFamily: EDITORIAL_SERIF,
-              
-              fontWeight: 400,
-              color: accentColor ?? color,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            {p.t}
-          </em>
+          emphasisStyle === "bold" ? (
+            <strong
+              key={i}
+              style={{
+                fontWeight: 800,
+                color: accentColor ?? color,
+                letterSpacing: "-0.035em",
+              }}
+            >
+              {p.t}
+            </strong>
+          ) : (
+            <em
+              key={i}
+              style={{
+                fontFamily: EDITORIAL_SERIF,
+                fontWeight: 400,
+                color: accentColor ?? color,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {p.t}
+            </em>
+          )
         ) : (
           <span key={i}>{p.t}</span>
         ),
       )}
+
     </h1>
   );
 }
