@@ -158,3 +158,60 @@ export function buildCampaignAssets(
   }
   return out;
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// Variant → CampaignSource extraction. Given a favorited module variant ID
+// and a target brand, pull whatever the deterministic seeder produces (the
+// same content the library card previews) and shape it into a CampaignSource
+// with the strongest available slots: title, summary, and the first stat.
+// This is the deterministic fallback; TODO(ai) will rewrite these for each
+// target format's copy budget.
+// ────────────────────────────────────────────────────────────────────────────
+type SeededContent = {
+  heading?: string;
+  title?: string;
+  subhead?: string;
+  eyebrow?: string;
+  body?: string;
+  summary?: string;
+  description?: string;
+  quote?: { text?: string; attribution?: string } | string;
+  stats?: Array<{ value?: string | number; label?: string }>;
+  metrics?: Array<{ value?: string | number; label?: string }>;
+  kpis?: Array<{ value?: string | number; label?: string }>;
+};
+
+function firstStat(c: SeededContent): { value: string; label: string } | undefined {
+  const pool = c.stats ?? c.metrics ?? c.kpis ?? [];
+  for (const s of pool) {
+    if (s && s.value != null && s.label) {
+      return { value: String(s.value), label: String(s.label) };
+    }
+  }
+  return undefined;
+}
+
+function firstText(...values: Array<unknown>): string | undefined {
+  for (const v of values) {
+    if (typeof v === "string" && v.trim()) return v.trim();
+  }
+  return undefined;
+}
+
+export function sourceFromVariant(variantId: string, brand: BrandMode): CampaignSource {
+  const variant = byId(MODULE_VARIANTS, variantId);
+  const brief = resolveDivisionBrief(brand);
+  const raw = seedDivisionContent(variantId, brief, variant?.familyId ?? "Selected module", brand);
+  const c = (raw ?? {}) as SeededContent;
+  const title = firstText(c.heading, c.title, c.subhead, c.eyebrow) ?? variant?.name ?? "Favorited module";
+  const summary = firstText(c.summary, c.body, c.description);
+  const quote = typeof c.quote === "object" && c.quote ? firstText(c.quote.text) : firstText(c.quote as string);
+  return {
+    kind: "slide",
+    variantId,
+    title,
+    summary: summary ?? quote,
+    stat: firstStat(c),
+  };
+}
+
