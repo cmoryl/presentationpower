@@ -80,15 +80,37 @@ function KitBuilderView() {
   );
   const [regenTick, setRegenTick] = useState(0);
 
+  // Wizard mode — triggered by ?blank=1 from /social and /events blank-kit CTAs.
+  const isWizard = !!search.blank;
+  const [step, setStep] = useState(0);
+  const [manualCopy, setManualCopy] = useState({
+    title: "",
+    summary: "",
+    cta: "",
+    statValue: "",
+    statLabel: "",
+  });
+
   const brand = useMemo(
     () => BRAND_MODES.find((b) => b.id === brandId) ?? BRAND_MODES[0],
     [brandId],
   );
 
   const source: CampaignSource | null = useMemo(() => {
+    if (isWizard) {
+      if (!manualCopy.title.trim()) return null;
+      return {
+        kind: "manual",
+        copy: {
+          title: manualCopy.title.trim(),
+          summary: manualCopy.summary.trim() || undefined,
+          cta: manualCopy.cta.trim() || undefined,
+        },
+      };
+    }
     if (!sourceId) return null;
     return sourceFromVariant(sourceId, brand);
-  }, [sourceId, brand]);
+  }, [isWizard, manualCopy, sourceId, brand]);
 
   const eventFacts: EventFacts = useMemo(() => {
     if (!attachEvent) return { ...EMPTY_EVENT, subBrand: brandId };
