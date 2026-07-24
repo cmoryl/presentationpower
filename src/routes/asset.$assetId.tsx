@@ -46,6 +46,8 @@ import { PrintSectionPicker, PRINT_SECTION_DND_MIME } from "@/components/print/s
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
+import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
+
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
 import { analyzePrintAsset, canAddModule } from "@/lib/print-capacity";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
