@@ -579,16 +579,43 @@ export function KitWizard({
             eyebrow="Step 5 of 5"
             title={`Your kit · ${assets.length} asset${assets.length === 1 ? "" : "s"}`}
             actions={
-              <button
-                type="button"
-                onClick={() => {
-                  setRemoved(new Set());
-                  setRegenTick((n) => n + 1);
-                }}
-                className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:bg-black/5"
-              >
-                <RefreshCw size={12} /> Regenerate all
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (exporting || !assets.length) return;
+                    setExporting(true);
+                    const tId = toast.loading(`Preparing ${assets.length} asset${assets.length === 1 ? "" : "s"}…`);
+                    try {
+                      await exportKitZip(
+                        assets,
+                        kitName || `${surface}-kit`,
+                        (d, t) => toast.loading(`Rendering ${d}/${t}…`, { id: tId }),
+                      );
+                      toast.success("Kit downloaded", { id: tId });
+                    } catch (err) {
+                      console.error(err);
+                      toast.error("Export failed", { id: tId });
+                    } finally {
+                      setExporting(false);
+                    }
+                  }}
+                  disabled={exporting || assets.length === 0}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#03002C] disabled:opacity-50"
+                >
+                  <Download size={12} /> {exporting ? "Exporting…" : "Download kit (.zip)"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRemoved(new Set());
+                    setRegenTick((n) => n + 1);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:bg-black/5"
+                >
+                  <RefreshCw size={12} /> Regenerate all
+                </button>
+              </div>
             }
           >
             {/* Save this kit — name + save button, always visible on review. */}
