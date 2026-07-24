@@ -412,10 +412,19 @@ function DeckEditor() {
             >
               {active && mv && (
                 <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
-                  <ScaledSlide>
-                    <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
-                    <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
-                  </ScaledSlide>
+                  <LiveEditOverlay
+                    enabled={false}
+                    slideId={active.id}
+                    content={active.content as Record<string, unknown>}
+                    editableFields={mv.editableFields}
+                    inkOverrides={active.inkOverrides}
+                    onChange={() => {}}
+                  >
+                    <ScaledSlide>
+                      <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
+                      <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
+                    </ScaledSlide>
+                  </LiveEditOverlay>
                 </SlideVideoPreviewContext.Provider>
               )}
               <span className="pointer-events-none absolute right-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100">
