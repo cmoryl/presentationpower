@@ -1011,13 +1011,15 @@ function AssetEditor() {
 }
 
 function ModulesPanel({
-  kind, modules, onAdd, onChange,
+  kind, modules, onAdd, onChange, mode,
 }: {
   kind: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
   modules: PrintSection[];
   onAdd: () => void;
   onChange: (next: PrintSection[]) => void;
+  mode: PrintMode;
 }) {
+  const editorMode = mode;
   function move(i: number, dir: -1 | 1) {
     const j = i + dir;
     if (j < 0 || j >= modules.length) return;
