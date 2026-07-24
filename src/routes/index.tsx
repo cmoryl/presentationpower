@@ -143,7 +143,20 @@ function Dashboard() {
   const [aiConfigured, setAiConfigured] = useState<boolean | null>(null);
   const [cloudCount, setCloudCount] = useState<number | null>(null);
   const [modeId, setModeId] = useState<ModeId>("presentation");
+  const [autoRotate, setAutoRotate] = useState(true);
   const mode = MODES.find((m) => m.id === modeId) ?? MODES[0];
+
+  // Auto-rotate through modes every 5s until the user picks one or hovers the picker.
+  useEffect(() => {
+    if (!autoRotate) return;
+    const id = window.setInterval(() => {
+      setModeId((cur) => {
+        const idx = MODES.findIndex((m) => m.id === cur);
+        return MODES[(idx + 1) % MODES.length].id;
+      });
+    }, 5000);
+    return () => window.clearInterval(id);
+  }, [autoRotate]);
 
   useEffect(() => {
     checkAi().then((r) => setAiConfigured(r.configured)).catch(() => setAiConfigured(true));
@@ -207,6 +220,8 @@ function Dashboard() {
             <div
               role="tablist"
               aria-label="What are you building?"
+              onMouseEnter={() => setAutoRotate(false)}
+              onFocus={() => setAutoRotate(false)}
               className="flex flex-wrap gap-1.5 rounded-2xl border border-white/10 bg-white/[0.04] p-1.5 backdrop-blur sm:inline-flex"
             >
               {MODES.map((m) => {
@@ -218,7 +233,7 @@ function Dashboard() {
                     type="button"
                     role="tab"
                     aria-selected={active}
-                    onClick={() => setModeId(m.id)}
+                    onClick={() => { setAutoRotate(false); setModeId(m.id); }}
                     className={`group relative inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300 ${
                       active
                         ? "bg-white text-[#03002C] shadow-lg shadow-black/20"
