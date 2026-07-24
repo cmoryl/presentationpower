@@ -178,7 +178,9 @@ for (const kind of Object.keys(COMBOS) as Kind[]) {
     test("drag reorder preserves verdict and module identity", async ({ page }) => {
       await openHarness(page, kind);
       await addVariant(page, "stat-callout-row-portrait");
-      await addVariant(page, "stat-bento-portrait");
+      // adaptor-brief has a 3.5pu budget; callout(1.6) + bento(2.0) = 3.6pu
+      // exceeds it, so use a lighter second variant on that template.
+      await addVariant(page, kind === "adaptor-brief" ? "stat-callout-row-portrait" : "stat-bento-portrait");
       const before = await readOrder(page);
       const levelBefore = await readLevel(page);
       expect(before.length).toBe(2);
