@@ -181,36 +181,30 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
       aria-hidden
       style={bandStyle}
     >
-      {showFallback ? (
-        <div style={{ position: "absolute", inset: 0, background: fallbackBg }} />
-      ) : (
-        <img
-          src={media.imageUrl}
-          alt=""
-          onError={() => setFailed(true)}
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            objectPosition,
-          }}
-        />
-      )}
+      <img
+        src={media.imageUrl}
+        alt=""
+        onError={() => setFailed(true)}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          objectPosition,
+        }}
+      />
 
-      {/* Accent color wash — skip on fallback so we don't double-tint the gradient */}
-      {!showFallback && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundColor: overlayColor,
-            opacity: overlayOpacity,
-            mixBlendMode: blendMode,
-          }}
-        />
-      )}
+      {/* Accent color wash over the photo */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundColor: overlayColor,
+          opacity: overlayOpacity,
+          mixBlendMode: blendMode,
+        }}
+      />
       {/* Legibility scrim into the body background — scaled by washStrength */}
       {effectiveScrim !== "none" && effectiveScrimOpacity > 0 && (
         <div
