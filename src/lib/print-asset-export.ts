@@ -18,6 +18,13 @@ import {
   type SlideExportMode,
 } from "./slide-image-export";
 import { fetchIccProfile, wrapPdfAsX4, type IccProfileKey } from "./pdf-x4";
+import {
+  captureVectorText,
+  enableHideTextForCapture,
+  overlayVectorText,
+  type VectorTextCapture,
+} from "./print-vector-text";
+
 
 export type PrintPageSizeKey = "A4" | "Letter" | "Square" | "Custom";
 export type PrintExportQuality = "300dpi" | "600dpi";
@@ -103,7 +110,29 @@ export interface PrintExportOptions {
   onProgress?: ExportProgressCallback;
   /** Fires when the requested DPI cannot be honored (canvas ceiling reached). */
   onQualityClamp?: (info: PrintExportQualityClampInfo) => void;
+  /**
+   * Enable vector-text overlay (two-pass render): hide DOM text during
+   * raster capture, then draw the same visual lines with embedded Geist
+   * on top. Text becomes selectable, searchable, and press-sharp.
+   *
+   * Defaults to ON for `press` and `press-x4` (print-asset routes only),
+   * OFF for `digital`. Pass `false` to force raster-only.
+   */
+  vectorText?: boolean;
+  /** Fires once the vector-text overlay has been drawn (diagnostics). */
+  onVectorTextReport?: (report: VectorTextReport) => void;
 }
+
+export interface VectorTextReport {
+  enabled: boolean;
+  linesDrawn: number;
+  glyphOnlyLines: number;
+  fontResources: string[];
+  rasterBytes: number;
+  finalBytes: number;
+  skippedClamped: number;
+}
+
 
 function resolveTrim(opts: PrintExportOptions): PrintPageDimensions {
   if (opts.pageSize === "Custom") {
@@ -238,26 +267,50 @@ export async function exportPrintAssetAsPdf(
     compress: true,
   });
 
+  // Vector text is a print-asset-only feature; digital output stays raster.
+  const vectorText = opts.vectorText ?? !isDigital;
+  const captures: VectorTextCapture[] = [];
+
   for (let i = 0; i < pages.length; i++) {
     if (i > 0) pdf.addPage([pageWidth, pageHeight], orientation);
-    const pngDataUrl = await captureSlideAsDataUrl(pages[i]!, {
-      mode: opts.mode ?? "light",
-      targetWidth: resolved.widthPx,
-      onProgress: opts.onProgress,
-    });
-    if (isDigital) {
-      // Convert PNG → JPEG for a ~10× file-size reduction on aurora pages.
-      const jpegDataUrl = await pngDataUrlToJpeg(
-        pngDataUrl,
-        opts.mode ?? "light",
-        DIGITAL_JPEG_QUALITY,
-      );
-      pdf.addImage(jpegDataUrl, "JPEG", 0, 0, pageWidth, pageHeight, undefined, "FAST");
-    } else {
-      pdf.addImage(pngDataUrl, "PNG", 0, 0, pageWidth, pageHeight, undefined, "SLOW");
+    const pageNode = pages[i]!;
+
+    // PASS A — raster with text hidden (vector) or full raster (digital).
+    let restoreHide: (() => void) | null = null;
+    if (vectorText) {
+      // Snapshot vector-text positions BEFORE hiding text so line breaks are
+      // still real. captureSlideAsDataUrl's font/image waits will run again,
+      // but by then layout has been settled by React and this outer await
+      // above ensures fonts are ready.
+      try {
+        if (typeof document !== "undefined" && document.fonts?.ready) {
+          await document.fonts.ready;
+        }
+      } catch { /* best effort */ }
+      captures.push(captureVectorText(pageNode));
+      restoreHide = enableHideTextForCapture(pageNode);
     }
-    if (cropMarks && bleed > 0) {
-      drawCropMarks(pdf, pageWidth, pageHeight, bleed);
+    try {
+      const pngDataUrl = await captureSlideAsDataUrl(pageNode, {
+        mode: opts.mode ?? "light",
+        targetWidth: resolved.widthPx,
+        onProgress: opts.onProgress,
+      });
+      if (isDigital) {
+        const jpegDataUrl = await pngDataUrlToJpeg(
+          pngDataUrl,
+          opts.mode ?? "light",
+          DIGITAL_JPEG_QUALITY,
+        );
+        pdf.addImage(jpegDataUrl, "JPEG", 0, 0, pageWidth, pageHeight, undefined, "FAST");
+      } else {
+        pdf.addImage(pngDataUrl, "PNG", 0, 0, pageWidth, pageHeight, undefined, "SLOW");
+      }
+      if (cropMarks && bleed > 0) {
+        drawCropMarks(pdf, pageWidth, pageHeight, bleed);
+      }
+    } finally {
+      restoreHide?.();
     }
   }
 
@@ -265,13 +318,51 @@ export async function exportPrintAssetAsPdf(
     opts.filename ??
     `print-asset-${opts.pageSize.toLowerCase()}-${format}-${Date.now()}.pdf`;
 
+  // Serialize raster PDF once so we can chain vector overlay → X-4 wrap.
+  const rasterBytesArr = new Uint8Array(pdf.output("arraybuffer"));
+
+  // PASS B — vector-text overlay.
+  let workingBytes: Uint8Array = rasterBytesArr;
+  const vectorReport: VectorTextReport = {
+    enabled: vectorText,
+    linesDrawn: 0,
+    glyphOnlyLines: 0,
+    fontResources: [],
+    rasterBytes: rasterBytesArr.byteLength,
+    finalBytes: rasterBytesArr.byteLength,
+    skippedClamped: captures.reduce((n, c) => n + c.stats.skippedClamped, 0),
+  };
+  if (vectorText && captures.length > 0) {
+    try {
+      const overlay = await overlayVectorText(workingBytes, {
+        pageWidthIn: pageWidth,
+        pageHeightIn: pageHeight,
+        bleedIn: bleed,
+        captures,
+      });
+      workingBytes = overlay.bytes;
+      vectorReport.linesDrawn = overlay.stats.linesDrawn;
+      vectorReport.glyphOnlyLines = overlay.stats.glyphOnly;
+      vectorReport.fontResources = overlay.fontResources;
+      vectorReport.finalBytes = workingBytes.byteLength;
+      console.info(
+        `[print-asset-export] Vector-text overlay: ${overlay.stats.linesDrawn} lines ` +
+          `(${overlay.stats.glyphOnly} per-glyph for tracking), fonts=[${overlay.fontResources.join(", ")}], ` +
+          `rasterBytes=${rasterBytesArr.byteLength}, finalBytes=${workingBytes.byteLength}`,
+      );
+    } catch (err) {
+      console.warn("[print-asset-export] Vector overlay failed, shipping raster-only.", err);
+      vectorReport.enabled = false;
+    }
+  }
+  opts.onVectorTextReport?.(vectorReport);
+
   if (format === "press-x4") {
     if (!opts.iccProfile) {
       throw new Error("press-x4 export requires an `iccProfile` option.");
     }
-    const rawBytes = pdf.output("arraybuffer");
     const iccBytes = await fetchIccProfile(opts.iccProfile);
-    const x4Bytes = await wrapPdfAsX4(new Uint8Array(rawBytes), {
+    const x4Bytes = await wrapPdfAsX4(workingBytes, {
       trimSize: { widthIn: trim.widthIn, heightIn: trim.heightIn },
       bleedIn: bleed,
       iccProfileBytes: iccBytes,
@@ -279,9 +370,14 @@ export async function exportPrintAssetAsPdf(
       title: opts.filename,
     });
     triggerBlobDownload(x4Bytes, filename, "application/pdf");
+
   } else {
-    pdf.save(filename);
+    // press / digital paths — ship the overlaid bytes so vector text
+    // survives on non-X4 exports too. Digital bypasses overlay above so
+    // `workingBytes === rasterBytesArr` in that case.
+    triggerBlobDownload(workingBytes, filename, "application/pdf");
   }
+
 }
 
 /** Convert a PNG data URL to a JPEG data URL with a mode-appropriate flat
