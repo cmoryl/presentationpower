@@ -1907,7 +1907,7 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Zoomed regional map (Americas, EMEA, APAC, LATAM, or MEA) with labeled pins and a supporting caption.",
     permittedLayoutIds: ["LF-03", "LF-06"],
     capacity: { titleChars: 80, bodyChars: 200, items: { min: 3, max: 40 } },
-    editableFields: ["title", "subtitle", "region", "narrative", "items[].city", "items[].country", "items[].region", "items[].lat", "items[].lon", "items[].role", "items[].label"],
+    editableFields: ["title", "subtitle", "region", "narrative", "stat.value", "stat.unit", "stat.label", "regionMetrics[].region", "regionMetrics[].label", "regionMetrics[].value", "regionMetrics[].unit", "regionMetrics[].percent", "regionMetrics[].delta", "items[].city", "items[].country", "items[].region", "items[].lat", "items[].lon", "items[].role", "items[].label"],
     lockedFields: ["footer", "logo"],
   },
   {
@@ -1917,7 +1917,7 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description: "Primary HQ pin with curved arcs to every satellite office, over the stylized world map.",
     permittedLayoutIds: ["LF-05"],
     capacity: { titleChars: 80, bodyChars: 140, items: { min: 3, max: 60 } },
-    editableFields: ["title", "subtitle", "items[].city", "items[].country", "items[].region", "items[].lat", "items[].lon", "items[].role", "items[].label"],
+    editableFields: ["title", "subtitle", "stat.value", "stat.unit", "stat.label", "regionMetrics[].region", "regionMetrics[].label", "regionMetrics[].value", "regionMetrics[].unit", "regionMetrics[].percent", "regionMetrics[].delta", "items[].city", "items[].country", "items[].region", "items[].lat", "items[].lon", "items[].role", "items[].label"],
     lockedFields: ["footer", "logo"],
   },
 ];
