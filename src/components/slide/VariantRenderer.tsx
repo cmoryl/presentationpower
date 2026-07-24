@@ -6647,7 +6647,10 @@ function MediaTile({
     if (snap && snap.currentTime > 0) {
       try { v.currentTime = snap.currentTime; } catch { /* seek before ready */ }
     }
-    const onPlay = () => pauseAllVideosExcept(v);
+    // In the library grid multiple tiles legitimately autoplay in parallel
+    // (forceAutoplay=true). Suppress mutual-exclusion there — otherwise
+    // each newly mounted tile pauses its siblings and cascade-aborts them.
+    const onPlay = () => { if (!forceAutoplay) pauseAllVideosExcept(v); };
     const onPause = () => {
       const s = videoPlaybackStore.get(previewKey) ?? { currentTime: 0, userStarted: false, paused: true };
       videoPlaybackStore.set(previewKey, { ...s, currentTime: v.currentTime, paused: true });
