@@ -6608,16 +6608,13 @@ function MediaTile({
     if (typeof document === "undefined") return;
     const check = () => {
       const cls = document.body.classList;
-      const next = forceAutoplay || (!isThumbnail && (cls.contains("present-mode") || cls.contains("share-mode")));
-      // eslint-disable-next-line no-console
-      console.log("[MediaTile.autoplay]", { forceAutoplay, isThumbnail, next, seed });
-      setAutoplay(next);
+      setAutoplay(forceAutoplay || (!isThumbnail && (cls.contains("present-mode") || cls.contains("share-mode"))));
     };
     check();
     const obs = new MutationObserver(check);
     obs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
     return () => obs.disconnect();
-  }, [isThumbnail, forceAutoplay, seed]);
+  }, [isThumbnail, forceAutoplay]);
 
   // Per-slide playback settings (defaults preserve current behavior).
   const wantAutoplay = videoAutoplay !== false;
