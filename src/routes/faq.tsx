@@ -489,26 +489,30 @@ export const Route = createFileRoute("/faq")({
 function FAQPage() {
   return (
     <AppShell>
-      <div className="flex items-baseline justify-between gap-6">
-        <div>
-          <div className="text-xs uppercase tracking-[0.3em] text-black/50">Support</div>
-          <h1 className="mt-3 text-4xl font-semibold">Frequently asked questions</h1>
-          <p className="mt-3 max-w-2xl text-black/60">
-            Answers about master briefs, presentation decks, print studio, event & social kits, translation, knowledge, and administration. Can't find
-            what you need?{" "}
-            <Link to="/knowledge" className="font-medium text-[#003FC7] hover:underline">
-              Browse the knowledge base
+      <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#C2A3FF22] px-6 py-14 sm:-mt-10 sm:px-12 lg:px-24 lg:py-20">
+        <div className="mx-auto max-w-[1400px]">
+          <div className="flex items-baseline justify-between gap-6">
+            <div>
+              <div className="text-xs uppercase tracking-[0.3em] text-black/50">Support</div>
+              <h1 className="mt-3 text-4xl font-semibold sm:text-5xl">Frequently asked questions</h1>
+              <p className="mt-3 max-w-2xl text-black/60">
+                Answers about master briefs, presentation decks, print studio, event & social kits, translation, knowledge, and administration. Can't find
+                what you need?{" "}
+                <Link to="/knowledge" className="font-medium text-[#003FC7] hover:underline">
+                  Browse the knowledge base
+                </Link>
+                .
+              </p>
+            </div>
+            <Link
+              to="/about"
+              className="rounded-full border border-black/15 bg-white/70 px-4 py-2.5 text-sm text-black/70 hover:border-black/40"
+            >
+              About the platform →
             </Link>
-            .
-          </p>
+          </div>
         </div>
-        <Link
-          to="/about"
-          className="rounded-full border border-black/15 px-4 py-2.5 text-sm text-black/70 hover:border-black/40"
-        >
-          About the platform →
-        </Link>
-      </div>
+      </header>
 
       <div className="mt-12">
         <div className="flex items-baseline justify-between">
