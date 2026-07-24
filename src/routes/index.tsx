@@ -486,8 +486,7 @@ function ParallaxWatermark({ accent }: { accent: string }) {
 }
 
 function AuroraHero({ mode }: { mode: ModeDef }) {
-
-
+  const rootRef = useRef<HTMLDivElement | null>(null);
 
   // Scroll-driven parallax: blobs and vignette drift at different rates as the
   // hero scrolls out of view. rAF-throttled to stay smooth and cheap.
@@ -509,8 +508,62 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
     };
   }, []);
 
+  // Pointer-driven parallax: blobs and base wash follow the cursor by a few px.
+  // Tracked on the hero's own bounding rect, rAF-throttled, and smoothed toward
+  // the target so it drifts naturally as the carousel auto-rotates. Resets to
+  // center when the pointer leaves.
+  const [pointer, setPointer] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    const el = rootRef.current?.parentElement; // the <section> wrapping the hero
+    if (!el) return;
+    let raf = 0;
+    let targetX = 0;
+    let targetY = 0;
+    let curX = 0;
+    let curY = 0;
+    const tick = () => {
+      curX += (targetX - curX) * 0.08;
+      curY += (targetY - curY) * 0.08;
+      if (Math.abs(targetX - curX) < 0.001 && Math.abs(targetY - curY) < 0.001) {
+        raf = 0;
+        setPointer({ x: curX, y: curY });
+        return;
+      }
+      setPointer({ x: curX, y: curY });
+      raf = requestAnimationFrame(tick);
+    };
+    const kick = () => {
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+    const onMove = (e: MouseEvent) => {
+      const r = el.getBoundingClientRect();
+      targetX = ((e.clientX - r.left) / r.width) * 2 - 1;   // -1..1
+      targetY = ((e.clientY - r.top) / r.height) * 2 - 1;   // -1..1
+      kick();
+    };
+    const onLeave = () => {
+      targetX = 0;
+      targetY = 0;
+      kick();
+    };
+    el.addEventListener("mousemove", onMove);
+    el.addEventListener("mouseleave", onLeave);
+    return () => {
+      el.removeEventListener("mousemove", onMove);
+      el.removeEventListener("mouseleave", onLeave);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
   // Cap the effective scroll so blobs don't fly off screen once past hero.
   const y = Math.min(scrollY, 800);
+  // Pointer offsets (px) — kept subtle so it reads as depth, not motion sickness.
+  const pxA = pointer.x * 22;
+  const pyA = pointer.y * 16;
+  const pxB = pointer.x * -18;
+  const pyB = pointer.y * -12;
+  const washX = pointer.x * 6;
+  const washY = pointer.y * 4;
 
   // Per-mode blob positions — stacked as always-mounted layers so we cross-fade
   // opacity instead of re-mounting. That kills the abrupt "pop" between steps.
@@ -521,8 +574,9 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
     social:       { aTop: "48%",    aLeft: "-100px", bBottom: "-160px", bRight: "48%" },
   };
 
+
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div ref={rootRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
       {/* Always-mounted per-mode layers — each holds its own two blobs at its
           own positions/colors and cross-fades in/out. No remounts, no pop. */}
       {MODES.map((m) => {
@@ -538,7 +592,7 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
             <div
               className="absolute inset-0"
               style={{
-                background: `radial-gradient(60% 55% at 20% 30%, ${m.accent}22 0%, transparent 60%), radial-gradient(55% 50% at 85% 75%, ${m.glow}1c 0%, transparent 65%)`,
+                background: `radial-gradient(60% 55% at ${20 + washX}% ${30 + washY}%, ${m.accent}22 0%, transparent 60%), radial-gradient(55% 50% at ${85 + washX}% ${75 + washY}%, ${m.glow}1c 0%, transparent 65%)`,
               }}
             />
             <div
@@ -548,7 +602,7 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
                 opacity: 0.42,
                 top: p.aTop,
                 left: p.aLeft,
-                transform: `translate3d(${y * 0.08}px, ${y * -0.35}px, 0) scale(${active ? 1 : 0.94})`,
+                transform: `translate3d(${y * 0.08 + pxA}px, ${y * -0.35 + pyA}px, 0) scale(${active ? 1 : 0.94})`,
                 transition: "transform 1600ms cubic-bezier(.4,0,.2,1)",
               }}
             />
@@ -559,7 +613,7 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
                 opacity: 0.32,
                 bottom: p.bBottom,
                 right: p.bRight,
-                transform: `translate3d(${y * -0.1}px, ${y * 0.22}px, 0) scale(${active ? 1 : 0.94})`,
+                transform: `translate3d(${y * -0.1 + pxB}px, ${y * 0.22 + pyB}px, 0) scale(${active ? 1 : 0.94})`,
                 transition: "transform 1600ms cubic-bezier(.4,0,.2,1)",
               }}
             />
