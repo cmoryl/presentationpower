@@ -92,6 +92,8 @@ function DeckEditor() {
   const setDeckContext = useDeckStore((s) => s.setDeckContext);
   const applySlideBackground = useDeckStore((s) => s.applySlideBackground);
   const setSlideMode = useDeckStore((s) => s.setSlideMode);
+  const setSlideInkOverride = useDeckStore((s) => s.setSlideInkOverride);
+  const clearSlideInkOverrides = useDeckStore((s) => s.clearSlideInkOverrides);
 
 
   const [activeIdx, setActiveIdx] = useState(0);
