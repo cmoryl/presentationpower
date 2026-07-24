@@ -1801,13 +1801,14 @@ function VariantDetailModal({
               {pinned ? "Pinned" : "Pin"}
             </button>
             {pinned ? (
-              <a
-                href={`/admin/campaigns/kit?source=${encodeURIComponent(variant.id)}`}
+              <Link
+                to="/admin/campaigns/kit"
+                search={{ source: variant.id }}
                 className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#003FC7]/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white"
                 title="Generate a social kit from this favorited module"
               >
                 <Sparkles size={12} /> Create social kit
-              </a>
+              </Link>
             ) : null}
 
             <button

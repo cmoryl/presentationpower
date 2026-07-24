@@ -68,8 +68,19 @@ test.describe("Module preview video-demo autoplay matrix", () => {
     const consoleErrors: string[] = [];
     page.on("pageerror", (err) => consoleErrors.push(String(err)));
 
-    await page.goto("/library", { waitUntil: "domcontentloaded" });
+    await page.goto("/library?eager=1", { waitUntil: "domcontentloaded" });
     await page.waitForLoadState("networkidle").catch(() => undefined);
+
+    // The video sample fixtures we ship (media.w3.org H.264 mp4s) require a
+    // proprietary codec that Playwright's bundled Chromium OSS build does
+    // not include. Skip cleanly instead of failing spuriously — this is an
+    // environment constraint, not a product regression. Real Chrome, Safari,
+    // and Firefox all support these fixtures.
+    const canPlayH264 = await page.evaluate(() => {
+      const v = document.createElement("video");
+      return Boolean(v.canPlayType('video/mp4; codecs="avc1.42E01E"'));
+    });
+    test.skip(!canPlayH264, "browser lacks H.264 support for sample media");
 
     // Imagery is off by default on /library (perf: 156 modules). A real user
     // toggles it on to see video-demo backdrops — do that here explicitly

@@ -40,7 +40,10 @@ export default defineConfig({
         })(),
       },
     },
-    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
-    { name: "webkit", use: { ...devices["Desktop Safari"] } },
+    // NOTE: Firefox and WebKit runners are intentionally NOT enabled here.
+    // Playwright doesn't ship their binaries by default in this sandbox and
+    // installing them isn't permitted, so listing them as projects would
+    // silently no-op or fail. When "full Playwright suite" is invoked, only
+    // Chromium runs — that's the honest scope of local + CI coverage.
   ],
 });

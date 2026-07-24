@@ -7,6 +7,7 @@ import {
   Presentation, Printer, CalendarDays, Share2, Wand2, Search, CornerDownLeft,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useSignedIn } from "@/components/CloudDeckControls";
 import { useDeckStore, type Deck } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
@@ -145,10 +146,12 @@ function Dashboard() {
   const [modeId, setModeId] = useState<ModeId>("presentation");
   const [autoRotate, setAutoRotate] = useState(true);
   const mode = MODES.find((m) => m.id === modeId) ?? MODES[0];
+  const reducedMotion = useReducedMotion();
 
   // Auto-rotate through modes every 5s until the user picks one or hovers the picker.
+  // Skipped entirely under prefers-reduced-motion — no timer is scheduled.
   useEffect(() => {
-    if (!autoRotate) return;
+    if (!autoRotate || reducedMotion) return;
     const id = window.setInterval(() => {
       setModeId((cur) => {
         const idx = MODES.findIndex((m) => m.id === cur);
@@ -156,7 +159,7 @@ function Dashboard() {
       });
     }, 5000);
     return () => window.clearInterval(id);
-  }, [autoRotate]);
+  }, [autoRotate, reducedMotion]);
 
   useEffect(() => {
     checkAi().then((r) => setAiConfigured(r.configured)).catch(() => setAiConfigured(true));
@@ -453,15 +456,17 @@ function Dashboard() {
 /* ---------- aurora hero backdrop ---------- */
 
 function ParallaxWatermark({ accent }: { accent: string }) {
+  const reducedMotion = useReducedMotion();
   const [scrollY, setScrollY] = useState(0);
   useEffect(() => {
+    if (reducedMotion) return; // no scroll listener, no rAF loop
     let raf = 0;
     const update = () => { raf = 0; setScrollY(window.scrollY); };
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => { window.removeEventListener("scroll", onScroll); if (raf) cancelAnimationFrame(raf); };
-  }, []);
-  const y = Math.min(scrollY, 800);
+  }, [reducedMotion]);
+  const y = reducedMotion ? 0 : Math.min(scrollY, 800);
   return (
     <div
       aria-hidden
@@ -487,11 +492,14 @@ function ParallaxWatermark({ accent }: { accent: string }) {
 
 function AuroraHero({ mode }: { mode: ModeDef }) {
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const reducedMotion = useReducedMotion();
 
   // Scroll-driven parallax: blobs and vignette drift at different rates as the
   // hero scrolls out of view. rAF-throttled to stay smooth and cheap.
+  // Skipped entirely under prefers-reduced-motion.
   const [scrollY, setScrollY] = useState(0);
   useEffect(() => {
+    if (reducedMotion) return;
     let raf = 0;
     const update = () => {
       raf = 0;
@@ -506,14 +514,13 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
       window.removeEventListener("scroll", onScroll);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [reducedMotion]);
 
-  // Pointer-driven parallax: blobs and base wash follow the cursor by a few px.
-  // Tracked on the hero's own bounding rect, rAF-throttled, and smoothed toward
-  // the target so it drifts naturally as the carousel auto-rotates. Resets to
-  // center when the pointer leaves.
+  // Pointer-driven parallax. Skipped entirely under prefers-reduced-motion —
+  // no listeners attached, no rAF loop scheduled.
   const [pointer, setPointer] = useState({ x: 0, y: 0 });
   useEffect(() => {
+    if (reducedMotion) return;
     const el = rootRef.current?.parentElement; // the <section> wrapping the hero
     if (!el) return;
     let raf = 0;
@@ -553,10 +560,10 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
       el.removeEventListener("mouseleave", onLeave);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [reducedMotion]);
 
   // Cap the effective scroll so blobs don't fly off screen once past hero.
-  const y = Math.min(scrollY, 800);
+  const y = reducedMotion ? 0 : Math.min(scrollY, 800);
   // Pointer offsets (px) — kept subtle so it reads as depth, not motion sickness.
   const pxA = pointer.x * 22;
   const pyA = pointer.y * 16;
