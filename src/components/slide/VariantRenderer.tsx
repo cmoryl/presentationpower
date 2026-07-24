@@ -6058,6 +6058,43 @@ function renderLocationsVariant(
         <div className="relative mt-10 flex-1 overflow-hidden">
           <LocWorldMap pins={pins} region="world" mode={mode} accent={accent} primary={primary} showLabels showSpokes ariaLabel={`${title} — hub and spoke network map`} />
         </div>
+        {hasRegionMetrics && (
+          <div
+            className="mt-8 grid gap-8 pt-5"
+            style={{
+              borderTop: `1px solid ${ink.hairline}`,
+              gridTemplateColumns: `repeat(${Math.min(regionMetrics.length, 5)}, minmax(0, 1fr))`,
+            }}
+          >
+            {regionMetrics.slice(0, 5).map((it, i) => {
+              const delta = it.delta ?? "";
+              const negative = delta.trim().startsWith("-");
+              return (
+                <div key={`${it.label}-${i}`}>
+                  <div className="uppercase" style={{ fontSize: 11, letterSpacing: "0.28em", fontWeight: 700, color: "var(--slide-accent-text)" }}>
+                    {it.region ?? it.label}
+                  </div>
+                  <div className="mt-2 flex items-baseline gap-2">
+                    <div className="tabular-nums" style={{ color: ink.strong, fontSize: 36, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 0.95 }}>
+                      {it.value ?? (typeof it.percent === "number" ? `${it.percent}%` : "")}
+                    </div>
+                    {it.unit && (
+                      <div style={{ color: ink.muted, fontSize: 13 }}>{it.unit}</div>
+                    )}
+                  </div>
+                  <div className="mt-1 flex items-baseline gap-2">
+                    <div style={{ color: ink.muted, fontSize: 13 }}>{it.label}</div>
+                    {delta && (
+                      <div className="uppercase tabular-nums" style={{ fontSize: 11, letterSpacing: "0.22em", fontWeight: 700, color: negative ? "#B42318" : "var(--slide-accent-text)" }}>
+                        {delta}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
         <div
           className="mt-8 flex items-center gap-10 pt-5"
           style={{ borderTop: `1px solid ${ink.hairline}`, color: ink.muted, fontSize: 14, letterSpacing: "0.02em" }}
