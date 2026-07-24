@@ -18,7 +18,7 @@
  *   - window.__printDnd = { add, move, remove, get, setTemplate }
  */
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   analyzePrintAsset,
@@ -72,7 +72,13 @@ function emptyContent(kind: PrintTemplateKind) {
   return emptyAdaptorBrief();
 }
 
+
+
 export const Route = createFileRoute("/test/print-dnd")({
+  beforeLoad: () => {
+    // Playwright fixture only. Does not resolve in production builds.
+    if (!import.meta.env.DEV) throw notFound();
+  },
   head: () => ({
     meta: [
       { title: "Print DnD Harness" },

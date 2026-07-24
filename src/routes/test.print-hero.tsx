@@ -20,7 +20,7 @@
  *   - window.__printHero.getBandRect()      → DOMRect
  */
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import { PrintHeroMediaLayer, type PrintHeroAspect, type PrintHeroMedia, type PrintHeroScrim } from "@/components/print/PrintHeroMedia";
 
@@ -38,7 +38,13 @@ function parseEnum<T extends string>(v: string | null, allowed: readonly T[]): T
   return (allowed as readonly string[]).includes(v) ? (v as T) : undefined;
 }
 
+
+
 export const Route = createFileRoute("/test/print-hero")({
+  beforeLoad: () => {
+    // Playwright fixture only. Does not resolve in production builds.
+    if (!import.meta.env.DEV) throw notFound();
+  },
   component: PrintHeroHarness,
   head: () => ({ meta: [{ title: "Print hero test harness" }] }),
 });
