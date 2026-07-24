@@ -6,6 +6,7 @@
 // a real kit end-to-end. Also surfaces the format catalog by surface, a
 // phased-rollout explainer, and the favorites-to-kit entry point.
 
+import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import {
@@ -51,7 +52,7 @@ export const Route = createFileRoute("/events")({
     ],
     links: [{ rel: "canonical", href: "https://presentationpower.lovable.app/events" }],
   }),
-  component: EventsView,
+  component: () => (<AppShell><EventsView /></AppShell>),
 });
 
 const PLAYBOOK_ICON: Record<EventPlaybook["kind"], React.ComponentType<{ size?: number; className?: string }>> = {

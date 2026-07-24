@@ -6,6 +6,7 @@
 // reproducible and reviewable. A "Configure this kit" CTA hands off to the
 // existing /admin/campaigns/kit builder pre-seeded with the same profile.
 
+import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMemo } from "react";
 import {
@@ -45,7 +46,7 @@ export const Route = createFileRoute("/events/demo/$playbookId")({
       ],
     };
   },
-  component: PlaybookDemoView,
+  component: () => (<AppShell><PlaybookDemoView /></AppShell>),
 });
 
 function PlaybookDemoView() {
