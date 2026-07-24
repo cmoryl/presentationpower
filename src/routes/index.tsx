@@ -512,38 +512,60 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
   // Cap the effective scroll so blobs don't fly off screen once past hero.
   const y = Math.min(scrollY, 800);
 
+  // Per-mode blob positions — stacked as always-mounted layers so we cross-fade
+  // opacity instead of re-mounting. That kills the abrupt "pop" between steps.
+  const POS: Record<ModeId, { aTop: string; aLeft: string; bBottom: string; bRight: string }> = {
+    presentation: { aTop: "-160px", aLeft: "-120px", bBottom: "-100px", bRight: "-80px" },
+    print:        { aTop: "38%",    aLeft: "58%",    bBottom: "-40px",  bRight: "-120px" },
+    event:        { aTop: "-40px",  aLeft: "38%",    bBottom: "38%",    bRight: "-80px" },
+    social:       { aTop: "48%",    aLeft: "-100px", bBottom: "-160px", bRight: "48%" },
+  };
+
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-      {/* Base wash — always present, keeps hero from feeling flat between transitions. */}
-      <div
-        className="absolute inset-0 opacity-70 transition-[background] duration-[1200ms] ease-out"
-        style={{
-          background: `radial-gradient(60% 55% at 20% 30%, ${mode.accent}22 0%, transparent 60%), radial-gradient(55% 50% at 85% 75%, ${mode.glow}1c 0%, transparent 65%)`,
-        }}
-      />
-      {/* Keyed layer re-mounts per mode → each rotation gets a full fade+scale entrance. */}
-      <div key={mode.id} className="absolute inset-0 animate-hero-mode-in">
-        <div
-          className="absolute h-[520px] w-[520px] rounded-full blur-[120px] will-change-transform"
-          style={{
-            backgroundColor: mode.accent,
-            opacity: 0.42,
-            top: mode.id === "presentation" ? "-160px" : mode.id === "print" ? "38%" : mode.id === "event" ? "-40px" : "48%",
-            left: mode.id === "presentation" ? "-120px" : mode.id === "print" ? "58%" : mode.id === "event" ? "38%" : "-100px",
-            transform: `translate3d(${y * 0.08}px, ${y * -0.35}px, 0)`,
-          }}
-        />
-        <div
-          className="absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
-          style={{
-            backgroundColor: mode.glow,
-            opacity: 0.32,
-            bottom: mode.id === "presentation" ? "-100px" : mode.id === "print" ? "-40px" : mode.id === "event" ? "38%" : "-160px",
-            right: mode.id === "presentation" ? "-80px" : mode.id === "print" ? "-120px" : mode.id === "event" ? "-80px" : "48%",
-            transform: `translate3d(${y * -0.1}px, ${y * 0.22}px, 0)`,
-          }}
-        />
-      </div>
+      {/* Always-mounted per-mode layers — each holds its own two blobs at its
+          own positions/colors and cross-fades in/out. No remounts, no pop. */}
+      {MODES.map((m) => {
+        const active = m.id === mode.id;
+        const p = POS[m.id];
+        return (
+          <div
+            key={m.id}
+            className="absolute inset-0 transition-opacity duration-[1600ms] ease-[cubic-bezier(.4,0,.2,1)] will-change-[opacity]"
+            style={{ opacity: active ? 1 : 0 }}
+          >
+            {/* Base wash for this mode — soft ambient so the fade never dips to flat navy. */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `radial-gradient(60% 55% at 20% 30%, ${m.accent}22 0%, transparent 60%), radial-gradient(55% 50% at 85% 75%, ${m.glow}1c 0%, transparent 65%)`,
+              }}
+            />
+            <div
+              className="absolute h-[520px] w-[520px] rounded-full blur-[120px] will-change-transform"
+              style={{
+                backgroundColor: m.accent,
+                opacity: 0.42,
+                top: p.aTop,
+                left: p.aLeft,
+                transform: `translate3d(${y * 0.08}px, ${y * -0.35}px, 0) scale(${active ? 1 : 0.94})`,
+                transition: "transform 1600ms cubic-bezier(.4,0,.2,1)",
+              }}
+            />
+            <div
+              className="absolute h-[460px] w-[460px] rounded-full blur-[140px] will-change-transform"
+              style={{
+                backgroundColor: m.glow,
+                opacity: 0.32,
+                bottom: p.bBottom,
+                right: p.bRight,
+                transform: `translate3d(${y * -0.1}px, ${y * 0.22}px, 0) scale(${active ? 1 : 0.94})`,
+                transition: "transform 1600ms cubic-bezier(.4,0,.2,1)",
+              }}
+            />
+          </div>
+        );
+      })}
       {/* Soft top-to-bottom vignette — no hard cutoff, no visible band. */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.04),rgba(255,255,255,0)_90%)]" />
     </div>
