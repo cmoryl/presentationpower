@@ -108,6 +108,109 @@ export function KitWizard({
   const [regenTick, setRegenTick] = useState(0);
   const [removed, setRemoved] = useState<Set<string>>(new Set());
 
+  // ─── Save state ────────────────────────────────────────────────────────
+  const [savedKitId, setSavedKitId] = useState<string | undefined>(kitId);
+  const [kitName, setKitName] = useState<string>("");
+  const [saving, setSaving] = useState(false);
+  const [hydrating, setHydrating] = useState<boolean>(!!kitId);
+
+  const getKitFn = useServerFn(getKit);
+  const saveKitFn = useServerFn(saveKit);
+  const router = useRouter();
+  const navigate = useNavigate();
+
+  // Hydrate all fields from a saved kit when kitId is provided.
+  useEffect(() => {
+    if (!kitId) return;
+    let cancelled = false;
+    setHydrating(true);
+    getKitFn({ data: { id: kitId } })
+      .then((row: SavedKit | null) => {
+        if (cancelled || !row) return;
+        setSavedKitId(row.id);
+        setKitName(row.name);
+        setBrandId(row.brandId);
+        setMode(row.mode);
+        setProfileId(row.profileId);
+        setFormatIds(row.formatIds);
+        setManualCopy({
+          title: row.copy.title ?? "",
+          summary: row.copy.summary ?? "",
+          cta: row.copy.cta ?? "",
+          statValue: row.copy.statValue ?? "",
+          statLabel: row.copy.statLabel ?? "",
+        });
+        setEvent({ ...EMPTY_EVENT, ...(row.eventFacts as Partial<EventFacts>), subBrand: row.brandId });
+        setAttachEvent(row.attachEvent);
+        setStep(4); // jump to review
+      })
+      .catch((err) => {
+        toast.error(err instanceof Error ? err.message : "Failed to load saved kit");
+      })
+      .finally(() => {
+        if (!cancelled) setHydrating(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // Only re-hydrate when kitId itself changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kitId]);
+
+  async function handleSave() {
+    const name = kitName.trim();
+    if (!name) {
+      toast.error("Give your kit a name first.");
+      return;
+    }
+    if (!manualCopy.title.trim()) {
+      toast.error("Add a headline (Step 2) before saving.");
+      return;
+    }
+    if (formatIds.length === 0) {
+      toast.error("Pick at least one format before saving.");
+      return;
+    }
+    setSaving(true);
+    try {
+      const row = await saveKitFn({
+        data: {
+          id: savedKitId,
+          name,
+          surface,
+          brandId,
+          mode,
+          profileId,
+          formatIds,
+          copy: {
+            title: manualCopy.title.trim() || undefined,
+            summary: manualCopy.summary.trim() || undefined,
+            cta: manualCopy.cta.trim() || undefined,
+            statValue: manualCopy.statValue.trim() || undefined,
+            statLabel: manualCopy.statLabel.trim() || undefined,
+          },
+          eventFacts: attachEvent ? (event as unknown as Record<string, any>) : {},
+          attachEvent,
+        },
+      });
+      setSavedKitId(row.id);
+      toast.success(savedKitId ? `Updated "${row.name}"` : `Saved "${row.name}" to your kits`);
+      // Reflect the id in the URL so refresh keeps us editing the same row.
+      if (!savedKitId) {
+        navigate({
+          to: surface === "event" ? "/events/new" : "/social/new",
+          search: { kit: row.id } as any,
+          replace: true,
+        }).catch(() => void 0);
+      }
+      router.invalidate();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to save kit");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   const source: CampaignSource | null = useMemo(() => {
     if (!manualCopy.title.trim()) return null;
     return {
