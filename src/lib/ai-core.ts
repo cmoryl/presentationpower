@@ -179,8 +179,24 @@ export async function callAnthropicWithTools(
   executeTool: (call: AnthropicToolCall) => Promise<unknown>,
   opts?: { maxTokens?: number; temperature?: number; maxIterations?: number },
 ): Promise<ToolLoopResult> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) throw new Error("ANTHROPIC_API_KEY missing");
+  const provider = getActiveAiProvider();
+  if (provider === "anthropic") {
+    return callAnthropicWithToolsDirect(systemBlocks, messages, tools, executeTool, opts);
+  }
+  if (provider === "lovable-gateway") {
+    return callGatewayWithTools(systemBlocks, messages, tools, executeTool, opts);
+  }
+  throw new Error("No AI provider configured");
+}
+
+async function callAnthropicWithToolsDirect(
+  systemBlocks: string[],
+  messages: AnthropicMsg[],
+  tools: AnthropicToolDef[],
+  executeTool: (call: AnthropicToolCall) => Promise<unknown>,
+  opts?: { maxTokens?: number; temperature?: number; maxIterations?: number },
+): Promise<ToolLoopResult> {
+  const apiKey = process.env.ANTHROPIC_API_KEY!;
   const maxIterations = opts?.maxIterations ?? 6;
   const convo: AnthropicMsg[] = [...messages];
 
@@ -242,7 +258,6 @@ export async function callAnthropicWithTools(
     convo.push({ role: "user", content: toolResults });
   }
 
-  // Force a final text-only response.
   const res = await doCall(false);
   if (!res.ok) {
     const body = await res.text().catch(() => "");
@@ -250,6 +265,130 @@ export async function callAnthropicWithTools(
   }
   const json = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
   const text = (json.content ?? []).map((c) => (c.type === "text" ? c.text ?? "" : "")).join("").trim();
+  return { ok: true, text, iterations: maxIterations };
+}
+
+// Gateway tool loop (OpenAI-compat function calling). Input `messages` are
+// treated as plain string content (all current callers pass string-content
+// history); assistant tool_call turns and tool results are tracked in the
+// OpenAI-shaped internal convo.
+type OpenAiToolCall = {
+  id: string;
+  type: "function";
+  function: { name: string; arguments: string };
+};
+type OpenAiMsg =
+  | { role: "system" | "user"; content: string }
+  | { role: "assistant"; content: string | null; tool_calls?: OpenAiToolCall[] }
+  | { role: "tool"; tool_call_id: string; content: string };
+
+async function callGatewayWithTools(
+  systemBlocks: string[],
+  messages: AnthropicMsg[],
+  tools: AnthropicToolDef[],
+  executeTool: (call: AnthropicToolCall) => Promise<unknown>,
+  opts?: { maxTokens?: number; temperature?: number; maxIterations?: number },
+): Promise<ToolLoopResult> {
+  const apiKey = process.env.LOVABLE_API_KEY!;
+  const maxIterations = opts?.maxIterations ?? 6;
+  const openaiTools = tools.map((t) => ({
+    type: "function" as const,
+    function: {
+      name: t.name,
+      description: t.description,
+      parameters: t.input_schema,
+    },
+  }));
+  const convo: OpenAiMsg[] = [{ role: "system", content: systemBlocks.join("\n\n") }];
+  for (const m of messages) {
+    const content =
+      typeof m.content === "string"
+        ? m.content
+        : Array.isArray(m.content)
+          ? (m.content as Array<{ type: string; text?: string }>)
+              .map((p) => (p.type === "text" ? p.text ?? "" : ""))
+              .join("")
+          : "";
+    convo.push({ role: m.role, content });
+  }
+
+  const doCall = async (withTools: boolean) => {
+    const body: Record<string, unknown> = {
+      model: LOVABLE_GATEWAY_MODEL,
+      max_tokens: opts?.maxTokens ?? 4096,
+      temperature: opts?.temperature ?? 0.2,
+      messages: convo,
+    };
+    if (withTools) body.tools = openaiTools;
+    return fetch(LOVABLE_GATEWAY_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+  };
+
+  for (let i = 0; i < maxIterations; i++) {
+    const res = await doCall(true);
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      return { ok: false, status: res.status, body: body.slice(0, 500) };
+    }
+    const json = (await res.json()) as {
+      choices?: Array<{
+        finish_reason?: string;
+        message?: {
+          role: "assistant";
+          content?: string | null;
+          tool_calls?: OpenAiToolCall[];
+        };
+      }>;
+    };
+    const msg = json.choices?.[0]?.message;
+    const toolCalls = msg?.tool_calls ?? [];
+    if (!msg || toolCalls.length === 0) {
+      return { ok: true, text: (msg?.content ?? "").trim(), iterations: i };
+    }
+    convo.push({
+      role: "assistant",
+      content: msg.content ?? null,
+      tool_calls: toolCalls,
+    });
+    for (const tc of toolCalls) {
+      let input: Record<string, unknown> = {};
+      try {
+        input = JSON.parse(tc.function.arguments || "{}");
+      } catch {
+        input = {};
+      }
+      try {
+        const result = await executeTool({ id: tc.id, name: tc.function.name, input });
+        convo.push({
+          role: "tool",
+          tool_call_id: tc.id,
+          content: JSON.stringify(result).slice(0, 8000),
+        });
+      } catch (e) {
+        convo.push({
+          role: "tool",
+          tool_call_id: tc.id,
+          content: JSON.stringify({ error: (e as Error).message.slice(0, 500) }),
+        });
+      }
+    }
+  }
+
+  const res = await doCall(false);
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    return { ok: false, status: res.status, body: body.slice(0, 500) };
+  }
+  const json = (await res.json()) as {
+    choices?: Array<{ message?: { content?: string } }>;
+  };
+  const text = (json.choices?.[0]?.message?.content ?? "").trim();
   return { ok: true, text, iterations: maxIterations };
 }
 
