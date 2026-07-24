@@ -136,6 +136,25 @@ function AssetEditor() {
       .then((r) => {
         setRow(r);
         setLoading(false);
+        // Hydrate export panel state from persisted prefs — WYSIWYG defaults.
+        const prefs = (r.context as PrintAssetContext | null)?.exportPrefs;
+        if (prefs) {
+          if (prefs.size) setExportSize(prefs.size as PrintPageSizeKey);
+          if (typeof prefs.customW === "number") setCustomW(prefs.customW);
+          if (typeof prefs.customH === "number") setCustomH(prefs.customH);
+          if (typeof prefs.bleedIn === "number") setBleedIn(prefs.bleedIn);
+          if (typeof prefs.cropMarks === "boolean") setCropMarks(prefs.cropMarks);
+          if (prefs.mode) setExportMode(prefs.mode);
+          if (prefs.quality) setExportQuality(prefs.quality as PrintExportQuality);
+          if (prefs.format) setExportFormat(prefs.format as PrintExportFormat);
+          if (prefs.iccProfile) setIccProfile(prefs.iccProfile as IccProfileKey);
+        } else {
+          // No stored prefs → default export mode to whatever the editor is in
+          // so the first export is WYSIWYG rather than a surprise.
+          const editorMode = (r.context as PrintAssetContext | null)?.editorMode;
+          if (editorMode) setExportMode(editorMode);
+        }
+        exportHydratedRef.current = true;
       })
       .catch(() => setLoading(false));
   }, [assetId, load]);
