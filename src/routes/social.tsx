@@ -116,10 +116,13 @@ function SocialView() {
           <Stat label="Divisions" value={String(new Set(SOCIAL_PLAYBOOKS.map((p) => p.subBrand)).size)} />
           <Stat label="Angles" value={String(SOCIAL_ANGLES.length)} />
         </dl>
+        </div>
       </header>
 
+      <div className="mx-auto max-w-7xl space-y-14 px-4 py-10 sm:px-6 lg:px-8">
       {/* Your saved kits (signed-in, non-empty only) */}
       <SavedKitsSection surface="social" />
+
 
       {/* Angle filter */}
       <section id="playbooks" className="space-y-5">
