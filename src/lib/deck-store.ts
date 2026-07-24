@@ -208,6 +208,7 @@ type DeckState = {
   updateSlideCanvasBlocks: (deckId: string, slideId: string, blocks: CanvasBlock[]) => void;
   setSlideLogo: (deckId: string, slideId: string, patch: { position?: SlideLogoPosition; orientation?: "auto" | "horizontal" | "stacked" | "vertical-left" | "vertical-right" | "mark-only" }) => void;
   applySlideBackground: (deckId: string, slideIds: string[], background: unknown) => void;
+  setSlideMode: (deckId: string, slideId: string, mode: "light" | "dark") => void;
 
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
