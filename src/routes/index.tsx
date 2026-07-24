@@ -437,7 +437,37 @@ function Dashboard() {
 
 /* ---------- aurora hero backdrop ---------- */
 
-function AuroraHero({ mode }: { mode: ModeDef }) {
+function ParallaxWatermark({ accent }: { accent: string }) {
+  const [scrollY, setScrollY] = useState(0);
+  useEffect(() => {
+    let raf = 0;
+    const update = () => { raf = 0; setScrollY(window.scrollY); };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => { window.removeEventListener("scroll", onScroll); if (raf) cancelAnimationFrame(raf); };
+  }, []);
+  const y = Math.min(scrollY, 800);
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-x-0 -bottom-6 select-none text-center font-semibold leading-none tracking-[-0.04em] will-change-transform"
+      style={{
+        fontSize: "clamp(120px, 22vw, 320px)",
+        background: `linear-gradient(180deg, ${accent}22 0%, ${accent}08 40%, transparent 100%)`,
+        WebkitBackgroundClip: "text",
+        backgroundClip: "text",
+        color: "transparent",
+        mixBlendMode: "screen",
+        transform: `translate3d(0, ${y * 0.45}px, 0)`,
+        opacity: Math.max(0, 1 - y / 700),
+      }}
+    >
+      MODULAR
+    </div>
+  );
+}
+
+
   // Scroll-driven parallax: blobs and vignette drift at different rates as the
   // hero scrolls out of view. rAF-throttled to stay smooth and cheap.
   const [scrollY, setScrollY] = useState(0);
