@@ -861,6 +861,32 @@ function Library() {
         </Link>
       </div>
 
+      {selectMode && selected.length > 0 && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-6 z-40 flex justify-center px-4">
+          <div className="pointer-events-auto flex items-center gap-3 rounded-full border border-white/10 bg-[#03002C] px-4 py-2 text-sm text-white shadow-2xl">
+            <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-medium">
+              {selected.length} selected
+            </span>
+            <button
+              type="button"
+              onClick={clearSelection}
+              className="text-xs text-white/70 hover:text-white"
+            >
+              Clear
+            </button>
+            <div className="h-4 w-px bg-white/20" />
+            <button
+              type="button"
+              onClick={createDeckFromSelection}
+              className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-medium hover:bg-[#0053ff]"
+            >
+              <Plus size={14} /> Create deck from selection →
+            </button>
+          </div>
+        </div>
+      )}
+
+
       {active && (
         <VariantDetailModal
           variant={active}
