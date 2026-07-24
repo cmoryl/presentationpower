@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TemplatesRouteImport } from './routes/templates'
+import { Route as SocialRouteImport } from './routes/social'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LogohubRouteImport } from './routes/logohub'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
@@ -85,6 +86,11 @@ const TemplatesRoute = TemplatesRouteImport.update({
   path: '/templates',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SocialRoute = SocialRouteImport.update({
+  id: '/social',
+  path: '/social',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -141,9 +147,9 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const SocialIndexRoute = SocialIndexRouteImport.update({
-  id: '/social/',
-  path: '/social/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => SocialRoute,
 } as any)
 const LibraryIndexRoute = LibraryIndexRouteImport.update({
   id: '/library/',
@@ -181,14 +187,14 @@ const TestPrintDndRoute = TestPrintDndRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const SocialPresetsRoute = SocialPresetsRouteImport.update({
-  id: '/social/presets',
-  path: '/social/presets',
-  getParentRoute: () => rootRouteImport,
+  id: '/presets',
+  path: '/presets',
+  getParentRoute: () => SocialRoute,
 } as any)
 const SocialNewRoute = SocialNewRouteImport.update({
-  id: '/social/new',
-  path: '/social/new',
-  getParentRoute: () => rootRouteImport,
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => SocialRoute,
 } as any)
 const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
@@ -382,9 +388,9 @@ const DecksDeckIdIndexRoute = DecksDeckIdIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const SocialDemoPlaybookIdRoute = SocialDemoPlaybookIdRouteImport.update({
-  id: '/social/demo/$playbookId',
-  path: '/social/demo/$playbookId',
-  getParentRoute: () => rootRouteImport,
+  id: '/demo/$playbookId',
+  path: '/demo/$playbookId',
+  getParentRoute: () => SocialRoute,
 } as any)
 const KnowledgeBrandGuidesSlugRoute =
   KnowledgeBrandGuidesSlugRouteImport.update({
@@ -446,6 +452,7 @@ export interface FileRoutesByFullPath {
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/social': typeof SocialRouteWithChildren
   '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
@@ -589,6 +596,7 @@ export interface FileRoutesById {
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/logohub': typeof LogohubRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/social': typeof SocialRouteWithChildren
   '/templates': typeof TemplatesRoute
   '/admin/ab': typeof AdminAbRoute
   '/admin/ai': typeof AdminAiRoute
@@ -663,6 +671,7 @@ export interface FileRouteTypes {
     | '/knowledge'
     | '/logohub'
     | '/reset-password'
+    | '/social'
     | '/templates'
     | '/admin/ab'
     | '/admin/ai'
@@ -805,6 +814,7 @@ export interface FileRouteTypes {
     | '/knowledge'
     | '/logohub'
     | '/reset-password'
+    | '/social'
     | '/templates'
     | '/admin/ab'
     | '/admin/ai'
@@ -878,6 +888,7 @@ export interface RootRouteChildren {
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
   LogohubRoute: typeof LogohubRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SocialRoute: typeof SocialRouteWithChildren
   TemplatesRoute: typeof TemplatesRoute
   ApiChatRoute: typeof ApiChatRoute
   AssetAssetIdRoute: typeof AssetAssetIdRoute
@@ -891,14 +902,11 @@ export interface RootRouteChildren {
   LibraryMyRoute: typeof LibraryMyRoute
   LibraryPrintRoute: typeof LibraryPrintRoute
   ShareTokenRoute: typeof ShareTokenRoute
-  SocialNewRoute: typeof SocialNewRoute
-  SocialPresetsRoute: typeof SocialPresetsRoute
   TestPrintDndRoute: typeof TestPrintDndRoute
   TestPrintHeroRoute: typeof TestPrintHeroRoute
   DecksIndexRoute: typeof DecksIndexRoute
   EventsIndexRoute: typeof EventsIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
-  SocialIndexRoute: typeof SocialIndexRoute
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
   ApiPublicPdfIndexProxyRoute: typeof ApiPublicPdfIndexProxyRoute
   DecksDeckIdDocumentRoute: typeof DecksDeckIdDocumentRoute
@@ -906,7 +914,6 @@ export interface RootRouteChildren {
   DecksDeckIdPresentRoute: typeof DecksDeckIdPresentRoute
   DecksDeckIdPrintRoute: typeof DecksDeckIdPrintRoute
   EventsDemoPlaybookIdRoute: typeof EventsDemoPlaybookIdRoute
-  SocialDemoPlaybookIdRoute: typeof SocialDemoPlaybookIdRoute
   DecksDeckIdIndexRoute: typeof DecksDeckIdIndexRoute
 }
 
@@ -917,6 +924,13 @@ declare module '@tanstack/react-router' {
       path: '/templates'
       fullPath: '/templates'
       preLoaderRoute: typeof TemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/social': {
+      id: '/social'
+      path: '/social'
+      fullPath: '/social'
+      preLoaderRoute: typeof SocialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -998,10 +1012,10 @@ declare module '@tanstack/react-router' {
     }
     '/social/': {
       id: '/social/'
-      path: '/social'
+      path: '/'
       fullPath: '/social/'
       preLoaderRoute: typeof SocialIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SocialRoute
     }
     '/library/': {
       id: '/library/'
@@ -1054,17 +1068,17 @@ declare module '@tanstack/react-router' {
     }
     '/social/presets': {
       id: '/social/presets'
-      path: '/social/presets'
+      path: '/presets'
       fullPath: '/social/presets'
       preLoaderRoute: typeof SocialPresetsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SocialRoute
     }
     '/social/new': {
       id: '/social/new'
-      path: '/social/new'
+      path: '/new'
       fullPath: '/social/new'
       preLoaderRoute: typeof SocialNewRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SocialRoute
     }
     '/share/$token': {
       id: '/share/$token'
@@ -1334,10 +1348,10 @@ declare module '@tanstack/react-router' {
     }
     '/social/demo/$playbookId': {
       id: '/social/demo/$playbookId'
-      path: '/social/demo/$playbookId'
+      path: '/demo/$playbookId'
       fullPath: '/social/demo/$playbookId'
       preLoaderRoute: typeof SocialDemoPlaybookIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof SocialRoute
     }
     '/knowledge/brand-guides/$slug': {
       id: '/knowledge/brand-guides/$slug'
@@ -1491,6 +1505,23 @@ const KnowledgeRouteWithChildren = KnowledgeRoute._addFileChildren(
   KnowledgeRouteChildren,
 )
 
+interface SocialRouteChildren {
+  SocialNewRoute: typeof SocialNewRoute
+  SocialPresetsRoute: typeof SocialPresetsRoute
+  SocialIndexRoute: typeof SocialIndexRoute
+  SocialDemoPlaybookIdRoute: typeof SocialDemoPlaybookIdRoute
+}
+
+const SocialRouteChildren: SocialRouteChildren = {
+  SocialNewRoute: SocialNewRoute,
+  SocialPresetsRoute: SocialPresetsRoute,
+  SocialIndexRoute: SocialIndexRoute,
+  SocialDemoPlaybookIdRoute: SocialDemoPlaybookIdRoute,
+}
+
+const SocialRouteWithChildren =
+  SocialRoute._addFileChildren(SocialRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -1503,6 +1534,7 @@ const rootRouteChildren: RootRouteChildren = {
   KnowledgeRoute: KnowledgeRouteWithChildren,
   LogohubRoute: LogohubRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SocialRoute: SocialRouteWithChildren,
   TemplatesRoute: TemplatesRoute,
   ApiChatRoute: ApiChatRoute,
   AssetAssetIdRoute: AssetAssetIdRoute,
@@ -1516,14 +1548,11 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryMyRoute: LibraryMyRoute,
   LibraryPrintRoute: LibraryPrintRoute,
   ShareTokenRoute: ShareTokenRoute,
-  SocialNewRoute: SocialNewRoute,
-  SocialPresetsRoute: SocialPresetsRoute,
   TestPrintDndRoute: TestPrintDndRoute,
   TestPrintHeroRoute: TestPrintHeroRoute,
   DecksIndexRoute: DecksIndexRoute,
   EventsIndexRoute: EventsIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
-  SocialIndexRoute: SocialIndexRoute,
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
   ApiPublicPdfIndexProxyRoute: ApiPublicPdfIndexProxyRoute,
   DecksDeckIdDocumentRoute: DecksDeckIdDocumentRoute,
@@ -1531,7 +1560,6 @@ const rootRouteChildren: RootRouteChildren = {
   DecksDeckIdPresentRoute: DecksDeckIdPresentRoute,
   DecksDeckIdPrintRoute: DecksDeckIdPrintRoute,
   EventsDemoPlaybookIdRoute: EventsDemoPlaybookIdRoute,
-  SocialDemoPlaybookIdRoute: SocialDemoPlaybookIdRoute,
   DecksDeckIdIndexRoute: DecksDeckIdIndexRoute,
 }
 export const routeTree = rootRouteImport
