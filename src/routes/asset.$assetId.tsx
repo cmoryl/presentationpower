@@ -26,7 +26,9 @@ import type {
   PrintAssetContext,
   PrintAssetRow,
   PrintDensity,
+  PrintExportPrefs,
   PrintHeroMedia,
+  PrintMode,
   PrintPageSize,
 } from "@/lib/print-assets.types";
 import { emptyCaseStudy, emptySpotlight, emptyEBrochure, emptyAdaptorBrief } from "@/lib/print-assets.types";
@@ -43,9 +45,12 @@ import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
 import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
+import { ContentInspector } from "@/components/print/ContentInspector";
+import { schemaFor } from "@/lib/print-content-schema";
+import { CONTENT_SCHEMAS, unreachablePaths } from "@/lib/print-content-schema";
 
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
-import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2 } from "lucide-react";
+import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2, Sun, Moon } from "lucide-react";
 
 export const Route = createFileRoute("/asset/$assetId")({
   head: ({ params }) => ({
@@ -82,16 +87,20 @@ function AssetEditor() {
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const [exportOpen, setExportOpen] = useState(false);
   const [exportBusy, setExportBusy] = useState(false);
+  // Export panel state — hydrated from ctx.exportPrefs on load, then mirrored
+  // back to ctx on every change via updateExportPref so a user's preset
+  // survives reload and can be duplicated with the asset.
   const [exportSize, setExportSize] = useState<PrintPageSizeKey>("A4");
   const [customW, setCustomW] = useState(8.5);
   const [customH, setCustomH] = useState(11);
   const [bleedIn, setBleedIn] = useState(0.125);
   const [cropMarks, setCropMarks] = useState(true);
-  const [exportMode, setExportMode] = useState<"light" | "dark">("light");
+  const [exportMode, setExportMode] = useState<PrintMode>("light");
   const [exportQuality, setExportQuality] = useState<PrintExportQuality>("300dpi");
   const [exportFormat, setExportFormat] = useState<PrintExportFormat>("digital");
   const [iccProfile, setIccProfile] = useState<IccProfileKey>("GRACoL2013_CRPC6");
   const [pickerOpen, setPickerOpen] = useState(false);
+  const exportHydratedRef = useRef(false);
 
   // Undo/redo history for content + context snapshots.
   const historyRef = useRef<{
@@ -128,6 +137,25 @@ function AssetEditor() {
       .then((r) => {
         setRow(r);
         setLoading(false);
+        // Hydrate export panel state from persisted prefs — WYSIWYG defaults.
+        const prefs = (r.context as PrintAssetContext | null)?.exportPrefs;
+        if (prefs) {
+          if (prefs.size) setExportSize(prefs.size as PrintPageSizeKey);
+          if (typeof prefs.customW === "number") setCustomW(prefs.customW);
+          if (typeof prefs.customH === "number") setCustomH(prefs.customH);
+          if (typeof prefs.bleedIn === "number") setBleedIn(prefs.bleedIn);
+          if (typeof prefs.cropMarks === "boolean") setCropMarks(prefs.cropMarks);
+          if (prefs.mode) setExportMode(prefs.mode);
+          if (prefs.quality) setExportQuality(prefs.quality as PrintExportQuality);
+          if (prefs.format) setExportFormat(prefs.format as PrintExportFormat);
+          if (prefs.iccProfile) setIccProfile(prefs.iccProfile as IccProfileKey);
+        } else {
+          // No stored prefs → default export mode to whatever the editor is in
+          // so the first export is WYSIWYG rather than a surprise.
+          const editorMode = (r.context as PrintAssetContext | null)?.editorMode;
+          if (editorMode) setExportMode(editorMode);
+        }
+        exportHydratedRef.current = true;
       })
       .catch(() => setLoading(false));
   }, [assetId, load]);
@@ -180,6 +208,47 @@ function AssetEditor() {
     window.addEventListener("beforeunload", onBeforeUnload);
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [dirty]);
+
+  // Mirror export panel state into ctx.exportPrefs so the user's preset
+  // survives reload — no more re-tuning bleed/quality/ICC on every export.
+  // Skipped until initial hydration completes to avoid overwriting stored
+  // prefs with the useState defaults on first render.
+  useEffect(() => {
+    if (!exportHydratedRef.current) return;
+    const r = rowRef.current;
+    if (!r) return;
+    const next: PrintExportPrefs = {
+      size: exportSize,
+      customW,
+      customH,
+      bleedIn,
+      cropMarks,
+      mode: exportMode,
+      quality: exportQuality,
+      format: exportFormat,
+      iccProfile,
+    };
+    const ctxNow = (r.context as PrintAssetContext | null) ?? {};
+    const prev = ctxNow.exportPrefs;
+    if (
+      prev &&
+      prev.size === next.size &&
+      prev.customW === next.customW &&
+      prev.customH === next.customH &&
+      prev.bleedIn === next.bleedIn &&
+      prev.cropMarks === next.cropMarks &&
+      prev.mode === next.mode &&
+      prev.quality === next.quality &&
+      prev.format === next.format &&
+      prev.iccProfile === next.iccProfile
+    ) {
+      return;
+    }
+    setRow({ ...r, context: { ...ctxNow, exportPrefs: next } as PrintAssetContext });
+    setDirty(true);
+    // Intentionally do NOT push history for export-panel churn.
+  }, [exportSize, customW, customH, bleedIn, cropMarks, exportMode, exportQuality, exportFormat, iccProfile]);
+
 
 
   useEffect(() => {
@@ -305,6 +374,27 @@ function AssetEditor() {
   }
   const editableFieldPaths = collectStringPaths(rawContent);
 
+  // Dev-time safety net: if a content field slips into the schema without a
+  // matching editor path, warn loudly rather than let it silently disappear
+  // from the UI (the exact class of bug that stranded `client`, `eyebrow`,
+  // etc. before the Content inspector existed).
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      import("@/lib/print-content-schema").then(({ schemaFor: sf, unreachablePaths, fullyPopulatedSample }) => {
+        const dead = unreachablePaths(sf(kind), fullyPopulatedSample(kind));
+        if (dead.length > 0) {
+          // eslint-disable-next-line no-console
+          console.warn(
+            `[print-content-schema] Unreachable fields for kind="${kind}":`,
+            dead,
+          );
+        }
+      });
+    }, [kind]);
+  }
+
+
   function updateStat(i: number, patch: Partial<CaseStudyStat>) {
     const next = [...content.stats];
     next[i] = { ...next[i], ...patch };
@@ -407,6 +497,9 @@ function AssetEditor() {
 
   const pageSize: PrintPageSize = ctx.pageSize ?? "A4";
   const density: PrintDensity = ctx.density ?? "standard";
+  const editorMode: PrintMode = ctx.editorMode ?? "light";
+  const showBleedGuides: boolean = !!ctx.showBleedGuides;
+  const bleedFraction = Math.max(0, Math.min(0.06, bleedIn / (pageSize === "A4" ? 8.27 : pageSize === "Letter" ? 8.5 : 8.5)));
   const canvasAspect =
     pageSize === "A4" ? "1 / 1.414"
     : pageSize === "Letter" ? "8.5 / 11"
@@ -427,6 +520,8 @@ function AssetEditor() {
 
   const densityPad = density === "compact" ? "p-8" : density === "airy" ? "p-16" : "p-12";
   const densityGap = density === "compact" ? "gap-4" : density === "airy" ? "gap-10" : "gap-6";
+
+
 
 
   return (
@@ -469,6 +564,43 @@ function AssetEditor() {
                 className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium text-[#03002C] hover:bg-black/5 disabled:opacity-30 dark:text-white dark:hover:bg-white/5"
               >
                 <Redo2 size={12} /> Redo
+              </button>
+            </div>
+
+            {/* Editor mode toggle. Persisted to ctx so it survives reload,
+                and defaults the export panel so downloads are WYSIWYG. */}
+            <div className="mr-1 inline-flex items-center gap-0 rounded-full border border-black/10 bg-white p-0.5 dark:border-white/10 dark:bg-white/[0.03]" role="group" aria-label="Editor mode">
+              <button
+                type="button"
+                data-testid="editor-mode-light"
+                aria-pressed={editorMode === "light"}
+                onClick={() => {
+                  patchCtx({ editorMode: "light" });
+                  if (exportHydratedRef.current) setExportMode("light");
+                }}
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition ${
+                  editorMode === "light"
+                    ? "bg-[#03002C] text-white dark:bg-white dark:text-[#03002C]"
+                    : "text-[#03002C] hover:bg-black/5 dark:text-white dark:hover:bg-white/5"
+                }`}
+              >
+                <Sun size={12} /> Light
+              </button>
+              <button
+                type="button"
+                data-testid="editor-mode-dark"
+                aria-pressed={editorMode === "dark"}
+                onClick={() => {
+                  patchCtx({ editorMode: "dark" });
+                  if (exportHydratedRef.current) setExportMode("dark");
+                }}
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium transition ${
+                  editorMode === "dark"
+                    ? "bg-[#03002C] text-white dark:bg-white dark:text-[#03002C]"
+                    : "text-[#03002C] hover:bg-black/5 dark:text-white dark:hover:bg-white/5"
+                }`}
+              >
+                <Moon size={12} /> Dark
               </button>
             </div>
 
@@ -704,7 +836,7 @@ function AssetEditor() {
                 <CaseStudyLayout
                   content={rawContent as unknown as CaseStudyContent}
                   brand={brand}
-                  mode="light"
+                  mode={editorMode}
                   pageSize={pageSize}
                   density={density}
                   seed={`asset-${row.id}`}
@@ -714,7 +846,7 @@ function AssetEditor() {
                 <SpotlightLayout
                   content={rawContent as unknown as SpotlightContent}
                   brand={brand}
-                  mode="light"
+                  mode={editorMode}
                   pageSize={pageSize}
                   density={density}
                   seed={`asset-${row.id}`}
@@ -724,7 +856,7 @@ function AssetEditor() {
                 <EBrochureLayout
                   content={rawContent as unknown as EBrochureContent}
                   brand={brand}
-                  mode="light"
+                  mode={editorMode}
                   pageSize={pageSize}
                   density={density}
                   seed={`asset-${row.id}`}
@@ -734,7 +866,7 @@ function AssetEditor() {
                 <AdaptorBriefLayout
                   content={rawContent as unknown as AdaptorBriefContent}
                   brand={brand}
-                  mode="light"
+                  mode={editorMode}
                   pageSize={pageSize}
                   density={density}
                   seed={`asset-${row.id}`}
@@ -742,6 +874,26 @@ function AssetEditor() {
               )}
               {ctx.printSafeArea && (
                 <div className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25" />
+              )}
+              {showBleedGuides && (
+                <>
+                  {/* Bleed edge (outer) — where the printed art bleeds off. */}
+                  <div
+                    className="pointer-events-none absolute rounded-none border border-dashed border-[#E53D2E]/70"
+                    style={{
+                      top: `${-bleedFraction * 100}%`,
+                      left: `${-bleedFraction * 100}%`,
+                      right: `${-bleedFraction * 100}%`,
+                      bottom: `${-bleedFraction * 100}%`,
+                    }}
+                    data-testid="bleed-guide-outer"
+                  />
+                  {/* Trim edge — the finished cut line. */}
+                  <div
+                    className="pointer-events-none absolute inset-0 border border-dashed border-[#003FC7]/70"
+                    data-testid="bleed-guide-trim"
+                  />
+                </>
               )}
             </LiveEditOverlay>
 
@@ -778,6 +930,14 @@ function AssetEditor() {
                   type="checkbox"
                   checked={!!ctx.printSafeArea}
                   onChange={(e) => patchCtx({ printSafeArea: e.target.checked })}
+                />
+              </Row>
+              <Row label="Bleed + trim guides">
+                <input
+                  type="checkbox"
+                  data-testid="toggle-bleed-guides"
+                  checked={showBleedGuides}
+                  onChange={(e) => patchCtx({ showBleedGuides: e.target.checked })}
                 />
               </Row>
             </Panel>
@@ -833,7 +993,20 @@ function AssetEditor() {
                 modules={content.modules ?? []}
                 onAdd={() => setPickerOpen(true)}
                 onChange={(next) => patchContent({ modules: next })}
+                mode={editorMode}
               />
+
+              {/* Schema-driven Content inspector — the guaranteed safety net.
+                  Every content field in the active kind is reachable here,
+                  including fields already bound to the canvas overlay. */}
+              <div className="mt-4 pt-4 border-t border-black/10 dark:border-white/10">
+                <ContentInspector
+                  schema={schemaFor(kind)}
+                  content={rawContent}
+                  canvasEditablePaths={new Set(editableFieldPaths)}
+                  onWritePath={(path: string, value: unknown) => patchByPath(path, value)}
+                />
+              </div>
             </Panel>
 
 
@@ -894,20 +1067,22 @@ function AssetEditor() {
           // Keep drawer open so the user can insert multiple modules.
         }}
         brand={brand}
-        mode="light"
+        mode={editorMode}
       />
     </AppShell>
   );
 }
 
 function ModulesPanel({
-  kind, modules, onAdd, onChange,
+  kind, modules, onAdd, onChange, mode,
 }: {
   kind: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
   modules: PrintSection[];
   onAdd: () => void;
   onChange: (next: PrintSection[]) => void;
+  mode: PrintMode;
 }) {
+  const editorMode = mode;
   function move(i: number, dir: -1 | 1) {
     const j = i + dir;
     if (j < 0 || j >= modules.length) return;
@@ -1136,7 +1311,7 @@ function ModulesPanel({
                     ))}
                   </div>
                   <div className="pt-1">
-                    <PrintSectionRenderer section={m} mode="light" accent="#003FC7" />
+                    <PrintSectionRenderer section={m} mode={editorMode} accent="#003FC7" />
                   </div>
                 </div>
               )}
