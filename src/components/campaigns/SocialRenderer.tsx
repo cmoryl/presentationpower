@@ -166,7 +166,7 @@ export function SocialRenderer({
       className="relative overflow-hidden rounded-xl shadow-[0_6px_24px_rgba(3,0,44,0.14)]"
       style={wrapperStyle}
     >
-      <div className="relative" style={inner}>
+      <div className="relative" style={inner} data-kit-asset-frame="true">
         {/* Force mode into the aurora subtree — SocialRenderer is invoked
             outside the deck editor's provider. */}
         <SlideModeContext.Provider value={mode}>

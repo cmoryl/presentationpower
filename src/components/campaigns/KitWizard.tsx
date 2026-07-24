@@ -25,6 +25,8 @@ import {
 import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
+import { exportKitZip } from "@/lib/kit-export";
+import { Download } from "lucide-react";
 
 /** First playbook copy for a given brand — the canonical division voice. */
 function exampleCopyForBrand(brandId: string) {
@@ -111,6 +113,7 @@ export function KitWizard({
   // ─── Save state ────────────────────────────────────────────────────────
   const [savedKitId, setSavedKitId] = useState<string | undefined>(kitId);
   const [kitName, setKitName] = useState<string>("");
+  const [exporting, setExporting] = useState(false);
   const [saving, setSaving] = useState(false);
   const [hydrating, setHydrating] = useState<boolean>(!!kitId);
 
@@ -577,16 +580,43 @@ export function KitWizard({
             eyebrow="Step 5 of 5"
             title={`Your kit · ${assets.length} asset${assets.length === 1 ? "" : "s"}`}
             actions={
-              <button
-                type="button"
-                onClick={() => {
-                  setRemoved(new Set());
-                  setRegenTick((n) => n + 1);
-                }}
-                className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:bg-black/5"
-              >
-                <RefreshCw size={12} /> Regenerate all
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (exporting || !assets.length) return;
+                    setExporting(true);
+                    const tId = toast.loading(`Preparing ${assets.length} asset${assets.length === 1 ? "" : "s"}…`);
+                    try {
+                      await exportKitZip(
+                        assets,
+                        kitName || `${surface}-kit`,
+                        (d, t) => toast.loading(`Rendering ${d}/${t}…`, { id: tId }),
+                      );
+                      toast.success("Kit downloaded", { id: tId });
+                    } catch (err) {
+                      console.error(err);
+                      toast.error("Export failed", { id: tId });
+                    } finally {
+                      setExporting(false);
+                    }
+                  }}
+                  disabled={exporting || assets.length === 0}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#03002C] disabled:opacity-50"
+                >
+                  <Download size={12} /> {exporting ? "Exporting…" : "Download kit (.zip)"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setRemoved(new Set());
+                    setRegenTick((n) => n + 1);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/70 hover:bg-black/5"
+                >
+                  <RefreshCw size={12} /> Regenerate all
+                </button>
+              </div>
             }
           >
             {/* Save this kit — name + save button, always visible on review. */}
@@ -655,14 +685,16 @@ export function KitWizard({
                     <div className="text-[10px] text-black/40">
                       {asset.format.width}×{asset.format.height} · {asset.mode}
                     </div>
-                    <SocialRenderer
-                      format={asset.format}
-                      brandId={asset.brandId}
-                      mode={asset.mode}
-                      copy={asset.copy}
-                      facts={{ hashtag: eventFacts.hashtag, registrationUrl: eventFacts.registrationUrl }}
-                      displayShortEdge={260}
-                    />
+                    <div data-kit-asset-id={asset.id}>
+                      <SocialRenderer
+                        format={asset.format}
+                        brandId={asset.brandId}
+                        mode={asset.mode}
+                        copy={asset.copy}
+                        facts={{ hashtag: eventFacts.hashtag, registrationUrl: eventFacts.registrationUrl }}
+                        displayShortEdge={260}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
