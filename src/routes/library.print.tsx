@@ -685,6 +685,47 @@ function PreviewFrame({ label, children }: { label: string; children: React.Reac
   );
 }
 
+function PrintTemplateHtmlButton({
+  kind, brand, label, mode,
+}: { kind: PrintAssetKind; brand: BrandMode; label: string; mode: "light" | "dark" }) {
+  const [busy, setBusy] = useState(false);
+  const onClick = async () => {
+    if (busy) return;
+    const element = renderPrintByKind(kind, brand, mode);
+    if (!element) return;
+    const slug = `${kind}-${brand.id}-${mode}`;
+    const filename = `${slug}.html`;
+    const toastId = `print-tpl-html-${slug}`;
+    setBusy(true);
+    toast.loading(`Preparing ${mode} HTML…`, { id: toastId, description: `${filename} — starting…`, duration: Infinity });
+    try {
+      const mod = await import("@/lib/print-html-export");
+      await mod.exportElementAsStandaloneHtml(element, {
+        filename,
+        title: `${label} — ${brand.name} (${mode})`,
+        onProgress: (msg) => toast.loading(`Building ${mode} HTML`, { id: toastId, description: `${filename} — ${msg}`, duration: Infinity }),
+      });
+      toast.success(`${mode === "light" ? "Light" : "Dark"} HTML downloaded`, { id: toastId, description: filename, duration: 5000 });
+    } catch (err) {
+      console.error("[library/print] template HTML export failed", err);
+      toast.error("HTML export failed", { id: toastId, description: "Check console for details.", duration: 6000 });
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={busy}
+      className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
+      title={`Download self-contained ${mode} HTML`}
+    >
+      <Download size={12} /> {mode === "light" ? "Light" : "Dark"} HTML
+    </button>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Admin-approved shelf — division-scoped, filtered client-side per template
 // ---------------------------------------------------------------------------
