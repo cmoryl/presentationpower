@@ -450,25 +450,51 @@ function Dashboard() {
 /* ---------- aurora hero backdrop ---------- */
 
 function AuroraHero({ mode }: { mode: ModeDef }) {
+  // Scroll-driven parallax: blobs and vignette drift at different rates as the
+  // hero scrolls out of view. rAF-throttled to stay smooth and cheap.
+  const [scrollY, setScrollY] = useState(0);
+  useEffect(() => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      setScrollY(window.scrollY);
+    };
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // Cap the effective scroll so blobs don't fly off screen once past hero.
+  const y = Math.min(scrollY, 800);
+
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
       <div
-        className="absolute h-[420px] w-[420px] rounded-full opacity-40 blur-[110px] transition-all duration-[900ms] ease-out"
+        className="absolute h-[420px] w-[420px] rounded-full opacity-40 blur-[110px] transition-[background-color,top,left,right,bottom] duration-[900ms] ease-out will-change-transform"
         style={{
           backgroundColor: mode.accent,
           top: mode.id === "presentation" ? "-140px" : mode.id === "print" ? "40%" : mode.id === "event" ? "-40px" : "50%",
           left: mode.id === "presentation" ? "-100px" : mode.id === "print" ? "60%" : mode.id === "event" ? "40%" : "-80px",
+          transform: `translate3d(${y * 0.08}px, ${y * -0.35}px, 0)`,
         }}
       />
       <div
-        className="absolute h-[380px] w-[380px] rounded-full opacity-30 blur-[130px] transition-all duration-[900ms] ease-out"
+        className="absolute h-[380px] w-[380px] rounded-full opacity-30 blur-[130px] transition-[background-color,top,left,right,bottom] duration-[900ms] ease-out will-change-transform"
         style={{
           backgroundColor: mode.glow,
           bottom: mode.id === "presentation" ? "-80px" : mode.id === "print" ? "-40px" : mode.id === "event" ? "40%" : "-140px",
           right: mode.id === "presentation" ? "-60px" : mode.id === "print" ? "-100px" : mode.id === "event" ? "-80px" : "50%",
+          transform: `translate3d(${y * -0.1}px, ${y * 0.22}px, 0)`,
         }}
       />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.04),transparent_60%)]" />
+      {/* Smooth radial vignette — no hard 60% cutoff that reads as a band. */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.035),rgba(255,255,255,0)_85%)]" />
     </div>
   );
 }
