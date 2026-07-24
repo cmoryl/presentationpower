@@ -434,6 +434,47 @@ function Library() {
     const { deckId } = createDeckFromTemplate(payload);
     navigate({ to: "/decks/$deckId", params: { deckId } });
   }
+  function createDeckFromSelection() {
+    const ids = selected;
+    if (ids.length === 0) return;
+    const brand = scopeBrand ?? tpMaster;
+    const brief = resolveDivisionBrief(brand);
+    const slides: TemplatePayload["slides"] = [];
+    for (const vid of ids) {
+      const variant = byId(MODULE_VARIANTS, vid);
+      if (!variant) continue;
+      const content = seedDivisionContent(vid, brief, "Selected module", brand) as Record<string, unknown>;
+      slides.push({
+        sectionId: sectionForVariant(vid),
+        variantId: vid,
+        layoutId: variant.permittedLayoutIds[0] ?? "",
+        content: content as unknown as TemplatePayload["slides"][number]["content"],
+      });
+    }
+    if (slides.length === 0) return;
+    const payload: TemplatePayload = {
+      title: `Custom deck · ${slides.length} module${slides.length === 1 ? "" : "s"}`,
+      brandModeId: brand.id,
+      archetypeId: "arch-product-pitch",
+      subCompany: null,
+      context: null,
+      brief: {
+        prospect: brief.prospect,
+        industry: brief.industry,
+        audience: brief.audience,
+        meetingObjective: `Custom deck built from ${slides.length} library module${slides.length === 1 ? "" : "s"}`,
+        lengthTarget: slides.length,
+        clientFacts: brief.clientFacts,
+      },
+      slides,
+    };
+    const { deckId } = createDeckFromTemplate(payload);
+    toast.success(`Deck created from ${slides.length} module${slides.length === 1 ? "" : "s"}`);
+    setSelected([]);
+    setSelectMode(false);
+    navigate({ to: "/decks/$deckId", params: { deckId } });
+  }
+
 
 
   return (
