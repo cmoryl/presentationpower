@@ -965,7 +965,6 @@ const VariantCard = memo(function VariantCard({
    *  their filler logos for real LogoHub rows. */
   logoHubPool?: LogoFiller[];
   /** Compact thumbnail layout: smaller preview + condensed metadata. */
-  /** Compact thumbnail layout: smaller preview + condensed metadata. */
   compact?: boolean;
   /** When true, clicking the card toggles selection instead of opening the
    *  detail modal — used by the library's multi-select → build deck flow. */
