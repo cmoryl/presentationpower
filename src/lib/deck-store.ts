@@ -86,6 +86,8 @@ export type DeckSlide = {
   notes?: string;
   logoPosition?: SlideLogoPosition;
   logoOrientation?: "auto" | "horizontal" | "stacked" | "vertical-left" | "vertical-right" | "mark-only";
+  // Per-slide light/dark mode override. Undefined = default ("light").
+  mode?: "light" | "dark";
   // Free-form canvas overlay — draggable text blocks positioned in stage
   // coordinates on top of the variant. Persists across sessions and always
   // renders (in preview, present, share). Empty/undefined = no overlay.
