@@ -122,10 +122,11 @@ export function PrintFooterLockup({
 }) {
   const accent = brand.tokens.accent || brand.tokens.primary;
   const primary = brand.tokens.primary;
-  const ink = mode === "dark" ? "#F5F4FF" : "#03002C";
-  const inkSoft = mode === "dark" ? "rgba(245,244,255,0.72)" : "rgba(85,85,85,0.9)";
-  const dividerCol = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.14)";
-  const accentInk = mode === "dark" ? accent : primary;
+  const ink = mode === "dark" ? "#FFFFFF" : "#03002C";
+  const inkSoft = mode === "dark" ? "#FFFFFF" : "rgba(85,85,85,0.9)";
+  const dividerCol = mode === "dark" ? "rgba(255,255,255,0.24)" : "rgba(3,0,44,0.14)";
+  const accentInk = mode === "dark" ? "#FFFFFF" : primary;
+
   const isEnterprise = brand.id === "bm-enterprise";
 
   const chipStyle: CSSProperties = {
