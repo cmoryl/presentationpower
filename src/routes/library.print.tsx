@@ -653,11 +653,25 @@ function TemplateDetailOverlay({
 }
 
 function PrintPreview({ kind, brand, mode }: { kind: PrintAssetKind; brand: BrandMode; mode: "light" | "dark" }) {
-  if (kind === "spotlight") return <SpotlightLayout content={SPOTLIGHT_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
-  if (kind === "ebrochure") return <EBrochureLayout content={EBROCHURE_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
-  if (kind === "adaptor-brief") return <AdaptorBriefLayout content={ADAPTOR_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
-  if (kind === "case-study") return <CaseStudyLayout content={CASE_STUDY_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+  return renderPrintByKind(kind, brand, mode);
+}
+
+function renderPrintByKind(
+  kind: PrintAssetKind,
+  brand: BrandMode,
+  mode: "light" | "dark",
+  content?: unknown,
+): React.ReactElement | null {
+  if (kind === "spotlight")
+    return <SpotlightLayout content={(content as SpotlightContent) ?? SPOTLIGHT_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+  if (kind === "ebrochure")
+    return <EBrochureLayout content={(content as EBrochureContent) ?? EBROCHURE_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+  if (kind === "adaptor-brief")
+    return <AdaptorBriefLayout content={(content as AdaptorBriefContent) ?? ADAPTOR_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
+  if (kind === "case-study")
+    return <CaseStudyLayout content={(content as CaseStudyContent) ?? CASE_STUDY_SEED} brand={brand} mode={mode} pageSize="Letter" density="standard" />;
   return null;
+}
 }
 
 function PreviewFrame({ label, children }: { label: string; children: React.ReactNode }) {
