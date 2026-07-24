@@ -70,6 +70,7 @@ import { Route as DecksDeckIdExportRouteImport } from './routes/decks.$deckId.ex
 import { Route as DecksDeckIdDocumentRouteImport } from './routes/decks.$deckId.document'
 import { Route as ApiPublicPdfIndexProxyRouteImport } from './routes/api/public/pdf-index-proxy'
 import { Route as ApiPublicBrandhubSeedProxyRouteImport } from './routes/api/public/brandhub-seed-proxy'
+import { Route as AdminCampaignsKitRouteImport } from './routes/admin.campaigns.kit'
 
 const TemplatesRoute = TemplatesRouteImport.update({
   id: '/templates',
@@ -379,6 +380,11 @@ const ApiPublicBrandhubSeedProxyRoute =
     path: '/api/public/brandhub-seed-proxy',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminCampaignsKitRoute = AdminCampaignsKitRouteImport.update({
+  id: '/kit',
+  path: '/kit',
+  getParentRoute: () => AdminCampaignsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -399,7 +405,7 @@ export interface FileRoutesByFullPath {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
-  '/admin/campaigns': typeof AdminCampaignsRoute
+  '/admin/campaigns': typeof AdminCampaignsRouteWithChildren
   '/admin/globallink': typeof AdminGloballinkRoute
   '/admin/globallink-share': typeof AdminGloballinkShareRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
@@ -433,6 +439,7 @@ export interface FileRoutesByFullPath {
   '/decks/': typeof DecksIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
+  '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
@@ -460,7 +467,7 @@ export interface FileRoutesByTo {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
-  '/admin/campaigns': typeof AdminCampaignsRoute
+  '/admin/campaigns': typeof AdminCampaignsRouteWithChildren
   '/admin/globallink': typeof AdminGloballinkRoute
   '/admin/globallink-share': typeof AdminGloballinkShareRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
@@ -494,6 +501,7 @@ export interface FileRoutesByTo {
   '/decks': typeof DecksIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
   '/library': typeof LibraryIndexRoute
+  '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
@@ -524,7 +532,7 @@ export interface FileRoutesById {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
-  '/admin/campaigns': typeof AdminCampaignsRoute
+  '/admin/campaigns': typeof AdminCampaignsRouteWithChildren
   '/admin/globallink': typeof AdminGloballinkRoute
   '/admin/globallink-share': typeof AdminGloballinkShareRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
@@ -558,6 +566,7 @@ export interface FileRoutesById {
   '/decks/': typeof DecksIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
+  '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
   '/decks/$deckId/document': typeof DecksDeckIdDocumentRoute
@@ -623,6 +632,7 @@ export interface FileRouteTypes {
     | '/decks/'
     | '/knowledge/'
     | '/library/'
+    | '/admin/campaigns/kit'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/pdf-index-proxy'
     | '/decks/$deckId/document'
@@ -684,6 +694,7 @@ export interface FileRouteTypes {
     | '/decks'
     | '/knowledge'
     | '/library'
+    | '/admin/campaigns/kit'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/pdf-index-proxy'
     | '/decks/$deckId/document'
@@ -747,6 +758,7 @@ export interface FileRouteTypes {
     | '/decks/'
     | '/knowledge/'
     | '/library/'
+    | '/admin/campaigns/kit'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/pdf-index-proxy'
     | '/decks/$deckId/document'
@@ -1223,8 +1235,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicBrandhubSeedProxyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/campaigns/kit': {
+      id: '/admin/campaigns/kit'
+      path: '/kit'
+      fullPath: '/admin/campaigns/kit'
+      preLoaderRoute: typeof AdminCampaignsKitRouteImport
+      parentRoute: typeof AdminCampaignsRoute
+    }
   }
 }
+
+interface AdminCampaignsRouteChildren {
+  AdminCampaignsKitRoute: typeof AdminCampaignsKitRoute
+}
+
+const AdminCampaignsRouteChildren: AdminCampaignsRouteChildren = {
+  AdminCampaignsKitRoute: AdminCampaignsKitRoute,
+}
+
+const AdminCampaignsRouteWithChildren = AdminCampaignsRoute._addFileChildren(
+  AdminCampaignsRouteChildren,
+)
 
 interface AdminRouteChildren {
   AdminAbRoute: typeof AdminAbRoute
@@ -1233,7 +1264,7 @@ interface AdminRouteChildren {
   AdminApprovalsRoute: typeof AdminApprovalsRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBrandAssetsRoute: typeof AdminBrandAssetsRoute
-  AdminCampaignsRoute: typeof AdminCampaignsRoute
+  AdminCampaignsRoute: typeof AdminCampaignsRouteWithChildren
   AdminGloballinkRoute: typeof AdminGloballinkRoute
   AdminGloballinkShareRoute: typeof AdminGloballinkShareRoute
   AdminIconStudioRoute: typeof AdminIconStudioRoute
@@ -1257,7 +1288,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminApprovalsRoute: AdminApprovalsRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminBrandAssetsRoute: AdminBrandAssetsRoute,
-  AdminCampaignsRoute: AdminCampaignsRoute,
+  AdminCampaignsRoute: AdminCampaignsRouteWithChildren,
   AdminGloballinkRoute: AdminGloballinkRoute,
   AdminGloballinkShareRoute: AdminGloballinkShareRoute,
   AdminIconStudioRoute: AdminIconStudioRoute,
