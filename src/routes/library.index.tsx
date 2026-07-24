@@ -938,6 +938,9 @@ const VariantCard = memo(function VariantCard({
   importBusy = false,
   logoHubPool,
   compact = false,
+  selectable = false,
+  selected = false,
+  onToggleSelect,
 }: {
   variant: ModuleVariant;
   familyName?: string;
