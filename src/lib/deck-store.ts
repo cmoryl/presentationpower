@@ -15,6 +15,7 @@ import { BRAND_PROFILES, getSubCompanyProfile } from "./brand-profiles";
 import { pickCaseStudy, pickProofLogos, CASE_STUDIES } from "./case-studies";
 import { getApprovedLogoItems } from "./approved-logos";
 import { variantSupportsImagery, variantSupportsVideo } from "./variant-media";
+import { track } from "./analytics-track";
 
 export type BrandModeId = string;
 
@@ -1766,6 +1767,15 @@ export const useDeckStore = create<DeckState>()(
           briefs: { ...s.briefs, [brief.id]: brief },
           decks: { ...s.decks, [deck.id]: deck },
         }));
+        track({
+          event: "deck.create",
+          category: "deck",
+          divisionId: brief.brandModeId,
+          deckId: deck.id,
+          value: deck.slides.length,
+          props: { archetypeId: brief.archetypeId, source: "brief" },
+        });
+        track({ event: "brief.submit", category: "brief", divisionId: brief.brandModeId, props: { prospect: brief.prospect } });
         return { briefId: brief.id, deckId: deck.id };
       },
 
@@ -2136,6 +2146,16 @@ export const useDeckStore = create<DeckState>()(
         const insertAt = idx < 0 ? deck.slides.length : idx + 1;
         const next = [...deck.slides.slice(0, insertAt), newSlide, ...deck.slides.slice(insertAt)].map((sl, i) => ({ ...sl, position: i }));
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
+        track({
+          event: "slide.add",
+          category: "slide",
+          divisionId: deck.brandModeId,
+          deckId,
+          slideId: newSlide.id,
+          variantId: newSlide.variantId,
+          moduleFamily: byId(MODULE_VARIANTS, newSlide.variantId)?.familyId ?? null,
+          props: { sectionId, source: "addSlide" },
+        });
       },
 
       insertVariantSlide: (deckId, variantId) => {
@@ -2161,6 +2181,10 @@ export const useDeckStore = create<DeckState>()(
         };
         const next = [...deck.slides, newSlide].map((sl, i) => ({ ...sl, position: i }));
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
+        track({
+          event: "slide.add", category: "slide", divisionId: deck.brandModeId, deckId, slideId: newSlide.id,
+          variantId: variant.id, moduleFamily: variant.familyId, props: { source: "insertVariant" },
+        });
         return { slideId: newSlide.id };
       },
 
@@ -2206,6 +2230,10 @@ export const useDeckStore = create<DeckState>()(
         const copy: DeckSlide = { ...src, id: nanoid(8), content: structuredClone(src.content), changes: [] };
         const next = [...deck.slides.slice(0, idx + 1), copy, ...deck.slides.slice(idx + 1)].map((sl, i) => ({ ...sl, position: i }));
         set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
+        track({
+          event: "slide.duplicate", category: "slide", divisionId: deck.brandModeId, deckId, slideId: copy.id,
+          variantId: src.variantId, moduleFamily: byId(MODULE_VARIANTS, src.variantId)?.familyId ?? null,
+        });
       },
 
 
