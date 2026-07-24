@@ -5879,19 +5879,21 @@ function renderLocationsVariant(
     const regionCount = pins.filter((p) => region === "world" || p.region === region || (region === "MEA" && p.region === "MEA")).length;
     return (
       <SlideFrame brand={brand as never} pageNumber={pageNumber}>
-        <AuroraOrb accent={accent} x={8} y={20} size={860} intensity={0.5} />
         <div className="relative flex h-full flex-col">
-          <div className="flex items-start justify-between gap-8">
-            <Header />
-            <div className="rounded-full px-5 py-2 backdrop-blur-md" style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.06)", border: `1px solid ${accent}66`, color: ink.strong, fontSize: 14, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-              {region === "world" ? "Worldwide" : LOC_REGION_LABELS[region as LocPin["region"]]} · {regionCount}
+          <div className="flex items-start justify-between gap-12">
+            <Header compact />
+            <div className="flex flex-col items-end text-right" style={{ minWidth: 180 }}>
+              <span className="tabular-nums font-semibold" style={{ fontSize: 88, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}>{regionCount}</span>
+              <div className="mt-3 uppercase" style={{ fontSize: 12, letterSpacing: "0.3em", color: "var(--slide-accent-text)", fontWeight: 700 }}>
+                {region === "world" ? "Worldwide" : LOC_REGION_LABELS[region as LocPin["region"]]}
+              </div>
             </div>
           </div>
-          <div className="relative mt-8 flex-1 overflow-hidden rounded-3xl" style={{ border: `1px solid ${ink.hairline}`, background: isDark ? "rgba(255,255,255,0.02)" : "rgba(3,0,44,0.015)" }}>
+          <div className="relative mt-10 flex-1 overflow-hidden">
             <LocWorldMap pins={pins} region={region} mode={mode} accent={accent} primary={primary} showLabels ariaLabel={`${title} — ${region === "world" ? "world" : LOC_REGION_LABELS[region as LocPin["region"]]} map`} />
           </div>
           {narrative && (
-            <div className="mt-6" style={{ color: ink.muted, fontSize: 18, lineHeight: 1.45, maxWidth: 1400 }}>
+            <div className="mt-8 pt-6" style={{ borderTop: `1px solid ${ink.hairline}`, color: ink.muted, fontSize: 18, lineHeight: 1.45, maxWidth: 1400 }}>
               {narrative}
             </div>
           )}
@@ -5899,6 +5901,7 @@ function renderLocationsVariant(
       </SlideFrame>
     );
   }
+
 
   // MV-LOC-HUB-SPOKE
   return (
