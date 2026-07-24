@@ -57,7 +57,7 @@ import { schemaFor } from "@/lib/print-content-schema";
 import { CONTENT_SCHEMAS, unreachablePaths } from "@/lib/print-content-schema";
 
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
-import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2, Sun, Moon } from "lucide-react";
+import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2, Sun, Moon, ChevronDown, ChevronRight, Eye, EyeOff } from "lucide-react";
 
 export const Route = createFileRoute("/asset/$assetId")({
   head: ({ params }) => ({
@@ -1203,95 +1203,63 @@ function ModulesPanel({
         }}
       >
         {modules.map((m, i) => (
-          <div key={m.id}>
-            <DropIndicator active={dropIdx === i} />
-            <div
-              draggable
-              onDragStart={(e) => {
-                // Only start a reorder when the drag originates from the
-                // header/grip — inputs and buttons inside the card must
-                // stay interactive without accidentally lifting the card.
-                const src = e.target as HTMLElement | null;
-                if (!src?.closest("[data-drag-handle]")) {
-                  e.preventDefault();
-                  return;
-                }
-                e.dataTransfer.effectAllowed = "move";
-                e.dataTransfer.setData("text/plain", String(i));
-                setDraggingIdx(i);
-              }}
-              onDragEnd={() => {
-                setDropIdx(null);
-                setDropKind(null);
-                setDraggingIdx(null);
-              }}
-              onDragOver={(e) => {
+          <ModuleCard
+            key={m.id}
+            index={i}
+            section={m}
+            editorMode={editorMode}
+            draggingIdx={draggingIdx}
+            dropIdx={dropIdx}
+            DropIndicator={DropIndicator}
+            onDragStart={(e) => {
+              const src = e.target as HTMLElement | null;
+              if (!src?.closest("[data-drag-handle]")) {
                 e.preventDefault();
-                const isInsert = e.dataTransfer.types.includes(PRINT_SECTION_DND_MIME);
-                e.dataTransfer.dropEffect = isInsert ? "copy" : "move";
-                setDropKind(isInsert ? "insert" : "reorder");
-                setDropIdx(computeInsertIndex(e, i));
-              }}
-              onDrop={(e) => {
-                e.preventDefault();
-                const targetIdx = computeInsertIndex(e, i);
-                setDropIdx(null);
-                setDropKind(null);
-                setDraggingIdx(null);
-                // New-module insert from drawer takes priority.
-                const inserted = readInsertPayload(e);
-                if (inserted) {
-                  if (!gate.ok) return;
-                  insertAt(targetIdx, inserted);
-                  return;
-                }
-                const from = Number(e.dataTransfer.getData("text/plain"));
-                if (Number.isNaN(from)) return;
-                // Adjust for the removal of the source item ahead of target.
-                const to = from < targetIdx ? targetIdx - 1 : targetIdx;
-                if (to === from) return;
-                const next = [...modules];
-                const [moved] = next.splice(from, 1);
-                if (!moved) return;
-                next.splice(to, 0, moved);
-                onChange(next);
-              }}
-              className={
-                "rounded-md border p-2 transition " +
-                (draggingIdx === i
-                  ? "border-[#003FC7]/60 bg-[#003FC7]/[0.04] opacity-50 shadow-sm dark:border-[#003FC7]/60"
-                  : "border-black/10 dark:border-white/10")
+                return;
               }
-            >
-              <div
-                data-drag-handle
-                className="flex cursor-grab items-center justify-between active:cursor-grabbing"
-                title="Drag to reorder"
-              >
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
-                  <GripVertical size={14} className="text-black/40 dark:text-white/40" aria-hidden />
-                  {sectionKindLabel(m.kind)}
-                </div>
-
-                <div className="flex items-center gap-1">
-                  <button className="rounded p-1 text-black/50 hover:bg-black/5" onClick={() => move(i, -1)} aria-label="Move up"><ArrowUp size={14} /></button>
-                  <button className="rounded p-1 text-black/50 hover:bg-black/5" onClick={() => move(i, 1)} aria-label="Move down"><ArrowDown size={14} /></button>
-                  <button className="rounded p-1 text-red-500 hover:bg-red-500/10" onClick={() => remove(i)} aria-label="Delete"><Trash2 size={14} /></button>
-                </div>
-              </div>
-
-              <div className="mt-2 space-y-2">
-                <SectionInlineEditor
-                  section={m}
-                  onPatch={(p) => patch(i, p)}
-                />
-                <div className="pt-1">
-                  <PrintSectionRenderer section={m} mode={editorMode} accent="#003FC7" />
-                </div>
-              </div>
-
-            </div>
-          </div>
+              e.dataTransfer.effectAllowed = "move";
+              e.dataTransfer.setData("text/plain", String(i));
+              setDraggingIdx(i);
+            }}
+            onDragEnd={() => {
+              setDropIdx(null);
+              setDropKind(null);
+              setDraggingIdx(null);
+            }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              const isInsert = e.dataTransfer.types.includes(PRINT_SECTION_DND_MIME);
+              e.dataTransfer.dropEffect = isInsert ? "copy" : "move";
+              setDropKind(isInsert ? "insert" : "reorder");
+              setDropIdx(computeInsertIndex(e, i));
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              const targetIdx = computeInsertIndex(e, i);
+              setDropIdx(null);
+              setDropKind(null);
+              setDraggingIdx(null);
+              const inserted = readInsertPayload(e);
+              if (inserted) {
+                if (!gate.ok) return;
+                insertAt(targetIdx, inserted);
+                return;
+              }
+              const from = Number(e.dataTransfer.getData("text/plain"));
+              if (Number.isNaN(from)) return;
+              const to = from < targetIdx ? targetIdx - 1 : targetIdx;
+              if (to === from) return;
+              const next = [...modules];
+              const [moved] = next.splice(from, 1);
+              if (!moved) return;
+              next.splice(to, 0, moved);
+              onChange(next);
+            }}
+            onMoveUp={() => move(i, -1)}
+            onMoveDown={() => move(i, 1)}
+            onRemove={() => remove(i)}
+            onPatch={(p) => patch(i, p)}
+          />
         ))}
         {/* Tail indicator — shown when a drag lands after the last item. */}
         <DropIndicator active={dropIdx === modules.length && modules.length > 0} />
@@ -1329,8 +1297,136 @@ function ModulesPanel({
   );
 }
 
+function ModuleCard({
+  index,
+  section,
+  editorMode,
+  draggingIdx,
+  dropIdx,
+  DropIndicator,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDrop,
+  onMoveUp,
+  onMoveDown,
+  onRemove,
+  onPatch,
+}: {
+  index: number;
+  section: PrintSection;
+  editorMode: PrintMode;
+  draggingIdx: number | null;
+  dropIdx: number | null;
+  DropIndicator: (props: { active: boolean }) => React.ReactElement;
+  onDragStart: (e: React.DragEvent) => void;
+  onDragEnd: () => void;
+  onDragOver: (e: React.DragEvent) => void;
+  onDrop: (e: React.DragEvent) => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onRemove: () => void;
+  onPatch: (p: Partial<PrintSection>) => void;
+}) {
+  const [open, setOpen] = useState(true);
+  const [showPreview, setShowPreview] = useState(false);
+  const i = index;
+  const m = section;
+  const summary = getSectionSummary(m);
+  return (
+    <div>
+      <DropIndicator active={dropIdx === i} />
+      <div
+        draggable
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        onDragOver={onDragOver}
+        onDrop={onDrop}
+        className={
+          "rounded-lg border bg-white/60 p-2 transition dark:bg-white/[0.02] " +
+          (draggingIdx === i
+            ? "border-[#003FC7]/60 bg-[#003FC7]/[0.04] opacity-50 shadow-sm"
+            : "border-black/10 dark:border-white/10")
+        }
+      >
+        <div
+          data-drag-handle
+          className="flex cursor-grab items-center justify-between gap-2 active:cursor-grabbing"
+          title="Drag to reorder"
+        >
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
+            className="flex min-w-0 flex-1 items-center gap-1.5 text-left"
+            aria-expanded={open}
+          >
+            <GripVertical size={14} className="shrink-0 text-black/30 dark:text-white/30" aria-hidden />
+            {open ? <ChevronDown size={14} className="shrink-0 text-black/50 dark:text-white/50" /> : <ChevronRight size={14} className="shrink-0 text-black/50 dark:text-white/50" />}
+            <span className="truncate text-[11px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
+              {sectionKindLabel(m.kind)}
+            </span>
+            {!open && summary && (
+              <span className="truncate text-[11px] text-black/45 dark:text-white/45">· {summary}</span>
+            )}
+          </button>
+          <div className="flex items-center gap-0.5">
+            <button className="rounded p-1 text-black/50 hover:bg-black/5 dark:text-white/50" onClick={onMoveUp} aria-label="Move up"><ArrowUp size={13} /></button>
+            <button className="rounded p-1 text-black/50 hover:bg-black/5 dark:text-white/50" onClick={onMoveDown} aria-label="Move down"><ArrowDown size={13} /></button>
+            <button className="rounded p-1 text-red-500 hover:bg-red-500/10" onClick={onRemove} aria-label="Delete"><Trash2 size={13} /></button>
+          </div>
+        </div>
+
+        {open && (
+          <div className="mt-2 space-y-2">
+            <SectionInlineEditor section={m} onPatch={onPatch} />
+            <button
+              type="button"
+              onClick={() => setShowPreview((v) => !v)}
+              className="flex w-full items-center justify-center gap-1 rounded border border-dashed border-black/15 py-1 text-[10px] font-semibold uppercase tracking-widest text-black/50 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:text-white/50"
+              title="Preview appears on the canvas — toggle a compact preview here"
+            >
+              {showPreview ? <><EyeOff size={11} /> Hide preview</> : <><Eye size={11} /> Show preview</>}
+            </button>
+            {showPreview && (
+              <div className="overflow-hidden rounded border border-black/10 dark:border-white/10">
+                <div
+                  className="origin-top-left"
+                  style={{ transform: "scale(0.42)", width: "238%", pointerEvents: "none" }}
+                >
+                  <PrintSectionRenderer section={m} mode={editorMode} accent="#003FC7" />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function getSectionSummary(s: PrintSection): string {
+  const anyS = s as unknown as { title?: string; eyebrow?: string; text?: string; items?: Array<unknown> };
+  if (anyS.title) return anyS.title;
+  if (anyS.text) return String(anyS.text).slice(0, 40);
+  if (anyS.eyebrow) return anyS.eyebrow;
+  if (anyS.items?.length) return `${anyS.items.length} item${anyS.items.length === 1 ? "" : "s"}`;
+  return "";
+}
+
 
 const inspectorInput =
+  "w-full rounded-md border border-black/10 bg-white px-2 py-1.5 text-xs text-[#03002C] focus:border-[#003FC7] focus:outline-none dark:border-white/10 dark:bg-white/[0.03] dark:text-white";
+
+function LabeledField({ label, children, hint }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <label className="block space-y-1">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/55 dark:text-white/55">{label}</span>
+      {children}
+      {hint && <span className="block text-[10px] text-black/40 dark:text-white/40">{hint}</span>}
+    </label>
+  );
+}
+
   "w-full rounded-md border border-black/10 bg-white px-2 py-1.5 text-xs text-[#03002C] focus:border-[#003FC7] focus:outline-none dark:border-white/10 dark:bg-white/[0.03] dark:text-white";
 
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
@@ -1749,23 +1845,39 @@ function StatsInlineEditor({
   };
   return (
     <>
-      <select className={inspectorInput} value={section.variantId} onChange={(e) => onPatch({ variantId: e.target.value as PrintStatsVariant })}>
-        {PRINT_STATS_VARIANTS.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
-      </select>
-      <input className={inspectorInput} placeholder="Eyebrow" value={section.eyebrow ?? ""} onChange={(e) => onPatch({ eyebrow: e.target.value })} />
-      <input className={inspectorInput} placeholder="Title" value={section.title ?? ""} onChange={(e) => onPatch({ title: e.target.value })} />
-      <ArrayEditor
-        items={section.items}
-        onChange={(items) => onPatch({ items })}
-        add={() => ({ label: "", value: "", unit: "" }) as PrintStatsSection["items"][number]}
-        row={(it, idx) => (
-          <div className="grid grid-cols-[1fr_60px_50px] gap-1">
-            <input className={inspectorInput} placeholder="Label" value={it.label} onChange={(e) => patchItem(idx, { label: e.target.value })} />
-            <input className={inspectorInput} placeholder="Value" value={it.value} onChange={(e) => patchItem(idx, { value: e.target.value })} />
-            <input className={inspectorInput} placeholder="Unit" value={it.unit ?? ""} onChange={(e) => patchItem(idx, { unit: e.target.value })} />
-          </div>
-        )}
-      />
+      <LabeledField label="Layout style">
+        <select className={inspectorInput} value={section.variantId} onChange={(e) => onPatch({ variantId: e.target.value as PrintStatsVariant })}>
+          {PRINT_STATS_VARIANTS.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
+        </select>
+      </LabeledField>
+      <div className="grid grid-cols-2 gap-2">
+        <LabeledField label="Eyebrow">
+          <input className={inspectorInput} placeholder="e.g. Impact at a glance" value={section.eyebrow ?? ""} onChange={(e) => onPatch({ eyebrow: e.target.value })} />
+        </LabeledField>
+        <LabeledField label="Title">
+          <input className={inspectorInput} placeholder="e.g. By the numbers" value={section.title ?? ""} onChange={(e) => onPatch({ title: e.target.value })} />
+        </LabeledField>
+      </div>
+      <div className="pt-1">
+        <div className="mb-1 flex items-center justify-between">
+          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/55 dark:text-white/55">Stat items</span>
+          <span className="text-[10px] text-black/40 dark:text-white/40">{section.items.length} · label / value / unit</span>
+        </div>
+        <ArrayEditor
+          items={section.items}
+          onChange={(items) => onPatch({ items })}
+          add={() => ({ label: "", value: "", unit: "" }) as PrintStatsSection["items"][number]}
+          row={(it, idx) => (
+            <div className="space-y-1">
+              <input className={inspectorInput} placeholder="Label (what it measures)" value={it.label} onChange={(e) => patchItem(idx, { label: e.target.value })} />
+              <div className="grid grid-cols-[1fr_1fr] gap-1">
+                <input className={inspectorInput} placeholder="Value (e.g. 48)" value={it.value} onChange={(e) => patchItem(idx, { value: e.target.value })} />
+                <input className={inspectorInput} placeholder="Unit (e.g. hr, %, M)" value={it.unit ?? ""} onChange={(e) => patchItem(idx, { unit: e.target.value })} />
+              </div>
+            </div>
+          )}
+        />
+      </div>
     </>
   );
 }
