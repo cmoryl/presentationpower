@@ -125,6 +125,12 @@ function EventsView() {
             >
               Start from a blank kit <ArrowRight size={14} />
             </Link>
+            <Link
+              to="/events/presets"
+              className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 px-5 py-2 text-sm font-medium text-[#03002C] hover:border-[#003FC7]/50"
+            >
+              All presets <ArrowRight size={14} />
+            </Link>
           </div>
         </div>
 

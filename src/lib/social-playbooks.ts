@@ -387,6 +387,217 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
       { label: "Partner co-marketed leads", target: "460" },
     ],
   },
+  // ────────── Expansion pack · seasonal + division deep-cuts ──────────
+  {
+    id: "lifesci-trial-recruit-push",
+    angle: "recruitment",
+    name: "Life Sciences · trial recruitment push",
+    tagline: "Multi-market patient recruitment kit for a Phase II study.",
+    intent:
+      "Localized recruitment set aimed at four investigator countries — square + portrait + story per market, plus a wide email header for the site coordinators.",
+    subBrand: "bm-tp-lifesci",
+    divisionLabel: "TransPerfect Life Sciences",
+    kitProfileId: "full-launch",
+    seedVariantId: "MV-CTX-STAT-GRID",
+    accent: "#A6FA87",
+    chip: "Life Sciences",
+    copy: {
+      title: "Now enrolling in 4 countries — a Phase II study for treatment-resistant depression.",
+      summary:
+        "Localized in US · DE · JP · BR with fully translated ICF and site collateral in under 10 business days.",
+      cta: "Refer a patient",
+    },
+    phases: [
+      { when: "Week 1", label: "Awareness", detail: "Portrait + story per market.", formats: ["portrait-1080x1350", "story-1080x1920"] },
+      { when: "Week 2", label: "Site coordinator email", detail: "Wide banner + eligibility grid.", formats: ["email-header-1200x400", "callout-1200x628"] },
+      { when: "Week 4", label: "Recap", detail: "Enrolment stat square.", formats: ["square-1080"] },
+    ],
+    deliverables: [
+      { surface: "digital", label: "4× market pack", detail: "Portrait + story per country." },
+      { surface: "email", label: "Coordinator email", detail: "1200×400 banner." },
+      { surface: "digital", label: "Enrolment stat", detail: "1080×1080 recap." },
+    ],
+    kpis: [
+      { label: "Site referrals · T+30", target: "620" },
+      { label: "Screened patients", target: "1,400" },
+      { label: "Randomized · T+90", target: "180" },
+    ],
+  },
+  {
+    id: "legal-case-win-spotlight",
+    angle: "case-spotlight",
+    name: "Legal · cross-border case win",
+    tagline: "Editorial spotlight for a landmark cross-border discovery matter.",
+    intent:
+      "Editorial one-two — hero portrait with the win headline, plus a metric-driven LinkedIn link card for referral partners.",
+    subBrand: "bm-tp-legal",
+    divisionLabel: "TransPerfect Legal",
+    kitProfileId: "social-essentials",
+    seedVariantId: "MV-CASE-METRICS",
+    accent: "#003FC7",
+    chip: "Legal",
+    copy: {
+      title: "8.4M documents · 12 languages · 74 days.",
+      summary:
+        "How TransPerfect Legal cleared the largest cross-border eDiscovery matter of 2026 without a single privilege dispute.",
+      cta: "Read the case",
+    },
+    phases: [
+      { when: "Day 1", label: "Hero spotlight", detail: "Editorial portrait + summary.", formats: ["portrait-1080x1350"] },
+      { when: "Day 2", label: "Metrics square", detail: "Numbers-only tile.", formats: ["square-1080"] },
+      { when: "Day 5", label: "Referral link", detail: "LinkedIn link card.", formats: ["linkedin-link-1200x627"] },
+    ],
+    deliverables: [
+      { surface: "digital", label: "Editorial portrait", detail: "1080×1350 hero." },
+      { surface: "digital", label: "Metrics square", detail: "1080×1080 numbers-only." },
+      { surface: "digital", label: "Referral link", detail: "1200×627 LinkedIn card." },
+    ],
+    kpis: [
+      { label: "Case-study downloads", target: "4.2k" },
+      { label: "Inbound referrals · T+30", target: "58" },
+      { label: "Partner shares", target: "310" },
+    ],
+  },
+  {
+    id: "games-launch-drop",
+    angle: "product-tease",
+    name: "Games · localization launch drop",
+    tagline: "Countdown-to-launch drops for a triple-A gaming title.",
+    intent:
+      "3-beat countdown — reveal, key-art tease, launch — designed for X and YouTube with 16:9 as the hero geometry.",
+    subBrand: "bm-tp-games",
+    divisionLabel: "TransPerfect Gaming",
+    kitProfileId: "full-launch",
+    seedVariantId: "MV-ED-HERO-BLEED",
+    accent: "#EC388A",
+    chip: "Gaming",
+    copy: {
+      title: "Every quest. Every quip. 32 languages, day-and-date.",
+      summary:
+        "How TransPerfect Gaming shipped the year's biggest RPG in 32 languages on the same day the servers went live.",
+      cta: "See the workflow",
+    },
+    phases: [
+      { when: "T-14", label: "Reveal", detail: "Wide teaser + YouTube thumb.", formats: ["x-1600x900", "youtube-1280x720"] },
+      { when: "T-7", label: "Key-art tease", detail: "Portrait + story.", formats: ["portrait-1080x1350", "story-1080x1920"] },
+      { when: "T-0", label: "Launch", detail: "Square + LinkedIn card.", formats: ["square-1080", "linkedin-link-1200x627"] },
+    ],
+    deliverables: [
+      { surface: "digital", label: "Reveal wide", detail: "1600×900 hero." },
+      { surface: "video", label: "YouTube thumb", detail: "1280×720 preview." },
+      { surface: "digital", label: "Launch pack", detail: "Portrait + story + square." },
+    ],
+    kpis: [
+      { label: "Trailer views · T+7", target: "5.2M" },
+      { label: "Wishlist adds", target: "180k" },
+      { label: "Press pickups", target: "34" },
+    ],
+  },
+  {
+    id: "digital-globallink-webinar",
+    angle: "thought-leadership",
+    name: "GlobalLink · monthly webinar",
+    tagline: "Monthly deep-dive webinar promo kit for GlobalLink customers.",
+    intent:
+      "Speaker-forward promo — portrait invite, wide email header, and a milestone square for the recording drop.",
+    subBrand: "bm-tp-digital",
+    divisionLabel: "GlobalLink",
+    kitProfileId: "event-kit",
+    seedVariantId: "MV-OP-COVER-DOSSIER",
+    accent: "#A1FBF9",
+    chip: "GlobalLink",
+    copy: {
+      title: "Inside the GlobalLink AI · a 30-minute deep-dive with the product team.",
+      summary:
+        "First Thursday of every month · live Q&A · recording sent to every registrant.",
+      cta: "Save my seat",
+    },
+    phases: [
+      { when: "T-14", label: "Invite", detail: "Portrait speaker card + email header.", formats: ["portrait-1080x1350", "email-header-1200x400"] },
+      { when: "T-1", label: "Reminder", detail: "Story + LinkedIn post.", formats: ["story-1080x1920", "linkedin-post-1200x1200"] },
+      { when: "T+1", label: "Recording", detail: "Square + link card.", formats: ["square-1080", "linkedin-link-1200x627"] },
+    ],
+    deliverables: [
+      { surface: "digital", label: "Speaker invite", detail: "1080×1350 portrait." },
+      { surface: "email", label: "Email header", detail: "1200×400 wide." },
+      { surface: "digital", label: "Recording drop", detail: "Square + link card." },
+    ],
+    kpis: [
+      { label: "Registrations", target: "3.8k" },
+      { label: "Live attendance", target: "1.6k" },
+      { label: "Recording views · T+7", target: "9.2k" },
+    ],
+  },
+  {
+    id: "media-award-nom",
+    angle: "milestone",
+    name: "Media · award nomination",
+    tagline: "Industry award nomination hype set for a media localization win.",
+    intent:
+      "Editorial-poster feel — hero portrait for the nomination, story for the countdown, and a link card the day results drop.",
+    subBrand: "bm-tp-media",
+    divisionLabel: "TransPerfect Media",
+    kitProfileId: "social-essentials",
+    seedVariantId: "MV-OP-COVER-EDITORIAL",
+    accent: "#FFEB66",
+    chip: "Media",
+    copy: {
+      title: "Nominated · Best Localized Series, Global Media Awards 2026.",
+      summary:
+        "Five languages · zero dub-swap latency · one team of 40 across three studios.",
+      cta: "See the trailer",
+    },
+    phases: [
+      { when: "T-14", label: "Nomination", detail: "Editorial poster.", formats: ["portrait-1080x1350"] },
+      { when: "T-1", label: "Countdown", detail: "Story reveal.", formats: ["story-1080x1920"] },
+      { when: "T+0", label: "Result", detail: "LinkedIn link card.", formats: ["linkedin-link-1200x627"] },
+    ],
+    deliverables: [
+      { surface: "digital", label: "Nomination poster", detail: "1080×1350 portrait." },
+      { surface: "digital", label: "Countdown story", detail: "1080×1920 reveal." },
+      { surface: "digital", label: "Result card", detail: "1200×627 link card." },
+    ],
+    kpis: [
+      { label: "Trailer views", target: "820k" },
+      { label: "Press pickups", target: "18" },
+      { label: "Award-page traffic", target: "42k" },
+    ],
+  },
+  {
+    id: "trial-interactive-milestone",
+    angle: "milestone",
+    name: "Trial Interactive · platform milestone",
+    tagline: "Investor-grade milestone drop for the Trial Interactive platform.",
+    intent:
+      "Numbers-first milestone — stat square + wide callout + email header — sized for pharma sponsors and investors.",
+    subBrand: "bm-trial-interactive",
+    divisionLabel: "Trial Interactive",
+    kitProfileId: "email-set",
+    seedVariantId: "MV-CTX-STAT-GRID",
+    accent: "#A1FBF9",
+    chip: "Trial Interactive",
+    copy: {
+      title: "10,000 clinical trials · 68 countries · 1 platform.",
+      summary:
+        "Trial Interactive crosses the 10k-study milestone in 2026 — investigator-site adoption up 42% year over year.",
+      cta: "Read the milestone note",
+    },
+    phases: [
+      { when: "Day 1", label: "Milestone", detail: "Stat square + wide callout.", formats: ["square-1080", "callout-1200x628"] },
+      { when: "Day 2", label: "Sponsor email", detail: "Wide banner.", formats: ["email-header-1200x400"] },
+      { when: "Day 7", label: "Analyst recap", detail: "Link card.", formats: ["linkedin-link-1200x627"] },
+    ],
+    deliverables: [
+      { surface: "digital", label: "Stat square", detail: "1080×1080 numbers-only." },
+      { surface: "email", label: "Sponsor banner", detail: "1200×400 header." },
+      { surface: "digital", label: "Analyst link", detail: "1200×627 recap." },
+    ],
+    kpis: [
+      { label: "Sponsor briefings booked", target: "24" },
+      { label: "Investor deck downloads", target: "1.1k" },
+      { label: "Analyst notes · T+30", target: "9" },
+    ],
+  },
 ];
 
 export const SOCIAL_PLAYBOOKS_BY_ID: Record<string, SocialPlaybook> = Object.fromEntries(
