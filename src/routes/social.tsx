@@ -55,6 +55,7 @@ const ANGLE_ICON: Record<SocialAngle, React.ComponentType<{ size?: number; class
   "case-spotlight": Newspaper,
   "thought-leadership": BookOpen,
   recruitment: Users,
+  hiring: Users,
   announcement: Megaphone,
   partnership: Handshake,
 };
