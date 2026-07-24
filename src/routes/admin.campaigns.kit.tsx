@@ -60,6 +60,18 @@ const EMPTY_EVENT: EventFacts = {
 
 function KitBuilderView() {
   const search = useSearch({ from: Route.id });
+
+  // ?blank=1 used to open an in-admin wizard. That flow now lives on public
+  // /social/new and /events/new so users aren't dropped into the admin
+  // sidebar mid-flow — redirect any lingering deeplinks.
+  if (search.blank) {
+    if (typeof window !== "undefined") {
+      const target = search.profile === "event-kit" ? "/events/new" : "/social/new";
+      window.location.replace(target);
+    }
+    return null;
+  }
+
   const { favorites } = useFavorites();
   const favoriteVariants = useMemo(
     () => MODULE_VARIANTS.filter((v) => favorites.has(v.id)),
