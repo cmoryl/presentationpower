@@ -45,6 +45,19 @@ function OracleAskView() {
   useEffect(() => { inputRef.current?.focus(); }, []);
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, busy]);
 
+  // Seed from a home-page prompt handoff (sessionStorage).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const seed = window.sessionStorage.getItem("oracle:seed");
+    if (!seed) return;
+    window.sessionStorage.removeItem("oracle:seed");
+    setInput(seed);
+    // Fire-and-forget on next tick so `send` is in scope.
+    const t = window.setTimeout(() => { void send(seed); }, 30);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const send = async (text: string) => {
     const q = text.trim();
     if (!q || busy) return;
