@@ -135,10 +135,13 @@ function EventsView() {
           <Stat label="Rendered demo assets" value={String(totalAssets)} />
           <Stat label="Kit profiles" value={String(KIT_PROFILES.length)} />
         </dl>
+        </div>
       </header>
 
+      <div className="mx-auto max-w-7xl space-y-14 px-4 py-10 sm:px-6 lg:px-8">
       {/* Your saved kits (signed-in, non-empty only) */}
       <SavedKitsSection surface="event" />
+
 
       {/* Playbook grid */}
       <section id="playbooks" className="space-y-5">
