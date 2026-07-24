@@ -70,6 +70,17 @@ test.describe("Module preview video-demo autoplay matrix", () => {
 
     await page.goto("/library", { waitUntil: "domcontentloaded" });
     await page.waitForLoadState("networkidle").catch(() => undefined);
+
+    // Imagery is off by default on /library (perf: 156 modules). A real user
+    // toggles it on to see video-demo backdrops — do that here explicitly
+    // instead of flipping the product default just to make the test pass.
+    const imageryToggle = page.getByTestId("library-imagery-toggle");
+    await expect(imageryToggle).toBeVisible({ timeout: 10_000 });
+    if ((await imageryToggle.getAttribute("aria-pressed")) !== "true") {
+      await imageryToggle.click();
+      await expect(imageryToggle).toHaveAttribute("aria-pressed", "true");
+    }
+
     await scrollToLoadAll(page);
 
     // Wait for at least one <video> to appear.

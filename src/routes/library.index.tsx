@@ -226,7 +226,7 @@ function Library() {
   const [pinnedOnly, setPinnedOnly] = useState(false);
   const [sort, setSort] = useState<"default" | "most-used" | "pinned-first">("default");
 
-  const [showImagery, setShowImagery] = useState(true);
+  const [showImagery, setShowImagery] = useState(false);
   const [density, setDensity] = useState<"comfortable" | "thumb">(() => {
     if (typeof window === "undefined") return "comfortable";
     return (window.localStorage.getItem("library:density") as "comfortable" | "thumb") ?? "comfortable";
@@ -541,6 +541,7 @@ function Library() {
               type="button"
               onClick={() => setShowImagery((v) => !v)}
               aria-pressed={showImagery}
+              data-testid="library-imagery-toggle"
               title="Render each module with sample background imagery"
               className={`rounded-full border px-3 py-1.5 text-xs ${
                 showImagery
