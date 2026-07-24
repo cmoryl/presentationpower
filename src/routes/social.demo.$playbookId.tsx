@@ -3,6 +3,7 @@
 // Mirrors /events/demo/$playbookId but sources from src/lib/social-playbooks.ts
 // so every TransPerfect division has a rendered, brand-appropriate demo kit.
 
+import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMemo } from "react";
 import {
@@ -47,7 +48,7 @@ export const Route = createFileRoute("/social/demo/$playbookId")({
       ],
     };
   },
-  component: SocialDemoView,
+  component: () => (<AppShell><SocialDemoView /></AppShell>),
 });
 
 function SocialDemoView() {

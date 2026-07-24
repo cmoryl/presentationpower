@@ -4,6 +4,7 @@
 // favorites-to-kit entry point and kit-profile presets. Every playbook
 // opens /social/demo/$id for a fully-rendered live preview.
 
+import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
@@ -45,7 +46,7 @@ export const Route = createFileRoute("/social")({
     ],
     links: [{ rel: "canonical", href: "https://presentationpower.lovable.app/social" }],
   }),
-  component: SocialView,
+  component: () => (<AppShell><SocialView /></AppShell>),
 });
 
 const ANGLE_ICON: Record<SocialAngle, React.ComponentType<{ size?: number; className?: string }>> = {
