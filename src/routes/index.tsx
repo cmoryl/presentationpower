@@ -115,8 +115,8 @@ const MODES: ModeDef[] = [
     icon: Share2,
     accent: "#FF9B70",
     glow: "#EC388A",
-    eyebrow: "Campaigns · division-scoped",
-    headline: "Turn any moment into a full social kit.",
+    eyebrow: "Modular campaigns · division-scoped",
+    headline: "Turn one module into a full social kit.",
     copy: "Division-scoped playbooks — brand anthems, product teases, milestones, case spotlights — each seeded from a real module and rendered live in your palette.",
     actions: [
       { label: "Open Social hub", to: "/social", primary: true },
