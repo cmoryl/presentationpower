@@ -214,6 +214,8 @@ type DeckState = {
   setSlideLogo: (deckId: string, slideId: string, patch: { position?: SlideLogoPosition; orientation?: "auto" | "horizontal" | "stacked" | "vertical-left" | "vertical-right" | "mark-only" }) => void;
   applySlideBackground: (deckId: string, slideIds: string[], background: unknown) => void;
   setSlideMode: (deckId: string, slideId: string, mode: "light" | "dark") => void;
+  setSlideInkOverride: (deckId: string, slideId: string, path: string, color: string | null) => void;
+  clearSlideInkOverrides: (deckId: string, slideId: string) => void;
 
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
   moveSlide: (deckId: string, slideId: string, direction: -1 | 1) => void;
