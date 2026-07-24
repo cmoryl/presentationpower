@@ -57,7 +57,7 @@ import { schemaFor } from "@/lib/print-content-schema";
 import { CONTENT_SCHEMAS, unreachablePaths } from "@/lib/print-content-schema";
 
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
-import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2, Sun, Moon } from "lucide-react";
+import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2, Sun, Moon, ChevronDown, ChevronRight, Eye, EyeOff } from "lucide-react";
 
 export const Route = createFileRoute("/asset/$assetId")({
   head: ({ params }) => ({
