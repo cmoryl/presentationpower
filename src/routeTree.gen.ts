@@ -29,6 +29,7 @@ import { Route as DecksIndexRouteImport } from './routes/decks.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as TestPrintHeroRouteImport } from './routes/test.print-hero'
 import { Route as TestPrintDndRouteImport } from './routes/test.print-dnd'
+import { Route as SocialNewRouteImport } from './routes/social.new'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as LibraryPrintRouteImport } from './routes/library.print'
 import { Route as LibraryMyRouteImport } from './routes/library.my'
@@ -37,6 +38,7 @@ import { Route as KnowledgeOracleRouteImport } from './routes/knowledge.oracle'
 import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
 import { Route as KnowledgeAskRouteImport } from './routes/knowledge.ask'
 import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
+import { Route as EventsNewRouteImport } from './routes/events.new'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
 import { Route as AssetSpotlightPreviewRouteImport } from './routes/asset.spotlight-preview'
@@ -176,6 +178,11 @@ const TestPrintDndRoute = TestPrintDndRouteImport.update({
   path: '/test/print-dnd',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SocialNewRoute = SocialNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => SocialRoute,
+} as any)
 const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
   path: '/share/$token',
@@ -215,6 +222,11 @@ const KnowledgeEntryIdRoute = KnowledgeEntryIdRouteImport.update({
   id: '/$entryId',
   path: '/$entryId',
   getParentRoute: () => KnowledgeRoute,
+} as any)
+const EventsNewRoute = EventsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => EventsRoute,
 } as any)
 const DecksImportRoute = DecksImportRouteImport.update({
   id: '/decks/import',
@@ -451,6 +463,7 @@ export interface FileRoutesByFullPath {
   '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
+  '/events/new': typeof EventsNewRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/new': typeof KnowledgeNewRoute
@@ -459,6 +472,7 @@ export interface FileRoutesByFullPath {
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
   '/share/$token': typeof ShareTokenRoute
+  '/social/new': typeof SocialNewRoute
   '/test/print-dnd': typeof TestPrintDndRoute
   '/test/print-hero': typeof TestPrintHeroRoute
   '/admin/': typeof AdminIndexRoute
@@ -517,6 +531,7 @@ export interface FileRoutesByTo {
   '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
+  '/events/new': typeof EventsNewRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/new': typeof KnowledgeNewRoute
@@ -525,6 +540,7 @@ export interface FileRoutesByTo {
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
   '/share/$token': typeof ShareTokenRoute
+  '/social/new': typeof SocialNewRoute
   '/test/print-dnd': typeof TestPrintDndRoute
   '/test/print-hero': typeof TestPrintHeroRoute
   '/admin': typeof AdminIndexRoute
@@ -586,6 +602,7 @@ export interface FileRoutesById {
   '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
+  '/events/new': typeof EventsNewRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/new': typeof KnowledgeNewRoute
@@ -594,6 +611,7 @@ export interface FileRoutesById {
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
   '/share/$token': typeof ShareTokenRoute
+  '/social/new': typeof SocialNewRoute
   '/test/print-dnd': typeof TestPrintDndRoute
   '/test/print-hero': typeof TestPrintHeroRoute
   '/admin/': typeof AdminIndexRoute
@@ -656,6 +674,7 @@ export interface FileRouteTypes {
     | '/asset/spotlight-preview'
     | '/brief/new'
     | '/decks/import'
+    | '/events/new'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
     | '/knowledge/new'
@@ -664,6 +683,7 @@ export interface FileRouteTypes {
     | '/library/my'
     | '/library/print'
     | '/share/$token'
+    | '/social/new'
     | '/test/print-dnd'
     | '/test/print-hero'
     | '/admin/'
@@ -722,6 +742,7 @@ export interface FileRouteTypes {
     | '/asset/spotlight-preview'
     | '/brief/new'
     | '/decks/import'
+    | '/events/new'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
     | '/knowledge/new'
@@ -730,6 +751,7 @@ export interface FileRouteTypes {
     | '/library/my'
     | '/library/print'
     | '/share/$token'
+    | '/social/new'
     | '/test/print-dnd'
     | '/test/print-hero'
     | '/admin'
@@ -790,6 +812,7 @@ export interface FileRouteTypes {
     | '/asset/spotlight-preview'
     | '/brief/new'
     | '/decks/import'
+    | '/events/new'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
     | '/knowledge/new'
@@ -798,6 +821,7 @@ export interface FileRouteTypes {
     | '/library/my'
     | '/library/print'
     | '/share/$token'
+    | '/social/new'
     | '/test/print-dnd'
     | '/test/print-hero'
     | '/admin/'
@@ -998,6 +1022,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TestPrintDndRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/social/new': {
+      id: '/social/new'
+      path: '/new'
+      fullPath: '/social/new'
+      preLoaderRoute: typeof SocialNewRouteImport
+      parentRoute: typeof SocialRoute
+    }
     '/share/$token': {
       id: '/share/$token'
       path: '/share/$token'
@@ -1053,6 +1084,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/knowledge/$entryId'
       preLoaderRoute: typeof KnowledgeEntryIdRouteImport
       parentRoute: typeof KnowledgeRoute
+    }
+    '/events/new': {
+      id: '/events/new'
+      path: '/new'
+      fullPath: '/events/new'
+      preLoaderRoute: typeof EventsNewRouteImport
+      parentRoute: typeof EventsRoute
     }
     '/decks/import': {
       id: '/decks/import'
@@ -1386,10 +1424,12 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface EventsRouteChildren {
+  EventsNewRoute: typeof EventsNewRoute
   EventsDemoPlaybookIdRoute: typeof EventsDemoPlaybookIdRoute
 }
 
 const EventsRouteChildren: EventsRouteChildren = {
+  EventsNewRoute: EventsNewRoute,
   EventsDemoPlaybookIdRoute: EventsDemoPlaybookIdRoute,
 }
 
@@ -1421,10 +1461,12 @@ const KnowledgeRouteWithChildren = KnowledgeRoute._addFileChildren(
 )
 
 interface SocialRouteChildren {
+  SocialNewRoute: typeof SocialNewRoute
   SocialDemoPlaybookIdRoute: typeof SocialDemoPlaybookIdRoute
 }
 
 const SocialRouteChildren: SocialRouteChildren = {
+  SocialNewRoute: SocialNewRoute,
   SocialDemoPlaybookIdRoute: SocialDemoPlaybookIdRoute,
 }
 
