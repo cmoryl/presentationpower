@@ -919,9 +919,14 @@ const VariantCard = memo(function VariantCard({
   };
   const isDark = mode === "dark";
   const isAB = mode === "ab";
+  // Dark-mode backdrops are always shown — the curated Corporate / TP Media /
+  // TP Gaming PNG sets (and aurora fallback) are integral to the dark look, so
+  // the "Sample imagery" toggle only gates LIGHT-mode photo washes.
   const lightBackdrop = showImagery ? backdropForVariant(variant, brand.id, "light") : null;
-  const darkBackdrop = showImagery ? backdropForVariant(variant, brand.id, "dark") : null;
-  const singleBackdrop = showImagery ? backdropForVariant(variant, brand.id, isDark ? "dark" : "light") : null;
+  const darkBackdrop = backdropForVariant(variant, brand.id, "dark");
+  const singleBackdrop = isDark
+    ? backdropForVariant(variant, brand.id, "dark")
+    : (showImagery ? backdropForVariant(variant, brand.id, "light") : null);
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
   const singleRef = useRef<HTMLDivElement | null>(null);
@@ -2103,7 +2108,7 @@ function ModalABPreview({
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
   const lightBackdrop = showImagery ? backdropForVariant(variant, brand.id, "light") : null;
-  const darkBackdrop = showImagery ? backdropForVariant(variant, brand.id, "dark") : null;
+  const darkBackdrop = backdropForVariant(variant, brand.id, "dark");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
