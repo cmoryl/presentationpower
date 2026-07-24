@@ -2,13 +2,17 @@
 //
 // Same wizard as /social/new but pre-seeds the event kit profile and defaults
 // the "attach event facts" toggle on. Renders outside admin so the flow
-// remains in the main app shell.
+// remains in the main app shell. Accepts ?kit=<uuid> to reopen a saved kit.
 
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
 import { AppShell } from "@/components/AppShell";
 import { KitWizard } from "@/components/campaigns/KitWizard";
 
+const SearchSchema = z.object({ kit: z.string().uuid().optional() });
+
 export const Route = createFileRoute("/events/new")({
+  validateSearch: (raw) => SearchSchema.parse(raw ?? {}),
   head: () => ({
     meta: [
       { title: "New event kit · TransPerfect Modular" },
@@ -30,6 +34,7 @@ export const Route = createFileRoute("/events/new")({
 });
 
 function EventsNewPage() {
+  const { kit } = Route.useSearch();
   return (
     <AppShell>
       <KitWizard
@@ -38,6 +43,7 @@ function EventsNewPage() {
         backHref="/events"
         backLabel="Back to events"
         finishHref="/events"
+        kitId={kit}
       />
     </AppShell>
   );
