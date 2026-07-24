@@ -6608,13 +6608,16 @@ function MediaTile({
     if (typeof document === "undefined") return;
     const check = () => {
       const cls = document.body.classList;
-      setAutoplay(forceAutoplay || (!isThumbnail && (cls.contains("present-mode") || cls.contains("share-mode"))));
+      const next = forceAutoplay || (!isThumbnail && (cls.contains("present-mode") || cls.contains("share-mode")));
+      // eslint-disable-next-line no-console
+      console.log("[MediaTile.autoplay]", { forceAutoplay, isThumbnail, next, seed });
+      setAutoplay(next);
     };
     check();
     const obs = new MutationObserver(check);
     obs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
     return () => obs.disconnect();
-  }, [isThumbnail, forceAutoplay]);
+  }, [isThumbnail, forceAutoplay, seed]);
 
   // Per-slide playback settings (defaults preserve current behavior).
   const wantAutoplay = videoAutoplay !== false;
@@ -6688,10 +6691,12 @@ function MediaTile({
     pauseAllVideosExcept(v);
     const p = v.play();
     if (p && typeof (p as Promise<void>).catch === "function") {
-      (p as Promise<void>).catch(() => {
+      (p as Promise<void>).catch((err) => {
+        // eslint-disable-next-line no-console
+        console.log("[MediaTile.play.err]", seed, String(err));
         if (!wantMuted) {
           v.muted = true;
-          v.play().catch(() => setAutoplayBlocked(true));
+          v.play().catch((err2) => { console.log("[MediaTile.play.err2]", seed, String(err2)); setAutoplayBlocked(true); });
         } else {
           setAutoplayBlocked(true);
         }
@@ -6708,6 +6713,10 @@ function MediaTile({
       ? resolvedOverrideUrl
       : tileBackdrops[h % tileBackdrops.length];
   const hasVideo = Boolean(resolvedVideoUrl && resolvedVideoUrl.length > 0);
+  if (typeof window !== "undefined" && (hasVideo || autoplay)) {
+    // eslint-disable-next-line no-console
+    console.log("[MediaTile.render]", { seed, hasVideo, autoplay, shouldPlay, resolvedVideoUrl });
+  }
   const accent = brand.tokens.accent;
   const primary = brand.tokens.primary;
   // Rotate scrim direction deterministically so a wall of image tiles never
