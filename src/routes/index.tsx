@@ -467,6 +467,9 @@ function ParallaxWatermark({ accent }: { accent: string }) {
   );
 }
 
+function AuroraHero({ mode }: { mode: ModeDef }) {
+
+
 
   // Scroll-driven parallax: blobs and vignette drift at different rates as the
   // hero scrolls out of view. rAF-throttled to stay smooth and cheap.
