@@ -503,7 +503,7 @@ function FunnelBar({ funnel }: { funnel: { briefs: number; decksCreated: number;
   );
 }
 
-function Panel({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
+function Panel({ title, subtitle, children }: { title: string; subtitle?: string; children: import("react").ReactNode }) {
   return (
     <div className="rounded-2xl border border-black/10 bg-white/70 p-4 backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">
       <div className="mb-3">
