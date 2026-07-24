@@ -1762,7 +1762,7 @@ function StatsInlineEditor({
       <ArrayEditor
         items={section.items}
         onChange={(items) => onPatch({ items })}
-        add={() => ({ label: "", value: "" })}
+        add={() => ({ label: "", value: "", unit: "" }) as PrintStatsSection["items"][number]}
         row={(it, idx) => (
           <div className="grid grid-cols-[1fr_60px_50px] gap-1">
             <input className={inspectorInput} placeholder="Label" value={it.label} onChange={(e) => patchItem(idx, { label: e.target.value })} />
@@ -1813,7 +1813,7 @@ function LogoGridInlineEditor({
       <ArrayEditor
         items={section.items}
         onChange={(items) => onPatch({ items })}
-        add={() => ({ name: "Client" })}
+        add={() => ({ name: "Client", url: "", path: "" })}
         row={(it, idx) => (
           <div className="grid grid-cols-[1fr_1fr] gap-1">
             <input className={inspectorInput} placeholder="Name" value={it.name} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, name: e.target.value } : x) })} />
@@ -1845,7 +1845,7 @@ function ExpertiseInlineEditor({
       <ArrayEditor
         items={section.items}
         onChange={(items) => onPatch({ items })}
-        add={() => ({ label: "" })}
+        add={() => ({ label: "", icon: "" })}
         row={(it, idx) => (
           <div className="grid grid-cols-[1fr_90px] gap-1">
             <input className={inspectorInput} placeholder="Label" value={it.label} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, label: e.target.value } : x) })} />
@@ -1873,7 +1873,7 @@ function FeatureListInlineEditor({
       <ArrayEditor
         items={section.items}
         onChange={(items) => onPatch({ items })}
-        add={() => ({ verb: "", body: "" })}
+        add={() => ({ verb: "", body: "", icon: "" })}
         row={(it, idx) => (
           <div className="space-y-1">
             <div className="grid grid-cols-[1fr_90px] gap-1">
