@@ -2108,7 +2108,7 @@ function ModalABPreview({
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
   const lightBackdrop = showImagery ? backdropForVariant(variant, brand.id, "light") : null;
-  const darkBackdrop = showImagery ? backdropForVariant(variant, brand.id, "dark") : null;
+  const darkBackdrop = backdropForVariant(variant, brand.id, "dark");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
