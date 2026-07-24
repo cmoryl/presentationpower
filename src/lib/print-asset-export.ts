@@ -18,6 +18,13 @@ import {
   type SlideExportMode,
 } from "./slide-image-export";
 import { fetchIccProfile, wrapPdfAsX4, type IccProfileKey } from "./pdf-x4";
+import {
+  captureVectorText,
+  enableHideTextForCapture,
+  overlayVectorText,
+  type VectorTextCapture,
+} from "./print-vector-text";
+
 
 export type PrintPageSizeKey = "A4" | "Letter" | "Square" | "Custom";
 export type PrintExportQuality = "300dpi" | "600dpi";
