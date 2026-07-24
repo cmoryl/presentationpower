@@ -54,6 +54,7 @@ import { Route as AdminImageryRouteImport } from './routes/admin.imagery'
 import { Route as AdminIconStudioRouteImport } from './routes/admin.icon-studio'
 import { Route as AdminGloballinkShareRouteImport } from './routes/admin.globallink-share'
 import { Route as AdminGloballinkRouteImport } from './routes/admin.globallink'
+import { Route as AdminCampaignsRouteImport } from './routes/admin.campaigns'
 import { Route as AdminBrandAssetsRouteImport } from './routes/admin.brand-assets'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminApprovalsRouteImport } from './routes/admin.approvals'
@@ -295,6 +296,11 @@ const AdminGloballinkRoute = AdminGloballinkRouteImport.update({
   path: '/globallink',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCampaignsRoute = AdminCampaignsRouteImport.update({
+  id: '/campaigns',
+  path: '/campaigns',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminBrandAssetsRoute = AdminBrandAssetsRouteImport.update({
   id: '/brand-assets',
   path: '/brand-assets',
@@ -393,6 +399,7 @@ export interface FileRoutesByFullPath {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
+  '/admin/campaigns': typeof AdminCampaignsRoute
   '/admin/globallink': typeof AdminGloballinkRoute
   '/admin/globallink-share': typeof AdminGloballinkShareRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
@@ -453,6 +460,7 @@ export interface FileRoutesByTo {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
+  '/admin/campaigns': typeof AdminCampaignsRoute
   '/admin/globallink': typeof AdminGloballinkRoute
   '/admin/globallink-share': typeof AdminGloballinkShareRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
@@ -516,6 +524,7 @@ export interface FileRoutesById {
   '/admin/approvals': typeof AdminApprovalsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
+  '/admin/campaigns': typeof AdminCampaignsRoute
   '/admin/globallink': typeof AdminGloballinkRoute
   '/admin/globallink-share': typeof AdminGloballinkShareRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
@@ -580,6 +589,7 @@ export interface FileRouteTypes {
     | '/admin/approvals'
     | '/admin/audit'
     | '/admin/brand-assets'
+    | '/admin/campaigns'
     | '/admin/globallink'
     | '/admin/globallink-share'
     | '/admin/icon-studio'
@@ -640,6 +650,7 @@ export interface FileRouteTypes {
     | '/admin/approvals'
     | '/admin/audit'
     | '/admin/brand-assets'
+    | '/admin/campaigns'
     | '/admin/globallink'
     | '/admin/globallink-share'
     | '/admin/icon-studio'
@@ -702,6 +713,7 @@ export interface FileRouteTypes {
     | '/admin/approvals'
     | '/admin/audit'
     | '/admin/brand-assets'
+    | '/admin/campaigns'
     | '/admin/globallink'
     | '/admin/globallink-share'
     | '/admin/icon-studio'
@@ -1099,6 +1111,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGloballinkRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/campaigns': {
+      id: '/admin/campaigns'
+      path: '/campaigns'
+      fullPath: '/admin/campaigns'
+      preLoaderRoute: typeof AdminCampaignsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/brand-assets': {
       id: '/admin/brand-assets'
       path: '/brand-assets'
@@ -1214,6 +1233,7 @@ interface AdminRouteChildren {
   AdminApprovalsRoute: typeof AdminApprovalsRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBrandAssetsRoute: typeof AdminBrandAssetsRoute
+  AdminCampaignsRoute: typeof AdminCampaignsRoute
   AdminGloballinkRoute: typeof AdminGloballinkRoute
   AdminGloballinkShareRoute: typeof AdminGloballinkShareRoute
   AdminIconStudioRoute: typeof AdminIconStudioRoute
@@ -1237,6 +1257,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminApprovalsRoute: AdminApprovalsRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminBrandAssetsRoute: AdminBrandAssetsRoute,
+  AdminCampaignsRoute: AdminCampaignsRoute,
   AdminGloballinkRoute: AdminGloballinkRoute,
   AdminGloballinkShareRoute: AdminGloballinkShareRoute,
   AdminIconStudioRoute: AdminIconStudioRoute,
