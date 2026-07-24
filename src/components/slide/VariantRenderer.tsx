@@ -5580,46 +5580,75 @@ function renderLocationsVariant(
   const totalCities = pins.length;
   const totalRegions = (Object.keys(counts) as LocPin["region"][]).filter((k) => counts[k] > 0).length;
 
-  const RegionStrip = () => (
-    <div className="mt-6 grid grid-cols-5 gap-3">
-      {(Object.keys(LOC_REGION_LABELS) as LocPin["region"][]).map((k) => {
-        const n = counts[k] ?? 0;
-        const active = n > 0;
-        return (
-          <div
-            key={k}
-            className="rounded-2xl px-4 py-3 backdrop-blur-md"
-            style={{
-              background: isDark ? "rgba(255,255,255,0.04)" : "rgba(3,0,44,0.03)",
-              border: `1px solid ${active ? accent + "55" : ink.hairline}`,
-              opacity: active ? 1 : 0.5,
-            }}
-          >
-            <div style={{ color: accent, fontSize: 11, letterSpacing: "0.24em", fontWeight: 600, textTransform: "uppercase" }}>{k}</div>
-            <div className="mt-1 flex items-baseline gap-2">
-              <div style={{ color: ink.strong, fontSize: 34, fontWeight: 600, letterSpacing: "-0.02em" }}>{n}</div>
-              <div style={{ color: ink.muted, fontSize: 13 }}>{LOC_REGION_LABELS[k]}</div>
+  // Free-form region rail — a bare hairline row of region ticks, no cards,
+  // no plate, no per-cell borders. Matches the KPI/chart Aurora v2 grammar.
+  const RegionRail = () => {
+    const keys = (Object.keys(LOC_REGION_LABELS) as LocPin["region"][]);
+    const activeKeys = keys.filter((k) => (counts[k] ?? 0) > 0);
+    return (
+      <div className="mt-10 flex items-stretch" style={{ borderTop: `1px solid ${ink.hairline}` }}>
+        {keys.map((k) => {
+          const n = counts[k] ?? 0;
+          const active = n > 0;
+          return (
+            <div
+              key={k}
+              className="flex-1 pr-6 pt-5"
+              style={{ opacity: active ? 1 : 0.35 }}
+            >
+              <div style={{ color: active ? "var(--slide-accent-text)" : ink.muted, fontSize: 11, letterSpacing: "0.28em", fontWeight: 700, textTransform: "uppercase" }}>{k}</div>
+              <div className="mt-2 flex items-baseline gap-2">
+                <div className="tabular-nums" style={{ color: ink.strong, fontSize: 44, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 0.95 }}>{n}</div>
+                <div style={{ color: ink.muted, fontSize: 13, letterSpacing: "-0.005em" }}>{LOC_REGION_LABELS[k]}</div>
+              </div>
             </div>
+          );
+        })}
+        {activeKeys.length === 0 && (
+          <div className="pt-5" style={{ color: ink.muted, fontSize: 13 }}>No regional coverage yet.</div>
+        )}
+      </div>
+    );
+  };
+
+  // Shared header — free-form Aurora v2. Left rail: kicker + 60px title +
+  // muted headline. Right rail: hero stat (total cities) + delta-style meta.
+  const Header = ({ compact = false }: { compact?: boolean } = {}) => (
+    <div className="flex items-start justify-between gap-16">
+      <div style={{ maxWidth: 900 }}>
+        <Kicker brand={brand as never}>{s(c.kicker) || `${totalRegions} regions · global footprint`}</Kicker>
+        <div
+          className="mt-4"
+          style={{ fontSize: compact ? 52 : 60, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02, maxWidth: 900 }}
+        >
+          {title}
+        </div>
+        {subtitle && (
+          <div
+            className="mt-5"
+            style={{ fontSize: 22, color: ink.muted, letterSpacing: "-0.005em", lineHeight: 1.45, maxWidth: 780 }}
+          >
+            {subtitle}
           </div>
-        );
-      })}
+        )}
+      </div>
+      <div className="flex flex-col items-end text-right" style={{ minWidth: 220 }}>
+        <div className="flex items-baseline gap-2">
+          <span className="tabular-nums font-semibold" style={{ fontSize: 104, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}>
+            {totalCities}
+          </span>
+        </div>
+        <div className="mt-3 uppercase" style={{ fontSize: 13, letterSpacing: "0.3em", color: ink.muted, fontWeight: 600 }}>
+          Cities live
+        </div>
+        <div className="mt-2 uppercase tabular-nums" style={{ fontSize: 14, letterSpacing: "0.24em", color: "var(--slide-accent-text)", fontWeight: 700 }}>
+          ● {totalRegions} regions
+        </div>
+      </div>
     </div>
   );
 
-  // Shared header block
-  const Header = () => (
-    <div>
-      <Kicker brand={brand as never}>{`${totalCities} cities · ${totalRegions} regions`}</Kicker>
-      <div className="mt-3" style={{ color: ink.strong, fontSize: 60, fontWeight: 600, lineHeight: 1.05, letterSpacing: "-0.03em", maxWidth: 1400 }}>
-        {title}
-      </div>
-      {subtitle && (
-        <div className="mt-4" style={{ color: ink.muted, fontSize: 22, lineHeight: 1.35, maxWidth: 1200 }}>
-          {subtitle}
-        </div>
-      )}
-    </div>
-  );
+
 
   if (variantId === "MV-LOC-WORLD-PINS") {
     return (
