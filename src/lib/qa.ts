@@ -19,6 +19,15 @@ export function runQa(slides: DeckSlide[], brandModeId?: string): QaIssue[] {
   const profile = brandModeId ? BRAND_PROFILES[brandModeId] : undefined;
   const restricted = new Set(profile?.contentScope.restrictedFamilyIds ?? []);
   const preferred = new Set(profile?.contentScope.preferredVariantIds ?? []);
+  // Which families are actually opinionated for this brand? Only warn about
+  // "non-preferred variant" when the current slide's family has at least one
+  // preferred alternative — otherwise every cover/context/section variant
+  // trips the gate for brands that only curate a few content families.
+  const preferredFamilies = new Set(
+    [...preferred]
+      .map((vid) => byId(MODULE_VARIANTS, vid)?.familyId)
+      .filter((f): f is string => typeof f === "string"),
+  );
   const hasScope = !!profile;
 
   for (const slide of slides) {
