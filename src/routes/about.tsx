@@ -43,113 +43,98 @@ type Pillar = {
 const CHANGELOG: Array<{ date: string; title: string; body: string }> = [
   {
     date: "2026-07",
-    title: "GlobalLink admin + translation engine",
-    body: "New /admin/globallink dashboard for API base URL, key, project code and callback secret. Powers the AI/GlobalLink translation overlay engine used by TranslateDrawer, LanguageSwitcher and localized PPTX/PDF exports.",
+    title: "Build-wide breadcrumbs",
+    body: "A shared breadcrumb trail resolves dynamic segments — deck titles, playbook names, admin sections — with friendly labels and fallback shortened IDs across every route.",
   },
   {
     date: "2026-07",
-    title: "Multi-language decks & slide overlays",
-    body: "Non-destructive translation overlays per slide with per-slide language status badges, job history, retries, and localized exports.",
+    title: "Master brief flow (Presentation + Print + Event + Social)",
+    body: "One brief can fan out into a deck, print assets (case study, spotlight, ebrochure, adaptor brief), an event kit, and a social kit — with a single production summary linking every artifact.",
   },
   {
     date: "2026-07",
-    title: "Division-specific imagery library",
-    body: "New division-imagery bucket managed from /admin/knowledge → Imagery, surfaced as a searchable Team library inside SlideImageryPanel and BackgroundImageryPanel.",
+    title: "Modular Command Center home",
+    body: "Signed-in home rebuilt as an interactive mode hero, Oracle prompt bar, AI suite catalog, and a large MODULAR watermark threaded through the surfaces.",
   },
   {
     date: "2026-07",
-    title: "Per-division PPTX import + RAG",
-    body: "Upload .pptx per division into imported_decks, view outlines, and chunk/embed them into the same gemini-embedding-001 (3072-dim) index the PDF extractions use.",
+    title: "Event & Social surfaces",
+    body: "New /events with 8+ industry-standard event playbooks and full kit previews; new /social with 9 division-scoped playbooks filtered by launch / thought leadership / campaign / event angles.",
+  },
+  {
+    date: "2026-07",
+    title: "Admin sidebar + Master Analytics + Master Knowledge",
+    body: "Left-sidebar admin shell with persisted state, a Master Analytics command center over the usage_events pipeline (per-module, per-division, power users, hot modules), and a consolidated Master Knowledge hub.",
+  },
+  {
+    date: "2026-07",
+    title: "Print Studio + vector text export",
+    body: "Long-form print (case study, spotlight, ebrochure, adaptor brief) with dnd-kit drag-and-drop, Content inspector for every schema field, drag-to-resize hero (20–80%), and vector text overlay via pdf-lib + Geist TTF embedding. Self-contained HTML export included.",
+  },
+  {
+    date: "2026-07",
+    title: "Locations family with map + pin editor",
+    body: "Region Focus, Hub & Spoke, and World Stats slides share the KPI/chart data model. Pin editor panel for placement and regional metrics; HD/4K PNG export via html-to-image.",
+  },
+  {
+    date: "2026-07",
+    title: "Live preview editing + per-slide light/dark + ink override",
+    body: "Click any text on the slide preview to edit in place. Floating palette flips a single slide to light/dark, or overrides ink color — all persisted per slide.",
+  },
+  {
+    date: "2026-07",
+    title: "Free-form Aurora v2 across data & chart modules",
+    body: "KPI Dashboard rebuilt as a bento infographic mosaic. Chart batches (line/column, gauge, donut trio, breakdown, report cards, locations) share edge-bleed feathered blooms with liquid-glass surfaces.",
+  },
+  {
+    date: "2026-07",
+    title: "Unified Media panel (image · video · background)",
+    body: "One tabbed panel per slide replaces three redundant editors. Video autoplays in previews with a visible Play overlay and isolated playback state.",
+  },
+  {
+    date: "2026-07",
+    title: "Multi-select → new deck + favorites → social kit",
+    body: "Select multiple library modules to compose a deck by hand. Favorite modules and package them into named bundles (Social essentials, Event kit) via Admin → Campaigns → Kit builder.",
+  },
+  {
+    date: "2026-07",
+    title: "PPTX import: faithful layout capture + 100 MB limit",
+    body: "Imports resolve master/layout inheritance and z-order, extract images, and capture faithful layout. Upload cap raised to 100 MB.",
+  },
+  {
+    date: "2026-07",
+    title: "Deck engagement & analytics via usage_events",
+    body: "Every share-link view, deck open, module usage and slide interaction writes to usage_events. Master Analytics filters by division, module family, and user.",
+  },
+  {
+    date: "2026-07",
+    title: "AI Roadmap Phases B–F complete",
+    body: "Narrative Strategist (deck architecture), Deep RAG synthesis (hybrid retrieval), Conversational deck Copilot, Semantic icon + logo suggestions, and Oracle knowledge chat — all routed via the Lovable AI gateway.",
+  },
+  {
+    date: "2026-07",
+    title: "BrandHub fully migrated in-project",
+    body: "~405 logos, 111k+ icons, brand intel and source documents migrated locally. No runtime dependency on BrandHub.",
+  },
+  {
+    date: "2026-07",
+    title: "GlobalLink translation engine + multi-language decks",
+    body: "Non-destructive per-slide translation overlays, live language switcher, retryable job history, localized PPTX/PDF exports, and admin at /admin/globallink.",
+  },
+  {
+    date: "2026-07",
+    title: "Deck duplication, templates, presenter view, rebrand",
+    body: "Duplicate any deck, flag as team template, browse /templates, run Presenter view, and Rebrand a deck to any brand mode with a live preview and auto-snapshot rollback.",
+  },
+  {
+    date: "2026-07",
+    title: "Shareable links + review workflow",
+    body: "View-only /share/$token viewer with expiry, revocation and token regeneration. deck_comments + ReviewStatusControl for Draft → In review → Approved.",
   },
   {
     date: "2026-07",
     title: "Batch PDF ingestion + embeddings",
-    body: "170 pdf_extractions processed with Gemini, 1,035 chunks embedded across all 10 divisions. Sources surface per-division in /admin/knowledge.",
-  },
-  {
-    date: "2026-07",
-    title: "Deck collaboration & review workflow",
-    body: "deck_comments table with CommentsPanel and ReviewStatusControl. Version snapshots and autosave validated at the RLS layer.",
-  },
-  {
-    date: "2026-07",
-    title: "Shareable deck links + analytics",
-    body: "View-only /share/$token viewer with expiry, revocation and token regeneration. /analytics dashboard tracks views per link.",
-  },
-  {
-    date: "2026-07",
-    title: "Deck duplication, templates & presenter view",
-    body: "Duplicate any deck, flag as team template, browse /templates gallery, and run Presenter view with speaker notes.",
-  },
-  {
-    date: "2026-07",
-    title: "Deck-level rebranding with live preview",
-    body: "Rebrand action re-tones the entire deck to any brand mode with auto-snapshot for safe rollback.",
-  },
-  {
-    date: "2026-07",
-    title: "Editor ergonomics bundle",
-    body: "Session Undo/Redo, SwapLayoutPicker, debounced autosave, slide reorder/duplicate, and modal-wide focus trapping via use-modal-a11y.",
-  },
-  {
-    date: "2026-07",
-    title: "Backgrounds & imagery system",
-    body: "Per-slide solids, gradients, patterns and image positioning. Expanded uploads to GIF, AVIF and SVG with vector-preserving passthrough.",
-  },
-  {
-    date: "2026-07",
-    title: "Export preflight + custom image fidelity",
-    body: "ExportPreflightModal scans CORS and asset risks before PPTX/PDF/Present. pptx-export renders custom mediaUrls with SVG rasterization on the fly.",
-  },
-  {
-    date: "2026-07",
-    title: "Conversational deck Copilot",
-    body: "Glass drawer in the deck editor executes natural-language instructions via Claude tool-use — add, edit, reorder, swap variants, rewrite copy.",
-  },
-  {
-    date: "2026-07",
-    title: "Narrative Strategist + Deep RAG synthesis",
-    body: "Brief flow gets a deck-architecture pass, and Claude reasons over full documents with hybrid retrieval across the embedded corpus.",
-  },
-  {
-    date: "2026-07",
-    title: "Semantic icon + logo suggestions & Oracle chat",
-    body: "Embedding-driven asset picks, plus a conversational Oracle knowledge chat.",
-  },
-  {
-    date: "2026-07",
-    title: "Brand Reviewer agent",
-    body: "Claude scores decks against the owned brand guides. All ~405 logos and 111k icons migrated locally — no BrandHub runtime dependency.",
-  },
-  {
-    date: "2026-07",
-    title: "LogoHub + client co-branding",
-    body: "client_logos storage with a logo picker inside the deck editor and SlideChrome. Managed at /admin/logohub.",
-  },
-  {
-    date: "2026-07",
-    title: "High-end variant design pass",
-    body: "28 new editorial layouts including Bento and Dashboard families with native PPTX chart mappings and cinematic hero scrims.",
-  },
-  {
-    date: "2026-07",
-    title: "Library search, filtering & A/B audit",
-    body: "Multi-select filters, virtualization, and WCAG 2.1 audit with automated Playwright visual regression across light/dark A/B variants.",
-  },
-  {
-    date: "2026-07",
-    title: "Home & Admin Command Centers",
-    body: "Signed-in home and /admin upgraded with KPI sparklines, recent activity and quick actions.",
-  },
-  {
-    date: "2026-07",
-    title: "Icon Studio + curated Lucide picker",
-    body: "/admin/icon-studio for iconography tokens; per-item icon picker in the deck editor overrides label-based auto-match.",
-  },
-  {
-    date: "2026-07",
-    title: "10 divisions, fully owned",
-    body: "Scope corrected to 10 canonical divisions with locally-hosted logos, brand intel and embedded source docs.",
+    body: "Division PDFs processed with Gemini, chunks embedded with gemini-embedding-001 (3072-dim) across all 10 divisions. Sources surface per-division in /admin/knowledge.",
   },
 ];
 
