@@ -26,6 +26,7 @@ import { KIT_PROFILES } from "@/lib/social-formats";
 import { useFavorites } from "@/lib/favorites";
 import { MODULE_VARIANTS } from "@/lib/taxonomy";
 import { SOCIAL_PLAYBOOKS, SOCIAL_ANGLES, type SocialAngle, type SocialPlaybook } from "@/lib/social-playbooks";
+import { SavedKitsSection } from "@/components/campaigns/SavedKitsSection";
 
 export const Route = createFileRoute("/social")({
   head: () => ({
