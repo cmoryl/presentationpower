@@ -337,6 +337,16 @@ function DeckEditor() {
                 </button>
               </div>
             )}
+            {active && active.inkOverrides && Object.keys(active.inkOverrides).length > 0 && (
+              <button
+                type="button"
+                onClick={() => clearSlideInkOverrides(deck.id, active.id)}
+                className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-[10px] font-medium uppercase tracking-widest text-black/70 transition hover:border-red-500 hover:text-red-600"
+                title={`Clear ${Object.keys(active.inkOverrides).length} text color override(s) on this slide`}
+              >
+                ⟲ Reset colors ({Object.keys(active.inkOverrides).length})
+              </button>
+            )}
             <button
               type="button"
               onClick={() => { setCanvasMode(false); setLiveEdit((v) => !v); }}
