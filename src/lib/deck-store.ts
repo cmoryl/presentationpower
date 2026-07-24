@@ -143,6 +143,12 @@ export type DeckContext = {
   logoOrientation?: "horizontal" | "stacked";
   lastExportedAt?: string;
   lastExportKind?: "pptx" | "pdf" | "present";
+  masterSet?: {
+    eventPlaybookId?: string | null;
+    socialPlaybookId?: string | null;
+    printAssetIds?: string[];
+    brandDivisionId?: string | null;
+  };
 };
 
 
