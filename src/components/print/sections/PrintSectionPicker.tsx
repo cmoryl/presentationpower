@@ -5,51 +5,159 @@
 import { useState } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import type {
+  PrintExpertiseVariant,
+  PrintFeatureVariant,
+  PrintLogoGridVariant,
+  PrintQuoteVariant,
   PrintSection,
   PrintStatsVariant,
 } from "@/lib/print-assets.types";
-import { PRINT_STATS_VARIANTS, PrintSectionRenderer } from "./PrintSectionRenderer";
+import {
+  PRINT_EXPERTISE_VARIANTS,
+  PRINT_FEATURE_VARIANTS,
+  PRINT_LOGO_VARIANTS,
+  PRINT_QUOTE_VARIANTS,
+  PRINT_STATS_VARIANTS,
+  PrintSectionRenderer,
+} from "./PrintSectionRenderer";
 import { X, GripVertical } from "lucide-react";
 
 export const PRINT_SECTION_DND_MIME = "application/x-print-section";
 
+const rid = () => `sec-${Math.random().toString(36).slice(2, 10)}`;
+
+// ---- factories -------------------------------------------------------------
+
 export function makePrintStatsSection(variantId: PrintStatsVariant): PrintSection {
-  const base = {
-    id: `sec-${Math.random().toString(36).slice(2, 10)}`,
-    kind: "stats" as const,
-    variantId,
-    eyebrow: "Impact at a glance",
-    title: "By the numbers",
-  };
+  const base = { id: rid(), kind: "stats" as const, variantId, eyebrow: "Impact at a glance", title: "By the numbers" };
   if (variantId === "stat-bento-portrait") {
+    return { ...base, items: [
+      { label: "Global markets supported end-to-end", value: "200", unit: "+", caption: "Reach" },
+      { label: "Faster time to market", value: "3.4", unit: "x" },
+      { label: "Reduction in review cycles", value: "62", unit: "%" },
+    ]};
+  }
+  if (variantId === "stat-callout-row-portrait") {
+    return { ...base, items: [
+      { label: "Content refresh cycle", value: "48", unit: "hr", caption: "Down from 3 weeks" },
+      { label: "Translation cost saved", value: "$1.2", unit: "M", caption: "Annualized" },
+      { label: "Markets covered", value: "36", caption: "Live in Q1" },
+    ]};
+  }
+  return { ...base, items: [
+    { label: "Localization cost saved", value: "$1.2", unit: "M", delta: "+18%", trend: "up" },
+    { label: "Faster time-to-market", value: "3.4", unit: "x", delta: "+12%", trend: "up" },
+    { label: "Markets supported live", value: "36", delta: "+9%", trend: "up" },
+    { label: "Review cycles removed", value: "62", unit: "%", delta: "-62%", trend: "down" },
+  ]};
+}
+
+export function makePrintQuoteSection(variantId: PrintQuoteVariant): PrintSection {
+  return {
+    id: rid(), kind: "quote", variantId,
+    eyebrow: "In their words",
+    text: "They didn't just translate our content — they rebuilt the entire pipeline so every new market ships in days, not months.",
+    author: "Elena Marquez",
+    role: "VP of Global Marketing",
+    company: "Acme Global",
+  };
+}
+
+export function makePrintLogoGridSection(variantId: PrintLogoGridVariant): PrintSection {
+  const count = variantId === "logo-wall-portrait" ? 12 : variantId === "logo-row-portrait" ? 5 : 6;
+  return {
+    id: rid(), kind: "logo-grid", variantId,
+    eyebrow: "Trusted by",
+    title: "Selected clients",
+    items: Array.from({ length: count }, (_, i) => ({ name: `Client ${i + 1}` })),
+  };
+}
+
+export function makePrintExpertiseSection(variantId: PrintExpertiseVariant): PrintSection {
+  if (variantId === "expertise-credential-pills") {
     return {
-      ...base,
+      id: rid(), kind: "expertise", variantId,
+      title: "Certifications",
       items: [
-        { label: "Global markets supported end-to-end", value: "200", unit: "+", caption: "Reach" },
-        { label: "Faster time to market", value: "3.4", unit: "x" },
-        { label: "Reduction in review cycles", value: "62", unit: "%" },
+        { label: "ISO 17100" }, { label: "ISO 27001" }, { label: "ISO 9001" },
+        { label: "SOC 2 Type II" }, { label: "HIPAA" }, { label: "GDPR" },
       ],
     };
   }
-  if (variantId === "stat-callout-row-portrait") {
+  if (variantId === "expertise-checklist") {
     return {
-      ...base,
+      id: rid(), kind: "expertise", variantId,
+      eyebrow: "How we deliver",
+      title: "What's included",
       items: [
-        { label: "Content refresh cycle", value: "48", unit: "hr", caption: "Down from 3 weeks" },
-        { label: "Translation cost saved", value: "$1.2", unit: "M", caption: "Annualized" },
-        { label: "Markets covered", value: "36", caption: "Live in Q1" },
+        { label: "24/7 global program management" },
+        { label: "In-country linguists across 200+ markets" },
+        { label: "Automated QA and terminology enforcement" },
+        { label: "Enterprise-grade security & compliance" },
       ],
     };
   }
   return {
-    ...base,
+    id: rid(), kind: "expertise", variantId,
+    title: "We know how",
     items: [
-      { label: "Localization cost saved", value: "$1.2", unit: "M", delta: "+18%", trend: "up" },
-      { label: "Faster time-to-market", value: "3.4", unit: "x", delta: "+12%", trend: "up" },
-      { label: "Markets supported live", value: "36", delta: "+9%", trend: "up" },
-      { label: "Review cycles removed", value: "62", unit: "%", delta: "-62%", trend: "down" },
+      { label: "Strategy", icon: "sparkles" },
+      { label: "Localize", icon: "globe-alt" },
+      { label: "Automate", icon: "bolt" },
+      { label: "Measure", icon: "trending" },
+      { label: "Scale", icon: "target" },
     ],
   };
+}
+
+export function makePrintFeatureSection(variantId: PrintFeatureVariant): PrintSection {
+  const items = [
+    { verb: "Translate", body: "Human-in-the-loop translation across 200+ language pairs.", icon: "language" },
+    { verb: "Adapt",     body: "Transcreate and culturally tune every asset for each market.", icon: "sparkles" },
+    { verb: "Automate",  body: "Connect CMS, PIM, DAM — content flows without tickets.", icon: "bolt" },
+    { verb: "Measure",   body: "Live dashboards on quality, cost, and time-to-market.", icon: "trending" },
+    { verb: "Comply",    body: "Enterprise security, ISO/SOC certified programs.", icon: "check" },
+    { verb: "Scale",     body: "Launch new markets in days without adding headcount.", icon: "target" },
+  ];
+  const trim = variantId === "feature-cards-2col" ? 4 : variantId === "feature-list-1col" ? 5 : 6;
+  return {
+    id: rid(), kind: "feature-list", variantId,
+    eyebrow: "What we do",
+    title: "Capabilities at a glance",
+    items: items.slice(0, trim),
+  };
+}
+
+// ---- Picker UI ------------------------------------------------------------
+
+type Family = "stats" | "quote" | "logo-grid" | "expertise" | "feature-list";
+
+const FAMILIES: Array<{ id: Family; label: string }> = [
+  { id: "stats", label: "Stats" },
+  { id: "quote", label: "Quotes" },
+  { id: "logo-grid", label: "Logos" },
+  { id: "expertise", label: "Expertise" },
+  { id: "feature-list", label: "Features" },
+];
+
+function variantsForFamily(family: Family): Array<{ id: string; label: string; description: string }> {
+  switch (family) {
+    case "stats": return PRINT_STATS_VARIANTS;
+    case "quote": return PRINT_QUOTE_VARIANTS;
+    case "logo-grid": return PRINT_LOGO_VARIANTS;
+    case "expertise": return PRINT_EXPERTISE_VARIANTS;
+    case "feature-list": return PRINT_FEATURE_VARIANTS;
+  }
+}
+
+function makeSectionFor(family: Family, id: string): PrintSection {
+  switch (family) {
+    case "stats": return makePrintStatsSection(id as PrintStatsVariant);
+    case "quote": return makePrintQuoteSection(id as PrintQuoteVariant);
+    case "logo-grid": return makePrintLogoGridSection(id as PrintLogoGridVariant);
+    case "expertise": return makePrintExpertiseSection(id as PrintExpertiseVariant);
+    case "feature-list": return makePrintFeatureSection(id as PrintFeatureVariant);
+  }
 }
 
 export function PrintSectionPicker({
@@ -61,9 +169,10 @@ export function PrintSectionPicker({
   brand: BrandMode;
   mode: "light" | "dark";
 }) {
-  const [family] = useState<"stats">("stats");
+  const [family, setFamily] = useState<Family>("stats");
   if (!open) return null;
   const accent = brand.tokens.accent || brand.tokens.primary;
+  const variants = variantsForFamily(family);
 
   return (
     <div
@@ -83,36 +192,37 @@ export function PrintSectionPicker({
         </button>
       </div>
 
-      <div className="flex gap-2 border-b border-black/10 px-5 py-2 text-xs">
-        <button
-          className={`rounded-full px-2.5 py-1 font-medium ${family === "stats" ? "bg-black text-white" : "text-black/60"}`}
-        >
-          Stats
-        </button>
-        <span className="rounded-full px-2.5 py-1 text-black/30">Quotes · soon</span>
-        <span className="rounded-full px-2.5 py-1 text-black/30">Logo grids · soon</span>
+      <div className="flex flex-wrap gap-1.5 border-b border-black/10 px-5 py-2 text-xs">
+        {FAMILIES.map((f) => (
+          <button
+            key={f.id}
+            type="button"
+            onClick={() => setFamily(f.id)}
+            className={`rounded-full px-2.5 py-1 font-medium transition ${family === f.id ? "bg-black text-white" : "text-black/60 hover:text-black"}`}
+          >
+            {f.label}
+          </button>
+        ))}
       </div>
 
       <div className="grid flex-1 gap-4 overflow-auto p-5">
-        {PRINT_STATS_VARIANTS.map((v) => {
-          const preview = makePrintStatsSection(v.id);
+        {variants.map((v) => {
+          const preview = makeSectionFor(family, v.id);
           return (
             <div
               key={v.id}
               draggable
               onDragStart={(e) => {
-                // Rebuild fresh each drag so ids stay unique per insert.
-                const payload = makePrintStatsSection(v.id);
+                const payload = makeSectionFor(family, v.id);
                 e.dataTransfer.effectAllowed = "copy";
                 e.dataTransfer.setData(PRINT_SECTION_DND_MIME, JSON.stringify(payload));
-                // Fallback so browsers that ignore custom MIME still recognize a drag.
                 e.dataTransfer.setData("text/plain", `print-section:${v.id}`);
               }}
               className="group flex cursor-grab flex-col overflow-hidden rounded-xl border border-black/10 bg-white text-left transition hover:border-black hover:shadow-lg active:cursor-grabbing"
             >
               <button
                 type="button"
-                onClick={() => { onInsert(makePrintStatsSection(v.id)); }}
+                onClick={() => { onInsert(makeSectionFor(family, v.id)); }}
                 className="flex flex-col text-left"
               >
                 <div
