@@ -426,7 +426,42 @@ export function emptySpotlight(seed?: Partial<SpotlightContent>): SpotlightConte
     expert: seed?.expert,
     cta: seed?.cta ?? { label: "Talk to us" },
     heroMedia: seed?.heroMedia,
-    modules: seed?.modules ?? [],
+    modules: seed?.modules ?? [
+      {
+        id: "sec-spot-features",
+        kind: "feature-list",
+        variantId: "feature-cards-2col",
+        eyebrow: "What you get",
+        title: "Built for how modern teams ship",
+        items: [
+          { verb: "Translate", body: "Human-in-the-loop translation across 200+ language pairs.", icon: "language" },
+          { verb: "Automate", body: "Connect CMS, PIM, DAM — content flows without tickets.", icon: "bolt" },
+          { verb: "Measure", body: "Live dashboards on quality, cost, and time-to-market.", icon: "trending" },
+          { verb: "Scale", body: "Launch new markets in days without adding headcount.", icon: "target" },
+        ],
+      },
+      {
+        id: "sec-spot-expertise",
+        kind: "expertise",
+        variantId: "expertise-checklist",
+        eyebrow: "How we deliver",
+        title: "What's included",
+        items: [
+          { label: "24/7 global program management" },
+          { label: "In-country linguists across 200+ markets" },
+          { label: "Automated QA and terminology enforcement" },
+          { label: "Enterprise-grade security & compliance" },
+        ],
+      },
+      {
+        id: "sec-spot-logos",
+        kind: "logo-grid",
+        variantId: "logo-row-portrait",
+        eyebrow: "Trusted by",
+        title: "Selected clients",
+        items: Array.from({ length: 5 }, (_, i) => ({ name: `Client ${i + 1}` })),
+      },
+    ],
   };
 }
 
