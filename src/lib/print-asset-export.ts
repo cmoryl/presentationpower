@@ -372,8 +372,12 @@ export async function exportPrintAssetAsPdf(
     triggerBlobDownload(x4Bytes, filename, "application/pdf");
 
   } else {
-    pdf.save(filename);
+    // press / digital paths — ship the overlaid bytes so vector text
+    // survives on non-X4 exports too. Digital bypasses overlay above so
+    // `workingBytes === rasterBytesArr` in that case.
+    triggerBlobDownload(workingBytes, filename, "application/pdf");
   }
+
 }
 
 /** Convert a PNG data URL to a JPEG data URL with a mode-appropriate flat
