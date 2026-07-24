@@ -46,6 +46,8 @@ import { PrintSectionPicker, PRINT_SECTION_DND_MIME } from "@/components/print/s
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
+import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
+
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
 import { analyzePrintAsset, canAddModule } from "@/lib/print-capacity";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
@@ -879,6 +881,12 @@ function AssetEditor() {
               {ctx.printSafeArea && (
                 <div className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25" />
               )}
+              <HeroResizeHandle
+                canvasRef={canvasRef}
+                media={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
+                onChange={(next) => patchContent({ heroMedia: next } as never)}
+              />
+
               {showBleedGuides && (
                 <>
                   {/* Bleed edge (outer) — where the printed art bleeds off. */}
