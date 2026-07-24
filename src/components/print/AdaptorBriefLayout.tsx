@@ -197,12 +197,12 @@ export function AdaptorBriefLayout({
                     </div>
                   ))}
                 </div>
-              </>
+              </div>
             )}
 
             {/* QUOTE */}
             {content.quote && (
-              <div className="flex items-start" style={{ gap: cq(16), paddingTop: cq(30), flex: 1 }}>
+              <div data-section="quote" data-section-label="Quote" className="flex items-start" style={{ gap: cq(16), paddingTop: cq(30), flex: 1 }}>
                 <div style={{ fontFamily: "Georgia, serif", fontSize: cq(54), lineHeight: 0.8, color: accentInk, fontWeight: 700 }} aria-hidden>
                   &ldquo;
                 </div>
