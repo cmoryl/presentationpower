@@ -16,6 +16,7 @@ import { Route as LogohubRouteImport } from './routes/logohub'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
 import { Route as ImageryRouteImport } from './routes/imagery'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as EventsRouteImport } from './routes/events'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AtlasRouteImport } from './routes/atlas'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
@@ -116,6 +117,11 @@ const FaqRoute = FaqRouteImport.update({
   path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -162,9 +168,9 @@ const KnowledgeIndexRoute = KnowledgeIndexRouteImport.update({
   getParentRoute: () => KnowledgeRoute,
 } as any)
 const EventsIndexRoute = EventsIndexRouteImport.update({
-  id: '/events/',
-  path: '/events/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => EventsRoute,
 } as any)
 const DecksIndexRoute = DecksIndexRouteImport.update({
   id: '/decks/',
@@ -237,14 +243,14 @@ const KnowledgeEntryIdRoute = KnowledgeEntryIdRouteImport.update({
   getParentRoute: () => KnowledgeRoute,
 } as any)
 const EventsPresetsRoute = EventsPresetsRouteImport.update({
-  id: '/events/presets',
-  path: '/events/presets',
-  getParentRoute: () => rootRouteImport,
+  id: '/presets',
+  path: '/presets',
+  getParentRoute: () => EventsRoute,
 } as any)
 const EventsNewRoute = EventsNewRouteImport.update({
-  id: '/events/new',
-  path: '/events/new',
-  getParentRoute: () => rootRouteImport,
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => EventsRoute,
 } as any)
 const DecksImportRoute = DecksImportRouteImport.update({
   id: '/decks/import',
@@ -399,9 +405,9 @@ const KnowledgeBrandGuidesSlugRoute =
     getParentRoute: () => KnowledgeRoute,
   } as any)
 const EventsDemoPlaybookIdRoute = EventsDemoPlaybookIdRouteImport.update({
-  id: '/events/demo/$playbookId',
-  path: '/events/demo/$playbookId',
-  getParentRoute: () => rootRouteImport,
+  id: '/demo/$playbookId',
+  path: '/demo/$playbookId',
+  getParentRoute: () => EventsRoute,
 } as any)
 const DecksDeckIdPrintRoute = DecksDeckIdPrintRouteImport.update({
   id: '/decks/$deckId/print',
@@ -447,6 +453,7 @@ export interface FileRoutesByFullPath {
   '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
+  '/events': typeof EventsRouteWithChildren
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
@@ -591,6 +598,7 @@ export interface FileRoutesById {
   '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
+  '/events': typeof EventsRouteWithChildren
   '/faq': typeof FaqRoute
   '/imagery': typeof ImageryRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
@@ -666,6 +674,7 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/atlas'
     | '/auth'
+    | '/events'
     | '/faq'
     | '/imagery'
     | '/knowledge'
@@ -809,6 +818,7 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/atlas'
     | '/auth'
+    | '/events'
     | '/faq'
     | '/imagery'
     | '/knowledge'
@@ -883,6 +893,7 @@ export interface RootRouteChildren {
   AnalyticsRoute: typeof AnalyticsRoute
   AtlasRoute: typeof AtlasRoute
   AuthRoute: typeof AuthRoute
+  EventsRoute: typeof EventsRouteWithChildren
   FaqRoute: typeof FaqRoute
   ImageryRoute: typeof ImageryRoute
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
@@ -896,8 +907,6 @@ export interface RootRouteChildren {
   AssetSpotlightPreviewRoute: typeof AssetSpotlightPreviewRoute
   BriefNewRoute: typeof BriefNewRoute
   DecksImportRoute: typeof DecksImportRoute
-  EventsNewRoute: typeof EventsNewRoute
-  EventsPresetsRoute: typeof EventsPresetsRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
   LibraryMyRoute: typeof LibraryMyRoute
   LibraryPrintRoute: typeof LibraryPrintRoute
@@ -905,7 +914,6 @@ export interface RootRouteChildren {
   TestPrintDndRoute: typeof TestPrintDndRoute
   TestPrintHeroRoute: typeof TestPrintHeroRoute
   DecksIndexRoute: typeof DecksIndexRoute
-  EventsIndexRoute: typeof EventsIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
   ApiPublicPdfIndexProxyRoute: typeof ApiPublicPdfIndexProxyRoute
@@ -913,7 +921,6 @@ export interface RootRouteChildren {
   DecksDeckIdExportRoute: typeof DecksDeckIdExportRoute
   DecksDeckIdPresentRoute: typeof DecksDeckIdPresentRoute
   DecksDeckIdPrintRoute: typeof DecksDeckIdPrintRoute
-  EventsDemoPlaybookIdRoute: typeof EventsDemoPlaybookIdRoute
   DecksDeckIdIndexRoute: typeof DecksDeckIdIndexRoute
 }
 
@@ -966,6 +973,13 @@ declare module '@tanstack/react-router' {
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -1033,10 +1047,10 @@ declare module '@tanstack/react-router' {
     }
     '/events/': {
       id: '/events/'
-      path: '/events'
+      path: '/'
       fullPath: '/events/'
       preLoaderRoute: typeof EventsIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof EventsRoute
     }
     '/decks/': {
       id: '/decks/'
@@ -1138,17 +1152,17 @@ declare module '@tanstack/react-router' {
     }
     '/events/presets': {
       id: '/events/presets'
-      path: '/events/presets'
+      path: '/presets'
       fullPath: '/events/presets'
       preLoaderRoute: typeof EventsPresetsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof EventsRoute
     }
     '/events/new': {
       id: '/events/new'
-      path: '/events/new'
+      path: '/new'
       fullPath: '/events/new'
       preLoaderRoute: typeof EventsNewRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof EventsRoute
     }
     '/decks/import': {
       id: '/decks/import'
@@ -1362,10 +1376,10 @@ declare module '@tanstack/react-router' {
     }
     '/events/demo/$playbookId': {
       id: '/events/demo/$playbookId'
-      path: '/events/demo/$playbookId'
+      path: '/demo/$playbookId'
       fullPath: '/events/demo/$playbookId'
       preLoaderRoute: typeof EventsDemoPlaybookIdRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof EventsRoute
     }
     '/decks/$deckId/print': {
       id: '/decks/$deckId/print'
@@ -1481,6 +1495,23 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface EventsRouteChildren {
+  EventsNewRoute: typeof EventsNewRoute
+  EventsPresetsRoute: typeof EventsPresetsRoute
+  EventsIndexRoute: typeof EventsIndexRoute
+  EventsDemoPlaybookIdRoute: typeof EventsDemoPlaybookIdRoute
+}
+
+const EventsRouteChildren: EventsRouteChildren = {
+  EventsNewRoute: EventsNewRoute,
+  EventsPresetsRoute: EventsPresetsRoute,
+  EventsIndexRoute: EventsIndexRoute,
+  EventsDemoPlaybookIdRoute: EventsDemoPlaybookIdRoute,
+}
+
+const EventsRouteWithChildren =
+  EventsRoute._addFileChildren(EventsRouteChildren)
+
 interface KnowledgeRouteChildren {
   KnowledgeEntryIdRoute: typeof KnowledgeEntryIdRoute
   KnowledgeAskRoute: typeof KnowledgeAskRoute
@@ -1529,6 +1560,7 @@ const rootRouteChildren: RootRouteChildren = {
   AnalyticsRoute: AnalyticsRoute,
   AtlasRoute: AtlasRoute,
   AuthRoute: AuthRoute,
+  EventsRoute: EventsRouteWithChildren,
   FaqRoute: FaqRoute,
   ImageryRoute: ImageryRoute,
   KnowledgeRoute: KnowledgeRouteWithChildren,
@@ -1542,8 +1574,6 @@ const rootRouteChildren: RootRouteChildren = {
   AssetSpotlightPreviewRoute: AssetSpotlightPreviewRoute,
   BriefNewRoute: BriefNewRoute,
   DecksImportRoute: DecksImportRoute,
-  EventsNewRoute: EventsNewRoute,
-  EventsPresetsRoute: EventsPresetsRoute,
   LibraryImportedRoute: LibraryImportedRoute,
   LibraryMyRoute: LibraryMyRoute,
   LibraryPrintRoute: LibraryPrintRoute,
@@ -1551,7 +1581,6 @@ const rootRouteChildren: RootRouteChildren = {
   TestPrintDndRoute: TestPrintDndRoute,
   TestPrintHeroRoute: TestPrintHeroRoute,
   DecksIndexRoute: DecksIndexRoute,
-  EventsIndexRoute: EventsIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
   ApiPublicPdfIndexProxyRoute: ApiPublicPdfIndexProxyRoute,
@@ -1559,7 +1588,6 @@ const rootRouteChildren: RootRouteChildren = {
   DecksDeckIdExportRoute: DecksDeckIdExportRoute,
   DecksDeckIdPresentRoute: DecksDeckIdPresentRoute,
   DecksDeckIdPrintRoute: DecksDeckIdPrintRoute,
-  EventsDemoPlaybookIdRoute: EventsDemoPlaybookIdRoute,
   DecksDeckIdIndexRoute: DecksDeckIdIndexRoute,
 }
 export const routeTree = rootRouteImport
