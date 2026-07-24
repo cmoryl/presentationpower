@@ -6711,10 +6711,6 @@ function MediaTile({
       ? resolvedOverrideUrl
       : tileBackdrops[h % tileBackdrops.length];
   const hasVideo = Boolean(resolvedVideoUrl && resolvedVideoUrl.length > 0);
-  if (typeof window !== "undefined" && (hasVideo || autoplay)) {
-    // eslint-disable-next-line no-console
-    console.log("[MediaTile.render]", { seed, hasVideo, autoplay, shouldPlay, resolvedVideoUrl });
-  }
   const accent = brand.tokens.accent;
   const primary = brand.tokens.primary;
   // Rotate scrim direction deterministically so a wall of image tiles never
