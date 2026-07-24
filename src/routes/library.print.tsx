@@ -726,6 +726,33 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
     else toast.info("No downloadable file attached — open the variant to export.");
   };
 
+  const onDownloadHtml = async (v: ApprovedPrintVariant) => {
+    const kind = v.template_kind as PrintAssetKind;
+    const modeGuess = (v.context && typeof v.context === "object" && (v.context as { editorMode?: "light" | "dark" }).editorMode) ?? "light";
+    const element = renderPrintByKind(kind, brand, modeGuess, v.content);
+    if (!element) {
+      toast.error("Cannot render this template");
+      return;
+    }
+    const toastId = `approved-html-${v.id}`;
+    const slug = v.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || v.id;
+    const filename = `${slug}-${brand.id}-${modeGuess}.html`;
+    toast.loading("Preparing self-contained HTML…", { id: toastId, description: `${filename} — starting…`, duration: Infinity });
+    try {
+      const mod = await import("@/lib/print-html-export");
+      await mod.exportElementAsStandaloneHtml(element, {
+        filename,
+        title: `${v.title} — ${brand.name}`,
+        onProgress: (msg) => toast.loading("Building self-contained HTML", { id: toastId, description: `${filename} — ${msg}`, duration: Infinity }),
+      });
+      try { await dlFn({ data: { id: v.id } }); } catch { /* silent */ }
+      toast.success("HTML downloaded", { id: toastId, description: filename, duration: 5000 });
+    } catch (err) {
+      console.error("[library/print] HTML export failed", err);
+      toast.error("HTML export failed", { id: toastId, description: "Check console for details.", duration: 6000 });
+    }
+  };
+
   return (
     <section className="mt-14">
       <div className="mb-4 flex items-end justify-between gap-4">
