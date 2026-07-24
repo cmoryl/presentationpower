@@ -147,7 +147,7 @@ export function AdaptorBriefLayout({
             </div>
 
             {/* 6 FEATURE CARDS — grouped in one rounded panel (Canva ref). */}
-            <div style={{ paddingTop: cq(28) }}>
+            <div data-section="features" data-section-label="Feature grid" style={{ paddingTop: cq(28) }}>
               <div style={{ borderRadius: cq(16), padding: cq(18), ...glassCard(mode, accent) }}>
                 <div className="grid" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: cq(14) }}>
                   {features.map((f, i) => {
