@@ -406,7 +406,8 @@ export async function overlayVectorText(
 
   const pages = pdfDoc.getPages();
   let linesDrawn = 0;
-  let glyphOnly = 0;
+  let trackedLines = 0;
+
 
   for (let i = 0; i < pages.length && i < opts.captures.length; i++) {
     const page = pages[i]!;
