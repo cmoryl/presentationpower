@@ -220,6 +220,8 @@ function Dashboard() {
             <div
               role="tablist"
               aria-label="What are you building?"
+              onMouseEnter={() => setAutoRotate(false)}
+              onFocus={() => setAutoRotate(false)}
               className="flex flex-wrap gap-1.5 rounded-2xl border border-white/10 bg-white/[0.04] p-1.5 backdrop-blur sm:inline-flex"
             >
               {MODES.map((m) => {
