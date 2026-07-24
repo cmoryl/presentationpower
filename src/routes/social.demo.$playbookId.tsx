@@ -179,6 +179,39 @@ function SocialDemoView() {
         </ol>
       </section>
 
+      {/* Live asset gallery — rendered assets first */}
+      <section id="assets">
+        <SectionHead
+          eyebrow="Live preview"
+          title={`${assets.length} rendered assets · light + dark`}
+          desc="Rendered right now from the deterministic pipeline. Configure to swap copy and cadence."
+        />
+        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {assets.map((a) => (
+            <div
+              key={a.id}
+              className="flex flex-col gap-2 rounded-2xl border border-black/10 bg-white/70 p-3"
+            >
+              <div className="flex justify-center rounded-xl bg-white/40 p-2">
+                <SocialRenderer
+                  format={a.format}
+                  brandId={a.brandId}
+                  mode={a.mode}
+                  copy={a.copy}
+                  displayShortEdge={220}
+                />
+              </div>
+              <div className="flex items-center justify-between px-1 text-[11px]">
+                <span className="font-semibold text-[#03002C]">{a.format.label}</span>
+                <span className="text-black/50">
+                  {a.format.width}×{a.format.height} · {a.mode}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Marketing collateral — full kit scope, grouped, with status ribbons */}
       <section>
         <SectionHead
@@ -212,39 +245,6 @@ function SocialDemoView() {
         </ul>
       </section>
 
-
-      {/* Live asset gallery */}
-      <section id="assets">
-        <SectionHead
-          eyebrow="Live preview"
-          title={`${assets.length} rendered assets · light + dark`}
-          desc="Rendered right now from the deterministic pipeline. Configure to swap copy and cadence."
-        />
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {assets.map((a) => (
-            <div
-              key={a.id}
-              className="flex flex-col gap-2 rounded-2xl border border-black/10 bg-white/70 p-3"
-            >
-              <div className="flex justify-center rounded-xl bg-white/40 p-2">
-                <SocialRenderer
-                  format={a.format}
-                  brandId={a.brandId}
-                  mode={a.mode}
-                  copy={a.copy}
-                  displayShortEdge={220}
-                />
-              </div>
-              <div className="flex items-center justify-between px-1 text-[11px]">
-                <span className="font-semibold text-[#03002C]">{a.format.label}</span>
-                <span className="text-black/50">
-                  {a.format.width}×{a.format.height} · {a.mode}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
 
       {/* Related */}
       <section>
