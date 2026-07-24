@@ -46,6 +46,13 @@ function expectedLevel(kind: Kind, variants: Variant[]): Level {
 
 async function openHarness(page: Page, kind: Kind) {
   await page.goto(`/test/print-dnd?template=${kind}`, { waitUntil: "domcontentloaded" });
+  // Wait for React hydration: the harness registers window.__printDnd in a
+  // useEffect that runs post-hydration. Asserting DOM attributes alone matches
+  // the SSR paint before event handlers are bound and causes clicks to no-op.
+  await page.waitForFunction(
+    () => Boolean((window as unknown as { __printDnd?: unknown }).__printDnd),
+    { timeout: 15_000 },
+  );
   await expect(page.getByTestId("print-dnd-root")).toHaveAttribute("data-template", kind);
   await expect(page.getByTestId("layout-health")).toHaveAttribute("data-level", "ok");
 }
