@@ -373,30 +373,43 @@ export function SlideImageryPanel({
                   </div>
                 ) : (
                   <div className="grid max-h-64 grid-cols-4 gap-2 overflow-y-auto pr-1">
-                    {libResults.map((r) => (
-                      <button
-                        key={r.id}
-                        type="button"
-                        title={`${r.filename}${r.tags?.length ? "\nTags: " + r.tags.join(", ") : ""}${r.note ? "\n" + r.note : ""}`}
-                        onClick={() => {
-                          if (!r.signedUrl) return;
-                          onChange(r.signedUrl, null);
-                          void logImageryEvent({
-                            data: { imageId: `division-imagery:${r.id}`, brandId: divisionId ?? null, eventType: "use" },
-                          }).catch(() => {});
-                        }}
-                        disabled={!r.signedUrl}
-                        className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-black/10 bg-black/5 transition hover:border-black/40 disabled:opacity-40"
-                      >
-                        {r.signedUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={r.signedUrl} alt={r.filename} className="h-full w-full object-cover" loading="lazy" />
-                        ) : null}
-                        <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/70 to-transparent px-1.5 py-1 text-left text-[9px] text-white opacity-0 group-hover:opacity-100">
-                          {r.tags?.[0] ?? r.kind}
-                        </span>
-                      </button>
-                    ))}
+                    {libResults.map((r) => {
+                      const isActive = !!r.signedUrl && mediaUrl === r.signedUrl;
+                      return (
+                        <button
+                          key={r.id}
+                          type="button"
+                          title={`${r.filename}${r.tags?.length ? "\nTags: " + r.tags.join(", ") : ""}${r.note ? "\n" + r.note : ""}`}
+                          onClick={() => {
+                            if (!r.signedUrl) return;
+                            onChange(r.signedUrl, null);
+                            toast.success(`Applied ${r.filename}`, { id: "slide-imagery-apply", duration: 1500 });
+                            void logImageryEvent({
+                              data: { imageId: `division-imagery:${r.id}`, brandId: divisionId ?? null, eventType: "use" },
+                            }).catch(() => {});
+                          }}
+                          disabled={!r.signedUrl}
+                          className={`group relative aspect-[4/3] overflow-hidden rounded-lg border bg-black/5 transition disabled:opacity-40 ${
+                            isActive
+                              ? "border-2 border-[#003FC7] ring-2 ring-[#003FC7]/30"
+                              : "border-black/10 hover:border-black/40"
+                          }`}
+                        >
+                          {r.signedUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={r.signedUrl} alt={r.filename} className="h-full w-full object-cover" loading="lazy" />
+                          ) : null}
+                          {isActive && (
+                            <span className="absolute right-1 top-1 rounded-full bg-[#003FC7] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
+                              On
+                            </span>
+                          )}
+                          <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/70 to-transparent px-1.5 py-1 text-left text-[9px] text-white opacity-0 group-hover:opacity-100">
+                            {r.tags?.[0] ?? r.kind}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
