@@ -967,7 +967,7 @@ function AssetEditor() {
 
 
             <Panel title="Stats">
-              {content.stats.map((s, i) => (
+              {(content.stats ?? []).map((s, i) => (
                 <div key={i} className="grid grid-cols-[1fr_60px] gap-2">
                   <input className={inspectorInput} value={s.label} onChange={(e) => updateStat(i, { label: e.target.value })} placeholder="Label" />
                   <input className={inspectorInput} value={s.value} onChange={(e) => updateStat(i, { value: e.target.value })} placeholder="0" />
