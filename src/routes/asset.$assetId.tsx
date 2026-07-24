@@ -1275,7 +1275,7 @@ function ModulesPanel({
               >
                 <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
                   <GripVertical size={14} className="text-black/40 dark:text-white/40" aria-hidden />
-                  {m.kind === "stats" ? "Stats" : "Module"}
+                  {sectionKindLabel(m.kind)}
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -1285,43 +1285,16 @@ function ModulesPanel({
                 </div>
               </div>
 
-              {m.kind === "stats" && (
-                <div className="mt-2 space-y-2">
-                  <select
-                    className={inspectorInput}
-                    value={m.variantId}
-                    onChange={(e) => patch(i, { variantId: e.target.value as PrintStatsVariant } as Partial<PrintStatsSection>)}
-                  >
-                    {PRINT_STATS_VARIANTS.map((v) => (
-                      <option key={v.id} value={v.id}>{v.label}</option>
-                    ))}
-                  </select>
-                  <input
-                    className={inspectorInput}
-                    placeholder="Eyebrow"
-                    value={m.eyebrow ?? ""}
-                    onChange={(e) => patch(i, { eyebrow: e.target.value } as Partial<PrintStatsSection>)}
-                  />
-                  <input
-                    className={inspectorInput}
-                    placeholder="Title"
-                    value={m.title ?? ""}
-                    onChange={(e) => patch(i, { title: e.target.value } as Partial<PrintStatsSection>)}
-                  />
-                  <div className="space-y-1">
-                    {m.items.map((it, idx) => (
-                      <div key={idx} className="grid grid-cols-[1fr_60px_50px] gap-1">
-                        <input className={inspectorInput} placeholder="Label" value={it.label} onChange={(e) => patchStatsItem(i, idx, { label: e.target.value })} />
-                        <input className={inspectorInput} placeholder="Value" value={it.value} onChange={(e) => patchStatsItem(i, idx, { value: e.target.value })} />
-                        <input className={inspectorInput} placeholder="Unit" value={it.unit ?? ""} onChange={(e) => patchStatsItem(i, idx, { unit: e.target.value })} />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="pt-1">
-                    <PrintSectionRenderer section={m} mode={editorMode} accent="#003FC7" />
-                  </div>
+              <div className="mt-2 space-y-2">
+                <SectionInlineEditor
+                  section={m}
+                  onPatch={(p) => patch(i, p)}
+                />
+                <div className="pt-1">
+                  <PrintSectionRenderer section={m} mode={editorMode} accent="#003FC7" />
                 </div>
-              )}
+              </div>
+
             </div>
           </div>
         ))}
