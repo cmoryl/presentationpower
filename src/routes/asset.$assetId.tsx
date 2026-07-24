@@ -1601,10 +1601,41 @@ function HeroMediaPanel({
           )}
         </div>
       </div>
+      {/* Upload / drop zone — persists into the private slide-media bucket. */}
+      <div
+        onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; }}
+        onDrop={(e) => {
+          e.preventDefault();
+          const f = e.dataTransfer.files?.[0];
+          if (f) void handleFileUpload(f);
+        }}
+        className="rounded-lg border border-dashed border-black/15 bg-black/[0.02] p-2 text-center dark:border-white/15 dark:bg-white/[0.02]"
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/avif,image/gif"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void handleFileUpload(f);
+          }}
+        />
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={uploading}
+          className="inline-flex items-center gap-1.5 rounded-md border border-black/15 bg-white px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-40 dark:border-white/15 dark:bg-white/[0.04] dark:text-white/70"
+        >
+          <Upload size={12} /> {uploading ? "Uploading…" : "Upload image"}
+        </button>
+        <div className="mt-1 text-[10px] text-black/40 dark:text-white/40">or drop a PNG/JPG here · saved to your library</div>
+      </div>
+
       <div className="flex gap-2">
         <input
           className={`${inspectorInput} flex-1`}
-          placeholder="Image URL (https://…)"
+          placeholder="Or paste image URL (https://…)"
           value={media.imageUrl}
           onChange={(e) => patch({ imageUrl: e.target.value })}
         />
@@ -1612,7 +1643,7 @@ function HeroMediaPanel({
           type="button"
           onClick={() => setPickerOpen(true)}
           disabled={!divisionId}
-          className="inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/[0.05] px-2 py-1.5 text-[10px] uppercase tracking-[0.22em] text-white/80 transition hover:border-white/30 hover:bg-white/[0.1] disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex items-center gap-1 rounded-lg border border-black/15 bg-white px-2 py-1.5 text-[10px] uppercase tracking-[0.22em] text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/15 dark:bg-white/[0.05] dark:text-white/80"
           title={divisionId ? "Browse full division imagery library" : "Select a division first"}
         >
           <Images className="h-3 w-3" />
