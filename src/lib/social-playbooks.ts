@@ -620,3 +620,53 @@ export const SOCIAL_ANGLES: Array<{ id: SocialAngle; label: string }> = [
   { id: "announcement", label: "Announcement" },
   { id: "partnership", label: "Partnership" },
 ];
+
+// ────────────────────────────────────────────────────────────────────────────
+// Marketing-collateral catalog for social kits — combines live deliverables
+// with a rich set of standard extras (creator packs, ad variants, PR headers,
+// employee-advocacy assets). Anything not currently rendered is `coming-soon`.
+// ────────────────────────────────────────────────────────────────────────────
+
+const SOCIAL_EXTRAS: PlaybookDeliverable[] = [
+  { surface: "digital", category: "Digital & Web",     label: "Story bumper pack",             detail: "9:16 5-second video bumpers · light + dark.",              spec: "1080×1920 · MP4",  status: "coming-soon" },
+  { surface: "digital", category: "Digital & Web",     label: "Reel / TikTok cover set",       detail: "Vertical cover cards with title hierarchy.",                spec: "1080×1920",        status: "coming-soon" },
+  { surface: "digital", category: "Digital & Web",     label: "Podcast episode graphic",       detail: "Square episode art + 16:9 YouTube version.",                spec: "3000×3000",        status: "coming-soon" },
+  { surface: "digital", category: "Digital & Web",     label: "Facebook / Instagram covers",   detail: "Profile + page cover pack across platforms.",               spec: "1640×924 + 1500×500", status: "coming-soon" },
+  { surface: "digital", category: "Digital & Web",     label: "YouTube thumbnail pack",        detail: "3-variant thumbnail templates with title slots.",           spec: "1280×720",         status: "coming-soon" },
+  { surface: "digital", category: "Digital & Web",     label: "Newsletter banner",             detail: "600px HTML-safe hero for Substack / Beehiiv.",              spec: "1200×400",         status: "coming-soon" },
+  { surface: "digital", category: "Digital & Web",     label: "Discord / Slack banner",        detail: "Community server banner + boost card.",                     spec: "960×540",          status: "coming-soon" },
+  { surface: "digital", category: "Digital & Web",     label: "Blog header set",               detail: "Article hero + inline card at 3:2 and 16:9.",               spec: "1600×900",         status: "coming-soon" },
+  { surface: "digital", category: "Digital & Web",     label: "OG / social-share card",        detail: "Universal og:image with dynamic title slot.",               spec: "1200×630",         status: "coming-soon" },
+  { surface: "digital", category: "Digital & Web",     label: "LinkedIn newsletter cover",     detail: "Recurring cover with issue-number token.",                  spec: "744×400",          status: "coming-soon" },
+  { surface: "digital", category: "Digital & Web",     label: "Threads / X hero",              detail: "Header + reply-card cover set.",                            spec: "1500×500",         status: "coming-soon" },
+  { surface: "digital", category: "Digital & Web",     label: "Employee-advocacy pack",        detail: "Personal LinkedIn hero + share-ready graphics for the team.", spec: "1584×396 + 1200×627", status: "coming-soon" },
+  { surface: "email",   category: "Email & Direct",    label: "Email-signature banner",        detail: "600×80 personal signature banner.",                         spec: "600×80",           status: "coming-soon" },
+  { surface: "email",   category: "Email & Direct",    label: "Press-release header",          detail: "PR distribution header with logo + hashtag.",               spec: "1200×400",         status: "coming-soon" },
+  { surface: "digital", category: "Digital & Web",     label: "Paid-ad variant pack",          detail: "6 headline × 3 image variants for A/B rotation.",           spec: "1200×628 + 1080×1080", status: "coming-soon" },
+  { surface: "digital", category: "Digital & Web",     label: "App-store screenshot template", detail: "3 screenshot frames for iOS + Play.",                       spec: "1290×2796 / 1080×1920", status: "coming-soon" },
+];
+
+/** Rich collateral catalog for a social playbook. */
+export function getExpandedSocialCollateral(pb: SocialPlaybook): PlaybookDeliverable[] {
+  const live: PlaybookDeliverable[] = pb.deliverables.map((d) => ({
+    ...d,
+    status: d.status ?? "live",
+    category: d.category ?? inferCategoryFromSurface(d.surface),
+  }));
+  const liveKey = new Set(live.map((d) => d.label.toLowerCase()));
+  const extras = SOCIAL_EXTRAS.filter((d) => !liveKey.has(d.label.toLowerCase()));
+  return [...live, ...extras];
+}
+
+function inferCategoryFromSurface(s: PlaybookDeliverable["surface"]): CollateralCategory {
+  switch (s) {
+    case "signage":  return "Signage & Environment";
+    case "print":    return "Print & Collateral";
+    case "video":    return "Video & Motion";
+    case "email":    return "Email & Direct";
+    case "wearable": return "Wearables & Badges";
+    case "merch":    return "Merch & Swag";
+    default:         return "Digital & Web";
+  }
+}
+
