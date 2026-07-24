@@ -122,12 +122,25 @@ function KitBuilderView() {
     if (!source) return [];
     const activeFormats = formatIds.filter((id) => !!SOCIAL_FORMATS_BY_ID[id]);
     void regenTick;
-    return buildCampaignAssets(source, eventFacts, {
+    const built = buildCampaignAssets(source, eventFacts, {
       formatIds: activeFormats,
       mode,
       brandId,
-    }).filter((a) => !removed.has(a.id));
-  }, [source, formatIds, eventFacts, mode, brandId, regenTick, removed]);
+    });
+    // Manual/wizard sources can carry a stat that CampaignSource doesn't
+    // model — inject it into every generated asset's copy.
+    const withStat =
+      isWizard && manualCopy.statValue.trim() && manualCopy.statLabel.trim()
+        ? built.map((a) => ({
+            ...a,
+            copy: {
+              ...a.copy,
+              stat: { value: manualCopy.statValue.trim(), label: manualCopy.statLabel.trim() },
+            },
+          }))
+        : built;
+    return withStat.filter((a) => !removed.has(a.id));
+  }, [source, formatIds, eventFacts, mode, brandId, regenTick, removed, isWizard, manualCopy]);
 
   const applyProfile = (id: string) => {
     setProfileId(id);
