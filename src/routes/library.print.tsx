@@ -812,6 +812,25 @@ function ApprovedShelf({ brand }: { brand: BrandMode }) {
                         >
                           <Copy size={11} /> Use as draft
                         </button>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => onDownloadHtml(v)}
+                            title="Download self-contained HTML"
+                            className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1.5 text-[11px] font-medium text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+                          >
+                            <Download size={11} /> HTML
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onDownload(v)}
+                            title="Open thumbnail"
+                            className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1.5 text-xs text-black/60 hover:border-[#003FC7] hover:text-[#003FC7]"
+                          >
+                            <ImageIcon size={11} />
+                          </button>
+                        </div>
+                      </div>
                         <button
                           type="button"
                           onClick={() => onDownload(v)}
