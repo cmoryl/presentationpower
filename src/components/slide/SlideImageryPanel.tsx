@@ -299,26 +299,39 @@ export function SlideImageryPanel({
                 </div>
               </div>
               <div className="mt-2 grid max-h-64 grid-cols-4 gap-2 overflow-y-auto pr-1">
-                {builtIn.map((b, idx) => (
-                  <button
-                    key={`${b.kind}-${idx}`}
-                    type="button"
-                    title={`${b.label} · ${b.kind}`}
-                    onClick={() => {
-                      onChange(b.url, null);
-                      void logImageryEvent({
-                        data: { imageId: `builtin:${divisionId}:${b.kind}:${idx}`, brandId: divisionId, eventType: "use" },
-                      }).catch(() => {});
-                    }}
-                    className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-black/10 bg-black/5 transition hover:border-black/40"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={b.url} alt={b.label} className="h-full w-full object-cover" loading="lazy" />
-                    <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/70 to-transparent px-1.5 py-1 text-left text-[9px] text-white opacity-0 group-hover:opacity-100">
-                      {b.label}
-                    </span>
-                  </button>
-                ))}
+                {builtIn.map((b, idx) => {
+                  const isActive = mediaUrl === b.url;
+                  return (
+                    <button
+                      key={`${b.kind}-${idx}`}
+                      type="button"
+                      title={`${b.label} · ${b.kind}`}
+                      onClick={() => {
+                        onChange(b.url, null);
+                        toast.success(`Applied ${b.label}`, { id: "slide-imagery-apply", duration: 1500 });
+                        void logImageryEvent({
+                          data: { imageId: `builtin:${divisionId}:${b.kind}:${idx}`, brandId: divisionId, eventType: "use" },
+                        }).catch(() => {});
+                      }}
+                      className={`group relative aspect-[4/3] overflow-hidden rounded-lg border bg-black/5 transition ${
+                        isActive
+                          ? "border-2 border-[#003FC7] ring-2 ring-[#003FC7]/30"
+                          : "border-black/10 hover:border-black/40"
+                      }`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={b.url} alt={b.label} className="h-full w-full object-cover" loading="lazy" />
+                      {isActive && (
+                        <span className="absolute right-1 top-1 rounded-full bg-[#003FC7] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
+                          On
+                        </span>
+                      )}
+                      <span className="absolute inset-x-0 bottom-0 truncate bg-gradient-to-t from-black/70 to-transparent px-1.5 py-1 text-left text-[9px] text-white opacity-0 group-hover:opacity-100">
+                        {b.label}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           );
