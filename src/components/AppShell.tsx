@@ -291,7 +291,16 @@ export function AppShell({ children }: { children: ReactNode }) {
           </nav>
         </div>
       </header>
-      <main className="relative z-10 mx-auto max-w-[1400px] px-3 py-6 sm:px-8 sm:py-10">{children ?? <Outlet />}</main>
+      <main className="relative z-10 mx-auto max-w-[1400px] px-3 py-6 sm:px-8 sm:py-10">
+        {showAdminChrome ? (
+          <div className="flex flex-col gap-6 md:flex-row">
+            <AdminSidebar />
+            <div className="min-w-0 flex-1">{children ?? <Outlet />}</div>
+          </div>
+        ) : (
+          children ?? <Outlet />
+        )}
+      </main>
       <footer className="border-t border-black/10 bg-[#E8E4DC]/60 dark:!border-white/[0.06] dark:!bg-[#07061F]/70">
         <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-4 px-8 py-8 md:flex-row">
           <div className="text-xs text-black/50 dark:text-white/50">TransPerfect Modular · Built for sales enablement</div>
