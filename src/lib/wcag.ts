@@ -306,21 +306,20 @@ function applyAutoFixInternal(root: HTMLElement) {
     const postBg = effectiveBg(el);
     const postRatio = contrastRatio(target, postBg);
     if (postRatio < (large ? 3 : 4.5)) {
-      const chipBg = useLight ? "rgba(3,0,44,0.82)" : "rgba(255,255,255,0.9)";
-      el.style.setProperty("background-color", chipBg, "important");
-      el.style.setProperty("padding", "0.05em 0.35em", "important");
-      el.style.setProperty("border-radius", "0.25em", "important");
-      el.style.setProperty("box-decoration-break", "clone", "important");
-      el.style.setProperty("-webkit-box-decoration-break", "clone", "important");
-      if (!el.dataset.wcagChip) el.dataset.wcagChip = "1";
-    }
-    const bestRatio = Math.max(rDark, rLight);
-    if (bestRatio < (large ? 3 : 4.5)) {
-      const shadow = useLight
-        ? "0 1px 2px rgba(0,0,0,0.85), 0 0 6px rgba(0,0,0,0.65)"
-        : "0 1px 2px rgba(255,255,255,0.85), 0 0 6px rgba(255,255,255,0.65)";
-      el.style.setProperty("text-shadow", shadow, "important");
+      const halo = useLight
+        ? "0 0 18px rgba(3,0,44,0.85), 0 0 36px rgba(3,0,44,0.7), 0 2px 4px rgba(0,0,0,0.6)"
+        : "0 0 18px rgba(255,255,255,0.9), 0 0 36px rgba(255,255,255,0.75), 0 2px 4px rgba(255,255,255,0.6)";
+      el.style.setProperty("text-shadow", halo, "important");
       if (!el.dataset.wcagShadow) el.dataset.wcagShadow = "1";
+    } else {
+      const bestRatio = Math.max(rDark, rLight);
+      if (bestRatio < (large ? 3 : 4.5)) {
+        const shadow = useLight
+          ? "0 1px 2px rgba(0,0,0,0.85), 0 0 6px rgba(0,0,0,0.65)"
+          : "0 1px 2px rgba(255,255,255,0.85), 0 0 6px rgba(255,255,255,0.65)";
+        el.style.setProperty("text-shadow", shadow, "important");
+        if (!el.dataset.wcagShadow) el.dataset.wcagShadow = "1";
+      }
     }
     el.dataset.wcagFixed = "1";
   });
