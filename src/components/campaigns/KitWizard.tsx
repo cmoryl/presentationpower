@@ -298,7 +298,27 @@ export function KitWizard({
 
 
         {step === 1 && (
-          <StepCard eyebrow="Step 2 of 5" title="What's the message?">
+          <StepCard
+            eyebrow="Step 2 of 5"
+            title="What's the message?"
+            actions={
+              <button
+                type="button"
+                onClick={() => {
+                  const ex = exampleCopyForBrand(brandId);
+                  setManualCopy((prev) => ({
+                    ...prev,
+                    title: ex.title,
+                    summary: ex.summary ?? prev.summary,
+                    cta: ex.cta ?? prev.cta,
+                  }));
+                }}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#003FC7]/[0.06] px-3 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#003FC7]/10"
+              >
+                <Wand2 size={12} /> Fill with brand example
+              </button>
+            }
+          >
             <div className="grid gap-3 rounded-2xl border border-black/10 bg-white/60 p-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <TextField
@@ -344,6 +364,7 @@ export function KitWizard({
               </Link>
             </p>
           </StepCard>
+
         )}
 
         {step === 2 && (
