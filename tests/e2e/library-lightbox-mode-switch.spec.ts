@@ -62,6 +62,16 @@ test.describe("Library lightbox mode switch", () => {
   }) => {
     await page.goto("/library", { waitUntil: "domcontentloaded" });
     await page.waitForLoadState("networkidle").catch(() => undefined);
+
+    // Imagery is off by default on /library — toggle it on so video-demo
+    // Zoom affordances render (they gate on imagery being visible).
+    const imageryToggle = page.getByTestId("library-imagery-toggle");
+    await expect(imageryToggle).toBeVisible({ timeout: 10_000 });
+    if ((await imageryToggle.getAttribute("aria-pressed")) !== "true") {
+      await imageryToggle.click();
+      await expect(imageryToggle).toHaveAttribute("aria-pressed", "true");
+    }
+
     await scrollToLoadAll(page);
 
     // Video-demo cards render a "Zoom" affordance (non-video cards say "Details").

@@ -196,12 +196,20 @@ for (const kind of Object.keys(COMBOS) as Kind[]) {
       expect(await readLevel(page)).toBe(levelBefore);
     });
 
-    test("variant item overflow surfaces a block issue", async ({ page }) => {
+    test("variant item overflow surfaces a block issue AND gates further adds", async ({ page }) => {
       await openHarness(page, kind);
+      // The dedicated overflow affordance forces the callout row past its
+      // 4-item cap in a single click — this is the ONLY way to reach the
+      // `block` verdict without the weight-budget gate stopping us first,
+      // because the weight-budget gate disables add buttons before overflow.
       await page.getByTestId("add-callout-overflow").click();
-      // Callout row caps at 4 items — 8 items must yield block, regardless of
-      // whether the weight alone fits the budget.
       await expect(page.getByTestId("layout-health")).toHaveAttribute("data-level", "block");
+      // In the block state, every add button must be gated. This is the
+      // invariant the walker-bail relied on — assert it explicitly here so
+      // block-verdict button gating stays covered.
+      await expect(page.getByTestId("add-kpi")).toBeDisabled();
+      await expect(page.getByTestId("add-callout")).toBeDisabled();
+      await expect(page.getByTestId("add-bento")).toBeDisabled();
     });
   });
 }
