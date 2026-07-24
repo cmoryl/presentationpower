@@ -652,6 +652,54 @@ export type Database = {
           },
         ]
       }
+      campaign_kits: {
+        Row: {
+          attach_event: boolean
+          brand_id: string
+          copy: Json
+          created_at: string
+          event_facts: Json
+          format_ids: string[]
+          id: string
+          mode: string
+          name: string
+          profile_id: string
+          surface: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attach_event?: boolean
+          brand_id?: string
+          copy?: Json
+          created_at?: string
+          event_facts?: Json
+          format_ids?: string[]
+          id?: string
+          mode?: string
+          name: string
+          profile_id?: string
+          surface: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attach_event?: boolean
+          brand_id?: string
+          copy?: Json
+          created_at?: string
+          event_facts?: Json
+          format_ids?: string[]
+          id?: string
+          mode?: string
+          name?: string
+          profile_id?: string
+          surface?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       client_logos: {
         Row: {
           client_name: string
