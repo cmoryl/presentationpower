@@ -233,7 +233,7 @@ function Dashboard() {
                     type="button"
                     role="tab"
                     aria-selected={active}
-                    onClick={() => setModeId(m.id)}
+                    onClick={() => { setAutoRotate(false); setModeId(m.id); }}
                     className={`group relative inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300 ${
                       active
                         ? "bg-white text-[#03002C] shadow-lg shadow-black/20"
