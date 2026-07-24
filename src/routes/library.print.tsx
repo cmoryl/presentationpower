@@ -623,6 +623,8 @@ function TemplateDetailOverlay({
             <p className="mt-1 max-w-2xl text-sm text-black/60">{tpl.desc}</p>
           </div>
           <div className="flex items-center gap-2">
+            <PrintTemplateHtmlButton kind={kind} brand={brand} label={tpl.label} mode="light" />
+            <PrintTemplateHtmlButton kind={kind} brand={brand} label={tpl.label} mode="dark" />
             {tpl.live ? (
               <Link
                 to="/asset/new"
