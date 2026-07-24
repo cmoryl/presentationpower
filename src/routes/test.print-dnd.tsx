@@ -188,10 +188,11 @@ function PrintDnDHarness() {
       </section>
 
       <section className="mb-4 flex flex-wrap gap-2">
+        {(() => null)()}
         <button
           type="button"
           data-testid="add-kpi"
-          disabled={!canAddModule(kind, modules, 2.4).ok}
+          disabled={report.level === "block" || !canAddModule(kind, modules, 2.4).ok}
           onClick={() => addVariant("kpi-dashboard-portrait")}
           className="rounded border border-black/20 px-2 py-1 text-xs disabled:opacity-40"
         >
@@ -200,7 +201,7 @@ function PrintDnDHarness() {
         <button
           type="button"
           data-testid="add-callout"
-          disabled={!canAddModule(kind, modules, 1.6).ok}
+          disabled={report.level === "block" || !canAddModule(kind, modules, 1.6).ok}
           onClick={() => addVariant("stat-callout-row-portrait")}
           className="rounded border border-black/20 px-2 py-1 text-xs disabled:opacity-40"
         >
@@ -209,7 +210,7 @@ function PrintDnDHarness() {
         <button
           type="button"
           data-testid="add-bento"
-          disabled={!canAddModule(kind, modules, 2.0).ok}
+          disabled={report.level === "block" || !canAddModule(kind, modules, 2.0).ok}
           onClick={() => addVariant("stat-bento-portrait")}
           className="rounded border border-black/20 px-2 py-1 text-xs disabled:opacity-40"
         >
