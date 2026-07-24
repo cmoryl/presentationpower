@@ -5554,6 +5554,58 @@ function coerceMetrics(raw: unknown): LocMetric[] {
     .filter((x): x is LocMetric => !!x);
 }
 
+// Region-metric row — same shape the KPI/graph modules read from `c.items`
+// (MV-DASH-REGION-STATS et al.): { label, value, unit, percent, delta }.
+// For location slides we allow an optional `region` code so a row can bind
+// to a specific pin region, and we source them from `c.regionMetrics` so we
+// don't collide with `c.items` (which is the pin array on MV-LOC-*).
+type RegionMetricRow = {
+  region?: LocPin["region"];
+  label: string;
+  value?: string;
+  unit?: string;
+  percent?: number;
+  delta?: string;
+};
+
+function readRegionMetrics(c: Record<string, unknown>): RegionMetricRow[] {
+  const raw = Array.isArray(c.regionMetrics) ? (c.regionMetrics as unknown[]) : [];
+  const REGION_KEYS: LocPin["region"][] = ["AMER", "EMEA", "APAC", "LATAM", "MEA"];
+  const out: RegionMetricRow[] = [];
+  for (const r of raw) {
+    if (!r || typeof r !== "object") continue;
+    const rec = r as Record<string, unknown>;
+    const label = typeof rec.label === "string" ? rec.label.trim() : "";
+    if (!label) continue;
+    const regionRaw = typeof rec.region === "string" ? rec.region.toUpperCase() : "";
+    const region = (REGION_KEYS as string[]).includes(regionRaw)
+      ? (regionRaw as LocPin["region"])
+      : undefined;
+    const percentNum = Number(rec.percent);
+    out.push({
+      region,
+      label,
+      value: rec.value != null && rec.value !== "" ? String(rec.value) : undefined,
+      unit: typeof rec.unit === "string" && rec.unit ? rec.unit : undefined,
+      percent: Number.isFinite(percentNum) ? Math.max(0, Math.min(100, percentNum)) : undefined,
+      delta: typeof rec.delta === "string" && rec.delta ? rec.delta : undefined,
+    });
+  }
+  return out;
+}
+
+function readHeroStat(c: Record<string, unknown>): { value: string; unit?: string; label?: string } | null {
+  const stat = c.stat;
+  if (!stat || typeof stat !== "object") return null;
+  const rec = stat as Record<string, unknown>;
+  const value = rec.value != null && rec.value !== "" ? String(rec.value) : "";
+  if (!value) return null;
+  return {
+    value,
+    unit: typeof rec.unit === "string" && rec.unit ? rec.unit : undefined,
+    label: typeof rec.label === "string" && rec.label ? rec.label : undefined,
+  };
+}
 
 function renderLocationsVariant(
   variantId: string,
