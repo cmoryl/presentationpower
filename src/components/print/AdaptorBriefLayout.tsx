@@ -128,7 +128,7 @@ export function AdaptorBriefLayout({
                   accent={accent}
                   cq={cq}
                 />
-                <BrandLockup brand={brand} color={mode === "dark" ? "#FFFFFF" : resolvePrintLogoInk(content.logoColor, heroInk)} size="2xs" orientation="horizontal" />
+                <BrandLockup brand={brand} color={brand.id === "bm-enterprise" ? (mode === "dark" ? "#FFFFFF" : "#000000") : (mode === "dark" ? "#FFFFFF" : resolvePrintLogoInk(content.logoColor, heroInk))} size="2xs" orientation="horizontal" />
               </div>
               <h1 ref={heroRef} style={{
                 position: "relative",

@@ -122,12 +122,14 @@ export function PrintFooterLockup({
 }) {
   const accent = brand.tokens.accent || brand.tokens.primary;
   const primary = brand.tokens.primary;
+  const isEnterprise = brand.id === "bm-enterprise";
+  // Enterprise = the plain TransPerfect wordmark in pure black on white / white
+  // on dark — no navy tint, no division mark, no color logo variant.
   const ink = mode === "dark" ? "#FFFFFF" : "#03002C";
   const inkSoft = mode === "dark" ? "#FFFFFF" : "rgba(85,85,85,0.9)";
   const dividerCol = mode === "dark" ? "rgba(255,255,255,0.24)" : "rgba(3,0,44,0.14)";
   const accentInk = mode === "dark" ? "#FFFFFF" : primary;
-
-  const isEnterprise = brand.id === "bm-enterprise";
+  const enterpriseLogoInk = mode === "dark" ? "#FFFFFF" : "#000000";
 
   const chipStyle: CSSProperties = {
     display: "inline-flex",
@@ -149,7 +151,7 @@ export function PrintFooterLockup({
       }}
     >
       <div className="flex items-center min-w-0" style={{ gap: cq(12) }}>
-        <BrandLockup brand={enterpriseBrand} color={ink} size="2xs" orientation="horizontal" />
+        <BrandLockup brand={enterpriseBrand} color={enterpriseLogoInk} size="2xs" orientation="horizontal" />
         {!isEnterprise && (
           <>
             <div style={{ width: 1, height: cq(16), background: dividerCol, flexShrink: 0 }} aria-hidden />
