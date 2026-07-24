@@ -269,7 +269,8 @@ function SocialView() {
           </div>
         ) : null}
       </section>
-    </div>
+      </div>
+    </>
   );
 }
 
