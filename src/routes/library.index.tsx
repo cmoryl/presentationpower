@@ -479,14 +479,16 @@ function Library() {
 
   return (
     <AppShell>
-      <div>
-        <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library</div>
-        <div className="mt-3"><LibrarySubnav active="/library" /></div>
-        <h1 className="mt-4 text-4xl font-semibold">Approved module variants.</h1>
-        <p className="mt-3 max-w-2xl text-black/60">
-          Search and preview the modules the assembler pulls from. Scope by brand to hide off-limits families and float the preferred variants for that identity. Staging area for freshly imported PPTX slides lives under <Link to="/library/imported" className="underline hover:text-[#003FC7]">Imported slides</Link>.
-        </p>
-      </div>
+      <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] px-6 py-14 sm:-mt-10 sm:px-12 lg:px-24 lg:py-20 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
+        <div className="mx-auto max-w-[1400px]">
+          <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">Library</div>
+          <div className="mt-3"><LibrarySubnav active="/library" /></div>
+          <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">Approved module variants.</h1>
+          <p className="mt-3 max-w-2xl text-black/60 dark:text-white/60">
+            Search and preview the modules the assembler pulls from. Scope by brand to hide off-limits families and float the preferred variants for that identity. Staging area for freshly imported PPTX slides lives under <Link to="/library/imported" className="underline hover:text-[#003FC7]">Imported slides</Link>.
+          </p>
+        </div>
+      </header>
 
 
       <div className="mt-8 space-y-4">
