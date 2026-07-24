@@ -685,15 +685,16 @@ export function KitWizard({
                     <div className="text-[10px] text-black/40">
                       {asset.format.width}×{asset.format.height} · {asset.mode}
                     </div>
-                    <SocialRenderer
-                      format={asset.format}
-                      brandId={asset.brandId}
-                      mode={asset.mode}
-                      copy={asset.copy}
-                      facts={{ hashtag: eventFacts.hashtag, registrationUrl: eventFacts.registrationUrl }}
-                      displayShortEdge={260}
-                    />
-                  </div>
+                    <div data-kit-asset-id={asset.id}>
+                      <SocialRenderer
+                        format={asset.format}
+                        brandId={asset.brandId}
+                        mode={asset.mode}
+                        copy={asset.copy}
+                        facts={{ hashtag: eventFacts.hashtag, registrationUrl: eventFacts.registrationUrl }}
+                        displayShortEdge={260}
+                      />
+                    </div>
                 ))}
               </div>
             )}
