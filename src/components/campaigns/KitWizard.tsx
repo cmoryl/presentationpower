@@ -113,6 +113,7 @@ export function KitWizard({
   // ─── Save state ────────────────────────────────────────────────────────
   const [savedKitId, setSavedKitId] = useState<string | undefined>(kitId);
   const [kitName, setKitName] = useState<string>("");
+  const [exporting, setExporting] = useState(false);
   const [saving, setSaving] = useState(false);
   const [hydrating, setHydrating] = useState<boolean>(!!kitId);
 
