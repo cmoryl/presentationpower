@@ -21,8 +21,10 @@ import {
   SOCIAL_PLAYBOOKS,
   sourceFromSocialPlaybook,
   factsFromSocialPlaybook,
+  getExpandedSocialCollateral,
   type SocialPlaybook,
 } from "@/lib/social-playbooks";
+import { CollateralGrid } from "@/components/campaigns/CollateralGrid";
 import { KIT_PROFILES_BY_ID, SOCIAL_FORMATS_BY_ID } from "@/lib/social-formats";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { buildCampaignAssets } from "@/lib/campaigns";
