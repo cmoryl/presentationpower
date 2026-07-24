@@ -6,6 +6,9 @@
 
 import type { SocialFormat } from "./social-formats";
 import { getFormat } from "./social-formats";
+import { byId, MODULE_VARIANTS, type BrandMode } from "./taxonomy";
+import { resolveDivisionBrief, seedDivisionContent } from "./library-preview";
+
 
 export type EventSpeaker = { name: string; role?: string };
 export type EventSponsor = { name: string; tier?: "title" | "gold" | "silver" | "supporter" };
