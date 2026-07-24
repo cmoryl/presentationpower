@@ -385,21 +385,19 @@ function AssetEditor() {
   // matching editor path, warn loudly rather than let it silently disappear
   // from the UI (the exact class of bug that stranded `client`, `eyebrow`,
   // etc. before the Content inspector existed).
-  if (import.meta.env.DEV) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-      import("@/lib/print-content-schema").then(({ schemaFor: sf, unreachablePaths, fullyPopulatedSample }) => {
-        const dead = unreachablePaths(sf(kind), fullyPopulatedSample(kind));
-        if (dead.length > 0) {
-          // eslint-disable-next-line no-console
-          console.warn(
-            `[print-content-schema] Unreachable fields for kind="${kind}":`,
-            dead,
-          );
-        }
-      });
-    }, [kind]);
-  }
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    import("@/lib/print-content-schema").then(({ schemaFor: sf, unreachablePaths, fullyPopulatedSample }) => {
+      const dead = unreachablePaths(sf(kind), fullyPopulatedSample(kind));
+      if (dead.length > 0) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `[print-content-schema] Unreachable fields for kind="${kind}":`,
+          dead,
+        );
+      }
+    });
+  }, [kind]);
 
 
   function updateStat(i: number, patch: Partial<CaseStudyStat>) {
