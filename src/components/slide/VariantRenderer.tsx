@@ -5756,11 +5756,16 @@ function renderLocationsVariant(
       <div className="flex flex-col items-end text-right" style={{ minWidth: 220 }}>
         <div className="flex items-baseline gap-2">
           <span className="tabular-nums font-semibold" style={{ fontSize: 104, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}>
-            {totalCities}
+            {heroStat?.value ?? totalCities}
           </span>
+          {heroStat?.unit && (
+            <span className="tabular-nums" style={{ fontSize: 28, color: ink.muted, fontWeight: 600 }}>
+              {heroStat.unit}
+            </span>
+          )}
         </div>
         <div className="mt-3 uppercase" style={{ fontSize: 13, letterSpacing: "0.3em", color: ink.muted, fontWeight: 600 }}>
-          Cities live
+          {heroStat?.label ?? "Cities live"}
         </div>
         <div className="mt-2 uppercase tabular-nums" style={{ fontSize: 14, letterSpacing: "0.24em", color: "var(--slide-accent-text)", fontWeight: 700 }}>
           ● {totalRegions} regions
