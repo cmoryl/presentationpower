@@ -104,6 +104,7 @@ const navGroups: NavGroup[] = [
       { to: "/admin", label: "Command center", exact: true },
       { to: "/templates", label: "Templates" },
       { to: "/admin/print-library", label: "Print library" },
+      { to: "/admin/campaigns", label: "Campaigns (scaffold)" },
       { to: "/admin/audit", label: "Audit log" },
     ],
   },
