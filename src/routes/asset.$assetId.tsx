@@ -881,6 +881,12 @@ function AssetEditor() {
               {ctx.printSafeArea && (
                 <div className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25" />
               )}
+              <HeroResizeHandle
+                canvasRef={canvasRef}
+                media={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
+                onChange={(next) => patchContent({ heroMedia: next } as never)}
+              />
+
               {showBleedGuides && (
                 <>
                   {/* Bleed edge (outer) — where the printed art bleeds off. */}
