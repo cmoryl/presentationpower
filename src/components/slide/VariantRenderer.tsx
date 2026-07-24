@@ -5632,6 +5632,75 @@ function renderLocationsVariant(
   const totalCities = pins.length;
   const totalRegions = (Object.keys(counts) as LocPin["region"][]).filter((k) => counts[k] > 0).length;
 
+  // KPI/graph-style region metric fields — same shape MV-DASH-REGION-STATS
+  // reads from `c.items` and `c.stat`. We keep MV-LOC-* `c.items` as the pin
+  // array and expose the metrics via `c.regionMetrics` + `c.stat`.
+  const regionMetrics = readRegionMetrics(c);
+  const heroStat = readHeroStat(c);
+  const hasRegionMetrics = regionMetrics.length > 0;
+
+  // Compact metric list — mirrors the MV-DASH-REGION-STATS visual grammar
+  // (label · delta on top, progress bar below). Renders inside any panel.
+  const RegionMetricList = ({ rows, maxRows = 6 }: { rows: RegionMetricRow[]; maxRows?: number }) => {
+    const shown = rows.slice(0, maxRows);
+    return (
+      <div>
+        {shown.map((it, i) => {
+          const pct = typeof it.percent === "number" ? it.percent : 0;
+          const delta = it.delta ?? "";
+          const negative = delta.trim().startsWith("-");
+          return (
+            <div
+              key={`${it.label}-${i}`}
+              className="py-4"
+              style={{
+                borderTop: `1px solid ${ink.hairline}`,
+                borderBottom: i === shown.length - 1 ? `1px solid ${ink.hairline}` : "none",
+              }}
+            >
+              <div className="flex items-baseline justify-between gap-4">
+                <div style={{ fontSize: 18, fontWeight: 600, color: ink.strong, letterSpacing: "-0.005em" }}>
+                  {it.label}
+                </div>
+                <div className="flex items-baseline gap-3">
+                  {it.value && (
+                    <div className="tabular-nums" style={{ fontSize: 18, fontWeight: 600, color: ink.strong }}>
+                      {it.value}
+                      {it.unit && (
+                        <span style={{ fontSize: 12, color: ink.muted, marginLeft: 3 }}>{it.unit}</span>
+                      )}
+                    </div>
+                  )}
+                  {delta && (
+                    <div
+                      className="uppercase tabular-nums"
+                      style={{
+                        fontSize: 12,
+                        letterSpacing: "0.24em",
+                        fontWeight: 700,
+                        color: negative ? "#B42318" : "var(--slide-accent-text)",
+                      }}
+                    >
+                      {delta}
+                    </div>
+                  )}
+                </div>
+              </div>
+              {typeof it.percent === "number" && (
+                <div
+                  className="mt-2 h-1.5 overflow-hidden rounded-full"
+                  style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.08)" }}
+                >
+                  <div style={{ width: `${pct}%`, height: "100%", background: accent, opacity: 0.8 }} />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   // Free-form region rail — a bare hairline row of region ticks, no cards,
   // no plate, no per-cell borders. Matches the KPI/chart Aurora v2 grammar.
   const RegionRail = () => {
