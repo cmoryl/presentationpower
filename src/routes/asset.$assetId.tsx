@@ -46,6 +46,7 @@ import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
 import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
 import { ContentInspector } from "@/components/print/ContentInspector";
+import { schemaFor } from "@/lib/print-content-schema";
 import { CONTENT_SCHEMAS, unreachablePaths } from "@/lib/print-content-schema";
 
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
