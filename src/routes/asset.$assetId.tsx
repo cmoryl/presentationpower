@@ -1663,7 +1663,7 @@ function HeroMediaPanel({
         {applyingAll && (
           <div className="space-y-1">
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
-              <div className="h-full w-1/3 animate-[shimmer_1.2s_infinite] rounded-full bg-[#003FC7]" />
+              <div className="h-full w-1/3 animate-pulse rounded-full bg-[#003FC7]" />
             </div>
             <div className="text-[10px] text-black/50 dark:text-white/50">Applying hero to relevant templates…</div>
           </div>
