@@ -2,20 +2,19 @@ import { test, expect } from "@playwright/test";
 
 async function createDeckViaSkipAI(page: any) {
   await page.goto("/brief/new", { waitUntil: "domcontentloaded" });
-  await page.waitForTimeout(2000);
-  const skip = page.getByRole("button", { name: /skip AI/i });
+  const skip = page.getByRole("button", { name: /skip AI/i }).first();
+  await skip.waitFor({ state: "visible", timeout: 15000 });
   await skip.click();
   await page.waitForURL(/\/decks\/[A-Za-z0-9_-]+/, { timeout: 15000 });
   await page.waitForTimeout(1500);
   return page.url();
 }
 
-// Try each label; return the first trigger that exists on the page.
 async function firstAvailableTrigger(page: any) {
   const labels = ["History", "Slide", "Distribute", "Appearance", "Motion"];
   for (const label of labels) {
     const btn = page.getByRole("button", { name: new RegExp(`^${label}`, "i") }).first();
-    if (await btn.count() && (await btn.isVisible().catch(() => false))) {
+    if ((await btn.count()) > 0 && (await btn.isVisible().catch(() => false))) {
       return { btn, label };
     }
   }
