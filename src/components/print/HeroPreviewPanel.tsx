@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import type { PrintHeroMedia } from "@/lib/print-assets.types";
 import type { BrandMode } from "@/lib/taxonomy";
-import { Image as ImageIcon, Sparkles } from "lucide-react";
+import { Crosshair, Image as ImageIcon, Sparkles } from "lucide-react";
 
 type Props = {
   media: PrintHeroMedia | undefined;
