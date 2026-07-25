@@ -92,6 +92,16 @@ test.describe("Module preview video-demo autoplay matrix", () => {
       await expect(imageryToggle).toHaveAttribute("aria-pressed", "true");
     }
 
+    // Default preview mode is Light-only. To exercise BOTH light and dark
+    // autoplay paths in a single load, flip the preview to A/B mode so
+    // each variant renders light + dark previews side-by-side.
+    const abToggle = page.getByRole("button", { name: /A\/B/ });
+    await expect(abToggle).toBeVisible({ timeout: 10_000 });
+    if ((await abToggle.getAttribute("aria-pressed")) !== "true") {
+      await abToggle.click();
+      await expect(abToggle).toHaveAttribute("aria-pressed", "true");
+    }
+
     await scrollToLoadAll(page);
 
     // Wait for at least one <video> to appear.
