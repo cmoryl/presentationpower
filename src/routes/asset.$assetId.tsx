@@ -45,6 +45,7 @@ import {
 import { PrintSectionPicker, PRINT_SECTION_DND_MIME } from "@/components/print/sections/PrintSectionPicker";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
+import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
 
@@ -1624,6 +1625,39 @@ function HeroMediaPanel({
               );
             })
           )}
+        </div>
+      </div>
+      {/* Starter examples — always available bundled photography from the
+          division backdrop pool, so hero pickers have ready-to-use imagery
+          even before anyone uploads to the shared library. */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
+          <span>Starter examples{divisionId ? "" : " · enterprise pool"}</span>
+          <span className="text-[9px] normal-case tracking-normal text-black/40 dark:text-white/40">Bundled · ready to use</span>
+        </div>
+        <div className="grid grid-cols-4 gap-1.5">
+          {getDivisionImagery(divisionId ?? "bm-enterprise").photos.slice(0, 8).map((url, idx) => {
+            const active = enabled && media.imageUrl === url;
+            return (
+              <button
+                key={`${url}-${idx}`}
+                type="button"
+                onClick={() => {
+                  const base: PrintHeroMedia = enabled
+                    ? media
+                    : { imageUrl: "", overlayOpacity: 0.55, washStrength: 1, scrim: "bottom", blendMode: "multiply", heightPct: 46 };
+                  onChange({ ...base, imageUrl: url });
+                }}
+                className={`relative aspect-video overflow-hidden rounded border transition ${
+                  active
+                    ? "border-[#003FC7] ring-2 ring-[#003FC7]/40"
+                    : "border-black/10 hover:border-black/30 dark:border-white/10 dark:hover:border-white/30"
+                }`}
+                title={`Starter hero ${idx + 1}`}
+                style={{ backgroundImage: `url(${url})`, backgroundSize: "cover", backgroundPosition: "center" }}
+              />
+            );
+          })}
         </div>
       </div>
       {/* Upload / drop zone — persists into the private slide-media bucket. */}
