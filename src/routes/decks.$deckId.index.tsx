@@ -836,6 +836,60 @@ function DeckEditor() {
               }
             />
           )}
+          {active && (
+            <details className="group rounded-2xl border border-black/10 bg-white">
+              <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-xs uppercase tracking-widest text-[#003FC7] hover:bg-black/[0.02]">
+                <span>Logo on this slide</span>
+                <span className="text-black/40 transition group-open:rotate-180">▾</span>
+              </summary>
+              <div className="border-t border-black/10 px-4 py-4">
+                <div className="flex items-baseline justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setSlideLogo(deck.id, active.id, { position: "auto", orientation: "auto" })}
+                    className="text-[11px] uppercase tracking-widest text-black/40 hover:text-black"
+                  >
+                    Reset
+                  </button>
+                </div>
+                <div className="mt-2 space-y-3">
+                  <label className="block text-xs">
+                    <span className="mb-1 block font-medium text-black/70">Orientation</span>
+                    <select
+                      value={active.logoOrientation ?? "auto"}
+                      onChange={(e) => setSlideLogo(deck.id, active.id, { orientation: e.target.value as "auto" | "horizontal" | "stacked" | "mark-only" })}
+                      className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                    >
+                      <option value="auto">Auto (deck default · {logoOrientation})</option>
+                      <option value="horizontal">Horizontal (side-by-side)</option>
+                      <option value="stacked">Stacked</option>
+                      <option value="mark-only">Mark only (monogram)</option>
+                    </select>
+                  </label>
+                  <label className="block text-xs">
+                    <span className="mb-1 block font-medium text-black/70">Position</span>
+                    <select
+                      value={active.logoPosition ?? "auto"}
+                      onChange={(e) => setSlideLogo(deck.id, active.id, { position: e.target.value as never })}
+                      className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                    >
+                      <option value="auto">Auto (layout default)</option>
+                      <option value="top-left">Top left · half size</option>
+                      <option value="top-center">Top center · half size</option>
+                      <option value="top-right">Top right</option>
+                      <option value="bottom-left">Bottom left · half size</option>
+                      <option value="bottom-center">Bottom center · half size</option>
+                      <option value="bottom-right">Bottom right</option>
+                      <option value="hidden">Hidden</option>
+                    </select>
+                  </label>
+                </div>
+                <p className="mt-3 text-[11px] text-black/50">
+                  Always rendered as the top-most visual layer. Half-size positions keep the mark quiet; mark-only shows only the monogram.
+                </p>
+              </div>
+            </details>
+          )}
           <ClientLogoPanel
             current={deck.clientLogo ?? null}
             onChange={(logo) => setDeckClientLogo(deck.id, logo)}
