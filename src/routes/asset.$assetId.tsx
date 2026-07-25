@@ -1528,16 +1528,21 @@ function HeroMediaPanel({
   const applyAll = useServerFn(applyHeroToAllPrintAssets);
   const [applyingAll, setApplyingAll] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [applySummary, setApplySummary] = useState<
+    | { status: "success"; updated: number; scanned: number }
+    | { status: "error"; message: string; errors: string[] }
+    | null
+  >(null);
 
   function handleApplyToAll() {
     if (!enabled || !divisionId) return;
+    setApplySummary(null);
     setConfirmOpen(true);
   }
 
   async function handleConfirmApply() {
     if (!enabled || !divisionId) return;
-    const label = kind.replace("-", " ");
-    const tid = toast.loading("Applying hero to all templates…");
+    setApplySummary(null);
     setApplyingAll(true);
     try {
       const res = await applyAll({
@@ -1548,10 +1553,19 @@ function HeroMediaPanel({
           excludeAssetId: assetId ?? undefined,
         },
       });
-      toast.success(`Applied to ${res.updated} of ${res.scanned} ${label} asset${res.scanned === 1 ? "" : "s"}.`, { id: tid });
+      if (res.updated === res.scanned && res.errors.length === 0) {
+        setApplySummary({ status: "success", updated: res.updated, scanned: res.scanned });
+      } else if (res.updated > 0) {
+        setApplySummary({ status: "error", message: `Applied to ${res.updated} of ${res.scanned} assets; ${res.errors.length} failed.`, errors: res.errors });
+      } else {
+        setApplySummary({ status: "error", message: `Could not apply to any asset: ${res.errors[0] ?? "unknown error"}`, errors: res.errors });
+      }
+      toast.success(`Applied to ${res.updated} of ${res.scanned} ${kind.replace("-", " ")} asset${res.scanned === 1 ? "" : "s"}.`);
       setConfirmOpen(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Bulk apply failed.", { id: tid });
+      const message = err instanceof Error ? err.message : "Bulk apply failed.";
+      setApplySummary({ status: "error", message, errors: [message] });
+      toast.error(message);
     } finally {
       setApplyingAll(false);
     }
@@ -1630,19 +1644,60 @@ function HeroMediaPanel({
       <HeroPreviewPanel media={value} brand={brand} />
       {/* One-click bulk-apply — writes the current hero to every sibling
           print asset of the same kind under this division. */}
-      <div className="flex items-center justify-between rounded-md border border-black/10 bg-black/[0.02] px-2 py-1.5 dark:border-white/10 dark:bg-white/[0.03]">
-        <span className="text-[10px] text-black/60 dark:text-white/60">
-          Apply this hero to every <span className="font-semibold">{kind.replace("-", " ")}</span> in this division
-        </span>
-        <button
-          type="button"
-          onClick={handleApplyToAll}
-          disabled={!enabled || !divisionId || applyingAll}
-          className="rounded border border-black/15 bg-white px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/15 dark:bg-white/[0.05] dark:text-white/80"
-          title={!enabled ? "Select a hero image first" : !divisionId ? "Select a division first" : "Apply to all sibling templates"}
-        >
-          {applyingAll ? "Applying…" : "Apply to all"}
-        </button>
+      <div className="space-y-2 rounded-md border border-black/10 bg-black/[0.02] px-2 py-1.5 dark:border-white/10 dark:bg-white/[0.03]">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] text-black/60 dark:text-white/60">
+            Apply this hero to every <span className="font-semibold">{kind.replace("-", " ")}</span> in this division
+          </span>
+          <button
+            type="button"
+            onClick={handleApplyToAll}
+            disabled={!enabled || !divisionId || applyingAll}
+            className="rounded border border-black/15 bg-white px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/15 dark:bg-white/[0.05] dark:text-white/80"
+            title={!enabled ? "Select a hero image first" : !divisionId ? "Select a division first" : "Apply to all sibling templates"}
+          >
+            {applyingAll ? "Applying…" : "Apply to all"}
+          </button>
+        </div>
+
+        {applyingAll && (
+          <div className="space-y-1">
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
+              <div className="h-full w-1/3 animate-pulse rounded-full bg-[#003FC7]" />
+            </div>
+            <div className="text-[10px] text-black/50 dark:text-white/50">Applying hero to relevant templates…</div>
+          </div>
+        )}
+
+        {applySummary && applySummary.status === "success" && (
+          <div className="flex items-start gap-2 rounded-md bg-[#A6FA87]/20 px-2 py-1.5 text-[11px] text-[#0F5C1A] dark:bg-[#A6FA87]/15 dark:text-[#A6FA87]">
+            <span className="mt-0.5 inline-block h-3 w-3 shrink-0 rounded-full bg-[#A6FA87]" />
+            <span>
+              Success: applied to <strong>{applySummary.updated}</strong> of{" "}
+              <strong>{applySummary.scanned}</strong> {kind.replace("-", " ")} asset
+              {applySummary.scanned === 1 ? "" : "s"}.
+            </span>
+          </div>
+        )}
+
+        {applySummary && applySummary.status === "error" && (
+          <div className="space-y-1 rounded-md bg-[#E53D2E]/10 px-2 py-1.5 text-[11px] text-[#E53D2E] dark:bg-[#E53D2E]/15 dark:text-[#FF9B70]">
+            <div className="flex items-start gap-2">
+              <span className="mt-0.5 inline-block h-3 w-3 shrink-0 rounded-full bg-[#E53D2E]" />
+              <span className="font-medium">{applySummary.message}</span>
+            </div>
+            {applySummary.errors.length > 1 && (
+              <ul className="ml-5 list-disc text-[10px] opacity-90">
+                {applySummary.errors.slice(0, 3).map((err, i) => (
+                  <li key={i}>{err}</li>
+                ))}
+                {applySummary.errors.length > 3 && (
+                  <li>…and {applySummary.errors.length - 3} more</li>
+                )}
+              </ul>
+            )}
+          </div>
+        )}
       </div>
 
       <ConfirmModal
