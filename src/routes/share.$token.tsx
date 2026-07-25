@@ -130,6 +130,10 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
   const clientName = deck.brief?.prospect ?? undefined;
   const [presenting, setPresenting] = useState(false);
   const [i, setI] = useState(0);
+  const prevIRef = useRef(0);
+  const presentDirection: Direction = i >= prevIRef.current ? "forward" : "back";
+  useEffect(() => { prevIRef.current = i; }, [i]);
+
 
   // ---- Language overlay ----
   const listLocalesFn = useServerFn(listSharedLocales);
