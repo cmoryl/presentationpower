@@ -19,7 +19,7 @@ const TYPES: TransitionType[] = ["none", "fade", "push-left", "push-right", "zoo
 function DemoView() {
   const [i, setI] = useState(0);
   const [type, setType] = useState<TransitionType>("fade");
-  const [durationMs, setDurationMs] = useState(400);
+  const [durationMs, setDurationMs] = useState(800);
   const [dir, setDir] = useState<Direction>("forward");
 
   const slide = DEMO[i];
