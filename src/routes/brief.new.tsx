@@ -766,11 +766,9 @@ function BriefWizard() {
                   </div>
                 </div>
               </div>
-              </>)}
 
-              {step === 3 && (<>
               {/* SECTION — MASTER SET */}
-              <section className="rounded-2xl border bg-white p-6 shadow-[0_2px_20px_-8px_rgba(3,0,44,0.08)] md:p-8" style={{ borderColor: PALETTE.hairline }}>
+              <section id="master-set" className="scroll-mt-24 rounded-2xl border bg-white p-6 shadow-[0_2px_20px_-8px_rgba(3,0,44,0.08)] md:p-8" style={{ borderColor: PALETTE.hairline }}>
                 <div className="mb-5 flex items-baseline gap-3">
                   <span className="font-mono text-xs uppercase tracking-[0.18em] text-[#003FC7]">04 · Master set</span>
                   <span className="text-xs text-[#03002C]/45">Pick everything you want produced from this one brief.</span>
