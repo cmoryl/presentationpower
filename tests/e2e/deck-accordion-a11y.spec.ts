@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 async function createDeckViaSkipAI(page: any) {
   await page.goto("/brief/new", { waitUntil: "domcontentloaded" });
-  const skip = page.getByRole("button", { name: /skip AI/i }).first();
+  const skip = page.getByRole("button", { name: /or skip AI/i });
   await skip.waitFor({ state: "visible", timeout: 20000 });
   await expect(skip).toBeEnabled();
   await skip.click();
