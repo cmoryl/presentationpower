@@ -63,13 +63,14 @@ test.describe("Library lightbox mode switch", () => {
     await page.goto("/library?eager=1", { waitUntil: "domcontentloaded" });
     await page.waitForLoadState("networkidle").catch(() => undefined);
 
-    // Sample video fixtures are H.264 mp4; Playwright's bundled Chromium
-    // OSS build lacks that codec. Skip cleanly — not a product regression.
-    const canPlayH264 = await page.evaluate(() => {
+    // Sample fixtures are WebM/VP9 (see src/lib/video-slide-examples.ts) —
+    // Chromium OSS decodes VP9 natively, so this test RUNS in CI instead
+    // of skipping the way it did when fixtures were H.264 mp4.
+    const canPlayVP9 = await page.evaluate(() => {
       const v = document.createElement("video");
-      return Boolean(v.canPlayType('video/mp4; codecs="avc1.42E01E"'));
+      return Boolean(v.canPlayType('video/webm; codecs="vp9"'));
     });
-    test.skip(!canPlayH264, "browser lacks H.264 support for sample media");
+    expect(canPlayVP9, "browser lacks VP9 WebM support for sample media").toBe(true);
 
     // Imagery is off by default on /library — toggle it on so video-demo
     // Zoom affordances render (they gate on imagery being visible).
