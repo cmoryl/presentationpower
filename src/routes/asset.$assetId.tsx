@@ -2277,6 +2277,20 @@ function HeroMediaPanel({
           display={`${Math.round(heightPct)}%`}
         />
       )}
+      <Slider
+        label="Copy vertical offset"
+        value={media.copyOffsetPct ?? 0}
+        min={-50}
+        max={50}
+        step={1}
+        onChange={(v) => patch({ copyOffsetPct: v })}
+        display={
+          (media.copyOffsetPct ?? 0) === 0
+            ? "Centered"
+            : `${(media.copyOffsetPct ?? 0) > 0 ? "+" : ""}${Math.round(media.copyOffsetPct ?? 0)}%`
+        }
+      />
+
       <Row label="Scrim">
         <select
           className={inspectorInput}
