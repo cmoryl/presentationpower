@@ -5,6 +5,7 @@ import { useState } from "react";
 import { getAiAnalytics } from "@/lib/admin.functions";
 import { hasAiKey } from "@/lib/ai-status.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
+import { AdminPageHeader } from "@/components/admin/AdminPage";
 
 export const Route = createFileRoute("/admin/ai")({
   component: AiView,
@@ -33,6 +34,11 @@ function AiView() {
 
   return (
     <div className="space-y-8">
+      <AdminPageHeader
+        eyebrow="Analytics"
+        title="AI usage & cost"
+        description="Call volume, token spend, error rate, and model mix across the AI gateway."
+      />
       {status.data && (
         <div
           className={`flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-sm ${

@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { listAdminUsers, inviteAdminUser, setUserRole, deleteAdminUser } from "@/lib/admin.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
+import { AdminPageHeader } from "@/components/admin/AdminPage";
 
 const ROLES = ["admin", "editor", "brand_lead", "viewer", "user"] as const;
 type Role = (typeof ROLES)[number];
@@ -41,6 +42,11 @@ function UsersView() {
 
   return (
     <div className="space-y-8">
+      <AdminPageHeader
+        eyebrow="Governance"
+        title="Users & roles"
+        description="Invite teammates, assign roles, and audit who has admin access."
+      />
       <section className="rounded-2xl border border-black/10 bg-white/70 p-6 backdrop-blur">
         <h2 className="text-lg font-semibold">Invite a user</h2>
         <p className="mt-1 text-sm text-black/60">They will receive an email invitation and be assigned the selected role.</p>
