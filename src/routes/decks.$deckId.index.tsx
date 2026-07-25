@@ -307,8 +307,8 @@ function DeckEditor() {
                   aria-pressed={liveEdit}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
                     liveEdit
-                      ? "border-[#003FC7] bg-[#003FC7] text-white shadow-sm"
-                      : "border-black/10 bg-white text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+                      ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                      : "border-black/10 bg-white text-black/70 hover:border-primary hover:text-primary"
                   }`}
                   title="Toggle click-to-edit on the slide preview (Enter commits, Esc cancels)"
                 >
