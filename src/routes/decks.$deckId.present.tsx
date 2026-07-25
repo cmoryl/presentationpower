@@ -127,9 +127,9 @@ function PresenterView() {
       <div className="w-full max-w-[95vw]">
         <div className="mx-auto aspect-[16/9] w-full">
           {slide && variant && (
-            <ScaledSlide>
+            <SlideStage slideKey={slide.id} direction={direction} transition={transition}>
               <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} />
-            </ScaledSlide>
+            </SlideStage>
           )}
         </div>
       </div>
