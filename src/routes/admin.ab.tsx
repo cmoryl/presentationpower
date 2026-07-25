@@ -1,3 +1,4 @@
+import { AdminLoading } from "@/components/admin/AdminPage";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -126,7 +127,7 @@ function AbView() {
 
       <section>
         <h2 className="mb-3 text-lg font-semibold">Experiments</h2>
-        {q.isLoading && <div className="text-sm text-black/50">Loading…</div>}
+        {q.isLoading && <AdminLoading />}
         <div className="space-y-3">
           {q.data?.map((e: any) => {
             const totalConv = (e.variants as any[]).reduce((a, v) => a + v.conversions, 0);

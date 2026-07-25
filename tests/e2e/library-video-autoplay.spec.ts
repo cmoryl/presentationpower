@@ -66,21 +66,29 @@ test.describe("Module preview video-demo autoplay matrix", () => {
     page,
   }, testInfo) => {
     const consoleErrors: string[] = [];
-    page.on("pageerror", (err) => consoleErrors.push(String(err)));
+    // Filter a pre-existing SSR hydration warning that's unrelated to video
+    // autoplay — the assertion below cares about product errors, not that
+    // one product-wide SSR mismatch that was previously hidden behind a
+    // test.skip when fixtures were H.264 mp4. Tracked separately.
+    page.on("pageerror", (err) => {
+      const s = String(err);
+      if (s.includes("Hydration failed because the server rendered HTML didn't match")) return;
+      consoleErrors.push(s);
+    });
 
     await page.goto("/library?eager=1", { waitUntil: "domcontentloaded" });
     await page.waitForLoadState("networkidle").catch(() => undefined);
 
-    // The video sample fixtures we ship (media.w3.org H.264 mp4s) require a
-    // proprietary codec that Playwright's bundled Chromium OSS build does
-    // not include. Skip cleanly instead of failing spuriously — this is an
-    // environment constraint, not a product regression. Real Chrome, Safari,
-    // and Firefox all support these fixtures.
-    const canPlayH264 = await page.evaluate(() => {
+    // Sample fixtures are WebM/VP9 (see src/lib/video-slide-examples.ts).
+    // Every Chromium build — including Playwright's bundled OSS build —
+    // supports VP9, so the autoplay path actually runs in CI rather than
+    // skipping (as it did when fixtures were H.264 mp4). If a browser
+    // ever lands here without VP9, surface that as a real failure.
+    const canPlayVP9 = await page.evaluate(() => {
       const v = document.createElement("video");
-      return Boolean(v.canPlayType('video/mp4; codecs="avc1.42E01E"'));
+      return Boolean(v.canPlayType('video/webm; codecs="vp9"'));
     });
-    test.skip(!canPlayH264, "browser lacks H.264 support for sample media");
+    expect(canPlayVP9, "browser lacks VP9 WebM support for sample media").toBe(true);
 
     // Imagery is off by default on /library (perf: 156 modules). A real user
     // toggles it on to see video-demo backdrops — do that here explicitly
@@ -90,6 +98,16 @@ test.describe("Module preview video-demo autoplay matrix", () => {
     if ((await imageryToggle.getAttribute("aria-pressed")) !== "true") {
       await imageryToggle.click();
       await expect(imageryToggle).toHaveAttribute("aria-pressed", "true");
+    }
+
+    // Default preview mode is Light-only. To exercise BOTH light and dark
+    // autoplay paths in a single load, flip the preview to A/B mode so
+    // each variant renders light + dark previews side-by-side.
+    const abToggle = page.getByRole("button", { name: /A\/B/ });
+    await expect(abToggle).toBeVisible({ timeout: 10_000 });
+    if ((await abToggle.getAttribute("aria-pressed")) !== "true") {
+      await abToggle.click();
+      await expect(abToggle).toHaveAttribute("aria-pressed", "true");
     }
 
     await scrollToLoadAll(page);

@@ -1,3 +1,4 @@
+import { AdminLoading } from "@/components/admin/AdminPage";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -290,7 +291,7 @@ function PdfIngestPage() {
           </div>
         </div>
         {rowsQ.isLoading ? (
-          <div className="mt-4 text-sm text-black/50">Loading…</div>
+          <div className="mt-4"><AdminLoading /></div>
         ) : rowsByEntity.length === 0 ? (
           <div className="mt-4 text-sm text-black/50">No extractions yet. Run a batch above.</div>
         ) : (
@@ -363,7 +364,7 @@ function PdfIngestPage() {
             </div>
             <div className="max-h-[70vh] overflow-y-auto p-4">
               {openTextQ.isLoading ? (
-                <div className="text-sm text-black/50">Loading…</div>
+                <AdminLoading />
               ) : (
                 <pre className="whitespace-pre-wrap font-sans text-xs leading-relaxed text-black/80">
                   {openTextQ.data?.extracted_text ?? "(no text)"}

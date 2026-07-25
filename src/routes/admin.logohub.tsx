@@ -1,3 +1,4 @@
+import { AdminLoading } from "@/components/admin/AdminPage";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
@@ -305,7 +306,7 @@ function LogoHubAdmin() {
         </div>
 
         {q.isLoading ? (
-          <div className="mt-6 text-sm text-black/50">Loading…</div>
+          <div className="mt-6"><AdminLoading /></div>
         ) : filtered.length === 0 ? (
           <div className="mt-6 rounded-2xl border border-dashed border-black/15 bg-black/[0.02] p-8 text-center text-sm text-black/50">
             {totalRows === 0 ? "No logos yet. Add your first client above." : "No matches."}

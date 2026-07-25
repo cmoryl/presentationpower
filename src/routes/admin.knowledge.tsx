@@ -1,3 +1,4 @@
+import { AdminLoading } from "@/components/admin/AdminPage";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -294,7 +295,7 @@ function ColorsTab({ guide, canva }: { guide: BrandGuide; canva: CanvaPaletteEnt
       )}
       <Section title="Canva master reference · Next 2026 palette">
         {canva === null ? (
-          <div className="text-xs text-black/50">Loading…</div>
+          <AdminLoading />
         ) : canvaMatch.length === 0 ? (
           <div className="text-xs text-black/50">No division-specific entry in the Canva 2026 palette.</div>
         ) : (
@@ -497,7 +498,7 @@ function SourcesTab({ slug }: { slug: string }) {
   }, [rows]);
 
   if (rowsQ.isLoading) {
-    return <Section title="Source documents"><div className="text-xs text-black/50">Loading…</div></Section>;
+    return <Section title="Source documents"><AdminLoading /></Section>;
   }
   if (rows.length === 0) {
     return (
@@ -579,7 +580,7 @@ function SourcesTab({ slug }: { slug: string }) {
             </div>
             <div className="max-h-[70vh] overflow-y-auto p-4">
               {textQ.isLoading ? (
-                <div className="text-sm text-black/50">Loading…</div>
+                <AdminLoading />
               ) : (
                 <pre className="whitespace-pre-wrap font-sans text-xs leading-relaxed text-black/80">
                   {textQ.data?.extracted_text ?? "(no text)"}
@@ -725,7 +726,7 @@ function ImportedDecksTab({ slug }: { slug: string }) {
 
       <Section title={`Imported decks (${rows.length})`}>
         {rowsQ.isLoading ? (
-          <div className="text-xs text-black/50">Loading…</div>
+          <AdminLoading />
         ) : rows.length === 0 ? (
           <div className="text-xs text-black/50">No decks imported for this division yet.</div>
         ) : (
@@ -862,7 +863,7 @@ function ImportedDecksTab({ slug }: { slug: string }) {
             </div>
             <div className="max-h-[76vh] overflow-y-auto bg-black/[0.02] px-4 py-4">
               {detailQ.isLoading || !detail ? (
-                <div className="text-xs text-black/50">Loading…</div>
+                <AdminLoading />
               ) : (
                 <ol className="space-y-4">
                   {(detail.slides ?? []).map((sl) => {
@@ -950,7 +951,7 @@ function LibrarySubmissionsSection({ slug }: { slug: string }) {
         Slides teammates have sent to the <span className="font-medium">{slug}</span> approved-variants library. Each one keeps its extracted imagery so it stays visually intact.
       </p>
       {q.isLoading ? (
-        <div className="text-xs text-black/50">Loading…</div>
+        <AdminLoading />
       ) : rows.length === 0 ? (
         <div className="text-xs text-black/50">No slides sent yet. Use “Send to library” on any slide in an imported deck above.</div>
       ) : (
@@ -1206,7 +1207,7 @@ function DivisionImageryTab({ guide }: { guide: BrandGuide }) {
 
       <Section title={`Division imagery (${rows.length})`}>
         {q.isLoading ? (
-          <div className="text-xs text-black/50">Loading…</div>
+          <AdminLoading />
         ) : rows.length === 0 ? (
           <div className="text-xs text-black/50">No imagery uploaded for this division yet.</div>
         ) : (

@@ -63,13 +63,14 @@ test.describe("Library lightbox mode switch", () => {
     await page.goto("/library?eager=1", { waitUntil: "domcontentloaded" });
     await page.waitForLoadState("networkidle").catch(() => undefined);
 
-    // Sample video fixtures are H.264 mp4; Playwright's bundled Chromium
-    // OSS build lacks that codec. Skip cleanly — not a product regression.
-    const canPlayH264 = await page.evaluate(() => {
+    // Sample fixtures are WebM/VP9 (see src/lib/video-slide-examples.ts) —
+    // Chromium OSS decodes VP9 natively, so this test RUNS in CI instead
+    // of skipping the way it did when fixtures were H.264 mp4.
+    const canPlayVP9 = await page.evaluate(() => {
       const v = document.createElement("video");
-      return Boolean(v.canPlayType('video/mp4; codecs="avc1.42E01E"'));
+      return Boolean(v.canPlayType('video/webm; codecs="vp9"'));
     });
-    test.skip(!canPlayH264, "browser lacks H.264 support for sample media");
+    expect(canPlayVP9, "browser lacks VP9 WebM support for sample media").toBe(true);
 
     // Imagery is off by default on /library — toggle it on so video-demo
     // Zoom affordances render (they gate on imagery being visible).
@@ -108,21 +109,29 @@ test.describe("Library lightbox mode switch", () => {
     );
     const lightSrc = lightSnap.src;
 
-    // Flip the in-lightbox toggle to DARK.
-    await page.getByRole("button", { name: /Dark/ }).click();
+    // Flip the in-lightbox toggle to DARK (scope to lightbox — the page
+    // header also has a "☾ Dark" button that would trip strict mode).
+    await page.getByLabel("Enlarged slide preview").getByRole("button", { name: /Dark/ }).click();
 
     // Dark stage takes over; the light stage should no longer exist.
     const darkStage = page.locator(`${LIGHTBOX}[data-preview-mode="dark"]`);
     await expect(darkStage).toBeVisible({ timeout: 10_000 });
     await expect(lightStage).toHaveCount(0);
 
-    // Any video still carrying the previous (light) src must not be playing
-    // — mode switch unmounts the light preview and the store snapshots it.
-    const stalePlaying = await page.evaluate((src) => {
-      return Array.from(document.querySelectorAll("video"))
-        .filter((v) => (v.currentSrc || v.src) === src && !v.paused && v.currentTime > 0.05)
+    // No LIGHT-mode video may still be playing inside the lightbox after
+    // the switch. The dark stage's <video> shares the same src (light +
+    // dark previews reuse the media URL), so we scope by preview-mode,
+    // not by src.
+    void lightSrc;
+    const stalePlaying = await page.evaluate(() => {
+      const box = document.querySelector('[aria-label="Enlarged slide preview"]');
+      if (!box) return [];
+      const lightStage = box.querySelector('[data-preview-mode="light"]');
+      if (!lightStage) return [];
+      return Array.from(lightStage.querySelectorAll("video"))
+        .filter((v) => !v.paused && v.currentTime > 0.05)
         .map((v) => ({ src: v.currentSrc || v.src, t: v.currentTime }));
-    }, lightSrc);
+    });
     expect(
       stalePlaying,
       `previous-mode video kept playing after switch: ${JSON.stringify(stalePlaying)}`,

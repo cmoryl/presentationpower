@@ -13,16 +13,16 @@
 // the normal `insertExampleSlide` deck-store action, so
 // normalizeSlideMedia and variant-swap invariants still apply.
 
-// Stable public sample host — W3C media samples. Google's former
-// `gtv-videos-bucket` public alias now returns 403, so we cycle across a
-// handful of long-lived W3C mp4/poster pairs. Every clip has a matching
-// poster PNG at the same path.
+// Stable public sample host — W3C media samples. We use WebM/VP9 fixtures
+// (not H.264 mp4) because Playwright's bundled Chromium OSS build ships
+// without proprietary H.264 support — mp4 fixtures made the autoplay e2e
+// tests skip in CI. WebM/VP9 is decoded by every open-source Chromium
+// build and by real Chrome/Firefox/Safari, so tests actually RUN.
+// Every clip has a matching poster PNG at the same path.
 const W3 = "https://media.w3.org/2010/05";
 const CLIPS = [
-  { v: `${W3}/sintel/trailer.mp4`, p: `${W3}/sintel/poster.png` },
-  { v: `${W3}/bunny/trailer.mp4`, p: `${W3}/bunny/poster.png` },
-  { v: `${W3}/bunny/movie.mp4`, p: `${W3}/bunny/poster.png` },
-  { v: `${W3}/video/movie_300.mp4`, p: `${W3}/video/poster.png` },
+  { v: `${W3}/sintel/trailer.webm`, p: `${W3}/sintel/poster.png` },
+  { v: `${W3}/video/movie_300.webm`, p: `${W3}/video/poster.png` },
 ] as const;
 const clip = (i: number) => CLIPS[i % CLIPS.length];
 
