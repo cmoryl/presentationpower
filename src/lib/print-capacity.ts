@@ -50,8 +50,19 @@ export type CapacityReport = {
   /** Weight units used / total. */
   used: number;
   budget: number;
+  /** Base module budget for the template (before hero cost is applied). */
+  baseBudget: number;
+  /** Hero cost delta subtracted from the base budget (0 for no-hero assets). */
+  heroCostDelta: number;
+  /** Actionable suggestions the UI can offer alongside issue messages. */
+  suggestions: CapacitySuggestion[];
   issues: CapacityIssue[];
 };
+
+export type CapacitySuggestion =
+  | { kind: "reduce-hero"; targetHeightPct: number; frees: number; message: string }
+  | { kind: "swap-variant"; moduleIndex: number; from: string; to: string; frees: number; message: string }
+  | { kind: "drop-item"; moduleIndex: number; frees: number; message: string };
 
 /* ------------------------------------------------------------------
  * PER-TEMPLATE BUDGETS
