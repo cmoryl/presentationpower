@@ -10,6 +10,8 @@ import { test, expect } from "@playwright/test";
 
 const URL = "/dev/slidestage-demo";
 
+test.use({ viewport: { width: 1280, height: 1800 } });
+
 test.describe("SlideStage transitions", () => {
   test("mounts previous layer during fade + unmounts after", async ({ page }) => {
     await page.goto(URL, { waitUntil: "domcontentloaded" });
