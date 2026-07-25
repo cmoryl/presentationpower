@@ -73,7 +73,7 @@ export function ConfirmModal({
           <button
             type="button"
             onClick={onConfirm}
-            disabled={busy}
+            disabled={busy || disableConfirm}
             className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest text-white disabled:opacity-40 ${
               danger
                 ? "bg-[#E53D2E] hover:bg-[#c23022]"
