@@ -177,7 +177,7 @@ export const applyHeroToAllPrintAssets = createServerFn({ method: "POST" })
     const errors: string[] = [];
     // Prior heroMedia snapshots for the rows we actually update — feeds the
     // client-side "Undo apply to all" action.
-    const undoSnapshots: Array<{ id: string; heroMedia: Record<string, unknown> | null }> = [];
+    const undoSnapshots: Array<{ id: string; heroMedia: unknown }> = [];
     for (const r of candidates) {
       const existing = (r.content as Record<string, unknown>)?.heroMedia;
       if (data.onlyUncustomized && isHeroCustomized(existing)) {
@@ -200,12 +200,15 @@ export const applyHeroToAllPrintAssets = createServerFn({ method: "POST" })
         errors.push(uErr.message);
       }
     }
+    // Serialize snapshots as a JSON string — heroMedia is opaque JSONB and the
+    // server-fn serializable-map check rejects unknown-typed fields. The
+    // client parses this back into an array before calling the undo fn.
     return {
       updated,
       scanned: candidates.length,
       skipped,
       errors,
-      undoSnapshots,
+      undoToken: undoSnapshots.length > 0 ? JSON.stringify(undoSnapshots) : null,
     };
   });
 
