@@ -374,9 +374,10 @@ export function analyzeSection(
 function analyzeModules(
   kind: PrintTemplateKind,
   modules: PrintSection[] | undefined,
-): { used: number; issues: CapacityIssue[] } {
+  effectiveBudget?: number,
+): { used: number; issues: CapacityIssue[]; budget: number } {
   const list = modules ?? [];
-  const budget = PRINT_TEMPLATE_BUDGETS[kind].moduleBudget;
+  const budget = effectiveBudget ?? PRINT_TEMPLATE_BUDGETS[kind].moduleBudget;
   let used = 0;
   const issues: CapacityIssue[] = [];
   list.forEach((m, i) => {
@@ -387,7 +388,7 @@ function analyzeModules(
     issues.push({
       level: "block",
       code: "modules-page-overflow",
-      message: `Shared modules use ${used.toFixed(1)} of ${budget.toFixed(1)} page units — content will overflow the page. Remove or swap for a smaller variant.`,
+      message: `Shared modules use ${used.toFixed(1)} of ${budget.toFixed(1)} page units — content will overflow the page. Reduce the hero band, remove a module, or pick a lighter variant.`,
     });
   } else if (used > budget * 0.85) {
     issues.push({
@@ -396,7 +397,7 @@ function analyzeModules(
       message: `Shared modules use ${used.toFixed(1)} of ${budget.toFixed(1)} page units. Layout is tight — verify export.`,
     });
   }
-  return { used, issues };
+  return { used, issues, budget };
 }
 
 function analyzeCaseStudy(c: CaseStudyContent): CapacityIssue[] {
