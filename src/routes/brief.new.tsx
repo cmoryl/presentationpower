@@ -1193,6 +1193,33 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
+function SectionHeader({
+  index,
+  title,
+  description,
+  meta,
+}: {
+  index: string;
+  title: string;
+  description?: string;
+  meta?: React.ReactNode;
+}) {
+  return (
+    <header className="flex flex-col gap-3 border-b pb-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6" style={{ borderColor: PALETTE.hairline }}>
+      <div className="min-w-0">
+        <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#003FC7]">{index}</div>
+        <h2 className="mt-2 text-2xl font-semibold leading-[1.1] tracking-tight text-[#03002C] sm:text-[28px]">
+          {title}
+        </h2>
+        {description && (
+          <p className="mt-2 max-w-xl text-[13px] leading-relaxed text-[#1E2749]/70">{description}</p>
+        )}
+      </div>
+      {meta && <div className="shrink-0 text-right">{meta}</div>}
+    </header>
+  );
+}
+
 function BrandRelevancePanel({ brand }: { brand: BrandMode }) {
   const scope = brand.contentScope;
   if (!scope) return null;
