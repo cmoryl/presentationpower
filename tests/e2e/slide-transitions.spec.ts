@@ -37,7 +37,7 @@ test.describe("SlideStage transitions", () => {
   });
 
   test("reduced motion skips the previous layer entirely", async ({ browser }) => {
-    const context = await browser.newContext({ reducedMotion: "reduce" });
+    const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1280, height: 1800 } });
     const page = await context.newPage();
     await page.goto(URL, { waitUntil: "domcontentloaded" });
     await page.getByTestId("demo-slide-d-1").waitFor();
