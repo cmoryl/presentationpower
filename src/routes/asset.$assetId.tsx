@@ -1527,11 +1527,16 @@ function HeroMediaPanel({
   const [uploading, setUploading] = useState(false);
   const applyAll = useServerFn(applyHeroToAllPrintAssets);
   const [applyingAll, setApplyingAll] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
-  async function handleApplyToAll() {
+  function handleApplyToAll() {
+    if (!enabled || !divisionId) return;
+    setConfirmOpen(true);
+  }
+
+  async function handleConfirmApply() {
     if (!enabled || !divisionId) return;
     const label = kind.replace("-", " ");
-    if (!confirm(`Apply this hero image to every "${label}" print asset in this division? This overwrites their current hero.`)) return;
     const tid = toast.loading("Applying hero to all templates…");
     setApplyingAll(true);
     try {
@@ -1544,6 +1549,7 @@ function HeroMediaPanel({
         },
       });
       toast.success(`Applied to ${res.updated} of ${res.scanned} ${label} asset${res.scanned === 1 ? "" : "s"}.`, { id: tid });
+      setConfirmOpen(false);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Bulk apply failed.", { id: tid });
     } finally {
