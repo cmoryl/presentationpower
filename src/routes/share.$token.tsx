@@ -455,8 +455,12 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
                   const v = byId(MODULE_VARIANTS, s.variantId);
                   if (!v) return null;
                   return (
-                    <div className="overflow-hidden rounded-xl bg-white shadow-2xl">
-                      <ScaledSlide>
+                    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-white shadow-2xl">
+                      <SlideStage
+                        slideKey={s.id}
+                        direction={presentDirection}
+                        transition={resolveSlideTransition(s, undefined)}
+                      >
                         <VariantRenderer
                           slide={viewSlide(s)}
                           variant={v}
@@ -466,7 +470,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
                           clientLogoUrl={deck.client_logo_url}
                           subCompany={deck.sub_company ?? undefined}
                         />
-                      </ScaledSlide>
+                      </SlideStage>
                     </div>
                   );
                 })()}
