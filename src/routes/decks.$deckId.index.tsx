@@ -222,7 +222,7 @@ function DeckEditor() {
                 type="button"
                 onClick={() => setDeckContext(deckId, { logoOrientation: logoOrientation === "horizontal" ? "stacked" : "horizontal" })}
                 aria-label="Toggle logo orientation"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/60 transition hover:bg-black/[0.04] hover:text-[#003FC7]"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/60 transition hover:bg-black/[0.04] hover:text-primary"
               >
                 {logoOrientation === "stacked" ? <Rows2 size={16} strokeWidth={1.75} /> : <RectangleHorizontal size={16} strokeWidth={1.75} />}
               </button>
