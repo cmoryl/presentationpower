@@ -177,7 +177,7 @@ export const applyHeroToAllPrintAssets = createServerFn({ method: "POST" })
     const errors: string[] = [];
     // Prior heroMedia snapshots for the rows we actually update — feeds the
     // client-side "Undo apply to all" action.
-    const undoSnapshots: Array<{ id: string; heroMedia: unknown }> = [];
+    const undoSnapshots: Array<{ id: string; heroMedia: Record<string, unknown> | null }> = [];
     for (const r of candidates) {
       const existing = (r.content as Record<string, unknown>)?.heroMedia;
       if (data.onlyUncustomized && isHeroCustomized(existing)) {
