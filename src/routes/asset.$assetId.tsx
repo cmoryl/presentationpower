@@ -1528,6 +1528,7 @@ function HeroMediaPanel({
   const [uploading, setUploading] = useState(false);
   const applyAll = useServerFn(applyHeroToAllPrintAssets);
   const previewApply = useServerFn(previewApplyHeroToAllPrintAssets);
+  const undoApply = useServerFn(undoApplyHeroToAllPrintAssets);
   const [applyingAll, setApplyingAll] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -1536,9 +1537,16 @@ function HeroMediaPanel({
     | null
   >(null);
   const [previewError, setPreviewError] = useState<string | null>(null);
+  // Last apply's undo snapshot — session-only, cleared on new apply or successful undo.
+  const [lastUndo, setLastUndo] = useState<
+    | { snapshots: Array<{ id: string; heroMedia: unknown }>; appliedAt: number }
+    | null
+  >(null);
+  const [undoing, setUndoing] = useState(false);
   const [applySummary, setApplySummary] = useState<
     | { status: "success"; updated: number; scanned: number; skipped: number }
     | { status: "error"; message: string; errors: string[]; skipped?: number }
+    | { status: "undone"; restored: number }
     | null
   >(null);
 
