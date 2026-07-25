@@ -18,7 +18,9 @@ import {
   updatePrintAsset,
   deletePrintAsset,
   synthesizeCaseStudy,
+  applyHeroToAllPrintAssets,
 } from "@/lib/print-assets.functions";
+
 import { getDivisionContext } from "@/lib/division-knowledge.functions";
 import type {
   CaseStudyContent,
