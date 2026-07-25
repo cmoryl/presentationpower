@@ -95,6 +95,8 @@ function DeckEditor() {
   const setSlideMode = useDeckStore((s) => s.setSlideMode);
   const setSlideInkOverride = useDeckStore((s) => s.setSlideInkOverride);
   const clearSlideInkOverrides = useDeckStore((s) => s.clearSlideInkOverrides);
+  const setSlideTransition = useDeckStore((s) => s.setSlideTransition);
+  const setDeckDefaultTransition = useDeckStore((s) => s.setDeckDefaultTransition);
 
 
   const [activeIdx, setActiveIdx] = useState(0);
