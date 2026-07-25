@@ -471,6 +471,7 @@ function BriefWizard() {
               </section>
               </>)}
 
+              {step === 2 && (<>
               {/* REQUIRED: Prospect Name + Meeting Objective */}
               <section className="space-y-6">
                 <label className={labelCls}>Prospect</label>
