@@ -190,14 +190,12 @@ function DeckEditor() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-start gap-x-5 gap-y-3 rounded-2xl border border-black/[0.07] bg-white/80 px-5 py-3 shadow-[0_1px_0_rgba(0,0,0,0.02),0_8px_24px_-16px_rgba(3,0,44,0.12)] backdrop-blur">
-          <ToolbarGroup label="History">
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-black/[0.07] bg-white/80 px-3 py-2 shadow-[0_1px_0_rgba(0,0,0,0.02),0_8px_24px_-16px_rgba(3,0,44,0.12)] backdrop-blur">
+          <AccordionGroup label="History">
             <UndoRedoControls />
-          </ToolbarGroup>
+          </AccordionGroup>
 
-          <ToolbarDivider />
-
-          <ToolbarGroup label="Slide">
+          <AccordionGroup label="Slide" badge={totalOpen > 0 ? String(totalOpen) : undefined}>
             <Tip label={totalOpen > 0 ? `Comments · ${totalOpen} open` : "Comments"}>
               <button
                 type="button"
@@ -230,22 +228,24 @@ function DeckEditor() {
               </button>
             </Tip>
             <Tip label="Mark as template"><TemplateToggleButton deckId={deckId} /></Tip>
-          </ToolbarGroup>
+          </AccordionGroup>
 
-          <ToolbarDivider />
-
-          <ToolbarGroup label="Distribute">
+          <AccordionGroup label="Distribute">
             <Tip label="Save to cloud"><SaveToCloudButton deckId={deckId} /></Tip>
             <Tip label="Version history"><VersionHistoryButton deckId={deckId} /></Tip>
             <Tip label="Translate"><TranslateButton deckId={deckId} /></Tip>
             <Tip label="Language"><LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} /></Tip>
             <Tip label="Share"><ShareMenu deckId={deckId} /></Tip>
-          </ToolbarGroup>
+          </AccordionGroup>
 
           {active && (
             <>
-              <ToolbarDivider />
-              <ToolbarGroup label={`Slide ${String(clamped + 1).padStart(2, "0")} · Appearance`}>
+              <span className="mx-1 h-5 w-px bg-black/[0.08]" aria-hidden />
+              <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-black/35">
+                Slide {String(clamped + 1).padStart(2, "0")}
+              </span>
+
+              <AccordionGroup label="Appearance" hint={(active.mode ?? "light") === "dark" ? "Dark" : "Light"}>
                 <div
                   role="group"
                   aria-label="Slide appearance mode"
@@ -276,77 +276,73 @@ function DeckEditor() {
                     ☾ Dark
                   </button>
                 </div>
-              </ToolbarGroup>
+              </AccordionGroup>
 
-              <ToolbarGroup label="Motion">
+              <AccordionGroup label="Motion" hint={(active.transition?.type ?? deck.context?.defaultTransition?.type ?? "fade")}>
                 <TransitionPicker
                   slide={active}
                   deckDefault={deck.context?.defaultTransition}
                   onSlideChange={(t) => setSlideTransition(deck.id, active.id, t)}
                   onDeckDefaultChange={(t) => setDeckDefaultTransition(deck.id, t)}
                 />
-              </ToolbarGroup>
+              </AccordionGroup>
 
               {active.inkOverrides && Object.keys(active.inkOverrides).length > 0 && (
-                <ToolbarGroup label="Overrides">
+                <AccordionGroup label="Overrides" badge={String(Object.keys(active.inkOverrides).length)}>
                   <button
                     type="button"
                     onClick={() => clearSlideInkOverrides(deck.id, active.id)}
                     className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-[11px] font-medium text-black/70 transition hover:border-red-500 hover:text-red-600"
                     title={`Clear ${Object.keys(active.inkOverrides).length} text color override(s) on this slide`}
                   >
-                    ⟲ Reset
-                    <span className="rounded-full bg-black/[0.06] px-1.5 text-[10px]">{Object.keys(active.inkOverrides).length}</span>
+                    ⟲ Reset colors
                   </button>
-                </ToolbarGroup>
+                </AccordionGroup>
               )}
 
-              <div className="ml-auto flex items-start gap-3">
-                <ToolbarGroup label="Edit mode">
-                  <div className="inline-flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => { setCanvasMode(false); setLiveEdit((v) => !v); }}
-                      aria-pressed={liveEdit}
-                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-medium transition ${
-                        liveEdit
-                          ? "border-[#003FC7] bg-[#003FC7] text-white shadow-sm"
-                          : "border-black/10 bg-white text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
-                      }`}
-                      title="Toggle click-to-edit on the slide preview (Enter commits, Esc cancels)"
-                    >
-                      {liveEdit ? "● Live edit" : "✎ Live edit"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => { setLiveEdit(false); setCanvasMode((v) => !v); }}
-                      aria-pressed={canvasMode}
-                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-medium transition ${
-                        canvasMode
-                          ? "border-fuchsia-600 bg-fuchsia-600 text-white shadow-sm"
-                          : "border-black/10 bg-white text-black/70 hover:border-fuchsia-600 hover:text-fuchsia-600"
-                      }`}
-                      title="Free-form canvas: drag and edit text blocks anywhere on the slide"
-                    >
-                      {canvasMode ? "◇ Canvas" : "◇ Free canvas"}
-                    </button>
-                    <Tip label="Enlarge preview">
-                      <button
-                        type="button"
-                        onClick={() => setZoomed(true)}
-                        aria-label="Enlarge slide preview"
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 transition hover:border-[#003FC7] hover:text-[#003FC7]"
-                      >
-                        ⤢
-                      </button>
-                    </Tip>
-                  </div>
-                </ToolbarGroup>
+              <div className="ml-auto inline-flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => { setCanvasMode(false); setLiveEdit((v) => !v); }}
+                  aria-pressed={liveEdit}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
+                    liveEdit
+                      ? "border-[#003FC7] bg-[#003FC7] text-white shadow-sm"
+                      : "border-black/10 bg-white text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+                  }`}
+                  title="Toggle click-to-edit on the slide preview (Enter commits, Esc cancels)"
+                >
+                  {liveEdit ? "● Live edit" : "✎ Live edit"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setLiveEdit(false); setCanvasMode((v) => !v); }}
+                  aria-pressed={canvasMode}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
+                    canvasMode
+                      ? "border-fuchsia-600 bg-fuchsia-600 text-white shadow-sm"
+                      : "border-black/10 bg-white text-black/70 hover:border-fuchsia-600 hover:text-fuchsia-600"
+                  }`}
+                  title="Free-form canvas: drag and edit text blocks anywhere on the slide"
+                >
+                  {canvasMode ? "◇ Canvas" : "◇ Free canvas"}
+                </button>
+                <Tip label="Enlarge preview">
+                  <button
+                    type="button"
+                    onClick={() => setZoomed(true)}
+                    aria-label="Enlarge slide preview"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 transition hover:border-[#003FC7] hover:text-[#003FC7]"
+                  >
+                    ⤢
+                  </button>
+                </Tip>
               </div>
             </>
           )}
         </div>
       </header>
+
 
 
       <div className="mt-8 grid grid-cols-[260px_1fr_360px] gap-6">
