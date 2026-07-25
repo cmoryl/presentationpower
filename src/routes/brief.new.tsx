@@ -154,7 +154,7 @@ function BriefCommandCenter() {
               kind,
               title: `${submission.prospect} · ${kind.replace("-", " ")}`,
               brandModeId,
-              subCompany: null,
+              subCompany: "",
               brief: {
                 prospect: submission.prospect,
                 industry: submission.industry,
