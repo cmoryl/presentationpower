@@ -332,7 +332,7 @@ function DeckEditor() {
                     type="button"
                     onClick={() => setZoomed(true)}
                     aria-label="Enlarge slide preview"
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 transition hover:border-[#003FC7] hover:text-[#003FC7]"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 transition hover:border-primary hover:text-primary"
                   >
                     ⤢
                   </button>
