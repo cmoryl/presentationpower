@@ -1895,3 +1895,48 @@ function Tip({ label, children }: { label: string; children: React.ReactNode }) 
     </span>
   );
 }
+
+function AccordionGroup({
+  label,
+  hint,
+  badge,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  badge?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <details className="group/acc relative">
+      <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-full border border-black/[0.06] bg-white px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-black/55 transition hover:border-[#003FC7]/40 hover:text-[#003FC7] group-open/acc:border-[#003FC7] group-open/acc:bg-[#003FC7] group-open/acc:text-white [&::-webkit-details-marker]:hidden">
+        <span>{label}</span>
+        {hint && (
+          <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5 text-[9px] font-medium normal-case tracking-normal text-black/55 group-open/acc:bg-white/15 group-open/acc:text-white/85">
+            {hint}
+          </span>
+        )}
+        {badge && (
+          <span className="inline-flex min-w-[16px] items-center justify-center rounded-full bg-[#003FC7] px-1 text-[9px] font-bold text-white group-open/acc:bg-white group-open/acc:text-[#003FC7]">
+            {badge}
+          </span>
+        )}
+        <svg
+          aria-hidden
+          viewBox="0 0 12 12"
+          className="h-2.5 w-2.5 transition-transform duration-150 group-open/acc:rotate-180"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M3 4.5 L6 7.5 L9 4.5" />
+        </svg>
+      </summary>
+      <div className="absolute left-0 top-[calc(100%+6px)] z-40 flex items-center gap-1 whitespace-nowrap rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)]">
+        {children}
+      </div>
+    </details>
+  );
+}
