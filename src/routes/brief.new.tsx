@@ -921,10 +921,9 @@ function BriefWizard() {
                   </div>
                 )}
               </section>
-              </>)}
 
-              {step === 5 && (<>
               {/* SECTION — REVIEW & GENERATE */}
+              <div id="generate" className="scroll-mt-24" />
               <ReviewSummary
                 brand={brand}
                 brandPrimary={brandPrimary}
