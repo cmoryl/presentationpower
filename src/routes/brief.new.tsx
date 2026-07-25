@@ -280,17 +280,21 @@ function BriefWizard() {
           </div>
         </section>
 
-        <div className="mt-8">
-          <form className="space-y-10" onSubmit={(e) => e.preventDefault()}>
+        <div className="mt-12">
+          <form className="space-y-16" onSubmit={(e) => e.preventDefault()}>
               {/* SECTION 01: Brand Mode — drives everything below */}
-              <section id="brand" className="scroll-mt-24 space-y-4">
-                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
-                  <label className={labelCls}>01 · Brand Mode</label>
+              <section id="brand" className="scroll-mt-24 space-y-6">
+                <SectionHeader
+                  index="01 · Brand"
+                  title="Pick the brand mode"
+                  description="Drives archetype, palette, variant filters, and every downstream artifact."
+                  meta={
+                    <span className="text-[10px] font-medium uppercase tracking-widest text-[#1E2749]/50">
+                      drives archetype + variant filters
+                    </span>
+                  }
+                />
 
-                  <span className="max-w-[11rem] text-right text-[10px] font-medium uppercase tracking-widest text-[#1E2749]/50 sm:max-w-none">
-                    drives archetype + variant filters
-                  </span>
-                </div>
 
                 {/* Selected brand banner */}
                 {brand && (
@@ -441,7 +445,11 @@ function BriefWizard() {
 
               {/* REQUIRED: Prospect Name + Meeting Objective */}
               <section id="prospect" className="scroll-mt-24 space-y-6">
-                <label className={labelCls}>Prospect</label>
+                <SectionHeader
+                  index="02 · Prospect"
+                  title="Who's this brief for?"
+                  description="The prospect name and meeting objective anchor every artifact's opening framing."
+                />
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <Field label="Prospect Name">
                     <input
@@ -462,7 +470,14 @@ function BriefWizard() {
                 </div>
               </section>
 
+
               {/* REFINE: narrative, palette, AI strategist */}
+              <section className="space-y-6">
+                <SectionHeader
+                  index="03 · Refine"
+                  title="Tune the narrative (optional)"
+                  description="Industry, audience, narrative archetype, palette experiments, and the AI strategist. Skip to keep smart defaults."
+                />
 
               {/* OPTIONAL: Everything else, collapsed by default */}
               <div
@@ -757,14 +772,18 @@ function BriefWizard() {
                   </div>
                 </div>
               </div>
+              </section>
 
               {/* SECTION — MASTER SET */}
-              <section id="master-set" className="scroll-mt-24 rounded-2xl border bg-white p-6 shadow-[0_2px_20px_-8px_rgba(3,0,44,0.08)] md:p-8" style={{ borderColor: PALETTE.hairline }}>
-                <div className="mb-5 flex items-baseline gap-3">
-                  <span className="font-mono text-xs uppercase tracking-[0.18em] text-[#003FC7]">04 · Master set</span>
-                  <span className="text-xs text-[#03002C]/45">Pick everything you want produced from this one brief.</span>
-                </div>
+              <section id="master-set" className="scroll-mt-24 space-y-6">
+                <SectionHeader
+                  index="04 · Master set"
+                  title="Pick what to produce"
+                  description="Everything is enabled by default. Each surface assembles from the same brand, narrative, and knowledge context."
+                />
+                <div className="rounded-2xl border bg-white p-6 shadow-[0_2px_20px_-8px_rgba(3,0,44,0.08)] md:p-8 space-y-6" style={{ borderColor: PALETTE.hairline }}>
                 <div className="grid gap-3 md:grid-cols-2">
+
                   {/* Presentation */}
                   <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition ${masterSet.presentation ? "border-[#003FC7] bg-[#F0F5FF]" : "border-[#E4E9F2] bg-white hover:border-[#B7C4E0]"}`}>
                     <input
@@ -911,10 +930,17 @@ function BriefWizard() {
                     </ul>
                   </div>
                 )}
+                </div>
               </section>
 
               {/* SECTION — REVIEW & GENERATE */}
-              <div id="generate" className="scroll-mt-24" />
+              <section id="generate" className="scroll-mt-24 space-y-6">
+                <SectionHeader
+                  index="05 · Generate"
+                  title="Review and launch"
+                  description="Confirm the brief, then generate the full master set in one pass."
+                />
+
               <ReviewSummary
                 brand={brand}
                 brandPrimary={brandPrimary}
@@ -1166,8 +1192,10 @@ function BriefWizard() {
                   </button>
                 </div>
               </div>
+              </section>
 
             </form>
+
         </div>
       </div>
     </AppShell>
@@ -1190,6 +1218,33 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <span className={labelCls}>{label}</span>
       {children}
     </label>
+  );
+}
+
+function SectionHeader({
+  index,
+  title,
+  description,
+  meta,
+}: {
+  index: string;
+  title: string;
+  description?: string;
+  meta?: React.ReactNode;
+}) {
+  return (
+    <header className="flex flex-col gap-3 border-b pb-5 sm:flex-row sm:items-end sm:justify-between sm:gap-6" style={{ borderColor: PALETTE.hairline }}>
+      <div className="min-w-0">
+        <div className="font-mono text-[10px] uppercase tracking-[0.28em] text-[#003FC7]">{index}</div>
+        <h2 className="mt-2 text-2xl font-semibold leading-[1.1] tracking-tight text-[#03002C] sm:text-[28px]">
+          {title}
+        </h2>
+        {description && (
+          <p className="mt-2 max-w-xl text-[13px] leading-relaxed text-[#1E2749]/70">{description}</p>
+        )}
+      </div>
+      {meta && <div className="shrink-0 text-right">{meta}</div>}
+    </header>
   );
 }
 
