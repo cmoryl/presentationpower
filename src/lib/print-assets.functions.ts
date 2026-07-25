@@ -204,6 +204,46 @@ export const applyHeroToAllPrintAssets = createServerFn({ method: "POST" })
     };
   });
 
+// ---- PREVIEW: which sibling assets would update vs be skipped -------------
+//
+// Feeds the confirmation modal's "before you apply" list so the user sees
+// exactly which templates are in scope and which will be left alone.
+
+const PreviewApplyHeroInput = z.object({
+  kind: KindEnum,
+  brandModeId: z.string().min(1),
+  excludeAssetId: z.string().uuid().optional(),
+  onlyUncustomized: z.boolean().optional().default(true),
+});
+
+export const previewApplyHeroToAllPrintAssets = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) => PreviewApplyHeroInput.parse(raw))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: rows, error } = await supabase
+      .from("print_assets")
+      .select("id, title, content, updated_at")
+      .eq("owner_id", userId)
+      .eq("kind", data.kind)
+      .eq("brand_mode_id", data.brandModeId)
+      .order("updated_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    const candidates = (rows ?? []).filter((r) => r.id !== data.excludeAssetId);
+    const toUpdate: Array<{ id: string; title: string }> = [];
+    const toSkip: Array<{ id: string; title: string; reason: "customized" }> = [];
+    for (const r of candidates) {
+      const existing = (r.content as Record<string, unknown>)?.heroMedia;
+      const title = (r as { title?: string }).title ?? "Untitled";
+      if (data.onlyUncustomized && isHeroCustomized(existing)) {
+        toSkip.push({ id: r.id, title, reason: "customized" });
+      } else {
+        toUpdate.push({ id: r.id, title });
+      }
+    }
+    return { toUpdate, toSkip, scanned: candidates.length };
+  });
+
 
 
 export const deletePrintAsset = createServerFn({ method: "POST" })
