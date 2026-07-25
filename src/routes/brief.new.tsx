@@ -1635,7 +1635,7 @@ function ReviewSummary({
                 </span>
               ))
             ) : (
-              <span className="text-[#1E2749]/50">Nothing selected — go back to step 3</span>
+              <span className="text-[#1E2749]/50">Nothing selected — pick at least one surface above</span>
             )}
           </div>
         </ReviewRow>
