@@ -1814,3 +1814,16 @@ function TransitionPicker({
     </div>
   );
 }
+
+function ToolbarGroup({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="px-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-black/35">{label}</span>
+      <div className="flex items-center gap-0.5">{children}</div>
+    </div>
+  );
+}
+
+function ToolbarDivider() {
+  return <span className="mt-4 h-6 w-px self-start bg-black/[0.08]" aria-hidden />;
+}
