@@ -1160,6 +1160,32 @@ function AssetEditor() {
         brand={brand}
         mode={editorMode}
       />
+      <SwapVariantPreviewModal
+        open={!!pendingSwap}
+        moduleIndex={pendingSwap?.moduleIndex ?? 0}
+        fromVariant={pendingSwap?.from ?? "kpi-dashboard-portrait"}
+        toVariant={pendingSwap?.to ?? "stat-callout-row-portrait"}
+        frees={pendingSwap?.frees ?? 0}
+        section={
+          pendingSwap
+            ? ((content.modules ?? [])[pendingSwap.moduleIndex] as PrintStatsSection | undefined)
+            : undefined
+        }
+        mode={editorMode}
+        onCancel={() => setPendingSwap(null)}
+        onConfirm={() => {
+          if (!pendingSwap) return;
+          const modules = [...(content.modules ?? [])];
+          const cur = modules[pendingSwap.moduleIndex];
+          if (cur && cur.kind === "stats") {
+            modules[pendingSwap.moduleIndex] = { ...cur, variantId: pendingSwap.to };
+            patchContent({ modules });
+            toast.success(
+              `Swapped module ${pendingSwap.moduleIndex + 1} → ${pendingSwap.to} (freed ${pendingSwap.frees.toFixed(1)} units)`,
+            );
+          }
+          setPendingSwap(null);
+        }}
     </AppShell>
   );
 }
