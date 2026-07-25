@@ -347,7 +347,7 @@ function DeckEditor() {
 
 
 
-      <div className="mt-8 grid grid-cols-[260px_1fr_360px] gap-6">
+      <div className={`mt-8 grid gap-6 ${inspectorOpen ? "grid-cols-[260px_1fr_360px]" : "grid-cols-[260px_1fr_36px]"}`}>
         {/* Overview grid */}
         <div className="space-y-3">
           {deck.slides.map((slide, i) => {
