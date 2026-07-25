@@ -781,10 +781,9 @@ function BriefWizard() {
                   title="Pick what to produce"
                   description="Everything is enabled by default. Each surface assembles from the same brand, narrative, and knowledge context."
                 />
-                <div className="rounded-2xl border bg-white p-6 shadow-[0_2px_20px_-8px_rgba(3,0,44,0.08)] md:p-8" style={{ borderColor: PALETTE.hairline }}>
-
-                </div>
+                <div className="rounded-2xl border bg-white p-6 shadow-[0_2px_20px_-8px_rgba(3,0,44,0.08)] md:p-8 space-y-6" style={{ borderColor: PALETTE.hairline }}>
                 <div className="grid gap-3 md:grid-cols-2">
+
                   {/* Presentation */}
                   <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition ${masterSet.presentation ? "border-[#003FC7] bg-[#F0F5FF]" : "border-[#E4E9F2] bg-white hover:border-[#B7C4E0]"}`}>
                     <input
