@@ -20,6 +20,7 @@ import type {
   AdaptorBriefContent,
   CaseStudyContent,
   EBrochureContent,
+  PrintHeroMedia,
   PrintSection,
   PrintStatsSection,
   PrintStatsVariant,
