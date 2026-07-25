@@ -162,25 +162,42 @@ function DeckEditor() {
   return (
     <AppShell>
     <SlideMediaRefreshProvider slides={deck.slides}>
-      <div className="flex items-baseline justify-between gap-6">
-        <div className="min-w-0">
-          <Link to="/" className="text-xs uppercase tracking-widest text-black/50 hover:text-black">← Dashboard</Link>
-          <h1 className="mt-2 truncate text-3xl font-semibold">{deck.title}</h1>
-          <div className="mt-1 text-sm text-black/60">
-            {deck.slides.length} slides · Brand: {brand.name}
-            {qa.length > 0 && (
-              <span className="ml-3 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-900">
-                {qa.length} QA issue{qa.length === 1 ? "" : "s"}
-              </span>
-            )}
+      <header className="flex flex-col gap-6">
+        <div className="flex items-start justify-between gap-8">
+          <div className="min-w-0">
+            <Link to="/" className="text-[10px] font-medium uppercase tracking-[0.18em] text-black/40 hover:text-[#003FC7] transition">← Dashboard</Link>
+            <h1 className="mt-3 truncate text-[34px] font-semibold leading-tight tracking-tight text-[#03002C]">{deck.title}</h1>
+            <div className="mt-2 flex items-center gap-3 text-[13px] text-black/55">
+              <span>{deck.slides.length} slides</span>
+              <span className="h-1 w-1 rounded-full bg-black/20" aria-hidden />
+              <span>{brand.name}</span>
+              {qa.length > 0 && (
+                <>
+                  <span className="h-1 w-1 rounded-full bg-black/20" aria-hidden />
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-800">
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-500" aria-hidden />
+                    {qa.length} QA {qa.length === 1 ? "issue" : "issues"}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex items-center gap-3 text-[11px] text-black/50">
+              <AutosaveIndicator deckId={deckId} />
+              <ReviewStatusControl localDeckId={deckId} />
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 flex-wrap justify-end">
-          <ReviewStatusControl localDeckId={deckId} />
-          <AutosaveIndicator deckId={deckId} />
-          <div className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white/70 p-1 backdrop-blur dark:border-white/10 dark:bg-white/[0.03]">
+
+        <div className="flex flex-wrap items-center gap-6 rounded-2xl border border-black/[0.07] bg-white/80 px-5 py-3 shadow-[0_1px_0_rgba(0,0,0,0.02),0_8px_24px_-16px_rgba(3,0,44,0.12)] backdrop-blur">
+          <ToolbarGroup label="History">
             <UndoRedoControls />
-            <span className="mx-0.5 h-5 w-px bg-black/10 dark:bg-white/10" aria-hidden />
+          </ToolbarGroup>
+
+          <ToolbarDivider />
+
+          <ToolbarGroup label="Slide">
             <button
               type="button"
               onClick={() => setCommentsOpen((v) => !v)}
@@ -188,13 +205,13 @@ function DeckEditor() {
               aria-label="Comments"
               className={`relative inline-flex h-9 w-9 items-center justify-center rounded-full transition ${
                 commentsOpen
-                  ? "bg-[#003FC7]/10 text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]"
-                  : "text-black/70 hover:bg-black/[0.05] hover:text-black dark:text-white/70 dark:hover:bg-white/[0.06] dark:hover:text-white"
+                  ? "bg-[#003FC7] text-white"
+                  : "text-black/60 hover:bg-black/[0.04] hover:text-[#003FC7]"
               }`}
             >
-              <MessageSquare size={15} />
+              <MessageSquare size={16} strokeWidth={1.75} />
               {totalOpen > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 inline-flex min-w-[16px] items-center justify-center rounded-full bg-[#003FC7] px-1 text-[9px] font-semibold text-white">
+                <span className={`absolute -right-0.5 -top-0.5 inline-flex min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-semibold ${commentsOpen ? "bg-white text-[#003FC7]" : "bg-[#003FC7] text-white"}`}>
                   {totalOpen}
                 </span>
               )}
@@ -204,22 +221,26 @@ function DeckEditor() {
             <button
               type="button"
               onClick={() => setDeckContext(deckId, { logoOrientation: logoOrientation === "horizontal" ? "stacked" : "horizontal" })}
-              title={`Logo orientation: ${logoOrientation === "stacked" ? "Stacked" : "Horizontal"} — click to toggle`}
+              title={`Logo: ${logoOrientation === "stacked" ? "Stacked" : "Horizontal"} — click to toggle`}
               aria-label="Toggle logo orientation"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/70 transition hover:bg-black/[0.05] hover:text-black dark:text-white/70 dark:hover:bg-white/[0.06] dark:hover:text-white"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/60 transition hover:bg-black/[0.04] hover:text-[#003FC7]"
             >
-              {logoOrientation === "stacked" ? <Rows2 size={15} /> : <RectangleHorizontal size={15} />}
+              {logoOrientation === "stacked" ? <Rows2 size={16} strokeWidth={1.75} /> : <RectangleHorizontal size={16} strokeWidth={1.75} />}
             </button>
             <TemplateToggleButton deckId={deckId} />
-            <span className="mx-0.5 h-5 w-px bg-black/10 dark:bg-white/10" aria-hidden />
+          </ToolbarGroup>
+
+          <ToolbarDivider />
+
+          <ToolbarGroup label="Distribute">
             <SaveToCloudButton deckId={deckId} />
             <VersionHistoryButton deckId={deckId} />
             <TranslateButton deckId={deckId} />
             <LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} />
             <ShareMenu deckId={deckId} />
-          </div>
+          </ToolbarGroup>
         </div>
-      </div>
+      </header>
 
       <div className="mt-8 grid grid-cols-[260px_1fr_360px] gap-6">
         {/* Overview grid */}
