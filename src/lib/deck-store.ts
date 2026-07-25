@@ -75,6 +75,31 @@ export type CanvasBlock = {
   weight?: 400 | 500 | 600 | 700;
 };
 
+// ---- Presentation transitions (Pass 1 — on-screen only) --------------
+// Restricted to the SAFE native-mappable set so Pass 3 (PPTX post-processing
+// via jszip) can emit <p:transition> XML without a lossy mapping.
+export type TransitionType =
+  | "none"
+  | "fade"
+  | "push-left"
+  | "push-right"
+  | "zoom"
+  | "cut";
+
+export type SlideTransition = {
+  type: TransitionType;
+  durationMs?: number;
+};
+
+export const DEFAULT_SLIDE_TRANSITION: SlideTransition = { type: "fade", durationMs: 400 };
+
+export function resolveSlideTransition(
+  slide: { transition?: SlideTransition } | undefined | null,
+  context: { defaultTransition?: SlideTransition } | undefined | null,
+): SlideTransition {
+  return slide?.transition ?? context?.defaultTransition ?? DEFAULT_SLIDE_TRANSITION;
+}
+
 export type DeckSlide = {
   id: string;
   position: number;
