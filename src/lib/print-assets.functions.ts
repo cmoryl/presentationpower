@@ -295,15 +295,19 @@ export const previewApplyHeroToAllPrintAssets = createServerFn({ method: "POST" 
       .order("updated_at", { ascending: false });
     if (error) throw new Error(error.message);
     const candidates = (rows ?? []).filter((r) => r.id !== data.excludeAssetId);
-    const toUpdate: Array<{ id: string; title: string }> = [];
-    const toSkip: Array<{ id: string; title: string; reason: "customized" }> = [];
+    // heroMedia serialized as JSON string per row — same reason as the apply
+    // fn's undoToken: server-fn output rejects opaque `unknown` values.
+    const toUpdate: Array<{ id: string; title: string; heroMediaJson: string | null }> = [];
+    const toSkip: Array<{ id: string; title: string; reason: "customized"; heroMediaJson: string | null }> = [];
     for (const r of candidates) {
       const existing = (r.content as Record<string, unknown>)?.heroMedia;
       const title = (r as { title?: string }).title ?? "Untitled";
+      const heroMediaJson =
+        existing === undefined || existing === null ? null : JSON.stringify(existing);
       if (data.onlyUncustomized && isHeroCustomized(existing)) {
-        toSkip.push({ id: r.id, title, reason: "customized" });
+        toSkip.push({ id: r.id, title, reason: "customized", heroMediaJson });
       } else {
-        toUpdate.push({ id: r.id, title });
+        toUpdate.push({ id: r.id, title, heroMediaJson });
       }
     }
     return { toUpdate, toSkip, scanned: candidates.length };
