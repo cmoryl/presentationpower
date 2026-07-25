@@ -1186,6 +1186,7 @@ function AssetEditor() {
           }
           setPendingSwap(null);
         }}
+      />
     </AppShell>
   );
 }
