@@ -1503,11 +1503,15 @@ function HeroMediaPanel({
   onChange,
   divisionId,
   brand,
+  kind,
+  assetId,
 }: {
   value: PrintHeroMedia | undefined;
   onChange: (next: PrintHeroMedia | undefined) => void;
   divisionId: string | null;
   brand: BrandMode | undefined;
+  kind: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
+  assetId: string | null;
 }) {
   const enabled = !!value?.imageUrl;
   const media: PrintHeroMedia = value ?? { imageUrl: "" };
@@ -1520,6 +1524,32 @@ function HeroMediaPanel({
   const [pickerOpen, setPickerOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
+  const applyAll = useServerFn(applyHeroToAllPrintAssets);
+  const [applyingAll, setApplyingAll] = useState(false);
+
+  async function handleApplyToAll() {
+    if (!enabled || !divisionId) return;
+    const label = kind.replace("-", " ");
+    if (!confirm(`Apply this hero image to every "${label}" print asset in this division? This overwrites their current hero.`)) return;
+    const tid = toast.loading("Applying hero to all templates…");
+    setApplyingAll(true);
+    try {
+      const res = await applyAll({
+        data: {
+          kind,
+          brandModeId: divisionId,
+          heroMedia: media as unknown as Record<string, unknown>,
+          excludeAssetId: assetId ?? undefined,
+        },
+      });
+      toast.success(`Applied to ${res.updated} of ${res.scanned} ${label} asset${res.scanned === 1 ? "" : "s"}.`, { id: tid });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Bulk apply failed.", { id: tid });
+    } finally {
+      setApplyingAll(false);
+    }
+  }
+
 
   async function handleFileUpload(file: File) {
     if (!file.type.startsWith("image/")) {
