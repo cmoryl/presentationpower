@@ -897,22 +897,12 @@ function AssetEditor() {
                 onChange={(next) => patchContent({ heroMedia: next } as never)}
                 kind={kind as never}
                 usedModuleUnits={((rawContent as { modules?: PrintSection[] }).modules ?? []).reduce(
-                  (n, m) => n + (
-                    m.kind === "stats" ? ({
-                      "kpi-dashboard-portrait": 2.4,
-                      "stat-callout-row-portrait": 1.6,
-                      "stat-bento-portrait": 2.0,
-                    } as Record<string, number>)[m.variantId] ?? 2 :
-                    m.kind === "quote" ? 1.4 :
-                    m.kind === "logo-grid" ? 1.8 :
-                    m.kind === "expertise" ? 1.2 :
-                    m.kind === "feature-list" ? 2.2 :
-                    2
-                  ), 0,
+                  (n, m) => n + weightForSection(m), 0,
                 )}
                 hasTitle={!!(rawContent as { title?: string }).title}
                 hasSummary={!!(rawContent as { summary?: string }).summary}
               />
+
 
 
               {showBleedGuides && (
