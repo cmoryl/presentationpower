@@ -260,21 +260,45 @@ function BriefWizard() {
             <p className="mt-4 max-w-xl text-base text-white/70 sm:text-lg">
               Brief the system once. Pick which surfaces to produce — presentation, print, event kit, social kit — and every artifact assembles from the same brand, narrative, and knowledge context.
             </p>
-            {/* Step index */}
-            <ol className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] font-mono uppercase tracking-[0.18em] text-white/70">
-              {[
-                "01 · Brand",
-                "02 · Prospect",
-                "03 · Context (opt.)",
-                "04 · Master set",
-                "05 · Generate",
-              ].map((s) => (
-                <li key={s} className="flex items-center gap-2">
-                  <span className="inline-block h-1 w-1 rounded-full bg-[#A1FBF9]" />
-                  {s}
-                </li>
-              ))}
+            {/* Step index — clickable, shows current position */}
+            <ol className="mt-6 flex flex-wrap items-center gap-2 text-[11px] font-mono uppercase tracking-[0.14em]">
+              {STEPS.map((s, i) => {
+                const active = step === s.n;
+                const done = step > s.n;
+                const reachable = s.n <= step || done;
+                return (
+                  <li key={s.n} className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={!reachable}
+                      onClick={() => {
+                        if (reachable) {
+                          setStep(s.n);
+                          if (s.n === 4) setCustomizeOpen(true);
+                        }
+                      }}
+                      className={`flex items-center gap-2 rounded-full border px-3 py-1 transition ${
+                        active
+                          ? "border-[#A1FBF9] bg-[#A1FBF9]/15 text-white"
+                          : done
+                          ? "border-white/30 bg-white/5 text-white/85 hover:bg-white/10"
+                          : "border-white/15 text-white/50"
+                      }`}
+                    >
+                      <span className={`inline-flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold ${active ? "bg-[#A1FBF9] text-[#03002C]" : done ? "bg-white/20 text-white" : "bg-white/10 text-white/60"}`}>
+                        {done ? "✓" : s.n}
+                      </span>
+                      <span>{s.label}</span>
+                      {s.optional && <span className="text-[9px] opacity-60">· opt</span>}
+                    </button>
+                    {i < STEPS.length - 1 && <span aria-hidden className="h-px w-4 bg-white/20" />}
+                  </li>
+                );
+              })}
             </ol>
+            <p className="mt-3 text-xs text-white/60">
+              Step {step} of 5 · <span className="text-white/80">{STEPS[step - 1].label}</span> — {STEPS[step - 1].hint}
+            </p>
             <div className="mt-6 flex flex-wrap items-center gap-2">
               <Link
                 to="/decks/import"
