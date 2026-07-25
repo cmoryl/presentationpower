@@ -1528,16 +1528,21 @@ function HeroMediaPanel({
   const applyAll = useServerFn(applyHeroToAllPrintAssets);
   const [applyingAll, setApplyingAll] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [applySummary, setApplySummary] = useState<
+    | { status: "success"; updated: number; scanned: number }
+    | { status: "error"; message: string; errors: string[] }
+    | null
+  >(null);
 
   function handleApplyToAll() {
     if (!enabled || !divisionId) return;
+    setApplySummary(null);
     setConfirmOpen(true);
   }
 
   async function handleConfirmApply() {
     if (!enabled || !divisionId) return;
-    const label = kind.replace("-", " ");
-    const tid = toast.loading("Applying hero to all templates…");
+    setApplySummary(null);
     setApplyingAll(true);
     try {
       const res = await applyAll({
@@ -1548,10 +1553,19 @@ function HeroMediaPanel({
           excludeAssetId: assetId ?? undefined,
         },
       });
-      toast.success(`Applied to ${res.updated} of ${res.scanned} ${label} asset${res.scanned === 1 ? "" : "s"}.`, { id: tid });
+      if (res.updated === res.scanned && res.errors.length === 0) {
+        setApplySummary({ status: "success", updated: res.updated, scanned: res.scanned });
+      } else if (res.updated > 0) {
+        setApplySummary({ status: "error", message: `Applied to ${res.updated} of ${res.scanned} assets; ${res.errors.length} failed.`, errors: res.errors });
+      } else {
+        setApplySummary({ status: "error", message: `Could not apply to any asset: ${res.errors[0] ?? "unknown error"}`, errors: res.errors });
+      }
+      toast.success(`Applied to ${res.updated} of ${res.scanned} ${kind.replace("-", " ")} asset${res.scanned === 1 ? "" : "s"}.`);
       setConfirmOpen(false);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Bulk apply failed.", { id: tid });
+      const message = err instanceof Error ? err.message : "Bulk apply failed.";
+      setApplySummary({ status: "error", message, errors: [message] });
+      toast.error(message);
     } finally {
       setApplyingAll(false);
     }
