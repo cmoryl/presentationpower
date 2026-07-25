@@ -103,10 +103,19 @@ function BriefWizard() {
   };
   const [masterSet, setMasterSet] = useState<MasterSet>({
     presentation: true,
-    print: { enabled: false, kinds: ["case-study"] },
-    event: { enabled: false, playbookId: EVENT_PLAYBOOKS[0]?.id ?? null },
-    social: { enabled: false, playbookId: SOCIAL_PLAYBOOKS[0]?.id ?? null },
+    print: { enabled: true, kinds: ["case-study"] },
+    event: { enabled: true, playbookId: EVENT_PLAYBOOKS[0]?.id ?? null },
+    social: { enabled: true, playbookId: SOCIAL_PLAYBOOKS[0]?.id ?? null },
   });
+  // Wizard step state — 1 Brand · 2 Prospect · 3 Master set · 4 Refine (opt.) · 5 Generate
+  const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
+  const STEPS: Array<{ n: 1 | 2 | 3 | 4 | 5; label: string; hint: string; optional?: boolean }> = [
+    { n: 1, label: "Brand", hint: "Pick the division" },
+    { n: 2, label: "Prospect", hint: "Who + why" },
+    { n: 3, label: "Master set", hint: "What to produce" },
+    { n: 4, label: "Refine", hint: "Narrative · palette · AI plan", optional: true },
+    { n: 5, label: "Generate", hint: "Review and produce" },
+  ];
   type Produced = {
     deckId?: string;
     prints: Array<{ id: string; kind: PrintKind; title: string }>;
