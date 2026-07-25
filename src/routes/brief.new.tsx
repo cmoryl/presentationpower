@@ -1192,8 +1192,10 @@ function BriefWizard() {
                   </button>
                 </div>
               </div>
+              </section>
 
             </form>
+
         </div>
       </div>
     </AppShell>
