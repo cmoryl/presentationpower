@@ -12,17 +12,23 @@ type Props = {
 };
 
 export function HeroDiffTile({ before, after, status, accent = "#003FC7" }: Props) {
+  const rhs = status === "skip" ? before : after;
+  const beforeH = Math.round(before?.heightPct ?? 46);
+  const afterH = Math.round(rhs?.heightPct ?? 46);
+  const heightChanged = status !== "skip" && beforeH !== afterH;
   return (
     <div className="flex items-stretch gap-1.5">
-      <MiniHero media={before} accent={accent} label="Before" />
+      <MiniHero media={before} accent={accent} label="Before" heightPct={beforeH} />
       <div className="flex flex-col items-center justify-center px-0.5 text-[9px] uppercase tracking-[0.16em] text-black/40">
         →
       </div>
       <MiniHero
-        media={status === "skip" ? before : after}
+        media={rhs}
         accent={accent}
         label={status === "skip" ? "Kept" : "After"}
         dimmed={status === "skip"}
+        heightPct={afterH}
+        highlightHeight={heightChanged}
       />
     </div>
   );
@@ -33,14 +39,18 @@ function MiniHero({
   accent,
   label,
   dimmed = false,
+  heightPct: heightPctProp,
+  highlightHeight = false,
 }: {
   media: PrintHeroMedia | null;
   accent: string;
   label: string;
   dimmed?: boolean;
+  heightPct?: number;
+  highlightHeight?: boolean;
 }) {
   const hasMedia = !!media?.imageUrl;
-  const heightPct = media?.heightPct ?? 46;
+  const heightPct = heightPctProp ?? media?.heightPct ?? 46;
   const focalX = typeof media?.focalX === "number" ? media.focalX : 50;
   const focalY = typeof media?.focalY === "number" ? media.focalY : 40;
   const washStrength = media?.washStrength ?? 1;
@@ -98,7 +108,9 @@ function MiniHero({
           <div className="h-[2px] w-4/5 rounded-full bg-black/[0.08]" />
         </div>
       </div>
-      <span className="text-[9px] uppercase tracking-[0.16em] text-black/45">{label}</span>
+      <span className="text-[9px] uppercase tracking-[0.16em] text-black/45">
+        {label} · <span className={highlightHeight ? "text-[#003FC7] font-semibold" : ""}>{Math.round(heightPct)}%</span>
+      </span>
     </div>
   );
 }
