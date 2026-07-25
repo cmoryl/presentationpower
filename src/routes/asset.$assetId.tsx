@@ -1529,8 +1529,8 @@ function HeroMediaPanel({
   const [applyingAll, setApplyingAll] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [applySummary, setApplySummary] = useState<
-    | { status: "success"; updated: number; scanned: number }
-    | { status: "error"; message: string; errors: string[] }
+    | { status: "success"; updated: number; scanned: number; skipped: number }
+    | { status: "error"; message: string; errors: string[]; skipped?: number }
     | null
   >(null);
 
@@ -1551,16 +1551,21 @@ function HeroMediaPanel({
           brandModeId: divisionId,
           heroMedia: media as unknown as Record<string, unknown>,
           excludeAssetId: assetId ?? undefined,
+          // Skip templates the user has already customized
+          // (focal / scrim / wash overrides).
+          onlyUncustomized: true,
         },
       });
-      if (res.updated === res.scanned && res.errors.length === 0) {
-        setApplySummary({ status: "success", updated: res.updated, scanned: res.scanned });
+      const skipped = res.skipped ?? 0;
+      if (res.errors.length === 0) {
+        setApplySummary({ status: "success", updated: res.updated, scanned: res.scanned, skipped });
       } else if (res.updated > 0) {
-        setApplySummary({ status: "error", message: `Applied to ${res.updated} of ${res.scanned} assets; ${res.errors.length} failed.`, errors: res.errors });
+        setApplySummary({ status: "error", message: `Applied to ${res.updated} of ${res.scanned} assets; ${res.errors.length} failed${skipped ? `, ${skipped} skipped (customized)` : ""}.`, errors: res.errors, skipped });
       } else {
-        setApplySummary({ status: "error", message: `Could not apply to any asset: ${res.errors[0] ?? "unknown error"}`, errors: res.errors });
+        setApplySummary({ status: "error", message: `Could not apply to any asset: ${res.errors[0] ?? "unknown error"}`, errors: res.errors, skipped });
       }
-      toast.success(`Applied to ${res.updated} of ${res.scanned} ${kind.replace("-", " ")} asset${res.scanned === 1 ? "" : "s"}.`);
+      const skipMsg = skipped ? `, ${skipped} skipped` : "";
+      toast.success(`Applied to ${res.updated} of ${res.scanned} ${kind.replace("-", " ")} asset${res.scanned === 1 ? "" : "s"}${skipMsg}.`);
       setConfirmOpen(false);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Bulk apply failed.";
@@ -1570,6 +1575,7 @@ function HeroMediaPanel({
       setApplyingAll(false);
     }
   }
+
 
 
   async function handleFileUpload(file: File) {
@@ -1647,8 +1653,9 @@ function HeroMediaPanel({
       <div className="space-y-2 rounded-md border border-black/10 bg-black/[0.02] px-2 py-1.5 dark:border-white/10 dark:bg-white/[0.03]">
         <div className="flex items-center justify-between">
           <span className="text-[10px] text-black/60 dark:text-white/60">
-            Apply this hero to every <span className="font-semibold">{kind.replace("-", " ")}</span> in this division
+            Apply to every <span className="font-semibold">{kind.replace("-", " ")}</span> in this division still using default hero settings
           </span>
+
           <button
             type="button"
             onClick={handleApplyToAll}
@@ -1673,12 +1680,17 @@ function HeroMediaPanel({
           <div className="flex items-start gap-2 rounded-md bg-[#A6FA87]/20 px-2 py-1.5 text-[11px] text-[#0F5C1A] dark:bg-[#A6FA87]/15 dark:text-[#A6FA87]">
             <span className="mt-0.5 inline-block h-3 w-3 shrink-0 rounded-full bg-[#A6FA87]" />
             <span>
-              Success: applied to <strong>{applySummary.updated}</strong> of{" "}
+              Applied to <strong>{applySummary.updated}</strong> of{" "}
               <strong>{applySummary.scanned}</strong> {kind.replace("-", " ")} asset
-              {applySummary.scanned === 1 ? "" : "s"}.
+              {applySummary.scanned === 1 ? "" : "s"}
+              {applySummary.skipped > 0 ? (
+                <> · <strong>{applySummary.skipped}</strong> left untouched (customized focal / scrim / wash)</>
+              ) : null}
+              .
             </span>
           </div>
         )}
+
 
         {applySummary && applySummary.status === "error" && (
           <div className="space-y-1 rounded-md bg-[#E53D2E]/10 px-2 py-1.5 text-[11px] text-[#E53D2E] dark:bg-[#E53D2E]/15 dark:text-[#FF9B70]">
@@ -1703,7 +1715,8 @@ function HeroMediaPanel({
       <ConfirmModal
         open={confirmOpen}
         title="Apply hero to all templates?"
-        description={`This will overwrite the hero image on every "${kind.replace("-", " ")}" print asset in this division with the current hero and its settings.`}
+        description={`Applies the current hero to every "${kind.replace("-", " ")}" print asset in this division that still uses the default focal, scrim, and wash settings. Templates with custom tuning are left untouched.`}
+
         confirmLabel="Apply to all"
         cancelLabel="Cancel"
         busy={applyingAll}

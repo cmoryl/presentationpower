@@ -130,7 +130,33 @@ const ApplyHeroInput = z.object({
   brandModeId: z.string().min(1),
   heroMedia: z.record(z.string(), z.unknown()),
   excludeAssetId: z.string().uuid().optional(),
+  // When true (default), only overwrite hero blocks whose existing hero has
+  // no user-tuned focal/scrim/wash overrides. Blocks the user has customized
+  // are left untouched.
+  onlyUncustomized: z.boolean().optional().default(true),
 });
+
+// Keys that indicate a user tuned the focal point, scrim, or wash.
+// If an existing heroMedia has any of these, we treat it as customized.
+const HERO_CUSTOM_KEYS = [
+  "focalPoint",
+  "focalX",
+  "focalY",
+  "overlayColor",
+  "overlayOpacity",
+  "washStrength",
+  "scrimOpacity",
+  "scrim",
+  "blendMode",
+  "autoScrim",
+  "autoScrimThreshold",
+] as const;
+
+function isHeroCustomized(hero: unknown): boolean {
+  if (!hero || typeof hero !== "object") return false;
+  const h = hero as Record<string, unknown>;
+  return HERO_CUSTOM_KEYS.some((k) => h[k] !== undefined);
+}
 
 export const applyHeroToAllPrintAssets = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -145,10 +171,16 @@ export const applyHeroToAllPrintAssets = createServerFn({ method: "POST" })
       .eq("brand_mode_id", data.brandModeId);
     const { data: rows, error } = await query;
     if (error) throw new Error(error.message);
-    const targets = (rows ?? []).filter((r) => r.id !== data.excludeAssetId);
+    const candidates = (rows ?? []).filter((r) => r.id !== data.excludeAssetId);
     let updated = 0;
+    let skipped = 0;
     const errors: string[] = [];
-    for (const r of targets) {
+    for (const r of candidates) {
+      const existing = (r.content as Record<string, unknown>)?.heroMedia;
+      if (data.onlyUncustomized && isHeroCustomized(existing)) {
+        skipped += 1;
+        continue;
+      }
       const nextContent = {
         ...((r.content as Record<string, unknown>) ?? {}),
         heroMedia: data.heroMedia,
@@ -164,8 +196,14 @@ export const applyHeroToAllPrintAssets = createServerFn({ method: "POST" })
         errors.push(uErr.message);
       }
     }
-    return { updated, scanned: targets.length, errors };
+    return {
+      updated,
+      scanned: candidates.length,
+      skipped,
+      errors,
+    };
   });
+
 
 
 export const deletePrintAsset = createServerFn({ method: "POST" })
