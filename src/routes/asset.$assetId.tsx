@@ -1497,10 +1497,12 @@ function HeroMediaPanel({
   value,
   onChange,
   divisionId,
+  brand,
 }: {
   value: PrintHeroMedia | undefined;
   onChange: (next: PrintHeroMedia | undefined) => void;
   divisionId: string | null;
+  brand: BrandMode | undefined;
 }) {
   const enabled = !!value?.imageUrl;
   const media: PrintHeroMedia = value ?? { imageUrl: "" };
