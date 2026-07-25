@@ -437,7 +437,7 @@ function DeckEditor() {
         {/* Stage */}
         <div>
           {canvasMode ? (
-            <div className="relative block w-full overflow-hidden rounded-2xl border border-fuchsia-500/40 shadow-lg ring-1 ring-fuchsia-500/20">
+            <div className="relative block w-full overflow-hidden rounded-2xl border border-fuchsia-500/40 text-left shadow-lg ring-1 ring-fuchsia-500/20">
               {active && mv && (
                 <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
                   <FreeCanvasEditor
