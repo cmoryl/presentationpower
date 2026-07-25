@@ -1653,8 +1653,9 @@ function HeroMediaPanel({
       <div className="space-y-2 rounded-md border border-black/10 bg-black/[0.02] px-2 py-1.5 dark:border-white/10 dark:bg-white/[0.03]">
         <div className="flex items-center justify-between">
           <span className="text-[10px] text-black/60 dark:text-white/60">
-            Apply this hero to every <span className="font-semibold">{kind.replace("-", " ")}</span> in this division
+            Apply to every <span className="font-semibold">{kind.replace("-", " ")}</span> in this division still using default hero settings
           </span>
+
           <button
             type="button"
             onClick={handleApplyToAll}
