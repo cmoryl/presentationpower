@@ -4,7 +4,7 @@ async function createDeckViaSkipAI(page: any) {
   await page.goto("/brief/new", { waitUntil: "domcontentloaded" });
   await page.waitForTimeout(1500);
 
-  const skip = page.locator("text=OR SKIP AI");
+  const skip = page.locator("button:has-text('skip AI')");
   if (await skip.isVisible()) {
     await skip.click();
   } else {
