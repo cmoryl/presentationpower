@@ -32,18 +32,38 @@ type Props = {
   hasSummary?: boolean;
 };
 
-const MIN_PCT = 20;
-const MAX_PCT = 80;
+const MIN_PCT = HERO_HEIGHT_HARD_MIN;
+const MAX_PCT = HERO_HEIGHT_HARD_MAX;
 
-export function HeroResizeHandle({ canvasRef, media, onChange, disabledHint }: Props) {
+export function HeroResizeHandle({
+  canvasRef,
+  media,
+  onChange,
+  disabledHint,
+  kind,
+  usedModuleUnits,
+  hasTitle,
+  hasSummary,
+}: Props) {
   const heightPct = media?.heightPct ?? 46;
   // Enabled whenever a hero image is set — the grip drives `heightPct`, which
-  // every aspect variant respects. (Previously gated on aspect === "fill",
-  // which made the grip look missing on band/square heroes.)
+  // every aspect variant respects.
   const enabled = !!media?.imageUrl;
   const [dragging, setDragging] = useState(false);
   const [hover, setHover] = useState(false);
   const startRef = useRef<{ y: number; startPct: number; height: number } | null>(null);
+
+  // Content-aware ceiling — the tallest heightPct the modules can afford.
+  // When kind/used aren't supplied, the ceiling is just MAX_PCT.
+  const ceiling = useMemo(() => {
+    if (!kind || typeof usedModuleUnits !== "number") return MAX_PCT;
+    return maxHeroHeightPct(kind, usedModuleUnits, media, {
+      hasTitle: !!hasTitle,
+      hasSummary: !!hasSummary,
+    });
+  }, [kind, usedModuleUnits, media, hasTitle, hasSummary]);
+  const capped = heightPct >= ceiling;
+  const nearCap = heightPct >= ceiling - 3 && !capped;
 
   useEffect(() => {
     if (!dragging) return;
@@ -51,7 +71,7 @@ export function HeroResizeHandle({ canvasRef, media, onChange, disabledHint }: P
       const s = startRef.current;
       if (!s) return;
       const deltaPct = ((e.clientY - s.y) / s.height) * 100;
-      const next = Math.max(MIN_PCT, Math.min(MAX_PCT, s.startPct + deltaPct));
+      const next = Math.max(MIN_PCT, Math.min(ceiling, s.startPct + deltaPct));
       onChange({ ...(media ?? {} as PrintHeroMedia), heightPct: Math.round(next) });
     };
     const onUp = () => {
@@ -64,7 +84,7 @@ export function HeroResizeHandle({ canvasRef, media, onChange, disabledHint }: P
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
     };
-  }, [dragging, media, onChange]);
+  }, [dragging, media, onChange, ceiling]);
 
   const handleDown = (e: React.PointerEvent) => {
     if (!enabled) return;
@@ -76,9 +96,17 @@ export function HeroResizeHandle({ canvasRef, media, onChange, disabledHint }: P
   };
 
   const nudge = (delta: number) => {
-    const next = Math.max(MIN_PCT, Math.min(MAX_PCT, heightPct + delta));
+    const next = Math.max(MIN_PCT, Math.min(ceiling, heightPct + delta));
     onChange({ ...(media ?? {} as PrintHeroMedia), heightPct: next });
   };
+
+  const rimColor = capped
+    ? "#E53D2E"
+    : nearCap
+      ? "#FFB020"
+      : dragging || hover
+        ? "#003FC7"
+        : "rgba(0,63,199,0.35)";
 
   return (
     <div
