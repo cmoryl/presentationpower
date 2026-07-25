@@ -27,7 +27,7 @@
 // fall back to a sensible default per component.
 
 import type { CSSProperties, ReactNode } from "react";
-import { useMemo } from "react";
+import { useId, useMemo } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import { useSlideMode, useSlideAccent, useSlideInk } from "./SlideChrome";
 import { auroraOrbs, auroraLayerOpacity } from "@/lib/aurora-svg";
@@ -112,7 +112,10 @@ export function DuotoneImage({
   style?: CSSProperties;
 }) {
   const mode = useSlideMode();
-  const id = useMemo(() => Math.random().toString(36).slice(2, 8), []);
+  // Deterministic id — must be identical across SSR and client renders,
+  // otherwise the `filter: url(#tp-duotone-XXX)` attribute mismatches and
+  // React throws a hydration error. `useId()` is guaranteed stable.
+  const id = useId().replace(/[^a-zA-Z0-9]/g, "");
   const shadow = mode === "dark" ? "#050418" : brand.tokens.primary;
   const highlight = brand.tokens.accent;
   return (

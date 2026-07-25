@@ -26,18 +26,25 @@ export function LazyMount({
   onMount?: () => void;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
-  const [visible, setVisible] = useState<boolean>(() => {
-    if (eagerProp) return true;
-    if (typeof window === "undefined") return false;
-    try {
-      if ((window as any).__EAGER_PREVIEWS__) return true;
-      if (window.location.search.includes("eager=1")) return true;
-    } catch { /* ignore */ }
-    return false;
-  });
+  // Must be identical on the server and during the first client render
+  // to avoid a hydration mismatch. The eager escape hatches are applied
+  // in an effect below, after hydration.
+  const [visible, setVisible] = useState<boolean>(false);
 
   useEffect(() => {
     if (visible) return;
+    // Post-hydration eager escape hatches.
+    if (eagerProp) { setVisible(true); return; }
+    try {
+      if ((window as unknown as { __EAGER_PREVIEWS__?: boolean }).__EAGER_PREVIEWS__) {
+        setVisible(true);
+        return;
+      }
+      if (window.location.search.includes("eager=1")) {
+        setVisible(true);
+        return;
+      }
+    } catch { /* ignore */ }
     const el = ref.current;
     if (!el || typeof IntersectionObserver === "undefined") {
       setVisible(true);
@@ -57,7 +64,7 @@ export function LazyMount({
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [visible, rootMargin]);
+  }, [visible, rootMargin, eagerProp]);
 
   useEffect(() => {
     if (visible) onMount?.();
