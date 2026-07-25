@@ -1203,6 +1203,61 @@ function BriefWizard() {
                   </button>
                 </div>
               </div>
+              </>)}
+
+              {/* Wizard footer — Back / Continue for steps 1–4 */}
+              {step < 5 && (
+                <div
+                  className="flex items-center justify-between gap-4 border-t pt-6"
+                  style={{ borderColor: PALETTE.hairline }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setStep((s) => Math.max(1, s - 1) as typeof s)}
+                    disabled={step === 1}
+                    className="rounded-lg border-2 bg-white px-5 py-2.5 text-sm font-bold tracking-tight text-[#03002C] transition hover:bg-[#F7F9FC] disabled:opacity-40"
+                    style={{ borderColor: PALETTE.hairline }}
+                  >
+                    ← Back
+                  </button>
+                  <div className="flex items-center gap-3">
+                    {step === 4 && (
+                      <button
+                        type="button"
+                        onClick={() => setStep(5)}
+                        className="text-xs font-semibold uppercase tracking-widest text-[#1E2749]/60 hover:text-[#03002C]"
+                      >
+                        Skip refine →
+                      </button>
+                    )}
+                    {(() => {
+                      const brandOk = !!form.brandModeId && (form.brandModeId !== "bm-subcompany" || !!form.subCompany);
+                      const prospectOk = form.prospect.trim().length > 0 && form.meetingObjective.trim().length > 0;
+                      const canContinue = step === 1 ? brandOk : step === 2 ? prospectOk : true;
+                      return (
+                        <button
+                          type="button"
+                          disabled={!canContinue}
+                          onClick={() => {
+                            setStep((s) => {
+                              const n = Math.min(5, s + 1) as typeof s;
+                              if (n === 4) setCustomizeOpen(true);
+                              return n;
+                            });
+                          }}
+                          className="inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-bold tracking-tight text-white transition disabled:opacity-40"
+                          style={{
+                            background: `linear-gradient(135deg, ${brandPrimary} 0%, ${brandAccent} 100%)`,
+                            boxShadow: `0 10px 24px -12px ${brandPrimary}80`,
+                          }}
+                        >
+                          Continue → {step === 1 ? "Prospect" : step === 2 ? "Master set" : step === 3 ? "Refine" : "Generate"}
+                        </button>
+                      );
+                    })()}
+                  </div>
+                </div>
+              )}
             </form>
         </div>
       </div>
