@@ -108,6 +108,8 @@ function DeckEditor() {
   const [flashIndices, setFlashIndices] = useState<number[]>([]);
   const [pptxPreviewOpen, setPptxPreviewOpen] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
+  const [inspectorOpen, setInspectorOpen] = useState(true);
+
   const [commentCounts, setCommentCounts] = useState<Map<number | "deck", number>>(new Map());
   const totalOpen = useMemo(() => Array.from(commentCounts.values()).reduce((a, b) => a + b, 0), [commentCounts]);
   const [userId, setUserId] = useState<string | null>(null);
@@ -345,7 +347,7 @@ function DeckEditor() {
 
 
 
-      <div className="mt-8 grid grid-cols-[260px_1fr_360px] gap-6">
+      <div className={`mt-8 grid gap-6 ${inspectorOpen ? "grid-cols-[260px_1fr_360px]" : "grid-cols-[260px_1fr_36px]"}`}>
         {/* Overview grid */}
         <div className="space-y-3">
           {deck.slides.map((slide, i) => {
@@ -755,7 +757,32 @@ function DeckEditor() {
         </div>
 
         {/* Inspector */}
-        <aside className="space-y-4">
+        {!inspectorOpen ? (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setInspectorOpen(true)}
+              title="Expand inspector"
+              aria-label="Expand inspector"
+              className="sticky top-6 flex h-24 w-9 items-center justify-center rounded-l-xl border border-r-0 border-black/10 bg-white text-black/60 shadow-sm transition hover:bg-black/5 hover:text-black"
+            >
+              <span className="text-lg leading-none">‹</span>
+            </button>
+          </div>
+        ) : (
+        <aside className="space-y-4 relative">
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setInspectorOpen(false)}
+              title="Collapse inspector"
+              aria-label="Collapse inspector"
+              className="rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] uppercase tracking-widest text-black/60 hover:bg-black/5 hover:text-black"
+            >
+              Collapse ›
+            </button>
+          </div>
+
           {qa.length > 0 && (
             <Panel label="QA gates">
               <div className="mb-2 flex gap-3 text-[10px] uppercase tracking-widest">
@@ -946,6 +973,8 @@ function DeckEditor() {
             onChange={(logo) => setDeckClientLogo(deck.id, logo)}
           />
         </aside>
+        )}
+
 
       </div>
       <CopilotPanel deckId={deckId} onHighlight={setFlashIndices} />
