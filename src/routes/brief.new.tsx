@@ -129,7 +129,7 @@ function BriefCommandCenter() {
       clientFacts: raw,
       abExperimentId: null as string | null,
       abVariantId: null as string | null,
-      abPaletteOverride: null as unknown,
+      abPaletteOverride: null as Record<string, string> | null,
     };
   }
 
