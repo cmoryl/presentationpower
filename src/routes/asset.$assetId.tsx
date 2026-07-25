@@ -1529,8 +1529,8 @@ function HeroMediaPanel({
   const [applyingAll, setApplyingAll] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [applySummary, setApplySummary] = useState<
-    | { status: "success"; updated: number; scanned: number }
-    | { status: "error"; message: string; errors: string[] }
+    | { status: "success"; updated: number; scanned: number; skipped: number }
+    | { status: "error"; message: string; errors: string[]; skipped?: number }
     | null
   >(null);
 
@@ -1551,16 +1551,21 @@ function HeroMediaPanel({
           brandModeId: divisionId,
           heroMedia: media as unknown as Record<string, unknown>,
           excludeAssetId: assetId ?? undefined,
+          // Skip templates the user has already customized
+          // (focal / scrim / wash overrides).
+          onlyUncustomized: true,
         },
       });
-      if (res.updated === res.scanned && res.errors.length === 0) {
-        setApplySummary({ status: "success", updated: res.updated, scanned: res.scanned });
+      const skipped = res.skipped ?? 0;
+      if (res.errors.length === 0) {
+        setApplySummary({ status: "success", updated: res.updated, scanned: res.scanned, skipped });
       } else if (res.updated > 0) {
-        setApplySummary({ status: "error", message: `Applied to ${res.updated} of ${res.scanned} assets; ${res.errors.length} failed.`, errors: res.errors });
+        setApplySummary({ status: "error", message: `Applied to ${res.updated} of ${res.scanned} assets; ${res.errors.length} failed${skipped ? `, ${skipped} skipped (customized)` : ""}.`, errors: res.errors, skipped });
       } else {
-        setApplySummary({ status: "error", message: `Could not apply to any asset: ${res.errors[0] ?? "unknown error"}`, errors: res.errors });
+        setApplySummary({ status: "error", message: `Could not apply to any asset: ${res.errors[0] ?? "unknown error"}`, errors: res.errors, skipped });
       }
-      toast.success(`Applied to ${res.updated} of ${res.scanned} ${kind.replace("-", " ")} asset${res.scanned === 1 ? "" : "s"}.`);
+      const skipMsg = skipped ? `, ${skipped} skipped` : "";
+      toast.success(`Applied to ${res.updated} of ${res.scanned} ${kind.replace("-", " ")} asset${res.scanned === 1 ? "" : "s"}${skipMsg}.`);
       setConfirmOpen(false);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Bulk apply failed.";
@@ -1570,6 +1575,7 @@ function HeroMediaPanel({
       setApplyingAll(false);
     }
   }
+
 
 
   async function handleFileUpload(file: File) {
