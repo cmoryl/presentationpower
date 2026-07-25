@@ -108,7 +108,9 @@ function MiniHero({
           <div className="h-[2px] w-4/5 rounded-full bg-black/[0.08]" />
         </div>
       </div>
-      <span className="text-[9px] uppercase tracking-[0.16em] text-black/45">{label}</span>
+      <span className="text-[9px] uppercase tracking-[0.16em] text-black/45">
+        {label} · <span className={highlightHeight ? "text-[#003FC7] font-semibold" : ""}>{Math.round(heightPct)}%</span>
+      </span>
     </div>
   );
 }
