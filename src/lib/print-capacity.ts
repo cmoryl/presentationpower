@@ -514,9 +514,14 @@ export function analyzePrintAsset(
     | EBrochureContent
     | AdaptorBriefContent,
 ): CapacityReport {
-  const budget = PRINT_TEMPLATE_BUDGETS[kind].moduleBudget;
+  const base = PRINT_TEMPLATE_BUDGETS[kind].moduleBudget;
   const modules = (content as { modules?: PrintSection[] }).modules;
-  const { used, issues: modIssues } = analyzeModules(kind, modules);
+  const heroMedia = (content as { heroMedia?: PrintHeroMedia }).heroMedia;
+  const copy = heroCopyOf(content);
+  const budget = effectiveModuleBudget(kind, heroMedia, copy);
+  const heroCostDelta = base - budget;
+
+  const { used, issues: modIssues } = analyzeModules(kind, modules, budget);
 
   let bodyIssues: CapacityIssue[] = [];
   if (kind === "case-study")   bodyIssues = analyzeCaseStudy(content as CaseStudyContent);
@@ -531,26 +536,106 @@ export function analyzePrintAsset(
       ? "warn"
       : "ok";
 
-  return { level, fill: budget > 0 ? used / budget : 0, used, budget, issues };
+  const suggestions = buildSuggestions({
+    kind,
+    modules: modules ?? [],
+    used,
+    budget,
+    heroMedia,
+    copy,
+  });
+
+  return {
+    level,
+    fill: budget > 0 ? used / budget : 0,
+    used,
+    budget,
+    baseBudget: base,
+    heroCostDelta,
+    suggestions,
+    issues,
+  };
+}
+
+/** Lighter stats variant chain, ordered heaviest → lightest. */
+const STATS_SWAP_CHAIN: PrintStatsVariant[] = [
+  "kpi-dashboard-portrait",
+  "stat-bento-portrait",
+  "stat-callout-row-portrait",
+];
+
+function buildSuggestions(args: {
+  kind: PrintTemplateKind;
+  modules: PrintSection[];
+  used: number;
+  budget: number;
+  heroMedia: PrintHeroMedia | undefined;
+  copy: HeroCopy;
+}): CapacitySuggestion[] {
+  const { kind, modules, used, budget, heroMedia, copy } = args;
+  const suggestions: CapacitySuggestion[] = [];
+  if (used <= budget) return suggestions;
+
+  // Suggestion 1: reduce hero band.
+  if (heroMedia?.imageUrl) {
+    const target = maxHeroHeightPct(kind, used, heroMedia, copy);
+    const current = heroMedia.heightPct ?? HERO_BASELINE_HEIGHT_PCT;
+    if (target < current) {
+      const coeff = HERO_UNITS_PER_PCT * (1 - HERO_FADE_SEAM_FRAC * (heroMedia.washStrength ?? 1));
+      const frees = (current - target) * coeff;
+      suggestions.push({
+        kind: "reduce-hero",
+        targetHeightPct: target,
+        frees,
+        message: `Reduce hero to ${target}% (frees ${frees.toFixed(1)} units)`,
+      });
+    }
+  }
+
+  // Suggestion 2: swap heaviest stats variant to a lighter one.
+  modules.forEach((m, i) => {
+    if (m.kind !== "stats") return;
+    const idx = STATS_SWAP_CHAIN.indexOf(m.variantId);
+    if (idx < 0 || idx === STATS_SWAP_CHAIN.length - 1) return;
+    const lighter = STATS_SWAP_CHAIN[idx + 1]!;
+    const cur = PRINT_STATS_VARIANT_LIMITS[m.variantId]?.weight ?? 2;
+    const next = PRINT_STATS_VARIANT_LIMITS[lighter]?.weight ?? 2;
+    const frees = cur - next;
+    if (frees <= 0) return;
+    suggestions.push({
+      kind: "swap-variant",
+      moduleIndex: i,
+      from: m.variantId,
+      to: lighter,
+      frees,
+      message: `Swap module ${i + 1}: ${m.variantId} → ${lighter} (frees ${frees.toFixed(1)} units)`,
+    });
+  });
+
+  return suggestions;
 }
 
 /**
  * Can the user add another module of the given weight without hard-blocking
- * the page? Used to gate the "Add module" button.
+ * the page? Used to gate the "Add module" button. Accepts optional
+ * hero-context so the gate honours the effective (hero-adjusted) budget.
  */
 export function canAddModule(
   kind: PrintTemplateKind,
   modules: PrintSection[] | undefined,
   candidateWeight = 2,
+  opts?: { heroMedia?: PrintHeroMedia; copy?: HeroCopy },
 ): { ok: boolean; remaining: number; reason?: string } {
-  const budget = PRINT_TEMPLATE_BUDGETS[kind].moduleBudget;
+  const budget = opts
+    ? effectiveModuleBudget(kind, opts.heroMedia, opts.copy ?? { hasTitle: false, hasSummary: false })
+    : PRINT_TEMPLATE_BUDGETS[kind].moduleBudget;
   const used = (modules ?? []).reduce((n, m) => n + weightForSection(m), 0);
   const remaining = budget - used;
   if (used + candidateWeight > budget) {
     return {
       ok: false,
       remaining,
-      reason: `No room — ${remaining.toFixed(1)} of ${budget.toFixed(1)} page units left. Remove a module or pick a lighter variant.`,
+      reason: `No room — ${remaining.toFixed(1)} of ${budget.toFixed(1)} page units left. Reduce the hero band, remove a module, or pick a lighter variant.`,
     };
   }
   return { ok: true, remaining };
