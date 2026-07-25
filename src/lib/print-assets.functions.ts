@@ -175,6 +175,9 @@ export const applyHeroToAllPrintAssets = createServerFn({ method: "POST" })
     let updated = 0;
     let skipped = 0;
     const errors: string[] = [];
+    // Prior heroMedia snapshots for the rows we actually update — feeds the
+    // client-side "Undo apply to all" action.
+    const undoSnapshots: Array<{ id: string; heroMedia: unknown }> = [];
     for (const r of candidates) {
       const existing = (r.content as Record<string, unknown>)?.heroMedia;
       if (data.onlyUncustomized && isHeroCustomized(existing)) {
@@ -192,6 +195,7 @@ export const applyHeroToAllPrintAssets = createServerFn({ method: "POST" })
         .eq("owner_id", userId);
       if (!uErr) {
         updated += 1;
+        undoSnapshots.push({ id: r.id, heroMedia: existing ?? null });
       } else {
         errors.push(uErr.message);
       }
@@ -201,7 +205,65 @@ export const applyHeroToAllPrintAssets = createServerFn({ method: "POST" })
       scanned: candidates.length,
       skipped,
       errors,
+      undoSnapshots,
     };
+  });
+
+// ---- UNDO: restore prior heroMedia values from an apply-to-all snapshot ---
+//
+// Reads each row's current content, swaps heroMedia back to the pre-apply
+// snapshot (or removes it if the prior value was null/undefined), and writes.
+// Scoped to owner_id so a user can only restore their own assets.
+
+const UndoApplyInput = z.object({
+  snapshots: z
+    .array(z.object({ id: z.string().uuid(), heroMedia: z.unknown() }))
+    .min(1)
+    .max(500),
+});
+
+export const undoApplyHeroToAllPrintAssets = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) => UndoApplyInput.parse(raw))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const ids = data.snapshots.map((s) => s.id);
+    const { data: rows, error } = await supabase
+      .from("print_assets")
+      .select("id, content")
+      .eq("owner_id", userId)
+      .in("id", ids);
+    if (error) throw new Error(error.message);
+    const byId = new Map<string, Record<string, unknown>>();
+    for (const r of rows ?? []) {
+      byId.set(r.id, (r.content as Record<string, unknown>) ?? {});
+    }
+    let restored = 0;
+    const errors: string[] = [];
+    for (const snap of data.snapshots) {
+      const current = byId.get(snap.id);
+      if (!current) {
+        errors.push(`Asset ${snap.id} not found`);
+        continue;
+      }
+      const nextContent: Record<string, unknown> = { ...current };
+      if (snap.heroMedia === null || snap.heroMedia === undefined) {
+        delete nextContent.heroMedia;
+      } else {
+        nextContent.heroMedia = snap.heroMedia;
+      }
+      const { error: uErr } = await supabase
+        .from("print_assets")
+        .update({ content: nextContent as never })
+        .eq("id", snap.id)
+        .eq("owner_id", userId);
+      if (!uErr) {
+        restored += 1;
+      } else {
+        errors.push(uErr.message);
+      }
+    }
+    return { restored, scanned: data.snapshots.length, errors };
   });
 
 // ---- PREVIEW: which sibling assets would update vs be skipped -------------
