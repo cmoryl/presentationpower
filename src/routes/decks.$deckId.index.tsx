@@ -1937,10 +1937,12 @@ function AccordionGroup({
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const [anchor, setAnchor] = useState<"left" | "right">("left");
   const rootRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const panelId = useId();
+
 
   const getFocusable = useCallback((): HTMLElement[] => {
     const panel = panelRef.current;
