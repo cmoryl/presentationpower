@@ -1621,6 +1621,23 @@ function HeroMediaPanel({
       {/* Live hero preview — updates as heroMedia changes (image, focal,
           scrim, wash, aspect). Gives the picker an immediate WYSIWYG loop. */}
       <HeroPreviewPanel media={value} brand={brand} />
+      {/* One-click bulk-apply — writes the current hero to every sibling
+          print asset of the same kind under this division. */}
+      <div className="flex items-center justify-between rounded-md border border-black/10 bg-black/[0.02] px-2 py-1.5 dark:border-white/10 dark:bg-white/[0.03]">
+        <span className="text-[10px] text-black/60 dark:text-white/60">
+          Apply this hero to every <span className="font-semibold">{kind.replace("-", " ")}</span> in this division
+        </span>
+        <button
+          type="button"
+          onClick={handleApplyToAll}
+          disabled={!enabled || !divisionId || applyingAll}
+          className="rounded border border-black/15 bg-white px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/15 dark:bg-white/[0.05] dark:text-white/80"
+          title={!enabled ? "Select a hero image first" : !divisionId ? "Select a division first" : "Apply to all sibling templates"}
+        >
+          {applyingAll ? "Applying…" : "Apply to all"}
+        </button>
+      </div>
+
       {/* Curated pool strip */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
