@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import type { PrintHeroMedia } from "@/lib/print-assets.types";
 import type { BrandMode } from "@/lib/taxonomy";
-import { Image as ImageIcon, Sparkles } from "lucide-react";
+import { Crosshair, Image as ImageIcon, Sparkles } from "lucide-react";
 
 type Props = {
   media: PrintHeroMedia | undefined;
@@ -15,6 +15,7 @@ export function HeroPreviewPanel({ media, brand }: Props) {
   const hasMedia = !!media?.imageUrl;
   const [view, setView] = useState<"media" | "base">(hasMedia ? "media" : "base");
   const [mode, setMode] = useState<"light" | "dark">("light");
+  const [showGuides, setShowGuides] = useState(true);
   // Auto-follow: when the user picks or clears imagery in the panel above,
   // snap the preview to the matching view so changes are visible instantly
   // without needing to toggle Photo/Aura by hand.
@@ -75,6 +76,16 @@ export function HeroPreviewPanel({ media, brand }: Props) {
               <Sparkles className="h-3 w-3" /> Base
             </button>
           </div>
+          <button
+            type="button"
+            onClick={() => setShowGuides((s) => !s)}
+            className={`inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] transition ${
+              showGuides ? "bg-white text-[#0b0d18]" : "text-white/70 hover:text-white"
+            }`}
+            title={showGuides ? "Hide centering guides" : "Show centering guides"}
+          >
+            <Crosshair className="h-3 w-3" /> Guides
+          </button>
         </div>
       </div>
 
@@ -87,11 +98,13 @@ export function HeroPreviewPanel({ media, brand }: Props) {
         ) : (
           <BaseHeroPreview mode={mode} />
         )}
-        <CenteringGuides
-          heightPct={active === "media" && hasMedia ? (media!.heightPct ?? 46) : 55}
-          offsetPct={media?.copyOffsetPct ?? 0}
-          isDark={isDark}
-        />
+        {showGuides && (
+          <CenteringGuides
+            heightPct={active === "media" && hasMedia ? (media!.heightPct ?? 46) : 55}
+            offsetPct={media?.copyOffsetPct ?? 0}
+            isDark={isDark}
+          />
+        )}
         {/* Page body placeholder lines */}
         <div className="absolute inset-x-4 bottom-4 space-y-1.5">
           <div className={`h-1.5 w-2/3 rounded-full ${isDark ? "bg-white/15" : "bg-black/10"}`} />
