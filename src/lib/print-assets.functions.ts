@@ -147,6 +147,7 @@ export const applyHeroToAllPrintAssets = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     const targets = (rows ?? []).filter((r) => r.id !== data.excludeAssetId);
     let updated = 0;
+    const errors: string[] = [];
     for (const r of targets) {
       const nextContent = {
         ...((r.content as Record<string, unknown>) ?? {}),
@@ -157,9 +158,13 @@ export const applyHeroToAllPrintAssets = createServerFn({ method: "POST" })
         .update({ content: nextContent as never })
         .eq("id", r.id)
         .eq("owner_id", userId);
-      if (!uErr) updated += 1;
+      if (!uErr) {
+        updated += 1;
+      } else {
+        errors.push(uErr.message);
+      }
     }
-    return { updated, scanned: targets.length };
+    return { updated, scanned: targets.length, errors };
   });
 
 
