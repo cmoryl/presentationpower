@@ -956,11 +956,36 @@ function DeckEditor() {
       {zoomed && active && mv && (
         <SlideLightbox
           onClose={() => setZoomed(false)}
-          label={`Slide ${clamped + 1} of ${deck.slides.length}`}
+          label={`Slide ${clamped + 1} of ${deck.slides.length}${liveEdit ? " · Live edit" : canvasMode ? " · Canvas" : ""}`}
           onPrev={clamped > 0 ? () => setActiveIdx(clamped - 1) : undefined}
           onNext={clamped < deck.slides.length - 1 ? () => setActiveIdx(clamped + 1) : undefined}
+          suppressEscape={liveEdit || canvasMode}
         >
-          <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
+          <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
+            {canvasMode ? (
+              <FreeCanvasEditor
+                brand={brand}
+                blocks={active.canvasBlocks}
+                onChange={(next) => updateCanvasBlocks(deck.id, active.id, next)}
+              >
+                <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
+              </FreeCanvasEditor>
+            ) : (
+              <LiveEditOverlay
+                enabled={liveEdit}
+                slideId={active.id}
+                content={active.content as Record<string, unknown>}
+                editableFields={mv.editableFields}
+                inkOverrides={active.inkOverrides}
+                onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
+                onSetInkColor={(cp, color) => setSlideInkOverride(deck.id, active.id, cp, color)}
+                onClearInkColor={(cp) => setSlideInkOverride(deck.id, active.id, cp, null)}
+              >
+                <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
+                <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
+              </LiveEditOverlay>
+            )}
+          </SlideVideoPreviewContext.Provider>
         </SlideLightbox>
       )}
 
