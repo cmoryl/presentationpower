@@ -9,6 +9,7 @@ import {
   syncOracleToKnowledge,
 } from "@/lib/admin.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
+import { AdminPageHeader } from "@/components/admin/AdminPage";
 
 export const Route = createFileRoute("/admin/oracle")({
   component: OracleAdminView,
@@ -59,21 +60,20 @@ function OracleAdminView() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-wrap items-baseline justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-semibold">Oracle knowledge base</h2>
-          <p className="mt-1 text-sm text-black/60">
-            {q.data.length} imported entries · {activeCount} active · {mirroredCount} mirrored into main knowledge_entries.
-          </p>
-        </div>
-        <input
-          type="search"
-          placeholder="Search title, content, tags…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-72 rounded-lg border border-black/15 bg-white px-3 py-2 text-sm outline-none focus:border-black/40"
-        />
-      </header>
+      <AdminPageHeader
+        eyebrow="Knowledge"
+        title="Oracle knowledge base"
+        description={`${q.data.length} imported entries · ${activeCount} active · ${mirroredCount} mirrored into main knowledge_entries.`}
+        actions={
+          <input
+            type="search"
+            placeholder="Search title, content, tags…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-72 rounded-lg border border-black/15 bg-white px-3 py-2 text-sm outline-none focus:border-black/40"
+          />
+        }
+      />
 
       <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/70 backdrop-blur">
         <table className="w-full text-sm">

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { listAuditLog } from "@/lib/admin.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
+import { AdminPageHeader } from "@/components/admin/AdminPage";
 
 export const Route = createFileRoute("/admin/audit")({
   component: AuditView,
@@ -52,12 +53,16 @@ function AuditView() {
 
   return (
     <section className="space-y-4">
-      <div className="flex flex-wrap items-baseline justify-between gap-3">
-        <h2 className="text-lg font-semibold">Audit log</h2>
-        <span className="text-xs text-black/50">
-          {filtered.length} of {rows.length} events
-        </span>
-      </div>
+      <AdminPageHeader
+        eyebrow="Governance"
+        title="Audit log"
+        description="Every admin, role, and module change — actor, target, and meta."
+        actions={
+          <span className="text-xs text-black/50">
+            {filtered.length} of {rows.length} events
+          </span>
+        }
+      />
 
       <div className="flex flex-wrap items-center gap-2">
         {CATEGORIES.map((c) => {
