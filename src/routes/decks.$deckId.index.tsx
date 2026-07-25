@@ -437,7 +437,7 @@ function DeckEditor() {
         {/* Stage */}
         <div>
           {canvasMode ? (
-            <div className="relative block w-full overflow-hidden rounded-2xl border border-fuchsia-500/40 shadow-lg ring-1 ring-fuchsia-500/20">
+            <div className="relative block w-full overflow-hidden rounded-2xl border border-fuchsia-500/40 text-left shadow-lg ring-1 ring-fuchsia-500/20">
               {active && mv && (
                 <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
                   <FreeCanvasEditor
@@ -453,7 +453,7 @@ function DeckEditor() {
               )}
             </div>
           ) : liveEdit ? (
-            <div className="relative block w-full overflow-hidden rounded-2xl border border-[#003FC7]/40 shadow-lg ring-1 ring-[#003FC7]/20">
+            <div className="relative block w-full overflow-hidden rounded-2xl border border-[#003FC7]/40 text-left shadow-lg ring-1 ring-[#003FC7]/20">
               {active && mv && (
                 <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
                   <LiveEditOverlay
@@ -480,7 +480,7 @@ function DeckEditor() {
               onClick={() => setZoomed(true)}
               title="Click to view larger"
               aria-label="View slide larger"
-              className="group relative block w-full overflow-hidden rounded-2xl border border-black/10 shadow-lg transition hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B2A4A]"
+              className="group relative block w-full overflow-hidden rounded-2xl border border-black/10 text-left shadow-lg transition hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B2A4A]"
             >
               {active && mv && (
                 <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
