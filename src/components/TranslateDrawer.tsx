@@ -576,9 +576,10 @@ export function TranslateButton({ deckId }: { deckId: string }) {
         type="button"
         onClick={() => setOpen(true)}
         title="Translate this deck"
-        className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 px-4 py-2 text-sm font-medium text-black backdrop-blur hover:border-black/30 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:border-white/30"
+        aria-label="Translate this deck"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.04] hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
       >
-        <Languages size={14} /> Translate
+        <Languages size={15} />
       </button>
       {open && (
         <TranslateDrawer

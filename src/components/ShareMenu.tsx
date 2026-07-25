@@ -329,11 +329,11 @@ export function ShareMenu({ deckId }: { deckId: string }) {
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 px-4 py-2 text-sm font-medium text-black backdrop-blur hover:border-black/30 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:border-white/30"
+        title="Share & export"
+        aria-label="Share & export"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.04] hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
       >
-        <Share2 size={14} />
-        Share
-        <ChevronDown size={14} className={`transition ${open ? "rotate-180" : ""}`} />
+        <Share2 size={15} />
       </button>
       {open && (
         <div className="absolute right-0 z-30 mt-2 w-80 overflow-hidden rounded-2xl border border-black/10 bg-white/95 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-[#07061F]/95">

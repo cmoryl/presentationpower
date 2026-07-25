@@ -66,11 +66,11 @@ export function VersionHistoryButton({ deckId }: { deckId: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3.5 py-2 text-xs font-medium text-black hover:border-black/30"
         title="Version history"
+        aria-label="Version history"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.04] hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
       >
-        <History className="h-3.5 w-3.5" />
-        History
+        <History className="h-[15px] w-[15px]" />
       </button>
       {open && <VersionHistoryDrawer deckId={deckId} onClose={() => setOpen(false)} />}
     </>
