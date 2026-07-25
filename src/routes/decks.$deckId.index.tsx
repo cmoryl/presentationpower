@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef, useCallback, useId } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
@@ -1907,24 +1907,100 @@ function AccordionGroup({
   badge?: string;
   children: React.ReactNode;
 }) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const panelId = useId();
+
+  const getFocusable = useCallback((): HTMLElement[] => {
+    const panel = panelRef.current;
+    if (!panel) return [];
+    return Array.from(
+      panel.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ),
+    ).filter((el) => !el.hasAttribute("data-focus-skip"));
+  }, []);
+
+  // Focus first element on open
+  useEffect(() => {
+    if (!open) return;
+    const els = getFocusable();
+    if (els.length > 0) els[0]?.focus();
+  }, [open, getFocusable]);
+
+  // Click outside + Escape
+  useEffect(() => {
+    if (!open) return;
+    const onDocDown = (e: MouseEvent) => {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
+    document.addEventListener("mousedown", onDocDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDocDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  // Focus trap via Tab cycling
+  const onPanelKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key !== "Tab") return;
+    const els = getFocusable();
+    if (els.length === 0) {
+      e.preventDefault();
+      return;
+    }
+    const first = els[0];
+    const last = els[els.length - 1];
+    const activeEl = document.activeElement as HTMLElement | null;
+    if (e.shiftKey && activeEl === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && activeEl === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  };
+
   return (
-    <details className="group/acc relative">
-      <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-full border border-black/[0.06] bg-white px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-black/55 transition hover:border-primary/40 hover:text-primary group-open/acc:border-primary group-open/acc:bg-primary group-open/acc:text-primary-foreground [&::-webkit-details-marker]:hidden">
+    <div ref={rootRef} className="group/acc relative" data-open={open ? "true" : "false"}>
+      <button
+        ref={triggerRef}
+        type="button"
+        aria-expanded={open}
+        aria-controls={panelId}
+        aria-haspopup="true"
+        onClick={() => setOpen((v) => !v)}
+        className={`flex cursor-pointer list-none items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] transition ${
+          open
+            ? "border-primary bg-primary text-primary-foreground"
+            : "border-black/[0.06] bg-white text-black/55 hover:border-primary/40 hover:text-primary"
+        }`}
+      >
         <span>{label}</span>
         {hint && (
-          <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5 text-[9px] font-medium normal-case tracking-normal text-black/55 group-open/acc:bg-primary-foreground/15 group-open/acc:text-primary-foreground/85">
+          <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-medium normal-case tracking-normal ${open ? "bg-primary-foreground/15 text-primary-foreground/85" : "bg-black/[0.05] text-black/55"}`}>
             {hint}
           </span>
         )}
         {badge && (
-          <span className="inline-flex min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground group-open/acc:bg-primary-foreground group-open/acc:text-primary">
+          <span className={`inline-flex min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-bold ${open ? "bg-primary-foreground text-primary" : "bg-primary text-primary-foreground"}`}>
             {badge}
           </span>
         )}
         <svg
           aria-hidden
           viewBox="0 0 12 12"
-          className="h-2.5 w-2.5 transition-transform duration-150 group-open/acc:rotate-180"
+          className={`h-2.5 w-2.5 transition-transform duration-150 ${open ? "rotate-180" : ""}`}
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
@@ -1933,10 +2009,19 @@ function AccordionGroup({
         >
           <path d="M3 4.5 L6 7.5 L9 4.5" />
         </svg>
-      </summary>
-      <div className="absolute left-0 top-[calc(100%+6px)] z-[60] flex items-center gap-1 whitespace-nowrap rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)]">
-        {children}
-      </div>
-    </details>
+      </button>
+      {open && (
+        <div
+          id={panelId}
+          ref={panelRef}
+          role="group"
+          aria-label={label}
+          onKeyDown={onPanelKeyDown}
+          className="absolute left-0 top-[calc(100%+6px)] z-[60] flex items-center gap-1 whitespace-nowrap rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)]"
+        >
+          {children}
+        </div>
+      )}
+    </div>
   );
 }
