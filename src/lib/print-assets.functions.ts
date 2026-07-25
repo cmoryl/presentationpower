@@ -119,7 +119,49 @@ export const updatePrintAsset = createServerFn({ method: "POST" })
     return row as unknown as PrintAssetRow;
   });
 
-// ---- DELETE ----------------------------------------------------------------
+// ---- BULK: apply hero media to all print assets of a kind+division ---------
+//
+// Powers the "Apply to all in this template" one-click action in the hero
+// picker — sets `content.heroMedia` on every asset the user owns matching the
+// same `kind` and `brand_mode_id`. Returns the number of rows updated.
+
+const ApplyHeroInput = z.object({
+  kind: KindEnum,
+  brandModeId: z.string().min(1),
+  heroMedia: z.record(z.string(), z.unknown()),
+  excludeAssetId: z.string().uuid().optional(),
+});
+
+export const applyHeroToAllPrintAssets = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw) => ApplyHeroInput.parse(raw))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    let query = supabase
+      .from("print_assets")
+      .select("id, content")
+      .eq("owner_id", userId)
+      .eq("kind", data.kind)
+      .eq("brand_mode_id", data.brandModeId);
+    const { data: rows, error } = await query;
+    if (error) throw new Error(error.message);
+    const targets = (rows ?? []).filter((r) => r.id !== data.excludeAssetId);
+    let updated = 0;
+    for (const r of targets) {
+      const nextContent = {
+        ...((r.content as Record<string, unknown>) ?? {}),
+        heroMedia: data.heroMedia,
+      };
+      const { error: uErr } = await supabase
+        .from("print_assets")
+        .update({ content: nextContent as never })
+        .eq("id", r.id)
+        .eq("owner_id", userId);
+      if (!uErr) updated += 1;
+    }
+    return { updated, scanned: targets.length };
+  });
+
 
 export const deletePrintAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
