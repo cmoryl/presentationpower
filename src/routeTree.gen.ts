@@ -43,6 +43,7 @@ import { Route as KnowledgeAskRouteImport } from './routes/knowledge.ask'
 import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
 import { Route as EventsPresetsRouteImport } from './routes/events.presets'
 import { Route as EventsNewRouteImport } from './routes/events.new'
+import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-demo'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
 import { Route as AssetSpotlightPreviewRouteImport } from './routes/asset.spotlight-preview'
@@ -251,6 +252,11 @@ const EventsNewRoute = EventsNewRouteImport.update({
   id: '/new',
   path: '/new',
   getParentRoute: () => EventsRoute,
+} as any)
+const DevSlidestageDemoRoute = DevSlidestageDemoRouteImport.update({
+  id: '/dev/slidestage-demo',
+  path: '/dev/slidestage-demo',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DecksImportRoute = DecksImportRouteImport.update({
   id: '/decks/import',
@@ -487,6 +493,7 @@ export interface FileRoutesByFullPath {
   '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
+  '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
   '/events/presets': typeof EventsPresetsRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
@@ -557,6 +564,7 @@ export interface FileRoutesByTo {
   '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
+  '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
   '/events/presets': typeof EventsPresetsRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
@@ -632,6 +640,7 @@ export interface FileRoutesById {
   '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
+  '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/events/new': typeof EventsNewRoute
   '/events/presets': typeof EventsPresetsRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
@@ -708,6 +717,7 @@ export interface FileRouteTypes {
     | '/asset/spotlight-preview'
     | '/brief/new'
     | '/decks/import'
+    | '/dev/slidestage-demo'
     | '/events/new'
     | '/events/presets'
     | '/knowledge/$entryId'
@@ -778,6 +788,7 @@ export interface FileRouteTypes {
     | '/asset/spotlight-preview'
     | '/brief/new'
     | '/decks/import'
+    | '/dev/slidestage-demo'
     | '/events/new'
     | '/events/presets'
     | '/knowledge/$entryId'
@@ -852,6 +863,7 @@ export interface FileRouteTypes {
     | '/asset/spotlight-preview'
     | '/brief/new'
     | '/decks/import'
+    | '/dev/slidestage-demo'
     | '/events/new'
     | '/events/presets'
     | '/knowledge/$entryId'
@@ -907,6 +919,7 @@ export interface RootRouteChildren {
   AssetSpotlightPreviewRoute: typeof AssetSpotlightPreviewRoute
   BriefNewRoute: typeof BriefNewRoute
   DecksImportRoute: typeof DecksImportRoute
+  DevSlidestageDemoRoute: typeof DevSlidestageDemoRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
   LibraryMyRoute: typeof LibraryMyRoute
   LibraryPrintRoute: typeof LibraryPrintRoute
@@ -1163,6 +1176,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/events/new'
       preLoaderRoute: typeof EventsNewRouteImport
       parentRoute: typeof EventsRoute
+    }
+    '/dev/slidestage-demo': {
+      id: '/dev/slidestage-demo'
+      path: '/dev/slidestage-demo'
+      fullPath: '/dev/slidestage-demo'
+      preLoaderRoute: typeof DevSlidestageDemoRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/decks/import': {
       id: '/decks/import'
@@ -1574,6 +1594,7 @@ const rootRouteChildren: RootRouteChildren = {
   AssetSpotlightPreviewRoute: AssetSpotlightPreviewRoute,
   BriefNewRoute: BriefNewRoute,
   DecksImportRoute: DecksImportRoute,
+  DevSlidestageDemoRoute: DevSlidestageDemoRoute,
   LibraryImportedRoute: LibraryImportedRoute,
   LibraryMyRoute: LibraryMyRoute,
   LibraryPrintRoute: LibraryPrintRoute,
