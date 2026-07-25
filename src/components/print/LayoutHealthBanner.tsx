@@ -1,13 +1,20 @@
 /**
  * Layout health banner for the print editor. Reads a CapacityReport from
  * src/lib/print-capacity.ts and renders an inline status card with issue
- * details. Kept dumb — all logic lives in the capacity analyzer.
+ * details plus actionable one-click compactions (reduce hero, swap module
+ * variant, etc.). All logic lives in the capacity analyzer; this component
+ * is a dumb view over the report shape.
  */
 
-import type { CapacityReport } from "@/lib/print-capacity";
-import { AlertTriangle, CheckCircle2, XOctagon } from "lucide-react";
+import type { CapacityReport, CapacitySuggestion } from "@/lib/print-capacity";
+import { AlertTriangle, CheckCircle2, XOctagon, Wand2 } from "lucide-react";
 
-export function LayoutHealthBanner({ report }: { report: CapacityReport }) {
+type Props = {
+  report: CapacityReport;
+  onApplySuggestion?: (s: CapacitySuggestion) => void;
+};
+
+export function LayoutHealthBanner({ report, onApplySuggestion }: Props) {
   const pct = Math.min(100, Math.round(report.fill * 100));
   const tone =
     report.level === "block"
@@ -39,6 +46,13 @@ export function LayoutHealthBanner({ report }: { report: CapacityReport }) {
   const Icon = tone.Icon;
   const blocking = report.issues.filter((i) => i.level === "block");
   const warnings = report.issues.filter((i) => i.level === "warn");
+  // Hero-cost split for the meter — a tiny amber stripe visualizes how much
+  // of the base budget the hero band has absorbed.
+  const heroFrac =
+    report.baseBudget > 0
+      ? Math.max(0, Math.min(1, report.heroCostDelta / report.baseBudget))
+      : 0;
+  const heroPct = Math.round(heroFrac * 100);
 
   return (
     <div
@@ -50,11 +64,24 @@ export function LayoutHealthBanner({ report }: { report: CapacityReport }) {
         <span className="inline-flex items-center gap-1.5">
           <Icon size={13} /> {tone.label}
         </span>
-        <span className="tabular-nums">{report.used.toFixed(1)} / {report.budget.toFixed(1)} pu</span>
+        <span className="tabular-nums">
+          {report.used.toFixed(1)} / {report.budget.toFixed(1)} pu
+          {report.heroCostDelta > 0.05 && (
+            <span className="ml-1 opacity-70">(hero {report.heroCostDelta.toFixed(1)})</span>
+          )}
+        </span>
       </div>
-      <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
+      <div className="mt-1.5 relative h-1.5 w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
+        {/* Hero stripe — sits at the tail of the bar to signal reserved-for-hero space */}
+        {heroFrac > 0 && (
+          <div
+            className="absolute inset-y-0 right-0 bg-black/25 dark:bg-white/25"
+            style={{ width: `${heroPct}%` }}
+            aria-hidden
+          />
+        )}
         <div
-          className={`h-full ${tone.bar} transition-all`}
+          className={`relative h-full ${tone.bar} transition-all`}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -71,6 +98,24 @@ export function LayoutHealthBanner({ report }: { report: CapacityReport }) {
             <li key={k}>• {i.message}</li>
           ))}
         </ul>
+      )}
+      {report.suggestions.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {report.suggestions.map((s, k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => onApplySuggestion?.(s)}
+              disabled={!onApplySuggestion}
+              className="inline-flex items-center gap-1 rounded-full border border-black/15 bg-white px-2 py-0.5 text-[10.5px] font-semibold text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7] disabled:cursor-default disabled:opacity-60 dark:border-white/15 dark:bg-white/[0.04] dark:text-white/85"
+              title={s.message}
+              data-testid={`capacity-suggestion-${s.kind}`}
+            >
+              <Wand2 size={11} />
+              {s.message}
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );

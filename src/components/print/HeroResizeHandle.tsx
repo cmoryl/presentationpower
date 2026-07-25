@@ -1,8 +1,20 @@
 // Drag handle overlay for the print asset canvas. Lets the user pull the
 // hero band up/down to resize it — snaps to `heroMedia.heightPct` (or the
 // non-media hero fallback field `heroHeightPct` if the layout supports it).
-import { useEffect, useRef, useState } from "react";
+//
+// The grip is content-aware: it clamps against the effective module budget
+// so users can't drag the hero taller than the page has room for. Passing
+// `usedModuleUnits` + `kind` unlocks the ceiling computation via
+// maxHeroHeightPct(); when omitted, it falls back to the hard [MIN, MAX]
+// clamp only.
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { PrintHeroMedia } from "@/lib/print-assets.types";
+import {
+  HERO_HEIGHT_HARD_MAX,
+  HERO_HEIGHT_HARD_MIN,
+  maxHeroHeightPct,
+  type PrintTemplateKind,
+} from "@/lib/print-capacity";
 
 type Props = {
   // Ref to the canvas element so we can measure vertical space in px.
@@ -12,20 +24,46 @@ type Props = {
   // Only shown when heroMedia exists; hero band without a photo uses layout
   // padding, not heightPct. Show a subtle hint in that case.
   disabledHint?: string;
+  // Hero-aware capacity clamp inputs. When provided, the grip refuses to
+  // cross the ceiling where modules would overflow the page.
+  kind?: PrintTemplateKind;
+  usedModuleUnits?: number;
+  hasTitle?: boolean;
+  hasSummary?: boolean;
 };
 
-const MIN_PCT = 20;
-const MAX_PCT = 80;
+const MIN_PCT = HERO_HEIGHT_HARD_MIN;
+const MAX_PCT = HERO_HEIGHT_HARD_MAX;
 
-export function HeroResizeHandle({ canvasRef, media, onChange, disabledHint }: Props) {
+export function HeroResizeHandle({
+  canvasRef,
+  media,
+  onChange,
+  disabledHint,
+  kind,
+  usedModuleUnits,
+  hasTitle,
+  hasSummary,
+}: Props) {
   const heightPct = media?.heightPct ?? 46;
   // Enabled whenever a hero image is set — the grip drives `heightPct`, which
-  // every aspect variant respects. (Previously gated on aspect === "fill",
-  // which made the grip look missing on band/square heroes.)
+  // every aspect variant respects.
   const enabled = !!media?.imageUrl;
   const [dragging, setDragging] = useState(false);
   const [hover, setHover] = useState(false);
   const startRef = useRef<{ y: number; startPct: number; height: number } | null>(null);
+
+  // Content-aware ceiling — the tallest heightPct the modules can afford.
+  // When kind/used aren't supplied, the ceiling is just MAX_PCT.
+  const ceiling = useMemo(() => {
+    if (!kind || typeof usedModuleUnits !== "number") return MAX_PCT;
+    return maxHeroHeightPct(kind, usedModuleUnits, media, {
+      hasTitle: !!hasTitle,
+      hasSummary: !!hasSummary,
+    });
+  }, [kind, usedModuleUnits, media, hasTitle, hasSummary]);
+  const capped = heightPct >= ceiling;
+  const nearCap = heightPct >= ceiling - 3 && !capped;
 
   useEffect(() => {
     if (!dragging) return;
@@ -33,7 +71,7 @@ export function HeroResizeHandle({ canvasRef, media, onChange, disabledHint }: P
       const s = startRef.current;
       if (!s) return;
       const deltaPct = ((e.clientY - s.y) / s.height) * 100;
-      const next = Math.max(MIN_PCT, Math.min(MAX_PCT, s.startPct + deltaPct));
+      const next = Math.max(MIN_PCT, Math.min(ceiling, s.startPct + deltaPct));
       onChange({ ...(media ?? {} as PrintHeroMedia), heightPct: Math.round(next) });
     };
     const onUp = () => {
@@ -46,7 +84,7 @@ export function HeroResizeHandle({ canvasRef, media, onChange, disabledHint }: P
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
     };
-  }, [dragging, media, onChange]);
+  }, [dragging, media, onChange, ceiling]);
 
   const handleDown = (e: React.PointerEvent) => {
     if (!enabled) return;
@@ -58,9 +96,17 @@ export function HeroResizeHandle({ canvasRef, media, onChange, disabledHint }: P
   };
 
   const nudge = (delta: number) => {
-    const next = Math.max(MIN_PCT, Math.min(MAX_PCT, heightPct + delta));
+    const next = Math.max(MIN_PCT, Math.min(ceiling, heightPct + delta));
     onChange({ ...(media ?? {} as PrintHeroMedia), heightPct: next });
   };
+
+  const rimColor = capped
+    ? "#E53D2E"
+    : nearCap
+      ? "#FFB020"
+      : dragging || hover
+        ? "#003FC7"
+        : "rgba(0,63,199,0.35)";
 
   return (
     <div
@@ -74,7 +120,7 @@ export function HeroResizeHandle({ canvasRef, media, onChange, disabledHint }: P
         style={{
           top: "50%",
           height: 1,
-          background: enabled ? (dragging || hover ? "#003FC7" : "rgba(0,63,199,0.35)") : "transparent",
+          background: enabled ? rimColor : "transparent",
           transition: "background 120ms ease",
         }}
       />
@@ -83,8 +129,10 @@ export function HeroResizeHandle({ canvasRef, media, onChange, disabledHint }: P
         role="slider"
         aria-label="Hero height"
         aria-valuemin={MIN_PCT}
-        aria-valuemax={MAX_PCT}
+        aria-valuemax={ceiling}
         aria-valuenow={Math.round(heightPct)}
+        data-capped={capped ? "true" : undefined}
+        data-near-cap={nearCap ? "true" : undefined}
         tabIndex={enabled ? 0 : -1}
         onPointerDown={handleDown}
         onPointerEnter={() => setHover(true)}
@@ -104,16 +152,33 @@ export function HeroResizeHandle({ canvasRef, media, onChange, disabledHint }: P
           transform: "translate(-50%, -50%)",
           padding: "6px 14px",
           background: enabled ? "#FFFFFF" : "rgba(255,255,255,0.6)",
-          borderColor: dragging || hover ? "#003FC7" : "rgba(0,0,0,0.15)",
+          borderColor: rimColor,
           opacity: enabled ? 1 : 0.55,
           userSelect: "none",
           touchAction: "none",
         }}
-        title={enabled ? "Drag to resize the hero band" : (disabledHint ?? "Add hero media to resize the band")}
+        title={
+          !enabled
+            ? (disabledHint ?? "Add hero media to resize the band")
+            : capped
+              ? `At page cap — modules need the remaining space. Ceiling ${ceiling}%.`
+              : nearCap
+                ? `Approaching page cap (${ceiling}% max).`
+                : "Drag to resize the hero band"
+        }
       >
         <GripDots />
-        <span className="tabular-nums" style={{ fontSize: 11, fontWeight: 600, color: "#03002C", letterSpacing: "0.04em" }}>
+        <span
+          className="tabular-nums"
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: capped ? "#E53D2E" : nearCap ? "#8A5B00" : "#03002C",
+            letterSpacing: "0.04em",
+          }}
+        >
           Hero · {Math.round(heightPct)}%
+          {capped ? " · cap" : nearCap ? ` · max ${ceiling}%` : ""}
         </span>
       </div>
     </div>

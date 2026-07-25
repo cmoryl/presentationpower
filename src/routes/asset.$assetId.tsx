@@ -57,7 +57,7 @@ import { HeroDiffTile } from "@/components/print/HeroDiffTile";
 import type { BrandMode } from "@/lib/taxonomy";
 
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
-import { analyzePrintAsset, canAddModule } from "@/lib/print-capacity";
+import { analyzePrintAsset, canAddModule, weightForSection, effectiveModuleBudget } from "@/lib/print-capacity";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
@@ -895,7 +895,15 @@ function AssetEditor() {
                 canvasRef={canvasRef}
                 media={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
                 onChange={(next) => patchContent({ heroMedia: next } as never)}
+                kind={kind as never}
+                usedModuleUnits={((rawContent as { modules?: PrintSection[] }).modules ?? []).reduce(
+                  (n, m) => n + weightForSection(m), 0,
+                )}
+                hasTitle={!!(rawContent as { title?: string }).title}
+                hasSummary={!!(rawContent as { summary?: string }).summary}
               />
+
+
 
               {showBleedGuides && (
                 <>
@@ -1029,14 +1037,33 @@ function AssetEditor() {
             </Panel>
 
             <Panel title="Shared modules">
-              <LayoutHealthBanner report={analyzePrintAsset("case-study", content)} />
+              <LayoutHealthBanner
+                report={analyzePrintAsset("case-study", content)}
+                onApplySuggestion={(s) => {
+                  if (s.kind === "reduce-hero") {
+                    const cur = (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia ?? {} as PrintHeroMedia;
+                    patchContent({ heroMedia: { ...cur, heightPct: s.targetHeightPct } } as never);
+                  } else if (s.kind === "swap-variant") {
+                    const modules = [...(content.modules ?? [])];
+                    const cur = modules[s.moduleIndex];
+                    if (cur && cur.kind === "stats") {
+                      modules[s.moduleIndex] = { ...cur, variantId: s.to as PrintStatsSection["variantId"] };
+                      patchContent({ modules });
+                    }
+                  }
+                }}
+              />
               <ModulesPanel
                 kind="case-study"
                 modules={content.modules ?? []}
+                heroMedia={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
+                hasTitle={!!(rawContent as { title?: string }).title}
+                hasSummary={!!(rawContent as { summary?: string }).summary}
                 onAdd={() => setPickerOpen(true)}
                 onChange={(next) => patchContent({ modules: next })}
                 mode={editorMode}
               />
+
 
               {/* Schema-driven Content inspector — the guaranteed safety net.
                   Every content field in the active kind is reachable here,
@@ -1116,13 +1143,16 @@ function AssetEditor() {
 }
 
 function ModulesPanel({
-  kind, modules, onAdd, onChange, mode,
+  kind, modules, onAdd, onChange, mode, heroMedia, hasTitle, hasSummary,
 }: {
   kind: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
   modules: PrintSection[];
   onAdd: () => void;
   onChange: (next: PrintSection[]) => void;
   mode: PrintMode;
+  heroMedia?: PrintHeroMedia;
+  hasTitle?: boolean;
+  hasSummary?: boolean;
 }) {
   const editorMode = mode;
   function move(i: number, dir: -1 | 1) {
@@ -1151,9 +1181,14 @@ function ModulesPanel({
   }
 
   // Weight the lightest known variant so a "no room" verdict really means no
-  // room even for the smallest module.
+  // room even for the smallest module. Hero-aware — the effective budget
+  // shrinks as the hero band grows.
   const lightestWeight = 1.6;
-  const gate = canAddModule(kind, modules, lightestWeight);
+  const gate = canAddModule(kind, modules, lightestWeight, {
+    heroMedia,
+    copy: { hasTitle: !!hasTitle, hasSummary: !!hasSummary },
+  });
+
 
   // Insertion index (0..modules.length) where a dragged item would land, plus
   // the source of the drag so we can style the indicator differently for
