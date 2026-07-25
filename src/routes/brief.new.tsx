@@ -291,9 +291,8 @@ function BriefWizard() {
 
         <div className="mt-8">
           <form className="space-y-10" onSubmit={(e) => e.preventDefault()}>
-              {step === 1 && (<>
               {/* SECTION 01: Brand Mode — drives everything below */}
-              <section className="space-y-4">
+              <section id="brand" className="scroll-mt-24 space-y-4">
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
                   <label className={labelCls}>01 · Brand Mode</label>
 
