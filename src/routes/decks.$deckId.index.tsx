@@ -973,6 +973,8 @@ function DeckEditor() {
             onChange={(logo) => setDeckClientLogo(deck.id, logo)}
           />
         </aside>
+        )}
+
 
       </div>
       <CopilotPanel deckId={deckId} onHighlight={setFlashIndices} />
