@@ -48,6 +48,8 @@ import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-i
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
+import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
+import type { BrandMode } from "@/lib/taxonomy";
 
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
 import { analyzePrintAsset, canAddModule } from "@/lib/print-capacity";
@@ -976,6 +978,7 @@ function AssetEditor() {
               value={content.heroMedia}
               onChange={(next) => patchContent({ heroMedia: next })}
               divisionId={row?.brand_mode_id ?? null}
+              brand={brand}
             />
 
             
@@ -1494,10 +1497,12 @@ function HeroMediaPanel({
   value,
   onChange,
   divisionId,
+  brand,
 }: {
   value: PrintHeroMedia | undefined;
   onChange: (next: PrintHeroMedia | undefined) => void;
   divisionId: string | null;
+  brand: BrandMode | undefined;
 }) {
   const enabled = !!value?.imageUrl;
   const media: PrintHeroMedia = value ?? { imageUrl: "" };
@@ -1578,6 +1583,9 @@ function HeroMediaPanel({
           }
         />
       </Row>
+      {/* Live hero preview — updates as heroMedia changes (image, focal,
+          scrim, wash, aspect). Gives the picker an immediate WYSIWYG loop. */}
+      <HeroPreviewPanel media={value} brand={brand} />
       {/* Curated pool strip */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
