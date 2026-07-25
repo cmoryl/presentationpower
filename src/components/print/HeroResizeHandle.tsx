@@ -1,8 +1,20 @@
 // Drag handle overlay for the print asset canvas. Lets the user pull the
 // hero band up/down to resize it — snaps to `heroMedia.heightPct` (or the
 // non-media hero fallback field `heroHeightPct` if the layout supports it).
-import { useEffect, useRef, useState } from "react";
+//
+// The grip is content-aware: it clamps against the effective module budget
+// so users can't drag the hero taller than the page has room for. Passing
+// `usedModuleUnits` + `kind` unlocks the ceiling computation via
+// maxHeroHeightPct(); when omitted, it falls back to the hard [MIN, MAX]
+// clamp only.
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { PrintHeroMedia } from "@/lib/print-assets.types";
+import {
+  HERO_HEIGHT_HARD_MAX,
+  HERO_HEIGHT_HARD_MIN,
+  maxHeroHeightPct,
+  type PrintTemplateKind,
+} from "@/lib/print-capacity";
 
 type Props = {
   // Ref to the canvas element so we can measure vertical space in px.
@@ -12,6 +24,12 @@ type Props = {
   // Only shown when heroMedia exists; hero band without a photo uses layout
   // padding, not heightPct. Show a subtle hint in that case.
   disabledHint?: string;
+  // Hero-aware capacity clamp inputs. When provided, the grip refuses to
+  // cross the ceiling where modules would overflow the page.
+  kind?: PrintTemplateKind;
+  usedModuleUnits?: number;
+  hasTitle?: boolean;
+  hasSummary?: boolean;
 };
 
 const MIN_PCT = 20;
