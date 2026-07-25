@@ -948,8 +948,19 @@ function BriefWizard() {
                   </div>
                 )}
               </section>
+              </>)}
 
-
+              {step === 5 && (<>
+              {/* SECTION — REVIEW & GENERATE */}
+              <ReviewSummary
+                brand={brand}
+                brandPrimary={brandPrimary}
+                form={form}
+                masterSet={masterSet}
+                effectiveArchetypeId={effectiveArchetypeId}
+                strategy={strategy}
+                narrativeArchetypes={narrativeArchetypes}
+              />
               <div
                 className="flex flex-col-reverse items-stretch justify-between gap-4 border-t pt-6 md:flex-row md:items-center"
                 style={{ borderColor: PALETTE.hairline }}
