@@ -121,6 +121,7 @@ export type DeckSlide = {
   // (e.g. "content.title" or "content.stats[0].label"). Hex colors (#rrggbb)
   // or "" to clear. Applied via a scoped stylesheet in LiveEditOverlay and
   // preserved across previews/exports.
+  inkOverrides?: Record<string, string>;
   // Optional per-slide transition override (Pass 1 — on-screen only).
   transition?: SlideTransition;
 };
