@@ -129,21 +129,32 @@ export function EBrochureLayout({
                 minHeight: content.heroMedia?.imageUrl
                   ? `calc(${(content.heroMedia.heightPct ?? 46) - 6}% - ${cq(padTop(density))})`
                   : undefined,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
               }}
             >
-              <h1 ref={heroRef} style={{
-                margin: 0, fontWeight: 700, fontSize: cq(30), lineHeight: 1.16,
-                letterSpacing: "-0.015em", color: ink, maxWidth: cq(440),
-              }}>
-                {content.title || "Untitled brochure"}
-              </h1>
-              {content.summary && (
-                <p ref={introRef} style={{
-                  margin: `${cq(12)} 0 0`, fontSize: cq(11.5), lineHeight: 1.65,
-                  color: inkSoft, maxWidth: cq(430),
-                }}>{content.summary}</p>
-              )}
+              <div
+                style={{
+                  transform: `translateY(${content.heroMedia?.copyOffsetPct ?? 0}%)`,
+                  willChange: "transform",
+                }}
+              >
+                <h1 ref={heroRef} style={{
+                  margin: 0, fontWeight: 700, fontSize: cq(30), lineHeight: 1.16,
+                  letterSpacing: "-0.015em", color: ink, maxWidth: cq(440),
+                }}>
+                  {content.title || "Untitled brochure"}
+                </h1>
+                {content.summary && (
+                  <p ref={introRef} style={{
+                    margin: `${cq(12)} 0 0`, fontSize: cq(11.5), lineHeight: 1.65,
+                    color: inkSoft, maxWidth: cq(430),
+                  }}>{content.summary}</p>
+                )}
+              </div>
             </div>
+
 
             {/* 3 SUMMARY CARDS — Challenge / Approach / Impact in one panel (Canva ref). */}
             <div style={{ paddingTop: cq(38), marginTop: cq(-6) }}>

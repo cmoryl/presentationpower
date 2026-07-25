@@ -130,6 +130,8 @@ export function CaseStudyLayout({
               padding: `${cq(padTop(density))} ${cq(padX(density))} ${cq(96)}`,
               overflow: "hidden",
               color: ink,
+              display: "flex",
+              flexDirection: "column",
               minHeight: content.heroMedia?.imageUrl
                 ? `${(content.heroMedia.heightPct ?? 46) - 4}%`
                 : undefined,
@@ -145,30 +147,42 @@ export function CaseStudyLayout({
               />
               <BrandLockup brand={brand} color={brand.id === "bm-enterprise" ? (mode === "dark" ? "#FFFFFF" : "#000000") : (mode === "dark" ? "#FFFFFF" : resolvePrintLogoInk(content.logoColor, ink))} size="2xs" orientation="horizontal" />
             </div>
-            <h1
-              ref={heroRef}
+            <div
               style={{
-                position: "relative",
-                margin: `${cq(14)} 0 0`,
-                fontWeight: 700, fontSize: cq(32), lineHeight: 1.15,
-                letterSpacing: "-0.015em", color: ink, maxWidth: cq(460),
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                transform: `translateY(${content.heroMedia?.copyOffsetPct ?? 0}%)`,
+                willChange: "transform",
               }}
             >
-              {heroTitle || "Untitled case study"}
-            </h1>
-            {(content.industry || content.audience) && (
-              <p
-                ref={introRef}
+              <h1
+                ref={heroRef}
                 style={{
-                  position: "relative", margin: `${cq(12)} 0 0`,
-                  fontSize: cq(12), lineHeight: 1.6,
-                  color: inkSoft, maxWidth: cq(420),
+                  position: "relative",
+                  margin: 0,
+                  fontWeight: 700, fontSize: cq(32), lineHeight: 1.15,
+                  letterSpacing: "-0.015em", color: ink, maxWidth: cq(460),
                 }}
               >
-                {[content.industry, content.audience].filter(Boolean).join(" · ")}
-              </p>
-            )}
+                {heroTitle || "Untitled case study"}
+              </h1>
+              {(content.industry || content.audience) && (
+                <p
+                  ref={introRef}
+                  style={{
+                    position: "relative", margin: `${cq(12)} 0 0`,
+                    fontSize: cq(12), lineHeight: 1.6,
+                    color: inkSoft, maxWidth: cq(420),
+                  }}
+                >
+                  {[content.industry, content.audience].filter(Boolean).join(" · ")}
+                </p>
+              )}
+            </div>
           </div>
+
 
 
           {/* STAT PILLS — tucked over the hero/body seam */}

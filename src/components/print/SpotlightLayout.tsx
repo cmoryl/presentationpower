@@ -172,49 +172,57 @@ export function SpotlightLayout({
                 ? `calc(${(content.heroMedia.heightPct ?? 46) - 6}% - ${padTopCq})`
                 : undefined,
             }}>
-              <div style={{ flex: "1.15 1 0" }}>
-                <h1
-                  ref={heroRef}
+              <div style={{ flex: "1.15 1 0", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                <div
                   style={{
-                    margin: 0,
-                    fontWeight: 700,
-                    fontSize: cq(33),
-                    lineHeight: 1.14,
-                    letterSpacing: "-0.015em",
-                    color: ink,
+                    transform: `translateY(${content.heroMedia?.copyOffsetPct ?? 0}%)`,
+                    willChange: "transform",
                   }}
                 >
-                  {content.productName || "Untitled spotlight"}
-                </h1>
-                {content.tagline && (
-                  <p
+                  <h1
+                    ref={heroRef}
                     style={{
-                      margin: `${cq(10)} 0 0`,
-                      fontSize: cq(12.5),
-                      lineHeight: 1.35,
-                      fontWeight: 600,
-                      color: accentInk,
-                      maxWidth: cq(340),
+                      margin: 0,
+                      fontWeight: 700,
+                      fontSize: cq(33),
+                      lineHeight: 1.14,
+                      letterSpacing: "-0.015em",
+                      color: ink,
                     }}
                   >
-                    {content.tagline}
-                  </p>
-                )}
-                {content.summary && (
-                  <p
-                    ref={introRef}
-                    style={{
-                      margin: `${cq(12)} 0 0`,
-                      fontSize: cq(11.5),
-                      lineHeight: 1.65,
-                      color: inkSoft,
-                      maxWidth: cq(320),
-                    }}
-                  >
-                    {content.summary}
-                  </p>
-                )}
+                    {content.productName || "Untitled spotlight"}
+                  </h1>
+                  {content.tagline && (
+                    <p
+                      style={{
+                        margin: `${cq(10)} 0 0`,
+                        fontSize: cq(12.5),
+                        lineHeight: 1.35,
+                        fontWeight: 600,
+                        color: accentInk,
+                        maxWidth: cq(340),
+                      }}
+                    >
+                      {content.tagline}
+                    </p>
+                  )}
+                  {content.summary && (
+                    <p
+                      ref={introRef}
+                      style={{
+                        margin: `${cq(12)} 0 0`,
+                        fontSize: cq(11.5),
+                        lineHeight: 1.65,
+                        color: inkSoft,
+                        maxWidth: cq(320),
+                      }}
+                    >
+                      {content.summary}
+                    </p>
+                  )}
+                </div>
               </div>
+
 
               {content.quote && (
                 <div

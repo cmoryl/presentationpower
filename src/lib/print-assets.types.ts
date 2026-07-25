@@ -43,6 +43,7 @@ export type PrintHeroMedia = {
   autoScrim?: boolean;            // sample image brightness and boost scrim on bright photos
   autoScrimThreshold?: number;    // 0..1 luminance above which the boost kicks in (default 0.6)
   heightPct?: number;             // share of page height, default 46 (used when aspect="fill")
+  copyOffsetPct?: number;         // -50..50 — vertical nudge of hero copy from centered baseline (0 = centered)
 };
 
 
