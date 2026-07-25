@@ -472,6 +472,12 @@ function BriefWizard() {
 
 
               {/* REFINE: narrative, palette, AI strategist */}
+              <section className="space-y-6">
+                <SectionHeader
+                  index="03 · Refine"
+                  title="Tune the narrative (optional)"
+                  description="Industry, audience, narrative archetype, palette experiments, and the AI strategist. Skip to keep smart defaults."
+                />
 
               {/* OPTIONAL: Everything else, collapsed by default */}
               <div
