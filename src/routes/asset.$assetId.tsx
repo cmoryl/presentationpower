@@ -1502,6 +1502,17 @@ function Block({ label, body, onChange }: { label: string; body: string; onChang
   );
 }
 
+function parseHeroMediaJson(json: string | null): PrintHeroMedia | null {
+  if (!json) return null;
+  try {
+    const parsed = JSON.parse(json) as PrintHeroMedia;
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+
 function HeroMediaPanel({
   value,
   onChange,
