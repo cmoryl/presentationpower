@@ -121,13 +121,18 @@ export function CaseStudyLayout({
           ) : null}
 
 
-          {/* HERO — no full-color band; background inherits page bg (white / offset black). */}
+          {/* HERO — no full-color band; background inherits page bg (white / offset black).
+              When a hero photo is present, reserve the hero band's vertical
+              space so the first content module lands at the image fade seam. */}
           <div
             className="relative"
             style={{
               padding: `${cq(padTop(density))} ${cq(padX(density))} ${cq(96)}`,
               overflow: "hidden",
               color: ink,
+              minHeight: content.heroMedia?.imageUrl
+                ? `${(content.heroMedia.heightPct ?? 46) - 4}%`
+                : undefined,
             }}
           >
             <div className="relative flex items-center justify-between" style={{ gap: cq(10) }}>
