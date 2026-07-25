@@ -176,6 +176,8 @@ export type DeckContext = {
     printAssetIds?: string[];
     brandDivisionId?: string | null;
   };
+  // Deck-level default transition (Pass 1 — on-screen only).
+  defaultTransition?: SlideTransition;
 };
 
 
