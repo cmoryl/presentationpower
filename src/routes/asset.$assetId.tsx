@@ -53,6 +53,7 @@ import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
+import { HeroDiffTile } from "@/components/print/HeroDiffTile";
 import type { BrandMode } from "@/lib/taxonomy";
 
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
@@ -1501,6 +1502,17 @@ function Block({ label, body, onChange }: { label: string; body: string; onChang
   );
 }
 
+function parseHeroMediaJson(json: string | null): PrintHeroMedia | null {
+  if (!json) return null;
+  try {
+    const parsed = JSON.parse(json) as PrintHeroMedia;
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+
 function HeroMediaPanel({
   value,
   onChange,
@@ -1534,7 +1546,11 @@ function HeroMediaPanel({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [preview, setPreview] = useState<
-    | { toUpdate: Array<{ id: string; title: string }>; toSkip: Array<{ id: string; title: string; reason: "customized" }>; scanned: number }
+    | {
+        toUpdate: Array<{ id: string; title: string; heroMediaJson: string | null }>;
+        toSkip: Array<{ id: string; title: string; reason: "customized"; heroMediaJson: string | null }>;
+        scanned: number;
+      }
     | null
   >(null);
   const [previewError, setPreviewError] = useState<string | null>(null);
@@ -1850,12 +1866,19 @@ function HeroMediaPanel({
                       Nothing to update — every sibling template already has custom tuning.
                     </p>
                   ) : (
-                    <ul className="mt-1 max-h-40 space-y-0.5 overflow-y-auto rounded-md border border-black/10 bg-black/[0.02] p-2">
-                      {preview.toUpdate.map((r) => (
-                        <li key={r.id} className="truncate text-[12px] text-black/80">
-                          {r.title}
-                        </li>
-                      ))}
+                    <ul className="mt-1 max-h-72 space-y-2 overflow-y-auto rounded-md border border-black/10 bg-black/[0.02] p-2">
+                      {preview.toUpdate.map((r) => {
+                        const before = parseHeroMediaJson(r.heroMediaJson);
+                        return (
+                          <li key={r.id} className="flex items-center gap-3 rounded border border-transparent bg-white/60 p-1.5">
+                            <HeroDiffTile before={before} after={media} status="update" />
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate text-[12px] font-medium text-black/85">{r.title}</div>
+                              <div className="text-[10px] uppercase tracking-[0.18em] text-[#003FC7]">Will update</div>
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ul>
                   )}
                 </section>
@@ -1869,15 +1892,21 @@ function HeroMediaPanel({
                       No customized templates — nothing to skip.
                     </p>
                   ) : (
-                    <ul className="mt-1 max-h-40 space-y-0.5 overflow-y-auto rounded-md border border-black/10 bg-black/[0.02] p-2">
-                      {preview.toSkip.map((r) => (
-                        <li key={r.id} className="flex items-center justify-between gap-2 text-[12px] text-black/70">
-                          <span className="truncate">{r.title}</span>
-                          <span className="shrink-0 text-[10px] uppercase tracking-[0.2em] text-black/40">
-                            customized
-                          </span>
-                        </li>
-                      ))}
+                    <ul className="mt-1 max-h-72 space-y-2 overflow-y-auto rounded-md border border-black/10 bg-black/[0.02] p-2">
+                      {preview.toSkip.map((r) => {
+                        const before = parseHeroMediaJson(r.heroMediaJson);
+                        return (
+                          <li key={r.id} className="flex items-center gap-3 rounded border border-transparent bg-white/60 p-1.5">
+                            <HeroDiffTile before={before} after={media} status="skip" />
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate text-[12px] font-medium text-black/85">{r.title}</div>
+                              <div className="text-[10px] uppercase tracking-[0.18em] text-black/50">
+                                Kept · customized focal / scrim / wash
+                              </div>
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ul>
                   )}
                 </section>
