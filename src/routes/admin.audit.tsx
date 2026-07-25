@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { listAuditLog } from "@/lib/admin.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
-import { AdminPageHeader } from "@/components/admin/AdminPage";
+import { AdminPageHeader , AdminLoading } from "@/components/admin/AdminPage";
 
 export const Route = createFileRoute("/admin/audit")({
   component: AuditView,
@@ -91,7 +91,7 @@ function AuditView() {
         />
       </div>
 
-      {q.isLoading && <div className="text-sm text-black/50">Loading…</div>}
+      {q.isLoading && <AdminLoading />}
 
       <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/70 backdrop-blur">
         <table className="w-full text-xs">

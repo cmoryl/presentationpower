@@ -1,3 +1,4 @@
+import { AdminLoading } from "@/components/admin/AdminPage";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -260,7 +261,7 @@ function PrintLibraryCurator() {
 
       {/* Grouped list */}
       {variants.isLoading ? (
-        <div className="text-sm text-black/50">Loading…</div>
+        <AdminLoading />
       ) : rows.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-black/15 bg-white p-10 text-center text-sm text-black/60">
           No approved variants yet. Publish one above to seed the shelf.

@@ -1,3 +1,4 @@
+import { AdminLoading } from "@/components/admin/AdminPage";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -31,7 +32,7 @@ function ImageryView() {
           className="ml-2 rounded-lg border border-black/15 bg-white px-3 py-1.5 text-xs" />
       </div>
 
-      {q.isLoading && <div className="text-sm text-black/50">Loading…</div>}
+      {q.isLoading && <AdminLoading />}
       {q.data && (
         <>
           <section className="grid grid-cols-2 gap-3 md:grid-cols-4">

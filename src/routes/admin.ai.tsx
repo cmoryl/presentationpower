@@ -5,7 +5,7 @@ import { useState } from "react";
 import { getAiAnalytics } from "@/lib/admin.functions";
 import { hasAiKey } from "@/lib/ai-status.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
-import { AdminPageHeader } from "@/components/admin/AdminPage";
+import { AdminPageHeader , AdminLoading } from "@/components/admin/AdminPage";
 
 export const Route = createFileRoute("/admin/ai")({
   component: AiView,
@@ -77,7 +77,7 @@ function AiView() {
           className="ml-2 rounded-lg border border-black/15 bg-white px-3 py-1.5 text-xs" />
       </div>
 
-      {q.isLoading && <div className="text-sm text-black/50">Loading…</div>}
+      {q.isLoading && <AdminLoading />}
       {q.data && (
         <>
           <section className="grid grid-cols-2 gap-3 md:grid-cols-4">

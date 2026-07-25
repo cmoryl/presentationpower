@@ -1,3 +1,4 @@
+import { AdminLoading } from "@/components/admin/AdminPage";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -579,7 +580,7 @@ function SourcesTab({ slug }: { slug: string }) {
             </div>
             <div className="max-h-[70vh] overflow-y-auto p-4">
               {textQ.isLoading ? (
-                <div className="text-sm text-black/50">Loading…</div>
+                <AdminLoading />
               ) : (
                 <pre className="whitespace-pre-wrap font-sans text-xs leading-relaxed text-black/80">
                   {textQ.data?.extracted_text ?? "(no text)"}

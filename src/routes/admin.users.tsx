@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { listAdminUsers, inviteAdminUser, setUserRole, deleteAdminUser } from "@/lib/admin.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
-import { AdminPageHeader } from "@/components/admin/AdminPage";
+import { AdminPageHeader , AdminLoading } from "@/components/admin/AdminPage";
 
 const ROLES = ["admin", "editor", "brand_lead", "viewer", "user"] as const;
 type Role = (typeof ROLES)[number];
@@ -76,7 +76,7 @@ function UsersView() {
           <h2 className="text-lg font-semibold">All users</h2>
           <span className="text-sm text-black/50">{q.data?.length ?? 0}</span>
         </div>
-        {q.isLoading && <div className="text-sm text-black/50">Loading…</div>}
+        {q.isLoading && <AdminLoading />}
         <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/70 backdrop-blur">
           <table className="w-full text-sm">
             <thead className="bg-black/5 text-left text-xs uppercase tracking-widest text-black/50">

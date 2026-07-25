@@ -1,3 +1,4 @@
+import { AdminLoading } from "@/components/admin/AdminPage";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -210,7 +211,7 @@ function ApprovalsView() {
               </button>
             </div>
           )}
-          {pending.isLoading && <div className="text-sm text-black/50">Loading…</div>}
+          {pending.isLoading && <AdminLoading />}
           {!pending.isLoading && currentRows.length === 0 && (
             <div className="rounded-2xl border border-dashed border-black/15 bg-white p-8 text-sm text-black/60">
               Queue is empty.
@@ -464,7 +465,7 @@ function ExpiringList({ rows, loading }: { rows: ExpiringRow[]; loading: boolean
     return ta - tb;
   }), [rows]);
 
-  if (loading) return <div className="text-sm text-black/50">Loading…</div>;
+  if (loading) return <AdminLoading />;
   if (sorted.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-black/15 bg-white p-8 text-sm text-black/60">
