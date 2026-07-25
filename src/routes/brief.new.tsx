@@ -280,17 +280,21 @@ function BriefWizard() {
           </div>
         </section>
 
-        <div className="mt-8">
-          <form className="space-y-10" onSubmit={(e) => e.preventDefault()}>
+        <div className="mt-12">
+          <form className="space-y-16" onSubmit={(e) => e.preventDefault()}>
               {/* SECTION 01: Brand Mode — drives everything below */}
-              <section id="brand" className="scroll-mt-24 space-y-4">
-                <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
-                  <label className={labelCls}>01 · Brand Mode</label>
+              <section id="brand" className="scroll-mt-24 space-y-6">
+                <SectionHeader
+                  index="01 · Brand"
+                  title="Pick the brand mode"
+                  description="Drives archetype, palette, variant filters, and every downstream artifact."
+                  meta={
+                    <span className="text-[10px] font-medium uppercase tracking-widest text-[#1E2749]/50">
+                      drives archetype + variant filters
+                    </span>
+                  }
+                />
 
-                  <span className="max-w-[11rem] text-right text-[10px] font-medium uppercase tracking-widest text-[#1E2749]/50 sm:max-w-none">
-                    drives archetype + variant filters
-                  </span>
-                </div>
 
                 {/* Selected brand banner */}
                 {brand && (
