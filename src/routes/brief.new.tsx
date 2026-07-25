@@ -115,6 +115,52 @@ function BriefWizard() {
   };
   const [produced, setProduced] = useState<Produced | null>(null);
   const [expanding, setExpanding] = useState(false);
+  const [briefPrompt, setBriefPrompt] = useState("");
+
+  // Destination tiles ↔ masterSet mapping. Each tile toggles a slice of masterSet.
+  type Destination =
+    | "presentation"
+    | "print:case-study"
+    | "print:spotlight"
+    | "print:ebrochure"
+    | "print:adaptor-brief"
+    | "event"
+    | "social";
+  const isDestOn = (d: Destination): boolean => {
+    if (d === "presentation") return masterSet.presentation;
+    if (d === "event") return masterSet.event.enabled;
+    if (d === "social") return masterSet.social.enabled;
+    const kind = d.slice(6) as PrintKind;
+    return masterSet.print.enabled && masterSet.print.kinds.includes(kind);
+  };
+  const toggleDest = (d: Destination) => {
+    setMasterSet((prev) => {
+      if (d === "presentation") return { ...prev, presentation: !prev.presentation };
+      if (d === "event") return { ...prev, event: { ...prev.event, enabled: !prev.event.enabled } };
+      if (d === "social") return { ...prev, social: { ...prev.social, enabled: !prev.social.enabled } };
+      const kind = d.slice(6) as PrintKind;
+      const has = prev.print.kinds.includes(kind);
+      const nextKinds = has ? prev.print.kinds.filter((k) => k !== kind) : [...prev.print.kinds, kind];
+      return { ...prev, print: { enabled: nextKinds.length > 0, kinds: nextKinds } };
+    });
+  };
+
+  // Seed the brief from the AI prompt bar. Light-touch: push the raw text into
+  // clientFacts, and if the user typed "for <Prospect>" try to lift a prospect name.
+  const applyPromptSeed = () => {
+    const raw = briefPrompt.trim();
+    if (!raw) return;
+    setForm((prev) => {
+      const next = { ...prev, clientFacts: raw };
+      const forMatch = raw.match(/\bfor\s+([A-Z][\w&.\- ]{1,48})/);
+      if (forMatch) next.prospect = forMatch[1].trim().replace(/[.,]$/, "");
+      if (raw.length <= 120 && !prev.meetingObjective.trim().startsWith(raw.slice(0, 20))) {
+        next.meetingObjective = raw;
+      }
+      return next;
+    });
+    document.getElementById("brand")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
   const [form, setForm] = useState({
     prospect: "Acme Global",
     industry: "Life sciences",
