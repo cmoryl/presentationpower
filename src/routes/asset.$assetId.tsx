@@ -981,7 +981,10 @@ function AssetEditor() {
               onChange={(next) => patchContent({ heroMedia: next })}
               divisionId={row?.brand_mode_id ?? null}
               brand={brand}
+              kind={kind}
+              assetId={row?.id ?? null}
             />
+
 
             
 
