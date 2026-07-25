@@ -340,6 +340,14 @@ function DeckEditor() {
                 </button>
               </div>
             )}
+            {active && (
+              <TransitionPicker
+                slide={active}
+                deckDefault={deck.context?.defaultTransition}
+                onSlideChange={(t) => setSlideTransition(deck.id, active.id, t)}
+                onDeckDefaultChange={(t) => setDeckDefaultTransition(deck.id, t)}
+              />
+            )}
             {active && active.inkOverrides && Object.keys(active.inkOverrides).length > 0 && (
               <button
                 type="button"
