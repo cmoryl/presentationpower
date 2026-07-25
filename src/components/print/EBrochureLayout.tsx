@@ -121,8 +121,16 @@ export function EBrochureLayout({
               <BrandLockup brand={brand} color={brand.id === "bm-enterprise" ? (mode === "dark" ? "#FFFFFF" : "#000000") : (mode === "dark" ? "#FFFFFF" : resolvePrintLogoInk(content.logoColor, ink))} size="2xs" orientation="horizontal" />
             </div>
 
-            {/* HERO — title + summary */}
-            <div style={{ paddingTop: cq(22) }}>
+            {/* HERO — title + summary. Reserve hero band height when a photo
+                is present so the summary cards drop into the fade seam. */}
+            <div
+              style={{
+                paddingTop: cq(22),
+                minHeight: content.heroMedia?.imageUrl
+                  ? `calc(${(content.heroMedia.heightPct ?? 46) - 6}% - ${cq(padTop(density))})`
+                  : undefined,
+              }}
+            >
               <h1 ref={heroRef} style={{
                 margin: 0, fontWeight: 700, fontSize: cq(30), lineHeight: 1.16,
                 letterSpacing: "-0.015em", color: ink, maxWidth: cq(440),

@@ -165,7 +165,13 @@ export function SpotlightLayout({
             {/* ============================================================ */}
             {/* HERO — title + intro (left)  |  quote glass card (right)      */}
             {/* ============================================================ */}
-            <div className="flex" style={{ gap: cq(28), paddingTop: cq(26) }}>
+            <div className="flex" style={{
+              gap: cq(28),
+              paddingTop: cq(26),
+              minHeight: content.heroMedia?.imageUrl
+                ? `calc(${(content.heroMedia.heightPct ?? 46) - 6}% - ${padTopCq})`
+                : undefined,
+            }}>
               <div style={{ flex: "1.15 1 0" }}>
                 <h1
                   ref={heroRef}
