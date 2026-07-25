@@ -2076,8 +2076,9 @@ function AccordionGroup({
           ref={panelRef}
           role="group"
           aria-label={label}
+          tabIndex={-1}
           onKeyDown={onPanelKeyDown}
-          className={`absolute top-[calc(100%+6px)] z-[60] flex max-w-[min(560px,calc(100vw-2rem))] flex-wrap items-center gap-1 rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)] ${anchor === "right" ? "right-0 left-auto" : "left-0 right-auto"}`}
+          className={`absolute top-[calc(100%+6px)] z-[60] flex max-w-[min(560px,calc(100vw-2rem))] flex-wrap items-center gap-1 rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)] outline-none ${anchor === "right" ? "right-0 left-auto" : "left-0 right-auto"}`}
         >
           {children}
         </div>
