@@ -198,46 +198,48 @@ function DeckEditor() {
           <ToolbarDivider />
 
           <ToolbarGroup label="Slide">
-            <button
-              type="button"
-              onClick={() => setCommentsOpen((v) => !v)}
-              title={`Comments${totalOpen > 0 ? ` (${totalOpen} open)` : ""}`}
-              aria-label="Comments"
-              className={`relative inline-flex h-9 w-9 items-center justify-center rounded-full transition ${
-                commentsOpen
-                  ? "bg-[#003FC7] text-white"
-                  : "text-black/60 hover:bg-black/[0.04] hover:text-[#003FC7]"
-              }`}
-            >
-              <MessageSquare size={16} strokeWidth={1.75} />
-              {totalOpen > 0 && (
-                <span className={`absolute -right-0.5 -top-0.5 inline-flex min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-semibold ${commentsOpen ? "bg-white text-[#003FC7]" : "bg-[#003FC7] text-white"}`}>
-                  {totalOpen}
-                </span>
-              )}
-            </button>
-            <DuplicateDeckButton deckId={deckId} />
-            <RebrandMenu deckId={deckId} />
-            <button
-              type="button"
-              onClick={() => setDeckContext(deckId, { logoOrientation: logoOrientation === "horizontal" ? "stacked" : "horizontal" })}
-              title={`Logo: ${logoOrientation === "stacked" ? "Stacked" : "Horizontal"} — click to toggle`}
-              aria-label="Toggle logo orientation"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/60 transition hover:bg-black/[0.04] hover:text-[#003FC7]"
-            >
-              {logoOrientation === "stacked" ? <Rows2 size={16} strokeWidth={1.75} /> : <RectangleHorizontal size={16} strokeWidth={1.75} />}
-            </button>
-            <TemplateToggleButton deckId={deckId} />
+            <Tip label={totalOpen > 0 ? `Comments · ${totalOpen} open` : "Comments"}>
+              <button
+                type="button"
+                onClick={() => setCommentsOpen((v) => !v)}
+                aria-label="Comments"
+                className={`relative inline-flex h-9 w-9 items-center justify-center rounded-full transition ${
+                  commentsOpen
+                    ? "bg-[#003FC7] text-white"
+                    : "text-black/60 hover:bg-black/[0.04] hover:text-[#003FC7]"
+                }`}
+              >
+                <MessageSquare size={16} strokeWidth={1.75} />
+                {totalOpen > 0 && (
+                  <span className={`absolute -right-0.5 -top-0.5 inline-flex min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-semibold ${commentsOpen ? "bg-white text-[#003FC7]" : "bg-[#003FC7] text-white"}`}>
+                    {totalOpen}
+                  </span>
+                )}
+              </button>
+            </Tip>
+            <Tip label="Duplicate deck"><DuplicateDeckButton deckId={deckId} /></Tip>
+            <Tip label="Rebrand"><RebrandMenu deckId={deckId} /></Tip>
+            <Tip label={`Logo · ${logoOrientation === "stacked" ? "Stacked" : "Horizontal"}`}>
+              <button
+                type="button"
+                onClick={() => setDeckContext(deckId, { logoOrientation: logoOrientation === "horizontal" ? "stacked" : "horizontal" })}
+                aria-label="Toggle logo orientation"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/60 transition hover:bg-black/[0.04] hover:text-[#003FC7]"
+              >
+                {logoOrientation === "stacked" ? <Rows2 size={16} strokeWidth={1.75} /> : <RectangleHorizontal size={16} strokeWidth={1.75} />}
+              </button>
+            </Tip>
+            <Tip label="Mark as template"><TemplateToggleButton deckId={deckId} /></Tip>
           </ToolbarGroup>
 
           <ToolbarDivider />
 
           <ToolbarGroup label="Distribute">
-            <SaveToCloudButton deckId={deckId} />
-            <VersionHistoryButton deckId={deckId} />
-            <TranslateButton deckId={deckId} />
-            <LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} />
-            <ShareMenu deckId={deckId} />
+            <Tip label="Save to cloud"><SaveToCloudButton deckId={deckId} /></Tip>
+            <Tip label="Version history"><VersionHistoryButton deckId={deckId} /></Tip>
+            <Tip label="Translate"><TranslateButton deckId={deckId} /></Tip>
+            <Tip label="Language"><LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} /></Tip>
+            <Tip label="Share"><ShareMenu deckId={deckId} /></Tip>
           </ToolbarGroup>
         </div>
       </header>
