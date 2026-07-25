@@ -73,6 +73,124 @@ export const PRINT_TEMPLATE_BUDGETS: Record<
 };
 
 /* ------------------------------------------------------------------
+ * HERO COST MODEL
+ *
+ * The hero band isn't a single strip — it's a stack of layers, each of
+ * which competes with (or gives back) module space:
+ *
+ *   1. photo layer                — hard pixels (heightPct)
+ *   2. accent wash / scrim        — hard pixels (co-located with photo)
+ *   3. fade-into-page seam        — feathered, SHARED with the first
+ *                                   module → rebated against hardBand
+ *   4. hero copy (title/summary)  — must fit inside the band
+ *
+ * Baseline defaults (heightPct 46, washStrength 1, title+summary) yield
+ * a hero cost delta of ZERO so today's constant `moduleBudget` values
+ * remain the "typical" effective budget. Growing the hero taller (or
+ * dampening the fade seam) subtracts from the effective module budget;
+ * shrinking the hero (or removing copy) gives units back.
+ * ---------------------------------------------------------------- */
+
+/** Weight units consumed per 1 percentage point of hero height. */
+export const HERO_UNITS_PER_PCT = 0.04;
+/** Fraction of the hero band that's a shared feathered seam (scaled by washStrength). */
+export const HERO_FADE_SEAM_FRAC = 0.15;
+/** Copy reserve inside the band. */
+export const HERO_COPY_RESERVE_TITLE = 0.2;
+export const HERO_COPY_RESERVE_SUMMARY = 0.3;
+/** Baseline height % against which hero-cost delta is measured. */
+export const HERO_BASELINE_HEIGHT_PCT = 46;
+/** Hard clamp on the grip regardless of remaining budget. */
+export const HERO_HEIGHT_HARD_MIN = 22;
+export const HERO_HEIGHT_HARD_MAX = 72;
+
+type HeroCopy = { hasTitle: boolean; hasSummary: boolean };
+
+function heroCopyOf(
+  content:
+    | CaseStudyContent
+    | SpotlightContent
+    | EBrochureContent
+    | AdaptorBriefContent
+    | undefined,
+): HeroCopy {
+  if (!content) return { hasTitle: false, hasSummary: false };
+  const c = content as { title?: string; summary?: string };
+  return {
+    hasTitle: !!c.title && c.title.trim().length > 0,
+    hasSummary: !!c.summary && c.summary.trim().length > 0,
+  };
+}
+
+/**
+ * Raw hero cost in weight units for a given (heightPct, washStrength, copy)
+ * triple. Returns 0 when no hero photo is present — a no-hero asset never
+ * shrinks the module budget.
+ */
+export function heroCostUnits(
+  heroMedia: PrintHeroMedia | undefined,
+  copy: HeroCopy,
+): number {
+  if (!heroMedia?.imageUrl) return 0;
+  const hp = clampNum(heroMedia.heightPct ?? HERO_BASELINE_HEIGHT_PCT, HERO_HEIGHT_HARD_MIN, HERO_HEIGHT_HARD_MAX);
+  const ws = clampNum(heroMedia.washStrength ?? 1, 0, 1);
+  const coeff = HERO_UNITS_PER_PCT * (1 - HERO_FADE_SEAM_FRAC * ws);
+  const copyReserve =
+    (copy.hasTitle ? HERO_COPY_RESERVE_TITLE : 0) +
+    (copy.hasSummary ? HERO_COPY_RESERVE_SUMMARY : 0);
+  return hp * coeff + copyReserve;
+}
+
+/** Baseline hero cost — subtracted so defaults yield delta=0. */
+export function heroCostBaseline(): number {
+  const coeff = HERO_UNITS_PER_PCT * (1 - HERO_FADE_SEAM_FRAC * 1);
+  return HERO_BASELINE_HEIGHT_PCT * coeff + HERO_COPY_RESERVE_TITLE + HERO_COPY_RESERVE_SUMMARY;
+}
+
+/**
+ * Effective module budget: base budget minus the hero-cost delta from
+ * baseline. Never returns below 1.0 — beyond that the page stops being a
+ * mixed hero+modules layout and the grip clamp should have already fired.
+ */
+export function effectiveModuleBudget(
+  kind: PrintTemplateKind,
+  heroMedia: PrintHeroMedia | undefined,
+  copy: HeroCopy,
+): number {
+  const base = PRINT_TEMPLATE_BUDGETS[kind].moduleBudget;
+  const delta = heroCostUnits(heroMedia, copy) - (heroMedia?.imageUrl ? heroCostBaseline() : 0);
+  return Math.max(1.0, base - delta);
+}
+
+function clampNum(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n));
+}
+
+/**
+ * Given current module load, return the maximum heightPct the hero can
+ * take without pushing the effective budget below `used`. Falls back to
+ * HERO_HEIGHT_HARD_MAX when there's room to spare.
+ */
+export function maxHeroHeightPct(
+  kind: PrintTemplateKind,
+  usedModuleUnits: number,
+  heroMedia: PrintHeroMedia | undefined,
+  copy: HeroCopy,
+): number {
+  const base = PRINT_TEMPLATE_BUDGETS[kind].moduleBudget;
+  const ws = clampNum(heroMedia?.washStrength ?? 1, 0, 1);
+  const coeff = HERO_UNITS_PER_PCT * (1 - HERO_FADE_SEAM_FRAC * ws);
+  const copyReserve =
+    (copy.hasTitle ? HERO_COPY_RESERVE_TITLE : 0) +
+    (copy.hasSummary ? HERO_COPY_RESERVE_SUMMARY : 0);
+  // effective = base - (hp*coeff + copyReserve - baseline) >= used
+  // hp <= (base - used + baseline - copyReserve) / coeff
+  const hp = (base - usedModuleUnits + heroCostBaseline() - copyReserve) / coeff;
+  if (!Number.isFinite(hp)) return HERO_HEIGHT_HARD_MAX;
+  return clampNum(Math.floor(hp), HERO_HEIGHT_HARD_MIN, HERO_HEIGHT_HARD_MAX);
+}
+
+/* ------------------------------------------------------------------
  * PER-VARIANT WEIGHTS AND CAPS
  * ---------------------------------------------------------------- */
 
