@@ -285,7 +285,190 @@ function BriefWizard() {
   return (
     <AppShell>
       <div className="font-['Geist']" style={{ color: PALETTE.ink }}>
-        {/* HERO — master creation flow */}
+        {/* HERO — command center: AI prompt bar leads, destination tiles below */}
+        <section className="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-[#03002C] via-[#0B2A4A] to-[#003FC7] p-8 text-white sm:p-10">
+          <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#A1FBF9]/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-[#C2A3FF]/20 blur-3xl" />
+
+          <div className="relative">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="max-w-2xl">
+                <div className="text-[11px] font-mono uppercase tracking-[0.28em] text-[#A1FBF9]">
+                  Master creation · one brief, full set
+                </div>
+                <h1 className="mt-3 text-3xl font-semibold leading-[1.05] tracking-tight sm:text-4xl">
+                  What are we making today?
+                </h1>
+                <p className="mt-2 max-w-xl text-sm text-white/70">
+                  Describe the opportunity in one line. Pick what you need. Every artifact assembles from the same brief.
+                </p>
+              </div>
+              <Link
+                to="/decks/import"
+                className="rounded-full border border-white/25 bg-white/5 px-4 py-2 text-xs font-medium text-white/90 backdrop-blur transition hover:bg-white/10"
+              >
+                Import PowerPoint →
+              </Link>
+            </div>
+
+            {/* AI prompt bar — the primary entry lane */}
+            <div className="mt-6 rounded-2xl border border-white/15 bg-white/[0.06] p-2 backdrop-blur-sm focus-within:border-[#A1FBF9]/60 focus-within:bg-white/[0.09] transition">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+                <textarea
+                  value={briefPrompt}
+                  onChange={(e) => setBriefPrompt(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                      e.preventDefault();
+                      applyPromptSeed();
+                    }
+                  }}
+                  rows={2}
+                  placeholder="e.g. Pilot pitch for Acme Global expanding into 12 markets, regulatory pressure, meeting VP Marketing next Tuesday…"
+                  className="flex-1 resize-none bg-transparent px-4 py-3 text-[15px] leading-snug text-white placeholder:text-white/40 focus:outline-none"
+                />
+                <div className="flex flex-row items-center gap-2 sm:flex-col sm:items-stretch sm:justify-between sm:px-1 sm:pb-1">
+                  <button
+                    type="button"
+                    onClick={applyPromptSeed}
+                    disabled={!briefPrompt.trim()}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#A1FBF9] px-5 py-2.5 text-sm font-semibold text-[#03002C] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Start brief
+                    <span className="hidden font-mono text-[10px] font-normal opacity-60 sm:inline">⌘↵</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("brand")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                    className="text-[11px] font-medium uppercase tracking-widest text-white/60 transition hover:text-white"
+                  >
+                    or start blank →
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Destination tile grid — progressive disclosure signal */}
+            <div className="mt-6">
+              <div className="mb-2 flex items-baseline justify-between">
+                <div className="text-[10px] font-mono uppercase tracking-[0.24em] text-white/55">
+                  Destinations · toggle to include
+                </div>
+                <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-white/45">
+                  {[
+                    masterSet.presentation && "deck",
+                    masterSet.print.enabled && `${masterSet.print.kinds.length} print`,
+                    masterSet.event.enabled && "event",
+                    masterSet.social.enabled && "social",
+                  ]
+                    .filter(Boolean)
+                    .join(" · ") || "none selected"}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-7">
+                {([
+                  { id: "presentation" as Destination, label: "Presentation", sub: "Deck" },
+                  { id: "print:case-study" as Destination, label: "Case study", sub: "Print" },
+                  { id: "print:spotlight" as Destination, label: "Spotlight", sub: "Print" },
+                  { id: "print:ebrochure" as Destination, label: "eBrochure", sub: "Print" },
+                  { id: "print:adaptor-brief" as Destination, label: "Adaptor brief", sub: "Print" },
+                  { id: "event" as Destination, label: "Event kit", sub: "Onsite" },
+                  { id: "social" as Destination, label: "Social kit", sub: "Digital" },
+                ]).map((t) => {
+                  const on = isDestOn(t.id);
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => toggleDest(t.id)}
+                      aria-pressed={on}
+                      className={`group relative flex flex-col items-start gap-1 rounded-xl border px-3 py-3 text-left transition ${
+                        on
+                          ? "border-[#A1FBF9]/70 bg-[#A1FBF9]/10 shadow-[0_0_0_1px_rgba(161,251,249,0.35)]"
+                          : "border-white/15 bg-white/[0.04] hover:border-white/35 hover:bg-white/[0.08]"
+                      }`}
+                    >
+                      <span className={`text-[9px] font-mono uppercase tracking-[0.2em] ${on ? "text-[#A1FBF9]" : "text-white/45"}`}>
+                        {t.sub}
+                      </span>
+                      <span className="text-sm font-semibold leading-tight text-white">{t.label}</span>
+                      <span
+                        aria-hidden
+                        className={`absolute right-2 top-2 h-1.5 w-1.5 rounded-full transition ${on ? "bg-[#A1FBF9]" : "bg-white/25"}`}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Jump chips — kept as tiny secondary nav */}
+            <nav className="mt-5 flex flex-wrap items-center gap-1.5 text-[10px] font-mono uppercase tracking-[0.14em]">
+              {[
+                { id: "brand", label: "Brand" },
+                { id: "prospect", label: "Prospect" },
+                { id: "master-set", label: "Master set" },
+                { id: "refine", label: "Refine" },
+                { id: "generate", label: "Generate" },
+              ].map((s) => (
+                <a
+                  key={s.id}
+                  href={`#${s.id}`}
+                  className="rounded-full border border-white/15 bg-white/[0.03] px-2.5 py-1 text-white/65 transition hover:border-[#A1FBF9]/50 hover:text-white"
+                >
+                  {s.label}
+                </a>
+              ))}
+            </nav>
+          </div>
+        </section>
+
+        <div className="mt-12">
+          <form className="space-y-16" onSubmit={(e) => e.preventDefault()}>
+              {/* SECTION 01: Brand Mode — drives everything below */}
+              <section id="brand" className="scroll-mt-24 space-y-6">
+                <SectionHeader
+                  index="01 · Brand"
+                  title="Pick the brand mode"
+                  description="Drives archetype, palette, variant filters, and every downstream artifact."
+                  meta={
+                    <span className="text-[10px] font-medium uppercase tracking-widest text-[#1E2749]/50">
+                      drives archetype + variant filters
+                    </span>
+                  }
+                />
+
+
+                {/* Selected brand banner */}
+                {brand && (
+                  <div
+                    className="grid grid-cols-1 gap-4 rounded-xl border p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                    style={{
+                      borderColor: `${brandPrimary}33`,
+                      background: `linear-gradient(90deg, ${brandPrimary}0a, ${brandAccent}0a)`,
+                    }}
+                  >
+                    <div className="min-w-0">
+                      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+                        <div className="min-w-0 max-w-full">
+                          <BrandLockup brand={brand} color={brandPrimary} size="sm" clientName={form.prospect} subCompany={form.subCompany} />
+                        </div>
+                        <span
+                          className="shrink-0 rounded-sm px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em]"
+                          style={{ backgroundColor: brandPrimary, color: "#fff" }}
+                        >
+                          {brand.role ?? "brand"}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-xs leading-relaxed text-[#1E2749]/75">{brand.description}</p>
+                    </div>
+                    <div className="hidden shrink-0 gap-3 text-right text-[10px] font-mono uppercase tracking-wider text-[#1E2749]/60 sm:flex">
+                      <StatPill label="industries" value={brand.contentScope?.industries.length ?? 0} />
+                      <StatPill label="archetypes" value={preferredIds.length} />
+                      <StatPill label="variants" value={preferredVariantIds.length} />
+                    </div>
+                  </div>
+                )}
         <section className="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-[#03002C] via-[#0B2A4A] to-[#003FC7] p-8 text-white sm:p-10">
           <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#A1FBF9]/20 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-[#C2A3FF]/20 blur-3xl" />
