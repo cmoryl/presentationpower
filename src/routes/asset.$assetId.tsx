@@ -1741,14 +1741,89 @@ function HeroMediaPanel({
       <ConfirmModal
         open={confirmOpen}
         title="Apply hero to all templates?"
-        description={`Applies the current hero to every "${kind.replace("-", " ")}" print asset in this division that still uses the default focal, scrim, and wash settings. Templates with custom tuning are left untouched.`}
+        description={`Review which "${kind.replace("-", " ")}" templates in this division will be updated. Anything with custom focal, scrim, or wash tuning is left untouched.`}
+        body={
+          <div className="space-y-4 text-sm text-black">
+            {previewLoading && (
+              <div className="text-black/60">Scanning sibling templates…</div>
+            )}
+            {previewError && (
+              <div className="rounded-md bg-[#E53D2E]/10 px-3 py-2 text-[#E53D2E]">
+                {previewError}
+              </div>
+            )}
+            {preview && !previewLoading && (
+              <>
+                <div className="flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-black/60">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="inline-block h-2 w-2 rounded-full bg-[#003FC7]" />
+                    Will update · <strong className="text-black">{preview.toUpdate.length}</strong>
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="inline-block h-2 w-2 rounded-full bg-black/30" />
+                    Skip · <strong className="text-black">{preview.toSkip.length}</strong>
+                  </span>
+                  <span className="ml-auto text-black/40 normal-case tracking-normal">
+                    {preview.scanned} total
+                  </span>
+                </div>
 
-        confirmLabel="Apply to all"
+                <section>
+                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#003FC7]">
+                    Will update ({preview.toUpdate.length})
+                  </h3>
+                  {preview.toUpdate.length === 0 ? (
+                    <p className="mt-1 text-[12px] text-black/50">
+                      Nothing to update — every sibling template already has custom tuning.
+                    </p>
+                  ) : (
+                    <ul className="mt-1 max-h-40 space-y-0.5 overflow-y-auto rounded-md border border-black/10 bg-black/[0.02] p-2">
+                      {preview.toUpdate.map((r) => (
+                        <li key={r.id} className="truncate text-[12px] text-black/80">
+                          {r.title}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </section>
+
+                <section>
+                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.22em] text-black/50">
+                    Skip ({preview.toSkip.length})
+                  </h3>
+                  {preview.toSkip.length === 0 ? (
+                    <p className="mt-1 text-[12px] text-black/50">
+                      No customized templates — nothing to skip.
+                    </p>
+                  ) : (
+                    <ul className="mt-1 max-h-40 space-y-0.5 overflow-y-auto rounded-md border border-black/10 bg-black/[0.02] p-2">
+                      {preview.toSkip.map((r) => (
+                        <li key={r.id} className="flex items-center justify-between gap-2 text-[12px] text-black/70">
+                          <span className="truncate">{r.title}</span>
+                          <span className="shrink-0 text-[10px] uppercase tracking-[0.2em] text-black/40">
+                            customized
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </section>
+              </>
+            )}
+          </div>
+        }
+        confirmLabel={
+          preview && preview.toUpdate.length > 0
+            ? `Apply to ${preview.toUpdate.length}`
+            : "Apply to all"
+        }
         cancelLabel="Cancel"
         busy={applyingAll}
+        disableConfirm={previewLoading || !!previewError || (preview !== null && preview.toUpdate.length === 0)}
         onCancel={() => setConfirmOpen(false)}
         onConfirm={handleConfirmApply}
       />
+
 
       {/* Curated pool strip */}
       <div className="space-y-1.5">
