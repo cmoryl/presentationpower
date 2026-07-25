@@ -1909,15 +1909,15 @@ function AccordionGroup({
 }) {
   return (
     <details className="group/acc relative">
-      <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-full border border-black/[0.06] bg-white px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-black/55 transition hover:border-[#003FC7]/40 hover:text-[#003FC7] group-open/acc:border-[#003FC7] group-open/acc:bg-[#003FC7] group-open/acc:text-white [&::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-full border border-black/[0.06] bg-white px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-black/55 transition hover:border-primary/40 hover:text-primary group-open/acc:border-primary group-open/acc:bg-primary group-open/acc:text-primary-foreground [&::-webkit-details-marker]:hidden">
         <span>{label}</span>
         {hint && (
-          <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5 text-[9px] font-medium normal-case tracking-normal text-black/55 group-open/acc:bg-white/15 group-open/acc:text-white/85">
+          <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5 text-[9px] font-medium normal-case tracking-normal text-black/55 group-open/acc:bg-primary-foreground/15 group-open/acc:text-primary-foreground/85">
             {hint}
           </span>
         )}
         {badge && (
-          <span className="inline-flex min-w-[16px] items-center justify-center rounded-full bg-[#003FC7] px-1 text-[9px] font-bold text-white group-open/acc:bg-white group-open/acc:text-[#003FC7]">
+          <span className="inline-flex min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground group-open/acc:bg-primary-foreground group-open/acc:text-primary">
             {badge}
           </span>
         )}
