@@ -447,11 +447,9 @@ function BriefWizard() {
 
                 {brand && <BrandRelevancePanel brand={brand} />}
               </section>
-              </>)}
 
-              {step === 2 && (<>
               {/* REQUIRED: Prospect Name + Meeting Objective */}
-              <section className="space-y-6">
+              <section id="prospect" className="scroll-mt-24 space-y-6">
                 <label className={labelCls}>Prospect</label>
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <Field label="Prospect Name">
