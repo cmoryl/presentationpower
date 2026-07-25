@@ -20,6 +20,7 @@ import {
   synthesizeCaseStudy,
   applyHeroToAllPrintAssets,
   previewApplyHeroToAllPrintAssets,
+  undoApplyHeroToAllPrintAssets,
 } from "@/lib/print-assets.functions";
 
 import { getDivisionContext } from "@/lib/division-knowledge.functions";
