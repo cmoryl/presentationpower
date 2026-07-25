@@ -494,6 +494,10 @@ function BriefWizard() {
                   </Field>
                 </div>
               </section>
+              </>)}
+
+              {step === 4 && (<>
+              {/* REFINE: narrative, palette, AI strategist */}
 
               {/* OPTIONAL: Everything else, collapsed by default */}
               <div
