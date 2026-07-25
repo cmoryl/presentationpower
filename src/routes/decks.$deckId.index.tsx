@@ -1954,12 +1954,20 @@ function AccordionGroup({
     ).filter((el) => !el.hasAttribute("data-focus-skip"));
   }, []);
 
-  // Focus first element on open
+  // Focus first element on open + edge-detect anchor to keep panel on-screen
   useEffect(() => {
     if (!open) return;
+    // Anchor from the right if the trigger is past the horizontal midpoint,
+    // so the panel opens inward rather than off-screen on narrow widths.
+    const rect = triggerRef.current?.getBoundingClientRect();
+    if (rect) {
+      const vw = window.innerWidth;
+      setAnchor(rect.left + rect.width / 2 > vw / 2 ? "right" : "left");
+    }
     const els = getFocusable();
     if (els.length > 0) els[0]?.focus();
   }, [open, getFocusable]);
+
 
   // Click outside + Escape
   useEffect(() => {
