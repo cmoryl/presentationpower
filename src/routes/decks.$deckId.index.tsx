@@ -1825,5 +1825,5 @@ function ToolbarGroup({ label, children }: { label: string; children: React.Reac
 }
 
 function ToolbarDivider() {
-  return <span className="mt-4 h-6 w-px self-start bg-black/[0.08]" aria-hidden />;
+  return <span className="mt-5 h-6 w-px bg-black/[0.08]" aria-hidden />;
 }
