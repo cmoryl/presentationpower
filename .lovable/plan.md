@@ -1,57 +1,87 @@
-# DnD Craft Pass — Staged Execution
 
-You asked me to be honest about what I can and can't reach in one pass. This ticket is roughly 3 dev-days of careful craft work compressed into a chat. Delivering all seven streams in one turn would force me to compress the two things you explicitly said not to compress: the WAI-ARIA keyboard path and the FLIP + insertion indicator craft. Splitting into three turns is the only way to hit the quality bar you set.
+# Hero-aware page capacity — pinning it down
 
-## Turn 1 — Triage, prereqs, foundation (executing now on approval)
+The hero isn't a single band, it's a stack of layers, and each one changes how much vertical page real estate is truly consumed. Today `moduleBudget` is a flat constant per template, so the resize grip and the capacity meter don't "see" the hero at all. That's the bug we're fixing.
 
-**A. Triage 14 Playwright failures**
-- Read each failing spec + `error-context.md`, identify the failing assertion, correlate to recent commits in `asset.$assetId.tsx` and `ContentInspector.tsx`.
-- Confirm/refute the two prime suspects from #1891: the global `sed 's|mode="light"|mode={editorMode}|g'` and the `patchByPath` wiring.
-- Fix root causes at the source, not by loosening assertions.
-- Report per failure: root cause, introducing pass, fix.
+## The hero is a stack, not a strip
 
-**B. Prereq screenshots from #1894**
-- ContentInspector for all 4 kinds (Case-Study, Spotlight, eBrochure, One-Pager) with an expanded array and a Canvas badge visible.
-- Mode toggle in both states with the canvas actually re-rendering.
-- Bleed + trim guides overlay.
+From `PrintHeroMedia.tsx`, the hero band is composed of:
 
-**C. Foundation for the rewrite**
-- `bun add @dnd-kit/core @dnd-kit/sortable @dnd-kit/accessibility` inside a lazy-loaded chunk co-located with the print editor route only.
-- Move the shared-modules panel out of the right inspector column into a horizontal tray directly under the document canvas. This is the placement work from #1898 that this ticket depends on but does not itself deliver — has to land before the DnD engine goes on top.
-- Wire `delete` and `replace` (variant + family swap with lossy-swap confirmation) on tray entries — still using the existing HTML5 DnD for now, so behavior is complete before mechanics change.
+```text
+┌─ hero band (heightPct of page) ─────────────┐
+│ 1. photo layer (object-fit: cover, focalX/Y)│
+│ 2. accent wash (overlayOpacity)             │
+│ 3. scrim gradient (scrim + scrimOpacity)    │  ← reserves copy strip
+│ 4. auto-scrim boost (dynamic +opacity)      │
+│ 5. fade-into-page (washStrength)            │  ← feathered seam, ~8-14% tall
+│ 6. hero copy overlay (title + summary)      │  ← lives ON the band
+└─────────────────────────────────────────────┘
+```
 
-**Turn 1 gate:** `tsgo`, full `vitest`, full Playwright (must be back to green), production build. Actual counts reported.
+Only layers 1–4 are "hard" pixels. Layer 5 (the fade seam) is the zone we already push the first module into — it's shared space, not owned space. Layer 6 (title/summary) needs a minimum legibility strip inside the band regardless of `heightPct`.
 
-## Turn 2 — dnd-kit engine + the 12 quality-bar items
+So "how much of the page does the hero really consume" is:
 
-- Replace HTML5 DnD with `@dnd-kit/core` + `sortable`. `PointerSensor` with 5px activation constraint. `KeyboardSensor` with the coordinate getter.
-- `DragOverlay` with `translate3d`-only movement, ~1.02 scale, elevated shadow, source-slot opacity dim.
-- Geometry cache on drag start (`onDragStart` snapshot of sibling rects), rAF-throttled `onDragMove`.
-- **FLIP layer** — first/last/invert/play on the sortable siblings when the insertion target changes. 200ms ease-out. Gated on `prefers-reduced-motion`.
-- **Insertion indicator** — 2px accent line between slots at the projected drop position. No live-reorder under the cursor; commit on drop.
-- **Drop settle** — animate the lifted item into its resolved slot; invalid drop animates back to origin.
-- **Auto-scroll** — proximity-proportional velocity when the pointer enters the top/bottom 60px of the scroll container.
-- **Touch** — `touch-action: none` on drag handles only (never the tray itself). Pointer capture via `PointerSensor` defaults.
-- **Keyboard + SR** — Space/Enter lift, Arrow move, Space/Enter drop, Escape cancel. `aria-live="polite"` region with position announcements ("Grabbed, position 2 of 4", "Moved to position 3", "Dropped", "Cancelled, returned to position 2").
+```text
+heroCost = heightPct × pageUnits/pct
+        − fadeSeam(washStrength) × pageUnits/pct    // returned to modules
+        + copyReserve(hasTitle, hasSummary)         // guaranteed inside the band
+```
 
-## Turn 3 — Picker cross-container drop, tests, performance verification
+That's the number the capacity model needs — not `heightPct` alone.
 
-- Extend the same `DndContext` to include the picker drawer as a draggable source. Cross-container drops land in the tray with the same insertion indicator drawing across tray/canvas boundary.
-- Playwright specs: pointer reorder, picker-to-canvas insert, keyboard reorder (arrow + Space + Escape), delete via keyboard, capacity meter update mid-drag.
-- Performance trace via `page.tracing.start({ screenshots: true, categories: [...] })` around a real drag; parse the trace, report actual frame durations and any long tasks >16ms. Attach the trace file.
-- Record a frame sequence of a full drag (start → move → drop) as GIF or numbered PNGs.
-- Full gate again with real counts.
+## What we'll build
 
-## Why not one turn
+### 1. `heroCostUnits(heroMedia, hasCopy)` in `print-capacity.ts`
+Pure function. Converts the layer stack into page units using the same weight scale as modules. Calibrated so the current defaults (heightPct 46, washStrength 1, bottom scrim, title+summary) match today's implicit reservation — no visual regression on existing assets.
 
-- Foundation (Turn 1) has to be right or the DnD rewrite lands on a broken base. The `sed` regression is exactly the kind of thing that will re-surface as "why does keyboard drop end up in the wrong slot" three days later if the root cause isn't understood first.
-- FLIP + insertion indicator is where the "craft" lives — it's ~400 lines of geometry math and animation code that has to be written slowly with the reduced-motion branch tested. Rushed FLIP looks worse than no FLIP.
-- Keyboard path needs its own attention: sensor + coordinate getter + announcement copy + focus management on delete/replace. If I fold it in with everything else it will silently become "arrows kind of work" instead of the real WAI-ARIA pattern.
+### 2. Dynamic `effectiveModuleBudget(kind, heroMedia, hasCopy)`
+```text
+effective = baseBudget[kind] − (heroCost − heroCostBaseline[kind])
+```
+Baseline picked per template so a "typical" hero yields today's budget. Bigger hero → smaller effective budget; smaller hero → more room for modules. `analyzePrintAsset` and `canAddModule` both consume this instead of the constant.
 
-## What you get if you say "just do it all in one turn anyway"
+### 3. Grip clamp in `HeroResizeHandle`
+The grip queries `analyzePrintAsset(kind, content)` with the candidate `heightPct` on every drag frame and refuses to cross the threshold where effective budget goes negative. Behaviour:
+- normal drag: pill shows "Hero · N%"
+- approaching cap: pill turns amber, tooltip "Modules using X of Y units"
+- at cap: pill red, drag stops, keyboard arrows no-op past the ceiling
+Hard floor at heightPct 22% and hard ceiling at 72% regardless of budget (below/above those the layout stops being a hero page — spotlight/photo template exist for those).
 
-I will still do it, but the honest expected outcome is: engine swap works, mouse feels roughly right, keyboard is partial (probably lift + move but no announcement region or Escape polish), FLIP is a plain CSS transition rather than true FLIP, and performance is asserted not measured. That's the compression this ticket exists to prevent.
+### 4. Text ceilings scale with hero cost
+`TEXT_LIMITS` becomes a function of `heroCost`. A taller hero tightens `summary`, `challengeBody`, etc. by a modest factor (≤15%) so the `pushLen` warn/block flips fire before render actually clips.
 
-## Confirm
+### 5. Actionable compactions in `LayoutHealthBanner`
+When `analyzePrintAsset` returns `block`, the banner already shows text hints. We add one-click actions derived from the module list:
+- "Swap KPI dashboard → callout row (frees 0.8 units)"
+- "Drop stats block from 4 → 3 items (frees ~0.3 units)"
+- "Reduce hero to N% (frees X units)"
+Each action is a store mutation; no new page, ever.
 
-Reply "go" to start Turn 1 immediately. Reply "one turn anyway" to accept the compression trade-off above. Reply with edits to reshape the split.
+### 6. Capacity meter shows the split
+The existing meter renders `used/budget`. Update its label to `modules used / budget (hero X.X)` and add a thin hero segment at the top of the bar so users see the trade-off visually.
+
+## Technical notes
+
+- All changes live in `src/lib/print-capacity.ts`, `src/components/print/HeroResizeHandle.tsx`, `src/components/print/LayoutHealthBanner.tsx`, and the capacity-meter render in `asset.$assetId.tsx`. Layout renderers are untouched — this is pure model + gating.
+- `heroCostUnits` calibration values will be added as named constants (`HERO_UNITS_PER_PCT`, `FADE_SEAM_PCT`, `COPY_RESERVE_UNITS`) so they're tunable without hunting through logic.
+- Existing test `src/lib/__tests__/print-capacity-responsive.test.ts` stays green because the default hero cost is calibrated to match today's constant budget. We'll add a new suite `print-capacity-hero.test.ts` covering:
+  - identical output vs today for default hero
+  - shrinking budget as `heightPct` grows
+  - clamp math (max heightPct given N modules)
+  - copy-reserve contribution when title/summary present vs absent
+- No persistence changes; all inputs already exist on `heroMedia`.
+- No migration; additive to the model only.
+
+## Scope guard
+
+Model + gating + banner actions only. No layout renderer changes, no PPTX/export changes, no new template kinds, no pagination.
+
+## Verify
+
+- unit: full vitest, including new hero-capacity suite
+- typecheck: `bunx tsgo --noEmit`
+- e2e: existing 61/61 stays green; add a Playwright test that drags the hero grip past the ceiling and asserts it clamps + banner shows an actionable swap
+- manual: on a case-study asset, drag hero from 30% → 70%, watch capacity meter shrink, `Add module` disable, banner suggest a lighter variant
+
+Approve and I'll build.
