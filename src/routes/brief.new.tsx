@@ -470,14 +470,13 @@ function BriefWizard() {
                   </Field>
                 </div>
               </section>
-              </>)}
 
-              {step === 4 && (<>
               {/* REFINE: narrative, palette, AI strategist */}
 
               {/* OPTIONAL: Everything else, collapsed by default */}
               <div
-                className="overflow-hidden rounded-xl border transition-shadow duration-300"
+                id="refine"
+                className="scroll-mt-24 overflow-hidden rounded-xl border transition-shadow duration-300"
                 style={{
                   borderColor: customizeOpen ? `${brandPrimary}44` : PALETTE.hairline,
                   backgroundColor: PALETTE.field,
