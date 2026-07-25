@@ -123,6 +123,12 @@ function AssetEditor() {
   const [exportFormat, setExportFormat] = useState<PrintExportFormat>("digital");
   const [iccProfile, setIccProfile] = useState<IccProfileKey>("GRACoL2013_CRPC6");
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [pendingSwap, setPendingSwap] = useState<{
+    moduleIndex: number;
+    from: PrintStatsVariant;
+    to: PrintStatsVariant;
+    frees: number;
+  } | null>(null);
   const exportHydratedRef = useRef(false);
 
   // Undo/redo history for content + context snapshots.
