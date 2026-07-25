@@ -190,7 +190,7 @@ function DeckEditor() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-black/[0.07] bg-white/80 px-3 py-2 shadow-[0_1px_0_rgba(0,0,0,0.02),0_8px_24px_-16px_rgba(3,0,44,0.12)] backdrop-blur">
+        <div className="relative z-50 flex flex-wrap items-center gap-2 rounded-2xl border border-black/[0.07] bg-white/80 px-3 py-2 shadow-[0_1px_0_rgba(0,0,0,0.02),0_8px_24px_-16px_rgba(3,0,44,0.12)] backdrop-blur">
           <AccordionGroup label="History">
             <UndoRedoControls />
           </AccordionGroup>
@@ -228,14 +228,6 @@ function DeckEditor() {
               </button>
             </Tip>
             <Tip label="Mark as template"><TemplateToggleButton deckId={deckId} /></Tip>
-          </AccordionGroup>
-
-          <AccordionGroup label="Distribute">
-            <Tip label="Save to cloud"><SaveToCloudButton deckId={deckId} /></Tip>
-            <Tip label="Version history"><VersionHistoryButton deckId={deckId} /></Tip>
-            <Tip label="Translate"><TranslateButton deckId={deckId} /></Tip>
-            <Tip label="Language"><LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} /></Tip>
-            <Tip label="Share"><ShareMenu deckId={deckId} /></Tip>
           </AccordionGroup>
 
           {active && (
