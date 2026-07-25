@@ -1,3 +1,4 @@
+import { AdminLoading } from "@/components/admin/AdminPage";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -241,7 +242,7 @@ function BrandAssetsAdminView() {
           </div>
         </div>
         {q.isLoading ? (
-          <div className="mt-6 text-sm text-black/50">Loading…</div>
+          <div className="mt-6"><AdminLoading /></div>
         ) : (q.data ?? []).length === 0 ? (
           <div className="mt-6 rounded-2xl border border-dashed border-black/15 bg-black/[0.02] p-8 text-center text-sm text-black/50">
             No assets yet. Upload PDFs above to feed personalization and RAG.
