@@ -1578,6 +1578,7 @@ function HeroMediaPanel({
   async function handleConfirmApply() {
     if (!enabled || !divisionId) return;
     setApplySummary(null);
+    setLastUndo(null);
     setApplyingAll(true);
     try {
       const res = await applyAll({
@@ -1586,8 +1587,6 @@ function HeroMediaPanel({
           brandModeId: divisionId,
           heroMedia: media as unknown as Record<string, unknown>,
           excludeAssetId: assetId ?? undefined,
-          // Skip templates the user has already customized
-          // (focal / scrim / wash overrides).
           onlyUncustomized: true,
         },
       });
@@ -1599,6 +1598,17 @@ function HeroMediaPanel({
       } else {
         setApplySummary({ status: "error", message: `Could not apply to any asset: ${res.errors[0] ?? "unknown error"}`, errors: res.errors, skipped });
       }
+      // Stash the undo snapshot so the user can revert this apply.
+      if (res.undoToken && res.updated > 0) {
+        try {
+          const parsed = JSON.parse(res.undoToken) as Array<{ id: string; heroMedia: unknown }>;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setLastUndo({ snapshots: parsed, appliedAt: Date.now() });
+          }
+        } catch {
+          // ignore — undo just won't be offered
+        }
+      }
       const skipMsg = skipped ? `, ${skipped} skipped` : "";
       toast.success(`Applied to ${res.updated} of ${res.scanned} ${kind.replace("-", " ")} asset${res.scanned === 1 ? "" : "s"}${skipMsg}.`);
       setConfirmOpen(false);
@@ -1608,6 +1618,31 @@ function HeroMediaPanel({
       toast.error(message);
     } finally {
       setApplyingAll(false);
+    }
+  }
+
+  async function handleUndoApply() {
+    if (!lastUndo || undoing) return;
+    setUndoing(true);
+    const tid = toast.loading("Reverting bulk apply…");
+    try {
+      const res = await undoApply({ data: { snapshots: lastUndo.snapshots } });
+      if (res.errors.length === 0) {
+        setApplySummary({ status: "undone", restored: res.restored });
+        setLastUndo(null);
+        toast.success(`Reverted ${res.restored} template${res.restored === 1 ? "" : "s"}.`, { id: tid });
+      } else if (res.restored > 0) {
+        setApplySummary({ status: "error", message: `Reverted ${res.restored} of ${res.scanned}; ${res.errors.length} failed.`, errors: res.errors });
+        toast.error(`Reverted ${res.restored} of ${res.scanned}; ${res.errors.length} failed.`, { id: tid });
+      } else {
+        setApplySummary({ status: "error", message: `Undo failed: ${res.errors[0] ?? "unknown error"}`, errors: res.errors });
+        toast.error("Undo failed.", { id: tid });
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Undo failed.";
+      toast.error(message, { id: tid });
+    } finally {
+      setUndoing(false);
     }
   }
 
