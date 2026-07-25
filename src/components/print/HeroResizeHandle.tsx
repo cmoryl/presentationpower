@@ -120,7 +120,7 @@ export function HeroResizeHandle({
         style={{
           top: "50%",
           height: 1,
-          background: enabled ? (dragging || hover ? "#003FC7" : "rgba(0,63,199,0.35)") : "transparent",
+          background: enabled ? rimColor : "transparent",
           transition: "background 120ms ease",
         }}
       />
@@ -129,8 +129,10 @@ export function HeroResizeHandle({
         role="slider"
         aria-label="Hero height"
         aria-valuemin={MIN_PCT}
-        aria-valuemax={MAX_PCT}
+        aria-valuemax={ceiling}
         aria-valuenow={Math.round(heightPct)}
+        data-capped={capped ? "true" : undefined}
+        data-near-cap={nearCap ? "true" : undefined}
         tabIndex={enabled ? 0 : -1}
         onPointerDown={handleDown}
         onPointerEnter={() => setHover(true)}
@@ -150,16 +152,33 @@ export function HeroResizeHandle({
           transform: "translate(-50%, -50%)",
           padding: "6px 14px",
           background: enabled ? "#FFFFFF" : "rgba(255,255,255,0.6)",
-          borderColor: dragging || hover ? "#003FC7" : "rgba(0,0,0,0.15)",
+          borderColor: rimColor,
           opacity: enabled ? 1 : 0.55,
           userSelect: "none",
           touchAction: "none",
         }}
-        title={enabled ? "Drag to resize the hero band" : (disabledHint ?? "Add hero media to resize the band")}
+        title={
+          !enabled
+            ? (disabledHint ?? "Add hero media to resize the band")
+            : capped
+              ? `At page cap — modules need the remaining space. Ceiling ${ceiling}%.`
+              : nearCap
+                ? `Approaching page cap (${ceiling}% max).`
+                : "Drag to resize the hero band"
+        }
       >
         <GripDots />
-        <span className="tabular-nums" style={{ fontSize: 11, fontWeight: 600, color: "#03002C", letterSpacing: "0.04em" }}>
+        <span
+          className="tabular-nums"
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: capped ? "#E53D2E" : nearCap ? "#8A5B00" : "#03002C",
+            letterSpacing: "0.04em",
+          }}
+        >
           Hero · {Math.round(heightPct)}%
+          {capped ? " · cap" : nearCap ? ` · max ${ceiling}%` : ""}
         </span>
       </div>
     </div>
