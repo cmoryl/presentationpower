@@ -127,6 +127,8 @@ export function AdaptorBriefLayout({
                 minHeight: content.heroMedia?.imageUrl
                   ? `calc(${(content.heroMedia.heightPct ?? 46) - 6}% - ${cq(padTop(density))})`
                   : undefined,
+                display: "flex",
+                flexDirection: "column",
               }}
             >
               <div style={heroCopyScrimStyle(mode)} aria-hidden />
@@ -139,21 +141,33 @@ export function AdaptorBriefLayout({
                 />
                 <BrandLockup brand={brand} color={brand.id === "bm-enterprise" ? (mode === "dark" ? "#FFFFFF" : "#000000") : (mode === "dark" ? "#FFFFFF" : resolvePrintLogoInk(content.logoColor, heroInk))} size="2xs" orientation="horizontal" />
               </div>
-              <h1 ref={heroRef} style={{
-                position: "relative",
-                margin: `${cq(12)} 0 0`, fontWeight: 700, fontSize: cq(37),
-                lineHeight: 1.12, letterSpacing: "-0.015em", color: heroInk, maxWidth: cq(480),
-              }}>
-                {content.title || "Untitled adaptor brief"}
-              </h1>
-              {content.summary && (
-                <p ref={introRef} style={{
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  transform: `translateY(${content.heroMedia?.copyOffsetPct ?? 0}%)`,
+                  willChange: "transform",
+                }}
+              >
+                <h1 ref={heroRef} style={{
                   position: "relative",
-                  margin: `${cq(14)} 0 0`, fontSize: cq(12.5), lineHeight: 1.6,
-                  color: heroSubInk, maxWidth: cq(380),
-                }}>{content.summary}</p>
-              )}
+                  margin: 0, fontWeight: 700, fontSize: cq(37),
+                  lineHeight: 1.12, letterSpacing: "-0.015em", color: heroInk, maxWidth: cq(480),
+                }}>
+                  {content.title || "Untitled adaptor brief"}
+                </h1>
+                {content.summary && (
+                  <p ref={introRef} style={{
+                    position: "relative",
+                    margin: `${cq(14)} 0 0`, fontSize: cq(12.5), lineHeight: 1.6,
+                    color: heroSubInk, maxWidth: cq(380),
+                  }}>{content.summary}</p>
+                )}
+              </div>
             </div>
+
 
             {/* 6 FEATURE CARDS — grouped in one rounded panel (Canva ref). */}
             <div data-section="features" data-section-label="Feature grid" style={{ paddingTop: cq(28) }}>
