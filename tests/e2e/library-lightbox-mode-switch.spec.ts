@@ -118,10 +118,14 @@ test.describe("Library lightbox mode switch", () => {
     await expect(darkStage).toBeVisible({ timeout: 10_000 });
     await expect(lightStage).toHaveCount(0);
 
-    // Any video still carrying the previous (light) src must not be playing
-    // — mode switch unmounts the light preview and the store snapshots it.
+    // Any video still carrying the previous (light) src INSIDE the lightbox
+    // must not be playing — mode switch unmounts the light preview and the
+    // store snapshots it. Ignore background /library cards, which keep
+    // autoplaying independently and share the same media URL.
     const stalePlaying = await page.evaluate((src) => {
-      return Array.from(document.querySelectorAll("video"))
+      const box = document.querySelector('[aria-label="Enlarged slide preview"]');
+      if (!box) return [];
+      return Array.from(box.querySelectorAll("video"))
         .filter((v) => (v.currentSrc || v.src) === src && !v.paused && v.currentTime > 0.05)
         .map((v) => ({ src: v.currentSrc || v.src, t: v.currentTime }));
     }, lightSrc);
