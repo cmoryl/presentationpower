@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { CloudOff, CloudUpload, Loader2 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,10 +39,11 @@ export function SaveToCloudButton({ deckId }: { deckId: string }) {
       <button
         type="button"
         onClick={() => navigate({ to: "/auth" })}
-        className="rounded-full border border-black/15 bg-white px-4 py-2 text-sm font-medium text-black hover:border-black/30"
         title="Sign in to save this deck to your account"
+        aria-label="Sign in to save"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.04] hover:text-black"
       >
-        Sign in to save
+        <CloudOff size={15} />
       </button>
     );
   }
@@ -72,9 +74,11 @@ export function SaveToCloudButton({ deckId }: { deckId: string }) {
       type="button"
       onClick={onSave}
       disabled={busy}
-      className="rounded-full border border-black/15 bg-white px-4 py-2 text-sm font-medium text-black hover:border-black/30 disabled:opacity-60"
+      title={busy ? "Saving…" : savedAt ? `Saved ${savedAt}` : "Save to my account"}
+      aria-label="Save to my account"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.04] hover:text-black disabled:opacity-60 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
     >
-      {busy ? "Saving…" : savedAt ? `Saved ${savedAt}` : "Save to my account"}
+      {busy ? <Loader2 size={15} className="animate-spin" /> : <CloudUpload size={15} />}
     </button>
   );
 }

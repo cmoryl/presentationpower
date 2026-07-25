@@ -40,27 +40,26 @@ export function UndoRedoControls() {
   }, [undo, redo]);
 
   return (
-    <div className="flex items-center gap-1 rounded-full border border-black/15 bg-white px-1 py-1">
+    <div className="inline-flex items-center">
       <button
         type="button"
         onClick={() => undo()}
         disabled={!canUndo}
         title={`Undo (${navigator.platform.includes("Mac") ? "⌘" : "Ctrl"}+Z)`}
         aria-label="Undo"
-        className="rounded-full px-2.5 py-1 text-sm text-black/70 hover:bg-black/5 disabled:cursor-not-allowed disabled:text-black/25"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/70 transition hover:bg-black/[0.05] hover:text-black disabled:cursor-not-allowed disabled:text-black/25 disabled:hover:bg-transparent dark:text-white/70 dark:hover:bg-white/[0.06] dark:hover:text-white"
       >
-        ↶
+        <span aria-hidden className="text-base leading-none">↶</span>
       </button>
-      <div className="h-4 w-px bg-black/10" />
       <button
         type="button"
         onClick={() => redo()}
         disabled={!canRedo}
         title={`Redo (${navigator.platform.includes("Mac") ? "⌘⇧" : "Ctrl+Shift"}+Z)`}
         aria-label="Redo"
-        className="rounded-full px-2.5 py-1 text-sm text-black/70 hover:bg-black/5 disabled:cursor-not-allowed disabled:text-black/25"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/70 transition hover:bg-black/[0.05] hover:text-black disabled:cursor-not-allowed disabled:text-black/25 disabled:hover:bg-transparent dark:text-white/70 dark:hover:bg-white/[0.06] dark:hover:text-white"
       >
-        ↷
+        <span aria-hidden className="text-base leading-none">↷</span>
       </button>
     </div>
   );

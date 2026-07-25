@@ -19,7 +19,7 @@ import { BrandReviewPanel } from "@/components/BrandReviewPanel";
 import { ArtDirectorPanel } from "@/components/ArtDirectorPanel";
 import { CommentsPanel } from "@/components/CommentsPanel";
 import { ReviewStatusControl } from "@/components/ReviewStatusControl";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, RectangleHorizontal, Rows2 } from "lucide-react";
 import { UndoRedoControls } from "@/components/UndoRedoControls";
 import { SwapLayoutButton } from "@/components/SwapLayoutPicker";
 import { useDeckStore, DEFAULT_SLIDE_TRANSITION, resolveSlideTransition, type DeckClientLogo, type DeckSlide, type SlideTransition, type TransitionType } from "@/lib/deck-store";
@@ -177,41 +177,47 @@ function DeckEditor() {
         </div>
         <div className="flex items-center gap-2 flex-wrap justify-end">
           <ReviewStatusControl localDeckId={deckId} />
-          <button
-            type="button"
-            onClick={() => setCommentsOpen((v) => !v)}
-            className={`relative inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium backdrop-blur transition ${
-              commentsOpen
-                ? "border-[#003FC7]/40 bg-[#003FC7]/10 text-[#003FC7] dark:border-[#A1FBF9]/30 dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]"
-                : "border-black/15 bg-white/70 text-black hover:border-black/30 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:border-white/30"
-            }`}
-            title="Comments"
-          >
-            <MessageSquare size={14} /> Comments
-            {totalOpen > 0 && (
-              <span className="ml-0.5 inline-flex min-w-[18px] items-center justify-center rounded-full bg-[#003FC7] px-1.5 text-[10px] font-semibold text-white">
-                {totalOpen}
-              </span>
-            )}
-          </button>
-          <UndoRedoControls />
           <AutosaveIndicator deckId={deckId} />
-          <DuplicateDeckButton deckId={deckId} />
-          <RebrandMenu deckId={deckId} />
-          <button
-            type="button"
-            onClick={() => setDeckContext(deckId, { logoOrientation: logoOrientation === "horizontal" ? "stacked" : "horizontal" })}
-            className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 px-3 py-2 text-xs font-medium text-black hover:border-black/30 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:border-white/30"
-            title="Toggle logo orientation"
-          >
-            Logo: {logoOrientation === "stacked" ? "Stacked" : "Horizontal"}
-          </button>
-          <TemplateToggleButton deckId={deckId} />
-          <SaveToCloudButton deckId={deckId} />
-          <VersionHistoryButton deckId={deckId} />
-          <TranslateButton deckId={deckId} />
-          <LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} />
-          <ShareMenu deckId={deckId} />
+          <div className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white/70 p-1 backdrop-blur dark:border-white/10 dark:bg-white/[0.03]">
+            <UndoRedoControls />
+            <span className="mx-0.5 h-5 w-px bg-black/10 dark:bg-white/10" aria-hidden />
+            <button
+              type="button"
+              onClick={() => setCommentsOpen((v) => !v)}
+              title={`Comments${totalOpen > 0 ? ` (${totalOpen} open)` : ""}`}
+              aria-label="Comments"
+              className={`relative inline-flex h-9 w-9 items-center justify-center rounded-full transition ${
+                commentsOpen
+                  ? "bg-[#003FC7]/10 text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]"
+                  : "text-black/70 hover:bg-black/[0.05] hover:text-black dark:text-white/70 dark:hover:bg-white/[0.06] dark:hover:text-white"
+              }`}
+            >
+              <MessageSquare size={15} />
+              {totalOpen > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 inline-flex min-w-[16px] items-center justify-center rounded-full bg-[#003FC7] px-1 text-[9px] font-semibold text-white">
+                  {totalOpen}
+                </span>
+              )}
+            </button>
+            <DuplicateDeckButton deckId={deckId} />
+            <RebrandMenu deckId={deckId} />
+            <button
+              type="button"
+              onClick={() => setDeckContext(deckId, { logoOrientation: logoOrientation === "horizontal" ? "stacked" : "horizontal" })}
+              title={`Logo orientation: ${logoOrientation === "stacked" ? "Stacked" : "Horizontal"} — click to toggle`}
+              aria-label="Toggle logo orientation"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/70 transition hover:bg-black/[0.05] hover:text-black dark:text-white/70 dark:hover:bg-white/[0.06] dark:hover:text-white"
+            >
+              {logoOrientation === "stacked" ? <Rows2 size={15} /> : <RectangleHorizontal size={15} />}
+            </button>
+            <TemplateToggleButton deckId={deckId} />
+            <span className="mx-0.5 h-5 w-px bg-black/10 dark:bg-white/10" aria-hidden />
+            <SaveToCloudButton deckId={deckId} />
+            <VersionHistoryButton deckId={deckId} />
+            <TranslateButton deckId={deckId} />
+            <LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} />
+            <ShareMenu deckId={deckId} />
+          </div>
         </div>
       </div>
 

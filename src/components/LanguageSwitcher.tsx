@@ -192,11 +192,12 @@ export function LanguageSwitcher({
         type="button"
         onClick={() => !disabled && setOpen((v) => !v)}
         disabled={disabled}
-        title={disabled ? "Save the deck to enable language switching" : "Switch language"}
-        className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white/70 px-4 py-2 text-sm font-medium text-black backdrop-blur transition hover:border-black/30 disabled:opacity-40 dark:border-white/15 dark:bg-white/[0.06] dark:text-white dark:hover:border-white/30"
+        title={disabled ? "Save the deck to enable language switching" : `Language: ${currentLabel}`}
+        aria-label={`Language: ${currentLabel}`}
+        className="inline-flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-full border border-black/10 bg-white px-2 text-[11px] font-semibold uppercase tracking-wider text-black/70 transition hover:border-black/25 hover:bg-black/[0.04] hover:text-black disabled:opacity-40 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
       >
         <Languages size={14} className="text-[#003FC7] dark:text-[#A1FBF9]" />
-        {currentLabel}
+        <span>{(current || "EN").toUpperCase()}</span>
       </button>
 
       {open && !disabled && (
