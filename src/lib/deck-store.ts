@@ -2100,6 +2100,44 @@ export const useDeckStore = create<DeckState>()(
         }));
       },
 
+      setSlideTransition: (deckId, slideId, transition) => {
+        pushHistory();
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) =>
+                sl.id === slideId
+                  ? { ...sl, transition: transition ?? undefined }
+                  : sl,
+              ),
+            },
+          },
+        }));
+      },
+
+      setDeckDefaultTransition: (deckId, transition) => {
+        pushHistory();
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              context: {
+                ...(deck.context ?? {}),
+                defaultTransition: transition ?? undefined,
+              },
+            },
+          },
+        }));
+      },
+
+
       setSlideInkOverride: (deckId, slideId, path, color) => {
         pushHistory();
         const deck = get().decks[deckId];
