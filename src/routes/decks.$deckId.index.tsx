@@ -242,7 +242,110 @@ function DeckEditor() {
             <Tip label="Share"><ShareMenu deckId={deckId} /></Tip>
           </ToolbarGroup>
         </div>
+
+        {active && (
+          <div className="flex flex-wrap items-center justify-between gap-6 rounded-2xl border border-black/[0.07] bg-gradient-to-b from-white to-[#F7F9FC] px-5 py-3 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+            <div className="flex flex-wrap items-center gap-5">
+              <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-black/35">
+                Slide {String(clamped + 1).padStart(2, "0")}
+              </span>
+              <span className="h-6 w-px bg-black/[0.08]" aria-hidden />
+
+              <div className="flex flex-col gap-1.5">
+                <span className="px-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-black/35">Appearance</span>
+                <div
+                  role="group"
+                  aria-label="Slide appearance mode"
+                  className="inline-flex items-center rounded-full bg-black/[0.04] p-0.5 text-[11px] font-medium"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setSlideMode(deck.id, active.id, "light")}
+                    aria-pressed={(active.mode ?? "light") === "light"}
+                    className={`rounded-full px-3 py-1 transition ${
+                      (active.mode ?? "light") === "light"
+                        ? "bg-white text-[#03002C] shadow-sm"
+                        : "text-black/50 hover:text-black"
+                    }`}
+                  >
+                    ☀ Light
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSlideMode(deck.id, active.id, "dark")}
+                    aria-pressed={(active.mode ?? "light") === "dark"}
+                    className={`rounded-full px-3 py-1 transition ${
+                      (active.mode ?? "light") === "dark"
+                        ? "bg-[#03002C] text-white shadow-sm"
+                        : "text-black/50 hover:text-black"
+                    }`}
+                  >
+                    ☾ Dark
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <span className="px-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-black/35">Motion</span>
+                <TransitionPicker
+                  slide={active}
+                  deckDefault={deck.context?.defaultTransition}
+                  onSlideChange={(t) => setSlideTransition(deck.id, active.id, t)}
+                  onDeckDefaultChange={(t) => setDeckDefaultTransition(deck.id, t)}
+                />
+              </div>
+
+              {active.inkOverrides && Object.keys(active.inkOverrides).length > 0 && (
+                <div className="flex flex-col gap-1.5">
+                  <span className="px-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-black/35">Overrides</span>
+                  <button
+                    type="button"
+                    onClick={() => clearSlideInkOverrides(deck.id, active.id)}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-[11px] font-medium text-black/70 transition hover:border-red-500 hover:text-red-600"
+                    title={`Clear ${Object.keys(active.inkOverrides).length} text color override(s) on this slide`}
+                  >
+                    ⟲ Reset colors
+                    <span className="rounded-full bg-black/[0.06] px-1.5 text-[10px]">{Object.keys(active.inkOverrides).length}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <span className="px-1 text-right text-[9px] font-semibold uppercase tracking-[0.16em] text-black/35">Edit mode</span>
+              <div className="inline-flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => { setCanvasMode(false); setLiveEdit((v) => !v); }}
+                  aria-pressed={liveEdit}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-medium transition ${
+                    liveEdit
+                      ? "border-[#003FC7] bg-[#003FC7] text-white shadow-sm"
+                      : "border-black/10 bg-white text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+                  }`}
+                  title="Toggle click-to-edit on the slide preview (Enter commits, Esc cancels)"
+                >
+                  {liveEdit ? "● Live edit" : "✎ Live edit"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setLiveEdit(false); setCanvasMode((v) => !v); }}
+                  aria-pressed={canvasMode}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-medium transition ${
+                    canvasMode
+                      ? "border-fuchsia-600 bg-fuchsia-600 text-white shadow-sm"
+                      : "border-black/10 bg-white text-black/70 hover:border-fuchsia-600 hover:text-fuchsia-600"
+                  }`}
+                  title="Free-form canvas: drag and edit text blocks anywhere on the slide"
+                >
+                  {canvasMode ? "◇ Canvas" : "◇ Free canvas"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </header>
+
 
       <div className="mt-8 grid grid-cols-[260px_1fr_360px] gap-6">
         {/* Overview grid */}
