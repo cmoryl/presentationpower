@@ -1907,13 +1907,13 @@ function AccordionGroup({
   badge?: string;
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = React.useState(false);
-  const rootRef = React.useRef<HTMLDivElement | null>(null);
-  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
-  const panelRef = React.useRef<HTMLDivElement | null>(null);
-  const panelId = React.useId();
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const panelId = useId();
 
-  const getFocusable = React.useCallback((): HTMLElement[] => {
+  const getFocusable = useCallback((): HTMLElement[] => {
     const panel = panelRef.current;
     if (!panel) return [];
     return Array.from(
@@ -1924,14 +1924,14 @@ function AccordionGroup({
   }, []);
 
   // Focus first element on open
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open) return;
     const els = getFocusable();
     if (els.length > 0) els[0]?.focus();
   }, [open, getFocusable]);
 
   // Click outside + Escape
-  React.useEffect(() => {
+  useEffect(() => {
     if (!open) return;
     const onDocDown = (e: MouseEvent) => {
       if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
