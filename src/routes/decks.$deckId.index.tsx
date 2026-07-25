@@ -108,6 +108,8 @@ function DeckEditor() {
   const [flashIndices, setFlashIndices] = useState<number[]>([]);
   const [pptxPreviewOpen, setPptxPreviewOpen] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
+  const [inspectorOpen, setInspectorOpen] = useState(true);
+
   const [commentCounts, setCommentCounts] = useState<Map<number | "deck", number>>(new Map());
   const totalOpen = useMemo(() => Array.from(commentCounts.values()).reduce((a, b) => a + b, 0), [commentCounts]);
   const [userId, setUserId] = useState<string | null>(null);
