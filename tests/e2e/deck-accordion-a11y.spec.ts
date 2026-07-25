@@ -21,6 +21,8 @@ async function firstAvailableTrigger(page: any) {
   throw new Error("No accordion trigger found");
 }
 
+test.describe.configure({ mode: "serial" });
+
 test.describe("Deck toolbar accordion popover a11y", () => {
   test("trigger exposes aria-expanded and controls a labeled panel", async ({ page }) => {
     await createDeckViaSkipAI(page);
