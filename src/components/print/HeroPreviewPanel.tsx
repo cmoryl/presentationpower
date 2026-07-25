@@ -15,6 +15,7 @@ export function HeroPreviewPanel({ media, brand }: Props) {
   const hasMedia = !!media?.imageUrl;
   const [view, setView] = useState<"media" | "base">(hasMedia ? "media" : "base");
   const [mode, setMode] = useState<"light" | "dark">("light");
+  const [showGuides, setShowGuides] = useState(true);
   // Auto-follow: when the user picks or clears imagery in the panel above,
   // snap the preview to the matching view so changes are visible instantly
   // without needing to toggle Photo/Aura by hand.
