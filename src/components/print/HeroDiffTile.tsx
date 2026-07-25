@@ -12,17 +12,23 @@ type Props = {
 };
 
 export function HeroDiffTile({ before, after, status, accent = "#003FC7" }: Props) {
+  const rhs = status === "skip" ? before : after;
+  const beforeH = Math.round(before?.heightPct ?? 46);
+  const afterH = Math.round(rhs?.heightPct ?? 46);
+  const heightChanged = status !== "skip" && beforeH !== afterH;
   return (
     <div className="flex items-stretch gap-1.5">
-      <MiniHero media={before} accent={accent} label="Before" />
+      <MiniHero media={before} accent={accent} label="Before" heightPct={beforeH} />
       <div className="flex flex-col items-center justify-center px-0.5 text-[9px] uppercase tracking-[0.16em] text-black/40">
         →
       </div>
       <MiniHero
-        media={status === "skip" ? before : after}
+        media={rhs}
         accent={accent}
         label={status === "skip" ? "Kept" : "After"}
         dimmed={status === "skip"}
+        heightPct={afterH}
+        highlightHeight={heightChanged}
       />
     </div>
   );
