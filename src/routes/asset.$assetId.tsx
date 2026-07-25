@@ -53,6 +53,7 @@ import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
+import { HeroDiffTile } from "@/components/print/HeroDiffTile";
 import type { BrandMode } from "@/lib/taxonomy";
 
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
