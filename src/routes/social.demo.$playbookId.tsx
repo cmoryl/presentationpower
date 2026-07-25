@@ -188,28 +188,22 @@ function SocialDemoView() {
         />
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {assets.map((a) => (
-            <div
+            <AssetPreviewCard
               key={a.id}
-              className="flex flex-col gap-2 rounded-2xl border border-black/10 bg-white/70 p-3"
-            >
-              <div className="flex justify-center rounded-xl bg-white/40 p-2">
-                <SocialRenderer
-                  format={a.format}
-                  brandId={a.brandId}
-                  mode={a.mode}
-                  copy={a.copy}
-                  displayShortEdge={220}
-                />
-              </div>
-              <div className="flex items-center justify-between px-1 text-[11px]">
-                <span className="font-semibold text-[#03002C]">{a.format.label}</span>
-                <span className="text-black/50">
-                  {a.format.width}×{a.format.height} · {a.mode}
-                </span>
-              </div>
-            </div>
+              rendererProps={{
+                format: a.format,
+                brandId: a.brandId,
+                mode: a.mode,
+                copy: a.copy,
+              }}
+              formatLabel={a.format.label}
+              formatWidth={a.format.width}
+              formatHeight={a.format.height}
+              mode={a.mode}
+            />
           ))}
         </div>
+
       </section>
 
       {/* Marketing collateral — full kit scope, grouped, with status ribbons */}
