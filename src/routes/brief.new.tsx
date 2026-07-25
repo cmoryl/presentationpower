@@ -107,15 +107,6 @@ function BriefWizard() {
     event: { enabled: true, playbookId: EVENT_PLAYBOOKS[0]?.id ?? null },
     social: { enabled: true, playbookId: SOCIAL_PLAYBOOKS[0]?.id ?? null },
   });
-  // Wizard step state — 1 Brand · 2 Prospect · 3 Master set · 4 Refine (opt.) · 5 Generate
-  const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
-  const STEPS: Array<{ n: 1 | 2 | 3 | 4 | 5; label: string; hint: string; optional?: boolean }> = [
-    { n: 1, label: "Brand", hint: "Pick the division" },
-    { n: 2, label: "Prospect", hint: "Who + why" },
-    { n: 3, label: "Master set", hint: "What to produce" },
-    { n: 4, label: "Refine", hint: "Narrative · palette · AI plan", optional: true },
-    { n: 5, label: "Generate", hint: "Review and produce" },
-  ];
   type Produced = {
     deckId?: string;
     prints: Array<{ id: string; kind: PrintKind; title: string }>;
@@ -260,45 +251,24 @@ function BriefWizard() {
             <p className="mt-4 max-w-xl text-base text-white/70 sm:text-lg">
               Brief the system once. Pick which surfaces to produce — presentation, print, event kit, social kit — and every artifact assembles from the same brand, narrative, and knowledge context.
             </p>
-            {/* Step index — clickable, shows current position */}
-            <ol className="mt-6 flex flex-wrap items-center gap-2 text-[11px] font-mono uppercase tracking-[0.14em]">
-              {STEPS.map((s, i) => {
-                const active = step === s.n;
-                const done = step > s.n;
-                const reachable = s.n <= step || done;
-                return (
-                  <li key={s.n} className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      disabled={!reachable}
-                      onClick={() => {
-                        if (reachable) {
-                          setStep(s.n);
-                          if (s.n === 4) setCustomizeOpen(true);
-                        }
-                      }}
-                      className={`flex items-center gap-2 rounded-full border px-3 py-1 transition ${
-                        active
-                          ? "border-[#A1FBF9] bg-[#A1FBF9]/15 text-white"
-                          : done
-                          ? "border-white/30 bg-white/5 text-white/85 hover:bg-white/10"
-                          : "border-white/15 text-white/50"
-                      }`}
-                    >
-                      <span className={`inline-flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold ${active ? "bg-[#A1FBF9] text-[#03002C]" : done ? "bg-white/20 text-white" : "bg-white/10 text-white/60"}`}>
-                        {done ? "✓" : s.n}
-                      </span>
-                      <span>{s.label}</span>
-                      {s.optional && <span className="text-[9px] opacity-60">· opt</span>}
-                    </button>
-                    {i < STEPS.length - 1 && <span aria-hidden className="h-px w-4 bg-white/20" />}
-                  </li>
-                );
-              })}
-            </ol>
-            <p className="mt-3 text-xs text-white/60">
-              Step {step} of 5 · <span className="text-white/80">{STEPS[step - 1].label}</span> — {STEPS[step - 1].hint}
-            </p>
+            {/* Quick jump chips — anchor scroll to each section */}
+            <nav className="mt-6 flex flex-wrap items-center gap-2 text-[11px] font-mono uppercase tracking-[0.14em]">
+              {[
+                { id: "brand", label: "Brand" },
+                { id: "prospect", label: "Prospect" },
+                { id: "master-set", label: "Master set" },
+                { id: "refine", label: "Refine · opt" },
+                { id: "generate", label: "Generate" },
+              ].map((s) => (
+                <a
+                  key={s.id}
+                  href={`#${s.id}`}
+                  className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-white/75 transition hover:border-[#A1FBF9]/60 hover:bg-white/10 hover:text-white"
+                >
+                  {s.label}
+                </a>
+              ))}
+            </nav>
             <div className="mt-6 flex flex-wrap items-center gap-2">
               <Link
                 to="/decks/import"
@@ -312,9 +282,8 @@ function BriefWizard() {
 
         <div className="mt-8">
           <form className="space-y-10" onSubmit={(e) => e.preventDefault()}>
-              {step === 1 && (<>
               {/* SECTION 01: Brand Mode — drives everything below */}
-              <section className="space-y-4">
+              <section id="brand" className="scroll-mt-24 space-y-4">
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
                   <label className={labelCls}>01 · Brand Mode</label>
 
@@ -469,11 +438,9 @@ function BriefWizard() {
 
                 {brand && <BrandRelevancePanel brand={brand} />}
               </section>
-              </>)}
 
-              {step === 2 && (<>
               {/* REQUIRED: Prospect Name + Meeting Objective */}
-              <section className="space-y-6">
+              <section id="prospect" className="scroll-mt-24 space-y-6">
                 <label className={labelCls}>Prospect</label>
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <Field label="Prospect Name">
@@ -494,14 +461,13 @@ function BriefWizard() {
                   </Field>
                 </div>
               </section>
-              </>)}
 
-              {step === 4 && (<>
               {/* REFINE: narrative, palette, AI strategist */}
 
               {/* OPTIONAL: Everything else, collapsed by default */}
               <div
-                className="overflow-hidden rounded-xl border transition-shadow duration-300"
+                id="refine"
+                className="scroll-mt-24 overflow-hidden rounded-xl border transition-shadow duration-300"
                 style={{
                   borderColor: customizeOpen ? `${brandPrimary}44` : PALETTE.hairline,
                   backgroundColor: PALETTE.field,
@@ -791,11 +757,9 @@ function BriefWizard() {
                   </div>
                 </div>
               </div>
-              </>)}
 
-              {step === 3 && (<>
               {/* SECTION — MASTER SET */}
-              <section className="rounded-2xl border bg-white p-6 shadow-[0_2px_20px_-8px_rgba(3,0,44,0.08)] md:p-8" style={{ borderColor: PALETTE.hairline }}>
+              <section id="master-set" className="scroll-mt-24 rounded-2xl border bg-white p-6 shadow-[0_2px_20px_-8px_rgba(3,0,44,0.08)] md:p-8" style={{ borderColor: PALETTE.hairline }}>
                 <div className="mb-5 flex items-baseline gap-3">
                   <span className="font-mono text-xs uppercase tracking-[0.18em] text-[#003FC7]">04 · Master set</span>
                   <span className="text-xs text-[#03002C]/45">Pick everything you want produced from this one brief.</span>
@@ -948,10 +912,9 @@ function BriefWizard() {
                   </div>
                 )}
               </section>
-              </>)}
 
-              {step === 5 && (<>
               {/* SECTION — REVIEW & GENERATE */}
+              <div id="generate" className="scroll-mt-24" />
               <ReviewSummary
                 brand={brand}
                 brandPrimary={brandPrimary}
@@ -1203,61 +1166,7 @@ function BriefWizard() {
                   </button>
                 </div>
               </div>
-              </>)}
 
-              {/* Wizard footer — Back / Continue for steps 1–4 */}
-              {step < 5 && (
-                <div
-                  className="flex items-center justify-between gap-4 border-t pt-6"
-                  style={{ borderColor: PALETTE.hairline }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setStep((s) => Math.max(1, s - 1) as typeof s)}
-                    disabled={step === 1}
-                    className="rounded-lg border-2 bg-white px-5 py-2.5 text-sm font-bold tracking-tight text-[#03002C] transition hover:bg-[#F7F9FC] disabled:opacity-40"
-                    style={{ borderColor: PALETTE.hairline }}
-                  >
-                    ← Back
-                  </button>
-                  <div className="flex items-center gap-3">
-                    {step === 4 && (
-                      <button
-                        type="button"
-                        onClick={() => setStep(5)}
-                        className="text-xs font-semibold uppercase tracking-widest text-[#1E2749]/60 hover:text-[#03002C]"
-                      >
-                        Skip refine →
-                      </button>
-                    )}
-                    {(() => {
-                      const brandOk = !!form.brandModeId && (form.brandModeId !== "bm-subcompany" || !!form.subCompany);
-                      const prospectOk = form.prospect.trim().length > 0 && form.meetingObjective.trim().length > 0;
-                      const canContinue = step === 1 ? brandOk : step === 2 ? prospectOk : true;
-                      return (
-                        <button
-                          type="button"
-                          disabled={!canContinue}
-                          onClick={() => {
-                            setStep((s) => {
-                              const n = Math.min(5, s + 1) as typeof s;
-                              if (n === 4) setCustomizeOpen(true);
-                              return n;
-                            });
-                          }}
-                          className="inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-bold tracking-tight text-white transition disabled:opacity-40"
-                          style={{
-                            background: `linear-gradient(135deg, ${brandPrimary} 0%, ${brandAccent} 100%)`,
-                            boxShadow: `0 10px 24px -12px ${brandPrimary}80`,
-                          }}
-                        >
-                          Continue → {step === 1 ? "Prospect" : step === 2 ? "Master set" : step === 3 ? "Refine" : "Generate"}
-                        </button>
-                      );
-                    })()}
-                  </div>
-                </div>
-              )}
             </form>
         </div>
       </div>
@@ -1726,7 +1635,7 @@ function ReviewSummary({
                 </span>
               ))
             ) : (
-              <span className="text-[#1E2749]/50">Nothing selected — go back to step 3</span>
+              <span className="text-[#1E2749]/50">Nothing selected — pick at least one surface above</span>
             )}
           </div>
         </ReviewRow>
