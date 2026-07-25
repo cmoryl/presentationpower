@@ -20,6 +20,7 @@ import {
   synthesizeCaseStudy,
   applyHeroToAllPrintAssets,
   previewApplyHeroToAllPrintAssets,
+  undoApplyHeroToAllPrintAssets,
 } from "@/lib/print-assets.functions";
 
 import { getDivisionContext } from "@/lib/division-knowledge.functions";
@@ -1528,6 +1529,7 @@ function HeroMediaPanel({
   const [uploading, setUploading] = useState(false);
   const applyAll = useServerFn(applyHeroToAllPrintAssets);
   const previewApply = useServerFn(previewApplyHeroToAllPrintAssets);
+  const undoApply = useServerFn(undoApplyHeroToAllPrintAssets);
   const [applyingAll, setApplyingAll] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -1536,9 +1538,16 @@ function HeroMediaPanel({
     | null
   >(null);
   const [previewError, setPreviewError] = useState<string | null>(null);
+  // Last apply's undo snapshot — session-only, cleared on new apply or successful undo.
+  const [lastUndo, setLastUndo] = useState<
+    | { snapshots: Array<{ id: string; heroMedia: unknown }>; appliedAt: number }
+    | null
+  >(null);
+  const [undoing, setUndoing] = useState(false);
   const [applySummary, setApplySummary] = useState<
     | { status: "success"; updated: number; scanned: number; skipped: number }
     | { status: "error"; message: string; errors: string[]; skipped?: number }
+    | { status: "undone"; restored: number }
     | null
   >(null);
 
@@ -1569,6 +1578,7 @@ function HeroMediaPanel({
   async function handleConfirmApply() {
     if (!enabled || !divisionId) return;
     setApplySummary(null);
+    setLastUndo(null);
     setApplyingAll(true);
     try {
       const res = await applyAll({
@@ -1577,8 +1587,6 @@ function HeroMediaPanel({
           brandModeId: divisionId,
           heroMedia: media as unknown as Record<string, unknown>,
           excludeAssetId: assetId ?? undefined,
-          // Skip templates the user has already customized
-          // (focal / scrim / wash overrides).
           onlyUncustomized: true,
         },
       });
@@ -1590,6 +1598,17 @@ function HeroMediaPanel({
       } else {
         setApplySummary({ status: "error", message: `Could not apply to any asset: ${res.errors[0] ?? "unknown error"}`, errors: res.errors, skipped });
       }
+      // Stash the undo snapshot so the user can revert this apply.
+      if (res.undoToken && res.updated > 0) {
+        try {
+          const parsed = JSON.parse(res.undoToken) as Array<{ id: string; heroMedia: unknown }>;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setLastUndo({ snapshots: parsed, appliedAt: Date.now() });
+          }
+        } catch {
+          // ignore — undo just won't be offered
+        }
+      }
       const skipMsg = skipped ? `, ${skipped} skipped` : "";
       toast.success(`Applied to ${res.updated} of ${res.scanned} ${kind.replace("-", " ")} asset${res.scanned === 1 ? "" : "s"}${skipMsg}.`);
       setConfirmOpen(false);
@@ -1599,6 +1618,31 @@ function HeroMediaPanel({
       toast.error(message);
     } finally {
       setApplyingAll(false);
+    }
+  }
+
+  async function handleUndoApply() {
+    if (!lastUndo || undoing) return;
+    setUndoing(true);
+    const tid = toast.loading("Reverting bulk apply…");
+    try {
+      const res = await undoApply({ data: { snapshots: lastUndo.snapshots } });
+      if (res.errors.length === 0) {
+        setApplySummary({ status: "undone", restored: res.restored });
+        setLastUndo(null);
+        toast.success(`Reverted ${res.restored} template${res.restored === 1 ? "" : "s"}.`, { id: tid });
+      } else if (res.restored > 0) {
+        setApplySummary({ status: "error", message: `Reverted ${res.restored} of ${res.scanned}; ${res.errors.length} failed.`, errors: res.errors });
+        toast.error(`Reverted ${res.restored} of ${res.scanned}; ${res.errors.length} failed.`, { id: tid });
+      } else {
+        setApplySummary({ status: "error", message: `Undo failed: ${res.errors[0] ?? "unknown error"}`, errors: res.errors });
+        toast.error("Undo failed.", { id: tid });
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Undo failed.";
+      toast.error(message, { id: tid });
+    } finally {
+      setUndoing(false);
     }
   }
 
@@ -1703,19 +1747,48 @@ function HeroMediaPanel({
         )}
 
         {applySummary && applySummary.status === "success" && (
-          <div className="flex items-start gap-2 rounded-md bg-[#A6FA87]/20 px-2 py-1.5 text-[11px] text-[#0F5C1A] dark:bg-[#A6FA87]/15 dark:text-[#A6FA87]">
-            <span className="mt-0.5 inline-block h-3 w-3 shrink-0 rounded-full bg-[#A6FA87]" />
+          <div className="space-y-1.5 rounded-md bg-[#A6FA87]/20 px-2 py-1.5 text-[11px] text-[#0F5C1A] dark:bg-[#A6FA87]/15 dark:text-[#A6FA87]">
+            <div className="flex items-start gap-2">
+              <span className="mt-0.5 inline-block h-3 w-3 shrink-0 rounded-full bg-[#A6FA87]" />
+              <span>
+                Applied to <strong>{applySummary.updated}</strong> of{" "}
+                <strong>{applySummary.scanned}</strong> {kind.replace("-", " ")} asset
+                {applySummary.scanned === 1 ? "" : "s"}
+                {applySummary.skipped > 0 ? (
+                  <> · <strong>{applySummary.skipped}</strong> left untouched (customized focal / scrim / wash)</>
+                ) : null}
+                .
+              </span>
+            </div>
+            {lastUndo && (
+              <div className="flex items-center justify-between gap-2 pl-5">
+                <span className="text-[10px] opacity-80">
+                  Not what you expected? Restore the previous hero on {lastUndo.snapshots.length} template
+                  {lastUndo.snapshots.length === 1 ? "" : "s"}.
+                </span>
+                <button
+                  type="button"
+                  onClick={handleUndoApply}
+                  disabled={undoing}
+                  className="rounded border border-current/40 bg-white/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] transition hover:bg-white disabled:opacity-40 dark:bg-black/30 dark:hover:bg-black/50"
+                >
+                  {undoing ? "Reverting…" : "Undo"}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {applySummary && applySummary.status === "undone" && (
+          <div className="flex items-start gap-2 rounded-md bg-black/[0.04] px-2 py-1.5 text-[11px] text-black/70 dark:bg-white/[0.06] dark:text-white/70">
+            <span className="mt-0.5 inline-block h-3 w-3 shrink-0 rounded-full bg-black/40 dark:bg-white/40" />
             <span>
-              Applied to <strong>{applySummary.updated}</strong> of{" "}
-              <strong>{applySummary.scanned}</strong> {kind.replace("-", " ")} asset
-              {applySummary.scanned === 1 ? "" : "s"}
-              {applySummary.skipped > 0 ? (
-                <> · <strong>{applySummary.skipped}</strong> left untouched (customized focal / scrim / wash)</>
-              ) : null}
-              .
+              Reverted <strong>{applySummary.restored}</strong> template
+              {applySummary.restored === 1 ? "" : "s"} to the previous hero.
             </span>
           </div>
         )}
+
 
 
         {applySummary && applySummary.status === "error" && (
