@@ -213,6 +213,11 @@ export const deleteCloudDeck = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw) => z.object({ deckId: z.string() }).parse(raw))
   .handler(async ({ data, context }) => {
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!UUID_RE.test(data.deckId)) {
+      // Local-only deck id — nothing to delete in the cloud.
+      return { ok: true, skipped: true as const };
+    }
     const { supabase } = context;
     await supabase.from("deck_slides").delete().eq("deck_id", data.deckId);
     const { error } = await supabase.from("decks").delete().eq("id", data.deckId);
