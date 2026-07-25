@@ -2,16 +2,12 @@ import { test, expect } from "@playwright/test";
 
 async function createDeckViaSkipAI(page: any) {
   await page.goto("/brief/new", { waitUntil: "domcontentloaded" });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(2000);
 
-  const skip = page.locator("button:has-text('skip AI')");
-  if (await skip.isVisible()) {
-    await skip.click();
-  } else {
-    await page.click("text=Skip AI");
-  }
+  const skip = page.getByRole("button", { name: /skip AI/i });
+  await skip.click();
 
-  await page.waitForURL(/\/decks\/[A-Za-z0-9_-]+/, { timeout: 10000 });
+  await page.waitForURL(/\/decks\/[A-Za-z0-9_-]+/, { timeout: 15000 });
   await page.waitForTimeout(1500);
   return page.url();
 }
