@@ -757,7 +757,32 @@ function DeckEditor() {
         </div>
 
         {/* Inspector */}
-        <aside className="space-y-4">
+        {!inspectorOpen ? (
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setInspectorOpen(true)}
+              title="Expand inspector"
+              aria-label="Expand inspector"
+              className="sticky top-6 flex h-24 w-9 items-center justify-center rounded-l-xl border border-r-0 border-black/10 bg-white text-black/60 shadow-sm transition hover:bg-black/5 hover:text-black"
+            >
+              <span className="text-lg leading-none">‹</span>
+            </button>
+          </div>
+        ) : (
+        <aside className="space-y-4 relative">
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setInspectorOpen(false)}
+              title="Collapse inspector"
+              aria-label="Collapse inspector"
+              className="rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] uppercase tracking-widest text-black/60 hover:bg-black/5 hover:text-black"
+            >
+              Collapse ›
+            </button>
+          </div>
+
           {qa.length > 0 && (
             <Panel label="QA gates">
               <div className="mb-2 flex gap-3 text-[10px] uppercase tracking-widest">
