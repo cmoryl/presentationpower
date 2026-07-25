@@ -1937,10 +1937,12 @@ function AccordionGroup({
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const [anchor, setAnchor] = useState<"left" | "right">("left");
   const rootRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const panelId = useId();
+
 
   const getFocusable = useCallback((): HTMLElement[] => {
     const panel = panelRef.current;
@@ -1952,12 +1954,20 @@ function AccordionGroup({
     ).filter((el) => !el.hasAttribute("data-focus-skip"));
   }, []);
 
-  // Focus first element on open
+  // Focus first element on open + edge-detect anchor to keep panel on-screen
   useEffect(() => {
     if (!open) return;
+    // Anchor from the right if the trigger is past the horizontal midpoint,
+    // so the panel opens inward rather than off-screen on narrow widths.
+    const rect = triggerRef.current?.getBoundingClientRect();
+    if (rect) {
+      const vw = window.innerWidth;
+      setAnchor(rect.left + rect.width / 2 > vw / 2 ? "right" : "left");
+    }
     const els = getFocusable();
     if (els.length > 0) els[0]?.focus();
   }, [open, getFocusable]);
+
 
   // Click outside + Escape
   useEffect(() => {
@@ -2046,7 +2056,7 @@ function AccordionGroup({
           role="group"
           aria-label={label}
           onKeyDown={onPanelKeyDown}
-          className="absolute left-0 top-[calc(100%+6px)] z-[60] flex items-center gap-1 whitespace-nowrap rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)]"
+          className={`absolute top-[calc(100%+6px)] z-[60] flex max-w-[min(560px,calc(100vw-2rem))] flex-wrap items-center gap-1 rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)] ${anchor === "right" ? "right-0 left-auto" : "left-0 right-auto"}`}
         >
           {children}
         </div>
