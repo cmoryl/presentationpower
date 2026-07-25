@@ -14,7 +14,8 @@ async function createDeckViaSkipAI(page: any) {
 }
 
 async function firstAvailableTrigger(page: any) {
-  const labels = ["History", "Slide", "Distribute", "Appearance", "Motion"];
+  // Prefer triggers whose panels host focusable actions.
+  const labels = ["Distribute", "Slide", "Appearance", "Motion", "History"];
   for (const label of labels) {
     const btn = page.getByRole("button", { name: new RegExp(`^${label}`, "i") }).first();
     if ((await btn.count()) > 0 && (await btn.isVisible().catch(() => false))) {
