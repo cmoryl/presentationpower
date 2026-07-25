@@ -1037,14 +1037,33 @@ function AssetEditor() {
             </Panel>
 
             <Panel title="Shared modules">
-              <LayoutHealthBanner report={analyzePrintAsset("case-study", content)} />
+              <LayoutHealthBanner
+                report={analyzePrintAsset("case-study", content)}
+                onApplySuggestion={(s) => {
+                  if (s.kind === "reduce-hero") {
+                    const cur = (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia ?? {} as PrintHeroMedia;
+                    patchContent({ heroMedia: { ...cur, heightPct: s.targetHeightPct } } as never);
+                  } else if (s.kind === "swap-variant") {
+                    const modules = [...(content.modules ?? [])];
+                    const cur = modules[s.moduleIndex];
+                    if (cur && cur.kind === "stats") {
+                      modules[s.moduleIndex] = { ...cur, variantId: s.to as PrintStatsSection["variantId"] };
+                      patchContent({ modules });
+                    }
+                  }
+                }}
+              />
               <ModulesPanel
                 kind="case-study"
                 modules={content.modules ?? []}
+                heroMedia={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
+                hasTitle={!!(rawContent as { title?: string }).title}
+                hasSummary={!!(rawContent as { summary?: string }).summary}
                 onAdd={() => setPickerOpen(true)}
                 onChange={(next) => patchContent({ modules: next })}
                 mode={editorMode}
               />
+
 
               {/* Schema-driven Content inspector — the guaranteed safety net.
                   Every content field in the active kind is reachable here,
