@@ -1527,18 +1527,43 @@ function HeroMediaPanel({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
   const applyAll = useServerFn(applyHeroToAllPrintAssets);
+  const previewApply = useServerFn(previewApplyHeroToAllPrintAssets);
   const [applyingAll, setApplyingAll] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [preview, setPreview] = useState<
+    | { toUpdate: Array<{ id: string; title: string }>; toSkip: Array<{ id: string; title: string; reason: "customized" }>; scanned: number }
+    | null
+  >(null);
+  const [previewError, setPreviewError] = useState<string | null>(null);
   const [applySummary, setApplySummary] = useState<
     | { status: "success"; updated: number; scanned: number; skipped: number }
     | { status: "error"; message: string; errors: string[]; skipped?: number }
     | null
   >(null);
 
-  function handleApplyToAll() {
+  async function handleApplyToAll() {
     if (!enabled || !divisionId) return;
     setApplySummary(null);
+    setPreview(null);
+    setPreviewError(null);
     setConfirmOpen(true);
+    setPreviewLoading(true);
+    try {
+      const res = await previewApply({
+        data: {
+          kind,
+          brandModeId: divisionId,
+          excludeAssetId: assetId ?? undefined,
+          onlyUncustomized: true,
+        },
+      });
+      setPreview(res);
+    } catch (err) {
+      setPreviewError(err instanceof Error ? err.message : "Could not load preview.");
+    } finally {
+      setPreviewLoading(false);
+    }
   }
 
   async function handleConfirmApply() {
