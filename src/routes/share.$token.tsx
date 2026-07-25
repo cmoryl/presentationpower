@@ -4,10 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { getSharedDeck, recordShareView } from "@/lib/deck-sharing.functions";
 import { getSharedDeckTranslations, listSharedLocales, listLanguages } from "@/lib/translation.functions";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
+import { SlideStage, type Direction } from "@/components/slide/SlideStage";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
-import type { DeckSlide } from "@/lib/deck-store";
+import { resolveSlideTransition, type DeckSlide } from "@/lib/deck-store";
 import { Play, X, ChevronLeft, ChevronRight, Languages, Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { deckCloudId } from "@/lib/deck-uuid";
@@ -129,6 +130,10 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
   const clientName = deck.brief?.prospect ?? undefined;
   const [presenting, setPresenting] = useState(false);
   const [i, setI] = useState(0);
+  const prevIRef = useRef(0);
+  const presentDirection: Direction = i >= prevIRef.current ? "forward" : "back";
+  useEffect(() => { prevIRef.current = i; }, [i]);
+
 
   // ---- Language overlay ----
   const listLocalesFn = useServerFn(listSharedLocales);
@@ -450,8 +455,12 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
                   const v = byId(MODULE_VARIANTS, s.variantId);
                   if (!v) return null;
                   return (
-                    <div className="overflow-hidden rounded-xl bg-white shadow-2xl">
-                      <ScaledSlide>
+                    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-white shadow-2xl">
+                      <SlideStage
+                        slideKey={s.id}
+                        direction={presentDirection}
+                        transition={resolveSlideTransition(s, undefined)}
+                      >
                         <VariantRenderer
                           slide={viewSlide(s)}
                           variant={v}
@@ -461,7 +470,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
                           clientLogoUrl={deck.client_logo_url}
                           subCompany={deck.sub_company ?? undefined}
                         />
-                      </ScaledSlide>
+                      </SlideStage>
                     </div>
                   );
                 })()}

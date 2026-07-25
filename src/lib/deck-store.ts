@@ -75,6 +75,31 @@ export type CanvasBlock = {
   weight?: 400 | 500 | 600 | 700;
 };
 
+// ---- Presentation transitions (Pass 1 — on-screen only) --------------
+// Restricted to the SAFE native-mappable set so Pass 3 (PPTX post-processing
+// via jszip) can emit <p:transition> XML without a lossy mapping.
+export type TransitionType =
+  | "none"
+  | "fade"
+  | "push-left"
+  | "push-right"
+  | "zoom"
+  | "cut";
+
+export type SlideTransition = {
+  type: TransitionType;
+  durationMs?: number;
+};
+
+export const DEFAULT_SLIDE_TRANSITION: SlideTransition = { type: "fade", durationMs: 400 };
+
+export function resolveSlideTransition(
+  slide: { transition?: SlideTransition } | undefined | null,
+  context: { defaultTransition?: SlideTransition } | undefined | null,
+): SlideTransition {
+  return slide?.transition ?? context?.defaultTransition ?? DEFAULT_SLIDE_TRANSITION;
+}
+
 export type DeckSlide = {
   id: string;
   position: number;
@@ -97,6 +122,8 @@ export type DeckSlide = {
   // or "" to clear. Applied via a scoped stylesheet in LiveEditOverlay and
   // preserved across previews/exports.
   inkOverrides?: Record<string, string>;
+  // Optional per-slide transition override (Pass 1 — on-screen only).
+  transition?: SlideTransition;
 };
 
 
@@ -149,6 +176,8 @@ export type DeckContext = {
     printAssetIds?: string[];
     brandDivisionId?: string | null;
   };
+  // Deck-level default transition (Pass 1 — on-screen only).
+  defaultTransition?: SlideTransition;
 };
 
 
@@ -220,6 +249,8 @@ type DeckState = {
   setSlideLogo: (deckId: string, slideId: string, patch: { position?: SlideLogoPosition; orientation?: "auto" | "horizontal" | "stacked" | "vertical-left" | "vertical-right" | "mark-only" }) => void;
   applySlideBackground: (deckId: string, slideIds: string[], background: unknown) => void;
   setSlideMode: (deckId: string, slideId: string, mode: "light" | "dark") => void;
+  setSlideTransition: (deckId: string, slideId: string, transition: SlideTransition | null) => void;
+  setDeckDefaultTransition: (deckId: string, transition: SlideTransition | null) => void;
   setSlideInkOverride: (deckId: string, slideId: string, path: string, color: string | null) => void;
   clearSlideInkOverrides: (deckId: string, slideId: string) => void;
 
@@ -2068,6 +2099,44 @@ export const useDeckStore = create<DeckState>()(
           },
         }));
       },
+
+      setSlideTransition: (deckId, slideId, transition) => {
+        pushHistory();
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) =>
+                sl.id === slideId
+                  ? { ...sl, transition: transition ?? undefined }
+                  : sl,
+              ),
+            },
+          },
+        }));
+      },
+
+      setDeckDefaultTransition: (deckId, transition) => {
+        pushHistory();
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              context: {
+                ...(deck.context ?? {}),
+                defaultTransition: transition ?? undefined,
+              },
+            },
+          },
+        }));
+      },
+
 
       setSlideInkOverride: (deckId, slideId, path, color) => {
         pushHistory();

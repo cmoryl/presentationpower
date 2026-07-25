@@ -1,12 +1,13 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { useDeckStore } from "@/lib/deck-store";
+import { useDeckStore, resolveSlideTransition } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
-import { ScaledSlide } from "@/components/slide/ScaledSlide";
+
+import { SlideStage, type Direction } from "@/components/slide/SlideStage";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { SlideMediaRefreshProvider, SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { cn } from "@/lib/utils";
-import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 
 const focusThumb = (el: HTMLButtonElement | null) => {
@@ -33,6 +34,9 @@ function PresenterView() {
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const navigate = useNavigate();
   const [i, setI] = useState(0);
+  const prevIRef = useRef(0);
+  const direction: Direction = i >= prevIRef.current ? "forward" : "back";
+  useEffect(() => { prevIRef.current = i; }, [i]);
   const [stripOpen, setStripOpen] = useState(true);
   const [notesOpen, setNotesOpen] = useState(false);
   const [focusedThumb, setFocusedThumb] = useState(0);
@@ -43,6 +47,7 @@ function PresenterView() {
   const nextSlide = deck.slides[i + 1];
   const nextVariant = nextSlide ? byId(MODULE_VARIANTS, nextSlide.variantId) : undefined;
   const variant = slide ? byId(MODULE_VARIANTS, slide.variantId) : undefined;
+  const transition = resolveSlideTransition(slide, deck.context);
   const sectionKeyMsg = slide
     ? deck.context?.strategy?.recommendedSections?.find((r) => r.sectionId === slide.sectionId)?.keyMessage
     : undefined;
@@ -122,9 +127,9 @@ function PresenterView() {
       <div className="w-full max-w-[95vw]">
         <div className="mx-auto aspect-[16/9] w-full">
           {slide && variant && (
-            <ScaledSlide>
+            <SlideStage slideKey={slide.id} direction={direction} transition={transition}>
               <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={i + 1} clientName={brief?.prospect} />
-            </ScaledSlide>
+            </SlideStage>
           )}
         </div>
       </div>
