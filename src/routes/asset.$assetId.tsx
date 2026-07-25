@@ -1558,6 +1558,9 @@ function HeroMediaPanel({
   brand,
   kind,
   assetId,
+  hasTitle = false,
+  hasSummary = false,
+  modules,
 }: {
   value: PrintHeroMedia | undefined;
   onChange: (next: PrintHeroMedia | undefined) => void;
@@ -1565,6 +1568,9 @@ function HeroMediaPanel({
   brand: BrandMode | undefined;
   kind: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
   assetId: string | null;
+  hasTitle?: boolean;
+  hasSummary?: boolean;
+  modules?: PrintSection[];
 }) {
   const enabled = !!value?.imageUrl;
   const media: PrintHeroMedia = value ?? { imageUrl: "" };
