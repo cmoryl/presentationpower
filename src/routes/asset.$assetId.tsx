@@ -1779,6 +1779,13 @@ function HeroMediaPanel({
       {/* Live hero preview — updates as heroMedia changes (image, focal,
           scrim, wash, aspect). Gives the picker an immediate WYSIWYG loop. */}
       <HeroPreviewPanel media={value} brand={brand} />
+      <HeroCostDebugPanel
+        kind={kind}
+        media={value}
+        hasTitle={hasTitle}
+        hasSummary={hasSummary}
+        modules={modules}
+      />
       {/* One-click bulk-apply — writes the current hero to every sibling
           print asset of the same kind under this division. */}
       <div className="space-y-2 rounded-md border border-black/10 bg-black/[0.02] px-2 py-1.5 dark:border-white/10 dark:bg-white/[0.03]">
