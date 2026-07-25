@@ -100,21 +100,33 @@ export function LayoutHealthBanner({ report, onApplySuggestion }: Props) {
         </ul>
       )}
       {report.suggestions.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {report.suggestions.map((s, k) => (
-            <button
-              key={k}
-              type="button"
-              onClick={() => onApplySuggestion?.(s)}
-              disabled={!onApplySuggestion}
-              className="inline-flex items-center gap-1 rounded-full border border-black/15 bg-white px-2 py-0.5 text-[10.5px] font-semibold text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7] disabled:cursor-default disabled:opacity-60 dark:border-white/15 dark:bg-white/[0.04] dark:text-white/85"
-              title={s.message}
-              data-testid={`capacity-suggestion-${s.kind}`}
-            >
-              <Wand2 size={11} />
-              {s.message}
-            </button>
-          ))}
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          {report.suggestions.map((s, k) => {
+            const isHeroFit = s.kind === "reduce-hero";
+            const label = isHeroFit
+              ? `Reduce hero to fit → ${(s as Extract<CapacitySuggestion, { kind: "reduce-hero" }>).targetHeightPct}%`
+              : s.message;
+            const title = isHeroFit
+              ? `Sets hero height to ${(s as Extract<CapacitySuggestion, { kind: "reduce-hero" }>).targetHeightPct}% — the computed target that clears the current overflow (frees ${(s as Extract<CapacitySuggestion, { kind: "reduce-hero" }>).frees.toFixed(1)} units).`
+              : s.message;
+            const cls = isHeroFit
+              ? "inline-flex items-center gap-1 rounded-full border border-[#003FC7] bg-[#003FC7] px-2.5 py-1 text-[10.5px] font-semibold text-white hover:bg-[#03002C] hover:border-[#03002C] disabled:cursor-default disabled:opacity-60"
+              : "inline-flex items-center gap-1 rounded-full border border-black/15 bg-white px-2 py-0.5 text-[10.5px] font-semibold text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7] disabled:cursor-default disabled:opacity-60 dark:border-white/15 dark:bg-white/[0.04] dark:text-white/85";
+            return (
+              <button
+                key={k}
+                type="button"
+                onClick={() => onApplySuggestion?.(s)}
+                disabled={!onApplySuggestion}
+                className={cls}
+                title={title}
+                data-testid={`capacity-suggestion-${s.kind}`}
+              >
+                <Wand2 size={11} />
+                {label}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

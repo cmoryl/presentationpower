@@ -1042,17 +1042,22 @@ function AssetEditor() {
 
             <Panel title="Shared modules">
               <LayoutHealthBanner
-                report={analyzePrintAsset("case-study", content)}
+                report={analyzePrintAsset(kind, content)}
                 onApplySuggestion={(s) => {
                   if (s.kind === "reduce-hero") {
                     const cur = (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia ?? {} as PrintHeroMedia;
+                    const prev = cur.heightPct ?? 46;
                     patchContent({ heroMedia: { ...cur, heightPct: s.targetHeightPct } } as never);
+                    toast.success(
+                      `Hero reduced to ${s.targetHeightPct}% (was ${Math.round(prev)}%) — freed ${s.frees.toFixed(1)} units`,
+                    );
                   } else if (s.kind === "swap-variant") {
                     const modules = [...(content.modules ?? [])];
                     const cur = modules[s.moduleIndex];
                     if (cur && cur.kind === "stats") {
                       modules[s.moduleIndex] = { ...cur, variantId: s.to as PrintStatsSection["variantId"] };
                       patchContent({ modules });
+                      toast.success(`Swapped module ${s.moduleIndex + 1} → ${s.to}`);
                     }
                   }
                 }}
