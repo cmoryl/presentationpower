@@ -87,12 +87,18 @@ export function HeroPreviewPanel({ media, brand }: Props) {
         ) : (
           <BaseHeroPreview mode={mode} />
         )}
+        <CenteringGuides
+          heightPct={active === "media" && hasMedia ? (media!.heightPct ?? 46) : 55}
+          offsetPct={media?.copyOffsetPct ?? 0}
+          isDark={isDark}
+        />
         {/* Page body placeholder lines */}
         <div className="absolute inset-x-4 bottom-4 space-y-1.5">
           <div className={`h-1.5 w-2/3 rounded-full ${isDark ? "bg-white/15" : "bg-black/10"}`} />
           <div className={`h-1.5 w-4/5 rounded-full ${isDark ? "bg-white/10" : "bg-black/8"}`} />
           <div className={`h-1.5 w-1/2 rounded-full ${isDark ? "bg-white/10" : "bg-black/8"}`} />
         </div>
+
       </div>
 
       <div className="pt-2 text-[10px] leading-relaxed text-white/50">
@@ -172,3 +178,78 @@ function BaseHeroPreview({ mode }: { mode: "light" | "dark" }) {
     />
   );
 }
+
+/**
+ * Subtle overlay guides to help align the hero copy vertically:
+ *  - dashed horizontal line at the hero band's true vertical center
+ *  - dashed vertical line at horizontal center (as an alignment reference)
+ *  - accent-colored line at the current copy-offset target position,
+ *    with a small % chip when non-zero
+ */
+function CenteringGuides({
+  heightPct,
+  offsetPct,
+  isDark,
+}: {
+  heightPct: number;
+  offsetPct: number;
+  isDark: boolean;
+}) {
+  const clampedOffset = Math.max(-50, Math.min(50, offsetPct));
+  // Copy is centered inside the hero band (0..heightPct% of page).
+  // Offset translates the copy block by `offsetPct%` of the band height.
+  const centerY = heightPct / 2;
+  const offsetY = centerY + (clampedOffset / 100) * heightPct;
+  const guideColor = isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.25)";
+  const accent = "#003FC7";
+  const nudged = clampedOffset !== 0;
+  return (
+    <div className="pointer-events-none absolute inset-0" aria-hidden>
+      {/* horizontal center of the hero band */}
+      <div
+        className="absolute inset-x-0"
+        style={{
+          top: `${centerY}%`,
+          height: 0,
+          borderTop: `1px dashed ${guideColor}`,
+        }}
+      />
+      {/* vertical center reference */}
+      <div
+        className="absolute inset-y-0"
+        style={{
+          left: "50%",
+          width: 0,
+          borderLeft: `1px dashed ${guideColor}`,
+          opacity: 0.6,
+        }}
+      />
+      {/* current offset position (only when nudged) */}
+      {nudged ? (
+        <>
+          <div
+            className="absolute inset-x-0"
+            style={{
+              top: `${offsetY}%`,
+              height: 0,
+              borderTop: `1px solid ${accent}`,
+              boxShadow: `0 0 0 0.5px ${accent}`,
+            }}
+          />
+          <div
+            className="absolute rounded-full px-1.5 py-[1px] text-[9px] font-medium leading-none text-white"
+            style={{
+              top: `calc(${offsetY}% - 8px)`,
+              right: 6,
+              background: accent,
+            }}
+          >
+            {clampedOffset > 0 ? "+" : ""}
+            {Math.round(clampedOffset)}%
+          </div>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
