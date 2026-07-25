@@ -369,185 +369,179 @@ function BriefCommandCenter() {
 
   return (
     <AppShell>
-      <div className="mx-auto flex min-h-[72vh] max-w-4xl flex-col justify-center font-['Geist'] text-[#03002C]">
-        <section className="relative overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-[#03002C] via-[#0B2A4A] to-[#003FC7] p-8 text-white shadow-[0_30px_80px_-40px_rgba(3,0,44,0.55)] sm:p-10">
-          <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#A1FBF9]/20 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-32 -left-16 h-80 w-80 rounded-full bg-[#C2A3FF]/20 blur-3xl" />
-
-          <div className="relative">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div className="max-w-2xl">
-                <div className="text-[11px] font-mono uppercase tracking-[0.28em] text-[#A1FBF9]">
-                  New master brief
-                </div>
-                <h1 className="mt-3 text-3xl font-semibold leading-[1.05] tracking-tight sm:text-4xl">
-                  What are we making today?
-                </h1>
-                <p className="mt-2 max-w-xl text-sm text-white/70">
-                  One line. Pick what you need. Refine on the next screen.
-                </p>
-              </div>
-              <Link
-                to="/decks/import"
-                className="rounded-full border border-white/25 bg-white/5 px-4 py-2 text-xs font-medium text-white/90 backdrop-blur transition hover:bg-white/10"
-              >
-                Import PowerPoint →
-              </Link>
+      <div className="mx-auto w-full max-w-5xl px-6 py-16 font-['Geist'] text-[#03002C] sm:py-20 lg:px-8">
+        {/* Header */}
+        <header className="flex flex-wrap items-start justify-between gap-6">
+          <div className="max-w-2xl">
+            <div className="text-[11px] font-mono uppercase tracking-[0.28em] text-[#003FC7]">
+              New master brief
             </div>
+            <h1 className="mt-4 text-4xl font-semibold leading-[1.02] tracking-tight sm:text-5xl">
+              What are we making today?
+            </h1>
+            <p className="mt-3 max-w-xl text-base text-black/60">
+              One line. Pick what you need. Refine on the next screen.
+            </p>
+          </div>
+          <Link
+            to="/decks/import"
+            className="rounded-full border border-black/15 bg-white px-4 py-2 text-xs font-medium text-black/70 transition hover:border-black/30 hover:text-black"
+          >
+            Import PowerPoint →
+          </Link>
+        </header>
 
-            {/* AI prompt bar */}
-            <div className="mt-6 rounded-2xl border border-white/15 bg-white/[0.06] p-2 backdrop-blur-sm transition focus-within:border-[#A1FBF9]/60 focus-within:bg-white/[0.09]">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
-                <textarea
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-                      e.preventDefault();
-                      if (!busy) void generateWithAi();
-                    }
-                  }}
-                  rows={2}
-                  placeholder="e.g. Pilot pitch for Acme Global expanding into 12 markets, meeting VP Marketing next Tuesday…"
-                  className="flex-1 resize-none bg-transparent px-4 py-3 text-[15px] leading-snug text-white placeholder:text-white/40 focus:outline-none"
-                />
-                <div className="flex flex-row items-center gap-2 sm:flex-col sm:items-stretch sm:justify-between sm:px-1 sm:pb-1">
-                  <button
-                    type="button"
-                    onClick={() => void generateWithAi()}
-                    disabled={busy || selectedCount === 0}
-                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#A1FBF9] px-5 py-2.5 text-sm font-semibold text-[#03002C] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
-                    style={{
-                      boxShadow: `0 10px 24px -12px ${brandAccent}80`,
-                    }}
-                  >
-                    {busy
-                      ? aiStatus === "assembling"
-                        ? "Assembling…"
-                        : aiStatus === "knowledge"
-                          ? "Pulling context…"
-                          : "Personalizing…"
-                      : "Generate"}
-                    <span className="hidden font-mono text-[10px] font-normal opacity-60 sm:inline">⌘↵</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => void generateFast()}
-                    disabled={busy || selectedCount === 0}
-                    className="text-[11px] font-medium uppercase tracking-widest text-white/60 transition hover:text-white disabled:opacity-40"
-                  >
-                    {expanding ? "Producing…" : "or skip AI →"}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {aiStatus === "error" && aiError && (
-              <div className="mt-3 rounded-lg border border-rose-300/40 bg-rose-500/20 px-3 py-2 text-xs text-rose-100">
-                AI failed: {aiError}
-              </div>
-            )}
-
-            {/* Destination tiles */}
-            <div className="mt-6">
-              <div className="mb-2 flex items-baseline justify-between">
-                <div className="text-[10px] font-mono uppercase tracking-[0.24em] text-white/55">
-                  Destinations
-                </div>
-                <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-white/45">
-                  {selectedCount} selected
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
-                {destinations.map((t) => {
-                  const on = isDestOn(t.id);
-                  return (
-                    <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => toggleDest(t.id)}
-                      aria-pressed={on}
-                      className={`group relative flex flex-col items-start gap-1 rounded-xl border px-3 py-3 text-left transition ${
-                        on
-                          ? "border-[#A1FBF9]/70 bg-[#A1FBF9]/10 shadow-[0_0_0_1px_rgba(161,251,249,0.35)]"
-                          : "border-white/15 bg-white/[0.04] hover:border-white/35 hover:bg-white/[0.08]"
-                      }`}
-                    >
-                      <span
-                        className={`text-[9px] font-mono uppercase tracking-[0.2em] ${on ? "text-[#A1FBF9]" : "text-white/45"}`}
-                      >
-                        {t.sub}
-                      </span>
-                      <span className="text-sm font-semibold leading-tight text-white">{t.label}</span>
-                      <span
-                        aria-hidden
-                        className={`absolute right-2 top-2 h-1.5 w-1.5 rounded-full transition ${on ? "bg-[#A1FBF9]" : "bg-white/25"}`}
-                      />
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Compact brand + prospect strip */}
-            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
-              <label className="block">
-                <span className="text-[10px] font-mono uppercase tracking-[0.24em] text-white/55">
-                  Prospect
-                </span>
-                <input
-                  value={prospect}
-                  onChange={(e) => setProspect(e.target.value)}
-                  placeholder="Company name"
-                  className="mt-1.5 w-full rounded-xl border border-white/15 bg-white/[0.06] px-3 py-2.5 text-sm text-white placeholder:text-white/35 focus:border-[#A1FBF9]/60 focus:outline-none"
-                />
-              </label>
-              <label className="block">
-                <span className="text-[10px] font-mono uppercase tracking-[0.24em] text-white/55">
-                  Brand mode
-                </span>
-                <div className="mt-1.5 flex gap-1.5 overflow-x-auto pb-1">
-                  {brandModes.map((b) => {
-                    const active = b.id === brandModeId;
-                    const c = b.tokens?.primary || "#003FC7";
-                    return (
-                      <button
-                        key={b.id}
-                        type="button"
-                        onClick={() => setBrandModeId(b.id)}
-                        aria-pressed={active}
-                        className={`shrink-0 rounded-xl border px-3 py-2 text-left text-[11px] font-semibold tracking-tight transition ${
-                          active
-                            ? "border-white/70 bg-white/15 text-white"
-                            : "border-white/15 bg-white/[0.04] text-white/70 hover:border-white/35 hover:text-white"
-                        }`}
-                        style={active ? { boxShadow: `inset 0 -2px 0 0 ${c}` } : undefined}
-                        title={b.name}
-                      >
-                        {b.name}
-                      </button>
-                    );
-                  })}
-                </div>
-              </label>
-            </div>
-
-            <div className="mt-5 flex items-center justify-between text-[11px] text-white/55">
-              <span>
-                Assembling under{" "}
-                <strong className="font-semibold text-white">{brand?.name ?? "brand"}</strong>. Refine
-                everything else on the deck page.
-              </span>
-              <span
-                className="inline-block h-2 w-8 rounded-full"
-                style={{
-                  background: `linear-gradient(90deg, ${brandPrimary}, ${brandAccent})`,
+        {/* AI prompt bar */}
+        <section className="mt-14">
+          <div className="rounded-2xl border border-black/10 bg-white p-2 shadow-[0_1px_0_0_rgba(0,0,0,0.02)] transition focus-within:border-[#003FC7]/50 focus-within:shadow-[0_8px_24px_-16px_rgba(0,63,199,0.35)]">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+              <textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                    e.preventDefault();
+                    if (!busy) void generateWithAi();
+                  }
                 }}
+                rows={2}
+                placeholder="e.g. Pilot pitch for Acme Global expanding into 12 markets, meeting VP Marketing next Tuesday…"
+                className="flex-1 resize-none bg-transparent px-4 py-3 text-[15px] leading-snug text-[#03002C] placeholder:text-black/35 focus:outline-none"
               />
+              <div className="flex flex-row items-center gap-2 sm:flex-col sm:items-stretch sm:justify-between sm:px-1 sm:pb-1">
+                <button
+                  type="button"
+                  onClick={() => void generateWithAi()}
+                  disabled={busy || selectedCount === 0}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#003FC7] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#03002C] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {busy
+                    ? aiStatus === "assembling"
+                      ? "Assembling…"
+                      : aiStatus === "knowledge"
+                        ? "Pulling context…"
+                        : "Personalizing…"
+                    : "Generate"}
+                  <span className="hidden font-mono text-[10px] font-normal opacity-70 sm:inline">⌘↵</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void generateFast()}
+                  disabled={busy || selectedCount === 0}
+                  className="text-[11px] font-medium uppercase tracking-widest text-black/50 transition hover:text-black disabled:opacity-40"
+                >
+                  {expanding ? "Producing…" : "or skip AI →"}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {aiStatus === "error" && aiError && (
+            <div className="mt-3 rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+              AI failed: {aiError}
+            </div>
+          )}
+        </section>
+
+        {/* Destination tiles */}
+        <section className="mt-16">
+          <div className="mb-5 flex items-baseline justify-between">
+            <div className="text-[11px] font-mono uppercase tracking-[0.24em] text-black/55">
+              Destinations
+            </div>
+            <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-black/40">
+              {selectedCount} selected
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+            {destinations.map((t) => {
+              const on = isDestOn(t.id);
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => toggleDest(t.id)}
+                  aria-pressed={on}
+                  className={`group relative flex min-h-[92px] flex-col items-start justify-end gap-1 rounded-2xl border px-4 py-4 text-left transition ${
+                    on
+                      ? "border-[#003FC7] bg-[#003FC7]/[0.04] shadow-[0_0_0_1px_rgba(0,63,199,0.35)]"
+                      : "border-black/10 bg-white hover:border-black/30"
+                  }`}
+                >
+                  <span
+                    className={`text-[9px] font-mono uppercase tracking-[0.2em] ${on ? "text-[#003FC7]" : "text-black/45"}`}
+                  >
+                    {t.sub}
+                  </span>
+                  <span className="text-sm font-semibold leading-tight text-[#03002C]">{t.label}</span>
+                  <span
+                    aria-hidden
+                    className={`absolute right-3 top-3 h-1.5 w-1.5 rounded-full transition ${on ? "bg-[#003FC7]" : "bg-black/15"}`}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Brand + prospect */}
+        <section className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
+          <label className="block">
+            <span className="text-[11px] font-mono uppercase tracking-[0.24em] text-black/55">
+              Prospect
+            </span>
+            <input
+              value={prospect}
+              onChange={(e) => setProspect(e.target.value)}
+              placeholder="Company name"
+              className="mt-2 w-full rounded-xl border border-black/10 bg-white px-3 py-3 text-sm text-[#03002C] placeholder:text-black/35 focus:border-[#003FC7]/60 focus:outline-none"
+            />
+          </label>
+          <div>
+            <span className="text-[11px] font-mono uppercase tracking-[0.24em] text-black/55">
+              Brand mode
+            </span>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {brandModes.map((b) => {
+                const active = b.id === brandModeId;
+                const c = b.tokens?.primary || "#003FC7";
+                return (
+                  <button
+                    key={b.id}
+                    type="button"
+                    onClick={() => setBrandModeId(b.id)}
+                    aria-pressed={active}
+                    className={`rounded-xl border px-3 py-2 text-left text-[11px] font-semibold tracking-tight transition ${
+                      active
+                        ? "border-[#03002C] bg-[#03002C] text-white"
+                        : "border-black/10 bg-white text-black/65 hover:border-black/30 hover:text-black"
+                    }`}
+                    style={active ? { boxShadow: `inset 0 -2px 0 0 ${c}` } : undefined}
+                    title={b.name}
+                  >
+                    {b.name}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </section>
+
+        <div className="mt-16 flex items-center justify-between border-t border-black/10 pt-5 text-[11px] text-black/50">
+          <span>
+            Assembling under{" "}
+            <strong className="font-semibold text-[#03002C]">{brand?.name ?? "brand"}</strong>. Refine
+            everything else on the deck page.
+          </span>
+          <span
+            className="inline-block h-2 w-10 rounded-full"
+            style={{
+              background: `linear-gradient(90deg, ${brandPrimary}, ${brandAccent})`,
+            }}
+          />
+        </div>
       </div>
     </AppShell>
   );
 }
+
