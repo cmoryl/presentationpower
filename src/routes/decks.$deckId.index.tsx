@@ -1934,7 +1934,7 @@ function AccordionGroup({
           <path d="M3 4.5 L6 7.5 L9 4.5" />
         </svg>
       </summary>
-      <div className="absolute left-0 top-[calc(100%+6px)] z-40 flex items-center gap-1 whitespace-nowrap rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)]">
+      <div className="absolute left-0 top-[calc(100%+6px)] z-[60] flex items-center gap-1 whitespace-nowrap rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)]">
         {children}
       </div>
     </details>
