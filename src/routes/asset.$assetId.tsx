@@ -995,6 +995,9 @@ function AssetEditor() {
               brand={brand}
               kind={kind}
               assetId={row?.id ?? null}
+              hasTitle={!!(content as { title?: string }).title?.trim()}
+              hasSummary={!!(content as { summary?: string }).summary?.trim()}
+              modules={(content as { modules?: PrintSection[] }).modules}
             />
 
 
