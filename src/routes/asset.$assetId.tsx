@@ -1534,7 +1534,11 @@ function HeroMediaPanel({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [preview, setPreview] = useState<
-    | { toUpdate: Array<{ id: string; title: string }>; toSkip: Array<{ id: string; title: string; reason: "customized" }>; scanned: number }
+    | {
+        toUpdate: Array<{ id: string; title: string; heroMediaJson: string | null }>;
+        toSkip: Array<{ id: string; title: string; reason: "customized"; heroMediaJson: string | null }>;
+        scanned: number;
+      }
     | null
   >(null);
   const [previewError, setPreviewError] = useState<string | null>(null);
