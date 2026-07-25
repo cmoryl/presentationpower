@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { CloudOff, CloudUpload, Loader2 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
