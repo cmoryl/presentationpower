@@ -1679,12 +1679,17 @@ function HeroMediaPanel({
           <div className="flex items-start gap-2 rounded-md bg-[#A6FA87]/20 px-2 py-1.5 text-[11px] text-[#0F5C1A] dark:bg-[#A6FA87]/15 dark:text-[#A6FA87]">
             <span className="mt-0.5 inline-block h-3 w-3 shrink-0 rounded-full bg-[#A6FA87]" />
             <span>
-              Success: applied to <strong>{applySummary.updated}</strong> of{" "}
+              Applied to <strong>{applySummary.updated}</strong> of{" "}
               <strong>{applySummary.scanned}</strong> {kind.replace("-", " ")} asset
-              {applySummary.scanned === 1 ? "" : "s"}.
+              {applySummary.scanned === 1 ? "" : "s"}
+              {applySummary.skipped > 0 ? (
+                <> · <strong>{applySummary.skipped}</strong> left untouched (customized focal / scrim / wash)</>
+              ) : null}
+              .
             </span>
           </div>
         )}
+
 
         {applySummary && applySummary.status === "error" && (
           <div className="space-y-1 rounded-md bg-[#E53D2E]/10 px-2 py-1.5 text-[11px] text-[#E53D2E] dark:bg-[#E53D2E]/15 dark:text-[#FF9B70]">
