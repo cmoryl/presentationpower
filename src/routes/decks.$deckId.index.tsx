@@ -1098,18 +1098,22 @@ function SlideLightbox({
   label,
   onPrev,
   onNext,
+  suppressEscape,
 }: {
   children: React.ReactNode;
   onClose: () => void;
   label: string;
   onPrev?: () => void;
   onNext?: () => void;
+  suppressEscape?: boolean;
 }) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      else if (e.key === "ArrowLeft" && onPrev) onPrev();
-      else if (e.key === "ArrowRight" && onNext) onNext();
+      const t = e.target as HTMLElement | null;
+      const editing = !!t && (t.isContentEditable || t.tagName === "INPUT" || t.tagName === "TEXTAREA");
+      if (e.key === "Escape" && !suppressEscape && !editing) onClose();
+      else if (e.key === "ArrowLeft" && onPrev && !editing) onPrev();
+      else if (e.key === "ArrowRight" && onNext && !editing) onNext();
     };
     window.addEventListener("keydown", handler);
     const prev = document.body.style.overflow;
@@ -1118,7 +1122,7 @@ function SlideLightbox({
       window.removeEventListener("keydown", handler);
       document.body.style.overflow = prev;
     };
-  }, [onClose, onPrev, onNext]);
+  }, [onClose, onPrev, onNext, suppressEscape]);
 
   return (
     <div
