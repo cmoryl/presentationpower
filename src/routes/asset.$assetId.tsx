@@ -65,6 +65,7 @@ import { CONTENT_SCHEMAS, unreachablePaths } from "@/lib/print-content-schema";
 
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { SectionSelectOverlay } from "@/components/print/SectionSelectOverlay";
+import { ConfirmModal } from "@/components/ConfirmModal";
 import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2, Sun, Moon, ChevronDown, ChevronRight, Eye, EyeOff, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { uploadSlideMedia } from "@/lib/slide-media";
@@ -1526,11 +1527,16 @@ function HeroMediaPanel({
   const [uploading, setUploading] = useState(false);
   const applyAll = useServerFn(applyHeroToAllPrintAssets);
   const [applyingAll, setApplyingAll] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
-  async function handleApplyToAll() {
+  function handleApplyToAll() {
+    if (!enabled || !divisionId) return;
+    setConfirmOpen(true);
+  }
+
+  async function handleConfirmApply() {
     if (!enabled || !divisionId) return;
     const label = kind.replace("-", " ");
-    if (!confirm(`Apply this hero image to every "${label}" print asset in this division? This overwrites their current hero.`)) return;
     const tid = toast.loading("Applying hero to all templates…");
     setApplyingAll(true);
     try {
@@ -1543,6 +1549,7 @@ function HeroMediaPanel({
         },
       });
       toast.success(`Applied to ${res.updated} of ${res.scanned} ${label} asset${res.scanned === 1 ? "" : "s"}.`, { id: tid });
+      setConfirmOpen(false);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Bulk apply failed.", { id: tid });
     } finally {
@@ -1637,6 +1644,17 @@ function HeroMediaPanel({
           {applyingAll ? "Applying…" : "Apply to all"}
         </button>
       </div>
+
+      <ConfirmModal
+        open={confirmOpen}
+        title="Apply hero to all templates?"
+        description={`This will overwrite the hero image on every "${kind.replace("-", " ")}" print asset in this division with the current hero and its settings.`}
+        confirmLabel="Apply to all"
+        cancelLabel="Cancel"
+        busy={applyingAll}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={handleConfirmApply}
+      />
 
       {/* Curated pool strip */}
       <div className="space-y-1.5">
