@@ -109,8 +109,9 @@ test.describe("Library lightbox mode switch", () => {
     );
     const lightSrc = lightSnap.src;
 
-    // Flip the in-lightbox toggle to DARK.
-    await page.getByRole("button", { name: /Dark/ }).click();
+    // Flip the in-lightbox toggle to DARK (scope to lightbox — the page
+    // header also has a "☾ Dark" button that would trip strict mode).
+    await page.getByLabel("Enlarged slide preview").getByRole("button", { name: /Dark/ }).click();
 
     // Dark stage takes over; the light stage should no longer exist.
     const darkStage = page.locator(`${LIGHTBOX}[data-preview-mode="dark"]`);
