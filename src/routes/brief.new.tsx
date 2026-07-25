@@ -445,7 +445,11 @@ function BriefWizard() {
 
               {/* REQUIRED: Prospect Name + Meeting Objective */}
               <section id="prospect" className="scroll-mt-24 space-y-6">
-                <label className={labelCls}>Prospect</label>
+                <SectionHeader
+                  index="02 · Prospect"
+                  title="Who's this brief for?"
+                  description="The prospect name and meeting objective anchor every artifact's opening framing."
+                />
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <Field label="Prospect Name">
                     <input
@@ -465,6 +469,7 @@ function BriefWizard() {
                   </Field>
                 </div>
               </section>
+
 
               {/* REFINE: narrative, palette, AI strategist */}
 
