@@ -1675,3 +1675,112 @@ function SpeakerNotesPanel({ value, onChange }: { value: string; onChange: (v: s
 }
 
 
+
+const TRANSITION_TYPES: { value: TransitionType; label: string }[] = [
+  { value: "none", label: "None" },
+  { value: "cut", label: "Cut" },
+  { value: "fade", label: "Fade" },
+  { value: "push-left", label: "Push ←" },
+  { value: "push-right", label: "Push →" },
+  { value: "zoom", label: "Zoom" },
+];
+
+const SPEED_PRESETS: { key: "fast" | "med" | "slow"; label: string; durationMs: number }[] = [
+  { key: "fast", label: "Fast", durationMs: 250 },
+  { key: "med", label: "Med", durationMs: 400 },
+  { key: "slow", label: "Slow", durationMs: 600 },
+];
+
+function speedKey(ms?: number): "fast" | "med" | "slow" {
+  if (ms == null) return "med";
+  if (ms <= 300) return "fast";
+  if (ms >= 550) return "slow";
+  return "med";
+}
+
+function TransitionPicker({
+  slide,
+  deckDefault,
+  onSlideChange,
+  onDeckDefaultChange,
+}: {
+  slide: DeckSlide;
+  deckDefault: SlideTransition | undefined;
+  onSlideChange: (t: SlideTransition | null) => void;
+  onDeckDefaultChange: (t: SlideTransition | null) => void;
+}) {
+  const resolved = resolveSlideTransition(slide, { defaultTransition: deckDefault });
+  const usingSlideOverride = Boolean(slide.transition);
+  const base: SlideTransition = usingSlideOverride
+    ? (slide.transition as SlideTransition)
+    : deckDefault ?? DEFAULT_SLIDE_TRANSITION;
+  const speed = speedKey(base.durationMs);
+
+  function updateSlide(patch: Partial<SlideTransition>) {
+    onSlideChange({ ...base, ...patch });
+  }
+
+  function updateDeck(patch: Partial<SlideTransition>) {
+    const next: SlideTransition = { ...(deckDefault ?? DEFAULT_SLIDE_TRANSITION), ...patch };
+    onDeckDefaultChange(next);
+  }
+
+  return (
+    <div
+      className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white px-2 py-1 text-[11px] font-medium uppercase tracking-widest text-black/70"
+      title="Slide transition (played on-screen only in Pass 1)"
+      data-testid="transition-picker"
+    >
+      <span className="pl-1 text-black/40">Transition</span>
+      <select
+        aria-label="Transition type"
+        value={resolved.type}
+        onChange={(e) => updateSlide({ type: e.target.value as TransitionType })}
+        className="rounded-full bg-transparent px-1 py-0.5 text-[11px] font-medium uppercase tracking-widest text-black focus:outline-none"
+      >
+        {TRANSITION_TYPES.map((t) => (
+          <option key={t.value} value={t.value}>
+            {t.label}
+          </option>
+        ))}
+      </select>
+      <span className="text-black/25">·</span>
+      <select
+        aria-label="Transition speed"
+        value={speed}
+        onChange={(e) => {
+          const preset = SPEED_PRESETS.find((p) => p.key === e.target.value);
+          if (preset) updateSlide({ durationMs: preset.durationMs });
+        }}
+        className="rounded-full bg-transparent px-1 py-0.5 text-[11px] font-medium uppercase tracking-widest text-black focus:outline-none"
+      >
+        {SPEED_PRESETS.map((p) => (
+          <option key={p.key} value={p.key}>
+            {p.label}
+          </option>
+        ))}
+      </select>
+      <button
+        type="button"
+        onClick={() => {
+          updateDeck({ type: resolved.type, durationMs: resolved.durationMs });
+          onSlideChange(null);
+        }}
+        className="rounded-full border border-black/10 px-2 py-0.5 text-[9px] uppercase tracking-widest text-black/50 hover:border-[#003FC7] hover:text-[#003FC7]"
+        title="Make this the deck-wide default"
+      >
+        Set default
+      </button>
+      {usingSlideOverride && (
+        <button
+          type="button"
+          onClick={() => onSlideChange(null)}
+          className="text-[9px] uppercase tracking-widest text-black/40 hover:text-red-600"
+          title="Clear this slide's override (fall back to deck default)"
+        >
+          Reset
+        </button>
+      )}
+    </div>
+  );
+}
