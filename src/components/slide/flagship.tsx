@@ -27,7 +27,7 @@
 // fall back to a sensible default per component.
 
 import type { CSSProperties, ReactNode } from "react";
-import { useMemo } from "react";
+import { useId, useMemo } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import { useSlideMode, useSlideAccent, useSlideInk } from "./SlideChrome";
 import { auroraOrbs, auroraLayerOpacity } from "@/lib/aurora-svg";
