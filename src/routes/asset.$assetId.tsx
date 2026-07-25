@@ -976,6 +976,7 @@ function AssetEditor() {
               value={content.heroMedia}
               onChange={(next) => patchContent({ heroMedia: next })}
               divisionId={row?.brand_mode_id ?? null}
+              brand={brand}
             />
 
             
