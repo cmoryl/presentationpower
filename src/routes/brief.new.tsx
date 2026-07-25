@@ -469,6 +469,7 @@ function BriefWizard() {
 
                 {brand && <BrandRelevancePanel brand={brand} />}
               </section>
+              </>)}
 
               {/* REQUIRED: Prospect Name + Meeting Objective */}
               <section className="space-y-6">
