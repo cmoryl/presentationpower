@@ -1645,6 +1645,17 @@ function HeroMediaPanel({
         </button>
       </div>
 
+      <ConfirmModal
+        open={confirmOpen}
+        title="Apply hero to all templates?"
+        description={`This will overwrite the hero image on every "${kind.replace("-", " ")}" print asset in this division with the current hero and its settings.`}
+        confirmLabel="Apply to all"
+        cancelLabel="Cancel"
+        busy={applyingAll}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={handleConfirmApply}
+      />
+
       {/* Curated pool strip */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
