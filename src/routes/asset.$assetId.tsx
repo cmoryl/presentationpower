@@ -1583,6 +1583,9 @@ function HeroMediaPanel({
           }
         />
       </Row>
+      {/* Live hero preview — updates as heroMedia changes (image, focal,
+          scrim, wash, aspect). Gives the picker an immediate WYSIWYG loop. */}
+      <HeroPreviewPanel media={value} brand={brand} />
       {/* Curated pool strip */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
