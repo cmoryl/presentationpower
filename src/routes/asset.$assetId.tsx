@@ -1143,13 +1143,16 @@ function AssetEditor() {
 }
 
 function ModulesPanel({
-  kind, modules, onAdd, onChange, mode,
+  kind, modules, onAdd, onChange, mode, heroMedia, hasTitle, hasSummary,
 }: {
   kind: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
   modules: PrintSection[];
   onAdd: () => void;
   onChange: (next: PrintSection[]) => void;
   mode: PrintMode;
+  heroMedia?: PrintHeroMedia;
+  hasTitle?: boolean;
+  hasSummary?: boolean;
 }) {
   const editorMode = mode;
   function move(i: number, dir: -1 | 1) {
@@ -1178,9 +1181,14 @@ function ModulesPanel({
   }
 
   // Weight the lightest known variant so a "no room" verdict really means no
-  // room even for the smallest module.
+  // room even for the smallest module. Hero-aware — the effective budget
+  // shrinks as the hero band grows.
   const lightestWeight = 1.6;
-  const gate = canAddModule(kind, modules, lightestWeight);
+  const gate = canAddModule(kind, modules, lightestWeight, {
+    heroMedia,
+    copy: { hasTitle: !!hasTitle, hasSummary: !!hasSummary },
+  });
+
 
   // Insertion index (0..modules.length) where a dragged item would land, plus
   // the source of the drag so we can style the indicator differently for
