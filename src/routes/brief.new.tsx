@@ -1640,3 +1640,112 @@ function KnowledgeUsedPanel({
     </div>
   );
 }
+
+function ReviewSummary({
+  brand,
+  brandPrimary,
+  form,
+  masterSet,
+  effectiveArchetypeId,
+  strategy,
+  narrativeArchetypes,
+}: {
+  brand: BrandMode | undefined;
+  brandPrimary: string;
+  form: {
+    prospect: string;
+    industry: string;
+    meetingObjective: string;
+    audience: string;
+    clientFacts: string;
+    lengthTarget: number;
+    subCompany: string;
+  };
+  masterSet: {
+    presentation: boolean;
+    print: { enabled: boolean; kinds: string[] };
+    event: { enabled: boolean; playbookId: string | null };
+    social: { enabled: boolean; playbookId: string | null };
+  };
+  effectiveArchetypeId: string;
+  strategy: DeckStrategy | null;
+  narrativeArchetypes: Array<{ id: string; name: string }>;
+}) {
+  const archetype = narrativeArchetypes.find((a) => a.id === effectiveArchetypeId);
+  const outputs: string[] = [];
+  if (masterSet.presentation) outputs.push("Presentation deck");
+  if (masterSet.print.enabled) outputs.push(`${masterSet.print.kinds.length} print asset${masterSet.print.kinds.length > 1 ? "s" : ""}`);
+  if (masterSet.event.enabled) outputs.push("Event kit");
+  if (masterSet.social.enabled) outputs.push("Social kit");
+  return (
+    <section
+      className="rounded-2xl border bg-white p-6 shadow-[0_2px_20px_-8px_rgba(3,0,44,0.08)] md:p-8"
+      style={{ borderColor: PALETTE.hairline }}
+    >
+      <div className="mb-5 flex items-baseline gap-3">
+        <span className="font-mono text-xs uppercase tracking-[0.18em]" style={{ color: brandPrimary }}>
+          05 · Review
+        </span>
+        <span className="text-xs text-[#03002C]/45">Confirm the brief, then generate the master set.</span>
+      </div>
+      <dl className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2">
+        <ReviewRow label="Brand">
+          {brand?.name ?? "—"}
+          {form.subCompany ? <span className="ml-2 text-[#1E2749]/60">· {form.subCompany}</span> : null}
+        </ReviewRow>
+        <ReviewRow label="Prospect">{form.prospect || "—"}</ReviewRow>
+        <ReviewRow label="Objective">{form.meetingObjective || "—"}</ReviewRow>
+        <ReviewRow label="Audience">{form.audience || <span className="text-[#1E2749]/50">not set</span>}</ReviewRow>
+        <ReviewRow label="Industry">{form.industry || <span className="text-[#1E2749]/50">not set</span>}</ReviewRow>
+        <ReviewRow label="Narrative">
+          {archetype?.name ?? "—"} · {form.lengthTarget} slides
+        </ReviewRow>
+        <ReviewRow label="AI plan">
+          {strategy ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[11px] font-semibold text-[#003FC7]">
+              ✓ Strategist plan attached · {strategy.recommendedSections.length} sections
+            </span>
+          ) : (
+            <span className="text-[#1E2749]/50">Optional — will assemble from atlas</span>
+          )}
+        </ReviewRow>
+        <ReviewRow label="Producing">
+          <div className="flex flex-wrap gap-1.5">
+            {outputs.length > 0 ? (
+              outputs.map((o) => (
+                <span
+                  key={o}
+                  className="rounded-full border px-2.5 py-0.5 text-[11px] font-semibold"
+                  style={{
+                    borderColor: `${brandPrimary}55`,
+                    backgroundColor: `${brandPrimary}12`,
+                    color: brandPrimary,
+                  }}
+                >
+                  {o}
+                </span>
+              ))
+            ) : (
+              <span className="text-[#1E2749]/50">Nothing selected — go back to step 3</span>
+            )}
+          </div>
+        </ReviewRow>
+      </dl>
+      {form.clientFacts && (
+        <div className="mt-5 rounded-lg border p-3 text-xs leading-relaxed text-[#1E2749]" style={{ borderColor: PALETTE.hairline, backgroundColor: PALETTE.field }}>
+          <div className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#1E2749]/60">Client facts</div>
+          {form.clientFacts}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ReviewRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <dt className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#1E2749]/60">{label}</dt>
+      <dd className="mt-1 text-sm font-medium text-[#03002C]">{children}</dd>
+    </div>
+  );
+}
