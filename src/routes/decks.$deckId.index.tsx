@@ -453,7 +453,7 @@ function DeckEditor() {
               )}
             </div>
           ) : liveEdit ? (
-            <div className="relative block w-full overflow-hidden rounded-2xl border border-[#003FC7]/40 shadow-lg ring-1 ring-[#003FC7]/20">
+            <div className="relative block w-full overflow-hidden rounded-2xl border border-[#003FC7]/40 text-left shadow-lg ring-1 ring-[#003FC7]/20">
               {active && mv && (
                 <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
                   <LiveEditOverlay
