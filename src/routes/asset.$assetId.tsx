@@ -1714,7 +1714,8 @@ function HeroMediaPanel({
       <ConfirmModal
         open={confirmOpen}
         title="Apply hero to all templates?"
-        description={`This will overwrite the hero image on every "${kind.replace("-", " ")}" print asset in this division with the current hero and its settings.`}
+        description={`Applies the current hero to every "${kind.replace("-", " ")}" print asset in this division that still uses the default focal, scrim, and wash settings. Templates with custom tuning are left untouched.`}
+
         confirmLabel="Apply to all"
         cancelLabel="Cancel"
         busy={applyingAll}
