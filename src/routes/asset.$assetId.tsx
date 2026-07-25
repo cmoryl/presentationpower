@@ -53,6 +53,7 @@ import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
+import { HeroCostDebugPanel } from "@/components/print/HeroCostDebugPanel";
 import { HeroDiffTile } from "@/components/print/HeroDiffTile";
 import type { BrandMode } from "@/lib/taxonomy";
 
@@ -995,6 +996,9 @@ function AssetEditor() {
               brand={brand}
               kind={kind}
               assetId={row?.id ?? null}
+              hasTitle={!!(content as { title?: string }).title?.trim()}
+              hasSummary={!!(content as { summary?: string }).summary?.trim()}
+              modules={(content as { modules?: PrintSection[] }).modules}
             />
 
 
@@ -1555,6 +1559,9 @@ function HeroMediaPanel({
   brand,
   kind,
   assetId,
+  hasTitle = false,
+  hasSummary = false,
+  modules,
 }: {
   value: PrintHeroMedia | undefined;
   onChange: (next: PrintHeroMedia | undefined) => void;
@@ -1562,6 +1569,9 @@ function HeroMediaPanel({
   brand: BrandMode | undefined;
   kind: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
   assetId: string | null;
+  hasTitle?: boolean;
+  hasSummary?: boolean;
+  modules?: PrintSection[];
 }) {
   const enabled = !!value?.imageUrl;
   const media: PrintHeroMedia = value ?? { imageUrl: "" };
@@ -1769,6 +1779,13 @@ function HeroMediaPanel({
       {/* Live hero preview — updates as heroMedia changes (image, focal,
           scrim, wash, aspect). Gives the picker an immediate WYSIWYG loop. */}
       <HeroPreviewPanel media={value} brand={brand} />
+      <HeroCostDebugPanel
+        kind={kind}
+        media={value}
+        hasTitle={hasTitle}
+        hasSummary={hasSummary}
+        modules={modules}
+      />
       {/* One-click bulk-apply — writes the current hero to every sibling
           print asset of the same kind under this division. */}
       <div className="space-y-2 rounded-md border border-black/10 bg-black/[0.02] px-2 py-1.5 dark:border-white/10 dark:bg-white/[0.03]">
