@@ -1954,18 +1954,24 @@ function AccordionGroup({
     ).filter((el) => !el.hasAttribute("data-focus-skip"));
   }, []);
 
-  // Focus first element on open + edge-detect anchor to keep panel on-screen
+  // Focus first element on open + edge-detect anchor to keep panel on-screen.
+  // Edge case: if the panel has zero focusable descendants we must NOT trap
+  // the user inside an unreachable region. Focus the panel container itself
+  // (tabindex=-1 gives it a programmatic focus target) so screen readers
+  // announce the group and Escape/Tab still return control to the trigger.
   useEffect(() => {
     if (!open) return;
-    // Anchor from the right if the trigger is past the horizontal midpoint,
-    // so the panel opens inward rather than off-screen on narrow widths.
     const rect = triggerRef.current?.getBoundingClientRect();
     if (rect) {
       const vw = window.innerWidth;
       setAnchor(rect.left + rect.width / 2 > vw / 2 ? "right" : "left");
     }
     const els = getFocusable();
-    if (els.length > 0) els[0]?.focus();
+    if (els.length > 0) {
+      els[0]?.focus();
+    } else {
+      panelRef.current?.focus();
+    }
   }, [open, getFocusable]);
 
 
@@ -1990,17 +1996,32 @@ function AccordionGroup({
     };
   }, [open]);
 
-  // Focus trap via Tab cycling
+  // Focus trap via Tab cycling.
+  // Edge case: with zero focusables there is nothing to cycle to, so Tab
+  // closes the popover and returns focus to the trigger (forward Tab) or
+  // lets the browser move focus to the previous element (Shift+Tab). This
+  // avoids swallowing keystrokes in an empty panel.
   const onPanelKeyDown = (e: React.KeyboardEvent) => {
     if (e.key !== "Tab") return;
     const els = getFocusable();
     if (els.length === 0) {
-      e.preventDefault();
+      setOpen(false);
+      if (!e.shiftKey) {
+        e.preventDefault();
+        triggerRef.current?.focus();
+      }
       return;
     }
     const first = els[0];
     const last = els[els.length - 1];
     const activeEl = document.activeElement as HTMLElement | null;
+    // If focus is on the panel itself (empty-panel fallback state that just
+    // gained a focusable via async render), send Tab to the first element.
+    if (activeEl === panelRef.current) {
+      e.preventDefault();
+      (e.shiftKey ? last : first).focus();
+      return;
+    }
     if (e.shiftKey && activeEl === first) {
       e.preventDefault();
       last.focus();
