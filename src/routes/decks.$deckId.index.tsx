@@ -480,7 +480,7 @@ function DeckEditor() {
               onClick={() => setZoomed(true)}
               title="Click to view larger"
               aria-label="View slide larger"
-              className="group relative block w-full overflow-hidden rounded-2xl border border-black/10 shadow-lg transition hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B2A4A]"
+              className="group relative block w-full overflow-hidden rounded-2xl border border-black/10 text-left shadow-lg transition hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0B2A4A]"
             >
               {active && mv && (
                 <SlideVideoPreviewContext.Provider value={setVideoPreviewUrl}>
