@@ -39,14 +39,18 @@ function MiniHero({
   accent,
   label,
   dimmed = false,
+  heightPct: heightPctProp,
+  highlightHeight = false,
 }: {
   media: PrintHeroMedia | null;
   accent: string;
   label: string;
   dimmed?: boolean;
+  heightPct?: number;
+  highlightHeight?: boolean;
 }) {
   const hasMedia = !!media?.imageUrl;
-  const heightPct = media?.heightPct ?? 46;
+  const heightPct = heightPctProp ?? media?.heightPct ?? 46;
   const focalX = typeof media?.focalX === "number" ? media.focalX : 50;
   const focalY = typeof media?.focalY === "number" ? media.focalY : 40;
   const washStrength = media?.washStrength ?? 1;
