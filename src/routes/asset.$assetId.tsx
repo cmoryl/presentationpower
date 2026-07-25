@@ -1747,19 +1747,48 @@ function HeroMediaPanel({
         )}
 
         {applySummary && applySummary.status === "success" && (
-          <div className="flex items-start gap-2 rounded-md bg-[#A6FA87]/20 px-2 py-1.5 text-[11px] text-[#0F5C1A] dark:bg-[#A6FA87]/15 dark:text-[#A6FA87]">
-            <span className="mt-0.5 inline-block h-3 w-3 shrink-0 rounded-full bg-[#A6FA87]" />
+          <div className="space-y-1.5 rounded-md bg-[#A6FA87]/20 px-2 py-1.5 text-[11px] text-[#0F5C1A] dark:bg-[#A6FA87]/15 dark:text-[#A6FA87]">
+            <div className="flex items-start gap-2">
+              <span className="mt-0.5 inline-block h-3 w-3 shrink-0 rounded-full bg-[#A6FA87]" />
+              <span>
+                Applied to <strong>{applySummary.updated}</strong> of{" "}
+                <strong>{applySummary.scanned}</strong> {kind.replace("-", " ")} asset
+                {applySummary.scanned === 1 ? "" : "s"}
+                {applySummary.skipped > 0 ? (
+                  <> · <strong>{applySummary.skipped}</strong> left untouched (customized focal / scrim / wash)</>
+                ) : null}
+                .
+              </span>
+            </div>
+            {lastUndo && (
+              <div className="flex items-center justify-between gap-2 pl-5">
+                <span className="text-[10px] opacity-80">
+                  Not what you expected? Restore the previous hero on {lastUndo.snapshots.length} template
+                  {lastUndo.snapshots.length === 1 ? "" : "s"}.
+                </span>
+                <button
+                  type="button"
+                  onClick={handleUndoApply}
+                  disabled={undoing}
+                  className="rounded border border-current/40 bg-white/60 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] transition hover:bg-white disabled:opacity-40 dark:bg-black/30 dark:hover:bg-black/50"
+                >
+                  {undoing ? "Reverting…" : "Undo"}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {applySummary && applySummary.status === "undone" && (
+          <div className="flex items-start gap-2 rounded-md bg-black/[0.04] px-2 py-1.5 text-[11px] text-black/70 dark:bg-white/[0.06] dark:text-white/70">
+            <span className="mt-0.5 inline-block h-3 w-3 shrink-0 rounded-full bg-black/40 dark:bg-white/40" />
             <span>
-              Applied to <strong>{applySummary.updated}</strong> of{" "}
-              <strong>{applySummary.scanned}</strong> {kind.replace("-", " ")} asset
-              {applySummary.scanned === 1 ? "" : "s"}
-              {applySummary.skipped > 0 ? (
-                <> · <strong>{applySummary.skipped}</strong> left untouched (customized focal / scrim / wash)</>
-              ) : null}
-              .
+              Reverted <strong>{applySummary.restored}</strong> template
+              {applySummary.restored === 1 ? "" : "s"} to the previous hero.
             </span>
           </div>
         )}
+
 
 
         {applySummary && applySummary.status === "error" && (
