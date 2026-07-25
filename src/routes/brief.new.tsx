@@ -930,10 +930,17 @@ function BriefWizard() {
                     </ul>
                   </div>
                 )}
+                </div>
               </section>
 
               {/* SECTION — REVIEW & GENERATE */}
-              <div id="generate" className="scroll-mt-24" />
+              <section id="generate" className="scroll-mt-24 space-y-6">
+                <SectionHeader
+                  index="05 · Generate"
+                  title="Review and launch"
+                  description="Confirm the brief, then generate the full master set in one pass."
+                />
+
               <ReviewSummary
                 brand={brand}
                 brandPrimary={brandPrimary}
