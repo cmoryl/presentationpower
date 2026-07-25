@@ -1059,12 +1059,18 @@ function AssetEditor() {
                       `Hero reduced to ${s.targetHeightPct}% (was ${Math.round(prev)}%) — freed ${s.frees.toFixed(1)} units`,
                     );
                   } else if (s.kind === "swap-variant") {
-                    const modules = [...(content.modules ?? [])];
+                    // Open a before/after preview modal instead of applying
+                    // instantly — the confirm handler in the modal below runs
+                    // the actual mutation once the user reviews the change.
+                    const modules = content.modules ?? [];
                     const cur = modules[s.moduleIndex];
                     if (cur && cur.kind === "stats") {
-                      modules[s.moduleIndex] = { ...cur, variantId: s.to as PrintStatsSection["variantId"] };
-                      patchContent({ modules });
-                      toast.success(`Swapped module ${s.moduleIndex + 1} → ${s.to}`);
+                      setPendingSwap({
+                        moduleIndex: s.moduleIndex,
+                        from: cur.variantId,
+                        to: s.to as PrintStatsVariant,
+                        frees: s.frees,
+                      });
                     }
                   }
                 }}
