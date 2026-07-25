@@ -23,7 +23,7 @@ import { getPlaybook, EVENT_PLAYBOOKS, getExpandedCollateral, type EventPlaybook
 import { KIT_PROFILES_BY_ID, SOCIAL_FORMATS_BY_ID } from "@/lib/social-formats";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { buildCampaignAssets, sourceFromVariant } from "@/lib/campaigns";
-import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
+import { AssetPreviewCard } from "@/components/campaigns/AssetPreviewCard";
 import { ForkPresetButton } from "@/components/campaigns/ForkPresetButton";
 import { CollateralGrid } from "@/components/campaigns/CollateralGrid";
 
