@@ -19,8 +19,10 @@ const MAX_PCT = 80;
 
 export function HeroResizeHandle({ canvasRef, media, onChange, disabledHint }: Props) {
   const heightPct = media?.heightPct ?? 46;
-  const aspect = media?.aspect ?? "fill";
-  const enabled = !!media?.imageUrl && aspect === "fill";
+  // Enabled whenever a hero image is set — the grip drives `heightPct`, which
+  // every aspect variant respects. (Previously gated on aspect === "fill",
+  // which made the grip look missing on band/square heroes.)
+  const enabled = !!media?.imageUrl;
   const [dragging, setDragging] = useState(false);
   const [hover, setHover] = useState(false);
   const startRef = useRef<{ y: number; startPct: number; height: number } | null>(null);
