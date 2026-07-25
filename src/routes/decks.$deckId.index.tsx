@@ -190,7 +190,7 @@ function DeckEditor() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-black/[0.07] bg-white/80 px-3 py-2 shadow-[0_1px_0_rgba(0,0,0,0.02),0_8px_24px_-16px_rgba(3,0,44,0.12)] backdrop-blur">
+        <div className="relative z-50 flex flex-wrap items-center gap-2 rounded-2xl border border-black/[0.07] bg-white/80 px-3 py-2 shadow-[0_1px_0_rgba(0,0,0,0.02),0_8px_24px_-16px_rgba(3,0,44,0.12)] backdrop-blur">
           <AccordionGroup label="History">
             <UndoRedoControls />
           </AccordionGroup>
@@ -203,13 +203,13 @@ function DeckEditor() {
                 aria-label="Comments"
                 className={`relative inline-flex h-9 w-9 items-center justify-center rounded-full transition ${
                   commentsOpen
-                    ? "bg-[#003FC7] text-white"
-                    : "text-black/60 hover:bg-black/[0.04] hover:text-[#003FC7]"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-black/60 hover:bg-black/[0.04] hover:text-primary"
                 }`}
               >
                 <MessageSquare size={16} strokeWidth={1.75} />
                 {totalOpen > 0 && (
-                  <span className={`absolute -right-0.5 -top-0.5 inline-flex min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-semibold ${commentsOpen ? "bg-white text-[#003FC7]" : "bg-[#003FC7] text-white"}`}>
+                  <span className={`absolute -right-0.5 -top-0.5 inline-flex min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-semibold ${commentsOpen ? "bg-primary-foreground text-primary" : "bg-primary text-primary-foreground"}`}>
                     {totalOpen}
                   </span>
                 )}
@@ -222,20 +222,12 @@ function DeckEditor() {
                 type="button"
                 onClick={() => setDeckContext(deckId, { logoOrientation: logoOrientation === "horizontal" ? "stacked" : "horizontal" })}
                 aria-label="Toggle logo orientation"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/60 transition hover:bg-black/[0.04] hover:text-[#003FC7]"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/60 transition hover:bg-black/[0.04] hover:text-primary"
               >
                 {logoOrientation === "stacked" ? <Rows2 size={16} strokeWidth={1.75} /> : <RectangleHorizontal size={16} strokeWidth={1.75} />}
               </button>
             </Tip>
             <Tip label="Mark as template"><TemplateToggleButton deckId={deckId} /></Tip>
-          </AccordionGroup>
-
-          <AccordionGroup label="Distribute">
-            <Tip label="Save to cloud"><SaveToCloudButton deckId={deckId} /></Tip>
-            <Tip label="Version history"><VersionHistoryButton deckId={deckId} /></Tip>
-            <Tip label="Translate"><TranslateButton deckId={deckId} /></Tip>
-            <Tip label="Language"><LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} /></Tip>
-            <Tip label="Share"><ShareMenu deckId={deckId} /></Tip>
           </AccordionGroup>
 
           {active && (
@@ -300,6 +292,14 @@ function DeckEditor() {
                 </AccordionGroup>
               )}
 
+              <AccordionGroup label="Distribute">
+                <Tip label="Save to cloud"><SaveToCloudButton deckId={deckId} /></Tip>
+                <Tip label="Version history"><VersionHistoryButton deckId={deckId} /></Tip>
+                <Tip label="Translate"><TranslateButton deckId={deckId} /></Tip>
+                <Tip label="Language"><LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} /></Tip>
+                <Tip label="Share"><ShareMenu deckId={deckId} /></Tip>
+              </AccordionGroup>
+
               <div className="ml-auto inline-flex items-center gap-1.5">
                 <button
                   type="button"
@@ -307,8 +307,8 @@ function DeckEditor() {
                   aria-pressed={liveEdit}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
                     liveEdit
-                      ? "border-[#003FC7] bg-[#003FC7] text-white shadow-sm"
-                      : "border-black/10 bg-white text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+                      ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                      : "border-black/10 bg-white text-black/70 hover:border-primary hover:text-primary"
                   }`}
                   title="Toggle click-to-edit on the slide preview (Enter commits, Esc cancels)"
                 >
@@ -332,7 +332,7 @@ function DeckEditor() {
                     type="button"
                     onClick={() => setZoomed(true)}
                     aria-label="Enlarge slide preview"
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 transition hover:border-[#003FC7] hover:text-[#003FC7]"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 transition hover:border-primary hover:text-primary"
                   >
                     ⤢
                   </button>
@@ -1887,10 +1887,10 @@ function Tip({ label, children }: { label: string; children: React.ReactNode }) 
       {children}
       <span
         role="tooltip"
-        className="pointer-events-none absolute left-1/2 top-[calc(100%+8px)] z-50 -translate-x-1/2 whitespace-nowrap rounded-md bg-[#03002C] px-2 py-1 text-[10px] font-medium tracking-wide text-white opacity-0 shadow-lg transition-all duration-150 group-hover:opacity-100 group-focus-within:opacity-100 group-hover:translate-y-0 -translate-y-0.5"
+        className="pointer-events-none absolute left-1/2 top-[calc(100%+8px)] z-50 -translate-x-1/2 whitespace-nowrap rounded-md bg-accent-foreground px-2 py-1 text-[10px] font-medium tracking-wide text-primary-foreground opacity-0 shadow-lg transition-all duration-150 group-hover:opacity-100 group-focus-within:opacity-100 group-hover:translate-y-0 -translate-y-0.5"
       >
         {label}
-        <span aria-hidden className="absolute left-1/2 top-0 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-[#03002C]" />
+        <span aria-hidden className="absolute left-1/2 top-0 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-accent-foreground" />
       </span>
     </span>
   );
@@ -1909,15 +1909,15 @@ function AccordionGroup({
 }) {
   return (
     <details className="group/acc relative">
-      <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-full border border-black/[0.06] bg-white px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-black/55 transition hover:border-[#003FC7]/40 hover:text-[#003FC7] group-open/acc:border-[#003FC7] group-open/acc:bg-[#003FC7] group-open/acc:text-white [&::-webkit-details-marker]:hidden">
+      <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-full border border-black/[0.06] bg-white px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-black/55 transition hover:border-primary/40 hover:text-primary group-open/acc:border-primary group-open/acc:bg-primary group-open/acc:text-primary-foreground [&::-webkit-details-marker]:hidden">
         <span>{label}</span>
         {hint && (
-          <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5 text-[9px] font-medium normal-case tracking-normal text-black/55 group-open/acc:bg-white/15 group-open/acc:text-white/85">
+          <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5 text-[9px] font-medium normal-case tracking-normal text-black/55 group-open/acc:bg-primary-foreground/15 group-open/acc:text-primary-foreground/85">
             {hint}
           </span>
         )}
         {badge && (
-          <span className="inline-flex min-w-[16px] items-center justify-center rounded-full bg-[#003FC7] px-1 text-[9px] font-bold text-white group-open/acc:bg-white group-open/acc:text-[#003FC7]">
+          <span className="inline-flex min-w-[16px] items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground group-open/acc:bg-primary-foreground group-open/acc:text-primary">
             {badge}
           </span>
         )}
@@ -1934,7 +1934,7 @@ function AccordionGroup({
           <path d="M3 4.5 L6 7.5 L9 4.5" />
         </svg>
       </summary>
-      <div className="absolute left-0 top-[calc(100%+6px)] z-40 flex items-center gap-1 whitespace-nowrap rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)]">
+      <div className="absolute left-0 top-[calc(100%+6px)] z-[60] flex items-center gap-1 whitespace-nowrap rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)]">
         {children}
       </div>
     </details>
