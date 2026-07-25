@@ -292,6 +292,14 @@ function DeckEditor() {
                 </AccordionGroup>
               )}
 
+              <AccordionGroup label="Distribute">
+                <Tip label="Save to cloud"><SaveToCloudButton deckId={deckId} /></Tip>
+                <Tip label="Version history"><VersionHistoryButton deckId={deckId} /></Tip>
+                <Tip label="Translate"><TranslateButton deckId={deckId} /></Tip>
+                <Tip label="Language"><LanguageSwitcher cloudDeckId={cloudDeckId} onChange={setOverlay} /></Tip>
+                <Tip label="Share"><ShareMenu deckId={deckId} /></Tip>
+              </AccordionGroup>
+
               <div className="ml-auto inline-flex items-center gap-1.5">
                 <button
                   type="button"
