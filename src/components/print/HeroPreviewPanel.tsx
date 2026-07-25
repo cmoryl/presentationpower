@@ -76,6 +76,16 @@ export function HeroPreviewPanel({ media, brand }: Props) {
               <Sparkles className="h-3 w-3" /> Base
             </button>
           </div>
+          <button
+            type="button"
+            onClick={() => setShowGuides((s) => !s)}
+            className={`inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] transition ${
+              showGuides ? "bg-white text-[#0b0d18]" : "text-white/70 hover:text-white"
+            }`}
+            title={showGuides ? "Hide centering guides" : "Show centering guides"}
+          >
+            <Crosshair className="h-3 w-3" /> Guides
+          </button>
         </div>
       </div>
 
