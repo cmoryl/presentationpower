@@ -9,26 +9,32 @@ export function ConfirmModal({
   open,
   title,
   description,
+  body,
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
   busy,
   danger,
+  disableConfirm,
   onCancel,
   onConfirm,
 }: {
   open: boolean;
   title: ReactNode;
   description?: ReactNode;
+  body?: ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
   busy?: boolean;
   danger?: boolean;
+  disableConfirm?: boolean;
   onCancel: () => void;
   onConfirm: () => void;
 }) {
   const dialogRef = useRef<HTMLDivElement>(null);
   useModalA11y({ open, onClose: onCancel, containerRef: dialogRef });
   if (!open) return null;
+
+  const width = body ? "max-w-[560px]" : "max-w-[420px]";
 
   return (
     <div
@@ -41,7 +47,7 @@ export function ConfirmModal({
         aria-modal="true"
         aria-labelledby="confirm-modal-title"
         tabIndex={-1}
-        className="w-full max-w-[420px] rounded-2xl border border-white/15 bg-white text-black shadow-2xl outline-none"
+        className={`w-full ${width} rounded-2xl border border-white/15 bg-white text-black shadow-2xl outline-none`}
         onClick={(e) => e.stopPropagation()}
       >
         <header className="border-b border-black/10 px-6 py-5">
@@ -50,6 +56,10 @@ export function ConfirmModal({
           </h2>
           {description && <p className="mt-1 text-sm text-black/60">{description}</p>}
         </header>
+
+        {body && (
+          <div className="max-h-[50vh] overflow-y-auto px-6 py-4">{body}</div>
+        )}
 
         <footer className="flex items-center justify-end gap-2 border-t border-black/10 bg-black/[0.02] px-6 py-4">
           <button
@@ -63,7 +73,7 @@ export function ConfirmModal({
           <button
             type="button"
             onClick={onConfirm}
-            disabled={busy}
+            disabled={busy || disableConfirm}
             className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest text-white disabled:opacity-40 ${
               danger
                 ? "bg-[#E53D2E] hover:bg-[#c23022]"
