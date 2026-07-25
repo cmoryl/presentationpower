@@ -203,13 +203,13 @@ function DeckEditor() {
                 aria-label="Comments"
                 className={`relative inline-flex h-9 w-9 items-center justify-center rounded-full transition ${
                   commentsOpen
-                    ? "bg-[#003FC7] text-white"
-                    : "text-black/60 hover:bg-black/[0.04] hover:text-[#003FC7]"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-black/60 hover:bg-black/[0.04] hover:text-primary"
                 }`}
               >
                 <MessageSquare size={16} strokeWidth={1.75} />
                 {totalOpen > 0 && (
-                  <span className={`absolute -right-0.5 -top-0.5 inline-flex min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-semibold ${commentsOpen ? "bg-white text-[#003FC7]" : "bg-[#003FC7] text-white"}`}>
+                  <span className={`absolute -right-0.5 -top-0.5 inline-flex min-w-[16px] items-center justify-center rounded-full px-1 text-[9px] font-semibold ${commentsOpen ? "bg-primary-foreground text-primary" : "bg-primary text-primary-foreground"}`}>
                     {totalOpen}
                   </span>
                 )}
