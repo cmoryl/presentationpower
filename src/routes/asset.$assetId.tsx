@@ -58,6 +58,7 @@ import { HeroDiffTile } from "@/components/print/HeroDiffTile";
 import type { BrandMode } from "@/lib/taxonomy";
 
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
+import { SwapVariantPreviewModal } from "@/components/print/SwapVariantPreviewModal";
 import { analyzePrintAsset, canAddModule, weightForSection, effectiveModuleBudget } from "@/lib/print-capacity";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
@@ -122,6 +123,12 @@ function AssetEditor() {
   const [exportFormat, setExportFormat] = useState<PrintExportFormat>("digital");
   const [iccProfile, setIccProfile] = useState<IccProfileKey>("GRACoL2013_CRPC6");
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [pendingSwap, setPendingSwap] = useState<{
+    moduleIndex: number;
+    from: PrintStatsVariant;
+    to: PrintStatsVariant;
+    frees: number;
+  } | null>(null);
   const exportHydratedRef = useRef(false);
 
   // Undo/redo history for content + context snapshots.
@@ -1052,12 +1059,18 @@ function AssetEditor() {
                       `Hero reduced to ${s.targetHeightPct}% (was ${Math.round(prev)}%) — freed ${s.frees.toFixed(1)} units`,
                     );
                   } else if (s.kind === "swap-variant") {
-                    const modules = [...(content.modules ?? [])];
+                    // Open a before/after preview modal instead of applying
+                    // instantly — the confirm handler in the modal below runs
+                    // the actual mutation once the user reviews the change.
+                    const modules = content.modules ?? [];
                     const cur = modules[s.moduleIndex];
                     if (cur && cur.kind === "stats") {
-                      modules[s.moduleIndex] = { ...cur, variantId: s.to as PrintStatsSection["variantId"] };
-                      patchContent({ modules });
-                      toast.success(`Swapped module ${s.moduleIndex + 1} → ${s.to}`);
+                      setPendingSwap({
+                        moduleIndex: s.moduleIndex,
+                        from: cur.variantId,
+                        to: s.to as PrintStatsVariant,
+                        frees: s.frees,
+                      });
                     }
                   }
                 }}
@@ -1146,6 +1159,33 @@ function AssetEditor() {
         }}
         brand={brand}
         mode={editorMode}
+      />
+      <SwapVariantPreviewModal
+        open={!!pendingSwap}
+        moduleIndex={pendingSwap?.moduleIndex ?? 0}
+        fromVariant={pendingSwap?.from ?? "kpi-dashboard-portrait"}
+        toVariant={pendingSwap?.to ?? "stat-callout-row-portrait"}
+        frees={pendingSwap?.frees ?? 0}
+        section={
+          pendingSwap
+            ? ((content.modules ?? [])[pendingSwap.moduleIndex] as PrintStatsSection | undefined)
+            : undefined
+        }
+        mode={editorMode}
+        onCancel={() => setPendingSwap(null)}
+        onConfirm={() => {
+          if (!pendingSwap) return;
+          const modules = [...(content.modules ?? [])];
+          const cur = modules[pendingSwap.moduleIndex];
+          if (cur && cur.kind === "stats") {
+            modules[pendingSwap.moduleIndex] = { ...cur, variantId: pendingSwap.to };
+            patchContent({ modules });
+            toast.success(
+              `Swapped module ${pendingSwap.moduleIndex + 1} → ${pendingSwap.to} (freed ${pendingSwap.frees.toFixed(1)} units)`,
+            );
+          }
+          setPendingSwap(null);
+        }}
       />
     </AppShell>
   );
