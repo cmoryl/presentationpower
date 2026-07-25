@@ -98,11 +98,13 @@ export function HeroPreviewPanel({ media, brand }: Props) {
         ) : (
           <BaseHeroPreview mode={mode} />
         )}
-        <CenteringGuides
-          heightPct={active === "media" && hasMedia ? (media!.heightPct ?? 46) : 55}
-          offsetPct={media?.copyOffsetPct ?? 0}
-          isDark={isDark}
-        />
+        {showGuides && (
+          <CenteringGuides
+            heightPct={active === "media" && hasMedia ? (media!.heightPct ?? 46) : 55}
+            offsetPct={media?.copyOffsetPct ?? 0}
+            isDark={isDark}
+          />
+        )}
         {/* Page body placeholder lines */}
         <div className="absolute inset-x-4 bottom-4 space-y-1.5">
           <div className={`h-1.5 w-2/3 rounded-full ${isDark ? "bg-white/15" : "bg-black/10"}`} />
