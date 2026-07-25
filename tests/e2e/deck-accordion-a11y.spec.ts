@@ -76,12 +76,16 @@ test.describe("Deck toolbar accordion popover a11y", () => {
     const panel = page.locator(`#${controlsId}`);
     await expect(panel).toBeVisible();
 
-    // Focus should land inside the panel on open.
-    const initiallyInside = await page.evaluate((id) => {
-      const p = document.getElementById(id!);
-      return !!p && p.contains(document.activeElement);
-    }, controlsId);
-    expect(initiallyInside).toBe(true);
+    // Wait for the focus-on-open effect to run.
+    await page.waitForTimeout(50);
+    await expect
+      .poll(async () =>
+        page.evaluate((id: string) => {
+          const p = document.getElementById(id);
+          return !!p && p.contains(document.activeElement);
+        }, controlsId!),
+      )
+      .toBe(true);
 
     // Tab several times — focus must stay within the panel.
     for (let i = 0; i < 8; i++) {
