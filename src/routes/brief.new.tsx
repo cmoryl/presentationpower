@@ -103,10 +103,19 @@ function BriefWizard() {
   };
   const [masterSet, setMasterSet] = useState<MasterSet>({
     presentation: true,
-    print: { enabled: false, kinds: ["case-study"] },
-    event: { enabled: false, playbookId: EVENT_PLAYBOOKS[0]?.id ?? null },
-    social: { enabled: false, playbookId: SOCIAL_PLAYBOOKS[0]?.id ?? null },
+    print: { enabled: true, kinds: ["case-study"] },
+    event: { enabled: true, playbookId: EVENT_PLAYBOOKS[0]?.id ?? null },
+    social: { enabled: true, playbookId: SOCIAL_PLAYBOOKS[0]?.id ?? null },
   });
+  // Wizard step state — 1 Brand · 2 Prospect · 3 Master set · 4 Refine (opt.) · 5 Generate
+  const [step, setStep] = useState<1 | 2 | 3 | 4 | 5>(1);
+  const STEPS: Array<{ n: 1 | 2 | 3 | 4 | 5; label: string; hint: string; optional?: boolean }> = [
+    { n: 1, label: "Brand", hint: "Pick the division" },
+    { n: 2, label: "Prospect", hint: "Who + why" },
+    { n: 3, label: "Master set", hint: "What to produce" },
+    { n: 4, label: "Refine", hint: "Narrative · palette · AI plan", optional: true },
+    { n: 5, label: "Generate", hint: "Review and produce" },
+  ];
   type Produced = {
     deckId?: string;
     prints: Array<{ id: string; kind: PrintKind; title: string }>;
@@ -251,21 +260,45 @@ function BriefWizard() {
             <p className="mt-4 max-w-xl text-base text-white/70 sm:text-lg">
               Brief the system once. Pick which surfaces to produce — presentation, print, event kit, social kit — and every artifact assembles from the same brand, narrative, and knowledge context.
             </p>
-            {/* Step index */}
-            <ol className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] font-mono uppercase tracking-[0.18em] text-white/70">
-              {[
-                "01 · Brand",
-                "02 · Prospect",
-                "03 · Context (opt.)",
-                "04 · Master set",
-                "05 · Generate",
-              ].map((s) => (
-                <li key={s} className="flex items-center gap-2">
-                  <span className="inline-block h-1 w-1 rounded-full bg-[#A1FBF9]" />
-                  {s}
-                </li>
-              ))}
+            {/* Step index — clickable, shows current position */}
+            <ol className="mt-6 flex flex-wrap items-center gap-2 text-[11px] font-mono uppercase tracking-[0.14em]">
+              {STEPS.map((s, i) => {
+                const active = step === s.n;
+                const done = step > s.n;
+                const reachable = s.n <= step || done;
+                return (
+                  <li key={s.n} className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      disabled={!reachable}
+                      onClick={() => {
+                        if (reachable) {
+                          setStep(s.n);
+                          if (s.n === 4) setCustomizeOpen(true);
+                        }
+                      }}
+                      className={`flex items-center gap-2 rounded-full border px-3 py-1 transition ${
+                        active
+                          ? "border-[#A1FBF9] bg-[#A1FBF9]/15 text-white"
+                          : done
+                          ? "border-white/30 bg-white/5 text-white/85 hover:bg-white/10"
+                          : "border-white/15 text-white/50"
+                      }`}
+                    >
+                      <span className={`inline-flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold ${active ? "bg-[#A1FBF9] text-[#03002C]" : done ? "bg-white/20 text-white" : "bg-white/10 text-white/60"}`}>
+                        {done ? "✓" : s.n}
+                      </span>
+                      <span>{s.label}</span>
+                      {s.optional && <span className="text-[9px] opacity-60">· opt</span>}
+                    </button>
+                    {i < STEPS.length - 1 && <span aria-hidden className="h-px w-4 bg-white/20" />}
+                  </li>
+                );
+              })}
             </ol>
+            <p className="mt-3 text-xs text-white/60">
+              Step {step} of 5 · <span className="text-white/80">{STEPS[step - 1].label}</span> — {STEPS[step - 1].hint}
+            </p>
             <div className="mt-6 flex flex-wrap items-center gap-2">
               <Link
                 to="/decks/import"
@@ -279,6 +312,7 @@ function BriefWizard() {
 
         <div className="mt-8">
           <form className="space-y-10" onSubmit={(e) => e.preventDefault()}>
+              {step === 1 && (<>
               {/* SECTION 01: Brand Mode — drives everything below */}
               <section className="space-y-4">
                 <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
@@ -435,7 +469,9 @@ function BriefWizard() {
 
                 {brand && <BrandRelevancePanel brand={brand} />}
               </section>
+              </>)}
 
+              {step === 2 && (<>
               {/* REQUIRED: Prospect Name + Meeting Objective */}
               <section className="space-y-6">
                 <label className={labelCls}>Prospect</label>
@@ -458,6 +494,10 @@ function BriefWizard() {
                   </Field>
                 </div>
               </section>
+              </>)}
+
+              {step === 4 && (<>
+              {/* REFINE: narrative, palette, AI strategist */}
 
               {/* OPTIONAL: Everything else, collapsed by default */}
               <div
@@ -751,7 +791,9 @@ function BriefWizard() {
                   </div>
                 </div>
               </div>
+              </>)}
 
+              {step === 3 && (<>
               {/* SECTION — MASTER SET */}
               <section className="rounded-2xl border bg-white p-6 shadow-[0_2px_20px_-8px_rgba(3,0,44,0.08)] md:p-8" style={{ borderColor: PALETTE.hairline }}>
                 <div className="mb-5 flex items-baseline gap-3">
@@ -906,8 +948,19 @@ function BriefWizard() {
                   </div>
                 )}
               </section>
+              </>)}
 
-
+              {step === 5 && (<>
+              {/* SECTION — REVIEW & GENERATE */}
+              <ReviewSummary
+                brand={brand}
+                brandPrimary={brandPrimary}
+                form={form}
+                masterSet={masterSet}
+                effectiveArchetypeId={effectiveArchetypeId}
+                strategy={strategy}
+                narrativeArchetypes={narrativeArchetypes}
+              />
               <div
                 className="flex flex-col-reverse items-stretch justify-between gap-4 border-t pt-6 md:flex-row md:items-center"
                 style={{ borderColor: PALETTE.hairline }}
@@ -1150,6 +1203,61 @@ function BriefWizard() {
                   </button>
                 </div>
               </div>
+              </>)}
+
+              {/* Wizard footer — Back / Continue for steps 1–4 */}
+              {step < 5 && (
+                <div
+                  className="flex items-center justify-between gap-4 border-t pt-6"
+                  style={{ borderColor: PALETTE.hairline }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setStep((s) => Math.max(1, s - 1) as typeof s)}
+                    disabled={step === 1}
+                    className="rounded-lg border-2 bg-white px-5 py-2.5 text-sm font-bold tracking-tight text-[#03002C] transition hover:bg-[#F7F9FC] disabled:opacity-40"
+                    style={{ borderColor: PALETTE.hairline }}
+                  >
+                    ← Back
+                  </button>
+                  <div className="flex items-center gap-3">
+                    {step === 4 && (
+                      <button
+                        type="button"
+                        onClick={() => setStep(5)}
+                        className="text-xs font-semibold uppercase tracking-widest text-[#1E2749]/60 hover:text-[#03002C]"
+                      >
+                        Skip refine →
+                      </button>
+                    )}
+                    {(() => {
+                      const brandOk = !!form.brandModeId && (form.brandModeId !== "bm-subcompany" || !!form.subCompany);
+                      const prospectOk = form.prospect.trim().length > 0 && form.meetingObjective.trim().length > 0;
+                      const canContinue = step === 1 ? brandOk : step === 2 ? prospectOk : true;
+                      return (
+                        <button
+                          type="button"
+                          disabled={!canContinue}
+                          onClick={() => {
+                            setStep((s) => {
+                              const n = Math.min(5, s + 1) as typeof s;
+                              if (n === 4) setCustomizeOpen(true);
+                              return n;
+                            });
+                          }}
+                          className="inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-bold tracking-tight text-white transition disabled:opacity-40"
+                          style={{
+                            background: `linear-gradient(135deg, ${brandPrimary} 0%, ${brandAccent} 100%)`,
+                            boxShadow: `0 10px 24px -12px ${brandPrimary}80`,
+                          }}
+                        >
+                          Continue → {step === 1 ? "Prospect" : step === 2 ? "Master set" : step === 3 ? "Refine" : "Generate"}
+                        </button>
+                      );
+                    })()}
+                  </div>
+                </div>
+              )}
             </form>
         </div>
       </div>
@@ -1529,6 +1637,115 @@ function KnowledgeUsedPanel({
           </ul>
         </div>
       )}
+    </div>
+  );
+}
+
+function ReviewSummary({
+  brand,
+  brandPrimary,
+  form,
+  masterSet,
+  effectiveArchetypeId,
+  strategy,
+  narrativeArchetypes,
+}: {
+  brand: BrandMode | undefined;
+  brandPrimary: string;
+  form: {
+    prospect: string;
+    industry: string;
+    meetingObjective: string;
+    audience: string;
+    clientFacts: string;
+    lengthTarget: number;
+    subCompany: string;
+  };
+  masterSet: {
+    presentation: boolean;
+    print: { enabled: boolean; kinds: string[] };
+    event: { enabled: boolean; playbookId: string | null };
+    social: { enabled: boolean; playbookId: string | null };
+  };
+  effectiveArchetypeId: string;
+  strategy: DeckStrategy | null;
+  narrativeArchetypes: Array<{ id: string; name: string }>;
+}) {
+  const archetype = narrativeArchetypes.find((a) => a.id === effectiveArchetypeId);
+  const outputs: string[] = [];
+  if (masterSet.presentation) outputs.push("Presentation deck");
+  if (masterSet.print.enabled) outputs.push(`${masterSet.print.kinds.length} print asset${masterSet.print.kinds.length > 1 ? "s" : ""}`);
+  if (masterSet.event.enabled) outputs.push("Event kit");
+  if (masterSet.social.enabled) outputs.push("Social kit");
+  return (
+    <section
+      className="rounded-2xl border bg-white p-6 shadow-[0_2px_20px_-8px_rgba(3,0,44,0.08)] md:p-8"
+      style={{ borderColor: PALETTE.hairline }}
+    >
+      <div className="mb-5 flex items-baseline gap-3">
+        <span className="font-mono text-xs uppercase tracking-[0.18em]" style={{ color: brandPrimary }}>
+          05 · Review
+        </span>
+        <span className="text-xs text-[#03002C]/45">Confirm the brief, then generate the master set.</span>
+      </div>
+      <dl className="grid grid-cols-1 gap-x-8 gap-y-4 md:grid-cols-2">
+        <ReviewRow label="Brand">
+          {brand?.name ?? "—"}
+          {form.subCompany ? <span className="ml-2 text-[#1E2749]/60">· {form.subCompany}</span> : null}
+        </ReviewRow>
+        <ReviewRow label="Prospect">{form.prospect || "—"}</ReviewRow>
+        <ReviewRow label="Objective">{form.meetingObjective || "—"}</ReviewRow>
+        <ReviewRow label="Audience">{form.audience || <span className="text-[#1E2749]/50">not set</span>}</ReviewRow>
+        <ReviewRow label="Industry">{form.industry || <span className="text-[#1E2749]/50">not set</span>}</ReviewRow>
+        <ReviewRow label="Narrative">
+          {archetype?.name ?? "—"} · {form.lengthTarget} slides
+        </ReviewRow>
+        <ReviewRow label="AI plan">
+          {strategy ? (
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[11px] font-semibold text-[#003FC7]">
+              ✓ Strategist plan attached · {strategy.recommendedSections.length} sections
+            </span>
+          ) : (
+            <span className="text-[#1E2749]/50">Optional — will assemble from atlas</span>
+          )}
+        </ReviewRow>
+        <ReviewRow label="Producing">
+          <div className="flex flex-wrap gap-1.5">
+            {outputs.length > 0 ? (
+              outputs.map((o) => (
+                <span
+                  key={o}
+                  className="rounded-full border px-2.5 py-0.5 text-[11px] font-semibold"
+                  style={{
+                    borderColor: `${brandPrimary}55`,
+                    backgroundColor: `${brandPrimary}12`,
+                    color: brandPrimary,
+                  }}
+                >
+                  {o}
+                </span>
+              ))
+            ) : (
+              <span className="text-[#1E2749]/50">Nothing selected — go back to step 3</span>
+            )}
+          </div>
+        </ReviewRow>
+      </dl>
+      {form.clientFacts && (
+        <div className="mt-5 rounded-lg border p-3 text-xs leading-relaxed text-[#1E2749]" style={{ borderColor: PALETTE.hairline, backgroundColor: PALETTE.field }}>
+          <div className="mb-1 text-[10px] font-bold uppercase tracking-widest text-[#1E2749]/60">Client facts</div>
+          {form.clientFacts}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ReviewRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <dt className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#1E2749]/60">{label}</dt>
+      <dd className="mt-1 text-sm font-medium text-[#03002C]">{children}</dd>
     </div>
   );
 }
