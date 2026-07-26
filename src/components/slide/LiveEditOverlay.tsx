@@ -259,8 +259,9 @@ export function LiveEditOverlay({
     function commit(target: HTMLElement) {
       const path = target.getAttribute("data-live-path");
       if (!path) return;
-      // Preserve hard returns; only collapse runs of spaces/tabs.
-      const next = (target.innerText ?? target.textContent ?? "")
+      // Serialise bold/italic back to markers; preserve hard returns and
+      // only collapse runs of spaces/tabs.
+      const next = domToInlineMarkers(target)
         .replace(/\r\n?/g, "\n")
         .replace(/[ \t\u00a0]+/g, " ")
         .replace(/\n{3,}/g, "\n\n")
@@ -293,7 +294,22 @@ export function LiveEditOverlay({
     function onKeyDown(e: KeyboardEvent) {
       const t = e.target as HTMLElement | null;
       if (!t?.hasAttribute?.("data-live-path")) return;
-      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      const mod = e.metaKey || e.ctrlKey;
+      if (mod && (e.key === "b" || e.key === "B")) {
+        e.preventDefault();
+        e.stopPropagation();
+        wrapSelection(t, "**");
+        commit(t);
+        return;
+      }
+      if (mod && (e.key === "i" || e.key === "I")) {
+        e.preventDefault();
+        e.stopPropagation();
+        wrapSelection(t, "*");
+        commit(t);
+        return;
+      }
+      if (e.key === "Enter" && mod) {
         // Cmd/Ctrl+Enter commits; plain Enter inserts a hard return.
         e.preventDefault();
         t.blur();
@@ -302,10 +318,19 @@ export function LiveEditOverlay({
       } else if (e.key === "Escape") {
         e.preventDefault();
         const path = t.getAttribute("data-live-path")!;
-        t.textContent = String(readPath(content, path) ?? "");
+        t.innerHTML = inlineMarkersToHtml(String(readPath(content, path) ?? ""));
         t.blur();
       }
     }
+    function onPaste(e: ClipboardEvent) {
+      const t = e.target as HTMLElement | null;
+      if (!t?.hasAttribute?.("data-live-path")) return;
+      // Keep pastes plain — no foreign markup in the slide DOM.
+      e.preventDefault();
+      const text = e.clipboardData?.getData("text/plain") ?? "";
+      document.execCommand("insertText", false, text);
+    }
+
     function onClick(e: MouseEvent) {
       const t = e.target as HTMLElement | null;
       if (t?.closest?.("[data-live-path]")) e.stopPropagation();
