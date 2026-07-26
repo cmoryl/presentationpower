@@ -60,12 +60,15 @@ function AuthPage() {
     if (mode === "forgot") return;
     let mounted = true;
     supabase.auth.getSession().then(({ data }) => {
-      if (mounted && data.session) navigate({ to: "/admin", replace: true });
+      if (mounted && data.session) {
+        if (returnTo) window.location.href = returnTo;
+        else navigate({ to: "/admin", replace: true });
+      }
     });
     return () => {
       mounted = false;
     };
-  }, [navigate, pathname, mode]);
+  }, [navigate, pathname, mode, returnTo]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
