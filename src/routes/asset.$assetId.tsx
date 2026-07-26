@@ -1212,6 +1212,7 @@ function AssetEditor() {
               <input className={inspectorInput} placeholder="Email" value={content.expert?.email ?? ""} onChange={(e) => patchContent({ expert: { ...(content.expert ?? { name: "" }), email: e.target.value, name: content.expert?.name ?? "" } })} />
             </Panel>
           </div>
+          )}
         </div>
       </div>
       <PrintSectionPicker
