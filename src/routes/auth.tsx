@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
-  validateSearch: (s: Record<string, unknown>) => ({
+  validateSearch: (s: { next?: string }): { next?: string } => ({
     next: typeof s.next === "string" ? s.next : undefined,
   }),
   head: () => ({ meta: [{ title: "Sign in · TransPerfect Modular" }] }),
