@@ -32,7 +32,7 @@ const SlideIn = z.object({
   sectionName: z.string().optional(),
   variantId: z.string(),
   layoutId: z.string(),
-  content: z.record(z.unknown()),
+  content: z.record(z.string(), z.unknown()),
   notes: z.string().optional(),
 });
 
