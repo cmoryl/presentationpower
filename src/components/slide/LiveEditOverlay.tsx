@@ -165,8 +165,11 @@ export function LiveEditOverlay({
 
 
   // Precompute path → value map for the tag pass; unique-by-value only.
+  // Values are matched both with their raw markers (first paint, where the
+  // renderer prints `**bold**` literally) and stripped (after we've swapped
+  // the markers for real <strong>/<em>).
   const uniqueByValue = useMemo(() => {
-    const entries: { path: string; value: string }[] = [];
+    const entries: { path: string; value: string; raw: string }[] = [];
     for (const pattern of editableFields) {
       for (const cp of expandPath(pattern, content)) {
         const raw = readPath(content, cp);
@@ -175,13 +178,18 @@ export function LiveEditOverlay({
         // resolve against the DOM's rendered text.
         const v = raw.replace(/\s+/g, " ").trim();
         if (!v) continue;
-        entries.push({ path: cp, value: v });
+        entries.push({ path: cp, value: v, raw });
+        const stripped = stripInlineMarkers(v).replace(/\s+/g, " ").trim();
+        if (stripped && stripped !== v) entries.push({ path: cp, value: stripped, raw });
       }
     }
     const counts = new Map<string, number>();
     for (const e of entries) counts.set(e.value, (counts.get(e.value) ?? 0) + 1);
-    const map = new Map<string, string>();
-    for (const e of entries) if ((counts.get(e.value) ?? 0) === 1) map.set(e.value, e.path);
+    const map = new Map<string, { path: string; raw: string }>();
+    for (const e of entries) {
+      if ((counts.get(e.value) ?? 0) !== 1) continue;
+      map.set(e.value, { path: e.path, raw: e.raw });
+    }
     return map;
   }, [content, editableFields]);
 
@@ -206,6 +214,7 @@ export function LiveEditOverlay({
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     const claimedPaths = new Set<string>();
     const claimedEls = new Set<Element>();
+    const toFormat: { el: HTMLElement; raw: string }[] = [];
     let node: Node | null = walker.nextNode();
     while (node) {
       const parent = node.parentElement;
@@ -215,23 +224,32 @@ export function LiveEditOverlay({
         !parent.closest("input,textarea,button,select,[data-slide-chrome]")
       ) {
         const txt = (parent.textContent ?? "").replace(/\s+/g, " ").trim();
-        const path = uniqueByValue.get(txt);
-        if (path && !claimedPaths.has(path)) {
-          parent.setAttribute("data-live-path", path);
+        const hit = uniqueByValue.get(txt);
+        if (hit && !claimedPaths.has(hit.path)) {
+          parent.setAttribute("data-live-path", hit.path);
           if (enabled) {
-            parent.setAttribute("contenteditable", "plaintext-only");
+            parent.setAttribute("contenteditable", "true");
             parent.setAttribute("spellcheck", "true");
             parent.classList.add("live-edit-target");
           }
-          claimedPaths.add(path);
+          // Render markers as real bold / italic (edit mode and read-only).
+          if (MARKER_RE.test(hit.raw) && parent.children.length === 0) {
+            toFormat.push({ el: parent, raw: hit.raw });
+          }
+          claimedPaths.add(hit.path);
           claimedEls.add(parent);
         }
       }
       node = walker.nextNode();
     }
+    for (const f of toFormat) {
+      if (document.activeElement === f.el) continue;
+      f.el.innerHTML = inlineMarkersToHtml(f.raw);
+    }
 
     setBoundCount(claimedPaths.size);
   }, [enabled, slideId, uniqueByValue, tick]);
+
 
   // Commit handlers via event delegation.
   useEffect(() => {
