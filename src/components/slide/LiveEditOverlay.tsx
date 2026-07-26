@@ -96,7 +96,9 @@ export function LiveEditOverlay({
       for (const cp of expandPath(pattern, content)) {
         const raw = readPath(content, cp);
         if (typeof raw !== "string") continue;
-        const v = raw.trim();
+        // Match on collapsed text so values containing hard returns still
+        // resolve against the DOM's rendered text.
+        const v = raw.replace(/\s+/g, " ").trim();
         if (!v) continue;
         entries.push({ path: cp, value: v });
       }
@@ -164,7 +166,15 @@ export function LiveEditOverlay({
     function commit(target: HTMLElement) {
       const path = target.getAttribute("data-live-path");
       if (!path) return;
-      const next = (target.textContent ?? "").replace(/\s+/g, " ").trim();
+      // Preserve hard returns; only collapse runs of spaces/tabs.
+      const next = (target.innerText ?? target.textContent ?? "")
+        .replace(/\r\n?/g, "\n")
+        .replace(/[ \t\u00a0]+/g, " ")
+        .replace(/\n{3,}/g, "\n\n")
+        .split("\n")
+        .map((l) => l.trim())
+        .join("\n")
+        .trim();
       const prev = String(readPath(content, path) ?? "").trim();
       if (next === prev) return;
       onChange(path, next);
@@ -190,9 +200,12 @@ export function LiveEditOverlay({
     function onKeyDown(e: KeyboardEvent) {
       const t = e.target as HTMLElement | null;
       if (!t?.hasAttribute?.("data-live-path")) return;
-      if (e.key === "Enter") {
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+        // Cmd/Ctrl+Enter commits; plain Enter inserts a hard return.
         e.preventDefault();
         t.blur();
+      } else if (e.key === "Enter") {
+        e.stopPropagation();
       } else if (e.key === "Escape") {
         e.preventDefault();
         const path = t.getAttribute("data-live-path")!;
@@ -278,7 +291,7 @@ export function LiveEditOverlay({
       className={enabled ? "live-edit-active relative h-full w-full" : "relative h-full w-full"}
       data-live-bound={boundCount}
     >
-      {overrideCss ? <style>{overrideCss}</style> : null}
+      <style>{`[data-live-path]{white-space:pre-wrap;}\n${overrideCss}`}</style>
       {children}
       {canPickColor ? (
         <div
