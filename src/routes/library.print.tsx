@@ -192,12 +192,25 @@ const ADAPTOR_SEED: AdaptorBriefContent = emptyAdaptorBrief({
   },
 });
 
+// Example hero photo — bundled division imagery so the case-study example
+// always shows an image hero (no upload / auth required).
+const EXAMPLE_HERO_URL = getDivisionImagery("bm-enterprise").photos[0];
+
 const CASE_STUDY_SEED: CaseStudyContent = emptyCaseStudy({
   eyebrow: "Client case study",
   client: "Aēsop",
   industry: "Beauty & personal care",
   audience: "Global product knowledge teams",
   summary: "Aēsop's success story in rapid product knowledge localization",
+  heroMedia: {
+    imageUrl: EXAMPLE_HERO_URL,
+    overlayOpacity: 0.55,
+    washStrength: 1,
+    scrim: "bottom",
+    blendMode: "multiply",
+    heightPct: 46,
+  },
+
   challenge: {
     heading: "The Challenge",
     body: "Aēsop needed to localize hundreds of product knowledge modules — combining technical content, regulatory updates, and training materials — across multiple markets. Their internal team was overloaded with disconnected processes, inconsistent terminology, and manual handoffs that slowed delivery and increased costs.",
