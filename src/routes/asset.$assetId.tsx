@@ -1090,13 +1090,13 @@ function AssetEditor() {
             </Panel>
 
             {baseBrand && (
-              <Panel title="Page color">
-                <AccentOverridePanel
+              <Panel title="Page color override">
+                <PageColorOverridePanel
                   accentOverride={ctx.accentOverride}
                   primaryOverride={ctx.primaryOverride}
                   brandAccent={baseBrand.tokens.accent || baseBrand.tokens.primary}
                   brandPrimary={baseBrand.tokens.primary}
-                  onChange={(patch) => patchCtx(patch)}
+                  onChange={(patch: { accentOverride?: string; primaryOverride?: string }) => patchCtx(patch)}
                 />
               </Panel>
             )}
