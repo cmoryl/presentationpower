@@ -939,6 +939,25 @@ function AssetEditor() {
                 </>
               )}
             </LiveEditOverlay>
+            <PrintOverflowOverlay
+              state={overflow}
+              onFix={() => {
+                const cur = (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia;
+                if (!cur?.imageUrl) {
+                  toast.error("Content overflows the page — remove a module or shorten copy.");
+                  return;
+                }
+                const prev = cur.heightPct ?? 46;
+                // Give back roughly the clipped height, plus a 2pt safety margin.
+                const next = Math.max(22, Math.round(prev - overflow.overflowFrac * 100 - 2));
+                if (next >= prev) {
+                  toast.error("Hero is already at its minimum — remove a module or shorten copy.");
+                  return;
+                }
+                patchContent({ heroMedia: { ...cur, heightPct: next } } as never);
+                toast.success(`Hero reduced to ${next}% (was ${Math.round(prev)}%) to stop the page clipping`);
+              }}
+            />
             <SectionSelectOverlay
               canvasRef={canvasRef}
               scanKey={rawContent}
