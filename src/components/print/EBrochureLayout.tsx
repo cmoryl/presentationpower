@@ -83,6 +83,7 @@ export function EBrochureLayout({
       <SlideAccentContext.Provider value={accent}>
         <div
           className="relative w-full overflow-hidden [container-type:inline-size]"
+          data-print-page
           style={{
             aspectRatio: pageAspect(pageSize),
             backgroundColor: mode === "light" ? "#FFFFFF" : bg,
