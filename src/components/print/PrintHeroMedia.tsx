@@ -233,7 +233,7 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
             position: "absolute",
             inset: 0,
             backgroundColor: pageBg,
-            opacity: clamp01((isDark ? 0.22 : 0.3) + autoBoost * 0.45),
+            opacity: clamp01((isDark ? 0.18 : 0.2) + autoBoost * 0.5),
           }}
         />
       )}
