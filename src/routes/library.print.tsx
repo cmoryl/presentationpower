@@ -275,7 +275,7 @@ function PrintCenterPage() {
   const onDelete = async (id: string) => {
     if (!window.confirm("Delete this print asset? This cannot be undone.")) return;
     try {
-      await delFn({ data: { id } });
+      await delFn({ data: { assetId: id } });
       toast.success("Deleted");
       assetsQuery.refetch();
     } catch (e) {
