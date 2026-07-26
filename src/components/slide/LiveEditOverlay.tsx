@@ -339,11 +339,13 @@ export function LiveEditOverlay({
     root.addEventListener("focusin", onFocusIn, true);
     root.addEventListener("focusout", onFocusOut, true);
     root.addEventListener("keydown", onKeyDown, true);
+    root.addEventListener("paste", onPaste, true);
     root.addEventListener("click", onClick, true);
     return () => {
       root.removeEventListener("focusin", onFocusIn, true);
       root.removeEventListener("focusout", onFocusOut, true);
       root.removeEventListener("keydown", onKeyDown, true);
+      root.removeEventListener("paste", onPaste, true);
       root.removeEventListener("click", onClick, true);
     };
   }, [enabled, content, onChange]);
