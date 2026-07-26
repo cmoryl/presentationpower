@@ -82,6 +82,7 @@ import { Route as DecksDeckIdDocumentRouteImport } from './routes/decks.$deckId.
 import { Route as ApiPublicPdfIndexProxyRouteImport } from './routes/api/public/pdf-index-proxy'
 import { Route as ApiPublicBrandhubSeedProxyRouteImport } from './routes/api/public/brandhub-seed-proxy'
 import { Route as AdminCampaignsKitRouteImport } from './routes/admin.campaigns.kit'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 
 const TemplatesRoute = TemplatesRouteImport.update({
   id: '/templates',
@@ -451,6 +452,11 @@ const AdminCampaignsKitRoute = AdminCampaignsKitRouteImport.update({
   path: '/kit',
   getParentRoute: () => AdminCampaignsRoute,
 } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -514,6 +520,7 @@ export interface FileRoutesByFullPath {
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
   '/social/': typeof SocialIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
@@ -585,6 +592,7 @@ export interface FileRoutesByTo {
   '/knowledge': typeof KnowledgeIndexRoute
   '/library': typeof LibraryIndexRoute
   '/social': typeof SocialIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
@@ -661,6 +669,7 @@ export interface FileRoutesById {
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
   '/social/': typeof SocialIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
@@ -738,6 +747,7 @@ export interface FileRouteTypes {
     | '/knowledge/'
     | '/library/'
     | '/social/'
+    | '/.lovable/oauth/consent'
     | '/admin/campaigns/kit'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/pdf-index-proxy'
@@ -809,6 +819,7 @@ export interface FileRouteTypes {
     | '/knowledge'
     | '/library'
     | '/social'
+    | '/.lovable/oauth/consent'
     | '/admin/campaigns/kit'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/pdf-index-proxy'
@@ -884,6 +895,7 @@ export interface FileRouteTypes {
     | '/knowledge/'
     | '/library/'
     | '/social/'
+    | '/.lovable/oauth/consent'
     | '/admin/campaigns/kit'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/pdf-index-proxy'
@@ -928,6 +940,7 @@ export interface RootRouteChildren {
   TestPrintHeroRoute: typeof TestPrintHeroRoute
   DecksIndexRoute: typeof DecksIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
   ApiPublicPdfIndexProxyRoute: typeof ApiPublicPdfIndexProxyRoute
   DecksDeckIdDocumentRoute: typeof DecksDeckIdDocumentRoute
@@ -1450,6 +1463,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCampaignsKitRouteImport
       parentRoute: typeof AdminCampaignsRoute
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1603,6 +1623,7 @@ const rootRouteChildren: RootRouteChildren = {
   TestPrintHeroRoute: TestPrintHeroRoute,
   DecksIndexRoute: DecksIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
   ApiPublicPdfIndexProxyRoute: ApiPublicPdfIndexProxyRoute,
   DecksDeckIdDocumentRoute: DecksDeckIdDocumentRoute,
