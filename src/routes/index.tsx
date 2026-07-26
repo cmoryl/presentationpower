@@ -964,7 +964,7 @@ function RecentActivity({
   useEffect(() => {
     let cancelled = false;
     listKits({ data: {} })
-      .then((rows) => {
+      .then((rows: SavedKit[]) => {
         if (cancelled || !Array.isArray(rows)) return;
         setKitItems(
           rows.map((k) => ({
