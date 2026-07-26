@@ -255,6 +255,7 @@ type DeckState = {
   setSlideTransition: (deckId: string, slideId: string, transition: SlideTransition | null) => void;
   setDeckDefaultTransition: (deckId: string, transition: SlideTransition | null) => void;
   setSlideInkOverride: (deckId: string, slideId: string, path: string, color: string | null) => void;
+  setSlideInkScopeColor: (deckId: string, slideId: string, scope: string, color: string | null) => void;
   clearSlideInkOverrides: (deckId: string, slideId: string) => void;
 
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
