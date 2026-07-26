@@ -52,6 +52,81 @@ export const INK_ALL_SCOPE = "*";
 
 type InkTarget = "block" | "section" | "all";
 
+/* ---------------- inline formatting (markdown-lite) ----------------
+ * Values are stored as plain strings with `**bold**` / `*italic*`
+ * markers so nothing about the data model or the renderers changes.
+ * The overlay renders those markers as real <strong>/<em> and
+ * serialises them back on commit. */
+
+const MARKER_RE = /(\*\*|__|\*|_)/;
+
+export function stripInlineMarkers(s: string): string {
+  return s
+    .replace(/\*\*(.+?)\*\*/gs, "$1")
+    .replace(/__(.+?)__/gs, "$1")
+    .replace(/(?<!\*)\*(?!\s)(.+?)(?<!\s)\*(?!\*)/gs, "$1")
+    .replace(/(?<!_)_(?!\s)(.+?)(?<!\s)_(?!_)/gs, "$1");
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+export function inlineMarkersToHtml(s: string): string {
+  return escapeHtml(s)
+    .replace(/\*\*(.+?)\*\*/gs, "<strong>$1</strong>")
+    .replace(/__(.+?)__/gs, "<strong>$1</strong>")
+    .replace(/(?<!\*)\*(?!\s)(.+?)(?<!\s)\*(?!\*)/gs, "<em>$1</em>")
+    .replace(/(?<!_)_(?!\s)(.+?)(?<!\s)_(?!_)/gs, "<em>$1</em>");
+}
+
+/** Serialise an edited element back to marker text. */
+export function domToInlineMarkers(root: HTMLElement): string {
+  const out: string[] = [];
+  const walk = (node: Node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      out.push(node.nodeValue ?? "");
+      return;
+    }
+    if (!(node instanceof HTMLElement)) return;
+    const tag = node.tagName.toLowerCase();
+    const style = node.style;
+    const bold =
+      tag === "strong" || tag === "b" || style.fontWeight === "bold" || Number(style.fontWeight) >= 600;
+    const italic = tag === "em" || tag === "i" || style.fontStyle === "italic";
+    if (tag === "br") {
+      out.push("\n");
+      return;
+    }
+    if (bold) out.push("**");
+    if (italic) out.push("*");
+    node.childNodes.forEach(walk);
+    if (italic) out.push("*");
+    if (bold) out.push("**");
+    if (tag === "div" || tag === "p") out.push("\n");
+  };
+  root.childNodes.forEach(walk);
+  return out.join("");
+}
+
+/** Wrap the current selection inside `el` with a marker pair. */
+function wrapSelection(el: HTMLElement, marker: "**" | "*") {
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+  if (!el.contains(range.commonAncestorContainer)) return;
+  if (range.collapsed) return;
+  const text = range.toString();
+  const stripped = stripInlineMarkers(text);
+  const frag = document.createRange().createContextualFragment(
+    inlineMarkersToHtml(`${marker}${stripped}${marker}`),
+  );
+  range.deleteContents();
+  range.insertNode(frag);
+  sel.removeAllRanges();
+}
+
+
 export function LiveEditOverlay({
   enabled,
   slideId,
