@@ -429,6 +429,29 @@ export function LiveEditOverlay({
           className="pointer-events-auto absolute left-1/2 top-3 z-40 -translate-x-1/2 rounded-2xl border border-black/10 bg-white/95 px-2.5 py-2 shadow-lg backdrop-blur"
           onMouseDown={(e) => e.preventDefault()} // keep focus on the editable element
         >
+          <div className="mb-1.5 flex items-center gap-1">
+            <span className="mr-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-black/50">
+              Style
+            </span>
+            <button
+              type="button"
+              data-testid="live-format-bold"
+              title="Bold selection (⌘/Ctrl + B)"
+              onClick={() => applyFormat("**")}
+              className="h-6 w-6 rounded-md border border-black/10 text-[12px] font-bold text-black/80 hover:bg-black/5"
+            >
+              B
+            </button>
+            <button
+              type="button"
+              data-testid="live-format-italic"
+              title="Italicize selection (⌘/Ctrl + I)"
+              onClick={() => applyFormat("*")}
+              className="h-6 w-6 rounded-md border border-black/10 text-[12px] italic text-black/80 hover:bg-black/5"
+            >
+              I
+            </button>
+          </div>
           {scopeSupported ? (
             <div className="mb-1.5 flex items-center gap-1">
               <span className="mr-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-black/50">
