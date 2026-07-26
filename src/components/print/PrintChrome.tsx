@@ -151,11 +151,11 @@ export function PrintFooterLockup({
       }}
     >
       <div className="flex items-center min-w-0" style={{ gap: cq(12) }}>
-        <BrandLockup brand={enterpriseBrand} color={enterpriseLogoInk} size="2xs" orientation="horizontal" />
+        <BrandLockup brand={enterpriseBrand} color={enterpriseLogoInk} size="2xs" orientation="horizontal" monochromeOfficialLogo />
         {!isEnterprise && (
           <>
             <div style={{ width: 1, height: cq(16), background: dividerCol, flexShrink: 0 }} aria-hidden />
-            <BrandLockup brand={brand} color={enterpriseLogoInk} size="2xs" orientation="horizontal" />
+            <BrandLockup brand={brand} color={enterpriseLogoInk} size="2xs" orientation="horizontal" monochromeOfficialLogo />
           </>
         )}
       </div>

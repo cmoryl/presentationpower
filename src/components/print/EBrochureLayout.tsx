@@ -117,7 +117,7 @@ export function EBrochureLayout({
                 accent={accent}
                 cq={cq}
               />
-              <BrandLockup brand={brand} color={mode === "dark" ? "#FFFFFF" : "#000000"} size="2xs" orientation="horizontal" />
+              <BrandLockup brand={brand} color={mode === "dark" ? "#FFFFFF" : "#000000"} size="2xs" orientation="horizontal" monochromeOfficialLogo />
             </div>
 
             {/* HERO — title + summary. Reserve hero band height when a photo
