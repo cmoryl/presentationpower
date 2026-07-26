@@ -20,6 +20,8 @@ import { resolveBrandMode } from "@/lib/brand-profiles";
 import { BRAND_GUIDES } from "@/lib/brand-guides";
 import { hasAiKey } from "@/lib/ai-status.functions";
 import { listMyCloudDecks, deleteCloudDeck } from "@/lib/cloud-decks.functions";
+import { listMyPrintAssets } from "@/lib/print-assets.functions";
+import { listMyKits, type SavedKit } from "@/lib/kits.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
