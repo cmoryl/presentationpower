@@ -51,7 +51,7 @@ import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker"
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
-import { AccentOverridePanel } from "@/components/print/AccentOverridePanel";
+import { PageColorOverridePanel } from "@/components/print/PageColorOverridePanel";
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
 import { HeroCostDebugPanel } from "@/components/print/HeroCostDebugPanel";
