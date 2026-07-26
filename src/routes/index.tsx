@@ -943,7 +943,7 @@ function RecentActivity({
   useEffect(() => {
     let cancelled = false;
     listPrint()
-      .then((rows) => {
+      .then((rows: any) => {
         if (cancelled || !Array.isArray(rows)) return;
         setPrintItems(
           rows.map((r: any) => ({
