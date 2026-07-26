@@ -217,22 +217,60 @@ export function LiveEditOverlay({
     };
   }, [enabled, content, onChange]);
 
-  // Build the scoped stylesheet for ink overrides. Keyed by concrete path.
+  // Build the scoped stylesheet for ink overrides. Scope rules are emitted
+  // first so a per-field override always wins over its section / all-text
+  // colour (equal specificity → last rule wins).
   const overrideCss = useMemo(() => {
-    if (!inkOverrides) return "";
     const rules: string[] = [];
-    for (const [path, hex] of Object.entries(inkOverrides)) {
-      if (!/^#[0-9a-fA-F]{6}$/.test(hex)) continue;
+    const isHex = (h: string) => /^#[0-9a-fA-F]{6}$/.test(h);
+    for (const [scope, hex] of Object.entries(inkScopeOverrides ?? {})) {
+      if (!isHex(hex)) continue;
+      if (scope === INK_ALL_SCOPE) {
+        rules.push(`[data-live-path], [data-live-path] * { color: ${hex} !important; }`);
+        continue;
+      }
+      const q = scope.replace(/"/g, '\\"');
+      rules.push(
+        `[data-live-path="${q}"], [data-live-path^="${q}."], [data-live-path^="${q}."] *, [data-live-path="${q}"] * { color: ${hex} !important; }`,
+      );
+    }
+    for (const [path, hex] of Object.entries(inkOverrides ?? {})) {
+      if (!isHex(hex)) continue;
       // Attribute-escape any unusual characters — paths use [ ] . which are
       // legal in CSS attribute-value selectors when quoted.
       const q = path.replace(/"/g, '\\"');
       rules.push(`[data-live-path="${q}"], [data-live-path="${q}"] * { color: ${hex} !important; }`);
     }
     return rules.join("\n");
-  }, [inkOverrides]);
+  }, [inkOverrides, inkScopeOverrides]);
 
-  const canPickColor = enabled && !!activePath && (onSetInkColor || onClearInkColor);
-  const activeHex = activePath ? inkOverrides?.[activePath] : undefined;
+  const canPickColor =
+    enabled && !!activePath && (onSetInkColor || onClearInkColor || onSetInkScopeColor);
+  const activeScope = activePath ? inkScopeOf(activePath) : null;
+  const scopeSupported = !!(onSetInkScopeColor || onClearInkScopeColor);
+  const target: InkTarget = scopeSupported ? inkTarget : "block";
+  const targetKey =
+    target === "block" ? activePath : target === "section" ? activeScope : INK_ALL_SCOPE;
+  const activeHex =
+    target === "block"
+      ? activePath
+        ? inkOverrides?.[activePath]
+        : undefined
+      : targetKey
+        ? inkScopeOverrides?.[targetKey]
+        : undefined;
+
+  function applyColor(hex: string) {
+    if (!targetKey) return;
+    if (target === "block") onSetInkColor?.(targetKey, hex);
+    else onSetInkScopeColor?.(targetKey, hex);
+  }
+  function clearColor() {
+    if (!targetKey) return;
+    if (target === "block") onClearInkColor?.(targetKey);
+    else onClearInkScopeColor?.(targetKey);
+  }
+
 
   return (
     <div
