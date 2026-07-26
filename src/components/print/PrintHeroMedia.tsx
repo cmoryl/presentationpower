@@ -115,8 +115,11 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
   // Auto legibility: sample the image band where hero text sits and, if too
   // bright, boost the scrim opacity so light copy still reads. CORS-tainted
   // canvases just no-op — we degrade gracefully to the manual scrim setting.
+  // Auto legibility is ON by default so any image stays readable in both modes;
+  // authors can still opt out with autoScrim: false.
+  const autoScrimOn = media.autoScrim !== false;
   useEffect(() => {
-    if (!media.autoScrim || !media.imageUrl) { setAutoBoost(0); return; }
+    if (!autoScrimOn || !media.imageUrl) { setAutoBoost(0); return; }
     let cancelled = false;
     const img = new Image();
     img.crossOrigin = "anonymous";
