@@ -155,7 +155,7 @@ export function PrintFooterLockup({
         {!isEnterprise && (
           <>
             <div style={{ width: 1, height: cq(16), background: dividerCol, flexShrink: 0 }} aria-hidden />
-            <BrandLockup brand={brand} color={ink} size="2xs" orientation="horizontal" />
+            <BrandLockup brand={brand} color={enterpriseLogoInk} size="2xs" orientation="horizontal" />
           </>
         )}
       </div>

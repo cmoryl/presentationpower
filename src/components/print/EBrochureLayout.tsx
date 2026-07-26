@@ -5,7 +5,6 @@ import type {
   PrintDensity,
   PrintPageSize,
 } from "@/lib/print-assets.types";
-import { resolvePrintLogoInk } from "@/lib/print-assets.types";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
 import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
@@ -118,7 +117,7 @@ export function EBrochureLayout({
                 accent={accent}
                 cq={cq}
               />
-              <BrandLockup brand={brand} color={brand.id === "bm-enterprise" ? (mode === "dark" ? "#FFFFFF" : "#000000") : (mode === "dark" ? "#FFFFFF" : resolvePrintLogoInk(content.logoColor, ink))} size="2xs" orientation="horizontal" />
+              <BrandLockup brand={brand} color={mode === "dark" ? "#FFFFFF" : "#000000"} size="2xs" orientation="horizontal" />
             </div>
 
             {/* HERO — title + summary. Reserve hero band height when a photo
