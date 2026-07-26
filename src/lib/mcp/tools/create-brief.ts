@@ -22,12 +22,13 @@ export default defineTool({
       .from("briefs")
       .insert({
         owner_id: ctx.getUserId(),
+        title: input.prospect || "Untitled brief",
         prospect: input.prospect,
         industry: input.industry,
         meeting_objective: input.meeting_objective,
         audience: input.audience,
         brand_mode_id: input.brand_mode_id ?? "transperfect",
-        client_facts: input.client_facts ?? "",
+        known_facts: input.client_facts ?? "",
       })
       .select("id, prospect, industry, created_at")
       .single();
