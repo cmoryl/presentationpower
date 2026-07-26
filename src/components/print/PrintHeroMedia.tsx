@@ -223,6 +223,21 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
           mixBlendMode: blendMode,
         }}
       />
+      {/* Readability plate — a flat veil in the page background colour so hero
+          copy keeps contrast over ANY image. Light mode veils toward white
+          (dark ink reads), dark mode veils toward near-black (light ink reads).
+          Strength ramps with the auto-luminance boost. */}
+      {autoScrimOn && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundColor: pageBg,
+            opacity: clamp01((isDark ? 0.22 : 0.3) + autoBoost * 0.45),
+          }}
+        />
+      )}
+
       {/* Legibility scrim into the body background — scaled by washStrength */}
       {effectiveScrim !== "none" && effectiveScrimOpacity > 0 && (
         <div
