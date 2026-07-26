@@ -1088,6 +1088,20 @@ function AssetEditor() {
               </Row>
             </Panel>
 
+            {baseBrand && (
+              <Panel title="Page color">
+                <AccentOverridePanel
+                  accentOverride={ctx.accentOverride}
+                  primaryOverride={ctx.primaryOverride}
+                  brandAccent={baseBrand.tokens.accent || baseBrand.tokens.primary}
+                  brandPrimary={baseBrand.tokens.primary}
+                  onChange={(patch) => patchCtx(patch)}
+                />
+              </Panel>
+            )}
+
+
+
             <HeroMediaPanel
               value={content.heroMedia}
               onChange={(next) => patchContent({ heroMedia: next })}
