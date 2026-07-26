@@ -980,7 +980,36 @@ function AssetEditor() {
 
 
           {/* INSPECTOR */}
+          {!inspectorOpen ? (
+            <div className="flex justify-end">
+              <button
+                type="button"
+                data-testid="print-inspector-expand"
+                onClick={() => setInspectorOpen(true)}
+                title="Expand inspector"
+                aria-label="Expand inspector"
+                aria-expanded={false}
+                className="sticky top-6 flex h-24 w-9 items-center justify-center rounded-l-xl border border-r-0 border-black/10 bg-white text-black/60 shadow-sm transition hover:bg-black/5 hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
+              >
+                <span className="text-lg leading-none">‹</span>
+              </button>
+            </div>
+          ) : (
           <div className="space-y-4">
+            <div className="flex justify-end">
+              <button
+                type="button"
+                data-testid="print-inspector-collapse"
+                onClick={() => setInspectorOpen(false)}
+                title="Collapse inspector"
+                aria-label="Collapse inspector"
+                aria-expanded={true}
+                className="rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] uppercase tracking-widest text-black/60 transition hover:bg-black/5 hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
+              >
+                Collapse ›
+              </button>
+            </div>
+
             <Panel title="Layout">
               <Row label="Page size">
                 <select
