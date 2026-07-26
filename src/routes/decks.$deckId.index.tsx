@@ -1203,7 +1203,8 @@ function SlideLightbox({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
