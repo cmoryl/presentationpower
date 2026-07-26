@@ -96,7 +96,9 @@ export function LiveEditOverlay({
       for (const cp of expandPath(pattern, content)) {
         const raw = readPath(content, cp);
         if (typeof raw !== "string") continue;
-        const v = raw.trim();
+        // Match on collapsed text so values containing hard returns still
+        // resolve against the DOM's rendered text.
+        const v = raw.replace(/\s+/g, " ").trim();
         if (!v) continue;
         entries.push({ path: cp, value: v });
       }
