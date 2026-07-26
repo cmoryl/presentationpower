@@ -1,0 +1,193 @@
+{
+  "version": 1,
+  "sdk_version": "0.24.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://lhopfjygzpjawpskiqxl.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "transperfect-modular-mcp",
+      "version": "0.1.0",
+      "title": "TransPerfect Modular"
+    },
+    "tools": [
+      {
+        "name": "list_decks",
+        "title": "List decks",
+        "description": "List the signed-in user's saved presentation decks (id, title, brand, dates).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991,
+              "description": "Maximum number of decks to return (default 25)."
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_deck",
+        "title": "Get deck",
+        "description": "Get one deck of the signed-in user, including its slides in order.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "deck_id": {
+              "type": "string",
+              "description": "The deck UUID, as returned by list_decks."
+            }
+          },
+          "required": [
+            "deck_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_print_assets",
+        "title": "List print assets",
+        "description": "List the signed-in user's saved print assets (case studies, spotlights, e-brochures, adaptor briefs).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "description": "Optional kind filter: case-study, spotlight, ebrochure, or adaptor-brief."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991,
+              "description": "Maximum number of assets to return (default 25)."
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_print_asset",
+        "title": "Get print asset",
+        "description": "Get one saved print asset of the signed-in user, including its content blocks.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "asset_id": {
+              "type": "string",
+              "description": "The print asset UUID, as returned by list_print_assets."
+            }
+          },
+          "required": [
+            "asset_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_campaign_kits",
+        "title": "List campaign kits",
+        "description": "List the signed-in user's saved social and event campaign kits.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "surface": {
+              "type": "string",
+              "description": "Optional filter: 'social' or 'event'."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991,
+              "description": "Maximum number of kits to return (default 25)."
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_brief",
+        "title": "Create brief",
+        "description": "Create a new deck brief for the signed-in user, which can then be opened in the app to generate a deck.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "prospect": {
+              "type": "string",
+              "description": "Prospect or client name."
+            },
+            "industry": {
+              "type": "string",
+              "description": "Industry vertical for the prospect."
+            },
+            "meeting_objective": {
+              "type": "string",
+              "description": "What the meeting should achieve."
+            },
+            "audience": {
+              "type": "string",
+              "description": "Who is in the room."
+            },
+            "brand_mode_id": {
+              "type": "string",
+              "description": "Brand mode id, e.g. 'transperfect'."
+            },
+            "client_facts": {
+              "type": "string",
+              "description": "Freeform notes and facts about the client."
+            }
+          },
+          "required": [
+            "prospect",
+            "industry",
+            "meeting_objective",
+            "audience"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
