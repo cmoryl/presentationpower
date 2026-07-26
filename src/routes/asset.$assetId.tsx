@@ -343,6 +343,21 @@ function AssetEditor() {
     setDirty(true);
     setHistoryTick((t) => t + 1);
   }
+  const isHex = (h: string) => /^#[0-9a-fA-F]{6}$/.test(h.trim());
+  /** Per-field text colour override (path → hex). null clears. */
+  function setInkColor(path: string, color: string | null) {
+    const next = { ...(ctx.inkOverrides ?? {}) };
+    if (!color || !isHex(color)) delete next[path];
+    else next[path] = color.trim().toLowerCase();
+    patchCtx({ inkOverrides: Object.keys(next).length ? next : undefined });
+  }
+  /** Section ("modules[2]") or all-text ("*") colour override. null clears. */
+  function setInkScopeColor(scope: string, color: string | null) {
+    const next = { ...(ctx.inkScopeOverrides ?? {}) };
+    if (!color || !isHex(color)) delete next[scope];
+    else next[scope] = color.trim().toLowerCase();
+    patchCtx({ inkScopeOverrides: Object.keys(next).length ? next : undefined });
+  }
   function patchCtx(patch: Partial<PrintAssetContext>) {
     if (!row) return;
     pushHistory();
@@ -861,6 +876,12 @@ function AssetEditor() {
               content={rawContent}
               editableFields={editableFieldPaths}
               onChange={(path, value) => patchByPath(path, value)}
+              inkOverrides={ctx.inkOverrides}
+              inkScopeOverrides={ctx.inkScopeOverrides}
+              onSetInkColor={(cp, color) => setInkColor(cp, color)}
+              onClearInkColor={(cp) => setInkColor(cp, null)}
+              onSetInkScopeColor={(sc, color) => setInkScopeColor(sc, color)}
+              onClearInkScopeColor={(sc) => setInkScopeColor(sc, null)}
             >
               {brand && kind === "case-study" && (
                 <CaseStudyLayout
