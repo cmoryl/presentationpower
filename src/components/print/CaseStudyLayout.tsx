@@ -145,7 +145,7 @@ export function CaseStudyLayout({
                 cq={cq}
                 onDark
               />
-              <BrandLockup brand={brand} color={brand.id === "bm-enterprise" ? (mode === "dark" ? "#FFFFFF" : "#000000") : (mode === "dark" ? "#FFFFFF" : resolvePrintLogoInk(content.logoColor, ink))} size="2xs" orientation="horizontal" />
+              <BrandLockup brand={brand} color={mode === "dark" ? "#FFFFFF" : "#000000"} size="2xs" orientation="horizontal" />
             </div>
             <div
               style={{
