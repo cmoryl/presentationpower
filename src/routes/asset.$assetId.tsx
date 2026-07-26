@@ -58,6 +58,8 @@ import { HeroDiffTile } from "@/components/print/HeroDiffTile";
 import type { BrandMode } from "@/lib/taxonomy";
 
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
+import { usePrintOverflow } from "@/hooks/use-print-overflow";
+import { PrintOverflowOverlay } from "@/components/print/PrintOverflowOverlay";
 import { SwapVariantPreviewModal } from "@/components/print/SwapVariantPreviewModal";
 import { analyzePrintAsset, canAddModule, weightForSection, effectiveModuleBudget } from "@/lib/print-capacity";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
@@ -108,6 +110,9 @@ function AssetEditor() {
   const [divisionStats, setDivisionStats] = useState<Array<{ label: string; value: string; unit: string | null }>>([]);
   const [divisionQuotes, setDivisionQuotes] = useState<Array<{ quote: string; author: string | null; role: string | null }>>([]);
   const canvasRef = useRef<HTMLDivElement | null>(null);
+  // Measured (not predicted) page overflow — fires whenever content is really
+  // clipped by the fixed-height page, e.g. after dragging the hero too tall.
+  const overflow = usePrintOverflow(canvasRef, row?.content);
   const [exportOpen, setExportOpen] = useState(false);
   const [exportBusy, setExportBusy] = useState(false);
   // Export panel state — hydrated from ctx.exportPrefs on load, then mirrored
@@ -934,6 +939,25 @@ function AssetEditor() {
                 </>
               )}
             </LiveEditOverlay>
+            <PrintOverflowOverlay
+              state={overflow}
+              onFix={() => {
+                const cur = (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia;
+                if (!cur?.imageUrl) {
+                  toast.error("Content overflows the page — remove a module or shorten copy.");
+                  return;
+                }
+                const prev = cur.heightPct ?? 46;
+                // Give back roughly the clipped height, plus a 2pt safety margin.
+                const next = Math.max(22, Math.round(prev - overflow.overflowFrac * 100 - 2));
+                if (next >= prev) {
+                  toast.error("Hero is already at its minimum — remove a module or shorten copy.");
+                  return;
+                }
+                patchContent({ heroMedia: { ...cur, heightPct: next } } as never);
+                toast.success(`Hero reduced to ${next}% (was ${Math.round(prev)}%) to stop the page clipping`);
+              }}
+            />
             <SectionSelectOverlay
               canvasRef={canvasRef}
               scanKey={rawContent}
@@ -1048,6 +1072,17 @@ function AssetEditor() {
             </Panel>
 
             <Panel title="Shared modules">
+              {overflow.clipped && (
+                <div
+                  data-testid="overflow-inspector-note"
+                  className="mb-2 rounded-xl border border-red-400/60 bg-red-50 px-3 py-2 text-[11px] font-semibold leading-snug text-red-700 dark:bg-red-500/10 dark:text-red-300"
+                  role="alert"
+                >
+                  Page is clipping: {Math.round(overflow.overflowFrac * 100)}% ({overflow.overflowPx}px)
+                  of content sits past the trim edge and will be cut from the export. Shrink the hero,
+                  remove a module, or shorten copy.
+                </div>
+              )}
               <LayoutHealthBanner
                 report={analyzePrintAsset(kind, content)}
                 onApplySuggestion={(s) => {
