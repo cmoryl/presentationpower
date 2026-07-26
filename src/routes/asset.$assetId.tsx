@@ -834,7 +834,7 @@ function AssetEditor() {
         </div>
 
         {/* LAYOUT */}
-        <div className="grid grid-cols-[220px_1fr_340px] gap-6">
+        <div className={`grid gap-6 ${inspectorOpen ? "grid-cols-[220px_1fr_340px]" : "grid-cols-[220px_1fr_36px]"}`}>
           {/* SPINE */}
           <div className="space-y-2">
             <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/50 dark:text-white/50">Pages</div>
