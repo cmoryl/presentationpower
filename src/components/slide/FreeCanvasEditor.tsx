@@ -138,7 +138,7 @@ export function FreeCanvasEditor({
   const showDistribute = selectedBlocks.length >= 3;
 
   return (
-    <div ref={wrapRef} className="relative w-full">
+    <div ref={wrapRef} className="relative h-full w-full">
       {children}
       <div className="absolute inset-0 z-40">
         {list.map((b) => {

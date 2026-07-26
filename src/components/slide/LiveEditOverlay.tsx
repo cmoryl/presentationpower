@@ -210,7 +210,7 @@ export function LiveEditOverlay({
   return (
     <div
       ref={wrapRef}
-      className={enabled ? "live-edit-active relative" : "relative"}
+      className={enabled ? "live-edit-active relative h-full w-full" : "relative h-full w-full"}
       data-live-bound={boundCount}
     >
       {overrideCss ? <style>{overrideCss}</style> : null}
