@@ -166,7 +166,15 @@ export function LiveEditOverlay({
     function commit(target: HTMLElement) {
       const path = target.getAttribute("data-live-path");
       if (!path) return;
-      const next = (target.textContent ?? "").replace(/\s+/g, " ").trim();
+      // Preserve hard returns; only collapse runs of spaces/tabs.
+      const next = (target.innerText ?? target.textContent ?? "")
+        .replace(/\r\n?/g, "\n")
+        .replace(/[ \t\u00a0]+/g, " ")
+        .replace(/\n{3,}/g, "\n\n")
+        .split("\n")
+        .map((l) => l.trim())
+        .join("\n")
+        .trim();
       const prev = String(readPath(content, path) ?? "").trim();
       if (next === prev) return;
       onChange(path, next);
