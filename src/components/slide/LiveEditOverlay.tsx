@@ -34,6 +34,24 @@ const COLOR_SWATCHES: { label: string; hex: string }[] = [
   { label: "Red", hex: "#E53D2E" },
 ];
 
+/**
+ * Scope key for a concrete content path.
+ * "modules[2].title" → "modules[2]" (the section it belongs to)
+ * "stats[0].label"   → "stats[0]"
+ * "content.title"    → "content"
+ * "title"            → "title"
+ */
+export function inkScopeOf(path: string): string {
+  const arr = path.match(/^(.*\[\d+\])/);
+  if (arr?.[1]) return arr[1];
+  const dot = path.indexOf(".");
+  return dot > 0 ? path.slice(0, dot) : path;
+}
+
+export const INK_ALL_SCOPE = "*";
+
+type InkTarget = "block" | "section" | "all";
+
 export function LiveEditOverlay({
   enabled,
   slideId,
@@ -43,6 +61,9 @@ export function LiveEditOverlay({
   inkOverrides,
   onSetInkColor,
   onClearInkColor,
+  inkScopeOverrides,
+  onSetInkScopeColor,
+  onClearInkScopeColor,
   children,
 }: {
   enabled: boolean;
@@ -53,6 +74,10 @@ export function LiveEditOverlay({
   inkOverrides?: Record<string, string>;
   onSetInkColor?: (concretePath: string, color: string) => void;
   onClearInkColor?: (concretePath: string) => void;
+  /** Scope-level colors: key is a scope from inkScopeOf(), or "*" for all text. */
+  inkScopeOverrides?: Record<string, string>;
+  onSetInkScopeColor?: (scope: string, color: string) => void;
+  onClearInkScopeColor?: (scope: string) => void;
   children: React.ReactNode;
 }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -61,6 +86,8 @@ export function LiveEditOverlay({
   // relying on React re-render timing.
   const [tick, setTick] = useState(0);
   const [activePath, setActivePath] = useState<string | null>(null);
+  const [inkTarget, setInkTarget] = useState<InkTarget>("block");
+
 
   // Precompute path → value map for the tag pass; unique-by-value only.
   const uniqueByValue = useMemo(() => {
