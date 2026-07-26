@@ -141,11 +141,16 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
           count += 1;
         }
         const lum = count ? sum / count : 0;
-        const threshold = clamp01(media.autoScrimThreshold ?? 0.6);
-        if (lum > threshold) {
-          // Ramp: at threshold → +0.15, at pure white → +0.55.
-          const boost = 0.15 + ((lum - threshold) / Math.max(0.001, 1 - threshold)) * 0.4;
-          setAutoBoost(clamp01(boost));
+        // Mode-aware contrast risk:
+        //  - dark pages use light ink → bright photos are the problem
+        //  - light pages use dark ink → dark photos are the problem
+        const threshold = clamp01(media.autoScrimThreshold ?? (isDark ? 0.6 : 0.45));
+        const risk = isDark
+          ? (lum - threshold) / Math.max(0.001, 1 - threshold)
+          : (threshold - lum) / Math.max(0.001, threshold);
+        if (risk > 0) {
+          // Ramp: just past threshold → +0.15, worst case → +0.55.
+          setAutoBoost(clamp01(0.15 + clamp01(risk) * 0.4));
         } else {
           setAutoBoost(0);
         }
@@ -157,7 +162,8 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
     img.onerror = () => { if (!cancelled) setAutoBoost(0); };
     img.src = media.imageUrl;
     return () => { cancelled = true; };
-  }, [media.imageUrl, media.autoScrim, media.autoScrimThreshold, scrim]);
+  }, [media.imageUrl, autoScrimOn, media.autoScrimThreshold, scrim, isDark]);
+
 
   const showFallback = !media.imageUrl || failed;
   // When no image is present (or it failed to load) we render NOTHING — no
