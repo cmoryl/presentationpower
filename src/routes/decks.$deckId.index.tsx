@@ -1150,9 +1150,13 @@ function SlideLightbox({
     };
   }, [onClose, onPrev, onNext, suppressEscape]);
 
-  return (
+  // Portal to <body>: the editor's <main> creates a stacking context, so an
+  // in-tree overlay renders *below* the sticky app nav no matter its z-index.
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex flex-col bg-black/85 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex flex-col bg-black/85 backdrop-blur-sm"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
