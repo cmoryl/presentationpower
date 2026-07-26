@@ -2201,7 +2201,9 @@ export const useDeckStore = create<DeckState>()(
             [deckId]: {
               ...deck,
               slides: deck.slides.map((sl) =>
-                sl.id === slideId ? { ...sl, inkOverrides: undefined } : sl,
+                sl.id === slideId
+                  ? { ...sl, inkOverrides: undefined, inkScopeOverrides: undefined }
+                  : sl,
               ),
             },
           },
