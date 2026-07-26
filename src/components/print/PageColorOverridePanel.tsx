@@ -1,5 +1,5 @@
 /**
- * Page accent / primary color override control for the print asset editor.
+ * Page color override control for the print asset editor.
  *
  * The division brand supplies accent + primary tokens; this panel lets a user
  * override either one per page (swatch, native color picker, or typed hex) and
@@ -129,7 +129,7 @@ function ColorRow({
   );
 }
 
-export function AccentOverridePanel({
+export function PageColorOverridePanel({
   accentOverride,
   primaryOverride,
   brandAccent,
@@ -143,10 +143,10 @@ export function AccentOverridePanel({
   onChange: (patch: { accentOverride?: string; primaryOverride?: string }) => void;
 }) {
   return (
-    <div data-testid="accent-override-panel" className="space-y-2">
+    <div data-testid="page-color-override-panel" className="space-y-2">
       <ColorRow
         label="Accent"
-        testId="accent-override"
+        testId="page-color-accent"
         value={accentOverride}
         fallback={brandAccent}
         onChange={(hex) => onChange({ accentOverride: hex ?? undefined })}
@@ -154,7 +154,7 @@ export function AccentOverridePanel({
       <div className="h-px bg-black/5 dark:bg-white/10" />
       <ColorRow
         label="Primary"
-        testId="primary-override"
+        testId="page-color-primary"
         value={primaryOverride}
         fallback={brandPrimary}
         onChange={(hex) => onChange({ primaryOverride: hex ?? undefined })}

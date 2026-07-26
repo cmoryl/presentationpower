@@ -51,7 +51,7 @@ import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker"
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
-import { AccentOverridePanel } from "@/components/print/AccentOverridePanel";
+import { PageColorOverridePanel } from "@/components/print/PageColorOverridePanel";
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
 import { HeroCostDebugPanel } from "@/components/print/HeroCostDebugPanel";
@@ -1090,13 +1090,13 @@ function AssetEditor() {
             </Panel>
 
             {baseBrand && (
-              <Panel title="Page color">
-                <AccentOverridePanel
+              <Panel title="Page color override">
+                <PageColorOverridePanel
                   accentOverride={ctx.accentOverride}
                   primaryOverride={ctx.primaryOverride}
                   brandAccent={baseBrand.tokens.accent || baseBrand.tokens.primary}
                   brandPrimary={baseBrand.tokens.primary}
-                  onChange={(patch) => patchCtx(patch)}
+                  onChange={(patch: { accentOverride?: string; primaryOverride?: string }) => patchCtx(patch)}
                 />
               </Panel>
             )}
