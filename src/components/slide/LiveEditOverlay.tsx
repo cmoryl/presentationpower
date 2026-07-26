@@ -291,7 +291,7 @@ export function LiveEditOverlay({
       className={enabled ? "live-edit-active relative h-full w-full" : "relative h-full w-full"}
       data-live-bound={boundCount}
     >
-      {overrideCss ? <style>{overrideCss}</style> : null}
+      <style>{`.live-edit-target{white-space:pre-wrap;}\n${overrideCss}`}</style>
       {children}
       {canPickColor ? (
         <div
