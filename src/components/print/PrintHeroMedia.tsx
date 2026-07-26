@@ -48,15 +48,24 @@ type Props = {
 };
 
 export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
+  const isDark = mode === "dark";
   const overlayColor = media.overlayColor ?? accent;
-  const overlayOpacity = clamp01(media.overlayOpacity ?? 0.55);
+  // Mode-aware wash defaults: dark pages multiply the accent into the photo so
+  // light ink reads; light pages keep a softer wash so dark ink reads.
+  const overlayOpacity = clamp01(media.overlayOpacity ?? (isDark ? 0.62 : 0.42));
   const washStrength = clamp01(media.washStrength ?? 1);
-  const scrimOpacity = clamp01(media.scrimOpacity ?? media.washStrength ?? 1);
+  // Readability floor — never let the scrim drop below what hero copy needs.
+  const scrimFloor = isDark ? 0.55 : 0.45;
+  const scrimOpacity = Math.max(
+    scrimFloor,
+    clamp01(media.scrimOpacity ?? media.washStrength ?? 1),
+  );
   const scrim = media.scrim ?? "bottom";
-  const blendMode = media.blendMode ?? "multiply";
+  const blendMode = media.blendMode ?? (isDark ? "multiply" : "soft-light");
   const heightPct = media.heightPct ?? 46;
   const aspect = media.aspect ?? "fill";
-  const pageBg = mode === "dark" ? "#111114" : "#FFFFFF";
+  const pageBg = isDark ? "#111114" : "#FFFFFF";
+
 
   // Safe-area guards keep the subject inside the crop as the band reflows
   // across breakpoints. Clamp so users can't zero-out the buffer.
