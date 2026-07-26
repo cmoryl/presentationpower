@@ -48,15 +48,24 @@ type Props = {
 };
 
 export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
+  const isDark = mode === "dark";
   const overlayColor = media.overlayColor ?? accent;
-  const overlayOpacity = clamp01(media.overlayOpacity ?? 0.55);
+  // Mode-aware wash defaults: dark pages multiply the accent into the photo so
+  // light ink reads; light pages keep a softer wash so dark ink reads.
+  const overlayOpacity = clamp01(media.overlayOpacity ?? (isDark ? 0.62 : 0.42));
   const washStrength = clamp01(media.washStrength ?? 1);
-  const scrimOpacity = clamp01(media.scrimOpacity ?? media.washStrength ?? 1);
+  // Readability floor — never let the scrim drop below what hero copy needs.
+  const scrimFloor = isDark ? 0.55 : 0.45;
+  const scrimOpacity = Math.max(
+    scrimFloor,
+    clamp01(media.scrimOpacity ?? media.washStrength ?? 1),
+  );
   const scrim = media.scrim ?? "bottom";
-  const blendMode = media.blendMode ?? "multiply";
+  const blendMode = media.blendMode ?? (isDark ? "multiply" : "soft-light");
   const heightPct = media.heightPct ?? 46;
   const aspect = media.aspect ?? "fill";
-  const pageBg = mode === "dark" ? "#111114" : "#FFFFFF";
+  const pageBg = isDark ? "#111114" : "#FFFFFF";
+
 
   // Safe-area guards keep the subject inside the crop as the band reflows
   // across breakpoints. Clamp so users can't zero-out the buffer.
@@ -106,8 +115,11 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
   // Auto legibility: sample the image band where hero text sits and, if too
   // bright, boost the scrim opacity so light copy still reads. CORS-tainted
   // canvases just no-op — we degrade gracefully to the manual scrim setting.
+  // Auto legibility is ON by default so any image stays readable in both modes;
+  // authors can still opt out with autoScrim: false.
+  const autoScrimOn = media.autoScrim !== false;
   useEffect(() => {
-    if (!media.autoScrim || !media.imageUrl) { setAutoBoost(0); return; }
+    if (!autoScrimOn || !media.imageUrl) { setAutoBoost(0); return; }
     let cancelled = false;
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -132,11 +144,16 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
           count += 1;
         }
         const lum = count ? sum / count : 0;
-        const threshold = clamp01(media.autoScrimThreshold ?? 0.6);
-        if (lum > threshold) {
-          // Ramp: at threshold → +0.15, at pure white → +0.55.
-          const boost = 0.15 + ((lum - threshold) / Math.max(0.001, 1 - threshold)) * 0.4;
-          setAutoBoost(clamp01(boost));
+        // Mode-aware contrast risk:
+        //  - dark pages use light ink → bright photos are the problem
+        //  - light pages use dark ink → dark photos are the problem
+        const threshold = clamp01(media.autoScrimThreshold ?? (isDark ? 0.6 : 0.45));
+        const risk = isDark
+          ? (lum - threshold) / Math.max(0.001, 1 - threshold)
+          : (threshold - lum) / Math.max(0.001, threshold);
+        if (risk > 0) {
+          // Ramp: just past threshold → +0.15, worst case → +0.55.
+          setAutoBoost(clamp01(0.15 + clamp01(risk) * 0.4));
         } else {
           setAutoBoost(0);
         }
@@ -148,7 +165,8 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
     img.onerror = () => { if (!cancelled) setAutoBoost(0); };
     img.src = media.imageUrl;
     return () => { cancelled = true; };
-  }, [media.imageUrl, media.autoScrim, media.autoScrimThreshold, scrim]);
+  }, [media.imageUrl, autoScrimOn, media.autoScrimThreshold, scrim, isDark]);
+
 
   const showFallback = !media.imageUrl || failed;
   // When no image is present (or it failed to load) we render NOTHING — no
@@ -205,6 +223,21 @@ export function PrintHeroMediaLayer({ media, accent, mode, cq }: Props) {
           mixBlendMode: blendMode,
         }}
       />
+      {/* Readability plate — a flat veil in the page background colour so hero
+          copy keeps contrast over ANY image. Light mode veils toward white
+          (dark ink reads), dark mode veils toward near-black (light ink reads).
+          Strength ramps with the auto-luminance boost. */}
+      {autoScrimOn && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundColor: pageBg,
+            opacity: clamp01((isDark ? 0.18 : 0.2) + autoBoost * 0.5),
+          }}
+        />
+      )}
+
       {/* Legibility scrim into the body background — scaled by washStrength */}
       {effectiveScrim !== "none" && effectiveScrimOpacity > 0 && (
         <div

@@ -205,12 +205,11 @@ const CASE_STUDY_SEED: CaseStudyContent = emptyCaseStudy({
   summary: "Aēsop's success story in rapid product knowledge localization",
   heroMedia: {
     imageUrl: EXAMPLE_HERO_URL,
-    overlayOpacity: 0.55,
-    washStrength: 1,
+    autoScrim: true,
     scrim: "bottom",
-    blendMode: "multiply",
     heightPct: 46,
   },
+
 
   challenge: {
     heading: "The Challenge",
