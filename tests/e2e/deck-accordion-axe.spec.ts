@@ -30,15 +30,20 @@ const RULES = [
 
 async function createDeckViaSkipAI(page: any) {
   await page.goto("/brief/new", { waitUntil: "domcontentloaded" });
-  await page.waitForTimeout(2000);
   const skip = page.getByRole("button", { name: /or skip AI/i });
-  await skip.waitFor({ state: "visible", timeout: 20000 });
+  await skip.waitFor({ state: "visible", timeout: 30000 });
   await skip.click();
   await page.waitForFunction(() => /\/decks\/[A-Za-z0-9_-]+/.test(location.pathname), null, {
-    timeout: 30000,
+    timeout: 45000,
   });
-  await page.waitForTimeout(1500);
+  // Toolbar renders after the deck hydrates; wait for a known trigger.
+  await page
+    .getByRole("button", { name: /^Motion/i })
+    .first()
+    .waitFor({ state: "visible", timeout: 30000 });
+  await page.waitForTimeout(500);
 }
+
 
 test.describe.configure({ mode: "serial" });
 
