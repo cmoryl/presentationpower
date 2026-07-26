@@ -77,7 +77,7 @@ export function usePrintOverflow(
       setState((prev) =>
         prev.overflowPx === overflowPx && prev.pageHeight === pageHeight
           ? prev
-          : { overflowPx, pageHeight, overflowFrac, clipped: overflowPx > 2 },
+          : { overflowPx, pageHeight, overflowFrac, clipped: overflowPx > 6 },
       );
     };
 
