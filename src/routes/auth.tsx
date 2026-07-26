@@ -4,14 +4,30 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
+  validateSearch: (s: { next?: string }): { next?: string } => ({
+    next: typeof s.next === "string" ? s.next : undefined,
+  }),
   head: () => ({ meta: [{ title: "Sign in · TransPerfect Modular" }] }),
   component: AuthPage,
 });
+
+/** Only same-origin relative paths are allowed as post-login redirects. */
+function safeNext(next: string | undefined): string | null {
+  if (!next) return null;
+  if (!next.startsWith("/") || next.startsWith("//")) return null;
+  return next;
+}
 
 type Mode = "signin" | "signup" | "forgot";
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
+  const returnTo = safeNext(next);
+  const goAfterAuth = () => {
+    if (returnTo) window.location.href = returnTo;
+    else navigate({ to: "/admin", replace: true });
+  };
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
@@ -44,12 +60,15 @@ function AuthPage() {
     if (mode === "forgot") return;
     let mounted = true;
     supabase.auth.getSession().then(({ data }) => {
-      if (mounted && data.session) navigate({ to: "/admin", replace: true });
+      if (mounted && data.session) {
+        if (returnTo) window.location.href = returnTo;
+        else navigate({ to: "/admin", replace: true });
+      }
     });
     return () => {
       mounted = false;
     };
-  }, [navigate, pathname, mode]);
+  }, [navigate, pathname, mode, returnTo]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -62,7 +81,7 @@ function AuthPage() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/admin`,
+            emailRedirectTo: `${window.location.origin}${returnTo ?? "/admin"}`,
             data: name ? { display_name: name } : undefined,
           },
         });
@@ -73,7 +92,7 @@ function AuthPage() {
           setInfo("Account created. Check your inbox to confirm the email, then sign in.");
           setMode("signin");
         } else {
-          navigate({ to: "/admin", replace: true });
+          goAfterAuth();
         }
       } else if (mode === "forgot") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -90,7 +109,7 @@ function AuthPage() {
           if (remember) window.localStorage.setItem("tp.rememberedEmail", email);
           else window.localStorage.removeItem("tp.rememberedEmail");
         } catch { /* ignore */ }
-        navigate({ to: "/admin", replace: true });
+        goAfterAuth();
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong. Try again.");
