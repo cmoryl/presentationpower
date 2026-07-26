@@ -122,6 +122,9 @@ export type DeckSlide = {
   // or "" to clear. Applied via a scoped stylesheet in LiveEditOverlay and
   // preserved across previews/exports.
   inkOverrides?: Record<string, string>;
+  // Scope-level text colors — keyed by a path scope (e.g. "content.stats[0]")
+  // or "*" for every bound string on the slide. Per-field inkOverrides win.
+  inkScopeOverrides?: Record<string, string>;
   // Optional per-slide transition override (Pass 1 — on-screen only).
   transition?: SlideTransition;
 };
