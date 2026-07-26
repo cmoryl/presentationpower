@@ -385,39 +385,9 @@ function Dashboard() {
         </div>
       </section>
 
-      {/* ================= RECENT DECKS ================= */}
-      <section className="mt-12">
-        <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
-          <SectionHeader kicker="Workspace" title="Recent decks" hint={`${allDecks.length} total`} inline />
-          <Link to="/decks" className="text-sm text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white">
-            View all →
-          </Link>
-        </div>
+      {/* ================= RECENT ACTIVITY (all areas) ================= */}
+      <RecentActivity decks={recentDecks} allDeckCount={allDecks.length} briefs={briefs} />
 
-        {recentDecks.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-black/15 bg-white p-12 text-center dark:border-white/15 dark:bg-white/[0.03]">
-            <div className="mx-auto max-w-md">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#003FC7]/10 text-2xl text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">✦</div>
-              <h3 className="mt-4 text-xl font-semibold">No decks yet</h3>
-              <p className="mt-2 text-sm text-black/60 dark:text-white/60">
-                Start with a brief, or ask the Oracle above. In under a minute you'll have a governed, on-brand deck.
-              </p>
-              <Link
-                to="/brief/new"
-                className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:opacity-90"
-              >
-                <Rocket size={14} /> Create your first brief
-              </Link>
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {recentDecks.map((d) => (
-              <DeckCard key={d.id} deck={d} industry={briefs[d.briefId]?.industry} />
-            ))}
-          </div>
-        )}
-      </section>
 
       {/* ================= AI SUITE ================= */}
       <section className="mt-12">
