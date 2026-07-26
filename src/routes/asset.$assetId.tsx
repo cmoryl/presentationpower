@@ -305,20 +305,20 @@ function AssetEditor() {
 
   // Page-level accent/primary overrides. Applied by cloning the division brand
   // so every layout, chrome band and hero wash picks them up unchanged.
+  const ctxAccent = (row?.context as PrintAssetContext | null)?.accentOverride;
+  const ctxPrimary = (row?.context as PrintAssetContext | null)?.primaryOverride;
   const brand = useMemo(() => {
     if (!baseBrand) return baseBrand;
-    const accent = ctx.accentOverride;
-    const primary = ctx.primaryOverride;
-    if (!accent && !primary) return baseBrand;
+    if (!ctxAccent && !ctxPrimary) return baseBrand;
     return {
       ...baseBrand,
       tokens: {
         ...baseBrand.tokens,
-        ...(accent ? { accent } : {}),
-        ...(primary ? { primary } : {}),
+        ...(ctxAccent ? { accent: ctxAccent } : {}),
+        ...(ctxPrimary ? { primary: ctxPrimary } : {}),
       },
     };
-  }, [baseBrand, ctx.accentOverride, ctx.primaryOverride]);
+  }, [baseBrand, ctxAccent, ctxPrimary]);
 
   const kindForAudit = (row?.kind ?? "case-study") as "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
   useEffect(() => {
