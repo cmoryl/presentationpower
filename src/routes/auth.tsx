@@ -81,7 +81,7 @@ function AuthPage() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/admin`,
+            emailRedirectTo: `${window.location.origin}${returnTo ?? "/admin"}`,
             data: name ? { display_name: name } : undefined,
           },
         });
@@ -92,7 +92,7 @@ function AuthPage() {
           setInfo("Account created. Check your inbox to confirm the email, then sign in.");
           setMode("signin");
         } else {
-          navigate({ to: "/admin", replace: true });
+          goAfterAuth();
         }
       } else if (mode === "forgot") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -109,7 +109,7 @@ function AuthPage() {
           if (remember) window.localStorage.setItem("tp.rememberedEmail", email);
           else window.localStorage.removeItem("tp.rememberedEmail");
         } catch { /* ignore */ }
-        navigate({ to: "/admin", replace: true });
+        goAfterAuth();
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong. Try again.");
