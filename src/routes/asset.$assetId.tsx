@@ -51,6 +51,7 @@ import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker"
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
 
+import { AccentOverridePanel } from "@/components/print/AccentOverridePanel";
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
 import { HeroCostDebugPanel } from "@/components/print/HeroCostDebugPanel";
@@ -298,10 +299,27 @@ function AssetEditor() {
       });
   }, [row?.brand_mode_id, fetchDivisionCtx]);
 
-  const brand = useMemo(
+  const baseBrand = useMemo(
     () => brandModes.find((b) => b.id === row?.brand_mode_id) ?? brandModes[0],
     [brandModes, row?.brand_mode_id],
   );
+
+  // Page-level accent/primary overrides. Applied by cloning the division brand
+  // so every layout, chrome band and hero wash picks them up unchanged.
+  const ctxAccent = (row?.context as PrintAssetContext | null)?.accentOverride;
+  const ctxPrimary = (row?.context as PrintAssetContext | null)?.primaryOverride;
+  const brand = useMemo(() => {
+    if (!baseBrand) return baseBrand;
+    if (!ctxAccent && !ctxPrimary) return baseBrand;
+    return {
+      ...baseBrand,
+      tokens: {
+        ...baseBrand.tokens,
+        ...(ctxAccent ? { accent: ctxAccent } : {}),
+        ...(ctxPrimary ? { primary: ctxPrimary } : {}),
+      },
+    };
+  }, [baseBrand, ctxAccent, ctxPrimary]);
 
   const kindForAudit = (row?.kind ?? "case-study") as "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
   useEffect(() => {
@@ -1070,6 +1088,20 @@ function AssetEditor() {
                 />
               </Row>
             </Panel>
+
+            {baseBrand && (
+              <Panel title="Page color">
+                <AccentOverridePanel
+                  accentOverride={ctx.accentOverride}
+                  primaryOverride={ctx.primaryOverride}
+                  brandAccent={baseBrand.tokens.accent || baseBrand.tokens.primary}
+                  brandPrimary={baseBrand.tokens.primary}
+                  onChange={(patch) => patchCtx(patch)}
+                />
+              </Panel>
+            )}
+
+
 
             <HeroMediaPanel
               value={content.heroMedia}

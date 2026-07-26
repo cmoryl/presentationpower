@@ -327,6 +327,10 @@ export type PrintAssetContext = {
   showBleedGuides?: boolean;
   /** Persisted export panel settings. Optional — falls back to defaults. */
   exportPrefs?: PrintExportPrefs;
+  /** Page accent color override (hex). Falls back to the division accent. */
+  accentOverride?: string;
+  /** Page primary color override (hex). Falls back to the division primary. */
+  primaryOverride?: string;
   /** Per-field text color overrides, keyed by concrete content path. */
   inkOverrides?: Record<string, string>;
   /** Section-level ("modules[2]") or all-text ("*") color overrides. */
