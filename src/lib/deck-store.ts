@@ -2166,6 +2166,31 @@ export const useDeckStore = create<DeckState>()(
         }));
       },
 
+      setSlideInkScopeColor: (deckId, slideId, scope, color) => {
+        pushHistory();
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const hex = typeof color === "string" ? color.trim() : "";
+        const valid = /^#[0-9a-fA-F]{6}$/.test(hex);
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) => {
+                if (sl.id !== slideId) return sl;
+                const next: Record<string, string> = { ...(sl.inkScopeOverrides ?? {}) };
+                if (!color || !valid) delete next[scope];
+                else next[scope] = hex.toLowerCase();
+                return { ...sl, inkScopeOverrides: Object.keys(next).length ? next : undefined };
+              }),
+            },
+          },
+        }));
+      },
+
+
+
       clearSlideInkOverrides: (deckId, slideId) => {
         pushHistory();
         const deck = get().decks[deckId];
