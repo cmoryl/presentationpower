@@ -95,6 +95,7 @@ function DeckEditor() {
   const applySlideBackground = useDeckStore((s) => s.applySlideBackground);
   const setSlideMode = useDeckStore((s) => s.setSlideMode);
   const setSlideInkOverride = useDeckStore((s) => s.setSlideInkOverride);
+  const setSlideInkScopeColor = useDeckStore((s) => s.setSlideInkScopeColor);
   const clearSlideInkOverrides = useDeckStore((s) => s.clearSlideInkOverrides);
   const setSlideTransition = useDeckStore((s) => s.setSlideTransition);
   const setDeckDefaultTransition = useDeckStore((s) => s.setDeckDefaultTransition);
@@ -282,13 +283,13 @@ function DeckEditor() {
                 />
               </AccordionGroup>
 
-              {active.inkOverrides && Object.keys(active.inkOverrides).length > 0 && (
-                <AccordionGroup label="Overrides" badge={String(Object.keys(active.inkOverrides).length)}>
+              {(Object.keys(active.inkOverrides ?? {}).length + Object.keys(active.inkScopeOverrides ?? {}).length) > 0 && (
+                <AccordionGroup label="Overrides" badge={String(Object.keys(active.inkOverrides ?? {}).length + Object.keys(active.inkScopeOverrides ?? {}).length)}>
                   <button
                     type="button"
                     onClick={() => clearSlideInkOverrides(deck.id, active.id)}
                     className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-3 py-1 text-[11px] font-medium text-black/70 transition hover:border-red-500 hover:text-red-600"
-                    title={`Clear ${Object.keys(active.inkOverrides).length} text color override(s) on this slide`}
+                    title={`Clear ${Object.keys(active.inkOverrides ?? {}).length + Object.keys(active.inkScopeOverrides ?? {}).length} text color override(s) on this slide`}
                   >
                     ⟲ Reset colors
                   </button>
@@ -465,9 +466,12 @@ function DeckEditor() {
                     content={active.content as Record<string, unknown>}
                     editableFields={mv.editableFields}
                     inkOverrides={active.inkOverrides}
+                    inkScopeOverrides={active.inkScopeOverrides}
                     onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
                     onSetInkColor={(cp, color) => setSlideInkOverride(deck.id, active.id, cp, color)}
                     onClearInkColor={(cp) => setSlideInkOverride(deck.id, active.id, cp, null)}
+                    onSetInkScopeColor={(sc, color) => setSlideInkScopeColor(deck.id, active.id, sc, color)}
+                    onClearInkScopeColor={(sc) => setSlideInkScopeColor(deck.id, active.id, sc, null)}
                   >
                     <ScaledSlide>
                       <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
@@ -493,6 +497,7 @@ function DeckEditor() {
                     content={active.content as Record<string, unknown>}
                     editableFields={mv.editableFields}
                     inkOverrides={active.inkOverrides}
+                    inkScopeOverrides={active.inkScopeOverrides}
                     onChange={() => {}}
                   >
                     <ScaledSlide>
@@ -1003,9 +1008,12 @@ function DeckEditor() {
                 content={active.content as Record<string, unknown>}
                 editableFields={mv.editableFields}
                 inkOverrides={active.inkOverrides}
+                inkScopeOverrides={active.inkScopeOverrides}
                 onChange={(cp, value) => updateField(deck.id, active.id, cp, value)}
                 onSetInkColor={(cp, color) => setSlideInkOverride(deck.id, active.id, cp, color)}
                 onClearInkColor={(cp) => setSlideInkOverride(deck.id, active.id, cp, null)}
+                onSetInkScopeColor={(sc, color) => setSlideInkScopeColor(deck.id, active.id, sc, color)}
+                onClearInkScopeColor={(sc) => setSlideInkScopeColor(deck.id, active.id, sc, null)}
               >
                 <VariantRenderer slide={applyOverlay(active)} variant={mv} brand={brand} pageNumber={clamped + 1} clientName={brief?.prospect} clientLogoUrl={clientLogoUrl} subCompany={deck?.subCompany} logoOrientation={logoOrientation} mode={active.mode ?? "light"} />
                 <CanvasBlockLayer blocks={active.canvasBlocks} brand={brand} />
