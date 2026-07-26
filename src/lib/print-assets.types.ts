@@ -327,6 +327,10 @@ export type PrintAssetContext = {
   showBleedGuides?: boolean;
   /** Persisted export panel settings. Optional — falls back to defaults. */
   exportPrefs?: PrintExportPrefs;
+  /** Per-field text color overrides, keyed by concrete content path. */
+  inkOverrides?: Record<string, string>;
+  /** Section-level ("modules[2]") or all-text ("*") color overrides. */
+  inkScopeOverrides?: Record<string, string>;
 };
 
 export type PrintAssetKind = "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";

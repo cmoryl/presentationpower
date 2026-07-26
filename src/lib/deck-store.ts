@@ -122,6 +122,9 @@ export type DeckSlide = {
   // or "" to clear. Applied via a scoped stylesheet in LiveEditOverlay and
   // preserved across previews/exports.
   inkOverrides?: Record<string, string>;
+  // Scope-level text colors — keyed by a path scope (e.g. "content.stats[0]")
+  // or "*" for every bound string on the slide. Per-field inkOverrides win.
+  inkScopeOverrides?: Record<string, string>;
   // Optional per-slide transition override (Pass 1 — on-screen only).
   transition?: SlideTransition;
 };
@@ -252,6 +255,7 @@ type DeckState = {
   setSlideTransition: (deckId: string, slideId: string, transition: SlideTransition | null) => void;
   setDeckDefaultTransition: (deckId: string, transition: SlideTransition | null) => void;
   setSlideInkOverride: (deckId: string, slideId: string, path: string, color: string | null) => void;
+  setSlideInkScopeColor: (deckId: string, slideId: string, scope: string, color: string | null) => void;
   clearSlideInkOverrides: (deckId: string, slideId: string) => void;
 
   swapVariant: (deckId: string, slideId: string, newVariantId: string) => void;
@@ -2162,6 +2166,31 @@ export const useDeckStore = create<DeckState>()(
         }));
       },
 
+      setSlideInkScopeColor: (deckId, slideId, scope, color) => {
+        pushHistory();
+        const deck = get().decks[deckId];
+        if (!deck) return;
+        const hex = typeof color === "string" ? color.trim() : "";
+        const valid = /^#[0-9a-fA-F]{6}$/.test(hex);
+        set((s) => ({
+          decks: {
+            ...s.decks,
+            [deckId]: {
+              ...deck,
+              slides: deck.slides.map((sl) => {
+                if (sl.id !== slideId) return sl;
+                const next: Record<string, string> = { ...(sl.inkScopeOverrides ?? {}) };
+                if (!color || !valid) delete next[scope];
+                else next[scope] = hex.toLowerCase();
+                return { ...sl, inkScopeOverrides: Object.keys(next).length ? next : undefined };
+              }),
+            },
+          },
+        }));
+      },
+
+
+
       clearSlideInkOverrides: (deckId, slideId) => {
         pushHistory();
         const deck = get().decks[deckId];
@@ -2172,7 +2201,9 @@ export const useDeckStore = create<DeckState>()(
             [deckId]: {
               ...deck,
               slides: deck.slides.map((sl) =>
-                sl.id === slideId ? { ...sl, inkOverrides: undefined } : sl,
+                sl.id === slideId
+                  ? { ...sl, inkOverrides: undefined, inkScopeOverrides: undefined }
+                  : sl,
               ),
             },
           },

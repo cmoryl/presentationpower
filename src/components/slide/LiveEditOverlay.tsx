@@ -34,6 +34,24 @@ const COLOR_SWATCHES: { label: string; hex: string }[] = [
   { label: "Red", hex: "#E53D2E" },
 ];
 
+/**
+ * Scope key for a concrete content path.
+ * "modules[2].title" → "modules[2]" (the section it belongs to)
+ * "stats[0].label"   → "stats[0]"
+ * "content.title"    → "content"
+ * "title"            → "title"
+ */
+export function inkScopeOf(path: string): string {
+  const arr = path.match(/^(.*\[\d+\])/);
+  if (arr?.[1]) return arr[1];
+  const dot = path.indexOf(".");
+  return dot > 0 ? path.slice(0, dot) : path;
+}
+
+export const INK_ALL_SCOPE = "*";
+
+type InkTarget = "block" | "section" | "all";
+
 export function LiveEditOverlay({
   enabled,
   slideId,
@@ -43,6 +61,9 @@ export function LiveEditOverlay({
   inkOverrides,
   onSetInkColor,
   onClearInkColor,
+  inkScopeOverrides,
+  onSetInkScopeColor,
+  onClearInkScopeColor,
   children,
 }: {
   enabled: boolean;
@@ -53,6 +74,10 @@ export function LiveEditOverlay({
   inkOverrides?: Record<string, string>;
   onSetInkColor?: (concretePath: string, color: string) => void;
   onClearInkColor?: (concretePath: string) => void;
+  /** Scope-level colors: key is a scope from inkScopeOf(), or "*" for all text. */
+  inkScopeOverrides?: Record<string, string>;
+  onSetInkScopeColor?: (scope: string, color: string) => void;
+  onClearInkScopeColor?: (scope: string) => void;
   children: React.ReactNode;
 }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -61,6 +86,8 @@ export function LiveEditOverlay({
   // relying on React re-render timing.
   const [tick, setTick] = useState(0);
   const [activePath, setActivePath] = useState<string | null>(null);
+  const [inkTarget, setInkTarget] = useState<InkTarget>("block");
+
 
   // Precompute path → value map for the tag pass; unique-by-value only.
   const uniqueByValue = useMemo(() => {
@@ -190,22 +217,60 @@ export function LiveEditOverlay({
     };
   }, [enabled, content, onChange]);
 
-  // Build the scoped stylesheet for ink overrides. Keyed by concrete path.
+  // Build the scoped stylesheet for ink overrides. Scope rules are emitted
+  // first so a per-field override always wins over its section / all-text
+  // colour (equal specificity → last rule wins).
   const overrideCss = useMemo(() => {
-    if (!inkOverrides) return "";
     const rules: string[] = [];
-    for (const [path, hex] of Object.entries(inkOverrides)) {
-      if (!/^#[0-9a-fA-F]{6}$/.test(hex)) continue;
+    const isHex = (h: string) => /^#[0-9a-fA-F]{6}$/.test(h);
+    for (const [scope, hex] of Object.entries(inkScopeOverrides ?? {})) {
+      if (!isHex(hex)) continue;
+      if (scope === INK_ALL_SCOPE) {
+        rules.push(`[data-live-path], [data-live-path] * { color: ${hex} !important; }`);
+        continue;
+      }
+      const q = scope.replace(/"/g, '\\"');
+      rules.push(
+        `[data-live-path="${q}"], [data-live-path^="${q}."], [data-live-path^="${q}."] *, [data-live-path="${q}"] * { color: ${hex} !important; }`,
+      );
+    }
+    for (const [path, hex] of Object.entries(inkOverrides ?? {})) {
+      if (!isHex(hex)) continue;
       // Attribute-escape any unusual characters — paths use [ ] . which are
       // legal in CSS attribute-value selectors when quoted.
       const q = path.replace(/"/g, '\\"');
       rules.push(`[data-live-path="${q}"], [data-live-path="${q}"] * { color: ${hex} !important; }`);
     }
     return rules.join("\n");
-  }, [inkOverrides]);
+  }, [inkOverrides, inkScopeOverrides]);
 
-  const canPickColor = enabled && !!activePath && (onSetInkColor || onClearInkColor);
-  const activeHex = activePath ? inkOverrides?.[activePath] : undefined;
+  const canPickColor =
+    enabled && !!activePath && (onSetInkColor || onClearInkColor || onSetInkScopeColor);
+  const activeScope = activePath ? inkScopeOf(activePath) : null;
+  const scopeSupported = !!(onSetInkScopeColor || onClearInkScopeColor);
+  const target: InkTarget = scopeSupported ? inkTarget : "block";
+  const targetKey =
+    target === "block" ? activePath : target === "section" ? activeScope : INK_ALL_SCOPE;
+  const activeHex =
+    target === "block"
+      ? activePath
+        ? inkOverrides?.[activePath]
+        : undefined
+      : targetKey
+        ? inkScopeOverrides?.[targetKey]
+        : undefined;
+
+  function applyColor(hex: string) {
+    if (!targetKey) return;
+    if (target === "block") onSetInkColor?.(targetKey, hex);
+    else onSetInkScopeColor?.(targetKey, hex);
+  }
+  function clearColor() {
+    if (!targetKey) return;
+    if (target === "block") onClearInkColor?.(targetKey);
+    else onClearInkScopeColor?.(targetKey);
+  }
+
 
   return (
     <div
@@ -218,9 +283,42 @@ export function LiveEditOverlay({
       {canPickColor ? (
         <div
           data-live-color-picker
-          className="pointer-events-auto absolute left-1/2 top-3 z-40 -translate-x-1/2 rounded-full border border-black/10 bg-white/95 px-2 py-1.5 shadow-lg backdrop-blur"
+          data-ink-target={target}
+          className="pointer-events-auto absolute left-1/2 top-3 z-40 -translate-x-1/2 rounded-2xl border border-black/10 bg-white/95 px-2.5 py-2 shadow-lg backdrop-blur"
           onMouseDown={(e) => e.preventDefault()} // keep focus on the editable element
         >
+          {scopeSupported ? (
+            <div className="mb-1.5 flex items-center gap-1">
+              <span className="mr-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-black/50">
+                Apply to
+              </span>
+              {([
+                { id: "block", label: "This text" },
+                { id: "section", label: "Section" },
+                { id: "all", label: "All text" },
+              ] as { id: InkTarget; label: string }[]).map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  data-testid={`ink-target-${opt.id}`}
+                  aria-pressed={target === opt.id}
+                  onClick={() => setInkTarget(opt.id)}
+                  title={
+                    opt.id === "section" && activeScope
+                      ? `All text in ${activeScope}`
+                      : opt.label
+                  }
+                  className={`rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest transition ${
+                    target === opt.id
+                      ? "bg-[#003FC7] text-white"
+                      : "border border-black/15 text-black/55 hover:border-[#003FC7]/50 hover:text-black"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          ) : null}
           <div className="flex items-center gap-1.5">
             <span className="mr-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-black/50">Text</span>
             {COLOR_SWATCHES.map((sw) => (
@@ -228,7 +326,7 @@ export function LiveEditOverlay({
                 key={sw.hex}
                 type="button"
                 title={`${sw.label} · ${sw.hex}`}
-                onClick={() => onSetInkColor?.(activePath!, sw.hex)}
+                onClick={() => applyColor(sw.hex)}
                 className={`h-5 w-5 rounded-full border transition hover:scale-110 ${
                   activeHex?.toLowerCase() === sw.hex.toLowerCase()
                     ? "border-[#003FC7] ring-2 ring-[#003FC7]/40"
@@ -238,21 +336,22 @@ export function LiveEditOverlay({
               />
             ))}
             <label
-              className="ml-1 inline-flex h-5 w-5 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-black/20 bg-white text-[9px] font-bold text-black/60"
+              className="relative ml-1 inline-flex h-5 w-5 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-black/20 bg-white text-[9px] font-bold text-black/60"
               title="Custom color"
             >
               +
               <input
                 type="color"
+                data-testid="ink-custom-hex"
                 className="absolute h-0 w-0 opacity-0"
                 value={activeHex ?? "#003FC7"}
-                onChange={(e) => onSetInkColor?.(activePath!, e.target.value)}
+                onChange={(e) => applyColor(e.target.value)}
               />
             </label>
             {activeHex ? (
               <button
                 type="button"
-                onClick={() => onClearInkColor?.(activePath!)}
+                onClick={clearColor}
                 title="Clear color override"
                 className="ml-1 rounded-full border border-black/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-black/60 hover:border-red-500 hover:text-red-600"
               >
@@ -262,6 +361,7 @@ export function LiveEditOverlay({
           </div>
         </div>
       ) : null}
+
     </div>
   );
 }
