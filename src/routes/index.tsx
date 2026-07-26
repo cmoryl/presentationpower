@@ -898,6 +898,223 @@ function MiniStat({ label, value, accent }: { label: string; value: number | str
   );
 }
 
+/* ---------- recent activity across every area ---------- */
+
+type ActivityKind = "deck" | "print" | "social" | "event";
+
+type ActivityItem = {
+  id: string;
+  kind: ActivityKind;
+  title: string;
+  meta: string;
+  at: string;
+  to: string;
+  search?: Record<string, string>;
+  params?: Record<string, string>;
+};
+
+const ACTIVITY_META: Record<
+  ActivityKind,
+  { label: string; icon: React.ComponentType<{ size?: number }>; accent: string }
+> = {
+  deck: { label: "Deck", icon: Presentation, accent: "#003FC7" },
+  print: { label: "Print", icon: Printer, accent: "#EC388A" },
+  social: { label: "Social", icon: Share2, accent: "#FF9B70" },
+  event: { label: "Event", icon: CalendarDays, accent: "#A6FA87" },
+};
+
+function RecentActivity({
+  decks,
+  allDeckCount,
+  briefs,
+}: {
+  decks: Deck[];
+  allDeckCount: number;
+  briefs: Record<string, { industry?: string } | undefined>;
+}) {
+  const listPrint = useServerFn(listMyPrintAssets);
+  const listKits = useServerFn(listMyKits);
+  const [printItems, setPrintItems] = useState<ActivityItem[]>([]);
+  const [kitItems, setKitItems] = useState<ActivityItem[]>([]);
+  const [filter, setFilter] = useState<"all" | ActivityKind>("all");
+
+  useEffect(() => {
+    let cancelled = false;
+    listPrint()
+      .then((rows) => {
+        if (cancelled || !Array.isArray(rows)) return;
+        setPrintItems(
+          rows.map((r: any) => ({
+            id: `print-${r.id}`,
+            kind: "print" as const,
+            title: r.title || "Untitled print asset",
+            meta: String(r.kind ?? "print").replace(/-/g, " "),
+            at: r.updated_at ?? r.created_at ?? new Date(0).toISOString(),
+            to: "/asset/$assetId",
+            params: { assetId: r.id },
+          })),
+        );
+      })
+      .catch(() => { /* signed out — stay quiet */ });
+    return () => { cancelled = true; };
+  }, [listPrint]);
+
+  useEffect(() => {
+    let cancelled = false;
+    listKits({ data: {} })
+      .then((rows) => {
+        if (cancelled || !Array.isArray(rows)) return;
+        setKitItems(
+          rows.map((k) => ({
+            id: `kit-${k.id}`,
+            kind: (k.surface === "event" ? "event" : "social") as ActivityKind,
+            title: k.name || "Untitled kit",
+            meta: `${k.formatIds.length} format${k.formatIds.length === 1 ? "" : "s"}`,
+            at: k.updatedAt ?? k.createdAt,
+            to: k.surface === "event" ? "/events/new" : "/social/new",
+            search: { kit: k.id },
+          })),
+        );
+      })
+      .catch(() => { /* signed out — stay quiet */ });
+    return () => { cancelled = true; };
+  }, [listKits]);
+
+  const deckItems = useMemo<ActivityItem[]>(
+    () =>
+      decks.map((d) => ({
+        id: `deck-${d.id}`,
+        kind: "deck" as const,
+        title: d.title,
+        meta: `${d.slides.length} slide${d.slides.length === 1 ? "" : "s"}${
+          briefs[d.briefId]?.industry ? ` · ${briefs[d.briefId]!.industry}` : ""
+        }`,
+        at: d.context?.lastExportedAt ?? d.createdAt,
+        to: "/decks/$deckId",
+        params: { deckId: d.id },
+      })),
+    [decks, briefs],
+  );
+
+  const items = useMemo(() => {
+    const all = [...deckItems, ...printItems, ...kitItems];
+    const scoped = filter === "all" ? all : all.filter((i) => i.kind === filter);
+    return scoped.sort((a, b) => (b.at ?? "").localeCompare(a.at ?? "")).slice(0, 9);
+  }, [deckItems, printItems, kitItems, filter]);
+
+  const counts: Record<ActivityKind, number> = {
+    deck: allDeckCount,
+    print: printItems.length,
+    social: kitItems.filter((k) => k.kind === "social").length,
+    event: kitItems.filter((k) => k.kind === "event").length,
+  };
+
+  const chips: { id: "all" | ActivityKind; label: string; count?: number }[] = [
+    { id: "all", label: "All", count: counts.deck + counts.print + counts.social + counts.event },
+    { id: "deck", label: "Decks", count: counts.deck },
+    { id: "print", label: "Print", count: counts.print },
+    { id: "social", label: "Social", count: counts.social },
+    { id: "event", label: "Events", count: counts.event },
+  ];
+
+  return (
+    <section className="mt-12">
+      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
+        <SectionHeader
+          kicker="Workspace"
+          title="Recent activity"
+          hint="Decks, print, social, and events"
+          inline
+        />
+        <Link to="/decks" className="text-sm text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white">
+          View all decks →
+        </Link>
+      </div>
+
+      <div className="mb-4 flex flex-wrap gap-1.5">
+        {chips.map((c) => (
+          <button
+            key={c.id}
+            type="button"
+            aria-pressed={filter === c.id}
+            onClick={() => setFilter(c.id)}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+              filter === c.id
+                ? "border-[#003FC7] bg-[#003FC7] text-white"
+                : "border-black/10 bg-white text-black/65 hover:border-[#003FC7]/40 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70"
+            }`}
+          >
+            {c.label}
+            {typeof c.count === "number" ? (
+              <span className={filter === c.id ? "text-white/70" : "text-black/35 dark:text-white/40"}>{c.count}</span>
+            ) : null}
+          </button>
+        ))}
+      </div>
+
+      {items.length === 0 ? (
+        <div className="rounded-3xl border border-dashed border-black/15 bg-white p-12 text-center dark:border-white/15 dark:bg-white/[0.03]">
+          <div className="mx-auto max-w-md">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#003FC7]/10 text-2xl text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">✦</div>
+            <h3 className="mt-4 text-xl font-semibold">Nothing here yet</h3>
+            <p className="mt-2 text-sm text-black/60 dark:text-white/60">
+              Start with a brief, a print asset, or a campaign kit — anything you make shows up here.
+            </p>
+            <Link
+              to="/brief/new"
+              className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:opacity-90"
+            >
+              <Rocket size={14} /> Create your first brief
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {items.map((item) => (
+            <ActivityCard key={item.id} item={item} />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ActivityCard({ item }: { item: ActivityItem }) {
+  const meta = ACTIVITY_META[item.kind];
+  const Icon = meta.icon;
+  return (
+    <Link
+      to={item.to as any}
+      params={item.params as any}
+      search={item.search as any}
+      className="group flex flex-col gap-3 rounded-2xl border border-black/10 bg-white p-4 transition hover:-translate-y-0.5 hover:border-[#003FC7]/40 hover:shadow-[0_12px_34px_rgba(3,0,44,0.10)] dark:border-white/10 dark:bg-white/[0.04]"
+    >
+      <div className="flex items-start gap-3">
+        <span
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-white"
+          style={{ background: meta.accent }}
+          aria-hidden
+        >
+          <Icon size={16} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-black/45 dark:text-white/45">
+            {meta.label}
+          </div>
+          <div className="truncate text-sm font-semibold text-[#03002C] dark:text-white">{item.title}</div>
+        </div>
+      </div>
+      <div className="mt-auto flex items-center justify-between gap-2 border-t border-black/5 pt-3 text-[11px] text-black/55 dark:border-white/5 dark:text-white/55">
+        <span className="truncate capitalize">{item.meta}</span>
+        <span className="inline-flex items-center gap-1 whitespace-nowrap">
+          <Clock size={11} /> {item.at ? relative(item.at) : "—"}
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+
 function relative(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const m = Math.floor(diff / 60000);
