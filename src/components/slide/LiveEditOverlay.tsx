@@ -404,6 +404,15 @@ export function LiveEditOverlay({
     else onClearInkScopeColor?.(targetKey);
   }
 
+  function applyFormat(marker: "**" | "*") {
+    const el = document.activeElement as HTMLElement | null;
+    if (!el?.hasAttribute?.("data-live-path")) return;
+    wrapSelection(el, marker);
+    const path = el.getAttribute("data-live-path")!;
+    const next = domToInlineMarkers(el).replace(/[ \t\u00a0]+/g, " ").trim();
+    onChange(path, next);
+    setTick((t) => t + 1);
+  }
 
   return (
     <div
