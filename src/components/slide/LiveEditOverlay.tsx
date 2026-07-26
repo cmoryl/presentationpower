@@ -200,9 +200,12 @@ export function LiveEditOverlay({
     function onKeyDown(e: KeyboardEvent) {
       const t = e.target as HTMLElement | null;
       if (!t?.hasAttribute?.("data-live-path")) return;
-      if (e.key === "Enter") {
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+        // Cmd/Ctrl+Enter commits; plain Enter inserts a hard return.
         e.preventDefault();
         t.blur();
+      } else if (e.key === "Enter") {
+        e.stopPropagation();
       } else if (e.key === "Escape") {
         e.preventDefault();
         const path = t.getAttribute("data-live-path")!;
