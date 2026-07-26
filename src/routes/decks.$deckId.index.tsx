@@ -1340,6 +1340,7 @@ function FieldEditor({
           return long ? (
             <textarea
               key={cp}
+              aria-label={`${path} — ${cp}`}
               className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
               rows={3}
               value={value}
@@ -1348,11 +1349,13 @@ function FieldEditor({
           ) : (
             <input
               key={cp}
+              aria-label={`${path} — ${cp}`}
               className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
               value={value}
               onChange={(e) => onChange(cp, e.target.value)}
             />
           );
+
         })}
       </div>
     </div>
