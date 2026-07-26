@@ -108,6 +108,7 @@ function AssetEditor() {
   const [saving, setSaving] = useState(false);
   const [synthBusy, setSynthBusy] = useState(false);
   const [divisionStats, setDivisionStats] = useState<Array<{ label: string; value: string; unit: string | null }>>([]);
+  const [inspectorOpen, setInspectorOpen] = useState(true);
   const [divisionQuotes, setDivisionQuotes] = useState<Array<{ quote: string; author: string | null; role: string | null }>>([]);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   // Measured (not predicted) page overflow — fires whenever content is really
