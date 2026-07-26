@@ -52,6 +52,81 @@ export const INK_ALL_SCOPE = "*";
 
 type InkTarget = "block" | "section" | "all";
 
+/* ---------------- inline formatting (markdown-lite) ----------------
+ * Values are stored as plain strings with `**bold**` / `*italic*`
+ * markers so nothing about the data model or the renderers changes.
+ * The overlay renders those markers as real <strong>/<em> and
+ * serialises them back on commit. */
+
+const MARKER_RE = /(\*\*|__|\*|_)/;
+
+export function stripInlineMarkers(s: string): string {
+  return s
+    .replace(/\*\*(.+?)\*\*/gs, "$1")
+    .replace(/__(.+?)__/gs, "$1")
+    .replace(/(?<!\*)\*(?!\s)(.+?)(?<!\s)\*(?!\*)/gs, "$1")
+    .replace(/(?<!_)_(?!\s)(.+?)(?<!\s)_(?!_)/gs, "$1");
+}
+
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+export function inlineMarkersToHtml(s: string): string {
+  return escapeHtml(s)
+    .replace(/\*\*(.+?)\*\*/gs, "<strong>$1</strong>")
+    .replace(/__(.+?)__/gs, "<strong>$1</strong>")
+    .replace(/(?<!\*)\*(?!\s)(.+?)(?<!\s)\*(?!\*)/gs, "<em>$1</em>")
+    .replace(/(?<!_)_(?!\s)(.+?)(?<!\s)_(?!_)/gs, "<em>$1</em>");
+}
+
+/** Serialise an edited element back to marker text. */
+export function domToInlineMarkers(root: HTMLElement): string {
+  const out: string[] = [];
+  const walk = (node: Node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      out.push(node.nodeValue ?? "");
+      return;
+    }
+    if (!(node instanceof HTMLElement)) return;
+    const tag = node.tagName.toLowerCase();
+    const style = node.style;
+    const bold =
+      tag === "strong" || tag === "b" || style.fontWeight === "bold" || Number(style.fontWeight) >= 600;
+    const italic = tag === "em" || tag === "i" || style.fontStyle === "italic";
+    if (tag === "br") {
+      out.push("\n");
+      return;
+    }
+    if (bold) out.push("**");
+    if (italic) out.push("*");
+    node.childNodes.forEach(walk);
+    if (italic) out.push("*");
+    if (bold) out.push("**");
+    if (tag === "div" || tag === "p") out.push("\n");
+  };
+  root.childNodes.forEach(walk);
+  return out.join("");
+}
+
+/** Wrap the current selection inside `el` with a marker pair. */
+function wrapSelection(el: HTMLElement, marker: "**" | "*") {
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+  if (!el.contains(range.commonAncestorContainer)) return;
+  if (range.collapsed) return;
+  const text = range.toString();
+  const stripped = stripInlineMarkers(text);
+  const frag = document.createRange().createContextualFragment(
+    inlineMarkersToHtml(`${marker}${stripped}${marker}`),
+  );
+  range.deleteContents();
+  range.insertNode(frag);
+  sel.removeAllRanges();
+}
+
+
 export function LiveEditOverlay({
   enabled,
   slideId,
@@ -90,8 +165,11 @@ export function LiveEditOverlay({
 
 
   // Precompute path → value map for the tag pass; unique-by-value only.
+  // Values are matched both with their raw markers (first paint, where the
+  // renderer prints `**bold**` literally) and stripped (after we've swapped
+  // the markers for real <strong>/<em>).
   const uniqueByValue = useMemo(() => {
-    const entries: { path: string; value: string }[] = [];
+    const entries: { path: string; value: string; raw: string }[] = [];
     for (const pattern of editableFields) {
       for (const cp of expandPath(pattern, content)) {
         const raw = readPath(content, cp);
@@ -100,13 +178,18 @@ export function LiveEditOverlay({
         // resolve against the DOM's rendered text.
         const v = raw.replace(/\s+/g, " ").trim();
         if (!v) continue;
-        entries.push({ path: cp, value: v });
+        entries.push({ path: cp, value: v, raw });
+        const stripped = stripInlineMarkers(v).replace(/\s+/g, " ").trim();
+        if (stripped && stripped !== v) entries.push({ path: cp, value: stripped, raw });
       }
     }
     const counts = new Map<string, number>();
     for (const e of entries) counts.set(e.value, (counts.get(e.value) ?? 0) + 1);
-    const map = new Map<string, string>();
-    for (const e of entries) if ((counts.get(e.value) ?? 0) === 1) map.set(e.value, e.path);
+    const map = new Map<string, { path: string; raw: string }>();
+    for (const e of entries) {
+      if ((counts.get(e.value) ?? 0) !== 1) continue;
+      map.set(e.value, { path: e.path, raw: e.raw });
+    }
     return map;
   }, [content, editableFields]);
 
@@ -131,6 +214,7 @@ export function LiveEditOverlay({
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     const claimedPaths = new Set<string>();
     const claimedEls = new Set<Element>();
+    const toFormat: { el: HTMLElement; raw: string }[] = [];
     let node: Node | null = walker.nextNode();
     while (node) {
       const parent = node.parentElement;
@@ -140,23 +224,32 @@ export function LiveEditOverlay({
         !parent.closest("input,textarea,button,select,[data-slide-chrome]")
       ) {
         const txt = (parent.textContent ?? "").replace(/\s+/g, " ").trim();
-        const path = uniqueByValue.get(txt);
-        if (path && !claimedPaths.has(path)) {
-          parent.setAttribute("data-live-path", path);
+        const hit = uniqueByValue.get(txt);
+        if (hit && !claimedPaths.has(hit.path)) {
+          parent.setAttribute("data-live-path", hit.path);
           if (enabled) {
-            parent.setAttribute("contenteditable", "plaintext-only");
+            parent.setAttribute("contenteditable", "true");
             parent.setAttribute("spellcheck", "true");
             parent.classList.add("live-edit-target");
           }
-          claimedPaths.add(path);
+          // Render markers as real bold / italic (edit mode and read-only).
+          if (MARKER_RE.test(hit.raw) && parent.children.length === 0) {
+            toFormat.push({ el: parent, raw: hit.raw });
+          }
+          claimedPaths.add(hit.path);
           claimedEls.add(parent);
         }
       }
       node = walker.nextNode();
     }
+    for (const f of toFormat) {
+      if (document.activeElement === f.el) continue;
+      f.el.innerHTML = inlineMarkersToHtml(f.raw);
+    }
 
     setBoundCount(claimedPaths.size);
   }, [enabled, slideId, uniqueByValue, tick]);
+
 
   // Commit handlers via event delegation.
   useEffect(() => {
@@ -166,8 +259,9 @@ export function LiveEditOverlay({
     function commit(target: HTMLElement) {
       const path = target.getAttribute("data-live-path");
       if (!path) return;
-      // Preserve hard returns; only collapse runs of spaces/tabs.
-      const next = (target.innerText ?? target.textContent ?? "")
+      // Serialise bold/italic back to markers; preserve hard returns and
+      // only collapse runs of spaces/tabs.
+      const next = domToInlineMarkers(target)
         .replace(/\r\n?/g, "\n")
         .replace(/[ \t\u00a0]+/g, " ")
         .replace(/\n{3,}/g, "\n\n")
@@ -200,7 +294,22 @@ export function LiveEditOverlay({
     function onKeyDown(e: KeyboardEvent) {
       const t = e.target as HTMLElement | null;
       if (!t?.hasAttribute?.("data-live-path")) return;
-      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      const mod = e.metaKey || e.ctrlKey;
+      if (mod && (e.key === "b" || e.key === "B")) {
+        e.preventDefault();
+        e.stopPropagation();
+        wrapSelection(t, "**");
+        commit(t);
+        return;
+      }
+      if (mod && (e.key === "i" || e.key === "I")) {
+        e.preventDefault();
+        e.stopPropagation();
+        wrapSelection(t, "*");
+        commit(t);
+        return;
+      }
+      if (e.key === "Enter" && mod) {
         // Cmd/Ctrl+Enter commits; plain Enter inserts a hard return.
         e.preventDefault();
         t.blur();
@@ -209,10 +318,19 @@ export function LiveEditOverlay({
       } else if (e.key === "Escape") {
         e.preventDefault();
         const path = t.getAttribute("data-live-path")!;
-        t.textContent = String(readPath(content, path) ?? "");
+        t.innerHTML = inlineMarkersToHtml(String(readPath(content, path) ?? ""));
         t.blur();
       }
     }
+    function onPaste(e: ClipboardEvent) {
+      const t = e.target as HTMLElement | null;
+      if (!t?.hasAttribute?.("data-live-path")) return;
+      // Keep pastes plain — no foreign markup in the slide DOM.
+      e.preventDefault();
+      const text = e.clipboardData?.getData("text/plain") ?? "";
+      document.execCommand("insertText", false, text);
+    }
+
     function onClick(e: MouseEvent) {
       const t = e.target as HTMLElement | null;
       if (t?.closest?.("[data-live-path]")) e.stopPropagation();
@@ -221,11 +339,13 @@ export function LiveEditOverlay({
     root.addEventListener("focusin", onFocusIn, true);
     root.addEventListener("focusout", onFocusOut, true);
     root.addEventListener("keydown", onKeyDown, true);
+    root.addEventListener("paste", onPaste, true);
     root.addEventListener("click", onClick, true);
     return () => {
       root.removeEventListener("focusin", onFocusIn, true);
       root.removeEventListener("focusout", onFocusOut, true);
       root.removeEventListener("keydown", onKeyDown, true);
+      root.removeEventListener("paste", onPaste, true);
       root.removeEventListener("click", onClick, true);
     };
   }, [enabled, content, onChange]);
@@ -284,6 +404,15 @@ export function LiveEditOverlay({
     else onClearInkScopeColor?.(targetKey);
   }
 
+  function applyFormat(marker: "**" | "*") {
+    const el = document.activeElement as HTMLElement | null;
+    if (!el?.hasAttribute?.("data-live-path")) return;
+    wrapSelection(el, marker);
+    const path = el.getAttribute("data-live-path")!;
+    const next = domToInlineMarkers(el).replace(/[ \t\u00a0]+/g, " ").trim();
+    onChange(path, next);
+    setTick((t) => t + 1);
+  }
 
   return (
     <div
@@ -300,6 +429,29 @@ export function LiveEditOverlay({
           className="pointer-events-auto absolute left-1/2 top-3 z-40 -translate-x-1/2 rounded-2xl border border-black/10 bg-white/95 px-2.5 py-2 shadow-lg backdrop-blur"
           onMouseDown={(e) => e.preventDefault()} // keep focus on the editable element
         >
+          <div className="mb-1.5 flex items-center gap-1">
+            <span className="mr-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-black/50">
+              Style
+            </span>
+            <button
+              type="button"
+              data-testid="live-format-bold"
+              title="Bold selection (⌘/Ctrl + B)"
+              onClick={() => applyFormat("**")}
+              className="h-6 w-6 rounded-md border border-black/10 text-[12px] font-bold text-black/80 hover:bg-black/5"
+            >
+              B
+            </button>
+            <button
+              type="button"
+              data-testid="live-format-italic"
+              title="Italicize selection (⌘/Ctrl + I)"
+              onClick={() => applyFormat("*")}
+              className="h-6 w-6 rounded-md border border-black/10 text-[12px] italic text-black/80 hover:bg-black/5"
+            >
+              I
+            </button>
+          </div>
           {scopeSupported ? (
             <div className="mb-1.5 flex items-center gap-1">
               <span className="mr-1 text-[9px] font-semibold uppercase tracking-[0.22em] text-black/50">
