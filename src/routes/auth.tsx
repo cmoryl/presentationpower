@@ -22,6 +22,12 @@ type Mode = "signin" | "signup" | "forgot";
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
+  const returnTo = safeNext(next);
+  const goAfterAuth = () => {
+    if (returnTo) window.location.href = returnTo;
+    else navigate({ to: "/admin", replace: true });
+  };
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
