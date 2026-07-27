@@ -394,7 +394,9 @@ function NextBrandGuide() {
                   <th className="py-3 pr-4 font-medium">HEX</th>
                   <th className="py-3 pr-4 font-medium">RGB</th>
                   <th className="py-3 pr-4 font-medium">CMYK</th>
+                  <th className="py-3 pr-4 font-medium">HSL</th>
                   <th className="py-3 font-medium">Pantone</th>
+
                 </tr>
               </thead>
               <tbody>
@@ -410,12 +412,22 @@ function NextBrandGuide() {
                     <td className="py-3 pr-4 tabular-nums">{d.accent}</td>
                     <td className="py-3 pr-4 tabular-nums">{d.rgb}</td>
                     <td className="py-3 pr-4 tabular-nums">{d.cmyk}</td>
+                    <td className="py-3 pr-4 tabular-nums">{d.hsl}</td>
                     <td className="py-3">{d.pantone}</td>
+
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+          <p className="mt-4 max-w-3xl text-sm text-black/60 dark:text-white/60">
+            <strong className="font-semibold">Blue build note.</strong> The specified TransPerfect /
+            City Series / GlobalLink blue is <span className="tabular-nums">#13B1F3</span> (Pantone
+            306 C). The released vector artwork carries the applied screen blue{" "}
+            <span className="tabular-nums">#00AEEF</span>. Match the artwork on screen; specify
+            Pantone 306 C for anything printed or fabricated.
+          </p>
+
         </Section>
 
         {/* Typography */}
