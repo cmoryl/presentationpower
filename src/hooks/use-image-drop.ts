@@ -14,7 +14,7 @@ import type * as React from "react";
 import { useCallback, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { toast } from "sonner";
+import { errorToast, successToast } from "@/lib/a11y-toast";
 import { uploadSlideMedia } from "@/lib/slide-media";
 import { uploadDivisionImagery } from "@/lib/division-imagery.functions";
 import { logImageryEvent } from "@/lib/admin.functions";
@@ -128,13 +128,13 @@ export function useImageDrop({
       if (images.length === 0) {
         const msg = "Drop an image file (JPEG, PNG, WebP, GIF, SVG, AVIF).";
         setError(msg);
-        toast.error("Unsupported file type", { description: msg, important: true });
+        errorToast("Unsupported file type", msg);
         return;
       }
       if (rejected > 0) {
-        toast.error(
+        errorToast(
           rejected === 1 ? "1 file skipped" : `${rejected} files skipped`,
-          { description: "Only JPEG, PNG, WebP, GIF, SVG and AVIF images can be uploaded.", important: true },
+          "Only JPEG, PNG, WebP, GIF, SVG and AVIF images can be uploaded.",
         );
       }
       setError(null);
@@ -205,11 +205,10 @@ export function useImageDrop({
                 // Applying the image to the slide already succeeded — filing it
                 // is best-effort (e.g. signed-out or RLS denial).
                 console.warn("Division library filing failed", e);
-                toast.error(`Couldn't add "${file.name}" to the division library`, {
-                  description:
-                    e instanceof Error ? e.message : "The image is on the slide, but wasn't saved to the library.",
-                  important: true,
-                });
+                errorToast(
+                  `Couldn't add "${file.name}" to the division library`,
+                  e instanceof Error ? e.message : "The image is on the slide, but wasn't saved to the library.",
+                );
               }
             }
             step(i + 1, 0, file.name, "done");
@@ -217,7 +216,7 @@ export function useImageDrop({
             const msg = e instanceof Error ? e.message : "Upload failed.";
             failures.push(`"${file.name}": ${msg}`);
             setError(msg);
-            toast.error(`Upload failed — ${file.name}`, { description: msg, important: true });
+            errorToast(`Upload failed — ${file.name}`, msg);
           }
         }
 
@@ -228,20 +227,17 @@ export function useImageDrop({
 
         if (applied > 0) {
           const suffix = filed > 0 ? " and added to the division library" : "";
-          toast.success(
+          successToast(
             applied === 1 ? `Image applied${suffix}` : `${applied} images applied${suffix}`,
             { id: "image-drop", duration: 2200 },
           );
         } else if (failures.length > 0) {
-          toast.error("No images were uploaded", {
-            description: failures[0],
-            important: true,
-          });
+          errorToast("No images were uploaded", failures[0]);
         }
       } catch (e) {
         const msg = e instanceof Error ? e.message : "Upload failed.";
         setError(msg);
-        toast.error("Upload failed", { description: msg, important: true });
+        errorToast("Upload failed", msg);
       } finally {
         setBusy(false);
         setProgress(null);
