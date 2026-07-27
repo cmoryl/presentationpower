@@ -232,10 +232,11 @@ function Hero({ division, total }: { division: NextDivision; total: number }) {
           {NEXT_EVENT.name}
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/70">
-          {NEXT_EVENT.headlinePattern} — one system, eleven divisions, {total || 616} master
+          “The new production ecosystem for …” — one system, eleven divisions, {total || 616} master
           designs. Every division inherits the same layout grid and swaps only its accent, lockup
           and headline suffix.
         </p>
+
         <dl className="mt-6 flex flex-wrap gap-x-8 gap-y-3 text-sm text-white/80">
           <Fact icon={CalendarDays} label="Dates" value={NEXT_EVENT.datesLabel} />
           <Fact icon={MapPin} label="Venue" value={`${NEXT_EVENT.venue} · ${NEXT_EVENT.city}`} />
