@@ -201,14 +201,18 @@ function NextHub() {
           <DialogTitle className="text-sm font-semibold">
             {preview ? `${preview.code} — ${preview.format}` : ""}
           </DialogTitle>
-          {preview?.exampleUrl ? (
+          {preview && isSponsorshipPacket(preview) && sponsorshipPacketPages(preview.divisionId) ? (
+            <SponsorshipPacketPages
+              divisionId={preview.divisionId}
+              pages={sponsorshipPacketPages(preview.divisionId)!}
+            />
+          ) : preview?.exampleUrl ? (
             <img
               src={preview.exampleUrl}
               alt={`${preview.code} ${preview.format} example render`}
               className="max-h-[64vh] w-full rounded-lg border border-border bg-muted object-contain"
               loading="lazy"
             />
-
           ) : (
             <p className="text-sm text-muted-foreground">No example render available yet.</p>
           )}
