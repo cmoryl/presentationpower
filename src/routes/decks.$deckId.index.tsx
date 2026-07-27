@@ -550,7 +550,12 @@ function DeckEditor() {
         </div>
 
         {/* Stage — drop images from your computer straight onto the slide */}
-        <div {...stageDrop.dropProps} className="relative" data-testid="slide-stage-dropzone">
+        <div
+          {...stageDrop.dropProps}
+          className="relative"
+          data-testid="slide-stage-dropzone"
+          aria-busy={stageDrop.busy}
+        >
           {(stageDrop.isOver || stageDrop.busy) && (
             <div className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#003FC7] bg-[#003FC7]/10 text-center backdrop-blur-[1px]">
               <div className="rounded-full bg-[#003FC7] px-4 py-2 text-[11px] uppercase tracking-widest text-white">
