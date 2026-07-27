@@ -278,7 +278,7 @@ function OverviewView() {
         </div>
 
         {/* Deck body: trend + breakdowns */}
-        <div className="mt-6 grid gap-6 lg:grid-cols-12">
+        <div className="mt-6 grid gap-6 [&>*]:min-w-0 lg:grid-cols-12">
           {/* Sparkline trend */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5 lg:col-span-7">
             <div className="flex items-end justify-between gap-3">
@@ -367,7 +367,7 @@ function OverviewView() {
         </div>
 
         {/* Brand mode + Archetype + Recent decks */}
-        <div className="mt-6 grid gap-6 lg:grid-cols-12">
+        <div className="mt-6 grid gap-6 [&>*]:min-w-0 lg:grid-cols-12">
           <BreakdownBlock
             title="Brand Modes"
             subtitle="Deck distribution"
@@ -449,7 +449,7 @@ function OverviewView() {
           </div>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-12">
+        <div className="grid gap-6 [&>*]:min-w-0 lg:grid-cols-12">
           {/* Donut: success/error */}
           <div className="lg:col-span-4">
             <Donut
