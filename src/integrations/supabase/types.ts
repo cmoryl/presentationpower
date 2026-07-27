@@ -663,6 +663,8 @@ export type Database = {
           id: string
           mode: string
           name: string
+          next_design: boolean
+          next_track_id: string
           profile_id: string
           surface: string
           updated_at: string
@@ -678,6 +680,8 @@ export type Database = {
           id?: string
           mode?: string
           name: string
+          next_design?: boolean
+          next_track_id?: string
           profile_id?: string
           surface: string
           updated_at?: string
@@ -693,6 +697,8 @@ export type Database = {
           id?: string
           mode?: string
           name?: string
+          next_design?: boolean
+          next_track_id?: string
           profile_id?: string
           surface?: string
           updated_at?: string

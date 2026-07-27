@@ -21,6 +21,10 @@ import {
 import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { NextRenderer, NEXT_RENDER_TRACKS } from "@/components/campaigns/NextRenderer";
+import { NEXT_NAVY_SPEC } from "@/lib/next-brand-guide";
+import { AssetPreviewFrame } from "@/components/campaigns/AssetPreviewFrame";
+
+
 import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
 
 import { Download } from "lucide-react";
@@ -153,6 +157,8 @@ export function KitWizard({
           subBrand: row.brandId,
         });
         setAttachEvent(row.attachEvent);
+        setNextDesign(!!row.nextDesign);
+        setNextTrackId(row.nextTrackId || "city-series");
         setStep(4); // jump to review
       })
       .catch((err) => {
@@ -202,6 +208,8 @@ export function KitWizard({
           },
           eventFacts: attachEvent ? (event as unknown as Record<string, any>) : {},
           attachEvent,
+          nextDesign,
+          nextTrackId,
         },
       });
       setSavedKitId(row.id);
@@ -681,18 +689,30 @@ export function KitWizard({
             </div>
 
             {/* NEXT 2026 design mode — regenerate the kit into the event look. */}
-            <div className="mb-5 rounded-2xl border border-[#001450]/25 bg-[#001450]/[0.04] p-4">
+            <div
+              className="mb-5 rounded-2xl border p-4"
+              style={{
+                borderColor: `${NEXT_NAVY_SPEC}40`,
+                background: `${NEXT_NAVY_SPEC}0A`,
+              }}
+            >
               <div className="flex flex-wrap items-center gap-3">
-                <label className="inline-flex items-center gap-2 text-sm font-medium text-[#001450]">
+                <label
+                  className="inline-flex items-center gap-2 text-sm font-medium"
+                  style={{ color: NEXT_NAVY_SPEC }}
+                >
                   <input
                     type="checkbox"
+                    data-testid="next-design-toggle"
                     checked={nextDesign}
                     onChange={(e) => {
                       setNextDesign(e.target.checked);
                       setRegenTick((n) => n + 1);
                     }}
-                    className="size-4 accent-[#001450]"
+                    className="size-4"
+                    style={{ accentColor: NEXT_NAVY_SPEC }}
                   />
+
                   Regenerate in NEXT 2026 designs
                 </label>
                 <label className="inline-flex items-center gap-2 text-xs text-black/60">
@@ -742,7 +762,7 @@ export function KitWizard({
             ) : (
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {assets.map((asset) => (
-                  <div key={asset.id} className="space-y-2">
+                  <div key={asset.id} className="min-w-0 space-y-2">
                     <div className="text-[11px] uppercase tracking-widest text-black/60">
                       {asset.format.label}
                     </div>
@@ -750,36 +770,42 @@ export function KitWizard({
                       {asset.format.width}×{asset.format.height} ·{" "}
                       {nextDesign ? "NEXT 2026" : asset.mode}
                     </div>
-                    <div data-kit-asset-id={asset.id}>
-                      {nextDesign ? (
-                        <NextRenderer
-                          format={asset.format}
-                          trackId={nextTrackId}
-                          copy={asset.copy}
-                          facts={{
-                            hashtag: eventFacts.hashtag,
-                            registrationUrl: eventFacts.registrationUrl,
-                            city: eventFacts.city,
-                          }}
-                          displayShortEdge={260}
-                        />
-                      ) : (
-                        <SocialRenderer
-                          format={asset.format}
-                          brandId={asset.brandId}
-                          mode={asset.mode}
-                          copy={asset.copy}
-                          facts={{
-                            hashtag: eventFacts.hashtag,
-                            registrationUrl: eventFacts.registrationUrl,
-                          }}
-                          displayShortEdge={260}
-                        />
-                      )}
+                    <div data-kit-asset-id={asset.id} className="min-w-0">
+                      <AssetPreviewFrame width={asset.format.width} height={asset.format.height}>
+                        {(displayShortEdge) =>
+                          nextDesign ? (
+                            <NextRenderer
+                              format={asset.format}
+                              trackId={nextTrackId}
+                              copy={asset.copy}
+                              facts={{
+                                hashtag: eventFacts.hashtag,
+                                registrationUrl: eventFacts.registrationUrl,
+                                city: eventFacts.city,
+                              }}
+                              displayShortEdge={displayShortEdge}
+                            />
+                          ) : (
+                            <SocialRenderer
+                              format={asset.format}
+                              brandId={asset.brandId}
+                              mode={asset.mode}
+                              copy={asset.copy}
+                              facts={{
+                                hashtag: eventFacts.hashtag,
+                                registrationUrl: eventFacts.registrationUrl,
+                              }}
+                              displayShortEdge={displayShortEdge}
+                            />
+                          )
+                        }
+                      </AssetPreviewFrame>
                     </div>
                   </div>
                 ))}
               </div>
+
+
             )}
           </StepCard>
         )}
