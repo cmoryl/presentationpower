@@ -88,6 +88,11 @@ export function SlideImageryPanel({
   const [libQuery, setLibQuery] = useState("");
   const [libOpen, setLibOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const drop = useImageDrop({
+    divisionId,
+    onApply: ({ url, path }) => onChange(url, path),
+  });
+
 
   useEffect(() => {
     let cancelled = false;
