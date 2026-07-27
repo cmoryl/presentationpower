@@ -20,6 +20,7 @@ import {
 } from "@/lib/campaigns";
 import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
+import { NextRenderer, NEXT_RENDER_TRACKS } from "@/components/campaigns/NextRenderer";
 import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
 
 import { Download } from "lucide-react";
