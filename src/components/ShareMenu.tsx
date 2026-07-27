@@ -237,12 +237,23 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   async function ensureCloudSaved(): Promise<string> {
     if (!deck || !brief || !cloudDeckId) throw new Error("Missing deck/brief context");
     // Persist client logo URL into context so the shared payload can render it.
-    const clientLogoUrl = deck.clientLogo?.primaryUrl ?? null;
+    // Editor URLs are signed for an hour — a share link outlives that, so
+    // re-sign the logo with a long-lived URL before saving.
+    let clientLogoUrl = deck.clientLogo?.primaryUrl ?? null;
+    if (deck.clientLogo?.id) {
+      try {
+        const res = await signShareLogo({ data: { logoId: deck.clientLogo.id } });
+        if (res.url) clientLogoUrl = res.url;
+      } catch {
+        // Non-fatal — fall back to the editor URL.
+      }
+    }
     const nextContext = { ...(deck.context ?? {}), ...(clientLogoUrl ? { clientLogoUrl } : {}) };
     const deckToSave: Deck = { ...deck, context: nextContext };
     await save({ data: { deck: deckToSave, brief: brief as Brief } });
     return cloudDeckId;
   }
+
 
   async function onEnableShare(expiresAt: string | null = null) {
     if (!signedIn) {
