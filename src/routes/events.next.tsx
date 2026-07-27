@@ -783,8 +783,8 @@ function SponsorshipPacketPages({
   return (
     <div>
       <p className="text-xs text-muted-foreground">
-        All {pages.length} pages of the {divisionId} sponsorship packet, exported from the Canva
-        master.
+        All {pages.length} pages, exported from the Canva master.
+
       </p>
       <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {pages.map((src, i) => (
