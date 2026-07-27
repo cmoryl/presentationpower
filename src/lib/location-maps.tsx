@@ -1453,7 +1453,10 @@ const REGION_BOUNDS: Record<
 };
 
 function regionViewBox(region: RegionKey): string {
-  if (region === "world") return `0 0 ${WORLD_VIEWBOX.w} ${WORLD_VIEWBOX.h}`;
+  // Trim the empty polar bands (above ~82°N, below ~58°S) so the world view
+  // fills wide slide areas instead of floating in dead space.
+  if (region === "world") return `0 22 ${WORLD_VIEWBOX.w} 389`;
+
   const b = REGION_BOUNDS[region];
   const tl = projectLatLon(b.latMax, b.lonMin);
   const br = projectLatLon(b.latMin, b.lonMax);
