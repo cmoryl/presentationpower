@@ -11,13 +11,19 @@ import type { CSSProperties } from "react";
 import type { SocialFormat } from "@/lib/social-formats";
 import { aspectClass } from "@/lib/social-formats";
 import type { CampaignCopy, EventFacts } from "@/lib/campaigns";
-import { NEXT_DIVISIONS, getNextDivision, type NextLockup } from "@/lib/next-brand-guide";
+import {
+  NEXT_DIVISIONS,
+  NEXT_NAVY_ARTWORK,
+  NEXT_NAVY_SPEC,
+  getNextDivision,
+  type NextLockup,
+} from "@/lib/next-brand-guide";
 
 export const NEXT_RENDER_TRACKS = NEXT_DIVISIONS.map((d) => ({ id: d.id, name: d.name }));
 
 /** Navy ground per track — City Series gets its own deeper navy. */
 function groundFor(trackId: string) {
-  return trackId === "city-series" ? "#001450" : "#10025E";
+  return trackId === "city-series" ? NEXT_NAVY_SPEC : NEXT_NAVY_ARTWORK;
 }
 
 /** Pick the widest white lockup for corner placement. */
@@ -275,9 +281,10 @@ export function NextRenderer({
                   padding: `${(short * 1.2) / 100}px ${(short * 2.2) / 100}px`,
                   borderRadius: 9999,
                   background: accent,
-                  color: "#001450",
+                  color: NEXT_NAVY_SPEC,
                   fontWeight: 600,
                   letterSpacing: "0.02em",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {copy.cta}
@@ -292,6 +299,7 @@ export function NextRenderer({
                   background: "rgba(255,255,255,0.14)",
                   border: "1px solid rgba(255,255,255,0.24)",
                   color: "#FFFFFF",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {facts.hashtag}

@@ -35,6 +35,10 @@ export type SavedKit = {
   // JSON-safe. Wizard uses string fields plus speakers/sponsors arrays.
   eventFacts: Record<string, any>;
   attachEvent: boolean;
+  /** NEXT 2026 design mode — renders assets in the NEXT event look. */
+  nextDesign: boolean;
+  /** NEXT track id (next-brand-guide division), e.g. "city-series". */
+  nextTrackId: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -51,6 +55,8 @@ function rowToKit(r: any): SavedKit {
     copy: r.copy ?? {},
     eventFacts: r.event_facts ?? {},
     attachEvent: !!r.attach_event,
+    nextDesign: !!r.next_design,
+    nextTrackId: r.next_track_id || "city-series",
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };
@@ -109,6 +115,8 @@ const SaveInput = z.object({
   }),
   eventFacts: z.record(z.string(), z.unknown()).default({}),
   attachEvent: z.boolean().default(false),
+  nextDesign: z.boolean().default(false),
+  nextTrackId: z.string().min(1).max(80).default("city-series"),
 });
 
 export const saveKit = createServerFn({ method: "POST" })
@@ -127,6 +135,8 @@ export const saveKit = createServerFn({ method: "POST" })
       copy: data.copy,
       event_facts: data.eventFacts,
       attach_event: data.attachEvent,
+      next_design: data.nextDesign,
+      next_track_id: data.nextTrackId,
     };
     if (data.id) {
       const { data: row, error } = await s

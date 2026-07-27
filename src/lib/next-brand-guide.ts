@@ -31,7 +31,20 @@ export type NextDivisionBrand = {
   lockups: NextLockup[];
 };
 
+/**
+ * NEXT navy tokens — the single source of truth for both navies.
+ *
+ * `NEXT_NAVY_SPEC` is the palette-PDF spec navy reserved for City Series.
+ * `NEXT_NAVY_ARTWORK` is the navy the delivered City Series vector artwork is
+ * actually built in (paired with `NEXT_BLUE_ARTWORK`). Component code must
+ * read these instead of repeating hex literals.
+ */
+export const NEXT_NAVY_SPEC = "#001450";
+export const NEXT_NAVY_ARTWORK = "#10025E";
+export const NEXT_BLUE_ARTWORK = "#1590EF";
+
 /** Core structural colors shared by every NEXT lockup. */
+
 export const NEXT_CORE_COLORS = [
   {
     name: "NEXT Navy",
@@ -41,7 +54,7 @@ export const NEXT_CORE_COLORS = [
   },
   {
     name: "City Series Navy",
-    hex: "#001450",
+    hex: NEXT_NAVY_SPEC,
     rgb: "0, 20, 80",
     role: "Deeper navy reserved for the City Series lockup",
   },
@@ -77,7 +90,7 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
     id: "transperfect",
     name: "TransPerfect NEXT",
     accent: "#13B1F3",
-    accentArtwork: "#1590EF",
+    accentArtwork: NEXT_BLUE_ARTWORK,
     rgb: "19, 177, 243",
     cmyk: "92, 27, 0, 5",
     pantone: "Pantone 306 C",
@@ -96,12 +109,12 @@ export const NEXT_DIVISIONS: NextDivisionBrand[] = [
     id: "city-series",
     name: "TransPerfect NEXT City Series",
     accent: "#13B1F3",
-    accentArtwork: "#1590EF",
+    accentArtwork: NEXT_BLUE_ARTWORK,
     rgb: "19, 177, 243",
     cmyk: "92, 27, 0, 5",
     pantone: "Pantone 306 C",
     hsl: "198°, 92%, 95%",
-    note: "Multi-city roadshow lockup, sourced from the official City Series master folder (SSv1, SSv2, Stacked — color, all white, and DBlue-on-white 'reverse'). Applied artwork builds navy #10025E with blue #1590EF; spec navy remains #001450. Never swap in a city name inside the lockup — set city names as separate type.",
+    note: `Multi-city roadshow lockup, sourced from the official City Series master folder (SSv1, SSv2, Stacked — color, all white, and DBlue-on-white 'reverse'). Applied artwork builds navy ${NEXT_NAVY_ARTWORK} with blue ${NEXT_BLUE_ARTWORK}; spec navy remains ${NEXT_NAVY_SPEC}. Never swap in a city name inside the lockup — set city names as separate type.`,
     lockups: [
       { lockup: "ssv1", lockupLabel: "Side by side v1", variant: "color", variantLabel: "Color", src: "/next-2026/logos/city-series-ssv1-color.svg", aspect: 3.3195 },
       { lockup: "ssv1", lockupLabel: "Side by side v1", variant: "white", variantLabel: "All white", src: "/next-2026/logos/city-series-ssv1-white.svg", aspect: 3.3195 },
