@@ -9195,28 +9195,47 @@ function renderLocationsVariant(
   );
 
   if (variantId === "MV-LOC-WORLD-PINS") {
-    // Free-form Aurora v2 — map bleeds directly onto the aurora, no plate,
-    // no border, no tint. RegionRail sits below on a single hairline.
+    // Free-form Aurora v2 — halftone map bleeds onto the aurora, framed by
+    // corner registration ticks and a role legend. RegionRail sits below.
+    const tick = ink.hairline;
+    const Corner = ({ pos }: { pos: "tl" | "tr" | "bl" | "br" }) => {
+      const v: React.CSSProperties = { position: "absolute", width: 18, height: 18 };
+      if (pos === "tl") Object.assign(v, { top: 0, left: 0, borderTop: `1px solid ${tick}`, borderLeft: `1px solid ${tick}` });
+      if (pos === "tr") Object.assign(v, { top: 0, right: 0, borderTop: `1px solid ${tick}`, borderRight: `1px solid ${tick}` });
+      if (pos === "bl") Object.assign(v, { bottom: 0, left: 0, borderBottom: `1px solid ${tick}`, borderLeft: `1px solid ${tick}` });
+      if (pos === "br") Object.assign(v, { bottom: 0, right: 0, borderBottom: `1px solid ${tick}`, borderRight: `1px solid ${tick}` });
+      return <span aria-hidden style={v} />;
+    };
     return (
       <SlideFrame brand={brand as never} pageNumber={pageNumber}>
         <div className="relative flex h-full flex-col">
           <Header />
-          <div className="relative mt-10 flex-1 overflow-hidden">
-            <LocWorldMap
-              pins={pins}
-              region="world"
-              mode={mode}
-              accent={accent}
-              primary={primary}
-              showLabels
-              ariaLabel={`${title} — world map`}
-            />
+          <div className="relative mt-8 flex-1 overflow-hidden">
+            <Corner pos="tl" />
+            <Corner pos="tr" />
+            <Corner pos="bl" />
+            <Corner pos="br" />
+            <div className="absolute inset-0 px-6 py-4">
+              <LocWorldMap
+                pins={pins}
+                region="world"
+                mode={mode}
+                accent={accent}
+                primary={primary}
+                showLabels
+                ariaLabel={`${title} — world map`}
+              />
+            </div>
+          </div>
+          <div className="mt-5">
+            <RoleLegend />
           </div>
           <RegionRail />
         </div>
       </SlideFrame>
     );
   }
+
 
   if (variantId === "MV-LOC-WORLD-STATS") {
     const metrics = coerceMetrics(c.metrics);
