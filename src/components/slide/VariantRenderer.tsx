@@ -7137,7 +7137,7 @@ function AuroraStatCell({
       <div className={centered ? "flex min-w-0 flex-col items-center" : "min-w-0 flex-1"}>
 
         <div
-          className="flex items-baseline gap-2 tabular-nums"
+          className={`flex items-baseline gap-2 tabular-nums${centered ? " justify-center" : ""}`}
           style={{
             fontSize: 84,
             fontWeight: 600,
@@ -7163,11 +7163,14 @@ function AuroraStatCell({
               color: ink.muted,
               letterSpacing: "-0.005em",
               maxWidth: 320,
+              marginLeft: centered ? "auto" : undefined,
+              marginRight: centered ? "auto" : undefined,
             }}
           >
             {label}
           </div>
         ) : null}
+
       </div>
     </div>
   );
