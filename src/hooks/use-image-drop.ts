@@ -128,16 +128,22 @@ export function useImageDrop({
       if (images.length === 0) {
         const msg = "Drop an image file (JPEG, PNG, WebP, GIF, SVG, AVIF).";
         setError(msg);
-        toast.error("Unsupported file type", { description: msg });
+        toast.error("Unsupported file type", { description: msg, important: true });
         return;
       }
       if (rejected > 0) {
         toast.error(
           rejected === 1 ? "1 file skipped" : `${rejected} files skipped`,
-          { description: "Only JPEG, PNG, WebP, GIF, SVG and AVIF images can be uploaded." },
+          { description: "Only JPEG, PNG, WebP, GIF, SVG and AVIF images can be uploaded.", important: true },
         );
       }
       setError(null);
+      // Remember what had keyboard focus so we can restore it once the
+      // progress indicator disappears (dropping a file often blurs the page).
+      const focusOrigin =
+        typeof document !== "undefined" && document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null;
       setBusy(true);
 
       const total = images.length;
@@ -202,6 +208,7 @@ export function useImageDrop({
                 toast.error(`Couldn't add "${file.name}" to the division library`, {
                   description:
                     e instanceof Error ? e.message : "The image is on the slide, but wasn't saved to the library.",
+                  important: true,
                 });
               }
             }
@@ -210,7 +217,7 @@ export function useImageDrop({
             const msg = e instanceof Error ? e.message : "Upload failed.";
             failures.push(`"${file.name}": ${msg}`);
             setError(msg);
-            toast.error(`Upload failed — ${file.name}`, { description: msg });
+            toast.error(`Upload failed — ${file.name}`, { description: msg, important: true });
           }
         }
 
@@ -228,15 +235,23 @@ export function useImageDrop({
         } else if (failures.length > 0) {
           toast.error("No images were uploaded", {
             description: failures[0],
+            important: true,
           });
         }
       } catch (e) {
         const msg = e instanceof Error ? e.message : "Upload failed.";
         setError(msg);
-        toast.error("Upload failed", { description: msg });
+        toast.error("Upload failed", { description: msg, important: true });
       } finally {
         setBusy(false);
         setProgress(null);
+        if (typeof document !== "undefined") {
+          const active = document.activeElement;
+          const focusLost = !active || active === document.body || !document.contains(active);
+          if (focusLost && focusOrigin && document.contains(focusOrigin)) {
+            focusOrigin.focus({ preventScroll: true });
+          }
+        }
       }
     },
     [addToLibrary, divisionId, enabled, onApply, qc, uploadToLibrary],
