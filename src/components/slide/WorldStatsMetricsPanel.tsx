@@ -60,7 +60,6 @@ type Props = {
   }) => void;
 };
 
-
 const FORMATS: NonNullable<LocationMetric["format"]>[] = ["number", "currency", "percent"];
 
 function coerceMetrics(raw: unknown): LocationMetric[] {
@@ -75,7 +74,9 @@ function coerceMetrics(raw: unknown): LocationMetric[] {
         id,
         label,
         unit: m.unit ? String(m.unit) : undefined,
-        format: (FORMATS.includes(m.format as never) ? (m.format as LocationMetric["format"]) : "number"),
+        format: FORMATS.includes(m.format as never)
+          ? (m.format as LocationMetric["format"])
+          : "number",
         precision: Number.isFinite(Number(m.precision)) ? Number(m.precision) : 0,
       };
     })
@@ -113,27 +114,50 @@ function coercePins(raw: unknown, fallback: LocationPin[]): LocationPin[] {
 }
 
 function slug(input: string): string {
-  return input.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `metric-${Date.now()}`;
+  return (
+    input
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || `metric-${Date.now()}`
+  );
 }
 
-export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId, regionFilter, excludeRoles, topN, scaleMode, onChange }: Props) {
+export function WorldStatsMetricsPanel({
+  brandId,
+  items,
+  metrics,
+  activeMetricId,
+  regionFilter,
+  excludeRoles,
+  topN,
+  scaleMode,
+  onChange,
+}: Props) {
   const seeded = React.useMemo(() => getDivisionLocationSet(brandId), [brandId]);
   const pins = React.useMemo(() => coercePins(items, seeded.pins), [items, seeded.pins]);
   const metricList = React.useMemo(() => coerceMetrics(metrics), [metrics]);
-  const activeId = typeof activeMetricId === "string" && activeMetricId ? activeMetricId : metricList[0]?.id ?? "";
+  const activeId =
+    typeof activeMetricId === "string" && activeMetricId
+      ? activeMetricId
+      : (metricList[0]?.id ?? "");
 
   const activeRegions = React.useMemo<RegionKey[]>(() => {
     if (!Array.isArray(regionFilter) || regionFilter.length === 0) return REGION_KEYS;
-    const set = new Set(regionFilter.filter((r): r is RegionKey => REGION_KEYS.includes(r as RegionKey)));
+    const set = new Set(
+      regionFilter.filter((r): r is RegionKey => REGION_KEYS.includes(r as RegionKey)),
+    );
     return set.size ? Array.from(set) : REGION_KEYS;
   }, [regionFilter]);
   const allActive = activeRegions.length === REGION_KEYS.length;
 
   const toggleRegion = (k: RegionKey) => {
     const set = new Set(activeRegions);
-    if (set.has(k)) set.delete(k); else set.add(k);
+    if (set.has(k)) set.delete(k);
+    else set.add(k);
     const next = REGION_KEYS.filter((r) => set.has(r));
-    onChange({ regionFilter: next.length === 0 || next.length === REGION_KEYS.length ? null : next });
+    onChange({
+      regionFilter: next.length === 0 || next.length === REGION_KEYS.length ? null : next,
+    });
   };
   const setPreset = (regions: RegionKey[] | null) => onChange({ regionFilter: regions });
 
@@ -158,7 +182,8 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
   }, [pins]);
   const toggleRole = (k: RoleKey) => {
     const set = new Set(excludedRoles);
-    if (set.has(k)) set.delete(k); else set.add(k);
+    if (set.has(k)) set.delete(k);
+    else set.add(k);
     const next = ROLE_KEYS.filter((r) => set.has(r));
     onChange({ excludeRoles: next.length === 0 ? null : next });
   };
@@ -172,7 +197,6 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
     ? (scaleMode as ScaleMode)
     : "absolute";
   const setScaleMode = (m: ScaleMode) => onChange({ scaleMode: m });
-
 
   const updateMetric = (id: string, patch: Partial<LocationMetric>) => {
     const next = metricList.map((m) => (m.id === id ? { ...m, ...patch } : m));
@@ -190,7 +214,7 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
     onChange({
       metrics: next,
       items: nextPins,
-      activeMetricId: activeId === id ? next[0]?.id ?? null : activeId,
+      activeMetricId: activeId === id ? (next[0]?.id ?? null) : activeId,
     });
   };
 
@@ -247,7 +271,14 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
 
   const activeMetric = metricList.find((m) => m.id === activeId);
   const total = activeMetric
-    ? pins.reduce((sum, p) => sum + (Number.isFinite(p.values?.[activeMetric.id]) ? (p.values![activeMetric.id] as number) : 0), 0)
+    ? pins.reduce(
+        (sum, p) =>
+          sum +
+          (Number.isFinite(p.values?.[activeMetric.id])
+            ? (p.values![activeMetric.id] as number)
+            : 0),
+        0,
+      )
     : 0;
   const coverage = activeMetric
     ? pins.filter((p) => Number.isFinite(p.values?.[activeMetric.id])).length
@@ -257,9 +288,12 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
     <div className="rounded-2xl border-2 border-sky-500/20 bg-white p-6">
       <div className="flex items-baseline justify-between">
         <div>
-          <div className="text-xs uppercase tracking-widest text-sky-700">World stats · metric editor</div>
+          <div className="text-xs uppercase tracking-widest text-sky-700">
+            World stats · metric editor
+          </div>
           <div className="mt-1 text-[11px] text-black/50">
-            Define the metric shown on the world-stats panel and enter a value per pin. The active metric drives the headline total, per-region breakdown, and top locations.
+            Define the metric shown on the world-stats panel and enter a value per pin. The active
+            metric drives the headline total, per-region breakdown, and top locations.
           </div>
         </div>
         <button
@@ -275,13 +309,38 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
       <div className="mt-5 rounded-xl border border-black/10 bg-black/[0.015] p-3">
         <div className="flex items-baseline justify-between">
           <div className="text-[10px] font-semibold uppercase tracking-widest text-black/60">
-            Region filter {allActive ? "· all regions" : `· ${activeRegions.length}/${REGION_KEYS.length}`}
+            Region filter{" "}
+            {allActive ? "· all regions" : `· ${activeRegions.length}/${REGION_KEYS.length}`}
           </div>
           <div className="flex gap-2">
-            <button type="button" onClick={() => setPreset(null)} className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-widest ${allActive ? "bg-sky-600 text-white" : "border border-black/15 text-black/60 hover:border-sky-500 hover:text-sky-600"}`}>All</button>
-            <button type="button" onClick={() => setPreset(["AMER", "LATAM"])} className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-sky-500 hover:text-sky-600">Americas</button>
-            <button type="button" onClick={() => setPreset(["EMEA", "MEA"])} className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-sky-500 hover:text-sky-600">EMEA</button>
-            <button type="button" onClick={() => setPreset(["APAC"])} className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-sky-500 hover:text-sky-600">APAC</button>
+            <button
+              type="button"
+              onClick={() => setPreset(null)}
+              className={`rounded-full px-2 py-0.5 text-[10px] uppercase tracking-widest ${allActive ? "bg-sky-600 text-white" : "border border-black/15 text-black/60 hover:border-sky-500 hover:text-sky-600"}`}
+            >
+              All
+            </button>
+            <button
+              type="button"
+              onClick={() => setPreset(["AMER", "LATAM"])}
+              className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-sky-500 hover:text-sky-600"
+            >
+              Americas
+            </button>
+            <button
+              type="button"
+              onClick={() => setPreset(["EMEA", "MEA"])}
+              className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-sky-500 hover:text-sky-600"
+            >
+              EMEA
+            </button>
+            <button
+              type="button"
+              onClick={() => setPreset(["APAC"])}
+              className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-sky-500 hover:text-sky-600"
+            >
+              APAC
+            </button>
           </div>
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -299,12 +358,14 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
                   disabled
                     ? "cursor-not-allowed border-black/10 text-black/25"
                     : on
-                    ? "border-sky-500 bg-sky-500/10 text-sky-700"
-                    : "border-black/15 text-black/60 hover:border-sky-500 hover:text-sky-600"
+                      ? "border-sky-500 bg-sky-500/10 text-sky-700"
+                      : "border-black/15 text-black/60 hover:border-sky-500 hover:text-sky-600"
                 }`}
                 title={disabled ? "No pins in this region" : on ? "Click to hide" : "Click to show"}
               >
-                <span className={`h-1.5 w-1.5 rounded-full ${on && !disabled ? "bg-sky-600" : "bg-black/25"}`} />
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${on && !disabled ? "bg-sky-600" : "bg-black/25"}`}
+                />
                 <span className="tracking-wide">{REGION_LABELS[k]}</span>
                 <span className="tabular-nums text-black/40">{count}</span>
               </button>
@@ -312,7 +373,8 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
           })}
         </div>
         <div className="mt-2 text-[10px] text-black/45">
-          Filters apply to the map, the legend scale, the headline total, and the top-locations list.
+          Filters apply to the map, the legend scale, the headline total, and the top-locations
+          list.
         </div>
       </div>
 
@@ -320,7 +382,8 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
       <div className="mt-3 rounded-xl border border-black/10 bg-black/[0.015] p-3">
         <div className="flex items-baseline justify-between">
           <div className="text-[10px] font-semibold uppercase tracking-widest text-black/60">
-            Role filter {excludedRoles.length === 0 ? "· all roles" : `· hiding ${excludedRoles.length}`}
+            Role filter{" "}
+            {excludedRoles.length === 0 ? "· all roles" : `· hiding ${excludedRoles.length}`}
           </div>
           {excludedRoles.length > 0 && (
             <button
@@ -347,12 +410,20 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
                   disabled
                     ? "cursor-not-allowed border-black/10 text-black/25"
                     : excluded
-                    ? "border-black/20 bg-black/5 text-black/40 line-through"
-                    : "border-sky-500/60 bg-sky-500/10 text-sky-700 hover:border-sky-500"
+                      ? "border-black/20 bg-black/5 text-black/40 line-through"
+                      : "border-sky-500/60 bg-sky-500/10 text-sky-700 hover:border-sky-500"
                 }`}
-                title={disabled ? "No pins with this role" : excluded ? "Click to include" : "Click to exclude"}
+                title={
+                  disabled
+                    ? "No pins with this role"
+                    : excluded
+                      ? "Click to include"
+                      : "Click to exclude"
+                }
               >
-                <span className={`h-1.5 w-1.5 rounded-full ${excluded ? "bg-black/25" : "bg-sky-600"}`} />
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${excluded ? "bg-black/25" : "bg-sky-600"}`}
+                />
                 <span className="tracking-wide">{ROLE_LABELS[k]}</span>
                 <span className="tabular-nums text-black/40">{count}</span>
               </button>
@@ -418,8 +489,8 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
                   m === "absolute"
                     ? "Color scale spans the raw min/max of the active metric."
                     : m === "region-percent"
-                    ? "Each pin is normalized to its own region's total."
-                    : "Each pin is normalized to the global (filtered) total."
+                      ? "Each pin is normalized to its own region's total."
+                      : "Each pin is normalized to the global (filtered) total."
                 }
               >
                 {SCALE_MODE_LABELS[m]}
@@ -429,15 +500,11 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
         </div>
       </div>
 
-
-
-
-
-
       {/* Metrics list */}
       {metricList.length === 0 ? (
         <div className="mt-5 rounded-xl border border-dashed border-black/15 bg-black/[0.015] p-6 text-center text-sm text-black/50">
-          No metrics defined yet. Add one to enable per-pin data entry — until then the panel shows pin counts.
+          No metrics defined yet. Add one to enable per-pin data entry — until then the panel shows
+          pin counts.
         </div>
       ) : (
         <>
@@ -454,7 +521,9 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
                       type="button"
                       onClick={() => setActive(m.id)}
                       className={`grid h-6 w-6 place-items-center rounded-full text-[10px] font-semibold ${
-                        isActive ? "bg-sky-600 text-white" : "border border-black/20 text-black/40 hover:border-sky-500 hover:text-sky-600"
+                        isActive
+                          ? "bg-sky-600 text-white"
+                          : "border border-black/20 text-black/40 hover:border-sky-500 hover:text-sky-600"
                       }`}
                       title={isActive ? "Active metric" : "Set as active"}
                     >
@@ -476,12 +545,17 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
                       title="Unit e.g. $M, %, hrs"
                     />
                     <select
+                      aria-label="Format"
                       value={m.format ?? "number"}
-                      onChange={(e) => updateMetric(m.id, { format: e.target.value as LocationMetric["format"] })}
+                      onChange={(e) =>
+                        updateMetric(m.id, { format: e.target.value as LocationMetric["format"] })
+                      }
                       className="rounded-lg border border-black/15 bg-white px-2 py-1.5 text-xs"
                     >
                       {FORMATS.map((f) => (
-                        <option key={f} value={f}>{f}</option>
+                        <option key={f} value={f}>
+                          {f}
+                        </option>
                       ))}
                     </select>
                     <input
@@ -489,7 +563,11 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
                       min={0}
                       max={4}
                       value={m.precision ?? 0}
-                      onChange={(e) => updateMetric(m.id, { precision: Math.max(0, Math.min(4, Number(e.target.value) || 0)) })}
+                      onChange={(e) =>
+                        updateMetric(m.id, {
+                          precision: Math.max(0, Math.min(4, Number(e.target.value) || 0)),
+                        })
+                      }
                       className="w-14 rounded-lg border border-black/15 bg-white px-2 py-1.5 text-center text-xs font-mono"
                       title="Decimal precision"
                     />
@@ -504,7 +582,8 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
                   {isActive && (
                     <div className="mt-2 flex items-center justify-between text-[11px] text-black/50">
                       <span>
-                        Total <b className="text-black/80">{formatMetricValue(total, m)}</b> · {coverage}/{pins.length} pins
+                        Total <b className="text-black/80">{formatMetricValue(total, m)}</b> ·{" "}
+                        {coverage}/{pins.length} pins
                       </span>
                       <div className="flex gap-2">
                         <button
@@ -541,7 +620,10 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
                 {pins.map((p) => {
                   const raw = p.values?.[activeMetric.id];
                   return (
-                    <div key={p.id} className="grid grid-cols-[1fr_120px_100px] items-center gap-3 px-3 py-2">
+                    <div
+                      key={p.id}
+                      className="grid grid-cols-[1fr_120px_100px] items-center gap-3 px-3 py-2"
+                    >
                       <div className="min-w-0">
                         <div className="truncate text-sm text-black">{p.label || p.city}</div>
                         <div className="truncate text-[10px] text-black/40">
@@ -557,13 +639,17 @@ export function WorldStatsMetricsPanel({ brandId, items, metrics, activeMetricId
                         className="w-full rounded-lg border border-black/15 bg-white px-2 py-1 text-right text-sm font-mono"
                       />
                       <div className="text-right text-[12px] font-medium text-black/70 tabular-nums">
-                        {Number.isFinite(raw) ? formatMetricValue(raw as number, activeMetric) : "—"}
+                        {Number.isFinite(raw)
+                          ? formatMetricValue(raw as number, activeMetric)
+                          : "—"}
                       </div>
                     </div>
                   );
                 })}
                 {pins.length === 0 && (
-                  <div className="p-6 text-center text-sm text-black/50">Add pins first, then enter their values here.</div>
+                  <div className="p-6 text-center text-sm text-black/50">
+                    Add pins first, then enter their values here.
+                  </div>
                 )}
               </div>
             </div>

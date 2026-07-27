@@ -94,7 +94,9 @@ export function SaveModuleDialog({
   });
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
     if (open) {
       window.addEventListener("keydown", onKey);
       return () => window.removeEventListener("keydown", onKey);
@@ -124,7 +126,11 @@ export function SaveModuleDialog({
             <Bookmark size={16} className="text-[#003FC7]" />
             <div className="text-sm font-semibold">Save to My Modules</div>
           </div>
-          <button onClick={onClose} className="rounded-full p-1 text-icon-muted hover:bg-black/5" aria-label="Close">
+          <button
+            onClick={onClose}
+            className="rounded-full p-1 text-icon-muted hover:bg-black/5"
+            aria-label="Close"
+          >
             <X size={16} />
           </button>
         </div>
@@ -159,6 +165,7 @@ export function SaveModuleDialog({
             <div>
               <label className="mb-1 block text-xs font-medium text-black/70">Save as</label>
               <select
+                aria-label="Save Kind"
                 value={saveKind}
                 onChange={(e) => setSaveKind(e.target.value as "populated" | "template")}
                 className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm focus:border-[#003FC7] focus:outline-none focus:ring-2 focus:ring-[#003FC7]/20"
@@ -170,20 +177,25 @@ export function SaveModuleDialog({
             <div>
               <label className="mb-1 block text-xs font-medium text-black/70">Role</label>
               <select
+                aria-label="Role"
                 value={role}
                 onChange={(e) => setRole(e.target.value as ModuleRole | "")}
                 className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm focus:border-[#003FC7] focus:outline-none focus:ring-2 focus:ring-[#003FC7]/20"
               >
                 <option value="">— none —</option>
                 {ROLES.map((r) => (
-                  <option key={r.id} value={r.id}>{r.label}</option>
+                  <option key={r.id} value={r.id}>
+                    {r.label}
+                  </option>
                 ))}
               </select>
             </div>
           </div>
 
           <div>
-            <label className="mb-1 block text-xs font-medium text-black/70">Division / sub-brand</label>
+            <label className="mb-1 block text-xs font-medium text-black/70">
+              Division / sub-brand
+            </label>
             <input
               value={division}
               onChange={(e) => setDivision(e.target.value)}
@@ -199,7 +211,9 @@ export function SaveModuleDialog({
                 <button
                   key={t}
                   type="button"
-                  onClick={() => tags.includes(t) ? setTags(tags.filter((x) => x !== t)) : setTags([...tags, t])}
+                  onClick={() =>
+                    tags.includes(t) ? setTags(tags.filter((x) => x !== t)) : setTags([...tags, t])
+                  }
                   className={`rounded-full border px-2 py-0.5 text-[11px] transition ${
                     tags.includes(t)
                       ? "border-[#003FC7] bg-[#003FC7] text-white"
@@ -214,7 +228,12 @@ export function SaveModuleDialog({
               <input
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(); } }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addTag();
+                  }
+                }}
                 className="flex-1 rounded-lg border border-black/15 bg-white px-3 py-2 text-sm focus:border-[#003FC7] focus:outline-none focus:ring-2 focus:ring-[#003FC7]/20"
                 placeholder="Add custom tag and press Enter"
               />
@@ -222,14 +241,23 @@ export function SaveModuleDialog({
                 type="button"
                 onClick={addTag}
                 className="rounded-lg border border-black/15 bg-white px-3 text-sm hover:border-[#003FC7] hover:text-[#003FC7]"
-              >Add</button>
+              >
+                Add
+              </button>
             </div>
             {tags.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1">
                 {tags.map((t) => (
-                  <span key={t} className="inline-flex items-center gap-1 rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[11px] text-[#003FC7]">
+                  <span
+                    key={t}
+                    className="inline-flex items-center gap-1 rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[11px] text-[#003FC7]"
+                  >
                     #{t}
-                    <button type="button" onClick={() => setTags(tags.filter((x) => x !== t))} aria-label={`Remove ${t}`}>
+                    <button
+                      type="button"
+                      onClick={() => setTags(tags.filter((x) => x !== t))}
+                      aria-label={`Remove ${t}`}
+                    >
                       <X size={12} />
                     </button>
                   </span>
@@ -249,13 +277,21 @@ export function SaveModuleDialog({
           <button
             onClick={onClose}
             className="rounded-full border border-black/15 bg-white px-4 py-1.5 text-sm hover:bg-black/5"
-          >Cancel</button>
+          >
+            Cancel
+          </button>
           <button
             onClick={() => mutation.mutate()}
             disabled={mutation.isPending || saved}
             className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-1.5 text-sm text-white transition hover:bg-[#002FA0] disabled:opacity-60"
           >
-            {saved ? <Check size={14} /> : mutation.isPending ? <Loader2 size={14} className="animate-spin" /> : <Bookmark size={14} />}
+            {saved ? (
+              <Check size={14} />
+            ) : mutation.isPending ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Bookmark size={14} />
+            )}
             {saved ? "Saved" : mutation.isPending ? "Saving…" : "Save module"}
           </button>
         </div>

@@ -4,11 +4,7 @@ import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { FolderOpen, ArrowRight, CalendarDays } from "lucide-react";
-import {
-  EVENT_PLAYBOOKS,
-  type EventPlaybook,
-  type PlaybookKind,
-} from "@/lib/event-playbooks";
+import { EVENT_PLAYBOOKS, type EventPlaybook, type PlaybookKind } from "@/lib/event-playbooks";
 import { KIT_PROFILES_BY_ID } from "@/lib/social-formats";
 
 const KIND_LABEL: Record<PlaybookKind, string> = {
@@ -75,8 +71,8 @@ function PresetsView() {
               All event presets, one folder view.
             </h1>
             <p className="max-w-2xl text-base text-black/65">
-              Every industry-standard event preset — grouped by kind. Preview
-              any live, or fork it into your saved kits.
+              Every industry-standard event preset — grouped by kind. Preview any live, or fork it
+              into your saved kits.
             </p>
           </div>
         </div>
@@ -123,14 +119,15 @@ function PresetsView() {
                     <div className="mt-3 line-clamp-1 text-sm font-semibold text-[#03002C]">
                       {p.name}
                     </div>
-                    <p className="mt-1 line-clamp-2 flex-1 text-xs text-black/60">
-                      {p.tagline}
-                    </p>
+                    <p className="mt-1 line-clamp-2 flex-1 text-xs text-black/60">{p.tagline}</p>
                     <div className="mt-3 flex items-center justify-between text-[11px] text-black/55">
                       <span>
                         {p.phases.length} beats · {p.deliverables.length} assets
                       </span>
-                      <ArrowRight size={12} className="translate-x-0 transition group-hover:translate-x-0.5" />
+                      <ArrowRight
+                        size={12}
+                        className="translate-x-0 transition group-hover:translate-x-0.5"
+                      />
                     </div>
                   </Link>
                 );

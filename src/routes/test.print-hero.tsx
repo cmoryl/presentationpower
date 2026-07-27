@@ -22,7 +22,12 @@
 
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
-import { PrintHeroMediaLayer, type PrintHeroAspect, type PrintHeroMedia, type PrintHeroScrim } from "@/components/print/PrintHeroMedia";
+import {
+  PrintHeroMediaLayer,
+  type PrintHeroAspect,
+  type PrintHeroMedia,
+  type PrintHeroScrim,
+} from "@/components/print/PrintHeroMedia";
 
 const ALLOWED_ASPECTS: readonly PrintHeroAspect[] = ["fill", "21:9", "16:9", "3:2", "4:3", "1:1"];
 const ALLOWED_SCRIMS: readonly PrintHeroScrim[] = ["top", "bottom", "both", "radial", "none"];
@@ -38,8 +43,6 @@ function parseEnum<T extends string>(v: string | null, allowed: readonly T[]): T
   return (allowed as readonly string[]).includes(v) ? (v as T) : undefined;
 }
 
-
-
 export const Route = createFileRoute("/test/print-hero")({
   beforeLoad: () => {
     // Playwright fixture only. Does not resolve in production builds.
@@ -53,31 +56,37 @@ function PrintHeroHarness() {
   // Read URL query params on the client. We deliberately avoid loader-based
   // search parsing so Playwright can hot-swap params via ?query= without any
   // router revalidation ceremony.
-  const params = typeof window === "undefined" ? new URLSearchParams() : new URLSearchParams(window.location.search);
+  const params =
+    typeof window === "undefined"
+      ? new URLSearchParams()
+      : new URLSearchParams(window.location.search);
 
-  const media: PrintHeroMedia = useMemo(() => ({
-    imageUrl: params.get("imageUrl") ?? "",
-    focalX: parseNum(params.get("focalX")),
-    focalY: parseNum(params.get("focalY")),
-    safeAreaX: parseNum(params.get("safeAreaX")),
-    safeAreaY: parseNum(params.get("safeAreaY")),
-    aspect: parseEnum(params.get("aspect"), ALLOWED_ASPECTS),
-    scrim: parseEnum(params.get("scrim"), ALLOWED_SCRIMS),
-    heightPct: parseNum(params.get("heightPct")),
-    overlayOpacity: parseNum(params.get("overlayOpacity")),
-    washStrength: parseNum(params.get("washStrength")),
-  }), [
-    params.get("imageUrl"),
-    params.get("focalX"),
-    params.get("focalY"),
-    params.get("safeAreaX"),
-    params.get("safeAreaY"),
-    params.get("aspect"),
-    params.get("scrim"),
-    params.get("heightPct"),
-    params.get("overlayOpacity"),
-    params.get("washStrength"),
-  ]);
+  const media: PrintHeroMedia = useMemo(
+    () => ({
+      imageUrl: params.get("imageUrl") ?? "",
+      focalX: parseNum(params.get("focalX")),
+      focalY: parseNum(params.get("focalY")),
+      safeAreaX: parseNum(params.get("safeAreaX")),
+      safeAreaY: parseNum(params.get("safeAreaY")),
+      aspect: parseEnum(params.get("aspect"), ALLOWED_ASPECTS),
+      scrim: parseEnum(params.get("scrim"), ALLOWED_SCRIMS),
+      heightPct: parseNum(params.get("heightPct")),
+      overlayOpacity: parseNum(params.get("overlayOpacity")),
+      washStrength: parseNum(params.get("washStrength")),
+    }),
+    [
+      params.get("imageUrl"),
+      params.get("focalX"),
+      params.get("focalY"),
+      params.get("safeAreaX"),
+      params.get("safeAreaY"),
+      params.get("aspect"),
+      params.get("scrim"),
+      params.get("heightPct"),
+      params.get("overlayOpacity"),
+      params.get("washStrength"),
+    ],
+  );
 
   // 816px portrait canvas mirrors the print templates. cqw maps to the
   // container's inline size, keeping the band proportional at every viewport.
@@ -87,7 +96,8 @@ function PrintHeroHarness() {
     const el = document.querySelector<HTMLElement>('[data-testid="hero-band"]');
     const img = document.querySelector<HTMLImageElement>('[data-testid="hero-img"]');
     (window as unknown as { __printHero: unknown }).__printHero = {
-      getObjectPosition: () => (img ? img.style.objectPosition || getComputedStyle(img).objectPosition : null),
+      getObjectPosition: () =>
+        img ? img.style.objectPosition || getComputedStyle(img).objectPosition : null,
       getBandRect: () => el?.getBoundingClientRect() ?? null,
     };
   });
@@ -131,7 +141,7 @@ function HeroTestTagger() {
     const wrap = document.querySelector<HTMLElement>('[data-testid="hero-band-wrap"]');
     if (!wrap) return;
     // The outer band is the pointer-events-none absolute layer.
-    const band = wrap.querySelector<HTMLElement>('.pointer-events-none.absolute');
+    const band = wrap.querySelector<HTMLElement>(".pointer-events-none.absolute");
     if (band) band.setAttribute("data-testid", "hero-band");
     const img = wrap.querySelector<HTMLImageElement>("img");
     if (img) img.setAttribute("data-testid", "hero-img");

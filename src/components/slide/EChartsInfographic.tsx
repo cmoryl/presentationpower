@@ -64,7 +64,14 @@ function deepMerge<T extends Record<string, unknown>>(a: T, b: Record<string, un
   for (const k of Object.keys(b)) {
     const av = out[k];
     const bv = b[k];
-    if (av && bv && typeof av === "object" && typeof bv === "object" && !Array.isArray(av) && !Array.isArray(bv)) {
+    if (
+      av &&
+      bv &&
+      typeof av === "object" &&
+      typeof bv === "object" &&
+      !Array.isArray(av) &&
+      !Array.isArray(bv)
+    ) {
       out[k] = deepMerge(av as Record<string, unknown>, bv as Record<string, unknown>);
     } else {
       out[k] = bv;

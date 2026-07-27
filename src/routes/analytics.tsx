@@ -2,7 +2,15 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { BarChart3, Eye, Users, Share2, TrendingUp, ArrowRight, Sparkles } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
 import { AppShell } from "@/components/AppShell";
 import { useSignedIn } from "@/components/CloudDeckControls";
 import { getLibraryAnalytics, type DeckAnalyticsSummary } from "@/lib/deck-analytics.functions";
@@ -11,7 +19,11 @@ export const Route = createFileRoute("/analytics")({
   head: () => ({
     meta: [
       { title: "Analytics · TransPerfect Modular" },
-      { name: "description", content: "Library-wide deck engagement analytics: views, unique viewers, and top-performing decks." },
+      {
+        name: "description",
+        content:
+          "Library-wide deck engagement analytics: views, unique viewers, and top-performing decks.",
+      },
     ],
   }),
   component: AnalyticsPage,
@@ -25,7 +37,10 @@ function AnalyticsPage() {
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!signedIn) { setLoading(false); return; }
+    if (!signedIn) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     fetchAnalytics()
       .then((r) => setData(r))
@@ -44,7 +59,8 @@ function AnalyticsPage() {
             Which decks earn attention.
           </h1>
           <p className="mt-3 max-w-2xl text-sm text-white/70">
-            Library-wide engagement across every shareable deck you've published. Track views, unique viewers, and the last 30 days of momentum.
+            Library-wide engagement across every shareable deck you've published. Track views,
+            unique viewers, and the last 30 days of momentum.
           </p>
         </div>
       </section>
@@ -53,43 +69,81 @@ function AnalyticsPage() {
         <EmptyState
           title="Sign in to see analytics"
           body="Shareable links, view counts, and engagement trends unlock once you're signed in."
-          cta={<Link to="/auth" className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:opacity-90">Sign in <ArrowRight size={14} /></Link>}
+          cta={
+            <Link
+              to="/auth"
+              className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            >
+              Sign in <ArrowRight size={14} />
+            </Link>
+          }
         />
       ) : loading ? (
         <div className="mt-8 rounded-2xl border border-black/10 bg-white/60 p-10 text-center text-sm text-black/60 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60">
           Loading analytics…
         </div>
       ) : err ? (
-        <div className="mt-8 rounded-2xl border border-red-500/40 bg-red-500/[0.06] p-6 text-sm text-red-600 dark:text-red-300">{err}</div>
+        <div className="mt-8 rounded-2xl border border-red-500/40 bg-red-500/[0.06] p-6 text-sm text-red-600 dark:text-red-300">
+          {err}
+        </div>
       ) : !data || data.totalDecks === 0 ? (
         <EmptyState
           title="No decks yet"
           body="Assemble your first deck to start tracking engagement."
-          cta={<Link to="/brief/new" className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:opacity-90"><Sparkles size={14} /> Start a brief</Link>}
+          cta={
+            <Link
+              to="/brief/new"
+              className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            >
+              <Sparkles size={14} /> Start a brief
+            </Link>
+          }
         />
       ) : data.totalViews === 0 ? (
         <EmptyState
           title="No views recorded yet"
           body={`You have ${data.totalDecks} deck${data.totalDecks === 1 ? "" : "s"}${data.sharedDecks > 0 ? ` and ${data.sharedDecks} shareable link${data.sharedDecks === 1 ? "" : "s"}` : ""}. Share a deck to start collecting analytics.`}
-          cta={data.sharedDecks === 0
-            ? <div className="text-xs text-black/50 dark:text-white/50">Enable sharing from any deck's Share menu.</div>
-            : null}
+          cta={
+            data.sharedDecks === 0 ? (
+              <div className="text-xs text-black/50 dark:text-white/50">
+                Enable sharing from any deck's Share menu.
+              </div>
+            ) : null
+          }
         />
       ) : (
         <>
           {/* KPI STRIP */}
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Kpi icon={<Eye size={16} />} label="Total views" value={data.totalViews.toLocaleString()} />
-            <Kpi icon={<Users size={16} />} label="Unique viewers" value={data.uniqueViewers.toLocaleString()} />
-            <Kpi icon={<Share2 size={16} />} label="Shared decks" value={`${data.sharedDecks} / ${data.totalDecks}`} />
-            <Kpi icon={<TrendingUp size={16} />} label="Views · 30 days" value={data.trend.reduce((n, d) => n + d.views, 0).toLocaleString()} />
+            <Kpi
+              icon={<Eye size={16} />}
+              label="Total views"
+              value={data.totalViews.toLocaleString()}
+            />
+            <Kpi
+              icon={<Users size={16} />}
+              label="Unique viewers"
+              value={data.uniqueViewers.toLocaleString()}
+            />
+            <Kpi
+              icon={<Share2 size={16} />}
+              label="Shared decks"
+              value={`${data.sharedDecks} / ${data.totalDecks}`}
+            />
+            <Kpi
+              icon={<TrendingUp size={16} />}
+              label="Views · 30 days"
+              value={data.trend.reduce((n, d) => n + d.views, 0).toLocaleString()}
+            />
           </div>
 
           {/* TREND */}
           <section className="mt-8 rounded-2xl border border-black/10 bg-white/70 p-6 dark:border-white/10 dark:bg-white/[0.04]">
             <div className="mb-4 flex items-center gap-2">
               <BarChart3 size={14} className="text-[#003FC7] dark:text-[#A1FBF9]" />
-              <div className="text-[10px] uppercase tracking-widest text-black/60 dark:text-white/60">Views · Last 30 days</div>
+              <div className="text-[10px] uppercase tracking-widest text-black/60 dark:text-white/60">
+                Views · Last 30 days
+              </div>
             </div>
             <div className="h-56 w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -110,10 +164,23 @@ function AnalyticsPage() {
                     allowDecimals={false}
                   />
                   <Tooltip
-                    contentStyle={{ background: "rgba(7,6,31,0.95)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, color: "#fff", fontSize: 12 }}
+                    contentStyle={{
+                      background: "rgba(7,6,31,0.95)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: 12,
+                      color: "#fff",
+                      fontSize: 12,
+                    }}
                     labelStyle={{ color: "rgba(255,255,255,0.6)" }}
                   />
-                  <Line type="monotone" dataKey="views" stroke="#003FC7" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: "#A1FBF9" }} />
+                  <Line
+                    type="monotone"
+                    dataKey="views"
+                    stroke="#003FC7"
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 4, fill: "#A1FBF9" }}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -124,7 +191,9 @@ function AnalyticsPage() {
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <TrendingUp size={14} className="text-[#003FC7] dark:text-[#A1FBF9]" />
-                <div className="text-[10px] uppercase tracking-widest text-black/60 dark:text-white/60">Top decks</div>
+                <div className="text-[10px] uppercase tracking-widest text-black/60 dark:text-white/60">
+                  Top decks
+                </div>
               </div>
               <div className="text-[10px] text-black/40 dark:text-white/40">Sorted by views</div>
             </div>
@@ -141,17 +210,26 @@ function AnalyticsPage() {
                 </thead>
                 <tbody>
                   {data.topDecks.map((d) => (
-                    <tr key={d.deckId} className="border-t border-black/[0.05] transition hover:bg-black/[0.02] dark:border-white/[0.05] dark:hover:bg-white/[0.03]">
+                    <tr
+                      key={d.deckId}
+                      className="border-t border-black/[0.05] transition hover:bg-black/[0.02] dark:border-white/[0.05] dark:hover:bg-white/[0.03]"
+                    >
                       <td className="px-4 py-3">
-                        <div className="truncate font-medium text-black dark:text-white">{d.title || "Untitled deck"}</div>
+                        <div className="truncate font-medium text-black dark:text-white">
+                          {d.title || "Untitled deck"}
+                        </div>
                         {d.shareToken && (
                           <div className="mt-0.5 inline-flex items-center gap-1 text-[10px] text-[#003FC7] dark:text-[#A1FBF9]">
                             <Share2 size={12} /> Shared
                           </div>
                         )}
                       </td>
-                      <td className="px-4 py-3 tabular-nums text-black dark:text-white">{d.views}</td>
-                      <td className="px-4 py-3 tabular-nums text-black/70 dark:text-white/70">{d.uniqueViewers}</td>
+                      <td className="px-4 py-3 tabular-nums text-black dark:text-white">
+                        {d.views}
+                      </td>
+                      <td className="px-4 py-3 tabular-nums text-black/70 dark:text-white/70">
+                        {d.uniqueViewers}
+                      </td>
                       <td className="px-4 py-3 text-[11px] text-black/60 dark:text-white/60">
                         {d.lastViewedAt ? relTime(d.lastViewedAt) : "—"}
                       </td>
@@ -166,7 +244,9 @@ function AnalyticsPage() {
                             View <ArrowRight size={12} />
                           </Link>
                         ) : (
-                          <span className="text-[10px] text-black/30 dark:text-white/30">Not shared</span>
+                          <span className="text-[10px] text-black/30 dark:text-white/30">
+                            Not shared
+                          </span>
                         )}
                       </td>
                     </tr>
@@ -185,10 +265,14 @@ function Kpi({ icon, label, value }: { icon: React.ReactNode; label: string; val
   return (
     <div className="rounded-2xl border border-black/10 bg-white/70 p-5 dark:border-white/10 dark:bg-white/[0.04]">
       <div className="flex items-center gap-2 text-black/60 dark:text-white/60">
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#003FC7]/10 text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">{icon}</span>
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#003FC7]/10 text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">
+          {icon}
+        </span>
         <span className="text-[10px] uppercase tracking-widest">{label}</span>
       </div>
-      <div className="mt-3 text-3xl font-semibold tabular-nums text-black dark:text-white">{value}</div>
+      <div className="mt-3 text-3xl font-semibold tabular-nums text-black dark:text-white">
+        {value}
+      </div>
     </div>
   );
 }

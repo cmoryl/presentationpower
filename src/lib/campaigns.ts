@@ -9,7 +9,6 @@ import { getFormat } from "./social-formats";
 import { byId, MODULE_VARIANTS, type BrandMode } from "./taxonomy";
 import { resolveDivisionBrief, seedDivisionContent } from "./library-preview";
 
-
 export type EventSpeaker = { name: string; role?: string };
 export type EventSponsor = { name: string; tier?: "title" | "gold" | "silver" | "supporter" };
 
@@ -29,7 +28,13 @@ export type EventFacts = {
 };
 
 export type CampaignSource =
-  | { kind: "slide"; variantId: string; title?: string; summary?: string; stat?: { value: string; label: string } }
+  | {
+      kind: "slide";
+      variantId: string;
+      title?: string;
+      summary?: string;
+      stat?: { value: string; label: string };
+    }
   | { kind: "print-asset"; assetId: string; title?: string; summary?: string }
   | { kind: "module"; moduleId: string; title?: string; summary?: string }
   | { kind: "manual"; copy: { title: string; summary?: string; cta?: string } };
@@ -203,9 +208,11 @@ export function sourceFromVariant(variantId: string, brand: BrandMode): Campaign
   const brief = resolveDivisionBrief(brand);
   const raw = seedDivisionContent(variantId, brief, variant?.familyId ?? "Selected module", brand);
   const c = (raw ?? {}) as SeededContent;
-  const title = firstText(c.heading, c.title, c.subhead, c.eyebrow) ?? variant?.name ?? "Favorited module";
+  const title =
+    firstText(c.heading, c.title, c.subhead, c.eyebrow) ?? variant?.name ?? "Favorited module";
   const summary = firstText(c.summary, c.body, c.description);
-  const quote = typeof c.quote === "object" && c.quote ? firstText(c.quote.text) : firstText(c.quote as string);
+  const quote =
+    typeof c.quote === "object" && c.quote ? firstText(c.quote.text) : firstText(c.quote as string);
   return {
     kind: "slide",
     variantId,
@@ -214,4 +221,3 @@ export function sourceFromVariant(variantId: string, brand: BrandMode): Campaign
     stat: firstStat(c),
   };
 }
-

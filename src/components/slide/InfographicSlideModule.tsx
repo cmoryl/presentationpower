@@ -17,11 +17,7 @@ import { SlideFrame } from "./SlideChrome";
 import { TitleBlock } from "./primitives";
 import { AuroraLayer } from "./flagship";
 import type { DeckSlide } from "@/lib/deck-store";
-import type {
-  InfographicKind,
-  InfographicSpec,
-  RenderContext,
-} from "@/lib/infographics/spec";
+import type { InfographicKind, InfographicSpec, RenderContext } from "@/lib/infographics/spec";
 import { renderInfographic } from "@/lib/infographics/registry";
 import { ensureA11y } from "@/lib/infographics/a11y";
 import { ChartDataDrawer } from "./ChartDataDrawer";
@@ -56,9 +52,12 @@ export function InfographicSlideModule({ slide, variant, brand, pageNumber, mode
     const declared = content.spec as Partial<InfographicSpec> | undefined;
     const kind = (declared?.kind ?? KIND_BY_VARIANT[variant.id] ?? "custom") as InfographicKind;
     const encoding = declared?.encoding ?? (content.encoding as InfographicSpec["encoding"]) ?? {};
-    const rows = (declared?.data?.rows ?? (content.rows as InfographicSpec["data"]["rows"]) ?? []) as InfographicSpec["data"]["rows"];
+    const rows = (declared?.data?.rows ??
+      (content.rows as InfographicSpec["data"]["rows"]) ??
+      []) as InfographicSpec["data"]["rows"];
     const source = declared?.data?.source ?? (s(content.source) || undefined);
-    const columns = declared?.data?.columns ?? (content.columns as Record<string, string> | undefined);
+    const columns =
+      declared?.data?.columns ?? (content.columns as Record<string, string> | undefined);
     return ensureA11y({
       id: `${slide.id}-viz`,
       kind,
@@ -86,7 +85,11 @@ export function InfographicSlideModule({ slide, variant, brand, pageNumber, mode
       <AuroraLayer brand={brand} />
       <div className="relative z-10 flex h-full flex-col gap-6 px-16 py-14">
         <div className="flex items-start justify-between gap-6">
-          <TitleBlock brand={brand} kicker={s(content.kicker) || variant.name} title={spec.title || variant.name} />
+          <TitleBlock
+            brand={brand}
+            kicker={s(content.kicker) || variant.name}
+            title={spec.title || variant.name}
+          />
           <ChartDataDrawer spec={spec} />
         </div>
         <div className="flex-1 min-h-0">{renderInfographic(spec, ctx)}</div>

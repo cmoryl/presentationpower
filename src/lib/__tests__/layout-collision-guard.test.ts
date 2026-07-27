@@ -28,25 +28,32 @@ const VARIANT_RENDERER = readFileSync(
   resolve(REPO, "src/components/slide/VariantRenderer.tsx"),
   "utf8",
 );
-const PRIMITIVES = readFileSync(
-  resolve(REPO, "src/components/slide/primitives.tsx"),
-  "utf8",
-);
+const PRIMITIVES = readFileSync(resolve(REPO, "src/components/slide/primitives.tsx"), "utf8");
 
 // Minimum Tailwind mt-* / mb-* number required as breathing room.
 // TitleBlock itself carries mb-10 (~40px), so these thresholds gate the
 // *additional* clearance on the first body sibling.
-const MIN_TITLE_BOTTOM = 10;   // mb-10 ≈ 40px on TitleBlock
-const MIN_BODY_TOP     = 8;    // + mt-8  ≈ 72px total
-const MIN_CHART_TOP    = 10;   // + mt-10 ≈ 80px total for data-viz
-const MIN_SEG_TOP_PX   = 140;  // marginTop reserve for above-labels
-const MIN_SEG_BOT_PX   = 120;  // marginBottom reserve for below-labels
-
+const MIN_TITLE_BOTTOM = 10; // mb-10 ≈ 40px on TitleBlock
+const MIN_BODY_TOP = 8; // + mt-8  ≈ 72px total
+const MIN_CHART_TOP = 10; // + mt-10 ≈ 80px total for data-viz
+const MIN_SEG_TOP_PX = 140; // marginTop reserve for above-labels
+const MIN_SEG_BOT_PX = 120; // marginBottom reserve for below-labels
 
 // Chart / data-viz families whose first body sibling needs extra clearance.
 const CHART_VARIANT_HINTS = [
-  "CHART", "BAR", "LINE", "AREA", "DONUT", "STAT", "DASH",
-  "GRAPH", "TREND", "MATURITY", "GAUGE", "SPARK", "METRIC",
+  "CHART",
+  "BAR",
+  "LINE",
+  "AREA",
+  "DONUT",
+  "STAT",
+  "DASH",
+  "GRAPH",
+  "TREND",
+  "MATURITY",
+  "GAUGE",
+  "SPARK",
+  "METRIC",
 ];
 
 function readTailwindNumber(cls: string, prefix: "mt" | "mb"): number | null {
@@ -106,7 +113,9 @@ describe("Variant bodies keep clearance below the hero title", () => {
     if (!sibling) continue;
     const snippet = sibling[1];
 
-    const firstOpen = snippet.match(/<(?:div|section|main|GlassTile|MetaRow|SegmentedBar|Aurora[A-Za-z]+)\b[^>]*>/);
+    const firstOpen = snippet.match(
+      /<(?:div|section|main|GlassTile|MetaRow|SegmentedBar|Aurora[A-Za-z]+)\b[^>]*>/,
+    );
     if (!firstOpen) continue;
 
     const tag = firstOpen[0];

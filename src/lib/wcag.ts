@@ -7,7 +7,10 @@ function parseColor(input: string): [number, number, number, number] | null {
   if (!s || s === "transparent") return null;
   const m = s.match(/rgba?\(([^)]+)\)/i);
   if (!m) return null;
-  const parts = m[1].split(/[,\s/]+/).filter(Boolean).map(Number);
+  const parts = m[1]
+    .split(/[,\s/]+/)
+    .filter(Boolean)
+    .map(Number);
   if (parts.length < 3 || parts.some((n) => Number.isNaN(n))) return null;
   const [r, g, b] = parts;
   const a = parts[3] ?? 1;
@@ -83,12 +86,14 @@ export function auditNode(root: HTMLElement): WcagReport {
     const txt = (el.textContent ?? "").trim();
     if (!txt) return;
     // only inspect leaf-ish nodes with own text
-    const ownText = Array.from(el.childNodes).some((n) => n.nodeType === 3 && (n.textContent ?? "").trim());
+    const ownText = Array.from(el.childNodes).some(
+      (n) => n.nodeType === 3 && (n.textContent ?? "").trim(),
+    );
     if (!ownText) return;
     const cs = getComputedStyle(el);
     if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
     let fg = cs.color;
-    let bg = effectiveBg(el);
+    const bg = effectiveBg(el);
     const fontSize = parseFloat(cs.fontSize);
     const weight = parseInt(cs.fontWeight, 10) || 400;
     const large = fontSize >= 24 || (fontSize >= 18.66 && weight >= 700);
@@ -132,7 +137,15 @@ export function auditNode(root: HTMLElement): WcagReport {
   });
 
   const overall: WcagLevel =
-    sampled === 0 ? "AA" : aaFail === 0 ? (minRatio >= 7 ? "AAA" : "AA") : minRatio >= 3 ? "AA-Large" : "FAIL";
+    sampled === 0
+      ? "AA"
+      : aaFail === 0
+        ? minRatio >= 7
+          ? "AAA"
+          : "AA"
+        : minRatio >= 3
+          ? "AA-Large"
+          : "FAIL";
 
   return {
     sampled,
@@ -266,7 +279,12 @@ export function applyAutoFix(root: HTMLElement): number {
         applyAutoFixInternal(root);
       });
     });
-    obs.observe(root, { subtree: true, childList: true, attributes: true, attributeFilter: ["style", "class"] });
+    obs.observe(root, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["style", "class"],
+    });
     rootAny.__wcagObserver = obs;
   }
   return fixed;
@@ -325,7 +343,6 @@ function applyAutoFixInternal(root: HTMLElement) {
   });
 }
 
-
 export function revertAutoFix(root: HTMLElement) {
   const nodes = root.querySelectorAll<HTMLElement>("[data-wcag-fixed]");
   nodes.forEach((el) => {
@@ -350,7 +367,6 @@ export function revertAutoFix(root: HTMLElement) {
     delete el.dataset.wcagOriginal;
   });
 }
-
 
 // ---- Type scale audit + auto-fix ----
 //
@@ -426,6 +442,3 @@ export function revertTypeFix(root: HTMLElement) {
     delete el.dataset.typeOriginal;
   });
 }
-
-
-

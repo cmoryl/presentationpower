@@ -19,14 +19,18 @@ import {
   Users,
   BadgeCheck,
 } from "lucide-react";
-import { getPlaybook, EVENT_PLAYBOOKS, getExpandedCollateral, type EventPlaybook } from "@/lib/event-playbooks";
+import {
+  getPlaybook,
+  EVENT_PLAYBOOKS,
+  getExpandedCollateral,
+  type EventPlaybook,
+} from "@/lib/event-playbooks";
 import { KIT_PROFILES_BY_ID, SOCIAL_FORMATS_BY_ID } from "@/lib/social-formats";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { buildCampaignAssets, sourceFromVariant } from "@/lib/campaigns";
 import { AssetPreviewCard } from "@/components/campaigns/AssetPreviewCard";
 import { ForkPresetButton } from "@/components/campaigns/ForkPresetButton";
 import { CollateralGrid } from "@/components/campaigns/CollateralGrid";
-
 
 export const Route = createFileRoute("/events/demo/$playbookId")({
   loader: ({ params }) => {
@@ -48,7 +52,11 @@ export const Route = createFileRoute("/events/demo/$playbookId")({
       ],
     };
   },
-  component: () => (<AppShell><PlaybookDemoView /></AppShell>),
+  component: () => (
+    <AppShell>
+      <PlaybookDemoView />
+    </AppShell>
+  ),
 });
 
 function PlaybookDemoView() {
@@ -220,7 +228,6 @@ function PlaybookDemoView() {
             />
           ))}
         </div>
-
       </section>
 
       {/* Marketing collateral — full kit scope, grouped, with status ribbons */}
@@ -237,7 +244,11 @@ function PlaybookDemoView() {
 
       {/* KPI targets */}
       <section>
-        <SectionHead eyebrow="Success" title="KPI targets" desc="Benchmark rules of thumb from prior runs." />
+        <SectionHead
+          eyebrow="Success"
+          title="KPI targets"
+          desc="Benchmark rules of thumb from prior runs."
+        />
         <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {playbook.kpis.map((k) => (
             <li
@@ -255,7 +266,6 @@ function PlaybookDemoView() {
           ))}
         </ul>
       </section>
-
 
       {/* Related playbooks */}
       <section>
@@ -302,15 +312,7 @@ function FactRow({
   );
 }
 
-function SectionHead({
-  eyebrow,
-  title,
-  desc,
-}: {
-  eyebrow: string;
-  title: string;
-  desc?: string;
-}) {
+function SectionHead({ eyebrow, title, desc }: { eyebrow: string; title: string; desc?: string }) {
   return (
     <div className="space-y-1">
       <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">

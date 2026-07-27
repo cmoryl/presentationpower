@@ -11,11 +11,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Check, RefreshCw, Save, Sparkles, Wand2 } from "lucide-react";
 import { BRAND_MODES } from "@/lib/taxonomy";
-import {
-  SOCIAL_FORMATS_BY_ID,
-  KIT_PROFILES,
-  getFormat,
-} from "@/lib/social-formats";
+import { SOCIAL_FORMATS_BY_ID, KIT_PROFILES, getFormat } from "@/lib/social-formats";
 import {
   buildCampaignAssets,
   type EventFacts,
@@ -143,7 +139,11 @@ export function KitWizard({
           statValue: row.copy.statValue ?? "",
           statLabel: row.copy.statLabel ?? "",
         });
-        setEvent({ ...EMPTY_EVENT, ...(row.eventFacts as Partial<EventFacts>), subBrand: row.brandId });
+        setEvent({
+          ...EMPTY_EVENT,
+          ...(row.eventFacts as Partial<EventFacts>),
+          subBrand: row.brandId,
+        });
         setAttachEvent(row.attachEvent);
         setStep(4); // jump to review
       })
@@ -408,7 +408,6 @@ export function KitWizard({
           </StepCard>
         )}
 
-
         {step === 1 && (
           <StepCard
             eyebrow="Step 2 of 5"
@@ -476,7 +475,6 @@ export function KitWizard({
               </Link>
             </p>
           </StepCard>
-
         )}
 
         {step === 2 && (
@@ -554,10 +552,27 @@ export function KitWizard({
             </label>
             {attachEvent && (
               <div className="mt-3 grid gap-3 rounded-2xl border border-black/10 bg-white/60 p-4 sm:grid-cols-2">
-                <TextField label="Event name" value={event.name} onChange={(v) => setEvent({ ...event, name: v })} />
-                <TextField label="City" value={event.city ?? ""} onChange={(v) => setEvent({ ...event, city: v })} />
-                <TextField label="Venue" value={event.venue ?? ""} onChange={(v) => setEvent({ ...event, venue: v })} />
-                <TextField label="Hashtag" value={event.hashtag ?? ""} onChange={(v) => setEvent({ ...event, hashtag: v })} placeholder="#TPNext" />
+                <TextField
+                  label="Event name"
+                  value={event.name}
+                  onChange={(v) => setEvent({ ...event, name: v })}
+                />
+                <TextField
+                  label="City"
+                  value={event.city ?? ""}
+                  onChange={(v) => setEvent({ ...event, city: v })}
+                />
+                <TextField
+                  label="Venue"
+                  value={event.venue ?? ""}
+                  onChange={(v) => setEvent({ ...event, venue: v })}
+                />
+                <TextField
+                  label="Hashtag"
+                  value={event.hashtag ?? ""}
+                  onChange={(v) => setEvent({ ...event, hashtag: v })}
+                  placeholder="#TPNext"
+                />
                 <TextField
                   label="Start date"
                   value={event.startDate ?? ""}
@@ -586,12 +601,12 @@ export function KitWizard({
                   onClick={async () => {
                     if (exporting || !assets.length) return;
                     setExporting(true);
-                    const tId = toast.loading(`Preparing ${assets.length} asset${assets.length === 1 ? "" : "s"}…`);
+                    const tId = toast.loading(
+                      `Preparing ${assets.length} asset${assets.length === 1 ? "" : "s"}…`,
+                    );
                     try {
-                      await exportKitZip(
-                        assets,
-                        kitName || `${surface}-kit`,
-                        (d, t) => toast.loading(`Rendering ${d}/${t}…`, { id: tId }),
+                      await exportKitZip(assets, kitName || `${surface}-kit`, (d, t) =>
+                        toast.loading(`Rendering ${d}/${t}…`, { id: tId }),
                       );
                       toast.success("Kit downloaded", { id: tId });
                     } catch (err) {
@@ -691,7 +706,10 @@ export function KitWizard({
                         brandId={asset.brandId}
                         mode={asset.mode}
                         copy={asset.copy}
-                        facts={{ hashtag: eventFacts.hashtag, registrationUrl: eventFacts.registrationUrl }}
+                        facts={{
+                          hashtag: eventFacts.hashtag,
+                          registrationUrl: eventFacts.registrationUrl,
+                        }}
                         displayShortEdge={260}
                       />
                     </div>
@@ -759,9 +777,7 @@ function StepCard({
             {eyebrow}
           </div>
           <h2 className="mt-1 text-xl font-bold tracking-tight text-[#03002C]">{title}</h2>
-          {description && (
-            <p className="mt-1.5 max-w-2xl text-xs text-black/55">{description}</p>
-          )}
+          {description && <p className="mt-1.5 max-w-2xl text-xs text-black/55">{description}</p>}
         </div>
         {actions ? <div className="shrink-0">{actions}</div> : null}
       </header>
@@ -841,7 +857,6 @@ function BrandPreview({
     </div>
   );
 }
-
 
 function EmptyState({
   title,

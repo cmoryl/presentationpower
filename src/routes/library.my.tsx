@@ -68,7 +68,9 @@ function MyModules() {
 
   const roles = useMemo(() => {
     const s = new Set<string>();
-    rows.forEach((r) => { if (r.role) s.add(r.role); });
+    rows.forEach((r) => {
+      if (r.role) s.add(r.role);
+    });
     return [...s].sort();
   }, [rows]);
 
@@ -96,16 +98,22 @@ function MyModules() {
     <AppShell>
       <div>
         <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library · My Modules</div>
-        <div className="mt-3"><LibrarySubnav active="/library/my" /></div>
+        <div className="mt-3">
+          <LibrarySubnav active="/library/my" />
+        </div>
 
         <h1 className="mt-3 text-4xl font-semibold">Your saved modules.</h1>
         <p className="mt-3 max-w-2xl text-black/60">
-          Reusable module instances you saved from previews or from live decks. Drop them into any deck, brochure, one-pager, or social surface.
+          Reusable module instances you saved from previews or from live decks. Drop them into any
+          deck, brochure, one-pager, or social surface.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <div className="relative w-72">
-            <Search size={14} className="pointer-events-none absolute left-3 top-2.5 text-foreground/40" />
+            <Search
+              size={14}
+              className="pointer-events-none absolute left-3 top-2.5 text-foreground/40"
+            />
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
@@ -114,6 +122,7 @@ function MyModules() {
             />
           </div>
           <select
+            aria-label="Kind Filter"
             value={kindFilter}
             onChange={(e) => setKindFilter(e.target.value as typeof kindFilter)}
             className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
@@ -123,14 +132,21 @@ function MyModules() {
             <option value="template">Template</option>
           </select>
           <select
+            aria-label="Role Filter"
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
             className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
           >
             <option value="all">All roles</option>
-            {roles.map((r) => <option key={r} value={r}>{r}</option>)}
+            {roles.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
           </select>
-          <span className="ml-auto text-xs text-black/50">{filtered.length} of {rows.length}</span>
+          <span className="ml-auto text-xs text-black/50">
+            {filtered.length} of {rows.length}
+          </span>
         </div>
 
         <div className="mt-6">
@@ -151,7 +167,11 @@ function MyModules() {
                 {rows.length === 0 ? "No saved modules yet." : "No modules match your filters."}
               </div>
               <div className="mt-1 text-xs text-black/50">
-                Preview any variant in the <Link to="/library" className="underline">Library</Link> and hit “Save as module”.
+                Preview any variant in the{" "}
+                <Link to="/library" className="underline">
+                  Library
+                </Link>{" "}
+                and hit “Save as module”.
               </div>
             </div>
           )}
@@ -173,9 +193,18 @@ function MyModules() {
   );
 }
 
-function SavedModuleCard({ row, onDelete, deleting }: { row: SavedRow; onDelete: () => void; deleting: boolean }) {
+function SavedModuleCard({
+  row,
+  onDelete,
+  deleting,
+}: {
+  row: SavedRow;
+  onDelete: () => void;
+  deleting: boolean;
+}) {
   const variant: ModuleVariant | undefined = byId(MODULE_VARIANTS, row.variant_id);
-  const brand = BRAND_MODES.find((b) => b.id === (row.brand_mode ?? "bm-enterprise")) ?? BRAND_MODES[0];
+  const brand =
+    BRAND_MODES.find((b) => b.id === (row.brand_mode ?? "bm-enterprise")) ?? BRAND_MODES[0];
   const backdrop = variant ? backdropForVariant(variant, brand.id, "light") : null;
   const content = row.content && Object.keys(row.content).length > 0 ? row.content : {};
   const slide = variant
@@ -253,7 +282,12 @@ function SavedModuleCard({ row, onDelete, deleting }: { row: SavedRow; onDelete:
             </span>
           )}
           {row.tags.map((t) => (
-            <span key={t} className="rounded-full bg-black/[0.04] px-2 py-0.5 text-[10px] text-black/60">#{t}</span>
+            <span
+              key={t}
+              className="rounded-full bg-black/[0.04] px-2 py-0.5 text-[10px] text-black/60"
+            >
+              #{t}
+            </span>
           ))}
         </div>
         <div className="mt-3">
@@ -320,7 +354,9 @@ function UseOnSurfaceAction({ row }: { row: SavedRow }) {
     window.setTimeout(() => setFlash(null), 1800);
   }
 
-  const activeSupported = active ? variantSupportsSurface(row.variant_id, active.kind, active.format) : true;
+  const activeSupported = active
+    ? variantSupportsSurface(row.variant_id, active.kind, active.format)
+    : true;
 
   return (
     <div className="relative">
@@ -331,7 +367,11 @@ function UseOnSurfaceAction({ row }: { row: SavedRow }) {
             onClick={() => activeSupported && addTo(active.id)}
             disabled={!activeSupported}
             className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#0030a0] disabled:cursor-not-allowed disabled:bg-black/20"
-            title={activeSupported ? `Add to ${active.title}` : "This variant doesn't fit the active surface format"}
+            title={
+              activeSupported
+                ? `Add to ${active.title}`
+                : "This variant doesn't fit the active surface format"
+            }
           >
             <Plus size={12} />
             Use on {SURFACE_LABELS[active.kind]}
@@ -402,7 +442,9 @@ function UseOnSurfaceAction({ row }: { row: SavedRow }) {
           <div className="space-y-2">
             {(Object.keys(SURFACE_FORMATS) as SurfaceKind[]).map((kind) => (
               <div key={kind}>
-                <div className="mb-0.5 text-[11px] font-medium text-black/70">{SURFACE_LABELS[kind]}</div>
+                <div className="mb-0.5 text-[11px] font-medium text-black/70">
+                  {SURFACE_LABELS[kind]}
+                </div>
                 <div className="flex flex-wrap gap-1">
                   {SURFACE_FORMATS[kind].map((fmt) => {
                     const ok = variantSupportsSurface(row.variant_id, kind, fmt.id);
@@ -413,7 +455,11 @@ function UseOnSurfaceAction({ row }: { row: SavedRow }) {
                         disabled={!ok}
                         onClick={() => createAndAdd(kind, fmt.id)}
                         className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:cursor-not-allowed disabled:opacity-30"
-                        title={ok ? `Create ${SURFACE_LABELS[kind]} · ${fmt.label}` : "Not supported for this variant"}
+                        title={
+                          ok
+                            ? `Create ${SURFACE_LABELS[kind]} · ${fmt.label}`
+                            : "Not supported for this variant"
+                        }
                       >
                         {fmt.label}
                       </button>

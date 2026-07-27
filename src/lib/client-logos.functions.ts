@@ -10,8 +10,17 @@ type SbClient = {
   rpc: (fn: string, args?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
   storage: {
     from: (b: string) => {
-      createSignedUrl: (path: string, expires: number) => Promise<{ data: { signedUrl: string } | null; error: unknown }>;
-      createSignedUrls: (paths: string[], expires: number) => Promise<{ data: Array<{ path: string; signedUrl: string | null; error: string | null }> | null; error: unknown }>;
+      createSignedUrl: (
+        path: string,
+        expires: number,
+      ) => Promise<{ data: { signedUrl: string } | null; error: unknown }>;
+      createSignedUrls: (
+        paths: string[],
+        expires: number,
+      ) => Promise<{
+        data: Array<{ path: string; signedUrl: string | null; error: string | null }> | null;
+        error: unknown;
+      }>;
       remove: (paths: string[]) => Promise<{ data: unknown; error: unknown }>;
     };
   };
@@ -23,7 +32,10 @@ async function assertCanManage(context: { supabase: unknown; userId: string }) {
   const s = context.supabase as SbClient;
   const { data: isAdmin } = await s.rpc("has_role", { _user_id: context.userId, _role: "admin" });
   if (isAdmin) return true;
-  const { data: isReviewer } = await s.rpc("has_role", { _user_id: context.userId, _role: "brand_reviewer" });
+  const { data: isReviewer } = await s.rpc("has_role", {
+    _user_id: context.userId,
+    _role: "brand_reviewer",
+  });
   return Boolean(isReviewer);
 }
 
@@ -72,7 +84,9 @@ export const listClientLogos = createServerFn({ method: "GET" })
     const rows = (data ?? []) as Array<Record<string, any>>;
     const allPaths = Array.from(
       new Set(
-        rows.flatMap((r) => [r.primary_path, r.dark_path, r.light_path, r.mono_path].filter((p): p is string => !!p)),
+        rows.flatMap((r) =>
+          [r.primary_path, r.dark_path, r.light_path, r.mono_path].filter((p): p is string => !!p),
+        ),
       ),
     );
     const urlMap = new Map<string, string>();
@@ -85,38 +99,43 @@ export const listClientLogos = createServerFn({ method: "GET" })
         if (entry.signedUrl) urlMap.set(entry.path, entry.signedUrl);
       }
     }
-    return rows.map((r): ClientLogoRow => ({
-      id: r.id,
-      client_name: r.client_name,
-      slug: r.slug,
-      industry: r.industry ?? null,
-      division_id: r.division_id ?? null,
-      notes: r.notes ?? null,
-      primary_path: r.primary_path,
-      dark_path: r.dark_path ?? null,
-      light_path: r.light_path ?? null,
-      mono_path: r.mono_path ?? null,
-      source_filename: r.source_filename ?? null,
-      mime_type: r.mime_type ?? null,
-      file_size: r.file_size ?? null,
-      source: r.source ?? null,
-      website: r.website ?? null,
-      tags: r.tags ?? [],
-      is_active: r.is_active ?? true,
-      created_by: r.created_by ?? null,
-      created_at: r.created_at,
-      updated_at: r.updated_at,
-      primaryUrl: urlMap.get(r.primary_path) ?? null,
-      darkUrl: r.dark_path ? urlMap.get(r.dark_path) ?? null : null,
-      lightUrl: r.light_path ? urlMap.get(r.light_path) ?? null : null,
-      monoUrl: r.mono_path ? urlMap.get(r.mono_path) ?? null : null,
-    }));
+    return rows.map(
+      (r): ClientLogoRow => ({
+        id: r.id,
+        client_name: r.client_name,
+        slug: r.slug,
+        industry: r.industry ?? null,
+        division_id: r.division_id ?? null,
+        notes: r.notes ?? null,
+        primary_path: r.primary_path,
+        dark_path: r.dark_path ?? null,
+        light_path: r.light_path ?? null,
+        mono_path: r.mono_path ?? null,
+        source_filename: r.source_filename ?? null,
+        mime_type: r.mime_type ?? null,
+        file_size: r.file_size ?? null,
+        source: r.source ?? null,
+        website: r.website ?? null,
+        tags: r.tags ?? [],
+        is_active: r.is_active ?? true,
+        created_by: r.created_by ?? null,
+        created_at: r.created_at,
+        updated_at: r.updated_at,
+        primaryUrl: urlMap.get(r.primary_path) ?? null,
+        darkUrl: r.dark_path ? (urlMap.get(r.dark_path) ?? null) : null,
+        lightUrl: r.light_path ? (urlMap.get(r.light_path) ?? null) : null,
+        monoUrl: r.mono_path ? (urlMap.get(r.mono_path) ?? null) : null,
+      }),
+    );
   });
 
 // ── CREATE ──────────────────────────────────────────────────────────────
 const createInput = z.object({
   clientName: z.string().min(1),
-  slug: z.string().min(1).regex(/^[a-z0-9][a-z0-9-]*$/, "slug must be lowercase, hyphenated"),
+  slug: z
+    .string()
+    .min(1)
+    .regex(/^[a-z0-9][a-z0-9-]*$/, "slug must be lowercase, hyphenated"),
   industry: z.string().nullable().optional(),
   divisionId: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
@@ -206,7 +225,9 @@ export const deleteClientLogo = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .single();
     const paths = row
-      ? [row.primary_path, row.dark_path, row.light_path, row.mono_path].filter((p: string | null): p is string => !!p)
+      ? [row.primary_path, row.dark_path, row.light_path, row.mono_path].filter(
+          (p: string | null): p is string => !!p,
+        )
       : [];
     if (paths.length) {
       await s.storage.from(BUCKET).remove(paths);
@@ -285,14 +306,14 @@ export const signClientLogoForShare = createServerFn({ method: "POST" })
     return { url: signed?.signedUrl ?? null };
   });
 
-
 // ── IMPORT FROM BRANDHUB (one-time seed utility) ────────────────────────
 // Reads public global_client_logos rows from BrandHUB's Supabase (anon-readable),
 // downloads each file server-side, uploads to our client-logos bucket, and
 // inserts a client_logos row per client. Batches with offset/limit so the
 // caller can page through the ~400 total logos without hitting timeouts.
 const BRANDHUB_URL = "https://nhxaijbyqfkkhhoornzy.supabase.co";
-const BRANDHUB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oeGFpamJ5cWZra2hob29ybnp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2NDU0ODYsImV4cCI6MjA4MzIyMTQ4Nn0.Uw6QPHoOo_15FWCfnSAZYyGZNEr-XlZ8NrVyLlcuiWk";
+const BRANDHUB_ANON =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oeGFpamJ5cWZra2hob29ybnp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc2NDU0ODYsImV4cCI6MjA4MzIyMTQ4Nn0.Uw6QPHoOo_15FWCfnSAZYyGZNEr-XlZ8NrVyLlcuiWk";
 
 type BrandhubFile = { url: string; format?: string; lockup?: string; variant?: string };
 type BrandhubLogo = {
@@ -305,15 +326,22 @@ type BrandhubLogo = {
 };
 
 function slugifyName(s: string): string {
-  return s.toLowerCase().trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "") || "logo";
+  return (
+    s
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "") || "logo"
+  );
 }
 
 function pickFiles(files: BrandhubFile[]): {
-  primary?: BrandhubFile; dark?: BrandhubFile; light?: BrandhubFile; mono?: BrandhubFile;
+  primary?: BrandhubFile;
+  dark?: BrandhubFile;
+  light?: BrandhubFile;
+  mono?: BrandhubFile;
 } {
   const find = (lockup: string, variant: string) =>
     files.find((f) => (f.lockup ?? "") === lockup && (f.variant ?? "") === variant);
@@ -327,129 +355,209 @@ function pickFiles(files: BrandhubFile[]): {
 export const importBrandhubLogos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
-    z.object({
-      offset: z.number().int().nonnegative().default(0),
-      limit: z.number().int().min(1).max(50).default(20),
-    }).parse(input),
+    z
+      .object({
+        offset: z.number().int().nonnegative().default(0),
+        limit: z.number().int().min(1).max(50).default(20),
+      })
+      .parse(input),
   )
-  .handler(async ({ data, context }): Promise<{
-    ok: boolean; total: number; processed: number; created: number; skipped: number;
-    filesUploaded: number; nextOffset: number | null; errors: string[];
-  }> => {
-    const s = context.supabase as unknown as SbClient;
-    const { data: isAdmin } = await s.rpc("has_role", { _user_id: context.userId, _role: "admin" });
-    if (!isAdmin) throw new Error("Forbidden: admin required");
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<{
+      ok: boolean;
+      total: number;
+      processed: number;
+      created: number;
+      skipped: number;
+      filesUploaded: number;
+      nextOffset: number | null;
+      errors: string[];
+    }> => {
+      const s = context.supabase as unknown as SbClient;
+      const { data: isAdmin } = await s.rpc("has_role", {
+        _user_id: context.userId,
+        _role: "admin",
+      });
+      if (!isAdmin) throw new Error("Forbidden: admin required");
 
-    const listRes = await fetch(
-      `${BRANDHUB_URL}/rest/v1/global_client_logos?select=id,name,description,category,website_url,files&order=name.asc&offset=${data.offset}&limit=${data.limit}`,
-      { headers: { apikey: BRANDHUB_ANON, Authorization: `Bearer ${BRANDHUB_ANON}`, Prefer: "count=exact" } },
-    );
-    if (!listRes.ok) {
-      return { ok: false, total: 0, processed: 0, created: 0, skipped: 0, filesUploaded: 0, nextOffset: null, errors: [`Fetch ${listRes.status}`] };
-    }
-    const contentRange = listRes.headers.get("content-range") ?? "";
-    const totalMatch = /\/(\d+)$/.exec(contentRange);
-    const total = totalMatch ? Number(totalMatch[1]) : 0;
-    const logos = (await listRes.json()) as BrandhubLogo[];
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const sa = supabaseAdmin as unknown as SbClient;
-
-    let created = 0, skipped = 0, filesUploaded = 0;
-    const errors: string[] = [];
-
-    for (const logo of logos) {
-      try {
-        const slug = slugifyName(logo.name);
-        const { data: existing } = await sa.from("client_logos").select("id").eq("slug", slug).maybeSingle();
-        if (existing) { skipped++; continue; }
-
-        const files = Array.isArray(logo.files) ? logo.files : [];
-        if (files.length === 0) { skipped++; continue; }
-        const picks = pickFiles(files);
-        if (!picks.primary) { skipped++; continue; }
-
-        const paths: Record<"primary" | "dark" | "light" | "mono", string | null> = {
-          primary: null, dark: null, light: null, mono: null,
+      const listRes = await fetch(
+        `${BRANDHUB_URL}/rest/v1/global_client_logos?select=id,name,description,category,website_url,files&order=name.asc&offset=${data.offset}&limit=${data.limit}`,
+        {
+          headers: {
+            apikey: BRANDHUB_ANON,
+            Authorization: `Bearer ${BRANDHUB_ANON}`,
+            Prefer: "count=exact",
+          },
+        },
+      );
+      if (!listRes.ok) {
+        return {
+          ok: false,
+          total: 0,
+          processed: 0,
+          created: 0,
+          skipped: 0,
+          filesUploaded: 0,
+          nextOffset: null,
+          errors: [`Fetch ${listRes.status}`],
         };
-        let firstMime = "image/svg+xml";
-        let firstSize = 0;
-        let firstFilename = "";
-        const uploaded = new Map<string, string>();
-
-        const variantList: Array<["primary" | "dark" | "light" | "mono", BrandhubFile | undefined]> = [
-          ["primary", picks.primary],
-          ["dark", picks.dark],
-          ["light", picks.light],
-          ["mono", picks.mono],
-        ];
-
-        for (const [slot, file] of variantList) {
-          if (!file) continue;
-          let path = uploaded.get(file.url);
-          if (!path) {
-            const dl = await fetch(file.url);
-            if (!dl.ok) { errors.push(`${logo.name}: download ${slot} ${dl.status}`); continue; }
-            const buf = await dl.arrayBuffer();
-            const format = (file.format || "svg").toLowerCase().replace(/[^a-z0-9]/g, "");
-            const mime =
-              format === "svg" ? "image/svg+xml" :
-              format === "png" ? "image/png" :
-              format === "jpg" || format === "jpeg" ? "image/jpeg" :
-              format === "webp" ? "image/webp" :
-              "application/octet-stream";
-            const filename = `${file.lockup ?? "logo"}-${file.variant ?? slot}.${format}`;
-            path = `${slug}/${filename}`;
-            const bucket = sa.storage.from(BUCKET) as unknown as {
-              upload: (p: string, body: ArrayBuffer, o: { contentType: string; upsert: boolean }) => Promise<{ error: unknown }>;
-            };
-            const { error: upErr } = await bucket.upload(path, buf, {
-              contentType: mime,
-              upsert: true,
-            });
-            if (upErr) { errors.push(`${logo.name}: upload ${slot}: ${(upErr as { message?: string }).message ?? "err"}`); continue; }
-            uploaded.set(file.url, path);
-            filesUploaded++;
-            if (slot === "primary") { firstMime = mime; firstSize = buf.byteLength; firstFilename = filename; }
-          }
-          paths[slot] = path;
-        }
-
-        if (!paths.primary) { skipped++; continue; }
-
-        const { error: insErr } = await sa.from("client_logos").insert({
-          client_name: logo.name,
-          slug,
-          industry: logo.category ?? null,
-          division_id: null,
-          notes: logo.description ?? null,
-          website: logo.website_url ?? null,
-          source: "brandhub-import",
-          primary_path: paths.primary,
-          dark_path: paths.dark,
-          light_path: paths.light,
-          mono_path: paths.mono,
-          source_filename: firstFilename || `${slug}.svg`,
-          mime_type: firstMime,
-          file_size: firstSize || null,
-          tags: logo.category ? [logo.category.toLowerCase()] : [],
-          created_by: context.userId,
-        });
-        if (insErr) {
-          errors.push(`${logo.name}: insert ${(insErr as { message?: string }).message ?? "err"}`);
-          continue;
-        }
-        created++;
-      } catch (e) {
-        errors.push(`${logo.name}: ${(e as Error).message}`);
       }
-    }
+      const contentRange = listRes.headers.get("content-range") ?? "";
+      const totalMatch = /\/(\d+)$/.exec(contentRange);
+      const total = totalMatch ? Number(totalMatch[1]) : 0;
+      const logos = (await listRes.json()) as BrandhubLogo[];
 
-    const nextOffset = data.offset + logos.length;
-    return {
-      ok: true, total,
-      processed: logos.length, created, skipped, filesUploaded,
-      nextOffset: nextOffset < total ? nextOffset : null,
-      errors: errors.slice(0, 20),
-    };
-  });
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const sa = supabaseAdmin as unknown as SbClient;
+
+      let created = 0,
+        skipped = 0,
+        filesUploaded = 0;
+      const errors: string[] = [];
+
+      for (const logo of logos) {
+        try {
+          const slug = slugifyName(logo.name);
+          const { data: existing } = await sa
+            .from("client_logos")
+            .select("id")
+            .eq("slug", slug)
+            .maybeSingle();
+          if (existing) {
+            skipped++;
+            continue;
+          }
+
+          const files = Array.isArray(logo.files) ? logo.files : [];
+          if (files.length === 0) {
+            skipped++;
+            continue;
+          }
+          const picks = pickFiles(files);
+          if (!picks.primary) {
+            skipped++;
+            continue;
+          }
+
+          const paths: Record<"primary" | "dark" | "light" | "mono", string | null> = {
+            primary: null,
+            dark: null,
+            light: null,
+            mono: null,
+          };
+          let firstMime = "image/svg+xml";
+          let firstSize = 0;
+          let firstFilename = "";
+          const uploaded = new Map<string, string>();
+
+          const variantList: Array<
+            ["primary" | "dark" | "light" | "mono", BrandhubFile | undefined]
+          > = [
+            ["primary", picks.primary],
+            ["dark", picks.dark],
+            ["light", picks.light],
+            ["mono", picks.mono],
+          ];
+
+          for (const [slot, file] of variantList) {
+            if (!file) continue;
+            let path = uploaded.get(file.url);
+            if (!path) {
+              const dl = await fetch(file.url);
+              if (!dl.ok) {
+                errors.push(`${logo.name}: download ${slot} ${dl.status}`);
+                continue;
+              }
+              const buf = await dl.arrayBuffer();
+              const format = (file.format || "svg").toLowerCase().replace(/[^a-z0-9]/g, "");
+              const mime =
+                format === "svg"
+                  ? "image/svg+xml"
+                  : format === "png"
+                    ? "image/png"
+                    : format === "jpg" || format === "jpeg"
+                      ? "image/jpeg"
+                      : format === "webp"
+                        ? "image/webp"
+                        : "application/octet-stream";
+              const filename = `${file.lockup ?? "logo"}-${file.variant ?? slot}.${format}`;
+              path = `${slug}/${filename}`;
+              const bucket = sa.storage.from(BUCKET) as unknown as {
+                upload: (
+                  p: string,
+                  body: ArrayBuffer,
+                  o: { contentType: string; upsert: boolean },
+                ) => Promise<{ error: unknown }>;
+              };
+              const { error: upErr } = await bucket.upload(path, buf, {
+                contentType: mime,
+                upsert: true,
+              });
+              if (upErr) {
+                errors.push(
+                  `${logo.name}: upload ${slot}: ${(upErr as { message?: string }).message ?? "err"}`,
+                );
+                continue;
+              }
+              uploaded.set(file.url, path);
+              filesUploaded++;
+              if (slot === "primary") {
+                firstMime = mime;
+                firstSize = buf.byteLength;
+                firstFilename = filename;
+              }
+            }
+            paths[slot] = path;
+          }
+
+          if (!paths.primary) {
+            skipped++;
+            continue;
+          }
+
+          const { error: insErr } = await sa.from("client_logos").insert({
+            client_name: logo.name,
+            slug,
+            industry: logo.category ?? null,
+            division_id: null,
+            notes: logo.description ?? null,
+            website: logo.website_url ?? null,
+            source: "brandhub-import",
+            primary_path: paths.primary,
+            dark_path: paths.dark,
+            light_path: paths.light,
+            mono_path: paths.mono,
+            source_filename: firstFilename || `${slug}.svg`,
+            mime_type: firstMime,
+            file_size: firstSize || null,
+            tags: logo.category ? [logo.category.toLowerCase()] : [],
+            created_by: context.userId,
+          });
+          if (insErr) {
+            errors.push(
+              `${logo.name}: insert ${(insErr as { message?: string }).message ?? "err"}`,
+            );
+            continue;
+          }
+          created++;
+        } catch (e) {
+          errors.push(`${logo.name}: ${(e as Error).message}`);
+        }
+      }
+
+      const nextOffset = data.offset + logos.length;
+      return {
+        ok: true,
+        total,
+        processed: logos.length,
+        created,
+        skipped,
+        filesUploaded,
+        nextOffset: nextOffset < total ? nextOffset : null,
+        errors: errors.slice(0, 20),
+      };
+    },
+  );

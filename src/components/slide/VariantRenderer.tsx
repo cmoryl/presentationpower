@@ -1,15 +1,65 @@
 import * as React from "react";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
-import { SlideFrame as BaseSlideFrame, SlideModeContext, SlideBackdropContext, SlideAccentContext, SlideInkContext, makeSlideInk, useSlideInk, type SlideMode, type SlideBackdrop } from "./SlideChrome";
-import { SlideThumbnailContext, SlideVideoPreviewContext, SlideForceVideoAutoplayContext, useResolvedVideoUrl, useResolvedPosterUrl, useResolvedImageUrl, useResolvedLogoUrl } from "@/lib/slide-media-refresh";
+import {
+  SlideFrame as BaseSlideFrame,
+  SlideModeContext,
+  SlideBackdropContext,
+  SlideAccentContext,
+  SlideInkContext,
+  makeSlideInk,
+  useSlideInk,
+  type SlideMode,
+  type SlideBackdrop,
+} from "./SlideChrome";
+import {
+  SlideThumbnailContext,
+  SlideVideoPreviewContext,
+  SlideForceVideoAutoplayContext,
+  useResolvedVideoUrl,
+  useResolvedPosterUrl,
+  useResolvedImageUrl,
+  useResolvedLogoUrl,
+} from "@/lib/slide-media-refresh";
 import { resolveSlideBackground } from "@/lib/background-library";
 import { backdropForVariant } from "./variantBackdrop";
 
-import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, Fragment } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  Fragment,
+} from "react";
 import type { ComponentProps, ReactNode } from "react";
 import type { DeckSlide } from "@/lib/deck-store";
-import { TitleBlock, Kicker, DisplayTitle, Hairline, SupportingText, MetaRow, StatFigure, QuoteMark, Attribution, SoftDivider } from "./primitives";
-import { EditorialTitle, PullQuote, DuotoneImage, GrainOverlay, CinematicScrim, StatRail, GlassTile, IconWell, AuroraOrb, AuroraSidePanel, EDITORIAL_SERIF } from "./flagship";
+import {
+  TitleBlock,
+  Kicker,
+  DisplayTitle,
+  Hairline,
+  SupportingText,
+  MetaRow,
+  StatFigure,
+  QuoteMark,
+  Attribution,
+  SoftDivider,
+} from "./primitives";
+import {
+  EditorialTitle,
+  PullQuote,
+  DuotoneImage,
+  GrainOverlay,
+  CinematicScrim,
+  StatRail,
+  GlassTile,
+  IconWell,
+  AuroraOrb,
+  AuroraSidePanel,
+  EDITORIAL_SERIF,
+} from "./flagship";
 import { APPROVED_LOGOS } from "@/lib/approved-logos";
 import { InfographicSlideModule } from "./InfographicSlideModule";
 
@@ -50,11 +100,7 @@ function ClientLogoChip({
       >
         {label}
       </span>
-      <span
-        aria-hidden
-        className="inline-block h-3 w-px"
-        style={{ background: faint }}
-      />
+      <span aria-hidden className="inline-block h-3 w-px" style={{ background: faint }} />
       <img
         src={src}
         alt={clientName ? `${clientName} logo` : `${pick.name} logo (example)`}
@@ -64,14 +110,20 @@ function ClientLogoChip({
   );
 }
 
-
 // Module-scoped context so helper components (CardGrid, StatGrid, NumberedList,
 // etc.) automatically pick up the current slide's clientName + layoutId when
 // they wrap themselves in <SlideFrame>. VariantRenderer sets the value once
 // per render.
 import type { LogoPosition, LogoOrientation } from "@/lib/logo-placement";
 
-const SlideFrameCtx = createContext<{ clientName?: string; layoutId?: string; clientLogoUrl?: string | null; subCompany?: string; logoOrientation?: LogoOrientation; logoPosition?: LogoPosition }>({});
+const SlideFrameCtx = createContext<{
+  clientName?: string;
+  layoutId?: string;
+  clientLogoUrl?: string | null;
+  subCompany?: string;
+  logoOrientation?: LogoOrientation;
+  logoPosition?: LogoPosition;
+}>({});
 
 function SlideFrame(props: ComponentProps<typeof BaseSlideFrame>) {
   const ctx = useContext(SlideFrameCtx);
@@ -88,7 +140,6 @@ function SlideFrame(props: ComponentProps<typeof BaseSlideFrame>) {
   );
 }
 
-
 import {
   ICON_SIZES,
   resolveEmphasisColors,
@@ -99,12 +150,48 @@ import {
   type IconEmphasis,
 } from "@/lib/iconography";
 import {
-  Sparkles, Workflow, Layers3, Users, ShieldCheck, Target, Rocket, LineChart,
-  Search, Cog, MessageSquareQuote, Building2, Landmark, Cpu, Factory, Store,
-  HeartPulse, Car, Plane, Coins, Calendar, ArrowRight, CheckCircle2,
-  AlertTriangle, TrendingUp, GitBranch, Globe2, Lightbulb, ClipboardList,
-  FileCheck2, Send, MessagesSquare, Mail, Phone, Timer, Trophy, Puzzle,
-  Handshake, Play, BarChart3, Zap, ArrowUpRight,
+  Sparkles,
+  Workflow,
+  Layers3,
+  Users,
+  ShieldCheck,
+  Target,
+  Rocket,
+  LineChart,
+  Search,
+  Cog,
+  MessageSquareQuote,
+  Building2,
+  Landmark,
+  Cpu,
+  Factory,
+  Store,
+  HeartPulse,
+  Car,
+  Plane,
+  Coins,
+  Calendar,
+  ArrowRight,
+  CheckCircle2,
+  AlertTriangle,
+  TrendingUp,
+  GitBranch,
+  Globe2,
+  Lightbulb,
+  ClipboardList,
+  FileCheck2,
+  Send,
+  MessagesSquare,
+  Mail,
+  Phone,
+  Timer,
+  Trophy,
+  Puzzle,
+  Handshake,
+  Play,
+  BarChart3,
+  Zap,
+  ArrowUpRight,
 } from "lucide-react";
 
 type IconType = typeof Sparkles;
@@ -188,7 +275,6 @@ function pickIcon(label: string, fallbackIndex = 0, override?: string | null): I
   return DEFAULT_ICONS[Math.abs(fallbackIndex) % DEFAULT_ICONS.length];
 }
 
-
 function IconBadge({
   brand,
   label,
@@ -212,11 +298,13 @@ function IconBadge({
 }) {
   // Back-compat: map legacy `tone` values into the new emphasis/treatment axes.
   const legacyOnDark = tone === "onDark";
-  const emphasis: IconEmphasis =
-    legacyOnDark ? "inverse"
-    : tone === "primary" ? "primary"
-    : tone === "accent" ? "accent"
-    : (tone as IconEmphasis);
+  const emphasis: IconEmphasis = legacyOnDark
+    ? "inverse"
+    : tone === "primary"
+      ? "primary"
+      : tone === "accent"
+        ? "accent"
+        : (tone as IconEmphasis);
   const spec = withDefaults({
     placement,
     size,
@@ -228,9 +316,10 @@ function IconBadge({
   const colors = resolveEmphasisColors(brand, spec.treatment, spec.emphasis);
   const Icon = pickIcon(label, index, override);
   const isCircle = spec.treatment === "soft-circle";
-  const a11y = spec.a11yRole === "semantic"
-    ? { role: "img" as const, "aria-label": ariaLabel ?? label }
-    : { "aria-hidden": true as const };
+  const a11y =
+    spec.a11yRole === "semantic"
+      ? { role: "img" as const, "aria-label": ariaLabel ?? label }
+      : { "aria-hidden": true as const };
   return (
     <div
       className={`flex shrink-0 items-center justify-center ${isCircle ? "rounded-full" : ""}`}
@@ -249,7 +338,6 @@ function IconBadge({
   );
 }
 
-
 type Props = {
   slide: DeckSlide;
   variant: ModuleVariant;
@@ -263,12 +351,17 @@ type Props = {
 };
 
 type Item = Record<string, unknown>;
-const s = (v: unknown, fb = ""): string => (typeof v === "string" ? v : typeof v === "number" ? String(v) : fb);
+const s = (v: unknown, fb = ""): string =>
+  typeof v === "string" ? v : typeof v === "number" ? String(v) : fb;
 const arr = (v: unknown): Item[] => (Array.isArray(v) ? (v as Item[]) : []);
-const obj = (v: unknown): Record<string, unknown> => (v && typeof v === "object" ? (v as Record<string, unknown>) : {});
+const obj = (v: unknown): Record<string, unknown> =>
+  v && typeof v === "object" ? (v as Record<string, unknown>) : {};
 const strs = (v: unknown): string[] => (Array.isArray(v) ? (v as unknown[]).map((x) => s(x)) : []);
 function lastWord(t: string): string {
-  const words = String(t || "").trim().split(/\s+/).filter(Boolean);
+  const words = String(t || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
   return words[words.length - 1] ?? "";
 }
 
@@ -292,12 +385,28 @@ function themeBrandForMode(brand: BrandMode, mode: SlideMode): BrandMode {
 }
 
 export function VariantRenderer(props: Props) {
-  const { slide, variant, brand, pageNumber, clientName, clientLogoUrl, subCompany, mode = "light", logoOrientation } = props;
+  const {
+    slide,
+    variant,
+    brand,
+    pageNumber,
+    clientName,
+    clientLogoUrl,
+    subCompany,
+    mode = "light",
+    logoOrientation,
+  } = props;
   const c = slide.content as Record<string, unknown>;
   const contentClientName = s((slide.content as Record<string, unknown>).clientName) || undefined;
   const resolvedClient = clientName || contentClientName;
   const themedBrand = themeBrandForMode(brand, mode);
-  const semanticInk = makeSlideInk(mode, brand.tokens.accent, brand.tokens.primary, brand.tokens.surface, brand.tokens.ink);
+  const semanticInk = makeSlideInk(
+    mode,
+    brand.tokens.accent,
+    brand.tokens.primary,
+    brand.tokens.surface,
+    brand.tokens.ink,
+  );
 
   // Custom background per slide (from content.background). Falls back to null
   // so variants that render their own MediaTile / deterministic backdrops are
@@ -307,7 +416,8 @@ export function VariantRenderer(props: Props) {
   // the curated 10-gradient backdrop set when the slide has no explicit
   // background configured. Light mode intentionally stays clean (white
   // surface + ink text) — do not inject a photo backdrop there.
-  const fallbackBackdrop = !resolvedBg && mode === "dark" ? backdropForVariant(variant, brand.id, mode) : null;
+  const fallbackBackdrop =
+    !resolvedBg && mode === "dark" ? backdropForVariant(variant, brand.id, mode) : null;
   const backdrop: SlideBackdrop | null = resolvedBg
     ? {
         url: resolvedBg.url,
@@ -324,20 +434,42 @@ export function VariantRenderer(props: Props) {
       }
     : fallbackBackdrop;
 
-
   return (
     <SlideModeContext.Provider value={mode}>
       <SlideAccentContext.Provider value={themedBrand?.tokens?.accent ?? null}>
         <SlideInkContext.Provider value={semanticInk}>
           <SlideBackdropContext.Provider value={backdrop}>
-            <SlideFrameCtx.Provider value={{ clientName: resolvedClient, layoutId: slide.layoutId, clientLogoUrl: clientLogoUrl ?? null, subCompany, logoOrientation: slide.logoOrientation && slide.logoOrientation !== "auto" ? slide.logoOrientation : logoOrientation, logoPosition: slide.logoPosition && slide.logoPosition !== "auto" ? slide.logoPosition : undefined }}>
-              {renderVariantBody({ slide, variant, brand: themedBrand, pageNumber, c, mode, clientName: resolvedClient, clientLogoUrl: clientLogoUrl ?? null })}
+            <SlideFrameCtx.Provider
+              value={{
+                clientName: resolvedClient,
+                layoutId: slide.layoutId,
+                clientLogoUrl: clientLogoUrl ?? null,
+                subCompany,
+                logoOrientation:
+                  slide.logoOrientation && slide.logoOrientation !== "auto"
+                    ? slide.logoOrientation
+                    : logoOrientation,
+                logoPosition:
+                  slide.logoPosition && slide.logoPosition !== "auto"
+                    ? slide.logoPosition
+                    : undefined,
+              }}
+            >
+              {renderVariantBody({
+                slide,
+                variant,
+                brand: themedBrand,
+                pageNumber,
+                c,
+                mode,
+                clientName: resolvedClient,
+                clientLogoUrl: clientLogoUrl ?? null,
+              })}
             </SlideFrameCtx.Provider>
           </SlideBackdropContext.Provider>
         </SlideInkContext.Provider>
       </SlideAccentContext.Provider>
     </SlideModeContext.Provider>
-
   );
 }
 
@@ -351,7 +483,6 @@ function pickLogoForMode(it: Record<string, unknown>, mode: SlideMode): string {
   if (mode === "dark") return dark || light;
   return light || dark;
 }
-
 
 function renderVariantBody({
   slide,
@@ -372,12 +503,17 @@ function renderVariantBody({
   clientName?: string;
   clientLogoUrl?: string | null;
 }): ReactNode {
-
   // Mode-aware ink palette for charts and data viz. Every chart/graph variant
   // MUST use these tokens (never hardcoded `rgba(10,15,28,X)`) so text stays
   // readable when a dark backdrop is applied.
   const isDark = mode === "dark";
-  const semantic = makeSlideInk(mode, brand.tokens.accent, brand.tokens.primary, brand.tokens.surface, brand.tokens.ink);
+  const semantic = makeSlideInk(
+    mode,
+    brand.tokens.accent,
+    brand.tokens.primary,
+    brand.tokens.surface,
+    brand.tokens.ink,
+  );
   const ink = {
     strong: semantic.text,
     body: semantic.muted,
@@ -407,8 +543,6 @@ function renderVariantBody({
   }
 
   switch (variant.id) {
-
-
     // ── Opening ────────────────────────────────────────────────────────
     case "MV-OP-COVER":
       return (
@@ -456,7 +590,12 @@ function renderVariantBody({
               />
             </div>
             {s(c.subtitle) && (
-              <SupportingText size="xl" opacity={0.86} maxWidthPx={1200} className="mt-10 tp-rise tp-rise-delay-2">
+              <SupportingText
+                size="xl"
+                opacity={0.86}
+                maxWidthPx={1200}
+                className="mt-10 tp-rise tp-rise-delay-2"
+              >
                 {s(c.subtitle)}
               </SupportingText>
             )}
@@ -465,7 +604,6 @@ function renderVariantBody({
               {s(c.date) && <span>{s(c.date)}</span>}
             </MetaRow>
           </div>
-
         </SlideFrame>
       );
 
@@ -474,15 +612,41 @@ function renderVariantBody({
       const _titleSize = _titleLen > 60 ? "title" : _titleLen > 30 ? "section" : "cover";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-media"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} videoAutoplay={c.videoAutoplay as boolean | undefined} videoLoop={c.videoLoop as boolean | undefined} videoMuted={c.videoMuted as boolean | undefined} videoControls={c.videoControls as boolean | undefined} className="absolute inset-0 h-full w-full rounded-none tp-kenburns" />
+          <MediaTile
+            brand={brand}
+            seed={s(c.mediaSeed, s(c.clientName, "cover-media"))}
+            overrideUrl={s(c.mediaUrl)}
+            mediaPath={s(c.mediaPath)}
+            videoUrl={s(c.videoUrl)}
+            videoPosterUrl={s(c.videoPosterUrl)}
+            videoPath={s(c.videoPath)}
+            videoPosterPath={s(c.videoPosterPath)}
+            videoAutoplay={c.videoAutoplay as boolean | undefined}
+            videoLoop={c.videoLoop as boolean | undefined}
+            videoMuted={c.videoMuted as boolean | undefined}
+            videoControls={c.videoControls as boolean | undefined}
+            className="absolute inset-0 h-full w-full rounded-none tp-kenburns"
+          />
           {/* Duotone-style color wash tinted to the brand accent, plus grain */}
-          <div aria-hidden className="pointer-events-none absolute inset-0" style={{ background: brand.tokens.accent, mixBlendMode: "color", opacity: 0.28 }} />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{ background: brand.tokens.accent, mixBlendMode: "color", opacity: 0.28 }}
+          />
           <GrainOverlay opacity={0.09} />
           <CinematicScrim anchor="bottom" strength={0.9} tint="#050418" vignette={0.28} />
           <div className="absolute inset-x-24 top-32 bottom-40 flex flex-col justify-end overflow-hidden text-white">
             <div className="flex items-center gap-4 tp-rise">
-              <span className="inline-block h-2 w-2 rounded-full" style={{ background: brand.tokens.accent, boxShadow: `0 0 24px ${brand.tokens.accent}` }} />
-              <Kicker brand={brand} color="#ffffff">Prepared for {s(c.clientName)}</Kicker>
+              <span
+                className="inline-block h-2 w-2 rounded-full"
+                style={{
+                  background: brand.tokens.accent,
+                  boxShadow: `0 0 24px ${brand.tokens.accent}`,
+                }}
+              />
+              <Kicker brand={brand} color="#ffffff">
+                Prepared for {s(c.clientName)}
+              </Kicker>
             </div>
             <div className="mt-6 flex items-end gap-6 tp-rise tp-rise-delay-1">
               <StatRail color={"#ffffff"} height={180} className="mb-4" />
@@ -497,20 +661,22 @@ function renderVariantBody({
               />
             </div>
             {s(c.subtitle) && (
-              <SupportingText size="lg" opacity={0.92} maxWidthPx={1180} className="mt-6 line-clamp-2 tp-rise tp-rise-delay-2">
+              <SupportingText
+                size="lg"
+                opacity={0.92}
+                maxWidthPx={1180}
+                className="mt-6 line-clamp-2 tp-rise tp-rise-delay-2"
+              >
                 {s(c.subtitle)}
               </SupportingText>
             )}
             <MetaRow className="mt-10 tp-rise tp-rise-delay-3">
               {s(c.date) && <span>{s(c.date)}</span>}
             </MetaRow>
-
           </div>
-
         </SlideFrame>
       );
     }
-
 
     case "MV-OP-COVER-MINIMAL":
       return (
@@ -528,7 +694,12 @@ function renderVariantBody({
               />
             </div>
             {s(c.subtitle) && (
-              <SupportingText size="xl" opacity={0.72} maxWidthPx={1080} className="mt-8 tp-rise tp-rise-delay-2">
+              <SupportingText
+                size="xl"
+                opacity={0.72}
+                maxWidthPx={1080}
+                className="mt-8 tp-rise tp-rise-delay-2"
+              >
                 {s(c.subtitle)}
               </SupportingText>
             )}
@@ -545,8 +716,12 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="divider">
           <div className="flex h-full flex-col justify-center">
-            <div className="tp-rise"><Kicker brand={brand}>{s(c.kicker, "Section")}</Kicker></div>
-            <div className="mt-8 tp-rise tp-rise-delay-1"><StatRail color={"var(--slide-accent-text)"} height={96} /></div>
+            <div className="tp-rise">
+              <Kicker brand={brand}>{s(c.kicker, "Section")}</Kicker>
+            </div>
+            <div className="mt-8 tp-rise tp-rise-delay-1">
+              <StatRail color={"var(--slide-accent-text)"} height={96} />
+            </div>
             <div className="mt-10 tp-rise tp-rise-delay-2">
               <EditorialTitle
                 text={s(c.title)}
@@ -560,7 +735,6 @@ function renderVariantBody({
           </div>
         </SlideFrame>
       );
-
 
     case "MV-OP-DIVIDER-NUMBERED":
       return (
@@ -580,8 +754,15 @@ function renderVariantBody({
               {s(c.chapterNumber, "01")}
             </div>
             <div className="flex-1">
-              <Kicker brand={brand} color={ink.muted}>{s(c.kicker, "Chapter")}</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={64} thicknessPx={2} className="mt-6" />
+              <Kicker brand={brand} color={ink.muted}>
+                {s(c.kicker, "Chapter")}
+              </Kicker>
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={64}
+                thicknessPx={2}
+                className="mt-6"
+              />
               <DisplayTitle size="section" color={ink.strong} maxWidthPx={1100} className="mt-8">
                 {s(c.title)}
               </DisplayTitle>
@@ -641,7 +822,9 @@ function renderVariantBody({
                   <div
                     aria-hidden
                     className="h-[1px] w-10"
-                    style={{ background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, transparent 100%)` }}
+                    style={{
+                      background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, transparent 100%)`,
+                    }}
                   />
                 </div>
               ))}
@@ -657,15 +840,32 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, "Agenda")} kicker="Contents" />
           <div className="mt-12">
             {arr(c.items).map((it, i) => (
-              <div key={i} className="flex items-baseline gap-10 border-t py-7" style={{ borderColor: "rgba(10,15,28,0.10)" }}>
+              <div
+                key={i}
+                className="flex items-baseline gap-10 border-t py-7"
+                style={{ borderColor: "rgba(10,15,28,0.10)" }}
+              >
                 <div
                   className="tabular-nums"
-                  style={{ color: "var(--slide-accent-text)", fontSize: 40, fontWeight: 600, letterSpacing: "-0.02em", minWidth: 90 }}
+                  style={{
+                    color: "var(--slide-accent-text)",
+                    fontSize: 40,
+                    fontWeight: 600,
+                    letterSpacing: "-0.02em",
+                    minWidth: 90,
+                  }}
                 >
                   {String(i + 1).padStart(2, "0")}
                 </div>
                 <div className="flex-1">
-                  <div style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.015em", lineHeight: 1.15 }}>
+                  <div
+                    style={{
+                      fontSize: 34,
+                      fontWeight: 600,
+                      letterSpacing: "-0.015em",
+                      lineHeight: 1.15,
+                    }}
+                  >
                     {s(it.label)}
                   </div>
                   {s(it.body) && (
@@ -680,7 +880,6 @@ function renderVariantBody({
         </SlideFrame>
       );
 
-
     case "MV-OP-INTRO-TEAM":
     case "MV-TEAM-BIOS-3":
     case "MV-TEAM-BIOS-4": {
@@ -693,7 +892,9 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Team")} />
-          <div className={`mt-14 grid gap-8 ${cols === 4 ? "grid-cols-4" : cols === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
+          <div
+            className={`mt-14 grid gap-8 ${cols === 4 ? "grid-cols-4" : cols === 2 ? "grid-cols-2" : "grid-cols-3"}`}
+          >
             {people.map((p, i) => {
               const name = s(p.name);
               const initials = name
@@ -797,15 +998,40 @@ function renderVariantBody({
     // ── Context & Challenge ───────────────────────────────────────────
     case "MV-CTX-CARDS-3":
     case "MV-SOL-PILLARS-3":
-      return <CardGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={3} />;
+      return (
+        <CardGrid
+          brand={brand}
+          pageNumber={pageNumber}
+          title={s(c.title)}
+          items={arr(c.items)}
+          cols={3}
+        />
+      );
 
     case "MV-CTX-CARDS-2":
     case "MV-SOL-PILLARS-2":
-      return <CardGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} />;
+      return (
+        <CardGrid
+          brand={brand}
+          pageNumber={pageNumber}
+          title={s(c.title)}
+          items={arr(c.items)}
+          cols={2}
+        />
+      );
 
     case "MV-CTX-CARDS-4":
     case "MV-SOL-PILLARS-4":
-      return <CardGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} />;
+      return (
+        <CardGrid
+          brand={brand}
+          pageNumber={pageNumber}
+          title={s(c.title)}
+          items={arr(c.items)}
+          cols={2}
+          rows={2}
+        />
+      );
 
     case "MV-CTX-COST": {
       return (
@@ -813,7 +1039,12 @@ function renderVariantBody({
           <div className="grid h-full grid-cols-[1.05fr_1fr] items-center gap-24">
             <div className="min-w-0">
               <Kicker brand={brand}>Cost of inaction</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={88} thicknessPx={2} className="mt-6 mb-10" />
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={88}
+                thicknessPx={2}
+                className="mt-6 mb-10"
+              />
               <StatFigure
                 brand={brand}
                 value={s(c.stat)}
@@ -831,31 +1062,75 @@ function renderVariantBody({
     }
 
     case "MV-PROOF-STATS-4":
-      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} align={s(c.align) === "center" ? "center" : "left"} />;
+      return (
+        <AuroraStatGrid
+          brand={brand}
+          pageNumber={pageNumber}
+          title={s(c.title)}
+          items={arr(c.items)}
+          cols={2}
+          rows={2}
+          align={s(c.align) === "center" ? "center" : "left"}
+        />
+      );
 
     case "MV-CTX-STAT-GRID":
-      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} align={s(c.align) === "center" ? "center" : "left"} />;
-
+      return (
+        <AuroraStatGrid
+          brand={brand}
+          pageNumber={pageNumber}
+          title={s(c.title)}
+          items={arr(c.items)}
+          cols={2}
+          rows={2}
+          align={s(c.align) === "center" ? "center" : "left"}
+        />
+      );
 
     case "MV-PROOF-STATS-2":
-      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} align={s(c.align) === "center" ? "center" : "left"} />;
+      return (
+        <AuroraStatGrid
+          brand={brand}
+          pageNumber={pageNumber}
+          title={s(c.title)}
+          items={arr(c.items)}
+          cols={2}
+          align={s(c.align) === "center" ? "center" : "left"}
+        />
+      );
 
     case "MV-PROOF-STATS-3":
     case "MV-INS-OPPORTUNITY-SIZE":
-      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={3} align={s(c.align) === "center" ? "center" : "left"} />;
-
+      return (
+        <AuroraStatGrid
+          brand={brand}
+          pageNumber={pageNumber}
+          title={s(c.title)}
+          items={arr(c.items)}
+          cols={3}
+          align={s(c.align) === "center" ? "center" : "left"}
+        />
+      );
 
     case "MV-CTX-TREND":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex h-full flex-col justify-center">
             <Kicker brand={brand}>
-              <span className="mr-4 inline-block align-[-0.15em]" style={{ fontSize: 44, letterSpacing: 0 }}>
+              <span
+                className="mr-4 inline-block align-[-0.15em]"
+                style={{ fontSize: 44, letterSpacing: 0 }}
+              >
                 {s(c.direction) === "down" ? "\u2193" : "\u2191"}
               </span>
               Trend
             </Kicker>
-            <Hairline color={"var(--slide-accent-text)"} widthPx={88} thicknessPx={2} className="mt-6 mb-8" />
+            <Hairline
+              color={"var(--slide-accent-text)"}
+              widthPx={88}
+              thicknessPx={2}
+              className="mt-6 mb-8"
+            />
             <DisplayTitle size="section" color={ink.strong} maxWidthPx={1500}>
               {s(c.headline)}
             </DisplayTitle>
@@ -867,7 +1142,14 @@ function renderVariantBody({
       );
 
     case "MV-CTX-CHALLENGE-STACK":
-      return <NumberedList brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} />;
+      return (
+        <NumberedList
+          brand={brand}
+          pageNumber={pageNumber}
+          title={s(c.title)}
+          items={arr(c.items)}
+        />
+      );
 
     // ── Insight ────────────────────────────────────────────────────────
     case "MV-INS-CALLOUT":
@@ -875,7 +1157,12 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex h-full flex-col justify-center">
             <Kicker brand={brand}>Insight</Kicker>
-            <Hairline color={"var(--slide-accent-text)"} widthPx={88} thicknessPx={2} className="mt-6 mb-10" />
+            <Hairline
+              color={"var(--slide-accent-text)"}
+              widthPx={88}
+              thicknessPx={2}
+              className="mt-6 mb-10"
+            />
             <DisplayTitle size="section" color={ink.strong} maxWidthPx={1520}>
               {s(c.insight)}
             </DisplayTitle>
@@ -926,7 +1213,6 @@ function renderVariantBody({
               </div>
             </div>
           </div>
-
         </SlideFrame>
       );
 
@@ -940,12 +1226,29 @@ function renderVariantBody({
                 { label: "So what", body: s(c.soWhat) },
                 { label: "Now what", body: s(c.nowWhat) },
               ].map((b, i) => (
-                <div key={i} className="px-10 first:pl-0 last:pr-0" style={{
-                  borderLeft: i === 0 ? undefined : "1px solid rgba(10,15,28,0.10)",
-                }}>
-                  <Hairline color={"var(--slide-accent-text)"} widthPx={44} thicknessPx={2} className="mb-6" />
+                <div
+                  key={i}
+                  className="px-10 first:pl-0 last:pr-0"
+                  style={{
+                    borderLeft: i === 0 ? undefined : "1px solid rgba(10,15,28,0.10)",
+                  }}
+                >
+                  <Hairline
+                    color={"var(--slide-accent-text)"}
+                    widthPx={44}
+                    thicknessPx={2}
+                    className="mb-6"
+                  />
                   <Kicker brand={brand}>{b.label}</Kicker>
-                  <div className="mt-6" style={{ fontSize: 34, lineHeight: 1.28, letterSpacing: "-0.01em", color: ink.strong }}>
+                  <div
+                    className="mt-6"
+                    style={{
+                      fontSize: 34,
+                      lineHeight: 1.28,
+                      letterSpacing: "-0.01em",
+                      color: ink.strong,
+                    }}
+                  >
                     {b.body}
                   </div>
                 </div>
@@ -964,7 +1267,10 @@ function renderVariantBody({
                 <div className="flex items-center gap-4 tp-rise">
                   <span
                     className="inline-block h-2 w-2 rounded-full"
-                    style={{ background: brand.tokens.accent, boxShadow: `0 0 20px ${brand.tokens.accent}` }}
+                    style={{
+                      background: brand.tokens.accent,
+                      boxShadow: `0 0 20px ${brand.tokens.accent}`,
+                    }}
                   />
                   <Kicker brand={brand}>In their words</Kicker>
                 </div>
@@ -979,7 +1285,9 @@ function renderVariantBody({
                 </div>
                 <div
                   className="mt-10 h-[2px] w-[120px] rounded-full tp-rise tp-rise-delay-2"
-                  style={{ backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)` }}
+                  style={{
+                    backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)`,
+                  }}
                 />
                 <div className="mt-8 tp-rise tp-rise-delay-3">
                   <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} />
@@ -990,7 +1298,6 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
-
 
     // ── Solution & Process ─────────────────────────────────────────────
     case "MV-SOL-PILLARS-5": {
@@ -1003,17 +1310,39 @@ function renderVariantBody({
             <div className="mt-12 grid grid-cols-2 gap-10" style={{ gridTemplateRows: "1fr 1fr" }}>
               <GlassTile radius={26} padding="px-10 py-10" className="row-span-2">
                 <Kicker brand={brand}>Hero</Kicker>
-                <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-4 mb-6" />
-                <div style={{ fontSize: 56, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.05, color: ink.strong }}>
+                <Hairline
+                  color={"var(--slide-accent-text)"}
+                  widthPx={72}
+                  thicknessPx={2}
+                  className="mt-4 mb-6"
+                />
+                <div
+                  style={{
+                    fontSize: 56,
+                    fontWeight: 600,
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.05,
+                    color: ink.strong,
+                  }}
+                >
                   {s(hero.title)}
                 </div>
                 <SupportingText size="lg" opacity={0.78} className="mt-6" maxWidthPx={560}>
                   {s(hero.body)}
                 </SupportingText>
               </GlassTile>
-              {arr(c.items).slice(0, 4).map((it, i) => (
-                <Card key={i} brand={brand} title={s(it.title)} body={s(it.body)} index={i + 1} icon={s(it.icon)} />
-              ))}
+              {arr(c.items)
+                .slice(0, 4)
+                .map((it, i) => (
+                  <Card
+                    key={i}
+                    brand={brand}
+                    title={s(it.title)}
+                    body={s(it.body)}
+                    index={i + 1}
+                    icon={s(it.icon)}
+                  />
+                ))}
             </div>
           </div>
         </SlideFrame>
@@ -1033,14 +1362,29 @@ function renderVariantBody({
                   <div className="flex items-center gap-10 py-7">
                     <div
                       className="w-16 tabular-nums"
-                      style={{ fontSize: 22, fontWeight: 600, letterSpacing: "0.18em", color: "var(--slide-accent-text)" }}
+                      style={{
+                        fontSize: 22,
+                        fontWeight: 600,
+                        letterSpacing: "0.18em",
+                        color: "var(--slide-accent-text)",
+                      }}
                     >
                       {String(i + 1).padStart(2, "0")}
                     </div>
-                    <div className="w-72" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: "var(--slide-ink)" }}>
+                    <div
+                      className="w-72"
+                      style={{
+                        fontSize: 30,
+                        fontWeight: 600,
+                        letterSpacing: "-0.015em",
+                        color: "var(--slide-ink)",
+                      }}
+                    >
                       {s(it.label)}
                     </div>
-                    <SupportingText size="md" opacity={0.75} className="flex-1">{s(it.body)}</SupportingText>
+                    <SupportingText size="md" opacity={0.75} className="flex-1">
+                      {s(it.body)}
+                    </SupportingText>
                   </div>
                 </div>
               ))}
@@ -1059,12 +1403,20 @@ function renderVariantBody({
               <div className="grid grid-cols-2 gap-x-16 gap-y-8">
                 {arr(c.items).map((it, i) => (
                   <div key={i} className="flex items-start gap-5">
-                    <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} />
+                    <IconBadge
+                      brand={brand}
+                      label={s(it.label)}
+                      index={i}
+                      size="md"
+                      override={s(it.icon)}
+                    />
                     <div className="flex-1">
                       <div className="text-3xl font-semibold" style={{ color: ink.strong }}>
                         {s(it.label)}
                       </div>
-                      <div className="mt-2 text-2xl opacity-80" style={{ color: ink.muted }}>{s(it.body)}</div>
+                      <div className="mt-2 text-2xl opacity-80" style={{ color: ink.muted }}>
+                        {s(it.body)}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -1084,7 +1436,12 @@ function renderVariantBody({
               className="absolute left-0 right-8 top-[9px] h-px"
               style={{ backgroundColor: brand.tokens.accent, opacity: 0.55 }}
             />
-            <div className="grid gap-10" style={{ gridTemplateColumns: `repeat(${Math.max(arr(c.items).length, 1)}, minmax(0, 1fr))` }}>
+            <div
+              className="grid gap-10"
+              style={{
+                gridTemplateColumns: `repeat(${Math.max(arr(c.items).length, 1)}, minmax(0, 1fr))`,
+              }}
+            >
               {arr(c.items).map((it, i) => (
                 <div key={i} className="pr-8">
                   {/* Refined node — small precise dot on the rule */}
@@ -1103,14 +1460,34 @@ function renderVariantBody({
                   </div>
                   <div
                     className="mb-3 uppercase tabular-nums"
-                    style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}
+                    style={{
+                      fontSize: 18,
+                      letterSpacing: "0.28em",
+                      color: "var(--slide-accent-text)",
+                      fontWeight: 600,
+                    }}
                   >
                     {String(i + 1).padStart(2, "0")}
                   </div>
-                  <div style={{ fontSize: 30, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em", lineHeight: 1.15 }}>
+                  <div
+                    style={{
+                      fontSize: 30,
+                      fontWeight: 600,
+                      color: ink.strong,
+                      letterSpacing: "-0.015em",
+                      lineHeight: 1.15,
+                    }}
+                  >
                     {s(it.label)}
                   </div>
-                  <div className="mt-4" style={{ fontSize: 22, lineHeight: 1.4, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>
+                  <div
+                    className="mt-4"
+                    style={{
+                      fontSize: 22,
+                      lineHeight: 1.4,
+                      color: "color-mix(in oklab, currentColor 72%, transparent)",
+                    }}
+                  >
                     {s(it.body)}
                   </div>
                 </div>
@@ -1121,7 +1498,14 @@ function renderVariantBody({
       );
 
     case "MV-PROC-PHASES":
-      return <NumberedList brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items).map((it) => ({ title: s(it.label), body: s(it.body) }))} />;
+      return (
+        <NumberedList
+          brand={brand}
+          pageNumber={pageNumber}
+          title={s(c.title)}
+          items={arr(c.items).map((it) => ({ title: s(it.label), body: s(it.body) }))}
+        />
+      );
 
     case "MV-PROC-BEFORE-AFTER": {
       const before = obj(c.before);
@@ -1130,21 +1514,61 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
           <div className="mt-14 grid grid-cols-2 gap-16">
-            <div className="flex flex-col pt-8" style={{ borderTop: "1px solid rgba(10,15,28,0.15)" }}>
-              <Kicker brand={brand} color="color-mix(in oklab, currentColor 62%, transparent)">Before</Kicker>
-              <div className="mt-8" style={{ fontSize: 40, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
+            <div
+              className="flex flex-col pt-8"
+              style={{ borderTop: "1px solid rgba(10,15,28,0.15)" }}
+            >
+              <Kicker brand={brand} color="color-mix(in oklab, currentColor 62%, transparent)">
+                Before
+              </Kicker>
+              <div
+                className="mt-8"
+                style={{
+                  fontSize: 40,
+                  fontWeight: 600,
+                  color: ink.strong,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.1,
+                }}
+              >
                 {s(before.title)}
               </div>
-              <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.4, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>
+              <div
+                className="mt-6"
+                style={{
+                  fontSize: 24,
+                  lineHeight: 1.4,
+                  color: "color-mix(in oklab, currentColor 72%, transparent)",
+                }}
+              >
                 {s(before.body)}
               </div>
             </div>
-            <div className="flex flex-col pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+            <div
+              className="flex flex-col pt-8"
+              style={{ borderTop: `2px solid ${brand.tokens.accent}` }}
+            >
               <Kicker brand={brand}>After</Kicker>
-              <div className="mt-8" style={{ fontSize: 40, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>
+              <div
+                className="mt-8"
+                style={{
+                  fontSize: 40,
+                  fontWeight: 600,
+                  color: ink.strong,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.1,
+                }}
+              >
                 {s(after.title)}
               </div>
-              <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.4, color: "color-mix(in oklab, currentColor 82%, transparent)" }}>
+              <div
+                className="mt-6"
+                style={{
+                  fontSize: 24,
+                  lineHeight: 1.4,
+                  color: "color-mix(in oklab, currentColor 82%, transparent)",
+                }}
+              >
                 {s(after.body)}
               </div>
             </div>
@@ -1152,7 +1576,6 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
-
 
     // ── Proof & Data ──────────────────────────────────────────────────
     case "MV-PROOF-LOGOS":
@@ -1184,7 +1607,9 @@ function renderVariantBody({
                   <div
                     aria-hidden
                     className="absolute inset-x-0 top-0 h-[2px]"
-                    style={{ background: `linear-gradient(90deg, ${accent}00, ${accent}, ${accent}00)` }}
+                    style={{
+                      background: `linear-gradient(90deg, ${accent}00, ${accent}, ${accent}00)`,
+                    }}
                   />
                   <div className="flex flex-1 items-center justify-center">
                     {logoUrl || logoPath ? (
@@ -1196,7 +1621,9 @@ function renderVariantBody({
                         style={{ filter: isDark ? "brightness(1.05)" : undefined }}
                       />
                     ) : (
-                      <div style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.01em" }}>{name}</div>
+                      <div style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.01em" }}>
+                        {name}
+                      </div>
                     )}
                   </div>
                   {result && (
@@ -1221,7 +1648,6 @@ function renderVariantBody({
       );
     }
 
-
     case "MV-PROOF-LOGOS-STRIP": {
       const items = arr(c.items).slice(0, 6);
       const rule = mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
@@ -1229,7 +1655,12 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           {s(c.kicker) && <Kicker brand={brand}>{s(c.kicker)}</Kicker>}
           <SlideTitle brand={brand} title={s(c.title)} />
-          <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-10" />
+          <Hairline
+            color={"var(--slide-accent-text)"}
+            widthPx={96}
+            thicknessPx={2}
+            className="mt-10"
+          />
           <div
             className="mt-16 flex items-center justify-between gap-10 px-4 py-14"
             style={{ borderTop: `1px solid ${rule}`, borderBottom: `1px solid ${rule}` }}
@@ -1241,9 +1672,16 @@ function renderVariantBody({
               return (
                 <div key={i} className="flex h-24 flex-1 items-center justify-center">
                   {url || path ? (
-                    <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-16 max-w-full object-contain" />
+                    <ClientLogoImg
+                      url={url}
+                      path={path}
+                      alt={`${name} logo`}
+                      className="max-h-16 max-w-full object-contain"
+                    />
                   ) : (
-                    <div className="text-xl font-semibold" style={{ color: ink.strong }}>{name}</div>
+                    <div className="text-xl font-semibold" style={{ color: ink.strong }}>
+                      {name}
+                    </div>
                   )}
                 </div>
               );
@@ -1266,9 +1704,16 @@ function renderVariantBody({
             return (
               <div key={i} className="flex aspect-[5/2] items-center justify-center p-4">
                 {url || path ? (
-                  <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-14 max-w-[88%] object-contain" />
+                  <ClientLogoImg
+                    url={url}
+                    path={path}
+                    alt={`${name} logo`}
+                    className="max-h-14 max-w-[88%] object-contain"
+                  />
                 ) : (
-                  <div className="text-lg font-semibold" style={{ color: ink.strong }}>{name}</div>
+                  <div className="text-lg font-semibold" style={{ color: ink.strong }}>
+                    {name}
+                  </div>
                 )}
               </div>
             );
@@ -1292,9 +1737,8 @@ function renderVariantBody({
     }
 
     case "MV-PROOF-LOGOS-FEATURED": {
-      const featuredUrl = mode === "dark"
-        ? s(c.featuredLogoUrlDark ?? c.featuredLogoUrl)
-        : s(c.featuredLogoUrl);
+      const featuredUrl =
+        mode === "dark" ? s(c.featuredLogoUrlDark ?? c.featuredLogoUrl) : s(c.featuredLogoUrl);
       const featuredName = s(c.featuredName, "Anchor partner");
       const featuredNote = s(c.featuredNote);
       const supports = arr(c.items).slice(0, 4);
@@ -1306,11 +1750,20 @@ function renderVariantBody({
             className="mt-14 grid h-[540px] grid-cols-[1.4fr_1fr] gap-14"
             style={{ borderTop: `1px solid ${divider}` }}
           >
-            <div className="flex flex-col items-center justify-center p-8 text-center" style={{ borderRight: `1px solid ${divider}` }}>
+            <div
+              className="flex flex-col items-center justify-center p-8 text-center"
+              style={{ borderRight: `1px solid ${divider}` }}
+            >
               {featuredUrl ? (
-                <ClientLogoImg url={featuredUrl} alt={`${featuredName} logo`} className="max-h-44 max-w-[72%] object-contain" />
+                <ClientLogoImg
+                  url={featuredUrl}
+                  alt={`${featuredName} logo`}
+                  className="max-h-44 max-w-[72%] object-contain"
+                />
               ) : (
-                <div className="text-4xl font-semibold" style={{ color: ink.strong }}>{featuredName}</div>
+                <div className="text-4xl font-semibold" style={{ color: ink.strong }}>
+                  {featuredName}
+                </div>
               )}
               {featuredNote && (
                 <div className="mt-10 max-w-md text-lg opacity-75" style={{ color: ink.strong }}>
@@ -1331,9 +1784,16 @@ function renderVariantBody({
                 return (
                   <div key={i} className="flex items-center justify-center p-6" style={cellBorders}>
                     {url || path ? (
-                      <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-14 max-w-[80%] object-contain" />
+                      <ClientLogoImg
+                        url={url}
+                        path={path}
+                        alt={`${name} logo`}
+                        className="max-h-14 max-w-[80%] object-contain"
+                      />
                     ) : (
-                      <div className="text-lg font-semibold" style={{ color: ink.strong }}>{name}</div>
+                      <div className="text-lg font-semibold" style={{ color: ink.strong }}>
+                        {name}
+                      </div>
                     )}
                   </div>
                 );
@@ -1356,10 +1816,15 @@ function renderVariantBody({
               return (
                 <div key={gi} className="flex flex-col gap-6">
                   <div className="flex items-baseline gap-3">
-                    <div className="text-xl font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--slide-accent-text)" }}>
+                    <div
+                      className="text-xl font-semibold uppercase tracking-[0.14em]"
+                      style={{ color: "var(--slide-accent-text)" }}
+                    >
                       {String.fromCharCode(65 + gi)}
                     </div>
-                    <div className="text-2xl font-medium" style={{ color: textColor }}>{s(g.label)}</div>
+                    <div className="text-2xl font-medium" style={{ color: textColor }}>
+                      {s(g.label)}
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-8">
                     {logos.map((it, i) => {
@@ -1369,9 +1834,16 @@ function renderVariantBody({
                       return (
                         <div key={i} className="flex aspect-[3/2] items-center justify-center p-3">
                           {url || path ? (
-                            <ClientLogoImg url={url} path={path} alt={`${name} logo`} className="max-h-12 max-w-[86%] object-contain" />
+                            <ClientLogoImg
+                              url={url}
+                              path={path}
+                              alt={`${name} logo`}
+                              className="max-h-12 max-w-[86%] object-contain"
+                            />
                           ) : (
-                            <div className="text-base font-semibold" style={{ color: textColor }}>{name}</div>
+                            <div className="text-base font-semibold" style={{ color: textColor }}>
+                              {name}
+                            </div>
                           )}
                         </div>
                       );
@@ -1421,7 +1893,12 @@ function renderVariantBody({
                       className={`object-contain ${isAnchor ? "max-h-[75%] max-w-[85%]" : "max-h-[65%] max-w-[80%]"}`}
                     />
                   ) : (
-                    <div className={`font-semibold ${isAnchor ? "text-3xl" : "text-xl"}`} style={{ color: textColor }}>{name}</div>
+                    <div
+                      className={`font-semibold ${isAnchor ? "text-3xl" : "text-xl"}`}
+                      style={{ color: textColor }}
+                    >
+                      {name}
+                    </div>
                   )}
                 </div>
               );
@@ -1431,18 +1908,33 @@ function renderVariantBody({
       );
     }
 
-
-
-
     case "MV-PROOF-TESTIMONIAL":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="relative grid h-full grid-cols-[1.35fr_1fr] items-center gap-24">
-            <QuoteMark color={"var(--slide-accent-text)"} size={560} className="absolute -top-6 -left-4" />
+            <QuoteMark
+              color={"var(--slide-accent-text)"}
+              size={560}
+              className="absolute -top-6 -left-4"
+            />
             <div className="relative">
               <Kicker brand={brand}>Testimonial</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
-              <div style={{ fontSize: 60, fontWeight: 500, lineHeight: 1.2, letterSpacing: "-0.015em", color: ink.strong, maxWidth: 980 }}>
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={72}
+                thicknessPx={2}
+                className="mt-6 mb-10"
+              />
+              <div
+                style={{
+                  fontSize: 60,
+                  fontWeight: 500,
+                  lineHeight: 1.2,
+                  letterSpacing: "-0.015em",
+                  color: ink.strong,
+                  maxWidth: 980,
+                }}
+              >
                 {s(c.quote)}
               </div>
               <div className="mt-12">
@@ -1450,7 +1942,12 @@ function renderVariantBody({
               </div>
             </div>
             <div className="flex flex-col items-start">
-              <Hairline color={"var(--slide-accent-text)"} widthPx={56} thicknessPx={2} className="mb-6" />
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={56}
+                thicknessPx={2}
+                className="mb-6"
+              />
               <Kicker brand={brand}>Measurable outcome</Kicker>
               <div className="mt-8">
                 <StatFigure brand={brand} value={s(c.metric)} size="lg" />
@@ -1483,15 +1980,30 @@ function renderVariantBody({
     case "MV-DEC-COMPARE-TABLE": {
       const columns = arr(c.columns);
       const rows = arr(c.items);
-      const winnerIdx = typeof (c as { winnerIndex?: number }).winnerIndex === "number" ? (c as { winnerIndex?: number }).winnerIndex : undefined;
+      const winnerIdx =
+        typeof (c as { winnerIndex?: number }).winnerIndex === "number"
+          ? (c as { winnerIndex?: number }).winnerIndex
+          : undefined;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <AuroraOrb x={92} y={28} size={860} />
           <div className="relative">
             <SlideTitle brand={brand} title={s(c.title)} />
             <GlassTile radius={26} padding="px-12 py-10" className="mt-12">
-              <div className="grid gap-x-8" style={{ gridTemplateColumns: `2fr ${columns.map(() => "1fr").join(" ")}` }}>
-                <div className="pb-4 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.faint, fontWeight: 600, borderBottom: `1px solid ${ink.hairlineStrong}` }}>
+              <div
+                className="grid gap-x-8"
+                style={{ gridTemplateColumns: `2fr ${columns.map(() => "1fr").join(" ")}` }}
+              >
+                <div
+                  className="pb-4 uppercase"
+                  style={{
+                    fontSize: 18,
+                    letterSpacing: "0.28em",
+                    color: ink.faint,
+                    fontWeight: 600,
+                    borderBottom: `1px solid ${ink.hairlineStrong}`,
+                  }}
+                >
                   Criteria
                 </div>
                 {columns.map((col, i) => (
@@ -1513,7 +2025,12 @@ function renderVariantBody({
                   <div key={ri} className="contents">
                     <div
                       className="py-5"
-                      style={{ fontSize: 24, letterSpacing: "-0.01em", color: ink.strong, borderBottom: `1px solid ${ink.hairline}` }}
+                      style={{
+                        fontSize: 24,
+                        letterSpacing: "-0.01em",
+                        color: ink.strong,
+                        borderBottom: `1px solid ${ink.hairline}`,
+                      }}
                     >
                       {s(r.criterion)}
                     </div>
@@ -1526,7 +2043,10 @@ function renderVariantBody({
                           color: winnerIdx === ci ? ink.strong : ink.muted,
                           fontWeight: winnerIdx === ci ? 600 : 400,
                           borderBottom: `1px solid ${ink.hairline}`,
-                          background: winnerIdx === ci ? `color-mix(in oklab, ${brand.tokens.accent} 8%, transparent)` : undefined,
+                          background:
+                            winnerIdx === ci
+                              ? `color-mix(in oklab, ${brand.tokens.accent} 8%, transparent)`
+                              : undefined,
                         }}
                       >
                         {v}
@@ -1554,16 +2074,36 @@ function renderVariantBody({
               >
                 <div
                   className="mt-2 flex h-7 w-7 shrink-0 items-center justify-center"
-                  style={{ border: `2px solid ${brand.tokens.accent}`, color: "var(--slide-accent-text)", fontSize: 18, fontWeight: 700 }}
+                  style={{
+                    border: `2px solid ${brand.tokens.accent}`,
+                    color: "var(--slide-accent-text)",
+                    fontSize: 18,
+                    fontWeight: 700,
+                  }}
                 >
                   ✓
                 </div>
                 <div>
-                  <div style={{ fontSize: 26, fontWeight: 600, color: ink.strong, letterSpacing: "-0.01em", lineHeight: 1.25 }}>
+                  <div
+                    style={{
+                      fontSize: 26,
+                      fontWeight: 600,
+                      color: ink.strong,
+                      letterSpacing: "-0.01em",
+                      lineHeight: 1.25,
+                    }}
+                  >
                     {s(it.label)}
                   </div>
                   {s(it.note) && (
-                    <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.4, color: "color-mix(in oklab, currentColor 65%, transparent)" }}>
+                    <div
+                      className="mt-2"
+                      style={{
+                        fontSize: 20,
+                        lineHeight: 1.4,
+                        color: "color-mix(in oklab, currentColor 65%, transparent)",
+                      }}
+                    >
                       {s(it.note)}
                     </div>
                   )}
@@ -1573,7 +2113,6 @@ function renderVariantBody({
           </div>
         </SlideFrame>
       );
-
 
     case "MV-COMM-PRICING":
       return (
@@ -1586,18 +2125,32 @@ function renderVariantBody({
                 <div
                   key={i}
                   className="pt-8"
-                  style={{ borderTop: `${featured ? 3 : 1}px solid ${featured ? brand.tokens.accent : `${ink.hairline}`}` }}
+                  style={{
+                    borderTop: `${featured ? 3 : 1}px solid ${featured ? brand.tokens.accent : `${ink.hairline}`}`,
+                  }}
                 >
                   <Kicker brand={brand} color={featured ? "var(--slide-accent-text)" : ink.faint}>
                     {s(tier.name)}
                   </Kicker>
                   <div
                     className="mt-6 font-semibold tabular-nums"
-                    style={{ fontSize: 88, lineHeight: 0.95, letterSpacing: "-0.03em", color: ink.strong }}
+                    style={{
+                      fontSize: 88,
+                      lineHeight: 0.95,
+                      letterSpacing: "-0.03em",
+                      color: ink.strong,
+                    }}
                   >
                     {s(tier.price)}
                     {s(tier.unit) && (
-                      <span className="ml-2 font-medium" style={{ fontSize: 26, color: "var(--slide-accent-text)", letterSpacing: "-0.01em" }}>
+                      <span
+                        className="ml-2 font-medium"
+                        style={{
+                          fontSize: 26,
+                          color: "var(--slide-accent-text)",
+                          letterSpacing: "-0.01em",
+                        }}
+                      >
                         {s(tier.unit)}
                       </span>
                     )}
@@ -1607,7 +2160,9 @@ function renderVariantBody({
                       <div key={k}>
                         {k > 0 && <SoftDivider />}
                         <div className="flex gap-4 py-3" style={{ fontSize: 22, lineHeight: 1.35 }}>
-                          <span style={{ color: "var(--slide-accent-text)", fontWeight: 600 }}>—</span>
+                          <span style={{ color: "var(--slide-accent-text)", fontWeight: 600 }}>
+                            —
+                          </span>
                           <span style={{ opacity: 0.82 }}>{f}</span>
                         </div>
                       </div>
@@ -1626,16 +2181,21 @@ function renderVariantBody({
           <div className="grid h-full grid-cols-2 items-center gap-24">
             <div className="min-w-0">
               <Kicker brand={brand}>{s(c.title, "Investment")}</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={88} thicknessPx={2} className="mt-6 mb-10" />
-              <StatFigure
-                brand={brand}
-                value={s(c.amount)}
-                unit={s(c.unit)}
-                size="xl"
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={88}
+                thicknessPx={2}
+                className="mt-6 mb-10"
               />
+              <StatFigure brand={brand} value={s(c.amount)} unit={s(c.unit)} size="xl" />
             </div>
             <div className="min-w-0">
-              <Hairline color={"var(--slide-accent-text)"} widthPx={56} thicknessPx={2} className="mb-6" />
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={56}
+                thicknessPx={2}
+                className="mb-6"
+              />
               <Kicker brand={brand}>Included</Kicker>
               <div className="mt-8 space-y-5">
                 {arr(c.items).map((it, i) => (
@@ -1644,8 +2204,18 @@ function renderVariantBody({
                     className="flex items-start gap-5 pt-5"
                     style={{ borderTop: i === 0 ? "none" : "1px solid rgba(10,15,28,0.10)" }}
                   >
-                    <span className="mt-3 h-2 w-8 shrink-0" style={{ backgroundColor: brand.tokens.accent }} />
-                    <span style={{ fontSize: 26, lineHeight: 1.3, letterSpacing: "-0.01em", color: ink.strong }}>
+                    <span
+                      className="mt-3 h-2 w-8 shrink-0"
+                      style={{ backgroundColor: brand.tokens.accent }}
+                    />
+                    <span
+                      style={{
+                        fontSize: 26,
+                        lineHeight: 1.3,
+                        letterSpacing: "-0.01em",
+                        color: ink.strong,
+                      }}
+                    >
                       {s(it.label)}
                     </span>
                   </div>
@@ -1663,7 +2233,12 @@ function renderVariantBody({
           <div className="mt-12">
             <div
               className="grid grid-cols-[80px_1fr_1fr] gap-10 pb-4 uppercase"
-              style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.faint, borderBottom: `1px solid ${brand.tokens.accent}` }}
+              style={{
+                fontSize: 18,
+                letterSpacing: "0.28em",
+                color: ink.faint,
+                borderBottom: `1px solid ${brand.tokens.accent}`,
+              }}
             >
               <div className="tabular-nums">№</div>
               <div>Risk</div>
@@ -1673,11 +2248,30 @@ function renderVariantBody({
               <div key={i}>
                 {i > 0 && <SoftDivider />}
                 <div className="grid grid-cols-[80px_1fr_1fr] items-start gap-10 py-6">
-                  <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, letterSpacing: "0.18em", color: "var(--slide-accent-text)" }}>
+                  <div
+                    className="tabular-nums"
+                    style={{
+                      fontSize: 22,
+                      fontWeight: 600,
+                      letterSpacing: "0.18em",
+                      color: "var(--slide-accent-text)",
+                    }}
+                  >
                     {String(i + 1).padStart(2, "0")}
                   </div>
-                  <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(it.risk)}</div>
-                  <SupportingText size="md" opacity={0.72}>{s(it.mitigation)}</SupportingText>
+                  <div
+                    style={{
+                      fontSize: 26,
+                      fontWeight: 600,
+                      letterSpacing: "-0.01em",
+                      color: ink.strong,
+                    }}
+                  >
+                    {s(it.risk)}
+                  </div>
+                  <SupportingText size="md" opacity={0.72}>
+                    {s(it.mitigation)}
+                  </SupportingText>
                 </div>
               </div>
             ))}
@@ -1689,34 +2283,64 @@ function renderVariantBody({
     case "MV-CASE-SPREAD": {
       const rows: Array<{ label: string; body: string; icon: string }> = [
         { label: "Challenge", body: s(c.challenge), icon: "◇" },
-        { label: "Solution",  body: s(c.solution),  icon: "◆" },
-        { label: "Result",    body: s(c.result),    icon: "★" },
+        { label: "Solution", body: s(c.solution), icon: "◆" },
+        { label: "Result", body: s(c.result), icon: "★" },
       ];
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <Kicker brand={brand}>Case study</Kicker>
-          <Hairline color={"var(--slide-accent-text)"} widthPx={88} thicknessPx={2} className="mt-6 mb-8" />
-          <DisplayTitle size="section" color={ink.strong}>{s(c.client)}</DisplayTitle>
+          <Hairline
+            color={"var(--slide-accent-text)"}
+            widthPx={88}
+            thicknessPx={2}
+            className="mt-6 mb-8"
+          />
+          <DisplayTitle size="section" color={ink.strong}>
+            {s(c.client)}
+          </DisplayTitle>
           <div className="mt-6">
-            <ClientLogoChip mode={mode} clientName={clientName ?? s(c.client)} clientLogoUrl={clientLogoUrl} accent="var(--slide-accent-text)" faint={ink.faint} size={36} />
+            <ClientLogoChip
+              mode={mode}
+              clientName={clientName ?? s(c.client)}
+              clientLogoUrl={clientLogoUrl}
+              accent="var(--slide-accent-text)"
+              faint={ink.faint}
+              size={36}
+            />
           </div>
           <div className="mt-10 grid grid-cols-3 gap-8">
             {rows.map((r, i) => (
-              <GlassTile key={i} radius={22} padding="px-8 py-8" className={`tp-rise tp-rise-delay-${Math.min(i + 1, 3) as 1 | 2 | 3}`}>
+              <GlassTile
+                key={i}
+                radius={22}
+                padding="px-8 py-8"
+                className={`tp-rise tp-rise-delay-${Math.min(i + 1, 3) as 1 | 2 | 3}`}
+              >
                 <div className="flex items-center gap-4">
                   <IconWell accent={brand.tokens.accent}>
-                    <span style={{ fontSize: 20, color: "var(--slide-accent-text)" }}>{r.icon}</span>
+                    <span style={{ fontSize: 20, color: "var(--slide-accent-text)" }}>
+                      {r.icon}
+                    </span>
                   </IconWell>
                   <div
                     className="uppercase font-semibold"
-                    style={{ color: "var(--slide-accent-text)", fontSize: 12, letterSpacing: "0.28em" }}
+                    style={{
+                      color: "var(--slide-accent-text)",
+                      fontSize: 12,
+                      letterSpacing: "0.28em",
+                    }}
                   >
                     {r.label}
                   </div>
                 </div>
                 <div
                   className="mt-6"
-                  style={{ fontSize: 22, lineHeight: 1.35, color: ink.strong, letterSpacing: "-0.005em" }}
+                  style={{
+                    fontSize: 22,
+                    lineHeight: 1.35,
+                    color: ink.strong,
+                    letterSpacing: "-0.005em",
+                  }}
                 >
                   {r.body}
                 </div>
@@ -1732,21 +2356,46 @@ function renderVariantBody({
       );
     }
 
-
     case "MV-CASE-METRICS":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <Kicker brand={brand}>Case study</Kicker>
-          <Hairline color={"var(--slide-accent-text)"} widthPx={88} thicknessPx={2} className="mt-6 mb-8" />
-          <DisplayTitle size="section" color={ink.strong}>{s(c.client)}</DisplayTitle>
+          <Hairline
+            color={"var(--slide-accent-text)"}
+            widthPx={88}
+            thicknessPx={2}
+            className="mt-6 mb-8"
+          />
+          <DisplayTitle size="section" color={ink.strong}>
+            {s(c.client)}
+          </DisplayTitle>
           <div className="mt-6">
-            <ClientLogoChip mode={mode} clientName={clientName ?? s(c.client)} clientLogoUrl={clientLogoUrl} accent="var(--slide-accent-text)" faint={ink.faint} size={36} />
+            <ClientLogoChip
+              mode={mode}
+              clientName={clientName ?? s(c.client)}
+              clientLogoUrl={clientLogoUrl}
+              accent="var(--slide-accent-text)"
+              faint={ink.faint}
+              size={36}
+            />
           </div>
-          <SupportingText size="lg" opacity={0.72} className="mt-8" maxWidthPx={1180}>{s(c.summary)}</SupportingText>
+          <SupportingText size="lg" opacity={0.72} className="mt-8" maxWidthPx={1180}>
+            {s(c.summary)}
+          </SupportingText>
           <div className="mt-14 grid grid-cols-3 gap-14">
             {arr(c.items).map((it, i) => (
-              <div key={i} className={i > 0 ? "pl-10" : ""} style={i > 0 ? { borderLeft: `1px solid ${ink.hairline}` } : undefined}>
-                <StatFigure brand={brand} value={s(it.value)} unit={s(it.unit)} label={s(it.label)} size="lg" />
+              <div
+                key={i}
+                className={i > 0 ? "pl-10" : ""}
+                style={i > 0 ? { borderLeft: `1px solid ${ink.hairline}` } : undefined}
+              >
+                <StatFigure
+                  brand={brand}
+                  value={s(it.value)}
+                  unit={s(it.unit)}
+                  label={s(it.label)}
+                  size="lg"
+                />
               </div>
             ))}
           </div>
@@ -1759,20 +2408,47 @@ function renderVariantBody({
           <div className="grid h-full grid-cols-2 gap-20">
             <div className="flex flex-col justify-center">
               <Kicker brand={brand}>Case study</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
-              <DisplayTitle size="section" color={ink.strong}>{s(c.client)}</DisplayTitle>
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={72}
+                thicknessPx={2}
+                className="mt-6 mb-8"
+              />
+              <DisplayTitle size="section" color={ink.strong}>
+                {s(c.client)}
+              </DisplayTitle>
               <div className="mt-6">
-                <ClientLogoChip mode={mode} clientName={clientName ?? s(c.client)} clientLogoUrl={clientLogoUrl} accent="var(--slide-accent-text)" faint={ink.faint} size={36} />
+                <ClientLogoChip
+                  mode={mode}
+                  clientName={clientName ?? s(c.client)}
+                  clientLogoUrl={clientLogoUrl}
+                  accent="var(--slide-accent-text)"
+                  faint={ink.faint}
+                  size={36}
+                />
               </div>
-              <div className="mt-8" style={{ fontSize: 42, fontWeight: 600, lineHeight: 1.1, letterSpacing: "-0.02em" }}>
+              <div
+                className="mt-8"
+                style={{ fontSize: 42, fontWeight: 600, lineHeight: 1.1, letterSpacing: "-0.02em" }}
+              >
                 {s(c.headline)}
               </div>
             </div>
             <div className="flex flex-col justify-center">
-              <SupportingText size="lg" opacity={0.82}>{s(c.story)}</SupportingText>
+              <SupportingText size="lg" opacity={0.82}>
+                {s(c.story)}
+              </SupportingText>
               <div className="mt-10 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
                 <Kicker brand={brand}>Result</Kicker>
-                <div className="mt-4" style={{ fontSize: 40, fontWeight: 600, letterSpacing: "-0.02em", color: ink.strong }}>
+                <div
+                  className="mt-4"
+                  style={{
+                    fontSize: 40,
+                    fontWeight: 600,
+                    letterSpacing: "-0.02em",
+                    color: ink.strong,
+                  }}
+                >
                   {s(c.result)}
                 </div>
               </div>
@@ -1789,7 +2465,12 @@ function renderVariantBody({
           <div className="mt-12">
             <div
               className="grid grid-cols-[1.3fr_1fr_2fr] gap-10 pb-4 uppercase"
-              style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.faint, borderBottom: `1px solid ${brand.tokens.accent}` }}
+              style={{
+                fontSize: 18,
+                letterSpacing: "0.28em",
+                color: ink.faint,
+                borderBottom: `1px solid ${brand.tokens.accent}`,
+              }}
             >
               <div>Forum</div>
               <div>Cadence</div>
@@ -1799,9 +2480,30 @@ function renderVariantBody({
               <div key={i}>
                 {i > 0 && <SoftDivider />}
                 <div className="grid grid-cols-[1.3fr_1fr_2fr] items-start gap-10 py-6">
-                  <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(it.forum)}</div>
-                  <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(it.cadence)}</div>
-                  <SupportingText size="md" opacity={0.72}>{s(it.purpose)}</SupportingText>
+                  <div
+                    style={{
+                      fontSize: 26,
+                      fontWeight: 600,
+                      letterSpacing: "-0.01em",
+                      color: ink.strong,
+                    }}
+                  >
+                    {s(it.forum)}
+                  </div>
+                  <div
+                    className="uppercase"
+                    style={{
+                      fontSize: 18,
+                      letterSpacing: "0.28em",
+                      color: "var(--slide-accent-text)",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {s(it.cadence)}
+                  </div>
+                  <SupportingText size="md" opacity={0.72}>
+                    {s(it.purpose)}
+                  </SupportingText>
                 </div>
               </div>
             ))}
@@ -1813,17 +2515,23 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title="Our recommendation" />
-          <div className="mt-14 max-w-6xl text-5xl font-medium leading-tight">{s(c.recommendation)}</div>
+          <div className="mt-14 max-w-6xl text-5xl font-medium leading-tight">
+            {s(c.recommendation)}
+          </div>
           <div className="mt-10 max-w-5xl text-3xl opacity-75">{s(c.rationale)}</div>
         </SlideFrame>
       );
 
     case "MV-CLOSE-CTA": {
-      const steps: Item[] = arr(c.items).length > 0
-        ? arr(c.items)
-        : s(c.nextSteps)
-          ? s(c.nextSteps).split(/\n+/).filter(Boolean).map((line) => ({ label: line } as Item))
-          : [];
+      const steps: Item[] =
+        arr(c.items).length > 0
+          ? arr(c.items)
+          : s(c.nextSteps)
+            ? s(c.nextSteps)
+                .split(/\n+/)
+                .filter(Boolean)
+                .map((line) => ({ label: line }) as Item)
+            : [];
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
           <AuroraOrb x={88} y={28} size={860} />
@@ -1832,13 +2540,18 @@ function renderVariantBody({
               <div className="flex items-center gap-4">
                 <span
                   className="inline-block h-2 w-2 rounded-full"
-                  style={{ background: brand.tokens.accent, boxShadow: `0 0 24px ${brand.tokens.accent}` }}
+                  style={{
+                    background: brand.tokens.accent,
+                    boxShadow: `0 0 24px ${brand.tokens.accent}`,
+                  }}
                 />
                 <Kicker brand={brand}>What happens next</Kicker>
               </div>
               <div
                 className="mt-8 h-[2px] w-[160px] rounded-full"
-                style={{ backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)` }}
+                style={{
+                  backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 100%)`,
+                }}
               />
               <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080} className="mt-10">
                 {s(c.message, "Let's start.")}
@@ -1853,14 +2566,15 @@ function renderVariantBody({
             {steps.length > 0 && (
               <AuroraSidePanel
                 kicker="Next steps"
-                items={steps.slice(0, 4).map((it) => ({ label: s(it.label ?? it.title ?? it.body) }))}
+                items={steps
+                  .slice(0, 4)
+                  .map((it) => ({ label: s(it.label ?? it.title ?? it.body) }))}
               />
             )}
           </div>
         </SlideFrame>
       );
     }
-
 
     case "MV-CLOSE-THANKS":
       return (
@@ -1900,7 +2614,12 @@ function renderVariantBody({
             </div>
             <div className="relative flex flex-col items-center">
               <Kicker brand={brand}>The floor is yours</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6" />
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={72}
+                thicknessPx={2}
+                className="mt-6"
+              />
               <DisplayTitle size="cover" color={ink.strong} maxWidthPx={1400} className="mt-10">
                 {s(c.title, "Questions")}
               </DisplayTitle>
@@ -1922,7 +2641,12 @@ function renderVariantBody({
           <div className="relative grid h-full grid-cols-[1.05fr_0.95fr] items-center gap-24">
             <div>
               <Kicker brand={brand}>Stay in touch</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-6 mb-10" />
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={96}
+                thicknessPx={2}
+                className="mt-6 mb-10"
+              />
               <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>
                 {s(c.title, "Let's keep the conversation going.")}
               </DisplayTitle>
@@ -1934,16 +2658,42 @@ function renderVariantBody({
             </div>
             {people.length > 0 && (
               <GlassTile radius={28} padding="px-12 py-12">
-                <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", fontWeight: 600, color: ink.faint }}>
+                <div
+                  className="uppercase"
+                  style={{
+                    fontSize: 18,
+                    letterSpacing: "0.28em",
+                    fontWeight: 600,
+                    color: ink.faint,
+                  }}
+                >
                   Your team
                 </div>
                 <div className="mt-10 space-y-10">
                   {people.slice(0, 4).map((p, i) => (
-                    <div key={i} className={`tp-rise tp-rise-delay-${Math.min(i + 1, 3) as 1 | 2 | 3}`}>
-                      <div style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>
+                    <div
+                      key={i}
+                      className={`tp-rise tp-rise-delay-${Math.min(i + 1, 3) as 1 | 2 | 3}`}
+                    >
+                      <div
+                        style={{
+                          fontSize: 30,
+                          fontWeight: 600,
+                          letterSpacing: "-0.015em",
+                          color: ink.strong,
+                        }}
+                      >
                         {s(p.name)}
                       </div>
-                      <div className="mt-1 uppercase" style={{ color: "var(--slide-accent-text)", fontSize: 15, letterSpacing: "0.28em", fontWeight: 600 }}>
+                      <div
+                        className="mt-1 uppercase"
+                        style={{
+                          color: "var(--slide-accent-text)",
+                          fontSize: 15,
+                          letterSpacing: "0.28em",
+                          fontWeight: 600,
+                        }}
+                      >
                         {s(p.role)}
                       </div>
                       <div className="mt-4 space-y-1" style={{ fontSize: 20, color: ink.muted }}>
@@ -1960,18 +2710,22 @@ function renderVariantBody({
       );
     }
 
-
-
-
     // ── Extended covers ────────────────────────────────────────────────
     case "MV-OP-COVER-EDITORIAL":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div className="grid h-full grid-cols-[1.5fr_1fr] gap-16">
             <div className="flex flex-col justify-between">
-              <Kicker brand={brand} tracking="0.32em">{s(c.kicker, "Vol. 01")}</Kicker>
+              <Kicker brand={brand} tracking="0.32em">
+                {s(c.kicker, "Vol. 01")}
+              </Kicker>
               <div>
-                <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mb-8" />
+                <Hairline
+                  color={"var(--slide-accent-text)"}
+                  widthPx={96}
+                  thicknessPx={2}
+                  className="mb-8"
+                />
                 <DisplayTitle size="cover" color={ink.strong} maxWidthPx={1080}>
                   {s(c.title)}
                 </DisplayTitle>
@@ -1987,7 +2741,11 @@ function renderVariantBody({
               </MetaRow>
             </div>
             <div className="flex items-center">
-              <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "editorial"))} className="aspect-[3/4] w-full" />
+              <MediaTile
+                brand={brand}
+                seed={s(c.mediaSeed, s(c.clientName, "editorial"))}
+                className="aspect-[3/4] w-full"
+              />
             </div>
           </div>
         </SlideFrame>
@@ -1997,8 +2755,15 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div className="-m-24 grid h-[calc(100%+192px)] grid-cols-2">
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "split"))} className="h-full w-full rounded-none" />
-            <div className="relative flex flex-col justify-center p-24 text-white" style={{ backgroundColor: brand.tokens.primary }}>
+            <MediaTile
+              brand={brand}
+              seed={s(c.mediaSeed, s(c.clientName, "split"))}
+              className="h-full w-full rounded-none"
+            />
+            <div
+              className="relative flex flex-col justify-center p-24 text-white"
+              style={{ backgroundColor: brand.tokens.primary }}
+            >
               {/* Subtle radial glow inside the primary panel */}
               <div
                 aria-hidden
@@ -2009,7 +2774,12 @@ function renderVariantBody({
               />
               <div className="relative">
                 <Kicker brand={brand}>Prepared for {s(c.clientName)}</Kicker>
-                <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6" />
+                <Hairline
+                  color={"var(--slide-accent-text)"}
+                  widthPx={72}
+                  thicknessPx={2}
+                  className="mt-6"
+                />
                 <DisplayTitle size="section" color={ink.strong} maxWidthPx={720} className="mt-8">
                   {s(c.title)}
                 </DisplayTitle>
@@ -2031,12 +2801,10 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div className="flex h-full flex-col justify-between">
-            <Kicker brand={brand} tracking="0.42em">{s(c.kicker, "A briefing")}</Kicker>
-            <DisplayTitle
-              size="hero"
-              color={ink.strong}
-              className="uppercase"
-            >
+            <Kicker brand={brand} tracking="0.42em">
+              {s(c.kicker, "A briefing")}
+            </Kicker>
+            <DisplayTitle size="hero" color={ink.strong} className="uppercase">
               {s(c.title, "Signal")}
             </DisplayTitle>
             <div className="flex items-center justify-between">
@@ -2056,7 +2824,12 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-2 p-2">
             {(items.length ? items : [{}, {}, {}, {}]).slice(0, 4).map((it, i) => (
-              <MediaTile key={i} brand={brand} seed={s(it.seed, `grid-${i}`)} className="h-full w-full rounded-none" />
+              <MediaTile
+                key={i}
+                brand={brand}
+                seed={s(it.seed, `grid-${i}`)}
+                className="h-full w-full rounded-none"
+              />
             ))}
           </div>
           <div
@@ -2067,7 +2840,12 @@ function renderVariantBody({
           />
           <div className="relative flex h-full flex-col justify-end text-white">
             <Kicker brand={brand}>{s(c.date, "Briefing")}</Kicker>
-            <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-8" />
+            <Hairline
+              color={"var(--slide-accent-text)"}
+              widthPx={96}
+              thicknessPx={2}
+              className="mt-8"
+            />
             <DisplayTitle size="cover" color={ink.strong} maxWidthPx={1520} className="mt-10">
               {s(c.title)}
             </DisplayTitle>
@@ -2086,7 +2864,10 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex h-full flex-col justify-between" style={{ color: ink.strong }}>
             <div className="flex items-start justify-between">
-              <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.32em", opacity: 0.65 }}>
+              <div
+                className="uppercase"
+                style={{ fontSize: 18, letterSpacing: "0.32em", opacity: 0.65 }}
+              >
                 Dossier · Ref {s(c.reference, "TP-0001")}
               </div>
               <div
@@ -2111,15 +2892,22 @@ function renderVariantBody({
                 Prepared for {s(c.clientName)}
               </SupportingText>
             </div>
-            <div className="grid grid-cols-3 gap-16 border-t pt-8" style={{ borderColor: "rgba(10,15,28,0.14)" }}>
+            <div
+              className="grid grid-cols-3 gap-16 border-t pt-8"
+              style={{ borderColor: "rgba(10,15,28,0.14)" }}
+            >
               {[
                 ["Prepared by", s(c.prepared, "TransPerfect")],
                 ["Date", s(c.date)],
                 ["Distribution", "Internal"],
               ].map(([label, value], i) => (
                 <div key={i}>
-                  <Kicker brand={brand} size={14} tracking="0.32em">{label}</Kicker>
-                  <div className="mt-3" style={{ fontSize: 22, letterSpacing: "-0.01em" }}>{value}</div>
+                  <Kicker brand={brand} size={14} tracking="0.32em">
+                    {label}
+                  </Kicker>
+                  <div className="mt-3" style={{ fontSize: 22, letterSpacing: "-0.01em" }}>
+                    {value}
+                  </div>
                 </div>
               ))}
             </div>
@@ -2132,16 +2920,32 @@ function renderVariantBody({
       const _titleSize = _titleLen > 60 ? "title" : _titleLen > 30 ? "section" : "cover";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.clientName, "cover-image"))} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile
+            brand={brand}
+            seed={s(c.mediaSeed, s(c.clientName, "cover-image"))}
+            className="absolute inset-0 h-full w-full rounded-none"
+          />
           <HeroScrim brand={brand} anchor="bottom" />
           <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
-            <Kicker brand={brand} tracking="0.32em">Prepared for {s(c.clientName)}</Kicker>
-            <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-6" />
+            <Kicker brand={brand} tracking="0.32em">
+              Prepared for {s(c.clientName)}
+            </Kicker>
+            <Hairline
+              color={"var(--slide-accent-text)"}
+              widthPx={96}
+              thicknessPx={2}
+              className="mt-6"
+            />
             <DisplayTitle size={_titleSize} color={ink.strong} maxWidthPx={1520} className="mt-6">
               {s(c.title)}
             </DisplayTitle>
             {s(c.subtitle) && (
-              <SupportingText size="lg" opacity={0.9} maxWidthPx={1180} className="mt-6 line-clamp-2">
+              <SupportingText
+                size="lg"
+                opacity={0.9}
+                maxWidthPx={1180}
+                className="mt-6 line-clamp-2"
+              >
                 {s(c.subtitle)}
               </SupportingText>
             )}
@@ -2152,7 +2956,6 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
-
 
     case "MV-OP-COVER-MONOGRAM":
       return (
@@ -2203,9 +3006,18 @@ function renderVariantBody({
           <div className="flex h-full flex-col justify-between">
             <Kicker brand={brand}>{s(c.kicker, "A proposal")}</Kicker>
             <div className="grid grid-cols-[1fr_1.4fr] items-end gap-16">
-              <MediaTile brand={brand} seed={s(c.mediaSeed, "stacked")} className="aspect-[4/5] w-full" />
+              <MediaTile
+                brand={brand}
+                seed={s(c.mediaSeed, "stacked")}
+                className="aspect-[4/5] w-full"
+              />
               <div>
-                <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mb-8" />
+                <Hairline
+                  color={"var(--slide-accent-text)"}
+                  widthPx={72}
+                  thicknessPx={2}
+                  className="mb-8"
+                />
                 <DisplayTitle size="section" color={ink.strong} maxWidthPx={1000}>
                   {s(c.title)}
                 </DisplayTitle>
@@ -2224,34 +3036,71 @@ function renderVariantBody({
         </SlideFrame>
       );
 
-
     // ── Image-forward content ──────────────────────────────────────────
     case "MV-IMG-FULL-BLEED": {
       const _titleLen = s(c.title).length + s(c.body).length;
       const _titleSize = _titleLen > 60 ? "title" : _titleLen > 30 ? "section" : "cover";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "hero"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} videoAutoplay={c.videoAutoplay as boolean | undefined} videoLoop={c.videoLoop as boolean | undefined} videoMuted={c.videoMuted as boolean | undefined} videoControls={c.videoControls as boolean | undefined} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile
+            brand={brand}
+            seed={s(c.mediaSeed, s(c.title, "hero"))}
+            overrideUrl={s(c.mediaUrl)}
+            mediaPath={s(c.mediaPath)}
+            videoUrl={s(c.videoUrl)}
+            videoPosterUrl={s(c.videoPosterUrl)}
+            videoPath={s(c.videoPath)}
+            videoPosterPath={s(c.videoPosterPath)}
+            videoAutoplay={c.videoAutoplay as boolean | undefined}
+            videoLoop={c.videoLoop as boolean | undefined}
+            videoMuted={c.videoMuted as boolean | undefined}
+            videoControls={c.videoControls as boolean | undefined}
+            className="absolute inset-0 h-full w-full rounded-none"
+          />
           <HeroScrim brand={brand} anchor="bottom" />
           <div className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
             <Kicker brand={brand}>{s(c.kicker, "In focus")}</Kicker>
-            <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-6 mb-6" />
-            <DisplayTitle size={_titleSize} color={ink.strong} maxWidthPx={1600}>{s(c.title)}</DisplayTitle>
-            <SupportingText size="lg" opacity={0.9} maxWidthPx={1180} className="mt-6 line-clamp-2">{s(c.body)}</SupportingText>
+            <Hairline
+              color={"var(--slide-accent-text)"}
+              widthPx={96}
+              thicknessPx={2}
+              className="mt-6 mb-6"
+            />
+            <DisplayTitle size={_titleSize} color={ink.strong} maxWidthPx={1600}>
+              {s(c.title)}
+            </DisplayTitle>
+            <SupportingText size="lg" opacity={0.9} maxWidthPx={1180} className="mt-6 line-clamp-2">
+              {s(c.body)}
+            </SupportingText>
           </div>
         </SlideFrame>
       );
     }
 
-
     case "MV-IMG-SPLIT":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-2 gap-14">
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "split"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} videoAutoplay={c.videoAutoplay as boolean | undefined} videoLoop={c.videoLoop as boolean | undefined} videoMuted={c.videoMuted as boolean | undefined} videoControls={c.videoControls as boolean | undefined} className="h-full w-full" />
+            <MediaTile
+              brand={brand}
+              seed={s(c.mediaSeed, s(c.title, "split"))}
+              overrideUrl={s(c.mediaUrl)}
+              mediaPath={s(c.mediaPath)}
+              videoUrl={s(c.videoUrl)}
+              videoPosterUrl={s(c.videoPosterUrl)}
+              videoPath={s(c.videoPath)}
+              videoPosterPath={s(c.videoPosterPath)}
+              videoAutoplay={c.videoAutoplay as boolean | undefined}
+              videoLoop={c.videoLoop as boolean | undefined}
+              videoMuted={c.videoMuted as boolean | undefined}
+              videoControls={c.videoControls as boolean | undefined}
+              className="h-full w-full"
+            />
             <div className="flex flex-col justify-center">
               <SlideTitle brand={brand} title={s(c.title)} />
-              <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={720}>{s(c.body)}</SupportingText>
+              <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={720}>
+                {s(c.body)}
+              </SupportingText>
               {s(c.caption) && (
                 <MetaRow className="mt-12">
                   <span>{s(c.caption)}</span>
@@ -2267,9 +3116,35 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex h-full flex-col items-center justify-center">
             <Kicker brand={brand}>{s(c.title, "In focus")}</Kicker>
-            <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "framed"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} videoAutoplay={c.videoAutoplay as boolean | undefined} videoLoop={c.videoLoop as boolean | undefined} videoMuted={c.videoMuted as boolean | undefined} videoControls={c.videoControls as boolean | undefined} className="aspect-[16/9] w-[80%]" />
-            <SupportingText size="lg" opacity={0.85} className="mt-10 text-center" maxWidthPx={1100}>{s(c.caption)}</SupportingText>
+            <Hairline
+              color={"var(--slide-accent-text)"}
+              widthPx={72}
+              thicknessPx={2}
+              className="mt-6 mb-8"
+            />
+            <MediaTile
+              brand={brand}
+              seed={s(c.mediaSeed, s(c.title, "framed"))}
+              overrideUrl={s(c.mediaUrl)}
+              mediaPath={s(c.mediaPath)}
+              videoUrl={s(c.videoUrl)}
+              videoPosterUrl={s(c.videoPosterUrl)}
+              videoPath={s(c.videoPath)}
+              videoPosterPath={s(c.videoPosterPath)}
+              videoAutoplay={c.videoAutoplay as boolean | undefined}
+              videoLoop={c.videoLoop as boolean | undefined}
+              videoMuted={c.videoMuted as boolean | undefined}
+              videoControls={c.videoControls as boolean | undefined}
+              className="aspect-[16/9] w-[80%]"
+            />
+            <SupportingText
+              size="lg"
+              opacity={0.85}
+              className="mt-10 text-center"
+              maxWidthPx={1100}
+            >
+              {s(c.caption)}
+            </SupportingText>
             {s(c.credit) && (
               <MetaRow className="mt-6">
                 <span>{s(c.credit)}</span>
@@ -2286,9 +3161,25 @@ function renderVariantBody({
           <div className="mt-12 grid grid-cols-3 gap-8">
             {arr(c.items).map((it, i) => (
               <div key={i}>
-                <MediaTile brand={brand} seed={s(it.seed, `grid3-${i}`)} className="aspect-[4/3] w-full" />
-                <div className="mt-5" style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(it.label)}</div>
-                <SupportingText size="md" opacity={0.72} className="mt-2">{s(it.caption)}</SupportingText>
+                <MediaTile
+                  brand={brand}
+                  seed={s(it.seed, `grid3-${i}`)}
+                  className="aspect-[4/3] w-full"
+                />
+                <div
+                  className="mt-5"
+                  style={{
+                    fontSize: 26,
+                    fontWeight: 600,
+                    letterSpacing: "-0.01em",
+                    color: ink.strong,
+                  }}
+                >
+                  {s(it.label)}
+                </div>
+                <SupportingText size="md" opacity={0.72} className="mt-2">
+                  {s(it.caption)}
+                </SupportingText>
               </div>
             ))}
           </div>
@@ -2300,16 +3191,29 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Selected work")} />
           <div className="mt-10 grid grid-cols-3 grid-rows-2 gap-5">
-            {arr(c.items).slice(0, 6).map((it, i) => (
-              <div key={i}>
-                <MediaTile brand={brand} seed={s(it.seed, `grid6-${i}`)} className="aspect-[4/3] w-full" />
-                {s(it.caption) && (
-                  <div className="mt-3 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 60%, transparent)" }}>
-                    {s(it.caption)}
-                  </div>
-                )}
-              </div>
-            ))}
+            {arr(c.items)
+              .slice(0, 6)
+              .map((it, i) => (
+                <div key={i}>
+                  <MediaTile
+                    brand={brand}
+                    seed={s(it.seed, `grid6-${i}`)}
+                    className="aspect-[4/3] w-full"
+                  />
+                  {s(it.caption) && (
+                    <div
+                      className="mt-3 uppercase"
+                      style={{
+                        fontSize: 16,
+                        letterSpacing: "0.28em",
+                        color: "color-mix(in oklab, currentColor 60%, transparent)",
+                      }}
+                    >
+                      {s(it.caption)}
+                    </div>
+                  )}
+                </div>
+              ))}
           </div>
         </SlideFrame>
       );
@@ -2318,19 +3222,54 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-[1fr_1.3fr] gap-14">
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.name, "portrait"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} videoAutoplay={c.videoAutoplay as boolean | undefined} videoLoop={c.videoLoop as boolean | undefined} videoMuted={c.videoMuted as boolean | undefined} videoControls={c.videoControls as boolean | undefined} className="h-full w-full" portrait />
+            <MediaTile
+              brand={brand}
+              seed={s(c.mediaSeed, s(c.name, "portrait"))}
+              overrideUrl={s(c.mediaUrl)}
+              mediaPath={s(c.mediaPath)}
+              videoUrl={s(c.videoUrl)}
+              videoPosterUrl={s(c.videoPosterUrl)}
+              videoPath={s(c.videoPath)}
+              videoPosterPath={s(c.videoPosterPath)}
+              videoAutoplay={c.videoAutoplay as boolean | undefined}
+              videoLoop={c.videoLoop as boolean | undefined}
+              videoMuted={c.videoMuted as boolean | undefined}
+              videoControls={c.videoControls as boolean | undefined}
+              className="h-full w-full"
+              portrait
+            />
             <div className="flex flex-col justify-center">
               <Kicker brand={brand}>{s(c.role)}</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
-              <DisplayTitle size="section" color={ink.strong}>{s(c.name)}</DisplayTitle>
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={72}
+                thicknessPx={2}
+                className="mt-6 mb-8"
+              />
+              <DisplayTitle size="section" color={ink.strong}>
+                {s(c.name)}
+              </DisplayTitle>
               {s(c.quote) && (
-                <div className="relative mt-10 pl-8" style={{ borderLeft: `2px solid ${brand.tokens.accent}` }}>
-                  <div style={{ fontSize: 34, fontWeight: 500, lineHeight: 1.3, letterSpacing: "-0.01em", color: ink.strong }}>
+                <div
+                  className="relative mt-10 pl-8"
+                  style={{ borderLeft: `2px solid ${brand.tokens.accent}` }}
+                >
+                  <div
+                    style={{
+                      fontSize: 34,
+                      fontWeight: 500,
+                      lineHeight: 1.3,
+                      letterSpacing: "-0.01em",
+                      color: ink.strong,
+                    }}
+                  >
                     “{s(c.quote)}”
                   </div>
                 </div>
               )}
-              <SupportingText size="lg" opacity={0.78} className="mt-8" maxWidthPx={720}>{s(c.narrative)}</SupportingText>
+              <SupportingText size="lg" opacity={0.78} className="mt-8" maxWidthPx={720}>
+                {s(c.narrative)}
+              </SupportingText>
             </div>
           </div>
         </SlideFrame>
@@ -2339,14 +3278,48 @@ function renderVariantBody({
     case "MV-IMG-QUOTE-BG":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} videoUrl={s(c.videoUrl)} videoPosterUrl={s(c.videoPosterUrl)} videoPath={s(c.videoPath)} videoPosterPath={s(c.videoPosterPath)} videoAutoplay={c.videoAutoplay as boolean | undefined} videoLoop={c.videoLoop as boolean | undefined} videoMuted={c.videoMuted as boolean | undefined} videoControls={c.videoControls as boolean | undefined} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile
+            brand={brand}
+            seed={s(c.mediaSeed, s(c.attribution, "quote"))}
+            overrideUrl={s(c.mediaUrl)}
+            mediaPath={s(c.mediaPath)}
+            videoUrl={s(c.videoUrl)}
+            videoPosterUrl={s(c.videoPosterUrl)}
+            videoPath={s(c.videoPath)}
+            videoPosterPath={s(c.videoPosterPath)}
+            videoAutoplay={c.videoAutoplay as boolean | undefined}
+            videoLoop={c.videoLoop as boolean | undefined}
+            videoMuted={c.videoMuted as boolean | undefined}
+            videoControls={c.videoControls as boolean | undefined}
+            className="absolute inset-0 h-full w-full rounded-none"
+          />
           <HeroScrim brand={brand} anchor="center" />
           <div className="relative flex h-full flex-col justify-center text-white">
-            <QuoteMark color={"var(--slide-accent-text)"} size={520} opacity={0.18} className="absolute -top-4 -left-4" />
+            <QuoteMark
+              color={"var(--slide-accent-text)"}
+              size={520}
+              opacity={0.18}
+              className="absolute -top-4 -left-4"
+            />
             <div className="relative max-w-[1500px]">
-              <Kicker brand={brand} color={"var(--slide-accent-text)"}>In their words</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
-              <div style={{ fontSize: 72, fontWeight: 500, lineHeight: 1.18, letterSpacing: "-0.02em", color: ink.strong }}>
+              <Kicker brand={brand} color={"var(--slide-accent-text)"}>
+                In their words
+              </Kicker>
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={72}
+                thicknessPx={2}
+                className="mt-6 mb-10"
+              />
+              <div
+                style={{
+                  fontSize: 72,
+                  fontWeight: 500,
+                  lineHeight: 1.18,
+                  letterSpacing: "-0.02em",
+                  color: ink.strong,
+                }}
+              >
                 {s(c.quote)}
               </div>
               <div className="mt-14">
@@ -2364,13 +3337,40 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "What changes")} />
           <div className="mt-12 grid grid-cols-2 gap-8">
-            {[{ label: "Before", panel: before }, { label: "After", panel: after }].map((p, i) => (
+            {[
+              { label: "Before", panel: before },
+              { label: "After", panel: after },
+            ].map((p, i) => (
               <div key={i} className="pt-0">
-                <MediaTile brand={brand} seed={s(p.panel.seed, `${p.label}-${s(p.panel.label)}`)} className="aspect-[16/9] w-full rounded-none" muted={i === 0} />
-                <div className="mt-8 pt-6" style={{ borderTop: `${i === 1 ? 2 : 1}px solid ${i === 1 ? brand.tokens.accent : `${ink.hairline}`}` }}>
-                  <Kicker brand={brand} color={i === 1 ? "var(--slide-accent-text)" : ink.faint}>{p.label}</Kicker>
-                  <div className="mt-4" style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>{s(p.panel.label)}</div>
-                  <SupportingText size="md" opacity={0.72} className="mt-3">{s(p.panel.body)}</SupportingText>
+                <MediaTile
+                  brand={brand}
+                  seed={s(p.panel.seed, `${p.label}-${s(p.panel.label)}`)}
+                  className="aspect-[16/9] w-full rounded-none"
+                  muted={i === 0}
+                />
+                <div
+                  className="mt-8 pt-6"
+                  style={{
+                    borderTop: `${i === 1 ? 2 : 1}px solid ${i === 1 ? brand.tokens.accent : `${ink.hairline}`}`,
+                  }}
+                >
+                  <Kicker brand={brand} color={i === 1 ? "var(--slide-accent-text)" : ink.faint}>
+                    {p.label}
+                  </Kicker>
+                  <div
+                    className="mt-4"
+                    style={{
+                      fontSize: 34,
+                      fontWeight: 600,
+                      letterSpacing: "-0.015em",
+                      color: ink.strong,
+                    }}
+                  >
+                    {s(p.panel.label)}
+                  </div>
+                  <SupportingText size="md" opacity={0.72} className="mt-3">
+                    {s(p.panel.body)}
+                  </SupportingText>
                 </div>
               </div>
             ))}
@@ -2383,10 +3383,19 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-2 gap-16">
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.label, "stat"))} className="h-full w-full" />
+            <MediaTile
+              brand={brand}
+              seed={s(c.mediaSeed, s(c.label, "stat"))}
+              className="h-full w-full"
+            />
             <div className="flex flex-col justify-center">
               <Kicker brand={brand}>Signal</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={72}
+                thicknessPx={2}
+                className="mt-6 mb-10"
+              />
               <StatFigure
                 brand={brand}
                 value={s(c.stat)}
@@ -2407,16 +3416,22 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "A quick look")} />
           <div className="mt-14 grid grid-cols-5 gap-6">
-            {arr(c.items).slice(0, 5).map((it, i) => (
-              <div key={i}>
-                <MediaTile brand={brand} seed={s(it.seed, `strip-${i}`)} className="aspect-[3/4] w-full" />
-                {s(it.caption) && (
-                  <MetaRow className="mt-4">
-                    <span>{s(it.caption)}</span>
-                  </MetaRow>
-                )}
-              </div>
-            ))}
+            {arr(c.items)
+              .slice(0, 5)
+              .map((it, i) => (
+                <div key={i}>
+                  <MediaTile
+                    brand={brand}
+                    seed={s(it.seed, `strip-${i}`)}
+                    className="aspect-[3/4] w-full"
+                  />
+                  {s(it.caption) && (
+                    <MetaRow className="mt-4">
+                      <span>{s(it.caption)}</span>
+                    </MetaRow>
+                  )}
+                </div>
+              ))}
           </div>
         </SlideFrame>
       );
@@ -2427,21 +3442,35 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "What clients tell us")} />
           <div className="mt-14 grid grid-cols-1 gap-0">
-            {arr(c.items).slice(0, 3).map((it, i) => (
-              <div
-                key={i}
-                className="grid grid-cols-[80px_1fr_320px] items-start gap-10 py-10"
-                style={{ borderTop: i === 0 ? "none" : "1px solid rgba(10,15,28,0.10)" }}
-              >
-                <QuoteMark color={"var(--slide-accent-text)"} size={110} opacity={0.9} className="-mt-4" />
-                <div style={{ fontSize: 30, lineHeight: 1.32, letterSpacing: "-0.01em", color: ink.strong }}>
-                  {s(it.quote)}
+            {arr(c.items)
+              .slice(0, 3)
+              .map((it, i) => (
+                <div
+                  key={i}
+                  className="grid grid-cols-[80px_1fr_320px] items-start gap-10 py-10"
+                  style={{ borderTop: i === 0 ? "none" : "1px solid rgba(10,15,28,0.10)" }}
+                >
+                  <QuoteMark
+                    color={"var(--slide-accent-text)"}
+                    size={110}
+                    opacity={0.9}
+                    className="-mt-4"
+                  />
+                  <div
+                    style={{
+                      fontSize: 30,
+                      lineHeight: 1.32,
+                      letterSpacing: "-0.01em",
+                      color: ink.strong,
+                    }}
+                  >
+                    {s(it.quote)}
+                  </div>
+                  <div className="text-right">
+                    <Attribution brand={brand} name={s(it.attribution)} role={s(it.role)} />
+                  </div>
                 </div>
-                <div className="text-right">
-                  <Attribution brand={brand} name={s(it.attribution)} role={s(it.role)} />
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
         </SlideFrame>
       );
@@ -2450,17 +3479,45 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-[420px_1fr] items-stretch gap-16">
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "portrait"))} className="h-full w-full" portrait />
+            <MediaTile
+              brand={brand}
+              seed={s(c.mediaSeed, s(c.attribution, "portrait"))}
+              className="h-full w-full"
+              portrait
+            />
             <div className="relative flex flex-col justify-center">
-              <QuoteMark color={"var(--slide-accent-text)"} size={520} className="absolute -top-4 -left-2" />
+              <QuoteMark
+                color={"var(--slide-accent-text)"}
+                size={520}
+                className="absolute -top-4 -left-2"
+              />
               <div className="relative">
                 <Kicker brand={brand}>In their words</Kicker>
-                <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
-                <div style={{ fontSize: 60, fontWeight: 500, lineHeight: 1.2, letterSpacing: "-0.015em", color: ink.strong, maxWidth: 1080 }}>
+                <Hairline
+                  color={"var(--slide-accent-text)"}
+                  widthPx={72}
+                  thicknessPx={2}
+                  className="mt-6 mb-10"
+                />
+                <div
+                  style={{
+                    fontSize: 60,
+                    fontWeight: 500,
+                    lineHeight: 1.2,
+                    letterSpacing: "-0.015em",
+                    color: ink.strong,
+                    maxWidth: 1080,
+                  }}
+                >
                   {s(c.quote)}
                 </div>
                 <div className="mt-14">
-                  <Attribution brand={brand} name={s(c.attribution)} role={s(c.role)} org={s(c.org)} />
+                  <Attribution
+                    brand={brand}
+                    name={s(c.attribution)}
+                    role={s(c.role)}
+                    org={s(c.org)}
+                  />
                 </div>
               </div>
             </div>
@@ -2473,11 +3530,28 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex h-full items-center justify-center">
             <div className="relative max-w-[1300px]">
-              <QuoteMark color={"var(--slide-accent-text)"} size={560} className="absolute -top-10 -left-6" />
+              <QuoteMark
+                color={"var(--slide-accent-text)"}
+                size={560}
+                className="absolute -top-10 -left-6"
+              />
               <div className="relative">
                 <Kicker brand={brand}>Testimonial</Kicker>
-                <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
-                <div style={{ fontSize: 56, fontWeight: 500, lineHeight: 1.22, letterSpacing: "-0.015em", color: ink.strong }}>
+                <Hairline
+                  color={"var(--slide-accent-text)"}
+                  widthPx={72}
+                  thicknessPx={2}
+                  className="mt-6 mb-10"
+                />
+                <div
+                  style={{
+                    fontSize: 56,
+                    fontWeight: 500,
+                    lineHeight: 1.22,
+                    letterSpacing: "-0.015em",
+                    color: ink.strong,
+                  }}
+                >
                   {s(c.quote)}
                 </div>
                 <div className="mt-14 flex items-end justify-between gap-10">
@@ -2498,11 +3572,28 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="relative grid h-full grid-cols-[1.3fr_1fr] items-center gap-24">
-            <QuoteMark color={"var(--slide-accent-text)"} size={520} className="absolute -top-6 -left-4" />
+            <QuoteMark
+              color={"var(--slide-accent-text)"}
+              size={520}
+              className="absolute -top-6 -left-4"
+            />
             <div className="relative">
               <Kicker brand={brand}>In their words</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
-              <div style={{ fontSize: 58, fontWeight: 500, lineHeight: 1.2, letterSpacing: "-0.015em", color: ink.strong }}>
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={72}
+                thicknessPx={2}
+                className="mt-6 mb-10"
+              />
+              <div
+                style={{
+                  fontSize: 58,
+                  fontWeight: 500,
+                  lineHeight: 1.2,
+                  letterSpacing: "-0.015em",
+                  color: ink.strong,
+                }}
+              >
                 {s(c.quote)}
               </div>
               <div className="mt-12">
@@ -2510,7 +3601,12 @@ function renderVariantBody({
               </div>
             </div>
             <div>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={56} thicknessPx={2} className="mb-6" />
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={56}
+                thicknessPx={2}
+                className="mb-6"
+              />
               <Kicker brand={brand}>{s(c.metricLabel, "Outcome")}</Kicker>
               <div className="mt-8">
                 <StatFigure brand={brand} value={s(c.metric)} unit={s(c.unit)} size="xl" />
@@ -2524,10 +3620,22 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div className="relative flex h-full flex-col justify-center text-white">
-            <QuoteMark color={"var(--slide-accent-text)"} size={780} opacity={0.16} className="absolute -top-6 -left-4" />
+            <QuoteMark
+              color={"var(--slide-accent-text)"}
+              size={780}
+              opacity={0.16}
+              className="absolute -top-6 -left-4"
+            />
             <div className="relative">
-              <Kicker brand={brand} color={"var(--slide-accent-text)"}>Testimonial</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mt-8 mb-12" />
+              <Kicker brand={brand} color={"var(--slide-accent-text)"}>
+                Testimonial
+              </Kicker>
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={120}
+                thicknessPx={2}
+                className="mt-8 mb-12"
+              />
               <DisplayTitle size="cover" color={ink.strong} maxWidthPx={1620}>
                 {s(c.quote)}
               </DisplayTitle>
@@ -2540,25 +3648,40 @@ function renderVariantBody({
       );
     case "MV-INFO-DONUT": {
       const items = arr(c.items);
-      const total = items.reduce((sum, it) => sum + (typeof it.value === "number" ? it.value : Number(it.value) || 0), 0) || 1;
+      const total =
+        items.reduce(
+          (sum, it) => sum + (typeof it.value === "number" ? it.value : Number(it.value) || 0),
+          0,
+        ) || 1;
       const palette = [brand.tokens.primary, brand.tokens.accent, "#4A90A4", "#8E44AD", "#22C1C3"];
       let cum = 0;
-      const segments = items.map((it, i) => {
-        const v = typeof it.value === "number" ? it.value : Number(it.value) || 0;
-        const start = (cum / total) * 360;
-        cum += v;
-        const end = (cum / total) * 360;
-        return `${palette[i % palette.length]} ${start}deg ${end}deg`;
-      }).join(", ");
+      const segments = items
+        .map((it, i) => {
+          const v = typeof it.value === "number" ? it.value : Number(it.value) || 0;
+          const start = (cum / total) * 360;
+          cum += v;
+          const end = (cum / total) * 360;
+          return `${palette[i % palette.length]} ${start}deg ${end}deg`;
+        })
+        .join(", ");
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Where the effort goes")} />
           <div className="mt-10 grid grid-cols-[560px_1fr] items-center gap-16">
             <div className="relative aspect-square w-[560px]">
-              <div className="absolute inset-0 rounded-full" style={{ background: `conic-gradient(${segments})` }} />
-              <div className="absolute inset-[18%] flex flex-col items-center justify-center rounded-full text-center" style={{ backgroundColor: brand.tokens.surface }}>
+              <div
+                className="absolute inset-0 rounded-full"
+                style={{ background: `conic-gradient(${segments})` }}
+              />
+              <div
+                className="absolute inset-[18%] flex flex-col items-center justify-center rounded-full text-center"
+                style={{ backgroundColor: brand.tokens.surface }}
+              >
                 <div className="text-8xl font-semibold leading-none" style={{ color: ink.strong }}>
-                  {s(c.centerValue)}<span className="text-4xl" style={{ color: "var(--slide-accent-text)" }}>{s(c.centerUnit)}</span>
+                  {s(c.centerValue)}
+                  <span className="text-4xl" style={{ color: "var(--slide-accent-text)" }}>
+                    {s(c.centerUnit)}
+                  </span>
                 </div>
                 <div className="mt-4 max-w-[80%] text-xl opacity-80">{s(c.centerLabel)}</div>
               </div>
@@ -2566,11 +3689,21 @@ function renderVariantBody({
             <div className="space-y-5">
               {items.map((it, i) => (
                 <div key={i} className="flex items-start gap-5">
-                  <div className="mt-3 h-5 w-5 shrink-0 rounded" style={{ backgroundColor: palette[i % palette.length] }} />
+                  <div
+                    className="mt-3 h-5 w-5 shrink-0 rounded"
+                    style={{ backgroundColor: palette[i % palette.length] }}
+                  />
                   <div className="flex-1">
                     <div className="flex items-baseline justify-between gap-6">
-                      <div className="text-2xl font-semibold" style={{ color: ink.strong }}>{s(it.label)}</div>
-                      <div className="text-2xl font-semibold" style={{ color: "var(--slide-accent-text)" }}>{s(it.value)}%</div>
+                      <div className="text-2xl font-semibold" style={{ color: ink.strong }}>
+                        {s(it.label)}
+                      </div>
+                      <div
+                        className="text-2xl font-semibold"
+                        style={{ color: "var(--slide-accent-text)" }}
+                      >
+                        {s(it.value)}%
+                      </div>
                     </div>
                     <div className="mt-1 text-lg opacity-70">{s(it.note)}</div>
                   </div>
@@ -2603,7 +3736,10 @@ function renderVariantBody({
                     }}
                   >
                     <div className="text-2xl font-semibold">{s(it.label)}</div>
-                    <div className="text-3xl font-semibold">{s(it.value)}<span className="ml-2 text-xl opacity-80">{s(it.unit)}</span></div>
+                    <div className="text-3xl font-semibold">
+                      {s(it.value)}
+                      <span className="ml-2 text-xl opacity-80">{s(it.unit)}</span>
+                    </div>
                   </div>
                   <div className="flex-1 text-xl opacity-70">{s(it.note)}</div>
                 </div>
@@ -2616,7 +3752,9 @@ function renderVariantBody({
 
     case "MV-INFO-BAR-COMPARE": {
       const items = arr(c.items);
-      const values = items.map((it) => (typeof it.value === "number" ? it.value : Number(it.value) || 0));
+      const values = items.map((it) =>
+        typeof it.value === "number" ? it.value : Number(it.value) || 0,
+      );
       const max = Math.max(1, ...values);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
@@ -2631,9 +3769,20 @@ function renderVariantBody({
                   const highlight = i === items.length - 1;
                   return (
                     <div key={i} className="grid grid-cols-[260px_1fr_140px] items-center gap-6">
-                      <div className="text-2xl font-semibold" style={{ color: ink.strong, letterSpacing: "-0.01em" }}>{s(it.label)}</div>
+                      <div
+                        className="text-2xl font-semibold"
+                        style={{ color: ink.strong, letterSpacing: "-0.01em" }}
+                      >
+                        {s(it.label)}
+                      </div>
                       <div className="relative h-10 w-full">
-                        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2" style={{ height: 2, background: `color-mix(in oklab, ${brand.tokens.accent} 14%, transparent)` }} />
+                        <div
+                          className="absolute left-0 right-0 top-1/2 -translate-y-1/2"
+                          style={{
+                            height: 2,
+                            background: `color-mix(in oklab, ${brand.tokens.accent} 14%, transparent)`,
+                          }}
+                        />
                         <div
                           className="absolute top-1/2 left-0 -translate-y-1/2"
                           style={{
@@ -2645,11 +3794,32 @@ function renderVariantBody({
                           }}
                         />
                         {s(it.note) && (
-                          <div className="absolute right-3 top-1/2 -translate-y-[135%] uppercase" style={{ fontSize: 13, letterSpacing: "0.22em", color: ink.faint, fontWeight: 600 }}>{s(it.note)}</div>
+                          <div
+                            className="absolute right-3 top-1/2 -translate-y-[135%] uppercase"
+                            style={{
+                              fontSize: 13,
+                              letterSpacing: "0.22em",
+                              color: ink.faint,
+                              fontWeight: 600,
+                            }}
+                          >
+                            {s(it.note)}
+                          </div>
                         )}
                       </div>
-                      <div className="text-right tabular-nums" style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.02em", color: highlight ? "var(--slide-accent-text)" : ink.strong }}>
-                        {s(it.value)}<span className="ml-1" style={{ fontSize: 18, color: ink.faint }}>{s(c.unit)}</span>
+                      <div
+                        className="text-right tabular-nums"
+                        style={{
+                          fontSize: 34,
+                          fontWeight: 600,
+                          letterSpacing: "-0.02em",
+                          color: highlight ? "var(--slide-accent-text)" : ink.strong,
+                        }}
+                      >
+                        {s(it.value)}
+                        <span className="ml-1" style={{ fontSize: 18, color: ink.faint }}>
+                          {s(c.unit)}
+                        </span>
                       </div>
                     </div>
                   );
@@ -2685,11 +3855,32 @@ function renderVariantBody({
                   className="absolute w-[240px] -translate-x-1/2 -translate-y-1/2 p-2 text-center"
                   style={{ left: `${x}%`, top: `${y}%` }}
                 >
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full" style={{ backgroundColor: `${brand.tokens.accent}22`, color: "var(--slide-accent-text)" }}>
-                    {(() => { const Ic = pickIcon(s(it.label), i, s(it.icon)); return <Ic size={24} />; })()}
+                  <div
+                    className="mx-auto flex h-12 w-12 items-center justify-center rounded-full"
+                    style={{
+                      backgroundColor: `${brand.tokens.accent}22`,
+                      color: "var(--slide-accent-text)",
+                    }}
+                  >
+                    {(() => {
+                      const Ic = pickIcon(s(it.label), i, s(it.icon));
+                      return <Ic size={24} />;
+                    })()}
                   </div>
-                  <div className="mt-4" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(it.label)}</div>
-                  <SupportingText size="sm" opacity={0.72} className="mt-2">{s(it.body)}</SupportingText>
+                  <div
+                    className="mt-4"
+                    style={{
+                      fontSize: 24,
+                      fontWeight: 600,
+                      letterSpacing: "-0.01em",
+                      color: ink.strong,
+                    }}
+                  >
+                    {s(it.label)}
+                  </div>
+                  <SupportingText size="sm" opacity={0.72} className="mt-2">
+                    {s(it.body)}
+                  </SupportingText>
                 </div>
               );
             })}
@@ -2725,8 +3916,14 @@ function renderVariantBody({
             </div>
             <div className="space-y-6">
               {items.map((it, i) => (
-                <div key={i} className="border-l-4 pl-6" style={{ borderColor: brand.tokens.accent }}>
-                  <div className="text-2xl font-semibold" style={{ color: ink.strong }}>{s(it.label)}</div>
+                <div
+                  key={i}
+                  className="border-l-4 pl-6"
+                  style={{ borderColor: brand.tokens.accent }}
+                >
+                  <div className="text-2xl font-semibold" style={{ color: ink.strong }}>
+                    {s(it.label)}
+                  </div>
                   <div className="mt-2 text-xl opacity-80">{s(it.body)}</div>
                 </div>
               ))}
@@ -2752,20 +3949,38 @@ function renderVariantBody({
                 <div
                   key={i}
                   className="absolute h-[380px] w-[380px] rounded-full"
-                  style={{ left: pos.left, top: pos.top, backgroundColor: colors[i], opacity: 0.45, mixBlendMode: "multiply" }}
+                  style={{
+                    left: pos.left,
+                    top: pos.top,
+                    backgroundColor: colors[i],
+                    opacity: 0.45,
+                    mixBlendMode: "multiply",
+                  }}
                 />
               ))}
               <div className="absolute left-1/2 top-1/2 z-10 max-w-[260px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/95 p-6 text-center shadow-lg">
-                <div className="text-lg uppercase tracking-[0.25em]" style={{ color: "var(--slide-accent-text)" }}>Intersection</div>
-                <div className="mt-2 text-2xl font-semibold" style={{ color: ink.strong }}>{s(c.intersection)}</div>
+                <div
+                  className="text-lg uppercase tracking-[0.25em]"
+                  style={{ color: "var(--slide-accent-text)" }}
+                >
+                  Intersection
+                </div>
+                <div className="mt-2 text-2xl font-semibold" style={{ color: ink.strong }}>
+                  {s(c.intersection)}
+                </div>
               </div>
             </div>
             <div className="space-y-6">
               {items.map((it, i) => (
                 <div key={i} className="flex items-start gap-5">
-                  <div className="mt-2 h-6 w-6 shrink-0 rounded-full" style={{ backgroundColor: colors[i] }} />
+                  <div
+                    className="mt-2 h-6 w-6 shrink-0 rounded-full"
+                    style={{ backgroundColor: colors[i] }}
+                  />
                   <div>
-                    <div className="text-2xl font-semibold" style={{ color: ink.strong }}>{s(it.label)}</div>
+                    <div className="text-2xl font-semibold" style={{ color: ink.strong }}>
+                      {s(it.label)}
+                    </div>
                     <div className="mt-2 text-xl opacity-80">{s(it.body)}</div>
                   </div>
                 </div>
@@ -2782,34 +3997,67 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Client outcomes")} />
           <div className="mt-10 grid grid-cols-3 gap-x-10 gap-y-12">
-            {arr(c.items).slice(0, 6).map((it, i) => {
-              const logoUrl = s(it.logoUrl);
-              const logoPath = s(it.logoPath);
-              return (
-                <div key={i} className="pt-6" style={{ borderTop: `1px solid ${ink.hairline}` }}>
-                  <div className="flex items-center justify-between">
-                    {logoUrl || logoPath ? (
-                      <ClientLogoImg
-                        path={logoPath}
-                        url={logoUrl}
-                        alt={s(it.client) ? `${s(it.client)} logo` : "Client logo"}
-                        style={{ maxHeight: 36, maxWidth: 140, objectFit: "contain" }}
-                      />
-                    ) : (
-                      <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, letterSpacing: "0.18em", color: "var(--slide-accent-text)" }}>
-                        {s(it.client).split(" ").map((w) => w[0]).join("").slice(0, 3).toUpperCase()}
-                      </div>
-                    )}
-                    <Kicker brand={brand} color="color-mix(in oklab, currentColor 62%, transparent)" size={16}>{s(it.sector)}</Kicker>
+            {arr(c.items)
+              .slice(0, 6)
+              .map((it, i) => {
+                const logoUrl = s(it.logoUrl);
+                const logoPath = s(it.logoPath);
+                return (
+                  <div key={i} className="pt-6" style={{ borderTop: `1px solid ${ink.hairline}` }}>
+                    <div className="flex items-center justify-between">
+                      {logoUrl || logoPath ? (
+                        <ClientLogoImg
+                          path={logoPath}
+                          url={logoUrl}
+                          alt={s(it.client) ? `${s(it.client)} logo` : "Client logo"}
+                          style={{ maxHeight: 36, maxWidth: 140, objectFit: "contain" }}
+                        />
+                      ) : (
+                        <div
+                          className="tabular-nums"
+                          style={{
+                            fontSize: 22,
+                            fontWeight: 600,
+                            letterSpacing: "0.18em",
+                            color: "var(--slide-accent-text)",
+                          }}
+                        >
+                          {s(it.client)
+                            .split(" ")
+                            .map((w) => w[0])
+                            .join("")
+                            .slice(0, 3)
+                            .toUpperCase()}
+                        </div>
+                      )}
+                      <Kicker
+                        brand={brand}
+                        color="color-mix(in oklab, currentColor 62%, transparent)"
+                        size={16}
+                      >
+                        {s(it.sector)}
+                      </Kicker>
+                    </div>
+                    <div
+                      className="mt-6"
+                      style={{
+                        fontSize: 28,
+                        fontWeight: 600,
+                        letterSpacing: "-0.015em",
+                        color: ink.strong,
+                      }}
+                    >
+                      {s(it.client)}
+                    </div>
+                    <SupportingText size="md" opacity={0.75} className="mt-3">
+                      {s(it.result)}
+                    </SupportingText>
+                    <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${ink.hairline}` }}>
+                      <StatFigure brand={brand} value={s(it.metric)} unit={s(it.unit)} size="sm" />
+                    </div>
                   </div>
-                  <div className="mt-6" style={{ fontSize: 28, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>{s(it.client)}</div>
-                  <SupportingText size="md" opacity={0.75} className="mt-3">{s(it.result)}</SupportingText>
-                  <div className="mt-6 pt-5" style={{ borderTop: `1px solid ${ink.hairline}` }}>
-                    <StatFigure brand={brand} value={s(it.metric)} unit={s(it.unit)} size="sm" />
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         </SlideFrame>
       );
@@ -2819,37 +4067,75 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Client engagements")} />
           <div className="mt-10 grid grid-cols-3 gap-8">
-            {arr(c.items).slice(0, 3).map((it, i) => {
-              const logoUrl = s(it.logoUrl);
-              const logoPath = s(it.logoPath);
-              return (
-                <div key={i}>
-                  {logoUrl || logoPath ? (
-                    <div
-                      className="flex aspect-[16/10] w-full items-center justify-center rounded-md"
-                      style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(10,15,28,0.08)" }}
-                    >
-                      <ClientLogoImg
-                        path={logoPath}
-                        url={logoUrl}
-                        alt={s(it.client) ? `${s(it.client)} logo` : "Client logo"}
-                        style={{ maxHeight: "70%", maxWidth: "75%", objectFit: "contain" }}
+            {arr(c.items)
+              .slice(0, 3)
+              .map((it, i) => {
+                const logoUrl = s(it.logoUrl);
+                const logoPath = s(it.logoPath);
+                return (
+                  <div key={i}>
+                    {logoUrl || logoPath ? (
+                      <div
+                        className="flex aspect-[16/10] w-full items-center justify-center rounded-md"
+                        style={{
+                          backgroundColor: "#FFFFFF",
+                          border: "1px solid rgba(10,15,28,0.08)",
+                        }}
+                      >
+                        <ClientLogoImg
+                          path={logoPath}
+                          url={logoUrl}
+                          alt={s(it.client) ? `${s(it.client)} logo` : "Client logo"}
+                          style={{ maxHeight: "70%", maxWidth: "75%", objectFit: "contain" }}
+                        />
+                      </div>
+                    ) : (
+                      <MediaTile
+                        brand={brand}
+                        seed={s(it.seed, s(it.client, `client-${i}`))}
+                        className="aspect-[16/10] w-full"
                       />
-                    </div>
-                  ) : (
-                    <MediaTile brand={brand} seed={s(it.seed, s(it.client, `client-${i}`))} className="aspect-[16/10] w-full" />
-                  )}
-                  <div className="mt-6 pt-5" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                    <Kicker brand={brand} color="color-mix(in oklab, currentColor 62%, transparent)" size={16}>{s(it.sector)}</Kicker>
-                    <div className="mt-4" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>{s(it.client)}</div>
-                    <SupportingText size="md" opacity={0.78} className="mt-3">{s(it.story)}</SupportingText>
-                    <div className="mt-6" style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-0.01em", color: "var(--slide-accent-text)" }}>
-                      {s(it.metric)}
+                    )}
+                    <div
+                      className="mt-6 pt-5"
+                      style={{ borderTop: `2px solid ${brand.tokens.accent}` }}
+                    >
+                      <Kicker
+                        brand={brand}
+                        color="color-mix(in oklab, currentColor 62%, transparent)"
+                        size={16}
+                      >
+                        {s(it.sector)}
+                      </Kicker>
+                      <div
+                        className="mt-4"
+                        style={{
+                          fontSize: 30,
+                          fontWeight: 600,
+                          letterSpacing: "-0.015em",
+                          color: ink.strong,
+                        }}
+                      >
+                        {s(it.client)}
+                      </div>
+                      <SupportingText size="md" opacity={0.78} className="mt-3">
+                        {s(it.story)}
+                      </SupportingText>
+                      <div
+                        className="mt-6"
+                        style={{
+                          fontSize: 22,
+                          fontWeight: 600,
+                          letterSpacing: "-0.01em",
+                          color: "var(--slide-accent-text)",
+                        }}
+                      >
+                        {s(it.metric)}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         </SlideFrame>
       );
@@ -2859,18 +4145,44 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "In practice")} />
           <div className="mt-10 grid grid-cols-2 gap-x-10 gap-y-10">
-            {arr(c.items).slice(0, 4).map((it, i) => (
-              <div key={i} className="grid grid-cols-[240px_1fr] items-start gap-8">
-                <MediaTile brand={brand} seed={s(it.seed, `mx-${i}`)} className="aspect-[4/3] w-full" />
-                <div className="pt-2">
-                  <div className="tabular-nums uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>
-                    {String(i + 1).padStart(2, "0")}
+            {arr(c.items)
+              .slice(0, 4)
+              .map((it, i) => (
+                <div key={i} className="grid grid-cols-[240px_1fr] items-start gap-8">
+                  <MediaTile
+                    brand={brand}
+                    seed={s(it.seed, `mx-${i}`)}
+                    className="aspect-[4/3] w-full"
+                  />
+                  <div className="pt-2">
+                    <div
+                      className="tabular-nums uppercase"
+                      style={{
+                        fontSize: 18,
+                        letterSpacing: "0.28em",
+                        color: "var(--slide-accent-text)",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </div>
+                    <div
+                      className="mt-4"
+                      style={{
+                        fontSize: 30,
+                        fontWeight: 600,
+                        letterSpacing: "-0.015em",
+                        color: ink.strong,
+                      }}
+                    >
+                      {s(it.label)}
+                    </div>
+                    <SupportingText size="md" opacity={0.75} className="mt-3">
+                      {s(it.body)}
+                    </SupportingText>
                   </div>
-                  <div className="mt-4" style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>{s(it.label)}</div>
-                  <SupportingText size="md" opacity={0.75} className="mt-3">{s(it.body)}</SupportingText>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </SlideFrame>
       );
@@ -2880,13 +4192,31 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Program surface area")} />
           <div className="mt-6 grid grid-cols-3 gap-x-8 gap-y-6">
-            {arr(c.items).slice(0, 6).map((it, i) => (
-              <div key={i}>
-                <MediaTile brand={brand} seed={s(it.seed, `mx6-${i}`)} className="aspect-[16/9] w-full" />
-                <div className="mt-4" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(it.label)}</div>
-                <SupportingText size="sm" opacity={0.72} className="mt-2 line-clamp-2">{s(it.body)}</SupportingText>
-              </div>
-            ))}
+            {arr(c.items)
+              .slice(0, 6)
+              .map((it, i) => (
+                <div key={i}>
+                  <MediaTile
+                    brand={brand}
+                    seed={s(it.seed, `mx6-${i}`)}
+                    className="aspect-[16/9] w-full"
+                  />
+                  <div
+                    className="mt-4"
+                    style={{
+                      fontSize: 24,
+                      fontWeight: 600,
+                      letterSpacing: "-0.01em",
+                      color: ink.strong,
+                    }}
+                  >
+                    {s(it.label)}
+                  </div>
+                  <SupportingText size="sm" opacity={0.72} className="mt-2 line-clamp-2">
+                    {s(it.body)}
+                  </SupportingText>
+                </div>
+              ))}
           </div>
         </SlideFrame>
       );
@@ -2898,37 +4228,58 @@ function renderVariantBody({
           <div className="relative">
             <SlideTitle brand={brand} title={s(c.title, "Three engagements")} />
             <div className="mt-10 grid grid-cols-3 gap-8">
-              {arr(c.items).slice(0, 3).map((it, i) => {
-                const logoUrl = s(it.logoUrl);
-                const logoPath = s(it.logoPath);
-                return (
-                  <GlassTile key={i} radius={24} padding="px-8 py-8" className="flex flex-col">
-                    <Kicker brand={brand} color="var(--slide-accent-text)" size={16}>Client · {String(i + 1).padStart(2, "0")}</Kicker>
-                    <div className="mt-4 flex items-center gap-4">
-                      {(logoUrl || logoPath) && (
-                        <ClientLogoImg
-                          path={logoPath}
-                          url={logoUrl}
-                          alt={s(it.client) ? `${s(it.client)} logo` : "Client logo"}
-                          style={{ maxHeight: 36, maxWidth: 120, objectFit: "contain" }}
-                        />
-                      )}
-                      <div style={{ fontSize: 28, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong }}>{s(it.client)}</div>
-                    </div>
-                    <div className="mt-8">
-                      <Kicker brand={brand} size={16}>Challenge</Kicker>
-                      <SupportingText size="md" opacity={0.82} className="mt-3">{s(it.challenge)}</SupportingText>
-                    </div>
-                    <div className="mt-8 flex-1">
-                      <Kicker brand={brand} size={16}>Outcome</Kicker>
-                      <SupportingText size="md" opacity={0.82} className="mt-3">{s(it.outcome)}</SupportingText>
-                    </div>
-                    <div className="mt-10">
-                      <StatFigure brand={brand} value={s(it.metric)} size="md" />
-                    </div>
-                  </GlassTile>
-                );
-              })}
+              {arr(c.items)
+                .slice(0, 3)
+                .map((it, i) => {
+                  const logoUrl = s(it.logoUrl);
+                  const logoPath = s(it.logoPath);
+                  return (
+                    <GlassTile key={i} radius={24} padding="px-8 py-8" className="flex flex-col">
+                      <Kicker brand={brand} color="var(--slide-accent-text)" size={16}>
+                        Client · {String(i + 1).padStart(2, "0")}
+                      </Kicker>
+                      <div className="mt-4 flex items-center gap-4">
+                        {(logoUrl || logoPath) && (
+                          <ClientLogoImg
+                            path={logoPath}
+                            url={logoUrl}
+                            alt={s(it.client) ? `${s(it.client)} logo` : "Client logo"}
+                            style={{ maxHeight: 36, maxWidth: 120, objectFit: "contain" }}
+                          />
+                        )}
+                        <div
+                          style={{
+                            fontSize: 28,
+                            fontWeight: 600,
+                            letterSpacing: "-0.015em",
+                            color: ink.strong,
+                          }}
+                        >
+                          {s(it.client)}
+                        </div>
+                      </div>
+                      <div className="mt-8">
+                        <Kicker brand={brand} size={16}>
+                          Challenge
+                        </Kicker>
+                        <SupportingText size="md" opacity={0.82} className="mt-3">
+                          {s(it.challenge)}
+                        </SupportingText>
+                      </div>
+                      <div className="mt-8 flex-1">
+                        <Kicker brand={brand} size={16}>
+                          Outcome
+                        </Kicker>
+                        <SupportingText size="md" opacity={0.82} className="mt-3">
+                          {s(it.outcome)}
+                        </SupportingText>
+                      </div>
+                      <div className="mt-10">
+                        <StatFigure brand={brand} value={s(it.metric)} size="md" />
+                      </div>
+                    </GlassTile>
+                  );
+                })}
             </div>
           </div>
         </SlideFrame>
@@ -2943,7 +4294,12 @@ function renderVariantBody({
           <div className="relative grid h-full grid-cols-[1.05fr_0.95fr] items-center gap-24">
             <div>
               <Kicker brand={brand}>Timeline</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-6 mb-10" />
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={96}
+                thicknessPx={2}
+                className="mt-6 mb-10"
+              />
               <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>
                 {s(c.title, "What happens next.")}
               </DisplayTitle>
@@ -2968,7 +4324,6 @@ function renderVariantBody({
       );
     }
 
-
     case "MV-CLOSE-CHECKLIST": {
       const items = arr(c.items);
       return (
@@ -2977,7 +4332,12 @@ function renderVariantBody({
           <div className="relative grid h-full grid-cols-[1fr_1fr] items-center gap-24">
             <div>
               <Kicker brand={brand}>Action plan</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-6 mb-10" />
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={96}
+                thicknessPx={2}
+                className="mt-6 mb-10"
+              />
               <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>
                 {s(c.title, "What happens next.")}
               </DisplayTitle>
@@ -3001,7 +4361,6 @@ function renderVariantBody({
       );
     }
 
-
     case "MV-CLOSE-DECISION":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="close">
@@ -3009,24 +4368,57 @@ function renderVariantBody({
           <div className="relative grid h-full grid-cols-[1.15fr_0.85fr] items-center gap-24">
             <div>
               <Kicker brand={brand}>{s(c.kicker, "The ask")}</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-8 mb-10" />
-              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>{s(c.ask)}</DisplayTitle>
-              <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={880}>{s(c.rationale)}</SupportingText>
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={96}
+                thicknessPx={2}
+                className="mt-8 mb-10"
+              />
+              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1080}>
+                {s(c.ask)}
+              </DisplayTitle>
+              <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={880}>
+                {s(c.rationale)}
+              </SupportingText>
             </div>
             <GlassTile radius={28} padding="px-12 py-12">
-              <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", fontWeight: 600, color: ink.faint }}>
+              <div
+                className="uppercase"
+                style={{ fontSize: 18, letterSpacing: "0.28em", fontWeight: 600, color: ink.faint }}
+              >
                 Decision by
               </div>
               <div
                 className="mt-8 tabular-nums"
-                style={{ fontSize: 96, lineHeight: 1, fontWeight: 600, letterSpacing: "-0.03em", color: "var(--slide-accent-text)" }}
+                style={{
+                  fontSize: 96,
+                  lineHeight: 1,
+                  fontWeight: 600,
+                  letterSpacing: "-0.03em",
+                  color: "var(--slide-accent-text)",
+                }}
               >
                 {s(c.decisionBy, "—")}
               </div>
               {s(c.owner) && (
                 <div className="mt-10 pt-8" style={{ borderTop: `1px solid ${ink.hairline}` }}>
-                  <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", fontWeight: 600, color: ink.faint }}>Owner</div>
-                  <div className="mt-2" style={{ fontSize: 24, fontWeight: 600, color: ink.strong }}>{s(c.owner)}</div>
+                  <div
+                    className="uppercase"
+                    style={{
+                      fontSize: 14,
+                      letterSpacing: "0.28em",
+                      fontWeight: 600,
+                      color: ink.faint,
+                    }}
+                  >
+                    Owner
+                  </div>
+                  <div
+                    className="mt-2"
+                    style={{ fontSize: 24, fontWeight: 600, color: ink.strong }}
+                  >
+                    {s(c.owner)}
+                  </div>
                 </div>
               )}
             </GlassTile>
@@ -3034,26 +4426,75 @@ function renderVariantBody({
         </SlideFrame>
       );
 
-
     case "MV-CLOSE-CALENDAR":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-[520px_1fr] items-center gap-20">
             <div className="flex flex-col items-center text-center">
               <Kicker brand={brand}>Kickoff</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
-              <div className="tabular-nums" style={{ fontSize: 200, lineHeight: 0.92, fontWeight: 600, letterSpacing: "-0.035em", color: ink.strong }}>
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={72}
+                thicknessPx={2}
+                className="mt-6 mb-10"
+              />
+              <div
+                className="tabular-nums"
+                style={{
+                  fontSize: 200,
+                  lineHeight: 0.92,
+                  fontWeight: 600,
+                  letterSpacing: "-0.035em",
+                  color: ink.strong,
+                }}
+              >
                 {s(c.date)}
               </div>
-              <div className="mt-6" style={{ fontSize: 32, fontWeight: 600, letterSpacing: "-0.01em", color: ink.strong }}>{s(c.day)}</div>
-              <div className="mt-2 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 60%, transparent)" }}>{s(c.monthYear)}</div>
+              <div
+                className="mt-6"
+                style={{
+                  fontSize: 32,
+                  fontWeight: 600,
+                  letterSpacing: "-0.01em",
+                  color: ink.strong,
+                }}
+              >
+                {s(c.day)}
+              </div>
+              <div
+                className="mt-2 uppercase"
+                style={{
+                  fontSize: 18,
+                  letterSpacing: "0.28em",
+                  color: "color-mix(in oklab, currentColor 60%, transparent)",
+                }}
+              >
+                {s(c.monthYear)}
+              </div>
             </div>
             <div>
               <Kicker brand={brand}>{s(c.title, "Kickoff")}</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
-              <div style={{ fontSize: 48, fontWeight: 600, lineHeight: 1.15, letterSpacing: "-0.02em", color: ink.strong }}>{s(c.body)}</div>
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={72}
+                thicknessPx={2}
+                className="mt-6 mb-8"
+              />
+              <div
+                style={{
+                  fontSize: 48,
+                  fontWeight: 600,
+                  lineHeight: 1.15,
+                  letterSpacing: "-0.02em",
+                  color: ink.strong,
+                }}
+              >
+                {s(c.body)}
+              </div>
               <SoftDivider className="mt-10 mb-6" />
-              <MetaRow><span>{s(c.owner)}</span></MetaRow>
+              <MetaRow>
+                <span>{s(c.owner)}</span>
+              </MetaRow>
             </div>
           </div>
         </SlideFrame>
@@ -3066,20 +4507,54 @@ function renderVariantBody({
           <div className="relative grid h-full grid-cols-[1.2fr_0.8fr] items-center gap-24">
             <div>
               <Kicker brand={brand}>{s(c.kicker, "A closing note")}</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mt-8 mb-10" />
-              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1100}>{s(c.statement)}</DisplayTitle>
-              <MetaRow className="mt-14"><span>{s(c.signoff)}</span></MetaRow>
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={96}
+                thicknessPx={2}
+                className="mt-8 mb-10"
+              />
+              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1100}>
+                {s(c.statement)}
+              </DisplayTitle>
+              <MetaRow className="mt-14">
+                <span>{s(c.signoff)}</span>
+              </MetaRow>
             </div>
             {(s(c.attribution) || s(c.role)) && (
               <GlassTile radius={28} padding="px-12 py-12">
-                <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", fontWeight: 600, color: ink.faint }}>
+                <div
+                  className="uppercase"
+                  style={{
+                    fontSize: 18,
+                    letterSpacing: "0.28em",
+                    fontWeight: 600,
+                    color: ink.faint,
+                  }}
+                >
                   Signed
                 </div>
-                <div className="mt-8" style={{ fontSize: 36, fontWeight: 600, letterSpacing: "-0.015em", color: ink.strong, lineHeight: 1.15 }}>
+                <div
+                  className="mt-8"
+                  style={{
+                    fontSize: 36,
+                    fontWeight: 600,
+                    letterSpacing: "-0.015em",
+                    color: ink.strong,
+                    lineHeight: 1.15,
+                  }}
+                >
                   {s(c.attribution, s(c.signoff))}
                 </div>
                 {s(c.role) && (
-                  <div className="mt-3 uppercase" style={{ color: "var(--slide-accent-text)", fontSize: 15, letterSpacing: "0.28em", fontWeight: 600 }}>
+                  <div
+                    className="mt-3 uppercase"
+                    style={{
+                      color: "var(--slide-accent-text)",
+                      fontSize: 15,
+                      letterSpacing: "0.28em",
+                      fontWeight: 600,
+                    }}
+                  >
                     {s(c.role)}
                   </div>
                 )}
@@ -3089,23 +4564,49 @@ function renderVariantBody({
         </SlideFrame>
       );
 
-
     case "MV-CLOSE-SPLIT":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-2 gap-16">
-            <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "cta"))} className="h-full w-full" />
+            <MediaTile
+              brand={brand}
+              seed={s(c.mediaSeed, s(c.title, "cta"))}
+              className="h-full w-full"
+            />
             <div className="flex flex-col justify-center">
               <Kicker brand={brand}>Next step</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={72} thicknessPx={2} className="mt-6 mb-8" />
-              <DisplayTitle size="title" color={ink.strong}>{s(c.title)}</DisplayTitle>
-              <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={720}>{s(c.body)}</SupportingText>
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={72}
+                thicknessPx={2}
+                className="mt-6 mb-8"
+              />
+              <DisplayTitle size="title" color={ink.strong}>
+                {s(c.title)}
+              </DisplayTitle>
+              <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={720}>
+                {s(c.body)}
+              </SupportingText>
               <div className="mt-12 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
                 <Kicker brand={brand}>Call to action</Kicker>
-                <div className="mt-4" style={{ fontSize: 44, fontWeight: 600, letterSpacing: "-0.02em", color: ink.strong }}>{s(c.ctaLabel)}</div>
-                <SupportingText size="md" opacity={0.75} className="mt-3">{s(c.ctaDetail)}</SupportingText>
+                <div
+                  className="mt-4"
+                  style={{
+                    fontSize: 44,
+                    fontWeight: 600,
+                    letterSpacing: "-0.02em",
+                    color: ink.strong,
+                  }}
+                >
+                  {s(c.ctaLabel)}
+                </div>
+                <SupportingText size="md" opacity={0.75} className="mt-3">
+                  {s(c.ctaDetail)}
+                </SupportingText>
               </div>
-              <MetaRow className="mt-10"><span>{s(c.owner)}</span></MetaRow>
+              <MetaRow className="mt-10">
+                <span>{s(c.owner)}</span>
+              </MetaRow>
             </div>
           </div>
         </SlideFrame>
@@ -3116,31 +4617,64 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Two ways to start")} />
           <div className="mt-14 grid grid-cols-2 gap-16">
-            {arr(c.items).slice(0, 2).map((it, i) => {
-              const highlight = i === 0;
-              return (
-                <div
-                  key={i}
-                  className="flex flex-col pt-8"
-                  style={{ borderTop: `${highlight ? 3 : 1}px solid ${highlight ? brand.tokens.accent : `${ink.hairline}`}` }}
-                >
-                  <Kicker brand={brand} color={highlight ? "var(--slide-accent-text)" : ink.faint}>
-                    {highlight ? "Recommended" : "Alternative"}
-                  </Kicker>
-                  <div className="mt-6" style={{ fontSize: 56, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.05, color: ink.strong }}>
-                    {s(it.label)}
+            {arr(c.items)
+              .slice(0, 2)
+              .map((it, i) => {
+                const highlight = i === 0;
+                return (
+                  <div
+                    key={i}
+                    className="flex flex-col pt-8"
+                    style={{
+                      borderTop: `${highlight ? 3 : 1}px solid ${highlight ? brand.tokens.accent : `${ink.hairline}`}`,
+                    }}
+                  >
+                    <Kicker
+                      brand={brand}
+                      color={highlight ? "var(--slide-accent-text)" : ink.faint}
+                    >
+                      {highlight ? "Recommended" : "Alternative"}
+                    </Kicker>
+                    <div
+                      className="mt-6"
+                      style={{
+                        fontSize: 56,
+                        fontWeight: 600,
+                        letterSpacing: "-0.02em",
+                        lineHeight: 1.05,
+                        color: ink.strong,
+                      }}
+                    >
+                      {s(it.label)}
+                    </div>
+                    <SupportingText
+                      size="lg"
+                      opacity={0.78}
+                      className="mt-6 flex-1"
+                      maxWidthPx={620}
+                    >
+                      {s(it.body)}
+                    </SupportingText>
+                    <div
+                      className="mt-10 flex items-center gap-4"
+                      style={{
+                        fontSize: 24,
+                        fontWeight: 600,
+                        letterSpacing: "-0.005em",
+                        color: highlight ? "var(--slide-accent-text)" : ink.strong,
+                      }}
+                    >
+                      <span>{s(it.ctaLabel)}</span>
+                      <ArrowRight className="icon-strong" size={20} />
+                    </div>
+                    {s(it.note) && (
+                      <MetaRow className="mt-6">
+                        <span>{s(it.note)}</span>
+                      </MetaRow>
+                    )}
                   </div>
-                  <SupportingText size="lg" opacity={0.78} className="mt-6 flex-1" maxWidthPx={620}>{s(it.body)}</SupportingText>
-                  <div className="mt-10 flex items-center gap-4" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-0.005em", color: highlight ? "var(--slide-accent-text)" : ink.strong }}>
-                    <span>{s(it.ctaLabel)}</span>
-                    <ArrowRight className="icon-strong" size={20} />
-                  </div>
-                  {s(it.note) && (
-                    <MetaRow className="mt-6"><span>{s(it.note)}</span></MetaRow>
-                  )}
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         </SlideFrame>
       );
@@ -3153,7 +4687,12 @@ function renderVariantBody({
               <Trophy size={20} className="mr-3 inline-block align-[-0.15em]" />
               {s(c.kicker, "Our commitment")}
             </Kicker>
-            <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mt-8 mb-12" />
+            <Hairline
+              color={"var(--slide-accent-text)"}
+              widthPx={120}
+              thicknessPx={2}
+              className="mt-8 mb-12"
+            />
             <StatFigure
               brand={brand}
               value={s(c.metric)}
@@ -3186,15 +4725,48 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-10 grid gap-6" style={{ gridTemplateColumns: "1.5fr 1fr 1fr", gridTemplateRows: "1fr 1fr", height: 720 }}>
+          <div
+            className="mt-10 grid gap-6"
+            style={{
+              gridTemplateColumns: "1.5fr 1fr 1fr",
+              gridTemplateRows: "1fr 1fr",
+              height: 720,
+            }}
+          >
             <div className={cellClass} style={{ ...cellBorder, gridRow: "1 / span 2" }}>
               <div className="flex items-center gap-4">
-                <IconBadge brand={brand} label={s(anchor.title)} index={0} size="md" override={s(anchor.icon)} treatment="soft-tile" />
+                <IconBadge
+                  brand={brand}
+                  label={s(anchor.title)}
+                  index={0}
+                  size="md"
+                  override={s(anchor.icon)}
+                  treatment="soft-tile"
+                />
                 <Kicker brand={brand}>Anchor</Kicker>
               </div>
               <div className="mt-auto">
-                <div style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(anchor.title)}</div>
-                <div className="mt-5" style={{ fontSize: 24, lineHeight: 1.42, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>{s(anchor.body)}</div>
+                <div
+                  style={{
+                    fontSize: 44,
+                    fontWeight: 600,
+                    color: ink.strong,
+                    letterSpacing: "-0.02em",
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {s(anchor.title)}
+                </div>
+                <div
+                  className="mt-5"
+                  style={{
+                    fontSize: 24,
+                    lineHeight: 1.42,
+                    color: "color-mix(in oklab, currentColor 72%, transparent)",
+                  }}
+                >
+                  {s(anchor.body)}
+                </div>
               </div>
             </div>
             {rest.map((it, i) => {
@@ -3203,25 +4775,69 @@ function renderVariantBody({
                 <div key={i} className={cellClass} style={cellBorder}>
                   {kind === "stat" ? (
                     <>
-                      <IconBadge brand={brand} label={s(it.label)} index={i + 1} size="sm" override={s(it.icon)} treatment="soft-tile" />
+                      <IconBadge
+                        brand={brand}
+                        label={s(it.label)}
+                        index={i + 1}
+                        size="sm"
+                        override={s(it.icon)}
+                        treatment="soft-tile"
+                      />
                       <div className="mt-auto">
-                        <StatFigure brand={brand} value={s(it.value)} unit={s(it.unit)} label={s(it.label)} size="md" />
+                        <StatFigure
+                          brand={brand}
+                          value={s(it.value)}
+                          unit={s(it.unit)}
+                          label={s(it.label)}
+                          size="md"
+                        />
                       </div>
                     </>
                   ) : kind === "media" ? (
                     <div className="relative -m-10 h-full overflow-hidden">
-                      <MediaTile brand={brand} seed={s(it.mediaSeed, s(it.title, `bento-${i}`))} className="absolute inset-0 h-full w-full rounded-none" />
-                      <div className="absolute inset-x-6 bottom-6 uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.strong }}>{s(it.title)}</div>
+                      <MediaTile
+                        brand={brand}
+                        seed={s(it.mediaSeed, s(it.title, `bento-${i}`))}
+                        className="absolute inset-0 h-full w-full rounded-none"
+                      />
+                      <div
+                        className="absolute inset-x-6 bottom-6 uppercase"
+                        style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.strong }}
+                      >
+                        {s(it.title)}
+                      </div>
                     </div>
                   ) : (
                     <>
                       <div className="flex items-center gap-4">
-                        <IconBadge brand={brand} label={s(it.title)} index={i + 1} size="sm" override={s(it.icon)} treatment="soft-tile" />
+                        <IconBadge
+                          brand={brand}
+                          label={s(it.title)}
+                          index={i + 1}
+                          size="sm"
+                          override={s(it.icon)}
+                          treatment="soft-tile"
+                        />
                         <Kicker brand={brand}>{String(i + 2).padStart(2, "0")}</Kicker>
                       </div>
                       <div className="mt-auto">
-                        <div style={{ fontSize: 28, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.title)}</div>
-                        <div className="mt-3" style={{ fontSize: 20, lineHeight: 1.4, color: ink.muted }}>{s(it.body)}</div>
+                        <div
+                          style={{
+                            fontSize: 28,
+                            fontWeight: 600,
+                            color: ink.strong,
+                            letterSpacing: "-0.015em",
+                            lineHeight: 1.15,
+                          }}
+                        >
+                          {s(it.title)}
+                        </div>
+                        <div
+                          className="mt-3"
+                          style={{ fontSize: 20, lineHeight: 1.4, color: ink.muted }}
+                        >
+                          {s(it.body)}
+                        </div>
                       </div>
                     </>
                   )}
@@ -3240,7 +4856,7 @@ function renderVariantBody({
       const rng = (seed: number) => {
         let a = (seed * 2654435761) >>> 0;
         return () => {
-          a = (a + 0x6D2B79F5) >>> 0;
+          a = (a + 0x6d2b79f5) >>> 0;
           let t = a;
           t = Math.imul(t ^ (t >>> 15), t | 1);
           t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
@@ -3253,7 +4869,8 @@ function renderVariantBody({
         return Number.isFinite(n) ? n : 60;
       };
       const seriesFor = (label: string, trend: string, base: number) => {
-        const seed = Array.from(label).reduce((a, ch) => a + ch.charCodeAt(0), 7) + Math.round(base * 13);
+        const seed =
+          Array.from(label).reduce((a, ch) => a + ch.charCodeAt(0), 7) + Math.round(base * 13);
         const r = rng(seed);
         const dir = trend === "down" ? -1 : 1;
         const arr: number[] = [];
@@ -3274,7 +4891,16 @@ function renderVariantBody({
         return 78;
       };
       const usedIcons = new Set<IconType>();
-      const dedupPool: IconType[] = [LineChart, TrendingUp, Target, Zap, Trophy, Rocket, Sparkles, BarChart3];
+      const dedupPool: IconType[] = [
+        LineChart,
+        TrendingUp,
+        Target,
+        Zap,
+        Trophy,
+        Rocket,
+        Sparkles,
+        BarChart3,
+      ];
       const pickTileIcon = (label: string, override: string, i: number) => {
         let Icon = pickIcon(label || "kpi", i, override);
         if (usedIcons.has(Icon)) {
@@ -3382,7 +5008,8 @@ function renderVariantBody({
                         style={{
                           width: 74,
                           height: 74,
-                          background: "color-mix(in oklab, var(--slide-accent-text) 12%, transparent)",
+                          background:
+                            "color-mix(in oklab, var(--slide-accent-text) 12%, transparent)",
                           border: `1px solid color-mix(in oklab, var(--slide-accent-text) 32%, transparent)`,
                           color: "var(--slide-accent-text)",
                         }}
@@ -3463,12 +5090,7 @@ function renderVariantBody({
                     {cornerNum}
                     <div className="relative flex items-center gap-6">
                       <svg width={220} height={220} viewBox="-110 -110 220 220" aria-hidden>
-                        <circle
-                          r={R}
-                          fill="none"
-                          stroke={ink.hairline}
-                          strokeWidth={10}
-                        />
+                        <circle r={R} fill="none" stroke={ink.hairline} strokeWidth={10} />
                         <circle
                           r={R}
                           fill="none"
@@ -3499,7 +5121,15 @@ function renderVariantBody({
                             }}
                           >
                             {value}
-                            <span style={{ fontSize: 24, color: "var(--slide-accent-text)", marginLeft: 4 }}>{unit}</span>
+                            <span
+                              style={{
+                                fontSize: 24,
+                                color: "var(--slide-accent-text)",
+                                marginLeft: 4,
+                              }}
+                            >
+                              {unit}
+                            </span>
                           </div>
                         </foreignObject>
                       </svg>
@@ -3507,12 +5137,22 @@ function renderVariantBody({
                     <div>
                       <div className="flex items-center gap-2.5">
                         <Icon size={20} style={{ color: "var(--slide-accent-text)" }} aria-hidden />
-                        <div style={{ fontSize: 22, fontWeight: 600, color: ink.strong, letterSpacing: "-0.01em" }}>
+                        <div
+                          style={{
+                            fontSize: 22,
+                            fontWeight: 600,
+                            color: ink.strong,
+                            letterSpacing: "-0.01em",
+                          }}
+                        >
                           {label}
                         </div>
                       </div>
                       {delta && (
-                        <div className="mt-2 flex items-center gap-2" style={{ fontSize: 16, color: tInk }}>
+                        <div
+                          className="mt-2 flex items-center gap-2"
+                          style={{ fontSize: 16, color: tInk }}
+                        >
                           <span>{arrow}</span>
                           <span className="tabular-nums font-semibold">{delta}</span>
                           <span style={{ color: ink.faint }}>vs. baseline</span>
@@ -3535,7 +5175,8 @@ function renderVariantBody({
                         style={{
                           width: 48,
                           height: 48,
-                          background: "color-mix(in oklab, var(--slide-accent-text) 10%, transparent)",
+                          background:
+                            "color-mix(in oklab, var(--slide-accent-text) 10%, transparent)",
                           border: `1px solid color-mix(in oklab, var(--slide-accent-text) 28%, transparent)`,
                           color: "var(--slide-accent-text)",
                         }}
@@ -3547,24 +5188,41 @@ function renderVariantBody({
                       <div className="flex items-baseline gap-1.5">
                         <span
                           className="tabular-nums font-semibold"
-                          style={{ fontSize: 72, lineHeight: 0.9, letterSpacing: "-0.045em", color: ink.strong }}
+                          style={{
+                            fontSize: 72,
+                            lineHeight: 0.9,
+                            letterSpacing: "-0.045em",
+                            color: ink.strong,
+                          }}
                         >
                           {value}
                         </span>
                         {unit && (
-                          <span style={{ fontSize: 26, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}>
+                          <span
+                            style={{
+                              fontSize: 26,
+                              color: "var(--slide-accent-text)",
+                              letterSpacing: "-0.02em",
+                            }}
+                          >
                             {unit}
                           </span>
                         )}
                       </div>
-                      <div className="mt-1" style={{ fontSize: 18, color: ink.muted, letterSpacing: "-0.005em" }}>
+                      <div
+                        className="mt-1"
+                        style={{ fontSize: 18, color: ink.muted, letterSpacing: "-0.005em" }}
+                      >
                         {label}
                       </div>
                     </div>
                     <div style={{ opacity: 0.9 }}>
                       <Sparkline brand={brand} values={series} h={52} />
                       {delta && (
-                        <div className="mt-2 flex items-center gap-1.5" style={{ fontSize: 15, color: tInk }}>
+                        <div
+                          className="mt-2 flex items-center gap-1.5"
+                          style={{ fontSize: 15, color: tInk }}
+                        >
                           <span>{arrow}</span>
                           <span className="tabular-nums font-semibold">{delta}</span>
                         </div>
@@ -3586,7 +5244,8 @@ function renderVariantBody({
                         style={{
                           width: 52,
                           height: 52,
-                          background: "color-mix(in oklab, var(--slide-accent-text) 10%, transparent)",
+                          background:
+                            "color-mix(in oklab, var(--slide-accent-text) 10%, transparent)",
                           border: `1px solid color-mix(in oklab, var(--slide-accent-text) 28%, transparent)`,
                           color: "var(--slide-accent-text)",
                         }}
@@ -3594,16 +5253,29 @@ function renderVariantBody({
                         <Icon size={24} aria-hidden />
                       </div>
                       <div className="flex-1">
-                        <div style={{ fontSize: 18, color: ink.muted, letterSpacing: "-0.005em" }}>{label}</div>
+                        <div style={{ fontSize: 18, color: ink.muted, letterSpacing: "-0.005em" }}>
+                          {label}
+                        </div>
                         <div className="mt-0.5 flex items-baseline gap-1.5">
                           <span
                             className="tabular-nums font-semibold"
-                            style={{ fontSize: 46, lineHeight: 0.95, letterSpacing: "-0.035em", color: ink.strong }}
+                            style={{
+                              fontSize: 46,
+                              lineHeight: 0.95,
+                              letterSpacing: "-0.035em",
+                              color: ink.strong,
+                            }}
                           >
                             {value}
                           </span>
                           {unit && (
-                            <span style={{ fontSize: 20, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}>
+                            <span
+                              style={{
+                                fontSize: 20,
+                                color: "var(--slide-accent-text)",
+                                letterSpacing: "-0.02em",
+                              }}
+                            >
                               {unit}
                             </span>
                           )}
@@ -3615,7 +5287,9 @@ function renderVariantBody({
                             <span>{arrow}</span>
                             <span className="tabular-nums font-semibold">{delta}</span>
                           </div>
-                          <div style={{ color: ink.faint, fontSize: 12, letterSpacing: "0.02em" }}>vs. baseline</div>
+                          <div style={{ color: ink.faint, fontSize: 12, letterSpacing: "0.02em" }}>
+                            vs. baseline
+                          </div>
                         </div>
                       )}
                     </div>
@@ -3653,31 +5327,48 @@ function renderVariantBody({
                       style={{
                         width: 48,
                         height: 48,
-                        background: "color-mix(in oklab, var(--slide-accent-text) 10%, transparent)",
+                        background:
+                          "color-mix(in oklab, var(--slide-accent-text) 10%, transparent)",
                         border: `1px solid color-mix(in oklab, var(--slide-accent-text) 28%, transparent)`,
                         color: "var(--slide-accent-text)",
                       }}
                     >
                       <Icon size={22} aria-hidden />
                     </div>
-                    <div style={{ fontSize: 18, color: ink.muted, letterSpacing: "-0.005em" }}>{label}</div>
+                    <div style={{ fontSize: 18, color: ink.muted, letterSpacing: "-0.005em" }}>
+                      {label}
+                    </div>
                   </div>
                   <div className="flex items-end justify-between">
                     <div className="flex items-baseline gap-1.5">
                       <span
                         className="tabular-nums font-semibold"
-                        style={{ fontSize: 78, lineHeight: 0.9, letterSpacing: "-0.045em", color: ink.strong }}
+                        style={{
+                          fontSize: 78,
+                          lineHeight: 0.9,
+                          letterSpacing: "-0.045em",
+                          color: ink.strong,
+                        }}
                       >
                         {value}
                       </span>
                       {unit && (
-                        <span style={{ fontSize: 26, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}>
+                        <span
+                          style={{
+                            fontSize: 26,
+                            color: "var(--slide-accent-text)",
+                            letterSpacing: "-0.02em",
+                          }}
+                        >
                           {unit}
                         </span>
                       )}
                     </div>
                     {delta && (
-                      <div className="flex items-center gap-1.5" style={{ fontSize: 15, color: tInk }}>
+                      <div
+                        className="flex items-center gap-1.5"
+                        style={{ fontSize: 15, color: tInk }}
+                      >
                         <span>{arrow}</span>
                         <span className="tabular-nums font-semibold">{delta}</span>
                       </div>
@@ -3691,9 +5382,6 @@ function renderVariantBody({
       );
     }
 
-
-
-
     case "MV-ROADMAP-QUARTERS": {
       const quarters = strs(c.quarters).length ? strs(c.quarters) : ["Q1", "Q2", "Q3", "Q4"];
       const items = arr(c.items);
@@ -3701,10 +5389,25 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-14">
-            <div className="grid gap-6" style={{ gridTemplateColumns: `240px repeat(${quarters.length}, minmax(0, 1fr))` }}>
+            <div
+              className="grid gap-6"
+              style={{ gridTemplateColumns: `240px repeat(${quarters.length}, minmax(0, 1fr))` }}
+            >
               <div />
               {quarters.map((q, i) => (
-                <div key={i} className="pb-4 uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600, borderBottom: `2px solid ${brand.tokens.accent}` }}>{q}</div>
+                <div
+                  key={i}
+                  className="pb-4 uppercase"
+                  style={{
+                    fontSize: 20,
+                    letterSpacing: "0.28em",
+                    color: "var(--slide-accent-text)",
+                    fontWeight: 600,
+                    borderBottom: `2px solid ${brand.tokens.accent}`,
+                  }}
+                >
+                  {q}
+                </div>
               ))}
               {items.map((it, i) => {
                 const start = Math.max(1, Number(it.start ?? 1));
@@ -3712,15 +5415,41 @@ function renderVariantBody({
                 const span = end - start + 1;
                 return (
                   <>
-                    <div key={`l-${i}`} className="py-5 pr-6" style={{ fontSize: 22, fontWeight: 600, color: ink.strong, letterSpacing: "-0.01em", borderTop: `1px solid ${ink.hairline}` }}>
+                    <div
+                      key={`l-${i}`}
+                      className="py-5 pr-6"
+                      style={{
+                        fontSize: 22,
+                        fontWeight: 600,
+                        color: ink.strong,
+                        letterSpacing: "-0.01em",
+                        borderTop: `1px solid ${ink.hairline}`,
+                      }}
+                    >
                       {s(it.label)}
-                      {s(it.note) && <div className="mt-1" style={{ fontSize: 16, fontWeight: 400, color: "color-mix(in oklab, currentColor 60%, transparent)", letterSpacing: 0 }}>{s(it.note)}</div>}
+                      {s(it.note) && (
+                        <div
+                          className="mt-1"
+                          style={{
+                            fontSize: 16,
+                            fontWeight: 400,
+                            color: "color-mix(in oklab, currentColor 60%, transparent)",
+                            letterSpacing: 0,
+                          }}
+                        >
+                          {s(it.note)}
+                        </div>
+                      )}
                     </div>
                     {Array.from({ length: quarters.length }).map((_, q) => {
                       const active = q + 1 >= start && q + 1 <= end;
                       const isStart = q + 1 === start;
                       return (
-                        <div key={`c-${i}-${q}`} className="py-5" style={{ borderTop: `1px solid ${ink.hairline}` }}>
+                        <div
+                          key={`c-${i}-${q}`}
+                          className="py-5"
+                          style={{ borderTop: `1px solid ${ink.hairline}` }}
+                        >
                           {isStart && (
                             <div
                               style={{
@@ -3766,15 +5495,43 @@ function renderVariantBody({
                     }}
                   >
                     <div className="flex items-center gap-5">
-                      <IconBadge brand={brand} label={s(it.label)} index={i} size="md" override={s(it.icon)} treatment="on-dark" tone="onDark" />
+                      <IconBadge
+                        brand={brand}
+                        label={s(it.label)}
+                        index={i}
+                        size="md"
+                        override={s(it.icon)}
+                        treatment="on-dark"
+                        tone="onDark"
+                      />
                       <div>
-                        <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", opacity: 0.85 }}>{String(i + 1).padStart(2, "0")}</div>
-                        <div className="mt-2" style={{ fontSize: 32, fontWeight: 600, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
-                        {s(it.note) && <div className="mt-1" style={{ fontSize: 18, opacity: 0.85 }}>{s(it.note)}</div>}
+                        <div
+                          className="uppercase"
+                          style={{ fontSize: 16, letterSpacing: "0.28em", opacity: 0.85 }}
+                        >
+                          {String(i + 1).padStart(2, "0")}
+                        </div>
+                        <div
+                          className="mt-2"
+                          style={{ fontSize: 32, fontWeight: 600, letterSpacing: "-0.015em" }}
+                        >
+                          {s(it.label)}
+                        </div>
+                        {s(it.note) && (
+                          <div className="mt-1" style={{ fontSize: 18, opacity: 0.85 }}>
+                            {s(it.note)}
+                          </div>
+                        )}
                       </div>
                     </div>
-                    <div className="tabular-nums font-semibold text-right" style={{ fontSize: 56, letterSpacing: "-0.02em", lineHeight: 1 }}>
-                      {s(it.value)}<span className="ml-1" style={{ fontSize: 26, opacity: 0.9 }}>{s(it.unit)}</span>
+                    <div
+                      className="tabular-nums font-semibold text-right"
+                      style={{ fontSize: 56, letterSpacing: "-0.02em", lineHeight: 1 }}
+                    >
+                      {s(it.value)}
+                      <span className="ml-1" style={{ fontSize: 26, opacity: 0.9 }}>
+                        {s(it.unit)}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -3794,16 +5551,44 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="relative mx-auto mt-10" style={{ width: 820, height: 720 }}>
             <svg viewBox="-400 -360 800 720" className="absolute inset-0 h-full w-full">
-              <circle cx="0" cy="0" r={R} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} opacity={0.5} />
+              <circle
+                cx="0"
+                cy="0"
+                r={R}
+                fill="none"
+                stroke="var(--slide-accent-text)"
+                strokeWidth={2}
+                opacity={0.5}
+              />
               {items.map((_, i) => {
                 const a1 = (i / n) * Math.PI * 2 - Math.PI / 2;
                 const a2 = ((i + 0.85) / n) * Math.PI * 2 - Math.PI / 2;
-                const x1 = Math.cos(a1) * R, y1 = Math.sin(a1) * R;
-                const x2 = Math.cos(a2) * R, y2 = Math.sin(a2) * R;
-                return <path key={i} d={`M ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2}`} stroke={ink.strong} strokeWidth={4} fill="none" markerEnd="url(#fw-arrow)" opacity={0.9} />;
+                const x1 = Math.cos(a1) * R,
+                  y1 = Math.sin(a1) * R;
+                const x2 = Math.cos(a2) * R,
+                  y2 = Math.sin(a2) * R;
+                return (
+                  <path
+                    key={i}
+                    d={`M ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2}`}
+                    stroke={ink.strong}
+                    strokeWidth={4}
+                    fill="none"
+                    markerEnd="url(#fw-arrow)"
+                    opacity={0.9}
+                  />
+                );
               })}
               <defs>
-                <marker id="fw-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <marker
+                  id="fw-arrow"
+                  viewBox="0 0 10 10"
+                  refX="8"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto-start-reverse"
+                >
                   <path d="M 0 0 L 10 5 L 0 10 z" fill={ink.strong} />
                 </marker>
               </defs>
@@ -3811,7 +5596,18 @@ function renderVariantBody({
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center" style={{ width: 260 }}>
                 <Kicker brand={brand}>Hub</Kicker>
-                <div className="mt-3" style={{ fontSize: 30, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(c.hub, "Program")}</div>
+                <div
+                  className="mt-3"
+                  style={{
+                    fontSize: 30,
+                    fontWeight: 600,
+                    color: ink.strong,
+                    letterSpacing: "-0.015em",
+                    lineHeight: 1.15,
+                  }}
+                >
+                  {s(c.hub, "Program")}
+                </div>
               </div>
             </div>
             {items.map((it, i) => {
@@ -3819,12 +5615,45 @@ function renderVariantBody({
               const x = Math.cos(angle) * R + 400;
               const y = Math.sin(angle) * R + 360;
               return (
-                <div key={i} className="absolute -translate-x-1/2 -translate-y-1/2 text-center" style={{ left: x, top: y, width: 220 }}>
-                  <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full" style={{ background: "#fff", border: `2px solid ${brand.tokens.accent}` }}>
-                    <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="glyph" />
+                <div
+                  key={i}
+                  className="absolute -translate-x-1/2 -translate-y-1/2 text-center"
+                  style={{ left: x, top: y, width: 220 }}
+                >
+                  <div
+                    className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full"
+                    style={{ background: "#fff", border: `2px solid ${brand.tokens.accent}` }}
+                  >
+                    <IconBadge
+                      brand={brand}
+                      label={s(it.label)}
+                      index={i}
+                      size="sm"
+                      override={s(it.icon)}
+                      treatment="glyph"
+                    />
                   </div>
-                  <div style={{ fontSize: 24, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
-                  {s(it.note) && <div className="mt-1" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 66%, transparent)" }}>{s(it.note)}</div>}
+                  <div
+                    style={{
+                      fontSize: 24,
+                      fontWeight: 600,
+                      color: ink.strong,
+                      letterSpacing: "-0.015em",
+                    }}
+                  >
+                    {s(it.label)}
+                  </div>
+                  {s(it.note) && (
+                    <div
+                      className="mt-1"
+                      style={{
+                        fontSize: 16,
+                        color: "color-mix(in oklab, currentColor 66%, transparent)",
+                      }}
+                    >
+                      {s(it.note)}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -3871,7 +5700,10 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           {s(c.subtitle) && (
-            <div className="mt-10 max-w-[1080px]" style={{ fontSize: 22, lineHeight: 1.4, color: ink.muted }}>
+            <div
+              className="mt-10 max-w-[1080px]"
+              style={{ fontSize: 22, lineHeight: 1.4, color: ink.muted }}
+            >
               {s(c.subtitle)}
             </div>
           )}
@@ -3884,7 +5716,7 @@ function renderVariantBody({
                   <stop offset="100%" stopColor={accent} />
                 </linearGradient>
                 <linearGradient id={curveId} x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stopColor={accent} stopOpacity={isDark ? 0.28 : 0.20} />
+                  <stop offset="0%" stopColor={accent} stopOpacity={isDark ? 0.28 : 0.2} />
                   <stop offset="100%" stopColor={accent} stopOpacity={0} />
                 </linearGradient>
                 <filter id={glowId} x="-50%" y="-50%" width="200%" height="200%">
@@ -3898,58 +5730,140 @@ function renderVariantBody({
               {/* Baseline & tick guides */}
               {Array.from({ length: 4 }, (_, i) => {
                 const y = PAD_TOP + ((H - PAD_TOP - PAD_BOT) / 3) * i;
-                return <line key={i} x1={PAD_X} y1={y} x2={W - PAD_X} y2={y} stroke={ink.axis} strokeDasharray={i === 3 ? "0" : "2 8"} strokeWidth={1} />;
+                return (
+                  <line
+                    key={i}
+                    x1={PAD_X}
+                    y1={y}
+                    x2={W - PAD_X}
+                    y2={y}
+                    stroke={ink.axis}
+                    strokeDasharray={i === 3 ? "0" : "2 8"}
+                    strokeWidth={1}
+                  />
+                );
               })}
               {/* Y-axis frame labels */}
-              <text x={PAD_X - 24} y={PAD_TOP + 6} textAnchor="end" fontSize={16} letterSpacing="0.28em" fill={ink.faint} style={{ textTransform: "uppercase", fontWeight: 600 }}>High</text>
-              <text x={PAD_X - 24} y={H - PAD_BOT + 6} textAnchor="end" fontSize={16} letterSpacing="0.28em" fill={ink.faint} style={{ textTransform: "uppercase", fontWeight: 600 }}>Low</text>
+              <text
+                x={PAD_X - 24}
+                y={PAD_TOP + 6}
+                textAnchor="end"
+                fontSize={16}
+                letterSpacing="0.28em"
+                fill={ink.faint}
+                style={{ textTransform: "uppercase", fontWeight: 600 }}
+              >
+                High
+              </text>
+              <text
+                x={PAD_X - 24}
+                y={H - PAD_BOT + 6}
+                textAnchor="end"
+                fontSize={16}
+                letterSpacing="0.28em"
+                fill={ink.faint}
+                style={{ textTransform: "uppercase", fontWeight: 600 }}
+              >
+                Low
+              </text>
               {/* Curve fill under-glow */}
               <path d={areaPath} fill={`url(#${curveId})`} />
               {/* Curve stroke */}
-              <path d={path} fill="none" stroke={`url(#${gradId})`} strokeWidth={5} strokeLinecap="round" filter={`url(#${glowId})`} />
+              <path
+                d={path}
+                fill="none"
+                stroke={`url(#${gradId})`}
+                strokeWidth={5}
+                strokeLinecap="round"
+                filter={`url(#${glowId})`}
+              />
               {/* Nodes */}
               {items.map((it, i) => {
                 const current = Boolean(it.current) || i === currentIdx;
                 const p = points[i];
                 const isFirst = i === 0;
                 const isLast = i === n - 1;
-                const anchor: "start" | "middle" | "end" = isFirst ? "start" : isLast ? "end" : "middle";
+                const anchor: "start" | "middle" | "end" = isFirst
+                  ? "start"
+                  : isLast
+                    ? "end"
+                    : "middle";
                 const labelX = isFirst ? p.x - 6 : isLast ? p.x + 6 : p.x;
                 const noteX = labelX;
                 const label = s(it.label);
                 const note = s(it.note);
                 return (
                   <g key={i}>
-                    {current && (
-                      <circle cx={p.x} cy={p.y} r={26} fill={accent} opacity={0.18} />
-                    )}
-                    <circle cx={p.x} cy={p.y} r={current ? 14 : 9} fill={current ? accent : ink.ringOnDark} stroke={current ? accent : primary} strokeWidth={current ? 0 : 3} />
+                    {current && <circle cx={p.x} cy={p.y} r={26} fill={accent} opacity={0.18} />}
+                    <circle
+                      cx={p.x}
+                      cy={p.y}
+                      r={current ? 14 : 9}
+                      fill={current ? accent : ink.ringOnDark}
+                      stroke={current ? accent : primary}
+                      strokeWidth={current ? 0 : 3}
+                    />
                     {current && <circle cx={p.x} cy={p.y} r={5} fill={ink.ringOnDark} />}
-                    <text x={labelX} y={p.y - 32} textAnchor={anchor} fontSize={28} fontWeight={700} fill={ink.strong} style={{ letterSpacing: "-0.015em" }}>{label}</text>
+                    <text
+                      x={labelX}
+                      y={p.y - 32}
+                      textAnchor={anchor}
+                      fontSize={28}
+                      fontWeight={700}
+                      fill={ink.strong}
+                      style={{ letterSpacing: "-0.015em" }}
+                    >
+                      {label}
+                    </text>
                     {note && (
-                      <text x={noteX} y={H - PAD_BOT + 40} textAnchor={anchor} fontSize={18} fill={ink.muted}>
+                      <text
+                        x={noteX}
+                        y={H - PAD_BOT + 40}
+                        textAnchor={anchor}
+                        fontSize={18}
+                        fill={ink.muted}
+                      >
                         {note}
                       </text>
                     )}
                     {current && (
-                      <text x={p.x} y={p.y + 44} textAnchor="middle" fontSize={13} fontWeight={700} fill={accent} style={{ letterSpacing: "0.32em", textTransform: "uppercase" }}>You are here</text>
+                      <text
+                        x={p.x}
+                        y={p.y + 44}
+                        textAnchor="middle"
+                        fontSize={13}
+                        fontWeight={700}
+                        fill={accent}
+                        style={{ letterSpacing: "0.32em", textTransform: "uppercase" }}
+                      >
+                        You are here
+                      </text>
                     )}
                   </g>
                 );
               })}
               {/* X-axis kicker */}
-              <text x={PAD_X} y={H - 14} fontSize={13} letterSpacing="0.32em" fill={ink.faint} style={{ textTransform: "uppercase", fontWeight: 700 }}>{s(c.axisLabel, "Program maturity")}</text>
+              <text
+                x={PAD_X}
+                y={H - 14}
+                fontSize={13}
+                letterSpacing="0.32em"
+                fill={ink.faint}
+                style={{ textTransform: "uppercase", fontWeight: 700 }}
+              >
+                {s(c.axisLabel, "Program maturity")}
+              </text>
             </svg>
           </div>
         </SlideFrame>
       );
     }
 
-
     case "MV-JOURNEY-MAP": {
       const items = arr(c.items);
       const n = Math.max(items.length, 2);
-      const W = 1600, H = 260;
+      const W = 1600,
+        H = 260;
       const points = items.map((it, i) => {
         const x = 60 + (i / (n - 1)) * (W - 120);
         const sent = Math.max(1, Math.min(5, Number(it.sentiment ?? 3)));
@@ -3963,13 +5877,36 @@ function renderVariantBody({
           <div className="mt-10">
             <div className="grid" style={{ gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))` }}>
               {items.map((it, i) => (
-                <div key={i} className="pb-5" style={{ borderBottom: `2px solid ${brand.tokens.accent}` }}>
+                <div
+                  key={i}
+                  className="pb-5"
+                  style={{ borderBottom: `2px solid ${brand.tokens.accent}` }}
+                >
                   <div className="flex items-center gap-3">
-                    <IconBadge brand={brand} label={s(it.phase)} index={i} size="sm" override={s(it.icon)} treatment="soft-circle" />
+                    <IconBadge
+                      brand={brand}
+                      label={s(it.phase)}
+                      index={i}
+                      size="sm"
+                      override={s(it.icon)}
+                      treatment="soft-circle"
+                    />
                     <Kicker brand={brand}>Phase {String(i + 1).padStart(2, "0")}</Kicker>
                   </div>
-                  <div className="mt-2" style={{ fontSize: 28, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em" }}>{s(it.phase)}</div>
-                  <div className="mt-2" style={{ fontSize: 18, color: ink.muted, lineHeight: 1.4 }}>{s(it.touchpoint)}</div>
+                  <div
+                    className="mt-2"
+                    style={{
+                      fontSize: 28,
+                      fontWeight: 600,
+                      color: ink.strong,
+                      letterSpacing: "-0.015em",
+                    }}
+                  >
+                    {s(it.phase)}
+                  </div>
+                  <div className="mt-2" style={{ fontSize: 18, color: ink.muted, lineHeight: 1.4 }}>
+                    {s(it.touchpoint)}
+                  </div>
                 </div>
               ))}
             </div>
@@ -3977,12 +5914,44 @@ function renderVariantBody({
               <path d={path} fill="none" stroke={ink.strong} strokeWidth={3} />
               {points.map((p, i) => (
                 <g key={i}>
-                  <circle cx={p.x} cy={p.y} r={11} fill="var(--slide-accent-text)" stroke="#fff" strokeWidth={3} />
-                  <text x={p.x} y={p.y - 20} textAnchor="middle" fontSize={18} fontWeight={600} fill={ink.strong}>{String(p.it.sentiment ?? "")}/5</text>
+                  <circle
+                    cx={p.x}
+                    cy={p.y}
+                    r={11}
+                    fill="var(--slide-accent-text)"
+                    stroke="#fff"
+                    strokeWidth={3}
+                  />
+                  <text
+                    x={p.x}
+                    y={p.y - 20}
+                    textAnchor="middle"
+                    fontSize={18}
+                    fontWeight={600}
+                    fill={ink.strong}
+                  >
+                    {String(p.it.sentiment ?? "")}/5
+                  </text>
                 </g>
               ))}
-              <text x={20} y={20} fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>High</text>
-              <text x={20} y={H} fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}>Low</text>
+              <text
+                x={20}
+                y={20}
+                fontSize={14}
+                fill={ink.faint}
+                style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}
+              >
+                High
+              </text>
+              <text
+                x={20}
+                y={H}
+                fontSize={14}
+                fill={ink.faint}
+                style={{ letterSpacing: "0.28em", textTransform: "uppercase" }}
+              >
+                Low
+              </text>
             </svg>
           </div>
         </SlideFrame>
@@ -3995,18 +5964,55 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14 grid" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+          <div
+            className="mt-14 grid"
+            style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+          >
             {items.map((it, i) => {
               const name = s(it.name);
-              const initials = name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+              const initials = name
+                .split(/\s+/)
+                .map((w) => w[0])
+                .slice(0, 2)
+                .join("")
+                .toUpperCase();
               return (
-                <div key={i} className="flex aspect-[4/3] items-center justify-center" style={{ borderRight: (i + 1) % cols === 0 ? "none" : `1px solid ${ink.divider}`, borderBottom: `1px solid ${ink.divider}`, borderTop: i < cols ? `1px solid ${ink.divider}` : "none", borderLeft: i % cols === 0 ? `1px solid ${ink.divider}` : "none" }}>
-                  {(pickLogoForMode(it, mode) || s(it.logoPath)) ? (
-                    <ClientLogoImg path={s(it.logoPath)} url={pickLogoForMode(it, mode)} alt={name} className="max-h-16 max-w-[70%] object-contain" style={{ opacity: 0.9 }} />
+                <div
+                  key={i}
+                  className="flex aspect-[4/3] items-center justify-center"
+                  style={{
+                    borderRight: (i + 1) % cols === 0 ? "none" : `1px solid ${ink.divider}`,
+                    borderBottom: `1px solid ${ink.divider}`,
+                    borderTop: i < cols ? `1px solid ${ink.divider}` : "none",
+                    borderLeft: i % cols === 0 ? `1px solid ${ink.divider}` : "none",
+                  }}
+                >
+                  {pickLogoForMode(it, mode) || s(it.logoPath) ? (
+                    <ClientLogoImg
+                      path={s(it.logoPath)}
+                      url={pickLogoForMode(it, mode)}
+                      alt={name}
+                      className="max-h-16 max-w-[70%] object-contain"
+                      style={{ opacity: 0.9 }}
+                    />
                   ) : (
                     <div className="flex flex-col items-center gap-2">
-                      <div style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em" }}>{initials || "—"}</div>
-                      <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", color: ink.faint }}>{name}</div>
+                      <div
+                        style={{
+                          fontSize: 44,
+                          fontWeight: 600,
+                          color: ink.strong,
+                          letterSpacing: "-0.02em",
+                        }}
+                      >
+                        {initials || "—"}
+                      </div>
+                      <div
+                        className="uppercase"
+                        style={{ fontSize: 14, letterSpacing: "0.28em", color: ink.faint }}
+                      >
+                        {name}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -4031,8 +6037,25 @@ function renderVariantBody({
                 {[0, 1, 2, 3].map((q) => {
                   const isTarget = q + 1 === target;
                   return (
-                    <div key={q} className="flex items-start justify-start p-6" style={{ border: `1px solid ${ink.hairline}`, background: isTarget ? `${brand.tokens.accent}14` : "transparent" }}>
-                      <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: isTarget ? "var(--slide-accent-text)" : ink.faint, fontWeight: 600 }}>{quadrants[q] ?? `Q${q + 1}`}</div>
+                    <div
+                      key={q}
+                      className="flex items-start justify-start p-6"
+                      style={{
+                        border: `1px solid ${ink.hairline}`,
+                        background: isTarget ? `${brand.tokens.accent}14` : "transparent",
+                      }}
+                    >
+                      <div
+                        className="uppercase"
+                        style={{
+                          fontSize: 16,
+                          letterSpacing: "0.28em",
+                          color: isTarget ? "var(--slide-accent-text)" : ink.faint,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {quadrants[q] ?? `Q${q + 1}`}
+                      </div>
                     </div>
                   );
                 })}
@@ -4041,19 +6064,60 @@ function renderVariantBody({
                 const x = Math.max(0.05, Math.min(0.95, Number(it.x ?? 0.5))) * S;
                 const y = (1 - Math.max(0.05, Math.min(0.95, Number(it.y ?? 0.5)))) * S;
                 return (
-                  <div key={i} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: x, top: y }}>
-                    <div className="h-4 w-4 rounded-full" style={{ background: brand.tokens.primary, boxShadow: `0 0 0 4px ${brand.tokens.primary}22` }} />
-                    <div className="mt-2 whitespace-nowrap" style={{ fontSize: 18, fontWeight: 600, color: ink.strong, letterSpacing: "-0.01em" }}>{s(it.label)}</div>
+                  <div
+                    key={i}
+                    className="absolute -translate-x-1/2 -translate-y-1/2"
+                    style={{ left: x, top: y }}
+                  >
+                    <div
+                      className="h-4 w-4 rounded-full"
+                      style={{
+                        background: brand.tokens.primary,
+                        boxShadow: `0 0 0 4px ${brand.tokens.primary}22`,
+                      }}
+                    />
+                    <div
+                      className="mt-2 whitespace-nowrap"
+                      style={{
+                        fontSize: 18,
+                        fontWeight: 600,
+                        color: ink.strong,
+                        letterSpacing: "-0.01em",
+                      }}
+                    >
+                      {s(it.label)}
+                    </div>
                   </div>
                 );
               })}
-              <div className="absolute -left-2 top-1/2 -translate-y-1/2 -rotate-90 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(c.axisY)}</div>
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>{s(c.axisX)}</div>
+              <div
+                className="absolute -left-2 top-1/2 -translate-y-1/2 -rotate-90 uppercase"
+                style={{
+                  fontSize: 16,
+                  letterSpacing: "0.28em",
+                  color: "var(--slide-accent-text)",
+                  fontWeight: 600,
+                }}
+              >
+                {s(c.axisY)}
+              </div>
+              <div
+                className="absolute -bottom-8 left-1/2 -translate-x-1/2 uppercase"
+                style={{
+                  fontSize: 16,
+                  letterSpacing: "0.28em",
+                  color: "var(--slide-accent-text)",
+                  fontWeight: 600,
+                }}
+              >
+                {s(c.axisX)}
+              </div>
             </div>
             <div className="flex flex-col justify-center gap-6">
               <Kicker brand={brand}>Reading</Kicker>
               <div style={{ fontSize: 22, lineHeight: 1.45, color: ink.body }}>
-                Position on <b>{s(c.axisX)}</b> and <b>{s(c.axisY)}</b>. The tinted quadrant is where the program should live.
+                Position on <b>{s(c.axisX)}</b> and <b>{s(c.axisY)}</b>. The tinted quadrant is
+                where the program should live.
               </div>
             </div>
           </div>
@@ -4068,32 +6132,104 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-8">
-            <div className="grid gap-8" style={{ gridTemplateColumns: `repeat(${Math.max(above.length, 2)}, minmax(0, 1fr))` }}>
+            <div
+              className="grid gap-8"
+              style={{
+                gridTemplateColumns: `repeat(${Math.max(above.length, 2)}, minmax(0, 1fr))`,
+              }}
+            >
               {above.map((it, i) => (
                 <div key={i}>
                   <div className="flex items-center gap-3">
-                    <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="glyph" />
+                    <IconBadge
+                      brand={brand}
+                      label={s(it.label)}
+                      index={i}
+                      size="sm"
+                      override={s(it.icon)}
+                      treatment="glyph"
+                    />
                     <Kicker brand={brand}>Visible</Kicker>
                   </div>
-                  <div className="mt-3" style={{ fontSize: 28, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
-                  <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.42, color: ink.body }}>{s(it.body)}</div>
+                  <div
+                    className="mt-3"
+                    style={{
+                      fontSize: 28,
+                      fontWeight: 600,
+                      color: ink.strong,
+                      letterSpacing: "-0.015em",
+                    }}
+                  >
+                    {s(it.label)}
+                  </div>
+                  <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.42, color: ink.body }}>
+                    {s(it.body)}
+                  </div>
                 </div>
               ))}
             </div>
             <div className="my-10 flex items-center gap-6">
               <div className="h-[2px] flex-1" style={{ background: brand.tokens.accent }} />
-              <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>Waterline — {s(c.waterline, "what leadership sees")}</div>
+              <div
+                className="uppercase"
+                style={{
+                  fontSize: 18,
+                  letterSpacing: "0.28em",
+                  color: "var(--slide-accent-text)",
+                  fontWeight: 600,
+                }}
+              >
+                Waterline — {s(c.waterline, "what leadership sees")}
+              </div>
               <div className="h-[2px] flex-1" style={{ background: brand.tokens.accent }} />
             </div>
-            <div className="grid gap-8" style={{ gridTemplateColumns: `repeat(${Math.max(Math.min(below.length, 3), 2)}, minmax(0, 1fr))` }}>
+            <div
+              className="grid gap-8"
+              style={{
+                gridTemplateColumns: `repeat(${Math.max(Math.min(below.length, 3), 2)}, minmax(0, 1fr))`,
+              }}
+            >
               {below.map((it, i) => (
-                <div key={i} className="p-6" style={{ background: ink.surface, border: "1px solid rgba(10,15,28,0.08)" }}>
+                <div
+                  key={i}
+                  className="p-6"
+                  style={{ background: ink.surface, border: "1px solid rgba(10,15,28,0.08)" }}
+                >
                   <div className="flex items-center justify-between gap-3">
-                    <div className="uppercase" style={{ fontSize: 14, letterSpacing: "0.28em", color: ink.faint, fontWeight: 600 }}>Hidden</div>
-                    <IconBadge brand={brand} label={s(it.label)} index={i} size="sm" override={s(it.icon)} treatment="soft-tile" />
+                    <div
+                      className="uppercase"
+                      style={{
+                        fontSize: 14,
+                        letterSpacing: "0.28em",
+                        color: ink.faint,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Hidden
+                    </div>
+                    <IconBadge
+                      brand={brand}
+                      label={s(it.label)}
+                      index={i}
+                      size="sm"
+                      override={s(it.icon)}
+                      treatment="soft-tile"
+                    />
                   </div>
-                  <div className="mt-3" style={{ fontSize: 24, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em" }}>{s(it.label)}</div>
-                  <div className="mt-2" style={{ fontSize: 18, lineHeight: 1.42, color: ink.body }}>{s(it.body)}</div>
+                  <div
+                    className="mt-3"
+                    style={{
+                      fontSize: 24,
+                      fontWeight: 600,
+                      color: ink.strong,
+                      letterSpacing: "-0.015em",
+                    }}
+                  >
+                    {s(it.label)}
+                  </div>
+                  <div className="mt-2" style={{ fontSize: 18, lineHeight: 1.42, color: ink.body }}>
+                    {s(it.body)}
+                  </div>
                 </div>
               ))}
             </div>
@@ -4110,17 +6246,48 @@ function renderVariantBody({
             <div className="flex flex-col justify-between">
               <Kicker brand={brand}>{s(c.kicker, "Editorial")}</Kicker>
               <div>
-                <StatFigure brand={brand} value={s(c.pullValue, "3×")} unit={s(c.pullUnit)} label={s(c.pullLabel)} size="xl" />
+                <StatFigure
+                  brand={brand}
+                  value={s(c.pullValue, "3×")}
+                  unit={s(c.pullUnit)}
+                  label={s(c.pullLabel)}
+                  size="xl"
+                />
               </div>
-              <MetaRow><span>{s(c.folio)}</span></MetaRow>
+              <MetaRow>
+                <span>{s(c.folio)}</span>
+              </MetaRow>
             </div>
             <div className="flex flex-col">
-              <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mb-6" />
-              <DisplayTitle size="section" color={ink.strong} maxWidthPx={1080}>{s(c.title)}</DisplayTitle>
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={120}
+                thicknessPx={2}
+                className="mb-6"
+              />
+              <DisplayTitle size="section" color={ink.strong} maxWidthPx={1080}>
+                {s(c.title)}
+              </DisplayTitle>
               <div className="mt-12 grid gap-12" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
-                <div style={{ fontSize: 22, lineHeight: 1.5, color: "color-mix(in oklab, currentColor 78%, transparent)" }}>{s(c.bodyLeft)}</div>
+                <div
+                  style={{
+                    fontSize: 22,
+                    lineHeight: 1.5,
+                    color: "color-mix(in oklab, currentColor 78%, transparent)",
+                  }}
+                >
+                  {s(c.bodyLeft)}
+                </div>
                 <div style={{ background: "rgba(10,15,28,0.15)" }} />
-                <div style={{ fontSize: 22, lineHeight: 1.5, color: "color-mix(in oklab, currentColor 78%, transparent)" }}>{s(c.bodyRight)}</div>
+                <div
+                  style={{
+                    fontSize: 22,
+                    lineHeight: 1.5,
+                    color: "color-mix(in oklab, currentColor 78%, transparent)",
+                  }}
+                >
+                  {s(c.bodyRight)}
+                </div>
               </div>
             </div>
           </div>
@@ -4132,24 +6299,83 @@ function renderVariantBody({
       const items = arr(c.items).slice(0, 3);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <div className="grid h-full gap-0" style={{ gridTemplateColumns: "40% 1fr", margin: "-64px", minHeight: "calc(100% + 128px)" }}>
-            <div className="relative flex flex-col justify-between overflow-hidden p-16" style={{ background: "#03002C", color: "#FFFFFF" }}>
-              <div aria-hidden className="pointer-events-none absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full" style={{ background: `radial-gradient(circle, ${brand.tokens.accent}33, transparent 70%)` }} />
-              <Kicker brand={brand} color={ink.strong}>{s(c.kicker, "Our belief")}</Kicker>
+          <div
+            className="grid h-full gap-0"
+            style={{
+              gridTemplateColumns: "40% 1fr",
+              margin: "-64px",
+              minHeight: "calc(100% + 128px)",
+            }}
+          >
+            <div
+              className="relative flex flex-col justify-between overflow-hidden p-16"
+              style={{ background: "#03002C", color: "#FFFFFF" }}
+            >
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -left-24 -top-24 h-[420px] w-[420px] rounded-full"
+                style={{
+                  background: `radial-gradient(circle, ${brand.tokens.accent}33, transparent 70%)`,
+                }}
+              />
+              <Kicker brand={brand} color={ink.strong}>
+                {s(c.kicker, "Our belief")}
+              </Kicker>
               <div className="relative">
-                <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mb-8" />
-                <DisplayTitle size="section" color={ink.strong}>{s(c.statement)}</DisplayTitle>
+                <Hairline
+                  color={"var(--slide-accent-text)"}
+                  widthPx={96}
+                  thicknessPx={2}
+                  className="mb-8"
+                />
+                <DisplayTitle size="section" color={ink.strong}>
+                  {s(c.statement)}
+                </DisplayTitle>
               </div>
-              <MetaRow><span>{s(c.signoff, "TransPerfect")}</span></MetaRow>
+              <MetaRow>
+                <span>{s(c.signoff, "TransPerfect")}</span>
+              </MetaRow>
             </div>
             <div className="flex flex-col justify-center gap-12 p-16">
               {items.map((it, i) => (
-                <div key={i} className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
+                <div
+                  key={i}
+                  className="pt-6"
+                  style={{ borderTop: `2px solid ${brand.tokens.accent}` }}
+                >
                   <div className="flex items-baseline gap-6">
-                    <span className="tabular-nums font-semibold" style={{ fontSize: 26, color: "var(--slide-accent-text)", letterSpacing: "-0.01em" }}>{String(i + 1).padStart(2, "0")}</span>
+                    <span
+                      className="tabular-nums font-semibold"
+                      style={{
+                        fontSize: 26,
+                        color: "var(--slide-accent-text)",
+                        letterSpacing: "-0.01em",
+                      }}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
                     <div className="flex-1">
-                      <div style={{ fontSize: 34, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.title)}</div>
-                      <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>{s(it.body)}</div>
+                      <div
+                        style={{
+                          fontSize: 34,
+                          fontWeight: 600,
+                          color: ink.strong,
+                          letterSpacing: "-0.015em",
+                          lineHeight: 1.15,
+                        }}
+                      >
+                        {s(it.title)}
+                      </div>
+                      <div
+                        className="mt-2"
+                        style={{
+                          fontSize: 22,
+                          lineHeight: 1.42,
+                          color: "color-mix(in oklab, currentColor 72%, transparent)",
+                        }}
+                      >
+                        {s(it.body)}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -4170,18 +6396,54 @@ function renderVariantBody({
               <React.Fragment key={i}>
                 {i > 0 && <div style={{ background: ink.hairline }} />}
                 <div className="px-10">
-                  <div className="uppercase" style={{ fontSize: 13, letterSpacing: "0.28em", fontWeight: 700, color: "var(--slide-accent-text)" }}>
+                  <div
+                    className="uppercase"
+                    style={{
+                      fontSize: 13,
+                      letterSpacing: "0.28em",
+                      fontWeight: 700,
+                      color: "var(--slide-accent-text)",
+                    }}
+                  >
                     {s(it.label) || `0${i + 1}`}
                   </div>
-                  <div className="mt-6 tabular-nums flex items-baseline gap-2" style={{ fontSize: 108, fontWeight: 600, lineHeight: 0.95, letterSpacing: "-0.04em", color: ink.strong }}>
+                  <div
+                    className="mt-6 tabular-nums flex items-baseline gap-2"
+                    style={{
+                      fontSize: 108,
+                      fontWeight: 600,
+                      lineHeight: 0.95,
+                      letterSpacing: "-0.04em",
+                      color: ink.strong,
+                    }}
+                  >
                     <span>{s(it.value) || "—"}</span>
-                    {s(it.unit) && <span style={{ fontSize: 52, fontWeight: 500, letterSpacing: "-0.02em" }}>{s(it.unit)}</span>}
+                    {s(it.unit) && (
+                      <span style={{ fontSize: 52, fontWeight: 500, letterSpacing: "-0.02em" }}>
+                        {s(it.unit)}
+                      </span>
+                    )}
                   </div>
                   {s(it.note) && (
-                    <div className="mt-8" style={{ fontSize: 20, lineHeight: 1.5, color: ink.muted, maxWidth: 460 }}>{s(it.note)}</div>
+                    <div
+                      className="mt-8"
+                      style={{ fontSize: 20, lineHeight: 1.5, color: ink.muted, maxWidth: 460 }}
+                    >
+                      {s(it.note)}
+                    </div>
                   )}
                   {s(it.source) && (
-                    <div className="mt-6 uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}>{s(it.source)}</div>
+                    <div
+                      className="mt-6 uppercase"
+                      style={{
+                        fontSize: 11,
+                        letterSpacing: "0.24em",
+                        color: ink.faint,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {s(it.source)}
+                    </div>
                   )}
                 </div>
               </React.Fragment>
@@ -4197,17 +6459,46 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="relative mt-12 pl-32">
-            <div className="absolute bottom-2 left-24 top-2 w-[2px]" style={{ background: brand.tokens.accent }} />
+            <div
+              className="absolute bottom-2 left-24 top-2 w-[2px]"
+              style={{ background: brand.tokens.accent }}
+            />
             <div className="flex flex-col gap-10">
               {items.map((it, i) => (
                 <div key={i} className="relative">
-                  <div className="absolute -left-[38px] top-3 h-4 w-4 rounded-full" style={{ background: "#fff", border: `3px solid ${brand.tokens.accent}` }} />
-                  <div className="absolute -left-32 top-1 w-24 pr-4 text-right tabular-nums uppercase" style={{ fontSize: 18, letterSpacing: "0.24em", color: "var(--slide-accent-text)", fontWeight: 600 }}>
+                  <div
+                    className="absolute -left-[38px] top-3 h-4 w-4 rounded-full"
+                    style={{ background: "#fff", border: `3px solid ${brand.tokens.accent}` }}
+                  />
+                  <div
+                    className="absolute -left-32 top-1 w-24 pr-4 text-right tabular-nums uppercase"
+                    style={{
+                      fontSize: 18,
+                      letterSpacing: "0.24em",
+                      color: "var(--slide-accent-text)",
+                      fontWeight: 600,
+                    }}
+                  >
                     {s(it.date)}
                   </div>
                   <div>
-                    <div style={{ fontSize: 30, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em", lineHeight: 1.15 }}>{s(it.label)}</div>
-                    <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: ink.muted, maxWidth: 1080 }}>{s(it.body)}</div>
+                    <div
+                      style={{
+                        fontSize: 30,
+                        fontWeight: 600,
+                        color: ink.strong,
+                        letterSpacing: "-0.015em",
+                        lineHeight: 1.15,
+                      }}
+                    >
+                      {s(it.label)}
+                    </div>
+                    <div
+                      className="mt-2"
+                      style={{ fontSize: 22, lineHeight: 1.42, color: ink.muted, maxWidth: 1080 }}
+                    >
+                      {s(it.body)}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -4225,31 +6516,63 @@ function renderVariantBody({
           <AuroraOrb x={92} y={32} size={880} />
           <div className="relative">
             <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-            <div className="relative mt-16 grid items-stretch gap-8" style={{ gridTemplateColumns: "1fr 1fr" }}>
+            <div
+              className="relative mt-16 grid items-stretch gap-8"
+              style={{ gridTemplateColumns: "1fr 1fr" }}
+            >
               <GlassTile radius={26} padding="px-12 py-12" intensity={0.65}>
                 <div style={{ opacity: 0.72 }}>
                   <div className="mb-6" style={{ height: 2, background: ink.axis, width: 96 }} />
-                  <Kicker brand={brand} color={ink.muted}>{s(before.label, "Before")}</Kicker>
+                  <Kicker brand={brand} color={ink.muted}>
+                    {s(before.label, "Before")}
+                  </Kicker>
                   <div className="mt-8">
-                    <StatFigure brand={brand} value={s(before.value)} unit={s(before.unit)} size="lg" valueColor={ink.muted} />
+                    <StatFigure
+                      brand={brand}
+                      value={s(before.value)}
+                      unit={s(before.unit)}
+                      size="lg"
+                      valueColor={ink.muted}
+                    />
                   </div>
-                  <div className="mt-6" style={{ fontSize: 22, lineHeight: 1.42, color: ink.muted }}>{s(before.body)}</div>
+                  <div
+                    className="mt-6"
+                    style={{ fontSize: 22, lineHeight: 1.42, color: ink.muted }}
+                  >
+                    {s(before.body)}
+                  </div>
                 </div>
               </GlassTile>
               <GlassTile radius={26} padding="px-12 py-12">
-                <Hairline color={"var(--slide-accent-text)"} widthPx={96} thicknessPx={2} className="mb-6" />
+                <Hairline
+                  color={"var(--slide-accent-text)"}
+                  widthPx={96}
+                  thicknessPx={2}
+                  className="mb-6"
+                />
                 <Kicker brand={brand}>{s(after.label, "After")}</Kicker>
                 <div className="mt-8">
                   <StatFigure brand={brand} value={s(after.value)} unit={s(after.unit)} size="xl" />
                 </div>
-                <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.42, color: ink.body }}>{s(after.body)}</div>
+                <div className="mt-6" style={{ fontSize: 24, lineHeight: 1.42, color: ink.body }}>
+                  {s(after.body)}
+                </div>
               </GlassTile>
               <div
                 aria-hidden
                 className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2"
                 style={{ left: "50%" }}
               >
-                <div className="flex h-16 w-16 items-center justify-center rounded-full" style={{ background: brand.tokens.accent, color: ink.onSurface(brand.tokens.accent), fontSize: 28, fontWeight: 600, boxShadow: `0 8px 32px -6px ${brand.tokens.accent}` }}>
+                <div
+                  className="flex h-16 w-16 items-center justify-center rounded-full"
+                  style={{
+                    background: brand.tokens.accent,
+                    color: ink.onSurface(brand.tokens.accent),
+                    fontSize: 28,
+                    fontWeight: 600,
+                    boxShadow: `0 8px 32px -6px ${brand.tokens.accent}`,
+                  }}
+                >
                   <ArrowRight className="icon-strong" size={24} />
                 </div>
               </div>
@@ -4265,32 +6588,76 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="relative">
-            <QuoteMark color={"var(--slide-accent-text)"} size={520} className="absolute -left-6 -top-24" />
+            <QuoteMark
+              color={"var(--slide-accent-text)"}
+              size={520}
+              className="absolute -left-6 -top-24"
+            />
             <div className="relative">
               <Kicker brand={brand}>Voices</Kicker>
-              <div className="mt-8 max-w-[1500px]" style={{ fontSize: 60, lineHeight: 1.1, letterSpacing: "-0.02em", fontWeight: 600, color: ink.strong }}>
+              <div
+                className="mt-8 max-w-[1500px]"
+                style={{
+                  fontSize: 60,
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.02em",
+                  fontWeight: 600,
+                  color: ink.strong,
+                }}
+              >
                 &ldquo;{s(hero.quote)}&rdquo;
               </div>
               <div className="mt-10">
-                <Attribution brand={brand} name={s(hero.name)} role={s(hero.role)} org={s(hero.org)} />
+                <Attribution
+                  brand={brand}
+                  name={s(hero.name)}
+                  role={s(hero.role)}
+                  org={s(hero.org)}
+                />
               </div>
             </div>
           </div>
           <div className="mt-16 grid gap-12" style={{ gridTemplateColumns: "1fr 1px 1fr" }}>
             {items[0] && (
               <div className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                <div style={{ fontSize: 26, lineHeight: 1.35, color: "color-mix(in oklab, currentColor 82%, transparent)" }}>&ldquo;{s(items[0].quote)}&rdquo;</div>
+                <div
+                  style={{
+                    fontSize: 26,
+                    lineHeight: 1.35,
+                    color: "color-mix(in oklab, currentColor 82%, transparent)",
+                  }}
+                >
+                  &ldquo;{s(items[0].quote)}&rdquo;
+                </div>
                 <div className="mt-5">
-                  <Attribution brand={brand} name={s(items[0].name)} role={s(items[0].role)} org={s(items[0].org)} />
+                  <Attribution
+                    brand={brand}
+                    name={s(items[0].name)}
+                    role={s(items[0].role)}
+                    org={s(items[0].org)}
+                  />
                 </div>
               </div>
             )}
             <div style={{ background: `${ink.hairline}` }} />
             {items[1] && (
               <div className="pt-6" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                <div style={{ fontSize: 26, lineHeight: 1.35, color: "color-mix(in oklab, currentColor 82%, transparent)" }}>&ldquo;{s(items[1].quote)}&rdquo;</div>
+                <div
+                  style={{
+                    fontSize: 26,
+                    lineHeight: 1.35,
+                    color: "color-mix(in oklab, currentColor 82%, transparent)",
+                  }}
+                >
+                  &ldquo;{s(items[1].quote)}&rdquo;
+                </div>
                 <div className="mt-5">
-                  <Attribution brand={brand} name={s(items[1].name)} role={s(items[1].role)} org={s(items[1].org)} />
+                  <Attribution
+                    brand={brand}
+                    name={s(items[1].name)}
+                    role={s(items[1].role)}
+                    org={s(items[1].org)}
+                  />
                 </div>
               </div>
             )}
@@ -4305,19 +6672,57 @@ function renderVariantBody({
           <div className="flex h-full flex-col justify-center" style={{ maxWidth: 1500 }}>
             <Kicker brand={brand}>Definition</Kicker>
             <div className="mt-6">
-              <DisplayTitle size="section" color={ink.strong}>{s(c.term)}</DisplayTitle>
+              <DisplayTitle size="section" color={ink.strong}>
+                {s(c.term)}
+              </DisplayTitle>
             </div>
             <div className="mt-6 flex flex-wrap items-baseline gap-6">
-              <span className="uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: ink.faint, fontWeight: 500 }}>{s(c.pronunciation)}</span>
-              <span style={{ fontSize: 24, color: "var(--slide-accent-text)",  fontWeight: 600 }}>{s(c.partOfSpeech, "n.")}</span>
+              <span
+                className="uppercase"
+                style={{ fontSize: 20, letterSpacing: "0.28em", color: ink.faint, fontWeight: 500 }}
+              >
+                {s(c.pronunciation)}
+              </span>
+              <span style={{ fontSize: 24, color: "var(--slide-accent-text)", fontWeight: 600 }}>
+                {s(c.partOfSpeech, "n.")}
+              </span>
             </div>
-            <div className="mt-10" style={{ fontSize: 34, lineHeight: 1.35, color: "color-mix(in oklab, currentColor 85%, transparent)", maxWidth: 1400 }}>
+            <div
+              className="mt-10"
+              style={{
+                fontSize: 34,
+                lineHeight: 1.35,
+                color: "color-mix(in oklab, currentColor 85%, transparent)",
+                maxWidth: 1400,
+              }}
+            >
               {s(c.definition)}
             </div>
             {s(c.usage) && (
-              <div className="mt-12 pt-8" style={{ borderTop: "1px solid rgba(10,15,28,0.15)", maxWidth: 1400 }}>
-                <span className="uppercase mr-4" style={{ fontSize: 14, letterSpacing: "0.28em", color: "var(--slide-accent-text)", fontWeight: 600 }}>Usage</span>
-                <span style={{ fontSize: 24, lineHeight: 1.45, color: "color-mix(in oklab, currentColor 65%, transparent)" }}>{s(c.usage)}</span>
+              <div
+                className="mt-12 pt-8"
+                style={{ borderTop: "1px solid rgba(10,15,28,0.15)", maxWidth: 1400 }}
+              >
+                <span
+                  className="uppercase mr-4"
+                  style={{
+                    fontSize: 14,
+                    letterSpacing: "0.28em",
+                    color: "var(--slide-accent-text)",
+                    fontWeight: 600,
+                  }}
+                >
+                  Usage
+                </span>
+                <span
+                  style={{
+                    fontSize: 24,
+                    lineHeight: 1.45,
+                    color: "color-mix(in oklab, currentColor 65%, transparent)",
+                  }}
+                >
+                  {s(c.usage)}
+                </span>
               </div>
             )}
           </div>
@@ -4332,13 +6737,49 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-12">
             {items.map((it, i) => (
-              <div key={i} className="relative grid items-center gap-8 py-8" style={{ gridTemplateColumns: "160px 1fr", borderTop: i === 0 ? `1px solid ${ink.hairline}` : "none", borderBottom: `1px solid ${ink.hairline}` }}>
-                <div className="tabular-nums font-semibold" style={{ fontSize: 120, lineHeight: 1, letterSpacing: "-0.03em", color: "var(--slide-accent-text)", opacity: 0.18 }}>
+              <div
+                key={i}
+                className="relative grid items-center gap-8 py-8"
+                style={{
+                  gridTemplateColumns: "160px 1fr",
+                  borderTop: i === 0 ? `1px solid ${ink.hairline}` : "none",
+                  borderBottom: `1px solid ${ink.hairline}`,
+                }}
+              >
+                <div
+                  className="tabular-nums font-semibold"
+                  style={{
+                    fontSize: 120,
+                    lineHeight: 1,
+                    letterSpacing: "-0.03em",
+                    color: "var(--slide-accent-text)",
+                    opacity: 0.18,
+                  }}
+                >
                   {String(i + 1).padStart(2, "0")}
                 </div>
                 <div>
-                  <div style={{ fontSize: 40, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em", lineHeight: 1.1 }}>{s(it.statement)}</div>
-                  <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.42, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>{s(it.body)}</div>
+                  <div
+                    style={{
+                      fontSize: 40,
+                      fontWeight: 600,
+                      color: ink.strong,
+                      letterSpacing: "-0.015em",
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    {s(it.statement)}
+                  </div>
+                  <div
+                    className="mt-2"
+                    style={{
+                      fontSize: 22,
+                      lineHeight: 1.42,
+                      color: "color-mix(in oklab, currentColor 72%, transparent)",
+                    }}
+                  >
+                    {s(it.body)}
+                  </div>
                 </div>
               </div>
             ))}
@@ -4354,21 +6795,60 @@ function renderVariantBody({
           <AuroraOrb x={92} y={30} size={880} />
           <div className="relative grid h-full grid-cols-[1fr_1fr] items-center gap-16">
             <div>
-              <Kicker brand={brand} color={"var(--slide-accent-text)"}>{s(c.kicker, "Three to remember")}</Kicker>
-              <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mt-6 mb-10" />
-              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={880}>{s(c.title)}</DisplayTitle>
+              <Kicker brand={brand} color={"var(--slide-accent-text)"}>
+                {s(c.kicker, "Three to remember")}
+              </Kicker>
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={120}
+                thicknessPx={2}
+                className="mt-6 mb-10"
+              />
+              <DisplayTitle size="hero" color={ink.strong} maxWidthPx={880}>
+                {s(c.title)}
+              </DisplayTitle>
             </div>
             <GlassTile radius={28} padding="px-10 py-8">
               {items.map((it, i) => {
                 const n = items.length - i;
                 return (
-                  <div key={i} className="grid items-center gap-8 py-6" style={{ gridTemplateColumns: "140px 1fr", borderTop: i === 0 ? "none" : `1px solid ${ink.hairline}` }}>
-                    <div className="tabular-nums font-semibold" style={{ fontSize: 96, lineHeight: 0.95, letterSpacing: "-0.025em", color: "var(--slide-accent-text)" }}>
+                  <div
+                    key={i}
+                    className="grid items-center gap-8 py-6"
+                    style={{
+                      gridTemplateColumns: "140px 1fr",
+                      borderTop: i === 0 ? "none" : `1px solid ${ink.hairline}`,
+                    }}
+                  >
+                    <div
+                      className="tabular-nums font-semibold"
+                      style={{
+                        fontSize: 96,
+                        lineHeight: 0.95,
+                        letterSpacing: "-0.025em",
+                        color: "var(--slide-accent-text)",
+                      }}
+                    >
                       {n}
                     </div>
                     <div>
-                      <div style={{ fontSize: 32, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.12 }}>{s(it.statement)}</div>
-                      <div className="mt-2" style={{ fontSize: 20, lineHeight: 1.42, color: ink.muted }}>{s(it.body)}</div>
+                      <div
+                        style={{
+                          fontSize: 32,
+                          fontWeight: 600,
+                          color: ink.strong,
+                          letterSpacing: "-0.02em",
+                          lineHeight: 1.12,
+                        }}
+                      >
+                        {s(it.statement)}
+                      </div>
+                      <div
+                        className="mt-2"
+                        style={{ fontSize: 20, lineHeight: 1.42, color: ink.muted }}
+                      >
+                        {s(it.body)}
+                      </div>
                     </div>
                   </div>
                 );
@@ -4389,11 +6869,50 @@ function renderVariantBody({
               const itemInk = i === 0 ? ink.strong : i === 1 ? ink.muted : ink.faint;
               const labelColor = i === 0 ? "var(--slide-accent-text)" : ink.faint;
               return (
-                <div key={i} className="grid gap-12 py-10" style={{ gridTemplateColumns: "200px 1fr", borderTop: `1px solid ${ink.hairline}`, borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none" }}>
-                  <div className="uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: labelColor, fontWeight: 600 }}>{s(it.label)}</div>
+                <div
+                  key={i}
+                  className="grid gap-12 py-10"
+                  style={{
+                    gridTemplateColumns: "200px 1fr",
+                    borderTop: `1px solid ${ink.hairline}`,
+                    borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none",
+                  }}
+                >
+                  <div
+                    className="uppercase"
+                    style={{
+                      fontSize: 20,
+                      letterSpacing: "0.28em",
+                      color: labelColor,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {s(it.label)}
+                  </div>
                   <div>
-                    <div style={{ fontSize: 44, fontWeight: 600, color: itemInk, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(it.headline)}</div>
-                    <div className="mt-3" style={{ fontSize: 22, lineHeight: 1.42, color: itemInk, opacity: 0.85, maxWidth: 1200 }}>{s(it.body)}</div>
+                    <div
+                      style={{
+                        fontSize: 44,
+                        fontWeight: 600,
+                        color: itemInk,
+                        letterSpacing: "-0.02em",
+                        lineHeight: 1.1,
+                      }}
+                    >
+                      {s(it.headline)}
+                    </div>
+                    <div
+                      className="mt-3"
+                      style={{
+                        fontSize: 22,
+                        lineHeight: 1.42,
+                        color: itemInk,
+                        opacity: 0.85,
+                        maxWidth: 1200,
+                      }}
+                    >
+                      {s(it.body)}
+                    </div>
                   </div>
                 </div>
               );
@@ -4414,19 +6933,64 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-10 grid gap-14" style={{ gridTemplateColumns: "1fr 1fr" }}>
             <div className="flex flex-col gap-10">
-              <SummaryStatCard brand={brand} label={s(primary.label)} value={s(primary.value)} unit={s(primary.unit)} series={toNums(primary.series)} />
-              <SummaryStatCard brand={brand} label={s(secondary.label)} value={s(secondary.value)} unit={s(secondary.unit)} series={toNums(secondary.series)} />
+              <SummaryStatCard
+                brand={brand}
+                label={s(primary.label)}
+                value={s(primary.value)}
+                unit={s(primary.unit)}
+                series={toNums(primary.series)}
+              />
+              <SummaryStatCard
+                brand={brand}
+                label={s(secondary.label)}
+                value={s(secondary.value)}
+                unit={s(secondary.unit)}
+                series={toNums(secondary.series)}
+              />
             </div>
             <div>
               <Kicker brand={brand}>Balance</Kicker>
               <div className="mt-8">
-                <StatFigure brand={brand} value={s(balance.value)} unit={s(balance.unit)} label={s(balance.label)} size="xl" />
+                <StatFigure
+                  brand={brand}
+                  value={s(balance.value)}
+                  unit={s(balance.unit)}
+                  label={s(balance.label)}
+                  size="xl"
+                />
               </div>
               <div className="mt-10">
                 {bItems.map((it, i) => (
-                  <div key={i} className="flex items-baseline justify-between py-5" style={{ borderTop: `1px solid ${ink.hairline}`, borderBottom: i === bItems.length - 1 ? `1px solid ${ink.hairline}` : "none" }}>
-                    <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.24em", color: "color-mix(in oklab, currentColor 60%, transparent)", fontWeight: 600 }}>{s(it.label)}</div>
-                    <div className="tabular-nums" style={{ fontSize: 32, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em" }}>{s(it.value)}</div>
+                  <div
+                    key={i}
+                    className="flex items-baseline justify-between py-5"
+                    style={{
+                      borderTop: `1px solid ${ink.hairline}`,
+                      borderBottom: i === bItems.length - 1 ? `1px solid ${ink.hairline}` : "none",
+                    }}
+                  >
+                    <div
+                      className="uppercase"
+                      style={{
+                        fontSize: 18,
+                        letterSpacing: "0.24em",
+                        color: "color-mix(in oklab, currentColor 60%, transparent)",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {s(it.label)}
+                    </div>
+                    <div
+                      className="tabular-nums"
+                      style={{
+                        fontSize: 32,
+                        fontWeight: 600,
+                        color: ink.strong,
+                        letterSpacing: "-0.02em",
+                      }}
+                    >
+                      {s(it.value)}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -4448,7 +7012,13 @@ function renderVariantBody({
             <Kicker brand={brand}>{s(c.kicker, "Portfolio")}</Kicker>
             <div
               className="mt-4"
-              style={{ fontSize: 52, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+              style={{
+                fontSize: 52,
+                fontWeight: 600,
+                color: ink.strong,
+                letterSpacing: "-0.03em",
+                lineHeight: 1.02,
+              }}
             >
               {s(c.title, variant.name)}
             </div>
@@ -4456,14 +7026,27 @@ function renderVariantBody({
           <div className="mt-14 grid gap-16" style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
             {items.map((it, i) => (
               <div key={i} className="flex flex-col items-center text-center">
-                <FreeformDonut brand={brand} percent={Number(it.value) || 0} size={280} bloom={i === 0} />
+                <FreeformDonut
+                  brand={brand}
+                  percent={Number(it.value) || 0}
+                  size={280}
+                  bloom={i === 0}
+                />
                 <div
                   className="mt-8 uppercase"
-                  style={{ fontSize: 15, letterSpacing: "0.28em", color: ink.strong, fontWeight: 700 }}
+                  style={{
+                    fontSize: 15,
+                    letterSpacing: "0.28em",
+                    color: ink.strong,
+                    fontWeight: 700,
+                  }}
                 >
                   {s(it.label)}
                 </div>
-                <div className="mt-3" style={{ fontSize: 17, lineHeight: 1.45, color: ink.muted, maxWidth: 320 }}>
+                <div
+                  className="mt-3"
+                  style={{ fontSize: 17, lineHeight: 1.45, color: ink.muted, maxWidth: 320 }}
+                >
                   {s(it.body)}
                 </div>
               </div>
@@ -4472,7 +7055,6 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
-
 
     case "MV-DASH-SALES-CHART": {
       // Free-form aurora rebuild — no panel, no card, no border around the
@@ -4489,14 +7071,26 @@ function renderVariantBody({
               <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
               <div
                 className="mt-4"
-                style={{ fontSize: 60, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+                style={{
+                  fontSize: 60,
+                  fontWeight: 600,
+                  color: ink.strong,
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1.02,
+                }}
               >
                 {s(c.title, variant.name)}
               </div>
               {s(c.headline) && (
                 <div
                   className="mt-5"
-                  style={{ fontSize: 22, color: ink.muted, letterSpacing: "-0.005em", lineHeight: 1.45, maxWidth: 680 }}
+                  style={{
+                    fontSize: 22,
+                    color: ink.muted,
+                    letterSpacing: "-0.005em",
+                    lineHeight: 1.45,
+                    maxWidth: 680,
+                  }}
                 >
                   {s(c.headline)}
                 </div>
@@ -4507,14 +7101,23 @@ function renderVariantBody({
                 <div className="flex items-baseline gap-2">
                   <span
                     className="tabular-nums font-semibold"
-                    style={{ fontSize: 104, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}
+                    style={{
+                      fontSize: 104,
+                      lineHeight: 0.9,
+                      letterSpacing: "-0.04em",
+                      color: ink.strong,
+                    }}
                   >
                     {s(stat.value)}
                   </span>
                   {s(stat.unit) && (
                     <span
                       className="font-medium"
-                      style={{ fontSize: 36, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}
+                      style={{
+                        fontSize: 36,
+                        color: "var(--slide-accent-text)",
+                        letterSpacing: "-0.02em",
+                      }}
                     >
                       {s(stat.unit)}
                     </span>
@@ -4523,7 +7126,13 @@ function renderVariantBody({
                 {s(stat.label) && (
                   <div
                     className="mt-3 uppercase"
-                    style={{ fontSize: 13, letterSpacing: "0.3em", color: ink.muted, fontWeight: 600, maxWidth: 260 }}
+                    style={{
+                      fontSize: 13,
+                      letterSpacing: "0.3em",
+                      color: ink.muted,
+                      fontWeight: 600,
+                      maxWidth: 260,
+                    }}
                   >
                     {s(stat.label)}
                   </div>
@@ -4531,7 +7140,12 @@ function renderVariantBody({
                 {s(stat.delta) && (
                   <div
                     className="mt-2 uppercase tabular-nums"
-                    style={{ fontSize: 14, letterSpacing: "0.24em", color: "var(--slide-accent-text)", fontWeight: 700 }}
+                    style={{
+                      fontSize: 14,
+                      letterSpacing: "0.24em",
+                      color: "var(--slide-accent-text)",
+                      fontWeight: 700,
+                    }}
                   >
                     ▲ {s(stat.delta)}
                   </div>
@@ -4559,7 +7173,13 @@ function renderVariantBody({
             <Kicker brand={brand}>{s(c.kicker, "Signals")}</Kicker>
             <div
               className="mt-4"
-              style={{ fontSize: 52, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+              style={{
+                fontSize: 52,
+                fontWeight: 600,
+                color: ink.strong,
+                letterSpacing: "-0.03em",
+                lineHeight: 1.02,
+              }}
             >
               {s(c.title, variant.name)}
             </div>
@@ -4567,10 +7187,21 @@ function renderVariantBody({
           <div className="mt-14 grid gap-8" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
             {items.map((it, i) => (
               <div key={i} className="flex flex-col items-center">
-                <FreeformSemiGauge brand={brand} percent={Number(it.value) || 0} size={240} bloom={i === 0} />
+                <FreeformSemiGauge
+                  brand={brand}
+                  percent={Number(it.value) || 0}
+                  size={240}
+                  bloom={i === 0}
+                />
                 <div
                   className="mt-4 uppercase text-center"
-                  style={{ fontSize: 14, letterSpacing: "0.26em", color: ink.strong, fontWeight: 700, maxWidth: 220 }}
+                  style={{
+                    fontSize: 14,
+                    letterSpacing: "0.26em",
+                    color: ink.strong,
+                    fontWeight: 700,
+                    maxWidth: 220,
+                  }}
                 >
                   {s(it.label)}
                 </div>
@@ -4589,8 +7220,6 @@ function renderVariantBody({
       );
     }
 
-
-
     case "MV-DASH-PERFORMANCE": {
       // Free-form Aurora v2 rebuild. Bars sit directly on the aurora — no
       // panel, no axis cage, no gridlines. Feathered accent gradient fill
@@ -4607,14 +7236,26 @@ function renderVariantBody({
               <Kicker brand={brand}>{s(c.kicker, "Performance")}</Kicker>
               <div
                 className="mt-4"
-                style={{ fontSize: 60, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+                style={{
+                  fontSize: 60,
+                  fontWeight: 600,
+                  color: ink.strong,
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1.02,
+                }}
               >
                 {s(c.title, variant.name)}
               </div>
               {s(c.headline) && (
                 <div
                   className="mt-5"
-                  style={{ fontSize: 22, color: ink.muted, letterSpacing: "-0.005em", lineHeight: 1.45, maxWidth: 680 }}
+                  style={{
+                    fontSize: 22,
+                    color: ink.muted,
+                    letterSpacing: "-0.005em",
+                    lineHeight: 1.45,
+                    maxWidth: 680,
+                  }}
                 >
                   {s(c.headline)}
                 </div>
@@ -4625,14 +7266,23 @@ function renderVariantBody({
                 <div className="flex items-baseline gap-2">
                   <span
                     className="tabular-nums font-semibold"
-                    style={{ fontSize: 104, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}
+                    style={{
+                      fontSize: 104,
+                      lineHeight: 0.9,
+                      letterSpacing: "-0.04em",
+                      color: ink.strong,
+                    }}
                   >
                     {s(stat.value)}
                   </span>
                   {s(stat.unit) && (
                     <span
                       className="font-medium"
-                      style={{ fontSize: 36, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}
+                      style={{
+                        fontSize: 36,
+                        color: "var(--slide-accent-text)",
+                        letterSpacing: "-0.02em",
+                      }}
                     >
                       {s(stat.unit)}
                     </span>
@@ -4641,7 +7291,13 @@ function renderVariantBody({
                 {s(stat.label) && (
                   <div
                     className="mt-3 uppercase"
-                    style={{ fontSize: 13, letterSpacing: "0.3em", color: ink.muted, fontWeight: 600, maxWidth: 260 }}
+                    style={{
+                      fontSize: 13,
+                      letterSpacing: "0.3em",
+                      color: ink.muted,
+                      fontWeight: 600,
+                      maxWidth: 260,
+                    }}
                   >
                     {s(stat.label)}
                   </div>
@@ -4672,13 +7328,25 @@ function renderVariantBody({
                           : "none",
                     }}
                   />
-                  <span style={{ fontSize: 18, color: ink.strong, fontWeight: 600, letterSpacing: "-0.005em" }}>
+                  <span
+                    style={{
+                      fontSize: 18,
+                      color: ink.strong,
+                      fontWeight: 600,
+                      letterSpacing: "-0.005em",
+                    }}
+                  >
                     {s(l.label)}
                   </span>
                   {s(l.value) && (
                     <span
                       className="tabular-nums"
-                      style={{ fontSize: 18, color: ink.faint, fontWeight: 500, letterSpacing: "-0.005em" }}
+                      style={{
+                        fontSize: 18,
+                        color: ink.faint,
+                        fontWeight: 500,
+                        letterSpacing: "-0.005em",
+                      }}
                     >
                       {s(l.value)}
                     </span>
@@ -4703,7 +7371,13 @@ function renderVariantBody({
             <Kicker brand={brand}>{s(c.kicker, "Report")}</Kicker>
             <div
               className="mt-4"
-              style={{ fontSize: 52, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+              style={{
+                fontSize: 52,
+                fontWeight: 600,
+                color: ink.strong,
+                letterSpacing: "-0.03em",
+                lineHeight: 1.02,
+              }}
             >
               {s(c.title, variant.name)}
             </div>
@@ -4716,7 +7390,6 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
-
 
     case "MV-DASH-GROWTH-COLUMNS": {
       // Free-form Aurora v2. Columns sit on a single hairline baseline that
@@ -4737,14 +7410,26 @@ function renderVariantBody({
               <Kicker brand={brand}>{s(c.kicker, "Trajectory")}</Kicker>
               <div
                 className="mt-4"
-                style={{ fontSize: 52, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+                style={{
+                  fontSize: 52,
+                  fontWeight: 600,
+                  color: ink.strong,
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1.02,
+                }}
               >
                 {s(c.title, variant.name)}
               </div>
               {s(c.headline) && (
                 <div
                   className="mt-5"
-                  style={{ fontSize: 20, color: ink.muted, letterSpacing: "-0.005em", lineHeight: 1.45, maxWidth: 680 }}
+                  style={{
+                    fontSize: 20,
+                    color: ink.muted,
+                    letterSpacing: "-0.005em",
+                    lineHeight: 1.45,
+                    maxWidth: 680,
+                  }}
                 >
                   {s(c.headline)}
                 </div>
@@ -4776,13 +7461,25 @@ function renderVariantBody({
                     color-mix(in oklab, var(--slide-accent-text) 4%, transparent) 80%,
                     color-mix(in oklab, var(--slide-accent-text) 0%, transparent) 100%)`;
               return (
-                <div key={i} className="flex flex-col items-center justify-end" style={{ position: "relative" }}>
+                <div
+                  key={i}
+                  className="flex flex-col items-center justify-end"
+                  style={{ position: "relative" }}
+                >
                   <div
                     className="tabular-nums"
-                    style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.025em", lineHeight: 1 }}
+                    style={{
+                      fontSize: 44,
+                      fontWeight: 600,
+                      color: ink.strong,
+                      letterSpacing: "-0.025em",
+                      lineHeight: 1,
+                    }}
                   >
                     {s(it.value)}
-                    <span style={{ fontSize: 22, color: "var(--slide-accent-text)", marginLeft: 4 }}>
+                    <span
+                      style={{ fontSize: 22, color: "var(--slide-accent-text)", marginLeft: 4 }}
+                    >
                       {s(it.unit)}
                     </span>
                   </div>
@@ -4832,7 +7529,8 @@ function renderVariantBody({
                           top: 0,
                           height: 2,
                           background: "var(--slide-accent-text)",
-                          boxShadow: "0 0 14px 2px color-mix(in oklab, var(--slide-accent-text) 55%, transparent)",
+                          boxShadow:
+                            "0 0 14px 2px color-mix(in oklab, var(--slide-accent-text) 55%, transparent)",
                         }}
                       />
                     )}
@@ -4878,7 +7576,13 @@ function renderVariantBody({
             <Kicker brand={brand}>{s(c.kicker, "Breakdown")}</Kicker>
             <div
               className="mt-4"
-              style={{ fontSize: 52, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02 }}
+              style={{
+                fontSize: 52,
+                fontWeight: 600,
+                color: ink.strong,
+                letterSpacing: "-0.03em",
+                lineHeight: 1.02,
+              }}
             >
               {s(c.title, variant.name)}
             </div>
@@ -4911,8 +7615,6 @@ function renderVariantBody({
       );
     }
 
-
-
     case "MV-DASH-REGION-STATS": {
       const stat = obj(c.stat);
       const items = arr(c.items).slice(0, 6);
@@ -4921,7 +7623,13 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-10 grid gap-16" style={{ gridTemplateColumns: "1fr 1.2fr" }}>
             <div className="flex min-w-0 flex-col justify-center">
-              <StatFigure brand={brand} value={s(stat.value)} unit={s(stat.unit)} label={s(stat.label)} size="xl" />
+              <StatFigure
+                brand={brand}
+                value={s(stat.value)}
+                unit={s(stat.unit)}
+                label={s(stat.label)}
+                size="xl"
+              />
             </div>
             <div>
               {items.map((it, i) => {
@@ -4929,12 +7637,33 @@ function renderVariantBody({
                 const delta = s(it.delta);
                 const negative = delta.trim().startsWith("-");
                 return (
-                  <div key={i} className="py-5" style={{ borderTop: `1px solid ${ink.hairline}`, borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none" }}>
+                  <div
+                    key={i}
+                    className="py-5"
+                    style={{
+                      borderTop: `1px solid ${ink.hairline}`,
+                      borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none",
+                    }}
+                  >
                     <div className="flex items-baseline justify-between">
-                      <div style={{ fontSize: 26, fontWeight: 600, color: ink.strong }}>{s(it.label)}</div>
-                      <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.24em", fontWeight: 600, color: negative ? "#B42318" : "var(--slide-accent-text)" }}>{delta}</div>
+                      <div style={{ fontSize: 26, fontWeight: 600, color: ink.strong }}>
+                        {s(it.label)}
+                      </div>
+                      <div
+                        className="uppercase"
+                        style={{
+                          fontSize: 16,
+                          letterSpacing: "0.24em",
+                          fontWeight: 600,
+                          color: negative ? "#B42318" : "var(--slide-accent-text)",
+                        }}
+                      >
+                        {delta}
+                      </div>
                     </div>
-                    <div className="mt-3"><ProgressBar brand={brand} percent={pct} /></div>
+                    <div className="mt-3">
+                      <ProgressBar brand={brand} percent={pct} />
+                    </div>
                   </div>
                 );
               })}
@@ -4955,20 +7684,62 @@ function renderVariantBody({
           <div className="mt-10 grid gap-14" style={{ gridTemplateColumns: "1fr 2.4fr" }}>
             <div>
               <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
-              <div className="mt-6" style={{ fontSize: 38, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.1 }}>{s(c.headline)}</div>
+              <div
+                className="mt-6"
+                style={{
+                  fontSize: 38,
+                  fontWeight: 600,
+                  color: ink.strong,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.1,
+                }}
+              >
+                {s(c.headline)}
+              </div>
             </div>
-            <div className="grid items-end gap-4" style={{ gridTemplateColumns: `repeat(${items.length || 1}, 1fr)`, minHeight: 520 }}>
+            <div
+              className="grid items-end gap-4"
+              style={{ gridTemplateColumns: `repeat(${items.length || 1}, 1fr)`, minHeight: 520 }}
+            >
               {items.map((it, i) => {
                 const v = Number(it.value) || 0;
                 const h = Math.max(20, (v / max) * 420);
                 const isLast = i === items.length - 1;
                 return (
                   <div key={i} className="flex flex-col items-center justify-end">
-                    <div className="tabular-nums" style={{ fontSize: isLast ? 26 : 18, fontWeight: 600, color: isLast ? ink.strong : ink.muted, letterSpacing: "-0.02em" }}>
-                      {s(it.value)}<span style={{ fontSize: isLast ? 14 : 11, color: ink.faint, marginLeft: 2 }}>{s(it.unit)}</span>
+                    <div
+                      className="tabular-nums"
+                      style={{
+                        fontSize: isLast ? 26 : 18,
+                        fontWeight: 600,
+                        color: isLast ? ink.strong : ink.muted,
+                        letterSpacing: "-0.02em",
+                      }}
+                    >
+                      {s(it.value)}
+                      <span style={{ fontSize: isLast ? 14 : 11, color: ink.faint, marginLeft: 2 }}>
+                        {s(it.unit)}
+                      </span>
                     </div>
-                    <div className="mt-3 w-full" style={{ height: h, background: isLast ? "var(--slide-accent-text)" : ink.surface, maxWidth: 90 }} />
-                    <div className="mt-3 uppercase tabular-nums" style={{ fontSize: 12, letterSpacing: "0.22em", color: ink.faint, fontWeight: 600 }}>{s(it.year)}</div>
+                    <div
+                      className="mt-3 w-full"
+                      style={{
+                        height: h,
+                        background: isLast ? "var(--slide-accent-text)" : ink.surface,
+                        maxWidth: 90,
+                      }}
+                    />
+                    <div
+                      className="mt-3 uppercase tabular-nums"
+                      style={{
+                        fontSize: 12,
+                        letterSpacing: "0.22em",
+                        color: ink.faint,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {s(it.year)}
+                    </div>
                   </div>
                 );
               })}
@@ -4986,12 +7757,28 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className="mt-16">
-            <AxisBarChart brand={brand} bars={bars} height={520} highlight={highlight} unit={s(c.unit)} />
+            <AxisBarChart
+              brand={brand}
+              bars={bars}
+              height={520}
+              highlight={highlight}
+              unit={s(c.unit)}
+            />
           </div>
           {s(c.legend) && (
             <div className="mt-6 flex items-center gap-4">
               <div style={{ width: 14, height: 14, background: brand.tokens.accent }} />
-              <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.24em", color: "color-mix(in oklab, currentColor 65%, transparent)", fontWeight: 600 }}>{s(c.legend)}</div>
+              <div
+                className="uppercase"
+                style={{
+                  fontSize: 16,
+                  letterSpacing: "0.24em",
+                  color: "color-mix(in oklab, currentColor 65%, transparent)",
+                  fontWeight: 600,
+                }}
+              >
+                {s(c.legend)}
+              </div>
             </div>
           )}
         </SlideFrame>
@@ -4999,7 +7786,11 @@ function renderVariantBody({
     }
 
     case "MV-GRAPH-CATEGORY-BARS": {
-      const items = arr(c.items).map((it) => ({ label: s(it.label), value: Number(it.value) || 0, unit: s(it.unit) }));
+      const items = arr(c.items).map((it) => ({
+        label: s(it.label),
+        value: Number(it.value) || 0,
+        unit: s(it.unit),
+      }));
       const max = Math.max(1, ...items.map((it) => it.value));
       const stat = obj(c.stat);
       return (
@@ -5011,22 +7802,67 @@ function renderVariantBody({
                 const pct = (it.value / max) * 100;
                 const isTop = i === 0;
                 return (
-                  <div key={i} className="py-5" style={{ borderTop: i === 0 ? `2px solid ${brand.tokens.accent}` : `1px solid ${ink.hairline}`, borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none" }}>
+                  <div
+                    key={i}
+                    className="py-5"
+                    style={{
+                      borderTop:
+                        i === 0 ? `2px solid ${brand.tokens.accent}` : `1px solid ${ink.hairline}`,
+                      borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none",
+                    }}
+                  >
                     <div className="flex items-baseline justify-between mb-3">
-                      <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.24em", color: ink.strong, fontWeight: 600 }}>{it.label}</div>
-                      <div className="tabular-nums" style={{ fontSize: 28, fontWeight: 600, color: ink.strong }}>
-                        {it.value}<span style={{ fontSize: 16, color: "var(--slide-accent-text)", marginLeft: 4 }}>{it.unit}</span>
+                      <div
+                        className="uppercase"
+                        style={{
+                          fontSize: 18,
+                          letterSpacing: "0.24em",
+                          color: ink.strong,
+                          fontWeight: 600,
+                        }}
+                      >
+                        {it.label}
+                      </div>
+                      <div
+                        className="tabular-nums"
+                        style={{ fontSize: 28, fontWeight: 600, color: ink.strong }}
+                      >
+                        {it.value}
+                        <span
+                          style={{ fontSize: 16, color: "var(--slide-accent-text)", marginLeft: 4 }}
+                        >
+                          {it.unit}
+                        </span>
                       </div>
                     </div>
                     <div style={{ position: "relative", height: 4, background: ink.surface }}>
-                      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${pct}%`, background: isTop ? "var(--slide-accent-text)" : ink.strong, opacity: isTop ? 1 : 0.55 }} />
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          height: "100%",
+                          width: `${pct}%`,
+                          background: isTop ? "var(--slide-accent-text)" : ink.strong,
+                          opacity: isTop ? 1 : 0.55,
+                        }}
+                      />
                     </div>
                   </div>
                 );
               })}
             </div>
-            <div className="flex flex-col justify-center pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-              <StatFigure brand={brand} value={s(stat.value)} unit={s(stat.unit)} label={s(stat.label)} size="xl" />
+            <div
+              className="flex flex-col justify-center pt-8"
+              style={{ borderTop: `2px solid ${brand.tokens.accent}` }}
+            >
+              <StatFigure
+                brand={brand}
+                value={s(stat.value)}
+                unit={s(stat.unit)}
+                label={s(stat.label)}
+                size="xl"
+              />
             </div>
           </div>
         </SlideFrame>
@@ -5048,11 +7884,16 @@ function renderVariantBody({
     }
 
     case "MV-GRAPH-RINGS": {
-      const items = arr(c.items).slice(0, 4).map((it) => ({ label: s(it.label), value: Number(it.value) || 0, body: s(it.body) }));
+      const items = arr(c.items)
+        .slice(0, 4)
+        .map((it) => ({ label: s(it.label), value: Number(it.value) || 0, body: s(it.body) }));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-10 grid gap-16 items-center" style={{ gridTemplateColumns: "1fr 1fr" }}>
+          <div
+            className="mt-10 grid gap-16 items-center"
+            style={{ gridTemplateColumns: "1fr 1fr" }}
+          >
             <div className="flex items-center justify-center">
               <ConcentricRings brand={brand} items={items} size={520} />
             </div>
@@ -5061,14 +7902,43 @@ function renderVariantBody({
                 const color = i === 0 ? brand.tokens.accent : brand.tokens.primary;
                 const opacity = i === 0 ? 1 : 0.35 + (1 - i / items.length) * 0.5;
                 return (
-                  <div key={i} className="py-4 flex items-start gap-5" style={{ borderTop: `1px solid ${ink.hairline}`, borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none" }}>
-                    <div style={{ width: 16, height: 16, background: color, opacity, marginTop: 8 }} />
+                  <div
+                    key={i}
+                    className="py-4 flex items-start gap-5"
+                    style={{
+                      borderTop: `1px solid ${ink.hairline}`,
+                      borderBottom: i === items.length - 1 ? `1px solid ${ink.hairline}` : "none",
+                    }}
+                  >
+                    <div
+                      style={{ width: 16, height: 16, background: color, opacity, marginTop: 8 }}
+                    />
                     <div style={{ flex: 1 }}>
                       <div className="flex items-baseline justify-between">
-                        <div style={{ fontSize: 22, fontWeight: 600, color: ink.strong }}>{it.label}</div>
-                        <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: "var(--slide-accent-text)" }}>{it.value}%</div>
+                        <div style={{ fontSize: 22, fontWeight: 600, color: ink.strong }}>
+                          {it.label}
+                        </div>
+                        <div
+                          className="tabular-nums"
+                          style={{
+                            fontSize: 22,
+                            fontWeight: 600,
+                            color: "var(--slide-accent-text)",
+                          }}
+                        >
+                          {it.value}%
+                        </div>
                       </div>
-                      <div className="mt-2" style={{ fontSize: 16, color: "color-mix(in oklab, currentColor 65%, transparent)", lineHeight: 1.4 }}>{it.body}</div>
+                      <div
+                        className="mt-2"
+                        style={{
+                          fontSize: 16,
+                          color: "color-mix(in oklab, currentColor 65%, transparent)",
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {it.body}
+                      </div>
                     </div>
                   </div>
                 );
@@ -5090,15 +7960,49 @@ function renderVariantBody({
               const total = Math.max(1, Number(it.total) || 100);
               const pct = Math.min(100, Math.round((done / total) * 100));
               return (
-                <div key={i} className="pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
-                  <div className="uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: "color-mix(in oklab, currentColor 60%, transparent)", fontWeight: 600 }}>{s(it.label)}</div>
+                <div
+                  key={i}
+                  className="pt-8"
+                  style={{ borderTop: `2px solid ${brand.tokens.accent}` }}
+                >
+                  <div
+                    className="uppercase"
+                    style={{
+                      fontSize: 16,
+                      letterSpacing: "0.28em",
+                      color: "color-mix(in oklab, currentColor 60%, transparent)",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {s(it.label)}
+                  </div>
                   <div className="mt-6 flex items-baseline gap-3">
-                    <div className="tabular-nums" style={{ fontSize: 88, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1 }}>{pct}%</div>
+                    <div
+                      className="tabular-nums"
+                      style={{
+                        fontSize: 88,
+                        fontWeight: 600,
+                        color: ink.strong,
+                        letterSpacing: "-0.03em",
+                        lineHeight: 1,
+                      }}
+                    >
+                      {pct}%
+                    </div>
                     <div style={{ fontSize: 20, color: ink.faint }}>of 100%</div>
                   </div>
-                  <div className="mt-4 tabular-nums" style={{ fontSize: 16, color: ink.faint }}>{done.toLocaleString()} / {total.toLocaleString()}</div>
-                  <div className="mt-6"><ProgressBar brand={brand} percent={pct} /></div>
-                  <div className="mt-6" style={{ fontSize: 18, color: ink.muted, lineHeight: 1.45 }}>{s(it.body)}</div>
+                  <div className="mt-4 tabular-nums" style={{ fontSize: 16, color: ink.faint }}>
+                    {done.toLocaleString()} / {total.toLocaleString()}
+                  </div>
+                  <div className="mt-6">
+                    <ProgressBar brand={brand} percent={pct} />
+                  </div>
+                  <div
+                    className="mt-6"
+                    style={{ fontSize: 18, color: ink.muted, lineHeight: 1.45 }}
+                  >
+                    {s(it.body)}
+                  </div>
                 </div>
               );
             })}
@@ -5114,10 +8018,28 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="mb-6 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
             <Kicker brand={brand}>{s(c.kicker, "Trajectory")}</Kicker>
-            <div className="mt-4" style={{ fontSize: 44, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
+            <div
+              className="mt-4"
+              style={{
+                fontSize: 44,
+                fontWeight: 600,
+                color: ink.strong,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.15,
+                maxWidth: 1500,
+              }}
+            >
+              {s(c.headline, s(c.title))}
+            </div>
           </div>
           <div className="mt-12">
-            <DecadeAreaChart brand={brand} series={series} height={520} calloutLabel={s(callout.year)} calloutNote={s(callout.note)} />
+            <DecadeAreaChart
+              brand={brand}
+              series={series}
+              height={520}
+              calloutLabel={s(callout.year)}
+              calloutNote={s(callout.note)}
+            />
           </div>
         </SlideFrame>
       );
@@ -5135,23 +8057,81 @@ function renderVariantBody({
               return (
                 <div key={i} className="py-7">
                   <div className="flex items-baseline justify-between gap-8 mb-4">
-                    <div style={{ fontSize: 24, fontWeight: 600, color: ink.strong, letterSpacing: "-0.01em" }}>{s(it.label)}</div>
+                    <div
+                      style={{
+                        fontSize: 24,
+                        fontWeight: 600,
+                        color: ink.strong,
+                        letterSpacing: "-0.01em",
+                      }}
+                    >
+                      {s(it.label)}
+                    </div>
                     <div className="flex items-baseline gap-10">
-                      <div className="tabular-nums" style={{ fontSize: 44, fontWeight: 600, color: "var(--slide-accent-text)", letterSpacing: "-0.025em" }}>{cur}%</div>
-                      <div className="tabular-nums" style={{ fontSize: 26, fontWeight: 500, color: ink.faint }}>{bench}%</div>
+                      <div
+                        className="tabular-nums"
+                        style={{
+                          fontSize: 44,
+                          fontWeight: 600,
+                          color: "var(--slide-accent-text)",
+                          letterSpacing: "-0.025em",
+                        }}
+                      >
+                        {cur}%
+                      </div>
+                      <div
+                        className="tabular-nums"
+                        style={{ fontSize: 26, fontWeight: 500, color: ink.faint }}
+                      >
+                        {bench}%
+                      </div>
                     </div>
                   </div>
                   <div className="flex flex-col gap-2.5">
                     <div style={{ position: "relative", height: 6 }}>
-                      <div style={{ position: "absolute", inset: 0, background: `color-mix(in oklab, ${brand.tokens.accent} 10%, transparent)` }} />
-                      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${cur}%`, background: `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.accent} 55%, transparent), ${brand.tokens.accent})` }} />
+                      <div
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          background: `color-mix(in oklab, ${brand.tokens.accent} 10%, transparent)`,
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          height: "100%",
+                          width: `${cur}%`,
+                          background: `linear-gradient(90deg, color-mix(in oklab, ${brand.tokens.accent} 55%, transparent), ${brand.tokens.accent})`,
+                        }}
+                      />
                     </div>
                     <div style={{ position: "relative", height: 3 }}>
-                      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${bench}%`, background: `color-mix(in oklab, ${brand.tokens.primary} 35%, transparent)` }} />
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          height: "100%",
+                          width: `${bench}%`,
+                          background: `color-mix(in oklab, ${brand.tokens.primary} 35%, transparent)`,
+                        }}
+                      />
                     </div>
                   </div>
                   {s(it.range) && (
-                    <div className="mt-3 uppercase" style={{ fontSize: 14, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}>{s(it.range)}</div>
+                    <div
+                      className="mt-3 uppercase"
+                      style={{
+                        fontSize: 14,
+                        letterSpacing: "0.24em",
+                        color: ink.faint,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {s(it.range)}
+                    </div>
                   )}
                 </div>
               );
@@ -5162,61 +8142,141 @@ function renderVariantBody({
     }
 
     case "MV-GRAPH-LINE-MULTI": {
-      const series = arr(c.series).slice(0, 3).map((p) => ({ label: s(p.label), points: arr(p.points).map((v: unknown) => Number(v) || 0) }));
+      const series = arr(c.series)
+        .slice(0, 3)
+        .map((p) => ({
+          label: s(p.label),
+          points: arr(p.points).map((v: unknown) => Number(v) || 0),
+        }));
       const xLabels = arr(obj(c.axis).x).map((v: unknown) => String(v));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="mb-6 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
             <Kicker brand={brand}>{s(c.kicker, "Trend")}</Kicker>
-            <div className="mt-4" style={{ fontSize: 42, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
+            <div
+              className="mt-4"
+              style={{
+                fontSize: 42,
+                fontWeight: 600,
+                color: ink.strong,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.15,
+                maxWidth: 1500,
+              }}
+            >
+              {s(c.headline, s(c.title))}
+            </div>
           </div>
-          <div className="mt-12"><LineMultiChart brand={brand} series={series} xLabels={xLabels} unit={s(c.unit, "%")} height={500} /></div>
+          <div className="mt-12">
+            <LineMultiChart
+              brand={brand}
+              series={series}
+              xLabels={xLabels}
+              unit={s(c.unit, "%")}
+              height={500}
+            />
+          </div>
         </SlideFrame>
       );
     }
 
     case "MV-GRAPH-STACKED-BAR": {
       const segments = arr(c.segments).map((sg) => ({ label: s(sg.label) }));
-      const columns = arr(c.columns).map((col) => ({ label: s(col.label), values: arr(col.values).map((v: unknown) => Number(v) || 0) }));
+      const columns = arr(c.columns).map((col) => ({
+        label: s(col.label),
+        values: arr(col.values).map((v: unknown) => Number(v) || 0),
+      }));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14"><StackedBarChart brand={brand} segments={segments} columns={columns} unit={s(c.unit)} height={520} /></div>
+          <div className="mt-14">
+            <StackedBarChart
+              brand={brand}
+              segments={segments}
+              columns={columns}
+              unit={s(c.unit)}
+              height={520}
+            />
+          </div>
         </SlideFrame>
       );
     }
 
     case "MV-GRAPH-AREA-STACK": {
-      const series = arr(c.series).slice(0, 4).map((p) => ({ label: s(p.label), points: arr(p.points).map((v: unknown) => Number(v) || 0) }));
+      const series = arr(c.series)
+        .slice(0, 4)
+        .map((p) => ({
+          label: s(p.label),
+          points: arr(p.points).map((v: unknown) => Number(v) || 0),
+        }));
       const xLabels = arr(obj(c.axis).x).map((v: unknown) => String(v));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="mb-6 pt-8" style={{ borderTop: `2px solid ${brand.tokens.accent}` }}>
             <Kicker brand={brand}>{s(c.kicker, "Composition")}</Kicker>
-            <div className="mt-4" style={{ fontSize: 42, fontWeight: 600, color: ink.strong, letterSpacing: "-0.02em", lineHeight: 1.15, maxWidth: 1500 }}>{s(c.headline, s(c.title))}</div>
+            <div
+              className="mt-4"
+              style={{
+                fontSize: 42,
+                fontWeight: 600,
+                color: ink.strong,
+                letterSpacing: "-0.02em",
+                lineHeight: 1.15,
+                maxWidth: 1500,
+              }}
+            >
+              {s(c.headline, s(c.title))}
+            </div>
           </div>
-          <div className="mt-12"><StackedAreaChart brand={brand} series={series} xLabels={xLabels} unit={s(c.unit)} height={500} /></div>
+          <div className="mt-12">
+            <StackedAreaChart
+              brand={brand}
+              series={series}
+              xLabels={xLabels}
+              unit={s(c.unit)}
+              height={500}
+            />
+          </div>
         </SlideFrame>
       );
     }
 
     case "MV-GRAPH-WATERFALL": {
-      const steps = arr(c.steps).map((st) => ({ label: s(st.label), value: Number(st.value) || 0, kind: s(st.kind, "up") as "start" | "up" | "down" | "end" }));
+      const steps = arr(c.steps).map((st) => ({
+        label: s(st.label),
+        value: Number(st.value) || 0,
+        kind: s(st.kind, "up") as "start" | "up" | "down" | "end",
+      }));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14"><WaterfallChart brand={brand} steps={steps} unit={s(c.unit)} height={540} /></div>
+          <div className="mt-14">
+            <WaterfallChart brand={brand} steps={steps} unit={s(c.unit)} height={540} />
+          </div>
         </SlideFrame>
       );
     }
 
     case "MV-GRAPH-BUBBLE": {
       const axis = obj(c.axis);
-      const items = arr(c.items).map((it) => ({ label: s(it.label), x: Number(it.x) || 0, y: Number(it.y) || 0, size: Number(it.size) || 20 }));
+      const items = arr(c.items).map((it) => ({
+        label: s(it.label),
+        x: Number(it.x) || 0,
+        y: Number(it.y) || 0,
+        size: Number(it.size) || 20,
+      }));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14"><BubbleChart brand={brand} items={items} axisX={s(axis.x, "X")} axisY={s(axis.y, "Y")} height={560} /></div>
+          <div className="mt-14">
+            <BubbleChart
+              brand={brand}
+              items={items}
+              axisX={s(axis.x, "X")}
+              axisY={s(axis.y, "Y")}
+              height={560}
+            />
+          </div>
         </SlideFrame>
       );
     }
@@ -5224,22 +8284,39 @@ function renderVariantBody({
     case "MV-GRAPH-HEATMAP": {
       const rows = arr(c.rows).map((v: unknown) => String(v));
       const cols = arr(c.columns).map((v: unknown) => String(v));
-      const cells = arr(c.cells).map((row: unknown) => arr(row).map((v: unknown) => Number(v) || 0));
+      const cells = arr(c.cells).map((row: unknown) =>
+        arr(row).map((v: unknown) => Number(v) || 0),
+      );
       const scale = obj(c.scale);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14"><HeatmapChart brand={brand} rows={rows} cols={cols} cells={cells} min={Number(scale.min) || 0} max={Number(scale.max) || 100} /></div>
+          <div className="mt-14">
+            <HeatmapChart
+              brand={brand}
+              rows={rows}
+              cols={cols}
+              cells={cells}
+              min={Number(scale.min) || 0}
+              max={Number(scale.max) || 100}
+            />
+          </div>
         </SlideFrame>
       );
     }
 
     case "MV-GRAPH-TREEMAP": {
-      const items = arr(c.items).map((it) => ({ label: s(it.label), value: Number(it.value) || 0, meta: s(it.meta) }));
+      const items = arr(c.items).map((it) => ({
+        label: s(it.label),
+        value: Number(it.value) || 0,
+        meta: s(it.meta),
+      }));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-10"><Treemap brand={brand} items={items} height={560} /></div>
+          <div className="mt-10">
+            <Treemap brand={brand} items={items} height={560} />
+          </div>
         </SlideFrame>
       );
     }
@@ -5247,11 +8324,25 @@ function renderVariantBody({
     case "MV-GRAPH-COMBO": {
       const bars = obj(c.bars);
       const line = obj(c.line);
-      const points = arr(c.points).map((p) => ({ label: s(p.label), bar: Number(p.bar) || 0, line: Number(p.line) || 0 }));
+      const points = arr(c.points).map((p) => ({
+        label: s(p.label),
+        bar: Number(p.bar) || 0,
+        line: Number(p.line) || 0,
+      }));
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="mt-14"><ComboChart brand={brand} points={points} barLabel={s(bars.label, "Volume")} barUnit={s(bars.unit)} lineLabel={s(line.label, "Rate")} lineUnit={s(line.unit, "%")} height={540} /></div>
+          <div className="mt-14">
+            <ComboChart
+              brand={brand}
+              points={points}
+              barLabel={s(bars.label, "Volume")}
+              barUnit={s(bars.unit)}
+              lineLabel={s(line.label, "Rate")}
+              lineUnit={s(line.unit, "%")}
+              height={540}
+            />
+          </div>
         </SlideFrame>
       );
     }
@@ -5262,13 +8353,28 @@ function renderVariantBody({
       const _size = _len > 70 ? "title" : _len > 40 ? "section" : "cover";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.title, "editorial-bleed"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile
+            brand={brand}
+            seed={s(c.mediaSeed, s(c.title, "editorial-bleed"))}
+            overrideUrl={s(c.mediaUrl)}
+            mediaPath={s(c.mediaPath)}
+            className="absolute inset-0 h-full w-full rounded-none"
+          />
           <HeroScrim brand={brand} anchor="bottom" />
           <div className="absolute inset-x-24 top-24 flex items-start">
-            {s(c.kicker) && <Kicker brand={brand} tracking="0.36em">{s(c.kicker)}</Kicker>}
+            {s(c.kicker) && (
+              <Kicker brand={brand} tracking="0.36em">
+                {s(c.kicker)}
+              </Kicker>
+            )}
           </div>
           <div className="absolute inset-x-24 bottom-24 flex flex-col text-white">
-            <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mb-8" />
+            <Hairline
+              color={"var(--slide-accent-text)"}
+              widthPx={120}
+              thicknessPx={2}
+              className="mb-8"
+            />
             <DisplayTitle size={_size} color={ink.strong} maxWidthPx={1620}>
               {s(c.title, "One line. Say it well.")}
             </DisplayTitle>
@@ -5286,34 +8392,58 @@ function renderVariantBody({
       // Two soft aurora orbs behind minimal type. Tokens are palette-locked.
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <div className="absolute inset-0 overflow-hidden" style={{ background: brand.tokens.primary }}>
+          <div
+            className="absolute inset-0 overflow-hidden"
+            style={{ background: brand.tokens.primary }}
+          >
             <div
               aria-hidden
               className="absolute"
               style={{
-                width: 1100, height: 1100, left: -220, top: -260, borderRadius: "50%",
+                width: 1100,
+                height: 1100,
+                left: -220,
+                top: -260,
+                borderRadius: "50%",
                 background: `radial-gradient(circle at 30% 30%, ${brand.tokens.accent}CC 0%, ${brand.tokens.accent}00 60%)`,
-                filter: "blur(60px)", opacity: 0.85,
+                filter: "blur(60px)",
+                opacity: 0.85,
               }}
             />
             <div
               aria-hidden
               className="absolute"
               style={{
-                width: 900, height: 900, right: -180, bottom: -220, borderRadius: "50%",
+                width: 900,
+                height: 900,
+                right: -180,
+                bottom: -220,
+                borderRadius: "50%",
                 background: `radial-gradient(circle at 60% 40%, ${brand.tokens.accent}80 0%, ${brand.tokens.accent}00 60%)`,
-                filter: "blur(80px)", opacity: 0.75,
+                filter: "blur(80px)",
+                opacity: 0.75,
               }}
             />
             <div
               aria-hidden
               className="absolute inset-0"
-              style={{ background: `linear-gradient(180deg, ${brand.tokens.primary}00 0%, ${brand.tokens.primary}66 100%)` }}
+              style={{
+                background: `linear-gradient(180deg, ${brand.tokens.primary}00 0%, ${brand.tokens.primary}66 100%)`,
+              }}
             />
           </div>
           <div className="relative flex h-full flex-col justify-center">
-            {s(c.kicker) && <Kicker brand={brand} tracking="0.36em">{s(c.kicker)}</Kicker>}
-            <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mt-8" />
+            {s(c.kicker) && (
+              <Kicker brand={brand} tracking="0.36em">
+                {s(c.kicker)}
+              </Kicker>
+            )}
+            <Hairline
+              color={"var(--slide-accent-text)"}
+              widthPx={120}
+              thicknessPx={2}
+              className="mt-8"
+            />
             <DisplayTitle size="hero" color={ink.strong} maxWidthPx={1620} className="mt-10">
               {s(c.title, "Signal through the noise.")}
             </DisplayTitle>
@@ -5345,8 +8475,17 @@ function renderVariantBody({
               {numeral}
             </div>
             <div className="flex flex-col">
-              {s(c.kicker) && <Kicker brand={brand} tracking="0.36em">{s(c.kicker, "Chapter")}</Kicker>}
-              <Hairline color={"var(--slide-accent-text)"} widthPx={120} thicknessPx={2} className="mt-8" />
+              {s(c.kicker) && (
+                <Kicker brand={brand} tracking="0.36em">
+                  {s(c.kicker, "Chapter")}
+                </Kicker>
+              )}
+              <Hairline
+                color={"var(--slide-accent-text)"}
+                widthPx={120}
+                thicknessPx={2}
+                className="mt-8"
+              />
               <DisplayTitle size="section" color={ink.strong} maxWidthPx={1080} className="mt-8">
                 {s(c.title, "New chapter")}
               </DisplayTitle>
@@ -5394,7 +8533,13 @@ function renderVariantBody({
     case "MV-ED-STAT-PHOTO": {
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.label, "stat-photo"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile
+            brand={brand}
+            seed={s(c.mediaSeed, s(c.label, "stat-photo"))}
+            overrideUrl={s(c.mediaUrl)}
+            mediaPath={s(c.mediaPath)}
+            className="absolute inset-0 h-full w-full rounded-none"
+          />
           <HeroScrim brand={brand} anchor="bottom" />
           <div className="absolute inset-x-24 bottom-24 flex items-end justify-between gap-16 text-white">
             <div className="flex-shrink-0">
@@ -5411,7 +8556,10 @@ function renderVariantBody({
                 <span style={{ fontSize: 130, marginLeft: 8 }}>{s(c.unit, "%")}</span>
               </div>
               {s(c.label) && (
-                <div className="mt-4 uppercase" style={{ fontSize: 24, letterSpacing: "0.28em", opacity: 0.85 }}>
+                <div
+                  className="mt-4 uppercase"
+                  style={{ fontSize: 24, letterSpacing: "0.28em", opacity: 0.85 }}
+                >
                   {s(c.label)}
                 </div>
               )}
@@ -5427,10 +8575,19 @@ function renderVariantBody({
     }
 
     case "MV-ED-QUOTE-BLEED": {
-      const quote = s(c.quote, "The best interfaces get out of the way.").replace(/^["'“”]|["'“”]$/g, "");
+      const quote = s(c.quote, "The best interfaces get out of the way.").replace(
+        /^["'“”]|["'“”]$/g,
+        "",
+      );
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
-          <MediaTile brand={brand} seed={s(c.mediaSeed, s(c.attribution, "quote-bleed"))} overrideUrl={s(c.mediaUrl)} mediaPath={s(c.mediaPath)} className="absolute inset-0 h-full w-full rounded-none" />
+          <MediaTile
+            brand={brand}
+            seed={s(c.mediaSeed, s(c.attribution, "quote-bleed"))}
+            overrideUrl={s(c.mediaUrl)}
+            mediaPath={s(c.mediaPath)}
+            className="absolute inset-0 h-full w-full rounded-none"
+          />
           <div
             aria-hidden
             className="absolute inset-0"
@@ -5453,7 +8610,11 @@ function renderVariantBody({
               {quote}
             </div>
             <div className="mt-12">
-              <Attribution brand={brand} name={s(c.attribution, "Attributed source")} role={s(c.role) || undefined} />
+              <Attribution
+                brand={brand}
+                name={s(c.attribution, "Attributed source")}
+                role={s(c.role) || undefined}
+              />
             </div>
           </div>
         </SlideFrame>
@@ -5469,11 +8630,6 @@ function renderVariantBody({
     }
 
     default:
-
-
-
-
-
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
@@ -5505,11 +8661,15 @@ function coercePin(raw: Record<string, unknown>, i: number): LocPin | null {
   const validRegion = ["AMER", "EMEA", "APAC", "LATAM", "MEA"].includes(region)
     ? (region as LocPin["region"])
     : lon < -30
-      ? (lat > 15 ? "AMER" : "LATAM")
+      ? lat > 15
+        ? "AMER"
+        : "LATAM"
       : lon < 60
-        ? (lat < 12 ? "MEA" : "EMEA")
+        ? lat < 12
+          ? "MEA"
+          : "EMEA"
         : "APAC";
-  const role = (raw.role as string) as LocPin["role"] | undefined;
+  const role = raw.role as string as LocPin["role"] | undefined;
   let values: Record<string, number> | undefined;
   if (raw.values && typeof raw.values === "object") {
     values = {};
@@ -5591,7 +8751,9 @@ function readRegionMetrics(c: Record<string, unknown>): RegionMetricRow[] {
   return out;
 }
 
-function readHeroStat(c: Record<string, unknown>): { value: string; unit?: string; label?: string } | null {
+function readHeroStat(
+  c: Record<string, unknown>,
+): { value: string; unit?: string; label?: string } | null {
   const stat = c.stat;
   if (!stat || typeof stat !== "object") return null;
   const rec = stat as Record<string, unknown>;
@@ -5614,9 +8776,8 @@ function renderLocationsVariant(
 ): React.ReactElement {
   const seeded = locGetDivisionSet(brand.id);
   const rawItems = Array.isArray(c.items) ? (c.items as Record<string, unknown>[]) : [];
-  const pins: LocPin[] = rawItems.length > 0
-    ? rawItems.map(coercePin).filter((x): x is LocPin => !!x)
-    : seeded.pins;
+  const pins: LocPin[] =
+    rawItems.length > 0 ? rawItems.map(coercePin).filter((x): x is LocPin => !!x) : seeded.pins;
 
   const title = (c.title as string) || seeded.headline;
   const subtitle = (c.subtitle as string) || seeded.subhead || "";
@@ -5627,7 +8788,9 @@ function renderLocationsVariant(
   const isDark = mode === "dark";
   const counts = locRegionCounts(pins);
   const totalCities = pins.length;
-  const totalRegions = (Object.keys(counts) as LocPin["region"][]).filter((k) => counts[k] > 0).length;
+  const totalRegions = (Object.keys(counts) as LocPin["region"][]).filter(
+    (k) => counts[k] > 0,
+  ).length;
 
   // KPI/graph-style region metric fields — same shape MV-DASH-REGION-STATS
   // reads from `c.items` and `c.stat`. We keep MV-LOC-* `c.items` as the pin
@@ -5638,7 +8801,13 @@ function renderLocationsVariant(
 
   // Compact metric list — mirrors the MV-DASH-REGION-STATS visual grammar
   // (label · delta on top, progress bar below). Renders inside any panel.
-  const RegionMetricList = ({ rows, maxRows = 6 }: { rows: RegionMetricRow[]; maxRows?: number }) => {
+  const RegionMetricList = ({
+    rows,
+    maxRows = 6,
+  }: {
+    rows: RegionMetricRow[];
+    maxRows?: number;
+  }) => {
     const shown = rows.slice(0, maxRows);
     return (
       <div>
@@ -5656,15 +8825,27 @@ function renderLocationsVariant(
               }}
             >
               <div className="flex items-baseline justify-between gap-4">
-                <div style={{ fontSize: 18, fontWeight: 600, color: ink.strong, letterSpacing: "-0.005em" }}>
+                <div
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 600,
+                    color: ink.strong,
+                    letterSpacing: "-0.005em",
+                  }}
+                >
                   {it.label}
                 </div>
                 <div className="flex items-baseline gap-3">
                   {it.value && (
-                    <div className="tabular-nums" style={{ fontSize: 18, fontWeight: 600, color: ink.strong }}>
+                    <div
+                      className="tabular-nums"
+                      style={{ fontSize: 18, fontWeight: 600, color: ink.strong }}
+                    >
                       {it.value}
                       {it.unit && (
-                        <span style={{ fontSize: 12, color: ink.muted, marginLeft: 3 }}>{it.unit}</span>
+                        <span style={{ fontSize: 12, color: ink.muted, marginLeft: 3 }}>
+                          {it.unit}
+                        </span>
                       )}
                     </div>
                   )}
@@ -5688,7 +8869,9 @@ function renderLocationsVariant(
                   className="mt-2 h-1.5 overflow-hidden rounded-full"
                   style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.08)" }}
                 >
-                  <div style={{ width: `${pct}%`, height: "100%", background: accent, opacity: 0.8 }} />
+                  <div
+                    style={{ width: `${pct}%`, height: "100%", background: accent, opacity: 0.8 }}
+                  />
                 </div>
               )}
             </div>
@@ -5701,7 +8884,7 @@ function renderLocationsVariant(
   // Free-form region rail — a bare hairline row of region ticks, no cards,
   // no plate, no per-cell borders. Matches the KPI/chart Aurora v2 grammar.
   const RegionRail = () => {
-    const keys = (Object.keys(LOC_REGION_LABELS) as LocPin["region"][]);
+    const keys = Object.keys(LOC_REGION_LABELS) as LocPin["region"][];
     const activeKeys = keys.filter((k) => (counts[k] ?? 0) > 0);
     return (
       <div className="mt-10 flex items-stretch" style={{ borderTop: `1px solid ${ink.hairline}` }}>
@@ -5709,21 +8892,42 @@ function renderLocationsVariant(
           const n = counts[k] ?? 0;
           const active = n > 0;
           return (
-            <div
-              key={k}
-              className="flex-1 pr-6 pt-5"
-              style={{ opacity: active ? 1 : 0.35 }}
-            >
-              <div style={{ color: active ? "var(--slide-accent-text)" : ink.muted, fontSize: 11, letterSpacing: "0.28em", fontWeight: 700, textTransform: "uppercase" }}>{k}</div>
+            <div key={k} className="flex-1 pr-6 pt-5" style={{ opacity: active ? 1 : 0.35 }}>
+              <div
+                style={{
+                  color: active ? "var(--slide-accent-text)" : ink.muted,
+                  fontSize: 11,
+                  letterSpacing: "0.28em",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                }}
+              >
+                {k}
+              </div>
               <div className="mt-2 flex items-baseline gap-2">
-                <div className="tabular-nums" style={{ color: ink.strong, fontSize: 44, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 0.95 }}>{n}</div>
-                <div style={{ color: ink.muted, fontSize: 13, letterSpacing: "-0.005em" }}>{LOC_REGION_LABELS[k]}</div>
+                <div
+                  className="tabular-nums"
+                  style={{
+                    color: ink.strong,
+                    fontSize: 44,
+                    fontWeight: 600,
+                    letterSpacing: "-0.03em",
+                    lineHeight: 0.95,
+                  }}
+                >
+                  {n}
+                </div>
+                <div style={{ color: ink.muted, fontSize: 13, letterSpacing: "-0.005em" }}>
+                  {LOC_REGION_LABELS[k]}
+                </div>
               </div>
             </div>
           );
         })}
         {activeKeys.length === 0 && (
-          <div className="pt-5" style={{ color: ink.muted, fontSize: 13 }}>No regional coverage yet.</div>
+          <div className="pt-5" style={{ color: ink.muted, fontSize: 13 }}>
+            No regional coverage yet.
+          </div>
         )}
       </div>
     );
@@ -5734,17 +8938,32 @@ function renderLocationsVariant(
   const Header = ({ compact = false }: { compact?: boolean } = {}) => (
     <div className="flex items-start justify-between gap-16">
       <div style={{ maxWidth: 900 }}>
-        <Kicker brand={brand as never}>{s(c.kicker) || `${totalRegions} regions · global footprint`}</Kicker>
+        <Kicker brand={brand as never}>
+          {s(c.kicker) || `${totalRegions} regions · global footprint`}
+        </Kicker>
         <div
           className="mt-4"
-          style={{ fontSize: compact ? 52 : 60, fontWeight: 600, color: ink.strong, letterSpacing: "-0.03em", lineHeight: 1.02, maxWidth: 900 }}
+          style={{
+            fontSize: compact ? 52 : 60,
+            fontWeight: 600,
+            color: ink.strong,
+            letterSpacing: "-0.03em",
+            lineHeight: 1.02,
+            maxWidth: 900,
+          }}
         >
           {title}
         </div>
         {subtitle && (
           <div
             className="mt-5"
-            style={{ fontSize: 22, color: ink.muted, letterSpacing: "-0.005em", lineHeight: 1.45, maxWidth: 780 }}
+            style={{
+              fontSize: 22,
+              color: ink.muted,
+              letterSpacing: "-0.005em",
+              lineHeight: 1.45,
+              maxWidth: 780,
+            }}
           >
             {subtitle}
           </div>
@@ -5752,26 +8971,41 @@ function renderLocationsVariant(
       </div>
       <div className="flex flex-col items-end text-right" style={{ minWidth: 220 }}>
         <div className="flex items-baseline gap-2">
-          <span className="tabular-nums font-semibold" style={{ fontSize: 104, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}>
+          <span
+            className="tabular-nums font-semibold"
+            style={{ fontSize: 104, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}
+          >
             {heroStat?.value ?? totalCities}
           </span>
           {heroStat?.unit && (
-            <span className="tabular-nums" style={{ fontSize: 28, color: ink.muted, fontWeight: 600 }}>
+            <span
+              className="tabular-nums"
+              style={{ fontSize: 28, color: ink.muted, fontWeight: 600 }}
+            >
               {heroStat.unit}
             </span>
           )}
         </div>
-        <div className="mt-3 uppercase" style={{ fontSize: 13, letterSpacing: "0.3em", color: ink.muted, fontWeight: 600 }}>
+        <div
+          className="mt-3 uppercase"
+          style={{ fontSize: 13, letterSpacing: "0.3em", color: ink.muted, fontWeight: 600 }}
+        >
           {heroStat?.label ?? "Cities live"}
         </div>
-        <div className="mt-2 uppercase tabular-nums" style={{ fontSize: 14, letterSpacing: "0.24em", color: "var(--slide-accent-text)", fontWeight: 700 }}>
+        <div
+          className="mt-2 uppercase tabular-nums"
+          style={{
+            fontSize: 14,
+            letterSpacing: "0.24em",
+            color: "var(--slide-accent-text)",
+            fontWeight: 700,
+          }}
+        >
           ● {totalRegions} regions
         </div>
       </div>
     </div>
   );
-
-
 
   if (variantId === "MV-LOC-WORLD-PINS") {
     // Free-form Aurora v2 — map bleeds directly onto the aurora, no plate,
@@ -5781,14 +9015,21 @@ function renderLocationsVariant(
         <div className="relative flex h-full flex-col">
           <Header />
           <div className="relative mt-10 flex-1 overflow-hidden">
-            <LocWorldMap pins={pins} region="world" mode={mode} accent={accent} primary={primary} showLabels ariaLabel={`${title} — world map`} />
+            <LocWorldMap
+              pins={pins}
+              region="world"
+              mode={mode}
+              accent={accent}
+              primary={primary}
+              showLabels
+              ariaLabel={`${title} — world map`}
+            />
           </div>
           <RegionRail />
         </div>
       </SlideFrame>
     );
   }
-
 
   if (variantId === "MV-LOC-WORLD-STATS") {
     const metrics = coerceMetrics(c.metrics);
@@ -5800,25 +9041,40 @@ function renderLocationsVariant(
     const REGION_KEY_SET: LocPin["region"][] = ["AMER", "EMEA", "APAC", "LATAM", "MEA"];
     const rawFilter = Array.isArray(c.regionFilter) ? (c.regionFilter as unknown[]) : [];
     const filterSet = new Set(
-      rawFilter.filter((r): r is LocPin["region"] => typeof r === "string" && REGION_KEY_SET.includes(r as LocPin["region"])),
+      rawFilter.filter(
+        (r): r is LocPin["region"] =>
+          typeof r === "string" && REGION_KEY_SET.includes(r as LocPin["region"]),
+      ),
     );
     // Optional role exclusions — hide pins whose role is in this list.
-    const ROLE_KEY_SET: NonNullable<LocPin["role"]>[] = ["HQ", "hub", "office", "delivery", "partner"];
+    const ROLE_KEY_SET: NonNullable<LocPin["role"]>[] = [
+      "HQ",
+      "hub",
+      "office",
+      "delivery",
+      "partner",
+    ];
     const rawExcludeRoles = Array.isArray(c.excludeRoles) ? (c.excludeRoles as unknown[]) : [];
     const excludeRoleSet = new Set(
-      rawExcludeRoles.filter((r): r is NonNullable<LocPin["role"]> =>
-        typeof r === "string" && ROLE_KEY_SET.includes(r as NonNullable<LocPin["role"]>),
+      rawExcludeRoles.filter(
+        (r): r is NonNullable<LocPin["role"]> =>
+          typeof r === "string" && ROLE_KEY_SET.includes(r as NonNullable<LocPin["role"]>),
       ),
     );
     const roleFilterActive = excludeRoleSet.size > 0;
-    const regionFilteredPins = filterSet.size > 0 && filterSet.size < REGION_KEY_SET.length
-      ? pins.filter((p) => filterSet.has(p.region))
-      : pins;
+    const regionFilteredPins =
+      filterSet.size > 0 && filterSet.size < REGION_KEY_SET.length
+        ? pins.filter((p) => filterSet.has(p.region))
+        : pins;
     const filteredPins = roleFilterActive
-      ? regionFilteredPins.filter((p) => !excludeRoleSet.has((p.role ?? "office") as NonNullable<LocPin["role"]>))
+      ? regionFilteredPins.filter(
+          (p) => !excludeRoleSet.has((p.role ?? "office") as NonNullable<LocPin["role"]>),
+        )
       : regionFilteredPins;
     const filteredCities = filteredPins.length;
-    const filteredRegions = (Object.keys(LOC_REGION_LABELS) as LocPin["region"][]).filter((k) => filteredPins.some((p) => p.region === k)).length;
+    const filteredRegions = (Object.keys(LOC_REGION_LABELS) as LocPin["region"][]).filter((k) =>
+      filteredPins.some((p) => p.region === k),
+    ).length;
     const filterActive = filteredPins.length !== pins.length;
 
     // Aggregate active metric per region + global (over filtered pins).
@@ -5836,19 +9092,23 @@ function renderLocationsVariant(
       }
     }
 
-
     const TOP_N_OPTIONS = [5, 10, 25] as const;
     const rawTopN = Number(c.topN);
     const topN = (TOP_N_OPTIONS as readonly number[]).includes(rawTopN) ? rawTopN : 5;
     const SCALE_MODES = ["absolute", "region-percent", "global-percent"] as const;
     const rawScaleMode = typeof c.scaleMode === "string" ? c.scaleMode : "absolute";
-    const scaleMode: (typeof SCALE_MODES)[number] = (SCALE_MODES as readonly string[]).includes(rawScaleMode)
+    const scaleMode: (typeof SCALE_MODES)[number] = (SCALE_MODES as readonly string[]).includes(
+      rawScaleMode,
+    )
       ? (rawScaleMode as (typeof SCALE_MODES)[number])
       : "absolute";
     const topPins = usingMetric
       ? [...filteredPins]
           .filter((p) => Number.isFinite(p.values?.[activeMetric!.id]))
-          .sort((a, b) => (b.values![activeMetric!.id] as number) - (a.values![activeMetric!.id] as number))
+          .sort(
+            (a, b) =>
+              (b.values![activeMetric!.id] as number) - (a.values![activeMetric!.id] as number),
+          )
           .slice(0, topN)
       : [];
 
@@ -5858,27 +9118,61 @@ function renderLocationsVariant(
           <div className="flex flex-1 flex-col">
             <Header compact />
             {filterActive && (
-              <div className="mt-4 flex flex-wrap items-center gap-2" style={{ color: ink.muted, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase" }}>
-                <span style={{ fontWeight: 700, color: "var(--slide-accent-text)" }}>Region filter</span>
+              <div
+                className="mt-4 flex flex-wrap items-center gap-2"
+                style={{
+                  color: ink.muted,
+                  fontSize: 11,
+                  letterSpacing: "0.22em",
+                  textTransform: "uppercase",
+                }}
+              >
+                <span style={{ fontWeight: 700, color: "var(--slide-accent-text)" }}>
+                  Region filter
+                </span>
                 {(Object.keys(LOC_REGION_LABELS) as LocPin["region"][])
                   .filter((k) => filterSet.has(k))
-                  .map((k) => (
-                    <span key={k}>{LOC_REGION_LABELS[k]}</span>
-                  ))
+                  .map((k) => <span key={k}>{LOC_REGION_LABELS[k]}</span>)
                   .reduce<React.ReactNode[]>((acc, node, i, arr) => {
                     acc.push(node);
-                    if (i < arr.length - 1) acc.push(<span key={`sep-${i}`} style={{ opacity: 0.4 }}>·</span>);
+                    if (i < arr.length - 1)
+                      acc.push(
+                        <span key={`sep-${i}`} style={{ opacity: 0.4 }}>
+                          ·
+                        </span>,
+                      );
                     return acc;
                   }, [])}
               </div>
             )}
-            <div data-map-export-root="world-stats" className="relative mt-8 flex-1 overflow-hidden">
-              <LocWorldMap pins={filteredPins} region="world" mode={mode} accent={accent} primary={primary} showLabels={false} metric={activeMetric} metricId={activeMetric?.id} scaleMode={scaleMode} ariaLabel={`${title} — world map${activeMetric ? ` visualizing ${activeMetric.label}${scaleMode === "region-percent" ? " (% of region)" : scaleMode === "global-percent" ? " (% of global)" : ""}` : ""}${filterActive ? ` filtered to ${filteredRegions} regions` : ""}`} />
+            <div
+              data-map-export-root="world-stats"
+              className="relative mt-8 flex-1 overflow-hidden"
+            >
+              <LocWorldMap
+                pins={filteredPins}
+                region="world"
+                mode={mode}
+                accent={accent}
+                primary={primary}
+                showLabels={false}
+                metric={activeMetric}
+                metricId={activeMetric?.id}
+                scaleMode={scaleMode}
+                ariaLabel={`${title} — world map${activeMetric ? ` visualizing ${activeMetric.label}${scaleMode === "region-percent" ? " (% of region)" : scaleMode === "global-percent" ? " (% of global)" : ""}` : ""}${filterActive ? ` filtered to ${filteredRegions} regions` : ""}`}
+              />
               <button
                 type="button"
                 onClick={(e) => {
-                  const root = (e.currentTarget.closest('[data-map-export-root="world-stats"]') as HTMLElement | null);
-                  if (root) void exportMapNodeAsPng(root, `${(title || "world-stats").toString().toLowerCase().replace(/\s+/g, "-")}.png`, isDark ? "#03002C" : "#ffffff");
+                  const root = e.currentTarget.closest(
+                    '[data-map-export-root="world-stats"]',
+                  ) as HTMLElement | null;
+                  if (root)
+                    void exportMapNodeAsPng(
+                      root,
+                      `${(title || "world-stats").toString().toLowerCase().replace(/\s+/g, "-")}.png`,
+                      isDark ? "#03002C" : "#ffffff",
+                    );
                 }}
                 aria-label="Export map as PNG"
                 className="absolute right-0 top-0 rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase tracking-widest transition hover:scale-[1.03]"
@@ -5891,25 +9185,49 @@ function renderLocationsVariant(
           <div className="flex w-[520px] flex-col justify-end">
             <div className="pl-8" style={{ borderLeft: `1px solid ${ink.hairline}` }}>
               <div className="flex items-baseline justify-between">
-                <div style={{ color: "var(--slide-accent-text)", fontSize: 12, letterSpacing: "0.3em", fontWeight: 700, textTransform: "uppercase" }}>
+                <div
+                  style={{
+                    color: "var(--slide-accent-text)",
+                    fontSize: 12,
+                    letterSpacing: "0.3em",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                  }}
+                >
                   {usingMetric ? activeMetric!.label : "Global footprint"}
                 </div>
                 {usingMetric && metricCoverage < filteredPins.length && (
-                  <div style={{ color: ink.muted, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }}>
+                  <div
+                    style={{
+                      color: ink.muted,
+                      fontSize: 10,
+                      letterSpacing: "0.22em",
+                      textTransform: "uppercase",
+                      fontWeight: 600,
+                    }}
+                  >
                     {metricCoverage}/{filteredPins.length} pins
                   </div>
-
                 )}
               </div>
 
               {usingMetric ? (
                 <>
                   <div className="mt-4">
-                    <div style={{ color: ink.strong, fontSize: 68, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1 }}>
+                    <div
+                      style={{
+                        color: ink.strong,
+                        fontSize: 68,
+                        fontWeight: 600,
+                        letterSpacing: "-0.03em",
+                        lineHeight: 1,
+                      }}
+                    >
                       {locFormatMetric(metricTotal, activeMetric)}
                     </div>
                     <div style={{ color: ink.muted, fontSize: 13, marginTop: 6 }}>
-                      {activeMetric!.label} · {filteredCities} cities across {filteredRegions} regions{filterActive ? ` (of ${totalCities}/${totalRegions})` : ""}
+                      {activeMetric!.label} · {filteredCities} cities across {filteredRegions}{" "}
+                      regions{filterActive ? ` (of ${totalCities}/${totalRegions})` : ""}
                     </div>
                   </div>
                   <div className="mt-6 space-y-2">
@@ -5921,15 +9239,35 @@ function renderLocationsVariant(
                         return (
                           <div key={k}>
                             <div className="flex items-baseline justify-between">
-                              <div style={{ color: ink.strong, fontSize: 13, fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase" }}>
+                              <div
+                                style={{
+                                  color: ink.strong,
+                                  fontSize: 13,
+                                  fontWeight: 600,
+                                  letterSpacing: "0.14em",
+                                  textTransform: "uppercase",
+                                }}
+                              >
                                 {LOC_REGION_LABELS[k]}
                               </div>
                               <div style={{ color: ink.muted, fontSize: 12 }}>
                                 {locFormatMetric(val, activeMetric)} · {pct}%
                               </div>
                             </div>
-                            <div className="mt-1 h-1.5 overflow-hidden rounded-full" style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.08)" }}>
-                              <div style={{ width: `${pct}%`, height: "100%", background: accent, opacity: 0.8 }} />
+                            <div
+                              className="mt-1 h-1.5 overflow-hidden rounded-full"
+                              style={{
+                                background: isDark ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.08)",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  width: `${pct}%`,
+                                  height: "100%",
+                                  background: accent,
+                                  opacity: 0.8,
+                                }}
+                              />
                             </div>
                           </div>
                         );
@@ -5938,8 +9276,19 @@ function renderLocationsVariant(
 
                   {topPins.length > 0 && (
                     <div className="mt-6 border-t pt-4" style={{ borderColor: ink.hairline }}>
-                      <div style={{ color: ink.muted, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600 }}>
-                        Top {topN} locations{roleFilterActive ? ` · excl. ${Array.from(excludeRoleSet).join(", ")}` : ""}
+                      <div
+                        style={{
+                          color: ink.muted,
+                          fontSize: 10,
+                          letterSpacing: "0.2em",
+                          textTransform: "uppercase",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Top {topN} locations
+                        {roleFilterActive
+                          ? ` · excl. ${Array.from(excludeRoleSet).join(", ")}`
+                          : ""}
                       </div>
                       <div className="mt-3 space-y-1.5">
                         {topPins.map((p) => {
@@ -5953,9 +9302,20 @@ function renderLocationsVariant(
                           }
                           return (
                             <div key={p.id} className="flex items-baseline justify-between">
-                              <div style={{ color: ink.strong, fontSize: 14 }}>{p.label || p.city}</div>
-                              <div style={{ color: accent, fontSize: 14, fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
-                                {pctForPin != null ? `${pctForPin.toFixed(1)}%` : locFormatMetric(raw, activeMetric)}
+                              <div style={{ color: ink.strong, fontSize: 14 }}>
+                                {p.label || p.city}
+                              </div>
+                              <div
+                                style={{
+                                  color: accent,
+                                  fontSize: 14,
+                                  fontWeight: 600,
+                                  fontVariantNumeric: "tabular-nums",
+                                }}
+                              >
+                                {pctForPin != null
+                                  ? `${pctForPin.toFixed(1)}%`
+                                  : locFormatMetric(raw, activeMetric)}
                               </div>
                             </div>
                           );
@@ -5971,26 +9331,74 @@ function renderLocationsVariant(
               ) : (
                 <div className="mt-4 grid grid-cols-2 gap-y-6">
                   <div>
-                    <div style={{ color: ink.strong, fontSize: 56, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1 }}>{totalCities}</div>
+                    <div
+                      style={{
+                        color: ink.strong,
+                        fontSize: 56,
+                        fontWeight: 600,
+                        letterSpacing: "-0.03em",
+                        lineHeight: 1,
+                      }}
+                    >
+                      {totalCities}
+                    </div>
                     <div style={{ color: ink.muted, fontSize: 13, marginTop: 6 }}>Cities</div>
                   </div>
                   <div>
-                    <div style={{ color: ink.strong, fontSize: 56, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1 }}>{totalRegions}</div>
+                    <div
+                      style={{
+                        color: ink.strong,
+                        fontSize: 56,
+                        fontWeight: 600,
+                        letterSpacing: "-0.03em",
+                        lineHeight: 1,
+                      }}
+                    >
+                      {totalRegions}
+                    </div>
                     <div style={{ color: ink.muted, fontSize: 13, marginTop: 6 }}>Regions</div>
                   </div>
                   {(Object.keys(LOC_REGION_LABELS) as LocPin["region"][])
                     .filter((k) => counts[k] > 0)
                     .map((k) => (
                       <div key={k}>
-                        <div style={{ color: ink.strong, fontSize: 32, fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1 }}>{counts[k]}</div>
-                        <div style={{ color: ink.muted, fontSize: 12, marginTop: 4, textTransform: "uppercase", letterSpacing: "0.18em" }}>{LOC_REGION_LABELS[k]}</div>
+                        <div
+                          style={{
+                            color: ink.strong,
+                            fontSize: 32,
+                            fontWeight: 600,
+                            letterSpacing: "-0.02em",
+                            lineHeight: 1,
+                          }}
+                        >
+                          {counts[k]}
+                        </div>
+                        <div
+                          style={{
+                            color: ink.muted,
+                            fontSize: 12,
+                            marginTop: 4,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.18em",
+                          }}
+                        >
+                          {LOC_REGION_LABELS[k]}
+                        </div>
                       </div>
                     ))}
                 </div>
               )}
 
               {narrative && (
-                <div className="mt-6 border-t pt-4" style={{ borderColor: ink.hairline, color: ink.muted, fontSize: 15, lineHeight: 1.45 }}>
+                <div
+                  className="mt-6 border-t pt-4"
+                  style={{
+                    borderColor: ink.hairline,
+                    color: ink.muted,
+                    fontSize: 15,
+                    lineHeight: 1.45,
+                  }}
+                >
                   {narrative}
                 </div>
               )}
@@ -6001,17 +9409,36 @@ function renderLocationsVariant(
     );
   }
 
-
   if (variantId === "MV-LOC-REGION-FOCUS") {
-    const regionCount = pins.filter((p) => region === "world" || p.region === region || (region === "MEA" && p.region === "MEA")).length;
+    const regionCount = pins.filter(
+      (p) => region === "world" || p.region === region || (region === "MEA" && p.region === "MEA"),
+    ).length;
     return (
       <SlideFrame brand={brand as never} pageNumber={pageNumber}>
         <div className="relative flex h-full flex-col">
           <div className="flex items-start justify-between gap-12">
             <Header compact />
             <div className="flex flex-col items-end text-right" style={{ minWidth: 180 }}>
-              <span className="tabular-nums font-semibold" style={{ fontSize: 88, lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}>{regionCount}</span>
-              <div className="mt-3 uppercase" style={{ fontSize: 12, letterSpacing: "0.3em", color: "var(--slide-accent-text)", fontWeight: 700 }}>
+              <span
+                className="tabular-nums font-semibold"
+                style={{
+                  fontSize: 88,
+                  lineHeight: 0.9,
+                  letterSpacing: "-0.04em",
+                  color: ink.strong,
+                }}
+              >
+                {regionCount}
+              </span>
+              <div
+                className="mt-3 uppercase"
+                style={{
+                  fontSize: 12,
+                  letterSpacing: "0.3em",
+                  color: "var(--slide-accent-text)",
+                  fontWeight: 700,
+                }}
+              >
                 {region === "world" ? "Worldwide" : LOC_REGION_LABELS[region as LocPin["region"]]}
               </div>
             </div>
@@ -6019,10 +9446,26 @@ function renderLocationsVariant(
           {hasRegionMetrics ? (
             <div className="mt-10 grid flex-1 gap-12" style={{ gridTemplateColumns: "1.55fr 1fr" }}>
               <div className="relative overflow-hidden">
-                <LocWorldMap pins={pins} region={region} mode={mode} accent={accent} primary={primary} showLabels ariaLabel={`${title} — ${region === "world" ? "world" : LOC_REGION_LABELS[region as LocPin["region"]]} map`} />
+                <LocWorldMap
+                  pins={pins}
+                  region={region}
+                  mode={mode}
+                  accent={accent}
+                  primary={primary}
+                  showLabels
+                  ariaLabel={`${title} — ${region === "world" ? "world" : LOC_REGION_LABELS[region as LocPin["region"]]} map`}
+                />
               </div>
               <div className="pl-8" style={{ borderLeft: `1px solid ${ink.hairline}` }}>
-                <div style={{ color: "var(--slide-accent-text)", fontSize: 12, letterSpacing: "0.3em", fontWeight: 700, textTransform: "uppercase" }}>
+                <div
+                  style={{
+                    color: "var(--slide-accent-text)",
+                    fontSize: 12,
+                    letterSpacing: "0.3em",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                  }}
+                >
                   Region metrics
                 </div>
                 <div className="mt-4">
@@ -6032,11 +9475,28 @@ function renderLocationsVariant(
             </div>
           ) : (
             <div className="relative mt-10 flex-1 overflow-hidden">
-              <LocWorldMap pins={pins} region={region} mode={mode} accent={accent} primary={primary} showLabels ariaLabel={`${title} — ${region === "world" ? "world" : LOC_REGION_LABELS[region as LocPin["region"]]} map`} />
+              <LocWorldMap
+                pins={pins}
+                region={region}
+                mode={mode}
+                accent={accent}
+                primary={primary}
+                showLabels
+                ariaLabel={`${title} — ${region === "world" ? "world" : LOC_REGION_LABELS[region as LocPin["region"]]} map`}
+              />
             </div>
           )}
           {narrative && (
-            <div className="mt-8 pt-6" style={{ borderTop: `1px solid ${ink.hairline}`, color: ink.muted, fontSize: 18, lineHeight: 1.45, maxWidth: 1400 }}>
+            <div
+              className="mt-8 pt-6"
+              style={{
+                borderTop: `1px solid ${ink.hairline}`,
+                color: ink.muted,
+                fontSize: 18,
+                lineHeight: 1.45,
+                maxWidth: 1400,
+              }}
+            >
               {narrative}
             </div>
           )}
@@ -6045,7 +9505,6 @@ function renderLocationsVariant(
     );
   }
 
-
   // MV-LOC-HUB-SPOKE — free-form Aurora v2. Map bleeds onto the aurora, the
   // legend sits on a shared hairline as tiny inline swatch pills.
   return (
@@ -6053,7 +9512,16 @@ function renderLocationsVariant(
       <div className="relative flex h-full flex-col">
         <Header />
         <div className="relative mt-10 flex-1 overflow-hidden">
-          <LocWorldMap pins={pins} region="world" mode={mode} accent={accent} primary={primary} showLabels showSpokes ariaLabel={`${title} — hub and spoke network map`} />
+          <LocWorldMap
+            pins={pins}
+            region="world"
+            mode={mode}
+            accent={accent}
+            primary={primary}
+            showLabels
+            showSpokes
+            ariaLabel={`${title} — hub and spoke network map`}
+          />
         </div>
         {hasRegionMetrics && (
           <div
@@ -6068,21 +9536,44 @@ function renderLocationsVariant(
               const negative = delta.trim().startsWith("-");
               return (
                 <div key={`${it.label}-${i}`}>
-                  <div className="uppercase" style={{ fontSize: 11, letterSpacing: "0.28em", fontWeight: 700, color: "var(--slide-accent-text)" }}>
+                  <div
+                    className="uppercase"
+                    style={{
+                      fontSize: 11,
+                      letterSpacing: "0.28em",
+                      fontWeight: 700,
+                      color: "var(--slide-accent-text)",
+                    }}
+                  >
                     {it.region ?? it.label}
                   </div>
                   <div className="mt-2 flex items-baseline gap-2">
-                    <div className="tabular-nums" style={{ color: ink.strong, fontSize: 36, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 0.95 }}>
+                    <div
+                      className="tabular-nums"
+                      style={{
+                        color: ink.strong,
+                        fontSize: 36,
+                        fontWeight: 600,
+                        letterSpacing: "-0.03em",
+                        lineHeight: 0.95,
+                      }}
+                    >
                       {it.value ?? (typeof it.percent === "number" ? `${it.percent}%` : "")}
                     </div>
-                    {it.unit && (
-                      <div style={{ color: ink.muted, fontSize: 13 }}>{it.unit}</div>
-                    )}
+                    {it.unit && <div style={{ color: ink.muted, fontSize: 13 }}>{it.unit}</div>}
                   </div>
                   <div className="mt-1 flex items-baseline gap-2">
                     <div style={{ color: ink.muted, fontSize: 13 }}>{it.label}</div>
                     {delta && (
-                      <div className="uppercase tabular-nums" style={{ fontSize: 11, letterSpacing: "0.22em", fontWeight: 700, color: negative ? "#B42318" : "var(--slide-accent-text)" }}>
+                      <div
+                        className="uppercase tabular-nums"
+                        style={{
+                          fontSize: 11,
+                          letterSpacing: "0.22em",
+                          fontWeight: 700,
+                          color: negative ? "#B42318" : "var(--slide-accent-text)",
+                        }}
+                      >
                         {delta}
                       </div>
                     )}
@@ -6094,28 +9585,87 @@ function renderLocationsVariant(
         )}
         <div
           className="mt-8 flex items-center gap-10 pt-5"
-          style={{ borderTop: `1px solid ${ink.hairline}`, color: ink.muted, fontSize: 14, letterSpacing: "0.02em" }}
+          style={{
+            borderTop: `1px solid ${ink.hairline}`,
+            color: ink.muted,
+            fontSize: 14,
+            letterSpacing: "0.02em",
+          }}
         >
           <span className="inline-flex items-center gap-3">
-            <span style={{ display: "inline-block", width: 14, height: 14, borderRadius: 999, background: accent, boxShadow: `0 0 18px ${accent}` }} />
-            <span style={{ color: ink.strong, fontWeight: 600, letterSpacing: "0.22em", textTransform: "uppercase", fontSize: 12 }}>HQ / Hub</span>
+            <span
+              style={{
+                display: "inline-block",
+                width: 14,
+                height: 14,
+                borderRadius: 999,
+                background: accent,
+                boxShadow: `0 0 18px ${accent}`,
+              }}
+            />
+            <span
+              style={{
+                color: ink.strong,
+                fontWeight: 600,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                fontSize: 12,
+              }}
+            >
+              HQ / Hub
+            </span>
           </span>
           <span className="inline-flex items-center gap-3">
-            <span style={{ display: "inline-block", width: 9, height: 9, borderRadius: 999, background: accent, opacity: 0.75 }} />
-            <span style={{ color: ink.strong, fontWeight: 600, letterSpacing: "0.22em", textTransform: "uppercase", fontSize: 12 }}>Delivery office</span>
+            <span
+              style={{
+                display: "inline-block",
+                width: 9,
+                height: 9,
+                borderRadius: 999,
+                background: accent,
+                opacity: 0.75,
+              }}
+            />
+            <span
+              style={{
+                color: ink.strong,
+                fontWeight: 600,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                fontSize: 12,
+              }}
+            >
+              Delivery office
+            </span>
           </span>
           <span className="inline-flex items-center gap-3">
-            <span style={{ display: "inline-block", width: 28, height: 2, background: accent, opacity: 0.55, borderRadius: 2 }} />
-            <span style={{ color: ink.strong, fontWeight: 600, letterSpacing: "0.22em", textTransform: "uppercase", fontSize: 12 }}>Follow-the-sun route</span>
+            <span
+              style={{
+                display: "inline-block",
+                width: 28,
+                height: 2,
+                background: accent,
+                opacity: 0.55,
+                borderRadius: 2,
+              }}
+            />
+            <span
+              style={{
+                color: ink.strong,
+                fontWeight: 600,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                fontSize: 12,
+              }}
+            >
+              Follow-the-sun route
+            </span>
           </span>
         </div>
       </div>
     </SlideFrame>
   );
 }
-
-
-
 
 // ────────────────────────────────────────────────────────────────────────────
 // HeroScrim — the single overlay stack that sits on top of a full-bleed
@@ -6274,9 +9824,7 @@ function PlayOverlay({
         }}
       />
       <div className="relative flex flex-col items-center gap-2">
-        <span
-          className="flex h-16 w-16 items-center justify-center rounded-full bg-white/95 text-[#03002C] shadow-[0_10px_30px_-5px_rgba(0,0,0,0.6)] ring-1 ring-white/60 transition-transform duration-150 group-hover:scale-105 group-focus-visible:scale-105"
-        >
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/95 text-[#03002C] shadow-[0_10px_30px_-5px_rgba(0,0,0,0.6)] ring-1 ring-white/60 transition-transform duration-150 group-hover:scale-105 group-focus-visible:scale-105">
           <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden fill="currentColor">
             <path d="M5 3.2v15.6c0 .9 1 1.4 1.7.9l12-7.8c.7-.4.7-1.4 0-1.8l-12-7.8C6 1.8 5 2.3 5 3.2z" />
           </svg>
@@ -6342,14 +9890,24 @@ function VideoHoverControls({
     }
   }, [videoRef, onUserPause, announce]);
 
-  const seek = useCallback((delta: number) => {
-    const v = videoRef.current;
-    if (!v) return;
-    const dur = Number.isFinite(v.duration) ? v.duration : 0;
-    const next = Math.max(0, dur > 0 ? Math.min(dur, v.currentTime + delta) : v.currentTime + delta);
-    try { v.currentTime = next; } catch { /* seek before ready */ }
-    announce(delta < 0 ? `Rewound ${Math.abs(delta)} seconds` : `Forwarded ${delta} seconds`);
-  }, [videoRef, announce]);
+  const seek = useCallback(
+    (delta: number) => {
+      const v = videoRef.current;
+      if (!v) return;
+      const dur = Number.isFinite(v.duration) ? v.duration : 0;
+      const next = Math.max(
+        0,
+        dur > 0 ? Math.min(dur, v.currentTime + delta) : v.currentTime + delta,
+      );
+      try {
+        v.currentTime = next;
+      } catch {
+        /* seek before ready */
+      }
+      announce(delta < 0 ? `Rewound ${Math.abs(delta)} seconds` : `Forwarded ${delta} seconds`);
+    },
+    [videoRef, announce],
+  );
 
   const toggleMute = useCallback(() => {
     const v = videoRef.current;
@@ -6463,7 +10021,11 @@ function VideoHoverControls({
       aria-pressed={pressed === undefined ? undefined : pressed}
       title={shortcut ? `${label} — ${shortcut}` : label}
       onClick={act(onClick)}
-      onKeyDown={(e) => { if (e.key === "Enter") { act(onClick)(e); } }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          act(onClick)(e);
+        }
+      }}
       className={`flex ${wide ? "h-10 w-11" : "h-10 w-10"} cursor-pointer items-center justify-center rounded-full bg-white/10 text-white ring-1 ring-white/25 backdrop-blur-md transition hover:bg-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70`}
       data-media-hover-control={label}
     >
@@ -6480,14 +10042,32 @@ function VideoHoverControls({
       className="pointer-events-auto absolute inset-x-0 bottom-0 z-30 flex items-center justify-center gap-2 bg-gradient-to-t from-black/55 via-black/20 to-transparent px-3 pb-3 pt-8 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100"
       data-media-controls="hover"
     >
-      <span className="sr-only" role="status" aria-live="polite">{status}</span>
+      <span className="sr-only" role="status" aria-live="polite">
+        {status}
+      </span>
       <Btn label="Rewind 10 seconds" shortcut="J" onClick={() => seek(-10)}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
           <path d="M11 17l-5-5 5-5" />
           <path d="M18 17l-5-5 5-5" />
         </svg>
       </Btn>
-      <Btn label={playing ? "Pause" : "Play"} shortcut="Space" onClick={togglePlay} wide pressed={playing}>
+      <Btn
+        label={playing ? "Pause" : "Play"}
+        shortcut="Space"
+        onClick={togglePlay}
+        wide
+        pressed={playing}
+      >
         {playing ? (
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
             <rect x="6" y="5" width="4" height="14" rx="1" />
@@ -6500,20 +10080,50 @@ function VideoHoverControls({
         )}
       </Btn>
       <Btn label="Forward 10 seconds" shortcut="L" onClick={() => seek(10)}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
           <path d="M13 17l5-5-5-5" />
           <path d="M6 17l5-5-5-5" />
         </svg>
       </Btn>
       <Btn label={muted ? "Unmute" : "Mute"} shortcut="M" onClick={toggleMute} pressed={muted}>
         {muted ? (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
             <path d="M11 5L6 9H3v6h3l5 4V5z" />
             <path d="M22 9l-6 6" />
             <path d="M16 9l6 6" />
           </svg>
         ) : (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
             <path d="M11 5L6 9H3v6h3l5 4V5z" />
             <path d="M15.5 8.5a5 5 0 010 7" />
             <path d="M18.5 5.5a9 9 0 010 13" />
@@ -6523,8 +10133,6 @@ function VideoHoverControls({
     </div>
   );
 }
-
-
 
 /**
  * Per-preview video playback registry.
@@ -6547,10 +10155,11 @@ function pauseAllVideosExcept(active: HTMLVideoElement | null) {
       v.pause();
       const s = videoPlaybackStore.get(key) ?? { currentTime: 0, userStarted: false, paused: true };
       videoPlaybackStore.set(key, { ...s, currentTime: v.currentTime, paused: true });
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
   });
 }
-
 
 function MediaTile({
   brand,
@@ -6609,7 +10218,10 @@ function MediaTile({
     if (typeof document === "undefined") return;
     const check = () => {
       const cls = document.body.classList;
-      setAutoplay(forceAutoplay || (!isThumbnail && (cls.contains("present-mode") || cls.contains("share-mode"))));
+      setAutoplay(
+        forceAutoplay ||
+          (!isThumbnail && (cls.contains("present-mode") || cls.contains("share-mode"))),
+      );
     };
     check();
     const obs = new MutationObserver(check);
@@ -6643,18 +10255,32 @@ function MediaTile({
     registeredVideos.set(v, previewKey);
     const snap = videoPlaybackStore.get(previewKey);
     if (snap && snap.currentTime > 0) {
-      try { v.currentTime = snap.currentTime; } catch { /* seek before ready */ }
+      try {
+        v.currentTime = snap.currentTime;
+      } catch {
+        /* seek before ready */
+      }
     }
     // In the library grid multiple tiles legitimately autoplay in parallel
     // (forceAutoplay=true). Suppress mutual-exclusion there — otherwise
     // each newly mounted tile pauses its siblings and cascade-aborts them.
-    const onPlay = () => { if (!forceAutoplay) pauseAllVideosExcept(v); };
+    const onPlay = () => {
+      if (!forceAutoplay) pauseAllVideosExcept(v);
+    };
     const onPause = () => {
-      const s = videoPlaybackStore.get(previewKey) ?? { currentTime: 0, userStarted: false, paused: true };
+      const s = videoPlaybackStore.get(previewKey) ?? {
+        currentTime: 0,
+        userStarted: false,
+        paused: true,
+      };
       videoPlaybackStore.set(previewKey, { ...s, currentTime: v.currentTime, paused: true });
     };
     const onTime = () => {
-      const s = videoPlaybackStore.get(previewKey) ?? { currentTime: 0, userStarted: false, paused: !shouldPlay };
+      const s = videoPlaybackStore.get(previewKey) ?? {
+        currentTime: 0,
+        userStarted: false,
+        paused: !shouldPlay,
+      };
       // Coalesce writes: only persist ~4× per second worth of drift.
       if (Math.abs(v.currentTime - s.currentTime) > 0.25) {
         videoPlaybackStore.set(previewKey, { ...s, currentTime: v.currentTime });
@@ -6671,7 +10297,9 @@ function MediaTile({
           paused: true,
         });
         v.pause();
-      } catch { /* noop */ }
+      } catch {
+        /* noop */
+      }
       v.removeEventListener("play", onPlay);
       v.removeEventListener("pause", onPause);
       v.removeEventListener("timeupdate", onTime);
@@ -6682,7 +10310,11 @@ function MediaTile({
   // Persist userStarted so reopening the same preview key resumes.
   useEffect(() => {
     if (!resolvedVideoUrl) return;
-    const s = videoPlaybackStore.get(previewKey) ?? { currentTime: 0, userStarted: false, paused: true };
+    const s = videoPlaybackStore.get(previewKey) ?? {
+      currentTime: 0,
+      userStarted: false,
+      paused: true,
+    };
     videoPlaybackStore.set(previewKey, { ...s, userStarted });
   }, [previewKey, userStarted, resolvedVideoUrl]);
 
@@ -6709,8 +10341,8 @@ function MediaTile({
     resolvedPosterUrl && resolvedPosterUrl.length > 0
       ? resolvedPosterUrl
       : resolvedOverrideUrl && resolvedOverrideUrl.length > 0
-      ? resolvedOverrideUrl
-      : tileBackdrops[h % tileBackdrops.length];
+        ? resolvedOverrideUrl
+        : tileBackdrops[h % tileBackdrops.length];
   const hasVideo = Boolean(resolvedVideoUrl && resolvedVideoUrl.length > 0);
   const accent = brand.tokens.accent;
   const primary = brand.tokens.primary;
@@ -6726,7 +10358,6 @@ function MediaTile({
     return (
       <div
         className={`group ${/\b(absolute|fixed)\b/.test(className ?? "") ? "" : "relative"} overflow-hidden rounded-2xl ${className ?? ""}`}
-
         style={{ background: "#EEF2F8", filter: grayscale }}
       >
         {hasVideo && shouldPlay ? (
@@ -6758,10 +10389,14 @@ function MediaTile({
             style={{ filter: "brightness(1.06) saturate(0.92) contrast(1.02)" }}
           />
         )}
-        {hasVideo && !shouldPlay && (
-          autoplay ? (
+        {hasVideo &&
+          !shouldPlay &&
+          (autoplay ? (
             <PlayOverlay
-              onActivate={() => { setAutoplayBlocked(false); setUserStarted(true); }}
+              onActivate={() => {
+                setAutoplayBlocked(false);
+                setUserStarted(true);
+              }}
               label="Play video"
               hint={autoplayBlocked ? "Autoplay blocked — tap to play" : "Play demo"}
             />
@@ -6773,12 +10408,14 @@ function MediaTile({
             />
           ) : (
             <PlayOverlay
-              onActivate={() => { setAutoplayBlocked(false); setUserStarted(true); }}
+              onActivate={() => {
+                setAutoplayBlocked(false);
+                setUserStarted(true);
+              }}
               label="Play video"
               hint="Play demo"
             />
-          )
-        )}
+          ))}
         {hasVideo && shouldPlay && (
           <VideoHoverControls
             videoRef={videoRef}
@@ -6872,10 +10509,14 @@ function MediaTile({
           style={{ filter: "brightness(0.92) saturate(1.05) contrast(1.05)" }}
         />
       )}
-      {hasVideo && !shouldPlay && (
-        autoplay ? (
+      {hasVideo &&
+        !shouldPlay &&
+        (autoplay ? (
           <PlayOverlay
-            onActivate={() => { setAutoplayBlocked(false); setUserStarted(true); }}
+            onActivate={() => {
+              setAutoplayBlocked(false);
+              setUserStarted(true);
+            }}
             label="Play video"
             hint={autoplayBlocked ? "Autoplay blocked — tap to play" : "Play demo"}
           />
@@ -6887,12 +10528,14 @@ function MediaTile({
           />
         ) : (
           <PlayOverlay
-            onActivate={() => { setAutoplayBlocked(false); setUserStarted(true); }}
+            onActivate={() => {
+              setAutoplayBlocked(false);
+              setUserStarted(true);
+            }}
             label="Play video"
             hint="Play demo"
           />
-        )
-      )}
+        ))}
       {hasVideo && shouldPlay && (
         <VideoHoverControls
           videoRef={videoRef}
@@ -6924,8 +10567,7 @@ function MediaTile({
         aria-hidden
         className="absolute inset-x-0 top-0 h-[32%]"
         style={{
-          background:
-            "linear-gradient(180deg, rgba(3,0,44,0.55) 0%, rgba(3,0,44,0) 100%)",
+          background: "linear-gradient(180deg, rgba(3,0,44,0.55) 0%, rgba(3,0,44,0) 100%)",
         }}
       />
       {/* Fine grain — screen blend so it lifts shadows without milking mids. */}
@@ -6948,9 +10590,6 @@ function MediaTile({
     </div>
   );
 }
-
-
-
 
 // ────────────────────────────────────────────────────────────────────────────
 // Shared building blocks
@@ -6975,9 +10614,19 @@ function CardGrid({
   return (
     <SlideFrame brand={brand} pageNumber={pageNumber}>
       <SlideTitle brand={brand} title={title} />
-      <div className={`mt-14 grid gap-10 ${gridClass}`} style={rows ? { gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` } : undefined}>
+      <div
+        className={`mt-14 grid gap-10 ${gridClass}`}
+        style={rows ? { gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` } : undefined}
+      >
         {items.map((it, i) => (
-          <Card key={i} brand={brand} title={s(it.title)} body={s(it.body)} index={i + 1} icon={s(it.icon)} />
+          <Card
+            key={i}
+            brand={brand}
+            title={s(it.title)}
+            body={s(it.body)}
+            index={i + 1}
+            icon={s(it.icon)}
+          />
         ))}
       </div>
     </SlideFrame>
@@ -6990,7 +10639,21 @@ function CardGrid({
 // is driven purely by cell count; short vs long numerals still align on the
 // baseline because StatFigure is sized by name, not by string length.
 
-function StatTile({ brand, item, index, dense, cols, isLastRow }: { brand: BrandMode; item: Item; index: number; dense: boolean; cols: number; isLastRow: boolean }) {
+function StatTile({
+  brand,
+  item,
+  index,
+  dense,
+  cols,
+  isLastRow,
+}: {
+  brand: BrandMode;
+  item: Item;
+  index: number;
+  dense: boolean;
+  cols: number;
+  isLastRow: boolean;
+}) {
   const mode = useContext(SlideModeContext);
   const isDark = mode === "dark";
   const isFirstInRow = index % cols === 0;
@@ -7015,7 +10678,9 @@ function StatTile({ brand, item, index, dense, cols, isLastRow }: { brand: Brand
       />
       {s(item.title) && (
         <div className="mb-6">
-          <Kicker brand={brand} size={16}>{s(item.title)}</Kicker>
+          <Kicker brand={brand} size={16}>
+            {s(item.title)}
+          </Kicker>
         </div>
       )}
       <StatFigure
@@ -7135,7 +10800,6 @@ function AuroraStatCell({
         })()}
       </div>
       <div className={centered ? "flex min-w-0 flex-col items-center" : "min-w-0 flex-1"}>
-
         <div
           className={`flex items-baseline gap-2 tabular-nums${centered ? " justify-center" : ""}`}
           style={{
@@ -7148,7 +10812,9 @@ function AuroraStatCell({
         >
           <span>{value || "—"}</span>
           {unit ? (
-            <span style={{ fontSize: 48, fontWeight: 500, letterSpacing: "-0.02em", color: ink.strong }}>
+            <span
+              style={{ fontSize: 48, fontWeight: 500, letterSpacing: "-0.02em", color: ink.strong }}
+            >
               {unit}
             </span>
           ) : null}
@@ -7170,12 +10836,10 @@ function AuroraStatCell({
             {label}
           </div>
         ) : null}
-
       </div>
     </div>
   );
 }
-
 
 function StatGrid({
   brand,
@@ -7207,16 +10871,34 @@ function StatGrid({
         {items.map((it, i) => {
           const rowIdx = Math.floor(i / cols);
           const isLastRow = rowIdx === rowCount - 1;
-          return <StatTile key={i} brand={brand} item={it} index={i} dense={dense} cols={cols} isLastRow={isLastRow} />;
+          return (
+            <StatTile
+              key={i}
+              brand={brand}
+              item={it}
+              index={i}
+              dense={dense}
+              cols={cols}
+              isLastRow={isLastRow}
+            />
+          );
         })}
       </div>
     </SlideFrame>
   );
 }
 
-
-
-function NumberedList({ brand, pageNumber, title, items }: { brand: BrandMode; pageNumber: number; title: string; items: Item[] }) {
+function NumberedList({
+  brand,
+  pageNumber,
+  title,
+  items,
+}: {
+  brand: BrandMode;
+  pageNumber: number;
+  title: string;
+  items: Item[];
+}) {
   const ink = useSlideInk();
   return (
     <SlideFrame brand={brand} pageNumber={pageNumber}>
@@ -7228,20 +10910,41 @@ function NumberedList({ brand, pageNumber, title, items }: { brand: BrandMode; p
             <div
               key={i}
               className="grid grid-cols-[80px_88px_1fr] items-start gap-10 py-7"
-              style={{ borderTop: i === 0 ? "1px solid rgba(10,15,28,0.10)" : "none", borderBottom: `1px solid ${ink.hairline}` }}
+              style={{
+                borderTop: i === 0 ? "1px solid rgba(10,15,28,0.10)" : "none",
+                borderBottom: `1px solid ${ink.hairline}`,
+              }}
             >
               <div
                 className="pt-1 font-semibold tabular-nums"
-                style={{ fontSize: 40, color: "var(--slide-accent-text)", letterSpacing: "-0.02em" }}
+                style={{
+                  fontSize: 40,
+                  color: "var(--slide-accent-text)",
+                  letterSpacing: "-0.02em",
+                }}
               >
                 {String(i + 1).padStart(2, "0")}
               </div>
               <IconBadge brand={brand} label={label} index={i} size="md" override={s(it.icon)} />
               <div>
-                <div style={{ fontSize: 32, fontWeight: 600, color: ink.strong, letterSpacing: "-0.015em" }}>
+                <div
+                  style={{
+                    fontSize: 32,
+                    fontWeight: 600,
+                    color: ink.strong,
+                    letterSpacing: "-0.015em",
+                  }}
+                >
                   {label}
                 </div>
-                <div className="mt-2" style={{ fontSize: 22, lineHeight: 1.4, color: "color-mix(in oklab, currentColor 72%, transparent)" }}>
+                <div
+                  className="mt-2"
+                  style={{
+                    fontSize: 22,
+                    lineHeight: 1.4,
+                    color: "color-mix(in oklab, currentColor 72%, transparent)",
+                  }}
+                >
                   {s(it.body)}
                 </div>
               </div>
@@ -7253,12 +10956,31 @@ function NumberedList({ brand, pageNumber, title, items }: { brand: BrandMode; p
   );
 }
 
-function SlideTitle({ brand, title, kicker }: { brand: BrandMode; title: string; kicker?: string }) {
+function SlideTitle({
+  brand,
+  title,
+  kicker,
+}: {
+  brand: BrandMode;
+  title: string;
+  kicker?: string;
+}) {
   return <TitleBlock brand={brand} title={title} kicker={kicker} size="title" />;
 }
 
-
-function Card({ brand, title, body, index, icon }: { brand: BrandMode; title: string; body: string; index: number; icon?: string }) {
+function Card({
+  brand,
+  title,
+  body,
+  index,
+  icon,
+}: {
+  brand: BrandMode;
+  title: string;
+  body: string;
+  index: number;
+  icon?: string;
+}) {
   const mode = useContext(SlideModeContext);
   const ink = useSlideInk();
   const isDark = mode === "dark";
@@ -7279,7 +11001,9 @@ function Card({ brand, title, body, index, icon }: { brand: BrandMode; title: st
       <div
         aria-hidden
         className="absolute inset-x-0 top-0 h-[3px]"
-        style={{ background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 80%)` }}
+        style={{
+          background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${brand.tokens.accent}00 80%)`,
+        }}
       />
       <div className="flex items-start justify-between">
         <div
@@ -7296,11 +11020,24 @@ function Card({ brand, title, body, index, icon }: { brand: BrandMode; title: st
         >
           {String(index).padStart(2, "0")}
         </div>
-        <IconBadge brand={brand} label={title} index={index - 1} size="md" override={icon} treatment="soft-circle" />
+        <IconBadge
+          brand={brand}
+          label={title}
+          index={index - 1}
+          size="md"
+          override={icon}
+          treatment="soft-circle"
+        />
       </div>
       <div
         className="mt-10"
-        style={{ fontSize: 36, fontWeight: 600, color: titleColor, letterSpacing: "-0.02em", lineHeight: 1.14 }}
+        style={{
+          fontSize: 36,
+          fontWeight: 600,
+          color: titleColor,
+          letterSpacing: "-0.02em",
+          lineHeight: 1.14,
+        }}
       >
         {title}
       </div>
@@ -7311,7 +11048,15 @@ function Card({ brand, title, body, index, icon }: { brand: BrandMode; title: st
   );
 }
 
-function Quadrant({ brand, label, highlight }: { brand: BrandMode; label: string; highlight?: boolean }) {
+function Quadrant({
+  brand,
+  label,
+  highlight,
+}: {
+  brand: BrandMode;
+  label: string;
+  highlight?: boolean;
+}) {
   const ink = useSlideInk();
   return (
     <div
@@ -7348,15 +11093,29 @@ function LabelBlock({ brand, label, body }: { brand: BrandMode; label: string; b
   );
 }
 
-
-
 // ── Dashboard helpers ──────────────────────────────────────────────────
 function toNums(v: unknown): number[] {
   if (!Array.isArray(v)) return [];
   return v.map((x) => (typeof x === "number" ? x : Number(x))).filter((n) => Number.isFinite(n));
 }
 
-function Sparkline({ brand: _brand, values, w = 380, h = 100, filled = true, peakPin = false, peakLabel = "PEAK" }: { brand: BrandMode; values: number[]; w?: number; h?: number; filled?: boolean; peakPin?: boolean; peakLabel?: string }) {
+function Sparkline({
+  brand: _brand,
+  values,
+  w = 380,
+  h = 100,
+  filled = true,
+  peakPin = false,
+  peakLabel = "PEAK",
+}: {
+  brand: BrandMode;
+  values: number[];
+  w?: number;
+  h?: number;
+  filled?: boolean;
+  peakPin?: boolean;
+  peakLabel?: string;
+}) {
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
   const vals = values.length ? values : [1, 1];
@@ -7365,9 +11124,15 @@ function Sparkline({ brand: _brand, values, w = 380, h = 100, filled = true, pea
   const range = max - min || 1;
   const pad = 4;
   const step = (w - pad * 2) / Math.max(vals.length - 1, 1);
-  const pts = vals.map((v, i) => [pad + i * step, h - pad - ((v - min) / range) * (h - pad * 2)] as [number, number]);
-  const linePath = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
-  const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - pad} L${pts[0][0].toFixed(1)},${h - pad} Z` : "";
+  const pts = vals.map(
+    (v, i) => [pad + i * step, h - pad - ((v - min) / range) * (h - pad * 2)] as [number, number],
+  );
+  const linePath = pts
+    .map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`)
+    .join(" ");
+  const areaPath = pts.length
+    ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - pad} L${pts[0][0].toFixed(1)},${h - pad} Z`
+    : "";
   const peakIdx = vals.indexOf(max);
   const peak = pts[peakIdx];
   const last = pts[pts.length - 1];
@@ -7376,14 +11141,35 @@ function Sparkline({ brand: _brand, values, w = 380, h = 100, filled = true, pea
       <AiryDefs id={id} />
       {filled && <path d={areaPath} fill={`url(#${id}-airy)`} />}
       <line x1={pad} y1={h - pad} x2={w - pad} y2={h - pad} stroke={ink.hairline} strokeWidth={1} />
-      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeLinecap="round" strokeLinejoin="round" />
-      {last && (
-        <circle cx={last[0]} cy={last[1]} r={3.5} fill="var(--slide-accent-text)" />
-      )}
+      <path
+        d={linePath}
+        fill="none"
+        stroke="var(--slide-accent-text)"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {last && <circle cx={last[0]} cy={last[1]} r={3.5} fill="var(--slide-accent-text)" />}
       {peakPin && peak && (
         <g>
-          <line x1={peak[0]} y1={peak[1]} x2={peak[0]} y2={Math.max(peak[1] - 18, 6)} stroke={ink.hairlineStrong} strokeWidth={1} />
-          <text x={peak[0]} y={Math.max(peak[1] - 22, 10)} textAnchor="middle" fontSize={9} fontWeight={600} fill={ink.muted} style={{ letterSpacing: "0.22em" }}>{peakLabel}</text>
+          <line
+            x1={peak[0]}
+            y1={peak[1]}
+            x2={peak[0]}
+            y2={Math.max(peak[1] - 18, 6)}
+            stroke={ink.hairlineStrong}
+            strokeWidth={1}
+          />
+          <text
+            x={peak[0]}
+            y={Math.max(peak[1] - 22, 10)}
+            textAnchor="middle"
+            fontSize={9}
+            fontWeight={600}
+            fill={ink.muted}
+            style={{ letterSpacing: "0.22em" }}
+          >
+            {peakLabel}
+          </text>
         </g>
       )}
     </svg>
@@ -7397,26 +11183,24 @@ function AiryDefs({ id }: { id: string }) {
     <defs>
       {/* Highlighted / accented bars: soft accent bloom, top-heavy */}
       <linearGradient id={`${id}-airy`} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"  stopColor="var(--slide-accent-text)" stopOpacity={0.55} />
+        <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.55} />
         <stop offset="55%" stopColor="var(--slide-accent-text)" stopOpacity={0.22} />
         <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0.04} />
       </linearGradient>
       {/* Frosted glass fill for baseline/neutral bars — mode-aware via accent */}
       <linearGradient id={`${id}-glass`} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"  stopColor="var(--slide-accent-text)" stopOpacity={0.16} />
+        <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.16} />
         <stop offset="60%" stopColor="var(--slide-accent-text)" stopOpacity={0.08} />
         <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0.02} />
       </linearGradient>
       {/* Muted glass for tertiary segments */}
       <linearGradient id={`${id}-glass-mute`} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%"  stopColor="var(--slide-accent-text)" stopOpacity={0.08} />
+        <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.08} />
         <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0.02} />
       </linearGradient>
     </defs>
   );
 }
-
-
 
 // ── Editorial data primitives ─────────────────────────────────────────
 // DotGridBackdrop retired as decorative chartjunk. Kept as no-op for callers.
@@ -7424,10 +11208,30 @@ function DotGridBackdrop(_props: { opacity?: number } = {}) {
   return null;
 }
 
-function LiveMetaFooter({ brand: _brand, source, refCode }: { brand: BrandMode; source?: string; refCode?: string; live?: boolean }) {
+function LiveMetaFooter({
+  brand: _brand,
+  source,
+  refCode,
+}: {
+  brand: BrandMode;
+  source?: string;
+  refCode?: string;
+  live?: boolean;
+}) {
   const ink = useSlideInk();
   return (
-    <div className="flex items-center justify-between" style={{ borderTop: `1px solid ${ink.hairline}`, paddingTop: 16, fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 500, textTransform: "uppercase" }}>
+    <div
+      className="flex items-center justify-between"
+      style={{
+        borderTop: `1px solid ${ink.hairline}`,
+        paddingTop: 16,
+        fontSize: 11,
+        letterSpacing: "0.24em",
+        color: ink.faint,
+        fontWeight: 500,
+        textTransform: "uppercase",
+      }}
+    >
       <div className="flex gap-10">
         {source && <span>Source · {source}</span>}
         {refCode && <span>Ref · {refCode}</span>}
@@ -7437,7 +11241,15 @@ function LiveMetaFooter({ brand: _brand, source, refCode }: { brand: BrandMode; 
 }
 
 type SegBar = { label: string; value: number; note?: string };
-function SegmentedBar({ brand, segments, height = 68 }: { brand: BrandMode; segments: SegBar[]; height?: number }) {
+function SegmentedBar({
+  brand,
+  segments,
+  height = 68,
+}: {
+  brand: BrandMode;
+  segments: SegBar[];
+  height?: number;
+}) {
   const ink = useSlideInk();
   const total = segments.reduce((s, x) => s + x.value, 0) || 1;
   return (
@@ -7449,23 +11261,56 @@ function SegmentedBar({ brand, segments, height = 68 }: { brand: BrandMode; segm
           const bg = emphasis ? brand.tokens.accent : i === 1 ? ink.accent(0.22) : ink.trackFill;
           const above = i % 2 === 0;
           return (
-            <div key={i} className="relative" style={{ width: `${pct}%`, background: bg, border: emphasis ? "none" : `1px solid ${ink.hairline}` }}>
+            <div
+              key={i}
+              className="relative"
+              style={{
+                width: `${pct}%`,
+                background: bg,
+                border: emphasis ? "none" : `1px solid ${ink.hairline}`,
+              }}
+            >
               <div
                 className="absolute"
-                style={{
-                  left: 0,
-                  [above ? "bottom" : "top"]: "100%",
-                  [above ? "marginBottom" : "marginTop"]: 20,
-                  paddingLeft: 10,
-                  borderLeft: `1px solid ${ink.hairlineStrong}`,
-                  minWidth: 160,
-                } as React.CSSProperties}
+                style={
+                  {
+                    left: 0,
+                    [above ? "bottom" : "top"]: "100%",
+                    [above ? "marginBottom" : "marginTop"]: 20,
+                    paddingLeft: 10,
+                    borderLeft: `1px solid ${ink.hairlineStrong}`,
+                    minWidth: 160,
+                  } as React.CSSProperties
+                }
               >
-                <div className="uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}>{seg.label}</div>
-                <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 600, color: ink.text, letterSpacing: "-0.01em", marginTop: 2 }}>
+                <div
+                  className="uppercase"
+                  style={{
+                    fontSize: 11,
+                    letterSpacing: "0.24em",
+                    color: ink.faint,
+                    fontWeight: 600,
+                  }}
+                >
+                  {seg.label}
+                </div>
+                <div
+                  className="tabular-nums"
+                  style={{
+                    fontSize: 22,
+                    fontWeight: 600,
+                    color: ink.text,
+                    letterSpacing: "-0.01em",
+                    marginTop: 2,
+                  }}
+                >
                   {pct.toFixed(1)}%
                 </div>
-                {seg.note && <div style={{ fontSize: 12, color: ink.muted, marginTop: 2, maxWidth: 220 }}>{seg.note}</div>}
+                {seg.note && (
+                  <div style={{ fontSize: 12, color: ink.muted, marginTop: 2, maxWidth: 220 }}>
+                    {seg.note}
+                  </div>
+                )}
               </div>
             </div>
           );
@@ -7478,30 +11323,87 @@ function SegmentedBar({ brand, segments, height = 68 }: { brand: BrandMode; segm
 function EditorialNote({ title, body, accent }: { title: string; body: string; accent?: string }) {
   const ink = useSlideInk();
   return (
-    <div className="relative" style={{ background: ink.panel, border: `1px solid ${ink.hairline}`, padding: 24 }}>
-      <div style={{ position: "absolute", top: -1, left: 24, width: 56, height: 1, background: accent || ink.text, opacity: 0.7 }} />
-      <div className="uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.text, fontWeight: 700 }}>{title}</div>
+    <div
+      className="relative"
+      style={{ background: ink.panel, border: `1px solid ${ink.hairline}`, padding: 24 }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: -1,
+          left: 24,
+          width: 56,
+          height: 1,
+          background: accent || ink.text,
+          opacity: 0.7,
+        }}
+      />
+      <div
+        className="uppercase"
+        style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.text, fontWeight: 700 }}
+      >
+        {title}
+      </div>
       <div style={{ fontSize: 14, color: ink.muted, lineHeight: 1.55, marginTop: 8 }}>{body}</div>
     </div>
   );
 }
 
-function SummaryStatCard({ brand, label, value, unit, series }: { brand: BrandMode; label: string; value: string; unit: string; series: number[] }) {
+function SummaryStatCard({
+  brand,
+  label,
+  value,
+  unit,
+  series,
+}: {
+  brand: BrandMode;
+  label: string;
+  value: string;
+  unit: string;
+  series: number[];
+}) {
   const ink = useSlideInk();
   return (
     <div>
-      <div className="uppercase" style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.muted, fontWeight: 600 }}>{label}</div>
-      <div className="mt-4 flex items-baseline" style={{ fontSize: 84, fontWeight: 600, color: ink.text, letterSpacing: "-0.03em", lineHeight: 1 }}>
-        <span className="tabular-nums">{value || "—"}</span>
-        {unit && <span style={{ fontSize: 40, marginLeft: 8, color: "var(--slide-accent-text)" }}>{unit}</span>}
+      <div
+        className="uppercase"
+        style={{ fontSize: 18, letterSpacing: "0.28em", color: ink.muted, fontWeight: 600 }}
+      >
+        {label}
       </div>
-      <div className="mt-4"><Sparkline brand={brand} values={series} h={70} /></div>
+      <div
+        className="mt-4 flex items-baseline"
+        style={{
+          fontSize: 84,
+          fontWeight: 600,
+          color: ink.text,
+          letterSpacing: "-0.03em",
+          lineHeight: 1,
+        }}
+      >
+        <span className="tabular-nums">{value || "—"}</span>
+        {unit && (
+          <span style={{ fontSize: 40, marginLeft: 8, color: "var(--slide-accent-text)" }}>
+            {unit}
+          </span>
+        )}
+      </div>
+      <div className="mt-4">
+        <Sparkline brand={brand} values={series} h={70} />
+      </div>
     </div>
   );
 }
 
-
-function Donut({ brand: _brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
+function Donut({
+  brand: _brand,
+  percent,
+  size = 260,
+}: {
+  brand: BrandMode;
+  percent: number;
+  size?: number;
+}) {
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
   const p = Math.max(0, Math.min(100, percent));
@@ -7511,12 +11413,48 @@ function Donut({ brand: _brand, percent, size = 260 }: { brand: BrandMode; perce
   const dash = (p / 100) * circ;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={ink.trackFill} strokeWidth={stroke} />
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
-      <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central" fontSize={size * 0.32} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}>
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        fill="none"
+        stroke={ink.trackFill}
+        strokeWidth={stroke}
+      />
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        fill="none"
+        stroke="var(--slide-accent-text)"
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeDasharray={`${dash} ${circ - dash}`}
+        transform={`rotate(-90 ${size / 2} ${size / 2})`}
+      />
+      <text
+        x={size / 2}
+        y={size / 2}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize={size * 0.32}
+        fontWeight={600}
+        fill={ink.text}
+        style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}
+      >
         {Math.round(p)}
       </text>
-      <text x={size / 2} y={size / 2 + size * 0.19} textAnchor="middle" fontSize={size * 0.075} fontWeight={500} fill={ink.faint} style={{ letterSpacing: "0.22em" }}>%</text>
+      <text
+        x={size / 2}
+        y={size / 2 + size * 0.19}
+        textAnchor="middle"
+        fontSize={size * 0.075}
+        fontWeight={500}
+        fill={ink.faint}
+        style={{ letterSpacing: "0.22em" }}
+      >
+        %
+      </text>
     </svg>
   );
 }
@@ -7550,7 +11488,10 @@ function FreeformAreaChart({
   const step = series.length > 1 ? (w - padL - padR) / (series.length - 1) : 0;
   const pts = series.map(
     (p, i) =>
-      [padL + i * step, padT + (h - padT - padB) * (1 - (p.value - min) / range)] as [number, number],
+      [padL + i * step, padT + (h - padT - padB) * (1 - (p.value - min) / range)] as [
+        number,
+        number,
+      ],
   );
   const linePath = pts
     .map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`)
@@ -7607,7 +11548,14 @@ function FreeformAreaChart({
       />
       {/* Subtle inner dots on every point */}
       {pts.map((p, i) => (
-        <circle key={i} cx={p[0]} cy={p[1]} r={2.5} fill="var(--slide-accent-text)" opacity={0.55} />
+        <circle
+          key={i}
+          cx={p[0]}
+          cy={p[1]}
+          r={2.5}
+          fill="var(--slide-accent-text)"
+          opacity={0.55}
+        />
       ))}
       {/* Final point: radial halo + solid core */}
       {last && (
@@ -7787,7 +11735,7 @@ function FreeformSvgDefs({ id }: { id: string }) {
         <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
       </linearGradient>
       <linearGradient id={`${id}-bloom-h-mute`} x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.20} />
+        <stop offset="0%" stopColor="var(--slide-accent-text)" stopOpacity={0.2} />
         <stop offset="70%" stopColor="var(--slide-accent-text)" stopOpacity={0.06} />
         <stop offset="100%" stopColor="var(--slide-accent-text)" stopOpacity={0} />
       </linearGradient>
@@ -7925,18 +11873,18 @@ function FreeformSemiGauge({
       width={vbW}
       height={vbH}
       viewBox={`${vbX} ${vbY} ${vbW} ${vbH}`}
-      style={{ overflow: "visible", marginLeft: -pad, marginRight: -pad, marginTop: -pad, marginBottom: -pad }}
+      style={{
+        overflow: "visible",
+        marginLeft: -pad,
+        marginRight: -pad,
+        marginTop: -pad,
+        marginBottom: -pad,
+      }}
       aria-hidden
     >
       <FreeformSvgDefs id={id} />
       {/* Feathered halo behind the terminus */}
-      <circle
-        cx={termX}
-        cy={termY}
-        r={haloR}
-        fill={`url(#${id}-halo)`}
-        opacity={bloom ? 1 : 0.7}
-      />
+      <circle cx={termX} cy={termY} r={haloR} fill={`url(#${id}-halo)`} opacity={bloom ? 1 : 0.7} />
       {/* Hairline track */}
       <path d={arc} fill="none" stroke={ink.hairline} strokeWidth={1} />
       {/* Accent stroke arc with glow */}
@@ -7962,12 +11910,13 @@ function FreeformSemiGauge({
         style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}
       >
         {Math.round(p)}
-        <tspan fontSize={size * 0.09} fill={ink.faint} dx={4} style={{ letterSpacing: "0.18em" }}>%</tspan>
+        <tspan fontSize={size * 0.09} fill={ink.faint} dx={4} style={{ letterSpacing: "0.18em" }}>
+          %
+        </tspan>
       </text>
     </svg>
   );
 }
-
 
 // Free-form breakdown row. Left-to-right feathered accent gradient, no
 // pill/track. When bloom=true, adds a radial halo + accent stroke tip at
@@ -8019,7 +11968,13 @@ function FreeformBreakdownRow({
             {value}
           </span>
           {unit && (
-            <span style={{ fontSize: bloom ? 22 : 16, color: "var(--slide-accent-text)", fontWeight: 500 }}>
+            <span
+              style={{
+                fontSize: bloom ? 22 : 16,
+                color: "var(--slide-accent-text)",
+                fontWeight: 500,
+              }}
+            >
               {unit}
             </span>
           )}
@@ -8080,7 +12035,8 @@ function FreeformBreakdownRow({
                 width: 2,
                 height: "100%",
                 background: "var(--slide-accent-text)",
-                boxShadow: "0 0 14px 2px color-mix(in oklab, var(--slide-accent-text) 55%, transparent)",
+                boxShadow:
+                  "0 0 14px 2px color-mix(in oklab, var(--slide-accent-text) 55%, transparent)",
                 zIndex: 1,
               }}
             />
@@ -8126,7 +12082,9 @@ function FreeformReportItem({
         />
       )}
       <div className="relative" style={{ zIndex: 1 }}>
-        <Kicker brand={brand} color={negative ? "#E53D2E" : undefined}>{meta}</Kicker>
+        <Kicker brand={brand} color={negative ? "#E53D2E" : undefined}>
+          {meta}
+        </Kicker>
         <div
           className="mt-6 tabular-nums"
           style={{
@@ -8141,20 +12099,35 @@ function FreeformReportItem({
         </div>
         <div
           className="mt-6"
-          style={{ fontSize: 22, color: ink.muted, lineHeight: 1.4, letterSpacing: "-0.005em", maxWidth: 520 }}
+          style={{
+            fontSize: 22,
+            color: ink.muted,
+            lineHeight: 1.4,
+            letterSpacing: "-0.005em",
+            maxWidth: 520,
+          }}
         >
           {s(item.label)}
         </div>
         {toNums(item.series).length > 0 && (
-          <div className="mt-8"><Sparkline brand={brand} values={toNums(item.series)} h={72} /></div>
+          <div className="mt-8">
+            <Sparkline brand={brand} values={toNums(item.series)} h={72} />
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; percent: number; size?: number }) {
-
+function SemiGauge({
+  brand: _brand,
+  percent,
+  size = 260,
+}: {
+  brand: BrandMode;
+  percent: number;
+  size?: number;
+}) {
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
   const p = Math.max(0, Math.min(100, percent));
@@ -8169,54 +12142,143 @@ function SemiGauge({ brand: _brand, percent, size = 260 }: { brand: BrandMode; p
   return (
     <svg width={size} height={h} viewBox={`0 0 ${size} ${h}`} aria-hidden>
       <path d={arc} fill="none" stroke={ink.trackFill} strokeWidth={stroke} strokeLinecap="round" />
-      <path d={arc} fill="none" stroke="var(--slide-accent-text)" strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${arcC}`} />
-      <text x={cx} y={cy - 24} textAnchor="middle" fontSize={size * 0.34} fontWeight={600} fill={ink.text} style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}>
+      <path
+        d={arc}
+        fill="none"
+        stroke="var(--slide-accent-text)"
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeDasharray={`${dash} ${arcC}`}
+      />
+      <text
+        x={cx}
+        y={cy - 24}
+        textAnchor="middle"
+        fontSize={size * 0.34}
+        fontWeight={600}
+        fill={ink.text}
+        style={{ letterSpacing: "-0.035em", fontVariantNumeric: "tabular-nums" }}
+      >
         {Math.round(p)}
       </text>
-      <text x={cx} y={cy - 6} textAnchor="middle" fontSize={size * 0.075} fontWeight={500} fill={ink.faint} style={{ letterSpacing: "0.22em" }}>%</text>
+      <text
+        x={cx}
+        y={cy - 6}
+        textAnchor="middle"
+        fontSize={size * 0.075}
+        fontWeight={500}
+        fill={ink.faint}
+        style={{ letterSpacing: "0.22em" }}
+      >
+        %
+      </text>
     </svg>
   );
 }
 
-
-
-
-function AreaChart({ brand: _brand, series, height = 480 }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; bare?: boolean; airy?: boolean }) {
+function AreaChart({
+  brand: _brand,
+  series,
+  height = 480,
+}: {
+  brand: BrandMode;
+  series: { label: string; value: number }[];
+  height?: number;
+  bare?: boolean;
+  airy?: boolean;
+}) {
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
   const w = 1000;
   const h = height;
-  const padL = 20, padR = 20, padT = 20, padB = 60;
+  const padL = 20,
+    padR = 20,
+    padT = 20,
+    padB = 60;
   const vals = series.map((p) => p.value);
   const max = Math.max(1, ...vals);
   const min = Math.min(0, ...vals);
   const range = max - min || 1;
   const step = series.length > 1 ? (w - padL - padR) / (series.length - 1) : 0;
-  const pts = series.map((p, i) => [padL + i * step, padT + (h - padT - padB) * (1 - (p.value - min) / range)] as [number, number]);
-  const linePath = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
-  const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z` : "";
+  const pts = series.map(
+    (p, i) =>
+      [padL + i * step, padT + (h - padT - padB) * (1 - (p.value - min) / range)] as [
+        number,
+        number,
+      ],
+  );
+  const linePath = pts
+    .map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`)
+    .join(" ");
+  const areaPath = pts.length
+    ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z`
+    : "";
   const showEvery = series.length > 8 ? Math.ceil(series.length / 8) : 1;
   const last = pts[pts.length - 1];
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <AiryDefs id={id} />
-      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairline} strokeWidth={1} />
+      <line
+        x1={padL}
+        y1={h - padB}
+        x2={w - padR}
+        y2={h - padB}
+        stroke={ink.hairline}
+        strokeWidth={1}
+      />
       {areaPath && <path d={areaPath} fill={`url(#${id}-airy)`} />}
-      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d={linePath}
+        fill="none"
+        stroke="var(--slide-accent-text)"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
       {last && <circle cx={last[0]} cy={last[1]} r={4.5} fill="var(--slide-accent-text)" />}
-      {series.map((p, i) => (i % showEvery === 0 || i === series.length - 1) ? (
-        <text key={i} x={pts[i]?.[0]} y={h - padB + 28} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{p.label}</text>
-      ) : null)}
+      {series.map((p, i) =>
+        i % showEvery === 0 || i === series.length - 1 ? (
+          <text
+            key={i}
+            x={pts[i]?.[0]}
+            y={h - padB + 28}
+            textAnchor="middle"
+            fontSize={16}
+            fill={ink.faint}
+            style={{
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            {p.label}
+          </text>
+        ) : null,
+      )}
     </svg>
   );
 }
 
-function BarChart({ brand: _brand, bars, height = 480, highlight }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string; bare?: boolean }) {
+function BarChart({
+  brand: _brand,
+  bars,
+  height = 480,
+  highlight,
+}: {
+  brand: BrandMode;
+  bars: { label: string; value: number }[];
+  height?: number;
+  highlight?: string;
+  bare?: boolean;
+}) {
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
   const w = 900;
   const h = height;
-  const padL = 20, padR = 20, padT = 30, padB = 60;
+  const padL = 20,
+    padR = 20,
+    padT = 30,
+    padB = 60;
   const max = Math.max(1, ...bars.map((b) => b.value));
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(bars.length, 1);
@@ -8224,7 +12286,14 @@ function BarChart({ brand: _brand, bars, height = 480, highlight }: { brand: Bra
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <AiryDefs id={id} />
-      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
+      <line
+        x1={padL}
+        y1={h - padB}
+        x2={w - padR}
+        y2={h - padB}
+        stroke={ink.hairlineStrong}
+        strokeWidth={1}
+      />
       {bars.map((b, i) => {
         const bh = (b.value / max) * chartH;
         const x = padL + i * slot + (slot - barW) / 2;
@@ -8232,10 +12301,40 @@ function BarChart({ brand: _brand, bars, height = 480, highlight }: { brand: Bra
         const isHi = highlight ? b.label === highlight : false;
         return (
           <g key={i}>
-            <rect x={x} y={y} width={barW} height={bh} fill={isHi ? `url(#${id}-airy)` : ink.trackFill} rx={2} />
+            <rect
+              x={x}
+              y={y}
+              width={barW}
+              height={bh}
+              fill={isHi ? `url(#${id}-airy)` : ink.trackFill}
+              rx={2}
+            />
             {isHi && <rect x={x} y={y} width={barW} height={2} fill="var(--slide-accent-text)" />}
-            <text x={x + barW / 2} y={h - padB + 30} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{b.label}</text>
-            <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={isHi ? 26 : 18} fontWeight={600} fill={isHi ? ink.text : ink.muted} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{b.value}</text>
+            <text
+              x={x + barW / 2}
+              y={h - padB + 30}
+              textAnchor="middle"
+              fontSize={16}
+              fill={ink.faint}
+              style={{
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {b.label}
+            </text>
+            <text
+              x={x + barW / 2}
+              y={y - 12}
+              textAnchor="middle"
+              fontSize={isHi ? 26 : 18}
+              fontWeight={600}
+              fill={isHi ? ink.text : ink.muted}
+              style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}
+            >
+              {b.value}
+            </text>
           </g>
         );
       })}
@@ -8243,19 +12342,43 @@ function BarChart({ brand: _brand, bars, height = 480, highlight }: { brand: Bra
   );
 }
 
-
 function ReportCard({ brand, item }: { brand: BrandMode; item: Item }) {
   const ink = useSlideInk();
   const delta = s(item.delta);
   const negative = delta.trim().startsWith("-");
   return (
     <div>
-      <Kicker brand={brand} color={negative ? "#E53D2E" : undefined}>{negative ? "Reduction" : "Growth"}</Kicker>
-      <div className="mt-6" style={{ fontSize: 96, fontWeight: 600, color: ink.text, letterSpacing: "-0.035em", lineHeight: 0.95 }}>{delta}</div>
-      <div className="mt-6" style={{ fontSize: 26, color: ink.muted, lineHeight: 1.35, maxWidth: 520 }}>{s(item.label)}</div>
-      <div className="mt-8"><Sparkline brand={brand} values={toNums(item.series)} h={80} /></div>
+      <Kicker brand={brand} color={negative ? "#E53D2E" : undefined}>
+        {negative ? "Reduction" : "Growth"}
+      </Kicker>
+      <div
+        className="mt-6"
+        style={{
+          fontSize: 96,
+          fontWeight: 600,
+          color: ink.text,
+          letterSpacing: "-0.035em",
+          lineHeight: 0.95,
+        }}
+      >
+        {delta}
+      </div>
+      <div
+        className="mt-6"
+        style={{ fontSize: 26, color: ink.muted, lineHeight: 1.35, maxWidth: 520 }}
+      >
+        {s(item.label)}
+      </div>
+      <div className="mt-8">
+        <Sparkline brand={brand} values={toNums(item.series)} h={80} />
+      </div>
       {s(item.meta) && (
-        <div className="mt-4 uppercase" style={{ fontSize: 16, letterSpacing: "0.28em", color: ink.faint, fontWeight: 600 }}>{s(item.meta)}</div>
+        <div
+          className="mt-4 uppercase"
+          style={{ fontSize: 16, letterSpacing: "0.28em", color: ink.faint, fontWeight: 600 }}
+        >
+          {s(item.meta)}
+        </div>
       )}
     </div>
   );
@@ -8266,18 +12389,43 @@ function ProgressBar({ brand: _brand, percent }: { brand: BrandMode; percent: nu
   const p = Math.max(0, Math.min(100, percent));
   return (
     <div style={{ position: "relative", height: 4, background: ink.trackFill, flex: 1 }}>
-      <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${p}%`, background: "var(--slide-accent-text)" }} />
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          height: "100%",
+          width: `${p}%`,
+          background: "var(--slide-accent-text)",
+        }}
+      />
     </div>
   );
 }
 
 // ── Graph helpers (Batch 4) ────────────────────────────────────────────
-function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { brand: BrandMode; bars: { label: string; value: number }[]; height?: number; highlight?: string; unit?: string; bare?: boolean }) {
+function AxisBarChart({
+  brand: _brand,
+  bars,
+  height = 480,
+  highlight,
+  unit,
+}: {
+  brand: BrandMode;
+  bars: { label: string; value: number }[];
+  height?: number;
+  highlight?: string;
+  unit?: string;
+  bare?: boolean;
+}) {
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
   const w = 1720;
   const h = height;
-  const padL = 90, padR = 40, padT = 40, padB = 60;
+  const padL = 90,
+    padR = 40,
+    padT = 40,
+    padB = 60;
   const max = Math.max(1, ...bars.map((b) => b.value));
   const niceMax = Math.ceil(max * 1.1);
   const chartH = h - padT - padB;
@@ -8293,8 +12441,26 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { 
         const val = niceMax * (1 - i / ticks);
         return (
           <g key={i}>
-            <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} opacity={i === ticks ? 1 : 0.55} />
-            <text x={padL - 14} y={y + 5} textAnchor="end" fontSize={14} fill={ink.faint} style={{ fontVariantNumeric: "tabular-nums" }}>{val.toFixed(0)}{unit || ""}</text>
+            <line
+              x1={padL}
+              y1={y}
+              x2={w - padR}
+              y2={y}
+              stroke={ink.hairline}
+              strokeWidth={1}
+              opacity={i === ticks ? 1 : 0.55}
+            />
+            <text
+              x={padL - 14}
+              y={y + 5}
+              textAnchor="end"
+              fontSize={14}
+              fill={ink.faint}
+              style={{ fontVariantNumeric: "tabular-nums" }}
+            >
+              {val.toFixed(0)}
+              {unit || ""}
+            </text>
           </g>
         );
       })}
@@ -8318,31 +12484,73 @@ function AxisBarChart({ brand: _brand, bars, height = 480, highlight, unit }: { 
             />
             {isHi && <rect x={x} y={y} width={barW} height={2} fill="var(--slide-accent-text)" />}
             {isHi && hiValue !== undefined && (
-              <text x={x + barW / 2} y={y - 16} textAnchor="middle" fontSize={22} fontWeight={600} fill={ink.text} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{b.value}{unit || ""}</text>
+              <text
+                x={x + barW / 2}
+                y={y - 16}
+                textAnchor="middle"
+                fontSize={22}
+                fontWeight={600}
+                fill={ink.text}
+                style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}
+              >
+                {b.value}
+                {unit || ""}
+              </text>
             )}
-            <text x={x + barW / 2} y={h - padB + 30} textAnchor="middle" fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{b.label}</text>
+            <text
+              x={x + barW / 2}
+              y={h - padB + 30}
+              textAnchor="middle"
+              fontSize={14}
+              fill={ink.faint}
+              style={{
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {b.label}
+            </text>
           </g>
         );
-
       })}
     </svg>
   );
 }
-
 
 function DonutBlock({ brand, item }: { brand: BrandMode; item: Item }) {
   const ink = useSlideInk();
   return (
     <div className="flex flex-col items-center text-center">
       <Kicker brand={brand}>{s(item.meta, "Snapshot")}</Kicker>
-      <div className="mt-6"><Donut brand={brand} percent={Number(item.value) || 0} size={340} /></div>
-      <div className="mt-8 uppercase" style={{ fontSize: 20, letterSpacing: "0.28em", color: ink.text, fontWeight: 600 }}>{s(item.label)}</div>
-      <div className="mt-4" style={{ fontSize: 20, lineHeight: 1.45, color: ink.muted, maxWidth: 480 }}>{s(item.body)}</div>
+      <div className="mt-6">
+        <Donut brand={brand} percent={Number(item.value) || 0} size={340} />
+      </div>
+      <div
+        className="mt-8 uppercase"
+        style={{ fontSize: 20, letterSpacing: "0.28em", color: ink.text, fontWeight: 600 }}
+      >
+        {s(item.label)}
+      </div>
+      <div
+        className="mt-4"
+        style={{ fontSize: 20, lineHeight: 1.45, color: ink.muted, maxWidth: 480 }}
+      >
+        {s(item.body)}
+      </div>
     </div>
   );
 }
 
-function ConcentricRings({ brand: _brand, items, size = 480 }: { brand: BrandMode; items: { label: string; value: number }[]; size?: number }) {
+function ConcentricRings({
+  brand: _brand,
+  items,
+  size = 480,
+}: {
+  brand: BrandMode;
+  items: { label: string; value: number }[];
+  size?: number;
+}) {
   const ink = useSlideInk();
   const stroke = 12;
   const gap = 12;
@@ -8356,8 +12564,26 @@ function ConcentricRings({ brand: _brand, items, size = 480 }: { brand: BrandMod
         const isPrimary = i === 0;
         return (
           <g key={i}>
-            <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={ink.trackFill} strokeWidth={stroke} />
-            <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={isPrimary ? "var(--slide-accent-text)" : ink.strong} strokeOpacity={isPrimary ? 1 : Math.max(0.35, 0.85 - i * 0.15)} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={`${dash} ${circ - dash}`} transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={r}
+              fill="none"
+              stroke={ink.trackFill}
+              strokeWidth={stroke}
+            />
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={r}
+              fill="none"
+              stroke={isPrimary ? "var(--slide-accent-text)" : ink.strong}
+              strokeOpacity={isPrimary ? 1 : Math.max(0.35, 0.85 - i * 0.15)}
+              strokeWidth={stroke}
+              strokeLinecap="round"
+              strokeDasharray={`${dash} ${circ - dash}`}
+              transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            />
           </g>
         );
       })}
@@ -8365,20 +12591,40 @@ function ConcentricRings({ brand: _brand, items, size = 480 }: { brand: BrandMod
   );
 }
 
-
-
-function DecadeAreaChart({ brand: _brand, series, height = 480, calloutLabel, calloutNote }: { brand: BrandMode; series: { label: string; value: number }[]; height?: number; calloutLabel?: string; calloutNote?: string; bare?: boolean }) {
+function DecadeAreaChart({
+  brand: _brand,
+  series,
+  height = 480,
+  calloutLabel,
+  calloutNote,
+}: {
+  brand: BrandMode;
+  series: { label: string; value: number }[];
+  height?: number;
+  calloutLabel?: string;
+  calloutNote?: string;
+  bare?: boolean;
+}) {
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
   const w = 1720;
   const h = height;
-  const padL = 30, padR = 30, padT = 40, padB = 60;
+  const padL = 30,
+    padR = 30,
+    padT = 40,
+    padB = 60;
   const vals = series.map((p) => p.value);
   const max = Math.max(1, ...vals);
   const min = Math.min(0, ...vals);
   const range = max - min || 1;
   const step = series.length > 1 ? (w - padL - padR) / (series.length - 1) : 0;
-  const pts = series.map((p, i) => [padL + i * step, padT + (h - padT - padB) * (1 - (p.value - min) / range)] as [number, number]);
+  const pts = series.map(
+    (p, i) =>
+      [padL + i * step, padT + (h - padT - padB) * (1 - (p.value - min) / range)] as [
+        number,
+        number,
+      ],
+  );
   const smooth = (points: [number, number][]) => {
     if (points.length < 2) return "";
     let d = `M${points[0][0]},${points[0][1]}`;
@@ -8391,37 +12637,109 @@ function DecadeAreaChart({ brand: _brand, series, height = 480, calloutLabel, ca
     return d;
   };
   const linePath = smooth(pts);
-  const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z` : "";
+  const areaPath = pts.length
+    ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${h - padB} L${pts[0][0].toFixed(1)},${h - padB} Z`
+    : "";
   const highlightIdx = series.findIndex((p) => p.label === calloutLabel);
   const hi = highlightIdx >= 0 ? pts[highlightIdx] : null;
   const showEvery = series.length > 10 ? 2 : 1;
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <AiryDefs id={id} />
-      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
+      <line
+        x1={padL}
+        y1={h - padB}
+        x2={w - padR}
+        y2={h - padB}
+        stroke={ink.hairlineStrong}
+        strokeWidth={1}
+      />
       {areaPath && <path d={areaPath} fill={`url(#${id}-airy)`} />}
-      <path d={linePath} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-      {series.map((p, i) => (i % showEvery === 0 || i === series.length - 1) ? (
-        <text key={i} x={pts[i]?.[0]} y={h - padB + 30} textAnchor="middle" fontSize={14} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase", fontVariantNumeric: "tabular-nums" }}>{p.label}</text>
-      ) : null)}
+      <path
+        d={linePath}
+        fill="none"
+        stroke="var(--slide-accent-text)"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {series.map((p, i) =>
+        i % showEvery === 0 || i === series.length - 1 ? (
+          <text
+            key={i}
+            x={pts[i]?.[0]}
+            y={h - padB + 30}
+            textAnchor="middle"
+            fontSize={14}
+            fill={ink.faint}
+            style={{
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            {p.label}
+          </text>
+        ) : null,
+      )}
       {hi && (
         <g>
           <circle cx={hi[0]} cy={hi[1]} r={4.5} fill="var(--slide-accent-text)" />
-          <line x1={hi[0]} y1={hi[1] - 12} x2={hi[0]} y2={Math.max(hi[1] - 96, 12)} stroke={ink.hairlineStrong} strokeWidth={1} />
-          <text x={hi[0]} y={Math.max(hi[1] - 108, 20)} textAnchor="middle" fontSize={18} fontWeight={600} fill={ink.strong} style={{ letterSpacing: "-0.01em" }}>{calloutLabel}</text>
-          <text x={hi[0]} y={Math.max(hi[1] - 84, 44)} textAnchor="middle" fontSize={14} fill={ink.muted}>{calloutNote}</text>
+          <line
+            x1={hi[0]}
+            y1={hi[1] - 12}
+            x2={hi[0]}
+            y2={Math.max(hi[1] - 96, 12)}
+            stroke={ink.hairlineStrong}
+            strokeWidth={1}
+          />
+          <text
+            x={hi[0]}
+            y={Math.max(hi[1] - 108, 20)}
+            textAnchor="middle"
+            fontSize={18}
+            fontWeight={600}
+            fill={ink.strong}
+            style={{ letterSpacing: "-0.01em" }}
+          >
+            {calloutLabel}
+          </text>
+          <text
+            x={hi[0]}
+            y={Math.max(hi[1] - 84, 44)}
+            textAnchor="middle"
+            fontSize={14}
+            fill={ink.muted}
+          >
+            {calloutNote}
+          </text>
         </g>
       )}
     </svg>
   );
 }
 
-
 // ── Extended graph helpers ───────────────────────────────────────────────
-function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand: BrandMode; series: { label: string; points: number[] }[]; xLabels: string[]; unit?: string; height?: number }) {
+function LineMultiChart({
+  brand,
+  series,
+  xLabels,
+  unit,
+  height = 480,
+}: {
+  brand: BrandMode;
+  series: { label: string; points: number[] }[];
+  xLabels: string[];
+  unit?: string;
+  height?: number;
+}) {
   const ink = useSlideInk();
-  const w = 1720, h = height;
-  const padL = 90, padR = 40, padT = 30, padB = 80;
+  const w = 1720,
+    h = height;
+  const padL = 90,
+    padR = 40,
+    padT = 30,
+    padB = 80;
   const cols = [brand.tokens.accent, brand.tokens.primary, ink.faint];
   const all = series.flatMap((s) => s.points);
   const max = Math.max(1, ...all);
@@ -8439,28 +12757,72 @@ function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand:
           return (
             <g key={i}>
               <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} />
-              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={16} fill={ink.faint}>{Math.round(val)}{unit || ""}</text>
+              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={16} fill={ink.faint}>
+                {Math.round(val)}
+                {unit || ""}
+              </text>
             </g>
           );
         })}
         {series.map((sr, si) => {
-          const pts = sr.points.map((v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number]);
-          const d = pts.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(" ");
+          const pts = sr.points.map(
+            (v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number],
+          );
+          const d = pts
+            .map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`))
+            .join(" ");
           return (
             <g key={si}>
-              <path d={d} fill="none" stroke={cols[si] || ink.strong} strokeWidth={si === 0 ? 3 : 2} strokeLinecap="round" strokeLinejoin="round" opacity={si === 0 ? 1 : 0.85} />
-              {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={si === 0 ? 5 : 4} fill={cols[si] || ink.strong} />)}
+              <path
+                d={d}
+                fill="none"
+                stroke={cols[si] || ink.strong}
+                strokeWidth={si === 0 ? 3 : 2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity={si === 0 ? 1 : 0.85}
+              />
+              {pts.map((p, i) => (
+                <circle
+                  key={i}
+                  cx={p[0]}
+                  cy={p[1]}
+                  r={si === 0 ? 5 : 4}
+                  fill={cols[si] || ink.strong}
+                />
+              ))}
             </g>
           );
         })}
         {xLabels.map((lb, i) => (
-          <text key={i} x={padL + i * step} y={h - padB + 34} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{lb}</text>
+          <text
+            key={i}
+            x={padL + i * step}
+            y={h - padB + 34}
+            textAnchor="middle"
+            fontSize={16}
+            fill={ink.faint}
+            style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
+          >
+            {lb}
+          </text>
         ))}
       </svg>
       <div className="mt-2 flex flex-wrap gap-6">
         {series.map((sr, i) => (
-          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
-            <span style={{ display: "inline-block", width: 22, height: 3, background: cols[i] || ink.strong }} />
+          <div
+            key={i}
+            className="flex items-center gap-2"
+            style={{ fontSize: 16, color: ink.muted }}
+          >
+            <span
+              style={{
+                display: "inline-block",
+                width: 22,
+                height: 3,
+                background: cols[i] || ink.strong,
+              }}
+            />
             <span style={{ fontWeight: 600, color: ink.strong }}>{sr.label}</span>
           </div>
         ))}
@@ -8469,11 +12831,27 @@ function LineMultiChart({ brand, series, xLabels, unit, height = 480 }: { brand:
   );
 }
 
-function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { brand: BrandMode; segments: { label: string }[]; columns: { label: string; values: number[] }[]; unit?: string; height?: number }) {
+function StackedBarChart({
+  brand,
+  segments,
+  columns,
+  unit,
+  height = 480,
+}: {
+  brand: BrandMode;
+  segments: { label: string }[];
+  columns: { label: string; values: number[] }[];
+  unit?: string;
+  height?: number;
+}) {
   const ink = useSlideInk();
   const id = useId().replace(/:/g, "");
-  const w = 1720, h = height;
-  const padL = 90, padR = 40, padT = 30, padB = 80;
+  const w = 1720,
+    h = height;
+  const padL = 90,
+    padR = 40,
+    padT = 30,
+    padB = 80;
   const totals = columns.map((c) => c.values.reduce((a, b) => a + b, 0));
   const max = Math.max(1, ...totals);
   const niceMax = Math.ceil(max * 1.1);
@@ -8490,7 +12868,17 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
         <AiryDefs id={id} />
         {Array.from({ length: ticks + 1 }, (_, i) => {
           const y = padT + (chartH / ticks) * i;
-          return <line key={i} x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} />;
+          return (
+            <line
+              key={i}
+              x1={padL}
+              y1={y}
+              x2={w - padR}
+              y2={y}
+              stroke={ink.hairline}
+              strokeWidth={1}
+            />
+          );
         })}
         {columns.map((col, i) => {
           const x = padL + i * slot + (slot - barW) / 2;
@@ -8514,31 +12902,72 @@ function StackedBarChart({ brand, segments, columns, unit, height = 480 }: { bra
                   />
                 );
               })}
-              <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{col.label}</text>
+              <text
+                x={x + barW / 2}
+                y={h - padB + 32}
+                textAnchor="middle"
+                fontSize={16}
+                fill={ink.faint}
+                style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
+              >
+                {col.label}
+              </text>
             </g>
           );
         })}
       </svg>
       <div className="mt-3 flex flex-wrap gap-6">
         {segments.map((sg, i) => (
-          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
-            <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || ink.strong, opacity: i === 0 ? 0.75 : 0.45 - i * 0.1, border: `1px solid ${ink.hairlineStrong}` }} />
+          <div
+            key={i}
+            className="flex items-center gap-2"
+            style={{ fontSize: 16, color: ink.muted }}
+          >
+            <span
+              style={{
+                display: "inline-block",
+                width: 16,
+                height: 16,
+                background: cols[i] || ink.strong,
+                opacity: i === 0 ? 0.75 : 0.45 - i * 0.1,
+                border: `1px solid ${ink.hairlineStrong}`,
+              }}
+            />
             <span style={{ fontWeight: 600, color: ink.strong }}>{sg.label}</span>
           </div>
         ))}
-        {unit && <div style={{ fontSize: 14, color: ink.faint, marginLeft: "auto" }}>Units: {unit}</div>}
+        {unit && (
+          <div style={{ fontSize: 14, color: ink.faint, marginLeft: "auto" }}>Units: {unit}</div>
+        )}
       </div>
     </div>
   );
 }
 
-
-function StackedAreaChart({ brand, series, xLabels, unit, height = 480 }: { brand: BrandMode; series: { label: string; points: number[] }[]; xLabels: string[]; unit?: string; height?: number }) {
+function StackedAreaChart({
+  brand,
+  series,
+  xLabels,
+  unit,
+  height = 480,
+}: {
+  brand: BrandMode;
+  series: { label: string; points: number[] }[];
+  xLabels: string[];
+  unit?: string;
+  height?: number;
+}) {
   const ink = useSlideInk();
-  const w = 1720, h = height;
-  const padL = 60, padR = 40, padT = 30, padB = 80;
+  const w = 1720,
+    h = height;
+  const padL = 60,
+    padR = 40,
+    padT = 30,
+    padB = 80;
   const n = Math.max(...series.map((s) => s.points.length), 1);
-  const totals = Array.from({ length: n }, (_, i) => series.reduce((a, s) => a + (s.points[i] || 0), 0));
+  const totals = Array.from({ length: n }, (_, i) =>
+    series.reduce((a, s) => a + (s.points[i] || 0), 0),
+  );
   const max = Math.max(1, ...totals);
   const niceMax = Math.ceil(max * 1.1);
   const chartH = h - padT - padB;
@@ -8549,37 +12978,100 @@ function StackedAreaChart({ brand, series, xLabels, unit, height = 480 }: { bran
     const bottom = stacks.slice();
     const top = stacks.map((v, i) => v + (sr.points[i] || 0));
     stacks = top;
-    const topPts = top.map((v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number]);
-    const botPts = bottom.map((v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number]).reverse();
-    const d = [...topPts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`), ...botPts.map((p) => `L${p[0]},${p[1]}`), "Z"].join(" ");
+    const topPts = top.map(
+      (v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number],
+    );
+    const botPts = bottom
+      .map((v, i) => [padL + i * step, padT + chartH * (1 - v / niceMax)] as [number, number])
+      .reverse();
+    const d = [
+      ...topPts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`),
+      ...botPts.map((p) => `L${p[0]},${p[1]}`),
+      "Z",
+    ].join(" ");
     return { d, color: cols[si] || ink.strong, si };
   });
   return (
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-        <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
-        {layers.map((l) => <path key={l.si} d={l.d} fill={l.color} opacity={l.si === 0 ? 0.32 : Math.max(0.08, 0.22 - l.si * 0.05)} stroke={l.color} strokeOpacity={l.si === 0 ? 0.7 : 0.35} strokeWidth={1.5} />)}
+        <line
+          x1={padL}
+          y1={h - padB}
+          x2={w - padR}
+          y2={h - padB}
+          stroke={ink.hairlineStrong}
+          strokeWidth={1}
+        />
+        {layers.map((l) => (
+          <path
+            key={l.si}
+            d={l.d}
+            fill={l.color}
+            opacity={l.si === 0 ? 0.32 : Math.max(0.08, 0.22 - l.si * 0.05)}
+            stroke={l.color}
+            strokeOpacity={l.si === 0 ? 0.7 : 0.35}
+            strokeWidth={1.5}
+          />
+        ))}
         {xLabels.map((lb, i) => (
-          <text key={i} x={padL + i * step} y={h - padB + 34} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{lb}</text>
+          <text
+            key={i}
+            x={padL + i * step}
+            y={h - padB + 34}
+            textAnchor="middle"
+            fontSize={16}
+            fill={ink.faint}
+            style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
+          >
+            {lb}
+          </text>
         ))}
       </svg>
       <div className="mt-3 flex flex-wrap gap-6">
         {series.map((sr, i) => (
-          <div key={i} className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
-            <span style={{ display: "inline-block", width: 16, height: 16, background: cols[i] || ink.strong, opacity: i === 0 ? 0.95 : 0.7 - i * 0.15 }} />
+          <div
+            key={i}
+            className="flex items-center gap-2"
+            style={{ fontSize: 16, color: ink.muted }}
+          >
+            <span
+              style={{
+                display: "inline-block",
+                width: 16,
+                height: 16,
+                background: cols[i] || ink.strong,
+                opacity: i === 0 ? 0.95 : 0.7 - i * 0.15,
+              }}
+            />
             <span style={{ fontWeight: 600, color: ink.strong }}>{sr.label}</span>
           </div>
         ))}
-        {unit && <div style={{ fontSize: 14, color: ink.faint, marginLeft: "auto" }}>Units: {unit}</div>}
+        {unit && (
+          <div style={{ fontSize: 14, color: ink.faint, marginLeft: "auto" }}>Units: {unit}</div>
+        )}
       </div>
     </div>
   );
 }
 
-function WaterfallChart({ brand: _brand, steps, unit, height = 500 }: { brand: BrandMode; steps: { label: string; value: number; kind: "start" | "up" | "down" | "end" }[]; unit?: string; height?: number }) {
+function WaterfallChart({
+  brand: _brand,
+  steps,
+  unit,
+  height = 500,
+}: {
+  brand: BrandMode;
+  steps: { label: string; value: number; kind: "start" | "up" | "down" | "end" }[];
+  unit?: string;
+  height?: number;
+}) {
   const ink = useSlideInk();
-  const w = 1720, h = height;
-  const padL = 90, padR = 40, padT = 40, padB = 90;
+  const w = 1720,
+    h = height;
+  const padL = 90,
+    padR = 40,
+    padT = 40,
+    padB = 90;
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(steps.length, 1);
   const barW = slot * 0.5;
@@ -8591,14 +13083,27 @@ function WaterfallChart({ brand: _brand, steps, unit, height = 500 }: { brand: B
     }
     const base = running;
     running += st.value;
-    return { base: Math.min(base, running), top: Math.max(base, running), kind: st.kind, label: st.label, value: st.value };
+    return {
+      base: Math.min(base, running),
+      top: Math.max(base, running),
+      kind: st.kind,
+      label: st.label,
+      value: st.value,
+    };
   });
   const maxVal = Math.max(1, ...bars.map((b) => b.top));
   const niceMax = Math.ceil(maxVal * 1.1);
   const scale = (v: number) => padT + chartH * (1 - v / niceMax);
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
+      <line
+        x1={padL}
+        y1={h - padB}
+        x2={w - padR}
+        y2={h - padB}
+        stroke={ink.hairlineStrong}
+        strokeWidth={1}
+      />
       {bars.map((b, i) => {
         const x = padL + i * slot + (slot - barW) / 2;
         const y = scale(b.top);
@@ -8607,44 +13112,144 @@ function WaterfallChart({ brand: _brand, steps, unit, height = 500 }: { brand: B
         let fillOpacity = 0.22;
         let strokeOpacity = 0.55;
         let fill: string = "var(--slide-accent-text)";
-        if (b.kind === "up") { fillOpacity = 0.42; strokeOpacity = 0.7; }
-        else if (b.kind === "down") { fillOpacity = 0.12; strokeOpacity = 0.3; fill = ink.strong; }
+        if (b.kind === "up") {
+          fillOpacity = 0.42;
+          strokeOpacity = 0.7;
+        } else if (b.kind === "down") {
+          fillOpacity = 0.12;
+          strokeOpacity = 0.3;
+          fill = ink.strong;
+        }
         const prev = bars[i - 1];
         return (
           <g key={i}>
             {prev && (
-              <line x1={x - (slot - barW)} y1={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} x2={x} y2={scale(prev.kind === "start" || prev.kind === "end" ? prev.top : (b.kind === "up" ? b.base : b.top))} stroke={ink.hairline} strokeDasharray="3 3" />
+              <line
+                x1={x - (slot - barW)}
+                y1={scale(
+                  prev.kind === "start" || prev.kind === "end"
+                    ? prev.top
+                    : b.kind === "up"
+                      ? b.base
+                      : b.top,
+                )}
+                x2={x}
+                y2={scale(
+                  prev.kind === "start" || prev.kind === "end"
+                    ? prev.top
+                    : b.kind === "up"
+                      ? b.base
+                      : b.top,
+                )}
+                stroke={ink.hairline}
+                strokeDasharray="3 3"
+              />
             )}
-            <rect x={x} y={y} width={barW} height={Math.max(2, bh)} rx={3} fill={fill} fillOpacity={fillOpacity} stroke="var(--slide-accent-text)" strokeOpacity={strokeOpacity} strokeWidth={1} />
-            <text x={x + barW / 2} y={y - 12} textAnchor="middle" fontSize={16} fontWeight={600} fill={b.kind === "down" ? ink.muted : ink.text} style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.01em" }}>
-              {b.kind === "up" ? "+" : b.kind === "down" ? "−" : ""}{Math.abs(b.value).toFixed(1)}{unit || ""}
+            <rect
+              x={x}
+              y={y}
+              width={barW}
+              height={Math.max(2, bh)}
+              rx={3}
+              fill={fill}
+              fillOpacity={fillOpacity}
+              stroke="var(--slide-accent-text)"
+              strokeOpacity={strokeOpacity}
+              strokeWidth={1}
+            />
+            <text
+              x={x + barW / 2}
+              y={y - 12}
+              textAnchor="middle"
+              fontSize={16}
+              fontWeight={600}
+              fill={b.kind === "down" ? ink.muted : ink.text}
+              style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.01em" }}
+            >
+              {b.kind === "up" ? "+" : b.kind === "down" ? "−" : ""}
+              {Math.abs(b.value).toFixed(1)}
+              {unit || ""}
             </text>
-            <text x={x + barW / 2} y={h - padB + 30} textAnchor="middle" fontSize={13} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{b.label}</text>
+            <text
+              x={x + barW / 2}
+              y={h - padB + 30}
+              textAnchor="middle"
+              fontSize={13}
+              fill={ink.faint}
+              style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
+            >
+              {b.label}
+            </text>
           </g>
         );
       })}
-
     </svg>
   );
 }
 
-function BubbleChart({ brand, items, axisX, axisY, height = 560 }: { brand: BrandMode; items: { label: string; x: number; y: number; size: number }[]; axisX: string; axisY: string; height?: number }) {
+function BubbleChart({
+  brand,
+  items,
+  axisX,
+  axisY,
+  height = 560,
+}: {
+  brand: BrandMode;
+  items: { label: string; x: number; y: number; size: number }[];
+  axisX: string;
+  axisY: string;
+  height?: number;
+}) {
   const ink = useSlideInk();
-  const w = 1720, h = height;
-  const padL = 110, padR = 60, padT = 40, padB = 90;
+  const w = 1720,
+    h = height;
+  const padL = 110,
+    padR = 60,
+    padT = 40,
+    padB = 90;
   const chartW = w - padL - padR;
   const chartH = h - padT - padB;
   const maxSize = Math.max(1, ...items.map((i) => i.size));
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       {[0, 0.25, 0.5, 0.75, 1].map((t, i) => (
-        <line key={i} x1={padL} y1={padT + chartH * t} x2={w - padR} y2={padT + chartH * t} stroke={ink.hairline} strokeWidth={1} />
+        <line
+          key={i}
+          x1={padL}
+          y1={padT + chartH * t}
+          x2={w - padR}
+          y2={padT + chartH * t}
+          stroke={ink.hairline}
+          strokeWidth={1}
+        />
       ))}
       {[0, 0.25, 0.5, 0.75, 1].map((t, i) => (
-        <line key={`v${i}`} x1={padL + chartW * t} y1={padT} x2={padL + chartW * t} y2={h - padB} stroke={ink.hairline} strokeWidth={1} />
+        <line
+          key={`v${i}`}
+          x1={padL + chartW * t}
+          y1={padT}
+          x2={padL + chartW * t}
+          y2={h - padB}
+          stroke={ink.hairline}
+          strokeWidth={1}
+        />
       ))}
-      <line x1={padL} y1={h - padB} x2={w - padR} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
-      <line x1={padL} y1={padT} x2={padL} y2={h - padB} stroke={ink.hairlineStrong} strokeWidth={1} />
+      <line
+        x1={padL}
+        y1={h - padB}
+        x2={w - padR}
+        y2={h - padB}
+        stroke={ink.hairlineStrong}
+        strokeWidth={1}
+      />
+      <line
+        x1={padL}
+        y1={padT}
+        x2={padL}
+        y2={h - padB}
+        stroke={ink.hairlineStrong}
+        strokeWidth={1}
+      />
       {items.map((it, i) => {
         const cx = padL + (it.x / 100) * chartW;
         const cy = padT + (1 - it.y / 100) * chartH;
@@ -8652,35 +13257,114 @@ function BubbleChart({ brand, items, axisX, axisY, height = 560 }: { brand: Bran
         return (
           <g key={i}>
             <circle cx={cx} cy={cy} r={r} fill="var(--slide-accent-text)" opacity={0.28} />
-            <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--slide-accent-text)" strokeWidth={2} />
-            <text x={cx} y={cy + 6} textAnchor="middle" fontSize={22} fontWeight={700} fill={ink.strong}>{it.label}</text>
+            <circle
+              cx={cx}
+              cy={cy}
+              r={r}
+              fill="none"
+              stroke="var(--slide-accent-text)"
+              strokeWidth={2}
+            />
+            <text
+              x={cx}
+              y={cy + 6}
+              textAnchor="middle"
+              fontSize={22}
+              fontWeight={700}
+              fill={ink.strong}
+            >
+              {it.label}
+            </text>
           </g>
         );
       })}
-      <text x={w / 2} y={h - 24} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }}>{axisX} →</text>
-      <text x={30} y={h / 2} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }} transform={`rotate(-90 30 ${h / 2})`}>{axisY} →</text>
+      <text
+        x={w / 2}
+        y={h - 24}
+        textAnchor="middle"
+        fontSize={16}
+        fill={ink.faint}
+        style={{ letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }}
+      >
+        {axisX} →
+      </text>
+      <text
+        x={30}
+        y={h / 2}
+        textAnchor="middle"
+        fontSize={16}
+        fill={ink.faint}
+        style={{ letterSpacing: "0.22em", textTransform: "uppercase", fontWeight: 600 }}
+        transform={`rotate(-90 30 ${h / 2})`}
+      >
+        {axisY} →
+      </text>
     </svg>
   );
 }
 
-function HeatmapChart({ brand, rows, cols, cells, min, max }: { brand: BrandMode; rows: string[]; cols: string[]; cells: number[][]; min: number; max: number }) {
+function HeatmapChart({
+  brand,
+  rows,
+  cols,
+  cells,
+  min,
+  max,
+}: {
+  brand: BrandMode;
+  rows: string[];
+  cols: string[];
+  cells: number[][];
+  min: number;
+  max: number;
+}) {
   const ink = useSlideInk();
   const range = Math.max(1, max - min);
   return (
     <div>
-      <div className="grid" style={{ gridTemplateColumns: `160px repeat(${cols.length}, minmax(0, 1fr))`, gap: 4 }}>
+      <div
+        className="grid"
+        style={{ gridTemplateColumns: `160px repeat(${cols.length}, minmax(0, 1fr))`, gap: 4 }}
+      >
         <div />
         {cols.map((c, i) => (
-          <div key={i} className="text-center uppercase" style={{ fontSize: 14, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600, paddingBottom: 8 }}>{c}</div>
+          <div
+            key={i}
+            className="text-center uppercase"
+            style={{
+              fontSize: 14,
+              letterSpacing: "0.24em",
+              color: ink.faint,
+              fontWeight: 600,
+              paddingBottom: 8,
+            }}
+          >
+            {c}
+          </div>
         ))}
         {rows.map((r, ri) => (
           <Fragment key={ri}>
-            <div className="pr-4 flex items-center justify-end uppercase" style={{ fontSize: 14, letterSpacing: "0.2em", color: ink.strong, fontWeight: 600 }}>{r}</div>
+            <div
+              className="pr-4 flex items-center justify-end uppercase"
+              style={{ fontSize: 14, letterSpacing: "0.2em", color: ink.strong, fontWeight: 600 }}
+            >
+              {r}
+            </div>
             {cols.map((_, ci) => {
               const v = cells[ri]?.[ci] ?? 0;
               const t = Math.max(0, Math.min(1, (v - min) / range));
               return (
-                <div key={ci} style={{ aspectRatio: "2 / 1", background: brand.tokens.accent, opacity: 0.15 + t * 0.85, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div
+                  key={ci}
+                  style={{
+                    aspectRatio: "2 / 1",
+                    background: brand.tokens.accent,
+                    opacity: 0.15 + t * 0.85,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
                   <span style={{ fontSize: 22, fontWeight: 700, color: ink.strong }}>{v}</span>
                 </div>
               );
@@ -8689,23 +13373,60 @@ function HeatmapChart({ brand, rows, cols, cells, min, max }: { brand: BrandMode
         ))}
       </div>
       <div className="mt-3 flex items-center gap-3">
-        <span className="uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}>Low</span>
-        <div style={{ flex: 1, height: 6, background: `linear-gradient(90deg, ${brand.tokens.accent}22, ${brand.tokens.accent})` }} />
-        <span className="uppercase" style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}>High</span>
-        <span style={{ fontSize: 12, color: ink.faint }}>{min}–{max}</span>
+        <span
+          className="uppercase"
+          style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}
+        >
+          Low
+        </span>
+        <div
+          style={{
+            flex: 1,
+            height: 6,
+            background: `linear-gradient(90deg, ${brand.tokens.accent}22, ${brand.tokens.accent})`,
+          }}
+        />
+        <span
+          className="uppercase"
+          style={{ fontSize: 11, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}
+        >
+          High
+        </span>
+        <span style={{ fontSize: 12, color: ink.faint }}>
+          {min}–{max}
+        </span>
       </div>
     </div>
   );
 }
 
-function Treemap({ brand, items, height = 560 }: { brand: BrandMode; items: { label: string; value: number; meta?: string }[]; height?: number }) {
+function Treemap({
+  brand,
+  items,
+  height = 560,
+}: {
+  brand: BrandMode;
+  items: { label: string; value: number; meta?: string }[];
+  height?: number;
+}) {
   const ink = useSlideInk();
   // Simple squarified layout: sort desc, slice vertically then horizontally alternately.
   const total = items.reduce((a, b) => a + b.value, 0) || 1;
   const w = 1720;
   const sorted = [...items].sort((a, b) => b.value - a.value);
-  const rects: { x: number; y: number; w: number; h: number; label: string; value: number; meta?: string }[] = [];
-  let x = 0, y = 0, remW = w, remH = height;
+  const rects: {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    label: string;
+    value: number;
+    meta?: string;
+  }[] = [];
+  let x = 0,
+    y = 0,
+    remW = w,
+    remH = height;
   let remainingTotal = total;
   let vertical = true;
   for (let i = 0; i < sorted.length; i++) {
@@ -8719,25 +13440,66 @@ function Treemap({ brand, items, height = 560 }: { brand: BrandMode; items: { la
     if (vertical) {
       const rw = remW * share;
       rects.push({ x, y, w: rw, h: remH, label: it.label, value: it.value, meta: it.meta });
-      x += rw; remW -= rw;
+      x += rw;
+      remW -= rw;
     } else {
       const rh = remH * share;
       rects.push({ x, y, w: remW, h: rh, label: it.label, value: it.value, meta: it.meta });
-      y += rh; remH -= rh;
+      y += rh;
+      remH -= rh;
     }
     remainingTotal -= it.value;
     vertical = !vertical;
   }
-  const cols = [brand.tokens.accent, brand.tokens.primary, ink.muted, ink.faint, ink.hairlineStrong];
+  const cols = [
+    brand.tokens.accent,
+    brand.tokens.primary,
+    ink.muted,
+    ink.faint,
+    ink.hairlineStrong,
+  ];
   return (
-    <svg viewBox={`0 0 ${w} ${height}`} width="100%" height={height} preserveAspectRatio="none" aria-hidden>
+    <svg
+      viewBox={`0 0 ${w} ${height}`}
+      width="100%"
+      height={height}
+      preserveAspectRatio="none"
+      aria-hidden
+    >
       {rects.map((r, i) => (
         <g key={i}>
-          <rect x={r.x + 4} y={r.y + 4} width={Math.max(0, r.w - 8)} height={Math.max(0, r.h - 8)} fill={cols[i] || ink.strong} opacity={i === 0 ? 1 : 0.9} />
-          <text x={r.x + 24} y={r.y + 46} fontSize={r.w > 380 ? 26 : 18} fontWeight={700} fill={ink.strong} style={{ letterSpacing: "-0.01em" }}>{r.label}</text>
-          <text x={r.x + 24} y={r.y + 80} fontSize={r.w > 380 ? 40 : 24} fontWeight={700} fill={ink.strong} style={{ letterSpacing: "-0.02em" }}>{r.value}%</text>
+          <rect
+            x={r.x + 4}
+            y={r.y + 4}
+            width={Math.max(0, r.w - 8)}
+            height={Math.max(0, r.h - 8)}
+            fill={cols[i] || ink.strong}
+            opacity={i === 0 ? 1 : 0.9}
+          />
+          <text
+            x={r.x + 24}
+            y={r.y + 46}
+            fontSize={r.w > 380 ? 26 : 18}
+            fontWeight={700}
+            fill={ink.strong}
+            style={{ letterSpacing: "-0.01em" }}
+          >
+            {r.label}
+          </text>
+          <text
+            x={r.x + 24}
+            y={r.y + 80}
+            fontSize={r.w > 380 ? 40 : 24}
+            fontWeight={700}
+            fill={ink.strong}
+            style={{ letterSpacing: "-0.02em" }}
+          >
+            {r.value}%
+          </text>
           {r.meta && r.w > 260 && r.h > 120 && (
-            <text x={r.x + 24} y={r.y + 116} fontSize={16} fill={ink.muted}>{r.meta}</text>
+            <text x={r.x + 24} y={r.y + 116} fontSize={16} fill={ink.muted}>
+              {r.meta}
+            </text>
           )}
         </g>
       ))}
@@ -8745,10 +13507,30 @@ function Treemap({ brand, items, height = 560 }: { brand: BrandMode; items: { la
   );
 }
 
-function ComboChart({ brand, points, barLabel, barUnit, lineLabel, lineUnit, height = 520 }: { brand: BrandMode; points: { label: string; bar: number; line: number }[]; barLabel: string; barUnit?: string; lineLabel: string; lineUnit?: string; height?: number }) {
+function ComboChart({
+  brand,
+  points,
+  barLabel,
+  barUnit,
+  lineLabel,
+  lineUnit,
+  height = 520,
+}: {
+  brand: BrandMode;
+  points: { label: string; bar: number; line: number }[];
+  barLabel: string;
+  barUnit?: string;
+  lineLabel: string;
+  lineUnit?: string;
+  height?: number;
+}) {
   const ink = useSlideInk();
-  const w = 1720, h = height;
-  const padL = 100, padR = 100, padT = 30, padB = 90;
+  const w = 1720,
+    h = height;
+  const padL = 100,
+    padR = 100,
+    padT = 30,
+    padB = 90;
   const chartH = h - padT - padB;
   const slot = (w - padL - padR) / Math.max(points.length, 1);
   const barW = slot * 0.5;
@@ -8756,7 +13538,10 @@ function ComboChart({ brand, points, barLabel, barUnit, lineLabel, lineUnit, hei
   const lineMax = Math.max(1, ...points.map((p) => p.line));
   const niceBar = Math.ceil(barMax * 1.15);
   const niceLine = Math.ceil(lineMax * 1.05);
-  const pts = points.map((p, i) => [padL + i * slot + slot / 2, padT + chartH * (1 - p.line / niceLine)] as [number, number]);
+  const pts = points.map(
+    (p, i) =>
+      [padL + i * slot + slot / 2, padT + chartH * (1 - p.line / niceLine)] as [number, number],
+  );
   const d = pts.map((p, i) => (i === 0 ? `M${p[0]},${p[1]}` : `L${p[0]},${p[1]}`)).join(" ");
   const ticks = 4;
   return (
@@ -8769,8 +13554,20 @@ function ComboChart({ brand, points, barLabel, barUnit, lineLabel, lineUnit, hei
           return (
             <g key={i}>
               <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} />
-              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={14} fill={ink.faint}>{bv.toFixed(1)}{barUnit || ""}</text>
-              <text x={w - padR + 12} y={y + 6} textAnchor="start" fontSize={14} fill="var(--slide-accent-text)">{Math.round(lv)}{lineUnit || ""}</text>
+              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={14} fill={ink.faint}>
+                {bv.toFixed(1)}
+                {barUnit || ""}
+              </text>
+              <text
+                x={w - padR + 12}
+                y={y + 6}
+                textAnchor="start"
+                fontSize={14}
+                fill="var(--slide-accent-text)"
+              >
+                {Math.round(lv)}
+                {lineUnit || ""}
+              </text>
             </g>
           );
         })}
@@ -8780,25 +13577,68 @@ function ComboChart({ brand, points, barLabel, barUnit, lineLabel, lineUnit, hei
           const y = h - padB - bh;
           return (
             <g key={i}>
-              <rect x={x} y={y} width={barW} height={bh} rx={3} fill="var(--slide-accent-text)" fillOpacity={0.18} stroke="var(--slide-accent-text)" strokeOpacity={0.45} strokeWidth={1} />
-              <text x={x + barW / 2} y={h - padB + 32} textAnchor="middle" fontSize={16} fill={ink.faint} style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}>{p.label}</text>
+              <rect
+                x={x}
+                y={y}
+                width={barW}
+                height={bh}
+                rx={3}
+                fill="var(--slide-accent-text)"
+                fillOpacity={0.18}
+                stroke="var(--slide-accent-text)"
+                strokeOpacity={0.45}
+                strokeWidth={1}
+              />
+              <text
+                x={x + barW / 2}
+                y={h - padB + 32}
+                textAnchor="middle"
+                fontSize={16}
+                fill={ink.faint}
+                style={{ letterSpacing: "0.14em", textTransform: "uppercase" }}
+              >
+                {p.label}
+              </text>
             </g>
           );
         })}
-        <path d={d} fill="none" stroke="var(--slide-accent-text)" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-        {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={6} fill="var(--slide-accent-text)" />)}
+        <path
+          d={d}
+          fill="none"
+          stroke="var(--slide-accent-text)"
+          strokeWidth={3}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        {pts.map((p, i) => (
+          <circle key={i} cx={p[0]} cy={p[1]} r={6} fill="var(--slide-accent-text)" />
+        ))}
       </svg>
       <div className="mt-2 flex flex-wrap gap-6">
         <div className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
-          <span style={{ display: "inline-block", width: 16, height: 16, background: brand.tokens.primary, opacity: 0.85 }} />
+          <span
+            style={{
+              display: "inline-block",
+              width: 16,
+              height: 16,
+              background: brand.tokens.primary,
+              opacity: 0.85,
+            }}
+          />
           <span style={{ fontWeight: 600, color: ink.strong }}>{barLabel}</span>
         </div>
         <div className="flex items-center gap-2" style={{ fontSize: 16, color: ink.muted }}>
-          <span style={{ display: "inline-block", width: 22, height: 3, background: brand.tokens.accent }} />
+          <span
+            style={{
+              display: "inline-block",
+              width: 22,
+              height: 3,
+              background: brand.tokens.accent,
+            }}
+          />
           <span style={{ fontWeight: 600, color: ink.strong }}>{lineLabel}</span>
         </div>
       </div>
     </div>
   );
 }
-

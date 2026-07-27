@@ -28,9 +28,6 @@ import type {
 } from "@/lib/pptx-import";
 import { applyColorMods } from "@/lib/pptx-import";
 
-
-
-
 type SlideLayoutWithUrls = SlideLayout & {
   shapes: (LayoutShape & { url?: string; fill?: LayoutFill & { url?: string } })[];
 };
@@ -38,15 +35,31 @@ type SlideLayoutWithUrls = SlideLayout & {
 // PPTX schemeClr tokens → default web colors. We accept a theme override so
 // per-deck accents flow through when available.
 const SCHEME_DEFAULTS: Record<string, string> = {
-  bg1: "#FFFFFF", tx1: "#0B0B12", bg2: "#F2F2F2", tx2: "#333333",
-  accent1: "#003FC7", accent2: "#5A6ACF", accent3: "#8892D0", accent4: "#A1FBF9",
-  accent5: "#C2A3FF", accent6: "#FFEB66", dk1: "#0B0B12", dk2: "#03002C",
-  lt1: "#FFFFFF", lt2: "#F5F5F5", hlink: "#003FC7", folHlink: "#5A6ACF",
+  bg1: "#FFFFFF",
+  tx1: "#0B0B12",
+  bg2: "#F2F2F2",
+  tx2: "#333333",
+  accent1: "#003FC7",
+  accent2: "#5A6ACF",
+  accent3: "#8892D0",
+  accent4: "#A1FBF9",
+  accent5: "#C2A3FF",
+  accent6: "#FFEB66",
+  dk1: "#0B0B12",
+  dk2: "#03002C",
+  lt1: "#FFFFFF",
+  lt2: "#F5F5F5",
+  hlink: "#003FC7",
+  folHlink: "#5A6ACF",
   phClr: "#0B0B12",
 };
 
 // Parses `var(--pptx-accent1)?lm=750&lo=250` → { key: "accent1", mods: {...} }
-function parseSchemeToken(c: string): { key?: string; mods?: Parameters<typeof applyColorMods>[1]; base?: string } {
+function parseSchemeToken(c: string): {
+  key?: string;
+  mods?: Parameters<typeof applyColorMods>[1];
+  base?: string;
+} {
   const m = /^(var\(--pptx-([\w]+)\)|#[0-9A-Fa-f]{6})(?:\?(.*))?$/.exec(c);
   if (!m) return { base: c };
   const isVar = m[1].startsWith("var(");
@@ -81,12 +94,16 @@ function resolveColor(c: string | undefined, theme?: Record<string, string>): st
   else return c;
   if (parsed.mods) {
     base = applyColorMods(base, parsed.mods);
-    if (parsed.mods.alpha !== undefined && parsed.mods.alpha < 1) return withAlpha(base, parsed.mods.alpha);
+    if (parsed.mods.alpha !== undefined && parsed.mods.alpha < 1)
+      return withAlpha(base, parsed.mods.alpha);
   }
   return base;
 }
 
-function fillToCss(fill: LayoutFill | undefined, theme?: Record<string, string>): string | undefined {
+function fillToCss(
+  fill: LayoutFill | undefined,
+  theme?: Record<string, string>,
+): string | undefined {
   if (!fill) return undefined;
   if (fill.kind === "solid") {
     const base = resolveColor(fill.color, theme);
@@ -124,7 +141,12 @@ function fillToCss(fill: LayoutFill | undefined, theme?: Record<string, string>)
 
 function imageFillToCss(fill: LayoutFill | undefined): React.CSSProperties | undefined {
   if (!fill || fill.kind !== "image" || !("url" in fill) || !fill.url) return undefined;
-  const f = fill as LayoutFill & { url?: string; srcRect?: LayoutSrcRect; opacity?: number; tile?: boolean };
+  const f = fill as LayoutFill & {
+    url?: string;
+    srcRect?: LayoutSrcRect;
+    opacity?: number;
+    tile?: boolean;
+  };
   if (f.tile && !f.srcRect) {
     return {
       backgroundImage: `url(${f.url})`,
@@ -161,7 +183,9 @@ function imageFillToCss(fill: LayoutFill | undefined): React.CSSProperties | und
 function withAlpha(color: string, alpha: number): string {
   const m = /^#([0-9a-fA-F]{6})$/.exec(color);
   if (m) {
-    const a = Math.round(Math.max(0, Math.min(1, alpha)) * 255).toString(16).padStart(2, "0");
+    const a = Math.round(Math.max(0, Math.min(1, alpha)) * 255)
+      .toString(16)
+      .padStart(2, "0");
     return `#${m[1]}${a}`;
   }
   return color;
@@ -174,59 +198,146 @@ function withAlpha(color: string, alpha: number): string {
 function prstToMask(prst: string | undefined): { borderRadius?: string; clipPath?: string } {
   if (!prst) return {};
   switch (prst) {
-    case "ellipse": return { borderRadius: "50%" };
-    case "roundRect": return { borderRadius: "8%" };
-    case "round1Rect": return { borderRadius: "8% 8% 0 0" };
-    case "round2SameRect": return { borderRadius: "8% 0 0 8%" };
-    case "round2DiagRect": return { borderRadius: "8% 0 8% 0" };
-    case "snip1Rect": return { clipPath: "polygon(0 0, 92% 0, 100% 8%, 100% 100%, 0 100%)" };
-    case "snip2SameRect": return { clipPath: "polygon(8% 0, 92% 0, 100% 8%, 100% 100%, 0 100%, 0 8%)" };
-    case "snip2DiagRect": return { clipPath: "polygon(8% 0, 100% 0, 100% 92%, 92% 100%, 0 100%, 0 8%)" };
-    case "snipRoundRect": return { borderRadius: "0 8% 0 8%" };
-    case "triangle": return { clipPath: "polygon(50% 0, 100% 100%, 0 100%)" };
-    case "rtTriangle": return { clipPath: "polygon(0 0, 0 100%, 100% 100%)" };
-    case "diamond": return { clipPath: "polygon(50% 0, 100% 50%, 50% 100%, 0 50%)" };
-    case "parallelogram": return { clipPath: "polygon(20% 0, 100% 0, 80% 100%, 0 100%)" };
-    case "trapezoid": return { clipPath: "polygon(20% 0, 80% 0, 100% 100%, 0 100%)" };
-    case "pentagon": return { clipPath: "polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%)" };
-    case "hexagon": return { clipPath: "polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%)" };
-    case "heptagon": return { clipPath: "polygon(50% 0, 90% 20%, 100% 60%, 78% 100%, 22% 100%, 0 60%, 10% 20%)" };
-    case "octagon": return { clipPath: "polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%)" };
-    case "chevron": return { clipPath: "polygon(0 0, 75% 0, 100% 50%, 75% 100%, 0 100%, 25% 50%)" };
-    case "star5": return { clipPath: "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)" };
-    case "star6": return { clipPath: "polygon(50% 0, 65% 25%, 100% 25%, 82% 50%, 100% 75%, 65% 75%, 50% 100%, 35% 75%, 0 75%, 18% 50%, 0 25%, 35% 25%)" };
-    case "star4": return { clipPath: "polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%)" };
-    case "leftArrow": return { clipPath: "polygon(0 50%, 40% 0, 40% 30%, 100% 30%, 100% 70%, 40% 70%, 40% 100%)" };
-    case "rightArrow": return { clipPath: "polygon(100% 50%, 60% 0, 60% 30%, 0 30%, 0 70%, 60% 70%, 60% 100%)" };
-    case "upArrow": return { clipPath: "polygon(50% 0, 100% 40%, 70% 40%, 70% 100%, 30% 100%, 30% 40%, 0 40%)" };
-    case "downArrow": return { clipPath: "polygon(50% 100%, 100% 60%, 70% 60%, 70% 0, 30% 0, 30% 60%, 0 60%)" };
-    case "leftRightArrow": return { clipPath: "polygon(0 50%, 20% 20%, 20% 40%, 80% 40%, 80% 20%, 100% 50%, 80% 80%, 80% 60%, 20% 60%, 20% 80%)" };
-    case "upDownArrow": return { clipPath: "polygon(50% 0, 80% 20%, 60% 20%, 60% 80%, 80% 80%, 50% 100%, 20% 80%, 40% 80%, 40% 20%, 20% 20%)" };
-    case "notchedRightArrow": return { clipPath: "polygon(0 30%, 60% 30%, 60% 0, 100% 50%, 60% 100%, 60% 70%, 0 70%, 10% 50%)" };
-    case "plus": return { clipPath: "polygon(35% 0, 65% 0, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0 65%, 0 35%, 35% 35%)" };
-    case "mathPlus": return { clipPath: "polygon(35% 0, 65% 0, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0 65%, 0 35%, 35% 35%)" };
-    case "cross": return { clipPath: "polygon(35% 0, 65% 0, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0 65%, 0 35%, 35% 35%)" };
-    case "bevel": return { clipPath: "polygon(10% 10%, 90% 10%, 100% 0, 100% 100%, 90% 90%, 10% 90%, 0 100%, 0 0)" };
-    case "plaque": return { clipPath: "polygon(0 15%, 15% 0, 85% 0, 100% 15%, 100% 85%, 85% 100%, 15% 100%, 0 85%)" };
-    case "cloud": return { borderRadius: "50% 40% 45% 50% / 60% 55% 50% 55%" };
-    case "sun": return { clipPath: "polygon(50% 0%, 60% 20%, 82% 15%, 78% 38%, 100% 50%, 78% 62%, 82% 85%, 60% 80%, 50% 100%, 40% 80%, 18% 85%, 22% 62%, 0 50%, 22% 38%, 18% 15%, 40% 20%)" };
-    case "moon": return { clipPath: "ellipse(50% 50% at 40% 50%)" };
-    case "arc": return { borderRadius: "50%" };
-    case "chord": return { borderRadius: "50%" };
-    case "pie": return { borderRadius: "50%" };
-    case "bracketPair": return { clipPath: "polygon(10% 0, 15% 4%, 15% 96%, 10% 100%, 90% 100%, 85% 96%, 85% 4%, 90% 0)" };
-    case "leftBracket": return { clipPath: "polygon(0 0, 100% 5%, 20% 5%, 20% 95%, 100% 95%, 0 100%)" };
-    case "rightBracket": return { clipPath: "polygon(0 5%, 80% 5%, 80% 95%, 0 95%, 100% 100%, 100% 0)" };
-    case "callout1": case "wedgeRectCallout":
+    case "ellipse":
+      return { borderRadius: "50%" };
+    case "roundRect":
+      return { borderRadius: "8%" };
+    case "round1Rect":
+      return { borderRadius: "8% 8% 0 0" };
+    case "round2SameRect":
+      return { borderRadius: "8% 0 0 8%" };
+    case "round2DiagRect":
+      return { borderRadius: "8% 0 8% 0" };
+    case "snip1Rect":
+      return { clipPath: "polygon(0 0, 92% 0, 100% 8%, 100% 100%, 0 100%)" };
+    case "snip2SameRect":
+      return { clipPath: "polygon(8% 0, 92% 0, 100% 8%, 100% 100%, 0 100%, 0 8%)" };
+    case "snip2DiagRect":
+      return { clipPath: "polygon(8% 0, 100% 0, 100% 92%, 92% 100%, 0 100%, 0 8%)" };
+    case "snipRoundRect":
+      return { borderRadius: "0 8% 0 8%" };
+    case "triangle":
+      return { clipPath: "polygon(50% 0, 100% 100%, 0 100%)" };
+    case "rtTriangle":
+      return { clipPath: "polygon(0 0, 0 100%, 100% 100%)" };
+    case "diamond":
+      return { clipPath: "polygon(50% 0, 100% 50%, 50% 100%, 0 50%)" };
+    case "parallelogram":
+      return { clipPath: "polygon(20% 0, 100% 0, 80% 100%, 0 100%)" };
+    case "trapezoid":
+      return { clipPath: "polygon(20% 0, 80% 0, 100% 100%, 0 100%)" };
+    case "pentagon":
+      return { clipPath: "polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%)" };
+    case "hexagon":
+      return { clipPath: "polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%)" };
+    case "heptagon":
+      return { clipPath: "polygon(50% 0, 90% 20%, 100% 60%, 78% 100%, 22% 100%, 0 60%, 10% 20%)" };
+    case "octagon":
+      return {
+        clipPath: "polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%)",
+      };
+    case "chevron":
+      return { clipPath: "polygon(0 0, 75% 0, 100% 50%, 75% 100%, 0 100%, 25% 50%)" };
+    case "star5":
+      return {
+        clipPath:
+          "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)",
+      };
+    case "star6":
+      return {
+        clipPath:
+          "polygon(50% 0, 65% 25%, 100% 25%, 82% 50%, 100% 75%, 65% 75%, 50% 100%, 35% 75%, 0 75%, 18% 50%, 0 25%, 35% 25%)",
+      };
+    case "star4":
+      return {
+        clipPath: "polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%)",
+      };
+    case "leftArrow":
+      return { clipPath: "polygon(0 50%, 40% 0, 40% 30%, 100% 30%, 100% 70%, 40% 70%, 40% 100%)" };
+    case "rightArrow":
+      return { clipPath: "polygon(100% 50%, 60% 0, 60% 30%, 0 30%, 0 70%, 60% 70%, 60% 100%)" };
+    case "upArrow":
+      return { clipPath: "polygon(50% 0, 100% 40%, 70% 40%, 70% 100%, 30% 100%, 30% 40%, 0 40%)" };
+    case "downArrow":
+      return { clipPath: "polygon(50% 100%, 100% 60%, 70% 60%, 70% 0, 30% 0, 30% 60%, 0 60%)" };
+    case "leftRightArrow":
+      return {
+        clipPath:
+          "polygon(0 50%, 20% 20%, 20% 40%, 80% 40%, 80% 20%, 100% 50%, 80% 80%, 80% 60%, 20% 60%, 20% 80%)",
+      };
+    case "upDownArrow":
+      return {
+        clipPath:
+          "polygon(50% 0, 80% 20%, 60% 20%, 60% 80%, 80% 80%, 50% 100%, 20% 80%, 40% 80%, 40% 20%, 20% 20%)",
+      };
+    case "notchedRightArrow":
+      return {
+        clipPath: "polygon(0 30%, 60% 30%, 60% 0, 100% 50%, 60% 100%, 60% 70%, 0 70%, 10% 50%)",
+      };
+    case "plus":
+      return {
+        clipPath:
+          "polygon(35% 0, 65% 0, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0 65%, 0 35%, 35% 35%)",
+      };
+    case "mathPlus":
+      return {
+        clipPath:
+          "polygon(35% 0, 65% 0, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0 65%, 0 35%, 35% 35%)",
+      };
+    case "cross":
+      return {
+        clipPath:
+          "polygon(35% 0, 65% 0, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0 65%, 0 35%, 35% 35%)",
+      };
+    case "bevel":
+      return {
+        clipPath: "polygon(10% 10%, 90% 10%, 100% 0, 100% 100%, 90% 90%, 10% 90%, 0 100%, 0 0)",
+      };
+    case "plaque":
+      return {
+        clipPath: "polygon(0 15%, 15% 0, 85% 0, 100% 15%, 100% 85%, 85% 100%, 15% 100%, 0 85%)",
+      };
+    case "cloud":
+      return { borderRadius: "50% 40% 45% 50% / 60% 55% 50% 55%" };
+    case "sun":
+      return {
+        clipPath:
+          "polygon(50% 0%, 60% 20%, 82% 15%, 78% 38%, 100% 50%, 78% 62%, 82% 85%, 60% 80%, 50% 100%, 40% 80%, 18% 85%, 22% 62%, 0 50%, 22% 38%, 18% 15%, 40% 20%)",
+      };
+    case "moon":
+      return { clipPath: "ellipse(50% 50% at 40% 50%)" };
+    case "arc":
+      return { borderRadius: "50%" };
+    case "chord":
+      return { borderRadius: "50%" };
+    case "pie":
+      return { borderRadius: "50%" };
+    case "bracketPair":
+      return {
+        clipPath: "polygon(10% 0, 15% 4%, 15% 96%, 10% 100%, 90% 100%, 85% 96%, 85% 4%, 90% 0)",
+      };
+    case "leftBracket":
+      return { clipPath: "polygon(0 0, 100% 5%, 20% 5%, 20% 95%, 100% 95%, 0 100%)" };
+    case "rightBracket":
+      return { clipPath: "polygon(0 5%, 80% 5%, 80% 95%, 0 95%, 100% 100%, 100% 0)" };
+    case "callout1":
+    case "wedgeRectCallout":
       return { borderRadius: "6%" };
-    case "cube": return { clipPath: "polygon(0 20%, 20% 0, 100% 0, 100% 80%, 80% 100%, 0 100%)" };
-    case "can": return { borderRadius: "50% / 12%" };
-    case "rect": default: return {};
+    case "cube":
+      return { clipPath: "polygon(0 20%, 20% 0, 100% 0, 100% 80%, 80% 100%, 0 100%)" };
+    case "can":
+      return { borderRadius: "50% / 12%" };
+    case "rect":
+    default:
+      return {};
   }
 }
 
 // PPTX effect → CSS box-shadow / filter chain
-function effectToCss(effect: LayoutEffect | undefined, theme?: Record<string, string>): { boxShadow?: string; filter?: string } {
+function effectToCss(
+  effect: LayoutEffect | undefined,
+  theme?: Record<string, string>,
+): { boxShadow?: string; filter?: string } {
   if (!effect) return {};
   const shadows: string[] = [];
   const filters: string[] = [];
@@ -309,19 +420,31 @@ function runStyle(run: LayoutRun, theme?: Record<string, string>): React.CSSProp
   else if (run.cap === "small") s.fontVariantCaps = "small-caps";
   if (run.spacingPct !== undefined) s.letterSpacing = `${run.spacingPct}pt`;
   if (run.baselinePct !== undefined && run.baselinePct !== 0) {
-    if (run.baselinePct > 0) { s.verticalAlign = "super"; s.fontSize = run.sizePt ? `${run.sizePt * 0.75}pt` : "0.75em"; }
-    else { s.verticalAlign = "sub"; s.fontSize = run.sizePt ? `${run.sizePt * 0.75}pt` : "0.75em"; }
+    if (run.baselinePct > 0) {
+      s.verticalAlign = "super";
+      s.fontSize = run.sizePt ? `${run.sizePt * 0.75}pt` : "0.75em";
+    } else {
+      s.verticalAlign = "sub";
+      s.fontSize = run.sizePt ? `${run.sizePt * 0.75}pt` : "0.75em";
+    }
   }
   return s;
 }
 
-function borderFromLine(line: LayoutLine | undefined, theme?: Record<string, string>): string | undefined {
+function borderFromLine(
+  line: LayoutLine | undefined,
+  theme?: Record<string, string>,
+): string | undefined {
   if (!line || !line.color) return undefined;
   const w = (line.widthPt ?? 0.75).toFixed(2);
   const dash =
-    line.dashStyle === "dash" || line.dashStyle === "sysDash" ? "dashed" :
-    line.dashStyle === "dot" || line.dashStyle === "sysDot" ? "dotted" :
-    line.dashStyle === "dashDot" ? "dashed" : "solid";
+    line.dashStyle === "dash" || line.dashStyle === "sysDash"
+      ? "dashed"
+      : line.dashStyle === "dot" || line.dashStyle === "sysDot"
+        ? "dotted"
+        : line.dashStyle === "dashDot"
+          ? "dashed"
+          : "solid";
   const col = resolveColor(line.color, theme);
   return `${w}pt ${dash} ${col}`;
 }
@@ -397,16 +520,23 @@ type ResolvedShape = {
   placeholderKind?: string;
 };
 
-
 type ResolvedLayout = {
   size: { w: number; h: number };
   backgroundIsImage: boolean;
   bg: string;
-  bgImage?: LayoutFill & { url?: string; srcRect?: LayoutSrcRect; opacity?: number; tile?: boolean };
+  bgImage?: LayoutFill & {
+    url?: string;
+    srcRect?: LayoutSrcRect;
+    opacity?: number;
+    tile?: boolean;
+  };
   shapes: ResolvedShape[];
 };
 
-const resolvedLayoutCache: WeakMap<SlideLayoutWithUrls, Map<string, ResolvedLayout>> = new WeakMap();
+const resolvedLayoutCache: WeakMap<
+  SlideLayoutWithUrls,
+  Map<string, ResolvedLayout>
+> = new WeakMap();
 
 function themeKey(theme: Record<string, string> | undefined): string {
   if (!theme) return "";
@@ -414,33 +544,48 @@ function themeKey(theme: Record<string, string> | undefined): string {
   return keys.map((k) => `${k}:${theme[k]}`).join("|");
 }
 
-function resolvePara(para: LayoutPara, textBody: LayoutTextBody, theme: Record<string, string> | undefined): ResolvedPara {
+function resolvePara(
+  para: LayoutPara,
+  textBody: LayoutTextBody,
+  theme: Record<string, string> | undefined,
+): ResolvedPara {
   const lineHeight: number | string | undefined = para.lineSpacing
-    ? "mult" in para.lineSpacing ? para.lineSpacing.mult : `${para.lineSpacing.pt}pt`
+    ? "mult" in para.lineSpacing
+      ? para.lineSpacing.mult
+      : `${para.lineSpacing.pt}pt`
     : undefined;
   const marL = para.marLIn ?? (para.level ? (para.level + 1) * 0.25 : undefined);
   const indent = para.indentIn;
   // hanging indent is negative textIndent (bullet outdents)
   const textIndent = indent !== undefined ? `${indent}in` : undefined;
-  const bulletCharDefault = para.bullet === "char" ? (para.bulletChar || "•") : undefined;
+  const bulletCharDefault = para.bullet === "char" ? para.bulletChar || "•" : undefined;
   const bulletCharAuto = para.bullet === "auto" ? "1." : undefined;
   return {
     align:
-      para.align === "ctr" ? "center" :
-      para.align === "r" ? "right" :
-      para.align === "just" ? "justify" : "left",
+      para.align === "ctr"
+        ? "center"
+        : para.align === "r"
+          ? "right"
+          : para.align === "just"
+            ? "justify"
+            : "left",
     marginLeft: marL !== undefined ? `${marL}in` : undefined,
     textIndent,
     bulletChar: bulletCharDefault ?? bulletCharAuto,
-    bulletStyle: para.bulletColor ? {
-      color: resolveColor(para.bulletColor, theme),
-      fontFamily: para.bulletFont ? `"${para.bulletFont}", inherit` : undefined,
-    } : para.bulletFont ? { fontFamily: `"${para.bulletFont}", inherit` } : undefined,
+    bulletStyle: para.bulletColor
+      ? {
+          color: resolveColor(para.bulletColor, theme),
+          fontFamily: para.bulletFont ? `"${para.bulletFont}", inherit` : undefined,
+        }
+      : para.bulletFont
+        ? { fontFamily: `"${para.bulletFont}", inherit` }
+        : undefined,
     spcBefore: para.spcBeforePt !== undefined ? `${para.spcBeforePt}pt` : undefined,
     spcAfter: para.spcAfterPt !== undefined ? `${para.spcAfterPt}pt` : undefined,
     lineHeight,
     runs: para.runs.map((r) => {
-      const scaled = textBody.fontScale && r.sizePt ? { ...r, sizePt: r.sizePt * textBody.fontScale } : r;
+      const scaled =
+        textBody.fontScale && r.sizePt ? { ...r, sizePt: r.sizePt * textBody.fontScale } : r;
       return {
         text: r.text,
         isBreak: r.text === "\n",
@@ -467,7 +612,12 @@ function resolveShape(
     const anchorJustify: "flex-start" | "center" | "flex-end" =
       anchor === "ctr" ? "center" : anchor === "b" ? "flex-end" : "flex-start";
     const fillObj = fillIsImage
-      ? (shape.fill as LayoutFill & { url?: string; srcRect?: LayoutSrcRect; opacity?: number; tile?: boolean })
+      ? (shape.fill as LayoutFill & {
+          url?: string;
+          srcRect?: LayoutSrcRect;
+          opacity?: number;
+          tile?: boolean;
+        })
       : undefined;
     const ins = shape.text.insets ?? { l: 0.1, t: 0.05, r: 0.1, b: 0.05 };
     return {
@@ -526,13 +676,21 @@ function resolveShape(
         stroke,
         strokeWidth: (shape.line?.widthPt ?? 1) / 72,
         strokeDash:
-          shape.line?.dashStyle === "dash" || shape.line?.dashStyle === "sysDash" ? "6 4" :
-          shape.line?.dashStyle === "dot" || shape.line?.dashStyle === "sysDot" ? "2 3" :
-          shape.line?.dashStyle === "dashDot" ? "6 3 2 3" : undefined,
+          shape.line?.dashStyle === "dash" || shape.line?.dashStyle === "sysDash"
+            ? "6 4"
+            : shape.line?.dashStyle === "dot" || shape.line?.dashStyle === "sysDot"
+              ? "2 3"
+              : shape.line?.dashStyle === "dashDot"
+                ? "6 3 2 3"
+                : undefined,
         strokeCap:
-          shape.line?.cap === "rnd" ? "round" :
-          shape.line?.cap === "sq" ? "square" :
-          shape.line?.cap === "flat" ? "butt" : undefined,
+          shape.line?.cap === "rnd"
+            ? "round"
+            : shape.line?.cap === "sq"
+              ? "square"
+              : shape.line?.cap === "flat"
+                ? "butt"
+                : undefined,
         hasArrow: !!shape.line?.tailArrow,
         viewBox: `0 0 ${shape.frame.w} ${shape.frame.h}`,
         x2: shape.frame.w,
@@ -546,7 +704,8 @@ function resolveShape(
       kind: "table",
       base,
       table: {
-        header: shape.header, rows: shape.rows,
+        header: shape.header,
+        rows: shape.rows,
         cellGrid: shape.cellGrid,
         colWidthsIn: shape.colWidthsIn,
         rowHeightsIn: shape.rowHeightsIn,
@@ -557,12 +716,16 @@ function resolveShape(
   }
 
   if (shape.kind === "chart") {
-    return { kind: "chart", base, chart: shape.chart, placeholderKind: shape.chart ? undefined : "chart" };
+    return {
+      kind: "chart",
+      base,
+      chart: shape.chart,
+      placeholderKind: shape.chart ? undefined : "chart",
+    };
   }
 
   return { kind: shape.kind, base, placeholderKind: shape.kind };
 }
-
 
 function resolveLayout(
   layout: SlideLayoutWithUrls,
@@ -574,7 +737,11 @@ function resolveLayout(
     backgroundIsImage,
     bg: backgroundIsImage ? "#FFFFFF" : (fillToCss(layout.background, theme) ?? "#FFFFFF"),
     bgImage: backgroundIsImage
-      ? (layout.background as LayoutFill & { url?: string; srcRect?: LayoutSrcRect; opacity?: number })
+      ? (layout.background as LayoutFill & {
+          url?: string;
+          srcRect?: LayoutSrcRect;
+          opacity?: number;
+        })
       : undefined,
     shapes: (layout.shapes ?? []).map((sh) => resolveShape(sh, theme)),
   };
@@ -601,7 +768,12 @@ function getResolvedLayout(
 // ── Renderers over resolved shapes ─────────────────────────────────────
 
 function CroppedImage({
-  url, srcRect, opacity, style, duotone, tile,
+  url,
+  srcRect,
+  opacity,
+  style,
+  duotone,
+  tile,
 }: {
   url: string;
   srcRect?: LayoutSrcRect;
@@ -613,8 +785,24 @@ function CroppedImage({
   // Duotone: cheap approximation — mix-blend-mode over a coloured overlay.
   const duoOverlay = duotone ? (
     <>
-      <div style={{ position: "absolute", inset: 0, background: duotone[0], mixBlendMode: "multiply", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", inset: 0, background: duotone[1], mixBlendMode: "screen", pointerEvents: "none" }} />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: duotone[0],
+          mixBlendMode: "multiply",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: duotone[1],
+          mixBlendMode: "screen",
+          pointerEvents: "none",
+        }}
+      />
     </>
   ) : null;
   if (tile && !srcRect) {
@@ -637,7 +825,19 @@ function CroppedImage({
   if (!srcRect) {
     return (
       <div style={{ ...style, overflow: "hidden", position: "absolute" }}>
-        <img src={url} alt="" draggable={false} style={{ width: "100%", height: "100%", objectFit: "fill", opacity, display: "block", filter: duotone ? "grayscale(1) contrast(1.1)" : undefined }} />
+        <img
+          src={url}
+          alt=""
+          draggable={false}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "fill",
+            opacity,
+            display: "block",
+            filter: duotone ? "grayscale(1) contrast(1.1)" : undefined,
+          }}
+        />
         {duoOverlay}
       </div>
     );
@@ -680,7 +880,11 @@ type SlideAssets = {
 };
 type EmbeddedFontLite = {
   typeface: string;
-  variants: Array<{ style: "regular" | "bold" | "italic" | "boldItalic"; mime?: string; dataUrl?: string }>;
+  variants: Array<{
+    style: "regular" | "bold" | "italic" | "boldItalic";
+    mime?: string;
+    dataUrl?: string;
+  }>;
 };
 
 const HyperlinkCtx = createContext<Record<string, { target: string; external?: boolean }>>({});
@@ -688,15 +892,19 @@ const HyperlinkCtx = createContext<Record<string, { target: string; external?: b
 function ParaBlock({ para }: { para: ResolvedPara }) {
   const linkMap = useContext(HyperlinkCtx);
   return (
-    <p style={{
-      textAlign: para.align,
-      marginLeft: para.marginLeft,
-      textIndent: para.textIndent,
-      marginTop: para.spcBefore,
-      marginBottom: para.spcAfter ?? "0.06in",
-      lineHeight: para.lineHeight ?? 1.2,
-    }}>
-      {para.bulletChar && <span style={{ marginRight: "0.08in", ...para.bulletStyle }}>{para.bulletChar}</span>}
+    <p
+      style={{
+        textAlign: para.align,
+        marginLeft: para.marginLeft,
+        textIndent: para.textIndent,
+        marginTop: para.spcBefore,
+        marginBottom: para.spcAfter ?? "0.06in",
+        lineHeight: para.lineHeight ?? 1.2,
+      }}
+    >
+      {para.bulletChar && (
+        <span style={{ marginRight: "0.08in", ...para.bulletStyle }}>{para.bulletChar}</span>
+      )}
       {para.runs.map((r, i) => {
         if (r.isBreak) return <br key={i} />;
         if (r.hlink) {
@@ -716,7 +924,11 @@ function ParaBlock({ para }: { para: ResolvedPara }) {
             </a>
           );
         }
-        return <span key={i} style={r.style}>{r.text}</span>;
+        return (
+          <span key={i} style={r.style}>
+            {r.text}
+          </span>
+        );
       })}
     </p>
   );
@@ -734,16 +946,41 @@ function CustomPathClipDef({ id, path }: { id: string; path: CustomPath }) {
   );
 }
 
-function TableGrid({ table, theme }: { table: NonNullable<ResolvedShape["table"]>; theme?: Record<string, string> }) {
+function TableGrid({
+  table,
+  theme,
+}: {
+  table: NonNullable<ResolvedShape["table"]>;
+  theme?: Record<string, string>;
+}) {
   // Prefer the rich cellGrid path when available; falls back to plain rows.
   if (!table.cellGrid) {
     return (
-      <table style={{ width: "100%", height: "100%", borderCollapse: "collapse", fontSize: "10pt", color: "#0B0B12" }}>
+      <table
+        style={{
+          width: "100%",
+          height: "100%",
+          borderCollapse: "collapse",
+          fontSize: "10pt",
+          color: "#0B0B12",
+        }}
+      >
         {table.header.length > 0 && (
           <thead>
             <tr>
               {table.header.map((h, i) => (
-                <th key={i} style={{ padding: "4px 6px", borderBottom: "1px solid #0B0B12", textAlign: "left", fontWeight: 600, background: "#F5F5F5" }}>{h}</th>
+                <th
+                  key={i}
+                  style={{
+                    padding: "4px 6px",
+                    borderBottom: "1px solid #0B0B12",
+                    textAlign: "left",
+                    fontWeight: 600,
+                    background: "#F5F5F5",
+                  }}
+                >
+                  {h}
+                </th>
               ))}
             </tr>
           </thead>
@@ -752,7 +989,9 @@ function TableGrid({ table, theme }: { table: NonNullable<ResolvedShape["table"]
           {table.rows.map((row, ri) => (
             <tr key={ri}>
               {row.map((cell, ci) => (
-                <td key={ci} style={{ padding: "3px 6px", borderBottom: "1px solid #E5E7EB" }}>{cell}</td>
+                <td key={ci} style={{ padding: "3px 6px", borderBottom: "1px solid #E5E7EB" }}>
+                  {cell}
+                </td>
               ))}
             </tr>
           ))}
@@ -762,11 +1001,20 @@ function TableGrid({ table, theme }: { table: NonNullable<ResolvedShape["table"]
   }
   const totalW = (table.colWidthsIn ?? []).reduce((s, w) => s + w, 0);
   return (
-    <table style={{ width: "100%", height: "100%", borderCollapse: "collapse", fontSize: "10pt", color: "#0B0B12", tableLayout: "fixed" }}>
+    <table
+      style={{
+        width: "100%",
+        height: "100%",
+        borderCollapse: "collapse",
+        fontSize: "10pt",
+        color: "#0B0B12",
+        tableLayout: "fixed",
+      }}
+    >
       {table.colWidthsIn && totalW > 0 && (
         <colgroup>
           {table.colWidthsIn.map((w, i) => (
-            <col key={i} style={{ width: `${(w / totalW * 100).toFixed(2)}%` }} />
+            <col key={i} style={{ width: `${((w / totalW) * 100).toFixed(2)}%` }} />
           ))}
         </colgroup>
       )}
@@ -775,27 +1023,42 @@ function TableGrid({ table, theme }: { table: NonNullable<ResolvedShape["table"]
           const isHeader = ri === 0 && table.firstRow;
           const bandBg = table.bandRow && ri > 0 && ri % 2 === 0 ? "#F5F5F5" : undefined;
           return (
-            <tr key={ri} style={{ height: table.rowHeightsIn?.[ri] ? `${table.rowHeightsIn[ri]}in` : undefined }}>
+            <tr
+              key={ri}
+              style={{
+                height: table.rowHeightsIn?.[ri] ? `${table.rowHeightsIn[ri]}in` : undefined,
+              }}
+            >
               {row.map((cell, ci) => {
                 if (cell.hMerge || cell.vMerge) return null;
-                const bg = cell.fill?.kind === "image" ? undefined : (fillToCss(cell.fill, theme) ?? (isHeader ? "#F5F5F5" : bandBg));
+                const bg =
+                  cell.fill?.kind === "image"
+                    ? undefined
+                    : (fillToCss(cell.fill, theme) ?? (isHeader ? "#F5F5F5" : bandBg));
                 const imageBg = imageFillToCss(cell.fill);
                 const bt = borderFromLine(cell.borders?.t, theme);
                 const br = borderFromLine(cell.borders?.r, theme);
                 const bb = borderFromLine(cell.borders?.b, theme) ?? "1px solid #E5E7EB";
                 const bl = borderFromLine(cell.borders?.l, theme);
-                const marginsCss = cell.margins ? `${cell.margins.t}in ${cell.margins.r}in ${cell.margins.b}in ${cell.margins.l}in` : "3px 6px";
+                const marginsCss = cell.margins
+                  ? `${cell.margins.t}in ${cell.margins.r}in ${cell.margins.b}in ${cell.margins.l}in`
+                  : "3px 6px";
                 const anchor = cell.anchor ?? (isHeader ? "ctr" : "t");
-                const vAlign: "top" | "middle" | "bottom" = anchor === "ctr" ? "middle" : anchor === "b" ? "bottom" : "top";
+                const vAlign: "top" | "middle" | "bottom" =
+                  anchor === "ctr" ? "middle" : anchor === "b" ? "bottom" : "top";
                 return (
-                  <td key={ci}
+                  <td
+                    key={ci}
                     colSpan={cell.colSpan}
                     rowSpan={cell.rowSpan}
                     style={{
                       padding: marginsCss,
                       background: bg,
                       ...imageBg,
-                      borderTop: bt, borderRight: br, borderBottom: bb, borderLeft: bl,
+                      borderTop: bt,
+                      borderRight: br,
+                      borderBottom: bb,
+                      borderLeft: bl,
                       verticalAlign: vAlign,
                       fontWeight: isHeader ? 600 : undefined,
                     }}
@@ -815,7 +1078,15 @@ function TableGrid({ table, theme }: { table: NonNullable<ResolvedShape["table"]
   );
 }
 
-function ResolvedShapeNode({ shape, salt, theme }: { shape: ResolvedShape; salt: string; theme?: Record<string, string> }) {
+function ResolvedShapeNode({
+  shape,
+  salt,
+  theme,
+}: {
+  shape: ResolvedShape;
+  salt: string;
+  theme?: Record<string, string>;
+}) {
   if (shape.kind === "text" && shape.text) {
     const t = shape.text;
     const clipId = t.customPath ? customPathClipId(salt, t.customPath) : undefined;
@@ -832,10 +1103,10 @@ function ResolvedShapeNode({ shape, salt, theme }: { shape: ResolvedShape; salt:
             boxShadow: t.boxShadow,
             filter: t.filter,
             overflow: "hidden",
-            transform: [
-              (shape.base.transform ?? ""),
-              t.rotDeg ? `rotate(${t.rotDeg}deg)` : "",
-            ].filter(Boolean).join(" ") || undefined,
+            transform:
+              [shape.base.transform ?? "", t.rotDeg ? `rotate(${t.rotDeg}deg)` : ""]
+                .filter(Boolean)
+                .join(" ") || undefined,
           }}
         >
           {t.fillUrl && (
@@ -847,15 +1118,19 @@ function ResolvedShapeNode({ shape, salt, theme }: { shape: ResolvedShape; salt:
               style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
             />
           )}
-          <div style={{
-            position: "relative",
-            padding: t.insetsCss,
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: t.anchorJustify,
-          }}>
-            {t.paras.map((p, i) => <ParaBlock key={i} para={p} />)}
+          <div
+            style={{
+              position: "relative",
+              padding: t.insetsCss,
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: t.anchorJustify,
+            }}
+          >
+            {t.paras.map((p, i) => (
+              <ParaBlock key={i} para={p} />
+            ))}
           </div>
         </div>
       </>
@@ -869,14 +1144,16 @@ function ResolvedShapeNode({ shape, salt, theme }: { shape: ResolvedShape; salt:
       return (
         <>
           {im.customPath && clipId && <CustomPathClipDef id={clipId} path={im.customPath} />}
-          <div style={{
-            ...shape.base,
-            background: "#E5E7EB",
-            borderRadius: im.borderRadius,
-            clipPath: clipId ? `url(#${clipId})` : im.clipPath,
-            border: im.border,
-            boxShadow: im.boxShadow,
-          }} />
+          <div
+            style={{
+              ...shape.base,
+              background: "#E5E7EB",
+              borderRadius: im.borderRadius,
+              clipPath: clipId ? `url(#${clipId})` : im.clipPath,
+              border: im.border,
+              boxShadow: im.boxShadow,
+            }}
+          />
         </>
       );
     }
@@ -905,9 +1182,16 @@ function ResolvedShapeNode({ shape, salt, theme }: { shape: ResolvedShape; salt:
   if (shape.kind === "line" && shape.line) {
     const ln = shape.line;
     return (
-      <svg style={{ ...shape.base, overflow: "visible" }} viewBox={ln.viewBox} preserveAspectRatio="none">
+      <svg
+        style={{ ...shape.base, overflow: "visible" }}
+        viewBox={ln.viewBox}
+        preserveAspectRatio="none"
+      >
         <line
-          x1={0} y1={0} x2={ln.x2} y2={ln.y2}
+          x1={0}
+          y1={0}
+          x2={ln.x2}
+          y2={ln.y2}
           stroke={ln.stroke}
           strokeWidth={ln.strokeWidth}
           strokeDasharray={ln.strokeDash}
@@ -934,10 +1218,19 @@ function ResolvedShapeNode({ shape, salt, theme }: { shape: ResolvedShape; salt:
     );
   }
 
-
-
   return (
-    <div style={{ ...shape.base, background: "#F5F5F5", border: "1px dashed #C4C4C4", display: "flex", alignItems: "center", justifyContent: "center", color: "#666", fontSize: "9pt" }}>
+    <div
+      style={{
+        ...shape.base,
+        background: "#F5F5F5",
+        border: "1px dashed #C4C4C4",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#666",
+        fontSize: "9pt",
+      }}
+    >
       {shape.placeholderKind ?? shape.kind}
     </div>
   );
@@ -948,7 +1241,16 @@ function ResolvedShapeNode({ shape, salt, theme }: { shape: ResolvedShape; salt:
 // SVG. Supports bar/column, line/area, pie/doughnut. Fonts + colors + title
 // + legend + axis titles + numberFormat unit are honored.
 
-const CHART_PALETTE = ["#003FC7", "#5A6ACF", "#A1FBF9", "#C2A3FF", "#FFEB66", "#A6FA87", "#FF9B70", "#EC388A"];
+const CHART_PALETTE = [
+  "#003FC7",
+  "#5A6ACF",
+  "#A1FBF9",
+  "#C2A3FF",
+  "#FFEB66",
+  "#A6FA87",
+  "#FF9B70",
+  "#EC388A",
+];
 
 function formatValue(v: number, unit?: string, fmt?: string): string {
   if (!isFinite(v)) return "";
@@ -962,21 +1264,59 @@ function ChartRender({ chart }: { chart: ParsedChart }) {
   const family = chart.font?.family ? `"${chart.font.family}", inherit` : "inherit";
   const textColor = chart.font?.color ?? "#0B0B12";
   const gridColor = "rgba(11,11,18,0.12)";
-  const seriesColor = (i: number, override?: string) => override ?? CHART_PALETTE[i % CHART_PALETTE.length];
+  const seriesColor = (i: number, override?: string) =>
+    override ?? CHART_PALETTE[i % CHART_PALETTE.length];
 
   return (
-    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", fontFamily: family, color: textColor, padding: "6pt 8pt", boxSizing: "border-box" }}>
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        fontFamily: family,
+        color: textColor,
+        padding: "6pt 8pt",
+        boxSizing: "border-box",
+      }}
+    >
       {chart.title && (
-        <div style={{ fontSize: "12pt", fontWeight: 600, marginBottom: "4pt", textAlign: "center" }}>{chart.title}</div>
+        <div
+          style={{ fontSize: "12pt", fontWeight: 600, marginBottom: "4pt", textAlign: "center" }}
+        >
+          {chart.title}
+        </div>
       )}
       <div style={{ flex: 1, minHeight: 0, position: "relative" }}>
-        <ChartBody chart={chart} textColor={textColor} gridColor={gridColor} seriesColor={seriesColor} />
+        <ChartBody
+          chart={chart}
+          textColor={textColor}
+          gridColor={gridColor}
+          seriesColor={seriesColor}
+        />
       </div>
       {chart.legend?.visible !== false && chart.series.length > 0 && (
-        <div style={{ display: "flex", gap: "10pt", flexWrap: "wrap", justifyContent: "center", marginTop: "4pt", fontSize: "8pt" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: "10pt",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            marginTop: "4pt",
+            fontSize: "8pt",
+          }}
+        >
           {chart.series.map((s, i) => (
             <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: "4pt" }}>
-              <span style={{ width: "10pt", height: "10pt", background: seriesColor(i, s.color), borderRadius: 2, display: "inline-block" }} />
+              <span
+                style={{
+                  width: "10pt",
+                  height: "10pt",
+                  background: seriesColor(i, s.color),
+                  borderRadius: 2,
+                  display: "inline-block",
+                }}
+              />
               {s.label || `Series ${i + 1}`}
             </span>
           ))}
@@ -987,33 +1327,47 @@ function ChartRender({ chart }: { chart: ParsedChart }) {
 }
 
 function ChartBody({
-  chart, textColor, gridColor, seriesColor,
+  chart,
+  textColor,
+  gridColor,
+  seriesColor,
 }: {
   chart: ParsedChart;
   textColor: string;
   gridColor: string;
   seriesColor: (i: number, override?: string) => string;
 }) {
-  const W = 400, H = 220;
+  const W = 400,
+    H = 220;
   const kind = chart.kind;
 
   if (kind === "pie" || kind === "doughnut") {
     const s = chart.series[0];
     if (!s || s.values.length === 0) return null;
     const total = s.values.reduce((a, b) => a + Math.max(0, b), 0) || 1;
-    const cx = W / 2, cy = H / 2, r = Math.min(W, H) / 2 - 8;
+    const cx = W / 2,
+      cy = H / 2,
+      r = Math.min(W, H) / 2 - 8;
     const rInner = kind === "doughnut" ? r * 0.55 : 0;
     let acc = 0;
     return (
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style={{ fontFamily: "inherit" }}>
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        width="100%"
+        height="100%"
+        preserveAspectRatio="xMidYMid meet"
+        style={{ fontFamily: "inherit" }}
+      >
         {s.values.map((v, i) => {
           const frac = Math.max(0, v) / total;
           const a0 = acc * Math.PI * 2 - Math.PI / 2;
           acc += frac;
           const a1 = acc * Math.PI * 2 - Math.PI / 2;
           const large = frac > 0.5 ? 1 : 0;
-          const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0);
-          const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+          const x0 = cx + r * Math.cos(a0),
+            y0 = cy + r * Math.sin(a0);
+          const x1 = cx + r * Math.cos(a1),
+            y1 = cy + r * Math.sin(a1);
           const color = s.pointColors?.[i] ?? seriesColor(i);
           const path = rInner
             ? `M${cx + rInner * Math.cos(a0)},${cy + rInner * Math.sin(a0)} L${x0},${y0} A${r},${r} 0 ${large} 1 ${x1},${y1} L${cx + rInner * Math.cos(a1)},${cy + rInner * Math.sin(a1)} A${rInner},${rInner} 0 ${large} 0 ${cx + rInner * Math.cos(a0)},${cy + rInner * Math.sin(a0)} Z`
@@ -1029,13 +1383,22 @@ function ChartBody({
   const rawMax = Math.max(0, ...allVals);
   const rawMin = Math.min(0, ...allVals);
   const stacked = !!chart.stacked;
-  const yMax = stacked ? chart.categories.map((_, ci) => chart.series.reduce((a, s) => a + Math.max(0, s.values[ci] ?? 0), 0)).reduce((a, b) => Math.max(a, b), 0) : rawMax;
+  const yMax = stacked
+    ? chart.categories
+        .map((_, ci) => chart.series.reduce((a, s) => a + Math.max(0, s.values[ci] ?? 0), 0))
+        .reduce((a, b) => Math.max(a, b), 0)
+    : rawMax;
   const yMin = stacked ? 0 : rawMin;
   const range = yMax - yMin || 1;
-  const catCount = chart.categories.length || Math.max(1, ...chart.series.map((s) => s.values.length));
+  const catCount =
+    chart.categories.length || Math.max(1, ...chart.series.map((s) => s.values.length));
 
-  const padL = 34, padR = 8, padT = 8, padB = 22;
-  const iw = W - padL - padR, ih = H - padT - padB;
+  const padL = 34,
+    padR = 8,
+    padT = 8,
+    padB = 22;
+  const iw = W - padL - padR,
+    ih = H - padT - padB;
   const yFor = (v: number) => padT + ih - ((v - yMin) / range) * ih;
   const gridLines = 4;
 
@@ -1050,7 +1413,9 @@ function ChartBody({
           return (
             <g key={g}>
               <line x1={padL} y1={y} x2={W - padR} y2={y} stroke={gridColor} strokeWidth={0.5} />
-              <text x={padL - 3} y={y + 2} textAnchor="end" {...axisText}>{formatValue(v, chart.unit, chart.numberFormat)}</text>
+              <text x={padL - 3} y={y + 2} textAnchor="end" {...axisText}>
+                {formatValue(v, chart.unit, chart.numberFormat)}
+              </text>
             </g>
           );
         })}
@@ -1058,19 +1423,36 @@ function ChartBody({
           const color = seriesColor(si, s.color);
           const step = catCount > 1 ? iw / (catCount - 1) : iw;
           const pts = s.values.map((v, i) => [padL + step * i, yFor(v)] as [number, number]);
-          const linePath = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
-          const areaPath = pts.length ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${yFor(0)} L${pts[0][0].toFixed(1)},${yFor(0)} Z` : "";
+          const linePath = pts
+            .map((p, i) => `${i === 0 ? "M" : "L"}${p[0].toFixed(1)},${p[1].toFixed(1)}`)
+            .join(" ");
+          const areaPath = pts.length
+            ? `${linePath} L${pts[pts.length - 1][0].toFixed(1)},${yFor(0)} L${pts[0][0].toFixed(1)},${yFor(0)} Z`
+            : "";
           return (
             <g key={si}>
               {kind === "area" && <path d={areaPath} fill={color} fillOpacity={0.25} />}
-              <path d={linePath} fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-              {pts.map((p, i) => <circle key={i} cx={p[0]} cy={p[1]} r={2.5} fill={color} />)}
+              <path
+                d={linePath}
+                fill="none"
+                stroke={color}
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              {pts.map((p, i) => (
+                <circle key={i} cx={p[0]} cy={p[1]} r={2.5} fill={color} />
+              ))}
             </g>
           );
         })}
         {chart.categories.map((c, i) => {
           const step = catCount > 1 ? iw / (catCount - 1) : iw;
-          return <text key={i} x={padL + step * i} y={H - 8} textAnchor="middle" {...axisText}>{c}</text>;
+          return (
+            <text key={i} x={padL + step * i} y={H - 8} textAnchor="middle" {...axisText}>
+              {c}
+            </text>
+          );
         })}
       </svg>
     );
@@ -1086,7 +1468,9 @@ function ChartBody({
         return !horizontal ? (
           <g key={g}>
             <line x1={padL} y1={y} x2={W - padR} y2={y} stroke={gridColor} strokeWidth={0.5} />
-            <text x={padL - 3} y={y + 2} textAnchor="end" {...axisText}>{formatValue(v, chart.unit, chart.numberFormat)}</text>
+            <text x={padL - 3} y={y + 2} textAnchor="end" {...axisText}>
+              {formatValue(v, chart.unit, chart.numberFormat)}
+            </text>
           </g>
         ) : null;
       })}
@@ -1105,12 +1489,37 @@ function ChartBody({
                   if (stacked) {
                     const x = padL + (stackAcc / range) * iw;
                     stackAcc += Math.max(0, v);
-                    return <rect key={si} x={x} y={padT + ci * groupH + groupH * 0.15} width={bw} height={groupH * 0.7} fill={color} />;
+                    return (
+                      <rect
+                        key={si}
+                        x={x}
+                        y={padT + ci * groupH + groupH * 0.15}
+                        width={bw}
+                        height={groupH * 0.7}
+                        fill={color}
+                      />
+                    );
                   }
-                  return <rect key={si} x={padL} y={padT + ci * groupH + groupH * 0.15 + si * barH} width={bw} height={barH * 0.9} fill={color} />;
+                  return (
+                    <rect
+                      key={si}
+                      x={padL}
+                      y={padT + ci * groupH + groupH * 0.15 + si * barH}
+                      width={bw}
+                      height={barH * 0.9}
+                      fill={color}
+                    />
+                  );
                 });
               })()}
-              <text x={padL - 3} y={padT + ci * groupH + groupH / 2 + 2} textAnchor="end" {...axisText}>{cat}</text>
+              <text
+                x={padL - 3}
+                y={padT + ci * groupH + groupH / 2 + 2}
+                textAnchor="end"
+                {...axisText}
+              >
+                {cat}
+              </text>
             </g>
           ));
         }
@@ -1127,20 +1536,38 @@ function ChartBody({
                 if (stacked) {
                   const y = yFor(stackAcc + Math.max(0, v));
                   stackAcc += Math.max(0, v);
-                  return <rect key={si} x={padL + ci * groupW + groupW * 0.15} y={y} width={groupW * 0.7} height={bh} fill={color} />;
+                  return (
+                    <rect
+                      key={si}
+                      x={padL + ci * groupW + groupW * 0.15}
+                      y={y}
+                      width={groupW * 0.7}
+                      height={bh}
+                      fill={color}
+                    />
+                  );
                 }
-                return <rect key={si} x={padL + ci * groupW + groupW * 0.15 + si * barW} y={yFor(v)} width={barW * 0.9} height={bh} fill={color} />;
+                return (
+                  <rect
+                    key={si}
+                    x={padL + ci * groupW + groupW * 0.15 + si * barW}
+                    y={yFor(v)}
+                    width={barW * 0.9}
+                    height={bh}
+                    fill={color}
+                  />
+                );
               });
             })()}
-            <text x={padL + ci * groupW + groupW / 2} y={H - 8} textAnchor="middle" {...axisText}>{cat}</text>
+            <text x={padL + ci * groupW + groupW / 2} y={H - 8} textAnchor="middle" {...axisText}>
+              {cat}
+            </text>
           </g>
         ));
       })()}
     </svg>
   );
 }
-
-
 
 /**
  * Render a captured PPTX slide layout at any target width.
@@ -1194,7 +1621,7 @@ export function FaithfulSlideCanvas({
           .filter((v) => v.dataUrl)
           .map((v) => {
             const { weight, italic } = styleFor(v);
-            return `@font-face{font-family:"${f.typeface.replace(/"/g, "'")}";src:url(${v.dataUrl}) format("${(v.mime === "application/x-font-otf" || v.mime === "font/otf") ? "opentype" : "truetype"}");font-weight:${weight};font-style:${italic ? "italic" : "normal"};font-display:swap;}`;
+            return `@font-face{font-family:"${f.typeface.replace(/"/g, "'")}";src:url(${v.dataUrl}) format("${v.mime === "application/x-font-otf" || v.mime === "font/otf" ? "opentype" : "truetype"}");font-weight:${weight};font-style:${italic ? "italic" : "normal"};font-display:swap;}`;
           }),
       )
       .join("\n");
@@ -1203,7 +1630,7 @@ export function FaithfulSlideCanvas({
   const size = resolved?.size ?? { w: 13.333, h: 7.5 };
   const innerPx = size.w * 96;
   const scale = width / innerPx;
-  const height = (size.h * 96) * scale;
+  const height = size.h * 96 * scale;
 
   const badges: Array<{ label: string; tone: "hidden" | "info" | "accent" }> = [];
   if (assets?.hidden) badges.push({ label: "Hidden", tone: "hidden" });
@@ -1221,7 +1648,13 @@ export function FaithfulSlideCanvas({
     <HyperlinkCtx.Provider value={linkMap}>
       <div
         className={className}
-        style={{ width, height, position: "relative", overflow: "hidden", background: resolved?.bg ?? "#FFFFFF" }}
+        style={{
+          width,
+          height,
+          position: "relative",
+          overflow: "hidden",
+          background: resolved?.bg ?? "#FFFFFF",
+        }}
       >
         {fontFaceCss && <style dangerouslySetInnerHTML={{ __html: fontFaceCss }} />}
         {resolved?.bgImage?.url && (
@@ -1247,7 +1680,15 @@ export function FaithfulSlideCanvas({
         >
           <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden>
             <defs>
-              <marker id="faithful-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <marker
+                id="faithful-arrow"
+                viewBox="0 0 10 10"
+                refX="9"
+                refY="5"
+                markerWidth="6"
+                markerHeight="6"
+                orient="auto-start-reverse"
+              >
                 <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
               </marker>
             </defs>
@@ -1260,7 +1701,18 @@ export function FaithfulSlideCanvas({
         {showChrome && (badges.length > 0 || mediaChips.length > 0) && (
           <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
             {badges.length > 0 && (
-              <div style={{ position: "absolute", top: 8, right: 8, display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end", maxWidth: "70%" }}>
+              <div
+                style={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  display: "flex",
+                  gap: 6,
+                  flexWrap: "wrap",
+                  justifyContent: "flex-end",
+                  maxWidth: "70%",
+                }}
+              >
                 {badges.map((b, i) => (
                   <span
                     key={i}
@@ -1271,8 +1723,14 @@ export function FaithfulSlideCanvas({
                       borderRadius: 999,
                       fontWeight: 600,
                       letterSpacing: "0.04em",
-                      color: b.tone === "hidden" ? "#fff" : b.tone === "accent" ? "#03002C" : "#03002C",
-                      background: b.tone === "hidden" ? "rgba(11,11,18,0.72)" : b.tone === "accent" ? "rgba(255,235,102,0.92)" : "rgba(255,255,255,0.85)",
+                      color:
+                        b.tone === "hidden" ? "#fff" : b.tone === "accent" ? "#03002C" : "#03002C",
+                      background:
+                        b.tone === "hidden"
+                          ? "rgba(11,11,18,0.72)"
+                          : b.tone === "accent"
+                            ? "rgba(255,235,102,0.92)"
+                            : "rgba(255,255,255,0.85)",
                       border: "1px solid rgba(11,11,18,0.12)",
                       backdropFilter: "blur(6px)",
                     }}
@@ -1283,7 +1741,16 @@ export function FaithfulSlideCanvas({
               </div>
             )}
             {mediaChips.length > 0 && (
-              <div style={{ position: "absolute", bottom: 8, left: 8, display: "flex", gap: 6, flexWrap: "wrap" }}>
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 8,
+                  left: 8,
+                  display: "flex",
+                  gap: 6,
+                  flexWrap: "wrap",
+                }}
+              >
                 {mediaChips.map((m) => (
                   <span
                     key={m.key}

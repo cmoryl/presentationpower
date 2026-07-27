@@ -14,9 +14,7 @@ function slug(s: string) {
 }
 
 async function captureAsset(asset: CampaignAsset): Promise<Blob | null> {
-  const root = document.querySelector<HTMLElement>(
-    `[data-kit-asset-id="${asset.id}"]`,
-  );
+  const root = document.querySelector<HTMLElement>(`[data-kit-asset-id="${asset.id}"]`);
   if (!root) return null;
   // The scaled inner frame — SocialRenderer renders it as the first
   // descendant with an inline transform.

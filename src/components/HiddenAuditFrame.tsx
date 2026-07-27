@@ -26,7 +26,13 @@ export function HiddenAuditFrame({
     const t = window.setTimeout(async () => {
       try {
         // Auto-fix first so the audit reflects the actually-rendered (fixed) state.
-        const { applyAutoFix, revertAutoFix, auditNode: audit, auditAndFixTypography, revertTypeFix } = await import("@/lib/wcag");
+        const {
+          applyAutoFix,
+          revertAutoFix,
+          auditNode: audit,
+          auditAndFixTypography,
+          revertTypeFix,
+        } = await import("@/lib/wcag");
         revertAutoFix(el);
         revertTypeFix(el);
         auditAndFixTypography(el);

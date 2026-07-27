@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { listAuditLog } from "@/lib/admin.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
-import { AdminPageHeader , AdminLoading } from "@/components/admin/AdminPage";
+import { AdminPageHeader, AdminLoading } from "@/components/admin/AdminPage";
 
 export const Route = createFileRoute("/admin/audit")({
   component: AuditView,
@@ -78,7 +78,9 @@ function AuditView() {
               }`}
             >
               {c.label}
-              <span className={`ml-1.5 ${active ? "text-white/60" : "text-black/40"}`}>{count}</span>
+              <span className={`ml-1.5 ${active ? "text-white/60" : "text-black/40"}`}>
+                {count}
+              </span>
             </button>
           );
         })}
@@ -108,7 +110,9 @@ function AuditView() {
             {filtered.map((r) => (
               <tr key={r.id} className="border-t border-black/5 align-top">
                 <td className="p-2 text-black/60">{new Date(r.created_at).toLocaleString()}</td>
-                <td className="p-2 font-mono text-black/60">{r.actor_user_id?.slice(0, 8) ?? "—"}</td>
+                <td className="p-2 font-mono text-black/60">
+                  {r.actor_user_id?.slice(0, 8) ?? "—"}
+                </td>
                 <td className="p-2 font-medium">{r.action}</td>
                 <td className="p-2 font-mono text-black/60">
                   {r.target_type ? `${r.target_type}:${r.target_id?.slice(0, 8) ?? "—"}` : "—"}

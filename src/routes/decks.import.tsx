@@ -7,12 +7,7 @@ import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { importPowerpoint } from "@/lib/pptx-import.functions";
 import type { ParsedDeck } from "@/lib/pptx-import";
 import { mapParsedSlide, type MappedSlide } from "@/lib/pptx-mapping";
-import {
-  MODULE_VARIANTS,
-  SECTION_FRAMEWORKS,
-  variantsForSection,
-  byId,
-} from "@/lib/taxonomy";
+import { MODULE_VARIANTS, SECTION_FRAMEWORKS, variantsForSection, byId } from "@/lib/taxonomy";
 
 export const Route = createFileRoute("/decks/import")({
   head: () => ({
@@ -91,7 +86,6 @@ function ImportView() {
       }
       if (file.size > 100 * 1024 * 1024) {
         throw new Error("File is larger than 100MB. Please slim it down or split it.");
-
       }
 
       setStep("read", "active", formatBytes(file.size));
@@ -127,11 +121,7 @@ function ImportView() {
       setStep("map", "active", "Matching each slide to the closest variant…");
       await new Promise((r) => setTimeout(r, 30));
       const mapped = result.slides.map((s) => mapParsedSlide(s, result.slides.length));
-      setStep(
-        "map",
-        "done",
-        `${mapped.length} slide${mapped.length === 1 ? "" : "s"} mapped`,
-      );
+      setStep("map", "done", `${mapped.length} slide${mapped.length === 1 ? "" : "s"} mapped`);
       setProgress(100);
 
       setParsed(result);
@@ -202,10 +192,7 @@ function ImportView() {
           content: m.content,
           notes: m.source.notes || undefined,
         })),
-        context:
-          Object.keys(abPaletteOverride).length > 0
-            ? { abPaletteOverride }
-            : undefined,
+        context: Object.keys(abPaletteOverride).length > 0 ? { abPaletteOverride } : undefined,
       });
       setStep("create", "done", `Deck ready · ${mapping.length} slides`);
       setProgress(100);
@@ -230,7 +217,6 @@ function ImportView() {
     setFileInfo(null);
   }
 
-
   return (
     <AppShell>
       <div className="mx-auto max-w-5xl">
@@ -239,10 +225,9 @@ function ImportView() {
             <div className="text-xs uppercase tracking-[0.3em] text-black/50">Import</div>
             <h1 className="mt-3 text-4xl font-semibold">Reformat an existing PowerPoint.</h1>
             <p className="mt-3 max-w-2xl text-black/60">
-              We extract titles, bullets, speaker notes, embedded images, and theme
-              colors — then re-author each slide onto the closest TransPerfect module
-              variant. Original imagery and accent palette carry through so the
-              reformatted deck still looks like your source.
+              We extract titles, bullets, speaker notes, embedded images, and theme colors — then
+              re-author each slide onto the closest TransPerfect module variant. Original imagery
+              and accent palette carry through so the reformatted deck still looks like your source.
             </p>
           </div>
           <Link
@@ -256,12 +241,7 @@ function ImportView() {
         {stage === "upload" && <UploadCard onFile={onFile} />}
 
         {(stage === "processing" || stage === "creating" || stage === "done") && (
-          <ProgressPanel
-            steps={steps}
-            progress={progress}
-            fileInfo={fileInfo}
-            stage={stage}
-          />
+          <ProgressPanel steps={steps} progress={progress} fileInfo={fileInfo} stage={stage} />
         )}
 
         {stage === "error" && (
@@ -293,7 +273,6 @@ function ImportView() {
             archetypes={narrativeArchetypes}
           />
         )}
-
       </div>
     </AppShell>
   );
@@ -384,7 +363,8 @@ function diagnoseSlide(row: MappedSlide): SlideDiagnostic {
     return {
       kind: "image-fallback",
       label: "Seeded imagery",
-      detail: "Source slide had no embedded picture — deterministic brand-mode stock is used to fill the image area.",
+      detail:
+        "Source slide had no embedded picture — deterministic brand-mode stock is used to fill the image area.",
       tone: "info",
     };
   }
@@ -396,13 +376,7 @@ function diagnoseSlide(row: MappedSlide): SlideDiagnostic {
   };
 }
 
-function DiagnosticsPanel({
-  parsed,
-  mapping,
-}: {
-  parsed: ParsedDeck;
-  mapping: MappedSlide[];
-}) {
+function DiagnosticsPanel({ parsed, mapping }: { parsed: ParsedDeck; mapping: MappedSlide[] }) {
   const diagnostics = mapping.map(diagnoseSlide);
   const counts = {
     preserved: diagnostics.filter((d) => d.kind === "image-preserved").length,
@@ -424,7 +398,8 @@ function DiagnosticsPanel({
       : {
           tone: "info",
           label: "Default palette",
-          detail: "No theme accents were found in the source file — the deck uses the TransPerfect default palette.",
+          detail:
+            "No theme accents were found in the source file — the deck uses the TransPerfect default palette.",
         },
   );
   if (theme?.headingFont || theme?.bodyFont) {
@@ -438,23 +413,18 @@ function DiagnosticsPanel({
     deckNotes.push({
       tone: "warn",
       label: "Images truncated",
-      detail: "Some images in the source file exceeded the per-file limit and were skipped during extraction. Those slides will use seeded stock imagery.",
+      detail:
+        "Some images in the source file exceeded the per-file limit and were skipped during extraction. Those slides will use seeded stock imagery.",
     });
   }
-  const problems = diagnostics
-    .map((d, i) => ({ d, i }))
-    .filter((x) => x.d.tone !== "ok");
+  const problems = diagnostics.map((d, i) => ({ d, i })).filter((x) => x.d.tone !== "ok");
 
   return (
     <div className="rounded-2xl border border-black/10 bg-white p-6">
       <div className="flex items-baseline justify-between">
         <div>
-          <div className="text-xs uppercase tracking-widest text-black/50">
-            Import diagnostics
-          </div>
-          <div className="mt-1 text-lg font-semibold">
-            What will carry through, and what won't
-          </div>
+          <div className="text-xs uppercase tracking-widest text-black/50">Import diagnostics</div>
+          <div className="mt-1 text-lg font-semibold">What will carry through, and what won't</div>
         </div>
         <div className="text-xs text-black/50">
           {mapping.length} slide{mapping.length === 1 ? "" : "s"} analysed
@@ -517,9 +487,7 @@ function StatTile({
   return (
     <div className={`rounded-xl border ${toneRing} px-4 py-3`}>
       <div className="text-3xl font-semibold tabular-nums">{value}</div>
-      <div className="mt-1 text-[10px] uppercase tracking-widest text-black/55">
-        {label}
-      </div>
+      <div className="mt-1 text-[10px] uppercase tracking-widest text-black/55">{label}</div>
     </div>
   );
 }
@@ -602,10 +570,7 @@ function ReviewPanel({
               {parsed.slideCount} slide{parsed.slideCount === 1 ? "" : "s"} extracted
             </div>
           </div>
-          <button
-            onClick={onReupload}
-            className="text-sm text-black/60 hover:text-black"
-          >
+          <button onClick={onReupload} className="text-sm text-black/60 hover:text-black">
             Replace file
           </button>
         </div>
@@ -660,8 +625,7 @@ function ReviewPanel({
           {mapping.map((row, i) => {
             const section = byId(SECTION_FRAMEWORKS, row.sectionId);
             const options = variantsForSection(row.sectionId);
-            const pool =
-              options.some((o) => o.id === row.variantId) ? options : MODULE_VARIANTS;
+            const pool = options.some((o) => o.id === row.variantId) ? options : MODULE_VARIANTS;
             return (
               <div
                 key={i}
@@ -699,6 +663,7 @@ function ReviewPanel({
                   <div className="mt-1 text-[11px] text-black/45">{row.rationale}</div>
                 </div>
                 <select
+                  aria-label="Variant"
                   value={row.variantId}
                   onChange={(e) => onVariantChange(i, e.target.value)}
                   className="w-full rounded-lg border border-black/15 bg-white px-2.5 py-1.5 text-xs focus:border-[#0B2A4A] focus:outline-none"
@@ -898,7 +863,13 @@ function StepIcon({ status }: { status: StepStatus }) {
   if (status === "done") {
     return (
       <span className={`${base} bg-[#003FC7] text-white`}>
-        <svg viewBox="0 0 12 12" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          viewBox="0 0 12 12"
+          className="h-3 w-3"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M2.5 6.5l2.5 2.5 4.5-5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </span>
@@ -906,7 +877,9 @@ function StepIcon({ status }: { status: StepStatus }) {
   }
   if (status === "active") {
     return (
-      <span className={`${base} border-2 border-[#003FC7] border-t-transparent animate-spin bg-transparent`} />
+      <span
+        className={`${base} border-2 border-[#003FC7] border-t-transparent animate-spin bg-transparent`}
+      />
     );
   }
   if (status === "error") {
@@ -914,4 +887,3 @@ function StepIcon({ status }: { status: StepStatus }) {
   }
   return <span className={`${base} border border-black/20 bg-white`} />;
 }
-

@@ -45,7 +45,8 @@ export function OnScreenSizeBadge({
         );
         if (!ownText) return;
         const cs = getComputedStyle(node);
-        if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) return;
+        if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1)
+          return;
         const px = parseFloat(cs.fontSize);
         if (!Number.isFinite(px) || px <= 0) return;
         sampled++;

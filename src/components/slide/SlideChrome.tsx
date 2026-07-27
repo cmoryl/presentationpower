@@ -12,7 +12,6 @@ import {
 import { GRAIN_SVG } from "@/components/slide/grain";
 import { AuroraLayer } from "@/components/slide/flagship";
 
-
 // Every slide can render in light or dark mode. VariantRenderer sets this
 // context per slide; SlideFrame and helpers read it to flip content surfaces
 // and text colors without every switch case having to know about the mode.
@@ -70,7 +69,6 @@ export type SlideInk = {
 
 export const SlideInkContext = createContext<SlideInk | null>(null);
 
-
 function hexToRgba(hex: string, alpha: number): string {
   const m = /^#?([a-f\d]{6})$/i.exec(hex);
   if (!m) return hex;
@@ -89,11 +87,18 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
 }
 
 function rgbToHex({ r, g, b }: { r: number; g: number; b: number }): string {
-  const to = (v: number) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0");
+  const to = (v: number) =>
+    Math.max(0, Math.min(255, Math.round(v)))
+      .toString(16)
+      .padStart(2, "0");
   return `#${to(r)}${to(g)}${to(b)}`;
 }
 
-function mixRgb(a: { r: number; g: number; b: number }, b: { r: number; g: number; b: number }, t: number) {
+function mixRgb(
+  a: { r: number; g: number; b: number },
+  b: { r: number; g: number; b: number },
+  t: number,
+) {
   return { r: a.r + (b.r - a.r) * t, g: a.g + (b.g - a.g) * t, b: a.b + (b.b - a.b) * t };
 }
 
@@ -115,7 +120,12 @@ export function contrastRatio(foreground: string, background: string): number {
   return (light + 0.05) / (dark + 0.05);
 }
 
-function readableOn(hex: string, backgrounds: string[], prefer: "darken" | "lighten", target = 4.5): string {
+function readableOn(
+  hex: string,
+  backgrounds: string[],
+  prefer: "darken" | "lighten",
+  target = 4.5,
+): string {
   const rgb = hexToRgb(hex);
   if (!rgb) return hex;
   const pole = prefer === "darken" ? { r: 0, g: 0, b: 0 } : { r: 255, g: 255, b: 255 };
@@ -136,12 +146,10 @@ function readableOn(hex: string, backgrounds: string[], prefer: "darken" | "ligh
 // on navy. Only luminance is shifted — the hue stays the division's own so
 // the palette identity is preserved.
 export function readableAccent(hex: string, mode: SlideMode, surfaceHex?: string): string {
-  const backgrounds = mode === "dark"
-    ? ["#03002C", "#0A1230"]
-    : ["#FFFFFF", surfaceHex ?? "#FFFFFF"];
+  const backgrounds =
+    mode === "dark" ? ["#03002C", "#0A1230"] : ["#FFFFFF", surfaceHex ?? "#FFFFFF"];
   return readableOn(hex, backgrounds, mode === "dark" ? "lighten" : "darken", 4.5);
 }
-
 
 export function makeSlideInk(
   mode: SlideMode,
@@ -153,7 +161,12 @@ export function makeSlideInk(
   const dark = mode === "dark";
   const textHex = dark
     ? "#FFFFFF"
-    : readableOn(primaryHex ?? baseInkHex ?? "#03002C", ["#FFFFFF", surfaceHex ?? "#FFFFFF"], "darken", 4.5);
+    : readableOn(
+        primaryHex ?? baseInkHex ?? "#03002C",
+        ["#FFFFFF", surfaceHex ?? "#FFFFFF"],
+        "darken",
+        4.5,
+      );
   const bodyHex = dark
     ? "#FFFFFF"
     : readableOn(baseInkHex ?? "#03002C", ["#FFFFFF", surfaceHex ?? "#FFFFFF"], "darken", 4.5);
@@ -169,9 +182,14 @@ export function makeSlideInk(
     hairlineStrong: `rgba(${base},${dark ? 0.22 : 0.18})`,
     trackFill: `rgba(${base},${dark ? 0.08 : 0.07})`,
     panel: dark ? "rgba(10, 8, 48, 0.34)" : "rgba(255,255,255,0.55)",
-    accent: (a: number) =>
-      accentHex ? hexToRgba(accentHex, a) : `rgba(${base},${a})`,
-    onSurface: (hex: string) => readableOn(hex, dark ? ["#03002C", "#0A1230"] : ["#FFFFFF", surfaceHex ?? "#FFFFFF"], dark ? "lighten" : "darken", 4.5),
+    accent: (a: number) => (accentHex ? hexToRgba(accentHex, a) : `rgba(${base},${a})`),
+    onSurface: (hex: string) =>
+      readableOn(
+        hex,
+        dark ? ["#03002C", "#0A1230"] : ["#FFFFFF", surfaceHex ?? "#FFFFFF"],
+        dark ? "lighten" : "darken",
+        4.5,
+      ),
     accentText,
   };
 }
@@ -184,10 +202,6 @@ export function useSlideInk(accentOverride?: string | null): SlideInk {
   if (provided && accentOverride === undefined) return provided;
   return makeSlideInk(mode, accentHex);
 }
-
-
-
-
 
 // Optional imagery layer rendered BEHIND the slide content. When set, the
 // SlideFrame replaces its opaque token background with either a photo + scrim
@@ -242,7 +256,6 @@ export function SlideFrame({
   logoPosition?: LogoPosition;
   logoOrientation?: LogoOrientation;
 }) {
-
   const mode = useSlideMode();
   const backdrop = useContext(SlideBackdropContext);
   // Cover / divider / close chrome historically forced a dark navy surface so
@@ -254,7 +267,8 @@ export function SlideFrame({
   // sets this via SlideModeContext.Provider), chrome stays light and titles
   // resolve to a dark ink via `makeSlideInk`. Legacy dark covers still work —
   // callers just pass `mode="dark"`.
-  const isChromeDark = (variant === "cover" || variant === "divider" || variant === "close") && mode === "dark";
+  const isChromeDark =
+    (variant === "cover" || variant === "divider" || variant === "close") && mode === "dark";
   const slideDark = mode === "dark";
 
   const hasBackdrop = !!backdrop;
@@ -263,7 +277,9 @@ export function SlideFrame({
   const hasBackdropCss = !!(backdrop?.css && !backdrop?.url && !backdrop?.aurora);
   // A backdrop is "dark" when the caller flagged darkChrome, or when it's a
   // photo/aurora backdrop on a non-light slide (legacy behavior).
-  const backdropIsDark = hasBackdrop && (backdrop?.darkChrome ?? ((hasBackdropImage || hasBackdropAurora) && !slideDark));
+  const backdropIsDark =
+    hasBackdrop &&
+    (backdrop?.darkChrome ?? ((hasBackdropImage || hasBackdropAurora) && !slideDark));
   const lightBackdrop = hasBackdrop && !backdropIsDark && !slideDark;
   const darkBackdrop = hasBackdrop && !lightBackdrop;
 
@@ -276,15 +292,13 @@ export function SlideFrame({
   // Bottom-adjacent logos sit above the footer band; content needs extra
   // pb so titles / bullets / cards don't slide under the lockup. Top-adjacent
   // logos need a little more pt on hero (cover) chrome where the mark is xl.
-  const bottomLogo = showLogo && (
-    placement.position === "bottom-left" ||
-    placement.position === "bottom-right" ||
-    placement.position === "bottom-center"
-  );
+  const bottomLogo =
+    showLogo &&
+    (placement.position === "bottom-left" ||
+      placement.position === "bottom-right" ||
+      placement.position === "bottom-center");
   const topCenterLogo = showLogo && placement.position === "top-center";
   const bottomCenterLogo = showLogo && placement.position === "bottom-center";
-
-
 
   // Light backdrops use a cream/white tint so photography reads bright; dark
   // backdrops keep the original navy scrim. Callers can still override tint.
@@ -293,7 +307,6 @@ export function SlideFrame({
   // near-opaque so imagery reads as a subtle wash on a white page.
   const tint = lightBackdrop ? "#FFFFFF" : (backdrop?.tint ?? defaultTint);
   const scrimStrength = lightBackdrop ? 0.97 : (backdrop?.scrimStrength ?? 0.55);
-
 
   const scrimGradient = (() => {
     if (!backdrop) return "none";
@@ -306,23 +319,33 @@ export function SlideFrame({
     const to = (dir: string) =>
       `linear-gradient(${dir}, ${hexA(t, a)} 0%, ${hexA(t, midA)} 45%, ${hexA(t, minA)} 100%)`;
     switch (backdrop.scrim ?? "bottom") {
-      case "bottom": return to("to top");
-      case "top":    return to("to bottom");
-      case "left":   return to("to right");
-      case "right":  return to("to left");
-      case "full":   return `linear-gradient(${hexA(t, a)}, ${hexA(t, a)})`;
+      case "bottom":
+        return to("to top");
+      case "top":
+        return to("to bottom");
+      case "left":
+        return to("to right");
+      case "right":
+        return to("to left");
+      case "full":
+        return `linear-gradient(${hexA(t, a)}, ${hexA(t, a)})`;
       case "vignette":
         return lightBackdrop
           ? `radial-gradient(circle at 50% 50%, ${hexA(t, a * 0.85)} 0%, ${hexA(t, a)} 70%)`
           : `linear-gradient(${hexA(t, a * 0.35)}, ${hexA(t, a)})`;
     }
-
   })();
 
   // A dark chrome (cover/divider/close) or backdrop-dark surface reads as dark
   // for accent-as-text purposes; content-on-white uses light mode tuning.
-  const inkMode: SlideMode = (slideDark || darkBackdrop) ? "dark" : "light";
-  const frameInk = makeSlideInk(inkMode, brand.tokens.accent, brand.tokens.primary, brand.tokens.surface, brand.tokens.ink);
+  const inkMode: SlideMode = slideDark || darkBackdrop ? "dark" : "light";
+  const frameInk = makeSlideInk(
+    inkMode,
+    brand.tokens.accent,
+    brand.tokens.primary,
+    brand.tokens.surface,
+    brand.tokens.ink,
+  );
   const accentTextHex = frameInk.accentText;
 
   return (
@@ -343,20 +366,18 @@ export function SlideFrame({
         ["--slide-track-fill" as string]: frameInk.trackFill,
       }}
     >
-
       {hasBackdropCss && (
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{ background: backdrop!.css }}
-        />
+        <div aria-hidden className="absolute inset-0" style={{ background: backdrop!.css }} />
       )}
       {hasBackdropAurora && (
-        <AuroraLayer seed={backdrop?.auroraSeed ?? "aurora"} brand={brand} baseTint={backdrop?.tint} />
+        <AuroraLayer
+          seed={backdrop?.auroraSeed ?? "aurora"}
+          brand={brand}
+          baseTint={backdrop?.tint}
+        />
       )}
       {hasBackdropImage && (
         <>
-
           <img
             src={backdrop!.url}
             alt=""
@@ -365,7 +386,8 @@ export function SlideFrame({
             style={{
               objectFit: backdrop!.fit ?? "cover",
               objectPosition: `${50 + (backdrop!.offsetX ?? 0) / 2}% ${50 + (backdrop!.offsetY ?? 0) / 2}%`,
-              transform: backdrop!.zoom && backdrop!.zoom !== 1 ? `scale(${backdrop!.zoom})` : undefined,
+              transform:
+                backdrop!.zoom && backdrop!.zoom !== 1 ? `scale(${backdrop!.zoom})` : undefined,
               transformOrigin: "center center",
               filter: lightBackdrop
                 ? `brightness(${1.16 + (backdrop!.imageDim ?? 0) * 0.16}) saturate(0.62) contrast(0.82)`
@@ -399,13 +421,15 @@ export function SlideFrame({
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0"
-              style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.74), rgba(255,255,255,0.62))" }}
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(255,255,255,0.74), rgba(255,255,255,0.62))",
+              }}
             />
           )}
           <div className="absolute inset-0" style={{ backgroundImage: scrimGradient }} />
         </>
       )}
-
 
       {/* ─────────────────────────────────────────────────────────────────
           Abstract ground grammar (no-backdrop slides). One layered system
@@ -419,144 +443,174 @@ export function SlideFrame({
           stronger accent presence — those are the deck's dramatic moments.
           Content variants stay quiet and recessive so data reads clean.
           ───────────────────────────────────────────────────────────────── */}
-      {!hasBackdrop && slideDark && (() => {
-        const isHero = variant === "cover" || variant === "divider" || variant === "close";
-        const primary = brand.tokens.primary;
-        const accent = brand.tokens.accent;
-        const sweepA = isHero ? 0.72 : 0.48;
-        const sweepB = isHero ? 0.28 : 0.14;
-        const accentA = isHero ? 0.30 : 0.14;
-        const accentB = isHero ? 0.14 : 0.06;
-        return (
-          <>
-            {/* Angled primary wash — bottom-left → top-right, so light rakes
+      {!hasBackdrop &&
+        slideDark &&
+        (() => {
+          const isHero = variant === "cover" || variant === "divider" || variant === "close";
+          const primary = brand.tokens.primary;
+          const accent = brand.tokens.accent;
+          const sweepA = isHero ? 0.72 : 0.48;
+          const sweepB = isHero ? 0.28 : 0.14;
+          const accentA = isHero ? 0.3 : 0.14;
+          const accentB = isHero ? 0.14 : 0.06;
+          return (
+            <>
+              {/* Angled primary wash — bottom-left → top-right, so light rakes
                 across the slide the way it does across a photograph. */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{
-                backgroundImage: `linear-gradient(118deg, ${hexA(primary, sweepA)} 0%, ${hexA(primary, sweepB)} 48%, rgba(0,0,0,0) 82%)`,
-              }}
-            />
-            {/* Accent corner glow — the moment of division re-tone. */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{
-                backgroundImage: `radial-gradient(58% 44% at 92% 96%, ${hexA(accent, accentA)} 0%, ${hexA(accent, 0)} 70%), radial-gradient(42% 30% at 6% 8%, ${hexA(accent, accentB)} 0%, ${hexA(accent, 0)} 70%)`,
-                mixBlendMode: "screen",
-              }}
-            />
-            {/* Depth: subtle top highlight + bottom vignette. */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{ backgroundImage: "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 22%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.32) 100%)" }}
-            />
-            {/* Grain — matches MediaTile / HeroScrim tactile finish. */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{ backgroundImage: GRAIN_SVG, backgroundSize: "160px 160px", opacity: isHero ? 0.14 : 0.08, mixBlendMode: "overlay" }}
-            />
-          </>
-        );
-      })()}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage: `linear-gradient(118deg, ${hexA(primary, sweepA)} 0%, ${hexA(primary, sweepB)} 48%, rgba(0,0,0,0) 82%)`,
+                }}
+              />
+              {/* Accent corner glow — the moment of division re-tone. */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage: `radial-gradient(58% 44% at 92% 96%, ${hexA(accent, accentA)} 0%, ${hexA(accent, 0)} 70%), radial-gradient(42% 30% at 6% 8%, ${hexA(accent, accentB)} 0%, ${hexA(accent, 0)} 70%)`,
+                  mixBlendMode: "screen",
+                }}
+              />
+              {/* Depth: subtle top highlight + bottom vignette. */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 22%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.32) 100%)",
+                }}
+              />
+              {/* Grain — matches MediaTile / HeroScrim tactile finish. */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage: GRAIN_SVG,
+                  backgroundSize: "160px 160px",
+                  opacity: isHero ? 0.14 : 0.08,
+                  mixBlendMode: "overlay",
+                }}
+              />
+            </>
+          );
+        })()}
 
       {/* Light-mode abstract ground — same grammar, airy mood. Extremely
           recessive by default so content variants stay clean; hero chrome
           variants in light mode already flip to dark chrome above so they
           take the dark branch, not this one. */}
-      {!hasBackdrop && !slideDark && (() => {
-        const primary = brand.tokens.primary;
-        const accent = brand.tokens.accent;
-        return (
-          <>
-            {/* Angled wash — off-white with a whisper of primary along the
+      {!hasBackdrop &&
+        !slideDark &&
+        (() => {
+          const primary = brand.tokens.primary;
+          const accent = brand.tokens.accent;
+          return (
+            <>
+              {/* Angled wash — off-white with a whisper of primary along the
                 bottom-left → top-right axis, kept far below AA-impact. */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{
-                backgroundImage: `linear-gradient(118deg, ${hexA(primary, 0.02)} 0%, ${hexA(primary, 0.008)} 45%, rgba(255,255,255,0) 80%), linear-gradient(180deg, rgba(255,255,255,1) 0%, ${hexA(brand.tokens.surface, 0.38)} 100%)`,
-              }}
-            />
-            {/* Accent corner glow — division re-tone as a faint tint. */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{
-                backgroundImage: `radial-gradient(50% 38% at 104% 104%, ${hexA(accent, 0.045)} 0%, ${hexA(accent, 0)} 72%), radial-gradient(36% 26% at -4% -4%, ${hexA(primary, 0.02)} 0%, ${hexA(primary, 0)} 74%)`,
-                mixBlendMode: "multiply",
-              }}
-            />
-            {/* Vignette — very faint, keeps corners from feeling paper-cut. */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{ backgroundImage: "radial-gradient(120% 100% at 50% 50%, rgba(0,0,0,0) 62%, rgba(3,0,44,0.018) 100%)" }}
-            />
-            {/* Grain — barely-there tactile finish. */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{ backgroundImage: GRAIN_SVG, backgroundSize: "160px 160px", opacity: 0.03, mixBlendMode: "multiply" }}
-            />
-          </>
-        );
-      })()}
-
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage: `linear-gradient(118deg, ${hexA(primary, 0.02)} 0%, ${hexA(primary, 0.008)} 45%, rgba(255,255,255,0) 80%), linear-gradient(180deg, rgba(255,255,255,1) 0%, ${hexA(brand.tokens.surface, 0.38)} 100%)`,
+                }}
+              />
+              {/* Accent corner glow — division re-tone as a faint tint. */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage: `radial-gradient(50% 38% at 104% 104%, ${hexA(accent, 0.045)} 0%, ${hexA(accent, 0)} 72%), radial-gradient(36% 26% at -4% -4%, ${hexA(primary, 0.02)} 0%, ${hexA(primary, 0)} 74%)`,
+                  mixBlendMode: "multiply",
+                }}
+              />
+              {/* Vignette — very faint, keeps corners from feeling paper-cut. */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(120% 100% at 50% 50%, rgba(0,0,0,0) 62%, rgba(3,0,44,0.018) 100%)",
+                }}
+              />
+              {/* Grain — barely-there tactile finish. */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage: GRAIN_SVG,
+                  backgroundSize: "160px 160px",
+                  opacity: 0.03,
+                  mixBlendMode: "multiply",
+                }}
+              />
+            </>
+          );
+        })()}
 
       {/* Brand bar (locked) — hairline accent rule, editorial not decorative. */}
       <div
         className="absolute left-0 top-0 h-[2px] w-full"
-        style={{ backgroundColor: brand.tokens.accent, opacity: slideDark || darkBackdrop ? 0.85 : 0.9 }}
+        style={{
+          backgroundColor: brand.tokens.accent,
+          opacity: slideDark || darkBackdrop ? 0.85 : 0.9,
+        }}
       />
       {/* Brand lockup (locked) — placed per approved zone. Content slides
           stay quiet at sm so titles carry the composition; cover / divider /
           close slides scale up so the mark reads at hero size. */}
-      {showLogo && (() => {
-        // Vertical orientations are retired — coerce legacy vertical-* to
-        // horizontal so persisted decks never render rotated lockups.
-        const normalizedOrient: "horizontal" | "stacked" | "mark-only" =
-          logoOrientation === "stacked" ? "stacked"
-          : logoOrientation === "mark-only" ? "mark-only"
-          : "horizontal";
-        
-        const isMarkOnly = normalizedOrient === "mark-only";
-        // Half-size positions per brand direction (top/bottom-center + left side).
-        const halfSize = (
-          placement.position === "top-center" ||
-          placement.position === "bottom-center" ||
-          placement.position === "top-left" ||
-          placement.position === "bottom-left"
-        );
-        const baseSize = variant === "content" ? "sm" : variant === "cover" ? "xl" : "md";
-        const shrink: Record<string, "2xs" | "xs" | "sm" | "md" | "lg" | "xl"> = {
-          xl: "sm", lg: "xs", md: "xs", sm: "2xs", xs: "2xs", "2xs": "2xs",
-        };
-        const sizeAfterHalf = halfSize ? shrink[baseSize] : (baseSize as "sm" | "md" | "xl");
-        const effectiveSize = isMarkOnly ? (shrink[sizeAfterHalf] ?? sizeAfterHalf) : sizeAfterHalf;
+      {showLogo &&
+        (() => {
+          // Vertical orientations are retired — coerce legacy vertical-* to
+          // horizontal so persisted decks never render rotated lockups.
+          const normalizedOrient: "horizontal" | "stacked" | "mark-only" =
+            logoOrientation === "stacked"
+              ? "stacked"
+              : logoOrientation === "mark-only"
+                ? "mark-only"
+                : "horizontal";
 
-        const containerStyle = logoPositionStyles(placement.position);
+          const isMarkOnly = normalizedOrient === "mark-only";
+          // Half-size positions per brand direction (top/bottom-center + left side).
+          const halfSize =
+            placement.position === "top-center" ||
+            placement.position === "bottom-center" ||
+            placement.position === "top-left" ||
+            placement.position === "bottom-left";
+          const baseSize = variant === "content" ? "sm" : variant === "cover" ? "xl" : "md";
+          const shrink: Record<string, "2xs" | "xs" | "sm" | "md" | "lg" | "xl"> = {
+            xl: "sm",
+            lg: "xs",
+            md: "xs",
+            sm: "2xs",
+            xs: "2xs",
+            "2xs": "2xs",
+          };
+          const sizeAfterHalf = halfSize ? shrink[baseSize] : (baseSize as "sm" | "md" | "xl");
+          const effectiveSize = isMarkOnly
+            ? (shrink[sizeAfterHalf] ?? sizeAfterHalf)
+            : sizeAfterHalf;
 
-        return (
-          // Logo is always the top-most visual layer on every slide.
-          <div style={{ ...containerStyle, zIndex: 60, pointerEvents: "none" }}>
-            <BrandLockup
-              brand={brand}
-              color={logoColor}
-              size={effectiveSize}
-              clientName={clientName}
-              clientLogoUrl={clientLogoUrl ?? null}
-              subCompany={subCompany}
-              orientation={normalizedOrient}
-              monochromeOfficialLogo
-            />
-          </div>
-        );
-      })()}
+          const containerStyle = logoPositionStyles(placement.position);
 
+          return (
+            // Logo is always the top-most visual layer on every slide.
+            <div style={{ ...containerStyle, zIndex: 60, pointerEvents: "none" }}>
+              <BrandLockup
+                brand={brand}
+                color={logoColor}
+                size={effectiveSize}
+                clientName={clientName}
+                clientLogoUrl={clientLogoUrl ?? null}
+                subCompany={subCompany}
+                orientation={normalizedOrient}
+                monochromeOfficialLogo
+              />
+            </div>
+          );
+        })()}
 
       {/* Content — 96px side margin. Vertical reserves grow when a logo
           hugs the top or bottom so text never runs under the lockup or the
@@ -610,18 +664,21 @@ export function SlideFrame({
           </span>
         )}
       </div>
-
-
     </div>
   );
 }
 
 function hexA(hex: string, alpha: number): string {
   const h = hex.replace("#", "");
-  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const full =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h;
   const r = parseInt(full.slice(0, 2), 16);
   const g = parseInt(full.slice(2, 4), 16);
   const b = parseInt(full.slice(4, 6), 16);
   return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, alpha))})`;
 }
-

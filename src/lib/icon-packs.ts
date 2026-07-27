@@ -22,7 +22,6 @@ import solarAsset from "../../public/icon-library/packs/solar.json.asset.json";
 import tablerAsset from "../../public/icon-library/packs/tabler.json.asset.json";
 import twemojiAsset from "../../public/icon-library/packs/twemoji.json.asset.json";
 
-
 export interface IconManifestPack {
   id: string;
   name: string;
@@ -115,8 +114,7 @@ export function loadManifest(): Promise<IconManifest> {
 export async function listPacks(): Promise<IconManifestPack[]> {
   const m = await loadManifest();
   return [...m.packs].sort(
-    (a, b) =>
-      (b.priority ?? 0) - (a.priority ?? 0) || a.name.localeCompare(b.name),
+    (a, b) => (b.priority ?? 0) - (a.priority ?? 0) || a.name.localeCompare(b.name),
   );
 }
 
@@ -164,9 +162,7 @@ export function iconSvgMarkup(
   const size = opts?.size ?? 24;
   const color = opts?.color ?? "currentColor";
   const vb = iconViewBox(pack, icon);
-  const body = opts?.color
-    ? icon.body.replace(/currentColor/g, color)
-    : icon.body;
+  const body = opts?.color ? icon.body.replace(/currentColor/g, color) : icon.body;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="${vb}" aria-hidden="true">${body}</svg>`;
 }
 

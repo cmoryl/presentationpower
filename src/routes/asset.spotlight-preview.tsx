@@ -73,12 +73,32 @@ const SEEDED_CONTENT: SpotlightContent = emptySpotlight({
       eyebrow: "What you get",
       title: "Built for how modern teams ship",
       items: [
-        { verb: "Translate", body: "Human-in-the-loop translation across 200+ language pairs.", icon: "language" },
-        { verb: "Adapt", body: "Transcreate and culturally tune every asset for each market.", icon: "sparkles" },
-        { verb: "Automate", body: "Connect CMS, PIM, DAM — content flows without tickets.", icon: "bolt" },
-        { verb: "Measure", body: "Live dashboards on quality, cost, and time-to-market.", icon: "trending" },
+        {
+          verb: "Translate",
+          body: "Human-in-the-loop translation across 200+ language pairs.",
+          icon: "language",
+        },
+        {
+          verb: "Adapt",
+          body: "Transcreate and culturally tune every asset for each market.",
+          icon: "sparkles",
+        },
+        {
+          verb: "Automate",
+          body: "Connect CMS, PIM, DAM — content flows without tickets.",
+          icon: "bolt",
+        },
+        {
+          verb: "Measure",
+          body: "Live dashboards on quality, cost, and time-to-market.",
+          icon: "trending",
+        },
         { verb: "Comply", body: "Enterprise security, ISO/SOC certified programs.", icon: "check" },
-        { verb: "Scale", body: "Launch new markets in days without adding headcount.", icon: "target" },
+        {
+          verb: "Scale",
+          body: "Launch new markets in days without adding headcount.",
+          icon: "target",
+        },
       ],
     },
     {
@@ -87,8 +107,12 @@ const SEEDED_CONTENT: SpotlightContent = emptySpotlight({
       variantId: "expertise-credential-pills",
       title: "Certifications",
       items: [
-        { label: "ISO 17100" }, { label: "ISO 27001" }, { label: "ISO 9001" },
-        { label: "SOC 2 Type II" }, { label: "HIPAA" }, { label: "GDPR" },
+        { label: "ISO 17100" },
+        { label: "ISO 27001" },
+        { label: "ISO 9001" },
+        { label: "SOC 2 Type II" },
+        { label: "HIPAA" },
+        { label: "GDPR" },
       ],
     },
     {
@@ -105,18 +129,13 @@ const SEEDED_CONTENT: SpotlightContent = emptySpotlight({
 function SpotlightPreview() {
   const { brandModes } = useTaxonomy();
   const brandParam =
-    typeof window !== "undefined"
-      ? new URLSearchParams(window.location.search).get("brand")
-      : null;
+    typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("brand") : null;
   const brand = useMemo(() => {
     if (brandParam) {
       const hit = brandModes.find((b) => b.id === brandParam || b.id === `bm-${brandParam}`);
       if (hit) return hit;
     }
-    return (
-      brandModes.find((b) => b.id === "bm-tp-lifesci") ??
-      brandModes[0]
-    );
+    return brandModes.find((b) => b.id === "bm-tp-lifesci") ?? brandModes[0];
   }, [brandModes, brandParam]);
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
@@ -140,8 +159,6 @@ function SpotlightPreview() {
     }
   };
 
-
-
   if (!brand) {
     return (
       <AppShell>
@@ -162,8 +179,8 @@ function SpotlightPreview() {
               Spotlight · GlobalLink NEXT · Letter portrait
             </h1>
             <p className="mt-1 max-w-2xl text-sm text-black/60 dark:text-white/60">
-              Rendered on the portrait-projected aurora with free-form typography and
-              hairline dividers only — no cards, panels, or tiles.
+              Rendered on the portrait-projected aurora with free-form typography and hairline
+              dividers only — no cards, panels, or tiles.
             </p>
           </div>
           <div className="flex gap-2">

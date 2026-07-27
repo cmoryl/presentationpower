@@ -4,7 +4,9 @@ import { cq, sectionInk, sectionGlass } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
 
 export function PullQuoteHero({
-  section, mode, accent,
+  section,
+  mode,
+  accent,
 }: {
   section: PrintQuoteSection;
   mode: "light" | "dark";
@@ -22,11 +24,29 @@ export function PullQuoteHero({
         }}
       >
         {section.eyebrow && (
-          <div style={{ fontSize: cq(9.5), fontWeight: 700, letterSpacing: "0.18em", color: accent, textTransform: "uppercase", marginBottom: cq(8) }}>
+          <div
+            style={{
+              fontSize: cq(9.5),
+              fontWeight: 700,
+              letterSpacing: "0.18em",
+              color: accent,
+              textTransform: "uppercase",
+              marginBottom: cq(8),
+            }}
+          >
             {section.eyebrow}
           </div>
         )}
-        <div aria-hidden style={{ fontFamily: "Georgia, serif", fontSize: cq(72), lineHeight: 0.55, color: accent, fontWeight: 700 }}>
+        <div
+          aria-hidden
+          style={{
+            fontFamily: "Georgia, serif",
+            fontSize: cq(72),
+            lineHeight: 0.55,
+            color: accent,
+            fontWeight: 700,
+          }}
+        >
           &ldquo;
         </div>
         <p
@@ -44,10 +64,23 @@ export function PullQuoteHero({
           {section.text}
         </p>
         {(section.author || section.role || section.company) && (
-          <div style={{ marginTop: cq(14), fontSize: cq(10.5), fontWeight: 700, color: accent, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+          <div
+            style={{
+              marginTop: cq(14),
+              fontSize: cq(10.5),
+              fontWeight: 700,
+              color: accent,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+            }}
+          >
             — {section.author}
-            {section.role && <span style={{ color: ink.soft, fontWeight: 500 }}>{`, ${section.role}`}</span>}
-            {section.company && <span style={{ color: ink.faint, fontWeight: 500 }}>{` · ${section.company}`}</span>}
+            {section.role && (
+              <span style={{ color: ink.soft, fontWeight: 500 }}>{`, ${section.role}`}</span>
+            )}
+            {section.company && (
+              <span style={{ color: ink.faint, fontWeight: 500 }}>{` · ${section.company}`}</span>
+            )}
           </div>
         )}
       </div>

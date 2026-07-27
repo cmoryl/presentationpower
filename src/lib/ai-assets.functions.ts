@@ -73,7 +73,8 @@ export const suggestAssetsForSlide = createServerFn({ method: "POST" })
       const gov = governanceBlock();
       const curated = ICON_LIBRARY.map((e) => `- ${e.name} · ${e.group} · ${e.label}`).join("\n");
       const packList = PACKS.map(
-        (p) => `- ${p.id} · ${p.name}${p.categories ? ` (${Object.keys(p.categories).slice(0, 8).join(",")})` : ""}`,
+        (p) =>
+          `- ${p.id} · ${p.name}${p.categories ? ` (${Object.keys(p.categories).slice(0, 8).join(",")})` : ""}`,
       ).join("\n");
 
       const system = [
@@ -101,7 +102,8 @@ export const suggestAssetsForSlide = createServerFn({ method: "POST" })
         .filter(Boolean)
         .join("\n");
 
-      const runOnce = async () => callAnthropic(system, user, { maxTokens: 1200, temperature: 0.3 });
+      const runOnce = async () =>
+        callAnthropic(system, user, { maxTokens: 1200, temperature: 0.3 });
       let res = await runOnce();
       if (!res.ok) res = await runOnce();
       if (!res.ok) return { ok: false, error: `Claude ${res.status}` };

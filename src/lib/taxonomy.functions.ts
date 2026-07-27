@@ -57,7 +57,12 @@ export const getTaxonomy = createServerFn({ method: "GET" }).handler(
           id: r.id,
           name: r.name,
           description: r.description ?? "",
-          tokens: (r.tokens as BrandMode["tokens"]) ?? { primary: "", accent: "", surface: "", ink: "" },
+          tokens: (r.tokens as BrandMode["tokens"]) ?? {
+            primary: "",
+            accent: "",
+            surface: "",
+            ink: "",
+          },
           role: profile.role,
           parentId: profile.parentId,
           logo: profile.logo,

@@ -15,12 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Database, Download, ClipboardCopy } from "lucide-react";
 import type { InfographicSpec } from "@/lib/infographics/spec";
-import {
-  columnsOf,
-  specToCsv,
-  specToMarkdown,
-  downloadSpecAsCsv,
-} from "@/lib/infographics/csv";
+import { columnsOf, specToCsv, specToMarkdown, downloadSpecAsCsv } from "@/lib/infographics/csv";
 
 type Props = {
   spec: InfographicSpec;
@@ -61,17 +56,11 @@ export function ChartDataDrawer({ spec, triggerLabel, className }: Props) {
       <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
           <SheetTitle>{spec.title || "Chart data"}</SheetTitle>
-          <SheetDescription>
-            {spec.accessibility.longDesc}
-          </SheetDescription>
+          <SheetDescription>{spec.accessibility.longDesc}</SheetDescription>
         </SheetHeader>
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() => downloadSpecAsCsv(spec)}
-          >
+          <Button size="sm" variant="secondary" onClick={() => downloadSpecAsCsv(spec)}>
             <Download size={14} className="mr-1" aria-hidden /> Download CSV
           </Button>
           <Button size="sm" variant="ghost" onClick={onCopy}>
@@ -93,10 +82,7 @@ export function ChartDataDrawer({ spec, triggerLabel, className }: Props) {
             </thead>
             <tbody>
               {spec.data.rows.map((row, i) => (
-                <tr
-                  key={i}
-                  className={i % 2 === 0 ? "bg-background" : "bg-muted/20"}
-                >
+                <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/20"}>
                   {cols.map((k) => (
                     <td key={k} className="px-3 py-2 tabular-nums">
                       {String(row[k] ?? "")}
@@ -109,9 +95,7 @@ export function ChartDataDrawer({ spec, triggerLabel, className }: Props) {
         </div>
 
         {spec.data.source ? (
-          <p className="mt-3 text-[11px] text-muted-foreground">
-            Source: {spec.data.source}
-          </p>
+          <p className="mt-3 text-[11px] text-muted-foreground">Source: {spec.data.source}</p>
         ) : null}
       </SheetContent>
     </Sheet>

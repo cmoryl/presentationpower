@@ -43,7 +43,11 @@ export const listApprovedPrintVariants = createServerFn({ method: "POST" })
   .inputValidator((raw) => ListInput.parse(raw ?? {}))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    let q = supabase.from("approved_print_variants").select("*").order("order_index").order("published_at", { ascending: false });
+    let q = supabase
+      .from("approved_print_variants")
+      .select("*")
+      .order("order_index")
+      .order("published_at", { ascending: false });
     if (data.templateKind) q = q.eq("template_kind", data.templateKind);
     if (data.divisionId) q = q.eq("division_id", data.divisionId);
     if (!data.includeAll) q = q.eq("status", "published");
@@ -201,7 +205,10 @@ export const deleteApprovedPrintVariant = createServerFn({ method: "POST" })
 // ============== DUPLICATE INTO USER DRAFTS ==================================
 // Clones an approved variant into the caller's private print_assets table so
 // they can edit their own copy.
-const DuplicateInput = z.object({ id: z.string().uuid(), title: z.string().min(1).max(200).optional() });
+const DuplicateInput = z.object({
+  id: z.string().uuid(),
+  title: z.string().min(1).max(200).optional(),
+});
 export const duplicateApprovedPrintVariant = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw) => DuplicateInput.parse(raw))
@@ -230,7 +237,8 @@ export const duplicateApprovedPrintVariant = createServerFn({ method: "POST" })
     if (error) throw error;
 
     // fire-and-forget analytic bump
-    await supabase.from("approved_print_variants")
+    await supabase
+      .from("approved_print_variants")
       .update({ duplicate_count: (v.duplicate_count ?? 0) + 1 })
       .eq("id", v.id);
     return row;
@@ -249,7 +257,8 @@ export const recordApprovedVariantDownload = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .single();
     if (!v) return { ok: true };
-    await supabase.from("approved_print_variants")
+    await supabase
+      .from("approved_print_variants")
       .update({ download_count: (v.download_count ?? 0) + 1 })
       .eq("id", data.id);
     return { ok: true };
@@ -288,17 +297,22 @@ export const suggestPrintVariant = createServerFn({ method: "POST" })
 
 export const listPrintVariantSuggestions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ status: z.enum(["pending","approved","rejected"]).optional() }).parse(raw ?? {}))
+  .inputValidator((raw) =>
+    z.object({ status: z.enum(["pending", "approved", "rejected"]).optional() }).parse(raw ?? {}),
+  )
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    let q = supabase.from("approved_print_suggestions").select("*").order("created_at", { ascending: false });
+    let q = supabase
+      .from("approved_print_suggestions")
+      .select("*")
+      .order("created_at", { ascending: false });
     if (data.status) q = q.eq("status", data.status);
     const { data: rows, error } = await q;
     if (error) throw error;
     return (rows ?? []) as PrintVariantSuggestion[];
   });
 
-const ReviewInput = z.object({ id: z.string().uuid(), status: z.enum(["approved","rejected"]) });
+const ReviewInput = z.object({ id: z.string().uuid(), status: z.enum(["approved", "rejected"]) });
 export const reviewPrintVariantSuggestion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw) => ReviewInput.parse(raw))

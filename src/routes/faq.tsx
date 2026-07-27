@@ -208,7 +208,6 @@ const GUIDES: Array<{ title: string; blurb: string; steps: string[] }> = [
   },
 ];
 
-
 const FAQS: Array<{ section: string; items: QA[] }> = [
   {
     section: "Getting started",
@@ -494,10 +493,12 @@ function FAQPage() {
           <div className="flex items-baseline justify-between gap-6">
             <div>
               <div className="text-xs uppercase tracking-[0.3em] text-black/50">Support</div>
-              <h1 className="mt-3 text-4xl font-semibold sm:text-5xl">Frequently asked questions</h1>
+              <h1 className="mt-3 text-4xl font-semibold sm:text-5xl">
+                Frequently asked questions
+              </h1>
               <p className="mt-3 max-w-2xl text-black/60">
-                Answers about master briefs, presentation decks, print studio, event & social kits, translation, knowledge, and administration. Can't find
-                what you need?{" "}
+                Answers about master briefs, presentation decks, print studio, event & social kits,
+                translation, knowledge, and administration. Can't find what you need?{" "}
                 <Link to="/knowledge" className="font-medium text-[#003FC7] hover:underline">
                   Browse the knowledge base
                 </Link>
@@ -516,7 +517,9 @@ function FAQPage() {
 
       <div className="mt-12">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.25em] text-[#003FC7]">Step-by-step basics</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-[0.25em] text-[#003FC7]">
+            Step-by-step basics
+          </h2>
           <span className="text-xs text-black/40">{GUIDES.length} guides</span>
         </div>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
@@ -548,7 +551,9 @@ function FAQPage() {
       </div>
 
       <div className="mt-14">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.25em] text-[#003FC7]">Common questions</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.25em] text-[#003FC7]">
+          Common questions
+        </h2>
       </div>
 
       <div className="mt-4 space-y-10">

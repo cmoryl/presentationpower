@@ -5,7 +5,13 @@ import type { DeckStrategy } from "@/lib/ai-strategist.functions";
  * Visual chapter scaffold — collapses a DeckStrategy into 3–5 narrative
  * chapters so the user can eyeball rhythm and balance before generation.
  */
-export function ChapterMap({ plan, primaryColor = "#003FC7" }: { plan: DeckStrategy; primaryColor?: string }) {
+export function ChapterMap({
+  plan,
+  primaryColor = "#003FC7",
+}: {
+  plan: DeckStrategy;
+  primaryColor?: string;
+}) {
   const chapters = computeChapters(plan);
   if (chapters.length === 0) return null;
   const total = plan.recommendedSections.length;
@@ -30,12 +36,20 @@ export function ChapterMap({ plan, primaryColor = "#003FC7" }: { plan: DeckStrat
             >
               <div
                 className="h-1.5 w-full rounded-full"
-                style={{ backgroundColor: primaryColor, opacity: 0.35 + (ch.sections.length / total) * 0.5 }}
+                style={{
+                  backgroundColor: primaryColor,
+                  opacity: 0.35 + (ch.sections.length / total) * 0.5,
+                }}
               />
-              <div className="mt-1.5 truncate text-[11px] font-bold uppercase tracking-widest" style={{ color: primaryColor }}>
+              <div
+                className="mt-1.5 truncate text-[11px] font-bold uppercase tracking-widest"
+                style={{ color: primaryColor }}
+              >
                 {ch.label}
               </div>
-              <div className="text-[10px] text-black/60">{ch.sections.length} slide{ch.sections.length === 1 ? "" : "s"}</div>
+              <div className="text-[10px] text-black/60">
+                {ch.sections.length} slide{ch.sections.length === 1 ? "" : "s"}
+              </div>
             </div>
           );
         })}

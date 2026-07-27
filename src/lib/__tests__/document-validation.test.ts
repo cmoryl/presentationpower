@@ -17,7 +17,9 @@ describe("validateDocument", () => {
   });
 
   it("ignores empty stat rows but flags half-filled ones", () => {
-    expect(validateDocument({ ...base, content: { stats: [{ label: "", value: "" }] } })).toEqual({});
+    expect(validateDocument({ ...base, content: { stats: [{ label: "", value: "" }] } })).toEqual(
+      {},
+    );
     const errs = validateDocument({ ...base, content: { stats: [{ label: "", value: "42%" }] } });
     expect(errs["stats.0.label"]).toBeTruthy();
     expect(errs["stats.0.value"]).toBeUndefined();
@@ -26,7 +28,9 @@ describe("validateDocument", () => {
   it("requires quote text and author once the quote is touched", () => {
     const errs = validateDocument({ ...base, content: { quote: { text: "", author: "Ada" } } });
     expect(errs["quote.text"]).toBeTruthy();
-    expect(validateDocument({ ...base, content: { quote: { text: "Great", author: "Ada" } } })).toEqual({});
+    expect(
+      validateDocument({ ...base, content: { quote: { text: "Great", author: "Ada" } } }),
+    ).toEqual({});
   });
 
   it("validates contact email format only when provided", () => {

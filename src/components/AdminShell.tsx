@@ -69,7 +69,10 @@ function SessionRoleBanner() {
       {signedIn && (
         <>
           <span className="hidden text-black/20 sm:inline">·</span>
-          <span className="max-w-[220px] truncate text-black/70 dark:text-white/70" title={info?.email ?? undefined}>
+          <span
+            className="max-w-[220px] truncate text-black/70 dark:text-white/70"
+            title={info?.email ?? undefined}
+          >
             {info?.email}
           </span>
           {isAdmin && (
@@ -86,7 +89,10 @@ function SessionRoleBanner() {
         </>
       )}
       {!signedIn && !loading && (
-        <a href="/auth" className="ml-auto rounded-lg bg-[#003FC7] px-3 py-1 text-xs font-semibold text-white hover:bg-[#0033a3]">
+        <a
+          href="/auth"
+          className="ml-auto rounded-lg bg-[#003FC7] px-3 py-1 text-xs font-semibold text-white hover:bg-[#0033a3]"
+        >
           Sign in
         </a>
       )}
@@ -217,7 +223,8 @@ export function AdminForbidden({ message }: { message?: string }) {
     <div className="rounded-2xl border border-amber-300 bg-amber-50 p-8">
       <h2 className="text-2xl font-semibold text-amber-950">Admin access required</h2>
       <p className="mt-2 text-sm text-amber-900/80">
-        {message ?? "This console is limited to accounts with the admin role. Ask a workspace admin to grant access."}
+        {message ??
+          "This console is limited to accounts with the admin role. Ask a workspace admin to grant access."}
       </p>
     </div>
   );

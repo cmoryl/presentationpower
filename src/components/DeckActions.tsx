@@ -76,7 +76,11 @@ export function TemplateToggleButton({ deckId }: { deckId: string }) {
           : "border-black/10 bg-white text-black/70 hover:border-black/25 hover:bg-black/[0.04] hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white")
       }
     >
-      {busy ? <Loader2 size={14} className="animate-spin" /> : <Bookmark size={14} className={isTemplate ? "fill-current" : ""} />}
+      {busy ? (
+        <Loader2 size={14} className="animate-spin" />
+      ) : (
+        <Bookmark size={14} className={isTemplate ? "fill-current" : ""} />
+      )}
     </button>
   );
 }

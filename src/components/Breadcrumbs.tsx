@@ -53,9 +53,7 @@ const STATIC_LABELS: Record<string, string> = {
 const HIDDEN_SEGMENTS = new Set(["api", "_authenticated"]);
 
 function titleCase(seg: string): string {
-  return seg
-    .replace(/[-_]+/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return seg.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function shortenId(id: string): string {
@@ -69,9 +67,13 @@ export function Breadcrumbs() {
 
   const crumbs = useMemo(() => {
     // Root has no breadcrumbs — home page speaks for itself.
-    if (pathname === "/" || pathname === "") return [] as Array<{ label: string; to: string; last: boolean }>;
+    if (pathname === "/" || pathname === "")
+      return [] as Array<{ label: string; to: string; last: boolean }>;
 
-    const parts = pathname.split("/").filter(Boolean).filter((p) => !HIDDEN_SEGMENTS.has(p));
+    const parts = pathname
+      .split("/")
+      .filter(Boolean)
+      .filter((p) => !HIDDEN_SEGMENTS.has(p));
     const items: Array<{ label: string; to: string; last: boolean }> = [];
     let acc = "";
     for (let i = 0; i < parts.length; i += 1) {
@@ -121,7 +123,9 @@ export function Breadcrumbs() {
       </Link>
       {crumbs.map((c) => (
         <span key={c.to} className="flex items-center gap-1.5">
-          <span aria-hidden className="text-black/25 dark:text-white/25">/</span>
+          <span aria-hidden className="text-black/25 dark:text-white/25">
+            /
+          </span>
           {c.last ? (
             <span
               aria-current="page"

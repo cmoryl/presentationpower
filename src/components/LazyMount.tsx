@@ -34,7 +34,10 @@ export function LazyMount({
   useEffect(() => {
     if (visible) return;
     // Post-hydration eager escape hatches.
-    if (eagerProp) { setVisible(true); return; }
+    if (eagerProp) {
+      setVisible(true);
+      return;
+    }
     try {
       if ((window as unknown as { __EAGER_PREVIEWS__?: boolean }).__EAGER_PREVIEWS__) {
         setVisible(true);
@@ -44,7 +47,9 @@ export function LazyMount({
         setVisible(true);
         return;
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     const el = ref.current;
     if (!el || typeof IntersectionObserver === "undefined") {
       setVisible(true);

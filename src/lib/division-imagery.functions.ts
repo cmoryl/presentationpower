@@ -53,7 +53,7 @@ const UploadInput = z.object({
 });
 
 function decodeBase64Payload(payload: string): Buffer {
-  const b64 = payload.startsWith("data:") ? payload.split(",", 2)[1] ?? "" : payload;
+  const b64 = payload.startsWith("data:") ? (payload.split(",", 2)[1] ?? "") : payload;
   return Buffer.from(b64, "base64");
 }
 
@@ -81,7 +81,13 @@ export const uploadDivisionImagery = createServerFn({ method: "POST" })
     const variantPaths: string[] = [];
     const variantsMeta: Record<
       string,
-      { path: string; width: number | null; height: number | null; bytes: number; contentType: string }
+      {
+        path: string;
+        width: number | null;
+        height: number | null;
+        bytes: number;
+        contentType: string;
+      }
     > = {};
     if (data.variants?.length) {
       for (const v of data.variants) {
@@ -131,7 +137,10 @@ export const uploadDivisionImagery = createServerFn({ method: "POST" })
       .select()
       .single();
     if (error) {
-      await s.storage.from(BUCKET).remove([path, ...variantPaths]).catch(() => {});
+      await s.storage
+        .from(BUCKET)
+        .remove([path, ...variantPaths])
+        .catch(() => {});
       throw new Error(`Save failed: ${(error as { message?: string }).message ?? "unknown"}`);
     }
     return row as { id: string };
@@ -194,10 +203,12 @@ async function signVariantUrls(
 export const listDivisionImagery = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((v) =>
-    z.object({
-      divisionId: z.string().min(1).max(120),
-      onlyApproved: z.boolean().optional(),
-    }).parse(v),
+    z
+      .object({
+        divisionId: z.string().min(1).max(120),
+        onlyApproved: z.boolean().optional(),
+      })
+      .parse(v),
   )
   .handler(async ({ data, context }): Promise<DivisionImageryEntry[]> => {
     const s = context.supabase as unknown as SbClient;
@@ -273,14 +284,19 @@ export const deleteDivisionImagery = createServerFn({ method: "POST" })
       .maybeSingle();
     if (qErr) throw new Error((qErr as { message?: string }).message ?? "Lookup failed");
     const path = (row as { storage_path?: string } | null)?.storage_path;
-    const variants = (row as { variants?: Record<string, { path?: string }> } | null)?.variants ?? {};
+    const variants =
+      (row as { variants?: Record<string, { path?: string }> } | null)?.variants ?? {};
     const variantPaths = Object.values(variants)
       .map((v) => v?.path)
       .filter((p): p is string => !!p);
     const { error } = await s.from("division_imagery").delete().eq("id", data.id);
     if (error) throw new Error((error as { message?: string }).message ?? "Delete failed");
     const toRemove = [path, ...variantPaths].filter((p): p is string => !!p);
-    if (toRemove.length) await s.storage.from(BUCKET).remove(toRemove).catch(() => {});
+    if (toRemove.length)
+      await s.storage
+        .from(BUCKET)
+        .remove(toRemove)
+        .catch(() => {});
     return { ok: true };
   });
 
@@ -288,9 +304,7 @@ export const deleteDivisionImagery = createServerFn({ method: "POST" })
 // division library shelf and print template picker by default.
 export const approveDivisionImagery = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) =>
-    z.object({ id: z.string().uuid(), approved: z.boolean() }).parse(v),
-  )
+  .inputValidator((v) => z.object({ id: z.string().uuid(), approved: z.boolean() }).parse(v))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const { data: isAdmin } = await (s as any).rpc("has_role", {
@@ -385,7 +399,11 @@ export const attachDivisionImageryVariants = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .maybeSingle();
     if (qErr) throw new Error((qErr as { message?: string }).message ?? "Lookup failed");
-    const r = row as { id: string; uploaded_by: string; variants: Record<string, unknown> | null } | null;
+    const r = row as {
+      id: string;
+      uploaded_by: string;
+      variants: Record<string, unknown> | null;
+    } | null;
     if (!r) throw new Error("Image not found");
 
     if (r.uploaded_by !== context.userId) {
@@ -428,7 +446,11 @@ export const attachDivisionImageryVariants = createServerFn({ method: "POST" })
       return { ok: true, presets: Object.keys(merged) };
     } catch (e) {
       // Clean up any files we uploaded this call so we don't leak on failure.
-      if (uploaded.length) await s.storage.from(BUCKET).remove(uploaded).catch(() => {});
+      if (uploaded.length)
+        await s.storage
+          .from(BUCKET)
+          .remove(uploaded)
+          .catch(() => {});
       throw e;
     }
   });

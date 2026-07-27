@@ -90,7 +90,7 @@ async function callAnthropicDirect(
   }
   const json = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
   const text = (json.content ?? [])
-    .map((c) => (c.type === "text" ? c.text ?? "" : ""))
+    .map((c) => (c.type === "text" ? (c.text ?? "") : ""))
     .join("")
     .trim();
   return { ok: true, text };
@@ -240,18 +240,34 @@ async function callAnthropicWithToolsDirect(
     };
     const parts = json.content ?? [];
     convo.push({ role: "assistant", content: parts });
-    const toolUses = parts.filter((p): p is { type: "tool_use"; id: string; name: string; input: Record<string, unknown> } => p.type === "tool_use");
+    const toolUses = parts.filter(
+      (p): p is { type: "tool_use"; id: string; name: string; input: Record<string, unknown> } =>
+        p.type === "tool_use",
+    );
     if (toolUses.length === 0 || json.stop_reason !== "tool_use") {
-      const text = parts.filter((p) => p.type === "text").map((p) => (p as { text: string }).text).join("").trim();
+      const text = parts
+        .filter((p) => p.type === "text")
+        .map((p) => (p as { text: string }).text)
+        .join("")
+        .trim();
       return { ok: true, text, iterations: i };
     }
     const toolResults = await Promise.all(
       toolUses.map(async (tu) => {
         try {
           const result = await executeTool({ id: tu.id, name: tu.name, input: tu.input });
-          return { type: "tool_result" as const, tool_use_id: tu.id, content: JSON.stringify(result).slice(0, 8000) };
+          return {
+            type: "tool_result" as const,
+            tool_use_id: tu.id,
+            content: JSON.stringify(result).slice(0, 8000),
+          };
         } catch (e) {
-          return { type: "tool_result" as const, tool_use_id: tu.id, is_error: true, content: (e as Error).message.slice(0, 500) };
+          return {
+            type: "tool_result" as const,
+            tool_use_id: tu.id,
+            is_error: true,
+            content: (e as Error).message.slice(0, 500),
+          };
         }
       }),
     );
@@ -264,7 +280,10 @@ async function callAnthropicWithToolsDirect(
     return { ok: false, status: res.status, body: body.slice(0, 500) };
   }
   const json = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
-  const text = (json.content ?? []).map((c) => (c.type === "text" ? c.text ?? "" : "")).join("").trim();
+  const text = (json.content ?? [])
+    .map((c) => (c.type === "text" ? (c.text ?? "") : ""))
+    .join("")
+    .trim();
   return { ok: true, text, iterations: maxIterations };
 }
 
@@ -306,7 +325,7 @@ async function callGatewayWithTools(
         ? m.content
         : Array.isArray(m.content)
           ? (m.content as Array<{ type: string; text?: string }>)
-              .map((p) => (p.type === "text" ? p.text ?? "" : ""))
+              .map((p) => (p.type === "text" ? (p.text ?? "") : ""))
               .join("")
           : "";
     convo.push({ role: m.role, content });

@@ -72,7 +72,7 @@ export function HeroResizeHandle({
       if (!s) return;
       const deltaPct = ((e.clientY - s.y) / s.height) * 100;
       const next = Math.max(MIN_PCT, Math.min(ceiling, s.startPct + deltaPct));
-      onChange({ ...(media ?? {} as PrintHeroMedia), heightPct: Math.round(next) });
+      onChange({ ...(media ?? ({} as PrintHeroMedia)), heightPct: Math.round(next) });
     };
     const onUp = () => {
       setDragging(false);
@@ -97,7 +97,7 @@ export function HeroResizeHandle({
 
   const nudge = (delta: number) => {
     const next = Math.max(MIN_PCT, Math.min(ceiling, heightPct + delta));
-    onChange({ ...(media ?? {} as PrintHeroMedia), heightPct: next });
+    onChange({ ...(media ?? ({} as PrintHeroMedia)), heightPct: next });
   };
 
   const rimColor = capped
@@ -139,10 +139,22 @@ export function HeroResizeHandle({
         onPointerLeave={() => setHover(false)}
         onKeyDown={(e) => {
           if (!enabled) return;
-          if (e.key === "ArrowUp") { e.preventDefault(); nudge(-1); }
-          if (e.key === "ArrowDown") { e.preventDefault(); nudge(1); }
-          if (e.key === "PageUp") { e.preventDefault(); nudge(-5); }
-          if (e.key === "PageDown") { e.preventDefault(); nudge(5); }
+          if (e.key === "ArrowUp") {
+            e.preventDefault();
+            nudge(-1);
+          }
+          if (e.key === "ArrowDown") {
+            e.preventDefault();
+            nudge(1);
+          }
+          if (e.key === "PageUp") {
+            e.preventDefault();
+            nudge(-5);
+          }
+          if (e.key === "PageDown") {
+            e.preventDefault();
+            nudge(5);
+          }
         }}
         className={`pointer-events-auto absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full border shadow-sm transition ${
           enabled ? "cursor-ns-resize hover:shadow-md" : "cursor-not-allowed"
@@ -177,8 +189,7 @@ export function HeroResizeHandle({
             letterSpacing: "0.04em",
           }}
         >
-          Hero · {Math.round(heightPct)}%
-          {capped ? " · cap" : nearCap ? ` · max ${ceiling}%` : ""}
+          Hero · {Math.round(heightPct)}%{capped ? " · cap" : nearCap ? ` · max ${ceiling}%` : ""}
         </span>
       </div>
     </div>

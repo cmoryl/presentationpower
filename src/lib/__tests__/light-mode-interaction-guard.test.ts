@@ -25,7 +25,10 @@ import { resolve } from "node:path";
 
 const CSS = readFileSync(resolve(__dirname, "../../styles.css"), "utf8");
 const stripped = CSS.replace(/\/\*[\s\S]*?\*\//g, "");
-const rules = stripped.split("}").map((r) => r.trim()).filter(Boolean);
+const rules = stripped
+  .split("}")
+  .map((r) => r.trim())
+  .filter(Boolean);
 
 const DARK_SURFACE_HEXES: Record<string, string> = {
   "#03002c": "Blue 800 — dark-mode surface, never a light-mode interaction bg",
@@ -70,14 +73,21 @@ describe("light-mode interaction-state surface guard", () => {
 
       if (DARK_SCOPE(selector)) continue;
       if (!INTERACTION_STATE.test(selector)) continue;
-      if (/^\s*@(keyframes|font-face|supports|media|utility|layer|theme)\b/.test(selector)) continue;
+      if (/^\s*@(keyframes|font-face|supports|media|utility|layer|theme)\b/.test(selector))
+        continue;
 
-      const decls = body.split(";").map((d) => d.trim()).filter(Boolean);
+      const decls = body
+        .split(";")
+        .map((d) => d.trim())
+        .filter(Boolean);
       for (const decl of decls) {
         const colonIdx = decl.indexOf(":");
         if (colonIdx < 0) continue;
         const prop = decl.slice(0, colonIdx).trim().toLowerCase();
-        const value = decl.slice(colonIdx + 1).trim().toLowerCase();
+        const value = decl
+          .slice(colonIdx + 1)
+          .trim()
+          .toLowerCase();
 
         const isBackgroundProp = prop === "background" || prop === "background-color";
         const isSurfaceToken = prop.startsWith("--") && SURFACE_TOKENS.test(prop);
@@ -123,14 +133,21 @@ describe("light-mode interaction-state surface guard", () => {
 
       if (DARK_SCOPE(selector)) continue;
       if (!INTERACTION_STATE.test(selector)) continue;
-      if (/^\s*@(keyframes|font-face|supports|media|utility|layer|theme)\b/.test(selector)) continue;
+      if (/^\s*@(keyframes|font-face|supports|media|utility|layer|theme)\b/.test(selector))
+        continue;
 
-      const decls = body.split(";").map((d) => d.trim()).filter(Boolean);
+      const decls = body
+        .split(";")
+        .map((d) => d.trim())
+        .filter(Boolean);
       for (const decl of decls) {
         const colonIdx = decl.indexOf(":");
         if (colonIdx < 0) continue;
         const prop = decl.slice(0, colonIdx).trim().toLowerCase();
-        const value = decl.slice(colonIdx + 1).trim().toLowerCase();
+        const value = decl
+          .slice(colonIdx + 1)
+          .trim()
+          .toLowerCase();
 
         const isBackgroundProp = prop === "background" || prop === "background-color";
         const isSurfaceToken = prop.startsWith("--") && SURFACE_TOKENS.test(prop);
@@ -142,7 +159,9 @@ describe("light-mode interaction-state surface guard", () => {
         // L < 0.35 is a dark surface. Light-mode interactions should stay
         // >= 0.85 (tint), or at worst mid (>= 0.55) for pressed states.
         if (L < 0.35) {
-          offenders.push(`${selector.trim()} → ${prop}: ${value}  (oklch L=${L} is a dark surface)`);
+          offenders.push(
+            `${selector.trim()} → ${prop}: ${value}  (oklch L=${L} is a dark surface)`,
+          );
         }
       }
     }

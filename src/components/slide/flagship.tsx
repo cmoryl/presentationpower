@@ -50,7 +50,11 @@ export function DuotoneFilter({
   id,
   shadow,
   highlight,
-}: { id: string; shadow: string; highlight: string }) {
+}: {
+  id: string;
+  shadow: string;
+  highlight: string;
+}) {
   const s = hexToRgb01(shadow);
   const h = hexToRgb01(highlight);
   // luminance -> (h - s) * L + s per channel
@@ -70,10 +74,7 @@ export function DuotoneFilter({
       <defs>
         <filter id={`tp-duotone-${id}`} colorInterpolationFilters="sRGB">
           <feColorMatrix type="matrix" values={matrix} />
-          <feColorMatrix
-            type="matrix"
-            values={[r, g, b, "0 0 0 1 0"].join(" ")}
-          />
+          <feColorMatrix type="matrix" values={[r, g, b, "0 0 0 1 0"].join(" ")} />
         </filter>
       </defs>
     </svg>
@@ -82,9 +83,10 @@ export function DuotoneFilter({
 
 function hexToRgb01(hex: string): { r: number; g: number; b: number } {
   const h = hex.replace("#", "");
-  const n = h.length === 3
-    ? h.split("").map((c) => parseInt(c + c, 16))
-    : [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+  const n =
+    h.length === 3
+      ? h.split("").map((c) => parseInt(c + c, 16))
+      : [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
   return { r: (n[0] ?? 0) / 255, g: (n[1] ?? 0) / 255, b: (n[2] ?? 0) / 255 };
 }
 
@@ -193,7 +195,11 @@ export function CinematicScrim({
     : `linear-gradient(${direction[anchor]}, ${tint} 0%, ${tint}00 65%)`;
   return (
     <>
-      <div aria-hidden className="pointer-events-none absolute inset-0" style={{ backgroundImage: scrim, opacity: strength }} />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{ backgroundImage: scrim, opacity: strength }}
+      />
       {vignette > 0 && (
         <div
           aria-hidden
@@ -264,7 +270,6 @@ export function EditorialTitle({
   /** How the emphasized word renders. "italic-serif" (default) or "bold" (heavier sans, no italic). */
   emphasisStyle?: "italic-serif" | "bold";
 }) {
-
   const parts: Array<{ t: string; italic: boolean }> = [];
   if (emphasize && text.toLowerCase().includes(emphasize.toLowerCase())) {
     const idx = text.toLowerCase().indexOf(emphasize.toLowerCase());
@@ -318,7 +323,6 @@ export function EditorialTitle({
           <span key={i}>{p.t}</span>
         ),
       )}
-
     </h1>
   );
 }
@@ -358,7 +362,6 @@ export function PullQuote({
     opacity,
     fontWeight: 500,
     letterSpacing: "-0.06em",
-    
   };
   return (
     <div className={`relative ${className}`}>
@@ -379,7 +382,7 @@ export function PullQuote({
           fontFamily: EDITORIAL_SERIF,
           fontSize: size,
           fontWeight: 400,
-          
+
           lineHeight: 1.08,
           letterSpacing: "-0.02em",
           color,
@@ -404,7 +407,6 @@ export function PullQuote({
     </div>
   );
 }
-
 
 // ── ChartAnnotation ───────────────────────────────────────────────────────
 // A callout that overlays a chart region with a numbered dot, a short label
@@ -438,10 +440,19 @@ export function ChartAnnotation({
   const dotSize = 26;
   const offset = 40;
   const cardStyle: CSSProperties = { width };
-  if (anchor === "right") { cardStyle.left = offset; cardStyle.top = -12; }
-  else if (anchor === "left") { cardStyle.right = offset; cardStyle.top = -12; }
-  else if (anchor === "top") { cardStyle.bottom = offset; cardStyle.left = -width / 2 + dotSize / 2; }
-  else { cardStyle.top = offset; cardStyle.left = -width / 2 + dotSize / 2; }
+  if (anchor === "right") {
+    cardStyle.left = offset;
+    cardStyle.top = -12;
+  } else if (anchor === "left") {
+    cardStyle.right = offset;
+    cardStyle.top = -12;
+  } else if (anchor === "top") {
+    cardStyle.bottom = offset;
+    cardStyle.left = -width / 2 + dotSize / 2;
+  } else {
+    cardStyle.top = offset;
+    cardStyle.left = -width / 2 + dotSize / 2;
+  }
   return (
     <div
       className="pointer-events-none absolute"
@@ -469,7 +480,8 @@ export function ChartAnnotation({
           background: cardBg,
           border: `1px solid ${ring}`,
           backdropFilter: "blur(8px)",
-          boxShadow: mode === "dark" ? "0 12px 40px rgba(0,0,0,0.35)" : "0 12px 40px rgba(10,15,28,0.10)",
+          boxShadow:
+            mode === "dark" ? "0 12px 40px rgba(0,0,0,0.35)" : "0 12px 40px rgba(10,15,28,0.10)",
         }}
       >
         <div
@@ -478,7 +490,10 @@ export function ChartAnnotation({
         >
           Callout {String(index).padStart(2, "0")}
         </div>
-        <div className="mt-1" style={{ color: ink, fontSize: 15, fontWeight: 600, lineHeight: 1.25 }}>
+        <div
+          className="mt-1"
+          style={{ color: ink, fontSize: 15, fontWeight: 600, lineHeight: 1.25 }}
+        >
           {label}
         </div>
         {detail && (
@@ -498,7 +513,11 @@ export function StatRail({
   color,
   height = 88,
   className = "",
-}: { color: string; height?: number; className?: string }) {
+}: {
+  color: string;
+  height?: number;
+  className?: string;
+}) {
   return (
     <div
       aria-hidden
@@ -512,7 +531,6 @@ export function StatRail({
     />
   );
 }
-
 
 // ── AuroraLayer ───────────────────────────────────────────────────────────
 // Procedural aurora backdrop — 3 large blurred radial "orbs" over a deep
@@ -539,7 +557,10 @@ export function AuroraLayer({
 }) {
   const mode = useSlideMode();
   const base = baseTint ?? (mode === "dark" ? "#03002C" : "#FFFFFF");
-  const orbs = useMemo(() => auroraOrbs(seed, brand, mode, aspect), [seed, brand, mode, aspect?.w, aspect?.h]);
+  const orbs = useMemo(
+    () => auroraOrbs(seed, brand, mode, aspect),
+    [seed, brand, mode, aspect?.w, aspect?.h],
+  );
   const vw = aspect?.w ?? 1280;
   const vh = aspect?.h ?? 720;
   return (
@@ -564,8 +585,16 @@ export function AuroraLayer({
               r={mode === "dark" ? "90%" : "95%"}
             >
               <stop offset="0%" stopColor={o.color} stopOpacity={o.alpha} />
-              <stop offset={mode === "dark" ? "38%" : "42%"} stopColor={o.color} stopOpacity={o.alpha * 0.55} />
-              <stop offset={mode === "dark" ? "78%" : "80%"} stopColor={o.color} stopOpacity={o.alpha * 0.15} />
+              <stop
+                offset={mode === "dark" ? "38%" : "42%"}
+                stopColor={o.color}
+                stopOpacity={o.alpha * 0.55}
+              />
+              <stop
+                offset={mode === "dark" ? "78%" : "80%"}
+                stopColor={o.color}
+                stopOpacity={o.alpha * 0.15}
+              />
               <stop offset="100%" stopColor={o.color} stopOpacity="0" />
             </radialGradient>
           ))}
@@ -610,7 +639,6 @@ export function AuroraLayer({
 // truth shared by the on-screen renderer and the PPTX/PDF exporter. The
 // parity test in src/lib/__tests__/aurora-parity.test.ts locks them together.
 
-
 // Linearly blend two hex colors. t=0 returns a, t=1 returns b.
 function mixHex(a: string, b: string, t: number): string {
   const pa = /^#?([a-f\d]{6})$/i.exec(a);
@@ -618,15 +646,18 @@ function mixHex(a: string, b: string, t: number): string {
   if (!pa || !pb) return a;
   const ia = parseInt(pa[1], 16);
   const ib = parseInt(pb[1], 16);
-  const ar = (ia >> 16) & 255, ag = (ia >> 8) & 255, ab_ = ia & 255;
-  const br = (ib >> 16) & 255, bg = (ib >> 8) & 255, bb_ = ib & 255;
+  const ar = (ia >> 16) & 255,
+    ag = (ia >> 8) & 255,
+    ab_ = ia & 255;
+  const br = (ib >> 16) & 255,
+    bg = (ib >> 8) & 255,
+    bb_ = ib & 255;
   const r = Math.round(ar + (br - ar) * t);
   const g = Math.round(ag + (bg - ag) * t);
   const bl = Math.round(ab_ + (bb_ - ab_) * t);
   const to = (v: number) => v.toString(16).padStart(2, "0");
   return `#${to(r)}${to(g)}${to(bl)}`;
 }
-
 
 // Rotate a hex color's hue by `deg` degrees and nudge lightness by `dl`.
 // Used to derive the sibling aurora orb from the brand accent so we don't
@@ -635,11 +666,13 @@ function shiftHue(hex: string, deg: number, dl = 0): string {
   const m = /^#?([a-f\d]{6})$/i.exec(hex);
   if (!m) return hex;
   const int = parseInt(m[1], 16);
-  let r = ((int >> 16) & 255) / 255;
-  let g = ((int >> 8) & 255) / 255;
-  let b = (int & 255) / 255;
-  const max = Math.max(r, g, b), min = Math.min(r, g, b);
-  let hh = 0; const l = (max + min) / 2;
+  const r = ((int >> 16) & 255) / 255;
+  const g = ((int >> 8) & 255) / 255;
+  const b = (int & 255) / 255;
+  const max = Math.max(r, g, b),
+    min = Math.min(r, g, b);
+  let hh = 0;
+  const l = (max + min) / 2;
   const d = max - min;
   const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
   if (d !== 0) {
@@ -654,17 +687,34 @@ function shiftHue(hex: string, deg: number, dl = 0): string {
   const c = (1 - Math.abs(2 * l2 - 1)) * s;
   const x = c * (1 - Math.abs(((hh / 60) % 2) - 1));
   const mm = l2 - c / 2;
-  let rr = 0, gg = 0, bb = 0;
-  if (hh < 60) { rr = c; gg = x; }
-  else if (hh < 120) { rr = x; gg = c; }
-  else if (hh < 180) { gg = c; bb = x; }
-  else if (hh < 240) { gg = x; bb = c; }
-  else if (hh < 300) { rr = x; bb = c; }
-  else { rr = c; bb = x; }
-  const to = (v: number) => Math.round((v + mm) * 255).toString(16).padStart(2, "0");
+  let rr = 0,
+    gg = 0,
+    bb = 0;
+  if (hh < 60) {
+    rr = c;
+    gg = x;
+  } else if (hh < 120) {
+    rr = x;
+    gg = c;
+  } else if (hh < 180) {
+    gg = c;
+    bb = x;
+  } else if (hh < 240) {
+    gg = x;
+    bb = c;
+  } else if (hh < 300) {
+    rr = x;
+    bb = c;
+  } else {
+    rr = c;
+    bb = x;
+  }
+  const to = (v: number) =>
+    Math.round((v + mm) * 255)
+      .toString(16)
+      .padStart(2, "0");
   return `#${to(rr)}${to(gg)}${to(bb)}`;
 }
-
 
 // ── GlassTile ─────────────────────────────────────────────────────────────
 // Frosted-navy translucent card with hairline border. The Canva "Aesop"
@@ -699,17 +749,17 @@ export function GlassTile({
   // reads through the tile edge without tinting the whole surface.
   const fillAlpha = Math.min(0.7, (mode === "dark" ? 0.22 : 0.55) * intensity);
   const ringAlpha = Math.min(0.4, (mode === "dark" ? 0.16 : 0.16) * intensity);
-  const bg = mode === "dark"
-    ? `rgba(10, 8, 48, ${fillAlpha})`
-    : `rgba(255, 255, 255, ${fillAlpha})`;
+  const bg =
+    mode === "dark" ? `rgba(10, 8, 48, ${fillAlpha})` : `rgba(255, 255, 255, ${fillAlpha})`;
   const ring = a
     ? hexA(a, mode === "dark" ? 0.32 : 0.28)
     : mode === "dark"
       ? `rgba(255, 255, 255, ${ringAlpha})`
       : `rgba(10, 15, 28, ${ringAlpha})`;
-  const highlight = mode === "dark"
-    ? "inset 0 1px 0 0 rgba(255,255,255,0.08)"
-    : "inset 0 1px 0 0 rgba(255,255,255,0.75)";
+  const highlight =
+    mode === "dark"
+      ? "inset 0 1px 0 0 rgba(255,255,255,0.08)"
+      : "inset 0 1px 0 0 rgba(255,255,255,0.75)";
   const accentGlow = a ? `, 0 12px 40px -18px ${hexA(a, 0.35)}` : "";
   return (
     <div
@@ -749,11 +799,15 @@ export function IconWell({
   const a = accent ?? ctxAccent ?? undefined;
   const ink = useSlideInk(a);
   const bg = a
-    ? hexA(a, mode === "dark" ? 0.14 : 0.10)
-    : mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(10,15,28,0.05)";
+    ? hexA(a, mode === "dark" ? 0.14 : 0.1)
+    : mode === "dark"
+      ? "rgba(255,255,255,0.06)"
+      : "rgba(10,15,28,0.05)";
   const ring = a
     ? hexA(a, mode === "dark" ? 0.45 : 0.35)
-    : mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(10,15,28,0.10)";
+    : mode === "dark"
+      ? "rgba(255,255,255,0.14)"
+      : "rgba(10,15,28,0.10)";
   return (
     <div
       aria-hidden
@@ -766,7 +820,7 @@ export function IconWell({
         border: `1px solid ${ring}`,
         color: ink.text,
         backdropFilter: "blur(12px) saturate(140%)",
-        boxShadow: a ? `inset 0 0 0 1px ${hexA(a, 0.10)}` : undefined,
+        boxShadow: a ? `inset 0 0 0 1px ${hexA(a, 0.1)}` : undefined,
       }}
     >
       {children}
@@ -786,8 +840,6 @@ function hexA(hex: string, alpha: number): string {
   const b = int & 255;
   return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, alpha))})`;
 }
-
-
 
 // ── AuroraOrb ─────────────────────────────────────────────────────────────
 // A single, large, feathered radial orb — used to place a soft, defocused
@@ -841,7 +893,6 @@ export function AuroraOrb({
     />
   );
 }
-
 
 // ── AuroraSidePanel ───────────────────────────────────────────────────────
 // The "right side" glass card the deck uses on close/CTA slides: a frosted
@@ -911,7 +962,15 @@ export function AuroraSidePanel({
                 </div>
               )}
               {it.meta && (
-                <div className="mt-3 uppercase" style={{ fontSize: 14, letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}>
+                <div
+                  className="mt-3 uppercase"
+                  style={{
+                    fontSize: 14,
+                    letterSpacing: "0.24em",
+                    color: ink.faint,
+                    fontWeight: 600,
+                  }}
+                >
                   {it.meta}
                 </div>
               )}
@@ -922,7 +981,3 @@ export function AuroraSidePanel({
     </GlassTile>
   );
 }
-
-
-
-

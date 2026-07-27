@@ -21,7 +21,13 @@ type NominatimHit = {
   display_name: string;
   lat: string;
   lon: string;
-  address?: { city?: string; town?: string; village?: string; country?: string; country_code?: string };
+  address?: {
+    city?: string;
+    town?: string;
+    village?: string;
+    country?: string;
+    country_code?: string;
+  };
 };
 
 function inferRegion(lat: number, lon: number): LocationPin["region"] {
@@ -64,7 +70,6 @@ function coerceItems(raw: unknown, fallback: LocationPin[]): LocationPin[] {
     .filter((x): x is LocationPin => !!x);
 }
 
-
 export function PinEditorPanel({ brandId, items, onChange }: Props) {
   const seeded = React.useMemo(() => getDivisionLocationSet(brandId), [brandId]);
   const pins = React.useMemo(() => coerceItems(items, seeded.pins), [items, seeded.pins]);
@@ -96,7 +101,14 @@ export function PinEditorPanel({ brandId, items, onChange }: Props) {
   const addBlank = () => {
     const next: LocationPin[] = [
       ...pins,
-      { id: `pin-${Date.now()}`, city: "New location", region: "AMER", lat: 40.7128, lon: -74.006, role: "office" },
+      {
+        id: `pin-${Date.now()}`,
+        city: "New location",
+        region: "AMER",
+        lat: 40.7128,
+        lon: -74.006,
+        role: "office",
+      },
     ];
     push(next);
     setOpenIdx(next.length - 1);
@@ -142,7 +154,12 @@ export function PinEditorPanel({ brandId, items, onChange }: Props) {
     const lat = parseFloat(hit.lat);
     const lon = parseFloat(hit.lon);
     const addr = hit.address || {};
-    const city = addr.city || addr.town || addr.village || hit.display_name.split(",")[0]?.trim() || "Location";
+    const city =
+      addr.city ||
+      addr.town ||
+      addr.village ||
+      hit.display_name.split(",")[0]?.trim() ||
+      "Location";
     updatePin(i, {
       lat,
       lon,
@@ -159,9 +176,12 @@ export function PinEditorPanel({ brandId, items, onChange }: Props) {
     <div className="rounded-2xl border-2 border-emerald-500/20 bg-white p-6">
       <div className="flex items-baseline justify-between">
         <div>
-          <div className="text-xs uppercase tracking-widest text-emerald-700">Locations · pin editor</div>
+          <div className="text-xs uppercase tracking-widest text-emerald-700">
+            Locations · pin editor
+          </div>
           <div className="mt-1 text-[11px] text-black/50">
-            {pins.length} {pins.length === 1 ? "pin" : "pins"} on this map. Search by city, paste exact coordinates, or reorder to control label priority.
+            {pins.length} {pins.length === 1 ? "pin" : "pins"} on this map. Search by city, paste
+            exact coordinates, or reorder to control label priority.
           </div>
         </div>
         <div className="flex gap-2">
@@ -184,7 +204,9 @@ export function PinEditorPanel({ brandId, items, onChange }: Props) {
 
       <div className="mt-5 divide-y divide-black/5 rounded-xl border border-black/10">
         {pins.length === 0 && (
-          <div className="p-6 text-center text-sm text-black/50">No pins yet. Click "+ Add pin" to place one.</div>
+          <div className="p-6 text-center text-sm text-black/50">
+            No pins yet. Click "+ Add pin" to place one.
+          </div>
         )}
         {pins.map((p, i) => {
           const open = openIdx === i;
@@ -193,7 +215,9 @@ export function PinEditorPanel({ brandId, items, onChange }: Props) {
               <div className="flex items-center gap-3">
                 <span
                   className="grid h-8 w-8 place-items-center rounded-full text-[11px] font-semibold text-white"
-                  style={{ background: p.role === "HQ" || p.role === "hub" ? "#059669" : "#0B2A4A" }}
+                  style={{
+                    background: p.role === "HQ" || p.role === "hub" ? "#059669" : "#0B2A4A",
+                  }}
                   title={p.role}
                 >
                   {i + 1}
@@ -201,16 +225,43 @@ export function PinEditorPanel({ brandId, items, onChange }: Props) {
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium text-black">{p.label || p.city}</div>
                   <div className="truncate text-[11px] text-black/50">
-                    {[p.country, p.region, `${p.lat.toFixed(3)}, ${p.lon.toFixed(3)}`, p.role].filter(Boolean).join(" · ")}
+                    {[p.country, p.region, `${p.lat.toFixed(3)}, ${p.lon.toFixed(3)}`, p.role]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="rounded p-1 text-black/40 hover:bg-black/5 disabled:opacity-30" aria-label="Move up">↑</button>
-                  <button type="button" onClick={() => move(i, 1)} disabled={i === pins.length - 1} className="rounded p-1 text-black/40 hover:bg-black/5 disabled:opacity-30" aria-label="Move down">↓</button>
-                  <button type="button" onClick={() => setOpenIdx(open ? null : i)} className="ml-1 rounded-full border border-black/15 px-3 py-1 text-[11px] uppercase tracking-widest text-black/60 hover:border-black/40 hover:text-black">
+                  <button
+                    type="button"
+                    onClick={() => move(i, -1)}
+                    disabled={i === 0}
+                    className="rounded p-1 text-black/40 hover:bg-black/5 disabled:opacity-30"
+                    aria-label="Move up"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => move(i, 1)}
+                    disabled={i === pins.length - 1}
+                    className="rounded p-1 text-black/40 hover:bg-black/5 disabled:opacity-30"
+                    aria-label="Move down"
+                  >
+                    ↓
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setOpenIdx(open ? null : i)}
+                    className="ml-1 rounded-full border border-black/15 px-3 py-1 text-[11px] uppercase tracking-widest text-black/60 hover:border-black/40 hover:text-black"
+                  >
                     {open ? "Close" : "Edit"}
                   </button>
-                  <button type="button" onClick={() => removePin(i)} className="rounded-full border border-red-200 px-3 py-1 text-[11px] uppercase tracking-widest text-red-600 hover:bg-red-50" aria-label="Delete pin">
+                  <button
+                    type="button"
+                    onClick={() => removePin(i)}
+                    className="rounded-full border border-red-200 px-3 py-1 text-[11px] uppercase tracking-widest text-red-600 hover:bg-red-50"
+                    aria-label="Delete pin"
+                  >
                     Delete
                   </button>
                 </div>
@@ -220,7 +271,9 @@ export function PinEditorPanel({ brandId, items, onChange }: Props) {
                 <div className="mt-4 space-y-4 rounded-lg bg-black/[0.02] p-4">
                   {/* Search */}
                   <div>
-                    <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">Search a location</div>
+                    <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
+                      Search a location
+                    </div>
                     <input
                       type="text"
                       value={activeSearchFor === i ? query : ""}
@@ -244,15 +297,24 @@ export function PinEditorPanel({ brandId, items, onChange }: Props) {
                             className="block w-full rounded border border-black/10 bg-white px-3 py-2 text-left text-[12px] hover:border-emerald-500 hover:bg-emerald-50"
                           >
                             <div className="font-medium text-black">{r.display_name}</div>
-                            <div className="text-[10px] text-black/40">{parseFloat(r.lat).toFixed(4)}, {parseFloat(r.lon).toFixed(4)}</div>
+                            <div className="text-[10px] text-black/40">
+                              {parseFloat(r.lat).toFixed(4)}, {parseFloat(r.lon).toFixed(4)}
+                            </div>
                           </button>
                         ))}
-                        {!searching && query.trim().length >= 2 && results.length === 0 && !searchErr && (
-                          <div className="text-[11px] text-black/40">No matches. Enter coordinates directly below.</div>
-                        )}
+                        {!searching &&
+                          query.trim().length >= 2 &&
+                          results.length === 0 &&
+                          !searchErr && (
+                            <div className="text-[11px] text-black/40">
+                              No matches. Enter coordinates directly below.
+                            </div>
+                          )}
                       </div>
                     )}
-                    <div className="mt-1 text-[10px] text-black/40">Search powered by OpenStreetMap · Nominatim.</div>
+                    <div className="mt-1 text-[10px] text-black/40">
+                      Search powered by OpenStreetMap · Nominatim.
+                    </div>
                   </div>
 
                   {/* Grid of fields */}
@@ -289,11 +351,15 @@ export function PinEditorPanel({ brandId, items, onChange }: Props) {
                       <span className="mb-1 block font-medium text-black/70">Region</span>
                       <select
                         value={p.region}
-                        onChange={(e) => updatePin(i, { region: e.target.value as LocationPin["region"] })}
+                        onChange={(e) =>
+                          updatePin(i, { region: e.target.value as LocationPin["region"] })
+                        }
                         className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
                       >
                         {REGIONS.map((r) => (
-                          <option key={r} value={r}>{r}</option>
+                          <option key={r} value={r}>
+                            {r}
+                          </option>
                         ))}
                       </select>
                     </label>
@@ -307,7 +373,8 @@ export function PinEditorPanel({ brandId, items, onChange }: Props) {
                         value={p.lat}
                         onChange={(e) => {
                           const v = Number(e.target.value);
-                          if (Number.isFinite(v)) updatePin(i, { lat: Math.max(-90, Math.min(90, v)) });
+                          if (Number.isFinite(v))
+                            updatePin(i, { lat: Math.max(-90, Math.min(90, v)) });
                         }}
                         className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm font-mono"
                       />
@@ -322,7 +389,8 @@ export function PinEditorPanel({ brandId, items, onChange }: Props) {
                         value={p.lon}
                         onChange={(e) => {
                           const v = Number(e.target.value);
-                          if (Number.isFinite(v)) updatePin(i, { lon: Math.max(-180, Math.min(180, v)) });
+                          if (Number.isFinite(v))
+                            updatePin(i, { lon: Math.max(-180, Math.min(180, v)) });
                         }}
                         className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm font-mono"
                       />

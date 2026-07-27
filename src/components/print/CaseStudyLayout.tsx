@@ -1,10 +1,6 @@
 import { useRef, type CSSProperties } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
-import type {
-  CaseStudyContent,
-  PrintDensity,
-  PrintPageSize,
-} from "@/lib/print-assets.types";
+import type { CaseStudyContent, PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
 import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
@@ -23,8 +19,6 @@ import {
   clampLines,
   PrintEyebrow,
 } from "@/components/print/print-primitives";
-
-
 
 // -----------------------------------------------------------------------
 // PORT — TransPerfect CaseStudy.dc.html → CaseStudyLayout
@@ -45,9 +39,14 @@ function padTop(d: PrintDensity): number {
 
 const STAT_ICONS = [ICON_PATHS["globe-alt"], ICON_PATHS.sparkles, ICON_PATHS.trending];
 
-
 export function CaseStudyLayout({
-  content, brand, mode, pageSize = "Letter", density = "standard", seed, style,
+  content,
+  brand,
+  mode,
+  pageSize = "Letter",
+  density = "standard",
+  seed,
+  style,
 }: {
   content: CaseStudyContent;
   brand: BrandMode;
@@ -65,9 +64,10 @@ export function CaseStudyLayout({
   const dividerCol = mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.10)";
   const accentInk = mode === "dark" ? accent : primary;
   const bg = mode === "dark" ? "#111114" : "#FFFFFF";
-  const chipBg = mode === "dark"
-    ? `color-mix(in srgb, ${accent} 22%, rgba(6,4,32,0.7))`
-    : `color-mix(in srgb, ${accent} 18%, #ffffff)`;
+  const chipBg =
+    mode === "dark"
+      ? `color-mix(in srgb, ${accent} 22%, rgba(6,4,32,0.7))`
+      : `color-mix(in srgb, ${accent} 18%, #ffffff)`;
 
   const heroRef = useRef<HTMLHeadingElement | null>(null);
   const introRef = useRef<HTMLParagraphElement | null>(null);
@@ -76,15 +76,32 @@ export function CaseStudyLayout({
     : `${content.client || "Client"} case study`;
   const heroTitle = content.summary?.trim() ? content.summary : title;
   useTextFit(heroRef, heroTitle, { min: 22, max: 32, base: 60, cap: 110, containerWidth: PAGE_W });
-  useTextFit(introRef, content.industry ?? content.audience ?? "", { min: 10, max: 12, base: 120, cap: 210, containerWidth: PAGE_W });
+  useTextFit(introRef, content.industry ?? content.audience ?? "", {
+    min: 10,
+    max: 12,
+    base: 120,
+    cap: 210,
+    containerWidth: PAGE_W,
+  });
 
   const stats = content.stats.slice(0, 3);
   const blocks: Array<{ label: string; block: typeof content.challenge; icon: string }> = [
-    { label: content.challenge.heading || "The Challenge", block: content.challenge, icon: ICON_PATHS["globe-alt"] },
-    { label: content.solution.heading || "The Solution", block: content.solution, icon: ICON_PATHS.sparkles },
-    { label: content.result.heading || "The Result", block: content.result, icon: ICON_PATHS.trending },
+    {
+      label: content.challenge.heading || "The Challenge",
+      block: content.challenge,
+      icon: ICON_PATHS["globe-alt"],
+    },
+    {
+      label: content.solution.heading || "The Solution",
+      block: content.solution,
+      icon: ICON_PATHS.sparkles,
+    },
+    {
+      label: content.result.heading || "The Result",
+      block: content.result,
+      icon: ICON_PATHS.trending,
+    },
   ];
-
 
   const engagement = content.engagement ?? {
     title: "Engagement Snapshot",
@@ -120,7 +137,6 @@ export function CaseStudyLayout({
             <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
           ) : null}
 
-
           {/* HERO — no full-color band; background inherits page bg (white / offset black).
               When a hero photo is present, reserve the hero band's vertical
               space so the first content module lands at the image fade seam. */}
@@ -145,7 +161,13 @@ export function CaseStudyLayout({
                 cq={cq}
                 onDark
               />
-              <BrandLockup brand={brand} color={mode === "dark" ? "#FFFFFF" : "#000000"} size="2xs" orientation="horizontal" monochromeOfficialLogo />
+              <BrandLockup
+                brand={brand}
+                color={mode === "dark" ? "#FFFFFF" : "#000000"}
+                size="2xs"
+                orientation="horizontal"
+                monochromeOfficialLogo
+              />
             </div>
             <div
               style={{
@@ -162,8 +184,12 @@ export function CaseStudyLayout({
                 style={{
                   position: "relative",
                   margin: 0,
-                  fontWeight: 700, fontSize: cq(32), lineHeight: 1.15,
-                  letterSpacing: "-0.015em", color: ink, maxWidth: cq(460),
+                  fontWeight: 700,
+                  fontSize: cq(32),
+                  lineHeight: 1.15,
+                  letterSpacing: "-0.015em",
+                  color: ink,
+                  maxWidth: cq(460),
                 }}
               >
                 {heroTitle || "Untitled case study"}
@@ -172,9 +198,12 @@ export function CaseStudyLayout({
                 <p
                   ref={introRef}
                   style={{
-                    position: "relative", margin: `${cq(12)} 0 0`,
-                    fontSize: cq(12), lineHeight: 1.6,
-                    color: inkSoft, maxWidth: cq(420),
+                    position: "relative",
+                    margin: `${cq(12)} 0 0`,
+                    fontSize: cq(12),
+                    lineHeight: 1.6,
+                    color: inkSoft,
+                    maxWidth: cq(420),
                   }}
                 >
                   {[content.industry, content.audience].filter(Boolean).join(" · ")}
@@ -182,8 +211,6 @@ export function CaseStudyLayout({
               )}
             </div>
           </div>
-
-
 
           {/* STAT PILLS — tucked over the hero/body seam */}
           {stats.length > 0 && (
@@ -202,14 +229,18 @@ export function CaseStudyLayout({
                   style={{
                     borderRadius: cq(12),
                     padding: `${cq(14)} ${cq(16)}`,
-                    display: "flex", alignItems: "center", gap: cq(10),
+                    display: "flex",
+                    alignItems: "center",
+                    gap: cq(10),
                     ...glass(mode, accent),
                   }}
                 >
                   <div
                     className="flex items-center justify-center"
                     style={{
-                      width: cq(34), height: cq(34), borderRadius: "50%",
+                      width: cq(34),
+                      height: cq(34),
+                      borderRadius: "50%",
                       border: `1.5px solid color-mix(in srgb, ${accent} 45%, rgba(255,255,255,0.25))`,
                       flexShrink: 0,
                     }}
@@ -217,10 +248,20 @@ export function CaseStudyLayout({
                     <Icon d={STAT_ICONS[i % STAT_ICONS.length]!} size={cq(17)} color={accentInk} />
                   </div>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: cq(13), color: accentInk, letterSpacing: "-0.01em" }}>
-                      {s.value}{s.unit ?? ""}
+                    <div
+                      style={{
+                        fontWeight: 700,
+                        fontSize: cq(13),
+                        color: accentInk,
+                        letterSpacing: "-0.01em",
+                      }}
+                    >
+                      {s.value}
+                      {s.unit ?? ""}
                     </div>
-                    <div style={{ fontSize: cq(9), color: inkFaint, marginTop: cq(2) }}>{s.label}</div>
+                    <div style={{ fontSize: cq(9), color: inkFaint, marginTop: cq(2) }}>
+                      {s.label}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -245,20 +286,32 @@ export function CaseStudyLayout({
                 <div
                   className="flex items-center justify-center"
                   style={{
-                    width: cq(44), height: cq(44), borderRadius: "50%",
-                    background: chipBg, flexShrink: 0,
+                    width: cq(44),
+                    height: cq(44),
+                    borderRadius: "50%",
+                    background: chipBg,
+                    flexShrink: 0,
                   }}
                 >
                   <Icon d={b.icon} size={cq(22)} color={accentInk} />
                 </div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: cq(13.5), color: accentInk }}>{b.label}</div>
+                  <div style={{ fontWeight: 700, fontSize: cq(13.5), color: accentInk }}>
+                    {b.label}
+                  </div>
                   {b.block.body && (
-                    <p style={{ margin: `${cq(5)} 0 0`, fontSize: cq(10.5), lineHeight: 1.6, color: inkSoft, ...clampLines(3) }}>
+                    <p
+                      style={{
+                        margin: `${cq(5)} 0 0`,
+                        fontSize: cq(10.5),
+                        lineHeight: 1.6,
+                        color: inkSoft,
+                        ...clampLines(3),
+                      }}
+                    >
                       {b.block.body}
                     </p>
                   )}
-
                 </div>
               </div>
             ))}
@@ -272,21 +325,47 @@ export function CaseStudyLayout({
                       flex: "1.4 1 0",
                       borderRadius: cq(14),
                       padding: `${cq(20)} ${cq(22)}`,
-                      background: mode === "dark"
-                        ? `linear-gradient(120deg, color-mix(in srgb, ${accent} 22%, rgba(10,8,36,0.6)), rgba(6,4,32,0.55))`
-                        : `linear-gradient(120deg, color-mix(in srgb, ${accent} 14%, #EFE7FF), color-mix(in srgb, ${accent} 8%, #E0F7F6))`,
+                      background:
+                        mode === "dark"
+                          ? `linear-gradient(120deg, color-mix(in srgb, ${accent} 22%, rgba(10,8,36,0.6)), rgba(6,4,32,0.55))`
+                          : `linear-gradient(120deg, color-mix(in srgb, ${accent} 14%, #EFE7FF), color-mix(in srgb, ${accent} 8%, #E0F7F6))`,
                       border: `1px solid color-mix(in srgb, ${accent} 20%, rgba(255,255,255,0.6))`,
                     }}
                   >
-                    <div style={{ fontFamily: "Georgia, serif", fontSize: cq(40), lineHeight: 0.6, color: accentInk, fontWeight: 700 }} aria-hidden>
+                    <div
+                      style={{
+                        fontFamily: "Georgia, serif",
+                        fontSize: cq(40),
+                        lineHeight: 0.6,
+                        color: accentInk,
+                        fontWeight: 700,
+                      }}
+                      aria-hidden
+                    >
                       &ldquo;
                     </div>
-                    <p style={{ margin: `${cq(10)} 0 0`, fontSize: cq(12.5), lineHeight: 1.6, color: ink, ...clampLines(5) }}>
+                    <p
+                      style={{
+                        margin: `${cq(10)} 0 0`,
+                        fontSize: cq(12.5),
+                        lineHeight: 1.6,
+                        color: ink,
+                        ...clampLines(5),
+                      }}
+                    >
                       {content.quote.text}
                     </p>
 
-                    <div style={{ marginTop: cq(10), fontSize: cq(11), fontWeight: 700, color: accentInk }}>
-                      — {content.quote.author}{content.quote.company ? ` · ${content.quote.company}` : ""}
+                    <div
+                      style={{
+                        marginTop: cq(10),
+                        fontSize: cq(11),
+                        fontWeight: 700,
+                        color: accentInk,
+                      }}
+                    >
+                      — {content.quote.author}
+                      {content.quote.company ? ` · ${content.quote.company}` : ""}
                     </div>
                   </div>
                 )}
@@ -296,17 +375,31 @@ export function CaseStudyLayout({
                       {engagement.title ?? "Engagement Snapshot"}
                     </div>
                     {engagement.bullets.slice(0, 4).map((b, k) => (
-                      <div key={k} className="flex items-center" style={{ gap: cq(8), marginTop: k === 0 ? cq(12) : cq(9) }}>
+                      <div
+                        key={k}
+                        className="flex items-center"
+                        style={{ gap: cq(8), marginTop: k === 0 ? cq(12) : cq(9) }}
+                      >
                         <div
                           className="flex items-center justify-center"
                           style={{
-                            width: cq(22), height: cq(22), borderRadius: "50%",
-                            background: chipBg, flexShrink: 0,
+                            width: cq(22),
+                            height: cq(22),
+                            borderRadius: "50%",
+                            background: chipBg,
+                            flexShrink: 0,
                           }}
                         >
-                          <Icon d={ICON_PATHS.check} size={cq(12)} color={accentInk} strokeWidth={2} />
+                          <Icon
+                            d={ICON_PATHS.check}
+                            size={cq(12)}
+                            color={accentInk}
+                            strokeWidth={2}
+                          />
                         </div>
-                        <div style={{ fontSize: cq(10), color: inkSoft, ...clampLines(2) }}>{b}</div>
+                        <div style={{ fontSize: cq(10), color: inkSoft, ...clampLines(2) }}>
+                          {b}
+                        </div>
                       </div>
                     ))}
                   </div>

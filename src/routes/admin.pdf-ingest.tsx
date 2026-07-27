@@ -12,7 +12,6 @@ import {
   type PdfExtractionRow,
 } from "@/lib/pdf-ingest.functions";
 
-
 export const Route = createFileRoute("/admin/pdf-ingest")({
   head: () => ({
     meta: [{ title: "PDF Ingestion · Admin · TransPerfect" }],
@@ -38,7 +37,6 @@ function PdfIngestPage() {
   const [embedEntity, setEmbedEntity] = useState<string>("");
   const [embedLimit, setEmbedLimit] = useState<number>(5);
   const [embedLog, setEmbedLog] = useState<string>("");
-
 
   const ingestMut = useMutation({
     mutationFn: async () => {
@@ -113,7 +111,6 @@ function PdfIngestPage() {
     return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
   }, [rowsQ.data]);
 
-
   const rowsByEntity = useMemo(() => {
     const map = new Map<string, PdfExtractionRow[]>();
     for (const r of rowsQ.data ?? []) {
@@ -178,9 +175,12 @@ function PdfIngestPage() {
 
       {/* Run controls */}
       <section className="rounded-2xl border border-black/10 bg-white/70 p-5">
-        <div className="mb-3 text-[10px] uppercase tracking-widest text-black/50">Run ingestion</div>
+        <div className="mb-3 text-[10px] uppercase tracking-widest text-black/50">
+          Run ingestion
+        </div>
         <div className="grid gap-3 sm:grid-cols-[1fr_120px_auto_auto]">
           <select
+            aria-label="Entity Filter"
             value={entityFilter}
             onChange={(e) => setEntityFilter(e.target.value)}
             className="rounded-lg border border-black/10 bg-white px-3 py-2 text-sm"
@@ -202,7 +202,11 @@ function PdfIngestPage() {
             placeholder="Limit"
           />
           <label className="flex items-center gap-2 text-xs text-black/70">
-            <input type="checkbox" checked={skipExisting} onChange={(e) => setSkipExisting(e.target.checked)} />
+            <input
+              type="checkbox"
+              checked={skipExisting}
+              onChange={(e) => setSkipExisting(e.target.checked)}
+            />
             Skip existing OK
           </label>
           <button
@@ -214,20 +218,28 @@ function PdfIngestPage() {
             {ingestMut.isPending ? "Running…" : "Run batch"}
           </button>
         </div>
-        {runLog && <div className="mt-3 rounded-lg bg-black/[0.04] p-3 font-mono text-xs text-black/80">{runLog}</div>}
+        {runLog && (
+          <div className="mt-3 rounded-lg bg-black/[0.04] p-3 font-mono text-xs text-black/80">
+            {runLog}
+          </div>
+        )}
         <p className="mt-3 text-[11px] text-black/50">
-          Tip: to process all 262 PDFs, pick each entity in turn or leave "All entities" selected and rerun until Queued = 0.
-          Reruns are safe.
+          Tip: to process all 262 PDFs, pick each entity in turn or leave "All entities" selected
+          and rerun until Queued = 0. Reruns are safe.
         </p>
       </section>
 
       {/* Embedding pipeline */}
       <section className="rounded-2xl border border-black/10 bg-white/70 p-5">
-        <div className="mb-1 text-[10px] uppercase tracking-widest text-black/50">Embed into RAG</div>
+        <div className="mb-1 text-[10px] uppercase tracking-widest text-black/50">
+          Embed into RAG
+        </div>
         <p className="mb-3 text-xs text-black/60">
-          Chunks OK extractions (1200/200) and embeds with <code className="rounded bg-black/[0.05] px-1">google/gemini-embedding-001</code> into
-          <code className="ml-1 rounded bg-black/[0.05] px-1">brand_asset_chunks</code>, tagged with the mapped <code className="rounded bg-black/[0.05] px-1">division_id</code>.
-          Idempotent — already-embedded docs are skipped.
+          Chunks OK extractions (1200/200) and embeds with{" "}
+          <code className="rounded bg-black/[0.05] px-1">google/gemini-embedding-001</code> into
+          <code className="ml-1 rounded bg-black/[0.05] px-1">brand_asset_chunks</code>, tagged with
+          the mapped <code className="rounded bg-black/[0.05] px-1">division_id</code>. Idempotent —
+          already-embedded docs are skipped.
         </p>
         <div className="mb-3 grid gap-1 rounded-lg border border-black/[0.06] bg-white p-3 text-[11px] text-black/70 sm:grid-cols-2 md:grid-cols-3">
           <div className="font-semibold text-black/60">Embedded coverage</div>
@@ -235,7 +247,10 @@ function PdfIngestPage() {
             {stats.embedded}/{stats.ok} OK docs · {stats.totalChunks.toLocaleString()} chunks total
           </div>
           {embedByEntity.map(([slug, s]) => (
-            <div key={slug} className="flex items-center justify-between rounded bg-black/[0.03] px-2 py-1">
+            <div
+              key={slug}
+              className="flex items-center justify-between rounded bg-black/[0.03] px-2 py-1"
+            >
               <span className="font-mono">{slug}</span>
               <span className={s.embedded === s.ok ? "text-emerald-700" : "text-amber-700"}>
                 {s.embedded}/{s.ok} · {s.chunks} ch
@@ -245,6 +260,7 @@ function PdfIngestPage() {
         </div>
         <div className="grid gap-3 sm:grid-cols-[1fr_120px_auto]">
           <select
+            aria-label="Embed Entity"
             value={embedEntity}
             onChange={(e) => setEmbedEntity(e.target.value)}
             className="rounded-lg border border-black/10 bg-white px-3 py-2 text-sm"
@@ -274,30 +290,46 @@ function PdfIngestPage() {
             {embedMut.isPending ? "Embedding…" : "Embed batch"}
           </button>
         </div>
-        {embedLog && <div className="mt-3 rounded-lg bg-black/[0.04] p-3 font-mono text-xs text-black/80">{embedLog}</div>}
+        {embedLog && (
+          <div className="mt-3 rounded-lg bg-black/[0.04] p-3 font-mono text-xs text-black/80">
+            {embedLog}
+          </div>
+        )}
       </section>
-
-
 
       {/* Extractions table */}
       <section className="rounded-2xl border border-black/10 bg-white/70 p-5">
         <div className="flex items-baseline justify-between">
           <div className="text-[10px] uppercase tracking-widest text-black/50">Extractions</div>
           <div className="flex gap-3 text-xs text-black/60">
-            <span>Total: <b className="text-black">{stats.total}</b></span>
-            <span className="text-emerald-700">OK: <b>{stats.ok}</b></span>
-            <span className="text-amber-700">Skipped: <b>{stats.skipped}</b></span>
-            <span className="text-red-700">Failed: <b>{stats.failed}</b></span>
+            <span>
+              Total: <b className="text-black">{stats.total}</b>
+            </span>
+            <span className="text-emerald-700">
+              OK: <b>{stats.ok}</b>
+            </span>
+            <span className="text-amber-700">
+              Skipped: <b>{stats.skipped}</b>
+            </span>
+            <span className="text-red-700">
+              Failed: <b>{stats.failed}</b>
+            </span>
           </div>
         </div>
         {rowsQ.isLoading ? (
-          <div className="mt-4"><AdminLoading /></div>
+          <div className="mt-4">
+            <AdminLoading />
+          </div>
         ) : rowsByEntity.length === 0 ? (
           <div className="mt-4 text-sm text-black/50">No extractions yet. Run a batch above.</div>
         ) : (
           <div className="mt-4 space-y-4">
             {rowsByEntity.map(([key, rows]) => (
-              <details key={key} className="rounded-lg border border-black/[0.06] bg-white p-3" open>
+              <details
+                key={key}
+                className="rounded-lg border border-black/[0.06] bg-white p-3"
+                open
+              >
                 <summary className="cursor-pointer text-sm font-medium text-black">
                   {rows[0].entity_name ?? key}{" "}
                   <span className="ml-2 text-[10px] uppercase tracking-widest text-black/40">
@@ -309,7 +341,9 @@ function PdfIngestPage() {
                     <li key={r.id} className="flex items-center justify-between gap-4 py-2 text-xs">
                       <div className="min-w-0 flex-1">
                         <div className="truncate text-black">{r.title}</div>
-                        <div className="mt-0.5 truncate text-[10px] text-black/40">{r.source_url}</div>
+                        <div className="mt-0.5 truncate text-[10px] text-black/40">
+                          {r.source_url}
+                        </div>
                         {r.error && <div className="text-[10px] text-red-600">{r.error}</div>}
                       </div>
                       <span
@@ -323,7 +357,9 @@ function PdfIngestPage() {
                       >
                         {r.status}
                       </span>
-                      <span className="shrink-0 font-mono text-[10px] text-black/50">{r.char_count.toLocaleString()} ch</span>
+                      <span className="shrink-0 font-mono text-[10px] text-black/50">
+                        {r.char_count.toLocaleString()} ch
+                      </span>
                       {r.status === "ok" && (
                         <button
                           type="button"
@@ -344,7 +380,10 @@ function PdfIngestPage() {
 
       {/* Text drawer */}
       {openId && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4" onClick={() => setOpenId(null)}>
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4"
+          onClick={() => setOpenId(null)}
+        >
           <div
             className="max-h-[85vh] w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
@@ -352,7 +391,9 @@ function PdfIngestPage() {
             <div className="flex items-center justify-between border-b border-black/10 px-4 py-3">
               <div className="min-w-0">
                 <div className="truncate text-sm font-medium">{openTextQ.data?.title ?? "…"}</div>
-                <div className="truncate text-[10px] text-black/50">{openTextQ.data?.source_url}</div>
+                <div className="truncate text-[10px] text-black/50">
+                  {openTextQ.data?.source_url}
+                </div>
               </div>
               <button
                 type="button"

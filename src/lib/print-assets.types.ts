@@ -14,10 +14,7 @@ export const PRINT_LOGO_INK: Record<Exclude<PrintLogoColor, "auto">, string> = {
 /** Resolve a `PrintLogoColor` override against the auto ink the layout would
  *  otherwise use. Layouts pass in the color they'd default to (white for
  *  dark heroes, navy for light heroes); an explicit override wins. */
-export function resolvePrintLogoInk(
-  override: PrintLogoColor | undefined,
-  autoInk: string,
-): string {
+export function resolvePrintLogoInk(override: PrintLogoColor | undefined, autoInk: string): string {
   if (!override || override === "auto") return autoInk;
   return PRINT_LOGO_INK[override];
 }
@@ -30,22 +27,21 @@ export type PrintHeroAspect = "fill" | "21:9" | "16:9" | "3:2" | "4:3" | "1:1";
 
 export type PrintHeroMedia = {
   imageUrl: string;
-  focalPoint?: string;            // legacy CSS object-position
-  focalX?: number;                // 0..100 — horizontal focal %, wins over focalPoint
-  focalY?: number;                // 0..100 — vertical focal %, wins over focalPoint
-  aspect?: PrintHeroAspect;       // "fill" uses heightPct; others letterbox to ratio
-  overlayColor?: string;          // hex; falls back to division accent
-  overlayOpacity?: number;        // 0..1 — accent color wash opacity, default 0.55
-  washStrength?: number;          // 0..1 — feather-into-page intensity, default 1
-  scrimOpacity?: number;          // 0..1 — scrim gradient opacity; falls back to washStrength
+  focalPoint?: string; // legacy CSS object-position
+  focalX?: number; // 0..100 — horizontal focal %, wins over focalPoint
+  focalY?: number; // 0..100 — vertical focal %, wins over focalPoint
+  aspect?: PrintHeroAspect; // "fill" uses heightPct; others letterbox to ratio
+  overlayColor?: string; // hex; falls back to division accent
+  overlayOpacity?: number; // 0..1 — accent color wash opacity, default 0.55
+  washStrength?: number; // 0..1 — feather-into-page intensity, default 1
+  scrimOpacity?: number; // 0..1 — scrim gradient opacity; falls back to washStrength
   scrim?: "top" | "bottom" | "both" | "radial" | "none";
   blendMode?: "normal" | "multiply" | "overlay" | "soft-light" | "screen";
-  autoScrim?: boolean;            // sample image brightness and boost scrim on bright photos
-  autoScrimThreshold?: number;    // 0..1 luminance above which the boost kicks in (default 0.6)
-  heightPct?: number;             // share of page height, default 46 (used when aspect="fill")
-  copyOffsetPct?: number;         // -50..50 — vertical nudge of hero copy from centered baseline (0 = centered)
+  autoScrim?: boolean; // sample image brightness and boost scrim on bright photos
+  autoScrimThreshold?: number; // 0..1 luminance above which the boost kicks in (default 0.6)
+  heightPct?: number; // share of page height, default 46 (used when aspect="fill")
+  copyOffsetPct?: number; // -50..50 — vertical nudge of hero copy from centered baseline (0 = centered)
 };
-
 
 // ---------------------------------------------------------------------------
 // SHARED MODULES → PRINT SECTIONS
@@ -58,10 +54,10 @@ export type PrintStatItem = {
   label: string;
   value: string;
   unit?: string;
-  delta?: string;                 // e.g. "+12%" — optional trend chip
+  delta?: string; // e.g. "+12%" — optional trend chip
   trend?: "up" | "down" | "flat";
-  caption?: string;               // small line below label
-  icon?: string;                  // lucide name — layout may map or ignore
+  caption?: string; // small line below label
+  icon?: string; // lucide name — layout may map or ignore
 };
 
 /** Portrait-native variant IDs for the Stats family. */
@@ -147,10 +143,7 @@ export type PrintFeatureItem = {
   icon?: string;
 };
 
-export type PrintFeatureVariant =
-  | "feature-cards-3col"
-  | "feature-cards-2col"
-  | "feature-list-1col";
+export type PrintFeatureVariant = "feature-cards-3col" | "feature-cards-2col" | "feature-list-1col";
 
 export type PrintFeatureListSection = {
   id: string;
@@ -169,10 +162,6 @@ export type PrintSection =
   | PrintExpertiseSection
   | PrintFeatureListSection;
 
-
-
-
-
 export type CaseStudyStat = {
   label: string;
   value: string;
@@ -186,16 +175,16 @@ export type CaseStudyBlock = {
 };
 
 export type CaseStudyContent = {
-  eyebrow?: string;                     // e.g. "Case study"
-  logoColor?: PrintLogoColor;           // header lockup override (auto|black|white)
-  client: string;                       // prospect / customer name
+  eyebrow?: string; // e.g. "Case study"
+  logoColor?: PrintLogoColor; // header lockup override (auto|black|white)
+  client: string; // prospect / customer name
   industry?: string;
   audience?: string;
-  summary?: string;                     // one-line engagement summary
+  summary?: string; // one-line engagement summary
   challenge: CaseStudyBlock;
   solution: CaseStudyBlock;
   result: CaseStudyBlock;
-  stats: CaseStudyStat[];               // up to 5
+  stats: CaseStudyStat[]; // up to 5
   quote?: { text: string; author: string; role?: string; company?: string };
   expert?: { name: string; role?: string; email?: string };
   cta?: { label: string; url?: string; subhead?: string; buttonLabel?: string };
@@ -209,7 +198,6 @@ export type CaseStudyContent = {
   /** Reusable shared-module blocks inserted between body content and CTA. */
   modules?: PrintSection[];
 };
-
 
 // ---------------------------------------------------------------------------
 // SPOTLIGHT — single-page product / service highlight
@@ -227,20 +215,19 @@ export type CaseStudyContent = {
 // A spotlight has no challenge/solution/result arc; the narrative is
 // value-prop → capabilities → proof.
 export type SpotlightContent = {
-  eyebrow?: string;                     // e.g. "Product spotlight"
-  logoColor?: PrintLogoColor;           // header lockup override (auto|black|white)
-  productName: string;                  // hero name of the product / service
-  tagline: string;                      // one-line positioning
-  summary?: string;                     // 1–2 sentence value proposition
-  capabilities: CaseStudyBlock[];       // 3–5 feature blocks
-  stats: CaseStudyStat[];               // 2–4 proof points
+  eyebrow?: string; // e.g. "Product spotlight"
+  logoColor?: PrintLogoColor; // header lockup override (auto|black|white)
+  productName: string; // hero name of the product / service
+  tagline: string; // one-line positioning
+  summary?: string; // 1–2 sentence value proposition
+  capabilities: CaseStudyBlock[]; // 3–5 feature blocks
+  stats: CaseStudyStat[]; // 2–4 proof points
   quote?: { text: string; author: string; role?: string; company?: string };
   expert?: { name: string; role?: string; email?: string };
   cta?: { label: string; url?: string };
   heroMedia?: PrintHeroMedia;
   modules?: PrintSection[];
 };
-
 
 // ---------------------------------------------------------------------------
 // E-BROCHURE — single-page marketing PDF (Challenge / Approach / Impact +
@@ -255,12 +242,12 @@ export type SpotlightContent = {
 export type EBrochureSection = CaseStudyBlock & { bullets: string[] };
 
 export type EBrochureContent = {
-  eyebrow?: string;            // e.g. "eBrochure"
-  logoColor?: PrintLogoColor;  // header lockup override (auto|black|white)
-  title: string;               // hero H1
-  summary?: string;            // 1–2 sentence subhead
+  eyebrow?: string; // e.g. "eBrochure"
+  logoColor?: PrintLogoColor; // header lockup override (auto|black|white)
+  title: string; // hero H1
+  summary?: string; // 1–2 sentence subhead
   sections: EBrochureSection[]; // exactly 3 — Challenge / Approach / Impact
-  stats: CaseStudyStat[];      // 3–5 proof points
+  stats: CaseStudyStat[]; // 3–5 proof points
   quote?: { text: string; author: string; role?: string; company?: string };
   discover?: { body: string; bullets: string[] }; // right-hand "Discover" panel
   cta?: { label: string; url?: string; subhead?: string };
@@ -268,30 +255,28 @@ export type EBrochureContent = {
   modules?: PrintSection[];
 };
 
-
 // ---------------------------------------------------------------------------
 // ADAPTOR / APPLICATION BRIEF — single-page portrait brief with a clean
 // page-base hero, 6 feature cards, a "We Know How" strip, and a quote row.
 // Ported from ApplicationBrief.dc.html.
 // ---------------------------------------------------------------------------
 export type AdaptorFeature = {
-  verb: string;   // "Supports", "Adapts", "Enables", "Automates", "Triggers", "Learns"
-  body: string;   // one-liner under the verb
+  verb: string; // "Supports", "Adapts", "Enables", "Automates", "Triggers", "Learns"
+  body: string; // one-liner under the verb
 };
 
 export type AdaptorBriefContent = {
-  eyebrow?: string;            // e.g. "Adaptor brief"
-  logoColor?: PrintLogoColor;  // header lockup override (auto|black|white)
-  title: string;               // hero H1
-  summary?: string;            // hero subhead
-  features: AdaptorFeature[];  // exactly 6
-  knowHow: string[];           // 5 "We Know How" one-liners
+  eyebrow?: string; // e.g. "Adaptor brief"
+  logoColor?: PrintLogoColor; // header lockup override (auto|black|white)
+  title: string; // hero H1
+  summary?: string; // hero subhead
+  features: AdaptorFeature[]; // exactly 6
+  knowHow: string[]; // 5 "We Know How" one-liners
   quote?: { text: string; author: string; role?: string; company?: string };
   cta?: { label: string; url?: string };
   heroMedia?: PrintHeroMedia;
   modules?: PrintSection[];
 };
-
 
 export type PrintPageSize = "A4" | "Letter" | "Square";
 export type PrintDensity = "compact" | "standard" | "airy";
@@ -302,14 +287,14 @@ export type PrintMode = "light" | "dark";
  *  dropdown, so their preset survives reload and can be duplicated. */
 export type PrintExportPrefs = {
   size?: "A4" | "Letter" | "Square" | "Custom";
-  customW?: number;                       // inches, when size=Custom
-  customH?: number;                       // inches, when size=Custom
-  bleedIn?: number;                       // 0 | 0.125 | 0.25
+  customW?: number; // inches, when size=Custom
+  customH?: number; // inches, when size=Custom
+  bleedIn?: number; // 0 | 0.125 | 0.25
   cropMarks?: boolean;
-  mode?: PrintMode;                       // "" means "follow editorMode"
+  mode?: PrintMode; // "" means "follow editorMode"
   quality?: "150dpi" | "300dpi" | "600dpi";
   format?: "digital" | "press-x4" | "press";
-  iccProfile?: string;                    // IccProfileKey — kept as string to avoid a circular import
+  iccProfile?: string; // IccProfileKey — kept as string to avoid a circular import
 };
 
 export type PrintAssetContext = {
@@ -342,7 +327,6 @@ export type PrintAssetContext = {
 };
 
 export type PrintAssetKind = "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
-
 
 export type PrintAssetRow = {
   id: string;
@@ -393,9 +377,10 @@ export function emptyCaseStudy(seed?: Partial<CaseStudyContent>): CaseStudyConte
       { label: "Fewer review cycles", value: "62", unit: "%" },
       { label: "Annualized cost saved", value: "$1.2", unit: "M" },
     ],
-    quote:
-      seed?.quote ??
-      { text: "They didn't just translate our content — they rebuilt how we ship it. We're moving at a pace we couldn't have imagined last year.", author: "VP of Global Marketing" },
+    quote: seed?.quote ?? {
+      text: "They didn't just translate our content — they rebuilt how we ship it. We're moving at a pace we couldn't have imagined last year.",
+      author: "VP of Global Marketing",
+    },
     expert: seed?.expert,
     cta: seed?.cta ?? { label: "Start a conversation" },
     engagement: seed?.engagement ?? {
@@ -424,18 +409,28 @@ export function emptySpotlight(seed?: Partial<SpotlightContent>): SpotlightConte
       seed?.summary ??
       `${product} plugs directly into the systems your teams already use — CMS, DAM, PIM, code — so every market ships from the same source of truth.`,
     capabilities: seed?.capabilities ?? [
-      { heading: "Connected everywhere", body: "40+ pre-built connectors keep content in sync with your CMS, DAM, PIM, and code — no more manual exports." },
-      { heading: "AI + human, in one loop", body: "Machine translation accelerates first drafts; certified linguists and reviewers refine anything customer-facing." },
-      { heading: "Governance built in", body: "Regulated-industry workflows, audit trails, and role-based approvals are on by default, not bolted on." },
+      {
+        heading: "Connected everywhere",
+        body: "40+ pre-built connectors keep content in sync with your CMS, DAM, PIM, and code — no more manual exports.",
+      },
+      {
+        heading: "AI + human, in one loop",
+        body: "Machine translation accelerates first drafts; certified linguists and reviewers refine anything customer-facing.",
+      },
+      {
+        heading: "Governance built in",
+        body: "Regulated-industry workflows, audit trails, and role-based approvals are on by default, not bolted on.",
+      },
     ],
     stats: seed?.stats ?? [
       { label: "Markets supported live", value: "200", unit: "+" },
       { label: "Faster to launch", value: "3.4", unit: "x" },
       { label: "Reduction in review cycles", value: "62", unit: "%" },
     ],
-    quote:
-      seed?.quote ??
-      { text: "We onboarded three new regions in the time it used to take us to launch one.", author: "Director of Digital Experience" },
+    quote: seed?.quote ?? {
+      text: "We onboarded three new regions in the time it used to take us to launch one.",
+      author: "Director of Digital Experience",
+    },
     expert: seed?.expert,
     cta: seed?.cta ?? { label: "Talk to us" },
     heroMedia: seed?.heroMedia,
@@ -447,10 +442,26 @@ export function emptySpotlight(seed?: Partial<SpotlightContent>): SpotlightConte
         eyebrow: "What you get",
         title: "Built for how modern teams ship",
         items: [
-          { verb: "Translate", body: "Human-in-the-loop translation across 200+ language pairs.", icon: "language" },
-          { verb: "Automate", body: "Connect CMS, PIM, DAM — content flows without tickets.", icon: "bolt" },
-          { verb: "Measure", body: "Live dashboards on quality, cost, and time-to-market.", icon: "trending" },
-          { verb: "Scale", body: "Launch new markets in days without adding headcount.", icon: "target" },
+          {
+            verb: "Translate",
+            body: "Human-in-the-loop translation across 200+ language pairs.",
+            icon: "language",
+          },
+          {
+            verb: "Automate",
+            body: "Connect CMS, PIM, DAM — content flows without tickets.",
+            icon: "bolt",
+          },
+          {
+            verb: "Measure",
+            body: "Live dashboards on quality, cost, and time-to-market.",
+            icon: "trending",
+          },
+          {
+            verb: "Scale",
+            body: "Launch new markets in days without adding headcount.",
+            icon: "target",
+          },
         ],
       },
       {
@@ -490,17 +501,29 @@ export function emptyEBrochure(seed?: Partial<EBrochureContent>): EBrochureConte
       {
         heading: "The challenge",
         body: "Global brands are shipping more content into more markets than ever — but legacy workflows still treat every new language as a fresh project.",
-        bullets: ["Fragmented vendor rosters", "Duplicated linguistic review", "Weeks lost to manual handoffs"],
+        bullets: [
+          "Fragmented vendor rosters",
+          "Duplicated linguistic review",
+          "Weeks lost to manual handoffs",
+        ],
       },
       {
         heading: "Our approach",
         body: "We connect the systems you already run, layer certified human expertise onto AI-accelerated first drafts, and give governance teams real audit trails.",
-        bullets: ["40+ pre-built platform connectors", "Human-in-loop review at every stage", "Enterprise-grade security and audit"],
+        bullets: [
+          "40+ pre-built platform connectors",
+          "Human-in-loop review at every stage",
+          "Enterprise-grade security and audit",
+        ],
       },
       {
         heading: "The impact",
         body: "Customers cut review cycles by more than half, ship into new markets in days instead of weeks, and unlock seven-figure annualized savings.",
-        bullets: ["3.4× faster time-to-market", "62% fewer review cycles", "$1.2M average annualized savings"],
+        bullets: [
+          "3.4× faster time-to-market",
+          "62% fewer review cycles",
+          "$1.2M average annualized savings",
+        ],
       },
     ],
     stats: seed?.stats ?? [
@@ -508,12 +531,17 @@ export function emptyEBrochure(seed?: Partial<EBrochureContent>): EBrochureConte
       { label: "Enterprise customers", value: "600", unit: "+" },
       { label: "Content refresh SLA", value: "48", unit: "hr" },
     ],
-    quote:
-      seed?.quote ??
-      { text: "It's the first localization program our compliance team has ever signed off on without changes.", author: "Head of Regulatory Content" },
+    quote: seed?.quote ?? {
+      text: "It's the first localization program our compliance team has ever signed off on without changes.",
+      author: "Head of Regulatory Content",
+    },
     discover: seed?.discover ?? {
       body: "Discover how we can help your organization streamline operations and deliver measurable results across every market.",
-      bullets: ["Trusted global partner", "Deep division expertise", "Hands-on, human collaboration"],
+      bullets: [
+        "Trusted global partner",
+        "Deep division expertise",
+        "Hands-on, human collaboration",
+      ],
     },
     cta: seed?.cta ?? { label: "See it in action" },
     heroMedia: seed?.heroMedia,
@@ -530,12 +558,30 @@ export function emptyAdaptorBrief(seed?: Partial<AdaptorBriefContent>): AdaptorB
       seed?.summary ??
       "Drop-in connectors that keep your CMS, DAM, PIM, and code repositories in sync with every language, every market, every release.",
     features: seed?.features ?? [
-      { verb: "Supports", body: "40+ enterprise platforms out of the box — Adobe, Sitecore, Contentful, Salesforce, GitHub." },
-      { verb: "Adapts", body: "Configurable workflows shape to your review, approval, and regulatory requirements." },
-      { verb: "Enables", body: "Human-in-loop review and certified linguists for anything customer-facing or regulated." },
-      { verb: "Automates", body: "First-draft translation, TM leverage, and file preparation with zero manual handoffs." },
-      { verb: "Triggers", body: "Content changes push into localization instantly via webhook or scheduled sync." },
-      { verb: "Learns", body: "Every project sharpens your TM, glossary, and style — quality compounds over time." },
+      {
+        verb: "Supports",
+        body: "40+ enterprise platforms out of the box — Adobe, Sitecore, Contentful, Salesforce, GitHub.",
+      },
+      {
+        verb: "Adapts",
+        body: "Configurable workflows shape to your review, approval, and regulatory requirements.",
+      },
+      {
+        verb: "Enables",
+        body: "Human-in-loop review and certified linguists for anything customer-facing or regulated.",
+      },
+      {
+        verb: "Automates",
+        body: "First-draft translation, TM leverage, and file preparation with zero manual handoffs.",
+      },
+      {
+        verb: "Triggers",
+        body: "Content changes push into localization instantly via webhook or scheduled sync.",
+      },
+      {
+        verb: "Learns",
+        body: "Every project sharpens your TM, glossary, and style — quality compounds over time.",
+      },
     ],
     knowHow: seed?.knowHow ?? [
       "Supports 600+ global enterprises",
@@ -544,9 +590,10 @@ export function emptyAdaptorBrief(seed?: Partial<AdaptorBriefContent>): AdaptorB
       "Integrates with 100+ platforms seamlessly",
       "Reduces costs and accelerates time-to-market",
     ],
-    quote:
-      seed?.quote ??
-      { text: "The connector shipped in a sprint. Two months in, our marketing team has stopped filing localization tickets entirely.", author: "Principal Engineer, Platform" },
+    quote: seed?.quote ?? {
+      text: "The connector shipped in a sprint. Two months in, our marketing team has stopped filing localization tickets entirely.",
+      author: "Principal Engineer, Platform",
+    },
     cta: seed?.cta ?? { label: "Talk to an expert" },
     heroMedia: seed?.heroMedia,
     modules: seed?.modules ?? [],

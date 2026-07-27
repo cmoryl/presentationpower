@@ -15,10 +15,7 @@ export type KitValidationIssue = {
   variantId: string;
   familyId: string | null;
   permittedFamilyIds: string[] | null;
-  reason:
-    | "unknown-section"
-    | "unknown-variant"
-    | "family-not-permitted";
+  reason: "unknown-section" | "unknown-variant" | "family-not-permitted";
   message: string;
 };
 
@@ -74,14 +71,13 @@ export function validateKitPayload(payload: TemplatePayload): KitValidationResul
   return { valid: issues.length === 0, issues };
 }
 
-export function formatKitValidationError(
-  kitTitle: string,
-  result: KitValidationResult,
-): string {
+export function formatKitValidationError(kitTitle: string, result: KitValidationResult): string {
   if (result.valid) return "";
   const head = `Kit "${kitTitle}" failed section validation (${result.issues.length} issue${result.issues.length === 1 ? "" : "s"}):`;
-  const body = result.issues.slice(0, 8).map((i) => `• ${i.message}`).join("\n");
-  const more =
-    result.issues.length > 8 ? `\n… and ${result.issues.length - 8} more.` : "";
+  const body = result.issues
+    .slice(0, 8)
+    .map((i) => `• ${i.message}`)
+    .join("\n");
+  const more = result.issues.length > 8 ? `\n… and ${result.issues.length - 8} more.` : "";
   return `${head}\n${body}${more}`;
 }

@@ -34,11 +34,7 @@ function firstError(result: { success: boolean; error?: z.ZodError }): string | 
   return result.success ? null : (result.error?.issues[0]?.message ?? "Invalid value.");
 }
 
-function checkLength(
-  value: string,
-  max: number,
-  label: string,
-): string | null {
+function checkLength(value: string, max: number, label: string): string | null {
   if (value.trim().length > max) return `${label} must be under ${max} characters.`;
   return null;
 }

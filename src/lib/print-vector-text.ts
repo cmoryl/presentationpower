@@ -124,18 +124,21 @@ function parseCssColor(css: string): { color: [number, number, number]; opacity:
   const m = css.match(/rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)(?:[\s,/]+([\d.]+))?\s*\)/i);
   if (m) {
     return {
-      color: [
-        Number(m[1]) / 255,
-        Number(m[2]) / 255,
-        Number(m[3]) / 255,
-      ] as [number, number, number],
+      color: [Number(m[1]) / 255, Number(m[2]) / 255, Number(m[3]) / 255] as [
+        number,
+        number,
+        number,
+      ],
       opacity: m[4] !== undefined ? Number(m[4]) : 1,
     };
   }
   const hex = css.trim().match(/^#([0-9a-f]{6})$/i);
   if (hex) {
     const n = parseInt(hex[1]!, 16);
-    return { color: [((n >> 16) & 0xff) / 255, ((n >> 8) & 0xff) / 255, (n & 0xff) / 255], opacity: 1 };
+    return {
+      color: [((n >> 16) & 0xff) / 255, ((n >> 8) & 0xff) / 255, (n & 0xff) / 255],
+      opacity: 1,
+    };
   }
   return { color: [0, 0, 0], opacity: 1 };
 }
@@ -179,7 +182,12 @@ function isRectClamped(rect: DOMRect, textParent: Element): boolean {
 function collectLinesForTextNode(
   node: Text,
   rootBounds: DOMRect,
-): Array<Omit<VectorTextLine, "family" | "weight" | "italic" | "color" | "opacity" | "sizeCss" | "letterSpacing"> & { glyphLefts: number[] }> {
+): Array<
+  Omit<
+    VectorTextLine,
+    "family" | "weight" | "italic" | "color" | "opacity" | "sizeCss" | "letterSpacing"
+  > & { glyphLefts: number[] }
+> {
   const raw = node.data;
   if (!raw || !raw.trim()) return [];
 
@@ -187,7 +195,12 @@ function collectLinesForTextNode(
   if (!parent) return [];
 
   const range = node.ownerDocument.createRange();
-  const lines: Array<Omit<VectorTextLine, "family" | "weight" | "italic" | "color" | "opacity" | "sizeCss" | "letterSpacing"> & { glyphLefts: number[] }> = [];
+  const lines: Array<
+    Omit<
+      VectorTextLine,
+      "family" | "weight" | "italic" | "color" | "opacity" | "sizeCss" | "letterSpacing"
+    > & { glyphLefts: number[] }
+  > = [];
 
   let currentTop: number | null = null;
   let currentBottom = 0;
@@ -397,7 +410,8 @@ export async function overlayVectorText(
   rasterPdfBytes: Uint8Array | ArrayBuffer,
   opts: VectorOverlayOptions,
 ): Promise<VectorOverlayResult> {
-  const source = rasterPdfBytes instanceof Uint8Array ? rasterPdfBytes : new Uint8Array(rasterPdfBytes);
+  const source =
+    rasterPdfBytes instanceof Uint8Array ? rasterPdfBytes : new Uint8Array(rasterPdfBytes);
   const pdfDoc = await PDFDocument.load(source, { updateMetadata: false });
   pdfDoc.registerFontkit(fontkit);
 
@@ -407,7 +421,6 @@ export async function overlayVectorText(
   const pages = pdfDoc.getPages();
   let linesDrawn = 0;
   let trackedLines = 0;
-
 
   for (let i = 0; i < pages.length && i < opts.captures.length; i++) {
     const page = pages[i]!;
@@ -442,7 +455,6 @@ export async function overlayVectorText(
 
       linesDrawn += 1;
       if (Math.abs(line.letterSpacing) >= 0.3) trackedLines += 1;
-
     }
   }
 
@@ -492,4 +504,3 @@ function drawVectorLine(page: PDFPage, line: VectorTextLine, font: PDFFont, ctx:
   // Reference to line kept alive for possible future per-glyph fallback.
   void line.glyphLefts;
 }
-

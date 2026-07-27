@@ -57,9 +57,7 @@ export function ConfirmModal({
           {description && <p className="mt-1 text-sm text-black/60">{description}</p>}
         </header>
 
-        {body && (
-          <div className="max-h-[50vh] overflow-y-auto px-6 py-4">{body}</div>
-        )}
+        {body && <div className="max-h-[50vh] overflow-y-auto px-6 py-4">{body}</div>}
 
         <footer className="flex items-center justify-end gap-2 border-t border-black/10 bg-black/[0.02] px-6 py-4">
           <button
@@ -75,9 +73,7 @@ export function ConfirmModal({
             onClick={onConfirm}
             disabled={busy || disableConfirm}
             className={`rounded-full px-4 py-2 text-xs uppercase tracking-widest text-white disabled:opacity-40 ${
-              danger
-                ? "bg-[#E53D2E] hover:bg-[#c23022]"
-                : "bg-[#003FC7] hover:bg-[#03002C]"
+              danger ? "bg-[#E53D2E] hover:bg-[#c23022]" : "bg-[#003FC7] hover:bg-[#03002C]"
             }`}
           >
             {busy ? "Working…" : confirmLabel}

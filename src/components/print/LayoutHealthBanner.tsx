@@ -49,9 +49,7 @@ export function LayoutHealthBanner({ report, onApplySuggestion }: Props) {
   // Hero-cost split for the meter — a tiny amber stripe visualizes how much
   // of the base budget the hero band has absorbed.
   const heroFrac =
-    report.baseBudget > 0
-      ? Math.max(0, Math.min(1, report.heroCostDelta / report.baseBudget))
-      : 0;
+    report.baseBudget > 0 ? Math.max(0, Math.min(1, report.heroCostDelta / report.baseBudget)) : 0;
   const heroPct = Math.round(heroFrac * 100);
 
   return (
@@ -60,7 +58,9 @@ export function LayoutHealthBanner({ report, onApplySuggestion }: Props) {
       data-level={report.level}
       className={`rounded-xl border ${tone.border} ${tone.bg} px-3 py-2.5`}
     >
-      <div className={`flex items-center justify-between gap-2 text-[11px] font-semibold uppercase tracking-widest ${tone.fg}`}>
+      <div
+        className={`flex items-center justify-between gap-2 text-[11px] font-semibold uppercase tracking-widest ${tone.fg}`}
+      >
         <span className="inline-flex items-center gap-1.5">
           <Icon size={13} /> {tone.label}
         </span>

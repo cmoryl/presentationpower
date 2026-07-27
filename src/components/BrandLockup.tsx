@@ -32,7 +32,6 @@ function TransPerfectWordmark({ height }: { height: number }) {
   );
 }
 
-
 // The approved TransPerfect horizontal wordmark. Used whenever the brand's
 // logo.wordmark resolves to "TransPerfect" — masked with currentColor so a
 // single SVG serves both dark and light surfaces.
@@ -75,17 +74,23 @@ export function BrandLockup({
               ? { markPx: 96, wordmarkPx: 64, wordPx: 48, dividerPx: 24, radiusPx: 16, gapPx: 22 }
               : { markPx: 32, wordmarkPx: 18, wordPx: 17, dividerPx: 11, radiusPx: 8, gapPx: 10 };
   const logo = brand.logo ?? { mark: brand.name.slice(0, 2).toUpperCase(), wordmark: brand.name };
-  const divisionLine = (subCompany ?? logo.divisionLine)?.replace("{client}", clientName ?? "Client");
+  const divisionLine = (subCompany ?? logo.divisionLine)?.replace(
+    "{client}",
+    clientName ?? "Client",
+  );
 
   // Vertical orientations are deprecated (never rotate the lockup). Any
   // persisted vertical-* value from legacy decks falls back to horizontal.
   const orientation: "horizontal" | "stacked" | "mark-only" =
-    orientationRaw === "stacked" ? "stacked"
-    : orientationRaw === "mark-only" ? "mark-only"
-    : "horizontal";
-  
+    orientationRaw === "stacked"
+      ? "stacked"
+      : orientationRaw === "mark-only"
+        ? "mark-only"
+        : "horizontal";
+
   const isMarkOnly = orientation === "mark-only";
-  const innerOrientation: "horizontal" | "stacked" = orientation === "stacked" ? "stacked" : "horizontal";
+  const innerOrientation: "horizontal" | "stacked" =
+    orientation === "stacked" ? "stacked" : "horizontal";
 
   // Mark-only mode: render just the letter tile. When a brand ships an
   // official image, we still fall back to the letter tile because the shipped
@@ -93,7 +98,12 @@ export function BrandLockup({
   if (isMarkOnly) {
     const tilePx = Math.round(dims.markPx * 1.15);
     return (
-      <div className="inline-flex" style={{ color }} role="img" aria-label={`${logo.wordmark} mark`}>
+      <div
+        className="inline-flex"
+        style={{ color }}
+        role="img"
+        aria-label={`${logo.wordmark} mark`}
+      >
         <div
           className="flex items-center justify-center font-semibold tracking-tight"
           style={{
@@ -116,26 +126,33 @@ export function BrandLockup({
   const isDarkChrome = /^#?fff(fff)?$/i.test(color) || color.toLowerCase() === "white";
   const divisionLogos = getDivisionLogos(brand.id);
   const stackedUrl = divisionLogos
-    ? (isDarkChrome ? (divisionLogos.stackedWhite ?? divisionLogos.stackedColor) : (divisionLogos.stackedColor ?? divisionLogos.stackedWhite))
+    ? isDarkChrome
+      ? (divisionLogos.stackedWhite ?? divisionLogos.stackedColor)
+      : (divisionLogos.stackedColor ?? divisionLogos.stackedWhite)
     : undefined;
   const horizontalUrl = divisionLogos
-    ? (isDarkChrome ? (divisionLogos.white ?? divisionLogos.color) : (divisionLogos.color ?? divisionLogos.white))
+    ? isDarkChrome
+      ? (divisionLogos.white ?? divisionLogos.color)
+      : (divisionLogos.color ?? divisionLogos.white)
     : undefined;
   const officialLogoUrl =
-    innerOrientation === "stacked"
-      ? (stackedUrl ?? horizontalUrl)
-      : (horizontalUrl ?? stackedUrl);
+    innerOrientation === "stacked" ? (stackedUrl ?? horizontalUrl) : (horizontalUrl ?? stackedUrl);
   const useOfficialImage = !!officialLogoUrl;
   const useOfficialWordmark = !useOfficialImage && TP_BRANDS.has(logo.wordmark);
   const wordmarkHeight = dims.wordmarkPx;
-  const officialImageHeight = Math.round(dims.wordmarkPx * (innerOrientation === "stacked" ? 3.2 : 1.9));
+  const officialImageHeight = Math.round(
+    dims.wordmarkPx * (innerOrientation === "stacked" ? 3.2 : 1.9),
+  );
 
   const wrapperStyle: React.CSSProperties = {};
 
   return (
     <div style={wrapperStyle}>
       <div
-        className={"flex min-w-0 max-w-full " + (innerOrientation === "stacked" ? "flex-col items-start" : "items-center")}
+        className={
+          "flex min-w-0 max-w-full " +
+          (innerOrientation === "stacked" ? "flex-col items-start" : "items-center")
+        }
         style={{ gap: dims.gapPx, color }}
         role="img"
         aria-label={`${logo.wordmark}${divisionLine ? " — " + divisionLine : ""}${clientLogoUrl ? " × client" : ""} lockup`}
@@ -168,14 +185,19 @@ export function BrandLockup({
                 objectFit: "contain",
                 display: "block",
                 filter: monochromeOfficialLogo
-                  ? (isDarkChrome ? "brightness(0) invert(1)" : "brightness(0) saturate(100%)")
+                  ? isDarkChrome
+                    ? "brightness(0) invert(1)"
+                    : "brightness(0) saturate(100%)"
                   : undefined,
               }}
             />
           ) : useOfficialWordmark ? (
             <TransPerfectWordmark height={wordmarkHeight} />
           ) : (
-            <div className="min-w-0 max-w-full break-words font-semibold tracking-wide" style={{ fontSize: dims.wordPx, letterSpacing: "0.02em" }}>
+            <div
+              className="min-w-0 max-w-full break-words font-semibold tracking-wide"
+              style={{ fontSize: dims.wordPx, letterSpacing: "0.02em" }}
+            >
               {logo.wordmark.toUpperCase()}
             </div>
           )}
@@ -204,7 +226,13 @@ export function BrandLockup({
             <img
               src={clientLogoUrl}
               alt={clientName ? `${clientName} logo` : "Client logo"}
-              style={{ height: dims.wordmarkPx * 1.6, width: "auto", maxWidth: dims.wordmarkPx * 6, objectFit: "contain", display: "block" }}
+              style={{
+                height: dims.wordmarkPx * 1.6,
+                width: "auto",
+                maxWidth: dims.wordmarkPx * 6,
+                objectFit: "contain",
+                display: "block",
+              }}
             />
           </>
         )}
@@ -212,6 +240,3 @@ export function BrandLockup({
     </div>
   );
 }
-
-
-

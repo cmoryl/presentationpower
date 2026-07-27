@@ -130,7 +130,9 @@ function ResetPasswordPage() {
                 />
               </label>
               <label className="block">
-                <span className="text-xs uppercase tracking-wider text-black/60">Confirm password</span>
+                <span className="text-xs uppercase tracking-wider text-black/60">
+                  Confirm password
+                </span>
                 <input
                   type="password"
                   required

@@ -64,7 +64,10 @@ export function RebrandMenu({ deckId }: { deckId: string }) {
   const [busy, setBusy] = useState(false);
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
-  const rebrandClientLogo = useResolvedClientLogo(deck?.clientLogo ?? { clientName: brief?.prospect ?? null }, "light");
+  const rebrandClientLogo = useResolvedClientLogo(
+    deck?.clientLogo ?? { clientName: brief?.prospect ?? null },
+    "light",
+  );
   const rebrandDeck = useDeckStore((s) => s.rebrandDeck);
   const snapshot = useServerFn(snapshotDeckVersion);
 
@@ -138,11 +141,16 @@ export function RebrandMenu({ deckId }: { deckId: string }) {
           >
             <div className="flex items-start justify-between border-b border-white/10 px-8 py-5">
               <div>
-                <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">Rebrand deck</div>
-                <h2 id="rebrand-menu-title" className="mt-1 text-2xl font-semibold">Re-tone this presentation for another division</h2>
+                <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">
+                  Rebrand deck
+                </div>
+                <h2 id="rebrand-menu-title" className="mt-1 text-2xl font-semibold">
+                  Re-tone this presentation for another division
+                </h2>
                 <p className="mt-1 max-w-2xl text-sm text-white/60">
-                  Colors, backdrops, imagery treatment and the wordmark will re-render in the selected brand.
-                  Slide text is not rewritten — review copy for division-specific references.
+                  Colors, backdrops, imagery treatment and the wordmark will re-render in the
+                  selected brand. Slide text is not rewritten — review copy for division-specific
+                  references.
                 </p>
               </div>
               <button
@@ -174,7 +182,11 @@ export function RebrandMenu({ deckId }: { deckId: string }) {
                       >
                         {(() => {
                           const logos = getDivisionLogos(t.key);
-                          const logoSrc = logos?.white ?? logos?.color ?? logos?.stackedWhite ?? logos?.stackedColor;
+                          const logoSrc =
+                            logos?.white ??
+                            logos?.color ??
+                            logos?.stackedWhite ??
+                            logos?.stackedColor;
                           const bg = `linear-gradient(135deg, ${t.swatches[0] ?? "#03002C"}, ${t.swatches[1] ?? "#003FC7"})`;
                           return (
                             <div
@@ -191,7 +203,11 @@ export function RebrandMenu({ deckId }: { deckId: string }) {
                               ) : (
                                 <div className="flex h-full w-full items-center gap-0.5">
                                   {t.swatches.slice(0, 4).map((hex, i) => (
-                                    <span key={i} className="block h-full flex-1" style={{ background: hex }} />
+                                    <span
+                                      key={i}
+                                      className="block h-full flex-1"
+                                      style={{ background: hex }}
+                                    />
                                   ))}
                                 </div>
                               )}
@@ -219,10 +235,10 @@ export function RebrandMenu({ deckId }: { deckId: string }) {
               <div className="flex flex-col overflow-hidden">
                 <div className="flex-1 overflow-hidden bg-black/40 p-6">
                   <div className="mb-3 flex items-center justify-between">
-                    <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">Live preview · Slide 1</div>
-                    <div className="text-xs text-white/60">
-                      {selected?.label}
+                    <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">
+                      Live preview · Slide 1
                     </div>
+                    <div className="text-xs text-white/60">{selected?.label}</div>
                   </div>
                   <div className="aspect-[16/9] w-full overflow-hidden rounded-2xl bg-white ring-1 ring-white/10">
                     <ScaledSlide>

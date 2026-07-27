@@ -95,7 +95,10 @@ export const SURFACE_LABELS: Record<SurfaceKind, string> = {
   email: "Email",
 };
 
-export const SURFACE_FORMATS: Record<SurfaceKind, { id: SurfaceFormat; label: string; w: number; h: number }[]> = {
+export const SURFACE_FORMATS: Record<
+  SurfaceKind,
+  { id: SurfaceFormat; label: string; w: number; h: number }[]
+> = {
   deck: [{ id: "16:9", label: "16:9 Slide", w: 1920, h: 1080 }],
   brochure: [
     { id: "bi-fold-letter", label: "Bi-fold · Letter", w: 2200, h: 1700 },
@@ -175,7 +178,11 @@ export function defaultSurfaceSupport(variant: ModuleVariant): SurfaceSupport {
 }
 
 /** Check whether a variant supports a given surface/format. */
-export function variantSupportsSurface(variantId: string, kind: SurfaceKind, format?: SurfaceFormat): boolean {
+export function variantSupportsSurface(
+  variantId: string,
+  kind: SurfaceKind,
+  format?: SurfaceFormat,
+): boolean {
   const variant = byId(MODULE_VARIANTS, variantId);
   if (!variant) return false;
   const support = defaultSurfaceSupport(variant);
@@ -184,7 +191,8 @@ export function variantSupportsSurface(variantId: string, kind: SurfaceKind, for
   }
   // social
   if (!format) return support.social["1:1"];
-  if (format === "ig-1x1" || format === "linkedin-1200x627") return support.social["1:1"] || support.social["16:9"];
+  if (format === "ig-1x1" || format === "linkedin-1200x627")
+    return support.social["1:1"] || support.social["16:9"];
   if (format === "ig-4x5" || format === "linkedin-1080x1350") return support.social["4:5"];
   if (format === "ig-9x16") return support.social["9:16"];
   if (format === "x-1600x900") return support.social["16:9"];
@@ -211,7 +219,11 @@ export function moduleFromSlide(slide: DeckSlide): ModuleInstance {
   };
 }
 
-export function slideFromModule(mi: ModuleInstance, position: number, sectionId = "generic"): DeckSlide {
+export function slideFromModule(
+  mi: ModuleInstance,
+  position: number,
+  sectionId = "generic",
+): DeckSlide {
   const variant = byId(MODULE_VARIANTS, mi.variantId);
   return {
     id: mi.id,

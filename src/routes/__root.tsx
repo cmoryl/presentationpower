@@ -26,11 +26,14 @@ function NotFoundComponent() {
         }}
       />
       <div className="relative max-w-md text-center">
-        <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">TransPerfect Modular</div>
+        <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">
+          TransPerfect Modular
+        </div>
         <h1 className="mt-4 text-6xl font-bold tracking-tight sm:text-7xl">404</h1>
         <h2 className="mt-3 text-xl font-semibold">This page couldn't be found</h2>
         <p className="mt-3 text-sm text-white/60">
-          The route you followed may have moved, been renamed, or never existed. Head back to the dashboard to keep working.
+          The route you followed may have moved, been renamed, or never existed. Head back to the
+          dashboard to keep working.
         </p>
         <div className="mt-6">
           <Link
@@ -44,7 +47,6 @@ function NotFoundComponent() {
     </div>
   );
 }
-
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
@@ -90,20 +92,40 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "TransPerfect Modular · Command Center" },
-      { name: "description", content: "Governed deck assembly, brand intelligence, and AI-powered enablement for TransPerfect sales teams." },
+      {
+        name: "description",
+        content:
+          "Governed deck assembly, brand intelligence, and AI-powered enablement for TransPerfect sales teams.",
+      },
       { name: "theme-color", content: "#003FC7" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { name: "apple-mobile-web-app-title", content: "TP Modular" },
       { name: "mobile-web-app-capable", content: "yes" },
       { property: "og:title", content: "TransPerfect Modular · Command Center" },
-      { property: "og:description", content: "Governed deck assembly, brand intelligence, and AI-powered enablement for TransPerfect sales teams." },
+      {
+        property: "og:description",
+        content:
+          "Governed deck assembly, brand intelligence, and AI-powered enablement for TransPerfect sales teams.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "TransPerfect Modular · Command Center" },
-      { name: "twitter:description", content: "Governed deck assembly, brand intelligence, and AI-powered enablement for TransPerfect sales teams." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8a9ab1bd-6be9-4889-bd5d-1b5ee1a151bf/id-preview-a7a94b56--c88f7719-c0c5-420f-915f-a154f8270b06.lovable.app-1784554479394.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8a9ab1bd-6be9-4889-bd5d-1b5ee1a151bf/id-preview-a7a94b56--c88f7719-c0c5-420f-915f-a154f8270b06.lovable.app-1784554479394.png" },
+      {
+        name: "twitter:description",
+        content:
+          "Governed deck assembly, brand intelligence, and AI-powered enablement for TransPerfect sales teams.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8a9ab1bd-6be9-4889-bd5d-1b5ee1a151bf/id-preview-a7a94b56--c88f7719-c0c5-420f-915f-a154f8270b06.lovable.app-1784554479394.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/8a9ab1bd-6be9-4889-bd5d-1b5ee1a151bf/id-preview-a7a94b56--c88f7719-c0c5-420f-915f-a154f8270b06.lovable.app-1784554479394.png",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

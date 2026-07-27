@@ -49,7 +49,9 @@ export function UndoRedoControls() {
         aria-label="Undo"
         className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/70 transition hover:bg-black/[0.05] hover:text-black disabled:cursor-not-allowed disabled:text-black/25 disabled:hover:bg-transparent dark:text-white/70 dark:hover:bg-white/[0.06] dark:hover:text-white"
       >
-        <span aria-hidden className="text-base leading-none">↶</span>
+        <span aria-hidden className="text-base leading-none">
+          ↶
+        </span>
       </button>
       <button
         type="button"
@@ -59,7 +61,9 @@ export function UndoRedoControls() {
         aria-label="Redo"
         className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/70 transition hover:bg-black/[0.05] hover:text-black disabled:cursor-not-allowed disabled:text-black/25 disabled:hover:bg-transparent dark:text-white/70 dark:hover:bg-white/[0.06] dark:hover:text-white"
       >
-        <span aria-hidden className="text-base leading-none">↷</span>
+        <span aria-hidden className="text-base leading-none">
+          ↷
+        </span>
       </button>
     </div>
   );

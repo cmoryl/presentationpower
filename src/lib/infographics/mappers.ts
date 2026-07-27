@@ -78,10 +78,7 @@ export function specFromKpiDashboard(c: Ctx): InfographicSpec {
  * categorical spec. Enough to power the data drawer + alt-text for the
  * existing bespoke variants without changing their render.
  */
-export function specFromDashChart(
-  c: Ctx,
-  kind: InfographicSpec["kind"] = "line",
-): InfographicSpec {
+export function specFromDashChart(c: Ctx, kind: InfographicSpec["kind"] = "line"): InfographicSpec {
   const items = arr(c.content.items);
   const series = arr(c.content.series);
   const rows: InfographicRow[] =
@@ -93,11 +90,13 @@ export function specFromDashChart(
           }
           return flat;
         })
-      : items.map((it): InfographicRow => ({
-          label: s(it.label ?? it.category ?? it.name),
-          value: n(it.value) ?? s(it.value),
-          note: s(it.note),
-        }));
+      : items.map(
+          (it): InfographicRow => ({
+            label: s(it.label ?? it.category ?? it.name),
+            value: n(it.value) ?? s(it.value),
+            note: s(it.note),
+          }),
+        );
 
   return {
     id: `${c.variantId}-spec`,
@@ -106,9 +105,7 @@ export function specFromDashChart(
     subtitle: s(c.content.subtitle),
     data: { rows, source: s(c.content.source) || undefined },
     encoding:
-      series.length > 0
-        ? { x: "period", value: "value" }
-        : { label: "label", value: "value" },
+      series.length > 0 ? { x: "period", value: "value" } : { label: "label", value: "value" },
     theme: baseTheme(c),
     accessibility: { shortAlt: "", longDesc: "" },
     export: { preferredFormat: "svg", rasterFallback: true },

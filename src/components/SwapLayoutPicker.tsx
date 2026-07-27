@@ -6,7 +6,7 @@ import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import type { DeckSlide } from "@/lib/deck-store";
 
-type BrandMode = typeof BRAND_MODES[number];
+type BrandMode = (typeof BRAND_MODES)[number];
 
 export function SwapLayoutButton({
   slide,
@@ -65,7 +65,10 @@ export function SwapLayoutButton({
           >
             <div className="flex items-center justify-between gap-3 border-b border-black/10 px-6 py-4">
               <div>
-                <div id="swap-layout-title" className="text-xs uppercase tracking-widest text-black/50">
+                <div
+                  id="swap-layout-title"
+                  className="text-xs uppercase tracking-widest text-black/50"
+                >
                   Swap layout · {byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}
                 </div>
                 <div className="mt-1 text-sm text-black/70">
@@ -85,7 +88,11 @@ export function SwapLayoutButton({
                 {options.map((v) => {
                   const isCurrent = v.id === slide.variantId;
                   const sameFamily = v.familyId === currentFamilyId;
-                  const previewSlide: DeckSlide = { ...slide, variantId: v.id, layoutId: v.permittedLayoutIds[0] };
+                  const previewSlide: DeckSlide = {
+                    ...slide,
+                    variantId: v.id,
+                    layoutId: v.permittedLayoutIds[0],
+                  };
                   return (
                     <button
                       key={v.id}

@@ -37,8 +37,14 @@ function NewEntryView() {
           title,
           body,
           kind,
-          tags: tags.split(",").map((s) => s.trim()).filter(Boolean),
-          sources: sources.split("\n").map((s) => s.trim()).filter(Boolean),
+          tags: tags
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+          sources: sources
+            .split("\n")
+            .map((s) => s.trim())
+            .filter(Boolean),
           visibility,
           shared_with_division_ids: sharedWith,
           expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
@@ -55,36 +61,60 @@ function NewEntryView() {
         <div className="text-xs uppercase tracking-[0.3em] text-black/50">Knowledge</div>
         <h1 className="mt-3 text-4xl font-semibold">New entry</h1>
         <p className="mt-3 text-black/60">
-          Owned by one division. Share it with siblings or publish globally to make it discoverable across
-          TransPerfect.
+          Owned by one division. Share it with siblings or publish globally to make it discoverable
+          across TransPerfect.
         </p>
 
         <div className="mt-10 space-y-6 rounded-2xl border border-black/10 bg-white p-8">
           <Field label="Owner division">
-            <select value={owner} onChange={(e) => setOwner(e.target.value)} className={inputCls}>
+            <select
+              aria-label="Owner"
+              value={owner}
+              onChange={(e) => setOwner(e.target.value)}
+              className={inputCls}
+            >
               {BRAND_MODES.map((b) => (
-                <option key={b.id} value={b.id}>{b.name}</option>
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
               ))}
             </select>
           </Field>
 
           <div className="grid grid-cols-2 gap-6">
             <Field label="Kind">
-              <select value={kind} onChange={(e) => setKind(e.target.value as EditableKnowledgeKind)} className={inputCls}>
+              <select
+                aria-label="Kind"
+                value={kind}
+                onChange={(e) => setKind(e.target.value as EditableKnowledgeKind)}
+                className={inputCls}
+              >
                 {Object.entries(KNOWLEDGE_KIND_META)
                   .filter(([k]) => k !== "source_deck" && k !== "source_pdf")
                   .map(([k, m]) => (
-                    <option key={k} value={k}>{m.label} — {m.description}</option>
+                    <option key={k} value={k}>
+                      {m.label} — {m.description}
+                    </option>
                   ))}
               </select>
             </Field>
             <Field label="Expires (optional)">
-              <input type="date" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} className={inputCls} />
+              <input
+                type="date"
+                value={expiresAt}
+                onChange={(e) => setExpiresAt(e.target.value)}
+                className={inputCls}
+              />
             </Field>
           </div>
 
           <Field label="Title">
-            <input value={title} onChange={(e) => setTitle(e.target.value)} className={inputCls} placeholder="e.g. FDA eCTD submission SLAs" />
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className={inputCls}
+              placeholder="e.g. FDA eCTD submission SLAs"
+            />
           </Field>
 
           <Field label="Body">
@@ -99,10 +129,21 @@ function NewEntryView() {
 
           <div className="grid grid-cols-2 gap-6">
             <Field label="Tags (comma separated)">
-              <input value={tags} onChange={(e) => setTags(e.target.value)} className={inputCls} placeholder="pharma, fda, ectd" />
+              <input
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+                className={inputCls}
+                placeholder="pharma, fda, ectd"
+              />
             </Field>
             <Field label="Sources (one per line)">
-              <textarea value={sources} onChange={(e) => setSources(e.target.value)} rows={2} className={inputCls} placeholder="https://…" />
+              <textarea
+                value={sources}
+                onChange={(e) => setSources(e.target.value)}
+                rows={2}
+                className={inputCls}
+                placeholder="https://…"
+              />
             </Field>
           </div>
 
@@ -114,10 +155,16 @@ function NewEntryView() {
                   type="button"
                   onClick={() => setVisibility(v)}
                   className={`rounded-full border px-4 py-1.5 text-sm ${
-                    visibility === v ? "border-[#05041A] bg-[#05041A] text-white" : "border-black/15 bg-white text-black/70"
+                    visibility === v
+                      ? "border-[#05041A] bg-[#05041A] text-white"
+                      : "border-black/15 bg-white text-black/70"
                   }`}
                 >
-                  {v === "private" ? "Private to owner" : v === "shared" ? "Shared with selected divisions" : "Global (all divisions)"}
+                  {v === "private"
+                    ? "Private to owner"
+                    : v === "shared"
+                      ? "Shared with selected divisions"
+                      : "Global (all divisions)"}
                 </button>
               ))}
             </div>
@@ -129,7 +176,10 @@ function NewEntryView() {
                 {BRAND_MODES.filter((b) => b.id !== owner).map((b) => {
                   const on = sharedWith.includes(b.id);
                   return (
-                    <label key={b.id} className="flex items-center gap-2 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm">
+                    <label
+                      key={b.id}
+                      className="flex items-center gap-2 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm"
+                    >
                       <input
                         type="checkbox"
                         checked={on}
@@ -174,7 +224,8 @@ function NewEntryView() {
   );
 }
 
-const inputCls = "w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm outline-none focus:border-black/40";
+const inputCls =
+  "w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm outline-none focus:border-black/40";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

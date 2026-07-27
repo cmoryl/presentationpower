@@ -47,11 +47,7 @@ function loadBitmap(file: File): Promise<HTMLImageElement> {
 }
 
 // center-crop to the target aspect, then downscale to (targetW,targetH).
-function drawCoverCrop(
-  img: HTMLImageElement,
-  targetW: number,
-  targetH: number,
-): HTMLCanvasElement {
+function drawCoverCrop(img: HTMLImageElement, targetW: number, targetH: number): HTMLCanvasElement {
   const sw = img.naturalWidth;
   const sh = img.naturalHeight;
   const srcAspect = sw / sh;
@@ -86,7 +82,7 @@ function b64Bytes(dataUrl: string): number {
   const comma = dataUrl.indexOf(",");
   const b64 = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
   // 4 base64 chars => 3 bytes
-  const padding = (b64.match(/=+$/)?.[0]?.length ?? 0);
+  const padding = b64.match(/=+$/)?.[0]?.length ?? 0;
   return Math.floor((b64.length * 3) / 4) - padding;
 }
 

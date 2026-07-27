@@ -44,7 +44,6 @@ const PAIRINGS: Pairing[] = [
   { kind: "ink", onSlide: AA_NORMAL, onSurface: AA_NORMAL },
 ];
 
-
 describe("light-mode text contrast guard (preview ↔ export)", () => {
   it("exporter light-mode text colors match the preview token block byte-for-byte", () => {
     const drift: string[] = [];
@@ -131,6 +130,8 @@ describe("light-mode text contrast guard (preview ↔ export)", () => {
         }
       }
     }
-    expect(drift, `Contrast-ratio drift between preview and export:\n${drift.join("\n")}`).toEqual([]);
+    expect(drift, `Contrast-ratio drift between preview and export:\n${drift.join("\n")}`).toEqual(
+      [],
+    );
   });
 });

@@ -154,8 +154,7 @@ function AboutPage() {
     {
       kicker: "01 · Intake",
       title: "Structured briefs, not blank docs.",
-      body:
-        "Every deck starts from a brief that captures prospect, industry, meeting objective, audience, brand mode, and narrative archetype. The brief drives module selection downstream — nothing is chosen at random.",
+      body: "Every deck starts from a brief that captures prospect, industry, meeting objective, audience, brand mode, and narrative archetype. The brief drives module selection downstream — nothing is chosen at random.",
       bullets: [
         "Prospect, industry & audience fields",
         "Brand mode + narrative archetype",
@@ -167,8 +166,7 @@ function AboutPage() {
     {
       kicker: "02 · Master set",
       title: "One brief, every surface.",
-      body:
-        "Toggle Presentation, Print, Event kit, and Social kit in section 04 of the brief and fan out the whole brand set in one pass — every artifact links back to the same brief and knowledge context.",
+      body: "Toggle Presentation, Print, Event kit, and Social kit in section 04 of the brief and fan out the whole brand set in one pass — every artifact links back to the same brief and knowledge context.",
       bullets: [
         "Deck + Case study + Spotlight + EBrochure + Adaptor brief",
         "Event playbook attachment",
@@ -180,8 +178,7 @@ function AboutPage() {
     {
       kicker: "03 · Assemble",
       title: "Modular decks from a governed library.",
-      body:
-        "Assemble picks module variants across section frameworks — Opening, Context, Solution, Process, Proof, Decision, Close — and each variant declares which layouts, tokens, and icons it permits.",
+      body: "Assemble picks module variants across section frameworks — Opening, Context, Solution, Process, Proof, Decision, Close — and each variant declares which layouts, tokens, and icons it permits.",
       bullets: [
         `${MODULE_VARIANTS.length} variants across ${SECTION_FRAMEWORKS.length} sections`,
         "Layout & token constraints enforced at render",
@@ -193,8 +190,7 @@ function AboutPage() {
     {
       kicker: "04 · Live edit",
       title: "Edit directly on the preview.",
-      body:
-        "Click any text on the slide to edit in place. Toggle a single slide to light or dark, override ink color, and manage image / video / background from one unified Media panel per slide.",
+      body: "Click any text on the slide to edit in place. Toggle a single slide to light or dark, override ink color, and manage image / video / background from one unified Media panel per slide.",
       bullets: [
         "Per-slide light/dark toggle + ink override",
         "Unified Media panel (image · video · background)",
@@ -204,8 +200,7 @@ function AboutPage() {
     {
       kicker: "05 · Copilot",
       title: "Natural-language deck editing.",
-      body:
-        "A glass drawer in the editor accepts prompts and executes tool-use actions — add / edit / reorder slides, swap variants, rewrite copy. Every change flows through the same store as manual edits.",
+      body: "A glass drawer in the editor accepts prompts and executes tool-use actions — add / edit / reorder slides, swap variants, rewrite copy. Every change flows through the same store as manual edits.",
       bullets: [
         "Runs on the Lovable AI gateway",
         "Per-field change log with revert",
@@ -215,8 +210,7 @@ function AboutPage() {
     {
       kicker: "06 · Print Studio",
       title: "Long-form print, same brand system.",
-      body:
-        "Case studies, spotlights, ebrochures, and adaptor briefs with dnd-kit editing, drag-to-resize hero (20–80%), and a Content inspector that guarantees every schema field has an editing path.",
+      body: "Case studies, spotlights, ebrochures, and adaptor briefs with dnd-kit editing, drag-to-resize hero (20–80%), and a Content inspector that guarantees every schema field has an editing path.",
       bullets: [
         "Vector text via pdf-lib + Geist TTF embedding",
         "PPTX · PDF · self-contained HTML export",
@@ -228,8 +222,7 @@ function AboutPage() {
     {
       kicker: "07 · Events & Social",
       title: "Playbooks, not blank pages.",
-      body:
-        "8+ industry-standard event playbooks with full kit previews, and 9 division-scoped social playbooks filterable by launch / thought leadership / campaign / event angle.",
+      body: "8+ industry-standard event playbooks with full kit previews, and 9 division-scoped social playbooks filterable by launch / thought leadership / campaign / event angle.",
       bullets: [
         "Event kits: signage, invites, session decks",
         "Social kits reference existing modules",
@@ -241,8 +234,7 @@ function AboutPage() {
     {
       kicker: "08 · Import & export",
       title: "Faithful PPTX import, honest exports.",
-      body:
-        "Import up to 100 MB .pptx — master/layout inheritance and z-order are resolved, images are extracted, slides auto-map to variants. Exports render deterministic Aurora backdrops so files match previews.",
+      body: "Import up to 100 MB .pptx — master/layout inheritance and z-order are resolved, images are extracted, slides auto-map to variants. Exports render deterministic Aurora backdrops so files match previews.",
       bullets: [
         "PPTX vector text + Geist TTF embedding",
         "PDF, self-contained HTML, PNG (HD/4K)",
@@ -254,8 +246,7 @@ function AboutPage() {
     {
       kicker: "09 · Knowledge & Oracle",
       title: "Grounded on the owned corpus.",
-      body:
-        "Division PDFs and imported PPTX are chunked and embedded with gemini-embedding-001 (3072-dim). Oracle chat and Deep RAG synthesis run hybrid retrieval over the full corpus — no external BrandHub call at runtime.",
+      body: "Division PDFs and imported PPTX are chunked and embedded with gemini-embedding-001 (3072-dim). Oracle chat and Deep RAG synthesis run hybrid retrieval over the full corpus — no external BrandHub call at runtime.",
       bullets: [
         "Per-division PDF & PPTX embeddings",
         "Oracle knowledge chat with citations",
@@ -267,8 +258,7 @@ function AboutPage() {
     {
       kicker: "10 · Locations & data",
       title: "Maps, KPIs, and charts on one data model.",
-      body:
-        "Region Focus, Hub & Spoke, and World Stats share the same regional metric fields as the KPI dashboard and chart batches. Pin editor for placements and metrics; HD/4K PNG export.",
+      body: "Region Focus, Hub & Spoke, and World Stats share the same regional metric fields as the KPI dashboard and chart batches. Pin editor for placements and metrics; HD/4K PNG export.",
       bullets: [
         "Free-form Aurora v2 across data modules",
         "Bento KPI dashboard mosaic",
@@ -278,8 +268,7 @@ function AboutPage() {
     {
       kicker: "11 · Translate & rebrand",
       title: "Localize and retone non-destructively.",
-      body:
-        "AI/GlobalLink overlays translate a deck per-slide with retryable jobs. Rebrand re-applies any brand mode across every slide with a live preview and auto-snapshot rollback.",
+      body: "AI/GlobalLink overlays translate a deck per-slide with retryable jobs. Rebrand re-applies any brand mode across every slide with a live preview and auto-snapshot rollback.",
       bullets: [
         "Per-slide language status + localized exports",
         "GlobalLink connector at /admin/globallink",
@@ -291,8 +280,7 @@ function AboutPage() {
     {
       kicker: "12 · Collaboration & share",
       title: "Comments, reviews, share links.",
-      body:
-        "Threaded comments per slide, ReviewStatusControl for Draft → In review → Approved, and view-only /share/$token URLs with expiry, revocation, and per-link analytics.",
+      body: "Threaded comments per slide, ReviewStatusControl for Draft → In review → Approved, and view-only /share/$token URLs with expiry, revocation, and per-link analytics.",
       bullets: [
         "deck_comments with CommentsPanel",
         "Non-destructive version restore",
@@ -302,8 +290,7 @@ function AboutPage() {
     {
       kicker: "13 · Governance & Analytics",
       title: "Admin sidebar, master hubs, deep analytics.",
-      body:
-        "Left-sidebar admin shell with Overview, Analytics, Knowledge, Brand assets, Translation, Governance. Master Analytics tracks per-module usage, per-division activity, power users, hot modules, and trends over the usage_events pipeline.",
+      body: "Left-sidebar admin shell with Overview, Analytics, Knowledge, Brand assets, Translation, Governance. Master Analytics tracks per-module usage, per-division activity, power users, hot modules, and trends over the usage_events pipeline.",
       bullets: [
         "User roles in user_roles (RLS-safe)",
         "Icon Studio + LogoHub + Brand guides",
@@ -317,21 +304,42 @@ function AboutPage() {
   const surfaces: Array<{ to: string; label: string; blurb: string }> = [
     { to: "/", label: "Home", blurb: "Modular command center with mode hero and Oracle prompt." },
     { to: "/brief/new", label: "New brief", blurb: "Master brief — fan out into every surface." },
-    { to: "/library", label: "Presentation", blurb: "Module library, decks, multi-select assembly." },
+    {
+      to: "/library",
+      label: "Presentation",
+      blurb: "Module library, decks, multi-select assembly.",
+    },
     { to: "/atlas", label: "Atlas", blurb: "Every module variant grouped by family & section." },
-    { to: "/library/print", label: "Print", blurb: "Case study, spotlight, ebrochure, adaptor brief." },
+    {
+      to: "/library/print",
+      label: "Print",
+      blurb: "Case study, spotlight, ebrochure, adaptor brief.",
+    },
     { to: "/events", label: "Event", blurb: "Event playbooks and full kit previews." },
     { to: "/social", label: "Social", blurb: "Division-scoped social playbooks and kits." },
     { to: "/templates", label: "Templates", blurb: "Team template gallery from duplicated decks." },
-    { to: "/knowledge", label: "Knowledge", blurb: "Oracle KB, brand guides, glossary, ask Oracle." },
-    { to: "/admin", label: "Admin", blurb: "Sidebar hubs — analytics, knowledge, brand, translation, governance." },
-    { to: "/admin/analytics", label: "Master analytics", blurb: "Usage, trends, power users, hot modules." },
-    { to: "/admin/globallink", label: "GlobalLink", blurb: "Translation connector config & status." },
+    {
+      to: "/knowledge",
+      label: "Knowledge",
+      blurb: "Oracle KB, brand guides, glossary, ask Oracle.",
+    },
+    {
+      to: "/admin",
+      label: "Admin",
+      blurb: "Sidebar hubs — analytics, knowledge, brand, translation, governance.",
+    },
+    {
+      to: "/admin/analytics",
+      label: "Master analytics",
+      blurb: "Usage, trends, power users, hot modules.",
+    },
+    {
+      to: "/admin/globallink",
+      label: "GlobalLink",
+      blurb: "Translation connector config & status.",
+    },
     { to: "/faq", label: "FAQ", blurb: "Step-by-step basics and common questions." },
   ];
-
-
-
 
   return (
     <AppShell>
@@ -345,9 +353,9 @@ function AboutPage() {
               </h1>
               <p className="mt-4 max-w-3xl text-lg text-black/65">
                 One brief fans out into every surface. This page documents the systems underneath —
-                master briefs, modules, brand governance, print studio, event & social kits, translation,
-                knowledge, live editing, Copilot, and analytics — so anyone new to the platform can
-                orient in one read.
+                master briefs, modules, brand governance, print studio, event & social kits,
+                translation, knowledge, live editing, Copilot, and analytics — so anyone new to the
+                platform can orient in one read.
               </p>
             </div>
             <Link
@@ -361,20 +369,12 @@ function AboutPage() {
       </header>
 
       <div className="mx-auto max-w-6xl">
-
         {/* Live stats */}
         <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {stats.map((s) => (
-            <div
-              key={s.label}
-              className="rounded-2xl border border-black/10 bg-white p-5"
-            >
-              <div className="text-4xl font-semibold tracking-tight text-[#003FC7]">
-                {s.value}
-              </div>
-              <div className="mt-1 text-xs uppercase tracking-widest text-black/50">
-                {s.label}
-              </div>
+            <div key={s.label} className="rounded-2xl border border-black/10 bg-white p-5">
+              <div className="text-4xl font-semibold tracking-tight text-[#003FC7]">{s.value}</div>
+              <div className="mt-1 text-xs uppercase tracking-widest text-black/50">{s.label}</div>
             </div>
           ))}
         </div>
@@ -383,16 +383,11 @@ function AboutPage() {
         <section className="mt-16">
           <div className="flex items-baseline justify-between">
             <h2 className="text-3xl font-semibold tracking-tight">How the platform works</h2>
-            <div className="text-xs uppercase tracking-widest text-black/50">
-              End-to-end
-            </div>
+            <div className="text-xs uppercase tracking-widest text-black/50">End-to-end</div>
           </div>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             {pillars.map((p) => (
-              <article
-                key={p.kicker}
-                className="rounded-2xl border border-black/10 bg-white p-6"
-              >
+              <article key={p.kicker} className="rounded-2xl border border-black/10 bg-white p-6">
                 <div className="text-[10px] font-medium uppercase tracking-widest text-[#003FC7]">
                   {p.kicker}
                 </div>
@@ -476,9 +471,9 @@ function AboutPage() {
               </div>
               <h2 className="mt-3 text-2xl font-semibold">Built on a modern edge stack.</h2>
               <p className="mt-3 text-sm text-white/70">
-                TanStack Start on Cloudflare Workers, React 19, Tailwind v4, Zustand for the
-                client deck state, Supabase for auth &amp; persistence, and pptxgenjs for
-                client-side PowerPoint export.
+                TanStack Start on Cloudflare Workers, React 19, Tailwind v4, Zustand for the client
+                deck state, Supabase for auth &amp; persistence, and pptxgenjs for client-side
+                PowerPoint export.
               </p>
             </div>
             <ul className="grid gap-2 text-sm text-white/80">

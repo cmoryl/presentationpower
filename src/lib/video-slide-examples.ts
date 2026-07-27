@@ -39,7 +39,8 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
     key: "cover-media-global-ops",
     variantId: "MV-OP-COVER-MEDIA",
     title: "Cover · Global Operations",
-    blurb: "Full-bleed cinematic cover with a motion backdrop — ideal for opening a global-operations narrative.",
+    blurb:
+      "Full-bleed cinematic cover with a motion backdrop — ideal for opening a global-operations narrative.",
     content: {
       kicker: "Global Operations · 2026",
       title: "Localization at the speed of your business.",
@@ -54,7 +55,8 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
     key: "cover-editorial-launch",
     variantId: "MV-OP-COVER-EDITORIAL",
     title: "Cover · Editorial Launch",
-    blurb: "Editorial hero with kicker + oversized headline over ambient motion — for keynote and campaign kick-offs.",
+    blurb:
+      "Editorial hero with kicker + oversized headline over ambient motion — for keynote and campaign kick-offs.",
     content: {
       kicker: "Client Kick-off",
       title: "A single partner for every market you enter.",
@@ -68,7 +70,8 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
     key: "cover-split-partnership",
     variantId: "MV-OP-COVER-SPLIT",
     title: "Cover · Split Partnership",
-    blurb: "Split hero — copy on one side, motion panel on the other. Great for opening a co-branded pitch.",
+    blurb:
+      "Split hero — copy on one side, motion panel on the other. Great for opening a co-branded pitch.",
     content: {
       kicker: "Strategic Partnership",
       title: "Built for regulated industries at global scale.",
@@ -82,7 +85,8 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
     key: "img-full-bleed-vision",
     variantId: "MV-IMG-FULL-BLEED",
     title: "Image · Full-Bleed Vision",
-    blurb: "Edge-to-edge motion with a small overlay caption — for vision statements and section dividers.",
+    blurb:
+      "Edge-to-edge motion with a small overlay caption — for vision statements and section dividers.",
     content: {
       title: "Everywhere your customer is.",
       caption: "24 offices · 90 countries · one operating model.",
@@ -94,7 +98,8 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
     key: "img-split-workflow",
     variantId: "MV-IMG-SPLIT",
     title: "Image · Split Workflow",
-    blurb: "50/50 split — narrative copy alongside a looping process shot. Best for workflow or capability slides.",
+    blurb:
+      "50/50 split — narrative copy alongside a looping process shot. Best for workflow or capability slides.",
     content: {
       kicker: "How it works",
       title: "One orchestration layer. Every content type.",
@@ -107,7 +112,8 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
     key: "img-caption-scale",
     variantId: "MV-IMG-CAPTION",
     title: "Image · Caption at Scale",
-    blurb: "Motion panel with a supporting caption block — for proof points about volume, speed, or reach.",
+    blurb:
+      "Motion panel with a supporting caption block — for proof points about volume, speed, or reach.",
     content: {
       title: "Localization at scale, without the seams.",
       caption:
@@ -121,7 +127,8 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
     key: "img-portrait-leader",
     variantId: "MV-IMG-PORTRAIT",
     title: "Image · Portrait Leader",
-    blurb: "Portrait-oriented motion frame with name + role — for leadership intros and case-lead spotlights.",
+    blurb:
+      "Portrait-oriented motion frame with name + role — for leadership intros and case-lead spotlights.",
     content: {
       name: "Alex Rivera",
       role: "Global Program Director",
@@ -135,7 +142,8 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
     key: "img-quote-bg-client",
     variantId: "MV-IMG-QUOTE-BG",
     title: "Image · Client Quote",
-    blurb: "Client quote layered over an ambient motion background — for testimonial and proof moments.",
+    blurb:
+      "Client quote layered over an ambient motion background — for testimonial and proof moments.",
     content: {
       quote:
         "TransPerfect became the localization backbone for every product launch we run — no exceptions.",

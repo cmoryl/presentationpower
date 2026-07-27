@@ -10,7 +10,11 @@ export const Route = createFileRoute("/knowledge/ask")({
   head: () => ({
     meta: [
       { title: "Ask Oracle · TransPerfect Modular" },
-      { name: "description", content: "Chat with the TransPerfect knowledge base — cited answers from Oracle, KB, and brand assets." },
+      {
+        name: "description",
+        content:
+          "Chat with the TransPerfect knowledge base — cited answers from Oracle, KB, and brand assets.",
+      },
     ],
   }),
   component: OracleAskView,
@@ -42,8 +46,12 @@ function OracleAskView() {
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => { inputRef.current?.focus(); }, []);
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, busy]);
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, busy]);
 
   // Seed from a home-page prompt handoff (sessionStorage).
   useEffect(() => {
@@ -53,7 +61,9 @@ function OracleAskView() {
     window.sessionStorage.removeItem("oracle:seed");
     setInput(seed);
     // Fire-and-forget on next tick so `send` is in scope.
-    const t = window.setTimeout(() => { void send(seed); }, 30);
+    const t = window.setTimeout(() => {
+      void send(seed);
+    }, 30);
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -79,7 +89,16 @@ function OracleAskView() {
         setErr(res.error);
         setMessages([...optimistic, { role: "assistant", content: `Sorry — ${res.error}` }]);
       } else {
-        setMessages([...optimistic, { role: "assistant", content: res.reply, sources: res.sources, fallbackNote: res.fallbackNote, setup: res.setup }]);
+        setMessages([
+          ...optimistic,
+          {
+            role: "assistant",
+            content: res.reply,
+            sources: res.sources,
+            fallbackNote: res.fallbackNote,
+            setup: res.setup,
+          },
+        ]);
       }
     } catch (e) {
       setErr((e as Error).message);
@@ -94,7 +113,9 @@ function OracleAskView() {
       <div className="mx-auto max-w-3xl px-6 py-10">
         <div className="mb-6 flex items-center justify-between gap-4">
           <div>
-            <div className="text-[10px] uppercase tracking-[0.3em] text-black/50 dark:text-white/50">Knowledge</div>
+            <div className="text-[10px] uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
+              Knowledge
+            </div>
             <h1 className="mt-1 flex items-center gap-2 text-3xl font-semibold tracking-tight text-[#03002C] dark:text-white">
               <Sparkles size={20} className="text-[#003FC7] dark:text-[#A1FBF9]" />
               Ask Oracle
@@ -112,7 +133,9 @@ function OracleAskView() {
             >
               <option value="master">All divisions</option>
               {BRAND_MODES.map((m) => (
-                <option key={m.id} value={m.id}>{m.name}</option>
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                </option>
               ))}
             </select>
           </label>
@@ -120,7 +143,9 @@ function OracleAskView() {
 
         {messages.length === 0 && (
           <div className="mb-6 rounded-2xl border border-black/10 bg-white/60 p-5 backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">
-            <div className="mb-3 text-[10px] uppercase tracking-widest text-black/50 dark:text-white/50">Try a starter</div>
+            <div className="mb-3 text-[10px] uppercase tracking-widest text-black/50 dark:text-white/50">
+              Try a starter
+            </div>
             <div className="flex flex-wrap gap-2">
               {STARTERS.map((s) => (
                 <button
@@ -128,7 +153,9 @@ function OracleAskView() {
                   type="button"
                   onClick={() => send(s)}
                   className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/80 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:bg-white/[0.05] dark:text-white/80 dark:hover:border-[#A1FBF9] dark:hover:text-[#A1FBF9]"
-                >{s}</button>
+                >
+                  {s}
+                </button>
               ))}
             </div>
           </div>
@@ -145,13 +172,18 @@ function OracleAskView() {
             </div>
           )}
           {err && (
-            <div className="rounded-md border border-red-200 bg-red-50 p-2 text-xs text-red-700">{err}</div>
+            <div className="rounded-md border border-red-200 bg-red-50 p-2 text-xs text-red-700">
+              {err}
+            </div>
           )}
           <div ref={endRef} />
         </div>
 
         <form
-          onSubmit={(e) => { e.preventDefault(); send(input); }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            send(input);
+          }}
           className="sticky bottom-6 mt-6 flex items-end gap-2 rounded-2xl border border-black/10 bg-white/80 p-3 backdrop-blur-xl dark:border-white/10 dark:bg-[#07061F]/70"
         >
           <textarea
@@ -159,7 +191,10 @@ function OracleAskView() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(input); }
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                send(input);
+              }
             }}
             rows={2}
             maxLength={2000}
@@ -193,8 +228,11 @@ function MessageBubble({ msg }: { msg: ChatMsg }) {
         <div className="whitespace-pre-wrap leading-relaxed">{msg.content}</div>
         {!isUser && msg.setup && (
           <div className="mt-3 rounded-md border border-amber-400/60 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900 dark:border-amber-400/40 dark:bg-amber-500/10 dark:text-amber-200">
-            <div className="font-semibold uppercase tracking-wider text-[10px] mb-1">AI setup needed</div>
-            Add <code className="font-mono">ANTHROPIC_API_KEY</code> in Project Settings → Secrets to enable synthesized answers. Showing raw top matches instead.
+            <div className="font-semibold uppercase tracking-wider text-[10px] mb-1">
+              AI setup needed
+            </div>
+            Add <code className="font-mono">ANTHROPIC_API_KEY</code> in Project Settings → Secrets
+            to enable synthesized answers. Showing raw top matches instead.
           </div>
         )}
         {!isUser && !msg.setup && msg.fallbackNote && (
@@ -219,7 +257,15 @@ function SourceChip({ src }: { src: OracleSource }) {
   const cls =
     "inline-flex items-center gap-1 rounded-full border border-black/10 bg-black/[0.03] px-2 py-0.5 text-[10px] text-black/70 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:bg-white/[0.05] dark:text-white/70 dark:hover:border-[#A1FBF9] dark:hover:text-[#A1FBF9]";
   if (src.href) {
-    return <a href={src.href} className={cls}>{label}</a>;
+    return (
+      <a href={src.href} className={cls}>
+        {label}
+      </a>
+    );
   }
-  return <span className={cls} title={src.id}>{label}</span>;
+  return (
+    <span className={cls} title={src.id}>
+      {label}
+    </span>
+  );
 }

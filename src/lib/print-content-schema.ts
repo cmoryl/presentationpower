@@ -28,13 +28,29 @@ export type EnumOption = { value: string; label: string };
 
 export type FieldSpec =
   /** Scalar text field. `multiline` renders a textarea, otherwise an input. */
-  | { kind: "string"; path: string; label: string; multiline?: boolean; placeholder?: string; optional?: boolean }
+  | {
+      kind: "string";
+      path: string;
+      label: string;
+      multiline?: boolean;
+      placeholder?: string;
+      optional?: boolean;
+    }
   /** Small controlled enum (e.g. logoColor auto|black|white). */
   | { kind: "enum"; path: string; label: string; options: EnumOption[]; optional?: boolean }
   /** A nested object with its own scalar children. */
   | { kind: "object"; path: string; label: string; fields: FieldSpec[]; optional?: boolean }
   /** Array of strings — add/remove/reorder plaintext rows. */
-  | { kind: "stringArray"; path: string; label: string; itemLabel?: string; placeholder?: string; optional?: boolean; minItems?: number; maxItems?: number }
+  | {
+      kind: "stringArray";
+      path: string;
+      label: string;
+      itemLabel?: string;
+      placeholder?: string;
+      optional?: boolean;
+      minItems?: number;
+      maxItems?: number;
+    }
   /** Array of objects — each row edited via nested FieldSpecs. */
   | {
       kind: "objectArray";
@@ -66,8 +82,20 @@ const LOGO_COLOR_OPTIONS: EnumOption[] = [
 /** Fields common to every kind — the header eyebrow + lockup override. */
 function headerFields(): FieldSpec[] {
   return [
-    { kind: "string", path: "eyebrow", label: "Eyebrow", placeholder: "e.g. Case study", optional: true },
-    { kind: "enum", path: "logoColor", label: "Lockup ink", options: LOGO_COLOR_OPTIONS, optional: true },
+    {
+      kind: "string",
+      path: "eyebrow",
+      label: "Eyebrow",
+      placeholder: "e.g. Case study",
+      optional: true,
+    },
+    {
+      kind: "enum",
+      path: "logoColor",
+      label: "Lockup ink",
+      options: LOGO_COLOR_OPTIONS,
+      optional: true,
+    },
   ];
 }
 
@@ -77,12 +105,18 @@ const statItemFields: FieldSpec[] = [
   { kind: "string", path: "value", label: "Value", placeholder: "62" },
   { kind: "string", path: "unit", label: "Unit", placeholder: "% / M / x", optional: true },
   { kind: "string", path: "delta", label: "Delta", placeholder: "+12%", optional: true },
-  { kind: "enum", path: "trend", label: "Trend", options: [
-    { value: "", label: "—" },
-    { value: "up", label: "Up" },
-    { value: "down", label: "Down" },
-    { value: "flat", label: "Flat" },
-  ], optional: true },
+  {
+    kind: "enum",
+    path: "trend",
+    label: "Trend",
+    options: [
+      { value: "", label: "—" },
+      { value: "up", label: "Up" },
+      { value: "down", label: "Down" },
+      { value: "flat", label: "Flat" },
+    ],
+    optional: true,
+  },
   { kind: "string", path: "caption", label: "Caption", optional: true },
 ];
 
@@ -90,7 +124,13 @@ const emptyStat = () => ({ label: "", value: "", unit: "", delta: "", trend: "",
 
 /** {text, author, role?, company?} — pull-quote. */
 const quoteFields: FieldSpec[] = [
-  { kind: "string", path: "text", label: "Quote", multiline: true, placeholder: "They didn't just translate our content…" },
+  {
+    kind: "string",
+    path: "text",
+    label: "Quote",
+    multiline: true,
+    placeholder: "They didn't just translate our content…",
+  },
   { kind: "string", path: "author", label: "Author", placeholder: "VP of Global Marketing" },
   { kind: "string", path: "role", label: "Role", optional: true },
   { kind: "string", path: "company", label: "Company", optional: true },
@@ -114,34 +154,97 @@ export const CASE_STUDY_SCHEMA: ContentSchema = {
     { kind: "string", path: "industry", label: "Industry", optional: true },
     { kind: "string", path: "audience", label: "Audience", optional: true },
     { kind: "string", path: "summary", label: "Summary", multiline: true, optional: true },
-    { kind: "object", path: "challenge", label: "Challenge", fields: [
-      { kind: "string", path: "heading", label: "Heading" },
-      { kind: "string", path: "body", label: "Body", multiline: true },
-    ]},
-    { kind: "object", path: "solution", label: "Approach", fields: [
-      { kind: "string", path: "heading", label: "Heading" },
-      { kind: "string", path: "body", label: "Body", multiline: true },
-    ]},
-    { kind: "object", path: "result", label: "Outcome", fields: [
-      { kind: "string", path: "heading", label: "Heading" },
-      { kind: "string", path: "body", label: "Body", multiline: true },
-    ]},
-    { kind: "objectArray", path: "stats", label: "Stats", itemLabel: "Stat", itemFactory: emptyStat, itemFields: statItemFields, minItems: 0, maxItems: 6 },
+    {
+      kind: "object",
+      path: "challenge",
+      label: "Challenge",
+      fields: [
+        { kind: "string", path: "heading", label: "Heading" },
+        { kind: "string", path: "body", label: "Body", multiline: true },
+      ],
+    },
+    {
+      kind: "object",
+      path: "solution",
+      label: "Approach",
+      fields: [
+        { kind: "string", path: "heading", label: "Heading" },
+        { kind: "string", path: "body", label: "Body", multiline: true },
+      ],
+    },
+    {
+      kind: "object",
+      path: "result",
+      label: "Outcome",
+      fields: [
+        { kind: "string", path: "heading", label: "Heading" },
+        { kind: "string", path: "body", label: "Body", multiline: true },
+      ],
+    },
+    {
+      kind: "objectArray",
+      path: "stats",
+      label: "Stats",
+      itemLabel: "Stat",
+      itemFactory: emptyStat,
+      itemFields: statItemFields,
+      minItems: 0,
+      maxItems: 6,
+    },
     { kind: "object", path: "quote", label: "Pull quote", optional: true, fields: quoteFields },
-    { kind: "object", path: "expert", label: "Expert / contact", optional: true, fields: expertFields },
-    { kind: "object", path: "cta", label: "Call to action", optional: true, fields: [
-      { kind: "string", path: "label", label: "Label", placeholder: "Start a conversation" },
-      { kind: "string", path: "url", label: "URL", optional: true },
-      { kind: "string", path: "subhead", label: "Subhead", optional: true },
-      { kind: "string", path: "buttonLabel", label: "Button label", optional: true },
-    ]},
-    { kind: "object", path: "engagement", label: "Engagement snapshot", optional: true, fields: [
-      { kind: "string", path: "title", label: "Title", optional: true },
-      { kind: "stringArray", path: "bullets", label: "Bullets", itemLabel: "Bullet", minItems: 0, maxItems: 6 },
-    ]},
-    { kind: "object", path: "footer", label: "Footer links", optional: true, fields: [
-      { kind: "stringArray", path: "links", label: "Links", itemLabel: "Link", placeholder: "https://…", minItems: 0, maxItems: 4 },
-    ]},
+    {
+      kind: "object",
+      path: "expert",
+      label: "Expert / contact",
+      optional: true,
+      fields: expertFields,
+    },
+    {
+      kind: "object",
+      path: "cta",
+      label: "Call to action",
+      optional: true,
+      fields: [
+        { kind: "string", path: "label", label: "Label", placeholder: "Start a conversation" },
+        { kind: "string", path: "url", label: "URL", optional: true },
+        { kind: "string", path: "subhead", label: "Subhead", optional: true },
+        { kind: "string", path: "buttonLabel", label: "Button label", optional: true },
+      ],
+    },
+    {
+      kind: "object",
+      path: "engagement",
+      label: "Engagement snapshot",
+      optional: true,
+      fields: [
+        { kind: "string", path: "title", label: "Title", optional: true },
+        {
+          kind: "stringArray",
+          path: "bullets",
+          label: "Bullets",
+          itemLabel: "Bullet",
+          minItems: 0,
+          maxItems: 6,
+        },
+      ],
+    },
+    {
+      kind: "object",
+      path: "footer",
+      label: "Footer links",
+      optional: true,
+      fields: [
+        {
+          kind: "stringArray",
+          path: "links",
+          label: "Links",
+          itemLabel: "Link",
+          placeholder: "https://…",
+          minItems: 0,
+          maxItems: 4,
+        },
+      ],
+    },
   ],
 };
 
@@ -150,24 +253,55 @@ export const SPOTLIGHT_SCHEMA: ContentSchema = {
   label: "Product spotlight",
   fields: [
     ...headerFields(),
-    { kind: "string", path: "productName", label: "Product name", placeholder: "GlobalLink Connect" },
+    {
+      kind: "string",
+      path: "productName",
+      label: "Product name",
+      placeholder: "GlobalLink Connect",
+    },
     { kind: "string", path: "tagline", label: "Tagline", placeholder: "Enterprise localization…" },
     { kind: "string", path: "summary", label: "Summary", multiline: true, optional: true },
-    { kind: "objectArray", path: "capabilities", label: "Capabilities", itemLabel: "Capability",
+    {
+      kind: "objectArray",
+      path: "capabilities",
+      label: "Capabilities",
+      itemLabel: "Capability",
       itemFactory: () => ({ heading: "", body: "" }),
       itemFields: [
         { kind: "string", path: "heading", label: "Heading" },
         { kind: "string", path: "body", label: "Body", multiline: true },
       ],
-      minItems: 1, maxItems: 6,
+      minItems: 1,
+      maxItems: 6,
     },
-    { kind: "objectArray", path: "stats", label: "Stats", itemLabel: "Stat", itemFactory: emptyStat, itemFields: statItemFields, minItems: 0, maxItems: 6 },
+    {
+      kind: "objectArray",
+      path: "stats",
+      label: "Stats",
+      itemLabel: "Stat",
+      itemFactory: emptyStat,
+      itemFields: statItemFields,
+      minItems: 0,
+      maxItems: 6,
+    },
     { kind: "object", path: "quote", label: "Pull quote", optional: true, fields: quoteFields },
-    { kind: "object", path: "expert", label: "Expert / contact", optional: true, fields: expertFields },
-    { kind: "object", path: "cta", label: "Call to action", optional: true, fields: [
-      { kind: "string", path: "label", label: "Label" },
-      { kind: "string", path: "url", label: "URL", optional: true },
-    ]},
+    {
+      kind: "object",
+      path: "expert",
+      label: "Expert / contact",
+      optional: true,
+      fields: expertFields,
+    },
+    {
+      kind: "object",
+      path: "cta",
+      label: "Call to action",
+      optional: true,
+      fields: [
+        { kind: "string", path: "label", label: "Label" },
+        { kind: "string", path: "url", label: "URL", optional: true },
+      ],
+    },
   ],
 };
 
@@ -178,26 +312,66 @@ export const EBROCHURE_SCHEMA: ContentSchema = {
     ...headerFields(),
     { kind: "string", path: "title", label: "Title" },
     { kind: "string", path: "summary", label: "Summary", multiline: true, optional: true },
-    { kind: "objectArray", path: "sections", label: "Sections", itemLabel: "Section",
+    {
+      kind: "objectArray",
+      path: "sections",
+      label: "Sections",
+      itemLabel: "Section",
       itemFactory: () => ({ heading: "", body: "", bullets: [] }),
       itemFields: [
         { kind: "string", path: "heading", label: "Heading" },
         { kind: "string", path: "body", label: "Body", multiline: true },
-        { kind: "stringArray", path: "bullets", label: "Bullets", itemLabel: "Bullet", minItems: 0, maxItems: 6 },
+        {
+          kind: "stringArray",
+          path: "bullets",
+          label: "Bullets",
+          itemLabel: "Bullet",
+          minItems: 0,
+          maxItems: 6,
+        },
       ],
-      minItems: 1, maxItems: 4,
+      minItems: 1,
+      maxItems: 4,
     },
-    { kind: "objectArray", path: "stats", label: "Stats", itemLabel: "Stat", itemFactory: emptyStat, itemFields: statItemFields, minItems: 0, maxItems: 6 },
+    {
+      kind: "objectArray",
+      path: "stats",
+      label: "Stats",
+      itemLabel: "Stat",
+      itemFactory: emptyStat,
+      itemFields: statItemFields,
+      minItems: 0,
+      maxItems: 6,
+    },
     { kind: "object", path: "quote", label: "Pull quote", optional: true, fields: quoteFields },
-    { kind: "object", path: "discover", label: "Discover panel", optional: true, fields: [
-      { kind: "string", path: "body", label: "Body", multiline: true },
-      { kind: "stringArray", path: "bullets", label: "Bullets", itemLabel: "Bullet", minItems: 0, maxItems: 6 },
-    ]},
-    { kind: "object", path: "cta", label: "Call to action", optional: true, fields: [
-      { kind: "string", path: "label", label: "Label" },
-      { kind: "string", path: "url", label: "URL", optional: true },
-      { kind: "string", path: "subhead", label: "Subhead", optional: true },
-    ]},
+    {
+      kind: "object",
+      path: "discover",
+      label: "Discover panel",
+      optional: true,
+      fields: [
+        { kind: "string", path: "body", label: "Body", multiline: true },
+        {
+          kind: "stringArray",
+          path: "bullets",
+          label: "Bullets",
+          itemLabel: "Bullet",
+          minItems: 0,
+          maxItems: 6,
+        },
+      ],
+    },
+    {
+      kind: "object",
+      path: "cta",
+      label: "Call to action",
+      optional: true,
+      fields: [
+        { kind: "string", path: "label", label: "Label" },
+        { kind: "string", path: "url", label: "URL", optional: true },
+        { kind: "string", path: "subhead", label: "Subhead", optional: true },
+      ],
+    },
   ],
 };
 
@@ -208,20 +382,38 @@ export const ADAPTOR_BRIEF_SCHEMA: ContentSchema = {
     ...headerFields(),
     { kind: "string", path: "title", label: "Title" },
     { kind: "string", path: "summary", label: "Summary", multiline: true, optional: true },
-    { kind: "objectArray", path: "features", label: "Features", itemLabel: "Feature",
+    {
+      kind: "objectArray",
+      path: "features",
+      label: "Features",
+      itemLabel: "Feature",
       itemFactory: () => ({ verb: "", body: "" }),
       itemFields: [
         { kind: "string", path: "verb", label: "Verb", placeholder: "Supports" },
         { kind: "string", path: "body", label: "Body", multiline: true },
       ],
-      minItems: 1, maxItems: 6,
+      minItems: 1,
+      maxItems: 6,
     },
-    { kind: "stringArray", path: "knowHow", label: "We know how", itemLabel: "Point", minItems: 0, maxItems: 8 },
+    {
+      kind: "stringArray",
+      path: "knowHow",
+      label: "We know how",
+      itemLabel: "Point",
+      minItems: 0,
+      maxItems: 8,
+    },
     { kind: "object", path: "quote", label: "Pull quote", optional: true, fields: quoteFields },
-    { kind: "object", path: "cta", label: "Call to action", optional: true, fields: [
-      { kind: "string", path: "label", label: "Label" },
-      { kind: "string", path: "url", label: "URL", optional: true },
-    ]},
+    {
+      kind: "object",
+      path: "cta",
+      label: "Call to action",
+      optional: true,
+      fields: [
+        { kind: "string", path: "label", label: "Label" },
+        { kind: "string", path: "url", label: "URL", optional: true },
+      ],
+    },
   ],
 };
 
@@ -269,10 +461,14 @@ export function fieldMatcherFromSchema(schema: ContentSchema): (leafPath: string
             switch (child.kind) {
               case "string":
               case "enum":
-                specPatterns.push(new RegExp("^" + escapeRegex(rendered).replace("__i__", "\\d+") + "$"));
+                specPatterns.push(
+                  new RegExp("^" + escapeRegex(rendered).replace("__i__", "\\d+") + "$"),
+                );
                 break;
               case "stringArray":
-                specPatterns.push(new RegExp("^" + escapeRegex(rendered).replace("__i__", "\\d+") + "\\[\\d+\\]$"));
+                specPatterns.push(
+                  new RegExp("^" + escapeRegex(rendered).replace("__i__", "\\d+") + "\\[\\d+\\]$"),
+                );
                 break;
               case "object":
                 // Rare — recurse.
@@ -364,10 +560,13 @@ export function fullyPopulatedSample(kind: PrintAssetKind): Record<string, unkno
   const heroMedia = { imageUrl: "https://example/img.jpg" };
   if (kind === "case-study") {
     return {
-      ...emptyCaseStudy({
+      ...(emptyCaseStudy({
         eyebrow: "Case study",
         logoColor: "black" as PrintLogoColor,
-        client: "C", industry: "I", audience: "A", summary: "S",
+        client: "C",
+        industry: "I",
+        audience: "A",
+        summary: "S",
         stats,
         quote,
         expert,
@@ -376,7 +575,7 @@ export function fullyPopulatedSample(kind: PrintAssetKind): Record<string, unkno
         footer: { links: ["https://a", "https://b"] },
         heroMedia,
         modules: [],
-      }) as unknown as Record<string, unknown>,
+      }) as unknown as Record<string, unknown>),
     };
   }
   if (kind === "spotlight") {
@@ -386,7 +585,10 @@ export function fullyPopulatedSample(kind: PrintAssetKind): Record<string, unkno
       productName: "P",
       tagline: "T",
       summary: "S",
-      capabilities: [{ heading: "H1", body: "B1" }, { heading: "H2", body: "B2" }],
+      capabilities: [
+        { heading: "H1", body: "B1" },
+        { heading: "H2", body: "B2" },
+      ],
       stats,
       quote,
       expert,

@@ -7,11 +7,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 // Pages that live outside /admin/* but are linked from the admin console.
 // When the user reaches them from an admin context, keep the admin sidebar visible.
-const ADMIN_LINKED_PATTERNS = [
-  /^\/analytics(\/|$)/,
-  /^\/templates(\/|$)/,
-  /^\/knowledge(\/|$)/,
-];
+const ADMIN_LINKED_PATTERNS = [/^\/analytics(\/|$)/, /^\/templates(\/|$)/, /^\/knowledge(\/|$)/];
 
 function matchesAdminLinked(pathname: string): boolean {
   return ADMIN_LINKED_PATTERNS.some((re) => re.test(pathname));
@@ -31,7 +27,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   // the default styles without requiring a hard refresh.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    try { window.localStorage.removeItem("tp:contrast-boost"); } catch { /* ignore */ }
+    try {
+      window.localStorage.removeItem("tp:contrast-boost");
+    } catch {
+      /* ignore */
+    }
     document.documentElement.classList.remove("contrast-boost");
   }, []);
 
@@ -51,12 +51,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   const showAdminChrome = !inAdmin && isAdminLinked && adminCtx;
   const themes: { id: ThemeMode; label: string }[] = [
     { id: "light", label: "Light" },
-    { id: "dark",  label: "Dark" },
+    { id: "dark", label: "Dark" },
   ];
   const nav = [
     { to: "/", label: "Dashboard" },
     { to: "/brief/new", label: "New brief" },
-    
+
     { to: "/library", label: "Presentation" },
     { to: "/library/print", label: "Print" },
     { to: "/events", label: "Event" },
@@ -64,7 +64,10 @@ export function AppShell({ children }: { children: ReactNode }) {
 
     { to: "/admin", label: "Admin" },
   ] as const;
-  const adminGroups: ReadonlyArray<{ label: string; items: ReadonlyArray<{ to: string; label: string }> }> = [
+  const adminGroups: ReadonlyArray<{
+    label: string;
+    items: ReadonlyArray<{ to: string; label: string }>;
+  }> = [
     {
       label: "Overview",
       items: [
@@ -125,7 +128,6 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/faq", label: "FAQ" },
   ] as const;
 
-
   // Sleek liquid-glass pills — hairline rings, gradient wash on active, no drop-shadow stacks.
   const pillIdle =
     "relative text-black/65 hover:text-black hover:bg-white/40 " +
@@ -175,16 +177,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         />
         <div className="relative mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-4 px-4 py-4 lg:flex-row lg:px-8 lg:py-5">
           <Link to="/" className="flex min-w-0 items-center gap-3">
-            <span
-              className="h-2 w-8 shrink-0 bg-[#E85A2C] dark:!bg-transparent"
-              style={{}}
-            />
+            <span className="h-2 w-8 shrink-0 bg-[#E85A2C] dark:!bg-transparent" style={{}} />
             <span
               aria-hidden
               className="hidden h-3 w-8 shrink-0 rounded-full dark:!block"
               style={{
-                background:
-                  "linear-gradient(90deg, #A1FBF9 0%, #7A5CFF 55%, #0057FF 100%)",
+                background: "linear-gradient(90deg, #A1FBF9 0%, #7A5CFF 55%, #0057FF 100%)",
                 boxShadow: "0 0 12px rgba(122,92,255,0.55)",
               }}
             />
@@ -211,7 +209,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                       onClick={() => setAdminOpen(false)}
                     >
                       {n.label}
-                      <span aria-hidden className="text-[10px]">▾</span>
+                      <span aria-hidden className="text-[10px]">
+                        ▾
+                      </span>
                     </Link>
                     {adminOpen && (
                       <div className="absolute left-1/2 top-full z-50 w-[720px] max-w-[92vw] -translate-x-1/2 pt-2">
@@ -285,7 +285,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                 );
               })}
             </div>
-
           </nav>
         </div>
       </header>
@@ -307,7 +306,9 @@ export function AppShell({ children }: { children: ReactNode }) {
       </main>
       <footer className="border-t border-black/10 bg-[#E8E4DC]/60 dark:!border-white/[0.06] dark:!bg-[#07061F]/70">
         <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-4 px-8 py-8 md:flex-row">
-          <div className="text-xs text-black/50 dark:text-white/50">TransPerfect Modular · Built for sales enablement</div>
+          <div className="text-xs text-black/50 dark:text-white/50">
+            TransPerfect Modular · Built for sales enablement
+          </div>
           <nav className="flex items-center gap-1">
             {footerNav.map((n) => {
               const active = pathname === n.to;

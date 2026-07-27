@@ -62,9 +62,9 @@ function IconStudio() {
         </div>
         <h2 className="mt-2 text-3xl font-semibold">Icon Studio</h2>
         <p className="mt-2 max-w-2xl text-sm text-black/60 dark:text-white/60">
-          The single source of truth for icons in TransPerfect decks. Placement,
-          treatment, emphasis and sizing live here — as does the full local
-          library of 111,000+ icons ported from BrandHUB.
+          The single source of truth for icons in TransPerfect decks. Placement, treatment, emphasis
+          and sizing live here — as does the full local library of 111,000+ icons ported from
+          BrandHUB.
         </p>
       </header>
 
@@ -135,32 +135,54 @@ function SystemTab() {
   return (
     <div className="space-y-12">
       <div className="flex flex-wrap gap-2 text-xs">
-        <Link to="/atlas" className="rounded-full border border-black/15 px-3 py-1.5 text-black/70 hover:border-black/40 dark:border-white/15 dark:text-white/70">
+        <Link
+          to="/atlas"
+          className="rounded-full border border-black/15 px-3 py-1.5 text-black/70 hover:border-black/40 dark:border-white/15 dark:text-white/70"
+        >
           View in Atlas →
         </Link>
-        <Link to="/knowledge/brand-guides" className="rounded-full border border-black/15 px-3 py-1.5 text-black/70 hover:border-black/40 dark:border-white/15 dark:text-white/70">
+        <Link
+          to="/knowledge/brand-guides"
+          className="rounded-full border border-black/15 px-3 py-1.5 text-black/70 hover:border-black/40 dark:border-white/15 dark:text-white/70"
+        >
           Brand guide · Hero Icons →
         </Link>
       </div>
 
       <section>
-        <SectionHead eyebrow="01" title="Module family marks" sub="One representative glyph per module family — wayfinding in Atlas cards, library filters and section chips." />
+        <SectionHead
+          eyebrow="01"
+          title="Module family marks"
+          sub="One representative glyph per module family — wayfinding in Atlas cards, library filters and section chips."
+        />
         <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
           {Object.values(MODULE_FAMILY_ICONS).map((f) => {
             const c = resolveEmphasisColors(MASTER, "soft-tile", f.emphasis);
             const Icon = f.Icon;
             return (
-              <div key={f.id} className="rounded-2xl border border-black/10 bg-white/70 p-4 backdrop-blur dark:border-white/10 dark:bg-white/5">
+              <div
+                key={f.id}
+                className="rounded-2xl border border-black/10 bg-white/70 p-4 backdrop-blur dark:border-white/10 dark:bg-white/5"
+              >
                 <div className="flex items-center gap-3">
-                  <div className="grid h-12 w-12 place-items-center rounded-xl" style={{ background: c.bg }}>
+                  <div
+                    className="grid h-12 w-12 place-items-center rounded-xl"
+                    style={{ background: c.bg }}
+                  >
                     <Icon size={22} color={c.fg} />
                   </div>
                   <div>
-                    <div className="text-xs font-semibold uppercase tracking-widest text-black/60 dark:text-white/60">{f.id}</div>
-                    <div className="text-xs capitalize text-black/50 dark:text-white/50">{f.emphasis}</div>
+                    <div className="text-xs font-semibold uppercase tracking-widest text-black/60 dark:text-white/60">
+                      {f.id}
+                    </div>
+                    <div className="text-xs capitalize text-black/50 dark:text-white/50">
+                      {f.emphasis}
+                    </div>
                   </div>
                 </div>
-                <div className="mt-3 text-xs leading-relaxed text-black/70 dark:text-white/70">{f.rationale}</div>
+                <div className="mt-3 text-xs leading-relaxed text-black/70 dark:text-white/70">
+                  {f.rationale}
+                </div>
               </div>
             );
           })}
@@ -168,17 +190,28 @@ function SystemTab() {
       </section>
 
       <section>
-        <SectionHead eyebrow="02" title="Placements" sub="Where icons sit relative to text and content." />
+        <SectionHead
+          eyebrow="02"
+          title="Placements"
+          sub="Where icons sit relative to text and content."
+        />
         <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
           {ICON_PLACEMENTS_META.map((p) => {
             const d = PLACEMENT_DEFAULTS[p.id];
             return (
-              <div key={p.id} className="rounded-2xl border border-black/10 bg-white/70 p-5 backdrop-blur dark:border-white/10 dark:bg-white/5">
+              <div
+                key={p.id}
+                className="rounded-2xl border border-black/10 bg-white/70 p-5 backdrop-blur dark:border-white/10 dark:bg-white/5"
+              >
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="text-sm font-semibold">{p.name}</div>
-                    <div className="mt-1 text-xs text-black/60 dark:text-white/60">{p.description}</div>
-                    <div className="mt-2 text-[11px] uppercase tracking-widest text-black/40 dark:text-white/40">Typical in</div>
+                    <div className="mt-1 text-xs text-black/60 dark:text-white/60">
+                      {p.description}
+                    </div>
+                    <div className="mt-2 text-[11px] uppercase tracking-widest text-black/40 dark:text-white/40">
+                      Typical in
+                    </div>
                     <div className="text-xs text-black/70 dark:text-white/70">{p.typicalIn}</div>
                   </div>
                   <div className="shrink-0">
@@ -187,7 +220,11 @@ function SystemTab() {
                         None
                       </div>
                     ) : (
-                      <Tile treatment={d.treatment} emphasis={d.emphasis} size={p.id === "watermark" || p.id === "standalone-hero" ? "lg" : d.size} />
+                      <Tile
+                        treatment={d.treatment}
+                        emphasis={d.emphasis}
+                        size={p.id === "watermark" || p.id === "standalone-hero" ? "lg" : d.size}
+                      />
                     )}
                   </div>
                 </div>
@@ -210,30 +247,51 @@ function SystemTab() {
             <div
               key={t.id}
               className="rounded-2xl border border-black/10 bg-white/70 p-4 backdrop-blur dark:border-white/10 dark:bg-white/5"
-              style={{ background: t.id === "on-dark" ? "#03002C" : undefined, color: t.id === "on-dark" ? "white" : undefined }}
+              style={{
+                background: t.id === "on-dark" ? "#03002C" : undefined,
+                color: t.id === "on-dark" ? "white" : undefined,
+              }}
             >
               <div className="flex items-center justify-center py-2">
-                <Tile treatment={t.id} emphasis={t.id === "on-dark" ? "inverse" : "accent"} size="md" />
+                <Tile
+                  treatment={t.id}
+                  emphasis={t.id === "on-dark" ? "inverse" : "accent"}
+                  size="md"
+                />
               </div>
               <div className="mt-3 text-sm font-semibold">{t.name}</div>
-              <div className="mt-1 text-xs" style={{ color: t.id === "on-dark" ? "rgba(255,255,255,0.7)" : undefined }}>{t.description}</div>
+              <div
+                className="mt-1 text-xs"
+                style={{ color: t.id === "on-dark" ? "rgba(255,255,255,0.7)" : undefined }}
+              >
+                {t.description}
+              </div>
             </div>
           ))}
         </div>
       </section>
 
       <section>
-        <SectionHead eyebrow="04" title="Emphasis" sub="Color role mapped against active brand tokens." />
+        <SectionHead
+          eyebrow="04"
+          title="Emphasis"
+          sub="Color role mapped against active brand tokens."
+        />
         <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
           {ICON_EMPHASIS_META.map((e) => {
             const c = resolveEmphasisColors(MASTER, "soft-tile", e.id);
             return (
-              <div key={e.id} className="rounded-2xl border border-black/10 bg-white/70 p-4 text-center backdrop-blur dark:border-white/10 dark:bg-white/5">
+              <div
+                key={e.id}
+                className="rounded-2xl border border-black/10 bg-white/70 p-4 text-center backdrop-blur dark:border-white/10 dark:bg-white/5"
+              >
                 <div className="mx-auto flex items-center justify-center">
                   <Tile treatment="soft-tile" emphasis={e.id} size="md" />
                 </div>
                 <div className="mt-3 text-sm font-semibold">{e.name}</div>
-                <div className="mt-1 font-mono text-[10px] text-black/50 dark:text-white/50">{c.fg}</div>
+                <div className="mt-1 font-mono text-[10px] text-black/50 dark:text-white/50">
+                  {c.fg}
+                </div>
               </div>
             );
           })}
@@ -261,9 +319,13 @@ function SystemTab() {
                 return (
                   <tr key={size}>
                     <td className="px-4 py-3 font-mono text-xs">{size}</td>
-                    <td className="px-4 py-3"><Tile treatment="soft-tile" emphasis="accent" size={size} /></td>
+                    <td className="px-4 py-3">
+                      <Tile treatment="soft-tile" emphasis="accent" size={size} />
+                    </td>
                     <td className="px-4 py-3 text-black/70 dark:text-white/70">{s.glyphPx}px</td>
-                    <td className="px-4 py-3 text-black/70 dark:text-white/70">{s.containerPx}px</td>
+                    <td className="px-4 py-3 text-black/70 dark:text-white/70">
+                      {s.containerPx}px
+                    </td>
                     <td className="px-4 py-3 text-black/70 dark:text-white/70">{s.gapPx}px</td>
                     <td className="px-4 py-3 text-black/70 dark:text-white/70">{s.radiusPx}px</td>
                     <td className="px-4 py-3 text-black/70 dark:text-white/70">1.75</td>
@@ -292,7 +354,11 @@ function CuratedTab() {
 
   return (
     <section className="space-y-4">
-      <SectionHead eyebrow="Q1" title="Curated Lucide marks" sub="Hand-picked default set used by the deck editor's icon picker. Names are stable; use them directly in module overrides." />
+      <SectionHead
+        eyebrow="Q1"
+        title="Curated Lucide marks"
+        sub="Hand-picked default set used by the deck editor's icon picker. Names are stable; use them directly in module overrides."
+      />
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <div className="rounded-2xl border border-black/10 bg-white/70 p-3 backdrop-blur dark:border-white/10 dark:bg-white/5">
           <div className="grid grid-cols-6 gap-1 md:grid-cols-10 lg:grid-cols-12">
@@ -327,11 +393,22 @@ function CuratedTab() {
               </div>
               <div className="font-mono text-xs">{selected}</div>
               <div className="space-y-1.5">
-                <CopyButton label="Copy name" active={copied === "name"} onClick={() => doCopy("name", selected)} />
-                <CopyButton label="Copy picker reference" active={copied === "ref"} onClick={() => doCopy("ref", selected)} />
+                <CopyButton
+                  label="Copy name"
+                  active={copied === "name"}
+                  onClick={() => doCopy("name", selected)}
+                />
+                <CopyButton
+                  label="Copy picker reference"
+                  active={copied === "ref"}
+                  onClick={() => doCopy("ref", selected)}
+                />
               </div>
               <p className="text-[11px] leading-relaxed text-black/55 dark:text-white/55">
-                Paste this name into any module's <code className="rounded bg-black/5 px-1 dark:bg-white/10">iconOverride</code> field, or into the icon picker on any deck cell. The Variant Renderer resolves it via <code className="rounded bg-black/5 px-1 dark:bg-white/10">iconByName</code>.
+                Paste this name into any module's{" "}
+                <code className="rounded bg-black/5 px-1 dark:bg-white/10">iconOverride</code>{" "}
+                field, or into the icon picker on any deck cell. The Variant Renderer resolves it
+                via <code className="rounded bg-black/5 px-1 dark:bg-white/10">iconByName</code>.
               </p>
             </div>
           ) : (
@@ -382,13 +459,15 @@ function PacksTab() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="text-sm font-semibold">{p.name}</div>
-                <div className="mt-0.5 font-mono text-[10px] text-black/45 dark:text-white/45">{p.id}</div>
+                <div className="mt-0.5 font-mono text-[10px] text-black/45 dark:text-white/45">
+                  {p.id}
+                </div>
               </div>
               <div className="text-right">
-                <div className="text-xl font-semibold tabular-nums">
-                  {p.count.toLocaleString()}
+                <div className="text-xl font-semibold tabular-nums">{p.count.toLocaleString()}</div>
+                <div className="text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40">
+                  icons
                 </div>
-                <div className="text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40">icons</div>
               </div>
             </div>
             <div className="mt-3 flex flex-wrap items-center gap-1 text-[10px] uppercase tracking-widest text-black/55 dark:text-white/55">
@@ -451,13 +530,17 @@ function PackDetail({
           <div>
             <div className="text-sm font-semibold">{meta?.name ?? packId}</div>
             <div className="text-[11px] text-black/50 dark:text-white/50">
-              {meta?.license}{meta?.author ? ` · ${meta.author}` : ""}
+              {meta?.license}
+              {meta?.author ? ` · ${meta.author}` : ""}
             </div>
           </div>
         </div>
         <input
           value={query}
-          onChange={(e) => { setQuery(e.target.value); setVisible(300); }}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setVisible(300);
+          }}
           placeholder={`Search ${meta?.count.toLocaleString() ?? ""} icons`}
           className="w-64 rounded-full border border-black/15 bg-white px-4 py-1.5 text-xs focus:border-[#003FC7] focus:outline-none dark:border-white/15 dark:bg-white/5"
         />
@@ -467,19 +550,20 @@ function PackDetail({
         <div
           onScroll={(e) => {
             const el = e.currentTarget;
-            if (
-              el.scrollTop + el.clientHeight >= el.scrollHeight - 200 &&
-              visible < names.length
-            ) {
+            if (el.scrollTop + el.clientHeight >= el.scrollHeight - 200 && visible < names.length) {
               setVisible((c) => Math.min(c + 300, names.length));
             }
           }}
           className="max-h-[70vh] overflow-y-auto rounded-2xl border border-black/10 bg-white/70 p-3 backdrop-blur dark:border-white/10 dark:bg-white/5"
         >
           {loading ? (
-            <div className="grid place-items-center py-16 text-xs text-black/50 dark:text-white/50">Loading pack…</div>
+            <div className="grid place-items-center py-16 text-xs text-black/50 dark:text-white/50">
+              Loading pack…
+            </div>
           ) : names.length === 0 ? (
-            <div className="grid place-items-center py-16 text-xs text-black/50 dark:text-white/50">No matches.</div>
+            <div className="grid place-items-center py-16 text-xs text-black/50 dark:text-white/50">
+              No matches.
+            </div>
           ) : (
             <>
               <div className="grid grid-cols-6 gap-1 md:grid-cols-8 lg:grid-cols-10">
@@ -500,18 +584,15 @@ function PackDetail({
               </div>
               {visible < names.length && (
                 <div className="mt-3 text-center text-[11px] text-black/40 dark:text-white/40">
-                  Showing {visible.toLocaleString()} of {names.length.toLocaleString()} — scroll for more
+                  Showing {visible.toLocaleString()} of {names.length.toLocaleString()} — scroll for
+                  more
                 </div>
               )}
             </>
           )}
         </div>
 
-        <PreviewPanel
-          pack={pack}
-          packId={packId}
-          selected={selected}
-        />
+        <PreviewPanel pack={pack} packId={packId} selected={selected} />
       </div>
     </section>
   );
@@ -669,12 +750,16 @@ function PreviewPanel({
             <IconRenderer pack={packId} name={selected} size={size * 2} color={color} />
           </div>
           <div>
-            <div className="font-mono text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40">Reference</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40">
+              Reference
+            </div>
             <div className="mt-0.5 break-all font-mono text-xs">{ref}</div>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <label className="text-xs">
-              <div className="text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40">Size</div>
+              <div className="text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40">
+                Size
+              </div>
               <input
                 type="number"
                 value={size}
@@ -683,7 +768,9 @@ function PreviewPanel({
               />
             </label>
             <label className="text-xs">
-              <div className="text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40">Color</div>
+              <div className="text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40">
+                Color
+              </div>
               <input
                 type="color"
                 value={color}
@@ -703,7 +790,9 @@ function PreviewPanel({
               label="Copy SVG"
               active={copied === "svg"}
               disabled={!pack || !icon}
-              onClick={() => pack && icon && doCopy("svg", iconSvgMarkup(pack, icon, { size, color }))}
+              onClick={() =>
+                pack && icon && doCopy("svg", iconSvgMarkup(pack, icon, { size, color }))
+              }
             />
             <CopyButton
               label="Copy name only"
@@ -712,7 +801,9 @@ function PreviewPanel({
             />
           </div>
           <p className="text-[11px] leading-relaxed text-black/55 dark:text-white/55">
-            Paste the reference into any module's icon override field. Variant Renderer resolves <code className="rounded bg-black/5 px-1 dark:bg-white/10">pack:name</code> refs via <code className="rounded bg-black/5 px-1 dark:bg-white/10">parseIconRef</code>.
+            Paste the reference into any module's icon override field. Variant Renderer resolves{" "}
+            <code className="rounded bg-black/5 px-1 dark:bg-white/10">pack:name</code> refs via{" "}
+            <code className="rounded bg-black/5 px-1 dark:bg-white/10">parseIconRef</code>.
           </p>
         </div>
       ) : (
@@ -767,8 +858,8 @@ function CopyButton({
         active
           ? "bg-[#A6FA87] text-[#03002C]"
           : primary
-          ? "bg-[#003FC7] text-white hover:bg-[#03002C]"
-          : "bg-[#03002C] text-white hover:bg-[#003FC7]"
+            ? "bg-[#003FC7] text-white hover:bg-[#03002C]"
+            : "bg-[#03002C] text-white hover:bg-[#003FC7]"
       }`}
     >
       {active ? "Copied ✓" : label}

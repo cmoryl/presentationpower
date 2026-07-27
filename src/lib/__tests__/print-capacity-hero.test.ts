@@ -55,7 +55,10 @@ describe("hero cost model", () => {
 
   it("a shorter hero (or no copy) returns units to the module budget", () => {
     const short: PrintHeroMedia = { ...heroBaseline, heightPct: 30 };
-    const noCopy = effectiveModuleBudget("case-study", short, { hasTitle: false, hasSummary: false });
+    const noCopy = effectiveModuleBudget("case-study", short, {
+      hasTitle: false,
+      hasSummary: false,
+    });
     expect(noCopy).toBeGreaterThan(PRINT_TEMPLATE_BUDGETS["case-study"].moduleBudget);
   });
 
@@ -74,8 +77,26 @@ describe("hero cost model", () => {
   it("canAddModule honours the hero-aware effective budget", () => {
     const bigHero: PrintHeroMedia = { ...heroBaseline, heightPct: 70 };
     const modules = [
-      { id: "a", kind: "stats", variantId: "kpi-dashboard-portrait", items: [{ label: "x", value: "1" }, { label: "y", value: "2" }, { label: "z", value: "3" }] },
-      { id: "b", kind: "stats", variantId: "kpi-dashboard-portrait", items: [{ label: "x", value: "1" }, { label: "y", value: "2" }, { label: "z", value: "3" }] },
+      {
+        id: "a",
+        kind: "stats",
+        variantId: "kpi-dashboard-portrait",
+        items: [
+          { label: "x", value: "1" },
+          { label: "y", value: "2" },
+          { label: "z", value: "3" },
+        ],
+      },
+      {
+        id: "b",
+        kind: "stats",
+        variantId: "kpi-dashboard-portrait",
+        items: [
+          { label: "x", value: "1" },
+          { label: "y", value: "2" },
+          { label: "z", value: "3" },
+        ],
+      },
     ] as never;
     const withHero = canAddModule("case-study", modules, 1.6, {
       heroMedia: bigHero,
@@ -86,24 +107,60 @@ describe("hero cost model", () => {
   });
 
   it("maxHeroHeightPct shrinks as module load grows", () => {
-    const light = maxHeroHeightPct("case-study", 1.6, heroBaseline, { hasTitle: true, hasSummary: true });
-    const heavy = maxHeroHeightPct("case-study", 5.0, heroBaseline, { hasTitle: true, hasSummary: true });
+    const light = maxHeroHeightPct("case-study", 1.6, heroBaseline, {
+      hasTitle: true,
+      hasSummary: true,
+    });
+    const heavy = maxHeroHeightPct("case-study", 5.0, heroBaseline, {
+      hasTitle: true,
+      hasSummary: true,
+    });
     expect(light).toBeGreaterThan(heavy);
     expect(heavy).toBeGreaterThanOrEqual(HERO_HEIGHT_HARD_MIN);
     expect(light).toBeLessThanOrEqual(HERO_HEIGHT_HARD_MAX);
   });
 
   it("maxHeroHeightPct never returns below hard floor even when overloaded", () => {
-    const clamp = maxHeroHeightPct("case-study", 999, heroBaseline, { hasTitle: true, hasSummary: true });
+    const clamp = maxHeroHeightPct("case-study", 999, heroBaseline, {
+      hasTitle: true,
+      hasSummary: true,
+    });
     expect(clamp).toBe(HERO_HEIGHT_HARD_MIN);
   });
 
   it("suggestions surface reduce-hero when modules push past the effective budget", () => {
     // Heavy modules + a tall hero → block, with a reduce-hero suggestion.
     const modules = [
-      { id: "a", kind: "stats", variantId: "kpi-dashboard-portrait", items: [{ label: "x", value: "1" }, { label: "y", value: "2" }, { label: "z", value: "3" }] },
-      { id: "b", kind: "stats", variantId: "kpi-dashboard-portrait", items: [{ label: "x", value: "1" }, { label: "y", value: "2" }, { label: "z", value: "3" }] },
-      { id: "c", kind: "stats", variantId: "stat-bento-portrait", items: [{ label: "x", value: "1" }, { label: "y", value: "2" }, { label: "z", value: "3" }] },
+      {
+        id: "a",
+        kind: "stats",
+        variantId: "kpi-dashboard-portrait",
+        items: [
+          { label: "x", value: "1" },
+          { label: "y", value: "2" },
+          { label: "z", value: "3" },
+        ],
+      },
+      {
+        id: "b",
+        kind: "stats",
+        variantId: "kpi-dashboard-portrait",
+        items: [
+          { label: "x", value: "1" },
+          { label: "y", value: "2" },
+          { label: "z", value: "3" },
+        ],
+      },
+      {
+        id: "c",
+        kind: "stats",
+        variantId: "stat-bento-portrait",
+        items: [
+          { label: "x", value: "1" },
+          { label: "y", value: "2" },
+          { label: "z", value: "3" },
+        ],
+      },
     ];
     const content = {
       ...emptyCaseStudy(),

@@ -2,7 +2,19 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Loader2, ExternalLink, Send, Image as ImageIcon, FileText, ChevronRight, X, Check, Wrench, Upload, RefreshCw } from "lucide-react";
+import {
+  Loader2,
+  ExternalLink,
+  Send,
+  Image as ImageIcon,
+  FileText,
+  ChevronRight,
+  X,
+  Check,
+  Wrench,
+  Upload,
+  RefreshCw,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { BRAND_MODES } from "@/lib/taxonomy";
@@ -22,14 +34,21 @@ import {
 } from "@/lib/imported-decks.functions";
 import { listDivisionImagery } from "@/lib/division-imagery.functions";
 
-
 export const Route = createFileRoute("/library/imported")({
   head: () => ({
     meta: [
       { title: "Imported Slides · Library" },
-      { name: "description", content: "Browse imported PPTX slides, assess layout and look, and promote them into the approved module library." },
+      {
+        name: "description",
+        content:
+          "Browse imported PPTX slides, assess layout and look, and promote them into the approved module library.",
+      },
       { property: "og:title", content: "Imported Slides · Library" },
-      { property: "og:description", content: "Staging area for imported PPTX slides before they become approved module variants." },
+      {
+        property: "og:description",
+        content:
+          "Staging area for imported PPTX slides before they become approved module variants.",
+      },
     ],
   }),
   component: ImportedLibrary,
@@ -87,11 +106,15 @@ function ImportedLibrary() {
     <AppShell>
       <div>
         <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library · Imported</div>
-        <div className="mt-3"><LibrarySubnav active="/library/imported" /></div>
+        <div className="mt-3">
+          <LibrarySubnav active="/library/imported" />
+        </div>
         <h1 className="mt-4 text-4xl font-semibold text-[#03002C]">Imported slide staging.</h1>
 
         <p className="mt-3 max-w-2xl text-black/60">
-          Every PPTX you upload lands here first. Inspect layout, hierarchy and imagery, then promote the strongest slides into the approved module library so the assembler can reuse them.
+          Every PPTX you upload lands here first. Inspect layout, hierarchy and imagery, then
+          promote the strongest slides into the approved module library so the assembler can reuse
+          them.
         </p>
       </div>
 
@@ -104,7 +127,10 @@ function ImportedLibrary() {
             <button
               key={bm.id}
               type="button"
-              onClick={() => { setBrandModeId(bm.id); setActiveDeckId(null); }}
+              onClick={() => {
+                setBrandModeId(bm.id);
+                setActiveDeckId(null);
+              }}
               className={`rounded-full px-3 py-1.5 text-xs transition ${
                 active
                   ? "bg-[#03002C] text-white"
@@ -132,7 +158,10 @@ function ImportedLibrary() {
           ) : decks.length === 0 ? (
             <div className="rounded-lg border border-dashed border-black/15 bg-white p-6 text-sm text-black/50">
               No decks imported for this scope yet. Upload a PPTX from{" "}
-              <Link to="/admin/knowledge" className="text-[#003FC7] underline">Admin → Knowledge</Link>.
+              <Link to="/admin/knowledge" className="text-[#003FC7] underline">
+                Admin → Knowledge
+              </Link>
+              .
             </div>
           ) : (
             decks.map((d) => {
@@ -148,7 +177,9 @@ function ImportedLibrary() {
                       : "border-black/10 bg-white hover:border-black/25"
                   }`}
                 >
-                  <div className="truncate text-sm font-medium text-[#03002C]">{d.original_filename}</div>
+                  <div className="truncate text-sm font-medium text-[#03002C]">
+                    {d.original_filename}
+                  </div>
                   <div className="mt-1 flex items-center gap-2 text-xs text-black/50">
                     <span>{d.slide_count} slides</span>
                     <span>·</span>
@@ -196,15 +227,23 @@ function ImportedLibrary() {
           onClose={() => setPreviewSlideIdx(null)}
         />
       )}
-
     </AppShell>
   );
 }
 
 function themeToTokens(theme?: {
-  accent1?: string; accent2?: string; accent3?: string; accent4?: string; accent5?: string; accent6?: string;
-  dark1?: string; dark2?: string; light1?: string; light2?: string;
-  hlink?: string; folHlink?: string;
+  accent1?: string;
+  accent2?: string;
+  accent3?: string;
+  accent4?: string;
+  accent5?: string;
+  accent6?: string;
+  dark1?: string;
+  dark2?: string;
+  light1?: string;
+  light2?: string;
+  hlink?: string;
+  folHlink?: string;
 }): Record<string, string> | undefined {
   if (!theme) return undefined;
   const t: Record<string, string> = {};
@@ -214,10 +253,22 @@ function themeToTokens(theme?: {
   if (theme.accent4) t.accent4 = theme.accent4;
   if (theme.accent5) t.accent5 = theme.accent5;
   if (theme.accent6) t.accent6 = theme.accent6;
-  if (theme.dark1) { t.dk1 = theme.dark1; t.tx1 = theme.dark1; }
-  if (theme.dark2) { t.dk2 = theme.dark2; t.tx2 = theme.dark2; }
-  if (theme.light1) { t.lt1 = theme.light1; t.bg1 = theme.light1; }
-  if (theme.light2) { t.lt2 = theme.light2; t.bg2 = theme.light2; }
+  if (theme.dark1) {
+    t.dk1 = theme.dark1;
+    t.tx1 = theme.dark1;
+  }
+  if (theme.dark2) {
+    t.dk2 = theme.dark2;
+    t.tx2 = theme.dark2;
+  }
+  if (theme.light1) {
+    t.lt1 = theme.light1;
+    t.bg1 = theme.light1;
+  }
+  if (theme.light2) {
+    t.lt2 = theme.light2;
+    t.bg2 = theme.light2;
+  }
   if (theme.hlink) t.hlink = theme.hlink;
   if (theme.folHlink) t.folHlink = theme.folHlink;
   return Object.keys(t).length ? t : undefined;
@@ -228,7 +279,9 @@ function EmptyState() {
     <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-dashed border-black/15 bg-white text-center">
       <FileText size={24} className="text-foreground/25" />
       <div className="mt-3 text-sm font-medium text-[#03002C]">Select an imported deck</div>
-      <div className="mt-1 text-xs text-black/50">Its slides will appear here as inspectable cards.</div>
+      <div className="mt-1 text-xs text-black/50">
+        Its slides will appear here as inspectable cards.
+      </div>
     </div>
   );
 }
@@ -251,10 +304,20 @@ type DeckSlidesData = {
   original_filename: string;
   slide_count: number;
   theme: {
-    accent1?: string; accent2?: string; accent3?: string; accent4?: string; accent5?: string; accent6?: string;
-    dark1?: string; dark2?: string; light1?: string; light2?: string;
-    hlink?: string; folHlink?: string;
-    headingFont?: string; bodyFont?: string;
+    accent1?: string;
+    accent2?: string;
+    accent3?: string;
+    accent4?: string;
+    accent5?: string;
+    accent6?: string;
+    dark1?: string;
+    dark2?: string;
+    light1?: string;
+    light2?: string;
+    hlink?: string;
+    folHlink?: string;
+    headingFont?: string;
+    bodyFont?: string;
   };
   slides: ImportedSlide[];
   status: string;
@@ -263,7 +326,6 @@ type DeckSlidesData = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   extras?: any;
 };
-
 
 function DeckSlides({
   deck,
@@ -296,7 +358,10 @@ function DeckSlides({
             <span>{deck.slide_count} slides</span>
             {deck.theme?.accent1 && (
               <span className="inline-flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-full border border-black/10" style={{ background: deck.theme.accent1 }} />
+                <span
+                  className="h-3 w-3 rounded-full border border-black/10"
+                  style={{ background: deck.theme.accent1 }}
+                />
                 accent
               </span>
             )}
@@ -308,14 +373,22 @@ function DeckSlides({
             type="button"
             onClick={() => reparse.mutate()}
             disabled={reparse.isPending}
-            title={missingLayouts > 0 ? `${missingLayouts} slides missing layout — re-extract from original .pptx` : "Re-extract layouts, shapes and charts from the original .pptx"}
+            title={
+              missingLayouts > 0
+                ? `${missingLayouts} slides missing layout — re-extract from original .pptx`
+                : "Re-extract layouts, shapes and charts from the original .pptx"
+            }
             className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs disabled:opacity-60 ${
               missingLayouts > 0
                 ? "border-[#003FC7] bg-[#003FC7] text-white hover:opacity-90"
                 : "border-black/15 bg-white text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
             }`}
           >
-            {reparse.isPending ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
+            {reparse.isPending ? (
+              <Loader2 size={12} className="animate-spin" />
+            ) : (
+              <RefreshCw size={12} />
+            )}
             {reparse.isPending
               ? "Re-extracting…"
               : missingLayouts > 0
@@ -363,7 +436,6 @@ function DeckSlides({
         />
       )}
 
-
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {deck.slides.map((s) => (
           <SlideCard
@@ -404,7 +476,8 @@ function SlideCard({
   const qc = useQueryClient();
 
   const send = useMutation({
-    mutationFn: () => sendFn({ data: { importedDeckId: deckId, slideIndex: slide.index, brandModeId } }),
+    mutationFn: () =>
+      sendFn({ data: { importedDeckId: deckId, slideIndex: slide.index, brandModeId } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["approved-library-examples", brandModeId] });
     },
@@ -430,7 +503,13 @@ function SlideCard({
         aria-label={`Preview slide ${slide.index + 1}`}
       >
         {slide.layout ? (
-          <FaithfulSlideCanvas layout={slide.layout} theme={deckTheme} width={320} assets={slide.assets} fonts={deckFonts} />
+          <FaithfulSlideCanvas
+            layout={slide.layout}
+            theme={deckTheme}
+            width={320}
+            assets={slide.assets}
+            fonts={deckFonts}
+          />
         ) : (
           <div className="flex aspect-[16/9] w-full items-center justify-center bg-black/[0.02] text-[10px] text-black/40">
             No layout captured
@@ -442,11 +521,12 @@ function SlideCard({
         {slide.title || <span className="italic text-black/40">Untitled</span>}
       </div>
 
-
       {slide.bullets.length > 0 && (
         <ul className="mt-3 space-y-1 text-xs text-black/60">
           {slide.bullets.slice(0, 3).map((b, i) => (
-            <li key={i} className="line-clamp-1">• {b}</li>
+            <li key={i} className="line-clamp-1">
+              • {b}
+            </li>
           ))}
           {slide.bullets.length > 3 && (
             <li className="text-black/40">+{slide.bullets.length - 3} more</li>
@@ -456,7 +536,10 @@ function SlideCard({
 
       <div className="mt-4 flex items-center gap-2 border-t border-black/5 pt-3 text-[11px] text-black/50">
         {slide.imageCount > 0 && (
-          <span className="inline-flex items-center gap-1"><ImageIcon size={12} />{slide.imageCount}</span>
+          <span className="inline-flex items-center gap-1">
+            <ImageIcon size={12} />
+            {slide.imageCount}
+          </span>
         )}
         {slide.notes && <span>• Notes</span>}
         <div className="ml-auto flex items-center gap-1.5">
@@ -508,7 +591,6 @@ function SlidePreview({
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-6 backdrop-blur-sm"
       onClick={onClose}
     >
-
       <div
         className="relative w-full max-w-6xl overflow-hidden rounded-2xl bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
@@ -529,7 +611,14 @@ function SlidePreview({
         <div className="bg-black/[0.03] p-6">
           {slide.layout ? (
             <div className="mx-auto" style={{ maxWidth: 1100 }}>
-              <FaithfulSlideCanvas layout={slide.layout} theme={deckTheme} width={1100} assets={slide.assets} fonts={deckExtras?.embeddedFonts} className="rounded-lg shadow-lg ring-1 ring-black/10" />
+              <FaithfulSlideCanvas
+                layout={slide.layout}
+                theme={deckTheme}
+                width={1100}
+                assets={slide.assets}
+                fonts={deckExtras?.embeddedFonts}
+                className="rounded-lg shadow-lg ring-1 ring-black/10"
+              />
             </div>
           ) : (
             <div className="rounded-lg border border-dashed border-black/20 bg-white p-16 text-center text-sm text-black/50">
@@ -546,15 +635,18 @@ function SlidePreview({
               )}
               {slide.notes && (
                 <div className="rounded-lg border border-black/10 bg-white p-4">
-                  <div className="text-[10px] uppercase tracking-widest text-black/40">Speaker notes</div>
-                  <div className="mt-1 whitespace-pre-wrap text-xs text-black/70">{slide.notes}</div>
+                  <div className="text-[10px] uppercase tracking-widest text-black/40">
+                    Speaker notes
+                  </div>
+                  <div className="mt-1 whitespace-pre-wrap text-xs text-black/70">
+                    {slide.notes}
+                  </div>
                 </div>
               )}
             </div>
           )}
           <AssetInspectorPanel slide={slide} extras={deckExtras} />
         </div>
-
       </div>
     </div>
   );
@@ -604,7 +696,10 @@ function RelinkDrawer({
   const broken = (brokenQ.data?.broken ?? []) as BrokenRefRow[];
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
+    >
       <div
         className="flex h-full w-full max-w-2xl flex-col bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
@@ -637,13 +732,17 @@ function RelinkDrawer({
           ) : broken.length === 0 ? (
             <div className="flex h-40 flex-col items-center justify-center text-center">
               <Check size={20} className="text-accent-foreground" />
-              <div className="mt-2 text-sm font-medium text-[#03002C]">All image refs resolved.</div>
+              <div className="mt-2 text-sm font-medium text-[#03002C]">
+                All image refs resolved.
+              </div>
               <div className="mt-1 text-xs text-black/50">No missing embeds to remap.</div>
             </div>
           ) : (
             <div className="space-y-3">
               <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-                {broken.length} image reference{broken.length === 1 ? "" : "s"} could not be extracted from the original .pptx. Attach a replacement below — the deck will re-render immediately.
+                {broken.length} image reference{broken.length === 1 ? "" : "s"} could not be
+                extracted from the original .pptx. Attach a replacement below — the deck will
+                re-render immediately.
               </div>
               {broken.map((r) => (
                 <RelinkRow
@@ -687,7 +786,8 @@ function RelinkRow({
   void brandModeId;
 
   async function handleFile(file: File) {
-    setBusy(true); setErr(null);
+    setBusy(true);
+    setErr(null);
     try {
       const buf = await file.arrayBuffer();
       const bytes = new Uint8Array(buf);
@@ -715,7 +815,8 @@ function RelinkRow({
   }
 
   async function handleReuse(path: string) {
-    setBusy(true); setErr(null);
+    setBusy(true);
+    setErr(null);
     try {
       await relinkFn({
         data: {
@@ -809,7 +910,11 @@ function RelinkRow({
                       title={it.filename}
                     >
                       {it.signedUrl ? (
-                        <img src={it.signedUrl} alt={it.filename} className="aspect-square w-full object-cover" />
+                        <img
+                          src={it.signedUrl}
+                          alt={it.filename}
+                          className="aspect-square w-full object-cover"
+                        />
                       ) : (
                         <div className="flex aspect-square w-full items-center justify-center text-[9px] text-icon-subtle">
                           <ImageIcon size={14} />
@@ -828,4 +933,3 @@ function RelinkRow({
     </div>
   );
 }
-

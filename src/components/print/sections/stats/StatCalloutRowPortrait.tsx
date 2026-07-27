@@ -4,7 +4,9 @@ import type { PrintStatsSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, sectionGlass } from "../shared";
 
 export function StatCalloutRowPortrait({
-  section, mode, accent,
+  section,
+  mode,
+  accent,
 }: {
   section: PrintStatsSection;
   mode: "light" | "dark";
@@ -19,18 +21,37 @@ export function StatCalloutRowPortrait({
       {(section.eyebrow || section.title) && (
         <header style={{ marginBottom: cq(12) }}>
           {section.eyebrow && (
-            <div style={{ fontSize: cq(9.5), fontWeight: 600, letterSpacing: "0.18em", color: accent, textTransform: "uppercase" }}>
+            <div
+              style={{
+                fontSize: cq(9.5),
+                fontWeight: 600,
+                letterSpacing: "0.18em",
+                color: accent,
+                textTransform: "uppercase",
+              }}
+            >
               {section.eyebrow}
             </div>
           )}
           {section.title && (
-            <h3 style={{ margin: `${cq(4)} 0 0`, fontSize: cq(18), fontWeight: 700, color: ink.strong, letterSpacing: "-0.015em" }}>
+            <h3
+              style={{
+                margin: `${cq(4)} 0 0`,
+                fontSize: cq(18),
+                fontWeight: 700,
+                color: ink.strong,
+                letterSpacing: "-0.015em",
+              }}
+            >
               {section.title}
             </h3>
           )}
         </header>
       )}
-      <div className="grid" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: cq(12) }}>
+      <div
+        className="grid"
+        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: cq(12) }}
+      >
         {items.map((it, i) => (
           <div
             key={i}
@@ -41,7 +62,16 @@ export function StatCalloutRowPortrait({
             }}
           >
             <div style={{ display: "flex", alignItems: "baseline", gap: cq(4) }}>
-              <span style={{ fontSize: cq(38), fontWeight: 700, lineHeight: 0.95, letterSpacing: "-0.035em", color: ink.strong, fontVariantNumeric: "tabular-nums" }}>
+              <span
+                style={{
+                  fontSize: cq(38),
+                  fontWeight: 700,
+                  lineHeight: 0.95,
+                  letterSpacing: "-0.035em",
+                  color: ink.strong,
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
                 {it.value || "—"}
               </span>
               {it.unit && (
@@ -52,7 +82,9 @@ export function StatCalloutRowPortrait({
               {it.label}
             </div>
             {it.caption && (
-              <div style={{ marginTop: cq(4), fontSize: cq(8.5), color: ink.faint }}>{it.caption}</div>
+              <div style={{ marginTop: cq(4), fontSize: cq(8.5), color: ink.faint }}>
+                {it.caption}
+              </div>
             )}
           </div>
         ))}

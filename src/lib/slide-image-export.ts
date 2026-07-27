@@ -82,7 +82,6 @@ const MIN_PIXEL_RATIO = 1;
 // silently downsamples the user's chosen target.
 const MAX_PIXEL_RATIO = 16;
 
-
 function resolvePixelRatio(
   node: HTMLElement,
   opts: { pixelRatio?: number; targetWidth?: number },
@@ -98,7 +97,6 @@ function resolvePixelRatio(
 }
 
 const DEFAULT_READY_TIMEOUT = 6000;
-
 
 function report(cb: ExportProgressCallback | undefined, p: ExportProgress): void {
   if (cb) {
@@ -181,7 +179,11 @@ async function inlineCrossOriginImages(
         img.setAttribute("src", dataUrl);
         // ensure decoded before capture
         if (typeof img.decode === "function") {
-          try { await img.decode(); } catch { /* non-fatal */ }
+          try {
+            await img.decode();
+          } catch {
+            /* non-fatal */
+          }
         }
         restorers.push(() => {
           if (original === null) img.removeAttribute("src");
@@ -193,7 +195,9 @@ async function inlineCrossOriginImages(
         console.warn("[slide-image-export] failed to inline image", img.src, err);
         const originalVisibility = img.style.visibility;
         img.style.visibility = "hidden";
-        restorers.push(() => { img.style.visibility = originalVisibility; });
+        restorers.push(() => {
+          img.style.visibility = originalVisibility;
+        });
       } finally {
         done += 1;
         report(onProgress, {
@@ -205,7 +209,9 @@ async function inlineCrossOriginImages(
     }),
   );
 
-  return () => { for (const r of restorers) r(); };
+  return () => {
+    for (const r of restorers) r();
+  };
 }
 
 /**
@@ -270,13 +276,18 @@ async function ensureFontsReady(
  * Returns a restore function.
  */
 function neutralizeBackdropFilters(root: HTMLElement, mode: SlideExportMode): () => void {
-  const affected: Array<{ el: HTMLElement; prev: string; prevBg: string; prevBoxShadow: string }> = [];
+  const affected: Array<{ el: HTMLElement; prev: string; prevBg: string; prevBoxShadow: string }> =
+    [];
   const nodes = root.querySelectorAll<HTMLElement>("*");
   const glassTint = mode === "dark" ? "rgba(20, 24, 60, 0.55)" : "rgba(255, 255, 255, 0.62)";
-  const glassEdge = mode === "dark" ? "0 0 0 1px rgba(255,255,255,0.06)" : "0 0 0 1px rgba(0,0,0,0.04)";
+  const glassEdge =
+    mode === "dark" ? "0 0 0 1px rgba(255,255,255,0.06)" : "0 0 0 1px rgba(0,0,0,0.04)";
   nodes.forEach((el) => {
     const cs = window.getComputedStyle(el);
-    const bf = cs.backdropFilter || (cs as unknown as { webkitBackdropFilter?: string }).webkitBackdropFilter || "";
+    const bf =
+      cs.backdropFilter ||
+      (cs as unknown as { webkitBackdropFilter?: string }).webkitBackdropFilter ||
+      "";
     if (!bf || bf === "none") return;
     affected.push({
       el,
@@ -286,10 +297,13 @@ function neutralizeBackdropFilters(root: HTMLElement, mode: SlideExportMode): ()
     });
     // Kill the property in both prefixed forms so foreignObject stops trying to honor it.
     el.style.backdropFilter = "none";
-    (el.style as CSSStyleDeclaration & { webkitBackdropFilter?: string }).webkitBackdropFilter = "none";
+    (el.style as CSSStyleDeclaration & { webkitBackdropFilter?: string }).webkitBackdropFilter =
+      "none";
     // If the element has no meaningful background, apply the tint so the
     // glass panel remains legible in the raster.
-    const bgAlpha = /rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(?:,\s*0(?:\.0+)?)?\s*\)/.test(cs.backgroundColor);
+    const bgAlpha = /rgba?\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(?:,\s*0(?:\.0+)?)?\s*\)/.test(
+      cs.backgroundColor,
+    );
     if (!cs.backgroundColor || cs.backgroundColor === "rgba(0, 0, 0, 0)" || bgAlpha) {
       el.style.backgroundColor = glassTint;
     }
@@ -300,7 +314,8 @@ function neutralizeBackdropFilters(root: HTMLElement, mode: SlideExportMode): ()
   return () => {
     for (const { el, prev, prevBg, prevBoxShadow } of affected) {
       el.style.backdropFilter = prev;
-      (el.style as CSSStyleDeclaration & { webkitBackdropFilter?: string }).webkitBackdropFilter = prev;
+      (el.style as CSSStyleDeclaration & { webkitBackdropFilter?: string }).webkitBackdropFilter =
+        prev;
       el.style.backgroundColor = prevBg;
       el.style.boxShadow = prevBoxShadow;
     }
@@ -344,7 +359,6 @@ export interface CaptureSlideOptions {
   onProgress?: ExportProgressCallback;
 }
 
-
 /**
  * Minimal reusable capture helper. Awaits `document.fonts.ready`, then
  * `img.decode()` on every descendant <img> (falling back to load events for
@@ -362,7 +376,11 @@ export async function captureSlide(
 
   report(onProgress, { stage: "fonts", progress: 0, message: "Waiting for fonts…" });
   if (typeof document !== "undefined" && document.fonts?.ready) {
-    try { await document.fonts.ready; } catch { /* best effort */ }
+    try {
+      await document.fonts.ready;
+    } catch {
+      /* best effort */
+    }
   }
   report(onProgress, { stage: "fonts", progress: 1, message: "Fonts ready" });
 
@@ -377,7 +395,11 @@ export async function captureSlide(
   await Promise.all(
     images.map(async (img) => {
       if (typeof img.decode === "function") {
-        try { await img.decode(); } catch { /* fall through to load event */ }
+        try {
+          await img.decode();
+        } catch {
+          /* fall through to load event */
+        }
       }
       if (!(img.complete && img.naturalWidth > 0)) {
         await new Promise<void>((resolve) => {
@@ -401,15 +423,12 @@ export async function captureSlide(
     pixelRatio: effectiveRatio,
     cacheBust: true,
     backgroundColor: opts.backgroundColor,
-    filter: (el) =>
-      !(el instanceof HTMLElement) || el.dataset?.exportIgnore !== "true",
+    filter: (el) => !(el instanceof HTMLElement) || el.dataset?.exportIgnore !== "true",
   });
 
   report(onProgress, { stage: "encode", progress: 1, message: "Encoded" });
   return dataUrl;
 }
-
-
 
 /**
  * Rasterize a slide DOM node to a PNG data URL. The node must be attached
@@ -460,7 +479,11 @@ export async function captureSlideAsDataUrl(
         `[slide-image-export] first pass failed at pixelRatio=${effectiveRatio.toFixed(2)}, retrying at ${fallbackRatio.toFixed(2)}`,
         err,
       );
-      report(onProgress, { stage: "render", progress: 0.5, message: "Retrying at lower resolution…" });
+      report(onProgress, {
+        stage: "render",
+        progress: 0.5,
+        message: "Retrying at lower resolution…",
+      });
       dataUrl = await toPng(node, {
         pixelRatio: fallbackRatio,
         cacheBust: true,

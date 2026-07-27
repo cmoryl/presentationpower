@@ -20,13 +20,7 @@ import { uploadDivisionImagery } from "@/lib/division-imagery.functions";
 import { logImageryEvent } from "@/lib/admin.functions";
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8 MB
-const PASSTHROUGH = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-  "image/svg+xml",
-];
+const PASSTHROUGH = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/svg+xml"];
 const RASTERIZE = ["image/avif"];
 export const DROP_ACCEPT = [...PASSTHROUGH, ...RASTERIZE];
 
@@ -65,7 +59,7 @@ function toBase64(file: File): Promise<string> {
     const reader = new FileReader();
     reader.onload = () => {
       const res = String(reader.result ?? "");
-      resolve(res.includes(",") ? res.split(",", 2)[1] ?? "" : res);
+      resolve(res.includes(",") ? (res.split(",", 2)[1] ?? "") : res);
     };
     reader.onerror = () => reject(new Error("Could not read the dropped file."));
     reader.readAsDataURL(file);
@@ -148,7 +142,12 @@ export function useImageDrop({
 
       const total = images.length;
       const PHASES = 3; // prepare, upload, file/finish
-      const step = (completed: number, phaseIdx: number, fileName: string, phase: ImageDropProgress["phase"]) =>
+      const step = (
+        completed: number,
+        phaseIdx: number,
+        fileName: string,
+        phase: ImageDropProgress["phase"],
+      ) =>
         setProgress({
           total,
           completed,
@@ -207,7 +206,9 @@ export function useImageDrop({
                 console.warn("Division library filing failed", e);
                 errorToast(
                   `Couldn't add "${file.name}" to the division library`,
-                  e instanceof Error ? e.message : "The image is on the slide, but wasn't saved to the library.",
+                  e instanceof Error
+                    ? e.message
+                    : "The image is on the slide, but wasn't saved to the library.",
                 );
               }
             }
@@ -253,7 +254,6 @@ export function useImageDrop({
     [addToLibrary, divisionId, enabled, onApply, qc, uploadToLibrary],
   );
 
-
   const dropProps = {
     onDragEnter: (e: React.DragEvent) => {
       if (!enabled) return;
@@ -286,5 +286,15 @@ export function useImageDrop({
     },
   };
 
-  return { dropProps, isOver, busy, progress, error, setError, addToLibrary, setAddToLibrary, ingest };
+  return {
+    dropProps,
+    isOver,
+    busy,
+    progress,
+    error,
+    setError,
+    addToLibrary,
+    setAddToLibrary,
+    ingest,
+  };
 }

@@ -23,9 +23,17 @@ export const Route = createFileRoute("/asset/new")({
   head: () => ({
     meta: [
       { title: "New print asset · TransPerfect Modular" },
-      { name: "description", content: "Draft a print-ready case study using the same brand engine that powers your decks." },
+      {
+        name: "description",
+        content:
+          "Draft a print-ready case study using the same brand engine that powers your decks.",
+      },
       { property: "og:title", content: "New print asset · TransPerfect Modular" },
-      { property: "og:description", content: "Print-ready case studies, brochures, and spotlights from the shared brand system." },
+      {
+        property: "og:description",
+        content:
+          "Print-ready case studies, brochures, and spotlights from the shared brand system.",
+      },
     ],
   }),
   validateSearch: (raw) => searchSchema.parse(raw ?? {}),
@@ -44,10 +52,34 @@ const KINDS: Array<{
   live: boolean;
   icon: React.ReactNode;
 }> = [
-  { id: "case-study",   label: "Case Study",     desc: "Challenge · Approach · Outcome, print-ready.",  live: true, icon: <FileText size={16} /> },
-  { id: "spotlight",    label: "Client Spotlight", desc: "Product/service hero + stats + capabilities.", live: true, icon: <Layers size={16} /> },
-  { id: "ebrochure",    label: "E-Brochure",     desc: "GlobalLink-style clean marketing PDF.",         live: true, icon: <PenSquare size={16} /> },
-  { id: "adaptor-brief",label: "Adaptor Brief",  desc: "Dark aurora hero + capability grid.",           live: true, icon: <Rocket size={16} /> },
+  {
+    id: "case-study",
+    label: "Case Study",
+    desc: "Challenge · Approach · Outcome, print-ready.",
+    live: true,
+    icon: <FileText size={16} />,
+  },
+  {
+    id: "spotlight",
+    label: "Client Spotlight",
+    desc: "Product/service hero + stats + capabilities.",
+    live: true,
+    icon: <Layers size={16} />,
+  },
+  {
+    id: "ebrochure",
+    label: "E-Brochure",
+    desc: "GlobalLink-style clean marketing PDF.",
+    live: true,
+    icon: <PenSquare size={16} />,
+  },
+  {
+    id: "adaptor-brief",
+    label: "Adaptor Brief",
+    desc: "Dark aurora hero + capability grid.",
+    live: true,
+    icon: <Rocket size={16} />,
+  },
 ];
 
 function NewAssetPage() {
@@ -56,17 +88,24 @@ function NewAssetPage() {
   const { brandModes } = useTaxonomy();
   const create = useServerFn(createPrintAssetWithBrief);
 
-  const [kind, setKind] = useState<"case-study" | "spotlight" | "ebrochure" | "adaptor-brief">(search.kind ?? "case-study");
+  const [kind, setKind] = useState<"case-study" | "spotlight" | "ebrochure" | "adaptor-brief">(
+    search.kind ?? "case-study",
+  );
   const [title, setTitle] = useState(search.prospect ? `${search.prospect} — Case Study` : "");
   const [brandModeId, setBrandModeId] = useState(
-    search.brandModeId ?? (brandModes.find((b) => b.id === "bm-tp-lifesci")?.id ?? brandModes[0]?.id ?? "bm-enterprise"),
+    search.brandModeId ??
+      brandModes.find((b) => b.id === "bm-tp-lifesci")?.id ??
+      brandModes[0]?.id ??
+      "bm-enterprise",
   );
   const [prospect, setProspect] = useState(search.prospect ?? "");
   const [industry, setIndustry] = useState(search.industry ?? "");
   const [audience, setAudience] = useState("");
   const [summary, setSummary] = useState("");
   const [pageSize, setPageSize] = useState<"A4" | "Letter" | "Square">("A4");
-  const [distribution, setDistribution] = useState<"sales-enablement" | "web-download" | "print">("sales-enablement");
+  const [distribution, setDistribution] = useState<"sales-enablement" | "web-download" | "print">(
+    "sales-enablement",
+  );
   const [ctaLabel, setCtaLabel] = useState("Start a conversation");
   const [ctaUrl, setCtaUrl] = useState("");
   const [contactCard, setContactCard] = useState(true);
@@ -85,7 +124,9 @@ function NewAssetPage() {
     setBusy(true);
     setErr(null);
     try {
-      const slideIds = (search.slideIds ?? "").split(",").filter((s: string) => /^[0-9a-f-]{36}$/i.test(s));
+      const slideIds = (search.slideIds ?? "")
+        .split(",")
+        .filter((s: string) => /^[0-9a-f-]{36}$/i.test(s));
       const asset = await create({
         data: {
           kind,
@@ -131,9 +172,9 @@ function NewAssetPage() {
             New print asset
           </h1>
           <p className="mt-3 max-w-xl text-sm text-black/60 dark:text-white/60">
-            Same brand engine, same division knowledge. This wizard drafts a print-ready case
-            study wired to the shared source — logos, aurora, stats, and quotes come from the
-            division you pick.
+            Same brand engine, same division knowledge. This wizard drafts a print-ready case study
+            wired to the shared source — logos, aurora, stats, and quotes come from the division you
+            pick.
           </p>
           {seedNote && (
             <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#A1FBF9]/40 bg-[#A1FBF9]/10 px-3 py-1 text-[11px] text-[#03002C] dark:border-[#A1FBF9]/30 dark:text-[#A1FBF9]">
@@ -185,12 +226,15 @@ function NewAssetPage() {
 
           <Field label="Division">
             <select
+              aria-label="Brand Mode"
               className={inputCls}
               value={brandModeId}
               onChange={(e) => setBrandModeId(e.target.value)}
             >
               {brandModes.map((b) => (
-                <option key={b.id} value={b.id}>{b.name}</option>
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
               ))}
             </select>
             {brand && (
@@ -205,14 +249,27 @@ function NewAssetPage() {
         <Section index="02" title="Story">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Client / prospect">
-              <input className={inputCls} value={prospect} onChange={(e) => setProspect(e.target.value)} />
+              <input
+                className={inputCls}
+                value={prospect}
+                onChange={(e) => setProspect(e.target.value)}
+              />
             </Field>
             <Field label="Industry">
-              <input className={inputCls} value={industry} onChange={(e) => setIndustry(e.target.value)} />
+              <input
+                className={inputCls}
+                value={industry}
+                onChange={(e) => setIndustry(e.target.value)}
+              />
             </Field>
           </div>
           <Field label="Audience">
-            <input className={inputCls} value={audience} onChange={(e) => setAudience(e.target.value)} placeholder="Head of Localization, VP Product" />
+            <input
+              className={inputCls}
+              value={audience}
+              onChange={(e) => setAudience(e.target.value)}
+              placeholder="Head of Localization, VP Product"
+            />
           </Field>
           <Field label="Engagement summary (one line)">
             <textarea
@@ -229,14 +286,24 @@ function NewAssetPage() {
         <Section index="03" title="Print spec">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <Field label="Page size">
-              <select className={inputCls} value={pageSize} onChange={(e) => setPageSize(e.target.value as typeof pageSize)}>
+              <select
+                aria-label="Page Size"
+                className={inputCls}
+                value={pageSize}
+                onChange={(e) => setPageSize(e.target.value as typeof pageSize)}
+              >
                 <option value="A4">A4</option>
                 <option value="Letter">US Letter</option>
                 <option value="Square">Square (1:1)</option>
               </select>
             </Field>
             <Field label="Distribution">
-              <select className={inputCls} value={distribution} onChange={(e) => setDistribution(e.target.value as typeof distribution)}>
+              <select
+                aria-label="Distribution"
+                className={inputCls}
+                value={distribution}
+                onChange={(e) => setDistribution(e.target.value as typeof distribution)}
+              >
                 <option value="sales-enablement">Sales enablement</option>
                 <option value="web-download">Web download</option>
                 <option value="print">Print</option>
@@ -255,10 +322,19 @@ function NewAssetPage() {
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="CTA label">
-              <input className={inputCls} value={ctaLabel} onChange={(e) => setCtaLabel(e.target.value)} />
+              <input
+                className={inputCls}
+                value={ctaLabel}
+                onChange={(e) => setCtaLabel(e.target.value)}
+              />
             </Field>
             <Field label="CTA URL (optional)">
-              <input className={inputCls} value={ctaUrl} onChange={(e) => setCtaUrl(e.target.value)} placeholder="https://…" />
+              <input
+                className={inputCls}
+                value={ctaUrl}
+                onChange={(e) => setCtaUrl(e.target.value)}
+                placeholder="https://…"
+              />
             </Field>
           </div>
         </Section>
@@ -280,7 +356,11 @@ function NewAssetPage() {
             {busy ? "Generating…" : "Generate print asset"}
           </button>
         </div>
-        {err && <div className="mt-3 rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">{err}</div>}
+        {err && (
+          <div className="mt-3 rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {err}
+          </div>
+        )}
       </div>
     </AppShell>
   );
@@ -289,12 +369,24 @@ function NewAssetPage() {
 const inputCls =
   "w-full rounded-md border border-black/10 bg-white px-4 py-3 text-sm text-[#03002C] placeholder:text-[#03002C]/35 focus:border-[#003FC7] focus:outline-none focus:ring-2 focus:ring-[#003FC7]/15 transition-all dark:border-white/10 dark:bg-white/[0.03] dark:text-white dark:placeholder:text-white/35";
 
-function Section({ index, title, children }: { index: string; title: string; children: React.ReactNode }) {
+function Section({
+  index,
+  title,
+  children,
+}: {
+  index: string;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="mb-6 rounded-3xl border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-white/[0.03]">
       <header className="mb-4 flex items-center gap-3">
-        <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-black/40 dark:text-white/40">{index}</div>
-        <div className="text-sm font-semibold uppercase tracking-[0.18em] text-[#03002C] dark:text-white">{title}</div>
+        <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-black/40 dark:text-white/40">
+          {index}
+        </div>
+        <div className="text-sm font-semibold uppercase tracking-[0.18em] text-[#03002C] dark:text-white">
+          {title}
+        </div>
       </header>
       <div className="space-y-3">{children}</div>
     </section>

@@ -12,11 +12,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import {
-  analyzePrintAsset,
-  canAddModule,
-  PRINT_TEMPLATE_BUDGETS,
-} from "../print-capacity";
+import { analyzePrintAsset, canAddModule, PRINT_TEMPLATE_BUDGETS } from "../print-capacity";
 import type {
   CaseStudyContent,
   PrintStatsSection,
@@ -57,36 +53,37 @@ function analyzeAtViewport(width: number, content: CaseStudyContent) {
 }
 
 describe("print capacity model — viewport invariance", () => {
-  const fixtures: { name: string; content: CaseStudyContent; expected: "ok" | "warn" | "block" }[] = [
-    { name: "empty",       content: emptyCaseStudy(), expected: "ok" },
-    {
-      name: "single-kpi-dashboard",
-      content: withModules(emptyCaseStudy(), [stats("kpi-dashboard-portrait", 3)]),
-      expected: "ok",
-    },
-    {
-      name: "two-kpi-modules",
-      content: withModules(emptyCaseStudy(), [
-        stats("kpi-dashboard-portrait", 3),
-        stats("stat-callout-row-portrait", 3),
-      ]),
-      expected: "ok",
-    },
-    {
-      name: "over-budget",
-      content: withModules(emptyCaseStudy(), [
-        stats("kpi-dashboard-portrait", 3),
-        stats("kpi-dashboard-portrait", 3),
-        stats("stat-bento-portrait", 3),
-      ]),
-      expected: "block",
-    },
-    {
-      name: "over-item-cap",
-      content: withModules(emptyCaseStudy(), [stats("kpi-dashboard-portrait", 8)]),
-      expected: "block",
-    },
-  ];
+  const fixtures: { name: string; content: CaseStudyContent; expected: "ok" | "warn" | "block" }[] =
+    [
+      { name: "empty", content: emptyCaseStudy(), expected: "ok" },
+      {
+        name: "single-kpi-dashboard",
+        content: withModules(emptyCaseStudy(), [stats("kpi-dashboard-portrait", 3)]),
+        expected: "ok",
+      },
+      {
+        name: "two-kpi-modules",
+        content: withModules(emptyCaseStudy(), [
+          stats("kpi-dashboard-portrait", 3),
+          stats("stat-callout-row-portrait", 3),
+        ]),
+        expected: "ok",
+      },
+      {
+        name: "over-budget",
+        content: withModules(emptyCaseStudy(), [
+          stats("kpi-dashboard-portrait", 3),
+          stats("kpi-dashboard-portrait", 3),
+          stats("stat-bento-portrait", 3),
+        ]),
+        expected: "block",
+      },
+      {
+        name: "over-item-cap",
+        content: withModules(emptyCaseStudy(), [stats("kpi-dashboard-portrait", 8)]),
+        expected: "block",
+      },
+    ];
 
   for (const fx of fixtures) {
     it(`${fx.name} reports "${fx.expected}" at every breakpoint`, () => {

@@ -99,8 +99,7 @@ export async function wrapPdfAsX4(
   pdfBytes: Uint8Array | ArrayBuffer,
   opts: WrapPdfAsX4Options,
 ): Promise<Uint8Array> {
-  const source =
-    pdfBytes instanceof Uint8Array ? pdfBytes : new Uint8Array(pdfBytes);
+  const source = pdfBytes instanceof Uint8Array ? pdfBytes : new Uint8Array(pdfBytes);
 
   const pdfDoc = await PDFDocument.load(source, { updateMetadata: false });
 
@@ -119,14 +118,8 @@ export async function wrapPdfAsX4(
   const pages = pdfDoc.getPages();
   for (const page of pages) {
     // Ensure MediaBox is authoritative (matches what jsPDF produced).
-    page.node.set(
-      PDFName.of("MediaBox"),
-      pdfDoc.context.obj([0, 0, mediaWpt, mediaHpt]),
-    );
-    page.node.set(
-      PDFName.of("BleedBox"),
-      pdfDoc.context.obj([0, 0, mediaWpt, mediaHpt]),
-    );
+    page.node.set(PDFName.of("MediaBox"), pdfDoc.context.obj([0, 0, mediaWpt, mediaHpt]));
+    page.node.set(PDFName.of("BleedBox"), pdfDoc.context.obj([0, 0, mediaWpt, mediaHpt]));
     page.node.set(
       PDFName.of("TrimBox"),
       pdfDoc.context.obj([bleedPt, bleedPt, bleedPt + trimWpt, bleedPt + trimHpt]),

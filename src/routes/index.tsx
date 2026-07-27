@@ -2,9 +2,27 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  Sparkles, Brain, MessageSquare, ShieldCheck, ImageIcon, Compass,
-  BookOpen, Palette, Shapes, ArrowRight, ArrowUpRight, Rocket, Cloud, Clock,
-  Presentation, Printer, CalendarDays, Share2, Wand2, Search, CornerDownLeft,
+  Sparkles,
+  Brain,
+  MessageSquare,
+  ShieldCheck,
+  ImageIcon,
+  Compass,
+  BookOpen,
+  Palette,
+  Shapes,
+  ArrowRight,
+  ArrowUpRight,
+  Rocket,
+  Cloud,
+  Clock,
+  Presentation,
+  Printer,
+  CalendarDays,
+  Share2,
+  Wand2,
+  Search,
+  CornerDownLeft,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
@@ -13,8 +31,12 @@ import { useDeckStore, type Deck } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import {
-  BRAND_MODES, MODULE_FAMILIES, MODULE_VARIANTS,
-  SECTION_FRAMEWORKS, LAYOUT_FRAMEWORKS, byId,
+  BRAND_MODES,
+  MODULE_FAMILIES,
+  MODULE_VARIANTS,
+  SECTION_FRAMEWORKS,
+  LAYOUT_FRAMEWORKS,
+  byId,
 } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { BRAND_GUIDES } from "@/lib/brand-guides";
@@ -27,9 +49,17 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "TransPerfect Modular · Command Center" },
-      { name: "description", content: "Governed brand engine for TransPerfect. Assemble presentations, print, event, and social — from one modular library, powered by the Oracle." },
+      {
+        name: "description",
+        content:
+          "Governed brand engine for TransPerfect. Assemble presentations, print, event, and social — from one modular library, powered by the Oracle.",
+      },
       { property: "og:title", content: "TransPerfect Modular · Command Center" },
-      { property: "og:description", content: "Governed brand engine for TransPerfect. Assemble presentations, print, event, and social — from one modular library, powered by the Oracle." },
+      {
+        property: "og:description",
+        content:
+          "Governed brand engine for TransPerfect. Assemble presentations, print, event, and social — from one modular library, powered by the Oracle.",
+      },
       { property: "og:type", content: "website" },
     ],
   }),
@@ -164,12 +194,19 @@ function Dashboard() {
   }, [autoRotate, reducedMotion]);
 
   useEffect(() => {
-    checkAi().then((r) => setAiConfigured(r.configured)).catch(() => setAiConfigured(true));
+    checkAi()
+      .then((r) => setAiConfigured(r.configured))
+      .catch(() => setAiConfigured(true));
   }, [checkAi]);
 
   useEffect(() => {
-    if (!signedIn) { setCloudCount(null); return; }
-    listCloud().then((rows) => setCloudCount(Array.isArray(rows) ? rows.length : 0)).catch(() => setCloudCount(0));
+    if (!signedIn) {
+      setCloudCount(null);
+      return;
+    }
+    listCloud()
+      .then((rows) => setCloudCount(Array.isArray(rows) ? rows.length : 0))
+      .catch(() => setCloudCount(0));
   }, [signedIn, listCloud]);
 
   const allDecks = useMemo<Deck[]>(() => Object.values(decksMap), [decksMap]);
@@ -184,7 +221,8 @@ function Dashboard() {
     for (const d of allDecks) {
       const at = d.context?.lastExportedAt;
       if (!at) continue;
-      if (!latest || at > latest.at) latest = { at, kind: d.context?.lastExportKind, title: d.title };
+      if (!latest || at > latest.at)
+        latest = { at, kind: d.context?.lastExportKind, title: d.title };
     }
     return latest;
   }, [allDecks]);
@@ -193,22 +231,23 @@ function Dashboard() {
   const sendToOracle = (prompt: string) => {
     const q = prompt.trim();
     if (!q) return;
-    try { window.sessionStorage.setItem("oracle:seed", q); } catch { /* ignore */ }
+    try {
+      window.sessionStorage.setItem("oracle:seed", q);
+    } catch {
+      /* ignore */
+    }
     navigate({ to: "/knowledge/ask" });
   };
 
   return (
     <AppShell>
       {/* ================= HERO ================= */}
-      <section
-        className="full-bleed relative -mt-6 overflow-hidden border-b border-white/10 bg-[#03002C] py-8 text-white sm:-mt-10 sm:py-14 lg:py-20"
-      >
+      <section className="full-bleed relative -mt-6 overflow-hidden border-b border-white/10 bg-[#03002C] py-8 text-white sm:-mt-10 sm:py-14 lg:py-20">
         {/* animated aurora blobs — reactive to selected mode + scroll parallax */}
         <AuroraHero mode={mode} />
 
         {/* Oversized MODULAR watermark — brand signature behind the hero */}
         <ParallaxWatermark accent={mode.accent} />
-
 
         <div className="relative">
           <div className="flex flex-wrap items-center gap-2">
@@ -238,7 +277,10 @@ function Dashboard() {
                     type="button"
                     role="tab"
                     aria-selected={active}
-                    onClick={() => { setAutoRotate(false); setModeId(m.id); }}
+                    onClick={() => {
+                      setAutoRotate(false);
+                      setModeId(m.id);
+                    }}
                     className={`group relative inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300 ${
                       active
                         ? "bg-white text-[#03002C] shadow-lg shadow-black/20"
@@ -270,7 +312,10 @@ function Dashboard() {
           </div>
 
           {/* Mode content — remounts on change for a soft fade-in */}
-          <div key={mode.id} className="mt-6 grid animate-fade-in gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-end">
+          <div
+            key={mode.id}
+            className="mt-6 grid animate-fade-in gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-end"
+          >
             <div>
               <div
                 className="text-[10px] font-semibold uppercase tracking-[0.32em]"
@@ -281,9 +326,7 @@ function Dashboard() {
               <h1 className="mt-3 text-[42px] font-semibold leading-[1.04] tracking-tight sm:text-5xl">
                 {mode.headline}
               </h1>
-              <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/70">
-                {mode.copy}
-              </p>
+              <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/70">{mode.copy}</p>
               <div className="mt-6 flex flex-wrap items-center gap-2">
                 {mode.actions.map((a) => (
                   <ModeActionButton key={a.label} action={a} accent={mode.accent} />
@@ -317,10 +360,15 @@ function Dashboard() {
                     <li key={s}>
                       <button
                         type="button"
-                        onClick={() => sendToOracle(`Help me start a ${mode.label.toLowerCase()}: ${s}`)}
+                        onClick={() =>
+                          sendToOracle(`Help me start a ${mode.label.toLowerCase()}: ${s}`)
+                        }
                         className="group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] text-white/80 transition hover:bg-white/[0.06] hover:text-white"
                       >
-                        <ArrowUpRight size={12} className="shrink-0 text-primary-foreground/40 group-hover:text-primary-foreground" />
+                        <ArrowUpRight
+                          size={12}
+                          className="shrink-0 text-primary-foreground/40 group-hover:text-primary-foreground"
+                        />
                         <span className="truncate">{s}</span>
                       </button>
                     </li>
@@ -332,10 +380,18 @@ function Dashboard() {
 
           {/* Agent prompt bar */}
           <div className="relative mt-8">
-            <AgentBar onSubmit={sendToOracle} onDeck={(q) => {
-              try { window.sessionStorage.setItem("oracle:seed", q); } catch { /* ignore */ }
-              navigate({ to: "/brief/new" });
-            }} accent={mode.accent} />
+            <AgentBar
+              onSubmit={sendToOracle}
+              onDeck={(q) => {
+                try {
+                  window.sessionStorage.setItem("oracle:seed", q);
+                } catch {
+                  /* ignore */
+                }
+                navigate({ to: "/brief/new" });
+              }}
+              accent={mode.accent}
+            />
           </div>
         </div>
       </section>
@@ -345,15 +401,23 @@ function Dashboard() {
         <div className="mt-6 flex items-center gap-3 rounded-2xl border border-amber-300/40 bg-amber-50/70 px-5 py-3 text-sm text-amber-900 dark:border-amber-300/20 dark:bg-amber-500/[0.06] dark:text-amber-100">
           <Sparkles size={16} className="shrink-0" />
           <div>
-            <span className="font-medium">AI suite ready.</span>{" "}
-            Add <code className="rounded bg-black/5 px-1.5 py-0.5 text-[11px] dark:bg-white/10">ANTHROPIC_API_KEY</code> in Project Settings → Secrets to activate strategist, copilot, review, and asset suggestions.
+            <span className="font-medium">AI suite ready.</span> Add{" "}
+            <code className="rounded bg-black/5 px-1.5 py-0.5 text-[11px] dark:bg-white/10">
+              ANTHROPIC_API_KEY
+            </code>{" "}
+            in Project Settings → Secrets to activate strategist, copilot, review, and asset
+            suggestions.
           </div>
         </div>
       )}
 
       {/* ================= FAST LANES ================= */}
       <section className="mt-10">
-        <SectionHeader kicker="Fast lanes" title="Jump into a surface" hint="Every command in the build" />
+        <SectionHeader
+          kicker="Fast lanes"
+          title="Jump into a surface"
+          hint="Every command in the build"
+        />
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {MODES.map((m) => {
             const Icon = m.icon;
@@ -390,29 +454,101 @@ function Dashboard() {
       {/* ================= RECENT ACTIVITY (all areas) ================= */}
       <RecentActivity decks={recentDecks} allDeckCount={allDecks.length} briefs={briefs} />
 
-
       {/* ================= AI SUITE ================= */}
       <section className="mt-12">
-        <SectionHeader kicker="Intelligence" title="AI suite" hint="Six agents, one command surface" />
+        <SectionHeader
+          kicker="Intelligence"
+          title="AI suite"
+          hint="Six agents, one command surface"
+        />
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <AiCard to="/brief/new" icon={<Brain size={16} />} title="Narrative Strategist" desc="Plans deck architecture from your brief before assembly." tint="#A1FBF9" />
-          <AiCard to="/knowledge/ask" icon={<BookOpen size={16} />} title="Deep RAG Synthesis" desc="Claude reasoning over the full brand knowledge base." tint="#C2A3FF" />
-          <AiCard to="/atlas" icon={<MessageSquare size={16} />} title="Deck Copilot" desc="Natural-language edits from inside the deck editor." tint="#A6FA87" />
-          <AiCard to="/atlas" icon={<ShieldCheck size={16} />} title="Brand Reviewer" desc="Scores every deck against its division's guide." tint="#FFEB66" />
-          <AiCard to="/atlas" icon={<ImageIcon size={16} />} title="Asset Suggest" desc="Semantic icon and logo recommendations per slide." tint="#FF9B70" />
-          <AiCard to="/knowledge/ask" icon={<Compass size={16} />} title="Ask Oracle" desc="Conversational hybrid retrieval over Oracle + KB." tint="#EC388A" />
+          <AiCard
+            to="/brief/new"
+            icon={<Brain size={16} />}
+            title="Narrative Strategist"
+            desc="Plans deck architecture from your brief before assembly."
+            tint="#A1FBF9"
+          />
+          <AiCard
+            to="/knowledge/ask"
+            icon={<BookOpen size={16} />}
+            title="Deep RAG Synthesis"
+            desc="Claude reasoning over the full brand knowledge base."
+            tint="#C2A3FF"
+          />
+          <AiCard
+            to="/atlas"
+            icon={<MessageSquare size={16} />}
+            title="Deck Copilot"
+            desc="Natural-language edits from inside the deck editor."
+            tint="#A6FA87"
+          />
+          <AiCard
+            to="/atlas"
+            icon={<ShieldCheck size={16} />}
+            title="Brand Reviewer"
+            desc="Scores every deck against its division's guide."
+            tint="#FFEB66"
+          />
+          <AiCard
+            to="/atlas"
+            icon={<ImageIcon size={16} />}
+            title="Asset Suggest"
+            desc="Semantic icon and logo recommendations per slide."
+            tint="#FF9B70"
+          />
+          <AiCard
+            to="/knowledge/ask"
+            icon={<Compass size={16} />}
+            title="Ask Oracle"
+            desc="Conversational hybrid retrieval over Oracle + KB."
+            tint="#EC388A"
+          />
         </div>
       </section>
 
       {/* ================= KNOWLEDGE & BRAND ================= */}
       <section className="mt-12">
-        <SectionHeader kicker="Library" title="Knowledge & brand" hint="Everything the deck engine draws from" />
+        <SectionHeader
+          kicker="Library"
+          title="Knowledge & brand"
+          hint="Everything the deck engine draws from"
+        />
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <ResourceTile to="/knowledge/brand-guides" icon={<Palette size={16} />} title="Brand Guides" count={BRAND_GUIDES.length} caption="Master + divisions" />
-          <ResourceTile to="/logohub" icon={<Shapes size={16} />} title="LogoHub" count="400+" caption="Client + division logos" />
-          <ResourceTile to="/admin/icon-studio" icon={<ImageIcon size={16} />} title="Icon Studio" count={27} caption="Curated icon packs" />
-          <ResourceTile to="/knowledge" icon={<BookOpen size={16} />} title="Knowledge Base" count={MODULE_FAMILIES.length} caption="Modules + Oracle" />
-          <ResourceTile to="/knowledge/ask" icon={<Compass size={16} />} title="Ask Oracle" caption="Hybrid retrieval chat" />
+          <ResourceTile
+            to="/knowledge/brand-guides"
+            icon={<Palette size={16} />}
+            title="Brand Guides"
+            count={BRAND_GUIDES.length}
+            caption="Master + divisions"
+          />
+          <ResourceTile
+            to="/logohub"
+            icon={<Shapes size={16} />}
+            title="LogoHub"
+            count="400+"
+            caption="Client + division logos"
+          />
+          <ResourceTile
+            to="/admin/icon-studio"
+            icon={<ImageIcon size={16} />}
+            title="Icon Studio"
+            count={27}
+            caption="Curated icon packs"
+          />
+          <ResourceTile
+            to="/knowledge"
+            icon={<BookOpen size={16} />}
+            title="Knowledge Base"
+            count={MODULE_FAMILIES.length}
+            caption="Modules + Oracle"
+          />
+          <ResourceTile
+            to="/knowledge/ask"
+            icon={<Compass size={16} />}
+            title="Ask Oracle"
+            caption="Hybrid retrieval chat"
+          />
         </div>
         <div className="mt-4 grid gap-4 sm:grid-cols-4">
           <MiniStat label="Module variants" value={MODULE_VARIANTS.length} accent="#003FC7" />
@@ -433,10 +569,18 @@ function ParallaxWatermark({ accent }: { accent: string }) {
   useEffect(() => {
     if (reducedMotion) return; // no scroll listener, no rAF loop
     let raf = 0;
-    const update = () => { raf = 0; setScrollY(window.scrollY); };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    const update = () => {
+      raf = 0;
+      setScrollY(window.scrollY);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => { window.removeEventListener("scroll", onScroll); if (raf) cancelAnimationFrame(raf); };
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, [reducedMotion]);
   const y = reducedMotion ? 0 : Math.min(scrollY, 800);
   return (
@@ -516,8 +660,8 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
     };
     const onMove = (e: MouseEvent) => {
       const r = el.getBoundingClientRect();
-      targetX = ((e.clientX - r.left) / r.width) * 2 - 1;   // -1..1
-      targetY = ((e.clientY - r.top) / r.height) * 2 - 1;   // -1..1
+      targetX = ((e.clientX - r.left) / r.width) * 2 - 1; // -1..1
+      targetY = ((e.clientY - r.top) / r.height) * 2 - 1; // -1..1
       kick();
     };
     const onLeave = () => {
@@ -548,11 +692,10 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
   // opacity instead of re-mounting. That kills the abrupt "pop" between steps.
   const POS: Record<ModeId, { aTop: string; aLeft: string; bBottom: string; bRight: string }> = {
     presentation: { aTop: "-160px", aLeft: "-120px", bBottom: "-100px", bRight: "-80px" },
-    print:        { aTop: "38%",    aLeft: "58%",    bBottom: "-40px",  bRight: "-120px" },
-    event:        { aTop: "-40px",  aLeft: "38%",    bBottom: "38%",    bRight: "-80px" },
-    social:       { aTop: "48%",    aLeft: "-100px", bBottom: "-160px", bRight: "48%" },
+    print: { aTop: "38%", aLeft: "58%", bBottom: "-40px", bRight: "-120px" },
+    event: { aTop: "-40px", aLeft: "38%", bBottom: "38%", bRight: "-80px" },
+    social: { aTop: "48%", aLeft: "-100px", bBottom: "-160px", bRight: "48%" },
   };
-
 
   return (
     <div ref={rootRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -606,7 +749,8 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
 }
 
 function ModeActionButton({ action, accent }: { action: ModeAction; accent: string }) {
-  const shared = "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition";
+  const shared =
+    "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition";
   if (action.primary) {
     return (
       <Link
@@ -615,7 +759,11 @@ function ModeActionButton({ action, accent }: { action: ModeAction; accent: stri
       >
         <Rocket size={14} style={{ color: accent }} />
         {action.label}
-        {action.hint && <span className="text-[10px] font-semibold uppercase tracking-widest text-black/40">· {action.hint}</span>}
+        {action.hint && (
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-black/40">
+            · {action.hint}
+          </span>
+        )}
       </Link>
     );
   }
@@ -625,7 +773,11 @@ function ModeActionButton({ action, accent }: { action: ModeAction; accent: stri
       className={`${shared} border border-white/20 bg-white/[0.05] text-white/85 backdrop-blur hover:border-white/40 hover:bg-white/[0.1]`}
     >
       {action.label}
-      {action.hint && <span className="text-[10px] font-semibold uppercase tracking-widest text-white/50">· {action.hint}</span>}
+      {action.hint && (
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-white/50">
+          · {action.hint}
+        </span>
+      )}
     </Link>
   );
 }
@@ -651,9 +803,7 @@ function AgentBar({
   };
 
   return (
-    <div
-      className="group relative overflow-hidden rounded-2xl border border-white/15 bg-white/[0.06] p-1.5 backdrop-blur transition focus-within:border-white/40 focus-within:bg-white/[0.09]"
-    >
+    <div className="group relative overflow-hidden rounded-2xl border border-white/15 bg-white/[0.06] p-1.5 backdrop-blur transition focus-within:border-white/40 focus-within:bg-white/[0.09]">
       <span
         aria-hidden
         className="pointer-events-none absolute -left-8 top-1/2 h-24 w-24 -translate-y-1/2 rounded-full opacity-40 blur-2xl transition"
@@ -669,7 +819,10 @@ function AgentBar({
             <Wand2 size={16} />
           </span>
           <div className="min-w-0 flex-1">
-            <label htmlFor="agent-prompt" className="block text-[10px] font-semibold uppercase tracking-[0.28em] text-white/50">
+            <label
+              htmlFor="agent-prompt"
+              className="block text-[10px] font-semibold uppercase tracking-[0.28em] text-white/50"
+            >
               Ask the Oracle · or describe what you need
             </label>
             <textarea
@@ -719,11 +872,21 @@ function AgentBar({
 /* ---------- shared bits ---------- */
 
 function SectionHeader({
-  kicker, title, hint, inline,
-}: { kicker: string; title: string; hint?: string; inline?: boolean }) {
+  kicker,
+  title,
+  hint,
+  inline,
+}: {
+  kicker: string;
+  title: string;
+  hint?: string;
+  inline?: boolean;
+}) {
   return (
     <div className={inline ? "" : "mb-1"}>
-      <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#003FC7] dark:text-[#A1FBF9]">{kicker}</div>
+      <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#003FC7] dark:text-[#A1FBF9]">
+        {kicker}
+      </div>
       <div className="mt-1 flex items-baseline gap-3">
         <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
         {hint && <span className="text-xs text-black/45 dark:text-white/45">{hint}</span>}
@@ -732,11 +895,22 @@ function SectionHeader({
   );
 }
 
-function HeroStat({ label, value, sub, icon }: { label: string; value: number | string; sub?: string; icon?: React.ReactNode }) {
+function HeroStat({
+  label,
+  value,
+  sub,
+  icon,
+}: {
+  label: string;
+  value: number | string;
+  sub?: string;
+  icon?: React.ReactNode;
+}) {
   return (
     <div className="rounded-2xl border border-white/15 bg-white/[0.06] p-4 backdrop-blur">
       <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-white/60">
-        {icon}<span>{label}</span>
+        {icon}
+        <span>{label}</span>
       </div>
       <div className="mt-2 text-2xl font-semibold tabular-nums">{value}</div>
       {sub && <div className="mt-1 text-[11px] text-white/50">{sub}</div>}
@@ -745,8 +919,18 @@ function HeroStat({ label, value, sub, icon }: { label: string; value: number | 
 }
 
 function AiCard({
-  to, icon, title, desc, tint,
-}: { to: string; icon: React.ReactNode; title: string; desc: string; tint: string }) {
+  to,
+  icon,
+  title,
+  desc,
+  tint,
+}: {
+  to: string;
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  tint: string;
+}) {
   return (
     <Link
       to={to}
@@ -811,10 +995,17 @@ function DeckCard({ deck: d, industry }: { deck: Deck; industry?: string }) {
         </div>
         <div className="border-t border-black/10 p-5 dark:border-white/10">
           <div className="flex items-center gap-2">
-            <span className="h-1.5 w-8 rounded-full" style={{ backgroundColor: brand.tokens.accent }} />
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">{brand.name}</span>
+            <span
+              className="h-1.5 w-8 rounded-full"
+              style={{ backgroundColor: brand.tokens.accent }}
+            />
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
+              {brand.name}
+            </span>
             {d.isTemplate && (
-              <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">Template</span>
+              <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">
+                Template
+              </span>
             )}
           </div>
           <div className="mt-3 line-clamp-2 text-lg font-semibold">{d.title}</div>
@@ -866,8 +1057,18 @@ function DeckCard({ deck: d, industry }: { deck: Deck; industry?: string }) {
 }
 
 function ResourceTile({
-  to, icon, title, count, caption,
-}: { to: string; icon: React.ReactNode; title: string; count?: number | string; caption: string }) {
+  to,
+  icon,
+  title,
+  count,
+  caption,
+}: {
+  to: string;
+  icon: React.ReactNode;
+  title: string;
+  count?: number | string;
+  caption: string;
+}) {
   return (
     <Link
       to={to}
@@ -885,16 +1086,29 @@ function ResourceTile({
         </div>
         <div className="mt-0.5 text-xs text-black/55 dark:text-white/55">{caption}</div>
       </div>
-      <ArrowRight size={14} className="mt-1 shrink-0 text-foreground/30 transition group-hover:translate-x-0.5 group-hover:text-foreground/60 dark:text-primary-foreground/30 dark:group-hover:text-primary-foreground/60" />
+      <ArrowRight
+        size={14}
+        className="mt-1 shrink-0 text-foreground/30 transition group-hover:translate-x-0.5 group-hover:text-foreground/60 dark:text-primary-foreground/30 dark:group-hover:text-primary-foreground/60"
+      />
     </Link>
   );
 }
 
-function MiniStat({ label, value, accent }: { label: string; value: number | string; accent: string }) {
+function MiniStat({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: number | string;
+  accent: string;
+}) {
   return (
     <div className="relative overflow-hidden rounded-xl border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/[0.04]">
       <span className="absolute left-0 top-0 h-full w-1" style={{ backgroundColor: accent }} />
-      <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50 dark:text-white/50">{label}</div>
+      <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50 dark:text-white/50">
+        {label}
+      </div>
       <div className="mt-1.5 text-2xl font-semibold tabular-nums">{value}</div>
     </div>
   );
@@ -957,8 +1171,12 @@ function RecentActivity({
           })),
         );
       })
-      .catch(() => { /* signed out — stay quiet */ });
-    return () => { cancelled = true; };
+      .catch(() => {
+        /* signed out — stay quiet */
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [listPrint]);
 
   useEffect(() => {
@@ -978,8 +1196,12 @@ function RecentActivity({
           })),
         );
       })
-      .catch(() => { /* signed out — stay quiet */ });
-    return () => { cancelled = true; };
+      .catch(() => {
+        /* signed out — stay quiet */
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [listKits]);
 
   const deckItems = useMemo<ActivityItem[]>(
@@ -1028,7 +1250,10 @@ function RecentActivity({
           hint="Decks, print, social, and events"
           inline
         />
-        <Link to="/decks" className="text-sm text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white">
+        <Link
+          to="/decks"
+          className="text-sm text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+        >
           View all decks →
         </Link>
       </div>
@@ -1048,7 +1273,11 @@ function RecentActivity({
           >
             {c.label}
             {typeof c.count === "number" ? (
-              <span className={filter === c.id ? "text-white/70" : "text-black/35 dark:text-white/40"}>{c.count}</span>
+              <span
+                className={filter === c.id ? "text-white/70" : "text-black/35 dark:text-white/40"}
+              >
+                {c.count}
+              </span>
             ) : null}
           </button>
         ))}
@@ -1057,10 +1286,13 @@ function RecentActivity({
       {items.length === 0 ? (
         <div className="rounded-3xl border border-dashed border-black/15 bg-white p-12 text-center dark:border-white/15 dark:bg-white/[0.03]">
           <div className="mx-auto max-w-md">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#003FC7]/10 text-2xl text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">✦</div>
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#003FC7]/10 text-2xl text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">
+              ✦
+            </div>
             <h3 className="mt-4 text-xl font-semibold">Nothing here yet</h3>
             <p className="mt-2 text-sm text-black/60 dark:text-white/60">
-              Start with a brief, a print asset, or a campaign kit — anything you make shows up here.
+              Start with a brief, a print asset, or a campaign kit — anything you make shows up
+              here.
             </p>
             <Link
               to="/brief/new"
@@ -1103,7 +1335,9 @@ function ActivityCard({ item }: { item: ActivityItem }) {
           <div className="text-[10px] font-semibold uppercase tracking-widest text-black/45 dark:text-white/45">
             {meta.label}
           </div>
-          <div className="truncate text-sm font-semibold text-[#03002C] dark:text-white">{item.title}</div>
+          <div className="truncate text-sm font-semibold text-[#03002C] dark:text-white">
+            {item.title}
+          </div>
         </div>
       </div>
       <div className="mt-auto flex items-center justify-between gap-2 border-t border-black/5 pt-3 text-[11px] text-black/55 dark:border-white/5 dark:text-white/55">
@@ -1115,7 +1349,6 @@ function ActivityCard({ item }: { item: ActivityItem }) {
     </Link>
   );
 }
-
 
 function relative(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();

@@ -27,11 +27,7 @@ import type {
   SpotlightContent,
 } from "./print-assets.types";
 
-export type PrintTemplateKind =
-  | "case-study"
-  | "spotlight"
-  | "ebrochure"
-  | "adaptor-brief";
+export type PrintTemplateKind = "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
 
 export type CapacityLevel = "ok" | "warn" | "block";
 
@@ -61,7 +57,14 @@ export type CapacityReport = {
 
 export type CapacitySuggestion =
   | { kind: "reduce-hero"; targetHeightPct: number; frees: number; message: string }
-  | { kind: "swap-variant"; moduleIndex: number; from: string; to: string; frees: number; message: string }
+  | {
+      kind: "swap-variant";
+      moduleIndex: number;
+      from: string;
+      to: string;
+      frees: number;
+      message: string;
+    }
   | { kind: "drop-item"; moduleIndex: number; frees: number; message: string };
 
 /* ------------------------------------------------------------------
@@ -77,10 +80,10 @@ export const PRINT_TEMPLATE_BUDGETS: Record<
   PrintTemplateKind,
   { moduleBudget: number; label: string }
 > = {
-  "case-study":   { moduleBudget: 5.5, label: "Case Study"    },
-  "spotlight":    { moduleBudget: 4.5, label: "Spotlight"     },
-  "ebrochure":    { moduleBudget: 4.0, label: "eBrochure"     },
-  "adaptor-brief":{ moduleBudget: 3.5, label: "Adaptor Brief" },
+  "case-study": { moduleBudget: 5.5, label: "Case Study" },
+  spotlight: { moduleBudget: 4.5, label: "Spotlight" },
+  ebrochure: { moduleBudget: 4.0, label: "eBrochure" },
+  "adaptor-brief": { moduleBudget: 3.5, label: "Adaptor Brief" },
 };
 
 /* ------------------------------------------------------------------
@@ -118,12 +121,7 @@ export const HERO_HEIGHT_HARD_MAX = 72;
 type HeroCopy = { hasTitle: boolean; hasSummary: boolean };
 
 function heroCopyOf(
-  content:
-    | CaseStudyContent
-    | SpotlightContent
-    | EBrochureContent
-    | AdaptorBriefContent
-    | undefined,
+  content: CaseStudyContent | SpotlightContent | EBrochureContent | AdaptorBriefContent | undefined,
 ): HeroCopy {
   if (!content) return { hasTitle: false, hasSummary: false };
   const c = content as { title?: string; summary?: string };
@@ -138,12 +136,13 @@ function heroCopyOf(
  * triple. Returns 0 when no hero photo is present — a no-hero asset never
  * shrinks the module budget.
  */
-export function heroCostUnits(
-  heroMedia: PrintHeroMedia | undefined,
-  copy: HeroCopy,
-): number {
+export function heroCostUnits(heroMedia: PrintHeroMedia | undefined, copy: HeroCopy): number {
   if (!heroMedia?.imageUrl) return 0;
-  const hp = clampNum(heroMedia.heightPct ?? HERO_BASELINE_HEIGHT_PCT, HERO_HEIGHT_HARD_MIN, HERO_HEIGHT_HARD_MAX);
+  const hp = clampNum(
+    heroMedia.heightPct ?? HERO_BASELINE_HEIGHT_PCT,
+    HERO_HEIGHT_HARD_MIN,
+    HERO_HEIGHT_HARD_MAX,
+  );
   const ws = clampNum(heroMedia.washStrength ?? 1, 0, 1);
   const coeff = HERO_UNITS_PER_PCT * (1 - HERO_FADE_SEAM_FRAC * ws);
   const copyReserve =
@@ -209,9 +208,9 @@ export const PRINT_STATS_VARIANT_LIMITS: Record<
   PrintStatsVariant,
   { weight: number; minItems: number; maxItems: number; labelMax: number; valueMax: number }
 > = {
-  "kpi-dashboard-portrait":   { weight: 2.4, minItems: 3, maxItems: 4, labelMax: 40, valueMax: 8 },
-  "stat-callout-row-portrait":{ weight: 1.6, minItems: 2, maxItems: 4, labelMax: 32, valueMax: 8 },
-  "stat-bento-portrait":      { weight: 2.0, minItems: 3, maxItems: 5, labelMax: 44, valueMax: 8 },
+  "kpi-dashboard-portrait": { weight: 2.4, minItems: 3, maxItems: 4, labelMax: 40, valueMax: 8 },
+  "stat-callout-row-portrait": { weight: 1.6, minItems: 2, maxItems: 4, labelMax: 32, valueMax: 8 },
+  "stat-bento-portrait": { weight: 2.0, minItems: 3, maxItems: 5, labelMax: 44, valueMax: 8 },
 };
 
 // Weights for non-stats families. Tuned against portrait renderers so the
@@ -223,21 +222,21 @@ export const PRINT_QUOTE_VARIANT_WEIGHTS = {
 } as const;
 
 export const PRINT_LOGO_VARIANT_LIMITS = {
-  "logo-grid-portrait":  { weight: 1.8, maxItems: 9 },
-  "logo-row-portrait":   { weight: 1.0, maxItems: 6 },
-  "logo-wall-portrait":  { weight: 2.4, maxItems: 12 },
+  "logo-grid-portrait": { weight: 1.8, maxItems: 9 },
+  "logo-row-portrait": { weight: 1.0, maxItems: 6 },
+  "logo-wall-portrait": { weight: 2.4, maxItems: 12 },
 } as const;
 
 export const PRINT_EXPERTISE_VARIANT_LIMITS = {
-  "expertise-icon-strip":       { weight: 1.2, maxItems: 6, labelMax: 24 },
-  "expertise-checklist":        { weight: 1.8, maxItems: 6, labelMax: 90 },
+  "expertise-icon-strip": { weight: 1.2, maxItems: 6, labelMax: 24 },
+  "expertise-checklist": { weight: 1.8, maxItems: 6, labelMax: 90 },
   "expertise-credential-pills": { weight: 0.9, maxItems: 8, labelMax: 32 },
 } as const;
 
 export const PRINT_FEATURE_VARIANT_LIMITS = {
   "feature-cards-3col": { weight: 2.4, maxItems: 6, bodyMax: 140 },
   "feature-cards-2col": { weight: 2.0, maxItems: 4, bodyMax: 180 },
-  "feature-list-1col":  { weight: 2.6, maxItems: 5, bodyMax: 200 },
+  "feature-list-1col": { weight: 2.6, maxItems: 5, bodyMax: 200 },
 } as const;
 
 export function weightForSection(section: PrintSection): number {
@@ -274,14 +273,14 @@ const TEXT_LIMITS = {
     quoteText: 340,
     statsMax: 5,
   },
-  "spotlight": {
+  spotlight: {
     summary: 220,
     tagline: 90,
     capabilityBody: 220,
     capabilitiesMax: 5,
     statsMax: 4,
   },
-  "ebrochure": {
+  ebrochure: {
     summary: 220,
     sectionBody: 380,
     bulletMax: 120,
@@ -327,10 +326,7 @@ function pushLen(
   }
 }
 
-export function analyzeSection(
-  section: PrintSection,
-  moduleIndex: number,
-): CapacityIssue[] {
+export function analyzeSection(section: PrintSection, moduleIndex: number): CapacityIssue[] {
   const issues: CapacityIssue[] = [];
   if (section.kind === "stats") {
     const cfg = PRINT_STATS_VARIANT_LIMITS[section.variantId];
@@ -359,25 +355,52 @@ export function analyzeSection(
     pushLen(issues, "Stats title", s.title, 60, moduleIndex);
     pushLen(issues, "Stats eyebrow", s.eyebrow, 48, moduleIndex);
   } else if (section.kind === "quote") {
-    pushLen(issues, "Quote text", section.text, section.variantId === "quote-inline-compact" ? 180 : 340, moduleIndex);
+    pushLen(
+      issues,
+      "Quote text",
+      section.text,
+      section.variantId === "quote-inline-compact" ? 180 : 340,
+      moduleIndex,
+    );
     pushLen(issues, "Quote author", section.author, 60, moduleIndex);
   } else if (section.kind === "logo-grid") {
     const cfg = PRINT_LOGO_VARIANT_LIMITS[section.variantId];
     if (cfg && section.items.length > cfg.maxItems) {
-      issues.push({ level: "block", code: "logos-overflow", message: `${section.variantId} supports up to ${cfg.maxItems} logos — ${section.items.length} will clip.`, moduleIndex });
+      issues.push({
+        level: "block",
+        code: "logos-overflow",
+        message: `${section.variantId} supports up to ${cfg.maxItems} logos — ${section.items.length} will clip.`,
+        moduleIndex,
+      });
     }
   } else if (section.kind === "expertise") {
     const cfg = PRINT_EXPERTISE_VARIANT_LIMITS[section.variantId];
     if (cfg && section.items.length > cfg.maxItems) {
-      issues.push({ level: "block", code: "expertise-overflow", message: `${section.variantId} supports up to ${cfg.maxItems} items — ${section.items.length} will clip.`, moduleIndex });
+      issues.push({
+        level: "block",
+        code: "expertise-overflow",
+        message: `${section.variantId} supports up to ${cfg.maxItems} items — ${section.items.length} will clip.`,
+        moduleIndex,
+      });
     }
-    if (cfg) section.items.forEach((it, i) => pushLen(issues, `Item ${i + 1} label`, it.label, cfg.labelMax, moduleIndex));
+    if (cfg)
+      section.items.forEach((it, i) =>
+        pushLen(issues, `Item ${i + 1} label`, it.label, cfg.labelMax, moduleIndex),
+      );
   } else if (section.kind === "feature-list") {
     const cfg = PRINT_FEATURE_VARIANT_LIMITS[section.variantId];
     if (cfg && section.items.length > cfg.maxItems) {
-      issues.push({ level: "block", code: "features-overflow", message: `${section.variantId} supports up to ${cfg.maxItems} features — ${section.items.length} will clip.`, moduleIndex });
+      issues.push({
+        level: "block",
+        code: "features-overflow",
+        message: `${section.variantId} supports up to ${cfg.maxItems} features — ${section.items.length} will clip.`,
+        moduleIndex,
+      });
     }
-    if (cfg) section.items.forEach((it, i) => pushLen(issues, `Feature ${i + 1} body`, it.body, cfg.bodyMax, moduleIndex));
+    if (cfg)
+      section.items.forEach((it, i) =>
+        pushLen(issues, `Feature ${i + 1} body`, it.body, cfg.bodyMax, moduleIndex),
+      );
   }
   return issues;
 }
@@ -485,9 +508,7 @@ function analyzeAdaptor(c: AdaptorBriefContent): CapacityIssue[] {
   const t = TEXT_LIMITS["adaptor-brief"];
   const issues: CapacityIssue[] = [];
   pushLen(issues, "Summary", c.summary, t.summary);
-  (c.features ?? []).forEach((f, i) =>
-    pushLen(issues, `Feature ${i + 1}`, f.body, t.featureBody),
-  );
+  (c.features ?? []).forEach((f, i) => pushLen(issues, `Feature ${i + 1}`, f.body, t.featureBody));
   if ((c.features?.length ?? 0) > t.featuresMax) {
     issues.push({
       level: "block",
@@ -508,11 +529,7 @@ function analyzeAdaptor(c: AdaptorBriefContent): CapacityIssue[] {
 
 export function analyzePrintAsset(
   kind: PrintTemplateKind,
-  content:
-    | CaseStudyContent
-    | SpotlightContent
-    | EBrochureContent
-    | AdaptorBriefContent,
+  content: CaseStudyContent | SpotlightContent | EBrochureContent | AdaptorBriefContent,
 ): CapacityReport {
   const base = PRINT_TEMPLATE_BUDGETS[kind].moduleBudget;
   const modules = (content as { modules?: PrintSection[] }).modules;
@@ -524,9 +541,9 @@ export function analyzePrintAsset(
   const { used, issues: modIssues } = analyzeModules(kind, modules, budget);
 
   let bodyIssues: CapacityIssue[] = [];
-  if (kind === "case-study")   bodyIssues = analyzeCaseStudy(content as CaseStudyContent);
-  else if (kind === "spotlight")     bodyIssues = analyzeSpotlight(content as SpotlightContent);
-  else if (kind === "ebrochure")     bodyIssues = analyzeEBrochure(content as EBrochureContent);
+  if (kind === "case-study") bodyIssues = analyzeCaseStudy(content as CaseStudyContent);
+  else if (kind === "spotlight") bodyIssues = analyzeSpotlight(content as SpotlightContent);
+  else if (kind === "ebrochure") bodyIssues = analyzeEBrochure(content as EBrochureContent);
   else if (kind === "adaptor-brief") bodyIssues = analyzeAdaptor(content as AdaptorBriefContent);
 
   const issues = [...modIssues, ...bodyIssues];
@@ -627,7 +644,11 @@ export function canAddModule(
   opts?: { heroMedia?: PrintHeroMedia; copy?: HeroCopy },
 ): { ok: boolean; remaining: number; reason?: string } {
   const budget = opts
-    ? effectiveModuleBudget(kind, opts.heroMedia, opts.copy ?? { hasTitle: false, hasSummary: false })
+    ? effectiveModuleBudget(
+        kind,
+        opts.heroMedia,
+        opts.copy ?? { hasTitle: false, hasSummary: false },
+      )
     : PRINT_TEMPLATE_BUDGETS[kind].moduleBudget;
   const used = (modules ?? []).reduce((n, m) => n + weightForSection(m), 0);
   const remaining = budget - used;

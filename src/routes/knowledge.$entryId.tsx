@@ -63,8 +63,14 @@ function EntryView() {
           title,
           body,
           kind,
-          tags: tags.split(",").map((s) => s.trim()).filter(Boolean),
-          sources: sources.split("\n").map((s) => s.trim()).filter(Boolean),
+          tags: tags
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean),
+          sources: sources
+            .split("\n")
+            .map((s) => s.trim())
+            .filter(Boolean),
           visibility,
           shared_with_division_ids: sharedWith,
           expires_at: expiresAt ? new Date(expiresAt).toISOString() : null,
@@ -78,7 +84,12 @@ function EntryView() {
     onSuccess: () => navigate({ to: "/knowledge" as never }),
   });
 
-  if (entry.isLoading) return <AppShell><div className="text-sm text-black/60">Loading…</div></AppShell>;
+  if (entry.isLoading)
+    return (
+      <AppShell>
+        <div className="text-sm text-black/60">Loading…</div>
+      </AppShell>
+    );
   if (!entry.data) throw notFound();
 
   const ownerName = BRAND_MODES.find((b) => b.id === owner)?.name ?? owner;
@@ -86,16 +97,23 @@ function EntryView() {
   return (
     <AppShell>
       <div className="mx-auto max-w-3xl">
-        <Link to={"/knowledge" as never} className="text-xs uppercase tracking-widest text-black/50 hover:text-black">
+        <Link
+          to={"/knowledge" as never}
+          className="text-xs uppercase tracking-widest text-black/50 hover:text-black"
+        >
           ← Back to knowledge
         </Link>
         <div className="mt-3 flex items-baseline justify-between gap-6">
           <div>
-            <div className="text-xs uppercase tracking-[0.3em] text-black/50">{KNOWLEDGE_KIND_META[kind].label} · {ownerName}</div>
+            <div className="text-xs uppercase tracking-[0.3em] text-black/50">
+              {KNOWLEDGE_KIND_META[kind].label} · {ownerName}
+            </div>
             <h1 className="mt-2 text-3xl font-semibold">{title || "Untitled"}</h1>
           </div>
           <button
-            onClick={() => { if (confirm("Delete this entry?")) remove.mutate(); }}
+            onClick={() => {
+              if (confirm("Delete this entry?")) remove.mutate();
+            }}
             className="rounded-full border border-red-300 bg-white px-4 py-2 text-sm text-red-700 hover:bg-red-50"
           >
             Delete
@@ -104,33 +122,68 @@ function EntryView() {
 
         <div className="mt-8 space-y-6 rounded-2xl border border-black/10 bg-white p-8">
           <Field label="Owner division">
-            <select value={owner} onChange={(e) => setOwner(e.target.value)} className={inputCls}>
-              {BRAND_MODES.map((b) => (<option key={b.id} value={b.id}>{b.name}</option>))}
+            <select
+              aria-label="Owner"
+              value={owner}
+              onChange={(e) => setOwner(e.target.value)}
+              className={inputCls}
+            >
+              {BRAND_MODES.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
             </select>
           </Field>
           <div className="grid grid-cols-2 gap-6">
             <Field label="Kind">
-              <select value={kind} onChange={(e) => setKind(e.target.value as EditableKnowledgeKind)} className={inputCls}>
+              <select
+                aria-label="Kind"
+                value={kind}
+                onChange={(e) => setKind(e.target.value as EditableKnowledgeKind)}
+                className={inputCls}
+              >
                 {Object.entries(KNOWLEDGE_KIND_META)
                   .filter(([k]) => k !== "source_deck" && k !== "source_pdf")
                   .map(([k, m]) => (
-                    <option key={k} value={k}>{m.label}</option>
+                    <option key={k} value={k}>
+                      {m.label}
+                    </option>
                   ))}
               </select>
             </Field>
             <Field label="Expires">
-              <input type="date" value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} className={inputCls} />
+              <input
+                type="date"
+                value={expiresAt}
+                onChange={(e) => setExpiresAt(e.target.value)}
+                className={inputCls}
+              />
             </Field>
           </div>
           <Field label="Title">
             <input value={title} onChange={(e) => setTitle(e.target.value)} className={inputCls} />
           </Field>
           <Field label="Body">
-            <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={8} className={inputCls} />
+            <textarea
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              rows={8}
+              className={inputCls}
+            />
           </Field>
           <div className="grid grid-cols-2 gap-6">
-            <Field label="Tags"><input value={tags} onChange={(e) => setTags(e.target.value)} className={inputCls} /></Field>
-            <Field label="Sources"><textarea value={sources} onChange={(e) => setSources(e.target.value)} rows={2} className={inputCls} /></Field>
+            <Field label="Tags">
+              <input value={tags} onChange={(e) => setTags(e.target.value)} className={inputCls} />
+            </Field>
+            <Field label="Sources">
+              <textarea
+                value={sources}
+                onChange={(e) => setSources(e.target.value)}
+                rows={2}
+                className={inputCls}
+              />
+            </Field>
           </div>
           <Field label="Visibility">
             <div className="flex flex-wrap gap-2">
@@ -152,11 +205,18 @@ function EntryView() {
                 {BRAND_MODES.filter((b) => b.id !== owner).map((b) => {
                   const on = sharedWith.includes(b.id);
                   return (
-                    <label key={b.id} className="flex items-center gap-2 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm">
+                    <label
+                      key={b.id}
+                      className="flex items-center gap-2 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm"
+                    >
                       <input
                         type="checkbox"
                         checked={on}
-                        onChange={(e) => setSharedWith((prev) => e.target.checked ? [...prev, b.id] : prev.filter((x) => x !== b.id))}
+                        onChange={(e) =>
+                          setSharedWith((prev) =>
+                            e.target.checked ? [...prev, b.id] : prev.filter((x) => x !== b.id),
+                          )
+                        }
                       />
                       <span>{b.name}</span>
                     </label>
@@ -187,7 +247,8 @@ function EntryView() {
   );
 }
 
-const inputCls = "w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm outline-none focus:border-black/40";
+const inputCls =
+  "w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm outline-none focus:border-black/40";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

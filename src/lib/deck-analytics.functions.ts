@@ -42,7 +42,15 @@ export const getLibraryAnalytics = createServerFn({ method: "GET" })
     const deckIds = deckRows.map((d) => d.id);
 
     if (deckIds.length === 0) {
-      return { totalDecks: 0, sharedDecks: 0, totalViews: 0, uniqueViewers: 0, topDecks: [], deckStats: [], trend: [] };
+      return {
+        totalDecks: 0,
+        sharedDecks: 0,
+        totalViews: 0,
+        uniqueViewers: 0,
+        topDecks: [],
+        deckStats: [],
+        trend: [],
+      };
     }
 
     const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();

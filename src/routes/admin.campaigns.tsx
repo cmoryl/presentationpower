@@ -11,11 +11,7 @@ import { useMemo, useState } from "react";
 import { Sparkles, Star } from "lucide-react";
 import { SOCIAL_FORMATS, aspectClass, KIT_PROFILES } from "@/lib/social-formats";
 import type { SocialFormat } from "@/lib/social-formats";
-import {
-  buildCampaignAssets,
-  type CampaignSource,
-  type EventFacts,
-} from "@/lib/campaigns";
+import { buildCampaignAssets, type CampaignSource, type EventFacts } from "@/lib/campaigns";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { useFavorites } from "@/lib/favorites";
@@ -201,7 +197,10 @@ function CampaignsView() {
                   brandId={asset.brandId}
                   mode={asset.mode}
                   copy={asset.copy}
-                  facts={{ hashtag: DEMO_EVENT.hashtag, registrationUrl: DEMO_EVENT.registrationUrl }}
+                  facts={{
+                    hashtag: DEMO_EVENT.hashtag,
+                    registrationUrl: DEMO_EVENT.registrationUrl,
+                  }}
                   displayShortEdge={280}
                 />
               </div>
@@ -210,24 +209,26 @@ function CampaignsView() {
         </div>
       </AdminSection>
 
-
       {/* Pipeline stub CTA */}
       <section className="rounded-3xl border border-dashed border-black/15 bg-black/[0.02] p-5">
         <h2 className="text-[11px] uppercase tracking-[0.18em] text-black/60">
           Campaign from content · Stub
         </h2>
         <p className="mt-2 max-w-3xl text-sm text-black/60">
-          Any deck slide, print asset, or module can seed a campaign. The pipeline
-          extracts base copy today; the AI adapter slot is marked with{" "}
+          Any deck slide, print asset, or module can seed a campaign. The pipeline extracts base
+          copy today; the AI adapter slot is marked with{" "}
           <code className="rounded bg-black/10 px-1.5 py-0.5 text-[11px]">TODO(ai)</code> in{" "}
-          <code className="rounded bg-black/10 px-1.5 py-0.5 text-[11px]">src/lib/campaigns.ts</code>.
+          <code className="rounded bg-black/10 px-1.5 py-0.5 text-[11px]">
+            src/lib/campaigns.ts
+          </code>
+          .
         </p>
         <button
           type="button"
           onClick={() =>
             // Dry-run demo — logs the resulting CampaignAsset[] so we can
             // eyeball provenance + TODO markers without hitting a network.
-             
+
             console.log("buildCampaignAssets sample →", assets.slice(0, 4))
           }
           className="mt-4 rounded-full bg-[#003FC7] px-4 py-2 text-[11px] uppercase tracking-widest text-white hover:bg-[#03002C]"
@@ -243,24 +244,23 @@ function CampaignsView() {
         </h2>
         <ul className="mt-2 list-disc pl-5 leading-relaxed">
           <li>
-            <b>Story / Reel 1080×1920</b> — pure scaling from the square preset leaves too much
-            dead space around the title. Wants a bespoke portrait-tall preset with a
-            centered lockup, larger CTA, and safe-area anchored middle-block.
+            <b>Story / Reel 1080×1920</b> — pure scaling from the square preset leaves too much dead
+            space around the title. Wants a bespoke portrait-tall preset with a centered lockup,
+            larger CTA, and safe-area anchored middle-block.
           </li>
           <li>
             <b>X 1600×900 / Callout 1200×628 / Email 1200×400</b> — long summary is force-dropped
-            because it never fits. Real solution is a shorter AI-adapted title (single
-            clause) rather than the current summary strip.
+            because it never fits. Real solution is a shorter AI-adapted title (single clause)
+            rather than the current summary strip.
           </li>
           <li>
-            <b>Portrait 1000×1500 / 1080×1350</b> — hero-metric position is fine but a
-            three-part stack (eyebrow / title / stat) needs a rhythm rule the shared
-            preset doesn't yet encode.
+            <b>Portrait 1000×1500 / 1080×1350</b> — hero-metric position is fine but a three-part
+            stack (eyebrow / title / stat) needs a rhythm rule the shared preset doesn't yet encode.
           </li>
           <li>
             Kit-numbered assets (speakers grid, sponsor grid, advocacy variants) are
-            <b> not</b> in scope here — they need bespoke layouts, not aspect-driven
-            scaling. Renderer covers the geometry-agnostic 60%; the rest is future work.
+            <b> not</b> in scope here — they need bespoke layouts, not aspect-driven scaling.
+            Renderer covers the geometry-agnostic 60%; the rest is future work.
           </li>
         </ul>
       </section>

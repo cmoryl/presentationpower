@@ -16,8 +16,7 @@ import { getDeckSlideTranslations, listLanguages } from "@/lib/translation.funct
 
 export const Route = createFileRoute("/decks/$deckId/print")({
   head: () => ({ meta: [{ title: "Print · TransPerfect Modular" }] }),
-  validateSearch: (raw) =>
-    z.object({ lang: z.string().min(2).max(10).optional() }).parse(raw),
+  validateSearch: (raw) => z.object({ lang: z.string().min(2).max(10).optional() }).parse(raw),
   component: PrintGate,
 });
 
@@ -35,7 +34,6 @@ function PrintView() {
   const { lang } = Route.useSearch();
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
-
 
   const fetchTx = useServerFn(getDeckSlideTranslations);
   const listLangs = useServerFn(listLanguages);
@@ -64,7 +62,8 @@ function PrintView() {
         if (cancelled) return;
         const map = new Map<number, Record<string, unknown>>();
         for (const r of rows as Array<{ position: number; content: unknown }>) {
-          if (r.content && typeof r.content === "object") map.set(r.position, r.content as Record<string, unknown>);
+          if (r.content && typeof r.content === "object")
+            map.set(r.position, r.content as Record<string, unknown>);
         }
         setOverlay(map);
         const l = (langs as Array<{ id: string; rtl: boolean }>).find((x) => x.id === lang);
@@ -92,7 +91,10 @@ function PrintView() {
     });
   }, [deck, overlay]);
 
-  const resolvedLogo = useResolvedClientLogo(deck?.clientLogo ?? { clientName: brief?.prospect ?? null }, "light");
+  const resolvedLogo = useResolvedClientLogo(
+    deck?.clientLogo ?? { clientName: brief?.prospect ?? null },
+    "light",
+  );
 
   if (!deck) throw notFound();
   const brand = resolveBrandMode(deck.brandModeId, deck.subCompany);
@@ -100,8 +102,11 @@ function PrintView() {
 
   return (
     <SlideMediaRefreshProvider slides={deck.slides}>
-    <div className="print-root min-h-screen bg-neutral-200 py-8 print:bg-white print:py-0" dir={isRtl ? "rtl" : undefined}>
-      <style>{`
+      <div
+        className="print-root min-h-screen bg-neutral-200 py-8 print:bg-white print:py-0"
+        dir={isRtl ? "rtl" : undefined}
+      >
+        <style>{`
         @media print {
           @page { size: 1280px 720px landscape; margin: 0; }
           html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
@@ -112,48 +117,50 @@ function PrintView() {
         }
         .print-slide, .print-slide * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
       `}</style>
-      <div className="no-print mx-auto mb-6 max-w-[1280px] px-6 text-xs text-black/60">
-        <div className="rounded-lg border border-black/10 bg-white p-3">
-          <strong>{loading ? "Preparing translated slides…" : "Ready to print."}</strong>{" "}
-          {!loading && (
-            <>
-              If the dialog didn't open,{" "}
-              <button className="underline" onClick={() => window.print()}>click here</button>. Select "Save as PDF" for
-              a print-faithful PDF at 16:9.
-            </>
-          )}
-          {lang && !loading && (
-            <span className="ml-1 text-black/40">Language: {lang.toUpperCase()}</span>
-          )}
+        <div className="no-print mx-auto mb-6 max-w-[1280px] px-6 text-xs text-black/60">
+          <div className="rounded-lg border border-black/10 bg-white p-3">
+            <strong>{loading ? "Preparing translated slides…" : "Ready to print."}</strong>{" "}
+            {!loading && (
+              <>
+                If the dialog didn't open,{" "}
+                <button className="underline" onClick={() => window.print()}>
+                  click here
+                </button>
+                . Select "Save as PDF" for a print-faithful PDF at 16:9.
+              </>
+            )}
+            {lang && !loading && (
+              <span className="ml-1 text-black/40">Language: {lang.toUpperCase()}</span>
+            )}
+          </div>
+        </div>
+        <div className="mx-auto flex max-w-[1280px] flex-col items-center gap-6 print:max-w-none print:gap-0">
+          {overlaidSlides.map((slide, i) => {
+            const variant = byId(MODULE_VARIANTS, slide.variantId);
+            if (!variant) return null;
+            return (
+              <div
+                key={slide.id}
+                className="print-slide overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm"
+                style={{ width: 1280, height: 720 }}
+              >
+                <ScaledSlide>
+                  <VariantRenderer
+                    slide={slide}
+                    variant={variant}
+                    brand={brand}
+                    pageNumber={i + 1}
+                    clientName={brief?.prospect}
+                    clientLogoUrl={clientLogoUrl}
+                    subCompany={deck.subCompany}
+                    logoOrientation={deck.context?.logoOrientation}
+                  />
+                </ScaledSlide>
+              </div>
+            );
+          })}
         </div>
       </div>
-      <div className="mx-auto flex max-w-[1280px] flex-col items-center gap-6 print:max-w-none print:gap-0">
-        {overlaidSlides.map((slide, i) => {
-          const variant = byId(MODULE_VARIANTS, slide.variantId);
-          if (!variant) return null;
-          return (
-            <div
-              key={slide.id}
-              className="print-slide overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm"
-              style={{ width: 1280, height: 720 }}
-            >
-              <ScaledSlide>
-                <VariantRenderer
-                  slide={slide}
-                  variant={variant}
-                  brand={brand}
-                  pageNumber={i + 1}
-                  clientName={brief?.prospect}
-                  clientLogoUrl={clientLogoUrl}
-                  subCompany={deck.subCompany}
-                  logoOrientation={deck.context?.logoOrientation}
-                />
-              </ScaledSlide>
-            </div>
-          );
-        })}
-      </div>
-    </div>
     </SlideMediaRefreshProvider>
   );
 }

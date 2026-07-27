@@ -4,7 +4,13 @@ import { byId, MODULE_VARIANTS, NARRATIVE_ARCHETYPES, SECTION_FRAMEWORKS } from 
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-export function DeckChat({ deck, brief }: { deck: Deck; brief?: { prospect: string; industry: string; audience: string; archetypeId: string } }) {
+export function DeckChat({
+  deck,
+  brief,
+}: {
+  deck: Deck;
+  brief?: { prospect: string; industry: string; audience: string; archetypeId: string };
+}) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -44,7 +50,10 @@ export function DeckChat({ deck, brief }: { deck: Deck; brief?: { prospect: stri
       });
       if (!res.ok || !res.body) {
         const t = await res.text().catch(() => "");
-        setMessages((m) => [...m, { role: "assistant", content: `Error: ${res.status} ${t.slice(0, 200)}` }]);
+        setMessages((m) => [
+          ...m,
+          { role: "assistant", content: `Error: ${res.status} ${t.slice(0, 200)}` },
+        ]);
         setStreaming(false);
         return;
       }
@@ -58,13 +67,17 @@ export function DeckChat({ deck, brief }: { deck: Deck; brief?: { prospect: stri
         setMessages((m) => {
           const copy = [...m];
           const last = copy[copy.length - 1];
-          if (last?.role === "assistant") copy[copy.length - 1] = { ...last, content: last.content + chunk };
+          if (last?.role === "assistant")
+            copy[copy.length - 1] = { ...last, content: last.content + chunk };
           return copy;
         });
       }
     } catch (e) {
       if ((e as Error).name !== "AbortError") {
-        setMessages((m) => [...m, { role: "assistant", content: `Error: ${(e as Error).message}` }]);
+        setMessages((m) => [
+          ...m,
+          { role: "assistant", content: `Error: ${(e as Error).message}` },
+        ]);
       }
     } finally {
       setStreaming(false);
@@ -89,24 +102,37 @@ export function DeckChat({ deck, brief }: { deck: Deck; brief?: { prospect: stri
           <div className="text-xs uppercase tracking-widest text-black/50">Deck assistant</div>
           <div className="text-sm font-medium">{deck.title}</div>
         </div>
-        <button onClick={() => setOpen(false)} className="rounded-md px-2 py-1 text-sm text-black/60 hover:bg-black/5">✕</button>
+        <button
+          onClick={() => setOpen(false)}
+          className="rounded-md px-2 py-1 text-sm text-black/60 hover:bg-black/5"
+        >
+          ✕
+        </button>
       </div>
       <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4 text-sm">
         {messages.length === 0 && (
           <div className="text-black/50">
-            Ask about narrative, pacing, or where the story is weak. I read the deck outline — not the slide bodies — so keep questions strategic.
+            Ask about narrative, pacing, or where the story is weak. I read the deck outline — not
+            the slide bodies — so keep questions strategic.
           </div>
         )}
         {messages.map((m, i) => (
           <div key={i} className={m.role === "user" ? "text-right" : ""}>
-            <div className={`inline-block max-w-[85%] rounded-2xl px-3 py-2 ${m.role === "user" ? "bg-[#0B2A4A] text-white" : "bg-black/5"}`}>
-              <div className="whitespace-pre-wrap">{m.content || (streaming && i === messages.length - 1 ? "…" : "")}</div>
+            <div
+              className={`inline-block max-w-[85%] rounded-2xl px-3 py-2 ${m.role === "user" ? "bg-[#0B2A4A] text-white" : "bg-black/5"}`}
+            >
+              <div className="whitespace-pre-wrap">
+                {m.content || (streaming && i === messages.length - 1 ? "…" : "")}
+              </div>
             </div>
           </div>
         ))}
       </div>
       <form
-        onSubmit={(e) => { e.preventDefault(); send(); }}
+        onSubmit={(e) => {
+          e.preventDefault();
+          send();
+        }}
         className="flex items-center gap-2 border-t border-black/10 p-3"
       >
         <input

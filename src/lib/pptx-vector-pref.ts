@@ -17,14 +17,24 @@ export function getPreferVector(): boolean {
     const raw = window.localStorage.getItem(KEY);
     if (raw === "true") return true;
     if (raw === "false") return false;
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   return DEFAULT;
 }
 
 export function setPreferVector(v: boolean): void {
   if (typeof window === "undefined") return;
-  try { window.localStorage.setItem(KEY, v ? "true" : "false"); } catch { /* ignore */ }
-  try { window.dispatchEvent(new CustomEvent("pptx:prefer-vector", { detail: v })); } catch { /* ignore */ }
+  try {
+    window.localStorage.setItem(KEY, v ? "true" : "false");
+  } catch {
+    /* ignore */
+  }
+  try {
+    window.dispatchEvent(new CustomEvent("pptx:prefer-vector", { detail: v }));
+  } catch {
+    /* ignore */
+  }
 }
 
 export const PREFER_VECTOR_EVENT = "pptx:prefer-vector";

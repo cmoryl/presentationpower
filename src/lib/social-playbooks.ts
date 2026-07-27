@@ -8,8 +8,12 @@
 // Adding a new division playbook here surfaces automatically on /social.
 
 import type { CampaignSource, EventFacts } from "./campaigns";
-import type { PlaybookPhase, PlaybookDeliverable, PlaybookKpi, CollateralCategory } from "./event-playbooks";
-
+import type {
+  PlaybookPhase,
+  PlaybookDeliverable,
+  PlaybookKpi,
+  CollateralCategory,
+} from "./event-playbooks";
 
 export type SocialAngle =
   | "announcement"
@@ -90,15 +94,42 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
       cta: "See how we work",
     },
     phases: [
-      { when: "Week 1", label: "Anthem drop", detail: "Big-idea square + story + LinkedIn link.", formats: ["square-1080", "story-1080x1920", "linkedin-link-1200x627"] },
-      { when: "Week 2", label: "Proof", detail: "Follow-up stat callout + case metrics.", formats: ["callout-1200x628", "portrait-1080x1350"] },
-      { when: "Week 3", label: "Engage", detail: "Question prompt · community reply thread.", formats: ["square-1080"] },
+      {
+        when: "Week 1",
+        label: "Anthem drop",
+        detail: "Big-idea square + story + LinkedIn link.",
+        formats: ["square-1080", "story-1080x1920", "linkedin-link-1200x627"],
+      },
+      {
+        when: "Week 2",
+        label: "Proof",
+        detail: "Follow-up stat callout + case metrics.",
+        formats: ["callout-1200x628", "portrait-1080x1350"],
+      },
+      {
+        when: "Week 3",
+        label: "Engage",
+        detail: "Question prompt · community reply thread.",
+        formats: ["square-1080"],
+      },
     ],
     deliverables: [
       { surface: "digital", label: "Anthem square", detail: "1080×1080 with the master lockup." },
-      { surface: "digital", label: "Story loop", detail: "1080×1920 vertical for IG + LI stories." },
-      { surface: "digital", label: "LinkedIn link card", detail: "1200×628 for the anthem article." },
-      { surface: "digital", label: "Portrait proof card", detail: "1080×1350 stat callout follow-up." },
+      {
+        surface: "digital",
+        label: "Story loop",
+        detail: "1080×1920 vertical for IG + LI stories.",
+      },
+      {
+        surface: "digital",
+        label: "LinkedIn link card",
+        detail: "1200×628 for the anthem article.",
+      },
+      {
+        surface: "digital",
+        label: "Portrait proof card",
+        detail: "1080×1350 stat callout follow-up.",
+      },
     ],
     kpis: [
       { label: "Impressions · 30 days", target: "1.2M" },
@@ -126,14 +157,42 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
       cta: "Read the case study",
     },
     phases: [
-      { when: "Day 1", label: "Reveal", detail: "Editorial cover + stat headline.", formats: ["portrait-1080x1350", "linkedin-post-1200x1200"] },
-      { when: "Day 3", label: "Pull-quote", detail: "Client executive quote card.", formats: ["square-1080", "callout-1200x628"] },
-      { when: "Day 7", label: "Territory map", detail: "Global rollout story + YouTube trailer card.", formats: ["story-1080x1920", "youtube-1280x720"] },
-      { when: "Day 14", label: "Recap", detail: "LinkedIn link card + email header.", formats: ["linkedin-link-1200x627", "email-header-1200x400"] },
+      {
+        when: "Day 1",
+        label: "Reveal",
+        detail: "Editorial cover + stat headline.",
+        formats: ["portrait-1080x1350", "linkedin-post-1200x1200"],
+      },
+      {
+        when: "Day 3",
+        label: "Pull-quote",
+        detail: "Client executive quote card.",
+        formats: ["square-1080", "callout-1200x628"],
+      },
+      {
+        when: "Day 7",
+        label: "Territory map",
+        detail: "Global rollout story + YouTube trailer card.",
+        formats: ["story-1080x1920", "youtube-1280x720"],
+      },
+      {
+        when: "Day 14",
+        label: "Recap",
+        detail: "LinkedIn link card + email header.",
+        formats: ["linkedin-link-1200x627", "email-header-1200x400"],
+      },
     ],
     deliverables: [
-      { surface: "digital", label: "Editorial portrait cover", detail: "1080×1350 magazine-style hero." },
-      { surface: "digital", label: "Pull-quote card", detail: "Client attribution + territory list." },
+      {
+        surface: "digital",
+        label: "Editorial portrait cover",
+        detail: "1080×1350 magazine-style hero.",
+      },
+      {
+        surface: "digital",
+        label: "Pull-quote card",
+        detail: "Client attribution + territory list.",
+      },
       { surface: "video", label: "Story trailer bumper", detail: "1080×1920 9-second edit." },
       { surface: "email", label: "Case study email header", detail: "1200×400 with CTA." },
     ],
@@ -163,13 +222,36 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
       cta: "Download the brief",
     },
     phases: [
-      { when: "Day 1", label: "Data drop", detail: "Stat headline + link card.", formats: ["callout-1200x628", "linkedin-link-1200x627"] },
-      { when: "Day 4", label: "So what", detail: "Implication carousel + email.", formats: ["portrait-1080x1350", "email-header-1200x400"] },
-      { when: "Day 10", label: "Debrief", detail: "Roundtable invite callout.", formats: ["callout-1200x628"] },
+      {
+        when: "Day 1",
+        label: "Data drop",
+        detail: "Stat headline + link card.",
+        formats: ["callout-1200x628", "linkedin-link-1200x627"],
+      },
+      {
+        when: "Day 4",
+        label: "So what",
+        detail: "Implication carousel + email.",
+        formats: ["portrait-1080x1350", "email-header-1200x400"],
+      },
+      {
+        when: "Day 10",
+        label: "Debrief",
+        detail: "Roundtable invite callout.",
+        formats: ["callout-1200x628"],
+      },
     ],
     deliverables: [
-      { surface: "digital", label: "Stat headline card", detail: "Landscape callout · dark palette." },
-      { surface: "email", label: "GC-list email header", detail: "1200×400 with brief-download CTA." },
+      {
+        surface: "digital",
+        label: "Stat headline card",
+        detail: "Landscape callout · dark palette.",
+      },
+      {
+        surface: "email",
+        label: "GC-list email header",
+        detail: "1200×400 with brief-download CTA.",
+      },
       { surface: "digital", label: "Implication portrait", detail: "1080×1350 · so-what stack." },
     ],
     kpis: [
@@ -198,9 +280,24 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
       cta: "Talk to Gaming ops",
     },
     phases: [
-      { when: "Drop day", label: "Stat drop", detail: "Big number square + story.", formats: ["square-1080", "story-1080x1920"] },
-      { when: "Day 2", label: "Breakdown", detail: "3-stat portrait card + YouTube thumb.", formats: ["portrait-1080x1350", "youtube-1280x720"] },
-      { when: "Day 5", label: "Studio spotlight", detail: "Featured studio testimonial.", formats: ["callout-1200x628", "linkedin-post-1200x1200"] },
+      {
+        when: "Drop day",
+        label: "Stat drop",
+        detail: "Big number square + story.",
+        formats: ["square-1080", "story-1080x1920"],
+      },
+      {
+        when: "Day 2",
+        label: "Breakdown",
+        detail: "3-stat portrait card + YouTube thumb.",
+        formats: ["portrait-1080x1350", "youtube-1280x720"],
+      },
+      {
+        when: "Day 5",
+        label: "Studio spotlight",
+        detail: "Featured studio testimonial.",
+        formats: ["callout-1200x628", "linkedin-post-1200x1200"],
+      },
     ],
     deliverables: [
       { surface: "digital", label: "Big-number square", detail: "1080×1080 max-contrast." },
@@ -233,10 +330,30 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
       cta: "Get notified",
     },
     phases: [
-      { when: "T-14", label: "Hint", detail: "Silhouette tease · story.", formats: ["story-1080x1920", "square-1080"] },
-      { when: "T-7", label: "Feature", detail: "Feature list portrait + link card.", formats: ["portrait-1080x1350", "linkedin-link-1200x627"] },
-      { when: "T-1", label: "Countdown", detail: "24-hour reveal story.", formats: ["story-1080x1920"] },
-      { when: "Launch", label: "Reveal", detail: "Callout + LinkedIn post.", formats: ["callout-1200x628", "linkedin-post-1200x1200"] },
+      {
+        when: "T-14",
+        label: "Hint",
+        detail: "Silhouette tease · story.",
+        formats: ["story-1080x1920", "square-1080"],
+      },
+      {
+        when: "T-7",
+        label: "Feature",
+        detail: "Feature list portrait + link card.",
+        formats: ["portrait-1080x1350", "linkedin-link-1200x627"],
+      },
+      {
+        when: "T-1",
+        label: "Countdown",
+        detail: "24-hour reveal story.",
+        formats: ["story-1080x1920"],
+      },
+      {
+        when: "Launch",
+        label: "Reveal",
+        detail: "Callout + LinkedIn post.",
+        formats: ["callout-1200x628", "linkedin-post-1200x1200"],
+      },
     ],
     deliverables: [
       { surface: "digital", label: "Silhouette tease", detail: "Blurred product square." },
@@ -269,8 +386,18 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
       cta: "Review our certifications",
     },
     phases: [
-      { when: "Day 1", label: "Announcement", detail: "Callout + LinkedIn link card.", formats: ["callout-1200x628", "linkedin-link-1200x627"] },
-      { when: "Day 5", label: "Client note", detail: "Email header to sponsors + CROs.", formats: ["email-header-1200x400"] },
+      {
+        when: "Day 1",
+        label: "Announcement",
+        detail: "Callout + LinkedIn link card.",
+        formats: ["callout-1200x628", "linkedin-link-1200x627"],
+      },
+      {
+        when: "Day 5",
+        label: "Client note",
+        detail: "Email header to sponsors + CROs.",
+        formats: ["email-header-1200x400"],
+      },
     ],
     deliverables: [
       { surface: "digital", label: "Certification callout", detail: "1200×628 with cite line." },
@@ -302,10 +429,30 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
       cta: "See eligibility",
     },
     phases: [
-      { when: "Week 1", label: "Kickoff", detail: "Portrait + story with eligibility.", formats: ["portrait-1080x1350", "story-1080x1920"] },
-      { when: "Week 2", label: "Site rally", detail: "Site-nomination LinkedIn post.", formats: ["linkedin-post-1200x1200", "callout-1200x628"] },
-      { when: "Week 3", label: "Patient story", detail: "Anonymous participant reflection.", formats: ["square-1080", "story-1080x1920"] },
-      { when: "Ongoing", label: "Weekly update", detail: "Enrollment progress callout.", formats: ["callout-1200x628"] },
+      {
+        when: "Week 1",
+        label: "Kickoff",
+        detail: "Portrait + story with eligibility.",
+        formats: ["portrait-1080x1350", "story-1080x1920"],
+      },
+      {
+        when: "Week 2",
+        label: "Site rally",
+        detail: "Site-nomination LinkedIn post.",
+        formats: ["linkedin-post-1200x1200", "callout-1200x628"],
+      },
+      {
+        when: "Week 3",
+        label: "Patient story",
+        detail: "Anonymous participant reflection.",
+        formats: ["square-1080", "story-1080x1920"],
+      },
+      {
+        when: "Ongoing",
+        label: "Weekly update",
+        detail: "Enrollment progress callout.",
+        formats: ["callout-1200x628"],
+      },
     ],
     deliverables: [
       { surface: "digital", label: "Eligibility portrait", detail: "1080×1350 with criteria." },
@@ -338,9 +485,24 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
       cta: "Read the shareholder note",
     },
     phases: [
-      { when: "Day 1", label: "Milestone", detail: "Callout + LinkedIn link card.", formats: ["callout-1200x628", "linkedin-link-1200x627"] },
-      { when: "Day 2", label: "Shareholder note", detail: "Email header + long-form link.", formats: ["email-header-1200x400"] },
-      { when: "Day 7", label: "Recap", detail: "Chart callout + summary square.", formats: ["callout-1200x628", "square-1080"] },
+      {
+        when: "Day 1",
+        label: "Milestone",
+        detail: "Callout + LinkedIn link card.",
+        formats: ["callout-1200x628", "linkedin-link-1200x627"],
+      },
+      {
+        when: "Day 2",
+        label: "Shareholder note",
+        detail: "Email header + long-form link.",
+        formats: ["email-header-1200x400"],
+      },
+      {
+        when: "Day 7",
+        label: "Recap",
+        detail: "Chart callout + summary square.",
+        formats: ["callout-1200x628", "square-1080"],
+      },
     ],
     deliverables: [
       { surface: "digital", label: "Milestone callout", detail: "Dark-navy 1200×628." },
@@ -373,9 +535,24 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
       cta: "See the integration",
     },
     phases: [
-      { when: "Day 1", label: "Joint launch", detail: "Co-branded callout + LinkedIn post.", formats: ["callout-1200x628", "linkedin-post-1200x1200"] },
-      { when: "Day 3", label: "Deep-dive", detail: "Feature portrait + LinkedIn link card.", formats: ["portrait-1080x1350", "linkedin-link-1200x627"] },
-      { when: "Day 7", label: "Customer stories", detail: "Story + YouTube integration demo.", formats: ["story-1080x1920", "youtube-1280x720"] },
+      {
+        when: "Day 1",
+        label: "Joint launch",
+        detail: "Co-branded callout + LinkedIn post.",
+        formats: ["callout-1200x628", "linkedin-post-1200x1200"],
+      },
+      {
+        when: "Day 3",
+        label: "Deep-dive",
+        detail: "Feature portrait + LinkedIn link card.",
+        formats: ["portrait-1080x1350", "linkedin-link-1200x627"],
+      },
+      {
+        when: "Day 7",
+        label: "Customer stories",
+        detail: "Story + YouTube integration demo.",
+        formats: ["story-1080x1920", "youtube-1280x720"],
+      },
     ],
     deliverables: [
       { surface: "digital", label: "Two-logo callout", detail: "Balanced lockup · 1200×628." },
@@ -409,9 +586,24 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
       cta: "Refer a patient",
     },
     phases: [
-      { when: "Week 1", label: "Awareness", detail: "Portrait + story per market.", formats: ["portrait-1080x1350", "story-1080x1920"] },
-      { when: "Week 2", label: "Site coordinator email", detail: "Wide banner + eligibility grid.", formats: ["email-header-1200x400", "callout-1200x628"] },
-      { when: "Week 4", label: "Recap", detail: "Enrolment stat square.", formats: ["square-1080"] },
+      {
+        when: "Week 1",
+        label: "Awareness",
+        detail: "Portrait + story per market.",
+        formats: ["portrait-1080x1350", "story-1080x1920"],
+      },
+      {
+        when: "Week 2",
+        label: "Site coordinator email",
+        detail: "Wide banner + eligibility grid.",
+        formats: ["email-header-1200x400", "callout-1200x628"],
+      },
+      {
+        when: "Week 4",
+        label: "Recap",
+        detail: "Enrolment stat square.",
+        formats: ["square-1080"],
+      },
     ],
     deliverables: [
       { surface: "digital", label: "4× market pack", detail: "Portrait + story per country." },
@@ -444,9 +636,24 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
       cta: "Read the case",
     },
     phases: [
-      { when: "Day 1", label: "Hero spotlight", detail: "Editorial portrait + summary.", formats: ["portrait-1080x1350"] },
-      { when: "Day 2", label: "Metrics square", detail: "Numbers-only tile.", formats: ["square-1080"] },
-      { when: "Day 5", label: "Referral link", detail: "LinkedIn link card.", formats: ["linkedin-link-1200x627"] },
+      {
+        when: "Day 1",
+        label: "Hero spotlight",
+        detail: "Editorial portrait + summary.",
+        formats: ["portrait-1080x1350"],
+      },
+      {
+        when: "Day 2",
+        label: "Metrics square",
+        detail: "Numbers-only tile.",
+        formats: ["square-1080"],
+      },
+      {
+        when: "Day 5",
+        label: "Referral link",
+        detail: "LinkedIn link card.",
+        formats: ["linkedin-link-1200x627"],
+      },
     ],
     deliverables: [
       { surface: "digital", label: "Editorial portrait", detail: "1080×1350 hero." },
@@ -479,9 +686,24 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
       cta: "See the workflow",
     },
     phases: [
-      { when: "T-14", label: "Reveal", detail: "Wide teaser + YouTube thumb.", formats: ["x-1600x900", "youtube-1280x720"] },
-      { when: "T-7", label: "Key-art tease", detail: "Portrait + story.", formats: ["portrait-1080x1350", "story-1080x1920"] },
-      { when: "T-0", label: "Launch", detail: "Square + LinkedIn card.", formats: ["square-1080", "linkedin-link-1200x627"] },
+      {
+        when: "T-14",
+        label: "Reveal",
+        detail: "Wide teaser + YouTube thumb.",
+        formats: ["x-1600x900", "youtube-1280x720"],
+      },
+      {
+        when: "T-7",
+        label: "Key-art tease",
+        detail: "Portrait + story.",
+        formats: ["portrait-1080x1350", "story-1080x1920"],
+      },
+      {
+        when: "T-0",
+        label: "Launch",
+        detail: "Square + LinkedIn card.",
+        formats: ["square-1080", "linkedin-link-1200x627"],
+      },
     ],
     deliverables: [
       { surface: "digital", label: "Reveal wide", detail: "1600×900 hero." },
@@ -509,14 +731,28 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
     chip: "GlobalLink",
     copy: {
       title: "Inside the GlobalLink AI · a 30-minute deep-dive with the product team.",
-      summary:
-        "First Thursday of every month · live Q&A · recording sent to every registrant.",
+      summary: "First Thursday of every month · live Q&A · recording sent to every registrant.",
       cta: "Save my seat",
     },
     phases: [
-      { when: "T-14", label: "Invite", detail: "Portrait speaker card + email header.", formats: ["portrait-1080x1350", "email-header-1200x400"] },
-      { when: "T-1", label: "Reminder", detail: "Story + LinkedIn post.", formats: ["story-1080x1920", "linkedin-post-1200x1200"] },
-      { when: "T+1", label: "Recording", detail: "Square + link card.", formats: ["square-1080", "linkedin-link-1200x627"] },
+      {
+        when: "T-14",
+        label: "Invite",
+        detail: "Portrait speaker card + email header.",
+        formats: ["portrait-1080x1350", "email-header-1200x400"],
+      },
+      {
+        when: "T-1",
+        label: "Reminder",
+        detail: "Story + LinkedIn post.",
+        formats: ["story-1080x1920", "linkedin-post-1200x1200"],
+      },
+      {
+        when: "T+1",
+        label: "Recording",
+        detail: "Square + link card.",
+        formats: ["square-1080", "linkedin-link-1200x627"],
+      },
     ],
     deliverables: [
       { surface: "digital", label: "Speaker invite", detail: "1080×1350 portrait." },
@@ -544,14 +780,23 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
     chip: "Media",
     copy: {
       title: "Nominated · Best Localized Series, Global Media Awards 2026.",
-      summary:
-        "Five languages · zero dub-swap latency · one team of 40 across three studios.",
+      summary: "Five languages · zero dub-swap latency · one team of 40 across three studios.",
       cta: "See the trailer",
     },
     phases: [
-      { when: "T-14", label: "Nomination", detail: "Editorial poster.", formats: ["portrait-1080x1350"] },
+      {
+        when: "T-14",
+        label: "Nomination",
+        detail: "Editorial poster.",
+        formats: ["portrait-1080x1350"],
+      },
       { when: "T-1", label: "Countdown", detail: "Story reveal.", formats: ["story-1080x1920"] },
-      { when: "T+0", label: "Result", detail: "LinkedIn link card.", formats: ["linkedin-link-1200x627"] },
+      {
+        when: "T+0",
+        label: "Result",
+        detail: "LinkedIn link card.",
+        formats: ["linkedin-link-1200x627"],
+      },
     ],
     deliverables: [
       { surface: "digital", label: "Nomination poster", detail: "1080×1350 portrait." },
@@ -584,9 +829,24 @@ export const SOCIAL_PLAYBOOKS: SocialPlaybook[] = [
       cta: "Read the milestone note",
     },
     phases: [
-      { when: "Day 1", label: "Milestone", detail: "Stat square + wide callout.", formats: ["square-1080", "callout-1200x628"] },
-      { when: "Day 2", label: "Sponsor email", detail: "Wide banner.", formats: ["email-header-1200x400"] },
-      { when: "Day 7", label: "Analyst recap", detail: "Link card.", formats: ["linkedin-link-1200x627"] },
+      {
+        when: "Day 1",
+        label: "Milestone",
+        detail: "Stat square + wide callout.",
+        formats: ["square-1080", "callout-1200x628"],
+      },
+      {
+        when: "Day 2",
+        label: "Sponsor email",
+        detail: "Wide banner.",
+        formats: ["email-header-1200x400"],
+      },
+      {
+        when: "Day 7",
+        label: "Analyst recap",
+        detail: "Link card.",
+        formats: ["linkedin-link-1200x627"],
+      },
     ],
     deliverables: [
       { surface: "digital", label: "Stat square", detail: "1080×1080 numbers-only." },
@@ -628,22 +888,134 @@ export const SOCIAL_ANGLES: Array<{ id: SocialAngle; label: string }> = [
 // ────────────────────────────────────────────────────────────────────────────
 
 const SOCIAL_EXTRAS: PlaybookDeliverable[] = [
-  { surface: "digital", category: "Digital & Web",     label: "Story bumper pack",             detail: "9:16 5-second video bumpers · light + dark.",              spec: "1080×1920 · MP4",  status: "coming-soon" },
-  { surface: "digital", category: "Digital & Web",     label: "Reel / TikTok cover set",       detail: "Vertical cover cards with title hierarchy.",                spec: "1080×1920",        status: "coming-soon" },
-  { surface: "digital", category: "Digital & Web",     label: "Podcast episode graphic",       detail: "Square episode art + 16:9 YouTube version.",                spec: "3000×3000",        status: "coming-soon" },
-  { surface: "digital", category: "Digital & Web",     label: "Facebook / Instagram covers",   detail: "Profile + page cover pack across platforms.",               spec: "1640×924 + 1500×500", status: "coming-soon" },
-  { surface: "digital", category: "Digital & Web",     label: "YouTube thumbnail pack",        detail: "3-variant thumbnail templates with title slots.",           spec: "1280×720",         status: "coming-soon" },
-  { surface: "digital", category: "Digital & Web",     label: "Newsletter banner",             detail: "600px HTML-safe hero for Substack / Beehiiv.",              spec: "1200×400",         status: "coming-soon" },
-  { surface: "digital", category: "Digital & Web",     label: "Discord / Slack banner",        detail: "Community server banner + boost card.",                     spec: "960×540",          status: "coming-soon" },
-  { surface: "digital", category: "Digital & Web",     label: "Blog header set",               detail: "Article hero + inline card at 3:2 and 16:9.",               spec: "1600×900",         status: "coming-soon" },
-  { surface: "digital", category: "Digital & Web",     label: "OG / social-share card",        detail: "Universal og:image with dynamic title slot.",               spec: "1200×630",         status: "coming-soon" },
-  { surface: "digital", category: "Digital & Web",     label: "LinkedIn newsletter cover",     detail: "Recurring cover with issue-number token.",                  spec: "744×400",          status: "coming-soon" },
-  { surface: "digital", category: "Digital & Web",     label: "Threads / X hero",              detail: "Header + reply-card cover set.",                            spec: "1500×500",         status: "coming-soon" },
-  { surface: "digital", category: "Digital & Web",     label: "Employee-advocacy pack",        detail: "Personal LinkedIn hero + share-ready graphics for the team.", spec: "1584×396 + 1200×627", status: "coming-soon" },
-  { surface: "email",   category: "Email & Direct",    label: "Email-signature banner",        detail: "600×80 personal signature banner.",                         spec: "600×80",           status: "coming-soon" },
-  { surface: "email",   category: "Email & Direct",    label: "Press-release header",          detail: "PR distribution header with logo + hashtag.",               spec: "1200×400",         status: "coming-soon" },
-  { surface: "digital", category: "Digital & Web",     label: "Paid-ad variant pack",          detail: "6 headline × 3 image variants for A/B rotation.",           spec: "1200×628 + 1080×1080", status: "coming-soon" },
-  { surface: "digital", category: "Digital & Web",     label: "App-store screenshot template", detail: "3 screenshot frames for iOS + Play.",                       spec: "1290×2796 / 1080×1920", status: "coming-soon" },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "Story bumper pack",
+    detail: "9:16 5-second video bumpers · light + dark.",
+    spec: "1080×1920 · MP4",
+    status: "coming-soon",
+  },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "Reel / TikTok cover set",
+    detail: "Vertical cover cards with title hierarchy.",
+    spec: "1080×1920",
+    status: "coming-soon",
+  },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "Podcast episode graphic",
+    detail: "Square episode art + 16:9 YouTube version.",
+    spec: "3000×3000",
+    status: "coming-soon",
+  },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "Facebook / Instagram covers",
+    detail: "Profile + page cover pack across platforms.",
+    spec: "1640×924 + 1500×500",
+    status: "coming-soon",
+  },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "YouTube thumbnail pack",
+    detail: "3-variant thumbnail templates with title slots.",
+    spec: "1280×720",
+    status: "coming-soon",
+  },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "Newsletter banner",
+    detail: "600px HTML-safe hero for Substack / Beehiiv.",
+    spec: "1200×400",
+    status: "coming-soon",
+  },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "Discord / Slack banner",
+    detail: "Community server banner + boost card.",
+    spec: "960×540",
+    status: "coming-soon",
+  },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "Blog header set",
+    detail: "Article hero + inline card at 3:2 and 16:9.",
+    spec: "1600×900",
+    status: "coming-soon",
+  },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "OG / social-share card",
+    detail: "Universal og:image with dynamic title slot.",
+    spec: "1200×630",
+    status: "coming-soon",
+  },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "LinkedIn newsletter cover",
+    detail: "Recurring cover with issue-number token.",
+    spec: "744×400",
+    status: "coming-soon",
+  },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "Threads / X hero",
+    detail: "Header + reply-card cover set.",
+    spec: "1500×500",
+    status: "coming-soon",
+  },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "Employee-advocacy pack",
+    detail: "Personal LinkedIn hero + share-ready graphics for the team.",
+    spec: "1584×396 + 1200×627",
+    status: "coming-soon",
+  },
+  {
+    surface: "email",
+    category: "Email & Direct",
+    label: "Email-signature banner",
+    detail: "600×80 personal signature banner.",
+    spec: "600×80",
+    status: "coming-soon",
+  },
+  {
+    surface: "email",
+    category: "Email & Direct",
+    label: "Press-release header",
+    detail: "PR distribution header with logo + hashtag.",
+    spec: "1200×400",
+    status: "coming-soon",
+  },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "Paid-ad variant pack",
+    detail: "6 headline × 3 image variants for A/B rotation.",
+    spec: "1200×628 + 1080×1080",
+    status: "coming-soon",
+  },
+  {
+    surface: "digital",
+    category: "Digital & Web",
+    label: "App-store screenshot template",
+    detail: "3 screenshot frames for iOS + Play.",
+    spec: "1290×2796 / 1080×1920",
+    status: "coming-soon",
+  },
 ];
 
 /** Rich collateral catalog for a social playbook. */
@@ -660,13 +1032,19 @@ export function getExpandedSocialCollateral(pb: SocialPlaybook): PlaybookDeliver
 
 function inferCategoryFromSurface(s: PlaybookDeliverable["surface"]): CollateralCategory {
   switch (s) {
-    case "signage":  return "Signage & Environment";
-    case "print":    return "Print & Collateral";
-    case "video":    return "Video & Motion";
-    case "email":    return "Email & Direct";
-    case "wearable": return "Wearables & Badges";
-    case "merch":    return "Merch & Swag";
-    default:         return "Digital & Web";
+    case "signage":
+      return "Signage & Environment";
+    case "print":
+      return "Print & Collateral";
+    case "video":
+      return "Video & Motion";
+    case "email":
+      return "Email & Direct";
+    case "wearable":
+      return "Wearables & Badges";
+    case "merch":
+      return "Merch & Swag";
+    default:
+      return "Digital & Web";
   }
 }
-

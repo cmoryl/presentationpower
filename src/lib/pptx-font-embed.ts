@@ -21,7 +21,7 @@ const FONT_URLS: Record<"regular" | "bold" | "italic" | "boldItalic", string> = 
   boldItalic: "/fonts/Geist-BoldItalic.ttf",
 };
 
-let fontCache: Partial<Record<keyof typeof FONT_URLS, Uint8Array>> = {};
+const fontCache: Partial<Record<keyof typeof FONT_URLS, Uint8Array>> = {};
 
 async function fetchFont(kind: keyof typeof FONT_URLS): Promise<Uint8Array | null> {
   if (fontCache[kind]) return fontCache[kind]!;
@@ -98,8 +98,8 @@ export async function embedFontsInPptx(blob: Blob): Promise<Blob> {
     let ct = await zip.file(ctPath)!.async("string");
     if (!/Extension="fntdata"/.test(ct)) {
       ct = ct.replace(
-        "<Types xmlns=\"http://schemas.openxmlformats.org/package/2006/content-types\">",
-        `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="fntdata" ContentType="application/vnd.openxmlformats-officedocument.obfuscatedFont"/>`
+        '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">',
+        `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="fntdata" ContentType="application/vnd.openxmlformats-officedocument.obfuscatedFont"/>`,
       );
       zip.file(ctPath, ct);
     }
@@ -129,10 +129,10 @@ export async function embedFontsInPptx(blob: Blob): Promise<Blob> {
             p.kind === "regular"
               ? "p:regular"
               : p.kind === "bold"
-              ? "p:bold"
-              : p.kind === "italic"
-              ? "p:italic"
-              : "p:boldItalic";
+                ? "p:bold"
+                : p.kind === "italic"
+                  ? "p:italic"
+                  : "p:boldItalic";
           return `<${tag} r:id="${relIds[p.kind]}"/>`;
         })
         .join("");
@@ -153,7 +153,11 @@ export async function embedFontsInPptx(blob: Blob): Promise<Blob> {
       zip.file(presPath, pres);
     }
 
-    return await zip.generateAsync({ type: "blob", mimeType: blob.type || "application/vnd.openxmlformats-officedocument.presentationml.presentation" });
+    return await zip.generateAsync({
+      type: "blob",
+      mimeType:
+        blob.type || "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    });
   } catch (e) {
     console.warn("[pptx-font-embed] failed, returning original blob", e);
     return blob;

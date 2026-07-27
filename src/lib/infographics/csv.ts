@@ -26,12 +26,8 @@ export function columnsOf(rows: InfographicRow[]): string[] {
 
 export function specToCsv(spec: InfographicSpec): string {
   const cols = columnsOf(spec.data.rows);
-  const header = cols
-    .map((k) => escapeCsvCell(spec.data.columns?.[k] ?? k))
-    .join(",");
-  const lines = spec.data.rows.map((row) =>
-    cols.map((k) => escapeCsvCell(row[k])).join(","),
-  );
+  const header = cols.map((k) => escapeCsvCell(spec.data.columns?.[k] ?? k)).join(",");
+  const lines = spec.data.rows.map((row) => cols.map((k) => escapeCsvCell(row[k])).join(","));
   return [header, ...lines].join("\r\n");
 }
 
@@ -40,9 +36,7 @@ export function specToMarkdown(spec: InfographicSpec): string {
   if (cols.length === 0) return "";
   const headers = cols.map((k) => spec.data.columns?.[k] ?? k);
   const sep = cols.map(() => "---");
-  const body = spec.data.rows.map((row) =>
-    cols.map((k) => String(row[k] ?? "")).join(" | "),
-  );
+  const body = spec.data.rows.map((row) => cols.map((k) => String(row[k] ?? "")).join(" | "));
   return [
     "| " + headers.join(" | ") + " |",
     "| " + sep.join(" | ") + " |",

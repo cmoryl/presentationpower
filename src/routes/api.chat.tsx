@@ -48,50 +48,58 @@ export const Route = createFileRoute("/api/chat")({
 
         const ctx = parsed.deckContext;
         const outlineLines = ctx.slides
-          .map((s) => `  ${String(s.position + 1).padStart(2, "0")}. [${s.section}] ${s.variant}${s.title ? ` — "${s.title}"` : ""}`)
+          .map(
+            (s) =>
+              `  ${String(s.position + 1).padStart(2, "0")}. [${s.section}] ${s.variant}${s.title ? ` — "${s.title}"` : ""}`,
+          )
           .join("\n");
 
-        const system = parsed.mode === "guide"
-          ? [
-              "You are a PowerPoint editing coach inside a TransPerfect deck builder.",
-              "Your job: GUIDE the user through editing their deck between this app and PowerPoint. You do NOT make edits yourself — you tell the user exactly where to click, what to change, and in what order.",
-              "Style: numbered steps, one action per step, ≤15 words per step. Executive plain English. No hype.",
-              "Always ground guidance in this app's actual capabilities:",
-              "  • Import .pptx via /decks/import (100MB cap; extracts imagery + layout).",
-              "  • Edit any slide inline on the deck preview (click text to live-edit).",
-              "  • Use the Copilot (assist mode) to batch-rewrite slides via natural language.",
-              "  • Swap layouts via the layout picker on each slide.",
-              "  • Export back to .pptx from the Export menu (per-slide fidelity; native charts).",
-              "  • Translate via the Translate drawer (GlobalLink).",
-              "When the user asks 'how do I…', respond with: (1) the exact path in THIS app, then (2) what to verify in PowerPoint after export.",
-              "If a step needs PowerPoint (e.g. fixing a master slide, embedding video), say so plainly and give the exact PowerPoint menu path.",
-              "End every response with a single 'Next:' suggestion.",
-              "",
-              "Deck context:",
-              `  Title: ${ctx.title}`,
-              ctx.prospect ? `  Prospect: ${ctx.prospect}` : "",
-              ctx.industry ? `  Industry: ${ctx.industry}` : "",
-              ctx.audience ? `  Audience: ${ctx.audience}` : "",
-              ctx.archetype ? `  Archetype: ${ctx.archetype}` : "",
-              "",
-              "Slide outline:",
-              outlineLines,
-            ].filter(Boolean).join("\n")
-          : [
-              "You are a TransPerfect deck assistant. You help the user reason about the deck they are editing.",
-              "You do NOT edit slides directly — you suggest what to change, and the user applies it.",
-              "Be concise. Use plain executive English. No hype words.",
-              "",
-              "Deck context:",
-              `  Title: ${ctx.title}`,
-              ctx.prospect ? `  Prospect: ${ctx.prospect}` : "",
-              ctx.industry ? `  Industry: ${ctx.industry}` : "",
-              ctx.audience ? `  Audience: ${ctx.audience}` : "",
-              ctx.archetype ? `  Archetype: ${ctx.archetype}` : "",
-              "",
-              "Slide outline:",
-              outlineLines,
-            ].filter(Boolean).join("\n");
+        const system =
+          parsed.mode === "guide"
+            ? [
+                "You are a PowerPoint editing coach inside a TransPerfect deck builder.",
+                "Your job: GUIDE the user through editing their deck between this app and PowerPoint. You do NOT make edits yourself — you tell the user exactly where to click, what to change, and in what order.",
+                "Style: numbered steps, one action per step, ≤15 words per step. Executive plain English. No hype.",
+                "Always ground guidance in this app's actual capabilities:",
+                "  • Import .pptx via /decks/import (100MB cap; extracts imagery + layout).",
+                "  • Edit any slide inline on the deck preview (click text to live-edit).",
+                "  • Use the Copilot (assist mode) to batch-rewrite slides via natural language.",
+                "  • Swap layouts via the layout picker on each slide.",
+                "  • Export back to .pptx from the Export menu (per-slide fidelity; native charts).",
+                "  • Translate via the Translate drawer (GlobalLink).",
+                "When the user asks 'how do I…', respond with: (1) the exact path in THIS app, then (2) what to verify in PowerPoint after export.",
+                "If a step needs PowerPoint (e.g. fixing a master slide, embedding video), say so plainly and give the exact PowerPoint menu path.",
+                "End every response with a single 'Next:' suggestion.",
+                "",
+                "Deck context:",
+                `  Title: ${ctx.title}`,
+                ctx.prospect ? `  Prospect: ${ctx.prospect}` : "",
+                ctx.industry ? `  Industry: ${ctx.industry}` : "",
+                ctx.audience ? `  Audience: ${ctx.audience}` : "",
+                ctx.archetype ? `  Archetype: ${ctx.archetype}` : "",
+                "",
+                "Slide outline:",
+                outlineLines,
+              ]
+                .filter(Boolean)
+                .join("\n")
+            : [
+                "You are a TransPerfect deck assistant. You help the user reason about the deck they are editing.",
+                "You do NOT edit slides directly — you suggest what to change, and the user applies it.",
+                "Be concise. Use plain executive English. No hype words.",
+                "",
+                "Deck context:",
+                `  Title: ${ctx.title}`,
+                ctx.prospect ? `  Prospect: ${ctx.prospect}` : "",
+                ctx.industry ? `  Industry: ${ctx.industry}` : "",
+                ctx.audience ? `  Audience: ${ctx.audience}` : "",
+                ctx.archetype ? `  Archetype: ${ctx.archetype}` : "",
+                "",
+                "Slide outline:",
+                outlineLines,
+              ]
+                .filter(Boolean)
+                .join("\n");
 
         const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
@@ -102,10 +110,7 @@ export const Route = createFileRoute("/api/chat")({
           body: JSON.stringify({
             model: "google/gemini-2.5-flash",
             stream: true,
-            messages: [
-              { role: "system", content: system },
-              ...parsed.messages,
-            ],
+            messages: [{ role: "system", content: system }, ...parsed.messages],
           }),
         });
 

@@ -7,7 +7,15 @@
 // badge so the two editing surfaces feel like one system, not two.
 
 import { useState } from "react";
-import { ChevronDown, ChevronRight, Plus, Trash2, ArrowUp, ArrowDown, MousePointerClick } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Plus,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  MousePointerClick,
+} from "lucide-react";
 import type { FieldSpec, ContentSchema } from "@/lib/print-content-schema";
 
 const input =
@@ -30,7 +38,11 @@ function readPath(root: Record<string, unknown>, path: string): unknown {
 }
 
 /** Immutably write a value at a dotted path. */
-function writePath(root: Record<string, unknown>, path: string, value: unknown): Record<string, unknown> {
+function writePath(
+  root: Record<string, unknown>,
+  path: string,
+  value: unknown,
+): Record<string, unknown> {
   const parts = tokenizePath(path);
   if (parts.length === 0) return root;
   return set(root, parts, 0, value) as Record<string, unknown>;
@@ -55,7 +67,7 @@ function tokenizePath(path: string): Array<string | number> {
   const out: Array<string | number> = [];
   for (const chunk of path.split(".")) {
     let rest = chunk;
-    // eslint-disable-next-line no-constant-condition
+
     while (true) {
       const m = /^([^\[]+)?(\[(\d+)\])?(.*)$/.exec(rest);
       if (!m) break;
@@ -106,7 +118,11 @@ export function ContentInspector({
 }
 
 function FieldGroup({
-  spec, basePath, content, onWritePath, canvasEditablePaths,
+  spec,
+  basePath,
+  content,
+  onWritePath,
+  canvasEditablePaths,
 }: {
   spec: FieldSpec;
   basePath: string;
@@ -214,7 +230,9 @@ function FieldGroup({
   }
 
   // objectArray
-  const list = ((readPath(content, fullPath) as unknown[] | undefined) ?? []) as Array<Record<string, unknown>>;
+  const list = ((readPath(content, fullPath) as unknown[] | undefined) ?? []) as Array<
+    Record<string, unknown>
+  >;
   const canAdd = spec.maxItems === undefined || list.length < spec.maxItems;
   const canRemove = spec.minItems === undefined || list.length > spec.minItems;
   return (
@@ -225,7 +243,9 @@ function FieldGroup({
           return (
             <div key={i} className="rounded-lg border border-black/10 p-2 dark:border-white/10">
               <div className="mb-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-widest text-black/60 dark:text-white/60">
-                <span>{spec.itemLabel} {i + 1}</span>
+                <span>
+                  {spec.itemLabel} {i + 1}
+                </span>
                 <div className="flex items-center gap-0.5">
                   <button
                     type="button"
@@ -286,7 +306,11 @@ function FieldGroup({
 }
 
 function ScalarField({
-  spec, fullPath, value, onWritePath, canvasBound,
+  spec,
+  fullPath,
+  value,
+  onWritePath,
+  canvasBound,
 }: {
   spec: Extract<FieldSpec, { kind: "string" | "enum" }>;
   fullPath: string;
@@ -298,7 +322,10 @@ function ScalarField({
   return (
     <label className="block">
       <div className="mb-1 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-black/55 dark:text-white/55">
-        <span>{spec.label}{spec.optional ? "" : " *"}</span>
+        <span>
+          {spec.label}
+          {spec.optional ? "" : " *"}
+        </span>
         {canvasBound && <CanvasBadge />}
       </div>
       {spec.kind === "enum" ? (
@@ -308,7 +335,9 @@ function ScalarField({
           onChange={(e) => onWritePath(fullPath, e.target.value)}
         >
           {spec.options.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
           ))}
         </select>
       ) : spec.multiline ? (
@@ -343,7 +372,9 @@ function CanvasBadge() {
 }
 
 function CollapsibleSection({
-  label, count, children,
+  label,
+  count,
+  children,
 }: {
   label: string;
   count?: number;
@@ -362,7 +393,9 @@ function CollapsibleSection({
           {label}
         </span>
         {typeof count === "number" && (
-          <span className="rounded-full bg-black/5 px-1.5 py-0.5 text-[9px] tabular-nums text-black/60 dark:bg-white/10 dark:text-white/60">{count}</span>
+          <span className="rounded-full bg-black/5 px-1.5 py-0.5 text-[9px] tabular-nums text-black/60 dark:bg-white/10 dark:text-white/60">
+            {count}
+          </span>
         )}
       </button>
       {open && <div className="mt-2 space-y-2">{children}</div>}

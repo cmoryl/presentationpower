@@ -14,7 +14,11 @@ export const Route = createFileRoute("/admin/translation")({
   head: () => ({
     meta: [
       { title: "Translation · Admin · TransPerfect Modular" },
-      { name: "description", content: "Manage translation engines, protected glossary terms, and target languages for deck localization." },
+      {
+        name: "description",
+        content:
+          "Manage translation engines, protected glossary terms, and target languages for deck localization.",
+      },
     ],
   }),
   component: TranslationAdminPage,
@@ -27,9 +31,22 @@ function TranslationAdminPage() {
   const upsertFn = useServerFn(upsertGlossaryTerm);
   const deleteFn = useServerFn(deleteGlossaryTerm);
 
-  const [engines, setEngines] = useState<Array<{ id: string; label: string; configured: boolean; note?: string }>>([]);
-  const [languages, setLanguages] = useState<Array<{ id: string; label: string; native: string; rtl: boolean }>>([]);
-  const [glossary, setGlossary] = useState<Array<{ id: string; term: string; do_not_translate: boolean; scope: string; scope_id: string | null; notes: string | null }>>([]);
+  const [engines, setEngines] = useState<
+    Array<{ id: string; label: string; configured: boolean; note?: string }>
+  >([]);
+  const [languages, setLanguages] = useState<
+    Array<{ id: string; label: string; native: string; rtl: boolean }>
+  >([]);
+  const [glossary, setGlossary] = useState<
+    Array<{
+      id: string;
+      term: string;
+      do_not_translate: boolean;
+      scope: string;
+      scope_id: string | null;
+      notes: string | null;
+    }>
+  >([]);
   const [scopeFilter, setScopeFilter] = useState<"all" | "global" | "division" | "deck">("all");
   const [newTerm, setNewTerm] = useState("");
   const [newScope, setNewScope] = useState<"global" | "division">("global");
@@ -99,19 +116,25 @@ function TranslationAdminPage() {
     <div className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
       <header className="mb-8 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4">
         <div className="min-w-0">
-          <div className="text-[10px] uppercase tracking-[0.35em] text-black/50">Admin · Localization</div>
-          <h1 className="mt-2 truncate text-2xl font-semibold tracking-tight text-[#03002C] sm:text-3xl">Translation</h1>
+          <div className="text-[10px] uppercase tracking-[0.35em] text-black/50">
+            Admin · Localization
+          </div>
+          <h1 className="mt-2 truncate text-2xl font-semibold tracking-tight text-[#03002C] sm:text-3xl">
+            Translation
+          </h1>
           <p className="mt-2 max-w-2xl text-sm text-black/65">
-            Configure GlobalLink, review the protected term glossary, and toggle target languages available to authors.
+            Configure GlobalLink, review the protected term glossary, and toggle target languages
+            available to authors.
           </p>
         </div>
         <Languages size={24} className="shrink-0 text-[#003FC7]" />
       </header>
 
-
       {/* Engine status */}
       <section className="mb-8 rounded-2xl border border-black/10 bg-white p-6">
-        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-black/60">Engines</h2>
+        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-black/60">
+          Engines
+        </h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {engines.map((e) => (
             <div
@@ -130,7 +153,9 @@ function TranslationAdminPage() {
                 )}
                 <span className="font-semibold">{e.label}</span>
               </div>
-              <div className="mt-1 text-xs text-black/70">{e.note ?? (e.configured ? "Ready" : "")}</div>
+              <div className="mt-1 text-xs text-black/70">
+                {e.note ?? (e.configured ? "Ready" : "")}
+              </div>
             </div>
           ))}
         </div>
@@ -154,6 +179,7 @@ function TranslationAdminPage() {
             className="min-w-0 rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] placeholder:text-black/40 outline-none focus:border-[#003FC7]"
           />
           <select
+            aria-label="New Scope"
             value={newScope}
             onChange={(e) => setNewScope(e.target.value as "global" | "division")}
             className="min-w-0 rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C]"
@@ -175,7 +201,6 @@ function TranslationAdminPage() {
             <Plus size={14} /> Add
           </button>
         </div>
-
 
         {/* Filter */}
         <div className="mb-3 flex items-center gap-2 text-xs">
@@ -209,11 +234,15 @@ function TranslationAdminPage() {
               {filtered.map((g) => (
                 <tr key={g.id} className="border-t border-black/5 align-top">
                   <td className="px-3 py-2 font-medium text-[#03002C]">
-                    <div className="max-w-[220px] truncate" title={g.term}>{g.term}</div>
+                    <div className="max-w-[220px] truncate" title={g.term}>
+                      {g.term}
+                    </div>
                   </td>
                   <td className="px-3 py-2">{g.scope}</td>
                   <td className="px-3 py-2 font-mono text-xs text-black/50">
-                    <div className="max-w-[160px] truncate" title={g.scope_id ?? ""}>{g.scope_id ?? "—"}</div>
+                    <div className="max-w-[160px] truncate" title={g.scope_id ?? ""}>
+                      {g.scope_id ?? "—"}
+                    </div>
                   </td>
                   <td className="px-3 py-2">{g.do_not_translate ? "Yes" : "No"}</td>
                   <td className="px-3 py-2 text-right">
@@ -237,7 +266,6 @@ function TranslationAdminPage() {
             </tbody>
           </table>
         </div>
-
       </section>
 
       {/* Languages */}
@@ -255,12 +283,13 @@ function TranslationAdminPage() {
               <span className="truncate font-medium text-[#03002C]">{l.label}</span>
               <span className="truncate text-black/50">· {l.native}</span>
               {l.rtl && (
-                <span className="shrink-0 rounded bg-[#003FC7]/10 px-1.5 text-[10px] text-[#003FC7]">RTL</span>
+                <span className="shrink-0 rounded bg-[#003FC7]/10 px-1.5 text-[10px] text-[#003FC7]">
+                  RTL
+                </span>
               )}
             </div>
           ))}
         </div>
-
       </section>
 
       {status && <div className="mt-6 text-xs text-black/60">{status}</div>}

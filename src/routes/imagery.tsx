@@ -66,7 +66,8 @@ function ImageryPage() {
           memoryTags: memory.tags,
           memoryNotes: memory.notes,
           kind,
-          userPrompt: prompt || (kind === "photo" ? "hero scene for this brand" : "atmospheric backdrop"),
+          userPrompt:
+            prompt || (kind === "photo" ? "hero scene for this brand" : "atmospheric backdrop"),
         },
       });
       lib.add({
@@ -160,16 +161,20 @@ function ImageryPage() {
           <div className="mt-2 text-lg font-semibold text-[#03002C]">
             {ctx.tagline ?? brand.description}
           </div>
-          {ctx.intro && (
-            <p className="mt-2 line-clamp-3 text-sm text-black/60">{ctx.intro}</p>
-          )}
+          {ctx.intro && <p className="mt-2 line-clamp-3 text-sm text-black/60">{ctx.intro}</p>}
         </div>
         <div>
           <div className="text-[11px] uppercase tracking-[0.25em] text-black/50">Palette</div>
           <div className="mt-2 flex gap-1.5">
-            {(ctx.primaryColors.length ? ctx.primaryColors : [primary, accent]).slice(0, 6).map((c, i) => (
-              <div key={i} className="h-8 w-8 rounded-md border border-black/10" style={{ background: c }} />
-            ))}
+            {(ctx.primaryColors.length ? ctx.primaryColors : [primary, accent])
+              .slice(0, 6)
+              .map((c, i) => (
+                <div
+                  key={i}
+                  className="h-8 w-8 rounded-md border border-black/10"
+                  style={{ background: c }}
+                />
+              ))}
           </div>
           {ctx.photography && (
             <p className="mt-3 line-clamp-2 text-xs text-black/60">
@@ -179,10 +184,13 @@ function ImageryPage() {
           )}
         </div>
         <div>
-          <div className="text-[11px] uppercase tracking-[0.25em] text-black/50">Library memory</div>
+          <div className="text-[11px] uppercase tracking-[0.25em] text-black/50">
+            Library memory
+          </div>
           <MemoryChips tags={aggregateMemory(brandId).tags} />
           <div className="mt-2 text-xs text-black/50">
-            {lib.active.length} active · {lib.all.length - lib.active.length} muted · {lib.all.length} total
+            {lib.active.length} active · {lib.all.length - lib.active.length} muted ·{" "}
+            {lib.all.length} total
           </div>
         </div>
       </div>
@@ -219,7 +227,9 @@ function ImageryPage() {
             <div className="mt-3 rounded-lg border border-black/5 bg-[#F7F5F0] p-3">
               <div className="flex items-baseline justify-between">
                 <div className="text-[11px] uppercase tracking-wider" style={{ color: primary }}>
-                  {strongMatch ? "Strong matches already in your library" : "Possibly relevant existing imagery"}
+                  {strongMatch
+                    ? "Strong matches already in your library"
+                    : "Possibly relevant existing imagery"}
                 </div>
                 <div className="text-[10px] text-black/40">
                   ranked by tags · notes · prior prompts · brand fit
@@ -237,7 +247,11 @@ function ImageryPage() {
                     title={m.reasons.join(" · ")}
                   >
                     <div className="relative">
-                      <img src={m.entry.url} alt="" className="aspect-[16/10] w-full object-cover" />
+                      <img
+                        src={m.entry.url}
+                        alt=""
+                        className="aspect-[16/10] w-full object-cover"
+                      />
                       <span
                         className="absolute right-1 top-1 rounded-full px-1.5 py-0.5 text-[9px] font-medium text-white"
                         style={{ background: primary }}
@@ -247,7 +261,11 @@ function ImageryPage() {
                     </div>
                     <div className="p-1.5">
                       <div className="text-[10px] font-medium text-[#03002C]">
-                        {m.entry.source === "ai" ? "AI" : m.entry.source === "upload" ? "Upload" : m.entry.kind}
+                        {m.entry.source === "ai"
+                          ? "AI"
+                          : m.entry.source === "upload"
+                            ? "Upload"
+                            : m.entry.kind}
                       </div>
                       <div className="line-clamp-1 text-[10px] text-black/50">
                         {m.reasons[0] ?? "brand fit"}
@@ -266,7 +284,8 @@ function ImageryPage() {
 
           <div className="mt-3 flex items-center justify-between gap-3">
             <div className="text-xs text-black/50">
-              Uses this brand's palette, tagline, photography guideline, and active library memory tags.
+              Uses this brand's palette, tagline, photography guideline, and active library memory
+              tags.
             </div>
             <button
               onClick={handleGenerate}
@@ -274,11 +293,7 @@ function ImageryPage() {
               className="rounded-full px-4 py-2 text-sm font-medium text-white transition disabled:opacity-50"
               style={{ background: strongMatch ? "#03002C" : primary }}
             >
-              {busy
-                ? "Generating…"
-                : strongMatch
-                  ? "Generate anyway"
-                  : "Generate image"}
+              {busy ? "Generating…" : strongMatch ? "Generate anyway" : "Generate image"}
             </button>
           </div>
           {error && <div className="mt-2 text-xs text-red-600">{error}</div>}
@@ -301,14 +316,22 @@ function ImageryPage() {
       </div>
 
       {/* Analytics */}
-      <AnalyticsPanel brandName={ctx.name} primary={primary} accent={accent} analytics={lib.analytics} onSelect={(id) => setSelected(id)} />
+      <AnalyticsPanel
+        brandName={ctx.name}
+        primary={primary}
+        accent={accent}
+        analytics={lib.analytics}
+        onSelect={(id) => setSelected(id)}
+      />
 
       {/* Imagery grid */}
       <div className="mt-8 grid gap-4 md:grid-cols-[2fr_1fr]">
         <div>
           <div className="mb-3 flex items-baseline justify-between">
             <div className="text-sm font-semibold text-[#03002C]">Library</div>
-            <div className="text-xs text-black/50">Click to inspect · toggle to include/exclude</div>
+            <div className="text-xs text-black/50">
+              Click to inspect · toggle to include/exclude
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {lib.all.map((e) => {
@@ -422,8 +445,8 @@ function MemoryPanel({
       <div className="rounded-2xl border border-black/10 bg-white p-5">
         <div className="text-sm font-semibold text-[#03002C]">Memory</div>
         <p className="mt-2 text-xs text-black/50">
-          Select an image to view or edit its memory tags and direction notes. Memory feeds every
-          AI generation and search for this brand.
+          Select an image to view or edit its memory tags and direction notes. Memory feeds every AI
+          generation and search for this brand.
         </p>
       </div>
     );
@@ -446,7 +469,10 @@ function MemoryPanel({
       <div className="mt-3 text-[11px] uppercase tracking-wider text-black/50">Tags</div>
       <div className="mt-1 flex flex-wrap gap-1">
         {localTags.map((t) => (
-          <span key={t} className="inline-flex items-center gap-1 rounded-full bg-black/5 px-2 py-0.5 text-[10px]">
+          <span
+            key={t}
+            className="inline-flex items-center gap-1 rounded-full bg-black/5 px-2 py-0.5 text-[10px]"
+          >
             {t}
             {editable && (
               <button
@@ -582,7 +608,9 @@ function AnalyticsPanel({
                             : r.entry.source === "upload"
                               ? "Upload"
                               : r.entry.kind}
-                          <span className="ml-2 text-black/40">{r.entry.id.split(":").slice(-2).join(":")}</span>
+                          <span className="ml-2 text-black/40">
+                            {r.entry.id.split(":").slice(-2).join(":")}
+                          </span>
                         </span>
                         <span className="text-[10px] text-black/50">{fmtAgo(r.lastUsedAt)}</span>
                       </div>
@@ -618,7 +646,8 @@ function AnalyticsPanel({
                 >
                   <img src={e.url} alt="" className="aspect-[16/10] w-full object-cover" />
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-1 text-[10px] text-white">
-                    {fmtAgo(e.createdAt)} · {e.source === "ai" ? "AI" : e.source === "upload" ? "upload" : e.kind}
+                    {fmtAgo(e.createdAt)} ·{" "}
+                    {e.source === "ai" ? "AI" : e.source === "upload" ? "upload" : e.kind}
                   </div>
                 </button>
               ))}
@@ -714,10 +743,12 @@ function RestorePanel({
             title="Restore to library"
             className="group relative overflow-hidden rounded-md border border-black/10 bg-white"
           >
-            <img src={e.url} alt="" className="aspect-[16/10] w-full object-cover opacity-70 transition group-hover:opacity-100" />
-            <span
-              className="absolute inset-x-0 bottom-0 bg-black/70 py-0.5 text-center text-[10px] font-medium text-white opacity-0 transition group-hover:opacity-100"
-            >
+            <img
+              src={e.url}
+              alt=""
+              className="aspect-[16/10] w-full object-cover opacity-70 transition group-hover:opacity-100"
+            />
+            <span className="absolute inset-x-0 bottom-0 bg-black/70 py-0.5 text-center text-[10px] font-medium text-white opacity-0 transition group-hover:opacity-100">
               Restore
             </span>
           </button>

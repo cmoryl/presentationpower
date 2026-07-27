@@ -5,8 +5,18 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import type { CaseStudyContent, PrintAssetContext, PrintAssetKind, PrintAssetRow } from "./print-assets.types";
-import { emptyCaseStudy, emptySpotlight, emptyEBrochure, emptyAdaptorBrief } from "./print-assets.types";
+import type {
+  CaseStudyContent,
+  PrintAssetContext,
+  PrintAssetKind,
+  PrintAssetRow,
+} from "./print-assets.types";
+import {
+  emptyCaseStudy,
+  emptySpotlight,
+  emptyEBrochure,
+  emptyAdaptorBrief,
+} from "./print-assets.types";
 
 const KindEnum = z.enum(["case-study", "spotlight", "ebrochure", "adaptor-brief"]);
 
@@ -163,7 +173,7 @@ export const applyHeroToAllPrintAssets = createServerFn({ method: "POST" })
   .inputValidator((raw) => ApplyHeroInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    let query = supabase
+    const query = supabase
       .from("print_assets")
       .select("id, content")
       .eq("owner_id", userId)
@@ -298,7 +308,12 @@ export const previewApplyHeroToAllPrintAssets = createServerFn({ method: "POST" 
     // heroMedia serialized as JSON string per row — same reason as the apply
     // fn's undoToken: server-fn output rejects opaque `unknown` values.
     const toUpdate: Array<{ id: string; title: string; heroMediaJson: string | null }> = [];
-    const toSkip: Array<{ id: string; title: string; reason: "customized"; heroMediaJson: string | null }> = [];
+    const toSkip: Array<{
+      id: string;
+      title: string;
+      reason: "customized";
+      heroMediaJson: string | null;
+    }> = [];
     for (const r of candidates) {
       const existing = (r.content as Record<string, unknown>)?.heroMedia;
       const title = (r as { title?: string }).title ?? "Untitled";
@@ -312,8 +327,6 @@ export const previewApplyHeroToAllPrintAssets = createServerFn({ method: "POST" 
     }
     return { toUpdate, toSkip, scanned: candidates.length };
   });
-
-
 
 export const deletePrintAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -445,9 +458,13 @@ export const synthesizeCaseStudy = createServerFn({ method: "POST" })
   .inputValidator((raw) => SynthInput.parse(raw))
   .handler(async ({ data }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) return { challenge: null, solution: null, result: null, error: "AI gateway not configured" };
+    if (!apiKey)
+      return { challenge: null, solution: null, result: null, error: "AI gateway not configured" };
 
-    const context = data.knowledgeSnippets.slice(0, 8).map((s, i) => `[${i + 1}] ${s}`).join("\n");
+    const context = data.knowledgeSnippets
+      .slice(0, 8)
+      .map((s, i) => `[${i + 1}] ${s}`)
+      .join("\n");
     const prompt = `You are drafting a print-ready case study for TransPerfect.
 Client: ${data.brief.prospect}
 Industry: ${data.brief.industry ?? "unspecified"}
@@ -474,7 +491,8 @@ lists. Headings are short and declarative.`;
           response_format: { type: "json_object" },
         }),
       });
-      if (!res.ok) return { challenge: null, solution: null, result: null, error: `Gateway ${res.status}` };
+      if (!res.ok)
+        return { challenge: null, solution: null, result: null, error: `Gateway ${res.status}` };
       const json = await res.json();
       const raw = json?.choices?.[0]?.message?.content ?? "{}";
       const parsed = JSON.parse(raw);

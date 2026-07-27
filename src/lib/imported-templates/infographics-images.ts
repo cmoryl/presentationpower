@@ -32,7 +32,8 @@ export const INFOGRAPHICS_IMAGES_TEMPLATE: TemplatePayload = {
       content: {
         kicker: "INFOGRAPHICS · IMAGE LIBRARY",
         title: "Infographics with Images",
-        subtitle: "A modular data-storytelling kit — twenty editable infographic layouts, image-forward.",
+        subtitle:
+          "A modular data-storytelling kit — twenty editable infographic layouts, image-forward.",
         clientName: "Data Library Kit",
         date: "2026",
         mediaSeed: "infographics-cover-data-hero",

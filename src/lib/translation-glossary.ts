@@ -10,13 +10,47 @@ export type GlossaryTerm = {
 // Keys inside slide.content whose string values should NEVER be translated:
 // ids, URLs, style tokens, layout keys, colors, class names.
 const NON_TRANSLATABLE_KEYS = new Set<string>([
-  "id", "layoutId", "variantId", "sectionId", "iconId", "brandModeId",
-  "archetypeId", "clientLogoId", "mediaId", "presetId", "kitId",
-  "url", "href", "src", "mediaUrl", "backgroundUrl", "imageUrl", "primaryUrl",
-  "color", "bg", "background", "backgroundColor", "textColor", "accentColor",
-  "hex", "palette", "swatch", "className", "class", "style", "font",
-  "align", "alignment", "layout", "position", "size", "sizePreset",
-  "dir", "locale", "lang", "language",
+  "id",
+  "layoutId",
+  "variantId",
+  "sectionId",
+  "iconId",
+  "brandModeId",
+  "archetypeId",
+  "clientLogoId",
+  "mediaId",
+  "presetId",
+  "kitId",
+  "url",
+  "href",
+  "src",
+  "mediaUrl",
+  "backgroundUrl",
+  "imageUrl",
+  "primaryUrl",
+  "color",
+  "bg",
+  "background",
+  "backgroundColor",
+  "textColor",
+  "accentColor",
+  "hex",
+  "palette",
+  "swatch",
+  "className",
+  "class",
+  "style",
+  "font",
+  "align",
+  "alignment",
+  "layout",
+  "position",
+  "size",
+  "sizePreset",
+  "dir",
+  "locale",
+  "lang",
+  "language",
 ]);
 
 function looksLikeUrl(s: string): boolean {
@@ -112,9 +146,7 @@ export function protectStrings(sources: string[], glossary: GlossaryTerm[]): str
   const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const pattern = new RegExp(`\\b(${dnt.map(escape).join("|")})\\b`, "gi");
 
-  return sources.map((s) =>
-    s.replace(pattern, (match) => `${OPEN}${match}${CLOSE}`),
-  );
+  return sources.map((s) => s.replace(pattern, (match) => `${OPEN}${match}${CLOSE}`));
 }
 
 /** Strip the protection sentinels after the engine returns. */

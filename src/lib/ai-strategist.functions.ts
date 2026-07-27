@@ -135,37 +135,37 @@ function repairStrategy(raw: DeckStrategy): DeckStrategy {
 export const planDeckStrategy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => Input.parse(raw))
-  .handler(async ({
-    data,
-  }): Promise<
-    | { ok: true; strategy: DeckStrategy }
-    | { ok: false; error: string; setup?: boolean }
-  > => {
-    if (!hasAnthropicKey()) {
-      return { ok: false, setup: true, error: ANTHROPIC_SETUP_MESSAGE };
-    }
+  .handler(
+    async ({
+      data,
+    }): Promise<
+      { ok: true; strategy: DeckStrategy } | { ok: false; error: string; setup?: boolean }
+    > => {
+      if (!hasAnthropicKey()) {
+        return { ok: false, setup: true, error: ANTHROPIC_SETUP_MESSAGE };
+      }
 
-    const stableSystem = [
-      "You are the TransPerfect Narrative Strategist — a senior sales strategist who architects persuasive decks.",
-      "Given a brief, you design the narrative arc, opening hook, closing ask, and a section-by-section deck plan.",
-      "You must reason about the persuasion problem: who the audience is, what they need to believe by the end, and what evidence gets them there.",
-      "Return STRICT JSON only — no prose, no markdown fences.",
-      "Use ONLY sectionId / variantId / layoutId values from the taxonomy below. Invalid IDs are dropped.",
-      "",
-      serializeBrandGuide(data.brandModeId),
-      "",
-      serializeBrandhubIntel(data.brandModeId),
-      "",
-      governanceBlock(),
-      "",
-      serializeTaxonomy(),
-    ].join("\n");
+      const stableSystem = [
+        "You are the TransPerfect Narrative Strategist — a senior sales strategist who architects persuasive decks.",
+        "Given a brief, you design the narrative arc, opening hook, closing ask, and a section-by-section deck plan.",
+        "You must reason about the persuasion problem: who the audience is, what they need to believe by the end, and what evidence gets them there.",
+        "Return STRICT JSON only — no prose, no markdown fences.",
+        "Use ONLY sectionId / variantId / layoutId values from the taxonomy below. Invalid IDs are dropped.",
+        "",
+        serializeBrandGuide(data.brandModeId),
+        "",
+        serializeBrandhubIntel(data.brandModeId),
+        "",
+        governanceBlock(),
+        "",
+        serializeTaxonomy(),
+      ].join("\n");
 
-    const variableUser = [
-      "Design the deck strategy for the following brief.",
-      "",
-      "Return JSON of the shape:",
-      `{
+      const variableUser = [
+        "Design the deck strategy for the following brief.",
+        "",
+        "Return JSON of the shape:",
+        `{
   "narrativeArc": string (2-3 sentence strategy),
   "recommendedSections": [{
     "sectionId": "SF-XX",
@@ -178,43 +178,47 @@ export const planDeckStrategy = createServerFn({ method: "POST" })
   "closingAsk": string,
   "risksToAvoid": string[]
 }`,
-      "",
-      `Target length: ${data.brief.lengthTarget ?? 10} slides. Prefer ${Math.max(6, Math.min(14, data.brief.lengthTarget ?? 10))} sections.`,
-      "",
-      "Brief:",
-      JSON.stringify(data.brief, null, 0),
-      data.subCompany ? `Sub-company: ${data.subCompany}` : "",
-    ]
-      .filter(Boolean)
-      .join("\n");
+        "",
+        `Target length: ${data.brief.lengthTarget ?? 10} slides. Prefer ${Math.max(6, Math.min(14, data.brief.lengthTarget ?? 10))} sections.`,
+        "",
+        "Brief:",
+        JSON.stringify(data.brief, null, 0),
+        data.subCompany ? `Sub-company: ${data.subCompany}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n");
 
-    async function attempt(extra?: string) {
-      const res = await callAnthropic(
-        [stableSystem],
-        extra ? `${variableUser}\n\n${extra}` : variableUser,
-        { maxTokens: 4096 },
-      );
-      if (!res.ok) return { rawError: `Anthropic ${res.status}: ${res.body}` } as const;
-      const parsed = extractJsonObject(res.text);
-      if (!parsed) return { rawError: "Model did not return JSON" } as const;
-      const check = StrategySchema.safeParse(parsed);
-      if (check.success) return { strategy: check.data } as const;
-      return { rawError: `Schema mismatch: ${check.error.message.slice(0, 200)}` } as const;
-    }
+      async function attempt(extra?: string) {
+        const res = await callAnthropic(
+          [stableSystem],
+          extra ? `${variableUser}\n\n${extra}` : variableUser,
+          { maxTokens: 4096 },
+        );
+        if (!res.ok) return { rawError: `Anthropic ${res.status}: ${res.body}` } as const;
+        const parsed = extractJsonObject(res.text);
+        if (!parsed) return { rawError: "Model did not return JSON" } as const;
+        const check = StrategySchema.safeParse(parsed);
+        if (check.success) return { strategy: check.data } as const;
+        return { rawError: `Schema mismatch: ${check.error.message.slice(0, 200)}` } as const;
+      }
 
-    let result = await attempt();
-    if (!("strategy" in result)) {
-      result = await attempt(
-        "Your previous response was not valid JSON matching the schema. Return ONLY the JSON object — no prose, no markdown fences.",
-      );
-    }
-    if (!("strategy" in result)) {
-      return { ok: false, error: ("rawError" in result && result.rawError) || "Strategy failed" };
-    }
+      let result = await attempt();
+      if (!("strategy" in result)) {
+        result = await attempt(
+          "Your previous response was not valid JSON matching the schema. Return ONLY the JSON object — no prose, no markdown fences.",
+        );
+      }
+      if (!("strategy" in result)) {
+        return { ok: false, error: ("rawError" in result && result.rawError) || "Strategy failed" };
+      }
 
-    const repaired = repairStrategy(result.strategy as DeckStrategy);
-    if (repaired.recommendedSections.length < 3) {
-      return { ok: false, error: "Strategist returned too few valid sections after taxonomy validation." };
-    }
-    return { ok: true, strategy: repaired };
-  });
+      const repaired = repairStrategy(result.strategy as DeckStrategy);
+      if (repaired.recommendedSections.length < 3) {
+        return {
+          ok: false,
+          error: "Strategist returned too few valid sections after taxonomy validation.",
+        };
+      }
+      return { ok: true, strategy: repaired };
+    },
+  );

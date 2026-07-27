@@ -9,20 +9,13 @@
 // them against a locked baseline per brand and snapshots the composite.
 
 import { describe, it, expect } from "vitest";
-import {
-  auroraOrbs,
-  auroraSvgDataUrl,
-  auroraBaseTint,
-  auroraLayerOpacity,
-} from "../aurora-svg";
+import { auroraOrbs, auroraSvgDataUrl, auroraBaseTint, auroraLayerOpacity } from "../aurora-svg";
 import { BRAND_MODES } from "../taxonomy";
 
 const SEED = "MV-OP-COVER-MINIMAL";
 
 function decodeSvg(dataUrl: string): string {
-  return decodeURIComponent(
-    dataUrl.replace("data:image/svg+xml;charset=utf-8,", ""),
-  );
+  return decodeURIComponent(dataUrl.replace("data:image/svg+xml;charset=utf-8,", ""));
 }
 
 /** Pull the numeric visual params out of the exported SVG payload. */
@@ -31,8 +24,9 @@ function extractDarkVisuals(svg: string) {
   const layerOpacityMatch = svg.match(/<g filter="url\(#aurora-blur\)" opacity="([\d.]+)"/);
   const orbR = svg.match(/<radialGradient id="orb-0"[^>]*r="([^"]+)"/)?.[1];
   const stops = [...svg.matchAll(/<stop offset="([^"]+)"[^/]*\/>/g)].map((m) => m[1]);
-  const rectFills = [...svg.matchAll(/<rect width="1280" height="720" fill="([^"]+)"(?: fill-opacity="([\d.]+)")?/g)]
-    .map((m) => ({ fill: m[1], alpha: m[2] ? Number(m[2]) : 1 }));
+  const rectFills = [
+    ...svg.matchAll(/<rect width="1280" height="720" fill="([^"]+)"(?: fill-opacity="([\d.]+)")?/g),
+  ].map((m) => ({ fill: m[1], alpha: m[2] ? Number(m[2]) : 1 }));
   return {
     blurStd: blurMatch ? Number(blurMatch[1]) : null,
     layerOpacity: layerOpacityMatch ? Number(layerOpacityMatch[1]) : null,
@@ -61,11 +55,15 @@ describe("aurora dark-mode visual regression (preview ↔ exported PPTX, free-fo
       const svg = decodeSvg(auroraSvgDataUrl(SEED, brand, "dark"));
       const v = extractDarkVisuals(svg);
       expect(v.blurStd, `blur drift for ${brand.id}`).toBe(DARK_BASELINE.blurStd);
-      expect(v.layerOpacity, `layer opacity drift for ${brand.id}`).toBe(DARK_BASELINE.layerOpacity);
+      expect(v.layerOpacity, `layer opacity drift for ${brand.id}`).toBe(
+        DARK_BASELINE.layerOpacity,
+      );
       expect(v.orbR, `orb radial extent drift for ${brand.id}`).toBe(DARK_BASELINE.orbR);
       expect(v.midStop, `mid stop drift for ${brand.id}`).toBe(DARK_BASELINE.midStop);
       expect(v.outerStop, `outer stop drift for ${brand.id}`).toBe(DARK_BASELINE.outerStop);
-      expect(v.baseFill?.toUpperCase(), `base tint drift for ${brand.id}`).toBe(DARK_BASELINE.baseFill);
+      expect(v.baseFill?.toUpperCase(), `base tint drift for ${brand.id}`).toBe(
+        DARK_BASELINE.baseFill,
+      );
       expect(auroraLayerOpacity("dark")).toBe(DARK_BASELINE.layerOpacity);
       expect(auroraBaseTint(brand, "dark").toUpperCase()).toBe(DARK_BASELINE.baseFill);
     }

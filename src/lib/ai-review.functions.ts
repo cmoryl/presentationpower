@@ -35,7 +35,6 @@ const ReviewSchema = z.object({
 export type BrandReview = z.infer<typeof ReviewSchema>;
 export type BrandReviewFinding = z.infer<typeof Finding>;
 
-
 // ---------------------------------------------------------------------------
 // Server function: reviewDeck
 // Accepts the deck payload from the client (works for local + saved decks).
@@ -97,41 +96,42 @@ const Input = z.object({
   slides: z.array(SlideInput).min(1).max(60),
 });
 
-
-
 export type ReviewDeckInput = z.infer<typeof Input>;
 
 export const reviewDeck = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) => Input.parse(raw))
-  .handler(async ({ data, context }): Promise<
-    | { ok: true; review: BrandReview; reviewId: string | null }
-    | { ok: false; error: string; setup?: boolean }
-  > => {
-    if (!hasAnthropicKey()) {
-      return { ok: false, setup: true, error: ANTHROPIC_SETUP_MESSAGE };
-    }
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<
+      | { ok: true; review: BrandReview; reviewId: string | null }
+      | { ok: false; error: string; setup?: boolean }
+    > => {
+      if (!hasAnthropicKey()) {
+        return { ok: false, setup: true, error: ANTHROPIC_SETUP_MESSAGE };
+      }
 
+      const { supabase, userId } = context;
 
-    const { supabase, userId } = context;
+      const stableSystem = [
+        "You are the TransPerfect Brand Reviewer — a rigorous senior brand strategist.",
+        "You audit sales decks against a division's brand guide, voice profile, terminology, and governance rules.",
+        "Return STRICT JSON only — no prose, no markdown fences, no commentary.",
+        "",
+        serializeBrandGuide(data.brandModeId),
+        "",
+        serializeBrandhubIntel(data.brandModeId),
+        "",
+        governanceBlock(),
+      ].join("\n");
 
-    const stableSystem = [
-      "You are the TransPerfect Brand Reviewer — a rigorous senior brand strategist.",
-      "You audit sales decks against a division's brand guide, voice profile, terminology, and governance rules.",
-      "Return STRICT JSON only — no prose, no markdown fences, no commentary.",
-      "",
-      serializeBrandGuide(data.brandModeId),
-      "",
-      serializeBrandhubIntel(data.brandModeId),
-      "",
-      governanceBlock(),
-    ].join("\n");
-
-    const variableUser = [
-      "Audit the following deck. For each slide (0-indexed), inspect every string in `content` against the brand guide above.",
-      "",
-      "Return JSON of the shape:",
-      `{
+      const variableUser = [
+        "Audit the following deck. For each slide (0-indexed), inspect every string in `content` against the brand guide above.",
+        "",
+        "Return JSON of the shape:",
+        `{
   "overallScore": number 0-100,
   "summary": string (<= 400 chars),
   "findings": [{
@@ -144,90 +144,90 @@ export const reviewDeck = createServerFn({ method: "POST" })
   }],
   "strengths": string[]
 }`,
-      "",
-      "Severity guidance:",
-      "- critical: banned terminology, wrong sub-brand, altered stats, or governance violations.",
-      "- warning: off-voice, weak claims, unclear structure.",
-      "- suggestion: polish opportunities.",
-      "",
-      `Deck title: ${data.deckTitle}`,
-      data.subCompany ? `Sub-company: ${data.subCompany}` : "",
-      data.brief ? `Brief context: ${JSON.stringify(data.brief)}` : "",
-      data.strategy
-        ? `Intended narrative (from AI Strategist — use to flag drift under category "structure"): ${JSON.stringify(data.strategy)}`
-        : "",
-      data.knowledgeFacts && data.knowledgeFacts.length
-        ? `Retrieved knowledge facts (use under category "claims" — flag any deck copy that contradicts, exaggerates, or fabricates specifics vs these facts): ${JSON.stringify(data.knowledgeFacts)}`
-        : "",
-      data.knowledgeSynthesis
-        ? `Knowledge synthesis (brief-specific summary from Deep-RAG): ${data.knowledgeSynthesis}`
-        : "",
-      "Slides (JSON):",
-      JSON.stringify(data.slides, null, 0),
+        "",
+        "Severity guidance:",
+        "- critical: banned terminology, wrong sub-brand, altered stats, or governance violations.",
+        "- warning: off-voice, weak claims, unclear structure.",
+        "- suggestion: polish opportunities.",
+        "",
+        `Deck title: ${data.deckTitle}`,
+        data.subCompany ? `Sub-company: ${data.subCompany}` : "",
+        data.brief ? `Brief context: ${JSON.stringify(data.brief)}` : "",
+        data.strategy
+          ? `Intended narrative (from AI Strategist — use to flag drift under category "structure"): ${JSON.stringify(data.strategy)}`
+          : "",
+        data.knowledgeFacts && data.knowledgeFacts.length
+          ? `Retrieved knowledge facts (use under category "claims" — flag any deck copy that contradicts, exaggerates, or fabricates specifics vs these facts): ${JSON.stringify(data.knowledgeFacts)}`
+          : "",
+        data.knowledgeSynthesis
+          ? `Knowledge synthesis (brief-specific summary from Deep-RAG): ${data.knowledgeSynthesis}`
+          : "",
+        "Slides (JSON):",
+        JSON.stringify(data.slides, null, 0),
+      ]
+        .filter(Boolean)
+        .join("\n");
 
-    ]
-      .filter(Boolean)
-      .join("\n");
-
-    async function attempt(extra?: string) {
-      const res = await callAnthropic(
-        [stableSystem],
-        extra ? `${variableUser}\n\n${extra}` : variableUser,
-        { maxTokens: 4096 },
-      );
-      if (!res.ok) return { rawError: `Anthropic ${res.status}: ${res.body}` } as const;
-      const text = res.text;
-      const start = text.indexOf("{");
-      const end = text.lastIndexOf("}");
-      if (start < 0 || end < 0) return { rawError: "Model did not return JSON" } as const;
-      try {
-        const parsed = ReviewSchema.safeParse(JSON.parse(text.slice(start, end + 1)));
-        if (parsed.success) return { review: parsed.data } as const;
-        return { rawError: `Schema mismatch: ${parsed.error.message.slice(0, 200)}` } as const;
-      } catch (e) {
-        return { rawError: `JSON parse failed: ${(e as Error).message}` } as const;
+      async function attempt(extra?: string) {
+        const res = await callAnthropic(
+          [stableSystem],
+          extra ? `${variableUser}\n\n${extra}` : variableUser,
+          { maxTokens: 4096 },
+        );
+        if (!res.ok) return { rawError: `Anthropic ${res.status}: ${res.body}` } as const;
+        const text = res.text;
+        const start = text.indexOf("{");
+        const end = text.lastIndexOf("}");
+        if (start < 0 || end < 0) return { rawError: "Model did not return JSON" } as const;
+        try {
+          const parsed = ReviewSchema.safeParse(JSON.parse(text.slice(start, end + 1)));
+          if (parsed.success) return { review: parsed.data } as const;
+          return { rawError: `Schema mismatch: ${parsed.error.message.slice(0, 200)}` } as const;
+        } catch (e) {
+          return { rawError: `JSON parse failed: ${(e as Error).message}` } as const;
+        }
       }
-    }
 
-    let result = await attempt();
-    if (!("review" in result) || !result.review) {
-      result = await attempt(
-        "Your previous response was not valid JSON matching the schema. Return ONLY the JSON object described above — no prose, no markdown fences.",
-      );
-    }
-    if (!("review" in result) || !result.review) {
-      return { ok: false, error: ("rawError" in result && result.rawError) || "Review failed" };
-    }
-    const review = result.review;
+      let result = await attempt();
+      if (!("review" in result) || !result.review) {
+        result = await attempt(
+          "Your previous response was not valid JSON matching the schema. Return ONLY the JSON object described above — no prose, no markdown fences.",
+        );
+      }
+      if (!("review" in result) || !result.review) {
+        return { ok: false, error: ("rawError" in result && result.rawError) || "Review failed" };
+      }
+      const review = result.review;
 
-    // Persist only if we have a cloud deck owned by the caller
-    let reviewId: string | null = null;
-    if (data.cloudDeckId) {
-      const { data: deck } = await supabase
-        .from("decks")
-        .select("id, owner_id")
-        .eq("id", data.cloudDeckId)
-        .single();
-      if (deck && deck.owner_id === userId) {
-        const { data: ins } = await supabase
-          .from("deck_reviews")
-          .insert({
-            deck_id: data.cloudDeckId,
-            created_by: userId,
-            model: ANTHROPIC_MODEL,
-            overall_score: Math.round(review.overallScore),
-            summary: review.summary,
-            findings: review.findings as never,
-            strengths: review.strengths as never,
-          })
-          .select("id")
+      // Persist only if we have a cloud deck owned by the caller
+      let reviewId: string | null = null;
+      if (data.cloudDeckId) {
+        const { data: deck } = await supabase
+          .from("decks")
+          .select("id, owner_id")
+          .eq("id", data.cloudDeckId)
           .single();
-        reviewId = ins?.id ?? null;
+        if (deck && deck.owner_id === userId) {
+          const { data: ins } = await supabase
+            .from("deck_reviews")
+            .insert({
+              deck_id: data.cloudDeckId,
+              created_by: userId,
+              model: ANTHROPIC_MODEL,
+              overall_score: Math.round(review.overallScore),
+              summary: review.summary,
+              findings: review.findings as never,
+              strengths: review.strengths as never,
+            })
+            .select("id")
+            .single();
+          reviewId = ins?.id ?? null;
+        }
       }
-    }
 
-    return { ok: true, review, reviewId };
-  });
+      return { ok: true, review, reviewId };
+    },
+  );
 
 // ---------------------------------------------------------------------------
 // List prior reviews for a saved deck

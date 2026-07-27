@@ -33,10 +33,13 @@ export function ScaledSlide({
   }, []);
 
   return (
-    <div ref={wrapRef} data-print-surface="" className={`relative w-full aspect-[16/9] overflow-hidden bg-white text-left ${className}`}>
+    <div
+      ref={wrapRef}
+      data-print-surface=""
+      className={`relative w-full aspect-[16/9] overflow-hidden bg-white text-left ${className}`}
+    >
       <div
         data-slide-stage=""
-
         className="absolute left-0 top-0 origin-top-left text-left"
         style={{
           width: 1920,
@@ -47,6 +50,5 @@ export function ScaledSlide({
         {children}
       </div>
     </div>
-
   );
 }

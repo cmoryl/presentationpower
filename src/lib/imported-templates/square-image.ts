@@ -43,10 +43,22 @@ export const SQUARE_IMAGE_TEMPLATE: TemplatePayload = {
       content: {
         title: "Program milestones",
         items: [
-          { label: "10 January", body: "Kick-off · Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam." },
-          { label: "22 March", body: "Milestone two · Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam." },
-          { label: "14 June", body: "Milestone three · Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam." },
-          { label: "30 September", body: "Wrap · Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam." },
+          {
+            label: "10 January",
+            body: "Kick-off · Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.",
+          },
+          {
+            label: "22 March",
+            body: "Milestone two · Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.",
+          },
+          {
+            label: "14 June",
+            body: "Milestone three · Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.",
+          },
+          {
+            label: "30 September",
+            body: "Wrap · Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.",
+          },
         ],
       },
     },
@@ -95,9 +107,21 @@ export const SQUARE_IMAGE_TEMPLATE: TemplatePayload = {
         title: "Three image placeholder",
         subtitle: "Subtitle text here",
         items: [
-          { label: "Image title", body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.", mediaSeed: "square-editorial-tile-1" },
-          { label: "Image title", body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.", mediaSeed: "square-editorial-tile-2" },
-          { label: "Image title", body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.", mediaSeed: "square-editorial-tile-3" },
+          {
+            label: "Image title",
+            body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.",
+            mediaSeed: "square-editorial-tile-1",
+          },
+          {
+            label: "Image title",
+            body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.",
+            mediaSeed: "square-editorial-tile-2",
+          },
+          {
+            label: "Image title",
+            body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.",
+            mediaSeed: "square-editorial-tile-3",
+          },
         ],
       },
     },
@@ -232,7 +256,11 @@ export const SQUARE_IMAGE_TEMPLATE: TemplatePayload = {
         title: "Four image placeholder",
         subtitle: "Subtitle text here",
         items: [
-          { label: "Freedom to make something", body: "$87M · Market Profit", mediaSeed: "square-matrix-a" },
+          {
+            label: "Freedom to make something",
+            body: "$87M · Market Profit",
+            mediaSeed: "square-matrix-a",
+          },
           { label: "Freedom to do anything", body: "Market Profit", mediaSeed: "square-matrix-b" },
           { label: "Freedom to do anything", body: "Market Profit", mediaSeed: "square-matrix-c" },
           { label: "Freedom to build", body: "Market Profit", mediaSeed: "square-matrix-d" },
@@ -249,9 +277,21 @@ export const SQUARE_IMAGE_TEMPLATE: TemplatePayload = {
         title: "Awesome title",
         body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.",
         items: [
-          { label: "11/04/2026", body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.", mediaSeed: "square-strip-1" },
-          { label: "11/04/2026", body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.", mediaSeed: "square-strip-2" },
-          { label: "11/04/2026", body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.", mediaSeed: "square-strip-3" },
+          {
+            label: "11/04/2026",
+            body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.",
+            mediaSeed: "square-strip-1",
+          },
+          {
+            label: "11/04/2026",
+            body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.",
+            mediaSeed: "square-strip-2",
+          },
+          {
+            label: "11/04/2026",
+            body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.",
+            mediaSeed: "square-strip-3",
+          },
         ],
       },
     },
@@ -281,10 +321,22 @@ export const SQUARE_IMAGE_TEMPLATE: TemplatePayload = {
       content: {
         title: "What's next",
         items: [
-          { label: "01 · 11/04/2026 · Type", body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam." },
-          { label: "02 · 18/04/2026 · Type", body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam." },
-          { label: "03 · 25/04/2026 · Type", body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam." },
-          { label: "04 · 02/05/2026 · Type", body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam." },
+          {
+            label: "01 · 11/04/2026 · Type",
+            body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.",
+          },
+          {
+            label: "02 · 18/04/2026 · Type",
+            body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.",
+          },
+          {
+            label: "03 · 25/04/2026 · Type",
+            body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.",
+          },
+          {
+            label: "04 · 02/05/2026 · Type",
+            body: "Lorem ipsum dolor sit amet, qui sint neque a velit modi quo numquam.",
+          },
         ],
       },
     },

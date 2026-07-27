@@ -119,7 +119,9 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
     let alive = true;
     (async () => {
       try {
-        const v = (await fetchVersion({ data: { versionId: selectedId } })) as unknown as VersionRecord;
+        const v = (await fetchVersion({
+          data: { versionId: selectedId },
+        })) as unknown as VersionRecord;
         if (alive) setSelected(v);
       } catch (e) {
         if (alive) setError((e as Error).message);
@@ -144,7 +146,12 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
   }
 
   async function onRestore(versionId: string, versionNumber: number) {
-    if (!confirm(`Restore this deck to v${versionNumber}? Your current state will be saved as a checkpoint first.`)) return;
+    if (
+      !confirm(
+        `Restore this deck to v${versionNumber}? Your current state will be saved as a checkpoint first.`,
+      )
+    )
+      return;
     setBusy(versionId);
     setError(null);
     try {
@@ -234,7 +241,14 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
   const previewClient = selected?.snapshot.brief?.prospect ?? brief?.prospect;
 
   return (
-    <div ref={dialogRef} className="fixed inset-0 z-50 flex outline-none" role="dialog" aria-modal="true" aria-labelledby="version-history-title" tabIndex={-1}>
+    <div
+      ref={dialogRef}
+      className="fixed inset-0 z-50 flex outline-none"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="version-history-title"
+      tabIndex={-1}
+    >
       <button
         type="button"
         aria-label="Close history"
@@ -249,7 +263,12 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
               <History size={16} className="text-[#050B18]" />
             </div>
             <div>
-              <div id="version-history-title" className="text-[10px] uppercase tracking-[0.24em] text-white/50">Version history</div>
+              <div
+                id="version-history-title"
+                className="text-[10px] uppercase tracking-[0.24em] text-white/50"
+              >
+                Version history
+              </div>
               <div className="text-base font-medium">{deck?.title ?? "Deck"}</div>
             </div>
           </div>
@@ -260,7 +279,11 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
               disabled={creating}
               className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-2 text-xs font-medium text-white hover:border-[#A1FBF9]/40 disabled:opacity-50"
             >
-              {creating ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} className="text-[#A1FBF9]" />}
+              {creating ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Sparkles size={14} className="text-[#A1FBF9]" />
+              )}
               Save checkpoint
             </button>
             <button
@@ -289,7 +312,8 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
               </div>
             ) : rows.length === 0 ? (
               <div className="p-6 text-sm text-white/60">
-                No versions yet. Save this deck to the cloud, then use <b>Save checkpoint</b> to start tracking changes.
+                No versions yet. Save this deck to the cloud, then use <b>Save checkpoint</b> to
+                start tracking changes.
               </div>
             ) : (
               <ul className="divide-y divide-white/5">
@@ -301,7 +325,9 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
                         type="button"
                         onClick={() => setSelectedId(r.id)}
                         className={`block w-full px-5 py-4 text-left transition ${
-                          isSel ? "bg-gradient-to-r from-[#003FC7]/25 to-transparent" : "hover:bg-white/[0.04]"
+                          isSel
+                            ? "bg-gradient-to-r from-[#003FC7]/25 to-transparent"
+                            : "hover:bg-white/[0.04]"
                         }`}
                       >
                         <div className="flex items-center justify-between">
@@ -345,7 +371,8 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
                       v{selected.version_number} · {new Date(selected.created_at).toLocaleString()}
                     </div>
                     <div className="truncate text-sm text-white/85">
-                      {selected.change_summary || "Snapshot"} · {selected.snapshot.slides.length} slides
+                      {selected.change_summary || "Snapshot"} · {selected.snapshot.slides.length}{" "}
+                      slides
                     </div>
                   </div>
                   <button

@@ -8,7 +8,11 @@ export const Route = createFileRoute("/knowledge/brand-guides/")({
   head: () => ({
     meta: [
       { title: "Brand Guides · Knowledge · TransPerfect" },
-      { name: "description", content: "Digital brand guides for TransPerfect, its divisions, product lines and portfolio brands." },
+      {
+        name: "description",
+        content:
+          "Digital brand guides for TransPerfect, its divisions, product lines and portfolio brands.",
+      },
     ],
   }),
   component: BrandGuidesIndex,
@@ -43,7 +47,14 @@ function BrandGuidesIndex() {
   const [query, setQuery] = useState("");
 
   const counts = useMemo(() => {
-    const c: Record<Bucket, number> = { all: BRAND_GUIDES.length, master: 0, division: 0, product: 0, portfolio: 0, cobrand: 0 };
+    const c: Record<Bucket, number> = {
+      all: BRAND_GUIDES.length,
+      master: 0,
+      division: 0,
+      product: 0,
+      portfolio: 0,
+      cobrand: 0,
+    };
     for (const g of BRAND_GUIDES) c[g.category]++;
     return c;
   }, []);
@@ -60,11 +71,13 @@ function BrandGuidesIndex() {
     <AppShell>
       <div className="flex items-baseline justify-between gap-6">
         <div>
-          <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">Knowledge · Brand Guides</div>
+          <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
+            Knowledge · Brand Guides
+          </div>
           <h1 className="mt-3 text-4xl font-semibold">Brand guides library</h1>
           <p className="mt-3 max-w-2xl text-black/60 dark:text-white/60">
-            The master TransPerfect brand system, plus division, product and portfolio guides — sourced from BrandHUB
-            intelligence and the master brand system.
+            The master TransPerfect brand system, plus division, product and portfolio guides —
+            sourced from BrandHUB intelligence and the master brand system.
           </p>
         </div>
         <Link
@@ -94,7 +107,9 @@ function BrandGuidesIndex() {
               {b.label}
               <span
                 className={`rounded-full px-1.5 text-[10px] tabular-nums ${
-                  active ? "bg-white/20 text-white dark:bg-black/20 dark:text-[#03002C]" : "bg-black/5 dark:bg-white/10"
+                  active
+                    ? "bg-white/20 text-white dark:bg-black/20 dark:text-[#03002C]"
+                    : "bg-black/5 dark:bg-white/10"
                 }`}
               >
                 {n}
@@ -139,18 +154,24 @@ function BrandGuidesIndex() {
                 {eyebrow}
               </div>
               <div className="mt-3 text-2xl font-semibold">{g.title}</div>
-              <div className="text-sm text-black/60 dark:text-white/60">{g.subtitle} · v{g.version}</div>
-              {g.tagline && <div className="mt-4 italic text-black/70 dark:text-white/70">"{g.tagline}"</div>}
+              <div className="text-sm text-black/60 dark:text-white/60">
+                {g.subtitle} · v{g.version}
+              </div>
+              {g.tagline && (
+                <div className="mt-4 italic text-black/70 dark:text-white/70">"{g.tagline}"</div>
+              )}
               <div className="mt-5 flex items-center gap-2">
-                {g.primaryColors.slice(0, 2).concat(g.secondaryColors.slice(0, 2)).map((c, i) => (
-                  <span
-                    key={`${c.hex}-${i}`}
-                    className="h-6 w-6 rounded-full border border-black/10 dark:border-white/20"
-                    style={{ background: c.hex }}
-                    title={`${c.name} ${c.hex}`}
-                  />
-                ))}
-
+                {g.primaryColors
+                  .slice(0, 2)
+                  .concat(g.secondaryColors.slice(0, 2))
+                  .map((c, i) => (
+                    <span
+                      key={`${c.hex}-${i}`}
+                      className="h-6 w-6 rounded-full border border-black/10 dark:border-white/20"
+                      style={{ background: c.hex }}
+                      title={`${c.name} ${c.hex}`}
+                    />
+                  ))}
               </div>
               <div className="mt-6 text-xs text-black/40 group-hover:text-black/70 dark:text-white/40 dark:group-hover:text-white/70">
                 Open guide →
@@ -168,10 +189,13 @@ function BrandGuidesIndex() {
         {bucket === "all" && !query && (
           <div className="rounded-2xl border border-dashed border-black/20 bg-black/[0.02] p-6 text-sm text-black/50 dark:border-white/20 dark:bg-white/[0.02] dark:text-white/60">
             <div className="text-[11px] uppercase tracking-[0.25em]">Extend the system</div>
-            <div className="mt-3 text-lg font-medium text-black/70 dark:text-white/80">Add a new guide</div>
+            <div className="mt-3 text-lg font-medium text-black/70 dark:text-white/80">
+              Add a new guide
+            </div>
             <p className="mt-2">
-              Regional divisions and additional portfolio brands can each get a dedicated guide. Add an entry to{" "}
-              <code>DIVISION_SEEDS</code> in <code>src/lib/brand-guides.ts</code> and it appears here.
+              Regional divisions and additional portfolio brands can each get a dedicated guide. Add
+              an entry to <code>DIVISION_SEEDS</code> in <code>src/lib/brand-guides.ts</code> and it
+              appears here.
             </p>
           </div>
         )}

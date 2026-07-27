@@ -35,9 +35,30 @@ import type {
   PrintMode,
   PrintPageSize,
 } from "@/lib/print-assets.types";
-import { emptyCaseStudy, emptySpotlight, emptyEBrochure, emptyAdaptorBrief } from "@/lib/print-assets.types";
-import type { PrintSection, PrintStatsSection, PrintStatsVariant, PrintQuoteSection, PrintQuoteVariant, PrintLogoGridSection, PrintLogoGridVariant, PrintExpertiseSection, PrintExpertiseVariant, PrintFeatureListSection, PrintFeatureVariant } from "@/lib/print-assets.types";
-import type { SpotlightContent, EBrochureContent, AdaptorBriefContent } from "@/lib/print-assets.types";
+import {
+  emptyCaseStudy,
+  emptySpotlight,
+  emptyEBrochure,
+  emptyAdaptorBrief,
+} from "@/lib/print-assets.types";
+import type {
+  PrintSection,
+  PrintStatsSection,
+  PrintStatsVariant,
+  PrintQuoteSection,
+  PrintQuoteVariant,
+  PrintLogoGridSection,
+  PrintLogoGridVariant,
+  PrintExpertiseSection,
+  PrintExpertiseVariant,
+  PrintFeatureListSection,
+  PrintFeatureVariant,
+} from "@/lib/print-assets.types";
+import type {
+  SpotlightContent,
+  EBrochureContent,
+  AdaptorBriefContent,
+} from "@/lib/print-assets.types";
 import {
   PRINT_STATS_VARIANTS,
   PRINT_QUOTE_VARIANTS,
@@ -46,7 +67,10 @@ import {
   PRINT_FEATURE_VARIANTS,
   PrintSectionRenderer,
 } from "@/components/print/sections/PrintSectionRenderer";
-import { PrintSectionPicker, PRINT_SECTION_DND_MIME } from "@/components/print/sections/PrintSectionPicker";
+import {
+  PrintSectionPicker,
+  PRINT_SECTION_DND_MIME,
+} from "@/components/print/sections/PrintSectionPicker";
 import { PrintIconPicker } from "@/components/print/PrintIconPicker";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
@@ -66,7 +90,12 @@ import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
 import { usePrintOverflow } from "@/hooks/use-print-overflow";
 import { PrintOverflowOverlay } from "@/components/print/PrintOverflowOverlay";
 import { SwapVariantPreviewModal } from "@/components/print/SwapVariantPreviewModal";
-import { analyzePrintAsset, canAddModule, weightForSection, effectiveModuleBudget } from "@/lib/print-capacity";
+import {
+  analyzePrintAsset,
+  canAddModule,
+  weightForSection,
+  effectiveModuleBudget,
+} from "@/lib/print-capacity";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
@@ -78,7 +107,27 @@ import { CONTENT_SCHEMAS, unreachablePaths } from "@/lib/print-content-schema";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { SectionSelectOverlay } from "@/components/print/SectionSelectOverlay";
 import { ConfirmModal } from "@/components/ConfirmModal";
-import { Save, Trash2, Sparkles, FileDown, ChevronLeft, Plus, ArrowUp, ArrowDown, Images, GripVertical, Undo2, Redo2, Sun, Moon, ChevronDown, ChevronRight, Eye, EyeOff, Upload } from "lucide-react";
+import {
+  Save,
+  Trash2,
+  Sparkles,
+  FileDown,
+  ChevronLeft,
+  Plus,
+  ArrowUp,
+  ArrowDown,
+  Images,
+  GripVertical,
+  Undo2,
+  Redo2,
+  Sun,
+  Moon,
+  ChevronDown,
+  ChevronRight,
+  Eye,
+  EyeOff,
+  Upload,
+} from "lucide-react";
 import { toast } from "sonner";
 import { validateDocument, errorSummary } from "@/lib/document-validation";
 import { uploadSlideMedia } from "@/lib/slide-media";
@@ -115,10 +164,14 @@ function AssetEditor() {
   const [showErrors, setShowErrors] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [synthBusy, setSynthBusy] = useState(false);
-  const [divisionStats, setDivisionStats] = useState<Array<{ label: string; value: string; unit: string | null }>>([]);
+  const [divisionStats, setDivisionStats] = useState<
+    Array<{ label: string; value: string; unit: string | null }>
+  >([]);
   const [inspectorOpen, setInspectorOpen] = useState(true);
   const [spineOpen, setSpineOpen] = useState(false);
-  const [divisionQuotes, setDivisionQuotes] = useState<Array<{ quote: string; author: string | null; role: string | null }>>([]);
+  const [divisionQuotes, setDivisionQuotes] = useState<
+    Array<{ quote: string; author: string | null; role: string | null }>
+  >([]);
   const canvasRef = useRef<HTMLDivElement | null>(null);
   // Measured (not predicted) page overflow — fires whenever content is really
   // clipped by the fixed-height page, e.g. after dragging the hero too tall.
@@ -165,16 +218,17 @@ function AssetEditor() {
       const tag = target?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || target?.isContentEditable) return;
       const k = e.key.toLowerCase();
-      if (k === "z" && !e.shiftKey) { e.preventDefault(); undoRef.current(); }
-      else if ((k === "z" && e.shiftKey) || k === "y") { e.preventDefault(); redoRef.current(); }
+      if (k === "z" && !e.shiftKey) {
+        e.preventDefault();
+        undoRef.current();
+      } else if ((k === "z" && e.shiftKey) || k === "y") {
+        e.preventDefault();
+        redoRef.current();
+      }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
-
-
-
-
 
   useEffect(() => {
     load({ data: { assetId } })
@@ -291,16 +345,26 @@ function AssetEditor() {
     setRow({ ...r, context: { ...ctxNow, exportPrefs: next } as PrintAssetContext });
     setDirty(true);
     // Intentionally do NOT push history for export-panel churn.
-  }, [exportSize, customW, customH, bleedIn, cropMarks, exportMode, exportQuality, exportFormat, iccProfile]);
-
-
+  }, [
+    exportSize,
+    customW,
+    customH,
+    bleedIn,
+    cropMarks,
+    exportMode,
+    exportQuality,
+    exportFormat,
+    iccProfile,
+  ]);
 
   useEffect(() => {
     if (!row?.brand_mode_id) return;
     fetchDivisionCtx({ data: { divisionId: row.brand_mode_id, knowledgeLimit: 12 } })
       .then((ctx) => {
         setDivisionStats(ctx.stats.map((s) => ({ label: s.label, value: s.value, unit: s.unit })));
-        setDivisionQuotes(ctx.quotes.map((q) => ({ quote: q.quote, author: q.author, role: q.role })));
+        setDivisionQuotes(
+          ctx.quotes.map((q) => ({ quote: q.quote, author: q.author, role: q.role })),
+        );
       })
       .catch(() => {
         // Non-fatal — editor still works without division context.
@@ -346,28 +410,53 @@ function AssetEditor() {
     ? { url: resolvedClientLogo.url, name: resolvedClientLogo.clientName }
     : null;
 
-  const kindForAudit = (row?.kind ?? "case-study") as "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
+  const kindForAudit = (row?.kind ?? "case-study") as
+    | "case-study"
+    | "spotlight"
+    | "ebrochure"
+    | "adaptor-brief";
   useEffect(() => {
     if (!import.meta.env.DEV) return;
     if (!row) return;
-    import("@/lib/print-content-schema").then(({ schemaFor: sf, unreachablePaths, fullyPopulatedSample }) => {
-      const dead = unreachablePaths(sf(kindForAudit), fullyPopulatedSample(kindForAudit));
-      if (dead.length > 0) {
-        // eslint-disable-next-line no-console
-        console.warn(`[print-content-schema] Unreachable fields for kind="${kindForAudit}":`, dead);
-      }
-    });
+    import("@/lib/print-content-schema").then(
+      ({ schemaFor: sf, unreachablePaths, fullyPopulatedSample }) => {
+        const dead = unreachablePaths(sf(kindForAudit), fullyPopulatedSample(kindForAudit));
+        if (dead.length > 0) {
+          console.warn(
+            `[print-content-schema] Unreachable fields for kind="${kindForAudit}":`,
+            dead,
+          );
+        }
+      },
+    );
   }, [kindForAudit, row]);
 
-  if (loading) return <AppShell><div className="p-10 text-sm text-black/60">Loading…</div></AppShell>;
-  if (!row) return <AppShell><div className="p-10 text-sm text-red-600">Print asset not found.</div></AppShell>;
+  if (loading)
+    return (
+      <AppShell>
+        <div className="p-10 text-sm text-black/60">Loading…</div>
+      </AppShell>
+    );
+  if (!row)
+    return (
+      <AppShell>
+        <div className="p-10 text-sm text-red-600">Print asset not found.</div>
+      </AppShell>
+    );
 
-  const kind = (row.kind ?? "case-study") as "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
+  const kind = (row.kind ?? "case-study") as
+    | "case-study"
+    | "spotlight"
+    | "ebrochure"
+    | "adaptor-brief";
   const rawContent: Record<string, unknown> = (() => {
     const c = (row.content as Record<string, unknown>) ?? {};
-    if (kind === "spotlight") return { ...(emptySpotlight() as unknown as Record<string, unknown>), ...c };
-    if (kind === "ebrochure") return { ...(emptyEBrochure() as unknown as Record<string, unknown>), ...c };
-    if (kind === "adaptor-brief") return { ...(emptyAdaptorBrief() as unknown as Record<string, unknown>), ...c };
+    if (kind === "spotlight")
+      return { ...(emptySpotlight() as unknown as Record<string, unknown>), ...c };
+    if (kind === "ebrochure")
+      return { ...(emptyEBrochure() as unknown as Record<string, unknown>), ...c };
+    if (kind === "adaptor-brief")
+      return { ...(emptyAdaptorBrief() as unknown as Record<string, unknown>), ...c };
     return { ...(emptyCaseStudy() as unknown as Record<string, unknown>), ...c };
   })();
   const content: CaseStudyContent = rawContent as unknown as CaseStudyContent;
@@ -412,7 +501,11 @@ function AssetEditor() {
     if (!row || historyRef.current.undo.length === 0) return;
     const prev = historyRef.current.undo.pop()!;
     historyRef.current.redo.push({ content: row.content, context: row.context });
-    setRow({ ...row, content: prev.content as CaseStudyContent, context: prev.context as PrintAssetContext });
+    setRow({
+      ...row,
+      content: prev.content as CaseStudyContent,
+      context: prev.context as PrintAssetContext,
+    });
     setDirty(true);
     setHistoryTick((t) => t + 1);
   }
@@ -420,7 +513,11 @@ function AssetEditor() {
     if (!row || historyRef.current.redo.length === 0) return;
     const nxt = historyRef.current.redo.pop()!;
     historyRef.current.undo.push({ content: row.content, context: row.context });
-    setRow({ ...row, content: nxt.content as CaseStudyContent, context: nxt.context as PrintAssetContext });
+    setRow({
+      ...row,
+      content: nxt.content as CaseStudyContent,
+      context: nxt.context as PrintAssetContext,
+    });
     setDirty(true);
     setHistoryTick((t) => t + 1);
   }
@@ -430,7 +527,11 @@ function AssetEditor() {
   // Generic path-based writer for click-in-preview live editing on the
   // non-case-study kinds. Path syntax matches @/lib/qa readPath:
   // "a.b", "a[0].b".
-  function writePath(obj: Record<string, unknown>, path: string, value: unknown): Record<string, unknown> {
+  function writePath(
+    obj: Record<string, unknown>,
+    path: string,
+    value: unknown,
+  ): Record<string, unknown> {
     const parts: (string | number)[] = path.split(".").flatMap((p) => {
       const m = /^([^\[]+)(\[(\d+)\])?$/.exec(p);
       if (!m) return [p];
@@ -442,7 +543,9 @@ function AssetEditor() {
       const k = parts[i]!;
       const nextK = parts[i + 1]!;
       const child = cur[k];
-      const nextChild = Array.isArray(child) ? [...child] : { ...(child ?? (typeof nextK === "number" ? [] : {})) };
+      const nextChild = Array.isArray(child)
+        ? [...child]
+        : { ...(child ?? (typeof nextK === "number" ? [] : {})) };
       cur[k] = nextChild;
       cur = nextChild;
     }
@@ -481,7 +584,6 @@ function AssetEditor() {
   const editableFieldPaths = collectStringPaths(rawContent);
 
   // Dev-time schema audit moved above early returns to preserve hook order.
-
 
   // Inline validation — recomputed on every keystroke so messages clear as
   // soon as the author fixes the field. Errors only render after a failed save
@@ -595,8 +697,6 @@ function AssetEditor() {
         },
       });
       setExportOpen(false);
-
-
     } catch (e) {
       alert(`Export failed: ${(e as Error).message}`);
     } finally {
@@ -608,11 +708,12 @@ function AssetEditor() {
   const density: PrintDensity = ctx.density ?? "standard";
   const editorMode: PrintMode = ctx.editorMode ?? "light";
   const showBleedGuides: boolean = !!ctx.showBleedGuides;
-  const bleedFraction = Math.max(0, Math.min(0.06, bleedIn / (pageSize === "A4" ? 8.27 : pageSize === "Letter" ? 8.5 : 8.5)));
+  const bleedFraction = Math.max(
+    0,
+    Math.min(0.06, bleedIn / (pageSize === "A4" ? 8.27 : pageSize === "Letter" ? 8.5 : 8.5)),
+  );
   const canvasAspect =
-    pageSize === "A4" ? "1 / 1.414"
-    : pageSize === "Letter" ? "8.5 / 11"
-    : "1 / 1";
+    pageSize === "A4" ? "1 / 1.414" : pageSize === "Letter" ? "8.5 / 11" : "1 / 1";
   // Aurora orb frame in the shared 1280×720 native space. Portrait / square
   // page sizes re-project the aurora composition onto a taller / square
   // frame so orbs bleed in from the correct edges (issue: with default
@@ -630,17 +731,19 @@ function AssetEditor() {
   const densityPad = density === "compact" ? "p-8" : density === "airy" ? "p-16" : "p-12";
   const densityGap = density === "compact" ? "gap-4" : density === "airy" ? "gap-10" : "gap-6";
 
-
-
-
   return (
     <AppShell>
       <div className="mx-auto max-w-[1400px] px-2 py-6">
         {/* HEADER BAR */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Link to="/" className="text-sm text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white">
-              <span className="inline-flex items-center gap-1"><ChevronLeft size={14} /> Home</span>
+            <Link
+              to="/"
+              className="text-sm text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+            >
+              <span className="inline-flex items-center gap-1">
+                <ChevronLeft size={14} /> Home
+              </span>
             </Link>
             <div>
               <input
@@ -649,7 +752,10 @@ function AssetEditor() {
                 aria-invalid={Boolean(fieldError("title"))}
                 aria-describedby={fieldError("title") ? "err-title" : undefined}
                 onBlur={() => markTouched("title")}
-                onChange={(e) => { setRow({ ...row, title: e.target.value }); setDirty(true); }}
+                onChange={(e) => {
+                  setRow({ ...row, title: e.target.value });
+                  setDirty(true);
+                }}
                 className={`rounded-md border bg-transparent px-2 py-1 text-lg font-semibold text-[#03002C] focus:outline-none dark:text-white ${
                   fieldError("title")
                     ? "border-red-500 focus:border-red-600"
@@ -689,7 +795,11 @@ function AssetEditor() {
 
             {/* Editor mode toggle. Persisted to ctx so it survives reload,
                 and defaults the export panel so downloads are WYSIWYG. */}
-            <div className="mr-1 inline-flex items-center gap-0 rounded-full border border-black/10 bg-white p-0.5 dark:border-white/10 dark:bg-white/[0.03]" role="group" aria-label="Editor mode">
+            <div
+              className="mr-1 inline-flex items-center gap-0 rounded-full border border-black/10 bg-white p-0.5 dark:border-white/10 dark:bg-white/[0.03]"
+              role="group"
+              aria-label="Editor mode"
+            >
               <button
                 type="button"
                 data-testid="editor-mode-light"
@@ -750,14 +860,18 @@ function AssetEditor() {
               </button>
               {exportOpen && (
                 <div className="absolute right-0 top-10 z-50 w-[22rem] rounded-2xl border border-black/10 bg-white p-4 text-xs shadow-xl dark:border-white/10 dark:bg-[#0B0A2A]">
-                  <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-black/60 dark:text-white/60">PDF export</div>
+                  <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-black/60 dark:text-white/60">
+                    PDF export
+                  </div>
 
                   {/* Format — the top-level distinction. Digital vs Press must
                       be an explicit choice; a user should never accidentally
                       email a 100 MB press file or send a 150 DPI file to a
                       printer. */}
                   <div className="mb-3 rounded-xl border border-black/10 p-2 dark:border-white/10">
-                    <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50 dark:text-white/50">Output for</div>
+                    <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50 dark:text-white/50">
+                      Output for
+                    </div>
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
@@ -769,7 +883,9 @@ function AssetEditor() {
                         }`}
                       >
                         <div className="font-semibold">Digital PDF</div>
-                        <div className="mt-0.5 leading-snug text-[10px] opacity-75">Screen / email · 150 DPI · small file</div>
+                        <div className="mt-0.5 leading-snug text-[10px] opacity-75">
+                          Screen / email · 150 DPI · small file
+                        </div>
                       </button>
                       <button
                         type="button"
@@ -781,7 +897,9 @@ function AssetEditor() {
                         }`}
                       >
                         <div className="font-semibold">Press PDF · X-4</div>
-                        <div className="mt-0.5 leading-snug text-[10px] opacity-75">Printer-ready · bleed · large file</div>
+                        <div className="mt-0.5 leading-snug text-[10px] opacity-75">
+                          Printer-ready · bleed · large file
+                        </div>
                       </button>
                     </div>
                   </div>
@@ -884,7 +1002,9 @@ function AssetEditor() {
                             className={inspectorInput}
                           >
                             {(Object.keys(X4_ICC_PROFILES) as IccProfileKey[]).map((k) => (
-                              <option key={k} value={k}>{X4_ICC_PROFILES[k].label}</option>
+                              <option key={k} value={k}>
+                                {X4_ICC_PROFILES[k].label}
+                              </option>
                             ))}
                           </select>
                         </label>
@@ -924,16 +1044,24 @@ function AssetEditor() {
         </div>
 
         {/* LAYOUT */}
-        <div className={`grid gap-6 ${
-          spineOpen
-            ? inspectorOpen ? "grid-cols-[220px_1fr_340px]" : "grid-cols-[220px_1fr_36px]"
-            : inspectorOpen ? "grid-cols-[36px_1fr_340px]" : "grid-cols-[36px_1fr_36px]"
-        }`}>
+        <div
+          className={`grid gap-6 ${
+            spineOpen
+              ? inspectorOpen
+                ? "grid-cols-[220px_1fr_340px]"
+                : "grid-cols-[220px_1fr_36px]"
+              : inspectorOpen
+                ? "grid-cols-[36px_1fr_340px]"
+                : "grid-cols-[36px_1fr_36px]"
+          }`}
+        >
           {/* SPINE */}
           {spineOpen ? (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/50 dark:text-white/50">Pages</div>
+                <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
+                  Pages
+                </div>
                 <button
                   type="button"
                   data-testid="print-spine-collapse"
@@ -946,15 +1074,19 @@ function AssetEditor() {
                   ‹ Collapse
                 </button>
               </div>
-              {["Cover", "Challenge", "Solution", "Result", "Stats", "Quote", "CTA / Contact"].map((p, i) => (
-                <div
-                  key={p}
-                  className="rounded-xl border border-black/10 bg-white p-3 text-xs text-[#03002C] dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
-                >
-                  <div className="font-mono text-[10px] text-black/40 dark:text-white/40">{String(i + 1).padStart(2, "0")}</div>
-                  {p}
-                </div>
-              ))}
+              {["Cover", "Challenge", "Solution", "Result", "Stats", "Quote", "CTA / Contact"].map(
+                (p, i) => (
+                  <div
+                    key={p}
+                    className="rounded-xl border border-black/10 bg-white p-3 text-xs text-[#03002C] dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
+                  >
+                    <div className="font-mono text-[10px] text-black/40 dark:text-white/40">
+                      {String(i + 1).padStart(2, "0")}
+                    </div>
+                    {p}
+                  </div>
+                ),
+              )}
             </div>
           ) : (
             <div className="flex justify-start">
@@ -974,317 +1106,409 @@ function AssetEditor() {
 
           {/* CANVAS + document inputs */}
           <div className="min-w-0 space-y-4">
-          <div
-            ref={canvasRef}
-            className="relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
-            style={{ aspectRatio: canvasAspect }}
-          >
-            <LiveEditOverlay
-              enabled={true}
-              slideId={`asset-${row.id}-${kind}`}
-              content={rawContent}
-              editableFields={editableFieldPaths}
-              onChange={(path, value) => patchByPath(path, value)}
-              inkOverrides={ctx.inkOverrides}
-              inkScopeOverrides={ctx.inkScopeOverrides}
-              onSetInkColor={(cp, color) => setInkColor(cp, color)}
-              onClearInkColor={(cp) => setInkColor(cp, null)}
-              onSetInkScopeColor={(sc, color) => setInkScopeColor(sc, color)}
-              onClearInkScopeColor={(sc) => setInkScopeColor(sc, null)}
+            <div
+              ref={canvasRef}
+              className="relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
+              style={{ aspectRatio: canvasAspect }}
             >
-              <PrintClientLogoProvider value={clientLogo}>
-              {brand && kind === "case-study" && (
-                <CaseStudyLayout
-                  content={rawContent as unknown as CaseStudyContent}
-                  brand={brand}
-                  mode={editorMode}
-                  pageSize={pageSize}
-                  density={density}
-                  seed={`asset-${row.id}`}
-                />
-              )}
-              {brand && kind === "spotlight" && (
-                <SpotlightLayout
-                  content={rawContent as unknown as SpotlightContent}
-                  brand={brand}
-                  mode={editorMode}
-                  pageSize={pageSize}
-                  density={density}
-                  seed={`asset-${row.id}`}
-                />
-              )}
-              {brand && kind === "ebrochure" && (
-                <EBrochureLayout
-                  content={rawContent as unknown as EBrochureContent}
-                  brand={brand}
-                  mode={editorMode}
-                  pageSize={pageSize}
-                  density={density}
-                  seed={`asset-${row.id}`}
-                />
-              )}
-              {brand && kind === "adaptor-brief" && (
-                <AdaptorBriefLayout
-                  content={rawContent as unknown as AdaptorBriefContent}
-                  brand={brand}
-                  mode={editorMode}
-                  pageSize={pageSize}
-                  density={density}
-                  seed={`asset-${row.id}`}
-                />
-              )}
-              </PrintClientLogoProvider>
-              {ctx.printSafeArea && (
-                <div className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25" />
-              )}
-              <HeroResizeHandle
-                canvasRef={canvasRef}
-                media={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
-                onChange={(next) => patchContent({ heroMedia: next } as never)}
-                kind={kind as never}
-                usedModuleUnits={((rawContent as { modules?: PrintSection[] }).modules ?? []).reduce(
-                  (n, m) => n + weightForSection(m), 0,
+              <LiveEditOverlay
+                enabled={true}
+                slideId={`asset-${row.id}-${kind}`}
+                content={rawContent}
+                editableFields={editableFieldPaths}
+                onChange={(path, value) => patchByPath(path, value)}
+                inkOverrides={ctx.inkOverrides}
+                inkScopeOverrides={ctx.inkScopeOverrides}
+                onSetInkColor={(cp, color) => setInkColor(cp, color)}
+                onClearInkColor={(cp) => setInkColor(cp, null)}
+                onSetInkScopeColor={(sc, color) => setInkScopeColor(sc, color)}
+                onClearInkScopeColor={(sc) => setInkScopeColor(sc, null)}
+              >
+                <PrintClientLogoProvider value={clientLogo}>
+                  {brand && kind === "case-study" && (
+                    <CaseStudyLayout
+                      content={rawContent as unknown as CaseStudyContent}
+                      brand={brand}
+                      mode={editorMode}
+                      pageSize={pageSize}
+                      density={density}
+                      seed={`asset-${row.id}`}
+                    />
+                  )}
+                  {brand && kind === "spotlight" && (
+                    <SpotlightLayout
+                      content={rawContent as unknown as SpotlightContent}
+                      brand={brand}
+                      mode={editorMode}
+                      pageSize={pageSize}
+                      density={density}
+                      seed={`asset-${row.id}`}
+                    />
+                  )}
+                  {brand && kind === "ebrochure" && (
+                    <EBrochureLayout
+                      content={rawContent as unknown as EBrochureContent}
+                      brand={brand}
+                      mode={editorMode}
+                      pageSize={pageSize}
+                      density={density}
+                      seed={`asset-${row.id}`}
+                    />
+                  )}
+                  {brand && kind === "adaptor-brief" && (
+                    <AdaptorBriefLayout
+                      content={rawContent as unknown as AdaptorBriefContent}
+                      brand={brand}
+                      mode={editorMode}
+                      pageSize={pageSize}
+                      density={density}
+                      seed={`asset-${row.id}`}
+                    />
+                  )}
+                </PrintClientLogoProvider>
+                {ctx.printSafeArea && (
+                  <div className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25" />
                 )}
-                hasTitle={!!(rawContent as { title?: string }).title}
-                hasSummary={!!(rawContent as { summary?: string }).summary}
-              />
+                <HeroResizeHandle
+                  canvasRef={canvasRef}
+                  media={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
+                  onChange={(next) => patchContent({ heroMedia: next } as never)}
+                  kind={kind as never}
+                  usedModuleUnits={(
+                    (rawContent as { modules?: PrintSection[] }).modules ?? []
+                  ).reduce((n, m) => n + weightForSection(m), 0)}
+                  hasTitle={!!(rawContent as { title?: string }).title}
+                  hasSummary={!!(rawContent as { summary?: string }).summary}
+                />
 
-
-
-              {showBleedGuides && (
-                <>
-                  {/* Bleed edge (outer) — where the printed art bleeds off. */}
-                  <div
-                    className="pointer-events-none absolute rounded-none border border-dashed border-[#E53D2E]/70"
-                    style={{
-                      top: `${-bleedFraction * 100}%`,
-                      left: `${-bleedFraction * 100}%`,
-                      right: `${-bleedFraction * 100}%`,
-                      bottom: `${-bleedFraction * 100}%`,
-                    }}
-                    data-testid="bleed-guide-outer"
-                  />
-                  {/* Trim edge — the finished cut line. */}
-                  <div
-                    className="pointer-events-none absolute inset-0 border border-dashed border-[#003FC7]/70"
-                    data-testid="bleed-guide-trim"
-                  />
-                </>
-              )}
-            </LiveEditOverlay>
-            <PrintOverflowOverlay
-              state={overflow}
-              onFix={() => {
-                const cur = (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia;
-                if (!cur?.imageUrl) {
-                  toast.error("Content overflows the page — remove a module or shorten copy.");
-                  return;
-                }
-                const prev = cur.heightPct ?? 46;
-                // Give back roughly the clipped height, plus a 2pt safety margin.
-                const next = Math.max(22, Math.round(prev - overflow.overflowFrac * 100 - 2));
-                if (next >= prev) {
-                  toast.error("Hero is already at its minimum — remove a module or shorten copy.");
-                  return;
-                }
-                patchContent({ heroMedia: { ...cur, heightPct: next } } as never);
-                toast.success(`Hero reduced to ${next}% (was ${Math.round(prev)}%) to stop the page clipping`);
-              }}
-            />
-            <SectionSelectOverlay
-              canvasRef={canvasRef}
-              scanKey={rawContent}
-              onDelete={(key) => {
-                if (key === "features") patchContent({ features: [] } as never);
-                else if (key === "knowHow") patchContent({ knowHow: [] } as never);
-                else if (key === "quote") patchContent({ quote: undefined } as never);
-                else if (key === "cta") patchContent({ cta: undefined } as never);
-                else if (key === "hero") patchContent({ heroMedia: undefined } as never);
-                toast.success(`${key} section removed`);
-              }}
-              onReplace={(key) => {
-                toast.info(`Edit "${key}" in the inspector panel →`);
-              }}
-            />
-
-          </div>
-
-          {/* DOCUMENT INPUTS — content entry lives under the document */}
-          <div className="space-y-3">
-            <Panel title="Stats" defaultOpen={false}>
-              {(content.stats ?? []).map((s, i) => (
-                <div key={i} className="space-y-1">
-                  <div className="grid grid-cols-[1fr_60px] gap-2">
-                    <input
-                      className={fieldError(`stats.${i}.label`) ? inspectorInputInvalid : inspectorInput}
-                      value={s.label}
-                      aria-label={`Stat ${i + 1} label`}
-                      aria-invalid={Boolean(fieldError(`stats.${i}.label`))}
-                      onBlur={() => markTouched(`stats.${i}.label`)}
-                      onChange={(e) => updateStat(i, { label: e.target.value })}
-                      placeholder="Label"
+                {showBleedGuides && (
+                  <>
+                    {/* Bleed edge (outer) — where the printed art bleeds off. */}
+                    <div
+                      className="pointer-events-none absolute rounded-none border border-dashed border-[#E53D2E]/70"
+                      style={{
+                        top: `${-bleedFraction * 100}%`,
+                        left: `${-bleedFraction * 100}%`,
+                        right: `${-bleedFraction * 100}%`,
+                        bottom: `${-bleedFraction * 100}%`,
+                      }}
+                      data-testid="bleed-guide-outer"
                     />
-                    <input
-                      className={fieldError(`stats.${i}.value`) ? inspectorInputInvalid : inspectorInput}
-                      value={s.value}
-                      aria-label={`Stat ${i + 1} value`}
-                      aria-invalid={Boolean(fieldError(`stats.${i}.value`))}
-                      onBlur={() => markTouched(`stats.${i}.value`)}
-                      onChange={(e) => updateStat(i, { value: e.target.value })}
-                      placeholder="0"
+                    {/* Trim edge — the finished cut line. */}
+                    <div
+                      className="pointer-events-none absolute inset-0 border border-dashed border-[#003FC7]/70"
+                      data-testid="bleed-guide-trim"
                     />
-                  </div>
-                  <FieldError id={`err-stats-${i}-label`} message={fieldError(`stats.${i}.label`)} />
-                  <FieldError id={`err-stats-${i}-value`} message={fieldError(`stats.${i}.value`)} />
-                </div>
-              ))}
-              {divisionStats.length > 0 && (
-                <div className="pt-2">
-                  <div className="text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">From division</div>
-                  <div className="mt-1 space-y-1">
-                    {divisionStats.slice(0, 5).map((s, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => {
-                          const next = [...content.stats];
-                          const idx = next.findIndex((x) => !x.label || !x.value);
-                          const target = idx >= 0 ? idx : 0;
-                          next[target] = { label: s.label, value: s.value, unit: s.unit ?? "" };
-                          patchContent({ stats: next });
-                        }}
-                        className="w-full rounded-md border border-black/10 bg-white px-2 py-1 text-left text-[11px] hover:border-[#003FC7] dark:border-white/10 dark:bg-white/[0.03]"
-                      >
-                        <span className="font-semibold">{s.value}{s.unit ?? ""}</span> · {s.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </Panel>
-
-            <Panel title="Shared modules" defaultOpen={false}>
-              {overflow.clipped && (
-                <div
-                  data-testid="overflow-inspector-note"
-                  className="mb-2 rounded-xl border border-red-400/60 bg-red-50 px-3 py-2 text-[11px] font-semibold leading-snug text-red-700 dark:bg-red-500/10 dark:text-red-300"
-                  role="alert"
-                >
-                  Page is clipping: {Math.round(overflow.overflowFrac * 100)}% ({overflow.overflowPx}px)
-                  of content sits past the trim edge and will be cut from the export. Shrink the hero,
-                  remove a module, or shorten copy.
-                </div>
-              )}
-              <LayoutHealthBanner
-                report={analyzePrintAsset(kind, content)}
-                onApplySuggestion={(s) => {
-                  if (s.kind === "reduce-hero") {
-                    const cur = (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia ?? {} as PrintHeroMedia;
-                    const prev = cur.heightPct ?? 46;
-                    patchContent({ heroMedia: { ...cur, heightPct: s.targetHeightPct } } as never);
-                    toast.success(
-                      `Hero reduced to ${s.targetHeightPct}% (was ${Math.round(prev)}%) — freed ${s.frees.toFixed(1)} units`,
-                    );
-                  } else if (s.kind === "swap-variant") {
-                    const modules = content.modules ?? [];
-                    const cur = modules[s.moduleIndex];
-                    if (cur && cur.kind === "stats") {
-                      setPendingSwap({
-                        moduleIndex: s.moduleIndex,
-                        from: cur.variantId,
-                        to: s.to as PrintStatsVariant,
-                        frees: s.frees,
-                      });
-                    }
+                  </>
+                )}
+              </LiveEditOverlay>
+              <PrintOverflowOverlay
+                state={overflow}
+                onFix={() => {
+                  const cur = (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia;
+                  if (!cur?.imageUrl) {
+                    toast.error("Content overflows the page — remove a module or shorten copy.");
+                    return;
                   }
+                  const prev = cur.heightPct ?? 46;
+                  // Give back roughly the clipped height, plus a 2pt safety margin.
+                  const next = Math.max(22, Math.round(prev - overflow.overflowFrac * 100 - 2));
+                  if (next >= prev) {
+                    toast.error(
+                      "Hero is already at its minimum — remove a module or shorten copy.",
+                    );
+                    return;
+                  }
+                  patchContent({ heroMedia: { ...cur, heightPct: next } } as never);
+                  toast.success(
+                    `Hero reduced to ${next}% (was ${Math.round(prev)}%) to stop the page clipping`,
+                  );
                 }}
               />
-              <ModulesPanel
-                kind="case-study"
-                modules={content.modules ?? []}
-                heroMedia={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
-                hasTitle={!!(rawContent as { title?: string }).title}
-                hasSummary={!!(rawContent as { summary?: string }).summary}
-                onAdd={() => setPickerOpen(true)}
-                onChange={(next) => patchContent({ modules: next })}
-                mode={editorMode}
+              <SectionSelectOverlay
+                canvasRef={canvasRef}
+                scanKey={rawContent}
+                onDelete={(key) => {
+                  if (key === "features") patchContent({ features: [] } as never);
+                  else if (key === "knowHow") patchContent({ knowHow: [] } as never);
+                  else if (key === "quote") patchContent({ quote: undefined } as never);
+                  else if (key === "cta") patchContent({ cta: undefined } as never);
+                  else if (key === "hero") patchContent({ heroMedia: undefined } as never);
+                  toast.success(`${key} section removed`);
+                }}
+                onReplace={(key) => {
+                  toast.info(`Edit "${key}" in the inspector panel →`);
+                }}
               />
+            </div>
 
-              {/* Schema-driven Content inspector — the guaranteed safety net. */}
-              <div className="mt-4 pt-4 border-t border-black/10 dark:border-white/10">
-                <ContentInspector
-                  schema={schemaFor(kind)}
-                  content={rawContent}
-                  canvasEditablePaths={new Set(editableFieldPaths)}
-                  onWritePath={(path: string, value: unknown) => patchByPath(path, value)}
-                />
-              </div>
-            </Panel>
-
-            <Panel title="Quote" defaultOpen={false}>
-              <textarea
-                rows={3}
-                className={fieldError("quote.text") ? inspectorInputInvalid : inspectorInput}
-                placeholder="Pull-quote text"
-                aria-label="Quote text"
-                aria-invalid={Boolean(fieldError("quote.text"))}
-                onBlur={() => markTouched("quote.text")}
-                value={content.quote?.text ?? ""}
-                onChange={(e) => patchContent({ quote: { ...(content.quote ?? { author: "" }), text: e.target.value, author: content.quote?.author ?? "" } })}
-              />
-              <FieldError id="err-quote-text" message={fieldError("quote.text")} />
-              <input
-                className={fieldError("quote.author") ? inspectorInputInvalid : inspectorInput}
-                placeholder="Author"
-                aria-label="Quote author"
-                aria-invalid={Boolean(fieldError("quote.author"))}
-                onBlur={() => markTouched("quote.author")}
-                value={content.quote?.author ?? ""}
-                onChange={(e) => patchContent({ quote: { ...(content.quote ?? { text: "" }), author: e.target.value, text: content.quote?.text ?? "" } })}
-              />
-              <FieldError id="err-quote-author" message={fieldError("quote.author")} />
-              <input
-                className={fieldError("quote.role") ? inspectorInputInvalid : inspectorInput}
-                placeholder="Role, Company"
-                aria-label="Quote author role"
-                onBlur={() => markTouched("quote.role")}
-                value={content.quote?.role ?? ""}
-                onChange={(e) => patchContent({ quote: { ...(content.quote ?? { text: "", author: "" }), role: e.target.value, text: content.quote?.text ?? "", author: content.quote?.author ?? "" } })}
-              />
-              <FieldError id="err-quote-role" message={fieldError("quote.role")} />
-              {divisionQuotes.length > 0 && (
-                <div className="pt-2">
-                  <div className="text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">From division</div>
-                  <div className="mt-1 space-y-1">
-                    {divisionQuotes.slice(0, 3).map((q, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => patchContent({ quote: { text: q.quote, author: q.author ?? "", role: q.role ?? "" } })}
-                        className="w-full rounded-md border border-black/10 bg-white px-2 py-1 text-left text-[11px] hover:border-[#003FC7] dark:border-white/10 dark:bg-white/[0.03]"
-                      >
-                        “{q.quote.slice(0, 90)}{q.quote.length > 90 ? "…" : ""}”
-                      </button>
-                    ))}
+            {/* DOCUMENT INPUTS — content entry lives under the document */}
+            <div className="space-y-3">
+              <Panel title="Stats" defaultOpen={false}>
+                {(content.stats ?? []).map((s, i) => (
+                  <div key={i} className="space-y-1">
+                    <div className="grid grid-cols-[1fr_60px] gap-2">
+                      <input
+                        className={
+                          fieldError(`stats.${i}.label`) ? inspectorInputInvalid : inspectorInput
+                        }
+                        value={s.label}
+                        aria-label={`Stat ${i + 1} label`}
+                        aria-invalid={Boolean(fieldError(`stats.${i}.label`))}
+                        onBlur={() => markTouched(`stats.${i}.label`)}
+                        onChange={(e) => updateStat(i, { label: e.target.value })}
+                        placeholder="Label"
+                      />
+                      <input
+                        className={
+                          fieldError(`stats.${i}.value`) ? inspectorInputInvalid : inspectorInput
+                        }
+                        value={s.value}
+                        aria-label={`Stat ${i + 1} value`}
+                        aria-invalid={Boolean(fieldError(`stats.${i}.value`))}
+                        onBlur={() => markTouched(`stats.${i}.value`)}
+                        onChange={(e) => updateStat(i, { value: e.target.value })}
+                        placeholder="0"
+                      />
+                    </div>
+                    <FieldError
+                      id={`err-stats-${i}-label`}
+                      message={fieldError(`stats.${i}.label`)}
+                    />
+                    <FieldError
+                      id={`err-stats-${i}-value`}
+                      message={fieldError(`stats.${i}.value`)}
+                    />
                   </div>
+                ))}
+                {divisionStats.length > 0 && (
+                  <div className="pt-2">
+                    <div className="text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
+                      From division
+                    </div>
+                    <div className="mt-1 space-y-1">
+                      {divisionStats.slice(0, 5).map((s, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => {
+                            const next = [...content.stats];
+                            const idx = next.findIndex((x) => !x.label || !x.value);
+                            const target = idx >= 0 ? idx : 0;
+                            next[target] = { label: s.label, value: s.value, unit: s.unit ?? "" };
+                            patchContent({ stats: next });
+                          }}
+                          className="w-full rounded-md border border-black/10 bg-white px-2 py-1 text-left text-[11px] hover:border-[#003FC7] dark:border-white/10 dark:bg-white/[0.03]"
+                        >
+                          <span className="font-semibold">
+                            {s.value}
+                            {s.unit ?? ""}
+                          </span>{" "}
+                          · {s.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </Panel>
+
+              <Panel title="Shared modules" defaultOpen={false}>
+                {overflow.clipped && (
+                  <div
+                    data-testid="overflow-inspector-note"
+                    className="mb-2 rounded-xl border border-red-400/60 bg-red-50 px-3 py-2 text-[11px] font-semibold leading-snug text-red-700 dark:bg-red-500/10 dark:text-red-300"
+                    role="alert"
+                  >
+                    Page is clipping: {Math.round(overflow.overflowFrac * 100)}% (
+                    {overflow.overflowPx}px) of content sits past the trim edge and will be cut from
+                    the export. Shrink the hero, remove a module, or shorten copy.
+                  </div>
+                )}
+                <LayoutHealthBanner
+                  report={analyzePrintAsset(kind, content)}
+                  onApplySuggestion={(s) => {
+                    if (s.kind === "reduce-hero") {
+                      const cur =
+                        (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia ??
+                        ({} as PrintHeroMedia);
+                      const prev = cur.heightPct ?? 46;
+                      patchContent({
+                        heroMedia: { ...cur, heightPct: s.targetHeightPct },
+                      } as never);
+                      toast.success(
+                        `Hero reduced to ${s.targetHeightPct}% (was ${Math.round(prev)}%) — freed ${s.frees.toFixed(1)} units`,
+                      );
+                    } else if (s.kind === "swap-variant") {
+                      const modules = content.modules ?? [];
+                      const cur = modules[s.moduleIndex];
+                      if (cur && cur.kind === "stats") {
+                        setPendingSwap({
+                          moduleIndex: s.moduleIndex,
+                          from: cur.variantId,
+                          to: s.to as PrintStatsVariant,
+                          frees: s.frees,
+                        });
+                      }
+                    }
+                  }}
+                />
+                <ModulesPanel
+                  kind="case-study"
+                  modules={content.modules ?? []}
+                  heroMedia={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
+                  hasTitle={!!(rawContent as { title?: string }).title}
+                  hasSummary={!!(rawContent as { summary?: string }).summary}
+                  onAdd={() => setPickerOpen(true)}
+                  onChange={(next) => patchContent({ modules: next })}
+                  mode={editorMode}
+                />
+
+                {/* Schema-driven Content inspector — the guaranteed safety net. */}
+                <div className="mt-4 pt-4 border-t border-black/10 dark:border-white/10">
+                  <ContentInspector
+                    schema={schemaFor(kind)}
+                    content={rawContent}
+                    canvasEditablePaths={new Set(editableFieldPaths)}
+                    onWritePath={(path: string, value: unknown) => patchByPath(path, value)}
+                  />
                 </div>
-              )}
-            </Panel>
+              </Panel>
 
-            <Panel title="Expert / contact" defaultOpen={false}>
-              <input className={fieldError("expert.name") ? inspectorInputInvalid : inspectorInput} placeholder="Name" aria-label="Contact name" aria-invalid={Boolean(fieldError("expert.name"))} onBlur={() => markTouched("expert.name")} value={content.expert?.name ?? ""} onChange={(e) => patchContent({ expert: { ...(content.expert ?? {}), name: e.target.value } })} />
-              <FieldError id="err-expert-name" message={fieldError("expert.name")} />
-              <input className={fieldError("expert.role") ? inspectorInputInvalid : inspectorInput} placeholder="Role" aria-label="Contact role" onBlur={() => markTouched("expert.role")} value={content.expert?.role ?? ""} onChange={(e) => patchContent({ expert: { ...(content.expert ?? { name: "" }), role: e.target.value, name: content.expert?.name ?? "" } })} />
-              <FieldError id="err-expert-role" message={fieldError("expert.role")} />
-              <input className={fieldError("expert.email") ? inspectorInputInvalid : inspectorInput} placeholder="Email" type="email" inputMode="email" aria-label="Contact email" aria-invalid={Boolean(fieldError("expert.email"))} onBlur={() => markTouched("expert.email")} value={content.expert?.email ?? ""} onChange={(e) => patchContent({ expert: { ...(content.expert ?? { name: "" }), email: e.target.value, name: content.expert?.name ?? "" } })} />
-              <FieldError id="err-expert-email" message={fieldError("expert.email")} />
-            </Panel>
+              <Panel title="Quote" defaultOpen={false}>
+                <textarea
+                  rows={3}
+                  className={fieldError("quote.text") ? inspectorInputInvalid : inspectorInput}
+                  placeholder="Pull-quote text"
+                  aria-label="Quote text"
+                  aria-invalid={Boolean(fieldError("quote.text"))}
+                  onBlur={() => markTouched("quote.text")}
+                  value={content.quote?.text ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      quote: {
+                        ...(content.quote ?? { author: "" }),
+                        text: e.target.value,
+                        author: content.quote?.author ?? "",
+                      },
+                    })
+                  }
+                />
+                <FieldError id="err-quote-text" message={fieldError("quote.text")} />
+                <input
+                  className={fieldError("quote.author") ? inspectorInputInvalid : inspectorInput}
+                  placeholder="Author"
+                  aria-label="Quote author"
+                  aria-invalid={Boolean(fieldError("quote.author"))}
+                  onBlur={() => markTouched("quote.author")}
+                  value={content.quote?.author ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      quote: {
+                        ...(content.quote ?? { text: "" }),
+                        author: e.target.value,
+                        text: content.quote?.text ?? "",
+                      },
+                    })
+                  }
+                />
+                <FieldError id="err-quote-author" message={fieldError("quote.author")} />
+                <input
+                  className={fieldError("quote.role") ? inspectorInputInvalid : inspectorInput}
+                  placeholder="Role, Company"
+                  aria-label="Quote author role"
+                  onBlur={() => markTouched("quote.role")}
+                  value={content.quote?.role ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      quote: {
+                        ...(content.quote ?? { text: "", author: "" }),
+                        role: e.target.value,
+                        text: content.quote?.text ?? "",
+                        author: content.quote?.author ?? "",
+                      },
+                    })
+                  }
+                />
+                <FieldError id="err-quote-role" message={fieldError("quote.role")} />
+                {divisionQuotes.length > 0 && (
+                  <div className="pt-2">
+                    <div className="text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
+                      From division
+                    </div>
+                    <div className="mt-1 space-y-1">
+                      {divisionQuotes.slice(0, 3).map((q, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() =>
+                            patchContent({
+                              quote: { text: q.quote, author: q.author ?? "", role: q.role ?? "" },
+                            })
+                          }
+                          className="w-full rounded-md border border-black/10 bg-white px-2 py-1 text-left text-[11px] hover:border-[#003FC7] dark:border-white/10 dark:bg-white/[0.03]"
+                        >
+                          “{q.quote.slice(0, 90)}
+                          {q.quote.length > 90 ? "…" : ""}”
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </Panel>
+
+              <Panel title="Expert / contact" defaultOpen={false}>
+                <input
+                  className={fieldError("expert.name") ? inspectorInputInvalid : inspectorInput}
+                  placeholder="Name"
+                  aria-label="Contact name"
+                  aria-invalid={Boolean(fieldError("expert.name"))}
+                  onBlur={() => markTouched("expert.name")}
+                  value={content.expert?.name ?? ""}
+                  onChange={(e) =>
+                    patchContent({ expert: { ...(content.expert ?? {}), name: e.target.value } })
+                  }
+                />
+                <FieldError id="err-expert-name" message={fieldError("expert.name")} />
+                <input
+                  className={fieldError("expert.role") ? inspectorInputInvalid : inspectorInput}
+                  placeholder="Role"
+                  aria-label="Contact role"
+                  onBlur={() => markTouched("expert.role")}
+                  value={content.expert?.role ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      expert: {
+                        ...(content.expert ?? { name: "" }),
+                        role: e.target.value,
+                        name: content.expert?.name ?? "",
+                      },
+                    })
+                  }
+                />
+                <FieldError id="err-expert-role" message={fieldError("expert.role")} />
+                <input
+                  className={fieldError("expert.email") ? inspectorInputInvalid : inspectorInput}
+                  placeholder="Email"
+                  type="email"
+                  inputMode="email"
+                  aria-label="Contact email"
+                  aria-invalid={Boolean(fieldError("expert.email"))}
+                  onBlur={() => markTouched("expert.email")}
+                  value={content.expert?.email ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      expert: {
+                        ...(content.expert ?? { name: "" }),
+                        email: e.target.value,
+                        name: content.expert?.name ?? "",
+                      },
+                    })
+                  }
+                />
+                <FieldError id="err-expert-email" message={fieldError("expert.email")} />
+              </Panel>
+            </div>
           </div>
-          </div>
-
-
-
-
 
           {/* INSPECTOR */}
           {!inspectorOpen ? (
@@ -1302,106 +1526,100 @@ function AssetEditor() {
               </button>
             </div>
           ) : (
-          <div className="space-y-4">
-            <div className="flex justify-end">
-              <button
-                type="button"
-                data-testid="print-inspector-collapse"
-                onClick={() => setInspectorOpen(false)}
-                title="Collapse inspector"
-                aria-label="Collapse inspector"
-                aria-expanded={true}
-                className="rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] uppercase tracking-widest text-black/60 transition hover:bg-black/5 hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
-              >
-                Collapse ›
-              </button>
-            </div>
-
-            <Panel title="Layout">
-              <Row label="Page size">
-                <select
-                  value={pageSize}
-                  onChange={(e) => patchCtx({ pageSize: e.target.value as PrintPageSize })}
-                  className={inspectorInput}
+            <div className="space-y-4">
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  data-testid="print-inspector-collapse"
+                  onClick={() => setInspectorOpen(false)}
+                  title="Collapse inspector"
+                  aria-label="Collapse inspector"
+                  aria-expanded={true}
+                  className="rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] uppercase tracking-widest text-black/60 transition hover:bg-black/5 hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
                 >
-                  <option value="A4">A4</option>
-                  <option value="Letter">US Letter</option>
-                  <option value="Square">Square</option>
-                </select>
-              </Row>
-              <Row label="Density">
-                <select
-                  value={density}
-                  onChange={(e) => patchCtx({ density: e.target.value as PrintDensity })}
-                  className={inspectorInput}
-                >
-                  <option value="compact">Compact</option>
-                  <option value="standard">Standard</option>
-                  <option value="airy">Airy</option>
-                </select>
-              </Row>
-              <Row label="Print-safe area">
-                <input
-                  type="checkbox"
-                  checked={!!ctx.printSafeArea}
-                  onChange={(e) => patchCtx({ printSafeArea: e.target.checked })}
-                />
-              </Row>
-              <Row label="Bleed + trim guides">
-                <input
-                  type="checkbox"
-                  data-testid="toggle-bleed-guides"
-                  checked={showBleedGuides}
-                  onChange={(e) => patchCtx({ showBleedGuides: e.target.checked })}
-                />
-              </Row>
-            </Panel>
+                  Collapse ›
+                </button>
+              </div>
 
-            {baseBrand && (
-              <Panel title="Page color override">
-                <PageColorOverridePanel
-                  accentOverride={ctx.accentOverride}
-                  primaryOverride={ctx.primaryOverride}
-                  brandAccent={baseBrand.tokens.accent || baseBrand.tokens.primary}
-                  brandPrimary={baseBrand.tokens.primary}
-                  onChange={(patch: { accentOverride?: string; primaryOverride?: string }) => patchCtx(patch)}
+              <Panel title="Layout">
+                <Row label="Page size">
+                  <select
+                    aria-label="Page Size"
+                    value={pageSize}
+                    onChange={(e) => patchCtx({ pageSize: e.target.value as PrintPageSize })}
+                    className={inspectorInput}
+                  >
+                    <option value="A4">A4</option>
+                    <option value="Letter">US Letter</option>
+                    <option value="Square">Square</option>
+                  </select>
+                </Row>
+                <Row label="Density">
+                  <select
+                    aria-label="Density"
+                    value={density}
+                    onChange={(e) => patchCtx({ density: e.target.value as PrintDensity })}
+                    className={inspectorInput}
+                  >
+                    <option value="compact">Compact</option>
+                    <option value="standard">Standard</option>
+                    <option value="airy">Airy</option>
+                  </select>
+                </Row>
+                <Row label="Print-safe area">
+                  <input
+                    type="checkbox"
+                    checked={!!ctx.printSafeArea}
+                    onChange={(e) => patchCtx({ printSafeArea: e.target.checked })}
+                  />
+                </Row>
+                <Row label="Bleed + trim guides">
+                  <input
+                    type="checkbox"
+                    data-testid="toggle-bleed-guides"
+                    checked={showBleedGuides}
+                    onChange={(e) => patchCtx({ showBleedGuides: e.target.checked })}
+                  />
+                </Row>
+              </Panel>
+
+              {baseBrand && (
+                <Panel title="Page color override">
+                  <PageColorOverridePanel
+                    accentOverride={ctx.accentOverride}
+                    primaryOverride={ctx.primaryOverride}
+                    brandAccent={baseBrand.tokens.accent || baseBrand.tokens.primary}
+                    brandPrimary={baseBrand.tokens.primary}
+                    onChange={(patch: { accentOverride?: string; primaryOverride?: string }) =>
+                      patchCtx(patch)
+                    }
+                  />
+                </Panel>
+              )}
+
+              <Panel title="Client logo">
+                <ClientLogoPanel
+                  selectedId={ctx.clientLogoId}
+                  selectedName={ctx.clientLogoName}
+                  mode={editorMode === "dark" ? "dark" : "light"}
+                  onChange={(next) => patchCtx(next)}
                 />
               </Panel>
-            )}
 
-
-
-            <Panel title="Client logo">
-              <ClientLogoPanel
-                selectedId={ctx.clientLogoId}
-                selectedName={ctx.clientLogoName}
-                mode={editorMode === "dark" ? "dark" : "light"}
-                onChange={(next) => patchCtx(next)}
+              <HeroMediaPanel
+                value={content.heroMedia}
+                onChange={(next) => patchContent({ heroMedia: next })}
+                divisionId={row?.brand_mode_id ?? null}
+                brand={brand}
+                kind={kind}
+                assetId={row?.id ?? null}
+                hasTitle={!!(content as { title?: string }).title?.trim()}
+                hasSummary={!!(content as { summary?: string }).summary?.trim()}
+                modules={(content as { modules?: PrintSection[] }).modules}
               />
-            </Panel>
 
-            <HeroMediaPanel
-              value={content.heroMedia}
-              onChange={(next) => patchContent({ heroMedia: next })}
-              divisionId={row?.brand_mode_id ?? null}
-              brand={brand}
-              kind={kind}
-              assetId={row?.id ?? null}
-              hasTitle={!!(content as { title?: string }).title?.trim()}
-              hasSummary={!!(content as { summary?: string }).summary?.trim()}
-              modules={(content as { modules?: PrintSection[] }).modules}
-            />
-
-
-            
-
-
-
-
-
-            {/* Content input panels live under the document — see below. */}
-
-          </div>
+              {/* Content input panels live under the document — see below. */}
+            </div>
           )}
         </div>
       </div>
@@ -1448,7 +1666,14 @@ function AssetEditor() {
 }
 
 function ModulesPanel({
-  kind, modules, onAdd, onChange, mode, heroMedia, hasTitle, hasSummary,
+  kind,
+  modules,
+  onAdd,
+  onChange,
+  mode,
+  heroMedia,
+  hasTitle,
+  hasSummary,
 }: {
   kind: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief";
   modules: PrintSection[];
@@ -1477,7 +1702,11 @@ function ModulesPanel({
     next[i] = { ...cur, ...p } as PrintSection;
     onChange(next);
   }
-  function patchStatsItem(i: number, itemIdx: number, p: Partial<PrintStatsSection["items"][number]>) {
+  function patchStatsItem(
+    i: number,
+    itemIdx: number,
+    p: Partial<PrintStatsSection["items"][number]>,
+  ) {
     const cur = modules[i];
     if (!cur || cur.kind !== "stats") return;
     const items = [...cur.items];
@@ -1493,7 +1722,6 @@ function ModulesPanel({
     heroMedia,
     copy: { hasTitle: !!hasTitle, hasSummary: !!hasSummary },
   });
-
 
   // Insertion index (0..modules.length) where a dragged item would land, plus
   // the source of the drag so we can style the indicator differently for
@@ -1568,7 +1796,9 @@ function ModulesPanel({
         </div>
       )}
       {gate.ok && modules.length === 0 && (
-        <div className="pt-1 text-[11px] text-black/50 dark:text-white/50">No shared modules yet. Insert stats blocks to enrich the document.</div>
+        <div className="pt-1 text-[11px] text-black/50 dark:text-white/50">
+          No shared modules yet. Insert stats blocks to enrich the document.
+        </div>
       )}
       <div
         className="space-y-1"
@@ -1654,14 +1884,26 @@ function ModulesPanel({
           e.dataTransfer.dropEffect = "copy";
           setDropKind("insert");
           setDropIdx(modules.length);
-          (e.currentTarget as HTMLDivElement).classList.add("border-[#003FC7]", "bg-[#003FC7]/5", "text-[#003FC7]");
+          (e.currentTarget as HTMLDivElement).classList.add(
+            "border-[#003FC7]",
+            "bg-[#003FC7]/5",
+            "text-[#003FC7]",
+          );
         }}
         onDragLeave={(e) => {
-          (e.currentTarget as HTMLDivElement).classList.remove("border-[#003FC7]", "bg-[#003FC7]/5", "text-[#003FC7]");
+          (e.currentTarget as HTMLDivElement).classList.remove(
+            "border-[#003FC7]",
+            "bg-[#003FC7]/5",
+            "text-[#003FC7]",
+          );
         }}
         onDrop={(e) => {
           const inserted = readInsertPayload(e);
-          (e.currentTarget as HTMLDivElement).classList.remove("border-[#003FC7]", "bg-[#003FC7]/5", "text-[#003FC7]");
+          (e.currentTarget as HTMLDivElement).classList.remove(
+            "border-[#003FC7]",
+            "bg-[#003FC7]/5",
+            "text-[#003FC7]",
+          );
           setDropIdx(null);
           setDropKind(null);
           if (!inserted) return;
@@ -1736,23 +1978,60 @@ function ModuleCard({
         >
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpen((v) => !v);
+            }}
             className="flex min-w-0 flex-1 items-center gap-1.5 text-left"
             aria-expanded={open}
           >
-            <GripVertical size={14} className="shrink-0 text-foreground/30 dark:text-primary-foreground/30" aria-hidden />
-            {open ? <ChevronDown size={14} className="shrink-0 text-foreground/50 dark:text-primary-foreground/50" /> : <ChevronRight size={14} className="shrink-0 text-foreground/50 dark:text-primary-foreground/50" />}
+            <GripVertical
+              size={14}
+              className="shrink-0 text-foreground/30 dark:text-primary-foreground/30"
+              aria-hidden
+            />
+            {open ? (
+              <ChevronDown
+                size={14}
+                className="shrink-0 text-foreground/50 dark:text-primary-foreground/50"
+              />
+            ) : (
+              <ChevronRight
+                size={14}
+                className="shrink-0 text-foreground/50 dark:text-primary-foreground/50"
+              />
+            )}
             <span className="truncate text-[11px] font-semibold uppercase tracking-widest text-black/70 dark:text-white/70">
               {sectionKindLabel(m.kind)}
             </span>
             {!open && summary && (
-              <span className="truncate text-[11px] text-black/45 dark:text-white/45">· {summary}</span>
+              <span className="truncate text-[11px] text-black/45 dark:text-white/45">
+                · {summary}
+              </span>
             )}
           </button>
           <div className="flex items-center gap-0.5">
-            <button className="rounded p-1 text-icon-muted hover:bg-black/5 dark:hover:bg-white/10" onClick={onMoveUp} aria-label="Move up"><ArrowUp size={12} /></button>
-            <button className="rounded p-1 text-icon-muted hover:bg-black/5 dark:hover:bg-white/10" onClick={onMoveDown} aria-label="Move down"><ArrowDown size={12} /></button>
-            <button className="rounded p-1 text-red-500 hover:bg-red-500/10" onClick={onRemove} aria-label="Delete"><Trash2 size={12} /></button>
+            <button
+              className="rounded p-1 text-icon-muted hover:bg-black/5 dark:hover:bg-white/10"
+              onClick={onMoveUp}
+              aria-label="Move up"
+            >
+              <ArrowUp size={12} />
+            </button>
+            <button
+              className="rounded p-1 text-icon-muted hover:bg-black/5 dark:hover:bg-white/10"
+              onClick={onMoveDown}
+              aria-label="Move down"
+            >
+              <ArrowDown size={12} />
+            </button>
+            <button
+              className="rounded p-1 text-red-500 hover:bg-red-500/10"
+              onClick={onRemove}
+              aria-label="Delete"
+            >
+              <Trash2 size={12} />
+            </button>
           </div>
         </div>
 
@@ -1765,7 +2044,15 @@ function ModuleCard({
               className="flex w-full items-center justify-center gap-1 rounded border border-dashed border-black/15 py-1 text-[10px] font-semibold uppercase tracking-widest text-black/50 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:text-white/50"
               title="Preview appears on the canvas — toggle a compact preview here"
             >
-              {showPreview ? <><EyeOff size={12} /> Hide preview</> : <><Eye size={12} /> Show preview</>}
+              {showPreview ? (
+                <>
+                  <EyeOff size={12} /> Hide preview
+                </>
+              ) : (
+                <>
+                  <Eye size={12} /> Show preview
+                </>
+              )}
             </button>
             {showPreview && (
               <div className="overflow-hidden rounded border border-black/10 dark:border-white/10">
@@ -1785,14 +2072,18 @@ function ModuleCard({
 }
 
 function getSectionSummary(s: PrintSection): string {
-  const anyS = s as unknown as { title?: string; eyebrow?: string; text?: string; items?: Array<unknown> };
+  const anyS = s as unknown as {
+    title?: string;
+    eyebrow?: string;
+    text?: string;
+    items?: Array<unknown>;
+  };
   if (anyS.title) return anyS.title;
   if (anyS.text) return String(anyS.text).slice(0, 40);
   if (anyS.eyebrow) return anyS.eyebrow;
   if (anyS.items?.length) return `${anyS.items.length} item${anyS.items.length === 1 ? "" : "s"}`;
   return "";
 }
-
 
 const inspectorInput =
   "w-full rounded-md border border-black/10 bg-white px-2 py-1.5 text-xs text-[#03002C] focus:border-[#003FC7] focus:outline-none dark:border-white/10 dark:bg-white/[0.03] dark:text-white";
@@ -1809,17 +2100,27 @@ function FieldError({ id, message }: { id: string; message: string | null }) {
   );
 }
 
-function LabeledField({ label, children, hint }: { label: string; hint?: string; children: React.ReactNode }) {
+function LabeledField({
+  label,
+  children,
+  hint,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block space-y-1">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/55 dark:text-white/55">{label}</span>
+      <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/55 dark:text-white/55">
+        {label}
+      </span>
       {children}
       {hint && <span className="block text-[10px] text-black/40 dark:text-white/40">{hint}</span>}
     </label>
   );
 }
 
-  "w-full rounded-md border border-black/10 bg-white px-2 py-1.5 text-xs text-[#03002C] focus:border-[#003FC7] focus:outline-none dark:border-white/10 dark:bg-white/[0.03] dark:text-white";
+("w-full rounded-md border border-black/10 bg-white px-2 py-1.5 text-xs text-[#03002C] focus:border-[#003FC7] focus:outline-none dark:border-white/10 dark:bg-white/[0.03] dark:text-white");
 
 function Panel({
   title,
@@ -1842,13 +2143,15 @@ function Panel({
         <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/60 dark:text-white/60">
           {title}
         </span>
-        <ChevronDown size={14} className={`shrink-0 text-icon-subtle transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDown
+          size={14}
+          className={`shrink-0 text-icon-subtle transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
       {open && <div className="space-y-2 px-4 pb-4">{children}</div>}
     </div>
   );
 }
-
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -1859,10 +2162,20 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   );
 }
 
-function Block({ label, body, onChange }: { label: string; body: string; onChange: (v: string) => void }) {
+function Block({
+  label,
+  body,
+  onChange,
+}: {
+  label: string;
+  body: string;
+  onChange: (v: string) => void;
+}) {
   return (
     <div>
-      <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/50 dark:text-white/50">{label}</div>
+      <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
+        {label}
+      </div>
       <textarea
         value={body}
         onChange={(e) => onChange(e.target.value)}
@@ -1883,7 +2196,6 @@ function parseHeroMediaJson(json: string | null): PrintHeroMedia | null {
     return null;
   }
 }
-
 
 function HeroMediaPanel({
   value,
@@ -1923,20 +2235,22 @@ function HeroMediaPanel({
   const [applyingAll, setApplyingAll] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
-  const [preview, setPreview] = useState<
-    | {
-        toUpdate: Array<{ id: string; title: string; heroMediaJson: string | null }>;
-        toSkip: Array<{ id: string; title: string; reason: "customized"; heroMediaJson: string | null }>;
-        scanned: number;
-      }
-    | null
-  >(null);
+  const [preview, setPreview] = useState<{
+    toUpdate: Array<{ id: string; title: string; heroMediaJson: string | null }>;
+    toSkip: Array<{
+      id: string;
+      title: string;
+      reason: "customized";
+      heroMediaJson: string | null;
+    }>;
+    scanned: number;
+  } | null>(null);
   const [previewError, setPreviewError] = useState<string | null>(null);
   // Last apply's undo snapshot — session-only, cleared on new apply or successful undo.
-  const [lastUndo, setLastUndo] = useState<
-    | { snapshots: Array<{ id: string; heroMedia: unknown }>; appliedAt: number }
-    | null
-  >(null);
+  const [lastUndo, setLastUndo] = useState<{
+    snapshots: Array<{ id: string; heroMedia: unknown }>;
+    appliedAt: number;
+  } | null>(null);
   const [undoing, setUndoing] = useState(false);
   const [applySummary, setApplySummary] = useState<
     | { status: "success"; updated: number; scanned: number; skipped: number }
@@ -1988,9 +2302,19 @@ function HeroMediaPanel({
       if (res.errors.length === 0) {
         setApplySummary({ status: "success", updated: res.updated, scanned: res.scanned, skipped });
       } else if (res.updated > 0) {
-        setApplySummary({ status: "error", message: `Applied to ${res.updated} of ${res.scanned} assets; ${res.errors.length} failed${skipped ? `, ${skipped} skipped (customized)` : ""}.`, errors: res.errors, skipped });
+        setApplySummary({
+          status: "error",
+          message: `Applied to ${res.updated} of ${res.scanned} assets; ${res.errors.length} failed${skipped ? `, ${skipped} skipped (customized)` : ""}.`,
+          errors: res.errors,
+          skipped,
+        });
       } else {
-        setApplySummary({ status: "error", message: `Could not apply to any asset: ${res.errors[0] ?? "unknown error"}`, errors: res.errors, skipped });
+        setApplySummary({
+          status: "error",
+          message: `Could not apply to any asset: ${res.errors[0] ?? "unknown error"}`,
+          errors: res.errors,
+          skipped,
+        });
       }
       // Stash the undo snapshot so the user can revert this apply.
       if (res.undoToken && res.updated > 0) {
@@ -2004,7 +2328,9 @@ function HeroMediaPanel({
         }
       }
       const skipMsg = skipped ? `, ${skipped} skipped` : "";
-      toast.success(`Applied to ${res.updated} of ${res.scanned} ${kind.replace("-", " ")} asset${res.scanned === 1 ? "" : "s"}${skipMsg}.`);
+      toast.success(
+        `Applied to ${res.updated} of ${res.scanned} ${kind.replace("-", " ")} asset${res.scanned === 1 ? "" : "s"}${skipMsg}.`,
+      );
       setConfirmOpen(false);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Bulk apply failed.";
@@ -2024,12 +2350,24 @@ function HeroMediaPanel({
       if (res.errors.length === 0) {
         setApplySummary({ status: "undone", restored: res.restored });
         setLastUndo(null);
-        toast.success(`Reverted ${res.restored} template${res.restored === 1 ? "" : "s"}.`, { id: tid });
+        toast.success(`Reverted ${res.restored} template${res.restored === 1 ? "" : "s"}.`, {
+          id: tid,
+        });
       } else if (res.restored > 0) {
-        setApplySummary({ status: "error", message: `Reverted ${res.restored} of ${res.scanned}; ${res.errors.length} failed.`, errors: res.errors });
-        toast.error(`Reverted ${res.restored} of ${res.scanned}; ${res.errors.length} failed.`, { id: tid });
+        setApplySummary({
+          status: "error",
+          message: `Reverted ${res.restored} of ${res.scanned}; ${res.errors.length} failed.`,
+          errors: res.errors,
+        });
+        toast.error(`Reverted ${res.restored} of ${res.scanned}; ${res.errors.length} failed.`, {
+          id: tid,
+        });
       } else {
-        setApplySummary({ status: "error", message: `Undo failed: ${res.errors[0] ?? "unknown error"}`, errors: res.errors });
+        setApplySummary({
+          status: "error",
+          message: `Undo failed: ${res.errors[0] ?? "unknown error"}`,
+          errors: res.errors,
+        });
         toast.error("Undo failed.", { id: tid });
       }
     } catch (err) {
@@ -2039,8 +2377,6 @@ function HeroMediaPanel({
       setUndoing(false);
     }
   }
-
-
 
   async function handleFileUpload(file: File) {
     if (!file.type.startsWith("image/")) {
@@ -2057,7 +2393,14 @@ function HeroMediaPanel({
       const { signedUrl } = await uploadSlideMedia(file, file.name);
       const base: PrintHeroMedia = enabled
         ? media
-        : { imageUrl: "", overlayOpacity: 0.55, washStrength: 1, scrim: "bottom", blendMode: "multiply", heightPct: 46 };
+        : {
+            imageUrl: "",
+            overlayOpacity: 0.55,
+            washStrength: 1,
+            scrim: "bottom",
+            blendMode: "multiply",
+            heightPct: 46,
+          };
       onChange({ ...base, imageUrl: signedUrl });
       toast.success("Hero image uploaded.", { id: tid });
     } catch (err) {
@@ -2074,14 +2417,25 @@ function HeroMediaPanel({
   const [curated, setCurated] = useState<DivisionImageryEntry[]>([]);
   const [curatedLoading, setCuratedLoading] = useState(false);
   useEffect(() => {
-    if (!divisionId) { setCurated([]); return; }
+    if (!divisionId) {
+      setCurated([]);
+      return;
+    }
     let cancelled = false;
     setCuratedLoading(true);
     list({ data: { divisionId, onlyApproved: true } })
-      .then((rows) => { if (!cancelled) setCurated(rows.slice(0, 12)); })
-      .catch(() => { if (!cancelled) setCurated([]); })
-      .finally(() => { if (!cancelled) setCuratedLoading(false); });
-    return () => { cancelled = true; };
+      .then((rows) => {
+        if (!cancelled) setCurated(rows.slice(0, 12));
+      })
+      .catch(() => {
+        if (!cancelled) setCurated([]);
+      })
+      .finally(() => {
+        if (!cancelled) setCuratedLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [divisionId, list]);
 
   function patch(p: Partial<PrintHeroMedia>) {
@@ -2092,7 +2446,14 @@ function HeroMediaPanel({
     // Preserve current tuning if the user was mid-edit; otherwise seed sane defaults.
     const base: PrintHeroMedia = enabled
       ? media
-      : { imageUrl: "", overlayOpacity: 0.55, washStrength: 1, scrim: "bottom", blendMode: "multiply", heightPct: 46 };
+      : {
+          imageUrl: "",
+          overlayOpacity: 0.55,
+          washStrength: 1,
+          scrim: "bottom",
+          blendMode: "multiply",
+          heightPct: 46,
+        };
     onChange({ ...base, imageUrl: entry.signedUrl });
   }
 
@@ -2104,7 +2465,14 @@ function HeroMediaPanel({
           checked={enabled}
           onChange={(e) =>
             e.target.checked
-              ? onChange({ imageUrl: media.imageUrl || "", overlayOpacity: 0.55, washStrength: 1, scrim: "bottom", blendMode: "multiply", heightPct: 46 })
+              ? onChange({
+                  imageUrl: media.imageUrl || "",
+                  overlayOpacity: 0.55,
+                  washStrength: 1,
+                  scrim: "bottom",
+                  blendMode: "multiply",
+                  heightPct: 46,
+                })
               : onChange(undefined)
           }
         />
@@ -2124,7 +2492,8 @@ function HeroMediaPanel({
       <div className="space-y-2 rounded-md border border-black/10 bg-black/[0.02] px-2 py-1.5 dark:border-white/10 dark:bg-white/[0.03]">
         <div className="flex items-center justify-between">
           <span className="text-[10px] text-black/60 dark:text-white/60">
-            Apply to every <span className="font-semibold">{kind.replace("-", " ")}</span> in this division still using default hero settings
+            Apply to every <span className="font-semibold">{kind.replace("-", " ")}</span> in this
+            division still using default hero settings
           </span>
 
           <button
@@ -2132,7 +2501,13 @@ function HeroMediaPanel({
             onClick={handleApplyToAll}
             disabled={!enabled || !divisionId || applyingAll}
             className="rounded border border-black/15 bg-white px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/15 dark:bg-white/[0.05] dark:text-white/80"
-            title={!enabled ? "Select a hero image first" : !divisionId ? "Select a division first" : "Apply to all sibling templates"}
+            title={
+              !enabled
+                ? "Select a hero image first"
+                : !divisionId
+                  ? "Select a division first"
+                  : "Apply to all sibling templates"
+            }
           >
             {applyingAll ? "Applying…" : "Apply to all"}
           </button>
@@ -2143,7 +2518,9 @@ function HeroMediaPanel({
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/10 dark:bg-white/10">
               <div className="h-full w-1/3 animate-pulse rounded-full bg-[#003FC7]" />
             </div>
-            <div className="text-[10px] text-black/50 dark:text-white/50">Applying hero to relevant templates…</div>
+            <div className="text-[10px] text-black/50 dark:text-white/50">
+              Applying hero to relevant templates…
+            </div>
           </div>
         )}
 
@@ -2156,7 +2533,11 @@ function HeroMediaPanel({
                 <strong>{applySummary.scanned}</strong> {kind.replace("-", " ")} asset
                 {applySummary.scanned === 1 ? "" : "s"}
                 {applySummary.skipped > 0 ? (
-                  <> · <strong>{applySummary.skipped}</strong> left untouched (customized focal / scrim / wash)</>
+                  <>
+                    {" "}
+                    · <strong>{applySummary.skipped}</strong> left untouched (customized focal /
+                    scrim / wash)
+                  </>
                 ) : null}
                 .
               </span>
@@ -2164,7 +2545,8 @@ function HeroMediaPanel({
             {lastUndo && (
               <div className="flex items-center justify-between gap-2 pl-5">
                 <span className="text-[10px] opacity-80">
-                  Not what you expected? Restore the previous hero on {lastUndo.snapshots.length} template
+                  Not what you expected? Restore the previous hero on {lastUndo.snapshots.length}{" "}
+                  template
                   {lastUndo.snapshots.length === 1 ? "" : "s"}.
                 </span>
                 <button
@@ -2189,8 +2571,6 @@ function HeroMediaPanel({
             </span>
           </div>
         )}
-
-
 
         {applySummary && applySummary.status === "error" && (
           <div className="space-y-1 rounded-md bg-[#E53D2E]/10 px-2 py-1.5 text-[11px] text-[#E53D2E] dark:bg-[#E53D2E]/15 dark:text-[#FF9B70]">
@@ -2218,9 +2598,7 @@ function HeroMediaPanel({
         description={`Review which "${kind.replace("-", " ")}" templates in this division will be updated. Anything with custom focal, scrim, or wash tuning is left untouched.`}
         body={
           <div className="space-y-4 text-sm text-black">
-            {previewLoading && (
-              <div className="text-black/60">Scanning sibling templates…</div>
-            )}
+            {previewLoading && <div className="text-black/60">Scanning sibling templates…</div>}
             {previewError && (
               <div className="rounded-md bg-[#E53D2E]/10 px-3 py-2 text-[#E53D2E]">
                 {previewError}
@@ -2255,11 +2633,18 @@ function HeroMediaPanel({
                       {preview.toUpdate.map((r) => {
                         const before = parseHeroMediaJson(r.heroMediaJson);
                         return (
-                          <li key={r.id} className="flex items-center gap-3 rounded border border-transparent bg-white/60 p-1.5">
+                          <li
+                            key={r.id}
+                            className="flex items-center gap-3 rounded border border-transparent bg-white/60 p-1.5"
+                          >
                             <HeroDiffTile before={before} after={media} status="update" />
                             <div className="min-w-0 flex-1">
-                              <div className="truncate text-[12px] font-medium text-black/85">{r.title}</div>
-                              <div className="text-[10px] uppercase tracking-[0.18em] text-[#003FC7]">Will update</div>
+                              <div className="truncate text-[12px] font-medium text-black/85">
+                                {r.title}
+                              </div>
+                              <div className="text-[10px] uppercase tracking-[0.18em] text-[#003FC7]">
+                                Will update
+                              </div>
                             </div>
                           </li>
                         );
@@ -2281,10 +2666,15 @@ function HeroMediaPanel({
                       {preview.toSkip.map((r) => {
                         const before = parseHeroMediaJson(r.heroMediaJson);
                         return (
-                          <li key={r.id} className="flex items-center gap-3 rounded border border-transparent bg-white/60 p-1.5">
+                          <li
+                            key={r.id}
+                            className="flex items-center gap-3 rounded border border-transparent bg-white/60 p-1.5"
+                          >
                             <HeroDiffTile before={before} after={media} status="skip" />
                             <div className="min-w-0 flex-1">
-                              <div className="truncate text-[12px] font-medium text-black/85">{r.title}</div>
+                              <div className="truncate text-[12px] font-medium text-black/85">
+                                {r.title}
+                              </div>
                               <div className="text-[10px] uppercase tracking-[0.18em] text-black/50">
                                 Kept · customized focal / scrim / wash
                               </div>
@@ -2306,11 +2696,12 @@ function HeroMediaPanel({
         }
         cancelLabel="Cancel"
         busy={applyingAll}
-        disableConfirm={previewLoading || !!previewError || (preview !== null && preview.toUpdate.length === 0)}
+        disableConfirm={
+          previewLoading || !!previewError || (preview !== null && preview.toUpdate.length === 0)
+        }
         onCancel={() => setConfirmOpen(false)}
         onConfirm={handleConfirmApply}
       />
-
 
       {/* Curated pool strip */}
       <div className="space-y-1.5">
@@ -2333,12 +2724,14 @@ function HeroMediaPanel({
             </div>
           ) : curated.length === 0 ? (
             <div className="col-span-4 rounded border border-dashed border-black/10 px-2 py-3 text-center text-[10px] text-black/50 dark:border-white/10 dark:text-white/40">
-              {divisionId ? "No approved imagery yet for this division." : "Select a division to see curated imagery."}
+              {divisionId
+                ? "No approved imagery yet for this division."
+                : "Select a division to see curated imagery."}
             </div>
           ) : (
             curated.map((entry) => {
               const url = entry.variantUrls?.thumb ?? entry.signedUrl ?? "";
-              const active = enabled && (entry.signedUrl === media.imageUrl);
+              const active = enabled && entry.signedUrl === media.imageUrl;
               return (
                 <button
                   key={entry.id}
@@ -2350,10 +2743,20 @@ function HeroMediaPanel({
                       : "border-black/10 hover:border-black/30 dark:border-white/10 dark:hover:border-white/30"
                   }`}
                   title={entry.filename || "Curated hero"}
-                  style={url ? { backgroundImage: `url(${url})`, backgroundSize: "cover", backgroundPosition: "center" } : {}}
+                  style={
+                    url
+                      ? {
+                          backgroundImage: `url(${url})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }
+                      : {}
+                  }
                 >
                   {!url && (
-                    <span className="absolute inset-0 grid place-items-center text-[9px] text-black/50 dark:text-white/40">no preview</span>
+                    <span className="absolute inset-0 grid place-items-center text-[9px] text-black/50 dark:text-white/40">
+                      no preview
+                    </span>
                   )}
                 </button>
               );
@@ -2367,36 +2770,54 @@ function HeroMediaPanel({
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.22em] text-black/50 dark:text-white/50">
           <span>Starter examples{divisionId ? "" : " · enterprise pool"}</span>
-          <span className="text-[9px] normal-case tracking-normal text-black/40 dark:text-white/40">Bundled · ready to use</span>
+          <span className="text-[9px] normal-case tracking-normal text-black/40 dark:text-white/40">
+            Bundled · ready to use
+          </span>
         </div>
         <div className="grid grid-cols-4 gap-1.5">
-          {getDivisionImagery(divisionId ?? "bm-enterprise").photos.slice(0, 8).map((url, idx) => {
-            const active = enabled && media.imageUrl === url;
-            return (
-              <button
-                key={`${url}-${idx}`}
-                type="button"
-                onClick={() => {
-                  const base: PrintHeroMedia = enabled
-                    ? media
-                    : { imageUrl: "", overlayOpacity: 0.55, washStrength: 1, scrim: "bottom", blendMode: "multiply", heightPct: 46 };
-                  onChange({ ...base, imageUrl: url });
-                }}
-                className={`relative aspect-video overflow-hidden rounded border transition ${
-                  active
-                    ? "border-[#003FC7] ring-2 ring-[#003FC7]/40"
-                    : "border-black/10 hover:border-black/30 dark:border-white/10 dark:hover:border-white/30"
-                }`}
-                title={`Starter hero ${idx + 1}`}
-                style={{ backgroundImage: `url(${url})`, backgroundSize: "cover", backgroundPosition: "center" }}
-              />
-            );
-          })}
+          {getDivisionImagery(divisionId ?? "bm-enterprise")
+            .photos.slice(0, 8)
+            .map((url, idx) => {
+              const active = enabled && media.imageUrl === url;
+              return (
+                <button
+                  key={`${url}-${idx}`}
+                  type="button"
+                  onClick={() => {
+                    const base: PrintHeroMedia = enabled
+                      ? media
+                      : {
+                          imageUrl: "",
+                          overlayOpacity: 0.55,
+                          washStrength: 1,
+                          scrim: "bottom",
+                          blendMode: "multiply",
+                          heightPct: 46,
+                        };
+                    onChange({ ...base, imageUrl: url });
+                  }}
+                  className={`relative aspect-video overflow-hidden rounded border transition ${
+                    active
+                      ? "border-[#003FC7] ring-2 ring-[#003FC7]/40"
+                      : "border-black/10 hover:border-black/30 dark:border-white/10 dark:hover:border-white/30"
+                  }`}
+                  title={`Starter hero ${idx + 1}`}
+                  style={{
+                    backgroundImage: `url(${url})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                />
+              );
+            })}
         </div>
       </div>
       {/* Upload / drop zone — persists into the private slide-media bucket. */}
       <div
-        onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "copy"; }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "copy";
+        }}
         onDrop={(e) => {
           e.preventDefault();
           const f = e.dataTransfer.files?.[0];
@@ -2422,7 +2843,9 @@ function HeroMediaPanel({
         >
           <Upload size={12} /> {uploading ? "Uploading…" : "Upload image"}
         </button>
-        <div className="mt-1 text-[10px] text-black/40 dark:text-white/40">or drop a PNG/JPG here · saved to your library</div>
+        <div className="mt-1 text-[10px] text-black/40 dark:text-white/40">
+          or drop a PNG/JPG here · saved to your library
+        </div>
       </div>
 
       <div className="flex gap-2">
@@ -2458,6 +2881,7 @@ function HeroMediaPanel({
 
       <Row label="Aspect">
         <select
+          aria-label="Aspect"
           className={inspectorInput}
           value={aspect}
           onChange={(e) => patch({ aspect: e.target.value as PrintHeroMedia["aspect"] })}
@@ -2581,6 +3005,7 @@ function HeroMediaPanel({
 
       <Row label="Scrim">
         <select
+          aria-label="Scrim"
           className={inspectorInput}
           value={media.scrim ?? "bottom"}
           onChange={(e) => patch({ scrim: e.target.value as PrintHeroMedia["scrim"] })}
@@ -2612,6 +3037,7 @@ function HeroMediaPanel({
       )}
       <Row label="Blend mode">
         <select
+          aria-label="Blend Mode"
           className={inspectorInput}
           value={media.blendMode ?? "multiply"}
           onChange={(e) => patch({ blendMode: e.target.value as PrintHeroMedia["blendMode"] })}
@@ -2671,39 +3097,66 @@ function Slider({
 
 function sectionKindLabel(kind: PrintSection["kind"]): string {
   switch (kind) {
-    case "stats": return "Stats";
-    case "quote": return "Quote";
-    case "logo-grid": return "Logo grid";
-    case "expertise": return "Expertise";
-    case "feature-list": return "Features";
-    default: return "Module";
+    case "stats":
+      return "Stats";
+    case "quote":
+      return "Quote";
+    case "logo-grid":
+      return "Logo grid";
+    case "expertise":
+      return "Expertise";
+    case "feature-list":
+      return "Features";
+    default:
+      return "Module";
   }
 }
 
 function SectionInlineEditor({
-  section, onPatch,
+  section,
+  onPatch,
 }: {
   section: PrintSection;
   onPatch: (p: Partial<PrintSection>) => void;
 }) {
   switch (section.kind) {
     case "stats":
-      return <StatsInlineEditor section={section} onPatch={(p) => onPatch(p as Partial<PrintSection>)} />;
+      return (
+        <StatsInlineEditor section={section} onPatch={(p) => onPatch(p as Partial<PrintSection>)} />
+      );
     case "quote":
-      return <QuoteInlineEditor section={section} onPatch={(p) => onPatch(p as Partial<PrintSection>)} />;
+      return (
+        <QuoteInlineEditor section={section} onPatch={(p) => onPatch(p as Partial<PrintSection>)} />
+      );
     case "logo-grid":
-      return <LogoGridInlineEditor section={section} onPatch={(p) => onPatch(p as Partial<PrintSection>)} />;
+      return (
+        <LogoGridInlineEditor
+          section={section}
+          onPatch={(p) => onPatch(p as Partial<PrintSection>)}
+        />
+      );
     case "expertise":
-      return <ExpertiseInlineEditor section={section} onPatch={(p) => onPatch(p as Partial<PrintSection>)} />;
+      return (
+        <ExpertiseInlineEditor
+          section={section}
+          onPatch={(p) => onPatch(p as Partial<PrintSection>)}
+        />
+      );
     case "feature-list":
-      return <FeatureListInlineEditor section={section} onPatch={(p) => onPatch(p as Partial<PrintSection>)} />;
+      return (
+        <FeatureListInlineEditor
+          section={section}
+          onPatch={(p) => onPatch(p as Partial<PrintSection>)}
+        />
+      );
     default:
       return null;
   }
 }
 
 function StatsInlineEditor({
-  section, onPatch,
+  section,
+  onPatch,
 }: {
   section: PrintStatsSection;
   onPatch: (p: Partial<PrintStatsSection>) => void;
@@ -2715,22 +3168,45 @@ function StatsInlineEditor({
   return (
     <>
       <LabeledField label="Layout style">
-        <select className={inspectorInput} value={section.variantId} onChange={(e) => onPatch({ variantId: e.target.value as PrintStatsVariant })}>
-          {PRINT_STATS_VARIANTS.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
+        <select
+          aria-label="Variant"
+          className={inspectorInput}
+          value={section.variantId}
+          onChange={(e) => onPatch({ variantId: e.target.value as PrintStatsVariant })}
+        >
+          {PRINT_STATS_VARIANTS.map((v) => (
+            <option key={v.id} value={v.id}>
+              {v.label}
+            </option>
+          ))}
         </select>
       </LabeledField>
       <div className="grid grid-cols-2 gap-2">
         <LabeledField label="Eyebrow">
-          <input className={inspectorInput} placeholder="e.g. Impact at a glance" value={section.eyebrow ?? ""} onChange={(e) => onPatch({ eyebrow: e.target.value })} />
+          <input
+            className={inspectorInput}
+            placeholder="e.g. Impact at a glance"
+            value={section.eyebrow ?? ""}
+            onChange={(e) => onPatch({ eyebrow: e.target.value })}
+          />
         </LabeledField>
         <LabeledField label="Title">
-          <input className={inspectorInput} placeholder="e.g. By the numbers" value={section.title ?? ""} onChange={(e) => onPatch({ title: e.target.value })} />
+          <input
+            className={inspectorInput}
+            placeholder="e.g. By the numbers"
+            value={section.title ?? ""}
+            onChange={(e) => onPatch({ title: e.target.value })}
+          />
         </LabeledField>
       </div>
       <div className="pt-1">
         <div className="mb-1 flex items-center justify-between">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/55 dark:text-white/55">Stat items</span>
-          <span className="text-[10px] text-black/40 dark:text-white/40">{section.items.length} · label / value / unit</span>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/55 dark:text-white/55">
+            Stat items
+          </span>
+          <span className="text-[10px] text-black/40 dark:text-white/40">
+            {section.items.length} · label / value / unit
+          </span>
         </div>
         <ArrayEditor
           items={section.items}
@@ -2738,10 +3214,25 @@ function StatsInlineEditor({
           add={() => ({ label: "", value: "", unit: "" }) as PrintStatsSection["items"][number]}
           row={(it, idx) => (
             <div className="space-y-1">
-              <input className={inspectorInput} placeholder="Label (what it measures)" value={it.label} onChange={(e) => patchItem(idx, { label: e.target.value })} />
+              <input
+                className={inspectorInput}
+                placeholder="Label (what it measures)"
+                value={it.label}
+                onChange={(e) => patchItem(idx, { label: e.target.value })}
+              />
               <div className="grid grid-cols-[1fr_1fr] gap-1">
-                <input className={inspectorInput} placeholder="Value (e.g. 48)" value={it.value} onChange={(e) => patchItem(idx, { value: e.target.value })} />
-                <input className={inspectorInput} placeholder="Unit (e.g. hr, %, M)" value={it.unit ?? ""} onChange={(e) => patchItem(idx, { unit: e.target.value })} />
+                <input
+                  className={inspectorInput}
+                  placeholder="Value (e.g. 48)"
+                  value={it.value}
+                  onChange={(e) => patchItem(idx, { value: e.target.value })}
+                />
+                <input
+                  className={inspectorInput}
+                  placeholder="Unit (e.g. hr, %, M)"
+                  value={it.unit ?? ""}
+                  onChange={(e) => patchItem(idx, { unit: e.target.value })}
+                />
               </div>
             </div>
           )}
@@ -2752,52 +3243,130 @@ function StatsInlineEditor({
 }
 
 function QuoteInlineEditor({
-  section, onPatch,
+  section,
+  onPatch,
 }: {
   section: PrintQuoteSection;
   onPatch: (p: Partial<PrintQuoteSection>) => void;
 }) {
   return (
     <>
-      <select className={inspectorInput} value={section.variantId} onChange={(e) => onPatch({ variantId: e.target.value as PrintQuoteVariant })}>
-        {PRINT_QUOTE_VARIANTS.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
+      <select
+        aria-label="Variant"
+        className={inspectorInput}
+        value={section.variantId}
+        onChange={(e) => onPatch({ variantId: e.target.value as PrintQuoteVariant })}
+      >
+        {PRINT_QUOTE_VARIANTS.map((v) => (
+          <option key={v.id} value={v.id}>
+            {v.label}
+          </option>
+        ))}
       </select>
-      <input className={inspectorInput} placeholder="Eyebrow" value={section.eyebrow ?? ""} onChange={(e) => onPatch({ eyebrow: e.target.value })} />
-      <textarea className={inspectorInput} placeholder="Quote text" rows={3} value={section.text} onChange={(e) => onPatch({ text: e.target.value })} />
+      <input
+        className={inspectorInput}
+        placeholder="Eyebrow"
+        value={section.eyebrow ?? ""}
+        onChange={(e) => onPatch({ eyebrow: e.target.value })}
+      />
+      <textarea
+        className={inspectorInput}
+        placeholder="Quote text"
+        rows={3}
+        value={section.text}
+        onChange={(e) => onPatch({ text: e.target.value })}
+      />
       <div className="grid grid-cols-2 gap-1">
-        <input className={inspectorInput} placeholder="Author" value={section.author ?? ""} onChange={(e) => onPatch({ author: e.target.value })} />
-        <input className={inspectorInput} placeholder="Role" value={section.role ?? ""} onChange={(e) => onPatch({ role: e.target.value })} />
+        <input
+          className={inspectorInput}
+          placeholder="Author"
+          value={section.author ?? ""}
+          onChange={(e) => onPatch({ author: e.target.value })}
+        />
+        <input
+          className={inspectorInput}
+          placeholder="Role"
+          value={section.role ?? ""}
+          onChange={(e) => onPatch({ role: e.target.value })}
+        />
       </div>
-      <input className={inspectorInput} placeholder="Company" value={section.company ?? ""} onChange={(e) => onPatch({ company: e.target.value })} />
+      <input
+        className={inspectorInput}
+        placeholder="Company"
+        value={section.company ?? ""}
+        onChange={(e) => onPatch({ company: e.target.value })}
+      />
     </>
   );
 }
 
 function LogoGridInlineEditor({
-  section, onPatch,
+  section,
+  onPatch,
 }: {
   section: PrintLogoGridSection;
   onPatch: (p: Partial<PrintLogoGridSection>) => void;
 }) {
   return (
     <>
-      <select className={inspectorInput} value={section.variantId} onChange={(e) => onPatch({ variantId: e.target.value as PrintLogoGridVariant })}>
-        {PRINT_LOGO_VARIANTS.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
+      <select
+        aria-label="Variant"
+        className={inspectorInput}
+        value={section.variantId}
+        onChange={(e) => onPatch({ variantId: e.target.value as PrintLogoGridVariant })}
+      >
+        {PRINT_LOGO_VARIANTS.map((v) => (
+          <option key={v.id} value={v.id}>
+            {v.label}
+          </option>
+        ))}
       </select>
-      <input className={inspectorInput} placeholder="Eyebrow" value={section.eyebrow ?? ""} onChange={(e) => onPatch({ eyebrow: e.target.value })} />
-      <input className={inspectorInput} placeholder="Title" value={section.title ?? ""} onChange={(e) => onPatch({ title: e.target.value })} />
+      <input
+        className={inspectorInput}
+        placeholder="Eyebrow"
+        value={section.eyebrow ?? ""}
+        onChange={(e) => onPatch({ eyebrow: e.target.value })}
+      />
+      <input
+        className={inspectorInput}
+        placeholder="Title"
+        value={section.title ?? ""}
+        onChange={(e) => onPatch({ title: e.target.value })}
+      />
       <ArrayEditor
         items={section.items}
         onChange={(items) => onPatch({ items })}
         add={() => ({ name: "Client", url: "", path: "" })}
         row={(it, idx) => (
           <div className="grid grid-cols-[1fr_1fr] gap-1">
-            <input className={inspectorInput} placeholder="Name" value={it.name} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, name: e.target.value } : x) })} />
-            <input className={inspectorInput} placeholder="Logo URL or /path" value={it.url ?? it.path ?? ""} onChange={(e) => {
-              const v = e.target.value;
-              const isPath = v.startsWith("/");
-              onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, url: isPath ? undefined : v, path: isPath ? v : undefined } : x) });
-            }} />
+            <input
+              className={inspectorInput}
+              placeholder="Name"
+              value={it.name}
+              onChange={(e) =>
+                onPatch({
+                  items: section.items.map((x, k) =>
+                    k === idx ? { ...x, name: e.target.value } : x,
+                  ),
+                })
+              }
+            />
+            <input
+              className={inspectorInput}
+              placeholder="Logo URL or /path"
+              value={it.url ?? it.path ?? ""}
+              onChange={(e) => {
+                const v = e.target.value;
+                const isPath = v.startsWith("/");
+                onPatch({
+                  items: section.items.map((x, k) =>
+                    k === idx
+                      ? { ...x, url: isPath ? undefined : v, path: isPath ? v : undefined }
+                      : x,
+                  ),
+                });
+              }}
+            />
           </div>
         )}
       />
@@ -2806,26 +3375,62 @@ function LogoGridInlineEditor({
 }
 
 function ExpertiseInlineEditor({
-  section, onPatch,
+  section,
+  onPatch,
 }: {
   section: PrintExpertiseSection;
   onPatch: (p: Partial<PrintExpertiseSection>) => void;
 }) {
   return (
     <>
-      <select className={inspectorInput} value={section.variantId} onChange={(e) => onPatch({ variantId: e.target.value as PrintExpertiseVariant })}>
-        {PRINT_EXPERTISE_VARIANTS.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
+      <select
+        aria-label="Variant"
+        className={inspectorInput}
+        value={section.variantId}
+        onChange={(e) => onPatch({ variantId: e.target.value as PrintExpertiseVariant })}
+      >
+        {PRINT_EXPERTISE_VARIANTS.map((v) => (
+          <option key={v.id} value={v.id}>
+            {v.label}
+          </option>
+        ))}
       </select>
-      <input className={inspectorInput} placeholder="Eyebrow" value={section.eyebrow ?? ""} onChange={(e) => onPatch({ eyebrow: e.target.value })} />
-      <input className={inspectorInput} placeholder="Title" value={section.title ?? ""} onChange={(e) => onPatch({ title: e.target.value })} />
+      <input
+        className={inspectorInput}
+        placeholder="Eyebrow"
+        value={section.eyebrow ?? ""}
+        onChange={(e) => onPatch({ eyebrow: e.target.value })}
+      />
+      <input
+        className={inspectorInput}
+        placeholder="Title"
+        value={section.title ?? ""}
+        onChange={(e) => onPatch({ title: e.target.value })}
+      />
       <ArrayEditor
         items={section.items}
         onChange={(items) => onPatch({ items })}
         add={() => ({ label: "", icon: "" })}
         row={(it, idx) => (
           <div className="grid grid-cols-[1fr_90px] gap-1">
-            <input className={inspectorInput} placeholder="Label" value={it.label} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, label: e.target.value } : x) })} />
-            <PrintIconPicker value={it.icon} onChange={(icon) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, icon } : x) })} />
+            <input
+              className={inspectorInput}
+              placeholder="Label"
+              value={it.label}
+              onChange={(e) =>
+                onPatch({
+                  items: section.items.map((x, k) =>
+                    k === idx ? { ...x, label: e.target.value } : x,
+                  ),
+                })
+              }
+            />
+            <PrintIconPicker
+              value={it.icon}
+              onChange={(icon) =>
+                onPatch({ items: section.items.map((x, k) => (k === idx ? { ...x, icon } : x)) })
+              }
+            />
           </div>
         )}
       />
@@ -2834,18 +3439,38 @@ function ExpertiseInlineEditor({
 }
 
 function FeatureListInlineEditor({
-  section, onPatch,
+  section,
+  onPatch,
 }: {
   section: PrintFeatureListSection;
   onPatch: (p: Partial<PrintFeatureListSection>) => void;
 }) {
   return (
     <>
-      <select className={inspectorInput} value={section.variantId} onChange={(e) => onPatch({ variantId: e.target.value as PrintFeatureVariant })}>
-        {PRINT_FEATURE_VARIANTS.map((v) => <option key={v.id} value={v.id}>{v.label}</option>)}
+      <select
+        aria-label="Variant"
+        className={inspectorInput}
+        value={section.variantId}
+        onChange={(e) => onPatch({ variantId: e.target.value as PrintFeatureVariant })}
+      >
+        {PRINT_FEATURE_VARIANTS.map((v) => (
+          <option key={v.id} value={v.id}>
+            {v.label}
+          </option>
+        ))}
       </select>
-      <input className={inspectorInput} placeholder="Eyebrow" value={section.eyebrow ?? ""} onChange={(e) => onPatch({ eyebrow: e.target.value })} />
-      <input className={inspectorInput} placeholder="Title" value={section.title ?? ""} onChange={(e) => onPatch({ title: e.target.value })} />
+      <input
+        className={inspectorInput}
+        placeholder="Eyebrow"
+        value={section.eyebrow ?? ""}
+        onChange={(e) => onPatch({ eyebrow: e.target.value })}
+      />
+      <input
+        className={inspectorInput}
+        placeholder="Title"
+        value={section.title ?? ""}
+        onChange={(e) => onPatch({ title: e.target.value })}
+      />
       <ArrayEditor
         items={section.items}
         onChange={(items) => onPatch({ items })}
@@ -2853,10 +3478,37 @@ function FeatureListInlineEditor({
         row={(it, idx) => (
           <div className="space-y-1">
             <div className="grid grid-cols-[1fr_90px] gap-1">
-              <input className={inspectorInput} placeholder="Verb" value={it.verb} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, verb: e.target.value } : x) })} />
-              <PrintIconPicker value={it.icon} onChange={(icon) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, icon } : x) })} />
+              <input
+                className={inspectorInput}
+                placeholder="Verb"
+                value={it.verb}
+                onChange={(e) =>
+                  onPatch({
+                    items: section.items.map((x, k) =>
+                      k === idx ? { ...x, verb: e.target.value } : x,
+                    ),
+                  })
+                }
+              />
+              <PrintIconPicker
+                value={it.icon}
+                onChange={(icon) =>
+                  onPatch({ items: section.items.map((x, k) => (k === idx ? { ...x, icon } : x)) })
+                }
+              />
             </div>
-            <input className={inspectorInput} placeholder="Body" value={it.body ?? ""} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, body: e.target.value } : x) })} />
+            <input
+              className={inspectorInput}
+              placeholder="Body"
+              value={it.body ?? ""}
+              onChange={(e) =>
+                onPatch({
+                  items: section.items.map((x, k) =>
+                    k === idx ? { ...x, body: e.target.value } : x,
+                  ),
+                })
+              }
+            />
           </div>
         )}
       />
@@ -2865,7 +3517,10 @@ function FeatureListInlineEditor({
 }
 
 function ArrayEditor<T>({
-  items, onChange, add, row,
+  items,
+  onChange,
+  add,
+  row,
 }: {
   items: T[];
   onChange: (next: T[]) => void;
@@ -2883,16 +3538,44 @@ function ArrayEditor<T>({
   return (
     <div className="space-y-1">
       {items.map((it, idx) => (
-        <div key={idx} className="rounded border border-black/5 bg-black/[0.02] p-1.5 dark:border-white/10 dark:bg-white/5">
+        <div
+          key={idx}
+          className="rounded border border-black/5 bg-black/[0.02] p-1.5 dark:border-white/10 dark:bg-white/5"
+        >
           {row(it, idx)}
           <div className="mt-1 flex items-center justify-end gap-1">
-            <button type="button" className="rounded p-0.5 text-icon-subtle hover:bg-black/5 dark:hover:bg-white/10" onClick={() => move(idx, -1)} aria-label="Move up"><ArrowUp size={12} /></button>
-            <button type="button" className="rounded p-0.5 text-icon-subtle hover:bg-black/5 dark:hover:bg-white/10" onClick={() => move(idx, 1)} aria-label="Move down"><ArrowDown size={12} /></button>
-            <button type="button" className="rounded p-0.5 text-red-500 hover:bg-red-500/10" onClick={() => remove(idx)} aria-label="Remove"><Trash2 size={12} /></button>
+            <button
+              type="button"
+              className="rounded p-0.5 text-icon-subtle hover:bg-black/5 dark:hover:bg-white/10"
+              onClick={() => move(idx, -1)}
+              aria-label="Move up"
+            >
+              <ArrowUp size={12} />
+            </button>
+            <button
+              type="button"
+              className="rounded p-0.5 text-icon-subtle hover:bg-black/5 dark:hover:bg-white/10"
+              onClick={() => move(idx, 1)}
+              aria-label="Move down"
+            >
+              <ArrowDown size={12} />
+            </button>
+            <button
+              type="button"
+              className="rounded p-0.5 text-red-500 hover:bg-red-500/10"
+              onClick={() => remove(idx)}
+              aria-label="Remove"
+            >
+              <Trash2 size={12} />
+            </button>
           </div>
         </div>
       ))}
-      <button type="button" onClick={() => onChange([...items, add()])} className="flex w-full items-center justify-center gap-1 rounded border border-dashed border-black/20 py-1 text-[10px] font-semibold uppercase tracking-widest text-black/60 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/20 dark:text-white/60">
+      <button
+        type="button"
+        onClick={() => onChange([...items, add()])}
+        className="flex w-full items-center justify-center gap-1 rounded border border-dashed border-black/20 py-1 text-[10px] font-semibold uppercase tracking-widest text-black/60 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/20 dark:text-white/60"
+      >
         <Plus size={12} /> Add item
       </button>
     </div>

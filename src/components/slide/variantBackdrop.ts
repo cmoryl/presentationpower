@@ -47,20 +47,39 @@ import games09 from "@/assets/backdrops/tp-games-dark/bg-09.webp";
 import games10 from "@/assets/backdrops/tp-games-dark/bg-10.webp";
 
 export const CORPORATE_DARK_BACKDROPS: string[] = [
-  corp01, corp02, corp03, corp04, corp05,
-  corp06, corp07, corp08, corp09, corp10,
+  corp01,
+  corp02,
+  corp03,
+  corp04,
+  corp05,
+  corp06,
+  corp07,
+  corp08,
+  corp09,
+  corp10,
 ];
 
 export const TP_MEDIA_DARK_BACKDROPS: string[] = [
-  media01, media02, media03, media04, media05, media06,
+  media01,
+  media02,
+  media03,
+  media04,
+  media05,
+  media06,
 ];
 
 export const TP_GAMES_DARK_BACKDROPS: string[] = [
-  games01, games02, games03, games04, games05,
-  games06, games07, games08, games09, games10,
+  games01,
+  games02,
+  games03,
+  games04,
+  games05,
+  games06,
+  games07,
+  games08,
+  games09,
+  games10,
 ];
-
-
 
 const PORTRAITS = [portrait1, portrait2, portrait3, portrait4];
 
@@ -78,7 +97,6 @@ export function pickTpMediaDarkBackdrop(variantId: string): string {
 export function pickTpGamesDarkBackdrop(variantId: string): string {
   return TP_GAMES_DARK_BACKDROPS[hashStr(variantId) % TP_GAMES_DARK_BACKDROPS.length];
 }
-
 
 function hashStr(s: string): number {
   let h = 0;
@@ -104,7 +122,6 @@ function _computeBackdrop(
   brandId: string = "bm-enterprise",
   mode: "light" | "dark" = "dark",
 ): SlideBackdrop | null {
-
   const id = variant.id;
   const seed = hashStr(id);
   const set = getDivisionImagery(brandId);
@@ -168,13 +185,9 @@ function _computeBackdrop(
         ? pickTpGamesDarkBackdrop(id)
         : null;
 
-
-
-  const pickPhoto = (offset = 0) =>
-    corporateBg ?? photos[(seed + offset) % photos.length];
-  const pickAbstract = (offset = 0) =>
-    corporateBg ?? abstracts[(seed + offset) % abstracts.length];
-  const pickPortrait = () => (corporateBg ?? PORTRAITS[seed % PORTRAITS.length]);
+  const pickPhoto = (offset = 0) => corporateBg ?? photos[(seed + offset) % photos.length];
+  const pickAbstract = (offset = 0) => corporateBg ?? abstracts[(seed + offset) % abstracts.length];
+  const pickPortrait = () => corporateBg ?? PORTRAITS[seed % PORTRAITS.length];
 
   // Full-bleed cover / hero — division photograph, strong side scrim.
   if (/^MV-OP-COVER(-MEDIA)?$/.test(id) || id === "MV-CS-HERO" || id === "MV-CTA-CLOSING-HERO") {

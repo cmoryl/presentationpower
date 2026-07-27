@@ -56,12 +56,15 @@ export function Kicker({
 // The single dominant type element on a slide. Sizes are named, not free-form,
 // so covers stay cinematic and titles stay quiet.
 type DisplaySize = "hero" | "cover" | "divider" | "section" | "title";
-const DISPLAY_SPECS: Record<DisplaySize, { fontSize: number; lineHeight: number; letterSpacing: string; weight: number }> = {
-  hero:    { fontSize: 124, lineHeight: 0.94, letterSpacing: "-0.04em",  weight: 600 },
-  cover:   { fontSize: 100, lineHeight: 0.98, letterSpacing: "-0.03em",  weight: 600 },
-  divider: { fontSize: 88,  lineHeight: 1.02, letterSpacing: "-0.025em", weight: 600 },
-  section: { fontSize: 72,  lineHeight: 1.04, letterSpacing: "-0.02em",  weight: 600 },
-  title:   { fontSize: 56,  lineHeight: 1.08, letterSpacing: "-0.015em", weight: 600 },
+const DISPLAY_SPECS: Record<
+  DisplaySize,
+  { fontSize: number; lineHeight: number; letterSpacing: string; weight: number }
+> = {
+  hero: { fontSize: 124, lineHeight: 0.94, letterSpacing: "-0.04em", weight: 600 },
+  cover: { fontSize: 100, lineHeight: 0.98, letterSpacing: "-0.03em", weight: 600 },
+  divider: { fontSize: 88, lineHeight: 1.02, letterSpacing: "-0.025em", weight: 600 },
+  section: { fontSize: 72, lineHeight: 1.04, letterSpacing: "-0.02em", weight: 600 },
+  title: { fontSize: 56, lineHeight: 1.08, letterSpacing: "-0.015em", weight: 600 },
 };
 
 export function DisplayTitle({
@@ -131,7 +134,13 @@ export function Hairline({
 export function SoftDivider({ className = "" }: { className?: string }) {
   const ink = useSlideInk();
   const color = ink.hairline;
-  return <div className={className} style={{ height: 1, width: "100%", backgroundColor: color }} aria-hidden />;
+  return (
+    <div
+      className={className}
+      style={{ height: 1, width: "100%", backgroundColor: color }}
+      aria-hidden
+    />
+  );
 }
 
 // ── Body / Supporting text ────────────────────────────────────────────────
@@ -160,13 +169,7 @@ export function SupportingText({
 }
 
 // ── Meta row (dates, presenters, "prepared by" line) ──────────────────────
-export function MetaRow({
-  children,
-  className = "",
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
+export function MetaRow({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <div
       className={`flex flex-wrap items-center gap-x-16 gap-y-3 uppercase ${className}`}
@@ -199,19 +202,23 @@ export function TitleBlock({
   const titleColor = ink.text;
   const dekColor = ink.muted;
   return (
-    <div className={(align === "center" ? "flex flex-col items-center text-center" : "") + " mb-10"}>
+    <div
+      className={(align === "center" ? "flex flex-col items-center text-center" : "") + " mb-10"}
+    >
       {kicker && (
         <div className="mb-6">
           <Kicker brand={brand}>{kicker}</Kicker>
         </div>
       )}
-      {!kicker && <Hairline color={brand.tokens.accent} widthPx={88} thicknessPx={2} className="mb-6" />}
+      {!kicker && (
+        <Hairline color={brand.tokens.accent} widthPx={88} thicknessPx={2} className="mb-6" />
+      )}
       <DisplayTitle size={size} color={titleColor}>
         {title}
       </DisplayTitle>
       {dek && (
         <div className="mt-6">
-          <SupportingText size="lg" opacity={1} maxWidthPx={1180} className="" >
+          <SupportingText size="lg" opacity={1} maxWidthPx={1180} className="">
             <span style={{ color: dekColor }}>{dek}</span>
           </SupportingText>
         </div>
@@ -220,18 +227,17 @@ export function TitleBlock({
   );
 }
 
-
 // ── StatFigure ────────────────────────────────────────────────────────────
 // A single stat, sized like a display headline: huge tabular numeral in
 // primary, unit/suffix in accent, small-caps label beneath. Sizes are named
 // so a stat row baseline-aligns and a single-stat slide can go monumental.
 type StatSize = "sm" | "md" | "lg" | "xl" | "monumental";
 const STAT_SPECS: Record<StatSize, { valuePx: number; unitPx: number; labelPx: number }> = {
-  sm:          { valuePx: 84,  unitPx: 32, labelPx: 20 },
-  md:          { valuePx: 116, unitPx: 42, labelPx: 22 },
-  lg:          { valuePx: 156, unitPx: 54, labelPx: 24 },
-  xl:          { valuePx: 200, unitPx: 66, labelPx: 26 },
-  monumental:  { valuePx: 280, unitPx: 84, labelPx: 28 },
+  sm: { valuePx: 84, unitPx: 32, labelPx: 20 },
+  md: { valuePx: 116, unitPx: 42, labelPx: 22 },
+  lg: { valuePx: 156, unitPx: 54, labelPx: 24 },
+  xl: { valuePx: 200, unitPx: 66, labelPx: 26 },
+  monumental: { valuePx: 280, unitPx: 84, labelPx: 28 },
 };
 
 export function StatFigure({
@@ -439,4 +445,3 @@ export function Attribution({
     </div>
   );
 }
-

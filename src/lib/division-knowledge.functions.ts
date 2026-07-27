@@ -137,20 +137,22 @@ export const getDivisionContext = createServerFn({ method: "POST" })
       Promise.resolve({ data: [], error: null } as { data: unknown[]; error: null }),
     ]);
 
-    const logos: DivisionLogoRef[] = ((logosQ.data ?? []) as Array<Record<string, unknown>>).map((r) => ({
-      id: r.id as string,
-      name: (r.client_name as string) ?? "",
-      url: (r.primary_path as string) ?? "",
-      role: (r.industry as string | null) ?? null,
-    }));
+    const logos: DivisionLogoRef[] = ((logosQ.data ?? []) as Array<Record<string, unknown>>).map(
+      (r) => ({
+        id: r.id as string,
+        name: (r.client_name as string) ?? "",
+        url: (r.primary_path as string) ?? "",
+        role: (r.industry as string | null) ?? null,
+      }),
+    );
 
     const result: DivisionContext = {
       divisionId,
       mode: (modeQ.data as DivisionBrandMode | null) ?? null,
-      stats: ((statsQ.data ?? []) as DivisionStat[]),
-      quotes: ((quotesQ.data ?? []) as DivisionQuote[]),
-      knowledge: ((knowledgeQ.data ?? []) as unknown as DivisionKnowledgeEntry[]),
-      imagery: ((imageryQ.data ?? []) as DivisionImageryRef[]),
+      stats: (statsQ.data ?? []) as DivisionStat[],
+      quotes: (quotesQ.data ?? []) as DivisionQuote[],
+      knowledge: (knowledgeQ.data ?? []) as unknown as DivisionKnowledgeEntry[],
+      imagery: (imageryQ.data ?? []) as DivisionImageryRef[],
       logos,
       caseStudies: [],
     };
@@ -168,7 +170,10 @@ export const getDivisionContexts = createServerFn({ method: "POST" })
     const { supabase } = context;
 
     const [modes, stats, quotes] = await Promise.all([
-      supabase.from("brand_modes").select("id, name, description, tokens").in("id", data.divisionIds),
+      supabase
+        .from("brand_modes")
+        .select("id, name, description, tokens")
+        .in("id", data.divisionIds),
       supabase
         .from("division_stats")
         .select("id, division_id, label, value, unit, caption, source, sort_order")

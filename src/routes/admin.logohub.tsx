@@ -42,7 +42,11 @@ function LogoHubAdmin() {
   const updateFn = useServerFn(updateClientLogo);
   const deleteFn = useServerFn(deleteClientLogo);
   const qc = useQueryClient();
-  const q = useQuery({ queryKey: ["admin", "logohub"], queryFn: () => listFn().catch(() => []), retry: false });
+  const q = useQuery({
+    queryKey: ["admin", "logohub"],
+    queryFn: () => listFn().catch(() => []),
+    retry: false,
+  });
 
   const [clientName, setClientName] = useState("");
   const [slug, setSlug] = useState("");
@@ -130,7 +134,10 @@ function LogoHubAdmin() {
           sourceFilename: primaryFilename,
           mimeType: primaryMime,
           fileSize: primarySize,
-          tags: tagsStr.split(",").map((t) => t.trim()).filter(Boolean),
+          tags: tagsStr
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
         },
       });
       setStatus(`Added ${clientName.trim()}.`);
@@ -161,7 +168,8 @@ function LogoHubAdmin() {
           <div>
             <h2 className="text-lg font-semibold">LogoHub</h2>
             <p className="mt-1 text-sm text-black/60">
-              Client logo repository. Upload primary, dark, light and mono variants per client for reuse across decks, case studies and briefs.
+              Client logo repository. Upload primary, dark, light and mono variants per client for
+              reuse across decks, case studies and briefs.
             </p>
           </div>
           <Link
@@ -174,7 +182,9 @@ function LogoHubAdmin() {
       </section>
 
       <section>
-        <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-black/60">Add a client</h3>
+        <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-black/60">
+          Add a client
+        </h3>
         <div className="mt-3 grid gap-3 md:grid-cols-3">
           <label className="text-xs text-black/70">
             <div className="mb-1 font-medium">Client name</div>
@@ -270,7 +280,9 @@ function LogoHubAdmin() {
               <input
                 type="file"
                 accept="image/png,image/jpeg,image/svg+xml,image/webp,image/avif"
-                onChange={(e) => setFiles((prev) => ({ ...prev, [v.key]: e.target.files?.[0] ?? null }))}
+                onChange={(e) =>
+                  setFiles((prev) => ({ ...prev, [v.key]: e.target.files?.[0] ?? null }))
+                }
                 className="w-full text-xs"
               />
               {files[v.key] && (
@@ -306,7 +318,9 @@ function LogoHubAdmin() {
         </div>
 
         {q.isLoading ? (
-          <div className="mt-6"><AdminLoading /></div>
+          <div className="mt-6">
+            <AdminLoading />
+          </div>
         ) : filtered.length === 0 ? (
           <div className="mt-6 rounded-2xl border border-dashed border-black/15 bg-black/[0.02] p-8 text-center text-sm text-black/50">
             {totalRows === 0 ? "No logos yet. Add your first client above." : "No matches."}
@@ -322,7 +336,10 @@ function LogoHubAdmin() {
                   if (t === null) return;
                   editTags.mutate({
                     id: r.id,
-                    tags: t.split(",").map((x) => x.trim()).filter(Boolean),
+                    tags: t
+                      .split(",")
+                      .map((x) => x.trim())
+                      .filter(Boolean),
                   });
                 }}
                 onDelete={() => {
@@ -353,7 +370,9 @@ function AdminLogoCard({
   onEditTags: () => void;
   onDelete: () => void;
 }) {
-  const available = ADMIN_VARIANTS.filter((v) => typeof row[v.urlField] === "string" && row[v.urlField].length > 0);
+  const available = ADMIN_VARIANTS.filter(
+    (v) => typeof row[v.urlField] === "string" && row[v.urlField].length > 0,
+  );
   const initial = available[0]?.key ?? "primary";
   const [active, setActive] = useState<string>(initial);
   const activeUrl = row[ADMIN_VARIANTS.find((v) => v.key === active)?.urlField ?? "primaryUrl"];
@@ -380,7 +399,8 @@ function AdminLogoCard({
           <div className="truncate text-sm font-semibold">{row.client_name}</div>
           <div className="mt-0.5 text-[11px] text-black/50">
             {row.industry ?? "—"}
-            {row.division_id && ` · ${BRAND_MODES.find((b) => b.id === row.division_id)?.name ?? row.division_id}`}
+            {row.division_id &&
+              ` · ${BRAND_MODES.find((b) => b.id === row.division_id)?.name ?? row.division_id}`}
           </div>
         </div>
         <span className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] font-mono uppercase text-black/60">
@@ -441,4 +461,3 @@ function AdminLogoCard({
     </div>
   );
 }
-

@@ -34,8 +34,7 @@ import type { Deck } from "@/lib/deck-store";
 // aurora backdrop rasterization required, no chart series, no image fetch.
 // MV-OP-COVER-MINIMAL is a simple cover module present in the taxonomy.
 const FIXTURE_VARIANT_ID =
-  MODULE_VARIANTS.find((v) => v.id === "MV-OP-COVER-MINIMAL")?.id ??
-  MODULE_VARIANTS[0].id;
+  MODULE_VARIANTS.find((v) => v.id === "MV-OP-COVER-MINIMAL")?.id ?? MODULE_VARIANTS[0].id;
 
 function minimalDeck(brandId: string): Deck {
   return {

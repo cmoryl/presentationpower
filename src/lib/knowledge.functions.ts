@@ -30,7 +30,6 @@ const BM_TO_GUIDE_SLUG: Record<string, string> = {
   "bm-division": "globallink",
 };
 
-
 export type KnowledgeEntry = {
   id: string;
   owner_division_id: string;
@@ -59,9 +58,9 @@ export type EditableKnowledgeKind =
   | "note";
 
 type ListInput = {
-  divisionId?: string;         // filter to entries visible to this division
-  includeShared?: boolean;     // include entries shared with this division from other owners
-  includeGlobal?: boolean;     // include global entries
+  divisionId?: string; // filter to entries visible to this division
+  includeShared?: boolean; // include entries shared with this division from other owners
+  includeGlobal?: boolean; // include global entries
   kind?: KnowledgeKind;
   search?: string;
   tag?: string;
@@ -148,7 +147,8 @@ export const upsertKnowledgeEntry = createServerFn({ method: "POST" })
       tags: (data.tags ?? []).map((t) => t.trim()).filter(Boolean),
       sources: (data.sources ?? []).map((s) => s.trim()).filter(Boolean),
       visibility: data.visibility,
-      shared_with_division_ids: data.visibility === "shared" ? data.shared_with_division_ids ?? [] : [],
+      shared_with_division_ids:
+        data.visibility === "shared" ? (data.shared_with_division_ids ?? []) : [],
       expires_at: data.expires_at ?? null,
     };
 
@@ -187,8 +187,14 @@ export const KNOWLEDGE_KIND_META: Record<KnowledgeKind, { label: string; descrip
   policy: { label: "Policy", description: "Rule or process the division follows" },
   terminology: { label: "Terminology", description: "Preferred term / do-not-use" },
   note: { label: "Note", description: "Working knowledge or lore" },
-  source_deck: { label: "Uploaded deck", description: "PowerPoint uploaded to this division's brand area" },
-  source_pdf: { label: "Source PDF", description: "Ingested brand/reference PDF for this division" },
+  source_deck: {
+    label: "Uploaded deck",
+    description: "PowerPoint uploaded to this division's brand area",
+  },
+  source_pdf: {
+    label: "Source PDF",
+    description: "Ingested brand/reference PDF for this division",
+  },
 };
 
 // ── Virtual entries ──────────────────────────────────────────────────────
@@ -215,7 +221,9 @@ async function loadVirtualEntriesForDivision(
     try {
       const { data: decks } = await supabase
         .from("imported_decks")
-        .select("id, original_filename, file_size, slide_count, status, chunk_count, embedded_at, created_at")
+        .select(
+          "id, original_filename, file_size, slide_count, status, chunk_count, embedded_at, created_at",
+        )
         .eq("division_id", guideSlug)
         .order("created_at", { ascending: false })
         .limit(50);
@@ -233,7 +241,8 @@ async function loadVirtualEntriesForDivision(
         const body = `${d.slide_count} slide${d.slide_count === 1 ? "" : "s"} · ${(d.file_size / 1024).toFixed(0)} KB · ${d.status}${
           (d.chunk_count ?? 0) > 0 ? ` · ${d.chunk_count} RAG chunks` : ""
         }`;
-        if (needle && !title.toLowerCase().includes(needle) && !body.toLowerCase().includes(needle)) continue;
+        if (needle && !title.toLowerCase().includes(needle) && !body.toLowerCase().includes(needle))
+          continue;
         if (filters.tag && filters.tag !== "uploaded-deck") continue;
         results.push({
           id: `deck:${d.id}`,
@@ -260,7 +269,9 @@ async function loadVirtualEntriesForDivision(
     try {
       const { data: pdfs } = await supabase
         .from("pdf_extractions")
-        .select("id, title, source_url, char_count, chunk_count, status, entity_slug, updated_at, created_at")
+        .select(
+          "id, title, source_url, char_count, chunk_count, status, entity_slug, updated_at, created_at",
+        )
         .eq("entity_slug", guideSlug)
         .order("created_at", { ascending: false })
         .limit(50);
@@ -279,7 +290,8 @@ async function loadVirtualEntriesForDivision(
         const body = `${(p.char_count ?? 0).toLocaleString()} chars${
           (p.chunk_count ?? 0) > 0 ? ` · ${p.chunk_count} RAG chunks` : ""
         } · ${p.status}`;
-        if (needle && !title.toLowerCase().includes(needle) && !body.toLowerCase().includes(needle)) continue;
+        if (needle && !title.toLowerCase().includes(needle) && !body.toLowerCase().includes(needle))
+          continue;
         if (filters.tag && filters.tag !== "source-pdf") continue;
         results.push({
           id: `pdf:${p.id}`,
@@ -304,4 +316,3 @@ async function loadVirtualEntriesForDivision(
 
   return results;
 }
-

@@ -30,11 +30,15 @@ export type DeckLogoOrientation = "horizontal" | "stacked";
 export type SlideLogoOrientationInput = LogoOrientation | "auto";
 
 export const LOGO_ORIENTATION_META: Array<{ id: LogoOrientation; name: string; hint: string }> = [
-  { id: "horizontal",     name: "Horizontal",     hint: "Side-by-side mark + wordmark (default)" },
-  { id: "stacked",        name: "Stacked",        hint: "Mark above wordmark — covers, heroes" },
-  { id: "vertical-left",  name: "Vertical · left", hint: "Rotated −90°, pinned to the left edge" },
-  { id: "vertical-right", name: "Vertical · right", hint: "Rotated +90°, pinned to the right edge" },
-  { id: "mark-only",      name: "Mark only",      hint: "Monogram / symbol only, no wordmark" },
+  { id: "horizontal", name: "Horizontal", hint: "Side-by-side mark + wordmark (default)" },
+  { id: "stacked", name: "Stacked", hint: "Mark above wordmark — covers, heroes" },
+  { id: "vertical-left", name: "Vertical · left", hint: "Rotated −90°, pinned to the left edge" },
+  {
+    id: "vertical-right",
+    name: "Vertical · right",
+    hint: "Rotated +90°, pinned to the right edge",
+  },
+  { id: "mark-only", name: "Mark only", hint: "Monogram / symbol only, no wordmark" },
 ];
 
 // Chrome variants align to SlideFrame's `variant` prop.
@@ -45,24 +49,24 @@ export type ChromeVariant = "cover" | "content" | "divider" | "close";
 // dividers use the top-left flush with the section number; closes sign off
 // bottom-right.
 export const DEFAULT_LOGO_POSITION: Record<ChromeVariant, LogoPosition> = {
-  cover:   "top-center",
+  cover: "top-center",
   content: "top-right",
   divider: "top-left",
-  close:   "bottom-right",
+  close: "bottom-right",
 };
 
 // Per-layout-framework overrides. Full-bleed / poster / editorial layouts
 // need dedicated positions so the lockup never collides with hero media or
 // oversized type.
 export const LOGO_POSITION_BY_LAYOUT: Record<string, LogoPosition> = {
-  "LF-05": "bottom-left",   // Full-bleed media — logo tucks bottom-left over the image
-  "LF-25": "top-left",      // Editorial spread — flush with the kicker
-  "LF-27": "bottom-left",   // Portrait feature — logo under the narrative panel
+  "LF-05": "bottom-left", // Full-bleed media — logo tucks bottom-left over the image
+  "LF-25": "top-left", // Editorial spread — flush with the kicker
+  "LF-27": "bottom-left", // Portrait feature — logo under the narrative panel
   "LF-28": "bottom-center", // Poster type — centered signature under the block
   "LF-20": "bottom-center", // Quote focus — centered attribution area
-  "LF-19": "top-center",    // Logo wall — brand centered above the client logos
+  "LF-19": "top-center", // Logo wall — brand centered above the client logos
   "LF-24": "bottom-center", // Closing / CTA — centered sign-off
-  "LF-29": "bottom-right",  // Framed media — quiet corner
+  "LF-29": "bottom-right", // Framed media — quiet corner
 };
 
 export type LogoPlacementSpec = {
@@ -77,10 +81,14 @@ export type LogoPlacementSpec = {
 export function resolveLogoPlacement(
   chrome: ChromeVariant,
   layoutId?: string,
-  override?: LogoPosition
+  override?: LogoPosition,
 ): LogoPlacementSpec {
   if (override) {
-    return { position: override, source: "layout-override", rationale: "Explicit variant override" };
+    return {
+      position: override,
+      source: "layout-override",
+      rationale: "Explicit variant override",
+    };
   }
   if (layoutId && LOGO_POSITION_BY_LAYOUT[layoutId]) {
     return {
@@ -104,24 +112,40 @@ export function resolveLogoPlacement(
 export function logoPositionStyles(position: LogoPosition): CSSProperties {
   const inset = { top: 48, bottom: 96, left: 64, right: 64 };
   switch (position) {
-    case "top-left":      return { position: "absolute", top: inset.top,    left: inset.left };
-    case "top-right":     return { position: "absolute", top: inset.top,    right: inset.right };
-    case "top-center":    return { position: "absolute", top: inset.top,    left: "50%", transform: "translateX(-50%)" };
-    case "bottom-left":   return { position: "absolute", bottom: inset.bottom, left: inset.left };
-    case "bottom-right":  return { position: "absolute", bottom: inset.bottom, right: inset.right };
-    case "bottom-center": return { position: "absolute", bottom: inset.bottom, left: "50%", transform: "translateX(-50%)" };
+    case "top-left":
+      return { position: "absolute", top: inset.top, left: inset.left };
+    case "top-right":
+      return { position: "absolute", top: inset.top, right: inset.right };
+    case "top-center":
+      return { position: "absolute", top: inset.top, left: "50%", transform: "translateX(-50%)" };
+    case "bottom-left":
+      return { position: "absolute", bottom: inset.bottom, left: inset.left };
+    case "bottom-right":
+      return { position: "absolute", bottom: inset.bottom, right: inset.right };
+    case "bottom-center":
+      return {
+        position: "absolute",
+        bottom: inset.bottom,
+        left: "50%",
+        transform: "translateX(-50%)",
+      };
 
-    case "hidden":        return { display: "none" };
+    case "hidden":
+      return { display: "none" };
   }
 }
 
 // Metadata for the Atlas showcase.
 export const LOGO_POSITIONS_META: Array<{ id: LogoPosition; name: string; typicalIn: string }> = [
-  { id: "top-left",      name: "Top left",      typicalIn: "Dividers, editorial spreads" },
-  { id: "top-center",    name: "Top center",    typicalIn: "Covers, logo walls" },
-  { id: "top-right",     name: "Top right",     typicalIn: "Standard content (default)" },
-  { id: "bottom-left",   name: "Bottom left",   typicalIn: "Full-bleed media, portrait feature" },
-  { id: "bottom-center", name: "Bottom center", typicalIn: "Poster type, closing / CTA, quote focus" },
-  { id: "bottom-right",  name: "Bottom right",  typicalIn: "Close / sign-off, framed media" },
-  { id: "hidden",        name: "Hidden",        typicalIn: "Rare — reserved for full-bleed poster moments" },
+  { id: "top-left", name: "Top left", typicalIn: "Dividers, editorial spreads" },
+  { id: "top-center", name: "Top center", typicalIn: "Covers, logo walls" },
+  { id: "top-right", name: "Top right", typicalIn: "Standard content (default)" },
+  { id: "bottom-left", name: "Bottom left", typicalIn: "Full-bleed media, portrait feature" },
+  {
+    id: "bottom-center",
+    name: "Bottom center",
+    typicalIn: "Poster type, closing / CTA, quote focus",
+  },
+  { id: "bottom-right", name: "Bottom right", typicalIn: "Close / sign-off, framed media" },
+  { id: "hidden", name: "Hidden", typicalIn: "Rare — reserved for full-bleed poster moments" },
 ];
