@@ -129,6 +129,13 @@ export function KitWizard({
   const [nextDesign, setNextDesign] = useState(false);
   const [nextTrackId, setNextTrackId] = useState<string>("city-series");
 
+  // Optional background photo applied to every generated asset.
+  const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
+  const [imageScrimPct, setImageScrimPct] = useState(58);
+  const [zoomed, setZoomed] = useState<string | null>(null);
+
+
+
 
   // ─── Save state ────────────────────────────────────────────────────────
   const [savedKitId, setSavedKitId] = useState<string | undefined>(kitId);
