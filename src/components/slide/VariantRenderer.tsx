@@ -831,18 +831,19 @@ function renderVariantBody({
     }
 
     case "MV-PROOF-STATS-4":
-      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} />;
+      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} align={s(c.align) === "center" ? "center" : "left"} />;
 
     case "MV-CTX-STAT-GRID":
-      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} />;
+      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} rows={2} align={s(c.align) === "center" ? "center" : "left"} />;
 
 
     case "MV-PROOF-STATS-2":
-      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} />;
+      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={2} align={s(c.align) === "center" ? "center" : "left"} />;
 
     case "MV-PROOF-STATS-3":
     case "MV-INS-OPPORTUNITY-SIZE":
-      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={3} />;
+      return <AuroraStatGrid brand={brand} pageNumber={pageNumber} title={s(c.title)} items={arr(c.items)} cols={3} align={s(c.align) === "center" ? "center" : "left"} />;
+
 
     case "MV-CTX-TREND":
       return (
