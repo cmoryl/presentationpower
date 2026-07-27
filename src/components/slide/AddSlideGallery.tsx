@@ -151,7 +151,7 @@ function GalleryModal({
                   className="group overflow-hidden rounded-lg border border-black/10 bg-white text-left transition hover:border-[#003FC7] hover:shadow-lg"
                 >
                   <div className="relative aspect-[16/9] overflow-hidden bg-[#03002C]">
-                    <LazyMount minHeight={0}>
+                    <LazyMount placeholder={null} className="absolute inset-0">
                       <SlideThumbnailContext.Provider value={true}>
                         <ScaledSlide>
                           <VariantRenderer slide={previewSlide} variant={mv} brand={brand} pageNumber={1} />
