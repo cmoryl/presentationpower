@@ -21,6 +21,23 @@ const BRAND = {
   red: "#E53D2E",
 };
 
+// Where each build surface lives in the app. Keys mirror
+// getAdminOverview().buildSurfaces; omit a key to render a non-clickable tile.
+const SURFACE_LINKS: Record<string, string | undefined> = {
+  decks: "/atlas",
+  briefs: "/brief/new",
+  printAssets: "/library/print",
+  campaignKits: "/social",
+  surfaces: "/social",
+  savedModules: "/library/my",
+  slideModules: "/library",
+  importedDecks: "/library/imported",
+  divisionImagery: "/imagery",
+  clientLogos: "/logohub",
+  knowledge: "/knowledge",
+  translations: "/admin/translation",
+};
+
 function OverviewView() {
   const fn = useServerFn(getAdminOverview);
   const q = useQuery({ queryKey: ["admin", "overview"], queryFn: () => fn(), retry: false });
