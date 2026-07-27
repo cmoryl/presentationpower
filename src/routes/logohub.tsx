@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { listClientLogos } from "@/lib/client-logos.functions";
+import { useSessionUser } from "@/hooks/use-session-user";
 
 export const Route = createFileRoute("/logohub")({
   component: LogoHubBrowse,
