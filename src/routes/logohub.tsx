@@ -29,7 +29,7 @@ export const Route = createFileRoute("/logohub")({
 
 function LogoHubBrowse() {
   const listFn = useServerFn(listClientLogos);
-  const q = useQuery({ queryKey: ["logohub", "public"], queryFn: () => listFn(), retry: false });
+  const q = useQuery({ queryKey: ["logohub", "public"], queryFn: () => listFn().catch(() => []), retry: false });
   const [search, setSearch] = useState("");
   const [division, setDivision] = useState<string>("all");
 
