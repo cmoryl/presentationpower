@@ -772,27 +772,79 @@ function FilterChip({
   );
 }
 
-/** Renders every page of a division's sponsorship packet as a preview grid. */
+/** Page-by-page viewer for a division's sponsorship packet. */
 function SponsorshipPacketPages({ pages }: { pages: string[] }) {
+  const [index, setIndex] = useState(0);
+  const total = pages.length;
+  const go = (delta: number) => setIndex((i) => (i + delta + total) % total);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        go(1);
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        go(-1);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [total]);
+
   return (
     <div>
-      <p className="text-xs text-muted-foreground">
-        All {pages.length} pages, exported from the Canva master.
-      </p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs text-muted-foreground">
+          Page {index + 1} of {total} — exported from the Canva master. Use ← / → to flip.
+        </p>
+        <div className="flex shrink-0 items-center gap-1">
+          <button
+            type="button"
+            onClick={() => go(-1)}
+            aria-label="Previous page"
+            className="inline-flex size-8 items-center justify-center rounded-full border border-border text-icon transition hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <button
+            type="button"
+            onClick={() => go(1)}
+            aria-label="Next page"
+            className="inline-flex size-8 items-center justify-center rounded-full border border-border text-icon transition hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      </div>
 
-      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="relative mt-3 flex items-center justify-center rounded-lg border border-border bg-muted p-2">
+        <img
+          key={pages[index]}
+          src={pages[index]}
+          alt={`Sponsorship packet page ${index + 1} of ${total}`}
+          className="max-h-[60vh] w-auto max-w-full object-contain"
+        />
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2" role="tablist" aria-label="Packet pages">
         {pages.map((src, i) => (
-          <figure key={src} className="overflow-hidden rounded-lg border border-border bg-muted">
-            <img
-              src={src}
-              alt={`Sponsorship packet page ${i + 1} of ${pages.length}`}
-              className="w-full object-contain"
-              loading="lazy"
-            />
-            <figcaption className="border-t border-border bg-background px-2 py-1 text-[11px] text-muted-foreground">
-              Page {i + 1}
-            </figcaption>
-          </figure>
+          <button
+            key={src}
+            type="button"
+            role="tab"
+            aria-selected={i === index}
+            aria-label={`Go to page ${i + 1}`}
+            onClick={() => setIndex(i)}
+            className={`overflow-hidden rounded-md border transition ${
+              i === index
+                ? "border-primary ring-2 ring-primary/30"
+                : "border-border opacity-70 hover:opacity-100"
+            }`}
+          >
+            <img src={src} alt="" className="h-14 w-auto object-contain" loading="lazy" />
+          </button>
         ))}
       </div>
     </div>
@@ -800,6 +852,7 @@ function SponsorshipPacketPages({ pages }: { pages: string[] }) {
 }
 
 function RegistryCard({
+
   row,
   accent,
   onPreview,
