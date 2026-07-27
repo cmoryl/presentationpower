@@ -477,7 +477,7 @@ function AssetCard({
             type="button"
             onClick={onRegenerate}
             title="Regenerate this asset"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 hover:text-black"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-black/10 bg-white text-icon-muted hover:text-foreground"
           >
             <RefreshCw size={12} />
           </button>
@@ -485,7 +485,7 @@ function AssetCard({
             type="button"
             onClick={onRemove}
             title="Remove from kit"
-            className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-black/10 bg-white text-black/60 hover:text-red-600"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-black/10 bg-white text-icon-muted hover:text-red-600"
           >
             <X size={12} />
           </button>

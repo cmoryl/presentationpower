@@ -157,7 +157,7 @@ export function SectionSelectOverlay({ canvasRef, onDelete, onReplace, scanKey }
           </button>
           <button
             type="button"
-            className="rounded-md p-1 text-black/40 hover:bg-black/5 dark:text-white/40"
+            className="rounded-md p-1 text-icon-subtle hover:bg-black/5"
             onClick={() => setSelectedKey(null)}
             aria-label="Dismiss"
           >

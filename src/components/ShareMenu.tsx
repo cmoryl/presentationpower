@@ -344,7 +344,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
         aria-expanded={open}
         title="Share & export"
         aria-label="Share & export"
-        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.04] hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-icon transition hover:border-black/25 hover:bg-black/[0.04] hover:text-foreground dark:border-white/10 dark:bg-white/[0.04]"
       >
         <Share2 size={14} />
       </button>

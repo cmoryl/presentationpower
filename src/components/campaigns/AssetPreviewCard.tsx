@@ -130,7 +130,7 @@ function AssetPreviewModal({
             type="button"
             onClick={onClose}
             aria-label="Close preview"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-black/60 transition hover:bg-black/5 hover:text-[#03002C] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-icon-muted transition hover:bg-black/5 hover:text-[#03002C] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
           >
             <X size={16} />
           </button>

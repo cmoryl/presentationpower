@@ -68,7 +68,7 @@ export function VersionHistoryButton({ deckId }: { deckId: string }) {
         onClick={() => setOpen(true)}
         title="Version history"
         aria-label="Version history"
-        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-black/70 transition hover:border-black/25 hover:bg-black/[0.04] hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:text-white"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white text-icon transition hover:border-black/25 hover:bg-black/[0.04] hover:text-foreground dark:border-white/10 dark:bg-white/[0.04]"
       >
         <History className="h-[15px] w-[15px]" />
       </button>
@@ -266,7 +266,7 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
             <button
               type="button"
               onClick={onClose}
-              className="rounded-md p-1.5 text-white/60 hover:bg-white/10 hover:text-white"
+              className="rounded-md p-1.5 text-icon-inverse-muted hover:bg-white/10 hover:text-icon-inverse"
               aria-label="Close"
             >
               <X size={16} />

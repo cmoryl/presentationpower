@@ -60,7 +60,7 @@ export function SwapVariantPreviewModal({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-full p-1.5 text-black/60 hover:bg-black/5 hover:text-black dark:text-white/60 dark:hover:bg-white/10 dark:hover:text-white"
+            className="rounded-full p-1.5 text-icon-muted hover:bg-black/5 hover:text-foreground dark:hover:bg-white/10"
             aria-label="Close preview"
           >
             <X size={16} />

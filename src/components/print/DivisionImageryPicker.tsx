@@ -104,7 +104,7 @@ export function DivisionImageryPicker({ open, onClose, divisionId, onPick }: Pro
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full p-1.5 text-white/60 transition hover:bg-white/10 hover:text-white"
+            className="rounded-full p-1.5 text-icon-inverse-muted transition hover:bg-white/10 hover:text-icon-inverse"
             aria-label="Close"
           >
             <X size={16} />

@@ -147,7 +147,7 @@ export function RebrandMenu({ deckId }: { deckId: string }) {
               </div>
               <button
                 onClick={() => setOpen(false)}
-                className="rounded-full p-2 text-white/60 hover:bg-white/10 hover:text-white"
+                className="rounded-full p-2 text-icon-inverse-muted hover:bg-white/10 hover:text-icon-inverse"
                 aria-label="Close"
               >
                 <X size={16} />

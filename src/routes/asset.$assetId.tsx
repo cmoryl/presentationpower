@@ -1715,8 +1715,8 @@ function ModuleCard({
             )}
           </button>
           <div className="flex items-center gap-0.5">
-            <button className="rounded p-1 text-black/50 hover:bg-black/5 dark:text-white/50 dark:hover:bg-white/10" onClick={onMoveUp} aria-label="Move up"><ArrowUp size={12} /></button>
-            <button className="rounded p-1 text-black/50 hover:bg-black/5 dark:text-white/50 dark:hover:bg-white/10" onClick={onMoveDown} aria-label="Move down"><ArrowDown size={12} /></button>
+            <button className="rounded p-1 text-icon-muted hover:bg-black/5 dark:hover:bg-white/10" onClick={onMoveUp} aria-label="Move up"><ArrowUp size={12} /></button>
+            <button className="rounded p-1 text-icon-muted hover:bg-black/5 dark:hover:bg-white/10" onClick={onMoveDown} aria-label="Move down"><ArrowDown size={12} /></button>
             <button className="rounded p-1 text-red-500 hover:bg-red-500/10" onClick={onRemove} aria-label="Delete"><Trash2 size={12} /></button>
           </div>
         </div>
@@ -1807,7 +1807,7 @@ function Panel({
         <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-black/60 dark:text-white/60">
           {title}
         </span>
-        <ChevronDown size={14} className={`shrink-0 text-black/40 transition-transform dark:text-white/40 ${open ? "rotate-180" : ""}`} />
+        <ChevronDown size={14} className={`shrink-0 text-icon-subtle transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && <div className="space-y-2 px-4 pb-4">{children}</div>}
     </div>
@@ -2851,8 +2851,8 @@ function ArrayEditor<T>({
         <div key={idx} className="rounded border border-black/5 bg-black/[0.02] p-1.5 dark:border-white/10 dark:bg-white/5">
           {row(it, idx)}
           <div className="mt-1 flex items-center justify-end gap-1">
-            <button type="button" className="rounded p-0.5 text-black/40 hover:bg-black/5 dark:text-white/50 dark:hover:bg-white/10" onClick={() => move(idx, -1)} aria-label="Move up"><ArrowUp size={12} /></button>
-            <button type="button" className="rounded p-0.5 text-black/40 hover:bg-black/5 dark:text-white/50 dark:hover:bg-white/10" onClick={() => move(idx, 1)} aria-label="Move down"><ArrowDown size={12} /></button>
+            <button type="button" className="rounded p-0.5 text-icon-subtle hover:bg-black/5 dark:hover:bg-white/10" onClick={() => move(idx, -1)} aria-label="Move up"><ArrowUp size={12} /></button>
+            <button type="button" className="rounded p-0.5 text-icon-subtle hover:bg-black/5 dark:hover:bg-white/10" onClick={() => move(idx, 1)} aria-label="Move down"><ArrowDown size={12} /></button>
             <button type="button" className="rounded p-0.5 text-red-500 hover:bg-red-500/10" onClick={() => remove(idx)} aria-label="Remove"><Trash2 size={12} /></button>
           </div>
         </div>

@@ -169,7 +169,7 @@ function FieldGroup({
                     type="button"
                     onClick={() => moveArray(content, fullPath, i, -1, onWritePath)}
                     disabled={i === 0}
-                    className="rounded p-1 text-black/40 hover:bg-black/5 disabled:opacity-30 dark:text-white/40 dark:hover:bg-white/5"
+                    className="rounded p-1 text-icon-subtle hover:bg-black/5 disabled:opacity-30 dark:hover:bg-white/5"
                     aria-label={`Move ${spec.itemLabel ?? "item"} up`}
                   >
                     <ArrowUp size={12} />
@@ -178,7 +178,7 @@ function FieldGroup({
                     type="button"
                     onClick={() => moveArray(content, fullPath, i, 1, onWritePath)}
                     disabled={i === list.length - 1}
-                    className="rounded p-1 text-black/40 hover:bg-black/5 disabled:opacity-30 dark:text-white/40 dark:hover:bg-white/5"
+                    className="rounded p-1 text-icon-subtle hover:bg-black/5 disabled:opacity-30 dark:hover:bg-white/5"
                     aria-label={`Move ${spec.itemLabel ?? "item"} down`}
                   >
                     <ArrowDown size={12} />
@@ -231,7 +231,7 @@ function FieldGroup({
                     type="button"
                     onClick={() => moveArray(content, fullPath, i, -1, onWritePath)}
                     disabled={i === 0}
-                    className="rounded p-1 text-black/40 hover:bg-black/5 disabled:opacity-30 dark:text-white/40 dark:hover:bg-white/5"
+                    className="rounded p-1 text-icon-subtle hover:bg-black/5 disabled:opacity-30 dark:hover:bg-white/5"
                     aria-label={`Move ${spec.itemLabel} up`}
                   >
                     <ArrowUp size={12} />
@@ -240,7 +240,7 @@ function FieldGroup({
                     type="button"
                     onClick={() => moveArray(content, fullPath, i, 1, onWritePath)}
                     disabled={i === list.length - 1}
-                    className="rounded p-1 text-black/40 hover:bg-black/5 disabled:opacity-30 dark:text-white/40 dark:hover:bg-white/5"
+                    className="rounded p-1 text-icon-subtle hover:bg-black/5 disabled:opacity-30 dark:hover:bg-white/5"
                     aria-label={`Move ${spec.itemLabel} down`}
                   >
                     <ArrowDown size={12} />

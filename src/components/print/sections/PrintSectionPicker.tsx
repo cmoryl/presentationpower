@@ -187,7 +187,7 @@ export function PrintSectionPicker({
           <h2 className="text-base font-semibold text-black">Shared module library</h2>
           <div className="mt-0.5 text-[11px] text-black/50">Click to insert, or drag onto the Shared modules list.</div>
         </div>
-        <button onClick={onClose} className="rounded-full p-2 text-black/60 hover:bg-black/5" aria-label="Close">
+        <button onClick={onClose} className="rounded-full p-2 text-icon-muted hover:bg-black/5" aria-label="Close">
           <X size={16} />
         </button>
       </div>

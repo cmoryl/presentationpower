@@ -829,7 +829,7 @@ function Uploader({
                   <button
                     type="button"
                     onClick={() => setQueue((q) => q.filter((x) => x.id !== it.id))}
-                    className="rounded-full p-1 text-black/40 hover:bg-black/5 hover:text-rose-600"
+                    className="rounded-full p-1 text-icon-subtle hover:bg-black/5 hover:text-rose-600"
                     aria-label="Remove from queue"
                   >
                     <Trash2 size={12} />
@@ -1113,7 +1113,7 @@ function TargetingPanel({
                 title={isDefault ? "Auto-picked default" : "Set as default"}
                 className={
                   "inline-flex items-center rounded p-0.5 " +
-                  (isDefault ? "text-amber-500" : "text-black/25 hover:text-amber-400")
+                  (isDefault ? "text-amber-500" : "text-icon-subtle hover:text-amber-400")
                 }
               >
                 <Star size={12} fill={isDefault ? "currentColor" : "none"} />
