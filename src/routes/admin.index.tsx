@@ -281,14 +281,14 @@ function OverviewView() {
         <div className="mt-6 grid gap-6 lg:grid-cols-12">
           {/* Sparkline trend */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5 lg:col-span-7">
-            <div className="flex items-end justify-between">
-              <div>
+            <div className="flex items-end justify-between gap-3">
+              <div className="min-w-0">
                 <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">
                   Creation Trend · 30d
                 </div>
                 <div className="mt-1 font-[Geist] text-xl font-semibold">Decks per day</div>
               </div>
-              <div className="text-[10px] uppercase tracking-widest text-white/50">
+              <div className="shrink-0 text-[10px] whitespace-nowrap uppercase tracking-widest text-white/50">
                 {(q.data.decksPerDay ?? []).reduce((a, d) => a + d.count, 0)} total
               </div>
             </div>
