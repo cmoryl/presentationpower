@@ -74,6 +74,31 @@ function toBase64(file: File): Promise<string> {
 
 export type ImageDropResult = { url: string; path: string | null };
 
+/** Coarse-grained upload progress. Supabase Storage's JS client doesn't
+ *  surface byte-level progress, so we report deterministic phase steps per
+ *  file (prepare → upload → file to library → done), which is enough to
+ *  drive an honest, always-moving progress bar. */
+export type ImageDropProgress = {
+  total: number;
+  completed: number;
+  /** 0-100 across the whole batch, including in-flight phases. */
+  pct: number;
+  fileName: string;
+  phase: "preparing" | "uploading" | "filing" | "done";
+};
+
+const PHASE_LABEL: Record<ImageDropProgress["phase"], string> = {
+  preparing: "Preparing",
+  uploading: "Uploading",
+  filing: "Adding to library",
+  done: "Finishing up",
+};
+
+export function describeProgress(p: ImageDropProgress): string {
+  const scope = p.total > 1 ? ` (${Math.min(p.completed + 1, p.total)}/${p.total})` : "";
+  return `${PHASE_LABEL[p.phase]}${scope} — ${p.fileName}`;
+}
+
 export function useImageDrop({
   divisionId,
   onApply,
@@ -92,78 +117,131 @@ export function useImageDrop({
   const [error, setError] = useState<string | null>(null);
   const [isOver, setIsOver] = useState(false);
   const [addToLibrary, setAddToLibrary] = useState(defaultAddToLibrary);
+  const [progress, setProgress] = useState<ImageDropProgress | null>(null);
   const depth = useRef(0);
 
   const ingest = useCallback(
     async (files: File[]) => {
       if (!enabled) return;
       const images = files.filter((f) => DROP_ACCEPT.includes(f.type));
+      const rejected = files.length - images.length;
       if (images.length === 0) {
-        setError("Drop an image file (JPEG, PNG, WebP, GIF, SVG, AVIF).");
+        const msg = "Drop an image file (JPEG, PNG, WebP, GIF, SVG, AVIF).";
+        setError(msg);
+        toast.error("Unsupported file type", { description: msg });
         return;
+      }
+      if (rejected > 0) {
+        toast.error(
+          rejected === 1 ? "1 file skipped" : `${rejected} files skipped`,
+          { description: "Only JPEG, PNG, WebP, GIF, SVG and AVIF images can be uploaded." },
+        );
       }
       setError(null);
       setBusy(true);
+
+      const total = images.length;
+      const PHASES = 3; // prepare, upload, file/finish
+      const step = (completed: number, phaseIdx: number, fileName: string, phase: ImageDropProgress["phase"]) =>
+        setProgress({
+          total,
+          completed,
+          pct: Math.min(99, Math.round(((completed * PHASES + phaseIdx) / (total * PHASES)) * 100)),
+          fileName,
+          phase,
+        });
+
       let filed = 0;
+      let applied = 0;
+      const failures: string[] = [];
+
       try {
         for (let i = 0; i < images.length; i++) {
           const file = images[i];
           if (file.size > MAX_BYTES) {
-            setError(`"${file.name}" is too large. Max ${Math.round(MAX_BYTES / 1024 / 1024)} MB.`);
+            const msg = `"${file.name}" is too large. Max ${Math.round(MAX_BYTES / 1024 / 1024)} MB.`;
+            setError(msg);
+            failures.push(msg);
             continue;
           }
-          const prepared = RASTERIZE.includes(file.type) ? await rasterizeToPng(file) : file;
-          const uploaded = await uploadSlideMedia(prepared);
-          onApply({ url: uploaded.signedUrl, path: uploaded.path ?? null }, i);
-          void logImageryEvent({
-            data: {
-              imageId: `upload:${uploaded.path ?? uploaded.signedUrl}`,
-              brandId: divisionId ?? null,
-              eventType: "use",
-            },
-          }).catch(() => {});
+          try {
+            step(i, 0, file.name, "preparing");
+            const prepared = RASTERIZE.includes(file.type) ? await rasterizeToPng(file) : file;
 
-          if (addToLibrary && divisionId) {
-            try {
-              await uploadToLibrary({
-                data: {
-                  divisionId,
-                  filename: prepared.name || "dropped-image.png",
-                  contentType: prepared.type || "image/png",
-                  data: await toBase64(prepared),
-                  kind: "upload",
-                  tags: ["dropped", "slide"],
-                  note: "Added by drag-and-drop from the slide editor.",
-                },
-              });
-              filed++;
-            } catch (e) {
-              // Applying the image to the slide already succeeded — filing it
-              // is best-effort (e.g. signed-out or RLS denial).
-              console.warn("Division library filing failed", e);
+            step(i, 1, file.name, "uploading");
+            const uploaded = await uploadSlideMedia(prepared);
+            onApply({ url: uploaded.signedUrl, path: uploaded.path ?? null }, i);
+            applied++;
+            void logImageryEvent({
+              data: {
+                imageId: `upload:${uploaded.path ?? uploaded.signedUrl}`,
+                brandId: divisionId ?? null,
+                eventType: "use",
+              },
+            }).catch(() => {});
+
+            if (addToLibrary && divisionId) {
+              step(i, 2, file.name, "filing");
+              try {
+                await uploadToLibrary({
+                  data: {
+                    divisionId,
+                    filename: prepared.name || "dropped-image.png",
+                    contentType: prepared.type || "image/png",
+                    data: await toBase64(prepared),
+                    kind: "upload",
+                    tags: ["dropped", "slide"],
+                    note: "Added by drag-and-drop from the slide editor.",
+                  },
+                });
+                filed++;
+              } catch (e) {
+                // Applying the image to the slide already succeeded — filing it
+                // is best-effort (e.g. signed-out or RLS denial).
+                console.warn("Division library filing failed", e);
+                toast.error(`Couldn't add "${file.name}" to the division library`, {
+                  description:
+                    e instanceof Error ? e.message : "The image is on the slide, but wasn't saved to the library.",
+                });
+              }
             }
+            step(i + 1, 0, file.name, "done");
+          } catch (e) {
+            const msg = e instanceof Error ? e.message : "Upload failed.";
+            failures.push(`"${file.name}": ${msg}`);
+            setError(msg);
+            toast.error(`Upload failed — ${file.name}`, { description: msg });
           }
         }
+
         if (filed > 0) {
           void qc.invalidateQueries({ queryKey: ["division-imagery", divisionId] });
           void qc.invalidateQueries({ queryKey: ["admin-division-imagery", divisionId] });
+        }
+
+        if (applied > 0) {
+          const suffix = filed > 0 ? " and added to the division library" : "";
           toast.success(
-            filed === 1
-              ? "Image applied and added to the division library"
-              : `${filed} images applied and added to the division library`,
+            applied === 1 ? `Image applied${suffix}` : `${applied} images applied${suffix}`,
             { id: "image-drop", duration: 2200 },
           );
-        } else {
-          toast.success("Image applied to slide", { id: "image-drop", duration: 1800 });
+        } else if (failures.length > 0) {
+          toast.error("No images were uploaded", {
+            description: failures[0],
+          });
         }
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Upload failed.");
+        const msg = e instanceof Error ? e.message : "Upload failed.";
+        setError(msg);
+        toast.error("Upload failed", { description: msg });
       } finally {
         setBusy(false);
+        setProgress(null);
       }
     },
     [addToLibrary, divisionId, enabled, onApply, qc, uploadToLibrary],
   );
+
 
   const dropProps = {
     onDragEnter: (e: React.DragEvent) => {
