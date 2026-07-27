@@ -47,6 +47,7 @@ import {
   PrintSectionRenderer,
 } from "@/components/print/sections/PrintSectionRenderer";
 import { PrintSectionPicker, PRINT_SECTION_DND_MIME } from "@/components/print/sections/PrintSectionPicker";
+import { PrintIconPicker } from "@/components/print/PrintIconPicker";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
@@ -2824,7 +2825,7 @@ function ExpertiseInlineEditor({
         row={(it, idx) => (
           <div className="grid grid-cols-[1fr_90px] gap-1">
             <input className={inspectorInput} placeholder="Label" value={it.label} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, label: e.target.value } : x) })} />
-            <input className={inspectorInput} placeholder="Icon" value={it.icon ?? ""} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, icon: e.target.value } : x) })} />
+            <PrintIconPicker value={it.icon} onChange={(icon) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, icon } : x) })} />
           </div>
         )}
       />
@@ -2853,7 +2854,7 @@ function FeatureListInlineEditor({
           <div className="space-y-1">
             <div className="grid grid-cols-[1fr_90px] gap-1">
               <input className={inspectorInput} placeholder="Verb" value={it.verb} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, verb: e.target.value } : x) })} />
-              <input className={inspectorInput} placeholder="Icon" value={it.icon ?? ""} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, icon: e.target.value } : x) })} />
+              <PrintIconPicker value={it.icon} onChange={(icon) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, icon } : x) })} />
             </div>
             <input className={inspectorInput} placeholder="Body" value={it.body ?? ""} onChange={(e) => onPatch({ items: section.items.map((x, k) => k === idx ? { ...x, body: e.target.value } : x) })} />
           </div>
