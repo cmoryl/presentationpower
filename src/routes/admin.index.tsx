@@ -21,6 +21,23 @@ const BRAND = {
   red: "#E53D2E",
 };
 
+// Where each build surface lives in the app. Keys mirror
+// getAdminOverview().buildSurfaces; omit a key to render a non-clickable tile.
+const SURFACE_LINKS: Record<string, string | undefined> = {
+  decks: "/atlas",
+  briefs: "/brief/new",
+  printAssets: "/library/print",
+  campaignKits: "/social",
+  surfaces: "/social",
+  savedModules: "/library/my",
+  slideModules: "/library",
+  importedDecks: "/library/imported",
+  divisionImagery: "/imagery",
+  clientLogos: "/logohub",
+  knowledge: "/knowledge",
+  translations: "/admin/translation",
+};
+
 function OverviewView() {
   const fn = useServerFn(getAdminOverview);
   const q = useQuery({ queryKey: ["admin", "overview"], queryFn: () => fn(), retry: false });
@@ -81,8 +98,8 @@ function OverviewView() {
             Operations Console
           </h1>
           <p className="mt-2 max-w-xl text-sm text-black/60">
-            Real-time telemetry across AI orchestration, imagery pipelines, knowledgebase, and user
-            activity — last 30 days.
+            Every build surface plus the systems behind them — decks, briefs, print, campaign kits,
+            modules, imagery, logos, knowledge, translation and AI spend, last 30 days.
           </p>
         </div>
         <div className="flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 py-2 text-xs text-black/60 backdrop-blur">
@@ -130,33 +147,106 @@ function OverviewView() {
         ))}
       </section>
 
-      {/* DECK COMMAND CENTER */}
+      {/* BUILD COMMAND CENTER */}
       <section className="rounded-3xl border border-black/10 bg-gradient-to-br from-[#03002C] via-[#0A1350] to-[#003FC7] p-8 text-white">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <div className="text-[10px] uppercase tracking-[0.3em] text-white/50">Deck Studio</div>
+            <div className="text-[10px] uppercase tracking-[0.3em] text-white/50">Build Studio</div>
             <h2 className="mt-1 font-[Geist] text-3xl font-semibold tracking-tight">
-              Deck Command Center
+              Build Command Center
             </h2>
             <p className="mt-1 max-w-xl text-sm text-white/60">
-              End-to-end visibility across every generated deck — status pipeline, brand-mode
-              distribution, narrative archetypes, and the latest activity.
+              Every creation surface in one place — decks, briefs, print, campaign kits, modules,
+              imagery, logos, knowledge and translation.
             </p>
           </div>
-          <div className="flex gap-2">
-            <Link
-              to="/atlas"
-              className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#03002C] transition hover:bg-white/90"
-            >
-              Open Decks →
-            </Link>
+          <div className="flex flex-wrap gap-2">
             <Link
               to="/brief/new"
+              className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#03002C] transition hover:bg-white/90"
+            >
+              + New brief
+            </Link>
+            <Link
+              to="/asset/new"
               className="rounded-full border border-white/30 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
             >
-              + New Brief
+              + Print asset
+            </Link>
+            <Link
+              to="/social/new"
+              className="rounded-full border border-white/30 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+            >
+              + Social kit
+            </Link>
+            <Link
+              to="/events/new"
+              className="rounded-full border border-white/30 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+            >
+              + Event kit
             </Link>
           </div>
+        </div>
+
+        {/* Surface inventory — one tile per build surface */}
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {(q.data.buildSurfaces ?? []).map((s, i) => {
+            const palette = [
+              BRAND.aqua,
+              BRAND.lavender,
+              BRAND.yellow,
+              BRAND.peach,
+              BRAND.pink,
+              BRAND.green,
+            ];
+            const href = SURFACE_LINKS[s.key];
+            const body = (
+              <>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate text-[10px] uppercase tracking-[0.25em] text-white/50">
+                    {s.label}
+                  </span>
+                  <span
+                    className="h-2 w-2 shrink-0 rounded-full"
+                    style={{ background: palette[i % palette.length] }}
+                  />
+                </div>
+                <div className="mt-2 font-[Geist] text-3xl font-semibold tracking-tight">
+                  {s.total.toLocaleString()}
+                </div>
+                <div className="mt-1 text-[11px] text-white/50">+{s.window} in last 30d</div>
+              </>
+            );
+            return href ? (
+              <Link
+                key={s.key}
+                to={href}
+                className="rounded-2xl border border-white/10 bg-white/5 p-4 transition hover:border-white/25 hover:bg-white/10"
+              >
+                {body}
+              </Link>
+            ) : (
+              <div key={s.key} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                {body}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Deck pipeline detail */}
+        <div className="mt-8 mb-4 flex flex-wrap items-end justify-between gap-3 border-t border-white/10 pt-6">
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.3em] text-white/50">Deck pipeline</div>
+            <h3 className="mt-1 font-[Geist] text-xl font-semibold tracking-tight">
+              Deck status, brand modes and archetypes
+            </h3>
+          </div>
+          <Link
+            to="/atlas"
+            className="rounded-full border border-white/30 px-4 py-2 text-xs font-semibold text-white transition hover:bg-white/10"
+          >
+            Open decks →
+          </Link>
         </div>
 
         {/* Deck KPI strip */}
