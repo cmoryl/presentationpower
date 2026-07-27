@@ -98,8 +98,8 @@ function OverviewView() {
             Operations Console
           </h1>
           <p className="mt-2 max-w-xl text-sm text-black/60">
-            Real-time telemetry across AI orchestration, imagery pipelines, knowledgebase, and user
-            activity — last 30 days.
+            Every build surface plus the systems behind them — decks, briefs, print, campaign kits,
+            modules, imagery, logos, knowledge, translation and AI spend, last 30 days.
           </p>
         </div>
         <div className="flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-4 py-2 text-xs text-black/60 backdrop-blur">
