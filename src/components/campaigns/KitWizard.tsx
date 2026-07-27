@@ -20,6 +20,7 @@ import {
 } from "@/lib/campaigns";
 import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
+import { NextRenderer, NEXT_RENDER_TRACKS } from "@/components/campaigns/NextRenderer";
 import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
 
 import { Download } from "lucide-react";
@@ -105,6 +106,13 @@ export function KitWizard({
   const [event, setEvent] = useState<EventFacts>(EMPTY_EVENT);
   const [regenTick, setRegenTick] = useState(0);
   const [removed, setRemoved] = useState<Set<string>>(new Set());
+
+  // ─── NEXT 2026 design mode ─────────────────────────────────────────────
+  // When on, every asset re-renders in the NEXT design language (navy ground,
+  // track accent, official NEXT lockup) instead of the division aurora look.
+  const [nextDesign, setNextDesign] = useState(false);
+  const [nextTrackId, setNextTrackId] = useState<string>("city-series");
+
 
   // ─── Save state ────────────────────────────────────────────────────────
   const [savedKitId, setSavedKitId] = useState<string | undefined>(kitId);
@@ -672,6 +680,46 @@ export function KitWizard({
               </p>
             </div>
 
+            {/* NEXT 2026 design mode — regenerate the kit into the event look. */}
+            <div className="mb-5 rounded-2xl border border-[#001450]/25 bg-[#001450]/[0.04] p-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="inline-flex items-center gap-2 text-sm font-medium text-[#001450]">
+                  <input
+                    type="checkbox"
+                    checked={nextDesign}
+                    onChange={(e) => {
+                      setNextDesign(e.target.checked);
+                      setRegenTick((n) => n + 1);
+                    }}
+                    className="size-4 accent-[#001450]"
+                  />
+                  Regenerate in NEXT 2026 designs
+                </label>
+                <label className="inline-flex items-center gap-2 text-xs text-black/60">
+                  Track
+                  <select
+                    aria-label="NEXT track"
+                    value={nextTrackId}
+                    onChange={(e) => setNextTrackId(e.target.value)}
+                    disabled={!nextDesign}
+                    className="rounded-lg border border-black/15 bg-white px-2 py-1.5 text-xs disabled:opacity-40"
+                  >
+                    {NEXT_RENDER_TRACKS.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <p className="mt-2 text-[11px] text-black/55">
+                Rebuilds every asset on the NEXT navy ground with the track accent and the official
+                NEXT lockup. City Series uses the deeper City Series navy and City Series lockup —
+                the city name stays as set type, never inside the lockup.
+              </p>
+            </div>
+
+
             {source == null ? (
               <EmptyState
                 title="Add a headline to see your kit."
@@ -699,20 +747,35 @@ export function KitWizard({
                       {asset.format.label}
                     </div>
                     <div className="text-[10px] text-black/40">
-                      {asset.format.width}×{asset.format.height} · {asset.mode}
+                      {asset.format.width}×{asset.format.height} ·{" "}
+                      {nextDesign ? "NEXT 2026" : asset.mode}
                     </div>
                     <div data-kit-asset-id={asset.id}>
-                      <SocialRenderer
-                        format={asset.format}
-                        brandId={asset.brandId}
-                        mode={asset.mode}
-                        copy={asset.copy}
-                        facts={{
-                          hashtag: eventFacts.hashtag,
-                          registrationUrl: eventFacts.registrationUrl,
-                        }}
-                        displayShortEdge={260}
-                      />
+                      {nextDesign ? (
+                        <NextRenderer
+                          format={asset.format}
+                          trackId={nextTrackId}
+                          copy={asset.copy}
+                          facts={{
+                            hashtag: eventFacts.hashtag,
+                            registrationUrl: eventFacts.registrationUrl,
+                            city: eventFacts.city,
+                          }}
+                          displayShortEdge={260}
+                        />
+                      ) : (
+                        <SocialRenderer
+                          format={asset.format}
+                          brandId={asset.brandId}
+                          mode={asset.mode}
+                          copy={asset.copy}
+                          facts={{
+                            hashtag: eventFacts.hashtag,
+                            registrationUrl: eventFacts.registrationUrl,
+                          }}
+                          displayShortEdge={260}
+                        />
+                      )}
                     </div>
                   </div>
                 ))}
