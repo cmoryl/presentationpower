@@ -9,7 +9,19 @@ import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, Check, RefreshCw, Save, Sparkles, Wand2 } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  ImagePlus,
+  Maximize2,
+  RefreshCw,
+  Save,
+  Sparkles,
+  Wand2,
+  X,
+} from "lucide-react";
+
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { SOCIAL_FORMATS_BY_ID, KIT_PROFILES, getFormat } from "@/lib/social-formats";
 import {
