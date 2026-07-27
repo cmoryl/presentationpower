@@ -1568,7 +1568,36 @@ export function WorldMap({
       });
   }, [visiblePins, showSpokes]);
 
-  const glow = `url(#tp-pin-glow)`;
+  // Network mesh — connects HQ/hub tier pins to their nearest peers so the
+  // map reads as a connected system, not a scatter of dots.
+  const network = React.useMemo(() => {
+    if (!showNetwork) return [] as { d: string; o: number }[];
+    const nodes = visiblePins.filter((p) => p.role === "HQ" || p.role === "hub").slice(0, 14);
+    if (nodes.length < 2) return [];
+    const seen = new Set<string>();
+    const out: { d: string; o: number }[] = [];
+    for (const a of nodes) {
+      const pa = projectLatLon(a.lat, a.lon);
+      const peers = nodes
+        .filter((b) => b.id !== a.id)
+        .map((b) => ({ b, d: Math.hypot(projectLatLon(b.lat, b.lon).x - pa.x, projectLatLon(b.lat, b.lon).y - pa.y) }))
+        .sort((m, n) => m.d - n.d)
+        .slice(0, 2);
+      for (const { b, d } of peers) {
+        const key = [a.id, b.id].sort().join("|");
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const pb = projectLatLon(b.lat, b.lon);
+        out.push({ d: arcPath(pa, pb, 0.16), o: d > 420 ? 0.18 : 0.34 });
+      }
+    }
+    return out;
+  }, [visiblePins, showNetwork]);
+
+  const dots = React.useMemo(() => (texture === "dots" ? landDots(7.5) : []), [texture]);
+
+  const glow = `url(#tp-pin-glow-${uid})`;
+
 
   // ── Metric scale ────────────────────────────────────────────────────────
   const activeMetricId = metricId ?? metric?.id;
