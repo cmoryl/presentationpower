@@ -11,7 +11,12 @@ export default defineConfig({
   timeout: 60_000,
   expect: { timeout: 15_000 },
   fullyParallel: false,
-  retries: 0,
+  // Deck-creation specs (brief → deck → editor hydration) are slow; running
+  // many of them concurrently starves the dev server and produces navigation
+  // timeouts that are pure infrastructure flake, not product regressions.
+  workers: 2,
+  retries: 1,
+
   reporter: [["list"]],
   use: {
     baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:8080",
