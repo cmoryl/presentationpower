@@ -20,7 +20,6 @@ import {
 import { resolveSlideBackground } from "@/lib/background-library";
 import { variantSupportsImagery } from "@/lib/variant-media";
 
-
 // Preview canvas is 640×360 (16:9). PPTX slide is 13.333"×7.5". Everything we
 // draw uses a single px/inch scale so scrim positions and image sizing are
 // visually identical to what pptxgenjs will emit.

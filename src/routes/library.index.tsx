@@ -1704,7 +1704,9 @@ function VariantDetailModal({
       console.info(
         `[library] downloading module ${variant.id} · division=${brand.id} · mode=${exportMode}`,
       );
-      const { fileName } = await (await loadPptxExport())(singleSlideDeck, brand, {
+      const { fileName } = await (
+        await loadPptxExport()
+      )(singleSlideDeck, brand, {
         forceMode: exportMode,
       });
       toast.success("Module PPTX exported", {
@@ -1884,14 +1886,18 @@ function VariantDetailModal({
       let darkPptx: Awaited<ReturnType<typeof ExportDeckToPptxFn>> | null = null;
       if (zipSelection.pptxLight) {
         updateStage("Building light PPTX…");
-        lightPptx = await (await loadPptxExport())(buildDeck("light"), brand, {
+        lightPptx = await (
+          await loadPptxExport()
+        )(buildDeck("light"), brand, {
           forceMode: "light",
           output: "blob",
         });
       }
       if (zipSelection.pptxDark) {
         updateStage("Building dark PPTX…");
-        darkPptx = await (await loadPptxExport())(buildDeck("dark"), brand, {
+        darkPptx = await (
+          await loadPptxExport()
+        )(buildDeck("dark"), brand, {
           forceMode: "dark",
           output: "blob",
         });
