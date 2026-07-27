@@ -538,18 +538,28 @@
 }
 
 /* -----------------------------------------------------------------------------
- * Print icon theming
+ * Print / export icon theming
  * Browsers drop background/stroke color in print by default and the app shell
  * may be in dark mode when the user hits print. Icons must keep the ink they
- * were designed with, and app chrome must fall back to light tokens so dark
- * shell colors never bleed into a printed page.
+ * were designed with, app chrome must fall back to light tokens so dark shell
+ * colors never bleed into a printed page, and document surfaces that are
+ * intentionally dark (print slides, export pages, embedded previews) must keep
+ * their inverse icon ink instead of being flipped to dark ink.
  * -------------------------------------------------------------------------- */
+
 @media print {
+
+  /* Every inline icon — lucide or not — keeps its designed ink. */
+  svg,
+  svg * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
   svg.lucide,
   svg.lucide * {
     stroke: currentColor;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
   }
 
   /* App shell only — document surfaces set their own bg/ink and are untouched. */
@@ -561,10 +571,51 @@
   }
 
   /* Dark-mode icon ink is near-white and would vanish on the printed page.
-     Re-derive the icon scale from dark ink at the light-mode ratios. */
-  html.dark {
+     Re-derive the icon scale from dark ink at the light-mode ratios. This
+     applies to every dark scope (root shell *and* nested `.dark` subtrees such
+     as drawers, modals and embedded previews), not just <html>. */
+  html.dark,
+  .dark {
     --icon: rgba(3, 0, 44, 0.8);
     --icon-muted: rgba(3, 0, 44, 0.58);
     --icon-subtle: rgba(3, 0, 44, 0.46);
   }
+
+  /* …except inside surfaces that print their own dark paper. There the
+     original inverse-ready scale is correct, so restore it. */
+  .print-slide,
+  .print-page,
+  .doc-page,
+  [data-print-surface] {
+    /* Derive from the surface's own ink (currentColor), so a light slide in a
+       dark shell — and a dark slide in a light shell — both stay legible. */
+    --icon: color-mix(in oklab, currentColor 82%, transparent);
+    --icon-muted: color-mix(in oklab, currentColor 62%, transparent);
+    --icon-subtle: color-mix(in oklab, currentColor 46%, transparent);
+    --icon-inverse: rgba(255, 255, 255, 0.88);
+    --icon-inverse-muted: rgba(255, 255, 255, 0.62);
+    --icon-inverse-subtle: rgba(255, 255, 255, 0.45);
+  }
 }
+
+/* Screenshot / rasterised exports never trigger `@media print`, so mirror the
+   same guarantees on screen while an export surface is mounted. */
+body.export-mode svg,
+body.export-mode svg * {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  color-adjust: exact;
+}
+
+body.export-mode .print-slide,
+body.export-mode .print-page,
+body.export-mode .doc-page,
+body.export-mode [data-print-surface] {
+  --icon: color-mix(in oklab, currentColor 82%, transparent);
+  --icon-muted: color-mix(in oklab, currentColor 62%, transparent);
+  --icon-subtle: color-mix(in oklab, currentColor 46%, transparent);
+  --icon-inverse: rgba(255, 255, 255, 0.88);
+  --icon-inverse-muted: rgba(255, 255, 255, 0.62);
+  --icon-inverse-subtle: rgba(255, 255, 255, 0.45);
+}
+
