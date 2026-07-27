@@ -739,6 +739,71 @@ export function KitWizard({
               </p>
             </div>
 
+            {/* Background imagery — optional photo behind every asset. */}
+            <div className="mb-5 rounded-2xl border border-black/10 bg-white/70 p-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-sm font-medium text-[#03002C]">Background imagery</span>
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-black/70 hover:bg-black/5">
+                  <ImagePlus size={13} /> Upload image
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      e.target.value = "";
+                      if (!file) return;
+                      if (file.size > 8_000_000) {
+                        toast.error("Image is too large — keep it under 8 MB.");
+                        return;
+                      }
+                      const reader = new FileReader();
+                      reader.onload = () => setImageUrl(String(reader.result));
+                      reader.onerror = () => toast.error("That image could not be read.");
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+                </label>
+                <input
+                  type="url"
+                  aria-label="Background image URL"
+                  placeholder="…or paste an image URL"
+                  defaultValue={imageUrl?.startsWith("data:") ? "" : (imageUrl ?? "")}
+                  onBlur={(e) => setImageUrl(e.target.value.trim() || undefined)}
+                  className="min-w-[220px] flex-1 rounded-lg border border-black/15 bg-white px-3 py-1.5 text-xs"
+                />
+                {imageUrl ? (
+                  <button
+                    type="button"
+                    onClick={() => setImageUrl(undefined)}
+                    className="rounded-full border border-black/15 px-3 py-1.5 text-xs font-medium text-black/60 hover:bg-black/5"
+                  >
+                    Remove
+                  </button>
+                ) : null}
+              </div>
+              {imageUrl ? (
+                <label className="mt-3 flex max-w-sm items-center gap-3 text-[11px] text-black/60">
+                  Scrim
+                  <input
+                    type="range"
+                    min={20}
+                    max={90}
+                    value={imageScrimPct}
+                    onChange={(e) => setImageScrimPct(Number(e.target.value))}
+                    className="flex-1"
+                    aria-label="Image scrim strength"
+                  />
+                  <span className="w-8 tabular-nums">{imageScrimPct}%</span>
+                </label>
+              ) : (
+                <p className="mt-2 text-[11px] text-black/55">
+                  Drops a full-bleed photo behind every asset with a brand scrim so the copy stays
+                  legible. Uploaded files are embedded, so they export with the PNGs.
+                </p>
+              )}
+            </div>
+
 
             {source == null ? (
               <EmptyState
