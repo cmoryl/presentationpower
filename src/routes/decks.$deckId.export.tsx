@@ -8,7 +8,7 @@ import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { SlideMediaRefreshProvider } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
-import { exportDeckToPptx } from "@/lib/pptx-export";
+
 import { runQa, blockingIssues, warningIssues } from "@/lib/qa";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
@@ -96,6 +96,7 @@ function ExportView() {
   async function runPptxExport() {
     setExporting(true);
     try {
+      const { exportDeckToPptx } = await import("@/lib/pptx-export");
       const { blob, failedSlides } = await exportDeckToPptx(deck, brand, { output: "blob" });
       if (!blob) throw new Error("Export produced no blob");
       if (failedSlides.length) {
@@ -168,6 +169,7 @@ function ExportView() {
     try {
       let held = lastBlobRef.current;
       if (!held) {
+        const { exportDeckToPptx } = await import("@/lib/pptx-export");
         const { blob } = await exportDeckToPptx(deck, brand, { output: "blob" });
         if (!blob) throw new Error("Export produced no blob");
         held = { blob, fileName: `${deck.title.replace(/[^a-z0-9-_]+/gi, "-")}.pptx` };

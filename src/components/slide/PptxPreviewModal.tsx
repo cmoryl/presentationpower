@@ -19,7 +19,6 @@ import {
 } from "@/lib/pptx-background";
 import { resolveSlideBackground } from "@/lib/background-library";
 import { variantSupportsImagery } from "@/lib/variant-media";
-import { exportDeckToPptx } from "@/lib/pptx-export";
 
 // Preview canvas is 640×360 (16:9). PPTX slide is 13.333"×7.5". Everything we
 // draw uses a single px/inch scale so scrim positions and image sizing are
@@ -98,6 +97,7 @@ export function PptxPreviewModal({
         title: `${deck.title} — Preview slide ${slide.position + 1}`,
         slides: [{ ...slide, position: 0 }],
       };
+      const { exportDeckToPptx } = await import("@/lib/pptx-export");
       await exportDeckToPptx(singleDeck, brand);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Export failed");

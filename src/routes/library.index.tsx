@@ -48,7 +48,9 @@ import { VIDEO_SLIDE_EXAMPLES, type VideoSlideExample } from "@/lib/video-slide-
 import { listClientLogos } from "@/lib/client-logos.functions";
 import { toLogoFillers, overlayLogoHubFillers, type LogoFiller } from "@/lib/logohub-fillers";
 import { SaveModuleDialog } from "@/components/SaveModuleDialog";
-import { exportDeckToPptx } from "@/lib/pptx-export";
+import type { exportDeckToPptx as ExportDeckToPptxFn } from "@/lib/pptx-export";
+// Loaded on demand — pptxgenjs is large and only needed when a user exports.
+const loadPptxExport = async () => (await import("@/lib/pptx-export")).exportDeckToPptx;
 
 // ─── Pinned variants (per-user, local) ──────────────────────────────────────
 const PINS_KEY = "library.pinnedVariants.v1";
@@ -1698,11 +1700,13 @@ function VariantDetailModal({
             changes: [],
           },
         ],
-      } as Parameters<typeof exportDeckToPptx>[0];
+      } as Parameters<typeof ExportDeckToPptxFn>[0];
       console.info(
         `[library] downloading module ${variant.id} · division=${brand.id} · mode=${exportMode}`,
       );
-      const { fileName } = await exportDeckToPptx(singleSlideDeck, brand, {
+      const { fileName } = await (
+        await loadPptxExport()
+      )(singleSlideDeck, brand, {
         forceMode: exportMode,
       });
       toast.success("Module PPTX exported", {
@@ -1876,20 +1880,24 @@ function VariantDetailModal({
               changes: [],
             },
           ],
-        }) as Parameters<typeof exportDeckToPptx>[0];
+        }) as Parameters<typeof ExportDeckToPptxFn>[0];
 
-      let lightPptx: Awaited<ReturnType<typeof exportDeckToPptx>> | null = null;
-      let darkPptx: Awaited<ReturnType<typeof exportDeckToPptx>> | null = null;
+      let lightPptx: Awaited<ReturnType<typeof ExportDeckToPptxFn>> | null = null;
+      let darkPptx: Awaited<ReturnType<typeof ExportDeckToPptxFn>> | null = null;
       if (zipSelection.pptxLight) {
         updateStage("Building light PPTX…");
-        lightPptx = await exportDeckToPptx(buildDeck("light"), brand, {
+        lightPptx = await (
+          await loadPptxExport()
+        )(buildDeck("light"), brand, {
           forceMode: "light",
           output: "blob",
         });
       }
       if (zipSelection.pptxDark) {
         updateStage("Building dark PPTX…");
-        darkPptx = await exportDeckToPptx(buildDeck("dark"), brand, {
+        darkPptx = await (
+          await loadPptxExport()
+        )(buildDeck("dark"), brand, {
           forceMode: "dark",
           output: "blob",
         });
