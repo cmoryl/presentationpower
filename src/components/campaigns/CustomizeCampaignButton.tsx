@@ -120,7 +120,7 @@ export function CustomizeCampaignButton(props: Props) {
         body={
           <div className="space-y-5">
             <div className="grid gap-2 sm:grid-cols-3">
-              <Prefill label="Brand" value={brand?.name ?? p.subBrand} />
+              <Prefill label="Brand" value={brandLabel} />
               <Prefill label="Kit profile" value={profile?.label ?? "Custom"} />
               <Prefill
                 label="Formats"
