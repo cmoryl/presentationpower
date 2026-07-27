@@ -621,6 +621,14 @@ const NEXT_PATHWAYS: {
   cta: string;
 }[] = [
   {
+    id: "sponsorship",
+    title: "Sponsorship & deck",
+    who: "Sales / partnerships",
+    detail: "Digital sponsorship packet, sponsors grid and the 16:9 PowerPoint template.",
+    group: "sponsorship-deck",
+    cta: "Open packet & deck",
+  },
+  {
     id: "social",
     title: "Campaign & social",
     who: "Marketing / demand gen",
