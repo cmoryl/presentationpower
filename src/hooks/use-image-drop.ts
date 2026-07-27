@@ -10,6 +10,7 @@
 // Used by the deck editor stage (drop straight onto the slide) and by
 // SlideImageryPanel's dropzone.
 
+import type * as React from "react";
 import { useCallback, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
