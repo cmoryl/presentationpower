@@ -854,37 +854,54 @@ export function KitWizard({
                       {asset.format.width}×{asset.format.height} ·{" "}
                       {nextDesign ? "NEXT 2026" : asset.mode}
                     </div>
-                    <div data-kit-asset-id={asset.id} className="min-w-0">
-                      <AssetPreviewFrame width={asset.format.width} height={asset.format.height}>
-                        {(displayShortEdge) =>
-                          nextDesign ? (
-                            <NextRenderer
-                              format={asset.format}
-                              trackId={nextTrackId}
-                              copy={asset.copy}
-                              facts={{
-                                hashtag: eventFacts.hashtag,
-                                registrationUrl: eventFacts.registrationUrl,
-                                city: eventFacts.city,
-                              }}
-                              displayShortEdge={displayShortEdge}
-                            />
-                          ) : (
-                            <SocialRenderer
-                              format={asset.format}
-                              brandId={asset.brandId}
-                              mode={asset.mode}
-                              copy={asset.copy}
-                              facts={{
-                                hashtag: eventFacts.hashtag,
-                                registrationUrl: eventFacts.registrationUrl,
-                              }}
-                              displayShortEdge={displayShortEdge}
-                            />
-                          )
-                        }
-                      </AssetPreviewFrame>
+                    <div className="relative min-w-0">
+                      <div data-kit-asset-id={asset.id} className="min-w-0">
+                        <AssetPreviewFrame width={asset.format.width} height={asset.format.height}>
+                          {(displayShortEdge) =>
+                            nextDesign ? (
+                              <NextRenderer
+                                format={asset.format}
+                                trackId={nextTrackId}
+                                copy={asset.copy}
+                                facts={{
+                                  hashtag: eventFacts.hashtag,
+                                  registrationUrl: eventFacts.registrationUrl,
+                                  city: eventFacts.city,
+                                }}
+                                imageUrl={imageUrl}
+                                imageScrimPct={imageScrimPct}
+                                displayShortEdge={displayShortEdge}
+                              />
+                            ) : (
+                              <SocialRenderer
+                                format={asset.format}
+                                brandId={asset.brandId}
+                                mode={asset.mode}
+                                copy={asset.copy}
+                                facts={{
+                                  hashtag: eventFacts.hashtag,
+                                  registrationUrl: eventFacts.registrationUrl,
+                                }}
+                                imageUrl={imageUrl}
+                                imageScrimPct={imageScrimPct}
+                                displayShortEdge={displayShortEdge}
+                              />
+                            )
+                          }
+                        </AssetPreviewFrame>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setZoomed(asset.id)}
+                        aria-label={`View ${asset.format.label} at full size`}
+                        className="group absolute inset-0 flex items-start justify-end rounded-xl p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+                      >
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#03002C]/85 px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-white opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
+                          <Maximize2 size={11} /> View full
+                        </span>
+                      </button>
                     </div>
+
                   </div>
                 ))}
               </div>
