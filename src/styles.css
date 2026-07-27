@@ -548,9 +548,6 @@
  * -------------------------------------------------------------------------- */
 
 /* Surfaces that render their own ink and paper: print/export pages, slide
-   stages, and embedded preview frames rendered by the app. */
-@custom-variant print-surface (&:where(.print-slide, .print-page, .doc-page, [data-print-surface], .print-slide *, .print-page *, .doc-page *, [data-print-surface] *));
-
 @media print {
   /* Every inline icon — lucide or not — keeps its designed ink. */
   svg,
