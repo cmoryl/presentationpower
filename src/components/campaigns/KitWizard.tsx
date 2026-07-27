@@ -943,9 +943,132 @@ export function KitWizard({
           </button>
         )}
       </div>
+
+      {zoomed
+        ? (() => {
+            const asset = assets.find((a) => a.id === zoomed);
+            if (!asset) return null;
+            return (
+              <KitAssetZoom
+                onClose={() => setZoomed(null)}
+                label={asset.format.label}
+                meta={`${asset.format.width}×${asset.format.height} · ${nextDesign ? "NEXT 2026" : asset.mode}`}
+                width={asset.format.width}
+                height={asset.format.height}
+              >
+                {(shortEdge) =>
+                  nextDesign ? (
+                    <NextRenderer
+                      format={asset.format}
+                      trackId={nextTrackId}
+                      copy={asset.copy}
+                      facts={{
+                        hashtag: eventFacts.hashtag,
+                        registrationUrl: eventFacts.registrationUrl,
+                        city: eventFacts.city,
+                      }}
+                      imageUrl={imageUrl}
+                      imageScrimPct={imageScrimPct}
+                      displayShortEdge={shortEdge}
+                    />
+                  ) : (
+                    <SocialRenderer
+                      format={asset.format}
+                      brandId={asset.brandId}
+                      mode={asset.mode}
+                      copy={asset.copy}
+                      facts={{
+                        hashtag: eventFacts.hashtag,
+                        registrationUrl: eventFacts.registrationUrl,
+                      }}
+                      imageUrl={imageUrl}
+                      imageScrimPct={imageScrimPct}
+                      displayShortEdge={shortEdge}
+                    />
+                  )
+                }
+              </KitAssetZoom>
+            );
+          })()
+        : null}
     </div>
   );
 }
+
+/** Full-size lightbox for a generated kit asset. */
+function KitAssetZoom({
+  onClose,
+  label,
+  meta,
+  width,
+  height,
+  children,
+}: {
+  onClose: () => void;
+  label: string;
+  meta: string;
+  width: number;
+  height: number;
+  children: (shortEdge: number) => React.ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  useModalA11y({ open: true, onClose, containerRef: ref });
+
+  const [shortEdge, setShortEdge] = useState(720);
+  useEffect(() => {
+    function recompute() {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight - 120;
+      const short = Math.min(width, height);
+      const long = Math.max(width, height);
+      const longLimit = Math.max(vw, vh) - 160;
+      const next = Math.max(
+        240,
+        Math.min(Math.min(vw, vh) * 0.78, (longLimit * short) / long, 1080),
+      );
+      setShortEdge(Math.floor(next));
+    }
+    recompute();
+    window.addEventListener("resize", recompute);
+    return () => window.removeEventListener("resize", recompute);
+  }, [width, height]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[80] flex items-center justify-center bg-[#03002C]/80 p-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        ref={ref}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${label} full size preview`}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+        className="relative flex max-h-full max-w-full flex-col gap-3 rounded-2xl bg-white p-4 shadow-2xl outline-none"
+      >
+        <div className="flex items-center justify-between gap-6">
+          <div>
+            <div className="text-sm font-semibold text-[#03002C]">{label}</div>
+            <div className="text-[11px] text-black/55">{meta}</div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close preview"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-icon-muted transition hover:bg-black/5 hover:text-[#03002C] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+          >
+            <X size={16} />
+          </button>
+        </div>
+        <div className="flex items-center justify-center overflow-auto rounded-xl bg-[#F2F2F2] p-4">
+          {children(shortEdge)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 function StepCard({
   eyebrow,
