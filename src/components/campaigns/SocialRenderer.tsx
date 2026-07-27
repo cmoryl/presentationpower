@@ -113,6 +113,10 @@ export type SocialRendererProps = {
   mode: "light" | "dark";
   copy: CampaignCopy;
   facts?: Pick<EventFacts, "hashtag" | "registrationUrl">;
+  /** Optional full-bleed background photo (URL or data URL). */
+  imageUrl?: string;
+  /** 0–100 — how strongly the brand scrim darkens the photo. */
+  imageScrimPct?: number;
   /** Display size in CSS pixels — the frame renders at format.width×.height
    *  and this prop just scales the wrapper. Defaults to 320px on the short
    *  edge for grid previews. */
@@ -125,8 +129,11 @@ export function SocialRenderer({
   mode,
   copy,
   facts,
+  imageUrl,
+  imageScrimPct = 55,
   displayShortEdge = 320,
 }: SocialRendererProps) {
+
   const brand = findBrand(brandId);
   const preset = presetFor(format);
   const short = Math.min(format.width, format.height);
