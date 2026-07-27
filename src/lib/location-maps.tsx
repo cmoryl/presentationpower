@@ -1664,7 +1664,7 @@ export function WorldMap({
       style={{ display: "block", width: "100%", height: "100%", ...style }}
     >
       <defs>
-        <radialGradient id="tp-pin-glow" cx="50%" cy="50%" r="50%">
+        <radialGradient id={`tp-pin-glow-${uid}`} cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor={accent} stopOpacity={0.55} />
           <stop offset="60%" stopColor={accent} stopOpacity={0.14} />
           <stop offset="100%" stopColor={accent} stopOpacity={0} />
@@ -1673,14 +1673,49 @@ export function WorldMap({
           <stop offset="0%" stopColor={accent} stopOpacity={0.25} />
           <stop offset="100%" stopColor={accent} stopOpacity={1} />
         </linearGradient>
-        <linearGradient id="tp-map-wash" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={accent} stopOpacity={isDark ? 0.08 : 0.05} />
+        <linearGradient id={`tp-map-wash-${uid}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={accent} stopOpacity={isDark ? 0.1 : 0.06} />
           <stop offset="100%" stopColor={primary ?? accent} stopOpacity={isDark ? 0.02 : 0.02} />
         </linearGradient>
+        {/* Equatorial band — gives the dot field a horizon and depth. */}
+        <radialGradient id={`tp-map-horizon-${uid}`} cx="50%" cy="52%" r="62%">
+          <stop offset="0%" stopColor={accent} stopOpacity={isDark ? 0.16 : 0.1} />
+          <stop offset="70%" stopColor={accent} stopOpacity={0} />
+        </radialGradient>
+        {/* Dot field gradient — dots warm toward the brand accent near hubs. */}
+        <linearGradient id={`tp-dot-grade-${uid}`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor={dotFill} />
+          <stop offset="55%" stopColor={dotFill} />
+          <stop offset="100%" stopColor={accent} stopOpacity={0.55} />
+        </linearGradient>
+        <style>{`
+          @keyframes tpPinPulse {
+            0%   { r: 4px;  opacity: 0.55; }
+            70%  { r: 20px; opacity: 0; }
+            100% { r: 20px; opacity: 0; }
+          }
+          .tp-pulse-${uid} { animation: tpPinPulse 3.2s ease-out infinite; transform-box: fill-box; }
+          @media (prefers-reduced-motion: reduce) {
+            .tp-pulse-${uid} { animation: none; opacity: 0.18; }
+          }
+        `}</style>
       </defs>
 
-      {/* Subtle brand wash behind the map */}
-      <rect x={0} y={0} width={WORLD_VIEWBOX.w} height={WORLD_VIEWBOX.h} fill="url(#tp-map-wash)" />
+      {/* Brand wash + horizon glow behind the map */}
+      <rect
+        x={0}
+        y={0}
+        width={WORLD_VIEWBOX.w}
+        height={WORLD_VIEWBOX.h}
+        fill={`url(#tp-map-wash-${uid})`}
+      />
+      <rect
+        x={0}
+        y={0}
+        width={WORLD_VIEWBOX.w}
+        height={WORLD_VIEWBOX.h}
+        fill={`url(#tp-map-horizon-${uid})`}
+      />
 
       {/* Graticule */}
       <g stroke={graticule} strokeWidth={0.6} fill="none">
@@ -1690,18 +1725,60 @@ export function WorldMap({
         })}
         {parallels.map((lat) => {
           const { y } = projectLatLon(lat, 0);
-          return <line key={`p${lat}`} x1={0} x2={WORLD_VIEWBOX.w} y1={y} y2={y} />;
+          return (
+            <line
+              key={`p${lat}`}
+              x1={0}
+              x2={WORLD_VIEWBOX.w}
+              y1={y}
+              y2={y}
+              strokeDasharray={lat === 0 ? undefined : "3 5"}
+              opacity={lat === 0 ? 1.6 : 1}
+            />
+          );
         })}
       </g>
 
-      {/* Continents */}
-      <path
-        d={CONTINENT_PATHS}
-        fill={land}
-        stroke={landStroke}
-        strokeWidth={0.75}
-        strokeLinejoin="round"
-      />
+      {/* Landmass */}
+      {texture === "dots" ? (
+        <>
+          {/* Faint silhouette under the dot field keeps continents legible
+              at small sizes without flattening the halftone. */}
+          <path
+            d={CONTINENT_PATHS}
+            fill={isDark ? "rgba(255,255,255,0.022)" : "rgba(3,0,44,0.022)"}
+            stroke="none"
+          />
+          <g fill={`url(#tp-dot-grade-${uid})`} shapeRendering="geometricPrecision">
+            {dots.map((d, i) => (
+              <circle
+                key={`d${i}`}
+                cx={d.x}
+                cy={d.y}
+                r={1.05 + d.w * 1.15}
+                opacity={0.35 + d.w * 0.65}
+              />
+            ))}
+          </g>
+        </>
+      ) : (
+        <path
+          d={CONTINENT_PATHS}
+          fill={land}
+          stroke={landStroke}
+          strokeWidth={0.75}
+          strokeLinejoin="round"
+        />
+      )}
+
+      {/* Network mesh between hub-tier locations */}
+      {network.length > 0 && (
+        <g fill="none" stroke={accent} strokeWidth={0.8} strokeLinecap="round">
+          {network.map((n, i) => (
+            <path key={`n${i}`} d={n.d} opacity={n.o} />
+          ))}
+        </g>
+      )}
 
       {/* Spoke arcs (optional) */}
       {spokes.length > 0 && (
@@ -1711,6 +1788,29 @@ export function WorldMap({
           ))}
         </g>
       )}
+
+      {/* Pulse rings on the hub tier */}
+      {animate && (
+        <g fill="none" stroke={accent} strokeWidth={0.9}>
+          {visiblePins
+            .filter((p) => p.role === "HQ" || p.role === "hub")
+            .slice(0, 10)
+            .map((p, i) => {
+              const { x, y } = projectLatLon(p.lat, p.lon);
+              return (
+                <circle
+                  key={`pulse-${p.id}`}
+                  className={`tp-pulse-${uid}`}
+                  cx={x}
+                  cy={y}
+                  r={4}
+                  style={{ animationDelay: `${(i % 5) * 0.55}s` }}
+                />
+              );
+            })}
+        </g>
+      )}
+
 
       {/* Pin glows — scale radius by metric when active */}
       <g>
