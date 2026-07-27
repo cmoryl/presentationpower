@@ -254,7 +254,7 @@ function Library() {
   const listLogosFn = useServerFn(listClientLogos);
   const logoHubQuery = useQuery({
     queryKey: ["logohub", "fillers"],
-    queryFn: () => listLogosFn(),
+    queryFn: () => listLogosFn().catch(() => []),
     retry: false,
     staleTime: 5 * 60 * 1000,
   });

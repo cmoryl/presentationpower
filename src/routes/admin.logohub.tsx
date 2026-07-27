@@ -42,7 +42,7 @@ function LogoHubAdmin() {
   const updateFn = useServerFn(updateClientLogo);
   const deleteFn = useServerFn(deleteClientLogo);
   const qc = useQueryClient();
-  const q = useQuery({ queryKey: ["admin", "logohub"], queryFn: () => listFn(), retry: false });
+  const q = useQuery({ queryKey: ["admin", "logohub"], queryFn: () => listFn().catch(() => []), retry: false });
 
   const [clientName, setClientName] = useState("");
   const [slug, setSlug] = useState("");

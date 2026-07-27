@@ -1388,7 +1388,7 @@ function ClientLogoPanel({
   const [q, setQ] = useState("");
   const query = useQuery({
     queryKey: ["logohub", "picker"],
-    queryFn: () => listFn(),
+    queryFn: () => listFn().catch(() => []),
     enabled: open,
     retry: false,
     staleTime: 60_000,
@@ -1542,7 +1542,7 @@ function LogoGridItemsPanel({
   const [q, setQ] = useState("");
   const query = useQuery({
     queryKey: ["logohub", "grid-picker"],
-    queryFn: () => listFn(),
+    queryFn: () => listFn().catch(() => []),
     enabled: pickIdx !== null,
     retry: false,
     staleTime: 60_000,
