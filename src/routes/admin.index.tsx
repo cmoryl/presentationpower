@@ -385,14 +385,17 @@ function OverviewView() {
 
           {/* Recent decks list */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5 lg:col-span-4">
-            <div className="flex items-end justify-between">
-              <div>
+            <div className="flex items-end justify-between gap-3">
+              <div className="min-w-0">
                 <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">
                   Recent Activity
                 </div>
                 <div className="mt-1 font-[Geist] text-lg font-semibold">Latest decks</div>
               </div>
-              <Link to="/atlas" className="text-[11px] text-white/60 hover:text-white">
+              <Link
+                to="/atlas"
+                className="shrink-0 text-[11px] whitespace-nowrap text-white/60 hover:text-white"
+              >
                 All →
               </Link>
             </div>
