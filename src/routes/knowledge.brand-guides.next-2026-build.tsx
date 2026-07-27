@@ -77,7 +77,9 @@ function BlockView({ block }: { block: Block }) {
       </ul>
     );
   }
+  if (block.t !== "table") return null;
   const [head, ...body] = block.rows;
+
   return (
     <div className="overflow-x-auto rounded-xl border border-black/10 dark:border-white/10">
       <table className="w-full min-w-[420px] border-collapse text-left text-sm">
